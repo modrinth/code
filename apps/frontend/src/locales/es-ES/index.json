@@ -1301,39 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Elige entre Vanilla, Fabric, Forge, Quilt y NeoForge. Si está en Modrinth, pueden ejecutarse en tu servidor."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "No se pudo cambiar la versión del modpack"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "No se pudieron cargar las versiones"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "No se pudo reinstalar el modpack"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "No se pudo reparar el servidor"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "No se pudo guardar la configuración de instalación"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "No se pudo desvincular el modpack"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {Cargador} other {{loader}}} versión"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "La instalación de su servidor ha sido reparada."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Reparación completada"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Reiniciar servidor"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Elimina todos los datos de su servidor, incluidos sus mundos, mods y archivos de configuración. Las copias de seguridad permanecerán y podrán restaurarse."
-  },
   "hosting.plan.out-of-stock": {
     "message": "Agotado"
   },
@@ -2810,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
-  "servers.busy.backup-creating": {
-    "message": "Creación de copia de seguridad en curso"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Restauración de copia de seguridad en curso"
-  },
-  "servers.busy.installing": {
-    "message": "El servidor se está instalando"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Sincronización de contenido en progreso"
-  },
   "servers.notice.actions": {
     "message": "Acciones"
   },
@@ -3188,6 +3143,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Cargos anteriores"
+  },
   "settings.billing.expires": {
     "message": "Caduca el {date}"
   },
@@ -3310,9 +3268,6 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Error al volver a suscribirse"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Si el servidor está actualmente suspendido, pueden pasar hasta 10 minutos antes de que se realice otro intento de cobro."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Solicitud de renovación enviada"

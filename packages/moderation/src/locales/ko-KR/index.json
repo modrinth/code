@@ -45,7 +45,7 @@
     "defaultMessage": "설명 수정하기"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "라이선스 수정하기"
+    "defaultMessage": "라이선스 수정"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "요약 수정하기"
@@ -66,7 +66,7 @@
     "defaultMessage": "갤러리 페이지 보기"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "이 {type, select, mod {모드는} plugin {플러그인은} other {프로젝트는}} 소스 코드 공개를 요구하는 라이선스를 사용하고 있습니다. 추가되는 각 버전에 대해 소스 코드 링크 또는 소스 파일을 제공해 주세요. 또는 다른 라이선스를 사용해 보세요."
+    "defaultMessage": "이 {type, select, mod {모드는} plugin {플러그인은} other {프로젝트는}} 소스 코드를 공개해야 하는 라이선스를 사용하고 있습니다. 각 추가 버전에 해당하는 소스 코드 링크 또는 소스 파일을 제공해 주거나, 다른 라이선스를 고려해 보세요."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "소스 코드 제공"

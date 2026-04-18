@@ -1,8 +1,21 @@
 <template>
 	<div
 		ref="editorContainer"
-		class="flex flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
+		class="relative flex flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
 	>
+		<EditorFindReplace
+			ref="findReplaceRef"
+			v-model:is-find-open="isFindOpen"
+			v-model:find-query="inFileFindQuery"
+			:is-editing-image="isEditingImage"
+			:find-match-count="findMatchCount"
+			:current-find-match="currentFindMatch"
+			@find-next="findNext"
+			@find-previous="findPrevious"
+			@close="closeFind"
+			@replace="replaceOne"
+			@replace-all="replaceAllOccurrences"
+		/>
 		<component
 			:is="props.editorComponent"
 			v-if="!isEditingImage && !isLoading && props.editorComponent"
@@ -27,21 +40,18 @@
 
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
+import type { Ace } from 'ace-builds'
 import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectModrinthClient } from '#ui/providers'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
 
 import { injectFileManager } from '../../providers/file-manager'
 import type { EditingFile } from '../../types'
+import EditorFindReplace from './EditorFindReplace.vue'
 import FileImageViewer from './FileImageViewer.vue'
-
-interface MclogsResponse {
-	success: boolean
-	url?: string
-	error?: string
-}
 
 const props = defineProps<{
 	file: EditingFile | null
@@ -55,6 +65,7 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
+const client = injectModrinthClient()
 
 const messages = defineMessages({
 	failedToOpenTitle: {
@@ -104,9 +115,17 @@ const originalContent = ref('')
 const isEditingImage = ref(false)
 const imagePreview = ref<Blob | null>(null)
 const isLoading = ref(false)
-const editorInstance = ref<unknown>(null)
+const editorInstance = ref<Ace.Editor | null>(null)
 const editorContainer = ref<HTMLElement | null>(null)
 const editorHeight = ref('300px')
+
+const isFindOpen = ref(false)
+const inFileFindQuery = ref('')
+const findMatchCount = ref(0)
+const currentFindMatch = ref(0)
+const findReplaceRef = ref<{ focusFindInput: () => void; openReplace: () => void } | null>(null)
+
+watch(inFileFindQuery, handleFindInput)
 
 function updateEditorHeight() {
 	if (editorContainer.value) {
@@ -130,6 +149,7 @@ watch(
 	() => props.file,
 	async (newFile) => {
 		if (newFile) {
+			closeFind()
 			await loadFileContent(newFile)
 			nextTick(updateEditorHeight)
 		} else {
@@ -184,21 +204,28 @@ function resetState() {
 	imagePreview.value = null
 }
 
-function onEditorInit(editor: {
-	commands: {
-		addCommand: (cmd: {
-			name: string
-			bindKey: { win: string; mac: string }
-			exec: () => void
-		}) => void
-	}
-}) {
+function onEditorInit(editor: Ace.Editor) {
 	editorInstance.value = editor
 
 	editor.commands.addCommand({
 		name: 'save',
 		bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
 		exec: () => saveFileContent(false),
+	})
+
+	editor.commands.addCommand({
+		name: 'find',
+		bindKey: { win: 'Ctrl-F', mac: 'Command-F' },
+		exec: () => toggleFind(),
+	})
+
+	editor.commands.addCommand({
+		name: 'replace',
+		bindKey: { win: 'Ctrl-H', mac: 'Command-Option-F' },
+		exec: () => {
+			isFindOpen.value = true
+			nextTick(() => findReplaceRef.value?.openReplace())
+		},
 	})
 }
 
@@ -237,13 +264,7 @@ async function shareToMclogs() {
 	}
 
 	try {
-		const response = await fetch('https://api.mclo.gs/1/log', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: new URLSearchParams({ content: fileContent.value }),
-		})
-
-		const data = (await response.json()) as MclogsResponse
+		const data = await client.mclogs.logs_v1.create(fileContent.value)
 
 		if (data.success && data.url) {
 			await navigator.clipboard.writeText(data.url)
@@ -253,7 +274,7 @@ async function shareToMclogs() {
 				type: 'success',
 			})
 		} else {
-			throw new Error(data.error)
+			throw new Error('mclo.gs upload failed')
 		}
 	} catch (error) {
 		console.error('Error sharing file:', error)
@@ -263,6 +284,93 @@ async function shareToMclogs() {
 			type: 'error',
 		})
 	}
+}
+
+function countOccurrences(content: string, query: string): number {
+	if (!query) return 0
+	const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	return (content.match(new RegExp(escaped, 'gi')) ?? []).length
+}
+
+function toggleFind() {
+	if (isFindOpen.value) {
+		closeFind()
+	} else {
+		isFindOpen.value = true
+		nextTick(() => findReplaceRef.value?.focusFindInput())
+	}
+}
+
+function closeFind() {
+	isFindOpen.value = false
+	inFileFindQuery.value = ''
+	findMatchCount.value = 0
+	currentFindMatch.value = 0
+	editorInstance.value?.find('', { wrap: true })
+	editorInstance.value?.focus()
+}
+
+function replaceOne(query: string) {
+	const editor = editorInstance.value
+	if (!editor || findMatchCount.value === 0) return
+	editor.replace(query)
+	nextTick(() => {
+		const count = countOccurrences(fileContent.value, inFileFindQuery.value)
+		findMatchCount.value = count
+		currentFindMatch.value = count > 0 ? Math.min(currentFindMatch.value, count) : 0
+	})
+}
+
+function replaceAllOccurrences(query: string) {
+	const editor = editorInstance.value
+	if (!editor || findMatchCount.value === 0) return
+	editor.replaceAll(query)
+	nextTick(() => {
+		const count = countOccurrences(fileContent.value, inFileFindQuery.value)
+		findMatchCount.value = count
+		currentFindMatch.value = count > 0 ? 1 : 0
+		if (count > 0) {
+			editor.find(inFileFindQuery.value, { wrap: true, caseSensitive: false })
+		}
+	})
+}
+
+function handleFindInput() {
+	const editor = editorInstance.value
+	if (!editor) return
+
+	const query = inFileFindQuery.value
+	if (!query) {
+		findMatchCount.value = 0
+		currentFindMatch.value = 0
+		editor.find('', { wrap: true })
+		return
+	}
+
+	const count = countOccurrences(fileContent.value, query)
+	findMatchCount.value = count
+
+	if (count > 0) {
+		editor.find(query, { wrap: true, caseSensitive: false })
+		currentFindMatch.value = 1
+	} else {
+		currentFindMatch.value = 0
+	}
+}
+
+function findNext() {
+	const editor = editorInstance.value
+	if (!editor || findMatchCount.value === 0) return
+	editor.findNext()
+	currentFindMatch.value = (currentFindMatch.value % findMatchCount.value) + 1
+}
+
+function findPrevious() {
+	const editor = editorInstance.value
+	if (!editor || findMatchCount.value === 0) return
+	editor.findPrevious()
+	currentFindMatch.value =
+		((currentFindMatch.value - 2 + findMatchCount.value) % findMatchCount.value) + 1
 }
 
 function close() {
@@ -281,8 +389,10 @@ defineExpose({
 	shareToMclogs,
 	close,
 	isEditingImage,
+	isFindOpen,
 	fileContent,
 	hasUnsavedChanges,
 	revertChanges,
+	toggleFind,
 })
 </script>

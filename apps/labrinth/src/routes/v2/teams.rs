@@ -12,11 +12,10 @@ use ariadne::ids::UserId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(teams_get);
-
     cfg.service(
-        web::scope("team")
+        utoipa_actix_web::scope("/team")
             .service(team_members_get)
             .service(edit_team_member)
             .service(transfer_ownership)
@@ -31,7 +30,20 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 // also the members of the organization's team if the project is associated with an organization
 // (Unlike team_members_get_project, which only returns the members of the project's team)
 // They can be differentiated by the "organization_permissions" field being null or not
-#[get("{id}/members")]
+/// Get a project's team members.
+#[utoipa::path(
+    get,
+    operation_id = "getProjectTeamMembers",
+    params(("id" = String, Path, description = "The ID or slug of the project")),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
+#[get("/{id}/members")]
 pub async fn team_members_get_project(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -62,7 +74,15 @@ pub async fn team_members_get_project(
 }
 
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
-#[get("{id}/members")]
+/// Get a team's members.
+#[utoipa::path(
+    get,
+    operation_id = "getTeamMembers",
+    params(("id" = TeamId, Path, description = "The ID of the team")),
+    responses((status = 200, description = "Expected response to a valid request")),
+    security(("bearer_auth" = ["PROJECT_READ"]))
+)]
+#[get("/{id}/members")]
 pub async fn team_members_get(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
@@ -87,12 +107,19 @@ pub async fn team_members_get(
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct TeamIds {
     pub ids: String,
 }
 
-#[get("teams")]
+/// Get the members of multiple teams.
+#[utoipa::path(
+    get,
+    operation_id = "getTeams",
+    params(("ids" = String, Query, description = "The JSON array of team IDs")),
+    responses((status = 200, description = "Expected response to a valid request"))
+)]
+#[get("/teams")]
 pub async fn teams_get(
     req: HttpRequest,
     web::Query(ids): web::Query<TeamIds>,
@@ -127,7 +154,25 @@ pub async fn teams_get(
     }
 }
 
-#[post("{id}/join")]
+/// Join a team with a pending invite.
+#[utoipa::path(
+    post,
+    operation_id = "joinTeam",
+    params(("id" = TeamId, Path, description = "The ID of the team")),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_WRITE"]))
+)]
+#[post("/{id}/join")]
 pub async fn join_team(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
@@ -149,7 +194,7 @@ fn default_ordering() -> i64 {
     0
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct NewTeamMember {
     pub user_id: UserId,
     #[serde(default = "default_role")]
@@ -165,7 +210,26 @@ pub struct NewTeamMember {
     pub ordering: i64,
 }
 
-#[post("{id}/members")]
+/// Add a member to a team.
+#[utoipa::path(
+    post,
+    operation_id = "addTeamMember",
+    params(("id" = TeamId, Path, description = "The ID of the team")),
+    request_body = NewTeamMember,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_WRITE"]))
+)]
+#[post("/{id}/members")]
 pub async fn add_team_member(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
@@ -194,7 +258,7 @@ pub async fn add_team_member(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct EditTeamMember {
     pub permissions: Option<ProjectPermissions>,
     pub organization_permissions: Option<OrganizationPermissions>,
@@ -203,7 +267,33 @@ pub struct EditTeamMember {
     pub ordering: Option<i64>,
 }
 
-#[patch("{id}/members/{user_id}")]
+/// Modify a team member.
+#[utoipa::path(
+    patch,
+    operation_id = "modifyTeamMember",
+    params(
+        ("id" = TeamId, Path, description = "The ID of the team"),
+        (
+            "user_id" = UserId,
+            Path,
+            description = "The ID of the user to modify"
+        )
+    ),
+    request_body = EditTeamMember,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_WRITE"]))
+)]
+#[patch("/{id}/members/{user_id}")]
 pub async fn edit_team_member(
     req: HttpRequest,
     info: web::Path<(TeamId, UserId)>,
@@ -231,12 +321,31 @@ pub async fn edit_team_member(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct TransferOwnership {
     pub user_id: UserId,
 }
 
-#[patch("{id}/owner")]
+/// Transfer team ownership.
+#[utoipa::path(
+    patch,
+    operation_id = "transferTeamOwnership",
+    params(("id" = TeamId, Path, description = "The ID of the team")),
+    request_body = TransferOwnership,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_WRITE"]))
+)]
+#[patch("/{id}/owner")]
 pub async fn transfer_ownership(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
@@ -260,7 +369,32 @@ pub async fn transfer_ownership(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[delete("{id}/members/{user_id}")]
+/// Remove a member from a team.
+#[utoipa::path(
+    delete,
+    operation_id = "deleteTeamMember",
+    params(
+        ("id" = TeamId, Path, description = "The ID of the team"),
+        (
+            "user_id" = UserId,
+            Path,
+            description = "The ID of the user to remove"
+        )
+    ),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_WRITE"]))
+)]
+#[delete("/{id}/members/{user_id}")]
 pub async fn remove_team_member(
     req: HttpRequest,
     info: web::Path<(TeamId, UserId)>,

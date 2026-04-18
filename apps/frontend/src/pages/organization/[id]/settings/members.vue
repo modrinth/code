@@ -266,12 +266,12 @@ const openTeamMembers = ref([])
 const transferTargetMember = ref(null)
 const transferModal = ref(null)
 
-const allTeamMembers = ref(organization.value.members)
+const allTeamMembers = ref(organization.value.members.map((m) => ({ ...m })))
 
 watch(
 	() => organization.value,
 	() => {
-		allTeamMembers.value = organization.value.members
+		allTeamMembers.value = organization.value.members.map((m) => ({ ...m }))
 	},
 )
 

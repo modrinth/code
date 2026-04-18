@@ -11,6 +11,7 @@ import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -30,6 +31,8 @@ import type {
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
 } from '../../../shared/content-tab/types'
+
+type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
 
 const { formatMessage } = useVIntl()
 
@@ -95,6 +98,7 @@ const leaveMessages = defineMessages({
 const client = injectModrinthClient()
 const { server, worldId, busyReasons, isSyncingContent } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
+const { openServerSettings, browseServerContent } = injectServerSettingsModal()
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
@@ -397,9 +401,34 @@ if (typeof window !== 'undefined') {
 
 const updatingProject = ref<ContentItem | null>(null)
 const updatingModpack = ref(false)
-const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
-const loadingVersions = ref(false)
 const loadingChangelog = ref(false)
+
+const updatingProjectId = computed(() => updatingProject.value?.project?.id ?? null)
+
+const projectVersionsQuery = useQuery({
+	queryKey: computed(() => ['labrinth', 'versions', 'v2', updatingProjectId.value]),
+	queryFn: () =>
+		client.labrinth.versions_v2.getProjectVersions(updatingProjectId.value!, {
+			include_changelog: false,
+		}),
+	enabled: computed(() => !!updatingProjectId.value && !updatingModpack.value),
+})
+
+const updatingProjectVersions = computed(() => {
+	const source = updatingModpack.value
+		? modpackVersionsQuery.data.value
+		: projectVersionsQuery.data.value
+	if (!source) return []
+	return [...source].sort(
+		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+	)
+})
+
+const loadingVersions = computed(() =>
+	updatingModpack.value
+		? modpackVersionsQuery.isLoading.value
+		: projectVersionsQuery.isLoading.value,
+)
 
 const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
 const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
@@ -409,6 +438,16 @@ const currentGameVersion = computed(() => contentQuery.data.value?.game_version 
 const currentLoader = computed(() => contentQuery.data.value?.modloader ?? '')
 
 function handleBrowseContent() {
+	const contentType = type.value
+	if (browseServerContent && ['mod', 'plugin', 'datapack'].includes(contentType)) {
+		browseServerContent({
+			serverId,
+			worldId: worldId.value,
+			type: contentType as 'mod' | 'plugin' | 'datapack',
+		})
+		return
+	}
+
 	router.push({
 		path: `/discover/${type.value}s`,
 		query: { sid: serverId, wid: worldId.value },
@@ -472,7 +511,7 @@ function handleUploadFiles() {
 	input.click()
 }
 
-function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
+function addonToContentItem(addon: AddonWithUiState): ContentItem {
 	return {
 		project: {
 			id: addon.project_id ?? addon.filename,
@@ -503,6 +542,7 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 		environment: addon.version?.environment ?? undefined,
 		pack_client_retained: addon.pack_client_retained,
 		pack_client_depends: addon.pack_client_depends,
+		installing: addon.installing,
 	}
 }
 
@@ -620,31 +660,11 @@ async function handleUpdateItem(id: string) {
 
 	updatingModpack.value = false
 	updatingProject.value = item
-	updatingProjectVersions.value = []
-	loadingVersions.value = true
 	loadingChangelog.value = false
 
 	await nextTick()
 
 	contentUpdaterModal.value?.show(item.update_version_id ?? undefined)
-
-	try {
-		const versions = await client.labrinth.versions_v2.getProjectVersions(item.project.id, {
-			include_changelog: false,
-		})
-		versions.sort(
-			(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-		)
-		updatingProjectVersions.value = versions
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToLoadVersions),
-			text: err instanceof Error ? err.message : undefined,
-		})
-	} finally {
-		loadingVersions.value = false
-	}
 }
 
 async function handleSwitchVersion(item: ContentItem) {
@@ -652,31 +672,11 @@ async function handleSwitchVersion(item: ContentItem) {
 
 	updatingModpack.value = false
 	updatingProject.value = item
-	updatingProjectVersions.value = []
-	loadingVersions.value = true
 	loadingChangelog.value = false
 
 	await nextTick()
 
 	contentUpdaterModal.value?.show(item.version.id, { switchMode: true })
-
-	try {
-		const versions = await client.labrinth.versions_v2.getProjectVersions(item.project.id, {
-			include_changelog: false,
-		})
-		versions.sort(
-			(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-		)
-		updatingProjectVersions.value = versions
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToLoadVersions),
-			text: err instanceof Error ? err.message : undefined,
-		})
-	} finally {
-		loadingVersions.value = false
-	}
 }
 
 async function handleModpackUpdate() {
@@ -687,41 +687,19 @@ async function handleModpackUpdate() {
 	updatingProject.value = null
 	loadingChangelog.value = false
 
-	const cached = modpackVersionsQuery.data.value
-	if (cached) {
-		const sorted = [...cached].sort(
-			(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-		)
-		updatingProjectVersions.value = sorted
-		loadingVersions.value = false
-	} else {
-		updatingProjectVersions.value = []
-		loadingVersions.value = true
-	}
-
 	await nextTick()
 
 	contentUpdaterModal.value?.show(mp.has_update ?? undefined)
+}
 
-	if (!cached) {
-		try {
-			const versions = await client.labrinth.versions_v2.getProjectVersions(mp.spec.project_id, {
-				include_changelog: false,
-			})
-			versions.sort(
-				(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-			)
-			updatingProjectVersions.value = versions
-		} catch (err) {
-			addNotification({
-				type: 'error',
-				title: formatMessage(messages.failedToLoadVersions),
-				text: err instanceof Error ? err.message : undefined,
-			})
-		} finally {
-			loadingVersions.value = false
-		}
-	}
+function spliceVersionInCache(fullVersion: Labrinth.Versions.v2.Version) {
+	const projectId = updatingModpack.value ? modpackProjectId.value : updatingProjectId.value
+	if (!projectId) return
+	const key = ['labrinth', 'versions', 'v2', projectId]
+	queryClient.setQueryData(key, (old: Labrinth.Versions.v2.Version[] | undefined) => {
+		if (!old) return old
+		return old.map((v) => (v.id === fullVersion.id ? fullVersion : v))
+	})
 }
 
 async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
@@ -729,12 +707,7 @@ async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	loadingChangelog.value = true
 	try {
 		const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
-		const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
-		if (index !== -1) {
-			const newVersions = [...updatingProjectVersions.value]
-			newVersions[index] = fullVersion
-			updatingProjectVersions.value = newVersions
-		}
+		spliceVersionInCache(fullVersion)
 	} catch {
 		// Silently fail on changelog fetch
 	} finally {
@@ -746,12 +719,7 @@ async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
 	if (version.changelog) return
 	try {
 		const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
-		const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
-		if (index !== -1) {
-			const newVersions = [...updatingProjectVersions.value]
-			newVersions[index] = fullVersion
-			updatingProjectVersions.value = newVersions
-		}
+		spliceVersionInCache(fullVersion)
 	} catch {
 		// Silently fail on hover prefetch
 	}
@@ -760,8 +728,6 @@ async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
 function resetUpdateState() {
 	updatingModpack.value = false
 	updatingProject.value = null
-	updatingProjectVersions.value = []
-	loadingVersions.value = false
 	loadingChangelog.value = false
 }
 
@@ -786,7 +752,23 @@ function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?
 	performUpdate(selectedVersion)
 }
 
+function setAddonInstalling(filename: string, installing: boolean) {
+	queryClient.setQueryData(queryKey.value, (oldData: Archon.Content.v1.Addons | undefined) => {
+		if (!oldData) return oldData
+		return {
+			...oldData,
+			addons: (oldData.addons ?? []).map((a) =>
+				a.filename === filename ? { ...a, installing } : a,
+			),
+		}
+	})
+}
+
 async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
+	const item = updatingProject.value
+	if (item) {
+		setAddonInstalling(item.file_name, true)
+	}
 	try {
 		if (updatingModpack.value) {
 			const mp = contentQuery.data.value?.modpack
@@ -800,8 +782,8 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 				},
 				soft_override: true,
 			})
-		} else if (updatingProject.value) {
-			const addon = addonLookup.value.get(updatingProject.value.file_name)
+		} else if (item) {
+			const addon = addonLookup.value.get(item.file_name)
 			if (addon) {
 				await client.archon.content_v1.updateAddon(serverId, worldId.value!, {
 					filename: addon.filename,
@@ -811,6 +793,9 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 		}
 		await contentQuery.refetch()
 	} catch (err) {
+		if (item) {
+			setAddonInstalling(item.file_name, false)
+		}
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.failedToUpdate),
@@ -894,7 +879,7 @@ provideContentManager({
 	updateModpack: handleModpackUpdate,
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
-	openSettings: () => router.push(`/hosting/manage/${serverId}/options/loader`),
+	openSettings: () => openServerSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
 	mapToTableItem: (item) => {

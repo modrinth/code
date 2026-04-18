@@ -439,6 +439,24 @@
 				}"
 			>
 				<div class="normal-page__header relative my-4">
+					<div class="mb-6">
+						<ModerationProjectNags
+							v-if="
+								projectV3 &&
+								((currentMember && project.status === 'draft') ||
+									tags.rejectedStatuses.includes(project.status))
+							"
+							:project="project"
+							:project-v3="projectV3"
+							:versions="versions ?? undefined"
+							:current-member="currentMember"
+							:collapsed="collapsedChecklist"
+							:route-name="route.name"
+							:tags="tags"
+							@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+							@set-processing="setProcessing"
+						/>
+					</div>
 					<ProjectHeader
 						v-if="projectV3Loaded"
 						:project="project"
@@ -647,7 +665,7 @@
 									<nuxt-link
 										v-else
 										v-tooltip="formatMessage(commonMessages.followButton)"
-										to="/auth/sign-in"
+										:to="signInRouteObj"
 										:aria-label="formatMessage(commonMessages.followButton)"
 									>
 										<HeartIcon aria-hidden="true" />
@@ -655,7 +673,7 @@
 									<template #fallback>
 										<nuxt-link
 											v-tooltip="formatMessage(commonMessages.followButton)"
-											to="/auth/sign-in"
+											:to="signInRouteObj"
 											:aria-label="formatMessage(commonMessages.followButton)"
 										>
 											<HeartIcon aria-hidden="true" />
@@ -715,7 +733,7 @@
 										</button>
 									</template>
 								</PopoutMenu>
-								<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+								<nuxt-link v-else v-tooltip="'Save'" :to="signInRouteObj" aria-label="Save">
 									<BookmarkIcon aria-hidden="true" />
 								</nuxt-link>
 							</ButtonStyled>
@@ -768,7 +786,11 @@
 										{
 											id: 'report',
 											action: () =>
-												auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
+												auth.user
+													? reportProject(project.id)
+													: navigateTo(
+															getSignInRouteObj(route, getReportPath('project', project.id)),
+														),
 											color: 'red',
 											hoverOnly: true,
 											shown: !isMember,
@@ -1116,13 +1138,15 @@ import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
+import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
+import { getSignInRouteObj } from '~/composables/auth.js'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { useModerationStore } from '~/store/moderation.ts'
-import { reportProject } from '~/utils/report-helpers.ts'
+import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
 	key: (route) => `${route.params.id}`,
@@ -1130,6 +1154,7 @@ definePageMeta({
 
 const data = useNuxtApp()
 const route = useRoute()
+const signInRouteObj = computed(() => getSignInRouteObj(route))
 const config = useRuntimeConfig()
 const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()

@@ -38,6 +38,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showProjectPageQuickServerButton: false,
 	newProjectGeneralSettings: false,
 	newProjectEnvironmentSettings: true,
+	serverRamAsBytesAlwaysOn: false,
 	archonSentryCapture: false,
 	hideRussiaCensorshipBanner: false,
 	disablePrettyProjectUrlRedirects: false,

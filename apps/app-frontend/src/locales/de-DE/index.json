@@ -6,13 +6,13 @@
     "message": "Authentifizierungsserver sind nicht erreichbar"
   },
   "app.browse.add-server-to-instance": {
-    "message": "Server zu Instanz hinzufügen"
+    "message": "Server zur Instanz hinzufügen"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Server zu deiner Instanz hinzufügen"
   },
   "app.browse.add-to-instance": {
-    "message": "Zu Instanz hinzufügen"
+    "message": "Zur Instanz hinzufügen"
   },
   "app.browse.add-to-instance-name": {
     "message": "Zu {instanceName} hinzufügen"

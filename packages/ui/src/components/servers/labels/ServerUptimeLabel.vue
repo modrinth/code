@@ -5,11 +5,10 @@
 		class="server-action-buttons-anim flex min-w-0 flex-row items-center gap-2"
 		data-pyro-uptime
 	>
-		<div v-if="!noSeparator" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+		<Separator v-if="!noSeparator" />
 
-		<div class="flex gap-2">
-			<TimerIcon class="flex size-5 shrink-0" />
-			<time class="truncate text-sm font-semibold" :aria-label="verboseUptime">
+		<div class="flex gap-1.5">
+			<time class="truncate text-sm font-medium" :aria-label="verboseUptime">
 				{{ formattedUptime }}
 			</time>
 		</div>
@@ -17,8 +16,9 @@
 </template>
 
 <script setup lang="ts">
-import { TimerIcon } from '@modrinth/assets'
 import { computed } from 'vue'
+
+import Separator from './Separator.vue'
 
 const props = defineProps<{
 	uptimeSeconds: number

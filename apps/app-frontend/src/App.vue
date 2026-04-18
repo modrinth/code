@@ -1,5 +1,12 @@
 <script setup>
-import { AuthFeature, PanelVersionFeature, TauriModrinthClient } from '@modrinth/api-client'
+import {
+	AuthFeature,
+	NodeAuthFeature,
+	nodeAuthState,
+	PanelVersionFeature,
+	TauriModrinthClient,
+	VerboseLoggingFeature,
+} from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
@@ -11,15 +18,12 @@ import {
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
-	MaximizeIcon,
-	MinimizeIcon,
 	NewspaperIcon,
 	NotepadTextIcon,
 	PlusIcon,
 	RefreshCwIcon,
-	RestoreIcon,
 	RightArrowIcon,
-	ServerIcon,
+	ServerStackIcon,
 	SettingsIcon,
 	UserIcon,
 	WorldIcon,
@@ -28,7 +32,6 @@ import {
 import {
 	Admonition,
 	Avatar,
-	Button,
 	ButtonStyled,
 	commonMessages,
 	ContentInstallModal,
@@ -53,6 +56,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
@@ -79,7 +83,9 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
+import { config } from '@/config'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
@@ -127,17 +133,34 @@ const { addPopupNotification } = popupNotificationManager
 
 const tauriApiClient = new TauriModrinthClient({
 	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
+	labrinthBaseUrl: config.labrinthBaseUrl,
+	archonBaseUrl: config.archonBaseUrl,
 	features: [
+		new NodeAuthFeature({
+			getAuth: () => nodeAuthState.getAuth?.() ?? null,
+			refreshAuth: async () => {
+				if (nodeAuthState.refreshAuth) {
+					await nodeAuthState.refreshAuth()
+				}
+			},
+		}),
 		new AuthFeature({
-			token: async () => (await getCreds()).session,
+			token: async () => (await getCreds())?.session,
 		}),
 		new PanelVersionFeature(),
+		new VerboseLoggingFeature(),
 	],
 })
 provideModrinthClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
+	featureFlags: {
+		serverRamAsBytesAlwaysOn: computed(() =>
+			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
+		),
+	},
+	openExternalUrl: (url) => openUrl(url),
 })
 provideModalBehavior({
 	noblur: computed(() => !themeStore.advancedRendering),
@@ -395,17 +418,37 @@ const handleClose = async () => {
 }
 
 const router = useRouter()
+const route = useRoute()
+
+const loading = useLoading()
+loading.setEnabled(false)
+loading.startLoading()
+
+let suspensePending = false
+
+const sidebarOverlayScrollbarsOptions = Object.freeze({
+	overflow: {
+		x: 'hidden',
+		y: 'scroll',
+	},
+})
+
+router.beforeEach(() => {
+	suspensePending = false
+	loading.startLoading()
+})
 router.afterEach((to, from, failure) => {
 	trackEvent('PageView', {
 		path: to.path,
 		fromPath: from.path,
 		failed: failure,
 	})
+	setTimeout(() => {
+		if (!suspensePending && stateInitialized.value) {
+			loading.stopLoading()
+		}
+	}, 100)
 })
-const route = useRoute()
-
-const loading = useLoading()
-loading.setEnabled(false)
 
 const error = useError()
 const errorModal = ref()
@@ -459,9 +502,27 @@ setupAuthProvider(credentials, async (_redirectPath) => {
 	await signIn()
 })
 
+async function validateSession(sessionToken) {
+	try {
+		const response = await tauriFetch(`${config.labrinthBaseUrl}/v2/user`, {
+			method: 'GET',
+			headers: { Authorization: sessionToken },
+		})
+		if (response.status === 401) return false
+		return true
+	} catch {
+		return true
+	}
+}
+
 async function fetchCredentials() {
 	const creds = await getCreds().catch(handleError)
 	if (creds && creds.user_id) {
+		if (creds.session && !(await validateSession(creds.session))) {
+			await logout().catch(handleError)
+			credentials.value = null
+			return
+		}
 		creds.user = await get_user(creds.user_id, 'bypass').catch(handleError)
 	}
 	credentials.value = creds ?? null
@@ -935,6 +996,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </script>
 
 <template>
+	<WindowControls />
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
 	<div
@@ -983,13 +1045,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<WorldIcon />
 			</NavButton>
 			<NavButton
-				v-if="themeStore.featureFlags.servers_in_app"
-				v-tooltip.right="'Servers'"
-				to="/hosting/manage"
-			>
-				<ServerIcon />
-			</NavButton>
-			<NavButton
 				v-tooltip.right="'Discover content'"
 				to="/browse/modpack"
 				:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
@@ -1003,6 +1058,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton
 				v-tooltip.right="'Library'"
 				to="/library"
+				:is-primary="(r) => r.path === '/library' || r.path === '/library'"
 				:is-subpage="
 					() =>
 						route.path.startsWith('/instance') ||
@@ -1011,6 +1067,14 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				"
 			>
 				<LibraryIcon />
+			</NavButton>
+			<NavButton
+				v-tooltip.right="'Modrinth Hosting'"
+				to="/hosting/manage"
+				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"
+				:is-subpage="(r) => r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/'"
+			>
+				<ServerStackIcon />
 			</NavButton>
 			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<suspense>
@@ -1130,22 +1194,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 						<RunningAppBar />
 					</Suspense>
 				</div>
-				<section v-if="!nativeDecorations" class="window-controls" data-tauri-drag-region-exclude>
-					<Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
-						<MinimizeIcon />
-					</Button>
-					<Button
-						class="titlebar-button"
-						icon-only
-						@click="() => getCurrentWindow().toggleMaximize()"
-					>
-						<RestoreIcon v-if="isMaximized" />
-						<MaximizeIcon v-else />
-					</Button>
-					<Button class="titlebar-button close" icon-only @click="handleClose">
-						<XIcon />
-					</Button>
-				</section>
 			</section>
 		</div>
 	</div>
@@ -1181,7 +1229,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</div>
 			</transition>
 			<div
-				class="loading-indicator-container h-8 fixed z-50"
+				class="loading-indicator-container h-8 fixed z-50 pointer-events-none"
 				:style="{
 					top: 'calc(var(--top-bar-height))',
 					left: 'calc(var(--left-bar-width))',
@@ -1224,40 +1272,45 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</Admonition>
 			<RouterView v-slot="{ Component }">
 				<template v-if="Component">
-					<Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
+					<Suspense
+						@pending="
+							() => {
+								suspensePending = true
+								loading.startLoading()
+							}
+						"
+						@resolve="
+							() => {
+								loading.stopLoading()
+							}
+						"
+					>
 						<component :is="Component"></component>
 					</Suspense>
 				</template>
 			</RouterView>
 		</div>
 		<div
-			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto"
+			v-overlay-scrollbars="sidebarOverlayScrollbarsOptions"
+			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid"
 			:class="{ 'has-plus': hasPlus }"
+			data-overlayscrollbars-initialize
 		>
-			<div
-				class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative"
-				:class="{ 'pb-12': !hasPlus }"
-			>
+			<div class="app-sidebar-scrollable flex-grow shrink relative" :class="{ 'pb-12': !hasPlus }">
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
 				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
-					<div
-						class="p-4 pr-1 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
-					>
+					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<h3 class="text-base text-primary font-medium m-0">Playing as</h3>
 						<suspense>
 							<AccountsCard ref="accounts" mode="small" />
 						</suspense>
 					</div>
-					<div class="py-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<suspense>
-							<FriendsList
-								:credentials="credentials"
-								:sign-in="() => signIn()"
-								:refresh-credentials="fetchCredentials"
-							/>
+							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
 						</suspense>
 					</div>
-					<div v-if="news && news.length > 0" class="p-4 pr-1 flex flex-col items-center">
+					<div v-if="news && news.length > 0" class="p-4 flex flex-col items-center">
 						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">News</h3>
 						<div class="space-y-4 flex flex-col items-center w-full">
 							<NewsArticleCard
@@ -1287,8 +1340,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</div>
 	</div>
 	<I18nDebugPanel />
-	<NotificationPanel has-sidebar />
-	<PopupNotificationPanel has-sidebar />
+	<NotificationPanel :has-sidebar="sidebarVisible" />
+	<PopupNotificationPanel :has-sidebar="sidebarVisible" />
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
 	<ContentInstallModal
@@ -1324,72 +1377,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </template>
 
 <style lang="scss" scoped>
-.window-controls {
-	z-index: 20;
-	display: none;
-	flex-direction: row;
-	align-items: center;
-
-	.titlebar-button {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		transition: all ease-in-out 0.1s;
-		background-color: transparent;
-		color: var(--color-base);
-		height: 100%;
-		width: 3rem;
-		position: relative;
-		box-shadow: none;
-
-		&:last-child {
-			padding-right: 0.75rem;
-			width: 3.75rem;
-		}
-
-		svg {
-			width: 1.25rem;
-			height: 1.25rem;
-		}
-
-		&::before {
-			content: '';
-			border-radius: 999999px;
-			width: 3rem;
-			height: 3rem;
-			aspect-ratio: 1 / 1;
-			margin-block: auto;
-			position: absolute;
-			background-color: transparent;
-			scale: 0.9;
-			transition: all ease-in-out 0.2s;
-			z-index: -1;
-		}
-
-		&.close {
-			&:hover,
-			&:active {
-				color: var(--color-accent-contrast);
-
-				&::before {
-					background-color: var(--color-red);
-				}
-			}
-		}
-
-		&:hover,
-		&:active {
-			color: var(--color-contrast);
-
-			&::before {
-				background-color: var(--color-button-bg);
-				scale: 1;
-			}
-		}
-	}
-}
-
 .app-grid-layout,
 .app-contents {
 	--top-bar-height: 3rem;
@@ -1605,6 +1592,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 }
 </style>
 <style>
+.os-theme-dark,
+.os-theme-light {
+	--os-handle-bg: var(--color-scrollbar) !important;
+	--os-handle-bg-hover: var(--color-scrollbar) !important;
+	--os-handle-bg-active: var(--color-scrollbar) !important;
+}
+
 .mac {
 	.app-grid-statusbar {
 		padding-left: 5rem;
@@ -1614,10 +1608,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 .windows {
 	.fake-appbar {
 		height: 2.5rem !important;
-	}
-
-	.window-controls {
-		display: flex !important;
 	}
 
 	.info-card {

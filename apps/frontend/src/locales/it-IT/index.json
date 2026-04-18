@@ -333,7 +333,7 @@
     "message": "Verifica email"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Ricevi novità riguardanti Modrinth"
+    "message": "Ricevi novità riguardo a Modrinth"
   },
   "auth.welcome.description": {
     "message": "Fai ora parte della grandiosa comunità di creatori ed esploratori che già costruiscono, aggiornano e stanno sul pezzo con le fantastiche mod."
@@ -1301,60 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Scegli tra Vanilla, Fabric, Forge, Quilt e NeoForge. Se è su Modrinth, il tuo server può usarlo."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Errore nella modifica della versione del pacchetto"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Errore nel caricamento delle versioni"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Errore nel reinstallare il pacchetto"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Errore nella riparazione del server"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Errore nella reinizializzazione"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Errore nel salvataggio delle impostazioni"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Errore nello scollegamento del pacchetto"
-  },
-  "hosting.loader.loader-version": {
-    "message": "Versione {loader, select, null {del loader} other {di {loader}}}"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "L'installazione del server è stata riparata."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Riparazione completata"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Reimposta server"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Rimuove tutti i dati dal tuo server, inclusi i mondi, mod, e configurazioni. Eventuali backup rimarranno intatti e potranno essere ripristinati."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Reinizializza"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Il server verrà ripristinato alla configurazione iniziale così da poterlo riconfigurare. Vuoi davvero continuare?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Reinizializza"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "Il server è stato ripristinato alla configurazione iniziale."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Server reinizializzato"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Opzioni di assistenza"
-  },
   "hosting.plan.out-of-stock": {
     "message": "Non disponibile"
   },
@@ -1608,7 +1554,7 @@
     "message": "Note di versione"
   },
   "layout.footer.about.news": {
-    "message": "Novità"
+    "message": "Notizie"
   },
   "layout.footer.about.rewards-program": {
     "message": "Programma Premi"
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizza col server"
   },
-  "servers.busy.backup-creating": {
-    "message": "È in corso la creazione di un backup"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "È in corso il ripristino da un backup"
-  },
-  "servers.busy.installing": {
-    "message": "È in corso l'installazione del server"
-  },
-  "servers.busy.syncing-content": {
-    "message": "È in corso la sincronizzazione dei contenuti"
-  },
   "servers.notice.actions": {
     "message": "Azioni"
   },
@@ -3209,6 +3143,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Addebiti precedenti"
+  },
   "settings.billing.expires": {
     "message": "Scade: {date}"
   },
@@ -3217,6 +3154,12 @@
   },
   "settings.billing.interval.monthly": {
     "message": "mensile"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "trimestre"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "trimestrale"
   },
   "settings.billing.interval.year": {
     "message": "anno"
@@ -3333,7 +3276,7 @@
     "message": "Errore nel riabbonamento"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Se il server è in sospensione, un nuovo tentativo di addebito potrebbe richiedere fino a 10 minuti."
+    "message": "Se il server era stato annullato, potrebbero volerci 10-15 minuti per impostarlo."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Richiesta di riabbonamento inviata"
@@ -3597,10 +3540,10 @@
     "message": "Visualizzazione"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Novità da Modrinth"
+    "message": "Ultime notizie da Modrinth"
   },
   "ui.latest-news-row.view-all": {
-    "message": "Leggi tutte le novità"
+    "message": "Leggi tutte le notizie"
   },
   "ui.newsletter-button.subscribe": {
     "message": "Iscriviti"

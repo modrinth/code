@@ -1301,60 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Wähle zwischen Vanilla, Fabric, Forge, Quilt und NeoForge. Was auf Modrinth ist, kann auf deinem Server laufen."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Änder der Modpackversion fehlgeschlagen"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Versionen konnten nicht geladen werden"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Neuinstallation des Modpack fehlgeschlagen"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Reparatur des Servers fehlgeschlagen"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Server konnte nicht in den Onboarding-Zustand zurückgesetzt werden"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Speichern der Installationseinstellungen fehlgeschlagen"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Entkoppeln von Modpack fehlgeschlagen"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {Loader} other {{loader}}}version"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Deine Server-Installation wurde repariert."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Reparatur abgeschlossen"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Server zurücksetzen"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Entfernt sämtliche daten von deinem Server, inklusive deiner Welten, Mods und Konfigurationsdateien. Sicherung bleiben und können wiederhergestellt werden."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Auf Onboarding zurücksetzen"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Dadurch wird der Server in den Onboarding-Zustand zurückgesetzt, sodass die Einrichtung erneut abgeschlossen werden kann. Möchtest du wirklich fortfahren?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Auf Onboarding zurücksetzen"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "Der Server wurde in den Onboarding-Ablauf zurückgesetzt."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Server auf Onboarding zurückgesetzt"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Supportoptionen"
-  },
   "hosting.plan.out-of-stock": {
     "message": "Nicht verfügbar"
   },
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Mit Server synchronisieren"
   },
-  "servers.busy.backup-creating": {
-    "message": "Backup-Erstellung im gange"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Wiederherstellung aus Sicherung läuft"
-  },
-  "servers.busy.installing": {
-    "message": "Server wird installiert"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Inhalt wird synchronisiert"
-  },
   "servers.notice.actions": {
     "message": "Aktionen"
   },
@@ -3209,6 +3143,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Vergangene Abbuchungen"
+  },
   "settings.billing.expires": {
     "message": "Läuft ab am {date}"
   },
@@ -3331,9 +3268,6 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Fehler beim erneuten Abonnieren"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Falls der Server momentan pausiert ist, kann es bis zu 10 Minuten dauern, bis ein weiterer Zahlungsversuch unternommen wird."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Anfrage zum erneuten Abonnieren übermittelt"

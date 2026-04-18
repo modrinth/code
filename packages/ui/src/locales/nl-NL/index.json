@@ -68,8 +68,17 @@
   "button.continue": {
     "defaultMessage": "Doorgaan"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Kopieer bestandsnaam"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Kopieer volledig pad"
+  },
   "button.copy-id": {
     "defaultMessage": "Kopieer ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Kopieer link"
   },
   "button.copy-permalink": {
     "defaultMessage": "Kopieer permanente link"
@@ -80,6 +89,9 @@
   "button.decline": {
     "defaultMessage": "Wijs af"
   },
+  "button.disable": {
+    "defaultMessage": "Zet uit"
+  },
   "button.download": {
     "defaultMessage": "Downloaden"
   },
@@ -88,6 +100,9 @@
   },
   "button.edit": {
     "defaultMessage": "Bewerk"
+  },
+  "button.enable": {
+    "defaultMessage": "Zet aan"
   },
   "button.follow": {
     "defaultMessage": "Volg"
@@ -101,11 +116,17 @@
   "button.more-options": {
     "defaultMessage": "Meer opties"
   },
+  "button.move": {
+    "defaultMessage": "Verplaats"
+  },
   "button.next": {
     "defaultMessage": "Volgende"
   },
   "button.open-folder": {
     "defaultMessage": "Open folder"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Open in map"
   },
   "button.play": {
     "defaultMessage": "Speel"
@@ -121,6 +142,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "Verwijder afbeelding"
+  },
+  "button.rename": {
+    "defaultMessage": "Hernoem"
   },
   "button.repair": {
     "defaultMessage": "Herstel"
@@ -151,6 +175,9 @@
   },
   "button.show-all-versions": {
     "defaultMessage": "Toon alle versies"
+  },
+  "button.show-file": {
+    "defaultMessage": "Laat bestand zien"
   },
   "button.sign-in": {
     "defaultMessage": "Log in"
@@ -206,9 +233,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Verwijderwaarschuwing"
   },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Alle mods of content die je bovenop de modpack hebt toegevoegd zullen verwijderd worden."
-  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Downgrade} other {Update}} waarschuwing"
   },
@@ -235,6 +259,9 @@
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Toegevoegd (afhankelijkheid)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Uitgeschakeld"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Geüpdate"
@@ -385,6 +412,9 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} geselecteerd"
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": ""
   },
   "form.label.address-line": {
     "defaultMessage": "Adresregel"
@@ -717,7 +747,7 @@
     "defaultMessage": "Wachtwoord"
   },
   "label.played": {
-    "defaultMessage": "Gespeeld {ago}"
+    "defaultMessage": "Voor het laatst gespeeld {ago}"
   },
   "label.project": {
     "defaultMessage": "Project"
@@ -1532,9 +1562,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Betaalmethode"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "afgeschreven per {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Configureer je eigen plan met de specs die je nodig hebt."
   },
@@ -1550,17 +1577,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Meest populair"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Kies een plan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Selecteer deze plan"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfect voor 1 tot 5 vrienden, met enkele mods."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Kies hoeveel geheugen en snelheid je wil."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"

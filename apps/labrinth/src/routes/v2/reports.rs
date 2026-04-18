@@ -8,7 +8,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::Deserialize;
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(reports_get);
     cfg.service(reports);
     cfg.service(report_create);
@@ -17,7 +17,21 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(report_get);
 }
 
-#[post("report")]
+/// Create a report for a project, version, or user.
+#[utoipa::path(
+    post,
+    operation_id = "submitReport",
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["REPORT_CREATE"]))
+)]
+#[post("/report")]
 pub async fn report_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -40,7 +54,7 @@ pub async fn report_create(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ReportsRequestOptions {
     #[serde(default = "default_count")]
     count: u16,
@@ -55,7 +69,31 @@ fn default_all() -> bool {
     true
 }
 
-#[get("report")]
+/// Get open reports for the current user.
+#[utoipa::path(
+    get,
+    operation_id = "getOpenReports",
+    params(
+        (
+            "count" = Option<u16>,
+            Query,
+            description = "Maximum number of reports to return"
+        )
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["REPORT_READ"]))
+)]
+#[get("/report")]
 pub async fn reports(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -88,12 +126,36 @@ pub async fn reports(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ReportIds {
     pub ids: String,
 }
 
-#[get("reports")]
+/// Get multiple reports by ID.
+#[utoipa::path(
+    get,
+    operation_id = "getReports",
+    params(
+        (
+            "ids" = String,
+            Query,
+            description = "The JSON array of report IDs"
+        )
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["REPORT_READ"]))
+)]
+#[get("/reports")]
 pub async fn reports_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ReportIds>,
@@ -122,7 +184,25 @@ pub async fn reports_get(
     }
 }
 
-#[get("report/{id}")]
+/// Get a report by ID.
+#[utoipa::path(
+    get,
+    operation_id = "getReport",
+    params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["REPORT_READ"]))
+)]
+#[get("/report/{id}")]
 pub async fn report_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -145,14 +225,34 @@ pub async fn report_get(
     }
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditReport {
     #[validate(length(max = 65536))]
     pub body: Option<String>,
     pub closed: Option<bool>,
 }
 
-#[patch("report/{id}")]
+/// Modify a report.
+#[utoipa::path(
+    patch,
+    operation_id = "modifyReport",
+    params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
+    request_body = EditReport,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["REPORT_WRITE"]))
+)]
+#[patch("/report/{id}")]
 pub async fn report_edit(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -178,7 +278,25 @@ pub async fn report_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[delete("report/{id}")]
+/// Delete a report by ID.
+#[utoipa::path(
+    delete,
+    operation_id = "deleteReport",
+    params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["REPORT_DELETE"]))
+)]
+#[delete("/report/{id}")]
 pub async fn report_delete(
     req: HttpRequest,
     pool: web::Data<PgPool>,

@@ -54,7 +54,7 @@
     "message": "Название сборки"
   },
   "app.export-modal.select-files-label": {
-    "message": "Выберите файлы или папки для включения в сборку"
+    "message": "Выберите файлы и папки для экспорта"
   },
   "app.export-modal.version-number-label": {
     "message": "Номер версии"
@@ -93,7 +93,7 @@
     "message": "\"{name}\" был добавлен"
   },
   "app.instance.mods.projects-were-added": {
-    "message": "Проектов добавлено: {count}"
+    "message": "{count} Проектов было добавлено"
   },
   "app.instance.mods.share-text": {
     "message": "Посмотрите проекты, которые я использую в своей сборке модов!"
@@ -117,7 +117,7 @@
     "message": "Вы уверены, что хотите удалить этот мир навсегда?"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "Со сборкой"
+    "message": "Модовые"
   },
   "app.instance.worlds.filter-offline": {
     "message": "Не в сети"
@@ -126,7 +126,7 @@
     "message": "В сети"
   },
   "app.instance.worlds.filter-vanilla": {
-    "message": "Не модифицировано"
+    "message": "Ванильные"
   },
   "app.instance.worlds.no-worlds-description": {
     "message": "Добавить сервер или найти, чтобы начать"
@@ -147,7 +147,7 @@
     "message": "Поиск по {count, plural, one {# миру} other {# мирам}}..."
   },
   "app.instance.worlds.this-server": {
-    "message": "Этот сервер"
+    "message": "этот сервер"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Требуется дополнительный контент"
@@ -174,7 +174,7 @@
     "message": "Общая сборка сервера"
   },
   "app.modal.install-to-play.view-contents": {
-    "message": "Посмотреть"
+    "message": "Посмотреть содержимое"
   },
   "app.modal.update-to-play.header": {
     "message": "Обновление перед запуском"

@@ -679,7 +679,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								{{ option.label }}
 							</button>
 							<div class="hidden @[900px]:block">
-								<ButtonStyled type="transparent" hover-color-fill="none">
+								<ButtonStyled type="transparent">
 									<button
 										:aria-label="
 											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
@@ -699,7 +699,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 						<div class="flex items-center gap-2">
 							<div class="@[900px]:hidden">
-								<ButtonStyled type="transparent" hover-color-fill="none">
+								<ButtonStyled type="transparent">
 									<button
 										:aria-label="
 											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
@@ -729,7 +729,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								</button>
 							</ButtonStyled>
 
-							<ButtonStyled type="transparent" hover-color-fill="none">
+							<ButtonStyled type="transparent">
 								<button :disabled="refreshing || ctx.isBusy.value" @click="handleRefresh">
 									<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
 									{{ formatMessage(commonMessages.refreshButton) }}

@@ -399,7 +399,7 @@
     "message": "Frissítve {ago}"
   },
   "collection.return-link.dashboard-collections": {
-    "message": "A te gyűjteményeid"
+    "message": "A gyűjteményeid"
   },
   "collection.return-link.user": {
     "message": "{user} profilja"
@@ -507,7 +507,7 @@
     "message": "Adj meg egy projekt nevet..."
   },
   "create.project.owner-description": {
-    "message": "Állítsa be a projekt tulajdonosát saját magára vagy egy olyan szervezetre, amelynek tagja."
+    "message": "Állítsd be a projekt tulajdonosát saját magadra vagy egy olyan szervezetre, amelynek tagja vagy."
   },
   "create.project.owner-label": {
     "message": "Tulajdonos"
@@ -657,7 +657,7 @@
     "message": "Nettó összeg"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
-    "message": "USD egyenérték"
+    "message": "Amerikai dollárban kifejezett összeg"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Üzleti szervezet"
@@ -797,6 +797,9 @@
   "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
     "message": "Elérhető címletek"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "A(z) {usdBalance} egyenleged jelenleg {localBalance} értéketű."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "Keress Ajándékkártyákat ez az ár körül."
   },
@@ -818,6 +821,12 @@
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Összeg keresése"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Válassz kategóriát:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Válassz kategóriát a folytatáshoz"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Hitelesítetlen e-mail"
   },
@@ -835,6 +844,9 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit": {
     "message": "Pénzfelvételi korlát"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Elérted a(z) <b>{withdrawLimit}</b> kifizetési limitet. További kifizetésekhez ki kell töltened egy adózási űrlapot."
   },
   "dashboard.revenue.available-now": {
     "message": "Elérhető most"
@@ -878,8 +890,17 @@
   "dashboard.revenue.transactions.none": {
     "message": "Nincsenek tranzakciók"
   },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "A kifizetések és a felvételek itt jelennek meg."
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Összes megtekintése"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "A kifizetéseid ideiglenesen zárolva vannak, mert az adóazonosító számod vagy a társadalombiztosítási számod nem egyezik az adóhatóság (IRS) nyilvántartásában szereplő adatokkal. Kérjük, vedd fel a kapcsolatot az ügyfélszolgálattal az adóbevallásod visszaállításához és újbóli benyújtásához."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Vegyél fel az elérhető egyenlegéből bármilyen kifizetési móddal."
   },
   "dashboard.revenue.withdraw.card.title": {
     "message": "Pénzfelvétel"
@@ -935,20 +956,53 @@
   "dashboard.withdraw.error.email-verification.title": {
     "message": "E-mail hítelesítés szükséges"
   },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Nem tudtuk elküldeni a kifizetési kérelmed, kérjük, ellenőrizd az adataid, vagy vedd fel a kapcsolatot az ügyfélszolgálattal.\n{error}"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "A visszavonási kísérlet nem sikerült"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "Nincs elég pénzed ehhez a fizetéshez."
+  },
   "dashboard.withdraw.error.insufficient-balance.title": {
     "message": "Nincs elég vagyonod"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "A megadott cím nem ellenőrizhető. Ellenőrizd a cím adatait."
   },
   "dashboard.withdraw.error.invalid-address.title": {
     "message": "Cím megerősítése sikertelen"
   },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "A megadott bankszámlaadatok érvénytelenek. Ellenőrizd az adatokat."
+  },
   "dashboard.withdraw.error.invalid-bank.title": {
     "message": "Helytelen banki adatok"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "A megadott kriptovaluta-tárca címe érvénytelen. Ellenőrizd kétszer, és próbáld újra."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Érvénytelen pénztárca cím"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "A fizetés összege (díjak levonása után) nem éri el a minimális követelményt. Növeld a fizetés összegét."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Túl alacsony az összeg"
   },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Használd a régiódnak (USA vagy Nemzetközi) megfelelő PayPal-átutalási lehetőséget."
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.title": {
     "message": "PayPal régió eltérés"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "A fizetési kérelem benyújtásához ki kell töltened egy adóbevallási űrlapot."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Töltsd ki az adóbevallási űrlapot"
   },
   "error.collection.404.list_item.1": {
     "message": "Elírhatad a gyűjtemémyed linkjét."
@@ -1041,13 +1095,13 @@
     "message": "Békázva lettél!🐸🐸"
   },
   "frog.altText": {
-    "message": "Egy fotórealisztikus festmény egy béka labirintusról"
+    "message": "Egy fotórealisztikus festmény egy béka-labirintusról"
   },
   "frog.title": {
     "message": "Béka"
   },
   "hosting-marketing.available-locations": {
-    "message": "Észak-Amerikában, Európában és Délkelet-Ázsiában széles körű lefedettség mellett elérhető. Észak-Amerikában, Európában és Délkelet-Ázsiában széles körű lefedettség mellett elérhető."
+    "message": "Észak-Amerikában, Európában és Délkelet-Ázsiában érhető el széles körű lefedettség mellett."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Havi fizetés"
@@ -1056,7 +1110,7 @@
     "message": "Negyedéves fizetés"
   },
   "hosting-marketing.billing.save-with-quarterly": {
-    "message": "Negyedéves számlázással 16% kedvezményt kap!"
+    "message": "Negyedéves számlázással 16% kedvezményt kapsz!"
   },
   "hosting-marketing.billing.starting-at": {
     "message": "Kezdőár: {price} / hó"
@@ -1194,7 +1248,7 @@
     "message": "Pontosan tudod, mire van szükséged?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Próbálja ki 5 napig ingyen a <orange>3 GB-os szervert</orange>, amelyet a <orange>Medal</orange> biztosít"
+    "message": "Próbáld ki 5 napig ingyen egy <orange>3 GB-os szervert</orange>, amelyet a <orange>Medal</orange> biztosít"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "További információk"
@@ -1247,14 +1301,8 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Válassz a Vanilla, Fabric, Forge, Quilt és NeoForge közül. Ha Modrinthon fut, akkor a szervereden is futtatható."
   },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select,null {Betöltő} other {{loader}}} Verzió"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Szerver visszaállítása"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Minden adatot eltávolít a szerverről, beleértve a világokat, a modokat és a konfigurációs fájlokat is. A biztonsági másolatok megmaradnak, és visszaállíthatók."
+  "hosting.plan.out-of-stock": {
+    "message": "Nincs raktáron"
   },
   "hosting.plan.select-plan": {
     "message": "Csomag kiválasztása"
@@ -1263,7 +1311,7 @@
     "message": "Modok felfedezése"
   },
   "landing.button.go-to-dashboard": {
-    "message": "Vissza a főoldalra"
+    "message": "Ugrás az irányítópultra"
   },
   "landing.creator.feature.constantly-evolving.description": {
     "message": "Kapd meg a legjobb modolási élményt folyamatos frissítésekkel a Modrinth csapattól"
@@ -1392,7 +1440,7 @@
     "message": "Fedezz fel, játssz és ossz meg Minecraft-tartalmakat a közösség számára létrehozott nyílt forráskódú platformunkon."
   },
   "layout.action.change-theme": {
-    "message": "Kinézet"
+    "message": "Téma"
   },
   "layout.action.create-new": {
     "message": "Új létrehozása..."
@@ -1402,6 +1450,9 @@
   },
   "layout.action.lookup-by-email": {
     "message": "Keresés e-mail cím alapján"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Partnerlinkek kezelése"
   },
   "layout.action.manage-server-notices": {
     "message": "Szerver megjegyzések kezelése"
@@ -1419,10 +1470,16 @@
     "message": "Új szerver"
   },
   "layout.action.publish": {
-    "message": "Közzététel"
+    "message": "Létrehozás"
+  },
+  "layout.action.reports": {
+    "message": "Jelentések áttekintése"
   },
   "layout.action.review-projects": {
     "message": "Projekt áttekintés"
+  },
+  "layout.action.tech-review": {
+    "message": "Technikai áttekintés"
   },
   "layout.avatar.alt": {
     "message": "Avatárod"
@@ -1439,17 +1496,44 @@
   "layout.banner.build-fail.description": {
     "message": "A Modrinth felhasználói felületének jelenlegi telepítése nem tudta az API-ból lekérni az állapotadatokat. Ennek oka lehet egy szolgáltatáskimaradás vagy konfigurációs hiba. Kérünk, próbáld meg újra, amikor az API újra elérhetővé válik. Hibakódok: {errors}; Az API jelenlegi linkje: {url}"
   },
+  "layout.banner.build-fail.title": {
+    "message": "Hiba történt az API állapotának generálása közben a fordítás során."
+  },
+  "layout.banner.preview.description": {
+    "message": "Ha a hivatalos Modrinth weboldalt szeretnéd elérni, látogass el az <link>https://modrinth.com</link> oldalra. Ezt az előzetes telepítést a Modrinth munkatársai tesztelési célokra használják. A <branch-link>{owner}/{branch</branch-link> @ {commit} használatával készült."
+  },
+  "layout.banner.preview.title": {
+    "message": "Ez a Modrinth weboldal előzetes telepítése."
+  },
+  "layout.banner.staging.description": {
+    "message": "A tesztelési környezet teljesen elkülönül az éles Modrinth adatbázistól. Ezt tesztelési és hibakeresési célokra használják, és a Modrinth backend vagy frontend fejlesztés alatt álló, az éles példánynál újabb verzióit futtathatja."
+  },
   "layout.banner.staging.title": {
     "message": "A Modrinth színreviteli környezetét nézed"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Számlázási információ frissítése"
   },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Egy vagy több előfizetés megújítása sikertelen. Frissítsd a fizetés módját a hozzáférés elvesztésének elkerülése érdekében!"
+  },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Számlázási akció szükséges."
   },
+  "layout.banner.tax.action": {
+    "message": "Adózási űrlap kitöltése"
+  },
+  "layout.banner.tax.description": {
+    "message": "Idén már több mint {threshold} összeget vettél ki a Modrinth-ből. Az adózási szabályozásoknak való megfelelés érdekében ki kell töltened egy adóbevallási űrlapot. A kifizetések a nyomtatvány benyújtásáig szünetelnek."
+  },
+  "layout.banner.tax.title": {
+    "message": "Adózási űrlap szükséges"
+  },
   "layout.banner.tin-mismatch.action": {
     "message": "Támogatással való kapcsolatba lépés"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "A kifizetéseid ideiglenesen zárolva vannak, mert az adóazonosító számod vagy a társadalombiztosítási számod nem egyezik az adóhatóság (IRS) nyilvántartásában szereplő adatokkal. Kérjük, vedd fel a kapcsolatot az ügyfélszolgálattal az adóbevallásod visszaállításához és újbóli benyújtásához."
   },
   "layout.banner.tin-mismatch.title": {
     "message": "Adóbevallási űrlap sikertelen"
@@ -1476,7 +1560,7 @@
     "message": "Jutalomprogram"
   },
   "layout.footer.about.status": {
-    "message": "Státusz"
+    "message": "Állapot"
   },
   "layout.footer.legal": {
     "message": "Jogi megjegyzések"
@@ -1492,6 +1576,9 @@
   },
   "layout.footer.legal.rules": {
     "message": "Tartalmi szabályok"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Biztonsági közlemény"
   },
   "layout.footer.legal.terms-of-use": {
     "message": "Felhasználási feltételek"
@@ -1616,6 +1703,12 @@
   "moderation.page.reports": {
     "message": "Jelentések"
   },
+  "moderation.page.technicalReview": {
+    "message": "Műszaki áttekintés"
+  },
+  "muralpay.account-type.checking": {
+    "message": "Ellenőrzés"
+  },
   "muralpay.account-type.savings": {
     "message": "Megtakarítások"
   },
@@ -1673,8 +1766,14 @@
   "muralpay.country.sk": {
     "message": "Szlovákia"
   },
+  "muralpay.document-type.national-id": {
+    "message": "Nemzeti azonosító"
+  },
   "muralpay.document-type.passport": {
     "message": "Útlevél"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Állampolgársági azonosító"
   },
   "muralpay.document-type.ruc": {
     "message": "RUC"
@@ -1738,6 +1837,15 @@
   },
   "muralpay.field.swift-bic": {
     "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Pénztárca címe"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Egységes bankkód vagy egységes virtuális kód"
+  },
+  "muralpay.help.cci": {
+    "message": "Bankközi számlakód"
   },
   "muralpay.help.clabe": {
     "message": "Clave Bancaria Estandarizada (Mexikói bank fiók száma)"
@@ -2180,8 +2288,26 @@
   "project.download.title": {
     "message": "{title} letöltése"
   },
+  "project.environment.migration-no-permission.message": {
+    "message": "Átdolgoztuk a Modrinth Környezetek rendszerét, és új beállítások érhetők el. Nincs jogosultságod módosítani ezeket a beállításokat, de kérlek, jelezd a projekt egy másik tagjának, hogy a környezet metaadatait ellenőrizni kell."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "A környezeti metaadatokat felül kell vizsgálni"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "Tudj meg többet erről a változásról"
+  },
+  "project.environment.migration.message": {
+    "message": "Átdolgoztuk a Modrinth Környezetek rendszerét, és új lehetőségek érhetők el. Kérjük, ellenőrizd, hogy a metaadatok helyesek-e."
+  },
   "project.environment.migration.review-button": {
     "message": "Környezet beállítások Átnézése"
+  },
+  "project.environment.migration.title": {
+    "message": "Kérjük, tekintse át a környezet metaadatait"
+  },
+  "project.error.loading": {
+    "message": "Hiba a projektadatok {message} betöltése közben"
   },
   "project.error.page-not-found": {
     "message": "Az oldal nem található"
@@ -2246,6 +2372,12 @@
   "project.settings.general.tagline.placeholder.1": {
     "message": "pl. Átalakítja a játék menetét, hogy az az Alvilág körül forogjon."
   },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "pl. Hordható építőipari felszerelést ad hozzá."
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "pl. Valósághű bányajárat-építő mehanikákat ad hozzá."
+  },
   "project.settings.general.tagline.placeholder.4": {
     "message": "pl. Javítja az alvilágportálok egymáshoz való kapcsolódását."
   },
@@ -2277,7 +2409,7 @@
     "message": "Verziók"
   },
   "report.already-reported": {
-    "message": "Már jelentetted: {title}-t"
+    "message": "Már feljelentetted ezt: {title}"
   },
   "report.already-reported-description": {
     "message": "Már létezik egy nyitott jelentésed ehhez a {item, select, project {projekthez} version {verzióhoz} user {felhasználóhoz} other {tartalomhoz}}. További részletekkel egészítheted ki a jelentésed, ha van további információ, amit hozzá szeretnél adni."
@@ -2287,6 +2419,12 @@
   },
   "report.body.description": {
     "message": "Ha lehetséges és releváns, csatolj linkeket és képeket. Az üres vagy hiányos jelentéseket lezárjuk és figyelmen kívül hagyjuk."
+  },
+  "report.body.title": {
+    "message": "Adj meg további kontextust a jelentéseddel kapcsolatban"
+  },
+  "report.checking": {
+    "message": "{item, select, project {Projekt} version {Verzió} user {Felhasználó} other {Tartalom}} ellenőrzése..."
   },
   "report.could-not-find": {
     "message": "{item, select, project {Projekt} version {Verzió} user {Felhasználó} other {Tartalom}} nem található"
@@ -2298,10 +2436,16 @@
     "message": "Példák: rosszindulatú, spam, sértő, megtévesztő, félrevezető és illegális tartalom."
   },
   "report.form-not-for": {
-    "message": "Ez az űrlap nem alkalmas:"
+    "message": "Viszont ez az űrlap nem erre szolgál:"
+  },
+  "report.go-to-report": {
+    "message": "Jelentés megtekintése"
   },
   "report.not-for.bug-reports": {
-    "message": "Hiba bejenlentések"
+    "message": "Hibajelentések"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "A hibákat a <issues-link>hibajelentő rendszer</issues-link>ben jelentheted be."
   },
   "report.not-for.dmca": {
     "message": "DMCA leszedések"
@@ -2320,6 +2464,9 @@
   },
   "report.note.malicious.2": {
     "message": "A Microsoft Defender, a VirusTotal vagy az MI rosszindulatú programok észlelése által készített összefoglalók nem minősülnek elegendő bizonyítéknak, ezért nem fogadhatók el."
+  },
+  "report.please-report": {
+    "message": "Kérjük, az alábbiakat jelentsd:"
   },
   "report.question.content-id": {
     "message": "Mi a {item, select, project {projekt} version {verzió} user {felhasználó} other {tartalom}} azonosítója?"
@@ -2346,7 +2493,7 @@
     "message": "Statisztikák olvasása"
   },
   "scopes.category.analytics": {
-    "message": "Statisztikák"
+    "message": "Statisztika"
   },
   "scopes.category.collections": {
     "message": "Kollekciók"
@@ -2465,6 +2612,18 @@
   "scopes.patWrite.label": {
     "message": "PAT-ek írása"
   },
+  "scopes.payoutsRead.description": {
+    "message": "Kifizetési adatok olvasása"
+  },
+  "scopes.payoutsRead.label": {
+    "message": "Kifizetések olvasása"
+  },
+  "scopes.payoutsWrite.description": {
+    "message": "Pénzfelvétel"
+  },
+  "scopes.payoutsWrite.label": {
+    "message": "Kifizetések írása"
+  },
   "scopes.performAnalytics.description": {
     "message": "Statisztikai műveletek végrehajtása"
   },
@@ -2479,6 +2638,12 @@
   },
   "scopes.projectDelete.description": {
     "message": "Projektjeid törlése"
+  },
+  "scopes.projectDelete.label": {
+    "message": "Projektek törlése"
+  },
+  "scopes.projectRead.description": {
+    "message": "Olvasd el az összes projektedet"
   },
   "scopes.projectRead.label": {
     "message": "Projektek Olvasása"
@@ -2513,6 +2678,9 @@
   "scopes.reportWrite.label": {
     "message": "Jelentések írása"
   },
+  "scopes.sessionAccess.description": {
+    "message": "Modrinth által kiadott munkamenetek elérése"
+  },
   "scopes.sessionAccess.label": {
     "message": "Munkamenetek hozzáférése"
   },
@@ -2540,6 +2708,63 @@
   "scopes.threadWrite.label": {
     "message": "Szálakban írás"
   },
+  "scopes.userAuthWrite.description": {
+    "message": "Módosítsd a hitelesítési adataidat"
+  },
+  "scopes.userAuthWrite.label": {
+    "message": "Hitelesítési adatok írása"
+  },
+  "scopes.userDelete.description": {
+    "message": "Fiók törlése"
+  },
+  "scopes.userDelete.label": {
+    "message": "Fiók törlése"
+  },
+  "scopes.userRead.description": {
+    "message": "Hozzáférés a nyilvános profilinformációihoz"
+  },
+  "scopes.userRead.label": {
+    "message": "Felhasználói adatok olvasása"
+  },
+  "scopes.userReadEmail.description": {
+    "message": "Olvasd el az e-mailedet"
+  },
+  "scopes.userReadEmail.label": {
+    "message": "Felhasználói e-mail olvasása"
+  },
+  "scopes.userWrite.description": {
+    "message": "Írj a profilodra"
+  },
+  "scopes.userWrite.label": {
+    "message": "Felhasználói adatok írása"
+  },
+  "scopes.versionCreate.description": {
+    "message": "Új verziók létrehozása"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Verziók létrehozása"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Verziók törlése"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Verziók törlése"
+  },
+  "scopes.versionRead.description": {
+    "message": "Az összes verzió elolvasása"
+  },
+  "scopes.versionRead.label": {
+    "message": "Verziók olvasása"
+  },
+  "scopes.versionWrite.description": {
+    "message": "Verzióadatok írása"
+  },
+  "scopes.versionWrite.label": {
+    "message": "Verziók írása"
+  },
+  "search.filter.game-version-shader-message": {
+    "message": "A régebbi verziókhoz tartozó shader csomagok valószínűleg az újabb verziókon is működnek, csak kisebb problémákkal."
+  },
   "search.filter.locked.server": {
     "message": "A szerver által van megadva"
   },
@@ -2553,7 +2778,10 @@
     "message": "Szinkronizálás a szerverrel"
   },
   "servers.notice.actions": {
-    "message": "Akciók"
+    "message": "Műveletek"
+  },
+  "servers.notice.begins": {
+    "message": "Kezdődik"
   },
   "servers.notice.dismissable": {
     "message": "Elutasítható"
@@ -2771,6 +2999,9 @@
   "settings.account.two-factor.setup.intro": {
     "message": "A kétlépcsős hitelesítés biztosítja fiókod biztonságát azzal, hogy a bejelentkezéshez egy második eszköz használatát is megköveteli."
   },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "Ha a QR-kód nem olvassa be a kódot, manuálisan is megadhatja a titkos kódot:"
+  },
   "settings.account.two-factor.setup.scan": {
     "message": "Olvassa be a QR-kódot az <authy-link>Authy</authy-link>, a <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> vagy bármely más kétlépcsős hitelesítési alkalmazás segítségével a folyamat megkezdéséhez."
   },
@@ -2822,8 +3053,14 @@
   "settings.applications.delete.confirm.button": {
     "message": "Alkamazás törlése"
   },
+  "settings.applications.delete.confirm.description": {
+    "message": "Ez véglegesen törli ezt az alkalmazást és visszavonja az összes hozzáférési tokent. (örökre!)"
+  },
   "settings.applications.delete.confirm.title": {
     "message": "Biztos törölni szeretnéd ezt az alkamazást?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Az alkalmazások segítségével hitelesítheti a Modrinth felhasználóit a termékeivel. További információkért lásd a <docs-link>Modrinth API dokumentációját</docs-link>."
   },
   "settings.applications.field.description": {
     "message": "Leírás"
@@ -2870,14 +3107,92 @@
   "settings.applications.secret.disclaimer": {
     "message": "A secreteted most mentesd el, el lesz tüntetve mituán elhagyod ezt az oldalt!"
   },
+  "settings.authorizations.about-this-app": {
+    "message": "Az alkalmazásról"
+  },
   "settings.authorizations.by": {
     "message": "által"
+  },
+  "settings.authorizations.description": {
+    "message": "Amikor engedélyezel egy alkalmazást a Modrinth-fiókjoddal, hozzáférést biztosítasz számára a fiókodhoz. A fiókodhoz való hozzáférést bármikor kezelheted és ellenőrizheted itt."
+  },
+  "settings.authorizations.empty-state": {
+    "message": "Jelenleg nem tudjuk megjeleníteni a jogosult alkalmazásait, dolgozunk a probléma megoldásán. Kérjük, látogassa meg ezt az oldalt később!"
+  },
+  "settings.authorizations.head-title": {
+    "message": "Engedélyek"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "Visszavonás"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Ez visszavonja az alkalmazás hozzáférését a fiókodhoz. Később bármikor újra engedélyezheted."
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "Biztosan visszavonod ezt a kérelmet?"
+  },
+  "settings.billing.charges.description": {
+    "message": "A Modrinth-számládra korábban leadott összes fiókod itt lesz felsorolva:"
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Medal Server próbaverzió"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.charges.title": {
+    "message": "Korábbi költségek"
+  },
+  "settings.billing.expires": {
+    "message": "Lejár: {date}"
   },
   "settings.billing.interval.month": {
     "message": "hónap"
   },
+  "settings.billing.interval.monthly": {
+    "message": "havi"
+  },
+  "settings.billing.interval.year": {
+    "message": "év"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "éves"
+  },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Reklámmentes böngészés a modrinth.com-on és a Modrinth App-ban"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Modrinth+ jelvény a profilodon"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Támogasd közvetlenül a Modrinth-et és a fejlesztőit"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "Előnyök"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "Spórolj {amount}/évet éves számlázásra váltva!"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "Lemondtad az előfizetésedet."
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "A juttatásaidat a jelenlegi számlázási ciklus végéig megtartod."
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "Az előfizetés fizetése sikertelen. Frissítse a fizetési módot."
+  },
+  "settings.billing.midas.status.open": {
+    "message": "Jelenleg erre van előfizetésed:"
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "A fizetésed feldolgozás alatt áll. A juttatások a fizetés befejezése után aktiválódnak."
+  },
+  "settings.billing.midas.upsell": {
+    "message": "Iratkozz fel a Modrinth Plusra!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Előfizetés lemondása"
@@ -2897,8 +3212,17 @@
   "settings.billing.modal.delete.title": {
     "message": "Biztos törölni szeretnéd ezt a fizetési lehetőséget?"
   },
+  "settings.billing.next": {
+    "message": "Következő:"
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "Vagy {price} / év ({percent}% megtakarítás)!"
+  },
   "settings.billing.payment_method.action.add": {
     "message": "Fizetési lehetőség hozzáadása"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "Korábbi költségeid megtekintése"
   },
   "settings.billing.payment_method.action.primary": {
     "message": "Elsődlegesé rakás"
@@ -2906,8 +3230,41 @@
   "settings.billing.payment_method.card_expiry": {
     "message": "Lejár: {month}/{year}"
   },
+  "settings.billing.payment_method.none": {
+    "message": "Nem adtál hozzá fizetési módokat"
+  },
   "settings.billing.payment_method.primary": {
     "message": "Elsődleges"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Fizetési módok"
+  },
+  "settings.billing.plan.title": {
+    "message": "{size} terv"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} Megosztott CPU-k (maximum {bursts} CPU-ig terjedő löketek)"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "Nem található ehhez az előfizetéshez csatolt szerver. Ennek több lehetséges magyarázata is van. Ha nemrég vásároltad meg a szervert, ez normális. A szerver kiépítése akár egy órát is igénybe vehet. Ellenkező esetben, ha egy ideje vásároltad meg ezt a szervert, valószínűleg azóta felfüggesztették. Ha nem erre számítottál, kérjük, vedd fel a kapcsolatot a Modrinth ügyfélszolgálatával a következő információkkal:"
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "Szerverazonosító: {id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "Sáv azonosító: {id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} GB RAM"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Hiba történt a Modrinth szerverre való újbóli feliratkozás során."
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Szerver Előfizetések"
@@ -3109,6 +3466,15 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Összes hír"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Feliratkozás"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Feliratkozva!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Feliratkozás a Modrinth hírlevelére"
   },
   "version.environment.none.description": {
     "message": "A környezet erre a verzióra nem lett megadva."

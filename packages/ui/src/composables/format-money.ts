@@ -68,7 +68,7 @@ function getMaxDigits(currency: string): number {
 				style: 'currency',
 				currency,
 			})
-			maxDigits = formatter.resolvedOptions().maximumFractionDigits || 2
+			maxDigits = formatter.resolvedOptions().maximumFractionDigits ?? 2
 		} catch {
 			maxDigits = 2
 		}

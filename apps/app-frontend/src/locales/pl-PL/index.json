@@ -111,7 +111,7 @@
     "message": "Szukaj serwerów"
   },
   "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' zostanie **permanentnie usunięty**, i nie ma możliwości go odzyskać."
+    "message": "'{name}' zostanie **permanentnie usunięty** i nie ma możliwości go odzyskać."
   },
   "app.instance.worlds.delete-world-title": {
     "message": "Czy na pewno chcesz trwale usunąć ten świat?"

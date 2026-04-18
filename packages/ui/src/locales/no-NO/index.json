@@ -218,9 +218,6 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Slett {itemType}{count, plural, one {} other {s}}"
   },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Hvilken som helst mod eller innhold du legger til i toppen av modpakka kommer til å bli sletta."
-  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Nedgrader} other {Oppdatering}} advarsel"
   },
@@ -1703,9 +1700,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Betalingsmetode"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "bilde {intervall}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Velg en tilpasset plan med akkurat de spesifikasjonene du trenger."
   },
@@ -1721,17 +1715,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Mest populær"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Velg en plan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Velg Plan"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfekt for 1–5 venner med noen få lette modifikasjoner."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Velg mengden RAM og spesifikasjoner som passer dine behov."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"

@@ -94,14 +94,14 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<div>
+	<div class="flex flex-col gap-6">
 		<Checkbox
 			v-model="overrideWindowSettings"
 			:label="formatMessage(messages.customWindowSettings)"
 		/>
-		<div class="mt-2 flex items-center gap-4 justify-between">
-			<div>
-				<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.fullscreen) }}
 				</h2>
 				<p class="m-0">
@@ -120,9 +120,9 @@ const messages = defineMessages({
 			/>
 		</div>
 
-		<div class="mt-4 flex items-center gap-4 justify-between">
-			<div>
-				<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.width) }}
 				</h2>
 				<p class="m-0">
@@ -139,9 +139,9 @@ const messages = defineMessages({
 			/>
 		</div>
 
-		<div class="mt-4 flex items-center gap-4 justify-between">
-			<div>
-				<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.height) }}
 				</h2>
 				<p class="m-0">

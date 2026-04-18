@@ -46,7 +46,6 @@
 				<template #header>{{ ctx.busyWarning.value }}</template>
 				{{ formatMessage(messages.busyWarning) }}
 			</Admonition>
-			<FileOperationAdmonitions />
 			<div class="relative flex w-full flex-col">
 				<div class="relative isolate flex w-full flex-col gap-4">
 					<FileNavbar
@@ -55,6 +54,7 @@
 						:editing-file-name="ctx.editingFile.value?.name"
 						:editing-file-path="ctx.editingFile.value?.path"
 						:is-editing-image="fileEditorRef?.isEditingImage"
+						:is-editor-find-open="fileEditorRef?.isFindOpen"
 						:search-query="searchQuery"
 						:show-refresh-button="showRefreshButton"
 						:show-install-from-url="ctx.showInstallFromUrl"
@@ -71,6 +71,7 @@
 						@unzip-from-url="showUnzipFromUrlModal"
 						@refresh="ctx.refresh"
 						@share="() => fileEditorRef?.shareToMclogs()"
+						@find="() => fileEditorRef?.toggleFind()"
 					/>
 
 					<div v-if="!isEditing">
@@ -235,7 +236,6 @@ import FileEditor from './components/editor/FileEditor.vue'
 import FileContextMenu from './components/FileContextMenu.vue'
 import FileManagerError from './components/FileManagerError.vue'
 import FileNavbar from './components/FileNavbar.vue'
-import FileOperationAdmonitions from './components/FileOperationAdmonitions.vue'
 import FileTableHeader from './components/FileTableHeader.vue'
 import FileTableRow from './components/FileTableRow.vue'
 import FileCreateItemModal from './components/modals/FileCreateItemModal.vue'

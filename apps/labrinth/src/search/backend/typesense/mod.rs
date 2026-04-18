@@ -83,10 +83,16 @@ pub struct RequestConfig {
     pub prioritize_exact_match: bool,
     #[serde(default = "default_prioritize_num_matching_fields")]
     pub prioritize_num_matching_fields: bool,
+    #[serde(default = "default_prioritize_token_positions")]
+    pub prioritize_token_positions: bool,
+    #[serde(default = "default_drop_tokens_threshold")]
+    pub drop_tokens_threshold: usize,
     #[serde(default)]
     pub text_match_type: TextMatchType,
     #[serde(default)]
     pub bucketing: Bucketing,
+    #[serde(default = "default_max_candidates")]
+    pub max_candidates: usize,
 }
 
 impl Default for RequestConfig {
@@ -98,32 +104,38 @@ impl Default for RequestConfig {
             prioritize_exact_match: default_prioritize_exact_match(),
             prioritize_num_matching_fields:
                 default_prioritize_num_matching_fields(),
+            prioritize_token_positions: default_prioritize_token_positions(),
+            drop_tokens_threshold: default_drop_tokens_threshold(),
             text_match_type: TextMatchType::default(),
             bucketing: Bucketing::default(),
+            max_candidates: default_max_candidates(),
         }
     }
 }
 
 fn default_query_by() -> Vec<String> {
-    [
-        "name",
-        "indexed_name",
-        "slug",
-        "author",
-        "indexed_author",
-        "summary",
-    ]
-    .into_iter()
-    .map(str::to_string)
-    .collect()
+    // [
+    //     "name",
+    //     "indexed_name",
+    //     "slug",
+    //     "author",
+    //     "indexed_author",
+    //     "summary",
+    // ]
+    ["name", "indexed_name", "slug", "author", "indexed_author"]
+        .into_iter()
+        .map(str::to_string)
+        .collect()
 }
 
 fn default_query_by_weights() -> Vec<u8> {
-    vec![15, 15, 10, 3, 3, 1]
+    // vec![15, 15, 10, 3, 3, 1]
+    vec![15, 15, 10, 3, 3]
 }
 
 fn default_prefix() -> Vec<bool> {
-    vec![true, true, true, true, true, true]
+    // vec![true, true, true, true, true, true]
+    vec![true, true, true, true, true]
 }
 
 const fn default_prioritize_exact_match() -> bool {
@@ -132,6 +144,20 @@ const fn default_prioritize_exact_match() -> bool {
 
 const fn default_prioritize_num_matching_fields() -> bool {
     false
+}
+
+const fn default_prioritize_token_positions() -> bool {
+    // true
+    false
+}
+
+const fn default_drop_tokens_threshold() -> usize {
+    // 0
+    1
+}
+
+const fn default_max_candidates() -> usize {
+    8
 }
 
 impl TypesenseConfig {
@@ -697,6 +723,14 @@ impl SearchBackend for Typesense {
                     .to_string(),
             ),
             (
+                "prioritize_token_positions",
+                info.typesense_config.prioritize_token_positions.to_string(),
+            ),
+            (
+                "drop_tokens_threshold",
+                info.typesense_config.drop_tokens_threshold.to_string(),
+            ),
+            (
                 "text_match_type",
                 info.typesense_config.text_match_type.as_str().to_string(),
             ),
@@ -707,6 +741,10 @@ impl SearchBackend for Typesense {
             ("group_limit", "1".to_string()),
             ("facet_by", "project_id".to_string()),
             ("max_facet_values", "0".to_string()),
+            (
+                "max_candidates",
+                info.typesense_config.max_candidates.to_string(),
+            ),
         ];
         if let Some(query_by_weights) =
             Self::query_by_weights(&info.typesense_config)

@@ -41,6 +41,54 @@
   "badge.new": {
     "defaultMessage": "Новое"
   },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Отмена"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus, plural, one {# разделяемый} other {# разделяемых}} CPU"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Вы собираетесь возобновить подписку на <server-name>{serverName}</server-name>. После оплаты сервер продолжит работу без остановок."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Невозможно возобновить подписку: не удалось загрузить данные."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Ошибка"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Не удалось загрузить данные о подписке."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "в 5 дней"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "в месяц"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "в 3 месяца"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "в год"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Следующее списание — <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "План"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} ГБ ОЗУ"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Возобновить подписку"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} ГБ диска"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Возобновление подписки на сервер"
+  },
   "button.accept": {
     "defaultMessage": "Принять"
   },
@@ -233,6 +281,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Обновление проектов"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Удерживайте Shift при нажатии на кнопку \"Обновить всё\", чтобы пропустить это подтверждение в будущем."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Обновить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
   },
@@ -247,12 +298,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Удалить {itemType}{count, plural, one {} few {а} many {ов} other {а}}"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Любые моды или контент, добавленные вами поверх сборки модов, будут удалены."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Любые моды или контент, добавленные вами поверх сборки модов, будут сохранены."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Предупреждение: {action, select, downgrade {откат} other {обновление}} версии"
@@ -429,7 +474,7 @@
     "defaultMessage": "Обновление {progress}/{total} {contentType}..."
   },
   "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "Обновление проектов..."
+    "defaultMessage": "Обновление проекта..."
   },
   "content.selection-bar.selected-count": {
     "defaultMessage": "{count} проектов выбрано"
@@ -437,26 +482,32 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "Выбрано: {count, number}"
   },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Итоги распаковки"
+  },
   "files.conflict-modal.overwrite-button": {
-    "defaultMessage": "Переписать"
+    "defaultMessage": "Перезаписать"
   },
   "files.conflict-modal.overwrite-many-warning": {
-    "defaultMessage": "Более 100 файлов будет перезаписано если вы продолжите извлечение; вот несколько из них."
+    "defaultMessage": "При продолжении более 100 файлов будут перезаписаны; вот некоторые из них."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "{count, plural, one {Следующий # файл} few {Следующие # файла} other {Следующие # файлов}} уже есть на сервере. При продолжении они будут перезаписаны."
   },
   "files.conflict-modal.overwritten-count": {
-    "defaultMessage": "{count} переписано"
+    "defaultMessage": "{count, number} перезаписей"
   },
   "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Переписано"
+    "defaultMessage": "Перезапись"
   },
   "files.conflict-modal.warning-header": {
-    "defaultMessage": "Файлов будет переписано"
+    "defaultMessage": "Файлы будут перезаписаны"
   },
   "files.create-modal.create-button": {
     "defaultMessage": "Создать {type, select, directory {папку} other {файл}}"
   },
   "files.create-modal.header": {
-    "defaultMessage": "Создать {type, select, directory {папку} other {файл}}"
+    "defaultMessage": "Создание {type, select, directory {папки} other {файла}}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "Например: my-folder"
@@ -468,7 +519,10 @@
     "defaultMessage": "Удаление «{name}»"
   },
   "files.delete-modal.header": {
-    "defaultMessage": "Удалить файл"
+    "defaultMessage": "Удаление файла"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {Эта папка и всё содержимое в ней будет удалено навсегда. Это действие необратимо.} other {Этот файл будет удалён навсегда. Это действие необратимо.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Не получилось загрузить контент файла."
@@ -501,7 +555,7 @@
     "defaultMessage": "Сохранение не удалось"
   },
   "files.error.go-to-home": {
-    "defaultMessage": "Вернуться на главную страницу"
+    "defaultMessage": "Перейти в начало"
   },
   "files.error.try-again": {
     "defaultMessage": "Повторить попытку"
@@ -526,6 +580,15 @@
   },
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Уменьшить"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "Файловые операции отключены, пока операция выполняется."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Ошибка при запуске пробной версии"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "Пробный запуск не удался"
   },
   "files.layout.empty-folder-description": {
     "defaultMessage": "Нет файлов или папок."
@@ -564,7 +627,10 @@
     "defaultMessage": "Перемещение {type, select, directory {папки} other {файла}}"
   },
   "files.navbar.back-to-home": {
-    "defaultMessage": "Вернуться на главную страницу"
+    "defaultMessage": "В начало"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Навигационная цепочка"
   },
   "files.navbar.create-new": {
     "defaultMessage": "Создать..."
@@ -573,7 +639,7 @@
     "defaultMessage": "Навигация файла"
   },
   "files.navbar.home": {
-    "defaultMessage": "Главная"
+    "defaultMessage": "Начало"
   },
   "files.navbar.install-curseforge-pack": {
     "defaultMessage": "Установить сборку из CurseForge"
@@ -611,17 +677,14 @@
   "files.operations.modpack-from-url": {
     "defaultMessage": "сборка модов из URL"
   },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Загрузка файлов ({completed}/{total})"
-  },
   "files.rename-modal.header": {
     "defaultMessage": "Переименование {name}"
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Новое имя"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# элемент} few {# элемента} other {# элементов}}"
   },
   "files.table-header.created": {
     "defaultMessage": "Создан"
@@ -668,8 +731,20 @@
   "files.upload-dropdown.incorrect-file-type": {
     "defaultMessage": "Загрузка имела неправильный тип файла"
   },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Произошла непредвиденная ошибка."
+  },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " - {count} осталось"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Перетащите сюда {type, select, undefined {файл(ы)} other {{type}}}, чтобы загрузить"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "Имя должно содержать только буквенные символы, дефисы, подчеркивания или пробелы."
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "Имя должно содержать только буквенные символы, дефисы, подчёркивания, точки или пробелы."
   },
   "files.validation.name-label": {
     "defaultMessage": "Имя"
@@ -712,6 +787,9 @@
   },
   "files.zip-url-modal.step-copy-title": {
     "defaultMessage": "Скопировать URL"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "Просмотрите CurseForge и найдите нужную вам сборку модов."
   },
   "files.zip-url-modal.step-find-title": {
     "defaultMessage": "Найти сборку модов"
@@ -915,7 +993,7 @@
     "defaultMessage": "Выберите версию игры"
   },
   "installation-settings.aria.select-loader-version": {
-    "defaultMessage": "Выбрать версию {loader} "
+    "defaultMessage": "Выбрать версию {loader}"
   },
   "installation-settings.aria.select-platform": {
     "defaultMessage": "Выберите платформу"
@@ -937,6 +1015,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Мы не рекомендуем редактировать ваши настройки установки после установки контента. Если вы хотите изменить их, перезагрузите сервер."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Автоматическое исправление"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Сменить загрузчика модов"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Отключить конфликты"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "При смене версии игры, мы можем либо отключить установленные несовместимые проекты, либо попытаться решить несовместимости."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Предупреждение об несовместимости"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Установлены несовместимые проекты"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "При смене загрузчика модов, все установленные проекты будут отключены. Вместо этого мы рекомендуем сбросить ваш сервер."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Смена загрузчика модов приведёт к повреждениям"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Отвязка {projectType, select, server {серверного проекта} other {сборки}}"
@@ -1159,9 +1261,6 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "Мод зависит на клиентском моде и может вызывать проблемы при запуске сервера"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Это клиентский мод, который может вызвать проблемы. Мы оставили его включенным, так как некоторые авторы неверно указывают среду окружения, и загрузчик должен сам разрешить этот конфликт."
   },
   "label.client-retained-warning": {
     "defaultMessage": "Это клиентский мод, который был установлен как зависимый и может вызывать проблемы, при запуске сервера"
@@ -2454,10 +2553,10 @@
     "defaultMessage": "Загрузчик"
   },
   "search.server_content_type.modpack": {
-    "defaultMessage": "Со сборкой"
+    "defaultMessage": "Модовые"
   },
   "search.server_content_type.vanilla": {
-    "defaultMessage": "Без сборки"
+    "defaultMessage": "Ванильные"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Что-то пошло не так во время создания {backupName}. Пожалуйста, попробуйте ещё раз или обратитесь в поддержку, если проблема продолжится."
@@ -2561,9 +2660,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Способ оплаты"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "оплата: {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Соберите свой план с нужными характеристиками."
   },
@@ -2579,17 +2675,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Популярный"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Выберите план"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Выбрать план"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Для 1–5 друзей и пары лёгких модов."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Подберите объём памяти и характеристики под свои задачи."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "План"
