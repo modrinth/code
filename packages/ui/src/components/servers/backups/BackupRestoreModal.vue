@@ -4,7 +4,7 @@
 			<Admonition v-if="ctx.isServerRunning.value" type="critical" header="Server is running">
 				Stop the server before restoring a backup.
 			</Admonition>
-			<Admonition v-else type="critical" header="Restore warning">
+			<Admonition v-else type="critical" header="Your server files will be replaced">
 				Restoring your server will replace the current world and server files. Any changes made
 				since that backup will be permanently lost.
 			</Admonition>
