@@ -20,26 +20,28 @@
 				</span>
 			</div>
 		</div>
-		<div class="mt-2 flex justify-start gap-2">
-			<ButtonStyled color="brand">
-				<button :disabled="renameMutation.isPending.value || nameExists" @click="renameBackup">
-					<template v-if="renameMutation.isPending.value">
-						<SpinnerIcon class="animate-spin" />
-						Renaming...
-					</template>
-					<template v-else>
-						<SaveIcon />
-						Save changes
-					</template>
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button @click="hide">
-					<XIcon />
-					Cancel
-				</button>
-			</ButtonStyled>
-		</div>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button class="!border !border-surface-4" @click="hide">
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="renameMutation.isPending.value || nameExists" @click="renameBackup">
+						<template v-if="renameMutation.isPending.value">
+							<SpinnerIcon class="animate-spin" />
+							Renaming...
+						</template>
+						<template v-else>
+							<SaveIcon />
+							Save changes
+						</template>
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
 	</NewModal>
 </template>
 

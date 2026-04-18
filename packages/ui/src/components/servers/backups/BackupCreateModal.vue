@@ -45,9 +45,9 @@
 			</Transition>
 		</div>
 		<template #actions>
-			<div class="w-full flex flex-row gap-2 justify-end">
+			<div class="flex gap-2 justify-end">
 				<ButtonStyled type="outlined">
-					<button class="!border-[1px] !border-surface-4" @click="hideModal">
+					<button class="!border !border-surface-4" @click="hideModal">
 						<XIcon />
 						Cancel
 					</button>

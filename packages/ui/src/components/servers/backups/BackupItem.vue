@@ -2,11 +2,12 @@
 import type { Archon } from '@modrinth/api-client'
 import {
 	ClipboardCopyIcon,
-	ClockIcon,
 	DownloadIcon,
 	EditIcon,
+	LoaderCircleIcon,
 	MoreVerticalIcon,
 	RotateCounterClockwiseIcon,
+	ShieldIcon,
 	TrashIcon,
 	UserRoundIcon,
 	XIcon,
@@ -85,7 +86,7 @@ const activeOperation = computed(() => creating.value || restoring.value)
 
 const backupIcon = computed(() => {
 	if (props.backup.automated) {
-		return ClockIcon
+		return ShieldIcon
 	}
 	return UserRoundIcon
 })
@@ -167,35 +168,54 @@ const messages = defineMessages({
 		id: 'servers.backups.item.manual-backup',
 		defaultMessage: 'Manual backup',
 	},
+	creatingBackup: {
+		id: 'servers.backups.item.creating-backup',
+		defaultMessage: 'Creating backup\u2026',
+	},
+	restoring: {
+		id: 'servers.backups.item.restoring',
+		defaultMessage: 'Restoring',
+	},
 })
 </script>
 <template>
 	<div
-		class="grid items-center gap-4 rounded-2xl bg-bg-raised p-4 shadow-md"
-		:class="
-			preview
-				? 'grid-cols-1'
-				: 'grid-cols-[auto_1fr_auto] md:grid-cols-[minmax(0,1fr)_400px_minmax(0,1fr)]'
-		"
+		class="flex items-center gap-4 rounded-[20px] bg-surface-3 p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.3),0px_1px_3px_0px_rgba(0,0,0,0.15)]"
 	>
-		<div class="flex flex-row gap-4 items-center">
+		<div class="flex min-w-0 flex-1 items-center gap-4">
+			<!-- Icon tile -->
 			<div
-				class="flex size-12 shrink-0 items-center justify-center rounded-2xl border-solid border-[1px] border-surface-5 bg-surface-4 md:size-16"
+				class="flex shrink-0 items-center justify-center rounded-2xl border border-solid border-surface-5 bg-surface-4"
+				:class="preview ? 'size-10' : 'size-14'"
 			>
-				<component :is="backupIcon" class="size-7 text-secondary md:size-10" />
+				<LoaderCircleIcon
+					v-if="activeOperation"
+					v-tooltip="restoring ? formatMessage(messages.restoring) : undefined"
+					class="animate-spin text-secondary"
+					:class="preview ? 'size-6' : 'size-10'"
+				/>
+				<component
+					:is="backupIcon"
+					v-else
+					class="text-secondary"
+					:class="preview ? 'size-6' : 'size-10'"
+				/>
 			</div>
 
+			<!-- Name + badge + subtitle -->
 			<div class="flex min-w-0 flex-col gap-1.5">
-				<div class="flex flex-wrap items-center gap-2">
-					<span class="truncate font-semibold text-contrast max-w-[400px]">{{ backup.name }}</span>
+				<div class="flex min-w-0 items-center gap-2">
+					<span class="min-w-0 truncate font-semibold text-contrast">
+						{{ creating ? formatMessage(messages.creatingBackup) : backup.name }}
+					</span>
 					<span
 						v-if="backup.automated"
-						class="rounded-full border-solid border-[1px] border-surface-5 bg-surface-4 px-2.5 py-1 text-sm text-secondary"
+						class="shrink-0 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-secondary"
 					>
 						{{ formatMessage(messages.auto) }}
 					</span>
 				</div>
-				<div class="flex items-center gap-1.5 text-sm text-secondary">
+				<div class="flex items-center gap-1.5 text-sm font-medium text-secondary">
 					<template v-if="preview">
 						<span>{{ formatDateTime(backup.created_at) }}</span>
 					</template>
@@ -227,47 +247,51 @@ const messages = defineMessages({
 			</div>
 		</div>
 
-		<div
-			v-if="!preview"
-			class="col-span-full row-start-2 flex flex-col gap-2 md:col-span-1 md:row-start-auto md:items-center"
-		>
-			<span class="w-full font-medium text-contrast md:text-center">
-				{{ formatDateTime(backup.created_at) }}
-			</span>
+		<!-- Date + size (middle column) -->
+		<div v-if="!preview" class="flex w-[240px] shrink-0 flex-col gap-1.5">
+			<span class="whitespace-nowrap font-medium text-contrast">{{ formatDateTime(backup.created_at) }}</span>
 			<!-- TODO: Uncomment when API supports size field -->
-			<!-- <span class="text-secondary">{{ formatBytes(backup.size) }}</span> -->
+			<!-- <span class="font-normal text-secondary">{{ formatBytes(backup.size) }}</span> -->
 		</div>
 
-		<div v-if="!preview" class="flex shrink-0 items-center gap-2 md:justify-self-end">
-			<ButtonStyled v-if="!activeOperation" color="brand" type="outlined">
-				<button
-					v-tooltip="props.restoreDisabled"
-					class="!border-[1px]"
-					:disabled="!!props.restoreDisabled"
-					@click="() => emit('restore')"
-				>
-					<RotateCounterClockwiseIcon class="size-5" />
-					{{ formatMessage(messages.restore) }}
+		<!-- Right side actions -->
+		<div v-if="!preview" class="flex w-[180px] shrink-0 items-center justify-end gap-2">
+			<ButtonStyled v-if="creating" type="outlined">
+				<button @click="() => emit('delete', true)" class="!border !border-surface-4">
+					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
-			<ButtonStyled circular type="transparent">
-				<OverflowMenu :options="overflowMenuOptions">
-					<MoreVerticalIcon class="size-5" />
-					<template #copy-id>
-						<ClipboardCopyIcon class="size-5" />
-						{{ formatMessage(commonMessages.copyIdButton) }}
-					</template>
-					<template #download>
-						<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
-					</template>
-					<template #rename>
-						<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
-					</template>
-					<template #delete>
-						<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
-					</template>
-				</OverflowMenu>
-			</ButtonStyled>
+			<template v-else>
+				<ButtonStyled v-if="!activeOperation" color="brand" type="outlined">
+					<button
+						v-tooltip="props.restoreDisabled"
+						class="!border"
+						:disabled="!!props.restoreDisabled"
+						@click="() => emit('restore')"
+					>
+						<RotateCounterClockwiseIcon class="size-5" />
+						{{ formatMessage(messages.restore) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled circular type="transparent">
+					<OverflowMenu :options="overflowMenuOptions">
+						<MoreVerticalIcon class="size-5" />
+						<template #copy-id>
+							<ClipboardCopyIcon class="size-5" />
+							{{ formatMessage(commonMessages.copyIdButton) }}
+						</template>
+						<template #download>
+							<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
+						</template>
+						<template #rename>
+							<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
+						</template>
+						<template #delete>
+							<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
+						</template>
+					</OverflowMenu>
+				</ButtonStyled>
+			</template>
 		</div>
 
 		<pre v-if="!preview && showDebugInfo" class="w-full rounded-xl bg-surface-4 p-2 text-xs">{{
