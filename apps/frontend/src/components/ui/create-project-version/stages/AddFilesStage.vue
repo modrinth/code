@@ -4,8 +4,8 @@
 		mode="local"
 		:links="editTabLinks"
 		:active-index="2"
-		@tab-click="setEditTab"
 		class="mb-4 border border-solid border-surface-5 shadow-none drop-shadow-none"
+		@tab-click="setEditTab"
 	/>
 	<div class="flex w-full flex-col gap-4">
 		<template

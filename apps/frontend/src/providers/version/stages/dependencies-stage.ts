@@ -9,7 +9,7 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-dependencies',
 	stageContent: markRaw(DependenciesStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit dependencies' : 'Dependencies'),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit version' : 'Dependencies'),
 	skip: (ctx) => ctx.suggestedDependencies.value != null || ctx.projectType.value === 'modpack',
 	leftButtonConfig: (ctx) =>
 		ctx.editingVersion.value
@@ -38,7 +38,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'from-details-dependencies',
 	stageContent: markRaw(DependenciesStage),
-	title: 'Edit dependencies',
+	title: 'Edit version',
 	nonProgressStage: true,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
