@@ -249,7 +249,9 @@ const messages = defineMessages({
 
 		<!-- Date + size (middle column) -->
 		<div v-if="!preview" class="flex w-[240px] shrink-0 flex-col gap-1.5">
-			<span class="whitespace-nowrap font-medium text-contrast">{{ formatDateTime(backup.created_at) }}</span>
+			<span class="whitespace-nowrap font-medium text-contrast">{{
+				formatDateTime(backup.created_at)
+			}}</span>
 			<!-- TODO: Uncomment when API supports size field -->
 			<!-- <span class="font-normal text-secondary">{{ formatBytes(backup.size) }}</span> -->
 		</div>
@@ -257,7 +259,7 @@ const messages = defineMessages({
 		<!-- Right side actions -->
 		<div v-if="!preview" class="flex w-[180px] shrink-0 items-center justify-end gap-2">
 			<ButtonStyled v-if="creating" type="outlined">
-				<button @click="() => emit('delete', true)" class="!border !border-surface-4">
+				<button class="!border !border-surface-4" @click="() => emit('delete', true)">
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>

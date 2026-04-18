@@ -115,9 +115,7 @@ export const AllStates: Story = {
 		setup() {
 			const now = new Date(Date.now() - 1000 * 60 * 10).toISOString()
 
-			function makeBackup(
-				overrides: Partial<Archon.Backups.v1.Backup>,
-			): Archon.Backups.v1.Backup {
+			function makeBackup(overrides: Partial<Archon.Backups.v1.Backup>): Archon.Backups.v1.Backup {
 				return {
 					id: 'backup-001',
 					physical_id: 'phys-001',
