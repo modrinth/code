@@ -25,6 +25,7 @@ const props = defineProps<{
 		request: Archon.Servers.v0.StockRequest,
 	) => Promise<number>
 	custom: boolean
+	hideRegionSelection?: boolean
 	currency: string
 	interval: ServerBillingInterval
 	availableProducts: Labrinth.Billing.Internal.Product[]
@@ -179,23 +180,23 @@ const messages = defineMessages({
 	},
 })
 
+const getStockRequest = (
+	product: Labrinth.Billing.Internal.Product,
+): Archon.Servers.v0.StockRequest => {
+	const metadata = product.metadata
+	if (metadata.type === 'pyro' || metadata.type === 'medal') {
+		return {
+			cpu: metadata.cpu,
+			memory_mb: metadata.ram,
+			swap_mb: metadata.swap,
+			storage_mb: metadata.storage,
+		}
+	}
+	return { cpu: 0, memory_mb: 0, swap_mb: 0, storage_mb: 0 }
+}
+
 async function updateStock() {
 	currentStock.value = {}
-
-	const getStockRequest = (
-		product: Labrinth.Billing.Internal.Product,
-	): Archon.Servers.v0.StockRequest => {
-		const metadata = product.metadata
-		if (metadata.type === 'pyro' || metadata.type === 'medal') {
-			return {
-				cpu: metadata.cpu,
-				memory_mb: metadata.ram,
-				swap_mb: metadata.swap,
-				storage_mb: metadata.storage,
-			}
-		}
-		return { cpu: 0, memory_mb: 0, swap_mb: 0, storage_mb: 0 }
-	}
 
 	const capacityChecks = sortedRegions.value.map((region) =>
 		props.fetchStock(
@@ -219,8 +220,10 @@ onMounted(() => {
 		if (b.ping <= 0) return -1
 		return a.ping - b.ping
 	})[0]?.region
-	selectedRegion.value = undefined
 	selectedRam.value = minRam.value
+	if (!props.hideRegionSelection) {
+		selectedRegion.value = undefined
+	}
 	checkingCustomStock.value = true
 	updateStock().then(() => {
 		const firstWithStock = sortedRegions.value.find(
@@ -228,8 +231,9 @@ onMounted(() => {
 		)
 		let stockedRegion = selectedRegion.value
 		if (!stockedRegion) {
-			stockedRegion =
-				bestPing.value && currentStock.value[bestPing.value] > 0
+			stockedRegion = props.hideRegionSelection
+				? firstWithStock?.shortcode
+				: bestPing.value && currentStock.value[bestPing.value] > 0
 					? bestPing.value
 					: firstWithStock?.shortcode
 		}
@@ -247,36 +251,41 @@ onMounted(() => {
 		Checking availability...
 	</ModalLoadingIndicator>
 	<template v-else>
-		<h2 class="mt-0 mb-4 text-xl font-bold text-contrast">
-			{{ formatMessage(messages.prompt) }}
-		</h2>
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-			<ServersRegionButton
-				v-for="region in visibleRegions"
-				:key="region.shortcode"
-				v-model="selectedRegion"
-				:region="region"
-				:out-of-stock="currentStock[region.shortcode] === 0"
-				:ping="pings.find((p) => p.region === region.shortcode)?.ping"
-				:best-ping="bestPing === region.shortcode"
-			/>
-		</div>
-		<div class="mt-3 text-sm">
-			<IntlFormatted :message-id="messages.regionUnsupported">
-				<template #link="{ children }">
-					<a
-						class="text-link"
-						target="_blank"
-						rel="noopener noreferrer"
-						href="https://surveys.modrinth.com/servers-region-waitlist"
-					>
-						<component :is="() => children" />
-					</a>
-				</template>
-			</IntlFormatted>
-		</div>
+		<template v-if="!hideRegionSelection">
+			<h2 class="mt-0 mb-4 text-xl font-bold text-contrast">
+				{{ formatMessage(messages.prompt) }}
+			</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<ServersRegionButton
+					v-for="region in visibleRegions"
+					:key="region.shortcode"
+					v-model="selectedRegion"
+					:region="region"
+					:out-of-stock="currentStock[region.shortcode] === 0"
+					:ping="pings.find((p) => p.region === region.shortcode)?.ping"
+					:best-ping="bestPing === region.shortcode"
+				/>
+			</div>
+			<div class="mt-3 text-sm">
+				<IntlFormatted :message-id="messages.regionUnsupported">
+					<template #link="{ children }">
+						<a
+							class="text-link"
+							target="_blank"
+							rel="noopener noreferrer"
+							href="https://surveys.modrinth.com/servers-region-waitlist"
+						>
+							<component :is="() => children" />
+						</a>
+					</template>
+				</IntlFormatted>
+			</div>
+		</template>
 		<template v-if="custom">
-			<h2 class="mt-4 mb-2 text-xl font-bold text-contrast">
+			<h2
+				class="mb-2 text-xl font-bold text-contrast"
+				:class="hideRegionSelection ? 'mt-0' : 'mt-4'"
+			>
 				{{ formatMessage(messages.customPrompt) }}
 			</h2>
 			<div>

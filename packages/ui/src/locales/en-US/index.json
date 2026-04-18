@@ -3038,6 +3038,9 @@
   "servers.purchase.step.plan.your-current-plan": {
     "defaultMessage": "Your current plan"
   },
+  "servers.purchase.step.ram.title": {
+    "defaultMessage": "Ram"
+  },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Region"
   },

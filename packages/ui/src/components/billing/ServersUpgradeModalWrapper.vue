@@ -36,7 +36,7 @@ import {
 	useDebugLogger,
 } from '@modrinth/ui'
 import { useMutation, useQuery } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 const props = defineProps<{
 	stripePublishableKey: string
@@ -340,6 +340,7 @@ async function open(id?: string) {
 		subscription.value = null
 	}
 
+	await nextTick()
 	purchaseModal.value?.show(currentInterval.value)
 }
 
