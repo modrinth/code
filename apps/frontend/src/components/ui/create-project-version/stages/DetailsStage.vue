@@ -1,15 +1,13 @@
 <template>
+	<NavTabs
+		v-if="editingVersion"
+		mode="local"
+		:links="editTabLinks"
+		:active-index="1"
+		@tab-click="setEditTab"
+		class="mb-4 border border-solid border-surface-5 shadow-none drop-shadow-none"
+	/>
 	<div class="flex w-full flex-col gap-6">
-		<Chips
-			v-if="editingVersion"
-			:model-value="'details'"
-			:items="editTabs"
-			size="small"
-			aria-label="Version edit sections"
-			hide-checkmark-icon
-			@update:model-value="setEditTab"
-		/>
-
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">
 				Version type <span class="text-red">*</span>
@@ -63,28 +61,25 @@
 </template>
 
 <script lang="ts" setup>
-import { Chips, MarkdownEditor, StyledInput } from '@modrinth/ui'
+import { Chips, MarkdownEditor, NavTabs, StyledInput } from '@modrinth/ui'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 const { draftVersion, isUploading, editingVersion, modal } = injectManageVersionContext()
 
-type EditVersionTab = 'metadata' | 'details' | 'files'
+const editTabs = [
+	{ label: 'Metadata', href: 'metadata', stage: 'metadata' },
+	{ label: 'Details', href: 'details', stage: 'add-details' },
+	{ label: 'Files', href: 'files', stage: 'add-files' },
+] as const
 
-const editTabs: EditVersionTab[] = ['metadata', 'details', 'files']
-const editTabToStage: Record<EditVersionTab, string> = {
-	metadata: 'metadata',
-	details: 'add-details',
-	files: 'add-files',
-}
+const editTabLinks = editTabs.map(({ label, href }) => ({ label, href }))
 
-const isEditVersionTab = (tab: string): tab is EditVersionTab =>
-	editTabs.some((candidate) => candidate === tab)
-
-function setEditTab(tab: string | null | undefined) {
-	if (!tab || !isEditVersionTab(tab)) return
-	modal.value?.setStage(editTabToStage[tab])
+function setEditTab(index: number) {
+	const tab = editTabs[index]
+	if (!tab) return
+	modal.value?.setStage(tab.stage)
 }
 
 async function onImageUpload(file: File) {

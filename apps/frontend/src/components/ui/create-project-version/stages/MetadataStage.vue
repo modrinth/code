@@ -1,15 +1,13 @@
 <template>
+	<NavTabs
+		v-if="editingVersion"
+		mode="local"
+		:links="editTabLinks"
+		:active-index="0"
+		@tab-click="setEditTab"
+		class="mb-2 border border-solid border-surface-5 shadow-none drop-shadow-none"
+	/>
 	<div class="flex flex-col gap-6">
-		<Chips
-			v-if="editingVersion"
-			:model-value="'metadata'"
-			:items="editTabs"
-			size="small"
-			aria-label="Version edit sections"
-			hide-checkmark-icon
-			@update:model-value="setEditTab"
-		/>
-
 		<div v-if="!editingVersion" class="flex flex-col gap-1">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast"> Uploaded files </span>
@@ -208,11 +206,11 @@ import type { Labrinth } from '@modrinth/api-client'
 import { EditIcon, getLoaderIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
-	Chips,
 	defineMessages,
 	ENVIRONMENTS_COPY,
 	FormattedTag,
 	injectProjectPageContext,
+	NavTabs,
 	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
@@ -241,21 +239,18 @@ const { projectV2 } = injectProjectPageContext()
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
 
-type EditVersionTab = 'metadata' | 'details' | 'files'
+const editTabs = [
+	{ label: 'Metadata', href: 'metadata', stage: 'metadata' },
+	{ label: 'Details', href: 'details', stage: 'add-details' },
+	{ label: 'Files', href: 'files', stage: 'add-files' },
+] as const
 
-const editTabs: EditVersionTab[] = ['metadata', 'details', 'files']
-const editTabToStage: Record<EditVersionTab, string> = {
-	metadata: 'metadata',
-	details: 'add-details',
-	files: 'add-files',
-}
+const editTabLinks = editTabs.map(({ label, href }) => ({ label, href }))
 
-const isEditVersionTab = (tab: string): tab is EditVersionTab =>
-	editTabs.some((candidate) => candidate === tab)
-
-function setEditTab(tab: string | null | undefined) {
-	if (!tab || !isEditVersionTab(tab)) return
-	modal.value?.setStage(editTabToStage[tab])
+function setEditTab(index: number) {
+	const tab = editTabs[index]
+	if (!tab) return
+	modal.value?.setStage(tab.stage)
 }
 
 const isModpack = computed(() => projectType.value === 'modpack')

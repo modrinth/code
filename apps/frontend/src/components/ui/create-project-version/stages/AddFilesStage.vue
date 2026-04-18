@@ -1,15 +1,13 @@
 <template>
+	<NavTabs
+		v-if="editingVersion"
+		mode="local"
+		:links="editTabLinks"
+		:active-index="2"
+		@tab-click="setEditTab"
+		class="mb-4 border border-solid border-surface-5 shadow-none drop-shadow-none"
+	/>
 	<div class="flex w-full flex-col gap-4">
-		<Chips
-			v-if="editingVersion"
-			:model-value="'files'"
-			:items="editTabs"
-			size="small"
-			aria-label="Version edit sections"
-			hide-checkmark-icon
-			@update:model-value="setEditTab"
-		/>
-
 		<template
 			v-if="handlingNewFiles || !(filesToAdd.length || draftVersion.existing_files?.length)"
 		>
@@ -98,10 +96,10 @@
 <script lang="ts" setup>
 import {
 	Admonition,
-	Chips,
 	defineMessages,
 	DropzoneFileInput,
 	injectProjectPageContext,
+	NavTabs,
 	useVIntl,
 } from '@modrinth/ui'
 import { acceptFileFromProjectType } from '@modrinth/utils'
@@ -126,21 +124,18 @@ const {
 	handleNewFiles,
 } = injectManageVersionContext()
 
-type EditVersionTab = 'metadata' | 'details' | 'files'
+const editTabs = [
+	{ label: 'Metadata', href: 'metadata', stage: 'metadata' },
+	{ label: 'Details', href: 'details', stage: 'add-details' },
+	{ label: 'Files', href: 'files', stage: 'add-files' },
+] as const
 
-const editTabs: EditVersionTab[] = ['metadata', 'details', 'files']
-const editTabToStage: Record<EditVersionTab, string> = {
-	metadata: 'metadata',
-	details: 'add-details',
-	files: 'add-files',
-}
+const editTabLinks = editTabs.map(({ label, href }) => ({ label, href }))
 
-const isEditVersionTab = (tab: string): tab is EditVersionTab =>
-	editTabs.some((candidate) => candidate === tab)
-
-function setEditTab(tab: string | null | undefined) {
-	if (!tab || !isEditVersionTab(tab)) return
-	modal.value?.setStage(editTabToStage[tab])
+function setEditTab(index: number) {
+	const tab = editTabs[index]
+	if (!tab) return
+	modal.value?.setStage(tab.stage)
 }
 
 function handleRemoveFile(index: number) {
