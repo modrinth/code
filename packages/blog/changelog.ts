@@ -11,6 +11,49 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-04-18T19:00:59+00:00`,
+		product: 'app',
+		version: '0.13.2',
+		body: `## Added
+- Instances on the Library page are now grouped into collapsible accordions if they have an associated group. Thanks to [@kirushkinx](https://github.com/kirushkinx)!
+
+## Changed
+- Redesigned the "Find and Replace" tool in the instance Files tab editor to match the rest of the platform. Thanks to [@Creeperkatze](https://github.com/Creeperkatze)!
+
+## Fixed
+- Worlds and servers in the instance Worlds tab now load almost instantly instead of taking one to two seconds.
+- Fixed the Modrinth+ upgrade button and ad banner not staying pinned to the bottom right.
+- Fixed servers in the "Jump back in" section of the home page loading slowly. Thanks to [@Creeperkatze](https://github.com/Creeperkatze)!
+- Fixed several issues with the splash screen.
+- Fixed the cancel button when changing the install directory.
+- Fixed symlinks breaking directory moves.`,
+	},
+	{
+		date: `2026-04-18T19:00:59+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Alpha and beta indicators next to Paper build numbers in the server onboarding and reset modals and on the platform settings page.
+
+## Changed
+- Moved the "Kill server" action into a joined dropdown button with the "Stop" action.
+- Swapped the positions of the "Restart" and "Stop" actions in the server panel.
+- Redesigned the "Find and Replace" tool in the Files tab editor to match the rest of the platform. Thanks to [@Creeperkatze](https://github.com/Creeperkatze)!
+
+## Fixed
+- Fixed slow tab switching in the server panel.
+- Fixed slow loading of the "Manage servers" page in the Modrinth App and slow interactions with it on the website.`,
+	},
+	{
+		date: `2026-04-18T19:00:59+00:00`,
+		product: 'web',
+		body: `## Added
+- Tabs in the version edit modal for switching between version pages.
+
+## Fixed
+- Fixed incorrect margins on project cards.
+- Fixed slow loading of the 404 page. Thanks to [@IsQuyet](https://github.com/IsQuyet)!`,
+	},
+	{
 		date: `2026-04-15T19:39:48+00:00`,
 		product: 'hosting',
 		body: `## Added
