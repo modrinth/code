@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { InfoIcon, XIcon } from '@modrinth/assets'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, toValue } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -7,6 +8,19 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
 
 import { injectBrowseManager } from './providers/browse-manager'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	filtersHeading: {
+		id: 'browse-tab.filters-heading',
+		defaultMessage: 'Filters',
+	},
+	hideInstalledDefault: {
+		id: 'browse-tab.hide-installed-default',
+		defaultMessage: 'Hide installed content',
+	},
+})
 
 const ctx = injectBrowseManager()
 
@@ -80,7 +94,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 			v-if="ctx.filtersMenuOpen?.value"
 			class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
 		>
-			<h3 class="m-0 text-lg text-contrast">Filters</h3>
+			<h3 class="m-0 text-lg text-contrast">{{ formatMessage(messages.filtersHeading) }}</h3>
 			<ButtonStyled circular>
 				<button @click="closeFiltersMenu">
 					<XIcon />
@@ -98,7 +112,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		>
 			<Checkbox
 				v-model="ctx.hideInstalled!.value"
-				:label="ctx.hideInstalledLabel?.value ?? 'Hide installed content'"
+				:label="ctx.hideInstalledLabel?.value ?? formatMessage(messages.hideInstalledDefault)"
 				class="filter-checkbox"
 				@update:model-value="ctx.onFilterChange()"
 				@click.prevent.stop

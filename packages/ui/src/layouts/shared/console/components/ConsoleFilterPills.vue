@@ -1,6 +1,6 @@
 <template>
 	<FilterPills v-model="selectedFilters" :options="visibleOptions">
-		<template #all> All </template>
+		<template #all>{{ formatMessage(commonMessages.consoleFilterAllLevels) }}</template>
 	</FilterPills>
 </template>
 
@@ -8,22 +8,42 @@
 import { computed } from 'vue'
 
 import FilterPills from '#ui/components/base/FilterPills.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import type { ConditionalLevel } from '../composables/console-filtering'
 import type { LogLevel } from '../types'
 
 type FilterValue = LogLevel | 'all'
 
-const ALWAYS_VISIBLE: Array<{ id: LogLevel; label: string }> = [
-	{ id: 'error', label: 'Error' },
-	{ id: 'warn', label: 'Warn' },
-	{ id: 'info', label: 'Info' },
-]
+const { formatMessage } = useVIntl()
 
-const CONDITIONAL_OPTIONS: Array<{ id: ConditionalLevel; label: string }> = [
-	{ id: 'debug', label: 'Debug' },
-	{ id: 'trace', label: 'Trace' },
-]
+const logLevelLabels = defineMessages({
+	error: {
+		id: 'servers.console.filter.log-level.error',
+		defaultMessage: 'Error',
+	},
+	warn: {
+		id: 'servers.console.filter.log-level.warn',
+		defaultMessage: 'Warn',
+	},
+	info: {
+		id: 'servers.console.filter.log-level.info',
+		defaultMessage: 'Info',
+	},
+	debug: {
+		id: 'servers.console.filter.log-level.debug',
+		defaultMessage: 'Debug',
+	},
+	trace: {
+		id: 'servers.console.filter.log-level.trace',
+		defaultMessage: 'Trace',
+	},
+})
+
+const ALWAYS_VISIBLE: LogLevel[] = ['error', 'warn', 'info']
+
+const CONDITIONAL_LEVELS: ConditionalLevel[] = ['debug', 'trace']
 
 const props = defineProps<{
 	presentLevels: Set<ConditionalLevel>
@@ -36,8 +56,11 @@ const emit = defineEmits<{
 }>()
 
 const visibleOptions = computed(() => [
-	...ALWAYS_VISIBLE,
-	...CONDITIONAL_OPTIONS.filter((opt) => props.presentLevels.has(opt.id)),
+	...ALWAYS_VISIBLE.map((id) => ({ id, label: formatMessage(logLevelLabels[id]) })),
+	...CONDITIONAL_LEVELS.filter((id) => props.presentLevels.has(id)).map((id) => ({
+		id,
+		label: formatMessage(logLevelLabels[id]),
+	})),
 ])
 
 const selectedFilters = computed({

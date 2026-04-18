@@ -3,7 +3,7 @@
 		<ButtonStyled v-if="showClear && hasLogs" type="transparent">
 			<button @click="emit('clear')">
 				<XIcon />
-				Clear
+				{{ formatMessage(commonMessages.clearButton) }}
 			</button>
 		</ButtonStyled>
 		<ButtonStyled v-if="showDelete" type="transparent" hover-color-fill="background" color="red">
@@ -13,7 +13,7 @@
 				@click="emit('delete')"
 			>
 				<TrashIcon />
-				Delete
+				{{ formatMessage(commonMessages.deleteLabel) }}
 			</button>
 		</ButtonStyled>
 		<ButtonStyled v-if="hasLogs" type="transparent">
@@ -24,14 +24,14 @@
 			>
 				<SpinnerIcon v-if="sharing" class="animate-spin" />
 				<ShareIcon v-else />
-				Share
+				{{ formatMessage(messages.share) }}
 			</button>
 		</ButtonStyled>
 		<ButtonStyled type="transparent">
 			<button @click="emit('toggle-fullscreen')">
 				<ContractIcon v-if="fullscreen" />
 				<ExpandIcon v-else />
-				{{ fullscreen ? 'Collapse' : 'Expand' }}
+				{{ fullscreen ? formatMessage(messages.collapse) : formatMessage(messages.expand) }}
 			</button>
 		</ButtonStyled>
 	</div>
@@ -48,6 +48,25 @@ import {
 } from '@modrinth/assets'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	share: {
+		id: 'servers.console.action.share',
+		defaultMessage: 'Share',
+	},
+	expand: {
+		id: 'servers.console.action.expand',
+		defaultMessage: 'Expand',
+	},
+	collapse: {
+		id: 'servers.console.action.collapse',
+		defaultMessage: 'Collapse',
+	},
+})
 
 defineProps<{
 	showClear?: boolean

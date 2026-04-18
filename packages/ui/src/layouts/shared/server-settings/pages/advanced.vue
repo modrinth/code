@@ -5,26 +5,32 @@
 				<!-- SFTP section -->
 				<div class="flex flex-col gap-2">
 					<div class="flex flex-col items-center justify-between gap-0.5 sm:flex-row">
-						<span class="text-lg font-semibold text-contrast">SFTP</span>
+						<span class="text-lg font-semibold text-contrast">{{
+							formatMessage(messages.sftpSectionTitle)
+						}}</span>
 						<ButtonStyled>
 							<a
-								v-tooltip="'This button only works with compatible SFTP clients (e.g. WinSCP)'"
+								v-tooltip="formatMessage(messages.sftpLaunchTooltip)"
 								class="!w-full sm:!w-auto"
 								:href="sftpUrl"
 								target="_blank"
 							>
 								<ExternalIcon class="h-5 w-5" />
-								Launch SFTP
+								{{ formatMessage(messages.launchSftpButton) }}
 							</a>
 						</ButtonStyled>
 					</div>
 
 					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
-						<span class="text-lg font-semibold text-contrast">Server Address</span>
+						<span class="text-lg font-semibold text-contrast">{{
+							formatMessage(messages.serverAddressLabel)
+						}}</span>
 						<div
-							v-tooltip="'Copy SFTP server address'"
+							v-tooltip="formatMessage(messages.copySftpAddressTooltip)"
 							class="copy-field hover:bg-button-bg-hover"
-							@click="copyToClipboard('Server address', server?.sftp_host)"
+							@click="
+								copyToClipboard(formatMessage(messages.serverAddressLabel), server?.sftp_host)
+							"
 						>
 							<span class="cursor-pointer font-semibold text-primary">
 								{{ server?.sftp_host }}
@@ -35,11 +41,18 @@
 						</div>
 						<div class="flex flex-col gap-2 sm:mt-0 sm:flex-row">
 							<div class="flex w-full flex-col justify-center gap-2">
-								<span class="text-lg font-semibold text-contrast">Username</span>
+								<span class="text-lg font-semibold text-contrast">{{
+									formatMessage(commonMessages.usernameLabel)
+								}}</span>
 								<div
-									v-tooltip="'Copy SFTP username'"
+									v-tooltip="formatMessage(messages.copySftpUsernameTooltip)"
 									class="copy-field hover:bg-button-bg-hover"
-									@click="copyToClipboard('Username', server?.sftp_username)"
+									@click="
+										copyToClipboard(
+											formatMessage(commonMessages.usernameLabel),
+											server?.sftp_username,
+										)
+									"
 								>
 									<div class="truncate font-semibold">
 										{{ server?.sftp_username }}
@@ -50,14 +63,21 @@
 								</div>
 							</div>
 							<div class="flex w-full flex-col justify-center gap-2">
-								<span class="text-lg font-semibold text-contrast">Password</span>
+								<span class="text-lg font-semibold text-contrast">{{
+									formatMessage(commonMessages.passwordLabel)
+								}}</span>
 								<div
 									class="copy-field-has-button [&:hover:not(:has(button:hover))]:bg-button-bg-hover"
-									@click="copyToClipboard('Password', server?.sftp_password)"
+									@click="
+										copyToClipboard(
+											formatMessage(commonMessages.passwordLabel),
+											server?.sftp_password,
+										)
+									"
 								>
 									<div class="flex items-center gap-1.5 h-full w-full">
 										<div
-											v-tooltip="'Copy SFTP Password'"
+											v-tooltip="formatMessage(messages.copySftpPasswordTooltip)"
 											class="h-full flex justify-between grow items-center"
 										>
 											<div class="truncate font-semibold">
@@ -72,7 +92,11 @@
 
 										<ButtonStyled type="transparent" circular>
 											<button
-												v-tooltip="showPassword ? 'Hide password' : 'Show password'"
+												v-tooltip="
+													showPassword
+														? formatMessage(messages.hidePasswordTooltip)
+														: formatMessage(messages.showPasswordTooltip)
+												"
 												class="hover:bg-button-bg-hover grid h-10 w-10 place-content-center rounded-lg"
 												@click.stop="showPassword = !showPassword"
 											>
@@ -92,7 +116,9 @@
 				<div class="flex flex-col gap-2.5">
 					<div class="flex h-10 flex-col items-end justify-between gap-4 sm:flex-row">
 						<label for="startup-command-field" class="mb-0.5 flex flex-col gap-2">
-							<span class="text-lg font-semibold text-contrast">Startup command</span>
+							<span class="text-lg font-semibold text-contrast">{{
+								formatMessage(messages.startupCommandLabel)
+							}}</span>
 						</label>
 						<ButtonStyled v-if="startupCommand !== defaultStartupCommand" type="transparent">
 							<button
@@ -101,7 +127,7 @@
 								@click="resetToDefault"
 							>
 								<UpdatedIcon class="h-5 w-5" />
-								Default
+								{{ formatMessage(messages.defaultStartupButton) }}
 							</button>
 						</ButtonStyled>
 					</div>
@@ -121,13 +147,15 @@
 							<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
 						</div>
 					</div>
-					<span> The command that runs when your server is started. </span>
+					<span>{{ formatMessage(messages.startupCommandDescription) }}</span>
 				</div>
 
 				<!-- Java version section -->
 				<div class="flex flex-col gap-2.5">
 					<div class="flex flex-col gap-2">
-						<span class="text-lg font-semibold text-contrast">Java version</span>
+						<span class="text-lg font-semibold text-contrast">{{
+							formatMessage(messages.javaVersionLabel)
+						}}</span>
 					</div>
 					<div class="relative max-w-xs">
 						<Combobox
@@ -135,7 +163,9 @@
 							v-model="javaVersion"
 							name="java-version"
 							:options="displayedJavaVersions"
-							:display-value="javaVersionLabel ?? 'Java Version'"
+							:display-value="
+								javaVersionLabel ?? formatMessage(messages.javaVersionComboboxFallback)
+							"
 							:disabled="isStartupLoading"
 						>
 							<template #dropdown-footer>
@@ -146,7 +176,11 @@
 								>
 									<EyeOffIcon v-if="showAllVersions" class="size-4" />
 									<EyeIcon v-else class="size-4" />
-									{{ showAllVersions ? 'Hide extra versions' : 'Show all versions' }}
+									{{
+										showAllVersions
+											? formatMessage(messages.hideExtraJavaVersions)
+											: formatMessage(messages.showAllJavaVersions)
+									}}
 								</button>
 							</template>
 						</Combobox>
@@ -157,21 +191,23 @@
 							<SpinnerIcon class="h-5 w-5 animate-spin text-secondary" />
 						</div>
 					</div>
-					<span> The Java version your server runs on. </span>
+					<span>{{ formatMessage(messages.javaVersionDescription) }}</span>
 				</div>
 
 				<!-- Java runtime section -->
 				<div class="flex flex-col gap-2.5">
 					<div class="flex flex-col gap-2">
-						<span class="text-lg font-semibold text-contrast">Java runtime</span>
+						<span class="text-lg font-semibold text-contrast">{{
+							formatMessage(messages.javaRuntimeLabel)
+						}}</span>
 					</div>
 					<div class="relative max-w-xs">
 						<Combobox
 							:id="'runtime-field'"
 							v-model="jreVendor"
 							name="runtime"
-							:options="JRE_VENDORS"
-							:display-value="jreVendorLabel ?? 'Runtime'"
+							:options="JRE_VENDOR_OPTIONS"
+							:display-value="jreVendorLabel ?? formatMessage(messages.javaRuntimeComboboxFallback)"
 							:disabled="isStartupLoading"
 						/>
 						<div
@@ -181,7 +217,7 @@
 							<SpinnerIcon class="h-5 w-5 animate-spin text-secondary" />
 						</div>
 					</div>
-					<span> The Java runtime your server will use. </span>
+					<span>{{ formatMessage(messages.javaRuntimeDescription) }}</span>
 				</div>
 			</div>
 		</div>
@@ -210,13 +246,111 @@ import { computed, ref, watch } from 'vue'
 
 import { ButtonStyled, Combobox, StyledInput } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
+const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+
+const messages = defineMessages({
+	sftpSectionTitle: {
+		id: 'server.settings.advanced.sftp.title',
+		defaultMessage: 'SFTP',
+	},
+	sftpLaunchTooltip: {
+		id: 'server.settings.advanced.sftp.launch-tooltip',
+		defaultMessage: 'This button only works with compatible SFTP clients (e.g. WinSCP)',
+	},
+	launchSftpButton: {
+		id: 'server.settings.advanced.sftp.launch',
+		defaultMessage: 'Launch SFTP',
+	},
+	serverAddressLabel: {
+		id: 'server.settings.advanced.sftp.server-address',
+		defaultMessage: 'Server Address',
+	},
+	copySftpAddressTooltip: {
+		id: 'server.settings.advanced.sftp.copy-address-tooltip',
+		defaultMessage: 'Copy SFTP server address',
+	},
+	copySftpUsernameTooltip: {
+		id: 'server.settings.advanced.sftp.copy-username-tooltip',
+		defaultMessage: 'Copy SFTP username',
+	},
+	copySftpPasswordTooltip: {
+		id: 'server.settings.advanced.sftp.copy-password-tooltip',
+		defaultMessage: 'Copy SFTP password',
+	},
+	showPasswordTooltip: {
+		id: 'server.settings.advanced.sftp.show-password-tooltip',
+		defaultMessage: 'Show password',
+	},
+	hidePasswordTooltip: {
+		id: 'server.settings.advanced.sftp.hide-password-tooltip',
+		defaultMessage: 'Hide password',
+	},
+	startupCommandLabel: {
+		id: 'server.settings.advanced.startup-command.title',
+		defaultMessage: 'Startup command',
+	},
+	defaultStartupButton: {
+		id: 'server.settings.advanced.startup-command.default',
+		defaultMessage: 'Default',
+	},
+	startupCommandDescription: {
+		id: 'server.settings.advanced.startup-command.description',
+		defaultMessage: 'The command that runs when your server is started.',
+	},
+	javaVersionLabel: {
+		id: 'server.settings.advanced.java-version.title',
+		defaultMessage: 'Java version',
+	},
+	javaVersionComboboxFallback: {
+		id: 'server.settings.advanced.java-version.fallback',
+		defaultMessage: 'Java version',
+	},
+	javaVersionDescription: {
+		id: 'server.settings.advanced.java-version.description',
+		defaultMessage: 'The Java version your server runs on.',
+	},
+	showAllJavaVersions: {
+		id: 'server.settings.advanced.java-version.show-all',
+		defaultMessage: 'Show all versions',
+	},
+	hideExtraJavaVersions: {
+		id: 'server.settings.advanced.java-version.hide-extra',
+		defaultMessage: 'Hide extra versions',
+	},
+	javaRuntimeLabel: {
+		id: 'server.settings.advanced.java-runtime.title',
+		defaultMessage: 'Java runtime',
+	},
+	javaRuntimeComboboxFallback: {
+		id: 'server.settings.advanced.java-runtime.fallback',
+		defaultMessage: 'Runtime',
+	},
+	javaRuntimeDescription: {
+		id: 'server.settings.advanced.java-runtime.description',
+		defaultMessage: 'The Java runtime your server will use.',
+	},
+	clipboardCopiedTitle: {
+		id: 'server.settings.advanced.clipboard.copied.title',
+		defaultMessage: '{label} copied to clipboard!',
+	},
+	startupUpdateFailedTitle: {
+		id: 'server.settings.advanced.error.startup.title',
+		defaultMessage: 'Failed to update server arguments',
+	},
+	startupUpdateFailedText: {
+		id: 'server.settings.advanced.error.startup.text',
+		defaultMessage: 'Please try again later.',
+	},
+})
 const { server, serverId, worldId } = injectModrinthServerContext()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -225,11 +359,11 @@ const queryClient = useQueryClient()
 const showPassword = ref(false)
 const sftpUrl = computed(() => `sftp://${server.value?.sftp_username}@${server.value?.sftp_host}`)
 
-const copyToClipboard = (name: string, textToCopy?: string) => {
+const copyToClipboard = (label: string, textToCopy?: string) => {
 	navigator.clipboard.writeText(textToCopy || '')
 	addNotification({
 		type: 'success',
-		title: `${name} copied to clipboard!`,
+		title: formatMessage(messages.clipboardCopiedTitle, { label }),
 	})
 }
 
@@ -242,7 +376,7 @@ const { data: startupData, isLoading: isStartupLoading } = useQuery({
 	enabled: computed(() => worldId.value !== null),
 })
 
-const JAVA_VERSIONS = [
+const JAVA_VERSION_OPTIONS: { value: number; label: string }[] = [
 	{ value: 8, label: 'Java 8' },
 	{ value: 11, label: 'Java 11' },
 	{ value: 17, label: 'Java 17' },
@@ -271,24 +405,24 @@ function parseMinecraftReleaseVersion(version: string): MinecraftReleaseVersion 
 }
 
 function filterJavaVersions(compatibleVersions: number[]) {
-	return JAVA_VERSIONS.filter((version) => compatibleVersions.includes(version.value))
+	return JAVA_VERSION_OPTIONS.filter((version) => compatibleVersions.includes(version.value))
 }
 
 const displayedJavaVersions = computed(() => {
-	if (showAllVersions.value) return JAVA_VERSIONS
+	if (showAllVersions.value) return JAVA_VERSION_OPTIONS
 
 	const mcVersion = server.value?.mc_version ?? ''
-	if (!mcVersion) return JAVA_VERSIONS
+	if (!mcVersion) return JAVA_VERSION_OPTIONS
 
 	const releaseVersion = parseMinecraftReleaseVersion(mcVersion)
-	if (!releaseVersion) return JAVA_VERSIONS
+	if (!releaseVersion) return JAVA_VERSION_OPTIONS
 
 	if (releaseVersion.major > 1) {
 		if (releaseVersion.major >= 26) {
 			return filterJavaVersions([25])
 		}
 
-		return JAVA_VERSIONS
+		return JAVA_VERSION_OPTIONS
 	}
 
 	if (releaseVersion.minor >= 20) return filterJavaVersions([21])
@@ -298,7 +432,7 @@ const displayedJavaVersions = computed(() => {
 	return filterJavaVersions([8])
 })
 
-const JRE_VENDORS: { value: Archon.Content.v1.JreVendor; label: string }[] = [
+const JRE_VENDOR_OPTIONS: { value: Archon.Content.v1.JreVendor; label: string }[] = [
 	{ value: 'corretto', label: 'Corretto' },
 	{ value: 'temurin', label: 'Temurin' },
 	{ value: 'graal', label: 'GraalVM' },
@@ -316,9 +450,11 @@ const javaVersion = ref<number>()
 const jreVendor = ref<Archon.Content.v1.JreVendor>()
 
 const javaVersionLabel = computed(
-	() => JAVA_VERSIONS.find((v) => v.value === javaVersion.value)?.label,
+	() => JAVA_VERSION_OPTIONS.find((v) => v.value === javaVersion.value)?.label,
 )
-const jreVendorLabel = computed(() => JRE_VENDORS.find((v) => v.value === jreVendor.value)?.label)
+const jreVendorLabel = computed(
+	() => JRE_VENDOR_OPTIONS.find((v) => v.value === jreVendor.value)?.label,
+)
 
 function syncFormFromData() {
 	startupCommand.value = savedStartupCommand.value
@@ -355,16 +491,16 @@ const { mutate: saveStartup, isPending } = useMutation({
 		syncFormFromData()
 		addNotification({
 			type: 'success',
-			title: 'Server settings updated',
-			text: 'Your server settings were successfully changed.',
+			title: formatMessage(commonMessages.serverSettingsUpdatedTitle),
+			text: formatMessage(commonMessages.serverSettingsUpdatedText),
 		})
 	},
 	onError: (error) => {
 		console.error(error)
 		addNotification({
 			type: 'error',
-			title: 'Failed to update server arguments',
-			text: 'Please try again later.',
+			title: formatMessage(messages.startupUpdateFailedTitle),
+			text: formatMessage(messages.startupUpdateFailedText),
 		})
 	},
 })

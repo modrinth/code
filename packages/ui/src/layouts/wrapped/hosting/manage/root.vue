@@ -22,8 +22,8 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="We're getting your server ready"
-			description="Your server's hardware is being prepared and will be available shortly!"
+			:title="formatMessage(serverManageMessages.preparingServerTitle)"
+			:description="formatMessage(serverManageMessages.preparingServerDescription)"
 			:icon="TransferIcon"
 			icon-color="blue"
 			:action="generalErrorAction"
@@ -34,8 +34,8 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="Server upgrading"
-			description="Your server's hardware is currently being upgraded and will be back online shortly!"
+			:title="formatMessage(serverManageMessages.serverUpgradingTitle)"
+			:description="formatMessage(serverManageMessages.serverUpgradingDescription)"
 			:icon="TransferIcon"
 			icon-color="blue"
 			:action="generalErrorAction"
@@ -46,7 +46,7 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="Server suspended"
+			:title="formatMessage(serverManageMessages.serverSuspendedTitle)"
 			:description="suspendedDescription"
 			:icon="LockIcon"
 			icon-color="orange"
@@ -58,8 +58,8 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="An error occured."
-			description="Please contact Modrinth Support."
+			:title="formatMessage(serverManageMessages.forbiddenErrorTitle)"
+			:description="formatMessage(serverManageMessages.forbiddenErrorDescription)"
 			:icon="TransferIcon"
 			icon-color="orange"
 			:error-details="generalErrorDetails"
@@ -71,7 +71,7 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="Server Node Unavailable"
+			:title="formatMessage(serverManageMessages.nodeUnavailableTitle)"
 			:icon="TriangleAlertIcon"
 			icon-color="red"
 			:action="nodeUnavailableAction"
@@ -80,16 +80,13 @@
 			<template #description>
 				<div class="text-md space-y-4">
 					<p class="leading-[170%] text-secondary">
-						Your server's node, where your Modrinth Server is physically hosted, is not accessible
-						at the moment. We are working to resolve the issue as quickly as possible.
+						{{ formatMessage(serverManageMessages.nodeUnavailableP1) }}
 					</p>
 					<p class="leading-[170%] text-secondary">
-						Your data is safe and will not be lost, and your server will be back online as soon as
-						the issue is resolved.
+						{{ formatMessage(serverManageMessages.nodeUnavailableP2) }}
 					</p>
 					<p class="leading-[170%] text-secondary">
-						If reloading does not work initially, please contact Modrinth Support via the chat
-						bubble in the bottom right corner and we'll be happy to help.
+						{{ formatMessage(serverManageMessages.nodeUnavailableP3) }}
 					</p>
 				</div>
 			</template>
@@ -149,7 +146,11 @@
 						>
 							<ButtonStyled circular size="large">
 								<button
-									v-tooltip="showSettingsHint ? undefined : 'Server settings'"
+									v-tooltip="
+										showSettingsHint
+											? undefined
+											: formatMessage(serverManageMessages.serverSettingsTooltip)
+									"
 									@click="
 										() => {
 											openServerSettingsModal()
@@ -216,7 +217,7 @@
 							<div class="flex flex-col gap-2 leading-[150%]">
 								<div class="flex items-center gap-3">
 									<IssuesIcon class="flex h-8 w-8 shrink-0 text-red sm:hidden" />
-									<div class="flex gap-2 text-2xl font-bold">{{ errorTitle }}</div>
+									<div class="flex gap-2 text-2xl font-bold">{{ formattedInstallErrorTitle }}</div>
 								</div>
 
 								<div
@@ -228,44 +229,36 @@
 											errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
 										"
 									>
-										An invalid loader or Minecraft version was specified and could not be installed.
+										{{ formatMessage(serverManageMessages.installErrorInvalidIntro) }}
 										<ul class="m-0 mt-4 p-0 pl-4">
 											<li>
-												If this version of Minecraft was released recently, please check if Modrinth
-												Hosting supports it.
+												{{ formatMessage(serverManageMessages.installErrorBulletRecentMc) }}
 											</li>
 											<li>
-												If you've installed a modpack, it may have been packaged incorrectly or may
-												not be compatible with the loader.
+												{{ formatMessage(serverManageMessages.installErrorBulletModpack) }}
 											</li>
 											<li>
-												Your server may need to be reinstalled with a valid mod loader and version.
-												You can change the loader by clicking the "Change Loader" button.
+												{{ formatMessage(serverManageMessages.installErrorBulletReinstall) }}
 											</li>
 											<li>
-												If you're stuck, please contact Modrinth Support with the information below:
+												{{ formatMessage(serverManageMessages.installErrorBulletSupport) }}
 											</li>
 										</ul>
 										<ButtonStyled>
 											<button class="mt-2" @click="copyServerDebugInfo">
 												<CopyIcon v-if="!copied" />
 												<CheckIcon v-else />
-												Copy Debug Info
+												{{ formatMessage(serverManageMessages.copyDebugInfoButton) }}
 											</button>
 										</ButtonStyled>
 									</div>
 									<div v-if="errorMessage.toLocaleLowerCase() === 'internal error'">
-										An internal error occurred while installing your server. Don't fret — try
-										reinstalling your server, and if the problem persists, please contact Modrinth
-										support with your server's debug information.
+										{{ formatMessage(serverManageMessages.installErrorInternalBody) }}
 									</div>
 									<div
 										v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'"
 									>
-										An error occurred while installing your server because Modrinth Hosting does not
-										support the version of Minecraft or the loader you specified. Try reinstalling
-										your server with a different version or loader, and if the problem persists,
-										please contact Modrinth Support with your server's debug information.
+										{{ formatMessage(serverManageMessages.installErrorUnsupportedBody) }}
 									</div>
 
 									<div
@@ -273,13 +266,17 @@
 										class="mt-2 flex flex-col gap-4 sm:flex-row"
 									>
 										<ButtonStyled v-if="errorLog">
-											<button @click="openInstallLog"><FileIcon />Open Installation Log</button>
+											<button @click="openInstallLog">
+												<FileIcon />{{
+													formatMessage(serverManageMessages.openInstallationLogButton)
+												}}
+											</button>
 										</ButtonStyled>
 										<ButtonStyled>
 											<button @click="copyServerDebugInfo">
 												<CopyIcon v-if="!copied" />
 												<CheckIcon v-else />
-												Copy Debug Info
+												{{ formatMessage(serverManageMessages.copyDebugInfoButton) }}
 											</button>
 										</ButtonStyled>
 										<ButtonStyled color="red" type="standard">
@@ -288,7 +285,7 @@
 												@click="openServerSettingsModal('installation')"
 											>
 												<RightArrowIcon />
-												Change Loader
+												{{ formatMessage(serverManageMessages.changeLoaderButton) }}
 											</button>
 										</ButtonStyled>
 									</div>
@@ -312,7 +309,7 @@
 						class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
 					>
 						<IssuesIcon class="size-5 text-red" />
-						Something went wrong...
+						{{ formatMessage(serverManageMessages.wsDisconnectedMessage) }}
 					</div>
 
 					<div
@@ -321,7 +318,7 @@
 						class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
 					>
 						<LoaderCircleIcon class="h-5 w-5 animate-spin" />
-						Hang on, we're reconnecting to your server.
+						{{ formatMessage(serverManageMessages.wsReconnectingMessage) }}
 					</div>
 
 					<Transition
@@ -361,7 +358,12 @@
 								<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
 							</template>
 							<template #header>
-								Uploading files ({{ uploadState.completedFiles }}/{{ uploadState.totalFiles }})
+								{{
+									formatMessage(serverManageMessages.uploadingFilesHeader, {
+										completed: uploadState.completedFiles,
+										total: uploadState.totalFiles,
+									})
+								}}
 								<span v-if="uploadState.currentFileName" class="font-normal text-secondary">
 									— {{ uploadState.currentFileName }}
 								</span>
@@ -374,7 +376,9 @@
 							</span>
 							<template v-if="cancelUpload" #top-right-actions>
 								<ButtonStyled type="outlined" color="blue">
-									<button class="!border" @click="cancelUpload?.()">Cancel</button>
+									<button class="!border" @click="cancelUpload?.()">
+										{{ formatMessage(commonMessages.cancelButton) }}
+									</button>
 								</ButtonStyled>
 							</template>
 							<template #progress>
@@ -393,7 +397,9 @@
 		v-if="showAdvancedDebugInfo"
 		class="experimental-styles-within relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
 	>
-		<h2 class="m-0 text-lg font-extrabold text-contrast">Server data</h2>
+		<h2 class="m-0 text-lg font-extrabold text-contrast">
+			{{ formatMessage(serverManageMessages.serverDataHeading) }}
+		</h2>
 		<pre class="markdown-body w-full overflow-auto rounded-2xl bg-bg-raised p-4 text-sm">{{
 			safeStringify(serverData)
 		}}</pre>
@@ -476,6 +482,7 @@ import {
 	injectNotificationManager,
 	provideServerSettingsModal,
 } from '#ui/providers'
+import { commonMessages, serverPanelNavMessages } from '#ui/utils/common-messages'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import FileOperationAdmonitions from '../../../shared/files-tab/components/FileOperationAdmonitions.vue'
@@ -569,6 +576,194 @@ const settingsHintMessages = defineMessages({
 	},
 })
 
+const serverManageMessages = defineMessages({
+	preparingServerTitle: {
+		id: 'servers.manage.error.preparing.title',
+		defaultMessage: "We're getting your server ready",
+	},
+	preparingServerDescription: {
+		id: 'servers.manage.error.preparing.description',
+		defaultMessage: "Your server's hardware is being prepared and will be available shortly!",
+	},
+	serverUpgradingTitle: {
+		id: 'servers.manage.error.upgrading.title',
+		defaultMessage: 'Server upgrading',
+	},
+	serverUpgradingDescription: {
+		id: 'servers.manage.error.upgrading.description',
+		defaultMessage:
+			"Your server's hardware is currently being upgraded and will be back online shortly!",
+	},
+	serverSuspendedTitle: {
+		id: 'servers.manage.error.suspended.title',
+		defaultMessage: 'Server suspended',
+	},
+	suspendedCancelledDescription: {
+		id: 'servers.manage.error.suspended.cancelled',
+		defaultMessage:
+			'Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error.',
+	},
+	suspendedWithReasonDescription: {
+		id: 'servers.manage.error.suspended.with-reason',
+		defaultMessage:
+			'Your server has been suspended: {reason}\nContact Modrinth Support if you believe this is an error.',
+	},
+	suspendedDefaultDescription: {
+		id: 'servers.manage.error.suspended.default',
+		defaultMessage:
+			'Your server has been suspended.\nContact Modrinth Support if you believe this is an error.',
+	},
+	forbiddenErrorTitle: {
+		id: 'servers.manage.error.forbidden.title',
+		defaultMessage: 'An error occurred.',
+	},
+	forbiddenErrorDescription: {
+		id: 'servers.manage.error.forbidden.description',
+		defaultMessage: 'Please contact Modrinth Support.',
+	},
+	nodeUnavailableTitle: {
+		id: 'servers.manage.error.node-unavailable.title',
+		defaultMessage: 'Server Node Unavailable',
+	},
+	nodeUnavailableP1: {
+		id: 'servers.manage.error.node-unavailable.p1',
+		defaultMessage:
+			"Your server's node, where your Modrinth Server is physically hosted, is not accessible at the moment. We are working to resolve the issue as quickly as possible.",
+	},
+	nodeUnavailableP2: {
+		id: 'servers.manage.error.node-unavailable.p2',
+		defaultMessage:
+			'Your data is safe and will not be lost, and your server will be back online as soon as the issue is resolved.',
+	},
+	nodeUnavailableP3: {
+		id: 'servers.manage.error.node-unavailable.p3',
+		defaultMessage:
+			"If reloading does not work initially, please contact Modrinth Support via the chat bubble in the bottom right corner and we'll be happy to help.",
+	},
+	serverSettingsTooltip: {
+		id: 'servers.manage.tooltip.server-settings',
+		defaultMessage: 'Server settings',
+	},
+	installErrorInvalidIntro: {
+		id: 'servers.manage.install-error.invalid-version.intro',
+		defaultMessage:
+			'An invalid loader or Minecraft version was specified and could not be installed.',
+	},
+	installErrorBulletRecentMc: {
+		id: 'servers.manage.install-error.invalid-version.bullet-recent-mc',
+		defaultMessage:
+			'If this version of Minecraft was released recently, please check if Modrinth Hosting supports it.',
+	},
+	installErrorBulletModpack: {
+		id: 'servers.manage.install-error.invalid-version.bullet-modpack',
+		defaultMessage:
+			"If you've installed a modpack, it may have been packaged incorrectly or may not be compatible with the loader.",
+	},
+	installErrorBulletReinstall: {
+		id: 'servers.manage.install-error.invalid-version.bullet-reinstall',
+		defaultMessage:
+			'Your server may need to be reinstalled with a valid mod loader and version. You can change the loader by clicking the "Change Loader" button.',
+	},
+	installErrorBulletSupport: {
+		id: 'servers.manage.install-error.invalid-version.bullet-support',
+		defaultMessage: "If you're stuck, please contact Modrinth Support with the information below:",
+	},
+	installErrorInternalBody: {
+		id: 'servers.manage.install-error.internal.body',
+		defaultMessage:
+			"An internal error occurred while installing your server. Don't fret — try reinstalling your server, and if the problem persists, please contact Modrinth support with your server's debug information.",
+	},
+	installErrorUnsupportedBody: {
+		id: 'servers.manage.install-error.unsupported-version.body',
+		defaultMessage:
+			"An error occurred while installing your server because Modrinth Hosting does not support the version of Minecraft or the loader you specified. Try reinstalling your server with a different version or loader, and if the problem persists, please contact Modrinth Support with your server's debug information.",
+	},
+	copyDebugInfoButton: {
+		id: 'servers.manage.install-error.copy-debug-info',
+		defaultMessage: 'Copy Debug Info',
+	},
+	openInstallationLogButton: {
+		id: 'servers.manage.install-error.open-installation-log',
+		defaultMessage: 'Open Installation Log',
+	},
+	changeLoaderButton: {
+		id: 'servers.manage.install-error.change-loader',
+		defaultMessage: 'Change Loader',
+	},
+	wsDisconnectedMessage: {
+		id: 'servers.manage.ws.disconnected',
+		defaultMessage: 'Something went wrong...',
+	},
+	wsReconnectingMessage: {
+		id: 'servers.manage.ws.reconnecting',
+		defaultMessage: "Hang on, we're reconnecting to your server.",
+	},
+	uploadingFilesHeader: {
+		id: 'servers.manage.upload.header',
+		defaultMessage: 'Uploading files ({completed}/{total})',
+	},
+	serverDataHeading: {
+		id: 'servers.manage.debug.server-data-heading',
+		defaultMessage: 'Server data',
+	},
+	detailLabelServerId: {
+		id: 'servers.manage.details.server-id',
+		defaultMessage: 'Server ID',
+	},
+	detailLabelNode: {
+		id: 'servers.manage.details.node',
+		defaultMessage: 'Node',
+	},
+	detailLabelErrorMessage: {
+		id: 'servers.manage.details.error-message',
+		defaultMessage: 'Error message',
+	},
+	detailLabelTimestamp: {
+		id: 'servers.manage.details.timestamp',
+		defaultMessage: 'Timestamp',
+	},
+	detailLabelErrorName: {
+		id: 'servers.manage.details.error-name',
+		defaultMessage: 'Error Name',
+	},
+	detailLabelOriginalError: {
+		id: 'servers.manage.details.original-error',
+		defaultMessage: 'Original Error',
+	},
+	detailLabelStackTrace: {
+		id: 'servers.manage.details.stack-trace',
+		defaultMessage: 'Stack Trace',
+	},
+	nodePingFailedMessage: {
+		id: 'servers.manage.details.node-ping-failed',
+		defaultMessage: 'Unable to reach node. Ping test failed.',
+	},
+	goToBillingSettings: {
+		id: 'servers.manage.action.go-to-billing',
+		defaultMessage: 'Go to billing settings',
+	},
+	goBackToAllServers: {
+		id: 'servers.manage.action.go-back-to-servers',
+		defaultMessage: 'Go back to all servers',
+	},
+	reloadPageButton: {
+		id: 'servers.manage.action.reload-page',
+		defaultMessage: 'Reload',
+	},
+	notificationDismissNoticeError: {
+		id: 'servers.manage.notification.dismiss-notice-error',
+		defaultMessage: 'Error dismissing notice',
+	},
+	retryInstallationFailed: {
+		id: 'servers.manage.notification.retry-installation-failed',
+		defaultMessage: 'Failed to retry installation',
+	},
+	installationErrorTitle: {
+		id: 'servers.manage.install-error.title',
+		defaultMessage: 'Installation error',
+	},
+})
+
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
@@ -586,6 +781,14 @@ const errorTitle = ref('Error')
 const errorMessage = ref('An unexpected error occurred.')
 const errorLog = ref('')
 const errorLogFile = ref('')
+
+const formattedInstallErrorTitle = computed(() => {
+	const t = errorTitle.value
+	if (t === 'Installation error') return formatMessage(serverManageMessages.installationErrorTitle)
+	if (t === 'Error') return formatMessage(commonMessages.errorLabel)
+	return t
+})
+
 const isOnboarding = computed(() => serverData.value?.flows?.intro)
 
 const SETTINGS_HINT_KEY = 'server-panel-settings-hint-dismissed'
@@ -844,25 +1047,25 @@ watch(serverData, (data) => {
 
 const navLinks = computed<Tab[]>(() => [
 	{
-		label: 'Overview',
+		label: formatMessage(serverPanelNavMessages.overview),
 		href: `/hosting/manage/${props.serverId}`,
 		icon: LayoutTemplateIcon,
 		subpages: [],
 	},
 	{
-		label: 'Content',
+		label: formatMessage(serverPanelNavMessages.content),
 		href: `/hosting/manage/${props.serverId}/content`,
 		icon: BoxesIcon,
 		subpages: ['mods', 'datapacks'],
 	},
 	{
-		label: 'Files',
+		label: formatMessage(serverPanelNavMessages.files),
 		href: `/hosting/manage/${props.serverId}/files`,
 		icon: FolderOpenIcon,
 		subpages: [],
 	},
 	{
-		label: 'Backups',
+		label: formatMessage(serverPanelNavMessages.backups),
 		href: `/hosting/manage/${props.serverId}/backups`,
 		icon: DatabaseBackupIcon,
 		subpages: [],
@@ -878,7 +1081,7 @@ const surveyNotice = computed(() => serverData.value?.notices?.find((n) => n.lev
 async function dismissNotice(noticeId: number) {
 	await client.archon.servers_v0.dismissNotice(props.serverId, noticeId).catch((err) => {
 		addNotification({
-			title: 'Error dismissing notice',
+			title: formatMessage(serverManageMessages.notificationDismissNoticeError),
 			text: err,
 			type: 'error',
 		})
@@ -982,7 +1185,10 @@ async function handleContentRetry() {
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to retry installation',
+			text:
+				err instanceof Error
+					? err.message
+					: formatMessage(serverManageMessages.retryInstallationFailed),
 		})
 	}
 }
@@ -1224,62 +1430,64 @@ const nodeAccessible = ref(true)
 
 const nodeUnavailableDetails = computed(() => [
 	{
-		label: 'Server ID',
+		label: formatMessage(serverManageMessages.detailLabelServerId),
 		value: props.serverId,
 		type: 'inline' as const,
 	},
 	{
-		label: 'Node',
+		label: formatMessage(serverManageMessages.detailLabelNode),
 		value:
 			(serverError.value?.responseData as { hostname?: string } | undefined)?.hostname ??
 			serverData.value?.datacenter ??
-			'Unknown',
+			formatMessage(commonMessages.unknownLabel),
 		type: 'inline' as const,
 	},
 	{
-		label: 'Error message',
+		label: formatMessage(serverManageMessages.detailLabelErrorMessage),
 		value: nodeAccessible.value
-			? (serverError.value?.message ?? 'Unknown')
-			: 'Unable to reach node. Ping test failed.',
+			? (serverError.value?.message ?? formatMessage(commonMessages.unknownLabel))
+			: formatMessage(serverManageMessages.nodePingFailedMessage),
 		type: 'block' as const,
 	},
 ])
 
 const suspendedDescription = computed(() => {
 	if (serverData.value?.suspension_reason === 'cancelled') {
-		return 'Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error.'
+		return formatMessage(serverManageMessages.suspendedCancelledDescription)
 	}
 	if (serverData.value?.suspension_reason) {
-		return `Your server has been suspended: ${serverData.value.suspension_reason}\nContact Modrinth Support if you believe this is an error.`
+		return formatMessage(serverManageMessages.suspendedWithReasonDescription, {
+			reason: serverData.value.suspension_reason,
+		})
 	}
-	return 'Your server has been suspended.\nContact Modrinth Support if you believe this is an error.'
+	return formatMessage(serverManageMessages.suspendedDefaultDescription)
 })
 
 const generalErrorDetails = computed(() => [
 	{
-		label: 'Server ID',
+		label: formatMessage(serverManageMessages.detailLabelServerId),
 		value: props.serverId,
 		type: 'inline' as const,
 	},
 	{
-		label: 'Timestamp',
+		label: formatMessage(serverManageMessages.detailLabelTimestamp),
 		value: String(new Date().toISOString()),
 		type: 'inline' as const,
 	},
 	{
-		label: 'Error Name',
+		label: formatMessage(serverManageMessages.detailLabelErrorName),
 		value: serverError.value?.name,
 		type: 'inline' as const,
 	},
 	{
-		label: 'Error Message',
+		label: formatMessage(serverManageMessages.detailLabelErrorMessage),
 		value: serverError.value?.message,
 		type: 'block' as const,
 	},
 	...(serverError.value?.originalError
 		? [
 				{
-					label: 'Original Error',
+					label: formatMessage(serverManageMessages.detailLabelOriginalError),
 					value: String(serverError.value.originalError),
 					type: 'hidden' as const,
 				},
@@ -1288,7 +1496,7 @@ const generalErrorDetails = computed(() => [
 	...(serverError.value?.stack
 		? [
 				{
-					label: 'Stack Trace',
+					label: formatMessage(serverManageMessages.detailLabelStackTrace),
 					value: serverError.value.stack,
 					type: 'hidden' as const,
 				},
@@ -1297,26 +1505,33 @@ const generalErrorDetails = computed(() => [
 ])
 
 const suspendedAction = computed(() => ({
-	label: 'Go to billing settings',
+	label: formatMessage(serverManageMessages.goToBillingSettings),
 	onClick: () => props.navigateToBilling?.(),
 	color: 'brand' as const,
 }))
 
 const generalErrorAction = computed(() => ({
-	label: 'Go back to all servers',
+	label: formatMessage(serverManageMessages.goBackToAllServers),
 	onClick: () => props.navigateToServers?.(),
 	color: 'brand' as const,
 }))
 
 const nodeUnavailableAction = computed(() => ({
-	label: 'Reload',
+	label: formatMessage(serverManageMessages.reloadPageButton),
 	onClick: () => props.reloadPage(),
 	color: 'brand' as const,
 	disabled: false,
 }))
 
 const copyServerDebugInfo = () => {
-	const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}\nLog: ${errorLog.value}`
+	const debugInfo = [
+		`Server ID: ${String(serverData.value?.server_id ?? '')}`,
+		`Error: ${errorMessage.value}`,
+		`Kind: ${String(serverData.value?.upstream?.kind ?? '')}`,
+		`Project ID: ${String(serverData.value?.upstream?.project_id ?? '')}`,
+		`Version ID: ${String(serverData.value?.upstream?.version_id ?? '')}`,
+		`Log: ${errorLog.value}`,
+	].join('\n')
 	navigator.clipboard.writeText(debugInfo)
 	copied.value = true
 	setTimeout(() => {

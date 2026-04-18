@@ -65,9 +65,51 @@ import { useStorage } from '@vueuse/core'
 import { computed, defineAsyncComponent, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthServerContext, injectPageContext } from '#ui/providers'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	cpuTitle: {
+		id: 'servers.manage.stats.cpu.title',
+		defaultMessage: 'CPU',
+	},
+	memoryTitle: {
+		id: 'servers.manage.stats.memory.title',
+		defaultMessage: 'Memory',
+	},
+	storageTitle: {
+		id: 'servers.manage.stats.storage.title',
+		defaultMessage: 'Storage',
+	},
+	bytesWithUnit: {
+		id: 'servers.manage.stats.bytes-with-unit',
+		defaultMessage: '{value} {unit}',
+	},
+	unitByte: {
+		id: 'servers.manage.stats.unit.byte',
+		defaultMessage: 'B',
+	},
+	unitKilobyte: {
+		id: 'servers.manage.stats.unit.kilobyte',
+		defaultMessage: 'KB',
+	},
+	unitMegabyte: {
+		id: 'servers.manage.stats.unit.megabyte',
+		defaultMessage: 'MB',
+	},
+	unitGigabyte: {
+		id: 'servers.manage.stats.unit.gigabyte',
+		defaultMessage: 'GB',
+	},
+	ramTotalSecondary: {
+		id: 'servers.manage.stats.ram-total-secondary',
+		defaultMessage: '/ {total}',
+	},
+})
 
 const { serverId } = injectModrinthServerContext()
 const { featureFlags } = injectPageContext()
@@ -168,24 +210,41 @@ const buildChartOptions = (warning: boolean, index: number, dataMax: number) => 
 const cpuChartOptions = computed(() => buildChartOptions(cpuWarning.value, 0, cpuDataMax))
 const ramChartOptions = computed(() => buildChartOptions(ramWarning.value, 1, ramDataMax))
 
-const cpuSeries = computed(() => [{ name: 'CPU', data: cpuData.value }])
-const ramSeries = computed(() => [{ name: 'Memory', data: ramData.value }])
+const byteUnitMessages = [
+	messages.unitByte,
+	messages.unitKilobyte,
+	messages.unitMegabyte,
+	messages.unitGigabyte,
+] as const
+
+const cpuSeries = computed(() => [{ name: formatMessage(messages.cpuTitle), data: cpuData.value }])
+const ramSeries = computed(() => [
+	{ name: formatMessage(messages.memoryTitle), data: ramData.value },
+])
 
 const formatBytes = (bytes: number) => {
-	const units = ['B', 'KB', 'MB', 'GB']
 	let value = bytes
 	let unit = 0
-	while (value >= 1024 && unit < units.length - 1) {
+	while (value >= 1024 && unit < byteUnitMessages.length - 1) {
 		value /= 1024
 		unit++
 	}
-	return `${Math.round(value * 10) / 10} ${units[unit]}`
+	const rounded = String(Math.round(value * 10) / 10)
+	return formatMessage(messages.bytesWithUnit, {
+		value: rounded,
+		unit: formatMessage(byteUnitMessages[unit]),
+	})
 }
 
 const metrics = computed(() => {
 	const storageMetric = {
-		title: 'Storage',
-		value: props.loading ? '0 B' : formatBytes(stats.value.storage_usage_bytes ?? 0),
+		title: formatMessage(messages.storageTitle),
+		value: props.loading
+			? formatMessage(messages.bytesWithUnit, {
+					value: '0',
+					unit: formatMessage(messages.unitByte),
+				})
+			: formatBytes(stats.value.storage_usage_bytes ?? 0),
 		secondary: null as string | null,
 		icon: FolderOpenIcon,
 		showGraph: false,
@@ -197,7 +256,7 @@ const metrics = computed(() => {
 	if (props.loading) {
 		return [
 			{
-				title: 'CPU',
+				title: formatMessage(messages.cpuTitle),
 				value: '0.00%',
 				secondary: null as string | null,
 				icon: CpuIcon,
@@ -207,7 +266,7 @@ const metrics = computed(() => {
 				link: null,
 			},
 			{
-				title: 'Memory',
+				title: formatMessage(messages.memoryTitle),
 				value: '0.00%',
 				secondary: null as string | null,
 				icon: DatabaseIcon,
@@ -222,7 +281,7 @@ const metrics = computed(() => {
 
 	return [
 		{
-			title: 'CPU',
+			title: formatMessage(messages.cpuTitle),
 			value: `${cpuPercent.value.toFixed(2)}%`,
 			secondary: null as string | null,
 			icon: CpuIcon,
@@ -232,12 +291,14 @@ const metrics = computed(() => {
 			link: null,
 		},
 		{
-			title: 'Memory',
+			title: formatMessage(messages.memoryTitle),
 			value: showRamAsBytes.value
 				? formatBytes(stats.value.ram_usage_bytes ?? 0)
 				: `${ramPercent.value.toFixed(2)}%`,
 			secondary: showRamAsBytes.value
-				? `/ ${formatBytes(stats.value.ram_total_bytes ?? 0)}`
+				? ` ${formatMessage(messages.ramTotalSecondary, {
+						total: formatBytes(stats.value.ram_total_bytes ?? 0),
+					})}`
 				: (null as string | null),
 			icon: DatabaseIcon,
 			showGraph: true,

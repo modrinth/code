@@ -7,7 +7,9 @@
 						<!-- Server name -->
 						<div class="flex flex-col gap-2.5">
 							<label for="server-name-field" class="flex flex-col gap-2">
-								<span class="text-lg font-semibold text-contrast">Server name</span>
+								<span class="text-lg font-semibold text-contrast">{{
+									formatMessage(messages.serverNameLabel)
+								}}</span>
 							</label>
 							<div class="flex flex-col gap-2.5">
 								<StyledInput
@@ -17,9 +19,11 @@
 									:maxlength="48"
 									@keyup.enter="!serverName && saveGeneral"
 								/>
-								<span>This name is only visible on Modrinth.</span>
+								<span>{{ formatMessage(messages.serverNameDescription) }}</span>
 								<div class="text-red font-medium">
-									<span v-if="!isValidServerName"> Server name cannot be empty. </span>
+									<span v-if="!isValidServerName">
+										{{ formatMessage(messages.serverNameEmptyError) }}
+									</span>
 								</div>
 							</div>
 						</div>
@@ -27,7 +31,9 @@
 						<!-- Hostname -->
 						<div class="flex flex-col gap-2.5">
 							<label for="server-subdomain" class="flex flex-col gap-2.5">
-								<span class="text-lg font-semibold text-contrast">Hostname</span>
+								<span class="text-lg font-semibold text-contrast">{{
+									formatMessage(messages.hostnameLabel)
+								}}</span>
 								<div
 									class="flex w-full overflow-hidden rounded-xl bg-button-bg px-3 [box-shadow:var(--shadow-inset-sm)] transition-[box-shadow] duration-100 ease-in-out focus-within:[box-shadow:0_0_0_0.25rem_var(--color-brand-shadow)]"
 								>
@@ -35,12 +41,12 @@
 										<span
 											class="pointer-events-none invisible whitespace-pre px-px text-base font-medium"
 											aria-hidden="true"
-											>{{ serverSubdomain || 'Enter subdomain...' }}</span
+											>{{ serverSubdomain || formatMessage(messages.subdomainPlaceholder) }}</span
 										>
 										<input
 											id="server-subdomain"
 											:value="serverSubdomain"
-											placeholder="Enter subdomain..."
+											:placeholder="formatMessage(messages.subdomainPlaceholder)"
 											:maxlength="32"
 											class="absolute left-px inset-0 bg-transparent !p-0 text-base font-medium text-primary !shadow-none transition-colors placeholder:text-secondary focus:text-contrast"
 											autocomplete="off"
@@ -56,13 +62,13 @@
 									</div>
 								</div>
 							</label>
-							<span>Your friends can connect to your server using this address.</span>
+							<span>{{ formatMessage(messages.hostnameDescription) }}</span>
 							<div v-if="!isValidSubdomain" class="text-red font-medium">
 								<span v-if="!isValidLengthSubdomain">
-									Subdomain must be at least 5 characters long.
+									{{ formatMessage(messages.subdomainLengthError) }}
 								</span>
 								<span v-if="!isValidCharsSubdomain">
-									Subdomain can only contain alphanumeric characters and dashes.
+									{{ formatMessage(messages.subdomainCharsError) }}
 								</span>
 							</div>
 						</div>
@@ -79,15 +85,17 @@
 				>
 					<label :for="`pref-${key}`" class="flex flex-col gap-1">
 						<div class="flex flex-row items-center gap-2">
-							<span class="text-lg font-semibold text-contrast">{{ prefConfig.displayName }}</span>
+							<span class="text-lg font-semibold text-contrast">{{
+								formatMessage(prefConfig.title)
+							}}</span>
 							<div
 								v-if="!prefConfig.implemented"
 								class="hidden items-center gap-1 rounded-full bg-surface-2 p-1 px-1.5 text-xs font-semibold sm:flex"
 							>
-								Coming Soon
+								{{ formatMessage(messages.comingSoonBadge) }}
 							</div>
 						</div>
-						<span>{{ prefConfig.description }}</span>
+						<span>{{ formatMessage(prefConfig.description) }}</span>
 					</label>
 					<div v-tooltip="getPreferenceTooltip(key)">
 						<Toggle
@@ -102,14 +110,16 @@
 
 				<!-- Info -->
 				<div class="flex flex-col gap-2.5 pb-10">
-					<div class="text-lg m-0 font-semibold text-contrast">Info</div>
+					<div class="text-lg m-0 font-semibold text-contrast">
+						{{ formatMessage(messages.infoSectionTitle) }}
+					</div>
 					<div class="flex flex-col gap-2.5 rounded-xl bg-surface-2 p-4">
 						<div
 							v-for="property in infoProperties"
 							:key="property.name"
 							class="flex items-start justify-between gap-4"
 						>
-							<template v-if="property.value !== 'Unknown'">
+							<template v-if="property.value !== unknownLabelResolved">
 								<span class="mt-1">{{ property.name }}</span>
 								<CopyCode v-if="property.type === 'copy'" :text="property.value" />
 								<div
@@ -145,14 +155,142 @@ import { computed, ref, watch } from 'vue'
 import { CopyCode, StyledInput, Toggle } from '#ui/components'
 import EditServerIcon from '#ui/components/servers/edit-server-icon/EditServerIcon.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 	injectPageContext,
 } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
+const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+
+const messages = defineMessages({
+	serverNameLabel: {
+		id: 'server.settings.general.server-name',
+		defaultMessage: 'Server name',
+	},
+	serverNameDescription: {
+		id: 'server.settings.general.server-name-description',
+		defaultMessage: 'This name is only visible on Modrinth.',
+	},
+	serverNameEmptyError: {
+		id: 'server.settings.general.server-name-empty',
+		defaultMessage: 'Server name cannot be empty.',
+	},
+	hostnameLabel: {
+		id: 'server.settings.general.hostname',
+		defaultMessage: 'Hostname',
+	},
+	subdomainPlaceholder: {
+		id: 'server.settings.general.subdomain-placeholder',
+		defaultMessage: 'Enter subdomain…',
+	},
+	hostnameDescription: {
+		id: 'server.settings.general.hostname-description',
+		defaultMessage: 'Your friends can connect to your server using this address.',
+	},
+	subdomainLengthError: {
+		id: 'server.settings.general.subdomain-length',
+		defaultMessage: 'Subdomain must be at least 5 characters long.',
+	},
+	subdomainCharsError: {
+		id: 'server.settings.general.subdomain-chars',
+		defaultMessage: 'Subdomain can only contain alphanumeric characters and dashes.',
+	},
+	prefHideSubdomainTitle: {
+		id: 'server.settings.general.pref.hide-subdomain.title',
+		defaultMessage: 'Hide subdomain label',
+	},
+	prefHideSubdomainDescription: {
+		id: 'server.settings.general.pref.hide-subdomain.description',
+		defaultMessage: 'When enabled, the subdomain label will be hidden from the server header.',
+	},
+	prefRamAsBytesTitle: {
+		id: 'server.settings.general.pref.ram-bytes.title',
+		defaultMessage: 'RAM as bytes',
+	},
+	prefRamAsBytesDescription: {
+		id: 'server.settings.general.pref.ram-bytes.description',
+		defaultMessage: 'Show RAM usage in bytes instead of a percentage.',
+	},
+	prefRamAsBytesForcedTooltip: {
+		id: 'server.settings.general.pref.ram-bytes.forced-tooltip',
+		defaultMessage: 'Feature flag enabled to always show RAM as bytes.',
+	},
+	comingSoonBadge: {
+		id: 'server.settings.general.coming-soon',
+		defaultMessage: 'Coming soon',
+	},
+	infoSectionTitle: {
+		id: 'server.settings.general.info.title',
+		defaultMessage: 'Info',
+	},
+	infoServerId: {
+		id: 'server.settings.general.info.server-id',
+		defaultMessage: 'Server ID',
+	},
+	infoNode: {
+		id: 'server.settings.general.info.node',
+		defaultMessage: 'Node',
+	},
+	infoHostname: {
+		id: 'server.settings.general.info.hostname',
+		defaultMessage: 'Hostname',
+	},
+	infoServerSpecs: {
+		id: 'server.settings.general.info.server-specs',
+		defaultMessage: 'Server specs',
+	},
+	specsAvailable: {
+		id: 'server.settings.general.info.specs-available',
+		defaultMessage: 'Available',
+	},
+	specsCpuRamLine: {
+		id: 'server.settings.general.info.specs-cpu-ram-line',
+		defaultMessage:
+			'{shared} {sharedNum, plural, one {Shared CPU} other {Shared CPUs}} (Bursts up to {burst} CPUs)',
+	},
+	specsRamGb: {
+		id: 'server.settings.general.info.specs-ram-gb',
+		defaultMessage: '{gb} GB RAM',
+	},
+	specsSwapGb: {
+		id: 'server.settings.general.info.specs-swap-gb',
+		defaultMessage: '{gb} GB Swap',
+	},
+	specsStorageGb: {
+		id: 'server.settings.general.info.specs-storage-gb',
+		defaultMessage: '{gb} GB SSD',
+	},
+	subdomainUnavailableTitle: {
+		id: 'server.settings.general.error.subdomain-taken.title',
+		defaultMessage: 'Subdomain not available',
+	},
+	subdomainUnavailableText: {
+		id: 'server.settings.general.error.subdomain-taken.text',
+		defaultMessage: 'The subdomain you entered is already in use.',
+	},
+	subdomainCheckFailedTitle: {
+		id: 'server.settings.general.error.subdomain-check.title',
+		defaultMessage: 'Error checking availability',
+	},
+	subdomainCheckFailedText: {
+		id: 'server.settings.general.error.subdomain-check.text',
+		defaultMessage: 'Failed to verify if the subdomain is available.',
+	},
+	settingsUpdateFailedTitle: {
+		id: 'server.settings.general.error.update-failed.title',
+		defaultMessage: 'Failed to update server settings',
+	},
+	settingsUpdateFailedText: {
+		id: 'server.settings.general.error.update-failed.text',
+		defaultMessage: 'An error occurred while attempting to update your server settings.',
+	},
+})
+
 const client = injectModrinthClient()
 const { server: data, serverId, busyReasons } = injectModrinthServerContext()
 const { featureFlags } = injectPageContext()
@@ -185,18 +323,13 @@ watch(serverName, (newValue, oldValue) => {
 // Preferences
 const preferences = {
 	hideSubdomainLabel: {
-		displayName: 'Hide subdomain label',
-		description: 'When enabled, the subdomain label will be hidden from the server header.',
+		title: messages.prefHideSubdomainTitle,
+		description: messages.prefHideSubdomainDescription,
 		implemented: true,
 	},
-	// autoRestart: {
-	// 	displayName: 'Auto restarts',
-	// 	description: 'Automatically restart the server if it crashes.',
-	// 	implemented: false,
-	// },
 	ramAsNumber: {
-		displayName: 'RAM as bytes',
-		description: 'Show RAM usage in bytes instead of a percentage.',
+		title: messages.prefRamAsBytesTitle,
+		description: messages.prefRamAsBytesDescription,
 		implemented: true,
 	},
 } as const
@@ -229,7 +362,7 @@ const isPreferenceForcedByFeatureFlag = (key: string) =>
 
 const getPreferenceTooltip = (key: string) =>
 	isPreferenceForcedByFeatureFlag(key)
-		? 'Feature flag enabled to always show RAM as bytes.'
+		? formatMessage(messages.prefRamAsBytesForcedTooltip)
 		: undefined
 
 const getPreferenceValue = (key: string) =>
@@ -289,8 +422,10 @@ const getServerSpecs = (product?: Labrinth.Billing.Internal.Product | null) => {
 	}
 }
 
+const unknownLabelResolved = computed(() => formatMessage(commonMessages.unknownLabel))
+
 const serverHostname = computed(() =>
-	serverSubdomain.value ? `${serverSubdomain.value}.modrinth.gg` : 'Unknown',
+	serverSubdomain.value ? `${serverSubdomain.value}.modrinth.gg` : unknownLabelResolved.value,
 )
 
 const serverSpecs = computed(() => getServerSpecs(serverProduct.value))
@@ -314,24 +449,36 @@ type InfoProperty =
 	  }
 
 // Info properties
-const infoProperties = computed<InfoProperty[]>(() => [
-	{ name: 'Server ID', value: serverId ?? 'Unknown', type: 'copy' },
-	{ name: 'Node', value: data.value?.node?.instance ?? 'Unknown', type: 'copy' },
-	{ name: 'Hostname', value: serverHostname.value, type: 'copy' },
-	{
-		name: 'Server specs',
-		value: serverSpecs.value ? 'Available' : 'Unknown',
-		type: 'specs',
-		lines: serverSpecs.value
-			? [
-					`${serverSpecs.value.sharedCpus} Shared CPU${Number(serverSpecs.value.sharedCpus) > 1 ? 's' : ''} (Bursts up to ${serverSpecs.value.burstCpus} CPUs)`,
-					`${serverSpecs.value.ramGb} GB RAM`,
-					`${serverSpecs.value.swapGb} GB Swap`,
-					`${serverSpecs.value.storageGb} GB SSD`,
-				]
-			: [],
-	},
-])
+const infoProperties = computed<InfoProperty[]>(() => {
+	const u = unknownLabelResolved.value
+	const specs = serverSpecs.value
+	return [
+		{ name: formatMessage(messages.infoServerId), value: serverId ?? u, type: 'copy' },
+		{
+			name: formatMessage(messages.infoNode),
+			value: data.value?.node?.instance ?? u,
+			type: 'copy',
+		},
+		{ name: formatMessage(messages.infoHostname), value: serverHostname.value, type: 'copy' },
+		{
+			name: formatMessage(messages.infoServerSpecs),
+			value: specs ? formatMessage(messages.specsAvailable) : u,
+			type: 'specs',
+			lines: specs
+				? [
+						formatMessage(messages.specsCpuRamLine, {
+							shared: specs.sharedCpus,
+							sharedNum: Number(specs.sharedCpus),
+							burst: specs.burstCpus,
+						}),
+						formatMessage(messages.specsRamGb, { gb: specs.ramGb }),
+						formatMessage(messages.specsSwapGb, { gb: specs.swapGb }),
+						formatMessage(messages.specsStorageGb, { gb: specs.storageGb }),
+					]
+				: [],
+		},
+	]
+})
 
 // Unsaved changes tracking (API fields + preferences)
 const hasUnsavedChanges = computed(
@@ -359,8 +506,8 @@ const saveGeneral = async () => {
 				if (!available) {
 					addNotification({
 						type: 'error',
-						title: 'Subdomain not available',
-						text: 'The subdomain you entered is already in use.',
+						title: formatMessage(messages.subdomainUnavailableTitle),
+						text: formatMessage(messages.subdomainUnavailableText),
 					})
 					return
 				}
@@ -370,8 +517,8 @@ const saveGeneral = async () => {
 				console.error('Error checking subdomain availability:', error)
 				addNotification({
 					type: 'error',
-					title: 'Error checking availability',
-					text: 'Failed to verify if the subdomain is available.',
+					title: formatMessage(messages.subdomainCheckFailedTitle),
+					text: formatMessage(messages.subdomainCheckFailedText),
 				})
 				return
 			}
@@ -385,15 +532,15 @@ const saveGeneral = async () => {
 		})
 		addNotification({
 			type: 'success',
-			title: 'Server settings updated',
-			text: 'Your server settings were successfully changed.',
+			title: formatMessage(commonMessages.serverSettingsUpdatedTitle),
+			text: formatMessage(commonMessages.serverSettingsUpdatedText),
 		})
 	} catch (error) {
 		console.error(error)
 		addNotification({
 			type: 'error',
-			title: 'Failed to update server settings',
-			text: 'An error occurred while attempting to update your server settings.',
+			title: formatMessage(messages.settingsUpdateFailedTitle),
+			text: formatMessage(messages.settingsUpdateFailedText),
 		})
 	} finally {
 		isUpdating.value = false

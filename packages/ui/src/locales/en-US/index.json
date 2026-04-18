@@ -92,6 +92,36 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Resubscribe to Server"
   },
+  "browse-tab.filter-results": {
+    "defaultMessage": "Filter results…"
+  },
+  "browse-tab.filters-heading": {
+    "defaultMessage": "Filters"
+  },
+  "browse-tab.hide-installed-default": {
+    "defaultMessage": "Hide installed content"
+  },
+  "browse-tab.no-results": {
+    "defaultMessage": "No results found for your query!"
+  },
+  "browse-tab.offline": {
+    "defaultMessage": "You are currently offline. Connect to the internet to browse Modrinth!"
+  },
+  "browse-tab.search-placeholder": {
+    "defaultMessage": "{projectType, select, mod {Search mods…} modpack {Search modpacks…} resourcepack {Search resource packs…} shader {Search shaders…} datapack {Search datapacks…} plugin {Search plugins…} server {Search servers…} project {Search projects…} other {Search…}}"
+  },
+  "browse-tab.sort-by-placeholder": {
+    "defaultMessage": "Sort by"
+  },
+  "browse-tab.sort-by-prefix": {
+    "defaultMessage": "Sort by:"
+  },
+  "browse-tab.view-placeholder": {
+    "defaultMessage": "View"
+  },
+  "browse-tab.view-prefix": {
+    "defaultMessage": "View:"
+  },
   "button.accept": {
     "defaultMessage": "Accept"
   },
@@ -650,6 +680,33 @@
   "files.layout.unsaved-changes": {
     "defaultMessage": "You have unsaved changes."
   },
+  "files.manage.create-success-text": {
+    "defaultMessage": "Created {name}"
+  },
+  "files.manage.create-success-title": {
+    "defaultMessage": "{type, select, directory {Folder} other {File}} created"
+  },
+  "files.manage.delete-success-text": {
+    "defaultMessage": "Your file has been deleted."
+  },
+  "files.manage.delete-success-title": {
+    "defaultMessage": "File deleted"
+  },
+  "files.manage.download-failed-text": {
+    "defaultMessage": "Could not download the file."
+  },
+  "files.manage.move-success-text": {
+    "defaultMessage": "Moved to {path}"
+  },
+  "files.manage.move-success-title": {
+    "defaultMessage": "Moved"
+  },
+  "files.manage.rename-success-text": {
+    "defaultMessage": "Renamed to {name}"
+  },
+  "files.manage.rename-success-title": {
+    "defaultMessage": "Renamed"
+  },
   "files.move-modal.current-location": {
     "defaultMessage": "Current location"
   },
@@ -757,9 +814,6 @@
   },
   "files.upload-dropdown.failed-incorrect-type": {
     "defaultMessage": "Failed - Incorrect file type"
-  },
-  "files.upload-dropdown.failed-to-upload": {
-    "defaultMessage": "Failed to upload {fileName}"
   },
   "files.upload-dropdown.file": {
     "defaultMessage": "File"
@@ -1418,6 +1472,9 @@
   "label.extract-failed": {
     "defaultMessage": "Extract failed"
   },
+  "label.file-size.formatted": {
+    "defaultMessage": "{value} {unit, select, B {B} KB {KB} MB {MB} GB {GB} TB {TB} PB {PB} EB {EB} KiB {KiB} MiB {MiB} GiB {GiB} Bytes {Bytes} other {B}}"
+  },
   "label.filter-by": {
     "defaultMessage": "Filter by"
   },
@@ -1690,6 +1747,9 @@
   },
   "notification.error.title": {
     "defaultMessage": "An error occurred"
+  },
+  "notification.upload-failed.file-detail": {
+    "defaultMessage": "Failed to upload {fileName}"
   },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Accepted"
@@ -2654,6 +2714,450 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "server.panel.nav.backups": {
+    "defaultMessage": "Backups"
+  },
+  "server.panel.nav.content": {
+    "defaultMessage": "Content"
+  },
+  "server.panel.nav.files": {
+    "defaultMessage": "Files"
+  },
+  "server.panel.nav.overview": {
+    "defaultMessage": "Overview"
+  },
+  "server.settings.advanced.clipboard.copied.title": {
+    "defaultMessage": "{label} copied to clipboard!"
+  },
+  "server.settings.advanced.error.startup.text": {
+    "defaultMessage": "Please try again later."
+  },
+  "server.settings.advanced.error.startup.title": {
+    "defaultMessage": "Failed to update server arguments"
+  },
+  "server.settings.advanced.java-runtime.description": {
+    "defaultMessage": "The Java runtime your server will use."
+  },
+  "server.settings.advanced.java-runtime.fallback": {
+    "defaultMessage": "Runtime"
+  },
+  "server.settings.advanced.java-runtime.title": {
+    "defaultMessage": "Java runtime"
+  },
+  "server.settings.advanced.java-version.description": {
+    "defaultMessage": "The Java version your server runs on."
+  },
+  "server.settings.advanced.java-version.fallback": {
+    "defaultMessage": "Java version"
+  },
+  "server.settings.advanced.java-version.hide-extra": {
+    "defaultMessage": "Hide extra versions"
+  },
+  "server.settings.advanced.java-version.show-all": {
+    "defaultMessage": "Show all versions"
+  },
+  "server.settings.advanced.java-version.title": {
+    "defaultMessage": "Java version"
+  },
+  "server.settings.advanced.sftp.copy-address-tooltip": {
+    "defaultMessage": "Copy SFTP server address"
+  },
+  "server.settings.advanced.sftp.copy-password-tooltip": {
+    "defaultMessage": "Copy SFTP password"
+  },
+  "server.settings.advanced.sftp.copy-username-tooltip": {
+    "defaultMessage": "Copy SFTP username"
+  },
+  "server.settings.advanced.sftp.hide-password-tooltip": {
+    "defaultMessage": "Hide password"
+  },
+  "server.settings.advanced.sftp.launch": {
+    "defaultMessage": "Launch SFTP"
+  },
+  "server.settings.advanced.sftp.launch-tooltip": {
+    "defaultMessage": "This button only works with compatible SFTP clients (e.g. WinSCP)"
+  },
+  "server.settings.advanced.sftp.server-address": {
+    "defaultMessage": "Server Address"
+  },
+  "server.settings.advanced.sftp.show-password-tooltip": {
+    "defaultMessage": "Show password"
+  },
+  "server.settings.advanced.sftp.title": {
+    "defaultMessage": "SFTP"
+  },
+  "server.settings.advanced.startup-command.default": {
+    "defaultMessage": "Default"
+  },
+  "server.settings.advanced.startup-command.description": {
+    "defaultMessage": "The command that runs when your server is started."
+  },
+  "server.settings.advanced.startup-command.title": {
+    "defaultMessage": "Startup command"
+  },
+  "server.settings.general.coming-soon": {
+    "defaultMessage": "Coming soon"
+  },
+  "server.settings.general.error.subdomain-check.text": {
+    "defaultMessage": "Failed to verify if the subdomain is available."
+  },
+  "server.settings.general.error.subdomain-check.title": {
+    "defaultMessage": "Error checking availability"
+  },
+  "server.settings.general.error.subdomain-taken.text": {
+    "defaultMessage": "The subdomain you entered is already in use."
+  },
+  "server.settings.general.error.subdomain-taken.title": {
+    "defaultMessage": "Subdomain not available"
+  },
+  "server.settings.general.error.update-failed.text": {
+    "defaultMessage": "An error occurred while attempting to update your server settings."
+  },
+  "server.settings.general.error.update-failed.title": {
+    "defaultMessage": "Failed to update server settings"
+  },
+  "server.settings.general.hostname": {
+    "defaultMessage": "Hostname"
+  },
+  "server.settings.general.hostname-description": {
+    "defaultMessage": "Your friends can connect to your server using this address."
+  },
+  "server.settings.general.info.hostname": {
+    "defaultMessage": "Hostname"
+  },
+  "server.settings.general.info.node": {
+    "defaultMessage": "Node"
+  },
+  "server.settings.general.info.server-id": {
+    "defaultMessage": "Server ID"
+  },
+  "server.settings.general.info.server-specs": {
+    "defaultMessage": "Server specs"
+  },
+  "server.settings.general.info.specs-available": {
+    "defaultMessage": "Available"
+  },
+  "server.settings.general.info.specs-cpu-ram-line": {
+    "defaultMessage": "{shared} {sharedNum, plural, one {Shared CPU} other {Shared CPUs}} (Bursts up to {burst} CPUs)"
+  },
+  "server.settings.general.info.specs-ram-gb": {
+    "defaultMessage": "{gb} GB RAM"
+  },
+  "server.settings.general.info.specs-storage-gb": {
+    "defaultMessage": "{gb} GB SSD"
+  },
+  "server.settings.general.info.specs-swap-gb": {
+    "defaultMessage": "{gb} GB Swap"
+  },
+  "server.settings.general.info.title": {
+    "defaultMessage": "Info"
+  },
+  "server.settings.general.pref.hide-subdomain.description": {
+    "defaultMessage": "When enabled, the subdomain label will be hidden from the server header."
+  },
+  "server.settings.general.pref.hide-subdomain.title": {
+    "defaultMessage": "Hide subdomain label"
+  },
+  "server.settings.general.pref.ram-bytes.description": {
+    "defaultMessage": "Show RAM usage in bytes instead of a percentage."
+  },
+  "server.settings.general.pref.ram-bytes.forced-tooltip": {
+    "defaultMessage": "Feature flag enabled to always show RAM as bytes."
+  },
+  "server.settings.general.pref.ram-bytes.title": {
+    "defaultMessage": "RAM as bytes"
+  },
+  "server.settings.general.server-name": {
+    "defaultMessage": "Server name"
+  },
+  "server.settings.general.server-name-description": {
+    "defaultMessage": "This name is only visible on Modrinth."
+  },
+  "server.settings.general.server-name-empty": {
+    "defaultMessage": "Server name cannot be empty."
+  },
+  "server.settings.general.subdomain-chars": {
+    "defaultMessage": "Subdomain can only contain alphanumeric characters and dashes."
+  },
+  "server.settings.general.subdomain-length": {
+    "defaultMessage": "Subdomain must be at least 5 characters long."
+  },
+  "server.settings.general.subdomain-placeholder": {
+    "defaultMessage": "Enter subdomain…"
+  },
+  "server.settings.network.allocation-name.label": {
+    "defaultMessage": "Name"
+  },
+  "server.settings.network.allocation-name.placeholder": {
+    "defaultMessage": "e.g. Secondary allocation"
+  },
+  "server.settings.network.allocations.help": {
+    "defaultMessage": "Create additional ports for internet-facing features like map viewers or voice chat mods."
+  },
+  "server.settings.network.allocations.title": {
+    "defaultMessage": "Allocations"
+  },
+  "server.settings.network.column.actions": {
+    "defaultMessage": "Actions"
+  },
+  "server.settings.network.column.name": {
+    "defaultMessage": "Name"
+  },
+  "server.settings.network.column.port": {
+    "defaultMessage": "Port"
+  },
+  "server.settings.network.column.record-content": {
+    "defaultMessage": "Content"
+  },
+  "server.settings.network.column.record-name": {
+    "defaultMessage": "Name"
+  },
+  "server.settings.network.column.record-type": {
+    "defaultMessage": "Type"
+  },
+  "server.settings.network.create-allocation": {
+    "defaultMessage": "Create allocation"
+  },
+  "server.settings.network.create-allocation.tooltip": {
+    "defaultMessage": "Enter a name to create an allocation"
+  },
+  "server.settings.network.delete-allocation.description": {
+    "defaultMessage": "You are deleting the allocation on port {port}. This cannot be reserved again. Are you sure you want to proceed?"
+  },
+  "server.settings.network.delete-allocation.title": {
+    "defaultMessage": "Deleting allocation"
+  },
+  "server.settings.network.dns.export": {
+    "defaultMessage": "Export"
+  },
+  "server.settings.network.dns.help": {
+    "defaultMessage": "Set up your personal domain to connect to your server via custom DNS records."
+  },
+  "server.settings.network.dns.title": {
+    "defaultMessage": "DNS records"
+  },
+  "server.settings.network.edit-allocation.title": {
+    "defaultMessage": "Edit allocation"
+  },
+  "server.settings.network.error.load.description": {
+    "defaultMessage": "We couldn't load your server's network settings. Here's what we know:"
+  },
+  "server.settings.network.error.load.title": {
+    "defaultMessage": "Failed to load network settings"
+  },
+  "server.settings.network.primary-allocation": {
+    "defaultMessage": "Primary"
+  },
+  "server.settings.network.primary-allocation-row-name": {
+    "defaultMessage": "Primary allocation"
+  },
+  "server.settings.network.success.allocation-removed.text": {
+    "defaultMessage": "Your allocation has been removed."
+  },
+  "server.settings.network.success.allocation-removed.title": {
+    "defaultMessage": "Allocation removed"
+  },
+  "server.settings.network.success.allocation-reserved.text": {
+    "defaultMessage": "Your allocation has been reserved."
+  },
+  "server.settings.network.success.allocation-reserved.title": {
+    "defaultMessage": "Allocation reserved"
+  },
+  "server.settings.network.success.allocation-updated.text": {
+    "defaultMessage": "Your allocation has been updated."
+  },
+  "server.settings.network.success.allocation-updated.title": {
+    "defaultMessage": "Allocation updated"
+  },
+  "server.settings.network.success.text-copied.text": {
+    "defaultMessage": "{text} has been copied to your clipboard"
+  },
+  "server.settings.network.success.text-copied.title": {
+    "defaultMessage": "Text copied"
+  },
+  "server.settings.network.update-allocation": {
+    "defaultMessage": "Update allocation"
+  },
+  "server.settings.properties.advanced.title": {
+    "defaultMessage": "Advanced properties"
+  },
+  "server.settings.properties.error.update.fallback": {
+    "defaultMessage": "An error occurred."
+  },
+  "server.settings.properties.error.update.title": {
+    "defaultMessage": "Failed to update server properties"
+  },
+  "server.settings.properties.field.allow_cheats": {
+    "defaultMessage": "Allow cheats"
+  },
+  "server.settings.properties.field.allow_flight": {
+    "defaultMessage": "Allow flight"
+  },
+  "server.settings.properties.field.difficulty": {
+    "defaultMessage": "Difficulty"
+  },
+  "server.settings.properties.field.enforce_whitelist": {
+    "defaultMessage": "Enforce whitelist"
+  },
+  "server.settings.properties.field.force_gamemode": {
+    "defaultMessage": "Force gamemode"
+  },
+  "server.settings.properties.field.gamemode": {
+    "defaultMessage": "Gamemode"
+  },
+  "server.settings.properties.field.generate_structures": {
+    "defaultMessage": "Generate structures"
+  },
+  "server.settings.properties.field.generator_settings": {
+    "defaultMessage": "Generator settings"
+  },
+  "server.settings.properties.field.hardcore": {
+    "defaultMessage": "Hardcore"
+  },
+  "server.settings.properties.field.level_seed": {
+    "defaultMessage": "Level seed"
+  },
+  "server.settings.properties.field.level_type": {
+    "defaultMessage": "Level type"
+  },
+  "server.settings.properties.field.max_players": {
+    "defaultMessage": "Max players"
+  },
+  "server.settings.properties.field.max_tick_time": {
+    "defaultMessage": "Max tick time"
+  },
+  "server.settings.properties.field.motd": {
+    "defaultMessage": "MOTD"
+  },
+  "server.settings.properties.field.pause_when_empty_seconds": {
+    "defaultMessage": "Pause when empty (seconds)"
+  },
+  "server.settings.properties.field.player_idle_timeout": {
+    "defaultMessage": "Player idle timeout"
+  },
+  "server.settings.properties.field.require_resource_pack": {
+    "defaultMessage": "Require resource pack"
+  },
+  "server.settings.properties.field.resource_pack": {
+    "defaultMessage": "Resource pack"
+  },
+  "server.settings.properties.field.resource_pack_id": {
+    "defaultMessage": "Resource pack ID"
+  },
+  "server.settings.properties.field.resource_pack_sha1": {
+    "defaultMessage": "Resource pack SHA-1"
+  },
+  "server.settings.properties.field.simulation_distance": {
+    "defaultMessage": "Simulation distance"
+  },
+  "server.settings.properties.field.spawn_protection": {
+    "defaultMessage": "Spawn protection"
+  },
+  "server.settings.properties.field.sync_chunk_writes": {
+    "defaultMessage": "Sync chunk writes"
+  },
+  "server.settings.properties.field.view_distance": {
+    "defaultMessage": "View distance"
+  },
+  "server.settings.properties.field.white_list": {
+    "defaultMessage": "Whitelist"
+  },
+  "server.settings.properties.footer": {
+    "defaultMessage": "All other properties can be edited in server.properties via the <files-link>Files tab</files-link>."
+  },
+  "server.settings.properties.group.performance": {
+    "defaultMessage": "Performance"
+  },
+  "server.settings.properties.group.resource-pack": {
+    "defaultMessage": "Resource pack"
+  },
+  "server.settings.properties.intro": {
+    "defaultMessage": "Edit the Minecraft server properties file here, or use the <files-link>Files tab</files-link> to edit the full file. If you're unsure about a setting, the <wiki-link>Minecraft Wiki</wiki-link> has more details."
+  },
+  "server.settings.properties.label.allow-cheats": {
+    "defaultMessage": "Allow cheats"
+  },
+  "server.settings.properties.label.allow-flight": {
+    "defaultMessage": "Allow flight"
+  },
+  "server.settings.properties.label.difficulty": {
+    "defaultMessage": "Difficulty"
+  },
+  "server.settings.properties.label.enable-spawn-protection": {
+    "defaultMessage": "Enable spawn protection"
+  },
+  "server.settings.properties.label.enable-whitelist": {
+    "defaultMessage": "Enable whitelist"
+  },
+  "server.settings.properties.label.gamemode": {
+    "defaultMessage": "Gamemode"
+  },
+  "server.settings.properties.label.max-players": {
+    "defaultMessage": "Max players"
+  },
+  "server.settings.properties.label.motd": {
+    "defaultMessage": "MOTD"
+  },
+  "server.settings.properties.label.protection-radius": {
+    "defaultMessage": "Protection radius"
+  },
+  "server.settings.properties.placeholder.max-players": {
+    "defaultMessage": "20"
+  },
+  "server.settings.properties.placeholder.motd": {
+    "defaultMessage": "A Minecraft Server"
+  },
+  "server.settings.properties.placeholder.value": {
+    "defaultMessage": "Type here…"
+  },
+  "server.settings.properties.search.aria": {
+    "defaultMessage": "Search server properties"
+  },
+  "server.settings.properties.search.no-results.description": {
+    "defaultMessage": "No properties match \"{query}\"."
+  },
+  "server.settings.properties.search.no-results.title": {
+    "defaultMessage": "No properties found"
+  },
+  "server.settings.properties.search.placeholder": {
+    "defaultMessage": "Search server properties…"
+  },
+  "server.settings.properties.success.updated.text": {
+    "defaultMessage": "Your server properties were successfully changed."
+  },
+  "server.settings.properties.success.updated.title": {
+    "defaultMessage": "Server properties updated"
+  },
+  "server.settings.properties.warning.missing": {
+    "defaultMessage": "Some expected properties are missing from your server.properties — this usually means the server hasn't completed its first startup yet."
+  },
+  "server.settings.success.updated.text": {
+    "defaultMessage": "Your server settings were successfully changed."
+  },
+  "server.settings.success.updated.title": {
+    "defaultMessage": "Server settings updated"
+  },
+  "server.settings.tabs.admin-billing": {
+    "defaultMessage": "Admin Billing"
+  },
+  "server.settings.tabs.advanced": {
+    "defaultMessage": "Advanced"
+  },
+  "server.settings.tabs.billing": {
+    "defaultMessage": "Billing"
+  },
+  "server.settings.tabs.general": {
+    "defaultMessage": "General"
+  },
+  "server.settings.tabs.installation": {
+    "defaultMessage": "Installation"
+  },
+  "server.settings.tabs.network": {
+    "defaultMessage": "Network"
+  },
+  "server.settings.tabs.properties": {
+    "defaultMessage": "Properties"
+  },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Something went wrong while creating {backupName}. Please try again or contact support if the issue continues."
   },
@@ -2699,6 +3203,45 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restoring from backup"
   },
+  "servers.backups.create-modal.create-button": {
+    "defaultMessage": "Create backup"
+  },
+  "servers.backups.create-modal.duplicate-name": {
+    "defaultMessage": "You already have a backup named '<name-highlight>{name}</name-highlight>'."
+  },
+  "servers.backups.create-modal.name-label": {
+    "defaultMessage": "Name"
+  },
+  "servers.backups.create-modal.name-placeholder": {
+    "defaultMessage": "Backup #{number}"
+  },
+  "servers.backups.create-modal.notification.error.title": {
+    "defaultMessage": "Error creating backup"
+  },
+  "servers.backups.create-modal.notification.rate-limited": {
+    "defaultMessage": "You're creating backups too fast."
+  },
+  "servers.backups.create-modal.rate-limited-inline": {
+    "defaultMessage": "You're creating backups too fast. Please wait a moment before trying again."
+  },
+  "servers.backups.create-modal.title": {
+    "defaultMessage": "Create backup"
+  },
+  "servers.backups.delete-modal.backup-label": {
+    "defaultMessage": "Backup"
+  },
+  "servers.backups.delete-modal.delete-button": {
+    "defaultMessage": "Delete backup"
+  },
+  "servers.backups.delete-modal.title": {
+    "defaultMessage": "Delete backup"
+  },
+  "servers.backups.delete-modal.warning.body": {
+    "defaultMessage": "This backup will be permanently deleted. This action cannot be undone."
+  },
+  "servers.backups.delete-modal.warning.header": {
+    "defaultMessage": "Delete warning"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
@@ -2717,14 +3260,59 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"
   },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Rename"
-  },
   "servers.backups.item.restore": {
     "defaultMessage": "Restore"
   },
   "servers.backups.item.restoring": {
     "defaultMessage": "Restoring"
+  },
+  "servers.backups.rename-modal.duplicate-name": {
+    "defaultMessage": "You already have a backup named '<name-highlight>{name}</name-highlight>'."
+  },
+  "servers.backups.rename-modal.name-label": {
+    "defaultMessage": "Name"
+  },
+  "servers.backups.rename-modal.name-placeholder": {
+    "defaultMessage": "Backup #{number}"
+  },
+  "servers.backups.rename-modal.notification.error.title": {
+    "defaultMessage": "Error renaming backup"
+  },
+  "servers.backups.rename-modal.renaming": {
+    "defaultMessage": "Renaming..."
+  },
+  "servers.backups.rename-modal.title": {
+    "defaultMessage": "Renaming backup"
+  },
+  "servers.backups.restore-modal.backup-label": {
+    "defaultMessage": "Backup"
+  },
+  "servers.backups.restore-modal.notification.error.title": {
+    "defaultMessage": "Failed to restore backup"
+  },
+  "servers.backups.restore-modal.replace-files.body": {
+    "defaultMessage": "Restoring your server will replace the current world and server files. Any changes made since that backup will be permanently lost."
+  },
+  "servers.backups.restore-modal.replace-files.header": {
+    "defaultMessage": "Your server files will be replaced"
+  },
+  "servers.backups.restore-modal.restore-button": {
+    "defaultMessage": "Restore backup"
+  },
+  "servers.backups.restore-modal.restoring-button": {
+    "defaultMessage": "Restoring..."
+  },
+  "servers.backups.restore-modal.running.body": {
+    "defaultMessage": "Stop the server before restoring a backup."
+  },
+  "servers.backups.restore-modal.running.header": {
+    "defaultMessage": "Server is running"
+  },
+  "servers.backups.restore-modal.title": {
+    "defaultMessage": "Restore backup"
+  },
+  "servers.backups.warning.body": {
+    "defaultMessage": "You may want to <create-link>create a backup</create-link> before proceeding, as this process is irreversible and may permanently alter your world or the files on your server."
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Backup creation in progress"
@@ -2737,6 +3325,60 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "Content sync in progress"
+  },
+  "servers.console.action.collapse": {
+    "defaultMessage": "Collapse"
+  },
+  "servers.console.action.expand": {
+    "defaultMessage": "Expand"
+  },
+  "servers.console.action.share": {
+    "defaultMessage": "Share"
+  },
+  "servers.console.crash.problems-detected": {
+    "defaultMessage": "{count, plural, one {# problem detected} other {# problems detected}}"
+  },
+  "servers.console.delete-log-file.error.title": {
+    "defaultMessage": "Failed to delete log file"
+  },
+  "servers.console.delete-log-file.header": {
+    "defaultMessage": "Delete log file"
+  },
+  "servers.console.delete-log-file.irreversible.body": {
+    "defaultMessage": "Deleting this log file cannot be undone. Are you sure you want to continue?"
+  },
+  "servers.console.delete-log-file.irreversible.header": {
+    "defaultMessage": "This is irreversible"
+  },
+  "servers.console.error.unknown-detail": {
+    "defaultMessage": "Unknown error."
+  },
+  "servers.console.filter.all-levels": {
+    "defaultMessage": "All"
+  },
+  "servers.console.filter.log-level.debug": {
+    "defaultMessage": "Debug"
+  },
+  "servers.console.filter.log-level.error": {
+    "defaultMessage": "Error"
+  },
+  "servers.console.filter.log-level.info": {
+    "defaultMessage": "Info"
+  },
+  "servers.console.filter.log-level.trace": {
+    "defaultMessage": "Trace"
+  },
+  "servers.console.filter.log-level.warn": {
+    "defaultMessage": "Warn"
+  },
+  "servers.console.search.logs.placeholder": {
+    "defaultMessage": "Search logs"
+  },
+  "servers.console.share.logs.error.title": {
+    "defaultMessage": "Failed to share logs"
+  },
+  "servers.console.share.logs.header": {
+    "defaultMessage": "Share Logs"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Already have a server?"
@@ -2846,6 +3488,63 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Using {projectTitle}"
   },
+  "servers.manage.action.go-back-to-servers": {
+    "defaultMessage": "Go back to all servers"
+  },
+  "servers.manage.action.go-to-billing": {
+    "defaultMessage": "Go to billing settings"
+  },
+  "servers.manage.action.reload-page": {
+    "defaultMessage": "Reload"
+  },
+  "servers.manage.backups.create-backup": {
+    "defaultMessage": "Create backup"
+  },
+  "servers.manage.backups.empty.description": {
+    "defaultMessage": "Create your first backup"
+  },
+  "servers.manage.backups.empty.heading": {
+    "defaultMessage": "No backups yet"
+  },
+  "servers.manage.backups.group.earlier-today": {
+    "defaultMessage": "Earlier today"
+  },
+  "servers.manage.backups.group.just-now": {
+    "defaultMessage": "Just now"
+  },
+  "servers.manage.backups.group.last-two-weeks": {
+    "defaultMessage": "Last 2 weeks"
+  },
+  "servers.manage.backups.group.older": {
+    "defaultMessage": "Older"
+  },
+  "servers.manage.backups.group.yesterday": {
+    "defaultMessage": "Yesterday"
+  },
+  "servers.manage.backups.heading": {
+    "defaultMessage": "Backups"
+  },
+  "servers.manage.backups.load-failed.description": {
+    "defaultMessage": "We couldn't load your server's backups. Here's what went wrong:"
+  },
+  "servers.manage.backups.load-failed.title": {
+    "defaultMessage": "Failed to load backups"
+  },
+  "servers.manage.backups.loading": {
+    "defaultMessage": "Loading backups..."
+  },
+  "servers.manage.backups.notification.delete-error.title": {
+    "defaultMessage": "Error deleting backup"
+  },
+  "servers.manage.backups.tooltip.backup-in-progress": {
+    "defaultMessage": "A backup is already in progress"
+  },
+  "servers.manage.backups.tooltip.backup-slots-full": {
+    "defaultMessage": "All {quota, number} of your backup slots are in use"
+  },
+  "servers.manage.backups.tooltip.restore-disabled-running": {
+    "defaultMessage": "Cannot restore backup while server is running"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Checking for new servers..."
   },
@@ -2858,6 +3557,33 @@
   "servers.manage.contact-support-button": {
     "defaultMessage": "Contact Modrinth Support"
   },
+  "servers.manage.debug.server-data-heading": {
+    "defaultMessage": "Server data"
+  },
+  "servers.manage.details.error-message": {
+    "defaultMessage": "Error message"
+  },
+  "servers.manage.details.error-name": {
+    "defaultMessage": "Error Name"
+  },
+  "servers.manage.details.node": {
+    "defaultMessage": "Node"
+  },
+  "servers.manage.details.node-ping-failed": {
+    "defaultMessage": "Unable to reach node. Ping test failed."
+  },
+  "servers.manage.details.original-error": {
+    "defaultMessage": "Original Error"
+  },
+  "servers.manage.details.server-id": {
+    "defaultMessage": "Server ID"
+  },
+  "servers.manage.details.stack-trace": {
+    "defaultMessage": "Stack Trace"
+  },
+  "servers.manage.details.timestamp": {
+    "defaultMessage": "Timestamp"
+  },
   "servers.manage.error.alert-notice": {
     "defaultMessage": "Our systems automatically alert our team when there's an issue. We are already working on getting them back online."
   },
@@ -2867,17 +3593,95 @@
   "servers.manage.error.details": {
     "defaultMessage": "Error details:"
   },
+  "servers.manage.error.forbidden.description": {
+    "defaultMessage": "Please contact Modrinth Support."
+  },
+  "servers.manage.error.forbidden.title": {
+    "defaultMessage": "An error occurred."
+  },
+  "servers.manage.error.node-unavailable.p1": {
+    "defaultMessage": "Your server's node, where your Modrinth Server is physically hosted, is not accessible at the moment. We are working to resolve the issue as quickly as possible."
+  },
+  "servers.manage.error.node-unavailable.p2": {
+    "defaultMessage": "Your data is safe and will not be lost, and your server will be back online as soon as the issue is resolved."
+  },
+  "servers.manage.error.node-unavailable.p3": {
+    "defaultMessage": "If reloading does not work initially, please contact Modrinth Support via the chat bubble in the bottom right corner and we'll be happy to help."
+  },
+  "servers.manage.error.node-unavailable.title": {
+    "defaultMessage": "Server Node Unavailable"
+  },
+  "servers.manage.error.preparing.description": {
+    "defaultMessage": "Your server's hardware is being prepared and will be available shortly!"
+  },
+  "servers.manage.error.preparing.title": {
+    "defaultMessage": "We're getting your server ready"
+  },
   "servers.manage.error.queue-notice": {
     "defaultMessage": "If you recently purchased your Modrinth Hosting server, it is currently in a queue and will appear here as soon as it's ready. <warning>Do not attempt to purchase a new server.</warning>"
   },
   "servers.manage.error.support-notice": {
     "defaultMessage": "If you require personalized support regarding the status of your server, please contact Modrinth Support."
   },
+  "servers.manage.error.suspended.cancelled": {
+    "defaultMessage": "Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error."
+  },
+  "servers.manage.error.suspended.default": {
+    "defaultMessage": "Your server has been suspended.\nContact Modrinth Support if you believe this is an error."
+  },
+  "servers.manage.error.suspended.title": {
+    "defaultMessage": "Server suspended"
+  },
+  "servers.manage.error.suspended.with-reason": {
+    "defaultMessage": "Your server has been suspended: {reason}\nContact Modrinth Support if you believe this is an error."
+  },
   "servers.manage.error.title": {
     "defaultMessage": "Servers could not be loaded"
   },
+  "servers.manage.error.unknown-details": {
+    "defaultMessage": "Unknown error"
+  },
+  "servers.manage.error.upgrading.description": {
+    "defaultMessage": "Your server's hardware is currently being upgraded and will be back online shortly!"
+  },
+  "servers.manage.error.upgrading.title": {
+    "defaultMessage": "Server upgrading"
+  },
   "servers.manage.handle-error.title": {
     "defaultMessage": "An error occurred"
+  },
+  "servers.manage.install-error.change-loader": {
+    "defaultMessage": "Change Loader"
+  },
+  "servers.manage.install-error.copy-debug-info": {
+    "defaultMessage": "Copy Debug Info"
+  },
+  "servers.manage.install-error.internal.body": {
+    "defaultMessage": "An internal error occurred while installing your server. Don't fret — try reinstalling your server, and if the problem persists, please contact Modrinth support with your server's debug information."
+  },
+  "servers.manage.install-error.invalid-version.bullet-modpack": {
+    "defaultMessage": "If you've installed a modpack, it may have been packaged incorrectly or may not be compatible with the loader."
+  },
+  "servers.manage.install-error.invalid-version.bullet-recent-mc": {
+    "defaultMessage": "If this version of Minecraft was released recently, please check if Modrinth Hosting supports it."
+  },
+  "servers.manage.install-error.invalid-version.bullet-reinstall": {
+    "defaultMessage": "Your server may need to be reinstalled with a valid mod loader and version. You can change the loader by clicking the \"Change Loader\" button."
+  },
+  "servers.manage.install-error.invalid-version.bullet-support": {
+    "defaultMessage": "If you're stuck, please contact Modrinth Support with the information below:"
+  },
+  "servers.manage.install-error.invalid-version.intro": {
+    "defaultMessage": "An invalid loader or Minecraft version was specified and could not be installed."
+  },
+  "servers.manage.install-error.open-installation-log": {
+    "defaultMessage": "Open Installation Log"
+  },
+  "servers.manage.install-error.title": {
+    "defaultMessage": "Installation error"
+  },
+  "servers.manage.install-error.unsupported-version.body": {
+    "defaultMessage": "An error occurred while installing your server because Modrinth Hosting does not support the version of Minecraft or the loader you specified. Try reinstalling your server with a different version or loader, and if the problem persists, please contact Modrinth Support with your server's debug information."
   },
   "servers.manage.loading-servers": {
     "defaultMessage": "Loading your servers..."
@@ -2890,6 +3694,36 @@
   },
   "servers.manage.no-servers-found": {
     "defaultMessage": "No servers found."
+  },
+  "servers.manage.notification.dismiss-notice-error": {
+    "defaultMessage": "Error dismissing notice"
+  },
+  "servers.manage.notification.retry-installation-failed": {
+    "defaultMessage": "Failed to retry installation"
+  },
+  "servers.manage.overview.console.title": {
+    "defaultMessage": "Console"
+  },
+  "servers.manage.overview.download-ws-debug-json": {
+    "defaultMessage": "Download WS debug JSON"
+  },
+  "servers.manage.overview.ws-auth-error.description": {
+    "defaultMessage": "An error occurred while attempting to connect to your server. Please try refreshing the page. (WebSocket Authentication Failed)"
+  },
+  "servers.manage.overview.ws-auth-error.title": {
+    "defaultMessage": "Could not connect to the server."
+  },
+  "servers.manage.plan.custom": {
+    "defaultMessage": "Custom plan"
+  },
+  "servers.manage.plan.large": {
+    "defaultMessage": "Large plan"
+  },
+  "servers.manage.plan.medium": {
+    "defaultMessage": "Medium plan"
+  },
+  "servers.manage.plan.small": {
+    "defaultMessage": "Small plan"
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Payment information is still loading. Opening checkout as soon as it is ready."
@@ -2918,6 +3752,9 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Success"
   },
+  "servers.manage.resubscribe.fallback-server-name": {
+    "defaultMessage": "this server"
+  },
   "servers.manage.search-placeholder": {
     "defaultMessage": "Search {count} {count, plural, one {server} other {servers}}..."
   },
@@ -2932,6 +3769,45 @@
   },
   "servers.manage.settings-hint.title": {
     "defaultMessage": "Your server settings have moved"
+  },
+  "servers.manage.stats.bytes-with-unit": {
+    "defaultMessage": "{value} {unit}"
+  },
+  "servers.manage.stats.cpu.title": {
+    "defaultMessage": "CPU"
+  },
+  "servers.manage.stats.memory.title": {
+    "defaultMessage": "Memory"
+  },
+  "servers.manage.stats.ram-total-secondary": {
+    "defaultMessage": "/ {total}"
+  },
+  "servers.manage.stats.storage.title": {
+    "defaultMessage": "Storage"
+  },
+  "servers.manage.stats.unit.byte": {
+    "defaultMessage": "B"
+  },
+  "servers.manage.stats.unit.gigabyte": {
+    "defaultMessage": "GB"
+  },
+  "servers.manage.stats.unit.kilobyte": {
+    "defaultMessage": "KB"
+  },
+  "servers.manage.stats.unit.megabyte": {
+    "defaultMessage": "MB"
+  },
+  "servers.manage.tooltip.server-settings": {
+    "defaultMessage": "Server settings"
+  },
+  "servers.manage.upload.header": {
+    "defaultMessage": "Uploading files ({completed}/{total})"
+  },
+  "servers.manage.ws.disconnected": {
+    "defaultMessage": "Something went wrong..."
+  },
+  "servers.manage.ws.reconnecting": {
+    "defaultMessage": "Hang on, we're reconnecting to your server."
   },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} remaining..."
@@ -2986,6 +3862,51 @@
   },
   "servers.notice.undismissable": {
     "defaultMessage": "Undismissable"
+  },
+  "servers.onboarding.installation-failed.text": {
+    "defaultMessage": "An unexpected error occurred while installing. Please try again later."
+  },
+  "servers.onboarding.installation-failed.title": {
+    "defaultMessage": "Installation failed"
+  },
+  "servers.onboarding.modpack-upload-failed.text": {
+    "defaultMessage": "An unexpected error occurred while uploading. Please try again later."
+  },
+  "servers.onboarding.modpack-upload-failed.title": {
+    "defaultMessage": "Modpack upload failed"
+  },
+  "servers.onboarding.setup-heading": {
+    "defaultMessage": "Set up your server (~2 mins)"
+  },
+  "servers.onboarding.setup-server-button": {
+    "defaultMessage": "Set up server"
+  },
+  "servers.onboarding.step-1.description": {
+    "defaultMessage": "Pick your favorite modpack from Modrinth, or choose a loader and add the mods you want."
+  },
+  "servers.onboarding.step-1.title": {
+    "defaultMessage": "Choose what to play"
+  },
+  "servers.onboarding.step-2.description": {
+    "defaultMessage": "Set up your world just like singleplayer. Choose your game mode and world seed."
+  },
+  "servers.onboarding.step-2.title": {
+    "defaultMessage": "Configure your world"
+  },
+  "servers.onboarding.step-3.description": {
+    "defaultMessage": "Share your server with friends by copying the address and letting them know which mods they'll need to join."
+  },
+  "servers.onboarding.step-3.title": {
+    "defaultMessage": "Invite your friends"
+  },
+  "servers.onboarding.uploading-progress": {
+    "defaultMessage": "Uploading ({percent}%)"
+  },
+  "servers.onboarding.welcome-description": {
+    "defaultMessage": "Your server is ready. Here's what you need to do to start playing!"
+  },
+  "servers.onboarding.welcome-title": {
+    "defaultMessage": "Welcome to Modrinth Hosting"
   },
   "servers.purchase.notification.success.text": {
     "defaultMessage": "Your Modrinth Hosting purchase was completed successfully."

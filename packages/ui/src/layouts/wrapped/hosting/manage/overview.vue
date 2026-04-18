@@ -7,7 +7,9 @@
 			/>
 
 			<div class="flex min-h-[700px] flex-col gap-2">
-				<span class="text-2xl font-semibold text-contrast">Console</span>
+				<span class="text-2xl font-semibold text-contrast">{{
+					formatMessage(messages.consoleTitle)
+				}}</span>
 
 				<ConsolePageLayout />
 			</div>
@@ -17,10 +19,9 @@
 			v-if="isWsAuthIncorrect"
 			class="absolute inset-0 flex flex-col items-center justify-center bg-bg"
 		>
-			<h2>Could not connect to the server.</h2>
+			<h2>{{ formatMessage(messages.wsAuthErrorTitle) }}</h2>
 			<p>
-				An error occurred while attempting to connect to your server. Please try refreshing the
-				page. (WebSocket Authentication Failed)
+				{{ formatMessage(messages.wsAuthErrorDescription) }}
 			</p>
 		</div>
 
@@ -29,7 +30,7 @@
 			class="self-start rounded-lg bg-surface-3 px-3 py-1 text-sm text-contrast hover:brightness-125"
 			@click="downloadLog4jDebug"
 		>
-			Download WS debug JSON
+			{{ formatMessage(messages.downloadWsDebugJson) }}
 		</button>
 	</div>
 </template>
@@ -40,10 +41,33 @@ import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
 import { useModrinthServersConsole } from '#ui/composables'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { ConsolePageLayout, provideConsoleManager } from '#ui/layouts/shared/console'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
 import ServerManageStats from './components/ServerManageStats.vue'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	consoleTitle: {
+		id: 'servers.manage.overview.console.title',
+		defaultMessage: 'Console',
+	},
+	wsAuthErrorTitle: {
+		id: 'servers.manage.overview.ws-auth-error.title',
+		defaultMessage: 'Could not connect to the server.',
+	},
+	wsAuthErrorDescription: {
+		id: 'servers.manage.overview.ws-auth-error.description',
+		defaultMessage:
+			'An error occurred while attempting to connect to your server. Please try refreshing the page. (WebSocket Authentication Failed)',
+	},
+	downloadWsDebugJson: {
+		id: 'servers.manage.overview.download-ws-debug-json',
+		defaultMessage: 'Download WS debug JSON',
+	},
+})
 
 const props = withDefaults(
 	defineProps<{

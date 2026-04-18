@@ -29,7 +29,6 @@ export interface ServerSettingsTabContext {
 
 export interface ServerSettingsTabDefinition {
 	id: ServerSettingsTabId
-	label: string
 	icon: Component
 	href?: (ctx: ServerSettingsTabContext) => string
 	external?: boolean
@@ -39,33 +38,27 @@ export interface ServerSettingsTabDefinition {
 export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 	{
 		id: 'general',
-		label: 'General',
 		icon: SettingsIcon,
 	},
 	{
 		id: 'installation',
-		label: 'Installation',
 		icon: WrenchIcon,
 	},
 	{
 		id: 'network',
-		label: 'Network',
 		icon: VersionIcon,
 	},
 	{
 		id: 'properties',
-		label: 'Properties',
 		icon: ListIcon,
 		shown: ({ serverStatus }) => serverStatus !== 'installing',
 	},
 	{
 		id: 'advanced',
-		label: 'Advanced',
 		icon: TextQuoteIcon,
 	},
 	{
 		id: 'billing',
-		label: 'Billing',
 		icon: CardIcon,
 		href: ({ serverId }) => `/settings/billing#server-${serverId}`,
 		external: true,
@@ -73,7 +66,6 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 	},
 	{
 		id: 'admin-billing',
-		label: 'Admin Billing',
 		icon: ModrinthIcon,
 		href: ({ ownerId }) => `/admin/billing/${ownerId}`,
 		external: true,

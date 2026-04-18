@@ -39,11 +39,7 @@
 					v-model="url"
 					:icon="LinkIcon"
 					type="url"
-					:placeholder="
-						cf
-							? 'https://www.curseforge.com/minecraft/modpacks/.../files/6412259'
-							: 'https://www.example.com/.../modpack-name-1.0.2.zip'
-					"
+					:placeholder="cf ? CF_URL_PLACEHOLDER : ZIP_URL_PLACEHOLDER"
 					:disabled="submitted"
 					:error="touched && !!error"
 					autocomplete="off"
@@ -113,6 +109,10 @@ import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import InlineBackupCreator from '../../../content-tab/components/modals/InlineBackupCreator.vue'
+
+// Language-invariant example URLs for the input placeholder.
+const CF_URL_PLACEHOLDER = 'https://www.curseforge.com/minecraft/modpacks/.../files/6412259'
+const ZIP_URL_PLACEHOLDER = 'https://www.example.com/.../modpack-name-1.0.2.zip'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()

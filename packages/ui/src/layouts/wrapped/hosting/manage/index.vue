@@ -61,7 +61,10 @@
 						<li v-if="fetchError" class="text-red">
 							<p>{{ formatMessage(messages.errorDetails) }}</p>
 							<CopyCode
-								:text="(fetchError as ModrinthServersFetchError).message || 'Unknown error'"
+								:text="
+									(fetchError as ModrinthServersFetchError).message ||
+									formatMessage(messages.unknownErrorDetails)
+								"
 								:copyable="false"
 								:selectable="false"
 								:language="'json'"
@@ -318,6 +321,30 @@ const messages = defineMessages({
 	resubscribeErrorText: {
 		id: 'servers.manage.resubscribe-error.text',
 		defaultMessage: 'An error occurred while resubscribing to your Modrinth server.',
+	},
+	unknownErrorDetails: {
+		id: 'servers.manage.error.unknown-details',
+		defaultMessage: 'Unknown error',
+	},
+	planSmall: {
+		id: 'servers.manage.plan.small',
+		defaultMessage: 'Small plan',
+	},
+	planMedium: {
+		id: 'servers.manage.plan.medium',
+		defaultMessage: 'Medium plan',
+	},
+	planLarge: {
+		id: 'servers.manage.plan.large',
+		defaultMessage: 'Large plan',
+	},
+	planCustom: {
+		id: 'servers.manage.plan.custom',
+		defaultMessage: 'Custom plan',
+	},
+	resubscribeFallbackServerName: {
+		id: 'servers.manage.resubscribe.fallback-server-name',
+		defaultMessage: 'this server',
 	},
 })
 
@@ -778,18 +805,19 @@ function getProductFromPriceId(priceId: string | null | undefined) {
 }
 
 function getPlanName(product: Labrinth.Billing.Internal.Product | null): string {
-	if (!product) return 'Medium plan'
-	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return 'Medium plan'
+	if (!product) return formatMessage(messages.planMedium)
+	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal')
+		return formatMessage(messages.planMedium)
 
 	switch (product.metadata.ram) {
 		case 4096:
-			return 'Small plan'
+			return formatMessage(messages.planSmall)
 		case 6144:
-			return 'Medium plan'
+			return formatMessage(messages.planMedium)
 		case 8192:
-			return 'Large plan'
+			return formatMessage(messages.planLarge)
 		default:
-			return 'Custom plan'
+			return formatMessage(messages.planCustom)
 	}
 }
 
@@ -850,7 +878,8 @@ function openResubscribeModal(
 		subscriptionId: subscription.id,
 		wasSuspended: !!charge?.due && dayjs(charge.due).isBefore(dayjs()),
 		serverName:
-			serverList.value.find((server) => server.server_id === serverId)?.name ?? 'this server',
+			serverList.value.find((server) => server.server_id === serverId)?.name ??
+			formatMessage(messages.resubscribeFallbackServerName),
 		planName: getPlanName(product),
 		ramGb: getRamGb(product),
 		storageGb: getStorageGb(product),

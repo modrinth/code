@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, toValue } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -17,8 +18,50 @@ import type { SortType } from '#ui/utils/search'
 import BrowseInstallHeader from './header.vue'
 import { injectBrowseManager } from './providers/browse-manager'
 
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	searchPlaceholder: {
+		id: 'browse-tab.search-placeholder',
+		defaultMessage:
+			'{projectType, select, mod {Search mods…} modpack {Search modpacks…} resourcepack {Search resource packs…} shader {Search shaders…} datapack {Search datapacks…} plugin {Search plugins…} server {Search servers…} project {Search projects…} other {Search…}}',
+	},
+	sortByPlaceholder: {
+		id: 'browse-tab.sort-by-placeholder',
+		defaultMessage: 'Sort by',
+	},
+	sortByPrefix: {
+		id: 'browse-tab.sort-by-prefix',
+		defaultMessage: 'Sort by:',
+	},
+	viewPlaceholder: {
+		id: 'browse-tab.view-placeholder',
+		defaultMessage: 'View',
+	},
+	viewPrefix: {
+		id: 'browse-tab.view-prefix',
+		defaultMessage: 'View:',
+	},
+	filterResultsButton: {
+		id: 'browse-tab.filter-results',
+		defaultMessage: 'Filter results…',
+	},
+	offlineMessage: {
+		id: 'browse-tab.offline',
+		defaultMessage: 'You are currently offline. Connect to the internet to browse Modrinth!',
+	},
+	noResultsMessage: {
+		id: 'browse-tab.no-results',
+		defaultMessage: 'No results found for your query!',
+	},
+})
+
 const ctx = injectBrowseManager()
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
+
+const searchPlaceholderText = computed(() =>
+	formatMessage(messages.searchPlaceholder, { projectType: ctx.projectType.value }),
+)
 
 const sortOptions = computed<ComboboxOption<SortType>[]>(() =>
 	ctx.effectiveSortTypes.value.map((st) => ({
@@ -47,7 +90,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 		:icon="SearchIcon"
 		type="text"
 		autocomplete="off"
-		:placeholder="`Search ${ctx.projectType.value}s...`"
+		:placeholder="searchPlaceholderText"
 		clearable
 		wrapper-class="w-full"
 		:input-class="ctx.variant === 'web' ? '!h-12' : 'h-12'"
@@ -59,11 +102,11 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			:model-value="ctx.effectiveCurrentSortType.value"
 			:options="sortOptions"
 			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[16rem]'"
-			placeholder="Sort by"
+			:placeholder="formatMessage(messages.sortByPlaceholder)"
 			@update:model-value="(val: SortType) => (ctx.effectiveCurrentSortType.value = val)"
 		>
 			<template #prefix>
-				<span class="font-semibold text-primary">Sort by:</span>
+				<span class="font-semibold text-primary">{{ formatMessage(messages.sortByPrefix) }}</span>
 			</template>
 		</Combobox>
 
@@ -71,17 +114,19 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			:model-value="ctx.maxResults.value"
 			:options="maxResultsOptions"
 			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[9rem]'"
-			placeholder="View"
+			:placeholder="formatMessage(messages.viewPlaceholder)"
 			@update:model-value="(val: number) => (ctx.maxResults.value = val)"
 		>
 			<template #prefix>
-				<span class="font-semibold text-primary">View:</span>
+				<span class="font-semibold text-primary">{{ formatMessage(messages.viewPrefix) }}</span>
 			</template>
 		</Combobox>
 
 		<div v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value" class="lg:hidden">
 			<ButtonStyled>
-				<button @click="ctx.filtersMenuOpen.value = true">Filter results...</button>
+				<button @click="ctx.filtersMenuOpen.value = true">
+					{{ formatMessage(messages.filterResultsButton) }}
+				</button>
 			</ButtonStyled>
 		</div>
 
@@ -120,7 +165,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			<component :is="ctx.loadingComponent ?? LoadingIndicator" />
 		</section>
 		<section v-else-if="ctx.offline?.value && ctx.totalHits.value === 0" class="offline">
-			You are currently offline. Connect to the internet to browse Modrinth!
+			{{ formatMessage(messages.offlineMessage) }}
 		</section>
 		<section
 			v-else-if="
@@ -130,7 +175,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			"
 			class="offline"
 		>
-			<p>No results found for your query!</p>
+			<p>{{ formatMessage(messages.noResultsMessage) }}</p>
 		</section>
 
 		<ProjectCardList v-else :layout="ctx.effectiveLayout.value">

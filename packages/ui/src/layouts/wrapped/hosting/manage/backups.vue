@@ -11,16 +11,18 @@
 						<div class="grid place-content-center rounded-full bg-bg-orange p-4">
 							<IssuesIcon class="size-12 text-orange" />
 						</div>
-						<h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load backups</h1>
+						<h1 class="m-0 mb-2 w-fit text-4xl font-bold">
+							{{ formatMessage(messages.loadFailedTitle) }}
+						</h1>
 					</div>
 					<p class="text-lg text-secondary">
-						We couldn't load your server's backups. Here's what went wrong:
+						{{ formatMessage(messages.loadFailedDescription) }}
 					</p>
 					<p>
 						<span class="break-all font-mono">{{ error.message }}</span>
 					</p>
 					<ButtonStyled size="large" color="brand" @click="refetch">
-						<button class="mt-6 !w-full">Retry</button>
+						<button class="mt-6 !w-full">{{ formatMessage(commonMessages.retryButton) }}</button>
 					</ButtonStyled>
 				</div>
 			</div>
@@ -33,7 +35,9 @@
 			<BackupDeleteModal ref="deleteBackupModal" @delete="deleteBackup" />
 
 			<div v-if="backupsData?.length" class="mb-2 flex items-center align-middle justify-between">
-				<span class="text-2xl font-semibold text-contrast">Backups</span>
+				<span class="text-2xl font-semibold text-contrast">{{
+					formatMessage(messages.backupsHeading)
+				}}</span>
 				<ButtonStyled color="brand">
 					<button
 						v-tooltip="backupCreationDisabled"
@@ -41,7 +45,7 @@
 						@click="showCreateModel"
 					>
 						<PlusIcon class="size-5" />
-						Create backup
+						{{ formatMessage(messages.createBackup) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -55,13 +59,13 @@
 					>
 						<template v-if="!backupsData">
 							<SpinnerIcon class="animate-spin" />
-							Loading backups...
+							{{ formatMessage(messages.loadingBackups) }}
 						</template>
 						<template v-else>
 							<EmptyState
 								type="empty-inbox"
-								heading="No backups yet"
-								description="Create your first backup"
+								:heading="formatMessage(messages.noBackupsHeading)"
+								:description="formatMessage(messages.noBackupsDescription)"
 							>
 								<template #actions>
 									<ButtonStyled color="brand">
@@ -72,7 +76,7 @@
 											@click="showCreateModel"
 										>
 											<PlusIcon class="size-5" />
-											Create backup
+											{{ formatMessage(messages.createBackup) }}
 										</button>
 									</ButtonStyled>
 								</template>
@@ -81,10 +85,12 @@
 					</div>
 
 					<div v-else key="list" class="flex flex-col gap-1.5">
-						<template v-for="group in groupedBackups" :key="group.label">
+						<template v-for="group in groupedBackups" :key="group.label.id">
 							<div class="flex items-center gap-2">
 								<component :is="group.icon" v-if="group.icon" class="size-6 text-secondary" />
-								<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
+								<span class="text-lg font-semibold text-secondary">{{
+									formatMessage(group.label)
+								}}</span>
 							</div>
 
 							<div class="flex gap-2">
@@ -156,15 +162,83 @@ import BackupDeleteModal from '#ui/components/servers/backups/BackupDeleteModal.
 import BackupItem from '#ui/components/servers/backups/BackupItem.vue'
 import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
-import { useVIntl } from '#ui/composables/i18n'
+import { defineMessages, type MessageDescriptor, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	loadFailedTitle: {
+		id: 'servers.manage.backups.load-failed.title',
+		defaultMessage: 'Failed to load backups',
+	},
+	loadFailedDescription: {
+		id: 'servers.manage.backups.load-failed.description',
+		defaultMessage: "We couldn't load your server's backups. Here's what went wrong:",
+	},
+	backupsHeading: {
+		id: 'servers.manage.backups.heading',
+		defaultMessage: 'Backups',
+	},
+	createBackup: {
+		id: 'servers.manage.backups.create-backup',
+		defaultMessage: 'Create backup',
+	},
+	loadingBackups: {
+		id: 'servers.manage.backups.loading',
+		defaultMessage: 'Loading backups...',
+	},
+	noBackupsHeading: {
+		id: 'servers.manage.backups.empty.heading',
+		defaultMessage: 'No backups yet',
+	},
+	noBackupsDescription: {
+		id: 'servers.manage.backups.empty.description',
+		defaultMessage: 'Create your first backup',
+	},
+	groupJustNow: {
+		id: 'servers.manage.backups.group.just-now',
+		defaultMessage: 'Just now',
+	},
+	groupEarlierToday: {
+		id: 'servers.manage.backups.group.earlier-today',
+		defaultMessage: 'Earlier today',
+	},
+	groupYesterday: {
+		id: 'servers.manage.backups.group.yesterday',
+		defaultMessage: 'Yesterday',
+	},
+	groupLastTwoWeeks: {
+		id: 'servers.manage.backups.group.last-two-weeks',
+		defaultMessage: 'Last 2 weeks',
+	},
+	groupOlder: {
+		id: 'servers.manage.backups.group.older',
+		defaultMessage: 'Older',
+	},
+	restoreDisabledRunning: {
+		id: 'servers.manage.backups.tooltip.restore-disabled-running',
+		defaultMessage: 'Cannot restore backup while server is running',
+	},
+	backupSlotsFull: {
+		id: 'servers.manage.backups.tooltip.backup-slots-full',
+		defaultMessage: 'All {quota, number} of your backup slots are in use',
+	},
+	backupInProgressTooltip: {
+		id: 'servers.manage.backups.tooltip.backup-in-progress',
+		defaultMessage: 'A backup is already in progress',
+	},
+	errorDeletingBackupTitle: {
+		id: 'servers.manage.backups.notification.delete-error.title',
+		defaultMessage: 'Error deleting backup',
+	},
+})
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { server, worldId, backupsState, markBackupCancelled, busyReasons } =
@@ -240,7 +314,7 @@ const backups = computed(() => {
 })
 
 type BackupGroup = {
-	label: string
+	label: MessageDescriptor
 	icon: Component | null
 	backups: Archon.Backups.v1.Backup[]
 }
@@ -251,8 +325,12 @@ const groupedBackups = computed((): BackupGroup[] => {
 	const now = dayjs()
 	const groups: BackupGroup[] = []
 
-	const addToGroup = (label: string, icon: Component | null, backup: Archon.Backups.v1.Backup) => {
-		let group = groups.find((g) => g.label === label)
+	const addToGroup = (
+		label: MessageDescriptor,
+		icon: Component | null,
+		backup: Archon.Backups.v1.Backup,
+	) => {
+		let group = groups.find((g) => g.label.id === label.id)
 		if (!group) {
 			group = { label, icon, backups: [] }
 			groups.push(group)
@@ -268,15 +346,15 @@ const groupedBackups = computed((): BackupGroup[] => {
 		const diffDays = now.diff(created, 'day')
 
 		if (diffMinutes < 30 && isToday) {
-			addToGroup('Just now', CalendarIcon, backup)
+			addToGroup(messages.groupJustNow, CalendarIcon, backup)
 		} else if (isToday) {
-			addToGroup('Earlier today', CalendarIcon, backup)
+			addToGroup(messages.groupEarlierToday, CalendarIcon, backup)
 		} else if (isYesterday) {
-			addToGroup('Yesterday', CalendarIcon, backup)
+			addToGroup(messages.groupYesterday, CalendarIcon, backup)
 		} else if (diffDays <= 14) {
-			addToGroup('Last 2 weeks', CalendarIcon, backup)
+			addToGroup(messages.groupLastTwoWeeks, CalendarIcon, backup)
 		} else {
-			addToGroup('Older', CalendarIcon, backup)
+			addToGroup(messages.groupOlder, CalendarIcon, backup)
 		}
 	}
 
@@ -291,7 +369,7 @@ const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>()
 
 const backupRestoreDisabled = computed(() => {
 	if (props.isServerRunning) {
-		return 'Cannot restore backup while server is running'
+		return formatMessage(messages.restoreDisabledRunning)
 	}
 	if (busyReasons.value.length > 0) {
 		return formatMessage(busyReasons.value[0].reason)
@@ -304,7 +382,7 @@ const backupCreationDisabled = computed(() => {
 	if (quota !== undefined) {
 		const usedCount = backupsData.value?.length ?? server.value.used_backup_quota ?? 0
 		if (usedCount >= quota) {
-			return `All ${quota} of your backup slots are in use`
+			return formatMessage(messages.backupSlotsFull, { quota })
 		}
 	}
 	if (busyReasons.value.length > 0) {
@@ -312,7 +390,7 @@ const backupCreationDisabled = computed(() => {
 	}
 	// also check for active backups, combining REST data with WS overlay
 	if (backups.value.some((b) => b.status === 'in_progress' || b.status === 'pending')) {
-		return 'A backup is already in progress'
+		return formatMessage(messages.backupInProgressTooltip)
 	}
 	return undefined
 })
@@ -338,7 +416,7 @@ function deleteBackup(backup?: Archon.Backups.v1.Backup) {
 	if (!backup) {
 		addNotification({
 			type: 'error',
-			title: 'Error deleting backup',
+			title: formatMessage(messages.errorDeletingBackupTitle),
 			text: 'Backup is null',
 		})
 		return
@@ -349,7 +427,7 @@ function deleteBackup(backup?: Archon.Backups.v1.Backup) {
 			const message = err instanceof Error ? err.message : String(err)
 			addNotification({
 				type: 'error',
-				title: 'Error deleting backup',
+				title: formatMessage(messages.errorDeletingBackupTitle),
 				text: message,
 			})
 		},

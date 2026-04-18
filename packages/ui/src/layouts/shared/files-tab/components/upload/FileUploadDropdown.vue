@@ -120,7 +120,10 @@ import { injectModrinthClient } from '#ui/providers/api-client'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
 
+import { useFormatFileSizeI18n } from '../../composables/format-file-size-i18n'
+
 const { formatMessage } = useVIntl()
+const { formatUploadQueueSize } = useFormatFileSizeI18n()
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 
@@ -160,10 +163,6 @@ const messages = defineMessages({
 	incorrectFileType: {
 		id: 'files.upload-dropdown.incorrect-file-type',
 		defaultMessage: 'Upload had incorrect file type',
-	},
-	failedToUpload: {
-		id: 'files.upload-dropdown.failed-to-upload',
-		defaultMessage: 'Failed to upload {fileName}',
 	},
 })
 
@@ -240,13 +239,6 @@ watch(
 	{ deep: true },
 )
 
-const formatFileSize = (bytes: number): string => {
-	if (bytes < 1024) return bytes + ' B'
-	if (bytes < 1024 ** 2) return (bytes / 1024).toFixed(1) + ' KB'
-	if (bytes < 1024 ** 3) return (bytes / 1024 ** 2).toFixed(1) + ' MB'
-	return (bytes / 1024 ** 3).toFixed(1) + ' GB'
-}
-
 const cancelUpload = (item: UploadItem) => {
 	if (item.uploader && item.status === 'uploading') {
 		item.uploader.cancel()
@@ -269,7 +261,7 @@ const uploadFile = async (file: File) => {
 		file,
 		progress: 0,
 		status: 'pending',
-		size: formatFileSize(file.size),
+		size: formatUploadQueueSize(file.size),
 	}
 
 	uploadQueue.value.push(uploadItem)
@@ -343,7 +335,7 @@ const uploadFile = async (file: File) => {
 		if (error instanceof Error && error.message !== 'Upload cancelled') {
 			addNotification({
 				title: formatMessage(commonMessages.uploadFailedLabel),
-				text: formatMessage(messages.failedToUpload, { fileName: file.name }),
+				text: formatMessage(commonMessages.uploadFailedFileDetail, { fileName: file.name }),
 				type: 'error',
 			})
 		}

@@ -14,9 +14,10 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { useFormatDateTime } from '../../../composables'
-import { defineMessages, useVIntl } from '../../../composables/i18n'
-import { commonMessages } from '../../../utils'
+import { useFormatDateTime } from '#ui/composables'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
+
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'
 
@@ -143,10 +144,6 @@ const messages = defineMessages({
 	restore: {
 		id: 'servers.backups.item.restore',
 		defaultMessage: 'Restore',
-	},
-	rename: {
-		id: 'servers.backups.item.rename',
-		defaultMessage: 'Rename',
 	},
 	failedToCreateBackup: {
 		id: 'servers.backups.item.failed-to-create-backup',
@@ -286,7 +283,7 @@ const messages = defineMessages({
 							<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
 						</template>
 						<template #rename>
-							<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
+							<EditIcon class="size-5" /> {{ formatMessage(commonMessages.renameButton) }}
 						</template>
 						<template #delete>
 							<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}

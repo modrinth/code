@@ -122,10 +122,12 @@ import {
 	startFileDrag,
 	wasRecentDrag,
 } from '../composables/file-drag-state'
+import { useFormatFileSizeI18n } from '../composables/format-file-size-i18n'
 import { injectFileManager } from '../providers/file-manager'
 import type { FileItem } from '../types'
 
 const { formatMessage } = useVIntl()
+const { formatTableRowSize } = useFormatFileSizeI18n()
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
 
@@ -163,8 +165,6 @@ const isDropTarget = computed(
 	() => fileDragActive.value && fileDragTarget.value === props.path && props.type === 'directory',
 )
 const isDragSource = computed(() => fileDragActive.value && fileDragData.value?.path === props.path)
-
-const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])
 
 const formatDateTime = useFormatDateTime({
 	year: '2-digit',
@@ -307,12 +307,7 @@ const formattedSize = computed(() => {
 	}
 
 	if (props.size === undefined) return ''
-	const bytes = props.size
-	if (bytes === 0) return '0 B'
-
-	const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
-	const size = (bytes / Math.pow(1024, exponent)).toFixed(2)
-	return `${size} ${units[exponent]}`
+	return formatTableRowSize(props.size)
 })
 
 function openContextMenu(event: MouseEvent) {

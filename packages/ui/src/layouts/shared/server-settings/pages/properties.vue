@@ -5,32 +5,37 @@
 				<Admonition
 					v-if="hasNoProperties"
 					type="warning"
-					body="Some expected properties are missing from your server.properties - this usually means the server hasn't completed its first startup yet."
+					:body="formatMessage(messages.missingPropertiesWarning)"
 				/>
 				<div class="flex flex-col gap-2">
 					<div class="m-0">
-						Edit the Minecraft server properties file here, or use the
-						<AutoLink
-							class="goto-link !inline-block"
-							:to="filesTabLink"
-							@click="onFilesTabLinkClick"
-						>
-							Files tab
-						</AutoLink>
-						to edit the full file. If you're unsure about a setting, the
-						<AutoLink
-							class="goto-link !inline-block"
-							to="https://minecraft.wiki/w/Server.properties"
-							target="_blank"
-						>
-							Minecraft Wiki
-						</AutoLink>
-						has more details.
+						<IntlFormatted :message-id="messages.introParagraph">
+							<template #files-link="{ children }">
+								<AutoLink
+									class="goto-link !inline-block"
+									:to="filesTabLink"
+									@click="onFilesTabLinkClick"
+								>
+									<component :is="() => children" />
+								</AutoLink>
+							</template>
+							<template #wiki-link="{ children }">
+								<AutoLink
+									class="goto-link !inline-block"
+									to="https://minecraft.wiki/w/Server.properties"
+									target="_blank"
+								>
+									<component :is="() => children" />
+								</AutoLink>
+							</template>
+						</IntlFormatted>
 					</div>
 				</div>
 
 				<div class="w-full text-sm">
-					<label for="search-server-properties" class="sr-only"> Search server properties </label>
+					<label for="search-server-properties" class="sr-only">
+						{{ formatMessage(messages.searchPropertiesAriaLabel) }}
+					</label>
 					<StyledInput
 						id="search-server-properties"
 						v-model="searchInput"
@@ -39,7 +44,7 @@
 						:icon="SearchIcon"
 						name="search"
 						autocomplete="off"
-						placeholder="Search server properties..."
+						:placeholder="formatMessage(messages.searchPropertiesPlaceholder)"
 					/>
 				</div>
 				<div class="flex flex-col gap-3 pb-2">
@@ -51,7 +56,9 @@
 						>
 							<div class="flex w-full flex-col gap-1.5">
 								<div v-if="isPropertyVisible('gamemode')" class="flex flex-col gap-2.5 my-1">
-									<span class="font-semibold text-contrast">Gamemode</span>
+									<span class="font-semibold text-contrast">{{
+										formatMessage(messages.labelGamemode)
+									}}</span>
 									<Chips
 										v-model="combinedGamemode"
 										:items="gamemodeItems"
@@ -63,7 +70,9 @@
 									v-if="combinedGamemode !== 'hardcore' && isPropertyVisible('difficulty')"
 									class="flex flex-col gap-2.5 my-1"
 								>
-									<span class="font-semibold text-contrast">Difficulty</span>
+									<span class="font-semibold text-contrast">{{
+										formatMessage(messages.labelDifficulty)
+									}}</span>
 									<Chips
 										v-model="selectedDifficulty"
 										:items="difficultyItems"
@@ -72,23 +81,27 @@
 								</div>
 
 								<div v-if="isPropertyVisible('max_players')" class="flex flex-col gap-2.5 my-1">
-									<span class="font-semibold text-contrast">Max players</span>
+									<span class="font-semibold text-contrast">{{
+										formatMessage(messages.labelMaxPlayers)
+									}}</span>
 									<StyledInput
 										id="server-property-max-players"
 										:model-value="liveProperties.max_players"
 										type="number"
-										placeholder="20"
+										:placeholder="formatMessage(messages.placeholderDefaultMaxPlayers)"
 										wrapper-class="w-full max-w-[450px]"
 										@update:model-value="liveProperties.max_players = String($event)"
 									/>
 								</div>
 
 								<div v-if="isPropertyVisible('motd')" class="flex flex-col gap-2.5 my-1">
-									<span class="font-semibold text-contrast">MOTD</span>
+									<span class="font-semibold text-contrast">{{
+										formatMessage(messages.labelMotd)
+									}}</span>
 									<StyledInput
 										id="server-property-motd"
 										v-model="liveProperties.motd"
-										placeholder="A Minecraft Server"
+										:placeholder="formatMessage(messages.placeholderDefaultMotd)"
 										wrapper-class="w-full max-w-[450px]"
 									/>
 								</div>
@@ -97,7 +110,9 @@
 									v-if="isPropertyVisible('allow_flight')"
 									class="flex flex-row items-center justify-between gap-4 h-10"
 								>
-									<span class="font-semibold text-contrast">Allow flight</span>
+									<span class="font-semibold text-contrast">{{
+										formatMessage(messages.labelAllowFlight)
+									}}</span>
 									<Toggle
 										id="server-property-allow-flight"
 										:model-value="liveProperties.allow_flight === 'true'"
@@ -109,7 +124,9 @@
 									v-if="isPropertyVisible('allow_cheats')"
 									class="flex flex-row items-center justify-between gap-4 h-10"
 								>
-									<span class="font-semibold text-contrast">Allow cheats</span>
+									<span class="font-semibold text-contrast">{{
+										formatMessage(messages.labelAllowCheats)
+									}}</span>
 									<Toggle
 										id="server-property-allow-cheats"
 										:model-value="liveProperties.allow_cheats === 'true'"
@@ -121,7 +138,9 @@
 									v-if="isPropertyVisible('white_list')"
 									class="flex flex-row items-center justify-between gap-4 h-10"
 								>
-									<span class="font-semibold text-contrast">Enable whitelist</span>
+									<span class="font-semibold text-contrast">{{
+										formatMessage(messages.labelEnableWhitelist)
+									}}</span>
 									<Toggle id="server-property-whitelist" v-model="whitelistEnabled" />
 								</div>
 
@@ -129,7 +148,9 @@
 									v-if="isPropertyVisible('spawn_protection')"
 									class="flex flex-row items-center justify-between gap-4 h-10"
 								>
-									<span class="font-semibold text-contrast">Enable spawn protection</span>
+									<span class="font-semibold text-contrast">{{
+										formatMessage(messages.labelEnableSpawnProtection)
+									}}</span>
 									<Toggle
 										id="server-property-spawn-protection-toggle"
 										v-model="spawnProtectionEnabled"
@@ -140,7 +161,9 @@
 									v-if="spawnProtectionEnabled && isPropertyVisible('spawn_protection')"
 									class="flex items-center justify-between h-10"
 								>
-									<span class="font-semibold text-contrast">Protection radius</span>
+									<span class="font-semibold text-contrast">{{
+										formatMessage(messages.labelProtectionRadius)
+									}}</span>
 									<StyledInput
 										id="server-property-spawn-protection-radius"
 										:model-value="liveProperties.spawn_protection"
@@ -161,7 +184,9 @@
 						button-class="flex w-full flex-col gap-2 bg-transparent m-0 p-0 border-none"
 					>
 						<template #title>
-							<span class="text-lg font-semibold text-contrast">Advanced properties</span>
+							<span class="text-lg font-semibold text-contrast">{{
+								formatMessage(messages.advancedPropertiesTitle)
+							}}</span>
 						</template>
 
 						<div class="flex flex-col gap-6 pt-4">
@@ -201,7 +226,7 @@
 														:id="`server-property-${key}`"
 														:model-value="liveProperties[key]"
 														type="number"
-														placeholder="Type here..."
+														:placeholder="formatMessage(messages.propertyValuePlaceholder)"
 														wrapper-class="w-full"
 														:aria-labelledby="`property-label-${key}`"
 														@update:model-value="liveProperties[key] = String($event)"
@@ -211,7 +236,7 @@
 													<StyledInput
 														:id="`server-property-${key}`"
 														v-model="liveProperties[key]"
-														placeholder="Type here..."
+														:placeholder="formatMessage(messages.propertyValuePlaceholder)"
 														wrapper-class="w-full"
 														:aria-labelledby="`property-label-${key}`"
 													/>
@@ -222,14 +247,17 @@
 								</div>
 							</template>
 							<div>
-								All other properties can be edited in server.properties via the
-								<AutoLink
-									class="goto-link !inline-block"
-									:to="filesTabLink"
-									@click="onFilesTabLinkClick"
-								>
-									Files tab </AutoLink
-								>.
+								<IntlFormatted :message-id="messages.footerParagraph">
+									<template #files-link="{ children }">
+										<AutoLink
+											class="goto-link !inline-block"
+											:to="filesTabLink"
+											@click="onFilesTabLinkClick"
+										>
+											<component :is="() => children" />
+										</AutoLink>
+									</template>
+								</IntlFormatted>
 							</div>
 						</div>
 					</Accordion>
@@ -239,8 +267,12 @@
 						class="flex flex-col items-center gap-2 py-8 text-center text-secondary"
 					>
 						<SearchIcon class="size-10" />
-						<span class="text-lg font-semibold text-contrast">No properties found</span>
-						<span>No properties match "{{ searchInput }}".</span>
+						<span class="text-lg font-semibold text-contrast">{{
+							formatMessage(messages.noSearchResultsTitle)
+						}}</span>
+						<span>{{
+							formatMessage(messages.noSearchResultsDescription, { query: searchInput })
+						}}</span>
 					</div>
 				</div>
 			</div>
@@ -272,15 +304,230 @@ import Fuse from 'fuse.js'
 import { computed, ref, watch } from 'vue'
 
 import { Accordion, Admonition, AutoLink, Chips, StyledInput, Toggle } from '#ui/components'
+import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
-
+const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+
+const messages = defineMessages({
+	missingPropertiesWarning: {
+		id: 'server.settings.properties.warning.missing',
+		defaultMessage:
+			"Some expected properties are missing from your server.properties — this usually means the server hasn't completed its first startup yet.",
+	},
+	introParagraph: {
+		id: 'server.settings.properties.intro',
+		defaultMessage:
+			"Edit the Minecraft server properties file here, or use the <files-link>Files tab</files-link> to edit the full file. If you're unsure about a setting, the <wiki-link>Minecraft Wiki</wiki-link> has more details.",
+	},
+	searchPropertiesAriaLabel: {
+		id: 'server.settings.properties.search.aria',
+		defaultMessage: 'Search server properties',
+	},
+	searchPropertiesPlaceholder: {
+		id: 'server.settings.properties.search.placeholder',
+		defaultMessage: 'Search server properties…',
+	},
+	labelGamemode: {
+		id: 'server.settings.properties.label.gamemode',
+		defaultMessage: 'Gamemode',
+	},
+	labelDifficulty: {
+		id: 'server.settings.properties.label.difficulty',
+		defaultMessage: 'Difficulty',
+	},
+	labelMaxPlayers: {
+		id: 'server.settings.properties.label.max-players',
+		defaultMessage: 'Max players',
+	},
+	labelMotd: {
+		id: 'server.settings.properties.label.motd',
+		defaultMessage: 'MOTD',
+	},
+	labelAllowFlight: {
+		id: 'server.settings.properties.label.allow-flight',
+		defaultMessage: 'Allow flight',
+	},
+	labelAllowCheats: {
+		id: 'server.settings.properties.label.allow-cheats',
+		defaultMessage: 'Allow cheats',
+	},
+	labelEnableWhitelist: {
+		id: 'server.settings.properties.label.enable-whitelist',
+		defaultMessage: 'Enable whitelist',
+	},
+	labelEnableSpawnProtection: {
+		id: 'server.settings.properties.label.enable-spawn-protection',
+		defaultMessage: 'Enable spawn protection',
+	},
+	labelProtectionRadius: {
+		id: 'server.settings.properties.label.protection-radius',
+		defaultMessage: 'Protection radius',
+	},
+	advancedPropertiesTitle: {
+		id: 'server.settings.properties.advanced.title',
+		defaultMessage: 'Advanced properties',
+	},
+	groupPerformance: {
+		id: 'server.settings.properties.group.performance',
+		defaultMessage: 'Performance',
+	},
+	groupResourcePack: {
+		id: 'server.settings.properties.group.resource-pack',
+		defaultMessage: 'Resource pack',
+	},
+	propertyValuePlaceholder: {
+		id: 'server.settings.properties.placeholder.value',
+		defaultMessage: 'Type here…',
+	},
+	placeholderDefaultMaxPlayers: {
+		id: 'server.settings.properties.placeholder.max-players',
+		defaultMessage: '20',
+	},
+	placeholderDefaultMotd: {
+		id: 'server.settings.properties.placeholder.motd',
+		defaultMessage: 'A Minecraft Server',
+	},
+	footerParagraph: {
+		id: 'server.settings.properties.footer',
+		defaultMessage:
+			'All other properties can be edited in server.properties via the <files-link>Files tab</files-link>.',
+	},
+	noSearchResultsTitle: {
+		id: 'server.settings.properties.search.no-results.title',
+		defaultMessage: 'No properties found',
+	},
+	noSearchResultsDescription: {
+		id: 'server.settings.properties.search.no-results.description',
+		defaultMessage: 'No properties match "{query}".',
+	},
+	propertiesUpdatedTitle: {
+		id: 'server.settings.properties.success.updated.title',
+		defaultMessage: 'Server properties updated',
+	},
+	propertiesUpdatedText: {
+		id: 'server.settings.properties.success.updated.text',
+		defaultMessage: 'Your server properties were successfully changed.',
+	},
+	propertiesUpdateFailedTitle: {
+		id: 'server.settings.properties.error.update.title',
+		defaultMessage: 'Failed to update server properties',
+	},
+	propertiesUpdateFailedFallback: {
+		id: 'server.settings.properties.error.update.fallback',
+		defaultMessage: 'An error occurred.',
+	},
+})
+
+const propertyFieldMessages = defineMessages({
+	allow_cheats: {
+		id: 'server.settings.properties.field.allow_cheats',
+		defaultMessage: 'Allow cheats',
+	},
+	allow_flight: {
+		id: 'server.settings.properties.field.allow_flight',
+		defaultMessage: 'Allow flight',
+	},
+	difficulty: {
+		id: 'server.settings.properties.field.difficulty',
+		defaultMessage: 'Difficulty',
+	},
+	enforce_whitelist: {
+		id: 'server.settings.properties.field.enforce_whitelist',
+		defaultMessage: 'Enforce whitelist',
+	},
+	force_gamemode: {
+		id: 'server.settings.properties.field.force_gamemode',
+		defaultMessage: 'Force gamemode',
+	},
+	gamemode: {
+		id: 'server.settings.properties.field.gamemode',
+		defaultMessage: 'Gamemode',
+	},
+	generate_structures: {
+		id: 'server.settings.properties.field.generate_structures',
+		defaultMessage: 'Generate structures',
+	},
+	generator_settings: {
+		id: 'server.settings.properties.field.generator_settings',
+		defaultMessage: 'Generator settings',
+	},
+	hardcore: {
+		id: 'server.settings.properties.field.hardcore',
+		defaultMessage: 'Hardcore',
+	},
+	level_seed: {
+		id: 'server.settings.properties.field.level_seed',
+		defaultMessage: 'Level seed',
+	},
+	level_type: {
+		id: 'server.settings.properties.field.level_type',
+		defaultMessage: 'Level type',
+	},
+	max_players: {
+		id: 'server.settings.properties.field.max_players',
+		defaultMessage: 'Max players',
+	},
+	max_tick_time: {
+		id: 'server.settings.properties.field.max_tick_time',
+		defaultMessage: 'Max tick time',
+	},
+	motd: {
+		id: 'server.settings.properties.field.motd',
+		defaultMessage: 'MOTD',
+	},
+	pause_when_empty_seconds: {
+		id: 'server.settings.properties.field.pause_when_empty_seconds',
+		defaultMessage: 'Pause when empty (seconds)',
+	},
+	player_idle_timeout: {
+		id: 'server.settings.properties.field.player_idle_timeout',
+		defaultMessage: 'Player idle timeout',
+	},
+	require_resource_pack: {
+		id: 'server.settings.properties.field.require_resource_pack',
+		defaultMessage: 'Require resource pack',
+	},
+	resource_pack: {
+		id: 'server.settings.properties.field.resource_pack',
+		defaultMessage: 'Resource pack',
+	},
+	resource_pack_id: {
+		id: 'server.settings.properties.field.resource_pack_id',
+		defaultMessage: 'Resource pack ID',
+	},
+	resource_pack_sha1: {
+		id: 'server.settings.properties.field.resource_pack_sha1',
+		defaultMessage: 'Resource pack SHA-1',
+	},
+	simulation_distance: {
+		id: 'server.settings.properties.field.simulation_distance',
+		defaultMessage: 'Simulation distance',
+	},
+	spawn_protection: {
+		id: 'server.settings.properties.field.spawn_protection',
+		defaultMessage: 'Spawn protection',
+	},
+	sync_chunk_writes: {
+		id: 'server.settings.properties.field.sync_chunk_writes',
+		defaultMessage: 'Sync chunk writes',
+	},
+	view_distance: {
+		id: 'server.settings.properties.field.view_distance',
+		defaultMessage: 'View distance',
+	},
+	white_list: {
+		id: 'server.settings.properties.field.white_list',
+		defaultMessage: 'Whitelist',
+	},
+})
 const client = injectModrinthClient()
 const { serverId, worldId, powerState, busyReasons } = injectModrinthServerContext()
 const queryClient = useQueryClient()
@@ -329,9 +576,9 @@ function getPropertyDef(key: string): PropertyDef {
 	return KNOWN_PROPERTIES[key] ?? { type: 'text' }
 }
 
-const ADVANCED_GROUPS = [
+const ADVANCED_GROUP_DEFS = [
 	{
-		label: 'Performance',
+		labelMessage: messages.groupPerformance,
 		keys: [
 			'view_distance',
 			'simulation_distance',
@@ -342,10 +589,10 @@ const ADVANCED_GROUPS = [
 		],
 	},
 	{
-		label: 'Resource Pack',
+		labelMessage: messages.groupResourcePack,
 		keys: ['resource_pack', 'resource_pack_id', 'resource_pack_sha1', 'require_resource_pack'],
 	},
-]
+] as const
 
 type CombinedGamemode = 'survival' | 'creative' | 'hardcore'
 const gamemodeItems: CombinedGamemode[] = ['survival', 'creative', 'hardcore']
@@ -494,15 +741,18 @@ const { mutateAsync: saveProperties, isPending: isUpdating } = useMutation({
 		syncFormFromData()
 		addNotification({
 			type: 'success',
-			title: 'Server properties updated',
-			text: 'Your server properties were successfully changed.',
+			title: formatMessage(messages.propertiesUpdatedTitle),
+			text: formatMessage(messages.propertiesUpdatedText),
 		})
 	},
 	onError: (error) => {
 		addNotification({
 			type: 'error',
-			title: 'Failed to update server properties',
-			text: error instanceof Error ? error.message : 'An error occurred.',
+			title: formatMessage(messages.propertiesUpdateFailedTitle),
+			text:
+				error instanceof Error
+					? error.message
+					: formatMessage(messages.propertiesUpdateFailedFallback),
 		})
 	},
 })
@@ -512,8 +762,8 @@ function resetProperties() {
 }
 
 const advancedGroupedProperties = computed(() =>
-	ADVANCED_GROUPS.map((group) => ({
-		label: group.label,
+	ADVANCED_GROUP_DEFS.map((group) => ({
+		label: formatMessage(group.labelMessage),
 		properties: group.keys.filter((key) => key in liveProperties.value),
 	})).filter((g) => g.properties.length > 0),
 )
@@ -551,6 +801,10 @@ const hasVisibleAdvancedProperties = computed(() =>
 )
 
 function formatPropertyName(name: string): string {
+	const known = propertyFieldMessages[name as keyof typeof propertyFieldMessages]
+	if (known) {
+		return formatMessage(known)
+	}
 	return name
 		.split('_')
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))

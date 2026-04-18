@@ -567,6 +567,16 @@ export const commonMessages = defineMessages({
 		id: 'label.download-failed',
 		defaultMessage: 'Download failed',
 	},
+	/** Value is pre-formatted numeric string; unit is a stable key for ICU (B, KB, KiB, Bytes, …). */
+	fileSizeFormatted: {
+		id: 'label.file-size.formatted',
+		defaultMessage:
+			'{value} {unit, select, B {B} KB {KB} MB {MB} GB {GB} TB {TB} PB {PB} EB {EB} KiB {KiB} MiB {MiB} GiB {GiB} Bytes {Bytes} other {B}}',
+	},
+	uploadFailedFileDetail: {
+		id: 'notification.upload-failed.file-detail',
+		defaultMessage: 'Failed to upload {fileName}',
+	},
 	projectCreated: {
 		id: 'project.about.details.created',
 		defaultMessage: 'Created {date}',
@@ -607,6 +617,18 @@ export const commonMessages = defineMessages({
 		id: 'project.recent-plays.tooltip',
 		defaultMessage:
 			'{count} {countPlural, plural, one {recent play} other {recent plays}} from Modrinth in the past 2 weeks',
+	},
+	serverSettingsUpdatedTitle: {
+		id: 'server.settings.success.updated.title',
+		defaultMessage: 'Server settings updated',
+	},
+	serverSettingsUpdatedText: {
+		id: 'server.settings.success.updated.text',
+		defaultMessage: 'Your server settings were successfully changed.',
+	},
+	consoleFilterAllLevels: {
+		id: 'servers.console.filter.all-levels',
+		defaultMessage: 'All',
 	},
 })
 
@@ -1084,5 +1106,55 @@ export const paymentMethodMessages = defineMessages({
 	charityPlural: {
 		id: 'payment-method.charity-plural',
 		defaultMessage: 'Charities',
+	},
+})
+
+export const serverPanelNavMessages = defineMessages({
+	overview: {
+		id: 'server.panel.nav.overview',
+		defaultMessage: 'Overview',
+	},
+	content: {
+		id: 'server.panel.nav.content',
+		defaultMessage: 'Content',
+	},
+	files: {
+		id: 'server.panel.nav.files',
+		defaultMessage: 'Files',
+	},
+	backups: {
+		id: 'server.panel.nav.backups',
+		defaultMessage: 'Backups',
+	},
+})
+
+export const serverSettingsTabMessages = defineMessages({
+	general: {
+		id: 'server.settings.tabs.general',
+		defaultMessage: 'General',
+	},
+	installation: {
+		id: 'server.settings.tabs.installation',
+		defaultMessage: 'Installation',
+	},
+	network: {
+		id: 'server.settings.tabs.network',
+		defaultMessage: 'Network',
+	},
+	properties: {
+		id: 'server.settings.tabs.properties',
+		defaultMessage: 'Properties',
+	},
+	advanced: {
+		id: 'server.settings.tabs.advanced',
+		defaultMessage: 'Advanced',
+	},
+	billing: {
+		id: 'server.settings.tabs.billing',
+		defaultMessage: 'Billing',
+	},
+	'admin-billing': {
+		id: 'server.settings.tabs.admin-billing',
+		defaultMessage: 'Admin Billing',
 	},
 })

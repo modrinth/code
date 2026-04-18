@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { useVIntl } from '#ui/composables/i18n'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -26,6 +26,45 @@ const serverContext = injectModrinthServerContext()
 const { serverId, fsOps, busyReasons, uploadState, cancelUpload: cancelUploadRef } = serverContext
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	fileDeletedTitle: {
+		id: 'files.manage.delete-success-title',
+		defaultMessage: 'File deleted',
+	},
+	fileDeletedText: {
+		id: 'files.manage.delete-success-text',
+		defaultMessage: 'Your file has been deleted.',
+	},
+	renamedTitle: {
+		id: 'files.manage.rename-success-title',
+		defaultMessage: 'Renamed',
+	},
+	renamedTo: {
+		id: 'files.manage.rename-success-text',
+		defaultMessage: 'Renamed to {name}',
+	},
+	movedTitle: {
+		id: 'files.manage.move-success-title',
+		defaultMessage: 'Moved',
+	},
+	movedTo: {
+		id: 'files.manage.move-success-text',
+		defaultMessage: 'Moved to {path}',
+	},
+	itemCreatedTitle: {
+		id: 'files.manage.create-success-title',
+		defaultMessage: '{type, select, directory {Folder} other {File}} created',
+	},
+	itemCreatedText: {
+		id: 'files.manage.create-success-text',
+		defaultMessage: 'Created {name}',
+	},
+	downloadFailedText: {
+		id: 'files.manage.download-failed-text',
+		defaultMessage: 'Could not download the file.',
+	},
+})
 
 const route = useRoute()
 const router = useRouter()
@@ -175,8 +214,8 @@ const deleteMutation = useMutation({
 	},
 	onSuccess: () => {
 		addNotification({
-			title: 'File deleted',
-			text: 'Your file has been deleted.',
+			title: formatMessage(messages.fileDeletedTitle),
+			text: formatMessage(messages.fileDeletedText),
 			type: 'success',
 		})
 	},
@@ -218,7 +257,11 @@ const renameMutation = useMutation({
 		})
 	},
 	onSuccess: (_, { newName }) => {
-		addNotification({ title: 'Renamed', text: `Renamed to ${newName}`, type: 'success' })
+		addNotification({
+			title: formatMessage(messages.renamedTitle),
+			text: formatMessage(messages.renamedTo, { name: newName }),
+			type: 'success',
+		})
 	},
 	onSettled: () => {
 		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
@@ -247,7 +290,11 @@ const moveMutation = useMutation({
 		})
 	},
 	onSuccess: (_, { destination }) => {
-		addNotification({ title: 'Moved', text: `Moved to ${destination}`, type: 'success' })
+		addNotification({
+			title: formatMessage(messages.movedTitle),
+			text: formatMessage(messages.movedTo, { path: destination }),
+			type: 'success',
+		})
 	},
 	onSettled: () => {
 		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
@@ -286,10 +333,10 @@ const createMutation = useMutation({
 		})
 	},
 	onSuccess: (_, { path, type }) => {
-		const name = path.split('/').pop()
+		const name = path.split('/').pop() ?? ''
 		addNotification({
-			title: `${type === 'directory' ? 'Folder' : 'File'} created`,
-			text: `Created ${name}`,
+			title: formatMessage(messages.itemCreatedTitle, { type }),
+			text: formatMessage(messages.itemCreatedText, { name }),
 			type: 'success',
 		})
 	},
@@ -339,7 +386,7 @@ async function downloadFile(path: string, fileName: string): Promise<void> {
 	} catch {
 		addNotification({
 			title: formatMessage(commonMessages.downloadFailedLabel),
-			text: 'Could not download the file.',
+			text: formatMessage(messages.downloadFailedText),
 			type: 'error',
 		})
 	}
@@ -404,7 +451,7 @@ async function uploadFiles(files: File[]) {
 			if (err instanceof Error && err.message === 'Upload cancelled') break
 			addNotification({
 				title: formatMessage(commonMessages.uploadFailedLabel),
-				text: `Failed to upload ${file.name}`,
+				text: formatMessage(commonMessages.uploadFailedFileDetail, { fileName: file.name }),
 				type: 'error',
 			})
 		}

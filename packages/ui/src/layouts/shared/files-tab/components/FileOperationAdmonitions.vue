@@ -33,7 +33,10 @@
 			<span class="text-secondary">
 				{{
 					formatMessage(messages.extracted, {
-						size: 'bytes_processed' in op ? formatBytes(op.bytes_processed ?? 0) : '0 B',
+						size:
+							'bytes_processed' in op
+								? formatBinaryIecSize(op.bytes_processed ?? 0)
+								: formatBinaryIecSize(0),
 					})
 				}}
 				<template v-if="'current_file' in op && op.current_file">
@@ -77,7 +80,6 @@
 
 <script setup lang="ts">
 import { PackageOpenIcon, XIcon } from '@modrinth/assets'
-import { formatBytes } from '@modrinth/utils'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -86,7 +88,10 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthServerContext } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
+import { useFormatFileSizeI18n } from '../composables/format-file-size-i18n'
+
 const { formatMessage } = useVIntl()
+const { formatBinaryIecSize } = useFormatFileSizeI18n()
 
 const messages = defineMessages({
 	extracting: {

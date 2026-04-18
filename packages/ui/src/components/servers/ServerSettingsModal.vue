@@ -6,7 +6,7 @@ import { computed, nextTick, ref } from 'vue'
 
 import type { TabbedModalTab } from '#ui/components'
 import { TabbedModal } from '#ui/components'
-import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	ServerSettingsAdvancedPage,
 	ServerSettingsGeneralPage,
@@ -22,7 +22,7 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, serverSettingsTabMessages } from '#ui/utils/common-messages'
 
 type ShowOptions = {
 	serverId: string
@@ -89,10 +89,7 @@ const tabs = computed<TabbedModalTab[]>(() =>
 			isOwner: isOwner.value,
 			isAdmin: isAdmin.value,
 		}
-		const name = defineMessage({
-			id: `server.settings.tabs.${tab.id}`,
-			defaultMessage: tab.label,
-		})
+		const name = serverSettingsTabMessages[tab.id]
 		const shown = tab.shown ? tab.shown(ctx) : true
 
 		if (tab.external) {
@@ -222,7 +219,7 @@ defineExpose({ show, hide })
 	>
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
-				{{ server.name || 'Server' }} <ChevronRightIcon />
+				{{ server.name || formatMessage(commonMessages.serverLabel) }} <ChevronRightIcon />
 				<span class="font-extrabold text-contrast">{{
 					formatMessage(commonMessages.settingsLabel)
 				}}</span>

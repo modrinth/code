@@ -2,24 +2,32 @@
 	<div>
 		<Teleport to="body">
 			<div class="relative z-[100]">
-				<NewModal ref="editAllocationModal" header="Edit allocation" width="550px">
+				<NewModal
+					ref="editAllocationModal"
+					:header="formatMessage(messages.editAllocationHeader)"
+					width="550px"
+				>
 					<form class="flex w-full flex-col gap-2" @submit.prevent="editAllocation">
-						<label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
+						<label for="edit-allocation-name" class="font-semibold text-contrast">
+							{{ formatMessage(messages.allocationNameLabel) }}
+						</label>
 						<StyledInput
 							id="edit-allocation-name"
 							ref="editAllocationInput"
 							v-model="editAllocationName"
 							wrapper-class="w-full"
 							:maxlength="32"
-							placeholder="e.g. Secondary allocation"
+							:placeholder="formatMessage(messages.allocationNamePlaceholder)"
 						/>
 						<div class="mb-1 mt-4 flex justify-end gap-2.5">
 							<ButtonStyled>
-								<button @click="editAllocationModal?.hide()">Cancel</button>
+								<button @click="editAllocationModal?.hide()">
+									{{ formatMessage(commonMessages.cancelButton) }}
+								</button>
 							</ButtonStyled>
 							<ButtonStyled color="brand">
 								<button :disabled="!editAllocationName || creatingAllocation" type="submit">
-									<SaveIcon /> Update allocation
+									<SaveIcon /> {{ formatMessage(messages.updateAllocationButton) }}
 								</button>
 							</ButtonStyled>
 						</div>
@@ -28,9 +36,9 @@
 
 				<ConfirmModal
 					ref="confirmDeleteModal"
-					title="Deleting allocation"
-					:description="`You are deleting the allocation ${allocationToDelete}. This cannot be reserved again. Are you sure you want to proceed?`"
-					proceed-label="Delete"
+					:title="formatMessage(messages.deleteAllocationTitle)"
+					:description="deleteAllocationDescriptionText"
+					:proceed-label="formatMessage(commonMessages.deleteLabel)"
 					@proceed="confirmDeleteAllocation"
 				/>
 			</div>
@@ -47,16 +55,20 @@
 							<div class="grid place-content-center rounded-full bg-bg-orange p-4">
 								<IssuesIcon class="size-12 text-orange" />
 							</div>
-							<h1 class="m-0 mb-2 w-fit text-4xl font-semibold">Failed to load network settings</h1>
+							<h1 class="m-0 mb-2 w-fit text-4xl font-semibold">
+								{{ formatMessage(messages.loadNetworkErrorTitle) }}
+							</h1>
 						</div>
 						<p class="text-md text-secondary">
-							We couldn't load your server's network settings. Here's what we know:
+							{{ formatMessage(messages.loadNetworkErrorDescription) }}
 							<span class="break-all font-mono">{{
-								allocationsError?.message ?? 'Unknown error'
+								allocationsError?.message ?? formatMessage(commonMessages.unknownLabel)
 							}}</span>
 						</p>
 						<ButtonStyled size="large" color="brand" @click="() => refetchAllocations()">
-							<button class="mt-6 !w-full">Retry</button>
+							<button class="mt-6 !w-full">
+								{{ formatMessage(commonMessages.retryButton) }}
+							</button>
 						</ButtonStyled>
 					</div>
 				</div>
@@ -65,31 +77,37 @@
 				<div class="flex h-full flex-col gap-6">
 					<!-- Allocations section -->
 					<div class="flex flex-col gap-2.5">
-						<span class="text-lg font-semibold text-contrast">Allocations</span>
+						<span class="text-lg font-semibold text-contrast">{{
+							formatMessage(messages.allocationsSectionTitle)
+						}}</span>
 
 						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
 							<StyledInput
 								v-model="createAllocationName"
 								wrapper-class="grow max-w-[400px]"
 								:maxlength="32"
-								placeholder="e.g. Secondary allocation"
+								:placeholder="formatMessage(messages.allocationNamePlaceholder)"
 							/>
 
 							<ButtonStyled color="brand">
 								<button
-									v-tooltip="!createAllocationName ? 'Enter a name to create an allocation' : ''"
+									v-tooltip="
+										!createAllocationName ? formatMessage(messages.createAllocationTooltip) : ''
+									"
 									:disabled="!createAllocationName || creatingAllocation"
 									@click="addNewAllocation"
 								>
 									<PlusIcon />
-									<span>Create allocation</span>
+									<span>{{ formatMessage(messages.createAllocationButton) }}</span>
 								</button>
 							</ButtonStyled>
 						</div>
 
 						<Table :columns="allocationColumns" :data="allocationRows" row-key="port">
 							<template #cell-name="{ row }">
-								<TagItem v-if="row.primary" class="!font-medium">Primary</TagItem>
+								<TagItem v-if="row.primary" class="!font-medium">{{
+									formatMessage(messages.primaryAllocationLabel)
+								}}</TagItem>
 								<span v-else class="font-semibold">{{ row.name }}</span>
 							</template>
 							<template #cell-port="{ row }">
@@ -117,16 +135,15 @@
 								</div>
 							</template>
 						</Table>
-						<span>
-							Create additional ports for internet-facing features like map viewers or voice chat
-							mods.
-						</span>
+						<span>{{ formatMessage(messages.allocationsHelpText) }}</span>
 					</div>
 
 					<!-- DNS records section -->
 					<div class="flex flex-col gap-2.5">
 						<label for="user-domain" class="flex flex-col gap-2">
-							<span class="text-lg font-semibold text-contrast">DNS records</span>
+							<span class="text-lg font-semibold text-contrast">{{
+								formatMessage(messages.dnsRecordsTitle)
+							}}</span>
 						</label>
 						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
 							<StyledInput
@@ -144,7 +161,7 @@
 									@click="exportDnsRecords"
 								>
 									<UploadIcon />
-									<span>Export</span>
+									<span>{{ formatMessage(messages.exportDnsButton) }}</span>
 								</button>
 							</ButtonStyled>
 						</div>
@@ -184,9 +201,7 @@
 							</template>
 						</Table>
 
-						<span>
-							Set up your personal domain to connect to your server via custom DNS records.
-						</span>
+						<span>{{ formatMessage(messages.dnsRecordsHelpText) }}</span>
 					</div>
 				</div>
 			</div>
@@ -209,13 +224,145 @@ import { computed, nextTick, ref } from 'vue'
 
 import { ButtonStyled, ConfirmModal, NewModal, StyledInput, Table, TagItem } from '#ui/components'
 import type { TableColumn } from '#ui/components/base'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
+const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+
+const messages = defineMessages({
+	editAllocationHeader: {
+		id: 'server.settings.network.edit-allocation.title',
+		defaultMessage: 'Edit allocation',
+	},
+	allocationNameLabel: {
+		id: 'server.settings.network.allocation-name.label',
+		defaultMessage: 'Name',
+	},
+	allocationNamePlaceholder: {
+		id: 'server.settings.network.allocation-name.placeholder',
+		defaultMessage: 'e.g. Secondary allocation',
+	},
+	updateAllocationButton: {
+		id: 'server.settings.network.update-allocation',
+		defaultMessage: 'Update allocation',
+	},
+	deleteAllocationTitle: {
+		id: 'server.settings.network.delete-allocation.title',
+		defaultMessage: 'Deleting allocation',
+	},
+	deleteAllocationDescription: {
+		id: 'server.settings.network.delete-allocation.description',
+		defaultMessage:
+			'You are deleting the allocation on port {port}. This cannot be reserved again. Are you sure you want to proceed?',
+	},
+	loadNetworkErrorTitle: {
+		id: 'server.settings.network.error.load.title',
+		defaultMessage: 'Failed to load network settings',
+	},
+	loadNetworkErrorDescription: {
+		id: 'server.settings.network.error.load.description',
+		defaultMessage: "We couldn't load your server's network settings. Here's what we know:",
+	},
+	allocationsSectionTitle: {
+		id: 'server.settings.network.allocations.title',
+		defaultMessage: 'Allocations',
+	},
+	createAllocationTooltip: {
+		id: 'server.settings.network.create-allocation.tooltip',
+		defaultMessage: 'Enter a name to create an allocation',
+	},
+	createAllocationButton: {
+		id: 'server.settings.network.create-allocation',
+		defaultMessage: 'Create allocation',
+	},
+	primaryAllocationLabel: {
+		id: 'server.settings.network.primary-allocation',
+		defaultMessage: 'Primary',
+	},
+	primaryAllocationRowName: {
+		id: 'server.settings.network.primary-allocation-row-name',
+		defaultMessage: 'Primary allocation',
+	},
+	allocationsHelpText: {
+		id: 'server.settings.network.allocations.help',
+		defaultMessage:
+			'Create additional ports for internet-facing features like map viewers or voice chat mods.',
+	},
+	dnsRecordsTitle: {
+		id: 'server.settings.network.dns.title',
+		defaultMessage: 'DNS records',
+	},
+	exportDnsButton: {
+		id: 'server.settings.network.dns.export',
+		defaultMessage: 'Export',
+	},
+	dnsRecordsHelpText: {
+		id: 'server.settings.network.dns.help',
+		defaultMessage: 'Set up your personal domain to connect to your server via custom DNS records.',
+	},
+	columnName: {
+		id: 'server.settings.network.column.name',
+		defaultMessage: 'Name',
+	},
+	columnPort: {
+		id: 'server.settings.network.column.port',
+		defaultMessage: 'Port',
+	},
+	columnActions: {
+		id: 'server.settings.network.column.actions',
+		defaultMessage: 'Actions',
+	},
+	columnRecordType: {
+		id: 'server.settings.network.column.record-type',
+		defaultMessage: 'Type',
+	},
+	columnRecordName: {
+		id: 'server.settings.network.column.record-name',
+		defaultMessage: 'Name',
+	},
+	columnRecordContent: {
+		id: 'server.settings.network.column.record-content',
+		defaultMessage: 'Content',
+	},
+	allocationReservedTitle: {
+		id: 'server.settings.network.success.allocation-reserved.title',
+		defaultMessage: 'Allocation reserved',
+	},
+	allocationReservedText: {
+		id: 'server.settings.network.success.allocation-reserved.text',
+		defaultMessage: 'Your allocation has been reserved.',
+	},
+	allocationRemovedTitle: {
+		id: 'server.settings.network.success.allocation-removed.title',
+		defaultMessage: 'Allocation removed',
+	},
+	allocationRemovedText: {
+		id: 'server.settings.network.success.allocation-removed.text',
+		defaultMessage: 'Your allocation has been removed.',
+	},
+	allocationUpdatedTitle: {
+		id: 'server.settings.network.success.allocation-updated.title',
+		defaultMessage: 'Allocation updated',
+	},
+	allocationUpdatedText: {
+		id: 'server.settings.network.success.allocation-updated.text',
+		defaultMessage: 'Your allocation has been updated.',
+	},
+	textCopiedTitle: {
+		id: 'server.settings.network.success.text-copied.title',
+		defaultMessage: 'Text copied',
+	},
+	textCopiedText: {
+		id: 'server.settings.network.success.text-copied.text',
+		defaultMessage: '{text} has been copied to your clipboard',
+	},
+})
 const { server, serverId } = injectModrinthServerContext()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -237,15 +384,15 @@ const {
 })
 const allocations = allocationsData
 
-const allocationColumns: TableColumn[] = [
-	{ key: 'name', label: 'Name', width: '40%' },
-	{ key: 'port', label: 'Port' },
-	{ key: 'actions', label: 'Actions', width: '33%', align: 'right' },
-]
+const allocationColumns = computed<TableColumn[]>(() => [
+	{ key: 'name', label: formatMessage(messages.columnName), width: '40%' },
+	{ key: 'port', label: formatMessage(messages.columnPort) },
+	{ key: 'actions', label: formatMessage(messages.columnActions), width: '33%', align: 'right' },
+])
 
 const allocationRows = computed(() => {
 	const primary = {
-		name: 'Primary allocation',
+		name: formatMessage(messages.primaryAllocationRowName),
 		port: serverPrimaryPort.value,
 		primary: true,
 	}
@@ -257,11 +404,17 @@ const allocationRows = computed(() => {
 	return [primary, ...extra]
 })
 
-const dnsColumns: TableColumn[] = [
-	{ key: 'type', label: 'Type', width: '20%' },
-	{ key: 'name', label: 'Name', width: '35%' },
-	{ key: 'content', label: 'Content' },
-]
+const dnsColumns = computed<TableColumn[]>(() => [
+	{ key: 'type', label: formatMessage(messages.columnRecordType), width: '20%' },
+	{ key: 'name', label: formatMessage(messages.columnRecordName), width: '35%' },
+	{ key: 'content', label: formatMessage(messages.columnRecordContent) },
+])
+
+const deleteAllocationDescriptionText = computed(() =>
+	allocationToDelete.value != null
+		? formatMessage(messages.deleteAllocationDescription, { port: allocationToDelete.value })
+		: '',
+)
 
 const editAllocationModal = ref<typeof NewModal>()
 const confirmDeleteModal = ref<typeof ConfirmModal>()
@@ -284,8 +437,8 @@ const addNewAllocation = async () => {
 
 		addNotification({
 			type: 'success',
-			title: 'Allocation reserved',
-			text: 'Your allocation has been reserved.',
+			title: formatMessage(messages.allocationReservedTitle),
+			text: formatMessage(messages.allocationReservedText),
 		})
 	} catch (error) {
 		console.error('Failed to reserve new allocation:', error)
@@ -318,8 +471,8 @@ const confirmDeleteAllocation = async () => {
 
 	addNotification({
 		type: 'success',
-		title: 'Allocation removed',
-		text: 'Your allocation has been removed.',
+		title: formatMessage(messages.allocationRemovedTitle),
+		text: formatMessage(messages.allocationRemovedText),
 	})
 
 	allocationToDelete.value = null
@@ -342,8 +495,8 @@ const editAllocation = async () => {
 
 		addNotification({
 			type: 'success',
-			title: 'Allocation updated',
-			text: 'Your allocation has been updated.',
+			title: formatMessage(messages.allocationUpdatedTitle),
+			text: formatMessage(messages.allocationUpdatedText),
 		})
 	} catch (error) {
 		console.error('Failed to reserve new allocation:', error)
@@ -404,8 +557,8 @@ const copyText = (text: string) => {
 	navigator.clipboard.writeText(text)
 	addNotification({
 		type: 'success',
-		title: 'Text copied',
-		text: `${text} has been copied to your clipboard`,
+		title: formatMessage(messages.textCopiedTitle),
+		text: formatMessage(messages.textCopiedText, { text }),
 	})
 }
 </script>

@@ -1,14 +1,18 @@
 <template>
 	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-16 max-w-[500px]">
 		<div class="flex flex-col gap-2 w-full">
-			<h2 class="m-0 text-2xl font-semibold text-contrast">Welcome to Modrinth Hosting</h2>
+			<h2 class="m-0 text-2xl font-semibold text-contrast">
+				{{ formatMessage(messages.welcomeTitle) }}
+			</h2>
 			<p class="m-0 text-base text-secondary">
-				Your server is ready. Here's what you need to do to start playing!
+				{{ formatMessage(messages.welcomeDescription) }}
 			</p>
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<span class="text-base font-medium text-secondary"> Setup your server (~2mins) </span>
+			<span class="text-base font-medium text-secondary">
+				{{ formatMessage(messages.setupHeading) }}
+			</span>
 
 			<div class="rounded-[20px] border border-solid border-surface-5 bg-surface-3 p-5">
 				<div class="flex flex-col">
@@ -41,11 +45,13 @@
 			<ButtonStyled v-if="uploading" size="large">
 				<button class="ml-auto" disabled>
 					<SpinnerIcon class="animate-spin" />
-					Uploading ({{ uploadPercent }}%)
+					{{ formatMessage(messages.uploadingProgress, { percent: uploadPercent }) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled v-else color="brand" size="large">
-				<button class="ml-auto" @click="openModal">Setup server <RightArrowIcon /></button>
+				<button class="ml-auto" @click="openModal">
+					{{ formatMessage(messages.setupServerButton) }} <RightArrowIcon />
+				</button>
 			</ButtonStyled>
 		</div>
 
@@ -66,7 +72,13 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { GlobeIcon, PackageIcon, RightArrowIcon, SpinnerIcon, UsersIcon } from '@modrinth/assets'
-import { ButtonStyled, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	defineMessages,
+	injectModrinthClient,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -77,6 +89,73 @@ import { injectModrinthServerContext } from '#ui/providers'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	welcomeTitle: {
+		id: 'servers.onboarding.welcome-title',
+		defaultMessage: 'Welcome to Modrinth Hosting',
+	},
+	welcomeDescription: {
+		id: 'servers.onboarding.welcome-description',
+		defaultMessage: "Your server is ready. Here's what you need to do to start playing!",
+	},
+	setupHeading: {
+		id: 'servers.onboarding.setup-heading',
+		defaultMessage: 'Set up your server (~2 mins)',
+	},
+	uploadingProgress: {
+		id: 'servers.onboarding.uploading-progress',
+		defaultMessage: 'Uploading ({percent}%)',
+	},
+	setupServerButton: {
+		id: 'servers.onboarding.setup-server-button',
+		defaultMessage: 'Set up server',
+	},
+	step1Title: {
+		id: 'servers.onboarding.step-1.title',
+		defaultMessage: 'Choose what to play',
+	},
+	step1Description: {
+		id: 'servers.onboarding.step-1.description',
+		defaultMessage:
+			'Pick your favorite modpack from Modrinth, or choose a loader and add the mods you want.',
+	},
+	step2Title: {
+		id: 'servers.onboarding.step-2.title',
+		defaultMessage: 'Configure your world',
+	},
+	step2Description: {
+		id: 'servers.onboarding.step-2.description',
+		defaultMessage:
+			'Set up your world just like singleplayer. Choose your game mode and world seed.',
+	},
+	step3Title: {
+		id: 'servers.onboarding.step-3.title',
+		defaultMessage: 'Invite your friends',
+	},
+	step3Description: {
+		id: 'servers.onboarding.step-3.description',
+		defaultMessage:
+			"Share your server with friends by copying the address and letting them know which mods they'll need to join.",
+	},
+	modpackUploadFailedTitle: {
+		id: 'servers.onboarding.modpack-upload-failed.title',
+		defaultMessage: 'Modpack upload failed',
+	},
+	modpackUploadFailedText: {
+		id: 'servers.onboarding.modpack-upload-failed.text',
+		defaultMessage: 'An unexpected error occurred while uploading. Please try again later.',
+	},
+	installationFailedTitle: {
+		id: 'servers.onboarding.installation-failed.title',
+		defaultMessage: 'Installation failed',
+	},
+	installationFailedText: {
+		id: 'servers.onboarding.installation-failed.text',
+		defaultMessage: 'An unexpected error occurred while installing. Please try again later.',
+	},
+})
 
 async function searchModpacks(query: string, limit: number = 10) {
 	return client.labrinth.projects_v2.search({
@@ -209,8 +288,8 @@ const onCreate = async (config: CreationFlowContextValue) => {
 			await finalizeSetup()
 		} catch {
 			addNotification({
-				title: 'Modpack upload failed',
-				text: 'An unexpected error occurred while uploading. Please try again later.',
+				title: formatMessage(messages.modpackUploadFailedTitle),
+				text: formatMessage(messages.modpackUploadFailedText),
 				type: 'error',
 			})
 			config.loading.value = false
@@ -252,31 +331,29 @@ const onCreate = async (config: CreationFlowContextValue) => {
 		await finalizeSetup()
 	} catch {
 		addNotification({
-			title: 'Installation failed',
-			text: 'An unexpected error occurred while installing. Please try again later.',
+			title: formatMessage(messages.installationFailedTitle),
+			text: formatMessage(messages.installationFailedText),
 			type: 'error',
 		})
 		config.loading.value = false
 	}
 }
 
-const steps = [
+const steps = computed(() => [
 	{
 		icon: PackageIcon,
-		title: 'Choose what to play',
-		description:
-			'Pick your favorite modpack from Modrinth, or choose a loader and add the mods you want.',
+		title: formatMessage(messages.step1Title),
+		description: formatMessage(messages.step1Description),
 	},
 	{
 		icon: GlobeIcon,
-		title: 'Configure your world',
-		description: 'Set up your world just like singleplayer. Choose your gamemode and world seed.',
+		title: formatMessage(messages.step2Title),
+		description: formatMessage(messages.step2Description),
 	},
 	{
 		icon: UsersIcon,
-		title: 'Invite your friends',
-		description:
-			"Share your server with friends by copying the address and letting them know which mods they'll need to join.",
+		title: formatMessage(messages.step3Title),
+		description: formatMessage(messages.step3Description),
 	},
-]
+])
 </script>

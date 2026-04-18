@@ -11,11 +11,12 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, watch } from 'vue'
 
-import { useRelativeTime } from '../../../composables'
-import { defineMessages, useVIntl } from '../../../composables/i18n'
-import { injectModrinthClient, injectModrinthServerContext } from '../../../providers'
-import type { BackupProgressEntry } from '../../../providers/server-context'
-import { commonMessages } from '../../../utils'
+import { useRelativeTime } from '#ui/composables'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
+import type { BackupProgressEntry } from '#ui/providers/server-context'
+import { commonMessages } from '#ui/utils/common-messages'
+
 import Admonition from '../../base/Admonition.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import ProgressBar from '../../base/ProgressBar.vue'

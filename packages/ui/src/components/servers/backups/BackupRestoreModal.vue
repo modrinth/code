@@ -1,16 +1,19 @@
 <template>
-	<NewModal ref="modal" header="Restore backup" fade="danger">
+	<NewModal ref="modal" :header="formatMessage(messages.modalTitle)" fade="danger">
 		<div class="flex flex-col gap-6 max-w-[400px]">
-			<Admonition v-if="ctx.isServerRunning.value" type="critical" header="Server is running">
-				Stop the server before restoring a backup.
+			<Admonition
+				v-if="ctx.isServerRunning.value"
+				type="critical"
+				:header="formatMessage(messages.runningHeader)"
+			>
+				{{ formatMessage(messages.runningBody) }}
 			</Admonition>
-			<Admonition v-else type="critical" header="Your server files will be replaced">
-				Restoring your server will replace the current world and server files. Any changes made
-				since that backup will be permanently lost.
+			<Admonition v-else type="critical" :header="formatMessage(messages.replaceFilesHeader)">
+				{{ formatMessage(messages.replaceFilesBody) }}
 			</Admonition>
 
 			<div v-if="currentBackup" class="flex flex-col gap-2">
-				<span class="font-semibold text-contrast">Backup</span>
+				<span class="font-semibold text-contrast">{{ formatMessage(messages.backupLabel) }}</span>
 				<BackupItem :backup="currentBackup" preview class="!bg-surface-2 !shadow-none" />
 			</div>
 		</div>
@@ -20,14 +23,18 @@
 				<ButtonStyled type="outlined">
 					<button class="!border !border-surface-4" @click="modal?.hide()">
 						<XIcon />
-						Cancel
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="red">
 					<button :disabled="isRestoring || ctx.isServerRunning.value" @click="restoreBackup">
 						<SpinnerIcon v-if="isRestoring" class="animate-spin" />
 						<RotateCounterClockwiseIcon v-else />
-						{{ isRestoring ? 'Restoring...' : 'Restore backup' }}
+						{{
+							isRestoring
+								? formatMessage(messages.restoringButton)
+								: formatMessage(messages.restoreButton)
+						}}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -41,20 +48,64 @@ import { RotateCounterClockwiseIcon, SpinnerIcon, XIcon } from '@modrinth/assets
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
-} from '../../../providers'
+} from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
+
 import Admonition from '../../base/Admonition.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
 import BackupItem from './BackupItem.vue'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const ctx = injectModrinthServerContext()
+
+const messages = defineMessages({
+	modalTitle: {
+		id: 'servers.backups.restore-modal.title',
+		defaultMessage: 'Restore backup',
+	},
+	runningHeader: {
+		id: 'servers.backups.restore-modal.running.header',
+		defaultMessage: 'Server is running',
+	},
+	runningBody: {
+		id: 'servers.backups.restore-modal.running.body',
+		defaultMessage: 'Stop the server before restoring a backup.',
+	},
+	replaceFilesHeader: {
+		id: 'servers.backups.restore-modal.replace-files.header',
+		defaultMessage: 'Your server files will be replaced',
+	},
+	replaceFilesBody: {
+		id: 'servers.backups.restore-modal.replace-files.body',
+		defaultMessage:
+			'Restoring your server will replace the current world and server files. Any changes made since that backup will be permanently lost.',
+	},
+	backupLabel: {
+		id: 'servers.backups.restore-modal.backup-label',
+		defaultMessage: 'Backup',
+	},
+	restoringButton: {
+		id: 'servers.backups.restore-modal.restoring-button',
+		defaultMessage: 'Restoring...',
+	},
+	restoreButton: {
+		id: 'servers.backups.restore-modal.restore-button',
+		defaultMessage: 'Restore backup',
+	},
+	errorTitle: {
+		id: 'servers.backups.restore-modal.notification.error.title',
+		defaultMessage: 'Failed to restore backup',
+	},
+})
 
 const backupsQueryKey = ['backups', 'list', ctx.serverId]
 const restoreMutation = useMutation({
@@ -77,7 +128,7 @@ const restoreBackup = () => {
 		if (!currentBackup.value) {
 			addNotification({
 				type: 'error',
-				title: 'Failed to restore backup',
+				title: formatMessage(messages.errorTitle),
 				text: 'Current backup is null',
 			})
 		}
@@ -95,7 +146,11 @@ const restoreBackup = () => {
 		},
 		onError: (error) => {
 			const message = error instanceof Error ? error.message : String(error)
-			addNotification({ type: 'error', title: 'Failed to restore backup', text: message })
+			addNotification({
+				type: 'error',
+				title: formatMessage(messages.errorTitle),
+				text: message,
+			})
 		},
 		onSettled: () => {
 			isRestoring.value = false
