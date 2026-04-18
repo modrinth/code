@@ -13,6 +13,11 @@ export class LauncherMetaManifestV0Module extends AbstractModule {
 	/**
 	 * Get the loader manifest for a given loader platform.
 	 *
+	 * launcher-meta refuses CORS preflights that ask for the `Content-Type`
+	 * header (returns 403), so we strip the default `Content-Type: application/json`
+	 * the abstract client sets — these are body-less GETs and don't need it.
+	 * Without this the browser preflight is rejected and the GET never fires.
+	 *
 	 * @param loader - Loader platform (fabric, forge, quilt, neo)
 	 */
 	public async getManifest(loader: string): Promise<LauncherMeta.Manifest.v0.Manifest> {
@@ -21,6 +26,7 @@ export class LauncherMetaManifestV0Module extends AbstractModule {
 			version: `${loader}/v0`,
 			method: 'GET',
 			skipAuth: true,
+			headers: { 'Content-Type': '' },
 		})
 	}
 }

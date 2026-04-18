@@ -45,7 +45,7 @@
 
 			<div v-if="metric.showGraph" class="chart-space absolute bottom-0 left-0 right-0">
 				<VueApexCharts
-					v-if="!loading && metric.chartOptions"
+					v-if="isClient && !loading && metric.chartOptions"
 					type="area"
 					height="142"
 					:options="metric.chartOptions"
@@ -62,12 +62,19 @@
 import { CpuIcon, DatabaseIcon, FolderOpenIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
-import { computed, defineAsyncComponent, ref, shallowRef, watch } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { injectModrinthServerContext, injectPageContext } from '#ui/providers'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
+
+// apexcharts touches `window` at module load time, so we must not let SSR
+// resolve the async component. Render only after mount on the client.
+const isClient = ref(false)
+onMounted(() => {
+	isClient.value = true
+})
 
 const { serverId } = injectModrinthServerContext()
 const { featureFlags } = injectPageContext()
