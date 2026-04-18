@@ -4,7 +4,9 @@ use crate::database::DBProject;
 use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
-use crate::database::models::{DBOrganization, DBTeam, DBTeamMember, DBUser};
+use crate::database::models::{
+    DBOrganization, DBTeam, DBTeamMember, DBUser, DBUserId,
+};
 use crate::database::redis::RedisPool;
 use crate::models::ids::TeamId;
 use crate::models::notifications::NotificationBody;
@@ -689,7 +691,7 @@ pub struct EditTeamMember {
 
 pub async fn edit_team_member(
     req: HttpRequest,
-    info: web::Path<(TeamId, UserId)>,
+    info: web::Path<(TeamId, String)>,
     pool: web::Data<PgPool>,
     edit_member: web::Json<EditTeamMember>,
     redis: web::Data<RedisPool>,
@@ -697,7 +699,15 @@ pub async fn edit_team_member(
 ) -> Result<HttpResponse, ApiError> {
     let ids = info.into_inner();
     let id = ids.0.into();
-    let user_id = ids.1.into();
+
+    let user_id = DBUser::get(&ids.1, &**pool, &redis)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The user specified does not exist".to_string(),
+            )
+        })?
+        .id;
 
     let current_user = get_user_from_headers(
         &req,

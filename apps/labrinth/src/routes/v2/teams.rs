@@ -296,7 +296,7 @@ pub struct EditTeamMember {
 #[patch("/{id}/members/{user_id}")]
 pub async fn edit_team_member(
     req: HttpRequest,
-    info: web::Path<(TeamId, UserId)>,
+    info: web::Path<(TeamId, String)>,
     pool: web::Data<PgPool>,
     edit_member: web::Json<EditTeamMember>,
     redis: web::Data<RedisPool>,
