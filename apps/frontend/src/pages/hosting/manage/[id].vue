@@ -37,7 +37,8 @@
 </template>
 
 <script setup lang="ts">
-import { ServersManageRootLayout } from '@modrinth/ui'
+import { injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 
 import { reloadNuxtApp } from '#app'
 import { products } from '~/generated/state.json'
@@ -47,6 +48,21 @@ const route = useNativeRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
 const serverId = route.params.id as string
+
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+
+if (serverId) {
+	try {
+		await queryClient.ensureQueryData({
+			queryKey: ['servers', 'detail', serverId],
+			queryFn: () => client.archon.servers_v0.get(serverId)!,
+			staleTime: 30_000,
+		})
+	} catch {
+		// Let mounted layouts' useQuery surface errors; do not fail route setup.
+	}
+}
 
 const auth = (await useAuth()) as unknown as {
 	value: { user: { id: string; username: string; email: string; created: string } }

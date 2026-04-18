@@ -22,4 +22,5 @@ Refer to the standards: @standards/frontend/CROSS_PLATFORM_PAGES.md and @standar
    - Move the page component into `packages/ui/src/layouts/wrapped/` matching the route structure.
    - Replace any platform-specific imports with shared utilities.
    - Import and render the wrapped page from both frontends as a simple component.
+   - If the layout uses TanStack Query for initial route paint with `ReadyTransition` / `useReadyState`, each platform route shell must call `ensureQueryData` for those queries with matching keys and fetchers — see **Platform route shells: prefetch with `ensureQueryData`** in `standards/frontend/CROSS_PLATFORM_PAGES.md`.
 6. **Verify** the page renders correctly by checking for missing imports and that all DI contracts are satisfied.

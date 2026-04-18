@@ -95,14 +95,6 @@
 			</template>
 		</ErrorInformationCard>
 	</div>
-	<!-- Loading state (before serverData arrives) -->
-	<div
-		v-else-if="!serverData && !serverError"
-		class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 relative bottom-12"
-	>
-		<LoaderCircleIcon class="size-16 animate-spin" />
-		<span class="text-secondary">{{ formatMessage(loadingMessages.loadingServerPanel) }}</span>
-	</div>
 	<!-- SERVER START -->
 	<div
 		v-else-if="serverData"
@@ -120,14 +112,7 @@
 			},
 		]"
 	>
-		<div
-			v-if="revealState === 'pending' && !isOnboarding"
-			class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 relative bottom-12"
-		>
-			<LoaderCircleIcon class="size-16 animate-spin" />
-			<span class="text-secondary">{{ formatMessage(loadingMessages.loadingServerPanel) }}</span>
-		</div>
-		<template v-else>
+		<template v-if="revealState !== 'pending' || isOnboarding">
 			<ServerManageHeader
 				v-if="!isOnboarding"
 				class="server-stagger-item"
@@ -463,7 +448,9 @@ import {
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
 	useDebugLogger,
+	useLoadingBarToken,
 	useModrinthServersConsole,
+	useReadyState,
 	useServerImage,
 	useServerProject,
 } from '#ui/composables'
@@ -536,13 +523,6 @@ const props = withDefaults(
 
 const { formatMessage } = useVIntl()
 
-const loadingMessages = defineMessages({
-	loadingServerPanel: {
-		id: 'servers.manage.loading.serverPanel',
-		defaultMessage: 'Loading your server panel...',
-	},
-})
-
 const leaveMessages = defineMessages({
 	uploadInProgress: {
 		id: 'servers.manage.confirm-leave.upload-in-progress',
@@ -568,6 +548,9 @@ const settingsHintMessages = defineMessages({
 		defaultMessage: "Don't show again",
 	},
 })
+
+// disabled, keeping the animation logic cos it's really nice and we might want to re-enable in future
+const DISABLE_LOADING_ANIM = true
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
@@ -599,10 +582,16 @@ function dismissSettingsHint() {
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 
-const { data: serverData, error: serverQueryError } = useQuery({
+const {
+	data: serverData,
+	error: serverQueryError,
+	isLoading: serverLoading,
+} = useQuery({
 	queryKey: ['servers', 'detail', props.serverId],
 	queryFn: () => client.archon.servers_v0.get(props.serverId)!,
 })
+
+useLoadingBarToken(useReadyState({ isLoading: serverLoading, data: serverData }))
 
 function updateServerData(patch: Partial<Archon.Servers.v0.Server>) {
 	if (!serverData.value) return
@@ -817,7 +806,7 @@ log('canReveal initial', {
 })
 
 const revealState = ref<'pending' | 'revealing' | 'visible'>(
-	canReveal.value ? 'visible' : 'pending',
+	DISABLE_LOADING_ANIM || canReveal.value ? 'visible' : 'pending',
 )
 log('revealState initial', revealState.value)
 
@@ -826,11 +815,15 @@ const REVEAL_TOTAL_MS = 2 * 80 + 400
 watch(canReveal, (ready) => {
 	log('canReveal changed', { ready, revealState: revealState.value })
 	if (ready && revealState.value === 'pending') {
-		revealState.value = 'revealing'
-		setTimeout(() => {
+		if (DISABLE_LOADING_ANIM) {
 			revealState.value = 'visible'
-			log('revealState -> visible')
-		}, REVEAL_TOTAL_MS)
+		} else {
+			revealState.value = 'revealing'
+			setTimeout(() => {
+				revealState.value = 'visible'
+				log('revealState -> visible')
+			}, REVEAL_TOTAL_MS)
+		}
 	}
 })
 

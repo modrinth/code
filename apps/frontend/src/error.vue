@@ -1,6 +1,6 @@
 <template>
 	<NuxtLayout>
-		<ModrinthLoadingIndicator />
+		<LoadingBar />
 		<NotificationPanel />
 		<div class="main experimental-styles-within">
 			<div v-if="is404" class="error-graphic">
@@ -55,6 +55,7 @@ import { SadRinthbot } from '@modrinth/assets'
 import {
 	defineMessage,
 	IntlFormatted,
+	LoadingBar,
 	normalizeChildren,
 	NotificationPanel,
 	provideModrinthClient,
@@ -65,14 +66,15 @@ import {
 
 import Logo404 from '~/assets/images/404.svg'
 
-import ModrinthLoadingIndicator from './components/ui/modrinth-loading-indicator.ts'
 import { createModrinthClient } from './helpers/api.ts'
 import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
+import { setupLoadingStateProvider } from './providers/setup/loading-state.ts'
 
 const auth = await useAuth()
 const config = useRuntimeConfig()
 
 provideNotificationManager(new FrontendNotificationManager())
+setupLoadingStateProvider()
 
 const client = createModrinthClient(auth.value, {
 	apiBaseUrl: config.public.apiBaseUrl.replace('/v2/', '/'),

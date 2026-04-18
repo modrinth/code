@@ -35,9 +35,6 @@
 								@reinstall="onReinstall"
 								@reinstall-failed="onReinstallFailed"
 							/>
-							<template #fallback>
-								<LoadingIndicator />
-							</template>
 						</Suspense>
 					</template>
 				</RouterView>
@@ -48,8 +45,8 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { injectAuth, LoadingIndicator, ServersManageRootLayout } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import { injectAuth, injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, watch } from 'vue'
@@ -64,6 +61,8 @@ import { useTheming } from '@/store/theme'
 const route = useRoute()
 const router = useRouter()
 const auth = injectAuth()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const themeStore = useTheming()
 const breadcrumbs = useBreadcrumbs()
 
@@ -71,6 +70,18 @@ const serverId = computed(() => {
 	const rawId = route.params.id
 	return Array.isArray(rawId) ? rawId[0] : (rawId ?? '')
 })
+
+if (serverId.value) {
+	try {
+		await queryClient.ensureQueryData({
+			queryKey: ['servers', 'detail', serverId.value],
+			queryFn: () => client.archon.servers_v0.get(serverId.value)!,
+			staleTime: 30_000,
+		})
+	} catch {
+		// Let mounted layouts' useQuery surface errors; do not fail route setup.
+	}
+}
 
 const { data: serverData } = useQuery({
 	queryKey: computed(() => ['servers', 'detail', serverId.value]),

@@ -1,16 +1,15 @@
 <template>
 	<NuxtLayout>
 		<NuxtRouteAnnouncer />
-		<ModrinthLoadingIndicator />
+		<LoadingBar />
 		<NotificationPanel />
 		<I18nDebugPanel />
 		<NuxtPage />
 	</NuxtLayout>
 </template>
 <script setup lang="ts">
-import { I18nDebugPanel, NotificationPanel } from '@modrinth/ui'
+import { I18nDebugPanel, LoadingBar, NotificationPanel } from '@modrinth/ui'
 
-import ModrinthLoadingIndicator from '~/components/ui/modrinth-loading-indicator.ts'
 import { setupProviders } from '~/providers/setup.ts'
 
 const auth = await useAuth()

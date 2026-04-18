@@ -1,65 +1,67 @@
 <template>
-	<ContentPageLayout>
-		<template #modals>
-			<ShareModalWrapper
-				ref="shareModal"
-				:share-title="formatMessage(messages.shareTitle)"
-				:share-text="formatMessage(messages.shareText)"
-				:open-in-new-tab="false"
-			/>
-			<ModpackContentModal
-				ref="modpackContentModal"
-				:modpack-name="linkedModpackProject?.title"
-				:modpack-icon-url="linkedModpackProject?.icon_url ?? undefined"
-				:enable-toggle="!props.isServerInstance"
-				:get-overflow-options="getOverflowOptions"
-				:switch-version="handleSwitchVersion"
-				@update:enabled="handleModpackContentToggle"
-				@bulk:enable="handleModpackContentBulkToggle"
-				@bulk:disable="handleModpackContentBulkToggle"
-			/>
-			<ConfirmModpackUpdateModal
-				ref="modpackUpdateConfirmModal"
-				:downgrade="isModpackUpdateDowngrade"
-				:backup-tip="
-					[linkedModpackProject?.title, pendingModpackUpdateVersion?.version_number]
-						.filter(Boolean)
-						.join(' ')
-				"
-				@confirm="handleModpackUpdateConfirm"
-				@cancel="handleModpackUpdateCancel"
-			/>
-			<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
-			<ContentUpdaterModal
-				v-if="updatingProject || updatingModpack"
-				ref="contentUpdaterModal"
-				:versions="updatingProjectVersions"
-				:current-game-version="instance.game_version"
-				:current-loader="instance.loader"
-				:current-version-id="
-					updatingModpack
-						? (instance.linked_data?.version_id ?? '')
-						: (updatingProject?.version?.id ?? '')
-				"
-				:is-app="true"
-				:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
-				:project-icon-url="
-					updatingModpack ? linkedModpackProject?.icon_url : updatingProject?.project?.icon_url
-				"
-				:project-name="
-					updatingModpack
-						? (linkedModpackProject?.title ?? formatMessage(commonMessages.modpackLabel))
-						: (updatingProject?.project?.title ?? updatingProject?.file_name)
-				"
-				:loading="loadingVersions"
-				:loading-changelog="loadingChangelog"
-				@update="handleModalUpdate"
-				@cancel="resetUpdateState"
-				@version-select="handleVersionSelect"
-				@version-hover="handleVersionHover"
-			/>
-		</template>
-	</ContentPageLayout>
+	<ReadyTransition :pending="loading">
+		<ContentPageLayout>
+			<template #modals>
+				<ShareModalWrapper
+					ref="shareModal"
+					:share-title="formatMessage(messages.shareTitle)"
+					:share-text="formatMessage(messages.shareText)"
+					:open-in-new-tab="false"
+				/>
+				<ModpackContentModal
+					ref="modpackContentModal"
+					:modpack-name="linkedModpackProject?.title"
+					:modpack-icon-url="linkedModpackProject?.icon_url ?? undefined"
+					:enable-toggle="!props.isServerInstance"
+					:get-overflow-options="getOverflowOptions"
+					:switch-version="handleSwitchVersion"
+					@update:enabled="handleModpackContentToggle"
+					@bulk:enable="handleModpackContentBulkToggle"
+					@bulk:disable="handleModpackContentBulkToggle"
+				/>
+				<ConfirmModpackUpdateModal
+					ref="modpackUpdateConfirmModal"
+					:downgrade="isModpackUpdateDowngrade"
+					:backup-tip="
+						[linkedModpackProject?.title, pendingModpackUpdateVersion?.version_number]
+							.filter(Boolean)
+							.join(' ')
+					"
+					@confirm="handleModpackUpdateConfirm"
+					@cancel="handleModpackUpdateCancel"
+				/>
+				<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
+				<ContentUpdaterModal
+					v-if="updatingProject || updatingModpack"
+					ref="contentUpdaterModal"
+					:versions="updatingProjectVersions"
+					:current-game-version="instance.game_version"
+					:current-loader="instance.loader"
+					:current-version-id="
+						updatingModpack
+							? (instance.linked_data?.version_id ?? '')
+							: (updatingProject?.version?.id ?? '')
+					"
+					:is-app="true"
+					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
+					:project-icon-url="
+						updatingModpack ? linkedModpackProject?.icon_url : updatingProject?.project?.icon_url
+					"
+					:project-name="
+						updatingModpack
+							? (linkedModpackProject?.title ?? formatMessage(commonMessages.modpackLabel))
+							: (updatingProject?.project?.title ?? updatingProject?.file_name)
+					"
+					:loading="loadingVersions"
+					:loading-changelog="loadingChangelog"
+					@update="handleModalUpdate"
+					@cancel="resetUpdateState"
+					@version-select="handleVersionSelect"
+					@version-hover="handleVersionHover"
+				/>
+			</template>
+		</ContentPageLayout>
+	</ReadyTransition>
 </template>
 
 <script setup lang="ts">
@@ -82,6 +84,7 @@ import {
 	type OverflowMenuOption,
 	provideAppBackup,
 	provideContentManager,
+	ReadyTransition,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
