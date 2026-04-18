@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, type Ref, ref } from 'vue'
 
 const isClient = typeof window !== 'undefined'
 const stack: symbol[] = []
@@ -33,6 +33,7 @@ export function useModalStack() {
 	}
 
 	const hasModal = computed(() => stackSizeRef.value > 0)
+	const stackCount: Readonly<Ref<number>> = stackSizeRef
 
-	return { push, pop, isTopmost, stackSize, hasModal }
+	return { push, pop, isTopmost, stackSize, hasModal, stackCount }
 }

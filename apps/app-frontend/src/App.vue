@@ -1468,6 +1468,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 .app-grid-statusbar {
 	grid-area: status;
+	padding-right: var(--window-controls-width, 0px);
 }
 
 [data-tauri-drag-region-exclude] {
