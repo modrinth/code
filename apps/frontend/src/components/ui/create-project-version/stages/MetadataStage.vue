@@ -1,5 +1,15 @@
 <template>
 	<div class="flex flex-col gap-6">
+		<Chips
+			v-if="editingVersion"
+			:model-value="'metadata'"
+			:items="editTabs"
+			size="small"
+			aria-label="Version edit sections"
+			hide-checkmark-icon
+			@update:model-value="setEditTab"
+		/>
+
 		<div v-if="!editingVersion" class="flex flex-col gap-1">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast"> Uploaded files </span>
@@ -198,6 +208,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { EditIcon, getLoaderIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	Chips,
 	defineMessages,
 	ENVIRONMENTS_COPY,
 	FormattedTag,
@@ -229,6 +240,24 @@ const { projectV2 } = injectProjectPageContext()
 
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
+
+type EditVersionTab = 'metadata' | 'details' | 'files'
+
+const editTabs: EditVersionTab[] = ['metadata', 'details', 'files']
+const editTabToStage: Record<EditVersionTab, string> = {
+	metadata: 'metadata',
+	details: 'add-details',
+	files: 'add-files',
+}
+
+const isEditVersionTab = (tab: string): tab is EditVersionTab =>
+	editTabs.some((candidate) => candidate === tab)
+
+function setEditTab(tab: string | null | undefined) {
+	if (!tab || !isEditVersionTab(tab)) return
+	modal.value?.setStage(editTabToStage[tab])
+}
+
 const isModpack = computed(() => projectType.value === 'modpack')
 const isResourcePack = computed(
 	() =>

@@ -1,5 +1,15 @@
 <template>
 	<div class="flex w-full flex-col gap-6">
+		<Chips
+			v-if="editingVersion"
+			:model-value="'details'"
+			:items="editTabs"
+			size="small"
+			aria-label="Version edit sections"
+			hide-checkmark-icon
+			@update:model-value="setEditTab"
+		/>
+
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">
 				Version type <span class="text-red">*</span>
@@ -58,7 +68,24 @@ import { Chips, MarkdownEditor, StyledInput } from '@modrinth/ui'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
-const { draftVersion, isUploading } = injectManageVersionContext()
+const { draftVersion, isUploading, editingVersion, modal } = injectManageVersionContext()
+
+type EditVersionTab = 'metadata' | 'details' | 'files'
+
+const editTabs: EditVersionTab[] = ['metadata', 'details', 'files']
+const editTabToStage: Record<EditVersionTab, string> = {
+	metadata: 'metadata',
+	details: 'add-details',
+	files: 'add-files',
+}
+
+const isEditVersionTab = (tab: string): tab is EditVersionTab =>
+	editTabs.some((candidate) => candidate === tab)
+
+function setEditTab(tab: string | null | undefined) {
+	if (!tab || !isEditVersionTab(tab)) return
+	modal.value?.setStage(editTabToStage[tab])
+}
 
 async function onImageUpload(file: File) {
 	const response = await useImageUpload(file, { context: 'version' })
