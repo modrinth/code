@@ -76,7 +76,7 @@ onBeforeUnmount(release)
 	<slot v-else />
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .ready-fade-enter-active,
 .ready-fade-leave-active {
 	transition: opacity v-bind('`${props.duration}ms`') ease-in-out;

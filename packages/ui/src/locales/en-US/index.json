@@ -2870,9 +2870,6 @@
   "servers.manage.handle-error.title": {
     "defaultMessage": "An error occurred"
   },
-  "servers.manage.loading-servers": {
-    "defaultMessage": "Loading your servers..."
-  },
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
   },
