@@ -384,11 +384,7 @@
 										</button>
 									</ButtonStyled>
 
-									<template
-										v-for="opt in stageOptionsForSlots"
-										#[opt.id]
-										:key="opt.id"
-									>
+									<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
 										<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
 										{{ opt.text }}
 									</template>

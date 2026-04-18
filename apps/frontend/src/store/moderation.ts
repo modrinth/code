@@ -57,10 +57,7 @@ export const useModerationStore = defineStore(
 		const hasItems = computed(() => currentQueue.value.items.length > 0)
 		const progress = computed(() => {
 			if (currentQueue.value.total === 0) return 0
-			return (
-				(currentQueue.value.completed + currentQueue.value.skipped) /
-				currentQueue.value.total
-			)
+			return (currentQueue.value.completed + currentQueue.value.skipped) / currentQueue.value.total
 		})
 
 		function setQueue(projectIDs: string[]) {
@@ -95,9 +92,7 @@ export const useModerationStore = defineStore(
 				currentQueue.value.skipped++
 			}
 
-			currentQueue.value.items = currentQueue.value.items.filter(
-				(id: string) => id !== projectId,
-			)
+			currentQueue.value.items = currentQueue.value.items.filter((id: string) => id !== projectId)
 			currentQueue.value.lastUpdated = new Date()
 
 			return currentQueue.value.items.length > 0
