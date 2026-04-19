@@ -12,6 +12,7 @@ use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::error::Context;
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use ariadne::ids::UserId;
 use eyre::eyre;
@@ -700,11 +701,7 @@ pub async fn edit_team_member(
 
     let user_id = DBUser::get(&ids.1, &**pool, &redis)
         .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The user specified does not exist".to_string(),
-            )
-        })?
+        .wrap_request_err("The user specified does not exist")?
         .id;
 
     let current_user = get_user_from_headers(
