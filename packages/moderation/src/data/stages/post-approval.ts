@@ -7,7 +7,8 @@ const postApproval: Stage = {
 	title: 'Issue warnings, notices, or takedowns?',
 	id: 'post-approval',
 	icon: ScaleIcon,
-	guidance_url: 'https://modrinth.com/legal/rules',
+	guidance_url:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080c5a13cda0b1e4ae9ed',
 	shouldShow: (project) => project.status === 'approved',
 	actions: [
 		{
