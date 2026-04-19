@@ -4,9 +4,7 @@ use crate::database::DBProject;
 use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
-use crate::database::models::{
-    DBOrganization, DBTeam, DBTeamMember, DBUser, DBUserId,
-};
+use crate::database::models::{DBOrganization, DBTeam, DBTeamMember, DBUser};
 use crate::database::redis::RedisPool;
 use crate::models::ids::TeamId;
 use crate::models::notifications::NotificationBody;
