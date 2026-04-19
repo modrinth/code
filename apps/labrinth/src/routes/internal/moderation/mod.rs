@@ -416,6 +416,7 @@ async fn set_project_meta(
 
     let mut licenses = Vec::new();
     let mut file_hashes = Vec::new();
+    let mut file_filenames = Vec::new();
     let mut file_license_ids = Vec::new();
 
     for (hash, judgement) in judgements.0 {
@@ -451,6 +452,7 @@ async fn set_project_meta(
             flame_project_id: flame_id,
         });
         file_hashes.push(hash);
+        file_filenames.push(None);
         file_license_ids.push(id as i64);
     }
 
@@ -469,6 +471,7 @@ async fn set_project_meta(
             .iter()
             .map(|x| x.as_bytes().to_vec())
             .collect::<Vec<_>>(),
+        &file_filenames,
         &file_license_ids,
         user_id,
     )
