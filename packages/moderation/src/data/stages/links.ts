@@ -7,7 +7,8 @@ const links: Stage = {
 	title: "Are the project's links accurate and accessible?",
 	id: 'links',
 	icon: LinkIcon,
-	guidance_url: 'https://modrinth.com/legal/rules',
+	guidance_url:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
 	navigate: '/settings/links',
 	shouldShow: (project, projectV3) =>
 		Boolean(

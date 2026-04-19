@@ -8,7 +8,8 @@ const summary: Stage = {
 	text: async () => (await import('../messages/checklist-text/summary/summary.md?raw')).default,
 	id: 'summary',
 	icon: AlignLeftIcon,
-	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
+	guidance_url:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080bfb5e5c7c6211c693b',
 	actions: [
 		{
 			id: 'summary_insufficient',
