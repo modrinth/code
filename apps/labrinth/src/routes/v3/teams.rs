@@ -714,24 +714,19 @@ pub async fn edit_team_member(
     .await?
     .1;
 
-    let team_association =
-        DBTeam::get_association(id, &**pool).await?.ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The team specified does not exist".to_string(),
-            )
-        })?;
+    let team_association = DBTeam::get_association(id, &**pool)
+        .await?
+        .wrap_request_err("The team specified does not exist")?;
     let member =
         DBTeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
             .await?;
     let edit_member_db =
         DBTeamMember::get_from_user_id_pending(id, user_id, &**pool)
             .await?
-            .ok_or_else(|| {
-                ApiError::Request(eyre!(
-                    "This member does not exist in this team - \
-                    the member must first be created via `POST`"
-                ))
-            })?;
+            .wrap_request_err(
+                "This member does not exist in this team - \
+                    the member must first be created via `POST`",
+            )?;
 
     let mut transaction = pool.begin().await?;
 
