@@ -361,15 +361,15 @@ async fn test_lock_acquire_concurrent() {
             let pool1 = test_env.db.pool.clone();
             let pool2 = test_env.db.pool.clone();
             let barrier = Arc::new(Barrier::new(2));
-            let ba = barrier.clone();
-            let bb = barrier.clone();
+            let barrier_a = barrier.clone();
+            let barrier_b = barrier.clone();
 
             let h1 = tokio::spawn(async move {
-                ba.wait().await;
+                barrier_a.wait().await;
                 DBModerationLock::acquire(project_id, mod1, &pool1).await
             });
             let h2 = tokio::spawn(async move {
-                bb.wait().await;
+                barrier_b.wait().await;
                 DBModerationLock::acquire(project_id, mod2, &pool2).await
             });
             let (o1, o2) = tokio::join!(h1, h2);
