@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            mel.id,\n            mel.title,\n            mel.status,\n            mel.link,\n            mel.exceptions,\n            mel.proof,\n            mel.flame_project_id,\n            mel.inserted_at,\n            mel.inserted_by,\n            mel.updated_at,\n            mel.updated_by,\n            COALESCE(\n                jsonb_agg(\n                    jsonb_build_object(\n                        'name', f.filename,\n                        'sha1', encode(mef_all.sha1, 'escape')\n                    )\n                ) FILTER (WHERE f.id IS NOT NULL),\n                '[]'::jsonb\n            ) AS linked_files\n        FROM moderation_external_files mef\n        INNER JOIN moderation_external_licenses mel ON mel.id = mef.external_license_id\n        LEFT JOIN moderation_external_files mef_all ON mef_all.external_license_id = mel.id\n        LEFT JOIN hashes h ON h.algorithm = 'sha1' AND h.hash = mef_all.sha1\n        LEFT JOIN files f ON f.id = h.file_id\n        WHERE mef.sha1 = $1\n        GROUP BY mel.id\n        ",
+  "query": "\n        SELECT\n            mel.id,\n            mel.title,\n            mel.status,\n            mel.link,\n            mel.exceptions,\n            mel.proof,\n            mel.flame_project_id,\n            mel.inserted_at,\n            mel.inserted_by,\n            mel.updated_at,\n            mel.updated_by\n        FROM moderation_external_licenses mel\n        WHERE ($1::text IS NULL OR mel.title ILIKE '%' || $1 || '%')\n          AND ($2::integer IS NULL OR mel.flame_project_id = $2)\n        ORDER BY mel.id\n        ",
   "describe": {
     "columns": [
       {
@@ -57,16 +57,12 @@
         "ordinal": 10,
         "name": "updated_by",
         "type_info": "Int8"
-      },
-      {
-        "ordinal": 11,
-        "name": "linked_files",
-        "type_info": "Jsonb"
       }
     ],
     "parameters": {
       "Left": [
-        "Bytea"
+        "Text",
+        "Int4"
       ]
     },
     "nullable": [
@@ -80,9 +76,8 @@
       true,
       true,
       true,
-      true,
-      null
+      true
     ]
   },
-  "hash": "0974dbe1c02bcbf8df5b2e262b9dcd54ab6eac11bd5f636f954dd8227213158b"
+  "hash": "6542c79dffa73e462c527f1bd4ba67e658814d7a788259dc4b3874c54cb5ae57"
 }

@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO moderation_external_licenses (id, title, status, link, proof, flame_project_id, inserted_at, inserted_by, updated_at, updated_by)\n            SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::varchar[], $4::varchar[], $5::varchar[], $6::integer[], $7::timestamptz[], $8::bigint[], $7::timestamptz[], $8::bigint[])\n            ON CONFLICT (id) DO UPDATE SET\n                title = EXCLUDED.title,\n                status = EXCLUDED.status,\n                link = EXCLUDED.link,\n                proof = EXCLUDED.proof,\n                flame_project_id = EXCLUDED.flame_project_id,\n                updated_at = EXCLUDED.updated_at,\n                updated_by = EXCLUDED.updated_by\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "VarcharArray",
+        "VarcharArray",
+        "VarcharArray",
+        "VarcharArray",
+        "Int4Array",
+        "TimestamptzArray",
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "56428d0eec87c0cdaca1183c642f0478b9974de6b6d95f7ca48de605b3bf1103"
+}
