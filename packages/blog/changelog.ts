@@ -11,6 +11,21 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-04-19T00:07:46+00:00`,
+		product: 'app',
+		version: '0.13.3',
+		body: `## Fixed
+- Fixed overlap of window controls with the instance status card in the top bar of the app.`,
+	},
+	{
+		date: `2026-04-19T00:07:46+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed "You have unsaved changes" popup appearing behind the settings modal fade.
+- Fixed broken loader version dropdown in the platform settings.
+- Fixed "window not found" error that sometimes happens when loading the server panel.`,
+	},
+	{
 		date: `2026-04-18T19:00:59+00:00`,
 		product: 'app',
 		version: '0.13.2',
