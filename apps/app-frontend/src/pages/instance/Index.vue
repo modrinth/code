@@ -1,7 +1,7 @@
 <template>
-	<div v-if="instance" class="flex h-full flex-col">
+	<div v-if="instance" :class="{ 'flex h-full flex-col': isFixedRender }">
 		<div
-			class="shrink-0 p-6 pr-2 pb-4"
+			:class="['p-6 pr-2 pb-4', { 'shrink-0': isFixedRender }]"
 			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
 		>
 			<ExportModal ref="exportModal" :instance="instance" />
@@ -208,10 +208,10 @@
 				</template>
 			</ContentPageHeader>
 		</div>
-		<div class="shrink-0 px-6">
+		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
 			<NavTabs :links="tabs" />
 		</div>
-		<div v-if="!!instance" class="min-h-0 flex-1 overflow-y-auto p-6 pt-4">
+		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
 			<RouterView
 				v-if="route.path.startsWith('/instance')"
 				v-slot="{ Component }"
@@ -435,6 +435,19 @@ watch(
 )
 
 const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id as string)}`)
+
+/**
+ * Per-route layout mode.
+ * - `'scroll'` (default): the whole instance page scrolls inside `.app-viewport`. This lets
+ *   `position: sticky` children (and the viewport-rooted `IntersectionObserver` used by
+ *   `useStickyObserver`) work correctly.
+ * - `'fixed'`: the header + tabs are pinned and only the tab body scrolls in its own container.
+ *   Used by tabs whose content (e.g. the log console) needs a bounded height to resolve `h-full`.
+ */
+const renderMode = computed<'scroll' | 'fixed'>(() =>
+	route.meta.renderMode === 'fixed' ? 'fixed' : 'scroll',
+)
+const isFixedRender = computed(() => renderMode.value === 'fixed')
 
 const tabs = computed(() => [
 	{
