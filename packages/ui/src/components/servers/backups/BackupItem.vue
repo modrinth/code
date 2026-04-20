@@ -27,13 +27,14 @@ const formatDateTime = useFormatDateTime({
 })
 
 const emit = defineEmits<{
-	(e: 'download' | 'rename' | 'restore' | 'retry'): void
+	(e: 'download' | 'rename' | 'restore'): void
 	(e: 'delete', skipConfirmation?: boolean): void
 }>()
 
 const props = withDefaults(
 	defineProps<{
-		backup: Archon.Backups.v1.Backup
+		backup: Archon.BackupsQueue.v1.BackupQueueBackup
+		activeOperation?: Archon.BackupsQueue.v1.ActiveOperation
 		preview?: boolean
 		kyrosUrl?: string
 		jwt?: string
@@ -51,38 +52,28 @@ const props = withDefaults(
 	},
 )
 
+const latestHistoryOp = computed(() => props.backup.history[0])
+
 const failedToCreate = computed(
 	() => props.backup.status === 'error' || props.backup.status === 'timed_out',
 )
 
-const inactiveStates = ['failed', 'cancelled', 'done']
-
 const creating = computed(() => {
-	const task = props.backup.task?.create
-	if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
-		return true
-	}
-
-	if (
-		(props.backup.status === 'in_progress' || props.backup.status === 'pending') &&
-		!props.backup.task?.restore
-	) {
-		return true
-	}
-	return false
+	const op = props.activeOperation
+	if (op?.operation_type === 'create' && !op.has_parent) return true
+	if (op?.operation_type === 'restore') return false
+	return props.backup.status === 'pending' || props.backup.status === 'in_progress'
 })
 
-const restoring = computed(() => {
-	const task = props.backup.task?.restore
-	if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
-		return true
-	}
-	return false
-})
+const restoring = computed(() => props.activeOperation?.operation_type === 'restore')
 
-const failedToRestore = computed(() => props.backup.task?.restore?.state === 'failed')
+const failedToRestore = computed(
+	() =>
+		latestHistoryOp.value?.operation_type === 'restore' &&
+		(latestHistoryOp.value?.state === 'failed' || latestHistoryOp.value?.state === 'timed_out'),
+)
 
-const activeOperation = computed(() => creating.value || restoring.value)
+const activeOperationExists = computed(() => creating.value || restoring.value)
 
 const backupIcon = computed(() => {
 	if (props.backup.automated) {
@@ -101,7 +92,7 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 		})
 	}
 
-	if (!activeOperation.value) {
+	if (!activeOperationExists.value) {
 		if (options.length > 0) {
 			options.push({ divider: true })
 		}
@@ -116,7 +107,7 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 
 	options.push({ id: 'rename', action: () => emit('rename') })
 
-	if (!activeOperation.value) {
+	if (!activeOperationExists.value) {
 		options.push({ divider: true })
 		options.push({
 			id: 'delete',
@@ -131,13 +122,6 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 async function copyId() {
 	await navigator.clipboard.writeText(props.backup.id)
 }
-
-// TODO: Uncomment when API supports size field
-// const formatBytes = (bytes?: number) => {
-// 	if (!bytes) return ''
-// 	const mb = bytes / (1024 * 1024)
-// 	return `${mb.toFixed(0)} MiB`
-// }
 
 const messages = defineMessages({
 	restore: {
@@ -189,7 +173,7 @@ const messages = defineMessages({
 				:class="preview ? 'size-10' : 'size-14'"
 			>
 				<LoaderCircleIcon
-					v-if="activeOperation"
+					v-if="activeOperationExists"
 					v-tooltip="restoring ? formatMessage(messages.restoring) : undefined"
 					class="animate-spin text-secondary"
 					:class="preview ? 'size-6' : 'size-10'"
@@ -230,18 +214,11 @@ const messages = defineMessages({
 						</span>
 					</template>
 					<template v-else>
-						<!-- TODO: Uncomment when API supports creator_id field -->
-						<!-- <template v-if="backup.creator_id && backup.creator_id !== 'auto'">
-						<Avatar ... class="size-6 rounded-full" />
-						<span>{{ creatorName }}</span>
-					</template>
-					<template v-else> -->
 						<span>
 							{{
 								formatMessage(backup.automated ? messages.backupSchedule : messages.manualBackup)
 							}}
 						</span>
-						<!-- </template> -->
 					</template>
 				</div>
 			</div>
@@ -252,8 +229,6 @@ const messages = defineMessages({
 			<span class="whitespace-nowrap font-medium text-contrast">{{
 				formatDateTime(backup.created_at)
 			}}</span>
-			<!-- TODO: Uncomment when API supports size field -->
-			<!-- <span class="font-normal text-secondary">{{ formatBytes(backup.size) }}</span> -->
 		</div>
 
 		<!-- Right side actions -->
@@ -264,7 +239,7 @@ const messages = defineMessages({
 				</button>
 			</ButtonStyled>
 			<template v-else>
-				<ButtonStyled v-if="!activeOperation" color="brand" type="outlined">
+				<ButtonStyled v-if="!activeOperationExists" color="brand" type="outlined">
 					<button
 						v-tooltip="props.restoreDisabled"
 						class="!border"

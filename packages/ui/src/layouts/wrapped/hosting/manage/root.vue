@@ -468,6 +468,7 @@ import {
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
@@ -629,16 +630,16 @@ const worldId = computed(() => {
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
 
+const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQueue(
+	computed(() => props.serverId),
+	worldId,
+)
+
 const { image: serverImage } = useServerImage(
 	props.serverId,
 	computed(() => serverData.value?.upstream ?? null),
 )
 const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
-
-const cancelledBackups = new Set<string>()
-const markBackupCancelled = (backupId: string) => {
-	cancelledBackups.add(backupId)
-}
 
 const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
 const contentError = ref<Archon.Websocket.v0.SyncContentError | null>(null)
@@ -697,7 +698,6 @@ const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {
 }
 
 const {
-	backupsState,
 	cancelUpload,
 	cleanupCoreRuntime,
 	connectSocket,
@@ -715,8 +715,7 @@ const {
 	worldId,
 	server: serverData,
 	isSyncingContent,
-	markBackupCancelled,
-	includeBackupBusyReasons: true,
+	extraBusyReasons: backupsBusy,
 	setDisconnectedOnAuthIncorrect: false,
 	syncUptimeFromState: true,
 	incrementUptimeLocally: true,
@@ -988,69 +987,7 @@ async function handleContentRetry() {
 }
 
 const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) => {
-	if (data.task === 'file') return
-
-	const backupId = data.id
-
-	if (cancelledBackups.has(backupId)) return
-
-	const current = backupsState.get(backupId) ?? {}
-	const currentTaskState = current[data.task]?.state
-	const isIncomingTerminal =
-		data.state === 'done' || data.state === 'failed' || data.state === 'cancelled'
-
-	if (currentTaskState === data.state && isIncomingTerminal) return
-
-	const previousProgress = current[data.task]?.progress
-	if (currentTaskState !== data.state || previousProgress !== data.progress) {
-		backupsState.set(backupId, {
-			...current,
-			[data.task]: {
-				progress: data.progress,
-				state: data.state,
-			},
-		})
-	}
-
-	if (isIncomingTerminal) {
-		const attemptCleanup = (attempt: number = 1) => {
-			queryClient.invalidateQueries({ queryKey: ['backups', 'list', props.serverId] }).then(() => {
-				const backupData = queryClient.getQueryData<Archon.Backups.v1.Backup[]>([
-					'backups',
-					'list',
-					props.serverId,
-				])
-				const backup = backupData?.find((b) => b.id === backupId)
-				const isStillActive =
-					backup && (backup.status === 'in_progress' || backup.status === 'pending')
-
-				if (isStillActive && attempt < 6) {
-					setTimeout(() => attemptCleanup(attempt + 1), 1000 * Math.pow(2, attempt - 1))
-					return
-				}
-
-				if (isStillActive) {
-					queryClient.setQueryData<Archon.Backups.v1.Backup[]>(
-						['backups', 'list', props.serverId],
-						(old) =>
-							old?.map((b) => {
-								if (b.id !== backupId) return b
-								return {
-									...b,
-									status: data.state === 'done' ? ('done' as const) : ('error' as const),
-									ongoing: false,
-									interrupted: data.state === 'failed',
-								}
-							}),
-					)
-				}
-
-				backupsState.delete(backupId)
-			})
-		}
-
-		attemptCleanup()
-	}
+	handleWsBackupProgress(data)
 }
 
 const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => {
@@ -1473,8 +1410,6 @@ const cleanup = () => {
 
 	isReconnecting.value = false
 	isLoading.value = true
-
-	cancelledBackups.clear()
 
 	DOMPurify.removeHook('afterSanitizeAttributes')
 }

@@ -27,12 +27,12 @@
 		</div>
 
 		<div v-else key="content" class="contents">
-			<BackupCreateModal ref="createBackupModal" :backups="backupsData ?? []" />
-			<BackupRenameModal ref="renameBackupModal" :backups="backupsData ?? []" />
+			<BackupCreateModal ref="createBackupModal" :backups="backups" />
+			<BackupRenameModal ref="renameBackupModal" :backups="backups" />
 			<BackupRestoreModal ref="restoreBackupModal" />
 			<BackupDeleteModal ref="deleteBackupModal" @delete="deleteBackup" />
 
-			<div v-if="backupsData?.length" class="mb-2 flex items-center align-middle justify-between">
+			<div v-if="backups.length" class="mb-2 flex items-center align-middle justify-between">
 				<span class="text-2xl font-semibold text-contrast">Backups</span>
 				<ButtonStyled color="brand">
 					<button
@@ -53,7 +53,7 @@
 						key="empty"
 						class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
 					>
-						<template v-if="!backupsData">
+						<template v-if="query.isPending.value">
 							<SpinnerIcon class="animate-spin" />
 							Loading backups...
 						</template>
@@ -97,6 +97,7 @@
 										v-for="backup in group.backups"
 										:key="`backup-${backup.id}`"
 										:backup="backup"
+										:active-operation="activeOperationByBackupId.get(backup.id)"
 										:restore-disabled="backupRestoreDisabled"
 										:kyros-url="server.node?.instance"
 										:jwt="server.node?.token"
@@ -109,7 +110,6 @@
 											(skipConfirmation?: boolean) =>
 												skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
 										"
-										@retry="() => retryBackup(backup.id)"
 									/>
 								</TransitionGroup>
 							</div>
@@ -143,7 +143,7 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { CalendarIcon, DownloadIcon, IssuesIcon, PlusIcon, SpinnerIcon } from '@modrinth/assets'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import type { Component } from 'vue'
 import { computed, ref } from 'vue'
@@ -157,6 +157,7 @@ import BackupItem from '#ui/components/servers/backups/BackupItem.vue'
 import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
 import { useVIntl } from '#ui/composables/i18n'
+import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -167,8 +168,7 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { server, worldId, backupsState, markBackupCancelled, busyReasons } =
-	injectModrinthServerContext()
+const { server, worldId, busyReasons } = injectModrinthServerContext()
 
 const props = defineProps<{
 	isServerRunning: boolean
@@ -181,68 +181,42 @@ const serverId = route.params.id as string
 
 defineEmits(['onDownload'])
 
-const backupsQueryKey = ['backups', 'list', serverId]
-const {
-	data: backupsData,
-	error,
-	refetch,
-} = useQuery({
-	queryKey: backupsQueryKey,
-	queryFn: () => client.archon.backups_v1.list(serverId, worldId.value!),
-})
+const { backups, activeOperationByBackupId, invalidate, hasActiveCreate, query } =
+	useServerBackupsQueue(
+		computed(() => serverId),
+		worldId,
+	)
 
-const deleteMutation = useMutation({
+const error = computed(() => {
+	const err = query.error.value
+	return err instanceof Error ? err : err ? new Error(String(err)) : null
+})
+const refetch = () => query.refetch()
+
+/** Completed backups with a snapshot: queue API schedules deletion. */
+const deleteQueueMutation = useMutation({
 	mutationFn: (backupId: string) =>
-		client.archon.backups_v1.delete(serverId, worldId.value!, backupId),
-	onSuccess: (_data, backupId) => {
-		markBackupCancelled(backupId)
-		backupsState.delete(backupId)
-		queryClient.invalidateQueries({ queryKey: backupsQueryKey })
-		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+		client.archon.backups_queue_v1.delete(serverId, worldId.value!, backupId),
+	onSuccess: async () => {
+		await invalidate()
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	},
 })
 
-const retryMutation = useMutation({
+/** In-progress / incomplete backups: legacy cancel + delete path. */
+const deleteLegacyMutation = useMutation({
 	mutationFn: (backupId: string) =>
-		client.archon.backups_v1.retry(serverId, worldId.value!, backupId),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
-})
-
-const backups = computed(() => {
-	if (!backupsData.value) return []
-
-	const merged = backupsData.value.map((backup) => {
-		const progressState = backupsState.get(backup.id)
-		if (progressState) {
-			const hasOngoingTask = Object.values(progressState).some((task) => task?.state === 'ongoing')
-			const hasCompletedTask = Object.values(progressState).some((task) => task?.state === 'done')
-
-			return {
-				...backup,
-				task: {
-					...backup.task,
-					...progressState,
-				},
-				status: hasOngoingTask
-					? ('in_progress' as const)
-					: hasCompletedTask
-						? ('done' as const)
-						: backup.status,
-				ongoing: hasOngoingTask || (backup.ongoing && !hasCompletedTask),
-			}
-		}
-		return backup
-	})
-
-	return merged.sort((a, b) => {
-		return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-	})
+		client.archon.backups_v1.delete(serverId, worldId.value!, backupId),
+	onSuccess: async () => {
+		await invalidate()
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+	},
 })
 
 type BackupGroup = {
 	label: string
 	icon: Component | null
-	backups: Archon.Backups.v1.Backup[]
+	backups: Archon.BackupsQueue.v1.BackupQueueBackup[]
 }
 
 const groupedBackups = computed((): BackupGroup[] => {
@@ -251,7 +225,11 @@ const groupedBackups = computed((): BackupGroup[] => {
 	const now = dayjs()
 	const groups: BackupGroup[] = []
 
-	const addToGroup = (label: string, icon: Component | null, backup: Archon.Backups.v1.Backup) => {
+	const addToGroup = (
+		label: string,
+		icon: Component | null,
+		backup: Archon.BackupsQueue.v1.BackupQueueBackup,
+	) => {
 		let group = groups.find((g) => g.label === label)
 		if (!group) {
 			group = { label, icon, backups: [] }
@@ -302,7 +280,7 @@ const backupRestoreDisabled = computed(() => {
 const backupCreationDisabled = computed(() => {
 	const quota = server.value.backup_quota
 	if (quota !== undefined) {
-		const usedCount = backupsData.value?.length ?? server.value.used_backup_quota ?? 0
+		const usedCount = backups.value.length ?? server.value.used_backup_quota ?? 0
 		if (usedCount >= quota) {
 			return `All ${quota} of your backup slots are in use`
 		}
@@ -310,8 +288,7 @@ const backupCreationDisabled = computed(() => {
 	if (busyReasons.value.length > 0) {
 		return formatMessage(busyReasons.value[0].reason)
 	}
-	// also check for active backups, combining REST data with WS overlay
-	if (backups.value.some((b) => b.status === 'in_progress' || b.status === 'pending')) {
+	if (hasActiveCreate.value) {
 		return 'A backup is already in progress'
 	}
 	return undefined
@@ -326,15 +303,11 @@ function triggerDownloadAnimation() {
 	setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
 }
 
-const retryBackup = (backupId: string) => {
-	retryMutation.mutate(backupId, {
-		onError: (err) => {
-			console.error('Failed to retry backup:', err)
-		},
-	})
+function useQueueDeleteFor(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
+	return backup.status === 'done'
 }
 
-function deleteBackup(backup?: Archon.Backups.v1.Backup) {
+function deleteBackup(backup?: Archon.BackupsQueue.v1.BackupQueueBackup) {
 	if (!backup) {
 		addNotification({
 			type: 'error',
@@ -344,7 +317,9 @@ function deleteBackup(backup?: Archon.Backups.v1.Backup) {
 		return
 	}
 
-	deleteMutation.mutate(backup.id, {
+	const mutation = useQueueDeleteFor(backup) ? deleteQueueMutation : deleteLegacyMutation
+
+	mutation.mutate(backup.id, {
 		onError: (err) => {
 			const message = err instanceof Error ? err.message : String(err)
 			addNotification({

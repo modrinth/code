@@ -84,14 +84,14 @@ const queryClient = useQueryClient()
 const ctx = injectModrinthServerContext()
 
 const props = defineProps<{
-	backups?: Archon.Backups.v1.Backup[]
+	backups?: Archon.BackupsQueue.v1.BackupQueueBackup[]
 }>()
 
-const backupsQueryKey = ['backups', 'list', ctx.serverId]
+const backupsQueryKey = ['backups', 'queue', ctx.serverId]
 
 const createMutation = useMutation({
 	mutationFn: (name: string) =>
-		client.archon.backups_v1.create(ctx.serverId, ctx.worldId.value!, { name }),
+		client.archon.backups_queue_v1.create(ctx.serverId, ctx.worldId.value!, { name }),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 

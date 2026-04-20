@@ -2654,6 +2654,18 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "servers.backups.admonition.backup-cancelled.description": {
+    "defaultMessage": "Backup {backupName} was cancelled."
+  },
+  "servers.backups.admonition.backup-cancelled.title": {
+    "defaultMessage": "Backup cancelled"
+  },
+  "servers.backups.admonition.backup-completed.description": {
+    "defaultMessage": "{backupName} finished successfully."
+  },
+  "servers.backups.admonition.backup-completed.title": {
+    "defaultMessage": "Backup completed"
+  },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Something went wrong while creating {backupName}. Please try again or contact support if the issue continues."
   },
@@ -2675,6 +2687,12 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "Your backup"
   },
+  "servers.backups.admonition.restore-cancelled.description": {
+    "defaultMessage": "Restoring from {backupName} was cancelled."
+  },
+  "servers.backups.admonition.restore-cancelled.title": {
+    "defaultMessage": "Restore cancelled"
+  },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Something went wrong while restoring from {backupName}. Please try again or contact support if the issue continues."
   },
@@ -2692,6 +2710,12 @@
   },
   "servers.backups.admonition.restore-successful.title": {
     "defaultMessage": "Restoring from backup successful"
+  },
+  "servers.backups.admonition.restore-timed-out.description": {
+    "defaultMessage": "Restoring from {backupName} timed out. You can try again or contact support if the issue continues."
+  },
+  "servers.backups.admonition.restore-timed-out.title": {
+    "defaultMessage": "Restore timed out"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Restoring your server from {backupName}. This may take a couple of minutes."

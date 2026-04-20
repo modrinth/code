@@ -66,10 +66,10 @@ const queryClient = useQueryClient()
 const ctx = injectModrinthServerContext()
 
 const props = defineProps<{
-	backups?: Archon.Backups.v1.Backup[]
+	backups?: Archon.BackupsQueue.v1.BackupQueueBackup[]
 }>()
 
-const backupsQueryKey = ['backups', 'list', ctx.serverId]
+const backupsQueryKey = ['backups', 'queue', ctx.serverId]
 
 const renameMutation = useMutation({
 	mutationFn: ({ backupId, name }: { backupId: string; name: string }) =>
@@ -82,7 +82,7 @@ const input = ref<HTMLInputElement>()
 const backupName = ref('')
 const originalName = ref('')
 
-const currentBackup = ref<Archon.Backups.v1.Backup | null>(null)
+const currentBackup = ref<Archon.BackupsQueue.v1.BackupQueueBackup | null>(null)
 
 const trimmedName = computed(() => backupName.value.trim())
 
@@ -112,7 +112,7 @@ const focusInput = () => {
 	})
 }
 
-function show(backup: Archon.Backups.v1.Backup) {
+function show(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
 	currentBackup.value = backup
 	backupName.value = backup.name
 	originalName.value = backup.name

@@ -41,13 +41,13 @@ import NewModal from '../../modal/NewModal.vue'
 import BackupItem from './BackupItem.vue'
 
 const emit = defineEmits<{
-	(e: 'delete', backup: Archon.Backups.v1.Backup | undefined): void
+	(e: 'delete', backup: Archon.BackupsQueue.v1.BackupQueueBackup | undefined): void
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
-const currentBackup = ref<Archon.Backups.v1.Backup>()
+const currentBackup = ref<Archon.BackupsQueue.v1.BackupQueueBackup>()
 
-function show(backup: Archon.Backups.v1.Backup) {
+function show(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
 	currentBackup.value = backup
 	modal.value?.show()
 }

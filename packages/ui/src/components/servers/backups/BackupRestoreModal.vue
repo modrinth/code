@@ -56,18 +56,24 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const ctx = injectModrinthServerContext()
 
-const backupsQueryKey = ['backups', 'list', ctx.serverId]
+const backupsQueryKey = ['backups', 'queue', ctx.serverId]
+
+function safetyBackupName(backupName: string) {
+	const base = `Before restoring "${backupName}"`
+	return base.slice(0, 92)
+}
+
 const restoreMutation = useMutation({
-	mutationFn: (backupId: string) =>
-		client.archon.backups_v1.restore(ctx.serverId, ctx.worldId.value!, backupId),
+	mutationFn: ({ backupId, name }: { backupId: string; name: string }) =>
+		client.archon.backups_queue_v1.restore(ctx.serverId, ctx.worldId.value!, backupId, { name }),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
 const modal = ref<InstanceType<typeof NewModal>>()
-const currentBackup = ref<Archon.Backups.v1.Backup | null>(null)
+const currentBackup = ref<Archon.BackupsQueue.v1.BackupQueueBackup | null>(null)
 const isRestoring = ref(false)
 
-function show(backup: Archon.Backups.v1.Backup) {
+function show(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
 	currentBackup.value = backup
 	modal.value?.show()
 }
@@ -85,22 +91,24 @@ const restoreBackup = () => {
 	}
 
 	isRestoring.value = true
-	restoreMutation.mutate(currentBackup.value.id, {
-		onSuccess: () => {
-			// Optimistically update backupsState to show restore in progress immediately
-			ctx.backupsState.set(currentBackup.value!.id, {
-				restore: { progress: 0, state: 'ongoing' },
-			})
-			modal.value?.hide()
+	restoreMutation.mutate(
+		{
+			backupId: currentBackup.value.id,
+			name: safetyBackupName(currentBackup.value.name),
 		},
-		onError: (error) => {
-			const message = error instanceof Error ? error.message : String(error)
-			addNotification({ type: 'error', title: 'Failed to restore backup', text: message })
+		{
+			onSuccess: () => {
+				modal.value?.hide()
+			},
+			onError: (error) => {
+				const message = error instanceof Error ? error.message : String(error)
+				addNotification({ type: 'error', title: 'Failed to restore backup', text: message })
+			},
+			onSettled: () => {
+				isRestoring.value = false
+			},
 		},
-		onSettled: () => {
-			isRestoring.value = false
-		},
-	})
+	)
 }
 
 defineExpose({

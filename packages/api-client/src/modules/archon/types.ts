@@ -556,7 +556,14 @@ export namespace Archon {
 				token: string
 			}
 
-			export type BackupState = 'ongoing' | 'done' | 'failed' | 'cancelled' | 'unchanged'
+			export type BackupState =
+				| 'pending'
+				| 'ongoing'
+				| 'done'
+				| 'failed'
+				| 'cancelled'
+				| 'unchanged'
+				| 'damaged'
 			export type BackupTask = 'file' | 'create' | 'restore'
 
 			export type WSBackupProgressEvent = {
@@ -565,6 +572,8 @@ export namespace Archon {
 				task: BackupTask
 				state: BackupState
 				progress: number
+				start_time?: number | null
+				finish_time?: number | null
 			}
 
 			export type WSLogEvent = {
