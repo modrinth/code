@@ -95,12 +95,23 @@ async function handleDismiss(item: AdmonitionEntry) {
 		await invalidate()
 		return
 	}
-	const call =
-		item.type === 'create'
-			? client.archon.backups_queue_v1.ackCreate
-			: client.archon.backups_queue_v1.ackRestore
 	try {
-		await call(serverId, worldId.value!, item.operationId)
+		if (item.type === 'create') {
+			await client.archon.backups_queue_v1.ackCreate(
+				serverId,
+				worldId.value!,
+				item.operationId,
+			)
+		} else {
+			await client.archon.backups_queue_v1.ackRestore(
+				serverId,
+				worldId.value!,
+				item.operationId,
+			)
+		}
+	} catch (err) {
+		dismissedIds.delete(item.key)
+		console.error('Failed to acknowledge backup operation', err)
 	} finally {
 		await invalidate()
 	}
