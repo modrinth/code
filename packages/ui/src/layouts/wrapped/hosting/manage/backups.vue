@@ -107,7 +107,9 @@
 					<div v-else class="flex flex-col gap-1.5">
 						<template v-for="group in groupedBackups" :key="group.label">
 							<div class="flex items-center gap-2">
-								<component :is="group.icon" v-if="group.icon" class="size-6 text-secondary" />
+								<div class="flex w-5 shrink-0 justify-center">
+									<component :is="group.icon" v-if="group.icon" class="size-5 text-secondary" />
+								</div>
 								<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
 							</div>
 
@@ -115,7 +117,7 @@
 								<div
 									v-for="backup in group.backups"
 									:key="`backup-${backup.id}`"
-									class="flex gap-2 py-1.5"
+									class="flex gap-2"
 								>
 									<div class="flex w-5 flex-col items-center">
 										<div class="w-px flex-1 bg-surface-5" />
@@ -128,7 +130,7 @@
 										<div class="w-px flex-1 bg-surface-5" />
 									</div>
 									<BackupItem
-										class="min-w-0 flex-1"
+										class="my-1.5 min-w-0 flex-1"
 										:backup="backup"
 										:selected="selectedIds.has(backup.id)"
 										:active-operation="activeOperationByBackupId.get(backup.id)"
