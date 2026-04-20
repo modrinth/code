@@ -181,18 +181,6 @@
 					</div>
 
 					<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
-						<ButtonStyled type="transparent">
-							<button
-								type="button"
-								class="cq-show-icon"
-								:disabled="!canBulkDownload"
-								@click="bulkDownload"
-							>
-								<DownloadIcon />
-								<span class="bar-label">{{ formatMessage(commonMessages.downloadButton) }}</span>
-							</button>
-						</ButtonStyled>
-						<div class="mx-1 h-6 w-px bg-surface-5" />
 						<ButtonStyled type="transparent" color="red" hover-color-fill="background">
 							<button type="button" @click="confirmBulkDelete">
 								<TrashIcon />
@@ -201,25 +189,16 @@
 						</ButtonStyled>
 					</div>
 
-					<div v-else class="ml-auto flex items-center">
+					<div v-else class="ml-auto flex items-center" aria-live="polite">
 						<span class="px-4 py-2.5 text-base font-semibold tabular-nums text-secondary">
-							{{
-								formatMessage(messages.bulkDeleting, {
-									progress: bulkProgress,
-									total: bulkTotal,
-								})
-							}}
+							{{ formatMessage(messages.bulkDeleting, { total: bulkTotal }) }}
 						</span>
 					</div>
 
 					<div v-if="isBulkOperating" class="absolute bottom-0 left-0 right-0 h-1">
 						<div
-							class="h-full rounded-l-full bg-brand transition-[width] duration-200 ease-in-out"
-							:style="{
-								width: `${bulkTotal > 0 ? (bulkProgress / bulkTotal) * 100 : 0}%`,
-							}"
+							class="animate-indeterminate h-full rounded-l-full bg-brand"
 							role="progressbar"
-							:aria-valuenow="bulkProgress"
 							:aria-valuemin="0"
 							:aria-valuemax="bulkTotal"
 							style="box-shadow: 0px -2px 4px 0px rgba(27, 217, 106, 0.1)"
@@ -334,7 +313,7 @@ const messages = defineMessages({
 	},
 	bulkDeleting: {
 		id: 'servers.backups.bulk-bar.deleting',
-		defaultMessage: 'Deleting {progress}/{total} backups...',
+		defaultMessage: 'Deleting {total, plural, one {# backup} other {# backups}}...',
 	},
 })
 
@@ -408,6 +387,16 @@ const deleteLegacyMutation = useMutation({
 	},
 })
 
+/** Bulk delete via queue API — handles both completed and in-progress backups (cancels the latter). */
+const deleteManyMutation = useMutation({
+	mutationFn: (backupIds: string[]) =>
+		client.archon.backups_queue_v1.deleteMany(serverId, worldId.value!, backupIds),
+	onSuccess: async () => {
+		await invalidate()
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+	},
+})
+
 type BackupGroup = {
 	label: string
 	icon: Component | null
@@ -468,9 +457,7 @@ const {
 	selectedBackups,
 } = useBackupsSelection(filteredBackups, displayOrderedBackups)
 
-const canBulkDownload = computed(() => selectedBackups.value.some((b) => b.status === 'done'))
-
-const { isBulkOperating, bulkProgress, bulkTotal, runBulk } = useBulkOperation()
+const { isBulkOperating, bulkTotal } = useBulkOperation()
 
 const overTheTopDownloadAnimation = ref()
 const createBackupModal = ref<InstanceType<typeof BackupCreateModal>>()
@@ -513,57 +500,29 @@ function clearBackupFilters() {
 	selectedFilters.value = []
 }
 
-function bulkDownload() {
-	const kyros = server.value.node?.instance
-	const jwt = server.value.node?.token
-	if (!kyros || !jwt) return
-
-	const toDownload = selectedBackups.value.filter((b) => b.status === 'done')
-	if (!toDownload.length) return
-
-	for (const backup of toDownload) {
-		const url = `https://${kyros}/modrinth/v0/backups/${backup.id}/download?auth=${jwt}`
-		const iframe = document.createElement('iframe')
-		iframe.style.display = 'none'
-		iframe.src = url
-		document.body.appendChild(iframe)
-		setTimeout(() => iframe.remove(), 60_000)
-	}
-	triggerDownloadAnimation()
-	deselectAll()
-}
-
 function confirmBulkDelete() {
 	if (!selectedBackups.value.length) return
 	deleteBackupModal.value?.showBulk(selectedBackups.value)
 }
 
 async function bulkDelete(toRemove: Archon.BackupsQueue.v1.BackupQueueBackup[]) {
-	const failures: { name: string; message: string }[] = []
+	if (!toRemove.length) return
 
-	await runBulk(
-		'delete',
-		toRemove,
-		async (backup) => {
-			const mutation = useQueueDeleteFor(backup) ? deleteQueueMutation : deleteLegacyMutation
-			try {
-				await mutation.mutateAsync(backup.id)
-			} catch (err) {
-				failures.push({
-					name: backup.name,
-					message: err instanceof Error ? err.message : String(err),
-				})
-			}
-		},
-		{ delayMs: 0, onComplete: deselectAll },
-	)
+	isBulkOperating.value = true
+	bulkTotal.value = toRemove.length
 
-	if (failures.length) {
+	try {
+		await deleteManyMutation.mutateAsync(toRemove.map((b) => b.id))
+	} catch (err) {
 		addNotification({
 			type: 'error',
-			title: `Failed to delete ${failures.length} backup${failures.length === 1 ? '' : 's'}`,
-			text: failures.map((f) => `${f.name}: ${f.message}`).join('\n'),
+			title: `Failed to delete ${toRemove.length} backup${toRemove.length === 1 ? '' : 's'}`,
+			text: err instanceof Error ? err.message : String(err),
 		})
+	} finally {
+		deselectAll()
+		isBulkOperating.value = false
+		bulkTotal.value = 0
 	}
 }
 
@@ -632,6 +591,21 @@ function deleteBackup(backup?: Archon.BackupsQueue.v1.BackupQueueBackup) {
 
 .list-move {
 	transition: transform 200ms ease-in-out;
+}
+
+@keyframes indeterminate {
+	0% {
+		width: 20%;
+		margin-left: -20%;
+	}
+	100% {
+		width: 60%;
+		margin-left: 100%;
+	}
+}
+
+.animate-indeterminate {
+	animation: indeterminate 1.5s ease-in-out infinite;
 }
 
 .over-the-top-download-animation {

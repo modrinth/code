@@ -511,6 +511,10 @@ export namespace Archon {
 				id: string
 			}
 
+			export type DeleteManyBackupRequest = {
+				backup_ids: string[]
+			}
+
 			export type ActiveOperation = {
 				backup_id: string
 				operation_type: BackupQueueOperationType
