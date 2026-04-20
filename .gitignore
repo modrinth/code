@@ -81,3 +81,6 @@ apps/frontend/src/public/robots.txt
 
 # Oh My Code
 .omc/
+
+# Local dry-run output for scripts/build-theseus-release-notes.mjs
+/test_result.md
