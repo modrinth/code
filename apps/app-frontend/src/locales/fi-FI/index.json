@@ -5,8 +5,53 @@
   "app.auth-servers.unreachable.header": {
     "message": "Todennuspalvelimiin ei saada yhteyttä"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Lisää palvelin instanssiin"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Lisää palvelimia instanssiisi"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Lisää instanssiin"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Lisää instanssiin {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Lisätty"
+  },
+  "app.browse.already-added": {
+    "message": "On jo asennettu"
+  },
+  "app.browse.discover-content": {
+    "message": "Löydä sisältöä"
+  },
+  "app.browse.discover-servers": {
+    "message": "Löydä palvelimia"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Piilota lisätyt palvelimet"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Piilota asennettu sisältö"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Lataa sisältöä instanssiin"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Lisää modipaketin kuvaus..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Vie"
+  },
+  "app.export-modal.header": {
+    "message": "Vie modipaketti"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Modipaketin nimi"
+  },
   "app.export-modal.modpack-name-placeholder": {
-    "message": "Modpack nimi"
+    "message": "Modipaketin nimi"
   },
   "app.export-modal.select-files-label": {
     "message": "Valitse tiedostot ja kansiot pakettiin"
@@ -17,11 +62,89 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Kaikki sinun instanssisi data poistetaan pysyvästi, sisältäen maailmasi, konfiguraatiosi ja asennetun sisällön."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Tätä toimintoa ei voi peruuttaa"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Poista instannsi"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Poista instanssi"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Tämä modipaketti on jo asennettu instanssiin <bold>{instanceName}</bold>. Oletko varma että haluat kopioida sen?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Luo"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modipaketti on jo asennettu"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instanssi"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projekti"
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" lisättiin"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} projektia lisättiin"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Tsekkaa projektit joita käytän minun modipaketissani!"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Onnistuneesti ladattu"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Lisää palvelin"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Selaa palvelimia"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' tullaan **poistamaan pysyvästi**, eikä tule olemaan mitään tapaa palauttaa sitä."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Oletko varma että haluat pysyvästi poistaa tämän maailman?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modattu"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline-tilassa"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online-tilassa"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Lisää palvelin tai selaa aloittaaksesi"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Ei palvelimia tai maailmoja lisättynä"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' tullaan poistamaan sinun listaltasi, mukaan lukien pelin sisällä, eikä tule olemaan mitään tapaa palauttaa sitä."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) tullaan poistamaan sinun listaltasi, mukaan lukien pelin sisällä, eikä tule olemaan mitään tapaa palauttaa sitä."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Oletko varma että haluat poistaa {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Hae {count} maailmasta..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "tämän palvelimen"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Sisältö vaaditaan"
@@ -33,7 +156,7 @@
     "message": "Asenna"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": "one {{count, plural, one {# mod} other {# modia}}"
+    "message": "{count, plural, one {# mod} other {# modia}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Vaadittu modipaketti"
@@ -124,6 +247,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Lataa uudelleen asentaaksesi päivityksen"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Valitse vaihtoehto"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Yhteensopimaton versio {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Ei pelattu vielä"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline-tilassa"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} paikalla"
   },
   "friends.action.add-friend": {
     "message": "Lisää ystävä"
@@ -223,6 +364,12 @@
   },
   "instance.edit-world.title": {
     "message": "Muokkaa maailmaa"
+  },
+  "instance.files.adding-files": {
+    "message": "Lisätään tiedostoja ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Tallenna nimellä..."
   },
   "instance.server-modal.address": {
     "message": "Osoite"
@@ -441,7 +588,7 @@
     "message": "Palvelimen tarjoama"
   },
   "search.filter.locked.server-environment.title": {
-    "message": "Voit lisätä vain paikallisia modeja palvelinasennukseen"
+    "message": "Voit lisätä vain paikallisia modeja palvelin instanssiin"
   },
   "search.filter.locked.server-game-version.title": {
     "message": "Peliversio on palvelimen tarjoama"

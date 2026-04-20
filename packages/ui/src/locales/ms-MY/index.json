@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Lihat analitik"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Gagal memuat tetapan pelayan"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -40,6 +43,54 @@
   },
   "badge.new": {
     "defaultMessage": "Baharu"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Batal"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} CPU Berkongsi"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Anda akan melanggan semula pelayan <server-name>{serverName}</server-name>. Langganan anda akan diaktifkan semula dan pelayan anda akan terus berjalan tanpa gangguan."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Tidak boleh melanggan semula, gagal memuatkan butiran langganan."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Ralat"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Gagal memuat butiran langganan."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 hari"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/bulan"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/3 bulan"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/tahun"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Caj anda yang seterusnya akan dikenakan pada <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Pelan"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "RAM {ramGb} GB"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Langgan semula"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "Penyimpanan {storageGb} GB"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Langgan semula ke Pelayan"
   },
   "button.accept": {
     "defaultMessage": "Terima"
@@ -250,6 +301,9 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Padam {itemType}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {Penurunan taraf} other {Pengemaskinian}} boleh menyebabkan masalah keserasian. Mod atau kandungan yang anda tambahkan di atas pek mod akan disimpan, tetapi mungkin tidak serasi dengan versi baharu."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Amaran {action, select, downgrade {penurunan taraf} other {pengemaskinian}}"
@@ -494,11 +548,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Fail disimpan"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Tutup"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Cari"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} daripada {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Padanan seterusnya"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Tiada hasil"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Padanan sebelumnya"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Togol penggantian"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "URL fail log anda telah disalin ke papan keratan anda."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "URL log disalin"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Gantikan"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Gantikan Semua"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Gantikan dengan"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "Tidak dapat menyimpan fail."
@@ -557,9 +641,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Pengekstrakan dimulakan"
   },
-  "files.layout.loading": {
-    "defaultMessage": "Sedang memuat fail..."
-  },
   "files.layout.selected-count": {
     "defaultMessage": "{count} dipilih"
   },
@@ -589,6 +670,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "Navigasi fail"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Cari dalam fail"
   },
   "files.navbar.home": {
     "defaultMessage": "Laman utama"
@@ -895,6 +979,60 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Gagal memuat naik fail"
+  },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "Gagal menukar versi pek mod"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "Gagal memuat versi"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "Gagal memasang semula pek mod"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "Gagal membaiki pelayan"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Gagal menetapkan semula pelayan kepada proses penetapan awal"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "Gagal menyimpan tetapan pemasangan"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "Gagal menyahpaut pek mod"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "Versi {loader, select, null {pemuat} other {{loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "Pemasangan pelayan anda telah dibaiki."
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "Pembaikan selesai"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Tetap semula pelayan"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Mengalih keluar semua data pada pelayan anda, termasuk dunia, mod dan fail konfigurasi anda. Sandaran akan kekal dan boleh dipulihkan."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Tetap semula ke proses penetapan awal"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Pilihan ini akan mengembalikan pelayan ke proses penetapan awal supaya penetapan boleh diselesaikan semula. Adakah anda pasti mahu meneruskan?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "Tetap semula ke proses penetapan awal"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Pelayan telah dikembalikan ke aliran penetapan awal."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Pelayan ditetapkan semula ke proses penetapan awal"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Pilihan sokongan"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Boleh memecut sehingga {cpus} CPU"
@@ -1213,6 +1351,9 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "Mod ini bergantung pada mod bahagian pelanggan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "Ini adalah sebuah mod bahagian pelanggan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
   },
   "label.client-retained-warning": {
     "defaultMessage": "Ini ialah mod bahagian pelanggan yang dipasang sebagai kebergantungan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
@@ -2576,6 +2717,234 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Pulihkan"
   },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Penciptaan sandaran sedang dijalankan"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Pemulihan sandaran sedang dijalankan"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "Pelayan sedang dipasang"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "Penyegerakan kandungan sedang dijalankan"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "Sudah mempunyai pelayan?"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Ketahui lebih lanjut tentang Modrinth Hosting"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "Pelayan baharu"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "Pasang mod, jemput rakan dan main bersama-sama, semuanya dari Modrinth App."
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "Belum ada pelayan"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "Pilih mod kegemaran anda dan kami uruskan selebihnya."
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "Pemasangan mod sekali klik"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "Jemput rakan-rakan dan sediakan mereka terus dalam Modrinth App."
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "Main bersama rakan"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Daftar masuk"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "Sediakan pelayan anda seperti dunia ekapemain."
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "Persediaan yang mudah"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Disalin"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "Salin kod ke papan keratan"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "Salin ID"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "Muat turun sandaran terkini"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "Urus pengebilan"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Baharu"
+  },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Fail anda akan disimpan selama <days-remaining>{daysRemaining} {daysRemaining, plural, other {hari} } lagi</days-remaining>. Hubungi sokongan untuk memuat turun fail sebelum ia dipadamkan. "
+  },
+  "servers.listing.notice.files-preserved-after-cancellation": {
+    "defaultMessage": "Fail anda akan disimpan selama 30 hari selepas pembatalan."
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "Pelayan anda telah digantung melalui tindakan penyederhanaan. "
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Pelayan anda akan {verb} ke Pelan {planSize} pada <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.provisioning": {
+    "defaultMessage": "Sila tunggu sementara kami menyediakan pelayan anda. Ini boleh mengambil masa sehingga 10 minit."
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "Langganan anda telah dibatalkan."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "Langganan anda telah dibatalkan pada <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed": {
+    "defaultMessage": "Langganan anda telah dibatalkan kerana kegagalan pembayaran."
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
+    "defaultMessage": "Langganan anda telah dibatalkan pada <date>{formattedDate}</date> kerana kegagalan pembayaran. "
+  },
+  "servers.listing.notice.subscription-set-to-cancel": {
+    "defaultMessage": "Langganan anda ditetapkan untuk dibatalkan."
+  },
+  "servers.listing.notice.subscription-set-to-cancel-on-date": {
+    "defaultMessage": "Langganan anda ditetapkan untuk dibatalkan pada <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.suspended": {
+    "defaultMessage": "Pelayan anda telah digantung. Sila hubungi Sokongan Modrinth untuk maklumat lanjut."
+  },
+  "servers.listing.notice.upgrading": {
+    "defaultMessage": "Perkakasan pelayan anda sedang dinaik taraf dan akan kembali beroperasi tidak lama lagi."
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "Langgan semula"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "Ikon pelayan"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Sokongan"
+  },
+  "servers.listing.using-project-label": {
+    "defaultMessage": "Menggunakan {projectTitle}"
+  },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "Sedang menyemak pelayan baharu..."
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "Muat naik fail sedang dijalankan. Meninggalkan laman ini akan membatalkan muat naik."
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "Muat naik sedang berjalan"
+  },
+  "servers.manage.contact-support-button": {
+    "defaultMessage": "Hubungi Sokongan Modrinth"
+  },
+  "servers.manage.error.alert-notice": {
+    "defaultMessage": "Sistem kami akan memaklumkan pasukan kami secara automatik apabila terdapat masalah. Kami sedang berusaha untuk membawa mereka kembali dalam talian."
+  },
+  "servers.manage.error.description": {
+    "defaultMessage": "Kami mungkin menghadapi masalah sementara dengan pelayan kami."
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "Butiran ralat:"
+  },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "Jika anda baru-baru ini membeli pelayan Modrinth Hosting anda, ia sedang berada dalam barisan dan akan muncul di sini sebaik sahaja ia siap. <warning>Jangan cuba membeli pelayan baharu.</warning>"
+  },
+  "servers.manage.error.support-notice": {
+    "defaultMessage": "Jika anda memerlukan sokongan peribadi mengenai status pelayan anda, sila hubungi Sokongan Modrinth."
+  },
+  "servers.manage.error.title": {
+    "defaultMessage": "Pelayan tidak dapat dimuatkan"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "Sebuah ralat telah berlaku"
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "Pelayan baharu"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "Tiada pelayan dijumpai."
+  },
+  "servers.manage.purchase-unavailable.text": {
+    "defaultMessage": "Maklumat pembayaran masih sedang dimuatkan. Laman pembayaran akan dibuka sebaik sahaja ia bersedia."
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "Pembelian tidak tersedia"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "Muat semula"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "Sebuah ralat telah berlaku semasa melanggan semula pelayan Modrinth anda."
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "Ralat semasa melanggan semula"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "Jika pelayan sedang dibatalkan, percubaan pengecasan lain mungkin mengambil masa sehingga 10 minit."
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "Permintaan langganan semula telah dihantar"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "Langganan pelayan berjaya dilanggan semula"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "Berjaya"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Cari {count} {count, plural, other {pelayan}}..."
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "Mereka kini boleh ditemui di sini!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Jangan tunjukkan lagi"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Tetapan pelayan anda telah dipindahkan"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "Tinggal <days-count>{days}</days-count> {days, plural, other {hari}} <hours-count>{hours}</hours-count> {hours, plural, other {jam}} <minutes-count>{minutes}</minutes-count> {minutes, plural, other {minit}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {saat}}..."
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "Pelayan baharu"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "Percubaan pelayan Medal anda telah tamat dan pelayan anda telah digantung. Sila naik taraf untuk terus menggunakan pelayan anda."
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "Pelayan anda telah digantung. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan Modrinth untuk maklumat lanjut."
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "Pelayan anda telah digantung: {reason}. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan Modrinth untuk maklumat lanjut."
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "Perkakasan pelayan anda sedang dinaik taraf dan akan kembali beroperasi tidak lama lagi."
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "Ikon pelayan"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "Naik taraf"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "Menggunakan {projectTitle}"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Ketepikan"
   },
@@ -2603,6 +2972,12 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Tidak boleh diketepikan"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "Pembelian Modrinth Hosting anda telah berjaya diselesaikan."
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "Pembelian berjaya"
+  },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "Anda belum akan dicaj lagi."
   },
@@ -2612,14 +2987,26 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Kaedah pembayaran"
   },
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "Tersedia di Amerika Utara, Eropah dan Asia Tenggara."
+  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Pilih pelan tersuai dengan hanya spesifikasi yang anda perlukan."
+  },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "Tahu apa yang anda perlukan dengan pasti?"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Mari mulakan"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "Besar"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "Sesuai untuk 15–25 pemain, pek mod atau pengubahsuaian yang berat."
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "Sederhana"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "Bagus untuk 6–15 pemain dan berbilang mod."
@@ -2630,11 +3017,17 @@
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Pilih Pelan"
   },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "Kecil"
+  },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Sesuai untuk 1–5 rakan dengan beberapa mod ringan."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Pelan"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "Pelan semasa anda"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Rantau"

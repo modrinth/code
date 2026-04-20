@@ -80,115 +80,105 @@
 			</div>
 		</div>
 
-		<Transition v-else name="fade" mode="out-in">
+		<template v-else>
 			<div
-				v-if="(isLoading || !authReady) && !serverResponse"
-				key="loading"
-				class="flex flex-col gap-4 py-8"
+				class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
 			>
-				<div class="mb-4 text-center">
-					<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
-					<p class="m-0 mt-2 text-secondary">{{ formatMessage(messages.loadingServers) }}</p>
-				</div>
-				<div
-					v-for="i in 3"
-					:key="i"
-					class="flex animate-pulse flex-row items-center gap-4 overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4"
-				>
-					<div class="size-16 rounded-xl bg-button-bg"></div>
-					<div class="flex flex-1 flex-col gap-2">
-						<div class="h-6 w-48 rounded bg-button-bg"></div>
-						<div class="h-4 w-64 rounded bg-button-bg opacity-75"></div>
-					</div>
+				<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">
+					{{ formatMessage(messages.serversTitle) }}
+				</h1>
+				<div class="flex w-full flex-row items-center justify-end gap-2 md:mb-0">
+					<StyledInput
+						id="search"
+						v-model="searchInput"
+						:icon="SearchIcon"
+						type="search"
+						name="search"
+						autocomplete="off"
+						:disabled="showServersListLoading"
+						:placeholder="formatMessage(messages.searchPlaceholder, { count: filteredData.length })"
+						wrapper-class="w-full md:w-72"
+					/>
+					<ButtonStyled type="standard" color="brand">
+						<button @click="openPurchaseModal">
+							<PlusIcon />
+							{{ formatMessage(messages.newServerButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 
-			<div
-				v-else-if="serverList.length === 0 && !isPollingForNewServers"
-				key="empty"
-				class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
-			>
-				<ServerListEmpty
-					:logged-in="loggedIn"
-					@click-new-server="openPurchaseModal"
-					@click-sign-in="handleSignIn"
-				/>
-			</div>
-
-			<div v-else key="list">
-				<div
-					class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
-				>
-					<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">
-						{{ formatMessage(messages.serversTitle) }}
-					</h1>
-					<div class="flex w-full flex-row items-center justify-end gap-2 md:mb-0">
-						<StyledInput
-							id="search"
-							v-model="searchInput"
-							:icon="SearchIcon"
-							type="search"
-							name="search"
-							autocomplete="off"
-							:placeholder="
-								formatMessage(messages.searchPlaceholder, { count: filteredData.length })
-							"
-							wrapper-class="w-full md:w-72"
-						/>
-						<ButtonStyled type="standard" color="brand">
-							<button @click="openPurchaseModal">
-								<PlusIcon />
-								{{ formatMessage(messages.newServerButton) }}
-							</button>
-						</ButtonStyled>
-					</div>
-				</div>
-
-				<Transition
-					enter-active-class="transition-all duration-300 ease-out"
-					enter-from-class="opacity-0 max-h-0"
-					enter-to-class="opacity-100 max-h-20"
-					leave-active-class="transition-all duration-200 ease-in"
-					leave-from-class="opacity-100 max-h-20"
-					leave-to-class="opacity-0 max-h-0"
-				>
+			<Transition name="fade" mode="out-in">
+				<div v-if="showServersListLoading" key="loading" class="flex flex-col gap-3">
 					<div
-						v-if="showPollingForNewServers"
-						class="bg-brand/10 my-4 flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm text-brand"
+						v-for="i in 3"
+						:key="i"
+						class="flex animate-pulse flex-row items-center gap-4 overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4"
 					>
-						<LoaderCircleIcon class="size-4 animate-spin" />
-						<span>{{ formatMessage(messages.checkingForNewServers) }}</span>
+						<div class="size-16 rounded-xl bg-button-bg"></div>
+						<div class="flex flex-1 flex-col gap-2">
+							<div class="h-6 w-48 rounded bg-button-bg"></div>
+							<div class="h-4 w-64 rounded bg-button-bg opacity-75"></div>
+						</div>
 					</div>
-				</Transition>
-
-				<TransitionGroup
-					v-if="filteredData.length > 0 || isPollingForNewServers"
-					name="list"
-					tag="ul"
-					class="m-0 flex flex-col gap-3 p-0"
-				>
-					<MedalServerListing
-						v-for="server in filteredData.filter((s) => s.is_medal)"
-						:key="server.server_id"
-						v-bind="server"
-						@upgrade="openPurchaseModal"
-					/>
-					<ServerListing
-						v-for="server in filteredData.filter((s) => !s.is_medal)"
-						:key="server.server_id"
-						v-bind="server"
-						:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
-						:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
-						:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
-						:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
-					/>
-				</TransitionGroup>
-				<div v-else-if="isLoading" class="flex h-full items-center justify-center">
-					<p class="text-contrast"><LoaderCircleIcon class="size-5 animate-spin" /></p>
 				</div>
-				<div v-else>{{ formatMessage(messages.noServersFound) }}</div>
-			</div>
-		</Transition>
+
+				<div
+					v-else-if="serverList.length === 0 && !isPollingForNewServers"
+					key="empty"
+					class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
+				>
+					<ServerListEmpty
+						:logged-in="loggedIn"
+						@click-new-server="openPurchaseModal"
+						@click-sign-in="handleSignIn"
+					/>
+				</div>
+
+				<div v-else key="list">
+					<Transition
+						enter-active-class="transition-all duration-300 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-20"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-20"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showPollingForNewServers"
+							class="bg-brand/10 my-4 flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm text-brand"
+						>
+							<LoaderCircleIcon class="size-4 animate-spin" />
+							<span>{{ formatMessage(messages.checkingForNewServers) }}</span>
+						</div>
+					</Transition>
+
+					<TransitionGroup
+						v-if="filteredData.length > 0 || isPollingForNewServers"
+						name="list"
+						tag="ul"
+						class="m-0 flex flex-col gap-3 p-0"
+					>
+						<MedalServerListing
+							v-for="server in filteredData.filter((s) => s.is_medal)"
+							:key="server.server_id"
+							v-bind="server"
+							@upgrade="openPurchaseModal"
+						/>
+						<ServerListing
+							v-for="server in filteredData.filter((s) => !s.is_medal)"
+							:key="server.server_id"
+							v-bind="server"
+							:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
+							:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
+							:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
+							:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
+						/>
+					</TransitionGroup>
+					<div v-else>{{ formatMessage(messages.noServersFound) }}</div>
+				</div>
+			</Transition>
+		</template>
 	</div>
 </template>
 
@@ -236,7 +226,6 @@ const route = useRoute()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const loggedIn = computed(() => !!auth.user.value)
-const authReady = computed(() => auth.isReady?.value ?? true)
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -266,10 +255,6 @@ const messages = defineMessages({
 		defaultMessage: 'Contact Modrinth Support',
 	},
 	reloadButton: { id: 'servers.manage.reload-button', defaultMessage: 'Reload' },
-	loadingServers: {
-		id: 'servers.manage.loading-servers',
-		defaultMessage: 'Loading your servers...',
-	},
 	serversTitle: { id: 'servers.manage.servers-title', defaultMessage: 'Modrinth Hosting' },
 	searchPlaceholder: {
 		id: 'servers.manage.search-placeholder',
@@ -509,7 +494,7 @@ function runPingTest(region: Archon.Servers.v1.Region, index = 1) {
 const {
 	data: serverResponse,
 	error: fetchError,
-	isLoading,
+	isPending: serversQueryPending,
 } = useQuery({
 	queryKey: ['servers'],
 	queryFn: async () => {
@@ -555,6 +540,9 @@ const {
 })
 
 const hasError = computed(() => loggedIn.value && !!fetchError.value)
+
+/** Logged-in initial fetch: avoid treating "no data yet" as an empty server list. */
+const showServersListLoading = computed(() => loggedIn.value && serversQueryPending.value)
 
 const serverList = computed<Archon.Servers.v0.Server[]>(() => {
 	if (!loggedIn.value || !serverResponse.value) return []

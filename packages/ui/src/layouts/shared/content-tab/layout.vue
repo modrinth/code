@@ -15,7 +15,6 @@ import {
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
-	SpinnerIcon,
 	TextCursorInputIcon,
 	TrashIcon,
 	UploadIcon,
@@ -504,304 +503,300 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 <template>
 	<div class="flex flex-col gap-4 pb-6">
-		<div
-			v-if="ctx.loading.value"
-			role="status"
-			aria-live="polite"
-			class="flex min-h-[50vh] w-full flex-col items-center justify-center gap-2 text-center text-secondary"
-		>
-			<SpinnerIcon class="animate-spin" />
-			{{ formatMessage(messages.loadingContent) }}
-		</div>
-
-		<div
-			v-else-if="ctx.error.value"
-			class="flex w-full flex-col items-center justify-center gap-4 p-4"
-		>
-			<div class="universal-card flex flex-col items-center gap-4 p-6">
-				<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
-				<p class="text-secondary">{{ ctx.error.value.message }}</p>
-				<ButtonStyled color="brand">
-					<button @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</button>
-				</ButtonStyled>
-			</div>
-		</div>
-
-		<template v-else>
-			<Admonition v-if="ctx.isBusy.value && ctx.busyMessage?.value" type="warning">
-				<template #header>{{ ctx.busyMessage.value }}</template>
-				{{ formatMessage(messages.busyDescription) }}
-			</Admonition>
-
-			<ContentModpackCard
-				v-if="ctx.modpack.value"
-				:project="ctx.modpack.value.project"
-				:project-link="ctx.modpack.value.projectLink"
-				:version="ctx.modpack.value.version"
-				:version-link="ctx.modpack.value.versionLink"
-				:owner="ctx.modpack.value.owner"
-				:categories="ctx.modpack.value.categories"
-				:has-update="ctx.modpack.value.hasUpdate"
-				:disabled="ctx.modpack.value.disabled || ctx.isBusy.value"
-				:disabled-text="
-					ctx.modpack.value.disabledText ??
-					ctx.busyMessage?.value ??
-					(ctx.isBusy.value ? formatMessage(messages.pleaseWait) : undefined)
-				"
-				:show-content-hint="
-					!!(ctx.showContentHint?.value && ctx.modpack.value && ctx.items.value.length === 0)
-				"
-				v-on="{
-					...(ctx.updateModpack ? { update: () => ctx.updateModpack?.() } : {}),
-					...(ctx.viewModpackContent ? { content: () => ctx.viewModpackContent?.() } : {}),
-					...(ctx.unlinkModpack ? { unlink: () => confirmUnlinkModal?.show() } : {}),
-					...(ctx.openSettings ? { settings: () => ctx.openSettings?.() } : {}),
-				}"
-				@dismiss-content-hint="ctx.dismissContentHint?.()"
-			/>
-
-			<Transition
-				enter-active-class="transition-all duration-300 ease-out overflow-hidden"
-				enter-from-class="opacity-0 max-h-0"
-				enter-to-class="opacity-100 max-h-40"
-				leave-active-class="transition-all duration-200 ease-in overflow-hidden"
-				leave-from-class="opacity-100 max-h-40"
-				leave-to-class="opacity-0 max-h-0"
-				aria-live="polite"
+		<template v-if="!ctx.loading.value">
+			<div
+				v-if="ctx.error.value"
+				class="flex w-full flex-col items-center justify-center gap-4 p-4"
 			>
-				<Admonition v-if="ctx.uploadState?.value?.isUploading" type="info" show-actions-underneath>
-					<template #icon>
-						<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
-					</template>
-					<template #header>
+				<div class="universal-card flex flex-col items-center gap-4 p-6">
+					<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
+					<p class="text-secondary">{{ ctx.error.value.message }}</p>
+					<ButtonStyled color="brand">
+						<button @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</button>
+					</ButtonStyled>
+				</div>
+			</div>
+
+			<template v-else>
+				<Admonition v-if="ctx.isBusy.value && ctx.busyMessage?.value" type="warning">
+					<template #header>{{ ctx.busyMessage.value }}</template>
+					{{ formatMessage(messages.busyDescription) }}
+				</Admonition>
+
+				<ContentModpackCard
+					v-if="ctx.modpack.value"
+					:project="ctx.modpack.value.project"
+					:project-link="ctx.modpack.value.projectLink"
+					:version="ctx.modpack.value.version"
+					:version-link="ctx.modpack.value.versionLink"
+					:owner="ctx.modpack.value.owner"
+					:categories="ctx.modpack.value.categories"
+					:has-update="ctx.modpack.value.hasUpdate"
+					:disabled="ctx.modpack.value.disabled || ctx.isBusy.value"
+					:disabled-text="
+						ctx.modpack.value.disabledText ??
+						ctx.busyMessage?.value ??
+						(ctx.isBusy.value ? formatMessage(messages.pleaseWait) : undefined)
+					"
+					:show-content-hint="
+						!!(ctx.showContentHint?.value && ctx.modpack.value && ctx.items.value.length === 0)
+					"
+					v-on="{
+						...(ctx.updateModpack ? { update: () => ctx.updateModpack?.() } : {}),
+						...(ctx.viewModpackContent ? { content: () => ctx.viewModpackContent?.() } : {}),
+						...(ctx.unlinkModpack ? { unlink: () => confirmUnlinkModal?.show() } : {}),
+						...(ctx.openSettings ? { settings: () => ctx.openSettings?.() } : {}),
+					}"
+					@dismiss-content-hint="ctx.dismissContentHint?.()"
+				/>
+
+				<Transition
+					enter-active-class="transition-all duration-300 ease-out overflow-hidden"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-40"
+					leave-active-class="transition-all duration-200 ease-in overflow-hidden"
+					leave-from-class="opacity-100 max-h-40"
+					leave-to-class="opacity-0 max-h-0"
+					aria-live="polite"
+				>
+					<Admonition
+						v-if="ctx.uploadState?.value?.isUploading"
+						type="info"
+						show-actions-underneath
+					>
+						<template #icon>
+							<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
+						</template>
+						<template #header>
+							{{
+								formatMessage(messages.uploadingFiles, {
+									completed: ctx.uploadState?.value?.completedFiles ?? 0,
+									total: ctx.uploadState?.value?.totalFiles ?? 0,
+								})
+							}}
+						</template>
+						<span class="text-secondary">
+							{{ formatBytes(ctx.uploadState?.value?.uploadedBytes ?? 0) }}
+							/ {{ formatBytes(ctx.uploadState?.value?.totalBytes ?? 0) }} ({{
+								Math.round(uploadOverallProgress * 100)
+							}}%)
+						</span>
+						<template #actions>
+							<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
+						</template>
+					</Admonition>
+				</Transition>
+
+				<template v-if="ctx.items.value.length > 0">
+					<div class="flex flex-col gap-4">
+						<span v-if="ctx.modpack.value" class="text-xl font-semibold text-contrast">
+							{{ formatMessage(messages.additionalContent) }}
+						</span>
+
+						<div class="flex flex-wrap items-center gap-2">
+							<StyledInput
+								v-model="searchQuery"
+								:icon="SearchIcon"
+								type="text"
+								autocomplete="off"
+								:spellcheck="false"
+								input-class="!h-10"
+								wrapper-class="flex-1 min-w-0"
+								clearable
+								:placeholder="
+									formatMessage(messages.searchPlaceholder, {
+										count: tableItems.length,
+										contentType: `${ctx.contentTypeLabel.value}${tableItems.length === 1 ? '' : 's'}`,
+									})
+								"
+							/>
+
+							<div class="flex gap-2">
+								<ButtonStyled color="brand">
+									<button
+										v-tooltip="
+											ctx.busyMessage?.value ??
+											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+										"
+										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+										class="!h-10 flex items-center gap-2"
+										@click="ctx.browse"
+									>
+										<CompassIcon class="size-5" />
+										<span>{{ formatMessage(messages.browseContent) }}</span>
+									</button>
+								</ButtonStyled>
+								<ButtonStyled type="outlined">
+									<button
+										v-tooltip="
+											ctx.busyMessage?.value ??
+											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+										"
+										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+										class="!h-10 !border-button-bg !border-[1px]"
+										@click="ctx.uploadFiles"
+									>
+										<FolderOpenIcon class="size-5" />
+										{{ formatMessage(messages.uploadFiles) }}
+									</button>
+								</ButtonStyled>
+							</div>
+						</div>
+
+						<div class="@container flex flex-wrap items-center justify-between gap-2">
+							<div class="flex flex-wrap items-center gap-1.5">
+								<FilterIcon class="size-5 text-secondary" />
+								<button
+									class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+									:class="
+										selectedFilters.length === 0
+											? 'border-green bg-brand-highlight text-brand'
+											: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+									"
+									:aria-pressed="selectedFilters.length === 0"
+									@click="selectedFilters = []"
+								>
+									{{ formatMessage(commonMessages.allProjectType) }}
+								</button>
+								<button
+									v-for="option in filterOptions"
+									:key="option.id"
+									class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+									:class="
+										selectedFilters.includes(option.id)
+											? 'border-green bg-brand-highlight text-brand'
+											: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+									"
+									:aria-pressed="selectedFilters.includes(option.id)"
+									@click="toggleFilter(option.id)"
+								>
+									{{ option.label }}
+								</button>
+								<div class="hidden @[900px]:block">
+									<ButtonStyled type="transparent">
+										<button
+											:aria-label="
+												formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+											"
+											@click="cycleSortMode"
+										>
+											<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+												v-else-if="sortMode === 'date-added-newest'"
+											/><ClockArrowUpIcon
+												v-else-if="sortMode === 'date-added-oldest'"
+											/><ArrowDownAZIcon v-else />
+											{{ sortLabels[sortMode]() }}
+										</button>
+									</ButtonStyled>
+								</div>
+							</div>
+
+							<div class="flex items-center gap-2">
+								<div class="@[900px]:hidden">
+									<ButtonStyled type="transparent">
+										<button
+											:aria-label="
+												formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+											"
+											@click="cycleSortMode"
+										>
+											<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+												v-else-if="sortMode === 'date-added-newest'"
+											/><ClockArrowUpIcon
+												v-else-if="sortMode === 'date-added-oldest'"
+											/><ArrowDownAZIcon v-else />
+											{{ sortLabels[sortMode]() }}
+										</button>
+									</ButtonStyled>
+								</div>
+
+								<ButtonStyled
+									v-if="hasBulkUpdateSupport && hasOutdatedProjects"
+									color="green"
+									type="transparent"
+									color-fill="text"
+									hover-color-fill="background"
+								>
+									<button :disabled="isBulkOperating || ctx.isBusy.value" @click="promptUpdateAll">
+										<DownloadIcon />
+										{{ formatMessage(messages.updateAll) }}
+									</button>
+								</ButtonStyled>
+
+								<ButtonStyled type="transparent">
+									<button :disabled="refreshing || ctx.isBusy.value" @click="handleRefresh">
+										<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
+										{{ formatMessage(commonMessages.refreshButton) }}
+									</button>
+								</ButtonStyled>
+							</div>
+						</div>
+
+						<ContentCardTable
+							v-model:selected-ids="selectedIds"
+							:items="tableItems"
+							:show-selection="true"
+							@update:enabled="handleToggleEnabledById"
+							@delete="handleDeleteById"
+							@update="handleUpdateById"
+							@switch-version="handleSwitchVersionById"
+						>
+							<template #empty>
+								<span>{{ formatMessage(messages.noContentFound) }}</span>
+							</template>
+						</ContentCardTable>
+					</div>
+				</template>
+
+				<EmptyState v-else type="empty-inbox">
+					<template #heading>
 						{{
-							formatMessage(messages.uploadingFiles, {
-								completed: ctx.uploadState?.value?.completedFiles ?? 0,
-								total: ctx.uploadState?.value?.totalFiles ?? 0,
-							})
+							formatMessage(
+								ctx.modpack.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
+							)
 						}}
 					</template>
-					<span class="text-secondary">
-						{{ formatBytes(ctx.uploadState?.value?.uploadedBytes ?? 0) }}
-						/ {{ formatBytes(ctx.uploadState?.value?.totalBytes ?? 0) }} ({{
-							Math.round(uploadOverallProgress * 100)
-						}}%)
-					</span>
-					<template #actions>
-						<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
+					<template #description>
+						{{
+							ctx.modpack.value
+								? formatMessage(messages.emptyModpackHint)
+								: formatMessage(messages.emptyHint, {
+										contentType: `${ctx.contentTypeLabel.value}s`,
+									})
+						}}
 					</template>
-				</Admonition>
-			</Transition>
-
-			<template v-if="ctx.items.value.length > 0">
-				<div class="flex flex-col gap-4">
-					<span v-if="ctx.modpack.value" class="text-xl font-semibold text-contrast">
-						{{ formatMessage(messages.additionalContent) }}
-					</span>
-
-					<div class="flex flex-wrap items-center gap-2">
-						<StyledInput
-							v-model="searchQuery"
-							:icon="SearchIcon"
-							type="text"
-							autocomplete="off"
-							:spellcheck="false"
-							input-class="!h-10"
-							wrapper-class="flex-1 min-w-0"
-							clearable
-							:placeholder="
-								formatMessage(messages.searchPlaceholder, {
-									count: tableItems.length,
-									contentType: `${ctx.contentTypeLabel.value}${tableItems.length === 1 ? '' : 's'}`,
-								})
-							"
-						/>
-
-						<div class="flex gap-2">
-							<ButtonStyled color="brand">
-								<button
-									v-tooltip="
-										ctx.busyMessage?.value ??
-										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-									"
-									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-									class="!h-10 flex items-center gap-2"
-									@click="ctx.browse"
-								>
-									<CompassIcon class="size-5" />
-									<span>{{ formatMessage(messages.browseContent) }}</span>
-								</button>
-							</ButtonStyled>
-							<ButtonStyled type="outlined">
-								<button
-									v-tooltip="
-										ctx.busyMessage?.value ??
-										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-									"
-									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-									class="!h-10 !border-button-bg !border-[1px]"
-									@click="ctx.uploadFiles"
-								>
-									<FolderOpenIcon class="size-5" />
-									{{ formatMessage(messages.uploadFiles) }}
-								</button>
-							</ButtonStyled>
-						</div>
-					</div>
-
-					<div class="@container flex flex-wrap items-center justify-between gap-2">
-						<div class="flex flex-wrap items-center gap-1.5">
-							<FilterIcon class="size-5 text-secondary" />
+					<template #actions>
+						<ButtonStyled type="outlined">
 							<button
-								class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-								:class="
-									selectedFilters.length === 0
-										? 'border-green bg-brand-highlight text-brand'
-										: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+								v-tooltip="
+									ctx.busyMessage?.value ??
+									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 								"
-								:aria-pressed="selectedFilters.length === 0"
-								@click="selectedFilters = []"
+								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+								class="!h-10 !border-button-bg !border-[1px]"
+								@click="ctx.uploadFiles"
 							>
-								{{ formatMessage(commonMessages.allProjectType) }}
+								<FolderOpenIcon class="size-5" />
+								{{ formatMessage(messages.uploadFiles) }}
 							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
 							<button
-								v-for="option in filterOptions"
-								:key="option.id"
-								class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-								:class="
-									selectedFilters.includes(option.id)
-										? 'border-green bg-brand-highlight text-brand'
-										: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+								v-tooltip="
+									ctx.busyMessage?.value ??
+									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 								"
-								:aria-pressed="selectedFilters.includes(option.id)"
-								@click="toggleFilter(option.id)"
+								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+								class="!h-10 flex items-center gap-2"
+								@click="ctx.browse"
 							>
-								{{ option.label }}
+								<CompassIcon class="size-5" />
+								<span>{{ formatMessage(messages.browseContent) }}</span>
 							</button>
-							<div class="hidden @[900px]:block">
-								<ButtonStyled type="transparent">
-									<button
-										:aria-label="
-											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-										"
-										@click="cycleSortMode"
-									>
-										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-											v-else-if="sortMode === 'date-added-newest'"
-										/><ClockArrowUpIcon
-											v-else-if="sortMode === 'date-added-oldest'"
-										/><ArrowDownAZIcon v-else />
-										{{ sortLabels[sortMode]() }}
-									</button>
-								</ButtonStyled>
-							</div>
-						</div>
-
-						<div class="flex items-center gap-2">
-							<div class="@[900px]:hidden">
-								<ButtonStyled type="transparent">
-									<button
-										:aria-label="
-											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-										"
-										@click="cycleSortMode"
-									>
-										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-											v-else-if="sortMode === 'date-added-newest'"
-										/><ClockArrowUpIcon
-											v-else-if="sortMode === 'date-added-oldest'"
-										/><ArrowDownAZIcon v-else />
-										{{ sortLabels[sortMode]() }}
-									</button>
-								</ButtonStyled>
-							</div>
-
-							<ButtonStyled
-								v-if="hasBulkUpdateSupport && hasOutdatedProjects"
-								color="green"
-								type="transparent"
-								color-fill="text"
-								hover-color-fill="background"
-							>
-								<button :disabled="isBulkOperating || ctx.isBusy.value" @click="promptUpdateAll">
-									<DownloadIcon />
-									{{ formatMessage(messages.updateAll) }}
-								</button>
-							</ButtonStyled>
-
-							<ButtonStyled type="transparent">
-								<button :disabled="refreshing || ctx.isBusy.value" @click="handleRefresh">
-									<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
-									{{ formatMessage(commonMessages.refreshButton) }}
-								</button>
-							</ButtonStyled>
-						</div>
-					</div>
-
-					<ContentCardTable
-						v-model:selected-ids="selectedIds"
-						:items="tableItems"
-						:show-selection="true"
-						@update:enabled="handleToggleEnabledById"
-						@delete="handleDeleteById"
-						@update="handleUpdateById"
-						@switch-version="handleSwitchVersionById"
-					>
-						<template #empty>
-							<span>{{ formatMessage(messages.noContentFound) }}</span>
-						</template>
-					</ContentCardTable>
-				</div>
+						</ButtonStyled>
+					</template>
+				</EmptyState>
 			</template>
-
-			<EmptyState v-else type="empty-inbox">
-				<template #heading>
-					{{
-						formatMessage(
-							ctx.modpack.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
-						)
-					}}
-				</template>
-				<template #description>
-					{{
-						ctx.modpack.value
-							? formatMessage(messages.emptyModpackHint)
-							: formatMessage(messages.emptyHint, {
-									contentType: `${ctx.contentTypeLabel.value}s`,
-								})
-					}}
-				</template>
-				<template #actions>
-					<ButtonStyled type="outlined">
-						<button
-							v-tooltip="
-								ctx.busyMessage?.value ??
-								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-							"
-							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-							class="!h-10 !border-button-bg !border-[1px]"
-							@click="ctx.uploadFiles"
-						>
-							<FolderOpenIcon class="size-5" />
-							{{ formatMessage(messages.uploadFiles) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button
-							v-tooltip="
-								ctx.busyMessage?.value ??
-								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-							"
-							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-							class="!h-10 flex items-center gap-2"
-							@click="ctx.browse"
-						>
-							<CompassIcon class="size-5" />
-							<span>{{ formatMessage(messages.browseContent) }}</span>
-						</button>
-					</ButtonStyled>
-				</template>
-			</EmptyState>
 		</template>
 
 		<ContentSelectionBar

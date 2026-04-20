@@ -32,6 +32,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Посмотреть аналитику"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Не удалось загрузить настройки сервера"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Альфа"
+  },
   "badge.beta": {
     "defaultMessage": "Бета"
   },
@@ -299,6 +305,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Удалить {itemType}{count, plural, one {} few {а} many {ов} other {а}}"
   },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {Downgrading} other {Updating}} Это может привести к проблемам с совместимостью. Моды или контент, добавленные вами в дополнение к набору модов, будут сохранены, но могут быть несовместимы с новой версией."
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Предупреждение: {action, select, downgrade {откат} other {обновление}} версии"
   },
@@ -339,7 +348,7 @@
     "defaultMessage": "Некоторый контент на вашем сервере не может быть анализирован и может быть затронут этим изменением."
   },
   "content.diff-modal.updated-count": {
-    "defaultMessage": "{count} обновлено"
+    "defaultMessage": "{count} Обновлено"
   },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Создание резервной копии..."
@@ -369,7 +378,7 @@
     "defaultMessage": "Теперь он находится здесь!"
   },
   "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Контент сборки перенесён"
+    "defaultMessage": "Контент сборки перемещён"
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Больше не показывать"
@@ -492,7 +501,7 @@
     "defaultMessage": "При продолжении более 100 файлов будут перезаписаны; вот некоторые из них."
   },
   "files.conflict-modal.overwrite-warning": {
-    "defaultMessage": "{count, plural, one {Следующий # файл} few {Следующие # файла} other {Следующие # файлов}} уже есть на сервере. При продолжении они будут перезаписаны."
+    "defaultMessage": "{count, plural, one {Следующий # файл} few {Следующие # файла} other {Следующие # файлов}} уже есть на сервере. При продолжении {count, plural, =1 {он будет перезаписан} other {они будут перезаписаны}}."
   },
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count, number} перезаписей"
@@ -542,11 +551,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Файл сохранён"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Закрыть"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Найти"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current, number} из {total, number}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Следующее совпадение"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Не найдено"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Предыдущее совпадение"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Переключить замену"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "URL вашего файла лога скопирован в буфер обмена."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "URL лога скопирован"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Заменить"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Заменить всё"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Заменить"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "Не получилось сохранить файл."
@@ -605,9 +644,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Извлечение началось"
   },
-  "files.layout.loading": {
-    "defaultMessage": "Загрузка файлов..."
-  },
   "files.layout.selected-count": {
     "defaultMessage": "Выбрано: {count, number}"
   },
@@ -637,6 +673,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "Навигация файла"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Найти в файле"
   },
   "files.navbar.home": {
     "defaultMessage": "Начало"
@@ -944,17 +983,71 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Не удалось добавить файл"
   },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "Не удалось загрузить версии набор модов"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "Не удалось загрузить версии"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "Не удалось переустановить набор модов"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "Не удалось восстановить сервер"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Не удалось сбросить сервер в исходное состояние"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "Не удалось сохранить параметры установки"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "Не удалось отвязать набор модов"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "Версия {loader, select, null {загрузчика} other {{loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "Установка вашего сервера была восстановлена."
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "Восстановление завершено"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Сбросить сервер"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Удаляет все данные сервера, включая миры, моды и файлы настроек. Резервные копии останутся и их можно будет восстановить."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Сбросить настройки сервера"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Это действие вернет сервер на этап изначальной настройки для её повторного прохождения. Вы уверены, что хотите продолжить?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "Вернуть к изначальным настройкам"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Сервер возвращён до исходного состояния."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Сервер переустановлен"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Настройки поддержки"
+  },
   "hosting.specs.burst": {
-    "defaultMessage": "Временный рост до {cpus} CPU"
+    "defaultMessage": "Рост до {cpus} CPU"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "При высокой нагрузке сервер временно получает дополнительные потоки CPU для стабилизации TPS. Нажмите, чтобы узнать больше."
+    "defaultMessage": "Под нагрузкой сервер временно получает дополнительные потоки CPU. Нажмите, чтобы узнать подробнее."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} ГБ ОЗУ"
   },
   "hosting.specs.gb-storage": {
-    "defaultMessage": "{storage} ГБ хранилища"
+    "defaultMessage": "{storage} ГБ диска"
   },
   "hosting.specs.shared-cpus": {
     "defaultMessage": "{cpus, plural, one {# разделяемый} other {# разделяемых}} CPU"
@@ -1261,6 +1354,9 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "Мод зависит на клиентском моде и может вызывать проблемы при запуске сервера"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "Это клиентский мод, и он может вызвать проблемы при запуске сервера"
   },
   "label.client-retained-warning": {
     "defaultMessage": "Это клиентский мод, который был установлен как зависимый и может вызывать проблемы, при запуске сервера"
@@ -2624,6 +2720,234 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Восстановить"
   },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Выполняется создание резервной копии"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Восстановление из резервной копии в процессе"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "Сервер устанавливается"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "Синхронизация контента в процессе"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "Уже есть сервер?"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Подробнее о Modrinth Hosting"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "Новый сервер"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "Играйте в сборки вместе с друзьями через Modrinth App."
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "Серверов ещё нет"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "Выбирайте любимые моды, а мы сделаем всё остальное."
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "Установка модов в один клик"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "Приглашайте друзей и настаивайте всё прямо в Modrinth App."
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "Совместная игра"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Войти"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "Настаивайте сервер подобно одиночному миру."
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "Простая настройка"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Скопировано"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "Копировать код в буфер обмена"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "Копировать ID"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "Скачать последнюю резервную копию"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "Управление платежами"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Новый"
+  },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Ваши файлы будут храниться еще {daysRemaining} {daysRemaining, plural,one {день} few {дня} many {дней} other {дней}}. Свяжитесь с поддержкой чтобы скачать файлы до того, как они будут удалены. "
+  },
+  "servers.listing.notice.files-preserved-after-cancellation": {
+    "defaultMessage": "Ваши файлы будут храниться в течение 30 дней."
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "Ваш сервер был заблокирован модерацией "
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Ваш сервер будет {verb} к {planSize} Запланирован на <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.provisioning": {
+    "defaultMessage": "Пожалуйста, подождите, пока мы настроим ваш сервер. Это займет до 10 минут."
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "Ваша подписка была отменена."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "Ваша подписка была отменена\n<date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed": {
+    "defaultMessage": "Ваша подписка была отменена из-за сбоя платежа."
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
+    "defaultMessage": "Ваша подписка была отменена к <date>{formattedDate}</date> из-за сбоя платежа. "
+  },
+  "servers.listing.notice.subscription-set-to-cancel": {
+    "defaultMessage": "Ваша подписка будет отменена."
+  },
+  "servers.listing.notice.subscription-set-to-cancel-on-date": {
+    "defaultMessage": "Ваша подписка будет отменена к <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.suspended": {
+    "defaultMessage": "Ваш сервер был приостановлен. Пожалуйста, свяжитесь с поддержкой Modrinth для получения большей информации."
+  },
+  "servers.listing.notice.upgrading": {
+    "defaultMessage": "Аппаратное обеспечение вашего сервера в настоящее время обновляется и вскоре будет снова подключено к сети."
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "Возобновить подписку"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "Иконка сервера"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Поддержка"
+  },
+  "servers.listing.using-project-label": {
+    "defaultMessage": "Используется {projectTitle}"
+  },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "Проверка наличие новых серверов..."
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "Файлы загружаются. Если вы покинете эту страницу, загрузка будет отменена."
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "Выполняется загрузка"
+  },
+  "servers.manage.contact-support-button": {
+    "defaultMessage": "Связаться с поддержкой Modrinth"
+  },
+  "servers.manage.error.alert-notice": {
+    "defaultMessage": "Наши системы автоматически оповещают о проблемах. Мы уже работаем над исправлением ошибки."
+  },
+  "servers.manage.error.description": {
+    "defaultMessage": "Возможно, временный сбой на нашей стороне."
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "Сведения об ошибке:"
+  },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "Если сервер Modrinth Hosting куплен недавно, он сейчас в очереди и скоро появится здесь. <warning>Не покупайте новый сервер.</warning>"
+  },
+  "servers.manage.error.support-notice": {
+    "defaultMessage": "Если нужна помощь по конкретному серверу, обратитесь в поддержку Modrinth."
+  },
+  "servers.manage.error.title": {
+    "defaultMessage": "Серверы не загрузились"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "Произошла ошибка"
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "Новый сервер"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "Серверы не найдены."
+  },
+  "servers.manage.purchase-unavailable.text": {
+    "defaultMessage": "Платежная информация все ещё загружается. Откроем кассу, сразу как только она будет готова."
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "Покупка недоступна"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "Перезагрузить"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "Произошла ошибка при возобновлении подписки на вашем сервере Modrinth."
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "Не удалось возобновить подписку"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "Если сервер отменен, повторная попытка списания может занять до 10 минут."
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "Подписка возобновляется"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "Подписка на сервер успешно возобновлена"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "Успех"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Поиск по {count, plural, one {# серверу} other {# серверам}}..."
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "Теперь они находятся здесь!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Больше не показывать"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Настройки сервера перемещены"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {день} few {дня} other {дней}} <hours-count>{hours}</hours-count> {hours, plural, one {час} few {часа} other {часов}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {минута} few {минуты} other {минут}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {секунда} few {секунды} other {секунд}} осталось..."
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "Новый сервер"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "Ваша пробная версия Medal server закончилась, и работа вашего сервера была приостановлена. Пожалуйста, улучшите его, чтобы продолжить пользоваться вашим сервером."
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "Ваш сервер был приостановлен. Пожалуйста, обновите вашу платежную информацию и свяжитесь с поддержкой Modrinth для получения большей информации."
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "Ваш сервер был приостановлен: {reason}. Пожалуйста, обновите вашу платежную информацию и свяжитесь с поддержкой Modrinth для получения большей информации."
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "Аппаратное обеспечение вашего сервера в настоящее время обновляется и вскоре будет снова подключено к сети."
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "Иконка сервера"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "Улучшить"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "Используется {projectTitle}"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Закрыть"
   },
@@ -2651,6 +2975,12 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Незакрываемое"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "Ваша покупка Modrinth Hosting успешно завершена."
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "Успешная покупка"
+  },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "Средства пока не будут списаны."
   },
@@ -2660,17 +2990,29 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Способ оплаты"
   },
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "Доступно в Северной Америке, Европе и Юго‑Восточной Азии."
+  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Соберите свой план с нужными характеристиками."
+  },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "Чётко понимаете, что вам нужно?"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Настроить план"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "Большой"
+  },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "Для 15–25 игроков, сборок и тяжёлых модов."
+    "defaultMessage": "Для 15–25 игроков, сборок и тяжёлых модов."
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "Средний"
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "Для 6–15 игроков и нескольких модов."
+    "defaultMessage": "Для 6–15 игроков и нескольких модов."
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Популярный"
@@ -2678,11 +3020,17 @@
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Выбрать план"
   },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "Малый"
+  },
   "servers.purchase.step.plan.small.desc": {
-    "defaultMessage": "Для 1–5 друзей и пары лёгких модов."
+    "defaultMessage": "Для 1–5 друзей и пары лёгких модов."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "План"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "Текущий план"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Регион"
@@ -2802,7 +3150,7 @@
     "defaultMessage": "Язык"
   },
   "settings.language.warning": {
-    "defaultMessage": "Изменение языка {platform} может привести к тому, что часть контента будет отображаться на английском, если перевод отсутствует. {platform} Ещё не полностью переведена, поэтому в некоторых языках часть текста может оставаться на английском."
+    "defaultMessage": "Изменение языка {platform} может привести к тому, что часть контента будет отображаться на английском, если перевод отсутствует. Платформа {platform} ещё не полностью переведена, поэтому в некоторых языках часть текста может оставаться на английском."
   },
   "settings.pats.title": {
     "defaultMessage": "Личные токены доступа"

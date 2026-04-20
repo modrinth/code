@@ -6,49 +6,49 @@
     "message": "Doğrulama sunucularına erişilemedi"
   },
   "app.browse.add-server-to-instance": {
-    "message": "Örneğe sunucuyu ekle"
+    "message": "Sunucuyu kuruluma ekle"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Örneğinize sunucu ekleyin"
+    "message": "Kurulumunuza sunucular ekleyin"
   },
   "app.browse.add-to-instance": {
-    "message": "Örneğe ekle"
+    "message": "Kuruluma ekle"
   },
   "app.browse.add-to-instance-name": {
-    "message": "{instanceName} örneğine ekle"
+    "message": "{instanceName}'a ekle"
   },
   "app.browse.added": {
-    "message": "Eklendi"
+    "message": "Ekli"
   },
   "app.browse.already-added": {
-    "message": "Zaten eklendi"
+    "message": "Zaten ekli"
   },
   "app.browse.discover-content": {
-    "message": "İçerikleri keşfet"
+    "message": "İçerik keşfet"
   },
   "app.browse.discover-servers": {
-    "message": "Sunucuları keşfet"
+    "message": "Sunucu keşfet"
   },
   "app.browse.hide-added-servers": {
-    "message": "Eklenen sunucuları gizle\n"
+    "message": "Ekli sunucuları gizle"
   },
   "app.browse.hide-installed-content": {
-    "message": "Yüklü İçerikleri Gizle"
+    "message": "Kurulu içerikleri gizle"
   },
   "app.browse.install-content-to-instance": {
-    "message": "İçeriği örneğe yükle"
+    "message": "İçeriği kuruluma yükle"
   },
   "app.export-modal.description-placeholder": {
-    "message": "Mod paketi açıklaması yazın..."
+    "message": "Mod paketi açıklaması girin..."
   },
   "app.export-modal.export-button": {
-    "message": "Çıkart"
+    "message": "Dışa aktar"
   },
   "app.export-modal.header": {
-    "message": "Modpaketi çıkart"
+    "message": "Mod paketini dışa aktar"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Modpaketi Adı"
+    "message": "Mod Paketi Adı"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpaketi adı"
@@ -69,22 +69,22 @@
     "message": "Bu eylem geri alınamaz"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Örneği Sil"
+    "message": "Kurulumu sil"
   },
   "app.instance.confirm-delete.header": {
-    "message": "Örneği Sil"
+    "message": "Kurulumu sil"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Bu mod paketi zaten <bold>{instanceName}</bold> örneğinde yüklü. Kopyalamak istediğinizden emin misiniz?"
+    "message": "Bu mod paketi zaten <bold>{instanceName}</bold> kurulumunda yüklü. Kopyalamak istediğinizden emin misiniz?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Oluştur"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "Modpaketi zaten kurulu"
+    "message": "Modpaketi zaten yüklü"
   },
   "app.instance.modpack-already-installed.instance": {
-    "message": "Örnek"
+    "message": "Kurulum"
   },
   "app.instance.mods.content-type-project": {
     "message": "proje"
@@ -120,10 +120,10 @@
     "message": "Modlu"
   },
   "app.instance.worlds.filter-offline": {
-    "message": "Çevrimdışı"
+    "message": "Çevrim dışı"
   },
   "app.instance.worlds.filter-online": {
-    "message": "Çevrimiçi"
+    "message": "Çevrim içi"
   },
   "app.instance.worlds.filter-vanilla": {
     "message": "Vanilla"
@@ -141,7 +141,7 @@
     "message": "'{name}' ({address}) oyun içi dahil olmak üzere listenizden kaldırılacak ve geri getirilmesi mümkün olmayacaktır."
   },
   "app.instance.worlds.remove-server-title": {
-    "message": "{name} öğesini kaldırmak istediğinizden emin misiniz?"
+    "message": "{name}'i kaldırmak istediğinizden emin misiniz?"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} dünya ara..."
@@ -153,7 +153,7 @@
     "message": "İçerik gerekli"
   },
   "app.modal.install-to-play.header": {
-    "message": "Yükleyip oynayın"
+    "message": "Oynamak için yükleyin"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Yükle"
@@ -210,19 +210,19 @@
     "message": "Kaynak yönetimi"
   },
   "app.update-popup.body": {
-    "message": "Modrinth App v{version} güncellemesi hazır! Hemen güncellemek için yeniden yükle veya Modrinth App’i kapattığında otomatik olarak güncellenecek."
+    "message": "Modrinth App v{version} güncellemesi indirilmeye hazır! Hemen güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecek."
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} indirildi. Güncellemek için sayfayı yeniden yükle veya Modrinth App’i kapattığında otomatik olarak güncellenecek."
+    "message": "Modrinth App v{version} indirildi. Güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecek."
   },
   "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} yayımlandı. En yeni özellikler ve hata düzeltmeleri için paket yöneticin üzerinden güncelle!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} artık mevcut! Ölçüllü bağlantıda olduğunuzdan otomatik olarak indirmedik."
+    "message": "Modrinth App v{version} mevcut! Kısıtlı bağlantıda olduğunuzdan otomatik olarak indirmedik."
   },
   "app.update-popup.changelog": {
-    "message": "Değişiklikler"
+    "message": "Yama Notları"
   },
   "app.update-popup.download": {
     "message": "İndir ({size})"
@@ -231,7 +231,7 @@
     "message": "İndirme tamamlandı"
   },
   "app.update-popup.reload": {
-    "message": "Yeniden yükle"
+    "message": "Yeniden başlat"
   },
   "app.update-popup.title": {
     "message": "Güncelleme mevcut"
@@ -249,7 +249,7 @@
     "message": "Güncelleme indiriliyor (%{percent})"
   },
   "app.update.reload-to-update": {
-    "message": "Güncellemeyi kurmak için yeniden yükleyin"
+    "message": "Güncellemeyi kurmak için yeniden başlatın"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -264,7 +264,7 @@
     "message": "Henüz oynanmadı"
   },
   "app.world.world-item.offline": {
-    "message": "Çevrimdışı"
+    "message": "Çevrim dışı"
   },
   "app.world.world-item.players-online": {
     "message": "{count} çevrimiçi"
@@ -390,10 +390,10 @@
     "message": "Genel"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Profili sil"
+    "message": "Kurulumu sil"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Profili sil"
+    "message": "Kurulumu sil"
   },
   "instance.settings.tabs.general.delete.description": {
     "message": "Profili, içindeki dünyaları, ayarları ve indirilen şeyleri cihazınızdan sonsuza kadar siler. Dikkatli olun, bir profil silindikten sonra geri alınamaz."

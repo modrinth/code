@@ -32,6 +32,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "檢視數據分析"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "無法載入伺服器設定"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alpha 版"
+  },
   "badge.beta": {
     "defaultMessage": "Beta 版"
   },
@@ -44,11 +50,50 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "取消"
   },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} 個共用 CPU"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "你即將重新訂閱 <server-name>{serverName}</server-name>。你的訂閱將會重新啟用，且伺服器將持續執行不中斷。"
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "由於無法載入訂閱詳細資訊，因此無法重新訂閱。"
+  },
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "錯誤"
   },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "無法載入訂閱詳細資訊。"
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "／5 天"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "／月"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "／季"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "／年"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "下一次扣款日期為 <charge-date>{date}</charge-date>。"
+  },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "方案"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB 記憶體"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "重新訂閱"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB 儲存空間"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "重新訂閱伺服器"
   },
   "button.accept": {
     "defaultMessage": "接受"
@@ -259,6 +304,9 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "刪除{itemType}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {降級} other {更新}}可能會導致相容性問題。你額外新增至模組包的模組或內容將保留，但可能與新版本不相容。"
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {降級} other {更新}}警告"
@@ -503,11 +551,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "已儲存檔案"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "關閉"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "尋找"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current}/{total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "下一個相符項"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "沒有結果"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "上一場相符項"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "切換替換"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "你的記錄檔網址已複製到剪貼簿。"
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "記錄檔網址已複製"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "取代"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "取代全部"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "取代"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "無法儲存檔案。"
@@ -566,9 +644,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "解壓縮已開始"
   },
-  "files.layout.loading": {
-    "defaultMessage": " 正在載入檔案..."
-  },
   "files.layout.selected-count": {
     "defaultMessage": "已選擇 {count} 個"
   },
@@ -598,6 +673,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "檔案導覽"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "在檔案中尋找"
   },
   "files.navbar.home": {
     "defaultMessage": "首頁"
@@ -904,6 +982,60 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "無法更新檔案"
+  },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "無法變更模組包版本"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "無法載入版本"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "無法重新安裝模組包"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "無法修復伺服器"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "無法將伺服器重設為初始設定狀態"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "無法儲存安裝設定"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "無法取消連結模組包"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "{loader, select, null {載入器} other {{loader}}} 版本"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "你的伺服器安裝已修復完畢。"
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "修復完成"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "重設伺服器"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "將刪除你伺服器上的所有資料，包括你的世界、模組以及設定檔。備份將保留，並可供還原。"
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "重設為初始設定"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "此操作將使伺服器回到初始設定流程，以便重新完成設定。您確定要繼續嗎？"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "重設為初始設定"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "伺服器已回到初始設定流程。"
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "伺服器已重設為初始設定狀態"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "支援選項"
   },
   "hosting.specs.burst": {
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
@@ -1222,6 +1354,9 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "此模組依賴客戶端模組，啟動伺服器時可能會造成問題"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "此為用戶端模組，啟動伺服器時可能會導致問題"
   },
   "label.client-retained-warning": {
     "defaultMessage": "這是一個作為依賴項安裝的客戶端模組，啟動伺服器時可能會造成問題"
@@ -1992,7 +2127,7 @@
     "defaultMessage": "{count, number} 位追蹤者"
   },
   "project.online-player-count": {
-    "defaultMessage": "{count, number} 人線上"
+    "defaultMessage": "{count, number} 人在線上"
   },
   "project.online-player-count.tooltip": {
     "defaultMessage": "{count} 位玩家在線上"
@@ -2585,8 +2720,233 @@
   "servers.backups.item.restore": {
     "defaultMessage": "還原"
   },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "正在建立備份"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "正在還原備份"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "正在安裝伺服器"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "正在同步內容"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "已經有伺服器了嗎？"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "深入了解 Modrinth Hosting"
+  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "建立新的伺服器"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "安裝模組、邀請好友並一起暢玩，這一切都能在 Modrinth App 中輕鬆完成。"
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "目前還沒有伺服器"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "挑選你喜愛的模組，剩下的就交給我們處理。"
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "一鍵安裝模組"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "邀請好友並直接在 Modrinth App 中為他們完成設定。"
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "與好友同樂"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "登入"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "設定伺服器就像建立單人遊戲世界一樣簡單。"
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "簡單設定"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "已複製"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "將代碼複製到剪貼簿"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "複製 ID"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "下載最新備份"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "管理帳務"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "新伺服器"
+  },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "你的檔案還會保留 <days-remaining>{daysRemaining} 天</days-remaining>。請在檔案被刪除前聯絡支援團隊以進行下載。"
+  },
+  "servers.listing.notice.files-preserved-after-cancellation": {
+    "defaultMessage": "取消服務後，你的檔案將保留 30 天。"
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "由於違反管理規範，你的伺服器已遭停權。"
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "你的伺服器將於 {formattedDate} {verb}為 {planSize} 方案。"
+  },
+  "servers.listing.notice.provisioning": {
+    "defaultMessage": "我們正在為你設定伺服器，請稍候。這可能需要長達 10 分鐘。"
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "你的訂閱已取消。"
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "您的訂閱已於 <date>{formattedDate}</date>取消。"
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed": {
+    "defaultMessage": "由於付款失敗，您的訂閱已被取消。"
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
+    "defaultMessage": "由於付款失敗，您的訂閱已於<date>{formattedDate}</date>取消。"
+  },
+  "servers.listing.notice.subscription-set-to-cancel": {
+    "defaultMessage": "您的訂閱將被取消。"
+  },
+  "servers.listing.notice.subscription-set-to-cancel-on-date": {
+    "defaultMessage": "你的訂閱設定於 <date>{formattedDate}</date> 取消。"
+  },
+  "servers.listing.notice.suspended": {
+    "defaultMessage": "您的伺服器已被暫停。請聯絡 Modrinth 客服以了解更多資訊。"
+  },
+  "servers.listing.notice.upgrading": {
+    "defaultMessage": "您的伺服器硬體正在升級，很快就會恢復上線。"
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "重新訂閱"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "伺服器圖示"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "客服"
+  },
+  "servers.listing.using-project-label": {
+    "defaultMessage": "使用 {projectTitle}"
+  },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "正在檢查新伺服器…"
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "文件正在上傳中。離開此頁面將取消上傳。"
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "上傳中"
+  },
+  "servers.manage.contact-support-button": {
+    "defaultMessage": "聯絡 Modrinth 客服"
+  },
+  "servers.manage.error.alert-notice": {
+    "defaultMessage": "我們的系統會在出現問題時自動通知團隊。我們正在努力恢復系統功能。"
+  },
+  "servers.manage.error.description": {
+    "defaultMessage": "我們的伺服器可能暫時故障。"
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "錯誤詳細資訊："
+  },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "如果您最近購買了 Modrinth Hosting 伺服器，它目前正在排隊等待，準備就緒後會立即顯示在此處。 <warning>請勿嘗試購買新伺服器。 </warning>"
+  },
+  "servers.manage.error.support-notice": {
+    "defaultMessage": "若你需要關於伺服器狀態的專屬支援，請聯絡 Modrinth 客服。"
+  },
+  "servers.manage.error.title": {
+    "defaultMessage": "無法載入伺服器"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "發生錯誤"
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "新伺服器"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "找不到伺服器。"
+  },
+  "servers.manage.purchase-unavailable.text": {
+    "defaultMessage": "付款資訊仍在載入中。準備就緒後將立即開啟結帳頁面。"
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "無法購買"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "重新載入"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "重新訂閱你的 Modrinth 伺服器時發生錯誤。"
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "重新訂閱時發生錯誤"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "若伺服器目前已取消，可能最多需要 10 分鐘的時間才會再次嘗試扣款。"
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "已送出重新訂閱請求"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "伺服器方案已重新訂閱成功"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "成功"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "搜尋 {count} {count, plural, other {個伺服器}}..."
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "現在可以在這裡找到伺服器設定！"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "不再顯示"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "你的伺服器設定已移動位置"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "剩餘 <days-count>{days}</days-count> 天 <hours-count>{hours}</hours-count> 小時 <minutes-count>{minutes}</minutes-count> 分鐘 <seconds-count>{seconds}</seconds-count> 秒..."
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "新伺服器"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "你的 Medal 伺服器試用期已結束，且伺服器已暫停服務。請升級以繼續使用你的伺服器。"
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "你的伺服器已暫停服務。請更新你的帳務資訊，或聯絡 Modrinth 客服以取得更多資訊。"
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "你的伺服器已暫停服務，原因為：{reason}。請更新你的帳務資訊，或聯絡 Modrinth 客服以取得更多資訊。"
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "你的伺服器硬體目前正在升級中，稍後將恢復上線。"
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "伺服器圖示"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "升級"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "正在使用 {projectTitle}"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "撤銷"
@@ -2615,6 +2975,12 @@
   "servers.notice.undismissable": {
     "defaultMessage": "不可撤銷"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "你已成功完成 Modrinth Hosting 的購買程序。"
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "購買成功"
+  },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "你暫時還不會被收取費用。"
   },
@@ -2624,14 +2990,26 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "付款方式"
   },
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "服務範圍遍及北美、歐洲與東南亞。"
+  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "根據你需要的規格挑選自訂方案。"
+  },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "知道自己需要什麼規格？"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "立即開始"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "大型"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "適合 15 到 25 位玩家、大型模組包或重度模組環境。"
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "中型"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "適合 6 到 15 位玩家及多個模組。"
@@ -2642,11 +3020,17 @@
   "servers.purchase.step.plan.select": {
     "defaultMessage": "選擇方案"
   },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "小型"
+  },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "適合 1 到 5 位好友及少量輕量模組。"
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "方案"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "你的目前方案"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "地區"

@@ -31,180 +31,169 @@
 			><TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}</template
 		>
 	</FileContextMenu>
-	<Transition name="fade" mode="out-in">
-		<div
-			v-if="ctx.loading.value && items.length === 0"
-			key="loading"
-			class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
-		>
-			<SpinnerIcon class="animate-spin" />
-			{{ formatMessage(messages.loadingFiles) }}
-		</div>
+	<div v-if="!(ctx.loading.value && items.length === 0)" class="contents">
+		<Admonition v-if="ctx.busyWarning?.value" type="warning" class="mb-5">
+			<template #header>{{ ctx.busyWarning.value }}</template>
+			{{ formatMessage(messages.busyWarning) }}
+		</Admonition>
+		<div class="relative flex w-full flex-col">
+			<div class="relative isolate flex w-full flex-col gap-4">
+				<FileNavbar
+					:breadcrumbs="breadcrumbSegments"
+					:is-editing="isEditing"
+					:editing-file-name="ctx.editingFile.value?.name"
+					:editing-file-path="ctx.editingFile.value?.path"
+					:is-editing-image="fileEditorRef?.isEditingImage"
+					:is-editor-find-open="fileEditorRef?.isFindOpen"
+					:search-query="searchQuery"
+					:show-refresh-button="showRefreshButton"
+					:show-install-from-url="ctx.showInstallFromUrl"
+					:base-id="baseId"
+					:disabled="isBusy"
+					:disabled-tooltip="busyTooltip"
+					@navigate="navigateToSegment"
+					@navigate-home="() => navigateToSegment(-1)"
+					@prefetch-home="handlePrefetchHome"
+					@update:search-query="searchQuery = $event"
+					@create="showCreateModal"
+					@upload="initiateFileUpload"
+					@upload-zip="() => {}"
+					@unzip-from-url="showUnzipFromUrlModal"
+					@refresh="ctx.refresh"
+					@share="() => fileEditorRef?.shareToMclogs()"
+					@find="() => fileEditorRef?.toggleFind()"
+				/>
 
-		<div v-else key="content" class="contents">
-			<Admonition v-if="ctx.busyWarning?.value" type="warning" class="mb-5">
-				<template #header>{{ ctx.busyWarning.value }}</template>
-				{{ formatMessage(messages.busyWarning) }}
-			</Admonition>
-			<div class="relative flex w-full flex-col">
-				<div class="relative isolate flex w-full flex-col gap-4">
-					<FileNavbar
-						:breadcrumbs="breadcrumbSegments"
-						:is-editing="isEditing"
-						:editing-file-name="ctx.editingFile.value?.name"
-						:editing-file-path="ctx.editingFile.value?.path"
-						:is-editing-image="fileEditorRef?.isEditingImage"
-						:is-editor-find-open="fileEditorRef?.isFindOpen"
-						:search-query="searchQuery"
-						:show-refresh-button="showRefreshButton"
-						:show-install-from-url="ctx.showInstallFromUrl"
-						:base-id="baseId"
-						:disabled="isBusy"
-						:disabled-tooltip="busyTooltip"
-						@navigate="navigateToSegment"
-						@navigate-home="() => navigateToSegment(-1)"
-						@prefetch-home="handlePrefetchHome"
-						@update:search-query="searchQuery = $event"
-						@create="showCreateModal"
-						@upload="initiateFileUpload"
-						@upload-zip="() => {}"
-						@unzip-from-url="showUnzipFromUrlModal"
-						@refresh="ctx.refresh"
-						@share="() => fileEditorRef?.shareToMclogs()"
-						@find="() => fileEditorRef?.toggleFind()"
-					/>
-
-					<div v-if="!isEditing">
-						<FileUploadDragAndDrop
-							ref="fileUploadRef"
-							class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
-							@files-dropped="handleDroppedFiles"
-						>
-							<FileTableHeader
-								:sort-field="sortField"
-								:sort-desc="sortDescValue"
-								:all-selected="allSelected"
-								:some-selected="someSelected"
-								:is-stuck="isLabelBarStuck"
-								@sort="handleSort"
-								@toggle-all="toggleSelectAll"
-							/>
-							<div
-								v-if="filteredItems.length > 0"
-								ref="virtualListContainer"
-								class="relative w-full"
-								:style="{ minHeight: `${totalHeight}px`, overflowAnchor: 'none' }"
-							>
-								<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
-									<FileTableRow
-										v-for="(item, idx) in visibleItems"
-										:key="item.path"
-										:count="item.count"
-										:created="item.created"
-										:modified="item.modified"
-										:name="item.name"
-										:path="item.path"
-										:type="item.type"
-										:size="item.size"
-										:index="visibleRange.start + idx"
-										:is-last="visibleRange.start + idx === filteredItems.length - 1"
-										:selected="selectedItems.has(item.path)"
-										:write-disabled="isBusy"
-										:write-disabled-tooltip="busyTooltip"
-										@extract="() => handleExtractItem(item)"
-										@delete="() => showDeleteModal(item)"
-										@rename="() => showRenameModal(item)"
-										@download="() => handleDownload(item)"
-										@move="() => showMoveModal(item)"
-										@move-direct-to="handleDirectMove"
-										@edit="() => handleEditFile(item)"
-										@navigate="() => handleNavigateToFolder(item)"
-										@hover="() => handleItemHover(item)"
-										@contextmenu="(x, y) => handleContextMenu(item, x, y)"
-										@toggle-select="() => toggleItemSelection(item.path)"
-									/>
-								</div>
-							</div>
-							<div
-								v-else-if="items.length === 0 && !ctx.error.value"
-								class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
-							>
-								<div class="flex flex-col items-center gap-4 text-center">
-									<FolderOpenIcon class="h-16 w-16 text-secondary" />
-									<h3 class="m-0 text-2xl font-bold text-contrast">
-										{{ formatMessage(messages.emptyFolderTitle) }}
-									</h3>
-									<p class="m-0 text-sm text-secondary">
-										{{ formatMessage(messages.emptyFolderDescription) }}
-									</p>
-								</div>
-							</div>
-							<FileManagerError
-								v-else-if="ctx.error.value"
-								class="rounded-b-[20px]"
-								:title="formatMessage(messages.errorTitle)"
-								:message="formatMessage(messages.errorMessage)"
-								@refetch="ctx.refresh"
-								@home="navigateToSegment(-1)"
-							/>
-						</FileUploadDragAndDrop>
-					</div>
-					<FileEditor
-						v-else
-						ref="fileEditorRef"
-						:file="ctx.editingFile.value"
-						:editor-component="editorComponent"
-						@close="handleEditorClose"
-					/>
-				</div>
-			</div>
-
-			<FloatingActionBar :shown="hasUnsavedChanges">
-				<p class="m-0 text-sm font-semibold md:text-base">
-					{{ formatMessage(messages.unsavedChanges) }}
-				</p>
-				<div class="ml-auto flex gap-2">
-					<ButtonStyled type="transparent">
-						<button @click="fileEditorRef?.revertChanges()">
-							<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button @click="fileEditorRef?.saveFileContent(false)">
-							<SaveIcon /> {{ formatMessage(commonMessages.saveButton) }}
-						</button>
-					</ButtonStyled>
-				</div>
-			</FloatingActionBar>
-			<FloatingActionBar :shown="selectedItems.size > 0">
-				<div class="flex items-center gap-0.5">
-					<span class="px-4 py-2.5 text-base font-semibold text-contrast tabular-nums">
-						{{ formatMessage(messages.selectedCount, { count: selectedItems.size }) }}
-					</span>
-					<div class="mx-1 h-6 w-px bg-surface-5" />
-					<ButtonStyled type="transparent">
-						<button class="!text-primary" @click="deselectAll">
-							<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
-						</button>
-					</ButtonStyled>
-				</div>
-				<div class="ml-auto flex items-center gap-0.5">
-					<div class="mx-1 h-6 w-px bg-surface-5" />
-					<ButtonStyled
-						type="transparent"
-						color="red"
-						color-fill="text"
-						hover-color-fill="background"
+				<div v-if="!isEditing">
+					<FileUploadDragAndDrop
+						ref="fileUploadRef"
+						class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
+						@files-dropped="handleDroppedFiles"
 					>
-						<button v-tooltip="busyTooltip" :disabled="isBusy" @click="showBulkDeleteModal">
-							<TrashIcon />
-							<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
-						</button>
-					</ButtonStyled>
+						<FileTableHeader
+							:sort-field="sortField"
+							:sort-desc="sortDescValue"
+							:all-selected="allSelected"
+							:some-selected="someSelected"
+							:is-stuck="isLabelBarStuck"
+							@sort="handleSort"
+							@toggle-all="toggleSelectAll"
+						/>
+						<div
+							v-if="filteredItems.length > 0"
+							ref="virtualListContainer"
+							class="relative w-full"
+							:style="{ minHeight: `${totalHeight}px`, overflowAnchor: 'none' }"
+						>
+							<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
+								<FileTableRow
+									v-for="(item, idx) in visibleItems"
+									:key="item.path"
+									:count="item.count"
+									:created="item.created"
+									:modified="item.modified"
+									:name="item.name"
+									:path="item.path"
+									:type="item.type"
+									:size="item.size"
+									:index="visibleRange.start + idx"
+									:is-last="visibleRange.start + idx === filteredItems.length - 1"
+									:selected="selectedItems.has(item.path)"
+									:write-disabled="isBusy"
+									:write-disabled-tooltip="busyTooltip"
+									@extract="() => handleExtractItem(item)"
+									@delete="() => showDeleteModal(item)"
+									@rename="() => showRenameModal(item)"
+									@download="() => handleDownload(item)"
+									@move="() => showMoveModal(item)"
+									@move-direct-to="handleDirectMove"
+									@edit="() => handleEditFile(item)"
+									@navigate="() => handleNavigateToFolder(item)"
+									@hover="() => handleItemHover(item)"
+									@contextmenu="(x, y) => handleContextMenu(item, x, y)"
+									@toggle-select="() => toggleItemSelection(item.path)"
+								/>
+							</div>
+						</div>
+						<div
+							v-else-if="items.length === 0 && !ctx.error.value"
+							class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
+						>
+							<div class="flex flex-col items-center gap-4 text-center">
+								<FolderOpenIcon class="h-16 w-16 text-secondary" />
+								<h3 class="m-0 text-2xl font-bold text-contrast">
+									{{ formatMessage(messages.emptyFolderTitle) }}
+								</h3>
+								<p class="m-0 text-sm text-secondary">
+									{{ formatMessage(messages.emptyFolderDescription) }}
+								</p>
+							</div>
+						</div>
+						<FileManagerError
+							v-else-if="ctx.error.value"
+							class="rounded-b-[20px]"
+							:title="formatMessage(messages.errorTitle)"
+							:message="formatMessage(messages.errorMessage)"
+							@refetch="ctx.refresh"
+							@home="navigateToSegment(-1)"
+						/>
+					</FileUploadDragAndDrop>
 				</div>
-			</FloatingActionBar>
+				<FileEditor
+					v-else
+					ref="fileEditorRef"
+					:file="ctx.editingFile.value"
+					:editor-component="editorComponent"
+					@close="handleEditorClose"
+				/>
+			</div>
 		</div>
-	</Transition>
+
+		<FloatingActionBar :shown="hasUnsavedChanges">
+			<p class="m-0 text-sm font-semibold md:text-base">
+				{{ formatMessage(messages.unsavedChanges) }}
+			</p>
+			<div class="ml-auto flex gap-2">
+				<ButtonStyled type="transparent">
+					<button @click="fileEditorRef?.revertChanges()">
+						<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button @click="fileEditorRef?.saveFileContent(false)">
+						<SaveIcon /> {{ formatMessage(commonMessages.saveButton) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</FloatingActionBar>
+		<FloatingActionBar :shown="selectedItems.size > 0">
+			<div class="flex items-center gap-0.5">
+				<span class="px-4 py-2.5 text-base font-semibold text-contrast tabular-nums">
+					{{ formatMessage(messages.selectedCount, { count: selectedItems.size }) }}
+				</span>
+				<div class="mx-1 h-6 w-px bg-surface-5" />
+				<ButtonStyled type="transparent">
+					<button class="!text-primary" @click="deselectAll">
+						<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
+					</button>
+				</ButtonStyled>
+			</div>
+			<div class="ml-auto flex items-center gap-0.5">
+				<div class="mx-1 h-6 w-px bg-surface-5" />
+				<ButtonStyled
+					type="transparent"
+					color="red"
+					color-fill="text"
+					hover-color-fill="background"
+				>
+					<button v-tooltip="busyTooltip" :disabled="isBusy" @click="showBulkDeleteModal">
+						<TrashIcon />
+						<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
+					</button>
+				</ButtonStyled>
+			</div>
+		</FloatingActionBar>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -216,7 +205,6 @@ import {
 	PackageOpenIcon,
 	RightArrowIcon,
 	SaveIcon,
-	SpinnerIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import type { Component } from 'vue'
@@ -256,10 +244,6 @@ import type { FileContextMenuOption, FileItem } from './types'
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	loadingFiles: {
-		id: 'files.layout.loading',
-		defaultMessage: 'Loading files...',
-	},
 	busyWarning: {
 		id: 'files.layout.busy-warning',
 		defaultMessage: 'File operations are disabled while the operation is in progress.',

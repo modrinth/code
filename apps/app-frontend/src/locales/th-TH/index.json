@@ -2,17 +2,44 @@
   "app.auth-servers.unreachable.body": {
     "message": "เซิร์ฟเวอร์ตรวจสอบสิทธิ์ของ Minecraft อาจใช้งานไม่ได้ในขณะนี้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณและลองใหม่อีกครั้งในภายหลัง"
   },
+  "app.auth-servers.unreachable.header": {
+    "message": "ไม่สามารถเชื่อมต่อถึงเซิร์ฟเวอร์ได้"
+  },
   "app.browse.add-server-to-instance": {
     "message": "เพิ่มเซิร์ฟเวอร์ลงในอินสแตนซ์"
   },
+  "app.browse.add-servers-to-instance": {
+    "message": "เพิ่มเซิร์ฟเวอร์ลงในอินสแตนซ์ของคุณ"
+  },
+  "app.browse.add-to-instance": {
+    "message": "เพิ่มลงในอินสแตนซ์"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "เพิ่มลงใน {instanceName}"
+  },
   "app.browse.added": {
     "message": "เพิ่ม"
+  },
+  "app.browse.already-added": {
+    "message": "เพิ่มแล้ว"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "ซ่อนเซิร์ฟเวอร์ที่เพิ่มแล้ว"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "ซ่อนเนื้อหาที่ติดตั้งแล้ว"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "ติดตั้งเนื้อหาลงในอินสแตนซ์"
   },
   "app.export-modal.description-placeholder": {
     "message": "กรอกคำอธิบายมอดแพ็ก.."
   },
   "app.export-modal.modpack-name-label": {
     "message": "ชื่อมอดแพ็ก"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "ชื่อ ม็อดแพ็ก"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
@@ -24,6 +51,9 @@
     "message": "การดำเนินการนี้ไม่สามารถย้อนคืนได้"
   },
   "app.instance.confirm-delete.delete-button": {
+    "message": "ลบอินสแตนซ์"
+  },
+  "app.instance.confirm-delete.header": {
     "message": "ลบอินสแตนซ์"
   },
   "app.instance.modpack-already-installed.body": {
@@ -52,6 +82,9 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "อัปโหลดสำเร็จ"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "เพิ่มเซิร์ฟเวอร์"
   },
   "app.instance.worlds.browse-servers": {
     "message": "ค้นหาเซิฟเวอร์"
@@ -116,6 +149,9 @@
   "app.modal.install-to-play.shared-server-instance": {
     "message": "อินสแตนซ์เซิร์ฟเวอร์ที่ใช้ร่วมกัน"
   },
+  "app.modal.install-to-play.view-contents": {
+    "message": "ดูเนื้อหา"
+  },
   "app.modal.update-to-play.header": {
     "message": "อัปเดตเพื่อเล่น"
   },
@@ -149,8 +185,20 @@
   "app.settings.tabs.resource-management": {
     "message": "การจัดการทรัพยากร"
   },
+  "app.update-popup.body": {
+    "message": "แอฟ Modrinth v{version} พร้อมสำหรับการติดตั้งแล้ว! รีโหลดแอปเพื่ออัปเดต หรือ อัปเดตอัตโนมัติเมื่อคุณปิดแอฟ Modrinth"
+  },
+  "app.update-popup.body.download-complete": {
+    "message": "แอฟ Modrinth v{version} ดาวน์โหลดเสร็จแล้ว รีโหลดแอปเพื่ออัปเดต หรือ อัปเดตอัตโนมัติเมื่อคุณปิดแอฟ Modrinth"
+  },
   "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} พร้อมให้อัปเดตแล้ว โปรดใช้ตัวจัดการแพ็กเกจ ของคุณเพื่ออัปเดตฟีเจอร์ใหม่และตัวแก้ไขล่าสุด!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "แอฟ Modrinth v{version} พร้อมแล้ว! เนื่องจากคุณเปิดโหมดจำกัดปริมาณข้อมูล เราจึงไม่ได้อัปเดตอัตโนมัติ"
+  },
+  "app.update-popup.download": {
+    "message": "ดาวโหลด ({size})"
   },
   "app.update-popup.download-complete": {
     "message": "ดาวน์โหลดเสร็จสมบูรณ์"
@@ -175,6 +223,9 @@
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "เลือกตัวเลือก"
   },
   "app.world.world-item.incompatible-version": {
     "message": "เวอร์ชัน {version} ไม่รองรับ"
@@ -472,6 +523,9 @@
   },
   "search.filter.locked.instance": {
     "message": "อินสแตนซ์เป็นผู้จัดเตรียม"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "ซิงค์กับอินสแตนซ์"
   },
   "search.filter.locked.server": {
     "message": "เซิร์ฟเวอร์เป็นผู้จัดเตรียม"

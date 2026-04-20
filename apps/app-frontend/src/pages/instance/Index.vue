@@ -218,11 +218,7 @@
 				:key="instance.path"
 			>
 				<template v-if="Component">
-					<Suspense
-						:key="instance.path"
-						@pending="loadingBar.startLoading()"
-						@resolve="loadingBar.stopLoading()"
-					>
+					<Suspense :key="instance.path">
 						<component
 							:is="Component"
 							:instance="instance"
@@ -235,9 +231,6 @@
 							@play="updatePlayState"
 							@stop="() => stopInstance('InstanceSubpage')"
 						></component>
-						<template #fallback>
-							<LoadingIndicator />
-						</template>
 					</Suspense>
 				</template>
 			</RouterView>
@@ -296,7 +289,6 @@ import {
 	ButtonStyled,
 	ContentPageHeader,
 	injectNotificationManager,
-	LoadingIndicator,
 	NavTabs,
 	OverflowMenu,
 	ServerOnlinePlayers,
@@ -304,6 +296,7 @@ import {
 	ServerRecentPlays,
 	ServerRegion,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
@@ -323,16 +316,17 @@ import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { get_server_status } from '@/helpers/worlds'
+import { get_server_status, refreshWorlds } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { useBreadcrumbs, useLoading } from '@/store/state'
+import { useBreadcrumbs } from '@/store/state'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
 const { playServerProject } = injectServerInstall()
+const queryClient = useQueryClient()
 const route = useRoute()
 
 const router = useRouter()
@@ -392,6 +386,14 @@ async function fetchInstance() {
 	}
 
 	fetchDeferredData()
+
+	if (instance.value) {
+		queryClient.prefetchQuery({
+			queryKey: ['worlds', instance.value.path],
+			queryFn: () => refreshWorlds(instance.value!.path),
+			staleTime: 30_000,
+		})
+	}
 }
 
 function fetchDeferredData() {
@@ -470,8 +472,6 @@ if (instance.value) {
 		query: route.query,
 	})
 }
-
-const loadingBar = useLoading()
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 

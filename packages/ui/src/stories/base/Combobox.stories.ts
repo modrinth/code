@@ -187,3 +187,56 @@ export const MixedSubLabels: Story = {
 		],
 	},
 }
+
+/** Custom `#option` + `#search-selection-affix` (idle search field overlay), with `sync-with-selection`. */
+export const SearchableWithOptionAndSelectionAffix: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: '100',
+		}),
+		computed: {
+			options(): { value: string; label: string; tag?: 'BETA' }[] {
+				return [
+					{ value: '100', label: 'Build 100' },
+					{ value: '99', label: 'Build 99', tag: 'BETA' },
+				]
+			},
+		},
+		template: /* html */ `
+			<Combobox
+				v-model="selected"
+				:options="options"
+				searchable
+				sync-with-selection
+				placeholder="Select build"
+				search-placeholder="Search builds..."
+			>
+				<template #option="{ item, isSelected }">
+					<div class="flex w-full items-center justify-between gap-2">
+						<span
+							class="font-semibold leading-tight"
+							:class="isSelected ? 'text-contrast' : 'text-primary'"
+						>
+							{{ item.label }}
+						</span>
+						<span
+							v-if="item.tag === 'BETA'"
+							class="shrink-0 rounded-full bg-bg-orange px-2 text-sm font-bold text-orange"
+						>
+							Beta
+						</span>
+					</div>
+				</template>
+				<template #search-selection-affix="{ option }">
+					<span
+						v-if="option && option.tag === 'BETA'"
+						class="shrink-0 rounded-full bg-bg-orange px-2 text-sm font-bold text-orange"
+					>
+						Beta
+					</span>
+				</template>
+			</Combobox>
+		`,
+	}),
+}

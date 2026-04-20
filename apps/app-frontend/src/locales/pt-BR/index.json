@@ -39,7 +39,7 @@
     "message": "Instalar conteúdo na instância"
   },
   "app.export-modal.description-placeholder": {
-    "message": "Insira a descrição do pacote de mods..."
+    "message": "Insira uma descrição para o pacote de mods..."
   },
   "app.export-modal.export-button": {
     "message": "Exportar"

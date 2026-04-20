@@ -63,7 +63,7 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Alle Daten für deine Instanz werden permanent gelöscht, einschließlich deiner Welten, Konfigurationen und allen installierten Inhalten."
+    "message": "Alle Daten deiner Instanz werden permanent gelöscht, einschließlich deiner Welten, Konfigurationen und allen installierten Inhalten."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Diese Aktion kann nicht rückgängig gemacht werden"

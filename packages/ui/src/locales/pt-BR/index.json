@@ -35,6 +35,9 @@
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Falha ao carregar as configurações do servidor"
   },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -548,11 +551,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Arquivo salvo"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Fechar"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Localizar"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} de {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Próximo resultado"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Nenhum resultado"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Resultado anterior"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Alternar substituição"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "A URL do seu arquivo de log foi copiada para a área de transferência."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "URL do log copiada"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Substituir"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Substituir tudo"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Substituir"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "Não foi possível salvar o arquivo."
@@ -611,9 +644,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Extração iniciada"
   },
-  "files.layout.loading": {
-    "defaultMessage": "Carregando arquivos..."
-  },
   "files.layout.selected-count": {
     "defaultMessage": "{count} selecionado(s)"
   },
@@ -643,6 +673,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "Navegação de arquivos"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Localizar no arquivo"
   },
   "files.navbar.home": {
     "defaultMessage": "Início"
@@ -2839,12 +2872,6 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Ocorreu um erro"
-  },
-  "servers.manage.loading-servers": {
-    "defaultMessage": "Carregando seus servidores..."
-  },
-  "servers.manage.loading.serverPanel": {
-    "defaultMessage": "Carregando o painel do seu servidor..."
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Novo servidor"

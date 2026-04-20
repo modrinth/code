@@ -21,6 +21,7 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
+import PaperChannelBadge from '#ui/components/base/PaperChannelBadge.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -35,6 +36,7 @@ import ContentDiffModal from './components/ContentDiffModal.vue'
 import IncompatibleContentModal from './components/IncompatibleContentModal.vue'
 import { useInstallationForm } from './composables'
 import { injectInstallationSettings } from './providers/installation-settings'
+import type { LoaderVersionEntry } from './types'
 
 const { formatMessage } = useVIntl()
 const ctx = injectInstallationSettings()
@@ -57,6 +59,16 @@ const form = useInstallationForm(
 	contentDiffModal,
 	incompatibleContentModal,
 )
+
+function paperLoaderChannelTag(index: number): LoaderVersionEntry['channelTag'] | null {
+	if (form.selectedPlatform.value !== 'paper') return null
+	const entries = ctx.resolveLoaderVersions(
+		form.selectedPlatform.value,
+		form.selectedGameVersion.value,
+	)
+	const tag = entries[index]?.channelTag
+	return tag === 'ALPHA' || tag === 'BETA' ? tag : null
+}
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
 	if (form.isSaving.value) {
@@ -525,6 +537,7 @@ const messages = defineMessages({
 									formatMessage(commonMessages.selectVersionPlaceholder)
 								"
 								:aria-label="formatMessage(messages.selectGameVersionAriaLabel)"
+								@option-hover="ctx.onGameVersionHover?.($event)"
 							>
 								<template v-if="form.hasSnapshots.value" #dropdown-footer>
 									<button
@@ -574,7 +587,33 @@ const messages = defineMessages({
 										loader: form.formattedLoaderName.value,
 									})
 								"
-							/>
+							>
+								<template
+									v-if="form.selectedPlatform.value === 'paper'"
+									#option="{ item, isSelected }"
+								>
+									<div class="flex w-full items-center justify-between gap-2">
+										<div class="flex flex-wrap items-center gap-2">
+											<span
+												class="font-semibold leading-tight"
+												:class="isSelected ? 'text-contrast' : 'text-primary'"
+											>
+												{{ item.label }}
+											</span>
+											<PaperChannelBadge :channel="paperLoaderChannelTag(item.value)" />
+										</div>
+									</div>
+								</template>
+								<template
+									v-if="form.selectedPlatform.value === 'paper'"
+									#search-selection-affix="{ option }"
+								>
+									<PaperChannelBadge
+										affix
+										:channel="option ? paperLoaderChannelTag(option.value) : null"
+									/>
+								</template>
+							</Combobox>
 						</div>
 
 						<div class="flex flex-wrap gap-2">

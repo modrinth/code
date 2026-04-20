@@ -29,6 +29,9 @@ export interface InstallationSettingsContext {
 	resolveLoaderVersions: (loader: string, gameVersion: string) => LoaderVersionEntry[]
 	resolveHasSnapshots: (loader: string) => boolean
 
+	/** Prefetch loader build lists when the user hovers a game version (e.g. Paper/Purpur). */
+	onGameVersionHover?: (option: GameVersionOption) => void
+
 	save: (platform: string, gameVersion: string, loaderVersionId: string | null) => Promise<void>
 	repair: () => Promise<void>
 	reinstallModpack: () => Promise<void>

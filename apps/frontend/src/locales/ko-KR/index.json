@@ -3155,6 +3155,12 @@
   "settings.billing.interval.monthly": {
     "message": "월간"
   },
+  "settings.billing.interval.quarter": {
+    "message": "분기"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "분기별"
+  },
   "settings.billing.interval.year": {
     "message": "년"
   },
@@ -3268,6 +3274,9 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "재구독 오류"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "서버가 현재 취소된 상태라면, 서버를 다시 설정하는 데 10-15분 정도 소요될 수 있습니다."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "재구독 요청 접수됨"
