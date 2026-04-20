@@ -360,10 +360,7 @@ const messages = defineMessages({
 			</template>
 			<div class="flex flex-col gap-2">
 				<span>{{ getDescription(item) }}</span>
-				<span
-					v-if="hasErrorDetail(item)"
-					class="break-all font-mono text-sm text-secondary"
-				>
+				<span v-if="hasErrorDetail(item)" class="break-all font-mono text-sm text-secondary">
 					{{ item.error }}
 				</span>
 			</div>

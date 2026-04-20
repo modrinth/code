@@ -2678,6 +2678,12 @@
   "servers.backups.admonition.backup-queued.title": {
     "defaultMessage": "Backup queued"
   },
+  "servers.backups.admonition.backup-timed-out.description": {
+    "defaultMessage": "Creating {backupName} timed out. You can try again or contact support if the issue continues."
+  },
+  "servers.backups.admonition.backup-timed-out.title": {
+    "defaultMessage": "Backup timed out"
+  },
   "servers.backups.admonition.creating-backup.description": {
     "defaultMessage": "Saving world data and server configuration for {backupName}. This can take a few minutes."
   },
