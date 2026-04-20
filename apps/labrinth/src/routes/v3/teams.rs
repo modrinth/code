@@ -15,7 +15,6 @@ use crate::routes::ApiError;
 use crate::util::error::Context;
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use ariadne::ids::UserId;
-use eyre::eyre;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
