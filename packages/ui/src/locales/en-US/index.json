@@ -2727,7 +2727,7 @@
     "defaultMessage": "{count, plural, one {Bulk actions for one selected backup} other {Bulk actions for # selected backups}}"
   },
   "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Deleting {progress}/{total} backups..."
+    "defaultMessage": "Deleting {total, plural, one {# backup} other {# backups}}..."
   },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# backup selected} other {# backups selected}}"
