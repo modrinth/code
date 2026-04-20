@@ -333,7 +333,7 @@
     "message": "Verifica email"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Ricevi novità riguardo a Modrinth"
+    "message": "Ricevi novità riguardanti Modrinth"
   },
   "auth.welcome.description": {
     "message": "Fai ora parte della grandiosa comunità di creatori ed esploratori che già costruiscono, aggiornano e stanno sul pezzo con le fantastiche mod."
@@ -2037,7 +2037,7 @@
     "message": "{count} download"
   },
   "profile.label.joined": {
-    "message": "Account creato"
+    "message": "Iscrizione"
   },
   "profile.label.no-collections": {
     "message": "Questo utente non ha raccolte!"
@@ -2217,7 +2217,7 @@
     "message": "Rivedi progetto"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting è il modo più facile per giocare coi tuoi amici senza problemi!"
+    "message": "Modrinth Hosting è il modo più facile per invitare i tuoi amici a giocare spensieratamente!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "A partire da {price}<small> al mese</small>"
@@ -3276,7 +3276,7 @@
     "message": "Errore nel riabbonamento"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Se il server era stato annullato, potrebbero volerci 10-15 minuti per impostarlo."
+    "message": "Se il server è attualmente disattivato, potrebbero volerci 10-15 minuti per configurarlo."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Richiesta di riabbonamento inviata"

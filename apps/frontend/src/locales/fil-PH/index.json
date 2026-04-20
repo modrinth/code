@@ -2957,11 +2957,20 @@
   "settings.billing.interval.monthly": {
     "message": "buwanan"
   },
+  "settings.billing.interval.quarter": {
+    "message": "tatlong buwan"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "taluhang-buwan"
+  },
   "settings.billing.interval.year": {
     "message": "taon"
   },
   "settings.billing.interval.yearly": {
     "message": "taunan"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "Mga pakinabang"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Kanselahin ang iyong subscription"

@@ -75,7 +75,7 @@
     "message": "Verwijder instantie"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Deze modpakket is al in de <bold>{instanceName}<bold> instantie geïnstalleerd. Ben je zeker dat je hetgeen wil dupliceren?"
+    "message": "Deze modpakket is al in de <bold>{instanceName}<bold> instantie geïnstalleerd. Ben je zeker dat je het geen wil dupliceren?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Maak"
@@ -93,7 +93,7 @@
     "message": "\"{name}\" was toegevoegd"
   },
   "app.instance.mods.projects-were-added": {
-    "message": "{count} projecten waren toegevoegd"
+    "message": "{count} Projecten waren toegevoegd"
   },
   "app.instance.mods.share-text": {
     "message": "Bekijk de projecten die ik in mijn modpack gebruik!"
@@ -111,7 +111,10 @@
     "message": "Zoek servers"
   },
   "app.instance.worlds.delete-world-description": {
-    "message": "{name} zal **permanent verwijderd** worden en kan niet hersteld worden."
+    "message": "{name} Zal **permanent verwijderd** worden en kan niet hersteld worden."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Weet je zeker dat je deze wereld definitief wilt verwijderen?"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Gemod"
@@ -130,6 +133,12 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Noch servers noch werelden toegevoegd"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' wordt uit je lijst verwijderd, ook in de game, en kan op geen enkele manier worden hersteld."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) wordt uit je lijst verwijderd, ook in de game, en kan op geen enkele manier worden hersteld."
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Ben je zeker dat je {name} wil verwijderen?"
@@ -447,7 +456,7 @@
     "message": "Uitgevoerd nadat het spel is afgesloten."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Voer na-afsluitcommando in..."
+    "message": "Voer een opdracht na het afsluiten in..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Voor het opstarten"
@@ -513,7 +522,7 @@
     "message": "De hoogte van het spelvenster wanneer opgestart."
   },
   "instance.settings.tabs.window.height.enter": {
-    "message": "Vul hoogte in..."
+    "message": "Voer de lengte in..."
   },
   "instance.settings.tabs.window.width": {
     "message": "Breedte"
@@ -555,7 +564,7 @@
     "message": "Je kan alleen direct de servers in springen in Minecraft Alpha 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Je kan alleen direct je eigen werelden in springen in Minecraft 1.20+"
+    "message": "Je kan alleen direct je eigen werelden in springen in Minecraft 1,20+"
   },
   "instance.worlds.play_instance": {
     "message": "Speel instantie"

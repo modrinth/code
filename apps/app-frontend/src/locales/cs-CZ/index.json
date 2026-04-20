@@ -5,11 +5,146 @@
   "app.auth-servers.unreachable.header": {
     "message": "Připojení k autorizačním serverům se nezdařilo"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Přidat server do instance"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Přidat servery do instance"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Přidat do instance"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Přidat do {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Přidáno"
+  },
+  "app.browse.already-added": {
+    "message": "Už přidáno"
+  },
+  "app.browse.discover-content": {
+    "message": "Prozkoumat obsah"
+  },
+  "app.browse.discover-servers": {
+    "message": "Prozkoumat servery"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Skrýt přidané servery"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Skrýt nainstalovaný obsah"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Nainstalovat obsah do instnce"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Přidej popis modpacku..."
   },
+  "app.export-modal.export-button": {
+    "message": "Exportovat"
+  },
+  "app.export-modal.header": {
+    "message": "Exportovat modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Jméno Modpacku"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Jméno modpacku"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Vybrat soubory a složky co zahrnout do modpacku"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Číslo verze"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Všechna data z instance budou navždy smazána, včetně světů, nastavení a všeho ostatního."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Tato akce nemůže být vrácena"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Odstranit instanci"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Odstanit instanci"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Tento modpack je už nainstalovaný v instanci <bold>{instanceName}</bold>. Opravdu ho chceš duplikovat?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Vytvořit"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack už je nainstalovaný"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instance"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projekt"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" bylo přidáno"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projektů bylo přidáno"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Podívejte se na projekty co používám ve svém modpacku!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Sdílení obsahu modpacku"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Úspěšně nahráno"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Přidat server"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Procházet servery"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "\"{name}\" bude **navždy smazáno** a nebude způsob, jak to obnovit."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Opravdu si jsi jistý, že chceš navždy smazat tenhle svět?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modováno"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Přidej nebo procházej servery"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Žádné servery nebo světy nebyly přidány"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "„{name}“ bude odstraněn z tvého seznamu, včetně hry, a nebude žádný způsob, jak ho obnovit."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Opravdu chceš odstranit {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Hledat ve světech {count}..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "tento server"
   },
   "app.modal.install-to-play.header": {
     "message": "Nainstaluj ke hraní"
@@ -81,7 +216,7 @@
     "message": "Přidat přítele"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, one {žádost} few {žádosti} other {žádostí}} o přátelství"
+    "message": "{count} přátelé {count, plural, one {request} other {requests}}"
   },
   "friends.add-friend.submit": {
     "message": "Poslat žádost o přátelství"
@@ -363,7 +498,7 @@
     "message": "Můžeš rovnou skočit na server pouze v Minecraftu Alpha 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Můžeš se rovnou připojit do světa jednoho hráče pouze v Minecraftu 1.20+"
+    "message": "V Minecraftu 1.20+ se dá rovnou přeskočit pouze do singleplayerových světů"
   },
   "instance.worlds.play_instance": {
     "message": "Hrát instanci"

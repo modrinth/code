@@ -36,7 +36,7 @@
     "message": "Скрывать установленные"
   },
   "app.browse.install-content-to-instance": {
-    "message": "Установить контент в сборку"
+    "message": "Установка контента в сборку"
   },
   "app.export-modal.description-placeholder": {
     "message": "Введите описание сборки..."
@@ -45,7 +45,7 @@
     "message": "Экспортировать"
   },
   "app.export-modal.header": {
-    "message": "Экспорт сборки модов"
+    "message": "Экспорт сборки"
   },
   "app.export-modal.modpack-name-label": {
     "message": "Название сборки"
@@ -63,10 +63,10 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Все данные вашей инстанции будут окончательно удалены, включая ваши миры, настройки и весь установленный контент."
+    "message": "Все данные сборки будут удалены навсегда, в том числе миры, настройки и весь установленный контент."
   },
   "app.instance.confirm-delete.admonition-header": {
-    "message": "Это действие нельзя обратить"
+    "message": "Это действие необратимо"
   },
   "app.instance.confirm-delete.delete-button": {
     "message": "Удалить сборку"
@@ -75,13 +75,13 @@
     "message": "Удаление сборки"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Эта сборка модов уже установлена в сборку <bold>{instanceName}</bold>. Вы уверены, что хотите дублировать её?"
+    "message": "Выбранное содержимое уже установлено в сборке <bold>{instanceName}</bold>. Создать копию?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Создать"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "Сборка модов уже установлена"
+    "message": "Содержимое уже установлено"
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Сборка"
@@ -96,7 +96,7 @@
     "message": "{count} Проектов было добавлено"
   },
   "app.instance.mods.share-text": {
-    "message": "Посмотрите проекты, которые я использую в своей сборке модов!"
+    "message": "Что в моей сборке:"
   },
   "app.instance.mods.share-title": {
     "message": "Содержимое сборки"
@@ -111,10 +111,10 @@
     "message": "Найти серверы"
   },
   "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' будет **удалён навсегда**, и будет невозможно восстановить."
+    "message": "«{name}» будет **удалён навсегда**. Его невозможно восстановить."
   },
   "app.instance.worlds.delete-world-title": {
-    "message": "Вы уверены, что хотите удалить этот мир навсегда?"
+    "message": "Вы действительно хотите удалить этот мир?"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Модовые"
@@ -129,19 +129,19 @@
     "message": "Ванильные"
   },
   "app.instance.worlds.no-worlds-description": {
-    "message": "Добавить сервер или найти, чтобы начать"
+    "message": "Добавьте или найдите сервер"
   },
   "app.instance.worlds.no-worlds-heading": {
-    "message": "Сервера или мира не добавлены"
+    "message": "Нет серверов и миров"
   },
   "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' будет удален из вашего списка, включая в игре, и восстановить будет невозможно."
+    "message": "«{name}» будет удалён из списка — в том числе в игре. Его невозможно восстановить."
   },
   "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) будет удален из вашего списка, включая в игре, и восстановить будет невозможно."
+    "message": "«{name}» ({address}) будет удалён из списка — в том числе в игре. Его невозможно восстановить."
   },
   "app.instance.worlds.remove-server-title": {
-    "message": "Вы уверены, что хотите удалить {name}?"
+    "message": "Вы действительно хотите удалить {name}?"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Поиск по {count, plural, one {# миру} other {# мирам}}..."
@@ -261,7 +261,7 @@
     "message": "Несовместимая версия {version}"
   },
   "app.world.world-item.not-played-yet": {
-    "message": "Ещё не играли"
+    "message": "Ни разу не сыграно"
   },
   "app.world.world-item.offline": {
     "message": "Не в сети"
@@ -291,7 +291,7 @@
     "message": "Какое имя у друга на Modrinth?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Добавьте друзей</link>, чтобы видеть, во что они играют!"
+    "message": "<link>Добавьте друзей</link> и следите за ними!"
   },
   "friends.friend.cancel-request": {
     "message": "Отменить запрос"
@@ -330,7 +330,7 @@
     "message": "{title} — {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Войдите в аккаунт Modrinth</link>, чтобы добавлять друзей и видеть, во что они играют!"
+    "message": "<link>Войдите в аккаунт Modrinth</link>, чтобы добавлять друзей и следить за ними!"
   },
   "instance.add-server.add-and-play": {
     "message": "Добавить и играть"
@@ -396,7 +396,7 @@
     "message": "Удалить сборку"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Навсегда удаляет сборку с вашего устройства, включая миры, настройки и весь установленный контент. Учтите, что после удаления сборки восстановить её будет невозможно."
+    "message": "Навсегда удаляет сборку с устройства, в том числе миры, настройки и весь установленный контент. Учтите, что после удаления сборки её невозможно восстановить."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Удаление..."
@@ -432,7 +432,7 @@
     "message": "Создать новую группу"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Разделение по группам позволяет организовать сборки по разным разделам в библиотеке."
+    "message": "Позволяет организовать сборки по разным разделам в библиотеке."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "Введите название группы"
@@ -591,7 +591,7 @@
     "message": "Управляется сервером"
   },
   "search.filter.locked.server-environment.title": {
-    "message": "В серверную сборку можно добавлять только моды для клиента"
+    "message": "В серверной сборке доступны только клиентские моды"
   },
   "search.filter.locked.server-game-version.title": {
     "message": "Версия игры управляется сервером"

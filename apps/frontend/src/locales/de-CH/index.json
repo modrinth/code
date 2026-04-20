@@ -3155,6 +3155,12 @@
   "settings.billing.interval.monthly": {
     "message": "monatlich"
   },
+  "settings.billing.interval.quarter": {
+    "message": "Quartal"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "vierteljährlich"
+  },
   "settings.billing.interval.year": {
     "message": "Jahr"
   },
@@ -3268,6 +3274,9 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Fehler beim erneuten Abonnieren"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Falls der Server derzeit abgesagt ist, kann die Einrichtung des Servers 10-15 Minuten dauern."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Anfrage zum erneuten Abonnieren übermittelt"

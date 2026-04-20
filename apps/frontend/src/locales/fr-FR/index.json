@@ -567,7 +567,7 @@
     "message": "Révoquer"
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Êtes-vous sûr.e de vouloir révoquer votre lien d'affiliation ''{title}'' ?"
+    "message": "Êtes-vous sûr.e de vouloir révoquer votre lien d'affiliation « {title} » ?"
   },
   "dashboard.affiliate-links.search": {
     "message": "Rechercher des liens d'affiliation..."
@@ -1278,7 +1278,7 @@
     "message": "Choisissez parmi les milliers de modpacks disponibles sur Modrinth ou créez le vôtre. Invitez vos amis lorsque vous êtes prêt à jouer."
   },
   "hosting-marketing.why.heading": {
-    "message": "De modpack à serveur"
+    "message": "Un modpack. Pouf, c'est un serveur."
   },
   "hosting-marketing.why.modern-reliable-hosting": {
     "message": "Profitez d'un hébergement moderne et fiable"
@@ -3155,6 +3155,12 @@
   "settings.billing.interval.monthly": {
     "message": "mensuel"
   },
+  "settings.billing.interval.quarter": {
+    "message": "trimestre"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "trimestriel"
+  },
   "settings.billing.interval.year": {
     "message": "an"
   },
@@ -3268,6 +3274,9 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Erreur lors du réabonnement"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Si le serveur est actuellement annulé, le mettre en place prendra 10 à 15 minutes."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Demande de réabonnement envoyée"

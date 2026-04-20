@@ -1,6 +1,60 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft serveri za autentifikaciju su možda trenutno nedostupni. Molimo vas da proverite vašu internet vezu i pokušajte ponovo kasnije."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Serveri za autentifikaciju su nedostupni"
+  },
+  "app.browse.add-server-to-instance": {
+    "message": "Dodaj server na instancu"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Dodaj servere na tvoju instancu"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Dodaj na instancu"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Dodaj na {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Dodato"
+  },
+  "app.browse.already-added": {
+    "message": "Već je dodato"
+  },
+  "app.browse.discover-content": {
+    "message": "Otkrij sadržaj"
+  },
+  "app.browse.discover-servers": {
+    "message": "Otkrij servere"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Sakrije dodate servere"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Sakrije instalirani sadržaj"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Instaliraj sadržaj na instancu"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Ukucaj opis modpacka..."
+  },
   "app.export-modal.export-button": {
     "message": "Izvoz"
+  },
+  "app.export-modal.header": {
+    "message": "Izvezi modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Ime Modpacka"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Ime modpacka"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Izaberi fajlove i foldere da uključiš u pack"
   },
   "app.export-modal.version-number-label": {
     "message": "Broj verzije"
@@ -8,8 +62,92 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Svi podaci za tvoju instancu će biti trajno izbrisani, uključujući tvoje svetove, konfiguracije, i sav instaliran sadržaj."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Ova akcija ne može biti poništena"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Izbriši instancu"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Izbriši instancu"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Ovaj modpack je već instaliran u <bold>{instanceName}</bold> instancu. Da li ste sigurni da želite da je duplirate?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Napravi"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack je već instaliran"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instanca"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projekat"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" je dodato"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projekata je dodato"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Pogledaj ove projekte koje ja koristim u svom modpacku!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Deljenje sadržaja modpacka"
+  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uspešno otpremljeno"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Dodaj server"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Pretraži servere"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' će biti **trajno izbrisan**, i neće biti načina da se vrati."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Da li ste sigurni da hoćete da trajno izbrišete ovaj svet?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modifikovano"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Oflajn"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Onlajn"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanila"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Dodaj server ili pretraži da bi započeo"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Nema dodatih servera niti svetova"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' će biti izbrisan sa vaše liste, uključujući i unutar igre, i neće biti načina da se oporavi."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) će biti izbrisan sa vaše liste, uključujući i unutar igre, i neće biti načina da se oporavi."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Da li ste sigurni da hoćete da izbrišete {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Pretraži {count} svetova..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "ovaj server"
   },
   "app.settings.tabs.appearance": {
     "message": "Izgled"

@@ -3155,6 +3155,12 @@
   "settings.billing.interval.monthly": {
     "message": "每月"
   },
+  "settings.billing.interval.quarter": {
+    "message": "季度"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "季度"
+  },
   "settings.billing.interval.year": {
     "message": "年"
   },
@@ -3252,7 +3258,7 @@
     "message": "{shared} 共享 CPU（突发高达 {bursts} 个 CPU）"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "我们未能找到与此订阅关联的服务器。可能存在以下几种情况：若你刚刚购买服务器，此为正常现象，服务器配置可能需要一小时左右；若你已购买一段时间，服务器可能已被暂停使用。如有不符预期的情况，请提供以下信息联系 Modrinth 支持团队："
+    "message": "我们未能找到与此订阅关联的服务器。可能存在以下几种情况：若你刚刚购买服务器，此为正常现象，服务器配置可能需要一小时左右；若你已购买一段时间，服务器可能已被停用。如有不符预期的情况，请提供以下信息联系 Modrinth 支持团队："
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "服务器ID：{id}"
@@ -3268,6 +3274,9 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "重新订阅时出错"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "如果服务器当前已被取消，设置服务器可能需要10-15分钟。"
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "重新订阅请求已提交"

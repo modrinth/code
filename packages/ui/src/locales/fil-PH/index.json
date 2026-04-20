@@ -41,6 +41,27 @@
   "badge.new": {
     "defaultMessage": "Bago"
   },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Kanselahin"
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Error"
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 araw"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/buwan"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/tatlong buwan"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/taon"
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Plan"
+  },
   "button.accept": {
     "defaultMessage": "Tanggapin"
   },
@@ -94,6 +115,9 @@
   },
   "button.enable": {
     "defaultMessage": "Buksan"
+  },
+  "button.extract": {
+    "defaultMessage": "Bunutin"
   },
   "button.follow": {
     "defaultMessage": "Sundan"
@@ -191,6 +215,12 @@
   "collections.label.private": {
     "defaultMessage": "Pribado"
   },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Sigurado ka bang gusto mong i-update ang {count, plural, one {# proyekto} other {# proyekto}} sa pinakabago nilang bersiyon? Iminumungkahi namin na gawin ito nang paisa-isahan."
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "Ang {action, select, downgrade {pagda-downgrade} other {pag-uupdate}} ay maaaring magdulot ng mga isyu sa pagkakatugma. Ang mga mod o kontentong dinagdag mo sa modpack ay mananatili, ngunit maaaring di-magkatutugma sa panibagong bersiyon."
+  },
   "content.confirm-unlink.admonition-header": {
     "defaultMessage": "Ina-unlink ang modpack"
   },
@@ -254,17 +284,56 @@
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Nakabukas na ang lahat ng piniling kontento"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Isara"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Hahanapin"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} sa {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Sunod na tumugma"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Walang resulta"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Nagdaang tumugma"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "I-toggle ang pagpapalit"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Palitan"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Palitan Lahat"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Pampalit"
+  },
   "files.error.go-to-home": {
     "defaultMessage": "Pumunta sa folder ng tahanan"
   },
   "files.error.try-again": {
     "defaultMessage": "Subukan muli"
   },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "Palakihin"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "Paliitin"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "Nakapatay ang mga operasyon sa talaksan habang ang operasyon ay isinasagawa."
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Bumalik sa tahanan"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Hanapin sa Talaksan"
   },
   "files.navbar.home": {
     "defaultMessage": "Tahanan"
@@ -289,6 +358,9 @@
   },
   "files.table-header.size": {
     "defaultMessage": "Sukat"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Iwaksi"
   },
   "files.upload-dropdown.cancelled": {
     "defaultMessage": "Kinansela"
@@ -458,17 +530,29 @@
   "installation-settings.incompatible-content.auto-fix-button": {
     "defaultMessage": "Kusang-ayusin"
   },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Paitan ang loader"
+  },
   "installation-settings.incompatible-content.disable-conflicts-button": {
     "defaultMessage": "Patayin ang tumutunggali"
   },
   "installation-settings.incompatible-content.game-version-warning-body": {
     "defaultMessage": "Sa pagpapalit ng bersiyon ng laro, maaari naming patayin ang mga tumutunggaling na-install na kontento o subukang lutasin ang mga pagtutunggali."
   },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Babala sa di-pagkakatugma"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Di-magkatugmang kontentong ininstall"
+  },
   "installation-settings.incompatible-content.loader-change-body": {
     "defaultMessage": "Sa pagpapalit ng loader, ang lahat ng na-install na kontento ay mapapatay. Sa halip, inimumungkahi namin na i-reset ang iyong server."
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Naka-link na {projectType, select, server {server project} other {modpack}}"
+  },
+  "installation-settings.removed-incompatible": {
+    "defaultMessage": "Tinanggal (di-magkatugma)"
   },
   "installation-settings.saving": {
     "defaultMessage": "Sine-save..."
@@ -497,6 +581,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Hindi kilalang modo ng laro"
   },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} magkatugmang {count, plural, one {instansiya} other {instansiya}}"
+  },
   "instances.content-install.install-button": {
     "defaultMessage": "I-install"
   },
@@ -505,6 +592,9 @@
   },
   "instances.content-install.name-label": {
     "defaultMessage": "Pangalan"
+  },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "Walang mahanap na magkatugmang instansiya"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Hindi naglalaman ng karagdagang kontento ang modpack na ito."
@@ -528,7 +618,7 @@
     "defaultMessage": "Kasalukuyan"
   },
   "instances.updater-modal.badge.incompatible": {
-    "defaultMessage": "Hindi magkatugma"
+    "defaultMessage": "Di-magkatugma"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "I-update ang bersiyon"
@@ -537,7 +627,7 @@
     "defaultMessage": "Palitan ng bersiyon"
   },
   "instances.updater-modal.hide-incompatible": {
-    "defaultMessage": "Hindi magkatugma"
+    "defaultMessage": "Taguin ang di-magkakatugma"
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "Walang changelog para bersiyong ito."
@@ -552,7 +642,7 @@
     "defaultMessage": "Pumili ng bersiyon upang matingnan ang changelog"
   },
   "instances.updater-modal.show-incompatible": {
-    "defaultMessage": "Ipakita ang hindi magkatugma"
+    "defaultMessage": "Ipakita ang di-magkakatugma"
   },
   "instances.updater-modal.switch-to": {
     "defaultMessage": "Papalitan ng {version}"
@@ -650,6 +740,9 @@
   "label.plan-small": {
     "defaultMessage": "Small"
   },
+  "label.plan-unknown": {
+    "defaultMessage": "Hindi kilala"
+  },
   "label.platform": {
     "defaultMessage": "Plataporma"
   },
@@ -697,6 +790,9 @@
   },
   "label.title": {
     "defaultMessage": "Titulo"
+  },
+  "label.unknown": {
+    "defaultMessage": "Hindi kilala"
   },
   "label.unlisted": {
     "defaultMessage": "Unlisted"
@@ -1113,7 +1209,7 @@
     "defaultMessage": "Mga plataporma"
   },
   "project.about.compatibility.title": {
-    "defaultMessage": "Kompatibilidad"
+    "defaultMessage": "Pagkakatugma"
   },
   "project.about.creators.owner": {
     "defaultMessage": "May-ari ng proyekto"
@@ -1209,7 +1305,7 @@
     "defaultMessage": "Client at server, di-sapilitan sa server"
   },
   "project.environment.client-only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng client at maaaring gumana sa mga vanilla server."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng client at makatutugma sa mga vanilla server."
   },
   "project.environment.client-only.title": {
     "defaultMessage": "Panig ng client lamang"
@@ -1227,7 +1323,7 @@
     "defaultMessage": "Client at server, di-sapilitan sa dalawa"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at uugma sa mga vanilla client. Gagana lamang sa mga dedikadong server."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at makatutugma sa mga vanilla client. Gagana lamang sa mga dedikadong server."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Panig ng server lamang"
@@ -1239,7 +1335,7 @@
     "defaultMessage": "Client at server, di-sapilitan sa client"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at uugma sa mga vanilla client. Gagana rin sa internal server ng pang-isahang laro."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at makatutugma sa mga vanilla client. Gagana rin sa internal server ng pang-isahang laro."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Sa panig ng server lamang, gagana rin sa pang-isahang laro"
@@ -1563,7 +1659,7 @@
     "defaultMessage": "Client at server"
   },
   "project.settings.environment.client_only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng client at maaaring gumana sa mga vanilla server."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng client at makatutugma sa mga vanilla server."
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Panig ng client lamang"
@@ -1596,7 +1692,7 @@
     "defaultMessage": "Dedicated server lamang"
   },
   "project.settings.environment.server_only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at maaaring gumana sa mga vanilla client."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at makatutugma sa mga vanilla client."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
     "defaultMessage": "Gagana rin sa pang-isahang laro"
@@ -1704,7 +1800,7 @@
     "defaultMessage": "Kinandadong pansala"
   },
   "search.filter.locked.default.description": {
-    "defaultMessage": "Maaari kang maka-install ng kontentong incompatible kapag binuksan mo ang pansala na ito."
+    "defaultMessage": "Makai-install ka ng di-magkatutugmang kontento kapag binuksan mo ang pansala na ito."
   },
   "search.filter.locked.default.sync": {
     "defaultMessage": "I-sync ang pansala"
@@ -1823,6 +1919,27 @@
   "servers.backups.item.restore": {
     "defaultMessage": "I-restore"
   },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Mag-sign-in"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Kopyado"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Panibago"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Suporta"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "Mag-reload"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "Tagumpay"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "I-upgrade"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Alisin"
   },
@@ -1865,8 +1982,14 @@
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Magsimula"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "Large"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "Nakaaangkop sa 15–25 manlalaro, modpack, o mabibigat na modding."
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "Medium"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "Nakaaangkop sa 6–15 manlalaro at may karamihang mod."
@@ -1876,6 +1999,9 @@
   },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Pumili ng plan"
+  },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "Small"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Nakaaangkop sa 1–5 manlalaro na may iilang mod."

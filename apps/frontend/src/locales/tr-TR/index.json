@@ -1433,6 +1433,9 @@
   "landing.section.for-players.label": {
     "message": "Oyuncular İçin"
   },
+  "landing.section.for-players.tagline": {
+    "message": "{count}'un üzerinde içerik keşfedin"
+  },
   "landing.subheading": {
     "message": "Topluluk odaklı açık kaynak platformumuzda Minecraft içerikleri keşfedin, oynayın ve paylaşın."
   },
@@ -2030,6 +2033,9 @@
   "profile.label.collection": {
     "message": "Koleksiyon"
   },
+  "profile.label.downloads": {
+    "message": "{count} {countPlural, plural, one {indirme} other {indirmeler}}"
+  },
   "profile.label.joined": {
     "message": "Katılma:"
   },
@@ -2047,6 +2053,9 @@
   },
   "profile.label.organizations": {
     "message": "Organizasyonlar"
+  },
+  "profile.label.projects": {
+    "message": "{count} {countPlural, plural, one {proje} other {projeler}}"
   },
   "profile.label.saving": {
     "message": "Kaydediliyor..."
@@ -2804,6 +2813,27 @@
   "servers.plan.small.description": {
     "message": "1–5 arkadaş ve birkaç hafif mod için mükemmel."
   },
+  "settings.account.button.complete-setup": {
+    "message": "Kurulumu tamamla"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "Dışa aktarmayı indir"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "Dışa akatma oluştur"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "Dışa aktarma oluşturuluyor..."
+  },
+  "settings.account.data-export.description": {
+    "message": "Modrinth'e yüklediğiniz tüm kişisel verilerinizin bir kopyasını talep edin. Bu işlemin tamamlanması birkaç dakika sürebilir."
+  },
+  "settings.account.data-export.title": {
+    "message": "Veri dışa aktarma"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "Bu işlem, **tüm kullanıcı verilerinizi ve takip ettiğiniz hesapları anında siler**. Projeleriniz silinmez. Hesabınızı silme işlemi geri alınamaz.<br><br>Hesabınızla ilgili yardıma ihtiyacınız varsa, [Modrinth Discord](https://discord.modrinth.com) üzerinden destek alabilirsiniz."
+  },
   "settings.account.delete.confirm.proceed": {
     "message": "Hesabı sil"
   },
@@ -2813,11 +2843,35 @@
   "settings.account.delete.section.action": {
     "message": "Hesabı sil"
   },
+  "settings.account.delete.section.description": {
+    "message": "Hesabınızı sildiğinizde geri dönüş yoktur. Hesabınızı silmek, projeler hariç olmak olmak üzere tüm ekli verilerin sunucularımızdan silinmesine neden olur."
+  },
   "settings.account.delete.section.title": {
     "message": "Hesabı sil"
   },
+  "settings.account.email.action.save": {
+    "message": "Epostayı kaydet"
+  },
+  "settings.account.email.field.label": {
+    "message": "Eposta adresi"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Eposta adresinizi girin..."
+  },
   "settings.account.email.modal.header.add": {
     "message": "E-posta Ekle"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Eposta değiştirme"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "Hesap detaylarınız herkesse gösterilmez."
+  },
+  "settings.account.password.action.remove": {
+    "message": "Parolayı kaldır"
+  },
+  "settings.account.password.action.save": {
+    "message": "Parolayı kaydet"
   },
   "settings.account.password.error.mismatch": {
     "message": "Parolalar uyuşmuyor!"
@@ -2861,6 +2915,12 @@
   "settings.account.providers.action.add": {
     "message": "Ekle"
   },
+  "settings.account.providers.modal.header": {
+    "message": "Doğrulama sağlayıcıları"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Eylemler"
+  },
   "settings.account.providers.table.provider": {
     "message": "Sağlayıcı"
   },
@@ -2896,6 +2956,9 @@
   },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "Girilen kod yanlış!"
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "Çift aşamalı kodu girin"
   },
   "settings.account.two-factor.field.code.placeholder": {
     "message": "Kodu girin..."
@@ -3002,6 +3065,33 @@
   "settings.authorizations.by": {
     "message": "tarafından"
   },
+  "settings.authorizations.revoke.action": {
+    "message": "Kaldır"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "çeyrek"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "çeyreklik"
+  },
+  "settings.billing.interval.year": {
+    "message": "yıl"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "yıllık"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "Modrinth App ve modrinth.com'da reklamsız gezinme"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Profilinde Modrinth+ rozeti"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Modrinth ve üreticilerini direkt olarak destekleyin"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "Yararlar"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Aboneliği iptal et"
   },
@@ -3019,6 +3109,9 @@
   },
   "settings.billing.modal.delete.title": {
     "message": "Bu ödeme yöntemini kaldırmak istediğinizden emin misiniz?"
+  },
+  "settings.billing.next": {
+    "message": "Sonraki:"
   },
   "settings.billing.payment_method.action.add": {
     "message": "Ödeme yöntemi ekle"
@@ -3041,17 +3134,35 @@
   "settings.billing.payment_method.title": {
     "message": "Ödeme yöntemleri"
   },
+  "settings.billing.plan.title": {
+    "message": "{size} Plan"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "Sunucu Kimliği:{id}"
   },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "Stripe Kimliği: {id}"
+  },
   "settings.billing.pyro.ram": {
     "message": "{gb} GB RAM"
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Yeniden abone olurken hata"
   },
   "settings.billing.pyro.status.processing": {
     "message": "Ödemeniz işleniyor. Sunucunuz ödeme tamamlandığında aktifleşecektir."
   },
   "settings.billing.pyro.storage": {
     "message": "{gb} GB RAM"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} GB Değişim"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Modrinth Sunucu aboneliklerini yönet."
@@ -3068,11 +3179,20 @@
   "settings.billing.subscription.title": {
     "message": "Abonelikler"
   },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "Aylık faturalandırma size yıllık ek olarak {amount} maliyet çıkaracaktır"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "{date} tarihinde {interval} ödemeye geçer"
+  },
+  "settings.billing.update-method": {
+    "message": "Güncelleme metodu"
+  },
   "settings.billing.upgrade": {
     "message": "Güncelle"
   },
   "settings.display.banner.developer-mode.button": {
-    "message": "Geliştiri modunu devre dışı bırak"
+    "message": "Geliştirme modunu devre dışı bırak"
   },
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Geliştirme modu</strong> aktif. Modrinth'te bulunan çeşitli şeylerin dahilî kimliklerini gösterir, Modrinth API kullanan bir geliştiriciyseniz kullanışlı olabilir. Sayfanın en altındaki Modrinth logosuna 5 kere tıklayarak açılır ve kapanır."
@@ -3082,6 +3202,12 @@
   },
   "settings.display.flags.title": {
     "message": "Özellik aç/kapa"
+  },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "Geliştirme modu kapatıldı"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "Geliştirme modu kapalı"
   },
   "settings.display.project-list-layouts.datapack": {
     "message": "Veri Paketleri sayfası"
@@ -3265,6 +3391,9 @@
   },
   "ui.newsletter-button.subscribed": {
     "message": "Abone Olundu!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Modrinth haber mektuplarına abone ol"
   },
   "version.environment.none.description": {
     "message": "Bu sürüm için ortam belirtilmemiş."

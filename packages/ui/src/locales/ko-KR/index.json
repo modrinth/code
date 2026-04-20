@@ -32,6 +32,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "통계 보기"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "서버 설정 불러오기 실패"
+  },
+  "badge.alpha": {
+    "defaultMessage": "알파"
+  },
   "badge.beta": {
     "defaultMessage": "베타"
   },
@@ -40,6 +46,54 @@
   },
   "badge.new": {
     "defaultMessage": "소식"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "취소"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} 공유 CPU 코어"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "<server-name>{serverName}</server-name> 서버에 다시 구독하려고 합니다. 구독이 재활성화되며, 서버는 중단 없이 계속 실행됩니다."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "재구독할 수 없습니다. 구독 정보를 불러오는 데 실패했습니다."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "오류"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "구독 정보를 불러오는 데 실패했습니다."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5일"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/개월"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/분기"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/연"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "다음 결제일은 <charge-date>{date}</charge-date>입니다."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "플랜"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb}GB 램"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "재구독"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb}GB 저장소"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "서버 다시 구독"
   },
   "button.accept": {
     "defaultMessage": "수락"
@@ -250,6 +304,9 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} 삭제"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {다운그레이드 진행 중} other {업데이트 진행 중}}에는 호환성 문제가 발생할 수 있습니다. 모드팩에 추가한 모드나 콘텐츠는 유지되지만, 새 버전과 호환되지 않을 수 있습니다."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {다운그레이드} other {업데이트}} 주의"
@@ -494,11 +551,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "파일 저장됨"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "닫다"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "찾다"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current}개 중 {total}개"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "다음 경기"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "결과 없음"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "이전 경기"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "교체 전환"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "로그 파일 URL이 클립보드에 복사되었습니다."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "로그 URL 복사됨"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "바꾸다"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "모두 바꾸기"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "바꾸다"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "파일을 저장하지 못했습니다."
@@ -557,9 +644,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "내보내기 시작됨"
   },
-  "files.layout.loading": {
-    "defaultMessage": "파일 불러오는 중..."
-  },
   "files.layout.selected-count": {
     "defaultMessage": "{count}개 선택됨"
   },
@@ -589,6 +673,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "파일 탐색"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "파일에서 찾기"
   },
   "files.navbar.home": {
     "defaultMessage": "홈"
@@ -895,6 +982,60 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "파일 업로드 실패"
+  },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "모드팩 버전 변경 실패"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "버전 불러오기 실패"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "모드팩 재설치 실패"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "서버 복구 실패"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "서버 온보딩 상태로 재설정 실패"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "설치 설정 저장 실패"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "모드팩 연결 해제 실패"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "{loader, select, null {Loader} other {{loader}}} 버전"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "서버 설치가 복구되었습니다."
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "복구 완료"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "서버 초기화"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "서버에 저장된 세계, 모드, 설정 파일 등의 모든 데이터가 삭제됩니다. 백업 파일은 그대로 유지되며, 필요 시 복원할 수 있습니다."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "온보딩 상태로 재설정"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "서버가 다시 온보딩 단계로 돌아가 설정을 다시 완료할 수 있습니다. 계속하시겠습니까?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "온보딩 상태로 재설정"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "서버가 온보딩 상태로 되돌아갔습니다."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "온보딩 상태로 서버 재설정"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "지원 옵션"
   },
   "hosting.specs.burst": {
     "defaultMessage": "최대 {cpus} CPU까지 버스트 가능"
@@ -1213,6 +1354,9 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "이 모드는 클라이언트 측 모드에 의존하므로 서버를 시작할 때 문제가 발생할 수 있습니다"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "이 모드는 클라이언트 측 모드이므로 서버를 시작할 때 문제가 발생할 수 있습니다"
   },
   "label.client-retained-warning": {
     "defaultMessage": "이것은 종속성으로 설치된 클라이언트 측 모드이므로 서버를 시작할 때 문제가 발생할 수 있습니다"
@@ -2576,6 +2720,234 @@
   "servers.backups.item.restore": {
     "defaultMessage": "복원"
   },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "백업 생성 진행 중"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "백업 복원 진행 중"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "서버 설치 중"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "콘텐츠 동기화 진행 중"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "서버가 이미 있으신가요?"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Modrinth 호스팅에 관하여 알아보기"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth 호스팅"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "새로운 서버"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "Modrinth 앱에서 모드를 설치하고, 친구를 초대해 함께 플레이하세요."
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "서버 없음"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "즐겨찾는 모드들을 선택하시고 나머지는 저희에게 맡겨주세요."
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "원클릭 모드 설치"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "Modrinth 앱에서 친구들을 초대해 설정을 도울 수 있습니다."
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "친구들과 플레이하세요"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "로그인"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "싱글 플레이어 월드처럼 서버를 설정하세요."
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "간단한 설정"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "복사됨"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "코드를 클립보드에 복사하세요"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "신분증 복사"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "최신 백업 다운로드"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "청구 관리"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "새로운"
+  },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "파일은 <days-remaining>{daysRemaining}일 동안 보관됩니다. 삭제되기 전에 파일을 다운로드하려면 지원팀에 문의하세요."
+  },
+  "servers.listing.notice.files-preserved-after-cancellation": {
+    "defaultMessage": "취소 후 30일 동안 파일이 보존됩니다."
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "관리자의 조치로 인해 서버가 정지되었습니다."
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "서버는 <date>{formattedDate}</date>에 {verb} {planSize} 플랜으로 업그레이드됩니다."
+  },
+  "servers.listing.notice.provisioning": {
+    "defaultMessage": "서버 설정이 완료될 때까지 잠시 기다려 주십시오. 최대 10분 정도 소요될 수 있습니다."
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "구독이 취소되었습니다."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "구독이 <date>{formattedDate}</date>에 취소되었습니다."
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed": {
+    "defaultMessage": "결제 실패로 인해 구독이 취소되었습니다."
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
+    "defaultMessage": "결제 실패로 인해 <date>{formattedDate}</date>에 구독이 취소되었습니다."
+  },
+  "servers.listing.notice.subscription-set-to-cancel": {
+    "defaultMessage": "구독이 취소될 예정입니다."
+  },
+  "servers.listing.notice.subscription-set-to-cancel-on-date": {
+    "defaultMessage": "구독이 <date>{formattedDate}</date>에 취소되도록 설정되어 있습니다."
+  },
+  "servers.listing.notice.suspended": {
+    "defaultMessage": "서버가 정지되었습니다. 자세한 내용은 Modrinth 지원팀에 문의하십시오."
+  },
+  "servers.listing.notice.upgrading": {
+    "defaultMessage": "서버 하드웨어 업그레이드 작업이 진행 중이며 곧 다시 온라인 상태가 될 예정입니다."
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "재구독"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "서버 아이콘"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "지원하다"
+  },
+  "servers.listing.using-project-label": {
+    "defaultMessage": "{projectTitle} 사용"
+  },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "새 서버를 확인하는 중..."
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "파일 업로드가 진행 중입니다. 이 페이지를 나가면 업로드가 취소됩니다."
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "업로드 진행 중"
+  },
+  "servers.manage.contact-support-button": {
+    "defaultMessage": "Modrinth 지원팀에 문의하세요."
+  },
+  "servers.manage.error.alert-notice": {
+    "defaultMessage": "저희 시스템은 문제가 발생하면 자동으로 팀에 알림을 보냅니다. 현재 시스템을 다시 정상화하기 위해 노력하고 있습니다."
+  },
+  "servers.manage.error.description": {
+    "defaultMessage": "저희 서버에 일시적인 문제가 발생할 수 있습니다."
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "오류 세부정보:"
+  },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "최근에 Modrinth Hosting 서버를 구매하셨다면, 현재 대기 중이며 준비가 완료되는 대로 여기에 표시될 것입니다. <경고>새 서버를 구매하려고 시도하지 마십시오.</경고>"
+  },
+  "servers.manage.error.support-notice": {
+    "defaultMessage": "\n서버 상태와 관련하여 개별적인 지원이 필요하시면 Modrinth 지원팀에 문의해 주세요."
+  },
+  "servers.manage.error.title": {
+    "defaultMessage": "서버를 로드할 수 없습니다."
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "오류가 발생했습니다"
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "새로운 서버"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "서버를 찾을 수 없습니다."
+  },
+  "servers.manage.purchase-unavailable.text": {
+    "defaultMessage": "결제 정보가 아직 로딩 중입니다. 준비가 완료되는 대로 결제 페이지를 열겠습니다."
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "구매할 수 없음"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "새로고침"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "Modrinth 서버에 다시 가입하는 동안 오류가 발생했습니다."
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "재구독 중 오류 발생"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "서버 연결이 현재 취소된 경우, 다음 결제 시도까지 최대 10분이 소요될 수 있습니다."
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "재구독 요청이 제출되었습니다"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "서버 구독이 성공적으로 재구독되었습니다"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "성공"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "검색 {count} {count, plural, one {서버} other {서버}}..."
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth 호스팅"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "여기서 찾을 수 있습니다!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "다시 보지 않기"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "서버 설정이 이동되었습니다"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {일} other {일}} <hours-count>{hours}</hours-count> {hours, plural, one {시간} other {시간}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {분} other {분}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {초} other {초}} 남음..."
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "새로운 서버"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "Medal 서버 체험판이 종료되어 서버가 일시 중지되었습니다. 계속 사용하려면 업그레이드해 주세요."
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "서버가 일시 중지되었습니다. 결제 정보를 업데이트하거나 자세한 내용은 Modrinth 지원팀에 문의해 주세요."
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "서버가 일시 중지되었습니다: {reason}. 결제 정보를 업데이트하거나 자세한 내용은 Modrinth 지원팀에 문의해 주세요."
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "서버의 하드웨어가 현재 업그레이드 중이며, 곧 다시 온라인 상태로 돌아올 예정입니다."
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "서버 아이콘"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "업그레이드"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "{projectTitle} 사용"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "무시"
   },
@@ -2603,6 +2975,12 @@
   "servers.notice.undismissable": {
     "defaultMessage": "무시 불가"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "Modrinth 호스팅 결제가 성공적으로 완료되었습니다."
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "결제 성공"
+  },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "아직은 요금이 청구되지 않습니다."
   },
@@ -2612,14 +2990,26 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "결제 수단"
   },
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "북미, 유럽, 동남아시아에서 이용 가능합니다."
+  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "필요한 사양만을 갖춘 맞춤형 플랜을 선택하세요."
+  },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "정확히 필요한 것이 있나요?"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "시작하기"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "대형"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "15–25명의 플레이어, 모드팩 또는 무거운 모드에 적합합니다."
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "중형"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "6–15명의 플레이어와 여러개의 모드에 적합합니다."
@@ -2630,11 +3020,17 @@
   "servers.purchase.step.plan.select": {
     "defaultMessage": "플랜 선택"
   },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "소형"
+  },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "1–5명의 친구와 적은 수의 가벼운 모드에 적합합니다."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "플랜"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "현재 플랜"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "지역"

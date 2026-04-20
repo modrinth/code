@@ -251,6 +251,9 @@
   "app.update.reload-to-update": {
     "message": "أعد التحميل لتثبيت التحديث"
   },
+  "app.world.server-modal.placeholder-address": {
+    "message": "مثال.مودرنث.جج"
+  },
   "app.world.server-modal.select-an-option": {
     "message": "حدد خيارا"
   },
