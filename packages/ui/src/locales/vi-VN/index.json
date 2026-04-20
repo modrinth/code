@@ -32,6 +32,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Xem phân tích"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Không thể tải cài đặt máy chủ"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alpha"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -40,6 +46,51 @@
   },
   "badge.new": {
     "defaultMessage": "Mới"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Hủy"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} CPU chia sẻ"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Bạn chuẩn bị đăng ký lại <server-name> {serverName} </server-name>. Gói đăng ký của bạn sẽ được kích hoạt lại và máy chủ của bạn sẽ tiếp tục hoạt động."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Không thể đăng ký lại, lỗi tải thông tin đăng ký."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Lỗi"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Lỗi tải thông tin đăng ký."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 ngày"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/tháng"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/quý"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/năm"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Lần thanh toán tiếp theo sẽ là vào <charge-date> {date} </charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Gói"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB RAM"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Đăng ký lại"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB bộ nhớ"
   },
   "button.accept": {
     "defaultMessage": "Chấp nhận"
@@ -69,7 +120,7 @@
     "defaultMessage": "Tiếp tục"
   },
   "button.copy-filename": {
-    "defaultMessage": "Sao chép tên tài liệu"
+    "defaultMessage": "Sao chép tên tệp"
   },
   "button.copy-full-path": {
     "defaultMessage": "Sao chép đường dẫn"
@@ -81,7 +132,7 @@
     "defaultMessage": "Sao chép liên kết"
   },
   "button.copy-permalink": {
-    "defaultMessage": "Sao chép liên kết vĩnh viễn"
+    "defaultMessage": "Sao chép liên kết cố định"
   },
   "button.create-a-project": {
     "defaultMessage": "Tạo dự án"
@@ -117,7 +168,7 @@
     "defaultMessage": "Tối đa"
   },
   "button.more-options": {
-    "defaultMessage": "Thêm tùy chọn"
+    "defaultMessage": "Tùy chọn"
   },
   "button.move": {
     "defaultMessage": "Di chuyển"
@@ -129,7 +180,7 @@
     "defaultMessage": "Mở thư mục"
   },
   "button.open-in-folder": {
-    "defaultMessage": "Mở nó trong thư mục"
+    "defaultMessage": "Mở thư mục"
   },
   "button.play": {
     "defaultMessage": "Chơi"
@@ -234,7 +285,7 @@
     "defaultMessage": "Cập nhật dự án"
   },
   "content.confirm-bulk-update.shift-click-hint": {
-    "defaultMessage": "Nhẫn phím Shift trong khi ấn \"Update all\" để bỏ qua bước xác nhận trong tương lai"
+    "defaultMessage": "Nhẫn giữ phím Shift trong khi ấn \"Cập nhật tất cả\" để bỏ qua bước xác nhận."
   },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Cập nhật {count, plural, one {# dự án} other {# dự án}}"
@@ -243,25 +294,28 @@
     "defaultMessage": "Việc xóa một bản mod có thể ảnh hưởng vĩnh viễn đến thế giới của bạn, đồng thời có thể gây thiếu hụt nội dung hoặc phát sinh các lỗi không mong muốn khi tải lại thế giới đó."
   },
   "content.confirm-deletion.admonition-header": {
-    "defaultMessage": "Cảnh báo xoá"
+    "defaultMessage": "Cảnh báo trước khi xoá"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Xoá {count} {itemType}"
+    "defaultMessage": "Xóa {count} {itemType}{count, plural, other {}}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Xoá {itemType}"
+    "defaultMessage": "Xóa {itemType} {count, plural, other {}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {Việc hạ phiên bản} other {Việc cập nhật}} có thể gây ra lỗi tương thích. Những mod mà bạn thêm vào modpack sẽ được giữ lại nhưng chúng có thể sẽ không tương thích với phiên bản mới của modpack."
   },
   "content.confirm-modpack-update.admonition-header": {
-    "defaultMessage": "Cảnh báo {action, select, downgrade {hạ cấp} other {cập nhật}}"
+    "defaultMessage": "Cảnh báo {action, select, downgrade {hạ phiên bản} other {cập nhật}}"
   },
   "content.confirm-modpack-update.confirm-button": {
-    "defaultMessage": "{action, select, downgrade {Hạ cấp} other {Cập nhật}} modpack"
+    "defaultMessage": "{action, select, downgrade {Hạ phiên bản} other {Cập nhật}} modpack"
   },
   "content.confirm-modpack-update.header": {
-    "defaultMessage": "{action, select, downgrade {Hạ cấp} other {Cập nhật}} modpack"
+    "defaultMessage": "{action, select, downgrade {Hạ phiên bản} other {Cập nhật}} modpack"
   },
   "content.confirm-unlink.admonition-body": {
-    "defaultMessage": "Các bản mod và nội dung sẽ được hợp nhất với những gì bạn đã thêm vào bản modpack, và nó sẽ ngừng nhận các bản cập nhật."
+    "defaultMessage": "Các bản mod và nội dung sẽ được hợp nhất với những gì bạn đã thêm vào modpack và modpack sẽ ngừng nhận các bản cập nhật."
   },
   "content.confirm-unlink.admonition-header": {
     "defaultMessage": "Cảnh báo huỷ liên kết modpack"
@@ -494,11 +548,35 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Tệp đã được lưu"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Đóng"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Tìm"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} trên {total}"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Không có kết quả"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Những kết quả trước"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "URL tệp nhật kí của bạn đã được chép vào bảng tạm."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "Đã chép URL nhật kí"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Thay thế"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Thay thế tất cả"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Thay thế"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "Không lưu tệp này được."
@@ -507,7 +585,7 @@
     "defaultMessage": "Không lưu được"
   },
   "files.error.go-to-home": {
-    "defaultMessage": ""
+    "defaultMessage": "Quay về thư mục gốc"
   },
   "files.error.try-again": {
     "defaultMessage": "Thử lại"
@@ -537,16 +615,16 @@
     "defaultMessage": "Các thao tác với tệp sẽ bị vô hiệu hóa trong khi thao tác đang diễn ra."
   },
   "files.layout.empty-folder-description": {
-    "defaultMessage": "Không có tệp hoặc thư mục nào"
+    "defaultMessage": "Không có tệp hoặc thư mục nào."
   },
   "files.layout.empty-folder-title": {
     "defaultMessage": "Thư mục trống không"
   },
+  "files.layout.error-message": {
+    "defaultMessage": "Thư mục không tồn tại."
+  },
   "files.layout.error-title": {
     "defaultMessage": "Không thể tải tệp"
-  },
-  "files.layout.loading": {
-    "defaultMessage": "Đang tải tệp..."
   },
   "files.layout.selected-count": {
     "defaultMessage": "đã chọn {count}"
@@ -657,13 +735,13 @@
     "defaultMessage": "Tệp"
   },
   "files.upload-dropdown.file-uploads": {
-    "defaultMessage": "Tải lên "
+    "defaultMessage": "Tải lên"
   },
   "files.upload-dropdown.incorrect-file-type": {
     "defaultMessage": "Sai định dạng khi tải lên"
   },
   "files.upload-dropdown.unexpected-error": {
-    "defaultMessage": "Đã có lỗi xảy ra"
+    "defaultMessage": "Đã có lỗi xảy ra."
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": "Còn {count}"
@@ -672,7 +750,7 @@
     "defaultMessage": "Tên"
   },
   "files.validation.name-required": {
-    "defaultMessage": "Bắt buộc phải có tên"
+    "defaultMessage": "Bắt buộc phải có tên."
   },
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Cài đặt modpack của CurseForge"
@@ -681,7 +759,7 @@
     "defaultMessage": "Cài đặt một modpack của CurseForge"
   },
   "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Không thể tìm modpack của CurseForge từ đường dẫn đó"
+    "defaultMessage": "Không thể tìm modpack của CurseForge từ đường dẫn đó."
   },
   "files.zip-url-modal.cf-not-found-title": {
     "defaultMessage": "Không thể tìm thấy modpack từ CurseForge"
@@ -693,10 +771,10 @@
     "defaultMessage": "URL phải là URL phiên bản của gói mod trên CurseForge."
   },
   "files.zip-url-modal.error-url-invalid": {
-    "defaultMessage": "Đường dẫn phải khả dụng"
+    "defaultMessage": "Đường dẫn phải khả dụng."
   },
   "files.zip-url-modal.error-url-required": {
-    "defaultMessage": "Bắt buộc có đường dẫn"
+    "defaultMessage": "Bắt buộc có đường dẫn."
   },
   "files.zip-url-modal.install-button": {
     "defaultMessage": "Cài đặt"
@@ -708,13 +786,13 @@
     "defaultMessage": "Sao chép đường dẫn"
   },
   "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Tìm và xác định vị trí Modpack Curseforge mà bạn muốn"
+    "defaultMessage": "Tìm và xác định vị trí Modpack Curseforge mà bạn muốn."
   },
   "files.zip-url-modal.step-find-title": {
     "defaultMessage": "Tìm modpack"
   },
   "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Vào mục \"Tệp\" và chọn phiên bản để cài"
+    "defaultMessage": "Vào mục \"Files\" và chọn phiên bản để cài."
   },
   "files.zip-url-modal.step-select-title": {
     "defaultMessage": "Chọn phiên bản"
@@ -723,7 +801,7 @@
     "defaultMessage": "Đã xảy ra lỗi không xác định"
   },
   "files.zip-url-modal.zip-description": {
-    "defaultMessage": "Sao chép và dán dường dẫn trực tiếp của tệp .zip"
+    "defaultMessage": "Sao chép và dán dường dẫn trực tiếp của tệp .zip."
   },
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "Đang tải lên nội dung .zip từ đường dẫn"
@@ -867,13 +945,13 @@
     "defaultMessage": "Tăng tốc tối đa lên {cpus} CPU"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "Tính năng tăng tốc CPU cho phép máy chủ của bạn tạm thời sử dụng thêm các luồng để giúp giảm thiểu hiện tượng tăng đột biến TPS (số giao dịch mỗi giây). Nhấp vào đây để biết thêm thông tin."
+    "defaultMessage": "Tính năng tăng tốc CPU cho phép máy chủ của bạn tạm thời sử dụng thêm các luồng để giúp giảm thiểu hiện tượng tụt TPS. Nhấp để xem chi tiết."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB RAM"
   },
   "hosting.specs.gb-storage": {
-    "defaultMessage": "{storage} GB dung lượng lưu trữ"
+    "defaultMessage": "{storage} GB bộ nhớ"
   },
   "hosting.specs.shared-cpus": {
     "defaultMessage": "{cpus} CPU dùng chung"
@@ -915,7 +993,7 @@
     "defaultMessage": "Chọn phiên bản {loader}"
   },
   "installation-settings.aria.select-platform": {
-    "defaultMessage": "Chọn modloader"
+    "defaultMessage": "Chọn mod loader"
   },
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Xác nhận"
@@ -951,7 +1029,7 @@
     "defaultMessage": "Phiên bản {loader}"
   },
   "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Bạn sẽ cần khởi động lại máy chủ để đổi trình nạp."
+    "defaultMessage": "Bạn sẽ cần khởi động lại máy chủ để đổi mod loader."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Việc cài đặt lại modpack sẽ đặt lại nội dung của {type, select, server {máy chủ} other {phiên chơi}} về trạng thái ban đầu, đồng thời gỡ bỏ mọi mod hoặc nội dung mà bạn đã thêm vào."
@@ -1284,7 +1362,7 @@
     "defaultMessage": "Không rõ"
   },
   "label.platform": {
-    "defaultMessage": "Nền tảng"
+    "defaultMessage": "Mod loader"
   },
   "label.played": {
     "defaultMessage": "Đã chơi {ago}"

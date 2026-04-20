@@ -165,7 +165,7 @@
     "message": "Делитесь сборками"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Непохоже ни на один лаунчер,"
+    "message": "Лаунчер, непохожий"
   },
   "app-marketing.features.website.description": {
     "message": "Приложение полностью интегрировано с сайтом — открывайте любимые проекты прямо в Modrinth App!"
@@ -174,7 +174,7 @@
     "message": "Интеграция с сайтом"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "что вы использовали раньше"
+    "message": "на все остальные"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Скриншот Modrinth App со страницей содержимого сборки Cobblemon."
@@ -192,7 +192,7 @@
     "message": "Скачать Modrinth App для {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
-    "message": "Скриншот сборки Cobblemon на главном меню."
+    "message": "Скриншот главного меню сборки Cobblemon."
   },
   "app-marketing.hero.more-download-options": {
     "message": "Больше вариантов установки"
@@ -507,7 +507,7 @@
     "message": "Введите название проекта..."
   },
   "create.project.owner-description": {
-    "message": "Укажите себя или организацию, в которой состоите."
+    "message": "Укажите в качестве владельца проекта себя или организацию, членом которой вы являетесь."
   },
   "create.project.owner-label": {
     "message": "Владелец"
@@ -576,7 +576,7 @@
     "message": "Создать новую"
   },
   "dashboard.collections.empty.get-started-hint": {
-    "message": "Создайте свою первую коллекцию!"
+    "message": "Создайте свою первую коллекцию, чтобы начать работу!"
   },
   "dashboard.collections.empty.no-collections": {
     "message": "Коллекций пока нет"
@@ -657,7 +657,7 @@
     "message": "Чистая сумма"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
-    "message": "Долларов США"
+    "message": "Эквивалент в долларах США"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Юридическое лицо"
@@ -1119,10 +1119,10 @@
     "message": "На год"
   },
   "hosting-marketing.faq.burst-threads": {
-    "message": "Как работают с высокой нагрузкой на CPU?"
+    "message": "Как работает рост потоков CPU?"
   },
   "hosting-marketing.faq.burst-threads.answer": {
-    "message": "Когда ваш сервер испытывает высокую нагрузку, мы временно предоставляем ему доступ к дополнительным потокам CPU, чтобы уменьшить лаги и нестабильность. Это помогает предотвратить падение TPS ниже 20 и обеспечить максимально плавную работу. Поскольку эти дополнительные потоки доступны только на короткое время во время периодов высокой нагрузки, они могут не отображаться в отчётах Spark или других инструментах профилирования."
+    "message": "Когда сервер испытывает высокую нагрузку, ему временно выделяются дополнительные потоки CPU. Это помогает показателю TPS не упасть ниже 20 и обеспечивает максимально плавный игровой процесс. Из‑за своей кратковременности такие потоки могут не отображаться в отчётах Spark и других инструментах профилирования."
   },
   "hosting-marketing.faq.cpu-kind": {
     "message": "Какие процессоры используются на серверах Modrinth Hosting?"
@@ -1155,10 +1155,10 @@
     "message": "Чаще всего проблемы с производи­тель­ностью вызваны плохой оптимизацией сборок, модов, плагинов и наборов данных. Наши серверы рассчитаны на высокие нагрузки, поэтому при выборе подходящего плана серьёзных проблем возникнуть не должно."
   },
   "hosting-marketing.faq.increase-storage": {
-    "message": "Можно ли увеличить объём хранилища на сервере?"
+    "message": "Можно ли увеличить объём диска на сервере?"
   },
   "hosting-marketing.faq.increase-storage.answer": {
-    "message": "Да. Объём хранилища на сервере можно бесплатно увеличить: достаточно обратиться в поддержку Modrinth."
+    "message": "Да. Объём диска на сервере можно бесплатно увеличить: достаточно обратиться в поддержку Modrinth."
   },
   "hosting-marketing.faq.location": {
     "message": "Где расположены серверы Modrinth Hosting? Можно ли выбрать регион?"
@@ -1227,7 +1227,7 @@
     "message": "Поддержка в нужный момент"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Обращайтесь в команду Modrinth за помощью по вопросам, связанным с вашим сервером, в любое время."
+    "message": "Команда Modrinth готова помочь с сервером в любое время."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "Мощная консоль, удобная настройка и многое другое"
@@ -1266,7 +1266,7 @@
     "message": "Управляйте всем на Modrinth"
   },
   "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "Сервера, моды, игроки — всё уже есть на Modrinth. Не нужно переключаться между платформами."
+    "message": "Сервер, моды, игроки — всё уже есть на Modrinth. Не нужно переключаться между платформами."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Всегда высокая скорость"
@@ -1275,7 +1275,7 @@
     "message": "Из‑за отсутствия перегрузок в инфраструктуре каждый сервер работает на полной мощности."
   },
   "hosting-marketing.why.description": {
-    "message": "Выберите любую из тысяч сборок на Modrinth или создайте свою, пригласите друзей и начинайте игру."
+    "message": "Выберите любую из тысяч сборок на Modrinth или создайте свою. Пригласите друзей и начинайте игру."
   },
   "hosting-marketing.why.heading": {
     "message": "Найдите сборку. Сервер готов."
@@ -1290,13 +1290,13 @@
     "message": "Играйте сразу с модами"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Установка модов и сборок встроена в Modrinth Hosting и работает прямо на сервере."
+    "message": "Установка серверных модов и сборок встроена в Modrinth Hosting."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "Почему именно Modrinth Hosting?"
+    "message": "Преимущества Modrinth Hosting"
   },
   "hosting-marketing.why.your-favorite-mods": {
-    "message": "Все ваши любимые моды"
+    "message": "Любые моды на ваш вкус"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Выбирайте Fabric, Forge, Quilt, NeoForge или сервер без модов. Всё, что есть на Modrinth, работает на сервере."
@@ -1314,7 +1314,7 @@
     "message": "Перейти в панель управления"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Получайте лучший опыт моддинга с постоянными обновлениями от команды Modrinth"
+    "message": "Получайте лучший опыт в создании модов с постоянными обновлениями от команды Modrinth"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Постоянное развитие"
@@ -2805,13 +2805,13 @@
     "message": "Нет оповещений"
   },
   "servers.plan.large.description": {
-    "message": "Подходит для 15–25 игроков, сборок, либо требовательных модов."
+    "message": "Для 15–25 игроков, сборок и тяжёлых модов."
   },
   "servers.plan.medium.description": {
-    "message": "Подходит для 6–15 игроков и нескольких модов."
+    "message": "Для 6–15 игроков и нескольких модов."
   },
   "servers.plan.small.description": {
-    "message": "Подходит для 1–5 игроков и нескольких лёгких модов."
+    "message": "Для 1–5 друзей и пары лёгких модов."
   },
   "settings.account.button.complete-setup": {
     "message": "Завершить настройку"
@@ -3255,7 +3255,7 @@
     "message": "/{interval}"
   },
   "settings.billing.pyro.cpu": {
-    "message": "{shared, plural, one {# разделяемый} other {# разделяемых}} CPU (временный рост до {bursts} CPU)"
+    "message": "{shared, plural, one {# разделяемый} other {# разделяемых}} CPU (рост до {bursts} CPU)"
   },
   "settings.billing.pyro.linked-server.not-found": {
     "message": "Привязанный сервер не найден. Возможных причин несколько: сервер куплен только что — подождите, подготовка занимает до часа; сервер куплен давно — вероятно, его уже приостановили. Если что‑то не так, свяжитесь с поддержкой Modrinth, указав следующие данные:"
@@ -3274,6 +3274,9 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Не удалось возобновить подписку"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Если сервер в данный момент отключен, настройка сервера может занять 10-15 минут."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Подписка возобновляется"

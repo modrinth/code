@@ -300,7 +300,7 @@
     "defaultMessage": "Biztonsági mentés létrehozása"
   },
   "content.inline-backup.shift-click-hint": {
-    "defaultMessage": "A megerősítés kihagyásához tartsa lenyomva a Shift billentyűt a kattintás közben."
+    "defaultMessage": "A megerősítés kihagyásához tartsd lenyomva a Shift billentyűt a kattintás közben."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Javasoljuk a biztonsági másolat készítését a továbbhaladás előtt, hogy ha valami nem működne, vissza tudd állítani a(z) {type, select, server {world} other {instance}}-t."
@@ -463,9 +463,6 @@
   },
   "files.layout.error-title": {
     "defaultMessage": "Nem sikerült betölteni a fájlokat"
-  },
-  "files.layout.loading": {
-    "defaultMessage": "Fájlok betöltése"
   },
   "files.layout.selected-count": {
     "defaultMessage": "{count} kiválasztva"
@@ -945,7 +942,7 @@
     "defaultMessage": "Játékverzió"
   },
   "label.installing": {
-    "defaultMessage": "Letöltés…"
+    "defaultMessage": "Letöltés..."
   },
   "label.loading": {
     "defaultMessage": "Betöltés..."
@@ -1959,7 +1956,7 @@
     "defaultMessage": "R"
   },
   "project.visibility.archived": {
-    "defaultMessage": "Archíválva"
+    "defaultMessage": "Archiválva"
   },
   "project.visibility.draft": {
     "defaultMessage": "Piszkozat"

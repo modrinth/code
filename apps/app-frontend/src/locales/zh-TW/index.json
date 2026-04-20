@@ -6,7 +6,7 @@
     "message": "無法連線到驗證伺服器"
   },
   "app.browse.add-server-to-instance": {
-    "message": "新增此伺服器到實例中"
+    "message": "將伺服器新增到實例"
   },
   "app.browse.add-servers-to-instance": {
     "message": "新增伺服器到實例中"
@@ -15,7 +15,7 @@
     "message": "新增至實例"
   },
   "app.browse.add-to-instance-name": {
-    "message": "新增到 {instanceName}"
+    "message": "新增到「{instanceName}」"
   },
   "app.browse.added": {
     "message": "已新增"

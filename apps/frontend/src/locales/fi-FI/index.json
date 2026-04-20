@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Lataa RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Lataa: Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -149,6 +152,9 @@
   "app-marketing.features.play.title": {
     "message": "Pelaa lempi modeillasi"
   },
+  "app-marketing.features.sharing.description": {
+    "message": "Rakenna, jaa, ja pelaa modipaketteja millä tahansa tuhansista modeista ja modipaketeista Modrinthissa."
+  },
   "app-marketing.features.sharing.modpack": {
     "message": "Modipaketti"
   },
@@ -161,11 +167,20 @@
   "app-marketing.features.unlike-any-launcher": {
     "message": "Erilainen kuin mikään muu launcheri"
   },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App on täysin integroitu sivuston kanssa, jotta saat pääsyn kaikkiin lempi projekteihisi appin kautta!"
+  },
   "app-marketing.features.website.title": {
     "message": "Nettisivu integraatio"
   },
   "app-marketing.features.youve-used-before": {
     "message": "jota olet käyttänyt ennen"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Kuvakaappaus Modrinth Appista jossa on Cobblemon instanssi auki sisältö sivulle."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App on uniikki, avoimen lähdekoodin launcheri joka antaa sinun pelata lempi modeillasi, ja pitää ne ajantasalla, kaikki yhdessä siistissä pakkauksessa."
   },
   "app-marketing.hero.download-button": {
     "message": "Lataa Modrinth App"

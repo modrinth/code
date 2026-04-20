@@ -314,9 +314,6 @@
   "files.error.try-again": {
     "defaultMessage": "Tentar novamente"
   },
-  "files.layout.loading": {
-    "defaultMessage": "A carregar ficheiros..."
-  },
   "files.move-modal.current-location": {
     "defaultMessage": "Localização atual"
   },

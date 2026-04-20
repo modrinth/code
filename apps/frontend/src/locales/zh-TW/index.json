@@ -3155,6 +3155,12 @@
   "settings.billing.interval.monthly": {
     "message": "每月"
   },
+  "settings.billing.interval.quarter": {
+    "message": "季"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "每季"
+  },
   "settings.billing.interval.year": {
     "message": "年"
   },
@@ -3268,6 +3274,9 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "重新訂閱時發生錯誤"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "若伺服器目前處於取消狀態，可能需要 10 至 15 分鐘來完成伺服器設定。"
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "已送出重新訂閱請求"
