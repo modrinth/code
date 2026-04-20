@@ -25,6 +25,7 @@
 		"build-storybook": "pnpm --filter @modrinth/ui build-storybook",
 		"icons:add": "pnpm --filter @modrinth/assets icons:add",
 		"changelog:collect": "node scripts/run.mjs collect-changelog",
+		"changelog:combine-for-app": "node scripts/run.mjs build-theseus-release-notes",
 		"scripts": "node scripts/run.mjs"
 	},
 	"devDependencies": {
