@@ -1,28 +1,28 @@
 <template>
-	<NewModal ref="modal" header="Delete backup" fade="danger">
-		<div class="flex flex-col gap-6 max-w-[400px]">
-			<Admonition type="critical" header="Delete warning">
-				This backup will be permanently deleted. This action cannot be undone.
+	<NewModal
+		ref="modal"
+		:header="formatMessage(messages.header, { count })"
+		fade="danger"
+		max-width="500px"
+	>
+		<div class="flex flex-col gap-6">
+			<Admonition type="critical" :header="formatMessage(messages.admonitionHeader)">
+				{{ formatMessage(messages.admonitionBody, { count }) }}
 			</Admonition>
-
-			<div v-if="currentBackup" class="flex flex-col gap-2">
-				<span class="font-semibold text-contrast">Backup</span>
-				<BackupItem :backup="currentBackup" preview class="!bg-surface-2 !shadow-none" />
-			</div>
 		</div>
 
 		<template #actions>
-			<div class="flex gap-2 justify-end">
+			<div class="flex justify-end gap-2">
 				<ButtonStyled type="outlined">
 					<button class="!border !border-surface-4" @click="modal?.hide()">
 						<XIcon />
-						Cancel
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="red">
-					<button @click="deleteBackup">
+					<button @click="confirmDelete">
 						<TrashIcon />
-						Delete backup
+						{{ formatMessage(messages.confirm, { count }) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -33,31 +33,72 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
+import { defineMessages, useVIntl } from '../../../composables/i18n'
+import { commonMessages } from '../../../utils'
 import Admonition from '../../base/Admonition.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
-import BackupItem from './BackupItem.vue'
+
+const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
 	(e: 'delete', backup: Archon.BackupsQueue.v1.BackupQueueBackup | undefined): void
+	(e: 'bulk-delete', backups: Archon.BackupsQueue.v1.BackupQueueBackup[]): void
 }>()
 
+const messages = defineMessages({
+	header: {
+		id: 'servers.backups.delete-modal.header',
+		defaultMessage: 'Delete {count, plural, one {backup} other {backups}}',
+	},
+	admonitionHeader: {
+		id: 'servers.backups.delete-modal.admonition-header',
+		defaultMessage: 'Deletion warning',
+	},
+	admonitionBody: {
+		id: 'servers.backups.delete-modal.admonition-body',
+		defaultMessage:
+			'{count, plural, one {This backup} other {These backups}} cannot be recovered once deleted. This action is permanent.',
+	},
+	confirm: {
+		id: 'servers.backups.delete-modal.confirm',
+		defaultMessage: 'Delete {count, plural, one {backup} other {# backups}}',
+	},
+})
+
 const modal = ref<InstanceType<typeof NewModal>>()
-const currentBackup = ref<Archon.BackupsQueue.v1.BackupQueueBackup>()
+const singleBackup = ref<Archon.BackupsQueue.v1.BackupQueueBackup>()
+const bulkBackups = ref<Archon.BackupsQueue.v1.BackupQueueBackup[]>([])
+
+const isBulk = computed(() => bulkBackups.value.length > 0)
+const count = computed(() => (isBulk.value ? bulkBackups.value.length : 1))
 
 function show(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
-	currentBackup.value = backup
+	singleBackup.value = backup
+	bulkBackups.value = []
 	modal.value?.show()
 }
 
-function deleteBackup() {
+function showBulk(backups: Archon.BackupsQueue.v1.BackupQueueBackup[]) {
+	singleBackup.value = undefined
+	bulkBackups.value = [...backups]
+	modal.value?.show()
+}
+
+function confirmDelete() {
 	modal.value?.hide()
-	emit('delete', currentBackup.value)
+	if (isBulk.value) {
+		emit('bulk-delete', bulkBackups.value)
+		bulkBackups.value = []
+	} else {
+		emit('delete', singleBackup.value)
+	}
 }
 
 defineExpose({
 	show,
+	showBulk,
 })
 </script>

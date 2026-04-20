@@ -2723,6 +2723,42 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restoring from backup"
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "{count, plural, one {Bulk actions for one selected backup} other {Bulk actions for # selected backups}}"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "Deleting {progress}/{total} backups..."
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# backup selected} other {# backups selected}}"
+  },
+  "servers.backups.delete-modal.admonition-body": {
+    "defaultMessage": "{count, plural, one {This backup} other {These backups}} cannot be recovered once deleted. This action is permanent."
+  },
+  "servers.backups.delete-modal.admonition-header": {
+    "defaultMessage": "Deletion warning"
+  },
+  "servers.backups.delete-modal.confirm": {
+    "defaultMessage": "Delete {count, plural, one {backup} other {# backups}}"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "Delete {count, plural, one {backup} other {backups}}"
+  },
+  "servers.backups.empty.description": {
+    "defaultMessage": "Create your first backup"
+  },
+  "servers.backups.empty.heading": {
+    "defaultMessage": "No backups yet"
+  },
+  "servers.backups.filtered-empty.clear-filters": {
+    "defaultMessage": "Clear filters"
+  },
+  "servers.backups.filtered-empty.description": {
+    "defaultMessage": "Try a different filter or clear filters to see all backups."
+  },
+  "servers.backups.filtered-empty.heading": {
+    "defaultMessage": "No backups match"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
@@ -2749,6 +2785,21 @@
   },
   "servers.backups.item.restoring": {
     "defaultMessage": "Restoring"
+  },
+  "servers.backups.select-backup-aria": {
+    "defaultMessage": "Select backup {name}"
+  },
+  "servers.backups.toolbar.create-backup": {
+    "defaultMessage": "Create backup"
+  },
+  "servers.backups.toolbar.filter-auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.toolbar.filter-manual": {
+    "defaultMessage": "Manual"
+  },
+  "servers.backups.toolbar.select-all": {
+    "defaultMessage": "Select all"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Backup creation in progress"

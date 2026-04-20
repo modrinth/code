@@ -41,6 +41,7 @@ const props = withDefaults(
 		showCopyIdAction?: boolean
 		showDebugInfo?: boolean
 		restoreDisabled?: string
+		selected?: boolean
 	}>(),
 	{
 		preview: false,
@@ -49,6 +50,7 @@ const props = withDefaults(
 		showCopyIdAction: false,
 		showDebugInfo: false,
 		restoreDisabled: undefined,
+		selected: false,
 	},
 )
 
@@ -164,7 +166,8 @@ const messages = defineMessages({
 </script>
 <template>
 	<div
-		class="flex items-center gap-4 rounded-[20px] bg-surface-3 p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.3),0px_1px_3px_0px_rgba(0,0,0,0.15)]"
+		class="flex items-center gap-4 rounded-[20px] border-2 border-solid bg-surface-3 p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.3),0px_1px_3px_0px_rgba(0,0,0,0.15)]"
+		:class="props.selected ? 'border-brand-green' : 'border-transparent'"
 	>
 		<div class="flex min-w-0 flex-1 items-center gap-4">
 			<!-- Icon tile -->

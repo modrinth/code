@@ -31,10 +31,26 @@
 				<BackupCreateModal ref="createBackupModal" :backups="backups" />
 				<BackupRenameModal ref="renameBackupModal" :backups="backups" />
 				<BackupRestoreModal ref="restoreBackupModal" />
-				<BackupDeleteModal ref="deleteBackupModal" @delete="deleteBackup" />
+				<BackupDeleteModal
+					ref="deleteBackupModal"
+					@delete="deleteBackup"
+					@bulk-delete="bulkDelete"
+				/>
 
-				<div v-if="backups.length" class="mb-2 flex items-center align-middle justify-between">
-					<span class="text-2xl font-semibold text-contrast">Backups</span>
+				<div v-if="backups.length" class="mb-2 flex flex-wrap items-center justify-between gap-4">
+					<div class="flex min-w-0 flex-wrap items-center gap-4">
+						<Checkbox
+							:model-value="allSelected"
+							:indeterminate="someSelected"
+							:label="formatMessage(messages.selectAll)"
+							class="shrink-0 font-semibold"
+							@update:model-value="toggleSelectAll"
+						/>
+						<div class="hidden h-6 w-px bg-surface-5 sm:block" />
+						<FilterPills v-model="selectedFilters" :options="filterPillOptions">
+							<template #all>{{ formatMessage(commonMessages.allProjectType) }}</template>
+						</FilterPills>
+					</div>
 					<ButtonStyled color="brand">
 						<button
 							v-tooltip="backupCreationDisabled"
@@ -42,78 +58,174 @@
 							@click="showCreateModel"
 						>
 							<PlusIcon class="size-5" />
-							Create backup
+							{{ formatMessage(messages.createBackup) }}
 						</button>
 					</ButtonStyled>
 				</div>
 
 				<div class="flex w-full flex-col gap-1.5">
-					<Transition name="fade" mode="out-in">
-						<div
-							v-if="groupedBackups.length === 0"
-							key="empty"
-							class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
+					<div
+						v-if="groupedBackups.length === 0"
+						class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
+					>
+						<EmptyState
+							v-if="backups.length === 0"
+							type="empty-inbox"
+							:heading="formatMessage(messages.emptyHeading)"
+							:description="formatMessage(messages.emptyDescription)"
 						>
-							<EmptyState
-								type="empty-inbox"
-								heading="No backups yet"
-								description="Create your first backup"
-							>
-								<template #actions>
-									<ButtonStyled color="brand">
-										<button
-											v-tooltip="backupCreationDisabled"
-											:disabled="!!backupCreationDisabled"
-											class="w-min mx-auto"
-											@click="showCreateModel"
-										>
-											<PlusIcon class="size-5" />
-											Create backup
-										</button>
-									</ButtonStyled>
-								</template>
-							</EmptyState>
-						</div>
-
-						<div v-else key="list" class="flex flex-col gap-1.5">
-							<template v-for="group in groupedBackups" :key="group.label">
-								<div class="flex items-center gap-2">
-									<component :is="group.icon" v-if="group.icon" class="size-6 text-secondary" />
-									<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
-								</div>
-
-								<div class="flex gap-2">
-									<div class="flex w-5 justify-center">
-										<div class="h-full w-px bg-surface-5" />
-									</div>
-
-									<TransitionGroup name="list" tag="div" class="flex flex-1 flex-col gap-3 py-3">
-										<BackupItem
-											v-for="backup in group.backups"
-											:key="`backup-${backup.id}`"
-											:backup="backup"
-											:active-operation="activeOperationByBackupId.get(backup.id)"
-											:restore-disabled="backupRestoreDisabled"
-											:kyros-url="server.node?.instance"
-											:jwt="server.node?.token"
-											:show-copy-id-action="showCopyIdAction"
-											:show-debug-info="showDebugInfo"
-											@download="() => triggerDownloadAnimation()"
-											@rename="() => renameBackupModal?.show(backup)"
-											@restore="() => restoreBackupModal?.show(backup)"
-											@delete="
-												(skipConfirmation?: boolean) =>
-													skipConfirmation
-														? deleteBackup(backup)
-														: deleteBackupModal?.show(backup)
-											"
-										/>
-									</TransitionGroup>
-								</div>
+							<template #actions>
+								<ButtonStyled color="brand">
+									<button
+										v-tooltip="backupCreationDisabled"
+										:disabled="!!backupCreationDisabled"
+										class="mx-auto w-min"
+										@click="showCreateModel"
+									>
+										<PlusIcon class="size-5" />
+										{{ formatMessage(messages.createBackup) }}
+									</button>
+								</ButtonStyled>
 							</template>
-						</div>
-					</Transition>
+						</EmptyState>
+						<EmptyState
+							v-else
+							type="empty-inbox"
+							:heading="formatMessage(messages.filteredEmptyHeading)"
+							:description="formatMessage(messages.filteredEmptyDescription)"
+						>
+							<template #actions>
+								<ButtonStyled type="outlined">
+									<button class="!border !border-surface-4" @click="clearBackupFilters">
+										{{ formatMessage(messages.clearFilters) }}
+									</button>
+								</ButtonStyled>
+							</template>
+						</EmptyState>
+					</div>
+
+					<div v-else class="flex flex-col gap-1.5">
+						<template v-for="group in groupedBackups" :key="group.label">
+							<div class="flex items-center gap-2">
+								<component :is="group.icon" v-if="group.icon" class="size-6 text-secondary" />
+								<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
+							</div>
+
+							<TransitionGroup name="list" tag="div" class="flex flex-col gap-3 py-3">
+								<div
+									v-for="backup in group.backups"
+									:key="`backup-${backup.id}`"
+									class="flex gap-2"
+								>
+									<div class="flex w-5 flex-col items-center">
+										<div class="min-h-3 w-px flex-1 bg-surface-5" />
+										<Checkbox
+											:model-value="selectedIds.has(backup.id)"
+											:description="formatMessage(messages.selectBackupAria, { name: backup.name })"
+											class="shrink-0"
+											@update:model-value="toggleSelection(backup.id)"
+										/>
+										<div class="min-h-3 w-px flex-1 bg-surface-5" />
+									</div>
+									<BackupItem
+										class="min-w-0 flex-1"
+										:backup="backup"
+										:selected="selectedIds.has(backup.id)"
+										:active-operation="activeOperationByBackupId.get(backup.id)"
+										:restore-disabled="backupRestoreDisabled"
+										:kyros-url="server.node?.instance"
+										:jwt="server.node?.token"
+										:show-copy-id-action="showCopyIdAction"
+										:show-debug-info="showDebugInfo"
+										@download="() => triggerDownloadAnimation()"
+										@rename="() => renameBackupModal?.show(backup)"
+										@restore="() => restoreBackupModal?.show(backup)"
+										@delete="
+											(skipConfirmation?: boolean) =>
+												skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
+										"
+									/>
+								</div>
+							</TransitionGroup>
+						</template>
+					</div>
 				</div>
+
+				<FloatingActionBar
+					:shown="selectedIds.size > 0 || isBulkOperating"
+					:aria-label="
+						formatMessage(messages.bulkBarAriaLabel, {
+							count: isBulkOperating ? bulkTotal : selectedIds.size,
+						})
+					"
+				>
+					<div class="flex items-center gap-0.5">
+						<span class="px-4 py-2.5 text-base font-semibold tabular-nums text-contrast">
+							{{
+								formatMessage(messages.selectedCount, {
+									count: isBulkOperating ? bulkTotal : selectedIds.size,
+								})
+							}}
+						</span>
+						<div class="mx-1 h-6 w-px bg-surface-5" />
+						<ButtonStyled type="transparent">
+							<button
+								type="button"
+								:disabled="isBulkOperating"
+								:class="{ 'pointer-events-none opacity-60': isBulkOperating }"
+								@click="deselectAll"
+							>
+								{{ formatMessage(commonMessages.clearButton) }}
+							</button>
+						</ButtonStyled>
+					</div>
+
+					<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
+						<ButtonStyled type="transparent">
+							<button
+								type="button"
+								class="cq-show-icon"
+								:disabled="!canBulkDownload"
+								@click="bulkDownload"
+							>
+								<DownloadIcon />
+								<span class="bar-label">{{ formatMessage(commonMessages.downloadButton) }}</span>
+							</button>
+						</ButtonStyled>
+						<div class="mx-1 h-6 w-px bg-surface-5" />
+						<ButtonStyled type="transparent" color="red" hover-color-fill="background">
+							<button type="button" @click="confirmBulkDelete">
+								<TrashIcon />
+								<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
+							</button>
+						</ButtonStyled>
+					</div>
+
+					<div v-else class="ml-auto flex items-center">
+						<span class="px-4 py-2.5 text-base font-semibold tabular-nums text-secondary">
+							{{
+								formatMessage(messages.bulkDeleting, {
+									progress: bulkProgress,
+									total: bulkTotal,
+								})
+							}}
+						</span>
+					</div>
+
+					<div v-if="isBulkOperating" class="absolute bottom-0 left-0 right-0 h-1">
+						<div
+							class="h-full rounded-l-full bg-brand transition-[width] duration-200 ease-in-out"
+							:style="{
+								width: `${bulkTotal > 0 ? (bulkProgress / bulkTotal) * 100 : 0}%`,
+							}"
+							role="progressbar"
+							:aria-valuenow="bulkProgress"
+							:aria-valuemin="0"
+							:aria-valuemax="bulkTotal"
+							style="box-shadow: 0px -2px 4px 0px rgba(27, 217, 106, 0.1)"
+						/>
+					</div>
+				</FloatingActionBar>
 
 				<div
 					class="over-the-top-download-animation"
@@ -140,7 +252,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { CalendarIcon, DownloadIcon, IssuesIcon, PlusIcon } from '@modrinth/assets'
+import { CalendarIcon, DownloadIcon, IssuesIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import type { Component } from 'vue'
@@ -148,24 +260,91 @@ import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Checkbox from '#ui/components/base/Checkbox.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
+import FilterPills, { type FilterPillOption } from '#ui/components/base/FilterPills.vue'
+import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import BackupCreateModal from '#ui/components/servers/backups/BackupCreateModal.vue'
 import BackupDeleteModal from '#ui/components/servers/backups/BackupDeleteModal.vue'
 import BackupItem from '#ui/components/servers/backups/BackupItem.vue'
 import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
-import { useReadyState } from '#ui/composables'
-import { useVIntl } from '#ui/composables/i18n'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
+import { useBulkOperation } from '#ui/layouts/shared/content-tab/composables/bulk-operations'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
+
+import { useBackupsSelection } from './backups-selection'
+
+const messages = defineMessages({
+	selectAll: {
+		id: 'servers.backups.toolbar.select-all',
+		defaultMessage: 'Select all',
+	},
+	selectBackupAria: {
+		id: 'servers.backups.select-backup-aria',
+		defaultMessage: 'Select backup {name}',
+	},
+	filterManual: {
+		id: 'servers.backups.toolbar.filter-manual',
+		defaultMessage: 'Manual',
+	},
+	filterAuto: {
+		id: 'servers.backups.toolbar.filter-auto',
+		defaultMessage: 'Auto',
+	},
+	selectedCount: {
+		id: 'servers.backups.bulk-bar.selected-count',
+		defaultMessage: '{count, plural, one {# backup selected} other {# backups selected}}',
+	},
+	bulkBarAriaLabel: {
+		id: 'servers.backups.bulk-bar.aria-label',
+		defaultMessage:
+			'{count, plural, one {Bulk actions for one selected backup} other {Bulk actions for # selected backups}}',
+	},
+	createBackup: {
+		id: 'servers.backups.toolbar.create-backup',
+		defaultMessage: 'Create backup',
+	},
+	emptyHeading: {
+		id: 'servers.backups.empty.heading',
+		defaultMessage: 'No backups yet',
+	},
+	emptyDescription: {
+		id: 'servers.backups.empty.description',
+		defaultMessage: 'Create your first backup',
+	},
+	filteredEmptyHeading: {
+		id: 'servers.backups.filtered-empty.heading',
+		defaultMessage: 'No backups match',
+	},
+	filteredEmptyDescription: {
+		id: 'servers.backups.filtered-empty.description',
+		defaultMessage: 'Try a different filter or clear filters to see all backups.',
+	},
+	clearFilters: {
+		id: 'servers.backups.filtered-empty.clear-filters',
+		defaultMessage: 'Clear filters',
+	},
+	bulkDeleting: {
+		id: 'servers.backups.bulk-bar.deleting',
+		defaultMessage: 'Deleting {progress}/{total} backups...',
+	},
+})
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+
+const filterPillOptions = computed<FilterPillOption[]>(() => [
+	{ id: 'manual', label: formatMessage(messages.filterManual) },
+	{ id: 'auto', label: formatMessage(messages.filterAuto) },
+])
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { server, worldId, busyReasons } = injectModrinthServerContext()
@@ -193,7 +372,21 @@ const error = computed(() => {
 })
 const refetch = () => query.refetch()
 
-const backupsReadyPending = useReadyState(query)
+/** Until world exists we cannot fetch; `isLoading` is false while the query is disabled, which would flash empty state. */
+const backupsReadyPending = computed(
+	() => !worldId.value || (query.data.value === undefined && !query.error.value),
+)
+
+const selectedFilters = ref<string[]>([])
+
+const filteredBackups = computed(() => {
+	const f = selectedFilters.value
+	if (f.length === 0 || f.length === 2) {
+		return backups.value
+	}
+	const wantAuto = f.includes('auto')
+	return backups.value.filter((b) => b.automated === wantAuto)
+})
 
 /** Completed backups with a snapshot: queue API schedules deletion. */
 const deleteQueueMutation = useMutation({
@@ -222,7 +415,7 @@ type BackupGroup = {
 }
 
 const groupedBackups = computed((): BackupGroup[] => {
-	if (!backups.value.length) return []
+	if (!filteredBackups.value.length) return []
 
 	const now = dayjs()
 	const groups: BackupGroup[] = []
@@ -240,7 +433,7 @@ const groupedBackups = computed((): BackupGroup[] => {
 		group.backups.push(backup)
 	}
 
-	for (const backup of backups.value) {
+	for (const backup of filteredBackups.value) {
 		const created = dayjs(backup.created_at)
 		const diffMinutes = now.diff(created, 'minute')
 		const isToday = created.isSame(now, 'day')
@@ -262,6 +455,22 @@ const groupedBackups = computed((): BackupGroup[] => {
 
 	return groups
 })
+
+const displayOrderedBackups = computed(() => groupedBackups.value.flatMap((g) => g.backups))
+
+const {
+	selectedIds,
+	toggleSelection,
+	deselectAll,
+	toggleSelectAll,
+	allSelected,
+	someSelected,
+	selectedBackups,
+} = useBackupsSelection(filteredBackups, displayOrderedBackups)
+
+const canBulkDownload = computed(() => selectedBackups.value.some((b) => b.status === 'done'))
+
+const { isBulkOperating, bulkProgress, bulkTotal, runBulk } = useBulkOperation()
 
 const overTheTopDownloadAnimation = ref()
 const createBackupModal = ref<InstanceType<typeof BackupCreateModal>>()
@@ -298,6 +507,64 @@ const backupCreationDisabled = computed(() => {
 
 const showCreateModel = () => {
 	createBackupModal.value?.show()
+}
+
+function clearBackupFilters() {
+	selectedFilters.value = []
+}
+
+function bulkDownload() {
+	const kyros = server.value.node?.instance
+	const jwt = server.value.node?.token
+	if (!kyros || !jwt) return
+
+	const toDownload = selectedBackups.value.filter((b) => b.status === 'done')
+	if (!toDownload.length) return
+
+	for (const backup of toDownload) {
+		const url = `https://${kyros}/modrinth/v0/backups/${backup.id}/download?auth=${jwt}`
+		const iframe = document.createElement('iframe')
+		iframe.style.display = 'none'
+		iframe.src = url
+		document.body.appendChild(iframe)
+		setTimeout(() => iframe.remove(), 60_000)
+	}
+	triggerDownloadAnimation()
+	deselectAll()
+}
+
+function confirmBulkDelete() {
+	if (!selectedBackups.value.length) return
+	deleteBackupModal.value?.showBulk(selectedBackups.value)
+}
+
+async function bulkDelete(toRemove: Archon.BackupsQueue.v1.BackupQueueBackup[]) {
+	const failures: { name: string; message: string }[] = []
+
+	await runBulk(
+		'delete',
+		toRemove,
+		async (backup) => {
+			const mutation = useQueueDeleteFor(backup) ? deleteQueueMutation : deleteLegacyMutation
+			try {
+				await mutation.mutateAsync(backup.id)
+			} catch (err) {
+				failures.push({
+					name: backup.name,
+					message: err instanceof Error ? err.message : String(err),
+				})
+			}
+		},
+		{ delayMs: 0, onComplete: deselectAll },
+	)
+
+	if (failures.length) {
+		addNotification({
+			type: 'error',
+			title: `Failed to delete ${failures.length} backup${failures.length === 1 ? '' : 's'}`,
+			text: failures.map((f) => `${f.name}: ${f.message}`).join('\n'),
+		})
+	}
 }
 
 function triggerDownloadAnimation() {

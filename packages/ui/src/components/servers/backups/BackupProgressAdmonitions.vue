@@ -8,6 +8,7 @@ import {
 	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { useNow } from '@vueuse/core'
 import { computed, reactive } from 'vue'
 
 import { useRelativeTime } from '../../../composables'
@@ -21,6 +22,12 @@ import ProgressBar from '../../base/ProgressBar.vue'
 
 const { formatMessage } = useVIntl()
 const relativeTime = useRelativeTime()
+const now = useNow({ interval: 1000 })
+
+function formatCreatedRelative(createdAt: string | undefined) {
+	void now.value // tracks the useNow tick so the string re-renders every second
+	return relativeTime(createdAt)
+}
 const client = injectModrinthClient()
 const { serverId, worldId } = injectModrinthServerContext()
 const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQueue(
@@ -97,17 +104,9 @@ async function handleDismiss(item: AdmonitionEntry) {
 	}
 	try {
 		if (item.type === 'create') {
-			await client.archon.backups_queue_v1.ackCreate(
-				serverId,
-				worldId.value!,
-				item.operationId,
-			)
+			await client.archon.backups_queue_v1.ackCreate(serverId, worldId.value!, item.operationId)
 		} else {
-			await client.archon.backups_queue_v1.ackRestore(
-				serverId,
-				worldId.value!,
-				item.operationId,
-			)
+			await client.archon.backups_queue_v1.ackRestore(serverId, worldId.value!, item.operationId)
 		}
 	} catch (err) {
 		dismissedIds.delete(item.key)
@@ -321,7 +320,7 @@ const messages = defineMessages({
 					<span>{{ getTitle(item) }}</span>
 					<div v-if="item.createdAt" class="flex items-center gap-1.5 text-secondary">
 						<ClockIcon class="size-4" />
-						<span class="font-medium">{{ relativeTime(item.createdAt) }}</span>
+						<span class="font-medium">{{ formatCreatedRelative(item.createdAt) }}</span>
 					</div>
 				</div>
 			</template>
