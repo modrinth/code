@@ -2282,18 +2282,6 @@ const currentMember = computed(() => {
 	return val
 })
 
-const isProjectOwner = computed(() => {
-	if (!auth.value.user) return false
-
-	if (organization.value?.members?.length) {
-		return organization.value.members.some(
-			(member) => member.user.id === auth.value.user.id && member.is_owner,
-		)
-	}
-
-	return !!currentMember.value?.is_owner
-})
-
 const hasEditDetailsPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
 	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
