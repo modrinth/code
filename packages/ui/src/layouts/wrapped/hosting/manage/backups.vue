@@ -111,21 +111,21 @@
 								<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
 							</div>
 
-							<TransitionGroup name="list" tag="div" class="flex flex-col gap-3 py-3">
+							<TransitionGroup name="list" tag="div" class="flex flex-col">
 								<div
 									v-for="backup in group.backups"
 									:key="`backup-${backup.id}`"
-									class="flex gap-2"
+									class="flex gap-2 py-1.5"
 								>
 									<div class="flex w-5 flex-col items-center">
-										<div class="min-h-3 w-px flex-1 bg-surface-5" />
+										<div class="w-px flex-1 bg-surface-5" />
 										<Checkbox
 											:model-value="selectedIds.has(backup.id)"
 											:description="formatMessage(messages.selectBackupAria, { name: backup.name })"
 											class="shrink-0"
 											@update:model-value="toggleSelection(backup.id)"
 										/>
-										<div class="min-h-3 w-px flex-1 bg-surface-5" />
+										<div class="w-px flex-1 bg-surface-5" />
 									</div>
 									<BackupItem
 										class="min-w-0 flex-1"

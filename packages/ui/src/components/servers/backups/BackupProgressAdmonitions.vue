@@ -47,9 +47,11 @@ type AdmonitionEntry = {
 	syntheticLegacy: boolean
 	name?: string
 	createdAt?: string
+	error?: string | null
 }
 
 const dismissedIds = reactive(new Set<string>())
+const cancellingIds = reactive(new Set<string>())
 
 const admonitions = computed<AdmonitionEntry[]>(() => {
 	const result: AdmonitionEntry[] = []
@@ -90,6 +92,7 @@ const admonitions = computed<AdmonitionEntry[]>(() => {
 			syntheticLegacy: last.synthetic_legacy,
 			name: backup.name,
 			createdAt: backup.created_at,
+			error: last.error ?? null,
 		})
 	}
 
@@ -117,8 +120,15 @@ async function handleDismiss(item: AdmonitionEntry) {
 }
 
 async function handleCancel(item: AdmonitionEntry) {
-	await client.archon.backups_v1.delete(serverId, worldId.value!, item.backupId)
-	await invalidate()
+	if (cancellingIds.has(item.key)) return
+	cancellingIds.add(item.key)
+	try {
+		await client.archon.backups_v1.delete(serverId, worldId.value!, item.backupId)
+		await invalidate()
+	} catch (err) {
+		cancellingIds.delete(item.key)
+		throw err
+	}
 }
 
 async function handleRetry(item: AdmonitionEntry) {
@@ -161,12 +171,16 @@ function canRetry(item: AdmonitionEntry) {
 	return item.state === 'failed' || item.state === 'timed_out'
 }
 
+function hasErrorDetail(item: AdmonitionEntry) {
+	return !!item.error && (item.state === 'failed' || item.state === 'timed_out')
+}
+
 function getTitle(item: AdmonitionEntry) {
 	if (item.type === 'create') {
 		if (isQueued(item)) return formatMessage(messages.backupQueuedTitle)
 		if (isInProgress(item)) return formatMessage(messages.creatingBackupTitle)
-		if (item.state === 'failed' || item.state === 'timed_out')
-			return formatMessage(messages.backupFailedTitle)
+		if (item.state === 'failed') return formatMessage(messages.backupFailedTitle)
+		if (item.state === 'timed_out') return formatMessage(messages.backupTimedOutTitle)
 		if (item.state === 'cancelled') return formatMessage(messages.backupCancelledTitle)
 		if (item.state === 'completed') return formatMessage(messages.backupCompletedTitle)
 	}
@@ -184,8 +198,10 @@ function getDescription(item: AdmonitionEntry) {
 	if (item.type === 'create') {
 		if (isQueued(item)) return formatMessage(messages.backupQueuedDescription, { backupName })
 		if (isInProgress(item)) return formatMessage(messages.creatingBackupDescription, { backupName })
-		if (item.state === 'failed' || item.state === 'timed_out')
+		if (item.state === 'failed')
 			return formatMessage(messages.backupFailedDescription, { backupName })
+		if (item.state === 'timed_out')
+			return formatMessage(messages.backupTimedOutDescription, { backupName })
 		if (item.state === 'cancelled')
 			return formatMessage(messages.backupCancelledDescription, { backupName })
 		if (item.state === 'completed')
@@ -234,6 +250,15 @@ const messages = defineMessages({
 		id: 'servers.backups.admonition.backup-failed.description',
 		defaultMessage:
 			'Something went wrong while creating {backupName}. Please try again or contact support if the issue continues.',
+	},
+	backupTimedOutTitle: {
+		id: 'servers.backups.admonition.backup-timed-out.title',
+		defaultMessage: 'Backup timed out',
+	},
+	backupTimedOutDescription: {
+		id: 'servers.backups.admonition.backup-timed-out.description',
+		defaultMessage:
+			'Creating {backupName} timed out. You can try again or contact support if the issue continues.',
 	},
 	backupCancelledTitle: {
 		id: 'servers.backups.admonition.backup-cancelled.title',
@@ -324,10 +349,22 @@ const messages = defineMessages({
 					</div>
 				</div>
 			</template>
-			{{ getDescription(item) }}
+			<div class="flex flex-col gap-2">
+				<span>{{ getDescription(item) }}</span>
+				<span
+					v-if="hasErrorDetail(item)"
+					class="break-all font-mono text-sm text-secondary"
+				>
+					{{ item.error }}
+				</span>
+			</div>
 			<template #top-right-actions>
 				<ButtonStyled v-if="isQueued(item) || isInProgress(item)" type="outlined" color="blue">
-					<button class="!border" @click="handleCancel(item)">
+					<button
+						class="!border"
+						:disabled="cancellingIds.has(item.key)"
+						@click="handleCancel(item)"
+					>
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
