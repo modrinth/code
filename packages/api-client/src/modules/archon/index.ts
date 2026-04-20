@@ -1,4 +1,5 @@
 export * from './backups/v1'
+export * from './backups-queue/v1'
 export * from './content/v1'
 export * from './properties/v1'
 export * from './servers/v0'

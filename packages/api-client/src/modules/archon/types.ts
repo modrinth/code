@@ -404,6 +404,9 @@ export namespace Archon {
 				name: string
 				created_at: string
 				is_active: boolean
+				/**
+				 * @deprecated Prefer `client.archon.backups_queue_v1.list()` for queue-aware backup state.
+				 */
 				backups: Archon.Backups.v1.Backup[]
 				content: WorldContentInfo | null
 				readiness: WorldReadiness
@@ -434,16 +437,24 @@ export namespace Archon {
 	}
 
 	export namespace Backups {
+		/**
+		 * @deprecated Use {@link Archon.BackupsQueue.v1} and `client.archon.backups_queue_v1` instead.
+		 */
 		export namespace v1 {
+			/** @deprecated Use {@link Archon.BackupsQueue.v1} instead. */
 			export type BackupState = 'ongoing' | 'done' | 'failed' | 'cancelled' | 'unchanged'
+			/** @deprecated Use {@link Archon.BackupsQueue.v1} instead. */
 			export type BackupTask = 'file' | 'create' | 'restore'
+			/** @deprecated Use {@link Archon.BackupsQueue.v1} instead. */
 			export type BackupStatus = 'pending' | 'in_progress' | 'timed_out' | 'error' | 'done'
 
+			/** @deprecated Use {@link Archon.BackupsQueue.v1} instead. */
 			export type BackupTaskProgress = {
 				progress: number // 0.0 to 1.0
 				state: BackupState
 			}
 
+			/** @deprecated Use {@link Archon.BackupsQueue.v1.BackupQueueBackup} instead. */
 			export type Backup = {
 				id: string
 				physical_id: string
@@ -461,16 +472,79 @@ export namespace Archon {
 				}
 			}
 
+			/** @deprecated Use {@link Archon.BackupsQueue.v1.BackupRequest} instead. */
 			export type BackupRequest = {
 				name: string
 			}
 
+			/** @deprecated Use {@link Archon.BackupsQueue.v1} instead. */
 			export type PatchBackup = {
 				name?: string
 			}
 
+			/** @deprecated Use {@link Archon.BackupsQueue.v1.PostBackupQueueResponse} instead. */
 			export type PostBackupResponse = {
 				id: string
+			}
+		}
+	}
+
+	export namespace BackupsQueue {
+		export namespace v1 {
+			export type BackupQueueOperationType = 'create' | 'restore'
+
+			export type BackupQueueState =
+				| 'pending'
+				| 'ongoing'
+				| 'completed'
+				| 'cancelled'
+				| 'failed'
+				| 'timed_out'
+
+			export type BackupStatus = 'pending' | 'in_progress' | 'timed_out' | 'error' | 'done'
+
+			export type BackupRequest = {
+				name: string
+			}
+
+			export type PostBackupQueueResponse = {
+				id: string
+			}
+
+			export type ActiveOperation = {
+				backup_id: string
+				operation_type: BackupQueueOperationType
+				operation_id?: number | null
+				has_parent: boolean
+				scheduled_for: string
+				synthetic_legacy: boolean
+			}
+
+			export type BackupQueueOperation = {
+				operation_type: BackupQueueOperationType
+				operation_id?: number | null
+				state: BackupQueueState
+				scheduled_for: string
+				completed_at?: string | null
+				has_parent: boolean
+				error?: string | null
+				should_prompt: boolean
+				synthetic_legacy: boolean
+			}
+
+			export type BackupQueueBackup = {
+				id: string
+				name: string
+				created_at: string
+				status: BackupStatus
+				locked: boolean
+				automated: boolean
+				history: BackupQueueOperation[]
+			}
+
+			export type BackupsQueueResponse = {
+				active_operations: ActiveOperation[]
+				backups: BackupQueueBackup[]
 			}
 		}
 	}
