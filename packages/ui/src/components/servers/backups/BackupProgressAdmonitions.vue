@@ -331,12 +331,21 @@ const messages = defineMessages({
 
 <template>
 	<TransitionGroup
-		v-if="admonitions.length > 0"
 		name="backup-admonition"
 		tag="div"
-		class="flex flex-col gap-3"
+		enter-active-class="transition-all duration-300 ease-out overflow-hidden"
+		enter-from-class="opacity-0 max-h-0"
+		enter-to-class="opacity-100 max-h-40"
+		leave-active-class="transition-all duration-200 ease-in overflow-hidden"
+		leave-from-class="opacity-100 max-h-40"
+		leave-to-class="opacity-0 max-h-0"
 	>
-		<Admonition v-for="item in admonitions" :key="item.key" :type="getAdmonitionType(item.state)">
+		<Admonition
+			v-for="item in admonitions"
+			:key="item.key"
+			:type="getAdmonitionType(item.state)"
+			class="mb-4"
+		>
 			<template #icon="{ iconClass }">
 				<component :is="getIcon(item.state)" :class="iconClass" />
 			</template>
@@ -401,23 +410,6 @@ const messages = defineMessages({
 </template>
 
 <style scoped>
-.backup-admonition-enter-active,
-.backup-admonition-leave-active {
-	transition:
-		opacity 300ms ease-in-out,
-		transform 300ms ease-in-out;
-}
-
-.backup-admonition-enter-from {
-	opacity: 0;
-	transform: translateY(-10px);
-}
-
-.backup-admonition-leave-to {
-	opacity: 0;
-	transform: translateY(-10px);
-}
-
 .backup-admonition-move {
 	transition: transform 300ms ease-in-out;
 }
