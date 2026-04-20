@@ -443,8 +443,8 @@
 						<ModerationProjectNags
 							v-if="
 								projectV3 &&
-								((currentMember && project.status === 'draft') ||
-									tags.rejectedStatuses.includes(project.status))
+								currentMember &&
+								(project.status === 'draft' || tags.rejectedStatuses.includes(project.status))
 							"
 							:project="project"
 							:project-v3="projectV3"
@@ -2280,6 +2280,18 @@ const currentMember = computed(() => {
 	}
 
 	return val
+})
+
+const isProjectOwner = computed(() => {
+	if (!auth.value.user) return false
+
+	if (organization.value?.members?.length) {
+		return organization.value.members.some(
+			(member) => member.user.id === auth.value.user.id && member.is_owner,
+		)
+	}
+
+	return !!currentMember.value?.is_owner
 })
 
 const hasEditDetailsPermission = computed(() => {
