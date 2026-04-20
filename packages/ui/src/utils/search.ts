@@ -115,7 +115,7 @@ export function useSearch(
 		{ display: 'Date updated', name: 'updated' },
 	])
 
-	const currentSortType: Ref<SortType> = ref({ name: 'relevance', display: 'Relevance' })
+	const currentSortType: Ref<SortType> = ref(sortTypes[0])
 
 	const route = useRoute()
 	const currentPage = ref(1)

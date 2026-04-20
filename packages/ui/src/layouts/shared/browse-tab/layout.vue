@@ -59,7 +59,6 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			:model-value="ctx.effectiveCurrentSortType.value"
 			:options="sortOptions"
 			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[16rem]'"
-			placeholder="Sort by"
 			@update:model-value="(val: SortType) => (ctx.effectiveCurrentSortType.value = val)"
 		>
 			<template #prefix>
