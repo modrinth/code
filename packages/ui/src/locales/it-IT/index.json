@@ -42,7 +42,7 @@
     "defaultMessage": "Beta"
   },
   "badge.beta-release": {
-    "defaultMessage": "Rilascio in beta"
+    "defaultMessage": "Rilascio beta"
   },
   "badge.new": {
     "defaultMessage": "Novità"
