@@ -5,11 +5,12 @@ use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
+use eyre::{Context, eyre};
 use parking_lot::Mutex;
 use rand::Rng;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
-use std::collections::VecDeque;
+use std::collections::{HashSet, VecDeque};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
@@ -336,6 +337,41 @@ pub async fn fetch_mirrors(
     }
 
     unreachable!()
+}
+
+static TRUSTED_DOWNLOAD_HOSTS: LazyLock<HashSet<String>> =
+    LazyLock::new(|| {
+        env!("TRUSTED_DOWNLOAD_HOSTS")
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .collect()
+    });
+
+/// Downloads a file from specified mirrors, enforcing HTTPS and a trusted host allowlist
+#[tracing::instrument(skip(semaphore))]
+pub async fn fetch_from_trusted_mirrors(
+    mirrors: &[&str],
+    sha1: Option<&str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+) -> crate::Result<Bytes> {
+    for url in mirrors {
+        let parsed = url::Url::parse(url)
+            .with_context(|| eyre!("invalid download URL '{url}'"))?;
+
+        if parsed.scheme() != "https" {
+            return Err(eyre!("download URL '{url}' must use HTTPS").into());
+        }
+
+        let host = parsed.host_str().unwrap_or("");
+        if !TRUSTED_DOWNLOAD_HOSTS.contains(host) {
+            return Err(
+                eyre!("download URL host '{host}' is not trusted").into()
+            );
+        }
+    }
+
+    fetch_mirrors(mirrors, sha1, semaphore, exec).await
 }
 
 /// Posts a JSON to a URL
