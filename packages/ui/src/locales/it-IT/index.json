@@ -165,10 +165,10 @@
     "defaultMessage": "Segui"
   },
   "button.hide-snapshots": {
-    "defaultMessage": "Nascondi versioni snapshot"
+    "defaultMessage": "Nascondi le versioni snapshot"
   },
   "button.max": {
-    "defaultMessage": "Max"
+    "defaultMessage": "Massimo"
   },
   "button.more-options": {
     "defaultMessage": "Altre opzioni"
