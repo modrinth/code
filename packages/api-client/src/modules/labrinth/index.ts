@@ -1,5 +1,6 @@
 export * from './auth/internal'
 export * from './auth/v2'
+export * from './analytics/v3'
 export * from './billing/internal'
 export * from './collections'
 export * from './globals/internal'
