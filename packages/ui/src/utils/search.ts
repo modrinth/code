@@ -474,7 +474,7 @@ export function useSearch(
 					}
 					orGroups[field].push(val)
 				} else {
-					parts.push(`${field} = "${val}"`)
+					parts.push(`${field} = ${val === 'true' || val === 'false' ? val : `"${val}"`}`)
 				}
 			}
 		}
