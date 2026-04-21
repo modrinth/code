@@ -700,7 +700,7 @@ pub async fn edit_team_member(
 
     let user_id = DBUser::get(&ids.1, &**pool, &redis)
         .await?
-        .wrap_request_err("The user specified does not exist")?
+        .wrap_internal_err("Failed to fetch the specified user")?
         .id;
 
     let current_user = get_user_from_headers(
@@ -715,16 +715,17 @@ pub async fn edit_team_member(
 
     let team_association = DBTeam::get_association(id, &**pool)
         .await?
-        .wrap_request_err("The team specified does not exist")?;
+        .wrap_internal_err("Failed to fetch the specified team")?;
     let member =
         DBTeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
             .await?;
     let edit_member_db =
         DBTeamMember::get_from_user_id_pending(id, user_id, &**pool)
             .await?
-            .wrap_request_err(
-                "This member does not exist in this team - \
-                    the member must first be created via `POST`",
+            .wrap_internal_err(
+                "Failed to fetch team member: \
+				this member does not exist in this team - \
+				the member must first be created via `POST`",
             )?;
 
     let mut transaction = pool.begin().await?;
