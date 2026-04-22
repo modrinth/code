@@ -254,12 +254,12 @@ export const DismissAll: Story = {
 					Reset
 				</button>
 				<StackedAdmonitions :items="items" @dismiss-all="dismissAll">
-					<template #item="{ item }">
+					<template #item="{ item, dismissible }">
 						<Admonition
 							:type="item.type"
 							:header="item.header"
 							:body="item.body"
-							dismissible
+							:dismissible="dismissible"
 							@dismiss="dismiss(item.id)"
 						/>
 					</template>
@@ -314,7 +314,7 @@ export const RichContent: Story = {
 		},
 		template: /* html */ `
 			<StackedAdmonitions :items="items" @dismiss-all="dismissAll">
-				<template #item="{ item }">
+				<template #item="{ item, dismissible }">
 					<Admonition :type="item.type" :header="item.header">
 						{{ item.body }}
 						<template #top-right-actions>
@@ -324,7 +324,7 @@ export const RichContent: Story = {
 							<ButtonStyled v-if="item.canRetry" color="red">
 								<button @click="dismiss(item.id)">Retry</button>
 							</ButtonStyled>
-							<ButtonStyled circular type="transparent" hover-color-fill="background" :color="item.type === 'critical' ? 'red' : item.type === 'success' ? 'green' : 'blue'">
+							<ButtonStyled v-if="dismissible" circular type="transparent" hover-color-fill="background" :color="item.type === 'critical' ? 'red' : item.type === 'success' ? 'green' : 'blue'">
 								<button @click="dismiss(item.id)">✕</button>
 							</ButtonStyled>
 						</template>

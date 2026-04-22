@@ -8,6 +8,7 @@ import ButtonStyled from './ButtonStyled.vue'
 
 export type StackedAdmonitionType = 'info' | 'warning' | 'critical' | 'success'
 
+/** Extend this interface to attach arbitrary per-item data consumed in the #item slot. */
 export interface StackedAdmonitionItem {
 	id: string
 	type: StackedAdmonitionType
@@ -50,6 +51,12 @@ defineSlots<{
 		index: number
 		isFront: boolean
 		expanded: boolean
+		/**
+		 * Whether the consumer should render the Admonition's own dismiss button.
+		 * False when the stack header's "Dismiss"/"Dismiss all" covers the dismiss action
+		 * (e.g. single-item stack with `dismissAllEnabled`).
+		 */
+		dismissible: boolean
 	}): unknown
 	'header-label'(props: { count: number; expanded: boolean }): unknown
 }>()
@@ -64,15 +71,31 @@ const prefersReducedMotion = ref(false)
 const heights = ref<Record<string, number>>({})
 const cardEls = new Map<string, HTMLElement>()
 const observers = new Map<string, ResizeObserver>()
+const pendingHeights = new Map<string, number>()
+let flushHandle: number | null = null
+
+function scheduleHeightFlush() {
+	if (flushHandle != null) return
+	flushHandle = requestAnimationFrame(() => {
+		flushHandle = null
+		if (pendingHeights.size === 0) return
+		const next = { ...heights.value }
+		let changed = false
+		for (const [id, h] of pendingHeights) {
+			if (next[id] !== h) {
+				next[id] = h
+				changed = true
+			}
+		}
+		pendingHeights.clear()
+		if (changed) heights.value = next
+	})
+}
 
 const isExpanded = computed(() => {
 	if (props.items.length <= 1) return false
 	return props.expanded ?? internalExpanded.value
 })
-
-const collapsedInteractive = computed(() => !isExpanded.value && props.items.length >= 2)
-
-const renderedItems = computed(() => props.items)
 
 const frontCardHeight = computed(() => {
 	const front = props.items[0]
@@ -96,6 +119,10 @@ const springTransition = computed(() =>
 	prefersReducedMotion.value
 		? { duration: 0 }
 		: { type: 'spring' as const, stiffness: 260, damping: 32 },
+)
+
+const exitTransition = computed(() =>
+	prefersReducedMotion.value ? { duration: 0 } : { duration: 0.18 },
 )
 
 function cardPosition(index: number) {
@@ -133,14 +160,11 @@ function setCardRef(id: string, el: unknown) {
 	observers.get(id)?.disconnect()
 	cardEls.set(id, node)
 	const ro = new ResizeObserver(() => {
-		const next = node.offsetHeight
-		if (heights.value[id] !== next) {
-			heights.value = { ...heights.value, [id]: next }
-		}
+		pendingHeights.set(id, node.offsetHeight)
+		scheduleHeightFlush()
 	})
 	ro.observe(node)
 	observers.set(id, ro)
-	heights.value = { ...heights.value, [id]: node.offsetHeight }
 }
 
 function setExpanded(v: boolean) {
@@ -160,16 +184,8 @@ function onContainerClick(e: MouseEvent) {
 	const target = e.target as HTMLElement | null
 	if (!target) return
 	const interactive = target.closest('button, a, input, select, textarea, [role="button"]')
-	if (interactive && interactive.id !== stackId) return
+	if (interactive && interactive !== e.currentTarget) return
 	setExpanded(true)
-}
-
-function onContainerKeydown(e: KeyboardEvent) {
-	if (isExpanded.value || props.items.length <= 1) return
-	if (e.key === 'Enter' || e.key === ' ') {
-		e.preventDefault()
-		setExpanded(true)
-	}
 }
 
 watch(
@@ -180,18 +196,18 @@ watch(
 )
 
 watch(
-	() => props.items.map((i) => i.id).join('|'),
-	(joined) => {
-		const ids = new Set(joined.split('|').filter(Boolean))
+	() => props.items.map((i) => i.id),
+	(ids) => {
+		const idSet = new Set(ids)
 		for (const [id, ro] of observers) {
-			if (!ids.has(id)) {
+			if (!idSet.has(id)) {
 				ro.disconnect()
 				observers.delete(id)
 				cardEls.delete(id)
 			}
 		}
 		const next: Record<string, number> = {}
-		for (const id of ids) {
+		for (const id of idSet) {
 			if (heights.value[id] != null) next[id] = heights.value[id]
 		}
 		heights.value = next
@@ -215,6 +231,8 @@ onBeforeUnmount(() => {
 	for (const ro of observers.values()) ro.disconnect()
 	observers.clear()
 	cardEls.clear()
+	pendingHeights.clear()
+	if (flushHandle != null) cancelAnimationFrame(flushHandle)
 })
 
 const placeholderClasses: Record<StackedAdmonitionType, string> = {
@@ -233,17 +251,17 @@ const messages = defineMessages({
 		id: 'ui.stacked-admonitions.dismiss-all',
 		defaultMessage: 'Dismiss all',
 	},
-	expandAriaLabel: {
-		id: 'ui.stacked-admonitions.expand-aria-label',
-		defaultMessage: 'Expand {count, plural, one {# alert} other {# alerts}}',
+	dismiss: {
+		id: 'ui.stacked-admonitions.dismiss',
+		defaultMessage: 'Dismiss',
 	},
 })
 </script>
 
 <template>
 	<div v-if="items.length > 0" class="relative">
-		<div v-if="items.length >= 2" class="mb-2 flex items-center justify-between">
-			<ButtonStyled type="transparent">
+		<div v-if="items.length >= 1" class="mb-2 flex items-center justify-between">
+			<ButtonStyled v-if="items.length >= 2" type="transparent" hover-color-fill="none">
 				<button
 					type="button"
 					:aria-expanded="isExpanded"
@@ -263,10 +281,19 @@ const messages = defineMessages({
 					</slot>
 				</button>
 			</ButtonStyled>
-			<ButtonStyled v-if="dismissAllEnabled" type="transparent">
+			<span v-else class="px-3 py-1.5 text-sm font-medium text-secondary">
+				<slot name="header-label" :count="items.length" :expanded="isExpanded">
+					{{ formatMessage(messages.alertCount, { count: items.length }) }}
+				</slot>
+			</span>
+			<ButtonStyled v-if="dismissAllEnabled" type="transparent" hover-color-fill="none">
 				<button type="button" @click="$emit('dismiss-all')">
 					<XIcon class="h-4 w-4" />
-					{{ formatMessage(messages.dismissAll) }}
+					{{
+						items.length >= 2
+							? formatMessage(messages.dismissAll)
+							: formatMessage(messages.dismiss)
+					}}
 				</button>
 			</ButtonStyled>
 		</div>
@@ -277,21 +304,13 @@ const messages = defineMessages({
 			class="relative"
 			:animate="{ height: containerHeight }"
 			:transition="springTransition"
-			:role="collapsedInteractive ? 'button' : undefined"
-			:tabindex="collapsedInteractive ? 0 : undefined"
-			:aria-label="
-				collapsedInteractive
-					? formatMessage(messages.expandAriaLabel, { count: items.length })
-					: undefined
-			"
 			@mouseenter="isHovered = true"
 			@mouseleave="isHovered = false"
 			@click="onContainerClick"
-			@keydown="onContainerKeydown"
 		>
 			<AnimatePresence :initial="false">
 				<Motion
-					v-for="(item, index) in renderedItems"
+					v-for="(item, index) in items"
 					:key="item.id"
 					:ref="(el: unknown) => setCardRef(item.id, el)"
 					as="div"
@@ -302,13 +321,12 @@ const messages = defineMessages({
 						scale: cardPosition(index).scale,
 					}"
 					:animate="cardPosition(index)"
-					:exit="{ opacity: 0, scale: 0.9, transition: { duration: 0.18 } }"
+					:exit="{ opacity: 0, scale: 0.9, transition: exitTransition }"
 					:transition="springTransition"
 					:style="{
 						zIndex: items.length - index,
 						transformOrigin: 'top center',
 					}"
-					:inert="!isExpanded && index !== 0 ? true : undefined"
 					:aria-hidden="!isExpanded && index !== 0 ? 'true' : undefined"
 				>
 					<template v-if="isExpanded || index === 0">
@@ -318,6 +336,7 @@ const messages = defineMessages({
 							:index="index"
 							:is-front="index === 0"
 							:expanded="isExpanded"
+							:dismissible="!dismissAllEnabled"
 						/>
 					</template>
 					<div
