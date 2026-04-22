@@ -10,7 +10,7 @@ import {
 } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
 import type Stripe from 'stripe'
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, toRef, useTemplateRef, watch } from 'vue'
 
 import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
@@ -94,8 +94,8 @@ const {
 	noPaymentRequired,
 } = useStripe(
 	props.publishableKey,
-	props.customer,
-	props.paymentMethods,
+	toRef(props, 'customer'),
+	toRef(props, 'paymentMethods'),
 	props.currency,
 	selectedPlan,
 	selectedInterval,
@@ -208,12 +208,14 @@ async function beforeProceed(step: string) {
 			await initializeStripe()
 
 			if (primaryPaymentMethodId.value && skipPaymentMethods.value) {
-				const paymentMethod = await props.paymentMethods.find(
+				const paymentMethod = props.paymentMethods.find(
 					(x) => x.id === primaryPaymentMethodId.value,
 				)
-				await selectPaymentMethod(paymentMethod)
-				await setStep('review', true)
-				return false
+				if (paymentMethod) {
+					await selectPaymentMethod(paymentMethod)
+					await setStep('review', true)
+					return false
+				}
 			}
 			return true
 		case 'review':
