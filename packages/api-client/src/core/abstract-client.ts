@@ -30,6 +30,10 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	public readonly archon!: InferredClientModules['archon'] & { sockets: AbstractWebSocketClient }
 	public readonly kyros!: InferredClientModules['kyros']
 	public readonly iso3166!: InferredClientModules['iso3166']
+	public readonly mclogs!: InferredClientModules['mclogs']
+	public readonly launchermeta!: InferredClientModules['launchermeta']
+	public readonly paper!: InferredClientModules['paper']
+	public readonly purpur!: InferredClientModules['purpur']
 
 	constructor(config: ClientConfig) {
 		super()
@@ -126,6 +130,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 				...options.headers,
 			},
 		}
+		this.attachArchonSentryCaptureHeader(mergedOptions)
 
 		const headers = mergedOptions.headers
 		if (headers && 'Content-Type' in headers && headers['Content-Type'] === '') {
@@ -307,6 +312,21 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 		}
 
 		return headers
+	}
+
+	protected attachArchonSentryCaptureHeader(options: RequestOptions): void {
+		if (options.api !== 'archon' || !options.headers || !this.shouldCaptureArchonRequests()) {
+			return
+		}
+
+		options.headers['modrinth-sentry-capture'] = '1'
+	}
+
+	private shouldCaptureArchonRequests(): boolean {
+		const archonSentryCapture = this.config.archonSentryCapture
+		return typeof archonSentryCapture === 'function'
+			? archonSentryCapture()
+			: archonSentryCapture === true
 	}
 
 	/**

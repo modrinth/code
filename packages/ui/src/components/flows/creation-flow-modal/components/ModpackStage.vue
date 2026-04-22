@@ -147,6 +147,7 @@ watch(
 		// Always fetch the actual latest version from the API since search index can be stale
 		try {
 			const versions = await ctx.getProjectVersions(projectId)
+			if (ctx.modpackSearchProjectId.value !== projectId) return
 			if (versions.length > 0) {
 				const version = versions[0]
 				ctx.modpackSelection.value = {

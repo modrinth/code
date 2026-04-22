@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import {
+	ClipboardCopyIcon,
 	ClockIcon,
 	DownloadIcon,
 	EditIcon,
@@ -35,6 +36,7 @@ const props = withDefaults(
 		preview?: boolean
 		kyrosUrl?: string
 		jwt?: string
+		showCopyIdAction?: boolean
 		showDebugInfo?: boolean
 		restoreDisabled?: string
 	}>(),
@@ -42,6 +44,7 @@ const props = withDefaults(
 		preview: false,
 		kyrosUrl: undefined,
 		jwt: undefined,
+		showCopyIdAction: false,
 		showDebugInfo: false,
 		restoreDisabled: undefined,
 	},
@@ -90,7 +93,18 @@ const backupIcon = computed(() => {
 const overflowMenuOptions = computed<OverflowOption[]>(() => {
 	const options: OverflowOption[] = []
 
+	if (props.showCopyIdAction) {
+		options.push({
+			id: 'copy-id',
+			action: () => copyId(),
+		})
+	}
+
 	if (!activeOperation.value) {
+		if (options.length > 0) {
+			options.push({ divider: true })
+		}
+
 		options.push({
 			id: 'download',
 			action: () => emit('download'),
@@ -112,6 +126,10 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 
 	return options
 })
+
+async function copyId() {
+	await navigator.clipboard.writeText(props.backup.id)
+}
 
 // TODO: Uncomment when API supports size field
 // const formatBytes = (bytes?: number) => {
@@ -154,7 +172,11 @@ const messages = defineMessages({
 <template>
 	<div
 		class="grid items-center gap-4 rounded-2xl bg-bg-raised p-4 shadow-md"
-		:class="preview ? 'grid-cols-1' : 'grid-cols-[auto_1fr_auto] md:grid-cols-[1fr_400px_1fr]'"
+		:class="
+			preview
+				? 'grid-cols-1'
+				: 'grid-cols-[auto_1fr_auto] md:grid-cols-[minmax(0,1fr)_400px_minmax(0,1fr)]'
+		"
 	>
 		<div class="flex flex-row gap-4 items-center">
 			<div
@@ -231,6 +253,10 @@ const messages = defineMessages({
 			<ButtonStyled circular type="transparent">
 				<OverflowMenu :options="overflowMenuOptions">
 					<MoreVerticalIcon class="size-5" />
+					<template #copy-id>
+						<ClipboardCopyIcon class="size-5" />
+						{{ formatMessage(commonMessages.copyIdButton) }}
+					</template>
 					<template #download>
 						<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
 					</template>

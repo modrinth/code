@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "ביטול"
   },
+  "button.change-version": {
+    "defaultMessage": "שנה גרסה"
+  },
   "button.clear": {
     "defaultMessage": "נקה"
   },
@@ -77,6 +80,9 @@
   "button.decline": {
     "defaultMessage": "סרב"
   },
+  "button.disable": {
+    "defaultMessage": "השבת"
+  },
   "button.download": {
     "defaultMessage": "הורדה"
   },
@@ -86,8 +92,17 @@
   "button.edit": {
     "defaultMessage": "ערוך"
   },
+  "button.enable": {
+    "defaultMessage": "אפשר"
+  },
+  "button.extract": {
+    "defaultMessage": "חלץ"
+  },
   "button.follow": {
     "defaultMessage": "עקוב"
+  },
+  "button.hide-snapshots": {
+    "defaultMessage": "הסתר סנאפשוטים"
   },
   "button.max": {
     "defaultMessage": "מקסימום"
@@ -95,11 +110,17 @@
   "button.more-options": {
     "defaultMessage": "אפשרויות נוספות"
   },
+  "button.move": {
+    "defaultMessage": "הזז"
+  },
   "button.next": {
     "defaultMessage": "הבא"
   },
   "button.open-folder": {
     "defaultMessage": "פתח תיקיה"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "פתח בתקייה"
   },
   "button.play": {
     "defaultMessage": "שחק"
@@ -107,17 +128,32 @@
   "button.refresh": {
     "defaultMessage": "רענן"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "התקן מחדש חבילת מודים"
+  },
   "button.remove": {
     "defaultMessage": "מחק"
   },
   "button.remove-image": {
     "defaultMessage": "מחק תמונה"
   },
+  "button.rename": {
+    "defaultMessage": "שנה שם"
+  },
+  "button.repair": {
+    "defaultMessage": "תקן"
+  },
+  "button.repairing": {
+    "defaultMessage": "מתקן..."
+  },
   "button.report": {
     "defaultMessage": "דיווח"
   },
   "button.reset": {
     "defaultMessage": "איפוס"
+  },
+  "button.reset-server": {
+    "defaultMessage": "אפס שרת"
   },
   "button.retry": {
     "defaultMessage": "נסה שוב"
@@ -131,6 +167,12 @@
   "button.saving": {
     "defaultMessage": "שומר"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "הצג את כל הגרסאות"
+  },
+  "button.show-file": {
+    "defaultMessage": "הצג קובץ"
+  },
   "button.sign-in": {
     "defaultMessage": "התחבר"
   },
@@ -143,8 +185,14 @@
   "button.stop": {
     "defaultMessage": "עצור"
   },
+  "button.switch-version": {
+    "defaultMessage": "החלף גרסה"
+  },
   "button.unfollow": {
     "defaultMessage": "הסר מעקב"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "בטל קישור חבילת מודים"
   },
   "button.update": {
     "defaultMessage": "עדכן"
@@ -155,9 +203,6 @@
   "changelog.justNow": {
     "defaultMessage": "רק לעכשיו"
   },
-  "changelog.product.api": {
-    "defaultMessage": "ממשק API"
-  },
   "changelog.product.app": {
     "defaultMessage": "אפליקציה"
   },
@@ -165,10 +210,85 @@
     "defaultMessage": "ארח"
   },
   "changelog.product.web": {
-    "defaultMessage": "אתר אינטרנט"
+    "defaultMessage": "פלטפורמה"
   },
   "collections.label.private": {
     "defaultMessage": "פרטי"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "אתה בטוח שאתה רוצה לעדכן {count, plural, one {# פרויקט} other {# פרויקטים}} לגרסה המתאימה האחרונה שלהם? מומלץ לעדכן תוכן אחד־אחד."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "אזהרת עדכון"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "עדכן פרויקטים"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "עדכן {count, plural, one {# פרויקט} other {# פרויקטים}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "מחיקת מוד יכולה להשפיע לתמיד על העולם שלך ויכולה לגרום לתוכן חסר או בעיות לא צפויות כשהעולם נטען שוב."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "אזהרת מחיקה"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "מחק {count} {itemType}{count, plural, one {} other {ים}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "מחק {itemType}{count, plural, one {} other {ים}}"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count} נוספו"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "נוסף (תלות)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "מושבת"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "עודכן"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "יוצר גיבוי..."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "צור גיבוי"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "אל תציג שוב"
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "תוכן נוסף"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "אין תוכן מותקן"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "איו תוכן נוסף מותקן"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "טעינת התוכן נכשלה"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "טוען תוכן..."
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "לא נמצא תוכן."
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "אנא המתן"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "שתף"
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "מעדכן {סוגתוכן}..."
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "מיקום נוכחי"
   },
   "form.label.address-line": {
     "defaultMessage": "שורת הכתובת"
@@ -418,9 +538,6 @@
   },
   "label.singleplayer": {
     "defaultMessage": "שחקן יחיד"
-  },
-  "label.sort-by": {
-    "defaultMessage": "מיין לפי"
   },
   "label.success": {
     "defaultMessage": "הצלחה"
@@ -932,9 +1049,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "שיטת תשלום"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "מחויב כל {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "בחר תוכנית מותאמת אישית עם המפרט שאתה צריך בלבד."
   },
@@ -950,17 +1064,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "הכי פופולרי"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "בחר תוכנית"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "בחר תוכנית"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "מושלם ל‑1–5 חברים עם מספר מועט של מודים קלים."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "בחר את כמות ה‑RAM והמאפיינים המתאימים לצרכיך."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "תוכנית"

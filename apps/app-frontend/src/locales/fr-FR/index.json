@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "Impossible de contacter les serveurs d'authentification"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Ajouter le serveur à l'instance"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Ajouter des serveurs à votre instance"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Ajouter à l'instance"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Ajouter à {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Ajouté"
+  },
+  "app.browse.already-added": {
+    "message": "Déjà ajouté"
+  },
+  "app.browse.discover-content": {
+    "message": "Découvrir du contenu"
+  },
+  "app.browse.discover-servers": {
+    "message": "Découvrir des serveurs"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Masquer les serveurs ajoutés"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Masquer le contenu installé"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Installer du contenu à l'instance"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Saisir la description du modpack..."
   },
@@ -30,7 +63,7 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Toutes les données pour votre instance seront supprimée à jamais, y comprit vos mondes, configurations, et contenu supprimé."
+    "message": "Toutes les données pour votre instance seront supprimées à jamais, y compris vos mondes, vos configurations, et le contenu installé."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Cette action est irréversible"
@@ -41,17 +74,20 @@
   "app.instance.confirm-delete.header": {
     "message": "Supprimer l'instance"
   },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Ce modpack est déjà installé sur l'instance <bold>{instanceName}</bold>. Êtes-vous sûr.e de vouloir le dupliquer ?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Créer"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack déjà installé"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instance"
+  },
   "app.instance.mods.content-type-project": {
     "message": "projet"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Copier le lien"
-  },
-  "app.instance.mods.installing": {
-    "message": "Installation..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Modpack"
   },
   "app.instance.mods.project-was-added": {
     "message": "« {name} » a été ajouté"
@@ -63,22 +99,55 @@
     "message": "Jette un coup d'œil aux projets que j'utilise dans mon modpack !"
   },
   "app.instance.mods.share-title": {
-    "message": "Partagez le contenu de votre modpack"
-  },
-  "app.instance.mods.show-file": {
-    "message": "Montrer le fichier"
+    "message": "Partage du contenu de votre modpack"
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Mis en ligne avec succès"
   },
-  "app.instance.mods.switch-version": {
-    "message": "Changer de version"
+  "app.instance.worlds.add-server": {
+    "message": "Ajouter le serveur"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "Inconnu"
+  "app.instance.worlds.browse-servers": {
+    "message": "Parcourir des serveurs"
   },
-  "app.instance.mods.updating": {
-    "message": "Mise à jour..."
+  "app.instance.worlds.delete-world-description": {
+    "message": "« {name} » sera supprimé **pour toujours**, et il sera impossible de le récupérer."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Êtes-vous sûr.e de vouloir supprimer ce monde pour toujours ?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Moddé"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Hors ligne"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "En ligne"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Ajouter un serveur ou parcourir pour commencer"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Aucun serveur ou monde ajoutés"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "« {name} » sera retiré de votre liste, y compris en jeu, et il sera impossible de le récupérer."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "« {name} » ({address}) sera retiré de votre liste, y compris en jeu, et il sera impossible de le récupérer."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Êtes-vous sûr.e de vouloir retirer {name} ?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Rechercher {count} mondes..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "ce serveur"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Contenu requis"
@@ -128,9 +197,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "Options d’instance par défaut"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "Menu de fonctionnalité"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Installations de Java"
   },
@@ -144,7 +210,7 @@
     "message": "Gestion des ressources"
   },
   "app.update-popup.body": {
-    "message": "Modrinth App v{version} est prête à être installée ! Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Modrinth App."
+    "message": "Modrinth App v{version} est prête à être installée ! Relancez l'application pour faire la mise à jour maintenant, ou automatiquement à la fermeture de Modrinth App."
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} a finie d'être téléchargée. Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Modrinth App."
@@ -184,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Relancez l'application pour installer la mise à jour"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "exemple.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Sélectionner une option"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Version {version} incompatible"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Pas encore joué"
+  },
+  "app.world.world-item.offline": {
+    "message": "Hors ligne"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count, plural, =0 {Personne en ligne} one {# est en ligne} other {# sont en ligne}}"
   },
   "friends.action.add-friend": {
     "message": "Ajouter un ami"
@@ -283,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "Modifier le monde"
+  },
+  "instance.files.adding-files": {
+    "message": "Ajout de fichiers ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Sauvegarder en tant que..."
   },
   "instance.server-modal.address": {
     "message": "Adresse"
@@ -455,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Ne pas montrer dans l'Accueil"
   },
-  "instance.worlds.filter.available": {
-    "message": "Disponible"
-  },
   "instance.worlds.game_already_open": {
     "message": "L'instance est déjà ouverte"
   },
@@ -477,16 +564,10 @@
     "message": "Vous pouvez seulement entrer directement dans les serveurs sur Minecraft Alpha 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Vous pouvez seulement entrer directement dans les mondes solo sur Minecraft Alpha 1.20+"
+    "message": "Vous pouvez seulement entrer directement dans les mondes solo sur Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
     "message": "Jouer à l'instance"
-  },
-  "instance.worlds.type.server": {
-    "message": "Serveur"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Solo"
   },
   "instance.worlds.view_instance": {
     "message": "Voir l'instance"
@@ -516,6 +597,6 @@
     "message": "Version du jeu est procurée par le serveur"
   },
   "search.filter.locked.server-loader.title": {
-    "message": "Loader est procuré par le serveur"
+    "message": "Le loader est procuré par le serveur"
   }
 }

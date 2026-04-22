@@ -30,7 +30,7 @@ const props = defineProps<{
 	availableProducts: Labrinth.Billing.Internal.Product[]
 }>()
 
-const loading = ref(true)
+const loading = ref(false)
 const checkingCustomStock = ref(false)
 const selectedPlan = defineModel<Labrinth.Billing.Internal.Product>('plan')
 const selectedRegion = defineModel<string>('region')
@@ -214,12 +214,11 @@ async function updateStock() {
 onMounted(() => {
 	// auto select region with lowest ping
 	loading.value = true
-	bestPing.value =
-		props.pings.length > 0
-			? props.pings.reduce((acc, cur) => {
-					return acc.ping < cur.ping ? acc : cur
-				})?.region
-			: undefined
+	bestPing.value = [...props.pings].sort((a, b) => {
+		if (a.ping <= 0) return 1
+		if (b.ping <= 0) return -1
+		return a.ping - b.ping
+	})[0]?.region
 	selectedRegion.value = undefined
 	selectedRam.value = minRam.value
 	checkingCustomStock.value = true

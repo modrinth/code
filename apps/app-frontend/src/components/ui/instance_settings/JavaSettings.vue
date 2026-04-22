@@ -25,20 +25,24 @@ const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as unknown as AppSettings
 
-const overrideJavaInstall = ref(!!instance.java_path)
-const optimalJava = readonly(await get_optimal_jre_key(instance.path).catch(handleError))
-const javaInstall = ref({ path: optimalJava.path ?? instance.java_path })
+const overrideJavaInstall = ref(!!instance.value.java_path)
+const optimalJava = readonly(await get_optimal_jre_key(instance.value.path).catch(handleError))
+const javaInstall = ref({ path: optimalJava.path ?? instance.value.java_path })
 
-const overrideJavaArgs = ref((instance.extra_launch_args?.length ?? 0) > 0)
-const javaArgs = ref((instance.extra_launch_args ?? globalSettings.extra_launch_args).join(' '))
-
-const overrideEnvVars = ref((instance.custom_env_vars?.length ?? 0) > 0)
-const envVars = ref(
-	(instance.custom_env_vars ?? globalSettings.custom_env_vars).map((x) => x.join('=')).join(' '),
+const overrideJavaArgs = ref((instance.value.extra_launch_args?.length ?? 0) > 0)
+const javaArgs = ref(
+	(instance.value.extra_launch_args ?? globalSettings.extra_launch_args).join(' '),
 )
 
-const overrideMemorySettings = ref(!!instance.memory)
-const memory = ref(instance.memory ?? globalSettings.memory)
+const overrideEnvVars = ref((instance.value.custom_env_vars?.length ?? 0) > 0)
+const envVars = ref(
+	(instance.value.custom_env_vars ?? globalSettings.custom_env_vars)
+		.map((x) => x.join('='))
+		.join(' '),
+)
+
+const overrideMemorySettings = ref(!!instance.value.memory)
+const memory = ref(instance.value.memory ?? globalSettings.memory)
 const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) as unknown as {
 	maxMemory: number
 	snapPoints: number[]
@@ -76,7 +80,7 @@ watch(
 		memory,
 	],
 	async () => {
-		await edit(instance.path, editProfileObject.value)
+		await edit(instance.value.path, editProfileObject.value)
 	},
 	{ deep: true },
 )
@@ -107,10 +111,10 @@ const messages = defineMessages({
 
 <template>
 	<div>
-		<h2 id="project-name" class="m-0 mb-1 text-lg font-extrabold text-contrast block">
+		<h2 id="project-name" class="m-0 mb-2.5 text-lg font-semibold text-contrast block">
 			{{ formatMessage(messages.javaInstallation) }}
 		</h2>
-		<Checkbox v-model="overrideJavaInstall" label="Custom Java installation" class="mb-2" />
+		<Checkbox v-model="overrideJavaInstall" label="Custom Java installation" class="mb-2.5" />
 		<template v-if="!overrideJavaInstall">
 			<div class="flex my-2 items-center gap-2 font-semibold">
 				<template v-if="javaInstall">
@@ -140,10 +144,10 @@ const messages = defineMessages({
 			</div>
 		</template>
 		<JavaSelector v-if="overrideJavaInstall || !javaInstall" v-model="javaInstall" />
-		<h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
+		<h2 id="project-name" class="mt-6 mb-2.5 text-lg font-semibold text-contrast block">
 			{{ formatMessage(messages.javaMemory) }}
 		</h2>
-		<Checkbox v-model="overrideMemorySettings" label="Custom memory allocation" class="mb-2" />
+		<Checkbox v-model="overrideMemorySettings" label="Custom memory allocation" class="mb-2.5" />
 		<Slider
 			id="max-memory"
 			v-model="memory.maximum"
@@ -155,7 +159,7 @@ const messages = defineMessages({
 			:snap-range="512"
 			unit="MB"
 		/>
-		<h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
+		<h2 id="project-name" class="mt-6 mb-2.5 text-lg font-semibold text-contrast block">
 			{{ formatMessage(messages.javaArguments) }}
 		</h2>
 		<Checkbox v-model="overrideJavaArgs" label="Custom java arguments" class="my-2" />
@@ -167,10 +171,10 @@ const messages = defineMessages({
 			placeholder="Enter java arguments..."
 			wrapper-class="w-full"
 		/>
-		<h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
+		<h2 id="project-name" class="mt-6 mb-2.5 text-lg font-semibold text-contrast block">
 			{{ formatMessage(messages.javaEnvironmentVariables) }}
 		</h2>
-		<Checkbox v-model="overrideEnvVars" label="Custom environment variables" class="mb-2" />
+		<Checkbox v-model="overrideEnvVars" label="Custom environment variables" class="mb-2.5" />
 		<StyledInput
 			id="env-vars"
 			v-model="envVars"

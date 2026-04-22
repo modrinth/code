@@ -841,6 +841,23 @@ button {
 		opacity: 0.5;
 		box-shadow: none;
 		flex-shrink: 0;
+		user-select: none;
+	}
+
+	.text-input-wrapper__after {
+		display: flex;
+		color: var(--color-text);
+		padding: 0.5rem 1rem 0.5rem 0;
+		font-weight: var(--font-weight-medium);
+		min-height: 36px;
+		box-sizing: border-box;
+		width: fit-content;
+		align-items: center;
+		filter: grayscale(50%);
+		opacity: 0.5;
+		box-shadow: none;
+		flex-shrink: 0;
+		user-select: none;
 	}
 
 	input,

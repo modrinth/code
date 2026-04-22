@@ -72,7 +72,7 @@
     "defaultMessage": "Podaj kod źródłowy"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "Niektóre z Twoich linków zewnętrznych wydają się być identyczne. Każdy link powinien być wprowadzony tylko raz i z odpowiednim typem linku."
+    "defaultMessage": "Niektóre z Twoich linków zewnętrznych są identyczne. Każdy link powinien być wprowadzony tylko raz i z odpowiednim typem linku."
   },
   "nags.identical-links.title": {
     "defaultMessage": "Takie same linki"

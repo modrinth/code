@@ -32,10 +32,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const projectId = to.params.id as string
 
 	try {
-		// Fetch v2 project for redirect check AND cache it for the page
-		// Using fetchQuery ensures the page's useQuery gets this cached result
-		const project = await queryClient.fetchQuery(projectQueryOptions.v2(projectId, client))
-		const projectV3 = await queryClient.fetchQuery(projectQueryOptions.v3(projectId, client))
+		// Fetch v2 and v3 in parallel — cache both for the page's useQuery calls
+		const [project, projectV3] = await Promise.all([
+			queryClient.fetchQuery(projectQueryOptions.v2(projectId, client)),
+			queryClient.fetchQuery(projectQueryOptions.v3(projectId, client)),
+		])
 
 		// Let page handle 404
 		if (!project) return

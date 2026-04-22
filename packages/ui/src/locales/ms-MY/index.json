@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Lihat analitik"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Gagal memuat tetapan pelayan"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -40,6 +43,54 @@
   },
   "badge.new": {
     "defaultMessage": "Baharu"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Batal"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} CPU Berkongsi"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Anda akan melanggan semula pelayan <server-name>{serverName}</server-name>. Langganan anda akan diaktifkan semula dan pelayan anda akan terus berjalan tanpa gangguan."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Tidak boleh melanggan semula, gagal memuatkan butiran langganan."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Ralat"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Gagal memuat butiran langganan."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 hari"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/bulan"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/3 bulan"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/tahun"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Caj anda yang seterusnya akan dikenakan pada <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Pelan"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "RAM {ramGb} GB"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Langgan semula"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "Penyimpanan {storageGb} GB"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Langgan semula ke Pelayan"
   },
   "button.accept": {
     "defaultMessage": "Terima"
@@ -68,8 +119,17 @@
   "button.continue": {
     "defaultMessage": "Teruskan"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Salin nama fail"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Salin laluan penuh"
+  },
   "button.copy-id": {
     "defaultMessage": "Salin ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Salin pautan"
   },
   "button.copy-permalink": {
     "defaultMessage": "Salin pautan kekal"
@@ -80,6 +140,9 @@
   "button.decline": {
     "defaultMessage": "Tolak"
   },
+  "button.disable": {
+    "defaultMessage": "Nyahdayakan"
+  },
   "button.download": {
     "defaultMessage": "Muat turun"
   },
@@ -88,6 +151,12 @@
   },
   "button.edit": {
     "defaultMessage": "Sunting"
+  },
+  "button.enable": {
+    "defaultMessage": "Dayakan"
+  },
+  "button.extract": {
+    "defaultMessage": "Ekstrak"
   },
   "button.follow": {
     "defaultMessage": "Ikut"
@@ -101,11 +170,17 @@
   "button.more-options": {
     "defaultMessage": "Lebih banyak pilihan"
   },
+  "button.move": {
+    "defaultMessage": "Pindahkan"
+  },
   "button.next": {
     "defaultMessage": "Seterusnya"
   },
   "button.open-folder": {
     "defaultMessage": "Buka folder"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Buka dalam folder"
   },
   "button.play": {
     "defaultMessage": "Main"
@@ -122,6 +197,9 @@
   "button.remove-image": {
     "defaultMessage": "Alih keluar gambar"
   },
+  "button.rename": {
+    "defaultMessage": "Namakan semula"
+  },
   "button.repair": {
     "defaultMessage": "Baiki"
   },
@@ -133,6 +211,9 @@
   },
   "button.reset": {
     "defaultMessage": "Tetap semula"
+  },
+  "button.reset-server": {
+    "defaultMessage": "Tetap semula pelayan"
   },
   "button.retry": {
     "defaultMessage": "Cuba semula"
@@ -146,6 +227,12 @@
   "button.saving": {
     "defaultMessage": "Sedang menyimpan"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "Tunjukkan semua versi"
+  },
+  "button.show-file": {
+    "defaultMessage": "Tunjukkan fail"
+  },
   "button.sign-in": {
     "defaultMessage": "Daftar masuk"
   },
@@ -158,8 +245,14 @@
   "button.stop": {
     "defaultMessage": "Berhenti"
   },
+  "button.switch-version": {
+    "defaultMessage": "Tukar versi"
+  },
   "button.unfollow": {
     "defaultMessage": "Nyahikut"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "Nyahpaut pek mod"
   },
   "button.update": {
     "defaultMessage": "Kemas kini"
@@ -170,9 +263,6 @@
   "changelog.justNow": {
     "defaultMessage": "Tadi"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "Aplikasi"
   },
@@ -180,13 +270,580 @@
     "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
-    "defaultMessage": "Laman Sesawang"
+    "defaultMessage": "Platform"
   },
   "collections.label.private": {
     "defaultMessage": "Peribadi"
   },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Adakah anda pasti mahu mengemas kini {count, plural, other {# projek}} ke versi terkini yang serasi? Disyorkan untuk mengemas kini kandungan satu per satu."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Amaran kemas kini"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Kemas kini projek"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Tahan Shift sambil mengklik \"Kemas kini semua\" untuk melangkau pengesahan ini pada masa akan datang."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Kemas kini {count, plural, other {# projek}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Pemadaman mod boleh menjejaskan dunia anda secara kekal dan mungkin menyebabkan kandungan yang hilang atau masalah yang tidak dijangka apabila ia dimuatkan semula."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Amaran pemadaman"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Padam {count} {itemType}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Padam {itemType}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {Penurunan taraf} other {Pengemaskinian}} boleh menyebabkan masalah keserasian. Mod atau kandungan yang anda tambahkan di atas pek mod akan disimpan, tetapi mungkin tidak serasi dengan versi baharu."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "Amaran {action, select, downgrade {penurunan taraf} other {pengemaskinian}}"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "{action, select, downgrade {Turun taraf} other {Kemas kini}} pek mod"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "{action, select, downgrade {Turun taraf} other {Kemas kini}} pek mod"
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Mod dan kandungan akan digabungkan dengan apa yang anda tambahkan di atas pek mod dan ia akan berhenti menerima kemas kini."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Menyahpautkan pek mod"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Nyahpaut pek mod"
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Nyahpaut"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count} ditambah"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "Ditambah (kebergantungan)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Dinyahdayakan"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Dikemas Kini"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "{count} dialih keluar"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Sesetengah kandungan pada pelayan anda tidak dapat dianalisis dan mungkin terjejas oleh perubahan ini."
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "{count} dikemas kini"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "Sedang mencipta sandaran..."
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Sandaran berjaya dicipta"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Penciptaan sandaran gagal. Anda masih boleh meneruskan."
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "Sandaran sedang dijalankan, disyorkan untuk menunggu sehingga penyandaran selesai sebelum melakukan tindakan ini."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Penciptaan sandaran mungkin mengambil masa beberapa minit bergantung pada saiz pelayan anda."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Cipta sandaran"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Tahan Shift sambil mengklik untuk melangkau pengesahan."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Kami mengesyorkan agar anda membuat sandaran sebelum meneruskan supaya anda boleh memulihkan {type, select, server {dunia} other {pemasangan}} anda sekiranya terdapat sebarang kerosakan."
+  },
+  "content.modpack-card.content-hint-description": {
+    "defaultMessage": "Kandungan pek mod anda kini boleh didapati di sini!"
+  },
+  "content.modpack-card.content-hint-title": {
+    "defaultMessage": "Kandungan pek mod telah berpindah"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "Jangan tunjukkan lagi"
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Kandungan tambahan"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Layari kandungan"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "Sila tunggu sehingga operasi selesai sebelum menyunting kandungan."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Layari atau muat naik {contentType} untuk bermula"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Tambahkan kandungan tambahan di atas pek mod ini"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "Tiada kandungan dipasang"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "Tiada kandungan tambahan dipasang"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "Gagal memuat kandungan"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "Sedang memuat kandungan..."
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "Tiada kandungan dijumpai."
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Sila tunggu"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Cari {count} {contentType}..."
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "Nama fail"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Kongsi"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Pautan Markdown"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Pautan projek"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Nama projek"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Mengikut abjad"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Paling baharu dahulu"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Paling lama dahulu"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Isih mengikut {mode}"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Kemas kini semua"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Muat naik fail"
+  },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Sedang memuat naik fail ({completed}/{total})"
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "Semua kandungan yang dipilih sudah pun dinyahdayakan"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "Semua kandungan yang dipilih sudah pun didayakan"
+  },
+  "content.selection-bar.bulk.deleting": {
+    "defaultMessage": "Sedang memadamkan {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.deleting-waiting": {
+    "defaultMessage": "Sedang memadamkan {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling": {
+    "defaultMessage": "Sedang menyahdayakan {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-waiting": {
+    "defaultMessage": "Sedang menyahdayakan {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling": {
+    "defaultMessage": "Sedang mendayakan {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling-waiting": {
+    "defaultMessage": "Sedang mendayakan {contentType}..."
+  },
+  "content.selection-bar.bulk.updating": {
+    "defaultMessage": "Sedang mengemas kini {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "Sedang mengemas kini {contentType}..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count} {contentType} dipilih"
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "{count, number} dipilih"
+  },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Ringkasan pengekstrakan"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Tulis ganti"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "Lebih 100 fail akan ditulis ganti jika anda meneruskan pengekstrakan; berikut adalah sebahagian daripadanya."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "{count} fail berikut sudah wujud pada pelayan anda dan akan ditulis ganti jika anda meneruskan pengekstrakan."
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} ditulis ganti"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "Ditulis ganti"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "Fail akan ditulis ganti"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Cipta {type, select, directory {folder} other {fail}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Cipta sebuah {type, select, directory {folder} other {fail}}"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "cth. folder-saya"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "cth. config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "Memadam \"{name}\""
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "Padam fail"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {Folder ini dan semua kandungannya akan dipadamkan secara kekal. Tindakan ini tidak boleh dibuat asal.} other {Fail ini akan dipadamkan secara kekal. Tindakan ini tidak boleh dibuat asal.}}"
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "Tidak dapat memuat kandungan fail."
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "Gagal membuka fail"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "Tidak dapat memuat naik ke mclo.gs."
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Gagal berkongsi fail"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "Fail anda telah disimpan."
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "Fail disimpan"
+  },
+  "files.editor.find-close": {
+    "defaultMessage": "Tutup"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Cari"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} daripada {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Padanan seterusnya"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Tiada hasil"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Padanan sebelumnya"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Togol penggantian"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "URL fail log anda telah disalin ke papan keratan anda."
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "URL log disalin"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Gantikan"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Gantikan Semua"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Gantikan dengan"
+  },
+  "files.editor.save-failed-text": {
+    "defaultMessage": "Tidak dapat menyimpan fail."
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "Penyimpanan gagal"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "Pergi ke folder utama"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Cuba lagi"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "Gambat terlalu besar untuk dilihat (maksimum {maxDimension}x{maxDimension} piksel)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "Fail gambar tidak sah atau kosong."
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Gagal memuat gambar"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "Tetap semula zum"
+  },
+  "files.image_viewer.viewed_image_alt": {
+    "defaultMessage": "Gambar yang dilihat"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "Zum masuk"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "Zum keluar"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "Operasi fail dinyahdayakan semasa operasi sedang dijalankan."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Ralat semasa menjalankan simulasi percubaan"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "Simulasi percubaan gagal"
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "Tiada fail atau folder."
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "Folder ini kosong"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "Folder itu mungkin tidak wujud."
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "Tidak dapat memuat fail"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "Pengekstrakan dimulakan"
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "{count} dipilih"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "Anda mempunyai perubahan yang belum disimpan."
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "Lokasi semasa"
+  },
+  "files.move-modal.destination-path": {
+    "defaultMessage": "Laluan destinasi"
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "cth. /folder-saya"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {Pindahkan folder} other {Pindahkan fail}}"
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "Kembali ke laman utama"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Navigasi laluan"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "Cipta baharu..."
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "Navigasi fail"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Cari dalam fail"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "Laman utama"
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "Pasang pek CurseForge"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "Fail baharu"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "Folder baharu"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "Cari fail"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "Kongsi ke mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Muat naik fail"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "Muat naik daripada fail .zip"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Muat naik daripada URL .zip"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} diekstrak"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "Mengekstrak {source}"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Gagal"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "pek mod daripada URL"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "Namakan semula {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "Nama baharu"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, other {# item}}"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Dicipta"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Diubah suai"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Nama"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Saiz"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "Anda mempunyai perubahan yang belum disimpan yang akan hilang jika anda pergi. Adakah anda ingin menyimpannya sebelum pergi?"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Buang"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "Perubahan yang belum disimpan"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Dibatalkan"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "Gagal - Fail sudah wujud"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Gagal - {error}"
+  },
+  "files.upload-dropdown.failed-incorrect-type": {
+    "defaultMessage": "Gagal - Jenis fail salah"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "Gagal memuat naik {fileName}"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "Fail"
+  },
+  "files.upload-dropdown.file-uploads": {
+    "defaultMessage": "Muat naik {fileType}"
+  },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "Muat naik mempunyai jenis fail yang salah"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Sebuah ralat yang tidak dijangka telah berlaku."
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} yang tinggal"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Lepaskan {type, select, undefined {fail} other {{type}}} di sini untuk memuat naik"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "Nama mesti mengandungi hanya aksara alfanumerik, tanda sengkang (-), garis bawah (_), atau ruang."
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "Nama mesti mengandungi hanya aksara alfanumerik, tanda sengkang (-), garis bawah (_), titik (.), atau ruang."
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Nama"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "Nama diperlukan."
+  },
+  "files.zip-url-modal.backup-name": {
+    "defaultMessage": "Pemasangan pek mod CurseForge"
+  },
+  "files.zip-url-modal.cf-header": {
+    "defaultMessage": "Pasang pek mod CurseForge"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Tidak dapat menemui pek mod CurseForge pada URL tersebut."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "Pek mod CurseForge tidak ditemui"
+  },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "Masukkan pautan"
+  },
+  "files.zip-url-modal.error-cf-url": {
+    "defaultMessage": "URL mestilah URL versi pek mod CurseForge."
+  },
+  "files.zip-url-modal.error-url-invalid": {
+    "defaultMessage": "URL mestilah sah."
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "URL diperlukan."
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Pasang"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "Pemasangan gagal"
+  },
+  "files.zip-url-modal.step-copy-description": {
+    "defaultMessage": "Salin URL laman versi dan tampalkannya di bawah."
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "Salin URL"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "Layari CurseForge dan cari pek mod yang anda inginkan."
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "Cari pek mod"
+  },
+  "files.zip-url-modal.step-select-description": {
+    "defaultMessage": "Pergi ke tab \"Fail\" dan pilih versi untuk dipasang."
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "Pilih versi"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "Sebuah ralat yang tidak diketahui telah berlaku"
+  },
+  "files.zip-url-modal.zip-description": {
+    "defaultMessage": "Salin dan tampal URL muat turun terus fail .zip."
+  },
+  "files.zip-url-modal.zip-header": {
+    "defaultMessage": "Memuat naik kandungan .zip daripada URL"
   },
   "form.label.address-line": {
     "defaultMessage": "Baris alamat"
@@ -290,6 +947,93 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolusi"
   },
+  "hosting.content.failed-to-bulk-delete": {
+    "defaultMessage": "Gagal memadamkan kandungan"
+  },
+  "hosting.content.failed-to-bulk-disable": {
+    "defaultMessage": "Gagal menyahdayakan kandungan"
+  },
+  "hosting.content.failed-to-bulk-enable": {
+    "defaultMessage": "Gagal mendayakan kandungan"
+  },
+  "hosting.content.failed-to-bulk-update": {
+    "defaultMessage": "Gagal mengemas kini kandungan"
+  },
+  "hosting.content.failed-to-load-modpack-content": {
+    "defaultMessage": "Gagal memuat kandungan pek mod"
+  },
+  "hosting.content.failed-to-load-versions": {
+    "defaultMessage": "Gagal memuat versi"
+  },
+  "hosting.content.failed-to-remove": {
+    "defaultMessage": "Gagal mengalih keluar kandungan"
+  },
+  "hosting.content.failed-to-toggle": {
+    "defaultMessage": "Gagal menogol {name}"
+  },
+  "hosting.content.failed-to-unlink": {
+    "defaultMessage": "Gagal menyahpaut pek mod"
+  },
+  "hosting.content.failed-to-update": {
+    "defaultMessage": "Gagal mengemas kini"
+  },
+  "hosting.content.failed-to-upload": {
+    "defaultMessage": "Gagal memuat naik fail"
+  },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "Gagal menukar versi pek mod"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "Gagal memuat versi"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "Gagal memasang semula pek mod"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "Gagal membaiki pelayan"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Gagal menetapkan semula pelayan kepada proses penetapan awal"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "Gagal menyimpan tetapan pemasangan"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "Gagal menyahpaut pek mod"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "Versi {loader, select, null {pemuat} other {{loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "Pemasangan pelayan anda telah dibaiki."
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "Pembaikan selesai"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Tetap semula pelayan"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Mengalih keluar semua data pada pelayan anda, termasuk dunia, mod dan fail konfigurasi anda. Sandaran akan kekal dan boleh dipulihkan."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Tetap semula ke proses penetapan awal"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Pilihan ini akan mengembalikan pelayan ke proses penetapan awal supaya penetapan boleh diselesaikan semula. Adakah anda pasti mahu meneruskan?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "Tetap semula ke proses penetapan awal"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Pelayan telah dikembalikan ke aliran penetapan awal."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Pelayan ditetapkan semula ke proses penetapan awal"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Pilihan sokongan"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Boleh memecut sehingga {cpus} CPU"
   },
@@ -317,8 +1061,14 @@
   "icon-select.select": {
     "defaultMessage": "Pilih ikon"
   },
+  "input.search-version.placeholder": {
+    "defaultMessage": "Cari versi..."
+  },
   "input.search.placeholder": {
     "defaultMessage": "Cari..."
+  },
+  "input.select-version.placeholder": {
+    "defaultMessage": "Pilih versi"
   },
   "input.view.gallery": {
     "defaultMessage": "Bentuk galeri"
@@ -328,6 +1078,78 @@
   },
   "input.view.list": {
     "defaultMessage": "Bentuk barisan"
+  },
+  "installation-settings.aria.select-game-version": {
+    "defaultMessage": "Pilih versi permainan"
+  },
+  "installation-settings.aria.select-loader-version": {
+    "defaultMessage": "Pilih versi {loader}"
+  },
+  "installation-settings.aria.select-platform": {
+    "defaultMessage": "Pilih platform"
+  },
+  "installation-settings.confirm-version-change": {
+    "defaultMessage": "Pastikan"
+  },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "Menukar kepada {gameVersion} akan mengubah suai kandungan berikut pada pelayan anda."
+  },
+  "installation-settings.confirm-version-change-header": {
+    "defaultMessage": "Semak perubahan kandungan"
+  },
+  "installation-settings.edit-installation.title": {
+    "defaultMessage": "Sunting pemasangan"
+  },
+  "installation-settings.edit.warning-instance": {
+    "defaultMessage": "Kami tidak mengesyorkan anda untuk menyunting tetapan pemasangan anda selepas memasang kandungan. Jika anda ingin menyuntingnya, berhati-hati kerana ia boleh menyebabkan masalah."
+  },
+  "installation-settings.edit.warning-server": {
+    "defaultMessage": "Kami tidak mengesyorkan anda untuk menyunting tetapan pemasangan anda selepas memasang kandungan. Jika anda ingin menyuntingnya tetap semula pelayan anda."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Autobaiki"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Tukar pemuat"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Nyahdayakan kandungan bercanggah"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Apabila menukar versi permainan, kami boleh sama ada menyahdayakan kandungan yang dipasang yang tidak serasi atau cuba menyelesaikan ketidakserasian tersebut."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Amaran ketidakserasian"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Kandungan yang tidak serasi dipasang"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Apabila menukar pemuat, semua kandungan yang telah dipasang akan dinyahdayakan. Kami mengesyorkan supaya anda menetapkan semula pelayan anda."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Menukar pemuat boleh menyebabkan kerosakan"
+  },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "{projectType, select, server {Projek pelayan} other {Pek mod}} dipautkan"
+  },
+  "installation-settings.loader-version": {
+    "defaultMessage": "Versi {loader}"
+  },
+  "installation-settings.platform-lock-tooltip": {
+    "defaultMessage": "Anda perlu menetap semula pelayan anda untuk menukar pemuat."
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "Pemasangan semula pek mod akan menetapkan semula kandungan {type, select, server {pelayan} other {pemasangan}} kepada keadaan asalnya, mengalih keluar sebarang mod atau kandungan yang telah anda tambahkan."
+  },
+  "installation-settings.reinstall-modpack.title": {
+    "defaultMessage": "Pasang semula pek mod"
+  },
+  "installation-settings.reinstalling-modpack": {
+    "defaultMessage": "Sedang memasang semula pek mod"
+  },
+  "installation-settings.removed-incompatible": {
+    "defaultMessage": "Dialih Keluar (tidak serasi)"
   },
   "installation-settings.repair.instance-description": {
     "defaultMessage": "Memasang semula kebergantungan Minecraft dan memeriksa kerosakan. Ini mungkin dapat menyelesaikan isu jika permainan anda tidak dilancarkan kerana ralat berkaitan pelancar."
@@ -340,6 +1162,33 @@
   },
   "installation-settings.repair.server-title": {
     "defaultMessage": "Baiki pelayan"
+  },
+  "installation-settings.saving": {
+    "defaultMessage": "Sedang menyimpan..."
+  },
+  "installation-settings.search-game-version": {
+    "defaultMessage": "Cari versi permainan..."
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "Nyahpaut"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "Penyahpautan secara kekal ini akan memutuskan sambungan {type, select, server {pelayan} other {pemasangan}} ini daripada projek {projectType, select, server {pelayan} other {pek mod}}. Hal ini membenarkan anda menukar pemuat dan versi Minecraft, tetapi anda tidak akan menerima kemas kini pada masa hadapan."
+  },
+  "installation-settings.verifying": {
+    "defaultMessage": "Sedang mengesahkan..."
+  },
+  "instance.confirm-reinstall.admonition-body": {
+    "defaultMessage": "Pemasangan semula akan menetapkan semula semua kandungan yang dipasang atau diubah suai kepada apa yang disediakan oleh pek mod, mengalih keluar sebarang mod atau kandungan yang telah anda tambahkan di atas pemasangan asal."
+  },
+  "instance.confirm-reinstall.admonition-header": {
+    "defaultMessage": "Amaran pemasangan semula"
+  },
+  "instance.confirm-reinstall.header": {
+    "defaultMessage": "Pasang semula pek mod"
+  },
+  "instance.confirm-reinstall.reinstall-button": {
+    "defaultMessage": "Pasang semula pek mod"
   },
   "instance.confirm-repair.body": {
     "defaultMessage": "Pembaikan ini akan memasang semula pemuat dan kebergantungan Minecraft tanpa memadamkan kandungan anda. Ini mungkin menyelesaikan masalah jika {type, select, server {pelayan anda tidak dimulakan dengan betul} other {permainan anda tidak dilancarkan kerana ralat berkaitan pelancar}}."
@@ -365,11 +1214,56 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mod permainan yang tidak diketahui"
   },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Kembali"
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "Fail masih dimuat naik. Meninggalkan laman ini akan membatalkan muat naik dan perubahan anda mungkin hilang."
   },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Salin pautan"
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Muat naik sedang berjalan"
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} {count, plural, other {pemasangan}} serasi"
+  },
+  "instances.content-install.existing-tab": {
+    "defaultMessage": "Pemasangan sedia ada"
+  },
+  "instances.content-install.game-version-placeholder": {
+    "defaultMessage": "Pilih versi permainan"
+  },
+  "instances.content-install.header": {
+    "defaultMessage": "Pasang projek"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Pasang"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Dipasang"
+  },
+  "instances.content-install.instance-type": {
+    "defaultMessage": "Jenis pemasangan"
+  },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "Pemuat"
+  },
+  "instances.content-install.name-label": {
+    "defaultMessage": "Nama"
+  },
+  "instances.content-install.name-placeholder": {
+    "defaultMessage": "Masukkan nama pemasangan"
+  },
+  "instances.content-install.new-tab": {
+    "defaultMessage": "Pemasangan baharu"
+  },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "Tiada pemasangan yang serasi dijumpai"
+  },
+  "instances.content-install.remove-icon": {
+    "defaultMessage": "Alih keluar ikon"
+  },
+  "instances.content-install.search-placeholder": {
+    "defaultMessage": "Cari pemasangan"
+  },
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Pilih ikon"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Pek mod ini tidak menyertakan sebarang kandungan tambahan."
@@ -377,14 +1271,11 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Tiada kandungan dijumpai"
   },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "Semua"
-  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Kandungan pek mod"
   },
   "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Sedang memuatkan kandungan..."
+    "defaultMessage": "Sedang memuat kandungan..."
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Tiada projek yang sepadan dengan carian anda."
@@ -398,11 +1289,26 @@
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Tidak serasi"
   },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Turun taraf ke {version}"
+  },
   "instances.updater-modal.header": {
     "defaultMessage": "Kemas kini versi"
   },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "Tukar versi pek mod"
+  },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "Tukar versi"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Sembunyikan versi tidak serasi"
+  },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "Sedang memuat log perubahan..."
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "Sedang memuat versi..."
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "Tiada log perubahan yang disediakan untuk versi ini."
@@ -419,6 +1325,18 @@
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Tunjukkan versi tidak serasi"
   },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "Tukar ke {version}"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Kemas kini ke {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Pengemaskinian boleh merosakkan pemasangan anda. Semak log perubahan versi dan buat sandaran terlebih dahulu."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Pengemaskinian boleh merosakkan dunia anda. Semak log perubahan versi dan buat sandaran terlebih dahulu."
+  },
   "label.actions": {
     "defaultMessage": "Tindakan"
   },
@@ -431,6 +1349,15 @@
   "label.changes-saved": {
     "defaultMessage": "Perubahan disimpan"
   },
+  "label.client-depends-warning": {
+    "defaultMessage": "Mod ini bergantung pada mod bahagian pelanggan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "Ini adalah sebuah mod bahagian pelanggan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
+  },
+  "label.client-retained-warning": {
+    "defaultMessage": "Ini ialah mod bahagian pelanggan yang dipasang sebagai kebergantungan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
+  },
   "label.collections": {
     "defaultMessage": "Koleksi"
   },
@@ -439,6 +1366,15 @@
   },
   "label.content": {
     "defaultMessage": "Kandungan"
+  },
+  "label.copied-filename": {
+    "defaultMessage": "Nama fail disalin"
+  },
+  "label.copied-path": {
+    "defaultMessage": "Laluan disalin"
+  },
+  "label.create-failed": {
+    "defaultMessage": "Penciptaan gagal"
   },
   "label.created-ago": {
     "defaultMessage": "Dicipta {ago}"
@@ -449,11 +1385,23 @@
   "label.delete": {
     "defaultMessage": "Padam"
   },
+  "label.delete-failed": {
+    "defaultMessage": "Pemadaman gagal"
+  },
+  "label.delete-immediately": {
+    "defaultMessage": "Padam serta-merta"
+  },
   "label.description": {
     "defaultMessage": "Keterangan"
   },
   "label.details": {
     "defaultMessage": "Butiran"
+  },
+  "label.done": {
+    "defaultMessage": "Selesai"
+  },
+  "label.download-failed": {
+    "defaultMessage": "Muat turun gagal"
   },
   "label.email": {
     "defaultMessage": "E-mel"
@@ -464,17 +1412,38 @@
   "label.error": {
     "defaultMessage": "Ralat"
   },
+  "label.extract-failed": {
+    "defaultMessage": "Pengekstrakan gagal"
+  },
   "label.filter-by": {
     "defaultMessage": "Tapis mengikut"
   },
   "label.followed-projects": {
     "defaultMessage": "Projek yang diikuti"
   },
+  "label.game-version": {
+    "defaultMessage": "Versi permainan"
+  },
+  "label.installation-info": {
+    "defaultMessage": "Maklumat pemasangan"
+  },
+  "label.installed-modpack": {
+    "defaultMessage": "Pek mod yang dipasang"
+  },
+  "label.installing": {
+    "defaultMessage": "Sedang memasang..."
+  },
   "label.loading": {
     "defaultMessage": "Sedang memuat..."
   },
   "label.moderation": {
     "defaultMessage": "Penyederhanaan"
+  },
+  "label.modpack": {
+    "defaultMessage": "Pek Mod"
+  },
+  "label.move-failed": {
+    "defaultMessage": "Pemindahan gagal"
   },
   "label.no": {
     "defaultMessage": "Tidak"
@@ -491,6 +1460,24 @@
   "label.password": {
     "defaultMessage": "Kata laluan"
   },
+  "label.plan-custom": {
+    "defaultMessage": "Tersuai"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Besar"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "Sederhana"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Kecil"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "Tidak Diketahui"
+  },
+  "label.platform": {
+    "defaultMessage": "Platform"
+  },
   "label.played": {
     "defaultMessage": "Dimainkan {ago}"
   },
@@ -503,6 +1490,9 @@
   "label.rejected": {
     "defaultMessage": "Ditolak"
   },
+  "label.rename-failed": {
+    "defaultMessage": "Penamaan semula gagal"
+  },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "Saya bersetuju dengan <terms-link>Terma Program Ganjaran</terms-link>"
   },
@@ -514,6 +1504,12 @@
   },
   "label.search": {
     "defaultMessage": "Cari"
+  },
+  "label.select-all": {
+    "defaultMessage": "Pilih semua"
+  },
+  "label.selection-actions": {
+    "defaultMessage": "Tindakan pilihan"
   },
   "label.server": {
     "defaultMessage": "Pelayan"
@@ -528,7 +1524,7 @@
     "defaultMessage": "Ekapemain"
   },
   "label.sort-by": {
-    "defaultMessage": "Isih mengikut"
+    "defaultMessage": "Isih mengikut: "
   },
   "label.success": {
     "defaultMessage": "Berjaya"
@@ -536,11 +1532,20 @@
   "label.title": {
     "defaultMessage": "Tajuk"
   },
+  "label.unknown": {
+    "defaultMessage": "Tidak Diketahui"
+  },
   "label.unlisted": {
     "defaultMessage": "Tidak disenaraikan"
   },
   "label.update-available": {
     "defaultMessage": "Kemas kini tersedia"
+  },
+  "label.updating": {
+    "defaultMessage": "Sedang mengemas kini..."
+  },
+  "label.upload-failed": {
+    "defaultMessage": "Muat naik gagal"
   },
   "label.username": {
     "defaultMessage": "Nama pengguna"
@@ -582,7 +1587,7 @@
     "defaultMessage": "Bahasa Finland"
   },
   "locale.fil-PH": {
-    "defaultMessage": "Bahasa Filipina"
+    "defaultMessage": "Bahasa Filipino"
   },
   "locale.fr-FR": {
     "defaultMessage": "Bahasa Perancis"
@@ -667,9 +1672,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Memastikan fail dikemas kini apabila pelayan berubah"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Tutup"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Dapatkan Modrinth App"
@@ -956,6 +1958,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "Keserasian"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "Organisasi"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Pemilik projek"
   },
@@ -963,19 +1968,19 @@
     "defaultMessage": "Pencipta"
   },
   "project.about.details.created": {
-    "defaultMessage": "Dicipta pada {date}"
+    "defaultMessage": "Dicipta {date}"
   },
   "project.about.details.licensed": {
     "defaultMessage": "Berlesen {license}"
   },
   "project.about.details.published": {
-    "defaultMessage": "Diterbitkan pada {date}"
+    "defaultMessage": "Diterbitkan {date}"
   },
   "project.about.details.submitted": {
-    "defaultMessage": "Diserahkan pada {date}"
+    "defaultMessage": "Diserahkan {date}"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Dikemas kini pada {date}"
+    "defaultMessage": "Dikemas kini {date}"
   },
   "project.about.links.discord": {
     "defaultMessage": "Sertai pelayan Discord"
@@ -1016,17 +2021,35 @@
   "project.about.links.wiki": {
     "defaultMessage": "Kunjungi wiki"
   },
+  "project.about.server.address.tooltip": {
+    "defaultMessage": "Salin alamat pelayan Java"
+  },
   "project.about.server.copied": {
     "defaultMessage": "Disalin!"
   },
   "project.about.server.copiedText": {
-    "defaultMessage": "IP pelayan disalin ke papan keratan"
+    "defaultMessage": "Alamat pelayan disalin ke papan keratan"
   },
-  "project.about.server.latency": {
-    "defaultMessage": "Kelewatan"
+  "project.about.server.downloadModpack": {
+    "defaultMessage": "Muat turun pek mod"
+  },
+  "project.about.server.languages": {
+    "defaultMessage": "Bahasa"
+  },
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(Disyorkan)"
+  },
+  "project.about.server.region": {
+    "defaultMessage": "Rantau"
+  },
+  "project.about.server.requiredContent": {
+    "defaultMessage": "Kandungan yang diperlukan"
   },
   "project.about.server.title": {
     "defaultMessage": "Butiran pelayan"
+  },
+  "project.about.tags.title": {
+    "defaultMessage": "Tag"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, other {muat turun}}"
@@ -1112,8 +2135,266 @@
   "project.recent-plays.tooltip": {
     "defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}} daripada Modrinth dalam 2 minggu yang lalu"
   },
+  "project.server.customModpackTooltip": {
+    "defaultMessage": "Projek ini menggunakan pek mod tersuai"
+  },
+  "project.server.language.af": {
+    "defaultMessage": "Afrikaans"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "Amhara"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "Arab"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "Azerbaijan"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "Belarus"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "Bulgaria"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "Bengali"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "Bosnia"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "Catalonia"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "Czech"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "Denmark"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "Jerman"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "Yunani"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "Inggeris"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "Esperanto"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "Sepanyol"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "Estonia"
+  },
+  "project.server.language.eu": {
+    "defaultMessage": "Basque"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "Farsi"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "Finland"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "Perancis"
+  },
+  "project.server.language.ga": {
+    "defaultMessage": "Ireland"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "Galicia"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "Ibrani"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "Hindi"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "Croatia"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "Hungary"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "Armenia"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "Indonesia"
+  },
+  "project.server.language.is": {
+    "defaultMessage": "Iceland"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "Itali"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "Jepun"
+  },
+  "project.server.language.ka": {
+    "defaultMessage": "Georgia"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "Kazakh"
+  },
+  "project.server.language.km": {
+    "defaultMessage": "Khmer"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "Kannada"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "Korea"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "Lao"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "Lithuania"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "Latvia"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "Macedonia"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "Malayalam"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "Mongolia"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "Marathi"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "Melayu"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "Burma"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "Nepal"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "Belanda"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "Norway"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "Punjabi"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "Poland"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "Portugis"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "Romania"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "Rusia"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "Sinhala"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "Slovak"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "Slovenia"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "Albania"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "Serbia"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "Sweden"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "Swahili"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "Tamil"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "Telugu"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "Thai"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "Filipino"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Turki"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Ukraine"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "Urdu"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "Uzbek"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "Vietnam"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "Yoruba"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "Cina"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "Zulu"
+  },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "Asia"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Australia"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Eropah"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Timur Tengah"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "Rusia"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "Amerika Selatan"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "Pelayan dihoskan di {regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "AS Timur"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "AS Barat"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "Luar Talian"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "Pelayan sedang berada di luar talian"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "Dalam Talian"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitik"
@@ -1349,8 +2630,71 @@
   "search.filter_type.project_id": {
     "defaultMessage": "ID Projek"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "Jenis"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "Bahasa"
+  },
+  "search.filter_type.server_region": {
+    "defaultMessage": "Rantau"
+  },
+  "search.filter_type.server_status": {
+    "defaultMessage": "Status"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Pemuat"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Diubah Suai"
+  },
+  "search.server_content_type.vanilla": {
+    "defaultMessage": "Vanila"
+  },
+  "servers.backups.admonition.backup-failed.description": {
+    "defaultMessage": "Sesuatu telah berlaku semasa mencipta {backupName}. Sila cuba lagi atau hubungi sokongan jika masalah berterusan."
+  },
+  "servers.backups.admonition.backup-failed.title": {
+    "defaultMessage": "Penyandaran gagal"
+  },
+  "servers.backups.admonition.backup-queued.description": {
+    "defaultMessage": "{backupName} telah dimasukkan ke barisan dan akan bermula sebentar lagi."
+  },
+  "servers.backups.admonition.backup-queued.title": {
+    "defaultMessage": "Sandaran dalam barisan"
+  },
+  "servers.backups.admonition.creating-backup.description": {
+    "defaultMessage": "Menyimpan data dunia dan konfigurasi pelayan untuk {backupName}. Ini mungkin mengambil masa beberapa minit."
+  },
+  "servers.backups.admonition.creating-backup.title": {
+    "defaultMessage": "Sedang mencipta sandaran"
+  },
+  "servers.backups.admonition.fallback-name": {
+    "defaultMessage": "Sandaran anda"
+  },
+  "servers.backups.admonition.restore-failed.description": {
+    "defaultMessage": "Sesuatu telah berlaku semasa memulihkan daripada {backupName}. Sila cuba lagi atau hubungi sokongan jika masalah berterusan."
+  },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Pemulihan daripada sandaran gagal"
+  },
+  "servers.backups.admonition.restore-queued.description": {
+    "defaultMessage": "Pemulihan dari {backupName} telah dimasukkan ke barisan dan akan bermula sebentar lagi."
+  },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Pemulihan sandaran dalam barisan"
+  },
+  "servers.backups.admonition.restore-successful.description": {
+    "defaultMessage": "Pelayan anda telah dipulihkan kepada {backupName} dan sedia untuk dimulakan."
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Pemulihan daripada sandaran berjaya"
+  },
+  "servers.backups.admonition.restoring-backup.description": {
+    "defaultMessage": "Memulihkan pelayan anda daripada {backupName}. Ini mungkin mengambil masa beberapa minit."
+  },
+  "servers.backups.admonition.restoring-backup.title": {
+    "defaultMessage": "Memulihkan daripada sandaran"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
@@ -1372,6 +2716,234 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Pulihkan"
+  },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Penciptaan sandaran sedang dijalankan"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Pemulihan sandaran sedang dijalankan"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "Pelayan sedang dipasang"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "Penyegerakan kandungan sedang dijalankan"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "Sudah mempunyai pelayan?"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Ketahui lebih lanjut tentang Modrinth Hosting"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "Pelayan baharu"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "Pasang mod, jemput rakan dan main bersama-sama, semuanya dari Modrinth App."
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "Belum ada pelayan"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "Pilih mod kegemaran anda dan kami uruskan selebihnya."
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "Pemasangan mod sekali klik"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "Jemput rakan-rakan dan sediakan mereka terus dalam Modrinth App."
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "Main bersama rakan"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Daftar masuk"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "Sediakan pelayan anda seperti dunia ekapemain."
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "Persediaan yang mudah"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Disalin"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "Salin kod ke papan keratan"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "Salin ID"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "Muat turun sandaran terkini"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "Urus pengebilan"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Baharu"
+  },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Fail anda akan disimpan selama <days-remaining>{daysRemaining} {daysRemaining, plural, other {hari} } lagi</days-remaining>. Hubungi sokongan untuk memuat turun fail sebelum ia dipadamkan. "
+  },
+  "servers.listing.notice.files-preserved-after-cancellation": {
+    "defaultMessage": "Fail anda akan disimpan selama 30 hari selepas pembatalan."
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "Pelayan anda telah digantung melalui tindakan penyederhanaan. "
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Pelayan anda akan {verb} ke Pelan {planSize} pada <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.provisioning": {
+    "defaultMessage": "Sila tunggu sementara kami menyediakan pelayan anda. Ini boleh mengambil masa sehingga 10 minit."
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "Langganan anda telah dibatalkan."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "Langganan anda telah dibatalkan pada <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed": {
+    "defaultMessage": "Langganan anda telah dibatalkan kerana kegagalan pembayaran."
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
+    "defaultMessage": "Langganan anda telah dibatalkan pada <date>{formattedDate}</date> kerana kegagalan pembayaran. "
+  },
+  "servers.listing.notice.subscription-set-to-cancel": {
+    "defaultMessage": "Langganan anda ditetapkan untuk dibatalkan."
+  },
+  "servers.listing.notice.subscription-set-to-cancel-on-date": {
+    "defaultMessage": "Langganan anda ditetapkan untuk dibatalkan pada <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.suspended": {
+    "defaultMessage": "Pelayan anda telah digantung. Sila hubungi Sokongan Modrinth untuk maklumat lanjut."
+  },
+  "servers.listing.notice.upgrading": {
+    "defaultMessage": "Perkakasan pelayan anda sedang dinaik taraf dan akan kembali beroperasi tidak lama lagi."
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "Langgan semula"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "Ikon pelayan"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Sokongan"
+  },
+  "servers.listing.using-project-label": {
+    "defaultMessage": "Menggunakan {projectTitle}"
+  },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "Sedang menyemak pelayan baharu..."
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "Muat naik fail sedang dijalankan. Meninggalkan laman ini akan membatalkan muat naik."
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "Muat naik sedang berjalan"
+  },
+  "servers.manage.contact-support-button": {
+    "defaultMessage": "Hubungi Sokongan Modrinth"
+  },
+  "servers.manage.error.alert-notice": {
+    "defaultMessage": "Sistem kami akan memaklumkan pasukan kami secara automatik apabila terdapat masalah. Kami sedang berusaha untuk membawa mereka kembali dalam talian."
+  },
+  "servers.manage.error.description": {
+    "defaultMessage": "Kami mungkin menghadapi masalah sementara dengan pelayan kami."
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "Butiran ralat:"
+  },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "Jika anda baru-baru ini membeli pelayan Modrinth Hosting anda, ia sedang berada dalam barisan dan akan muncul di sini sebaik sahaja ia siap. <warning>Jangan cuba membeli pelayan baharu.</warning>"
+  },
+  "servers.manage.error.support-notice": {
+    "defaultMessage": "Jika anda memerlukan sokongan peribadi mengenai status pelayan anda, sila hubungi Sokongan Modrinth."
+  },
+  "servers.manage.error.title": {
+    "defaultMessage": "Pelayan tidak dapat dimuatkan"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "Sebuah ralat telah berlaku"
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "Pelayan baharu"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "Tiada pelayan dijumpai."
+  },
+  "servers.manage.purchase-unavailable.text": {
+    "defaultMessage": "Maklumat pembayaran masih sedang dimuatkan. Laman pembayaran akan dibuka sebaik sahaja ia bersedia."
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "Pembelian tidak tersedia"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "Muat semula"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "Sebuah ralat telah berlaku semasa melanggan semula pelayan Modrinth anda."
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "Ralat semasa melanggan semula"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "Jika pelayan sedang dibatalkan, percubaan pengecasan lain mungkin mengambil masa sehingga 10 minit."
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "Permintaan langganan semula telah dihantar"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "Langganan pelayan berjaya dilanggan semula"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "Berjaya"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Cari {count} {count, plural, other {pelayan}}..."
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "Mereka kini boleh ditemui di sini!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Jangan tunjukkan lagi"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Tetapan pelayan anda telah dipindahkan"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "Tinggal <days-count>{days}</days-count> {days, plural, other {hari}} <hours-count>{hours}</hours-count> {hours, plural, other {jam}} <minutes-count>{minutes}</minutes-count> {minutes, plural, other {minit}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {saat}}..."
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "Pelayan baharu"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "Percubaan pelayan Medal anda telah tamat dan pelayan anda telah digantung. Sila naik taraf untuk terus menggunakan pelayan anda."
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "Pelayan anda telah digantung. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan Modrinth untuk maklumat lanjut."
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "Pelayan anda telah digantung: {reason}. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan Modrinth untuk maklumat lanjut."
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "Perkakasan pelayan anda sedang dinaik taraf dan akan kembali beroperasi tidak lama lagi."
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "Ikon pelayan"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "Naik taraf"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "Menggunakan {projectTitle}"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Ketepikan"
@@ -1400,6 +2972,12 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Tidak boleh diketepikan"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "Pembelian Modrinth Hosting anda telah berjaya diselesaikan."
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "Pembelian berjaya"
+  },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "Anda belum akan dicaj lagi."
   },
@@ -1409,17 +2987,26 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Kaedah pembayaran"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "dibilkan {interval}"
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "Tersedia di Amerika Utara, Eropah dan Asia Tenggara."
   },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Pilih pelan tersuai dengan hanya spesifikasi yang anda perlukan."
   },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "Tahu apa yang anda perlukan dengan pasti?"
+  },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Mari mulakan"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "Besar"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "Sesuai untuk 15–25 pemain, pek mod atau pengubahsuaian yang berat."
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "Sederhana"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "Bagus untuk 6–15 pemain dan berbilang mod."
@@ -1427,20 +3014,20 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Paling Popular"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Pilih pelan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Pilih Pelan"
+  },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "Kecil"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Sesuai untuk 1–5 rakan dengan beberapa mod ringan."
   },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Pilih jumlah RAM dan spesifikasi yang sesuai dengan keperluan anda."
-  },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Pelan"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "Pelan semasa anda"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Rantau"
@@ -1468,6 +3055,24 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Eropah Barat"
+  },
+  "servers.setup.rate-limit.text": {
+    "defaultMessage": "Anda sedang dihadkan kekerapan. Sila cuba lagi kemudian."
+  },
+  "servers.setup.rate-limit.title": {
+    "defaultMessage": "Tidak dapat memasang semula pelayan"
+  },
+  "servers.setup.reinstall-failed.text": {
+    "defaultMessage": "Sebuah ralat yang tidak dijangka telah berlaku semasa memasang semula. Sila cuba lagi kemudian."
+  },
+  "servers.setup.reinstall-failed.title": {
+    "defaultMessage": "Pemasangan Semula Gagal"
+  },
+  "servers.setup.upload-warning": {
+    "defaultMessage": "Tolong jangan tutup laman ini semasa memuat naik."
+  },
+  "servers.setup.uploading-modpack.header": {
+    "defaultMessage": "Memuat naik pek mod"
   },
   "settings.account.title": {
     "defaultMessage": "Akaun dan keselamatan"
@@ -1510,6 +3115,9 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Tema warna"
+  },
+  "settings.feature-flags.title": {
+    "defaultMessage": "Penetapan ciri"
   },
   "settings.language.categories.default": {
     "defaultMessage": "Bahasa standard"
@@ -1698,7 +3306,7 @@
     "defaultMessage": "Pelbagai Rasa"
   },
   "tag.category.kitpvp": {
-    "defaultMessage": "Kit PVP"
+    "defaultMessage": "Kit PvP"
   },
   "tag.category.library": {
     "defaultMessage": "Pustaka"
@@ -1782,7 +3390,7 @@
     "defaultMessage": "Plot"
   },
   "tag.category.pokemon": {
-    "defaultMessage": "Pokemon"
+    "defaultMessage": "Pokémon"
   },
   "tag.category.potato": {
     "defaultMessage": "Kentang"
@@ -1791,10 +3399,10 @@
     "defaultMessage": "Penjara"
   },
   "tag.category.pve": {
-    "defaultMessage": "PVE"
+    "defaultMessage": "PvE"
   },
   "tag.category.pvp": {
-    "defaultMessage": "PVP"
+    "defaultMessage": "PvP"
   },
   "tag.category.questing": {
     "defaultMessage": "Misi"
@@ -1975,6 +3583,21 @@
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Anda mempunyai perubahan yang belum disimpan."
+  },
+  "ui.confirm-leave-modal.body": {
+    "defaultMessage": "Anda mempunyai perubahan yang belum disimpan yang akan hilang jika anda meninggalkan laman ini."
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "Anda mempunyai perubahan yang belum disimpan"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Tinggalkan laman"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Kekal pada laman"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Tinggalkan laman?"
   }
 }
 

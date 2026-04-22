@@ -30,13 +30,13 @@
     "defaultMessage": "외부 링크 추가"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "사용 가능한 모든 {totalAvailableTags, plural, one {# 개의 태그} other {# 개의 태그}}를 선택하셨습니다. 이는 사용자가 관련 프로젝트를 찾는 데 도움을 주기 위한 태그의 목적에 어긋납니다. 프로젝트와 관련된 태그만 선택해 주세요."
+    "defaultMessage": "사용 가능한 모든 {totalAvailableTags, plural, other {#개의 태그}}를 선택하셨습니다. 이는 사용자가 관련 프로젝트를 찾는 데 도움을 주기 위한 태그의 목적에 어긋납니다. 프로젝트와 관련된 태그만 선택해 주세요."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "올바른 태그를 선택해 주세요"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "작성한 설명이 {length, plural, one {# 자} other {# 자}}입니다. 명확하고 유익한 설명을 작성하려면 최소 {minChars, plural, one {# 자} other {# 자}}가 권장됩니다."
+    "defaultMessage": "작성한 설명이 {length, plural, one {#자} other {#자}}입니다. 명확하고 유익한 설명을 작성하려면 최소 {minChars, plural, one {#자} other {#자}}가 권장됩니다."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "설명을 덧붙여주세요"
@@ -45,7 +45,7 @@
     "defaultMessage": "설명 수정하기"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "라이선스 수정하기"
+    "defaultMessage": "라이선스 수정"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "요약 수정하기"
@@ -66,7 +66,7 @@
     "defaultMessage": "갤러리 페이지 보기"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "이 {type, select, mod {모드} plugin {플러그인} other {프로젝트}}은(는) 소스 코드 공개를 요구하는 라이선스를 사용하고 있습니다. 추가되는 각 버전에 대해 소스 코드 링크 또는 소스 파일을 제공해 주세요. 또는 다른 라이선스를 사용하는 것도 고려해 보세요."
+    "defaultMessage": "이 {type, select, mod {모드는} plugin {플러그인은} other {프로젝트는}} 소스 코드를 공개해야 하는 라이선스를 사용하고 있습니다. 각 추가 버전에 해당하는 소스 코드 링크 또는 소스 파일을 제공해 주거나, 다른 라이선스를 고려해 보세요."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "소스 코드 제공"
@@ -90,10 +90,10 @@
     "defaultMessage": "이 라이선스 URL {domain}은(는) 라이선스 정보로 적절하지 않습니다. 라이선스 URL은 소셜 미디어나 게임 플랫폼 등이 아닌, 라이선스 파일 자체로 연결되어야 합니다."
   },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "이 라이센스 URL은 잘못되었습니다. 라이선스 전문으로 연결되는 올바른 URL을 제공해 주세요."
+    "defaultMessage": "이 라이센스 URL은 잘못되었습니다. URL을 라이선스 전문으로 연결해 주세요."
   },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "올바른 라이선스 링크를 추가해주세요"
+    "defaultMessage": "올바른 라이선스 링크를 추가해 주세요"
   },
   "nags.link-shortener-usage.description": {
     "defaultMessage": "외부 링크나 라이선스 링크에서 링크 단축기 및 기타 방법의 사용은 금지되어 있습니다. 반드시 전체 길이의 링크만 사용해 주세요."
@@ -102,7 +102,7 @@
     "defaultMessage": "링크 단축기 사용 금지"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "설명의 {count, plural, one {# 헤더} other {# 헤더}} {count, plural, one {가} other {가}} 너무 깁니다. 헤더는 간결해야 하며, 완전한 문장이 아닌 단락 제목 역할을 해야 합니다."
+    "defaultMessage": "설명의 {count, plural, other {#개의 헤더}}{count, plural, other {}}가 너무 깁니다. 헤더는 간결해야 하며, 완전한 문장이 아닌 단락 제목 역할을 해야 합니다."
   },
   "nags.long-headers.title": {
     "defaultMessage": "헤더 단축"
@@ -135,7 +135,7 @@
     "defaultMessage": "피드백 검토"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count, plural, one {#개의 해상도 태그} other {#개의 해상도 태그}}({tags})를 선택했습니다. 리소스 팩에는 일반적으로 기본 해상도와 일치하는 해상도 태그 하나만 포함되어야 합니다."
+    "defaultMessage": "{count, plural, other {#개의 해상도 태그}} ({tags})를 선택했습니다. 리소스 팩에는 일반적으로 기본 해상도와 일치하는 해상도 태그 하나만 포함되어야 합니다."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "올바른 해상도 선택"
@@ -201,7 +201,7 @@
     "defaultMessage": "요약 정리"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "요약 길이는 {length, plural, one {#자} other {#자}}입니다. 적절한 정보를 제공하는 요약을 작성하려면 최소 {minChars, plural, one {#자} other {#자}} 이상을 권장합니다."
+    "defaultMessage": "작성한 요약이 {length, plural, other {#자}}입니다. 적절한 정보를 제공하는 요약을 작성하려면 최소 {minChars, plural, other {#자}} 이상을 권장합니다."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "요약 확장"
@@ -213,13 +213,13 @@
     "defaultMessage": "이름 정리"
   },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "{tagCount, plural, other {# 태그}}를 선택하셨습니다. 서버가 관련 검색 결과에 표시될 수 있도록 {maxTagCount} 이하로 줄여주세요."
+    "defaultMessage": "{tagCount, plural, other {#}}개의 태그를 선택했습니다. 서버가 관련 검색 결과에 표시될 수 있도록 {maxTagCount}개 이하로 줄여주세요."
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "올바른 태그를 선택해 주세요"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount, plural, other {# 태그}}를 선택하셨습니다. 프로젝트가 관련 검색 결과에 표시되도록 {maxTagCount} 이하로 줄이는 것을 고려해 보세요."
+    "defaultMessage": "{tagCount, plural, other {#}}개의 태그를 선택했습니다. 프로젝트가 관련 검색 결과에 표시될 수 있도록 {maxTagCount}개 이하로 줄여주세요."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "올바른 태그를 선택해주세요"

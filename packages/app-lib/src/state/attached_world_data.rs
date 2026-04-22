@@ -5,6 +5,8 @@ use std::collections::HashMap;
 #[derive(Debug, Clone, Default)]
 pub struct AttachedWorldData {
     pub display_status: DisplayStatus,
+    pub project_id: Option<String>,
+    pub content_kind: Option<String>,
 }
 
 impl AttachedWorldData {
@@ -18,7 +20,7 @@ impl AttachedWorldData {
 
         let attached_data = sqlx::query!(
             "
-            SELECT display_status
+            SELECT display_status, project_id, content_kind
             FROM attached_world_data
             WHERE profile_path = $1 and world_type = $2 and world_id = $3
             ",
@@ -31,6 +33,8 @@ impl AttachedWorldData {
 
         Ok(attached_data.map(|x| AttachedWorldData {
             display_status: DisplayStatus::from_string(&x.display_status),
+            project_id: x.project_id,
+            content_kind: x.content_kind,
         }))
     }
 
@@ -40,7 +44,7 @@ impl AttachedWorldData {
     ) -> crate::Result<HashMap<(WorldType, String), Self>> {
         let attached_data = sqlx::query!(
             "
-            SELECT world_type, world_id, display_status
+            SELECT world_type, world_id, display_status, project_id, content_kind
             FROM attached_world_data
             WHERE profile_path = $1
             ",
@@ -57,7 +61,11 @@ impl AttachedWorldData {
                     DisplayStatus::from_string(&x.display_status);
                 (
                     (world_type, x.world_id),
-                    AttachedWorldData { display_status },
+                    AttachedWorldData {
+                        display_status,
+                        project_id: x.project_id,
+                        content_kind: x.content_kind,
+                    },
                 )
             })
             .collect())
@@ -120,3 +128,5 @@ macro_rules! attached_data_setter {
 }
 
 attached_data_setter!(display_status: DisplayStatus, "display_status" => display_status.as_str());
+attached_data_setter!(project_id: &str, "project_id");
+attached_data_setter!(content_kind: &str, "content_kind");

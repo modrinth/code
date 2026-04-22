@@ -51,6 +51,7 @@
 				sync-with-selection
 				placeholder="Select game version"
 				search-placeholder="Search game version..."
+				@option-hover="handleGameVersionHover"
 			>
 				<template v-if="ctx.showSnapshotToggle" #dropdown-footer>
 					<button
@@ -90,7 +91,28 @@
 							:search-placeholder="
 								isPaperLike ? 'Search build number...' : 'Search loader version...'
 							"
-						/>
+						>
+							<!-- When not Paper, this scoped slot is omitted and Combobox uses default option markup. -->
+							<template v-if="selectedLoader === 'paper'" #option="{ item, isSelected }">
+								<div class="flex w-full items-center justify-between gap-2">
+									<div class="flex flex-wrap items-center gap-2">
+										<span
+											class="font-semibold leading-tight"
+											:class="isSelected ? 'text-contrast' : 'text-primary'"
+										>
+											{{ item.label }}
+										</span>
+										<PaperChannelBadge :channel="paperBuildChannelTag(String(item.value))" />
+									</div>
+								</div>
+							</template>
+							<template v-if="selectedLoader === 'paper'" #search-selection-affix="{ option }">
+								<PaperChannelBadge
+									affix
+									:channel="option ? paperBuildChannelTag(String(option.value)) : null"
+								/>
+							</template>
+						</Combobox>
 					</div>
 				</div>
 			</Collapsible>
@@ -99,23 +121,26 @@
 </template>
 
 <script setup lang="ts">
+import type { Paper } from '@modrinth/api-client'
 import { EyeIcon, EyeOffIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
-import { injectFilePicker, injectTags } from '../../../../providers'
+import { injectFilePicker, injectModrinthClient, injectTags } from '../../../../providers'
 import Avatar from '../../../base/Avatar.vue'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
+import PaperChannelBadge from '../../../base/PaperChannelBadge.vue'
 import StyledInput from '../../../base/StyledInput.vue'
 import type { LoaderVersionType } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
 import { capitalize, formatLoaderLabel } from '../shared'
 
 const debug = useDebugLogger('CustomSetupStage')
+const client = injectModrinthClient()
 const ctx = injectCreationFlowContext()
 const {
 	selectedLoader,
@@ -191,7 +216,7 @@ const loaderVersionsData = ref<LoaderVersionEntry[]>([])
 const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>({})
 
 // Paper/Purpur build caches
-const paperVersions = ref<Record<string, number[]>>({})
+const paperVersions = ref<Record<string, Paper.Versions.v3.Build[]>>({})
 const purpurVersions = ref<Record<string, string[]>>({})
 
 // Paper/Purpur supported game version sets (for filtering the game version combobox)
@@ -254,6 +279,14 @@ async function fetchLoaderManifest(loader: string) {
 	let apiLoader = loader
 	if (apiLoader === 'neoforge') apiLoader = 'neo'
 
+	debug(
+		'fetchLoaderManifest:',
+		loader,
+		'apiLoader:',
+		apiLoader,
+		'cached:',
+		!!loaderVersionsCache.value[apiLoader],
+	)
 	if (loaderVersionsCache.value[apiLoader]) return
 
 	try {
@@ -262,7 +295,9 @@ async function fetchLoaderManifest(loader: string) {
 			gameVersions: { id: string; loaders: LoaderVersionEntry[] }[]
 		}
 		loaderVersionsCache.value[apiLoader] = data.gameVersions
-	} catch {
+		debug('fetchLoaderManifest: loaded', apiLoader, 'gameVersions:', data.gameVersions.length)
+	} catch (e) {
+		debug('fetchLoaderManifest: FAILED', apiLoader, e)
 		loaderVersionsCache.value[apiLoader] = []
 	}
 }
@@ -270,9 +305,8 @@ async function fetchLoaderManifest(loader: string) {
 async function fetchPaperSupportedVersions() {
 	if (paperSupportedVersions.value) return
 	try {
-		const res = await fetch('https://api.papermc.io/v2/projects/paper')
-		const data = (await res.json()) as { versions: string[] }
-		paperSupportedVersions.value = new Set(data.versions)
+		const project = await client.paper.versions_v3.getProject()
+		paperSupportedVersions.value = new Set(Object.values(project.versions).flat())
 	} catch {
 		paperSupportedVersions.value = new Set()
 	}
@@ -281,30 +315,44 @@ async function fetchPaperSupportedVersions() {
 async function fetchPurpurSupportedVersions() {
 	if (purpurSupportedVersions.value) return
 	try {
-		const res = await fetch('https://api.purpurmc.org/v2/purpur')
-		const data = (await res.json()) as { versions: string[] }
-		purpurSupportedVersions.value = new Set(data.versions)
+		const project = await client.purpur.versions_v2.getProject()
+		purpurSupportedVersions.value = new Set(project.versions)
 	} catch {
 		purpurSupportedVersions.value = new Set()
 	}
 }
 
+function paperBuildChannelTag(buildId: string): 'ALPHA' | 'BETA' | null {
+	const gv = selectedGameVersion.value
+	if (!gv || selectedLoader.value !== 'paper') return null
+	const b = paperVersions.value[gv]?.find((x) => String(x.id) === buildId)
+	if (!b) return null
+	const u = String(b.channel).toUpperCase()
+	if (u === 'ALPHA' || u === 'BETA') return u
+	return null
+}
+
 async function fetchPaperVersions(mcVersion: string) {
 	if (paperVersions.value[mcVersion]) return
 	try {
-		const res = await fetch(`https://fill.papermc.io/v3/projects/paper/versions/${mcVersion}`)
-		const data = (await res.json()) as { builds: number[] }
-		paperVersions.value[mcVersion] = data.builds.sort((a, b) => b - a)
+		const data = await client.paper.versions_v3.getBuilds(mcVersion)
+		paperVersions.value[mcVersion] = data.builds.toSorted((a, b) => b.id - a.id)
 	} catch {
 		paperVersions.value[mcVersion] = []
 	}
 }
 
+function handleGameVersionHover(option: ComboboxOption<string | null>) {
+	const v = option.value
+	if (v == null || v === '') return
+	if (selectedLoader.value === 'paper') void fetchPaperVersions(v)
+	else if (selectedLoader.value === 'purpur') void fetchPurpurVersions(v)
+}
+
 async function fetchPurpurVersions(mcVersion: string) {
 	if (purpurVersions.value[mcVersion]) return
 	try {
-		const res = await fetch(`https://api.purpurmc.org/v2/purpur/${mcVersion}`)
-		const data = (await res.json()) as { builds: { all: string[] } }
+		const data = await client.purpur.versions_v2.getBuilds(mcVersion)
 		purpurVersions.value[mcVersion] = data.builds.all.sort((a, b) => parseInt(b) - parseInt(a))
 	} catch {
 		purpurVersions.value[mcVersion] = []
@@ -319,13 +367,32 @@ function getLoaderVersionsForGameVersion(
 	if (apiLoader === 'neoforge') apiLoader = 'neo'
 
 	const manifest = loaderVersionsCache.value[apiLoader]
+	debug('getLoaderVersionsForGameVersion:', {
+		loader,
+		apiLoader,
+		gameVersion,
+		hasManifest: !!manifest,
+		manifestLength: manifest?.length,
+	})
 	if (!manifest) return []
 
 	// Some loaders (e.g. Fabric) list all versions under a placeholder entry
 	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
-	if (placeholder) return placeholder.loaders
+	if (placeholder) {
+		debug(
+			'getLoaderVersionsForGameVersion: using placeholder, loaders:',
+			placeholder.loaders.length,
+		)
+		return placeholder.loaders
+	}
 
 	const entry = manifest.find((x) => x.id === gameVersion)
+	debug(
+		'getLoaderVersionsForGameVersion: entry for',
+		gameVersion,
+		':',
+		entry ? entry.loaders.length + ' loaders' : 'NOT FOUND',
+	)
 	return entry?.loaders ?? []
 }
 
@@ -348,9 +415,12 @@ watch(
 )
 
 // Watch loader + game version to resolve loader versions
+let loaderVersionWatchId = 0
 watch(
 	[() => selectedLoader.value, () => selectedGameVersion.value],
 	async ([loader, gameVersion]) => {
+		const watchId = ++loaderVersionWatchId
+		debug('watch [loader, gameVersion] fired:', { loader, gameVersion, watchId })
 		loaderVersionsData.value = []
 		selectedLoaderVersion.value = null
 
@@ -360,19 +430,19 @@ watch(
 
 		if (loader === 'paper') {
 			await fetchPaperVersions(gameVersion)
+			if (watchId !== loaderVersionWatchId) return
 			loaderVersionsLoading.value = false
-			// Auto-select latest build
 			const builds = paperVersions.value[gameVersion]
 			if (builds?.length) {
-				selectedLoaderVersion.value = `${builds[0]}`
+				selectedLoaderVersion.value = `${builds[0].id}`
 			}
 			return
 		}
 
 		if (loader === 'purpur') {
 			await fetchPurpurVersions(gameVersion)
+			if (watchId !== loaderVersionWatchId) return
 			loaderVersionsLoading.value = false
-			// Auto-select latest build
 			const builds = purpurVersions.value[gameVersion]
 			if (builds?.length) {
 				selectedLoaderVersion.value = builds[0]
@@ -381,7 +451,18 @@ watch(
 		}
 
 		await fetchLoaderManifest(loader)
+		if (watchId !== loaderVersionWatchId) {
+			debug('watch [loader, gameVersion]: stale execution, skipping', {
+				watchId,
+				current: loaderVersionWatchId,
+			})
+			return
+		}
 		loaderVersionsData.value = getLoaderVersionsForGameVersion(loader, gameVersion)
+		debug(
+			'watch [loader, gameVersion]: loaderVersionsData set, count:',
+			loaderVersionsData.value.length,
+		)
 		loaderVersionsLoading.value = false
 
 		// Auto-select based on loaderVersionType
@@ -395,6 +476,16 @@ watch(
 )
 
 function autoSelectLoaderVersion() {
+	debug(
+		'autoSelectLoaderVersion: type:',
+		loaderVersionType.value,
+		'dataCount:',
+		loaderVersionsData.value.length,
+		'stableCount:',
+		loaderVersionsData.value.filter((v) => v.stable).length,
+		'first:',
+		loaderVersionsData.value[0]?.id,
+	)
 	if (loaderVersionType.value === 'stable') {
 		const stable = loaderVersionsData.value.find((v) => v.stable)
 		selectedLoaderVersion.value = stable?.id ?? loaderVersionsData.value[0]?.id ?? null
@@ -403,13 +494,16 @@ function autoSelectLoaderVersion() {
 	} else if (loaderVersionType.value === 'other' && !selectedLoaderVersion.value) {
 		selectedLoaderVersion.value = loaderVersionsData.value[0]?.id ?? null
 	}
-	debug('autoSelectLoaderVersion:', selectedLoaderVersion.value, 'type:', loaderVersionType.value)
+	debug('autoSelectLoaderVersion: result:', selectedLoaderVersion.value)
 }
 
 const loaderVersionOptions = computed<ComboboxOption<string>[]>(() => {
 	if (selectedLoader.value === 'paper' && selectedGameVersion.value) {
 		const builds = paperVersions.value[selectedGameVersion.value] ?? []
-		return builds.map((b) => ({ value: `${b}`, label: `Build ${b}` }))
+		return builds.map((b) => ({
+			value: `${b.id}`,
+			label: `Build ${b.id}`,
+		}))
 	}
 
 	if (selectedLoader.value === 'purpur' && selectedGameVersion.value) {

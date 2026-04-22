@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Lataa RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Lataa: Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -34,6 +37,9 @@
   },
   "app-marketing.download.options-title": {
     "message": "Lataus vaihtoehdot"
+  },
+  "app-marketing.download.terms": {
+    "message": "Lataamalla Modrint sovelluksen, sinä hyväksyt meidän <terms-link>Ehdot</terms-link> Ja <privacy-link>Tietosuojakäytännöt</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Lataa Modrinth App (Beta)"
@@ -101,6 +107,9 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App toimii paremmin kuin monet johtavat modinhallintaohjelmat ja käyttää vain 150 MT RAM-muistia!"
+  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -137,8 +146,14 @@
   "app-marketing.features.performance.title": {
     "message": "Suorituskykyinen"
   },
+  "app-marketing.features.play.description": {
+    "message": "Käytä Modrinth sovellusta asentaaksesi ja pelataksesi sinun suosikki modeliila ja modpackeilla."
+  },
   "app-marketing.features.play.title": {
     "message": "Pelaa lempi modeillasi"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Rakenna, jaa, ja pelaa modipaketteja millä tahansa tuhansista modeista ja modipaketeista Modrinthissa."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modipaketti"
@@ -152,11 +167,20 @@
   "app-marketing.features.unlike-any-launcher": {
     "message": "Erilainen kuin mikään muu launcheri"
   },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App on täysin integroitu sivuston kanssa, jotta saat pääsyn kaikkiin lempi projekteihisi appin kautta!"
+  },
   "app-marketing.features.website.title": {
     "message": "Nettisivu integraatio"
   },
   "app-marketing.features.youve-used-before": {
     "message": "jota olet käyttänyt ennen"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Kuvakaappaus Modrinth Appista jossa on Cobblemon instanssi auki sisältö sivulle."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App on uniikki, avoimen lähdekoodin launcheri joka antaa sinun pelata lempi modeillasi, ja pitää ne ajantasalla, kaikki yhdessä siistissä pakkauksessa."
   },
   "app-marketing.hero.download-button": {
     "message": "Lataa Modrinth App"
@@ -326,6 +350,9 @@
   "collection.label.created-at": {
     "message": "Luotu {ago}"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {No projects yet} other {<stat>{count}</stat> {type}}}"
+  },
   "collection.label.updated-at": {
     "message": "Päivitetty {ago}"
   },
@@ -334,6 +361,9 @@
   },
   "collection.title": {
     "message": "{name} - kokoelma"
+  },
+  "create.collection.collection-info": {
+    "message": "Sinun uusi kokoelma luodaan julkiseksi kokoelmaksi {count, plural, =0 {no projects} one {# project} other {# projects}}:lla. "
   },
   "dashboard.collections.button.create-new": {
     "message": "Luo uusi"
@@ -346,6 +376,15 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Vero lomake"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Vahvista lompakkosi osoite"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Matalammat maksut saatavilla"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Prosessoidaan"
   },
   "error.collection.404.list_item.1": {
     "message": "Saatoit kirjoittaa kokoelman URL osoitteen väärin."
@@ -706,15 +745,6 @@
   },
   "servers.notices.no-notices": {
     "message": "Ei ilmoituksia"
-  },
-  "servers.plan.large.name": {
-    "message": "Suuri"
-  },
-  "servers.plan.medium.name": {
-    "message": "Keskikokoinen"
-  },
-  "servers.plan.small.name": {
-    "message": "Pieni"
   },
   "settings.billing.payment_method.action.primary": {
     "message": "Tee ensisijaiseksi"

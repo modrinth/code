@@ -5,32 +5,95 @@
   "app.auth-servers.unreachable.header": {
     "message": "Authenticatieservers kunnen niet worden bereikt"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Voeg server aan instantie toe"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Voeg servers aan instantie toe"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Voeg aan instantie toe"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Voeg aan {instanceName} toe"
+  },
+  "app.browse.added": {
+    "message": "Toegevoegd"
+  },
+  "app.browse.already-added": {
+    "message": "Al toegevoegd"
+  },
+  "app.browse.discover-content": {
+    "message": "Ontdek content"
+  },
+  "app.browse.discover-servers": {
+    "message": "Ontdek servers"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Verstop toegevoegde servers"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Verberg Geïnstalleerde inhoud"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Installeer inhoud naar instantie"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Voeg modpack beschrijving in..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exporteer"
+  },
+  "app.export-modal.header": {
+    "message": "Exporteer modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Modpack Naam"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modpack naam"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Selecteer bestanden en mappen om toe te voegen aan pack"
+  },
   "app.export-modal.version-number-label": {
     "message": "Versie nummer"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Alle data van je instantie zal permanent verwijderd worden, inclusief al je werelden, voorkeuren, en alle geïnstalleerde content."
+  },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Deze actie kan niet ongedaan gemaakt worden"
   },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Verwijder instantie"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Verwijder instantie"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Deze modpakket is al in de <bold>{instanceName}<bold> instantie geïnstalleerd. Ben je zeker dat je het geen wil dupliceren?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Maak"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack is al geïnstalleerd"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instantie"
+  },
   "app.instance.mods.content-type-project": {
     "message": "project"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Kopieer link"
-  },
-  "app.instance.mods.installing": {
-    "message": "Aan het installeren..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Modpack"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was toegevoegd"
   },
   "app.instance.mods.projects-were-added": {
-    "message": "{count} projecten waren toegevoegd"
+    "message": "{count} Projecten waren toegevoegd"
   },
   "app.instance.mods.share-text": {
     "message": "Bekijk de projecten die ik in mijn modpack gebruik!"
@@ -38,17 +101,53 @@
   "app.instance.mods.share-title": {
     "message": "Modpack-inhoud delen"
   },
-  "app.instance.mods.show-file": {
-    "message": "Bestand weergeven"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Succesvol geüpload"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "Onbekend"
+  "app.instance.worlds.add-server": {
+    "message": "Voeg server toe"
   },
-  "app.instance.mods.updating": {
-    "message": "Aan het updaten..."
+  "app.instance.worlds.browse-servers": {
+    "message": "Zoek servers"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "{name} Zal **permanent verwijderd** worden en kan niet hersteld worden."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Weet je zeker dat je deze wereld definitief wilt verwijderen?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Gemod"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Voeg of zoek een server om te beginnen"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Noch servers noch werelden toegevoegd"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' wordt uit je lijst verwijderd, ook in de game, en kan op geen enkele manier worden hersteld."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) wordt uit je lijst verwijderd, ook in de game, en kan op geen enkele manier worden hersteld."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Ben je zeker dat je {name} wil verwijderen?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Zoek werelden"
+  },
+  "app.instance.worlds.this-server": {
+    "message": "deze server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Content vereist"
@@ -97,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Standaardopties voor instantie"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Feature flags"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installaties"
@@ -154,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Herlaad om de update te installeren"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "voorbeeld.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Kies een keuze"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Incompatibele versie{version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Nog niet gespeeld"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Voeg een vriend toe"
@@ -254,6 +368,12 @@
   "instance.edit-world.title": {
     "message": "Wereld bewerken"
   },
+  "instance.files.adding-files": {
+    "message": "Bestanden toevoegen ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Opslaan als..."
+  },
   "instance.server-modal.address": {
     "message": "Adres"
   },
@@ -336,7 +456,7 @@
     "message": "Uitgevoerd nadat het spel is afgesloten."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Voer na-afsluitcommando in..."
+    "message": "Voer een opdracht na het afsluiten in..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Voor het opstarten"
@@ -402,7 +522,7 @@
     "message": "De hoogte van het spelvenster wanneer opgestart."
   },
   "instance.settings.tabs.window.height.enter": {
-    "message": "Vul hoogte in..."
+    "message": "Voer de lengte in..."
   },
   "instance.settings.tabs.window.width": {
     "message": "Breedte"
@@ -425,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Niet tonen op de startpagina"
   },
-  "instance.worlds.filter.available": {
-    "message": "Beschikbaar"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instantie is al open"
   },
@@ -447,16 +564,10 @@
     "message": "Je kan alleen direct de servers in springen in Minecraft Alpha 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Je kan alleen direct je eigen werelden in springen in Minecraft 1.20+"
+    "message": "Je kan alleen direct je eigen werelden in springen in Minecraft 1,20+"
   },
   "instance.worlds.play_instance": {
     "message": "Speel instantie"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Alleen spelen"
   },
   "instance.worlds.view_instance": {
     "message": "Bekijk instantie"

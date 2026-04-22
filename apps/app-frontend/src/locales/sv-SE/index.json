@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ej nå autentiseringsservrarna"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Lägg till server till instans"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Lägg till servrar till din instans"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Lägg till i instans"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Lägg till i {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Tillagd"
+  },
+  "app.browse.already-added": {
+    "message": "Redan tillagd"
+  },
+  "app.browse.discover-content": {
+    "message": "Upptäck innehåll"
+  },
+  "app.browse.discover-servers": {
+    "message": "Upptäck servrar"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Dölj tillagda servrar"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Dölj installerat innehåll"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Installera innehåll till instans"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Ange modpaketets beskrivning..."
   },
@@ -41,17 +74,20 @@
   "app.instance.confirm-delete.header": {
     "message": "Radera instans"
   },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Detta modpaket är redan installerat i instansen <bold>{instanceName}</bold>. Är du säker på att du vill duplicera det?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Skapa"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpaket redan installerat"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instans"
+  },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Kopiera länk"
-  },
-  "app.instance.mods.installing": {
-    "message": "Installerar..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Modd-paket"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" lades till"
@@ -60,25 +96,58 @@
     "message": "{count} projekt lades till"
   },
   "app.instance.mods.share-text": {
-    "message": "Kolla in projekten jag använder i mitt modd-paket!"
+    "message": "Kolla in projekten jag använder i mitt modpaket!"
   },
   "app.instance.mods.share-title": {
-    "message": "Delar innehåll från modd-paket"
-  },
-  "app.instance.mods.show-file": {
-    "message": "Visa fil"
+    "message": "Delar innehåll från modpaket"
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uppladdning lyckades"
   },
-  "app.instance.mods.switch-version": {
-    "message": "Byt version"
+  "app.instance.worlds.add-server": {
+    "message": "Lägg till server"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "Okänt"
+  "app.instance.worlds.browse-servers": {
+    "message": "Utforska servrar"
   },
-  "app.instance.mods.updating": {
-    "message": "Uppdaterar..."
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' kommer ** tas bort permanent**, och det kommer inte finnas något sätt att återskapa den."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Är du säker på att du vill permanent radera denna värld?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Moddad"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Lägg till en server eller utforska för att komma igång"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Inga servrar eller världar tillagda"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' kommer bli borttagen från din lista, inklusive i spelet, och det kommer inte finnas något sätt att återskapa den."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) kommer bli borttagen från din lista, inklusive i spelet, och det kommer inte finnas något sätt att återskapa den."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Är du säker på att du vill radera {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Sök {count} världar..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "denna server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Innehåll krävs"
@@ -127,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Standardinställningar för instanser"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Funktionsflaggor"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java-installationer"
@@ -184,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Ladda om för att installera uppdatering"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Välj ett alternativ"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Inkompatibel version {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Inte spelad än"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Lägg till en vän"
@@ -283,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "Redigera värld"
+  },
+  "instance.files.adding-files": {
+    "message": "Lägger till filer ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Spara som..."
   },
   "instance.server-modal.address": {
     "message": "Adress"
@@ -455,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Visa inte på Startsidan"
   },
-  "instance.worlds.filter.available": {
-    "message": "Tillgängliga"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instans är redan öppen"
   },
@@ -481,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Spela instans"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Enspelarläge"
   },
   "instance.worlds.view_instance": {
     "message": "Visa instans"

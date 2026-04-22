@@ -1,8 +1,12 @@
 <template>
-	<div v-if="instance">
-		<div class="p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
+	<div v-if="instance" :class="{ 'flex h-full flex-col': isFixedRender }">
+		<div
+			:class="['p-6 pr-2 pb-4', { 'shrink-0': isFixedRender }]"
+			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
+		>
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal
+				:key="instance.path"
 				ref="settingsModal"
 				:instance="instance"
 				:offline="offline"
@@ -35,27 +39,6 @@
 									{{ timePlayedHumanized }}
 								</template>
 								<template v-else> Never played </template>
-							</div>
-
-							<div v-if="linkedProjectV3" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
-
-							<div
-								v-if="linkedProjectV3"
-								class="flex gap-1.5 items-center font-medium text-primary"
-							>
-								Linked to
-								<Avatar
-									:src="linkedProjectV3.icon_url"
-									:alt="linkedProjectV3.name"
-									:tint-by="instance.path"
-									size="24px"
-								/>
-								<router-link
-									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-									class="hover:underline text-primary truncate"
-								>
-									{{ linkedProjectV3.name }}
-								</router-link>
 							</div>
 						</template>
 
@@ -134,9 +117,9 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled v-else-if="playing === true" color="red" size="large">
-							<button @click="stopInstance('InstancePage')">
+							<button :disabled="stopping" @click="stopInstance('InstancePage')">
 								<StopCircleIcon />
-								Stop
+								{{ stopping ? 'Stopping...' : 'Stop' }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled
@@ -192,7 +175,7 @@
 							color="brand"
 							size="large"
 						>
-							<button disabled>Loading...</button>
+							<button disabled>Starting...</button>
 						</ButtonStyled>
 						<ButtonStyled circular size="large">
 							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
@@ -225,21 +208,17 @@
 				</template>
 			</ContentPageHeader>
 		</div>
-		<div class="px-6">
+		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
 			<NavTabs :links="tabs" />
 		</div>
-		<div v-if="!!instance" class="p-6 pt-4">
+		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
 			<RouterView
 				v-if="route.path.startsWith('/instance')"
 				v-slot="{ Component }"
 				:key="instance.path"
 			>
 				<template v-if="Component">
-					<Suspense
-						:key="instance.path"
-						@pending="loadingBar.startLoading()"
-						@resolve="loadingBar.stopLoading()"
-					>
+					<Suspense :key="instance.path">
 						<component
 							:is="Component"
 							:instance="instance"
@@ -252,9 +231,6 @@
 							@play="updatePlayState"
 							@stop="() => stopInstance('InstanceSubpage')"
 						></component>
-						<template #fallback>
-							<LoadingIndicator />
-						</template>
 					</Suspense>
 				</template>
 			</RouterView>
@@ -285,6 +261,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BoxesIcon,
 	CheckCircleIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
@@ -302,6 +279,7 @@ import {
 	ServerIcon,
 	SettingsIcon,
 	StopCircleIcon,
+	TerminalSquareIcon,
 	UpdatedIcon,
 	UserPlusIcon,
 	XIcon,
@@ -311,13 +289,14 @@ import {
 	ButtonStyled,
 	ContentPageHeader,
 	injectNotificationManager,
-	LoadingIndicator,
+	NavTabs,
 	OverflowMenu,
 	ServerOnlinePlayers,
 	ServerPing,
 	ServerRecentPlays,
 	ServerRegion,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
@@ -329,7 +308,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
-import NavTabs from '@/components/ui/NavTabs.vue'
+import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
@@ -337,16 +316,17 @@ import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { get_server_status } from '@/helpers/worlds'
+import { get_server_status, refreshWorlds } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { useBreadcrumbs, useLoading } from '@/store/state'
+import { useBreadcrumbs } from '@/store/state'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
 const { playServerProject } = injectServerInstall()
+const queryClient = useQueryClient()
 const route = useRoute()
 
 const router = useRouter()
@@ -363,6 +343,7 @@ window.addEventListener('online', () => {
 const instance = ref<GameInstance>()
 const playing = ref(false)
 const loading = ref(false)
+const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
@@ -405,6 +386,14 @@ async function fetchInstance() {
 	}
 
 	fetchDeferredData()
+
+	if (instance.value) {
+		queryClient.prefetchQuery({
+			queryKey: ['worlds', instance.value.path],
+			queryFn: () => refreshWorlds(instance.value!.path),
+			staleTime: 30_000,
+		})
+	}
 }
 
 function fetchDeferredData() {
@@ -447,18 +436,39 @@ watch(
 
 const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id as string)}`)
 
+/**
+ * Per-route layout mode.
+ * - `'scroll'` (default): the whole instance page scrolls inside `.app-viewport`. This lets
+ *   `position: sticky` children (and the viewport-rooted `IntersectionObserver` used by
+ *   `useStickyObserver`) work correctly.
+ * - `'fixed'`: the header + tabs are pinned and only the tab body scrolls in its own container.
+ *   Used by tabs whose content (e.g. the log console) needs a bounded height to resolve `h-full`.
+ */
+const renderMode = computed<'scroll' | 'fixed'>(() =>
+	route.meta.renderMode === 'fixed' ? 'fixed' : 'scroll',
+)
+const isFixedRender = computed(() => renderMode.value === 'fixed')
+
 const tabs = computed(() => [
 	{
 		label: 'Content',
 		href: `${basePath.value}`,
+		icon: BoxesIcon,
+	},
+	{
+		label: 'Files',
+		href: `${basePath.value}/files`,
+		icon: FolderOpenIcon,
 	},
 	{
 		label: 'Worlds',
 		href: `${basePath.value}/worlds`,
+		icon: GlobeIcon,
 	},
 	{
 		label: 'Logs',
 		href: `${basePath.value}/logs`,
+		icon: TerminalSquareIcon,
 	},
 ])
 
@@ -475,8 +485,6 @@ if (instance.value) {
 		query: route.query,
 	})
 }
-
-const loadingBar = useLoading()
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
@@ -504,8 +512,10 @@ const startInstance = async (context: string) => {
 }
 
 const stopInstance = async (context: string) => {
-	playing.value = false
+	stopping.value = true
 	await kill(route.params.id as string).catch(handleError)
+	stopping.value = false
+	playing.value = false
 
 	if (!instance.value) return
 	trackEvent('InstanceStop', {
@@ -654,6 +664,11 @@ const timePlayedHumanized = computed(() => {
 onUnmounted(() => {
 	unlistenProcesses()
 	unlistenProfiles()
+	const profilePath = route.params.id
+	if (profilePath) {
+		const { destroy } = useInstanceConsole(profilePath)
+		destroy()
+	}
 })
 </script>
 

@@ -5,11 +5,11 @@ import {
 	commonMessages,
 	defineMessage,
 	injectNotificationManager,
+	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import HideFromHomeOption from '@/components/ui/world/modal/HideFromHomeOption.vue'
 import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
 import type { GameInstance } from '@/helpers/types'
@@ -32,7 +32,7 @@ const props = defineProps<{
 	instance: GameInstance
 }>()
 
-const modal = ref()
+const modal = ref<InstanceType<typeof NewModal>>()
 
 const name = ref<string>('')
 const address = ref<string>('')
@@ -81,11 +81,11 @@ function show(server: ServerWorld) {
 	index.value = server.index
 	displayStatus.value = server.display_status
 	hideFromHome.value = server.display_status === 'hidden'
-	modal.value.show()
+	modal.value?.show()
 }
 
 function hide() {
-	modal.value.hide()
+	modal.value?.hide()
 }
 
 defineExpose({ show })
@@ -96,29 +96,28 @@ const titleMessage = defineMessage({
 })
 </script>
 <template>
-	<ModalWrapper ref="modal">
-		<template #title>
-			<span class="font-extrabold text-lg text-contrast">{{ formatMessage(titleMessage) }}</span>
-		</template>
+	<NewModal ref="modal" :header="formatMessage(titleMessage)" width="500px" max-width="500px">
 		<ServerModalBody
 			v-model:name="name"
 			v-model:address="address"
 			v-model:resource-pack="resourcePack"
 		/>
 		<HideFromHomeOption v-model="hideFromHome" class="mt-3" />
-		<div class="flex gap-2 mt-4">
-			<ButtonStyled color="brand">
-				<button :disabled="!address" @click="saveServer">
-					<SaveIcon />
-					{{ formatMessage(commonMessages.saveChangesButton) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button @click="hide()">
-					<XIcon />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
-		</div>
-	</ModalWrapper>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button class="!border !border-surface-4" @click="hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!address" @click="saveServer">
+						<SaveIcon />
+						{{ formatMessage(commonMessages.saveChangesButton) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 </template>

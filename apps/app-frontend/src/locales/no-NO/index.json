@@ -41,9 +41,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "Standard instansinstillinger"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "Funksjonsflagg"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java installasjoner"
   },
@@ -341,9 +338,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Ikke vis på Hjem"
   },
-  "instance.worlds.filter.available": {
-    "message": "Tilgjengelig"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instansen er allerede open"
   },
@@ -364,12 +358,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Spill instans"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Enkeltspillermodus"
   },
   "instance.worlds.view_instance": {
     "message": "Vis instans"

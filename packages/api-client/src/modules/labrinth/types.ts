@@ -593,6 +593,7 @@ export namespace Labrinth {
 				categories: string[]
 				additional_categories: string[]
 				loaders: string[]
+				mrpack_loaders: string[]
 				versions: string[]
 				icon_url?: string
 				link_urls: Record<string, Link>

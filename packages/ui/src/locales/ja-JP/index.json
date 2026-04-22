@@ -18,7 +18,7 @@
     "defaultMessage": "アフィリエイトコードを作成するユーザー名"
   },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "ユーザーネームを入力…"
+    "defaultMessage": "ユーザー名を入力…"
   },
   "affiliate.createdBy": {
     "defaultMessage": "{user}によって作成"
@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "アナリティクスを表示"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "サーバー設定の読み込みに失敗しました"
+  },
   "badge.beta": {
     "defaultMessage": "ベータ"
   },
@@ -40,6 +43,54 @@
   },
   "badge.new": {
     "defaultMessage": "New"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "キャンセル"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} 共有CPU"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "<server-name>{serverName}</server-name> への再登録を行おうとしています。登録が再開され、サーバーは中断なく稼働し続けます。"
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "再登録できません。購読の詳細を読み込めませんでした。"
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "エラー"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "サブスクリプション情報の読み込みに失敗しました。"
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5日"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/月"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/四半期"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/年"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "次回の請求は<charge-date>{date}</charge-date>です。"
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "プラン"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "メモリ{ramGb} GB"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "再登録"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "ストレージ{storageGb} GB"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "サーバーに再登録"
   },
   "button.accept": {
     "defaultMessage": "承認"
@@ -68,8 +119,17 @@
   "button.continue": {
     "defaultMessage": "続行"
   },
+  "button.copy-filename": {
+    "defaultMessage": "ファイル名をコピー"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "完全パスをコピー"
+  },
   "button.copy-id": {
     "defaultMessage": "IDをコピー"
+  },
+  "button.copy-link": {
+    "defaultMessage": "リンクをコピー"
   },
   "button.copy-permalink": {
     "defaultMessage": "永続リンクをコピー"
@@ -80,6 +140,9 @@
   "button.decline": {
     "defaultMessage": "辞退"
   },
+  "button.disable": {
+    "defaultMessage": "無効化"
+  },
   "button.download": {
     "defaultMessage": "ダウンロード"
   },
@@ -89,11 +152,17 @@
   "button.edit": {
     "defaultMessage": "編集"
   },
+  "button.enable": {
+    "defaultMessage": "有効化"
+  },
+  "button.extract": {
+    "defaultMessage": "展開"
+  },
   "button.follow": {
     "defaultMessage": "フォロー"
   },
   "button.hide-snapshots": {
-    "defaultMessage": "スナップショットを表示"
+    "defaultMessage": "スナップショットを非表示"
   },
   "button.max": {
     "defaultMessage": "最大"
@@ -101,14 +170,20 @@
   "button.more-options": {
     "defaultMessage": "追加のオプション"
   },
+  "button.move": {
+    "defaultMessage": "移動"
+  },
   "button.next": {
     "defaultMessage": "次"
   },
   "button.open-folder": {
     "defaultMessage": "フォルダーを開く"
   },
+  "button.open-in-folder": {
+    "defaultMessage": "フォルダを開く"
+  },
   "button.play": {
-    "defaultMessage": "起動"
+    "defaultMessage": "プレイ"
   },
   "button.refresh": {
     "defaultMessage": "更新"
@@ -122,14 +197,17 @@
   "button.remove-image": {
     "defaultMessage": "画像を削除"
   },
+  "button.rename": {
+    "defaultMessage": "名前を変更"
+  },
   "button.repair": {
     "defaultMessage": "修復"
   },
   "button.repairing": {
-    "defaultMessage": "修復中..."
+    "defaultMessage": "修復中…"
   },
   "button.report": {
-    "defaultMessage": "報告する"
+    "defaultMessage": "報告"
   },
   "button.reset": {
     "defaultMessage": "リセット"
@@ -147,16 +225,19 @@
     "defaultMessage": "保存して更新"
   },
   "button.saving": {
-    "defaultMessage": "節約"
+    "defaultMessage": "保存中"
   },
   "button.show-all-versions": {
     "defaultMessage": "すべてのバージョンを表示"
   },
+  "button.show-file": {
+    "defaultMessage": "ファイルを表示"
+  },
   "button.sign-in": {
-    "defaultMessage": "サインイン"
+    "defaultMessage": "ログイン"
   },
   "button.sign-out": {
-    "defaultMessage": "サインアウト"
+    "defaultMessage": "ログアウト"
   },
   "button.sign-up": {
     "defaultMessage": "サインアップ"
@@ -177,28 +258,25 @@
     "defaultMessage": "更新"
   },
   "button.upload-image": {
-    "defaultMessage": "画像のアップロード"
+    "defaultMessage": "画像をアップロード"
   },
   "changelog.justNow": {
     "defaultMessage": "今"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
-    "defaultMessage": "App"
+    "defaultMessage": "アプリ"
   },
   "changelog.product.hosting": {
     "defaultMessage": "ホスティング"
   },
   "changelog.product.web": {
-    "defaultMessage": "ウェブ"
+    "defaultMessage": "プラットフォーム"
   },
   "collections.label.private": {
     "defaultMessage": "非公開"
   },
   "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "{count, plural, one {# プロジェクト} other {# これらプロジェクト}}を互換性のある最新バージョンにアップデートしてもよろしいですか？ 1 つずつアップデートすることをおすすめします。"
+    "defaultMessage": "プロジェクトを互換性のある最新バージョンにアップデートしてもよろしいですか？ 1つずつアップデートすることをおすすめします。"
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "アップデート前にご確認ください"
@@ -206,8 +284,11 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "プロジェクトをアップデート"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Shiftキーを押しながら「すべて更新」をクリックすると、今後この確認をスキップできます。"
+  },
   "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "{count, plural, one {# プロジェクト} other {# これらのプロジェクト}}をアップデート"
+    "defaultMessage": "プロジェクトをアップデート"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Modを削除すると、ワールドに永続的な影響を与え、再読み込み時にコンテンツの欠落や予期せぬ問題が発生する可能性があります。"
@@ -216,13 +297,13 @@
     "defaultMessage": "削除する前にご確認ください"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "{count} 件の {itemType}{count, plural, one {} other {}} を削除"
+    "defaultMessage": "{count}件の{itemType}を削除"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "{count, plural, one {} other {これらの}}{itemType}を削除"
+    "defaultMessage": "{itemType}を削除"
   },
   "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Modパックに追加したModやコンテンツはすべて削除されます。"
+    "defaultMessage": "{action, select,downgrade {ダウングレード} other {更新中}}互換性の問題が発生する可能性があります。モッドパックに追加したモッドやコンテンツは保持されますが、新しいバージョンとの互換性がなくなる場合があります。\n"
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {ダウングレード} other {アップデート}}前にご確認ください"
@@ -252,7 +333,7 @@
     "defaultMessage": "追加 (依存関係)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "削除済み"
+    "defaultMessage": "無効"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "アップデート済み"
@@ -262,9 +343,6 @@
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "サーバー上のコンテンツの一部は分析できず、この変更の影響を受ける可能性があります。"
-  },
-  "content.diff-modal.unknown-content-header": {
-    "defaultMessage": "不明なコンテンツ"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} 件更新されました"
@@ -301,9 +379,6 @@
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "再度表示しない"
-  },
-  "content.modpack-card.updating": {
-    "defaultMessage": "アップデート中..."
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "追加のコンテンツ"
@@ -369,13 +444,19 @@
     "defaultMessage": "{mode}"
   },
   "content.page-layout.update-all": {
-    "defaultMessage": "全て更新"
+    "defaultMessage": "すべて更新"
   },
   "content.page-layout.upload-files": {
     "defaultMessage": "ファイルをアップロード"
   },
   "content.page-layout.uploading-files": {
     "defaultMessage": "ファイルをアップロード中 ({completed} / {total})"
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "選択されたすべてのコンテンツは、既に無効化されています"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "選択されたすべてのコンテンツは、既にすべて有効化されています"
   },
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "{contentType}を削除中… ({progress} / {total})"
@@ -401,17 +482,368 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "{contentType}を更新中…"
   },
-  "content.selection-bar.disable": {
-    "defaultMessage": "無効にする"
-  },
-  "content.selection-bar.enable": {
-    "defaultMessage": "有効にする"
-  },
   "content.selection-bar.selected-count": {
     "defaultMessage": "{count}件の{contentType}を選択中"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number}項目を選択中"
+  },
+  "files.conflict-modal.header": {
+    "defaultMessage": "概要を書き出す"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "上書き"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "展開を行うと100個以上のファイルが上書きされます。該当ファイルの一部です。"
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "{count} 個のファイルが既にサーバー上に存在しており、展開を行うと上書きされます。"
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "上書きファイル {count} 個"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "上書き済み"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "ファイルが上書きされます"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "{type, select, directory {フォルダーを} other {ファイルを}}作成する"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "{type, select, directory {フォルダーを} other {ファイルを}}作成する"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "例: my-folder"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "例: config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "\"{name}\"を削除中"
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "ファイルを削除"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {フォルダーと全ての内容が完全に削除されます。元に戻すことはできません。} other {ファイルが完全に削除されます。元に戻すことはできません。}}"
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "ファイルの内容を読み込めませんでした。"
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "ファイルを開けません"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "mclo.gsにアップロードできませんでした。"
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "ファイルの公開に失敗"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "ファイルが保存されました。"
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "保存済み"
+  },
+  "files.editor.find-close": {
+    "defaultMessage": "閉じる"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "検索"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} / {total} 件"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "次の一致項目"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "結果はありません"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "前の一致項目"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "置換の切り替え"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "ログファイルのURLがクリップボードにコピーされました。"
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "ログのURLをコピー"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "置換"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "すべて置換"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "置換"
+  },
+  "files.editor.save-failed-text": {
+    "defaultMessage": "ファイルを保存できませんでした。"
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "保存に失敗"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "ホームフォルダーへ移動"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "再試行"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "画像のサイズが大きすぎて表示できません(最大{maxDimension}x{maxDimension} pixels)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "画像ファイルが無効または空です。"
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "画像の読み込みに失敗"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "拡大率をリセット"
+  },
+  "files.image_viewer.viewed_image_alt": {
+    "defaultMessage": "開いた画像"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "拡大"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "縮小"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "ファイル操作進行中は新たにファイル操作を行うことができません。"
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "実行確認中にエラーが発生"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "実行確認に失敗"
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "ファイルまたはフォルダーが存在しません。"
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "フォルダーが空"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "フォルダーが存在しません。"
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "ファイルの読み込みに失敗"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "展開を開始"
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "{count} 件 選択済"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "保存されていない変更があります。"
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "現在のパス"
+  },
+  "files.move-modal.destination-path": {
+    "defaultMessage": "移動先のパス"
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "例: /my-folder"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {フォルダを移動} other {ファイルを移動}}"
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "ホームに戻る"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "パンくずリスト"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "新しく追加…"
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "ファイルナビゲーション"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "ファイル内を検索"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "ホーム"
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "CurseForgeのmodpackをインストールする"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "新しいファイル"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "新しいフォルダー"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "ファイルを探す"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "mclo.gsに公開"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "ファイルをアップロード"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": ".zipファイルからアップロード"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": ".zip URLからアップロード"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} 展開済み"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "{source} を展開中"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "失敗"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "modpackのURL"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "名前変更 {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "新しい名前"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# 個} other {# 個}}"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "作成日"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "更新日"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "名前"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "ファイル数"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "保存されていない変更があります。閉じる前に保存しますか？"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "削除"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "未保存の変更"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "キャンセル"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "エラー - ファイルが既に存在しています"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "エラー - {error}"
+  },
+  "files.upload-dropdown.failed-incorrect-type": {
+    "defaultMessage": "失敗しました - ファイルの種類が正しくありません"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "{fileName} のアップロードに失敗しました"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "ファイル"
+  },
+  "files.upload-dropdown.file-uploads": {
+    "defaultMessage": "{fileType} をアップロード"
+  },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "アップロードされたファイルのタイプが正しくありません"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "予期せぬエラーが発生しました。"
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": "- 残り{count}"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "ここに{type, select,undefined {ファイル} other {{type}s}}ここにアップロードします"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "名前には、英数字、ハイフン、アンダースコア、またはスペースのみを含める必要があります。"
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "名前には、英数字、ハイフン、アンダースコア、ドット、またはスペースのみを含める必要があります。"
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "名前"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "名前は必須です。"
+  },
+  "files.zip-url-modal.backup-name": {
+    "defaultMessage": "CurseForgeのmodpackをインストール"
+  },
+  "files.zip-url-modal.cf-header": {
+    "defaultMessage": "CurseForgeのmodpackをインストールする"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "そのURLでCurseForge modpackが見つかりませんでした。"
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "CurseForge modpackが見つかりません"
+  },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "リンクを入力"
+  },
+  "files.zip-url-modal.error-cf-url": {
+    "defaultMessage": "URLはCurseForgeのmodpackバージョンのURLである必要があります。"
+  },
+  "files.zip-url-modal.error-url-invalid": {
+    "defaultMessage": "URLは有効である必要があります。"
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "URLは必須です。"
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "インストール"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "インストールに失敗"
+  },
+  "files.zip-url-modal.step-copy-description": {
+    "defaultMessage": "バージョンページのURLをコピーして、以下に貼り付けてください。"
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "URLをコピー"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "CurseForgeを閲覧して、目的のMODパックを探してください。"
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "Modパックを探す"
+  },
+  "files.zip-url-modal.step-select-description": {
+    "defaultMessage": "「ファイル」タブを開き、インストールするバージョンを選択してください。"
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "バージョンを選択"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "不明なエラーが発生しました"
+  },
+  "files.zip-url-modal.zip-description": {
+    "defaultMessage": ".zipファイルの直接ダウンロードURLをコピーして貼り付けてください。"
+  },
+  "files.zip-url-modal.zip-header": {
+    "defaultMessage": "URLから.zipコンテンツをアップロードしています"
   },
   "form.label.address-line": {
     "defaultMessage": "住所 1行目"
@@ -548,6 +980,12 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "ファイルのアップデートに失敗しました"
   },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "modpackのバージョン変更に失敗しました"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "バージョンの読み込みに失敗しました"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus}個のCPUに増加"
   },
@@ -620,6 +1058,15 @@
   "installation-settings.edit.warning-server": {
     "defaultMessage": "コンテンツのインストール後にインストール設定を編集することは推奨されません。編集する場合はサーバーをリセットしてください。"
   },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "自動修正"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "ローダーを変更"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "競合を無効化する"
+  },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "リンクされた{projectType, select, server {サーバープロジェクト} other {Modパック}}"
   },
@@ -669,7 +1116,7 @@
     "defaultMessage": "承認中…"
   },
   "instance.confirm-reinstall.admonition-body": {
-    "defaultMessage": "再インストールすると全てのインストールされたり変更されたコンテンツがModパックによって提供されたものにリセットされ、元のインストールに追加されたModやコンテンツが削除されます。"
+    "defaultMessage": "再インストールするとすべてのインストールされたり変更されたりしたコンテンツがModパックによって提供されたものにリセットされ、元のインストールに追加されたModやコンテンツが削除されます。"
   },
   "instance.confirm-reinstall.admonition-header": {
     "defaultMessage": "再インストールの警告"
@@ -707,15 +1154,6 @@
   "instances.confirm-leave-modal.body": {
     "defaultMessage": "ファイルはまだアップロード中です。このページを離れるとアップロードがキャンセルされ、変更が失われます。"
   },
-  "instances.confirm-leave-modal.leave": {
-    "defaultMessage": "ページを離れる"
-  },
-  "instances.confirm-leave-modal.stay": {
-    "defaultMessage": "ページを離れない"
-  },
-  "instances.confirm-leave-modal.title": {
-    "defaultMessage": "ページを離れますか？"
-  },
   "instances.confirm-leave-modal.upload-in-progress": {
     "defaultMessage": "進行中のアップロード"
   },
@@ -725,26 +1163,17 @@
   "instances.content-install.existing-tab": {
     "defaultMessage": "既存のインスタンス"
   },
-  "instances.content-install.game-version-label": {
-    "defaultMessage": "ゲームバージョン"
-  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "ゲームバージョンを選択"
   },
   "instances.content-install.header": {
     "defaultMessage": "プロジェクトをインストール"
   },
-  "instances.content-install.hide-snapshots": {
-    "defaultMessage": "スナップショットを非表示"
-  },
   "instances.content-install.install-button": {
     "defaultMessage": "インストール"
   },
   "instances.content-install.installed-badge": {
     "defaultMessage": "インストール済み"
-  },
-  "instances.content-install.installing-label": {
-    "defaultMessage": "インストール中…"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "インスタンスの種類"
@@ -773,23 +1202,11 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "アイコンを選択"
   },
-  "instances.content-install.show-all-versions": {
-    "defaultMessage": "全てのバージョンを表示"
-  },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "戻る"
-  },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "リンクをコピー"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "このModパックに追加コンテンツは一切含まれていません。"
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "コンテンツが見つかりません"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "すべて"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Modpackコンテンツ"
@@ -818,6 +1235,9 @@
   "instances.updater-modal.header-modpack": {
     "defaultMessage": "Modパックバージョンに切り替える"
   },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "バージョンを切り替える"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "非互換を非表示"
   },
@@ -842,6 +1262,9 @@
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "非互換を表示"
   },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "{version}に切り替える"
+  },
   "instances.updater-modal.update-to": {
     "defaultMessage": "{version}に更新"
   },
@@ -863,9 +1286,6 @@
   "label.changes-saved": {
     "defaultMessage": "変更が保存されました"
   },
-  "label.client-only-warning": {
-    "defaultMessage": "これはクライアント側のModであり問題が発生する可能性があります。一部の作成者が環境を誤って指定している場合があるため、ローダーが競合を解決するはずなので、この機能を有効にしたままにしています。"
-  },
   "label.collections": {
     "defaultMessage": "コレクション"
   },
@@ -874,6 +1294,9 @@
   },
   "label.content": {
     "defaultMessage": "コンテンツ"
+  },
+  "label.copied-path": {
+    "defaultMessage": "パスをコピーしました"
   },
   "label.created-ago": {
     "defaultMessage": "{ago} に作成"
@@ -893,6 +1316,12 @@
   "label.details": {
     "defaultMessage": "詳細"
   },
+  "label.done": {
+    "defaultMessage": "完了"
+  },
+  "label.download-failed": {
+    "defaultMessage": "ダウンロードに失敗"
+  },
   "label.email": {
     "defaultMessage": "メールアドレス"
   },
@@ -901,6 +1330,9 @@
   },
   "label.error": {
     "defaultMessage": "エラー"
+  },
+  "label.extract-failed": {
+    "defaultMessage": "展開に失敗"
   },
   "label.filter-by": {
     "defaultMessage": "フィルター"
@@ -929,6 +1361,9 @@
   "label.modpack": {
     "defaultMessage": "Modパック"
   },
+  "label.move-failed": {
+    "defaultMessage": "移動に失敗"
+  },
   "label.no": {
     "defaultMessage": "いいえ"
   },
@@ -943,6 +1378,21 @@
   },
   "label.password": {
     "defaultMessage": "パスワード"
+  },
+  "label.plan-custom": {
+    "defaultMessage": "カスタム"
+  },
+  "label.plan-large": {
+    "defaultMessage": "プレミアム"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "レギュラー"
+  },
+  "label.plan-small": {
+    "defaultMessage": "ライト"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "不明"
   },
   "label.platform": {
     "defaultMessage": "プラットフォーム"
@@ -990,7 +1440,7 @@
     "defaultMessage": "シングルプレイ"
   },
   "label.sort-by": {
-    "defaultMessage": "並び替え"
+    "defaultMessage": "並び替え: "
   },
   "label.success": {
     "defaultMessage": "成功"
@@ -1014,7 +1464,7 @@
     "defaultMessage": "バージョン"
   },
   "label.visibility": {
-    "defaultMessage": "公開"
+    "defaultMessage": "公開範囲"
   },
   "label.visit-your-profile": {
     "defaultMessage": "プロフィールを開く"
@@ -1044,7 +1494,7 @@
     "defaultMessage": "スペイン語 (スペイン)"
   },
   "locale.fi-FI": {
-    "defaultMessage": "フィンランド後"
+    "defaultMessage": "フィンランド語"
   },
   "locale.fil-PH": {
     "defaultMessage": "フィリピン語"
@@ -1122,7 +1572,7 @@
     "defaultMessage": "支払い方法を追加する"
   },
   "modal.add-payment-method.title": {
-    "defaultMessage": "支払い方法を追加"
+    "defaultMessage": "支払い方法を追加中"
   },
   "modal.open-in-app.benefit.install": {
     "defaultMessage": "必要なコンテンツを自動でインストールする"
@@ -1132,9 +1582,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "サーバーが変更したときにファイルを更新し続ける"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "閉じる"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Modrinth Appを入手する"
@@ -1421,6 +1868,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "互換性"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "組織"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "プロジェクトオーナー"
   },
@@ -1481,17 +1931,35 @@
   "project.about.links.wiki": {
     "defaultMessage": "ウィキを訪問する"
   },
+  "project.about.server.address.tooltip": {
+    "defaultMessage": "Javaのサーバーアドレスをコピー"
+  },
   "project.about.server.copied": {
     "defaultMessage": "コピーしました！"
   },
   "project.about.server.copiedText": {
-    "defaultMessage": "IPアドレスをクリップボードにコピーしました"
+    "defaultMessage": "サーバーアドレスをクリップボードにコピーしました"
   },
-  "project.about.server.latency": {
-    "defaultMessage": "遅延"
+  "project.about.server.downloadModpack": {
+    "defaultMessage": "Modパックをダウンロード"
+  },
+  "project.about.server.languages": {
+    "defaultMessage": "言語"
+  },
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(推奨)"
+  },
+  "project.about.server.region": {
+    "defaultMessage": "地域"
+  },
+  "project.about.server.requiredContent": {
+    "defaultMessage": "必須のコンテンツ"
   },
   "project.about.server.title": {
     "defaultMessage": "サーバーの詳細"
+  },
+  "project.about.tags.title": {
+    "defaultMessage": "タグ"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number}件のダウンロード"
@@ -1577,8 +2045,266 @@
   "project.recent-plays.tooltip": {
     "defaultMessage": "{count}件の過去2週間のModrinthからのプレイ"
   },
+  "project.server.customModpackTooltip": {
+    "defaultMessage": "このプロジェクトはカスタムModパックを使用しています"
+  },
+  "project.server.language.af": {
+    "defaultMessage": "アフリカーンス語"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "アムハラ語"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "アラビア語"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "アゼルバイジャン語"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "ベラルーシ語"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "ブルガリア語"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "ベンガル語"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "ボスニア語"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "カタルーニャ語"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "チェコ語"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "デンマーク語"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "ドイツ語"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "ギリシャ語"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "英語"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "エスペラント"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "スペイン語"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "エストニア語"
+  },
+  "project.server.language.eu": {
+    "defaultMessage": "バスク語"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "ペルシャ語"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "フィンランド語"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "フランス語"
+  },
+  "project.server.language.ga": {
+    "defaultMessage": "アイルランド語"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "ガリシア語"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "ヘブライ語"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "ヒンディー語"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "クロアチア語"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "ハンガリー語"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "アルメニア語"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "インドネシア語"
+  },
+  "project.server.language.is": {
+    "defaultMessage": "アイスランド語"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "イタリア語"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "日本語"
+  },
+  "project.server.language.ka": {
+    "defaultMessage": "グルジア語"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "カザフ語"
+  },
+  "project.server.language.km": {
+    "defaultMessage": "クメール語"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "カンナダ語"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "韓国語"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "ラオ語"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "リトアニア語"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "ラトビア語"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "マケドニア語"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "マラヤーラム語"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "モンゴル語"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "マラーティー語"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "マレー語"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "ビルマ語"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "ネパール語"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "オランダ語"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "ノルウェー語"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "パンジャブ語"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "ポーランド語"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "ポルトガル語"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "ルーマニア語"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "ロシア語"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "シンハラ語"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "スロバキア語"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "スロベニア語"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "アルバニア語"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "セルビア語"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "スウェーデン語"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "スワヒリ語"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "タミル語"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "テルグ語"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "タイ語"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "フィリピン語"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "トルコ語"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "ウクライナ語"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "ウルドゥー語"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "ウズベク語"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "ベトナム語"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "ヨルバ語"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "中国語"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "ズールー語"
+  },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "アジア"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "オーストラリア"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "ヨーロッパ"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "中東"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "ロシア"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "南アメリカ"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "サーバーの場所: {regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "アメリカ東部"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "アメリカ西部"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "オフライン"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "サーバーはオフラインです"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "オンライン"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "統計"
@@ -1791,7 +2517,7 @@
     "defaultMessage": "ゲームバージョン"
   },
   "search.filter_type.game_version.all_versions": {
-    "defaultMessage": "全てのバージョンを表示"
+    "defaultMessage": "すべてのバージョンを表示"
   },
   "search.filter_type.license": {
     "defaultMessage": "ライセンス"
@@ -1814,8 +2540,26 @@
   "search.filter_type.project_id": {
     "defaultMessage": "プロジェクトID"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "タイプ"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "言語"
+  },
+  "search.filter_type.server_region": {
+    "defaultMessage": "地域"
+  },
+  "search.filter_type.server_status": {
+    "defaultMessage": "ステータス"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "ローダー"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Mod導入済み"
+  },
+  "search.server_content_type.vanilla": {
+    "defaultMessage": "バニラ(Mod非導入)"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "{backupName}の作成中に問題が発生しました。問題が継続する場合は再試行するかサポートに連絡してください。"
@@ -1836,7 +2580,7 @@
     "defaultMessage": "バックアップを作成中"
   },
   "servers.backups.admonition.fallback-name": {
-    "defaultMessage": "バックアップ"
+    "defaultMessage": "保存したバックアップ"
   },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "{backupName}からの復元中に問題が発生しました。問題が継続する場合は再試行するかサポートに連絡してください。"
@@ -1919,9 +2663,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "支払い方法"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "{interval, select, month {1か月ごとに請求} quarterly {3か月ごとに請求}}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "必要な仕様だけのカスタマイズされたプランを選択。"
   },
@@ -1937,17 +2678,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "最人気"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "プランを選択してください"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "プランを選択"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "1〜5人、軽量なModを少し導入するなら最適"
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "利用法に合ったRAM容量とスペックを選択してください。"
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "プラン"
@@ -2226,7 +2961,7 @@
     "defaultMessage": "総合"
   },
   "tag.category.kitpvp": {
-    "defaultMessage": "Kit PVP"
+    "defaultMessage": "Kit PvP"
   },
   "tag.category.library": {
     "defaultMessage": "前提Mod"
@@ -2268,7 +3003,7 @@
     "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
-    "defaultMessage": "モブ"
+    "defaultMessage": "Mob"
   },
   "tag.category.modded": {
     "defaultMessage": "Mod向け"
@@ -2319,10 +3054,10 @@
     "defaultMessage": "刑務所"
   },
   "tag.category.pve": {
-    "defaultMessage": "PVE"
+    "defaultMessage": "PvE"
   },
   "tag.category.pvp": {
-    "defaultMessage": "PVP"
+    "defaultMessage": "PvP"
   },
   "tag.category.questing": {
     "defaultMessage": "クエスト"

@@ -13,6 +13,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::{auth::get_user_from_headers, database};
 use actix_web::{HttpRequest, HttpResponse, get, route, web};
+use quick_xml::escape::escape;
 use std::collections::HashSet;
 use yaserde::YaSerialize;
 
@@ -329,7 +330,7 @@ pub async fn version_file(
             artifact_id: project_id,
             version: vnum,
             name: project.inner.name,
-            description: project.inner.description,
+            description: escape(project.inner.summary).into_owned(),
         };
         return Ok(HttpResponse::Ok()
             .content_type("text/xml")

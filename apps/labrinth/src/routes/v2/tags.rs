@@ -12,9 +12,9 @@ use actix_web::{HttpResponse, get, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
-        web::scope("tag")
+        utoipa_actix_web::scope("/tag")
             .service(category_list)
             .service(loader_list)
             .service(game_version_list)
@@ -27,7 +27,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
 pub struct CategoryData {
     pub icon: String,
     pub name: String,
@@ -35,7 +35,19 @@ pub struct CategoryData {
     pub header: String,
 }
 
-#[get("category")]
+/// Get the list of project categories.
+#[utoipa::path(
+    get,
+    operation_id = "categoryList",
+    responses(
+        (
+            status = 200,
+            description = "Expected response to a valid request",
+            body = Vec<CategoryData>
+        )
+    )
+)]
+#[get("/category")]
 pub async fn category_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -62,14 +74,26 @@ pub async fn category_list(
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
 pub struct LoaderData {
     pub icon: String,
     pub name: String,
     pub supported_project_types: Vec<String>,
 }
 
-#[get("loader")]
+/// Get the list of loaders.
+#[utoipa::path(
+    get,
+    operation_id = "loaderList",
+    responses(
+        (
+            status = 200,
+            description = "Expected response to a valid request",
+            body = Vec<LoaderData>
+        )
+    )
+)]
+#[get("/loader")]
 pub async fn loader_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -116,7 +140,7 @@ pub async fn loader_list(
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
 pub struct GameVersionQueryData {
     pub version: String,
     pub version_type: String,
@@ -124,14 +148,38 @@ pub struct GameVersionQueryData {
     pub major: bool,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, utoipa::ToSchema)]
 pub struct GameVersionQuery {
     #[serde(rename = "type")]
     type_: Option<String>,
     major: Option<bool>,
 }
 
-#[get("game_version")]
+/// Get the list of game versions.
+#[utoipa::path(
+    get,
+    operation_id = "versionList",
+    params(
+        (
+            "type" = Option<String>,
+            Query,
+            description = "Optional game version type filter"
+        ),
+        (
+            "major" = Option<bool>,
+            Query,
+            description = "Whether to return only major versions"
+        )
+    ),
+    responses(
+        (
+            status = 200,
+            description = "Expected response to a valid request",
+            body = Vec<GameVersionQueryData>
+        )
+    )
+)]
+#[get("/game_version")]
 pub async fn game_version_list(
     pool: web::Data<PgPool>,
     query: web::Query<GameVersionQuery>,
@@ -185,13 +233,25 @@ pub async fn game_version_list(
     )
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct License {
     pub short: String,
     pub name: String,
 }
 
-#[get("license")]
+/// Get SPDX license identifiers and names.
+#[utoipa::path(
+    get,
+    operation_id = "licenseList",
+    responses(
+        (
+            status = 200,
+            description = "Expected response to a valid request",
+            body = Vec<License>
+        )
+    )
+)]
+#[get("/license")]
 pub async fn license_list() -> HttpResponse {
     let response = v3::tags::license_list().await;
 
@@ -212,13 +272,27 @@ pub async fn license_list() -> HttpResponse {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct LicenseText {
     pub title: String,
     pub body: String,
 }
 
-#[get("license/{id}")]
+/// Get full license text by SPDX ID.
+#[utoipa::path(
+    get,
+    operation_id = "licenseText",
+    params(("id" = String, Path, description = "The license ID to get the text for")),
+    responses(
+        (
+            status = 200,
+            description = "Expected response to a valid request",
+            body = LicenseText
+        ),
+        (status = 400, description = "Request was invalid, see given error")
+    )
+)]
+#[get("/license/{id}")]
 pub async fn license_text(
     params: web::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
@@ -240,7 +314,9 @@ pub async fn license_text(
     )
 }
 
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug)]
+#[derive(
+    serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, utoipa::ToSchema,
+)]
 pub struct DonationPlatformQueryData {
     // The difference between name and short is removed in v3.
     // Now, the 'id' becomes the name, and the 'name' is removed (the frontend uses the id as the name)
@@ -249,7 +325,19 @@ pub struct DonationPlatformQueryData {
     pub name: String,
 }
 
-#[get("donation_platform")]
+/// Get available donation platforms.
+#[utoipa::path(
+    get,
+    operation_id = "donationPlatformList",
+    responses(
+        (
+            status = 200,
+            description = "Expected response to a valid request",
+            body = Vec<DonationPlatformQueryData>
+        )
+    )
+)]
+#[get("/donation_platform")]
 pub async fn donation_platform_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -295,7 +383,19 @@ pub async fn donation_platform_list(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[get("report_type")]
+/// Get valid report types.
+#[utoipa::path(
+    get,
+    operation_id = "reportTypeList",
+    responses(
+        (
+            status = 200,
+            description = "Expected response to a valid request",
+            body = Vec<String>
+        )
+    )
+)]
+#[get("/report_type")]
 pub async fn report_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -306,7 +406,19 @@ pub async fn report_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-#[get("project_type")]
+/// Get valid project types.
+#[utoipa::path(
+    get,
+    operation_id = "projectTypeList",
+    responses(
+        (
+            status = 200,
+            description = "Expected response to a valid request",
+            body = Vec<String>
+        )
+    )
+)]
+#[get("/project_type")]
 pub async fn project_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -317,7 +429,19 @@ pub async fn project_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-#[get("side_type")]
+/// Get valid side-type values.
+#[utoipa::path(
+    get,
+    operation_id = "sideTypeList",
+    responses(
+        (
+            status = 200,
+            description = "Expected response to a valid request",
+            body = Vec<String>
+        )
+    )
+)]
+#[get("/side_type")]
 pub async fn side_type_list() -> Result<HttpResponse, ApiError> {
     // Original side types are no longer reflected in the database.
     // Therefore, we hardcode and return all the fields that are supported by our v2 conversion logic.

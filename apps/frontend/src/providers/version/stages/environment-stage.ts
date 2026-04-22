@@ -9,7 +9,7 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-environment',
 	stageContent: markRaw(EnvironmentStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit environment' : 'Environment'),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit version' : 'Environment'),
 	skip: (ctx) =>
 		ctx.noEnvironmentProject.value ||
 		(!ctx.editingVersion.value && !!ctx.inferredVersionData.value?.environment) ||
@@ -33,7 +33,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'from-details-environment',
 	stageContent: markRaw(EnvironmentStage),
-	title: 'Edit environment',
+	title: 'Edit version',
 	nonProgressStage: true,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',

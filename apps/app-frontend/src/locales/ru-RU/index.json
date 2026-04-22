@@ -5,23 +5,56 @@
   "app.auth-servers.unreachable.header": {
     "message": "Нет связи с серверами аутентификации"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Добавить сервер в сборку"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Добавление серверов в сборку"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Добавить в сборку"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Добавить в {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Добавлено"
+  },
+  "app.browse.already-added": {
+    "message": "Уже добавлено"
+  },
+  "app.browse.discover-content": {
+    "message": "Поиск проектов"
+  },
+  "app.browse.discover-servers": {
+    "message": "Поиск серверов"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Скрывать добавленные"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Скрывать установленные"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Установка контента в сборку"
+  },
   "app.export-modal.description-placeholder": {
-    "message": "Введите описание сборки модов..."
+    "message": "Введите описание сборки..."
   },
   "app.export-modal.export-button": {
     "message": "Экспортировать"
   },
   "app.export-modal.header": {
-    "message": "Экспортировать сборку модов"
+    "message": "Экспорт сборки"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Название сборки модов"
+    "message": "Название сборки"
   },
   "app.export-modal.modpack-name-placeholder": {
-    "message": "Название сборки модов"
+    "message": "Название сборки"
   },
   "app.export-modal.select-files-label": {
-    "message": "Выберите файлы и папки для добавления в пак"
+    "message": "Выберите файлы и папки для экспорта"
   },
   "app.export-modal.version-number-label": {
     "message": "Номер версии"
@@ -30,55 +63,91 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Все данные вашей установки будут окончательно удалены, включая ваши миры, настройки и весь установленный контент."
+    "message": "Все данные сборки будут удалены навсегда, в том числе миры, настройки и весь установленный контент."
   },
   "app.instance.confirm-delete.admonition-header": {
-    "message": "Это действие не может быть возвращено"
+    "message": "Это действие необратимо"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Удалить установку"
+    "message": "Удалить сборку"
   },
   "app.instance.confirm-delete.header": {
-    "message": "Удалить установку"
+    "message": "Удаление сборки"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Выбранное содержимое уже установлено в сборке <bold>{instanceName}</bold>. Создать копию?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Создать"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Содержимое уже установлено"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Сборка"
   },
   "app.instance.mods.content-type-project": {
     "message": "проект"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Скопировать ссылку"
-  },
-  "app.instance.mods.installing": {
-    "message": "Установка..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Сборка"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" был добавлен"
   },
   "app.instance.mods.projects-were-added": {
-    "message": "{count} проектов были добавлены"
+    "message": "{count} Проектов было добавлено"
   },
   "app.instance.mods.share-text": {
-    "message": "Посмотрите проекты, которые я использую в моей сборке модов!"
+    "message": "Что в моей сборке:"
   },
   "app.instance.mods.share-title": {
-    "message": "Поделится контентом сборки модов"
-  },
-  "app.instance.mods.show-file": {
-    "message": "Показать файл"
+    "message": "Содержимое сборки"
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Успешно загружено"
   },
-  "app.instance.mods.switch-version": {
-    "message": "Сменить версию"
+  "app.instance.worlds.add-server": {
+    "message": "Добавить сервер"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "Неизвестная"
+  "app.instance.worlds.browse-servers": {
+    "message": "Найти серверы"
   },
-  "app.instance.mods.updating": {
-    "message": "Обновление..."
+  "app.instance.worlds.delete-world-description": {
+    "message": "«{name}» будет **удалён навсегда**. Его невозможно восстановить."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Вы действительно хотите удалить этот мир?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Модовые"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Не в сети"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "В сети"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Ванильные"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Добавьте или найдите сервер"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Нет серверов и миров"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "«{name}» будет удалён из списка — в том числе в игре. Его невозможно восстановить."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "«{name}» ({address}) будет удалён из списка — в том числе в игре. Его невозможно восстановить."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Вы действительно хотите удалить {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Поиск по {count, plural, one {# миру} other {# мирам}}..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "этот сервер"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Требуется дополнительный контент"
@@ -127,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Предустановки"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Флаги функций"
   },
   "app.settings.tabs.java-installations": {
     "message": "Установки Java"
@@ -185,6 +251,24 @@
   "app.update.reload-to-update": {
     "message": "Перезапустить и обновить"
   },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Выберите вариант"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Несовместимая версия {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Ни разу не сыграно"
+  },
+  "app.world.world-item.offline": {
+    "message": "Не в сети"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} в игре"
+  },
   "friends.action.add-friend": {
     "message": "Добавить в друзья"
   },
@@ -207,7 +291,7 @@
     "message": "Какое имя у друга на Modrinth?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Добавьте друзей</link>, чтобы видеть, во что они играют!"
+    "message": "<link>Добавьте друзей</link> и следите за ними!"
   },
   "friends.friend.cancel-request": {
     "message": "Отменить запрос"
@@ -246,7 +330,7 @@
     "message": "{title} — {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Войдите в аккаунт Modrinth</link>, чтобы добавлять друзей и видеть, во что они играют!"
+    "message": "<link>Войдите в аккаунт Modrinth</link>, чтобы добавлять друзей и следить за ними!"
   },
   "instance.add-server.add-and-play": {
     "message": "Добавить и играть"
@@ -284,6 +368,12 @@
   "instance.edit-world.title": {
     "message": "Настройка мира"
   },
+  "instance.files.adding-files": {
+    "message": "Добавление файлов ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Сохранить как..."
+  },
   "instance.server-modal.address": {
     "message": "Адрес"
   },
@@ -306,7 +396,7 @@
     "message": "Удалить сборку"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Навсегда удаляет сборку с вашего устройства, включая миры, настройки и весь установленный контент. Учтите, что после удаления сборки восстановить её будет невозможно."
+    "message": "Навсегда удаляет сборку с устройства, в том числе миры, настройки и весь установленный контент. Учтите, что после удаления сборки её невозможно восстановить."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Удаление..."
@@ -342,7 +432,7 @@
     "message": "Создать новую группу"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Разделение по группам позволяет организовать сборки по разным разделам в библиотеке."
+    "message": "Позволяет организовать сборки по разным разделам в библиотеке."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "Введите название группы"
@@ -455,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Не показывать на главной"
   },
-  "instance.worlds.filter.available": {
-    "message": "Доступно"
-  },
   "instance.worlds.game_already_open": {
     "message": "Сборка уже запущена"
   },
@@ -482,12 +569,6 @@
   "instance.worlds.play_instance": {
     "message": "Запустить сборку"
   },
-  "instance.worlds.type.server": {
-    "message": "Сервер"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Одиночная игра"
-  },
   "instance.worlds.view_instance": {
     "message": "Посмотреть сборку"
   },
@@ -510,7 +591,7 @@
     "message": "Управляется сервером"
   },
   "search.filter.locked.server-environment.title": {
-    "message": "В серверную сборку можно добавлять только моды для клиента"
+    "message": "В серверной сборке доступны только клиентские моды"
   },
   "search.filter.locked.server-game-version.title": {
     "message": "Версия игры управляется сервером"

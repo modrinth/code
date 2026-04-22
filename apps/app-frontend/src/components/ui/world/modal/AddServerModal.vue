@@ -5,12 +5,11 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
 
-import InstanceModalTitlePrefix from '@/components/ui/modal/InstanceModalTitlePrefix.vue'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
 import type { GameInstance } from '@/helpers/types'
 import { add_server_to_profile, type ServerPackStatus, type ServerWorld } from '@/helpers/worlds.ts'
@@ -26,10 +25,10 @@ const props = defineProps<{
 	instance: GameInstance
 }>()
 
-const modal = ref()
+const modal = ref<InstanceType<typeof NewModal>>()
 
-const name = ref()
-const address = ref()
+const name = ref('')
+const address = ref('')
 const resourcePack = ref<ServerPackStatus>('enabled')
 
 async function addServer(play: boolean) {
@@ -60,11 +59,11 @@ function show() {
 	name.value = ''
 	address.value = ''
 	resourcePack.value = 'enabled'
-	modal.value.show()
+	modal.value?.show()
 }
 
 function hide() {
-	modal.value.hide()
+	modal.value?.hide()
 }
 
 const messages = defineMessages({
@@ -85,37 +84,33 @@ const messages = defineMessages({
 defineExpose({ show, hide })
 </script>
 <template>
-	<ModalWrapper ref="modal">
-		<template #title>
-			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
-				<InstanceModalTitlePrefix :instance="instance" />
-				<span class="font-extrabold text-contrast">{{ formatMessage(messages.title) }}</span>
-			</span>
-		</template>
+	<NewModal ref="modal" :header="formatMessage(messages.title)" width="500px" max-width="500px">
 		<ServerModalBody
 			v-model:name="name"
 			v-model:address="address"
 			v-model:resource-pack="resourcePack"
 		/>
-		<div class="flex gap-2 mt-4">
-			<ButtonStyled color="brand">
-				<button :disabled="!address" @click="addServer(true)">
-					<PlayIcon />
-					{{ formatMessage(messages.addAndPlay) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button :disabled="!address" @click="addServer(false)">
-					<PlusIcon />
-					{{ formatMessage(messages.addServer) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button @click="hide()">
-					<XIcon />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
-		</div>
-	</ModalWrapper>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button class="!border !border-surface-4" @click="hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button :disabled="!address" @click="addServer(false)">
+						<PlusIcon />
+						{{ formatMessage(messages.addServer) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!address" @click="addServer(true)">
+						<PlayIcon />
+						{{ formatMessage(messages.addAndPlay) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 </template>

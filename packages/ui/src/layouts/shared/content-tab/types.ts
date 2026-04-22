@@ -21,6 +21,8 @@ export interface ContentOwner {
 	link?: string | RouteLocationRaw | (() => void)
 }
 
+export type ClientWarningType = 'retained' | 'depends' | 'environment'
+
 export interface ContentCardTableItem {
 	id: string
 	project: ContentCardProject
@@ -33,6 +35,8 @@ export interface ContentCardTableItem {
 	installing?: boolean
 	hasUpdate?: boolean
 	isClientOnly?: boolean
+	clientWarning?: ClientWarningType | null
+	hideSwitchVersion?: boolean
 	overflowOptions?: OverflowMenuOption[]
 }
 
@@ -53,13 +57,19 @@ export interface ContentItem extends Omit<
 	update_version_id: string | null
 	date_added?: string
 	environment?: string
+	pack_client_retained?: boolean
+	pack_client_depends?: boolean
 	installing?: boolean
 }
 
 export type ContentModpackCardProject = Pick<
 	Labrinth.Projects.v2.Project,
-	'id' | 'slug' | 'title' | 'icon_url' | 'description' | 'downloads' | 'followers'
->
+	'id' | 'slug' | 'title' | 'icon_url' | 'description'
+> & {
+	downloads?: number | null
+	followers?: number | null
+	filename?: string | null
+}
 
 export type ContentModpackCardVersion = Pick<
 	Labrinth.Versions.v2.Version,

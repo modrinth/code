@@ -1,5 +1,15 @@
 <template>
 	<KeybindsModal ref="keybindsModal" />
+	<ConfirmModal
+		v-if="lockStatus?.locked && !lockStatus?.isOwnLock"
+		ref="takeOverModal"
+		title="Override moderation lock"
+		description="Are you sure you want to override?"
+		:has-to-type="false"
+		:markdown="false"
+		proceed-label="Take over"
+		@proceed="confirmTakeOverOverride"
+	/>
 	<div
 		tabindex="0"
 		class="moderation-checklist flex w-[600px] max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
@@ -60,7 +70,7 @@
 						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
-							<ButtonStyled v-if="lockStatus.expired" @click="retryAcquireLock">
+							<ButtonStyled @click="openTakeOverModal">
 								<button>
 									<LockIcon aria-hidden="true" />
 									Take over
@@ -384,13 +394,7 @@
 										</button>
 									</ButtonStyled>
 
-									<template
-										v-for="opt in stageOptions.filter(
-											(opt) => 'id' in opt && 'text' in opt && 'icon' in opt,
-										)"
-										#[opt.id]
-										:key="opt.id"
-									>
+									<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
 										<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
 										{{ opt.text }}
 									</template>
@@ -466,6 +470,7 @@ import {
 	ButtonStyled,
 	Checkbox,
 	Collapsible,
+	ConfirmModal,
 	DropdownSelect,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -486,6 +491,7 @@ import { computedAsync, useDebounceFn, useLocalStorage } from '@vueuse/core'
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
+import type { LockAcquireResponse } from '~/store/moderation.ts'
 import { useModerationStore } from '~/store/moderation.ts'
 
 import KeybindsModal from './ChecklistKeybindsModal.vue'
@@ -496,6 +502,7 @@ const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
+const takeOverModal = ref<InstanceType<typeof ConfirmModal>>()
 
 const props = defineProps<{
 	collapsed: boolean
@@ -511,6 +518,7 @@ const lockStatus = ref<{
 	locked: boolean
 	lockedBy?: { id: string; username: string; avatar_url?: string }
 	lockedAt?: Date
+	expiresAt?: Date
 	expired?: boolean
 	isOwnLock: boolean
 } | null>(null)
@@ -536,13 +544,15 @@ const PREFETCH_STALE_MS = 30_000 // 30 seconds
 const PREFETCH_TARGET_COUNT = 3 // Keep 3 unlocked projects ready
 const PREFETCH_BATCH_SIZE = 5 // Check 5 at a time in parallel
 
-const LOCK_EXPIRY_MINUTES = 15
-
-function handleVisibilityChange() {
+async function handleVisibilityChange() {
 	if (document.visibilityState === 'visible' && lockStatus.value?.isOwnLock) {
 		// Immediately refresh the lock when returning to the tab
 		// This handles cases where the heartbeat was throttled while backgrounded
-		moderationStore.refreshLock()
+		const refreshResult = await moderationStore.refreshLock()
+		if (!refreshResult.success) {
+			handleLockLost(refreshResult)
+			return
+		}
 		// Refresh prefetch queue when tab becomes visible (not debounced)
 		maintainPrefetchQueue()
 	}
@@ -555,7 +565,9 @@ function updateLockCountdown() {
 	}
 
 	const lockedAt = new Date(lockStatus.value.lockedAt)
-	const expiresAt = new Date(lockedAt.getTime() + LOCK_EXPIRY_MINUTES * 60 * 1000)
+	const expiresAt = lockStatus.value.expiresAt
+		? new Date(lockStatus.value.expiresAt)
+		: new Date(lockedAt.getTime() + 15 * 60 * 1000)
 	const now = new Date()
 	const remainingMs = expiresAt.getTime() - now.getTime()
 
@@ -582,10 +594,45 @@ function clearLockCountdown() {
 function startLockHeartbeat() {
 	lockCheckInterval.value = setInterval(
 		async () => {
-			await moderationStore.refreshLock()
+			const result = await moderationStore.refreshLock()
+			if (!result.success) {
+				handleLockLost(result)
+			}
 		},
 		5 * 60 * 1000,
 	)
+}
+
+function handleLockLost(result: LockAcquireResponse) {
+	clearInterval(lockCheckInterval.value!)
+	lockCheckInterval.value = null
+	clearLockCountdown()
+
+	lockStatus.value = {
+		locked: result.locked_by != null,
+		lockedBy: result.locked_by,
+		lockedAt: result.locked_at ? new Date(result.locked_at) : undefined,
+		expiresAt: result.expires_at ? new Date(result.expires_at) : undefined,
+		expired: result.expired,
+		isOwnLock: false,
+	}
+	lockError.value = false
+
+	if (result.locked_by) {
+		addNotification({
+			title: 'Lock taken over',
+			text: `@${result.locked_by.username} is now moderating this project.`,
+			type: 'warning',
+		})
+		updateLockCountdown()
+		lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
+	} else {
+		addNotification({
+			title: 'Moderation lock lost',
+			text: 'Your lock on this project has expired. Acquire the lock again to continue.',
+			type: 'warning',
+		})
+	}
 }
 
 function handleLockAcquired() {
@@ -713,28 +760,36 @@ async function handleExit() {
 	emit('exit')
 }
 
-async function retryAcquireLock() {
+function openTakeOverModal() {
+	takeOverModal.value?.show()
+}
+
+async function confirmTakeOverOverride() {
 	const projectId = projectV2.value?.id
 	if (!projectId) {
-		console.warn('[retryAcquireLock] No project ID available')
+		console.warn('[confirmTakeOverOverride] No project ID available')
 		return
 	}
-	const result = await moderationStore.acquireLock(projectId)
+	const result = await moderationStore.overrideLock(projectId)
 
 	if (result.success) {
+		addNotification({
+			title: 'Moderation lock overridden',
+			text: 'You are now moderating this project.',
+			type: 'success',
+		})
 		handleLockAcquired()
 	} else if (result.locked_by) {
-		// Still locked by another moderator, update status
 		lockStatus.value = {
 			locked: true,
 			lockedBy: result.locked_by,
 			lockedAt: result.locked_at ? new Date(result.locked_at) : undefined,
+			expiresAt: result.expires_at ? new Date(result.expires_at) : undefined,
 			expired: result.expired,
 			isOwnLock: false,
 		}
 		lockError.value = false
 
-		// Restart countdown timer
 		updateLockCountdown()
 		if (!lockCountdownInterval.value) {
 			lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
@@ -764,25 +819,21 @@ async function batchCheckLocksWithMetadata(
 	projectIds: string[],
 ): Promise<Map<string, LockCheckResult>> {
 	const results = new Map<string, LockCheckResult>()
-	const currentUserId = (auth.value?.user as { id?: string } | null)?.id
 
 	// Check locks and fetch minimal project data in parallel
 	const checks = await Promise.allSettled(
 		projectIds.map(async (id) => {
 			// Parallel: check lock AND fetch project metadata
-			const [lockStatus, projectData] = await Promise.all([
+			const [lockResponse, projectData] = await Promise.all([
 				moderationStore.checkLock(id),
 				useBaseFetch(`project/${id}`, { method: 'GET' }).catch(() => null),
 			])
 
-			// Check if lock is by the current user (own lock = can acquire)
-			const isOwnLock = lockStatus.locked_by?.id === currentUserId
-
 			return {
 				id,
-				locked: lockStatus.locked,
-				expired: lockStatus.expired,
-				isOwnLock,
+				locked: lockResponse.locked,
+				expired: lockResponse.expired,
+				isOwnLock: lockResponse.is_own_lock,
 				slug: (projectData as { slug?: string })?.slug,
 				projectType: (projectData as { project_type?: string })?.project_type,
 			}
@@ -1187,6 +1238,7 @@ watch(currentStage, () => {
 
 onMounted(async () => {
 	window.addEventListener('keydown', handleKeybinds)
+	window.addEventListener('beforeunload', handleBeforeUnload)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('left')
 
@@ -1220,6 +1272,7 @@ onMounted(async () => {
 			locked: true,
 			lockedBy: result.locked_by,
 			lockedAt: result.locked_at ? new Date(result.locked_at) : undefined,
+			expiresAt: result.expires_at ? new Date(result.expires_at) : undefined,
 			expired: result.expired,
 			isOwnLock: false,
 		}
@@ -1233,7 +1286,25 @@ onMounted(async () => {
 	}
 })
 
+function handleBeforeUnload() {
+	const projectId = projectV2.value?.id
+	if (!projectId || !lockStatus.value?.isOwnLock) return
+
+	const config = useRuntimeConfig()
+	const base = config.public.apiBaseUrl.replace(/\/v\d\/?$/, '/_internal/')
+	const token = (auth as unknown as { value?: { token?: string } }).value?.token
+	if (!token) return
+
+	// sendBeacon is POST-only and cannot set Authorization. The internal POST /release endpoint
+	// accepts the same token as text/plain (matches useBaseFetch's Authorization value).
+	void navigator.sendBeacon(
+		`${base}moderation/lock/${projectId}/release`,
+		new Blob([token], { type: 'text/plain' }),
+	)
+}
+
 onUnmounted(() => {
+	window.removeEventListener('beforeunload', handleBeforeUnload)
 	window.removeEventListener('keydown', handleKeybinds)
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('right')
@@ -1242,6 +1313,12 @@ onUnmounted(() => {
 		clearInterval(lockCheckInterval.value)
 	}
 	clearLockCountdown()
+
+	// Release lock if we own it (navigation away without explicit exit)
+	const projectId = projectV2.value?.id
+	if (projectId && lockStatus.value?.isOwnLock) {
+		moderationStore.releaseLock(projectId)
+	}
 
 	// Clear prefetch state to prevent memory leaks
 	prefetchQueue.value = []
@@ -1891,9 +1968,10 @@ async function sendMessage(status: ProjectStatus) {
 
 		const willHaveNext = moderationStore.completeCurrentProject(projectId, 'completed')
 
-		moderationStore.releaseLock(projectId).catch((err) => {
-			console.warn('Failed to release lock:', err)
-		})
+		await Promise.race([
+			moderationStore.releaseLock(projectId),
+			new Promise((r) => setTimeout(r, 2000)),
+		])
 
 		// Set both states together - hasNextProject MUST be set before done
 		// to avoid the race condition where done=true renders with hasNextProject=false
@@ -2021,9 +2099,10 @@ async function skipCurrentProject() {
 		return
 	}
 
-	moderationStore.releaseLock(projectId).catch((err) => {
-		console.warn('Failed to release lock:', err)
-	})
+	await Promise.race([
+		moderationStore.releaseLock(projectId),
+		new Promise((r) => setTimeout(r, 2000)),
+	])
 
 	hasNextProject.value = moderationStore.completeCurrentProject(projectId, 'skipped')
 
@@ -2089,6 +2168,12 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
 
 	return options
 })
+
+type StageOverflowSlotOption = OverflowMenuOption & { id: string; text: string }
+
+const stageOptionsForSlots = computed(() =>
+	stageOptions.value.filter((opt): opt is StageOverflowSlotOption => 'id' in opt && 'text' in opt),
+)
 </script>
 
 <style scoped lang="scss">

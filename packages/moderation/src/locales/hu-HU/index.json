@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "Adj hozzá egy ikont"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Add hozzá az IP címet és portot, amit a Java Edition játékosok használhatnak, hogy fellépjenek a szerveredre."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Adj hozzá egy Java Címet"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Adj meg minden releváns, a Modrinthon kívüli linket, például egy weboldalt, boltot vagy Discord-meghívót."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Adj hozzá külső linkeket"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Adj hozzá bármilyen releváns linket, amely a Modrinthon kívülre visz, mint például a forráskód, hibajelentő oldal vagy Discord meghívó."
   },
@@ -24,7 +36,7 @@
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "A leírásod {length} olvasható karakter hosszú. Egy világos és informatív leíráshoz legalább {minChars} karakter ajánlott."
+    "defaultMessage": "A jelenlegi leírás {length} olvasható karakter hosszú. Egy világos és informatív leíráshoz legalább {minChars} karakter ajánlott."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Fejtsd ki a leírást"
@@ -45,19 +57,25 @@
     "defaultMessage": "Cím szerkesztése"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "A kiemelt galériakép gyakran az első benyomást kelti a projektről."
+    "defaultMessage": "A kiemelt kép gyakran az első benyomást kelti a projektről."
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "Emelj ki egy galériaképet"
+    "defaultMessage": "Emelj ki egy képet"
   },
   "nags.gallery.title": {
-    "defaultMessage": "Látogasd meg a Galéria fület"
+    "defaultMessage": "Látogasd meg a Képek fület"
   },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "A {type, select, mod {mod} plugin {bővítmény} other {projekt}} licensze megköveteli, hogy a forráskód elérhető legyen. Kérünk, minden további verzióhoz adj meg forráskód linket vagy forrásfájlt, vagy fontold meg egy másik licensz használatát."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Adj meg egy forráskódot"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Úgy tűnik, hogy néhány külső hivatkozásod megegyezik. Minden hivatkozást csak egyszer szabad megadni, és a megfelelő hivatkozástípussal kell ellátni."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Azonos hivatkozások"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "A leírásnak elegendő mennyiségű egyszerű szöveget vagy képhelyettesítő szöveget kell tartalmaznia, hogy a képernyőolvasókat használók vagy lassú internetkapcsolattal rendelkezők számára is hozzáférhető legyen."
@@ -122,6 +140,15 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Válaszd ki, hogy a szervered mely verziókat támogatja, válassz egy modcsomagot, vagy tölts fel sajátot."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Kompatibilitás kiválasztása"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Tudasd a játékosokkal, hogy melyik régióban található a szervered."
+  },
   "nags.select-country.title": {
     "defaultMessage": "Régió választása"
   },
@@ -174,7 +201,7 @@
     "defaultMessage": "Tisztítsd meg az összegzést"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Az összegzés {length} karakter hosszú. Egy informatív és figyelemfelkeltő összegzéshez legalább {minChars} karakter ajánlott."
+    "defaultMessage": "A jelenlegi összegzés {length} karakter hosszú. Egy informatív és figyelemfelkeltő összegzéshez legalább {minChars} karakter ajánlott."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Fejtsd ki az összegzést"
@@ -198,10 +225,10 @@
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Legalább egy galériakép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és helyi csomagokat. Ha ez jellemzi a csomagodat, kérünk válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
+    "defaultMessage": "Legalább egy kép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és helyi csomagokat. Ha ez jellemzi a csomagodat, kérünk válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
   },
   "nags.upload-gallery-image.title": {
-    "defaultMessage": "Tölts fel egy galériaképet"
+    "defaultMessage": "Tölts fel egy képet"
   },
   "nags.upload-version.description": {
     "defaultMessage": "Legalább egy verzió szükséges a projekt felülvizsgálatra történő benyújtásához."

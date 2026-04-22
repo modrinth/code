@@ -22,9 +22,11 @@ const { instance } = injectInstanceSettings()
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
 const overrideHooks = ref(
-	!!instance.hooks.pre_launch || !!instance.hooks.wrapper || !!instance.hooks.post_exit,
+	!!instance.value.hooks.pre_launch ||
+		!!instance.value.hooks.wrapper ||
+		!!instance.value.hooks.post_exit,
 )
-const hooks = ref(instance.hooks ?? globalSettings.hooks)
+const hooks = ref(instance.value.hooks ?? globalSettings.hooks)
 
 const editProfileObject = computed(() => {
 	const editProfile: {
@@ -40,7 +42,7 @@ const editProfileObject = computed(() => {
 watch(
 	[overrideHooks, hooks],
 	async () => {
-		await edit(instance.path, editProfileObject.value)
+		await edit(instance.value.path, editProfileObject.value)
 	},
 	{ deep: true },
 )
@@ -99,57 +101,57 @@ const messages = defineMessages({
 
 <template>
 	<div>
-		<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
+		<h2 class="m-0 m-0 text-lg font-semibold text-contrast">
 			{{ formatMessage(messages.hooks) }}
 		</h2>
+		<Checkbox v-model="overrideHooks" :label="formatMessage(messages.customHooks)" class="my-2.5" />
 		<p class="m-0">
 			{{ formatMessage(messages.hooksDescription) }}
 		</p>
-		<Checkbox v-model="overrideHooks" :label="formatMessage(messages.customHooks)" class="mt-2" />
 
-		<h2 class="mt-2 mb-1 text-lg font-extrabold text-contrast">
+		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
 			{{ formatMessage(messages.preLaunch) }}
 		</h2>
-		<p class="m-0">
-			{{ formatMessage(messages.preLaunchDescription) }}
-		</p>
 		<StyledInput
 			id="pre-launch"
 			v-model="hooks.pre_launch"
 			autocomplete="off"
 			:disabled="!overrideHooks"
 			:placeholder="formatMessage(messages.preLaunchEnter)"
-			wrapper-class="w-full mt-2"
+			wrapper-class="w-full my-2.5"
 		/>
+		<p class="m-0">
+			{{ formatMessage(messages.preLaunchDescription) }}
+		</p>
 
-		<h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast">
+		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
 			{{ formatMessage(messages.wrapper) }}
 		</h2>
-		<p class="m-0">
-			{{ formatMessage(messages.wrapperDescription) }}
-		</p>
 		<StyledInput
 			id="wrapper"
 			v-model="hooks.wrapper"
 			autocomplete="off"
 			:disabled="!overrideHooks"
 			:placeholder="formatMessage(messages.wrapperEnter)"
-			wrapper-class="w-full mt-2"
+			wrapper-class="w-full my-2.5"
 		/>
+		<p class="m-0">
+			{{ formatMessage(messages.wrapperDescription) }}
+		</p>
 
-		<h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast">
+		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
 			{{ formatMessage(messages.postExit) }}
 		</h2>
-		<p class="m-0">
-			{{ formatMessage(messages.postExitDescription) }}
-		</p>
 		<StyledInput
 			id="post-exit"
 			v-model="hooks.post_exit"
 			autocomplete="off"
 			:disabled="!overrideHooks"
 			:placeholder="formatMessage(messages.postExitEnter)"
-			wrapper-class="w-full mt-2"
+			wrapper-class="w-full my-2.5"
 		/>
+		<p class="m-0">
+			{{ formatMessage(messages.postExitDescription) }}
+		</p>
 	</div>
 </template>

@@ -9,7 +9,7 @@ const statusAlerts: Stage = {
 	icon: TriangleAlertIcon,
 	text: async () => (await import('../messages/checklist-text/status-alerts/text.md?raw')).default,
 	guidance_url:
-		'https://www.notion.so/Project-Modification-Guidelines-22e5ee711bf080628416f0471ba6af02',
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6',
 	navigate: '/moderation',
 	actions: [
 		{

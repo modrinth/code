@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Toggle } from '@modrinth/ui'
+import { ButtonStyled, Toggle } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
@@ -25,17 +25,28 @@ watch(
 )
 </script>
 <template>
-	<div v-for="option in options" :key="option" class="mt-4 flex items-center justify-between">
-		<div>
-			<h2 class="m-0 text-lg font-extrabold text-contrast capitalize">
-				{{ option.replaceAll('_', ' ') }}
-			</h2>
+	<div class="flex flex-col gap-2.5 min-w-[600px]">
+		<div v-for="option in options" :key="option" class="flex items-center justify-between">
+			<div>
+				<h2 class="m-0 text-lg font-semibold text-contrast capitalize">
+					{{ option.replaceAll('_', ' ') }}
+				</h2>
+			</div>
+			<div class="flex items-center gap-2">
+				<ButtonStyled type="transparent">
+					<button
+						:disabled="themeStore.getFeatureFlag(option) === DEFAULT_FEATURE_FLAGS[option]"
+						@click="setFeatureFlag(option, DEFAULT_FEATURE_FLAGS[option])"
+					>
+						Reset to default
+					</button>
+				</ButtonStyled>
+				<Toggle
+					id="advanced-rendering"
+					:model-value="themeStore.getFeatureFlag(option)"
+					@update:model-value="() => setFeatureFlag(option, !themeStore.getFeatureFlag(option))"
+				/>
+			</div>
 		</div>
-
-		<Toggle
-			id="advanced-rendering"
-			:model-value="themeStore.getFeatureFlag(option)"
-			@update:model-value="() => setFeatureFlag(option, !themeStore.getFeatureFlag(option))"
-		/>
 	</div>
 </template>

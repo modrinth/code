@@ -20,6 +20,13 @@
 								icon: LanguagesIcon,
 								badge: `${formatMessage(commonMessages.beta)}`,
 							},
+							flags.developerMode
+								? {
+										link: '/settings/flags',
+										label: formatMessage(commonSettingsMessages.featureFlags),
+										icon: ToggleRightIcon,
+									}
+								: null,
 							auth.user ? { type: 'heading', label: formatMessage(messages.account) } : null,
 							auth.user
 								? {
@@ -91,6 +98,7 @@ import {
 	PaintbrushIcon,
 	ServerIcon,
 	ShieldIcon,
+	ToggleRightIcon,
 	UserIcon,
 } from '@modrinth/assets'
 import { commonMessages, commonSettingsMessages, defineMessages, useVIntl } from '@modrinth/ui'
@@ -116,6 +124,7 @@ const messages = defineMessages({
 
 const route = useNativeRoute()
 const auth = await useAuth()
+const flags = useFeatureFlags()
 
 useSeoMeta({
 	robots: 'noindex',

@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "Anulează"
   },
+  "button.change-version": {
+    "defaultMessage": "Schimbă versiunea"
+  },
   "button.clear": {
     "defaultMessage": "Șterge"
   },
@@ -65,8 +68,17 @@
   "button.continue": {
     "defaultMessage": "Continuă"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Copiază denumirea"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Copiază locatia completă"
+  },
   "button.copy-id": {
     "defaultMessage": "Copiază ID-ul"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Copiază linkul"
   },
   "button.copy-permalink": {
     "defaultMessage": "Copiază link-ul permanent"
@@ -77,6 +89,9 @@
   "button.decline": {
     "defaultMessage": "Refuză"
   },
+  "button.disable": {
+    "defaultMessage": "Deazactivează"
+  },
   "button.download": {
     "defaultMessage": "Descarcă"
   },
@@ -86,8 +101,17 @@
   "button.edit": {
     "defaultMessage": "Editează"
   },
+  "button.enable": {
+    "defaultMessage": "Activează"
+  },
+  "button.extract": {
+    "defaultMessage": "Extrage"
+  },
   "button.follow": {
     "defaultMessage": "Urmărește"
+  },
+  "button.hide-snapshots": {
+    "defaultMessage": "Ascunde snapshoturile"
   },
   "button.max": {
     "defaultMessage": "Maxim"
@@ -95,11 +119,17 @@
   "button.more-options": {
     "defaultMessage": "Mai multe opțiuni"
   },
+  "button.move": {
+    "defaultMessage": "Mută"
+  },
   "button.next": {
     "defaultMessage": "Următorul"
   },
   "button.open-folder": {
     "defaultMessage": "Deschide folder-ul"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Deschide în folder"
   },
   "button.play": {
     "defaultMessage": "Joacă"
@@ -107,17 +137,32 @@
   "button.refresh": {
     "defaultMessage": "Reîmprospătează"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Reinstalează modpackul"
+  },
   "button.remove": {
     "defaultMessage": "Elimină"
   },
   "button.remove-image": {
     "defaultMessage": "Elimină imaginea"
   },
+  "button.rename": {
+    "defaultMessage": "Redenumește"
+  },
+  "button.repair": {
+    "defaultMessage": "Repară"
+  },
+  "button.repairing": {
+    "defaultMessage": "Se repară..."
+  },
   "button.report": {
     "defaultMessage": "Raportează"
   },
   "button.reset": {
     "defaultMessage": "Resetează"
+  },
+  "button.reset-server": {
+    "defaultMessage": "Restartează serverul"
   },
   "button.retry": {
     "defaultMessage": "Reîncearcă"
@@ -131,6 +176,12 @@
   "button.saving": {
     "defaultMessage": "Salvează"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "Afișează toate versiunile"
+  },
+  "button.show-file": {
+    "defaultMessage": "Afișează fișierul"
+  },
   "button.sign-in": {
     "defaultMessage": "Conectează-te"
   },
@@ -143,8 +194,14 @@
   "button.stop": {
     "defaultMessage": "Stop"
   },
+  "button.switch-version": {
+    "defaultMessage": "Schimbă versiunea"
+  },
   "button.unfollow": {
     "defaultMessage": "Nu mai urmări"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "Deconectează modpackul"
   },
   "button.update": {
     "defaultMessage": "Actualizare"
@@ -155,9 +212,6 @@
   "changelog.justNow": {
     "defaultMessage": "Acum"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "Aplicație"
   },
@@ -165,10 +219,13 @@
     "defaultMessage": "Găzduire"
   },
   "changelog.product.web": {
-    "defaultMessage": "Website"
+    "defaultMessage": "Platformă"
   },
   "collections.label.private": {
     "defaultMessage": "Privat"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Esti sigur că vrei să actualizezi {count, plural, one {# proiect} other {# proiecte}} la cea mai recentă versiune compatibilă? Recomandăm sa le actualizezi pe rând."
   },
   "form.label.address-line": {
     "defaultMessage": "Adresă"
@@ -326,20 +383,11 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mod de joc necunoscut"
   },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Înapoi"
-  },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Copiați linkul"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Acest modpack nu include niciun conținut suplimentar."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Nu a fost găsit niciun conținut"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "Toate"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Conținutul Modpack"
@@ -488,9 +536,6 @@
   "label.singleplayer": {
     "defaultMessage": "Un singur jucător"
   },
-  "label.sort-by": {
-    "defaultMessage": "Filtrează după"
-  },
   "label.success": {
     "defaultMessage": "Succes"
   },
@@ -628,9 +673,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Mențineți fișierele actualizate atunci când serverul se modifică"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Închide"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Descărcați aplicația Modrinth"
@@ -979,12 +1021,6 @@
   },
   "project.about.server.copied": {
     "defaultMessage": "Copiată!"
-  },
-  "project.about.server.copiedText": {
-    "defaultMessage": "Adresa IP copiată în clipboard"
-  },
-  "project.about.server.latency": {
-    "defaultMessage": "Latență"
   },
   "project.about.server.title": {
     "defaultMessage": "Detalii server"
@@ -1370,9 +1406,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Metodă de plată"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "Facturat {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Alege un plan personalizat, cu specificațiile exacte de care ai nevoie."
   },
@@ -1388,17 +1421,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Cel mai Popular"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Alege un plan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Selectează un Plan"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfect pentru 1–5 prieteni cu câteva moduri simple."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Alege cantitatea de RAM și specificații care sunt potrivite pentru nevoile tale."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"
@@ -1485,7 +1512,7 @@
     "defaultMessage": "Cauta o limba..."
   },
   "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "{matches, plural,=0 {Nicio limbă nu se potrivește} one {#potriviri de limbă} other {#limbile se potrivesc}} căutarea ta."
+    "defaultMessage": "{matches, plural,=0 {Nicio limbă nu se potrivește} one {# potrivire de limbă} other {# limbi se potrivesc cu}} cautarea ta."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Nicio limbă nu corespunde căutării dvs."
@@ -1658,9 +1685,6 @@
   "tag.category.kitchen-sink": {
     "defaultMessage": "Cu de toate"
   },
-  "tag.category.kitpvp": {
-    "defaultMessage": "Kit PVP"
-  },
   "tag.category.library": {
     "defaultMessage": "Librărie"
   },
@@ -1742,20 +1766,11 @@
   "tag.category.plots": {
     "defaultMessage": "Loturi"
   },
-  "tag.category.pokemon": {
-    "defaultMessage": "Pokemon"
-  },
   "tag.category.potato": {
     "defaultMessage": "Cartof"
   },
   "tag.category.prison": {
     "defaultMessage": "Închisoare"
-  },
-  "tag.category.pve": {
-    "defaultMessage": "PVE"
-  },
-  "tag.category.pvp": {
-    "defaultMessage": "PVP"
   },
   "tag.category.questing": {
     "defaultMessage": "Căutare"
