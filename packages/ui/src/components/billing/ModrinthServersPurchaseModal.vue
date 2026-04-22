@@ -118,9 +118,7 @@ const steps: Step[] = props.planStage
 
 const isUpgrade = computed(() => !!props.existingSubscription)
 const skipRegionStep = computed(() => isUpgrade.value && !customServer.value)
-const visibleSteps = computed(() =>
-	steps.filter((s) => !(s === 'region' && skipRegionStep.value)),
-)
+const visibleSteps = computed(() => steps.filter((s) => !(s === 'region' && skipRegionStep.value)))
 
 const titles: Record<Step, MessageDescriptor> = {
 	plan: defineMessage({ id: 'servers.purchase.step.plan.title', defaultMessage: 'Plan' }),

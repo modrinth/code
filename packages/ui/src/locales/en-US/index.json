@@ -3050,6 +3050,9 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "How much RAM do you want your server to have?"
   },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "RAM"
+  },
   "servers.region.north-america": {
     "defaultMessage": "North America"
   },

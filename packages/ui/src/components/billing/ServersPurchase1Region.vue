@@ -290,7 +290,9 @@ onMounted(() => {
 				class="mb-2 text-xl font-bold text-contrast"
 				:class="hideRegionSelection ? 'mt-0' : 'mt-4'"
 			>
-				{{ formatMessage(hideRegionSelection ? messages.customPromptRamOnly : messages.customPrompt) }}
+				{{
+					formatMessage(hideRegionSelection ? messages.customPromptRamOnly : messages.customPrompt)
+				}}
 			</h2>
 			<div>
 				<Slider v-model="selectedRam" :min="minRam" :max="maxRam" :step="2" unit="GB" />
