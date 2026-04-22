@@ -109,10 +109,17 @@ impl Default for RequestConfig {
 }
 
 fn default_query_by() -> Vec<String> {
-    ["name", "indexed_name", "slug", "author", "indexed_author", "summary"]
-        .into_iter()
-        .map(str::to_string)
-        .collect()
+    [
+        "name",
+        "indexed_name",
+        "slug",
+        "author",
+        "indexed_author",
+        "summary",
+    ]
+    .into_iter()
+    .map(str::to_string)
+    .collect()
 }
 
 fn default_query_by_weights() -> Vec<u8> {
@@ -132,13 +139,13 @@ const fn default_prioritize_num_matching_fields() -> bool {
 }
 
 const fn default_prioritize_token_positions() -> bool {
-    // true
-    false
+    true
+    // false
 }
 
 const fn default_drop_tokens_threshold() -> usize {
-    // 0
-    1
+    0
+    // 1
 }
 
 const fn default_max_candidates() -> usize {
