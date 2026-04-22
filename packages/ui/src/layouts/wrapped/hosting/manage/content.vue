@@ -2,11 +2,10 @@
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
+import { computed, nextTick, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
-import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import { useReadyState } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
@@ -22,10 +21,7 @@ import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/Co
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
 import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
 import ContentPageLayout from '../../../shared/content-tab/layout.vue'
-import type {
-	ContentModpackData,
-	UploadState,
-} from '../../../shared/content-tab/providers/content-manager'
+import type { ContentModpackData } from '../../../shared/content-tab/providers/content-manager'
 import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
 import type {
 	ContentItem,
@@ -85,20 +81,9 @@ const messages = defineMessages({
 	},
 })
 
-const leaveMessages = defineMessages({
-	uploadInProgress: {
-		id: 'instances.confirm-leave-modal.upload-in-progress',
-		defaultMessage: 'Upload in progress',
-	},
-	leavePageBody: {
-		id: 'instances.confirm-leave-modal.body',
-		defaultMessage:
-			'Files are still being uploaded. Leaving this page will cancel the upload and your changes may be lost.',
-	},
-})
-
 const client = injectModrinthClient()
-const { server, worldId, busyReasons, isSyncingContent } = injectModrinthServerContext()
+const { server, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
+	injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const { openServerSettings, browseServerContent } = injectServerSettingsModal()
 const route = useRoute()
@@ -352,56 +337,9 @@ async function handleBulkDisable(items: ContentItem[]) {
 	}
 }
 
-const uploadState = ref<UploadState>({
-	isUploading: false,
-	currentFileName: null,
-	currentFileProgress: 0,
-	uploadedBytes: 0,
-	totalBytes: 0,
-	completedFiles: 0,
-	totalFiles: 0,
-})
-
-const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const modpackUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal>>()
-
-let activeUploadCancel: (() => void) | null = null
-
-const isUploading = computed(() => uploadState.value.isUploading)
-
-function handleBeforeUnload(e: BeforeUnloadEvent) {
-	if (isUploading.value) {
-		e.preventDefault()
-		return ''
-	}
-}
-
-if (typeof window !== 'undefined') {
-	watch(isUploading, (uploading) => {
-		if (uploading) {
-			window.addEventListener('beforeunload', handleBeforeUnload)
-		} else {
-			window.removeEventListener('beforeunload', handleBeforeUnload)
-		}
-	})
-
-	onBeforeUnmount(() => {
-		window.removeEventListener('beforeunload', handleBeforeUnload)
-	})
-
-	onBeforeRouteLeave(async () => {
-		if (isUploading.value) {
-			const shouldLeave = (await confirmLeaveModal.value?.prompt()) ?? false
-			if (shouldLeave) {
-				activeUploadCancel?.()
-			}
-			return shouldLeave
-		}
-		return true
-	})
-}
 
 const updatingProject = ref<ContentItem | null>(null)
 const updatingModpack = ref(false)
@@ -486,7 +424,7 @@ function handleUploadFiles() {
 				uploadState.value.totalBytes = p.total
 			},
 		})
-		activeUploadCancel = () => handle.cancel()
+		cancelUpload.value = () => handle.cancel()
 
 		try {
 			await handle.promise
@@ -500,7 +438,7 @@ function handleUploadFiles() {
 				text: err instanceof Error ? err.message : undefined,
 			})
 		} finally {
-			activeUploadCancel = null
+			cancelUpload.value = null
 			uploadState.value = {
 				isUploading: false,
 				currentFileName: null,
@@ -875,7 +813,6 @@ provideContentManager({
 	},
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
-	uploadState,
 	deletionContext: 'server',
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
@@ -967,11 +904,5 @@ provideContentManager({
 		server
 		@confirm="handleModpackUpdateConfirm"
 		@cancel="handleModpackUpdateCancel"
-	/>
-	<ConfirmLeaveModal
-		ref="confirmLeaveModal"
-		:header="formatMessage(leaveMessages.uploadInProgress)"
-		:body="formatMessage(leaveMessages.leavePageBody)"
-		admonition-type="critical"
 	/>
 </template>

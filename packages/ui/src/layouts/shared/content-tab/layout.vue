@@ -17,16 +17,12 @@ import {
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
-	UploadIcon,
 } from '@modrinth/assets'
-import { formatBytes } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 
-import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
-import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -134,17 +130,9 @@ const messages = defineMessages({
 		id: 'content.page-layout.share.label',
 		defaultMessage: 'Share',
 	},
-	uploadingFiles: {
-		id: 'content.page-layout.uploading-files',
-		defaultMessage: 'Uploading files ({completed}/{total})',
-	},
 	sortByLabel: {
 		id: 'content.page-layout.sort.label',
 		defaultMessage: 'Sort by {mode}',
-	},
-	busyDescription: {
-		id: 'content.page-layout.busy-description',
-		defaultMessage: 'Please wait for the operation to complete before editing content.',
 	},
 	pleaseWait: {
 		id: 'content.page-layout.please-wait',
@@ -153,12 +141,6 @@ const messages = defineMessages({
 })
 
 const ctx = injectContentManager()
-
-const uploadOverallProgress = computed(() => {
-	const state = ctx.uploadState?.value
-	if (!state || !state.isUploading || state.totalFiles === 0) return 0
-	return Math.min((state.completedFiles + state.currentFileProgress) / state.totalFiles, 1)
-})
 
 type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
 const sortMode = ref<SortMode>('alphabetical-asc')
@@ -518,11 +500,6 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</div>
 
 			<template v-else>
-				<Admonition v-if="ctx.isBusy.value && ctx.busyMessage?.value" type="warning">
-					<template #header>{{ ctx.busyMessage.value }}</template>
-					{{ formatMessage(messages.busyDescription) }}
-				</Admonition>
-
 				<ContentModpackCard
 					v-if="ctx.modpack.value"
 					:project="ctx.modpack.value.project"
@@ -549,43 +526,6 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					}"
 					@dismiss-content-hint="ctx.dismissContentHint?.()"
 				/>
-
-				<Transition
-					enter-active-class="transition-all duration-300 ease-out overflow-hidden"
-					enter-from-class="opacity-0 max-h-0"
-					enter-to-class="opacity-100 max-h-40"
-					leave-active-class="transition-all duration-200 ease-in overflow-hidden"
-					leave-from-class="opacity-100 max-h-40"
-					leave-to-class="opacity-0 max-h-0"
-					aria-live="polite"
-				>
-					<Admonition
-						v-if="ctx.uploadState?.value?.isUploading"
-						type="info"
-						show-actions-underneath
-					>
-						<template #icon>
-							<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
-						</template>
-						<template #header>
-							{{
-								formatMessage(messages.uploadingFiles, {
-									completed: ctx.uploadState?.value?.completedFiles ?? 0,
-									total: ctx.uploadState?.value?.totalFiles ?? 0,
-								})
-							}}
-						</template>
-						<span class="text-secondary">
-							{{ formatBytes(ctx.uploadState?.value?.uploadedBytes ?? 0) }}
-							/ {{ formatBytes(ctx.uploadState?.value?.totalBytes ?? 0) }} ({{
-								Math.round(uploadOverallProgress * 100)
-							}}%)
-						</span>
-						<template #actions>
-							<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
-						</template>
-					</Admonition>
-				</Transition>
 
 				<template v-if="ctx.items.value.length > 0">
 					<div class="flex flex-col gap-4">

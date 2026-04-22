@@ -315,17 +315,19 @@ export const RichContent: Story = {
 		template: /* html */ `
 			<StackedAdmonitions :items="items" @dismiss-all="dismissAll">
 				<template #item="{ item, dismissible }">
-					<Admonition :type="item.type" :header="item.header">
+					<Admonition
+						:type="item.type"
+						:header="item.header"
+						:dismissible="dismissible && !item.canCancel"
+						@dismiss="dismiss(item.id)"
+					>
 						{{ item.body }}
 						<template #top-right-actions>
 							<ButtonStyled v-if="item.canCancel" type="outlined" color="blue">
-								<button class="!border" @click="dismiss(item.id)">Cancel</button>
+								<button class="!border" type="button" @click="dismiss(item.id)">Cancel</button>
 							</ButtonStyled>
 							<ButtonStyled v-if="item.canRetry" color="red">
-								<button @click="dismiss(item.id)">Retry</button>
-							</ButtonStyled>
-							<ButtonStyled v-if="dismissible" circular type="transparent" hover-color-fill="background" :color="item.type === 'critical' ? 'red' : item.type === 'success' ? 'green' : 'blue'">
-								<button @click="dismiss(item.id)">✕</button>
+								<button type="button" @click="dismiss(item.id)">Retry</button>
 							</ButtonStyled>
 						</template>
 						<template v-if="item.progress != null" #progress>

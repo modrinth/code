@@ -12,7 +12,12 @@
 		"copyright": "",
 		"targets": "all",
 		"externalBin": [],
-		"icon": ["icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+		"icon": [
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		],
 		"windows": {
 			"nsis": {
 				"installMode": "currentUser",
@@ -35,7 +40,9 @@
 		},
 		"fileAssociations": [
 			{
-				"ext": ["mrpack"],
+				"ext": [
+					"mrpack"
+				],
 				"mimeType": "application/x-modrinth-modpack+zip"
 			}
 		]
@@ -47,7 +54,9 @@
 	"plugins": {
 		"deep-link": {
 			"desktop": {
-				"schemes": ["modrinth"]
+				"schemes": [
+					"modrinth"
+				]
 			},
 			"mobile": []
 		}
@@ -84,11 +93,17 @@
 				],
 				"enable": true
 			},
-			"capabilities": ["ads", "core", "plugins"],
+			"capabilities": [
+				"ads",
+				"core",
+				"plugins"
+			],
 			"csp": {
 				"default-src": "'self' customprotocol: asset:",
-				"connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.nodes.modrinth.com https://*.posthog.com https://posthog.modrinth.com https://*.sentry.io https://api.mclo.gs http://textures.minecraft.net https://textures.minecraft.net https://js.stripe.com https://*.stripe.com wss://*.stripe.com wss://*.nodes.modrinth.com wss://*.ts.net https://fill.papermc.io https://api.purpurmc.org 'self' data: blob:",
-				"font-src": ["https://cdn-raw.modrinth.com/fonts/"],
+				"connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.nodes.modrinth.com https://*.posthog.com https://posthog.modrinth.com https://*.sentry.io https://api.mclo.gs http://textures.minecraft.net https://textures.minecraft.net https://js.stripe.com https://*.stripe.com wss://*.stripe.com wss://*.nodes.modrinth.com https://*.taila228c5.ts.net https://*.taila228c5.ts.net wss://*.taila228c5.ts.net https://fill.papermc.io https://api.purpurmc.org 'self' data: blob:",
+				"font-src": [
+					"https://cdn-raw.modrinth.com/fonts/"
+				],
 				"img-src": "https: 'unsafe-inline' 'self' asset: http://asset.localhost http://textures.minecraft.net blob: data:",
 				"style-src": "'unsafe-inline' 'self'",
 				"script-src": "https://*.posthog.com https://posthog.modrinth.com https://js.stripe.com https://tally.so/widgets/embed.js 'self'",

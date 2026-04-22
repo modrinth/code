@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { ref } from 'vue'
 
 import Admonition from '../../components/base/Admonition.vue'
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
@@ -57,37 +58,56 @@ export const Dismissible: Story = {
 	},
 }
 
+export const HeaderWithTimestamp: Story = {
+	render: () => ({
+		components: { Admonition },
+		setup() {
+			const t = ref(Date.now() - 3600_000)
+			return { t }
+		},
+		template: /*html*/ `
+			<Admonition
+				type="info"
+				header="Creating backup"
+				:timestamp="t"
+			>
+				Saving world data for my-world.
+			</Admonition>
+		`,
+	}),
+}
+
 export const WithTopRightActions: Story = {
 	render: () => ({
 		components: { Admonition, ButtonStyled },
 		template: /*html*/ `
 			<div style="display: flex; flex-direction: column; gap: 1rem;">
-				<Admonition type="info" header="Uploading files (2/5)">
+				<Admonition
+					type="info"
+					header="Uploading files (2/5)"
+					:dismissible="false"
+				>
 					Uploading server files...
 					<template #top-right-actions>
 						<ButtonStyled type="outlined" color="blue">
-							<button class="!border">Cancel</button>
+							<button class="!border" type="button">Cancel</button>
 						</ButtonStyled>
 					</template>
 				</Admonition>
-				<Admonition type="critical" header="Extraction failed">
+				<Admonition
+					type="critical"
+					header="Extraction failed"
+					:dismissible="true"
+				>
 					Something went wrong while extracting the archive.
 					<template #top-right-actions>
 						<ButtonStyled color="red">
-							<button>Retry</button>
-						</ButtonStyled>
-						<ButtonStyled circular type="transparent" hover-color-fill="background" color="red">
-							<button>✕</button>
+							<button type="button">Retry</button>
 						</ButtonStyled>
 					</template>
 				</Admonition>
-				<Admonition type="success" header="Extraction complete">
+				<Admonition type="success" header="Extraction complete" :dismissible="true">
 					All files have been extracted successfully.
-					<template #top-right-actions>
-						<ButtonStyled circular type="transparent" hover-color-fill="background" color="green">
-							<button>✕</button>
-						</ButtonStyled>
-					</template>
 				</Admonition>
 			</div>
 		`,
@@ -99,35 +119,42 @@ export const WithProgressBar: Story = {
 		components: { Admonition, ButtonStyled, ProgressBar },
 		template: /*html*/ `
 			<div style="display: flex; flex-direction: column; gap: 1rem;">
-				<Admonition type="info" header="Uploading files (2/5)">
+				<Admonition
+					type="info"
+					header="Uploading files (2/5)"
+					:dismissible="false"
+				>
 					128 KB / 1.2 MB (45%)
 					<template #top-right-actions>
 						<ButtonStyled type="outlined" color="blue">
-							<button class="!border">Cancel</button>
+							<button class="!border" type="button">Cancel</button>
 						</ButtonStyled>
 					</template>
 					<template #progress>
 						<ProgressBar :progress="0.45" :max="1" color="blue" full-width />
 					</template>
 				</Admonition>
-				<Admonition type="info" header="Extracting modpack.zip">
+				<Admonition
+					type="info"
+					header="Extracting modpack.zip"
+					:dismissible="false"
+				>
 					24 MB extracted — config/settings.yml
 					<template #top-right-actions>
 						<ButtonStyled type="outlined" color="blue">
-							<button class="!border">Cancel</button>
+							<button class="!border" type="button">Cancel</button>
 						</ButtonStyled>
 					</template>
 					<template #progress>
 						<ProgressBar :progress="0.7" :max="1" color="blue" full-width />
 					</template>
 				</Admonition>
-				<Admonition type="success" header="Extraction complete — Done">
+				<Admonition
+					type="success"
+					header="Extraction complete — Done"
+					:dismissible="true"
+				>
 					56 MB extracted
-					<template #top-right-actions>
-						<ButtonStyled circular type="transparent" hover-color-fill="background" color="green">
-							<button>✕</button>
-						</ButtonStyled>
-					</template>
 					<template #progress>
 						<ProgressBar :progress="1" :max="1" color="green" full-width />
 					</template>

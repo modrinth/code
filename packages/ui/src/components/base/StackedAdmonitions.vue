@@ -102,6 +102,8 @@ const frontCardHeight = computed(() => {
 	return front ? (heights.value[front.id] ?? 0) : 0
 })
 
+const hasBehind = computed(() => props.items.length > 1)
+
 const containerHeight = computed(() => {
 	if (isExpanded.value) {
 		return props.items.reduce(
@@ -109,6 +111,7 @@ const containerHeight = computed(() => {
 			0,
 		)
 	}
+	if (!hasBehind.value) return frontCardHeight.value
 	const peek = isHovered.value ? props.hoverPeek : props.peek
 	const behind = Math.min(props.items.length - 1, props.maxVisibleBehind)
 	const pad = isHovered.value ? 6 : 0
