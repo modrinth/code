@@ -116,6 +116,12 @@ const steps: Step[] = props.planStage
 	? (['plan', 'region', 'payment', 'review'] as Step[])
 	: (['region', 'payment', 'review'] as Step[])
 
+const isUpgrade = computed(() => !!props.existingSubscription)
+const skipRegionStep = computed(() => isUpgrade.value && !customServer.value)
+const visibleSteps = computed(() =>
+	steps.filter((s) => !(s === 'region' && skipRegionStep.value)),
+)
+
 const titles: Record<Step, MessageDescriptor> = {
 	plan: defineMessage({ id: 'servers.purchase.step.plan.title', defaultMessage: 'Plan' }),
 	region: defineMessage({ id: 'servers.purchase.step.region.title', defaultMessage: 'Region' }),
@@ -146,17 +152,24 @@ const currentPing = computed(() => {
 
 const currentStep = ref<Step>()
 
-const currentStepIndex = computed(() => (currentStep.value ? steps.indexOf(currentStep.value) : -1))
+const currentStepIndex = computed(() =>
+	currentStep.value ? visibleSteps.value.indexOf(currentStep.value) : -1,
+)
 const previousStep = computed(() => {
-	const step = currentStep.value ? steps[steps.indexOf(currentStep.value) - 1] : undefined
+	if (!currentStep.value) return undefined
+	const idx = visibleSteps.value.indexOf(currentStep.value)
+	let step = idx > 0 ? visibleSteps.value[idx - 1] : undefined
 	if (step === 'payment' && skipPaymentMethods.value && primaryPaymentMethodId.value) {
-		return 'region'
+		const paymentIdx = visibleSteps.value.indexOf('payment')
+		step = paymentIdx > 0 ? visibleSteps.value[paymentIdx - 1] : undefined
 	}
 	return step
 })
-const nextStep = computed(() =>
-	currentStep.value ? steps[steps.indexOf(currentStep.value) + 1] : undefined,
-)
+const nextStep = computed(() => {
+	if (!currentStep.value) return undefined
+	const idx = visibleSteps.value.indexOf(currentStep.value)
+	return idx >= 0 ? visibleSteps.value[idx + 1] : undefined
+})
 
 const canProceed = computed(() => {
 	switch (currentStep.value) {
@@ -261,11 +274,25 @@ async function setStep(step: Step | undefined, skipValidation = false) {
 	}
 }
 
-watch(selectedPlan, () => {
-	if (currentStep.value === 'plan') {
-		customServer.value = !selectedPlan.value
-	}
-})
+watch(
+	selectedPlan,
+	() => {
+		if (currentStep.value === 'plan') {
+			customServer.value = !selectedPlan.value
+		}
+	},
+	{ flush: 'sync' },
+)
+
+watch(
+	() => props.existingSubscription,
+	(sub) => {
+		if (sub?.metadata?.type === 'pyro' && sub.metadata.region) {
+			selectedRegion.value = sub.metadata.region
+		}
+	},
+	{ immediate: true },
+)
 
 const defaultPlan = computed<Labrinth.Billing.Internal.Product | undefined>(() => {
 	return (
@@ -295,7 +322,9 @@ function begin(
 	customServer.value = !selectedPlan.value
 	selectedPaymentMethod.value = undefined
 	const skipPlanStep = props.planStage && plan !== undefined
-	currentStep.value = skipPlanStep ? (steps[1] ?? steps[0]) : steps[0]
+	currentStep.value = skipPlanStep
+		? (visibleSteps.value[1] ?? visibleSteps.value[0])
+		: visibleSteps.value[0]
 	skipPaymentMethods.value = true
 	projectId.value = project
 	modal.value?.show()
@@ -339,7 +368,7 @@ function goToBreadcrumbStep(id: string) {
 	<NewModal ref="modal" @hide="$emit('hide')">
 		<template #title>
 			<div class="flex items-center gap-1 font-bold text-secondary">
-				<template v-for="(step, index) in steps" :key="step">
+				<template v-for="(step, index) in visibleSteps" :key="step">
 					<button
 						v-if="index < currentStepIndex"
 						class="bg-transparent active:scale-95 font-bold text-secondary p-0"
@@ -356,7 +385,7 @@ function goToBreadcrumbStep(id: string) {
 						{{ formatMessage(titles[step]) }}
 					</span>
 					<ChevronRightIcon
-						v-if="index < steps.length - 1"
+						v-if="index < visibleSteps.length - 1"
 						class="h-5 w-5 text-secondary"
 						stroke-width="3"
 					/>
@@ -381,6 +410,7 @@ function goToBreadcrumbStep(id: string) {
 				:regions="regions"
 				:pings="pings"
 				:custom="customServer"
+				:hide-region-selection="isUpgrade"
 				:available-products="availableProducts"
 				:currency="currency"
 				:interval="selectedInterval"

@@ -178,6 +178,10 @@ const messages = defineMessages({
 		id: 'servers.region.custom.prompt',
 		defaultMessage: `How much RAM do you want your server to have?`,
 	},
+	customPromptRamOnly: {
+		id: 'servers.region.custom.prompt-ram-only',
+		defaultMessage: `RAM`,
+	},
 })
 
 async function updateStock() {
@@ -286,7 +290,7 @@ onMounted(() => {
 				class="mb-2 text-xl font-bold text-contrast"
 				:class="hideRegionSelection ? 'mt-0' : 'mt-4'"
 			>
-				{{ formatMessage(messages.customPrompt) }}
+				{{ formatMessage(hideRegionSelection ? messages.customPromptRamOnly : messages.customPrompt) }}
 			</h2>
 			<div>
 				<Slider v-model="selectedRam" :min="minRam" :max="maxRam" :step="2" unit="GB" />
