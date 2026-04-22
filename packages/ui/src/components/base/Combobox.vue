@@ -1,29 +1,44 @@
 <template>
 	<div ref="containerRef" class="relative inline-block w-full">
 		<!-- Searchable mode: input trigger -->
-		<StyledInput
-			v-if="searchable"
-			ref="searchTriggerRef"
-			v-model="searchQuery"
-			:icon="showSearchIcon ? SearchIcon : undefined"
-			type="text"
-			:placeholder="searchPlaceholder || placeholder"
-			:disabled="disabled"
-			wrapper-class="w-full"
-			:input-class="showChevron ? '!pr-9' : undefined"
-			class="relative"
-			@input="handleSearchInput"
-			@keydown="handleSearchKeydown"
-			@focus="handleSearchFocus"
-			@click="handleSearchClick"
-		>
-			<template v-if="showChevron" #right>
-				<ChevronLeftIcon
-					class="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-secondary transition-transform duration-150"
-					:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
-				/>
-			</template>
-		</StyledInput>
+		<div v-if="searchable" class="relative w-full rounded-xl bg-surface-4">
+			<!--
+				Selection mirror: horizontal padding must match StyledInput (filled + left icon uses `pl-10`,
+				else `pl-3`) and `searchableInputClass` when the chevron is shown (`!pr-9`), or the overlay
+				text will not line up with the transparent input text / caret.
+			-->
+			<div
+				v-if="searchSelectionOverlayVisible"
+				class="pointer-events-none absolute inset-y-0 left-0 right-0 z-0 flex min-w-0 items-center gap-2 font-medium text-primary"
+				:class="[showSearchIcon ? 'pl-10' : 'pl-3', showChevron ? 'pr-9' : 'pr-3']"
+				aria-hidden="true"
+			>
+				<span class="min-w-0 truncate">{{ searchQuery }}</span>
+				<slot name="search-selection-affix" :option="selectedOption" />
+			</div>
+			<StyledInput
+				ref="searchTriggerRef"
+				v-model="searchQuery"
+				:icon="showSearchIcon ? SearchIcon : undefined"
+				type="text"
+				:placeholder="searchPlaceholder || placeholder"
+				:disabled="disabled"
+				wrapper-class="w-full !bg-transparent"
+				:input-class="searchableInputClass"
+				class="relative z-[1]"
+				@input="handleSearchInput"
+				@keydown="handleSearchKeydown"
+				@focus="handleSearchFocus"
+				@click="handleSearchClick"
+			>
+				<template v-if="showChevron" #right>
+					<ChevronLeftIcon
+						class="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-secondary transition-transform duration-150"
+						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
+					/>
+				</template>
+			</StyledInput>
+		</div>
 
 		<!-- Standard mode: button trigger -->
 		<span
@@ -108,9 +123,14 @@
 								:class="getOptionClasses(item, index)"
 								tabindex="-1"
 								@click="handleOptionClick(item, index)"
-								@mouseenter="!item.disabled && (focusedIndex = index)"
+								@mouseenter="handleOptionMouseEnter(item, index)"
 							>
-								<slot :name="`option-${item.value}`" :item="item">
+								<slot
+									name="option"
+									:item="item"
+									:index="index"
+									:is-selected="!!(listbox && item.value === modelValue)"
+								>
 									<div class="flex w-full items-center justify-between gap-2">
 										<div class="flex items-center gap-2">
 											<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
@@ -151,7 +171,16 @@
 <script setup lang="ts" generic="T">
 import { ChevronLeftIcon, SearchIcon } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
-import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import {
+	type Component,
+	computed,
+	nextTick,
+	onMounted,
+	onUnmounted,
+	ref,
+	useSlots,
+	watch,
+} from 'vue'
 
 import StyledInput from './StyledInput.vue'
 
@@ -223,10 +252,13 @@ const props = withDefaults(
 const emit = defineEmits<{
 	'update:modelValue': [value: T]
 	select: [option: ComboboxOption<T>]
+	'option-hover': [option: ComboboxOption<T>]
 	open: []
 	close: []
 	searchInput: [query: string]
 }>()
+
+const slots = useSlots()
 
 const isOpen = ref(false)
 const searchQuery = ref('')
@@ -259,6 +291,23 @@ const selectedOption = computed<ComboboxOption<T> | undefined>(() => {
 	return props.options.find(
 		(opt): opt is ComboboxOption<T> => isDropdownOption(opt) && opt.value === props.modelValue,
 	)
+})
+
+/** Extra content (e.g. channel pill) next to the label while the search field is idle */
+const searchSelectionOverlayVisible = computed(() => {
+	if (!props.searchable || !props.syncWithSelection || !selectedOption.value) return false
+	if (!slots['search-selection-affix']) return false
+	if (isOpen.value || userHasTyped.value) return false
+	return true
+})
+
+const searchableInputClass = computed(() => {
+	const parts = ['!bg-transparent']
+	if (props.showChevron) parts.push('!pr-9')
+	if (searchSelectionOverlayVisible.value) {
+		parts.push('!text-transparent [caret-color:var(--color-text-primary)] selection:bg-transparent')
+	}
+	return parts.join(' ')
 })
 
 const triggerText = computed(() => {
@@ -444,6 +493,12 @@ function handleOptionClick(option: ComboboxOption<T>, index: number) {
 		}
 		closeDropdown()
 	}
+}
+
+function handleOptionMouseEnter(option: ComboboxOption<T>, index: number) {
+	if (option.disabled) return
+	focusedIndex.value = index
+	emit('option-hover', option)
 }
 
 function findNextFocusableOption(currentIndex: number, direction: 'next' | 'previous'): number {

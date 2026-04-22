@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
+
+import { useModalStack } from '../../composables/modal-stack'
 
 const props = defineProps<{
 	shown: boolean
@@ -8,6 +10,9 @@ const props = defineProps<{
 
 const toolbarEl = ref<HTMLElement | null>(null)
 const compact = ref(false)
+
+const { stackCount } = useModalStack()
+const zIndex = computed(() => 100 + stackCount.value * 10 + 31)
 
 function checkCompact() {
 	const el = toolbarEl.value
@@ -58,23 +63,26 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<Transition name="floating-action-bar" appear>
-		<div
-			v-if="shown"
-			class="floating-action-bar drop-shadow-2xl fixed z-[21] p-4 bottom-0"
-			aria-live="polite"
-		>
+	<Teleport to="body">
+		<Transition name="floating-action-bar" appear>
 			<div
-				ref="toolbarEl"
-				role="toolbar"
-				:aria-label="ariaLabel"
-				class="relative overflow-clip flex items-center gap-2 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto max-w-[60vw] px-4 py-3 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
-				:class="{ 'bar-compact': compact }"
+				v-if="shown"
+				class="floating-action-bar drop-shadow-2xl fixed p-4 bottom-0"
+				:style="{ zIndex }"
+				aria-live="polite"
 			>
-				<slot />
+				<div
+					ref="toolbarEl"
+					role="toolbar"
+					:aria-label="ariaLabel"
+					class="relative overflow-clip flex items-center gap-2 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto max-w-[60vw] px-4 py-3 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
+					:class="{ 'bar-compact': compact }"
+				>
+					<slot />
+				</div>
 			</div>
-		</div>
-	</Transition>
+		</Transition>
+	</Teleport>
 </template>
 
 <style scoped>

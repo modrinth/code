@@ -32,6 +32,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "查看分析"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "加载服务器设置失败"
+  },
+  "badge.alpha": {
+    "defaultMessage": "早期预览版"
+  },
   "badge.beta": {
     "defaultMessage": "测试版"
   },
@@ -40,6 +46,54 @@
   },
   "badge.new": {
     "defaultMessage": "新"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "取消"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} 个共享 CPU"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "你即将重新订阅 <server-name>{serverName}</server-name>。你的订阅将会重新启用，且服务器将持续运行。"
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "无法重新订阅，获取订阅信息失败。"
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "错误"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "获取订阅信息失败。"
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 天"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/月"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/季度"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/年"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "你的下一次扣费日期为 <charge-date>{date}</charge-date>。"
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "方案"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB 内存"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "重新订阅"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB 存储空间"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "重新订阅服务器"
   },
   "button.accept": {
     "defaultMessage": "接受"
@@ -250,6 +304,9 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "删除{itemType}{count, plural,one {} other {s}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {降级} other {更新}}可能会导致兼容性问题。你在整合包基础上额外添加的模组或内容将被保留，但可能与新版本不兼容。"
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {降级} other {升级}}警告"
@@ -494,11 +551,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "文件已保存"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "关闭"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "查找"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "第 {current} 项，共 {total} 项"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "下一个匹配项"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "无结果"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "上一个匹配项"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "切换替换"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "已将你的日志文件链接复制到剪切板。"
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "日志链接已复制"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "替换"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "替换所有"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "替换"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "无法保存文件。"
@@ -557,9 +644,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "已开始解压"
   },
-  "files.layout.loading": {
-    "defaultMessage": "文件加载中……"
-  },
   "files.layout.selected-count": {
     "defaultMessage": "已选择 {count} 项"
   },
@@ -589,6 +673,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "文件导航"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "在文件中查找"
   },
   "files.navbar.home": {
     "defaultMessage": "主目录"
@@ -895,6 +982,60 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "文件上传失败"
+  },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "更改整合包版本失败"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "加载版本失败"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "重新安装整合包失败"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "修复服务器失败"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "将服务器重置为初始设置失败"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "保存安装设置失败"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "取消关联整合包失败"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "{loader, select, null {加载器} other {{loader}}} 版本"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "你的服务器安装已被修复。"
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "修复完成"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "重置服务器"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "删除服务器上的所有数据，包括你的世界、模组和配置文件。备份将保留并可以恢复。"
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "重置为初始设置"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "这会让服务器重新进入初始化流程，以便你再次完成配置。你确定要继续吗？"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "重置为初始设置"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "服务器已回到初始化流程。"
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "服务器已重置为初始设置"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "支持选项"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst 时最高 {cpus} CPU"
@@ -1213,6 +1354,9 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "该模组依赖客户端模组，启动服务器时可能出现问题"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "这是一个客户端模组，启动服务器时可能会导致问题"
   },
   "label.client-retained-warning": {
     "defaultMessage": "该模组是作为依赖安装的客户端模组，启动服务器时可能出现问题"
@@ -2576,6 +2720,234 @@
   "servers.backups.item.restore": {
     "defaultMessage": "恢复"
   },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "正在创建备份"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "正在还原备份"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "正在安装服务器"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "正在同步內容"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "已经有服务器了吗？"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "深入了解 Modrinth Hosting"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "添加服务器"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "安装模组、邀请好友并一起畅玩，这一切都能在 Modrinth App 中轻松完成。"
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "目前还没有服务器"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "挑选你喜爱的模组，剩下的就交给我们处理。"
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "一键安装模组"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "邀请好友并直接在 Modrinth App 中为他们完成设置。"
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "与好友同乐"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "登录"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "像设置单人游戏世界一样配置你的服务器。"
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "设置简单"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "已复制"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "将代码复制到剪贴板"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "复制 ID"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "下载最新备份"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "管理账单"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "新"
+  },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "你的文件还将保留 <days-remaining>{daysRemaining} {daysRemaining, plural, one {天} other {天}}</days-remaining>。请在文件被删除前联系支持团队以下载文件。"
+  },
+  "servers.listing.notice.files-preserved-after-cancellation": {
+    "defaultMessage": "取消订阅后，你的文件将保留 30 天。"
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "你的服务器因管理操作停用。"
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "你的服务器将在 <date>{formattedDate}</date> {verb, select, downgrade {降级} upgrade {升级} other {切换}}到{planSize}计划。"
+  },
+  "servers.listing.notice.provisioning": {
+    "defaultMessage": "请等待我们设置你的服务器。这可能需要长达10分钟的时间。"
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "你的订阅已取消。"
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "你的订阅已于 <date>{formattedDate}</date> 取消。"
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed": {
+    "defaultMessage": "由于付款失败，你的订阅已被取消。"
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
+    "defaultMessage": "由于付款失败，你的订阅已于 <date>{formattedDate}</date> 取消。"
+  },
+  "servers.listing.notice.subscription-set-to-cancel": {
+    "defaultMessage": "你的订阅已取消。"
+  },
+  "servers.listing.notice.subscription-set-to-cancel-on-date": {
+    "defaultMessage": "你的订阅将于 <date>{formattedDate}</date> 取消。"
+  },
+  "servers.listing.notice.suspended": {
+    "defaultMessage": "你的服务器已被停用。请联系 Modrinth 支持以获取更多信息。"
+  },
+  "servers.listing.notice.upgrading": {
+    "defaultMessage": "你的服务器硬件正在升级，很快就会重新上线。"
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "重新订阅"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "服务器图标"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "支持"
+  },
+  "servers.listing.using-project-label": {
+    "defaultMessage": "正在使用 {projectTitle}"
+  },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "正在查找新服务器……"
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "有文件正在上传，离开此页面会终止传输进程。"
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "正在上传"
+  },
+  "servers.manage.contact-support-button": {
+    "defaultMessage": "联系 Modrinth 支持"
+  },
+  "servers.manage.error.alert-notice": {
+    "defaultMessage": "当出现问题时，我们的系统会自动提醒团队。我们已在努力让服务器恢复上线。"
+  },
+  "servers.manage.error.description": {
+    "defaultMessage": "我们的服务器可能暂时出现问题。"
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "错误详情："
+  },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "如果你最近购买了 Modrinth 托管服务器，它当前正在队列中，一旦准备就绪就会显示在此处。<warning>不要尝试购买新服务器。</warning>"
+  },
+  "servers.manage.error.support-notice": {
+    "defaultMessage": "如果你需要关于服务器状态的个性化支持，请联系 Modrinth 支持团队。"
+  },
+  "servers.manage.error.title": {
+    "defaultMessage": "服务器无法加载"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "发生错误"
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "新建服务器"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "未找到服务器。"
+  },
+  "servers.manage.purchase-unavailable.text": {
+    "defaultMessage": "支付信息仍在加载中，加载完成后将立即打开结账页面。"
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "购买不可用"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "重新启动"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "在重新订阅你的 Modrinth 服务器时发生了错误。"
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "重新订阅时出错"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "如果服务器当前已取消，再次尝试扣费可能最多需要10分钟。"
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "重新订阅请求已提交"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "服务器订阅已成功重新订阅"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "成功"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "搜索 {count} {count, plural, other {个服务器}}..."
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "他们现在可以在这里找到！"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "不再显示"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "你的服务器设置已移动"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, other {天}} <hours-count>{hours}</hours-count> {hours, plural, other {小时}} <minutes-count>{minutes}</minutes-count> {minutes, plural, other {分钟}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {秒}} 剩余……"
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "新服务器"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "你的 Medal 服务器试用期已结束，服务器已被停用。请升级以继续使用你的服务器。"
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "你的服务器已被停用。请更新你的账单信息，或联系 Modrinth 支持以获取更多信息。"
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "你的服务器已被停用：{reason}。请更新你的账单信息，或联系 Modrinth 支持以获取更多信息。"
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "你的服务器硬件正在升级，很快就会重新上线。"
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "服务器图标"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "升级"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "正在使用 {projectTitle}"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "隐藏"
   },
@@ -2603,6 +2975,12 @@
   "servers.notice.undismissable": {
     "defaultMessage": "不可隐藏"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "你的 Modrinth Hosting 购买已完成。"
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "购买成功"
+  },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "你现在还不会被收费。"
   },
@@ -2612,14 +2990,26 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "支付方式"
   },
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "在北美、欧洲和东南亚可用。"
+  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "按照你特定需要的配置选择一个定制方案。"
+  },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "了解自己的具体需求？"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "开始"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "大型"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "适合 15–25 名玩家使用，加整合包或重度添加模组。"
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "中型"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "适合 6–15 名玩家使用，加多个模组。"
@@ -2630,11 +3020,17 @@
   "servers.purchase.step.plan.select": {
     "defaultMessage": "选择方案"
   },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "小型"
+  },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "适合 1–5 位朋友使用，加少量轻量模组。"
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "方案"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "当前方案"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "地区"

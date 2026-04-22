@@ -35,6 +35,7 @@
 </template>
 
 <script setup lang="ts">
+// No ReadyTransition wrapper: console and ServerManageStats own their loading UX; there is no single TanStack "ready" gate for this tab.
 import type { Mclogs } from '@modrinth/api-client'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'

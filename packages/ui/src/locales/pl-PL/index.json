@@ -32,6 +32,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Pokaż dane analityczne"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Nie udało się załadować ustawień serwera"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -40,6 +46,42 @@
   },
   "badge.new": {
     "defaultMessage": "Nowe"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Anuluj"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} Współdzielonych procesorów"
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Błąd"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Nie udało się załadować detalów subskrypcji."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 dni"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/miesiąc"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/kwartał"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/rok"
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Plan"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB pamięci RAM"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Zasubskrybuj ponownie"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB miejsca na dysku"
   },
   "button.accept": {
     "defaultMessage": "Akceptuj"
@@ -494,11 +536,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Plik zapisany"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Zamknij"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Znajdź"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} na {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Następne dopasowanie"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Brak rezultatów"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Poprzednie dopasowanie"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Przełącz zamianę"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "Adres URL do twojego pliku logów został skopiowany do schowka."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "Skopiowano adres URL dziennika"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Zamień"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Zamień Wszystkie"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Zamień"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "Nie udało się zapisać pliku."
@@ -557,9 +629,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Rozpoczęto rozpakowywanie"
   },
-  "files.layout.loading": {
-    "defaultMessage": "Ładowanie plików..."
-  },
   "files.layout.selected-count": {
     "defaultMessage": "Wybrano {count}"
   },
@@ -589,6 +658,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "Nawigacja plików"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Znajdź w pliku"
   },
   "files.navbar.home": {
     "defaultMessage": "Strona główna"
@@ -895,6 +967,45 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Nie udało się przesłać pliku"
+  },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "Nie udało się zmienić wersji paczki modów"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "Nie udało się załadować wersji"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "Nie udało się przeinstalować paczki modów"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "Nie udało się naprawić serwera"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "Nie udało się zapisać ustawień instalacji"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "Nie udało się odłączyć paczki modów"
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "Naprawa ukończona"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Zresetuj serwer"
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Resetuj do trybu onboardingu"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "Resetuj do trybu onboardingu"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Serwer został przywrócony do trybu onboardingu."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Serwer zresetowany do trybu onboardingu"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Opcje pomocy"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Możliwość burstu do {cpus} procesorów"
@@ -2575,6 +2686,60 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Przywróć"
+  },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Trwa tworzenie kopii zapasowej"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Trwa przywracanie kopii zapasowej"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "Serwer jest instalowany"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "Synchronizacja zawartości w toku"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "Nowy serwer"
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "Graj z przyjaciółmi"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Zaloguj się"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Skopiowano"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "Skopiuj kod do schowka"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "Kopiuj ID"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "Zarządzaj rozliczaniem"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Nowe"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "Ikona serwera"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Wsparcie"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "Załaduj ponownie"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "Ulepsz"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "Używa {projectTitle}"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Odrzuć"

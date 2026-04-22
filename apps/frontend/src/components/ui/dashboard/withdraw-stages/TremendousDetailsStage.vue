@@ -75,16 +75,16 @@
 							<span class="font-semibold leading-tight">{{ selectedRewardOption.label }}</span>
 						</div>
 					</template>
-					<template v-for="option in rewardOptions" :key="option.value" #[`option-${option.value}`]>
+					<template #option="{ item }">
 						<div class="flex items-center gap-2">
 							<img
-								v-if="option.imageUrl"
-								:src="option.imageUrl"
-								:alt="option.label"
+								v-if="item.imageUrl"
+								:src="item.imageUrl"
+								:alt="item.label"
 								class="size-5 rounded-full object-cover"
 								loading="lazy"
 							/>
-							<span class="font-semibold leading-tight">{{ option.label }}</span>
+							<span class="font-semibold leading-tight">{{ item.label }}</span>
 						</div>
 					</template>
 				</Combobox>

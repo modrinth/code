@@ -32,6 +32,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Verileri görüntüle"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Sunucu ayarları yüklenemedi"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -40,6 +46,42 @@
   },
   "badge.new": {
     "defaultMessage": "Yeni"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "İptal"
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Hata"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Abonelik detayları yüklenemedi."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 gün"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/ay"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/çeyrek"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/yıl"
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Plan"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB RAM"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Yeniden abone ol"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB Depolama"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Sunucuya Yeniden Abone Ol"
   },
   "button.accept": {
     "defaultMessage": "Kabul Et"
@@ -491,11 +533,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Dosya kaydedildi"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Kapat"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Bul"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} / {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Sonraki eşleşme"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Sonuç yok"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Önceki eşleşme"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Değiştirmeyi aç/kapa"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "Günlük (log) dosyası bağlantınız panoya kopyalandı."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "Günlük (log) bağlantısı kopyalandı"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Değiştir"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Hepsini Değiştir"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Değiştir"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "Dosya kaydedilemedi."
@@ -554,9 +626,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Çıkarma işlemi başladı"
   },
-  "files.layout.loading": {
-    "defaultMessage": "Dosyalar yükleniyor..."
-  },
   "files.layout.selected-count": {
     "defaultMessage": "{count} seçildi"
   },
@@ -586,6 +655,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "Dosya gezintisi"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Dosyada bul"
   },
   "files.navbar.home": {
     "defaultMessage": "Ana sayfa"
@@ -893,6 +965,48 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Dosya yükleme başarısız"
   },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "Mod paketi sürümü değiştirilemedi"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "Sürümler yüklenemedi"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "Sunucu tamir edilemedi"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Sunucu başlangıç ayarlarına sıfırlanamadı"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "Kurulum ayarları kaydedilemedi"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "Mod paketi bağlantısı kaldırılamadı"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "Sunucu kurulumunuz başarıyla onarıldı."
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "Tamir tamamlandı"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Sunucuyu sıfırla"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Sunucunuzdaki tüm verileri, dünyalarınızı, modları ve yapılandırma dosyalarınızı siler. Yedekler korunur ve geri yüklenebilir."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Kurulum aşamasına sıfırla"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Bu sunucuyu kurulum aşamasına geri gönderecek. Devam etmek istediğinizden emin misiniz?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "Kurulum aşamasına sıfırla"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Destek seçenekleri"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"
   },
@@ -964,6 +1078,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "İçerik kurduktan sonra kurulumunuzu değiştirmenizi tavsiye etmeyiz. Eğer değişiklik yapmak isterseniz sunucunuzu sıfırlayın."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Oto-çöz"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Yükleyiciyi değiştir"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Çakışanları kapat"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Oyun sürümünü değiştirirken uyumsuz yüklü içerikleri kapatabilir veya çözmeye çalışabiliriz."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Uyumsuzluk uyarısı"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Uyumsuz içerik yüklü"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Yükleyiciyi değiştirdiğinizde tüm yüklü içerik kapatılacak. Onun yerine sunucunuzu sıfırlamanızı öneririz."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Yükleyici değiştirmek tehlikelidir"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Bağlı {projectType, select, server {sunucu} other {mod paketi}}"
@@ -1186,6 +1324,9 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "Bu mod, istemci tarafı (client-side) bir moda bağımlıdır ve sunucunuzu başlatırken sorunlara neden olabilir"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "Bu işlemci-tarafı bir mod ve sunucunuzu başlatırken sorunlara yol açabilir"
   },
   "label.client-retained-warning": {
     "defaultMessage": "Bu, bağımlılık olarak yüklenmiş bir istemci tarafı (client-side) modudur ve sunucunuzu başlatırken sorunlara neden olabilir"
@@ -2548,6 +2689,36 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Geri yükle"
+  },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Yedek oluşturma sürüyor"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Yedeğe dönme sürüyor"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "Sunucu kuruluyor"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "İçerik eşlemesi sürüyor"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "Zaten sunucunuz var mı?"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "Yeni sunucu"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "Mod kur, arkadaş davet et, birlikte oyna ve hepsini Modrinth App'ten yap."
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "Daha sunucu yok"
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "Tek-tıklamada mod kurma"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Görmezden gel"

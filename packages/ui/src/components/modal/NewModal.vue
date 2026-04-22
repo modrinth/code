@@ -288,7 +288,8 @@ defineExpose({
 const mouseX = ref(0)
 const mouseY = ref(0)
 
-const stackZBase = computed(() => stackDepth.value * 10)
+const MODAL_STACK_BASE_Z = 100
+const stackZBase = computed(() => MODAL_STACK_BASE_Z + stackDepth.value * 10)
 const stackOverlayZ = computed(() => stackZBase.value + 19)
 const stackTauriZ = computed(() => stackZBase.value + 20)
 const stackContainerZ = computed(() => stackZBase.value + 21)

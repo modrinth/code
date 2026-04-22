@@ -15,7 +15,7 @@
 			}"
 			@click="toggleItem(item)"
 		>
-			<CheckIcon v-if="selected === item" />
+			<CheckIcon v-if="selected === item && !hideCheckmarkIcon" />
 			<span>{{ formatLabel(item) }}</span>
 		</Button>
 	</div>
@@ -36,6 +36,7 @@ const props = withDefaults(
 		ariaLabel?: string
 		disabledItems?: T[]
 		disabledTooltip?: string
+		hideCheckmarkIcon?: boolean
 	}>(),
 	{
 		neverEmpty: true,

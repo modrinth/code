@@ -1,8 +1,27 @@
 <script setup lang="ts">
-import { injectModrinthServerContext, ServersManageBackupsPage } from '@modrinth/ui'
+import {
+	injectModrinthClient,
+	injectModrinthServerContext,
+	ServersManageBackupsPage,
+} from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 
-const { server, isServerRunning } = injectModrinthServerContext()
+const client = injectModrinthClient()
+const { server, serverId, worldId, isServerRunning } = injectModrinthServerContext()
+const queryClient = useQueryClient()
 const flags = useFeatureFlags()
+
+if (worldId.value) {
+	try {
+		await queryClient.ensureQueryData({
+			queryKey: ['backups', 'list', serverId],
+			queryFn: () => client.archon.backups_v1.list(serverId, worldId.value!),
+			staleTime: 30_000,
+		})
+	} catch {
+		// Let mounted layouts' useQuery surface errors; do not fail route setup.
+	}
+}
 
 useHead({
 	title: `Backups - ${server.value?.name ?? 'Server'} - Modrinth`,

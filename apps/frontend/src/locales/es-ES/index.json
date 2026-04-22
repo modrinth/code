@@ -1371,7 +1371,7 @@
     "message": "Encuentre lo que busca, de forma rápida y sencilla"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "El lugar para Minecraft {content}"
+    "message": "El lugar para {content} de Minecraft"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "paquetes de datos"
@@ -2646,13 +2646,13 @@
     "message": "Ver todos tus proyectos"
   },
   "scopes.projectRead.label": {
-    "message": "Ver proyectos"
+    "message": "Leer proyectos"
   },
   "scopes.projectWrite.description": {
     "message": "Escribir datos del proyecto"
   },
   "scopes.projectWrite.label": {
-    "message": "Redactar proyectos"
+    "message": "Escribir proyectos"
   },
   "scopes.reportCreate.description": {
     "message": "Crear informes"
@@ -3348,7 +3348,7 @@
     "message": "Modo de desarrollador desactivado"
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Página de paquetes de datos"
+    "message": "Página de Paquetes de Datos"
   },
   "settings.display.project-list-layouts.description": {
     "message": "Selecciona tu diseño preferido para cada página que muestre listas de proyectos en este dispositivo."
@@ -3378,7 +3378,7 @@
     "message": "Página de servidores"
   },
   "settings.display.project-list-layouts.shader": {
-    "message": "Página de Shaders"
+    "message": "Página de Sombreadores"
   },
   "settings.display.project-list-layouts.title": {
     "message": "Diseños de la lista de proyectos"
@@ -3474,7 +3474,7 @@
     "message": "Expira {inTime}"
   },
   "settings.pats.token.last-used": {
-    "message": "Último uso usada"
+    "message": "Último uso {ago}"
   },
   "settings.pats.token.never-used": {
     "message": "Nunca utilizado"

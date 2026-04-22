@@ -8,7 +8,8 @@ const environmentMultiple: Stage = {
 	id: 'environment',
 	navigate: '/settings/versions',
 	icon: GlobeIcon,
-	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
+	guidance_url:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
 	text: async () =>
 		(await import('../../messages/checklist-text/environment/environment-multiple.md?raw')).default,
 	shouldShow: (project, projectV3) =>

@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "عرض التحليلات"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "عذر تحميل خادم الإعدادات"
+  },
   "badge.beta": {
     "defaultMessage": "تجريبي"
   },
@@ -40,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "جديد"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "إلغاء"
   },
   "button.accept": {
     "defaultMessage": "اقبل"
@@ -226,6 +232,9 @@
   },
   "content.confirm-modpack-update.header": {
     "defaultMessage": "{action, select, downgrade {خفض ٳصدار} other {تحديث}} حزمة التعديلات"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": ""
   },
   "form.label.address-line": {
     "defaultMessage": "خط عنوان"

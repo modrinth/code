@@ -24,7 +24,7 @@
     "message": "Lade das RPM herunter"
   },
   "app-marketing.download.flathub": {
-    "message": "Jetzt auf Flathub"
+    "message": "Jetzt auf Flathub herunterladen"
   },
   "app-marketing.download.linux": {
     "message": "Linux"
@@ -369,13 +369,13 @@
     "message": "Dadurch wird diese Kollektion dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
   },
   "collection.delete-modal.title": {
-    "message": "Bist du Dir sicher, dass du diese Sammlung löschen willst?"
+    "message": "Möchtest du diese Kollektion wirklich löschen?"
   },
   "collection.description": {
     "message": "{description} – Schau dir die Kollektion {name} von {username} auf Modrinth an"
   },
   "collection.description.following": {
-    "message": "Automatisch generierte Sammlung aller Projekte, denen du folgst."
+    "message": "Automatisch generierte Kollektion aller Projekte, denen du folgst."
   },
   "collection.editing": {
     "message": "Kollektion bearbeiten"
@@ -3155,6 +3155,12 @@
   "settings.billing.interval.monthly": {
     "message": "monatlich"
   },
+  "settings.billing.interval.quarter": {
+    "message": "Quartal"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "vierteljährlich"
+  },
   "settings.billing.interval.year": {
     "message": "Jahr"
   },
@@ -3268,6 +3274,9 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Fehler beim erneuten Abonnieren"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Falls der Server derzeit gekündigt ist kann die Einrichtung des Servers 10-15 Minuten dauern."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Anfrage zum erneuten Abonnieren übermittelt"

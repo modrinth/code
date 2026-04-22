@@ -35,6 +35,9 @@
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Failed to load server settings"
   },
+  "badge.alpha": {
+    "defaultMessage": "Alpha"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -640,9 +643,6 @@
   },
   "files.layout.extraction-started-title": {
     "defaultMessage": "Extraction started"
-  },
-  "files.layout.loading": {
-    "defaultMessage": "Loading files..."
   },
   "files.layout.selected-count": {
     "defaultMessage": "{count} selected"
@@ -2872,12 +2872,6 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "An error occurred"
-  },
-  "servers.manage.loading-servers": {
-    "defaultMessage": "Loading your servers..."
-  },
-  "servers.manage.loading.serverPanel": {
-    "defaultMessage": "Loading your server panel..."
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"

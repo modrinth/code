@@ -110,6 +110,15 @@
   "app.instance.worlds.filter-vanilla": {
     "message": "Vanilla"
   },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Sigurado ka bang gusto mong tanggalin ang {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Hanapin sa {count} mundo..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "server na ito"
+  },
   "app.modal.install-to-play.content-required": {
     "message": "Nangangailangan ng kontento"
   },
@@ -211,6 +220,15 @@
   },
   "app.update.reload-to-update": {
     "message": "Handang ma-install ang update"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Pumili ng opsiyon"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Di-magkatugmang bersiyong {version}"
   },
   "app.world.world-item.offline": {
     "message": "Offline"
