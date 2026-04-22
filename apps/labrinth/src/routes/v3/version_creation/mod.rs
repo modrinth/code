@@ -1,3 +1,5 @@
+mod license_check;
+
 use super::project_creation::{CreateError, UploadedFile};
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
@@ -862,8 +864,10 @@ pub async fn upload_file(
         ));
     }
 
+    let data = data.freeze();
+
     let validation_result = validate_file(
-        data.clone().into(),
+        data.clone(),
         file_extension.to_string(),
         loaders.clone(),
         file_type,
@@ -872,6 +876,13 @@ pub async fn upload_file(
         redis,
     )
     .await?;
+
+    if let ValidationResult::PassWithPackDataAndFiles { .. } = validation_result
+    {
+        if let Err(e) = license_check::check_override_licenses(&data) {
+            eprintln!("license check failed: {e}");
+        }
+    }
 
     if let ValidationResult::PassWithPackDataAndFiles {
         ref format,
@@ -940,7 +951,6 @@ pub async fn upload_file(
         }
     }
 
-    let data = data.freeze();
     let primary = (validation_result.is_passed()
         && version_files.iter().all(|x| !x.primary)
         && !ignore_primary)
