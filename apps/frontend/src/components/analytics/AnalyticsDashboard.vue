@@ -1,7 +1,28 @@
 <template>
-	<QueryBuilder />
+	<div class="flex flex-col gap-4">
+		<QueryBuilder />
+		<StatCards />
+	</div>
 </template>
 
 <script setup lang="ts">
+import { injectProjectPageContext } from '@modrinth/ui'
+
+import { createAnalyticsDashboardContext, provideAnalyticsDashboardContext } from '~/providers/analytics'
+import { injectOrganizationContext } from '~/providers/organization-context'
+
 import QueryBuilder from './query-builder/QueryBuilder.vue'
+import StatCards from './stat-cards/StatCards.vue'
+
+const auth = await useAuth()
+const projectPageContext = injectProjectPageContext(null)
+const organizationContext = injectOrganizationContext(null)
+
+const analyticsDashboardContext = createAnalyticsDashboardContext({
+	auth,
+	projectPageContext,
+	organizationContext,
+})
+
+provideAnalyticsDashboardContext(analyticsDashboardContext)
 </script>
