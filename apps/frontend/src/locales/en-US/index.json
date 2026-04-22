@@ -227,6 +227,51 @@
   "auth.continue-with-provider": {
     "message": "Continue with {provider}"
   },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Age requirement"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Complete sign up"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Date of birth"
+  },
+  "auth.create-account.date-of-birth.over13-helper": {
+    "message": "You must be over 13 years old to use Modrinth."
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Please enter your date of birth before continuing."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Date of birth required"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "You cannot create an account at Modrinth unless you are 13 years old."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Relevant source code"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "We do not store your date of birth, it is only used to confirm your age at sign up."
+  },
+  "auth.create-account.page-title": {
+    "message": "Create Account"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Security check"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Keep me updated on the cool things Modrinth is working on via email"
+  },
+  "auth.create-account.title": {
+    "message": "Create an Account"
+  },
+  "auth.create-account.username.optional-label": {
+    "message": "Username"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Enter username"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Send recovery email"
   },
@@ -281,6 +326,9 @@
   "auth.sign-in.title": {
     "message": "Sign In"
   },
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Age requirement"
+  },
   "auth.sign-up.continue-with-email": {
     "message": "Continue with Email"
   },
@@ -295,9 +343,6 @@
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Already have an account?"
-  },
-  "auth.sign-up.subscribe.label": {
-    "message": "Subscribe to updates about Modrinth"
   },
   "auth.sign-up.title": {
     "message": "Sign Up"

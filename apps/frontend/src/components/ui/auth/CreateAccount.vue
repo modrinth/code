@@ -55,7 +55,7 @@
 			/>
 		</section>
 
-		<section class="flex flex-col gap-2.5" v-if="globals?.captcha_enabled">
+		<section v-if="globals?.captcha_enabled" class="flex flex-col gap-2.5">
 			<label class="text-md font-semibold text-contrast">{{
 				formatMessage(messages.securityCheckLabel)
 			}}</label>

@@ -19,7 +19,13 @@
 </template>
 
 <script setup>
-import { commonMessages, defineMessages, injectModrinthClient, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import {
+	commonMessages,
+	defineMessages,
+	injectModrinthClient,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
