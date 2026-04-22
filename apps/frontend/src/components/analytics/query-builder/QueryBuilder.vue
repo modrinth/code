@@ -107,16 +107,6 @@
 						</template>
 					</Menu>
 				</div>
-
-				<div v-if="activeFilterLabels.length > 0" class="flex flex-wrap items-center gap-2">
-					<span
-						v-for="filterLabel in activeFilterLabels"
-						:key="filterLabel"
-						class="inline-flex items-center rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1 text-xs font-medium text-primary"
-					>
-						{{ filterLabel }}
-					</span>
-				</div>
 			</div>
 		</div>
 	</div>
