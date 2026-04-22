@@ -5,12 +5,11 @@ use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
-use eyre::{Context, eyre};
 use parking_lot::Mutex;
 use rand::Rng;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
-use std::collections::{HashSet, VecDeque};
+use std::collections::VecDeque;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
@@ -164,6 +163,28 @@ pub async fn fetch(
         .await
 }
 
+#[tracing::instrument(skip(semaphore))]
+pub async fn fetch_with_client(
+    url: &str,
+    sha1: Option<&str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    client: &reqwest::Client,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client(
+        Method::GET,
+        url,
+        sha1,
+        None,
+        None,
+        None,
+        semaphore,
+        exec,
+        client,
+    )
+    .await
+}
+
 #[tracing::instrument(skip(json_body, semaphore))]
 pub async fn fetch_json<T>(
     method: Method,
@@ -184,7 +205,8 @@ where
     Ok(value)
 }
 
-/// Downloads a file with retry and checksum functionality
+/// Downloads a file with retry and checksum functionality, and a specific
+/// [`reqwest::Client`].
 #[tracing::instrument(skip(json_body, semaphore))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced(
@@ -196,6 +218,34 @@ pub async fn fetch_advanced(
     loading_bar: Option<(&LoadingBarId, f64)>,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client(
+        method,
+        url,
+        sha1,
+        json_body,
+        header,
+        loading_bar,
+        semaphore,
+        exec,
+        &INSECURE_REQWEST_CLIENT,
+    )
+    .await
+}
+
+/// Downloads a file with retry and checksum functionality
+#[tracing::instrument(skip(json_body, semaphore))]
+#[allow(clippy::too_many_arguments)]
+pub async fn fetch_advanced_with_client(
+    method: Method,
+    url: &str,
+    sha1: Option<&str>,
+    json_body: Option<serde_json::Value>,
+    header: Option<(&str, &str)>,
+    loading_bar: Option<(&LoadingBarId, f64)>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    client: &reqwest::Client,
 ) -> crate::Result<Bytes> {
     let _permit = semaphore.0.acquire().await?;
 
@@ -335,7 +385,9 @@ pub async fn fetch_mirrors(
     }
 
     for (index, mirror) in mirrors.iter().enumerate() {
-        let result = fetch(mirror, sha1, semaphore, exec).await;
+        let result =
+            fetch_with_client(mirror, sha1, semaphore, exec, &REQWEST_CLIENT)
+                .await;
 
         if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
             return result;
@@ -343,37 +395,6 @@ pub async fn fetch_mirrors(
     }
 
     unreachable!()
-}
-
-static TRUSTED_DOWNLOAD_HOSTS: LazyLock<HashSet<String>> =
-    LazyLock::new(|| {
-        env!("TRUSTED_DOWNLOAD_HOSTS")
-            .split(',')
-            .map(|s| s.trim().to_string())
-            .collect()
-    });
-
-/// Downloads a file from specified mirrors, enforcing HTTPS and a trusted host allowlist
-#[tracing::instrument(skip(semaphore))]
-pub async fn fetch_from_trusted_mirrors(
-    mirrors: &[&str],
-    sha1: Option<&str>,
-    semaphore: &FetchSemaphore,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-) -> crate::Result<Bytes> {
-    for url in mirrors {
-        let parsed = url::Url::parse(url)
-            .with_context(|| eyre!("invalid download URL '{url}'"))?;
-
-        let host = parsed.host_str().unwrap_or("");
-        if !TRUSTED_DOWNLOAD_HOSTS.contains(host) {
-            return Err(
-                eyre!("download URL host '{host}' is not trusted").into()
-            );
-        }
-    }
-
-    fetch_mirrors(mirrors, sha1, semaphore, exec).await
 }
 
 /// Posts a JSON to a URL
