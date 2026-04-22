@@ -10,6 +10,7 @@ use crate::database::models::{DBUser, DBUserId};
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
+use crate::models::error::ApiError as ApiErrorResponse;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
@@ -23,6 +24,7 @@ use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::validate::validation_errors_to_string;
 use actix_http::header::LOCATION;
+use actix_web::http::StatusCode;
 use actix_web::web::{Data, Query};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use argon2::password_hash::SaltString;
@@ -40,6 +42,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
+use thiserror::Error;
 use tracing::{error, info};
 use url::Url;
 use validator::Validate;
@@ -52,6 +55,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
             .service(auth_callback)
             .service(delete_auth_provider)
             .service(create_oauth_account)
+            .service(validate_create_account_with_password)
             .service(create_account_with_password)
             .service(login_password)
             .service(login_2fa)
@@ -96,7 +100,7 @@ impl TempUser {
                 .await?
                 .is_some()
         {
-            return Err(AuthenticationError::DuplicateUser);
+            return Err(AuthenticationError::DuplicateEmail);
         }
 
         let user_id =
@@ -107,7 +111,7 @@ impl TempUser {
             .wrap_err("failed to fetch existing user by id")?;
 
         if existing_id.is_some() {
-            return Err(AuthenticationError::DuplicateUser);
+            return Err(AuthenticationError::UsernameTaken);
         }
 
         let (avatar_url, raw_avatar_url) = if let Some(avatar_url) =
@@ -1282,7 +1286,7 @@ pub async fn auth_callback(
 
         if let Some(id) = user_id {
             if user_id_opt.is_some() {
-                return Err(AuthenticationError::DuplicateUser);
+                return Err(AuthenticationError::ProviderAlreadyLinked);
             }
 
             provider
@@ -1355,6 +1359,7 @@ pub async fn auth_callback(
             // for this, we redirect them to a frontend page which lets them set a username.
             // then frontend will call `/create/oauth` with the same state parameter and
             // chosen settings (username, subscribe to newsletter), and handle navigation.
+            let suggested_username = oauth_user.username.clone();
 
             flow_guard
                 .replace_with(DBFlow::OAuthPending {
@@ -1372,7 +1377,8 @@ pub async fn auth_callback(
                 .append_pair(
                     "requires_dob",
                     &requires_dob(provider).to_string(),
-                );
+                )
+                .append_pair("username", &suggested_username);
 
             let redirect_url = redirect_url.to_string();
             Ok(HttpResponse::TemporaryRedirect()
@@ -1406,7 +1412,7 @@ struct NewOAuthAccount {
     post,
     operation_id = "createOAuthAccount",
     responses(
-        (status = 200, description = "Account created"),
+        (status = 200, description = "OAuth account created"),
         (status = 400, description = "Invalid input")
     )
 )]
@@ -1418,6 +1424,10 @@ async fn create_oauth_account(
     redis: Data<RedisPool>,
     web::Json(new_account): web::Json<NewOAuthAccount>,
 ) -> Result<HttpResponse, ApiError> {
+    new_account.validate().map_err(|err| {
+        ApiError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
+
     if !check_hcaptcha(&req, &new_account.challenge).await? {
         return Err(ApiError::Turnstile);
     }
@@ -1562,14 +1572,270 @@ pub async fn check_sendy_subscription(
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct NewAccount {
     // keep in sync with NewOAuthAccount
-    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub username: String,
-    #[validate(length(min = 8, max = 256))]
     pub password: String,
-    #[validate(email)]
     pub email: String,
-    pub challenge: String,
+    pub challenge: Option<String>,
     pub sign_up_newsletter: Option<bool>,
+}
+
+#[derive(Debug, Validate)]
+struct AccountRegisterFlow {
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
+    username: String,
+    #[validate(length(min = 8, max = 256))]
+    password: String,
+    #[validate(email)]
+    email: String,
+    sign_up_newsletter: bool,
+}
+
+#[derive(Debug)]
+struct ReadyAccountRegisterFlow {
+    inner: AccountRegisterFlow,
+}
+
+#[derive(Debug, Error)]
+enum AccountRegisterValidateError {
+    #[error("Username is already taken on Modrinth.")]
+    UsernameTaken,
+    #[error(
+        "Email is already registered on Modrinth. Try 'Forgot password' to access your account."
+    )]
+    DuplicateEmail,
+    #[error("{}", match .0 {
+        Some(feedback) => format!("Password too weak: {feedback}"),
+        None => "Specified password is too weak! Please improve its strength.".to_string(),
+    })]
+    WeakPassword(Option<String>),
+    #[error("{0}")]
+    InvalidInput(String),
+}
+
+impl AccountRegisterValidateError {
+    fn error_code(&self) -> &'static str {
+        match self {
+            AccountRegisterValidateError::UsernameTaken => "username_taken",
+            AccountRegisterValidateError::DuplicateEmail => "duplicate_email",
+            AccountRegisterValidateError::WeakPassword(_) => "weak_password",
+            AccountRegisterValidateError::InvalidInput(_) => "invalid_input",
+        }
+    }
+}
+
+impl actix_web::ResponseError for AccountRegisterValidateError {
+    fn status_code(&self) -> StatusCode {
+        StatusCode::BAD_REQUEST
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::build(self.status_code()).json(ApiErrorResponse {
+            error: self.error_code(),
+            description: self.to_string(),
+            details: None,
+        })
+    }
+}
+
+impl From<AccountRegisterValidateError> for ApiError {
+    fn from(value: AccountRegisterValidateError) -> Self {
+        match &value {
+            AccountRegisterValidateError::UsernameTaken => {
+                ApiError::Authentication(AuthenticationError::UsernameTaken)
+            }
+            AccountRegisterValidateError::DuplicateEmail => {
+                ApiError::Authentication(AuthenticationError::DuplicateEmail)
+            }
+            _ => ApiError::InvalidInput(value.to_string()),
+        }
+    }
+}
+
+impl From<NewAccount> for AccountRegisterFlow {
+    fn from(account: NewAccount) -> Self {
+        Self {
+            username: account.username,
+            password: account.password,
+            email: account.email,
+            sign_up_newsletter: account.sign_up_newsletter.unwrap_or(false),
+        }
+    }
+}
+
+impl AccountRegisterFlow {
+    async fn validate(
+        self,
+        transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+    ) -> Result<ReadyAccountRegisterFlow, AccountRegisterValidateError> {
+        validator::Validate::validate(&self).map_err(|err| {
+            AccountRegisterValidateError::InvalidInput(
+                validation_errors_to_string(err, None),
+            )
+        })?;
+
+        if crate::database::models::DBUser::get(
+            &self.username,
+            &mut *transaction,
+            redis,
+        )
+        .await
+        .map_err(|err| {
+            AccountRegisterValidateError::InvalidInput(err.to_string())
+        })?
+        .is_some()
+        {
+            return Err(AccountRegisterValidateError::UsernameTaken);
+        }
+
+        let score =
+            zxcvbn::zxcvbn(&self.password, &[&self.username, &self.email]);
+
+        if score.score() < Score::Three {
+            let feedback = score
+                .feedback()
+                .and_then(|x| x.warning())
+                .map(|w| w.to_string());
+            return Err(AccountRegisterValidateError::WeakPassword(feedback));
+        }
+
+        if !crate::database::models::DBUser::get_by_case_insensitive_email(
+            &self.email,
+            &mut *transaction,
+        )
+        .await
+        .map_err(|err| {
+            AccountRegisterValidateError::InvalidInput(err.to_string())
+        })?
+        .is_empty()
+        {
+            return Err(AccountRegisterValidateError::DuplicateEmail);
+        }
+
+        Ok(ReadyAccountRegisterFlow { inner: self })
+    }
+}
+
+impl ReadyAccountRegisterFlow {
+    async fn execute(
+        self,
+        req: HttpRequest,
+        transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+        email_queue: &EmailQueue,
+    ) -> Result<crate::models::sessions::Session, ApiError> {
+        let register_flow = self.inner;
+
+        let user_id =
+            crate::database::models::generate_user_id(transaction).await?;
+
+        let hasher = Argon2::default();
+        let salt = SaltString::generate(&mut ChaCha20Rng::from_entropy());
+        let password_hash = hasher
+            .hash_password(register_flow.password.as_bytes(), &salt)?
+            .to_string();
+
+        crate::database::models::DBUser {
+            id: user_id,
+            github_id: None,
+            discord_id: None,
+            gitlab_id: None,
+            google_id: None,
+            steam_id: None,
+            microsoft_id: None,
+            password: Some(password_hash),
+            paypal_id: None,
+            paypal_country: None,
+            paypal_email: None,
+            venmo_handle: None,
+            stripe_customer_id: None,
+            totp_secret: None,
+            username: register_flow.username.clone(),
+            email: Some(register_flow.email.clone()),
+            email_verified: false,
+            avatar_url: None,
+            raw_avatar_url: None,
+            bio: None,
+            created: Utc::now(),
+            role: Role::Developer.to_string(),
+            badges: Badges::default(),
+            allow_friend_requests: true,
+            is_subscribed_to_newsletter: register_flow.sign_up_newsletter,
+        }
+        .insert(transaction)
+        .await
+        .map_err(|err| {
+            if let sqlx::Error::Database(database_error) = &err {
+                match database_error.constraint() {
+                    Some("username_unique" | "users_username_key") => {
+                        return ApiError::from(
+                            AccountRegisterValidateError::UsernameTaken,
+                        );
+                    }
+                    Some("email_unique" | "users_email_key") => {
+                        return ApiError::from(
+                            AccountRegisterValidateError::DuplicateEmail,
+                        );
+                    }
+                    _ => {}
+                }
+            }
+
+            ApiError::from(err)
+        })?;
+
+        let session =
+            issue_session(req, user_id, transaction, redis, None).await?;
+        let res = crate::models::sessions::Session::from(session, true, None);
+
+        let mailbox: Mailbox = register_flow.email.parse().map_err(|_| {
+            ApiError::InvalidInput("Invalid email address!".to_string())
+        })?;
+
+        let flow = DBFlow::ConfirmEmail {
+            user_id,
+            confirm_email: register_flow.email.clone(),
+        }
+        .insert(Duration::hours(24), redis)
+        .await?;
+
+        email_queue
+            .send_one(
+                transaction,
+                NotificationBody::VerifyEmail { flow },
+                user_id,
+                mailbox,
+            )
+            .await?
+            .as_user_error()?;
+
+        Ok(res)
+    }
+}
+
+#[utoipa::path(
+    post,
+    operation_id = "validateCreateAccountWithPassword",
+    responses(
+        (status = 200, description = "Account input is valid"),
+        (status = 400, description = "Invalid input")
+    )
+)]
+#[post("/create/validate")]
+pub async fn validate_create_account_with_password(
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    new_account: web::Json<NewAccount>,
+) -> Result<(), AccountRegisterValidateError> {
+    let mut transaction = pool.begin().await.map_err(|err| {
+        AccountRegisterValidateError::InvalidInput(err.to_string())
+    })?;
+
+    AccountRegisterFlow::from(new_account.into_inner())
+        .validate(&mut transaction, &redis)
+        .await?;
+
+    Ok(())
 }
 
 #[utoipa::path(
@@ -1588,122 +1854,23 @@ pub async fn create_account_with_password(
     new_account: web::Json<NewAccount>,
     email: web::Data<EmailQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    new_account.0.validate().map_err(|err| {
-        ApiError::InvalidInput(validation_errors_to_string(err, None))
-    })?;
+    let new_account = new_account.into_inner();
 
-    if !check_hcaptcha(&req, &new_account.challenge).await? {
+    if !check_hcaptcha(&req, new_account.challenge.as_deref().unwrap_or(""))
+        .await?
+    {
         return Err(ApiError::Turnstile);
     }
 
-    if crate::database::models::DBUser::get(
-        &new_account.username,
-        &**pool,
-        &redis,
-    )
-    .await?
-    .is_some()
-    {
-        return Err(ApiError::InvalidInput("Username is taken!".to_string()));
-    }
-
     let mut transaction = pool.begin().await?;
-    let user_id =
-        crate::database::models::generate_user_id(&mut transaction).await?;
 
-    let new_account = new_account.0;
+    let ready_flow = AccountRegisterFlow::from(new_account)
+        .validate(&mut transaction, &redis)
+        .await?;
 
-    let score = zxcvbn::zxcvbn(
-        &new_account.password,
-        &[&new_account.username, &new_account.email],
-    );
-
-    if score.score() < Score::Three {
-        return Err(ApiError::InvalidInput(
-            if let Some(feedback) = score.feedback().and_then(|x| x.warning()) {
-                format!("Password too weak: {feedback}")
-            } else {
-                "Specified password is too weak! Please improve its strength."
-                    .to_string()
-            },
-        ));
-    }
-
-    let hasher = Argon2::default();
-    let salt = SaltString::generate(&mut ChaCha20Rng::from_entropy());
-    let password_hash = hasher
-        .hash_password(new_account.password.as_bytes(), &salt)?
-        .to_string();
-
-    if !crate::database::models::DBUser::get_by_case_insensitive_email(
-        &new_account.email,
-        &**pool,
-    )
-    .await?
-    .is_empty()
-    {
-        return Err(ApiError::InvalidInput(
-            "Email is already registered on Modrinth! Try 'Forgot password' to access your account.".to_string(),
-        ));
-    }
-
-    crate::database::models::DBUser {
-        id: user_id,
-        github_id: None,
-        discord_id: None,
-        gitlab_id: None,
-        google_id: None,
-        steam_id: None,
-        microsoft_id: None,
-        password: Some(password_hash),
-        paypal_id: None,
-        paypal_country: None,
-        paypal_email: None,
-        venmo_handle: None,
-        stripe_customer_id: None,
-        totp_secret: None,
-        username: new_account.username.clone(),
-        email: Some(new_account.email.clone()),
-        email_verified: false,
-        avatar_url: None,
-        raw_avatar_url: None,
-        bio: None,
-        created: Utc::now(),
-        role: Role::Developer.to_string(),
-        badges: Badges::default(),
-        allow_friend_requests: true,
-        is_subscribed_to_newsletter: new_account
-            .sign_up_newsletter
-            .unwrap_or(false),
-    }
-    .insert(&mut transaction)
-    .await?;
-
-    let session =
-        issue_session(req, user_id, &mut transaction, &redis, None).await?;
-    let res = crate::models::sessions::Session::from(session, true, None);
-
-    let mailbox: Mailbox = new_account.email.parse().map_err(|_| {
-        ApiError::InvalidInput("Invalid email address!".to_string())
-    })?;
-
-    let flow = DBFlow::ConfirmEmail {
-        user_id,
-        confirm_email: new_account.email.clone(),
-    }
-    .insert(Duration::hours(24), &redis)
-    .await?;
-
-    email
-        .send_one(
-            &mut transaction,
-            NotificationBody::VerifyEmail { flow },
-            user_id,
-            mailbox,
-        )
-        .await?
-        .as_user_error()?;
-
+    let res = ready_flow
+        .execute(req, &mut transaction, &redis, &email)
+        .await?;
     transaction.commit().await?;
 
     Ok(HttpResponse::Ok().json(res))
