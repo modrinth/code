@@ -1,3 +1,7 @@
 <template>
-	<div>Analytics is being rebuilt.</div>
+	<AnalyticsDashboard />
 </template>
+
+<script setup lang="ts">
+import AnalyticsDashboard from '~/components/analytics/AnalyticsDashboard.vue'
+</script>
