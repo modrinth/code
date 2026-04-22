@@ -131,18 +131,24 @@ static GLOBAL_FETCH_FENCE: LazyLock<FetchFence> =
         inner: Mutex::new(FenceInner::new()),
     });
 
-pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
-    let mut headers = reqwest::header::HeaderMap::new();
-
-    let header =
-        reqwest::header::HeaderValue::from_str(&crate::launcher_user_agent())
-            .unwrap();
-    headers.insert(reqwest::header::USER_AGENT, header);
+fn reqwest_client_builder() -> reqwest::ClientBuilder {
     reqwest::Client::builder()
         .tcp_keepalive(Some(time::Duration::from_secs(10)))
-        .default_headers(headers)
+        .user_agent(crate::launcher_user_agent())
+}
+
+pub static INSECURE_REQWEST_CLIENT: LazyLock<reqwest::Client> =
+    LazyLock::new(|| {
+        reqwest_client_builder()
+            .build()
+            .expect("client configuration should be valid")
+    });
+
+pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
+    reqwest_client_builder()
+        .https_only(true)
         .build()
-        .expect("Reqwest Client Building Failed")
+        .expect("client configuration should be valid")
 });
 
 const FETCH_ATTEMPTS: usize = 2;
@@ -211,7 +217,7 @@ pub async fn fetch_advanced(
             return Err(ErrorKind::ApiIsDownError.into());
         }
 
-        let mut req = REQWEST_CLIENT.request(method.clone(), url);
+        let mut req = INSECURE_REQWEST_CLIENT.request(method.clone(), url);
 
         if let Some(body) = json_body.clone() {
             req = req.json(&body);
@@ -359,10 +365,6 @@ pub async fn fetch_from_trusted_mirrors(
         let parsed = url::Url::parse(url)
             .with_context(|| eyre!("invalid download URL '{url}'"))?;
 
-        if parsed.scheme() != "https" {
-            return Err(eyre!("download URL '{url}' must use HTTPS").into());
-        }
-
         let host = parsed.host_str().unwrap_or("");
         if !TRUSTED_DOWNLOAD_HOSTS.contains(host) {
             return Err(
@@ -384,7 +386,7 @@ pub async fn post_json(
 ) -> crate::Result<()> {
     let _permit = semaphore.0.acquire().await?;
 
-    let mut req = REQWEST_CLIENT.post(url).json(&json_body);
+    let mut req = INSECURE_REQWEST_CLIENT.post(url).json(&json_body);
 
     if let Some(creds) =
         crate::state::ModrinthCredentials::get_active(exec).await?
