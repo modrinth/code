@@ -180,23 +180,23 @@ const messages = defineMessages({
 	},
 })
 
-const getStockRequest = (
-	product: Labrinth.Billing.Internal.Product,
-): Archon.Servers.v0.StockRequest => {
-	const metadata = product.metadata
-	if (metadata.type === 'pyro' || metadata.type === 'medal') {
-		return {
-			cpu: metadata.cpu,
-			memory_mb: metadata.ram,
-			swap_mb: metadata.swap,
-			storage_mb: metadata.storage,
-		}
-	}
-	return { cpu: 0, memory_mb: 0, swap_mb: 0, storage_mb: 0 }
-}
-
 async function updateStock() {
 	currentStock.value = {}
+
+	const getStockRequest = (
+		product: Labrinth.Billing.Internal.Product,
+	): Archon.Servers.v0.StockRequest => {
+		const metadata = product.metadata
+		if (metadata.type === 'pyro' || metadata.type === 'medal') {
+			return {
+				cpu: metadata.cpu,
+				memory_mb: metadata.ram,
+				swap_mb: metadata.swap,
+				storage_mb: metadata.storage,
+			}
+		}
+		return { cpu: 0, memory_mb: 0, swap_mb: 0, storage_mb: 0 }
+	}
 
 	const capacityChecks = sortedRegions.value.map((region) =>
 		props.fetchStock(

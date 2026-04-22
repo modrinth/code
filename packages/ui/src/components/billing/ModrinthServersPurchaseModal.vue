@@ -112,62 +112,9 @@ const skipPaymentMethods = ref<boolean>(true)
 
 type Step = 'plan' | 'region' | 'payment' | 'review'
 
-const isUpgradeFlow = computed(() => !!props.existingSubscription)
-
-const existingRegion = computed<string | undefined>(() => {
-	const metadata = props.existingSubscription?.metadata
-	if (metadata?.type === 'pyro') {
-		return metadata.region
-	}
-
-	const existingPlanMetadata = props.existingPlan?.metadata
-	if (existingPlanMetadata?.type === 'medal') {
-		return existingPlanMetadata.region
-	}
-
-	return undefined
-})
-
-const preferredUpgradeRegion = computed(() => {
-	if (existingRegion.value) {
-		const matchingRegion = props.regions.find((region) => region.shortcode === existingRegion.value)
-		if (matchingRegion) {
-			return matchingRegion.shortcode
-		}
-	}
-
-	return props.regions[0]?.shortcode
-})
-
-watch(
-	() => [isUpgradeFlow.value, preferredUpgradeRegion.value] as const,
-	([upgradeFlow, preferredRegion]) => {
-		if (upgradeFlow && !selectedRegion.value && preferredRegion) {
-			selectedRegion.value = preferredRegion
-		}
-	},
-	{ immediate: true },
-)
-
-const shouldShowRamStep = computed(() => {
-	if (!props.planStage) return true
-	if (!isUpgradeFlow.value) return true
-
-	return customServer.value
-})
-
-const shouldHideRegionSelection = computed(() => isUpgradeFlow.value && customServer.value)
-
-const steps = computed<Step[]>(() =>
-	props.planStage
-		? ([
-				'plan',
-				...(shouldShowRamStep.value ? (['region'] as Step[]) : []),
-				'payment',
-				'review',
-			] as Step[])
-		: (['region', 'payment', 'review'] as Step[]),
-)
+const steps: Step[] = props.planStage
+	? (['plan', 'region', 'payment', 'review'] as Step[])
+	: (['region', 'payment', 'review'] as Step[])
 
 const titles: Record<Step, MessageDescriptor> = {
 	plan: defineMessage({ id: 'servers.purchase.step.plan.title', defaultMessage: 'Plan' }),
@@ -178,7 +125,6 @@ const titles: Record<Step, MessageDescriptor> = {
 	}),
 	review: defineMessage({ id: 'servers.purchase.step.review.title', defaultMessage: 'Review' }),
 }
-const ramTitle = defineMessage({ id: 'servers.purchase.step.ram.title', defaultMessage: 'Ram' })
 
 const purchaseSuccessTitle = defineMessage({
 	id: 'servers.purchase.notification.success.title',
@@ -200,58 +146,17 @@ const currentPing = computed(() => {
 
 const currentStep = ref<Step>()
 
-const stepOrder: Step[] = ['plan', 'region', 'payment', 'review']
-
-function findAdjacentStep(
-	from: Step,
-	direction: 'prev' | 'next',
-	activeSteps: Step[] = steps.value,
-): Step | undefined {
-	const fromOrderIndex = stepOrder.indexOf(from)
-	if (fromOrderIndex < 0) return undefined
-
-	if (direction === 'prev') {
-		for (let i = fromOrderIndex - 1; i >= 0; i--) {
-			const candidate = stepOrder[i]
-			if (activeSteps.includes(candidate)) return candidate
-		}
-	} else {
-		for (let i = fromOrderIndex + 1; i < stepOrder.length; i++) {
-			const candidate = stepOrder[i]
-			if (activeSteps.includes(candidate)) return candidate
-		}
-	}
-
-	return undefined
-}
-
-const currentStepIndex = computed(() => {
-	if (!currentStep.value) return -1
-	const index = steps.value.indexOf(currentStep.value)
-	if (index >= 0) return index
-
-	const fallback = findAdjacentStep(currentStep.value, 'prev')
-	return fallback ? steps.value.indexOf(fallback) : -1
-})
-
+const currentStepIndex = computed(() => (currentStep.value ? steps.indexOf(currentStep.value) : -1))
 const previousStep = computed(() => {
-	if (!currentStep.value) return undefined
-
-	if (currentStep.value === 'review' && skipPaymentMethods.value && primaryPaymentMethodId.value) {
-		return findAdjacentStep('payment', 'prev')
+	const step = currentStep.value ? steps[steps.indexOf(currentStep.value) - 1] : undefined
+	if (step === 'payment' && skipPaymentMethods.value && primaryPaymentMethodId.value) {
+		return 'region'
 	}
-
-	if (currentStep.value === 'payment' && skipPaymentMethods.value && primaryPaymentMethodId.value) {
-		return findAdjacentStep('payment', 'prev')
-	}
-
-	return findAdjacentStep(currentStep.value, 'prev')
+	return step
 })
-
-const nextStep = computed(() => {
-	if (!currentStep.value) return undefined
-	return findAdjacentStep(currentStep.value, 'next')
-})
+const nextStep = computed(() =>
+	currentStep.value ? steps[steps.indexOf(currentStep.value) + 1] : undefined,
+)
 
 const canProceed = computed(() => {
 	switch (currentStep.value) {
@@ -286,13 +191,10 @@ async function beforeProceed(step: string) {
 			return true
 		case 'region':
 			return true
-		case 'payment': {
+		case 'payment':
 			await initializeStripe()
 
-			const shouldAutoSkipPaymentStep =
-				primaryPaymentMethodId.value && skipPaymentMethods.value && currentStep.value !== 'review'
-
-			if (shouldAutoSkipPaymentStep) {
+			if (primaryPaymentMethodId.value && skipPaymentMethods.value) {
 				const paymentMethod = await props.paymentMethods.find(
 					(x) => x.id === primaryPaymentMethodId.value,
 				)
@@ -301,7 +203,6 @@ async function beforeProceed(step: string) {
 				return false
 			}
 			return true
-		}
 		case 'review':
 			if (noPaymentRequired.value) {
 				return true
@@ -352,10 +253,6 @@ async function setStep(step: Step | undefined, skipValidation = false) {
 		return
 	}
 
-	if (step && !steps.value.includes(step)) {
-		return
-	}
-
 	if (await beforeProceed(step)) {
 		currentStep.value = step
 		await nextTick()
@@ -370,19 +267,6 @@ watch(selectedPlan, () => {
 	}
 })
 
-watch(
-	steps,
-	(activeSteps) => {
-		if (!currentStep.value || activeSteps.includes(currentStep.value)) return
-
-		currentStep.value =
-			findAdjacentStep(currentStep.value, 'next', activeSteps) ??
-			findAdjacentStep(currentStep.value, 'prev', activeSteps) ??
-			activeSteps[0]
-	},
-	{ immediate: true },
-)
-
 const defaultPlan = computed<Labrinth.Billing.Internal.Product | undefined>(() => {
 	return (
 		props.availableProducts.find((p) => p?.metadata?.type === 'pyro' && p.metadata.ram === 6144) ??
@@ -390,14 +274,6 @@ const defaultPlan = computed<Labrinth.Billing.Internal.Product | undefined>(() =
 		props.availableProducts[0]
 	)
 })
-
-function getStepTitle(step: Step): MessageDescriptor {
-	if (step === 'region' && shouldHideRegionSelection.value) {
-		return ramTitle
-	}
-
-	return titles[step]
-}
 
 function begin(
 	interval: ServerBillingInterval,
@@ -417,10 +293,9 @@ function begin(
 
 	selectedInterval.value = interval
 	customServer.value = !selectedPlan.value
-	selectedRegion.value = isUpgradeFlow.value ? preferredUpgradeRegion.value : undefined
 	selectedPaymentMethod.value = undefined
 	const skipPlanStep = props.planStage && plan !== undefined
-	currentStep.value = skipPlanStep ? (steps.value[1] ?? steps.value[0]) : steps.value[0]
+	currentStep.value = skipPlanStep ? (steps[1] ?? steps[0]) : steps[0]
 	skipPaymentMethods.value = true
 	projectId.value = project
 	modal.value?.show()
@@ -440,12 +315,6 @@ function handleChooseCustom() {
 }
 
 function handleProceed() {
-	if (currentStep.value === 'plan') {
-		customServer.value = !selectedPlan.value
-		setStep(customServer.value ? 'region' : 'payment')
-		return
-	}
-
 	setStep(nextStep.value)
 }
 
@@ -476,7 +345,7 @@ function goToBreadcrumbStep(id: string) {
 						class="bg-transparent active:scale-95 font-bold text-secondary p-0"
 						@click="goToBreadcrumbStep(step)"
 					>
-						{{ formatMessage(getStepTitle(step)) }}
+						{{ formatMessage(titles[step]) }}
 					</button>
 					<span
 						v-else
@@ -484,7 +353,7 @@ function goToBreadcrumbStep(id: string) {
 							'text-contrast': index === currentStepIndex,
 						}"
 					>
-						{{ formatMessage(getStepTitle(step)) }}
+						{{ formatMessage(titles[step]) }}
 					</span>
 					<ChevronRightIcon
 						v-if="index < steps.length - 1"
@@ -512,7 +381,6 @@ function goToBreadcrumbStep(id: string) {
 				:regions="regions"
 				:pings="pings"
 				:custom="customServer"
-				:hide-region-selection="shouldHideRegionSelection"
 				:available-products="availableProducts"
 				:currency="currency"
 				:interval="selectedInterval"
