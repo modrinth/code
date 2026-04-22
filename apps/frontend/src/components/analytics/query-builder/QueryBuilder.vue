@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+		class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
 	>
 		<div v-if="showProjectRow" class="flex items-center gap-2">
 			<div class="flex items-center gap-2 text-primary">

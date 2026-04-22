@@ -4,8 +4,8 @@
 		class="flex h-full appearance-none flex-col gap-4 rounded-2xl border border-solid p-4 text-left transition-colors"
 		:class="
 			active
-				? 'border-brand bg-highlight-green'
-				: 'border-surface-5 bg-surface-2 hover:bg-surface-3'
+				? 'cursor-default border-brand bg-highlight-green'
+				: 'border-surface-5 bg-surface-3 hover:bg-surface-4 active:scale-95'
 		"
 		@click="emit('click')"
 	>
