@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { useFormatNumber } from '@modrinth/ui'
 
-import { type AnalyticsDashboardStat, injectAnalyticsDashboardContext } from '~/providers/analytics'
+import { type AnalyticsDashboardStat, injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 
 import StatCard from './StatCard.vue'
 

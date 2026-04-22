@@ -93,8 +93,8 @@
 <script setup lang="ts">
 import { Chips, useFormatNumber } from '@modrinth/ui'
 
-import type { AnalyticsDashboardStat } from '~/providers/analytics'
-import { injectAnalyticsDashboardContext } from '~/providers/analytics'
+import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
+import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 
 import AnalyticsChart from './AnalyticsChart.client.vue'
 import AnalyticsChartTooltip, { type AnalyticsChartTooltipEntry } from './AnalyticsChartTooltip.vue'

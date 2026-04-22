@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { injectProjectPageContext } from '@modrinth/ui'
 
-import { createAnalyticsDashboardContext, provideAnalyticsDashboardContext } from '~/providers/analytics'
+import { createAnalyticsDashboardContext, provideAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 import { injectOrganizationContext } from '~/providers/organization-context'
 
 import AnalyticsGraph from './graph/AnalyticsGraph.vue'

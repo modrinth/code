@@ -134,72 +134,26 @@ import {
 } from '@modrinth/ui'
 import { Menu } from 'floating-vue'
 
-import { injectAnalyticsDashboardContext } from '~/providers/analytics'
+import {
+	type AnalyticsBreakdownPreset,
+	type AnalyticsGroupByPreset,
+	type AnalyticsQueryFilterCategory,
+	type AnalyticsSelectedFilters,
+	type AnalyticsTimeframePreset,
+	injectAnalyticsDashboardContext,
+} from '~/providers/analytics/analytics'
 
 const ALL_FILTER_VALUE = '__all__'
 const MIN_RANGE_MS = 60 * 60 * 1000
 const MAX_TIME_SLICES = 1024
 
-export type QueryBuilderProject = {
-	id: string
-	name: string
-}
-
-export type QueryBuilderFilterCategory =
-	| 'project'
-	| 'country'
-	| 'monetization'
-	| 'download_source'
-	| 'download_type'
-	| 'game_version'
-	| 'loader_type'
-
-type TimeframePreset =
-	| 'today'
-	| 'yesterday'
-	| 'last_24_hours'
-	| 'last_7_days'
-	| 'last_14_days'
-	| 'last_30_days'
-	| 'last_90_days'
-	| 'last_190_days'
-	| 'this_month'
-	| 'year_to_date'
-	| 'all_time'
-
-type GroupByPreset = '1h' | '6h' | 'day' | 'week' | 'month' | 'year'
-
-type BreakdownPreset =
-	| 'none'
-	| 'country'
-	| 'monetization'
-	| 'download_source'
-	| 'download_type'
-	| 'loader'
-	| 'game_version'
-
 const analyticsDashboardContext = injectAnalyticsDashboardContext()
 const projects = computed(() => analyticsDashboardContext.projects.value)
-
-const selectedProjectIds = computed<string[]>({
-	get: () => analyticsDashboardContext.selectedProjectIds.value,
-	set: (nextProjectIds) => {
-		analyticsDashboardContext.selectedProjectIds.value = nextProjectIds
-	},
-})
-const selectedTimeframe = ref<TimeframePreset>('yesterday')
-const selectedGroupBy = ref<GroupByPreset>('1h')
-const selectedBreakdown = ref<BreakdownPreset>('none')
-
-const selectedFilters = ref<Record<QueryBuilderFilterCategory, string[]>>({
-	project: [],
-	country: [],
-	monetization: [],
-	download_source: [],
-	download_type: [],
-	game_version: [],
-	loader_type: [],
-})
+const selectedProjectIds = analyticsDashboardContext.selectedProjectIds
+const selectedTimeframe = analyticsDashboardContext.selectedTimeframe
+const selectedGroupBy = analyticsDashboardContext.selectedGroupBy
+const selectedBreakdown = analyticsDashboardContext.selectedBreakdown
+const selectedFilters = analyticsDashboardContext.selectedFilters
 
 const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 	projects.value.map((project) => ({
@@ -210,7 +164,7 @@ const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 
 const showProjectRow = computed(() => projects.value.length > 1)
 
-const timeframeOptions: ComboboxOption<TimeframePreset>[] = [
+const timeframeOptions: ComboboxOption<AnalyticsTimeframePreset>[] = [
 	{ value: 'today', label: 'Today' },
 	{ value: 'yesterday', label: 'Yesterday' },
 	{ value: 'last_24_hours', label: 'Last 24 hours' },
@@ -224,7 +178,7 @@ const timeframeOptions: ComboboxOption<TimeframePreset>[] = [
 	{ value: 'all_time', label: 'All time' },
 ]
 
-const groupByOptions: ComboboxOption<GroupByPreset>[] = [
+const groupByOptions: ComboboxOption<AnalyticsGroupByPreset>[] = [
 	{ value: '1h', label: '1h' },
 	{ value: '6h', label: '6h' },
 	{ value: 'day', label: 'Day' },
@@ -233,7 +187,7 @@ const groupByOptions: ComboboxOption<GroupByPreset>[] = [
 	{ value: 'year', label: 'Year' },
 ]
 
-const breakdownOptions: ComboboxOption<BreakdownPreset>[] = [
+const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
 	{ value: 'none', label: 'None' },
 	{ value: 'country', label: 'Country' },
 	{ value: 'monetization', label: 'Monetization' },
@@ -249,7 +203,7 @@ type FilterOption = {
 }
 
 type FilterCategory = {
-	key: QueryBuilderFilterCategory
+	key: AnalyticsQueryFilterCategory
 	label: string
 	options: FilterOption[]
 }
@@ -304,48 +258,7 @@ const filterCategories = computed<FilterCategory[]>(() => [
 	},
 ])
 
-const optionLabelByCategoryAndValue = computed(() => {
-	const optionLabelMap = new Map<string, string>()
-
-	for (const category of filterCategories.value) {
-		for (const option of category.options) {
-			optionLabelMap.set(`${category.key}:${option.value}`, option.label)
-		}
-	}
-
-	return optionLabelMap
-})
-
-const activeFilterLabels = computed(() => {
-	const labels: string[] = []
-
-	for (const category of filterCategories.value) {
-		if (category.key === 'project') {
-			continue
-		}
-
-		const selectedValues = selectedFilters.value[category.key]
-		for (const value of selectedValues) {
-			const optionLabel = optionLabelByCategoryAndValue.value.get(`${category.key}:${value}`)
-			if (optionLabel) {
-				labels.push(`${category.label}: ${optionLabel}`)
-			}
-		}
-	}
-
-	if (selectedProjectIds.value.length !== projects.value.length) {
-		for (const selectedProjectId of selectedProjectIds.value) {
-			const project = projects.value.find((item) => item.id === selectedProjectId)
-			if (project) {
-				labels.push(`Project: ${project.name}`)
-			}
-		}
-	}
-
-	return labels
-})
-
-function isFilterValueSelected(categoryKey: QueryBuilderFilterCategory, value: string): boolean {
+function isFilterValueSelected(categoryKey: AnalyticsQueryFilterCategory, value: string): boolean {
 	if (categoryKey === 'project') {
 		if (value === ALL_FILTER_VALUE) {
 			return selectedProjectIds.value.length === projects.value.length
@@ -362,7 +275,7 @@ function isFilterValueSelected(categoryKey: QueryBuilderFilterCategory, value: s
 }
 
 function toggleFilterValue(
-	categoryKey: QueryBuilderFilterCategory,
+	categoryKey: AnalyticsQueryFilterCategory,
 	value: string,
 	nextValue: boolean,
 ) {
@@ -406,7 +319,7 @@ function toggleFilterValue(
 	}
 }
 
-function getCategorySelectionCount(categoryKey: QueryBuilderFilterCategory): number {
+function getCategorySelectionCount(categoryKey: AnalyticsQueryFilterCategory): number {
 	if (categoryKey === 'project') {
 		return selectedProjectIds.value.length === projects.value.length
 			? 0
@@ -422,7 +335,7 @@ function startOfDay(date: Date): Date {
 	return nextDate
 }
 
-function getTimeRangeForPreset(preset: TimeframePreset): { start: Date; end: Date } {
+function getTimeRangeForPreset(preset: AnalyticsTimeframePreset): { start: Date; end: Date } {
 	const now = new Date()
 	const end = new Date(now)
 
@@ -489,7 +402,7 @@ function getTimeRangeForPreset(preset: TimeframePreset): { start: Date; end: Dat
 	}
 }
 
-function getGroupByMinutes(preset: GroupByPreset): number {
+function getGroupByMinutes(preset: AnalyticsGroupByPreset): number {
 	switch (preset) {
 		case '1h':
 			return 60
@@ -531,8 +444,8 @@ function unique<T>(values: T[]): T[] {
 }
 
 function withBreakdownFields(
-	breakdown: BreakdownPreset,
-	filters: Record<QueryBuilderFilterCategory, string[]>,
+	breakdown: AnalyticsBreakdownPreset,
+	filters: AnalyticsSelectedFilters,
 ): {
 	views: Labrinth.Analytics.v3.ProjectViewsField[]
 	downloads: Labrinth.Analytics.v3.ProjectDownloadsField[]

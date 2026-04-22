@@ -3,7 +3,26 @@ import { createContext, injectModrinthClient, type ProjectPageContext } from '@m
 import { useQuery } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 
-import type { OrganizationContext } from './organization-context'
+import type { OrganizationContext } from '../organization-context'
+import {
+	type AnalyticsBreakdownPreset,
+	type AnalyticsGroupByPreset,
+	type AnalyticsSelectedFilters,
+	type AnalyticsTimeframePreset,
+	areSelectedFiltersEqual,
+	areStringArraysEqual,
+	buildAnalyticsQueryBuilderRouteQuery,
+	hasAnalyticsQueryBuilderRouteChange,
+	readAnalyticsQueryBuilderState,
+} from './query-builder-url'
+
+export type {
+	AnalyticsBreakdownPreset,
+	AnalyticsGroupByPreset,
+	AnalyticsQueryFilterCategory,
+	AnalyticsSelectedFilters,
+	AnalyticsTimeframePreset,
+} from './query-builder-url'
 
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
 
@@ -29,6 +48,10 @@ export interface AnalyticsDashboardPercentChanges {
 export interface AnalyticsDashboardContextValue {
 	projects: ComputedRef<AnalyticsDashboardProject[]>
 	selectedProjectIds: Ref<string[]>
+	selectedTimeframe: Ref<AnalyticsTimeframePreset>
+	selectedGroupBy: Ref<AnalyticsGroupByPreset>
+	selectedBreakdown: Ref<AnalyticsBreakdownPreset>
+	selectedFilters: Ref<AnalyticsSelectedFilters>
 	fetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
 	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
@@ -137,8 +160,16 @@ export function createAnalyticsDashboardContext(
 	options: CreateAnalyticsDashboardContextOptions,
 ): AnalyticsDashboardContextValue {
 	const client = injectModrinthClient()
+	const route = useRoute()
+	const router = useRouter()
+	const initialQueryState = readAnalyticsQueryBuilderState(route.query, [])
+
 	const activeStat = ref<AnalyticsDashboardStat>('views')
-	const selectedProjectIds = ref<string[]>([])
+	const selectedProjectIds = ref<string[]>(initialQueryState.selectedProjectIds)
+	const selectedTimeframe = ref<AnalyticsTimeframePreset>(initialQueryState.selectedTimeframe)
+	const selectedGroupBy = ref<AnalyticsGroupByPreset>(initialQueryState.selectedGroupBy)
+	const selectedBreakdown = ref<AnalyticsBreakdownPreset>(initialQueryState.selectedBreakdown)
+	const selectedFilters = ref<AnalyticsSelectedFilters>(initialQueryState.selectedFilters)
 	const fetchRequest = ref<Labrinth.Analytics.v3.FetchRequest | null>(null)
 
 	const hasProjectContext = computed(() => Boolean(options.projectPageContext))
@@ -177,11 +208,12 @@ export function createAnalyticsDashboardContext(
 		}))
 	})
 
+	const availableProjectIds = computed(() => projects.value.map((project) => project.id))
+
 	watch(
 		projects,
 		(nextProjects) => {
 			if (nextProjects.length === 0) {
-				selectedProjectIds.value = []
 				return
 			}
 
@@ -192,6 +224,70 @@ export function createAnalyticsDashboardContext(
 				retainedSelection.length > 0 ? retainedSelection : nextProjects.map((project) => project.id)
 		},
 		{ immediate: true },
+	)
+
+	watch(
+		() => route.query,
+		(nextQuery) => {
+			const nextQueryState = readAnalyticsQueryBuilderState(nextQuery, availableProjectIds.value)
+
+			if (!areStringArraysEqual(selectedProjectIds.value, nextQueryState.selectedProjectIds)) {
+				selectedProjectIds.value = nextQueryState.selectedProjectIds
+			}
+			if (selectedTimeframe.value !== nextQueryState.selectedTimeframe) {
+				selectedTimeframe.value = nextQueryState.selectedTimeframe
+			}
+			if (selectedGroupBy.value !== nextQueryState.selectedGroupBy) {
+				selectedGroupBy.value = nextQueryState.selectedGroupBy
+			}
+			if (selectedBreakdown.value !== nextQueryState.selectedBreakdown) {
+				selectedBreakdown.value = nextQueryState.selectedBreakdown
+			}
+			if (!areSelectedFiltersEqual(selectedFilters.value, nextQueryState.selectedFilters)) {
+				selectedFilters.value = nextQueryState.selectedFilters
+			}
+		},
+	)
+
+	watch(
+		[
+			selectedProjectIds,
+			selectedTimeframe,
+			selectedGroupBy,
+			selectedBreakdown,
+			selectedFilters,
+			availableProjectIds,
+		],
+		() => {
+			if (import.meta.server) {
+				return
+			}
+
+			const nextRouteQuery = buildAnalyticsQueryBuilderRouteQuery(
+				route.query,
+				{
+					selectedProjectIds: selectedProjectIds.value,
+					selectedTimeframe: selectedTimeframe.value,
+					selectedGroupBy: selectedGroupBy.value,
+					selectedBreakdown: selectedBreakdown.value,
+					selectedFilters: selectedFilters.value,
+				},
+				availableProjectIds.value,
+			)
+
+			const hasAnalyticsQueryChange = hasAnalyticsQueryBuilderRouteChange(
+				route.query,
+				nextRouteQuery,
+			)
+
+			if (!hasAnalyticsQueryChange) return
+
+			router.replace({
+				path: route.path,
+				query: nextRouteQuery,
+			})
+		},
+		{ deep: true, immediate: true },
 	)
 
 	const { data: currentTimeSliceData, isPending: currentTimeSlicePending, isFetching: currentFetching } =
@@ -267,6 +363,10 @@ export function createAnalyticsDashboardContext(
 	return {
 		projects,
 		selectedProjectIds,
+		selectedTimeframe,
+		selectedGroupBy,
+		selectedBreakdown,
+		selectedFilters,
 		fetchRequest,
 		timeSlices,
 		previousTimeSlices,

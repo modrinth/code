@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type { AnalyticsDashboardProject, AnalyticsDashboardStat } from '~/providers/analytics'
+import type { AnalyticsDashboardProject, AnalyticsDashboardStat } from '~/providers/analytics/analytics'
 
 export type ChartDataset = {
 	projectId: string

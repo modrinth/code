@@ -19,7 +19,7 @@ import {
 	type TooltipModel,
 } from 'chart.js'
 
-import type { AnalyticsDashboardStat } from '~/providers/analytics'
+import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
 
 import { type ChartDataset, formatAxisValue } from './utils'
 
