@@ -149,8 +149,7 @@ const isDeleting = ref(false)
 const searchQuery = ref('')
 const isFullscreen = ref(false)
 const isApp =
-	typeof window !== 'undefined' &&
-	!!(window as unknown as Record<string, unknown>).__TAURI_INTERNALS__
+	typeof window !== 'undefined' && !!(window as Record<string, unknown>).__TAURI_INTERNALS__
 const isSharing = ref(false)
 const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters()
 const hasLogs = computed(() => ctx.logLines.value.length > 0)
