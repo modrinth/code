@@ -37,3 +37,6 @@ If you need help with the Modrinth web interface or app, please visit our [suppo
 ## License
 
 All packages in this repository are licensed under their respective licenses. Refer to the LICENSE file in each package for more information.
+
+
+<!-- Fix #5888 -->
