@@ -15,8 +15,8 @@ use crate::database::models::loader_fields::{
     VersionField,
 };
 use crate::database::models::{
-    DBProjectId, DBVersionId, LoaderFieldEnumId, LoaderFieldEnumValueId,
-    LoaderFieldId,
+    DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
+    LoaderFieldEnumValueId, LoaderFieldId,
 };
 use crate::database::redis::RedisPool;
 use crate::models::exp;
@@ -171,9 +171,9 @@ pub async fn index_local(
 
     info!("Indexing local org owners!");
 
-    let mods_org_owners: DashMap<DBProjectId, String> = sqlx::query!(
+    let mods_org_owners: DashMap<DBProjectId, (String, DBUserId)> = sqlx::query!(
         "
-        SELECT m.id mod_id, u.username
+        SELECT m.id mod_id, u.username, u.id uid
         FROM mods m
         INNER JOIN organizations o ON o.id = m.organization_id
         INNER JOIN team_members tm ON tm.is_owner = TRUE and tm.team_id = o.team_id
@@ -183,17 +183,17 @@ pub async fn index_local(
         &*project_ids,
     )
     .fetch(pool)
-    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, String>, m| {
-        acc.insert(DBProjectId(m.mod_id), m.username);
+    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, (String, DBUserId)>, m| {
+        acc.insert(DBProjectId(m.mod_id), (m.username, DBUserId(m.uid)));
         async move { Ok(acc) }
     })
     .await?;
 
     info!("Indexing local team owners!");
 
-    let mods_team_owners: DashMap<DBProjectId, String> = sqlx::query!(
+    let mods_team_owners: DashMap<DBProjectId, (String, DBUserId)> = sqlx::query!(
         "
-        SELECT m.id mod_id, u.username
+        SELECT m.id mod_id, u.username, u.id uid
         FROM mods m
         INNER JOIN team_members tm ON tm.is_owner = TRUE and tm.team_id = m.team_id
         INNER JOIN users u ON u.id = tm.user_id
@@ -202,8 +202,8 @@ pub async fn index_local(
         &project_ids,
     )
     .fetch(pool)
-    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, String>, m| {
-        acc.insert(DBProjectId(m.mod_id), m.username);
+    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, (String, DBUserId)>, m| {
+        acc.insert(DBProjectId(m.mod_id), (m.username, DBUserId(m.uid)));
         async move { Ok(acc) }
     })
     .await?;
@@ -263,7 +263,7 @@ pub async fn index_local(
             info!("projects index prog: {count}/{total_len}");
         }
 
-        let owner =
+        let (owner, owner_id) =
             if let Some((_, org_owner)) = mods_org_owners.remove(&project.id) {
                 org_owner
             } else if let Some((_, team_owner)) =
@@ -445,6 +445,7 @@ pub async fn index_local(
                     log_downloads: (project.downloads.max(1) as f64).ln(),
                     icon_url: project.icon_url.clone(),
                     author: owner.clone(),
+                    author_id: ariadne::ids::UserId::from(owner_id).to_string(),
                     indexed_author: normalize_for_search(&owner),
                     date_created: project.approved,
                     created_timestamp: project.approved.timestamp(),

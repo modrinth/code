@@ -193,8 +193,8 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 						name: result.author,
 						link:
 							ctx.variant === 'web'
-								? `/user/${result.author}`
-								: `https://modrinth.com/user/${result.author}`,
+								? `/user/${result.author_id}`
+								: `https://modrinth.com/user/${result.author_id}`,
 					}"
 					:date-updated="result.date_modified"
 					:date-published="result.date_created"
