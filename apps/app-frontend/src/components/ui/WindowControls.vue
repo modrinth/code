@@ -1,9 +1,5 @@
 <template>
-	<section
-		v-if="!nativeDecorations && os !== 'MacOS'"
-		class="window-controls"
-		data-tauri-drag-region-exclude
-	>
+	<section v-if="showControls" class="window-controls" data-tauri-drag-region-exclude>
 		<ButtonStyled type="transparent" circular>
 			<button class="titlebar-button" @click="() => getCurrentWindow().minimize()">
 				<MinimizeIcon />
@@ -28,18 +24,35 @@ import { MaximizeIcon, MinimizeIcon, RestoreIcon, XIcon } from '@modrinth/assets
 import { ButtonStyled } from '@modrinth/ui'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
+import { get as getSettings } from '@/helpers/settings.ts'
 import { getOS } from '@/helpers/utils.js'
+
+const WINDOW_CONTROLS_WIDTH = '8rem'
 
 const nativeDecorations = ref(true)
 const isMaximized = ref(false)
 const os = ref('')
 
+const showControls = computed(() => !nativeDecorations.value && os.value !== 'MacOS')
+watch(
+	showControls,
+	(visible) => {
+		if (typeof document === 'undefined') return
+		if (visible) {
+			document.documentElement.style.setProperty('--window-controls-width', WINDOW_CONTROLS_WIDTH)
+		} else {
+			document.documentElement.style.removeProperty('--window-controls-width')
+		}
+	},
+	{ immediate: true },
+)
+
 onMounted(async () => {
 	os.value = await getOS()
 
-	const settings = await import('@/helpers/settings.ts').then((m) => m.get())
+	const settings = await getSettings()
 	nativeDecorations.value = settings.native_decorations
 
 	if (os.value !== 'MacOS') {
@@ -54,6 +67,7 @@ onMounted(async () => {
 
 	onUnmounted(() => {
 		unlisten()
+		document.documentElement.style.removeProperty('--window-controls-width')
 	})
 })
 

@@ -7,7 +7,8 @@ const versions: Stage = {
 	title: "Are this project's files correct?",
 	id: 'versions',
 	icon: VersionIcon,
-	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
+	guidance_url:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0804bad38e9055951ff31',
 	navigate: '/versions',
 	shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 	actions: [

@@ -443,8 +443,8 @@
 						<ModerationProjectNags
 							v-if="
 								projectV3 &&
-								((currentMember && project.status === 'draft') ||
-									tags.rejectedStatuses.includes(project.status))
+								currentMember &&
+								(project.status === 'draft' || tags.rejectedStatuses.includes(project.status))
 							"
 							:project="project"
 							:project-v3="projectV3"

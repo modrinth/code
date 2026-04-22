@@ -1692,7 +1692,7 @@
     "message": "Cari"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Naik Taraf ke Modrinth+"
+    "message": "Naik taraf ke Modrinth+"
   },
   "moderation.moderate": {
     "message": "Sederhanakan"
@@ -3155,6 +3155,12 @@
   "settings.billing.interval.monthly": {
     "message": "bulanan"
   },
+  "settings.billing.interval.quarter": {
+    "message": "3 bulan"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "setiap tiga bulan"
+  },
   "settings.billing.interval.year": {
     "message": "tahun"
   },
@@ -3269,6 +3275,9 @@
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Ralat semasa melanggan semula"
   },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Jika pelayan dibatalkan pada masa ini, ia mungkin mengambil masa 10-15 minit untuk menyediakan pelayan."
+  },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Permintaan langganan semula telah dihantar"
   },
@@ -3327,7 +3336,7 @@
     "message": "Kaedah kemas kini"
   },
   "settings.billing.upgrade": {
-    "message": "Naik Taraf"
+    "message": "Naik taraf"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Nyahaktifkan mod pembangun"

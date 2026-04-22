@@ -40,12 +40,16 @@ export function useInstallationForm(
 	)
 
 	const loaderVersionOptions = computed(() =>
-		loaderVersionEntries.value.map((v, index) => ({ value: index, label: v.id })),
+		loaderVersionEntries.value.map((v, index) => ({
+			value: index,
+			label: v.label ?? v.id,
+		})),
 	)
 
 	const loaderVersionDisplayValue = computed(() => {
 		const idx = selectedLoaderVersion.value
-		return idx >= 0 && loaderVersionEntries.value[idx] ? loaderVersionEntries.value[idx].id : ''
+		const e = loaderVersionEntries.value[idx]
+		return idx >= 0 && e ? (e.label ?? e.id) : ''
 	})
 
 	const hasSnapshots = computed(() => ctx.resolveHasSnapshots(selectedPlatform.value))

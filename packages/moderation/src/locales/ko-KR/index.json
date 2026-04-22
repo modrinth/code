@@ -90,10 +90,10 @@
     "defaultMessage": "이 라이선스 URL {domain}은(는) 라이선스 정보로 적절하지 않습니다. 라이선스 URL은 소셜 미디어나 게임 플랫폼 등이 아닌, 라이선스 파일 자체로 연결되어야 합니다."
   },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "이 라이센스 URL은 잘못되었습니다. 라이선스 전문으로 연결되는 올바른 URL을 제공해 주세요."
+    "defaultMessage": "이 라이센스 URL은 잘못되었습니다. URL을 라이선스 전문으로 연결해 주세요."
   },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "올바른 라이선스 링크를 추가해주세요"
+    "defaultMessage": "올바른 라이선스 링크를 추가해 주세요"
   },
   "nags.link-shortener-usage.description": {
     "defaultMessage": "외부 링크나 라이선스 링크에서 링크 단축기 및 기타 방법의 사용은 금지되어 있습니다. 반드시 전체 길이의 링크만 사용해 주세요."

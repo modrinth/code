@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Lihat analisis"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Gagal memuat pengaturan server"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -40,6 +43,54 @@
   },
   "badge.new": {
     "defaultMessage": "Baru"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Batal"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} CPU Bersama"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Anda akan segera berlangganan ulang ke <server-name>{serverName}</server-name>. Langganan Anda akan diaktifkan kembali dan server Anda akan terus berjalan tanpa gangguan."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Tidak dapat berlangganan kembali, gagal memuat perincian langganan."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Galat"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Gagal memuat perincian langganan."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 hari"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/bulan"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/kuartal"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/tahun"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Tagihan Anda berikutnya akan jatuh tempo pada <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Langganan"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "RAM {ramGb} GB"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Berlangganan kembali"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "Penyimpanan {storageGb} GB"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Berlangganan ulang ke Server"
   },
   "button.accept": {
     "defaultMessage": "Terima"
@@ -233,6 +284,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Perbarui proyek"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Tahan tombol Shift saat mengeklik \"Perbarui semua\" untuk melewati pesan konfirmasi ini untuk kedepannya."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Perbarui {count, plural, other {# proyek}}"
   },
@@ -247,6 +301,18 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Hapus {itemType}{count, plural, other {}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {Menurunkan versi} other {Memperbarui versi}} dapat menyebabkan masalah kompatibilitas. Mod atau konten yang Anda tambahkan di atas paket akan tetap tersimpan, tetapi mungkin tidak cocok dengan versi baru."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "Peringatan {action, select, downgrade {penurunan versi} other {pembaruan}}"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "{action, select, downgrade {Turunkan versi} other {Perbarui}} paket mod"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "{action, select, downgrade {Turunkan versi} other {Perbarui}} paket mod"
   },
   "content.confirm-unlink.admonition-body": {
     "defaultMessage": "Mod dan konten akan digabungkan dengan apa yang Anda tambahkan di atas paket mod dan ia tidak akan lagi menerima pembaruan."
@@ -269,6 +335,18 @@
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Dimatikan"
   },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Diperbarui"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "{count} dihapus"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Beberapa konten pada server Anda tidak dapat dianalisis dan mungkin dipengaruhi oleh perubahan ini."
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "{count} diperbarui"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Membuat cadangan..."
   },
@@ -284,11 +362,272 @@
   "content.inline-backup.backup-takes-a-while": {
     "defaultMessage": "Pembuatan cadangan mungkin memerlukan waktu beberapa menit, tergantung pada ukuran server Anda."
   },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Buat cadangan"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Tahan tombol Shift saat mengeklik untuk melewati pesan konfirmasi."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Kami menyarankan Anda membuat cadangan terlebih dahulu sebelum melanjutkan, sehingga Anda dapat memulihkan {type, select, server {dunia} other {instans}} Anda bila terjadi masalah."
+  },
+  "content.modpack-card.content-hint-description": {
+    "defaultMessage": "Konten paket mod Anda kini dapat ditemukan di sini!"
+  },
+  "content.modpack-card.content-hint-title": {
+    "defaultMessage": "Konten paket mod telah berpindah"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "Jangan tampilkan lagi"
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Konten tambahan"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Jelajahi konten"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "Mohon tunggu hingga proses selesai sebelum menyunting konten."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Telusuri atau unggah {contentType} untuk memulai"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Tambahkan konten tambahan di atas paket mod ini"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "Belum ada konten yang terpasang"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "Belum ada konten tambahan yang terpasang"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "Gagal memuat konten"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "Sedang memuat konten..."
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "Konten tidak ditemukan."
+  },
   "content.page-layout.please-wait": {
     "defaultMessage": "Mohon tunggu"
   },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Cari {count} {contentType}..."
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "Nama berkas"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Bagikan"
+  },
   "content.page-layout.share.markdown-links": {
     "defaultMessage": "Tautan Markdown"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Tautan proyek"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Nama proyek"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Menurut abjad"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Terbaru dahulu"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Tertua dahulu"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Urutkan berdasarkan {mode}"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Perbarui semua"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Unggah berkas"
+  },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Mengunggah berkas ({completed}/{total})"
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "Semua konten terpilih telah dimatikan"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "Semua konten terpilih telah dihidupkan"
+  },
+  "content.selection-bar.bulk.deleting": {
+    "defaultMessage": "Menghapus {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.deleting-waiting": {
+    "defaultMessage": "Menghapus {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling": {
+    "defaultMessage": "Mematikan {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-waiting": {
+    "defaultMessage": "Mematikan {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling": {
+    "defaultMessage": "Menghidupkan {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling-waiting": {
+    "defaultMessage": "Menghidupkan {contentType}..."
+  },
+  "content.selection-bar.bulk.updating": {
+    "defaultMessage": "Memperbarui {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "Memperbarui {contentType}..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count} {contentType} dipilih"
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "{count, number} terpilih"
+  },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Ringkasan pengekstrakan"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Timpa"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "Lebih dari 100 berkas akan ditimpa bila Anda melanjutkan proses ekstraksi; berikut ini beberapa di antaranya."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "{count} berkas berikut ini telah ada di server Anda, dan akan ditimpa bila Anda melanjutkan proses ekstraksi."
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} tertimpa"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "Tertimpa"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "Berkas-berkas akan ditimpa"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Buat {type, select, directory {folder} other {berkas}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Buat {type, select, directory {folder} other {berkas}}"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "cth: folder-saya"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "cth: config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "Menghapus \"{name}\""
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "Hapus berkas"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {Folder ini beserta seluruh isinya akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.} other {Berkas ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.}}"
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "Tidak dapat memuat isi berkas."
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "Gagal membuka berkas"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "Tidak dapat diunggah ke mclo.gs."
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Gagal membagikan berkas"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "Berkas Anda telah disimpan."
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "Berkas disimpan"
+  },
+  "files.editor.find-close": {
+    "defaultMessage": "Tutup"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Cari"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} dari {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Pencocokan berikutnya"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Tidak ada hasil"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Pencocokan sebelumnya"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Hidup/matikan penggantian"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "URL berkas catatan Anda telah disalin ke papan klip."
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "URL catatan telah disalin"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Ganti"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Ganti Semua"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Ganti"
+  },
+  "files.editor.save-failed-text": {
+    "defaultMessage": "Tidak dapat menyimpan berkas."
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "Gagal menyimpan"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "Buka folder utama"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Coba lagi"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "Gambar terlalu besar untuk ditampilkan (maks. {maxDimension}x{maxDimension} piksel)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "Berkas gambar tidak sah atau kosong."
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Gagal memuat gambar"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "Atur ulang perbesaran"
+  },
+  "files.image_viewer.viewed_image_alt": {
+    "defaultMessage": "Gambar yang ditampilkan"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "Perbesar"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "Perkecil"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "Operasi berkas dimatikan selama proses sedang berlangsung."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Terjadi kesalahan saat menguji coba"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "Uji coba gagal"
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "Tidak ada berkas atau folder."
   },
   "form.label.address-line": {
     "defaultMessage": "Baris alamat"
@@ -1695,7 +2034,7 @@
     "defaultMessage": "Cocok untuk 1—5 orang teman dengan beberapa mod ringan."
   },
   "servers.purchase.step.plan.title": {
-    "defaultMessage": "Berlangganan"
+    "defaultMessage": "Langganan"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Wilayah"

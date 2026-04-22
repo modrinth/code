@@ -35,6 +35,9 @@
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Не вдалося завантажити налаштування сервера"
   },
+  "badge.alpha": {
+    "defaultMessage": "Альфа"
+  },
   "badge.beta": {
     "defaultMessage": "Бета"
   },
@@ -548,11 +551,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Файл збережено"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Закрити"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Знайти"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} з {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Наступний збіг"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Збігів немає"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Попередній збіг"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Перемкнути заміну"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "URL файлу журналу скопійовано до буфера обміну."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "URL журналу скопійовано"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Замінити"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Замінити все"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Замінити"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "Не вдалося зберегти файл."
@@ -611,9 +644,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Видобування почато"
   },
-  "files.layout.loading": {
-    "defaultMessage": "Завантаження файлів…"
-  },
   "files.layout.selected-count": {
     "defaultMessage": "{count} вибрано"
   },
@@ -643,6 +673,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "Навігація серед файлів"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Знайти в файлі"
   },
   "files.navbar.home": {
     "defaultMessage": "Головна"
@@ -2703,7 +2736,7 @@
     "defaultMessage": "Уже маєте сервер?"
   },
   "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Дізнайтеся більше про Modrinth Hosting"
+    "defaultMessage": "Більше про Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -2721,7 +2754,7 @@
     "defaultMessage": "Виберіть свої улюблені моди, а ми подбаємо про решту."
   },
   "servers.list-empty.one-click-mod-installs-title": {
-    "defaultMessage": "Установлення мода в одне натискання"
+    "defaultMessage": "Установлення в одне натискання"
   },
   "servers.list-empty.play-with-friends-description": {
     "defaultMessage": "Запросіть друзів і налаштуйте їх прямо в Modrinth App."
@@ -2756,8 +2789,125 @@
   "servers.listing.new-label": {
     "defaultMessage": "Новий"
   },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Ваші файли зберігатимуться ще <days-remaining>{daysRemaining} {daysRemaining, plural, one {день} few {дні} many {днів} other {днів} }</days-remaining>. Зверніться до служби підтримки, щоб завантажити файли, перш ніж їх буде видалено. "
+  },
+  "servers.listing.notice.files-preserved-after-cancellation": {
+    "defaultMessage": "Ваші файли зберігатимуться протягом 30 днів після скасування."
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "Ваш сервер призупинено модерацією. "
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Ваш сервер буде {verb} до {planSize} плану <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.provisioning": {
+    "defaultMessage": "Зачекайте, поки ми налаштуємо ваш сервер. Це може тривати до 10 хвилин."
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "Вашу підписку скасовано."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "Вашу підписку скасовано <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed": {
+    "defaultMessage": "Вашу підписку скасовано через помилку оплати."
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
+    "defaultMessage": "Вашу підписку скасовано <date>{formattedDate}</date> через помилку оплати. "
+  },
+  "servers.listing.notice.subscription-set-to-cancel": {
+    "defaultMessage": "Вашу підписку встановлено на скасування."
+  },
+  "servers.listing.notice.subscription-set-to-cancel-on-date": {
+    "defaultMessage": "Вашу підписку встановлено на скасовання <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.suspended": {
+    "defaultMessage": "Ваш сервер призупинено. Для подробиць зверніться до служби підтримки Modrinth."
+  },
+  "servers.listing.notice.upgrading": {
+    "defaultMessage": "Апаратне забезпечення вашого сервера зараз оновлюється та незабаром відновиться."
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "Підписатися повторно"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "Значок сервера"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Підтримка"
+  },
+  "servers.listing.using-project-label": {
+    "defaultMessage": "Використання {projectTitle}"
+  },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "Перевірка для нових серверів…"
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "Виконується завантаження файлу. Залишення цієї сторінки скасує завантаження."
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "Вивантаження триває"
+  },
+  "servers.manage.contact-support-button": {
+    "defaultMessage": "Зв'язатися зі службою підтримки Modrinth"
+  },
+  "servers.manage.error.alert-notice": {
+    "defaultMessage": "Наші системи автоматично сповіщають нашу команду про проблему. Ми вже працюємо над тим, щоб повернути їх у мережу."
+  },
+  "servers.manage.error.description": {
+    "defaultMessage": "У нас можуть виникнути тимчасові проблеми з нашими серверами."
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "Подробиці помилки:"
+  },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "Якщо ви нещодавно придбали свій сервер Modrinth Hosting, він зараз у черзі та з’явиться тут, щойно буде готовий. <warning>Не намагайтеся придбати новий сервер.</warning>"
+  },
+  "servers.manage.error.support-notice": {
+    "defaultMessage": "Якщо вам потрібна персональна підтримка щодо стану вашого сервера, зверніться до служби підтримки Modrinth."
+  },
+  "servers.manage.error.title": {
+    "defaultMessage": "Не вдалося завантажити сервера"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "Виникла помилка"
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "Новий сервер"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "Серверів не знайдено."
+  },
+  "servers.manage.purchase-unavailable.text": {
+    "defaultMessage": "Платіжна інформація ще завантажується. Перевірка відкриється коли все буде готово."
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "Покупка недоступна"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "Перезавантажити"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "Під час поновлення підписки на сервер Modrinth сталася помилка."
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "Помилка повторної підписки"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "Якщо сервер наразі скасовано, повторна спроба оплати може зайняти до 10 хвилин."
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "Запит на повторну підписку надіслано"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "Повторну підписку на сервер успішна"
+  },
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Успіх"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Пошук {count} {count, plural, one {сервера} few {серверів} many {серверів} other {серверів}}…"
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
@@ -2770,6 +2920,9 @@
   },
   "servers.manage.settings-hint.title": {
     "defaultMessage": "Налаштування вашого сервера переміщено"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "Залишилося <days-count>{days}</days-count> {days, plural, one {день} few {дні} other {днів}} <hours-count>{hours}</hours-count> {hours, plural, one {година} few {години} other {годин}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {хвилина} few {хвилини} other {хвилин}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {секунда} few {секунди} other {секунд}}…"
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "Новий сервер"

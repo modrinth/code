@@ -59,7 +59,6 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			:model-value="ctx.effectiveCurrentSortType.value"
 			:options="sortOptions"
 			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[16rem]'"
-			placeholder="Sort by"
 			@update:model-value="(val: SortType) => (ctx.effectiveCurrentSortType.value = val)"
 		>
 			<template #prefix>
@@ -161,7 +160,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 					@mouseenter="ctx.onServerProjectHover?.(result)"
 					@mouseleave="ctx.onProjectHoverEnd?.()"
 				>
-					<template v-if="ctx.getCardActions" #actions>
+					<template v-if="ctx.getCardActions?.(result, ctx.projectType.value)?.length" #actions>
 						<div class="flex gap-2">
 							<ButtonStyled
 								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
@@ -224,7 +223,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 					@mouseenter="ctx.onProjectHover?.(result)"
 					@mouseleave="ctx.onProjectHoverEnd?.()"
 				>
-					<template v-if="ctx.getCardActions" #actions>
+					<template v-if="ctx.getCardActions?.(result, ctx.projectType.value)?.length" #actions>
 						<div class="flex gap-2">
 							<ButtonStyled
 								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"

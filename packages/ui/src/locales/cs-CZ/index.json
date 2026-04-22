@@ -215,6 +215,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Smazat {itemType}{count, plural, one {} other {}}"
   },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {Downgrading} other {Updating}} může způsobit problémy s kompatibilitou. Mody nebo obsah, který jste přidali na modpack, zůstanou zachovány, ale nemusí být kompatibilní s novou verzí."
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Upozornění na {action, select, downgrade {zhoršení} other {vylepšení}}"
   },
@@ -346,6 +349,12 @@
   },
   "content.page-layout.uploading-files": {
     "defaultMessage": "Nahrávnání souborů ({completed}/{total})"
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "Aktualizování {contentType}..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count} {contentType} vybráno"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresa"

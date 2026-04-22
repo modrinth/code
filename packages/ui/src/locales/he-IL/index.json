@@ -287,9 +287,6 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "מעדכן {סוגתוכן}..."
   },
-  "files.layout.loading": {
-    "defaultMessage": "טוען קבצים..."
-  },
   "files.move-modal.current-location": {
     "defaultMessage": "מיקום נוכחי"
   },

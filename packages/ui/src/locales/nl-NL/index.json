@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Bekijk analyses"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "De serverinstellingen konden niet worden geladen"
+  },
   "badge.beta": {
     "defaultMessage": "Bèta"
   },
@@ -40,6 +43,54 @@
   },
   "badge.new": {
     "defaultMessage": "Nieuw"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Annuleren"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} Gedeelde CPU's"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "U staat op het punt uw abonnement op <server-name>{serverName}</server-name> te verlengen. Uw abonnement wordt opnieuw geactiveerd en uw server blijft zonder onderbreking draaien."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Ik kan me niet opnieuw abonneren; het laden van de abonnementsgegevens is mislukt."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Fout"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Het laden van de abonnementsgegevens is mislukt."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 Dagen"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/maand"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/kwartaal"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/jaar"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Uw volgende afschrijving vindt plaats op <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Plan"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB RAM"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Opnieuw abonneren"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB Opslag"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Opnieuw abonneren op de server"
   },
   "button.accept": {
     "defaultMessage": "Accepteer"
@@ -103,6 +154,9 @@
   },
   "button.enable": {
     "defaultMessage": "Zet aan"
+  },
+  "button.extract": {
+    "defaultMessage": "Uittreksel"
   },
   "button.follow": {
     "defaultMessage": "Volg"
@@ -215,14 +269,23 @@
   "changelog.product.hosting": {
     "defaultMessage": "Hosten"
   },
+  "changelog.product.web": {
+    "defaultMessage": "Platform"
+  },
   "collections.label.private": {
     "defaultMessage": "Prive"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Weet u zeker dat u {count, plural, one {# project} other {# projects}} wilt updaten naar de nieuwste compatibele versie? Het wordt aanbevolen om de inhoud één voor één te updaten."
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Update waarschuwing"
   },
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Update projecten"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Houd Shift ingedrukt terwijl je op “Alles bijwerken” klikt om deze bevestiging in de toekomst over te slaan."
   },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Update {count, plural, one {# project} other {# projecten}}"
@@ -232,6 +295,15 @@
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Verwijderwaarschuwing"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Verwijder {count} {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Verwijder {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {Downgrading} other {Updating}} kan compatibiliteitsproblemen veroorzaken. Mods of content die je bovenop het modpack hebt toegevoegd, blijven behouden, maar zijn mogelijk niet compatibel met de nieuwe versie."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Downgrade} other {Update}} waarschuwing"
@@ -410,11 +482,368 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "{contentType} aan het updaten..."
   },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count} {contentType} Geselecteerd"
+  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} geselecteerd"
   },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Samenvatting"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Overschrijven"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "Als u doorgaat met het uitpakken, worden meer dan 100 bestanden overschreven; hier zijn er een paar."
+  },
   "files.conflict-modal.overwrite-warning": {
     "defaultMessage": ""
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} Overschreven"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "Overschreven"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "Bestanden worden overschreven"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Maak {type, select, directory {folder} other {file}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Maak een {type, select, directory {folder} other {file}}"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "Bijv. mijn-map"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "Bijv. config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "“{name}” verwijderen"
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "Bestand verwijderen"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {This folder and all its contents will be permanently deleted. This action cannot be undone.} other {This file will be permanently deleted. This action cannot be undone.}}"
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "De inhoud van het bestand kon niet worden geladen."
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "Het bestand kan niet worden geopend"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "Het is niet gelukt om te uploaden naar mclo.gs."
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Het delen van het bestand is mislukt"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "Uw bestand is opgeslagen."
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "Bestand opgeslagen"
+  },
+  "files.editor.find-close": {
+    "defaultMessage": "Sluiten"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Vind"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} Of {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Volgende Match"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Geen Resultaat"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Vorige Match"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Schakelen tussen vervangen"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "De URL van je logbestand is naar je klembord gekopieerd."
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "URL van logboek gekopieerd"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Vervangen"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Alles Vervangen"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Vervangen"
+  },
+  "files.editor.save-failed-text": {
+    "defaultMessage": "Het bestand kon niet worden opgeslagen."
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "Opslaan is mislukt"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "Ga naar de thuismap"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Probeer het nog eens"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "Afbeelding te groot om weer te geven (max. {maxDimension} x {maxDimension} pixels)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "Ongeldig of leeg afbeeldingsbestand."
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Het laden van de afbeelding is mislukt"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "Zoom terugzetten"
+  },
+  "files.image_viewer.viewed_image_alt": {
+    "defaultMessage": "Weergegeven afbeelding"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "Inzoomen"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "Uitzoomen"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "Bestandsbewerkingen zijn uitgeschakeld terwijl de bewerking wordt uitgevoerd."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Fout bij het uitvoeren van een proefdraaien"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "De proef is mislukt"
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "Er zijn geen bestanden of mappen."
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "Deze map is leeg"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "De map bestaat mogelijk niet."
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "Bestanden kunnen niet worden geladen"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "De winning is begonnen"
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "{count} Geselecteerd"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "Er zijn wijzigingen die nog niet zijn opgeslagen."
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "Huidige locatie"
+  },
+  "files.move-modal.destination-path": {
+    "defaultMessage": "Doelpad"
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "Bijv. /mijn-map"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {Move folder} other {Move file}}"
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "Terug naar de startpagina"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Broodkruimelnavigatie"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "Nieuw aanmaken..."
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "Bestandsnavigatie"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Zoeken in bestand"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "Startpagina"
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "Installeer het CurseForge pakket"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "Nieuw bestand"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "Nieuwe map"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "Bestanden zoeken"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "Delen op mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Bestand uploaden"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "Uploaden vanuit een .zip-bestand"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Uploaden via een .zip-URL"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} Geëxtraheerd"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "{bron} Uitpakken"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Mislukt"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "Modpack via URL"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "Hernoem {naam}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "Nieuwe naam"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# item} other {# items}}"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Aangemaakt"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Gewijzigd"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Naam"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Maat"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "Er zijn wijzigingen die nog niet zijn opgeslagen. Deze gaan verloren als u de pagina verlaat. Wilt u ze opslaan voordat u de pagina verlaat?"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Verwijderen"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "Nog niet opgeslagen wijzigingen"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Geannuleerd"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "Mislukt - Bestand bestaat al"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Mislukt - {error}"
+  },
+  "files.upload-dropdown.failed-incorrect-type": {
+    "defaultMessage": "Mislukt - Verkeerd bestandstype"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "Het uploaden van {fileName} is mislukt"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "Bestand"
+  },
+  "files.upload-dropdown.file-uploads": {
+    "defaultMessage": "{fileType} Uploads"
+  },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "Het geüploade bestand had een onjuist bestandstype"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Er is een onverwachte fout opgetreden."
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} over"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Sleep {type, select, undefined {files} other {{type}s}} hierheen om te uploaden"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "De naam mag alleen bestaan uit letters, cijfers, streepjes, onderstrepingstekens of spaties."
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "De naam mag alleen bestaan uit letters, cijfers, streepjes, onderstrepingstekens, punten of spaties."
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Naam"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "De naam is verplicht."
+  },
+  "files.zip-url-modal.backup-name": {
+    "defaultMessage": "CurseForge modpack installeren"
+  },
+  "files.zip-url-modal.cf-header": {
+    "defaultMessage": "Installeer een CurseForge modpack"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "De modpack van CurseForge kon op die URL niet worden gevonden."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "CurseForge modpack niet gevonden"
+  },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "Link invoeren"
+  },
+  "files.zip-url-modal.error-cf-url": {
+    "defaultMessage": "De URL moet een URL zijn van een CurseForge modpackversie."
+  },
+  "files.zip-url-modal.error-url-invalid": {
+    "defaultMessage": "De URL moet geldig zijn."
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "Een URL is vereist."
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Installeren"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "Het installeren is mislukt"
+  },
+  "files.zip-url-modal.step-copy-description": {
+    "defaultMessage": "Kopieer de URL van de versiepagina en plak deze hieronder."
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "Kopieer de URL"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "Blader door CurseForge en zoek het gewenste modpack."
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "Zoek de modpack"
+  },
+  "files.zip-url-modal.step-select-description": {
+    "defaultMessage": "Ga naar het tabblad “Bestanden” en kies de versie die je wilt installeren."
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "Kies een versie"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "Er is een onbekende fout opgetreden"
+  },
+  "files.zip-url-modal.zip-description": {
+    "defaultMessage": "Kopieer en plak de directe downloadlink van een .zip-bestand."
+  },
+  "files.zip-url-modal.zip-header": {
+    "defaultMessage": "De inhoud van een .zip-bestand uploaden via een URL"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresregel"
@@ -542,6 +971,69 @@
   "hosting.content.failed-to-toggle": {
     "defaultMessage": "Het omschakelen van {name} is mislukt"
   },
+  "hosting.content.failed-to-unlink": {
+    "defaultMessage": "Het ontkoppelen van het modpack is mislukt"
+  },
+  "hosting.content.failed-to-update": {
+    "defaultMessage": "Het bijwerken is mislukt"
+  },
+  "hosting.content.failed-to-upload": {
+    "defaultMessage": "Het uploaden van het bestand is mislukt"
+  },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "Het is niet gelukt om de versie van het modpack te wijzigen"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "Kan versies niet laden"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "Het opnieuw installeren van het modpack is mislukt"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "Kon de server niet herstellen"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Het is niet gelukt om de server opnieuw in te stellen voor onboarding"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "Het opslaan van de installatie-instellingen is mislukt"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "Het ontkoppelen van het modpack is mislukt"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "{loader, select, null {Loader} other {{loader}}} versie"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "De installatie van uw server is hersteld."
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "Herstellen voltooid"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Server opnieuw opstarten"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Hiermee worden alle gegevens op je server verwijderd, inclusief je werelden, mods en configuratiebestanden. Back-ups blijven behouden en kunnen worden hersteld."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Terug naar de introductie"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Hierdoor wordt de server opnieuw in de onboarding fase gezet, zodat de installatie opnieuw kan worden voltooid. Weet u zeker dat u door wilt gaan?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "Terug naar de introductie"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "De server is teruggezet naar het onboardingproces."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Server opnieuw ingesteld voor onboarding"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Ondersteuningsmogelijkheden"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Burst tot {cpus} CPU's"
   },
@@ -587,23 +1079,125 @@
   "input.view.list": {
     "defaultMessage": "Rijen weergave"
   },
+  "installation-settings.aria.select-game-version": {
+    "defaultMessage": "Kies een spelversie"
+  },
+  "installation-settings.aria.select-loader-version": {
+    "defaultMessage": "Selecteer de versie van {loader}"
+  },
   "installation-settings.aria.select-platform": {
     "defaultMessage": "Kies het platform"
   },
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Bevestigen"
   },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "Als je dit wijzigt in {gameVersion}, worden de volgende gegevens op je server aangepast."
+  },
+  "installation-settings.confirm-version-change-header": {
+    "defaultMessage": "Wijzigingen in de inhoud controleren"
+  },
   "installation-settings.edit-installation.title": {
     "defaultMessage": "Installatie veranderen"
   },
+  "installation-settings.edit.warning-instance": {
+    "defaultMessage": "We raden af om je installatie-instellingen aan te passen nadat je inhoud hebt geïnstalleerd. Als je ze toch wilt aanpassen, wees dan voorzichtig, want dit kan problemen veroorzaken."
+  },
+  "installation-settings.edit.warning-server": {
+    "defaultMessage": "We raden af om je installatie-instellingen aan te passen nadat je inhoud hebt geïnstalleerd. Als je ze toch wilt aanpassen, reset dan je server."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Automatisch corrigeren"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Laadprogramma wijzigen"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Conflicten uitschakelen"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Als we de spelversie wijzigen, kunnen we ofwel de geïnstalleerde inhoud die niet compatibel is uitschakelen, ofwel proberen de incompatibiliteiten op te lossen."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Waarschuwing voor incompatibiliteit"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Er is incompatibele inhoud geïnstalleerd"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Als je de loader wijzigt, wordt alle geïnstalleerde inhoud uitgeschakeld. We raden je aan om in plaats daarvan je server te resetten."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Het vervangen van loaders is schadelijk"
+  },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "Gekoppeld {projectType, select, server {server project} other {modpack}}"
+  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader}-versie"
+  },
+  "installation-settings.platform-lock-tooltip": {
+    "defaultMessage": "Je moet je server opnieuw opstarten om van loader te wisselen."
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "Als je het modpack opnieuw installeert, wordt de inhoud van {type, select, server {server's} other {instance's}} teruggezet naar de oorspronkelijke staat, waarbij alle mods of inhoud die je hebt toegevoegd, worden verwijderd."
+  },
+  "installation-settings.reinstall-modpack.title": {
+    "defaultMessage": "Modpack opnieuw installeren"
+  },
+  "installation-settings.reinstalling-modpack": {
+    "defaultMessage": "Modpack opnieuw installeren"
+  },
+  "installation-settings.removed-incompatible": {
+    "defaultMessage": "Verwijderd (niet compatibel)"
+  },
+  "installation-settings.repair.instance-description": {
+    "defaultMessage": "Installeert de afhankelijkheden van Minecraft opnieuw en controleert op beschadigde bestanden. Dit kan problemen verhelpen als je spel niet start vanwege fouten in het opstartprogramma."
+  },
+  "installation-settings.repair.instance-title": {
+    "defaultMessage": "Instantie herstellen"
+  },
+  "installation-settings.repair.server-description": {
+    "defaultMessage": "Hiermee worden de loader en de Minecraft afhankelijkheden opnieuw geïnstalleerd zonder je inhoud te verwijderen. Dit kan problemen verhelpen als je server niet correct opstart."
+  },
+  "installation-settings.repair.server-title": {
+    "defaultMessage": "Server repareren"
   },
   "installation-settings.saving": {
     "defaultMessage": "Aan het opslaan..."
   },
   "installation-settings.search-game-version": {
     "defaultMessage": "Zoek de spelversie..."
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "Koppeling verwijderen"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "Door de koppeling ongedaan te maken, wordt deze {type, select, server {server} other {instance}} definitief losgekoppeld van het {projectType, select, server {server} other {modpack}}-project. Hierdoor kun je de loader en de Minecraft-versie wijzigen, maar ontvang je geen toekomstige updates meer."
+  },
+  "installation-settings.verifying": {
+    "defaultMessage": "Bezig met controleren..."
+  },
+  "instance.confirm-reinstall.admonition-body": {
+    "defaultMessage": "Als je het opnieuw installeert, wordt alle geïnstalleerde of aangepaste inhoud teruggezet naar de standaardinstellingen van het modpack, waardoor alle mods of inhoud die je bovenop de oorspronkelijke installatie hebt toegevoegd, worden verwijderd."
+  },
+  "instance.confirm-reinstall.admonition-header": {
+    "defaultMessage": "Waarschuwing bij herinstallatie"
+  },
+  "instance.confirm-reinstall.header": {
+    "defaultMessage": "Modpack opnieuw installeren"
+  },
+  "instance.confirm-reinstall.reinstall-button": {
+    "defaultMessage": "Modpack opnieuw installeren"
+  },
+  "instance.confirm-repair.body": {
+    "defaultMessage": "Door het spel opnieuw te installeren, worden de loader en de Minecraft-afhankelijkheden opnieuw geïnstalleerd zonder dat je inhoud wordt verwijderd. Dit kan problemen verhelpen als je {type, select, server {server is not starting correctly} other {game is not launching due to launcher-related errors}}."
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "Herstel {type, select, server {server} other {instance}}"
+  },
+  "instance.confirm-repair.repair-button": {
+    "defaultMessage": "Herstellen"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Avontuurmodus"
@@ -620,14 +1214,56 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Onbekende spelmodus"
   },
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "De bestanden worden nog geüpload. Als u deze pagina verlaat, wordt het uploaden afgebroken en gaan uw wijzigingen mogelijk verloren."
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Bezig met uploaden"
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} compatibel met {count, plural, one {instance} other {instances}}"
+  },
+  "instances.content-install.existing-tab": {
+    "defaultMessage": "Bestaande instantie"
+  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "Kies de spelversie"
+  },
+  "instances.content-install.header": {
+    "defaultMessage": "Project installeren"
   },
   "instances.content-install.install-button": {
     "defaultMessage": "Installeren"
   },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Geïnstalleerd"
+  },
+  "instances.content-install.instance-type": {
+    "defaultMessage": "Type instantie"
+  },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "Lader"
+  },
   "instances.content-install.name-label": {
     "defaultMessage": "Naam"
+  },
+  "instances.content-install.name-placeholder": {
+    "defaultMessage": "Voer de naam van de instantie in"
+  },
+  "instances.content-install.new-tab": {
+    "defaultMessage": "Nieuwe instantie"
+  },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "Er zijn geen compatibele instanties gevonden"
+  },
+  "instances.content-install.remove-icon": {
+    "defaultMessage": "Pictogram verwijderen"
+  },
+  "instances.content-install.search-placeholder": {
+    "defaultMessage": "Zoek instantie"
+  },
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Selecteer pictogram"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Deze modpack bevat geen extra inhoud."
@@ -653,11 +1289,26 @@
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Niet compatibel"
   },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Terugzetten naar {versie}"
+  },
   "instances.updater-modal.header": {
     "defaultMessage": "Update versie"
   },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "Versie van Modpack wijzigen"
+  },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "Versie wijzigen"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Verberg niet compatibele"
+  },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "Wachtlijst wordt geladen..."
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "Versies worden geladen..."
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "Geen wijzigingen doorgegeven voor deze versie."
@@ -674,6 +1325,18 @@
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Toon compatibele"
   },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "Overschakelen naar {versie}"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Update naar {versie}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Een update kan uw instantie onbruikbaar maken. Bekijk eerst het wijzigingslogboeken  van de versie en maak een back-up."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Een update kan je wereld op zijn kop zetten. Bekijk eerst de wijzigingslogboeken van de versie en maak een back-up."
+  },
   "label.actions": {
     "defaultMessage": "Acties"
   },
@@ -686,6 +1349,15 @@
   "label.changes-saved": {
     "defaultMessage": "Wijzigingen opgeslagen"
   },
+  "label.client-depends-warning": {
+    "defaultMessage": "Deze mod is afhankelijk van een client-side mod en kan problemen veroorzaken bij het opstarten van je server"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "Dit is een client-side mod en kan problemen veroorzaken bij het opstarten van je server"
+  },
+  "label.client-retained-warning": {
+    "defaultMessage": "Dit is een client-side mod die als afhankelijkheid is geïnstalleerd en mogelijk problemen veroorzaakt bij het opstarten van je server"
+  },
   "label.collections": {
     "defaultMessage": "Collecties"
   },
@@ -694,6 +1366,15 @@
   },
   "label.content": {
     "defaultMessage": "Inhoud"
+  },
+  "label.copied-filename": {
+    "defaultMessage": "Gekopieerde bestandsnaam"
+  },
+  "label.copied-path": {
+    "defaultMessage": "Gekopieerd pad"
+  },
+  "label.create-failed": {
+    "defaultMessage": "Het aanmaken is mislukt"
   },
   "label.created-ago": {
     "defaultMessage": "Gemaakt {ago}"
@@ -704,11 +1385,23 @@
   "label.delete": {
     "defaultMessage": "Verwijder"
   },
+  "label.delete-failed": {
+    "defaultMessage": "Verwijderen is mislukt"
+  },
+  "label.delete-immediately": {
+    "defaultMessage": "Onmiddellijk verwijderen"
+  },
   "label.description": {
     "defaultMessage": "Beschrijving"
   },
   "label.details": {
     "defaultMessage": "Details"
+  },
+  "label.done": {
+    "defaultMessage": "Klaar"
+  },
+  "label.download-failed": {
+    "defaultMessage": "Het downloaden is mislukt"
   },
   "label.email": {
     "defaultMessage": "Email"
@@ -719,17 +1412,38 @@
   "label.error": {
     "defaultMessage": "Fout"
   },
+  "label.extract-failed": {
+    "defaultMessage": "Het uitpakken is mislukt"
+  },
   "label.filter-by": {
     "defaultMessage": "Filter op"
   },
   "label.followed-projects": {
     "defaultMessage": "Gevolgde projecten"
   },
+  "label.game-version": {
+    "defaultMessage": "Spelversie"
+  },
+  "label.installation-info": {
+    "defaultMessage": "Informatie over de installatie"
+  },
+  "label.installed-modpack": {
+    "defaultMessage": "Geïnstalleerd modpack"
+  },
+  "label.installing": {
+    "defaultMessage": "Bezig met installeren..."
+  },
   "label.loading": {
     "defaultMessage": "Aan het laden..."
   },
   "label.moderation": {
     "defaultMessage": "Moderatie"
+  },
+  "label.modpack": {
+    "defaultMessage": "Modpack"
+  },
+  "label.move-failed": {
+    "defaultMessage": "Verplaatsing is mislukt"
   },
   "label.no": {
     "defaultMessage": "Nee"
@@ -746,6 +1460,24 @@
   "label.password": {
     "defaultMessage": "Wachtwoord"
   },
+  "label.plan-custom": {
+    "defaultMessage": "Op maat"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Groot"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "Gemiddeld"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Klein"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "Onbekend"
+  },
+  "label.platform": {
+    "defaultMessage": "Platform"
+  },
   "label.played": {
     "defaultMessage": "Voor het laatst gespeeld {ago}"
   },
@@ -757,6 +1489,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Afgewezen"
+  },
+  "label.rename-failed": {
+    "defaultMessage": "Het hernoemen is mislukt"
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "Ik ga akkoord met de <terms-link>voorwaarden van het beloningsprogramma</terms-link>"
@@ -770,6 +1505,12 @@
   "label.search": {
     "defaultMessage": "Zoek"
   },
+  "label.select-all": {
+    "defaultMessage": "Alles selecteren"
+  },
+  "label.selection-actions": {
+    "defaultMessage": "Selectiehandelingen"
+  },
   "label.server": {
     "defaultMessage": "Server"
   },
@@ -782,17 +1523,29 @@
   "label.singleplayer": {
     "defaultMessage": "Alleen spelen"
   },
+  "label.sort-by": {
+    "defaultMessage": "Sorteren op: "
+  },
   "label.success": {
     "defaultMessage": "Succes"
   },
   "label.title": {
     "defaultMessage": "Titel"
   },
+  "label.unknown": {
+    "defaultMessage": "Onbekend"
+  },
   "label.unlisted": {
     "defaultMessage": "Verborgen"
   },
   "label.update-available": {
     "defaultMessage": "Update beschikbaar"
+  },
+  "label.updating": {
+    "defaultMessage": "Bezig met bijwerken..."
+  },
+  "label.upload-failed": {
+    "defaultMessage": "Het uploaden is mislukt"
   },
   "label.username": {
     "defaultMessage": "Gebruikersnaam"
@@ -821,14 +1574,35 @@
   "locale.de-DE": {
     "defaultMessage": "Duits (Duitsland)"
   },
+  "locale.en-US": {
+    "defaultMessage": "Engels (Verenigde Staten)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Spaans (Latijns-Amerika)"
+  },
   "locale.es-ES": {
     "defaultMessage": "Spaans (Spanje)"
   },
   "locale.fi-FI": {
     "defaultMessage": "Fins"
   },
+  "locale.fil-PH": {
+    "defaultMessage": "Filipijns"
+  },
   "locale.fr-FR": {
     "defaultMessage": "Frans"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Hebreeuws"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Hongaars"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Indonesisch"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Italiaans (Italië)"
   },
   "locale.ja-JP": {
     "defaultMessage": "Japans"
@@ -836,17 +1610,53 @@
   "locale.ko-KR": {
     "defaultMessage": "Korenaans"
   },
+  "locale.ms-MY": {
+    "defaultMessage": "Maleis"
+  },
   "locale.nl-NL": {
     "defaultMessage": "Nederlands"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Noors (Bokmål)"
   },
   "locale.pl-PL": {
     "defaultMessage": "Pools"
   },
+  "locale.pt-BR": {
+    "defaultMessage": "Portugees (Brazilië)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Portugees (Portugal)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Roemeens"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Russisch"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Servisch (Latijns)"
+  },
   "locale.sv-SE": {
     "defaultMessage": "Zweeds"
   },
+  "locale.th-TH": {
+    "defaultMessage": "Thais"
+  },
   "locale.tr-TR": {
     "defaultMessage": "Turks"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Oekraïens"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Vietnamees"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Chinees (vereenvoudigd)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Chinees (traditioneel)"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Voeg betaalmethode toe"
@@ -1148,6 +1958,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "Compatibiliteit"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "Organisatie"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Projecteigenaar"
   },
@@ -1208,14 +2021,47 @@
   "project.about.links.wiki": {
     "defaultMessage": "Wiki bezoeken"
   },
+  "project.about.server.address.tooltip": {
+    "defaultMessage": "Kopieer het adres van de Java server"
+  },
   "project.about.server.copied": {
     "defaultMessage": "Gekopieerd!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "Het serveradres is naar het klembord gekopieerd"
+  },
+  "project.about.server.downloadModpack": {
+    "defaultMessage": "Modpack downloaden"
+  },
+  "project.about.server.languages": {
+    "defaultMessage": "Talen"
+  },
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(Aanbevolen)"
+  },
+  "project.about.server.region": {
+    "defaultMessage": "Regio"
+  },
+  "project.about.server.requiredContent": {
+    "defaultMessage": "Verplichte inhoud"
   },
   "project.about.server.title": {
     "defaultMessage": "Server details"
   },
+  "project.about.tags.title": {
+    "defaultMessage": "Tags"
+  },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {download} other {downloads}}"
+  },
+  "project.environment.client-and-server.description": {
+    "defaultMessage": "Vereist op zowel de client als de server."
+  },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Client en server op beide verreist"
+  },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "De meeste functies werken aan de gebruikerszijde, maar door het op de server te installeren, krijgt u toegang tot uitgebreidere mogelijkheden."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Client en server optioneel op server"
@@ -1226,6 +2072,9 @@
   "project.environment.client-only.title": {
     "defaultMessage": "Slechts clientzijde"
   },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Het biedt bepaalde functionaliteiten op zowel de client als de server, zij het slechts gedeeltelijk. Als je het op beide installeert, krijg je de beste ervaring."
+  },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Client en server beste wanneer op beide is geinstalleerd"
   },
@@ -1235,11 +2084,20 @@
   "project.environment.client-or-server.title": {
     "defaultMessage": "Client en server optioneel voor beide"
   },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Alle functionaliteit wordt aan de serverzijde uitgevoerd en is compatibel met standaard clients. Werkt alleen op toegewijde servers."
+  },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Enkel serverzijde"
   },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "De meeste functies werken aan de serverzijde, maar door de software op de client te installeren, krijgt u toegang tot uitgebreidere mogelijkheden."
+  },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Client en server optioneel voor client"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Alle functionaliteit wordt aan de serverzijde uitgevoerd en is compatibel met standaard clients. Werkt ook op de interne server in de singleplayer modus."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Alleen server kant, werkt op singleplayer"
@@ -1262,11 +2120,281 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Onbekende omgeving"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {follower} other {followers}}"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
   },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {player} other {players}} online"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}} van Modrinth in de afgelopen twee weken"
+  },
+  "project.server.customModpackTooltip": {
+    "defaultMessage": "Dit project maakt gebruik van een op maat gemaakt modpack"
+  },
+  "project.server.language.af": {
+    "defaultMessage": "Afrikaans"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "Amhaars"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "Arabisch"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "Azerbeidzjaans"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "Wit-Russisch"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "Bulgaars"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "Bengaals"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "Bosnisch"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "Catalaans"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "Tsjechisch"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "Deens"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "Duits"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "Grieks"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "Engels"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "Esperanto"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "Spaans"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "Ests"
+  },
+  "project.server.language.eu": {
+    "defaultMessage": "Baskisch"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "Perzisch"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "Fins"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "Frans"
+  },
+  "project.server.language.ga": {
+    "defaultMessage": "Iers"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "Galicisch"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "Hebreeuws"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "Hindi"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "Kroatisch"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "Hongaars"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "Armeens"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "Indonesisch"
+  },
+  "project.server.language.is": {
+    "defaultMessage": "IJslands"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "Italiaans"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "Japans"
+  },
+  "project.server.language.ka": {
+    "defaultMessage": "Georgië"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "Kazachs"
+  },
+  "project.server.language.km": {
+    "defaultMessage": "Khmer"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "Kannada"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "Koreaans"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "Laotisch"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "Litouws"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "Lets"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "Macedonisch"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "Malayalam"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "Mongools"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "Marathi"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "Maleis"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "Birmaans"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "Nepalees"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "Nederlands"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "Noors"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "Punjabi"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "Pools"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "Portugees"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "Roemeens"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "Russisch"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "Sinhala"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "Slovaaks"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "Sloveens"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "Albanees"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "Servisch"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "Zweeds"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "Swahili"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "Tamil"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "Telugu"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "Thais"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "Filipijns"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Turks"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Oekraïens"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "Urdu"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "Oezbeeks"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "Vietnamees"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "Yoruba"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "Chinees"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "Zoeloe"
+  },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "Azië"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Australië"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Europa"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Midden-Oosten"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "Rusland"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "Zuid-Amerika"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "Server gehost in {regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "Oostkust van de VS"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "Westkust van de VS"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "Offline"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "De server is offline"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "Online"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytica"
@@ -1502,8 +2630,71 @@
   "search.filter_type.project_id": {
     "defaultMessage": "Project ID"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "Type"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "Taal"
+  },
+  "search.filter_type.server_region": {
+    "defaultMessage": "Regio"
+  },
+  "search.filter_type.server_status": {
+    "defaultMessage": "Status"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Lader"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Gemodificeerd"
+  },
+  "search.server_content_type.vanilla": {
+    "defaultMessage": "Standaard"
+  },
+  "servers.backups.admonition.backup-failed.description": {
+    "defaultMessage": "Er is een fout opgetreden bij het maken van {backupName}. Probeer het nog eens of neem contact op met de helpdesk als het probleem zich blijft voordoen."
+  },
+  "servers.backups.admonition.backup-failed.title": {
+    "defaultMessage": "Back-up is mislukt"
+  },
+  "servers.backups.admonition.backup-queued.description": {
+    "defaultMessage": "{backupName} Staat in de wachtrij en wordt binnenkort gestart."
+  },
+  "servers.backups.admonition.backup-queued.title": {
+    "defaultMessage": "Back-up in de wachtrij"
+  },
+  "servers.backups.admonition.creating-backup.description": {
+    "defaultMessage": "De wereldgegevens en serverconfiguratie voor {backupName} worden opgeslagen. Dit kan enkele minuten duren."
+  },
+  "servers.backups.admonition.creating-backup.title": {
+    "defaultMessage": "Een back-up maken"
+  },
+  "servers.backups.admonition.fallback-name": {
+    "defaultMessage": "Uw back-up"
+  },
+  "servers.backups.admonition.restore-failed.description": {
+    "defaultMessage": "Er is een fout opgetreden tijdens het terugzetten vanuit {backupName}. Probeer het nog eens of neem contact op met de helpdesk als het probleem zich blijft voordoen."
+  },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Het herstellen vanuit de back-up is mislukt"
+  },
+  "servers.backups.admonition.restore-queued.description": {
+    "defaultMessage": "Het terugzetten vanuit {backupName} staat in de wachtrij en begint binnenkort."
+  },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Herstel vanuit back-up staat in de wachtrij"
+  },
+  "servers.backups.admonition.restore-successful.description": {
+    "defaultMessage": "Uw server is teruggezet naar {backupName} en is klaar om te starten."
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Het terugzetten vanuit de back-up is gelukt"
+  },
+  "servers.backups.admonition.restoring-backup.description": {
+    "defaultMessage": "Uw server wordt hersteld vanuit {backupName}. Dit kan enkele minuten duren."
+  },
+  "servers.backups.admonition.restoring-backup.title": {
+    "defaultMessage": "Terugzetten vanuit een back-up"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisch"
@@ -1525,6 +2716,234 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Herstel"
+  },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Er wordt een back-up gemaakt"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Het terugzetten van de back-up is bezig"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "De server wordt geïnstalleerd"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "Inhoud wordt gesynchroniseerd"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "Heb je al een server?"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Meer informatie over Modrinth Hosting"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "Nieuwe server"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "Installeer mods, nodig vrienden uit en speel samen – allemaal via de Modrinth app."
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "Nog geen servers"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "Kies je favoriete mods en wij zorgen voor de rest."
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "Mods installeren met één klik"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "Nodig vrienden uit en help ze op weg in de Modrinth app."
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "Speel met vrienden"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Inloggen"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "Stel je server in zoals een wereld voor één speler."
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "Eenvoudige set-up"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Gekopieerd"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "Kopieer de code naar het klembord"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "Kopieer ID"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "Laatste back-up downloaden"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "Facturering beheren"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Nieuw"
+  },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Uw bestanden worden nog <days-remaining>{daysRemaining} dagen bewaard {daysRemaining, plural, one {day} other {days} }</days-remaining>. Neem contact op met de helpdesk om de bestanden te downloaden voordat ze worden verwijderd. "
+  },
+  "servers.listing.notice.files-preserved-after-cancellation": {
+    "defaultMessage": "Uw bestanden blijven na opzegging nog 30 dagen bewaard."
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "Uw account is door de moderators geblokkeerd. "
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Uw server wordt op <date>{formattedDate}</date> overgezet naar het {planSize} Plan. "
+  },
+  "servers.listing.notice.provisioning": {
+    "defaultMessage": "Even geduld a.u.b. terwijl we uw server instellen. Dit kan tot 10 minuten duren."
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "Uw abonnement is opgezegd."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "Uw abonnement is op <date>{formattedDate}</date> opgezegd. "
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed": {
+    "defaultMessage": "Uw abonnement is opgezegd vanwege een mislukte betaling."
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
+    "defaultMessage": "Uw abonnement is op <date>{formattedDate}</date> opgezegd vanwege een mislukte betaling. "
+  },
+  "servers.listing.notice.subscription-set-to-cancel": {
+    "defaultMessage": "Uw abonnement wordt opgezegd."
+  },
+  "servers.listing.notice.subscription-set-to-cancel-on-date": {
+    "defaultMessage": "Uw abonnement wordt op <date>{formattedDate}</date> opgezegd. "
+  },
+  "servers.listing.notice.suspended": {
+    "defaultMessage": "Uw server is geblokkeerd. Neem contact op met de klantenservice van Modrinth voor meer informatie."
+  },
+  "servers.listing.notice.upgrading": {
+    "defaultMessage": "De hardware van uw server wordt momenteel geüpgraded en zal binnenkort weer online zijn."
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "Opnieuw abonneren"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "Serverpictogram"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Ondersteuning"
+  },
+  "servers.listing.using-project-label": {
+    "defaultMessage": "{projectTitle} Gebruiken"
+  },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "Op zoek naar nieuwe servers..."
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "Er wordt momenteel een bestand geüpload. Als u deze pagina verlaat, wordt het uploaden geannuleerd."
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "Bezig met uploaden"
+  },
+  "servers.manage.contact-support-button": {
+    "defaultMessage": "Neem contact op met de klantenservice van Modrinth"
+  },
+  "servers.manage.error.alert-notice": {
+    "defaultMessage": "Onze systemen waarschuwen ons team automatisch wanneer er een probleem is. We zijn al bezig om ze weer online te krijgen."
+  },
+  "servers.manage.error.description": {
+    "defaultMessage": "Het kan zijn dat we tijdelijk problemen hebben met onze servers."
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "Foutdetails:"
+  },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "Als u onlangs een server bij Modrinth Hosting hebt aangeschaft, staat deze momenteel in de wachtrij en verschijnt hij hier zodra hij klaar is. <warning>Probeer geen nieuwe server aan te schaffen.</warning>"
+  },
+  "servers.manage.error.support-notice": {
+    "defaultMessage": "Als je persoonlijke ondersteuning nodig hebt met betrekking tot de status van uw server, neem dan contact op met Modrinth Support."
+  },
+  "servers.manage.error.title": {
+    "defaultMessage": "De servers konden niet worden geladen"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "Er is een fout opgetreden"
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "Nieuwe server"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "Er zijn geen servers gevonden."
+  },
+  "servers.manage.purchase-unavailable.text": {
+    "defaultMessage": "De betalingsgegevens worden nog geladen. De kassa wordt geopend zodra alles klaar is."
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "Niet verkrijgbaar"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "Opnieuw laden"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "Er is een fout opgetreden bij het opnieuw abonneren op jouw Modrinth server."
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "Fout bij het opnieuw abonneren"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "Als de server momenteel is uitgeschakeld, kan het tot 10 minuten duren voordat er een nieuwe afschrijvingspoging wordt ondernomen."
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "Verzoek tot verlenging van het abonnement ingediend"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "Het serverabonnement is opnieuw geactiveerd"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "Succes"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Zoek {count} {count, plural, one {server} other {servers}}..."
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "Je vindt ze nu hier!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Niet meer weergeven"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Uw serverinstellingen zijn verplaatst"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} Resterend..."
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "Nieuwe server"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "De proefperiode van uw Medal server is verstreken en uw server is opgeschort. Upgrade om uw server te kunnen blijven gebruiken."
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "Uw account is opgeschort. Werk uw factuurgegevens bij of neem contact op met de klantenservice van Modrinth voor meer informatie."
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "Uw account is opgeschort: {reason}. Werk uw factuurgegevens bij of neem contact op met de klantenservice van Modrinth voor meer informatie."
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "De hardware van uw server wordt momenteel geüpgraded en zal binnenkort weer online zijn."
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "Serverpictogram"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "Upgraden"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "{projectTitle} Gebruiken"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Negeer"
@@ -1553,6 +2972,12 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Niet negeerbaar"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "Uw aankoop bij Modrinth Hosting is succesvol afgerond."
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "Aankoop geslaagd"
+  },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "Het wordt nog niet aan geslagen."
   },
@@ -1562,14 +2987,26 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Betaalmethode"
   },
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "Verkrijgbaar in Noord-Amerika, Europa en Zuidoost-Azië."
+  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Configureer je eigen plan met de specs die je nodig hebt."
+  },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "Weet je precies wat je nodig hebt?"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Aan de slag"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "Groot"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "Ideaal voor 15 tot 25 spelers, of intensieve mod-gebruik."
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "Medium"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "Geschikt voor 6 tot 15 spelers met meerdere mods."
@@ -1580,11 +3017,17 @@
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Selecteer deze plan"
   },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "Klein"
+  },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfect voor 1 tot 5 vrienden, met enkele mods."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "Uw huidige abonnement"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Regio"
@@ -1612,6 +3055,24 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "West Europa"
+  },
+  "servers.setup.rate-limit.text": {
+    "defaultMessage": "Er geldt een verwerkingslimiet. Probeer het later nog eens."
+  },
+  "servers.setup.rate-limit.title": {
+    "defaultMessage": "De server kan niet opnieuw worden geïnstalleerd"
+  },
+  "servers.setup.reinstall-failed.text": {
+    "defaultMessage": "Er is een onverwachte fout opgetreden tijdens het opnieuw installeren. Probeer het later nog eens."
+  },
+  "servers.setup.reinstall-failed.title": {
+    "defaultMessage": "Herinstallatie mislukt"
+  },
+  "servers.setup.upload-warning": {
+    "defaultMessage": "Sluit deze pagina alstublieft niet tijdens het uploaden."
+  },
+  "servers.setup.uploading-modpack.header": {
+    "defaultMessage": "Modpack uploaden"
   },
   "settings.account.title": {
     "defaultMessage": "Account en beveiliging"
@@ -1654,6 +3115,9 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Kleurschema"
+  },
+  "settings.feature-flags.title": {
+    "defaultMessage": "Functievlaggen"
   },
   "settings.language.categories.default": {
     "defaultMessage": "Standaardtalen"
@@ -1841,8 +3305,14 @@
   "tag.category.kitchen-sink": {
     "defaultMessage": "Overige"
   },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PvP"
+  },
   "tag.category.library": {
     "defaultMessage": "Bibliotheek"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Lifesteal"
   },
   "tag.category.lightweight": {
     "defaultMessage": "Lichtgewicht"
@@ -1895,6 +3365,12 @@
   "tag.category.offline-mode": {
     "defaultMessage": "Offline modus"
   },
+  "tag.category.oneblock": {
+    "defaultMessage": "One Block"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Optimalisatie"
   },
@@ -1910,17 +3386,38 @@
   "tag.category.personal-worlds": {
     "defaultMessage": "Persoonlijke wereld"
   },
+  "tag.category.plots": {
+    "defaultMessage": "Plots"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokémon"
+  },
   "tag.category.potato": {
     "defaultMessage": "Aardappel"
   },
   "tag.category.prison": {
     "defaultMessage": "Gevangenis"
   },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Questing"
+  },
   "tag.category.quests": {
     "defaultMessage": "Missies"
   },
+  "tag.category.racing": {
+    "defaultMessage": "Racing"
+  },
   "tag.category.realistic": {
     "defaultMessage": "Realistisch"
+  },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Recording SMP"
   },
   "tag.category.reflections": {
     "defaultMessage": "Reflecties"
@@ -2086,6 +3583,21 @@
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Sommigen wijzigingen zijn nog niet opgeslagen."
+  },
+  "ui.confirm-leave-modal.body": {
+    "defaultMessage": "Er zijn wijzigingen die nog niet zijn opgeslagen. Deze gaan verloren als u deze pagina verlaat."
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "Er zijn wijzigingen die nog niet zijn opgeslagen"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Pagina verlaten"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Blijf op deze pagina"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Wil je de pagina verlaten?"
   }
 }
 

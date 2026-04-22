@@ -7,7 +7,8 @@ const description: Stage = {
 	title: 'Is the description sufficient, accurate, and accessible?',
 	id: 'description',
 	icon: LibraryIcon,
-	guidance_url: 'https://modrinth.com/legal/rules#general-expectations',
+	guidance_url:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080508042e70089dd787e',
 	navigate: '/',
 	actions: [
 		{

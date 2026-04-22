@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Visa statistik"
   },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -40,6 +43,42 @@
   },
   "badge.new": {
     "defaultMessage": "Ny"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Avbryt"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} Delade CPUs"
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Kunde inte prenumerera igen, misslyckades att ladda prenumerationsdetaljer."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Fel"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Misslyckades att ladda prenumerationsdetaljer."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 dagar"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/månad"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/kvartal"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/år"
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Plan"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB RAM"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB lagring"
   },
   "button.accept": {
     "defaultMessage": "Acceptera"
@@ -245,6 +284,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Radera {count, plural, one {{itemType, select, project {projekt} version {version} user {användare} other {projekt}}} other {{itemType, select, project {projekt} version {versioner} user {användare} other {projekt}}}}"
   },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {Att nedgradera} other {Att uppdatera}} kan orsaka kompatibilitetsproblem. Moddar eller innehåller du har lagt till själv kommer behållas, men kanske inte är kompatibel med nya versionen."
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Varning om att {action, select, downgrade {nedgradera} other {uppdatera}}"
   },
@@ -428,20 +470,32 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} valda"
   },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Extraherings-lista"
+  },
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Skriv över"
   },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Över 100 filer kommer att skrivas över om du fortsätter med extrahering; här är några av dem."
   },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "De följande {count} filerna finns redan på din server, och kommer bli överskrivna om du fortsätter att extrahera."
+  },
   "files.conflict-modal.overwritten-count": {
-    "defaultMessage": "{count} överskriven"
+    "defaultMessage": "{count} överskrivna"
   },
   "files.conflict-modal.overwritten-label": {
     "defaultMessage": "Överskriven"
   },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Filer kommer att skrivas över"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Skapa {type, select, directory {mapp} other {fil}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Skapa en {type, select, directory {mapp} other {fil}}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "t.ex. min-mapp"
@@ -455,11 +509,59 @@
   "files.delete-modal.header": {
     "defaultMessage": "Radera fil"
   },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {Mappen och dess innehåll kommer raderas permanent. Det här kan inte ångras.} other {Filen kommer raderas permanent. Det här kan inte ångras.}}"
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "Kunde inte ladda filens innehåll."
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "Misslyckades att öppna filen"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "Kunde inte ladda upp till mclo.gs."
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Misslyckades att dela fil"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "Din fil har sparats."
+  },
   "files.editor.file-saved-title": {
     "defaultMessage": "Filen sparades"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Stäng"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Hitta"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} av {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Nästa match"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Inga resultat"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Föregående match"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Växla ersätta"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Ersätt"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Ersätt allt"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Ersätt"
+  },
   "files.editor.save-failed-title": {
-    "defaultMessage": "Sparning misslyckades"
+    "defaultMessage": "Misslyckades att spara"
   },
   "files.error.go-to-home": {
     "defaultMessage": "Gå till hemmapp"
@@ -484,9 +586,6 @@
   },
   "files.layout.error-title": {
     "defaultMessage": "Kunde inte ladda filerna"
-  },
-  "files.layout.loading": {
-    "defaultMessage": "Laddar filer..."
   },
   "files.layout.selected-count": {
     "defaultMessage": "{count} valda"
@@ -515,8 +614,41 @@
   "files.navbar.upload-file": {
     "defaultMessage": "Ladda upp fil"
   },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "modpaket från en webbadress"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "Ändra namn på {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "Nytt namn"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# föremål} other {# föremål}}"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Skapad"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Modifierades"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Namn"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Storlek"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "Du har osparade ändringar som kommer förloras om du lämnar. Vill du spara innan du lämnar?"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Kassera"
+  },
   "files.unsaved-changes-modal.header": {
     "defaultMessage": "Osparade ändringar"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Avbrutet"
   },
   "files.upload-dropdown.file": {
     "defaultMessage": "Fil"
@@ -2287,6 +2419,12 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Återställ"
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "Ny server"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "Uppgradera"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Avvisa"

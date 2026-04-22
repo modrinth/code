@@ -276,7 +276,9 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		() => options.projectType.value,
 		(newType, oldType) => {
 			debug('projectType changed', { from: oldType, to: newType })
-			currentSortType.value = { display: 'Relevance', name: 'relevance' }
+			effectiveCurrentSortType.value =
+				effectiveSortTypes.value.find((sortType) => sortType.name === 'relevance') ??
+				effectiveSortTypes.value[0]
 			query.value = ''
 		},
 	)

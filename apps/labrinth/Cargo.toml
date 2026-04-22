@@ -80,6 +80,7 @@ murmur2 = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
 prometheus = { workspace = true }
+quick-xml = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
 redis = { workspace = true, features = ["ahash", "r2d2", "tokio-comp"] }

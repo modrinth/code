@@ -78,11 +78,11 @@
 </template>
 
 <script setup>
+import { injectLoadingState } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { loading_listener } from '@/helpers/events.js'
-import { useLoading } from '@/store/loading.js'
 
 const doneLoading = ref(false)
 const loadingProgress = ref(0)
@@ -91,20 +91,20 @@ const message = ref()
 const MIN_DISPLAY_MS = 500
 const mountedAt = Date.now()
 
-const loading = useLoading()
+const loading = injectLoadingState()
 
 function onAfterLeave() {
 	loading.setEnabled(true)
 }
 
 watch(
-	loading,
-	(newValue) => {
-		if (newValue.barEnabled) {
+	[loading.barEnabled, loading.pending],
+	([barEnabled, pending]) => {
+		if (barEnabled) {
 			return
 		}
 
-		if (loading.loading) {
+		if (pending) {
 			loadingProgress.value = 0
 			fakeLoadingIncrease()
 			return
@@ -114,7 +114,7 @@ watch(
 		const delay = Math.max(0, MIN_DISPLAY_MS - elapsed)
 
 		setTimeout(() => {
-			if (loading.loading) {
+			if (loading.pending.value) {
 				return
 			}
 			doneLoading.value = true
