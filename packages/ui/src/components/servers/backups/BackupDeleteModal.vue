@@ -9,6 +9,21 @@
 			<Admonition type="critical" :header="formatMessage(messages.admonitionHeader)">
 				{{ formatMessage(messages.admonitionBody, { count }) }}
 			</Admonition>
+
+			<div v-if="displayBackups.length" class="flex flex-col gap-2 min-w-0">
+				<span class="font-semibold text-contrast">
+					{{ formatMessage(messages.backupsLabel, { count }) }}
+				</span>
+				<div class="flex flex-col gap-2 max-h-[240px] overflow-y-auto">
+					<BackupItem
+						v-for="backup in displayBackups"
+						:key="backup.id"
+						:backup="backup"
+						preview
+						class="!bg-surface-2 !shadow-none"
+					/>
+				</div>
+			</div>
 		</div>
 
 		<template #actions>
@@ -40,6 +55,7 @@ import { commonMessages } from '../../../utils'
 import Admonition from '../../base/Admonition.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
+import BackupItem from './BackupItem.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -66,6 +82,10 @@ const messages = defineMessages({
 		id: 'servers.backups.delete-modal.confirm',
 		defaultMessage: 'Delete {count, plural, one {backup} other {# backups}}',
 	},
+	backupsLabel: {
+		id: 'servers.backups.delete-modal.backups-label',
+		defaultMessage: '{count, plural, one {Backup} other {Backups ({count})}}',
+	},
 })
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -74,6 +94,9 @@ const bulkBackups = ref<Archon.BackupsQueue.v1.BackupQueueBackup[]>([])
 
 const isBulk = computed(() => bulkBackups.value.length > 0)
 const count = computed(() => (isBulk.value ? bulkBackups.value.length : 1))
+const displayBackups = computed(() =>
+	isBulk.value ? bulkBackups.value : singleBackup.value ? [singleBackup.value] : [],
+)
 
 function show(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
 	singleBackup.value = backup

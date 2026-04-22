@@ -4,7 +4,6 @@ import {
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
-	LoaderCircleIcon,
 	MoreVerticalIcon,
 	RotateCounterClockwiseIcon,
 	ShieldIcon,
@@ -12,11 +11,11 @@ import {
 	UserRoundIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
-import { commonMessages } from '../../../utils'
+import { commonMessages, truncatedTooltip } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'
 
@@ -53,6 +52,8 @@ const props = withDefaults(
 		selected: false,
 	},
 )
+
+const nameRef = ref<HTMLElement | null>(null)
 
 const latestHistoryOp = computed(() => props.backup.history[0])
 
@@ -158,15 +159,15 @@ const messages = defineMessages({
 		id: 'servers.backups.item.creating-backup',
 		defaultMessage: 'Creating backup\u2026',
 	},
-	restoring: {
-		id: 'servers.backups.item.restoring',
-		defaultMessage: 'Restoring',
+	restoreInProgress: {
+		id: 'servers.backups.item.restore-in-progress',
+		defaultMessage: 'Restore in progress\u2026',
 	},
 })
 </script>
 <template>
 	<div
-		class="flex items-center gap-4 rounded-[20px] border-2 border-solid bg-surface-3 p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.3),0px_1px_3px_0px_rgba(0,0,0,0.15)]"
+		class="flex items-center gap-4 rounded-[20px] border border-solid bg-surface-3 p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.3),0px_1px_3px_0px_rgba(0,0,0,0.15)]"
 		:class="props.selected ? 'border-brand-green' : 'border-transparent'"
 	>
 		<div class="flex min-w-0 flex-1 items-center gap-4">
@@ -175,15 +176,8 @@ const messages = defineMessages({
 				class="flex shrink-0 items-center justify-center rounded-2xl border border-solid border-surface-5 bg-surface-4"
 				:class="preview ? 'size-10' : 'size-14'"
 			>
-				<LoaderCircleIcon
-					v-if="activeOperationExists"
-					v-tooltip="restoring ? formatMessage(messages.restoring) : undefined"
-					class="animate-spin text-secondary"
-					:class="preview ? 'size-6' : 'size-10'"
-				/>
 				<component
 					:is="backupIcon"
-					v-else
 					class="text-secondary"
 					:class="preview ? 'size-6' : 'size-10'"
 				/>
@@ -192,7 +186,11 @@ const messages = defineMessages({
 			<!-- Name + badge + subtitle -->
 			<div class="flex min-w-0 flex-col gap-1.5">
 				<div class="flex min-w-0 items-center gap-2">
-					<span class="min-w-0 truncate font-semibold text-contrast">
+					<span
+						ref="nameRef"
+						v-tooltip="creating ? undefined : truncatedTooltip(nameRef, backup.name)"
+						class="min-w-0 truncate font-semibold text-contrast"
+					>
 						{{ creating ? formatMessage(messages.creatingBackup) : backup.name }}
 					</span>
 					<span
@@ -227,51 +225,50 @@ const messages = defineMessages({
 			</div>
 		</div>
 
-		<!-- Date + size (middle column) -->
-		<div v-if="!preview" class="flex w-[240px] shrink-0 flex-col gap-1.5">
+		<!-- Date (middle column) -->
+		<div v-if="!preview" class="flex shrink-0 items-center">
 			<span class="whitespace-nowrap font-medium text-contrast">{{
 				formatDateTime(backup.created_at)
 			}}</span>
 		</div>
 
 		<!-- Right side actions -->
-		<div v-if="!preview" class="flex w-[180px] shrink-0 items-center justify-end gap-2">
-			<ButtonStyled v-if="creating" type="outlined">
-				<button class="!border !border-surface-4" @click="() => emit('delete', true)">
-					{{ formatMessage(commonMessages.cancelButton) }}
+		<div v-if="!preview" class="flex min-w-0 flex-1 items-center justify-end gap-2">
+			<ButtonStyled color="brand" type="outlined">
+				<button
+					v-tooltip="
+						creating
+							? formatMessage(messages.creatingBackup)
+							: restoring
+								? formatMessage(messages.restoreInProgress)
+								: props.restoreDisabled
+					"
+					class="!border"
+					:disabled="activeOperationExists || !!props.restoreDisabled"
+					@click="() => emit('restore')"
+				>
+					<RotateCounterClockwiseIcon class="size-5" />
+					{{ formatMessage(messages.restore) }}
 				</button>
 			</ButtonStyled>
-			<template v-else>
-				<ButtonStyled v-if="!activeOperationExists" color="brand" type="outlined">
-					<button
-						v-tooltip="props.restoreDisabled"
-						class="!border"
-						:disabled="!!props.restoreDisabled"
-						@click="() => emit('restore')"
-					>
-						<RotateCounterClockwiseIcon class="size-5" />
-						{{ formatMessage(messages.restore) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu :options="overflowMenuOptions">
-						<MoreVerticalIcon class="size-5" />
-						<template #copy-id>
-							<ClipboardCopyIcon class="size-5" />
-							{{ formatMessage(commonMessages.copyIdButton) }}
-						</template>
-						<template #download>
-							<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
-						</template>
-						<template #rename>
-							<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
-						</template>
-						<template #delete>
-							<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
-			</template>
+			<ButtonStyled circular type="transparent">
+				<OverflowMenu :options="overflowMenuOptions">
+					<MoreVerticalIcon class="size-5" />
+					<template #copy-id>
+						<ClipboardCopyIcon class="size-5" />
+						{{ formatMessage(commonMessages.copyIdButton) }}
+					</template>
+					<template #download>
+						<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
+					</template>
+					<template #rename>
+						<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
+					</template>
+					<template #delete>
+						<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
+					</template>
+				</OverflowMenu>
+			</ButtonStyled>
 		</div>
 
 		<pre v-if="!preview && showDebugInfo" class="w-full rounded-xl bg-surface-4 p-2 text-xs">{{

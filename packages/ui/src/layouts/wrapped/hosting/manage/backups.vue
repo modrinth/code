@@ -43,7 +43,7 @@
 							:model-value="allSelected"
 							:indeterminate="someSelected"
 							:label="formatMessage(messages.selectAll)"
-							class="shrink-0 font-semibold"
+							class="shrink-0 text-secondary"
 							@update:model-value="toggleSelectAll"
 						/>
 						<div class="hidden h-6 w-px bg-surface-5 sm:block" />
