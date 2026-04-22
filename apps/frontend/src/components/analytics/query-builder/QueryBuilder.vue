@@ -3,9 +3,9 @@
 		class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
 	>
 		<div v-if="showProjectRow" class="flex items-center gap-2">
-			<div class="flex items-center gap-2 text-primary">
-				<FolderOpenIcon class="size-4" />
-				<span class="text-sm font-medium">Projects:</span>
+			<div class="flex w-32 items-center gap-2 text-primary">
+				<FolderOpenIcon class="size-5" />
+				<span class="text-base font-medium">Projects:</span>
 			</div>
 			<div class="w-[20rem]">
 				<MultiSelect
@@ -20,93 +20,97 @@
 			</div>
 		</div>
 
-		<div class="flex items-center gap-2">
-			<div class="flex items-center gap-2 text-primary">
-				<CalendarIcon class="size-4" />
-				<span class="text-sm font-medium">Timeframe:</span>
-			</div>
-			<div class="flex flex-wrap items-center gap-2">
-				<div class="w-[10rem]">
+		<div class="flex items-center gap-6">
+			<div class="flex items-center gap-2">
+				<div class="flex w-32 items-center gap-2 text-primary">
+					<CalendarIcon class="size-5" />
+					<span class="text-base font-medium">Timeframe:</span>
+				</div>
+				<div class="w-48">
 					<Combobox v-model="selectedTimeframe" :options="timeframeOptions" />
 				</div>
-				<span class="text-sm font-medium text-primary">Grouped by</span>
-				<div class="w-[8rem]">
+			</div>
+			<div class="flex items-center gap-2">
+				<span class="text-base font-medium text-primary">Grouped by</span>
+				<div class="w-48">
 					<Combobox v-model="selectedGroupBy" :options="groupByOptions" />
 				</div>
 			</div>
 		</div>
 
-		<div class="flex items-center gap-2">
-			<div class="flex items-center gap-2 text-primary md:pt-2">
-				<BlocksIcon class="size-4" />
-				<span class="text-sm font-medium">Breakdown:</span>
-			</div>
-			<div class="flex flex-col gap-2">
-				<div class="flex flex-wrap items-center gap-2">
-					<div class="w-[11rem]">
-						<Combobox v-model="selectedBreakdown" :options="breakdownOptions" />
-					</div>
-					<span class="text-sm font-medium text-primary">Filtered by</span>
-					<Menu :triggers="['click']" :auto-hide="false" no-auto-focus placement="bottom-start">
-						<button
-							type="button"
-							class="inline-flex items-center gap-2 rounded-xl border border-dashed border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-4"
-						>
-							<PlusIcon class="size-4" />
-							Add
-						</button>
-
-						<template #popper>
-							<div
-								class="flex w-[16rem] flex-col gap-1 rounded-xl border border-solid border-surface-5 bg-surface-4 p-2"
-							>
-								<Menu
-									v-for="category in filterCategories"
-									:key="category.key"
-									:triggers="['hover', 'focus']"
-									:auto-hide="false"
-									no-auto-focus
-									placement="right-start"
-								>
-									<button
-										type="button"
-										class="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-sm font-medium text-primary transition-colors hover:bg-surface-5"
-									>
-										<span>{{ category.label }}</span>
-										<div class="flex items-center gap-1">
-											<span
-												v-if="getCategorySelectionCount(category.key) > 0"
-												class="rounded-full bg-surface-5 px-1.5 py-0.5 text-xs text-primary"
-											>
-												{{ getCategorySelectionCount(category.key) }}
-											</span>
-											<ChevronRightIcon class="size-4 text-primary" />
-										</div>
-									</button>
-
-									<template #popper>
-										<div>
-											<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
-												{{ category.label }}
-											</p>
-											<div class="flex max-h-56 flex-col gap-2 overflow-y-auto">
-												<Checkbox
-													v-for="option in category.options"
-													:key="`${category.key}-${option.value}`"
-													:model-value="isFilterValueSelected(category.key, option.value)"
-													:label="option.label"
-													@update:model-value="
-														(nextValue) => toggleFilterValue(category.key, option.value, nextValue)
-													"
-												/>
-											</div>
-										</div>
-									</template>
-								</Menu>
-							</div>
-						</template>
-					</Menu>
+		<div class="flex items-center gap-6">
+			<div class="flex items-center gap-2">
+				<div class="flex w-32 items-center gap-2 text-primary">
+					<BlocksIcon class="size-5" />
+					<span class="text-base font-medium">Breakdown:</span>
 				</div>
+				<div class="flex flex-col gap-2">
+					<div class="flex flex-wrap items-center gap-2">
+						<div class="w-48">
+							<Combobox v-model="selectedBreakdown" :options="breakdownOptions" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="flex items-center gap-2">
+				<span class="text-base font-medium text-primary">Filtered by</span>
+				<Menu :triggers="['click']" :auto-hide="false" no-auto-focus placement="bottom-start">
+					<button
+						type="button"
+						class="inline-flex items-center gap-2 rounded-xl border border-dashed border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-4"
+					>
+						<PlusIcon class="size-5" />
+						Add
+					</button>
+
+					<template #popper>
+						<div class="flex w-[16rem] flex-col gap-1">
+							<Menu
+								v-for="category in filterCategories"
+								:key="category.key"
+								:triggers="['hover', 'focus']"
+								:auto-hide="false"
+								no-auto-focus
+								placement="right-start"
+							>
+								<button
+									type="button"
+									class="flex w-full items-center justify-between rounded-lg bg-surface-3 px-2 py-1.5 text-left text-base font-medium text-primary transition-colors hover:bg-surface-3"
+								>
+									<span>{{ category.label }}</span>
+									<div class="flex items-center gap-1">
+										<span
+											v-if="getCategorySelectionCount(category.key) > 0"
+											class="rounded-full bg-surface-3 px-1.5 py-0.5 text-xs text-primary"
+										>
+											{{ getCategorySelectionCount(category.key) }}
+										</span>
+										<ChevronRightIcon class="size-5 text-primary" />
+									</div>
+								</button>
+
+								<template #popper>
+									<div>
+										<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
+											{{ category.label }}
+										</p>
+										<div class="flex max-h-56 flex-col gap-2 overflow-y-auto">
+											<Checkbox
+												v-for="option in category.options"
+												:key="`${category.key}-${option.value}`"
+												:model-value="isFilterValueSelected(category.key, option.value)"
+												:label="option.label"
+												@update:model-value="
+													(nextValue) => toggleFilterValue(category.key, option.value, nextValue)
+												"
+											/>
+										</div>
+									</div>
+								</template>
+							</Menu>
+						</div>
+					</template>
+				</Menu>
 			</div>
 		</div>
 	</div>
