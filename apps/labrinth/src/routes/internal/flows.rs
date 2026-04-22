@@ -1665,7 +1665,7 @@ impl From<NewAccount> for AccountRegisterFlow {
 impl AccountRegisterFlow {
     async fn validate(
         self,
-        pool: &PgPool,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<ReadyAccountRegisterFlow, AccountRegisterValidateError> {
         validator::Validate::validate(&self).map_err(|err| {
@@ -1674,12 +1674,16 @@ impl AccountRegisterFlow {
             )
         })?;
 
-        if crate::database::models::DBUser::get(&self.username, pool, redis)
-            .await
-            .map_err(|err| {
-                AccountRegisterValidateError::InvalidInput(err.to_string())
-            })?
-            .is_some()
+        if crate::database::models::DBUser::get(
+            &self.username,
+            &mut *transaction,
+            redis,
+        )
+        .await
+        .map_err(|err| {
+            AccountRegisterValidateError::InvalidInput(err.to_string())
+        })?
+        .is_some()
         {
             return Err(AccountRegisterValidateError::UsernameTaken);
         }
@@ -1697,7 +1701,7 @@ impl AccountRegisterFlow {
 
         if !crate::database::models::DBUser::get_by_case_insensitive_email(
             &self.email,
-            pool,
+            &mut *transaction,
         )
         .await
         .map_err(|err| {
@@ -1716,15 +1720,14 @@ impl ReadyAccountRegisterFlow {
     async fn execute(
         self,
         req: HttpRequest,
-        pool: &PgPool,
+        transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         email_queue: &EmailQueue,
     ) -> Result<crate::models::sessions::Session, ApiError> {
         let register_flow = self.inner;
 
-        let mut transaction = pool.begin().await?;
         let user_id =
-            crate::database::models::generate_user_id(&mut transaction).await?;
+            crate::database::models::generate_user_id(transaction).await?;
 
         let hasher = Argon2::default();
         let salt = SaltString::generate(&mut ChaCha20Rng::from_entropy());
@@ -1759,11 +1762,30 @@ impl ReadyAccountRegisterFlow {
             allow_friend_requests: true,
             is_subscribed_to_newsletter: register_flow.sign_up_newsletter,
         }
-        .insert(&mut transaction)
-        .await?;
+        .insert(transaction)
+        .await
+        .map_err(|err| {
+            if let sqlx::Error::Database(database_error) = &err {
+                match database_error.constraint() {
+                    Some("username_unique" | "users_username_key") => {
+                        return ApiError::from(
+                            AccountRegisterValidateError::UsernameTaken,
+                        );
+                    }
+                    Some("email_unique" | "users_email_key") => {
+                        return ApiError::from(
+                            AccountRegisterValidateError::DuplicateEmail,
+                        );
+                    }
+                    _ => {}
+                }
+            }
+
+            ApiError::from(err)
+        })?;
 
         let session =
-            issue_session(req, user_id, &mut transaction, redis, None).await?;
+            issue_session(req, user_id, transaction, redis, None).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
 
         let mailbox: Mailbox = register_flow.email.parse().map_err(|_| {
@@ -1779,15 +1801,13 @@ impl ReadyAccountRegisterFlow {
 
         email_queue
             .send_one(
-                &mut transaction,
+                transaction,
                 NotificationBody::VerifyEmail { flow },
                 user_id,
                 mailbox,
             )
             .await?
             .as_user_error()?;
-
-        transaction.commit().await?;
 
         Ok(res)
     }
@@ -1801,14 +1821,18 @@ impl ReadyAccountRegisterFlow {
         (status = 400, description = "Invalid input")
     )
 )]
-#[post("create/validate")]
+#[post("/create/validate")]
 pub async fn validate_create_account_with_password(
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     new_account: web::Json<NewAccount>,
 ) -> Result<(), AccountRegisterValidateError> {
+    let mut transaction = pool.begin().await.map_err(|err| {
+        AccountRegisterValidateError::InvalidInput(err.to_string())
+    })?;
+
     AccountRegisterFlow::from(new_account.into_inner())
-        .validate(&pool, &redis)
+        .validate(&mut transaction, &redis)
         .await?;
 
     Ok(())
@@ -1822,7 +1846,7 @@ pub async fn validate_create_account_with_password(
         (status = 400, description = "Invalid input")
     )
 )]
-#[post("create")]
+#[post("/create")]
 pub async fn create_account_with_password(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -1838,11 +1862,16 @@ pub async fn create_account_with_password(
         return Err(ApiError::Turnstile);
     }
 
+    let mut transaction = pool.begin().await?;
+
     let ready_flow = AccountRegisterFlow::from(new_account)
-        .validate(&pool, &redis)
+        .validate(&mut transaction, &redis)
         .await?;
 
-    let res = ready_flow.execute(req, &pool, &redis, &email).await?;
+    let res = ready_flow
+        .execute(req, &mut transaction, &redis, &email)
+        .await?;
+    transaction.commit().await?;
 
     Ok(HttpResponse::Ok().json(res))
 }
