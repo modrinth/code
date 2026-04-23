@@ -1,4 +1,4 @@
-pub(crate) mod admin;
+pub mod admin;
 pub mod affiliate;
 pub mod billing;
 pub mod delphi;
