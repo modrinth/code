@@ -178,10 +178,11 @@ export const ForceExpanded: Story = {
 		components: { StackedAdmonitions, Admonition },
 		setup() {
 			const items = ref<DemoItem[]>(initialItems)
-			return { items }
+			const expanded = ref(true)
+			return { items, expanded }
 		},
 		template: /* html */ `
-			<StackedAdmonitions :items="items" :expanded="true">
+			<StackedAdmonitions :items="items" :expanded="expanded" @update:expanded="expanded = $event">
 				<template #item="{ item }">
 					<Admonition :type="item.type" :header="item.header" :body="item.body" />
 				</template>

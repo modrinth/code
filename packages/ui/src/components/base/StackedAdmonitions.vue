@@ -182,13 +182,27 @@ function toggleExpanded() {
 	setExpanded(!isExpanded.value)
 }
 
+function isInteractiveTarget(target: HTMLElement | null, currentTarget: EventTarget | null) {
+	if (!target) return false
+	const interactive = target.closest(
+		'button, a, input, select, textarea, summary, [role="button"], [role="link"]',
+	)
+	return !!interactive && interactive !== currentTarget
+}
+
 function onContainerClick(e: MouseEvent) {
 	if (isExpanded.value || props.items.length <= 1) return
 	const target = e.target as HTMLElement | null
-	if (!target) return
-	const interactive = target.closest('button, a, input, select, textarea, [role="button"]')
-	if (interactive && interactive !== e.currentTarget) return
+	if (isInteractiveTarget(target, e.currentTarget)) return
 	setExpanded(true)
+}
+
+function onCardClick(e: MouseEvent) {
+	if (!isExpanded.value) return
+	const target = e.target as HTMLElement | null
+	if (isInteractiveTarget(target, e.currentTarget)) return
+	e.stopPropagation()
+	setExpanded(false)
 }
 
 watch(
@@ -293,9 +307,7 @@ const messages = defineMessages({
 				<button type="button" @click="$emit('dismiss-all')">
 					<XIcon class="h-4 w-4" />
 					{{
-						items.length >= 2
-							? formatMessage(messages.dismissAll)
-							: formatMessage(messages.dismiss)
+						items.length >= 2 ? formatMessage(messages.dismissAll) : formatMessage(messages.dismiss)
 					}}
 				</button>
 			</ButtonStyled>
@@ -331,6 +343,7 @@ const messages = defineMessages({
 						transformOrigin: 'top center',
 					}"
 					:aria-hidden="!isExpanded && index !== 0 ? 'true' : undefined"
+					@click="onCardClick"
 				>
 					<template v-if="isExpanded || index === 0">
 						<slot
