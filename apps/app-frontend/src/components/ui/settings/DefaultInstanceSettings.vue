@@ -97,94 +97,6 @@ async function browseTarget(index: number) {
 <template>
 	<div>
 		<div class="flex flex-col gap-6">
-			<div class="flex flex-col gap-2.5">
-				<div class="flex items-center justify-between gap-4">
-					<div class="flex flex-col gap-1">
-						<h2 class="m-0 text-lg font-semibold text-contrast">File links</h2>
-						<p class="m-0 leading-tight">
-							Default links are applied when you create a new instance. Use relative paths like
-							screenshots or options.txt.
-						</p>
-					</div>
-
-					<button class="iconified-button brand-button" @click="addFileLink">
-						<PlusIcon />
-					</button>
-				</div>
-
-				<div
-					v-if="settings.file_links.length === 0"
-					class="rounded-2xl border border-solid border-button-border p-4"
-				>
-					<div class="flex items-center gap-3 text-secondary">
-						<LinkIcon class="size-5" />
-						<span>No default file links configured yet.</span>
-					</div>
-				</div>
-
-				<div v-for="(fileLink, index) in settings.file_links" :key="index" class="file-link-card">
-					<div class="flex items-center justify-between gap-2">
-						<div class="flex items-center gap-2 text-contrast">
-							<LinkIcon class="size-4" />
-							<span class="font-semibold">{{ fileLink.path || 'New file link' }}</span>
-						</div>
-						<button class="iconified-button danger-button" @click="removeFileLink(index)">
-							<TrashIcon />
-						</button>
-					</div>
-
-					<div class="grid gap-4 md:grid-cols-2">
-						<div class="flex flex-col gap-2">
-							<label class="text-sm font-medium text-secondary">Path in instance</label>
-							<StyledInput
-								v-model="fileLink.path"
-								autocomplete="off"
-								type="text"
-								placeholder="screenshots"
-								wrapper-class="w-full"
-							/>
-						</div>
-
-						<div class="flex flex-col gap-2">
-							<label class="text-sm font-medium text-secondary">Target on this device</label>
-							<div class="flex gap-2">
-								<StyledInput
-									v-model="fileLink.target"
-									autocomplete="off"
-									type="text"
-									placeholder="Select an existing file or folder"
-									wrapper-class="min-w-0 flex-1"
-								/>
-								<button class="iconified-button" @click="browseTarget(index)">
-									<FolderSearchIcon />
-								</button>
-							</div>
-						</div>
-					</div>
-
-					<div class="flex flex-wrap items-center gap-2">
-						<button
-							class="btn"
-							:class="{ 'btn-brand': fileLink.kind === 'directory' }"
-							@click="fileLink.kind = 'directory'"
-						>
-							<FolderSearchIcon class="size-4" />
-							Folder
-						</button>
-						<button
-							class="btn"
-							:class="{ 'btn-brand': fileLink.kind === 'file' }"
-							@click="fileLink.kind = 'file'"
-						>
-							<FileIcon class="size-4" />
-							File
-						</button>
-					</div>
-				</div>
-			</div>
-
-			<hr class="my-6 bg-button-border border-none h-[1px]" />
-
 			<div class="flex items-center justify-between gap-4">
 				<div class="flex flex-col gap-1">
 					<h3 class="m-0 text-lg font-semibold text-contrast">Fullscreen</h3>
@@ -312,6 +224,94 @@ async function browseTarget(index: number) {
 					wrapper-class="w-full"
 				/>
 				<p class="m-0 leading-tight">Ran after the game closes.</p>
+			</div>
+		</div>
+
+		<hr class="my-6 bg-button-border border-none h-[1px]" />
+
+		<div class="flex flex-col gap-2.5">
+			<div class="flex items-center justify-between gap-4">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">File links</h2>
+					<p class="m-0 leading-tight">
+						Default links are applied when you create a new instance. Use relative paths like
+						screenshots or options.txt.
+					</p>
+				</div>
+
+				<button class="iconified-button brand-button" @click="addFileLink">
+					<PlusIcon />
+				</button>
+			</div>
+
+			<div
+				v-if="settings.file_links.length === 0"
+				class="rounded-2xl border border-solid border-button-border p-4"
+			>
+				<div class="flex items-center gap-3 text-secondary">
+					<LinkIcon class="size-5" />
+					<span>No default file links configured yet.</span>
+				</div>
+			</div>
+
+			<div v-for="(fileLink, index) in settings.file_links" :key="index" class="file-link-card">
+				<div class="flex items-center justify-between gap-2">
+					<div class="flex items-center gap-2 text-contrast">
+						<LinkIcon class="size-4" />
+						<span class="font-semibold">{{ fileLink.path || 'New file link' }}</span>
+					</div>
+					<button class="iconified-button danger-button" @click="removeFileLink(index)">
+						<TrashIcon />
+					</button>
+				</div>
+
+				<div class="grid gap-4 md:grid-cols-2">
+					<div class="flex flex-col gap-2">
+						<label class="text-sm font-medium text-secondary">Path in instance</label>
+						<StyledInput
+							v-model="fileLink.path"
+							autocomplete="off"
+							type="text"
+							placeholder="screenshots"
+							wrapper-class="w-full"
+						/>
+					</div>
+
+					<div class="flex flex-col gap-2">
+						<label class="text-sm font-medium text-secondary">Target on this device</label>
+						<div class="flex gap-2">
+							<StyledInput
+								v-model="fileLink.target"
+								autocomplete="off"
+								type="text"
+								placeholder="Select an existing file or folder"
+								wrapper-class="min-w-0 flex-1"
+							/>
+							<button class="iconified-button" @click="browseTarget(index)">
+								<FolderSearchIcon />
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex flex-wrap items-center gap-2">
+					<button
+						class="btn"
+						:class="{ 'btn-brand': fileLink.kind === 'directory' }"
+						@click="fileLink.kind = 'directory'"
+					>
+						<FolderSearchIcon class="size-4" />
+						Folder
+					</button>
+					<button
+						class="btn"
+						:class="{ 'btn-brand': fileLink.kind === 'file' }"
+						@click="fileLink.kind = 'file'"
+					>
+						<FileIcon class="size-4" />
+						File
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
