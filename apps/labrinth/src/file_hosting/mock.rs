@@ -72,6 +72,16 @@ impl FileHost for MockHost {
             file_name: file_name.to_string(),
         })
     }
+
+    async fn read_file(
+        &self,
+        file_name: &str,
+        file_publicity: FileHostPublicity,
+    ) -> Result<Bytes, FileHostingError> {
+        let path = get_file_path(file_name, file_publicity);
+        let data = std::fs::read(&path)?;
+        Ok(Bytes::from(data))
+    }
 }
 
 fn get_file_path(

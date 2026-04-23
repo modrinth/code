@@ -64,6 +64,12 @@ pub trait FileHost: Send + Sync {
         file_name: &str,
         file_publicity: FileHostPublicity,
     ) -> Result<DeleteFileData, FileHostingError>;
+
+    async fn read_file(
+        &self,
+        file_name: &str,
+        file_publicity: FileHostPublicity,
+    ) -> Result<Bytes, FileHostingError>;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
