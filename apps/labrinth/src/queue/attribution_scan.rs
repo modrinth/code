@@ -1,18 +1,20 @@
-use std::io::Cursor;
+use std::io::{Cursor, Read};
 
-use bytes::Bytes;
 use eyre::{Result, eyre};
+use hex::ToHex;
+use sha1::Digest;
 use tokio::task::spawn_blocking;
 use tracing::info;
 use zip::ZipArchive;
 
 use crate::{
     database::{PgPool, PgTransaction, models::DBFileId, redis::RedisPool},
-    file_hosting::FileHost,
+    env::ENV,
+    file_hosting::{FileHost, FileHostPublicity},
     util::error::Context,
 };
 
-pub async fn scan_all_file_overrides(
+pub async fn scan_all_file_override_attributions(
     db: &PgPool,
     redis: &RedisPool,
     file_host: &dyn FileHost,
@@ -21,23 +23,27 @@ pub async fn scan_all_file_overrides(
 
     let files_to_scan = sqlx::query!(
         r#"
-        select file_id as "file_id: DBFileId"
-        from file_attributions
-        where scanned_at is null
+        select
+            fa.file_id as "file_id: DBFileId",
+            f.url
+        from file_attributions fa
+        inner join files f on f.id = fa.file_id
+        where fa.scanned_at is null
         "#
     )
-    .fetch_all(&db)
+    .fetch_all(&*db)
     .await
     .wrap_err("fetching files to scan")?;
 
     info!("Found {} files to scan", files_to_scan.len());
 
-    for file_id in files_to_scan {
-        let file_data = (); // todo get
-
-        scan_file_overrides(redis, &mut txn, file_id.file_id, file_data)
-            .await
-            .wrap_err_with(|| eyre!("scanning file {file_id}"))?;
+    for row in files_to_scan {
+        let file_id = row.file_id;
+        scan_file_override_attributions(
+            &mut txn, &redis, file_host, file_id, &row.url,
+        )
+        .await
+        .wrap_err_with(|| eyre!("scanning file {file_id:?}"))?;
     }
 
     txn.commit().await.wrap_err("committing transaction")?;
@@ -45,12 +51,26 @@ pub async fn scan_all_file_overrides(
     Ok(())
 }
 
-pub async fn scan_file_overrides(
-    redis: &RedisPool,
+/// Scan a single file, provided you already fetched the file ID and URL.
+pub async fn scan_file_override_attributions(
     txn: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+    file_host: &dyn FileHost,
     file_id: DBFileId,
-    file_data: Bytes,
+    file_url: &str,
 ) -> Result<()> {
+    let key = file_url
+        .strip_prefix(&ENV.CDN_URL)
+        .unwrap_or(&file_url)
+        .trim_start_matches('/');
+
+    let file_data = file_host
+        .read_file(key, FileHostPublicity::Public)
+        .await
+        .wrap_err_with(|| {
+        eyre!("reading file {file_id:?} from storage at {key}")
+    })?;
+
     let overrides = {
         let file_data = file_data.clone();
         spawn_blocking(move || extract_override_files(&file_data))
@@ -59,15 +79,17 @@ pub async fn scan_file_overrides(
             .wrap_err("extracting override files")?
     };
 
-    if !overrides.is_empty() {}
+    if !overrides.is_empty() {
+        // todo
+    }
 
     sqlx::query!(
         "
-        update file_attributions
-        set scanned_at = now()
-        where file_id = $1
-        ",
-        file_id,
+            update file_attributions
+            set scanned_at = now()
+            where file_id = $1
+            ",
+        file_id.0,
     )
     .execute(&mut *txn)
     .await
@@ -105,8 +127,9 @@ fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
     let mut files = Vec::new();
 
     for i in 0..zip.len() {
-        let mut file =
-            zip.by_index(i).wrap_err_with(|| eyre("reading file {i}"))?;
+        let mut file = zip
+            .by_index(i)
+            .wrap_err_with(|| eyre!("reading file {i}"))?;
         let name = file.name().to_string();
 
         if !OVERRIDE_PREFIXES

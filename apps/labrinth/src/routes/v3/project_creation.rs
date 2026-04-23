@@ -693,9 +693,7 @@ async fn project_create_inner(
                 None,
                 existing_file_names,
                 transaction,
-                pool,
                 redis,
-                &crate::util::http::HttpClient(http.clone()),
             )
             .await?;
 
@@ -908,7 +906,7 @@ async fn project_create_inner(
         let now = Utc::now();
 
         let id = project_builder_actual
-            .insert(&mut *transaction, http)
+            .insert(&mut *transaction, redis, file_host, http)
             .await?;
         DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
 

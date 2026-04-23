@@ -1,5 +1,3 @@
-mod license_check;
-
 use super::project_creation::{CreateError, UploadedFile};
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
@@ -371,9 +369,7 @@ async fn version_create_inner(
                 version_data.file_types.get(name).copied().flatten(),
                 existing_file_names,
                 transaction,
-                pool,
                 redis,
-                &HttpClient(http.clone()),
             )
             .await?;
 
@@ -487,7 +483,7 @@ async fn version_create_inner(
     };
 
     let project_id = builder.project_id;
-    builder.insert(transaction, http).await?;
+    builder.insert(transaction, redis, file_host, http).await?;
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =
@@ -761,9 +757,7 @@ async fn upload_file_to_version_inner(
                 file_data.file_types.get(name).copied().flatten(),
                 version.files.iter().map(|x| x.filename.clone()).collect(),
                 transaction,
-                &client,
                 &redis,
-                &HttpClient(http.clone()),
             )
             .await?;
 
@@ -786,7 +780,8 @@ async fn upload_file_to_version_inner(
         ));
     } else {
         for file in file_builders {
-            file.insert(version_id, &mut *transaction, http).await?;
+            file.insert(version_id, &mut *transaction, &redis, file_host, http)
+                .await?;
         }
     }
 
@@ -816,9 +811,7 @@ pub async fn upload_file(
     file_type: Option<FileType>,
     other_file_names: Vec<String>,
     transaction: &mut PgTransaction<'_>,
-    pool: &PgPool,
     redis: &RedisPool,
-    http: &HttpClient,
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
 
@@ -881,32 +874,6 @@ pub async fn upload_file(
         redis,
     )
     .await?;
-
-    if let ValidationResult::PassWithPackDataAndFiles { .. } = validation_result
-    {
-        match license_check::extract_override_files(&data) {
-            Ok(overrides) => {
-                if !overrides.is_empty() {
-                    let resolutions = license_check::resolve_overrides(
-                        &overrides,
-                        transaction,
-                        pool,
-                        redis,
-                        http,
-                    )
-                    .await;
-                    for file in &overrides {
-                        if let Some(res) = resolutions.get(&file.sha1) {
-                            println!("override: {} -> {:?}", file.path, res);
-                        }
-                    }
-                }
-            }
-            Err(e) => {
-                eprintln!("license check zip parse failed: {e}");
-            }
-        }
-    }
 
     if let ValidationResult::PassWithPackDataAndFiles {
         ref format,

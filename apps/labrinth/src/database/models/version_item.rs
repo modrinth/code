@@ -6,8 +6,10 @@ use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
 use crate::database::redis::RedisPool;
+use crate::file_hosting::FileHost;
 use crate::models::exp;
 use crate::models::projects::{FileType, VersionStatus};
+use crate::queue::attribution_scan::scan_file_override_attributions;
 use crate::routes::internal::delphi::DelphiRunParameters;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -17,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::iter;
+use tracing::error;
 
 pub const VERSIONS_NAMESPACE: &str = "versions";
 const VERSION_FILES_NAMESPACE: &str = "versions_files";
@@ -135,6 +138,8 @@ impl VersionFileBuilder {
         self,
         version_id: DBVersionId,
         transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+        file_host: &dyn FileHost,
         http: &reqwest::Client,
     ) -> Result<DBFileId, DatabaseError> {
         let file_id = generate_file_id(&mut *transaction).await?;
@@ -178,7 +183,19 @@ impl VersionFileBuilder {
         )
         .await
         {
-            tracing::error!("Error submitting new file to Delphi: {err}");
+            error!("Error submitting new file to Delphi: {err:?}");
+        }
+
+        if let Err(err) = scan_file_override_attributions(
+            &mut *transaction,
+            redis,
+            file_host,
+            file_id,
+            &self.url,
+        )
+        .await
+        {
+            error!("Error scanning new file {file_id:?}: {err:?}");
         }
 
         Ok(file_id)
@@ -195,6 +212,8 @@ impl VersionBuilder {
     pub async fn insert(
         self,
         transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+        file_host: &dyn FileHost,
         http: &reqwest::Client,
     ) -> Result<DBVersionId, DatabaseError> {
         let version = DBVersion {
@@ -236,7 +255,8 @@ impl VersionBuilder {
         } = self;
 
         for file in files {
-            file.insert(version_id, transaction, http).await?;
+            file.insert(version_id, transaction, redis, file_host, http)
+                .await?;
         }
 
         DependencyBuilder::insert_many(

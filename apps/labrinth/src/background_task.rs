@@ -3,6 +3,7 @@ use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::queue::analytics::cache::cache_analytics;
+use crate::queue::attribution_scan::scan_all_file_override_attributions;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
@@ -35,6 +36,10 @@ pub enum BackgroundTask {
     /// Attempts to ping Minecraft Java servers as if we were a client, to
     /// collect info on if they're online, game version, description, etc.
     PingMinecraftJavaServers,
+    /// Finds files of versions which have not been scanned for attributions
+    /// yet, extracts them to find file overrides, and finds any overrides which
+    /// require attribution from the creator.
+    ScanAttributions,
 }
 
 impl BackgroundTask {
@@ -91,6 +96,14 @@ impl BackgroundTask {
             }
             PingMinecraftJavaServers => {
                 ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
+            }
+            ScanAttributions => {
+                scan_all_file_override_attributions(
+                    &pool,
+                    &redis_pool,
+                    &**file_host,
+                )
+                .await
             }
         }
     }

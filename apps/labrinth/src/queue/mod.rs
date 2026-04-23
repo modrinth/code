@@ -1,4 +1,5 @@
 pub mod analytics;
+pub mod attribution_scan;
 pub mod billing;
 pub mod email;
 pub mod moderation;
