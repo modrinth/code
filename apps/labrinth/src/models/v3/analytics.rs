@@ -94,6 +94,9 @@ pub struct Playtime {
     pub game_version: String,
     /// Parent modpack this playtime was recorded in
     pub parent: u64,
+
+    // added retroactively - may be missing
+    pub country: Option<String>,
 }
 
 #[derive(Row, Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
