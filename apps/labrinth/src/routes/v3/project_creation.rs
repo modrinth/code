@@ -694,7 +694,9 @@ async fn project_create_inner(
                 None,
                 existing_file_names,
                 transaction,
+                pool,
                 redis,
+                &crate::util::http::HttpClient(http.clone()),
             )
             .await?;
 

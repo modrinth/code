@@ -372,7 +372,9 @@ async fn version_create_inner(
                 version_data.file_types.get(name).copied().flatten(),
                 existing_file_names,
                 transaction,
+                pool,
                 redis,
+                &HttpClient(http.clone()),
             )
             .await?;
 
@@ -760,7 +762,9 @@ async fn upload_file_to_version_inner(
                 file_data.file_types.get(name).copied().flatten(),
                 version.files.iter().map(|x| x.filename.clone()).collect(),
                 transaction,
+                &client,
                 &redis,
+                &HttpClient(http.clone()),
             )
             .await?;
 
@@ -813,7 +817,9 @@ pub async fn upload_file(
     file_type: Option<FileType>,
     other_file_names: Vec<String>,
     transaction: &mut PgTransaction<'_>,
+    pool: &PgPool,
     redis: &RedisPool,
+    http: &HttpClient,
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
 
@@ -879,8 +885,27 @@ pub async fn upload_file(
 
     if let ValidationResult::PassWithPackDataAndFiles { .. } = validation_result
     {
-        if let Err(e) = license_check::check_override_licenses(&data) {
-            eprintln!("license check failed: {e}");
+        match license_check::extract_override_files(&data) {
+            Ok(overrides) => {
+                if !overrides.is_empty() {
+                    let resolutions = license_check::resolve_overrides(
+                        &overrides,
+                        transaction,
+                        pool,
+                        redis,
+                        http,
+                    )
+                    .await;
+                    for file in &overrides {
+                        if let Some(res) = resolutions.get(&file.sha1) {
+                            println!("override: {} -> {:?}", file.path, res);
+                        }
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("license check zip parse failed: {e}");
+            }
         }
     }
 
