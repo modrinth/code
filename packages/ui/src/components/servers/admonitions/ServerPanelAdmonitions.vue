@@ -3,14 +3,16 @@ import { computed, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import StackedAdmonitions, { type StackedAdmonitionItem } from '#ui/components/base/StackedAdmonitions.vue'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
+import StackedAdmonitions, {
+	type StackedAdmonitionItem,
+} from '#ui/components/base/StackedAdmonitions.vue'
 import { ServerIcon } from '#ui/components/servers/icons'
 import InstallingBanner, {
 	type ContentError,
 	type SyncProgress,
 } from '#ui/components/servers/InstallingBanner.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
@@ -73,15 +75,11 @@ const filteredBusyReasons = computed(() =>
 )
 
 const contentBusyHeader = computed(() =>
-	filteredBusyReasons.value.length > 0
-		? formatMessage(filteredBusyReasons.value[0].reason)
-		: null,
+	filteredBusyReasons.value.length > 0 ? formatMessage(filteredBusyReasons.value[0].reason) : null,
 )
 
 const filesBusyHeader = computed(() =>
-	filteredBusyReasons.value.length > 0
-		? formatMessage(filteredBusyReasons.value[0].reason)
-		: null,
+	filteredBusyReasons.value.length > 0 ? formatMessage(filteredBusyReasons.value[0].reason) : null,
 )
 
 const dismissedIds = reactive(new Set<string>())
@@ -137,13 +135,13 @@ type ServerAdmonitionItem = StackedAdmonitionItem & {
 	priority: number
 	sortIndex: number
 } & (
-	| { kind: 'installing' }
-	| { kind: 'upload' }
-	| { kind: 'fs-op'; op: FileOperation }
-	| { kind: 'backup'; entry: BackupAdmonitionEntry }
-	| { kind: 'busy-content' }
-	| { kind: 'busy-files' }
-)
+		| { kind: 'installing' }
+		| { kind: 'upload' }
+		| { kind: 'fs-op'; op: FileOperation }
+		| { kind: 'backup'; entry: BackupAdmonitionEntry }
+		| { kind: 'busy-content' }
+		| { kind: 'busy-files' }
+	)
 
 const showInstallingBanner = computed(() => {
 	if (!ctx.server.value) return false
@@ -271,9 +269,17 @@ async function onBackupDismiss(item: BackupAdmonitionEntry) {
 	}
 	try {
 		if (item.type === 'create') {
-			await client.archon.backups_queue_v1.ackCreate(ctx.serverId, ctx.worldId.value!, item.operationId)
+			await client.archon.backups_queue_v1.ackCreate(
+				ctx.serverId,
+				ctx.worldId.value!,
+				item.operationId,
+			)
 		} else {
-			await client.archon.backups_queue_v1.ackRestore(ctx.serverId, ctx.worldId.value!, item.operationId)
+			await client.archon.backups_queue_v1.ackRestore(
+				ctx.serverId,
+				ctx.worldId.value!,
+				item.operationId,
+			)
 		}
 	} catch (err) {
 		dismissedIds.delete(item.key)

@@ -452,9 +452,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Upload files"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Uploading files ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "All selected content is already disabled"
   },
@@ -1216,12 +1213,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unknown game mode"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "Files are still being uploaded. Leaving this page will cancel the upload and your changes may be lost."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Upload in progress"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} compatible {count, plural, one {instance} other {instances}}"
@@ -2567,6 +2558,9 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Unlisted by staff"
   },
+  "s.bg": {
+    "defaultMessage": "Background task running"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "Filter locked"
   },
@@ -2739,10 +2733,13 @@
     "defaultMessage": "{count, plural, one {# backup selected} other {# backups selected}}"
   },
   "servers.backups.delete-modal.admonition-body": {
-    "defaultMessage": "{count, plural, one {This backup} other {These backups}} cannot be recovered once deleted. This action is permanent."
+    "defaultMessage": "Once deleted, {count, plural, one {this backup cannot} other {these backups cannot}} be recovered. Deletion is permanent."
   },
   "servers.backups.delete-modal.admonition-header": {
     "defaultMessage": "Deletion warning"
+  },
+  "servers.backups.delete-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {Backup} other {Backups ({count})}}"
   },
   "servers.backups.delete-modal.confirm": {
     "defaultMessage": "Delete {count, plural, one {backup} other {# backups}}"
@@ -2789,8 +2786,8 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Restore"
   },
-  "servers.backups.item.restoring": {
-    "defaultMessage": "Restoring"
+  "servers.backups.item.restore-in-progress": {
+    "defaultMessage": "Restore in progress…"
   },
   "servers.backups.select-backup-aria": {
     "defaultMessage": "Select backup {name}"
@@ -3688,5 +3685,11 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Leave page?"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count, plural, one {# alert} other {# alerts}}"
+  },
+  "ui.stacked-admonitions.dismiss-all": {
+    "defaultMessage": "Dismiss all"
   }
 }

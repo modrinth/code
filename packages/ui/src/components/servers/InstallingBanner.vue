@@ -1,5 +1,10 @@
 <template>
-	<Admonition :type="contentError ? 'critical' : 'info'" :show-actions-underneath="!contentError">
+	<Admonition
+		:type="contentError ? 'critical' : 'info'"
+		:progress="!contentError ? (progress ? progress.percent / 100 : 0) : undefined"
+		progress-color="blue"
+		:waiting="!contentError && !progress"
+	>
 		<template #icon>
 			<slot v-if="!contentError" name="icon">
 				<SpinnerIcon class="h-6 w-6 flex-none animate-spin text-brand-blue" />
@@ -32,16 +37,6 @@
 				</button>
 			</ButtonStyled>
 		</template>
-		<template v-if="!contentError" #actions>
-			<ProgressBar
-				v-if="progress"
-				:progress="progress.percent"
-				:max="100"
-				color="blue"
-				full-width
-			/>
-			<ProgressBar v-else :progress="0" :max="1" color="blue" full-width waiting />
-		</template>
 	</Admonition>
 </template>
 
@@ -52,7 +47,6 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import Admonition from '../base/Admonition.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
-import ProgressBar from '../base/ProgressBar.vue'
 
 export interface SyncProgress {
 	phase: 'Analyzing' | 'InstallingPack' | 'InstallingLoader' | 'Addons'

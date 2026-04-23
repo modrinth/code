@@ -43,7 +43,8 @@
 							:model-value="allSelected"
 							:indeterminate="someSelected"
 							:label="formatMessage(messages.selectAll)"
-							class="shrink-0 text-secondary"
+							class="shrink-0"
+							label-class="text-secondary font-semibold"
 							@update:model-value="toggleSelectAll"
 						/>
 						<div class="hidden h-6 w-px bg-surface-5 sm:block" />
@@ -107,10 +108,10 @@
 					<div v-else class="flex flex-col gap-1.5">
 						<template v-for="group in groupedBackups" :key="group.label">
 							<div class="flex items-center gap-2">
-								<div class="flex w-5 shrink-0 justify-center">
-									<component :is="group.icon" v-if="group.icon" class="size-5 text-secondary" />
+								<div class="flex w-5 shrink-0 items-center justify-center">
+									<component :is="group.icon" v-if="group.icon" class="size-5" />
 								</div>
-								<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
+								<span class="text-lg font-semibold leading-5 text-contrast">{{ group.label }}</span>
 							</div>
 
 							<TransitionGroup name="list" tag="div" class="flex flex-col">

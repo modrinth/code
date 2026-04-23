@@ -1,5 +1,5 @@
 <template>
-	<Admonition type="info">
+	<Admonition type="info" :progress="overallProgress" progress-color="blue">
 		<template #icon>
 			<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
 		</template>
@@ -19,9 +19,6 @@
 				<button class="!border" type="button" @click="cancelUpload()">Cancel</button>
 			</ButtonStyled>
 		</template>
-		<template #progress>
-			<ProgressBar :progress="overallProgress" :max="1" color="blue" full-width />
-		</template>
 	</Admonition>
 </template>
 
@@ -32,7 +29,6 @@ import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import { injectModrinthServerContext } from '#ui/providers'
 
 const ctx = injectModrinthServerContext()

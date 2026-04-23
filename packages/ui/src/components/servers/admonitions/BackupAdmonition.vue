@@ -9,7 +9,6 @@ import {
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import type { MessageDescriptor } from '#ui/composables/i18n'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -258,6 +257,9 @@ function getDescription(item: BackupAdmonitionEntry): string {
 		:header="getTitle(item)"
 		:timestamp="item.createdAt"
 		:dismissible="dismissible && isTerminal(item)"
+		:progress="isInProgress(item) ? item.progress : undefined"
+		progress-color="blue"
+		:waiting="isInProgress(item) && item.progress === 0"
 		@dismiss="$emit('dismiss')"
 	>
 		<template #icon="{ iconClass }">
@@ -281,14 +283,6 @@ function getDescription(item: BackupAdmonitionEntry): string {
 					{{ formatMessage(commonMessages.retryButton) }}
 				</button>
 			</ButtonStyled>
-		</template>
-		<template v-if="isInProgress(item)" #progress>
-			<ProgressBar
-				:progress="item.progress"
-				color="blue"
-				:waiting="item.progress === 0"
-				full-width
-			/>
 		</template>
 	</Admonition>
 </template>

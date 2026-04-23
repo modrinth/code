@@ -2,6 +2,9 @@
 	<Admonition
 		:type="op.state === 'done' ? 'success' : op.state?.startsWith('fail') ? 'critical' : 'info'"
 		:dismissible="dismissible && isTerminal"
+		:progress="'progress' in op ? (op.progress ?? 0) : 0"
+		:progress-color="op.state === 'done' ? 'green' : op.state?.startsWith('fail') ? 'red' : 'blue'"
+		:waiting="op.state === 'queued' || !op.progress || op.progress === 0"
 		@dismiss="$emit('dismiss')"
 	>
 		<template #icon="{ iconClass }">
@@ -37,15 +40,6 @@
 				</button>
 			</ButtonStyled>
 		</template>
-		<template #progress>
-			<ProgressBar
-				:progress="'progress' in op ? (op.progress ?? 0) : 0"
-				:max="1"
-				:color="op.state === 'done' ? 'green' : op.state?.startsWith('fail') ? 'red' : 'blue'"
-				:waiting="op.state === 'queued' || !op.progress || op.progress === 0"
-				full-width
-			/>
-		</template>
 	</Admonition>
 </template>
 
@@ -56,7 +50,6 @@ import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 import { injectModrinthServerContext } from '#ui/providers'
@@ -72,9 +65,7 @@ const props = defineProps<{
 const { formatMessage } = useVIntl()
 const ctx = injectModrinthServerContext()
 
-const isTerminal = computed(
-	() => props.op.state === 'done' || !!props.op.state?.startsWith('fail'),
-)
+const isTerminal = computed(() => props.op.state === 'done' || !!props.op.state?.startsWith('fail'))
 
 const messages = defineMessages({
 	extracting: {

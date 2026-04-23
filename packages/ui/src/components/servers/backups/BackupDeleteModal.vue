@@ -76,7 +76,7 @@ const messages = defineMessages({
 	admonitionBody: {
 		id: 'servers.backups.delete-modal.admonition-body',
 		defaultMessage:
-			'{count, plural, one {This backup} other {These backups}} cannot be recovered once deleted. This action is permanent.',
+			'Once deleted, {count, plural, one {this backup cannot} other {these backups cannot}} be recovered. Deletion is permanent.',
 	},
 	confirm: {
 		id: 'servers.backups.delete-modal.confirm',

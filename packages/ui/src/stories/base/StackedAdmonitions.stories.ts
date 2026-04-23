@@ -3,7 +3,6 @@ import { ref } from 'vue'
 
 import Admonition from '../../components/base/Admonition.vue'
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
-import ProgressBar from '../../components/base/ProgressBar.vue'
 import StackedAdmonitionsRaw, {
 	type StackedAdmonitionItem,
 } from '../../components/base/StackedAdmonitions.vue'
@@ -356,7 +355,7 @@ interface RichItem extends StackedAdmonitionItem {
 
 export const RichContent: Story = {
 	render: () => ({
-		components: { StackedAdmonitions, Admonition, ButtonStyled, ProgressBar },
+		components: { StackedAdmonitions, Admonition, ButtonStyled },
 		setup() {
 			const items = ref<RichItem[]>([
 				{
@@ -396,6 +395,8 @@ export const RichContent: Story = {
 						:type="item.type"
 						:header="item.header"
 						:dismissible="dismissible && !item.canCancel"
+						:progress="item.progress"
+						progress-color="blue"
 						@dismiss="dismiss(item.id)"
 					>
 						{{ item.body }}
@@ -406,9 +407,6 @@ export const RichContent: Story = {
 							<ButtonStyled v-if="item.canRetry" color="red">
 								<button type="button" @click="dismiss(item.id)">Retry</button>
 							</ButtonStyled>
-						</template>
-						<template v-if="item.progress != null" #progress>
-							<ProgressBar :progress="item.progress" :max="1" color="blue" full-width />
 						</template>
 					</Admonition>
 				</template>
