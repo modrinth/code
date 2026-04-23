@@ -178,13 +178,17 @@ const timeframeOptions: ComboboxOption<AnalyticsTimeframePreset>[] = [
 	{ value: 'all_time', label: 'All time' },
 ]
 
-const groupByOptions: ComboboxOption<AnalyticsGroupByPreset>[] = [
-	{ value: '1h', label: '1h' },
-	{ value: '6h', label: '6h' },
-	{ value: 'day', label: 'Day' },
-	{ value: 'week', label: 'Week' },
-	{ value: 'month', label: 'Month' },
-	{ value: 'year', label: 'Year' },
+const groupByPresetOptions: Array<{
+	value: AnalyticsGroupByPreset
+	label: string
+	minutes: number
+}> = [
+	{ value: '1h', label: '1h', minutes: 60 },
+	{ value: '6h', label: '6h', minutes: 360 },
+	{ value: 'day', label: 'Day', minutes: 24 * 60 },
+	{ value: 'week', label: 'Week', minutes: 7 * 24 * 60 },
+	{ value: 'month', label: 'Month', minutes: 30 * 24 * 60 },
+	{ value: 'year', label: 'Year', minutes: 365 * 24 * 60 },
 ]
 
 const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
@@ -438,6 +442,43 @@ function ensureMinimumRange(start: Date, end: Date): { start: Date; end: Date } 
 
 	return { start, end }
 }
+
+const selectedTimeframeDurationMinutes = computed(() => {
+	const rawRange = getTimeRangeForPreset(selectedTimeframe.value)
+	const { start, end } = ensureMinimumRange(rawRange.start, rawRange.end)
+	const durationMs = end.getTime() - start.getTime()
+	return Math.max(1, Math.floor(durationMs / (60 * 1000)))
+})
+
+const groupByOptions = computed<ComboboxOption<AnalyticsGroupByPreset>[]>(() => {
+	const options = groupByPresetOptions.map((option) => ({
+		value: option.value,
+		label: option.label,
+		disabled: option.minutes >= selectedTimeframeDurationMinutes.value,
+	}))
+
+	if (options.every((option) => option.disabled)) {
+		options[0].disabled = false
+	}
+
+	return options
+})
+
+watch(
+	groupByOptions,
+	(nextOptions) => {
+		const selectedOption = nextOptions.find((option) => option.value === selectedGroupBy.value)
+		if (selectedOption && !selectedOption.disabled) {
+			return
+		}
+
+		const fallbackOption = [...nextOptions].reverse().find((option) => !option.disabled) ?? nextOptions[0]
+		if (fallbackOption && selectedGroupBy.value !== fallbackOption.value) {
+			selectedGroupBy.value = fallbackOption.value
+		}
+	},
+	{ immediate: true },
+)
 
 function unique<T>(values: T[]): T[] {
 	return Array.from(new Set(values))
