@@ -10,21 +10,6 @@
 					</div>
 
 					<div class="flex items-center gap-2">
-						<button
-							v-for="dataModeOption in dataModeOptions"
-							:key="dataModeOption.value"
-							type="button"
-							class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
-							:class="
-								activeDataMode === dataModeOption.value
-									? 'border-brand bg-highlight-green text-brand'
-									: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
-							"
-							@click="activeDataMode = dataModeOption.value"
-						>
-							{{ dataModeOption.label }}
-						</button>
-
 						<div class="w-52">
 							<Chips
 								v-model="activeViewMode"
@@ -108,16 +93,12 @@ import {
 	isTimeRelevantForGroupBy,
 } from './utils'
 
-type DataMode = 'events'
 type ViewMode = 'line' | 'area' | 'bar'
 
 const analyticsDashboardContext = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 
-const activeDataMode = ref<DataMode>('events')
 const activeViewMode = ref<ViewMode>('line')
-
-const dataModeOptions: { value: DataMode; label: string }[] = [{ value: 'events', label: 'Events' }]
 
 const viewModeLabels: Record<ViewMode, string> = {
 	line: 'Line',
