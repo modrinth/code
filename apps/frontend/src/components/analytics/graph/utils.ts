@@ -4,6 +4,7 @@ import type {
 	AnalyticsBreakdownPreset,
 	AnalyticsDashboardProject,
 	AnalyticsDashboardStat,
+	AnalyticsGroupByPreset,
 } from '~/providers/analytics/analytics'
 
 import { getAnalyticsBreakdownValue } from '../breakdown'
@@ -15,8 +16,6 @@ export type ChartDataset = {
 	borderColor: string
 	backgroundColor: string
 }
-
-const DAY_MS = 24 * 60 * 60 * 1000
 
 export function getMetricValue(
 	point: Labrinth.Analytics.v3.ProjectAnalytics,
@@ -148,25 +147,23 @@ export function getSliceBucketRange(
 export function buildTimeAxisLabels(
 	timeRange: Labrinth.Analytics.v3.TimeRange,
 	sliceCount: number,
+	includeTime: boolean,
 ): string[] {
 	const startMs = new Date(timeRange.start).getTime()
 	const endMs = new Date(timeRange.end).getTime()
 	const totalMs = endMs - startMs
 	const bucketMs = sliceCount > 0 ? totalMs / sliceCount : 0
-	const formatter = getTickFormatter(totalMs)
+	const formatter = getBucketEndFormatter(includeTime)
 
 	const labels: string[] = []
 	for (let i = 0; i < sliceCount; i++) {
-		labels.push(formatter.format(new Date(startMs + i * bucketMs)))
+		labels.push(formatter.format(new Date(startMs + (i + 1) * bucketMs)))
 	}
 	return labels
 }
 
-function getTickFormatter(totalMs: number): Intl.DateTimeFormat {
-	if (totalMs <= 2 * DAY_MS) {
-		return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' })
-	}
-	if (totalMs < 31 * DAY_MS) {
+function getBucketEndFormatter(includeTime: boolean): Intl.DateTimeFormat {
+	if (includeTime) {
 		return new Intl.DateTimeFormat(undefined, {
 			month: 'short',
 			day: 'numeric',
@@ -177,27 +174,24 @@ function getTickFormatter(totalMs: number): Intl.DateTimeFormat {
 	return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' })
 }
 
-export function formatBucketRange(start: Date, end: Date): string {
-	const timeFormatter = new Intl.DateTimeFormat(undefined, {
-		hour: 'numeric',
-		minute: '2-digit',
-	})
-	const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
+export function isTimeRelevantForGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
+	return groupBy === '1h' || groupBy === '6h'
+}
+
+export function formatBucketEndLabel(end: Date, includeTime: boolean): string {
+	if (includeTime) {
+		return new Intl.DateTimeFormat(undefined, {
+			month: 'short',
+			day: 'numeric',
+			hour: 'numeric',
+			minute: '2-digit',
+		}).format(end)
+	}
+
+	return new Intl.DateTimeFormat(undefined, {
 		month: 'short',
 		day: 'numeric',
-		hour: 'numeric',
-		minute: '2-digit',
-	})
-
-	const sameDay =
-		start.getFullYear() === end.getFullYear() &&
-		start.getMonth() === end.getMonth() &&
-		start.getDate() === end.getDate()
-
-	if (sameDay) {
-		return `${timeFormatter.format(start)} – ${timeFormatter.format(end)}`
-	}
-	return `${dateTimeFormatter.format(start)} – ${dateTimeFormatter.format(end)}`
+	}).format(end)
 }
 
 export function formatMetricValue(

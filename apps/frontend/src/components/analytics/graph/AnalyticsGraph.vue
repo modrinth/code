@@ -101,10 +101,11 @@ import AnalyticsChartTooltip, { type AnalyticsChartTooltipEntry } from './Analyt
 import {
 	buildChartDatasets,
 	buildTimeAxisLabels,
-	formatBucketRange,
+	formatBucketEndLabel,
 	formatMetricValue,
 	getSliceBucketRange,
 	getSliceCount,
+	isTimeRelevantForGroupBy,
 } from './utils'
 
 type DataMode = 'events'
@@ -162,10 +163,14 @@ const sliceCount = computed(() => {
 	return getSliceCount(fetchRequest.time_range, fallback)
 })
 
+const showTimeInBucketLabel = computed(() =>
+	isTimeRelevantForGroupBy(analyticsDashboardContext.selectedGroupBy.value),
+)
+
 const chartLabels = computed(() => {
 	const fetchRequest = analyticsDashboardContext.fetchRequest.value
 	if (!fetchRequest) return []
-	return buildTimeAxisLabels(fetchRequest.time_range, sliceCount.value)
+	return buildTimeAxisLabels(fetchRequest.time_range, sliceCount.value, showTimeInBucketLabel.value)
 })
 
 const chartDatasets = computed(() =>
@@ -240,7 +245,7 @@ const hoverBucketRange = computed(() => {
 
 const hoverRangeLabel = computed(() => {
 	if (!hoverBucketRange.value) return ''
-	return formatBucketRange(hoverBucketRange.value.start, hoverBucketRange.value.end)
+	return formatBucketEndLabel(hoverBucketRange.value.end, showTimeInBucketLabel.value)
 })
 
 const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {

@@ -86,7 +86,12 @@ import type { AnalyticsBreakdownPreset } from '~/providers/analytics/analytics'
 import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 
 import { getAnalyticsBreakdownValue } from '../breakdown'
-import { formatBucketRange, getSliceBucketRange, getSliceCount } from '../graph/utils'
+import {
+	formatBucketEndLabel,
+	getSliceBucketRange,
+	getSliceCount,
+	isTimeRelevantForGroupBy,
+} from '../graph/utils'
 
 type TableMode = 'date_breakdown' | 'breakdown_only'
 type SortDirection = 'asc' | 'desc'
@@ -95,7 +100,7 @@ type TableColumnKey = 'date' | 'breakdown' | 'views' | 'downloads' | 'revenue' |
 type AnalyticsTableRow = {
 	id: string
 	date: string
-	dateStartMs: number
+	dateMs: number
 	breakdown: string
 	views: number
 	downloads: number
@@ -135,6 +140,10 @@ const selectedProjectIdSet = computed(
 	() => new Set(analyticsDashboardContext.selectedProjectIds.value),
 )
 
+const showTimeInBucketLabel = computed(() =>
+	isTimeRelevantForGroupBy(analyticsDashboardContext.selectedGroupBy.value),
+)
+
 const tableRows = computed<AnalyticsTableRow[]>(() => {
 	const fetchRequest = analyticsDashboardContext.fetchRequest.value
 	const timeSlices = analyticsDashboardContext.timeSlices.value
@@ -149,8 +158,8 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 
 	timeSlices.forEach((slice, sliceIndex) => {
 		const bucketRange = getSliceBucketRange(fetchRequest.time_range, sliceCount, sliceIndex)
-		const dateStartMs = bucketRange.start.getTime()
-		const dateLabel = formatBucketRange(bucketRange.start, bucketRange.end)
+		const dateMs = bucketRange.end.getTime()
+		const dateLabel = formatBucketEndLabel(bucketRange.end, showTimeInBucketLabel.value)
 
 		for (const point of slice) {
 			if (!('source_project' in point)) {
@@ -162,8 +171,7 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 			}
 
 			const breakdown = getBreakdownValue(point, selectedBreakdown)
-			const rowId =
-				tableMode.value === 'date_breakdown' ? `${dateStartMs}::${breakdown}` : breakdown
+			const rowId = tableMode.value === 'date_breakdown' ? `${dateMs}::${breakdown}` : breakdown
 
 			let row = nextRows.get(rowId)
 
@@ -171,7 +179,7 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 				row = {
 					id: rowId,
 					date: tableMode.value === 'date_breakdown' ? dateLabel : '',
-					dateStartMs: tableMode.value === 'date_breakdown' ? dateStartMs : 0,
+					dateMs: tableMode.value === 'date_breakdown' ? dateMs : 0,
 					breakdown,
 					views: 0,
 					downloads: 0,
@@ -250,7 +258,7 @@ const sortedRows = computed<AnalyticsTableRow[]>(() => {
 			return primaryResult * directionFactor
 		}
 
-		const dateResult = left.dateStartMs - right.dateStartMs
+		const dateResult = left.dateMs - right.dateMs
 		if (dateResult !== 0) {
 			return dateResult * directionFactor
 		}
@@ -314,7 +322,7 @@ function getSortComparison(
 ): number {
 	switch (column) {
 		case 'date':
-			return left.dateStartMs - right.dateStartMs
+			return left.dateMs - right.dateMs
 		case 'breakdown':
 			return left.breakdown.localeCompare(right.breakdown, undefined, { sensitivity: 'base' })
 		case 'views':
