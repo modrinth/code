@@ -44,7 +44,7 @@ pub enum FileHostPublicity {
 }
 
 #[async_trait]
-pub trait FileHost {
+pub trait FileHost: Send + Sync {
     async fn upload_file(
         &self,
         content_type: &str,

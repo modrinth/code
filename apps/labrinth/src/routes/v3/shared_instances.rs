@@ -22,7 +22,6 @@ use actix_web::web::{Data, Redirect};
 use actix_web::{HttpRequest, HttpResponse, web};
 use futures_util::future::try_join_all;
 use serde::Deserialize;
-use std::sync::Arc;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -565,7 +564,7 @@ pub async fn shared_instance_version_download(
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     info: web::Path<(SharedInstanceVersionId,)>,
     session_queue: Data<AuthQueue>,
 ) -> Result<Redirect, ApiError> {

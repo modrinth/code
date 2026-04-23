@@ -57,7 +57,7 @@ pub struct LabrinthConfig {
     pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
-    pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
+    pub file_host: web::Data<dyn file_hosting::FileHost>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
     pub search_backend: web::Data<dyn search::SearchBackend>,
@@ -82,7 +82,7 @@ pub fn app_setup(
     redis_pool: RedisPool,
     search_backend: actix_web::web::Data<dyn search::SearchBackend>,
     clickhouse: &mut Client,
-    file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
+    file_host: web::Data<dyn file_hosting::FileHost>,
     stripe_client: stripe::Client,
     anrok_client: anrok::Client,
     email_queue: EmailQueue,
@@ -339,7 +339,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
-    .app_data(web::Data::new(labrinth_config.file_host.clone()))
+    .app_data(labrinth_config.file_host.clone())
     .app_data(labrinth_config.search_backend.clone())
     .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.http_client.clone())

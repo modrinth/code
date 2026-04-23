@@ -38,7 +38,6 @@ use reqwest::header::AUTHORIZATION;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
-use std::sync::Arc;
 use tracing::info;
 use validator::Validate;
 use zxcvbn::Score;
@@ -83,7 +82,7 @@ impl TempUser {
         provider: AuthProvider,
         transaction: &mut PgTransaction<'_>,
         client: &PgPool,
-        file_host: &Arc<dyn FileHost + Send + Sync>,
+        file_host: &dyn FileHost,
         redis: &RedisPool,
     ) -> Result<crate::database::models::DBUserId, AuthenticationError> {
         if let Some(email) = &self.email
@@ -150,7 +149,7 @@ impl TempUser {
                     ext,
                     Some(96),
                     Some(1.0),
-                    &**file_host,
+                    file_host,
                 )
                 .await;
 
@@ -1161,7 +1160,7 @@ pub async fn auth_callback(
     req: HttpRequest,
     Query(query): Query<HashMap<String, String>>,
     client: Data<PgPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     redis: Data<RedisPool>,
 ) -> Result<HttpResponse, crate::auth::templates::ErrorPage> {
     let state_string = query
@@ -1319,7 +1318,7 @@ pub async fn auth_callback(
                         provider,
                         &mut transaction,
                         &client,
-                        &file_host,
+                        &**file_host,
                         &redis,
                     )
                     .await?

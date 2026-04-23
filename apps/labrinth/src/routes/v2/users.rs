@@ -11,7 +11,6 @@ use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 use validator::Validate;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
@@ -295,7 +294,7 @@ pub async fn user_icon_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -335,7 +334,7 @@ pub async fn user_icon_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert to V2

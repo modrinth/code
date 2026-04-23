@@ -43,7 +43,6 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sha1::Digest;
 use std::collections::{HashMap, HashSet};
-use std::sync::Arc;
 use validator::Validate;
 
 fn default_requested_status() -> VersionStatus {
@@ -112,7 +111,7 @@ pub async fn version_create(
     mut payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     moderation_queue: web::Data<AutomatedModerationQueue>,
     http: web::Data<HttpClient>,
@@ -125,7 +124,7 @@ pub async fn version_create(
         &mut payload,
         &mut transaction,
         &redis,
-        &***file_host,
+        &**file_host,
         &mut uploaded_files,
         &client,
         &session_queue,
@@ -136,7 +135,7 @@ pub async fn version_create(
 
     if result.is_err() {
         let undo_result = super::project_creation::undo_uploads(
-            &***file_host,
+            &**file_host,
             &uploaded_files,
         )
         .await;
@@ -548,7 +547,7 @@ pub async fn upload_file_to_version(
     mut payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     http: web::Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {
@@ -563,7 +562,7 @@ pub async fn upload_file_to_version(
         client,
         &mut transaction,
         redis,
-        &***file_host,
+        &**file_host,
         &mut uploaded_files,
         version_id,
         &session_queue,
@@ -573,7 +572,7 @@ pub async fn upload_file_to_version(
 
     if result.is_err() {
         let undo_result = super::project_creation::undo_uploads(
-            &***file_host,
+            &**file_host,
             &uploaded_files,
         )
         .await;

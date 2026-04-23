@@ -1,6 +1,7 @@
 use crate::database;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
+use crate::file_hosting::FileHost;
 use crate::queue::analytics::cache::cache_analytics;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
@@ -44,6 +45,7 @@ impl BackgroundTask {
         ro_pool: PgPool,
         redis_pool: RedisPool,
         search_backend: web::Data<dyn SearchBackend>,
+        file_host: web::Data<dyn FileHost>,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,

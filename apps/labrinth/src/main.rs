@@ -1,13 +1,13 @@
 use actix_web::dev::Service;
 use actix_web::middleware::from_fn;
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpServer, web};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
 
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
 use labrinth::env::ENV;
-use labrinth::file_hosting::{FileHostKind, S3BucketConfig, S3Host};
+use labrinth::file_hosting::{FileHost, FileHostKind, S3BucketConfig, S3Host};
 use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::anrok;
@@ -109,44 +109,38 @@ async fn app() -> std::io::Result<()> {
     let redis_pool = RedisPool::new("");
 
     let storage_backend = ENV.STORAGE_BACKEND;
-    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
-        match storage_backend {
-            FileHostKind::S3 => {
-                let not_empty = |v: &str| -> String {
-                    assert!(!v.is_empty(), "S3 env var is empty");
-                    v.to_string()
-                };
+    let file_host: Arc<dyn FileHost> = match storage_backend {
+        FileHostKind::S3 => {
+            let not_empty = |v: &str| -> String {
+                assert!(!v.is_empty(), "S3 env var is empty");
+                v.to_string()
+            };
 
-                Arc::new(
-                    S3Host::new(
-                        S3BucketConfig {
-                            name: not_empty(&ENV.S3_PUBLIC_BUCKET_NAME),
-                            uses_path_style: ENV
-                                .S3_PUBLIC_USES_PATH_STYLE_BUCKET,
-                            region: not_empty(&ENV.S3_PUBLIC_REGION),
-                            url: not_empty(&ENV.S3_PUBLIC_URL),
-                            access_token: not_empty(
-                                &ENV.S3_PUBLIC_ACCESS_TOKEN,
-                            ),
-                            secret: not_empty(&ENV.S3_PUBLIC_SECRET),
-                        },
-                        S3BucketConfig {
-                            name: not_empty(&ENV.S3_PRIVATE_BUCKET_NAME),
-                            uses_path_style: ENV
-                                .S3_PRIVATE_USES_PATH_STYLE_BUCKET,
-                            region: not_empty(&ENV.S3_PRIVATE_REGION),
-                            url: not_empty(&ENV.S3_PRIVATE_URL),
-                            access_token: not_empty(
-                                &ENV.S3_PRIVATE_ACCESS_TOKEN,
-                            ),
-                            secret: not_empty(&ENV.S3_PRIVATE_SECRET),
-                        },
-                    )
-                    .unwrap(),
+            Arc::new(
+                S3Host::new(
+                    S3BucketConfig {
+                        name: not_empty(&ENV.S3_PUBLIC_BUCKET_NAME),
+                        uses_path_style: ENV.S3_PUBLIC_USES_PATH_STYLE_BUCKET,
+                        region: not_empty(&ENV.S3_PUBLIC_REGION),
+                        url: not_empty(&ENV.S3_PUBLIC_URL),
+                        access_token: not_empty(&ENV.S3_PUBLIC_ACCESS_TOKEN),
+                        secret: not_empty(&ENV.S3_PUBLIC_SECRET),
+                    },
+                    S3BucketConfig {
+                        name: not_empty(&ENV.S3_PRIVATE_BUCKET_NAME),
+                        uses_path_style: ENV.S3_PRIVATE_USES_PATH_STYLE_BUCKET,
+                        region: not_empty(&ENV.S3_PRIVATE_REGION),
+                        url: not_empty(&ENV.S3_PRIVATE_URL),
+                        access_token: not_empty(&ENV.S3_PRIVATE_ACCESS_TOKEN),
+                        secret: not_empty(&ENV.S3_PRIVATE_SECRET),
+                    },
                 )
-            }
-            FileHostKind::Local => Arc::new(file_hosting::MockHost::new()),
-        };
+                .unwrap(),
+            )
+        }
+        FileHostKind::Local => Arc::new(file_hosting::MockHost::new()),
+    };
+    let file_host = web::Data::<dyn FileHost>::from(file_host);
 
     info!("Initializing clickhouse connection");
     let mut clickhouse = clickhouse::init_client().await.unwrap();
@@ -172,6 +166,7 @@ async fn app() -> std::io::Result<()> {
             ro_pool.into_inner(),
             redis_pool,
             search_backend,
+            file_host,
             clickhouse,
             stripe_client,
             anrok_client.clone(),

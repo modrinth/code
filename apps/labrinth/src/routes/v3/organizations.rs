@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::sync::Arc;
 
 use super::ApiError;
 use crate::auth::checks::is_visible_organization;
@@ -1057,7 +1056,7 @@ pub async fn organization_icon_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -1108,7 +1107,7 @@ pub async fn organization_icon_edit(
         organization_item.icon_url,
         organization_item.raw_icon_url,
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1127,7 +1126,7 @@ pub async fn organization_icon_edit(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1163,7 +1162,7 @@ pub async fn delete_organization_icon(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -1213,7 +1212,7 @@ pub async fn delete_organization_icon(
         organization_item.icon_url,
         organization_item.raw_icon_url,
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
