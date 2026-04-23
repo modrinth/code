@@ -8,7 +8,7 @@ use crate::pack::install_from::{
 use crate::state::{
     CacheBehaviour, CachedEntry, ProfileInstallStage, SideType, cache_file_hash,
 };
-use crate::util::fetch::{fetch_from_trusted_mirrors, sha1_async, write};
+use crate::util::fetch::{fetch_mirrors, sha1_async, write};
 use crate::util::io;
 use crate::{State, profile};
 use async_zip::base::read::seek::ZipFileReader;
@@ -228,7 +228,7 @@ pub async fn install_zipped_mrpack_files(
                     return Ok(());
                 }
 
-                let file = fetch_from_trusted_mirrors(
+                let file = fetch_mirrors(
                     &project
                         .downloads
                         .iter()
