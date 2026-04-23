@@ -347,7 +347,8 @@ impl TryFrom<ProfileQueryResult> for Profile {
             loader: ModLoader::from_string(&x.mod_loader),
             loader_version: x.mod_loader_version,
             groups: serde_json::from_value(x.groups).unwrap_or_default(),
-            file_links: serde_json::from_value(x.file_links).unwrap_or_default(),
+            file_links: serde_json::from_value(x.file_links)
+                .unwrap_or_default(),
             linked_data: if let Some(project_id) = x.linked_project_id {
                 if let Some(version_id) = x.linked_version_id {
                     x.locked.map(|locked| LinkedData {

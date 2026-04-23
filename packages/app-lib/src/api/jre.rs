@@ -112,7 +112,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             let path = path.join(dir);
 
             if path.exists() {
-                io::remove_dir_all(path).await?;
+                io::remove_dir_all(&path).await?;
             }
         }
 

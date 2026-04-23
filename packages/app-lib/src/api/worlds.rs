@@ -652,7 +652,7 @@ pub async fn delete_world(instance: &Path, world: &str) -> Result<()> {
     while let Some(entry) = dir.next_entry().await? {
         let path = entry.path();
         if entry.file_type().await?.is_dir() {
-            io::remove_dir_all(path).await?;
+            io::remove_dir_all(&path).await?;
             continue;
         }
         if path != lock_path {

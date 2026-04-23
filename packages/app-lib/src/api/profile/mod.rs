@@ -31,8 +31,8 @@ use crate::server_address::ServerAddress;
 use dashmap::DashMap;
 use std::iter::FromIterator;
 use std::{
-    future::Future,
     fs::Metadata,
+    future::Future,
     path::{Path, PathBuf},
     sync::Arc,
 };
@@ -239,23 +239,19 @@ fn normalize_profile_link_path(path: &str) -> crate::Result<String> {
             continue;
         }
         if part == ".." {
-            return Err(
-                crate::ErrorKind::InputError(format!(
-                    "Profile link path '{path}' cannot contain '..'"
-                ))
-                .as_error(),
-            );
+            return Err(crate::ErrorKind::InputError(format!(
+                "Profile link path '{path}' cannot contain '..'"
+            ))
+            .as_error());
         }
         parts.push(part);
     }
 
     if parts.is_empty() {
-        return Err(
-            crate::ErrorKind::InputError(
-                "Profile link path cannot be empty".to_string(),
-            )
-            .as_error(),
-        );
+        return Err(crate::ErrorKind::InputError(
+            "Profile link path cannot be empty".to_string(),
+        )
+        .as_error());
     }
 
     Ok(parts.join("/"))
@@ -270,12 +266,10 @@ fn resolve_profile_link_source(
         match component {
             std::path::Component::Normal(part) => source.push(part),
             _ => {
-                return Err(
-                    crate::ErrorKind::InputError(format!(
-                        "Invalid profile link path '{relative_path}'"
-                    ))
-                    .as_error(),
-                )
+                return Err(crate::ErrorKind::InputError(format!(
+                    "Invalid profile link path '{relative_path}'"
+                ))
+                .as_error());
             }
         }
     }
@@ -292,45 +286,37 @@ pub fn normalize_file_links(
     for file_link in file_links {
         let normalized_path = normalize_profile_link_path(&file_link.path)?;
         if !seen_paths.insert(normalized_path.clone()) {
-            return Err(
-                crate::ErrorKind::InputError(format!(
-                    "Duplicate file link path '{normalized_path}'"
-                ))
-                .as_error(),
-            );
+            return Err(crate::ErrorKind::InputError(format!(
+                "Duplicate file link path '{normalized_path}'"
+            ))
+            .as_error());
         }
 
         let target = PathBuf::from(file_link.target.trim());
         if !target.is_absolute() {
-            return Err(
-                crate::ErrorKind::InputError(format!(
-                    "File link target '{}' must be an absolute path",
-                    file_link.target
-                ))
-                .as_error(),
-            );
+            return Err(crate::ErrorKind::InputError(format!(
+                "File link target '{}' must be an absolute path",
+                file_link.target
+            ))
+            .as_error());
         }
 
         let metadata = std::fs::metadata(&target)
             .map_err(|e| crate::Error::from(IOError::with_path(e, &target)))?;
         match file_link.kind {
             FileLinkKind::Directory if !metadata.is_dir() => {
-                return Err(
-                    crate::ErrorKind::InputError(format!(
-                        "Target '{}' must be a directory",
-                        target.display()
-                    ))
-                    .as_error(),
-                )
+                return Err(crate::ErrorKind::InputError(format!(
+                    "Target '{}' must be a directory",
+                    target.display()
+                ))
+                .as_error());
             }
             FileLinkKind::File if !metadata.is_file() => {
-                return Err(
-                    crate::ErrorKind::InputError(format!(
-                        "Target '{}' must be a file",
-                        target.display()
-                    ))
-                    .as_error(),
-                )
+                return Err(crate::ErrorKind::InputError(format!(
+                    "Target '{}' must be a file",
+                    target.display()
+                ))
+                .as_error());
             }
             _ => {}
         }
@@ -338,13 +324,11 @@ pub fn normalize_file_links(
         let canonical_target =
             io::canonicalize(&target).map_err(crate::Error::from)?;
         if canonical_target.starts_with(profile_root) {
-            return Err(
-                crate::ErrorKind::InputError(format!(
-                    "Target '{}' cannot point inside the instance directory",
-                    canonical_target.display()
-                ))
-                .as_error(),
-            );
+            return Err(crate::ErrorKind::InputError(format!(
+                "Target '{}' cannot point inside the instance directory",
+                canonical_target.display()
+            ))
+            .as_error());
         }
 
         normalized_links.push(FileLink {
@@ -357,7 +341,10 @@ pub fn normalize_file_links(
     Ok(normalized_links)
 }
 
-async fn remove_link_path(path: &Path, kind: FileLinkKind) -> crate::Result<()> {
+async fn remove_link_path(
+    path: &Path,
+    kind: FileLinkKind,
+) -> crate::Result<()> {
     let remove_dir_result = tokio::fs::remove_dir(path)
         .await
         .map_err(|e| IOError::with_path(e, path));
@@ -370,11 +357,9 @@ async fn remove_link_path(path: &Path, kind: FileLinkKind) -> crate::Result<()> 
             if remove_dir_result.is_ok() || remove_file_result.is_ok() {
                 Ok(())
             } else {
-                Err(crate::Error::from(
-                    remove_dir_result.err().unwrap_or_else(|| {
-                        remove_file_result.err().expect("remove result missing")
-                    }),
-                ))
+                Err(crate::Error::from(remove_dir_result.err().unwrap_or_else(
+                    || remove_file_result.err().expect("remove result missing"),
+                )))
             }
         }
         FileLinkKind::File => {
@@ -441,14 +426,12 @@ fn create_directory_junction(
         details
     };
 
-    Err(
-        crate::ErrorKind::OtherError(format!(
-            "Windows could not create a folder link at '{}': {}",
-            source.display(),
-            message
-        ))
-        .as_error(),
-    )
+    Err(crate::ErrorKind::OtherError(format!(
+        "Windows could not create a folder link at '{}': {}",
+        source.display(),
+        message
+    ))
+    .as_error())
 }
 
 async fn create_link(
@@ -532,9 +515,9 @@ pub async fn reconcile_file_links(
             resolve_profile_link_source(profile_root, &requested.path)?;
 
         if let Some(parent) = source.parent() {
-            tokio::fs::create_dir_all(parent)
-                .await
-                .map_err(|e| crate::Error::from(IOError::with_path(e, parent)))?;
+            tokio::fs::create_dir_all(parent).await.map_err(|e| {
+                crate::Error::from(IOError::with_path(e, parent))
+            })?;
         }
 
         match std::fs::symlink_metadata(&source) {
@@ -995,9 +978,16 @@ pub async fn export_mrpack(
         .files
         .retain(|f| included_candidates_set.contains(f.path.as_str()));
 
-    // Build vec of all files in the folder
+    // Build vec of all files from the selected export candidates only.
+    // Symlinks are skipped to avoid exporting content outside the profile.
     let mut path_list = Vec::new();
-    add_all_recursive_folder_paths(&profile_base_path, &mut path_list).await?;
+    for candidate in &included_export_candidates {
+        add_selected_export_paths(
+            &profile_base_path.join(candidate),
+            &mut path_list,
+        )
+        .await?;
+    }
 
     // Initialize loading bar
     let loading_bar = init_loading(
@@ -1078,7 +1068,12 @@ pub async fn get_pack_export_candidates(
         .map_err(|e| IOError::with_path(e, &profile_base_dir))?
     {
         let path = entry.path();
-        if path.is_dir() {
+        let metadata = io::symlink_metadata(&path).await?;
+        if io::is_link(&metadata) {
+            continue;
+        }
+
+        if metadata.is_dir() {
             // Two layers of files/folders if its a folder
             let mut read_dir = io::read_dir(&path).await?;
             while let Some(entry) = read_dir
@@ -1086,9 +1081,14 @@ pub async fn get_pack_export_candidates(
                 .await
                 .map_err(|e| IOError::with_path(e, &profile_base_dir))?
             {
+                let child_path = entry.path();
+                let child_metadata = io::symlink_metadata(&child_path).await?;
+                if io::is_link(&child_metadata) {
+                    continue;
+                }
                 path_list.push(pack_get_relative_path(
                     &profile_base_dir,
-                    &entry.path(),
+                    &child_path,
                 )?);
             }
         } else {
@@ -1485,21 +1485,44 @@ pub async fn create_mrpack_json(
 
 // Given a folder path, populate a Vec of all the files in the folder, recursively
 #[async_recursion::async_recursion]
-pub async fn add_all_recursive_folder_paths(
+pub async fn add_selected_export_paths(
     path: &Path,
     path_list: &mut Vec<PathBuf>,
 ) -> crate::Result<()> {
+    let metadata = match io::symlink_metadata(path).await {
+        Ok(metadata) => metadata,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            return Ok(());
+        }
+        Err(err) => return Err(err.into()),
+    };
+
+    if io::is_link(&metadata) {
+        return Ok(());
+    }
+
+    if metadata.is_file() {
+        path_list.push(path.to_path_buf());
+        return Ok(());
+    }
+
     let mut read_dir = io::read_dir(path).await?;
     while let Some(entry) = read_dir
         .next_entry()
         .await
         .map_err(|e| IOError::with_path(e, path))?
     {
-        let path = entry.path();
-        if path.is_dir() {
-            add_all_recursive_folder_paths(&path, path_list).await?;
+        let entry_path = entry.path();
+        let entry_metadata = io::symlink_metadata(&entry_path).await?;
+
+        if io::is_link(&entry_metadata) {
+            continue;
+        }
+
+        if entry_metadata.is_dir() {
+            add_selected_export_paths(&entry_path, path_list).await?;
         } else {
-            path_list.push(path);
+            path_list.push(entry_path);
         }
     }
     Ok(())

@@ -3,6 +3,7 @@
 
 use eyre::{Context, ContextCompat, Result, eyre};
 use std::{
+    fs::Metadata,
     io::{ErrorKind, Write},
     path::Path,
 };
@@ -55,6 +56,33 @@ pub fn canonicalize(
     })
 }
 
+pub async fn symlink_metadata(
+    path: impl AsRef<std::path::Path>,
+) -> Result<std::fs::Metadata, IOError> {
+    let path = path.as_ref();
+    tokio::fs::symlink_metadata(path)
+        .await
+        .map_err(|e| IOError::IOPathError {
+            source: e,
+            path: path.to_string_lossy().to_string(),
+        })
+}
+
+pub fn is_link(metadata: &Metadata) -> bool {
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::MetadataExt;
+
+        const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x0400;
+        metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0
+    }
+
+    #[cfg(not(windows))]
+    {
+        metadata.file_type().is_symlink()
+    }
+}
+
 pub async fn read_dir(
     path: impl AsRef<std::path::Path>,
 ) -> Result<tokio::fs::ReadDir, IOError> {
@@ -91,16 +119,41 @@ pub async fn create_dir_all(
         })
 }
 
-pub async fn remove_dir_all(
-    path: impl AsRef<std::path::Path>,
-) -> Result<(), IOError> {
-    let path = path.as_ref();
-    tokio::fs::remove_dir_all(path)
+#[async_recursion::async_recursion]
+pub async fn remove_dir_all(path: &Path) -> Result<(), IOError> {
+    let metadata = symlink_metadata(path).await?;
+
+    if is_link(&metadata) {
+        return remove_link(path, &metadata).await;
+    }
+
+    let mut dir = read_dir(path).await?;
+    while let Some(entry) = dir
+        .next_entry()
         .await
-        .map_err(|e| IOError::IOPathError {
-            source: e,
-            path: path.to_string_lossy().to_string(),
-        })
+        .map_err(|e| IOError::with_path(e, path))?
+    {
+        let entry_path = entry.path();
+        let entry_metadata = symlink_metadata(&entry_path).await?;
+
+        if is_link(&entry_metadata) {
+            remove_link(&entry_path, &entry_metadata).await?;
+        } else if entry_metadata.is_dir() {
+            remove_dir_all(&entry_path).await?;
+        } else {
+            remove_file(&entry_path).await?;
+        }
+    }
+
+    remove_dir(path).await
+}
+
+async fn remove_link(path: &Path, metadata: &Metadata) -> Result<(), IOError> {
+    if metadata.is_dir() {
+        remove_dir(path).await
+    } else {
+        remove_file(path).await
+    }
 }
 
 /// Reads a text file to a string, automatically detecting its encoding and
