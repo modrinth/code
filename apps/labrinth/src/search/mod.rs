@@ -282,9 +282,11 @@ pub struct ResultSearchProject {
     pub project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
     pub author_id: Option<String>,
+    #[serde(default)]
     pub organization: Option<String>,
+    #[serde(default)]
     pub organization_id: Option<String>,
     pub name: String,
     pub summary: String,
