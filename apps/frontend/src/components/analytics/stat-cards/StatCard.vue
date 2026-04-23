@@ -10,7 +10,7 @@
 		@click="emit('click')"
 	>
 		<div class="flex items-center justify-between gap-3">
-			<div class="text-sm font-semibold text-primary">
+			<div class="text-base font-semibold text-primary">
 				{{ label }}
 			</div>
 
@@ -27,8 +27,8 @@
 			</div>
 		</div>
 
-		<div class="flex flex-col gap-2">
-			<div class="text-3xl font-extrabold leading-none text-contrast">
+		<div class="flex flex-col gap-2.5">
+			<div class="text-3xl font-semibold leading-none text-contrast">
 				{{ statLabel }}
 			</div>
 

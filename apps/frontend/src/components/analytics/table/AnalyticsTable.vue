@@ -59,7 +59,7 @@
 				<span class="text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="capitalize text-primary">{{ value }}</span>
 			</template>
 			<template #cell-views="{ row }">
 				<span>{{ formatInteger(row.views) }}</span>
@@ -204,6 +204,7 @@ const columns = computed<TableColumn<TableColumnKey>[]>(() => {
 			key: 'date',
 			label: 'Date',
 			enableSorting: true,
+			width: '20%',
 		})
 	}
 

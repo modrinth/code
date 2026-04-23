@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-4">
+	<div class="flex flex-col gap-4 pb-20">
 		<QueryBuilder />
 		<StatCards />
 		<AnalyticsGraph />
@@ -10,7 +10,10 @@
 <script setup lang="ts">
 import { injectProjectPageContext } from '@modrinth/ui'
 
-import { createAnalyticsDashboardContext, provideAnalyticsDashboardContext } from '~/providers/analytics/analytics'
+import {
+	createAnalyticsDashboardContext,
+	provideAnalyticsDashboardContext,
+} from '~/providers/analytics/analytics'
 import { injectOrganizationContext } from '~/providers/organization-context'
 
 import AnalyticsGraph from './graph/AnalyticsGraph.vue'
