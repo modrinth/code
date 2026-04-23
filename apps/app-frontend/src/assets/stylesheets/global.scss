@@ -180,14 +180,19 @@ img {
 	}
 }
 
+@import '@modrinth/assets/omorphia.scss';
+
 button,
 input[type='button'] {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
 	cursor: pointer;
-	border: none;
 	outline: 2px solid transparent;
 }
-
-@import '@modrinth/assets/omorphia.scss';
 
 input {
 	border-radius: var(--size-rounded-sm);

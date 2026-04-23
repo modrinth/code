@@ -28,8 +28,8 @@
 
 		<div v-else key="content" class="contents">
 			<ReadyTransition :pending="backupsReadyPending">
-				<BackupCreateModal ref="createBackupModal" :backups="backups" />
-				<BackupRenameModal ref="renameBackupModal" :backups="backups" />
+				<BackupCreateModal ref="createBackupModal" :backups="completedBackups" />
+				<BackupRenameModal ref="renameBackupModal" :backups="completedBackups" />
 				<BackupRestoreModal ref="restoreBackupModal" />
 				<BackupDeleteModal
 					ref="deleteBackupModal"
@@ -37,7 +37,10 @@
 					@bulk-delete="bulkDelete"
 				/>
 
-				<div v-if="backups.length" class="mb-2 flex flex-wrap items-center justify-between gap-4">
+				<div
+					v-if="completedBackups.length"
+					class="mb-2 flex flex-wrap items-center justify-between gap-4"
+				>
 					<div class="flex min-w-0 flex-wrap items-center gap-4">
 						<Checkbox
 							:model-value="allSelected"
@@ -70,7 +73,7 @@
 						class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
 					>
 						<EmptyState
-							v-if="backups.length === 0"
+							v-if="completedBackups.length === 0"
 							type="empty-inbox"
 							:heading="formatMessage(messages.emptyHeading)"
 							:description="formatMessage(messages.emptyDescription)"
@@ -134,7 +137,6 @@
 										class="my-1.5 min-w-0 flex-1"
 										:backup="backup"
 										:selected="selectedIds.has(backup.id)"
-										:active-operation="activeOperationByBackupId.get(backup.id)"
 										:restore-disabled="backupRestoreDisabled"
 										:kyros-url="server.node?.instance"
 										:jwt="server.node?.token"
@@ -342,11 +344,10 @@ const serverId = route.params.id as string
 
 defineEmits(['onDownload'])
 
-const { backups, activeOperationByBackupId, invalidate, hasActiveCreate, query } =
-	useServerBackupsQueue(
-		computed(() => serverId),
-		worldId,
-	)
+const { backups, invalidate, hasActiveCreate, query } = useServerBackupsQueue(
+	computed(() => serverId),
+	worldId,
+)
 
 const error = computed(() => {
 	const err = query.error.value
@@ -361,13 +362,15 @@ const backupsReadyPending = computed(
 
 const selectedFilters = ref<string[]>([])
 
+const completedBackups = computed(() => backups.value.filter((backup) => backup.status === 'done'))
+
 const filteredBackups = computed(() => {
 	const f = selectedFilters.value
 	if (f.length === 0 || f.length === 2) {
-		return backups.value
+		return completedBackups.value
 	}
 	const wantAuto = f.includes('auto')
-	return backups.value.filter((b) => b.automated === wantAuto)
+	return completedBackups.value.filter((b) => b.automated === wantAuto)
 })
 
 /** Completed backups with a snapshot: queue API schedules deletion. */

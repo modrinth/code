@@ -3,7 +3,7 @@
 		ref="modal"
 		:header="formatMessage(messages.header, { count })"
 		fade="danger"
-		max-width="500px"
+		width="500px"
 	>
 		<div class="flex flex-col gap-6">
 			<Admonition type="critical" :header="formatMessage(messages.admonitionHeader)">

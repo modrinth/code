@@ -1,6 +1,6 @@
 <template>
-	<NewModal ref="modal" header="Restore backup" fade="danger">
-		<div class="flex flex-col gap-6 max-w-[400px]">
+	<NewModal ref="modal" header="Restore backup" fade="danger" width="500px">
+		<div class="flex flex-col gap-6">
 			<Admonition v-if="ctx.isServerRunning.value" type="critical" header="Server is running">
 				Stop the server before restoring a backup.
 			</Admonition>

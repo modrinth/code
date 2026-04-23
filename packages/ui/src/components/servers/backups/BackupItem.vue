@@ -9,7 +9,6 @@ import {
 	ShieldIcon,
 	TrashIcon,
 	UserRoundIcon,
-	XIcon,
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
@@ -33,7 +32,6 @@ const emit = defineEmits<{
 const props = withDefaults(
 	defineProps<{
 		backup: Archon.BackupsQueue.v1.BackupQueueBackup
-		activeOperation?: Archon.BackupsQueue.v1.ActiveOperation
 		preview?: boolean
 		kyrosUrl?: string
 		jwt?: string
@@ -55,29 +53,6 @@ const props = withDefaults(
 
 const nameRef = ref<HTMLElement | null>(null)
 
-const latestHistoryOp = computed(() => props.backup.history[0])
-
-const failedToCreate = computed(
-	() => props.backup.status === 'error' || props.backup.status === 'timed_out',
-)
-
-const creating = computed(() => {
-	const op = props.activeOperation
-	if (op?.operation_type === 'create' && !op.has_parent) return true
-	if (op?.operation_type === 'restore') return false
-	return props.backup.status === 'pending' || props.backup.status === 'in_progress'
-})
-
-const restoring = computed(() => props.activeOperation?.operation_type === 'restore')
-
-const failedToRestore = computed(
-	() =>
-		latestHistoryOp.value?.operation_type === 'restore' &&
-		(latestHistoryOp.value?.state === 'failed' || latestHistoryOp.value?.state === 'timed_out'),
-)
-
-const activeOperationExists = computed(() => creating.value || restoring.value)
-
 const backupIcon = computed(() => {
 	if (props.backup.automated) {
 		return ShieldIcon
@@ -95,29 +70,25 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 		})
 	}
 
-	if (!activeOperationExists.value) {
-		if (options.length > 0) {
-			options.push({ divider: true })
-		}
-
-		options.push({
-			id: 'download',
-			action: () => emit('download'),
-			link: `https://${props.kyrosUrl}/modrinth/v0/backups/${props.backup.id}/download?auth=${props.jwt}`,
-			disabled: !props.kyrosUrl || !props.jwt,
-		})
+	if (options.length > 0) {
+		options.push({ divider: true })
 	}
+
+	options.push({
+		id: 'download',
+		action: () => emit('download'),
+		link: `https://${props.kyrosUrl}/modrinth/v0/backups/${props.backup.id}/download?auth=${props.jwt}`,
+		disabled: !props.kyrosUrl || !props.jwt,
+	})
 
 	options.push({ id: 'rename', action: () => emit('rename') })
 
-	if (!activeOperationExists.value) {
-		options.push({ divider: true })
-		options.push({
-			id: 'delete',
-			color: 'red',
-			action: () => emit('delete'),
-		})
-	}
+	options.push({ divider: true })
+	options.push({
+		id: 'delete',
+		color: 'red',
+		action: () => emit('delete'),
+	})
 
 	return options
 })
@@ -135,14 +106,6 @@ const messages = defineMessages({
 		id: 'servers.backups.item.rename',
 		defaultMessage: 'Rename',
 	},
-	failedToCreateBackup: {
-		id: 'servers.backups.item.failed-to-create-backup',
-		defaultMessage: 'Failed to create backup',
-	},
-	failedToRestoreBackup: {
-		id: 'servers.backups.item.failed-to-restore-backup',
-		defaultMessage: 'Failed to restore from backup',
-	},
 	auto: {
 		id: 'servers.backups.item.auto',
 		defaultMessage: 'Auto',
@@ -154,14 +117,6 @@ const messages = defineMessages({
 	manualBackup: {
 		id: 'servers.backups.item.manual-backup',
 		defaultMessage: 'Manual backup',
-	},
-	creatingBackup: {
-		id: 'servers.backups.item.creating-backup',
-		defaultMessage: 'Creating backup\u2026',
-	},
-	restoreInProgress: {
-		id: 'servers.backups.item.restore-in-progress',
-		defaultMessage: 'Restore in progress\u2026',
 	},
 })
 </script>
@@ -188,10 +143,10 @@ const messages = defineMessages({
 				<div class="flex min-w-0 items-center gap-2">
 					<span
 						ref="nameRef"
-						v-tooltip="creating ? undefined : truncatedTooltip(nameRef, backup.name)"
+						v-tooltip="truncatedTooltip(nameRef, backup.name)"
 						class="min-w-0 truncate font-semibold text-contrast"
 					>
-						{{ creating ? formatMessage(messages.creatingBackup) : backup.name }}
+						{{ backup.name }}
 					</span>
 					<span
 						v-if="backup.automated"
@@ -203,16 +158,6 @@ const messages = defineMessages({
 				<div class="flex items-center gap-1.5 text-sm font-medium text-secondary">
 					<template v-if="preview">
 						<span>{{ formatDateTime(backup.created_at) }}</span>
-					</template>
-					<template v-else-if="failedToCreate || failedToRestore">
-						<XIcon class="size-4 text-red" />
-						<span class="text-red">
-							{{
-								formatMessage(
-									failedToCreate ? messages.failedToCreateBackup : messages.failedToRestoreBackup,
-								)
-							}}
-						</span>
 					</template>
 					<template v-else>
 						<span>
@@ -236,15 +181,9 @@ const messages = defineMessages({
 		<div v-if="!preview" class="flex min-w-0 flex-1 items-center justify-end gap-2">
 			<ButtonStyled color="brand" type="outlined">
 				<button
-					v-tooltip="
-						creating
-							? formatMessage(messages.creatingBackup)
-							: restoring
-								? formatMessage(messages.restoreInProgress)
-								: props.restoreDisabled
-					"
+					v-tooltip="props.restoreDisabled"
 					class="!border"
-					:disabled="activeOperationExists || !!props.restoreDisabled"
+					:disabled="!!props.restoreDisabled"
 					@click="() => emit('restore')"
 				>
 					<RotateCounterClockwiseIcon class="size-5" />

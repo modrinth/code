@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" header="Renaming backup" max-width="500px" @show="focusInput">
+	<NewModal ref="modal" header="Renaming backup" width="500px" @show="focusInput">
 		<div class="flex flex-col gap-2">
 			<label for="backup-name-input">
 				<span class="text-lg font-semibold text-contrast"> Name </span>

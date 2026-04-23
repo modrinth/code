@@ -848,7 +848,7 @@ provideContentManager({
 
 <template>
 	<ReadyTransition :pending="contentReadyPending">
-		<ContentPageLayout>
+		<ContentPageLayout :bottom-padding="false">
 			<template #modals>
 				<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
 				<ModpackContentModal

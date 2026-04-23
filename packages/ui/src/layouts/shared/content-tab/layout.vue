@@ -49,6 +49,15 @@ import type { ContentCardTableItem, ContentItem } from './types'
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('ContentPageLayout')
 
+const props = withDefaults(
+	defineProps<{
+		bottomPadding?: boolean
+	}>(),
+	{
+		bottomPadding: true,
+	},
+)
+
 const messages = defineMessages({
 	loadingContent: {
 		id: 'content.page-layout.loading',
@@ -484,7 +493,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 </script>
 
 <template>
-	<div class="flex flex-col gap-4 pb-6">
+	<div class="flex flex-col gap-4" :class="{ 'pb-6': props.bottomPadding }">
 		<template v-if="!ctx.loading.value">
 			<div
 				v-if="ctx.error.value"
