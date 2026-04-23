@@ -11,6 +11,7 @@
 				<MultiSelect
 					v-model="selectedProjectIds"
 					:options="projectOptions"
+					:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 					placeholder="Select projects"
 					:searchable="projectOptions.length > 6"
 					:max-tag-rows="1"
@@ -20,25 +21,33 @@
 			</div>
 		</div>
 
-		<div class="flex items-center gap-6">
+		<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
 			<div class="flex items-center gap-2">
 				<div class="flex w-32 items-center gap-2 text-primary">
 					<CalendarIcon class="size-5" />
 					<span class="text-base font-medium">Timeframe:</span>
 				</div>
 				<div class="w-48">
-					<Combobox v-model="selectedTimeframe" :options="timeframeOptions" />
+					<Combobox
+						v-model="selectedTimeframe"
+						:options="timeframeOptions"
+						:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+					/>
 				</div>
 			</div>
 			<div class="flex items-center gap-2">
 				<span class="text-base font-medium text-primary">Grouped by</span>
 				<div class="w-48">
-					<Combobox v-model="selectedGroupBy" :options="groupByOptions" />
+					<Combobox
+						v-model="selectedGroupBy"
+						:options="groupByOptions"
+						:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+					/>
 				</div>
 			</div>
 		</div>
 
-		<div class="flex items-center gap-6">
+		<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
 			<div class="flex items-center gap-2">
 				<div class="flex w-32 items-center gap-2 text-primary">
 					<BlocksIcon class="size-5" />
@@ -47,7 +56,11 @@
 				<div class="flex flex-col gap-2">
 					<div class="flex flex-wrap items-center gap-2">
 						<div class="w-48">
-							<Combobox v-model="selectedBreakdown" :options="breakdownOptions" />
+							<Combobox
+								v-model="selectedBreakdown"
+								:options="breakdownOptions"
+								:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+							/>
 						</div>
 					</div>
 				</div>
@@ -94,7 +107,7 @@
 										<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
 											{{ category.label }}
 										</p>
-										<div class="flex max-h-56 flex-col gap-2 overflow-y-auto">
+										<div class="flex max-h-[min(70vh,32rem)] flex-col gap-2 overflow-y-auto pr-1">
 											<Checkbox
 												v-for="option in category.options"
 												:key="`${category.key}-${option.value}`"
@@ -146,6 +159,7 @@ import {
 const ALL_FILTER_VALUE = '__all__'
 const MIN_RANGE_MS = 60 * 60 * 1000
 const MAX_TIME_SLICES = 1024
+const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 
 const analyticsDashboardContext = injectAnalyticsDashboardContext()
 const projects = computed(() => analyticsDashboardContext.projects.value)
@@ -167,13 +181,11 @@ const showProjectRow = computed(() => projects.value.length > 1)
 const timeframeOptions: ComboboxOption<AnalyticsTimeframePreset>[] = [
 	{ value: 'today', label: 'Today' },
 	{ value: 'yesterday', label: 'Yesterday' },
-	{ value: 'last_24_hours', label: 'Last 24 hours' },
 	{ value: 'last_7_days', label: 'Last 7 days' },
 	{ value: 'last_14_days', label: 'Last 14 days' },
 	{ value: 'last_30_days', label: 'Last 30 days' },
 	{ value: 'last_90_days', label: 'Last 90 days' },
-	{ value: 'last_190_days', label: 'Last 190 days' },
-	{ value: 'this_month', label: 'This month' },
+	{ value: 'last_180_days', label: 'Last 180 days' },
 	{ value: 'year_to_date', label: 'Year to date' },
 	{ value: 'all_time', label: 'All time' },
 ]
@@ -353,11 +365,6 @@ function getTimeRangeForPreset(preset: AnalyticsTimeframePreset): { start: Date;
 				end: todayStart,
 			}
 		}
-		case 'last_24_hours':
-			return {
-				start: new Date(end.getTime() - 24 * 60 * 60 * 1000),
-				end,
-			}
 		case 'last_7_days':
 			return {
 				start: new Date(end.getTime() - 7 * 24 * 60 * 60 * 1000),
@@ -378,16 +385,11 @@ function getTimeRangeForPreset(preset: AnalyticsTimeframePreset): { start: Date;
 				start: new Date(end.getTime() - 90 * 24 * 60 * 60 * 1000),
 				end,
 			}
-		case 'last_190_days':
+		case 'last_180_days':
 			return {
-				start: new Date(end.getTime() - 190 * 24 * 60 * 60 * 1000),
+				start: new Date(end.getTime() - 180 * 24 * 60 * 60 * 1000),
 				end,
 			}
-		case 'this_month': {
-			const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-			monthStart.setHours(0, 0, 0, 0)
-			return { start: monthStart, end }
-		}
 		case 'year_to_date': {
 			const yearStart = new Date(now.getFullYear(), 0, 1)
 			yearStart.setHours(0, 0, 0, 0)

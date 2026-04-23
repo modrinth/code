@@ -12,13 +12,11 @@ export type AnalyticsQueryFilterCategory =
 export type AnalyticsTimeframePreset =
 	| 'today'
 	| 'yesterday'
-	| 'last_24_hours'
 	| 'last_7_days'
 	| 'last_14_days'
 	| 'last_30_days'
 	| 'last_90_days'
-	| 'last_190_days'
-	| 'this_month'
+	| 'last_180_days'
 	| 'year_to_date'
 	| 'all_time'
 
@@ -52,13 +50,11 @@ export const DEFAULT_BREAKDOWN_PRESET: AnalyticsBreakdownPreset = 'none'
 const TIMEFRAME_PRESET_VALUES: AnalyticsTimeframePreset[] = [
 	'today',
 	'yesterday',
-	'last_24_hours',
 	'last_7_days',
 	'last_14_days',
 	'last_30_days',
 	'last_90_days',
-	'last_190_days',
-	'this_month',
+	'last_180_days',
 	'year_to_date',
 	'all_time',
 ]
