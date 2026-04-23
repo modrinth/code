@@ -23,6 +23,23 @@ pub struct Download {
     pub country: String,
     pub user_agent: String,
     pub headers: Vec<(String, String)>,
+
+    // added retroactively - may be missing
+    pub reason: Option<DownloadReason>,
+    pub game_version: Option<String>,
+    pub loader: Option<String>,
+}
+
+/// Why a project was downloaded.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum DownloadReason {
+    /// Project was downloaded directly by the user.
+    Standalone,
+    /// Project was downloaded as a dependency, possibly transitive, of another
+    /// project.
+    Dependency,
+    /// Project was downloaded as part of a modpack.
+    Modpack,
 }
 
 #[derive(Debug, Row, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
