@@ -261,6 +261,30 @@ export async function get_pack_export_candidates(profilePath: string): Promise<s
 	return await invoke('plugin:profile|profile_get_pack_export_candidates', { profilePath })
 }
 
+export type ProfileScreenshot = {
+	name: string
+	absolutePath: string
+	relativePath: string
+	modifiedAtMs: number
+	url: string
+}
+
+export async function get_screenshots(path: string): Promise<ProfileScreenshot[]> {
+	return await invoke('plugin:profile|profile_get_screenshots', { path })
+}
+
+export async function open_screenshots_folder(path: string): Promise<void> {
+	return await invoke('plugin:profile|profile_open_screenshots_folder', { path })
+}
+
+export async function get_screenshot_bytes(path: string, fileName: string): Promise<number[]> {
+	return await invoke('plugin:profile|profile_get_screenshot_bytes', { path, fileName })
+}
+
+export async function delete_screenshot(path: string, fileName: string): Promise<void> {
+	return await invoke('plugin:profile|profile_delete_screenshot', { path, fileName })
+}
+
 // Run Minecraft using a pathed profile
 // Returns PID of child
 export async function run(path: string, serverAddress: string | null = null): Promise<unknown> {

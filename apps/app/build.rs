@@ -193,6 +193,10 @@ fn main() {
                         "profile_edit_icon",
                         "profile_export_mrpack",
                         "profile_get_pack_export_candidates",
+                        "profile_get_screenshots",
+                        "profile_open_screenshots_folder",
+                        "profile_get_screenshot_bytes",
+                        "profile_delete_screenshot",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

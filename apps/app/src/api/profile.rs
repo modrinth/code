@@ -3,7 +3,10 @@ use dashmap::DashMap;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
+use std::time::UNIX_EPOCH;
+use tauri::{Manager, Runtime};
+use tauri_plugin_opener::OpenerExt;
 use theseus::data::{ContentItem, Dependency, LinkedModpackInfo};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
@@ -42,8 +45,39 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_edit_icon,
             profile_export_mrpack,
             profile_get_pack_export_candidates,
+            profile_get_screenshots,
+            profile_open_screenshots_folder,
+            profile_get_screenshot_bytes,
+            profile_delete_screenshot,
         ])
         .build()
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileScreenshot {
+    pub name: String,
+    pub absolute_path: String,
+    pub relative_path: String,
+    pub modified_at_ms: i64,
+    pub url: String,
+}
+
+fn is_supported_screenshot(name: &str) -> bool {
+    matches!(
+        name.rsplit('.').next().map(|ext| ext.to_ascii_lowercase()),
+        Some(ext)
+            if matches!(
+                ext.as_str(),
+                "png" | "jpg" | "jpeg" | "gif" | "svg" | "webp"
+            )
+    )
+}
+
+fn is_safe_screenshot_name(file_name: &str) -> bool {
+    let mut components = Path::new(file_name).components();
+    matches!(components.next(), Some(Component::Normal(_)))
+        && components.next().is_none()
 }
 
 // Remove a profile
@@ -335,6 +369,136 @@ pub async fn profile_get_pack_export_candidates(
 ) -> Result<Vec<SafeRelativeUtf8UnixPathBuf>> {
     let candidates = profile::get_pack_export_candidates(profile_path).await?;
     Ok(candidates)
+}
+
+#[tauri::command]
+pub async fn profile_get_screenshots<R: Runtime>(
+    app_handle: tauri::AppHandle<R>,
+    path: &str,
+) -> Result<Vec<ProfileScreenshot>> {
+    let screenshots_dir =
+        profile::get_full_path(path).await?.join("screenshots");
+    let canonical_screenshots_dir =
+        match tokio::fs::canonicalize(&screenshots_dir).await {
+            Ok(path) => path,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+                return Ok(Vec::new());
+            }
+            Err(err) => return Err(err.into()),
+        };
+    app_handle
+        .asset_protocol_scope()
+        .allow_directory(&canonical_screenshots_dir, true)?;
+
+    let mut dir = match tokio::fs::read_dir(&screenshots_dir).await {
+        Ok(dir) => dir,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            return Ok(Vec::new());
+        }
+        Err(err) => return Err(err.into()),
+    };
+
+    let mut screenshots = Vec::new();
+    while let Some(entry) = dir.next_entry().await? {
+        let file_name = entry.file_name().to_string_lossy().to_string();
+        if !is_supported_screenshot(&file_name) {
+            continue;
+        }
+
+        let absolute_path = entry.path();
+        let metadata = match tokio::fs::metadata(&absolute_path).await {
+            Ok(metadata) if metadata.is_file() => metadata,
+            Ok(_) => continue,
+            Err(_) => continue,
+        };
+        let url = match super::utils::tauri_convert_file_src(&absolute_path) {
+            Ok(url) => url.to_string(),
+            Err(_) => continue,
+        };
+        let modified_at_ms = metadata
+            .modified()
+            .ok()
+            .and_then(|time| time.duration_since(UNIX_EPOCH).ok())
+            .map(|duration| duration.as_millis() as i64)
+            .unwrap_or_default();
+
+        screenshots.push(ProfileScreenshot {
+            name: file_name.clone(),
+            absolute_path: absolute_path.to_string_lossy().to_string(),
+            relative_path: format!("screenshots/{file_name}"),
+            modified_at_ms,
+            url,
+        });
+    }
+
+    screenshots.sort_by(|a, b| b.modified_at_ms.cmp(&a.modified_at_ms));
+    Ok(screenshots)
+}
+
+#[tauri::command]
+pub async fn profile_delete_screenshot(
+    path: &str,
+    file_name: &str,
+) -> Result<()> {
+    if !is_safe_screenshot_name(file_name) {
+        return Err(theseus::Error::from(theseus::ErrorKind::OtherError(
+            "Invalid screenshot name".to_string(),
+        ))
+        .into());
+    }
+
+    let screenshot_path = profile::get_full_path(path)
+        .await?
+        .join("screenshots")
+        .join(file_name);
+    tokio::fs::remove_file(screenshot_path).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn profile_open_screenshots_folder<R: Runtime>(
+    app_handle: tauri::AppHandle<R>,
+    path: &str,
+) -> Result<()> {
+    let screenshots_dir =
+        profile::get_full_path(path).await?.join("screenshots");
+    tokio::fs::create_dir_all(&screenshots_dir).await?;
+    let open_path = tokio::fs::canonicalize(&screenshots_dir)
+        .await
+        .unwrap_or(screenshots_dir);
+
+    tauri::async_runtime::spawn_blocking(move || {
+        app_handle
+            .opener()
+            .open_path(open_path.to_string_lossy(), None::<&str>)
+    })
+    .await?
+    .map_err(|err| {
+        theseus::Error::from(theseus::ErrorKind::OtherError(format!(
+            "Failed to open screenshots folder: {err}",
+        )))
+    })?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn profile_get_screenshot_bytes(
+    path: &str,
+    file_name: &str,
+) -> Result<Vec<u8>> {
+    if !is_safe_screenshot_name(file_name) {
+        return Err(theseus::Error::from(theseus::ErrorKind::OtherError(
+            "Invalid screenshot name".to_string(),
+        ))
+        .into());
+    }
+
+    let screenshot_path = profile::get_full_path(path)
+        .await?
+        .join("screenshots")
+        .join(file_name);
+    Ok(tokio::fs::read(screenshot_path).await?)
 }
 
 // Run minecraft using a profile using the default credentials

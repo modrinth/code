@@ -57,11 +57,20 @@
 							loading="lazy"
 						/>
 					</button>
-					<div class="flex flex-col gap-1 p-4">
-						<div class="flex items-center justify-between gap-2">
-							<div class="min-w-0 truncate font-semibold text-contrast" :title="screenshot.name">
-								{{ screenshot.name }}
-							</div>
+					<div class="flex items-center justify-between gap-2 p-4">
+						<div class="min-w-0 text-sm text-secondary">
+							{{ formatDateTime(screenshot.modifiedAt) }}
+						</div>
+						<div class="flex items-center gap-1">
+							<ButtonStyled circular type="transparent">
+								<button
+									:aria-label="formatMessage(messages.copyImage)"
+									:title="formatMessage(messages.copyImage)"
+									@click="copyScreenshotImage(screenshot)"
+								>
+									<CopyIcon class="size-5" />
+								</button>
+							</ButtonStyled>
 							<ButtonStyled circular type="transparent">
 								<TeleportOverflowMenu :options="getScreenshotMenuOptions(screenshot)">
 									<MoreHorizontalIcon class="size-5" />
@@ -88,9 +97,6 @@
 								</TeleportOverflowMenu>
 							</ButtonStyled>
 						</div>
-						<div class="text-sm text-secondary">
-							{{ formatDateTime(screenshot.modifiedAt) }}
-						</div>
 					</div>
 				</Card>
 			</div>
@@ -106,13 +112,8 @@
 				@click.stop
 			/>
 			<div class="modal-toolbar">
-				<div class="min-w-0">
-					<div class="truncate font-semibold text-contrast" :title="activeScreenshot.name">
-						{{ activeScreenshot.name }}
-					</div>
-					<div class="text-sm text-secondary">
-						{{ formatDateTime(activeScreenshot.modifiedAt) }}
-					</div>
+				<div class="text-sm text-secondary">
+					{{ formatDateTime(activeScreenshot.modifiedAt) }}
 				</div>
 				<div class="flex items-center gap-2">
 					<ButtonStyled v-if="screenshots.length > 1" circular type="transparent">
@@ -144,6 +145,7 @@
 <script setup lang="ts">
 import {
 	ClipboardCopyIcon,
+	CopyIcon,
 	DownloadIcon,
 	FolderOpenIcon,
 	LeftArrowIcon,
@@ -165,12 +167,16 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
-import { readDir, readFile, remove, stat } from '@tauri-apps/plugin-fs'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import { get_full_path } from '@/helpers/profile'
+import {
+	delete_screenshot,
+	get_screenshot_bytes,
+	get_screenshots,
+	open_screenshots_folder,
+} from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
-import { highlightInFolder, openPath } from '@/helpers/utils'
+import { highlightInFolder } from '@/helpers/utils'
 
 type ScreenshotItem = {
 	name: string
@@ -197,12 +203,23 @@ const messages = defineMessages({
 		id: 'instance.screenshots.save-as',
 		defaultMessage: 'Save as...',
 	},
+	copyImage: {
+		id: 'instance.screenshots.copy-image',
+		defaultMessage: 'Copy image',
+	},
+	copiedImage: {
+		id: 'instance.screenshots.copied-image',
+		defaultMessage: 'Copied image',
+	},
+	copyImageFailed: {
+		id: 'instance.screenshots.copy-image-failed',
+		defaultMessage: 'Failed to copy image',
+	},
 })
 
 const loading = ref(true)
 const error = ref<string | null>(null)
 const screenshots = ref<ScreenshotItem[]>([])
-const screenshotsDir = ref('')
 const activeIndex = ref<number | null>(null)
 
 const activeScreenshot = computed(() =>
@@ -215,30 +232,18 @@ function getExtension(fileName: string): string {
 
 function getImageMimeType(fileName: string): string {
 	const extension = getExtension(fileName)
-	switch (extension) {
-		case 'jpg':
-		case 'jpeg':
-			return 'image/jpeg'
-		case 'gif':
-			return 'image/gif'
-		case 'svg':
-			return 'image/svg+xml'
-		case 'webp':
-			return 'image/webp'
-		default:
-			return 'image/png'
+	if (extension === 'jpg' || extension === 'jpeg') {
+		return 'image/jpeg'
 	}
+	if (extension === 'svg') {
+		return 'image/svg+xml'
+	}
+	return `image/${extension || 'png'}`
 }
 
 function isMissingPathError(err: unknown): boolean {
 	const message = err instanceof Error ? err.message : String(err)
 	return /not found|cannot find|does not exist/i.test(message)
-}
-
-function revokeScreenshotUrls(items: ScreenshotItem[]) {
-	for (const item of items) {
-		URL.revokeObjectURL(item.url)
-	}
 }
 
 async function loadScreenshots() {
@@ -247,37 +252,16 @@ async function loadScreenshots() {
 	activeIndex.value = null
 
 	try {
-		revokeScreenshotUrls(screenshots.value)
-
-		const instanceRoot = await get_full_path(props.instance.path)
-		screenshotsDir.value = `${instanceRoot}/screenshots`
-
-		const entries = await readDir(screenshotsDir.value)
-		const nextScreenshots = await Promise.all(
-			entries
-				.filter((entry) => !entry.isDirectory && IMAGE_EXTENSIONS.has(getExtension(entry.name)))
-				.map(async (entry) => {
-					const absolutePath = `${screenshotsDir.value}/${entry.name}`
-					const bytes = await readFile(absolutePath)
-					const metadata = await stat(absolutePath)
-					const modifiedAt = metadata.mtime ?? metadata.birthtime ?? new Date(0)
-					return {
-						name: entry.name,
-						path: absolutePath,
-						relativePath: `screenshots/${entry.name}`,
-						url: URL.createObjectURL(
-							new Blob([bytes], {
-								type: getImageMimeType(entry.name),
-							}),
-						),
-						modifiedAt,
-					} satisfies ScreenshotItem
-				}),
-		)
-
-		screenshots.value = nextScreenshots.sort(
-			(a, b) => b.modifiedAt.getTime() - a.modifiedAt.getTime(),
-		)
+		const entries = await get_screenshots(props.instance.path)
+		screenshots.value = entries
+			.filter((entry) => IMAGE_EXTENSIONS.has(getExtension(entry.name)))
+			.map((entry) => ({
+				name: entry.name,
+				path: entry.absolutePath,
+				relativePath: entry.relativePath,
+				url: entry.url,
+				modifiedAt: new Date(entry.modifiedAtMs),
+			}))
 	} catch (err) {
 		if (isMissingPathError(err)) {
 			screenshots.value = []
@@ -307,6 +291,64 @@ async function copyScreenshotPath(screenshot: ScreenshotItem) {
 	})
 }
 
+async function copyScreenshotImage(screenshot: ScreenshotItem) {
+	let objectUrl: string | null = null
+
+	try {
+		if (typeof ClipboardItem === 'undefined' || !navigator.clipboard?.write) {
+			throw new Error('Image clipboard is not available in this app session.')
+		}
+
+		const screenshotBytes = await get_screenshot_bytes(props.instance.path, screenshot.name)
+		const sourceBlob = new Blob([new Uint8Array(screenshotBytes)], {
+			type: getImageMimeType(screenshot.name),
+		})
+		objectUrl = URL.createObjectURL(sourceBlob)
+		const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+			const element = new Image()
+			element.onload = () => resolve(element)
+			element.onerror = () => reject(new Error('Failed to load screenshot for clipboard copy.'))
+			element.src = objectUrl!
+		})
+		const canvas = document.createElement('canvas')
+		canvas.width = image.naturalWidth
+		canvas.height = image.naturalHeight
+		const context = canvas.getContext('2d')
+		if (!context) {
+			throw new Error('Failed to initialize an image canvas.')
+		}
+
+		context.drawImage(image, 0, 0)
+		const blob = await new Promise<Blob>((resolve, reject) => {
+			canvas.toBlob((value) => {
+				if (value) {
+					resolve(value)
+				} else {
+					reject(new Error('Failed to convert screenshot for clipboard copy.'))
+				}
+			}, 'image/png')
+		})
+		const clipboardItem = new ClipboardItem({
+			'image/png': blob,
+		})
+		await navigator.clipboard.write([clipboardItem])
+		addNotification({
+			title: formatMessage(messages.copiedImage),
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: formatMessage(messages.copyImageFailed),
+			text: err instanceof Error ? err.message : String(err),
+			type: 'error',
+		})
+	} finally {
+		if (objectUrl) {
+			URL.revokeObjectURL(objectUrl)
+		}
+	}
+}
+
 async function revealScreenshot(screenshot: ScreenshotItem) {
 	await highlightInFolder(screenshot.path)
 }
@@ -331,7 +373,7 @@ async function deleteScreenshot(screenshot: ScreenshotItem) {
 		if (activeScreenshot.value?.path === screenshot.path) {
 			hideImage()
 		}
-		await remove(screenshot.path)
+		await delete_screenshot(props.instance.path, screenshot.name)
 		await loadScreenshots()
 	} catch (err) {
 		addNotification({
@@ -399,11 +441,7 @@ async function revealActiveScreenshot() {
 }
 
 async function openScreenshotsFolder() {
-	if (!screenshotsDir.value) {
-		const instanceRoot = await get_full_path(props.instance.path)
-		screenshotsDir.value = `${instanceRoot}/screenshots`
-	}
-	await openPath(screenshotsDir.value)
+	await open_screenshots_folder(props.instance.path)
 }
 
 function handleKeydown(event: KeyboardEvent) {
@@ -434,7 +472,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
 	document.removeEventListener('keydown', handleKeydown)
-	revokeScreenshotUrls(screenshots.value)
 })
 </script>
 
