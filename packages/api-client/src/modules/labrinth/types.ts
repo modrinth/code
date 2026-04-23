@@ -1134,6 +1134,8 @@ export namespace Labrinth {
 				slug: string | null
 				author: string
 				author_id: string
+				organization: string | null
+				organization_id: string | null
 				title: string
 				description: string
 				categories: string[]
@@ -1169,6 +1171,8 @@ export namespace Labrinth {
 				slug: string | null
 				author: string
 				author_id: string
+				organization: string | null
+				organization_id: string | null
 				name: string
 				summary: string
 				categories: string[]

@@ -190,11 +190,15 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 					:title="result.title"
 					:icon-url="result.icon_url"
 					:author="{
-						name: result.author,
+						name: result.organization == null ? result.author : result.organization,
 						link:
-							ctx.variant === 'web'
-								? `/user/${result.author_id}`
-								: `https://modrinth.com/user/${result.author_id}`,
+							result.organization_id == null
+								? ctx.variant === 'web'
+									? `/user/${result.author_id}`
+									: `https://modrinth.com/user/${result.author_id}`
+								: ctx.variant === 'web'
+									? `/organization/${result.organization_id}`
+									: `https://modrinth.com/organization/${result.organization_id}`,
 					}"
 					:date-updated="result.date_modified"
 					:date-published="result.date_created"

@@ -15,7 +15,7 @@ use crate::database::models::loader_fields::{
     VersionField,
 };
 use crate::database::models::{
-    DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
+    DBOrganizationId, DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
     LoaderFieldEnumValueId, LoaderFieldId,
 };
 use crate::database::redis::RedisPool;
@@ -171,9 +171,9 @@ pub async fn index_local(
 
     info!("Indexing local org owners!");
 
-    let mods_org_owners: DashMap<DBProjectId, (String, DBUserId)> = sqlx::query!(
+    let mods_org_owners: DashMap<DBProjectId, ((String, DBUserId), (String, DBOrganizationId))> = sqlx::query!(
         "
-        SELECT m.id mod_id, u.username, u.id uid
+        SELECT m.id mod_id, u.username, u.id uid, o.name orgname, o.id oid
         FROM mods m
         INNER JOIN organizations o ON o.id = m.organization_id
         INNER JOIN team_members tm ON tm.is_owner = TRUE and tm.team_id = o.team_id
@@ -183,8 +183,8 @@ pub async fn index_local(
         &*project_ids,
     )
     .fetch(pool)
-    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, (String, DBUserId)>, m| {
-        acc.insert(DBProjectId(m.mod_id), (m.username, DBUserId(m.uid)));
+    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, ((String, DBUserId), (String, DBOrganizationId))>, m| {
+        acc.insert(DBProjectId(m.mod_id), ((m.username, DBUserId(m.uid)), (m.orgname, DBOrganizationId(m.oid))));
         async move { Ok(acc) }
     })
     .await?;
@@ -263,13 +263,15 @@ pub async fn index_local(
             info!("projects index prog: {count}/{total_len}");
         }
 
-        let (owner, owner_id) =
-            if let Some((_, org_owner)) = mods_org_owners.remove(&project.id) {
-                org_owner
+        let ((owner, owner_id), (org_name, org_id)) =
+            if let Some((_, (org_owner, (org_name, org_id)))) =
+                mods_org_owners.remove(&project.id)
+            {
+                (org_owner, (Some(org_name), Some(org_id)))
             } else if let Some((_, team_owner)) =
                 mods_team_owners.remove(&project.id)
             {
-                team_owner
+                (team_owner, (None, None))
             } else {
                 warn!(
                     "org owner not found for project {} id: {}!",
@@ -446,6 +448,10 @@ pub async fn index_local(
                     icon_url: project.icon_url.clone(),
                     author: owner.clone(),
                     author_id: ariadne::ids::UserId::from(owner_id).to_string(),
+                    organization: org_name.clone(),
+                    organization_id: org_id.map(|e| {
+                        crate::models::ids::OrganizationId::from(e).to_string()
+                    }),
                     indexed_author: normalize_for_search(&owner),
                     date_created: project.approved,
                     created_timestamp: project.approved.timestamp(),
