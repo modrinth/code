@@ -16,7 +16,6 @@ import {
 	LineElement,
 	PointElement,
 	Tooltip,
-	type TooltipModel,
 } from 'chart.js'
 
 import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
@@ -59,6 +58,11 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 let chartInstance: Chart | null = null
 
 const { formatCompactNumber } = useCompactNumber()
+
+type ExternalTooltipHandler = NonNullable<
+	NonNullable<NonNullable<ChartConfiguration['options']>['plugins']>['tooltip']
+>['external']
+type ExternalTooltipContext = Parameters<Exclude<ExternalTooltipHandler, undefined>>[0]
 
 function withAlpha(color: string, alpha: number): string {
 	const match = /^#([0-9a-f]{6})$/i.exec(color)
@@ -163,7 +167,7 @@ function buildConfig(): ChartConfiguration {
 	}
 }
 
-function handleExternalTooltip(context: { tooltip: TooltipModel<'line' | 'bar'> }) {
+function handleExternalTooltip(context: ExternalTooltipContext) {
 	const tooltip = context.tooltip
 	if (!tooltip || tooltip.opacity === 0) {
 		emit('hover', { visible: false, x: 0, y: 0, sliceIndex: null })
