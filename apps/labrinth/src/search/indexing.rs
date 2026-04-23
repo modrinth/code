@@ -34,6 +34,13 @@ fn normalize_for_search(s: &str) -> String {
     SPECIAL_CHARS_RE.replace_all(s, "").to_kebab_case()
 }
 
+struct ProjectOwner {
+    username: String,
+    user_id: DBUserId,
+    org_name: Option<String>,
+    org_id: Option<DBOrganizationId>,
+}
+
 pub async fn index_local(
     pool: &PgPool,
     redis: &RedisPool,
@@ -171,7 +178,7 @@ pub async fn index_local(
 
     info!("Indexing local org owners!");
 
-    let mods_org_owners: DashMap<DBProjectId, ((String, DBUserId), (String, DBOrganizationId))> = sqlx::query!(
+    let mods_org_owners: DashMap<DBProjectId, ProjectOwner> = sqlx::query!(
         "
         SELECT m.id mod_id, u.username, u.id uid, o.name orgname, o.id oid
         FROM mods m
@@ -183,15 +190,20 @@ pub async fn index_local(
         &*project_ids,
     )
     .fetch(pool)
-    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, ((String, DBUserId), (String, DBOrganizationId))>, m| {
-        acc.insert(DBProjectId(m.mod_id), ((m.username, DBUserId(m.uid)), (m.orgname, DBOrganizationId(m.oid))));
+    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, ProjectOwner>, m| {
+        acc.insert(DBProjectId(m.mod_id), ProjectOwner {
+			username: m.username,
+			user_id: DBUserId(m.uid),
+			org_name: Some(m.orgname),
+			org_id: Some(DBOrganizationId(m.oid)),
+		});
         async move { Ok(acc) }
     })
     .await?;
 
     info!("Indexing local team owners!");
 
-    let mods_team_owners: DashMap<DBProjectId, (String, DBUserId)> = sqlx::query!(
+    let mods_team_owners: DashMap<DBProjectId, ProjectOwner> = sqlx::query!(
         "
         SELECT m.id mod_id, u.username, u.id uid
         FROM mods m
@@ -202,8 +214,13 @@ pub async fn index_local(
         &project_ids,
     )
     .fetch(pool)
-    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, (String, DBUserId)>, m| {
-        acc.insert(DBProjectId(m.mod_id), (m.username, DBUserId(m.uid)));
+    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, ProjectOwner>, m| {
+        acc.insert(DBProjectId(m.mod_id), ProjectOwner {
+			username: m.username,
+			user_id: DBUserId(m.uid),
+			org_name: None,
+			org_id: None,
+		});
         async move { Ok(acc) }
     })
     .await?;
@@ -262,23 +279,24 @@ pub async fn index_local(
         if count % 1000 == 0 {
             info!("projects index prog: {count}/{total_len}");
         }
-
-        let ((owner, owner_id), (org_name, org_id)) =
-            if let Some((_, (org_owner, (org_name, org_id)))) =
-                mods_org_owners.remove(&project.id)
-            {
-                (org_owner, (Some(org_name), Some(org_id)))
-            } else if let Some((_, team_owner)) =
-                mods_team_owners.remove(&project.id)
-            {
-                (team_owner, (None, None))
-            } else {
+        let ProjectOwner {
+            username,
+            user_id,
+            org_name,
+            org_id,
+        } = match mods_org_owners
+            .remove(&project.id)
+            .or_else(|| mods_team_owners.remove(&project.id))
+        {
+            Some((_, owner)) => owner,
+            None => {
                 warn!(
                     "org owner not found for project {} id: {}!",
                     project.name, project.id.0
                 );
                 continue;
-            };
+            }
+        };
 
         let license = match project.license.split(' ').next() {
             Some(license) => license.to_string(),
@@ -446,13 +464,13 @@ pub async fn index_local(
                     downloads: project.downloads,
                     log_downloads: (project.downloads.max(1) as f64).ln(),
                     icon_url: project.icon_url.clone(),
-                    author: owner.clone(),
-                    author_id: ariadne::ids::UserId::from(owner_id).to_string(),
+                    author: username.clone(),
+                    author_id: ariadne::ids::UserId::from(user_id).to_string(),
                     organization: org_name.clone(),
                     organization_id: org_id.map(|e| {
                         crate::models::ids::OrganizationId::from(e).to_string()
                     }),
-                    indexed_author: normalize_for_search(&owner),
+                    indexed_author: normalize_for_search(&username),
                     date_created: project.approved,
                     created_timestamp: project.approved.timestamp(),
                     date_modified: project.updated,
