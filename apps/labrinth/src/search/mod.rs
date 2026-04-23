@@ -282,7 +282,8 @@ pub struct ResultSearchProject {
     pub project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
-    pub author_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub author_id: Option<String>,
     pub organization: Option<String>,
     pub organization_id: Option<String>,
     pub name: String,
@@ -321,7 +322,7 @@ impl From<UploadSearchProject> for ResultSearchProject {
             project_types: source.project_types,
             slug: source.slug,
             author: source.author,
-            author_id: source.author_id,
+            author_id: Some(source.author_id),
             organization: source.organization,
             organization_id: source.organization_id,
             name: source.name,

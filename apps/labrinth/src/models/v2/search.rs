@@ -17,7 +17,8 @@ pub struct LegacyResultSearchProject {
     pub project_type: String,
     pub slug: Option<String>,
     pub author: String,
-    pub author_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub author_id: Option<String>,
     pub organization: Option<String>,
     pub organization_id: Option<String>,
     pub title: String,

@@ -1133,7 +1133,7 @@ export namespace Labrinth {
 				project_type: string
 				slug: string | null
 				author: string
-				author_id: string
+				author_id: string | null
 				organization: string | null
 				organization_id: string | null
 				title: string
@@ -1170,7 +1170,7 @@ export namespace Labrinth {
 				project_types: string[]
 				slug: string | null
 				author: string
-				author_id: string
+				author_id: string | null
 				organization: string | null
 				organization_id: string | null
 				name: string
