@@ -17,10 +17,10 @@
 				})
 			}}
 			<span v-if="op.state === 'done'" class="font-normal text-green">
-				— {{ formatMessage(commonMessages.doneLabel) }}</span
+				- {{ formatMessage(commonMessages.doneLabel) }}</span
 			>
 			<span v-else-if="op.state?.startsWith('fail')" class="font-normal text-red">
-				— {{ formatMessage(messages.failed) }}</span
+				- {{ formatMessage(messages.failed) }}</span
 			>
 		</template>
 		<span class="text-secondary">
@@ -30,7 +30,7 @@
 				})
 			}}
 			<template v-if="'current_file' in op && op.current_file">
-				— {{ op.current_file?.split('/')?.pop() }}
+				- {{ op.current_file?.split('/')?.pop() }}
 			</template>
 		</span>
 		<template v-if="op.id" #top-right-actions>

@@ -6,7 +6,7 @@
 		<template #header>
 			Uploading files ({{ state.completedFiles }}/{{ state.totalFiles }})
 			<span v-if="state.currentFileName" class="font-normal text-secondary">
-				— {{ state.currentFileName }}
+				- {{ state.currentFileName }}
 			</span>
 		</template>
 		<span class="text-secondary">

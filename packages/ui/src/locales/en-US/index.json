@@ -2648,6 +2648,9 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "servers.admonitions.background-task-running": {
+    "defaultMessage": "Background task running"
+  },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "Backup {backupName} was cancelled."
   },
@@ -2697,19 +2700,19 @@
     "defaultMessage": "Something went wrong while restoring from {backupName}. Please try again or contact support if the issue continues."
   },
   "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Restoring from backup failed"
+    "defaultMessage": "Restore failed"
   },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Restoring from {backupName} is queued and will start shortly."
   },
   "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Restoring from backup queued"
+    "defaultMessage": "Restore queued"
   },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Your server has been restored to {backupName} and is ready to start."
   },
   "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Restoring from backup successful"
+    "defaultMessage": "Restore complete"
   },
   "servers.backups.admonition.restore-timed-out.description": {
     "defaultMessage": "Restoring from {backupName} timed out. You can try again or contact support if the issue continues."
@@ -2768,15 +2771,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Backup schedule"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Creating backup…"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Failed to create backup"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Failed to restore from backup"
-  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"
   },
@@ -2785,9 +2779,6 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Restore"
-  },
-  "servers.backups.item.restore-in-progress": {
-    "defaultMessage": "Restore in progress…"
   },
   "servers.backups.select-backup-aria": {
     "defaultMessage": "Select backup {name}"

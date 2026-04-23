@@ -11,7 +11,7 @@
 			</slot>
 		</template>
 		<template #header>
-			{{ contentError ? 'Installation error' : "We're preparing your server!" }}
+			{{ contentError ? 'Installation failed' : "We're preparing your server" }}
 		</template>
 		<template v-if="contentError">
 			{{ errorLabel }}
@@ -85,7 +85,7 @@ const errorLabel = computed(() => {
 
 	if (step === 'modpack') {
 		if (desc?.includes('no primary file')) {
-			return 'The modpack version has no downloadable file. It may have been packaged incorrectly.'
+			return 'This modpack version does not include a downloadable file. It may have been packaged incorrectly.'
 		}
 		if (desc?.includes('failed to install')) {
 			return 'Failed to install the modpack. It may be corrupted or incompatible.'

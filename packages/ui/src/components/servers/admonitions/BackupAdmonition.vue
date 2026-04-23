@@ -149,7 +149,7 @@ const messages = defineMessages({
 	},
 	restoreQueuedTitle: {
 		id: 'servers.backups.admonition.restore-queued.title',
-		defaultMessage: 'Restoring from backup queued',
+		defaultMessage: 'Restore queued',
 	},
 	restoreQueuedDescription: {
 		id: 'servers.backups.admonition.restore-queued.description',
@@ -165,7 +165,7 @@ const messages = defineMessages({
 	},
 	restoreSuccessfulTitle: {
 		id: 'servers.backups.admonition.restore-successful.title',
-		defaultMessage: 'Restoring from backup successful',
+		defaultMessage: 'Restore complete',
 	},
 	restoreSuccessfulDescription: {
 		id: 'servers.backups.admonition.restore-successful.description',
@@ -173,7 +173,7 @@ const messages = defineMessages({
 	},
 	restoreFailedTitle: {
 		id: 'servers.backups.admonition.restore-failed.title',
-		defaultMessage: 'Restoring from backup failed',
+		defaultMessage: 'Restore failed',
 	},
 	restoreFailedDescription: {
 		id: 'servers.backups.admonition.restore-failed.description',

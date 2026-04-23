@@ -1,10 +1,14 @@
 <script setup lang="ts" generic="ItemType extends StackedAdmonitionItem">
 import { ChevronDownIcon, XIcon } from '@modrinth/assets'
 import { AnimatePresence, Motion } from 'motion-v'
-import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, useAttrs, useId, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import ButtonStyled from './ButtonStyled.vue'
+
+defineOptions({
+	inheritAttrs: false,
+})
 
 export type StackedAdmonitionType = 'info' | 'warning' | 'critical' | 'success'
 
@@ -62,12 +66,14 @@ defineSlots<{
 
 const { formatMessage } = useVIntl()
 const stackId = useId()
+const attrs = useAttrs()
 
 const internalExpanded = ref(false)
 const isHovered = ref(false)
 const prefersReducedMotion = ref(false)
 const initialMeasurementSettled = ref(false)
 const enteringItemIds = ref<Set<string>>(new Set())
+const actionBarHeight = ref(0)
 
 const heights = ref<Record<string, number>>({})
 const cardEls = new Map<string, HTMLElement>()
@@ -76,6 +82,7 @@ const pendingHeights = new Map<string, number>()
 let flushHandle: number | null = null
 let initialMeasurementHandle: number | null = null
 let enteringHandle: number | null = null
+let actionBarObserver: ResizeObserver | null = null
 
 // Slot content may run effects, so measure the one real tree instead of mounting
 // hidden duplicates just to discover natural card heights.
@@ -160,6 +167,10 @@ const containerHeight = computed(() => {
 	return frontCardHeight.value + currentPeek() * behind + pad
 })
 
+const stackShellHeight = computed(() => {
+	return containerHeight.value + (hasActionBar.value ? actionBarHeight.value : 0)
+})
+
 const springTransition = computed(() =>
 	prefersReducedMotion.value || !initialMeasurementSettled.value
 		? { duration: 0 }
@@ -168,6 +179,10 @@ const springTransition = computed(() =>
 
 const exitTransition = computed(() =>
 	prefersReducedMotion.value ? { duration: 0 } : { duration: 0.18 },
+)
+
+const shellExitTransition = computed(() =>
+	prefersReducedMotion.value ? { duration: 0 } : { duration: 0.16 },
 )
 
 function collapsedCardPosition(index: number) {
@@ -254,6 +269,23 @@ function setCardRef(id: string, el: unknown) {
 	})
 	ro.observe(node)
 	observers.set(id, ro)
+}
+
+function setActionBarRef(el: unknown) {
+	const node = resolveNode(el)
+	actionBarObserver?.disconnect()
+	actionBarObserver = null
+	if (!node) {
+		actionBarHeight.value = 0
+		return
+	}
+
+	actionBarHeight.value = node.offsetHeight
+	const ro = new ResizeObserver(() => {
+		actionBarHeight.value = node.offsetHeight
+	})
+	ro.observe(node)
+	actionBarObserver = ro
 }
 
 function setExpanded(v: boolean) {
@@ -360,6 +392,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
 	mql?.removeEventListener('change', syncRM)
 	for (const ro of observers.values()) ro.disconnect()
+	actionBarObserver?.disconnect()
 	observers.clear()
 	cardEls.clear()
 	pendingHeights.clear()
@@ -388,136 +421,153 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<div v-if="items.length > 0" class="relative">
-		<Transition
-			enter-active-class="overflow-hidden transition-all duration-150 ease-out"
-			enter-from-class="-translate-y-1 opacity-0 max-h-0"
-			enter-to-class="translate-y-0 opacity-100 max-h-14"
-			leave-active-class="overflow-hidden transition-all duration-100 ease-in"
-			leave-from-class="translate-y-0 opacity-100 max-h-14"
-			leave-to-class="-translate-y-1 opacity-0 max-h-0"
-		>
-			<div v-if="hasActionBar">
-				<div class="flex items-center justify-between pb-2">
-					<ButtonStyled type="transparent">
-						<button
-							type="button"
-							:aria-expanded="isExpanded"
-							:aria-controls="stackId"
-							@click="toggleExpanded"
-						>
-							<Motion
-								as="span"
-								class="inline-flex"
-								:animate="{ rotate: isExpanded ? 0 : -90 }"
-								:transition="{ type: 'spring', stiffness: 350, damping: 30 }"
-							>
-								<ChevronDownIcon class="h-4 w-4" />
-							</Motion>
-							<slot name="header-label" :count="items.length" :expanded="isExpanded">
-								{{ formatMessage(messages.alertCount, { count: items.length }) }}
-							</slot>
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="dismissAllEnabled" type="transparent">
-						<button type="button" @click="$emit('dismiss-all')">
-							<XIcon class="h-4 w-4" />
-							{{ formatMessage(messages.dismissAll) }}
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-		</Transition>
-
-		<!-- Expanded-target overflow must become visible immediately so cards added
-			during the tail of the expand spring do not inherit collapse clipping. -->
+	<AnimatePresence :initial="false">
 		<Motion
-			:id="stackId"
+			v-if="items.length > 0"
+			v-bind="attrs"
 			as="div"
 			class="relative"
 			:initial="false"
-			:animate="{ height: containerHeight }"
+			:animate="{ height: stackShellHeight, opacity: 1, y: 0 }"
+			:exit="{
+				height: 0,
+				opacity: 0,
+				overflow: 'hidden',
+				y: -4,
+				transition: shellExitTransition,
+			}"
 			:transition="springTransition"
-			:style="{ overflow: isExpanded ? 'visible' : 'hidden' }"
-			v-bind="containerMotionProps"
-			@mouseenter="isHovered = true"
-			@mouseleave="isHovered = false"
-			@click="onContainerClick"
 		>
-			<AnimatePresence :initial="false">
-				<Motion
-					v-for="(item, index) in items"
-					:key="item.id"
-					as="div"
-					class="absolute inset-x-0 top-0 rounded-2xl bg-bg will-change-transform"
-					:initial="false"
-					:animate="cardPosition(index)"
-					:exit="{ opacity: 0, scale: 0.9, transition: exitTransition }"
-					:transition="springTransition"
-					:style="{
-						zIndex: items.length - index,
-						transformOrigin: 'top center',
-					}"
-					:aria-hidden="isSettledCollapsed && index !== 0 ? 'true' : undefined"
-					@click="onCardClick"
-				>
-					<template v-if="index === 0">
-						<div :ref="(el: unknown) => setCardRef(item.id, el)">
-							<slot
-								name="item"
-								:item="item"
-								:index="index"
-								:is-front="true"
-								:expanded="isExpanded"
-								:dismissible="itemDismissible"
-							/>
-						</div>
-					</template>
-					<template v-else>
-						<div class="relative">
-							<Motion
-								as="div"
-								:class="[
-									'absolute inset-0 rounded-2xl border border-solid',
-									placeholderClasses[item.type],
-								]"
-								:initial="false"
-								:animate="{ opacity: isExpanded ? 0 : 1 }"
-								:transition="springTransition"
-								aria-hidden="true"
-							/>
-							<Motion
-								as="div"
-								:initial="false"
-								:animate="{ height: targetCardHeight(index) }"
-								:transition="springTransition"
-								:style="{ overflow: isExpanded ? 'visible' : 'hidden' }"
+			<Transition
+				enter-active-class="overflow-hidden transition-all duration-150 ease-out"
+				enter-from-class="-translate-y-1 opacity-0 max-h-0"
+				enter-to-class="translate-y-0 opacity-100 max-h-14"
+				leave-active-class="overflow-hidden transition-all duration-100 ease-in"
+				leave-from-class="translate-y-0 opacity-100 max-h-14"
+				leave-to-class="-translate-y-1 opacity-0 max-h-0"
+			>
+				<div v-if="hasActionBar" :ref="(el: unknown) => setActionBarRef(el)">
+					<div class="flex items-center justify-between pb-2">
+						<ButtonStyled type="transparent">
+							<button
+								type="button"
+								:aria-expanded="isExpanded"
+								:aria-controls="stackId"
+								@click="toggleExpanded"
 							>
+								<Motion
+									as="span"
+									class="inline-flex"
+									:animate="{ rotate: isExpanded ? 0 : -90 }"
+									:transition="{ type: 'spring', stiffness: 350, damping: 30 }"
+								>
+									<ChevronDownIcon class="h-4 w-4" />
+								</Motion>
+								<slot name="header-label" :count="items.length" :expanded="isExpanded">
+									{{ formatMessage(messages.alertCount, { count: items.length }) }}
+								</slot>
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-if="dismissAllEnabled" type="transparent">
+							<button type="button" @click="$emit('dismiss-all')">
+								<XIcon class="h-4 w-4" />
+								{{ formatMessage(messages.dismissAll) }}
+							</button>
+						</ButtonStyled>
+					</div>
+				</div>
+			</Transition>
+
+			<!-- Expanded-target overflow must become visible immediately so cards added
+			during the tail of the expand spring do not inherit collapse clipping. -->
+			<Motion
+				:id="stackId"
+				as="div"
+				class="relative"
+				:initial="false"
+				:animate="{ height: containerHeight }"
+				:transition="springTransition"
+				:style="{ overflow: isExpanded ? 'visible' : 'hidden' }"
+				v-bind="containerMotionProps"
+				@mouseenter="isHovered = true"
+				@mouseleave="isHovered = false"
+				@click="onContainerClick"
+			>
+				<AnimatePresence :initial="false">
+					<Motion
+						v-for="(item, index) in items"
+						:key="item.id"
+						as="div"
+						class="absolute inset-x-0 top-0 rounded-2xl bg-bg will-change-transform"
+						:initial="false"
+						:animate="cardPosition(index)"
+						:exit="{ opacity: 0, scale: 0.9, transition: exitTransition }"
+						:transition="springTransition"
+						:style="{
+							zIndex: items.length - index,
+							transformOrigin: 'top center',
+						}"
+						:aria-hidden="isSettledCollapsed && index !== 0 ? 'true' : undefined"
+						@click="onCardClick"
+					>
+						<template v-if="index === 0">
+							<div :ref="(el: unknown) => setCardRef(item.id, el)">
+								<slot
+									name="item"
+									:item="item"
+									:index="index"
+									:is-front="true"
+									:expanded="isExpanded"
+									:dismissible="itemDismissible"
+								/>
+							</div>
+						</template>
+						<template v-else>
+							<div class="relative">
+								<Motion
+									as="div"
+									:class="[
+										'absolute inset-0 rounded-2xl border border-solid',
+										placeholderClasses[item.type],
+									]"
+									:initial="false"
+									:animate="{ opacity: isExpanded ? 0 : 1 }"
+									:transition="springTransition"
+									aria-hidden="true"
+								/>
 								<Motion
 									as="div"
 									:initial="false"
-									:animate="{ opacity: contentOpacity(index) }"
+									:animate="{ height: targetCardHeight(index) }"
 									:transition="springTransition"
+									:style="{ overflow: isExpanded ? 'visible' : 'hidden' }"
 								>
-									<div
-										:ref="(el: unknown) => setCardRef(item.id, el)"
-										:inert="!isExpanded ? true : undefined"
+									<Motion
+										as="div"
+										:initial="false"
+										:animate="{ opacity: contentOpacity(index) }"
+										:transition="springTransition"
 									>
-										<slot
-											name="item"
-											:item="item"
-											:index="index"
-											:is-front="false"
-											:expanded="isExpanded"
-											:dismissible="itemDismissible"
-										/>
-									</div>
+										<div
+											:ref="(el: unknown) => setCardRef(item.id, el)"
+											:inert="!isExpanded ? true : undefined"
+										>
+											<slot
+												name="item"
+												:item="item"
+												:index="index"
+												:is-front="false"
+												:expanded="isExpanded"
+												:dismissible="itemDismissible"
+											/>
+										</div>
+									</Motion>
 								</Motion>
-							</Motion>
-						</div>
-					</template>
-				</Motion>
-			</AnimatePresence>
+							</div>
+						</template>
+					</Motion>
+				</AnimatePresence>
+			</Motion>
 		</Motion>
-	</div>
+	</AnimatePresence>
 </template>

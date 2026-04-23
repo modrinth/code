@@ -41,6 +41,10 @@ const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQ
 )
 
 const messages = defineMessages({
+	backgroundTaskRunning: {
+		id: 'servers.admonitions.background-task-running',
+		defaultMessage: 'Background task running',
+	},
 	contentBusyBody: {
 		id: 'content.page-layout.busy-description',
 		defaultMessage: 'Please wait for the operation to complete before editing content.',
@@ -366,14 +370,14 @@ function onFileOpDismiss(item: ServerAdmonitionItem) {
 			<Admonition
 				v-else-if="item.kind === 'busy-content'"
 				type="warning"
-				:header="contentBusyHeader ?? ''"
+				:header="formatMessage(messages.backgroundTaskRunning)"
 			>
 				{{ formatMessage(messages.contentBusyBody) }}
 			</Admonition>
 			<Admonition
 				v-else-if="item.kind === 'busy-files'"
 				type="warning"
-				:header="filesBusyHeader ?? ''"
+				:header="formatMessage(messages.backgroundTaskRunning)"
 			>
 				{{ formatMessage(messages.filesBusyBody) }}
 			</Admonition>
