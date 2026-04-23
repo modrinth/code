@@ -1,5 +1,6 @@
 //! Theseus settings file
 
+use super::profiles::FileLink;
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Sqlite};
 use std::collections::HashMap;
@@ -31,6 +32,7 @@ pub struct Settings {
     pub memory: MemorySettings,
     pub force_fullscreen: bool,
     pub game_resolution: WindowSize,
+    pub file_links: Vec<FileLink>,
     pub hide_on_process_start: bool,
     pub hooks: Hooks,
 
@@ -74,7 +76,7 @@ impl Settings {
                 theme, locale, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,
                 discord_rpc, developer_mode, telemetry, personalized_ads,
                 onboarded,
-                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
+                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars, json(file_links) file_links,
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
                 hook_pre_launch, hook_wrapper, hook_post_exit,
                 custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,
@@ -109,6 +111,11 @@ impl Settings {
                 .unwrap_or_default(),
             custom_env_vars: res
                 .custom_env_vars
+                .as_ref()
+                .and_then(|x| serde_json::from_str(x).ok())
+                .unwrap_or_default(),
+            file_links: res
+                .file_links
                 .as_ref()
                 .and_then(|x| serde_json::from_str(x).ok())
                 .unwrap_or_default(),
@@ -152,6 +159,7 @@ impl Settings {
         let default_page = self.default_page.as_str();
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
+        let file_links = serde_json::to_string(&self.file_links)?;
         let feature_flags = serde_json::to_string(&self.feature_flags)?;
         let version = self.version as i64;
 
@@ -178,29 +186,30 @@ impl Settings {
 
                 extra_launch_args = jsonb($14),
                 custom_env_vars = jsonb($15),
-                mc_memory_max = $16,
-                mc_force_fullscreen = $17,
-                mc_game_resolution_x = $18,
-                mc_game_resolution_y = $19,
-                hide_on_process_start = $20,
+                file_links = jsonb($16),
+                mc_memory_max = $17,
+                mc_force_fullscreen = $18,
+                mc_game_resolution_x = $19,
+                mc_game_resolution_y = $20,
+                hide_on_process_start = $21,
 
-                hook_pre_launch = $21,
-                hook_wrapper = $22,
-                hook_post_exit = $23,
+                hook_pre_launch = $22,
+                hook_wrapper = $23,
+                hook_post_exit = $24,
 
-                custom_dir = $24,
-                prev_custom_dir = $25,
-                migrated = $26,
+                custom_dir = $25,
+                prev_custom_dir = $26,
+                migrated = $27,
 
-                toggle_sidebar = $27,
-                feature_flags = $28,
-                hide_nametag_skins_page = $29,
+                toggle_sidebar = $28,
+                feature_flags = $29,
+                hide_nametag_skins_page = $30,
 
-                skipped_update = $30,
-                pending_update_toast_for_version = $31,
-                auto_download_updates = $32,
+                skipped_update = $31,
+                pending_update_toast_for_version = $32,
+                auto_download_updates = $33,
 
-                version = $33
+                version = $34
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -217,6 +226,7 @@ impl Settings {
             self.onboarded,
             extra_launch_args,
             custom_env_vars,
+            file_links,
             self.memory.maximum,
             self.force_fullscreen,
             self.game_resolution.0,

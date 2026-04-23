@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                path, install_stage, launcher_feature_version, name, icon_path,\n                game_version, protocol_version, mod_loader, mod_loader_version,\n                json(groups) as \"groups!: serde_json::Value\",\n                linked_project_id, linked_version_id, locked,\n                created, modified, last_played,\n                submitted_time_played, recent_time_played,\n                override_java_path,\n                json(override_extra_launch_args) as \"override_extra_launch_args!: serde_json::Value\", json(override_custom_env_vars) as \"override_custom_env_vars!: serde_json::Value\",\n                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,\n                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit\n            FROM profiles\n            WHERE path IN (SELECT value FROM json_each($1))",
+  "query": "\n            SELECT\n                path, install_stage, launcher_feature_version, name, icon_path,\n                game_version, protocol_version, mod_loader, mod_loader_version,\n                json(groups) as \"groups!: serde_json::Value\",\n                json(file_links) as \"file_links!: serde_json::Value\",\n                linked_project_id, linked_version_id, locked,\n                created, modified, last_played,\n                submitted_time_played, recent_time_played,\n                override_java_path,\n                json(override_extra_launch_args) as \"override_extra_launch_args!: serde_json::Value\", json(override_custom_env_vars) as \"override_custom_env_vars!: serde_json::Value\",\n                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,\n                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit\n            FROM profiles\n            WHERE path IN (SELECT value FROM json_each($1))",
   "describe": {
     "columns": [
       {
@@ -54,93 +54,98 @@
         "type_info": "Null"
       },
       {
-        "name": "linked_project_id",
+        "name": "file_links!: serde_json::Value",
         "ordinal": 10,
-        "type_info": "Text"
+        "type_info": "Null"
       },
       {
-        "name": "linked_version_id",
+        "name": "linked_project_id",
         "ordinal": 11,
         "type_info": "Text"
       },
       {
-        "name": "locked",
+        "name": "linked_version_id",
         "ordinal": 12,
-        "type_info": "Integer"
+        "type_info": "Text"
       },
       {
-        "name": "created",
+        "name": "locked",
         "ordinal": 13,
         "type_info": "Integer"
       },
       {
-        "name": "modified",
+        "name": "created",
         "ordinal": 14,
         "type_info": "Integer"
       },
       {
-        "name": "last_played",
+        "name": "modified",
         "ordinal": 15,
         "type_info": "Integer"
       },
       {
-        "name": "submitted_time_played",
+        "name": "last_played",
         "ordinal": 16,
         "type_info": "Integer"
       },
       {
-        "name": "recent_time_played",
+        "name": "submitted_time_played",
         "ordinal": 17,
         "type_info": "Integer"
       },
       {
-        "name": "override_java_path",
+        "name": "recent_time_played",
         "ordinal": 18,
+        "type_info": "Integer"
+      },
+      {
+        "name": "override_java_path",
+        "ordinal": 19,
         "type_info": "Text"
       },
       {
         "name": "override_extra_launch_args!: serde_json::Value",
-        "ordinal": 19,
-        "type_info": "Null"
-      },
-      {
-        "name": "override_custom_env_vars!: serde_json::Value",
         "ordinal": 20,
         "type_info": "Null"
       },
       {
-        "name": "override_mc_memory_max",
+        "name": "override_custom_env_vars!: serde_json::Value",
         "ordinal": 21,
-        "type_info": "Integer"
+        "type_info": "Null"
       },
       {
-        "name": "override_mc_force_fullscreen",
+        "name": "override_mc_memory_max",
         "ordinal": 22,
         "type_info": "Integer"
       },
       {
-        "name": "override_mc_game_resolution_x",
+        "name": "override_mc_force_fullscreen",
         "ordinal": 23,
         "type_info": "Integer"
       },
       {
-        "name": "override_mc_game_resolution_y",
+        "name": "override_mc_game_resolution_x",
         "ordinal": 24,
         "type_info": "Integer"
       },
       {
-        "name": "override_hook_pre_launch",
+        "name": "override_mc_game_resolution_y",
         "ordinal": 25,
-        "type_info": "Text"
+        "type_info": "Integer"
       },
       {
-        "name": "override_hook_wrapper",
+        "name": "override_hook_pre_launch",
         "ordinal": 26,
         "type_info": "Text"
       },
       {
-        "name": "override_hook_post_exit",
+        "name": "override_hook_wrapper",
         "ordinal": 27,
+        "type_info": "Text"
+      },
+      {
+        "name": "override_hook_post_exit",
+        "ordinal": 28,
         "type_info": "Text"
       }
     ],
@@ -157,6 +162,7 @@
       true,
       false,
       true,
+      null,
       null,
       true,
       true,
@@ -178,5 +184,5 @@
       true
     ]
   },
-  "hash": "6a434cc55635b6e325e9e5f06d21b787af281db4402c8ff45fe6a77b5be6c929"
+  "hash": "9df5a975e928062379742745670b3b375003ba19a884417e11568ae9afebba2f"
 }

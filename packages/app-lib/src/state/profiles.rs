@@ -37,6 +37,7 @@ pub struct Profile {
     pub loader_version: Option<String>,
 
     pub groups: Vec<String>,
+    pub file_links: Vec<FileLink>,
 
     pub linked_data: Option<LinkedData>,
 
@@ -137,6 +138,20 @@ pub struct LinkedData {
     pub version_id: String,
 
     pub locked: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct FileLink {
+    pub path: String,
+    pub target: String,
+    pub kind: FileLinkKind,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum FileLinkKind {
+    File,
+    Directory,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
@@ -292,6 +307,7 @@ struct ProfileQueryResult {
     mod_loader: String,
     mod_loader_version: Option<String>,
     groups: serde_json::Value,
+    file_links: serde_json::Value,
     linked_project_id: Option<String>,
     linked_version_id: Option<String>,
     locked: Option<i64>,
@@ -331,6 +347,7 @@ impl TryFrom<ProfileQueryResult> for Profile {
             loader: ModLoader::from_string(&x.mod_loader),
             loader_version: x.mod_loader_version,
             groups: serde_json::from_value(x.groups).unwrap_or_default(),
+            file_links: serde_json::from_value(x.file_links).unwrap_or_default(),
             linked_data: if let Some(project_id) = x.linked_project_id {
                 if let Some(version_id) = x.linked_version_id {
                     x.locked.map(|locked| LinkedData {
@@ -394,6 +411,7 @@ macro_rules! select_profiles_with_predicate {
                 path, install_stage, launcher_feature_version, name, icon_path,
                 game_version, protocol_version, mod_loader, mod_loader_version,
                 json(groups) as "groups!: serde_json::Value",
+                json(file_links) as "file_links!: serde_json::Value",
                 linked_project_id, linked_version_id, locked,
                 created, modified, last_played,
                 submitted_time_played, recent_time_played,
@@ -467,6 +485,7 @@ impl Profile {
         let mod_loader = self.loader.as_str();
 
         let groups = serde_json::to_string(&self.groups)?;
+        let file_links = serde_json::to_string(&self.file_links)?;
 
         let linked_data_project_id =
             self.linked_data.as_ref().map(|x| x.project_id.clone());
@@ -495,6 +514,7 @@ impl Profile {
                 path, install_stage, name, icon_path,
                 game_version, mod_loader, mod_loader_version,
                 groups,
+                file_links,
                 linked_project_id, linked_version_id, locked,
                 created, modified, last_played,
                 submitted_time_played, recent_time_played,
@@ -507,13 +527,14 @@ impl Profile {
                 $1, $2, $3, $4,
                 $5, $6, $7,
                 jsonb($8),
-                $9, $10, $11,
-                $12, $13, $14,
-                $15, $16,
-                $17, jsonb($18), jsonb($19),
-                $20, $21, $22, $23,
-                $24, $25, $26,
-                $27, $28
+                jsonb($9),
+                $10, $11, $12,
+                $13, $14, $15,
+                $16, $17,
+                $18, jsonb($19), jsonb($20),
+                $21, $22, $23, $24,
+                $25, $26, $27,
+                $28, $29
             )
             ON CONFLICT (path) DO UPDATE SET
                 install_stage = $2,
@@ -525,32 +546,33 @@ impl Profile {
                 mod_loader_version = $7,
 
                 groups = jsonb($8),
+                file_links = jsonb($9),
 
-                linked_project_id = $9,
-                linked_version_id = $10,
-                locked = $11,
+                linked_project_id = $10,
+                linked_version_id = $11,
+                locked = $12,
 
-                created = $12,
-                modified = $13,
-                last_played = $14,
+                created = $13,
+                modified = $14,
+                last_played = $15,
 
-                submitted_time_played = $15,
-                recent_time_played = $16,
+                submitted_time_played = $16,
+                recent_time_played = $17,
 
-                override_java_path = $17,
-                override_extra_launch_args = jsonb($18),
-                override_custom_env_vars = jsonb($19),
-                override_mc_memory_max = $20,
-                override_mc_force_fullscreen = $21,
-                override_mc_game_resolution_x = $22,
-                override_mc_game_resolution_y = $23,
+                override_java_path = $18,
+                override_extra_launch_args = jsonb($19),
+                override_custom_env_vars = jsonb($20),
+                override_mc_memory_max = $21,
+                override_mc_force_fullscreen = $22,
+                override_mc_game_resolution_x = $23,
+                override_mc_game_resolution_y = $24,
 
-                override_hook_pre_launch = $24,
-                override_hook_wrapper = $25,
-                override_hook_post_exit = $26,
+                override_hook_pre_launch = $25,
+                override_hook_wrapper = $26,
+                override_hook_post_exit = $27,
 
-                protocol_version = $27,
-                launcher_feature_version = $28
+                protocol_version = $28,
+                launcher_feature_version = $29
             ",
             self.path,
             install_stage,
@@ -560,6 +582,7 @@ impl Profile {
             mod_loader,
             self.loader_version,
             groups,
+            file_links,
             linked_data_project_id,
             linked_data_version_id,
             linked_data_locked,

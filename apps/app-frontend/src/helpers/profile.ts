@@ -13,6 +13,7 @@ import type {
 	CacheBehaviour,
 	ContentFile,
 	ContentFileProjectType,
+	FileLink,
 	GameInstance,
 	InstanceLoader,
 } from './types'
@@ -274,6 +275,10 @@ export async function kill(path: string): Promise<void> {
 // Edits a profile
 export async function edit(path: string, editProfile: Partial<GameInstance>): Promise<void> {
 	return await invoke('plugin:profile|profile_edit', { path, editProfile })
+}
+
+export async function set_file_links(path: string, fileLinks: FileLink[]): Promise<FileLink[]> {
+	return await invoke('plugin:profile|profile_set_file_links', { path, fileLinks })
 }
 
 // Edits a profile's icon

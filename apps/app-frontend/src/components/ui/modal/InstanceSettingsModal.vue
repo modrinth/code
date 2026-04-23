@@ -5,6 +5,7 @@ import {
 	CodeIcon,
 	CoffeeIcon,
 	InfoIcon,
+	LinkIcon,
 	MonitorIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
@@ -20,6 +21,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
+import FileLinksSettings from '@/components/ui/instance_settings/FileLinksSettings.vue'
 import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.vue'
 import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
 import InstallationSettings from '@/components/ui/instance_settings/InstallationSettings.vue'
@@ -86,6 +88,14 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		}),
 		icon: WrenchIcon,
 		content: InstallationSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.file-links',
+			defaultMessage: 'File links',
+		}),
+		icon: LinkIcon,
+		content: FileLinksSettings,
 	},
 	{
 		name: defineMessage({

@@ -190,6 +190,7 @@ fn main() {
                         "profile_run",
                         "profile_kill",
                         "profile_edit",
+                        "profile_set_file_links",
                         "profile_edit_icon",
                         "profile_export_mrpack",
                         "profile_get_pack_export_candidates",

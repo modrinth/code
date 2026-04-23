@@ -1,0 +1,1 @@
+ALTER TABLE settings ADD COLUMN file_links JSONB NOT NULL DEFAULT '[]';

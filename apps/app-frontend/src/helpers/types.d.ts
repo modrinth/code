@@ -12,6 +12,7 @@ export type GameInstance = {
 	loader_version?: string
 
 	groups: string[]
+	file_links: FileLink[]
 
 	linked_data?: LinkedData
 
@@ -82,6 +83,14 @@ type Hooks = {
 	post_exit?: string
 }
 
+export type FileLinkKind = 'file' | 'directory'
+
+export type FileLink = {
+	path: string
+	target: string
+	kind: FileLinkKind
+}
+
 type Manifest = {
 	gameVersions: ManifestGameVersion[]
 }
@@ -121,6 +130,7 @@ type AppSettings = {
 	memory: MemorySettings
 	force_fullscreen: boolean
 	game_resolution: [number, number]
+	file_links: FileLink[]
 	hide_on_process_start: boolean
 	hooks: Hooks
 

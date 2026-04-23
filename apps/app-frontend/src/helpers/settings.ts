@@ -5,7 +5,7 @@
  */
 import { invoke } from '@tauri-apps/api/core'
 
-import type { Hooks, MemorySettings, WindowSize } from '@/helpers/types'
+import type { FileLink, Hooks, MemorySettings, WindowSize } from '@/helpers/types'
 import type { ColorTheme, FeatureFlag } from '@/store/theme.ts'
 
 // Settings object
@@ -55,6 +55,7 @@ export type AppSettings = {
 	memory: MemorySettings
 	force_fullscreen: boolean
 	game_resolution: WindowSize
+	file_links: FileLink[]
 	hide_on_process_start: boolean
 	hooks: Hooks
 

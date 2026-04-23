@@ -63,6 +63,7 @@ where
         settings.onboarded = legacy_settings.fully_onboarded;
         settings.extra_launch_args = legacy_settings.custom_java_args;
         settings.custom_env_vars = legacy_settings.custom_env_args;
+        settings.file_links = Vec::new();
         settings.memory.maximum = legacy_settings.memory.maximum;
         settings.force_fullscreen = legacy_settings.force_fullscreen;
         settings.game_resolution.0 = legacy_settings.game_resolution.0;
@@ -319,6 +320,7 @@ where
                         .loader_version
                         .map(|x| x.id),
                     groups: profile.metadata.groups,
+                    file_links: Vec::new(),
                     linked_data: profile.metadata.linked_data.and_then(|x| {
                         if let Some(project_id) = x.project_id
                             && let Some(version_id) = x.version_id

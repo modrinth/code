@@ -9,8 +9,8 @@ use crate::pack::install_from::{
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, ContentItem, Credentials, Dependency,
-    JavaVersion, LinkedModpackInfo, ProcessMetadata, ProfileFile,
-    ProfileInstallStage, ProjectType, SideType,
+    FileLink, FileLinkKind, JavaVersion, LinkedModpackInfo, ProcessMetadata,
+    ProfileFile, ProfileInstallStage, ProjectType, SideType,
 };
 
 use crate::event::{ProfilePayloadType, emit::emit_profile};
@@ -32,6 +32,7 @@ use dashmap::DashMap;
 use std::iter::FromIterator;
 use std::{
     future::Future,
+    fs::Metadata,
     path::{Path, PathBuf},
     sync::Arc,
 };
@@ -226,6 +227,372 @@ pub async fn get_mod_full_path(
     let path = get_full_path(profile_path).await?;
 
     Ok(path.join(project_path))
+}
+
+fn normalize_profile_link_path(path: &str) -> crate::Result<String> {
+    let trimmed = path.trim().replace('\\', "/");
+    let without_dot = trimmed.trim_start_matches("./");
+
+    let mut parts = Vec::new();
+    for part in without_dot.split('/') {
+        if part.is_empty() || part == "." {
+            continue;
+        }
+        if part == ".." {
+            return Err(
+                crate::ErrorKind::InputError(format!(
+                    "Profile link path '{path}' cannot contain '..'"
+                ))
+                .as_error(),
+            );
+        }
+        parts.push(part);
+    }
+
+    if parts.is_empty() {
+        return Err(
+            crate::ErrorKind::InputError(
+                "Profile link path cannot be empty".to_string(),
+            )
+            .as_error(),
+        );
+    }
+
+    Ok(parts.join("/"))
+}
+
+fn resolve_profile_link_source(
+    profile_root: &Path,
+    relative_path: &str,
+) -> crate::Result<PathBuf> {
+    let mut source = profile_root.to_path_buf();
+    for component in Path::new(relative_path).components() {
+        match component {
+            std::path::Component::Normal(part) => source.push(part),
+            _ => {
+                return Err(
+                    crate::ErrorKind::InputError(format!(
+                        "Invalid profile link path '{relative_path}'"
+                    ))
+                    .as_error(),
+                )
+            }
+        }
+    }
+    Ok(source)
+}
+
+pub fn normalize_file_links(
+    profile_root: &Path,
+    file_links: Vec<FileLink>,
+) -> crate::Result<Vec<FileLink>> {
+    let mut normalized_links = Vec::with_capacity(file_links.len());
+    let mut seen_paths = std::collections::HashSet::new();
+
+    for file_link in file_links {
+        let normalized_path = normalize_profile_link_path(&file_link.path)?;
+        if !seen_paths.insert(normalized_path.clone()) {
+            return Err(
+                crate::ErrorKind::InputError(format!(
+                    "Duplicate file link path '{normalized_path}'"
+                ))
+                .as_error(),
+            );
+        }
+
+        let target = PathBuf::from(file_link.target.trim());
+        if !target.is_absolute() {
+            return Err(
+                crate::ErrorKind::InputError(format!(
+                    "File link target '{}' must be an absolute path",
+                    file_link.target
+                ))
+                .as_error(),
+            );
+        }
+
+        let metadata = std::fs::metadata(&target)
+            .map_err(|e| crate::Error::from(IOError::with_path(e, &target)))?;
+        match file_link.kind {
+            FileLinkKind::Directory if !metadata.is_dir() => {
+                return Err(
+                    crate::ErrorKind::InputError(format!(
+                        "Target '{}' must be a directory",
+                        target.display()
+                    ))
+                    .as_error(),
+                )
+            }
+            FileLinkKind::File if !metadata.is_file() => {
+                return Err(
+                    crate::ErrorKind::InputError(format!(
+                        "Target '{}' must be a file",
+                        target.display()
+                    ))
+                    .as_error(),
+                )
+            }
+            _ => {}
+        }
+
+        let canonical_target =
+            io::canonicalize(&target).map_err(crate::Error::from)?;
+        if canonical_target.starts_with(profile_root) {
+            return Err(
+                crate::ErrorKind::InputError(format!(
+                    "Target '{}' cannot point inside the instance directory",
+                    canonical_target.display()
+                ))
+                .as_error(),
+            );
+        }
+
+        normalized_links.push(FileLink {
+            path: normalized_path,
+            target: canonical_target.to_string_lossy().to_string(),
+            kind: file_link.kind,
+        });
+    }
+
+    Ok(normalized_links)
+}
+
+async fn remove_link_path(path: &Path, kind: FileLinkKind) -> crate::Result<()> {
+    let remove_dir_result = tokio::fs::remove_dir(path)
+        .await
+        .map_err(|e| IOError::with_path(e, path));
+    let remove_file_result = tokio::fs::remove_file(path)
+        .await
+        .map_err(|e| IOError::with_path(e, path));
+
+    match kind {
+        FileLinkKind::Directory => {
+            if remove_dir_result.is_ok() || remove_file_result.is_ok() {
+                Ok(())
+            } else {
+                Err(crate::Error::from(
+                    remove_dir_result.err().unwrap_or_else(|| {
+                        remove_file_result.err().expect("remove result missing")
+                    }),
+                ))
+            }
+        }
+        FileLinkKind::File => {
+            if remove_file_result.is_ok() || remove_dir_result.is_ok() {
+                Ok(())
+            } else {
+                Err(crate::Error::from(
+                    remove_file_result.err().unwrap_or_else(|| {
+                        remove_dir_result.err().expect("remove result missing")
+                    }),
+                ))
+            }
+        }
+    }
+}
+
+fn is_removable_link_metadata(metadata: &Metadata, kind: FileLinkKind) -> bool {
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::MetadataExt;
+
+        const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x0400;
+        let is_reparse_point =
+            metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0;
+
+        return match kind {
+            FileLinkKind::Directory => is_reparse_point && metadata.is_dir(),
+            FileLinkKind::File => is_reparse_point && metadata.is_file(),
+        };
+    }
+
+    #[cfg(not(windows))]
+    {
+        let _ = kind;
+        metadata.file_type().is_symlink()
+    }
+}
+
+#[cfg(windows)]
+fn create_directory_junction(
+    source: &Path,
+    target: &Path,
+) -> crate::Result<()> {
+    let shell = std::env::var_os("ComSpec").unwrap_or("cmd.exe".into());
+    let output = std::process::Command::new(shell)
+        .arg("/C")
+        .arg("mklink")
+        .arg("/J")
+        .arg(source)
+        .arg(target)
+        .output()
+        .map_err(|e| crate::Error::from(IOError::with_path(e, source)))?;
+
+    if output.status.success() {
+        return Ok(());
+    }
+
+    let details = String::from_utf8_lossy(&output.stderr).trim().to_string();
+    let fallback_details =
+        String::from_utf8_lossy(&output.stdout).trim().to_string();
+    let message = if details.is_empty() {
+        fallback_details
+    } else {
+        details
+    };
+
+    Err(
+        crate::ErrorKind::OtherError(format!(
+            "Windows could not create a folder link at '{}': {}",
+            source.display(),
+            message
+        ))
+        .as_error(),
+    )
+}
+
+async fn create_link(
+    source: PathBuf,
+    target: PathBuf,
+    kind: FileLinkKind,
+) -> crate::Result<()> {
+    tokio::task::spawn_blocking(move || -> crate::Result<()> {
+        #[cfg(windows)]
+        {
+            let create_result = match kind {
+                FileLinkKind::Directory => {
+                    std::os::windows::fs::symlink_dir(&target, &source)
+                }
+                FileLinkKind::File => {
+                    std::os::windows::fs::symlink_file(&target, &source)
+                }
+            };
+
+            if let Err(err) = create_result {
+                if err.raw_os_error() == Some(1314) {
+                    match kind {
+                        FileLinkKind::Directory => {
+                            create_directory_junction(&source, &target)?;
+                        }
+                        FileLinkKind::File => {
+                            return Err(
+                                crate::ErrorKind::OtherError(format!(
+                                    "Windows blocked creation of a file link at '{}'. File links to files require Developer Mode or an elevated app session.",
+                                    source.display()
+                                ))
+                                .as_error(),
+                            );
+                        }
+                    }
+                } else {
+                    return Err(crate::Error::from(IOError::with_path(
+                        err, &source,
+                    )));
+                }
+            }
+        }
+
+        #[cfg(unix)]
+        {
+            std::os::unix::fs::symlink(&target, &source)
+                .map_err(|e| crate::Error::from(IOError::with_path(e, &source)))?;
+        }
+
+        Ok(())
+    })
+    .await
+    .map_err(|_| crate::Error::from(std::io::Error::other("background task failed")))??;
+
+    Ok(())
+}
+
+pub async fn reconcile_file_links(
+    profile_root: &Path,
+    current_links: &[FileLink],
+    requested_links: &[FileLink],
+) -> crate::Result<()> {
+    for current in current_links {
+        if requested_links
+            .iter()
+            .any(|candidate| candidate.path == current.path)
+        {
+            continue;
+        }
+
+        let source = resolve_profile_link_source(profile_root, &current.path)?;
+        if let Ok(metadata) = std::fs::symlink_metadata(&source)
+            && is_removable_link_metadata(&metadata, current.kind)
+        {
+            remove_link_path(&source, current.kind).await?;
+        }
+    }
+
+    for requested in requested_links {
+        let source =
+            resolve_profile_link_source(profile_root, &requested.path)?;
+
+        if let Some(parent) = source.parent() {
+            tokio::fs::create_dir_all(parent)
+                .await
+                .map_err(|e| crate::Error::from(IOError::with_path(e, parent)))?;
+        }
+
+        match std::fs::symlink_metadata(&source) {
+            Ok(metadata)
+                if is_removable_link_metadata(&metadata, requested.kind) =>
+            {
+                remove_link_path(&source, requested.kind).await?;
+            }
+            Ok(_) => {
+                return Err(
+                    crate::ErrorKind::InputError(format!(
+                        "Cannot create a file link at '{}' because that path already exists in the instance",
+                        requested.path
+                    ))
+                    .as_error(),
+                )
+            }
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => {}
+            Err(err) => {
+                return Err(crate::Error::from(IOError::with_path(err, &source)))
+            }
+        }
+
+        create_link(source, PathBuf::from(&requested.target), requested.kind)
+            .await?;
+    }
+
+    Ok(())
+}
+
+pub async fn set_file_links(
+    path: &str,
+    file_links: Vec<FileLink>,
+) -> crate::Result<Vec<FileLink>> {
+    let profile_root = get_full_path(path).await?;
+    let normalized_links = normalize_file_links(&profile_root, file_links)?;
+
+    let current_links = get(path)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(path.to_string()).as_error()
+        })?
+        .file_links;
+
+    reconcile_file_links(&profile_root, &current_links, &normalized_links)
+        .await?;
+
+    let saved_links = normalized_links.clone();
+    edit(path, move |prof| {
+        let saved_links = saved_links.clone();
+        prof.file_links = saved_links;
+        prof.modified = chrono::Utc::now();
+
+        async { Ok(()) }
+    })
+    .await?;
+
+    Ok(normalized_links)
 }
 
 /// Edit a profile using a given asynchronous closure

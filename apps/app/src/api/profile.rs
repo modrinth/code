@@ -4,7 +4,7 @@ use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use theseus::data::{ContentItem, Dependency, LinkedModpackInfo};
+use theseus::data::{ContentItem, Dependency, FileLink, LinkedModpackInfo};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
 use theseus::server_address::ServerAddress;
@@ -39,12 +39,14 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_run,
             profile_kill,
             profile_edit,
+            profile_set_file_links,
             profile_edit_icon,
             profile_export_mrpack,
             profile_get_pack_export_candidates,
         ])
         .build()
 }
+
 
 // Remove a profile
 // invoke('plugin:profile|profile_add_path',path)
@@ -481,6 +483,14 @@ pub async fn profile_edit(path: &str, edit_profile: EditProfile) -> Result<()> {
     .await?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn profile_set_file_links(
+    path: &str,
+    file_links: Vec<FileLink>,
+) -> Result<Vec<FileLink>> {
+    Ok(profile::set_file_links(path, file_links).await?)
 }
 
 // Edits a profile's icon

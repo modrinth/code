@@ -25,6 +25,7 @@ pub async fn profile_create(
     icon_path: Option<String>,      // the icon for the profile
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
+    apply_default_file_links: Option<bool>,
 ) -> crate::Result<String> {
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
@@ -82,6 +83,7 @@ pub async fn profile_create(
         loader: modloader,
         loader_version: loader.map(|x| x.id),
         groups: Vec::new(),
+        file_links: Vec::new(),
         linked_data,
         created: Utc::now(),
         modified: Utc::now(),
@@ -138,6 +140,23 @@ pub async fn profile_create(
         )
         .await;
 
+        if apply_default_file_links.unwrap_or(true) {
+            let settings = crate::settings::get().await?;
+            if !settings.file_links.is_empty() {
+                let normalized_links = profile::normalize_file_links(
+                    &full_path,
+                    settings.file_links,
+                )?;
+                profile::reconcile_file_links(
+                    &full_path,
+                    &[],
+                    &normalized_links,
+                )
+                .await?;
+                profile.file_links = normalized_links;
+            }
+        }
+
         profile.upsert(&state.pool).await?;
 
         emit_profile(&profile.path, ProfilePayloadType::Created).await?;
@@ -176,6 +195,7 @@ pub async fn profile_create_from_duplicate(
         profile.icon_path.clone(),
         profile.linked_data.clone(),
         Some(true),
+        Some(false),
     )
     .await?;
 

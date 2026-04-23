@@ -30,6 +30,7 @@ pub async fn profile_create(
         icon,
         linked_data,
         skip_install,
+        None,
     )
     .await?;
     Ok(res)
