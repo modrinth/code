@@ -279,23 +279,23 @@ pub async fn index_local(
         if count % 1000 == 0 {
             info!("projects index prog: {count}/{total_len}");
         }
-        let ProjectOwner {
-            username,
-            user_id,
-            org_name,
-            org_id,
-        } = match mods_org_owners
+        let Some((
+            _,
+            ProjectOwner {
+                username,
+                user_id,
+                org_name,
+                org_id,
+            },
+        )) = mods_org_owners
             .remove(&project.id)
             .or_else(|| mods_team_owners.remove(&project.id))
-        {
-            Some((_, owner)) => owner,
-            None => {
-                warn!(
-                    "org owner not found for project {} id: {}!",
-                    project.name, project.id.0
-                );
-                continue;
-            }
+        else {
+            warn!(
+                "org owner not found for project {} id: {}!",
+                project.name, project.id.0
+            );
+            continue;
         };
 
         let license = match project.license.split(' ').next() {
