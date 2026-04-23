@@ -26,6 +26,26 @@ export type {
 
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
 
+const ANALYTICS_DASHBOARD_STAT_ORDER: AnalyticsDashboardStat[] = [
+	'views',
+	'downloads',
+	'revenue',
+	'playtime',
+]
+
+const ANALYTICS_RELEVANT_STATS_BY_BREAKDOWN: Record<
+	AnalyticsBreakdownPreset,
+	readonly AnalyticsDashboardStat[]
+> = {
+	none: ANALYTICS_DASHBOARD_STAT_ORDER,
+	country: ['views', 'downloads'],
+	monetization: ['views'],
+	download_source: ['downloads'],
+	download_type: ['downloads', 'playtime'],
+	loader: ['playtime'],
+	game_version: ['playtime'],
+}
+
 export interface AnalyticsDashboardProject {
 	id: string
 	name: string
@@ -61,6 +81,13 @@ export interface AnalyticsDashboardContextValue {
 	currentTotals: ComputedRef<AnalyticsDashboardTotals>
 	previousTotals: ComputedRef<AnalyticsDashboardTotals>
 	percentChanges: ComputedRef<AnalyticsDashboardPercentChanges>
+	getRelevantAnalyticsDashboardStats: (
+		breakdown: AnalyticsBreakdownPreset,
+	) => readonly AnalyticsDashboardStat[]
+	isAnalyticsDashboardStatRelevant: (
+		stat: AnalyticsDashboardStat,
+		breakdown: AnalyticsBreakdownPreset,
+	) => boolean
 	setFetchRequest: (fetchRequest: Labrinth.Analytics.v3.FetchRequest) => void
 	setActiveStat: (stat: AnalyticsDashboardStat) => void
 }
@@ -209,6 +236,34 @@ export function createAnalyticsDashboardContext(
 	})
 
 	const availableProjectIds = computed(() => projects.value.map((project) => project.id))
+
+	function getRelevantAnalyticsDashboardStats(
+		breakdown: AnalyticsBreakdownPreset,
+	): readonly AnalyticsDashboardStat[] {
+		return ANALYTICS_RELEVANT_STATS_BY_BREAKDOWN[breakdown] ?? ANALYTICS_DASHBOARD_STAT_ORDER
+	}
+
+	function isAnalyticsDashboardStatRelevant(
+		stat: AnalyticsDashboardStat,
+		breakdown: AnalyticsBreakdownPreset,
+	): boolean {
+		return getRelevantAnalyticsDashboardStats(breakdown).includes(stat)
+	}
+
+	watch(
+		[selectedBreakdown, activeStat],
+		([nextBreakdown, nextActiveStat]) => {
+			if (isAnalyticsDashboardStatRelevant(nextActiveStat, nextBreakdown)) {
+				return
+			}
+
+			const fallbackStat = getRelevantAnalyticsDashboardStats(nextBreakdown)[0]
+			if (fallbackStat && fallbackStat !== nextActiveStat) {
+				activeStat.value = fallbackStat
+			}
+		},
+		{ immediate: true },
+	)
 
 	watch(
 		projects,
@@ -361,6 +416,10 @@ export function createAnalyticsDashboardContext(
 	}
 
 	function setActiveStat(nextStat: AnalyticsDashboardStat) {
+		if (!isAnalyticsDashboardStatRelevant(nextStat, selectedBreakdown.value)) {
+			return
+		}
+
 		activeStat.value = nextStat
 	}
 
@@ -380,6 +439,8 @@ export function createAnalyticsDashboardContext(
 		currentTotals,
 		previousTotals,
 		percentChanges,
+		getRelevantAnalyticsDashboardStats,
+		isAnalyticsDashboardStatRelevant,
 		setFetchRequest,
 		setActiveStat,
 	}

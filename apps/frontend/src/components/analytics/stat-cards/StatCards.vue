@@ -8,6 +8,7 @@
 			:vs-prev-period-percent="card.vsPrevPeriodPercent"
 			:icon="card.icon"
 			:active="analyticsDashboardContext.activeStat.value === card.key"
+			:disabled="card.disabled"
 			@click="analyticsDashboardContext.setActiveStat(card.key)"
 		/>
 	</div>
@@ -57,6 +58,7 @@ const statCards = computed<
 		statLabel: string
 		vsPrevPeriodPercent: string
 		icon: string
+		disabled: boolean
 	}[]
 >(() => [
 	{
@@ -65,6 +67,10 @@ const statCards = computed<
 		statLabel: formatStatNumber(analyticsDashboardContext.currentTotals.value.views),
 		vsPrevPeriodPercent: formatPercent(analyticsDashboardContext.percentChanges.value.views),
 		icon: 'eye',
+		disabled: !analyticsDashboardContext.isAnalyticsDashboardStatRelevant(
+			'views',
+			analyticsDashboardContext.selectedBreakdown.value,
+		),
 	},
 	{
 		key: 'downloads',
@@ -72,6 +78,10 @@ const statCards = computed<
 		statLabel: formatStatNumber(analyticsDashboardContext.currentTotals.value.downloads),
 		vsPrevPeriodPercent: formatPercent(analyticsDashboardContext.percentChanges.value.downloads),
 		icon: 'download',
+		disabled: !analyticsDashboardContext.isAnalyticsDashboardStatRelevant(
+			'downloads',
+			analyticsDashboardContext.selectedBreakdown.value,
+		),
 	},
 	{
 		key: 'revenue',
@@ -79,6 +89,10 @@ const statCards = computed<
 		statLabel: `$${formatStatNumber(analyticsDashboardContext.currentTotals.value.revenue)}`,
 		vsPrevPeriodPercent: formatPercent(analyticsDashboardContext.percentChanges.value.revenue),
 		icon: 'dollar',
+		disabled: !analyticsDashboardContext.isAnalyticsDashboardStatRelevant(
+			'revenue',
+			analyticsDashboardContext.selectedBreakdown.value,
+		),
 	},
 	{
 		key: 'playtime',
@@ -86,6 +100,10 @@ const statCards = computed<
 		statLabel: `${formatStatNumber(analyticsDashboardContext.currentTotals.value.playtime / 3600)} hrs`,
 		vsPrevPeriodPercent: formatPercent(analyticsDashboardContext.percentChanges.value.playtime),
 		icon: 'clock',
+		disabled: !analyticsDashboardContext.isAnalyticsDashboardStatRelevant(
+			'playtime',
+			analyticsDashboardContext.selectedBreakdown.value,
+		),
 	},
 ])
 </script>
