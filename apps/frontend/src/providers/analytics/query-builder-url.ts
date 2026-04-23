@@ -63,7 +63,14 @@ const TIMEFRAME_PRESET_VALUES: AnalyticsTimeframePreset[] = [
 	'all_time',
 ]
 
-const GROUP_BY_PRESET_VALUES: AnalyticsGroupByPreset[] = ['1h', '6h', 'day', 'week', 'month', 'year']
+const GROUP_BY_PRESET_VALUES: AnalyticsGroupByPreset[] = [
+	'1h',
+	'6h',
+	'day',
+	'week',
+	'month',
+	'year',
+]
 
 const BREAKDOWN_PRESET_VALUES: AnalyticsBreakdownPreset[] = [
 	'none',
@@ -180,7 +187,10 @@ function normalizeQueryValue(
 	if (value === undefined || value === null) return []
 	if (Array.isArray(value)) {
 		return value
-			.filter((item): item is LocationQueryValue | LocationQueryValueRaw => item !== undefined && item !== null)
+			.filter(
+				(item): item is LocationQueryValue | LocationQueryValueRaw =>
+					item !== undefined && item !== null,
+			)
 			.map((item) => String(item))
 	}
 	return [String(value)]
@@ -280,10 +290,7 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 		...currentRouteQuery,
 	} as MutableRouteQuery
 
-	const projectIdsQueryValue = areAllProjectsSelected(
-		state.selectedProjectIds,
-		availableProjectIds,
-	)
+	const projectIdsQueryValue = areAllProjectsSelected(state.selectedProjectIds, availableProjectIds)
 		? undefined
 		: serializeListQueryValue(state.selectedProjectIds)
 

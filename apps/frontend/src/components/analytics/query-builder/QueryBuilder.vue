@@ -472,7 +472,8 @@ watch(
 			return
 		}
 
-		const fallbackOption = [...nextOptions].reverse().find((option) => !option.disabled) ?? nextOptions[0]
+		const fallbackOption =
+			[...nextOptions].reverse().find((option) => !option.disabled) ?? nextOptions[0]
 		if (fallbackOption && selectedGroupBy.value !== fallbackOption.value) {
 			selectedGroupBy.value = fallbackOption.value
 		}

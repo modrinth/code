@@ -290,13 +290,17 @@ export function createAnalyticsDashboardContext(
 		{ deep: true, immediate: true },
 	)
 
-	const { data: currentTimeSliceData, isPending: currentTimeSlicePending, isFetching: currentFetching } =
-		useQuery({
-			queryKey: computed(() => ['analytics', 'dashboard', 'current', fetchRequest.value]),
-			queryFn: () => client.labrinth.analytics_v3.fetch(fetchRequest.value as Labrinth.Analytics.v3.FetchRequest),
-			enabled: computed(() => fetchRequest.value !== null),
-			placeholderData: [],
-		})
+	const {
+		data: currentTimeSliceData,
+		isPending: currentTimeSlicePending,
+		isFetching: currentFetching,
+	} = useQuery({
+		queryKey: computed(() => ['analytics', 'dashboard', 'current', fetchRequest.value]),
+		queryFn: () =>
+			client.labrinth.analytics_v3.fetch(fetchRequest.value as Labrinth.Analytics.v3.FetchRequest),
+		enabled: computed(() => fetchRequest.value !== null),
+		placeholderData: [],
+	})
 
 	const previousFetchRequest = computed(() => buildPreviousFetchRequest(fetchRequest.value))
 

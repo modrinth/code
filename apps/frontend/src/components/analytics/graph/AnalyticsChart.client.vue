@@ -91,11 +91,7 @@ function buildDatasets() {
 			}
 		}
 
-		const lineFill: 'origin' | '-1' | false = props.fill
-			? index === 0
-				? 'origin'
-				: '-1'
-			: false
+		const lineFill: 'origin' | '-1' | false = props.fill ? (index === 0 ? 'origin' : '-1') : false
 
 		return {
 			...common,
