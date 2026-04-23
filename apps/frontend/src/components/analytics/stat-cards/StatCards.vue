@@ -7,9 +7,9 @@
 			:stat-label="card.statLabel"
 			:vs-prev-period-percent="card.vsPrevPeriodPercent"
 			:icon="card.icon"
-			:active="analyticsDashboardContext.activeStat.value === card.key"
+			:active="activeStat === card.key"
 			:disabled="card.disabled"
-			@click="analyticsDashboardContext.setActiveStat(card.key)"
+			@click="setActiveStat(card.key)"
 		/>
 	</div>
 </template>
@@ -24,7 +24,14 @@ import {
 
 import StatCard from './StatCard.vue'
 
-const analyticsDashboardContext = injectAnalyticsDashboardContext()
+const {
+	activeStat,
+	setActiveStat,
+	currentTotals,
+	percentChanges,
+	selectedBreakdown,
+	isAnalyticsDashboardStatRelevant,
+} = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 
 const compactNumberFormatter = computed(
@@ -64,46 +71,34 @@ const statCards = computed<
 	{
 		key: 'views',
 		label: 'Views',
-		statLabel: formatStatNumber(analyticsDashboardContext.currentTotals.value.views),
-		vsPrevPeriodPercent: formatPercent(analyticsDashboardContext.percentChanges.value.views),
+		statLabel: formatStatNumber(currentTotals.value.views),
+		vsPrevPeriodPercent: formatPercent(percentChanges.value.views),
 		icon: 'eye',
-		disabled: !analyticsDashboardContext.isAnalyticsDashboardStatRelevant(
-			'views',
-			analyticsDashboardContext.selectedBreakdown.value,
-		),
+		disabled: !isAnalyticsDashboardStatRelevant('views', selectedBreakdown.value),
 	},
 	{
 		key: 'downloads',
 		label: 'Downloads',
-		statLabel: formatStatNumber(analyticsDashboardContext.currentTotals.value.downloads),
-		vsPrevPeriodPercent: formatPercent(analyticsDashboardContext.percentChanges.value.downloads),
+		statLabel: formatStatNumber(currentTotals.value.downloads),
+		vsPrevPeriodPercent: formatPercent(percentChanges.value.downloads),
 		icon: 'download',
-		disabled: !analyticsDashboardContext.isAnalyticsDashboardStatRelevant(
-			'downloads',
-			analyticsDashboardContext.selectedBreakdown.value,
-		),
+		disabled: !isAnalyticsDashboardStatRelevant('downloads', selectedBreakdown.value),
 	},
 	{
 		key: 'revenue',
 		label: 'Revenue',
-		statLabel: `$${formatStatNumber(analyticsDashboardContext.currentTotals.value.revenue)}`,
-		vsPrevPeriodPercent: formatPercent(analyticsDashboardContext.percentChanges.value.revenue),
+		statLabel: `$${formatStatNumber(currentTotals.value.revenue)}`,
+		vsPrevPeriodPercent: formatPercent(percentChanges.value.revenue),
 		icon: 'dollar',
-		disabled: !analyticsDashboardContext.isAnalyticsDashboardStatRelevant(
-			'revenue',
-			analyticsDashboardContext.selectedBreakdown.value,
-		),
+		disabled: !isAnalyticsDashboardStatRelevant('revenue', selectedBreakdown.value),
 	},
 	{
 		key: 'playtime',
 		label: 'Playtime',
-		statLabel: `${formatStatNumber(analyticsDashboardContext.currentTotals.value.playtime / 3600)} hrs`,
-		vsPrevPeriodPercent: formatPercent(analyticsDashboardContext.percentChanges.value.playtime),
+		statLabel: `${formatStatNumber(currentTotals.value.playtime / 3600)} hrs`,
+		vsPrevPeriodPercent: formatPercent(percentChanges.value.playtime),
 		icon: 'clock',
-		disabled: !analyticsDashboardContext.isAnalyticsDashboardStatRelevant(
-			'playtime',
-			analyticsDashboardContext.selectedBreakdown.value,
-		),
+		disabled: !isAnalyticsDashboardStatRelevant('playtime', selectedBreakdown.value),
 	},
 ])
 </script>

@@ -59,7 +59,13 @@
 				<span class="text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown="{ value }">
-				<span class="capitalize text-primary">{{ value }}</span>
+				<span
+					class="text-primary"
+					:class="{
+						capitalize: selectedBreakdown === 'monetization',
+					}"
+					>{{ value }}</span
+				>
 			</template>
 			<template #cell-views="{ row }">
 				<span>{{ formatInteger(row.views) }}</span>
@@ -108,16 +114,15 @@ type AnalyticsTableRow = {
 	playtime: number
 }
 
-const analyticsDashboardContext = injectAnalyticsDashboardContext()
+const { selectedProjectIds, selectedGroupBy, selectedBreakdown, fetchRequest, timeSlices } =
+	injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 
 const tableMode = ref<TableMode>('date_breakdown')
 const sortColumn = ref<TableColumnKey | undefined>('date')
 const sortDirection = ref<SortDirection>('asc')
 
-const showBreakdownOnlyMode = computed(
-	() => analyticsDashboardContext.selectedProjectIds.value.length > 1,
-)
+const showBreakdownOnlyMode = computed(() => selectedProjectIds.value.length > 1)
 
 watch(
 	showBreakdownOnlyMode,
@@ -136,28 +141,24 @@ watch(tableMode, (nextMode) => {
 	}
 })
 
-const selectedProjectIdSet = computed(
-	() => new Set(analyticsDashboardContext.selectedProjectIds.value),
-)
+const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 
-const showTimeInBucketLabel = computed(() =>
-	isTimeRelevantForGroupBy(analyticsDashboardContext.selectedGroupBy.value),
-)
+const showTimeInBucketLabel = computed(() => isTimeRelevantForGroupBy(selectedGroupBy.value))
 
 const tableRows = computed<AnalyticsTableRow[]>(() => {
-	const fetchRequest = analyticsDashboardContext.fetchRequest.value
-	const timeSlices = analyticsDashboardContext.timeSlices.value
-	const selectedBreakdown = analyticsDashboardContext.selectedBreakdown.value
+	const nextFetchRequest = fetchRequest.value
+	const nextTimeSlices = timeSlices.value
+	const nextSelectedBreakdown = selectedBreakdown.value
 
-	if (!fetchRequest || timeSlices.length === 0 || selectedProjectIdSet.value.size === 0) {
+	if (!nextFetchRequest || nextTimeSlices.length === 0 || selectedProjectIdSet.value.size === 0) {
 		return []
 	}
 
 	const nextRows = new Map<string, AnalyticsTableRow>()
-	const sliceCount = getSliceCount(fetchRequest.time_range, timeSlices.length)
+	const sliceCount = getSliceCount(nextFetchRequest.time_range, nextTimeSlices.length)
 
-	timeSlices.forEach((slice, sliceIndex) => {
-		const bucketRange = getSliceBucketRange(fetchRequest.time_range, sliceCount, sliceIndex)
+	nextTimeSlices.forEach((slice, sliceIndex) => {
+		const bucketRange = getSliceBucketRange(nextFetchRequest.time_range, sliceCount, sliceIndex)
 		const dateMs = bucketRange.end.getTime()
 		const dateLabel = formatBucketEndLabel(bucketRange.end, showTimeInBucketLabel.value)
 
@@ -170,7 +171,7 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 				continue
 			}
 
-			const breakdown = getBreakdownValue(point, selectedBreakdown)
+			const breakdown = getBreakdownValue(point, nextSelectedBreakdown)
 			const rowId = tableMode.value === 'date_breakdown' ? `${dateMs}::${breakdown}` : breakdown
 
 			let row = nextRows.get(rowId)

@@ -161,13 +161,15 @@ const MIN_RANGE_MS = 60 * 60 * 1000
 const MAX_TIME_SLICES = 1024
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 
-const analyticsDashboardContext = injectAnalyticsDashboardContext()
-const projects = computed(() => analyticsDashboardContext.projects.value)
-const selectedProjectIds = analyticsDashboardContext.selectedProjectIds
-const selectedTimeframe = analyticsDashboardContext.selectedTimeframe
-const selectedGroupBy = analyticsDashboardContext.selectedGroupBy
-const selectedBreakdown = analyticsDashboardContext.selectedBreakdown
-const selectedFilters = analyticsDashboardContext.selectedFilters
+const {
+	projects,
+	selectedProjectIds,
+	selectedTimeframe,
+	selectedGroupBy,
+	selectedBreakdown,
+	selectedFilters,
+	setFetchRequest,
+} = injectAnalyticsDashboardContext()
 
 const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 	projects.value.map((project) => ({
@@ -600,7 +602,7 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 watch(
 	fetchRequest,
 	(nextFetchRequest) => {
-		analyticsDashboardContext.setFetchRequest(nextFetchRequest)
+		setFetchRequest(nextFetchRequest)
 	},
 	{ deep: true, immediate: true },
 )

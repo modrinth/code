@@ -57,7 +57,7 @@
 						:stacked="isStacked"
 						:datasets="chartDatasets"
 						:labels="chartLabels"
-						:active-stat="analyticsDashboardContext.activeStat.value"
+						:active-stat="activeStat"
 						@hover="onChartHover"
 					/>
 				</ClientOnly>
@@ -95,7 +95,15 @@ import {
 
 type ViewMode = 'line' | 'area' | 'bar'
 
-const analyticsDashboardContext = injectAnalyticsDashboardContext()
+const {
+	activeStat,
+	selectedProjectIds,
+	projects,
+	fetchRequest,
+	timeSlices,
+	selectedGroupBy,
+	selectedBreakdown,
+} = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 
 const activeViewMode = ref<ViewMode>('line')
@@ -119,48 +127,46 @@ const titleByStat: Record<AnalyticsDashboardStat, string> = {
 	playtime: 'Playtime Over Time',
 }
 
-const selectedProjectIdSet = computed(
-	() => new Set(analyticsDashboardContext.selectedProjectIds.value),
-)
+const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 
 const selectedProjects = computed(() =>
-	analyticsDashboardContext.projects.value.filter((project) =>
-		selectedProjectIdSet.value.has(project.id),
-	),
+	projects.value.filter((project) => selectedProjectIdSet.value.has(project.id)),
 )
 
 const legendPalette = ['#00D084', '#A78BFA', '#F59E0B', '#38BDF8', '#FB7185', '#34D399']
 
-const graphTitle = computed(() => titleByStat[analyticsDashboardContext.activeStat.value])
+const graphTitle = computed(() => titleByStat[activeStat.value])
 
 const chartType = computed<'line' | 'bar'>(() => (activeViewMode.value === 'bar' ? 'bar' : 'line'))
 const isArea = computed(() => activeViewMode.value === 'area')
 const isStacked = computed(() => activeViewMode.value === 'area' || activeViewMode.value === 'bar')
 
 const sliceCount = computed(() => {
-	const fetchRequest = analyticsDashboardContext.fetchRequest.value
-	const fallback = analyticsDashboardContext.timeSlices.value.length
-	if (!fetchRequest) return Math.max(1, fallback)
-	return getSliceCount(fetchRequest.time_range, fallback)
+	const nextFetchRequest = fetchRequest.value
+	const fallback = timeSlices.value.length
+	if (!nextFetchRequest) return Math.max(1, fallback)
+	return getSliceCount(nextFetchRequest.time_range, fallback)
 })
 
-const showTimeInBucketLabel = computed(() =>
-	isTimeRelevantForGroupBy(analyticsDashboardContext.selectedGroupBy.value),
-)
+const showTimeInBucketLabel = computed(() => isTimeRelevantForGroupBy(selectedGroupBy.value))
 
 const chartLabels = computed(() => {
-	const fetchRequest = analyticsDashboardContext.fetchRequest.value
-	if (!fetchRequest) return []
-	return buildTimeAxisLabels(fetchRequest.time_range, sliceCount.value, showTimeInBucketLabel.value)
+	const nextFetchRequest = fetchRequest.value
+	if (!nextFetchRequest) return []
+	return buildTimeAxisLabels(
+		nextFetchRequest.time_range,
+		sliceCount.value,
+		showTimeInBucketLabel.value,
+	)
 })
 
 const chartDatasets = computed(() =>
 	buildChartDatasets(
-		analyticsDashboardContext.timeSlices.value,
+		timeSlices.value,
 		selectedProjects.value,
-		analyticsDashboardContext.activeStat.value,
+		activeStat.value,
 		legendPalette,
-		analyticsDashboardContext.selectedBreakdown.value,
+		selectedBreakdown.value,
 	),
 )
 
@@ -219,9 +225,9 @@ watch([chartLabels, chartDatasets], () => {
 })
 
 const hoverBucketRange = computed(() => {
-	const fetchRequest = analyticsDashboardContext.fetchRequest.value
-	if (!fetchRequest || hoverState.sliceIndex === null) return null
-	return getSliceBucketRange(fetchRequest.time_range, sliceCount.value, hoverState.sliceIndex)
+	const nextFetchRequest = fetchRequest.value
+	if (!nextFetchRequest || hoverState.sliceIndex === null) return null
+	return getSliceBucketRange(nextFetchRequest.time_range, sliceCount.value, hoverState.sliceIndex)
 })
 
 const hoverRangeLabel = computed(() => {
@@ -238,7 +244,7 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 		color: dataset.borderColor,
 		formattedValue: formatMetricValue(
 			dataset.data[sliceIndex] ?? 0,
-			analyticsDashboardContext.activeStat.value,
+			activeStat.value,
 			formatNumber,
 		),
 	}))
