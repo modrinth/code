@@ -53,8 +53,7 @@ defineSlots<{
 		expanded: boolean
 		/**
 		 * Whether the consumer should render the Admonition's own dismiss button.
-		 * False when the stack header's "Dismiss"/"Dismiss all" covers the dismiss action
-		 * (e.g. single-item stack with `dismissAllEnabled`).
+		 * False when the stack header's "Dismiss all" covers the dismiss action.
 		 */
 		dismissible: boolean
 	}): unknown
@@ -67,13 +66,19 @@ const stackId = useId()
 const internalExpanded = ref(false)
 const isHovered = ref(false)
 const prefersReducedMotion = ref(false)
+const initialMeasurementSettled = ref(false)
+const enteringItemIds = ref<Set<string>>(new Set())
 
 const heights = ref<Record<string, number>>({})
 const cardEls = new Map<string, HTMLElement>()
 const observers = new Map<string, ResizeObserver>()
 const pendingHeights = new Map<string, number>()
 let flushHandle: number | null = null
+let initialMeasurementHandle: number | null = null
+let enteringHandle: number | null = null
 
+// Slot content may run effects, so measure the one real tree instead of mounting
+// hidden duplicates just to discover natural card heights.
 function scheduleHeightFlush() {
 	if (flushHandle != null) return
 	flushHandle = requestAnimationFrame(() => {
@@ -88,7 +93,15 @@ function scheduleHeightFlush() {
 			}
 		}
 		pendingHeights.clear()
-		if (changed) heights.value = next
+		if (changed) {
+			heights.value = next
+			if (!initialMeasurementSettled.value && initialMeasurementHandle == null) {
+				initialMeasurementHandle = requestAnimationFrame(() => {
+					initialMeasurementHandle = null
+					initialMeasurementSettled.value = true
+				})
+			}
+		}
 	})
 }
 
@@ -96,30 +109,59 @@ const isExpanded = computed(() => {
 	if (props.items.length <= 1) return false
 	return props.expanded ?? internalExpanded.value
 })
+const hasActionBar = computed(() => props.items.length >= 2)
+const itemDismissible = computed(() => !props.dismissAllEnabled || props.items.length <= 1)
 
-const frontCardHeight = computed(() => {
-	const front = props.items[0]
-	return front ? (heights.value[front.id] ?? 0) : 0
-})
+type StackPhase = 'collapsed' | 'expanding' | 'expanded' | 'collapsing'
+
+const phase = ref<StackPhase>(isExpanded.value ? 'expanded' : 'collapsed')
+const isSettledCollapsed = computed(() => phase.value === 'collapsed')
+
+// Behind cards morph between a collapsed placeholder and real content. The shell
+// height owns that morph so mixed-height cards do not swap DOM midway through motion.
+function measuredCardHeight(index: number) {
+	const item = props.items[index]
+	return item ? (heights.value[item.id] ?? 0) : 0
+}
+
+function hasMeasuredCard(index: number) {
+	const item = props.items[index]
+	return !!item && heights.value[item.id] != null
+}
+
+const frontCardHeight = computed(() => measuredCardHeight(0))
 
 const hasBehind = computed(() => props.items.length > 1)
 
+function currentPeek() {
+	return isHovered.value ? props.hoverPeek : props.peek
+}
+
+function currentScaleStep() {
+	return isHovered.value ? props.hoverScaleStep : props.scaleStep
+}
+
+function targetCardHeight(index: number) {
+	if (index === 0) return measuredCardHeight(0)
+
+	const measured = measuredCardHeight(index) || frontCardHeight.value
+	return isExpanded.value ? measured : frontCardHeight.value
+}
+
 const containerHeight = computed(() => {
 	if (isExpanded.value) {
-		return props.items.reduce(
-			(acc, it, i) => acc + (heights.value[it.id] ?? 0) + (i > 0 ? props.expandedGap : 0),
-			0,
-		)
+		return props.items.reduce((acc, _, i) => {
+			return acc + measuredCardHeight(i) + (i > 0 ? props.expandedGap : 0)
+		}, 0)
 	}
 	if (!hasBehind.value) return frontCardHeight.value
-	const peek = isHovered.value ? props.hoverPeek : props.peek
 	const behind = Math.min(props.items.length - 1, props.maxVisibleBehind)
 	const pad = isHovered.value ? 6 : 0
-	return frontCardHeight.value + peek * behind + pad
+	return frontCardHeight.value + currentPeek() * behind + pad
 })
 
 const springTransition = computed(() =>
-	prefersReducedMotion.value
+	prefersReducedMotion.value || !initialMeasurementSettled.value
 		? { duration: 0 }
 		: { type: 'spring' as const, stiffness: 260, damping: 32 },
 )
@@ -128,23 +170,65 @@ const exitTransition = computed(() =>
 	prefersReducedMotion.value ? { duration: 0 } : { duration: 0.18 },
 )
 
-function cardPosition(index: number) {
-	if (isExpanded.value) {
-		let y = 0
-		for (let i = 0; i < index; i++) {
-			y += (heights.value[props.items[i].id] ?? 0) + props.expandedGap
-		}
-		return { y, scale: 1, opacity: 1 }
-	}
-	const peek = isHovered.value ? props.hoverPeek : props.peek
-	const step = isHovered.value ? props.hoverScaleStep : props.scaleStep
+function collapsedCardPosition(index: number) {
 	const hidden = index > props.maxVisibleBehind
 	return {
-		y: index * peek,
-		scale: Math.max(0.8, 1 - index * step),
+		y: index * currentPeek(),
+		scale: Math.max(0.8, 1 - index * currentScaleStep()),
 		opacity: hidden ? 0 : 1,
 	}
 }
+
+function expandedCardPosition(index: number) {
+	let y = 0
+	for (let i = 0; i < index; i++) {
+		y += measuredCardHeight(i) + props.expandedGap
+	}
+	return { y, scale: 1, opacity: 1 }
+}
+
+function cardPosition(index: number) {
+	const position = isExpanded.value ? expandedCardPosition(index) : collapsedCardPosition(index)
+	const item = props.items[index]
+	if (!item || !enteringItemIds.value.has(item.id)) return position
+
+	return {
+		...position,
+		y: position.y + 8,
+		opacity: 0,
+		scale: Math.min(1, position.scale + 0.02),
+	}
+}
+
+function contentOpacity(index: number) {
+	return isExpanded.value && hasMeasuredCard(index) ? 1 : 0
+}
+
+// Newly inserted cards need an explicit two-frame enter target because Motion's
+// initial state is disabled to avoid animating from zero-height on first mount.
+function markEntering(ids: string[]) {
+	if (!initialMeasurementSettled.value || prefersReducedMotion.value || ids.length === 0) return
+
+	const next = new Set(enteringItemIds.value)
+	for (const id of ids) next.add(id)
+	enteringItemIds.value = next
+
+	if (enteringHandle != null) cancelAnimationFrame(enteringHandle)
+	enteringHandle = requestAnimationFrame(() => {
+		enteringHandle = requestAnimationFrame(() => {
+			enteringHandle = null
+			enteringItemIds.value = new Set()
+		})
+	})
+}
+
+function onContainerAnimationComplete() {
+	phase.value = isExpanded.value ? 'expanded' : 'collapsed'
+}
+
+const containerMotionProps = computed(() => ({
+	onAnimationComplete: onContainerAnimationComplete,
+}))
 
 function resolveNode(el: unknown): HTMLElement | null {
 	if (!el) return null
@@ -159,6 +243,8 @@ function resolveNode(el: unknown): HTMLElement | null {
 function setCardRef(id: string, el: unknown) {
 	const node = resolveNode(el)
 	if (!node) return
+	pendingHeights.set(id, node.offsetHeight)
+	scheduleHeightFlush()
 	if (cardEls.get(id) === node) return
 	observers.get(id)?.disconnect()
 	cardEls.set(id, node)
@@ -177,9 +263,22 @@ function setExpanded(v: boolean) {
 	else emit('collapse')
 }
 
+function openStack() {
+	if (props.items.length <= 1 || isExpanded.value) return
+	phase.value = 'expanding'
+	setExpanded(true)
+}
+
+function closeStack() {
+	if (!isExpanded.value) return
+	phase.value = 'collapsing'
+	setExpanded(false)
+}
+
 function toggleExpanded() {
 	if (props.items.length <= 1) return
-	setExpanded(!isExpanded.value)
+	if (isExpanded.value) closeStack()
+	else openStack()
 }
 
 function isInteractiveTarget(target: HTMLElement | null, currentTarget: EventTarget | null) {
@@ -194,7 +293,7 @@ function onContainerClick(e: MouseEvent) {
 	if (isExpanded.value || props.items.length <= 1) return
 	const target = e.target as HTMLElement | null
 	if (isInteractiveTarget(target, e.currentTarget)) return
-	setExpanded(true)
+	openStack()
 }
 
 function onCardClick(e: MouseEvent) {
@@ -202,20 +301,35 @@ function onCardClick(e: MouseEvent) {
 	const target = e.target as HTMLElement | null
 	if (isInteractiveTarget(target, e.currentTarget)) return
 	e.stopPropagation()
-	setExpanded(false)
+	closeStack()
 }
 
 watch(
 	() => props.items.length,
 	(n) => {
-		if (n <= 1 && internalExpanded.value) setExpanded(false)
+		if (n <= 1 && (props.expanded ?? internalExpanded.value)) {
+			phase.value = 'collapsed'
+			setExpanded(false)
+		}
 	},
 )
 
+watch(isExpanded, (expanded, previousExpanded) => {
+	if (previousExpanded === undefined) {
+		phase.value = expanded ? 'expanded' : 'collapsed'
+		return
+	}
+	if (expanded && phase.value !== 'expanding') phase.value = 'expanding'
+	else if (!expanded && phase.value !== 'collapsing') phase.value = 'collapsing'
+})
+
 watch(
 	() => props.items.map((i) => i.id),
-	(ids) => {
+	(ids, previousIds = []) => {
 		const idSet = new Set(ids)
+		const previousIdSet = new Set(previousIds)
+		markEntering(ids.filter((id) => !previousIdSet.has(id)))
+
 		for (const [id, ro] of observers) {
 			if (!idSet.has(id)) {
 				ro.disconnect()
@@ -250,6 +364,8 @@ onBeforeUnmount(() => {
 	cardEls.clear()
 	pendingHeights.clear()
 	if (flushHandle != null) cancelAnimationFrame(flushHandle)
+	if (initialMeasurementHandle != null) cancelAnimationFrame(initialMeasurementHandle)
+	if (enteringHandle != null) cancelAnimationFrame(enteringHandle)
 })
 
 const placeholderClasses: Record<StackedAdmonitionType, string> = {
@@ -268,57 +384,62 @@ const messages = defineMessages({
 		id: 'ui.stacked-admonitions.dismiss-all',
 		defaultMessage: 'Dismiss all',
 	},
-	dismiss: {
-		id: 'ui.stacked-admonitions.dismiss',
-		defaultMessage: 'Dismiss',
-	},
 })
 </script>
 
 <template>
 	<div v-if="items.length > 0" class="relative">
-		<div v-if="items.length >= 1" class="mb-2 flex items-center justify-between">
-			<ButtonStyled v-if="items.length >= 2" type="transparent" hover-color-fill="none">
-				<button
-					type="button"
-					:aria-expanded="isExpanded"
-					:aria-controls="stackId"
-					@click="toggleExpanded"
-				>
-					<Motion
-						as="span"
-						class="inline-flex"
-						:animate="{ rotate: isExpanded ? 0 : -90 }"
-						:transition="{ type: 'spring', stiffness: 350, damping: 30 }"
-					>
-						<ChevronDownIcon class="h-4 w-4" />
-					</Motion>
-					<slot name="header-label" :count="items.length" :expanded="isExpanded">
-						{{ formatMessage(messages.alertCount, { count: items.length }) }}
-					</slot>
-				</button>
-			</ButtonStyled>
-			<span v-else class="px-3 py-1.5 text-sm font-medium text-secondary">
-				<slot name="header-label" :count="items.length" :expanded="isExpanded">
-					{{ formatMessage(messages.alertCount, { count: items.length }) }}
-				</slot>
-			</span>
-			<ButtonStyled v-if="dismissAllEnabled" type="transparent" hover-color-fill="none">
-				<button type="button" @click="$emit('dismiss-all')">
-					<XIcon class="h-4 w-4" />
-					{{
-						items.length >= 2 ? formatMessage(messages.dismissAll) : formatMessage(messages.dismiss)
-					}}
-				</button>
-			</ButtonStyled>
-		</div>
+		<Transition
+			enter-active-class="overflow-hidden transition-all duration-150 ease-out"
+			enter-from-class="-translate-y-1 opacity-0 max-h-0"
+			enter-to-class="translate-y-0 opacity-100 max-h-14"
+			leave-active-class="overflow-hidden transition-all duration-100 ease-in"
+			leave-from-class="translate-y-0 opacity-100 max-h-14"
+			leave-to-class="-translate-y-1 opacity-0 max-h-0"
+		>
+			<div v-if="hasActionBar">
+				<div class="flex items-center justify-between pb-2">
+					<ButtonStyled type="transparent">
+						<button
+							type="button"
+							:aria-expanded="isExpanded"
+							:aria-controls="stackId"
+							@click="toggleExpanded"
+						>
+							<Motion
+								as="span"
+								class="inline-flex"
+								:animate="{ rotate: isExpanded ? 0 : -90 }"
+								:transition="{ type: 'spring', stiffness: 350, damping: 30 }"
+							>
+								<ChevronDownIcon class="h-4 w-4" />
+							</Motion>
+							<slot name="header-label" :count="items.length" :expanded="isExpanded">
+								{{ formatMessage(messages.alertCount, { count: items.length }) }}
+							</slot>
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="dismissAllEnabled" type="transparent">
+						<button type="button" @click="$emit('dismiss-all')">
+							<XIcon class="h-4 w-4" />
+							{{ formatMessage(messages.dismissAll) }}
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+		</Transition>
 
+		<!-- Expanded-target overflow must become visible immediately so cards added
+			during the tail of the expand spring do not inherit collapse clipping. -->
 		<Motion
 			:id="stackId"
 			as="div"
 			class="relative"
+			:initial="false"
 			:animate="{ height: containerHeight }"
 			:transition="springTransition"
+			:style="{ overflow: isExpanded ? 'visible' : 'hidden' }"
+			v-bind="containerMotionProps"
 			@mouseenter="isHovered = true"
 			@mouseleave="isHovered = false"
 			@click="onContainerClick"
@@ -327,14 +448,9 @@ const messages = defineMessages({
 				<Motion
 					v-for="(item, index) in items"
 					:key="item.id"
-					:ref="(el: unknown) => setCardRef(item.id, el)"
 					as="div"
 					class="absolute inset-x-0 top-0 rounded-2xl bg-bg will-change-transform"
-					:initial="{
-						opacity: 0,
-						y: cardPosition(index).y - 8,
-						scale: cardPosition(index).scale,
-					}"
+					:initial="false"
 					:animate="cardPosition(index)"
 					:exit="{ opacity: 0, scale: 0.9, transition: exitTransition }"
 					:transition="springTransition"
@@ -342,25 +458,64 @@ const messages = defineMessages({
 						zIndex: items.length - index,
 						transformOrigin: 'top center',
 					}"
-					:aria-hidden="!isExpanded && index !== 0 ? 'true' : undefined"
+					:aria-hidden="isSettledCollapsed && index !== 0 ? 'true' : undefined"
 					@click="onCardClick"
 				>
-					<template v-if="isExpanded || index === 0">
-						<slot
-							name="item"
-							:item="item"
-							:index="index"
-							:is-front="index === 0"
-							:expanded="isExpanded"
-							:dismissible="!dismissAllEnabled"
-						/>
+					<template v-if="index === 0">
+						<div :ref="(el: unknown) => setCardRef(item.id, el)">
+							<slot
+								name="item"
+								:item="item"
+								:index="index"
+								:is-front="true"
+								:expanded="isExpanded"
+								:dismissible="itemDismissible"
+							/>
+						</div>
 					</template>
-					<div
-						v-else
-						:class="['rounded-2xl border border-solid', placeholderClasses[item.type]]"
-						:style="{ height: `${frontCardHeight}px` }"
-						aria-hidden="true"
-					/>
+					<template v-else>
+						<div class="relative">
+							<Motion
+								as="div"
+								:class="[
+									'absolute inset-0 rounded-2xl border border-solid',
+									placeholderClasses[item.type],
+								]"
+								:initial="false"
+								:animate="{ opacity: isExpanded ? 0 : 1 }"
+								:transition="springTransition"
+								aria-hidden="true"
+							/>
+							<Motion
+								as="div"
+								:initial="false"
+								:animate="{ height: targetCardHeight(index) }"
+								:transition="springTransition"
+								:style="{ overflow: isExpanded ? 'visible' : 'hidden' }"
+							>
+								<Motion
+									as="div"
+									:initial="false"
+									:animate="{ opacity: contentOpacity(index) }"
+									:transition="springTransition"
+								>
+									<div
+										:ref="(el: unknown) => setCardRef(item.id, el)"
+										:inert="!isExpanded ? true : undefined"
+									>
+										<slot
+											name="item"
+											:item="item"
+											:index="index"
+											:is-front="false"
+											:expanded="isExpanded"
+											:dismissible="itemDismissible"
+										/>
+									</div>
+								</Motion>
+							</Motion>
+						</div>
+					</template>
 				</Motion>
 			</AnimatePresence>
 		</Motion>

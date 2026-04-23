@@ -48,6 +48,17 @@ const initialItems: DemoItem[] = [
 	},
 ]
 
+const variedHeightItems: DemoItem[] = [
+	initialItems[0],
+	{
+		id: 'storage-nearly-full',
+		type: 'warning',
+		header: 'Storage nearly full',
+		body: 'Your server is using 92% of available storage. Large world backups, installation artifacts, and cached uploads are all contributing here, so this card is intentionally taller to exercise the collapse animation between mixed-height banners.',
+	},
+	initialItems[2],
+]
+
 export const Empty: Story = {
 	render: () => ({
 		components: { StackedAdmonitions, Admonition },
@@ -173,11 +184,76 @@ export const MixedTypes: Story = {
 	}),
 }
 
+export const VariedHeights: Story = {
+	render: () => ({
+		components: { StackedAdmonitions, Admonition },
+		setup() {
+			const items = ref<DemoItem[]>(variedHeightItems)
+			const expanded = ref(false)
+			let nextId = 1
+
+			function addAlert() {
+				const type = ['info', 'warning', 'critical', 'success'][nextId % 4] as DemoItem['type']
+				items.value = [
+					...items.value,
+					{
+						id: `new-alert-${nextId}`,
+						type,
+						header: `New alert ${nextId}`,
+						body:
+							nextId % 2 === 0
+								? 'A short dynamically added alert.'
+								: 'A dynamically added alert with a longer body so the stack can exercise measurement updates when new mixed-height items enter.',
+					},
+				]
+				nextId += 1
+			}
+
+			function reset() {
+				items.value = variedHeightItems
+				expanded.value = false
+				nextId = 1
+			}
+
+			return { items, expanded, addAlert, reset }
+		},
+		template: /* html */ `
+			<div>
+				<div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+					<button
+						type="button"
+						style="padding: 0.25rem 0.75rem; border-radius: 0.5rem; background: var(--color-button-bg); color: var(--color-contrast);"
+						@click="addAlert"
+					>
+						Add alert
+					</button>
+					<button
+						type="button"
+						style="padding: 0.25rem 0.75rem; border-radius: 0.5rem; background: var(--color-button-bg); color: var(--color-contrast);"
+						@click="reset"
+					>
+						Reset
+					</button>
+				</div>
+				<StackedAdmonitions
+					:items="items"
+					:expanded="expanded"
+					@update:expanded="expanded = $event"
+				>
+					<template #item="{ item }">
+						<Admonition :type="item.type" :header="item.header" :body="item.body" />
+					</template>
+				</StackedAdmonitions>
+			</div>
+		`,
+	}),
+}
+
 export const ForceExpanded: Story = {
 	render: () => ({
 		components: { StackedAdmonitions, Admonition },
 		setup() {
-			const items = ref<DemoItem[]>(initialItems)
+			const items = ref<DemoItem[]>(variedHeightItems)
 			const expanded = ref(true)
 			return { items, expanded }
 		},
