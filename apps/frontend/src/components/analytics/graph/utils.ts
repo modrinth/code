@@ -1,6 +1,12 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type { AnalyticsDashboardProject, AnalyticsDashboardStat } from '~/providers/analytics/analytics'
+import type {
+	AnalyticsBreakdownPreset,
+	AnalyticsDashboardProject,
+	AnalyticsDashboardStat,
+} from '~/providers/analytics/analytics'
+
+import { getAnalyticsBreakdownValue } from '../breakdown'
 
 export type ChartDataset = {
 	projectId: string
@@ -36,8 +42,47 @@ export function buildChartDatasets(
 	selectedProjects: AnalyticsDashboardProject[],
 	activeStat: AnalyticsDashboardStat,
 	palette: string[],
+	selectedBreakdown: AnalyticsBreakdownPreset,
 ): ChartDataset[] {
 	const selectedProjectIds = new Set(selectedProjects.map((project) => project.id))
+	if (selectedProjectIds.size === 0) {
+		return []
+	}
+
+	if (selectedBreakdown !== 'none') {
+		const dataByBreakdown = new Map<string, number[]>()
+
+		timeSlices.forEach((slice, sliceIndex) => {
+			for (const point of slice) {
+				if (!('source_project' in point)) continue
+				if (!selectedProjectIds.has(point.source_project)) continue
+
+				const value = getMetricValue(point, activeStat)
+				if (value === 0) continue
+
+				const breakdownValue = getAnalyticsBreakdownValue(point, selectedBreakdown)
+
+				let breakdownData = dataByBreakdown.get(breakdownValue)
+				if (!breakdownData) {
+					breakdownData = new Array(timeSlices.length).fill(0)
+					dataByBreakdown.set(breakdownValue, breakdownData)
+				}
+
+				breakdownData[sliceIndex] += value
+			}
+		})
+
+		return Array.from(dataByBreakdown.entries()).map(([breakdownValue, data], index) => {
+			const color = palette[index % palette.length]
+			return {
+				projectId: `breakdown:${breakdownValue}`,
+				label: breakdownValue,
+				data,
+				borderColor: color,
+				backgroundColor: color,
+			}
+		})
+	}
 
 	const dataByProjectId = new Map<string, number[]>()
 	for (const project of selectedProjects) {

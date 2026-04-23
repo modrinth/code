@@ -149,14 +149,6 @@ const selectedProjects = computed(() =>
 
 const legendPalette = ['#00D084', '#A78BFA', '#F59E0B', '#38BDF8', '#FB7185', '#34D399']
 
-const legendEntries = computed(() =>
-	selectedProjects.value.map((project, index) => ({
-		id: project.id,
-		name: project.name,
-		color: legendPalette[index % legendPalette.length],
-	})),
-)
-
 const graphTitle = computed(() => titleByStat[analyticsDashboardContext.activeStat.value])
 
 const chartType = computed<'line' | 'bar'>(() => (activeViewMode.value === 'bar' ? 'bar' : 'line'))
@@ -182,7 +174,16 @@ const chartDatasets = computed(() =>
 		selectedProjects.value,
 		analyticsDashboardContext.activeStat.value,
 		legendPalette,
+		analyticsDashboardContext.selectedBreakdown.value,
 	),
+)
+
+const legendEntries = computed(() =>
+	chartDatasets.value.map((dataset) => ({
+		id: dataset.projectId,
+		name: dataset.label,
+		color: dataset.borderColor,
+	})),
 )
 
 const chartContainer = ref<HTMLElement | null>(null)
@@ -226,7 +227,7 @@ function onChartHover(payload: HoverState) {
 	hoverState.sliceIndex = payload.sliceIndex
 }
 
-watch([chartLabels, selectedProjects], () => {
+watch([chartLabels, chartDatasets], () => {
 	hoverState.visible = false
 	hoverState.sliceIndex = null
 })

@@ -3,6 +3,7 @@
 		<QueryBuilder />
 		<StatCards />
 		<AnalyticsGraph />
+		<AnalyticsTable />
 	</div>
 </template>
 
@@ -15,6 +16,7 @@ import { injectOrganizationContext } from '~/providers/organization-context'
 import AnalyticsGraph from './graph/AnalyticsGraph.vue'
 import QueryBuilder from './query-builder/QueryBuilder.vue'
 import StatCards from './stat-cards/StatCards.vue'
+import AnalyticsTable from './table/AnalyticsTable.vue'
 
 const auth = await useAuth()
 const projectPageContext = injectProjectPageContext(null)
