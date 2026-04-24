@@ -26,6 +26,13 @@ export type {
 
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
 
+const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
+
+type ProjectTypeMetadata = {
+	project_type?: string | null
+	project_types?: readonly string[] | null
+}
+
 const ANALYTICS_DASHBOARD_STAT_ORDER: AnalyticsDashboardStat[] = [
 	'views',
 	'downloads',
@@ -143,6 +150,7 @@ function getPercentChange(currentValue: number, previousValue: number): number {
 function computeTotals(
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
 	selectedProjectIds: Set<string>,
+	availableProjectIds: Set<string>,
 ): AnalyticsDashboardTotals {
 	const totals: AnalyticsDashboardTotals = {
 		views: 0,
@@ -151,13 +159,19 @@ function computeTotals(
 		playtime: 0,
 	}
 
+	if (availableProjectIds.size === 0) {
+		return totals
+	}
+
+	const effectiveProjectIds = selectedProjectIds.size > 0 ? selectedProjectIds : availableProjectIds
+
 	for (const timeSlice of timeSlices) {
 		for (const dataPoint of timeSlice) {
 			if (!('source_project' in dataPoint)) {
 				continue
 			}
 
-			if (selectedProjectIds.size > 0 && !selectedProjectIds.has(dataPoint.source_project)) {
+			if (!effectiveProjectIds.has(dataPoint.source_project)) {
 				continue
 			}
 
@@ -181,6 +195,14 @@ function computeTotals(
 	}
 
 	return totals
+}
+
+function isServerProject(project: ProjectTypeMetadata): boolean {
+	if (project.project_type === MINECRAFT_JAVA_SERVER_PROJECT_TYPE) {
+		return true
+	}
+
+	return project.project_types?.includes(MINECRAFT_JAVA_SERVER_PROJECT_TYPE) ?? false
 }
 
 export function createAnalyticsDashboardContext(
@@ -219,20 +241,24 @@ export function createAnalyticsDashboardContext(
 	const projects = computed<AnalyticsDashboardProject[]>(() => {
 		if (hasProjectContext.value && options.projectPageContext) {
 			const project = options.projectPageContext.projectV2.value
-			return project ? [{ id: project.id, name: project.title }] : []
+			return project && !isServerProject(project) ? [{ id: project.id, name: project.title }] : []
 		}
 
 		if (hasOrganizationContext.value && options.organizationContext?.projects.value) {
-			return options.organizationContext.projects.value.map((project) => ({
-				id: project.id,
-				name: project.name,
-			}))
+			return options.organizationContext.projects.value
+				.filter((project) => !isServerProject(project))
+				.map((project) => ({
+					id: project.id,
+					name: project.name,
+				}))
 		}
 
-		return (userProjects.value ?? []).map((project) => ({
-			id: project.id,
-			name: project.title,
-		}))
+		return (userProjects.value ?? [])
+			.filter((project) => !isServerProject(project))
+			.map((project) => ({
+				id: project.id,
+				name: project.title,
+			}))
 	})
 
 	const availableProjectIds = computed(() => projects.value.map((project) => project.id))
@@ -393,12 +419,17 @@ export function createAnalyticsDashboardContext(
 	)
 
 	const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
+	const availableProjectIdSet = computed(() => new Set(availableProjectIds.value))
 
 	const currentTotals = computed<AnalyticsDashboardTotals>(() =>
-		computeTotals(timeSlices.value, selectedProjectIdSet.value),
+		computeTotals(timeSlices.value, selectedProjectIdSet.value, availableProjectIdSet.value),
 	)
 	const previousTotals = computed<AnalyticsDashboardTotals>(() =>
-		computeTotals(previousTimeSlices.value, selectedProjectIdSet.value),
+		computeTotals(
+			previousTimeSlices.value,
+			selectedProjectIdSet.value,
+			availableProjectIdSet.value,
+		),
 	)
 
 	const percentChanges = computed<AnalyticsDashboardPercentChanges>(() => ({
