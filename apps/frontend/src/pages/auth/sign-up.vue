@@ -49,7 +49,7 @@ const messages = defineMessages({
 	},
 	under13HelperText: {
 		id: 'auth.create-account.date-of-birth.under13-helper',
-		defaultMessage: 'You cannot create an account at Modrinth unless you are 13 years old.',
+		defaultMessage: 'You cannot create an account at Modrinth unless you are over 13 years old.',
 	},
 })
 
