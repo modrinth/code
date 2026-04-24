@@ -140,4 +140,4 @@ All i18n utilities come from `@modrinth/ui`:
 ## Reference Examples
 
 - Variables and plurals: `apps/frontend/src/pages/frog.vue`
-- Rich-text with link tags: `apps/frontend/src/pages/auth/welcome.vue` and `apps/frontend/src/error.vue`
+- Rich-text with link tags: `apps/frontend/src/error.vue`
