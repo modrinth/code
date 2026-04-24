@@ -87,6 +87,7 @@
 </template>
 
 <script setup>
+import { RightArrowIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	ButtonStyled,
@@ -99,7 +100,6 @@ import {
 import { computed } from 'vue'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
-import { RightArrowIcon } from '@modrinth/assets'
 
 const props = defineProps({
 	dateOfBirth: {
