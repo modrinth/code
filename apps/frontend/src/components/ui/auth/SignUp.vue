@@ -1,6 +1,8 @@
 <template>
-	<div class="flex flex-col gap-6">
-		<div class="text-center text-2xl font-semibold text-contrast">
+	<div
+		class="universal-card flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+	>
+		<div class="mx-auto text-center text-2xl font-semibold text-contrast">
 			{{ formatMessage(messages.signUpWithTitle) }}
 		</div>
 		<section class="flex flex-col gap-2.5">
@@ -79,7 +81,7 @@
 				wrapper-class="w-full"
 			/>
 
-			<p v-if="!routeQuery.launcher">
+			<p v-if="!routeQuery.launcher" class="m-0">
 				<IntlFormatted :message-id="messages.legalDisclaimer">
 					<template #terms-link="{ children }">
 						<NuxtLink to="/legal/terms" class="text-link">
@@ -104,7 +106,7 @@
 				</button>
 			</ButtonStyled>
 
-			<div class="auth-form__additional-options">
+			<div class="flex flex-wrap items-center justify-center gap-2">
 				{{ formatMessage(messages.alreadyHaveAccountLabel) }}
 				<NuxtLink
 					class="text-link"

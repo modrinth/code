@@ -1,29 +1,35 @@
 <template>
-	<div>
-		<div v-if="error" class="oauth-items">
+	<div
+		class="universal-card flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+	>
+		<div v-if="error" class="flex flex-col gap-8">
 			<div>
-				<h1>{{ formatMessage(commonMessages.errorLabel) }}</h1>
+				<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
+					{{ formatMessage(commonMessages.errorLabel) }}
+				</h1>
 			</div>
-			<p>
+			<p class="m-0">
 				<span>{{ error.data?.error }}: </span>
 				{{ error.data?.description }}
 			</p>
 		</div>
-		<div v-else-if="app && createdBy && authorizationData" class="oauth-items">
-			<div class="connected-items">
-				<div class="profile-pics">
+		<div v-else-if="app && createdBy && authorizationData" class="flex flex-col gap-8">
+			<div class="mt-4 flex items-center justify-center">
+				<div class="flex w-full flex-row items-center justify-evenly">
 					<Avatar size="md" :src="app.icon_url" />
 					<!-- <img class="profile-pic" :src="app.icon_url" alt="User profile picture" /> -->
-					<div class="connection-indicator">→</div>
+					<div class="flex select-none items-center justify-center text-[2rem] text-primary">→</div>
 					<Avatar size="md" circle :src="auth.user.avatar_url" />
 					<!-- <img class="profile-pic" :src="auth.user.avatar_url" alt="User profile picture" /> -->
 				</div>
 			</div>
-			<div class="title">
-				<h1>{{ formatMessage(messages.title, { appName: app.name }) }}</h1>
+			<div class="mx-auto">
+				<h1 class="mb-0 ml-0 mr-0 mt-0 text-xl text-contrast">
+					{{ formatMessage(messages.title, { appName: app.name }) }}
+				</h1>
 			</div>
-			<div class="auth-info">
-				<div class="scope-heading">
+			<div class="flex flex-col gap-3">
+				<div class="mb-3">
 					<IntlFormatted
 						:message-id="messages.appInfo"
 						:values="{
@@ -43,10 +49,10 @@
 						</template>
 					</IntlFormatted>
 				</div>
-				<div class="scope-items">
+				<div class="flex flex-col gap-3">
 					<div v-for="scopeItem in scopeDefinitions" :key="scopeItem">
-						<div class="scope-item">
-							<div class="scope-icon">
+						<div class="flex flex-row items-center gap-3">
+							<div class="flex aspect-square rounded-full bg-green p-2 text-white">
 								<CheckIcon />
 							</div>
 							{{ scopeItem }}
@@ -54,21 +60,21 @@
 					</div>
 				</div>
 			</div>
-			<div class="button-row">
-				<Button class="wide-button" large :action="onReject" :disabled="pending">
+			<div class="flex flex-row justify-center gap-2">
+				<Button class="!w-full" large :action="onReject" :disabled="pending">
 					<XIcon />
 					{{ formatMessage(messages.decline) }}
 				</Button>
-				<Button class="wide-button" color="primary" large :action="onAuthorize" :disabled="pending">
+				<Button class="!w-full" color="primary" large :action="onAuthorize" :disabled="pending">
 					<CheckIcon />
 					{{ formatMessage(messages.authorize) }}
 				</Button>
 			</div>
-			<div class="redirection-notice">
-				<p class="redirect-instructions">
+			<div class="flex flex-col gap-2 text-center">
+				<p class="m-0 text-sm">
 					<IntlFormatted :message-id="messages.redirectUrl" :values="{ url: redirectUri }">
 						<template #redirect-url="{ children }">
-							<span class="redirect-url">
+							<span class="font-bold">
 								<component :is="() => normalizeChildren(children)" />
 							</span>
 						</template>
@@ -242,130 +248,3 @@ definePageMeta({
 	middleware: 'auth',
 })
 </script>
-
-<style scoped lang="scss">
-.oauth-items {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-xl);
-}
-
-.scope-items {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-sm);
-}
-
-.scope-item {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: var(--gap-sm);
-}
-
-.scope-icon {
-	display: flex;
-
-	color: var(--color-raised-bg);
-	background-color: var(--color-green);
-	aspect-ratio: 1;
-	border-radius: 50%;
-	padding: var(--gap-xs);
-}
-.title {
-	margin-inline: auto;
-
-	h1 {
-		margin-bottom: 0 !important;
-	}
-}
-.redirection-notice {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-xs);
-	text-align: center;
-
-	.redirect-instructions {
-		font-size: var(--font-size-sm);
-	}
-
-	.redirect-url {
-		font-weight: bold;
-	}
-}
-
-.wide-button {
-	width: 100% !important;
-}
-
-.button-row {
-	display: flex;
-	flex-direction: row;
-	gap: var(--gap-xs);
-	justify-content: center;
-}
-.auth-info {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-sm);
-}
-
-.scope-heading {
-	margin-bottom: var(--gap-sm);
-}
-
-.profile-pics {
-	width: 100%;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-evenly;
-
-	.connection-indicator {
-		// Make sure the text sits in the middle and is centered.
-		// Make the text large, and make sure it's not selectable.
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 2rem;
-		user-select: none;
-
-		color: var(--color-primary);
-	}
-}
-
-.profile-pic {
-	width: 6rem;
-	height: 6rem;
-	border-radius: 50%;
-	margin: 0 1rem;
-}
-
-.dotted-border-line {
-	width: 75%;
-	border: 0.1rem dashed var(--color-divider);
-}
-
-.connected-items {
-	// Display dotted-border-line under profile-pics and centered behind them
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	position: relative;
-	z-index: 1;
-	margin-top: 1rem;
-
-	// Display profile-pics on top of dotted-border-line
-	.profile-pics {
-		position: relative;
-		z-index: 2;
-	}
-
-	// Display dotted-border-line behind profile-pics
-	.dotted-border-line {
-		position: absolute;
-		z-index: 1;
-	}
-}
-</style>

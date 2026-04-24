@@ -5,7 +5,10 @@
 			class="fixed left-0 top-0 z-[9999] m-0 h-full w-full border-0 p-0"
 		></iframe>
 	</div>
-	<div v-else>
+	<div
+		v-else
+		class="universal-card mx-auto flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+	>
 		<template v-if="flow && !subtleLauncherRedirectUri">
 			<label for="two-factor-code">
 				<span class="label__title">{{ formatMessage(messages.twoFactorCodeLabel) }}</span>
@@ -23,8 +26,8 @@
 				@keyup.enter="onTwoFactorSignIn()"
 			/>
 
-			<button class="btn btn-primary continue-btn" @click="onTwoFactorSignIn()">
-				{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
+			<button class="btn btn-primary min-h-10 font-bold no-underline" @click="onTwoFactorSignIn()">
+				{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon class="ml-2" />
 			</button>
 		</template>
 		<template v-else>
@@ -86,7 +89,7 @@
 
 				<div class="h-px w-full bg-surface-5"></div>
 
-				<section class="auth-form">
+				<section class="flex flex-col gap-2.5">
 					<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
 					<StyledInput
 						id="email"
@@ -126,7 +129,7 @@
 						</button>
 					</ButtonStyled>
 
-					<div class="auth-form__additional-options !text-base">
+					<div class="flex flex-wrap items-center justify-center gap-2.5 !text-base">
 						<IntlFormatted :message-id="messages.additionalOptionsLabel">
 							<template #forgot-password-link="{ children }">
 								<NuxtLink

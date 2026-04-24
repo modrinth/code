@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="shadow-card mx-auto flex w-full max-w-[30rem] flex-col gap-6 rounded-2xl border border-button-bg bg-surface-3 p-6"
+		class="shadow-card mx-auto flex w-full max-w-[28rem] flex-col gap-6 rounded-2xl border border-button-bg bg-surface-3 p-6"
 	>
 		<h1
 			class="mx-auto my-0 flex w-full justify-center text-center text-2xl font-semibold text-contrast"
@@ -172,6 +172,10 @@ const maxBirthDate = computed(() => {
 
 const isDateOfBirthMissing = computed(() => props.requiresDob && dateOfBirthModel.value === '')
 
+const isDateOfBirthYearZero = computed(
+	() => props.requiresDob && /^0000-/.test(dateOfBirthModel.value),
+)
+
 const isUnder13 = computed(
 	() =>
 		props.requiresDob &&
@@ -188,6 +192,15 @@ function onCompleteSignUpClick() {
 			title: formatMessage(messages.dateOfBirthRequiredTitle),
 			text: formatMessage(messages.dateOfBirthRequiredText),
 			type: 'warning',
+		})
+		return
+	}
+
+	if (isDateOfBirthYearZero.value) {
+		addNotification({
+			title: formatMessage(messages.dateOfBirthInvalidTitle),
+			text: formatMessage(messages.dateOfBirthInvalidText),
+			type: 'error',
 		})
 		return
 	}
@@ -220,6 +233,14 @@ const messages = defineMessages({
 	dateOfBirthRequiredText: {
 		id: 'auth.create-account.date-of-birth.required.text',
 		defaultMessage: 'Please enter your date of birth before continuing.',
+	},
+	dateOfBirthInvalidTitle: {
+		id: 'auth.create-account.date-of-birth.invalid.title',
+		defaultMessage: 'Invalid date of birth',
+	},
+	dateOfBirthInvalidText: {
+		id: 'auth.create-account.date-of-birth.invalid.text',
+		defaultMessage: 'Please enter a valid date of birth. Year cannot be 0000.',
 	},
 	over13HelperText: {
 		id: 'auth.create-account.date-of-birth.over13-helper',

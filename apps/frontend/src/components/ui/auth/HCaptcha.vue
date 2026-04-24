@@ -61,7 +61,7 @@ defineExpose({
 }
 
 .h-captcha iframe {
-	transform: scale(1.32);
+	transform: scale(1.33);
 	transform-origin: center;
 	margin: -1px;
 }
