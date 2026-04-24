@@ -257,7 +257,7 @@ pub async fn init_client_with_database(
         .query(&format!(
             "
             ALTER TABLE {database}.{PLAYTIME} {cluster_line}
-            ADD COLUMN IF NOT EXISTS country String,
+            ADD COLUMN IF NOT EXISTS country String
             "
         ))
         .execute()
