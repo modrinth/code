@@ -173,12 +173,9 @@ export const promotePendingSignInOAuthProvider = () => {
 		{ initOnMounted: true },
 	)
 	if (!pending.value) return
-	const last = useStorage<string | null>(
-		LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
-		null,
-		undefined,
-		{ initOnMounted: true },
-	)
+	const last = useStorage<string | null>(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null, undefined, {
+		initOnMounted: true,
+	})
 	last.value = pending.value
 	pending.value = null
 }
