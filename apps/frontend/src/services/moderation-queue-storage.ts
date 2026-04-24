@@ -20,8 +20,14 @@ function hasIndexedDb(): boolean {
 	return typeof window !== 'undefined' && typeof indexedDB !== 'undefined'
 }
 
-function hasLocalStorage(): boolean {
-	return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+function getLocalStorage(): Storage | null {
+	if (typeof window === 'undefined') return null
+
+	try {
+		return window.localStorage
+	} catch {
+		return null
+	}
 }
 
 function isStringArray(value: unknown): value is string[] {
@@ -45,6 +51,20 @@ function isPersistedStateCandidate(value: unknown): value is PersistedModeration
 	if (typeof queue.lastUpdated !== 'string') return false
 
 	return true
+}
+
+function savedAtTime(state: PersistedModerationQueueState): number {
+	const time = Date.parse(state.savedAt)
+	return Number.isNaN(time) ? 0 : time
+}
+
+function newestState(
+	first: PersistedModerationQueueState | null,
+	second: PersistedModerationQueueState | null,
+): PersistedModerationQueueState | null {
+	if (!first) return second
+	if (!second) return first
+	return savedAtTime(second) > savedAtTime(first) ? second : first
 }
 
 function openDatabase(): Promise<IDBDatabase> {
@@ -122,36 +142,69 @@ async function clearIndexedDb(): Promise<void> {
 }
 
 function loadFromLocalStorage(): PersistedModerationQueueState | null {
-	if (!hasLocalStorage()) return null
+	const storage = getLocalStorage()
+	if (!storage) return null
 
-	const raw = window.localStorage.getItem(MODERATION_QUEUE_KEY)
+	const raw = storage.getItem(MODERATION_QUEUE_KEY)
 	if (!raw) return null
 
-	const parsed: unknown = JSON.parse(raw)
-	return isPersistedStateCandidate(parsed) ? parsed : null
+	try {
+		const parsed: unknown = JSON.parse(raw)
+		if (isPersistedStateCandidate(parsed)) return parsed
+	} catch (error) {
+		console.debug('Failed to parse moderation queue from localStorage:', error)
+	}
+
+	safeClearLocalStorage()
+	return null
 }
 
 function saveToLocalStorage(state: PersistedModerationQueueState): void {
-	if (!hasLocalStorage()) return
-	window.localStorage.setItem(MODERATION_QUEUE_KEY, JSON.stringify(state))
+	const storage = getLocalStorage()
+	if (!storage) return
+	storage.setItem(MODERATION_QUEUE_KEY, JSON.stringify(state))
 }
 
 function clearLocalStorage(): void {
-	if (!hasLocalStorage()) return
-	window.localStorage.removeItem(MODERATION_QUEUE_KEY)
+	const storage = getLocalStorage()
+	if (!storage) return
+	storage.removeItem(MODERATION_QUEUE_KEY)
+}
+
+function safeClearLocalStorage(): void {
+	try {
+		clearLocalStorage()
+	} catch (error) {
+		console.debug('Failed to clear moderation queue from localStorage:', error)
+	}
+}
+
+function safeSaveLocalStorage(state: PersistedModerationQueueState): void {
+	try {
+		saveToLocalStorage(state)
+	} catch (error) {
+		console.debug('Failed to save moderation queue to localStorage:', error)
+	}
 }
 
 export async function loadQueueState(): Promise<PersistedModerationQueueState | null> {
 	if (!import.meta.client) return null
 
+	let indexedDbState: PersistedModerationQueueState | null = null
 	try {
-		const state = await loadFromIndexedDb()
-		if (state) return state
+		indexedDbState = await loadFromIndexedDb()
 	} catch (error) {
 		console.debug('Failed to load moderation queue from IndexedDB:', error)
 	}
 
-	return loadFromLocalStorage()
+	let localStorageState: PersistedModerationQueueState | null = null
+	try {
+		localStorageState = loadFromLocalStorage()
+	} catch (error) {
+		console.debug('Failed to load moderation queue from localStorage:', error)
+	}
+
+	return newestState(indexedDbState, localStorageState)
 }
 
 export async function saveQueueState(state: PersistedModerationQueueState): Promise<void> {
@@ -160,13 +213,14 @@ export async function saveQueueState(state: PersistedModerationQueueState): Prom
 	if (hasIndexedDb()) {
 		try {
 			await saveToIndexedDb(state)
+			safeSaveLocalStorage(state)
 			return
 		} catch (error) {
 			console.debug('Failed to save moderation queue to IndexedDB, using localStorage fallback:', error)
 		}
 	}
 
-	saveToLocalStorage(state)
+	safeSaveLocalStorage(state)
 }
 
 export async function clearQueueState(): Promise<void> {
@@ -175,11 +229,10 @@ export async function clearQueueState(): Promise<void> {
 	if (hasIndexedDb()) {
 		try {
 			await clearIndexedDb()
-			return
 		} catch (error) {
 			console.debug('Failed to clear moderation queue from IndexedDB:', error)
 		}
 	}
 
-	clearLocalStorage()
+	safeClearLocalStorage()
 }

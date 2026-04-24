@@ -487,6 +487,7 @@ import {
 	renderHighlightedString,
 } from '@modrinth/utils'
 import { computedAsync, useDebounceFn, useLocalStorage } from '@vueuse/core'
+import type { Component } from 'vue'
 
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -2066,7 +2067,7 @@ async function endChecklist(status?: string) {
 						foundUnlocked = true
 						break
 					}
-				await moderationQueue.completeCurrentProject(id, 'skipped')
+					await moderationQueue.completeCurrentProject(id, 'skipped')
 					skippedCount++
 				}
 
@@ -2171,7 +2172,7 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
 	return options
 })
 
-type StageOverflowSlotOption = OverflowMenuOption & { id: string; text: string }
+type StageOverflowSlotOption = OverflowMenuOption & { id: string; text: string; icon?: Component }
 
 const stageOptionsForSlots = computed(() =>
 	stageOptions.value.filter((opt): opt is StageOverflowSlotOption => 'id' in opt && 'text' in opt),

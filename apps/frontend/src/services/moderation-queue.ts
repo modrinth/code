@@ -75,12 +75,19 @@ function createEmptyQueue(): ModerationQueue {
 }
 
 function sanitizeQueue(raw: PersistedModerationQueueState['currentQueue']): ModerationQueue {
+	const lastUpdated = new Date(raw.lastUpdated)
+	const items = raw.items.filter((id): id is string => typeof id === 'string')
+	const completed = Number.isFinite(raw.completed) ? Math.max(Math.trunc(raw.completed), 0) : 0
+	const skipped = Number.isFinite(raw.skipped) ? Math.max(Math.trunc(raw.skipped), 0) : 0
+	const minimumTotal = items.length + completed + skipped
+	const total = Number.isFinite(raw.total) ? Math.max(Math.trunc(raw.total), minimumTotal) : minimumTotal
+
 	return {
-		items: raw.items.filter((id): id is string => typeof id === 'string'),
-		total: Number.isFinite(raw.total) ? raw.total : raw.items.length,
-		completed: Number.isFinite(raw.completed) ? raw.completed : 0,
-		skipped: Number.isFinite(raw.skipped) ? raw.skipped : 0,
-		lastUpdated: raw.lastUpdated ? new Date(raw.lastUpdated) : new Date(),
+		items,
+		total,
+		completed,
+		skipped,
+		lastUpdated: Number.isNaN(lastUpdated.getTime()) ? new Date() : lastUpdated,
 	}
 }
 
@@ -185,6 +192,10 @@ function createModerationQueueState() {
 		status: 'completed' | 'skipped' = 'completed',
 	): Promise<boolean> {
 		return withMutation(() => {
+			if (!currentQueue.value.items.includes(projectId)) {
+				return currentQueue.value.items.length > 0
+			}
+
 			if (status === 'completed') {
 				currentQueue.value.completed++
 			} else {
