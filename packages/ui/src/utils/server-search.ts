@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { getCategoryIcon, GlobeIcon, SERVER_CATEGORY_ICON_MAP, UserIcon } from '@modrinth/assets'
 import { sortedCategories } from '@modrinth/utils'
-import { computed, type ComputedRef, type Ref, ref } from 'vue'
+import { computed, type ComputedRef, type Ref, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { defineMessage, LOCALES, useVIntl } from '../composables/i18n'
@@ -139,7 +139,7 @@ export function useServerSearch(opts: {
 
 	const route = useRoute()
 
-	const serverCurrentSortType = ref<SortType>(SERVER_SORT_TYPES[0])
+	const serverCurrentSortType = shallowRef<SortType>(SERVER_SORT_TYPES[0])
 	const serverCurrentFilters = ref<FilterValue[]>([{ type: 'server_status', option: 'online' }])
 	const serverToggledGroups = ref<string[]>([])
 

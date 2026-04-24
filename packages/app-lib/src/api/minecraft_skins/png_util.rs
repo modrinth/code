@@ -14,7 +14,7 @@ use tokio_util::compat::FuturesAsyncReadCompatExt;
 use url::Url;
 
 use crate::{
-    ErrorKind, minecraft_skins::UrlOrBlob, util::fetch::REQWEST_CLIENT,
+    ErrorKind, minecraft_skins::UrlOrBlob, util::fetch::INSECURE_REQWEST_CLIENT,
 };
 
 pub async fn url_to_data_stream(
@@ -25,7 +25,7 @@ pub async fn url_to_data_stream(
 
         Ok(Either::Left(stream::once(async { Ok(data) })))
     } else {
-        let response = REQWEST_CLIENT
+        let response = INSECURE_REQWEST_CLIENT
             .get(url.as_str())
             .header("Accept", "image/png")
             .send()

@@ -11,6 +11,20 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-04-20T20:48:51+00:00`,
+		product: 'app',
+		version: '0.13.4',
+		body: `## Fixed
+- Browse page not using relevanced as default search type.
+- Fixed problem with the sticky header on scroll in the Files tab of instance pages.`,
+	},
+	{
+		date: `2026-04-20T20:48:51+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Browse page not using relevanced as default search type.`,
+	},
+	{
 		date: `2026-04-19T00:07:46+00:00`,
 		product: 'app',
 		version: '0.13.3',
