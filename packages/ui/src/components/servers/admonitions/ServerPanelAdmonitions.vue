@@ -165,7 +165,8 @@ const showInstallingBanner = computed(() => {
 	const installing =
 		ctx.server.value.status === 'installing' || ctx.isSyncingContent.value || !!props.contentError
 	if (!installing) return false
-	if (contentErrorKey.value && dismissedContentErrorKey.value === contentErrorKey.value) return false
+	if (contentErrorKey.value && dismissedContentErrorKey.value === contentErrorKey.value)
+		return false
 	return props.syncProgress?.phase !== 'Analyzing'
 })
 
@@ -190,11 +191,7 @@ function backupType(entry: BackupAdmonitionEntry): StackedAdmonitionItem['type']
 
 function backupPriority(entry: BackupAdmonitionEntry): number {
 	if (entry.state === 'failed' || entry.state === 'timed_out') return 1
-	if (
-		entry.state === 'ongoing' &&
-		(entry.status === 'in_progress' || entry.progress > 0)
-	)
-		return 2
+	if (entry.state === 'ongoing' && (entry.status === 'in_progress' || entry.progress > 0)) return 2
 	if (entry.state === 'ongoing' && entry.progress === 0) return 3
 	return 4
 }

@@ -1,5 +1,5 @@
 import { createGlobalState } from '@vueuse/core'
-import { ref, type Ref, shallowRef, triggerRef } from 'vue'
+import { type Ref, ref, shallowRef, triggerRef } from 'vue'
 
 import { detectLogLevel } from '../layouts/shared/console/composables/log-level'
 import type { Log4jEvent, LogLevel, LogLine } from '../layouts/shared/console/types'

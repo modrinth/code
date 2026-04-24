@@ -701,14 +701,20 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Upload from .zip URL"
   },
+  "files.operations.current-file": {
+    "defaultMessage": "Current file: {file}"
+  },
   "files.operations.extracted": {
     "defaultMessage": "{size} extracted"
   },
   "files.operations.extracting": {
     "defaultMessage": "Extracting {source}"
   },
-  "files.operations.failed": {
-    "defaultMessage": "Failed"
+  "files.operations.extracting-completed": {
+    "defaultMessage": "Extracting {source} finished"
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "Extracting {source} failed"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack from URL"
@@ -2661,7 +2667,7 @@
     "defaultMessage": "{backupName} finished successfully."
   },
   "servers.backups.admonition.backup-completed.title": {
-    "defaultMessage": "Backup completed"
+    "defaultMessage": "Backup finished"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Something went wrong while creating {backupName}. Please try again or contact support if the issue continues."
@@ -2712,7 +2718,7 @@
     "defaultMessage": "Your server has been restored to {backupName} and is ready to start."
   },
   "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Restore complete"
+    "defaultMessage": "Restore finished"
   },
   "servers.backups.admonition.restore-timed-out.description": {
     "defaultMessage": "Restoring from {backupName} timed out. You can try again or contact support if the issue continues."

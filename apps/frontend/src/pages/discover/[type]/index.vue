@@ -9,6 +9,7 @@ import {
 	ImageIcon,
 	ListIcon,
 	MoreVerticalIcon,
+	SpinnerIcon,
 } from '@modrinth/assets'
 import type { CardAction, CreationFlowContextValue } from '@modrinth/ui'
 import {
@@ -172,6 +173,25 @@ const serverIcon = computed(() => {
 })
 
 const serverHideInstalled = ref(false)
+const installingProjectIds = ref<Set<string>>(new Set())
+const optimisticallyInstalledProjectIds = ref<Set<string>>(new Set())
+
+function setProjectInstalling(projectId: string, installing: boolean) {
+	const next = new Set(installingProjectIds.value)
+	if (installing) {
+		next.add(projectId)
+	} else {
+		next.delete(projectId)
+	}
+	installingProjectIds.value = next
+}
+
+function markProjectInstalled(projectId: string) {
+	optimisticallyInstalledProjectIds.value = new Set([
+		...optimisticallyInstalledProjectIds.value,
+		projectId,
+	])
+}
 
 const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
 const { data: serverContentData, error: serverContentError } = useQuery({
@@ -278,7 +298,7 @@ async function serverInstall(project: InstallableSearchResult) {
 		handleError(new Error('No server to install to.'))
 		return
 	}
-	project.installing = true
+	setProjectInstalling(project.project_id, true)
 	try {
 		if (projectType.value?.id === 'modpack') {
 			const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id, {
@@ -287,7 +307,7 @@ async function serverInstall(project: InstallableSearchResult) {
 			const versionId = versions[0]?.id ?? project.latest_version
 			if (!versionId) {
 				handleError(new Error('No version found for this modpack'))
-				project.installing = false
+				setProjectInstalling(project.project_id, false)
 				return
 			}
 			const modalInstance = onboardingModalRef.value
@@ -327,6 +347,7 @@ async function serverInstall(project: InstallableSearchResult) {
 					),
 				)
 				project.installing = false
+				setProjectInstalling(project.project_id, false)
 				return
 			}
 			await installContentMutation.mutateAsync({
@@ -334,13 +355,13 @@ async function serverInstall(project: InstallableSearchResult) {
 				projectId: version.project_id,
 				versionId: version.id,
 			})
-			project.installed = true
+			markProjectInstalled(project.project_id)
 		}
 	} catch (e) {
 		console.error(e)
 		handleError(new Error(`Error installing content ${e}`))
 	}
-	project.installing = false
+	setProjectInstalling(project.project_id, false)
 }
 
 function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
@@ -447,16 +468,18 @@ function getCardActions(
 	if (serverData.value) {
 		const isInstalled =
 			projectResult.installed ||
+			optimisticallyInstalledProjectIds.value.has(result.project_id) ||
 			(serverContentData.value &&
 				(serverContentData.value.addons ?? []).find((x) => x.project_id === result.project_id)) ||
 			serverData.value.upstream?.project_id === result.project_id
+		const isInstalling = installingProjectIds.value.has(result.project_id)
 
 		return [
 			{
 				key: 'install',
-				label: projectResult.installing ? 'Installing...' : isInstalled ? 'Installed' : 'Install',
-				icon: isInstalled ? CheckIcon : DownloadIcon,
-				disabled: !!isInstalled || !!projectResult.installing,
+				label: isInstalling ? 'Installing...' : isInstalled ? 'Installed' : 'Install',
+				icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : DownloadIcon,
+				disabled: !!isInstalled || isInstalling,
 				color: 'brand',
 				type: 'outlined',
 				onClick: () => serverInstall(projectResult),

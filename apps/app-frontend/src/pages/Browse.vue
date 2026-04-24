@@ -644,6 +644,16 @@ const installContext = computed(() => {
 
 const installingProjectIds = ref<Set<string>>(new Set())
 
+function setProjectInstalling(projectId: string, installing: boolean) {
+	const next = new Set(installingProjectIds.value)
+	if (installing) {
+		next.add(projectId)
+	} else {
+		next.delete(projectId)
+	}
+	installingProjectIds.value = next
+}
+
 function getCardActions(
 	result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
 	currentProjectType: string,
@@ -736,7 +746,7 @@ function getCardActions(
 				color: 'brand',
 				type: 'outlined',
 				onClick: async () => {
-					installingProjectIds.value.add(projectResult.project_id)
+					setProjectInstalling(projectResult.project_id, true)
 					try {
 						const didInstall = await installProjectToServer(projectResult)
 						if (didInstall !== false) {
@@ -745,7 +755,7 @@ function getCardActions(
 					} catch (err) {
 						handleError(err as Error)
 					} finally {
-						installingProjectIds.value.delete(projectResult.project_id)
+						setProjectInstalling(projectResult.project_id, false)
 					}
 				},
 			},
@@ -770,14 +780,14 @@ function getCardActions(
 			color: 'brand',
 			type: 'outlined',
 			onClick: async () => {
-				installingProjectIds.value.add(projectResult.project_id)
+				setProjectInstalling(projectResult.project_id, true)
 				await installVersion(
 					projectResult.project_id,
 					null,
 					instance.value ? instance.value.path : null,
 					'SearchCard',
 					(versionId) => {
-						installingProjectIds.value.delete(projectResult.project_id)
+						setProjectInstalling(projectResult.project_id, false)
 						if (versionId) {
 							onSearchResultInstalled(projectResult.project_id)
 						}
@@ -790,7 +800,7 @@ function getCardActions(
 						preferredGameVersion: instance.value?.game_version ?? undefined,
 					},
 				).catch((err) => {
-					installingProjectIds.value.delete(projectResult.project_id)
+					setProjectInstalling(projectResult.project_id, false)
 					handleError(err)
 				})
 			},

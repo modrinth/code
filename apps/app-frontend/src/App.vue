@@ -685,7 +685,12 @@ async function fetchIntercomToken() {
 }
 
 async function bootIntercom() {
-	if (intercomBooting || intercomBooted || !hostingRouteActive.value || !credentials.value?.session) {
+	if (
+		intercomBooting ||
+		intercomBooted ||
+		!hostingRouteActive.value ||
+		!credentials.value?.session
+	) {
 		return
 	}
 
