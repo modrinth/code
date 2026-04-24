@@ -1324,12 +1324,17 @@ function initializeServer() {
 	}
 }
 
+let intercomInitialized = false
+
 const cleanup = () => {
 	isMounted.value = false
 
 	saveWsStateToCache()
 
-	shutdown()
+	if (intercomInitialized) {
+		shutdown()
+		intercomInitialized = false
+	}
 
 	cleanupCoreRuntime(props.serverId)
 
@@ -1353,19 +1358,36 @@ onMounted(() => {
 		})
 	}
 
-	let intercomInitialized = false
 	const tryInitIntercom = () => {
 		if (intercomInitialized) return
-		if (!props.authUser || !props.fetchIntercomToken) return
+		if (!props.authUser || !props.fetchIntercomToken) {
+			console.debug('[PYROSERVERS][INTERCOM] waiting for auth user and token fetcher', {
+				hasAuthUser: !!props.authUser,
+				hasFetchIntercomToken: !!props.fetchIntercomToken,
+			})
+			return
+		}
 		intercomInitialized = true
+		console.debug('[PYROSERVERS][INTERCOM] initializing secure support chat')
 		props
 			.fetchIntercomToken()
 			.then(({ token }) => {
+				console.debug('[PYROSERVERS][INTERCOM] fetched messenger JWT, booting widget')
 				Intercom({
 					app_id: props.intercomAppId!,
 					intercom_user_jwt: token,
 					session_duration: 1000 * 60 * 60 * 24,
 				})
+				window.setTimeout(() => {
+					const hasWidget = !!document.querySelector(
+						'.intercom-lightweight-app, #intercom-container, #intercom-frame',
+					)
+					if (!hasWidget) {
+						console.warn(
+							'[PYROSERVERS][INTERCOM] boot completed but no Intercom widget was detected',
+						)
+					}
+				}, 2500)
 			})
 			.catch((error) => {
 				intercomInitialized = false

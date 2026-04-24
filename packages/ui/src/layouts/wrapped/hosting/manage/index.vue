@@ -82,6 +82,7 @@
 
 		<template v-else>
 			<div
+				v-if="!showEmptyState"
 				class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
 			>
 				<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">
@@ -124,7 +125,7 @@
 				</div>
 
 				<div
-					v-else-if="serverList.length === 0 && !isPollingForNewServers"
+					v-else-if="showEmptyState"
 					key="empty"
 					class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
 				>
@@ -548,6 +549,11 @@ const serverList = computed<Archon.Servers.v0.Server[]>(() => {
 	if (!loggedIn.value || !serverResponse.value) return []
 	return serverResponse.value.servers
 })
+
+const showEmptyState = computed(
+	() =>
+		!showServersListLoading.value && serverList.value.length === 0 && !isPollingForNewServers.value,
+)
 
 const searchInput = ref('')
 
