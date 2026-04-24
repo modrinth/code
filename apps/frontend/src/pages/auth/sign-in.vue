@@ -26,7 +26,13 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import SignInView from '@/components/ui/auth/SignIn.vue'
-import { getLauncherRedirectUrl } from '@/composables/auth.ts'
+import {
+	getLauncherRedirectUrl,
+	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	promotePendingSignInOAuthProvider,
+} from '@/composables/auth.ts'
+import { useStorage } from '@vueuse/core'
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -48,6 +54,8 @@ useHead({
 
 const auth = await useAuth()
 const route = useNativeRoute()
+const pendingSignInOAuthProvider = useStorage(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
+const lastSignInOAuthProvider = useStorage(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
 
 if (route.query.state !== undefined) {
 	await navigateTo(
@@ -96,6 +104,8 @@ const token = ref('')
 const flow = ref(route.query.flow)
 
 async function beginPasswordSignIn() {
+	pendingSignInOAuthProvider.value = null
+	lastSignInOAuthProvider.value = null
 	startLoading()
 	try {
 		const res = await client.labrinth.auth_v2.login({
@@ -147,6 +157,8 @@ async function finishSignIn(token) {
 			token = auth.value.token
 		}
 
+		promotePendingSignInOAuthProvider()
+
 		const redirectUrl = `${getLauncherRedirectUrl(route)}/?code=${token}`
 
 		if (redirectUrl.startsWith('https://launcher-files.modrinth.com/')) {
@@ -172,6 +184,8 @@ async function finishSignIn(token) {
 		await useUser()
 		queryClient.clear()
 	}
+
+	promotePendingSignInOAuthProvider()
 
 	if (route.query.redirect) {
 		const redirect = decodeURIComponent(route.query.redirect)

@@ -33,6 +33,12 @@ import { useQuery } from '@tanstack/vue-query'
 
 import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
 import SignUpView from '@/components/ui/auth/SignUp.vue'
+import {
+	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	promotePendingSignInOAuthProvider,
+} from '@/composables/auth.ts'
+import { useStorage } from '@vueuse/core'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -59,6 +65,8 @@ useHead({
 
 const auth = await useAuth()
 const route = useNativeRoute()
+const pendingSignInOAuthProvider = useStorage(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
+const lastSignInOAuthProvider = useStorage(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
 
 const redirectTarget = route.query.redirect
 const showOtherOptions = ref(false)
@@ -96,6 +104,8 @@ const token = ref('')
 const subscribe = ref(false)
 
 async function continueWithEmail() {
+	pendingSignInOAuthProvider.value = null
+	lastSignInOAuthProvider.value = null
 	startLoading()
 	try {
 		const generatedUsername = generateUsernameFromEmail(email.value)
@@ -142,6 +152,8 @@ async function createAccount() {
 
 		await useAuth(res.session)
 		await useUser()
+
+		promotePendingSignInOAuthProvider()
 
 		if (route.query.launcher) {
 			await navigateTo({ path: '/auth/sign-in', query: route.query })

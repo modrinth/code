@@ -7,38 +7,62 @@
 		</div>
 		<section class="flex flex-col gap-2.5">
 			<ButtonStyled>
-				<a class="!shadow-none" :href="getAuthUrl('google', redirectTarget)">
+				<a
+					class="!shadow-none"
+					:href="getAuthUrl('google', redirectTarget)"
+					@click="onOAuthProviderClick('google')"
+				>
 					<GoogleColorIcon />
 					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Google' }) }}</span>
 				</a>
 			</ButtonStyled>
 			<ButtonStyled>
-				<a class="!shadow-none" :href="getAuthUrl('microsoft', redirectTarget)">
+				<a
+					class="!shadow-none"
+					:href="getAuthUrl('microsoft', redirectTarget)"
+					@click="onOAuthProviderClick('microsoft')"
+				>
 					<MicrosoftColorIcon />
 					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Microsoft' }) }}</span>
 				</a>
 			</ButtonStyled>
 			<ButtonStyled>
-				<a class="!shadow-none" :href="getAuthUrl('discord', redirectTarget)">
+				<a
+					class="!shadow-none"
+					:href="getAuthUrl('discord', redirectTarget)"
+					@click="onOAuthProviderClick('discord')"
+				>
 					<DiscordColorIcon />
 					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Discord' }) }}</span>
 				</a>
 			</ButtonStyled>
 			<template v-if="showOtherOptions">
 				<ButtonStyled>
-					<a class="!shadow-none" :href="getAuthUrl('github', redirectTarget)">
+					<a
+						class="!shadow-none"
+						:href="getAuthUrl('github', redirectTarget)"
+						@click="onOAuthProviderClick('github')"
+					>
 						<GitHubColorIcon />
 						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitHub' }) }}</span>
 					</a>
 				</ButtonStyled>
 				<ButtonStyled>
-					<a class="!shadow-none" :href="getAuthUrl('gitlab', redirectTarget)">
+					<a
+						class="!shadow-none"
+						:href="getAuthUrl('gitlab', redirectTarget)"
+						@click="onOAuthProviderClick('gitlab')"
+					>
 						<GitLabColorIcon />
 						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitLab' }) }}</span>
 					</a>
 				</ButtonStyled>
 				<ButtonStyled>
-					<a class="!shadow-none" :href="getAuthUrl('steam', redirectTarget)">
+					<a
+						class="!shadow-none"
+						:href="getAuthUrl('steam', redirectTarget)"
+						@click="onOAuthProviderClick('steam')"
+					>
 						<SteamColorIcon />
 						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Steam' }) }}</span>
 					</a>
@@ -144,7 +168,11 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { getAuthUrl } from '@/composables/auth.ts'
+import {
+	getAuthUrl,
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+} from '@/composables/auth.ts'
+import { useStorage } from '@vueuse/core'
 
 const props = defineProps({
 	redirectTarget: {
@@ -188,6 +216,11 @@ const passwordModel = computed({
 	get: () => props.password,
 	set: (value) => emit('update:password', value),
 })
+
+const pendingSignInOAuthProvider = useStorage(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
+const onOAuthProviderClick = (provider) => {
+	pendingSignInOAuthProvider.value = provider
+}
 
 const { formatMessage } = useVIntl()
 

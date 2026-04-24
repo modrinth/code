@@ -29,7 +29,10 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
-import { getLauncherRedirectUrl } from '@/composables/auth.ts'
+import {
+	getLauncherRedirectUrl,
+	promotePendingSignInOAuthProvider,
+} from '@/composables/auth.ts'
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -131,6 +134,8 @@ async function finishSignIn(sessionToken) {
 			token = auth.value.token
 		}
 
+		promotePendingSignInOAuthProvider()
+
 		const redirectUrl = `${getLauncherRedirectUrl(route)}/?code=${token}`
 
 		if (redirectUrl.startsWith('https://launcher-files.modrinth.com/')) {
@@ -148,6 +153,8 @@ async function finishSignIn(sessionToken) {
 		await useAuth(sessionToken)
 		await useUser()
 		queryClient.clear()
+
+		promotePendingSignInOAuthProvider()
 	}
 
 	if (route.query.redirect) {

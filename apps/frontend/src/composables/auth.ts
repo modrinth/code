@@ -1,4 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { useStorage } from '@vueuse/core'
 import type { LocationQueryValue, RouteLocationNormalizedLoaded } from 'vue-router'
 
 import type { CookieOptions } from '#app'
@@ -11,6 +12,9 @@ type AuthState = {
 type QueryValue = LocationQueryValue | LocationQueryValue[] | undefined
 type FullPathRoute = Pick<RouteLocationNormalizedLoaded, 'fullPath'>
 type LauncherRoute = Pick<RouteLocationNormalizedLoaded, 'query'>
+
+export const LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY = 'auth-last-sign-in-oauth-provider'
+export const PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY = 'auth-pending-sign-in-oauth-provider'
 
 const AUTH_COOKIE_OPTIONS = {
 	maxAge: 60 * 60 * 24 * 365 * 10,
@@ -142,6 +146,15 @@ export const getAuthUrl = (provider: string, redirect = '/dashboard') => {
 		: `${config.public.siteUrl}/auth/sign-in?redirect=${encodeURIComponent(redirect)}`
 
 	return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${encodeURIComponent(fullURL)}`
+}
+
+export const promotePendingSignInOAuthProvider = () => {
+	if (!import.meta.client) return
+	const pending = useStorage<string | null>(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
+	if (!pending.value) return
+	const last = useStorage<string | null>(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
+	last.value = pending.value
+	pending.value = null
 }
 
 export const removeAuthProvider = async (provider: string) => {

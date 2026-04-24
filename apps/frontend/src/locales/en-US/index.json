@@ -326,6 +326,9 @@
   "auth.sign-in.continue-with-email": {
     "message": "Continue with Email"
   },
+  "auth.sign-in.last-sign-in": {
+    "message": "Last sign in"
+  },
   "auth.sign-in.sign-in-with": {
     "message": "Sign into Modrinth"
   },
