@@ -79,13 +79,13 @@
 						</div>
 						<div class="flex items-center gap-2">
 							<ButtonStyled
-								v-if="moderationStore.isQueueMode && moderationStore.queueLength > 1"
+								v-if="moderationQueue.isQueueMode && moderationQueue.queueLength > 1"
 								color="brand"
 								@click="skipToNextProject"
 							>
 								<button>
 									<RightArrowIcon aria-hidden="true" />
-									Next project ({{ moderationStore.queueLength }} left)
+									Next project ({{ moderationQueue.queueLength }} left)
 								</button>
 							</ButtonStyled>
 						</div>
@@ -112,13 +112,13 @@
 						</div>
 						<div class="flex items-center gap-2">
 							<ButtonStyled
-								v-if="moderationStore.isQueueMode && moderationStore.queueLength > 1"
+								v-if="moderationQueue.isQueueMode && moderationQueue.queueLength > 1"
 								color="brand"
 								@click="skipToNextProject"
 							>
 								<button>
 									<RightArrowIcon aria-hidden="true" />
-									Next project ({{ moderationStore.queueLength }} left)
+									Next project ({{ moderationQueue.queueLength }} left)
 								</button>
 							</ButtonStyled>
 						</div>
@@ -131,9 +131,9 @@
 					<div v-if="done">
 						<p>
 							You are done moderating this project!
-							<template v-if="moderationStore.hasItems">
+							<template v-if="moderationQueue.hasItems">
 								There are
-								{{ moderationStore.queueLength }} left.
+								{{ moderationQueue.queueLength }} left.
 							</template>
 						</p>
 					</div>
@@ -331,10 +331,10 @@
 						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
-							<ButtonStyled v-if="!done && !generatedMessage && moderationStore.hasItems">
+							<ButtonStyled v-if="!done && !generatedMessage && moderationQueue.hasItems">
 								<button @click="skipCurrentProject">
 									<XIcon aria-hidden="true" />
-									Skip ({{ moderationStore.queueLength }} left)
+									Skip ({{ moderationQueue.queueLength }} left)
 								</button>
 							</ButtonStyled>
 						</div>
@@ -345,7 +345,7 @@
 									<button @click="endChecklist(undefined)">
 										<template v-if="hasNextProject">
 											<RightArrowIcon aria-hidden="true" />
-											Next project ({{ moderationStore.queueLength }} left)
+											Next project ({{ moderationQueue.queueLength }} left)
 										</template>
 										<template v-else>
 											<CheckIcon aria-hidden="true" />
@@ -490,9 +490,9 @@ import { computedAsync, useDebounceFn, useLocalStorage } from '@vueuse/core'
 
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { useModerationQueue } from '~/composables/moderation-queue.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
-import type { LockAcquireResponse } from '~/store/moderation.ts'
-import { useModerationStore } from '~/store/moderation.ts'
+import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
 
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
@@ -510,7 +510,7 @@ const props = defineProps<{
 
 const { projectV2, projectV3 } = injectProjectPageContext()
 
-const moderationStore = useModerationStore()
+const moderationQueue = useModerationQueue()
 const tags = useGeneratedState()
 const auth = await useAuth()
 
@@ -548,7 +548,7 @@ async function handleVisibilityChange() {
 	if (document.visibilityState === 'visible' && lockStatus.value?.isOwnLock) {
 		// Immediately refresh the lock when returning to the tab
 		// This handles cases where the heartbeat was throttled while backgrounded
-		const refreshResult = await moderationStore.refreshLock()
+		const refreshResult = await moderationQueue.refreshLock()
 		if (!refreshResult.success) {
 			handleLockLost(refreshResult)
 			return
@@ -594,7 +594,7 @@ function clearLockCountdown() {
 function startLockHeartbeat() {
 	lockCheckInterval.value = setInterval(
 		async () => {
-			const result = await moderationStore.refreshLock()
+			const result = await moderationQueue.refreshLock()
 			if (!result.success) {
 				handleLockLost(result)
 			}
@@ -667,7 +667,7 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 
 	// Quick re-check if close to expiry (last 5 seconds of TTL)
 	if (now - next.validatedAt > PREFETCH_STALE_MS - 5000) {
-		const recheck = await moderationStore.checkLock(next.projectId)
+		const recheck = await moderationQueue.checkLock(next.projectId)
 		if (recheck.locked && !recheck.expired) {
 			// Project got locked, remove from queue and try next
 			prefetchQueue.value.shift()
@@ -679,7 +679,9 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 	prefetchQueue.value.shift()
 
 	// Mark skipped projects as completed
-	next.skippedIds.forEach((id) => moderationStore.completeCurrentProject(id, 'skipped'))
+	await Promise.all(
+		next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
+	)
 
 	if (next.skippedIds.length > 0) {
 		addNotification({
@@ -752,7 +754,7 @@ async function handleExit() {
 	// Release if we own the lock, or if there was an error checking (we might still own it)
 	const projectId = projectV2.value?.id
 	if (projectId && (lockStatus.value?.isOwnLock || lockError.value)) {
-		const released = await moderationStore.releaseLock(projectId)
+		const released = await moderationQueue.releaseLock(projectId)
 		if (!released && lockStatus.value?.isOwnLock) {
 			console.warn('Failed to release moderation lock for project:', projectId)
 		}
@@ -770,7 +772,7 @@ async function confirmTakeOverOverride() {
 		console.warn('[confirmTakeOverOverride] No project ID available')
 		return
 	}
-	const result = await moderationStore.overrideLock(projectId)
+	const result = await moderationQueue.overrideLock(projectId)
 
 	if (result.success) {
 		addNotification({
@@ -825,7 +827,7 @@ async function batchCheckLocksWithMetadata(
 		projectIds.map(async (id) => {
 			// Parallel: check lock AND fetch project metadata
 			const [lockResponse, projectData] = await Promise.all([
-				moderationStore.checkLock(id),
+				moderationQueue.checkLock(id),
 				useBaseFetch(`project/${id}`, { method: 'GET' }).catch(() => null),
 			])
 
@@ -856,7 +858,7 @@ async function batchCheckLocksWithMetadata(
 // Maintain a queue of prefetched unlocked projects for instant navigation
 async function maintainPrefetchQueue() {
 	if (isPrefetching.value) return
-	if (!moderationStore.isQueueMode) return
+	if (!moderationQueue.isQueueMode) return
 
 	const currentProjectId = projectV2.value?.id
 
@@ -879,7 +881,7 @@ async function maintainPrefetchQueue() {
 
 		// 4. Get remaining queue items (excluding current and already prefetched)
 		const prefetchedIds = new Set(prefetchQueue.value.map((p) => p.projectId))
-		const queueItems = [...moderationStore.currentQueue.items]
+		const queueItems = [...moderationQueue.currentQueue.items]
 		const currentIndex = currentProjectId ? queueItems.indexOf(currentProjectId) : -1
 		const remainingItems =
 			currentIndex >= 0 ? queueItems.slice(currentIndex + 1) : queueItems.slice(1)
@@ -951,12 +953,12 @@ async function skipToNextProject() {
 		return
 	}
 	debug('[skipToNextProject] Starting. Current project:', currentProjectId)
-	debug('[skipToNextProject] Queue before complete:', [...moderationStore.currentQueue.items])
+	debug('[skipToNextProject] Queue before complete:', [...moderationQueue.currentQueue.items])
 
-	moderationStore.completeCurrentProject(currentProjectId, 'skipped')
+	await moderationQueue.completeCurrentProject(currentProjectId, 'skipped')
 
-	debug('[skipToNextProject] Queue after complete:', [...moderationStore.currentQueue.items])
-	debug('[skipToNextProject] hasItems:', moderationStore.hasItems)
+	debug('[skipToNextProject] Queue after complete:', [...moderationQueue.currentQueue.items])
+	debug('[skipToNextProject] hasItems:', moderationQueue.hasItems)
 
 	// Use prefetched data if available
 	if (await navigateToNextUnlockedProject()) {
@@ -968,7 +970,7 @@ async function skipToNextProject() {
 
 	// Fallback: batch check remaining projects with metadata (excluding current)
 	const remainingIds: string[] = []
-	const queueItems = moderationStore.currentQueue.items
+	const queueItems = moderationQueue.currentQueue.items
 
 	// Build list of remaining projects, excluding current
 	for (const id of queueItems) {
@@ -1011,7 +1013,7 @@ async function skipToNextProject() {
 				}
 				return
 			}
-			moderationStore.completeCurrentProject(id, 'skipped')
+			await moderationQueue.completeCurrentProject(id, 'skipped')
 			skippedCount++
 		}
 
@@ -1141,7 +1143,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				isLoadingMessage: loadingMessage.value,
 				isModpackPermissionsStage: isModpackPermissionsStage.value,
 
-				futureProjectCount: moderationStore.queueLength,
+				futureProjectCount: moderationQueue.queueLength,
 				visibleActionsCount: visibleActions.value.length,
 
 				focusedActionIndex: focusedActionIndex.value,
@@ -1249,14 +1251,14 @@ onMounted(async () => {
 	}
 
 	// Try to acquire lock
-	const result = await moderationStore.acquireLock(projectV2.value.id)
+	const result = await moderationQueue.acquireLock(projectV2.value.id)
 
 	if (result.success) {
 		handleLockAcquired()
 	} else if (result.locked_by) {
 		// Actually locked by another moderator
 		// In queue mode with more projects - auto-skip to next project
-		if (moderationStore.isQueueMode && moderationStore.queueLength > 1) {
+		if (moderationQueue.isQueueMode && moderationQueue.queueLength > 1) {
 			addNotification({
 				title: 'Project locked',
 				text: `Skipped project locked by @${result.locked_by.username}.`,
@@ -1317,7 +1319,7 @@ onUnmounted(() => {
 	// Release lock if we own it (navigation away without explicit exit)
 	const projectId = projectV2.value?.id
 	if (projectId && lockStatus.value?.isOwnLock) {
-		moderationStore.releaseLock(projectId)
+		void moderationQueue.releaseLock(projectId)
 	}
 
 	// Clear prefetch state to prevent memory leaks
@@ -1966,10 +1968,10 @@ async function sendMessage(status: ProjectStatus) {
 			})
 		}
 
-		const willHaveNext = moderationStore.completeCurrentProject(projectId, 'completed')
+		const willHaveNext = await moderationQueue.completeCurrentProject(projectId, 'completed')
 
 		await Promise.race([
-			moderationStore.releaseLock(projectId),
+			moderationQueue.releaseLock(projectId),
 			new Promise((r) => setTimeout(r, 2000)),
 		])
 
@@ -2000,7 +2002,7 @@ async function endChecklist(status?: string) {
 
 		await nextTick()
 
-		if (moderationStore.currentQueue.total > 1) {
+		if (moderationQueue.currentQueue.total > 1) {
 			addNotification({
 				title: 'Moderation completed',
 				text: `You have completed the moderation queue.`,
@@ -2019,7 +2021,7 @@ async function endChecklist(status?: string) {
 			// Fallback: batch check remaining projects with metadata
 			const remainingIds: string[] = []
 			const currentProjectId = projectV2.value?.id
-			const queueItems = moderationStore.currentQueue.items
+			const queueItems = moderationQueue.currentQueue.items
 
 			// Build list of remaining projects, excluding current
 			for (const id of queueItems) {
@@ -2064,7 +2066,7 @@ async function endChecklist(status?: string) {
 						foundUnlocked = true
 						break
 					}
-					moderationStore.completeCurrentProject(id, 'skipped')
+				await moderationQueue.completeCurrentProject(id, 'skipped')
 					skippedCount++
 				}
 
@@ -2100,11 +2102,11 @@ async function skipCurrentProject() {
 	}
 
 	await Promise.race([
-		moderationStore.releaseLock(projectId),
+		moderationQueue.releaseLock(projectId),
 		new Promise((r) => setTimeout(r, 2000)),
 	])
 
-	hasNextProject.value = moderationStore.completeCurrentProject(projectId, 'skipped')
+	hasNextProject.value = await moderationQueue.completeCurrentProject(projectId, 'skipped')
 
 	await endChecklist('skipped')
 }

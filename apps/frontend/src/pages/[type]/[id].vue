@@ -754,8 +754,8 @@
 										},
 										{
 											id: 'moderation-checklist',
-											action: () => {
-												moderationStore.setSingleProject(project.id)
+											action: async () => {
+												await moderationQueue.setSingleProject(project.id)
 												showModerationChecklist = true
 											},
 											color: 'orange',
@@ -1142,10 +1142,10 @@ import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectN
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
+import { useModerationQueue } from '~/composables/moderation-queue.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
-import { useModerationStore } from '~/store/moderation.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
@@ -1156,7 +1156,7 @@ const data = useNuxtApp()
 const route = useRoute()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const config = useRuntimeConfig()
-const moderationStore = useModerationStore()
+const moderationQueue = useModerationQueue()
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 
