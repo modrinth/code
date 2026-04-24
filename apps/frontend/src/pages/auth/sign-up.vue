@@ -30,6 +30,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
+import { useStorage } from '@vueuse/core'
 
 import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
 import SignUpView from '@/components/ui/auth/SignUp.vue'
@@ -38,7 +39,6 @@ import {
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	promotePendingSignInOAuthProvider,
 } from '@/composables/auth.ts'
-import { useStorage } from '@vueuse/core'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -102,19 +102,16 @@ const dateOfBirth = ref('')
 const username = ref('')
 const token = ref('')
 const subscribe = ref(false)
+const USERNAME_MAX_LENGTH = 39
+const MAX_USERNAME_SUFFIX_RETRIES = 10
+const MAX_RANDOM_USERNAME_ATTEMPTS = 10
 
 async function continueWithEmail() {
 	pendingSignInOAuthProvider.value = null
 	lastSignInOAuthProvider.value = null
 	startLoading()
 	try {
-		const generatedUsername = generateUsernameFromEmail(email.value)
-
-		await client.labrinth.auth_v2.validateCreateAccount({
-			username: generatedUsername,
-			password: password.value,
-			email: email.value,
-		})
+		const generatedUsername = await findAvailableGeneratedUsername()
 
 		token.value = ''
 		username.value = generatedUsername
@@ -136,7 +133,72 @@ function generateUsernameFromEmail(emailAddress) {
 		.replace(/_+/g, '_')
 		.replace(/^_+|_+$/g, '')
 
-	return (sanitized || 'user').slice(0, 39)
+	return (sanitized || 'user').slice(0, USERNAME_MAX_LENGTH)
+}
+
+async function findAvailableGeneratedUsername() {
+	const baseUsername = generateUsernameFromEmail(email.value)
+
+	for (let suffixAttempt = 0; suffixAttempt <= MAX_USERNAME_SUFFIX_RETRIES; suffixAttempt++) {
+		const candidateUsername = appendUsernameSuffix(baseUsername, suffixAttempt)
+
+		try {
+			await validateCreateAccountCandidate(candidateUsername)
+			return candidateUsername
+		} catch (err) {
+			if (!isUsernameTakenValidationError(err)) {
+				throw err
+			}
+		}
+	}
+
+	return await findAvailableRandomUsername()
+}
+
+function appendUsernameSuffix(baseUsername, suffixAttempt) {
+	if (suffixAttempt === 0) {
+		return baseUsername
+	}
+
+	const suffix = String(suffixAttempt)
+	const maxBaseLength = Math.max(1, USERNAME_MAX_LENGTH - suffix.length)
+	return `${baseUsername.slice(0, maxBaseLength)}${suffix}`
+}
+
+function generateRandomUsername() {
+	const randomSuffix = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`
+	const base = `user_${randomSuffix}`
+	return base.slice(0, USERNAME_MAX_LENGTH)
+}
+
+async function findAvailableRandomUsername() {
+	for (let attempt = 0; attempt < MAX_RANDOM_USERNAME_ATTEMPTS; attempt++) {
+		const candidateUsername = generateRandomUsername()
+
+		try {
+			await validateCreateAccountCandidate(candidateUsername)
+			return candidateUsername
+		} catch (err) {
+			if (!isUsernameTakenValidationError(err)) {
+				throw err
+			}
+		}
+	}
+
+	throw new Error('Unable to find an available username. Please choose one manually.')
+}
+
+async function validateCreateAccountCandidate(candidateUsername) {
+	await client.labrinth.auth_v2.validateCreateAccount({
+		username: candidateUsername,
+		password: password.value,
+		email: email.value,
+	})
+}
+
+function isUsernameTakenValidationError(error) {
+	const errorCode = error?.data?.error ?? error?.v1Error?.error ?? error?.responseData?.error
+	return errorCode === 'username_taken'
 }
 
 async function createAccount() {
