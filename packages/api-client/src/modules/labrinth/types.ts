@@ -1636,6 +1636,44 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace ExternalLicense {
+		export namespace Internal {
+			export type LinkedFile = {
+				name: string | null
+				sha1: string
+			}
+
+			export type ExternalProject = {
+				id: number
+				title: string | null
+				status: string
+				link: string | null
+				exceptions: string | null
+				proof: string | null
+				flame_project_id: number | null
+				inserted_at: string | null
+				inserted_by: number | null
+				updated_at: string | null
+				updated_by: number | null
+				linked_files: LinkedFile[]
+			}
+
+			export type SearchRequest = {
+				title?: string
+				flame_id?: number
+			}
+
+			export type UpdateLicenseRequest = {
+				title?: string
+				status: string
+				link?: string
+				exceptions?: string
+				proof?: string
+				flame_project_id?: number
+			}
+		}
+	}
+
 	export namespace Sessions {
 		export namespace v2 {
 			export type Session = {

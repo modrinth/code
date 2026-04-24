@@ -64,6 +64,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { BinaryIcon, HashIcon, SearchIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -74,7 +75,38 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { injectModrinthClient } from '@modrinth/ui'
 
+type ExternalProject = {
+	id: number
+	title: string | null
+	status: ExternalLicenseStatus
+	link: string | null
+	exceptions: string | null
+	proof: string | null
+	flame_project_id: number | null
+	files: {
+		sha1: string
+		name: string | null
+	}[]
+}
+
+type SearchKind = 'none' | 'title' | 'flame_id' | 'sha1'
+
+function mapProject(p: Labrinth.ExternalLicense.Internal.ExternalProject): ExternalProject {
+	return {
+		id: p.id,
+		title: p.title,
+		status: p.status as ExternalLicenseStatus,
+		link: p.link,
+		exceptions: p.exceptions,
+		proof: p.proof,
+		flame_project_id: p.flame_project_id,
+		files: p.linked_files.map((f) => ({ sha1: f.sha1, name: f.name })),
+	}
+}
+
+const client = injectModrinthClient()
 const query = ref('')
 
 const { formatMessage } = useVIntl()
@@ -102,7 +134,7 @@ const messages = defineMessages({
 	},
 	emptyDescription: {
 		id: 'moderation.external-projects.empty-description',
-		defaultMessage: 'Type at least 3 characters of a project’s title to begin browsing.',
+		defaultMessage: 'Type at least 3 characters of a project\u2019s title to begin browsing.',
 	},
 	noResultsByTitle: {
 		id: 'moderation.external-projects.no-results-by-title',
@@ -140,89 +172,17 @@ const messages = defineMessages({
 
 useHead({ title: () => formatMessage(messages.pageTitle) })
 
-type ExternalProject = {
-	id: string
-	title: string | null
-	status: ExternalLicenseStatus
-	link: string | null
-	exceptions: string | null
-	proof: string | null
-	flame_project_id: string | null
-	files: {
-		sha1: string
-		name: string | null
-	}[]
-}
-
-type SearchKind = 'none' | 'title' | 'flame_id' | 'sha1'
-
 const lastSearchKind = ref<SearchKind>('none')
 const activeQuery = ref('')
-
-const externalProjects = ref<ExternalProject[]>([
-	{
-		id: 'iV1m7lMU',
-		title: 'Create: Extended Flywheels Fabric',
-		status: 'yes',
-		link: 'https://www.curseforge.com/minecraft/mc-mods/create-extended-flywheels-fabric',
-		proof: 'See CurseForge page/license for permission',
-		exceptions: null,
-		flame_project_id: '750818',
-		files: [
-			{
-				sha1: 'd102ff70164359fb0906b32dbb067f4149e3239a',
-				name: 'extendedflywheels-1.19.2-0.5.0.g-1.2.5.1-fabric.jar',
-			},
-			{
-				sha1: '584de498addd512888b59d85f7278c2cbb9096c5',
-				name: 'extendedflywheels-1.18.2-0.5.0.g-1.2.5.1-fabric.jar',
-			},
-			{
-				sha1: 'fc887ab8f6dc40558dafb9ec35c4b08fb683e8f7',
-				name: 'extendedflywheels-1.19.2-0.5.0.g-1.2.5-fabric.jar',
-			},
-			{
-				sha1: 'b77e52f5d47820322d296427904553dee6dabbf6',
-				name: 'extendedflywheels-1.18.2-0.5.0.g-1.2.5-fabric.jar',
-			},
-		],
-	},
-])
+const externalProjects = ref<ExternalProject[]>([])
+const isLoading = ref(false)
+const hasSearched = ref(false)
 
 const displayProjects = computed(() => {
-	const q = activeQuery.value
-	const kind = lastSearchKind.value
-	const projects = externalProjects.value
-
-	if (kind === 'none') {
+	if (isLoading.value) {
 		return []
 	}
-
-	if (kind === 'title') {
-		if (q.length < 3) {
-			return []
-		}
-		const lower = q.toLowerCase()
-		return projects.filter((p) => p.title?.toLowerCase().includes(lower) ?? false)
-	}
-
-	if (kind === 'flame_id') {
-		const needle = q.trim()
-		if (!needle) {
-			return []
-		}
-		return projects.filter((p) => p.flame_project_id === needle)
-	}
-
-	if (kind === 'sha1') {
-		const needle = q.trim().toLowerCase()
-		if (!needle) {
-			return []
-		}
-		return projects.filter((p) => p.files.some((f) => f.sha1.toLowerCase() === needle))
-	}
-
-	return []
+	return externalProjects.value
 })
 
 const lookupNeedsInput = computed(() => {
@@ -280,18 +240,72 @@ const noResultsHeading = computed(() => {
 	return formatMessage(messages.noResultsByTitle)
 })
 
-function executeSearch() {
+async function executeSearch() {
 	lastSearchKind.value = 'title'
 	activeQuery.value = query.value
+
+	if (query.value.length < 3) {
+		externalProjects.value = []
+		return
+	}
+
+	isLoading.value = true
+	try {
+		const results = await client.labrinth.external_license_internal.search({
+			title: query.value,
+		})
+		externalProjects.value = results.map(mapProject)
+	} catch {
+		externalProjects.value = []
+	} finally {
+		isLoading.value = false
+		hasSearched.value = true
+	}
 }
 
-function executeFlameIdLookup() {
+async function executeFlameIdLookup() {
 	lastSearchKind.value = 'flame_id'
 	activeQuery.value = query.value
+
+	const flameId = parseInt(query.value.trim(), 10)
+	if (isNaN(flameId)) {
+		externalProjects.value = []
+		return
+	}
+
+	isLoading.value = true
+	try {
+		const results = await client.labrinth.external_license_internal.search({
+			flame_id: flameId,
+		})
+		externalProjects.value = results.map(mapProject)
+	} catch {
+		externalProjects.value = []
+	} finally {
+		isLoading.value = false
+		hasSearched.value = true
+	}
 }
 
-function executeSha1Lookup() {
+async function executeSha1Lookup() {
 	lastSearchKind.value = 'sha1'
 	activeQuery.value = query.value
+
+	const sha1 = query.value.trim()
+	if (!sha1) {
+		externalProjects.value = []
+		return
+	}
+
+	isLoading.value = true
+	try {
+		const result = await client.labrinth.external_license_internal.getBySha1(sha1)
+		externalProjects.value = [mapProject(result)]
+	} catch {
+		externalProjects.value = []
+	} finally {
+		isLoading.value = false
+		hasSearched.value = true
+	}
 }
 </script>
