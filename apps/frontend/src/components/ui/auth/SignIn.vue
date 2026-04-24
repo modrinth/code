@@ -381,8 +381,9 @@ const messages = defineMessages({
 	position: absolute;
 	top: -0.75rem;
 	right: 0.5rem;
+	z-index: 1;
 	border-radius: 9999px;
-	background: #2f5745;
+	background-color: var(--surface-3);
 	color: var(--color-green);
 	border: 1px solid var(--color-green);
 	padding: 0.25rem 0.5rem;
@@ -390,5 +391,13 @@ const messages = defineMessages({
 	font-weight: 600;
 	line-height: 1;
 	pointer-events: none;
+}
+.oauth-provider-last-sign-in-badge::before {
+	content: '';
+	inset: 0;
+	border-radius: inherit;
+	background-color: var(--color-green-highlight);
+	position: absolute;
+	z-index: 0;
 }
 </style>
