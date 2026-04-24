@@ -103,6 +103,7 @@ const backupAdmonitionEntries = computed<BackupAdmonitionEntry[]>(() => {
 			backupId: op.backup_id,
 			type: op.operation_type,
 			state: 'ongoing',
+			status: backup?.status,
 			progress: rawProgress,
 			operationId: op.operation_id ?? null,
 			syntheticLegacy: op.synthetic_legacy,
@@ -123,6 +124,7 @@ const backupAdmonitionEntries = computed<BackupAdmonitionEntry[]>(() => {
 			backupId: backup.id,
 			type: last.operation_type,
 			state: last.state,
+			status: backup.status,
 			progress: 0,
 			operationId: last.operation_id ?? null,
 			syntheticLegacy: last.synthetic_legacy,
@@ -176,7 +178,11 @@ function backupType(entry: BackupAdmonitionEntry): StackedAdmonitionItem['type']
 
 function backupPriority(entry: BackupAdmonitionEntry): number {
 	if (entry.state === 'failed' || entry.state === 'timed_out') return 1
-	if (entry.state === 'ongoing' && entry.progress > 0) return 2
+	if (
+		entry.state === 'ongoing' &&
+		(entry.status === 'in_progress' || entry.progress > 0)
+	)
+		return 2
 	if (entry.state === 'ongoing' && entry.progress === 0) return 3
 	return 4
 }

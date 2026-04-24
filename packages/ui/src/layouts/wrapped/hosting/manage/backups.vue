@@ -344,7 +344,7 @@ const serverId = route.params.id as string
 
 defineEmits(['onDownload'])
 
-const { backups, invalidate, hasActiveCreate, query } = useServerBackupsQueue(
+const { backups, invalidate, hasActiveCreate, hasActiveRestore, query } = useServerBackupsQueue(
 	computed(() => serverId),
 	worldId,
 )
@@ -478,6 +478,9 @@ const backupRestoreDisabled = computed(() => {
 	if (busyReasons.value.length > 0) {
 		return formatMessage(busyReasons.value[0].reason)
 	}
+	if (hasActiveCreate.value || hasActiveRestore.value) {
+		return 'A backup operation is already queued or in progress'
+	}
 	return undefined
 })
 
@@ -493,7 +496,7 @@ const backupCreationDisabled = computed(() => {
 		return formatMessage(busyReasons.value[0].reason)
 	}
 	if (hasActiveCreate.value) {
-		return 'A backup is already in progress'
+		return 'A backup is already queued or in progress'
 	}
 	return undefined
 })

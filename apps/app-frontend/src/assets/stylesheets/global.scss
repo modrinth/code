@@ -182,18 +182,6 @@ img {
 
 @import '@modrinth/assets/omorphia.scss';
 
-button,
-input[type='button'] {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	background: transparent;
-	color: inherit;
-	font: inherit;
-	cursor: pointer;
-	outline: 2px solid transparent;
-}
-
 input {
 	border-radius: var(--size-rounded-sm);
 	box-sizing: border-box;

@@ -55,10 +55,7 @@ defineSlots<{
 		index: number
 		isFront: boolean
 		expanded: boolean
-		/**
-		 * Whether the consumer should render the Admonition's own dismiss button.
-		 * False when the stack header's "Dismiss all" covers the dismiss action.
-		 */
+		/** Whether the consumer should render the Admonition's own dismiss button. */
 		dismissible: boolean
 	}): unknown
 	'header-label'(props: { count: number; expanded: boolean }): unknown
@@ -117,7 +114,7 @@ const isExpanded = computed(() => {
 	return props.expanded ?? internalExpanded.value
 })
 const hasActionBar = computed(() => props.items.length >= 2)
-const itemDismissible = computed(() => !props.dismissAllEnabled || props.items.length <= 1)
+const itemDismissible = computed(() => true)
 
 type StackPhase = 'collapsed' | 'expanding' | 'expanded' | 'collapsing'
 
@@ -169,6 +166,11 @@ const containerHeight = computed(() => {
 
 const stackShellHeight = computed(() => {
 	return containerHeight.value + (hasActionBar.value ? actionBarHeight.value : 0)
+})
+const containerOverflow = computed(() => {
+	if (isExpanded.value) return 'visible'
+	if (!hasBehind.value && hasMeasuredCard(0)) return 'visible'
+	return 'hidden'
 })
 
 const springTransition = computed(() =>
@@ -487,7 +489,7 @@ const messages = defineMessages({
 				:initial="false"
 				:animate="{ height: containerHeight }"
 				:transition="springTransition"
-				:style="{ overflow: isExpanded ? 'visible' : 'hidden' }"
+				:style="{ overflow: containerOverflow }"
 				v-bind="containerMotionProps"
 				@mouseenter="isHovered = true"
 				@mouseleave="isHovered = false"

@@ -40,12 +40,32 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 		for (const op of activeOperations.value) map.set(op.backup_id, op)
 		return map
 	})
+	const backupById = computed(() => {
+		const map = new Map<string, Archon.BackupsQueue.v1.BackupQueueBackup>()
+		for (const backup of backups.value) map.set(backup.id, backup)
+		return map
+	})
 
 	const hasActiveCreate = computed(() =>
 		activeOperations.value.some((o) => o.operation_type === 'create' && !o.has_parent),
 	)
 	const hasActiveRestore = computed(() =>
 		activeOperations.value.some((o) => o.operation_type === 'restore'),
+	)
+	const hasRunningCreate = computed(() =>
+		activeOperations.value.some(
+			(o) =>
+				o.operation_type === 'create' &&
+				!o.has_parent &&
+				backupById.value.get(o.backup_id)?.status === 'in_progress',
+		),
+	)
+	const hasRunningRestore = computed(() =>
+		activeOperations.value.some(
+			(o) =>
+				o.operation_type === 'restore' &&
+				backupById.value.get(o.backup_id)?.status === 'in_progress',
+		),
 	)
 
 	function handleWsBackupProgress(evt: Archon.Websocket.v0.WSBackupProgressEvent) {
@@ -71,7 +91,7 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 
 	const busyReasons = computed<BusyReason[]>(() => {
 		const reasons: BusyReason[] = []
-		if (hasActiveCreate.value) {
+		if (hasRunningCreate.value) {
 			reasons.push({
 				reason: defineMessage({
 					id: 'servers.busy.backup-creating',
@@ -79,7 +99,7 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 				}),
 			})
 		}
-		if (hasActiveRestore.value) {
+		if (hasRunningRestore.value) {
 			reasons.push({
 				reason: defineMessage({
 					id: 'servers.busy.backup-restoring',
@@ -103,6 +123,8 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 		backups,
 		hasActiveCreate,
 		hasActiveRestore,
+		hasRunningCreate,
+		hasRunningRestore,
 		progressFor,
 		handleWsBackupProgress,
 		busyReasons,

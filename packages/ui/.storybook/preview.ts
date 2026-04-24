@@ -1,6 +1,5 @@
 import 'floating-vue/dist/style.css'
 import '../../assets/styles/defaults.scss'
-import './preview.css'
 // frontend css imports
 // import '../../../apps/frontend/src/assets/styles/global.scss'
 // import '../../../apps/frontend/src/assets/styles/tailwind.css'

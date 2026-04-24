@@ -20,6 +20,7 @@ export type BackupAdmonitionEntry = {
 	backupId: string
 	type: 'create' | 'restore'
 	state: AdmonitionDisplayState
+	status?: Archon.BackupsQueue.v1.BackupStatus
 	progress: number
 	operationId: number | null
 	syntheticLegacy: boolean
@@ -46,6 +47,7 @@ type UiPhase = 'queued' | 'in_progress' | 'failed' | 'timed_out' | 'cancelled' |
 
 function resolveUiPhase(item: BackupAdmonitionEntry): UiPhase | null {
 	if (item.state === 'ongoing') {
+		if (item.status === 'in_progress') return 'in_progress'
 		return item.progress > 0 ? 'in_progress' : 'queued'
 	}
 	switch (item.state) {

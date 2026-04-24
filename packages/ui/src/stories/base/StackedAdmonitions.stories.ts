@@ -58,6 +58,13 @@ const variedHeightItems: DemoItem[] = [
 	initialItems[2],
 ]
 
+const completedBackupItem: DemoItem = {
+	id: 'backup-completed',
+	type: 'success',
+	header: 'Backup completed',
+	body: 'Backup 38298832 finished successfully.',
+}
+
 export const Empty: Story = {
 	render: () => ({
 		components: { StackedAdmonitions, Admonition },
@@ -80,12 +87,12 @@ export const SingleItem: Story = {
 	render: () => ({
 		components: { StackedAdmonitions, Admonition },
 		setup() {
-			const items = ref<DemoItem[]>([initialItems[0]])
+			const items = ref<DemoItem[]>([completedBackupItem])
 			function dismiss(id: string) {
 				items.value = items.value.filter((i) => i.id !== id)
 			}
 			function reset() {
-				items.value = [initialItems[0]]
+				items.value = [completedBackupItem]
 			}
 			return { items, dismiss, reset }
 		},
