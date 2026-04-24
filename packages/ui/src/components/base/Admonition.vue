@@ -1,7 +1,7 @@
 <template>
 	<div
 		:class="[
-			'relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-x-3 rounded-2xl border border-solid p-4 text-contrast',
+			'relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-x-2 rounded-2xl border border-solid p-4 text-contrast',
 			progress != null ? 'overflow-hidden pb-5' : '',
 			typeClasses[type],
 		]"
@@ -9,10 +9,10 @@
 		<slot name="icon" :icon-class="['h-6 w-6 flex-none', iconClasses[type]]">
 			<component :is="getSeverityIcon(type)" :class="['h-6 w-6 flex-none', iconClasses[type]]" />
 		</slot>
-		<div class="col-start-2 flex min-w-0 flex-1 flex-col gap-1">
+		<div class="col-start-2 flex min-w-0 flex-1 flex-col gap-2">
 			<div
 				v-if="header || $slots.header || normalizedTimestamp"
-				class="flex flex-wrap items-center gap-2 text-base font-semibold"
+				class="flex flex-wrap items-center gap-2 text-lg font-bold leading-6"
 			>
 				<slot name="header">{{ header }}</slot>
 				<span

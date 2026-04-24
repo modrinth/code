@@ -5,7 +5,7 @@ import Admonition from '../../components/base/Admonition.vue'
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 
 type AdmonitionType = 'info' | 'warning' | 'critical' | 'success'
-type ActionType = 'Cancel' | 'Retry' | 'RetryOutlined' | 'Dismiss'
+type ActionType = 'Cancel' | 'Retry' | 'Dismiss'
 type ProgressColor = 'blue' | 'green' | 'red'
 
 interface CopyExample {
@@ -57,14 +57,14 @@ const sections: CopySection[] = [
 				type: 'critical',
 				title: 'Installation failed',
 				body: 'The specified loader or Minecraft version could not be installed. It may be invalid or unsupported.',
-				action: 'RetryOutlined',
+				action: 'Retry',
 				dismissible: true,
 			},
 			{
 				type: 'critical',
 				title: 'Installation failed',
 				body: 'This modpack version does not include a downloadable file. It may have been packaged incorrectly.',
-				action: 'RetryOutlined',
+				action: 'Retry',
 				dismissible: true,
 			},
 		],
@@ -74,7 +74,7 @@ const sections: CopySection[] = [
 		items: [
 			{
 				type: 'info',
-				title: 'Uploading files (1/3) - resourcepack.zip',
+				title: 'Uploading resourcepack.zip (1/3)',
 				body: '20 KB / 100 KB (20%)',
 				action: 'Cancel',
 				progress: 0.2,
@@ -83,21 +83,21 @@ const sections: CopySection[] = [
 			{
 				type: 'info',
 				title: 'Extracting story-modpack.mrpack',
-				body: '2 MB extracted - overrides/server.properties',
+				body: '2 MB extracted. Current file: server.properties',
 				action: 'Cancel',
 				progress: 0.35,
 				progressColor: 'blue',
 			},
 			{
 				type: 'success',
-				title: 'Extracting story-modpack.mrpack - Done',
+				title: 'Extracting story-modpack.mrpack finished',
 				body: '12 MB extracted',
 				progress: 1,
 				progressColor: 'green',
 			},
 			{
 				type: 'critical',
-				title: 'Extracting story-modpack.mrpack - Failed',
+				title: 'Extracting story-modpack.mrpack failed',
 				body: '2 MB extracted',
 				action: 'Dismiss',
 				dismissible: true,
@@ -132,7 +132,7 @@ const sections: CopySection[] = [
 			},
 			{
 				type: 'success',
-				title: 'Backup completed',
+				title: 'Backup finished',
 				body: 'World backup finished successfully.',
 				action: 'Dismiss',
 				dismissible: true,
@@ -165,7 +165,7 @@ const sections: CopySection[] = [
 			},
 			{
 				type: 'success',
-				title: 'Restore complete',
+				title: 'Restore finished',
 				body: 'Your server has been restored to World backup and is ready to start.',
 				action: 'Dismiss',
 				dismissible: true,
@@ -217,8 +217,7 @@ export const AllCopy: Story = {
 							<template
 								v-if="
 									item.action === 'Cancel' ||
-										item.action === 'Retry' ||
-										item.action === 'RetryOutlined'
+										item.action === 'Retry'
 									"
 									#top-right-actions
 								>
@@ -227,13 +226,10 @@ export const AllCopy: Story = {
 									</ButtonStyled>
 									<ButtonStyled
 										v-else
-										:type="item.action === 'RetryOutlined' ? 'outlined' : undefined"
+										type="outlined"
 										color="red"
 									>
-										<button
-											:class="item.action === 'RetryOutlined' ? '!border' : undefined"
-											type="button"
-										>
+										<button class="!border" type="button">
 											<RotateCounterClockwiseIcon class="size-5" />
 											Retry
 										</button>
@@ -243,6 +239,31 @@ export const AllCopy: Story = {
 						</div>
 					</section>
 				</div>
+			</div>
+		`,
+	}),
+}
+
+export const TitleTreatmentExperiment: Story = {
+	render: () => ({
+		components: { Admonition, ButtonStyled, RotateCounterClockwiseIcon },
+		template: /* html */ `
+			<div style="max-width: 840px;">
+				<Admonition
+					type="critical"
+					header="Backup failed"
+					dismissible
+				>
+					Something went wrong while creating World backup. Please try again or contact support if the issue continues.
+					<template #top-right-actions>
+						<ButtonStyled type="outlined" color="red">
+							<button class="!border" type="button">
+								<RotateCounterClockwiseIcon class="size-5" />
+								Retry
+							</button>
+						</ButtonStyled>
+					</template>
+				</Admonition>
 			</div>
 		`,
 	}),

@@ -117,7 +117,10 @@ provideConsoleManager({
 	},
 	showCommandInput: true,
 	disableCommandInput: computed(() => serverPowerState.value !== 'running'),
-	loading: computed(() => !isConnected.value || isWsAuthIncorrect.value),
+	loading: computed(
+		() =>
+			!isConnected.value || modrinthServersConsole.isInitialLogHydrating.value || isWsAuthIncorrect.value,
+	),
 	onClear: async () => {
 		modrinthServersConsole.clear()
 		try {

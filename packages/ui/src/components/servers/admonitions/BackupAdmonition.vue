@@ -143,7 +143,7 @@ const messages = defineMessages({
 	},
 	backupCompletedTitle: {
 		id: 'servers.backups.admonition.backup-completed.title',
-		defaultMessage: 'Backup completed',
+		defaultMessage: 'Backup finished',
 	},
 	backupCompletedDescription: {
 		id: 'servers.backups.admonition.backup-completed.description',
@@ -167,7 +167,7 @@ const messages = defineMessages({
 	},
 	restoreSuccessfulTitle: {
 		id: 'servers.backups.admonition.restore-successful.title',
-		defaultMessage: 'Restore complete',
+		defaultMessage: 'Restore finished',
 	},
 	restoreSuccessfulDescription: {
 		id: 'servers.backups.admonition.restore-successful.description',
@@ -279,8 +279,8 @@ function getDescription(item: BackupAdmonitionEntry): string {
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
-			<ButtonStyled v-if="canRetry(item)" color="red">
-				<button type="button" @click="$emit('retry')">
+			<ButtonStyled v-if="canRetry(item)" color="red" type="outlined">
+				<button class="!border" type="button" @click="$emit('retry')">
 					<RotateCounterClockwiseIcon class="size-5" />
 					{{ formatMessage(commonMessages.retryButton) }}
 				</button>

@@ -58,9 +58,10 @@
 			ref="terminalRef"
 			class="min-h-0 flex-1"
 			:show-input="resolvedShowInput"
-			:disable-input="resolvedDisableInput"
+			:disable-input="resolvedInputDisabled"
 			:fullscreen="isFullscreen"
 			:empty-state-type="ctx.emptyStateType"
+			:loading="resolvedLoading"
 			@command="handleCommand"
 			@ready="handleTerminalReady"
 		/>
@@ -206,6 +207,15 @@ const resolvedDisableInput = computed(() => {
 	return isRef(v) ? v.value : v
 })
 
+// needs historical log start/end flags on ws to be properly useful
+const resolvedLoading = computed(() => {
+	const v = ctx.loading
+	if (!v) return false
+	return v.value
+})
+
+const resolvedInputDisabled = computed(() => resolvedDisableInput.value || resolvedLoading.value)
+
 const resolvedShareDisabled = computed(() => {
 	const v = ctx.shareDisabled
 	if (!v) return false
@@ -237,6 +247,11 @@ function rewriteFiltered() {
 	const term = terminalRef.value?.terminal
 	if (!term) return
 	const lines = ctx.logLines.value
+	if (resolvedLoading.value && lines.length === 0 && isLiveSource.value) {
+		terminalRef.value?.clearEmptyState()
+		lastWrittenIndex = 0
+		return
+	}
 	if (lines.length === 0 && isLiveSource.value) {
 		writeEmptyState()
 		return
@@ -271,6 +286,12 @@ watch(ctx.logLines, (lines, oldLines) => {
 	if (!term) return
 
 	if (lines.length === 0 && isLiveSource.value) {
+		if (resolvedLoading.value) {
+			terminalRef.value?.clearEmptyState()
+			lastWrittenIndex = 0
+			return
+		}
+
 		writeEmptyState()
 		return
 	}
@@ -310,6 +331,12 @@ watch(searchQuery, () => {
 	searchDebounce = setTimeout(() => {
 		rewriteFiltered()
 	}, 200)
+})
+
+watch(resolvedLoading, (loading) => {
+	if (!loading) {
+		rewriteFiltered()
+	}
 })
 
 function handleCommand(cmd: string) {

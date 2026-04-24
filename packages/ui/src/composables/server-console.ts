@@ -1,5 +1,5 @@
 import { createGlobalState } from '@vueuse/core'
-import { type Ref, shallowRef, triggerRef } from 'vue'
+import { ref, type Ref, shallowRef, triggerRef } from 'vue'
 
 import { detectLogLevel } from '../layouts/shared/console/composables/log-level'
 import type { Log4jEvent, LogLevel, LogLine } from '../layouts/shared/console/types'
@@ -52,6 +52,8 @@ function groupContinuations(lines: LogLine[]): LogLine[] {
 
 const batchTimeout = 300
 const initialBatchSize = 256
+const initialHydrationQuietMs = 700
+const initialHydrationMaxMs = 2000
 
 const LogLevelCode = {
 	None: 0,
@@ -224,9 +226,42 @@ export function createConsoleState() {
 
 	let lineBuffer: LogLine[] = []
 	let batchTimer: NodeJS.Timeout | null = null
+	let initialHydrationQuietTimer: ReturnType<typeof setTimeout> | null = null
+	let initialHydrationMaxTimer: ReturnType<typeof setTimeout> | null = null
+	const isInitialLogHydrating = ref(false)
 
 	let wrapCount = 0
 	let lastFlushMs = 0
+
+	const clearInitialHydrationTimers = (): void => {
+		if (initialHydrationQuietTimer) {
+			clearTimeout(initialHydrationQuietTimer)
+			initialHydrationQuietTimer = null
+		}
+		if (initialHydrationMaxTimer) {
+			clearTimeout(initialHydrationMaxTimer)
+			initialHydrationMaxTimer = null
+		}
+	}
+
+	const settleInitialLogHydration = (): void => {
+		if (!isInitialLogHydrating.value) return
+		clearInitialHydrationTimers()
+		flushBuffer()
+		isInitialLogHydrating.value = false
+	}
+
+	const armInitialHydrationQuietTimer = (): void => {
+		if (initialHydrationQuietTimer) clearTimeout(initialHydrationQuietTimer)
+		initialHydrationQuietTimer = setTimeout(settleInitialLogHydration, initialHydrationQuietMs)
+	}
+
+	const beginInitialLogHydration = (): void => {
+		clearInitialHydrationTimers()
+		isInitialLogHydrating.value = true
+		armInitialHydrationQuietTimer()
+		initialHydrationMaxTimer = setTimeout(settleInitialLogHydration, initialHydrationMaxMs)
+	}
 
 	const flushBuffer = (): void => {
 		if (lineBuffer.length === 0) return
@@ -269,6 +304,12 @@ export function createConsoleState() {
 	}
 
 	const addLines = (lines: LogLine[]): void => {
+		if (isInitialLogHydrating.value) {
+			lineBuffer.push(...lines)
+			armInitialHydrationQuietTimer()
+			return
+		}
+
 		if (output.value.length === 0 && lines.length >= initialBatchSize) {
 			lineBuffer = lines
 			flushBuffer()
@@ -326,6 +367,8 @@ export function createConsoleState() {
 		lineBuffer = []
 		wsEventHistory.length = 0
 		wrapCount = 0
+		isInitialLogHydrating.value = false
+		clearInitialHydrationTimers()
 		if (batchTimer) {
 			clearTimeout(batchTimer)
 			batchTimer = null
@@ -359,6 +402,8 @@ export function createConsoleState() {
 
 	return {
 		output,
+		isInitialLogHydrating,
+		beginInitialLogHydration,
 		addLines,
 		addLog4jEvent,
 		addLegacyLog,

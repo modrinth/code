@@ -4,10 +4,11 @@
 			<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
 		</template>
 		<template #header>
-			Uploading files ({{ state.completedFiles }}/{{ state.totalFiles }})
-			<span v-if="state.currentFileName" class="font-normal text-secondary">
-				- {{ state.currentFileName }}
-			</span>
+			{{
+				state.currentFileName
+					? `Uploading ${state.currentFileName} (${state.completedFiles}/${state.totalFiles})`
+					: `Uploading files (${state.completedFiles}/${state.totalFiles})`
+			}}
 		</template>
 		<span class="text-secondary">
 			{{ formatBytes(state.uploadedBytes) }} / {{ formatBytes(state.totalBytes) }} ({{

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -88,6 +88,17 @@ const filesBusyHeader = computed(() =>
 
 const dismissedIds = reactive(new Set<string>())
 const cancellingIds = reactive(new Set<string>())
+const dismissedContentErrorKey = ref<string | null>(null)
+
+const contentErrorKey = computed(() =>
+	props.contentError ? `${props.contentError.step}:${props.contentError.description}` : null,
+)
+
+watch(contentErrorKey, (key) => {
+	if (!key) {
+		dismissedContentErrorKey.value = null
+	}
+})
 
 const backupAdmonitionEntries = computed<BackupAdmonitionEntry[]>(() => {
 	const result: BackupAdmonitionEntry[] = []
@@ -154,6 +165,7 @@ const showInstallingBanner = computed(() => {
 	const installing =
 		ctx.server.value.status === 'installing' || ctx.isSyncingContent.value || !!props.contentError
 	if (!installing) return false
+	if (contentErrorKey.value && dismissedContentErrorKey.value === contentErrorKey.value) return false
 	return props.syncProgress?.phase !== 'Analyzing'
 })
 
@@ -260,6 +272,9 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 
 const hasBulkDismissableItems = computed(() =>
 	stackItems.value.some((it) => {
+		if (it.kind === 'installing') {
+			return !!props.contentError
+		}
 		if (it.kind === 'fs-op') {
 			const terminal = it.op.state === 'done' || !!it.op.state?.startsWith('fail')
 			return terminal && !!it.op.id
@@ -320,7 +335,9 @@ async function onBackupRetry(item: BackupAdmonitionEntry) {
 async function onDismissAll() {
 	const tasks: Promise<unknown>[] = []
 	for (const it of stackItems.value) {
-		if (it.kind === 'fs-op' && it.op.id) {
+		if (it.kind === 'installing' && props.contentError) {
+			onContentErrorDismiss()
+		} else if (it.kind === 'fs-op' && it.op.id) {
 			const { op } = it
 			if (op.state === 'done' || op.state?.startsWith('fail')) {
 				tasks.push(ctx.dismissOperation(it.op.id, 'dismiss'))
@@ -337,6 +354,12 @@ function onFileOpDismiss(item: ServerAdmonitionItem) {
 		void ctx.dismissOperation(item.op.id, 'dismiss')
 	}
 }
+
+function onContentErrorDismiss() {
+	if (contentErrorKey.value) {
+		dismissedContentErrorKey.value = contentErrorKey.value
+	}
+}
 </script>
 
 <template>
@@ -351,6 +374,8 @@ function onFileOpDismiss(item: ServerAdmonitionItem) {
 				v-if="item.kind === 'installing'"
 				:progress="syncProgress"
 				:content-error="contentError"
+				:dismissible="dismissible && !!contentError"
+				@dismiss="onContentErrorDismiss"
 				@retry="emit('content-retry')"
 			>
 				<template #icon>

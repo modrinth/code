@@ -324,6 +324,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			isWsAuthIncorrect.value = false
 
 			modrinthServersConsole.clear()
+			modrinthServersConsole.beginInitialLogHydration()
 
 			const baseSubscriptions: SocketUnsubscriber[] = [
 				client.archon.sockets.on(targetServerId, 'log', handleLog),

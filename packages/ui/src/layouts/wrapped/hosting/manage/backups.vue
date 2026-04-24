@@ -108,7 +108,7 @@
 						</EmptyState>
 					</div>
 
-					<div v-else class="flex flex-col gap-1.5">
+					<div v-else class="flex flex-col gap-3">
 						<template v-for="group in groupedBackups" :key="group.label">
 							<div class="flex items-center gap-2">
 								<div class="flex w-5 shrink-0 items-center justify-center">

@@ -1,9 +1,11 @@
 <template>
 	<Admonition
 		:type="contentError ? 'critical' : 'info'"
+		:dismissible="dismissible"
 		:progress="!contentError ? (progress ? progress.percent / 100 : 0) : undefined"
 		progress-color="blue"
 		:waiting="!contentError && !progress"
+		@dismiss="emit('dismiss')"
 	>
 		<template #icon>
 			<slot v-if="!contentError" name="icon">
@@ -31,7 +33,7 @@
 		</div>
 		<template v-if="contentError" #top-right-actions>
 			<ButtonStyled color="red" type="outlined">
-				<button class="!border" @click="emit('retry')">
+				<button class="!border" type="button" @click="emit('retry')">
 					<RotateCounterClockwiseIcon class="size-5" />
 					Retry
 				</button>
@@ -61,10 +63,12 @@ export interface ContentError {
 const props = defineProps<{
 	progress?: SyncProgress | null
 	contentError?: ContentError | null
+	dismissible?: boolean
 }>()
 
 const emit = defineEmits<{
 	retry: []
+	dismiss: []
 }>()
 
 const errorLabel = computed(() => {
@@ -88,7 +92,7 @@ const errorLabel = computed(() => {
 			return 'This modpack version does not include a downloadable file. It may have been packaged incorrectly.'
 		}
 		if (desc?.includes('failed to install')) {
-			return 'Failed to install the modpack. It may be corrupted or incompatible.'
+			return 'The modpack could not be installed. It may be corrupted or incompatible.'
 		}
 	}
 
