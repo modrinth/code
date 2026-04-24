@@ -1199,6 +1199,10 @@ async function logoutUser() {
 }
 
 function runAnalytics() {
+	if (import.meta.dev) {
+		return
+	}
+
 	const config = useRuntimeConfig()
 	const replacedUrl = config.public.apiBaseUrl.replace('v2/', '')
 
