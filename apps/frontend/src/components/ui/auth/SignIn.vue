@@ -184,30 +184,25 @@
 					</ButtonStyled>
 
 					<div class="flex flex-wrap items-center justify-center gap-2.5 !text-base">
-						<IntlFormatted :message-id="messages.additionalOptionsLabel">
-							<template #forgot-password-link="{ children }">
-								<NuxtLink
-									class="text-link"
-									:to="{
-										path: '/auth/reset-password',
-										query: routeQuery,
-									}"
-								>
-									<component :is="() => children" />
-								</NuxtLink>
-							</template>
-							<template #create-account-link="{ children }">
-								<NuxtLink
-									class="inline text-link"
-									:to="{
-										path: '/auth/sign-up',
-										query: routeQuery,
-									}"
-								>
-									<component :is="() => children" />
-								</NuxtLink>
-							</template>
-						</IntlFormatted>
+						<NuxtLink
+							class="text-link"
+							:to="{
+								path: '/auth/reset-password',
+								query: routeQuery,
+							}"
+						>
+							{{ formatMessage(messages.forgotPasswordLabel) }}
+						</NuxtLink>
+						<div class="h-1.5 w-1.5 rounded-full bg-surface-5" />
+						<NuxtLink
+							class="inline text-link"
+							:to="{
+								path: '/auth/sign-up',
+								query: routeQuery,
+							}"
+						>
+							{{ formatMessage(messages.createAccountLabel) }}
+						</NuxtLink>
 					</div>
 				</section>
 			</div>
@@ -227,14 +222,7 @@ import {
 	RightArrowIcon,
 	SteamColorIcon,
 } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	commonMessages,
-	defineMessages,
-	IntlFormatted,
-	StyledInput,
-	useVIntl,
-} from '@modrinth/ui'
+import { ButtonStyled, commonMessages, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 
@@ -331,10 +319,17 @@ const onOAuthProviderClick = (provider) => {
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	additionalOptionsLabel: {
-		id: 'auth.sign-in.additional-options',
-		defaultMessage:
-			"<forgot-password-link>Forgot password</forgot-password-link> • Don't have an account? <create-account-link>Sign up</create-account-link>",
+	forgotPasswordLabel: {
+		id: 'auth.sign-in.forgot-password',
+		defaultMessage: 'Forgot password',
+	},
+	noAccountLabel: {
+		id: 'auth.sign-in.no-account',
+		defaultMessage: "Don't have an account?",
+	},
+	createAccountLabel: {
+		id: 'auth.sign-in.create-account',
+		defaultMessage: 'Sign up',
 	},
 	signInWithLabel: {
 		id: 'auth.sign-in.sign-in-with',

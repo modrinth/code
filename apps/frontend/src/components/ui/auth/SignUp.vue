@@ -105,6 +105,16 @@
 				wrapper-class="w-full"
 			/>
 
+			<ButtonStyled color="brand">
+				<button
+					class="!w-full"
+					:disabled="!emailModel || !passwordModel"
+					@click="onContinueWithEmail()"
+				>
+					{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
+				</button>
+			</ButtonStyled>
+
 			<p v-if="!routeQuery.launcher" class="m-0">
 				<IntlFormatted :message-id="messages.legalDisclaimer">
 					<template #terms-link="{ children }">
@@ -120,17 +130,7 @@
 				</IntlFormatted>
 			</p>
 
-			<ButtonStyled color="brand">
-				<button
-					class="!w-full"
-					:disabled="!emailModel || !passwordModel"
-					@click="onContinueWithEmail()"
-				>
-					{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
-				</button>
-			</ButtonStyled>
-
-			<div class="flex flex-wrap items-center justify-center gap-2">
+			<div class="flex flex-wrap items-center justify-start gap-2">
 				{{ formatMessage(messages.alreadyHaveAccountLabel) }}
 				<NuxtLink
 					class="text-link"

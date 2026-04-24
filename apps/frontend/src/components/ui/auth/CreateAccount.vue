@@ -15,16 +15,16 @@
 			<input
 				id="create-account-dob"
 				v-model="dateOfBirthModel"
-				class="scheme-dark w-full border-0 bg-surface-4 text-lg text-primary outline-none [color-scheme:dark]"
+				class="scheme-dark h-9 w-full border-0 bg-surface-4 text-lg text-primary outline-none [color-scheme:dark]"
 				type="date"
-				:max="maxBirthDate"
+				:max="maxInputDate"
 			/>
 			<div>
 				{{ formatMessage(messages.over13HelperText) }}
 			</div>
 			<Admonition :type="'info'">
 				<template #header>
-					<div class="-mb-2 flex flex-col gap-1.5 font-normal leading-normal">
+					<div class="-mb-3 -mt-1 flex flex-col gap-0 text-sm font-normal leading-normal">
 						<div>
 							{{ formatMessage(messages.infoPanelText) }}
 						</div>
@@ -62,10 +62,12 @@
 			<HCaptcha v-if="globals?.captcha_enabled" :ref="onSetCaptchaRef" v-model="tokenModel" />
 		</section>
 
-		<div class="flex gap-2.5 rounded-2xl border border-solid border-surface-5 p-3">
+		<div
+			class="flex gap-2.5 rounded-2xl border border-solid border-surface-5 bg-surface-3 transition-all hover:brightness-110"
+		>
 			<Checkbox
 				v-model="subscribeModel"
-				class="text-left leading-snug text-primary transition-all hover:brightness-100"
+				class="p-3 text-left leading-snug text-primary transition-all"
 				:label="formatMessage(messages.subscribeLabel)"
 				:description="formatMessage(messages.subscribeLabel)"
 			/>
@@ -78,6 +80,7 @@
 				@click="onCompleteSignUpClick"
 			>
 				{{ formatMessage(messages.completeSignUpButton) }}
+				<RightArrowIcon />
 			</button>
 		</ButtonStyled>
 	</div>
@@ -96,6 +99,7 @@ import {
 import { computed } from 'vue'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
+import { RightArrowIcon } from '@modrinth/assets'
 
 const props = defineProps({
 	dateOfBirth: {
@@ -163,6 +167,8 @@ const subscribeModel = computed({
 	get: () => props.subscribe,
 	set: (value) => emit('update:subscribe', value),
 })
+
+const maxInputDate = computed(() => new Date().toISOString().slice(0, 10))
 
 const maxBirthDate = computed(() => {
 	const date = new Date()

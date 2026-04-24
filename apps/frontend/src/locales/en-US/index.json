@@ -320,14 +320,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Enter code..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Forgot password</forgot-password-link> • Don't have an account? <create-account-link>Sign up</create-account-link>"
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Continue with Email"
   },
+  "auth.sign-in.create-account": {
+    "message": "Sign up"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Forgot password"
+  },
   "auth.sign-in.last-sign-in": {
     "message": "Last sign in"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Don't have an account?"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Sign into Modrinth"
