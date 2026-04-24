@@ -238,7 +238,6 @@ onMounted(async () => {
 onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
-	document.documentElement.classList.remove('app-sidebar-visible')
 	shutdownHostingIntercom()
 
 	await unlistenUpdateDownload?.()
@@ -655,6 +654,8 @@ const showAd = computed(
 	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
 )
 const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
+const INTERCOM_DEFAULT_PADDING = 20
+const INTERCOM_APP_SIDEBAR_WIDTH = 300
 
 let intercomBooting = false
 let intercomBooted = false
@@ -696,6 +697,11 @@ async function bootIntercom() {
 			app_id: 'ykeritl9',
 			intercom_user_jwt: token,
 			session_duration: 1000 * 60 * 60 * 24,
+			alignment: 'right',
+			horizontal_padding: sidebarVisible.value
+				? INTERCOM_APP_SIDEBAR_WIDTH + INTERCOM_DEFAULT_PADDING
+				: INTERCOM_DEFAULT_PADDING,
+			vertical_padding: INTERCOM_DEFAULT_PADDING,
 		})
 		intercomBooted = true
 	} catch (error) {
@@ -715,7 +721,14 @@ function shutdownHostingIntercom() {
 watch(
 	sidebarVisible,
 	(visible) => {
-		document.documentElement.classList.toggle('app-sidebar-visible', visible)
+		if (intercomBooted) {
+			window.Intercom?.('update', {
+				horizontal_padding: visible
+					? INTERCOM_APP_SIDEBAR_WIDTH + INTERCOM_DEFAULT_PADDING
+					: INTERCOM_DEFAULT_PADDING,
+				vertical_padding: INTERCOM_DEFAULT_PADDING,
+			})
+		}
 	},
 	{ immediate: true },
 )
@@ -1745,12 +1758,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--os-handle-bg: var(--color-scrollbar) !important;
 	--os-handle-bg-hover: var(--color-scrollbar) !important;
 	--os-handle-bg-active: var(--color-scrollbar) !important;
-}
-
-html.app-sidebar-visible .intercom-lightweight-app-launcher,
-html.app-sidebar-visible .intercom-launcher-frame,
-html.app-sidebar-visible .intercom-messenger-frame {
-	right: calc(300px + 20px) !important;
 }
 
 .mac {
