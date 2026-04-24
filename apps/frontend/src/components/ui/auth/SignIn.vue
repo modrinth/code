@@ -40,7 +40,7 @@
 					<ButtonStyled>
 						<a
 							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': isLastSignInProvider('google') }"
+							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'google' }"
 							:href="getAuthUrl('google', redirectTarget)"
 							@click="onOAuthProviderClick('google')"
 						>
@@ -48,7 +48,10 @@
 							<span class="ml-1">{{
 								formatMessage(messages.continueWithProvider, { provider: 'Google' })
 							}}</span>
-							<span v-if="isLastSignInProvider('google')" class="oauth-provider-last-sign-in-badge">
+							<span
+								v-if="lastSignInProvider === 'google'"
+								class="oauth-provider-last-sign-in-badge"
+							>
 								{{ formatMessage(messages.lastSignInLabel) }}
 							</span>
 						</a>
@@ -56,7 +59,7 @@
 					<ButtonStyled>
 						<a
 							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': isLastSignInProvider('microsoft') }"
+							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'microsoft' }"
 							:href="getAuthUrl('microsoft', redirectTarget)"
 							@click="onOAuthProviderClick('microsoft')"
 						>
@@ -65,7 +68,7 @@
 								formatMessage(messages.continueWithProvider, { provider: 'Microsoft' })
 							}}</span>
 							<span
-								v-if="isLastSignInProvider('microsoft')"
+								v-if="lastSignInProvider === 'microsoft'"
 								class="oauth-provider-last-sign-in-badge"
 							>
 								{{ formatMessage(messages.lastSignInLabel) }}
@@ -75,7 +78,7 @@
 					<ButtonStyled>
 						<a
 							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': isLastSignInProvider('discord') }"
+							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'discord' }"
 							:href="getAuthUrl('discord', redirectTarget)"
 							@click="onOAuthProviderClick('discord')"
 						>
@@ -84,7 +87,7 @@
 								formatMessage(messages.continueWithProvider, { provider: 'Discord' })
 							}}</span>
 							<span
-								v-if="isLastSignInProvider('discord')"
+								v-if="lastSignInProvider === 'discord'"
 								class="oauth-provider-last-sign-in-badge"
 							>
 								{{ formatMessage(messages.lastSignInLabel) }}
@@ -94,7 +97,7 @@
 					<ButtonStyled>
 						<a
 							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': isLastSignInProvider('github') }"
+							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'github' }"
 							:href="getAuthUrl('github', redirectTarget)"
 							@click="onOAuthProviderClick('github')"
 						>
@@ -102,7 +105,10 @@
 							<span class="ml-1">{{
 								formatMessage(messages.continueWithProvider, { provider: 'GitHub' })
 							}}</span>
-							<span v-if="isLastSignInProvider('github')" class="oauth-provider-last-sign-in-badge">
+							<span
+								v-if="lastSignInProvider === 'github'"
+								class="oauth-provider-last-sign-in-badge"
+							>
 								{{ formatMessage(messages.lastSignInLabel) }}
 							</span>
 						</a>
@@ -110,7 +116,7 @@
 					<ButtonStyled>
 						<a
 							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': isLastSignInProvider('gitlab') }"
+							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'gitlab' }"
 							:href="getAuthUrl('gitlab', redirectTarget)"
 							@click="onOAuthProviderClick('gitlab')"
 						>
@@ -118,7 +124,10 @@
 							<span class="ml-1">{{
 								formatMessage(messages.continueWithProvider, { provider: 'GitLab' })
 							}}</span>
-							<span v-if="isLastSignInProvider('gitlab')" class="oauth-provider-last-sign-in-badge">
+							<span
+								v-if="lastSignInProvider === 'gitlab'"
+								class="oauth-provider-last-sign-in-badge"
+							>
 								{{ formatMessage(messages.lastSignInLabel) }}
 							</span>
 						</a>
@@ -126,7 +135,7 @@
 					<ButtonStyled>
 						<a
 							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': isLastSignInProvider('steam') }"
+							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'steam' }"
 							:href="getAuthUrl('steam', redirectTarget)"
 							@click="onOAuthProviderClick('steam')"
 						>
@@ -134,7 +143,7 @@
 							<span class="ml-1">{{
 								formatMessage(messages.continueWithProvider, { provider: 'Steam' })
 							}}</span>
-							<span v-if="isLastSignInProvider('steam')" class="oauth-provider-last-sign-in-badge">
+							<span v-if="lastSignInProvider === 'steam'" class="oauth-provider-last-sign-in-badge">
 								{{ formatMessage(messages.lastSignInLabel) }}
 							</span>
 						</a>
@@ -311,7 +320,7 @@ const twoFactorCodeModel = computed({
 
 const lastSignInOAuthProvider = useStorage(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
 const pendingSignInOAuthProvider = useStorage(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
-const isLastSignInProvider = (provider) => lastSignInOAuthProvider.value === provider
+const lastSignInProvider = computed(() => lastSignInOAuthProvider.value)
 const onOAuthProviderClick = (provider) => {
 	pendingSignInOAuthProvider.value = provider
 }
