@@ -142,7 +142,23 @@ export const getAuthUrl = (provider: string, redirect = '/dashboard') => {
 	const launcher = getQueryString(route.query.launcher)
 
 	const fullURL = launcher
-		? getLauncherRedirectUrl(route)
+		? (() => {
+				const callbackUrl = new URL('/auth/sign-in', config.public.siteUrl)
+				callbackUrl.searchParams.set('launcher', launcher)
+
+				const ipver = getQueryString(route.query.ipver)
+				const port = getQueryString(route.query.port)
+
+				if (ipver) {
+					callbackUrl.searchParams.set('ipver', ipver)
+				}
+
+				if (port) {
+					callbackUrl.searchParams.set('port', port)
+				}
+
+				return callbackUrl.toString()
+			})()
 		: `${config.public.siteUrl}/auth/sign-in?redirect=${encodeURIComponent(redirect)}`
 
 	return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${encodeURIComponent(fullURL)}`
