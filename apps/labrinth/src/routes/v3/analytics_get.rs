@@ -55,6 +55,10 @@ pub struct GetRequest {
     pub time_range: TimeRange,
     /// What analytics metrics to return data for.
     pub return_metrics: ReturnMetrics,
+    /// What project IDs to return data for.
+    ///
+    /// If this is empty, all of the user's projects will be included.
+    pub project_ids: Vec<ProjectId>,
 }
 
 /// Time range for fetching analytics.
@@ -107,10 +111,6 @@ pub struct ReturnMetrics {
     /// How much payout revenue an affiliate code has generated.
     pub affiliate_code_revenue: Option<Metrics<AffiliateCodeRevenueField>>,
 }
-
-/// Replacement for `()` because of a `utoipa` limitation.
-#[derive(Debug, Default, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct Unit {}
 
 /// See [`ReturnMetrics`].
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
@@ -612,9 +612,16 @@ pub async fn fetch_analytics(
 
     let mut time_slices = vec![TimeSlice::default(); num_time_slices];
 
-    // TODO fetch from req
-    let project_ids =
-        DBUser::get_projects(user.id.into(), &**pool, &redis).await?;
+    let project_ids = {
+        if req.project_ids.is_empty() {
+            DBUser::get_projects(user.id.into(), &**pool, &redis).await?
+        } else {
+            req.project_ids
+                .iter()
+                .map(|id| DBProjectId::from(*id))
+                .collect::<Vec<_>>()
+        }
+    };
 
     let project_ids =
         filter_allowed_project_ids(&project_ids, &user, &pool, &redis).await?;
