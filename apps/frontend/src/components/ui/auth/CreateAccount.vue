@@ -15,7 +15,7 @@
 			<input
 				id="create-account-dob"
 				v-model="dateOfBirthModel"
-				class="scheme-dark h-9 w-full border-0 bg-surface-4 text-lg text-primary outline-none [color-scheme:dark]"
+				class="create-account-dob-input scheme-dark h-9 w-full cursor-text border-0 bg-surface-4 text-lg text-primary outline-none [color-scheme:dark]"
 				type="date"
 				:max="maxInputDate"
 			/>
@@ -291,3 +291,15 @@ const messages = defineMessages({
 	},
 })
 </script>
+
+<style scoped>
+.create-account-dob-input::-webkit-calendar-picker-indicator {
+	opacity: 0.5;
+	transition: opacity 0.15s ease-in-out;
+}
+
+.create-account-dob-input::-webkit-calendar-picker-indicator:hover {
+	opacity: 1;
+	cursor: pointer;
+}
+</style>
