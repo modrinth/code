@@ -12,7 +12,7 @@ const toolbarEl = ref<HTMLElement | null>(null)
 const compact = ref(false)
 
 const { stackCount } = useModalStack()
-const zIndex = computed(() => 100 + stackCount.value * 10 + 31)
+const zIndex = computed(() => 100 + stackCount.value * 10 + 8)
 
 function checkCompact() {
 	const el = toolbarEl.value

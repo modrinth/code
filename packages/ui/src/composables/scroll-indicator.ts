@@ -20,7 +20,7 @@ export function useScrollIndicator(
 	containerRef: Ref<HTMLElement | null>,
 	options: ScrollIndicatorOptions = {},
 ): ScrollIndicator {
-	const { watchContent = true, debounceMs = 10, tolerance = 1, debug = false } = options
+	const { watchContent = true, debounceMs = 0, tolerance = 1, debug = false } = options
 
 	const showTopFade = ref(false)
 	const showBottomFade = ref(false)
