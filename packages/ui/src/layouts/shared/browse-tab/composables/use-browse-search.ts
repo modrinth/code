@@ -100,7 +100,13 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		serverFilterTypes,
 		serverRequestParams,
 		createServerPageParams,
-	} = useServerSearch({ tags: options.tags, query, maxResults, currentPage })
+	} = useServerSearch({
+		tags: options.tags,
+		query,
+		maxResults,
+		currentPage,
+		providedFilters: options.providedFilters,
+	})
 
 	const effectiveRequestParams = computed(() =>
 		isServerType.value ? serverRequestParams.value : requestParams.value,
