@@ -120,6 +120,8 @@ type StackPhase = 'collapsed' | 'expanding' | 'expanded' | 'collapsing'
 
 const phase = ref<StackPhase>(isExpanded.value ? 'expanded' : 'collapsed')
 const isSettledCollapsed = computed(() => phase.value === 'collapsed')
+const containerHeightSettled = ref(true)
+const singleItemEntrance = ref(false)
 
 // Behind cards morph between a collapsed placeholder and real content. The shell
 // height owns that morph so mixed-height cards do not swap DOM midway through motion.
@@ -169,6 +171,7 @@ const stackShellHeight = computed(() => {
 })
 const containerOverflow = computed(() => {
 	if (isExpanded.value) return 'visible'
+	if (!containerHeightSettled.value) return 'hidden'
 	if (!hasBehind.value && hasMeasuredCard(0)) return 'visible'
 	return 'hidden'
 })
@@ -177,6 +180,9 @@ const springTransition = computed(() =>
 	prefersReducedMotion.value || !initialMeasurementSettled.value
 		? { duration: 0 }
 		: { type: 'spring' as const, stiffness: 260, damping: 32 },
+)
+const heightTransition = computed(() =>
+	singleItemEntrance.value ? { duration: 0.12, ease: 'easeOut' as const } : springTransition.value,
 )
 
 const exitTransition = computed(() =>
@@ -207,6 +213,12 @@ function expandedCardPosition(index: number) {
 function cardPosition(index: number) {
 	const position = isExpanded.value ? expandedCardPosition(index) : collapsedCardPosition(index)
 	const item = props.items[index]
+	if (index === 0 && singleItemEntrance.value) {
+		return {
+			...position,
+			opacity: 0,
+		}
+	}
 	if (!item || !enteringItemIds.value.has(item.id)) return position
 
 	return {
@@ -241,6 +253,10 @@ function markEntering(ids: string[]) {
 
 function onContainerAnimationComplete() {
 	phase.value = isExpanded.value ? 'expanded' : 'collapsed'
+	containerHeightSettled.value = true
+	if (containerHeight.value > 0) {
+		singleItemEntrance.value = false
+	}
 }
 
 const containerMotionProps = computed(() => ({
@@ -340,7 +356,13 @@ function onCardClick(e: MouseEvent) {
 
 watch(
 	() => props.items.length,
-	(n) => {
+	(n, previousLength) => {
+		if (previousLength === 0 && n === 1 && !prefersReducedMotion.value) {
+			singleItemEntrance.value = true
+		} else if (n !== 1) {
+			singleItemEntrance.value = false
+		}
+
 		if (n <= 1 && (props.expanded ?? internalExpanded.value)) {
 			phase.value = 'collapsed'
 			setExpanded(false)
@@ -355,6 +377,22 @@ watch(isExpanded, (expanded, previousExpanded) => {
 	}
 	if (expanded && phase.value !== 'expanding') phase.value = 'expanding'
 	else if (!expanded && phase.value !== 'collapsing') phase.value = 'collapsing'
+})
+
+watch(containerHeight, (height, previousHeight) => {
+	if (height !== previousHeight) {
+		const openingSingleItem =
+			previousHeight === 0 && height > 0 && props.items.length === 1 && !prefersReducedMotion.value
+
+		if (openingSingleItem) {
+			singleItemEntrance.value = true
+		} else if (height === 0 || props.items.length !== 1) {
+			singleItemEntrance.value = false
+		}
+
+		containerHeightSettled.value =
+			prefersReducedMotion.value || (!initialMeasurementSettled.value && !openingSingleItem)
+	}
 })
 
 watch(
@@ -438,7 +476,7 @@ const messages = defineMessages({
 				y: -4,
 				transition: shellExitTransition,
 			}"
-			:transition="springTransition"
+			:transition="heightTransition"
 		>
 			<Transition
 				enter-active-class="overflow-hidden transition-all duration-150 ease-out"
@@ -488,7 +526,7 @@ const messages = defineMessages({
 				class="relative"
 				:initial="false"
 				:animate="{ height: containerHeight }"
-				:transition="springTransition"
+				:transition="heightTransition"
 				:style="{ overflow: containerOverflow }"
 				v-bind="containerMotionProps"
 				@mouseenter="isHovered = true"
