@@ -163,6 +163,18 @@ impl SearchField {
                 path: "open_source",
                 mapping: json!({ "type": "boolean" }),
             },
+            SearchField::RequiredDependencies => ElasticsearchFieldSpec {
+                path: "required_dependencies",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::OptionalDependencies => ElasticsearchFieldSpec {
+                path: "optional_dependencies",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::Incompatibilities => ElasticsearchFieldSpec {
+                path: "incompatibilities",
+                mapping: json!({ "type": "keyword" }),
+            },
             SearchField::Environment => ElasticsearchFieldSpec {
                 path: "environment",
                 mapping: json!({ "type": "keyword" }),
@@ -251,6 +263,9 @@ static ELASTICSEARCH_PROPERTIES: LazyLock<serde_json::Map<String, Value>> =
             ("license".to_string(), json!({ "type": "keyword" })),
             ("loaders".to_string(), json!({ "type": "keyword" })),
             ("color".to_string(), json!({ "type": "long" })),
+            ("required_dependencies".to_string(), json!({ "type": "keyword" })),
+            ("optional_dependencies".to_string(), json!({ "type": "keyword" })),
+            ("incompatibilities".to_string(), json!({ "type": "keyword" })),
             ("environment".to_string(), json!({ "type": "keyword" })),
             ("mrpack_loaders".to_string(), json!({ "type": "keyword" })),
             (

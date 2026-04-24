@@ -581,6 +581,18 @@ impl SearchField {
                 path: "open_source",
                 filterable: true,
             },
+            SearchField::RequiredDependencies => MeilisearchFieldSpec {
+                path: "required_dependencies",
+                filterable: true,
+            },
+            SearchField::OptionalDependencies => MeilisearchFieldSpec {
+                path: "optional_dependencies",
+                filterable: true,
+            },
+            SearchField::Incompatibilities => MeilisearchFieldSpec {
+                path: "incompatibilities",
+                filterable: true,
+            },
             SearchField::Environment => MeilisearchFieldSpec {
                 path: "environment",
                 filterable: true,
@@ -659,7 +671,6 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "color",
     "required_dependencies",
     "optional_dependencies",
-    "embedded_dependencies",
     "incompatibilities",
     // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
     // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
@@ -702,7 +713,6 @@ const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] = &[
     "version_published_timestamp",
     "required_dependencies",
     "optional_dependencies",
-    "embedded_dependencies",
     "incompatibilities",
     "minecraft_java_server.verified_plays_2w",
     "minecraft_java_server.ping.data.players_online",

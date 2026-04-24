@@ -20,11 +20,11 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::exp;
-use crate::models::ids::ProjectId;
-use crate::models::projects::from_duplicate_version_fields;
+use crate::models::ids::{ProjectId, VersionId};
+use crate::models::projects::{from_duplicate_version_fields, DependencyType};
 use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
-use crate::search::UploadSearchProject;
+use crate::search::{Dependencies, Dependency, UploadSearchProject};
 use crate::util::error::Context;
 
 fn normalize_for_search(s: &str) -> String {
@@ -486,10 +486,7 @@ pub async fn index_local(
                     featured_gallery: featured_gallery.clone(),
                     open_source,
                     color: project.color.map(|x| x as u32),
-                    required_dependencies: version.required_dependencies,
-                    optional_dependencies: version.optional_dependencies,
-                    embedded_dependencies: version.embedded_dependencies,
-                    incompatibilities: version.incompatibilities,
+                    dependencies: version.dependencies,
                     loader_fields,
                     project_loader_fields: project_loader_fields.clone(),
                     // 'loaders' is aggregate of all versions' loaders
@@ -511,10 +508,7 @@ struct PartialVersion {
     project_types: Vec<String>,
     version_fields: Vec<QueryVersionField>,
     date_published: DateTime<Utc>,
-    required_dependencies: Vec<String>,
-    optional_dependencies: Vec<String>,
-    embedded_dependencies: Vec<String>,
-    incompatibilities: Vec<String>,
+    dependencies: Dependencies,
 }
 
 async fn index_versions(
@@ -622,7 +616,61 @@ async fn index_versions(
         .await
         .wrap_err("failed to fetch version fields")?;
 
-    // Get version fields
+    // Get dependencies
+
+    // This can get a bit confusing to understand, so here's some documentation on it:
+    // pID = Project ID, vID = Version ID
+    //
+    // Projects:
+    //  Project A (pID: 1) -> The Dependent
+    //  Project B (pID: 2) -> The Dependency
+    //
+    // Versions:
+    //  Project A (pID: 1) Version v1.0.0 (vID: 400)
+    //  Project B (pID: 2) Version v2.0.0 (vID: 500)
+    //
+    // Returned Data:
+    //  dependent_version_id (vID: 400) = Project A v1.0.0 (This is the version which is declaring a dependency aka The Dependent)
+    //  dependency_project_id (pID: 2) = Project B (The Dependency) (this is technically nullable, but I'm not sure if there's any cases in which it'd be null)
+    //  dependency_version_id (vID: 500) = Project B v2.0.0 (The version required by the dependency) (nullable)
+    //  dependency_type = "required"
+    //
+    // And the returned data ends up saying in plain words:
+    // Version (Project A v1.0.0, vID: 400) has a (required) dependency on the version (Project B v2.0.0, vID: 500) from the Project (Project B, pID: 2)
+    // ~ @ithundxr
+    let dependencies: DashMap<DBVersionId, Dependencies> = sqlx::query!(
+            "
+            SELECT
+                d.dependent_id as \"dependent_version_id: DBVersionId\",
+                d.mod_dependency_id as \"dependency_project_id: DBProjectId\",
+                d.dependency_id as \"dependency_version_id: DBVersionId\",
+                d.dependency_type as \"dependency_type: DependencyType\"
+            FROM dependencies d
+            INNER JOIN mods m ON m.id = d.mod_dependency_id
+            WHERE dependent_id = ANY($1) AND dependency_type != 'embedded'
+            ",
+            &all_version_ids
+        )
+        .fetch(pool)
+        .try_fold(
+            DashMap::new(),
+            |acc: DashMap<DBVersionId, Dependencies>, m| {
+                if let Some(dependency_project_id) = m.dependency_project_id {
+                    let dependency = Dependency {
+                        project: ProjectId::from(dependency_project_id),
+                        version: m.dependency_version_id.map(VersionId::from),
+                    };
+
+                    acc.entry(m.dependent_version_id)
+                        .or_default()
+                        .add_dependency(m.dependency_type, dependency);
+                }
+
+                async move { Ok(acc) }
+            }
+        )
+        .await
+        .wrap_err("failed to fetch dependencies")?;
 
     // Convert to partial versions
     let mut res_versions: HashMap<DBProjectId, Vec<PartialVersion>> =
@@ -641,38 +689,10 @@ async fn index_versions(
                 .map(|(_, version_fields)| version_fields)
                 .unwrap_or_default();
 
-            let mut required_dependencies: Vec<String> = Vec::new();
-            let mut optional_dependencies: Vec<String> = Vec::new();
-            let mut embedded_dependencies: Vec<String> = Vec::new();
-            let mut incompatibilities: Vec<String> = Vec::new();
-
-            let records = sqlx::query!(
-                "
-                SELECT d.mod_dependency_id as \"mod_dependency_id: DBProjectId\", d.dependency_type, m.slug as \"slug\" FROM dependencies d
-                    INNER JOIN mods m ON m.id = d.mod_dependency_id
-                WHERE dependent_id = $1",
-                version_id.0
-            )
-                .fetch_all(pool)
-                .await?;
-
-            for r in records {
-                let v = match r.dependency_type.as_str() {
-                    "required" => &mut required_dependencies,
-                    "optional" => &mut optional_dependencies,
-                    "embedded" => &mut embedded_dependencies,
-                    "incompatible" => &mut incompatibilities,
-                    _ => continue,
-                };
-
-                if let Some(id) = r.mod_dependency_id {
-                    v.push(crate::models::ids::ProjectId::from(id).to_string())
-                }
-
-                if let Some(slug) = &r.slug {
-                    v.push(slug.to_string())
-                }
-            }
+            let dependencies = dependencies
+                .remove(version_id)
+                .map(|(_, dependencies)| dependencies)
+                .unwrap_or_default();
 
             res_versions
                 .entry(*project_id)
@@ -683,10 +703,7 @@ async fn index_versions(
                     project_types: version_loader_data.project_types,
                     version_fields,
                     date_published: *date_published,
-                    required_dependencies,
-                    optional_dependencies,
-                    embedded_dependencies,
-                    incompatibilities,
+                    dependencies,
                 });
         }
     }
