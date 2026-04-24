@@ -235,6 +235,7 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
@@ -243,7 +244,6 @@ import {
 	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 } from '@/composables/auth.ts'
-import { useStorage } from '@vueuse/core'
 
 const props = defineProps({
 	subtleLauncherRedirectUri: {

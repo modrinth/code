@@ -29,10 +29,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
-import {
-	getLauncherRedirectUrl,
-	promotePendingSignInOAuthProvider,
-} from '@/composables/auth.ts'
+import { getLauncherRedirectUrl, promotePendingSignInOAuthProvider } from '@/composables/auth.ts'
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()

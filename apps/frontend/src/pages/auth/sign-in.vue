@@ -24,6 +24,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useStorage } from '@vueuse/core'
 
 import SignInView from '@/components/ui/auth/SignIn.vue'
 import {
@@ -32,7 +33,6 @@ import {
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	promotePendingSignInOAuthProvider,
 } from '@/composables/auth.ts'
-import { useStorage } from '@vueuse/core'
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()

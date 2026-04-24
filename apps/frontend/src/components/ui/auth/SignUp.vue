@@ -166,13 +166,10 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 
-import {
-	getAuthUrl,
-	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
-} from '@/composables/auth.ts'
-import { useStorage } from '@vueuse/core'
+import { getAuthUrl, PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY } from '@/composables/auth.ts'
 
 const props = defineProps({
 	redirectTarget: {
