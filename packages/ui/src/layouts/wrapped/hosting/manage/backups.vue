@@ -119,12 +119,15 @@
 
 							<TransitionGroup name="list" tag="div" class="flex flex-col">
 								<div
-									v-for="backup in group.backups"
+									v-for="(backup, backupIndex) in group.backups"
 									:key="`backup-${backup.id}`"
 									class="flex gap-2"
 								>
 									<div class="flex w-5 flex-col items-center">
-										<div class="w-px flex-1 bg-surface-5" />
+										<div
+											class="w-px flex-1 bg-surface-5"
+											:class="{ '-mt-1.5': backupIndex === 0 }"
+										/>
 										<Checkbox
 											:model-value="selectedIds.has(backup.id)"
 											:description="formatMessage(messages.selectBackupAria, { name: backup.name })"

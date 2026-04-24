@@ -17,7 +17,7 @@
 				<slot name="header">{{ header }}</slot>
 				<span
 					v-if="normalizedTimestamp"
-					class="flex items-center gap-1.5 font-medium text-secondary"
+					class="flex items-center gap-1.5 text-base font-medium leading-normal text-secondary"
 				>
 					<ClockIcon class="size-4" />
 					{{ relativeTimeLabel }}

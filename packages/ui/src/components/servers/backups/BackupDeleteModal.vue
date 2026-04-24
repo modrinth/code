@@ -10,18 +10,50 @@
 				{{ formatMessage(messages.admonitionBody, { count }) }}
 			</Admonition>
 
-			<div v-if="displayBackups.length" class="flex flex-col gap-2 min-w-0">
+			<div v-if="displayBackups.length" class="flex min-w-0 flex-col gap-2">
 				<span class="font-semibold text-contrast">
 					{{ formatMessage(messages.backupsLabel, { count }) }}
 				</span>
-				<div class="flex flex-col gap-2 max-h-[240px] overflow-y-auto">
-					<BackupItem
-						v-for="backup in displayBackups"
-						:key="backup.id"
-						:backup="backup"
-						preview
-						class="!bg-surface-2 !shadow-none"
-					/>
+				<div class="relative">
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-2"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-2"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showTopFade"
+							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-2 bg-gradient-to-b from-bg-raised to-transparent"
+						/>
+					</Transition>
+					<div
+						ref="backupListRef"
+						class="flex max-h-[240px] flex-col gap-2 overflow-y-auto"
+						@scroll="checkScrollState"
+					>
+						<BackupItem
+							v-for="backup in displayBackups"
+							:key="backup.id"
+							:backup="backup"
+							preview
+							class="!bg-surface-2 !shadow-none"
+						/>
+					</div>
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-2"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-2"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showBottomFade"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-2 bg-gradient-to-t from-bg-raised to-transparent"
+						/>
+					</Transition>
 				</div>
 			</div>
 		</div>
@@ -48,9 +80,10 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
+import { useScrollIndicator } from '../../../composables/scroll-indicator'
 import { commonMessages } from '../../../utils'
 import Admonition from '../../base/Admonition.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
@@ -89,8 +122,11 @@ const messages = defineMessages({
 })
 
 const modal = ref<InstanceType<typeof NewModal>>()
+const backupListRef = ref<HTMLElement | null>(null)
 const singleBackup = ref<Archon.BackupsQueue.v1.BackupQueueBackup>()
 const bulkBackups = ref<Archon.BackupsQueue.v1.BackupQueueBackup[]>([])
+const { showTopFade, showBottomFade, checkScrollState, forceCheck } =
+	useScrollIndicator(backupListRef)
 
 const isBulk = computed(() => bulkBackups.value.length > 0)
 const count = computed(() => (isBulk.value ? bulkBackups.value.length : 1))
@@ -102,12 +138,14 @@ function show(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
 	singleBackup.value = backup
 	bulkBackups.value = []
 	modal.value?.show()
+	nextTick(() => forceCheck())
 }
 
 function showBulk(backups: Archon.BackupsQueue.v1.BackupQueueBackup[]) {
 	singleBackup.value = undefined
 	bulkBackups.value = [...backups]
 	modal.value?.show()
+	nextTick(() => forceCheck())
 }
 
 function confirmDelete() {
