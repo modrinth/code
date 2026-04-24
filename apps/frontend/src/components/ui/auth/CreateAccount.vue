@@ -30,7 +30,7 @@
 						</div>
 						<a
 							class="w-fit text-link underline"
-							:href="sourceCodeUrl"
+							:href="SOURCE_CODE_URL"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -86,7 +86,7 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { RightArrowIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -101,72 +101,32 @@ import { computed } from 'vue'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
 
-const props = defineProps({
-	dateOfBirth: {
-		type: String,
-		default: '',
-	},
-	username: {
-		type: String,
-		default: '',
-	},
-	token: {
-		type: String,
-		default: '',
-	},
-	subscribe: {
-		type: Boolean,
-		default: false,
-	},
-	globals: {
-		type: Object,
-		default: null,
-	},
-	requiresDob: {
-		type: Boolean,
-		default: true,
-	},
-	sourceCodeUrl: {
-		type: String,
-		default:
-			'https://github.com/modrinth/code/blob/main/apps/frontend/src/components/ui/auth/CreateAccount.vue',
-	},
-	onCompleteSignUp: {
-		type: Function,
-		default: () => {},
-	},
-	onSetCaptchaRef: {
-		type: Function,
-		default: undefined,
-	},
-})
+interface AuthGlobals {
+	captcha_enabled?: boolean
+	[key: string]: unknown
+}
 
-const emit = defineEmits([
-	'update:dateOfBirth',
-	'update:username',
-	'update:token',
-	'update:subscribe',
-])
+interface Props {
+	globals?: AuthGlobals | null
+	requiresDob?: boolean
+	onCompleteSignUp?: () => void
+	onSetCaptchaRef?: ((captchaRef: unknown) => void) | undefined
+}
 
-const dateOfBirthModel = computed({
-	get: () => props.dateOfBirth,
-	set: (value) => emit('update:dateOfBirth', value),
-})
+const {
+	globals = null,
+	requiresDob = true,
+	onCompleteSignUp = () => {},
+	onSetCaptchaRef = undefined,
+} = defineProps<Props>()
 
-const usernameModel = computed({
-	get: () => props.username,
-	set: (value) => emit('update:username', value),
-})
+const SOURCE_CODE_URL =
+	'https://github.com/modrinth/code/blob/main/apps/frontend/src/components/ui/auth/CreateAccount.vue'
 
-const tokenModel = computed({
-	get: () => props.token,
-	set: (value) => emit('update:token', value),
-})
-
-const subscribeModel = computed({
-	get: () => props.subscribe,
-	set: (value) => emit('update:subscribe', value),
-})
+const dateOfBirthModel = defineModel<string>('dateOfBirth', { default: '' })
+const usernameModel = defineModel<string>('username', { default: '' })
+const tokenModel = defineModel<string>('token', { default: '' })
+const subscribeModel = defineModel<boolean>('subscribe', { default: false })
 
 const maxInputDate = computed(() => new Date().toISOString().slice(0, 10))
 
@@ -176,17 +136,24 @@ const maxBirthDate = computed(() => {
 	return date.toISOString().slice(0, 10)
 })
 
-const isDateOfBirthMissing = computed(() => props.requiresDob && dateOfBirthModel.value === '')
+const getBirthYear = (dateOfBirth: string): number | null => {
+	const [yearPart = ''] = dateOfBirth.split('-')
+	const year = Number(yearPart)
+	return Number.isInteger(year) ? year : null
+}
 
-const isDateOfBirthYearZero = computed(
-	() => props.requiresDob && /^0000-/.test(dateOfBirthModel.value),
-)
+const isDateOfBirthMissing = computed(() => requiresDob && dateOfBirthModel.value === '')
+
+const isDateOfBirthYearZero = computed(() => {
+	if (!requiresDob || dateOfBirthModel.value === '') {
+		return false
+	}
+
+	return getBirthYear(dateOfBirthModel.value) === 0
+})
 
 const isUnder13 = computed(
-	() =>
-		props.requiresDob &&
-		dateOfBirthModel.value !== '' &&
-		dateOfBirthModel.value > maxBirthDate.value,
+	() => requiresDob && dateOfBirthModel.value !== '' && dateOfBirthModel.value > maxBirthDate.value,
 )
 
 const { addNotification } = injectNotificationManager()
@@ -220,7 +187,7 @@ function onCompleteSignUpClick() {
 		return
 	}
 
-	props.onCompleteSignUp()
+	onCompleteSignUp()
 }
 
 const messages = defineMessages({

@@ -234,6 +234,7 @@ import {
 import { ButtonStyled, commonMessages, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
+import type { LocationQuery } from 'vue-router'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
 import {
@@ -242,99 +243,54 @@ import {
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 } from '@/composables/auth.ts'
 
-const props = defineProps({
-	subtleLauncherRedirectUri: {
-		type: String,
-		default: '',
-	},
-	flow: {
-		default: '',
-	},
-	redirectTarget: {
-		type: String,
-		default: '',
-	},
-	routeQuery: {
-		type: Object,
-		default: () => ({}),
-	},
-	globals: {
-		type: Object,
-		default: null,
-	},
-	email: {
-		type: String,
-		default: '',
-	},
-	password: {
-		type: String,
-		default: '',
-	},
-	token: {
-		type: String,
-		default: '',
-	},
-	twoFactorCode: {
-		type: String || null,
-		default: null,
-	},
-	onPasswordSignIn: {
-		type: Function,
-		default: () => {},
-	},
-	onTwoFactorSignIn: {
-		type: Function,
-		default: () => {},
-	},
-	onSetCaptchaRef: {
-		type: Function,
-		default: undefined,
-	},
-})
+type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft'
 
-const emit = defineEmits([
-	'update:email',
-	'update:password',
-	'update:token',
-	'update:twoFactorCode',
-])
+interface AuthGlobals {
+	captcha_enabled?: boolean
+	[key: string]: unknown
+}
 
-const emailModel = computed({
-	get: () => props.email,
-	set: (value) => emit('update:email', value),
-})
+interface Props {
+	subtleLauncherRedirectUri?: string
+	flow?: string
+	redirectTarget?: string
+	routeQuery?: LocationQuery
+	globals?: AuthGlobals | null
+	onPasswordSignIn?: () => void
+	onTwoFactorSignIn?: () => void
+	onSetCaptchaRef?: ((captchaRef: unknown) => void) | undefined
+}
 
-const passwordModel = computed({
-	get: () => props.password,
-	set: (value) => emit('update:password', value),
-})
+const {
+	subtleLauncherRedirectUri = '',
+	flow = '',
+	redirectTarget = '',
+	routeQuery = {},
+	globals = null,
+	onPasswordSignIn = () => {},
+	onTwoFactorSignIn = () => {},
+	onSetCaptchaRef = undefined,
+} = defineProps<Props>()
 
-const tokenModel = computed({
-	get: () => props.token,
-	set: (value) => emit('update:token', value),
-})
+const emailModel = defineModel<string>('email', { default: '' })
+const passwordModel = defineModel<string>('password', { default: '' })
+const tokenModel = defineModel<string>('token', { default: '' })
+const twoFactorCodeModel = defineModel<string>('twoFactorCode', { default: '' })
 
-const twoFactorCodeModel = computed({
-	get: () => props.twoFactorCode,
-	set: (value) => emit('update:twoFactorCode', value),
-})
-
-type AuthProviders = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft'
-
-const lastSignInOAuthProvider = useStorage<AuthProviders>(
+const lastSignInOAuthProvider = useStorage<AuthProvider | null>(
 	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	null,
 	undefined,
 	{ initOnMounted: true },
 )
-const pendingSignInOAuthProvider = useStorage<AuthProviders>(
+const pendingSignInOAuthProvider = useStorage<AuthProvider | null>(
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	null,
 	undefined,
 	{ initOnMounted: true },
 )
 const lastSignInProvider = computed(() => lastSignInOAuthProvider.value)
-const onOAuthProviderClick = (provider: AuthProviders) => {
+const onOAuthProviderClick = (provider: AuthProvider) => {
 	pendingSignInOAuthProvider.value = provider
 }
 

@@ -18,7 +18,7 @@
 	/>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
 	commonMessages,
 	defineMessages,
@@ -27,9 +27,39 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import type { LocationQueryValue } from 'vue-router'
 
 import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
 import { getLauncherRedirectUrl, promotePendingSignInOAuthProvider } from '@/composables/auth.ts'
+
+interface AuthGlobalsResponse {
+	captcha_enabled?: boolean
+	[key: string]: unknown
+}
+
+interface ApiErrorShape {
+	data?: {
+		description?: string
+	}
+}
+
+const getQueryString = (
+	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string => {
+	const firstValue = Array.isArray(value) ? value[0] : value
+	return typeof firstValue === 'string' ? firstValue : ''
+}
+
+const getErrorMessage = (error: unknown): string => {
+	const apiError = error as ApiErrorShape
+	if (typeof apiError?.data?.description === 'string') {
+		return apiError.data.description
+	}
+	if (error instanceof Error) {
+		return error.message
+	}
+	return String(error)
+}
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -79,14 +109,14 @@ const dateOfBirth = ref('')
 const username = ref(defaultUsername.value)
 const token = ref('')
 const subscribe = ref(false)
-const subtleLauncherRedirectUri = ref()
+const subtleLauncherRedirectUri = ref<string>()
 
-const captcha = ref()
-const setCaptchaRef = (captchaRef) => {
-	captcha.value = captchaRef
+const captcha = ref<{ reset?: () => void } | null>(null)
+const setCaptchaRef = (captchaRef: unknown) => {
+	captcha.value = (captchaRef as { reset?: () => void } | null) ?? null
 }
 
-const { data: globals } = useQuery({
+const { data: globals } = useQuery<AuthGlobalsResponse>({
 	queryKey: ['auth-globals'],
 	queryFn: async () => {
 		try {
@@ -116,15 +146,15 @@ async function completeOAuthSignUp() {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }
 
-async function finishSignIn(sessionToken) {
+async function finishSignIn(sessionToken?: string | null) {
 	if (route.query.launcher) {
 		let token = sessionToken
 		if (!token) {
@@ -155,7 +185,7 @@ async function finishSignIn(sessionToken) {
 	}
 
 	if (route.query.redirect) {
-		const redirect = decodeURIComponent(route.query.redirect)
+		const redirect = decodeURIComponent(getQueryString(route.query.redirect))
 		await navigateTo(redirect, {
 			replace: true,
 		})

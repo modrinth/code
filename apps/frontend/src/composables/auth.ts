@@ -166,9 +166,19 @@ export const getAuthUrl = (provider: string, redirect = '/dashboard') => {
 
 export const promotePendingSignInOAuthProvider = () => {
 	if (!import.meta.client) return
-	const pending = useStorage<string | null>(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
+	const pending = useStorage<string | null>(
+		PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+		null,
+		undefined,
+		{ initOnMounted: true },
+	)
 	if (!pending.value) return
-	const last = useStorage<string | null>(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
+	const last = useStorage<string | null>(
+		LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+		null,
+		undefined,
+		{ initOnMounted: true },
+	)
 	last.value = pending.value
 	pending.value = null
 }

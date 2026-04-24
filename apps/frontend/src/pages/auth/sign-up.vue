@@ -21,7 +21,7 @@
 	/>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
 	commonMessages,
 	defineMessages,
@@ -31,6 +31,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
+import type { LocationQueryValue } from 'vue-router'
 
 import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
 import SignUpView from '@/components/ui/auth/SignUp.vue'
@@ -39,6 +40,42 @@ import {
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	promotePendingSignInOAuthProvider,
 } from '@/composables/auth.ts'
+
+interface AuthGlobalsResponse {
+	captcha_enabled?: boolean
+	[key: string]: unknown
+}
+
+interface ApiErrorShape {
+	data?: {
+		description?: string
+		error?: string
+	}
+	v1Error?: {
+		error?: string
+	}
+	responseData?: {
+		error?: string
+	}
+}
+
+const getQueryString = (
+	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string => {
+	const firstValue = Array.isArray(value) ? value[0] : value
+	return typeof firstValue === 'string' ? firstValue : ''
+}
+
+const getErrorMessage = (error: unknown): string => {
+	const apiError = error as ApiErrorShape
+	if (typeof apiError?.data?.description === 'string') {
+		return apiError.data.description
+	}
+	if (error instanceof Error) {
+		return error.message
+	}
+	return String(error)
+}
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -65,10 +102,20 @@ useHead({
 
 const auth = await useAuth()
 const route = useNativeRoute()
-const pendingSignInOAuthProvider = useStorage(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
-const lastSignInOAuthProvider = useStorage(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
+const pendingSignInOAuthProvider = useStorage(
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+	undefined,
+	{ initOnMounted: true },
+)
+const lastSignInOAuthProvider = useStorage(
+	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+	undefined,
+	{ initOnMounted: true },
+)
 
-const redirectTarget = route.query.redirect
+const redirectTarget = getQueryString(route.query.redirect)
 const showOtherOptions = ref(false)
 const isCreateAccountStep = ref(false)
 
@@ -76,15 +123,15 @@ if (auth.value.user) {
 	await navigateTo('/dashboard')
 }
 
-const captcha = ref()
-const setCaptchaRef = (captchaRef) => {
-	captcha.value = captchaRef
+const captcha = ref<{ reset?: () => void } | null>(null)
+const setCaptchaRef = (captchaRef: unknown) => {
+	captcha.value = (captchaRef as { reset?: () => void } | null) ?? null
 }
 const toggleOtherOptions = () => {
 	showOtherOptions.value = !showOtherOptions.value
 }
 
-const { data: globals } = useQuery({
+const { data: globals } = useQuery<AuthGlobalsResponse>({
 	queryKey: ['auth-globals'],
 	queryFn: async () => {
 		try {
@@ -119,14 +166,14 @@ async function continueWithEmail() {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
 	}
 	stopLoading()
 }
 
-function generateUsernameFromEmail(emailAddress) {
+function generateUsernameFromEmail(emailAddress: string): string {
 	const [localPart = ''] = emailAddress.trim().toLowerCase().split('@')
 	const sanitized = localPart
 		.replace(/[^a-zA-Z0-9_-]/g, '_')
@@ -136,7 +183,7 @@ function generateUsernameFromEmail(emailAddress) {
 	return (sanitized || 'user').slice(0, USERNAME_MAX_LENGTH)
 }
 
-async function findAvailableGeneratedUsername() {
+async function findAvailableGeneratedUsername(): Promise<string> {
 	const baseUsername = generateUsernameFromEmail(email.value)
 
 	for (let suffixAttempt = 0; suffixAttempt <= MAX_USERNAME_SUFFIX_RETRIES; suffixAttempt++) {
@@ -155,7 +202,7 @@ async function findAvailableGeneratedUsername() {
 	return await findAvailableRandomUsername()
 }
 
-function appendUsernameSuffix(baseUsername, suffixAttempt) {
+function appendUsernameSuffix(baseUsername: string, suffixAttempt: number): string {
 	if (suffixAttempt === 0) {
 		return baseUsername
 	}
@@ -165,13 +212,13 @@ function appendUsernameSuffix(baseUsername, suffixAttempt) {
 	return `${baseUsername.slice(0, maxBaseLength)}${suffix}`
 }
 
-function generateRandomUsername() {
+function generateRandomUsername(): string {
 	const randomSuffix = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`
 	const base = `user_${randomSuffix}`
 	return base.slice(0, USERNAME_MAX_LENGTH)
 }
 
-async function findAvailableRandomUsername() {
+async function findAvailableRandomUsername(): Promise<string> {
 	for (let attempt = 0; attempt < MAX_RANDOM_USERNAME_ATTEMPTS; attempt++) {
 		const candidateUsername = generateRandomUsername()
 
@@ -188,7 +235,7 @@ async function findAvailableRandomUsername() {
 	throw new Error('Unable to find an available username. Please choose one manually.')
 }
 
-async function validateCreateAccountCandidate(candidateUsername) {
+async function validateCreateAccountCandidate(candidateUsername: string): Promise<void> {
 	await client.labrinth.auth_v2.validateCreateAccount({
 		username: candidateUsername,
 		password: password.value,
@@ -196,8 +243,10 @@ async function validateCreateAccountCandidate(candidateUsername) {
 	})
 }
 
-function isUsernameTakenValidationError(error) {
-	const errorCode = error?.data?.error ?? error?.v1Error?.error ?? error?.responseData?.error
+function isUsernameTakenValidationError(error: unknown): boolean {
+	const apiError = error as ApiErrorShape
+	const errorCode =
+		apiError?.data?.error ?? apiError?.v1Error?.error ?? apiError?.responseData?.error
 	return errorCode === 'username_taken'
 }
 
@@ -223,17 +272,17 @@ async function createAccount() {
 		}
 
 		if (route.query.redirect) {
-			await navigateTo(route.query.redirect)
+			await navigateTo(getQueryString(route.query.redirect))
 		} else {
 			await navigateTo('/dashboard')
 		}
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }

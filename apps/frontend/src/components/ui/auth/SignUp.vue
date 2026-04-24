@@ -146,7 +146,7 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
 	DiscordColorIcon,
 	GitHubColorIcon,
@@ -167,55 +167,36 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
-import { computed } from 'vue'
+import type { LocationQuery } from 'vue-router'
 
 import { getAuthUrl, PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY } from '@/composables/auth.ts'
 
-const props = defineProps({
-	redirectTarget: {
-		type: String,
-		default: '',
-	},
-	showOtherOptions: {
-		type: Boolean,
-		default: false,
-	},
-	routeQuery: {
-		type: Object,
-		default: () => ({}),
-	},
-	email: {
-		type: String,
-		default: '',
-	},
-	password: {
-		type: String,
-		default: '',
-	},
-	onToggleOtherOptions: {
-		type: Function,
-		default: () => {},
-	},
-	onContinueWithEmail: {
-		type: Function,
-		default: () => {},
-	},
-})
+type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft'
 
-const emit = defineEmits(['update:email', 'update:password'])
+interface Props {
+	redirectTarget?: string
+	showOtherOptions?: boolean
+	routeQuery?: LocationQuery
+	onToggleOtherOptions?: () => void
+	onContinueWithEmail?: () => void
+}
 
-const emailModel = computed({
-	get: () => props.email,
-	set: (value) => emit('update:email', value),
-})
+const {
+	redirectTarget = '',
+	showOtherOptions = false,
+	routeQuery = {},
+	onToggleOtherOptions = () => {},
+	onContinueWithEmail = () => {},
+} = defineProps<Props>()
 
-const passwordModel = computed({
-	get: () => props.password,
-	set: (value) => emit('update:password', value),
-})
+const emailModel = defineModel<string>('email', { default: '' })
+const passwordModel = defineModel<string>('password', { default: '' })
 
-const pendingSignInOAuthProvider = useStorage(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
-const onOAuthProviderClick = (provider) => {
+const pendingSignInOAuthProvider = useStorage<AuthProvider | null>(
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+)
+const onOAuthProviderClick = (provider: AuthProvider) => {
 	pendingSignInOAuthProvider.value = provider
 }
 

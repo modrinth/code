@@ -15,7 +15,7 @@
 	/>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
 	commonMessages,
 	defineMessages,
@@ -25,6 +25,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
+import type { LocationQueryValue } from 'vue-router'
 
 import SignInView from '@/components/ui/auth/SignIn.vue'
 import {
@@ -33,6 +34,37 @@ import {
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	promotePendingSignInOAuthProvider,
 } from '@/composables/auth.ts'
+
+type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft'
+
+interface AuthGlobalsResponse {
+	captcha_enabled?: boolean
+	[key: string]: unknown
+}
+
+interface ApiErrorShape {
+	data?: {
+		description?: string
+	}
+}
+
+const getQueryString = (
+	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string => {
+	const firstValue = Array.isArray(value) ? value[0] : value
+	return typeof firstValue === 'string' ? firstValue : ''
+}
+
+const getErrorMessage = (error: unknown): string => {
+	const apiError = error as ApiErrorShape
+	if (typeof apiError?.data?.description === 'string') {
+		return apiError.data.description
+	}
+	if (error instanceof Error) {
+		return error.message
+	}
+	return String(error)
+}
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -54,8 +86,18 @@ useHead({
 
 const auth = await useAuth()
 const route = useNativeRoute()
-const pendingSignInOAuthProvider = useStorage(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
-const lastSignInOAuthProvider = useStorage(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
+const pendingSignInOAuthProvider = useStorage<AuthProvider | null>(
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+	undefined,
+	{ initOnMounted: true },
+)
+const lastSignInOAuthProvider = useStorage<AuthProvider | null>(
+	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+	undefined,
+	{ initOnMounted: true },
+)
 
 if (route.query.state !== undefined) {
 	await navigateTo(
@@ -69,8 +111,8 @@ if (route.query.state !== undefined) {
 	)
 }
 
-const redirectTarget = route.query.redirect || ''
-const subtleLauncherRedirectUri = ref()
+const redirectTarget = getQueryString(route.query.redirect)
+const subtleLauncherRedirectUri = ref<string>()
 
 if (route.query.code) {
 	await finishSignIn()
@@ -80,12 +122,12 @@ if (auth.value.user) {
 	await finishSignIn()
 }
 
-const captcha = ref()
-const setCaptchaRef = (captchaRef) => {
-	captcha.value = captchaRef
+const captcha = ref<{ reset?: () => void } | null>(null)
+const setCaptchaRef = (captchaRef: unknown) => {
+	captcha.value = (captchaRef as { reset?: () => void } | null) ?? null
 }
 
-const { data: globals } = useQuery({
+const { data: globals } = useQuery<AuthGlobalsResponse>({
 	queryKey: ['auth-globals'],
 	queryFn: async () => {
 		try {
@@ -101,7 +143,7 @@ const email = ref('')
 const password = ref('')
 const token = ref('')
 
-const flow = ref(route.query.flow)
+const flow = ref(getQueryString(route.query.flow))
 
 async function beginPasswordSignIn() {
 	pendingSignInOAuthProvider.value = null
@@ -122,37 +164,38 @@ async function beginPasswordSignIn() {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }
 
-const twoFactorCode = ref(null)
+const twoFactorCode = ref('')
 async function begin2FASignIn() {
 	startLoading()
 	try {
 		const res = await client.labrinth.auth_v2.login2FA({
 			flow: flow.value,
-			code: twoFactorCode.value ? twoFactorCode.value.toString() : twoFactorCode.value,
+			code: twoFactorCode.value,
 		})
 
 		await finishSignIn(res.session)
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }
 
-async function finishSignIn(token) {
+async function finishSignIn(sessionToken?: string | null) {
 	if (route.query.launcher) {
+		let token = sessionToken
 		if (!token) {
 			token = auth.value.token
 		}
@@ -179,8 +222,8 @@ async function finishSignIn(token) {
 		return
 	}
 
-	if (token) {
-		await useAuth(token)
+	if (sessionToken) {
+		await useAuth(sessionToken)
 		await useUser()
 		queryClient.clear()
 	}
@@ -188,7 +231,7 @@ async function finishSignIn(token) {
 	promotePendingSignInOAuthProvider()
 
 	if (route.query.redirect) {
-		const redirect = decodeURIComponent(route.query.redirect)
+		const redirect = decodeURIComponent(getQueryString(route.query.redirect))
 		await navigateTo(redirect, {
 			replace: true,
 		})
