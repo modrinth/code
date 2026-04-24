@@ -251,7 +251,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			</template>
 		</ProjectCardList>
 
-		<div :class="ctx.variant === 'web' ? 'pagination-after' : 'flex justify-end'">
+		<div :class="ctx.variant === 'web' ? 'pagination-after my-3' : 'flex justify-end'">
 			<Pagination
 				:page="ctx.currentPage.value"
 				:count="ctx.pageCount.value"
