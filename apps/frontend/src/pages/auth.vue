@@ -15,8 +15,8 @@ useSeoMeta({
 
 <style>
 .auth-container {
-	width: 28rem;
-	max-width: calc(100% - 2rem);
+	width: 100%;
+	max-width: 28rem;
 	display: flex;
 	flex-direction: column;
 	gap: 2rem;
