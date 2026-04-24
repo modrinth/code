@@ -219,7 +219,7 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
 	DiscordColorIcon,
 	GitHubColorIcon,
@@ -275,6 +275,7 @@ const props = defineProps({
 		default: '',
 	},
 	twoFactorCode: {
+		type: String || null,
 		default: null,
 	},
 	onPasswordSignIn: {
@@ -318,10 +319,22 @@ const twoFactorCodeModel = computed({
 	set: (value) => emit('update:twoFactorCode', value),
 })
 
-const lastSignInOAuthProvider = useStorage(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
-const pendingSignInOAuthProvider = useStorage(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null)
+type AuthProviders = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft'
+
+const lastSignInOAuthProvider = useStorage<AuthProviders>(
+	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+	undefined,
+	{ initOnMounted: true },
+)
+const pendingSignInOAuthProvider = useStorage<AuthProviders>(
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+	undefined,
+	{ initOnMounted: true },
+)
 const lastSignInProvider = computed(() => lastSignInOAuthProvider.value)
-const onOAuthProviderClick = (provider) => {
+const onOAuthProviderClick = (provider: AuthProviders) => {
 	pendingSignInOAuthProvider.value = provider
 }
 
