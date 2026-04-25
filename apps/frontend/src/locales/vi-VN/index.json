@@ -1301,39 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Chọn giữa phiên bản gốc (Vanilla), Fabric, Forge, Quilt và NeoForge. Nếu chúng có trên Modrinth, chúng sẽ hoạt động trên máy chủ của bạn."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Thay đổi phiên bản modpack thất bại"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Lỗi tải phiên bản"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Không thể cài đặt lại modpack"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Sửa chữa máy chủ thất bại"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Lưu cấu hình cài đặt thất bại"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Lỗi ngắt liên kết modpack"
-  },
-  "hosting.loader.loader-version": {
-    "message": "Phiên bản {loader, select, null {Loader} other {{loader}}}"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Bản cài đặt máy chủ của bạn đã được sửa chữa."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Hoàn tất sửa chữa"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Khởi động lại máy chủ"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Xóa toàn bộ dữ liệu trên máy chủ của bạn, bao gồm thế giới, các bản mod và tệp cấu hình. Các bản sao lưu sẽ được giữ lại và có thể khôi phục."
-  },
   "hosting.plan.out-of-stock": {
     "message": "Hết hàng"
   },
@@ -2810,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Đồng bộ với máy chủ"
   },
-  "servers.busy.backup-creating": {
-    "message": "Đang tiến hành tạo bản sao lưu"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Đang khôi phục bản sao lưu"
-  },
-  "servers.busy.installing": {
-    "message": "Đang cài đặt máy chủ"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Đang đồng bộ hóa nội dung"
-  },
   "servers.notice.actions": {
     "message": "Hành động"
   },
@@ -3310,9 +3265,6 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Xảy ra lỗi đăng ký lại"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Nếu máy chủ hiện đang bị đình chỉ, có thể mất tối đa 10 phút để thực hiện một lần thử tính phí khác."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Yêu cầu đăng ký lại đã được gửi"

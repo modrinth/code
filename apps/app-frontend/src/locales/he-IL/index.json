@@ -5,8 +5,38 @@
   "app.auth-servers.unreachable.header": {
     "message": "לא ניתן לגשת לשרתי האימות"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "הוסף שרת להתקנה"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "הוסף שרתים להתקנה שלך"
+  },
+  "app.browse.add-to-instance": {
+    "message": "הוספה להתקנה"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "הוסף אל {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "נוסף"
+  },
+  "app.browse.already-added": {
+    "message": "כבר נוסף"
+  },
+  "app.browse.discover-content": {
+    "message": "גלה תוכן"
+  },
+  "app.browse.discover-servers": {
+    "message": "גלה שרתים"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "הסתר שרתים שנוספו"
+  },
   "app.browse.hide-installed-content": {
     "message": "הסתר תוכן מותקן"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "הוספת התוכן להתקנה"
   },
   "app.export-modal.description-placeholder": {
     "message": "הזן את תיאור חבילת המודים..."
@@ -44,8 +74,17 @@
   "app.instance.confirm-delete.header": {
     "message": "מחיקת התקנה"
   },
+  "app.instance.modpack-already-installed.body": {
+    "message": "חבילת המודים הזו כבר מותקנת בתוך ההתקנה <bold>{instanceName}</bold>. האם אתה בטוח שברצונך לשכפל אותה?"
+  },
   "app.instance.modpack-already-installed.create": {
     "message": "צור"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "חבילת המודים הזאת כבר מותקנת"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "התקנה"
   },
   "app.instance.mods.content-type-project": {
     "message": "פרויקט"
@@ -68,11 +107,47 @@
   "app.instance.worlds.add-server": {
     "message": "הוסף שרת"
   },
+  "app.instance.worlds.browse-servers": {
+    "message": "עיון בשרתים"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' יימחק לצמיתות, ולא תהיה דרך לשחזר אותו."
+  },
   "app.instance.worlds.delete-world-title": {
     "message": "האם אתה בטוח שברצונך למחוק לצמיתות את העולם הזה?"
   },
+  "app.instance.worlds.filter-modded": {
+    "message": "עם מודים"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "לא מקוון"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "מחובר"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "ונילה"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "הוספת שרת או עיון כדי להתחיל"
+  },
   "app.instance.worlds.no-worlds-heading": {
     "message": "אין שרתים אן עולמות שנוספו"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' יוסר מהרשימה שלך, כולל מתוך המשחק, ולא תהיה דרך לשחזר אותו."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) יוסר מהרשימה שלך, כולל מתוך המשחק, ולא תהיה דרך לשחזר אותו."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "אתה בטוח שאתה רוצה להסיר {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "חיפוש ב-{count} עולמות..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "השרת הזה"
   },
   "app.modal.install-to-play.content-required": {
     "message": "תוכן נדרש"
@@ -176,6 +251,24 @@
   "app.update.reload-to-update": {
     "message": "צריך לרענן כדי להתקין את העדכון"
   },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "בחר אופציה"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "גרסה לא תואמת: {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "עדיין לא שוחק"
+  },
+  "app.world.world-item.offline": {
+    "message": "לא מקוון"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} מחוברים"
+  },
   "friends.action.add-friend": {
     "message": "הוספת חבר"
   },
@@ -274,6 +367,9 @@
   },
   "instance.edit-world.title": {
     "message": "ערוך עולם"
+  },
+  "instance.files.adding-files": {
+    "message": "הוספת קבצים ({completed}/{total})"
   },
   "instance.files.save-as": {
     "message": "שמור כ..."

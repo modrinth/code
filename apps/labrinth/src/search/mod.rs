@@ -228,6 +228,9 @@ pub struct UploadSearchProject {
     pub project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
+    pub author_id: String,
+    pub organization: Option<String>,
+    pub organization_id: Option<String>,
     pub indexed_author: String,
     pub name: String,
     pub indexed_name: String,
@@ -279,6 +282,12 @@ pub struct ResultSearchProject {
     pub project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
+    #[serde(default)]
+    pub author_id: Option<String>,
+    #[serde(default)]
+    pub organization: Option<String>,
+    #[serde(default)]
+    pub organization_id: Option<String>,
     pub name: String,
     pub summary: String,
     pub categories: Vec<String>,
@@ -315,6 +324,9 @@ impl From<UploadSearchProject> for ResultSearchProject {
             project_types: source.project_types,
             slug: source.slug,
             author: source.author,
+            author_id: Some(source.author_id),
+            organization: source.organization,
+            organization_id: source.organization_id,
             name: source.name,
             summary: source.summary,
             categories: source.categories,

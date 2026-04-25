@@ -424,21 +424,28 @@ pub async fn project_edit_internal(
             ));
         }
 
-        // If a moderator is completing a review (changing from Processing to another status),
-        // check if another moderator holds an active lock on this project
+        // If a moderator (non-admin) is completing a review (changing from Processing to another
+        // status), they must hold an active non-expired lock on this project.
         if user.role.is_mod()
+            && !user.role.is_admin()
             && project_item.inner.status == ProjectStatus::Processing
             && status != &ProjectStatus::Processing
-            && let Some(lock) =
-                DBModerationLock::get_with_user(project_item.inner.id, &pool)
-                    .await?
-            && lock.moderator_id != db_ids::DBUserId::from(user.id)
-            && !lock.expired
         {
-            return Err(ApiError::CustomAuthentication(format!(
-                "This project is currently being moderated by @{}. Please wait for them to finish or for the lock to expire.",
-                lock.moderator_username
-            )));
+            let lock =
+                DBModerationLock::get_with_user(project_item.inner.id, &pool)
+                    .await?;
+            let owns = lock.as_ref().is_some_and(|l| {
+                l.moderator_id == db_ids::DBUserId::from(user.id) && !l.expired
+            });
+            if !owns {
+                return Err(ApiError::CustomAuthentication(match lock {
+                    Some(l) => format!(
+                        "This project is currently being moderated by @{}. Please wait for them to finish or for the lock to expire.",
+                        l.moderator_username
+                    ),
+                    None => "You must hold an active moderation lock to complete this review. Open the project in the moderation checklist to acquire one.".to_string(),
+                }));
+            }
         }
 
         if status == &ProjectStatus::Processing {

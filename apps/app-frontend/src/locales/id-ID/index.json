@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat terhubung ke server autentikasi"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Tambah server ke instans"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Tambah server ke instans Anda"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Tambah ke instans"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Tambah ke {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Ditambahkan"
+  },
+  "app.browse.already-added": {
+    "message": "Telah ditambahkan"
+  },
+  "app.browse.discover-content": {
+    "message": "Temukan konten"
+  },
+  "app.browse.discover-servers": {
+    "message": "Temukan server"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Sembuyikan server tertambah"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Sembunyikan konten terpasang"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Pasang konten ke instans"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Masukkan deskripsi paket mod..."
   },
@@ -41,8 +74,17 @@
   "app.instance.confirm-delete.header": {
     "message": "Hapus instans"
   },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Paket mod ini telah terpasang di instans <bold>{instanceName}</bold>. Apakah Anda yakin ingin menggandakannya?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Buat"
+  },
   "app.instance.modpack-already-installed.header": {
     "message": "Paket mod telah terpasang"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instans"
   },
   "app.instance.mods.content-type-project": {
     "message": "proyek"
@@ -61,6 +103,51 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Berhasil diunggah"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Tambah server"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Telusuri server"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' akan **dihapus secara permanen**, dan Anda tidak akan dapat memulihkannya."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Apakah Anda yakin ingin menghapus dunia ini secara permanen?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Dimodifikasi"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Luring"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Daring"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanila"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Tambah server atau telusuri untuk memulai"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Tidak ada server atau dunia yang ditambahkan"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' akan dihapus dari daftar Anda, termasuk di dalam permainan, dan Anda tidak akan dapat memulihkannya."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) akan dihapus dari daftar Anda, termasuk di dalam permainan, dan Anda tidak akan dapat memulihkannya."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Apakah Anda yakin ingin menghapus {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Cari {count} dunia..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "server ini"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Konten diperlukan"
@@ -164,6 +251,24 @@
   "app.update.reload-to-update": {
     "message": "Muat ulang untuk memasang pembaruan"
   },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Pilih opsi"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Versi {version} tidak cocok"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Belum pernah dimainkan"
+  },
+  "app.world.world-item.offline": {
+    "message": "Luring"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} orang daring"
+  },
   "friends.action.add-friend": {
     "message": "Tambah teman"
   },
@@ -262,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "Sunting dunia"
+  },
+  "instance.files.adding-files": {
+    "message": "Menambahkan berkas ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Simpan sebagai..."
   },
   "instance.server-modal.address": {
     "message": "Alamat"

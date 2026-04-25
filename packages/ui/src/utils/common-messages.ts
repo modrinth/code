@@ -13,6 +13,10 @@ export const commonMessages = defineMessages({
 		id: 'button.analytics',
 		defaultMessage: 'Analytics',
 	},
+	alpha: {
+		id: 'badge.alpha',
+		defaultMessage: 'Alpha',
+	},
 	betaRelease: {
 		id: 'badge.beta-release',
 		defaultMessage: 'Beta Release',
@@ -403,8 +407,7 @@ export const commonMessages = defineMessages({
 	},
 	clientOnlyWarning: {
 		id: 'label.client-only-warning',
-		defaultMessage:
-			"This is a client-side mod and may cause issues. We've kept it enabled because some authors mislabel environments, and the loader should resolve the conflict.",
+		defaultMessage: 'This is a client-side mod and may cause issues when starting your server',
 	},
 	clientRetainedWarning: {
 		id: 'label.client-retained-warning',

@@ -1,5 +1,5 @@
-import { createPinia, defineStore } from 'pinia'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
 
 export interface ModerationQueue {
 	items: string[]
@@ -17,15 +17,19 @@ export interface LockedByUser {
 
 export interface LockStatusResponse {
 	locked: boolean
+	is_own_lock: boolean
 	locked_by?: LockedByUser
 	locked_at?: string
+	expires_at?: string
 	expired?: boolean
 }
 
 export interface LockAcquireResponse {
 	success: boolean
+	is_own_lock: boolean
 	locked_by?: LockedByUser
 	locked_at?: string
+	expires_at?: string
 	expired?: boolean
 }
 
@@ -42,71 +46,68 @@ function createEmptyQueue(): ModerationQueue {
 	return { ...EMPTY_QUEUE, lastUpdated: new Date() } as ModerationQueue
 }
 
-const pinia = createPinia()
-pinia.use(piniaPluginPersistedstate)
+export const useModerationStore = defineStore(
+	'moderation',
+	() => {
+		const currentQueue = ref<ModerationQueue>(createEmptyQueue())
+		const currentLock = ref<{ projectId: string; lockedAt: Date } | null>(null)
+		const isQueueMode = ref(false)
 
-export const useModerationStore = defineStore('moderation', {
-	state: () => ({
-		currentQueue: createEmptyQueue(),
-		currentLock: null as { projectId: string; lockedAt: Date } | null,
-		isQueueMode: false,
-	}),
+		const queueLength = computed(() => currentQueue.value.items.length)
+		const hasItems = computed(() => currentQueue.value.items.length > 0)
+		const progress = computed(() => {
+			if (currentQueue.value.total === 0) return 0
+			return (currentQueue.value.completed + currentQueue.value.skipped) / currentQueue.value.total
+		})
 
-	getters: {
-		queueLength: (state) => state.currentQueue.items.length,
-		hasItems: (state) => state.currentQueue.items.length > 0,
-		progress: (state) => {
-			if (state.currentQueue.total === 0) return 0
-			return (state.currentQueue.completed + state.currentQueue.skipped) / state.currentQueue.total
-		},
-	},
-
-	actions: {
-		setQueue(projectIDs: string[]) {
-			this.isQueueMode = true
-			this.currentQueue = {
+		function setQueue(projectIDs: string[]) {
+			isQueueMode.value = true
+			currentQueue.value = {
 				items: [...projectIDs],
 				total: projectIDs.length,
 				completed: 0,
 				skipped: 0,
 				lastUpdated: new Date(),
 			}
-		},
+		}
 
-		setSingleProject(projectId: string) {
-			this.isQueueMode = false
-			this.currentQueue = {
+		function setSingleProject(projectId: string) {
+			isQueueMode.value = false
+			currentQueue.value = {
 				items: [projectId],
 				total: 1,
 				completed: 0,
 				skipped: 0,
 				lastUpdated: new Date(),
 			}
-		},
+		}
 
-		completeCurrentProject(projectId: string, status: 'completed' | 'skipped' = 'completed') {
+		function completeCurrentProject(
+			projectId: string,
+			status: 'completed' | 'skipped' = 'completed',
+		) {
 			if (status === 'completed') {
-				this.currentQueue.completed++
+				currentQueue.value.completed++
 			} else {
-				this.currentQueue.skipped++
+				currentQueue.value.skipped++
 			}
 
-			this.currentQueue.items = this.currentQueue.items.filter((id: string) => id !== projectId)
-			this.currentQueue.lastUpdated = new Date()
+			currentQueue.value.items = currentQueue.value.items.filter((id: string) => id !== projectId)
+			currentQueue.value.lastUpdated = new Date()
 
-			return this.currentQueue.items.length > 0
-		},
+			return currentQueue.value.items.length > 0
+		}
 
-		getCurrentProjectId(): string | null {
-			return this.currentQueue.items[0] || null
-		},
+		function getCurrentProjectId(): string | null {
+			return currentQueue.value.items[0] || null
+		}
 
-		resetQueue() {
-			this.isQueueMode = false
-			this.currentQueue = createEmptyQueue()
-		},
+		function resetQueue() {
+			isQueueMode.value = false
+			currentQueue.value = createEmptyQueue()
+		}
 
-		async acquireLock(projectId: string): Promise<LockAcquireResponse> {
+		async function acquireLock(projectId: string): Promise<LockAcquireResponse> {
 			try {
 				const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
 					method: 'POST',
@@ -114,35 +115,57 @@ export const useModerationStore = defineStore('moderation', {
 				})) as LockAcquireResponse
 
 				if (response.success) {
-					this.currentLock = { projectId, lockedAt: new Date() }
+					currentLock.value = { projectId, lockedAt: new Date() }
+				} else if (currentLock.value?.projectId === projectId) {
+					// We were outbid or our lock expired — clear stale state
+					currentLock.value = null
 				}
 
 				return response
 			} catch (error) {
 				console.error('Failed to acquire moderation lock:', error)
-				// Return a failed response so the UI can handle it gracefully
-				return { success: false }
+				return { success: false, is_own_lock: false }
 			}
-		},
+		}
 
-		async releaseLock(projectId: string): Promise<boolean> {
+		async function overrideLock(projectId: string): Promise<LockAcquireResponse> {
+			try {
+				const response = (await useBaseFetch(`moderation/lock/${projectId}/override`, {
+					method: 'POST',
+					internal: true,
+				})) as LockAcquireResponse
+
+				if (response.success) {
+					currentLock.value = { projectId, lockedAt: new Date() }
+				} else if (currentLock.value?.projectId === projectId) {
+					currentLock.value = null
+				}
+
+				return response
+			} catch (error) {
+				console.error('Failed to override moderation lock:', error)
+				return { success: false, is_own_lock: false }
+			}
+		}
+
+		async function releaseLock(projectId: string): Promise<boolean> {
 			try {
 				const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
 					method: 'DELETE',
 					internal: true,
 				})) as { success: boolean }
 
-				if (this.currentLock?.projectId === projectId) {
-					this.currentLock = null
+				if (currentLock.value?.projectId === projectId) {
+					currentLock.value = null
 				}
 
 				return response.success
 			} catch {
 				return false
 			}
-		},
+		}
 
-		async checkLock(projectId: string): Promise<LockStatusResponse> {
+		async function checkLock(projectId: string): Promise<LockStatusResponse> {
 			try {
 				const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
 					method: 'GET',
@@ -152,34 +175,58 @@ export const useModerationStore = defineStore('moderation', {
 			} catch (error) {
 				console.error('Failed to check moderation lock:', error)
 				// Return unlocked status on error so moderation can proceed
-				return { locked: false }
+				return { locked: false, is_own_lock: false }
 			}
-		},
+		}
 
-		async refreshLock(): Promise<boolean> {
-			if (!this.currentLock) return false
+		async function refreshLock(): Promise<LockAcquireResponse> {
+			if (!currentLock.value) return { success: false, is_own_lock: false }
 
 			try {
-				const response = await this.acquireLock(this.currentLock.projectId)
-				return response.success
+				const response = await acquireLock(currentLock.value.projectId)
+				// acquireLock already clears currentLock on failure
+				return response
 			} catch (error) {
 				console.error('Failed to refresh moderation lock:', error)
-				return false
+				currentLock.value = null
+				return { success: false, is_own_lock: false }
 			}
-		},
-	},
+		}
 
-	persist: {
-		key: 'moderation-store',
-		serializer: {
-			serialize: JSON.stringify,
-			deserialize: (value: string) => {
-				const parsed = JSON.parse(value)
-				if (parsed.currentQueue?.lastUpdated) {
-					parsed.currentQueue.lastUpdated = new Date(parsed.currentQueue.lastUpdated)
-				}
-				return parsed
+		return {
+			currentQueue,
+			currentLock,
+			isQueueMode,
+			queueLength,
+			hasItems,
+			progress,
+			setQueue,
+			setSingleProject,
+			completeCurrentProject,
+			getCurrentProjectId,
+			resetQueue,
+			acquireLock,
+			overrideLock,
+			releaseLock,
+			checkLock,
+			refreshLock,
+		}
+	},
+	{
+		persist: {
+			key: 'moderation-store',
+			// Only persist queue state — currentLock is always revalidated on mount
+			paths: ['currentQueue', 'isQueueMode'],
+			serializer: {
+				serialize: JSON.stringify,
+				deserialize: (value: string) => {
+					const parsed = JSON.parse(value)
+					if (parsed.currentQueue?.lastUpdated) {
+						parsed.currentQueue.lastUpdated = new Date(parsed.currentQueue.lastUpdated)
+					}
+					return parsed
+				},
 			},
 		},
 	},
-})
+)

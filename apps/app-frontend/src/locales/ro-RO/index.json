@@ -107,6 +107,9 @@
   "app.update.reload-to-update": {
     "message": "Reîncarcă pentru a instala actualizarea"
   },
+  "app.world.server-modal.select-an-option": {
+    "message": "Selectează o opțiune"
+  },
   "friends.action.add-friend": {
     "message": "Adaugă un prieten"
   },

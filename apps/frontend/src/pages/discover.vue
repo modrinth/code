@@ -50,7 +50,6 @@ const selectableProjectTypes = [
 <template>
 	<div class="new-page sidebar" :class="{ 'alt-layout': !cosmetics.rightSearchLayout }">
 		<section class="normal-page__header mb-4 flex flex-col gap-4">
-			<div id="discover-header-prefix" class="empty:hidden"></div>
 			<NavTabs
 				v-if="!flags.projectTypesPrimaryNav && allowTabChanging"
 				:links="selectableProjectTypes"

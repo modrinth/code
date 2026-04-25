@@ -1301,60 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "随心选择原版、Fabric、Forge、Quilt 和 NeoForge。只要它在 Modrinth，你的服务器就能运行它。"
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "更改整合包版本失败"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "加载版本失败"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "重新下载整合包失败"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "修复服务器失败"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "将服务器重置至引导流程失败"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "保存安装设置失败"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "链接整合包包失败"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {加载器} other {{loader}}} 版本"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "你的服务器安装已被修复。"
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "修复完成"
-  },
-  "hosting.loader.reset-server": {
-    "message": "重置服务器"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "删除服务器上的所有数据，包括你的世界、模组和配置文件。备份将保留并可以恢复。"
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "重置至引导流程"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "这将使服务器重新进入引导流程，以便再次完成设置。你确定要继续吗？"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "重置至引导流程"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "服务器已返回至引导流程。"
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "服务器已重置至引导流程"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "支持选项"
-  },
   "hosting.plan.out-of-stock": {
     "message": "缺货"
   },
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "跟随服务器"
   },
-  "servers.busy.backup-creating": {
-    "message": "备份正在创建中"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "备份正在恢复"
-  },
-  "servers.busy.installing": {
-    "message": "正在安装服务器"
-  },
-  "servers.busy.syncing-content": {
-    "message": "进行内容同步中"
-  },
   "servers.notice.actions": {
     "message": "操作"
   },
@@ -3201,13 +3135,16 @@
     "message": "你过去所有支付给Modrinth账户的款项都将列在这里："
   },
   "settings.billing.charges.product.medal-trial": {
-    "message": "服务器试用版"
+    "message": "Medal 服务器试用"
   },
   "settings.billing.charges.product.midas": {
     "message": "Modrinth Plus"
   },
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth托管服务"
+  },
+  "settings.billing.charges.title": {
+    "message": "过去费用"
   },
   "settings.billing.expires": {
     "message": "有效期至{date}"
@@ -3217,6 +3154,12 @@
   },
   "settings.billing.interval.monthly": {
     "message": "每月"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "季度"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "季度"
   },
   "settings.billing.interval.year": {
     "message": "年"
@@ -3315,7 +3258,7 @@
     "message": "{shared} 共享 CPU（突发高达 {bursts} 个 CPU）"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "我们未能找到与此订阅关联的服务器。可能存在以下几种情况：若你刚刚购买服务器，此为正常现象，服务器配置可能需要一小时左右；若你已购买一段时间，服务器可能已被暂停使用。如有不符预期的情况，请提供以下信息联系 Modrinth 支持团队："
+    "message": "我们未能找到与此订阅关联的服务器。可能存在以下几种情况：若你刚刚购买服务器，此为正常现象，服务器配置可能需要一小时左右；若你已购买一段时间，服务器可能已被停用。如有不符预期的情况，请提供以下信息联系 Modrinth 支持团队："
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "服务器ID：{id}"
@@ -3333,7 +3276,7 @@
     "message": "重新订阅时出错"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "如果服务器当前已暂停，再次尝试扣费可能最多需要10分钟。"
+    "message": "如果服务器当前已被取消，设置服务器可能需要10-15分钟。"
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "重新订阅请求已提交"
@@ -3588,13 +3531,13 @@
     "message": "未知平台"
   },
   "settings.sidebar.label.account": {
-    "message": "账户选项"
+    "message": "账户设置"
   },
   "settings.sidebar.label.developer": {
-    "message": "开发者选项"
+    "message": "开发者设置"
   },
   "settings.sidebar.label.display": {
-    "message": "显示选项"
+    "message": "显示设置"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"

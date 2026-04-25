@@ -6,13 +6,13 @@
     "message": "No se puede acceder a los servidores de autenticación"
   },
   "app.browse.add-server-to-instance": {
-    "message": "Añadir servidor a la instancia"
+    "message": "Añadir servidor a instancia"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Añadir servidor a tu instancia"
+    "message": "Añade servidores a tu instancia"
   },
   "app.browse.add-to-instance": {
-    "message": "Añadir a la instancia"
+    "message": "Añadir a instancia"
   },
   "app.browse.add-to-instance-name": {
     "message": "Añadir a {instanceName}"
@@ -21,7 +21,7 @@
     "message": "Añadido"
   },
   "app.browse.already-added": {
-    "message": "Ya está añadido"
+    "message": "Ya se ha añadido"
   },
   "app.browse.discover-content": {
     "message": "Descubrir contenido"
@@ -36,10 +36,10 @@
     "message": "Ocultar contenido instalado"
   },
   "app.browse.install-content-to-instance": {
-    "message": "Instalar contenido a una instancia"
+    "message": "Instalar contenido a la instancia"
   },
   "app.export-modal.description-placeholder": {
-    "message": "Colocá la descripción del modpack..."
+    "message": "Introduce la descripción del modpack..."
   },
   "app.export-modal.export-button": {
     "message": "Exportar"
@@ -54,10 +54,10 @@
     "message": "Nombre del modpack"
   },
   "app.export-modal.select-files-label": {
-    "message": "Selelecciona archivos y carpetas para incluir en el pack"
+    "message": "Selecciona archivos y carpetas para incluirlos en el pack"
   },
   "app.export-modal.version-number-label": {
-    "message": "Nombre de la versión"
+    "message": "Número de la versión"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
@@ -75,13 +75,13 @@
     "message": "Eliminar instancia"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Este modpack ya está instalado en la instancia <bold>{instanceName}</bold>. ¿Estás seguro qué quieres duplicarlo?"
+    "message": "El modpack ya está instalado en la instancia <bold>{instanceName}</bold>. ¿Estás seguro de querer duplicarlo?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Crear"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "Este modpack ya esta instalado"
+    "message": "Este modpack ya está instalado"
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instancia"
@@ -90,19 +90,19 @@
     "message": "proyecto"
   },
   "app.instance.mods.project-was-added": {
-    "message": "\"{name}\" fue añadido"
+    "message": "Se añadió \"{name}\""
   },
   "app.instance.mods.projects-were-added": {
-    "message": "Se agregaron {count} proyectos"
+    "message": "Se añadieron {count} proyectos"
   },
   "app.instance.mods.share-text": {
-    "message": "¡Echa un vistazo a los proyectos que estoy usando en mi paquete de mods!"
+    "message": "¡Mira a los proyectos que estoy usando en mi modpack!"
   },
   "app.instance.mods.share-title": {
     "message": "Compartiendo contenido del modpack"
   },
   "app.instance.mods.successfully-uploaded": {
-    "message": "Subido correctamente"
+    "message": "Cargado correctamente"
   },
   "app.instance.worlds.add-server": {
     "message": "Añadir servidor"
@@ -111,13 +111,13 @@
     "message": "Explorar servidores"
   },
   "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' será **permanentemente eliminado**, y habrá forma de recuperarlo."
+    "message": "\"{name}\" se **eliminará permanentemente** y no habrá forma de recuperarlo."
   },
   "app.instance.worlds.delete-world-title": {
-    "message": "¿Estás seguro de qué quieres eliminar permanentemente este mundo?"
+    "message": "¿Estás seguro de que quieres eliminar este mundo de forma permanente?"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "Modeado"
+    "message": "Con mods"
   },
   "app.instance.worlds.filter-offline": {
     "message": "Sin conexión"
@@ -132,19 +132,19 @@
     "message": "Añadir un servidor o explora para comenzar"
   },
   "app.instance.worlds.no-worlds-heading": {
-    "message": "No hay servidores o mundos añadidos"
+    "message": "No hay servidores ni mundos añadidos"
   },
   "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' será eliminado de tu lista, incluyendo dentro del juego, y no habrá forma de recuperarlo."
+    "message": "\"{name}\" se eliminará de tu lista, también dentro del juego, y no podrás recuperarlo."
   },
   "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) será eliminado de tu lista, incluyendo dentro del juego, y no habrá forma de recuperarlo."
+    "message": "\"{name}\" ({address}) se eliminará de tu lista, también dentro del juego, y no podrás recuperarlo."
   },
   "app.instance.worlds.remove-server-title": {
-    "message": "¿Estás seguro de qué quieres eliminar {name}?"
+    "message": "¿Estás seguro de que quieres eliminar {name}?"
   },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Buscar {count} mundos..."
+    "message": "Buscar en {count} mundos..."
   },
   "app.instance.worlds.this-server": {
     "message": "este servidor"
@@ -165,7 +165,7 @@
     "message": "Modpack requerido"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Este servidor requiere mods para poder jugar. Haz click en Instalar para configurar los archivos requeridos desde Modrinth, después se ejecutará para entrar directamente al servidor."
+    "message": "Este servidor requiere mods para poder jugar. Haz clic en Instalar para configurar los archivos requeridos desde Modrinth, después se ejecutará para entrar directamente al servidor."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instancia compartida"
@@ -261,7 +261,7 @@
     "message": "Versión {version} incompatible"
   },
   "app.world.world-item.not-played-yet": {
-    "message": "No se ha jugado aún"
+    "message": "Aún no se ha jugado"
   },
   "app.world.world-item.offline": {
     "message": "Desconectado"
@@ -285,7 +285,7 @@
     "message": "¡Podría ser distinto a su nombre de usuario de Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Ingresa tu nombre de usuario de Modrinth..."
+    "message": "Introduce el nombre de usuario de Modrinth..."
   },
   "friends.add-friend.username.title": {
     "message": "¿Cuál es el nombre de usuario de Modrinth de tu amigo?"

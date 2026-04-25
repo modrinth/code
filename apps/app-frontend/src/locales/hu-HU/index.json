@@ -134,6 +134,12 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nincs szerver vagy világ"
   },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' eltávolításra kerül a listádról, beleértve a játékon belülieket is. Ezt a lépést nem tudod visszavonni."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) eltávolításra kerül a listádról, beleértve a játékon belülieket is. Ezt a lépést nem tudod visszavonni."
+  },
   "app.instance.worlds.remove-server-title": {
     "message": "Biztosan el akarod távolítani ezt: {name}?"
   },
@@ -222,7 +228,7 @@
     "message": "Letöltés ({size})"
   },
   "app.update-popup.download-complete": {
-    "message": "Letöltés sikeres"
+    "message": "Sikeres letöltés"
   },
   "app.update-popup.reload": {
     "message": "Újratöltés"
@@ -246,7 +252,7 @@
     "message": "A telepítéshez újraindítás szükséges"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "pelda.modrinth.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Válassz egy lehetőséget"
@@ -546,13 +552,13 @@
     "message": "Hardcore mód"
   },
   "instance.worlds.incompatible_server": {
-    "message": "A Szerver nem kompatibilis"
+    "message": "A szerver nem kompatibilis"
   },
   "instance.worlds.linked_server": {
     "message": "Szerverprojekt által kezelt"
   },
   "instance.worlds.no_contact": {
-    "message": "Nem lehet kapcsolatot létesíteni a szerverrel"
+    "message": "A szerverrel nem lehet kapcsolatot létesíteni"
   },
   "instance.worlds.no_server_quick_play": {
     "message": "Csak Minecraft Alpha 1.0.5+-tól tudsz egyből szerverhez csatlakozni"
@@ -591,6 +597,6 @@
     "message": "A játékverziót a szerver biztosítja"
   },
   "search.filter.locked.server-loader.title": {
-    "message": "A betöltő a szerver által van megadva"
+    "message": "A betöltőt a szerver biztosítja"
   }
 }

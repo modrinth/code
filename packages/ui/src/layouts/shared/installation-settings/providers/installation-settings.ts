@@ -29,6 +29,9 @@ export interface InstallationSettingsContext {
 	resolveLoaderVersions: (loader: string, gameVersion: string) => LoaderVersionEntry[]
 	resolveHasSnapshots: (loader: string) => boolean
 
+	/** Prefetch loader build lists when the user hovers a game version (e.g. Paper/Purpur). */
+	onGameVersionHover?: (option: GameVersionOption) => void
+
 	save: (platform: string, gameVersion: string, loaderVersionId: string | null) => Promise<void>
 	repair: () => Promise<void>
 	reinstallModpack: () => Promise<void>
@@ -54,6 +57,9 @@ export interface InstallationSettingsContext {
 	/** When false, hides change-version and reinstall buttons in linked state (default: true) */
 	showModpackVersionActions?: boolean | ComputedRef<boolean>
 
+	/** True when the linked modpack was uploaded as a local file rather than from Modrinth */
+	isLocalFile?: boolean | ComputedRef<boolean>
+
 	repairing?: Ref<boolean>
 	reinstalling?: Ref<boolean>
 
@@ -61,6 +67,27 @@ export interface InstallationSettingsContext {
 
 	lockPlatform?: boolean
 	hideLoaderVersion?: boolean
+
+	/** Bulk-disable all addons on the server (used before switching loaders). */
+	disableAllContent?: () => Promise<void>
+
+	/**
+	 * Disable addons that are incompatible with the target game version.
+	 * Fetches version metadata in bulk, disables any addon whose game_versions
+	 * doesn't include the target, plus any custom (non-Modrinth) content.
+	 */
+	disableIncompatibleContent?: (targetGameVersion: string) => Promise<void>
+
+	/**
+	 * Save the installation settings without auto-resolving content.
+	 * Uses installContent with soft_override instead of applyGameVersionUpdate.
+	 */
+	saveWithoutAutoFix?: (
+		platform: string,
+		gameVersion: string,
+		loaderVersionId: string | null,
+	) => Promise<void>
+
 	previewSave?: (
 		platform: string,
 		gameVersion: string,

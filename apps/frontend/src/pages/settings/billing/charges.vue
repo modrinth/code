@@ -50,6 +50,7 @@ import {
 	injectModrinthClient,
 	useFormatDateTime,
 	useFormatPrice,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
@@ -70,6 +71,10 @@ const formatDate = useFormatDateTime({
 })
 
 const messages = defineMessages({
+	title: {
+		id: 'settings.billing.charges.title',
+		defaultMessage: 'Past charges',
+	},
 	description: {
 		id: 'settings.billing.charges.description',
 		defaultMessage: 'All of your past charges to your Modrinth account will be listed here:',

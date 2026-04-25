@@ -1,53 +1,4 @@
 <template>
-	<Transition
-		enter-active-class="transition-all duration-300 ease-out overflow-hidden"
-		enter-from-class="opacity-0 max-h-0"
-		enter-to-class="opacity-100 max-h-40"
-		leave-active-class="transition-all duration-200 ease-in overflow-hidden"
-		leave-from-class="opacity-100 max-h-40"
-		leave-to-class="opacity-0 max-h-0"
-	>
-		<Admonition v-if="ctx.uploadState?.value?.isUploading" type="info" class="mb-4">
-			<template #icon>
-				<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
-			</template>
-			<template #header>
-				{{
-					ctx.uploadingLabel
-						? ctx.uploadingLabel(
-								ctx.uploadState.value.completedFiles,
-								ctx.uploadState.value.totalFiles,
-							)
-						: formatMessage(messages.uploadingFiles, {
-								completed: ctx.uploadState.value.completedFiles,
-								total: ctx.uploadState.value.totalFiles,
-							})
-				}}
-				<span v-if="ctx.uploadState.value.currentFileName" class="font-normal text-secondary">
-					— {{ ctx.uploadState.value.currentFileName }}
-				</span>
-			</template>
-			<span class="text-secondary">
-				{{
-					formatMessage(messages.uploadProgress, {
-						uploaded: formatBytes(ctx.uploadState.value.uploadedBytes),
-						total: formatBytes(ctx.uploadState.value.totalBytes),
-						percent: Math.round(uploadOverallProgress * 100),
-					})
-				}}
-			</span>
-			<template v-if="ctx.cancelUpload" #top-right-actions>
-				<ButtonStyled type="outlined" color="blue">
-					<button class="!border" @click="ctx.cancelUpload?.()">
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-			</template>
-			<template #progress>
-				<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
-			</template>
-		</Admonition>
-	</Transition>
 	<TransitionGroup
 		name="fs-op"
 		enter-active-class="transition-all duration-300 ease-out overflow-hidden"
@@ -89,13 +40,13 @@
 					— {{ op.current_file?.split('/')?.pop() }}
 				</template>
 			</span>
-			<template v-if="op.id && ctx.dismissOperation" #top-right-actions>
+			<template v-if="op.id" #top-right-actions>
 				<ButtonStyled
 					v-if="op.state !== 'done' && !op.state?.startsWith('fail')"
 					type="outlined"
 					color="blue"
 				>
-					<button class="!border" @click="ctx.dismissOperation?.(op.id!, 'cancel')">
+					<button class="!border" @click="ctx.dismissOperation(op.id!, 'cancel')">
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
@@ -106,7 +57,7 @@
 					hover-color-fill="background"
 					:color="op.state === 'done' ? 'green' : 'red'"
 				>
-					<button @click="ctx.dismissOperation?.(op.id!, 'dismiss')">
+					<button @click="ctx.dismissOperation(op.id!, 'dismiss')">
 						<XIcon />
 					</button>
 				</ButtonStyled>
@@ -125,29 +76,19 @@
 </template>
 
 <script setup lang="ts">
-import { PackageOpenIcon, UploadIcon, XIcon } from '@modrinth/assets'
+import { PackageOpenIcon, XIcon } from '@modrinth/assets'
 import { formatBytes } from '@modrinth/utils'
-import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectModrinthServerContext } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
-
-import { injectFileManager } from '../providers/file-manager'
 
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	uploadingFiles: {
-		id: 'files.operations.uploading-files',
-		defaultMessage: 'Uploading files ({completed}/{total})',
-	},
-	uploadProgress: {
-		id: 'files.operations.upload-progress',
-		defaultMessage: '{uploaded} / {total} ({percent}%)',
-	},
 	extracting: {
 		id: 'files.operations.extracting',
 		defaultMessage: 'Extracting {source}',
@@ -166,13 +107,7 @@ const messages = defineMessages({
 	},
 })
 
-const ctx = injectFileManager()
+const ctx = injectModrinthServerContext()
 
-const activeOperations = computed(() => ctx.activeOperations?.value ?? [])
-
-const uploadOverallProgress = computed(() => {
-	const state = ctx.uploadState?.value
-	if (!state || !state.isUploading || state.totalFiles === 0) return 0
-	return Math.min((state.completedFiles + state.currentFileProgress) / state.totalFiles, 1)
-})
+const activeOperations = ctx.activeOperations
 </script>

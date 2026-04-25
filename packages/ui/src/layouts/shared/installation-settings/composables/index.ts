@@ -1,1 +1,1 @@
-export { useInstallationForm } from './use-installation-form'
+export { type IncompatibleContentVariant, useInstallationForm } from './use-installation-form'

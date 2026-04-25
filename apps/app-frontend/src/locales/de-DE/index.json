@@ -6,13 +6,13 @@
     "message": "Authentifizierungsserver sind nicht erreichbar"
   },
   "app.browse.add-server-to-instance": {
-    "message": "Server zu Instanz hinzufügen"
+    "message": "Server zur Instanz hinzufügen"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Server zu deiner Instanz hinzufügen"
   },
   "app.browse.add-to-instance": {
-    "message": "Zu Instanz hinzufügen"
+    "message": "Zur Instanz hinzufügen"
   },
   "app.browse.add-to-instance-name": {
     "message": "Zu {instanceName} hinzufügen"
@@ -63,7 +63,7 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Alle Daten für deine Instanz werden permanent gelöscht, einschließlich deiner Welten, Konfigurationen und allen installierten Inhalten."
+    "message": "Alle Daten deiner Instanz werden permanent gelöscht, einschließlich deiner Welten, Konfigurationen und allen installierten Inhalten."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Diese Aktion kann nicht rückgängig gemacht werden"

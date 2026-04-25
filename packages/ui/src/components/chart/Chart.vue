@@ -1,13 +1,21 @@
 <!-- eslint-disable no-console -->
 <script setup>
 import dayjs from 'dayjs'
-import { defineAsyncComponent, ref } from 'vue'
+import { defineAsyncComponent, onMounted, ref } from 'vue'
 
 import { useFormatNumber } from '../../composables/index.ts'
 import Button from '../base/Button.vue'
 import Checkbox from '../base/Checkbox.vue'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
+
+// apexcharts touches `window` at module load time, so we must not let SSR
+// resolve the async component. Render only after mount on the client.
+const isClient = ref(false)
+onMounted(() => {
+	isClient.value = true
+})
+
 const formatNumber = useFormatNumber()
 
 const props = defineProps({
@@ -232,7 +240,14 @@ defineExpose({
 				<slot name="toolbar" />
 			</div>
 		</div>
-		<VueApexCharts ref="chart" :type="type" :options="chartOptions" :series="data" class="chart" />
+		<VueApexCharts
+			v-if="isClient"
+			ref="chart"
+			:type="type"
+			:options="chartOptions"
+			:series="data"
+			class="chart"
+		/>
 		<div v-if="!hideLegend" class="legend">
 			<Checkbox
 				v-for="legend in legendValues"

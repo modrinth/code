@@ -1101,7 +1101,7 @@
     "message": "Sapo"
   },
   "hosting-marketing.available-locations": {
-    "message": "Disponível na América do Norte, Europa, e Ásia Sudeste para uma cobertura extensa."
+    "message": "Disponível na América do Norte, Europa e Ásia Sudeste para uma cobertura extensa."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Pagar mensalmente"
@@ -1119,13 +1119,13 @@
     "message": "Pagar anualmente"
   },
   "hosting-marketing.faq.burst-threads": {
-    "message": "Como as threads de Turbo das CPUs funcionam?"
+    "message": "Como funcionam as threads de reforço das CPUs?"
   },
   "hosting-marketing.faq.burst-threads.answer": {
     "message": "Quando o teu servidor está sob uma carga elevada, concedemos temporariamente acesso a threads de CPU adicionais para ajudar a mitigar picos de latência e instabilidade. Isto ajuda a evitar que o TPS desça abaixo dos 20, garantindo a experiência mais fluída possível. Como estes threads de CPU extra só estão disponíveis por um curto período durante períodos de elevada carga, podem não aparecer nos relatórios do Spark ou noutras ferramentas de perfilagem."
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Que CPUs os servidores do Modrinth Hosting utilizam?"
+    "message": "Os servidores do Modrinth Hosting utilizam que tipo de CPUs?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
     "message": "Os servidores Modrinth Hosting estão equipados com CPUs AMD Ryzen 7900 e equivalentes ao 7950X3D com uma frequência de 5+ GHz, juntamente com memória DDR5."
@@ -1149,7 +1149,7 @@
     "message": "Quão rápidos são os servidores Modrinth Hosting?"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Os servidores Modrinth Hosting estão alojados em hardware moderno de alto desempenho, mas é dificil dizer exatamente como isso se traduz para quão rápido o teu servidor vai correr porque existêm imensos fatores que o afetam, como os mods, pacotes de dados, ou plugins que estás a correr no teu servidor, e até o comportamento dos utilizadores."
+    "message": "Os servidores Modrinth Hosting estão alojados em hardware moderno e de alto desempenho. No entanto, é dificil dizer exatamente como isso se traduzirá no desempenho do teu servidor, uma vez que existem imensos fatores que o afetam, como os mods, pacotes de dados ou plugins que estás a utilizar no teu servidor, e até mesmo o comportamento dos utilizadores."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "Maior parte dos problemas de desempenho que aparecem costumam ser causados por um modpack, mod, pacote de dados, ou plugin mal otimizado que provoca lentidão no servidor. Como os nossos servidores são de altíssima qualidade, não deverás ter muitos problemas, desde que escolhas um plano adequado ao conteúdo que estás a executar no servidor."
@@ -1158,22 +1158,22 @@
     "message": "Posso aumentar o armazenamento do meu servidor?"
   },
   "hosting-marketing.faq.increase-storage.answer": {
-    "message": "Sim, armazenamento pode ser aumentado no teu servidor sem custo adicional. Se precisas de mais espaço, contacta o Suporte Modrinth."
+    "message": "Sim, o armazenamento pode ser aumentado no teu servidor sem custos adicionais. Se precisares de mais espaço, contacta o suporte do Modrinth."
   },
   "hosting-marketing.faq.location": {
     "message": "Onde estão localizados os servidores Modrinth Hosting? Posso escolher uma região?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "Temos servidores disponíveis na América do Norte, Europa, e Ásia Sudeste no momento que podes escolher no momento da compra. Mais regiões estão para vir no futuro! Se gostarias de trocar a tua região, por favor contacta o suporte."
+    "message": "Temos servidores disponíveis na América do Norte, Europa e Ásia Sudeste, que podes escolher no momento da compra. Mais regiões serão adicionadas no futuro! Se quiseres trocar a tua região, entra em contacto com o suporte."
   },
   "hosting-marketing.faq.versions-loaders": {
-    "message": "Que versões de Minecraft e carregadores podem ser utilizados?"
+    "message": "Que versões de Minecraft e loaders podem ser utilizados?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
     "message": "Os servidores Modrinth Hosting podem executar qualquer versão de Minecraft: Java Edition voltando até à versão 1.2.5, incluindo versões snapshot."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
-    "message": "Também suportamos uma vasta gama de carregadores de mods e plugins, incluindo Fabric, Quilt, Forge e NeoForge para mods, bem como Paper e Purpur para plugins. A disponibilidade depende da compatibilidade do carregador de mods ou plugins com a versão selecionada do Minecraft."
+    "message": "Também suportamos uma vasta gama de loaders de mods e plugins, incluindo Fabric, Quilt, Forge e NeoForge para mods, bem como Paper e Purpur para plugins. A disponibilidade depende da compatibilidade do loader de mods ou plugins com a versão selecionada do Minecraft."
   },
   "hosting-marketing.get-started": {
     "message": "Começar"
@@ -1185,19 +1185,19 @@
     "message": "Começar um novo servidor"
   },
   "hosting-marketing.hero.button.start-your-server": {
-    "message": "Começar o teu servidor"
+    "message": "Cria o teu servidor"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Aloja o teu próximo servidor com Modrinth Hosting"
+    "message": "Aloja o teu próximo servidor com o Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting é a maneira mais fácil de teres o teu próprio servidor de Minecraft: Java Edition. Instala e joga os teus mods e modpacks favoritos, tudo na plataforma Modrinth."
+    "message": "O Modrinth Hosting é a maneira mais fácil de teres o teu próprio servidor de Minecraft: Java Edition. Instala e joga os teus mods e modpacks favoritos, tudo na plataforma Modrinth."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Gestão de rede avançada"
   },
   "hosting-marketing.included.advanced-networking.description": {
-    "message": "Adiciona o teu domínio ao teu servidor, reserva até 15 portas para mods que necessitem delas, e mais."
+    "message": "Adiciona o teu domínio ao teu servidor, reserva até 15 portas para mods que necessitem delas e muito mais."
   },
   "hosting-marketing.included.backups-included": {
     "message": "Backups incluídos"
@@ -1212,28 +1212,28 @@
     "message": "Partilha o teu servidor com um URL personalizado <contrast>modrinth.gg</contrast>."
   },
   "hosting-marketing.included.description": {
-    "message": "Cada servidor inclui um conjunto de funcionalidades concebidas para proporcionar uma experiência de alojamento que só Modrinth pode oferecer."
+    "message": "Cada servidor inclui um conjunto de recursos concebidos para proporcionar uma experiência de alojamento que só o Modrinth pode oferecer."
   },
   "hosting-marketing.included.file-manager": {
-    "message": "Gestor de arquivos fácil de usar"
+    "message": "Gestor de ficheiros fácil de usar"
   },
   "hosting-marketing.included.file-manager.description": {
     "message": "Procura, gere, edita, e envia ficheiros diretamente para o teu servidor facilmente."
   },
   "hosting-marketing.included.heading": {
-    "message": "Vem com todas as funcionalidade que precisas."
+    "message": "Vem com todos os recursos de que precisas."
   },
   "hosting-marketing.included.help": {
-    "message": "Ajuda quando a mais precisas"
+    "message": "Ajuda quando a mais precisares"
   },
   "hosting-marketing.included.help.description": {
     "message": "Contacta a equipa Modrinth sempre que precisares de ajuda com o teu servidor."
   },
   "hosting-marketing.included.powerful-console": {
-    "message": "Uma consola poderosa, gestor de propriedades do servidor, e mais"
+    "message": "Uma consola poderosa, gestor de propriedades do servidor e muito mais"
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "Modrinth Hosting vem com ferramentas poderosas para gerires o teu servidor."
+    "message": "O Modrinth Hosting inclui ferramentas poderosas para gerires o teu servidor."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "Acesso SFTP"
@@ -1251,7 +1251,7 @@
     "message": "Testa um <orange>servidor de 3 GB</orange> grátis por 5 dias, fornecido por <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
-    "message": "Saber Mais"
+    "message": "Saber mais"
   },
   "hosting-marketing.medal.text-secondary": {
     "message": "Oferta de tempo limitado. Cartão de crédito não necessário. Disponível para servidores EUA."
@@ -1260,100 +1260,46 @@
     "message": "Escolhe um plano personalizado apenas com as especificações de que precisas."
   },
   "hosting-marketing.server-for-everyone": {
-    "message": "Existe um servidor para toda a gente"
+    "message": "Existe um servidor para todos"
   },
   "hosting-marketing.why.all-on-modrinth": {
     "message": "Gere tudo no Modrinth"
   },
   "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "O teu servidor, mods, jogadores, e mais estão todos no Modrinth. Não precisas alternar entre plataformas."
+    "message": "O teu servidor, mods, jogadores e muito mais estão todos no Modrinth. Não precisas de alternar entre plataformas."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Consistentemente rápido"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "A nossa infraestrutura nunca está sobrecarregada, o que significa que cada servidor alojado com Modrinth sempre está na sua performance máxima."
+    "message": "A nossa infraestrutura nunca fica sobrecarregada, o que significa que todos os servidores alojados no Modrinth funcionam sempre com o máximo desempenho."
   },
   "hosting-marketing.why.description": {
-    "message": "Escolhe dos milhares de modpacks no Modrinth ou cria o teu próprio. Convida os teus amigos quando estiveres pronto para jogar."
+    "message": "Escolhe entre os milhares de modpacks no Modrinth ou cria o teu próprio. Convida os teus amigos quando estiveres pronto para jogar."
   },
   "hosting-marketing.why.heading": {
     "message": "Encontra um modpack. Agora é um servidor."
   },
   "hosting-marketing.why.modern-reliable-hosting": {
-    "message": "Experiencia um alojamento moderno e fiável"
+    "message": "Disfruta de um alojamento moderno e fiável"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Servidores Modrinth Hosting são alojados em <contrast>CPUs AMD de alto desempenho com RAM DDR5</contrast>, executados em software personalizado para assegurar que o teu servidor não tenha problemas."
+    "message": "Os servidores Modrinth Hosting são alojados em <contrast>CPUs AMD de alto desempenho com memória RAM DDR5</contrast>, utilizando um software personalizado para garantir que o teu servidor funcione sem problemas."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Joga onde os teus mods estão"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting integra perfeitamente o processo de instalação de mods e modpacks no seu servidor."
+    "message": "O Modrinth Hosting integra perfeitamente o processo de instalação de mods e modpacks no teu servidor."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "Porquê Modrinth Hosting?"
+    "message": "Porquê escolher o Modrinth Hosting?"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "Todos os teus mods favoritos"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "Escolhe entre Vanilla, Fabric, Forge, Quilt e NeoForge. Se está no Modrinth, consegue correr no teu servidor."
-  },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Falha a mudar versão do modpack"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Falha a carregar versões"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Falha a reinstalar modpack"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Falha a reparar servidor"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Falha a redefinir servidor para ativação"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Falha a guardar definições de instalação"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Falha a desassociar modpack"
-  },
-  "hosting.loader.loader-version": {
-    "message": "Versão do {loader, select,null {carregador}other {{loader}}}"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "A tua instalação do servidor foi reparada."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Reparação concluída"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Redefinir servidor"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Remove todos os dados no teu servidor, incluindo os teus mundos, mods, e ficheiros de configuração. Backups serão mantidos e podem ser restaurados."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Redefinir para ativação"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Isto vai colocar o servidor em modo de ativação para ser completada novamente. Tens a certeza que queres continuar?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Redefinir para ativação"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "O servidor foi colocado novamente no fluxo de ativação."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Servidor redefinido para ativação"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Opções de suporte"
+    "message": "Escolhe entre Vanilla, Fabric, Forge, Quilt e NeoForge. Se está no Modrinth, pode ser usado no teu servidor."
   },
   "hosting.plan.out-of-stock": {
     "message": "Fora de stock"
@@ -2271,7 +2217,7 @@
     "message": "Rever projeto"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting é a maneira mais fácil de jogar com os teus amigos sem complicações!"
+    "message": "O Modrinth Hosting é a maneira mais fácil de jogar com os teus amigos sem complicações!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "A partir de {price}<small> / mês</small>"
@@ -2826,22 +2772,10 @@
     "message": "Versão do jogo é fornecida pelo servidor"
   },
   "search.filter.locked.server-loader.title": {
-    "message": "Carregador é fornecido pelo servidor"
+    "message": "O loader é fornecido pelo servidor"
   },
   "search.filter.locked.server.sync": {
     "message": "Sincronizar com o servidor"
-  },
-  "servers.busy.backup-creating": {
-    "message": "Criação de backup em curso"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Restauro de backup em curso"
-  },
-  "servers.busy.installing": {
-    "message": "Servidor a ser instalado"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Sincronização de conteúdo em progresso"
   },
   "servers.notice.actions": {
     "message": "Ações"
@@ -3179,17 +3113,38 @@
   "settings.authorizations.by": {
     "message": "por"
   },
+  "settings.authorizations.description": {
+    "message": "Quando autorizas uma aplicação com a tua conta Modrinth, dás-lhe acesso à tua conta. Podes gerir e rever acesso à tua conta aqui quando quiseres."
+  },
+  "settings.authorizations.empty-state": {
+    "message": "Neste momento, não conseguimos mostrar as tuas aplicações autorizadas, estamos a tentar corrigir isto. Por favor tenta novamente mais tarde!"
+  },
   "settings.authorizations.head-title": {
     "message": "Autorizações"
   },
   "settings.authorizations.revoke.action": {
     "message": "Revogar"
   },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Isto irá revogar o acesso desta aplicação à tua conta. Podes sempre reautorizá-la no futuro."
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "Tens a certeza de que queres revogar esta aplicação?"
+  },
+  "settings.billing.charges.description": {
+    "message": "Todas as cobranças passadas na tua conta Modrinth são listadas aqui:"
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Teste de Servidor por Medal"
+  },
   "settings.billing.charges.product.midas": {
     "message": "Modrinth Plus"
   },
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
+  },
+  "settings.billing.charges.title": {
+    "message": "Pagamentos anteriores"
   },
   "settings.billing.expires": {
     "message": "Expira em {date}"
@@ -3206,8 +3161,38 @@
   "settings.billing.interval.yearly": {
     "message": "anual"
   },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "Navegação sem anúncios em modrinth.com e Modrinth App"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Distintivo Modrinth+ no teu perfil"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Suporta o Modrinth e criadores diretamente"
+  },
   "settings.billing.midas.benefits.title": {
     "message": "Benefícios"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "Poupa {amount}/ano ao trocar para a cobrança anual!"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "Tu cancelaste a tua subscrição."
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "Os teus benefícios mantêm-se até ao final do atual ciclo de faturação."
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "O pagamento da tua subscrição falhou. Por favor atualiza o teu método de pagamento."
+  },
+  "settings.billing.midas.status.open": {
+    "message": "Estás atualmente subscrito a:"
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "O teu pagamento está a ser processado. Os benefícios serão ativados quando o pagamento for concluído."
+  },
+  "settings.billing.midas.upsell": {
+    "message": "Torna-te um subscritor de Modrinth Plus!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Cancelar subscrição"
@@ -3263,11 +3248,38 @@
   "settings.billing.price.slash-interval": {
     "message": "/{interval}"
   },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} CPUs partilhadas (Reforço até {bursts} CPUs)"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "Um servidor associado a esta subscrição não foi encontrado. Podem existir algumas explicações possíveis para isto. Se acabaste de comprar o teu servidor, isto é normal. Pode levar até uma hora para o teu servidor ser provisionado. Caso contrário, se compraste este servidor a algum tempo, é provável que desde então tenha sido suspenso. Se isto não é o que estavas à espera, por favor contacta o Suporte Modrinth com a informação seguinte:"
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "ID do servidor: {id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "ID do Stripe: {id}"
+  },
   "settings.billing.pyro.ram": {
-    "message": "{gb} GB RAM"
+    "message": "{gb} GB de RAM"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Ocorreu um erro ao tentar resubscrever ao teu servidor Modrinth."
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Erro ao ressubscrever"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "Pedido de ressubscrição enviado"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "Subscrição de servidor ressubscrita com sucesso"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "O pagamento da tua subscrição falhou. Por favor atualiza o teu método de pagamento, e então ressubscreve."
   },
   "settings.billing.pyro.storage": {
-    "message": "{gb} GB SSD"
+    "message": "{gb} GB de SSD"
   },
   "settings.billing.pyro.swap": {
     "message": "{gb} GB Swap"
@@ -3282,7 +3294,7 @@
     "message": "Renova a {date}"
   },
   "settings.billing.resubscribe": {
-    "message": "Resubscrever"
+    "message": "Ressubscrever"
   },
   "settings.billing.since": {
     "message": "Desde {date}"
@@ -3295,6 +3307,15 @@
   },
   "settings.billing.subscription.title": {
     "message": "Subscrições"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Alterando para {interval}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Alterar para {interval}"
+  },
+  "settings.billing.update-method": {
+    "message": "Atualizar método"
   },
   "settings.billing.upgrade": {
     "message": "Melhorar"

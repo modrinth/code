@@ -5,7 +5,7 @@
 			'intercom-present': isIntercomPresent,
 			'location-left': notificationLocation === 'left',
 			'location-right': notificationLocation === 'right',
-			'has-sidebar': hasSidebar,
+			'has-sidebar': hasSidebar && !hasModalActive,
 		}"
 	>
 		<transition-group name="notifs">
@@ -92,6 +92,8 @@ import {
 } from '@modrinth/assets'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
+import { useModalStack } from '#ui/composables/modal-stack.ts'
+
 import { injectNotificationManager, type WebNotification } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
 
@@ -151,6 +153,8 @@ onMounted(() => {
 	})
 })
 
+const { hasModal: hasModalActive } = useModalStack()
+
 withDefaults(
 	defineProps<{
 		hasSidebar?: boolean
@@ -167,9 +171,11 @@ withDefaults(
 	bottom: 1.5rem;
 	z-index: 200;
 	width: 450px;
+	transition: bottom 0.25s ease-in-out;
 
 	&.location-right {
 		right: 1.5rem;
+		transition: right 0.25s ease-in-out;
 
 		&.has-sidebar {
 			right: 325px;
@@ -241,5 +247,9 @@ withDefaults(
 	.location-left & {
 		transform: translateX(-100%) scale(0.8);
 	}
+}
+
+body.floating-action-bar-shown .vue-notification-group {
+	bottom: calc(90px);
 }
 </style>

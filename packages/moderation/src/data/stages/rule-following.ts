@@ -8,7 +8,7 @@ const ruleFollowing: Stage = {
 	id: 'rule-following',
 	icon: ListBulletedIcon,
 	guidance_url:
-		'https://www.notion.so/Creator-Communication-Guide-1b65ee711bf080ec9337e3ccdded146c',
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080709084f6269835607f',
 	navigate: '/moderation',
 	actions: [
 		{
