@@ -20,12 +20,11 @@ export type BackupAdmonitionEntry = {
 	backupId: string
 	type: 'create' | 'restore'
 	state: AdmonitionDisplayState
-	status?: Archon.BackupsQueue.v1.BackupStatus
 	progress: number
 	operationId: number | null
 	syntheticLegacy: boolean
 	name?: string
-	createdAt?: string
+	timestamp?: string
 	error?: string | null
 }
 
@@ -46,11 +45,11 @@ const { formatMessage } = useVIntl()
 type UiPhase = 'queued' | 'in_progress' | 'failed' | 'timed_out' | 'cancelled' | 'completed'
 
 function resolveUiPhase(item: BackupAdmonitionEntry): UiPhase | null {
-	if (item.state === 'ongoing') {
-		if (item.status === 'in_progress') return 'in_progress'
-		return item.progress > 0 ? 'in_progress' : 'queued'
-	}
 	switch (item.state) {
+		case 'pending':
+			return 'queued'
+		case 'ongoing':
+			return 'in_progress'
 		case 'failed':
 		case 'timed_out':
 		case 'cancelled':
@@ -82,11 +81,15 @@ function isInProgress(item: BackupAdmonitionEntry) {
 }
 
 function isTerminal(item: BackupAdmonitionEntry) {
-	return item.state !== 'ongoing'
+	return item.state !== 'pending' && item.state !== 'ongoing'
 }
 
 function canRetry(item: BackupAdmonitionEntry) {
 	return item.state === 'failed' || item.state === 'timed_out'
+}
+
+function canCancel(item: BackupAdmonitionEntry) {
+	return isQueued(item) || isInProgress(item)
 }
 
 function hasErrorDetail(item: BackupAdmonitionEntry) {
@@ -257,7 +260,7 @@ function getDescription(item: BackupAdmonitionEntry): string {
 	<Admonition
 		:type="getAdmonitionType(item.state)"
 		:header="getTitle(item)"
-		:timestamp="item.createdAt"
+		:timestamp="item.timestamp"
 		:dismissible="dismissible && isTerminal(item)"
 		:progress="isInProgress(item) ? item.progress : undefined"
 		progress-color="blue"
@@ -274,7 +277,7 @@ function getDescription(item: BackupAdmonitionEntry): string {
 			</span>
 		</div>
 		<template #top-right-actions>
-			<ButtonStyled v-if="isQueued(item) || isInProgress(item)" type="outlined" color="blue">
+			<ButtonStyled v-if="canCancel(item)" type="outlined" color="blue">
 				<button class="!border" type="button" :disabled="cancelling" @click="$emit('cancel')">
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>

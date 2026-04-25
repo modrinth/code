@@ -2,9 +2,9 @@
 	<Admonition
 		:type="contentError ? 'critical' : 'info'"
 		:dismissible="dismissible"
-		:progress="!contentError ? (progress ? progress.percent / 100 : 0) : undefined"
+		:progress="progressValue"
 		progress-color="blue"
-		:waiting="!contentError && !progress"
+		:waiting="isWaiting"
 		@dismiss="emit('dismiss')"
 	>
 		<template #icon>
@@ -110,6 +110,16 @@ const phaseLabel = computed(() => {
 		default:
 			return 'Installing...'
 	}
+})
+
+const progressValue = computed(() => {
+	if (props.contentError) return undefined
+	return props.progress ? props.progress.percent / 100 : 0
+})
+
+const isWaiting = computed(() => {
+	if (props.contentError) return false
+	return !props.progress || props.progress.percent <= 0
 })
 
 const tickerMessages = [

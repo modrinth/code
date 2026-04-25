@@ -17,6 +17,7 @@
 				<slot name="header">{{ header }}</slot>
 				<span
 					v-if="normalizedTimestamp"
+					v-tooltip="timestampTooltip"
 					class="flex items-center gap-1.5 text-base font-medium leading-normal text-secondary"
 				>
 					<ClockIcon class="size-4" />
@@ -35,15 +36,17 @@
 			class="col-start-3 row-start-1 flex shrink-0 items-center gap-2 self-start"
 		>
 			<slot name="top-right-actions" />
-			<button
+			<ButtonStyled
 				v-if="dismissible"
-				type="button"
-				aria-label="Dismiss"
-				:class="['transition-opacity opacity-70 hover:opacity-100', iconClasses[type]]"
-				@click="$emit('dismiss')"
+				circular
+				type="transparent"
+				:color="buttonColors[type]"
+				hover-color-fill="background"
 			>
-				<XIcon class="h-6 w-6" />
-			</button>
+				<button type="button" aria-label="Dismiss" @click="$emit('dismiss')">
+					<XIcon />
+				</button>
+			</ButtonStyled>
 		</div>
 		<div
 			v-if="progress != null"
@@ -71,8 +74,9 @@ import { ClockIcon, XIcon } from '@modrinth/assets'
 import { useNow } from '@vueuse/core'
 import { computed } from 'vue'
 
-import { useRelativeTime } from '../../composables'
+import { useFormatDateTime, useRelativeTime } from '../../composables'
 import { getSeverityIcon } from '../../utils'
+import ButtonStyled from './ButtonStyled.vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -105,6 +109,10 @@ defineEmits<{
 }>()
 
 const relativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	dateStyle: 'long',
+	timeStyle: 'short',
+})
 const now = useNow({ interval: 1000 })
 
 const normalizedProgress = computed(() => Math.min(Math.max(props.progress ?? 0, 0), 1))
@@ -123,6 +131,11 @@ const relativeTimeLabel = computed(() => {
 	return t ? relativeTime(t) : ''
 })
 
+const timestampTooltip = computed(() => {
+	const t = normalizedTimestamp.value
+	return t ? formatDateTime(t) : ''
+})
+
 const typeClasses = {
 	info: 'border-brand-blue bg-bg-blue',
 	warning: 'border-brand-orange bg-bg-orange',
@@ -136,6 +149,13 @@ const iconClasses = {
 	critical: 'text-brand-red',
 	success: 'text-brand-green',
 }
+
+const buttonColors = {
+	info: 'blue',
+	warning: 'orange',
+	critical: 'red',
+	success: 'green',
+} as const
 
 const progressTrackClasses = {
 	info: 'bg-brand-blue/20',

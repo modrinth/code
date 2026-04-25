@@ -6,7 +6,7 @@ import {
 } from '@modrinth/api-client'
 import type { Stats } from '@modrinth/utils'
 import type { ComputedRef, Ref } from 'vue'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 import type { FileOperation } from '../layouts/shared/files-tab/types'
 import { injectModrinthClient, provideModrinthServerContext } from '../providers'
@@ -376,20 +376,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			console.error(`Failed to ${action} operation:`, error)
 		}
 	}
-
-	watch(
-		() => fsOps.value,
-		(newOps) => {
-			for (const op of newOps) {
-				if (op.state === 'done' && op.id && !dismissedOpIds.value.has(op.id)) {
-					setTimeout(() => {
-						dismissOperation(op.id!, 'dismiss')
-					}, 3000)
-				}
-			}
-		},
-		{ deep: true },
-	)
 
 	const refreshFsAuth = async () => {
 		if (!options.serverId.value) {

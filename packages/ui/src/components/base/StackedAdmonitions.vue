@@ -1,3 +1,5 @@
+<script lang="ts"></script>
+
 <script setup lang="ts" generic="ItemType extends StackedAdmonitionItem">
 import { ChevronDownIcon, XIcon } from '@modrinth/assets'
 import { AnimatePresence, Motion } from 'motion-v'
@@ -5,18 +7,18 @@ import { computed, onBeforeUnmount, onMounted, ref, useAttrs, useId, watch } fro
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import ButtonStyled from './ButtonStyled.vue'
-
-defineOptions({
-	inheritAttrs: false,
-})
-
 export type StackedAdmonitionType = 'info' | 'warning' | 'critical' | 'success'
 
 /** Extend this interface to attach arbitrary per-item data consumed in the #item slot. */
 export interface StackedAdmonitionItem {
 	id: string
 	type: StackedAdmonitionType
+	dismissible?: boolean
 }
+
+defineOptions({
+	inheritAttrs: false,
+})
 
 const props = withDefaults(
 	defineProps<{
@@ -114,7 +116,9 @@ const isExpanded = computed(() => {
 	return props.expanded ?? internalExpanded.value
 })
 const hasActionBar = computed(() => props.items.length >= 2)
-const itemDismissible = computed(() => true)
+function itemDismissible(item: ItemType) {
+	return item.dismissible ?? true
+}
 
 type StackPhase = 'collapsed' | 'expanding' | 'expanded' | 'collapsing'
 
@@ -558,7 +562,7 @@ const messages = defineMessages({
 									:index="index"
 									:is-front="true"
 									:expanded="isExpanded"
-									:dismissible="itemDismissible"
+									:dismissible="itemDismissible(item)"
 								/>
 							</div>
 						</template>
@@ -598,7 +602,7 @@ const messages = defineMessages({
 												:index="index"
 												:is-front="false"
 												:expanded="isExpanded"
-												:dismissible="itemDismissible"
+												:dismissible="itemDismissible(item)"
 											/>
 										</div>
 									</Motion>

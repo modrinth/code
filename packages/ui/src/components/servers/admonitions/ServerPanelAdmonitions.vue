@@ -108,18 +108,22 @@ const backupAdmonitionEntries = computed<BackupAdmonitionEntry[]>(() => {
 		const key = `${op.backup_id}:${op.operation_type}:${op.operation_id ?? 'legacy'}`
 		if (dismissedIds.has(key)) continue
 		const backup = backupById.get(op.backup_id)
+		const history = backup?.history.find(
+			(h) =>
+				h.operation_type === op.operation_type &&
+				(h.operation_id ?? null) === (op.operation_id ?? null),
+		)
 		const rawProgress = progressFor(op.backup_id, op.operation_type) ?? 0
 		result.push({
 			key,
 			backupId: op.backup_id,
 			type: op.operation_type,
-			state: 'ongoing',
-			status: backup?.status,
+			state: history?.state ?? 'ongoing',
 			progress: rawProgress,
 			operationId: op.operation_id ?? null,
 			syntheticLegacy: op.synthetic_legacy,
 			name: backup?.name,
-			createdAt: backup?.created_at,
+			timestamp: history?.scheduled_for ?? op.scheduled_for,
 		})
 	}
 
@@ -135,12 +139,11 @@ const backupAdmonitionEntries = computed<BackupAdmonitionEntry[]>(() => {
 			backupId: backup.id,
 			type: last.operation_type,
 			state: last.state,
-			status: backup.status,
 			progress: 0,
 			operationId: last.operation_id ?? null,
 			syntheticLegacy: last.synthetic_legacy,
 			name: backup.name,
-			createdAt: backup.created_at,
+			timestamp: last.completed_at ?? last.scheduled_for,
 			error: last.error ?? null,
 		})
 	}
@@ -191,8 +194,8 @@ function backupType(entry: BackupAdmonitionEntry): StackedAdmonitionItem['type']
 
 function backupPriority(entry: BackupAdmonitionEntry): number {
 	if (entry.state === 'failed' || entry.state === 'timed_out') return 1
-	if (entry.state === 'ongoing' && (entry.status === 'in_progress' || entry.progress > 0)) return 2
-	if (entry.state === 'ongoing' && entry.progress === 0) return 3
+	if (entry.state === 'ongoing') return 2
+	if (entry.state === 'pending') return 3
 	return 4
 }
 
@@ -204,6 +207,7 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 		out.push({
 			id: 'installing',
 			type: props.contentError ? 'critical' : 'info',
+			dismissible: !!props.contentError,
 			kind: 'installing',
 			priority: 0,
 			sortIndex: sortIndex++,
@@ -214,6 +218,7 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 		out.push({
 			id: 'upload-active',
 			type: 'info',
+			dismissible: false,
 			kind: 'upload',
 			priority: 2,
 			sortIndex: sortIndex++,
@@ -224,6 +229,7 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 		out.push({
 			id: op.id ? `fs-op-${op.id}` : `fs-op-${op.op}-${op.src}`,
 			type: fsOpType(op),
+			dismissible: !!op.id && (op.state === 'done' || !!op.state?.startsWith('fail')),
 			kind: 'fs-op',
 			op,
 			priority: fsOpPriority(op),
@@ -235,6 +241,7 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 		out.push({
 			id: `backup-${entry.key}`,
 			type: backupType(entry),
+			dismissible: entry.state !== 'pending' && entry.state !== 'ongoing',
 			kind: 'backup',
 			entry,
 			priority: backupPriority(entry),
@@ -247,6 +254,7 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 		out.push({
 			id: 'busy-content',
 			type: 'warning',
+			dismissible: false,
 			kind: 'busy-content',
 			priority: p,
 			sortIndex: sortIndex++,
@@ -258,6 +266,7 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 		out.push({
 			id: 'busy-files',
 			type: 'warning',
+			dismissible: false,
 			kind: 'busy-files',
 			priority: p,
 			sortIndex: sortIndex++,
@@ -267,21 +276,7 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 	return out.sort((a, b) => a.priority - b.priority || a.sortIndex - b.sortIndex)
 })
 
-const hasBulkDismissableItems = computed(() =>
-	stackItems.value.some((it) => {
-		if (it.kind === 'installing') {
-			return !!props.contentError
-		}
-		if (it.kind === 'fs-op') {
-			const terminal = it.op.state === 'done' || !!it.op.state?.startsWith('fail')
-			return terminal && !!it.op.id
-		}
-		if (it.kind === 'backup') {
-			return it.entry.state !== 'ongoing'
-		}
-		return false
-	}),
-)
+const hasBulkDismissableItems = computed(() => stackItems.value.some((it) => it.dismissible))
 
 async function onBackupDismiss(item: BackupAdmonitionEntry) {
 	dismissedIds.add(item.key)
@@ -332,6 +327,7 @@ async function onBackupRetry(item: BackupAdmonitionEntry) {
 async function onDismissAll() {
 	const tasks: Promise<unknown>[] = []
 	for (const it of stackItems.value) {
+		if (!it.dismissible) continue
 		if (it.kind === 'installing' && props.contentError) {
 			onContentErrorDismiss()
 		} else if (it.kind === 'fs-op' && it.op.id) {
