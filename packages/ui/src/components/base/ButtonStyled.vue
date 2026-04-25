@@ -242,7 +242,7 @@ const fontSize = computed(() => {
 	<div
 		class="btn-wrapper"
 		:class="[{ outline: type === 'outlined', chip: type === 'chip' }, fontSize]"
-		:style="`${colorVariables}--_height:${height};--_width:${width};--_radius: ${radius};--_padding-x:${paddingX};--_padding-y:${paddingY};--_gap:${gap};--_font-weight:${fontWeight};--_icon-size:${iconSize};`"
+		:style="`${colorVariables}--_height:${height};--_width:${width};--_radius: ${radius};--_padding-x:${paddingX};--_padding-y:${paddingY};--_gap:${gap};--_font-weight:${fontWeight};--_icon-size:${iconSize};--_outline-color:${color === 'standard' && type === 'outlined' ? 'var(--surface-5)' : 'currentColor'}`"
 	>
 		<slot />
 	</div>
@@ -323,7 +323,7 @@ const fontSize = computed(() => {
 	> *:first-child
 	> *:first-child
 	> :is(button, a, .button-like):first-child {
-	@apply border-current;
+	@apply border-[--_outline-color,currentColor];
 }
 
 /*noinspection CssUnresolvedCustomProperty*/
