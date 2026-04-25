@@ -16,7 +16,7 @@
 		/>
 
 		<Admonition
-			v-if="withheldVersions.length > 0"
+			v-if="flags.modpackPermissionsPage && withheldVersions.length > 0"
 			type="warning"
 			class="mb-4"
 			:header="

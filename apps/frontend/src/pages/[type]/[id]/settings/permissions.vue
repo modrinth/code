@@ -18,6 +18,13 @@ import { ref } from 'vue'
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
 
+if (!flags.value.modpackPermissionsPage) {
+	throw createError({
+		fatal: true,
+		statusCode: 404,
+	})
+}
+
 const externalFiles = ref([{}])
 const searchQuery = ref('')
 const currentSortType = ref('Oldest')
