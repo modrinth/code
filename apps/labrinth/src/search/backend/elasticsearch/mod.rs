@@ -263,9 +263,18 @@ static ELASTICSEARCH_PROPERTIES: LazyLock<serde_json::Map<String, Value>> =
             ("license".to_string(), json!({ "type": "keyword" })),
             ("loaders".to_string(), json!({ "type": "keyword" })),
             ("color".to_string(), json!({ "type": "long" })),
-            ("required_dependencies".to_string(), json!({ "type": "keyword" })),
-            ("optional_dependencies".to_string(), json!({ "type": "keyword" })),
-            ("incompatibilities".to_string(), json!({ "type": "keyword" })),
+            (
+                "required_dependencies".to_string(),
+                json!({ "type": "keyword" }),
+            ),
+            (
+                "optional_dependencies".to_string(),
+                json!({ "type": "keyword" }),
+            ),
+            (
+                "incompatibilities".to_string(),
+                json!({ "type": "keyword" }),
+            ),
             ("environment".to_string(), json!({ "type": "keyword" })),
             ("mrpack_loaders".to_string(), json!({ "type": "keyword" })),
             (

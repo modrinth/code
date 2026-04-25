@@ -928,7 +928,15 @@ impl VersionType {
 }
 
 #[derive(
-    Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, sqlx::Type, utoipa::ToSchema,
+    Serialize,
+    Deserialize,
+    Copy,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    sqlx::Type,
+    utoipa::ToSchema,
 )]
 #[sqlx(type_name = "varchar", rename_all = "lowercase")]
 #[serde(rename_all = "lowercase")]

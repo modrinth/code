@@ -21,7 +21,7 @@ use crate::database::models::{
 use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::ids::{ProjectId, VersionId};
-use crate::models::projects::{from_duplicate_version_fields, DependencyType};
+use crate::models::projects::{DependencyType, from_duplicate_version_fields};
 use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
 use crate::search::{Dependencies, Dependency, UploadSearchProject};
@@ -639,7 +639,7 @@ async fn index_versions(
     // Version (Project A v1.0.0, vID: 400) has a (required) dependency on the version (Project B v2.0.0, vID: 500) from the Project (Project B, pID: 2)
     // ~ @ithundxr
     let dependencies: DashMap<DBVersionId, Dependencies> = sqlx::query!(
-            "
+        "
             SELECT
                 d.dependent_id as \"dependent_version_id: DBVersionId\",
                 d.mod_dependency_id as \"dependency_project_id: DBProjectId\",
@@ -649,28 +649,28 @@ async fn index_versions(
             INNER JOIN mods m ON m.id = d.mod_dependency_id
             WHERE dependent_id = ANY($1) AND dependency_type != 'embedded'
             ",
-            &all_version_ids
-        )
-        .fetch(pool)
-        .try_fold(
-            DashMap::new(),
-            |acc: DashMap<DBVersionId, Dependencies>, m| {
-                if let Some(dependency_project_id) = m.dependency_project_id {
-                    let dependency = Dependency {
-                        project: ProjectId::from(dependency_project_id),
-                        version: m.dependency_version_id.map(VersionId::from),
-                    };
+        &all_version_ids
+    )
+    .fetch(pool)
+    .try_fold(
+        DashMap::new(),
+        |acc: DashMap<DBVersionId, Dependencies>, m| {
+            if let Some(dependency_project_id) = m.dependency_project_id {
+                let dependency = Dependency {
+                    project: ProjectId::from(dependency_project_id),
+                    version: m.dependency_version_id.map(VersionId::from),
+                };
 
-                    acc.entry(m.dependent_version_id)
-                        .or_default()
-                        .add_dependency(m.dependency_type, dependency);
-                }
-
-                async move { Ok(acc) }
+                acc.entry(m.dependent_version_id)
+                    .or_default()
+                    .add_dependency(m.dependency_type, dependency);
             }
-        )
-        .await
-        .wrap_err("failed to fetch dependencies")?;
+
+            async move { Ok(acc) }
+        },
+    )
+    .await
+    .wrap_err("failed to fetch dependencies")?;
 
     // Convert to partial versions
     let mut res_versions: HashMap<DBProjectId, Vec<PartialVersion>> =

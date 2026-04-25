@@ -2,20 +2,20 @@ use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
 use crate::models::ids::{ProjectId, VersionId};
+use crate::models::projects::DependencyType;
 use crate::queue::server_ping;
 use crate::routes::ApiError;
 use crate::{database::PgPool, env::ENV};
 use ariadne::ids::base62_impl::parse_base62;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
+use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Value;
-use std::{collections::HashMap, str::FromStr};
 use std::fmt::Formatter;
-use serde::de::{Error, Visitor};
+use std::{collections::HashMap, str::FromStr};
 use thiserror::Error;
 use utoipa::ToSchema;
-use crate::models::projects::DependencyType;
 
 pub mod backend;
 pub mod indexing;
@@ -235,7 +235,7 @@ pub struct Dependency {
 impl Serialize for Dependency {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: Serializer
+        S: Serializer,
     {
         let s = match self.version {
             Some(version) => format!("{}:{}", self.project, version),
@@ -248,7 +248,7 @@ impl Serialize for Dependency {
 impl<'de> Deserialize<'de> for Dependency {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
-        D: Deserializer<'de>
+        D: Deserializer<'de>,
     {
         struct DependencyVisitor;
 
@@ -256,7 +256,8 @@ impl<'de> Deserialize<'de> for Dependency {
             type Value = Dependency;
 
             fn expecting(&self, formatter: &mut Formatter) -> std::fmt::Result {
-                formatter.write_str("a string in the format 'project[:version]'")
+                formatter
+                    .write_str("a string in the format 'project[:version]'")
             }
 
             fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
@@ -265,12 +266,14 @@ impl<'de> Deserialize<'de> for Dependency {
             {
                 let mut parts = v.splitn(2, ":");
 
-                let project = parts.next()
-                    .and_then(|x|  parse_base62(x).ok())
+                let project = parts
+                    .next()
+                    .and_then(|x| parse_base62(x).ok())
                     .map(ProjectId)
                     .ok_or_else(|| E::custom("ProjectId is missing"))?;
-                let version = parts.next()
-                    .and_then(|x|  parse_base62(x).ok())
+                let version = parts
+                    .next()
+                    .and_then(|x| parse_base62(x).ok())
                     .map(VersionId);
 
                 Ok(Dependency { project, version })
@@ -292,7 +295,11 @@ pub struct Dependencies {
 }
 
 impl Dependencies {
-    pub fn add_dependency(&mut self, dependency_type: DependencyType, dep: Dependency) {
+    pub fn add_dependency(
+        &mut self,
+        dependency_type: DependencyType,
+        dep: Dependency,
+    ) {
         match dependency_type {
             DependencyType::Required => self.required_dependencies.push(dep),
             DependencyType::Optional => self.optional_dependencies.push(dep),
@@ -470,7 +477,8 @@ mod tests {
         };
 
         let serialized = serde_json::to_string(&dependency).unwrap();
-        let deserialized: Dependency = serde_json::from_str(&serialized).unwrap();
+        let deserialized: Dependency =
+            serde_json::from_str(&serialized).unwrap();
 
         assert_eq!(dependency.project, deserialized.project);
         assert_eq!(dependency.version, deserialized.version);
@@ -484,7 +492,8 @@ mod tests {
         };
 
         let serialized = serde_json::to_string(&dependency).unwrap();
-        let deserialized: Dependency = serde_json::from_str(&serialized).unwrap();
+        let deserialized: Dependency =
+            serde_json::from_str(&serialized).unwrap();
 
         assert_eq!(dependency.project, deserialized.project);
         assert_eq!(dependency.version, deserialized.version);
