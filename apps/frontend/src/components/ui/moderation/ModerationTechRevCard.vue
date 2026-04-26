@@ -435,6 +435,8 @@ async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 				backToFileList()
 			}
 		}
+
+		emit('refetch')
 	} catch (error) {
 		console.error('Failed to batch update:', error)
 		addNotification({
@@ -534,6 +536,8 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 				text: `This issue has been flagged as malicious.${otherText}`,
 			})
 		}
+
+		emit('refetch')
 	} catch (error) {
 		console.error('Failed to update detail status:', error)
 		addNotification({

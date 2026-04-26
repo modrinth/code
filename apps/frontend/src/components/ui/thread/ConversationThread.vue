@@ -442,7 +442,7 @@ async function sendReply(status = null, privateMessage = false) {
 
 		await updateThreadLocal()
 		if (status !== null) {
-			props.setStatus(status)
+			await props.setStatus(status)
 		}
 	} catch (err) {
 		addNotification({

@@ -486,6 +486,7 @@ import {
 	type ProjectStatus,
 	renderHighlightedString,
 } from '@modrinth/utils'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computedAsync, useDebounceFn } from '@vueuse/core'
 import type { Component } from 'vue'
 
@@ -521,9 +522,10 @@ const props = defineProps<{
 	collapsed: boolean
 }>()
 
-const { projectV2, projectV3 } = injectProjectPageContext()
+const { projectV2, projectV3, invalidate } = injectProjectPageContext()
 
 const moderationQueue = useModerationQueue()
+const queryClient = useQueryClient()
 const tags = useGeneratedState()
 const auth = await useAuth()
 
@@ -1950,6 +1952,16 @@ function generateModpackMessage(allFiles: {
 }
 
 const hasNextProject = ref(false)
+async function refreshModerationCaches(threadId?: string) {
+	const refreshes: Promise<unknown>[] = [invalidate(), refreshNuxtData('moderation-projects')]
+
+	if (threadId) {
+		refreshes.push(queryClient.invalidateQueries({ queryKey: ['thread', threadId] }))
+	}
+
+	await Promise.allSettled(refreshes)
+}
+
 async function sendMessage(status: ProjectStatus) {
 	// Capture project data upfront to avoid null issues during async operations
 	const projectId = projectV2.value?.id
@@ -1992,6 +2004,8 @@ async function sendMessage(status: ProjectStatus) {
 				body: modpackJudgements.value,
 			})
 		}
+
+		await refreshModerationCaches(threadId)
 
 		const willHaveNext = await moderationQueue.completeCurrentProject(projectId, 'completed')
 
