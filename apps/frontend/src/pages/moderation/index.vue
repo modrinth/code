@@ -111,8 +111,8 @@ import Fuse from 'fuse.js'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
-import { useModerationQueue } from '~/composables/moderation-queue.ts'
 import { enrichProjectBatch, type ModerationProject } from '~/helpers/moderation.ts'
+import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 useHead({ title: 'Projects queue - Modrinth' })
 

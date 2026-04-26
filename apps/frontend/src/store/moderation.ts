@@ -1,4 +1,3 @@
-import { useModerationQueue } from '~/composables/moderation-queue.ts'
 import type {
 	LockAcquireResponse,
 	LockedByUser,
@@ -6,6 +5,7 @@ import type {
 	ModerationQueue,
 	ModerationQueueService,
 } from '~/services/moderation-queue.ts'
+import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 export type {
 	LockAcquireResponse,

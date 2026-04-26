@@ -1,3 +1,5 @@
+import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
+import { injectModrinthClient } from '@modrinth/ui'
 import { computed, proxyRefs, ref } from 'vue'
 
 import {
@@ -14,29 +16,9 @@ export interface ModerationQueue {
 	lastUpdated: Date
 }
 
-export interface LockedByUser {
-	id: string
-	username: string
-	avatar_url?: string
-}
-
-export interface LockStatusResponse {
-	locked: boolean
-	is_own_lock: boolean
-	locked_by?: LockedByUser
-	locked_at?: string
-	expires_at?: string
-	expired?: boolean
-}
-
-export interface LockAcquireResponse {
-	success: boolean
-	is_own_lock: boolean
-	locked_by?: LockedByUser
-	locked_at?: string
-	expires_at?: string
-	expired?: boolean
-}
+export type LockedByUser = Labrinth.Moderation.Internal.LockedByUser
+export type LockStatusResponse = Labrinth.Moderation.Internal.LockStatusResponse
+export type LockAcquireResponse = Labrinth.Moderation.Internal.LockAcquireResponse
 
 export interface ModerationQueueService {
 	currentQueue: ModerationQueue
@@ -80,7 +62,9 @@ function sanitizeQueue(raw: PersistedModerationQueueState['currentQueue']): Mode
 	const completed = Number.isFinite(raw.completed) ? Math.max(Math.trunc(raw.completed), 0) : 0
 	const skipped = Number.isFinite(raw.skipped) ? Math.max(Math.trunc(raw.skipped), 0) : 0
 	const minimumTotal = items.length + completed + skipped
-	const total = Number.isFinite(raw.total) ? Math.max(Math.trunc(raw.total), minimumTotal) : minimumTotal
+	const total = Number.isFinite(raw.total)
+		? Math.max(Math.trunc(raw.total), minimumTotal)
+		: minimumTotal
 
 	return {
 		items,
@@ -109,7 +93,7 @@ function persistedPayload(
 	}
 }
 
-function createModerationQueueState() {
+function createModerationQueueState(client: AbstractModrinthClient = injectModrinthClient()) {
 	const currentQueue = ref(createEmptyQueue())
 	const currentLock = ref<{ projectId: string; lockedAt: Date } | null>(null)
 	const isQueueMode = ref(false)
@@ -224,10 +208,7 @@ function createModerationQueueState() {
 		await ready
 
 		try {
-			const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
-				method: 'POST',
-				internal: true,
-			})) as LockAcquireResponse
+			const response = await client.labrinth.moderation_internal.acquireLock(projectId)
 
 			if (response.success) {
 				currentLock.value = { projectId, lockedAt: new Date() }
@@ -246,10 +227,7 @@ function createModerationQueueState() {
 		await ready
 
 		try {
-			const response = (await useBaseFetch(`moderation/lock/${projectId}/override`, {
-				method: 'POST',
-				internal: true,
-			})) as LockAcquireResponse
+			const response = await client.labrinth.moderation_internal.overrideLock(projectId)
 
 			if (response.success) {
 				currentLock.value = { projectId, lockedAt: new Date() }
@@ -268,10 +246,7 @@ function createModerationQueueState() {
 		await ready
 
 		try {
-			const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
-				method: 'DELETE',
-				internal: true,
-			})) as { success: boolean }
+			const response = await client.labrinth.moderation_internal.releaseLock(projectId)
 
 			if (currentLock.value?.projectId === projectId) {
 				currentLock.value = null
@@ -287,10 +262,7 @@ function createModerationQueueState() {
 		await ready
 
 		try {
-			const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
-				method: 'GET',
-				internal: true,
-			})) as LockStatusResponse
+			const response = await client.labrinth.moderation_internal.checkLock(projectId)
 			return response
 		} catch (error) {
 			console.error('Failed to check moderation lock:', error)
@@ -339,3 +311,15 @@ function createModerationQueueState() {
 }
 
 export const createModerationQueueService = createModerationQueueState
+
+const moderationQueueServices = new WeakMap<object, ModerationQueueService>()
+
+export function useModerationQueue(): ModerationQueueService {
+	const nuxtApp = useNuxtApp()
+	const existingService = moderationQueueServices.get(nuxtApp)
+	if (existingService) return existingService
+
+	const service = createModerationQueueService()
+	moderationQueueServices.set(nuxtApp, service)
+	return service
+}

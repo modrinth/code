@@ -159,6 +159,7 @@
 								:disabled="false"
 								:heading-buttons="false"
 								:on-image-upload="onUploadHandler"
+								@input="persistGeneratedMessageState"
 							/>
 							<StyledInput
 								v-else
@@ -167,7 +168,7 @@
 								placeholder="No message generated."
 								autocomplete="off"
 								input-class="h-[400px] font-mono"
-								@input="persistState"
+								@input="persistGeneratedMessageState"
 							/>
 						</div>
 					</div>
@@ -441,10 +442,10 @@ import {
 } from '@modrinth/assets'
 import {
 	type Action,
+	type ActionState,
 	type ButtonAction,
 	checklist,
 	type ConditionalButtonAction,
-	deserializeActionStates,
 	type DropdownAction,
 	expandVariables,
 	finalPermissionMessages,
@@ -461,7 +462,6 @@ import {
 	keybinds,
 	type MultiSelectChipsAction,
 	processMessage,
-	serializeActionStates,
 	type Stage,
 	type ToggleAction,
 } from '@modrinth/moderation'
@@ -486,14 +486,26 @@ import {
 	type ProjectStatus,
 	renderHighlightedString,
 } from '@modrinth/utils'
-import { computedAsync, useDebounceFn, useLocalStorage } from '@vueuse/core'
+import { computedAsync, useDebounceFn } from '@vueuse/core'
 import type { Component } from 'vue'
 
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
-import { useModerationQueue } from '~/composables/moderation-queue.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
-import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
+import {
+	clearChecklistProgressState,
+	clearGeneratedMessageState as clearPersistedGeneratedMessageState,
+	createEmptyGeneratedMessageState,
+	loadChecklistActionStates,
+	loadChecklistStage,
+	loadChecklistTextInputs,
+	loadGeneratedMessageState,
+	saveChecklistActionStates,
+	saveChecklistStage,
+	saveChecklistTextInputs,
+	saveGeneratedMessageState,
+} from '~/services/moderation-checklist-storage.ts'
+import { type LockAcquireResponse, useModerationQueue } from '~/services/moderation-queue.ts'
 
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
@@ -737,10 +749,31 @@ async function onUploadHandler(file: File) {
 }
 
 const useSimpleEditor = ref(false)
-const message = ref('')
-const generatedMessage = ref(false)
+const checklistPersistenceProjectSlug = projectV2.value.slug
+const persistedGeneratedMessage = import.meta.client
+	? await loadGeneratedMessageState(checklistPersistenceProjectSlug)
+	: createEmptyGeneratedMessageState()
+const message = ref(
+	typeof persistedGeneratedMessage.message === 'string' ? persistedGeneratedMessage.message : '',
+)
+const generatedMessage = ref(persistedGeneratedMessage.generated === true)
 const loadingMessage = ref(false)
 const done = ref(false)
+
+function persistGeneratedMessageState() {
+	void saveGeneratedMessageState(checklistPersistenceProjectSlug, {
+		generated: generatedMessage.value,
+		message: message.value,
+	})
+}
+
+function clearGeneratedMessageState() {
+	generatedMessage.value = false
+	message.value = ''
+	void clearPersistedGeneratedMessageState(checklistPersistenceProjectSlug)
+}
+
+watch([generatedMessage, message], persistGeneratedMessageState, { flush: 'sync' })
 
 function handleModpackPermissionsComplete() {
 	modpackPermissionsComplete.value = true
@@ -1037,8 +1070,7 @@ function resetProgress() {
 	textInputValues.value = {}
 
 	done.value = false
-	generatedMessage.value = false
-	message.value = ''
+	clearGeneratedMessageState()
 	loadingMessage.value = false
 
 	localStorage.removeItem(`modpack-permissions-${projectV2.value.id}`)
@@ -1064,8 +1096,11 @@ function findFirstValidStage(): number {
 }
 
 const currentStageObj = computed(() => checklist[currentStage.value])
-const currentStage = useLocalStorage(`moderation-stage-${projectV2.value.slug}`, () =>
-	findFirstValidStage(),
+const persistedStage = import.meta.client
+	? await loadChecklistStage(checklistPersistenceProjectSlug)
+	: null
+const currentStage = ref(
+	persistedStage !== null && checklist[persistedStage] ? persistedStage : findFirstValidStage(),
 )
 
 const stageTextExpanded = computedAsync(async () => {
@@ -1084,37 +1119,27 @@ const stageTextExpanded = computedAsync(async () => {
 	return null
 }, null)
 
-interface ActionState {
-	selected: boolean
-	value?: any
-}
-
-const persistedActionStates = useLocalStorage(
-	`moderation-actions-${projectV2.value.slug}`,
-	{},
-	{
-		serializer: {
-			read: (v: any) => (v ? deserializeActionStates(v) : {}),
-			write: (v: any) => serializeActionStates(v),
-		},
-	},
-)
+const persistedActionStates = import.meta.client
+	? await loadChecklistActionStates(checklistPersistenceProjectSlug)
+	: {}
 
 const router = useRouter()
 
-const persistedTextInputs = useLocalStorage(
-	`moderation-inputs-${projectV2.value.slug}`,
-	{} as Record<string, string>,
-)
+const persistedTextInputs = import.meta.client
+	? await loadChecklistTextInputs(checklistPersistenceProjectSlug)
+	: {}
 
-const actionStates = ref<Record<string, ActionState>>(persistedActionStates.value)
-const textInputValues = ref<Record<string, string>>(persistedTextInputs.value)
+const actionStates = ref<Record<string, ActionState>>(persistedActionStates)
+const textInputValues = ref<Record<string, string>>(persistedTextInputs)
 
 const persistState = () => {
-	persistedActionStates.value = actionStates.value
-	persistedTextInputs.value = textInputValues.value
+	void saveChecklistActionStates(checklistPersistenceProjectSlug, actionStates.value)
+	void saveChecklistTextInputs(checklistPersistenceProjectSlug, textInputValues.value)
 }
 
+watch(currentStage, (stage) => {
+	void saveChecklistStage(checklistPersistenceProjectSlug, stage)
+})
 watch(actionStates, persistState, { deep: true })
 watch(textInputValues, persistState, { deep: true })
 
@@ -1812,8 +1837,7 @@ function nextStage() {
 }
 
 function goBackToStages() {
-	generatedMessage.value = false
-	message.value = ''
+	clearGeneratedMessageState()
 
 	let targetStage = checklist.length - 1
 	while (targetStage >= 0) {
@@ -1980,6 +2004,7 @@ async function sendMessage(status: ProjectStatus) {
 		// to avoid the race condition where done=true renders with hasNextProject=false
 		hasNextProject.value = willHaveNext
 		done.value = true
+		clearGeneratedMessageState()
 	} catch (error) {
 		console.error('Error submitting moderation:', error)
 		addNotification({
@@ -2115,15 +2140,15 @@ async function skipCurrentProject() {
 function clearProjectLocalStorage() {
 	localStorage.removeItem(`modpack-permissions-${projectV2.value.id}`)
 	localStorage.removeItem(`modpack-permissions-index-${projectV2.value.id}`)
-	localStorage.removeItem(`moderation-actions-${projectV2.value.slug}`)
-	localStorage.removeItem(`moderation-inputs-${projectV2.value.slug}`)
-	localStorage.removeItem(`moderation-stage-${projectV2.value.slug}`)
 
 	sessionStorage.removeItem(`modpack-permissions-data-${projectV2.value.id}`)
 	sessionStorage.removeItem(`modpack-permissions-permanent-no-${projectV2.value.id}`)
 	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
 
+	void clearChecklistProgressState(checklistPersistenceProjectSlug)
 	actionStates.value = {}
+	textInputValues.value = {}
+	clearGeneratedMessageState()
 }
 
 const isLastVisibleStage = computed(() => {
