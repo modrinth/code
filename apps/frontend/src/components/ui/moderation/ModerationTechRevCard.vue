@@ -562,9 +562,10 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 }
 
 const expandedClasses = reactive<Set<string>>(new Set())
+const autoExpandedFileIds = reactive<Set<string>>(new Set())
 const showCopyFeedback = reactive<Map<string, boolean>>(new Map())
 const highlightedSourceCache = reactive<Map<string, { source: string; lines: string[] }>>(new Map())
-const AUTO_EXPAND_CLASS_FLAG_LIMIT = 50
+const LAZY_LOAD_CLASS_SOURCE_MINIMUM = 10
 
 interface ClassGroup {
 	key: string
@@ -678,12 +679,18 @@ const groupedByJar = computed<JarGroup[]>(() => {
 	})
 })
 
-// Auto-expand if there's only one class in the file
+// Auto-expand/load source for small files; keep larger files lazy.
 watch(
-	groupedByClass,
-	(classes) => {
-		if (classes.length === 1 && classes[0].flags.length <= AUTO_EXPAND_CLASS_FLAG_LIMIT) {
-			expandClass(classes[0])
+	[selectedFileId, groupedByClass],
+	([fileId, classes]) => {
+		if (!fileId || classes.length === 0 || autoExpandedFileIds.has(fileId)) return
+
+		autoExpandedFileIds.add(fileId)
+
+		if (classes.length < LAZY_LOAD_CLASS_SOURCE_MINIMUM) {
+			for (const classItem of classes) {
+				expandClass(classItem)
+			}
 		}
 	},
 	{ immediate: true },
