@@ -22,7 +22,7 @@
 				<BigOptionButton
 					:icon="PackageIcon"
 					title="Modpack base"
-					description="Use a popular modpack as your starting point."
+					description="Use a popular modpack or upload one as your starting point."
 					@click="setSetupType('modpack')"
 				/>
 				<BigOptionButton
@@ -43,7 +43,7 @@
 				<BigOptionButton
 					:icon="PackageIcon"
 					title="Modpack base"
-					description="Use a popular modpack as your starting point."
+					description="Use a popular modpack or upload one as your starting point."
 					@click="setSetupType('modpack')"
 				/>
 				<BigOptionButton
