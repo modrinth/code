@@ -20,7 +20,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			>Report of '{report.title}' has been updated</Heading
 		>
 
-		<Text class="text-base">Hi {user.name},</Text>
+		<Text class="text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 
 		<Text class="text-base"
 			>Your report of {report.title} from {report.date} has been updated by our moderation

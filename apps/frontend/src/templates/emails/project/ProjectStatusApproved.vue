@@ -26,7 +26,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			>Your project, {project.name}, has been approved 🎉</Heading
 		>
 
-		<Text class="text-base">Congratulations {user.name},</Text>
+		<Text class="text-base">Congratulations <span class="no-auto-link">{user.name}</span>,</Text>
 
 		<Text class="text-base">
 			Your project
