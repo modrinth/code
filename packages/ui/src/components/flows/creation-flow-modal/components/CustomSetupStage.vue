@@ -161,7 +161,7 @@ import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
 import PaperChannelBadge from '../../../base/PaperChannelBadge.vue'
 import StyledInput from '../../../base/StyledInput.vue'
-import type { LoaderVersionType } from '../creation-flow-context'
+import type { LoaderVersionEntry, LoaderVersionType } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
 import { formatLoaderLabel } from '../shared'
 
@@ -290,7 +290,6 @@ onMounted(() => {
 		selectedGameVersion.value = ctx.initialGameVersion
 	}
 	debug('after init:', { loader: selectedLoader.value, gameVersion: selectedGameVersion.value })
-	void prefetchAllLoaderMetadata()
 })
 
 const tags = injectTags()
@@ -319,23 +318,12 @@ function removeIcon() {
 	ctx.instanceIconPath.value = null
 }
 
-// Loader versions fetched from launcher-meta
-interface LoaderVersionEntry {
-	id: string
-	stable: boolean
-}
-
 const loaderVersionsLoading = ref(false)
 const loaderVersionsData = ref<LoaderVersionEntry[]>([])
-const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>({})
 
 // Paper/Purpur build caches
 const paperVersions = ref<Record<string, Paper.Versions.v3.Build[]>>({})
 const purpurVersions = ref<Record<string, string[]>>({})
-
-// Paper/Purpur supported game version sets (for filtering the game version combobox)
-const paperSupportedVersions = ref<Set<string> | null>(null)
-const purpurSupportedVersions = ref<Set<string> | null>(null)
 
 function toApiLoaderName(loader: string): string {
 	return loader === 'neoforge' ? 'neo' : loader
@@ -344,9 +332,9 @@ function toApiLoaderName(loader: string): string {
 const gameVersionsLoading = computed(() => {
 	const loader = selectedLoader.value
 	if (!loader || loader === 'vanilla') return false
-	if (loader === 'paper') return paperSupportedVersions.value === null
-	if (loader === 'purpur') return purpurSupportedVersions.value === null
-	return loaderVersionsCache.value[toApiLoaderName(loader)] === undefined
+	if (loader === 'paper') return ctx.paperSupportedVersions.value === null
+	if (loader === 'purpur') return ctx.purpurSupportedVersions.value === null
+	return ctx.loaderVersionsCache.value[toApiLoaderName(loader)] === undefined
 })
 
 // Game versions from tags provider, filtered by loader support
@@ -358,21 +346,21 @@ const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 	// For loaders with per-version data, only show game versions that have builds
 	if (selectedLoader.value && selectedLoader.value !== 'vanilla') {
 		if (selectedLoader.value === 'paper') {
-			if (!paperSupportedVersions.value) return []
+			if (!ctx.paperSupportedVersions.value) return []
 			return versions
-				.filter((v) => paperSupportedVersions.value!.has(v.version))
+				.filter((v) => ctx.paperSupportedVersions.value!.has(v.version))
 				.map((v) => ({ value: v.version, label: v.version }))
 		}
 
 		if (selectedLoader.value === 'purpur') {
-			if (!purpurSupportedVersions.value) return []
+			if (!ctx.purpurSupportedVersions.value) return []
 			return versions
-				.filter((v) => purpurSupportedVersions.value!.has(v.version))
+				.filter((v) => ctx.purpurSupportedVersions.value!.has(v.version))
 				.map((v) => ({ value: v.version, label: v.version }))
 		}
 
 		const apiLoader = toApiLoaderName(selectedLoader.value)
-		const manifest = loaderVersionsCache.value[apiLoader]
+		const manifest = ctx.loaderVersionsCache.value[apiLoader]
 		if (!manifest) return []
 
 		const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
@@ -414,57 +402,13 @@ async function fetchLoaderManifest(loader: string) {
 		'apiLoader:',
 		apiLoader,
 		'cached:',
-		!!loaderVersionsCache.value[apiLoader],
+		!!ctx.loaderVersionsCache.value[apiLoader],
 	)
-	if (loaderVersionsCache.value[apiLoader]) return
-
-	try {
-		const data =
-			(await ctx.getLoaderManifest?.(apiLoader)) ??
-			(await client.launchermeta.manifest_v0.getManifest(apiLoader))
-		loaderVersionsCache.value[apiLoader] = data.gameVersions
-		debug('fetchLoaderManifest: loaded', apiLoader, 'gameVersions:', data.gameVersions.length)
-	} catch (e) {
-		debug('fetchLoaderManifest: FAILED', apiLoader, e)
-		loaderVersionsCache.value[apiLoader] = []
-	}
-}
-
-async function fetchPaperSupportedVersions() {
-	if (paperSupportedVersions.value) return
-	try {
-		const project = await client.paper.versions_v3.getProject()
-		paperSupportedVersions.value = new Set(Object.values(project.versions).flat())
-	} catch {
-		paperSupportedVersions.value = new Set()
-	}
-}
-
-async function fetchPurpurSupportedVersions() {
-	if (purpurSupportedVersions.value) return
-	try {
-		const project = await client.purpur.versions_v2.getProject()
-		purpurSupportedVersions.value = new Set(project.versions)
-	} catch {
-		purpurSupportedVersions.value = new Set()
-	}
+	await ctx.fetchLoaderMetadata(loader)
 }
 
 async function fetchLoaderMetadata(loader?: string | null) {
-	if (!loader || loader === 'vanilla') return
-	if (loader === 'paper') {
-		await fetchPaperSupportedVersions()
-		return
-	}
-	if (loader === 'purpur') {
-		await fetchPurpurSupportedVersions()
-		return
-	}
-	await fetchLoaderManifest(loader)
-}
-
-async function prefetchAllLoaderMetadata() {
-	await Promise.allSettled(effectiveLoaders.value.map((loader) => fetchLoaderMetadata(loader)))
+	await ctx.fetchLoaderMetadata(loader)
 }
 
 function paperBuildChannelTag(buildId: string): 'ALPHA' | 'BETA' | null {
@@ -509,7 +453,7 @@ function getLoaderVersionsForGameVersion(
 	gameVersion: string,
 ): LoaderVersionEntry[] {
 	const apiLoader = toApiLoaderName(loader)
-	const manifest = loaderVersionsCache.value[apiLoader]
+	const manifest = ctx.loaderVersionsCache.value[apiLoader]
 	debug('getLoaderVersionsForGameVersion:', {
 		loader,
 		apiLoader,

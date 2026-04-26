@@ -1,4 +1,5 @@
 import type { Archon, LauncherMeta } from '@modrinth/api-client'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
@@ -11,7 +12,7 @@ import {
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
-import { createContext } from '../../../providers'
+import { createContext, injectModrinthClient } from '../../../providers'
 import type { ImportableLauncher } from '../../../providers/instance-import'
 import type { MultiStageModal, StageConfigInput } from '../../base'
 import type { ComboboxOption } from '../../base/Combobox.vue'
@@ -24,6 +25,14 @@ export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
 export type GeneratorSettingsMode = 'default' | 'flat' | 'custom'
 export type LoaderManifestResolver = (loader: string) => Promise<LauncherMeta.Manifest.v0.Manifest>
+export interface LoaderVersionEntry {
+	id: string
+	stable: boolean
+}
+
+const loaderManifestQueryKey = (loader: string) => ['creation-flow', 'loader-manifest', loader] as const
+const paperSupportedVersionsQueryKey = ['creation-flow', 'paper', 'supported-versions'] as const
+const purpurSupportedVersionsQueryKey = ['creation-flow', 'purpur', 'supported-versions'] as const
 
 export const creationFlowMessages = defineMessages({
 	createWorldTitle: {
@@ -150,6 +159,9 @@ export interface CreationFlowContextValue {
 	hideLoaderChips: ComputedRef<boolean>
 	hideLoaderVersion: ComputedRef<boolean>
 	showSnapshots: Ref<boolean>
+	loaderVersionsCache: Ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>
+	paperSupportedVersions: Ref<Set<string> | null>
+	purpurSupportedVersions: Ref<Set<string> | null>
 
 	// Modpack state
 	modpackSelection: Ref<ModpackSelection | null>
@@ -192,6 +204,8 @@ export interface CreationFlowContextValue {
 	browseModpacks: () => void
 	finish: () => void
 	buildProperties: () => Archon.Content.v1.PropertiesFields
+	fetchLoaderMetadata: (loader?: string | null) => Promise<void>
+	prefetchLoaderMetadata: () => Promise<void>
 
 	// Platform-provided search
 	searchModpacks: (query: string, limit?: number) => Promise<ModpackSearchResult>
@@ -229,6 +243,8 @@ export function createCreationFlowContext(
 	options: CreationFlowOptions = {},
 ): CreationFlowContextValue {
 	const debug = useDebugLogger('CreationFlow')
+	const client = injectModrinthClient()
+	const queryClient = useQueryClient()
 	const { formatMessage } = useVIntl()
 	const availableLoaders = options.availableLoaders ?? ['fabric', 'neoforge', 'forge', 'quilt']
 	const showSnapshotToggle = options.showSnapshotToggle ?? false
@@ -237,6 +253,9 @@ export function createCreationFlowContext(
 	const initialLoader = options.initialLoader ?? null
 	const initialGameVersion = options.initialGameVersion ?? null
 	const onBack = options.onBack ?? null
+	const searchModpacks = options.searchModpacks!
+	const getProjectVersions = options.getProjectVersions!
+	const getLoaderManifest = options.getLoaderManifest ?? null
 
 	const setupType = ref<SetupType | null>(null)
 	const isImportMode = ref(false)
@@ -269,6 +288,9 @@ export function createCreationFlowContext(
 	const loaderVersionType = ref<LoaderVersionType>('stable')
 	const selectedLoaderVersion = ref<string | null>(null)
 	const showSnapshots = ref(false)
+	const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>({})
+	const paperSupportedVersions = ref<Set<string> | null>(null)
+	const purpurSupportedVersions = ref<Set<string> | null>(null)
 
 	const autoInstanceName = computed(() => {
 		const loader = selectedLoader.value
@@ -316,6 +338,83 @@ export function createCreationFlowContext(
 	const hideLoaderVersion = computed(
 		() => setupType.value === 'vanilla' || selectedLoader.value === 'vanilla',
 	)
+
+	function toApiLoaderName(loader: string): string {
+		return loader === 'neoforge' ? 'neo' : loader
+	}
+
+	async function fetchLoaderManifest(loader: string) {
+		const apiLoader = toApiLoaderName(loader)
+		if (loaderVersionsCache.value[apiLoader]) return
+
+		try {
+			const data = await queryClient.fetchQuery({
+				queryKey: loaderManifestQueryKey(apiLoader),
+				queryFn: async () =>
+					(await getLoaderManifest?.(apiLoader)) ??
+					(await client.launchermeta.manifest_v0.getManifest(apiLoader)),
+				staleTime: Infinity,
+			})
+			loaderVersionsCache.value[apiLoader] = data.gameVersions
+			debug('fetchLoaderManifest: loaded', apiLoader, 'gameVersions:', data.gameVersions.length)
+		} catch (error) {
+			debug('fetchLoaderManifest: failed', apiLoader, error)
+			loaderVersionsCache.value[apiLoader] = []
+		}
+	}
+
+	async function fetchPaperSupportedVersions() {
+		if (paperSupportedVersions.value) return
+		try {
+			paperSupportedVersions.value = await queryClient.fetchQuery({
+				queryKey: paperSupportedVersionsQueryKey,
+				queryFn: async () => {
+					const project = await client.paper.versions_v3.getProject()
+					return new Set(Object.values(project.versions).flat())
+				},
+				staleTime: Infinity,
+			})
+		} catch {
+			paperSupportedVersions.value = new Set()
+		}
+	}
+
+	async function fetchPurpurSupportedVersions() {
+		if (purpurSupportedVersions.value) return
+		try {
+			purpurSupportedVersions.value = await queryClient.fetchQuery({
+				queryKey: purpurSupportedVersionsQueryKey,
+				queryFn: async () => {
+					const project = await client.purpur.versions_v2.getProject()
+					return new Set(project.versions)
+				},
+				staleTime: Infinity,
+			})
+		} catch {
+			purpurSupportedVersions.value = new Set()
+		}
+	}
+
+	async function fetchLoaderMetadata(loader?: string | null) {
+		if (!loader || loader === 'vanilla') return
+		if (loader === 'paper') {
+			await fetchPaperSupportedVersions()
+			return
+		}
+		if (loader === 'purpur') {
+			await fetchPurpurSupportedVersions()
+			return
+		}
+		await fetchLoaderManifest(loader)
+	}
+
+	async function prefetchLoaderMetadata() {
+		await Promise.allSettled(
+			availableLoaders
+				.filter((loader) => loader !== 'vanilla')
+				.map((loader) => fetchLoaderMetadata(loader)),
+		)
+	}
 
 	async function reset() {
 		if (fetchExistingInstanceNames) {
@@ -432,10 +531,6 @@ export function createCreationFlowContext(
 		return { known }
 	}
 
-	const searchModpacks = options.searchModpacks!
-	const getProjectVersions = options.getProjectVersions!
-	const getLoaderManifest = options.getLoaderManifest ?? null
-
 	const resolvedStageConfigs = disableClose
 		? stageConfigs.map((stage) => ({ ...stage, disableClose: true }))
 		: stageConfigs
@@ -471,6 +566,9 @@ export function createCreationFlowContext(
 		hideLoaderChips,
 		hideLoaderVersion,
 		showSnapshots,
+		loaderVersionsCache,
+		paperSupportedVersions,
+		purpurSupportedVersions,
 		modpackSelection,
 		modpackFile,
 		modpackFilePath,
@@ -495,6 +593,8 @@ export function createCreationFlowContext(
 		browseModpacks,
 		finish,
 		buildProperties,
+		fetchLoaderMetadata,
+		prefetchLoaderMetadata,
 		searchModpacks,
 		getProjectVersions,
 		getLoaderManifest,

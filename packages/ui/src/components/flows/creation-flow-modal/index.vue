@@ -84,6 +84,7 @@ provideCreationFlowContext(ctx)
 
 async function show() {
 	await ctx.reset()
+	void ctx.prefetchLoaderMetadata()
 	modal.value?.setStage(0)
 	modal.value?.show()
 }
