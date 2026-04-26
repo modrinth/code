@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Card, StyledInput } from '@modrinth/ui'
+import { ButtonStyled, Card, NewModal, StyledInput } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import emails from '~/templates/emails'
@@ -14,7 +14,7 @@ const filtered = computed(() =>
 function openAll() {
 	let offset = 0
 	for (const id of filtered.value) {
-		openPreview(id, offset)
+		openPopupPreview(id, offset)
 		offset++
 	}
 }
@@ -23,7 +23,81 @@ function copy(id: string) {
 	navigator.clipboard?.writeText(`/_internal/templates/email/${id}`).catch(() => {})
 }
 
-function openPreview(id: string, offset = 0) {
+const previewModal = ref<{ hide: () => void; show: () => void } | null>(null)
+const previewTemplate = ref<string | null>(null)
+const previewLoading = ref(false)
+const previewError = ref<string | null>(null)
+const previewHtml = ref('')
+const previewVariables = ref<string[]>([])
+const variableValues = ref<Record<string, string>>({})
+
+function extractVariables(html: string): string[] {
+	const tokens = new Set<string>()
+	const regex = /\{([a-zA-Z0-9_.-]+)\}/g
+	let match = regex.exec(html)
+
+	while (match !== null) {
+		tokens.add(match[1])
+		match = regex.exec(html)
+	}
+
+	return [...tokens]
+}
+
+const renderedPreview = computed(() => {
+	let html = previewHtml.value
+
+	for (const [key, value] of Object.entries(variableValues.value)) {
+		if (!value) {
+			continue
+		}
+
+		const pattern = new RegExp(`\\{${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\}`, 'g')
+		html = html.replace(pattern, value)
+	}
+
+	return html
+})
+
+async function openPreview(id: string, event?: MouseEvent) {
+	if (event?.shiftKey) {
+		openPopupPreview(id)
+		return
+	}
+
+	previewTemplate.value = id
+	previewLoading.value = true
+	previewError.value = null
+	previewHtml.value = ''
+	previewVariables.value = []
+	variableValues.value = {}
+
+	try {
+		const response = await fetch(`/_internal/templates/email/${id}`)
+		previewHtml.value = await response.text()
+
+		if (!response.ok) {
+			throw new Error(`Failed to load template ${id}`)
+		}
+
+		const variables = extractVariables(previewHtml.value)
+		previewVariables.value = variables
+		variableValues.value = Object.fromEntries(variables.map((value) => [value, '']))
+		previewModal.value?.show()
+	} catch (error) {
+		previewError.value = 'Failed to load email preview.'
+		console.error(error)
+		previewModal.value?.show()
+	} finally {
+		previewLoading.value = false
+	}
+}
+
+function closePreview() {
+	previewModal.value?.hide()
+}
+
+function openPopupPreview(id: string, offset = 0) {
 	const width = 600
 	const height = 850
 	const left = window.screenX + (window.outerWidth - width) / 2 + ((offset * 28) % 320)
@@ -48,6 +122,63 @@ onMounted(() => {
 <template>
 	<div class="normal-page no-sidebar">
 		<h1 class="mb-4 text-3xl font-extrabold text-heading">Email templates</h1>
+		<NewModal
+			ref="previewModal"
+			header="Preview email"
+			width="min(92vw, 1000px)"
+			:max-content-height="'88vh'"
+			scrollable
+		>
+			<div class="flex flex-col gap-4">
+				<p class="label__title text-base">Template: {{ previewTemplate }}</p>
+
+				<div v-if="previewError" class="my-2 rounded border border-danger bg-danger/10 px-3 py-2 text-sm text-danger">
+					{{ previewError }}
+				</div>
+
+				<div v-if="previewLoading" class="my-4 text-sm text-secondary">Loading preview…</div>
+				<div v-else>
+					<div v-if="previewVariables.length" class="mt-2 grid gap-3 md:grid-cols-2">
+						<label
+							v-for="variable in previewVariables"
+							:key="variable"
+							:for="`preview-${variable}`"
+							class="flex flex-col"
+						>
+							<span class="label__title">{{ variable }}</span>
+							<StyledInput
+								:id="`preview-${variable}`"
+								v-model="variableValues[variable]"
+								type="text"
+								:placeholder="`Enter ${variable}`"
+							/>
+						</label>
+					</div>
+					<p v-else class="mt-2 text-xs text-secondary">
+						No template variables were detected; preview shown using default values.
+					</p>
+
+					<div class="mt-4">
+						<div class="mb-2 label__title">Rendered template</div>
+						<iframe
+							v-if="!previewError"
+							:srcdoc="renderedPreview"
+							class="h-[60vh] w-full rounded border border-divider bg-white"
+							sandbox="allow-same-origin"
+						/>
+						<div v-else class="rounded border border-divider bg-white px-4 py-3 text-sm text-secondary">
+							Could not render template preview.
+						</div>
+					</div>
+
+					<div class="mt-4 input-group">
+						<button class="iconified-button transparent" type="button" @click="closePreview">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</NewModal>
 		<div class="normal-page__content">
 			<Card class="mb-6 flex flex-col gap-4">
 				<div class="flex flex-wrap items-center gap-3">
@@ -96,8 +227,11 @@ onMounted(() => {
 						</div>
 
 						<div class="mt-auto flex gap-2">
-							<ButtonStyled color="brand" class="flex-1">
-								<button class="w-full justify-center" @click="openPreview(id)">
+						<ButtonStyled color="brand" class="flex-1">
+								<button
+									class="w-full justify-center"
+									@click="openPreview(id, $event)"
+								>
 									<PlayIcon class="h-4 w-4" aria-hidden="true" />
 									Preview
 								</button>
