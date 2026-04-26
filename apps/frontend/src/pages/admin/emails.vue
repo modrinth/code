@@ -132,7 +132,10 @@ onMounted(() => {
 			<div class="flex flex-col gap-4">
 				<p class="label__title text-base">Template: {{ previewTemplate }}</p>
 
-				<div v-if="previewError" class="my-2 rounded border border-danger bg-danger/10 px-3 py-2 text-sm text-danger">
+				<div
+					v-if="previewError"
+					class="border-danger bg-danger/10 text-danger my-2 rounded border px-3 py-2 text-sm"
+				>
 					{{ previewError }}
 				</div>
 
@@ -159,19 +162,22 @@ onMounted(() => {
 					</p>
 
 					<div class="mt-4">
-						<div class="mb-2 label__title">Rendered template</div>
+						<div class="label__title mb-2">Rendered template</div>
 						<iframe
 							v-if="!previewError"
 							:srcdoc="renderedPreview"
 							class="h-[60vh] w-full rounded border border-divider bg-white"
 							sandbox="allow-same-origin"
 						/>
-						<div v-else class="rounded border border-divider bg-white px-4 py-3 text-sm text-secondary">
+						<div
+							v-else
+							class="rounded border border-divider bg-white px-4 py-3 text-sm text-secondary"
+						>
 							Could not render template preview.
 						</div>
 					</div>
 
-					<div class="mt-4 input-group">
+					<div class="input-group mt-4">
 						<button class="iconified-button transparent" type="button" @click="closePreview">
 							Close
 						</button>
@@ -227,11 +233,8 @@ onMounted(() => {
 						</div>
 
 						<div class="mt-auto flex gap-2">
-						<ButtonStyled color="brand" class="flex-1">
-								<button
-									class="w-full justify-center"
-									@click="openPreview(id, $event)"
-								>
+							<ButtonStyled color="brand" class="flex-1">
+								<button class="w-full justify-center" @click="openPreview(id, $event)">
 									<PlayIcon class="h-4 w-4" aria-hidden="true" />
 									Preview
 								</button>

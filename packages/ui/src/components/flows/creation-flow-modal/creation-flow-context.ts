@@ -1,4 +1,4 @@
-import type { Archon } from '@modrinth/api-client'
+import type { Archon, LauncherMeta } from '@modrinth/api-client'
 import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
@@ -17,6 +17,7 @@ export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
 export type GeneratorSettingsMode = 'default' | 'flat' | 'custom'
+export type LoaderManifestResolver = (loader: string) => Promise<LauncherMeta.Manifest.v0.Manifest>
 
 export interface ModpackSelection {
 	projectId: string
@@ -137,6 +138,7 @@ export interface CreationFlowContextValue {
 	// Platform-provided search
 	searchModpacks: (query: string, limit?: number) => Promise<ModpackSearchResult>
 	getProjectVersions: (projectId: string) => Promise<{ id: string }[]>
+	getLoaderManifest: LoaderManifestResolver | null
 }
 
 export const [injectCreationFlowContext, provideCreationFlowContext] =
@@ -156,6 +158,7 @@ export interface CreationFlowOptions {
 	onBack?: () => void
 	searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
 	getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
+	getLoaderManifest?: LoaderManifestResolver
 }
 
 export function createCreationFlowContext(
@@ -372,6 +375,7 @@ export function createCreationFlowContext(
 
 	const searchModpacks = options.searchModpacks!
 	const getProjectVersions = options.getProjectVersions!
+	const getLoaderManifest = options.getLoaderManifest ?? null
 
 	const resolvedStageConfigs = disableClose
 		? stageConfigs.map((stage) => ({ ...stage, disableClose: true }))
@@ -433,6 +437,7 @@ export function createCreationFlowContext(
 		buildProperties,
 		searchModpacks,
 		getProjectVersions,
+		getLoaderManifest,
 	}
 
 	return contextValue

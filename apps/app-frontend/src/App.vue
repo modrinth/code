@@ -176,6 +176,7 @@ const {
 	handleBrowseModpacks,
 	searchModpacks,
 	getProjectVersions,
+	getLoaderManifest,
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
@@ -1108,6 +1109,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			:fetch-existing-instance-names="fetchExistingInstanceNames"
 			:search-modpacks="searchModpacks"
 			:get-project-versions="getProjectVersions"
+			:get-loader-manifest="getLoaderManifest"
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
 		/>
