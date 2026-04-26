@@ -126,6 +126,8 @@ const instance: Ref<Instance | null> = ref(null)
 const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
+const hiddenInstanceProjectIds = ref<Set<string>>(new Set())
+const hiddenInstanceProjectIdsInitialized = ref(false)
 const isServerInstance = ref(false)
 
 if (isFromWorlds.value && route.params.projectType !== 'server') {
@@ -139,6 +141,25 @@ enforceSetupModpackRoute(route.params.projectType as string | undefined)
 
 const allInstalledIds = computed(
 	() => new Set([...newlyInstalled.value, ...(installedProjectIds.value ?? [])]),
+)
+
+function syncHiddenInstanceProjectIds() {
+	hiddenInstanceProjectIds.value = new Set([
+		...(installedProjectIds.value ?? []),
+		...newlyInstalled.value,
+	])
+	hiddenInstanceProjectIdsInitialized.value = true
+}
+
+watch(
+	installedProjectIds,
+	(ids) => {
+		if (!ids) return
+		if (!hiddenInstanceProjectIdsInitialized.value) {
+			syncHiddenInstanceProjectIds()
+		}
+	},
+	{ immediate: true },
 )
 
 watchServerContextChanges()
@@ -221,14 +242,10 @@ const instanceFilters = computed(() => {
 			filters.push({ type: 'environment', option: 'client' })
 		}
 
-		if (
-			instanceHideInstalled.value &&
-			(installedProjectIds.value || newlyInstalled.value.length > 0)
-		) {
-			const allInstalled = [...(installedProjectIds.value ?? []), ...newlyInstalled.value]
-			allInstalled
-				.map((x) => ({ type: 'project_id', option: `project_id:${x}`, negative: true }))
-				.forEach((x) => filters.push(x))
+		if (instanceHideInstalled.value && hiddenInstanceProjectIds.value.size > 0) {
+			for (const id of hiddenInstanceProjectIds.value) {
+				filters.push({ type: 'project_id', option: `project_id:${id}`, negative: true })
+			}
 		}
 	}
 
@@ -239,6 +256,23 @@ const serverHideInstalled = ref(false)
 if (route.query.shi) {
 	serverHideInstalled.value = route.query.shi === 'true'
 }
+const hiddenServerContentProjectIds = ref<Set<string>>(new Set())
+const hiddenServerContentProjectIdsInitialized = ref(false)
+
+function syncHiddenServerContentProjectIds() {
+	hiddenServerContentProjectIds.value = new Set(serverContentProjectIds.value)
+	hiddenServerContentProjectIdsInitialized.value = true
+}
+
+watch(
+	serverContentProjectIds,
+	() => {
+		if (!hiddenServerContentProjectIdsInitialized.value) {
+			syncHiddenServerContentProjectIds()
+		}
+	},
+	{ immediate: true },
+)
 
 const serverContextFilters = computed(() => {
 	const filters: { type: string; option: string; negative?: boolean }[] = []
@@ -265,8 +299,8 @@ const serverContextFilters = computed(() => {
 		)
 	}
 
-	if (serverHideInstalled.value && serverContentProjectIds.value.size > 0) {
-		for (const id of serverContentProjectIds.value) {
+	if (serverHideInstalled.value && hiddenServerContentProjectIds.value.size > 0) {
+		for (const id of hiddenServerContentProjectIds.value) {
 			filters.push({ type: 'project_id', option: `project_id:${id}`, negative: true })
 		}
 	}
@@ -279,6 +313,9 @@ const combinedProvidedFilters = computed(() =>
 )
 
 const serverPings = shallowRef<Record<string, number | undefined>>({})
+const serverPingCache = new Map<string, number | undefined>()
+const pendingServerPings = new Map<string, Promise<number | undefined>>()
+let serverPingCacheActive = true
 const runningServerProjects = ref<Record<string, string>>({})
 
 async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
@@ -341,16 +378,44 @@ async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearc
 
 async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 	debugLog('pingServerHits', { hitCount: hits.length })
-	const pingsToFetch = hits.filter((hit) => hit.minecraft_java_server?.address)
+	const pingsToFetch = hits.flatMap((hit) => {
+		const address = hit.minecraft_java_server?.address
+		if (!address) return []
+		return [{ hit, address }]
+	})
+	const nextPings = { ...serverPings.value }
+	for (const { hit, address } of pingsToFetch) {
+		if (serverPingCache.has(address)) {
+			nextPings[hit.project_id] = serverPingCache.get(address)
+		}
+	}
+	serverPings.value = nextPings
+
 	await Promise.all(
-		pingsToFetch.map(async (hit) => {
-			const address = hit.minecraft_java_server!.address!
-			try {
-				const latency = await getServerLatency(address)
-				serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
-			} catch (err) {
-				console.error(`Failed to ping server ${address}:`, err)
+		pingsToFetch.map(async ({ hit, address }) => {
+			if (serverPingCache.has(address)) return
+
+			let pending = pendingServerPings.get(address)
+			if (!pending) {
+				pending = getServerLatency(address)
+					.then((latency) => {
+						if (serverPingCacheActive) serverPingCache.set(address, latency)
+						return latency
+					})
+					.catch((err) => {
+						console.error(`Failed to ping server ${address}:`, err)
+						if (serverPingCacheActive) serverPingCache.set(address, undefined)
+						return undefined
+					})
+					.finally(() => {
+						pendingServerPings.delete(address)
+					})
+				pendingServerPings.set(address, pending)
 			}
+
+			const latency = await pending
+			if (!serverPingCacheActive) return
+			serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
 		}),
 	)
 }
@@ -371,7 +436,10 @@ const unlistenProcesses = await process_listener(
 )
 
 onUnmounted(() => {
+	serverPingCacheActive = false
 	unlistenProcesses()
+	serverPingCache.clear()
+	pendingServerPings.clear()
 })
 
 const offline = ref(!navigator.onLine)
@@ -431,11 +499,11 @@ const messages = defineMessages({
 	},
 	hideAddedServers: {
 		id: 'app.browse.hide-added-servers',
-		defaultMessage: 'Hide added servers',
+		defaultMessage: 'Hide already added servers',
 	},
 	hideInstalledContent: {
 		id: 'app.browse.hide-installed-content',
-		defaultMessage: 'Hide installed content',
+		defaultMessage: 'Hide already installed content',
 	},
 	installContentToInstance: {
 		id: 'app.browse.install-content-to-instance',
@@ -644,6 +712,16 @@ const installContext = computed(() => {
 
 const installingProjectIds = ref<Set<string>>(new Set())
 
+function setProjectInstalling(projectId: string, installing: boolean) {
+	const next = new Set(installingProjectIds.value)
+	if (installing) {
+		next.add(projectId)
+	} else {
+		next.delete(projectId)
+	}
+	installingProjectIds.value = next
+}
+
 function getCardActions(
 	result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
 	currentProjectType: string,
@@ -731,12 +809,13 @@ function getCardActions(
 			{
 				key: 'install',
 				label: isInstalling ? 'Installing' : isInstalled ? 'Installed' : 'Install',
-				icon: isInstalled ? CheckIcon : PlusIcon,
+				icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : PlusIcon,
+				iconClass: isInstalling ? 'animate-spin' : undefined,
 				disabled: isInstalled || isInstalling,
 				color: 'brand',
 				type: 'outlined',
 				onClick: async () => {
-					installingProjectIds.value.add(projectResult.project_id)
+					setProjectInstalling(projectResult.project_id, true)
 					try {
 						const didInstall = await installProjectToServer(projectResult)
 						if (didInstall !== false) {
@@ -745,7 +824,7 @@ function getCardActions(
 					} catch (err) {
 						handleError(err as Error)
 					} finally {
-						installingProjectIds.value.delete(projectResult.project_id)
+						setProjectInstalling(projectResult.project_id, false)
 					}
 				},
 			},
@@ -766,18 +845,19 @@ function getCardActions(
 						? 'Install'
 						: 'Add to an instance',
 			icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : PlusIcon,
+			iconClass: isInstalling ? 'animate-spin' : undefined,
 			disabled: isInstalled || isInstalling,
 			color: 'brand',
 			type: 'outlined',
 			onClick: async () => {
-				installingProjectIds.value.add(projectResult.project_id)
+				setProjectInstalling(projectResult.project_id, true)
 				await installVersion(
 					projectResult.project_id,
 					null,
 					instance.value ? instance.value.path : null,
 					'SearchCard',
 					(versionId) => {
-						installingProjectIds.value.delete(projectResult.project_id)
+						setProjectInstalling(projectResult.project_id, false)
 						if (versionId) {
 							onSearchResultInstalled(projectResult.project_id)
 						}
@@ -790,7 +870,7 @@ function getCardActions(
 						preferredGameVersion: instance.value?.game_version ?? undefined,
 					},
 				).catch((err) => {
-					installingProjectIds.value.delete(projectResult.project_id)
+					setProjectInstalling(projectResult.project_id, false)
 					handleError(err)
 				})
 			},
@@ -833,7 +913,6 @@ async function search(requestParams: string) {
 	if (isServer) {
 		const hits = rawResults.result.hits ?? []
 		lastServerHits.value = hits
-		serverPings.value = {}
 		pingServerHits(hits)
 		checkServerRunningStates(hits)
 		return {
@@ -903,6 +982,23 @@ const searchState = useBrowseSearch({
 	}),
 })
 
+watch(
+	[
+		() => searchState.query.value,
+		() => searchState.currentFilters.value,
+		() => searchState.serverCurrentFilters.value,
+		() => projectType.value,
+	],
+	() => {
+		if (isServerContext.value) {
+			syncHiddenServerContentProjectIds()
+		} else if (instance.value) {
+			syncHiddenInstanceProjectIds()
+		}
+	},
+	{ deep: true },
+)
+
 if (instance.value?.game_version) {
 	const gv = instance.value.game_version
 	const alreadyHasGv = searchState.serverCurrentFilters.value.some(
@@ -934,8 +1030,13 @@ provideBrowseManager({
 	hideInstalled: computed({
 		get: () => (isServerContext.value ? serverHideInstalled.value : instanceHideInstalled.value),
 		set: (val: boolean) => {
-			if (isServerContext.value) serverHideInstalled.value = val
-			else instanceHideInstalled.value = val
+			if (isServerContext.value) {
+				serverHideInstalled.value = val
+				if (val) syncHiddenServerContentProjectIds()
+			} else {
+				instanceHideInstalled.value = val
+				if (val) syncHiddenInstanceProjectIds()
+			}
 		},
 	}),
 	showHideInstalled: computed(

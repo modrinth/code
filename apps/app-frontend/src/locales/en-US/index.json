@@ -30,10 +30,10 @@
     "message": "Discover servers"
   },
   "app.browse.hide-added-servers": {
-    "message": "Hide added servers"
+    "message": "Hide already added servers"
   },
   "app.browse.hide-installed-content": {
-    "message": "Hide installed content"
+    "message": "Hide already installed content"
   },
   "app.browse.install-content-to-instance": {
     "message": "Install content to instance"

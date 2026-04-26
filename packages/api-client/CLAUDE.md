@@ -37,7 +37,7 @@ client.labrinth.collections
 client.labrinth.billing_internal
 client.archon.servers_v0
 client.archon.servers_v1
-client.archon.backups_v0
+client.archon.backups_queue_v1
 client.archon.backups_v1
 client.archon.content_v0
 client.kyros.files_v0

@@ -7,8 +7,8 @@
 				? 'cursor-not-allowed opacity-50'
 				: 'cursor-pointer hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]'
 		"
-		:aria-label="description || label"
-		:aria-checked="modelValue"
+		:aria-label="description || label || undefined"
+		:aria-checked="indeterminate ? 'mixed' : modelValue"
 		role="checkbox"
 		@click="toggle"
 	>
@@ -25,7 +25,7 @@
 			<CheckIcon v-else-if="modelValue" aria-hidden="true" stroke-width="3" />
 		</span>
 		<!-- aria-hidden is set so screenreaders only use the <button>'s aria-label -->
-		<span v-if="label" aria-hidden="true">
+		<span v-if="label" :class="labelClass" aria-hidden="true">
 			{{ label }}
 		</span>
 		<slot v-else />
@@ -33,6 +33,7 @@
 </template>
 <script setup lang="ts">
 import { CheckIcon, MinusIcon } from '@modrinth/assets'
+import type { HTMLAttributes } from 'vue'
 
 const emit = defineEmits<{
 	'update:modelValue': [boolean]
@@ -41,6 +42,7 @@ const emit = defineEmits<{
 const props = withDefaults(
 	defineProps<{
 		label?: string
+		labelClass?: HTMLAttributes['class']
 		disabled?: boolean
 		description?: string
 		modelValue: boolean
@@ -49,6 +51,7 @@ const props = withDefaults(
 	}>(),
 	{
 		label: '',
+		labelClass: '',
 		disabled: false,
 		description: '',
 		modelValue: false,

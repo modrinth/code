@@ -452,9 +452,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Upload files"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Uploading files ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "All selected content is already disabled"
   },
@@ -704,14 +701,20 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Upload from .zip URL"
   },
+  "files.operations.current-file": {
+    "defaultMessage": "Current file: {file}"
+  },
   "files.operations.extracted": {
     "defaultMessage": "{size} extracted"
   },
   "files.operations.extracting": {
     "defaultMessage": "Extracting {source}"
   },
-  "files.operations.failed": {
-    "defaultMessage": "Failed"
+  "files.operations.extracting-completed": {
+    "defaultMessage": "Extracting {source} finished"
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "Extracting {source} failed"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack from URL"
@@ -1216,12 +1219,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unknown game mode"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "Files are still being uploaded. Leaving this page will cancel the upload and your changes may be lost."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Upload in progress"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} compatible {count, plural, one {instance} other {instances}}"
@@ -2567,6 +2564,9 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Unlisted by staff"
   },
+  "s.bg": {
+    "defaultMessage": "Background task running"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "Filter locked"
   },
@@ -2654,6 +2654,21 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "servers.admonitions.background-task-running": {
+    "defaultMessage": "Background task running"
+  },
+  "servers.backups.admonition.backup-cancelled.description": {
+    "defaultMessage": "Backup {backupName} was cancelled."
+  },
+  "servers.backups.admonition.backup-cancelled.title": {
+    "defaultMessage": "Backup cancelled"
+  },
+  "servers.backups.admonition.backup-completed.description": {
+    "defaultMessage": "{backupName} finished successfully."
+  },
+  "servers.backups.admonition.backup-completed.title": {
+    "defaultMessage": "Backup finished"
+  },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Something went wrong while creating {backupName}. Please try again or contact support if the issue continues."
   },
@@ -2666,6 +2681,12 @@
   "servers.backups.admonition.backup-queued.title": {
     "defaultMessage": "Backup queued"
   },
+  "servers.backups.admonition.backup-timed-out.description": {
+    "defaultMessage": "Creating {backupName} timed out. You can try again or contact support if the issue continues."
+  },
+  "servers.backups.admonition.backup-timed-out.title": {
+    "defaultMessage": "Backup timed out"
+  },
   "servers.backups.admonition.creating-backup.description": {
     "defaultMessage": "Saving world data and server configuration for {backupName}. This can take a few minutes."
   },
@@ -2675,23 +2696,35 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "Your backup"
   },
+  "servers.backups.admonition.restore-cancelled.description": {
+    "defaultMessage": "Restoring from {backupName} was cancelled."
+  },
+  "servers.backups.admonition.restore-cancelled.title": {
+    "defaultMessage": "Restore cancelled"
+  },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Something went wrong while restoring from {backupName}. Please try again or contact support if the issue continues."
   },
   "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Restoring from backup failed"
+    "defaultMessage": "Restore failed"
   },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Restoring from {backupName} is queued and will start shortly."
   },
   "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Restoring from backup queued"
+    "defaultMessage": "Restore queued"
   },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Your server has been restored to {backupName} and is ready to start."
   },
   "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Restoring from backup successful"
+    "defaultMessage": "Restore finished"
+  },
+  "servers.backups.admonition.restore-timed-out.description": {
+    "defaultMessage": "Restoring from {backupName} timed out. You can try again or contact support if the issue continues."
+  },
+  "servers.backups.admonition.restore-timed-out.title": {
+    "defaultMessage": "Restore timed out"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Restoring your server from {backupName}. This may take a couple of minutes."
@@ -2699,17 +2732,50 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restoring from backup"
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "{count, plural, one {Bulk actions for one selected backup} other {Bulk actions for # selected backups}}"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "Deleting {total, plural, one {# backup} other {# backups}}..."
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# backup selected} other {# backups selected}}"
+  },
+  "servers.backups.delete-modal.admonition-body": {
+    "defaultMessage": "Once deleted, {count, plural, one {this backup cannot} other {these backups cannot}} be recovered. Deletion is permanent."
+  },
+  "servers.backups.delete-modal.admonition-header": {
+    "defaultMessage": "Deletion warning"
+  },
+  "servers.backups.delete-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {Backup} other {Backups ({count})}}"
+  },
+  "servers.backups.delete-modal.confirm": {
+    "defaultMessage": "Delete {count, plural, one {backup} other {# backups}}"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "Delete {count, plural, one {backup} other {backups}}"
+  },
+  "servers.backups.empty.description": {
+    "defaultMessage": "Create your first backup"
+  },
+  "servers.backups.empty.heading": {
+    "defaultMessage": "No backups yet"
+  },
+  "servers.backups.filtered-empty.clear-filters": {
+    "defaultMessage": "Clear filters"
+  },
+  "servers.backups.filtered-empty.description": {
+    "defaultMessage": "Try a different filter or clear filters to see all backups."
+  },
+  "servers.backups.filtered-empty.heading": {
+    "defaultMessage": "No backups match"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Backup schedule"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Failed to create backup"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Failed to restore from backup"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"
@@ -2719,6 +2785,21 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Restore"
+  },
+  "servers.backups.select-backup-aria": {
+    "defaultMessage": "Select backup {name}"
+  },
+  "servers.backups.toolbar.create-backup": {
+    "defaultMessage": "Create backup"
+  },
+  "servers.backups.toolbar.filter-auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.toolbar.filter-manual": {
+    "defaultMessage": "Manual"
+  },
+  "servers.backups.toolbar.select-all": {
+    "defaultMessage": "Select all"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Backup creation in progress"
@@ -3604,5 +3685,11 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Leave page?"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count, plural, one {# alert} other {# alerts}}"
+  },
+  "ui.stacked-admonitions.dismiss-all": {
+    "defaultMessage": "Dismiss all"
   }
 }

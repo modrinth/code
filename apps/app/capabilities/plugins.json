@@ -28,7 +28,9 @@
 				{ "url": "https://*.nodes.modrinth.com/*" },
 				{ "url": "https://api.mclo.gs/*" },
 				{ "url": "https://fill.papermc.io/*" },
-				{ "url": "https://api.purpurmc.org/*" }
+				{ "url": "https://api.purpurmc.org/*" },
+				{ "url": "https://*.ts.net/*" },
+				{ "url": "https://*.*.ts.net/*" }
 			]
 		},
 

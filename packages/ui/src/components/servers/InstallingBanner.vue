@@ -1,12 +1,19 @@
 <template>
-	<Admonition :type="contentError ? 'critical' : 'info'" :show-actions-underneath="!contentError">
+	<Admonition
+		:type="contentError ? 'critical' : 'info'"
+		:dismissible="dismissible"
+		:progress="progressValue"
+		progress-color="blue"
+		:waiting="isWaiting"
+		@dismiss="emit('dismiss')"
+	>
 		<template #icon>
 			<slot v-if="!contentError" name="icon">
 				<SpinnerIcon class="h-6 w-6 flex-none animate-spin text-brand-blue" />
 			</slot>
 		</template>
 		<template #header>
-			{{ contentError ? 'Installation error' : "We're preparing your server!" }}
+			{{ contentError ? 'Installation failed' : "We're preparing your server" }}
 		</template>
 		<template v-if="contentError">
 			{{ errorLabel }}
@@ -26,21 +33,11 @@
 		</div>
 		<template v-if="contentError" #top-right-actions>
 			<ButtonStyled color="red" type="outlined">
-				<button class="!border" @click="emit('retry')">
+				<button class="!border" type="button" @click="emit('retry')">
 					<RotateCounterClockwiseIcon class="size-5" />
 					Retry
 				</button>
 			</ButtonStyled>
-		</template>
-		<template v-if="!contentError" #actions>
-			<ProgressBar
-				v-if="progress"
-				:progress="progress.percent"
-				:max="100"
-				color="blue"
-				full-width
-			/>
-			<ProgressBar v-else :progress="0" :max="1" color="blue" full-width waiting />
 		</template>
 	</Admonition>
 </template>
@@ -52,7 +49,6 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import Admonition from '../base/Admonition.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
-import ProgressBar from '../base/ProgressBar.vue'
 
 export interface SyncProgress {
 	phase: 'Analyzing' | 'InstallingPack' | 'InstallingLoader' | 'Addons'
@@ -67,10 +63,12 @@ export interface ContentError {
 const props = defineProps<{
 	progress?: SyncProgress | null
 	contentError?: ContentError | null
+	dismissible?: boolean
 }>()
 
 const emit = defineEmits<{
 	retry: []
+	dismiss: []
 }>()
 
 const errorLabel = computed(() => {
@@ -91,10 +89,10 @@ const errorLabel = computed(() => {
 
 	if (step === 'modpack') {
 		if (desc?.includes('no primary file')) {
-			return 'The modpack version has no downloadable file. It may have been packaged incorrectly.'
+			return 'This modpack version does not include a downloadable file. It may have been packaged incorrectly.'
 		}
 		if (desc?.includes('failed to install')) {
-			return 'Failed to install the modpack. It may be corrupted or incompatible.'
+			return 'The modpack could not be installed. It may be corrupted or incompatible.'
 		}
 	}
 
@@ -112,6 +110,16 @@ const phaseLabel = computed(() => {
 		default:
 			return 'Installing...'
 	}
+})
+
+const progressValue = computed(() => {
+	if (props.contentError) return undefined
+	return props.progress ? props.progress.percent / 100 : 0
+})
+
+const isWaiting = computed(() => {
+	if (props.contentError) return false
+	return !props.progress || props.progress.percent <= 0
 })
 
 const tickerMessages = [
