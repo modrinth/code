@@ -447,7 +447,7 @@
     "message": "Custom launch hooks"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Hooks allow advanced users to run certain system commands before and after launching the game."
+    "message": "Hooks can run commands before launch, as a wrapper, or after exit. Commands support $INST_NAME, $INST_ID, $INST_DIR/$INST_MC_DIR, $INST_JAVA, $INST_JAVA_ARGS."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exit"

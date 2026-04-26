@@ -781,15 +781,84 @@ async fn run_credentials(
         ))
     })?;
 
-    let pre_launch_hooks = profile
+    let pre_launch_hook = profile
         .hooks
         .pre_launch
         .as_ref()
         .or(settings.hooks.pre_launch.as_ref())
         .filter(|hook_command| !hook_command.is_empty());
-    if let Some(hook) = pre_launch_hooks {
-        // TODO: hook parameters
-        let mut cmd = shlex::split(hook)
+
+    let java_args = profile
+        .extra_launch_args
+        .clone()
+        .unwrap_or(settings.extra_launch_args);
+
+    let wrapper = profile
+        .hooks
+        .wrapper
+        .clone()
+        .or(settings.hooks.wrapper)
+        .filter(|hook_command| !hook_command.is_empty());
+
+    let env_args = profile
+        .custom_env_vars
+        .clone()
+        .unwrap_or(settings.custom_env_vars);
+
+    // Post post exit hooks
+    let post_exit_hook = profile
+        .hooks
+        .post_exit
+        .clone()
+        .or(settings.hooks.post_exit)
+        .filter(|hook_command| !hook_command.is_empty());
+
+    let memory = profile.memory.unwrap_or(settings.memory);
+    let resolution =
+        profile.game_resolution.unwrap_or(settings.game_resolution);
+    let has_hook_commands = pre_launch_hook.is_some()
+        || wrapper.is_some()
+        || post_exit_hook.is_some();
+    let full_path = if has_hook_commands {
+        Some(get_full_path(&profile.path).await?)
+    } else {
+        None
+    };
+    let hook_environment = if has_hook_commands {
+        let full_path = full_path
+            .as_ref()
+            .expect("hooked launches always resolve their instance path");
+        let java_version =
+            crate::launcher::resolve_java_for_launch(&profile).await?;
+
+        Some(crate::launcher::hooks::HookEnvironment::from_current_env(
+            &env_args,
+            crate::launcher::hooks::HookVariables {
+                instance_name: profile.name.clone(),
+                instance_id: profile.path.clone(),
+                instance_dir: full_path.to_string_lossy().to_string(),
+                java_path: java_version.path.clone(),
+                java_args: crate::launcher::hooks::build_hook_java_args(
+                    &java_args,
+                    memory,
+                    &java_version,
+                ),
+            },
+        ))
+    } else {
+        None
+    };
+    let launch_env_args = hook_environment
+        .as_ref()
+        .map_or_else(|| env_args.clone(), |env| env.injected_envs());
+
+    if let (Some(hook), Some(hook_environment), Some(full_path)) = (
+        pre_launch_hook,
+        hook_environment.as_ref(),
+        full_path.as_ref(),
+    ) {
+        let expanded_hook = hook_environment.expand(hook);
+        let mut cmd = shlex::split(&expanded_hook)
             .ok_or_else(|| {
                 crate::ErrorKind::LauncherError(format!(
                     "Invalid pre-launch command: {hook}",
@@ -798,12 +867,12 @@ async fn run_credentials(
             .into_iter();
 
         if let Some(command) = cmd.next() {
-            let full_path = get_full_path(&profile.path).await?;
             let result = Command::new(command)
                 .args(cmd)
-                .current_dir(&full_path)
+                .envs(launch_env_args.iter().cloned())
+                .current_dir(full_path)
                 .spawn()
-                .map_err(|e| IOError::with_path(e, &full_path))?
+                .map_err(|e| IOError::with_path(e, full_path))?
                 .wait()
                 .await
                 .map_err(IOError::from)?;
@@ -818,33 +887,19 @@ async fn run_credentials(
         }
     }
 
-    let java_args = profile
-        .extra_launch_args
-        .clone()
-        .unwrap_or(settings.extra_launch_args);
-
-    let wrapper = profile
-        .hooks
-        .wrapper
-        .clone()
-        .or(settings.hooks.wrapper)
+    let wrapper = wrapper
+        .map(|hook| {
+            hook_environment
+                .as_ref()
+                .map_or(hook.clone(), |env| env.expand(&hook))
+        })
         .filter(|hook_command| !hook_command.is_empty());
-
-    let memory = profile.memory.unwrap_or(settings.memory);
-    let resolution =
-        profile.game_resolution.unwrap_or(settings.game_resolution);
-
-    let env_args = profile
-        .custom_env_vars
-        .clone()
-        .unwrap_or(settings.custom_env_vars);
-
-    // Post post exit hooks
-    let post_exit_hook = profile
-        .hooks
-        .post_exit
-        .clone()
-        .or(settings.hooks.post_exit)
+    let post_exit_hook = post_exit_hook
+        .map(|hook| {
+            hook_environment
+                .as_ref()
+                .map_or(hook.clone(), |env| env.expand(&hook))
+        })
         .filter(|hook_command| !hook_command.is_empty());
 
     // Any options.txt settings that we want set, add here
@@ -915,7 +970,7 @@ async fn run_credentials(
 
     crate::launcher::launch_minecraft(
         &java_args,
-        &env_args,
+        &launch_env_args,
         &mc_set_options,
         &wrapper,
         &memory,
