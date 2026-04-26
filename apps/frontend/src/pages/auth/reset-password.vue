@@ -1,14 +1,24 @@
 <template>
-	<div>
-		<h1>{{ formatMessage(messages.longTitle) }}</h1>
-		<section class="auth-form">
-			<template v-if="step === 'choose_method'">
-				<p>
-					{{ formatMessage(methodChoiceMessages.description) }}
-				</p>
+	<div
+		class="universal-card flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+	>
+		<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
+			{{ formatMessage(messages.longTitle) }}
+		</h1>
+		<template v-if="step === 'choose_method'">
+			<Admonition :type="'info'">
+				<template #header>
+					<div class="-mb-2 flex flex-col gap-1.5 font-normal leading-normal">
+						<div>
+							{{ formatMessage(methodChoiceMessages.description) }}
+						</div>
+					</div>
+				</template>
+			</Admonition>
 
-				<label for="email" hidden>
-					{{ formatMessage(commonMessages.emailUsernameLabel) }}
+			<div class="flex flex-col gap-2.5">
+				<label class="text-md font-semibold text-contrast" for="email">
+					{{ formatMessage(commonMessages.emailLabel) }}
 				</label>
 				<StyledInput
 					id="email"
@@ -19,20 +29,37 @@
 					:placeholder="formatMessage(commonMessages.emailLabel)"
 					wrapper-class="w-full"
 				/>
+			</div>
 
+			<div class="flex flex-col gap-2.5">
+				<label class="text-md font-semibold text-contrast">{{
+					formatMessage(messages.securityCheckLabel)
+				}}</label>
 				<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
+			</div>
 
+			<ButtonStyled color="brand">
 				<button
-					class="btn btn-primary centered-btn"
+					class="!w-full"
 					:disabled="globals?.captcha_enabled ? !token : false"
 					@click="recovery"
 				>
 					<SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}
 				</button>
-			</template>
-			<template v-else-if="step === 'passed_challenge'">
-				<p>{{ formatMessage(postChallengeMessages.description) }}</p>
+			</ButtonStyled>
+		</template>
+		<template v-else-if="step === 'passed_challenge'">
+			<Admonition :type="'info'">
+				<template #header>
+					<div class="-mb-2 flex flex-col gap-1.5 font-normal leading-normal">
+						<div>
+							{{ formatMessage(postChallengeMessages.description) }}
+						</div>
+					</div>
+				</template>
+			</Admonition>
 
+			<div class="flex flex-col gap-2.5">
 				<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
 				<StyledInput
 					id="password"
@@ -57,16 +84,20 @@
 					wrapper-class="w-full"
 				/>
 
-				<button class="auth-form__input btn btn-primary continue-btn" @click="changePassword">
-					{{ formatMessage(postChallengeMessages.action) }}
-				</button>
-			</template>
-		</section>
+				<ButtonStyled color="brand">
+					<button class="!w-full" @click="changePassword">
+						{{ formatMessage(postChallengeMessages.action) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
 	</div>
 </template>
 <script setup>
 import { KeyIcon, MailIcon, SendIcon } from '@modrinth/assets'
 import {
+	Admonition,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
@@ -76,7 +107,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
-import HCaptcha from '@/components/ui/HCaptcha.vue'
+import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -143,6 +174,10 @@ const messages = defineMessages({
 	longTitle: {
 		id: 'auth.reset-password.title.long',
 		defaultMessage: 'Reset your password',
+	},
+	securityCheckLabel: {
+		id: 'auth.create-account.security-check.label',
+		defaultMessage: 'Security check',
 	},
 })
 

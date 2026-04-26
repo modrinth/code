@@ -13,7 +13,7 @@
 		@click="toggle"
 	>
 		<span
-			class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid"
+			class="w-5 h-5 aspect-square rounded-md flex items-center justify-center border-[1px] border-solid"
 			:class="
 				(modelValue
 					? 'bg-brand border-button-border text-brand-inverted'
