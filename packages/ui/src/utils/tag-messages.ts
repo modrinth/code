@@ -574,6 +574,10 @@ export const categoryMessages = defineMessages({
 
 export const DEFAULT_MOD_LOADERS: string[] = ['fabric', 'forge', 'neoforge']
 export const DEFAULT_SHADER_LOADERS: string[] = ['iris', 'optifine', 'vanilla']
+export const SUPPORTED_MOD_LOADERS: string[] = ['fabric', 'forge', 'quilt', 'neoforge']
+export const MOD_LOADER_SET: ReadonlySet<string> = new Set(SUPPORTED_MOD_LOADERS)
+export const HIDDEN_MOD_LOADERS: string[] = ['liteloader', 'modloader', 'rift']
+export const HIDDEN_MOD_LOADER_SET: ReadonlySet<string> = new Set(HIDDEN_MOD_LOADERS)
 
 const DEFAULT_LOADER_NAMES = new Set([...DEFAULT_MOD_LOADERS, ...DEFAULT_SHADER_LOADERS])
 

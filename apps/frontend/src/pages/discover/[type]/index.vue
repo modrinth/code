@@ -228,8 +228,7 @@ const serverFilters = computed(() => {
 
 		const platform = serverData.value.loader?.toLowerCase()
 
-		const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
-		if (platform && modLoaders.includes(platform)) {
+		if (platform && MOD_LOADER_SET.has(platform)) {
 			filters.push({ type: 'mod_loader', option: platform })
 		}
 

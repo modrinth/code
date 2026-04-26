@@ -17,6 +17,7 @@ export interface LoaderData {
 	dataPackLoaders: string[]
 	modLoaders: string[]
 	hiddenModLoaders: string[]
+	hiddenModLoaderSet: ReadonlySet<string>
 }
 
 // Re-export types from api-client for convenience
@@ -115,6 +116,7 @@ export const useGeneratedState = () =>
 			dataPackLoaders: ['datapack'],
 			modLoaders: ['forge', 'fabric', 'quilt', 'liteloader', 'modloader', 'rift', 'neoforge'],
 			hiddenModLoaders: ['liteloader', 'modloader', 'rift'],
+			hiddenModLoaderSet: new Set(['liteloader', 'modloader', 'rift']),
 		},
 		projectViewModes: ['list', 'grid', 'gallery'],
 		approvedStatuses: ['approved', 'archived', 'unlisted', 'private'],

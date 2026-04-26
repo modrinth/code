@@ -129,6 +129,75 @@ export function useSearch(
 		return formatCategory(formatMessage, categoryName)
 	}
 
+	const modLoaderOptions = computed(() =>
+		tags.value.loaders
+			.filter(
+				(loader) =>
+					loader.supported_project_types.includes('mod') &&
+					!loader.supported_project_types.includes('plugin') &&
+					!loader.supported_project_types.includes('datapack'),
+			)
+			.map((loader) => ({
+				id: loader.name,
+				formatted_name: formatLoader(formatMessage, loader.name),
+				icon: getLoaderIcon(loader.name),
+				method: 'or' as const,
+				value: `categories:${loader.name}`,
+			})),
+	)
+
+	const modpackLoaderOptions = computed(() =>
+		tags.value.loaders
+			.filter((loader) => loader.supported_project_types.includes('modpack'))
+			.map((loader) => ({
+				id: loader.name,
+				formatted_name: formatLoader(formatMessage, loader.name),
+				icon: getLoaderIcon(loader.name),
+				method: 'or' as const,
+				value: `categories:${loader.name}`,
+			})),
+	)
+
+	const pluginLoaderOptions = computed(() =>
+		tags.value.loaders
+			.filter(
+				(loader) =>
+					loader.supported_project_types.includes('plugin') &&
+					!PLUGIN_PLATFORMS.includes(loader.name),
+			)
+			.map((loader) => ({
+				id: loader.name,
+				formatted_name: formatLoader(formatMessage, loader.name),
+				icon: getLoaderIcon(loader.name),
+				method: 'or' as const,
+				value: `categories:${loader.name}`,
+			})),
+	)
+
+	const pluginPlatformOptions = computed(() =>
+		tags.value.loaders
+			.filter((loader) => PLUGIN_PLATFORMS.includes(loader.name))
+			.map((loader) => ({
+				id: loader.name,
+				formatted_name: formatLoader(formatMessage, loader.name),
+				icon: getLoaderIcon(loader.name),
+				method: 'or' as const,
+				value: `categories:${loader.name}`,
+			})),
+	)
+
+	const shaderLoaderOptions = computed(() =>
+		tags.value.loaders
+			.filter((loader) => loader.supported_project_types.includes('shader'))
+			.map((loader) => ({
+				id: loader.name,
+				formatted_name: formatLoader(formatMessage, loader.name),
+				icon: getLoaderIcon(loader.name),
+				method: 'or' as const,
+				value: `categories:${loader.name}`,
+			})),
+	)
+
 	const filters = computed(() => {
 		const categoryFilters: Record<string, FilterType> = {}
 		for (const category of sortedCategories(tags.value, formatCategoryName, locale.value)) {
@@ -251,22 +320,7 @@ export function useSearch(
 				supports_negative_filter: true,
 				default_values: DEFAULT_MOD_LOADERS,
 				searchable: false,
-				options: tags.value.loaders
-					.filter(
-						(loader) =>
-							loader.supported_project_types.includes('mod') &&
-							!loader.supported_project_types.includes('plugin') &&
-							!loader.supported_project_types.includes('datapack'),
-					)
-					.map((loader) => {
-						return {
-							id: loader.name,
-							formatted_name: formatLoader(formatMessage, loader.name),
-							icon: getLoaderIcon(loader.name),
-							method: 'or',
-							value: `categories:${loader.name}`,
-						}
-					}),
+				options: modLoaderOptions.value,
 				ordering: projectTypes.value.includes('mod') ? 1 : undefined,
 			},
 			{
@@ -282,17 +336,7 @@ export function useSearch(
 				query_param: 'g',
 				supports_negative_filter: true,
 				searchable: false,
-				options: tags.value.loaders
-					.filter((loader) => loader.supported_project_types.includes('modpack'))
-					.map((loader) => {
-						return {
-							id: loader.name,
-							formatted_name: formatLoader(formatMessage, loader.name),
-							icon: getLoaderIcon(loader.name),
-							method: 'or',
-							value: `categories:${loader.name}`,
-						}
-					}),
+				options: modpackLoaderOptions.value,
 			},
 			{
 				id: 'plugin_loader',
@@ -307,21 +351,7 @@ export function useSearch(
 				query_param: 'g',
 				supports_negative_filter: true,
 				searchable: false,
-				options: tags.value.loaders
-					.filter(
-						(loader) =>
-							loader.supported_project_types.includes('plugin') &&
-							!PLUGIN_PLATFORMS.includes(loader.name),
-					)
-					.map((loader) => {
-						return {
-							id: loader.name,
-							formatted_name: formatLoader(formatMessage, loader.name),
-							icon: getLoaderIcon(loader.name),
-							method: 'or',
-							value: `categories:${loader.name}`,
-						}
-					}),
+				options: pluginLoaderOptions.value,
 			},
 			{
 				id: 'plugin_platform',
@@ -336,17 +366,7 @@ export function useSearch(
 				query_param: 'g',
 				supports_negative_filter: true,
 				searchable: false,
-				options: tags.value.loaders
-					.filter((loader) => PLUGIN_PLATFORMS.includes(loader.name))
-					.map((loader) => {
-						return {
-							id: loader.name,
-							formatted_name: formatLoader(formatMessage, loader.name),
-							icon: getLoaderIcon(loader.name),
-							method: 'or',
-							value: `categories:${loader.name}`,
-						}
-					}),
+				options: pluginPlatformOptions.value,
 			},
 			{
 				id: 'shader_loader',
@@ -362,17 +382,7 @@ export function useSearch(
 				searchable: false,
 				display: 'expandable',
 				default_values: DEFAULT_SHADER_LOADERS,
-				options: tags.value.loaders
-					.filter((loader) => loader.supported_project_types.includes('shader'))
-					.map((loader) => {
-						return {
-							id: loader.name,
-							formatted_name: formatLoader(formatMessage, loader.name),
-							icon: getLoaderIcon(loader.name),
-							method: 'or',
-							value: `categories:${loader.name}`,
-						}
-					}),
+				options: shaderLoaderOptions.value,
 			},
 			{
 				id: 'license',
@@ -436,8 +446,8 @@ export function useSearch(
 		const filterValues = [...filteredFilters, ...validProvidedFilters]
 
 		const parts: string[] = []
-		const orGroups: Record<string, string[]> = {}
-		const negativeByType: Record<string, string[]> = {}
+		const orGroups = new Map<string, string[]>()
+		const negativeByType = new Map<string, string[]>()
 
 		for (const filterValue of filterValues) {
 			const type = filters.value.find((type) => type.id === filterValue.type)
@@ -464,22 +474,26 @@ export function useSearch(
 				if (!field || !val) continue
 
 				if (filterValue.negative) {
-					if (!negativeByType[field]) {
-						negativeByType[field] = []
+					const existing = negativeByType.get(field)
+					if (existing) {
+						existing.push(val)
+					} else {
+						negativeByType.set(field, [val])
 					}
-					negativeByType[field].push(val)
 				} else if (option.method === 'or') {
-					if (!orGroups[field]) {
-						orGroups[field] = []
+					const existing = orGroups.get(field)
+					if (existing) {
+						existing.push(val)
+					} else {
+						orGroups.set(field, [val])
 					}
-					orGroups[field].push(val)
 				} else {
 					parts.push(`${field} = ${val === 'true' || val === 'false' ? val : `"${val}"`}`)
 				}
 			}
 		}
 
-		for (const [field, values] of Object.entries(orGroups)) {
+		for (const [field, values] of orGroups) {
 			if (values.length === 1) {
 				parts.push(`${field} = "${values[0]}"`)
 			} else {
@@ -488,7 +502,7 @@ export function useSearch(
 			}
 		}
 
-		for (const [field, values] of Object.entries(negativeByType)) {
+		for (const [field, values] of negativeByType) {
 			const quoted = values.map((v) => `"${v}"`).join(', ')
 			parts.push(`${field} NOT IN [${quoted}]`)
 		}
