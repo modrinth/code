@@ -2,7 +2,9 @@
 	<div class="flex flex-col gap-2">
 		<!-- Header -->
 		<div class="flex items-center justify-between">
-			<span class="font-semibold text-contrast">{{ formatMessage(messages.launcherInstancesTitle) }}</span>
+			<span class="font-semibold text-contrast">{{
+				formatMessage(messages.launcherInstancesTitle)
+			}}</span>
 			<ButtonStyled
 				type="transparent"
 				size="small"
@@ -318,7 +320,9 @@ async function addLauncherPath() {
 			return
 		}
 		const launcher: ImportableLauncher = {
-			name: formatMessage(messages.customLauncherName, { pathName: path.split(/[\\/]/).pop() || path }),
+			name: formatMessage(messages.customLauncherName, {
+				pathName: path.split(/[\\/]/).pop() || path,
+			}),
 			path,
 			instances,
 		}

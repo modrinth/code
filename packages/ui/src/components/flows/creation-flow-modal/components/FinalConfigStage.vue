@@ -5,7 +5,10 @@
 			class="flex flex-col gap-2"
 		>
 			<span class="font-semibold text-contrast">{{ formatMessage(messages.worldNameLabel) }}</span>
-			<StyledInput v-model="worldName" :placeholder="formatMessage(messages.worldNamePlaceholder)" />
+			<StyledInput
+				v-model="worldName"
+				:placeholder="formatMessage(messages.worldNamePlaceholder)"
+			/>
 		</div>
 
 		<div v-if="ctx.setupType.value === 'vanilla'" class="flex flex-col gap-2">
@@ -66,7 +69,10 @@
 					</template>
 				</IntlFormatted>
 			</span>
-			<StyledInput v-model="worldSeed" :placeholder="formatMessage(messages.worldSeedPlaceholder)" />
+			<StyledInput
+				v-model="worldSeed"
+				:placeholder="formatMessage(messages.worldSeedPlaceholder)"
+			/>
 			<span class="text-sm text-secondary">{{ formatMessage(messages.worldSeedDescription) }}</span>
 		</div>
 
@@ -128,7 +134,7 @@
 
 <script setup lang="ts">
 import { EyeIcon, EyeOffIcon, SettingsIcon } from '@modrinth/assets'
-import { IntlFormatted, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
+import { commonMessages, defineMessages, IntlFormatted, useVIntl } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'

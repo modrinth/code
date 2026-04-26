@@ -143,7 +143,8 @@ const messages = defineMessages({
 	},
 	configureWorldDescription: {
 		id: 'servers.setup.onboarding.step.configure-world.description',
-		defaultMessage: 'Set up your world just like singleplayer. Choose your gamemode and world seed.',
+		defaultMessage:
+			'Set up your world just like singleplayer. Choose your gamemode and world seed.',
 	},
 	inviteFriendsTitle: {
 		id: 'servers.setup.onboarding.step.invite-friends.title',

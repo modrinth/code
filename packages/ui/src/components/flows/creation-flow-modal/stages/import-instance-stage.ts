@@ -5,7 +5,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 
 import type { StageConfigInput } from '../../../base'
 import ImportInstanceStage from '../components/ImportInstanceStage.vue'
-import { creationFlowMessages, type CreationFlowContextValue } from '../creation-flow-context'
+import { type CreationFlowContextValue, creationFlowMessages } from '../creation-flow-context'
 
 function getSelectedCount(ctx: CreationFlowContextValue): number {
 	let count = 0

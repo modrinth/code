@@ -567,7 +567,9 @@ const selectableProjectTypes = computed(() => {
 	const suffix = queryString ? `?${queryString}` : ''
 
 	if (isSetupServerContext.value) {
-		return [{ label: formatMessage(messages.modpacksProjectType), href: `/browse/modpack${suffix}` }]
+		return [
+			{ label: formatMessage(messages.modpacksProjectType), href: `/browse/modpack${suffix}` },
+		]
 	}
 
 	if (isFromWorlds.value) {

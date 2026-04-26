@@ -1,13 +1,17 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<span class="font-semibold text-contrast">{{ formatMessage(messages.knownModpackPrompt) }}</span>
+		<span class="font-semibold text-contrast">{{
+			formatMessage(messages.knownModpackPrompt)
+		}}</span>
 		<Combobox
 			v-model="ctx.modpackSearchProjectId.value"
 			:options="ctx.modpackSearchOptions.value"
 			searchable
 			:search-placeholder="formatMessage(messages.searchModpackPlaceholder)"
 			:no-options-message="
-				searchLoading ? formatMessage(commonMessages.loadingLabel) : formatMessage(messages.noResultsFound)
+				searchLoading
+					? formatMessage(commonMessages.loadingLabel)
+					: formatMessage(messages.noResultsFound)
 			"
 			:disable-search-filter="true"
 			@search-input="(query) => handleSearch(query)"

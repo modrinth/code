@@ -6,8 +6,8 @@ import { commonMessages } from '#ui/utils/common-messages'
 import type { StageConfigInput } from '../../../base'
 import FinalConfigStage from '../components/FinalConfigStage.vue'
 import {
-	creationFlowMessages,
 	type CreationFlowContextValue,
+	creationFlowMessages,
 	flowTypeHeadingMessages,
 } from '../creation-flow-context'
 

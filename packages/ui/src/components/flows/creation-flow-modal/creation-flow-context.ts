@@ -3,13 +3,13 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import {
 	defineMessages,
 	type MessageDescriptor,
 	useVIntl,
 	type VIntlFormatters,
 } from '#ui/composables/i18n'
-import { useDebugLogger } from '#ui/composables/debug-logger'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import { createContext, injectModrinthClient } from '../../../providers'
@@ -30,7 +30,8 @@ export interface LoaderVersionEntry {
 	stable: boolean
 }
 
-const loaderManifestQueryKey = (loader: string) => ['creation-flow', 'loader-manifest', loader] as const
+const loaderManifestQueryKey = (loader: string) =>
+	['creation-flow', 'loader-manifest', loader] as const
 const paperSupportedVersionsQueryKey = ['creation-flow', 'paper', 'supported-versions'] as const
 const purpurSupportedVersionsQueryKey = ['creation-flow', 'purpur', 'supported-versions'] as const
 
@@ -288,7 +289,9 @@ export function createCreationFlowContext(
 	const loaderVersionType = ref<LoaderVersionType>('stable')
 	const selectedLoaderVersion = ref<string | null>(null)
 	const showSnapshots = ref(false)
-	const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>({})
+	const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>(
+		{},
+	)
 	const paperSupportedVersions = ref<Set<string> | null>(null)
 	const purpurSupportedVersions = ref<Set<string> | null>(null)
 

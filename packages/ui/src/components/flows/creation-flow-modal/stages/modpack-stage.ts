@@ -5,7 +5,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 
 import type { StageConfigInput } from '../../../base'
 import ModpackStage from '../components/ModpackStage.vue'
-import { creationFlowMessages, type CreationFlowContextValue } from '../creation-flow-context'
+import { type CreationFlowContextValue, creationFlowMessages } from '../creation-flow-context'
 
 export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'modpack',
