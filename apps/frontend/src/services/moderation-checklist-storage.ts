@@ -23,7 +23,19 @@ const STAGE_KEY_PREFIX = 'moderation-stage-'
 const ACTION_STATES_KEY_PREFIX = 'moderation-actions-'
 const TEXT_INPUTS_KEY_PREFIX = 'moderation-inputs-'
 const GENERATED_MESSAGE_KEY_PREFIX = 'moderation-generated-message-'
+const CHECKLIST_STATE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000
+const CHECKLIST_CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1000
+const CHECKLIST_CLEANUP_LAST_RUN_KEY = 'moderation-checklist-cleanup:last-run'
+const CHECKLIST_STATE_KEY_PREFIXES = [
+	CHECKLIST_OPEN_KEY_PREFIX,
+	STAGE_KEY_PREFIX,
+	ACTION_STATES_KEY_PREFIX,
+	TEXT_INPUTS_KEY_PREFIX,
+	GENERATED_MESSAGE_KEY_PREFIX,
+]
 const indexedDbSaveChains = new Map<string, Promise<void>>()
+let checklistCleanupPromise: Promise<void> | null = null
+let checklistCleanupLastRunAt = 0
 
 export function createEmptyGeneratedMessageState(): ModerationChecklistGeneratedMessageState {
 	return {
@@ -210,6 +222,29 @@ function newestState<T>(
 	return savedAtTime(second) > savedAtTime(first) ? second : first
 }
 
+function isChecklistStateKey(key: string): boolean {
+	return CHECKLIST_STATE_KEY_PREFIXES.some((prefix) => key.startsWith(prefix))
+}
+
+function isStaleState<T>(
+	state: PersistedChecklistValue<T>,
+	now = Date.now(),
+	maxAgeMs = CHECKLIST_STATE_MAX_AGE_MS,
+): boolean {
+	const savedAt = savedAtTime(state)
+	if (savedAt === 0) return false
+	return now - savedAt > maxAgeMs
+}
+
+function isStaleRawState(value: unknown, now = Date.now()): boolean {
+	if (!isRecord(value)) return false
+	if (value.version !== 1 || typeof value.savedAt !== 'string') return false
+
+	const savedAt = Date.parse(value.savedAt)
+	if (Number.isNaN(savedAt)) return false
+	return now - savedAt > CHECKLIST_STATE_MAX_AGE_MS
+}
+
 async function loadFromIndexedDb<T>(
 	key: string,
 	normalize: (value: unknown) => PersistedChecklistValue<T> | null,
@@ -221,6 +256,36 @@ async function loadFromIndexedDb<T>(
 		const tx = db.transaction(STORE_NAME, 'readonly')
 		const store = tx.objectStore(STORE_NAME)
 		return normalize(await requestToPromise(store.get(key)))
+	} finally {
+		db.close()
+	}
+}
+
+async function cleanupIndexedDb(now = Date.now()): Promise<void> {
+	if (!hasIndexedDb()) return
+
+	const db = await openDatabase()
+	try {
+		const tx = db.transaction(STORE_NAME, 'readwrite')
+		const store = tx.objectStore(STORE_NAME)
+		const request = store.openCursor()
+
+		await new Promise<void>((resolve, reject) => {
+			request.onsuccess = () => {
+				const cursor = request.result
+				if (!cursor) return
+
+				const key = typeof cursor.key === 'string' ? cursor.key : null
+				if (key && isChecklistStateKey(key) && isStaleRawState(cursor.value, now)) {
+					cursor.delete()
+				}
+
+				cursor.continue()
+			}
+			request.onerror = () => reject(request.error ?? new Error('IndexedDB cursor failed'))
+			tx.oncomplete = () => resolve()
+			tx.onerror = () => reject(tx.error ?? new Error('IndexedDB transaction failed'))
+		})
 	} finally {
 		db.close()
 	}
@@ -331,11 +396,69 @@ function safeClearLocalStorage(key: string): void {
 	}
 }
 
+function cleanupLocalStorage(now = Date.now()): void {
+	const storage = getLocalStorage()
+	if (!storage) return
+
+	const keysToRemove: string[] = []
+	for (let index = 0; index < storage.length; index++) {
+		const key = storage.key(index)
+		if (!key || !isChecklistStateKey(key)) continue
+
+		const raw = storage.getItem(key)
+		if (!raw) continue
+
+		try {
+			if (isStaleRawState(JSON.parse(raw), now)) {
+				keysToRemove.push(key)
+			}
+		} catch {
+			keysToRemove.push(key)
+		}
+	}
+
+	keysToRemove.forEach((key) => safeClearLocalStorage(key))
+}
+
+function scheduleStaleChecklistCleanup(): void {
+	if (!import.meta.client || checklistCleanupPromise) return
+
+	const storage = getLocalStorage()
+	const now = Date.now()
+	const persistedLastRun = Number(storage?.getItem(CHECKLIST_CLEANUP_LAST_RUN_KEY) ?? 0)
+	const lastRun = Math.max(
+		checklistCleanupLastRunAt,
+		Number.isFinite(persistedLastRun) ? persistedLastRun : 0,
+	)
+	if (Number.isFinite(lastRun) && now - lastRun < CHECKLIST_CLEANUP_INTERVAL_MS) return
+
+	checklistCleanupLastRunAt = now
+	try {
+		storage?.setItem(CHECKLIST_CLEANUP_LAST_RUN_KEY, String(now))
+	} catch (error) {
+		console.debug('Failed to save moderation checklist cleanup timestamp:', error)
+	}
+
+	checklistCleanupPromise = (async () => {
+		cleanupLocalStorage(now)
+		try {
+			await cleanupIndexedDb(now)
+		} catch (error) {
+			console.debug('Failed to cleanup stale moderation checklist state from IndexedDB:', error)
+		}
+	})().finally(() => {
+		checklistCleanupPromise = null
+	})
+}
+
 async function loadState<T>(
 	key: string,
 	normalize: (value: unknown) => PersistedChecklistValue<T> | null,
+	touch = true,
 ): Promise<T | null> {
 	if (!import.meta.client) return null
+
+	scheduleStaleChecklistCleanup()
 
 	let indexedDbState: PersistedChecklistValue<T> | null = null
 	try {
@@ -351,11 +474,25 @@ async function loadState<T>(
 		console.debug('Failed to load moderation checklist state from localStorage:', error)
 	}
 
-	return newestState(indexedDbState, localStorageState)?.value ?? null
+	const state = newestState(indexedDbState, localStorageState)
+	if (!state) return null
+
+	if (isStaleState(state)) {
+		await clearState(key)
+		return null
+	}
+
+	if (touch) {
+		void saveState(key, state.value)
+	}
+
+	return state.value
 }
 
 async function saveState<T>(key: string, value: T): Promise<void> {
 	if (!import.meta.client) return
+
+	scheduleStaleChecklistCleanup()
 
 	const state = wrapValue(value)
 	safeSaveLocalStorage(key, state)
@@ -383,7 +520,7 @@ async function clearState(key: string): Promise<void> {
 }
 
 export async function loadChecklistOpenState(projectId: string): Promise<boolean | null> {
-	return loadState(`${CHECKLIST_OPEN_KEY_PREFIX}${projectId}`, normalizeChecklistOpen)
+	return loadState(`${CHECKLIST_OPEN_KEY_PREFIX}${projectId}`, normalizeChecklistOpen, false)
 }
 
 export async function saveChecklistOpenState(projectId: string, open: boolean): Promise<void> {
@@ -401,7 +538,13 @@ export async function saveChecklistStage(projectSlug: string, stage: number): Pr
 export async function loadChecklistActionStates(
 	projectSlug: string,
 ): Promise<Record<string, ActionState>> {
-	return (await loadState(`${ACTION_STATES_KEY_PREFIX}${projectSlug}`, normalizeActionStates)) ?? {}
+	const actionStates =
+		(await loadState(`${ACTION_STATES_KEY_PREFIX}${projectSlug}`, normalizeActionStates, false)) ??
+		{}
+	if (Object.keys(actionStates).length > 0) {
+		void saveChecklistActionStates(projectSlug, actionStates)
+	}
+	return actionStates
 }
 
 export async function saveChecklistActionStates(
@@ -436,10 +579,8 @@ export async function loadGeneratedMessageState(
 	projectSlug: string,
 ): Promise<ModerationChecklistGeneratedMessageState> {
 	return (
-		(await loadState(
-			`${GENERATED_MESSAGE_KEY_PREFIX}${projectSlug}`,
-			normalizeGeneratedMessage,
-		)) ?? createEmptyGeneratedMessageState()
+		(await loadState(`${GENERATED_MESSAGE_KEY_PREFIX}${projectSlug}`, normalizeGeneratedMessage)) ??
+		createEmptyGeneratedMessageState()
 	)
 }
 
@@ -451,5 +592,5 @@ export async function saveGeneratedMessageState(
 }
 
 export async function clearGeneratedMessageState(projectSlug: string): Promise<void> {
-	await saveGeneratedMessageState(projectSlug, createEmptyGeneratedMessageState())
+	await clearState(`${GENERATED_MESSAGE_KEY_PREFIX}${projectSlug}`)
 }

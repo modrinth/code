@@ -216,7 +216,10 @@ export async function saveQueueState(state: PersistedModerationQueueState): Prom
 			safeSaveLocalStorage(state)
 			return
 		} catch (error) {
-			console.debug('Failed to save moderation queue to IndexedDB, using localStorage fallback:', error)
+			console.debug(
+				'Failed to save moderation queue to IndexedDB, using localStorage fallback:',
+				error,
+			)
 		}
 	}
 
