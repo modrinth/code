@@ -246,7 +246,7 @@ const editingGameVersion = ref(server.value?.mc_version ?? '')
 const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
 const isResettingToOnboarding = ref(false)
 
-const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
+const modLoaders = SUPPORTED_MOD_LOADERS
 
 function toApiLoaderName(loader: string): string {
 	return loader === 'neoforge' ? 'neo' : loader

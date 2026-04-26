@@ -150,16 +150,24 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 				LOADER_FILTER_TYPES.includes(f.type as (typeof LOADER_FILTER_TYPES)[number]),
 			) || ['resourcepack', 'datapack'].includes(options.projectType.value),
 	)
-	const loadersNotForThisType = computed(
-		() =>
-			options.tags.value?.loaders
-				?.filter((loader) => !loader.supported_project_types.includes(options.projectType.value))
-				?.map((loader) => loader.name) ?? [],
-	)
-	const deprioritizedTags = computed(() => [
-		...selectedFilterTags.value,
-		...loadersNotForThisType.value,
-	])
+	const loadersNotForThisType = computed(() => {
+		const loaders = options.tags.value?.loaders
+		if (!loaders) return []
+		const result: string[] = []
+		for (const loader of loaders) {
+			if (!loader.supported_project_types.includes(options.projectType.value)) {
+				result.push(loader.name)
+			}
+		}
+		return result
+	})
+	const deprioritizedTags = computed(() => {
+		const selected = selectedFilterTags.value
+		const loaders = loadersNotForThisType.value
+		if (selected.length === 0) return loaders
+		if (loaders.length === 0) return selected
+		return [...selected, ...loaders]
+	})
 
 	const loading = ref(true)
 	const projectHits = shallowRef<BrowseSearchResponse['projectHits']>([])

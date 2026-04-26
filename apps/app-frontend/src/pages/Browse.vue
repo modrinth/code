@@ -211,9 +211,8 @@ const instanceFilters = computed(() => {
 		}
 
 		const platform = instance.value.loader
-		const supportedModLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 
-		if (platform && projectType.value === 'mod' && supportedModLoaders.includes(platform)) {
+		if (platform && projectType.value === 'mod' && MOD_LOADER_SET.has(platform)) {
 			filters.push({ type: 'mod_loader', option: platform })
 		}
 
@@ -250,7 +249,7 @@ const serverContextFilters = computed(() => {
 		if (gameVersion) filters.push({ type: 'game_version', option: gameVersion })
 
 		const platform = serverContextServerData.value.loader?.toLowerCase()
-		if (platform && ['fabric', 'forge', 'quilt', 'neoforge'].includes(platform))
+		if (platform && MOD_LOADER_SET.has(platform))
 			filters.push({ type: 'mod_loader', option: platform })
 		if (platform && ['paper', 'purpur'].includes(platform))
 			filters.push({ type: 'plugin_loader', option: platform })
