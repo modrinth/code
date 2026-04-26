@@ -7,13 +7,13 @@
 				<ButtonStyled type="outlined">
 					<button class="!border-surface-5" @click="triggerIconInput">
 						<UploadIcon />
-						Select icon
+						{{ formatMessage(messages.selectIcon) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled type="outlined">
 					<button class="!border-surface-5" :disabled="!ctx.instanceIcon.value" @click="removeIcon">
 						<XIcon />
-						Remove icon
+						{{ formatMessage(messages.removeIcon) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -21,17 +21,19 @@
 
 		<!-- Instance-specific: Name field -->
 		<div v-if="ctx.flowType === 'instance'" class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Name</span>
+			<span class="font-semibold text-contrast">{{ formatMessage(messages.nameLabel) }}</span>
 			<StyledInput
 				v-model="ctx.instanceName.value"
-				:placeholder="ctx.autoInstanceName.value || 'Enter instance name'"
+				:placeholder="ctx.autoInstanceName.value || formatMessage(messages.instanceNamePlaceholder)"
 			/>
 		</div>
 
 		<!-- Loader chips -->
 		<div v-if="!hideLoaderChips" class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">{{
-				ctx.flowType === 'instance' ? 'Loader' : 'Content loader'
+				ctx.flowType === 'instance'
+					? formatMessage(messages.loaderLabel)
+					: formatMessage(messages.contentLoaderLabel)
 			}}</span>
 			<Chips
 				v-model="selectedLoader"
@@ -43,15 +45,21 @@
 
 		<!-- Game version -->
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Game version</span>
+			<span class="font-semibold text-contrast">{{
+				formatMessage(commonMessages.gameVersionLabel)
+			}}</span>
 			<Combobox
 				v-model="selectedGameVersion"
 				:options="gameVersionOptions"
-				:no-options-message="gameVersionsLoading ? 'Loading...' : 'No versions available'"
+				:no-options-message="
+					gameVersionsLoading
+						? formatMessage(commonMessages.loadingLabel)
+						: formatMessage(messages.noVersionsAvailable)
+				"
 				searchable
 				sync-with-selection
-				placeholder="Select game version"
-				search-placeholder="Search game version..."
+				:placeholder="formatMessage(messages.selectGameVersion)"
+				:search-placeholder="formatMessage(messages.searchGameVersion)"
 				@option-hover="handleGameVersionHover"
 			>
 				<template v-if="ctx.showSnapshotToggle" #dropdown-footer>
@@ -62,7 +70,11 @@
 					>
 						<EyeOffIcon v-if="ctx.showSnapshots.value" class="size-4" />
 						<EyeIcon v-else class="size-4" />
-						{{ ctx.showSnapshots.value ? 'Hide snapshots' : 'Show all versions' }}
+						{{
+							ctx.showSnapshots.value
+								? formatMessage(commonMessages.hideSnapshotsButton)
+								: formatMessage(commonMessages.showAllVersionsButton)
+						}}
 					</button>
 				</template>
 			</Combobox>
@@ -73,24 +85,36 @@
 			<Collapsible :collapsed="!selectedLoader || !selectedGameVersion" overflow-visible>
 				<div class="flex flex-col gap-2">
 					<span class="font-semibold text-contrast">{{
-						isPaperLike ? 'Build number' : 'Loader version'
+						isPaperLike
+							? formatMessage(messages.buildNumberLabel)
+							: formatMessage(messages.loaderVersionLabel)
 					}}</span>
 					<Chips
 						v-if="!isPaperLike"
 						v-model="loaderVersionType"
 						:items="loaderVersionTypeItems"
-						:format-label="capitalize"
+						:format-label="formatLoaderVersionTypeLabel"
 					/>
 					<div v-if="isPaperLike || loaderVersionType === 'other'">
 						<Combobox
 							v-model="selectedLoaderVersion"
 							:options="loaderVersionOptions"
-							:no-options-message="loaderVersionsLoading ? 'Loading...' : 'No versions available'"
+							:no-options-message="
+								loaderVersionsLoading
+									? formatMessage(commonMessages.loadingLabel)
+									: formatMessage(messages.noVersionsAvailable)
+							"
 							searchable
 							sync-with-selection
-							:placeholder="isPaperLike ? 'Select build number' : 'Select loader version'"
+							:placeholder="
+								isPaperLike
+									? formatMessage(messages.selectBuildNumber)
+									: formatMessage(messages.selectLoaderVersion)
+							"
 							:search-placeholder="
-								isPaperLike ? 'Search build number...' : 'Search loader version...'
+								isPaperLike
+									? formatMessage(messages.searchBuildNumber)
+									: formatMessage(messages.searchLoaderVersion)
 							"
 						>
 							<!-- When not Paper, this scoped slot is omitted and Combobox uses default option markup. -->
@@ -124,6 +148,7 @@
 <script setup lang="ts">
 import type { Paper } from '@modrinth/api-client'
 import { EyeIcon, EyeOffIcon, UploadIcon, XIcon } from '@modrinth/assets'
+import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
@@ -138,11 +163,12 @@ import PaperChannelBadge from '../../../base/PaperChannelBadge.vue'
 import StyledInput from '../../../base/StyledInput.vue'
 import type { LoaderVersionType } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
-import { capitalize, formatLoaderLabel } from '../shared'
+import { formatLoaderLabel } from '../shared'
 
 const debug = useDebugLogger('CustomSetupStage')
 const client = injectModrinthClient()
 const ctx = injectCreationFlowContext()
+const { formatMessage } = useVIntl()
 const {
 	selectedLoader,
 	selectedGameVersion,
@@ -151,6 +177,92 @@ const {
 	hideLoaderChips,
 	hideLoaderVersion,
 } = ctx
+
+const messages = defineMessages({
+	selectIcon: {
+		id: 'creation-flow.modal.custom-setup.icon.select',
+		defaultMessage: 'Select icon',
+	},
+	removeIcon: {
+		id: 'creation-flow.modal.custom-setup.icon.remove',
+		defaultMessage: 'Remove icon',
+	},
+	nameLabel: {
+		id: 'creation-flow.modal.custom-setup.name.label',
+		defaultMessage: 'Name',
+	},
+	instanceNamePlaceholder: {
+		id: 'creation-flow.modal.custom-setup.name.placeholder',
+		defaultMessage: 'Enter instance name',
+	},
+	loaderLabel: {
+		id: 'creation-flow.modal.custom-setup.loader.label',
+		defaultMessage: 'Loader',
+	},
+	contentLoaderLabel: {
+		id: 'creation-flow.modal.custom-setup.content-loader.label',
+		defaultMessage: 'Content loader',
+	},
+	noVersionsAvailable: {
+		id: 'creation-flow.modal.custom-setup.options.no-versions-available',
+		defaultMessage: 'No versions available',
+	},
+	selectGameVersion: {
+		id: 'creation-flow.modal.custom-setup.game-version.placeholder',
+		defaultMessage: 'Select game version',
+	},
+	searchGameVersion: {
+		id: 'creation-flow.modal.custom-setup.game-version.search-placeholder',
+		defaultMessage: 'Search game version...',
+	},
+	buildNumberLabel: {
+		id: 'creation-flow.modal.custom-setup.build-number.label',
+		defaultMessage: 'Build number',
+	},
+	loaderVersionLabel: {
+		id: 'creation-flow.modal.custom-setup.loader-version.label',
+		defaultMessage: 'Loader version',
+	},
+	selectBuildNumber: {
+		id: 'creation-flow.modal.custom-setup.build-number.placeholder',
+		defaultMessage: 'Select build number',
+	},
+	selectLoaderVersion: {
+		id: 'creation-flow.modal.custom-setup.loader-version.placeholder',
+		defaultMessage: 'Select loader version',
+	},
+	searchBuildNumber: {
+		id: 'creation-flow.modal.custom-setup.build-number.search-placeholder',
+		defaultMessage: 'Search build number...',
+	},
+	searchLoaderVersion: {
+		id: 'creation-flow.modal.custom-setup.loader-version.search-placeholder',
+		defaultMessage: 'Search loader version...',
+	},
+	stableLoaderVersionType: {
+		id: 'creation-flow.modal.custom-setup.loader-version-type.stable',
+		defaultMessage: 'Stable',
+	},
+	latestLoaderVersionType: {
+		id: 'creation-flow.modal.custom-setup.loader-version-type.latest',
+		defaultMessage: 'Latest',
+	},
+	otherLoaderVersionType: {
+		id: 'creation-flow.modal.custom-setup.loader-version-type.other',
+		defaultMessage: 'Other',
+	},
+})
+
+function formatLoaderVersionTypeLabel(type: LoaderVersionType): string {
+	switch (type) {
+		case 'stable':
+			return formatMessage(messages.stableLoaderVersionType)
+		case 'latest':
+			return formatMessage(messages.latestLoaderVersionType)
+		case 'other':
+			return formatMessage(messages.otherLoaderVersionType)
+	}
+}
 
 // For instance flow, prepend 'vanilla' to available loaders.
 // For server flows, vanilla is a separate option in the setup type stage, so exclude it here.

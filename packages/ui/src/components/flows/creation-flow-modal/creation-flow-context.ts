@@ -2,6 +2,12 @@ import type { Archon, LauncherMeta } from '@modrinth/api-client'
 import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
+import {
+	defineMessages,
+	type MessageDescriptor,
+	useVIntl,
+	type VIntlFormatters,
+} from '#ui/composables/i18n'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
@@ -18,6 +24,64 @@ export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
 export type GeneratorSettingsMode = 'default' | 'flat' | 'custom'
 export type LoaderManifestResolver = (loader: string) => Promise<LauncherMeta.Manifest.v0.Manifest>
+
+export const creationFlowMessages = defineMessages({
+	createWorldTitle: {
+		id: 'creation-flow.title.create-world',
+		defaultMessage: 'Create world',
+	},
+	setUpServerTitle: {
+		id: 'creation-flow.title.set-up-server',
+		defaultMessage: 'Set up server',
+	},
+	resetServerTitle: {
+		id: 'creation-flow.title.reset-server',
+		defaultMessage: 'Reset server',
+	},
+	createInstanceTitle: {
+		id: 'creation-flow.title.create-instance',
+		defaultMessage: 'Create instance',
+	},
+	createWorldButton: {
+		id: 'creation-flow.button.create-world',
+		defaultMessage: 'Create world',
+	},
+	createInstanceButton: {
+		id: 'creation-flow.button.create-instance',
+		defaultMessage: 'Create instance',
+	},
+	setupServerButton: {
+		id: 'creation-flow.button.setup-server',
+		defaultMessage: 'Setup server',
+	},
+	finishButton: {
+		id: 'creation-flow.button.finish',
+		defaultMessage: 'Finish',
+	},
+	importInstanceTitle: {
+		id: 'creation-flow.title.import-instance',
+		defaultMessage: 'Import instance',
+	},
+	importButton: {
+		id: 'creation-flow.button.import',
+		defaultMessage: 'Import',
+	},
+	importInstancesButton: {
+		id: 'creation-flow.button.import-instances',
+		defaultMessage: 'Import {count, plural, one {# instance} other {# instances}}',
+	},
+	chooseModpackTitle: {
+		id: 'creation-flow.title.choose-modpack',
+		defaultMessage: 'Choose modpack',
+	},
+})
+
+export const flowTypeHeadingMessages: Record<FlowType, MessageDescriptor> = {
+	world: creationFlowMessages.createWorldTitle,
+	'server-onboarding': creationFlowMessages.setUpServerTitle,
+	'reset-server': creationFlowMessages.resetServerTitle,
+	instance: creationFlowMessages.createInstanceTitle,
+}
 
 export interface ModpackSelection {
 	projectId: string
@@ -44,16 +108,10 @@ export interface ModpackSearchResult {
 	limit: number
 }
 
-export const flowTypeHeadings: Record<FlowType, string> = {
-	world: 'Create world',
-	'server-onboarding': 'Set up server',
-	'reset-server': 'Reset server',
-	instance: 'Create instance',
-}
-
 export interface CreationFlowContextValue {
 	// Flow
 	flowType: FlowType
+	formatMessage: VIntlFormatters['formatMessage']
 
 	// Configuration
 	availableLoaders: string[]
@@ -171,6 +229,7 @@ export function createCreationFlowContext(
 	options: CreationFlowOptions = {},
 ): CreationFlowContextValue {
 	const debug = useDebugLogger('CreationFlow')
+	const { formatMessage } = useVIntl()
 	const availableLoaders = options.availableLoaders ?? ['fabric', 'neoforge', 'forge', 'quilt']
 	const showSnapshotToggle = options.showSnapshotToggle ?? false
 	const disableClose = options.disableClose ?? false
@@ -383,6 +442,7 @@ export function createCreationFlowContext(
 
 	const contextValue: CreationFlowContextValue = {
 		flowType,
+		formatMessage,
 		availableLoaders,
 		showSnapshotToggle,
 		disableClose,

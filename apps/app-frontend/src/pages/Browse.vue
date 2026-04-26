@@ -442,9 +442,25 @@ const messages = defineMessages({
 		id: 'app.browse.install-content-to-instance',
 		defaultMessage: 'Install content to instance',
 	},
+	installToServer: {
+		id: 'app.browse.server.install',
+		defaultMessage: 'Install',
+	},
+	installedToServer: {
+		id: 'app.browse.server.installed',
+		defaultMessage: 'Installed',
+	},
+	installingToServer: {
+		id: 'app.browse.server.installing',
+		defaultMessage: 'Installing',
+	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
 		defaultMessage: 'Loader is provided by the instance',
+	},
+	modpacksProjectType: {
+		id: 'app.browse.project-type.modpacks',
+		defaultMessage: 'Modpacks',
 	},
 	modLoaderProvidedByServer: {
 		id: 'search.filter.locked.server-loader.title',
@@ -551,7 +567,7 @@ const selectableProjectTypes = computed(() => {
 	const suffix = queryString ? `?${queryString}` : ''
 
 	if (isSetupServerContext.value) {
-		return [{ label: 'Modpacks', href: `/browse/modpack${suffix}` }]
+		return [{ label: formatMessage(messages.modpacksProjectType), href: `/browse/modpack${suffix}` }]
 	}
 
 	if (isFromWorlds.value) {
@@ -731,7 +747,13 @@ function getCardActions(
 		return [
 			{
 				key: 'install',
-				label: isInstalling ? 'Installing' : isInstalled ? 'Installed' : 'Install',
+				label: formatMessage(
+					isInstalling
+						? messages.installingToServer
+						: isInstalled
+							? messages.installedToServer
+							: messages.installToServer,
+				),
 				icon: isInstalled ? CheckIcon : PlusIcon,
 				disabled: isInstalled || isInstalling,
 				color: 'brand',
