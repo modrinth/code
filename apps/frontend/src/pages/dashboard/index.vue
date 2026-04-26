@@ -7,7 +7,7 @@
 					{{ auth.user.username }}
 				</h1>
 				<NuxtLink class="goto-link" :to="`/user/${auth.user.username}`">
-					Visit your profile
+					{{ formatMessage(commonMessages.visitYourProfile) }}
 					<ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
 				</NuxtLink>
 			</div>
@@ -15,13 +15,15 @@
 		<div class="dashboard-notifications">
 			<section class="universal-card">
 				<div class="header__row">
-					<h2 class="header__title text-2xl">Notifications</h2>
+					<h2 class="header__title text-2xl">
+						{{ formatMessage(commonMessages.notificationsLabel) }}
+					</h2>
 					<nuxt-link
 						v-if="notifications.length > 0"
 						class="goto-link"
 						to="/dashboard/notifications"
 					>
-						See all
+						{{ formatMessage(messages.seeAll) }}
 						<ChevronRightIcon />
 					</nuxt-link>
 				</div>
@@ -42,15 +44,15 @@
 						class="goto-link view-more-notifs mt-4"
 						to="/dashboard/notifications"
 					>
-						View {{ extraNotifs }} more notification{{ extraNotifs === 1 ? '' : 's' }}
+						{{ formatMessage(messages.viewMore, { extraNotifs: extraNotifs }) }}
 						<ChevronRightIcon />
 					</nuxt-link>
 				</template>
 				<div v-else class="universal-body">
-					<p>You have no unread notifications.</p>
+					<p>{{ formatMessage(messages.noUnreadNotifications) }}</p>
 					<nuxt-link class="iconified-button !mt-4" to="/dashboard/notifications/history">
 						<HistoryIcon />
-						View notification history
+						{{ formatMessage(messages.viewNotificationHistory) }}
 					</nuxt-link>
 				</div>
 			</section>
@@ -58,18 +60,16 @@
 
 		<div class="dashboard-analytics">
 			<section class="universal-card">
-				<h2>Analytics</h2>
+				<h2>{{ formatMessage(commonMessages.analyticsButton) }}</h2>
 				<div class="grid-display">
 					<div class="grid-display__item">
-						<div class="label">Total downloads</div>
+						<div class="label">{{ formatMessage(messages.totalDownloads) }}</div>
 						<div class="value">
 							{{ $formatNumber(projects.reduce((agg, x) => agg + x.downloads, 0)) }}
 						</div>
-						<span
-							>from
-							{{ downloadsProjectCount }}
-							project{{ downloadsProjectCount === 1 ? '' : 's' }}</span
-						>
+						<span>{{
+							formatMessage(messages.fromProjects, { count: downloadsProjectCount })
+						}}</span>
 						<!--          <NuxtLink class="goto-link" to="/dashboard/analytics"-->
 						<!--            >View breakdown-->
 						<!--            <ChevronRightIcon-->
@@ -78,16 +78,15 @@
 						<!--          /></NuxtLink>-->
 					</div>
 					<div class="grid-display__item">
-						<div class="label">Total followers</div>
+						<div class="label">{{ formatMessage(messages.totalFollowers) }}</div>
 						<div class="value">
 							{{ $formatNumber(projects.reduce((agg, x) => agg + x.followers, 0)) }}
 						</div>
 						<span>
-							<span
-								>from {{ followersProjectCount }} project{{
-									followersProjectCount === 1 ? '' : 's'
-								}}</span
-							></span
+							<span>{{
+								formatMessage(messages.fromProjects, { count: followersProjectCount })
+							}}</span></span
+						>
 						>
 					</div>
 				</div>
@@ -97,14 +96,58 @@
 </template>
 <script setup>
 import { ChevronRightIcon, HistoryIcon } from '@modrinth/assets'
-import { Avatar, injectModrinthClient } from '@modrinth/ui'
+import {
+	Avatar,
+	commonMessages,
+	defineMessages,
+	injectModrinthClient,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import NotificationItem from '~/components/ui/NotificationItem.vue'
 import { fetchExtraNotificationData, groupNotifications } from '~/helpers/platform-notifications.ts'
 
 useHead({
-	title: 'Dashboard - Modrinth',
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
+})
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	headTitle: {
+		id: 'dashboard.head-title',
+		defaultMessage: 'Dashboard',
+	},
+	seeAll: {
+		id: 'dashboard.notifications.link.see-all',
+		defaultMessage: 'See all',
+	},
+	viewMore: {
+		id: 'dashboard.notifications.link.view-more',
+		defaultMessage:
+			'View {extraNotifs} more {extraNotifs, plural, one {notification} other {notifications}}',
+	},
+	noUnreadNotifications: {
+		id: 'dashboard.notifications.empty.no-unread',
+		defaultMessage: 'You have no unread notifications.',
+	},
+	viewNotificationHistory: {
+		id: 'dashboard.notifications.link.view-history',
+		defaultMessage: 'View notification history',
+	},
+	totalDownloads: {
+		id: 'dashboard.analytics.total-downloads',
+		defaultMessage: 'Total downloads',
+	},
+	totalFollowers: {
+		id: 'dashboard.analytics.total-followers',
+		defaultMessage: 'Total followers',
+	},
+	fromProjects: {
+		id: 'dashboard.analytics.from-projects',
+		defaultMessage: 'from {count} {count, plural, one {project} other {projects}}',
+	},
 })
 
 const auth = await useAuth()
