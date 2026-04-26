@@ -89,7 +89,7 @@ const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
 	refetch: []
-	loadFileSources: [reportId: string]
+	loadIssueSources: [issueIds: string[]]
 	markComplete: [projectId: string]
 	showMaliciousSummary: [unsafeFiles: UnsafeFile[]]
 }>()
@@ -371,7 +371,6 @@ function formatFileSize(bytes: number): string {
 function viewFileFlags(file: FlattenedFileReport) {
 	selectedFileId.value = file.id
 	currentTab.value = 'File'
-	emit('loadFileSources', file.id)
 }
 
 function backToFileList() {
@@ -564,6 +563,8 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 
 const expandedClasses = reactive<Set<string>>(new Set())
 const showCopyFeedback = reactive<Map<string, boolean>>(new Map())
+const highlightedSourceCache = reactive<Map<string, { source: string; lines: string[] }>>(new Map())
+const AUTO_EXPAND_CLASS_FLAG_LIMIT = 50
 
 interface ClassGroup {
 	key: string
@@ -681,8 +682,8 @@ const groupedByJar = computed<JarGroup[]>(() => {
 watch(
 	groupedByClass,
 	(classes) => {
-		if (classes.length === 1) {
-			expandedClasses.add(classes[0].key)
+		if (classes.length === 1 && classes[0].flags.length <= AUTO_EXPAND_CLASS_FLAG_LIMIT) {
+			expandClass(classes[0])
 		}
 	},
 	{ immediate: true },
@@ -700,20 +701,49 @@ function getHighestSeverityInClass(
 	)
 }
 
-function toggleClass(classKey: string) {
-	if (expandedClasses.has(classKey)) {
-		expandedClasses.delete(classKey)
-	} else {
-		expandedClasses.add(classKey)
-	}
-}
-
 function getClassDecompiledSource(classItem: ClassGroup): string | undefined {
 	for (const flag of classItem.flags) {
 		const source = props.decompiledSources.get(flag.detail.id)
 		if (source) return source
 	}
 	return undefined
+}
+
+function getHighlightedClassSource(classItem: ClassGroup): string[] {
+	const source = getClassDecompiledSource(classItem)
+	if (!source) return []
+
+	const cached = highlightedSourceCache.get(classItem.key)
+	if (cached?.source === source) return cached.lines
+
+	const lines = highlightCodeLines(source, 'java')
+	highlightedSourceCache.set(classItem.key, { source, lines })
+	return lines
+}
+
+function isClassLoadingSource(classItem: ClassGroup): boolean {
+	return classItem.flags.some((flag) => props.loadingIssues.has(flag.issueId))
+}
+
+function loadClassSources(classItem: ClassGroup) {
+	const issueIds = [...new Set(classItem.flags.map((flag) => flag.issueId))]
+	if (issueIds.length > 0) {
+		emit('loadIssueSources', issueIds)
+	}
+}
+
+function expandClass(classItem: ClassGroup) {
+	if (expandedClasses.has(classItem.key)) return
+	expandedClasses.add(classItem.key)
+	loadClassSources(classItem)
+}
+
+function toggleClass(classItem: ClassGroup) {
+	if (expandedClasses.has(classItem.key)) {
+		expandedClasses.delete(classItem.key)
+	} else {
+		expandClass(classItem)
+	}
 }
 
 function handleThreadUpdate() {
@@ -1227,7 +1257,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					>
 						<div
 							class="flex cursor-pointer items-center justify-between p-4 transition-colors duration-200 hover:bg-surface-4"
-							@click="toggleClass(classItem.key)"
+							@click="toggleClass(classItem)"
 						>
 							<div class="my-auto flex items-center gap-2">
 								<ButtonStyled type="transparent" circular>
@@ -1269,7 +1299,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 
 								<Transition name="fade">
 									<div
-										v-if="classItem.flags.some((f) => loadingIssues.has(f.issueId))"
+										v-if="isClassLoadingSource(classItem)"
 										class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
 									>
 										<span class="flex items-center gap-1.5 text-sm font-medium text-secondary">
@@ -1282,7 +1312,10 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 						</div>
 
 						<Collapsible :collapsed="!expandedClasses.has(classItem.key)">
-							<div class="mt-2 flex flex-col gap-2 px-4 pb-4">
+							<div
+								v-if="expandedClasses.has(classItem.key)"
+								class="mt-2 flex flex-col gap-2 px-4 pb-4"
+							>
 								<div
 									v-for="flag in classItem.flags"
 									:key="`${flag.issueId}-${flag.detail.id}`"
@@ -1371,7 +1404,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								</div>
 
 								<div
-									v-if="getClassDecompiledSource(classItem)"
+									v-if="getHighlightedClassSource(classItem).length > 0"
 									class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
 								>
 									<ButtonStyled circular type="transparent">
@@ -1387,10 +1420,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 
 									<div class="overflow-x-auto bg-surface-3 py-3">
 										<div
-											v-for="(line, n) in highlightCodeLines(
-												getClassDecompiledSource(classItem)!,
-												'java',
-											)"
+											v-for="(line, n) in getHighlightedClassSource(classItem)"
 											:key="n"
 											class="flex font-mono text-[13px] leading-[1.6]"
 										>
@@ -1405,6 +1435,15 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 											</div>
 										</div>
 									</div>
+								</div>
+								<div
+									v-else-if="isClassLoadingSource(classItem)"
+									class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4"
+								>
+									<p class="flex items-center gap-2 text-sm text-secondary">
+										<LoaderCircleIcon class="size-4 animate-spin" />
+										Loading source...
+									</p>
 								</div>
 								<div
 									v-else
