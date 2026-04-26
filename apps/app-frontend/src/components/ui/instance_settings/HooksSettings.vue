@@ -54,7 +54,7 @@ const messages = defineMessages({
 	hooksDescription: {
 		id: 'instance.settings.tabs.hooks.description',
 		defaultMessage:
-			'Hooks allow advanced users to run certain system commands before and after launching the game.',
+			'Hooks can run commands before launch, as a wrapper, or after exit. Commands support $INST_NAME, $INST_ID, $INST_DIR/$INST_MC_DIR, $INST_JAVA, $INST_JAVA_ARGS.',
 	},
 	customHooks: {
 		id: 'instance.settings.tabs.hooks.custom-hooks',
