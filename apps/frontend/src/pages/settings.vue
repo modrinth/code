@@ -42,6 +42,13 @@
 										icon: ShieldIcon,
 									}
 								: null,
+							auth.user?.email
+								? {
+										link: '/settings/notifications',
+										label: formatMessage(commonSettingsMessages.notifications),
+										icon: BellIcon,
+									}
+								: null,
 							auth.user
 								? {
 										link: '/settings/authorizations',
@@ -90,6 +97,7 @@
 </template>
 <script setup>
 import {
+	BellIcon,
 	CardIcon,
 	GridIcon,
 	KeyIcon,
