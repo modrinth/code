@@ -218,6 +218,14 @@
 														disabled: project.status === 'withheld',
 													},
 													{
+														id: 'set-to-draft-reply',
+														action: () => {
+															sendReply('draft')
+														},
+														hoverFilled: true,
+														disabled: project.status === 'draft',
+													},
+													{
 														id: 'send-to-review-reply',
 														action: () => {
 															sendReply('processing', true)
@@ -235,6 +243,14 @@
 														},
 														hoverFilled: true,
 														disabled: project.status === 'withheld',
+													},
+													{
+														id: 'set-to-draft',
+														action: () => {
+															setStatus('draft')
+														},
+														hoverFilled: true,
+														disabled: project.status === 'draft',
 													},
 													{
 														id: 'send-to-review',
@@ -255,6 +271,14 @@
 									<template #withhold>
 										<EyeOffIcon aria-hidden="true" />
 										Withhold
+									</template>
+									<template #set-to-draft-reply>
+										<FileTextIcon aria-hidden="true" />
+										Set to draft with reply
+									</template>
+									<template #set-to-draft>
+										<FileTextIcon aria-hidden="true" />
+										Set to draft
 									</template>
 									<template #send-to-review-reply>
 										<ScaleIcon aria-hidden="true" />
@@ -280,6 +304,7 @@ import {
 	CheckIcon,
 	DropdownIcon,
 	EyeOffIcon,
+	FileTextIcon,
 	ReplyIcon,
 	ScaleIcon,
 	SendIcon,
