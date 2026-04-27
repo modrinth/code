@@ -8,15 +8,14 @@ import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { useReadyState } from '#ui/composables'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { useVIntl } from '#ui/composables/i18n'
+import type { EditingFile, FileItem } from '#ui/layouts/shared/files-tab/index.ts'
+import { FilePageLayout, provideFileManager } from '#ui/layouts/shared/files-tab/index.ts'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
-
-import type { EditingFile, FileItem } from '#ui/layouts/shared/files-tab/index.ts'
-import { FilePageLayout, provideFileManager } from '#ui/layouts/shared/files-tab/index.ts'
 
 const props = defineProps<{
 	showDebugInfo?: boolean
