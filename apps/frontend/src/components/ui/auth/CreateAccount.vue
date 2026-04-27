@@ -12,12 +12,13 @@
 			<label class="text-md font-semibold text-contrast" for="create-account-dob">
 				{{ formatMessage(messages.dateOfBirthLabel) }}
 			</label>
-			<input
+			<DatePicker
 				id="create-account-dob"
 				v-model="dateOfBirthModel"
-				class="create-account-dob-input scheme-dark h-9 w-full cursor-text border-0 bg-surface-4 text-lg text-primary outline-none [color-scheme:dark]"
-				type="date"
-				:max="maxInputDate"
+				wrapper-class="w-full"
+				min-date="1900-01-01"
+				:max-date="maxInputDate"
+				:placeholder="formatMessage(messages.dateOfBirthPlaceholder)"
 			/>
 			<div>
 				{{ formatMessage(messages.over13HelperText) }}
@@ -92,6 +93,7 @@ import {
 	Admonition,
 	ButtonStyled,
 	Checkbox,
+	DatePicker,
 	defineMessages,
 	injectNotificationManager,
 	StyledInput,
@@ -199,6 +201,10 @@ const messages = defineMessages({
 		id: 'auth.create-account.date-of-birth.label',
 		defaultMessage: 'Date of birth',
 	},
+	dateOfBirthPlaceholder: {
+		id: 'auth.create-account.date-of-birth.placeholder',
+		defaultMessage: 'Select your date of birth',
+	},
 	dateOfBirthRequiredTitle: {
 		id: 'auth.create-account.date-of-birth.required.title',
 		defaultMessage: 'Date of birth required',
@@ -258,15 +264,3 @@ const messages = defineMessages({
 	},
 })
 </script>
-
-<style scoped>
-.create-account-dob-input::-webkit-calendar-picker-indicator {
-	opacity: 0.5;
-	transition: opacity 0.15s ease-in-out;
-}
-
-.create-account-dob-input::-webkit-calendar-picker-indicator:hover {
-	opacity: 1;
-	cursor: pointer;
-}
-</style>
