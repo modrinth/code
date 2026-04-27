@@ -11,29 +11,52 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-04-27T17:30:17+00:00`,
+		date: `2026-04-27T19:59:24+00:00`,
 		product: 'app',
-		version: '0.13.5',
-		body: `## Fixed
-- Fixed issue where the instance creation modal would incorrectly state a mod loader supported a game version when in reality it didn't.
-- Fixed issue where the game version or loader version dropdown in the instance creation modal would appear empty for a few seconds.`,
+		version: '0.13.6',
+		body: `*Note: Modrinth App v0.13.5's release has been skipped - it's changes have been bundled into 0.13.6.*
+## Changed
+- Renamed the Browse page filter from "Hide installed content/added servers" to "Hide already installed content/added servers".
+- Content installed and servers added from an instance now stay visible on the Browse page until the search query or filters change.
+
+## Fixed
+- Fixed the instance creation modal incorrectly showing mod loaders as compatible with unsupported game versions.
+- Fixed the game version and loader version dropdowns appearing empty for a few seconds in the instance creation modal.`,
+	},
+	{
+		date: `2026-04-27T19:59:24+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Multi-select on the Backups tab for bulk deleting backups.
+- Manual and automatic backup filters on the Backups tab.
+
+## Changed
+- Server panel banners now stack more cleanly when multiple banners are shown.
+- The Backups tab now matches the rest of the server panel design.
+- Server panel banners now use clearer text.
+- Renamed the Discover page filter from "Hide installed content" to "Hide already installed content".
+- Content installed from the Discover page now stays visible until the search query or filters change.
+- The server console on the Overview tab now shows a loading animation until historical logs finish loading.
+
+## Fixed
+- Fixed backup creation and restoration failing in some cases.`,
 	},
 	{
 		date: `2026-04-27T17:30:17+00:00`,
 		product: 'web',
 		body: `## Fixed
-- Fixed issue with project data not reloading when migrating environment information through the \`/project/[id]/environment\` page or the modal via the environment migration warning admonition.
-- Fixed issue with tax compliance stage in the withdraw flow not showing up for certain users.
+- Fixed project data not reloading after migrating environment information from \`/project/[id]/environment\` or the migration warning modal.
+- Fixed the tax compliance step not appearing for some users in the withdrawal flow.
 
 ## Security
-- Fixed URLs rendering in email template variables.`,
+- Fixed email template variables rendering URLs.`,
 	},
 	{
 		date: `2026-04-27T17:30:17+00:00`,
 		product: 'hosting',
 		body: `## Fixed
-- Fixed issue where the server setup/reset server modal would incorrectly state a mod loader supported a game version when in reality it didn't.
-- Fixed issue where the game version or loader version dropdown in the server setup/reset server modal would appear empty for a few seconds.`,
+- Fixed the server setup and reset modals incorrectly showing mod loaders as compatible with unsupported game versions.
+- Fixed the game version and loader version dropdowns appearing empty for a few seconds in the server setup and reset modals.`,
 	},
 	{
 		date: `2026-04-20T20:48:51+00:00`,
