@@ -18,6 +18,7 @@
 				wrapper-class="w-full"
 				min-date="1900-01-01"
 				:max-date="maxInputDate"
+				preserve-day
 				:placeholder="formatMessage(messages.dateOfBirthPlaceholder)"
 			/>
 			<div>
@@ -130,7 +131,7 @@ const usernameModel = defineModel<string>('username', { default: '' })
 const tokenModel = defineModel<string>('token', { default: '' })
 const subscribeModel = defineModel<boolean>('subscribe', { default: false })
 
-const maxInputDate = computed(() => new Date().toISOString().slice(0, 10))
+const maxInputDate = computed(() => `${new Date().getFullYear()}-12-31`)
 
 const maxBirthDate = computed(() => {
 	const date = new Date()

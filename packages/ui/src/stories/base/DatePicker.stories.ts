@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import DatePicker from '../../components/base/DatePicker.vue'
 
@@ -82,6 +82,46 @@ export const MinMaxDates: Story = {
 					placeholder="Select an April date..."
 				/>
 				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const PreserveDay: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-05-31')
+			const intendedDay = ref<number | null>(null)
+			const resolvedDay = ref<number | null>(null)
+			const wasClamped = computed(
+				() =>
+					intendedDay.value !== null &&
+					resolvedDay.value !== null &&
+					intendedDay.value !== resolvedDay.value,
+			)
+			function onClamp(intended: number, resolved: number) {
+				intendedDay.value = intended
+				resolvedDay.value = resolved
+			}
+			return { value, intendedDay, resolvedDay, wasClamped, onClamp }
+		},
+		template: /* html */ `
+			<div class="flex max-w-sm flex-col gap-2">
+				<DatePicker
+					v-model="value"
+					wrapperClass="w-[300px]"
+					preserve-day
+					placeholder="Pick a date, then navigate months..."
+					@clamp="onClamp"
+				/>
+				<p v-if="wasClamped" class="text-xs text-secondary">
+					Day {{ intendedDay }} not available — showing {{ resolvedDay }}
+				</p>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+				<p class="text-xs text-secondary">
+					Try: pick May 31, then navigate to Feb (clamps to 28/29), then back to March (snaps to 31).
+				</p>
 			</div>
 		`,
 	}),

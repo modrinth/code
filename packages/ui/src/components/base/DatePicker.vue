@@ -71,6 +71,14 @@ const props = withDefaults(
 		clearable?: boolean
 		showIcon?: boolean
 		showToday?: boolean
+		/**
+		 * When true (single mode only), navigating between months/years preserves the
+		 * originally selected day number. If the target month has fewer days, the day
+		 * is clamped to the last valid day, and a `clamp` event is emitted with the
+		 * intended and resolved days. Navigating back to a month that supports the
+		 * original day snaps the selection back.
+		 */
+		preserveDay?: boolean
 		wrapperClass?: string
 		inputClass?: string
 	}>(),
@@ -83,18 +91,61 @@ const props = withDefaults(
 		clearable: true,
 		showIcon: true,
 		showToday: false,
+		preserveDay: false,
 	},
 )
 
 const emit = defineEmits<{
 	change: [value: DatePickerValue | DatePickerValue[]]
 	clear: []
+	clamp: [intendedDay: number, resolvedDay: number]
 }>()
 
 const inputRef = ref<HTMLInputElement>()
 const picker = ref<Instance>()
 const isSyncingFromModel = ref(false)
 const intendedViewMonth = ref<{ month: number; year: number } | null>(null)
+const intendedDay = ref<number | null>(null)
+const isPreservingDay = ref(false)
+
+function getDayFromDateStr(dateStr: string): number | null {
+	const parts = dateStr.split('-')
+	if (parts.length < 3) return null
+	const day = Number.parseInt(parts[2], 10)
+	return Number.isInteger(day) ? day : null
+}
+
+function daysInMonth(month: number, year: number): number {
+	return new Date(year, month + 1, 0).getDate()
+}
+
+function applyPreserveDay(instance: Instance) {
+	if (!props.preserveDay) return
+	if (props.mode !== 'single') return
+	if (intendedDay.value === null) return
+
+	const selected = instance.selectedDates[0]
+	if (!selected) return
+
+	if (
+		selected.getMonth() === instance.currentMonth &&
+		selected.getFullYear() === instance.currentYear
+	) {
+		return
+	}
+
+	const maxDay = daysInMonth(instance.currentMonth, instance.currentYear)
+	const resolvedDay = Math.min(intendedDay.value, maxDay)
+	const newDate = new Date(instance.currentYear, instance.currentMonth, resolvedDay)
+
+	emit('clamp', intendedDay.value, resolvedDay)
+
+	isPreservingDay.value = true
+	instance.setDate(newDate, true)
+	nextTick(() => {
+		isPreservingDay.value = false
+	})
+}
 
 const resolvedDateFormat = computed(
 	() => props.dateFormat ?? (props.enableTime ? 'Y-m-d H:i' : 'Y-m-d'),
@@ -141,7 +192,19 @@ watch(
 			onChange: picker.value.config.onChange,
 			onClose: picker.value.config.onClose,
 			onReady: picker.value.config.onReady,
+			onMonthChange: picker.value.config.onMonthChange,
+			onYearChange: picker.value.config.onYearChange,
 		})
+
+		if (!isPreservingDay.value && props.mode === 'single') {
+			const value = model.value
+			if (typeof value === 'string' && value) {
+				const day = getDayFromDateStr(value)
+				if (day !== null) intendedDay.value = day
+			} else {
+				intendedDay.value = null
+			}
+		}
 
 		syncAltInputState()
 		syncPickerFromModel()
@@ -172,6 +235,23 @@ onMounted(async () => {
 					year: instance.currentYear,
 				}
 			})
+
+			instance.calendarContainer.addEventListener(
+				'keydown',
+				(event) => {
+					const target = event.target as HTMLElement | null
+					if (!target?.matches('input.cur-year')) return
+					if (
+						event.key === 'ArrowLeft' ||
+						event.key === 'ArrowRight' ||
+						event.key === 'Home' ||
+						event.key === 'End'
+					) {
+						event.stopPropagation()
+					}
+				},
+				true,
+			)
 		},
 		onChange: (_selectedDates, dateStr, instance) => {
 			if (isSyncingFromModel.value) return
@@ -200,7 +280,18 @@ onMounted(async () => {
 			emit('clear')
 			emit('change', nextValue)
 		},
+		onMonthChange: (_selectedDates, _dateStr, instance) => {
+			applyPreserveDay(instance)
+		},
+		onYearChange: (_selectedDates, _dateStr, instance) => {
+			applyPreserveDay(instance)
+		},
 	})
+
+	if (props.mode === 'single' && typeof model.value === 'string' && model.value) {
+		const day = getDayFromDateStr(model.value)
+		if (day !== null) intendedDay.value = day
+	}
 
 	syncAltInputState()
 	syncPickerFromModel()
