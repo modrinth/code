@@ -87,6 +87,23 @@ export const MinMaxDates: Story = {
 	}),
 }
 
+export const ShowToday: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref(null)
+			return { value }
+		},
+		template: /* html */ `
+			<div class="flex max-w-sm flex-col gap-2">
+				<DatePicker v-model="value"
+				wrapperClass="w-[300px]" show-today placeholder="Today is highlighted..." />
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const Disabled: Story = {
 	args: {
 		modelValue: '2026-04-27',
