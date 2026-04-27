@@ -1510,6 +1510,7 @@ export namespace Labrinth {
 				id: string
 				issue_id: string
 				key: string
+				jar: string | null
 				file_path: string
 				decompiled_source: string | null
 				data: Record<string, unknown>
