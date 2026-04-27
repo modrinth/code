@@ -14,9 +14,8 @@ import {
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import FilePageLayout from '../../../shared/files-tab/layout.vue'
-import { provideFileManager } from '../../../shared/files-tab/providers/file-manager'
-import type { EditingFile, FileItem } from '../../../shared/files-tab/types'
+import type { EditingFile, FileItem } from '#ui/layouts/shared/files-tab/index.ts'
+import { FilePageLayout, provideFileManager } from '#ui/layouts/shared/files-tab/index.ts'
 
 const props = defineProps<{
 	showDebugInfo?: boolean

@@ -4,7 +4,7 @@ import { computed, reactive, type Ref } from 'vue'
 
 import { type BusyReason, injectModrinthClient } from '#ui/providers'
 
-import { defineMessage } from './i18n'
+import { defineMessage } from '../i18n'
 
 type ProgressKey = `${string}:${'create' | 'restore'}`
 

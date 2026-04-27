@@ -37,7 +37,7 @@ import {
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
-import WorldCard from './components/WorldCard.vue'
+import WorldCard from '#ui/components/servers/worlds/WorldCard.vue'
 
 const messages = defineMessages({
 	worldSlotName: {

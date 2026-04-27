@@ -1,7 +1,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
+import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
 import {
 	injectAppBackup,
 	injectModrinthClient,

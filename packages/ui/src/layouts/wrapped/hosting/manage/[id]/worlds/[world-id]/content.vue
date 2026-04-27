@@ -16,19 +16,19 @@ import {
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
-import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
-import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
-import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
-import ContentPageLayout from '../../../shared/content-tab/layout.vue'
-import type { ContentModpackData } from '../../../shared/content-tab/providers/content-manager'
-import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
+import ConfirmModpackUpdateModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
+import ConfirmUnlinkModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
+import ContentUpdaterModal from '#ui/layouts/shared/content-tab/components/modals/ContentUpdaterModal.vue'
+import ModpackContentModal from '#ui/layouts/shared/content-tab/components/modals/ModpackContentModal.vue'
+import ContentPageLayout from '#ui/layouts/shared/content-tab/layout.vue'
+import type { ContentModpackData } from '#ui/layouts/shared/content-tab/providers/content-manager'
+import { provideContentManager } from '#ui/layouts/shared/content-tab/providers/content-manager'
 import type {
 	ContentItem,
 	ContentModpackCardCategory,
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
-} from '../../../shared/content-tab/types'
+} from '#ui/layouts/shared/content-tab/types'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
 
