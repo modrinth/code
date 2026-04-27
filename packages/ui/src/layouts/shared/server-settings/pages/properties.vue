@@ -317,8 +317,10 @@ const { canUseAdvancedSettings, canUsePowerActions, permissionDeniedMessage } =
 const advancedActionTooltip = computed(() =>
 	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
 )
-const filesTabLink = computed(
-	() => `/hosting/manage/${encodeURIComponent(serverId)}/files?path=/&editing=server.properties`,
+const filesTabLink = computed(() =>
+	worldId.value
+		? `/hosting/manage/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId.value)}/files?path=/&editing=server.properties`
+		: `/hosting/manage/${encodeURIComponent(serverId)}/worlds`,
 )
 const serverSettings = injectServerSettings(null)
 
