@@ -3002,6 +3002,9 @@
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
   },
+  "servers.manage.worlds.meta.title": {
+    "message": "Worlds - {server} - Modrinth"
+  },
   "servers.notice.actions": {
     "message": "Actions"
   },

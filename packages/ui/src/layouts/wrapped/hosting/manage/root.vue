@@ -478,6 +478,139 @@ const settingsHintMessages = defineMessages({
 })
 
 const messages = defineMessages({
+	serverPreparingTitle: {
+		id: 'servers.manage.status.preparing.title',
+		defaultMessage: "We're getting your server ready",
+	},
+	serverPreparingDescription: {
+		id: 'servers.manage.status.preparing.description',
+		defaultMessage: "Your server's hardware is being prepared and will be available shortly!",
+	},
+	serverUpgradingTitle: {
+		id: 'servers.manage.status.upgrading.title',
+		defaultMessage: 'Server upgrading',
+	},
+	serverUpgradingDescription: {
+		id: 'servers.manage.status.upgrading.description',
+		defaultMessage:
+			"Your server's hardware is currently being upgraded and will be back online shortly!",
+	},
+	serverSuspendedTitle: {
+		id: 'servers.manage.status.suspended.title',
+		defaultMessage: 'Server suspended',
+	},
+	suspendedCancelledDescription: {
+		id: 'servers.manage.status.suspended.cancelled-description',
+		defaultMessage:
+			'Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error.',
+	},
+	suspendedReasonDescription: {
+		id: 'servers.manage.status.suspended.reason-description',
+		defaultMessage:
+			'Your server has been suspended: {reason}\nContact Modrinth Support if you believe this is an error.',
+	},
+	suspendedDescription: {
+		id: 'servers.manage.status.suspended.description',
+		defaultMessage:
+			'Your server has been suspended.\nContact Modrinth Support if you believe this is an error.',
+	},
+	generalErrorTitle: {
+		id: 'servers.manage.error.general.title',
+		defaultMessage: 'An error occurred.',
+	},
+	genericErrorMessage: {
+		id: 'servers.manage.error.general.message',
+		defaultMessage: 'An unexpected error occurred.',
+	},
+	contactSupportDescription: {
+		id: 'servers.manage.error.contact-support',
+		defaultMessage: 'Please contact Modrinth Support.',
+	},
+	nodeUnavailableTitle: {
+		id: 'servers.manage.error.node-unavailable.title',
+		defaultMessage: 'Server Node Unavailable',
+	},
+	nodeUnavailableDescription: {
+		id: 'servers.manage.error.node-unavailable.description',
+		defaultMessage:
+			"Your server's node, where your Modrinth Server is physically hosted, is not accessible at the moment. We are working to resolve the issue as quickly as possible.",
+	},
+	nodeUnavailableDataDescription: {
+		id: 'servers.manage.error.node-unavailable.data-description',
+		defaultMessage:
+			'Your data is safe and will not be lost, and your server will be back online as soon as the issue is resolved.',
+	},
+	nodeUnavailableSupportDescription: {
+		id: 'servers.manage.error.node-unavailable.support-description',
+		defaultMessage:
+			"If reloading does not work initially, please contact Modrinth Support via the chat bubble in the bottom right corner and we'll be happy to help.",
+	},
+	installInvalidVersionDescription: {
+		id: 'servers.manage.error.install.invalid-version.description',
+		defaultMessage:
+			'An invalid loader or Minecraft version was specified and could not be installed.',
+	},
+	installRecentMinecraftVersionNotice: {
+		id: 'servers.manage.error.install.invalid-version.recent-minecraft',
+		defaultMessage:
+			'If this version of Minecraft was released recently, please check if Modrinth Hosting supports it.',
+	},
+	installModpackCompatibilityNotice: {
+		id: 'servers.manage.error.install.invalid-version.modpack-compatibility',
+		defaultMessage:
+			"If you've installed a modpack, it may have been packaged incorrectly or may not be compatible with the loader.",
+	},
+	installChangeLoaderNotice: {
+		id: 'servers.manage.error.install.invalid-version.change-loader',
+		defaultMessage:
+			'Your server may need to be reinstalled with a valid mod loader and version. You can change the loader by clicking the "Change Loader" button.',
+	},
+	installSupportNotice: {
+		id: 'servers.manage.error.install.invalid-version.support',
+		defaultMessage: "If you're stuck, please contact Modrinth Support with the information below:",
+	},
+	installInternalErrorDescription: {
+		id: 'servers.manage.error.install.internal.description',
+		defaultMessage:
+			"An internal error occurred while installing your server. Don't fret - try reinstalling your server, and if the problem persists, please contact Modrinth support with your server's debug information.",
+	},
+	installUnsupportedVersionDescription: {
+		id: 'servers.manage.error.install.unsupported-version.description',
+		defaultMessage:
+			"An error occurred while installing your server because Modrinth Hosting does not support the version of Minecraft or the loader you specified. Try reinstalling your server with a different version or loader, and if the problem persists, please contact Modrinth Support with your server's debug information.",
+	},
+	installationErrorTitle: {
+		id: 'servers.manage.error.install.title',
+		defaultMessage: 'Installation error',
+	},
+	unknownError: {
+		id: 'servers.manage.error.unknown',
+		defaultMessage: 'Unknown error',
+	},
+	copyDebugInfo: {
+		id: 'servers.manage.error.copy-debug-info',
+		defaultMessage: 'Copy Debug Info',
+	},
+	openInstallationLog: {
+		id: 'servers.manage.error.open-installation-log',
+		defaultMessage: 'Open Installation Log',
+	},
+	changeLoader: {
+		id: 'servers.manage.error.change-loader',
+		defaultMessage: 'Change Loader',
+	},
+	websocketError: {
+		id: 'servers.manage.websocket.error',
+		defaultMessage: 'Something went wrong...',
+	},
+	websocketReconnecting: {
+		id: 'servers.manage.websocket.reconnecting',
+		defaultMessage: "Hang on, we're reconnecting to your server.",
+	},
+	serverDataTitle: {
+		id: 'servers.manage.debug.server-data',
+		defaultMessage: 'Server data',
+	},
 	serverSettings: {
 		id: 'servers.manage.server-settings',
 		defaultMessage: 'Server settings',
@@ -502,6 +635,67 @@ const messages = defineMessages({
 		id: 'servers.manage.nav.backups',
 		defaultMessage: 'Backups',
 	},
+	errorDismissingNotice: {
+		id: 'servers.manage.notice.dismiss-error',
+		defaultMessage: 'Error dismissing notice',
+	},
+	failedToRetryInstallation: {
+		id: 'servers.manage.install.retry-error',
+		defaultMessage: 'Failed to retry installation',
+	},
+	serverIdLabel: {
+		id: 'servers.manage.error-details.server-id',
+		defaultMessage: 'Server ID',
+	},
+	nodeLabel: {
+		id: 'servers.manage.error-details.node',
+		defaultMessage: 'Node',
+	},
+	errorMessageLabel: {
+		id: 'servers.manage.error-details.error-message',
+		defaultMessage: 'Error message',
+	},
+	timestampLabel: {
+		id: 'servers.manage.error-details.timestamp',
+		defaultMessage: 'Timestamp',
+	},
+	errorNameLabel: {
+		id: 'servers.manage.error-details.error-name',
+		defaultMessage: 'Error Name',
+	},
+	originalErrorLabel: {
+		id: 'servers.manage.error-details.original-error',
+		defaultMessage: 'Original Error',
+	},
+	stackTraceLabel: {
+		id: 'servers.manage.error-details.stack-trace',
+		defaultMessage: 'Stack Trace',
+	},
+	unknownLabel: {
+		id: 'servers.manage.error-details.unknown',
+		defaultMessage: 'Unknown',
+	},
+	nodePingFailed: {
+		id: 'servers.manage.error.node-ping-failed',
+		defaultMessage: 'Unable to reach node. Ping test failed.',
+	},
+	goToBillingSettings: {
+		id: 'servers.manage.action.go-to-billing-settings',
+		defaultMessage: 'Go to billing settings',
+	},
+	goBackToAllServers: {
+		id: 'servers.manage.action.go-back-to-all-servers',
+		defaultMessage: 'Go back to all servers',
+	},
+	reload: {
+		id: 'servers.manage.action.reload',
+		defaultMessage: 'Reload',
+	},
+	debugInfo: {
+		id: 'servers.manage.error.debug-info',
+		defaultMessage:
+			'Server ID: {serverId}\nError: {error}\nKind: {kind}\nProject ID: {projectId}\nVersion ID: {versionId}\nLog: {log}',
+	},
 })
 
 // disabled, keeping the animation logic cos it's really nice and we might want to re-enable in future
@@ -520,8 +714,14 @@ const isLoading = ref(true)
 const isMounted = ref(true)
 const copied = ref(false)
 const installError = ref<Error | null>(null)
-const errorTitle = ref('Error')
-const errorMessage = ref('An unexpected error occurred.')
+type InstallErrorTitle = 'generic' | 'installation'
+const errorTitle = ref<InstallErrorTitle>('generic')
+const errorTitleLabel = computed(() =>
+	errorTitle.value === 'installation'
+		? formatMessage(messages.installationErrorTitle)
+		: formatMessage(messages.generalErrorTitle),
+)
+const errorMessage = ref(formatMessage(messages.genericErrorMessage))
 const errorLog = ref('')
 const errorLogFile = ref('')
 const isOnboarding = computed(() => serverData.value?.flows?.intro)
@@ -824,7 +1024,7 @@ const surveyNotice = computed(() => serverData.value?.notices?.find((n) => n.lev
 async function dismissNotice(noticeId: number) {
 	await client.archon.servers_v0.dismissNotice(props.serverId, noticeId).catch((err) => {
 		addNotification({
-			title: 'Error dismissing notice',
+			title: formatMessage(messages.errorDismissingNotice),
 			text: err,
 			type: 'error',
 		})
@@ -928,7 +1128,7 @@ async function handleContentRetry() {
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to retry installation',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToRetryInstallation),
 		})
 	}
 }
@@ -978,9 +1178,9 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 		case 'err': {
 			console.log('failed to install')
 			console.log(data)
-			errorTitle.value = 'Installation error'
-			errorMessage.value = data.reason ?? 'Unknown error'
-			installError.value = new Error(data.reason ?? 'Unknown error')
+			errorTitle.value = 'installation'
+			errorMessage.value = data.reason ?? formatMessage(messages.unknownError)
+			installError.value = new Error(errorMessage.value)
 
 			try {
 				let files = await client.kyros.files_v0.listDirectory('/', 1, 100)
@@ -1038,8 +1238,8 @@ const onReinstall = async (
 	}
 
 	installError.value = null
-	errorTitle.value = 'Error'
-	errorMessage.value = 'An unexpected error occurred.'
+	errorTitle.value = 'generic'
+	errorMessage.value = formatMessage(messages.genericErrorMessage)
 
 	modrinthServersConsole.clear()
 
@@ -1108,62 +1308,64 @@ const nodeAccessible = ref(true)
 
 const nodeUnavailableDetails = computed(() => [
 	{
-		label: 'Server ID',
+		label: formatMessage(messages.serverIdLabel),
 		value: props.serverId,
 		type: 'inline' as const,
 	},
 	{
-		label: 'Node',
+		label: formatMessage(messages.nodeLabel),
 		value:
 			(serverError.value?.responseData as { hostname?: string } | undefined)?.hostname ??
 			serverData.value?.datacenter ??
-			'Unknown',
+			formatMessage(messages.unknownLabel),
 		type: 'inline' as const,
 	},
 	{
-		label: 'Error message',
+		label: formatMessage(messages.errorMessageLabel),
 		value: nodeAccessible.value
-			? (serverError.value?.message ?? 'Unknown')
-			: 'Unable to reach node. Ping test failed.',
+			? (serverError.value?.message ?? formatMessage(messages.unknownLabel))
+			: formatMessage(messages.nodePingFailed),
 		type: 'block' as const,
 	},
 ])
 
 const suspendedDescription = computed(() => {
 	if (serverData.value?.suspension_reason === 'cancelled') {
-		return 'Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error.'
+		return formatMessage(messages.suspendedCancelledDescription)
 	}
 	if (serverData.value?.suspension_reason) {
-		return `Your server has been suspended: ${serverData.value.suspension_reason}\nContact Modrinth Support if you believe this is an error.`
+		return formatMessage(messages.suspendedReasonDescription, {
+			reason: serverData.value.suspension_reason,
+		})
 	}
-	return 'Your server has been suspended.\nContact Modrinth Support if you believe this is an error.'
+	return formatMessage(messages.suspendedDescription)
 })
 
 const generalErrorDetails = computed(() => [
 	{
-		label: 'Server ID',
+		label: formatMessage(messages.serverIdLabel),
 		value: props.serverId,
 		type: 'inline' as const,
 	},
 	{
-		label: 'Timestamp',
+		label: formatMessage(messages.timestampLabel),
 		value: String(new Date().toISOString()),
 		type: 'inline' as const,
 	},
 	{
-		label: 'Error Name',
+		label: formatMessage(messages.errorNameLabel),
 		value: serverError.value?.name,
 		type: 'inline' as const,
 	},
 	{
-		label: 'Error Message',
+		label: formatMessage(messages.errorMessageLabel),
 		value: serverError.value?.message,
 		type: 'block' as const,
 	},
 	...(serverError.value?.originalError
 		? [
 				{
-					label: 'Original Error',
+					label: formatMessage(messages.originalErrorLabel),
 					value: String(serverError.value.originalError),
 					type: 'hidden' as const,
 				},
@@ -1172,7 +1374,7 @@ const generalErrorDetails = computed(() => [
 	...(serverError.value?.stack
 		? [
 				{
-					label: 'Stack Trace',
+					label: formatMessage(messages.stackTraceLabel),
 					value: serverError.value.stack,
 					type: 'hidden' as const,
 				},
@@ -1181,26 +1383,33 @@ const generalErrorDetails = computed(() => [
 ])
 
 const suspendedAction = computed(() => ({
-	label: 'Go to billing settings',
+	label: formatMessage(messages.goToBillingSettings),
 	onClick: () => props.navigateToBilling?.(),
 	color: 'brand' as const,
 }))
 
 const generalErrorAction = computed(() => ({
-	label: 'Go back to all servers',
+	label: formatMessage(messages.goBackToAllServers),
 	onClick: () => props.navigateToServers?.(),
 	color: 'brand' as const,
 }))
 
 const nodeUnavailableAction = computed(() => ({
-	label: 'Reload',
+	label: formatMessage(messages.reload),
 	onClick: () => props.reloadPage(),
 	color: 'brand' as const,
 	disabled: false,
 }))
 
 const copyServerDebugInfo = () => {
-	const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}\nLog: ${errorLog.value}`
+	const debugInfo = formatMessage(messages.debugInfo, {
+		serverId: serverData.value?.server_id ?? '',
+		error: errorMessage.value,
+		kind: serverData.value?.upstream?.kind ?? '',
+		projectId: serverData.value?.upstream?.project_id ?? '',
+		versionId: serverData.value?.upstream?.version_id ?? '',
+		log: errorLog.value,
+	})
 	navigator.clipboard.writeText(debugInfo)
 	copied.value = true
 	setTimeout(() => {

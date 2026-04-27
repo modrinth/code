@@ -3191,6 +3191,15 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Using {projectTitle}"
   },
+  "servers.manage.action.go-back-to-all-servers": {
+    "defaultMessage": "Go back to all servers"
+  },
+  "servers.manage.action.go-to-billing-settings": {
+    "defaultMessage": "Go to billing settings"
+  },
+  "servers.manage.action.reload": {
+    "defaultMessage": "Reload"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Checking for new servers..."
   },
@@ -3203,14 +3212,101 @@
   "servers.manage.contact-support-button": {
     "defaultMessage": "Contact Modrinth Support"
   },
+  "servers.manage.debug.server-data": {
+    "defaultMessage": "Server data"
+  },
+  "servers.manage.error-details.error-message": {
+    "defaultMessage": "Error message"
+  },
+  "servers.manage.error-details.error-name": {
+    "defaultMessage": "Error Name"
+  },
+  "servers.manage.error-details.node": {
+    "defaultMessage": "Node"
+  },
+  "servers.manage.error-details.original-error": {
+    "defaultMessage": "Original Error"
+  },
+  "servers.manage.error-details.server-id": {
+    "defaultMessage": "Server ID"
+  },
+  "servers.manage.error-details.stack-trace": {
+    "defaultMessage": "Stack Trace"
+  },
+  "servers.manage.error-details.timestamp": {
+    "defaultMessage": "Timestamp"
+  },
+  "servers.manage.error-details.unknown": {
+    "defaultMessage": "Unknown"
+  },
   "servers.manage.error.alert-notice": {
     "defaultMessage": "Our systems automatically alert our team when there's an issue. We are already working on getting them back online."
+  },
+  "servers.manage.error.change-loader": {
+    "defaultMessage": "Change Loader"
+  },
+  "servers.manage.error.contact-support": {
+    "defaultMessage": "Please contact Modrinth Support."
+  },
+  "servers.manage.error.copy-debug-info": {
+    "defaultMessage": "Copy Debug Info"
+  },
+  "servers.manage.error.debug-info": {
+    "defaultMessage": "Server ID: {serverId}\nError: {error}\nKind: {kind}\nProject ID: {projectId}\nVersion ID: {versionId}\nLog: {log}"
   },
   "servers.manage.error.description": {
     "defaultMessage": "We may have temporary issues with our servers."
   },
   "servers.manage.error.details": {
     "defaultMessage": "Error details:"
+  },
+  "servers.manage.error.general.message": {
+    "defaultMessage": "An unexpected error occurred."
+  },
+  "servers.manage.error.general.title": {
+    "defaultMessage": "An error occurred."
+  },
+  "servers.manage.error.install.internal.description": {
+    "defaultMessage": "An internal error occurred while installing your server. Don't fret - try reinstalling your server, and if the problem persists, please contact Modrinth support with your server's debug information."
+  },
+  "servers.manage.error.install.invalid-version.change-loader": {
+    "defaultMessage": "Your server may need to be reinstalled with a valid mod loader and version. You can change the loader by clicking the \"Change Loader\" button."
+  },
+  "servers.manage.error.install.invalid-version.description": {
+    "defaultMessage": "An invalid loader or Minecraft version was specified and could not be installed."
+  },
+  "servers.manage.error.install.invalid-version.modpack-compatibility": {
+    "defaultMessage": "If you've installed a modpack, it may have been packaged incorrectly or may not be compatible with the loader."
+  },
+  "servers.manage.error.install.invalid-version.recent-minecraft": {
+    "defaultMessage": "If this version of Minecraft was released recently, please check if Modrinth Hosting supports it."
+  },
+  "servers.manage.error.install.invalid-version.support": {
+    "defaultMessage": "If you're stuck, please contact Modrinth Support with the information below:"
+  },
+  "servers.manage.error.install.title": {
+    "defaultMessage": "Installation error"
+  },
+  "servers.manage.error.install.unsupported-version.description": {
+    "defaultMessage": "An error occurred while installing your server because Modrinth Hosting does not support the version of Minecraft or the loader you specified. Try reinstalling your server with a different version or loader, and if the problem persists, please contact Modrinth Support with your server's debug information."
+  },
+  "servers.manage.error.node-ping-failed": {
+    "defaultMessage": "Unable to reach node. Ping test failed."
+  },
+  "servers.manage.error.node-unavailable.data-description": {
+    "defaultMessage": "Your data is safe and will not be lost, and your server will be back online as soon as the issue is resolved."
+  },
+  "servers.manage.error.node-unavailable.description": {
+    "defaultMessage": "Your server's node, where your Modrinth Server is physically hosted, is not accessible at the moment. We are working to resolve the issue as quickly as possible."
+  },
+  "servers.manage.error.node-unavailable.support-description": {
+    "defaultMessage": "If reloading does not work initially, please contact Modrinth Support via the chat bubble in the bottom right corner and we'll be happy to help."
+  },
+  "servers.manage.error.node-unavailable.title": {
+    "defaultMessage": "Server Node Unavailable"
+  },
+  "servers.manage.error.open-installation-log": {
+    "defaultMessage": "Open Installation Log"
   },
   "servers.manage.error.queue-notice": {
     "defaultMessage": "If you recently purchased your Modrinth Hosting server, it is currently in a queue and will appear here as soon as it's ready. <warning>Do not attempt to purchase a new server.</warning>"
@@ -3221,14 +3317,38 @@
   "servers.manage.error.title": {
     "defaultMessage": "Servers could not be loaded"
   },
+  "servers.manage.error.unknown": {
+    "defaultMessage": "Unknown error"
+  },
   "servers.manage.handle-error.title": {
     "defaultMessage": "An error occurred"
+  },
+  "servers.manage.install.retry-error": {
+    "defaultMessage": "Failed to retry installation"
+  },
+  "servers.manage.nav.backups": {
+    "defaultMessage": "Backups"
+  },
+  "servers.manage.nav.content": {
+    "defaultMessage": "Content"
+  },
+  "servers.manage.nav.files": {
+    "defaultMessage": "Files"
+  },
+  "servers.manage.nav.overview": {
+    "defaultMessage": "Overview"
+  },
+  "servers.manage.nav.worlds": {
+    "defaultMessage": "Worlds"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
   },
   "servers.manage.no-servers-found": {
     "defaultMessage": "No servers found."
+  },
+  "servers.manage.notice.dismiss-error": {
+    "defaultMessage": "Error dismissing notice"
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Payment information is still loading. Opening checkout as soon as it is ready."
@@ -3260,6 +3380,9 @@
   "servers.manage.search-placeholder": {
     "defaultMessage": "Search {count} {count, plural, one {server} other {servers}}..."
   },
+  "servers.manage.server-settings": {
+    "defaultMessage": "Server settings"
+  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3271,6 +3394,69 @@
   },
   "servers.manage.settings-hint.title": {
     "defaultMessage": "Your server settings have moved"
+  },
+  "servers.manage.status.preparing.description": {
+    "defaultMessage": "Your server's hardware is being prepared and will be available shortly!"
+  },
+  "servers.manage.status.preparing.title": {
+    "defaultMessage": "We're getting your server ready"
+  },
+  "servers.manage.status.suspended.cancelled-description": {
+    "defaultMessage": "Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error."
+  },
+  "servers.manage.status.suspended.description": {
+    "defaultMessage": "Your server has been suspended.\nContact Modrinth Support if you believe this is an error."
+  },
+  "servers.manage.status.suspended.reason-description": {
+    "defaultMessage": "Your server has been suspended: {reason}\nContact Modrinth Support if you believe this is an error."
+  },
+  "servers.manage.status.suspended.title": {
+    "defaultMessage": "Server suspended"
+  },
+  "servers.manage.status.upgrading.description": {
+    "defaultMessage": "Your server's hardware is currently being upgraded and will be back online shortly!"
+  },
+  "servers.manage.status.upgrading.title": {
+    "defaultMessage": "Server upgrading"
+  },
+  "servers.manage.websocket.error": {
+    "defaultMessage": "Something went wrong..."
+  },
+  "servers.manage.websocket.reconnecting": {
+    "defaultMessage": "Hang on, we're reconnecting to your server."
+  },
+  "servers.manage.worlds.card.active": {
+    "defaultMessage": "Active"
+  },
+  "servers.manage.worlds.card.create": {
+    "defaultMessage": "Create world"
+  },
+  "servers.manage.worlds.card.created": {
+    "defaultMessage": "Created"
+  },
+  "servers.manage.worlds.card.edit": {
+    "defaultMessage": "Edit world"
+  },
+  "servers.manage.worlds.card.empty-description": {
+    "defaultMessage": "New world instance"
+  },
+  "servers.manage.worlds.card.installed-content": {
+    "defaultMessage": "Installed content"
+  },
+  "servers.manage.worlds.card.last-active": {
+    "defaultMessage": "Last active"
+  },
+  "servers.manage.worlds.card.none": {
+    "defaultMessage": "None"
+  },
+  "servers.manage.worlds.card.not-tracked-yet": {
+    "defaultMessage": "Not tracked yet"
+  },
+  "servers.manage.worlds.card.settings": {
+    "defaultMessage": "World settings"
+  },
+  "servers.manage.worlds.slot-name": {
+    "defaultMessage": "World #{index}"
   },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} remaining..."
