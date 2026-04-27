@@ -754,10 +754,7 @@
 										},
 										{
 											id: 'moderation-checklist',
-											action: () => {
-												moderationStore.setSingleProject(project.id)
-												showModerationChecklist = true
-											},
+											action: openModerationChecklistFromMenu,
 											color: 'orange',
 											hoverOnly: true,
 											shown:
@@ -1046,7 +1043,7 @@
 			>
 				<ModerationChecklist
 					:collapsed="collapsedModerationChecklist"
-					@exit="showModerationChecklist = false"
+					@exit="setModerationChecklistOpen(false)"
 					@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
 				/>
 			</div>
@@ -1145,7 +1142,11 @@ import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
-import { useModerationStore } from '~/store/moderation.ts'
+import {
+	loadChecklistOpenState,
+	saveChecklistOpenState,
+} from '~/services/moderation-checklist-storage.ts'
+import { useModerationQueue } from '~/services/moderation-queue.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
@@ -1156,7 +1157,7 @@ const data = useNuxtApp()
 const route = useRoute()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const config = useRuntimeConfig()
-const moderationStore = useModerationStore()
+const moderationQueue = useModerationQueue()
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 
@@ -2514,15 +2515,83 @@ async function copyPermalink() {
 
 const collapsedChecklist = ref(false)
 
-const showModerationChecklist = useLocalStorage(
-	`show-moderation-checklist-${project.value?.id ?? 'unknown'}`,
-	false,
-)
+const showModerationChecklist = ref(false)
 const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
 
-if (import.meta.client && history && history.state && history.state.showChecklist) {
-	showModerationChecklist.value = true
+function consumeShowChecklistHistoryState() {
+	if (!import.meta.client) return false
+	if (!window.history?.state?.showChecklist) return false
+
+	const state = { ...window.history.state }
+	delete state.showChecklist
+	window.history.replaceState(state, '', window.location.href)
+	return true
 }
+
+function setModerationChecklistOpen(open, projectId = project.value?.id) {
+	showModerationChecklist.value = open
+	if (projectId) {
+		void saveChecklistOpenState(projectId, open)
+	}
+}
+
+function isProjectInActiveModerationQueue(projectId = project.value?.id) {
+	return (
+		!!projectId &&
+		moderationQueue.isQueueMode &&
+		moderationQueue.currentQueue.items.includes(projectId)
+	)
+}
+
+async function openModerationChecklistFromMenu() {
+	const projectId = project.value?.id
+	if (!projectId) return
+
+	await moderationQueue.ready
+	if (!isProjectInActiveModerationQueue(projectId)) {
+		await moderationQueue.setSingleProject(projectId)
+	}
+
+	setModerationChecklistOpen(true)
+}
+
+watch(
+	() => project.value?.id,
+	async (projectId, _previousProjectId, onCleanup) => {
+		if (!import.meta.client || !projectId) return
+
+		let cancelled = false
+		onCleanup(() => {
+			cancelled = true
+		})
+
+		const openedFromNavigation = consumeShowChecklistHistoryState()
+		await moderationQueue.ready
+		if (cancelled) return
+
+		if (openedFromNavigation) {
+			setModerationChecklistOpen(true)
+			return
+		}
+
+		const storedOpen = await loadChecklistOpenState(projectId)
+		if (cancelled) return
+
+		if (storedOpen !== null) {
+			showModerationChecklist.value = storedOpen
+			return
+		}
+
+		const shouldRecoverFromQueue =
+			moderationQueue.isQueueMode && moderationQueue.getCurrentProjectId() === projectId
+		showModerationChecklist.value = shouldRecoverFromQueue
+
+		if (shouldRecoverFromQueue) {
+			void saveChecklistOpenState(projectId, true)
+		}
+	},
+	{ immediate: true },
+)
 
 function closeDownloadModal(event) {
 	downloadModal.value.hide(event)

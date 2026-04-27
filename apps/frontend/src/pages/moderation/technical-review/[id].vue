@@ -246,8 +246,14 @@ const reviewItem = computed(() => {
 	}
 })
 
-function handleMarkComplete(_projectId: string) {
-	queryClient.invalidateQueries({ queryKey: ['tech-reviews'] })
+async function handleMarkComplete(projectId: string) {
+	await Promise.all([
+		queryClient.invalidateQueries({ queryKey: ['tech-reviews'] }),
+		queryClient.invalidateQueries({ queryKey: ['tech-review-project-report', projectId] }),
+		queryClient.invalidateQueries({ queryKey: ['project', projectId] }),
+		queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] }),
+		queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] }),
+	])
 }
 
 const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
