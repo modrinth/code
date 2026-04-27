@@ -8,14 +8,6 @@ import { useRouter } from 'vue-router'
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { useReadyState } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import {
-	injectModrinthClient,
-	injectModrinthServerContext,
-	injectNotificationManager,
-	injectServerSettingsModal,
-} from '#ui/providers'
-import { commonMessages } from '#ui/utils/common-messages'
-
 import ConfirmModpackUpdateModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '#ui/layouts/shared/content-tab/components/modals/ContentUpdaterModal.vue'
@@ -29,6 +21,13 @@ import type {
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
 } from '#ui/layouts/shared/content-tab/types'
+import {
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+	injectServerSettingsModal,
+} from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
 

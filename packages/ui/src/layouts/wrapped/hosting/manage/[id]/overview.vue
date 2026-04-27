@@ -40,11 +40,10 @@ import type { Mclogs } from '@modrinth/api-client'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
+import ServerManageStats from '#ui/components/servers/ServerManageStats.vue'
 import { useModrinthServersConsole } from '#ui/composables'
 import { ConsolePageLayout, provideConsoleManager } from '#ui/layouts/shared/console'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
-
-import ServerManageStats from '#ui/components/servers/ServerManageStats.vue'
 
 const props = withDefaults(
 	defineProps<{

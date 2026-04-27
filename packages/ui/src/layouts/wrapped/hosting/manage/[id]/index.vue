@@ -401,6 +401,7 @@ import {
 	provideServerSettingsModal,
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
+
 import ServerOnboardingPanelPage from './onboarding.vue'
 
 interface Tab {

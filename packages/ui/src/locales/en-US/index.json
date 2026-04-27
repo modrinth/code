@@ -3425,6 +3425,18 @@
   "servers.manage.websocket.reconnecting": {
     "defaultMessage": "Hang on, we're reconnecting to your server."
   },
+  "servers.manage.world.all-worlds": {
+    "defaultMessage": "All worlds"
+  },
+  "servers.manage.world.fallback-name": {
+    "defaultMessage": "World"
+  },
+  "servers.manage.world.last-active": {
+    "defaultMessage": "Last active {time}"
+  },
+  "servers.manage.world.settings": {
+    "defaultMessage": "World settings"
+  },
   "servers.manage.worlds.card.active": {
     "defaultMessage": "Active"
   },
