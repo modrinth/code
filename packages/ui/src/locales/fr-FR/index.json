@@ -2073,7 +2073,7 @@
     "defaultMessage": "Toutes les fonctionnalités sont côté client et sont compatibles avec les serveurs vanilla."
   },
   "project.environment.client-only.title": {
-    "defaultMessage": "Client uniquement "
+    "defaultMessage": "Client uniquement"
   },
   "project.environment.client-or-server-prefers-both.description": {
     "defaultMessage": "Possède certaines fonctionnalités côté client et serveur, même si ce n'est que partiellement. L'installer sur les deux conduit à la meilleure expérience."
@@ -2091,7 +2091,7 @@
     "defaultMessage": "Toutes les fonctionnalités sont effectuées côté serveur et sont compatibles avec les clients vanille. Ne fonctionne que sur des serveurs dédiés."
   },
   "project.environment.dedicated-server-only.title": {
-    "defaultMessage": "Serveur uniquement "
+    "defaultMessage": "Serveur uniquement"
   },
   "project.environment.server-only-client-optional.description": {
     "defaultMessage": "La plupart des fonctionnalités sont côté serveur, mais son installation sur le client permet des fonctionnalités améliorées."
@@ -3044,6 +3044,9 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "Quelle quantité de mémoire vive souhaitez-vous donner à votre serveur ?"
   },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "Mémoire vive"
+  },
   "servers.region.north-america": {
     "defaultMessage": "Amérique du Nord"
   },
@@ -3138,7 +3141,7 @@
     "defaultMessage": "{matches, plural, =0 {Aucune langue ne correspond} one {# langue correspond} other {# langues correspondent}} à votre recherche."
   },
   "settings.language.languages.search.no-results": {
-    "defaultMessage": "Aucune langue correspond à votre recherche. "
+    "defaultMessage": "Aucune langue correspond à votre recherche."
   },
   "settings.language.platform.app": {
     "defaultMessage": "l'appli"

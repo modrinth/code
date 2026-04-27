@@ -3155,6 +3155,12 @@
   "settings.billing.interval.monthly": {
     "message": "havi"
   },
+  "settings.billing.interval.quarter": {
+    "message": "negyedév"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "negyedéves"
+  },
   "settings.billing.interval.year": {
     "message": "év"
   },
@@ -3266,14 +3272,71 @@
   "settings.billing.pyro.resubscribe.error.text": {
     "message": "Hiba történt a Modrinth szerverre való újbóli feliratkozás során."
   },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Hiba az újbóli feliratkozáskor"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Amennyiben a szervere jelenleg le van mondva, akár 10-15 percig is eltarthat, hogy a szerver felálljon."
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "Újra feliratkozási kérelem benyújtva"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "Szerver előfizetés sikeresen újrakezdve"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "Sikertelen fizetés. Kérjük frissítse a fizetési opcióját, majd próbálja újra."
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "Fizetése feldolgozás alatt áll. A szervere aktiválódik amint a fizetés sikeres."
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB SSD"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} GB Swap"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Modirinth szerver feliratkozások kezelése"
+  },
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Szerver Előfizetések"
+  },
+  "settings.billing.renews": {
+    "message": "Megújul: {date}"
+  },
+  "settings.billing.resubscribe": {
+    "message": "Feliratkozás újra"
+  },
+  "settings.billing.since": {
+    "message": "{date} óta"
+  },
+  "settings.billing.subscribe": {
+    "message": "Feliratkozás"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Modirinth feliratkozások kezelése"
   },
   "settings.billing.subscription.title": {
     "message": "Előfizetések"
   },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Váltás {interval} számlázásra"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Váltás {interval} számlázásra "
+  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "A havi számlázás évente további {amount} költséggel jár"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "{interval} számlázásra vált {date} napon"
+  },
+  "settings.billing.update-method": {
+    "message": "Fizetési mód változtatása"
+  },
+  "settings.billing.upgrade": {
+    "message": "Csomagváltás"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "A fejlesztői mód letiltása"
@@ -3353,6 +3416,18 @@
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Modrinth App promóciók elrejtése"
   },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Balra igazított oldalsáv oldalakon"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "A tartalom bal oldalára igazítja az oldalsávot."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "A keresési eredmények jobb oldalára igazítja a szűrőket."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Jobbra igazított szűrők oldalakon"
+  },
   "settings.display.theme.description": {
     "message": "Válaszd ki a Modrinth számára a kívánt színsémát ezen az eszközön."
   },
@@ -3364,6 +3439,9 @@
   },
   "settings.pats.action.create": {
     "message": "PAT létrehozása"
+  },
+  "settings.pats.description": {
+    "message": "A PAT-ek a Modrinth API-hoz való hozzáférést biztosítják. Bármikor létrehozhatók és visszavonhatók. További információkért látogasson el a <doc-link>Modrinth API dokumentációjára</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT létrehozása"

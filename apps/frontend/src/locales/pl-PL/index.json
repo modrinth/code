@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Utwórz link afiliacyjny"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Nie znaleziono żadnych kodów afiliacyjnych."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Błąd podczas ładowania linków afiliacyjnych"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Szukaj linku afiliacyjnego..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "z {count} {count, plural, one {projektu} other {projektów}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Wszystkie pobrania"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Wszyscy obserwujący"
   },
   "dashboard.collections.button.create-new": {
     "message": "Stwórz nową"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Twoje kolekcje"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Szukaj kolekcji..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Nazwa (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Ostatnio utworzone"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Ostatnio zaktualizowane"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Pobierz {formType}"
@@ -678,7 +702,7 @@
     "message": "Szukaj kraju..."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-text": {
-    "message": "Nie udało się odczytać dostępnych metod płatniczych. Spróbuj ponownie później."
+    "message": "Nie udało się znaleźć dostępnych metod płatniczych. Spróbuj ponownie później."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-title": {
     "message": "Nie udało się odczytać dostępnych metod płatniczych"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Przekroczono limit wypłat (<b>{withdrawLimit}</b>). Musisz wypełnić formularz podatkowy, by wypłacić więcej."
   },
+  "dashboard.head-title": {
+    "message": "Kokpit"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Oznacz wszystkie jako przeczytane"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Pokaż historię"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Nie masz żadnych nieprzeczytanych powiadomień."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Wystąpił błąd podczas ładowania powiadomień:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Historia"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Historia powiadomień"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Zobacz wszystkie"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Pokaż historię powiadomień"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Pokaż jeszcze {extraNotifs} {extraNotifs, plural, one {powiadomienie} few {powiadomienia} other {powiadomień}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Ładowanie powiadomień..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Utwórz organizację"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Utwórz organizację!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Nie udało się znaleźć organizacji"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {członek} other {członków}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organizacje"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Możesz edytować kilka projektów naraz, zaznaczając je poniżej."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Projekty serwerów nie wspierają grupowej edycji"
+  },
+  "dashboard.projects.empty": {
+    "message": "Nie masz jeszcze żadnych projektów. Wciśnij zielony przycisk powyżej, aby rozpocząć."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projekty"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "i {count} {count, plural, one {inny} few {inne} other {innych}}..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Wyczyść link"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Edytuj linki"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Zmiany zostaną zastosowane dla <strong>{count}</strong> {count, plural, one {projektu} other {projektów}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Linki podane poniżej nadpiszą te w każdym z wybranych projektów. Puste linki będą ignorowane. Możesz usunąć link ze wszystkich wybranych projektów przyciskiem kosza na śmieci."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Zaproszenie do Twojego serwera Discord."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Zaproszenie Discord"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Miejsce, gdzie użytkownicy mogą zgłaszać problemy i uwagi do Twojego projektu."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Śledzenie problemów"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Istniejący link zostanie usunięty"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Podaj prawidłowy URL zaproszenia Discord"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Podaj prawidłowy URL"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Pokaż wszystkie projekty"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Strona/repozytorium zawierające kod źródłowy Twojego projektu"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Kod źródłowy"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Strona zawierające informację, dokumentację i pomoc projektu."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Strona wiki"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Masowo edytowano linki wybranych projektów."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Ikona {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Projekt ma wiadomość od moderatorów. Otwórz projekt, by zobaczyć więcej."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Sprawdź metadane środowiska"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Rosnąco"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Malejąco"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Nazwa"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Rodzaj"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Ikona"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nazwa"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Rodzaj"
+  },
+  "dashboard.report.title": {
+    "message": "Zgłoś {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Aktywne zgłoszenia"
+  },
+  "dashboard.reports.title": {
+    "message": "Zgłoszenia"
+  },
   "dashboard.revenue.available-now": {
     "message": "Dostępne teraz"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Pobierz jako CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Historia transakcji"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transakcje"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Tutaj pojawią się otrzymane fundusze i wypłaty."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "W zeszłym miesiącu"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "W tym miesiącu"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Zobacz wszystkie"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Wszystkie lata"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Twoje wypłaty są tymczasowo zablokowane, ponieważ Twój TIN lub SSN nie pasował do zapisów IRS. Skontaktuj się z obsługą, by resetować i ponownie wysłać Twój formularz podatkowy."
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Wypłata"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Aktywne zgłoszenia"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analityka"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Twórcy"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Kokpit"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Powiadomienia"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organizacje"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Przegląd"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projekty"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Przychód"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Konto"
@@ -1311,7 +1536,7 @@
     "message": "Odkrywaj modyfikacje"
   },
   "landing.button.go-to-dashboard": {
-    "message": "Przejdź do panelu głównego"
+    "message": "Przejdź do kokpitu"
   },
   "landing.creator.feature.constantly-evolving.description": {
     "message": "Uzyskaj najlepsze możliwe doświadczenie w modowaniu dzięki stałym aktualizacjom od zespołu Modrinth"
@@ -2304,7 +2529,7 @@
     "message": "Sprawdź ustawienia środowiska"
   },
   "project.environment.migration.title": {
-    "message": "Proszę sprawdzić metadane środowiska"
+    "message": "Sprawdź metadane środowiska"
   },
   "project.error.loading": {
     "message": "Błąd podczas ładowania danych projektu{message}"
@@ -3158,6 +3383,9 @@
   "settings.billing.interval.quarter": {
     "message": "kwartał"
   },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "kwartalną"
+  },
   "settings.billing.interval.year": {
     "message": "rok"
   },
@@ -3271,6 +3499,9 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Błąd ponawiania subskrypcji"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Jeżeli serwer jest aktualnie zawieszony, jego aktywacja może zająć od 10 do 15 minut."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Wysłano wniosek o ponowienie subskrypcji"

@@ -393,7 +393,7 @@
     "message": "В коллекции пока нет проектов"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Нет проектов} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Нет проектов} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Обновлена {ago}"
@@ -411,7 +411,7 @@
     "message": "Дополнительные файлы предназначены для вспомогательных ресурсов, например исходного кода, но не для альтернативных версий или вариантов."
   },
   "create.collection.collection-info": {
-    "message": "Новая коллекция будет публичной {count, plural, =0 {без проектов} one {с # проектом} other {с # проектами}}."
+    "message": "Будет создана публичная коллекция {count, plural, =0 {без проектов} one {с # проектом} other {с # проектами}}."
   },
   "create.collection.create-collection": {
     "message": "Создать коллекцию"
@@ -507,7 +507,7 @@
     "message": "Введите название проекта..."
   },
   "create.project.owner-description": {
-    "message": "Укажите в качестве владельца проекта себя или организацию, членом которой вы являетесь."
+    "message": "Укажите себя или организацию, в которой состоите."
   },
   "create.project.owner-label": {
     "message": "Владелец"
@@ -576,7 +576,7 @@
     "message": "Создать новую"
   },
   "dashboard.collections.empty.get-started-hint": {
-    "message": "Создайте свою первую коллекцию, чтобы начать работу!"
+    "message": "Создайте свою первую коллекцию!"
   },
   "dashboard.collections.empty.no-collections": {
     "message": "Коллекций пока нет"
@@ -714,7 +714,7 @@
     "message": "Номер национального удостоверения"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
-    "message": "Введите номер национального удостоверения личности"
+    "message": "Введите номер национального удостоверения"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
     "message": "Номер загранпаспорта"
@@ -858,7 +858,7 @@
     "message": "Сумма может измениться, прежде чем станет доступна."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Нажмите, чтобы узнать, как Modrinth рассчитывает доход."
+    "message": "Нажмите, чтобы узнать, как Modrinth рассчитывает доход."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Ожидается {date}"
@@ -893,8 +893,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Выплаты и выводы средств появятся здесь."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "В прошлом месяце"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "В этом месяце"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Посмотреть все"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Все годы"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Вывод средств временно заблокирован: указанный TIN или SSN не совпал с данными IRS. Свяжитесь с поддержкой для повторной отправки формы."
@@ -1032,10 +1041,10 @@
     "message": "Контент недоступен по юридичес­ким причинам"
   },
   "error.generic.default.list_item.1": {
-    "message": "Проверьте, работает ли Modrinth, на нашей <status-link>странице статуса</status-link>."
+    "message": "Проверьте доступность Modrinth на <status-link>странице статуса</status-link>."
   },
   "error.generic.default.list_item.2": {
-    "message": "Если ошибка не исчезнет, вы можете уведомить о ней Modrinth Team в нашем <discord-link>сервере Discord</discord-link>."
+    "message": "Если проблема не исчезает, сообщите о ней команде Modrinth в <discord-link>Discord</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Повторите попытку через несколько минут."
@@ -1314,37 +1323,37 @@
     "message": "Перейти в панель управления"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Получайте лучший опыт в создании модов с постоянными обновлениями от команды Modrinth"
+    "message": "Получайте лучший опыт моддинга благодаря постоянным обновлениям от команды Modrinth"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Постоянное развитие"
   },
   "landing.creator.feature.data-statistics.description": {
-    "message": "Получайте детальные отчёты о просмотрах, скачиваниях и доходах"
+    "message": "Получайте подробные отчёты о просмотрах, скачиваниях и доходах"
   },
   "landing.creator.feature.data-statistics.title": {
     "message": "Данные и статистика"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Получайте внимание тысяч пользователей через поиск, главную страницу, сервер Discord и другие способы, которые появятся в будущем!"
+    "message": "Получайте внимание тысяч пользователей через поиск, главную страницу, сервер Discord и другие способы в будущем!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Заметность"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Подключайте инструменты сборки через Minotaur и публикуйте новые версии автоматически"
+    "message": "Подключайте инструменты сборки через Minotaur и публикуйте новые версии автоматически"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
-    "message": "Разнообразная экосистема"
+    "message": "Развитая экосистема"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Получайте доход от рекламы на страницах проектов и выводите средства в любое время"
+    "message": "Получайте доход от рекламы на страницах проектов и выводите средства в любое время"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Монетизация"
   },
   "landing.creator.feature.team-management.description": {
-    "message": "Приглашайте участников и управляйте ролями и разрешениями с лёгкостью"
+    "message": "Приглашайте участников и управляйте ролями и разрешениями без хлопот"
   },
   "landing.creator.feature.team-management.title": {
     "message": "Управление командой"
@@ -1353,19 +1362,19 @@
     "message": "Не удалось загрузить случайные проекты :("
   },
   "landing.feature.follow.description": {
-    "message": "Узнавайте о каждом обновлении и оставайтесь на связи с любимыми проектами."
+    "message": "Узнавайте о каждом обновлении и оставайтесь на связи с любимыми проектами."
   },
   "landing.feature.follow.heading": {
     "message": "Следите за тем, что нравится"
   },
   "landing.feature.launcher.description": {
-    "message": "Наш открытый API позволяет глубже интегрироваться с Modrinth — используйте <link>наше приложение</link> или сторонние лаунчеры наподобие ATLauncher, MultiMC и Prism Launcher."
+    "message": "Наш открытый API позволяет глубже интегрироваться с Modrinth — используйте <link>наше приложение</link> или сторонние лаунчеры наподобие ATLauncher, MultiMC и Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "Играйте через свой лаунчер"
   },
   "landing.feature.search.description": {
-    "message": "Мгновенный поиск и мощные фильтры Modrinth позволяют находить контент уже во время ввода."
+    "message": "Мгновенный поиск и мощные фильтры Modrinth позволяют находить контент уже во время ввода."
   },
   "landing.feature.search.heading": {
     "message": "Ищите нужное быстро и легко"
@@ -1419,16 +1428,16 @@
     "message": "Выпущена версия {version} для {gameVersion}"
   },
   "landing.section.for-creators.description": {
-    "message": "Разместите свои творения и найдите новых поклонников среди огромного сообщества игроков."
+    "message": "Разместите свои проекты и найдите новых поклонников среди огромного сообщества игроков."
   },
   "landing.section.for-creators.label": {
     "message": "Для авторов"
   },
   "landing.section.for-creators.tagline": {
-    "message": "Делитесь творениями с миром"
+    "message": "Делитесь творениями с миром"
   },
   "landing.section.for-players.description": {
-    "message": "От магических биомов до проклятых подземелий — вы точно найдёте контент, который выведет игру на новый уровень."
+    "message": "От магических биомов до проклятых подземелий — вы точно найдёте контент, который выведет игру на новый уровень."
   },
   "landing.section.for-players.label": {
     "message": "Для игроков"
@@ -1473,13 +1482,13 @@
     "message": "Опубликовать"
   },
   "layout.action.reports": {
-    "message": "Рассмотреть жалобы"
+    "message": "Рассмотрение жалоб"
   },
   "layout.action.review-projects": {
     "message": "Проверка проектов"
   },
   "layout.action.tech-review": {
-    "message": "Техническая проверка"
+    "message": "Техпроверка"
   },
   "layout.avatar.alt": {
     "message": "Ваш аватар"
@@ -1494,10 +1503,10 @@
     "message": "В целях безопасности Modrinth просит привязать почту к аккаунту."
   },
   "layout.banner.build-fail.description": {
-    "message": "При развёртывании Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Повторите сборку, когда API будет доступен. Коды ошибок: {errors}; Текущий URL-адрес API: {url}"
+    "message": "При развёртывании фронтенда Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Пересоберите проект, когда API станет доступен. Коды ошибок: {errors}. Текущий адрес API: {url}"
   },
   "layout.banner.build-fail.title": {
-    "message": "Ошибка генерации состояния от API во время сборки."
+    "message": "Ошибка генерации состояния от API во время сборки."
   },
   "layout.banner.preview.description": {
     "message": "Официальный сайт Modrinth доступен по адресу <link>https://modrinth.com</link>. Текущая предварительная версия предназначена для тестирования командой Modrinth и собрана из <branch-link>{owner}/{branch}</branch-link> @ {commit}."
@@ -1506,25 +1515,25 @@
     "message": "Это предварительная версия сайта Modrinth."
   },
   "layout.banner.staging.description": {
-    "message": "Тестовая среда полностью отделена от основной базы данных Modrinth и нужна для тестирования и отладки. Протеид и бекхенд здесь могут быть новее, чем на основном сайте."
+    "message": "Тестовая среда полностью отделена от основной базы данных Modrinth и нужна для тестирования и отладки. Фронтенд и бэкенд здесь могут содержать изменения, которые ещё не вышли на основном сайте."
   },
   "layout.banner.staging.title": {
-    "message": "Вы находитесь в тестовой среде Modrinth"
+    "message": "Вы находитесь в тестовой среде Modrinth"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Обновить платёжные данные"
   },
   "layout.banner.subscription-payment-failed.description": {
-    "message": "Не удалось продлить одну или несколько подписок. Обновите способ оплаты, чтобы не потерять доступ!"
+    "message": "Не удалось продлить одну или несколько подписок. Обновите способ оплаты, чтобы сохранить доступ."
   },
   "layout.banner.subscription-payment-failed.title": {
-    "message": "Требуются действия с платёжными данными."
+    "message": "Проблема с оплатой."
   },
   "layout.banner.tax.action": {
     "message": "Заполнить налоговую форму"
   },
   "layout.banner.tax.description": {
-    "message": "В этом году вы вывели уже более {threshold} из Modrinth. В соответствии с налоговым законодательством необходимо заполнить налоговую форму. Вывод средств приостановлен, пока форма не будет заполнена."
+    "message": "В этом году вы вывели уже более {threshold} из Modrinth. Для соблюдения налогового законодательства нужно заполнить налоговую форму. Вывод средств приостановлен до подачи этой формы."
   },
   "layout.banner.tax.title": {
     "message": "Требуется налоговая форма"
@@ -1533,7 +1542,7 @@
     "message": "Связаться с поддержкой"
   },
   "layout.banner.tin-mismatch.description": {
-    "message": "Вывод средств временно заблокирован — указанный TIN или SSN не совпал с данными IRS. Свяжитесь с поддержкой для повторной отправки формы."
+    "message": "Вывод средств временно заблокирован: указанный TIN или SSN не совпал с данными IRS. Свяжитесь с поддержкой для повторной отправки формы."
   },
   "layout.banner.tin-mismatch.title": {
     "message": "Налоговая форма отклонена"
@@ -1857,10 +1866,10 @@
     "message": "Аргентинский идентификационный номер налогоплательщика"
   },
   "muralpay.help.iban": {
-    "message": "Международный номер банковского счёта"
+    "message": "International Bank Account Number"
   },
   "muralpay.help.swift-bic": {
-    "message": "Банковский идентификационный код"
+    "message": "Bank Identifier Code"
   },
   "muralpay.pix-type.bank-account": {
     "message": "Банковский счёт"
@@ -2094,7 +2103,7 @@
     "message": "Вы присоединились к команде проекта"
   },
   "project-moderation-nags.publishing-checklist": {
-    "message": "Контрольный список для публикации"
+    "message": "Контрольный список для публикации"
   },
   "project-moderation-nags.required": {
     "message": "Обязательно"
@@ -2106,7 +2115,7 @@
     "message": "Проект {status, select, rejected {отклонён} withheld {на удержании} other {{status}}} командой Modrinth. Обычно после решения указанных модератором проблем можно снова запросить проверку."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
-    "message": "Необходимо выполнить обязательные действия в контрольном списке!"
+    "message": "Необходимо выполнить обязательные действия в контрольном списке!"
   },
   "project-moderation-nags.submit-for-review": {
     "message": "Запросите проверку"
@@ -2115,7 +2124,7 @@
     "message": "Отправить на проверку"
   },
   "project-moderation-nags.submit-for-review-desc": {
-    "message": "Проект сейчас виден только участникам. Для публикации он должен пройти проверку модераторами."
+    "message": "Проект сейчас виден только участникам. Для публикации он должен пройти проверку модераторами."
   },
   "project-moderation-nags.suggestion": {
     "message": "Предложение"
@@ -3510,10 +3519,10 @@
     "message": "Уникальное имя для идентификации профиля. Регистр не имеет значения."
   },
   "settings.sessions.action.revoke-session": {
-    "message": "Завершить сеанс"
+    "message": "Завершить сеанс"
   },
   "settings.sessions.created-ago": {
-    "message": "Создано {ago}"
+    "message": "Начат {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Текущий сеанс"
@@ -3522,7 +3531,7 @@
     "message": "Ниже представлены все устройства, с которых осуществлён вход в вашу учётную запись Modrinth. Вы можете управлять сеансом каждого из них по отдельности.\n\nЕсли среди них присутствует незнакомое устройство, незамедлительно завершите его сеанс и смените пароль своей учётной записи."
   },
   "settings.sessions.last-accessed-ago": {
-    "message": "Последняя активность {ago}"
+    "message": "Активность {ago}"
   },
   "settings.sessions.unknown-os": {
     "message": "Неизвестная ОС"
@@ -3540,7 +3549,7 @@
     "message": "Отображение"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Последние новости от Modrinth"
+    "message": "Последние новости от Modrinth"
   },
   "ui.latest-news-row.view-all": {
     "message": "Посмотреть все новости"

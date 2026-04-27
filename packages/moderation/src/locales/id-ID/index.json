@@ -159,7 +159,7 @@
     "defaultMessage": "Pilih bahasa"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Pilih lisensi yang digunakan untuk mendistribusikan {type, select, mod {mod} modpack {paket mod} resourcepack {paket sumber} shader {pencorak} plugin {pasang-masuk} datapack {paket data} other {proyek}} Anda."
+    "defaultMessage": "Pilih lisensi yang digunakan untuk mendistribusikan {type, select, mod {mod} modpack {paket mod} resourcepack {paket sumber} shader {efek gambar} plugin {pasang-masuk} datapack {paket data} other {proyek}} Anda."
   },
   "nags.select-license.title": {
     "defaultMessage": "Pilih lisensi"
@@ -225,7 +225,7 @@
     "defaultMessage": "Pilih tag yang tepat"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Setidaknya satu gambar galeri diperlukan untuk menampilkan konten {type, select, resourcepack {paket sumber Anda, kecuali bila paket sumber Anda merupakan paket audio atau penerjemahan. Bila demikian, mohon pilih tag yang sesuai} shader {pencorak Anda} other {proyek Anda}}."
+    "defaultMessage": "Setidaknya satu gambar galeri diperlukan untuk menampilkan konten {type, select, resourcepack {paket sumber Anda, kecuali bila paket sumber Anda merupakan paket audio atau penerjemahan. Bila demikian, mohon pilih tag yang sesuai} shader {efek gambar Anda} other {proyek Anda}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Unggah gambar galeri"
