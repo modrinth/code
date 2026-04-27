@@ -177,7 +177,7 @@ const menuContainer = ref<HTMLElement | null>(null)
 const submenu = ref<HTMLElement | null>(null)
 const submenuPosition = ref<Point>({ x: 0, y: 0 })
 const categoryButtonRefs = new Map<AnalyticsQueryFilterCategory, HTMLElement>()
-let pendingCategoryTimeout: ReturnType<typeof window.setTimeout> | null = null
+let pendingCategoryTimeout: NodeJS.Timeout | null = null
 let previousMousePosition: Point | null = null
 
 const filterCategories = computed<FilterCategory[]>(() => [
@@ -427,7 +427,7 @@ function handleCategoryMouseEnter(categoryKey: AnalyticsQueryFilterCategory) {
 
 	pendingCategoryKey.value = categoryKey
 	clearPendingCategoryTimeout()
-	pendingCategoryTimeout = window.setTimeout(() => {
+	pendingCategoryTimeout = setTimeout(() => {
 		if (pendingCategoryKey.value === categoryKey) {
 			activateCategory(categoryKey)
 		}
@@ -488,7 +488,7 @@ function triangleArea(a: Point, b: Point, c: Point): number {
 
 function clearPendingCategoryTimeout() {
 	if (pendingCategoryTimeout) {
-		window.clearTimeout(pendingCategoryTimeout)
+		clearTimeout(pendingCategoryTimeout)
 		pendingCategoryTimeout = null
 	}
 }
