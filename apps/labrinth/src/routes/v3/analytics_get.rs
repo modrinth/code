@@ -54,10 +54,12 @@ pub struct GetRequest {
     /// What time range to return statistics for.
     pub time_range: TimeRange,
     /// What analytics metrics to return data for.
+    #[serde(default)]
     pub return_metrics: ReturnMetrics,
     /// What project IDs to return data for.
     ///
     /// If this is empty, all of the user's projects will be included.
+    #[serde(default)]
     pub project_ids: Vec<ProjectId>,
 }
 
