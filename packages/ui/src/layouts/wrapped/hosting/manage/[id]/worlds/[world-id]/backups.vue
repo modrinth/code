@@ -284,10 +284,10 @@ import BackupDeleteModal from '#ui/components/servers/backups/BackupDeleteModal.
 import BackupItem from '#ui/components/servers/backups/BackupItem.vue'
 import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
-import { useBackupsSelection } from '#ui/composables/hosting/backups-selection'
+import { useBackupsSelection } from '#ui/composables/servers/backups-selection'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
 import { useBulkOperation } from '#ui/layouts/shared/content-tab/composables/bulk-operations'
 import {
 	injectModrinthClient,

@@ -26,25 +26,25 @@ import {
 } from '#ui/utils/server-content-installing'
 import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
-import type { BrowseInstallPlan } from '../../../shared/browse-tab/composables/install-logic'
+import type { BrowseInstallPlan } from '#ui/layouts/shared/browse-tab/composables/install-logic'
 import {
 	flushStoredServerAddonInstallQueue,
 	getStoredServerAddonInstallQueue,
 	getTargetInstallPreferences,
-} from '../../../shared/browse-tab/composables/install-logic'
-import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
-import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
-import ContentUpdaterModal from '../../../shared/content-tab/components/modals/content-updater-modal/index.vue'
-import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
-import ContentPageLayout from '../../../shared/content-tab/layout.vue'
-import type { ContentModpackData } from '../../../shared/content-tab/providers/content-manager'
-import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
+} from '#ui/layouts/shared/browse-tab/composables/install-logic'
+import ConfirmModpackUpdateModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
+import ConfirmUnlinkModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
+import ContentUpdaterModal from '#ui/layouts/shared/content-tab/components/modals/content-updater-modal/index.vue'
+import ModpackContentModal from '#ui/layouts/shared/content-tab/components/modals/ModpackContentModal.vue'
+import ContentPageLayout from '#ui/layouts/shared/content-tab/layout.vue'
+import type { ContentModpackData } from '#ui/layouts/shared/content-tab/providers/content-manager'
+import { provideContentManager } from '#ui/layouts/shared/content-tab/providers/content-manager'
 import type {
 	ContentItem,
 	ContentModpackCardCategory,
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
-} from '../../../shared/content-tab/types'
+} from '#ui/layouts/shared/content-tab/types'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
 type ContentOwnerAvatarSource = {
