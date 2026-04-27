@@ -218,8 +218,14 @@
   "auth.authorize.authorize-app-name": {
     "message": "Authorize {appName}"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "Missing required OAuth query parameters."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "No redirect location found in response"
+  },
+  "auth.authorize.errro-title": {
+    "message": "An Error Occured"
   },
   "auth.authorize.redirect-url": {
     "message": "You will be redirected to <redirect-url>{url}</redirect-url>"
@@ -244,6 +250,9 @@
   },
   "auth.create-account.date-of-birth.over13-helper": {
     "message": "You must be over 13 years old to use Modrinth."
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Select your date of birth"
   },
   "auth.create-account.date-of-birth.required.text": {
     "message": "Please enter your date of birth before continuing."

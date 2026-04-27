@@ -27,9 +27,10 @@
 </template>
 
 <script setup lang="ts">
+import 'flatpickr/dist/flatpickr.css'
+
 import { CalendarIcon } from '@modrinth/assets'
 import flatpickr from 'flatpickr'
-import 'flatpickr/dist/flatpickr.css'
 import type { Instance } from 'flatpickr/dist/types/instance'
 import type { Options } from 'flatpickr/dist/types/options'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
