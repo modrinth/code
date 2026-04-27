@@ -160,6 +160,7 @@
 				</div>
 
 				<FloatingActionBar
+					below-modal
 					:shown="selectedIds.size > 0 || isBulkOperating"
 					:aria-label="
 						formatMessage(messages.bulkBarAriaLabel, {
