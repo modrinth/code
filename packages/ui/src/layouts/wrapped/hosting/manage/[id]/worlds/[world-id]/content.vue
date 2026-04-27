@@ -11,22 +11,6 @@ import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-up
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
-	injectModrinthClient,
-	injectModrinthServerContext,
-	injectNotificationManager,
-	injectServerSettingsModal,
-} from '#ui/providers'
-import { commonMessages } from '#ui/utils/common-messages'
-import {
-	type PendingServerContentInstall,
-	pendingServerContentInstallsEvent,
-	readPendingServerContentInstallBaseline,
-	readPendingServerContentInstalls,
-	removePendingServerContentInstall,
-} from '#ui/utils/server-content-installing'
-import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
-
-import {
 	flushStoredServerAddonInstallQueue,
 	getStoredServerAddonInstallQueue,
 } from '#ui/layouts/shared/browse-tab/composables/install-logic'
@@ -43,6 +27,21 @@ import type {
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
 } from '#ui/layouts/shared/content-tab/types'
+import {
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+	injectServerSettingsModal,
+} from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
+import {
+	type PendingServerContentInstall,
+	pendingServerContentInstallsEvent,
+	readPendingServerContentInstallBaseline,
+	readPendingServerContentInstalls,
+	removePendingServerContentInstall,
+} from '#ui/utils/server-content-installing'
+import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
 type ContentOwnerAvatarSource = {
