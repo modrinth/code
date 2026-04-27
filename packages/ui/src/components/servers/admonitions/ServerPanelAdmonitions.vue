@@ -11,8 +11,8 @@ import InstallingBanner, {
 	type SyncProgress,
 } from '#ui/components/servers/InstallingBanner.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 

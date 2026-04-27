@@ -390,9 +390,9 @@ import {
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
-import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
+import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
+import { useServerManageCoreRuntime } from '#ui/composables/servers/server-manage-core-runtime.ts'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
@@ -409,7 +409,7 @@ import {
 	writePendingServerContentInstalls,
 } from '#ui/utils/server-content-installing'
 
-import ServerOnboardingPanelPage from './[id]/onboarding.vue'
+import ServerOnboardingPanelPage from './onboarding.vue'
 
 interface Tab {
 	label: string
