@@ -11,7 +11,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold"> Verify your email </Heading>
 
-		<Text class="text-muted text-base">Hi {user.name},</Text>
+		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
 			Please visit the link below to verify your email. If the button does not work, you can copy
 			the link and paste it into your browser. This link expires in 24 hours.

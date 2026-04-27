@@ -8,7 +8,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 	<StyledEmail title="We’ve added time to your server">
 		<Heading as="h1" class="mb-2 text-2xl font-bold">We’ve added time to your server</Heading>
 
-		<Text class="text-muted text-base">Hi {user.name},</Text>
+		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">{credit.header_message}</Text>
 
 		<Text class="text-muted text-base">

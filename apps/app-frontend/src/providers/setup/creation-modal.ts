@@ -11,6 +11,7 @@ import type ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlre
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
+import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
 import { create_profile_and_install, create_profile_and_install_from_file } from '@/helpers/pack'
 import { create, list } from '@/helpers/profile.js'
 import type { InstanceLoader } from '@/helpers/types'
@@ -165,6 +166,7 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 		handleBrowseModpacks,
 		searchModpacks,
 		getProjectVersions,
+		getLoaderManifest,
 		setModpackAlreadyInstalledModal,
 		handleModpackDuplicateCreateAnyway,
 		handleModpackDuplicateGoToInstance,
