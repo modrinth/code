@@ -20,7 +20,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			>Report of {report.title} has been submitted</Heading
 		>
 
-		<Text class="text-base">Hi {user.name},</Text>
+		<Text class="text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 
 		<Text class="text-base">
 			We've received your report of {report.title} and our moderation team will review it shortly.

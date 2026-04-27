@@ -1,12 +1,18 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<span class="font-semibold text-contrast">Already know the modpack you want to install?</span>
+		<span class="font-semibold text-contrast">{{
+			formatMessage(messages.knownModpackPrompt)
+		}}</span>
 		<Combobox
 			v-model="ctx.modpackSearchProjectId.value"
 			:options="ctx.modpackSearchOptions.value"
 			searchable
-			search-placeholder="Search for modpack"
-			:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
+			:search-placeholder="formatMessage(messages.searchModpackPlaceholder)"
+			:no-options-message="
+				searchLoading
+					? formatMessage(commonMessages.loadingLabel)
+					: formatMessage(messages.noResultsFound)
+			"
 			:disable-search-filter="true"
 			@search-input="(query) => handleSearch(query)"
 		>
@@ -18,20 +24,20 @@
 		</Combobox>
 		<div class="flex items-center gap-3">
 			<div class="h-[1px] w-full flex-1 bg-surface-5" />
-			<span class="text-sm text-secondary">or</span>
+			<span class="text-sm text-secondary">{{ formatMessage(commonMessages.orLabel) }}</span>
 			<div class="h-[1px] w-full flex-1 bg-surface-5" />
 		</div>
 		<div class="flex gap-3">
 			<ButtonStyled type="outlined">
 				<button class="flex-1 !border-surface-4" @click="triggerFileInput">
 					<ImportIcon />
-					Import modpack
+					{{ formatMessage(messages.importModpack) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="brand">
 				<button class="flex-1" @click="ctx.browseModpacks()">
 					<CompassIcon />
-					Browse modpacks
+					{{ formatMessage(messages.browseModpacks) }}
 				</button>
 			</ButtonStyled>
 		</div>
@@ -40,6 +46,7 @@
 
 <script setup lang="ts">
 import { CompassIcon, ImportIcon, RightArrowIcon } from '@modrinth/assets'
+import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
@@ -52,8 +59,32 @@ import { injectCreationFlowContext } from '../creation-flow-context'
 const debug = useDebugLogger('ModpackStage')
 const ctx = injectCreationFlowContext()
 const filePicker = injectFilePicker()
+const { formatMessage } = useVIntl()
 
 const searchLoading = ref(false)
+
+const messages = defineMessages({
+	knownModpackPrompt: {
+		id: 'creation-flow.modal.modpack.known-modpack.prompt',
+		defaultMessage: 'Already know the modpack you want to install?',
+	},
+	searchModpackPlaceholder: {
+		id: 'creation-flow.modal.modpack.search.placeholder',
+		defaultMessage: 'Search for modpack',
+	},
+	noResultsFound: {
+		id: 'creation-flow.modal.modpack.search.no-results',
+		defaultMessage: 'No results found',
+	},
+	importModpack: {
+		id: 'creation-flow.modal.modpack.action.import',
+		defaultMessage: 'Import modpack',
+	},
+	browseModpacks: {
+		id: 'creation-flow.modal.modpack.action.browse',
+		defaultMessage: 'Browse modpacks',
+	},
+})
 
 function proceedWithModpack() {
 	debug('proceedWithModpack:', {
