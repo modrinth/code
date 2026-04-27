@@ -95,9 +95,9 @@
 			<header class="flex min-h-[5.75rem] flex-col justify-center gap-1 px-5 py-4">
 				<div class="flex min-w-0 items-center justify-between gap-3">
 					<span
-						class="m-0 truncate text-xl font-semibold text-contrast"
 						ref="worldNameRef"
 						v-tooltip="truncatedTooltip(worldNameRef, world.name)"
+						class="m-0 truncate text-xl font-semibold text-contrast"
 						>{{ world.name }}</span
 					>
 					<span
@@ -170,7 +170,7 @@
 
 			<footer class="flex items-center justify-between gap-3 px-5 py-4">
 				<ButtonStyled>
-					<button @click="emit('edit', world.id)" class="!shadow-none">
+					<button class="!shadow-none" @click="emit('edit', world.id)">
 						<PencilIcon aria-hidden="true" />
 						{{ formatMessage(messages.editWorld) }}
 					</button>
@@ -178,8 +178,8 @@
 				<ButtonStyled circular>
 					<button
 						v-tooltip="formatMessage(messages.worldSettings)"
-						@click="emit('settings', world.id)"
 						class="!shadow-none"
+						@click="emit('settings', world.id)"
 					>
 						<Settings2Icon aria-hidden="true" />
 					</button>
