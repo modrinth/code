@@ -32,6 +32,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Statisztika megtekintése"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Nem sikerült betölteni a szerverbeállításokat"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
+  },
   "badge.beta": {
     "defaultMessage": "Béta"
   },
@@ -40,6 +46,54 @@
   },
   "badge.new": {
     "defaultMessage": "Új"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Mégse"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} Megosztott CPU-k"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Ön újra elő fog fizetni  <server-name>{serverName}</server-name> szerverre. Az előfizetése újra fog aktiválódni és a szervere kimaradás nélkül tovább fog működni."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Újrafeliratkozás sikertelen, nem sikerült betölteni az előfizetés adatait."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Hiba"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Nem sikerült betölteni az előfizetés adatait."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 nap"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/hónap"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/negyedév"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/év"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Következő befizetés: <charge-date>{date}</charge-date> napon."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Csomag"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB memória"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Feliratkozás újra"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB tárhely"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Újra feliratkozás szerverre"
   },
   "button.accept": {
     "defaultMessage": "Elfogadás"
@@ -71,6 +125,9 @@
   "button.copy-filename": {
     "defaultMessage": "Fájlnév másolása"
   },
+  "button.copy-full-path": {
+    "defaultMessage": "Teljes cím másolása"
+  },
   "button.copy-id": {
     "defaultMessage": "Azonosító másolása"
   },
@@ -101,6 +158,9 @@
   "button.enable": {
     "defaultMessage": "Engedélyezés"
   },
+  "button.extract": {
+    "defaultMessage": "Kibontás"
+  },
   "button.follow": {
     "defaultMessage": "Követés"
   },
@@ -112,6 +172,9 @@
   },
   "button.more-options": {
     "defaultMessage": "További opciók"
+  },
+  "button.move": {
+    "defaultMessage": "Áthelyezés"
   },
   "button.next": {
     "defaultMessage": "Következő"
@@ -169,6 +232,9 @@
   },
   "button.show-all-versions": {
     "defaultMessage": "Összes verzió mutatása"
+  },
+  "button.show-file": {
+    "defaultMessage": "Fájl megtekintése"
   },
   "button.sign-in": {
     "defaultMessage": "Bejelentkezés"
@@ -324,7 +390,7 @@
     "defaultMessage": "Kérlek várd meg a művelet befejezését a tartalom szerkesztése előtt."
   },
   "content.page-layout.empty.hint": {
-    "defaultMessage": "Böngésszen vagy töltsön fel projekteket a kezdéshez"
+    "defaultMessage": "Böngéssz vagy tölts fel projekteket a kezdéshez"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "További tartalom hozzáadása ehhez a modpackhez"
@@ -422,6 +488,15 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} db kiválasztva"
   },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Felülírás"
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} fájl felülírva"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "{type, select, directory {Mappa} other {Fájl}} létrehozása"
+  },
   "files.create-modal.header": {
     "defaultMessage": "{type, select, directory {Mappa} other {Fájl}} létrehozása"
   },
@@ -440,17 +515,50 @@
   "files.delete-modal.warning": {
     "defaultMessage": "{type, select, directory {Ez a mappa és annak teljes tartalma véglegesen törlődik. A műveletet nem lehet visszavonni.} other {Ez a fájl véglegesen törlődik. A műveletet nem lehet visszavonni.}}"
   },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "A fájl tartalmát nem sikerült betölteni."
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "A fájl megnyitása nem sikerült"
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Nem sikerült megosztani a fájlt"
+  },
   "files.editor.file-saved-text": {
     "defaultMessage": "A fájl elmentésre került."
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "A fájl mentve"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Bezárás"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Keresés"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} / {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Következő találat"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Nincs találat"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Előző találat"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "A naplófájl linkje másolva lett a vágólapra."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "Napló linkje másolva"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Csere"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Csere"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "A fájl mentése nem sikerült."
@@ -460,6 +568,15 @@
   },
   "files.error.try-again": {
     "defaultMessage": "Újra"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "A kép túl nagy a megjelenítéshez (maximum {maxDimension}x{maxDimension} pixel)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "Hibás vagy üres fájl."
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Nem sikerült a fájlt betölteni."
   },
   "files.layout.error-title": {
     "defaultMessage": "Nem sikerült betölteni a fájlokat"

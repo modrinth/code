@@ -453,7 +453,7 @@
     "defaultMessage": "Добавить файлы"
   },
   "content.page-layout.uploading-files": {
-    "defaultMessage": "Загружено файлов ({completed}/{total})"
+    "defaultMessage": "Добавление файлов ({completed}/⁠{total})"
   },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Весь выбранный контент уже отключён"
@@ -1218,10 +1218,10 @@
     "defaultMessage": "Неизвестный режим игры"
   },
   "instances.confirm-leave-modal.body": {
-    "defaultMessage": "Файлы ещё загружаются. Покинув страницу загрузка файлов будет прервана и ваши изменения будут потеряны."
+    "defaultMessage": "Файлы ещё добавляются. Если уйти со страницы, добавление будет отменено, а изменения могут пропасть."
   },
   "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Выполняется загрузка"
+    "defaultMessage": "Выполняется добавление"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} совместимо со {count, plural, one {сборкой} other {сборками}}"
@@ -1548,7 +1548,7 @@
     "defaultMessage": "Обновление..."
   },
   "label.upload-failed": {
-    "defaultMessage": "Загрузка не удалась"
+    "defaultMessage": "Добавление не удалось"
   },
   "label.username": {
     "defaultMessage": "Имя пользователя"
@@ -2844,10 +2844,10 @@
     "defaultMessage": "Проверка наличие новых серверов..."
   },
   "servers.manage.confirm-leave.body": {
-    "defaultMessage": "Файлы загружаются. Если вы покинете эту страницу, загрузка будет отменена."
+    "defaultMessage": "Файлы ещё добавляются. Если уйти со страницы, добавление будет отменено."
   },
   "servers.manage.confirm-leave.upload-in-progress": {
-    "defaultMessage": "Выполняется загрузка"
+    "defaultMessage": "Выполняется добавление"
   },
   "servers.manage.contact-support-button": {
     "defaultMessage": "Связаться с поддержкой Modrinth"
@@ -3043,6 +3043,9 @@
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "Сколько оперативной памяти вы хотите на сервере?"
+  },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "ОЗУ"
   },
   "servers.region.north-america": {
     "defaultMessage": "Северная Америка"
@@ -3588,19 +3591,19 @@
     "defaultMessage": "Имеются несохранённые изменения."
   },
   "ui.confirm-leave-modal.body": {
-    "defaultMessage": "У вас есть несохранённые изменения. Вы потеряете их если закроете страницу."
+    "defaultMessage": "Если уйти со страницы, несохранённые изменения будут потеряны."
   },
   "ui.confirm-leave-modal.header": {
-    "defaultMessage": "У вас есть несохранённые изменения"
+    "defaultMessage": "Имеются несохранённые изменения"
   },
   "ui.confirm-leave-modal.leave": {
-    "defaultMessage": "Покинуть страницу"
+    "defaultMessage": "Уйти со страницы"
   },
   "ui.confirm-leave-modal.stay": {
     "defaultMessage": "Остаться на странице"
   },
   "ui.confirm-leave-modal.title": {
-    "defaultMessage": "Покинуть страницу?"
+    "defaultMessage": "Уйти со страницы?"
   }
 }
 

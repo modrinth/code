@@ -32,6 +32,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Ver estatísticas"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Falha ao carregar configurações do servidor"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alpha"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -40,6 +46,54 @@
   },
   "badge.new": {
     "defaultMessage": "Novo"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Cancelar"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} CPUs Compartilhadas"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Você está prestes a renovar a assinatura do <server-name>{serverName}</server-name>. Sua assinatura será reativada e o seu servidor continuará rodando sem interrupção."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Não é possível renovar, falha ao carregar detalhes da assinatura."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Erro"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Falha ao carregar detalhes da assinatura"
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 dias"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/mês"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/trimestre"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/year"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "A sua próxima cobrança será em <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Plano"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB de RAM"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Reativar"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB de Armazenamento"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Renovar Servidor"
   },
   "button.accept": {
     "defaultMessage": "Aceitar"
@@ -224,11 +278,17 @@
   "collections.label.private": {
     "defaultMessage": "Privada"
   },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Você tem certeza que deseja atualizar {count, plural, one {# projeto} other {# projetos}} para a última versão compatível? É recomendável atualizar o conteúdo um por um."
+  },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Aviso de atualização"
   },
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Atualizar projetos"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Segure Shift enquanto clica em ''Atualizar tudo'' para pular essa confirmação futuramente."
   },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Atualizar {count, plural, one {# projeto} other {# projetos}}"
@@ -263,6 +323,9 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removidos"
   },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Parte do conteúdo no seu servidor não pôde ser analisada e pode ser afetada por essa alteração."
+  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} atualizados"
   },
@@ -272,14 +335,44 @@
   "content.inline-backup.backup-complete": {
     "defaultMessage": "Cópia de segurança criada com sucesso"
   },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Criação do backup falhou. Você ainda pode proceder."
+  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Criar cópia de segurança"
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Pressiona Shift enquanto clicas para saltar a confirmação."
   },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Recomendamos a criação de um backup antes de proceder para que você possa restaurar {type, select, server {seu mundo} other {sua instância}} se alguma coisa quebrar."
+  },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Não mostrar novamente"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "Aguarde essa operação ser finalizada antes de editar o conteúdo."
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "Nenhum conteúdo instalado"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "Nenhum conteúdo extra instalado"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "Falha ao carregar conteúdo"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "Carregando conteúdo"
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "Nenhum conteúdo encontrado"
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Aguarde"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Procurar {count} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Nomes dos ficheiros"
@@ -307,6 +400,24 @@
   },
   "content.page-layout.sort.label": {
     "defaultMessage": "Ordenar por {mode}"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Atualizar tudo"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Enviar arquivos"
+  },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Enviando arquivos ({completed}/{total})"
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "Todo conteúdo selecionado já está desabilitado"
+  },
+  "content.selection-bar.bulk.enabling-waiting": {
+    "defaultMessage": "Habilitando {contentType}..."
+  },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Resumo da extração"
   },
   "files.delete-modal.header": {
     "defaultMessage": "Eliminar ficheiro"

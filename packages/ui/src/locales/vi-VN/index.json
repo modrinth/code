@@ -92,6 +92,9 @@
   "billing.resubscribe-modal.storage": {
     "defaultMessage": "{storageGb} GB bộ nhớ"
   },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Đăng ký lại máy chủ"
+  },
   "button.accept": {
     "defaultMessage": "Chấp nhận"
   },
@@ -557,11 +560,17 @@
   "files.editor.find-match-count": {
     "defaultMessage": "{current} trên {total}"
   },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Trận tiếp theo"
+  },
   "files.editor.find-no-results": {
     "defaultMessage": "Không có kết quả"
   },
   "files.editor.find-previous-match": {
     "defaultMessage": "Những kết quả trước"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Chuyển đổi thay thế"
   },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "URL tệp nhật kí của bạn đã được chép vào bảng tạm."
@@ -614,6 +623,12 @@
   "files.layout.busy-warning": {
     "defaultMessage": "Các thao tác với tệp sẽ bị vô hiệu hóa trong khi thao tác đang diễn ra."
   },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Lỗi khi chạy thử nghiệm không tải"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "Thử nghiệm không thành công"
+  },
   "files.layout.empty-folder-description": {
     "defaultMessage": "Không có tệp hoặc thư mục nào."
   },
@@ -625,6 +640,9 @@
   },
   "files.layout.error-title": {
     "defaultMessage": "Không thể tải tệp"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "Quá trình giải nén bắt đầu"
   },
   "files.layout.selected-count": {
     "defaultMessage": "đã chọn {count}"
@@ -641,11 +659,20 @@
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "v.d. /thu-muc-cua-toi"
   },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {Move folder} other {Move file}}"
+  },
   "files.navbar.back-to-home": {
     "defaultMessage": "Quay về trang chủ"
   },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Điều hướng bằng đường dẫn"
+  },
   "files.navbar.create-new": {
     "defaultMessage": "Tạo mới..."
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "Điều hướng tệp"
   },
   "files.navbar.home": {
     "defaultMessage": "Trang chủ"
