@@ -85,7 +85,7 @@
 		</template>
 	</div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -95,6 +95,32 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
+import type { LocationQueryValue } from 'vue-router'
+
+interface ApiErrorShape {
+	data?: {
+		description?: string
+		error?: string
+	}
+}
+
+const getQueryString = (
+	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string => {
+	const firstValue = Array.isArray(value) ? value[0] : value
+	return typeof firstValue === 'string' ? firstValue : ''
+}
+
+const getErrorMessage = (error: unknown): string => {
+	const apiError = error as ApiErrorShape
+	if (typeof apiError?.data?.description === 'string') {
+		return apiError.data.description
+	}
+	if (error instanceof Error) {
+		return error.message
+	}
+	return String(error)
+}
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -180,13 +206,13 @@ const route = useNativeRoute()
 
 if (route.query.flow) {
 	try {
-		const emailVerified = useState('emailVerified', () => null)
+		const emailVerified = useState<boolean | null>('emailVerified', () => null)
 
 		if (emailVerified.value === null) {
 			await useBaseFetch('auth/email/verify', {
 				method: 'POST',
 				body: {
-					flow: route.query.flow,
+					flow: getQueryString(route.query.flow),
 				},
 			})
 			emailVerified.value = true
@@ -211,14 +237,14 @@ async function handleResendEmailVerification() {
 		addNotification({
 			title: formatMessage(messages.emailSentNotificationTitle),
 			text: formatMessage(messages.emailSentNotificationDescription, {
-				email: auth.value.user.email,
+				email: auth.value.user?.email ?? '',
 			}),
 			type: 'success',
 		})
 	} catch (err) {
 		addNotification({
 			title: formatMessage(messages.errorOccurredTitle),
-			text: err.data.description,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
 	}
