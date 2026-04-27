@@ -37,8 +37,8 @@ import { process_listener } from '@/helpers/events'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_profile_path } from '@/helpers/process'
 import {
-	get_installed_project_ids as getInstalledProjectIds,
 	get as getInstance,
+	get_installed_project_ids as getInstalledProjectIds,
 	kill,
 	list as listInstances,
 } from '@/helpers/profile.js'
