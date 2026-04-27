@@ -1080,7 +1080,7 @@
     "defaultMessage": "网格视图"
   },
   "input.view.list": {
-    "defaultMessage": "行式视图"
+    "defaultMessage": "列表视图"
   },
   "installation-settings.aria.select-game-version": {
     "defaultMessage": "选择游戏版本"
@@ -3043,6 +3043,9 @@
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "你需要服务器有多少运行内存？"
+  },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "内存"
   },
   "servers.region.north-america": {
     "defaultMessage": "北美"

@@ -38,6 +38,18 @@
   "app.browse.install-content-to-instance": {
     "message": "Install content to instance"
   },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpacks"
+  },
+  "app.browse.server.install": {
+    "message": "Install"
+  },
+  "app.browse.server.installed": {
+    "message": "Installed"
+  },
+  "app.browse.server.installing": {
+    "message": "Installing"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Enter modpack description..."
   },

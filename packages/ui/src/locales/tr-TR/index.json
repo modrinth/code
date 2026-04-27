@@ -275,6 +275,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Projeleri güncelle"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Gelecekte bu onayı atlamak için \"Hepsini güncelle\" seçeneğine tıklarken Shift tuşuna basılı tutun."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "{count} projeyi güncelle"
   },
@@ -2756,6 +2759,9 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Ödeme yöntemi"
   },
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "Kuzey Amerika, Avrupa ve Güneydoğu Asya'da mevcut."
+  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Sana gereken şeyler için özel bir plan oluştur."
   },
@@ -2779,6 +2785,9 @@
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "Şu anki planınız"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Bölge"

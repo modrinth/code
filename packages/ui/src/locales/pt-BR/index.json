@@ -450,10 +450,10 @@
     "defaultMessage": "Atualizar tudo"
   },
   "content.page-layout.upload-files": {
-    "defaultMessage": "Enviar arquivos"
+    "defaultMessage": "Adicionar arquivos"
   },
   "content.page-layout.uploading-files": {
-    "defaultMessage": "Enviando arquivos ({completed}/{total})"
+    "defaultMessage": "Adicionando arquivos ({completed}/{total})"
   },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Todo o conteúdo selecionado já está desativado"
@@ -696,13 +696,13 @@
     "defaultMessage": "Compartilhar em mclo.gs"
   },
   "files.navbar.upload-file": {
-    "defaultMessage": "Enviar arquivo"
+    "defaultMessage": "Adicionar arquivo"
   },
   "files.navbar.upload-from-zip": {
-    "defaultMessage": "Enviar a partir de arquivo .zip"
+    "defaultMessage": "Adicionar a partir de arquivo .zip"
   },
   "files.navbar.upload-from-zip-url": {
-    "defaultMessage": "Enviar a partir de um URL .zip"
+    "defaultMessage": "Adicionar a partir de um URL .zip"
   },
   "files.operations.extracted": {
     "defaultMessage": "{size} extraído"
@@ -759,7 +759,7 @@
     "defaultMessage": "Falha - Tipo de arquivo incorreto"
   },
   "files.upload-dropdown.failed-to-upload": {
-    "defaultMessage": "Falha ao enviar {fileName}"
+    "defaultMessage": "Falha ao adicionar {fileName}"
   },
   "files.upload-dropdown.file": {
     "defaultMessage": "Arquivo"
@@ -1548,7 +1548,7 @@
     "defaultMessage": "Atualizando..."
   },
   "label.upload-failed": {
-    "defaultMessage": "Falha ao enviar"
+    "defaultMessage": "Falha ao adicionar"
   },
   "label.username": {
     "defaultMessage": "Nome de usuário"
@@ -3044,6 +3044,9 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "Quanto de RAM você quer no seu servidor?"
   },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "RAM"
+  },
   "servers.region.north-america": {
     "defaultMessage": "América do Norte"
   },
@@ -3075,7 +3078,7 @@
     "defaultMessage": "Por favor, não feche esta página durante o processo de envio."
   },
   "servers.setup.uploading-modpack.header": {
-    "defaultMessage": "Enviando pacote de mods"
+    "defaultMessage": "Adicionando pacote de mods"
   },
   "settings.account.title": {
     "defaultMessage": "Conta e segurança"

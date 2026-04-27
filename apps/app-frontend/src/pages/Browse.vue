@@ -34,10 +34,11 @@ import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
+import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_profile_path } from '@/helpers/process'
 import {
-	get as getInstance,
 	get_installed_project_ids as getInstalledProjectIds,
+	get as getInstance,
 	kill,
 	list as listInstances,
 } from '@/helpers/profile.js'
@@ -509,9 +510,25 @@ const messages = defineMessages({
 		id: 'app.browse.install-content-to-instance',
 		defaultMessage: 'Install content to instance',
 	},
+	installToServer: {
+		id: 'app.browse.server.install',
+		defaultMessage: 'Install',
+	},
+	installedToServer: {
+		id: 'app.browse.server.installed',
+		defaultMessage: 'Installed',
+	},
+	installingToServer: {
+		id: 'app.browse.server.installing',
+		defaultMessage: 'Installing',
+	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
 		defaultMessage: 'Loader is provided by the instance',
+	},
+	modpacksProjectType: {
+		id: 'app.browse.project-type.modpacks',
+		defaultMessage: 'Modpacks',
 	},
 	modLoaderProvidedByServer: {
 		id: 'search.filter.locked.server-loader.title',
@@ -618,7 +635,9 @@ const selectableProjectTypes = computed(() => {
 	const suffix = queryString ? `?${queryString}` : ''
 
 	if (isSetupServerContext.value) {
-		return [{ label: 'Modpacks', href: `/browse/modpack${suffix}` }]
+		return [
+			{ label: formatMessage(messages.modpacksProjectType), href: `/browse/modpack${suffix}` },
+		]
 	}
 
 	if (isFromWorlds.value) {
@@ -808,8 +827,14 @@ function getCardActions(
 		return [
 			{
 				key: 'install',
-				label: isInstalling ? 'Installing' : isInstalled ? 'Installed' : 'Install',
-				icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : PlusIcon,
+				label: formatMessage(
+					isInstalling
+						? messages.installingToServer
+						: isInstalled
+							? messages.installedToServer
+							: messages.installToServer,
+				),
+				icon: isInstalled ? CheckIcon : PlusIcon,
 				iconClass: isInstalling ? 'animate-spin' : undefined,
 				disabled: isInstalled || isInstalling,
 				color: 'brand',
@@ -1073,6 +1098,7 @@ provideBrowseManager({
 			:on-back="onServerFlowBack"
 			:search-modpacks="searchServerModpacks"
 			:get-project-versions="getServerProjectVersions"
+			:get-loader-manifest="getLoaderManifest"
 			@hide="() => {}"
 			@browse-modpacks="() => {}"
 			@create="handleServerModpackFlowCreate"

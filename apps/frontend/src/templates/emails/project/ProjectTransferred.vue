@@ -24,7 +24,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		</Section>
 		<Heading as="h1" class="mb-2 text-2xl font-bold">Project ownership transferred</Heading>
 
-		<Text class="text-base">Hi {user.name},</Text>
+		<Text class="text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 
 		<Text class="text-base">
 			The ownership of

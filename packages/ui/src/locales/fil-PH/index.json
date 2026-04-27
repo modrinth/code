@@ -2021,6 +2021,9 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "Ilang RAM ba ang nais mong magamit ng sever mo?"
   },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "RAM"
+  },
   "servers.region.north-america": {
     "defaultMessage": "Hilagang Amerika"
   },
