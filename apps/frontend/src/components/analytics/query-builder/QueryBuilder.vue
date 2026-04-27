@@ -66,64 +66,7 @@
 				</div>
 			</div>
 			<div class="flex items-center gap-2">
-				<span class="text-base font-medium text-primary">Filtered by</span>
-				<Menu :triggers="['click']" :auto-hide="false" no-auto-focus placement="bottom-start">
-					<button
-						type="button"
-						class="inline-flex items-center gap-2 rounded-xl border border-dashed border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-4"
-					>
-						<PlusIcon class="size-5" />
-						Add
-					</button>
-
-					<template #popper>
-						<div class="flex w-[16rem] flex-col gap-1">
-							<Menu
-								v-for="category in filterCategories"
-								:key="category.key"
-								:triggers="['hover', 'focus']"
-								:auto-hide="false"
-								no-auto-focus
-								placement="right-start"
-							>
-								<button
-									type="button"
-									class="flex w-full items-center justify-between rounded-lg bg-surface-3 px-2 py-1.5 text-left text-base font-medium text-primary transition-colors hover:bg-surface-3"
-								>
-									<span>{{ category.label }}</span>
-									<div class="flex items-center gap-1">
-										<span
-											v-if="getCategorySelectionCount(category.key) > 0"
-											class="rounded-full bg-surface-3 px-1.5 py-0.5 text-xs text-primary"
-										>
-											{{ getCategorySelectionCount(category.key) }}
-										</span>
-										<ChevronRightIcon class="size-5 text-primary" />
-									</div>
-								</button>
-
-								<template #popper>
-									<div>
-										<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
-											{{ category.label }}
-										</p>
-										<div class="flex max-h-[min(70vh,32rem)] flex-col gap-2 overflow-y-auto pr-1">
-											<Checkbox
-												v-for="option in category.options"
-												:key="`${category.key}-${option.value}`"
-												:model-value="isFilterValueSelected(category.key, option.value)"
-												:label="option.label"
-												@update:model-value="
-													(nextValue) => toggleFilterValue(category.key, option.value, nextValue)
-												"
-											/>
-										</div>
-									</div>
-								</template>
-							</Menu>
-						</div>
-					</template>
-				</Menu>
+				<QueryBuilderFilter />
 			</div>
 		</div>
 	</div>
@@ -131,32 +74,19 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	BlocksIcon,
-	CalendarIcon,
-	ChevronRightIcon,
-	FolderOpenIcon,
-	PlusIcon,
-} from '@modrinth/assets'
-import {
-	Checkbox,
-	Combobox,
-	type ComboboxOption,
-	MultiSelect,
-	type MultiSelectOption,
-} from '@modrinth/ui'
-import { Menu } from 'floating-vue'
+import { BlocksIcon, CalendarIcon, FolderOpenIcon } from '@modrinth/assets'
+import { Combobox, type ComboboxOption, MultiSelect, type MultiSelectOption } from '@modrinth/ui'
 
 import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsGroupByPreset,
-	type AnalyticsQueryFilterCategory,
 	type AnalyticsSelectedFilters,
 	type AnalyticsTimeframePreset,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
-const ALL_FILTER_VALUE = '__all__'
+import QueryBuilderFilter from './QueryFilter.vue'
+
 const MIN_RANGE_MS = 60 * 60 * 1000
 const MAX_TIME_SLICES = 1024
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
@@ -214,138 +144,6 @@ const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
 	{ value: 'loader', label: 'Loader' },
 	{ value: 'game_version', label: 'Game version' },
 ]
-
-type FilterOption = {
-	value: string
-	label: string
-}
-
-type FilterCategory = {
-	key: AnalyticsQueryFilterCategory
-	label: string
-	options: FilterOption[]
-}
-
-const filterCategories = computed<FilterCategory[]>(() => [
-	{
-		key: 'project',
-		label: 'Project',
-		options: [
-			{ value: ALL_FILTER_VALUE, label: 'All projects' },
-			...projects.value.map((project) => ({ value: project.id, label: project.name })),
-		],
-	},
-	{
-		key: 'country',
-		label: 'Country',
-		options: [{ value: ALL_FILTER_VALUE, label: 'All countries' }],
-	},
-	{
-		key: 'monetization',
-		label: 'Monetization',
-		options: [
-			{ value: ALL_FILTER_VALUE, label: 'All monetization states' },
-			{ value: 'monetized', label: 'Monetized' },
-			{ value: 'unmonetized', label: 'Unmonetized' },
-		],
-	},
-	{
-		key: 'download_source',
-		label: 'Download source',
-		options: [{ value: ALL_FILTER_VALUE, label: 'All download sources' }],
-	},
-	{
-		key: 'download_type',
-		label: 'Download type',
-		options: [
-			{ value: ALL_FILTER_VALUE, label: 'All download types' },
-			{ value: 'modpack', label: 'Modpack' },
-			{ value: 'standalone', label: 'Standalone' },
-			{ value: 'dependency', label: 'Dependency' },
-		],
-	},
-	{
-		key: 'game_version',
-		label: 'Game version',
-		options: [{ value: ALL_FILTER_VALUE, label: 'All game versions' }],
-	},
-	{
-		key: 'loader_type',
-		label: 'Loader type',
-		options: [{ value: ALL_FILTER_VALUE, label: 'All loader types' }],
-	},
-])
-
-function isFilterValueSelected(categoryKey: AnalyticsQueryFilterCategory, value: string): boolean {
-	if (categoryKey === 'project') {
-		if (value === ALL_FILTER_VALUE) {
-			return selectedProjectIds.value.length === projects.value.length
-		}
-
-		return selectedProjectIds.value.includes(value)
-	}
-
-	const values = selectedFilters.value[categoryKey]
-	if (value === ALL_FILTER_VALUE) {
-		return values.length === 0
-	}
-	return values.includes(value)
-}
-
-function toggleFilterValue(
-	categoryKey: AnalyticsQueryFilterCategory,
-	value: string,
-	nextValue: boolean,
-) {
-	if (categoryKey === 'project') {
-		if (value === ALL_FILTER_VALUE) {
-			if (nextValue) {
-				selectedProjectIds.value = projects.value.map((project) => project.id)
-			}
-			return
-		}
-
-		if (nextValue) {
-			if (!selectedProjectIds.value.includes(value)) {
-				selectedProjectIds.value = [...selectedProjectIds.value, value]
-			}
-			return
-		}
-
-		selectedProjectIds.value = selectedProjectIds.value.filter((projectId) => projectId !== value)
-		if (selectedProjectIds.value.length === 0) {
-			selectedProjectIds.value = projects.value.map((project) => project.id)
-		}
-		return
-	}
-
-	const currentValues = selectedFilters.value[categoryKey]
-
-	if (value === ALL_FILTER_VALUE) {
-		if (nextValue) {
-			selectedFilters.value[categoryKey] = []
-		}
-		return
-	}
-
-	if (nextValue) {
-		if (!currentValues.includes(value)) {
-			selectedFilters.value[categoryKey] = [...currentValues, value]
-		}
-	} else {
-		selectedFilters.value[categoryKey] = currentValues.filter((item) => item !== value)
-	}
-}
-
-function getCategorySelectionCount(categoryKey: AnalyticsQueryFilterCategory): number {
-	if (categoryKey === 'project') {
-		return selectedProjectIds.value.length === projects.value.length
-			? 0
-			: selectedProjectIds.value.length
-	}
-
-	return selectedFilters.value[categoryKey].length
-}
 
 function startOfDay(date: Date): Date {
 	const nextDate = new Date(date)
