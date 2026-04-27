@@ -39,7 +39,7 @@
 import type { Archon } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import {
 	injectModrinthClient,
@@ -56,7 +56,7 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const ctx = injectModrinthServerContext()
 
-const backupsQueryKey = ['backups', 'queue', ctx.serverId]
+const backupsQueryKey = computed(() => ['backups', 'queue', ctx.serverId, ctx.worldId.value])
 
 function safetyBackupName(backupName: string) {
 	const base = `Before restoring "${backupName}"`
@@ -66,7 +66,7 @@ function safetyBackupName(backupName: string) {
 const restoreMutation = useMutation({
 	mutationFn: ({ backupId, name }: { backupId: string; name: string }) =>
 		client.archon.backups_queue_v1.restore(ctx.serverId, ctx.worldId.value!, backupId, { name }),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey.value }),
 })
 
 const modal = ref<InstanceType<typeof NewModal>>()

@@ -244,7 +244,6 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import type { Component } from 'vue'
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
@@ -334,16 +333,13 @@ const filterPillOptions = computed<FilterPillOption[]>(() => [
 ])
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { server, worldId, busyReasons } = injectModrinthServerContext()
+const { server, serverId, worldId, busyReasons } = injectModrinthServerContext()
 
 const props = defineProps<{
 	isServerRunning: boolean
 	showCopyIdAction?: boolean
 	showDebugInfo?: boolean
 }>()
-
-const route = useRoute()
-const serverId = route.params.id as string
 
 defineEmits(['onDownload'])
 

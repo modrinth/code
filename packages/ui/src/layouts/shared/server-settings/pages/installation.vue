@@ -206,18 +206,19 @@ const isInstalling = computed(() => {
 })
 const installationSettingsLayout = ref<InstanceType<typeof InstallationSettingsLayout>>()
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
+const contentListQueryKey = computed(() => ['content', 'list', 'v1', serverId, worldId.value])
 
 async function invalidateServerState() {
 	debug('invalidateServerState: starting')
 	await Promise.all([
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+		queryClient.invalidateQueries({ queryKey: contentListQueryKey.value }),
 	])
 	debug('invalidateServerState: complete')
 }
 
 const addonsQuery = useQuery({
-	queryKey: computed(() => ['content', 'list', 'v1', serverId]),
+	queryKey: contentListQueryKey,
 	queryFn: () =>
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
@@ -627,7 +628,7 @@ provideInstallationSettings({
 		const previousData = addonsQuery.data.value
 		if (previousData) {
 			debug('unlinkModpack: optimistically removing modpack from cache')
-			queryClient.setQueryData(['content', 'list', 'v1', serverId], {
+			queryClient.setQueryData(contentListQueryKey.value, {
 				...previousData,
 				modpack: null,
 			})
@@ -639,7 +640,7 @@ provideInstallationSettings({
 		} catch (err) {
 			debug('unlinkModpack: failed, reverting cache', err)
 			if (previousData) {
-				queryClient.setQueryData(['content', 'list', 'v1', serverId], previousData)
+				queryClient.setQueryData(contentListQueryKey.value, previousData)
 			}
 			addNotification({
 				type: 'error',
@@ -652,7 +653,7 @@ provideInstallationSettings({
 					queryKey: ['servers', 'detail', serverId],
 				}),
 				queryClient.invalidateQueries({
-					queryKey: ['content', 'list', 'v1', serverId],
+					queryKey: contentListQueryKey.value,
 				}),
 			])
 			debug('unlinkModpack: invalidation complete')

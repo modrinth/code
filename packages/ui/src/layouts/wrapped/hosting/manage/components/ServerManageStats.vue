@@ -76,7 +76,7 @@ onMounted(() => {
 	isClient.value = true
 })
 
-const { serverId } = injectModrinthServerContext()
+const { serverId, worldId } = injectModrinthServerContext()
 const { featureFlags } = injectPageContext()
 
 const props = withDefaults(
@@ -198,7 +198,9 @@ const metrics = computed(() => {
 		showGraph: false,
 		chartOptions: null as ReturnType<typeof buildChartOptions> | null,
 		series: null as { name: string; data: number[] }[] | null,
-		link: `/hosting/manage/${encodeURIComponent(serverId)}/files`,
+		link: worldId.value
+			? `/hosting/manage/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId.value)}/files`
+			: `/hosting/manage/${encodeURIComponent(serverId)}/worlds`,
 	}
 
 	if (props.loading) {

@@ -3,7 +3,7 @@ import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { useReadyState } from '#ui/composables'
@@ -82,14 +82,12 @@ const messages = defineMessages({
 })
 
 const client = injectModrinthClient()
-const { server, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
+const { server, serverId, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
 	injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const { openServerSettings, browseServerContent } = injectServerSettingsModal()
-const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
-const serverId = route.params.id as string
 
 const type = computed(() => {
 	const loader = server.value?.loader?.toLowerCase()
@@ -98,7 +96,7 @@ const type = computed(() => {
 	return 'mod'
 })
 
-const queryKey = computed(() => ['content', 'list', 'v1', serverId])
+const queryKey = computed(() => ['content', 'list', 'v1', serverId, worldId.value])
 
 const contentQuery = useQuery({
 	queryKey,

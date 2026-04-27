@@ -211,7 +211,10 @@ function syncHiddenInstalledProjectIds() {
 	hiddenInstalledProjectIdsInitialized.value = true
 }
 
-const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
+const contentQueryKey = computed(
+	() =>
+		['content', 'list', 'v1', currentServerId.value ?? '', currentWorldId.value ?? null] as const,
+)
 const { data: serverContentData, error: serverContentError } = useQuery({
 	queryKey: contentQueryKey,
 	queryFn: () => client.archon.content_v1.getAddons(currentServerId.value!, currentWorldId.value!),
@@ -252,7 +255,7 @@ const installContentMutation = useMutation({
 		}),
 	onSuccess: () => {
 		if (currentServerId.value) {
-			queryClient.refetchQueries({ queryKey: ['content', 'list', currentServerId.value] })
+			queryClient.refetchQueries({ queryKey: contentQueryKey.value })
 		}
 	},
 })
@@ -551,7 +554,7 @@ async function onModpackFlowCreate(config: CreationFlowContextValue) {
 		if (fromContext.value === 'onboarding') {
 			await client.archon.servers_v1.endIntro(currentServerId.value)
 			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
-			navigateTo(`/hosting/manage/${currentServerId.value}/content`)
+			navigateTo(getServerWorldContentPath(currentServerId.value, currentWorldId.value ?? null))
 		} else {
 			navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
 		}
@@ -566,8 +569,13 @@ const serverBackUrl = computed(() => {
 	const id = serverData.value.server_id
 	if (fromContext.value === 'onboarding') return `/hosting/manage/${id}?resumeModal=setup-type`
 	if (fromContext.value === 'reset-server') return `/hosting/manage/${id}?openSettings=installation`
-	return `/hosting/manage/${id}/content`
+	return getServerWorldContentPath(id, currentWorldId.value ?? null)
 })
+
+function getServerWorldContentPath(serverId: string, worldId: string | null) {
+	const base = `/hosting/manage/${encodeURIComponent(serverId)}/worlds`
+	return worldId ? `${base}/${encodeURIComponent(worldId)}` : base
+}
 
 const serverBackLabel = computed(() => {
 	if (fromContext.value === 'onboarding') return 'Back to setup'

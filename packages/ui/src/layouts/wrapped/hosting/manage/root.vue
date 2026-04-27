@@ -92,7 +92,17 @@
 			</template>
 		</ErrorInformationCard>
 	</div>
-	<!-- SERVER START -->
+	<div
+		v-else-if="serverData && isWorldDetailRoute"
+		data-pyro-world-manager-root
+		class="experimental-styles-within relative mx-auto box-border flex w-full min-w-0 flex-col px-6 transition-all duration-300"
+		:class="[
+			'server-panel-' + revealState,
+			isNuxt ? 'min-h-[100svh] max-w-[1280px] pb-16' : 'min-h-[calc(100svh-100px)] pb-6',
+		]"
+	>
+		<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
+	</div>
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
@@ -115,6 +125,7 @@
 				:server="serverData"
 				:server-image="serverImage"
 				:server-project="serverProject"
+				:active-world-name="activeWorldName"
 				:uptime-seconds="showUptime ? uptimeSeconds : undefined"
 			>
 				<template #actions>
@@ -306,7 +317,7 @@
 		</template>
 	</div>
 	<div
-		v-if="showAdvancedDebugInfo"
+		v-if="showAdvancedDebugInfo && !isWorldDetailRoute"
 		class="experimental-styles-within relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
 	>
 		<h2 class="m-0 text-lg font-extrabold text-contrast">
@@ -336,12 +347,9 @@ import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
-	BoxesIcon,
 	CheckIcon,
 	CopyIcon,
-	DatabaseBackupIcon,
 	FileIcon,
-	FolderOpenIcon,
 	IssuesIcon,
 	LayoutTemplateIcon,
 	LoaderCircleIcon,
@@ -619,21 +627,9 @@ const messages = defineMessages({
 		id: 'servers.manage.nav.overview',
 		defaultMessage: 'Overview',
 	},
-	contentNav: {
-		id: 'servers.manage.nav.content',
-		defaultMessage: 'Content',
-	},
 	worldsNav: {
 		id: 'servers.manage.nav.worlds',
 		defaultMessage: 'Worlds',
-	},
-	filesNav: {
-		id: 'servers.manage.nav.files',
-		defaultMessage: 'Files',
-	},
-	backupsNav: {
-		id: 'servers.manage.nav.backups',
-		defaultMessage: 'Backups',
 	},
 	errorDismissingNotice: {
 		id: 'servers.manage.notice.dismiss-error',
@@ -768,10 +764,28 @@ const { data: serverFull } = useQuery({
 })
 
 const worldId = computed(() => {
+	const routeWorldId = getRouteParam(route.params.world_id)
+	if (routeWorldId) return routeWorldId
 	if (!serverFull.value) return null
 	const activeWorld = serverFull.value.worlds.find((w) => w.is_active)
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
+
+const isWorldDetailRoute = computed(() => !!getRouteParam(route.params.world_id))
+const activeWorldName = computed(() => {
+	if (!serverFull.value) return null
+	const activeWorld = serverFull.value.worlds.find((world) => world.is_active)
+	return activeWorld?.name ?? serverFull.value.worlds[0]?.name ?? null
+})
+
+function getRouteParam(param: string | string[] | undefined): string | null {
+	if (Array.isArray(param)) return param[0] ?? null
+	return param ?? null
+}
+
+function getWorldPath(targetWorldId: string) {
+	return `/hosting/manage/${encodeURIComponent(props.serverId)}/worlds/${encodeURIComponent(targetWorldId)}`
+}
 
 const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQueue(
 	computed(() => props.serverId),
@@ -985,32 +999,14 @@ watch(serverData, (data) => {
 const navLinks = computed<Tab[]>(() => [
 	{
 		label: formatMessage(messages.overviewNav),
-		href: `/hosting/manage/${props.serverId}`,
+		href: `/hosting/manage/${encodeURIComponent(props.serverId)}`,
 		icon: LayoutTemplateIcon,
 		subpages: [],
 	},
 	{
-		label: formatMessage(messages.contentNav),
-		href: `/hosting/manage/${props.serverId}/content`,
-		icon: BoxesIcon,
-		subpages: ['mods', 'datapacks'],
-	},
-	{
 		label: formatMessage(messages.worldsNav),
-		href: `/hosting/manage/${props.serverId}/worlds`,
+		href: `/hosting/manage/${encodeURIComponent(props.serverId)}/worlds`,
 		icon: WorldIcon,
-		subpages: [],
-	},
-	{
-		label: formatMessage(messages.filesNav),
-		href: `/hosting/manage/${props.serverId}/files`,
-		icon: FolderOpenIcon,
-		subpages: [],
-	},
-	{
-		label: formatMessage(messages.backupsNav),
-		href: `/hosting/manage/${props.serverId}/backups`,
-		icon: DatabaseBackupIcon,
 		subpages: [],
 	},
 	...props.additionalTabs,
@@ -1159,7 +1155,7 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 }
 
 const handleNewMod = () => {
-	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+	queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
 }
 
 const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
@@ -1245,7 +1241,7 @@ const onReinstall = async (
 
 	debug('[root.vue] onReinstall: triggering immediate invalidation')
 	queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
-	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+	queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
 }
 
 const onReinstallFailed = () => {
@@ -1294,7 +1290,7 @@ async function invalidateAfterInstall() {
 				queryClient.invalidateQueries({
 					queryKey: ['servers', 'startup', 'v1', props.serverId],
 				}),
-				queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
+				queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] }),
 			])
 		} catch (err: unknown) {
 			console.error('Error refreshing data after installation:', err)
@@ -1418,7 +1414,10 @@ const copyServerDebugInfo = () => {
 }
 
 const openInstallLog = () => {
-	const url = `/hosting/manage/${props.serverId}/files?editing=${encodeURIComponent(errorLogFile.value)}`
+	const filesPath = worldId.value
+		? `${getWorldPath(worldId.value)}/files`
+		: `/hosting/manage/${encodeURIComponent(props.serverId)}/worlds`
+	const url = `${filesPath}?editing=${encodeURIComponent(errorLogFile.value)}`
 	window.history.pushState({}, '', url)
 	window.dispatchEvent(new PopStateEvent('popstate'))
 }
