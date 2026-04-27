@@ -119,7 +119,7 @@ const { data: allReports } = await useLazyAsyncData('new-moderation-reports', as
 			const completed = await Promise.all(enrichmentPromises.splice(0, 2))
 			allReports.push(...completed.flat())
 		}
-	} while (reports.length === REPORT_ENDPOINT_COUNT)
+	} while (true)
 
 	const remainingBatches = await Promise.all(enrichmentPromises)
 	allReports.push(...remainingBatches.flat())
