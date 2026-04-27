@@ -52,7 +52,13 @@ export function useServerImage(
 
 	const queryKey = computed(
 		() =>
-			['servers', 'detail', resolvedServerId.value, 'icon', upstream.value?.project_id ?? null] as const,
+			[
+				'servers',
+				'detail',
+				resolvedServerId.value,
+				'icon',
+				upstream.value?.project_id ?? null,
+			] as const,
 	)
 
 	const isEnabled = computed(() => {

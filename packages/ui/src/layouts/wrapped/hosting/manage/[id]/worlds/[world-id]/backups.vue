@@ -259,6 +259,7 @@ import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
 import { useBackupsSelection } from '#ui/composables/servers/backups-selection'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useBackupsSelection } from '#ui/composables/servers/backups-selection'
 import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
 import { useBulkOperation } from '#ui/layouts/shared/content-tab/composables/bulk-operations'
 import {
