@@ -22,8 +22,8 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="We're getting your server ready"
-			description="Your server's hardware is being prepared and will be available shortly!"
+			:title="formatMessage(messages.serverPreparingTitle)"
+			:description="formatMessage(messages.serverPreparingDescription)"
 			:icon="TransferIcon"
 			icon-color="blue"
 			:action="generalErrorAction"
@@ -34,8 +34,8 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="Server upgrading"
-			description="Your server's hardware is currently being upgraded and will be back online shortly!"
+			:title="formatMessage(messages.serverUpgradingTitle)"
+			:description="formatMessage(messages.serverUpgradingDescription)"
 			:icon="TransferIcon"
 			icon-color="blue"
 			:action="generalErrorAction"
@@ -46,7 +46,7 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="Server suspended"
+			:title="formatMessage(messages.serverSuspendedTitle)"
 			:description="suspendedDescription"
 			:icon="LockIcon"
 			icon-color="orange"
@@ -58,8 +58,8 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="An error occured."
-			description="Please contact Modrinth Support."
+			:title="formatMessage(messages.generalErrorTitle)"
+			:description="formatMessage(messages.contactSupportDescription)"
 			:icon="TransferIcon"
 			icon-color="orange"
 			:error-details="generalErrorDetails"
@@ -71,7 +71,7 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="Server Node Unavailable"
+			:title="formatMessage(messages.nodeUnavailableTitle)"
 			:icon="TriangleAlertIcon"
 			icon-color="red"
 			:action="nodeUnavailableAction"
@@ -80,16 +80,13 @@
 			<template #description>
 				<div class="text-md space-y-4">
 					<p class="leading-[170%] text-secondary">
-						Your server's node, where your Modrinth Server is physically hosted, is not accessible
-						at the moment. We are working to resolve the issue as quickly as possible.
+						{{ formatMessage(messages.nodeUnavailableDescription) }}
 					</p>
 					<p class="leading-[170%] text-secondary">
-						Your data is safe and will not be lost, and your server will be back online as soon as
-						the issue is resolved.
+						{{ formatMessage(messages.nodeUnavailableDataDescription) }}
 					</p>
 					<p class="leading-[170%] text-secondary">
-						If reloading does not work initially, please contact Modrinth Support via the chat
-						bubble in the bottom right corner and we'll be happy to help.
+						{{ formatMessage(messages.nodeUnavailableSupportDescription) }}
 					</p>
 				</div>
 			</template>
@@ -132,7 +129,7 @@
 						>
 							<ButtonStyled circular size="large">
 								<button
-									v-tooltip="showSettingsHint ? undefined : 'Server settings'"
+									v-tooltip="showSettingsHint ? undefined : formatMessage(messages.serverSettings)"
 									@click="
 										() => {
 											openServerSettingsModal()
@@ -199,70 +196,59 @@
 							<div class="flex flex-col gap-2 leading-[150%]">
 								<div class="flex items-center gap-3">
 									<IssuesIcon class="flex h-8 w-8 shrink-0 text-red sm:hidden" />
-									<div class="flex gap-2 text-2xl font-bold">{{ errorTitle }}</div>
+									<div class="flex gap-2 text-2xl font-bold">{{ errorTitleLabel }}</div>
 								</div>
 
-								<div
-									v-if="errorTitle.toLocaleLowerCase() === 'installation error'"
-									class="font-normal"
-								>
+								<div v-if="errorTitle === 'installation'" class="font-normal">
 									<div
 										v-if="
 											errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
 										"
 									>
-										An invalid loader or Minecraft version was specified and could not be installed.
+										{{ formatMessage(messages.installInvalidVersionDescription) }}
 										<ul class="m-0 mt-4 p-0 pl-4">
 											<li>
-												If this version of Minecraft was released recently, please check if Modrinth
-												Hosting supports it.
+												{{ formatMessage(messages.installRecentMinecraftVersionNotice) }}
 											</li>
 											<li>
-												If you've installed a modpack, it may have been packaged incorrectly or may
-												not be compatible with the loader.
+												{{ formatMessage(messages.installModpackCompatibilityNotice) }}
 											</li>
 											<li>
-												Your server may need to be reinstalled with a valid mod loader and version.
-												You can change the loader by clicking the "Change Loader" button.
+												{{ formatMessage(messages.installChangeLoaderNotice) }}
 											</li>
 											<li>
-												If you're stuck, please contact Modrinth Support with the information below:
+												{{ formatMessage(messages.installSupportNotice) }}
 											</li>
 										</ul>
 										<ButtonStyled>
 											<button class="mt-2" @click="copyServerDebugInfo">
 												<CopyIcon v-if="!copied" />
 												<CheckIcon v-else />
-												Copy Debug Info
+												{{ formatMessage(messages.copyDebugInfo) }}
 											</button>
 										</ButtonStyled>
 									</div>
 									<div v-if="errorMessage.toLocaleLowerCase() === 'internal error'">
-										An internal error occurred while installing your server. Don't fret — try
-										reinstalling your server, and if the problem persists, please contact Modrinth
-										support with your server's debug information.
+										{{ formatMessage(messages.installInternalErrorDescription) }}
 									</div>
 									<div
 										v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'"
 									>
-										An error occurred while installing your server because Modrinth Hosting does not
-										support the version of Minecraft or the loader you specified. Try reinstalling
-										your server with a different version or loader, and if the problem persists,
-										please contact Modrinth Support with your server's debug information.
+										{{ formatMessage(messages.installUnsupportedVersionDescription) }}
 									</div>
 
-									<div
-										v-if="errorTitle === 'Installation error'"
-										class="mt-2 flex flex-col gap-4 sm:flex-row"
-									>
+									<div class="mt-2 flex flex-col gap-4 sm:flex-row">
 										<ButtonStyled v-if="errorLog">
-											<button @click="openInstallLog"><FileIcon />Open Installation Log</button>
+											<button @click="openInstallLog">
+												<FileIcon />
+												{{ formatMessage(messages.openInstallationLog) }}
+											</button>
 										</ButtonStyled>
 										<ButtonStyled>
 											<button @click="copyServerDebugInfo">
 												<CopyIcon v-if="!copied" />
 												<CheckIcon v-else />
-												Copy Debug Info
+												{{ formatMessage(messages.copyDebugInfo) }}
 											</button>
 										</ButtonStyled>
 										<ButtonStyled color="red" type="standard">
@@ -271,7 +257,7 @@
 												@click="openServerSettingsModal('installation')"
 											>
 												<RightArrowIcon />
-												Change Loader
+												{{ formatMessage(messages.changeLoader) }}
 											</button>
 										</ButtonStyled>
 									</div>
@@ -295,7 +281,7 @@
 						class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
 					>
 						<IssuesIcon class="size-5 text-red" />
-						Something went wrong...
+						{{ formatMessage(messages.websocketError) }}
 					</div>
 
 					<div
@@ -304,7 +290,7 @@
 						class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
 					>
 						<LoaderCircleIcon class="h-5 w-5 animate-spin" />
-						Hang on, we're reconnecting to your server.
+						{{ formatMessage(messages.websocketReconnecting) }}
 					</div>
 
 					<ServerPanelAdmonitions
@@ -323,7 +309,9 @@
 		v-if="showAdvancedDebugInfo"
 		class="experimental-styles-within relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
 	>
-		<h2 class="m-0 text-lg font-extrabold text-contrast">Server data</h2>
+		<h2 class="m-0 text-lg font-extrabold text-contrast">
+			{{ formatMessage(messages.serverDataTitle) }}
+		</h2>
 		<pre class="markdown-body w-full overflow-auto rounded-2xl bg-bg-raised p-4 text-sm">{{
 			safeStringify(serverData)
 		}}</pre>
@@ -362,6 +350,7 @@ import {
 	SettingsIcon,
 	TransferIcon,
 	TriangleAlertIcon,
+	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
@@ -485,6 +474,33 @@ const settingsHintMessages = defineMessages({
 	dismiss: {
 		id: 'servers.manage.settings-hint.dismiss',
 		defaultMessage: "Don't show again",
+	},
+})
+
+const messages = defineMessages({
+	serverSettings: {
+		id: 'servers.manage.server-settings',
+		defaultMessage: 'Server settings',
+	},
+	overviewNav: {
+		id: 'servers.manage.nav.overview',
+		defaultMessage: 'Overview',
+	},
+	contentNav: {
+		id: 'servers.manage.nav.content',
+		defaultMessage: 'Content',
+	},
+	worldsNav: {
+		id: 'servers.manage.nav.worlds',
+		defaultMessage: 'Worlds',
+	},
+	filesNav: {
+		id: 'servers.manage.nav.files',
+		defaultMessage: 'Files',
+	},
+	backupsNav: {
+		id: 'servers.manage.nav.backups',
+		defaultMessage: 'Backups',
 	},
 })
 
@@ -768,25 +784,31 @@ watch(serverData, (data) => {
 
 const navLinks = computed<Tab[]>(() => [
 	{
-		label: 'Overview',
+		label: formatMessage(messages.overviewNav),
 		href: `/hosting/manage/${props.serverId}`,
 		icon: LayoutTemplateIcon,
 		subpages: [],
 	},
 	{
-		label: 'Content',
+		label: formatMessage(messages.contentNav),
 		href: `/hosting/manage/${props.serverId}/content`,
 		icon: BoxesIcon,
 		subpages: ['mods', 'datapacks'],
 	},
 	{
-		label: 'Files',
+		label: formatMessage(messages.worldsNav),
+		href: `/hosting/manage/${props.serverId}/worlds`,
+		icon: WorldIcon,
+		subpages: [],
+	},
+	{
+		label: formatMessage(messages.filesNav),
 		href: `/hosting/manage/${props.serverId}/files`,
 		icon: FolderOpenIcon,
 		subpages: [],
 	},
 	{
-		label: 'Backups',
+		label: formatMessage(messages.backupsNav),
 		href: `/hosting/manage/${props.serverId}/backups`,
 		icon: DatabaseBackupIcon,
 		subpages: [],
