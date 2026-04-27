@@ -2,18 +2,16 @@
 	<div
 		class="universal-card flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
 	>
-		<div v-if="authorizationError" class="flex flex-col gap-8">
-			<div>
-				<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
-					{{ formatMessage(commonMessages.errorLabel) }}
-				</h1>
-			</div>
+		<div v-if="authorizationError" class="flex flex-col gap-2.5">
+			<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
+				{{ formatMessage(messages.errorTitle) }}
+			</h1>
 			<p class="m-0">
 				<span>{{ authorizationError.error }}: </span>
 				{{ authorizationError.description }}
 			</p>
 		</div>
-		<div v-else-if="app && createdBy && authorizationData" class="flex flex-col gap-8">
+		<div v-else-if="app && createdBy && authorizationData" class="flex flex-col gap-6">
 			<div class="mt-4 flex items-center justify-center">
 				<div class="flex w-full flex-row items-center justify-evenly">
 					<Avatar size="md" :src="app.icon_url" />
@@ -51,9 +49,9 @@
 				</div>
 				<div class="flex flex-col gap-3">
 					<div v-for="scopeItem in scopeDefinitions" :key="scopeItem">
-						<div class="flex flex-row items-center gap-3">
-							<div class="flex aspect-square rounded-full bg-green p-2 text-white">
-								<CheckIcon />
+						<div class="flex flex-row items-center gap-2">
+							<div class="grid h-5 min-h-5 w-5 min-w-5 place-content-center rounded-full bg-green">
+								<CheckIcon class="text-sm text-black" />
 							</div>
 							{{ scopeItem }}
 						</div>
@@ -151,6 +149,10 @@ const messages = defineMessages({
 		id: 'auth.authorize.error.no-redirect-url',
 		defaultMessage: 'No redirect location found in response',
 	},
+	missingParametersError: {
+		id: 'auth.authorize.error.missing-parameters',
+		defaultMessage: 'Missing required OAuth query parameters.',
+	},
 	redirectUrl: {
 		id: 'auth.authorize.redirect-url',
 		defaultMessage: 'You will be redirected to <redirect-url>{url}</redirect-url>',
@@ -158,6 +160,10 @@ const messages = defineMessages({
 	title: {
 		id: 'auth.authorize.authorize-app-name',
 		defaultMessage: 'Authorize {appName}',
+	},
+	errorTitle: {
+		id: 'auth.authorize.errro-title',
+		defaultMessage: 'An Error Occured',
 	},
 })
 
@@ -169,6 +175,7 @@ const clientId = computed(() => getQueryString(router.query.client_id))
 const redirectUri = computed(() => getQueryString(router.query.redirect_uri))
 const scope = computed(() => getQueryString(router.query.scope))
 const state = computed(() => getQueryString(router.query.state))
+const hasRequiredParams = computed(() => !!clientId.value && !!redirectUri.value && !!scope.value)
 
 const getFlowIdAuthorization = async () => {
 	const authorization = await client.labrinth.oauth_internal.authorize({
@@ -202,10 +209,31 @@ const {
 		state.value,
 	]),
 	queryFn: getFlowIdAuthorization,
-	enabled: computed(() => !!clientId.value && !!redirectUri.value && !!scope.value),
+	enabled: hasRequiredParams,
 })
 
-const authorizationError = computed(() => (error.value as ApiErrorShape | null)?.data)
+const authorizationError = computed(() => {
+	if (!hasRequiredParams.value) {
+		return {
+			error: 'invalid_request',
+			description: formatMessage(messages.missingParametersError),
+		}
+	}
+
+	const apiError = (error.value as ApiErrorShape | null)?.data
+	if (apiError) {
+		return apiError
+	}
+
+	if (error.value) {
+		return {
+			error: 'server_error',
+			description: getErrorMessage(error.value),
+		}
+	}
+
+	return null
+})
 
 const { data: app, suspense: appSusp } = useQuery({
 	queryKey: computed(() => ['oauth/app', clientId.value]),
@@ -226,9 +254,7 @@ const { data: createdBy, suspense: userSusp } = useQuery({
 })
 
 onServerPrefetch(async () => {
-	await authSusp()
-	await appSusp()
-	await userSusp()
+	await Promise.allSettled([authSusp(), appSusp(), userSusp()])
 })
 
 const scopeDefinitions = computed(() =>
