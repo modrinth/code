@@ -29,6 +29,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+import WorldCard from '#ui/components/servers/worlds/WorldCard.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -36,8 +37,6 @@ import {
 	injectServerSettingsModal,
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
-
-import WorldCard from '#ui/components/servers/worlds/WorldCard.vue'
 
 const messages = defineMessages({
 	worldSlotName: {
