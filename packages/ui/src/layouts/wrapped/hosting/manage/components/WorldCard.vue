@@ -74,8 +74,8 @@
 					</defs>
 				</svg>
 				<div class="mt-6 flex flex-col gap-1">
-					<h2 class="m-0 text-2xl font-extrabold leading-8 text-contrast">{{ world.name }}</h2>
-					<p class="m-0 text-base font-medium leading-6 text-secondary">
+					<h2 class="m-0 text-2xl font-semibold leading-8 text-contrast">{{ world.name }}</h2>
+					<p class="m-0 text-base leading-6 text-secondary">
 						{{ formatMessage(messages.newWorldInstance) }}
 					</p>
 				</div>
@@ -83,7 +83,7 @@
 
 			<div class="px-5 pb-4">
 				<ButtonStyled color="brand">
-					<button class="w-full" @click="emit('create', world.id)">
+					<button class="w-full !h-10" @click="emit('create', world.id)">
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createWorld) }}
 					</button>
