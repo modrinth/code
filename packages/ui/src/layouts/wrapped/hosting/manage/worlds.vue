@@ -10,10 +10,7 @@
 				class="min-h-[19.75rem] animate-pulse rounded-2xl border border-solid border-surface-5 bg-bg-raised shadow-xl"
 			/>
 		</div>
-		<div
-			v-else
-			class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,20.25rem),1fr))] gap-6"
-		>
+		<div v-else class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,20.25rem),1fr))] gap-6">
 			<WorldCard
 				v-for="world in worldSlots"
 				:key="world.id"
@@ -135,10 +132,7 @@ async function loadContentSummary(
 	}
 }
 
-function toWorldSlot(
-	world: Archon.Servers.v1.WorldFull,
-	content: ContentSummary,
-): WorldSlot {
+function toWorldSlot(world: Archon.Servers.v1.WorldFull, content: ContentSummary): WorldSlot {
 	return {
 		type: 'world',
 		id: world.id,

@@ -3938,6 +3938,9 @@
   "servers.manage.content.title": {
     "message": "Content - {serverName} - Modrinth"
   },
+  "servers.manage.worlds.meta.title": {
+    "message": "Worlds - {server} - Modrinth"
+  },
   "servers.notice.actions": {
     "message": "Actions"
   },
