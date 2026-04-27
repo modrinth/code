@@ -58,6 +58,14 @@ export default new createRouter({
 					},
 				},
 				{
+					path: 'worlds',
+					name: 'ServerManageWorlds',
+					component: Hosting.Worlds,
+					meta: {
+						breadcrumb: [{ name: '?Server' }],
+					},
+				},
+				{
 					path: 'files',
 					name: 'ServerManageFiles',
 					component: Hosting.Files,
