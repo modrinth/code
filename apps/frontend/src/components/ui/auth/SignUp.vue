@@ -115,7 +115,7 @@
 				</button>
 			</ButtonStyled>
 
-			<p v-if="!routeQuery.launcher" class="m-0">
+			<p v-if="!routeQuery.launcher" class="m-0 text-center">
 				<IntlFormatted :message-id="messages.legalDisclaimer">
 					<template #terms-link="{ children }">
 						<NuxtLink to="/legal/terms" class="text-link">
@@ -130,10 +130,10 @@
 				</IntlFormatted>
 			</p>
 
-			<div class="flex flex-wrap items-center justify-start gap-2">
+			<div class="mx-auto flex flex-wrap items-center justify-start gap-2 text-center">
 				{{ formatMessage(messages.alreadyHaveAccountLabel) }}
 				<NuxtLink
-					class="text-link"
+					class="mr-1 text-link"
 					:to="{
 						path: '/auth/sign-in',
 						query: routeQuery,
