@@ -356,6 +356,12 @@
   "content.selection-bar.selected-count": {
     "defaultMessage": "{count} {contentType} vybráno"
   },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} přepsáno"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Žádné výsledky"
+  },
   "form.label.address-line": {
     "defaultMessage": "Adresa"
   },

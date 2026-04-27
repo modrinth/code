@@ -6,7 +6,7 @@
     "message": "Doğrulama sunucularına erişilemedi"
   },
   "app.browse.add-server-to-instance": {
-    "message": "Sunucuyu kuruluma ekle"
+    "message": "Kurulumunuza sunucu ekleyin"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Kurulumunuza sunucular ekleyin"

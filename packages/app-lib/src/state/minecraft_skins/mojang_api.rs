@@ -11,7 +11,7 @@ use crate::{
     ErrorKind,
     data::Credentials,
     state::{MinecraftProfile, PROFILE_CACHE, ProfileCacheEntry},
-    util::fetch::REQWEST_CLIENT,
+    util::fetch::INSECURE_REQWEST_CLIENT,
 };
 
 /// Provides operations for interacting with capes on a Minecraft player profile.
@@ -23,7 +23,7 @@ impl MinecraftCapeOperation {
         cape_id: Uuid,
     ) -> crate::Result<()> {
         update_profile_cache_from_response(
-            REQWEST_CLIENT
+            INSECURE_REQWEST_CLIENT
                 .put("https://api.minecraftservices.com/minecraft/profile/capes/active")
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Accept", "application/json")
@@ -42,7 +42,7 @@ impl MinecraftCapeOperation {
 
     pub async fn unequip_any(credentials: &Credentials) -> crate::Result<()> {
         update_profile_cache_from_response(
-            REQWEST_CLIENT
+            INSECURE_REQWEST_CLIENT
                 .delete("https://api.minecraftservices.com/minecraft/profile/capes/active")
                 .header("Accept", "application/json")
                 .bearer_auth(&credentials.access_token)
@@ -92,7 +92,7 @@ impl MinecraftSkinOperation {
             );
 
         update_profile_cache_from_response(
-            REQWEST_CLIENT
+            INSECURE_REQWEST_CLIENT
                 .post(
                     "https://api.minecraftservices.com/minecraft/profile/skins",
                 )
@@ -110,7 +110,7 @@ impl MinecraftSkinOperation {
 
     pub async fn unequip_any(credentials: &Credentials) -> crate::Result<()> {
         update_profile_cache_from_response(
-            REQWEST_CLIENT
+            INSECURE_REQWEST_CLIENT
                 .delete("https://api.minecraftservices.com/minecraft/profile/skins/active")
                 .header("Accept", "application/json")
                 .bearer_auth(&credentials.access_token)

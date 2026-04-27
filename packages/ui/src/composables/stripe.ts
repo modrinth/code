@@ -18,8 +18,8 @@ import { getPriceForInterval } from '../utils/product-utils'
 
 export const useStripe = (
 	publishableKey: string,
-	customer: Stripe.Customer,
-	paymentMethods: Stripe.PaymentMethod[],
+	customer: Ref<Stripe.Customer | null | undefined>,
+	paymentMethods: Ref<Stripe.PaymentMethod[]>,
 	currency: string,
 	product: Ref<Labrinth.Billing.Internal.Product | undefined>,
 	interval: Ref<ServerBillingInterval>,
@@ -96,7 +96,7 @@ export const useStripe = (
 
 		const contacts: ContactOption[] = []
 
-		paymentMethods.forEach((method) => {
+		paymentMethods.value.forEach((method) => {
 			const addr = method.billing_details?.address
 			if (
 				addr &&
@@ -131,15 +131,22 @@ export const useStripe = (
 	}
 
 	const primaryPaymentMethodId = computed<string | null>(() => {
-		if (customer && customer.invoice_settings && customer.invoice_settings.default_payment_method) {
-			const method = customer.invoice_settings.default_payment_method
+		const customerValue = customer.value
+		const paymentMethodsValue = paymentMethods.value
+
+		if (
+			customerValue &&
+			customerValue.invoice_settings &&
+			customerValue.invoice_settings.default_payment_method
+		) {
+			const method = customerValue.invoice_settings.default_payment_method
 			if (typeof method === 'string') {
 				return method
 			} else {
 				return method.id
 			}
-		} else if (paymentMethods && paymentMethods[0] && paymentMethods[0].id) {
-			return paymentMethods[0].id
+		} else if (paymentMethodsValue[0] && paymentMethodsValue[0].id) {
+			return paymentMethodsValue[0].id
 		} else {
 			return null
 		}
@@ -148,7 +155,7 @@ export const useStripe = (
 	const loadStripeElements = async () => {
 		loadingFailed.value = undefined
 		try {
-			if (!customer && primaryPaymentMethodId.value) {
+			if (!customer.value && primaryPaymentMethodId.value) {
 				paymentMethodLoading.value = true
 				await refreshPaymentIntent(primaryPaymentMethodId.value, false)
 				paymentMethodLoading.value = false
@@ -189,7 +196,7 @@ export const useStripe = (
 		try {
 			paymentMethodLoading.value = true
 			if (!confirmation) {
-				selectedPaymentMethod.value = paymentMethods.find((x) => x.id === id)
+				selectedPaymentMethod.value = paymentMethods.value.find((x) => x.id === id)
 			}
 
 			if (!product.value) {
@@ -248,7 +255,7 @@ export const useStripe = (
 						}
 					).payment_method
 					if (typeof paymentMethod === 'string') {
-						const method = paymentMethods.find((x) => x.id === paymentMethod)
+						const method = paymentMethods.value.find((x) => x.id === paymentMethod)
 						if (method) {
 							inputtedPaymentMethod.value = method
 						}

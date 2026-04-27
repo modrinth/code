@@ -35,6 +35,9 @@
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "サーバー設定の読み込みに失敗しました"
   },
+  "badge.alpha": {
+    "defaultMessage": "アルファ"
+  },
   "badge.beta": {
     "defaultMessage": "ベータ"
   },
@@ -333,7 +336,7 @@
     "defaultMessage": "追加 (依存関係)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "無効"
+    "defaultMessage": "無効化済み"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "アップデート済み"
@@ -986,6 +989,54 @@
   "hosting.loader.failed-to-load-versions": {
     "defaultMessage": "バージョンの読み込みに失敗しました"
   },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "modpackの再インストールに失敗しました"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "サーバーの修復に失敗しました"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "サーバーをオンボーディング状態にリセットできませんでした"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "インストール設定の保存に失敗しました"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "modpackのリンク解除に失敗しました"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "{loader, select, null {ローダ} other {{loader}}} バージョン"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "サーバーのインストールが修復されました。"
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "修理完了"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "サーバーをリセット"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "サーバー上のすべてのデータ（ワールド、MOD、設定ファイルなど）を削除します。バックアップは保持され、復元可能です。"
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "オンボーディング画面にリセット"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "これによりサーバーはオンボーディングモードに戻り、セットアップを再度完了できるようになります。本当に続行しますか？"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "オンボーディング画面にリセット"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "サーバーはオンボーディングフローに戻りました。"
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "サーバーがオンボーディングにリセットされました"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "サポートオプション"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus}個のCPUに増加"
   },
@@ -1066,6 +1117,21 @@
   },
   "installation-settings.incompatible-content.disable-conflicts-button": {
     "defaultMessage": "競合を無効化する"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "ゲームのバージョンを変更する際、互換性のないインストール済みコンテンツを無効にするか、互換性の問題を解決するよう試みるかのいずれかを選択できます。"
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "互換性に関する警告"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "互換性のないコンテンツがインストールされています"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "ローダーを変更すると、インストール済みのコンテンツはすべて無効になります。代わりにサーバーをリセットすることをお勧めします。"
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "ローダーの交換は破壊的である"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "リンクされた{projectType, select, server {サーバープロジェクト} other {Modパック}}"
@@ -1286,6 +1352,15 @@
   "label.changes-saved": {
     "defaultMessage": "変更が保存されました"
   },
+  "label.client-depends-warning": {
+    "defaultMessage": "このMODはクライアント側のMODに依存しているため、サーバーの起動時に問題が発生する可能性があります。"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "これはクライアント側のMODであり、サーバーの起動時に問題を引き起こす可能性があります。"
+  },
+  "label.client-retained-warning": {
+    "defaultMessage": "これは依存関係としてインストールされたクライアント側のMODであり、サーバーの起動時に問題を引き起こす可能性があります。"
+  },
   "label.collections": {
     "defaultMessage": "コレクション"
   },
@@ -1295,8 +1370,14 @@
   "label.content": {
     "defaultMessage": "コンテンツ"
   },
+  "label.copied-filename": {
+    "defaultMessage": "コピーされたファイル名"
+  },
   "label.copied-path": {
     "defaultMessage": "パスをコピーしました"
+  },
+  "label.create-failed": {
+    "defaultMessage": "作成に失敗しました"
   },
   "label.created-ago": {
     "defaultMessage": "{ago} に作成"
@@ -1306,6 +1387,9 @@
   },
   "label.delete": {
     "defaultMessage": "削除"
+  },
+  "label.delete-failed": {
+    "defaultMessage": "削除に失敗しました"
   },
   "label.delete-immediately": {
     "defaultMessage": "すぐに削除"
@@ -1409,6 +1493,9 @@
   "label.rejected": {
     "defaultMessage": "却下済み"
   },
+  "label.rename-failed": {
+    "defaultMessage": "名前変更に失敗しました"
+  },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "<terms-link>リワードプログラム規約</terms-link>に同意します"
   },
@@ -1456,6 +1543,12 @@
   },
   "label.update-available": {
     "defaultMessage": "更新が利用可能"
+  },
+  "label.updating": {
+    "defaultMessage": "更新中..."
+  },
+  "label.upload-failed": {
+    "defaultMessage": "アップロードに失敗しました"
   },
   "label.username": {
     "defaultMessage": "ユーザー名"
@@ -2626,6 +2719,75 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "修復"
+  },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "バックアップ作成中"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "バックアップ復元処理中"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "サーバーがインストール中です"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "コンテンツの同期処理中です"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "既にサーバーをお持ちですか？"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Modrinth Hostingについて詳しくはこちらをご覧ください"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "新しいサーバー"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "Modrinth Appを使えば、MODのインストール、友達の招待、そして一緒にプレイすることなど、すべてが可能です。"
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "サーバーはまだありません"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "お好みのMODを選んでいただければ、あとはすべてこちらで対応いたします。"
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "ワンクリックでMODをインストール"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "友達を招待して、Modrinth Appで簡単に設定してあげましょう。"
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "友達と遊ぶ"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "サインイン"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "サーバーは、シングルプレイヤーワールドと同じように設定してください。"
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "簡単なセットアップ"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "コピーしました"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "コードをクリップボードにコピー"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "IDをコピー"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "最新のバックアップをダウンロード"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "請求設定"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "新規"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "閉じる"
