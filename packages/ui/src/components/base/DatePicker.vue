@@ -309,7 +309,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year),
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply rounded-lg bg-surface-4 px-2 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-8;
+	@apply rounded-xl bg-surface-4 px-2 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-8;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
@@ -323,7 +323,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-prev-month),
 .modrinth-date-picker :deep(.flatpickr-next-month) {
-	@apply top-3 mx-3 flex h-8 w-8 items-center justify-center rounded-lg p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
+	@apply top-3 mx-3 flex h-8 w-8 items-center justify-center rounded-xl p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
 }
 
 .modrinth-date-picker :deep(.flatpickr-prev-month svg),
@@ -336,7 +336,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day) {
-	@apply m-0 max-w-none rounded-lg border border-solid border-transparent text-primary hover:border-surface-5 hover:bg-surface-4 hover:text-contrast;
+	@apply m-0 max-w-none rounded-xl border border-solid border-transparent text-primary hover:border-surface-5 hover:bg-surface-4 hover:text-contrast;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.today) {
@@ -350,7 +350,7 @@ defineExpose({
 .modrinth-date-picker :deep(.flatpickr-day.selected),
 .modrinth-date-picker :deep(.flatpickr-day.startRange),
 .modrinth-date-picker :deep(.flatpickr-day.endRange) {
-	@apply border-brand bg-brand text-brand-inverted !shadow-none hover:border-brand hover:bg-brand hover:text-brand-inverted hover:shadow-none;
+	@apply border-brand bg-brand text-brand-inverted !shadow-none hover:border-brand hover:bg-brand hover:text-brand-inverted hover:shadow-none rounded-xl;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.inRange) {
@@ -358,11 +358,11 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.startRange:not(.endRange)) {
-	@apply rounded-r-none border-r-0 border-y-surface-3;
+	@apply rounded-r-none border-r-0 border-surface-3;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.endRange:not(.startRange)) {
-	@apply rounded-l-none border-l-0 border-y-surface-3;
+	@apply rounded-l-none border-l-0 border-surface-3;
 }
 
 .modrinth-date-picker
@@ -378,12 +378,12 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .numInputWrapper) {
-	@apply h-full flex-1 rounded-lg bg-surface-4;
+	@apply h-full flex-1 rounded-xl bg-surface-4;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time input),
 .modrinth-date-picker :deep(.flatpickr-time .flatpickr-am-pm) {
-	@apply h-full rounded-lg bg-transparent px-2 text-center font-semibold text-primary hover:bg-surface-5 focus:bg-surface-5;
+	@apply h-full rounded-xl bg-transparent px-2 text-center font-semibold text-primary hover:bg-surface-5 focus:bg-surface-5;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .flatpickr-time-separator) {
