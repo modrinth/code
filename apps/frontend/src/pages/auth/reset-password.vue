@@ -93,7 +93,7 @@
 		</template>
 	</div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { KeyIcon, MailIcon, SendIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -106,8 +106,41 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
+import type { LocationQueryValue } from 'vue-router'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
+
+interface AuthGlobalsResponse {
+	captcha_enabled?: boolean
+	[key: string]: unknown
+}
+
+interface ApiErrorShape {
+	data?: {
+		description?: string
+		error?: string
+	}
+}
+
+type ResetPasswordStep = 'choose_method' | 'passed_challenge'
+
+const getQueryString = (
+	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string => {
+	const firstValue = Array.isArray(value) ? value[0] : value
+	return typeof firstValue === 'string' ? firstValue : ''
+}
+
+const getErrorMessage = (error: unknown): string => {
+	const apiError = error as ApiErrorShape
+	if (typeof apiError?.data?.description === 'string') {
+		return apiError.data.description
+	}
+	if (error instanceof Error) {
+		return error.message
+	}
+	return String(error)
+}
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -192,15 +225,15 @@ if (auth.value.user) {
 
 const route = useNativeRoute()
 
-const step = ref('choose_method')
+const step = ref<ResetPasswordStep>('choose_method')
 
 if (route.query.flow) {
 	step.value = 'passed_challenge'
 }
 
-const captcha = ref()
+const captcha = ref<{ reset?: () => void } | null>(null)
 
-const { data: globals } = useQuery({
+const { data: globals } = useQuery<AuthGlobalsResponse>({
 	queryKey: ['auth-globals'],
 	queryFn: async () => {
 		try {
@@ -231,10 +264,10 @@ async function recovery() {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }
@@ -247,7 +280,7 @@ async function changePassword() {
 	try {
 		await client.labrinth.auth_v2.changePassword({
 			new_password: newPassword.value,
-			flow: route.query.flow,
+			flow: getQueryString(route.query.flow),
 		})
 
 		addNotification({
@@ -259,10 +292,10 @@ async function changePassword() {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }
