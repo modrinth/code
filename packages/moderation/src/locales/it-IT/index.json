@@ -123,7 +123,7 @@
     "defaultMessage": "L'invito a Discord non può essere usato per altri collegamenti. Inserisci solo un link al tuo Discord nella casella Invito a Discord."
   },
   "nags.misused-discord-link.title": {
-    "defaultMessage": "Sposta l'invito Discord"
+    "defaultMessage": "Sposta l'invito a Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Visita il thread di moderazione"

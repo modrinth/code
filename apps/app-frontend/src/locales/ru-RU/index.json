@@ -261,7 +261,7 @@
     "message": "Несовместимая версия {version}"
   },
   "app.world.world-item.not-played-yet": {
-    "message": "Ни разу не сыграно"
+    "message": "Не запускалось"
   },
   "app.world.world-item.offline": {
     "message": "Не в сети"
