@@ -362,7 +362,7 @@ const filterPillOptions = computed<FilterPillOption[]>(() => [
 ])
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { server, worldId, busyReasons } = injectModrinthServerContext()
+const { server, serverId, worldId, busyReasons } = injectModrinthServerContext()
 
 const props = defineProps<{
 	isServerRunning: boolean
@@ -371,9 +371,7 @@ const props = defineProps<{
 }>()
 
 const route = useRoute()
-const serverId = route.params.id as string
 const BACKUP_HIGHLIGHT_DURATION_MS = 5_000
-
 defineEmits(['onDownload'])
 
 const { backups, invalidate, activeOperationByBackupId, hasActiveCreate, hasActiveRestore, query } =
