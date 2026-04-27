@@ -11,6 +11,31 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-04-27T17:30:17+00:00`,
+		product: 'app',
+		version: '0.13.5',
+		body: `## Fixed
+- Fixed issue where the instance creation modal would incorrectly state a mod loader supported a game version when in reality it didn't.
+- Fixed issue where the game version or loader version dropdown in the instance creation modal would appear empty for a few seconds.`,
+	},
+	{
+		date: `2026-04-27T17:30:17+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed issue with project data not reloading when migrating environment information through the \`/project/[id]/environment\` page or the modal via the environment migration warning admonition.
+- Fixed issue with tax compliance stage in the withdraw flow not showing up for certain users.
+
+## Security
+- Fixed URLs rendering in email template variables.`,
+	},
+	{
+		date: `2026-04-27T17:30:17+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed issue where the server setup/reset server modal would incorrectly state a mod loader supported a game version when in reality it didn't.
+- Fixed issue where the game version or loader version dropdown in the server setup/reset server modal would appear empty for a few seconds.`,
+	},
+	{
 		date: `2026-04-20T20:48:51+00:00`,
 		product: 'app',
 		version: '0.13.4',
