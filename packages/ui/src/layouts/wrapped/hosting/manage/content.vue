@@ -4,7 +4,7 @@ import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useIntervalFn } from '@vueuse/core'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
@@ -112,7 +112,7 @@ const messages = defineMessages({
 })
 
 const client = injectModrinthClient()
-const { server, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
+const { server, serverId, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
 	injectModrinthServerContext()
 const contentUploadSession = useUploadSessionUpload({
 	client,
@@ -123,10 +123,8 @@ const contentUploadSession = useUploadSessionUpload({
 })
 const { addNotification } = injectNotificationManager()
 const { openServerSettings, browseServerContent } = injectServerSettingsModal()
-const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
-const serverId = route.params.id as string
 
 const type = computed(() => {
 	const loader = server.value?.loader?.toLowerCase()
@@ -135,7 +133,7 @@ const type = computed(() => {
 	return 'mod'
 })
 
-const queryKey = computed(() => ['content', 'list', 'v1', serverId])
+const queryKey = computed(() => ['content', 'list', 'v1', serverId, worldId.value])
 
 function getContentOwnerAvatarUrl(owner: ContentOwnerAvatarSource) {
 	const ownerId = owner.type === 'user' ? owner.name || owner.id : owner.id
