@@ -234,7 +234,8 @@ async fn playtime_ingest(
                 parent: playtime.parent.map_or(0, |x| x.0),
                 country: headers
                     .get("cf-ipcountry")
-                    .and_then(|c| c.to_str().map(|s| s.to_string()).ok()),
+                    .and_then(|c| c.to_str().map(|s| s.to_string()).ok())
+                    .unwrap_or_default(),
             });
         }
     }
