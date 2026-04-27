@@ -284,8 +284,10 @@ const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const { serverId, worldId, powerState, busyReasons } = injectModrinthServerContext()
 const queryClient = useQueryClient()
-const filesTabLink = computed(
-	() => `/hosting/manage/${encodeURIComponent(serverId)}/files?path=/&editing=server.properties`,
+const filesTabLink = computed(() =>
+	worldId.value
+		? `/hosting/manage/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId.value)}/files?path=/&editing=server.properties`
+		: `/hosting/manage/${encodeURIComponent(serverId)}/worlds`,
 )
 const serverSettings = injectServerSettings(null)
 

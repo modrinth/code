@@ -12,7 +12,7 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
 
-	const queryKey = computed(() => ['backups', 'queue', serverId.value] as const)
+	const queryKey = computed(() => ['backups', 'queue', serverId.value, worldId.value] as const)
 
 	const progressOverlay = reactive(new Map<ProgressKey, number>())
 	const lastSeenState = new Map<ProgressKey, Archon.Websocket.v0.BackupState>()
