@@ -1,4 +1,5 @@
 <script setup>
+import { Intercom, shutdown as shutdownIntercom } from '@intercom/messenger-js-sdk'
 import {
 	AuthFeature,
 	NodeAuthFeature,
@@ -238,6 +239,7 @@ onMounted(async () => {
 onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
+	shutdownHostingIntercom()
 
 	await unlistenUpdateDownload?.()
 })
@@ -651,6 +653,102 @@ const forceSidebar = computed(
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 const showAd = computed(
 	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
+)
+const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
+const INTERCOM_DEFAULT_PADDING = 20
+const INTERCOM_APP_SIDEBAR_WIDTH = 300
+
+let intercomBooting = false
+let intercomBooted = false
+
+async function fetchIntercomToken() {
+	const creds = await getCreds()
+	if (!creds?.session) {
+		throw new Error('Not authenticated')
+	}
+
+	const params = new URLSearchParams()
+	if (route.path.startsWith('/hosting/manage/') && typeof route.params.id === 'string') {
+		params.set('server_id', route.params.id)
+	}
+	const query = params.size > 0 ? `?${params.toString()}` : ''
+
+	const response = await tauriFetch(`${config.siteUrl}/api/intercom/messenger-jwt${query}`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${creds.session}`,
+		},
+	})
+	if (!response.ok) {
+		throw new Error(`Failed to fetch Intercom token: ${response.status}`)
+	}
+	return await response.json()
+}
+
+async function bootIntercom() {
+	if (
+		intercomBooting ||
+		intercomBooted ||
+		!hostingRouteActive.value ||
+		!credentials.value?.session
+	) {
+		return
+	}
+
+	intercomBooting = true
+	console.debug('[APP][INTERCOM] initializing secure support chat')
+	try {
+		const { token } = await fetchIntercomToken()
+		Intercom({
+			app_id: 'ykeritl9',
+			intercom_user_jwt: token,
+			session_duration: 1000 * 60 * 60 * 24,
+			alignment: 'right',
+			horizontal_padding: sidebarVisible.value
+				? INTERCOM_APP_SIDEBAR_WIDTH + INTERCOM_DEFAULT_PADDING
+				: INTERCOM_DEFAULT_PADDING,
+			vertical_padding: INTERCOM_DEFAULT_PADDING,
+		})
+		intercomBooted = true
+	} catch (error) {
+		console.warn('[APP][INTERCOM] failed to initialize secure support chat', error)
+	} finally {
+		intercomBooting = false
+	}
+}
+
+function shutdownHostingIntercom() {
+	if (!intercomBooted && !intercomBooting) return
+	shutdownIntercom()
+	intercomBooting = false
+	intercomBooted = false
+}
+
+watch(
+	sidebarVisible,
+	(visible) => {
+		if (intercomBooted) {
+			window.Intercom?.('update', {
+				horizontal_padding: visible
+					? INTERCOM_APP_SIDEBAR_WIDTH + INTERCOM_DEFAULT_PADDING
+					: INTERCOM_DEFAULT_PADDING,
+				vertical_padding: INTERCOM_DEFAULT_PADDING,
+			})
+		}
+	},
+	{ immediate: true },
+)
+
+watch(
+	[hostingRouteActive, credentials],
+	([active]) => {
+		if (active) {
+			void bootIntercom()
+		} else {
+			shutdownHostingIntercom()
+		}
+	},
+	{ immediate: true },
 )
 
 watch(showAd, () => {

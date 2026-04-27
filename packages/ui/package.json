@@ -83,6 +83,7 @@
 		"jszip": "^3.10.1",
 		"lru-cache": "^11.2.4",
 		"markdown-it": "^13.0.2",
+		"motion-v": "^2.2.1",
 		"postprocessing": "^6.37.6",
 		"qrcode.vue": "^3.4.1",
 		"three": "^0.172.0",

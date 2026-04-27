@@ -174,7 +174,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
-									<component :is="action.icon" />
+									<component :is="action.icon" :class="action.iconClass" />
 									<template v-if="!action.circular">{{ action.label }}</template>
 								</button>
 							</ButtonStyled>
@@ -241,7 +241,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
-									<component :is="action.icon" />
+									<component :is="action.icon" :class="action.iconClass" />
 									<template v-if="!action.circular">{{ action.label }}</template>
 								</button>
 							</ButtonStyled>

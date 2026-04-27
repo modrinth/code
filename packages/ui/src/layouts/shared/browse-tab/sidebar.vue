@@ -98,7 +98,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		>
 			<Checkbox
 				v-model="ctx.hideInstalled!.value"
-				:label="ctx.hideInstalledLabel?.value ?? 'Hide installed content'"
+				:label="ctx.hideInstalledLabel?.value ?? 'Hide already installed content'"
 				class="filter-checkbox"
 				@update:model-value="ctx.onFilterChange()"
 				@click.prevent.stop

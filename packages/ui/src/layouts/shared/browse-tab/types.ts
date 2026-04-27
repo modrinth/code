@@ -30,6 +30,7 @@ export interface CardAction {
 	key: string
 	label: string
 	icon: Component
+	iconClass?: string
 	disabled?: boolean
 	color?: 'brand' | 'red'
 	type?: 'standard' | 'outlined' | 'transparent'
