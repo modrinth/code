@@ -6,13 +6,14 @@ import { useModalStack } from '../../composables/modal-stack'
 const props = defineProps<{
 	shown: boolean
 	ariaLabel?: string
+	belowModal?: boolean
 }>()
 
 const toolbarEl = ref<HTMLElement | null>(null)
 const compact = ref(false)
 
 const { stackCount } = useModalStack()
-const zIndex = computed(() => 100 + stackCount.value * 10 + 8)
+const zIndex = computed(() => 100 + stackCount.value * 10 + 8 + (!props.belowModal ? 1 : 0))
 
 function checkCompact() {
 	const el = toolbarEl.value
