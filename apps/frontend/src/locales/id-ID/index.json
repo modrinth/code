@@ -1392,7 +1392,7 @@
     "message": "server"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "pencorak"
+    "message": "efek gambar"
   },
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
@@ -1635,7 +1635,7 @@
     "message": "Hidup/matikan menu"
   },
   "layout.meta.description": {
-    "message": "Unduh mod, pasang-masuk, paket data, pencorak, paket sumber, dan paket mod untuk Minecraft di Modrinth. Temukan dan terbitkan proyek di Modrinth dengan antarmuka dan API yang modern dan mudah digunakan."
+    "message": "Unduh mod, pasang-masuk, paket data, efek gambar, paket sumber, dan paket mod untuk Minecraft di Modrinth. Temukan dan terbitkan proyek di Modrinth dengan antarmuka dan API yang modern dan mudah digunakan."
   },
   "layout.meta.og-description": {
     "message": "Temukan dan terbitkan konten Minecraft!"
@@ -2181,10 +2181,10 @@
     "message": "Server"
   },
   "project-type.shader.plural": {
-    "message": "Pencorak"
+    "message": "Efek Gambar"
   },
   "project-type.shader.singular": {
-    "message": "Pencorak"
+    "message": "Efek Gambar"
   },
   "project.about.details.created": {
     "message": "Dibuat {date}"
@@ -2763,7 +2763,7 @@
     "message": "Tulis versi"
   },
   "search.filter.game-version-shader-message": {
-    "message": "Paket pencorak untuk versi lama kemungkinan besar dapat bekerja di versi yang lebih baru dengan beberapa masalah ringan."
+    "message": "Paket efek gambar untuk versi lama kemungkinan besar dapat bekerja di versi yang lebih baru dengan beberapa masalah ringan."
   },
   "search.filter.locked.server": {
     "message": "Disediakan oleh server"
@@ -3099,7 +3099,7 @@
     "message": "Halaman Server"
   },
   "settings.display.project-list-layouts.shader": {
-    "message": "Halaman Pencorak (Shader)"
+    "message": "Halaman Efek Gambar"
   },
   "settings.display.project-list-layouts.title": {
     "message": "Tata letak daftar proyek"

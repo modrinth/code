@@ -2055,7 +2055,7 @@
     "defaultMessage": "標籤"
   },
   "project.download-count-tooltip": {
-    "defaultMessage": "下載次數：{count, number}"
+    "defaultMessage": "{count, number} 次下載"
   },
   "project.environment.client-and-server.description": {
     "defaultMessage": "用戶端與伺服器皆需安裝。"
@@ -3043,6 +3043,9 @@
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "你希望伺服器有多少記憶體？"
+  },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "記憶體"
   },
   "servers.region.north-america": {
     "defaultMessage": "北美洲"

@@ -67,6 +67,7 @@ const tailwindConfig = {
 			<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
+			<meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no" />
 			<link
 				href="https://fonts.googleapis.com/css?family=Inter:700,400"
 				rel="stylesheet"
@@ -78,6 +79,9 @@ const tailwindConfig = {
 				line-height:100%; } table { border-collapse:separate; } a, a:link, a:visited {
 				text-decoration:none; color:#1f68c0; } a:hover { text-decoration:underline; }
 				h1,h2,h3,h4,h5,h6 { color:#000 !important; margin:0; mso-line-height-rule:exactly; }
+				.no-auto-link, .no-auto-link a, .no-auto-link a:link, .no-auto-link a:visited, .no-auto-link
+				a[x-apple-data-detectors] { color:inherit !important; text-decoration:none !important;
+				cursor:default !important; pointer-events:none !important; }
 			</Style>
 		</Head>
 

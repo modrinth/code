@@ -3044,6 +3044,9 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "RAM이 얼마나 있었으면 좋겠나요?"
   },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "RAM"
+  },
   "servers.region.north-america": {
     "defaultMessage": "북아메리카"
   },

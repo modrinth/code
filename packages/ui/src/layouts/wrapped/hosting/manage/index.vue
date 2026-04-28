@@ -32,6 +32,13 @@
 			@purchase-success="handlePurchaseSuccess"
 			@hide="clearPurchaseIntent"
 		/>
+		<ServersUpgradeModalWrapper
+			v-if="loggedIn"
+			ref="medalUpgradeModal"
+			:stripe-publishable-key="props.stripePublishableKey"
+			:site-url="props.siteUrl"
+			:products="props.products"
+		/>
 		<ResubscribeModal ref="resubscribeModal" @resubscribe="handleResubscribeConfirm" />
 
 		<div
@@ -82,6 +89,7 @@
 
 		<template v-else>
 			<div
+				v-if="!showEmptyState"
 				class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
 			>
 				<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">
@@ -124,7 +132,7 @@
 				</div>
 
 				<div
-					v-else-if="serverList.length === 0 && !isPollingForNewServers"
+					v-else-if="showEmptyState"
 					key="empty"
 					class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
 				>
@@ -163,7 +171,7 @@
 							v-for="server in filteredData.filter((s) => s.is_medal)"
 							:key="server.server_id"
 							v-bind="server"
-							@upgrade="openPurchaseModal"
+							@upgrade="openMedalUpgradeModal"
 						/>
 						<ServerListing
 							v-for="server in filteredData.filter((s) => !s.is_medal)"
@@ -208,9 +216,10 @@ import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
 import type Stripe from 'stripe'
-import { computed, ref, watch } from 'vue'
+import { type ComponentPublicInstance, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeModalWrapper.vue'
 import MedalServerListing from '#ui/components/servers/marketing/MedalServerListing.vue'
 import ServerListing from '#ui/components/servers/ServerListing.vue'
 import { createHostingPurchaseIntentContext, provideHostingPurchaseIntent } from '#ui/providers'
@@ -339,6 +348,8 @@ function startNewServerPolling(initialServers: Archon.Servers.v0.Server[]) {
 
 const guestPlanModal = ref<InstanceType<typeof ServersGuestPlanModal> | null>(null)
 const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
+type UpgradeModalRef = ComponentPublicInstance<{ open: (id?: string) => void | Promise<void> }>
+const medalUpgradeModal = ref<UpgradeModalRef | null>(null)
 const resubscribeModal = ref<InstanceType<typeof ResubscribeModal> | null>(null)
 const affiliateCode = ref<string | null>(null)
 const selectedCurrency = ref<string>('USD')
@@ -549,6 +560,11 @@ const serverList = computed<Archon.Servers.v0.Server[]>(() => {
 	return serverResponse.value.servers
 })
 
+const showEmptyState = computed(
+	() =>
+		!showServersListLoading.value && serverList.value.length === 0 && !isPollingForNewServers.value,
+)
+
 const searchInput = ref('')
 
 const fuse = computed(() => {
@@ -690,6 +706,10 @@ const hostingPurchaseIntent = createHostingPurchaseIntentContext({
 provideHostingPurchaseIntent(hostingPurchaseIntent)
 
 const { openPurchaseModal, handleGuestPlanContinue, clearPurchaseIntent } = hostingPurchaseIntent
+
+function openMedalUpgradeModal(serverId: string) {
+	medalUpgradeModal.value?.open(serverId)
+}
 
 const { data: subscriptions } = useQuery({
 	queryKey: ['billing', 'subscriptions'],

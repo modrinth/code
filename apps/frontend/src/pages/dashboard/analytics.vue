@@ -2,14 +2,17 @@
 	<AnalyticsDashboard />
 </template>
 
-<script setup lang="ts">
+<script setup>
+import { commonProjectSettingsMessages, useVIntl } from '@modrinth/ui'
 import AnalyticsDashboard from '~/components/analytics/AnalyticsDashboard.vue'
+
+const { formatMessage } = useVIntl()
 
 definePageMeta({
 	middleware: 'auth',
 })
 
 useHead({
-	title: 'Analytics - Modrinth',
+	title: () => `${formatMessage(commonProjectSettingsMessages.analytics)} - Modrinth`,
 })
 </script>

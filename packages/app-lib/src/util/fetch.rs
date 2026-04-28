@@ -130,18 +130,24 @@ static GLOBAL_FETCH_FENCE: LazyLock<FetchFence> =
         inner: Mutex::new(FenceInner::new()),
     });
 
-pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
-    let mut headers = reqwest::header::HeaderMap::new();
-
-    let header =
-        reqwest::header::HeaderValue::from_str(&crate::launcher_user_agent())
-            .unwrap();
-    headers.insert(reqwest::header::USER_AGENT, header);
+fn reqwest_client_builder() -> reqwest::ClientBuilder {
     reqwest::Client::builder()
         .tcp_keepalive(Some(time::Duration::from_secs(10)))
-        .default_headers(headers)
+        .user_agent(crate::launcher_user_agent())
+}
+
+pub static INSECURE_REQWEST_CLIENT: LazyLock<reqwest::Client> =
+    LazyLock::new(|| {
+        reqwest_client_builder()
+            .build()
+            .expect("client configuration should be valid")
+    });
+
+pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
+    reqwest_client_builder()
+        .https_only(true)
         .build()
-        .expect("Reqwest Client Building Failed")
+        .expect("client configuration should be valid")
 });
 
 const FETCH_ATTEMPTS: usize = 2;
@@ -155,6 +161,28 @@ pub async fn fetch(
 ) -> crate::Result<Bytes> {
     fetch_advanced(Method::GET, url, sha1, None, None, None, semaphore, exec)
         .await
+}
+
+#[tracing::instrument(skip(semaphore))]
+pub async fn fetch_with_client(
+    url: &str,
+    sha1: Option<&str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    client: &reqwest::Client,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client(
+        Method::GET,
+        url,
+        sha1,
+        None,
+        None,
+        None,
+        semaphore,
+        exec,
+        client,
+    )
+    .await
 }
 
 #[tracing::instrument(skip(json_body, semaphore))]
@@ -177,7 +205,8 @@ where
     Ok(value)
 }
 
-/// Downloads a file with retry and checksum functionality
+/// Downloads a file with retry and checksum functionality, and a specific
+/// [`reqwest::Client`].
 #[tracing::instrument(skip(json_body, semaphore))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced(
@@ -189,6 +218,34 @@ pub async fn fetch_advanced(
     loading_bar: Option<(&LoadingBarId, f64)>,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client(
+        method,
+        url,
+        sha1,
+        json_body,
+        header,
+        loading_bar,
+        semaphore,
+        exec,
+        &INSECURE_REQWEST_CLIENT,
+    )
+    .await
+}
+
+/// Downloads a file with retry and checksum functionality
+#[tracing::instrument(skip(json_body, semaphore))]
+#[allow(clippy::too_many_arguments)]
+pub async fn fetch_advanced_with_client(
+    method: Method,
+    url: &str,
+    sha1: Option<&str>,
+    json_body: Option<serde_json::Value>,
+    header: Option<(&str, &str)>,
+    loading_bar: Option<(&LoadingBarId, f64)>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    client: &reqwest::Client,
 ) -> crate::Result<Bytes> {
     let _permit = semaphore.0.acquire().await?;
 
@@ -210,7 +267,7 @@ pub async fn fetch_advanced(
             return Err(ErrorKind::ApiIsDownError.into());
         }
 
-        let mut req = REQWEST_CLIENT.request(method.clone(), url);
+        let mut req = INSECURE_REQWEST_CLIENT.request(method.clone(), url);
 
         if let Some(body) = json_body.clone() {
             req = req.json(&body);
@@ -328,7 +385,9 @@ pub async fn fetch_mirrors(
     }
 
     for (index, mirror) in mirrors.iter().enumerate() {
-        let result = fetch(mirror, sha1, semaphore, exec).await;
+        let result =
+            fetch_with_client(mirror, sha1, semaphore, exec, &REQWEST_CLIENT)
+                .await;
 
         if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
             return result;
@@ -348,7 +407,7 @@ pub async fn post_json(
 ) -> crate::Result<()> {
     let _permit = semaphore.0.acquire().await?;
 
-    let mut req = REQWEST_CLIENT.post(url).json(&json_body);
+    let mut req = INSECURE_REQWEST_CLIENT.post(url).json(&json_body);
 
     if let Some(creds) =
         crate::state::ModrinthCredentials::get_active(exec).await?

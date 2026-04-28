@@ -83,9 +83,10 @@ if (import.meta.client) {
 
 const loadingIssues = reactive<Set<string>>(new Set())
 const decompiledSources = reactive<Map<string, string>>(new Map())
+const loadedIssues = reactive<Set<string>>(new Set())
 
 async function loadIssueSource(issueId: string): Promise<void> {
-	if (loadingIssues.has(issueId)) return
+	if (loadingIssues.has(issueId) || loadedIssues.has(issueId)) return
 
 	loadingIssues.add(issueId)
 
@@ -98,6 +99,7 @@ async function loadIssueSource(issueId: string): Promise<void> {
 				setCachedSource(detail.id, detail.decompiled_source)
 			}
 		}
+		loadedIssues.add(issueId)
 	} catch (error) {
 		console.error('Failed to load issue source:', error)
 	} finally {
@@ -105,36 +107,39 @@ async function loadIssueSource(issueId: string): Promise<void> {
 	}
 }
 
-function tryLoadCachedSourcesForFile(reportId: string): void {
-	if (!reviewItem.value) return
+function findIssuesByIds(issueIds: Set<string>): Labrinth.TechReview.Internal.FileIssue[] {
+	const issues: Labrinth.TechReview.Internal.FileIssue[] = []
 
-	const report = reviewItem.value.reports.find((r) => r.id === reportId)
-	if (report) {
+	if (!reviewItem.value) return []
+
+	for (const report of reviewItem.value.reports) {
 		for (const issue of report.issues) {
-			for (const detail of issue.details) {
-				if (!decompiledSources.has(detail.id)) {
-					const cached = getCachedSource(detail.id)
-					if (cached) {
-						decompiledSources.set(detail.id, cached)
-					}
-				}
+			if (issueIds.has(issue.id)) {
+				issues.push(issue)
 			}
 		}
 	}
+
+	return issues
 }
 
-function handleLoadFileSources(reportId: string): void {
-	tryLoadCachedSourcesForFile(reportId)
+function handleLoadIssueSources(issueIds: string[]): void {
+	const uniqueIssueIds = new Set(issueIds)
+	const issues = findIssuesByIds(uniqueIssueIds)
 
-	if (!reviewItem.value) return
-
-	const report = reviewItem.value.reports.find((r) => r.id === reportId)
-	if (report) {
-		for (const issue of report.issues) {
-			const hasUncached = issue.details.some((d) => !decompiledSources.has(d.id))
-			if (hasUncached) {
-				loadIssueSource(issue.id)
+	for (const issue of issues) {
+		for (const detail of issue.details) {
+			if (!decompiledSources.has(detail.id)) {
+				const cached = getCachedSource(detail.id)
+				if (cached) {
+					decompiledSources.set(detail.id, cached)
+				}
 			}
+		}
+
+		const hasUncached = issue.details.some((detail) => !decompiledSources.has(detail.id))
+		if (hasUncached) {
+			loadIssueSource(issue.id)
 		}
 	}
 }
@@ -241,8 +246,14 @@ const reviewItem = computed(() => {
 	}
 })
 
-function handleMarkComplete(_projectId: string) {
-	queryClient.invalidateQueries({ queryKey: ['tech-reviews'] })
+async function handleMarkComplete(projectId: string) {
+	await Promise.all([
+		queryClient.invalidateQueries({ queryKey: ['tech-reviews'] }),
+		queryClient.invalidateQueries({ queryKey: ['tech-review-project-report', projectId] }),
+		queryClient.invalidateQueries({ queryKey: ['project', projectId] }),
+		queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] }),
+		queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] }),
+	])
 }
 
 const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
@@ -292,7 +303,7 @@ function refetch() {
 			:loading-issues="loadingIssues"
 			:decompiled-sources="decompiledSources"
 			@refetch="refetch"
-			@load-file-sources="handleLoadFileSources"
+			@load-issue-sources="handleLoadIssueSources"
 			@mark-complete="handleMarkComplete"
 			@show-malicious-summary="handleShowMaliciousSummary"
 		/>

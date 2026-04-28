@@ -1,7 +1,7 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
-use crate::models::analytics::Download;
+use crate::models::analytics::{Download, DownloadReason};
 use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
@@ -16,6 +16,7 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
+use tracing::trace;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
@@ -34,6 +35,17 @@ pub struct DownloadBody {
     pub ip: String,
     pub headers: HashMap<String, String>,
 }
+
+/// Extra data attached to each download request, transmitted through the
+/// [`DOWNLOAD_META_HEADER`] header.
+#[derive(Debug, Clone, Deserialize)]
+pub struct DownloadMeta {
+    pub reason: DownloadReason,
+    pub game_version: String,
+    pub loader: String,
+}
+
+pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
 
 // This is an internal route, cannot be used without key
 #[utoipa::path(
@@ -118,7 +130,16 @@ pub async fn count_download(
     let ip = crate::util::ip::convert_to_ip_v6(&download_body.ip)
         .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
 
-    analytics_queue.add_download(Download {
+    let meta =
+        if let Some(meta) = download_body.headers.get(DOWNLOAD_META_HEADER) {
+            serde_json::from_str::<DownloadMeta>(meta)
+                .map(Some)
+                .wrap_request_err("invalid download meta")?
+        } else {
+            None
+        };
+
+    let download = Download {
         recorded: get_current_tenths_of_ms(),
         domain: url.host_str().unwrap_or_default().to_string(),
         site_path: url.path().to_string(),
@@ -153,7 +174,19 @@ pub async fn count_download(
                     .contains(&&*x.0.to_lowercase())
             })
             .collect(),
-    });
+        reason: meta
+            .as_ref()
+            .map(|m| m.reason.to_string())
+            .unwrap_or_default(),
+        game_version: meta
+            .as_ref()
+            .map(|m| m.game_version.clone())
+            .unwrap_or_default(),
+        loader: meta.as_ref().map(|m| m.loader.clone()).unwrap_or_default(),
+    };
+    trace!("added download {download:#?}");
+
+    analytics_queue.add_download(download);
 
     Ok(HttpResponse::NoContent().body(""))
 }

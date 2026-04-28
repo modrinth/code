@@ -174,7 +174,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
-									<component :is="action.icon" />
+									<component :is="action.icon" :class="action.iconClass" />
 									<template v-if="!action.circular">{{ action.label }}</template>
 								</button>
 							</ButtonStyled>
@@ -190,11 +190,15 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 					:title="result.title"
 					:icon-url="result.icon_url"
 					:author="{
-						name: result.author,
+						name: result.organization == null ? result.author : result.organization,
 						link:
-							ctx.variant === 'web'
-								? `/user/${result.author}`
-								: `https://modrinth.com/user/${result.author}`,
+							result.organization_id == null
+								? ctx.variant === 'web'
+									? `/user/${result.author_id ?? result.author}`
+									: `https://modrinth.com/user/${result.author_id ?? result.author}`
+								: ctx.variant === 'web'
+									? `/organization/${result.organization_id}`
+									: `https://modrinth.com/organization/${result.organization_id}`,
 					}"
 					:date-updated="result.date_modified"
 					:date-published="result.date_created"
@@ -237,7 +241,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
-									<component :is="action.icon" />
+									<component :is="action.icon" :class="action.iconClass" />
 									<template v-if="!action.circular">{{ action.label }}</template>
 								</button>
 							</ButtonStyled>
@@ -247,7 +251,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			</template>
 		</ProjectCardList>
 
-		<div :class="ctx.variant === 'web' ? 'pagination-after' : 'flex justify-end'">
+		<div :class="ctx.variant === 'web' ? 'pagination-after my-3' : 'flex justify-end'">
 			<Pagination
 				:page="ctx.currentPage.value"
 				:count="ctx.pageCount.value"

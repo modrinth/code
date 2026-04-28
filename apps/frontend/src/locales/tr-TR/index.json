@@ -2930,6 +2930,9 @@
   "settings.account.security.email.action.change": {
     "message": "Eposta değiştir"
   },
+  "settings.account.security.email.description": {
+    "message": "Hesabınıza bağlı e-posta adresini değiştirir."
+  },
   "settings.account.security.email.title": {
     "message": "Eposta"
   },
@@ -2939,8 +2942,20 @@
   "settings.account.security.password.action.change": {
     "message": "Parolayı değiştir"
   },
+  "settings.account.security.password.description.change": {
+    "message": "Hesabınıza giriş yapmak için kullanılan şifreyi değiştirin."
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "Hesabınızla ilişkili e-posta adresini değiştirir."
+  },
+  "settings.account.security.password.description.set": {
+    "message": "Hesabınıza giriş yapmak için kalıcı bir şifre belirleyin."
+  },
   "settings.account.security.password.title": {
     "message": "Parola"
+  },
+  "settings.account.security.providers.description": {
+    "message": "Hesabınıza giriş yöntemleri ekleyin veya kaldırın; GitHub, GitLab, Microsoft, Discord, Steam ve Google dahil."
   },
   "settings.account.security.title": {
     "message": "Hesap güvenliği"
@@ -2950,6 +2965,9 @@
   },
   "settings.account.security.two-factor.action.setup": {
     "message": "İki aşamalı doğrulama kur"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "Hesabınıza giriş yaparken ek bir güvenlik katmanı ekleyin."
   },
   "settings.account.security.two-factor.title": {
     "message": "İki aşamalı doğrulama"
@@ -3065,6 +3083,15 @@
   "settings.authorizations.by": {
     "message": "tarafından"
   },
+  "settings.authorizations.description": {
+    "message": "Modrinth hesabınızla bir uygulamayı yetkilendirdiğinizde, ona hesabınıza erişim izni vermiş olursunuz. Hesabınıza verilen erişimi dilediğiniz zaman burada yönetebilir ve gözden geçirebilirsiniz."
+  },
+  "settings.authorizations.empty-state": {
+    "message": "Yetkilendirdiğiniz uygulamalar şu anda görüntülenemiyor, bunu düzeltmek için çalışıyoruz. Lütfen bu sayfayı daha sonra tekrar ziyaret edin."
+  },
+  "settings.authorizations.head-title": {
+    "message": "Yetkiler"
+  },
   "settings.authorizations.revoke.action": {
     "message": "Kaldır"
   },
@@ -3092,6 +3119,9 @@
   "settings.billing.midas.benefits.title": {
     "message": "Yararlar"
   },
+  "settings.billing.midas.upsell": {
+    "message": "Modrinth Plus’a abone olun!"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Aboneliği iptal et"
   },
@@ -3112,6 +3142,9 @@
   },
   "settings.billing.next": {
     "message": "Sonraki:"
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "Veya {price} / yıl %({percent} tasarruf edin)!"
   },
   "settings.billing.payment_method.action.add": {
     "message": "Ödeme yöntemi ekle"
@@ -3286,6 +3319,9 @@
   },
   "settings.pats.action.create": {
     "message": "Bir PAT yarat"
+  },
+  "settings.pats.description": {
+    "message": "PAT'ler Modrinth API’sine erişmek için kullanılabilir. Bunlar istendiği zaman oluşturulabilir ve iptal edilebilir. Daha fazla bilgi için <doc-link>Modrinth API dokümantasyonuna</doc-link> bakın."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT oluştur"

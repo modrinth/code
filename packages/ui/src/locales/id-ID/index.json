@@ -1323,13 +1323,13 @@
     "defaultMessage": "{count, plural, other {server}}"
   },
   "project-type.shader.capital": {
-    "defaultMessage": "{count, plural, one {Pencorak} other {Pencorak}}"
+    "defaultMessage": "{count, plural, one {Efek Gambar} other {Efek Gambar}}"
   },
   "project-type.shader.category": {
-    "defaultMessage": "Pencorak"
+    "defaultMessage": "Efek Gambar"
   },
   "project-type.shader.lowercase": {
-    "defaultMessage": "{count, plural, one {pencorak} other {pencorak}}"
+    "defaultMessage": "{count, plural, one {efek gambar} other {efek gambar}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Lingkungan yang didukung"
@@ -2217,7 +2217,7 @@
     "defaultMessage": "Kompetitif"
   },
   "tag.category.core-shaders": {
-    "defaultMessage": "Pencorak Inti"
+    "defaultMessage": "Efek Gambar Inti"
   },
   "tag.category.creative-mode": {
     "defaultMessage": "Mode Kreatif"
@@ -2547,7 +2547,7 @@
     "defaultMessage": "Sponge"
   },
   "tag.loader.vanilla": {
-    "defaultMessage": "Pencorak Vanila"
+    "defaultMessage": "Efek Gambar Vanila"
   },
   "tag.loader.velocity": {
     "defaultMessage": "Velocity"

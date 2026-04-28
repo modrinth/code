@@ -12,7 +12,7 @@
     "message": "Přidat servery do instance"
   },
   "app.browse.add-to-instance": {
-    "message": "Přidat do instance"
+    "message": "Přidat do instalace"
   },
   "app.browse.add-to-instance-name": {
     "message": "Přidat do {instanceName}"
@@ -84,7 +84,7 @@
     "message": "Modpack už je nainstalovaný"
   },
   "app.instance.modpack-already-installed.instance": {
-    "message": "Instance"
+    "message": "Instalace"
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
@@ -117,7 +117,7 @@
     "message": "Opravdu si jsi jistý, že chceš navždy smazat tenhle svět?"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "Modováno"
+    "message": "Módováno"
   },
   "app.instance.worlds.filter-offline": {
     "message": "Offline"

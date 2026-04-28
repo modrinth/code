@@ -657,7 +657,7 @@
     "message": "순수령액"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
-    "message": "USD 환산액"
+    "message": "달러 환산액"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "사업체"
@@ -1125,10 +1125,10 @@
     "message": "서버가 과부하 상태일 때, 일시적으로 추가 CPU 스레드를 제공하여 지연과 불안정성을 완화합니다. 이를 통해 TPS가 20 밑으로 떨어지지 않도록 하여 가능한 한 부드러운 환경을 유지할 수 있습니다. 단, 이러한 추가 CPU 스레드는 부하가 높은 순간에만 잠시 제공되므로 Spark 보고서나 다른 프로파일링 도구에는 나타나지 않을 수 있습니다."
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Modrinth Hosting 서버는 어떤 종류의 CPU를 사용하나요?"
+    "message": "Modrinth 호스팅 서버는 어떤 종류의 CPU를 사용하나요?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting 서버는 5GHz 이상의 AMD Ryzen 7900 및 7950X3D급 CPU와 DDR5 메모리로 구동됩니다."
+    "message": "Modrinth 호스팅 서버는 5GHz 이상의 AMD Ryzen 7900 및 7950X3D급 CPU와 DDR5 메모리로 구동됩니다."
   },
   "hosting-marketing.faq.currency": {
     "message": "가격은 어떤 통화로 표시되나요?"
@@ -1137,7 +1137,7 @@
     "message": "모든 가격은 미국 달러(USD)로 표시됩니다."
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "Modrinth Hosting 서버는 DDoS 공격 방어 기능을 갖추고 있나요?"
+    "message": "Modrinth 호스팅 서버는 DDoS 공격 방어 기능을 갖추고 있나요?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
     "message": "네. 모든 Modrinth 호스팅 서버에는 DDoS 공격 방지 기능이 탑재되어 있으며, 일부 지역에서는 최대 17 Tbps의 용량을 제공합니다."
@@ -1161,7 +1161,7 @@
     "message": "네, 서버 저장 용량은 추가 비용 없이 늘릴 수 있습니다. 더 많은 저장 용량이 필요하시면 Modrinth 지원팀에 문의해 주세요."
   },
   "hosting-marketing.faq.location": {
-    "message": "Modrinth Hosting 서버는 어디에 위치해 있나요? 지역을 선택할 수 있나요?"
+    "message": "Modrinth 호스팅 서버는 어디에 위치해 있나요? 지역을 선택할 수 있나요?"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "현재 서버는 구매 시 북미, 유럽, 동남아 지역 중에서 선택할 수 있습니다. 향후 더 많은 지역에서 서비스를 제공할 예정입니다! 지역을 변경이 필요하면 지원팀에 문의해 주세요."
@@ -1188,10 +1188,10 @@
     "message": "새 서버 시작하기"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "다음 서버는 Modrinth Hosting으로 시작하세요"
+    "message": "당신의 다음 서버를 Modrinth 호스팅으로 시작하세요"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting은 Minecraft: Java Edition 서버를 운영하는 가장 쉬운 방법입니다. Modrinth 플랫폼 내에서 좋아하는 모드와 모드팩을 간편하게 설치하고 플레이하세요."
+    "message": "Modrinth 호스팅은 마인크래프트 자바에디션 서버를 운영하는 가장 쉬운 방법입니다. Modrinth 플랫폼 내에서 좋아하는 모드와 모드팩을 간편하게 설치하고 플레이하세요."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "고급 네트워킹 관리"
@@ -1236,13 +1236,13 @@
     "message": "Modrinth Hosting은 서버 관리를 위한 강력한 도구를 제공합니다."
   },
   "hosting-marketing.included.sftp-access": {
-    "message": "SFTP 액세스"
+    "message": "SFTP 엑세스"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "Modrinth Hosting에 내장된 SFTP를 사용하여 서버 파일에 직접 접근하세요."
+    "message": "Modrinth 호스팅에 내장된 SFTP를 사용하여 서버 파일에 직접 접근하세요."
   },
   "hosting-marketing.included.with-your-server": {
-    "message": "서버에 포함되어 있습니다."
+    "message": "당신의 서버에 포함되어 있습니다"
   },
   "hosting-marketing.know-what-you-need": {
     "message": "정확히 필요한 것이 있나요?"
@@ -1257,7 +1257,7 @@
     "message": "기간 한정 특가. 신용카드 필요 없음. 미국 서버에서 사용 가능."
   },
   "hosting-marketing.pick-customized-plan": {
-    "message": "필요한 사양만 포함된 맞춤형 플랜을 선택하세요."
+    "message": "당신이 필요한 사양만 포함된 맞춤형 플랜을 선택하세요."
   },
   "hosting-marketing.server-for-everyone": {
     "message": "모두를 위한 서버가 있습니다"
@@ -1290,10 +1290,10 @@
     "message": "모드가 있는 곳에서 플레이하세요"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting은 모드 및 모드팩 설치 과정을 서버에 완벽하게 통합합니다."
+    "message": "Modrinth 호스팅은 모드 및 모드팩 설치 과정을 서버에 완벽하게 통합합니다."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "Modrinth Hosting을 선택하는 이유는 무엇일까요?"
+    "message": "Modrinth 호스팅을 선택하는 이유는 무엇입니까?"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "좋아하는 모드로 플레이하세요"
@@ -1371,7 +1371,7 @@
     "message": "원하는 프로젝트를 쉽고 빠르게 찾으세요"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Minecraft {content} 위한 공간"
+    "message": "마인크래프트 {content} 위한 공간"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "데이터 팩을"
@@ -1401,7 +1401,7 @@
     "message": "Minecraft 창을 단순화한 표현으로, Modrinth 그린 색상의 Mojang Studios 로고가 포함되어 있습니다."
   },
   "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+    "message": "Modrinth 앱"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1599,7 +1599,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Modrinth 호스팅"
   },
   "layout.footer.resources": {
     "message": "정보"
@@ -1635,10 +1635,10 @@
     "message": "메뉴 전환"
   },
   "layout.meta.description": {
-    "message": "Modrinth에서 Minecraft 모드, 플러그인, 데이터 팩, 셰이더, 리소스 팩, 모드팩을 다운로드하세요. 현대적이고 사용하기 쉬운 인터페이스와 API를 통해 Modrinth에서 프로젝트를 탐색하고 게시하세요."
+    "message": "Modrinth에서 마인크래프트 모드, 플러그인, 데이터 팩, 셰이더, 리소스 팩, 모드팩을 다운로드하세요. 현대적이고 사용하기 쉬운 인터페이스와 API를 통해 Modrinth에서 프로젝트를 탐색하고 게시하세요."
   },
   "layout.meta.og-description": {
-    "message": "Minecraft 콘텐츠를 탐색하고 게시하세요!"
+    "message": "마인크래프트 콘텐츠를 탐색하고 게시하세요!"
   },
   "layout.mobile.close-menu": {
     "message": "메뉴 닫기"
@@ -1656,7 +1656,7 @@
     "message": "콘텐츠 탐색하기"
   },
   "layout.nav.get-modrinth-app": {
-    "message": "Modrinth App 받기"
+    "message": "Modrinth 앱 받기"
   },
   "layout.nav.home": {
     "message": "홈"
@@ -1665,7 +1665,7 @@
     "message": "서버 호스트하기"
   },
   "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+    "message": "Modrinth 앱"
   },
   "layout.nav.modrinth-home-page": {
     "message": "Modrinth 홈페이지"
@@ -1692,7 +1692,7 @@
     "message": "검색"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Modrinth+로 업그레이드"
+    "message": "Modrinth+ 로 업그레이드"
   },
   "moderation.moderate": {
     "message": "관리"
@@ -2217,7 +2217,7 @@
     "message": "프로젝트 검토"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting은 친구들과 번거로움 없이 플레이할 수 있는 가장 쉬운 방법입니다!"
+    "message": "Modrinth 호스팅은 친구들과 번거로움 없이 플레이할 수 있는 가장 쉬운 방법입니다!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "{price}<small> / 월</small>부터 시작"
@@ -2253,7 +2253,7 @@
     "message": "Modrinth App으로 설치"
   },
   "project.download.no-app": {
-    "message": "Modrinth App을 설치하지 않으셨나요?"
+    "message": "Modrinth 앱을 설치하지 않으셨나요?"
   },
   "project.download.no-versions-available": {
     "message": "{gameVersion} 및 {platform}용 버전이 없습니다."
@@ -2463,7 +2463,7 @@
     "message": "악성 또는 기만적인 콘텐츠에 대한 신고에는 코드 샘플과 같은 행위에 대한 실질적 증거가 포함되어야 합니다."
   },
   "report.note.malicious.2": {
-    "message": "Microsoft Defender, VirusTotal 또는 AI 멀웨어 탐지의 요약은 충분한 증거가 아니므로 허용되지 않습니다."
+    "message": "마이크로소프트 디펜더, VirusTotal 또는 인공지능 멀웨어 탐지의 요약은 충분한 증거가 아니므로 허용되지 않습니다."
   },
   "report.please-report": {
     "message": "해당 상황에서 신고하세요:"
@@ -2982,7 +2982,7 @@
     "message": "이 백업 코드들을 안전한 곳에 저장해 두세요. 이 백업 코드들은 기기를 사용할 수 없을때 2단계 인증 코드 대용으로 사용할 수 있습니다! 이 코드들을 비밀번호처럼 안전하게 보관하세요."
   },
   "settings.account.two-factor.backup.single-use": {
-    "message": "백업 코드는 한번만 사용 할 수 있습니다."
+    "message": "복구 코드는 한번만 사용 할 수 있습니다."
   },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "입력한 코드가 맞지 않습니다!"
@@ -3141,7 +3141,7 @@
     "message": "Modrinth Plus"
   },
   "settings.billing.charges.product.pyro": {
-    "message": "Modrinth Hosting"
+    "message": "Modrinth 호스팅"
   },
   "settings.billing.charges.title": {
     "message": "과거 결제 내역"
@@ -3174,7 +3174,7 @@
     "message": "프로필에 Modrinth+ 배지"
   },
   "settings.billing.midas.benefits.support": {
-    "message": "Modrith와 크리에이터 후원"
+    "message": "Modrith 와 크리에이터 후원"
   },
   "settings.billing.midas.benefits.title": {
     "message": "장점"
@@ -3297,7 +3297,7 @@
     "message": "{gb} GB 스왑 메모리"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "당신의 Modrinth Hosting 구독을 관리하세요."
+    "message": "당신의 Modrinth 호스팅 구독을 관리하세요."
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Hosting 구독"
@@ -3411,10 +3411,10 @@
     "message": "새 탭에서 외부 링크 열기"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "기본 네비게이선에서 \"Modrinth App 받기\" 버튼을 숨깁니다. Modrinth App 페이지는 여전히 시작 페이지 또는 하단에서 찾을 수 있습니다."
+    "message": "기본 네비게이선에서 \"Modrinth 앱 받기\" 버튼을 숨깁니다. Modrinth 앱 페이지는 여전히 시작 페이지 또는 하단에서 찾을 수 있습니다."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Modrinth App 프로모션 숨기기"
+    "message": "Modrinth 앱 프로모션 숨기기"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "콘텐츠 페이지에서 사이드바를 왼쪽으로 정렬"
@@ -3429,7 +3429,7 @@
     "message": "검색 페이지에서 필터 사이드바를 오른쪽으로 정렬"
   },
   "settings.display.theme.description": {
-    "message": "이 디바이스에서 선호하는 Modrinth의 색상 테마를 선택합니다."
+    "message": "이 디바이스에서 선호하는 Modrinth 의 색상 테마를 선택합니다."
   },
   "settings.display.theme.title": {
     "message": "색상 테마"
@@ -3462,7 +3462,7 @@
     "message": "이 토큰 삭제"
   },
   "settings.pats.modal.delete.description": {
-    "message": "토큰이 영구적으로 삭제됩니다."
+    "message": "토큰이 영구적으로 삭제됩니다 (영원히)."
   },
   "settings.pats.modal.delete.title": {
     "message": "정말로 이 토큰을 삭제할까요?"
@@ -3489,13 +3489,13 @@
     "message": "사용된 적 없음"
   },
   "settings.profile.bio.description": {
-    "message": "모든 사람에게 당신에 대해 소개하는 간단한 설명입니다."
+    "message": "모든 사람에게 당신을 소개하는 간단한 설명입니다."
   },
   "settings.profile.bio.title": {
     "message": "자기소개"
   },
   "settings.profile.description": {
-    "message": "당신의 프로필 정보는 Modrinth나 <docs-link>Modrinth API</docs-link>를 통해 공개될 수 있습니다."
+    "message": "당신의 프로필 정보는 Modrinth 나 <docs-link>Modrinth API</docs-link>를 통해 공개될 수 있습니다."
   },
   "settings.profile.head-title": {
     "message": "프로필 설정"

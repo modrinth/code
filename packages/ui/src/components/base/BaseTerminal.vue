@@ -4,6 +4,13 @@
 	>
 		<div ref="wrapperRef" class="relative min-h-0 flex-1 overflow-hidden pb-2 pt-1">
 			<div ref="containerRef" class="size-full" />
+			<Transition name="terminal-loading-fade">
+				<div
+					v-if="loading"
+					class="pointer-events-none absolute inset-0 z-20 animate-bpulse bg-surface-3"
+					aria-hidden="true"
+				/>
+			</Transition>
 			<div v-if="!isAtBottom" class="absolute bottom-4 right-4 z-10">
 				<ButtonStyled circular type="highlight" size="large">
 					<button class="!shadow-2xl" aria-label="Scroll to bottom" @click="scrollToBottom">
@@ -46,6 +53,7 @@ const props = withDefaults(
 		disableInput?: boolean
 		fullscreen?: boolean
 		emptyStateType?: 'server' | 'instance'
+		loading?: boolean
 	}>(),
 	{
 		scrollback: Infinity,
@@ -53,6 +61,7 @@ const props = withDefaults(
 		disableInput: false,
 		fullscreen: false,
 		emptyStateType: undefined,
+		loading: false,
 	},
 )
 
@@ -230,6 +239,15 @@ defineExpose({
 </script>
 
 <style>
+@keyframes bpulse {
+	50% {
+		filter: brightness(75%);
+	}
+}
+.animate-bpulse {
+	animation: bpulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 .xterm {
 	height: 100% !important;
 }
@@ -268,5 +286,15 @@ defineExpose({
 	width: 6px !important;
 	border-radius: 8px !important;
 	contain: layout style !important;
+}
+
+.terminal-loading-fade-enter-active,
+.terminal-loading-fade-leave-active {
+	transition: opacity 250ms ease-in-out;
+}
+
+.terminal-loading-fade-enter-from,
+.terminal-loading-fade-leave-to {
+	opacity: 0;
 }
 </style>

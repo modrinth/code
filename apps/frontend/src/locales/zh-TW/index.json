@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "建立聯盟連結"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "未找到推廣代碼。"
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "載入聯盟連結時發生錯誤"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "搜尋聯盟連結..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "來自 {count} {count, plural, one {project} other {projects}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "總下載量"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "總關注者"
   },
   "dashboard.collections.button.create-new": {
     "message": "新增"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "你的收藏"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "搜尋收藏集…"
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "姓名（A-Z）"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "最近創建"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "最近更新"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "下載 {formType}"
@@ -847,6 +871,39 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "你已用盡你的提領額度：<b>{withdrawLimit}</b>。你必須填寫一份稅務表單才能提領更多金額。"
+  },
+  "dashboard.head-title": {
+    "message": "儀表板"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "全部標記為已讀"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "查看歷史記錄"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "您沒有任何未讀通知。"
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "載入通知時發生錯誤："
+  },
+  "dashboard.notifications.history.label": {
+    "message": "歷史"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "通知歷史記錄"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "看全部"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "查看通知記錄"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "看更多 {extraNotifs} 條 {extraNotifs, plural, one {通知} other {通知}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "正在載入通知…"
   },
   "dashboard.revenue.available-now": {
     "message": "可提領"

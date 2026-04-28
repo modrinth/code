@@ -1121,8 +1121,20 @@
   "hosting-marketing.faq.burst-threads": {
     "message": "كيف تعمل مسارات المعالجة في وحدة المعالجة المركزية؟"
   },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "عندما يكون الخادم لديك تحت ضغطٍ عالٍ، نقوم مؤقتًا بمنحه وصولًا إلى خيوط معالجة إضافية (CPU threads) للمساعدة في تقليل التقطّعات وعدم الاستقرار. يساعد ذلك على منع انخفاض معدل النبضات في الثانية (TPS) إلى أقل من 20، مما يضمن تجربة سلسة قدر الإمكان. ونظرًا لأن خيوط المعالجة الإضافية هذه تكون متاحة لفترة قصيرة فقط أثناء فترات الضغط العالي، فقد لا تظهر في تقارير Spark أو أدوات تحليل الأداء الأخرى.\n"
+  },
   "hosting-marketing.faq.cpu-kind.answer": {
     "message": "تعمل استضافة خوادم مودرينث على AMD Ryzen 7900 و 7950X3D و وحدات معالجة مركزية مماثلة بسرعة 5+ غيغاهيرتز مقترنة بذاكرة وصول عشوائي من نوع DDR5"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "جميع الأسعار مُدرجة بالدولار الأمريكي (USD)."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "الأسئلة شائعه"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "ما سرعه خوادم modrinth؟"
   },
   "hosting-marketing.faq.location": {
     "message": "أين تقع استضافة خوادم Modrinth؟ هل يمكنني اختيار منطقة؟"
@@ -1144,6 +1156,9 @@
   },
   "hosting-marketing.included.backups-included": {
     "message": "النسخ الاحتياطية مضمنة"
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "رابط مخصص"
   },
   "hosting-marketing.included.description": {
     "message": "."
@@ -1333,6 +1348,21 @@
   },
   "landing.subheading": {
     "message": "اكتشف محتوى Minecraft والعب وشاركه من خلال منصتنا مفتوحة المصدر المصممة خصيصًا للمجتمع."
+  },
+  "layout.action.new-project": {
+    "message": "مشروع جديد"
+  },
+  "layout.action.new-server-project": {
+    "message": "خادم جديد"
+  },
+  "layout.action.publish": {
+    "message": "نشر"
+  },
+  "layout.action.review-projects": {
+    "message": "مراجعه المشروع"
+  },
+  "layout.avatar.alt": {
+    "message": "صورتك الرمزية"
   },
   "layout.banner.add-email.description": {
     "message": "لأسباب أمنية، يحتاج مودرنث منك تسجيل عنوان بريد إلكتروني في حسابك."
