@@ -21,6 +21,7 @@ export class LabrinthAnalyticsV3Module extends AbstractModule {
 	 *     end: '2026-02-01T00:00:00Z',
 	 *     resolution: { slices: 31 },
 	 *   },
+	 *   project_ids: ['A1B2C3D4'],
 	 *   return_metrics: {
 	 *     project_views: { bucket_by: ['project_id'] },
 	 *   },

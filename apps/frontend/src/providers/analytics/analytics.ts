@@ -132,6 +132,7 @@ function buildPreviousFetchRequest(
 			end: previousEnd.toISOString(),
 			resolution: fetchRequest.time_range.resolution,
 		},
+		project_ids: fetchRequest.project_ids,
 		return_metrics: fetchRequest.return_metrics,
 	}
 }

@@ -380,6 +380,7 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 				slices: resolutionSlices,
 			},
 		},
+		project_ids: selectedProjectIds.value,
 		return_metrics: {
 			project_views: {
 				bucket_by: bucketBy.views,

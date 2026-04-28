@@ -243,6 +243,7 @@ export namespace Labrinth {
 			export type FetchRequest = {
 				time_range: TimeRange
 				return_metrics: ReturnMetrics
+				project_ids?: string[]
 			}
 
 			export type TimeRange = {
