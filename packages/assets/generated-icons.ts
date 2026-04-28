@@ -53,6 +53,7 @@ import _ChevronLeftIcon from './icons/chevron-left.svg?component'
 import _ChevronRightIcon from './icons/chevron-right.svg?component'
 import _ChevronUpIcon from './icons/chevron-up.svg?component'
 import _CircleAlertIcon from './icons/circle-alert.svg?component'
+import _CircleArrowRightIcon from './icons/circle-arrow-right.svg?component'
 import _CircleUserIcon from './icons/circle-user.svg?component'
 import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
@@ -442,6 +443,7 @@ export const ChevronLeftIcon = _ChevronLeftIcon
 export const ChevronRightIcon = _ChevronRightIcon
 export const ChevronUpIcon = _ChevronUpIcon
 export const CircleAlertIcon = _CircleAlertIcon
+export const CircleArrowRightIcon = _CircleArrowRightIcon
 export const CircleUserIcon = _CircleUserIcon
 export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
