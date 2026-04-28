@@ -107,6 +107,26 @@ export const Default: StoryObj = {
 				})
 			}
 
+			const showWaitingProgress = () => {
+				popupManager.addPopupNotification({
+					title: 'Installing modpack...',
+					text: 'example-pack-1.0.0.mrpack',
+					type: 'info',
+					autoCloseMs: null,
+					waiting: true,
+				})
+			}
+
+			const showDeterminateProgress = () => {
+				popupManager.addPopupNotification({
+					title: 'Downloading update',
+					text: 'Downloading files...',
+					type: 'success',
+					autoCloseMs: null,
+					progress: 0.62,
+				})
+			}
+
 			const clearAll = () => {
 				popupManager.clearAllNotifications()
 			}
@@ -118,6 +138,8 @@ export const Default: StoryObj = {
 				showInfo,
 				showNoButtons,
 				showPermanent,
+				showWaitingProgress,
+				showDeterminateProgress,
 				clearAll,
 			}
 		},
@@ -141,6 +163,12 @@ export const Default: StoryObj = {
 					</ButtonStyled>
 					<ButtonStyled>
 						<button @click="showPermanent">Permanent</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="showWaitingProgress">Waiting Progress</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="showDeterminateProgress">Determinate Progress</button>
 					</ButtonStyled>
 					<ButtonStyled>
 						<button @click="clearAll">Clear All</button>

@@ -11,6 +11,8 @@ export interface PopupNotification {
 	title: string
 	text?: string
 	type?: 'error' | 'warning' | 'success' | 'info'
+	progress?: number
+	waiting?: boolean
 	buttons?: PopupNotificationButton[]
 	autoCloseMs?: number | null
 	timer?: NodeJS.Timeout

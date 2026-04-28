@@ -182,7 +182,7 @@ const {
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
-} = setupProviders(notificationManager)
+} = setupProviders(notificationManager, popupNotificationManager)
 
 const news = ref([])
 const availableSurvey = ref(false)
@@ -786,7 +786,9 @@ async function handleCommand(e) {
 	if (e.event === 'RunMRPack') {
 		// RunMRPack should directly install a local mrpack given a path
 		if (e.path.endsWith('.mrpack')) {
-			await create_profile_and_install_from_file(e.path).catch(handleError)
+			await create_profile_and_install_from_file(e.path, (createProfile, fileName) =>
+				unknownPackWarningModal.value?.show(createProfile, fileName),
+			).catch(handleError)
 			trackEvent('InstanceCreate', {
 				source: 'CreationModalFileDrop',
 			})
@@ -1265,12 +1267,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:disabled="offline"
 			>
 				<PlusIcon />
-			</NavButton>
-			<NavButton
-				v-tooltip.right="'Test unknown pack warning'"
-				:to="() => unknownPackWarningModal?.show()"
-			>
-				Test
 			</NavButton>
 			<div class="flex flex-grow"></div>
 			<Transition name="nav-button-animated">

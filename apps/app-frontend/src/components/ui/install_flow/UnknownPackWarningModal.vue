@@ -1,11 +1,14 @@
 <template>
-	<ModalWrapper ref="modal" :header="formatMessage(messages.header)">
+	<ModalWrapper ref="modal" :header="formatMessage(messages.header)" :on-hide="reset">
 		<div class="max-w-[31rem] flex flex-col gap-6">
 			<Admonition
 				type="warning"
 				:header="formatMessage(messages.warningTitle)"
 				:body="formatMessage(messages.warningBody)"
 			/>
+			<div v-if="fileName" class="overflow-x-auto whitespace-nowrap text-sm text-secondary">
+				{{ fileName }}
+			</div>
 			<div>
 				<p class="mt-0 leading-tight">
 					{{ formatMessage(messages.body) }}
@@ -17,14 +20,15 @@
 			<Checkbox v-model="dontShowAgain" :label="formatMessage(messages.dontShowAgain)" />
 			<div class="flex gap-2 justify-end">
 				<ButtonStyled type="outlined">
-					<button>
+					<button @click="cancel">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button>
-						<CircleArrowRightIcon />
+					<button :disabled="isProceeding" @click="proceed">
+						<SpinnerIcon v-if="isProceeding" class="animate-spin" />
+						<CircleArrowRightIcon v-else />
 						{{ formatMessage(messages.installAnyway) }}
 					</button>
 				</ButtonStyled>
@@ -33,8 +37,8 @@
 	</ModalWrapper>
 </template>
 
-<script setup>
-import { CircleArrowRightIcon, XIcon } from '@modrinth/assets'
+<script setup lang="ts">
+import { CircleArrowRightIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	ButtonStyled,
@@ -51,6 +55,10 @@ const { formatMessage } = useVIntl()
 
 const dontShowAgain = ref(false)
 const modal = useTemplateRef('modal')
+const onProceed = ref<() => Promise<void>>()
+const isProceeding = ref(false)
+const resolveShow = ref(null)
+const fileName = ref('')
 
 const messages = defineMessages({
 	header: {
@@ -83,8 +91,32 @@ const messages = defineMessages({
 	},
 })
 
-function show() {
-	modal.value.show()
+function show(createInstance: () => Promise<void>, selectedFileName = '') {
+	onProceed.value = createInstance
+	fileName.value = selectedFileName
+	dontShowAgain.value = false
+
+	modal.value?.show()
+}
+
+function reset() {
+	onProceed.value = undefined
+	fileName.value = ''
+}
+
+function cancel() {
+	modal.value?.hide()
+}
+
+function proceed() {
+	if (!onProceed.value) {
+		return
+	}
+
+	const createInstance = onProceed.value
+	modal.value?.hide()
+	// noinspection ES6MissingAwait
+	createInstance()
 }
 
 defineExpose({ show })

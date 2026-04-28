@@ -47,6 +47,15 @@
 							{{ item.text }}
 						</span>
 					</div>
+					<ProgressBar
+						v-if="item.progress != null || item.waiting"
+						:progress="item.progress ?? 0"
+						:max="1"
+						:waiting="item.waiting ?? false"
+						:color="progressColorForType(item.type)"
+						:gradient-border="false"
+						full-width
+					/>
 					<div v-if="item.buttons?.length" class="flex gap-1.5">
 						<ButtonStyled
 							v-for="(btn, idx) in item.buttons"
@@ -74,6 +83,7 @@ import {
 	type PopupNotificationButton,
 } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
+import ProgressBar from '../base/ProgressBar.vue'
 
 const popupNotificationManager = injectPopupNotificationManager()
 const notifications = computed<PopupNotification[]>(() =>
@@ -88,6 +98,19 @@ const dismiss = (id: string | number) => popupNotificationManager.removeNotifica
 function handleButtonClick(id: string | number, btn: PopupNotificationButton) {
 	btn.action()
 	popupNotificationManager.removeNotification(id)
+}
+
+function progressColorForType(type: PopupNotification['type']) {
+	if (type === 'error') {
+		return 'red'
+	} else if (type === 'warning') {
+		return 'orange'
+	} else if (type === 'success') {
+		return 'green'
+	} else if (type === 'info') {
+		return 'blue'
+	}
+	return 'green'
 }
 
 withDefaults(
