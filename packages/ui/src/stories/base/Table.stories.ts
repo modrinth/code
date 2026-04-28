@@ -219,6 +219,38 @@ export const WithCustomHeaderSlots: StoryObj = {
 	}),
 }
 
+export const WithHeaderSlot: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table, ButtonStyled },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Name' },
+				{ key: 'email', label: 'Email' },
+				{ key: 'status', label: 'Status' },
+				{ key: 'role', label: 'Role' },
+			]
+			const data = sampleUsers
+
+			return { columns, data }
+		},
+		template: /* html */ `
+			<Table :columns="columns" :data="data">
+				<template #header>
+					<div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+						<div class="text-lg font-semibold text-contrast">Team Members</div>
+						<div class="flex items-center gap-2">
+							<ButtonStyled color="brand">
+								<button type="button">Invite member</button>
+							</ButtonStyled>
+						</div>
+					</div>
+				</template>
+			</Table>
+		`,
+	}),
+}
+
 export const WithActionsColumn: StoryObj = {
 	args: {},
 	render: () => ({

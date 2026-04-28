@@ -1,5 +1,11 @@
 <template>
 	<div class="overflow-hidden rounded-2xl border border-solid border-surface-5">
+		<div
+			v-if="hasHeaderSlot"
+			class="border-solid border-0 border-b border-surface-5 bg-surface-3 p-4"
+		>
+			<slot name="header" />
+		</div>
 		<table class="w-full table-fixed border-separate border-spacing-0 border-surface-5">
 			<thead class="">
 				<tr class="bg-surface-3">
@@ -100,7 +106,7 @@
 	generic="K extends string = string, T extends Record<string, unknown> = Record<K, unknown>"
 >
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
 
 import Checkbox from './Checkbox.vue'
 
@@ -139,6 +145,8 @@ const props = withDefaults(
 const selectedIds = defineModel<unknown[]>('selectedIds', { default: () => [] })
 const sortColumn = defineModel<string | undefined>('sortColumn')
 const sortDirection = defineModel<SortDirection>('sortDirection', { default: 'asc' })
+const slots = useSlots()
+const hasHeaderSlot = computed(() => Boolean(slots.header))
 
 const emit = defineEmits<{
 	sort: [column: string, direction: SortDirection]
