@@ -1,6 +1,7 @@
 import type { AbstractModrinthClient } from '../core/abstract-client'
 import type { AbstractModule } from '../core/abstract-module'
 import { ArchonBackupsV1Module } from './archon/backups/v1'
+import { ArchonBackupsQueueV1Module } from './archon/backups-queue/v1'
 import { ArchonContentV1Module } from './archon/content/v1'
 import { ArchonOptionsV1Module } from './archon/options/v1'
 import { ArchonPropertiesV1Module } from './archon/properties/v1'
@@ -18,6 +19,7 @@ import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthGlobalsInternalModule } from './labrinth/globals/internal'
 import { LabrinthLimitsV3Module } from './labrinth/limits/v3'
+import { LabrinthModerationInternalModule } from './labrinth/moderation/internal'
 import { LabrinthNotificationsV2Module } from './labrinth/notifications/v2'
 import { LabrinthOAuthInternalModule } from './labrinth/oauth/internal'
 import { LabrinthOrganizationsV3Module } from './labrinth/organizations/v3'
@@ -54,6 +56,7 @@ type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
  * TODO: Better way? Probably not
  */
 export const MODULE_REGISTRY = {
+	archon_backups_queue_v1: ArchonBackupsQueueV1Module,
 	archon_backups_v1: ArchonBackupsV1Module,
 	archon_content_v1: ArchonContentV1Module,
 	archon_options_v1: ArchonOptionsV1Module,
@@ -73,6 +76,7 @@ export const MODULE_REGISTRY = {
 	labrinth_billing_internal: LabrinthBillingInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_globals_internal: LabrinthGlobalsInternalModule,
+	labrinth_moderation_internal: LabrinthModerationInternalModule,
 	labrinth_notifications_v2: LabrinthNotificationsV2Module,
 	labrinth_oauth_internal: LabrinthOAuthInternalModule,
 	labrinth_organizations_v3: LabrinthOrganizationsV3Module,

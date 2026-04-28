@@ -85,9 +85,8 @@
 						<span>
 							<span>{{
 								formatMessage(messages.fromProjects, { count: followersProjectCount })
-							}}</span></span
-						>
-						>
+							}}</span>
+						</span>
 					</div>
 				</div>
 			</section>

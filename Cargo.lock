@@ -27,7 +27,7 @@ checksum = "daa239b93927be1ff123eebada5a3ff23e89f0124ccb8609234e5103d5a5ae6d"
 dependencies = [
  "actix-utils",
  "actix-web",
- "derive_more 2.0.1",
+ "derive_more 2.1.1",
  "futures-util",
  "log",
  "once_cell",
@@ -46,7 +46,7 @@ dependencies = [
  "actix-web",
  "bitflags 2.9.4",
  "bytes",
- "derive_more 2.0.1",
+ "derive_more 2.1.1",
  "futures-core",
  "http-range",
  "log",
@@ -72,7 +72,7 @@ dependencies = [
  "brotli",
  "bytes",
  "bytestring",
- "derive_more 2.0.1",
+ "derive_more 2.1.1",
  "encoding_rs",
  "flate2",
  "foldhash",
@@ -226,7 +226,7 @@ dependencies = [
  "bytestring",
  "cfg-if",
  "cookie 0.16.2",
- "derive_more 2.0.1",
+ "derive_more 2.1.1",
  "encoding_rs",
  "foldhash",
  "futures-core",
@@ -1903,6 +1903,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "convert_case"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "633458d4ef8c78b72454de2d54fd6ab2e60f9e02be22f3c6104cdc8a4e0fceb9"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "cookie"
 version = "0.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2450,21 +2459,23 @@ dependencies = [
 
 [[package]]
 name = "derive_more"
-version = "2.0.1"
+version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "093242cf7570c207c83073cf82f79706fe7b8317e98620a47d5be7c3d8497678"
+checksum = "d751e9e49156b02b44f9c1815bcb94b984cdcc4396ecc32521c739452808b134"
 dependencies = [
  "derive_more-impl",
 ]
 
 [[package]]
 name = "derive_more-impl"
-version = "2.0.1"
+version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bda628edc44c4bb645fbe0f758797143e4e07926f7ebf4e9bdfbd3d2ce621df3"
+checksum = "799a97264921d8623a957f6c3b9011f3b5492f557bbb7a5a19b7fa6d06ba8dcb"
 dependencies = [
+ "convert_case 0.10.0",
  "proc-macro2",
  "quote",
+ "rustc_version",
  "syn 2.0.106",
  "unicode-xid",
 ]
@@ -4914,7 +4925,7 @@ dependencies = [
  "const_format",
  "dashmap",
  "deadpool-redis",
- "derive_more 2.0.1",
+ "derive_more 2.1.1",
  "dotenv-build",
  "dotenvy",
  "either",
@@ -5516,7 +5527,7 @@ name = "modrinth-util"
 version = "0.0.0"
 dependencies = [
  "actix-web",
- "derive_more 2.0.1",
+ "derive_more 2.1.1",
  "dotenvy",
  "eyre",
  "modrinth-log",
@@ -5582,7 +5593,7 @@ dependencies = [
  "arc-swap",
  "bytes",
  "chrono",
- "derive_more 2.0.1",
+ "derive_more 2.1.1",
  "reqwest 0.12.24",
  "rust_decimal",
  "rust_iso3166",
@@ -6593,7 +6604,7 @@ checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 name = "path-util"
 version = "0.0.0"
 dependencies = [
- "derive_more 2.0.1",
+ "derive_more 2.1.1",
  "itertools 0.14.0",
  "serde",
  "typed-path",
@@ -9275,7 +9286,7 @@ dependencies = [
 name = "sqlx-tracing"
 version = "0.2.0"
 dependencies = [
- "derive_more 2.0.1",
+ "derive_more 2.1.1",
  "futures",
  "opentelemetry",
  "opentelemetry-testing",
@@ -10148,7 +10159,7 @@ dependencies = [
  "daedalus",
  "dashmap",
  "data-url",
- "derive_more 2.0.1",
+ "derive_more 2.1.1",
  "dirs",
  "discord-rich-presence",
  "dotenvy",

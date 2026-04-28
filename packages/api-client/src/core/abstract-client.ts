@@ -9,6 +9,11 @@ import { AbstractUploadClient } from './abstract-upload-client'
 import type { AbstractWebSocketClient } from './abstract-websocket'
 import { ModrinthApiError, ModrinthServerError } from './errors'
 
+type ArchonClientModules = Omit<InferredClientModules['archon'], 'backups_v1'> & {
+	/** @deprecated Use `backups_queue_v1` for the Backups Queue API. */
+	backups_v1: InferredClientModules['archon']['backups_v1']
+}
+
 /**
  * Abstract base client for Modrinth APIs
  */
@@ -27,7 +32,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	private _moduleNamespaces: Map<string, Record<string, AbstractModule>> = new Map()
 
 	public readonly labrinth!: InferredClientModules['labrinth']
-	public readonly archon!: InferredClientModules['archon'] & { sockets: AbstractWebSocketClient }
+	public readonly archon!: ArchonClientModules & { sockets: AbstractWebSocketClient }
 	public readonly kyros!: InferredClientModules['kyros']
 	public readonly iso3166!: InferredClientModules['iso3166']
 	public readonly mclogs!: InferredClientModules['mclogs']

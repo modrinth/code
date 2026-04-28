@@ -1318,6 +1318,38 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Moderation {
+		export namespace Internal {
+			export type LockedByUser = {
+				id: string
+				username: string
+				avatar_url?: string
+			}
+
+			export type LockStatusResponse = {
+				locked: boolean
+				is_own_lock: boolean
+				locked_by?: LockedByUser
+				locked_at?: string
+				expires_at?: string
+				expired?: boolean
+			}
+
+			export type LockAcquireResponse = {
+				success: boolean
+				is_own_lock: boolean
+				locked_by?: LockedByUser
+				locked_at?: string
+				expires_at?: string
+				expired?: boolean
+			}
+
+			export type ReleaseLockResponse = {
+				success: boolean
+			}
+		}
+	}
+
 	export namespace Notifications {
 		export namespace v2 {
 			export type NotificationAction = {
@@ -1527,6 +1559,7 @@ export namespace Labrinth {
 				id: string
 				issue_id: string
 				key: string
+				jar: string | null
 				file_path: string
 				decompiled_source: string | null
 				data: Record<string, unknown>

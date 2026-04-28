@@ -89,7 +89,7 @@ const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
 	refetch: []
-	loadFileSources: [reportId: string]
+	loadIssueSources: [issueIds: string[]]
 	markComplete: [projectId: string]
 	showMaliciousSummary: [unsafeFiles: UnsafeFile[]]
 }>()
@@ -182,8 +182,54 @@ async function updateIssueDetails(data: { detail_id: string; verdict: 'safe' | '
 
 const severityOrder = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
 
-const detailDecisions = reactive<Map<string, 'safe' | 'malware'>>(new Map())
+type DetailDecision = 'safe' | 'malware'
+
+const detailDecisions = reactive<Map<string, DetailDecision>>(new Map())
 const updatingDetails = reactive<Set<string>>(new Set())
+
+function verdictToDecision(verdict: 'safe' | 'unsafe'): DetailDecision {
+	return verdict === 'safe' ? 'safe' : 'malware'
+}
+
+function getAllDetails(): Labrinth.TechReview.Internal.ReportIssueDetail[] {
+	return props.item.reports.flatMap((report) => report.issues.flatMap((issue) => issue.details))
+}
+
+function applyDecisionToRelatedDetails(
+	detailIds: string[],
+	decision: DetailDecision,
+): { otherMatchedCount: number } {
+	const allDetails = getAllDetails()
+	const selectedDetailIds = new Set(detailIds)
+	const updatedDetailIds = new Set<string>()
+
+	for (const detailId of detailIds) {
+		const detail = allDetails.find((candidate) => candidate.id === detailId)
+		let matchingDetails: Labrinth.TechReview.Internal.ReportIssueDetail[] = []
+
+		if (detail?.key) {
+			matchingDetails = allDetails.filter((candidate) => candidate.key === detail.key)
+		} else if (detail) {
+			matchingDetails = [detail]
+		}
+
+		if (matchingDetails.length === 0) {
+			detailDecisions.set(detailId, decision)
+			updatedDetailIds.add(detailId)
+			continue
+		}
+
+		for (const matchingDetail of matchingDetails) {
+			detailDecisions.set(matchingDetail.id, decision)
+			updatedDetailIds.add(matchingDetail.id)
+		}
+	}
+
+	return {
+		otherMatchedCount: [...updatedDetailIds].filter((detailId) => !selectedDetailIds.has(detailId))
+			.length,
+	}
+}
 
 function getFileHighestSeverity(
 	file: FlattenedFileReport,
@@ -325,7 +371,6 @@ function formatFileSize(bytes: number): string {
 function viewFileFlags(file: FlattenedFileReport) {
 	selectedFileId.value = file.id
 	currentTab.value = 'File'
-	emit('loadFileSources', file.id)
 }
 
 function backToFileList() {
@@ -416,10 +461,7 @@ async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 	try {
 		await updateIssueDetails(detailIds.map((detailId) => ({ detail_id: detailId, verdict })))
 
-		const decision = verdict === 'safe' ? 'safe' : 'malware'
-		for (const detailId of detailIds) {
-			detailDecisions.set(detailId, decision)
-		}
+		applyDecisionToRelatedDetails(detailIds, verdictToDecision(verdict))
 
 		addNotification({
 			type: 'success',
@@ -435,6 +477,8 @@ async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 				backToFileList()
 			}
 		}
+
+		emit('refetch')
 	} catch (error) {
 		console.error('Failed to batch update:', error)
 		addNotification({
@@ -464,37 +508,10 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 	try {
 		await updateIssueDetails([{ detail_id: detailId, verdict }])
 
-		const decision = verdict === 'safe' ? 'safe' : 'malware'
-
-		let detailKey: string | null = null
-		for (const report of props.item.reports) {
-			for (const issue of report.issues) {
-				const detail = issue.details.find((d) => d.id === detailId)
-				if (detail) {
-					detailKey = detail.key
-					break
-				}
-			}
-			if (detailKey) break
-		}
-
-		let otherMatchedCount = 0
-		if (detailKey) {
-			for (const report of props.item.reports) {
-				for (const issue of report.issues) {
-					for (const detail of issue.details) {
-						if (detail.key === detailKey) {
-							detailDecisions.set(detail.id, decision)
-							if (detail.id !== detailId) {
-								otherMatchedCount++
-							}
-						}
-					}
-				}
-			}
-		} else {
-			detailDecisions.set(detailId, decision)
-		}
+		const { otherMatchedCount } = applyDecisionToRelatedDetails(
+			[detailId],
+			verdictToDecision(verdict),
+		)
 
 		// Only collapse if the prior state was 'pending' (new decision, not updating existing)
 		if (priorDecision === 'pending') {
@@ -534,6 +551,8 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 				text: `This issue has been flagged as malicious.${otherText}`,
 			})
 		}
+
+		emit('refetch')
 	} catch (error) {
 		console.error('Failed to update detail status:', error)
 		addNotification({
@@ -547,7 +566,10 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 }
 
 const expandedClasses = reactive<Set<string>>(new Set())
+const autoExpandedFileIds = reactive<Set<string>>(new Set())
 const showCopyFeedback = reactive<Map<string, boolean>>(new Map())
+const highlightedSourceCache = reactive<Map<string, { source: string; lines: string[] }>>(new Map())
+const LAZY_LOAD_CLASS_SOURCE_MINIMUM = 10
 
 interface ClassGroup {
 	key: string
@@ -580,6 +602,10 @@ function splitJarSegments(jar: string | null, currentFileName: string | null): s
 		return segments.slice(1)
 	}
 	return segments
+}
+
+function isRootJarGroup(jarGroup: JarGroup): boolean {
+	return jarGroup.segments.length === 0
 }
 
 const groupedByClass = computed<ClassGroup[]>(() => {
@@ -647,18 +673,28 @@ const groupedByJar = computed<JarGroup[]>(() => {
 	}
 
 	return Array.from(jarMap.values()).sort((a, b) => {
+		const aRoot = isRootJarGroup(a)
+		const bRoot = isRootJarGroup(b)
+		if (aRoot !== bRoot) return aRoot ? -1 : 1
+
 		const aSeverity = getHighestSeverityInClass(a.classes.flatMap((classItem) => classItem.flags))
 		const bSeverity = getHighestSeverityInClass(b.classes.flatMap((classItem) => classItem.flags))
 		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
 	})
 })
 
-// Auto-expand if there's only one class in the file
+// Auto-expand/load source for small files; keep larger files lazy.
 watch(
-	groupedByClass,
-	(classes) => {
-		if (classes.length === 1) {
-			expandedClasses.add(classes[0].key)
+	[selectedFileId, groupedByClass],
+	([fileId, classes]) => {
+		if (!fileId || classes.length === 0 || autoExpandedFileIds.has(fileId)) return
+
+		autoExpandedFileIds.add(fileId)
+
+		if (classes.length < LAZY_LOAD_CLASS_SOURCE_MINIMUM) {
+			for (const classItem of classes) {
+				expandClass(classItem)
+			}
 		}
 	},
 	{ immediate: true },
@@ -676,20 +712,49 @@ function getHighestSeverityInClass(
 	)
 }
 
-function toggleClass(classKey: string) {
-	if (expandedClasses.has(classKey)) {
-		expandedClasses.delete(classKey)
-	} else {
-		expandedClasses.add(classKey)
-	}
-}
-
 function getClassDecompiledSource(classItem: ClassGroup): string | undefined {
 	for (const flag of classItem.flags) {
 		const source = props.decompiledSources.get(flag.detail.id)
 		if (source) return source
 	}
 	return undefined
+}
+
+function getHighlightedClassSource(classItem: ClassGroup): string[] {
+	const source = getClassDecompiledSource(classItem)
+	if (!source) return []
+
+	const cached = highlightedSourceCache.get(classItem.key)
+	if (cached?.source === source) return cached.lines
+
+	const lines = highlightCodeLines(source, 'java')
+	highlightedSourceCache.set(classItem.key, { source, lines })
+	return lines
+}
+
+function isClassLoadingSource(classItem: ClassGroup): boolean {
+	return classItem.flags.some((flag) => props.loadingIssues.has(flag.issueId))
+}
+
+function loadClassSources(classItem: ClassGroup) {
+	const issueIds = [...new Set(classItem.flags.map((flag) => flag.issueId))]
+	if (issueIds.length > 0) {
+		emit('loadIssueSources', issueIds)
+	}
+}
+
+function expandClass(classItem: ClassGroup) {
+	if (expandedClasses.has(classItem.key)) return
+	expandedClasses.add(classItem.key)
+	loadClassSources(classItem)
+}
+
+function toggleClass(classItem: ClassGroup) {
+	if (expandedClasses.has(classItem.key)) {
+		expandedClasses.delete(classItem.key)
+	} else {
+		expandClass(classItem)
+	}
 }
 
 function handleThreadUpdate() {
@@ -1203,7 +1268,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					>
 						<div
 							class="flex cursor-pointer items-center justify-between p-4 transition-colors duration-200 hover:bg-surface-4"
-							@click="toggleClass(classItem.key)"
+							@click="toggleClass(classItem)"
 						>
 							<div class="my-auto flex items-center gap-2">
 								<ButtonStyled type="transparent" circular>
@@ -1245,7 +1310,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 
 								<Transition name="fade">
 									<div
-										v-if="classItem.flags.some((f) => loadingIssues.has(f.issueId))"
+										v-if="isClassLoadingSource(classItem)"
 										class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
 									>
 										<span class="flex items-center gap-1.5 text-sm font-medium text-secondary">
@@ -1258,7 +1323,10 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 						</div>
 
 						<Collapsible :collapsed="!expandedClasses.has(classItem.key)">
-							<div class="mt-2 flex flex-col gap-2 px-4 pb-4">
+							<div
+								v-if="expandedClasses.has(classItem.key)"
+								class="mt-2 flex flex-col gap-2 px-4 pb-4"
+							>
 								<div
 									v-for="flag in classItem.flags"
 									:key="`${flag.issueId}-${flag.detail.id}`"
@@ -1347,7 +1415,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								</div>
 
 								<div
-									v-if="getClassDecompiledSource(classItem)"
+									v-if="getHighlightedClassSource(classItem).length > 0"
 									class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
 								>
 									<ButtonStyled circular type="transparent">
@@ -1363,10 +1431,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 
 									<div class="overflow-x-auto bg-surface-3 py-3">
 										<div
-											v-for="(line, n) in highlightCodeLines(
-												getClassDecompiledSource(classItem)!,
-												'java',
-											)"
+											v-for="(line, n) in getHighlightedClassSource(classItem)"
 											:key="n"
 											class="flex font-mono text-[13px] leading-[1.6]"
 										>
@@ -1381,6 +1446,15 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 											</div>
 										</div>
 									</div>
+								</div>
+								<div
+									v-else-if="isClassLoadingSource(classItem)"
+									class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4"
+								>
+									<p class="flex items-center gap-2 text-sm text-secondary">
+										<LoaderCircleIcon class="size-4 animate-spin" />
+										Loading source...
+									</p>
 								</div>
 								<div
 									v-else

@@ -16,6 +16,7 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
+use tracing::trace;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
@@ -129,12 +130,16 @@ pub async fn count_download(
     let ip = crate::util::ip::convert_to_ip_v6(&download_body.ip)
         .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
 
-    let meta = download_body
-        .headers
-        .get(DOWNLOAD_META_HEADER)
-        .and_then(|v| serde_json::from_str::<DownloadMeta>(v).ok());
+    let meta =
+        if let Some(meta) = download_body.headers.get(DOWNLOAD_META_HEADER) {
+            serde_json::from_str::<DownloadMeta>(meta)
+                .map(Some)
+                .wrap_request_err("invalid download meta")?
+        } else {
+            None
+        };
 
-    analytics_queue.add_download(Download {
+    let download = Download {
         recorded: get_current_tenths_of_ms(),
         domain: url.host_str().unwrap_or_default().to_string(),
         site_path: url.path().to_string(),
@@ -169,10 +174,19 @@ pub async fn count_download(
                     .contains(&&*x.0.to_lowercase())
             })
             .collect(),
-        reason: meta.as_ref().map(|m| m.reason),
-        game_version: meta.as_ref().map(|m| m.game_version.clone()),
-        loader: meta.as_ref().map(|m| m.loader.clone()),
-    });
+        reason: meta
+            .as_ref()
+            .map(|m| m.reason.to_string())
+            .unwrap_or_default(),
+        game_version: meta
+            .as_ref()
+            .map(|m| m.game_version.clone())
+            .unwrap_or_default(),
+        loader: meta.as_ref().map(|m| m.loader.clone()).unwrap_or_default(),
+    };
+    trace!("added download {download:#?}");
+
+    analytics_queue.add_download(download);
 
     Ok(HttpResponse::NoContent().body(""))
 }

@@ -29,7 +29,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			>New message from moderators on {project.name}</Heading
 		>
 
-		<Text class="text-base">Hi {user.name},</Text>
+		<Text class="text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 
 		<Text class="text-base">
 			Modrinth's moderation team has left a message on your project,

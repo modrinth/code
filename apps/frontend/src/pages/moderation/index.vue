@@ -112,13 +112,13 @@ import ConfettiExplosion from 'vue-confetti-explosion'
 
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
 import { enrichProjectBatch, type ModerationProject } from '~/helpers/moderation.ts'
-import { useModerationStore } from '~/store/moderation.ts'
+import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 useHead({ title: 'Projects queue - Modrinth' })
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
-const moderationStore = useModerationStore()
+const moderationQueue = useModerationQueue()
 const route = useRoute()
 const router = useRouter()
 
@@ -331,18 +331,18 @@ function goToPage(page: number) {
 async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
 	let skippedCount = 0
 
-	while (moderationStore.hasItems) {
-		const currentId = moderationStore.getCurrentProjectId()
+	while (moderationQueue.hasItems) {
+		const currentId = moderationQueue.getCurrentProjectId()
 		if (!currentId) return null
 
 		const project = filteredProjects.value.find((p) => p.project.id === currentId)
 		if (!project) {
-			moderationStore.completeCurrentProject(currentId, 'skipped')
+			await moderationQueue.completeCurrentProject(currentId, 'skipped')
 			continue
 		}
 
 		try {
-			const lockStatus = await moderationStore.checkLock(currentId)
+			const lockStatus = await moderationQueue.checkLock(currentId)
 
 			if (!lockStatus.locked || lockStatus.expired) {
 				if (skippedCount > 0) {
@@ -356,7 +356,7 @@ async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
 			}
 
 			// Project is locked, skip it
-			moderationStore.completeCurrentProject(currentId, 'skipped')
+			await moderationQueue.completeCurrentProject(currentId, 'skipped')
 			skippedCount++
 		} catch {
 			return project
@@ -371,7 +371,7 @@ async function moderateAllInFilter() {
 	const startIndex = (currentPage.value - 1) * itemsPerPage
 	const projectsFromCurrentPage = filteredProjects.value.slice(startIndex)
 	const projectIds = projectsFromCurrentPage.map((queueItem) => queueItem.project.id)
-	moderationStore.setQueue(projectIds)
+	await moderationQueue.setQueue(projectIds)
 
 	// Find first unlocked project
 	const targetProject = await findFirstUnlockedProject()
@@ -402,12 +402,12 @@ async function startFromProject(projectId: string) {
 	const projectIndex = filteredProjects.value.findIndex((p) => p.project.id === projectId)
 	if (projectIndex === -1) {
 		// Project not found in filtered list, just moderate it alone
-		moderationStore.setSingleProject(projectId)
+		await moderationQueue.setSingleProject(projectId)
 	} else {
 		// Start queue from this project onwards
 		const projectsFromHere = filteredProjects.value.slice(projectIndex)
 		const projectIds = projectsFromHere.map((queueItem) => queueItem.project.id)
-		moderationStore.setQueue(projectIds)
+		await moderationQueue.setQueue(projectIds)
 	}
 
 	// Find first unlocked project

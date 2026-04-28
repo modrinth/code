@@ -1,6 +1,6 @@
 <template>
-	<NewModal ref="modal" header="Renaming backup" @show="focusInput">
-		<div class="flex flex-col gap-2 md:w-[600px]">
+	<NewModal ref="modal" header="Renaming backup" width="500px" @show="focusInput">
+		<div class="flex flex-col gap-2">
 			<label for="backup-name-input">
 				<span class="text-lg font-semibold text-contrast"> Name </span>
 			</label>
@@ -20,26 +20,28 @@
 				</span>
 			</div>
 		</div>
-		<div class="mt-2 flex justify-start gap-2">
-			<ButtonStyled color="brand">
-				<button :disabled="renameMutation.isPending.value || nameExists" @click="renameBackup">
-					<template v-if="renameMutation.isPending.value">
-						<SpinnerIcon class="animate-spin" />
-						Renaming...
-					</template>
-					<template v-else>
-						<SaveIcon />
-						Save changes
-					</template>
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button @click="hide">
-					<XIcon />
-					Cancel
-				</button>
-			</ButtonStyled>
-		</div>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button class="!border !border-surface-4" @click="hide">
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="renameMutation.isPending.value || nameExists" @click="renameBackup">
+						<template v-if="renameMutation.isPending.value">
+							<SpinnerIcon class="animate-spin" />
+							Renaming...
+						</template>
+						<template v-else>
+							<SaveIcon />
+							Save changes
+						</template>
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
 	</NewModal>
 </template>
 
@@ -64,10 +66,10 @@ const queryClient = useQueryClient()
 const ctx = injectModrinthServerContext()
 
 const props = defineProps<{
-	backups?: Archon.Backups.v1.Backup[]
+	backups?: Archon.BackupsQueue.v1.BackupQueueBackup[]
 }>()
 
-const backupsQueryKey = ['backups', 'list', ctx.serverId]
+const backupsQueryKey = ['backups', 'queue', ctx.serverId]
 
 const renameMutation = useMutation({
 	mutationFn: ({ backupId, name }: { backupId: string; name: string }) =>
@@ -80,7 +82,7 @@ const input = ref<HTMLInputElement>()
 const backupName = ref('')
 const originalName = ref('')
 
-const currentBackup = ref<Archon.Backups.v1.Backup | null>(null)
+const currentBackup = ref<Archon.BackupsQueue.v1.BackupQueueBackup | null>(null)
 
 const trimmedName = computed(() => backupName.value.trim())
 
@@ -110,7 +112,7 @@ const focusInput = () => {
 	})
 }
 
-function show(backup: Archon.Backups.v1.Backup) {
+function show(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
 	currentBackup.value = backup
 	backupName.value = backup.name
 	originalName.value = backup.name

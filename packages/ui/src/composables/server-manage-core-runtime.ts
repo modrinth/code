@@ -6,7 +6,7 @@ import {
 } from '@modrinth/api-client'
 import type { Stats } from '@modrinth/utils'
 import type { ComputedRef, Ref } from 'vue'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 import type { FileOperation } from '../layouts/shared/files-tab/types'
 import { injectModrinthClient, provideModrinthServerContext } from '../providers'
@@ -27,8 +27,7 @@ type UseServerManageCoreRuntimeOptions = {
 	worldId: ReadableRef<string | null>
 	server: ReadableRef<Archon.Servers.v0.Server | null | undefined>
 	isSyncingContent: ReadableRef<boolean>
-	markBackupCancelled?: (backupId: string) => void
-	includeBackupBusyReasons?: boolean
+	extraBusyReasons?: ComputedRef<BusyReason[]>
 	setDisconnectedOnAuthIncorrect?: boolean
 	syncUptimeFromState?: boolean
 	incrementUptimeLocally?: boolean
@@ -94,7 +93,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	const isServerRunning = computed(() => serverPowerState.value === 'running')
 	const stats = ref<Stats>(createInitialStats())
 	const uptimeSeconds = ref(0)
-	const backupsState = reactive(new Map())
 	const fsAuth = ref<{ url: string; token: string } | null>(null)
 	const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
 	const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
@@ -106,12 +104,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	let uptimeIntervalId: ReturnType<typeof setInterval> | null = null
 	let staleStatsTimeoutId: ReturnType<typeof setTimeout> | null = null
 	let staleStatsIntervalId: ReturnType<typeof setInterval> | null = null
-
-	const markBackupCancelled =
-		options.markBackupCancelled ??
-		((backupId: string) => {
-			backupsState.delete(backupId)
-		})
 
 	const busyReasons = computed<BusyReason[]>(() => {
 		const reasons: BusyReason[] = []
@@ -131,28 +123,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 				}),
 			})
 		}
-		if (options.includeBackupBusyReasons) {
-			for (const entry of backupsState.values()) {
-				if (entry.create?.state === 'ongoing') {
-					reasons.push({
-						reason: defineMessage({
-							id: 'servers.busy.backup-creating',
-							defaultMessage: 'Backup creation in progress',
-						}),
-					})
-					break
-				}
-				if (entry.restore?.state === 'ongoing') {
-					reasons.push({
-						reason: defineMessage({
-							id: 'servers.busy.backup-restoring',
-							defaultMessage: 'Backup restore in progress',
-						}),
-					})
-					break
-				}
-			}
-		}
+		if (options.extraBusyReasons) reasons.push(...options.extraBusyReasons.value)
 		return reasons
 	})
 
@@ -353,6 +324,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			isWsAuthIncorrect.value = false
 
 			modrinthServersConsole.clear()
+			modrinthServersConsole.beginInitialLogHydration()
 
 			const baseSubscriptions: SocketUnsubscriber[] = [
 				client.archon.sockets.on(targetServerId, 'log', handleLog),
@@ -405,20 +377,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		}
 	}
 
-	watch(
-		() => fsOps.value,
-		(newOps) => {
-			for (const op of newOps) {
-				if (op.state === 'done' && op.id && !dismissedOpIds.value.has(op.id)) {
-					setTimeout(() => {
-						dismissOperation(op.id!, 'dismiss')
-					}, 3000)
-				}
-			}
-		},
-		{ deep: true },
-	)
-
 	const refreshFsAuth = async () => {
 		if (!options.serverId.value) {
 			fsAuth.value = null
@@ -440,8 +398,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		isServerRunning,
 		stats,
 		uptimeSeconds,
-		backupsState,
-		markBackupCancelled,
 		isSyncingContent: options.isSyncingContent as Ref<boolean>,
 		busyReasons,
 		fsAuth,
@@ -463,7 +419,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 
 	return {
 		activeOperations,
-		backupsState,
 		busyReasons,
 		cancelUpload,
 		cleanupCoreRuntime,
