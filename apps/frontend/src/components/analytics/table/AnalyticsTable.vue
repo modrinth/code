@@ -235,12 +235,14 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 const columns = computed<TableColumn<TableColumnKey>[]>(() => {
 	const nextColumns: TableColumn<TableColumnKey>[] = []
 
+	const stats = getRelevantAnalyticsDashboardStats(selectedBreakdown.value)
+
 	if (tableMode.value === 'date_breakdown') {
 		nextColumns.push({
 			key: 'date',
 			label: 'Date',
 			enableSorting: true,
-			width: '20%',
+			width: stats.length > 2 ? '20%' : '',
 		})
 	}
 
@@ -250,7 +252,7 @@ const columns = computed<TableColumn<TableColumnKey>[]>(() => {
 		enableSorting: true,
 	})
 
-	for (const stat of getRelevantAnalyticsDashboardStats(selectedBreakdown.value)) {
+	for (const stat of stats) {
 		const column = getMetricColumnForStat(stat)
 		if (column) {
 			nextColumns.push(column)
