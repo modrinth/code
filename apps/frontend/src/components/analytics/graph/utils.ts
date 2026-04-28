@@ -17,6 +17,75 @@ export type ChartDataset = {
 	backgroundColor: string
 }
 
+const REGION_CODE_PATTERN = /^[a-z]{2}$/i
+const OTHER_COUNTRY_CODE = 'XX'
+const OTHER_COUNTRY_LABEL = 'Other'
+const regionDisplayNamesByLocale = new Map<string, Intl.DisplayNames | null>()
+
+function getRegionDisplayNames(locale: string): Intl.DisplayNames | null {
+	if (regionDisplayNamesByLocale.has(locale)) {
+		return regionDisplayNamesByLocale.get(locale) ?? null
+	}
+
+	try {
+		const displayNames = new Intl.DisplayNames(locale, { type: 'region' })
+		regionDisplayNamesByLocale.set(locale, displayNames)
+		return displayNames
+	} catch {
+		regionDisplayNamesByLocale.set(locale, null)
+		return null
+	}
+}
+
+function formatCountryCode(countryCode: string): string {
+	const normalized = countryCode.trim().toUpperCase()
+	if (normalized === OTHER_COUNTRY_CODE) {
+		return OTHER_COUNTRY_LABEL
+	}
+
+	if (!REGION_CODE_PATTERN.test(normalized)) {
+		return countryCode
+	}
+
+	const locale = new Intl.DateTimeFormat().resolvedOptions().locale || 'en'
+	const localizedDisplayNames = getRegionDisplayNames(locale)
+	const localizedValue = localizedDisplayNames?.of(normalized)
+	if (localizedValue && localizedValue !== normalized) {
+		return localizedValue
+	}
+
+	const englishDisplayNames = getRegionDisplayNames('en')
+	const englishValue = englishDisplayNames?.of(normalized)
+	if (englishValue && englishValue !== normalized) {
+		return englishValue
+	}
+
+	return countryCode
+}
+
+function formatLoaderLabel(loader: string): string {
+	const normalized = loader.trim()
+	if (normalized.length === 0) {
+		return loader
+	}
+
+	return `${normalized[0].toUpperCase()}${normalized.slice(1)}`
+}
+
+export function formatBreakdownLabel(
+	breakdownValue: string,
+	selectedBreakdown: AnalyticsBreakdownPreset,
+): string {
+	if (selectedBreakdown === 'country') {
+		return formatCountryCode(breakdownValue)
+	}
+	if (selectedBreakdown === 'loader') {
+		return formatLoaderLabel(breakdownValue)
+	}
+
+	return breakdownValue
+}
+
 export function getMetricValue(
 	point: Labrinth.Analytics.v3.ProjectAnalytics,
 	activeStat: AnalyticsDashboardStat,
@@ -75,7 +144,7 @@ export function buildChartDatasets(
 			const color = palette[index % palette.length]
 			return {
 				projectId: `breakdown:${breakdownValue}`,
-				label: breakdownValue,
+				label: formatBreakdownLabel(breakdownValue, selectedBreakdown),
 				data,
 				borderColor: color,
 				backgroundColor: color,

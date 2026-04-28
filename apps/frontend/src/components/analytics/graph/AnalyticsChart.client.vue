@@ -48,6 +48,7 @@ const props = defineProps<{
 	datasets: ChartDataset[]
 	labels: string[]
 	activeStat: AnalyticsDashboardStat
+	pinnedSliceIndex: number | null
 }>()
 
 const emit = defineEmits<{
@@ -189,10 +190,41 @@ function refreshChart() {
 	chartInstance.data = config.data
 	chartInstance.options = config.options ?? {}
 	chartInstance.update('none')
+	applyPinnedSliceState()
+}
+
+function applyPinnedSliceState() {
+	if (!chartInstance) return
+
+	if (props.pinnedSliceIndex === null) {
+		chartInstance.setActiveElements([])
+		chartInstance.update('none')
+		return
+	}
+
+	const activeElements: { datasetIndex: number; index: number }[] = []
+	for (let datasetIndex = 0; datasetIndex < chartInstance.data.datasets.length; datasetIndex++) {
+		const dataset = chartInstance.data.datasets[datasetIndex]
+		if (!dataset) continue
+
+		const dataLength = Array.isArray(dataset.data) ? dataset.data.length : 0
+		if (props.pinnedSliceIndex >= dataLength) continue
+
+		activeElements.push({
+			datasetIndex,
+			index: props.pinnedSliceIndex,
+		})
+	}
+
+	chartInstance.setActiveElements(activeElements)
+	chartInstance.update('none')
 }
 
 function handleCanvasLeave() {
 	emit('hover', { visible: false, x: 0, y: 0, sliceIndex: null })
+	if (props.pinnedSliceIndex !== null) {
+		requestAnimationFrame(() => applyPinnedSliceState())
+	}
 }
 
 onMounted(() => {
@@ -211,7 +243,10 @@ watch(
 	() => {
 		chartInstance?.destroy()
 		chartInstance = null
-		nextTick(() => createChart())
+		nextTick(() => {
+			createChart()
+			applyPinnedSliceState()
+		})
 	},
 )
 
@@ -221,5 +256,12 @@ watch(
 		refreshChart()
 	},
 	{ deep: true },
+)
+
+watch(
+	() => props.pinnedSliceIndex,
+	() => {
+		applyPinnedSliceState()
+	},
 )
 </script>

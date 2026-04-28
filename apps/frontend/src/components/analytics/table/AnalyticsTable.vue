@@ -1,96 +1,111 @@
 <template>
-	<Table
-		v-model:sort-column="sortColumn"
-		v-model:sort-direction="sortDirection"
-		:columns="columns"
-		:data="sortedRows"
-		row-key="id"
-	>
-		<template #header>
-			<div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-				<div class="text-xl font-semibold text-contrast">Breakdown</div>
+	<div class="relative">
+		<Table
+			v-model:sort-column="sortColumn"
+			v-model:sort-direction="sortDirection"
+			:columns="columns"
+			:data="sortedRows"
+			row-key="id"
+		>
+			<template #header>
+				<div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+					<div class="text-xl font-semibold text-contrast">Breakdown</div>
 
-				<div class="flex flex-wrap items-center gap-2">
-					<button
-						type="button"
-						class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
-						:class="
-							tableMode === 'date_breakdown'
-								? 'border-brand bg-highlight-green text-brand'
-								: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
-						"
-						@click="tableMode = 'date_breakdown'"
-					>
-						Date + Breakdown
-					</button>
-					<button
-						v-if="showBreakdownOnlyMode"
-						type="button"
-						class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
-						:class="
-							tableMode === 'breakdown_only'
-								? 'border-brand bg-highlight-green text-brand'
-								: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
-						"
-						@click="tableMode = 'breakdown_only'"
-					>
-						Breakdown only
-					</button>
-					<button
-						type="button"
-						class="inline-flex items-center gap-2 rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
-						:class="
-							sortedRows.length > 0
-								? 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
-								: 'cursor-not-allowed border-surface-5 bg-surface-2 text-secondary'
-						"
-						:disabled="sortedRows.length === 0"
-						@click="downloadCsv"
-					>
-						<DownloadIcon class="size-4" />
-						Export CSV
-					</button>
+					<div class="flex flex-wrap items-center gap-2">
+						<button
+							type="button"
+							class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
+							:class="
+								tableMode === 'date_breakdown'
+									? 'border-brand bg-highlight-green text-brand'
+									: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
+							"
+							@click="tableMode = 'date_breakdown'"
+						>
+							Date + Breakdown
+						</button>
+						<button
+							v-if="showBreakdownOnlyMode"
+							type="button"
+							class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
+							:class="
+								tableMode === 'breakdown_only'
+									? 'border-brand bg-highlight-green text-brand'
+									: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
+							"
+							@click="tableMode = 'breakdown_only'"
+						>
+							Breakdown only
+						</button>
+						<button
+							type="button"
+							class="inline-flex items-center gap-2 rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
+							:class="
+								sortedRows.length > 0
+									? 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
+									: 'cursor-not-allowed border-surface-5 bg-surface-2 text-secondary'
+							"
+							:disabled="sortedRows.length === 0"
+							@click="downloadCsv"
+						>
+							<DownloadIcon class="size-4" />
+							Export CSV
+						</button>
+					</div>
 				</div>
-			</div>
-		</template>
+			</template>
 
-		<template #cell-date="{ value }">
-			<span class="text-primary">{{ value }}</span>
-		</template>
-		<template #cell-breakdown="{ value }">
-			<span
-				class="text-primary"
-				:class="{
-					capitalize: selectedBreakdown === 'monetization',
-				}"
-				>{{ value }}</span
-			>
-		</template>
-		<template #cell-views="{ row }">
-			<span>{{ formatInteger(row.views) }}</span>
-		</template>
-		<template #cell-downloads="{ row }">
-			<span>{{ formatInteger(row.downloads) }}</span>
-		</template>
-		<template #cell-revenue="{ row }">
-			<span>{{ formatRevenue(row.revenue) }}</span>
-		</template>
-		<template #cell-playtime="{ row }">
-			<span>{{ formatInteger(row.playtime) }}</span>
-		</template>
-	</Table>
+			<template #cell-date="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
+			<template #cell-breakdown="{ value }">
+				<span
+					class="text-primary"
+					:class="{
+						capitalize: selectedBreakdown === 'monetization',
+					}"
+					>{{ formatBreakdownDisplayValue(String(value)) }}</span
+				>
+			</template>
+			<template #cell-views="{ row }">
+				<span>{{ formatInteger(row.views) }}</span>
+			</template>
+			<template #cell-downloads="{ row }">
+				<span>{{ formatInteger(row.downloads) }}</span>
+			</template>
+			<template #cell-revenue="{ row }">
+				<span>{{ formatRevenue(row.revenue) }}</span>
+			</template>
+			<template #cell-playtime="{ row }">
+				<span>{{ formatInteger(row.playtime) }}</span>
+			</template>
+		</Table>
+		<div
+			v-if="isDataLoading"
+			class="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-surface-3"
+		>
+			<div class="inline-flex items-center gap-2 text-sm font-medium text-secondary">
+				<SpinnerIcon class="size-5 animate-spin" />
+				<span>Loading data</span>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon } from '@modrinth/assets'
+import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import { Table, type TableColumn, useFormatNumber } from '@modrinth/ui'
 
-import type { AnalyticsBreakdownPreset } from '~/providers/analytics/analytics'
+import type {
+	AnalyticsBreakdownPreset,
+	AnalyticsDashboardStat,
+} from '~/providers/analytics/analytics'
 import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 
-import { getAnalyticsBreakdownValue } from '../breakdown'
+import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'
 import {
+	formatBreakdownLabel,
 	formatBucketEndLabel,
 	getSliceBucketRange,
 	getSliceCount,
@@ -112,15 +127,26 @@ type AnalyticsTableRow = {
 	playtime: number
 }
 
-const { selectedProjectIds, selectedGroupBy, selectedBreakdown, fetchRequest, timeSlices } =
-	injectAnalyticsDashboardContext()
+const {
+	selectedProjectIds,
+	selectedGroupBy,
+	selectedBreakdown,
+	fetchRequest,
+	timeSlices,
+	getRelevantAnalyticsDashboardStats,
+	isLoading,
+	isRefetching,
+} = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
+const isDataLoading = computed(() => isLoading.value || isRefetching.value)
 
 const tableMode = ref<TableMode>('date_breakdown')
 const sortColumn = ref<TableColumnKey | undefined>('date')
 const sortDirection = ref<SortDirection>('asc')
 
-const showBreakdownOnlyMode = computed(() => selectedProjectIds.value.length > 1)
+const showBreakdownOnlyMode = computed(
+	() => selectedProjectIds.value.length > 1 || selectedBreakdown.value !== 'none',
+)
 
 watch(
 	showBreakdownOnlyMode,
@@ -140,6 +166,9 @@ watch(tableMode, (nextMode) => {
 })
 
 const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
+const relevantStats = computed(
+	() => new Set(getRelevantAnalyticsDashboardStats(selectedBreakdown.value)),
+)
 
 const showTimeInBucketLabel = computed(() => isTimeRelevantForGroupBy(selectedGroupBy.value))
 
@@ -169,7 +198,16 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 				continue
 			}
 
+			const pointStat = getStatForMetric(point.metric_kind)
+			if (!pointStat || !relevantStats.value.has(pointStat)) {
+				continue
+			}
+
 			const breakdown = getBreakdownValue(point, nextSelectedBreakdown)
+			if (nextSelectedBreakdown !== 'none' && breakdown === ALL_BREAKDOWN_VALUE) {
+				continue
+			}
+
 			const rowId = tableMode.value === 'date_breakdown' ? `${dateMs}::${breakdown}` : breakdown
 
 			let row = nextRows.get(rowId)
@@ -207,40 +245,35 @@ const columns = computed<TableColumn<TableColumnKey>[]>(() => {
 		})
 	}
 
-	nextColumns.push(
-		{
-			key: 'breakdown',
-			label: 'Breakdown',
-			enableSorting: true,
-		},
-		{
-			key: 'views',
-			label: 'Views',
-			enableSorting: true,
-			align: 'right',
-		},
-		{
-			key: 'downloads',
-			label: 'Downloads',
-			enableSorting: true,
-			align: 'right',
-		},
-		{
-			key: 'revenue',
-			label: 'Revenue',
-			enableSorting: true,
-			align: 'right',
-		},
-		{
-			key: 'playtime',
-			label: 'Playtime',
-			enableSorting: true,
-			align: 'right',
-		},
-	)
+	nextColumns.push({
+		key: 'breakdown',
+		label: 'Breakdown',
+		enableSorting: true,
+	})
+
+	for (const stat of getRelevantAnalyticsDashboardStats(selectedBreakdown.value)) {
+		const column = getMetricColumnForStat(stat)
+		if (column) {
+			nextColumns.push(column)
+		}
+	}
 
 	return nextColumns
 })
+
+watch(
+	columns,
+	(nextColumns) => {
+		const availableColumns = new Set(nextColumns.map((column) => column.key))
+		if (sortColumn.value && availableColumns.has(sortColumn.value)) {
+			return
+		}
+
+		sortColumn.value = tableMode.value === 'breakdown_only' ? 'breakdown' : 'date'
+		sortDirection.value = 'asc'
+	},
+	{ immediate: true },
+)
 
 const sortedRows = computed<AnalyticsTableRow[]>(() => {
 	const rows = [...tableRows.value]
@@ -308,6 +341,55 @@ function addMetricToRow(row: AnalyticsTableRow, point: Labrinth.Analytics.v3.Pro
 	}
 }
 
+function getStatForMetric(
+	metricKind: Labrinth.Analytics.v3.ProjectAnalytics['metric_kind'],
+): AnalyticsDashboardStat | null {
+	switch (metricKind) {
+		case 'views':
+		case 'downloads':
+		case 'revenue':
+		case 'playtime':
+			return metricKind
+		default:
+			return null
+	}
+}
+
+function getMetricColumnForStat(stat: AnalyticsDashboardStat): TableColumn<TableColumnKey> | null {
+	switch (stat) {
+		case 'views':
+			return {
+				key: 'views',
+				label: 'Views',
+				enableSorting: true,
+				align: 'right',
+			}
+		case 'downloads':
+			return {
+				key: 'downloads',
+				label: 'Downloads',
+				enableSorting: true,
+				align: 'right',
+			}
+		case 'revenue':
+			return {
+				key: 'revenue',
+				label: 'Revenue',
+				enableSorting: true,
+				align: 'right',
+			}
+		case 'playtime':
+			return {
+				key: 'playtime',
+				label: 'Playtime',
+				enableSorting: true,
+				align: 'right',
+			}
+		default:
+			return null
+	}
+}
+
 function getBreakdownValue(
 	point: Labrinth.Analytics.v3.ProjectAnalytics,
 	selectedBreakdown: AnalyticsBreakdownPreset,
@@ -324,7 +406,11 @@ function getSortComparison(
 		case 'date':
 			return left.dateMs - right.dateMs
 		case 'breakdown':
-			return left.breakdown.localeCompare(right.breakdown, undefined, { sensitivity: 'base' })
+			return formatBreakdownDisplayValue(left.breakdown).localeCompare(
+				formatBreakdownDisplayValue(right.breakdown),
+				undefined,
+				{ sensitivity: 'base' },
+			)
 		case 'views':
 			return left.views - right.views
 		case 'downloads':
@@ -336,6 +422,10 @@ function getSortComparison(
 		default:
 			return 0
 	}
+}
+
+function formatBreakdownDisplayValue(value: string): string {
+	return formatBreakdownLabel(value, selectedBreakdown.value)
 }
 
 function getCsvCellValue(row: AnalyticsTableRow, key: TableColumnKey): string | number {
