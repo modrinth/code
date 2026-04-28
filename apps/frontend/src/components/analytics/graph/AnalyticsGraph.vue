@@ -119,9 +119,9 @@ import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics
 import AnalyticsChart from './AnalyticsChart.client.vue'
 import AnalyticsChartTooltip, { type AnalyticsChartTooltipEntry } from './AnalyticsChartTooltip.vue'
 import {
-	type ChartDataset,
 	buildChartDatasets,
 	buildTimeAxisLabels,
+	type ChartDataset,
 	formatBucketEndLabel,
 	formatMetricValue,
 	getSliceBucketRange,
