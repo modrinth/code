@@ -77,6 +77,60 @@ export const TwoTagRows: Story = {
 	},
 }
 
+export const CustomInputContent: Story = {
+	args: {
+		...Default.args,
+		modelValue: ['en', 'es'],
+		fitContent: true,
+		showChevron: false,
+		clearable: false,
+		triggerClass:
+			'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 hover:bg-surface-5 hover:brightness-100 active:brightness-100',
+	},
+	render: (args) => ({
+		components: { MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			const selectedLabel = () => {
+				if (selected.value.length === 0) return 'All languages'
+				if (selected.value.length === 1) {
+					const option = args.options.find((item) => item.value === selected.value[0])
+					return option?.label ?? '1 selected'
+				}
+				return `${selected.value.length} selected`
+			}
+			return { args, selected, selectedLabel }
+		},
+		template: /*html*/ `
+			<div style="width: 400px;">
+				<MultiSelect v-bind="args" v-model="selected">
+					<template #input-content="{ isOpen }">
+						<div class="flex min-w-0 items-center gap-2">
+							<span class="truncate">
+								<span class="font-medium">Languages:</span>
+								<span class="ml-1 font-semibold text-contrast">{{ selectedLabel() }}</span>
+							</span>
+							<span
+								class="text-secondary transition-transform duration-150"
+								:style="{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }"
+							>
+								⌄
+							</span>
+							<button
+								type="button"
+								class="-mr-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+								@click.stop="selected = []"
+							>
+								×
+							</button>
+						</div>
+					</template>
+				</MultiSelect>
+			</div>
+		`,
+	}),
+}
+
 export const NoOptions: Story = {
 	args: {
 		...Default.args,
