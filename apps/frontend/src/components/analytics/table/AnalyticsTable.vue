@@ -1,84 +1,84 @@
 <template>
-	<section class="flex flex-col rounded-2xl border border-solid border-surface-5 bg-surface-3">
-		<div class="flex flex-col gap-3 p-4 xl:flex-row xl:items-center xl:justify-between">
-			<div class="text-xl font-semibold text-contrast">Breakdown</div>
+	<Table
+		v-model:sort-column="sortColumn"
+		v-model:sort-direction="sortDirection"
+		:columns="columns"
+		:data="sortedRows"
+		row-key="id"
+	>
+		<template #header>
+			<div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+				<div class="text-xl font-semibold text-contrast">Breakdown</div>
 
-			<div class="flex flex-wrap items-center gap-2">
-				<button
-					type="button"
-					class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
-					:class="
-						tableMode === 'date_breakdown'
-							? 'border-brand bg-highlight-green text-brand'
-							: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
-					"
-					@click="tableMode = 'date_breakdown'"
-				>
-					Date + Breakdown
-				</button>
-				<button
-					v-if="showBreakdownOnlyMode"
-					type="button"
-					class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
-					:class="
-						tableMode === 'breakdown_only'
-							? 'border-brand bg-highlight-green text-brand'
-							: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
-					"
-					@click="tableMode = 'breakdown_only'"
-				>
-					Breakdown only
-				</button>
-				<button
-					type="button"
-					class="inline-flex items-center gap-2 rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
-					:class="
-						sortedRows.length > 0
-							? 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
-							: 'cursor-not-allowed border-surface-5 bg-surface-2 text-secondary'
-					"
-					:disabled="sortedRows.length === 0"
-					@click="downloadCsv"
-				>
-					<DownloadIcon class="size-4" />
-					Export CSV
-				</button>
+				<div class="flex flex-wrap items-center gap-2">
+					<button
+						type="button"
+						class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
+						:class="
+							tableMode === 'date_breakdown'
+								? 'border-brand bg-highlight-green text-brand'
+								: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
+						"
+						@click="tableMode = 'date_breakdown'"
+					>
+						Date + Breakdown
+					</button>
+					<button
+						v-if="showBreakdownOnlyMode"
+						type="button"
+						class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
+						:class="
+							tableMode === 'breakdown_only'
+								? 'border-brand bg-highlight-green text-brand'
+								: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
+						"
+						@click="tableMode = 'breakdown_only'"
+					>
+						Breakdown only
+					</button>
+					<button
+						type="button"
+						class="inline-flex items-center gap-2 rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
+						:class="
+							sortedRows.length > 0
+								? 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
+								: 'cursor-not-allowed border-surface-5 bg-surface-2 text-secondary'
+						"
+						:disabled="sortedRows.length === 0"
+						@click="downloadCsv"
+					>
+						<DownloadIcon class="size-4" />
+						Export CSV
+					</button>
+				</div>
 			</div>
-		</div>
+		</template>
 
-		<Table
-			v-model:sort-column="sortColumn"
-			v-model:sort-direction="sortDirection"
-			:columns="columns"
-			:data="sortedRows"
-			row-key="id"
-		>
-			<template #cell-date="{ value }">
-				<span class="text-primary">{{ value }}</span>
-			</template>
-			<template #cell-breakdown="{ value }">
-				<span
-					class="text-primary"
-					:class="{
-						capitalize: selectedBreakdown === 'monetization',
-					}"
-					>{{ value }}</span
-				>
-			</template>
-			<template #cell-views="{ row }">
-				<span>{{ formatInteger(row.views) }}</span>
-			</template>
-			<template #cell-downloads="{ row }">
-				<span>{{ formatInteger(row.downloads) }}</span>
-			</template>
-			<template #cell-revenue="{ row }">
-				<span>{{ formatRevenue(row.revenue) }}</span>
-			</template>
-			<template #cell-playtime="{ row }">
-				<span>{{ formatInteger(row.playtime) }}</span>
-			</template>
-		</Table>
-	</section>
+		<template #cell-date="{ value }">
+			<span class="text-primary">{{ value }}</span>
+		</template>
+		<template #cell-breakdown="{ value }">
+			<span
+				class="text-primary"
+				:class="{
+					capitalize: selectedBreakdown === 'monetization',
+				}"
+				>{{ value }}</span
+			>
+		</template>
+		<template #cell-views="{ row }">
+			<span>{{ formatInteger(row.views) }}</span>
+		</template>
+		<template #cell-downloads="{ row }">
+			<span>{{ formatInteger(row.downloads) }}</span>
+		</template>
+		<template #cell-revenue="{ row }">
+			<span>{{ formatRevenue(row.revenue) }}</span>
+		</template>
+		<template #cell-playtime="{ row }">
+			<span>{{ formatInteger(row.playtime) }}</span>
+		</template>
+	</Table>
 </template>
 
 <script setup lang="ts">

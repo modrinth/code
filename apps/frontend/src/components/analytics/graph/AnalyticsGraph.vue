@@ -10,16 +10,15 @@
 					</div>
 
 					<div class="flex items-center gap-2">
-						<div class="w-52">
-							<Chips
-								v-model="activeViewMode"
-								:items="viewModeValues"
-								:format-label="formatViewModeLabel"
-								size="small"
-								:capitalize="false"
-								aria-label="Chart view mode"
-							/>
-						</div>
+						<Chips
+							v-model="activeViewMode"
+							:items="viewModeValues"
+							:format-label="formatViewModeLabel"
+							size="small"
+							hide-checkmark-icon
+							:capitalize="false"
+							aria-label="Chart view mode"
+						/>
 					</div>
 				</div>
 

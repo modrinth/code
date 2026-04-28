@@ -2,52 +2,39 @@
 	<div class="flex flex-wrap items-center gap-2">
 		<span class="text-base font-medium text-primary">Filtered by</span>
 
-		<Menu
+		<MultiSelect
 			v-for="preview in appliedFilterPreviews"
 			:key="preview.key"
-			:triggers="['click']"
-			:delay="0"
-			:auto-hide="false"
-			:popper-triggers="[]"
-			no-auto-focus
-			placement="bottom-start"
+			:model-value="getPreviewSelectedValues(preview.key)"
+			:options="preview.options"
+			:max-height="500"
+			:clearable="false"
+			:show-chevron="false"
+			:fit-content="true"
+			:trigger-class="previewTriggerClass"
+			@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
 		>
-			<div
-				role="button"
-				tabindex="0"
-				class="inline-flex max-w-[16rem] items-center gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-1.5 text-sm text-primary transition-colors hover:bg-surface-4"
-			>
-				<span class="truncate">
-					<span class="font-medium">{{ preview.label }}:</span>
-					<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
-				</span>
-				<ChevronDownIcon class="size-4 shrink-0 text-secondary" />
-				<button
-					type="button"
-					class="-mr-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full text-secondary transition-colors hover:bg-surface-5 hover:text-contrast"
-					:aria-label="`Clear ${preview.label} filter`"
-					@click.stop="clearFilterCategory(preview.key)"
-				>
-					<XIcon class="size-4" />
-				</button>
-			</div>
-
-			<template #popper>
-				<div>
-					<div class="flex max-h-[min(70vh,32rem)] flex-col gap-2 overflow-y-auto pr-1">
-						<Checkbox
-							v-for="option in preview.category.options"
-							:key="`${preview.category.key}-${option.value}`"
-							:model-value="isFilterValueSelected(preview.category.key, option.value)"
-							:label="option.label"
-							@update:model-value="
-								(nextValue) => toggleFilterValue(preview.category.key, option.value, nextValue)
-							"
-						/>
-					</div>
+			<template #input-content="{ isOpen }">
+				<div class="flex min-w-0 items-center gap-2">
+					<span class="truncate">
+						<span class="font-medium">{{ preview.label }}:</span>
+						<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
+					</span>
+					<ChevronDownIcon
+						class="size-4 shrink-0 text-secondary transition-transform duration-150"
+						:class="isOpen ? 'rotate-180' : ''"
+					/>
+					<button
+						type="button"
+						class="-mr-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+						:aria-label="`Clear ${preview.label} filter`"
+						@click.stop="clearFilterCategory(preview.key)"
+					>
+						<XIcon class="size-4" />
+					</button>
 				</div>
 			</template>
-		</Menu>
+		</MultiSelect>
 
 		<Menu
 			v-model:shown="isAddMenuOpen"
@@ -62,7 +49,7 @@
 			<button
 				ref="addMenuTrigger"
 				type="button"
-				class="inline-flex items-center gap-2 rounded-xl border border-dashed border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-4"
+				class="inline-flex h-10 items-center gap-2 rounded-xl border border-dashed border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-4"
 			>
 				<PlusIcon class="size-5" />
 				Add
@@ -126,7 +113,7 @@
 		<button
 			v-if="hasAppliedFilters"
 			type="button"
-			class="px-1.5 py-1 text-sm font-medium text-secondary transition-colors hover:text-contrast"
+			class="border-0 bg-transparent px-1.5 py-1 text-sm font-medium text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
 			@click="clearAllFilters"
 		>
 			Clear
@@ -136,7 +123,7 @@
 
 <script setup lang="ts">
 import { ChevronDownIcon, ChevronRightIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import { Checkbox } from '@modrinth/ui'
+import { Checkbox, MultiSelect, type MultiSelectOption } from '@modrinth/ui'
 import { Menu } from 'floating-vue'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 
@@ -264,11 +251,17 @@ const appliedFilterPreviews = computed(() =>
 			summary: getCategorySelectionSummary(category),
 			count: getCategorySelectionCount(category.key),
 			category,
+			options: category.options.map((option) => ({
+				value: option.value,
+				label: option.label,
+			})) as MultiSelectOption<string>[],
 		}))
 		.filter((preview) => preview.count > 0),
 )
 
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
+const previewTriggerClass =
+	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 hover:bg-surface-5 hover:brightness-100 active:brightness-100'
 
 function setCategoryButtonRef(
 	categoryKey: AnalyticsQueryFilterCategory,
@@ -407,6 +400,37 @@ function clearAllFilters() {
 			selectedFilters.value[category.key] = []
 		}
 	}
+}
+
+function getPreviewSelectedValues(categoryKey: AnalyticsQueryFilterCategory): string[] {
+	if (categoryKey === 'project') {
+		return selectedProjectIds.value
+	}
+
+	return selectedFilters.value[categoryKey]
+}
+
+function setPreviewSelectedValues(categoryKey: AnalyticsQueryFilterCategory, values: string[]) {
+	if (categoryKey === 'project') {
+		if (values.includes(ALL_FILTER_VALUE)) {
+			selectedProjectIds.value = projects.value.map((project) => project.id)
+			return
+		}
+
+		const allProjectIds = new Set(projects.value.map((project) => project.id))
+		const selectedProjects = values.filter((value) => allProjectIds.has(value))
+
+		selectedProjectIds.value =
+			selectedProjects.length > 0 ? selectedProjects : projects.value.map((project) => project.id)
+		return
+	}
+
+	if (values.includes(ALL_FILTER_VALUE) || values.length === 0) {
+		selectedFilters.value[categoryKey] = []
+		return
+	}
+
+	selectedFilters.value[categoryKey] = values.filter((value) => value !== ALL_FILTER_VALUE)
 }
 
 function activateCategory(categoryKey: AnalyticsQueryFilterCategory) {
