@@ -380,7 +380,6 @@ export function createAnalyticsDashboardContext(
 		queryFn: () =>
 			client.labrinth.analytics_v3.fetch(fetchRequest.value as Labrinth.Analytics.v3.FetchRequest),
 		enabled: computed(() => fetchRequest.value !== null),
-		placeholderData: [],
 	})
 
 	const previousFetchRequest = computed(() => buildPreviousFetchRequest(fetchRequest.value))
@@ -396,7 +395,6 @@ export function createAnalyticsDashboardContext(
 				previousFetchRequest.value as Labrinth.Analytics.v3.FetchRequest,
 			),
 		enabled: computed(() => previousFetchRequest.value !== null),
-		placeholderData: [],
 	})
 
 	const timeSlices = ref<Labrinth.Analytics.v3.TimeSlice[]>([])
@@ -405,7 +403,10 @@ export function createAnalyticsDashboardContext(
 	watch(
 		currentTimeSliceData,
 		(nextTimeSlices) => {
-			timeSlices.value = nextTimeSlices ?? []
+			if (nextTimeSlices === undefined) {
+				return
+			}
+			timeSlices.value = nextTimeSlices
 		},
 		{ immediate: true },
 	)
@@ -417,6 +418,14 @@ export function createAnalyticsDashboardContext(
 		},
 		{ immediate: true },
 	)
+
+	watch(fetchRequest, (nextFetchRequest) => {
+		if (nextFetchRequest !== null) {
+			return
+		}
+		timeSlices.value = []
+		previousTimeSlices.value = []
+	})
 
 	const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 	const availableProjectIdSet = computed(() => new Set(availableProjectIds.value))

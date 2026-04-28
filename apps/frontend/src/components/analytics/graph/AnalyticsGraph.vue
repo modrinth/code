@@ -3,7 +3,7 @@
 		class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
 	>
 		<div class="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-			<div class="flex w-full flex-col gap-4">
+			<div class="flex w-full flex-col gap-3">
 				<div class="flex items-center justify-between">
 					<div class="text-xl font-semibold text-contrast">
 						{{ graphTitle }}
@@ -140,10 +140,9 @@ const {
 	selectedGroupBy,
 	selectedBreakdown,
 	isLoading,
-	isRefetching,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
-const isDataLoading = computed(() => isLoading.value || isRefetching.value)
+const isDataLoading = computed(() => isLoading.value)
 
 const activeViewMode = ref<ViewMode>('line')
 

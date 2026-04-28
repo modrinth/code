@@ -90,6 +90,7 @@ import QueryBuilderFilter from './QueryFilter.vue'
 const MIN_RANGE_MS = 60 * 60 * 1000
 const MAX_TIME_SLICES = 1024
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
+const TIME_RANGE_ROUNDING_MS = 60 * 1000
 
 const {
 	projects,
@@ -151,8 +152,13 @@ function startOfDay(date: Date): Date {
 	return nextDate
 }
 
+function getRoundedNow(): Date {
+	const timestamp = Math.floor(Date.now() / TIME_RANGE_ROUNDING_MS) * TIME_RANGE_ROUNDING_MS
+	return new Date(timestamp)
+}
+
 function getTimeRangeForPreset(preset: AnalyticsTimeframePreset): { start: Date; end: Date } {
-	const now = new Date()
+	const now = getRoundedNow()
 	const end = new Date(now)
 
 	switch (preset) {
@@ -287,6 +293,10 @@ function unique<T>(values: T[]): T[] {
 	return Array.from(new Set(values))
 }
 
+function sortStrings<T extends string>(values: T[]): T[] {
+	return [...values].sort((left, right) => left.localeCompare(right))
+}
+
 function withBreakdownFields(
 	breakdown: AnalyticsBreakdownPreset,
 	filters: AnalyticsSelectedFilters,
@@ -380,19 +390,19 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 				slices: resolutionSlices,
 			},
 		},
-		project_ids: selectedProjectIds.value,
+		project_ids: sortStrings(selectedProjectIds.value),
 		return_metrics: {
 			project_views: {
-				bucket_by: bucketBy.views,
+				bucket_by: sortStrings(bucketBy.views),
 			},
 			project_downloads: {
-				bucket_by: bucketBy.downloads,
+				bucket_by: sortStrings(bucketBy.downloads),
 			},
 			project_playtime: {
-				bucket_by: bucketBy.playtime,
+				bucket_by: sortStrings(bucketBy.playtime),
 			},
 			project_revenue: {
-				bucket_by: bucketBy.revenue,
+				bucket_by: sortStrings(bucketBy.revenue),
 			},
 		},
 	}

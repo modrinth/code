@@ -135,10 +135,9 @@ const {
 	timeSlices,
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
-	isRefetching,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
-const isDataLoading = computed(() => isLoading.value || isRefetching.value)
+const isDataLoading = computed(() => isLoading.value)
 
 const tableMode = ref<TableMode>('date_breakdown')
 const sortColumn = ref<TableColumnKey | undefined>('date')
