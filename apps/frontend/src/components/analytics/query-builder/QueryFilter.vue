@@ -6,6 +6,7 @@
 			v-for="preview in appliedFilterPreviews"
 			:key="preview.key"
 			:triggers="['click']"
+			:delay="0"
 			:auto-hide="false"
 			:popper-triggers="[]"
 			no-auto-focus
@@ -33,9 +34,6 @@
 
 			<template #popper>
 				<div>
-					<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-secondary">
-						{{ preview.category.label }}
-					</p>
 					<div class="flex max-h-[min(70vh,32rem)] flex-col gap-2 overflow-y-auto pr-1">
 						<Checkbox
 							v-for="option in preview.category.options"
@@ -54,6 +52,7 @@
 		<Menu
 			v-model:shown="isAddMenuOpen"
 			:triggers="['click']"
+			:delay="0"
 			:auto-hide="false"
 			:popper-triggers="[]"
 			no-auto-focus
@@ -102,15 +101,14 @@
 
 		<Teleport to="body">
 			<div
-				v-if="isAddMenuOpen && activeCategory"
+				v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 				ref="submenu"
 				class="fixed z-[10000] min-w-[16rem] rounded-xl border border-solid border-surface-5 bg-surface-3 p-3 shadow-xl"
 				:style="submenuStyle"
+				@mouseenter="handleSubmenuMouseEnter"
+				@mouseleave="handleSubmenuMouseLeave"
 				@mousemove="(event) => handleMenuMouseMove(event, 'submenu')"
 			>
-				<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-secondary">
-					{{ activeCategory.label }}
-				</p>
 				<div class="flex max-h-[min(70vh,32rem)] flex-col gap-2 overflow-y-auto pr-1">
 					<Checkbox
 						v-for="option in activeCategory.options"
@@ -169,9 +167,11 @@ type Point = {
 const { projects, selectedProjectIds, selectedFilters } = injectAnalyticsDashboardContext()
 
 const isAddMenuOpen = ref(false)
-const activeCategoryKey = ref<AnalyticsQueryFilterCategory>('project')
+const activeCategoryKey = ref<AnalyticsQueryFilterCategory | null>(null)
 const pendingCategoryKey = ref<AnalyticsQueryFilterCategory | null>(null)
 const lastMousePosition = ref<Point | null>(null)
+const isCursorInsideSubmenu = ref(false)
+const hasSubmenuPosition = ref(false)
 const addMenuTrigger = ref<HTMLElement | null>(null)
 const menuContainer = ref<HTMLElement | null>(null)
 const submenu = ref<HTMLElement | null>(null)
@@ -247,8 +247,8 @@ const filterCategoriesByKey = computed(
 	() => new Map(filterCategories.value.map((category) => [category.key, category] as const)),
 )
 
-const activeCategory = computed(
-	() => filterCategoriesByKey.value.get(activeCategoryKey.value) ?? filterCategories.value[0],
+const activeCategory = computed(() =>
+	activeCategoryKey.value ? filterCategoriesByKey.value.get(activeCategoryKey.value) : undefined,
 )
 
 const submenuStyle = computed<CSSProperties>(() => ({
@@ -276,6 +276,9 @@ function setCategoryButtonRef(
 ) {
 	if (element instanceof HTMLElement) {
 		categoryButtonRefs.set(categoryKey, element)
+		if (isAddMenuOpen.value && categoryKey === activeCategoryKey.value) {
+			scheduleSubmenuPositionUpdate()
+		}
 	} else {
 		categoryButtonRefs.delete(categoryKey)
 	}
@@ -410,10 +413,15 @@ function activateCategory(categoryKey: AnalyticsQueryFilterCategory) {
 	clearPendingCategoryTimeout()
 	pendingCategoryKey.value = null
 	activeCategoryKey.value = categoryKey
-	nextTick(updateSubmenuPosition)
+	scheduleSubmenuPositionUpdate()
 }
 
 function handleCategoryMouseEnter(categoryKey: AnalyticsQueryFilterCategory) {
+	if (!activeCategoryKey.value) {
+		activateCategory(categoryKey)
+		return
+	}
+
 	if (categoryKey === activeCategoryKey.value) {
 		clearPendingCategoryTimeout()
 		pendingCategoryKey.value = null
@@ -428,9 +436,19 @@ function handleCategoryMouseEnter(categoryKey: AnalyticsQueryFilterCategory) {
 	pendingCategoryKey.value = categoryKey
 	clearPendingCategoryTimeout()
 	pendingCategoryTimeout = setTimeout(() => {
-		if (pendingCategoryKey.value === categoryKey) {
-			activateCategory(categoryKey)
+		if (pendingCategoryKey.value !== categoryKey) {
+			return
 		}
+
+		if (
+			isCursorInsideSubmenu.value ||
+			isCursorAimingAtSubmenu(lastMousePosition.value, previousMousePosition)
+		) {
+			pendingCategoryKey.value = null
+			return
+		}
+
+		activateCategory(categoryKey)
 	}, 180)
 }
 
@@ -461,13 +479,21 @@ function isCursorAimingAtSubmenu(cursor: Point | null, origin: Point | null): bo
 	}
 
 	const submenuRect = submenu.value.getBoundingClientRect()
+	const submenuTargetX =
+		origin.x <= submenuRect.left
+			? submenuRect.left
+			: origin.x >= submenuRect.right
+				? submenuRect.right
+				: cursor.x <= submenuRect.left
+					? submenuRect.left
+					: submenuRect.right
 	const upperTarget: Point = {
-		x: submenuRect.left,
-		y: submenuRect.top,
+		x: submenuTargetX,
+		y: submenuRect.top + 20,
 	}
 	const lowerTarget: Point = {
-		x: submenuRect.left,
-		y: submenuRect.bottom,
+		x: submenuTargetX,
+		y: submenuRect.bottom + 20,
 	}
 
 	return isPointInTriangle(cursor, origin, upperTarget, lowerTarget)
@@ -493,14 +519,18 @@ function clearPendingCategoryTimeout() {
 	}
 }
 
-function updateSubmenuPosition() {
+function updateSubmenuPosition(): boolean {
 	if (typeof window === 'undefined') {
-		return
+		return false
+	}
+
+	if (!activeCategoryKey.value) {
+		return false
 	}
 
 	const activeButton = categoryButtonRefs.get(activeCategoryKey.value)
 	if (!activeButton) {
-		return
+		return false
 	}
 
 	const buttonRect = activeButton.getBoundingClientRect()
@@ -523,13 +553,40 @@ function updateSubmenuPosition() {
 		x: left,
 		y: top,
 	}
+	hasSubmenuPosition.value = true
+	return true
+}
+
+function scheduleSubmenuPositionUpdate(retries = 8) {
+	if (typeof window === 'undefined') {
+		return
+	}
+
+	nextTick(() => {
+		if (!isAddMenuOpen.value || updateSubmenuPosition() || retries <= 0) {
+			return
+		}
+
+		window.requestAnimationFrame(() => scheduleSubmenuPositionUpdate(retries - 1))
+	})
 }
 
 function resetPendingCategory() {
 	clearPendingCategoryTimeout()
 	pendingCategoryKey.value = null
+	isCursorInsideSubmenu.value = false
 	lastMousePosition.value = null
 	previousMousePosition = null
+}
+
+function handleSubmenuMouseEnter() {
+	isCursorInsideSubmenu.value = true
+	clearPendingCategoryTimeout()
+	pendingCategoryKey.value = null
+}
+
+function handleSubmenuMouseLeave() {
+	isCursorInsideSubmenu.value = false
 }
 
 function handleDocumentPointerDown(event: PointerEvent) {
@@ -549,16 +606,16 @@ function handleDocumentPointerDown(event: PointerEvent) {
 }
 
 watch(isAddMenuOpen, (isOpen) => {
-	if (isOpen && !activeCategory.value) {
-		activeCategoryKey.value = filterCategories.value[0]?.key ?? 'project'
-	}
-
 	if (isOpen) {
-		nextTick(updateSubmenuPosition)
+		activeCategoryKey.value = null
+		hasSubmenuPosition.value = false
+		scheduleSubmenuPositionUpdate()
 		window.addEventListener('resize', updateSubmenuPosition)
 		window.addEventListener('scroll', updateSubmenuPosition, true)
 		window.addEventListener('pointerdown', handleDocumentPointerDown)
 	} else {
+		activeCategoryKey.value = null
+		hasSubmenuPosition.value = false
 		window.removeEventListener('resize', updateSubmenuPosition)
 		window.removeEventListener('scroll', updateSubmenuPosition, true)
 		window.removeEventListener('pointerdown', handleDocumentPointerDown)

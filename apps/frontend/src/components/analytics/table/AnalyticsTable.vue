@@ -1,8 +1,6 @@
 <template>
-	<section
-		class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
-	>
-		<div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+	<section class="flex flex-col rounded-2xl border border-solid border-surface-5 bg-surface-3">
+		<div class="flex flex-col gap-3 p-4 xl:flex-row xl:items-center xl:justify-between">
 			<div class="text-xl font-semibold text-contrast">Breakdown</div>
 
 			<div class="flex flex-wrap items-center gap-2">
