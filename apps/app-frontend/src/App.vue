@@ -1175,7 +1175,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </script>
 
 <template>
-	<WindowControls />
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
 	<div
@@ -1375,6 +1374,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 						<AppActionBar />
 					</Suspense>
 				</div>
+				<WindowControls />
 			</section>
 		</div>
 	</div>

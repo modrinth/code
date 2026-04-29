@@ -56,6 +56,7 @@ pub enum FeatureFlag {
     WorldsTab,
     WorldsInHome,
     ServerRamAsBytesAlwaysOn,
+    AlwaysShowAppControls,
     ServersInApp,
     ServerProjectQa,
     I18nDebug,

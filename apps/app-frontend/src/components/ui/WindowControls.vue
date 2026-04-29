@@ -1,18 +1,28 @@
 <template>
-	<section v-if="showControls" class="window-controls" data-tauri-drag-region-exclude>
+	<section
+		v-if="showControls"
+		class="flex items-center gap-2 mr-1.5"
+		data-tauri-drag-region-exclude
+	>
 		<ButtonStyled type="transparent" circular>
-			<button class="titlebar-button" @click="() => getCurrentWindow().minimize()">
+			<button class="relative expanded-button" @click="() => getCurrentWindow().minimize()">
 				<MinimizeIcon />
 			</button>
 		</ButtonStyled>
 		<ButtonStyled type="transparent" circular>
-			<button class="titlebar-button" @click="() => getCurrentWindow().toggleMaximize()">
+			<button class="relative expanded-button" @click="() => getCurrentWindow().toggleMaximize()">
 				<RestoreIcon v-if="isMaximized" />
 				<MaximizeIcon v-else />
 			</button>
 		</ButtonStyled>
-		<ButtonStyled type="transparent" circular>
-			<button class="titlebar-button close" @click="handleClose">
+		<ButtonStyled
+			type="transparent"
+			color="red"
+			color-fill="none"
+			hover-color-fill="background"
+			circular
+		>
+			<button class="relative expanded-button" @click="handleClose">
 				<XIcon />
 			</button>
 		</ButtonStyled>
@@ -24,29 +34,24 @@ import { MaximizeIcon, MinimizeIcon, RestoreIcon, XIcon } from '@modrinth/assets
 import { ButtonStyled } from '@modrinth/ui'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { get as getSettings } from '@/helpers/settings.ts'
 import { getOS } from '@/helpers/utils.js'
+import { useTheming } from '@/store/state'
 
-const WINDOW_CONTROLS_WIDTH = '8rem'
+const themeStore = useTheming()
 
 const nativeDecorations = ref(true)
 const isMaximized = ref(false)
 const os = ref('')
 
-const showControls = computed(() => !nativeDecorations.value && os.value !== 'MacOS')
-watch(
-	showControls,
-	(visible) => {
-		if (typeof document === 'undefined') return
-		if (visible) {
-			document.documentElement.style.setProperty('--window-controls-width', WINDOW_CONTROLS_WIDTH)
-		} else {
-			document.documentElement.style.removeProperty('--window-controls-width')
-		}
-	},
-	{ immediate: true },
+const alwaysShowAppControls = computed(() => themeStore.getFeatureFlag('always_show_app_controls'))
+
+const showControls = computed(
+	() =>
+		alwaysShowAppControls.value ||
+		(!nativeDecorations.value && (os.value === 'Windows' || os.value === 'Linux')),
 )
 
 onMounted(async () => {
@@ -67,7 +72,6 @@ onMounted(async () => {
 
 	onUnmounted(() => {
 		unlisten()
-		document.documentElement.style.removeProperty('--window-controls-width')
 	})
 })
 
@@ -76,23 +80,10 @@ const handleClose = async () => {
 	await getCurrentWindow().close()
 }
 </script>
-
-<style lang="scss" scoped>
-.window-controls {
-	position: fixed;
-	top: 0;
-	right: 0;
-	z-index: 10001;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	height: var(--top-bar-height, 3rem);
-	padding-right: 0.5rem;
-	gap: 0.25rem;
-
-	.titlebar-button.close:hover {
-		background-color: var(--color-red);
-		color: var(--color-accent-contrast);
-	}
+<style scoped>
+.expanded-button::before {
+	inset: -6px;
+	content: '';
+	position: absolute;
 }
 </style>

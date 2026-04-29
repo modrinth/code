@@ -7,6 +7,7 @@ export const DEFAULT_FEATURE_FLAGS = {
 	worlds_in_home: true,
 	server_project_qa: false,
 	server_ram_as_bytes_always_on: false,
+	always_show_app_controls: false,
 	i18n_debug: false,
 }
 
