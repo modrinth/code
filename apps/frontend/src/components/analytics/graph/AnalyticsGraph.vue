@@ -84,6 +84,7 @@
 						:active-stat="activeStat"
 						:pinned-slice-index="pinnedSliceIndex"
 						@hover="onChartHover"
+						@pinned-drag="onPinnedDrag"
 					/>
 				</ClientOnly>
 				<AnalyticsChartTooltip
@@ -211,6 +212,7 @@ const allChartDatasets = computed(() =>
 const chartContainer = ref<HTMLElement | null>(null)
 const containerSize = reactive({ width: 0, height: 0 })
 let resizeObserver: ResizeObserver | null = null
+let clearIgnoredChartClickTimeout: ReturnType<typeof setTimeout> | null = null
 
 onMounted(() => {
 	if (!chartContainer.value || typeof ResizeObserver === 'undefined') return
@@ -226,6 +228,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
 	resizeObserver?.disconnect()
 	resizeObserver = null
+	if (clearIgnoredChartClickTimeout) {
+		clearTimeout(clearIgnoredChartClickTimeout)
+		clearIgnoredChartClickTimeout = null
+	}
 })
 
 type HoverState = {
@@ -243,6 +249,7 @@ const hoverState = reactive<HoverState>({
 })
 
 const isHoverPinned = ref(false)
+const ignoreNextChartClick = ref(false)
 const hiddenDatasetIds = ref<Set<string>>(new Set())
 const showAllLegendEntries = ref(false)
 
@@ -274,8 +281,25 @@ function onChartHover(payload: HoverState) {
 	setHoverState(payload)
 }
 
+function onPinnedDrag(payload: HoverState) {
+	if (isDataLoading.value || !isHoverPinned.value) return
+	ignoreNextChartClick.value = true
+	if (clearIgnoredChartClickTimeout) {
+		clearTimeout(clearIgnoredChartClickTimeout)
+	}
+	clearIgnoredChartClickTimeout = setTimeout(() => {
+		ignoreNextChartClick.value = false
+		clearIgnoredChartClickTimeout = null
+	}, 350)
+	setHoverState(payload)
+}
+
 function onChartClick() {
 	if (isDataLoading.value) return
+	if (ignoreNextChartClick.value) {
+		ignoreNextChartClick.value = false
+		return
+	}
 
 	if (!hoverState.visible || hoverState.sliceIndex === null) {
 		if (isHoverPinned.value) {
