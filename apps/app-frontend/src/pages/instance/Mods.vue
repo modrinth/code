@@ -111,6 +111,7 @@ import {
 	get_linked_modpack_info,
 	list,
 	remove_project,
+	rename_project_companion_files,
 	toggle_disable_project,
 	update_managed_modrinth_version,
 	update_project,
@@ -300,6 +301,9 @@ async function removeMod(mod: ContentItem) {
 async function updateProject(mod: ContentItem) {
 	try {
 		const newPath = await update_project(props.instance.path, mod.file_path!)
+
+		await rename_project_companion_files(props.instance.path, mod.file_path!, newPath)
+
 		mod.file_path = newPath
 
 		if (mod.update_version_id) {
@@ -349,6 +353,8 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 		if (profile) {
 			await installVersionDependencies(profile, version).catch(handleError)
 		}
+
+		await rename_project_companion_files(props.instance.path, mod.file_path!, newPath)
 
 		mod.file_path = newPath
 	} catch (err) {
