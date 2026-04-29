@@ -24,8 +24,8 @@ const VERSIONS: VersionEntry[] = [
 - Changed the name of the button for creating an instance with a modpack to make it clearer what it's for.
 
 ## Fixed
-	- Fixed Java auto-installation not working on macOS
-	- Fix a skin naming error.`,
+- Fixed Java auto-installation not working on macOS.
+- Fix a skin naming error.`,
 	},
 	{
 		date: `2026-04-29T17:19:44+00:00`,

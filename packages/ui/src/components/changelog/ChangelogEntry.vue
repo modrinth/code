@@ -115,6 +115,16 @@ const messages = defineMessages({
 	h5,
 	h6 {
 		margin: 0;
+		margin-bottom: 0.25em;
+		font-weight: 600;
+
+		&:not(:first-child) {
+			margin-top: 0.75em;
+		}
+	}
+
+	h2 {
+		font-size: 1.125rem;
 	}
 
 	ul {
