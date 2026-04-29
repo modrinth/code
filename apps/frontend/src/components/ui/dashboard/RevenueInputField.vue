@@ -22,8 +22,8 @@
 				class="w-min"
 				@update:model-value="$emit('update:selectedCurrency', $event)"
 			>
-				<template v-for="option in currencyOptions" :key="option.value" #[`option-${option.value}`]>
-					<span class="font-semibold leading-tight">{{ option.label }}</span>
+				<template #option="{ item }">
+					<span class="font-semibold leading-tight">{{ item.label }}</span>
 				</template>
 			</Combobox>
 			<ButtonStyled>

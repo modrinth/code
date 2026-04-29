@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": ""
+    "message": "เวอร์ชั่น Linux แอพ Modrinth <issues-link> อาจมีปัญหา</issues-link> ในบางเครื่องและการตั้งค่าบางอย่าง ถ้าแอพ Modrinth ไม่เสถียรในเครื่องของคุณ เราขอให้คุณลองใช้แอพอื่นๆเช่น <prism-link>Prism Launcher</prism-link> เพื่อติดตั้งเนื้อหาของ Modrinth"
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -242,6 +242,9 @@
   "auth.sign-in.title": {
     "message": "ลงชื่อเข้าใช้"
   },
+  "auth.sign-up.action.create-account": {
+    "message": "สร้างบัญชี"
+  },
   "auth.sign-up.legal-dislaimer": {
     "message": "ในการสร้างบัญชี คุณยอมรับ <terms-link> ข้อกำหนด </terms-link> และ <privacy-policy-link> นโยบายความเป็นส่วนตัว </privacy-policy-link> ของ Modrinth"
   },
@@ -277,6 +280,9 @@
   },
   "auth.verify-email.failed-verification.description": {
     "message": "เราไม่สามารถตรวจสอบอีเมลของคุณได้ ลองส่งอีเมลยืนยันอีกครั้งผ่านแดชบอร์ดของคุณโดยลงชื่อเข้าใช้"
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "เราไม่สามารถยืนยันอีเมลของคุณได้ โปรดลองส่งอีเมลยืนยันอีกครั้งโดยใช้ปุ่มด้านล่าง"
   },
   "auth.verify-email.failed-verification.title": {
     "message": "การยืนยันอีเมลล้มเหลว"
@@ -385,6 +391,81 @@
   },
   "create.organization.name-label": {
     "message": ""
+  },
+  "create.organization.ownership-info": {
+    "message": "คุณจะเป็นเจ้าของในการจัดการต่างๆ และคุณก็สามารถเพิ่มสมาชิกได้ และ ย้ายเจ้าของตอนไหนก็ได้"
+  },
+  "create.organization.summary-label": {
+    "message": "สรุป"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.create-project": {
+    "message": "สร้างโปรเจ็ก"
+  },
+  "create.project.name-label": {
+    "message": "ชื่อ"
+  },
+  "create.project.name-placeholder": {
+    "message": "ใส่ชื่อโปรเจ็ก"
+  },
+  "create.project.owner-label": {
+    "message": "เจ้าของ"
+  },
+  "create.project.server-project-title": {
+    "message": "สร้าง เซิร์ฟเวอร์โปรเจ็ก"
+  },
+  "create.project.summary-label": {
+    "message": "สรุป"
+  },
+  "create.project.title": {
+    "message": "สร้างโปรเจ็ก"
+  },
+  "create.project.type-label": {
+    "message": "ประเภท"
+  },
+  "create.project.type-project": {
+    "message": "โปรเจ็ก"
+  },
+  "create.project.type-server": {
+    "message": "เซิร์ฟเวอร์"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-private": {
+    "message": "ส่วนตัว"
+  },
+  "create.project.visibility-public": {
+    "message": "สาธารณะ"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "สร้างใหม่"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "ดาวโหลด {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "คุณพร้อมแล้ว! 🎉"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "รายละเอียด"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "ปริมาณ"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "เลือกประเทศของคุณ"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "ค้นหาประเทศ"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "ภูมิถาค"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "บัญชี"
   },
   "error.generic.default.subtitle": {
     "message": ""
@@ -502,5 +583,11 @@
   },
   "landing.notifications.received-time": {
     "message": ""
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "อัปโหลดไอคอน"
+  },
+  "settings.applications.field.icon": {
+    "message": "ไอคอน"
   }
 }

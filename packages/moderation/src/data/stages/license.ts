@@ -24,7 +24,8 @@ const licenseStage: Stage = {
 	text: async () => (await import('../messages/checklist-text/licensing.md?raw')).default,
 	id: 'license',
 	icon: BookTextIcon,
-	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
+	guidance_url:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080f8805df7d012a8f770',
 	navigate: '/settings/license',
 	shouldShow(project, projectV3) {
 		return !projectV3?.minecraft_server

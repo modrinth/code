@@ -1301,60 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Vanilla、Fabric、Forge、Quilt、NeoForgeから選択してください。Modrinth上で動作するものは、あなたのサーバーでも実行可能です。"
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Modパックバージョンの変更に失敗しました"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "バージョンの読み込みに失敗しました"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Modパックの再インストールに失敗しました"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "サーバーの修復に失敗しました"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "サーバー設定の初期化に失敗しました"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "インストール設定の保存に失敗しました"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Modパックのリンク解除に失敗しました"
-  },
-  "hosting.loader.loader-version": {
-    "message": "ローダーのバージョン"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "サーバーのインストールが修復されました。"
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "修復が完了しました"
-  },
-  "hosting.loader.reset-server": {
-    "message": "サーバーをリセット"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "サーバー上のワールド、Mod、設定ファイルを含むすべてのデータを削除します。 バックアップは残り、復元できます。"
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "初期状態に戻す"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "これを行うことでサーバーが初期状態に戻されるためセットアップをもう一度行う必要があります。本当に続行しますか？"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "初期化"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "サーバーが初期状態に戻されました。"
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "サーバー初期化"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "サポート項目"
-  },
   "hosting.plan.out-of-stock": {
     "message": "品切れ"
   },
@@ -2109,7 +2055,7 @@
     "message": "組織"
   },
   "profile.label.projects": {
-    "message": "{count}件のプロジェクト"
+    "message": "{count} {countPlural, plural, one {プロジェクト} other {プロジェクト}}"
   },
   "profile.label.saving": {
     "message": "保存中…"
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "サーバーと同期"
   },
-  "servers.busy.backup-creating": {
-    "message": "進行中のバックアップの作成"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "進行中のバックアップの復元"
-  },
-  "servers.busy.installing": {
-    "message": "サーバーはインストール中です"
-  },
-  "servers.busy.syncing-content": {
-    "message": "進行中のコンテンツの同期"
-  },
   "servers.notice.actions": {
     "message": "アクション"
   },
@@ -3209,6 +3143,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "過去の請求"
+  },
   "settings.billing.expires": {
     "message": "有効期限: {date}"
   },
@@ -3331,9 +3268,6 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "再登録エラー"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "サーバーが一時停止中の場合、再請求の試行まで最大10分かかることがあります。"
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "再加入申請を受け付けました"

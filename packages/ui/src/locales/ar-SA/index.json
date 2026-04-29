@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "عرض التحليلات"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "عذر تحميل خادم الإعدادات"
+  },
   "badge.beta": {
     "defaultMessage": "تجريبي"
   },
@@ -40,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "جديد"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "إلغاء"
   },
   "button.accept": {
     "defaultMessage": "اقبل"
@@ -218,9 +224,6 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "حذف {count, plural, one {{itemType, select, project {project} version {version} user {user} other {content}}} other {{itemType, select, project {مشاريع} version {versions} user {users} other {contents}}}}"
   },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "أي تعديلات أو محتوى يضاف على حزمة التعديل سيحذف."
-  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "تحذير {action, select, downgrade {خفض الٳصدار} other {التحديث}}"
   },
@@ -229,6 +232,9 @@
   },
   "content.confirm-modpack-update.header": {
     "defaultMessage": "{action, select, downgrade {خفض ٳصدار} other {تحديث}} حزمة التعديلات"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": ""
   },
   "form.label.address-line": {
     "defaultMessage": "خط عنوان"

@@ -2,7 +2,7 @@
 	<nav
 		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
-		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
+		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold drop-shadow-xl"
 		:class="{ 'shadow-sm': mode === 'navigation' }"
 	>
 		<template v-if="mode === 'navigation'">
@@ -44,6 +44,7 @@
 
 		<!-- Animated slider background -->
 		<div
+			v-if="sliderReady && currentActiveIndex !== -1"
 			class="pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1"
 			:class="[
 				subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected',
@@ -221,7 +222,7 @@ function positionSlider() {
 
 	const isInitialPosition = sliderLeft.value === 4 && sliderRight.value === 4
 
-	if (isInitialPosition) {
+	if (!sliderReady.value || isInitialPosition) {
 		sliderLeft.value = newPosition.left
 		sliderRight.value = newPosition.right
 		sliderTop.value = newPosition.top
@@ -299,6 +300,8 @@ watch(
 watch(
 	() => props.links,
 	async () => {
+		sliderReady.value = false
+		transitionsEnabled.value = false
 		await nextTick()
 		updateActiveTab()
 	},

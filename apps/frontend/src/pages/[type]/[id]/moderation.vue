@@ -93,7 +93,7 @@
 				:set-status="setStatus"
 				:current-member="currentMember"
 				:auth="auth"
-				@update-thread="(newThread) => (thread = newThread)"
+				@update-thread="updateThread"
 			/>
 		</section>
 	</div>
@@ -131,6 +131,13 @@ const { data: thread } = useQuery({
 	queryFn: () => client.labrinth.threads_v3.getThread(project.value.thread_id),
 	enabled: computed(() => !!project.value?.thread_id),
 })
+
+function updateThread(newThread) {
+	const threadId = newThread?.id ?? project.value?.thread_id
+	if (!threadId) return
+
+	queryClient.setQueryData(['thread', threadId], newThread)
+}
 
 async function setStatus(status) {
 	startLoading()

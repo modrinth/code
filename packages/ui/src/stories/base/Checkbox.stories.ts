@@ -40,6 +40,14 @@ export const Indeterminate: Story = {
 	},
 }
 
+export const LabelClass: Story = {
+	args: {
+		label: 'Custom label class',
+		labelClass: 'text-brand font-bold',
+		modelValue: true,
+	},
+}
+
 export const AllStates: StoryObj = {
 	render: () => ({
 		components: { Checkbox },

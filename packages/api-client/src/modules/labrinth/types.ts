@@ -1133,6 +1133,9 @@ export namespace Labrinth {
 				project_type: string
 				slug: string | null
 				author: string
+				author_id: string | null
+				organization: string | null
+				organization_id: string | null
 				title: string
 				description: string
 				categories: string[]
@@ -1167,6 +1170,9 @@ export namespace Labrinth {
 				project_types: string[]
 				slug: string | null
 				author: string
+				author_id: string | null
+				organization: string | null
+				organization_id: string | null
 				name: string
 				summary: string
 				categories: string[]
@@ -1291,6 +1297,38 @@ export namespace Labrinth {
 				count?: number
 				offset?: number
 				all?: boolean
+			}
+		}
+	}
+
+	export namespace Moderation {
+		export namespace Internal {
+			export type LockedByUser = {
+				id: string
+				username: string
+				avatar_url?: string
+			}
+
+			export type LockStatusResponse = {
+				locked: boolean
+				is_own_lock: boolean
+				locked_by?: LockedByUser
+				locked_at?: string
+				expires_at?: string
+				expired?: boolean
+			}
+
+			export type LockAcquireResponse = {
+				success: boolean
+				is_own_lock: boolean
+				locked_by?: LockedByUser
+				locked_at?: string
+				expires_at?: string
+				expired?: boolean
+			}
+
+			export type ReleaseLockResponse = {
+				success: boolean
 			}
 		}
 	}
@@ -1550,6 +1588,7 @@ export namespace Labrinth {
 				id: string
 				issue_id: string
 				key: string
+				jar: string | null
 				file_path: string
 				decompiled_source: string | null
 				data: Record<string, unknown>

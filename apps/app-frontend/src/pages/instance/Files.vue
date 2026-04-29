@@ -6,6 +6,7 @@ import {
 	FilePageLayout,
 	injectNotificationManager,
 	provideFileManager,
+	ReadyTransition,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
@@ -54,6 +55,8 @@ const messages = defineMessages({
 
 const instanceRoot = ref('')
 const items = ref<FileItem[]>([])
+/** True until the first directory read for the current instance path finishes (initial load only). */
+const firstPaintPending = ref(true)
 const loading = ref(true)
 const error = ref<Error | null>(null)
 const currentPath = ref('')
@@ -123,6 +126,7 @@ async function refresh() {
 		items.value = []
 	} finally {
 		loading.value = false
+		firstPaintPending.value = false
 	}
 }
 
@@ -305,6 +309,7 @@ watch(
 	() => props.instance.path,
 	async () => {
 		debug('watch instance.path: changed to', props.instance.path)
+		firstPaintPending.value = true
 		instanceRoot.value = await get_full_path(props.instance.path)
 		currentPath.value = ''
 		await refresh()
@@ -341,5 +346,7 @@ provideFileManager({
 </script>
 
 <template>
-	<FilePageLayout :show-refresh-button="true" />
+	<ReadyTransition :pending="firstPaintPending">
+		<FilePageLayout :show-refresh-button="true" />
+	</ReadyTransition>
 </template>

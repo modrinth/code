@@ -285,15 +285,24 @@ async fn get_singleplayer_worlds_in_profile(
     if !saves_dir.exists() {
         return Ok(());
     }
-    let mut saves_dir = io::read_dir(saves_dir).await?;
-    while let Some(world_dir) = saves_dir.next_entry().await? {
+    let mut entries = io::read_dir(&saves_dir).await?;
+    let mut tasks = JoinSet::new();
+    while let Some(world_dir) = entries.next_entry().await? {
         let world_path = world_dir.path();
-        let level_dat_path = world_path.join("level.dat");
-        if !level_dat_path.exists() {
+        if !world_path.join("level.dat").exists() {
             continue;
         }
-        if let Ok(world) = read_singleplayer_world(world_path).await {
-            worlds.push(world);
+        tasks.spawn(read_singleplayer_world(world_path));
+    }
+    while let Some(result) = tasks.join_next().await {
+        match result {
+            Ok(Ok(world)) => worlds.push(world),
+            Ok(Err(e)) => {
+                tracing::warn!("Skipping unreadable world: {e}");
+            }
+            Err(e) => {
+                tracing::warn!("World read task panicked: {e}");
+            }
         }
     }
 
@@ -334,36 +343,36 @@ async fn read_singleplayer_world_maybe_locked(
     world_path: PathBuf,
     locked: bool,
 ) -> Result<World> {
-    #[derive(Deserialize, Debug)]
-    #[serde(rename_all = "PascalCase")]
-    struct LevelDataRoot {
-        data: LevelData,
-    }
-
-    #[derive(Deserialize, Debug)]
-    #[serde(rename_all = "PascalCase")]
-    struct LevelData {
-        #[serde(default)]
-        level_name: String,
-        #[serde(default)]
-        last_played: i64,
-        #[serde(default)]
-        game_type: i32,
-        #[serde(default, rename = "hardcore")]
-        hardcore: bool,
-    }
-
-    let level_data = io::read(world_path.join("level.dat")).await?;
-    let level_data: LevelDataRoot = quartz_nbt::serde::deserialize(
-        &level_data,
+    let raw = io::read(world_path.join("level.dat")).await?;
+    let (root, _) = quartz_nbt::io::read_nbt(
+        &mut Cursor::new(raw),
         quartz_nbt::io::Flavor::GzCompressed,
-    )?
-    .0;
-    let level_data = level_data.data;
+    )?;
 
-    let icon = Some(world_path.join("icon.png")).filter(|i| i.exists());
+    let data = root.get::<_, &NbtCompound>("Data").map_err(|_| {
+        Error::from(ErrorKind::InputError(
+            "Missing Data tag in level.dat".into(),
+        ))
+    })?;
 
-    let game_mode = match level_data.game_type {
+    let level_name = data
+        .get::<_, &str>("LevelName")
+        .unwrap_or_default()
+        .to_string();
+    let last_played = data.get::<_, i64>("LastPlayed").unwrap_or(0);
+    let game_type = data.get::<_, i32>("GameType").unwrap_or(0);
+    let hardcore = data.get::<_, i8>("hardcore").unwrap_or(0) != 0;
+
+    let icon = if tokio::fs::try_exists(world_path.join("icon.png"))
+        .await
+        .unwrap_or(false)
+    {
+        Some(Either::Left(world_path.join("icon.png")))
+    } else {
+        None
+    };
+
+    let game_mode = match game_type {
         0 => SingleplayerGameMode::Survival,
         1 => SingleplayerGameMode::Creative,
         2 => SingleplayerGameMode::Adventure,
@@ -372,9 +381,9 @@ async fn read_singleplayer_world_maybe_locked(
     };
 
     Ok(World {
-        name: level_data.level_name,
-        last_played: Utc.timestamp_millis_opt(level_data.last_played).single(),
-        icon: icon.map(Either::Left),
+        name: level_name,
+        last_played: Utc.timestamp_millis_opt(last_played).single(),
+        icon,
         display_status: DisplayStatus::Normal,
         details: WorldDetails::Singleplayer {
             path: world_path
@@ -383,7 +392,7 @@ async fn read_singleplayer_world_maybe_locked(
                 .to_string_lossy()
                 .to_string(),
             game_mode,
-            hardcore: level_data.hardcore,
+            hardcore,
             locked,
         },
     })
@@ -404,7 +413,6 @@ async fn get_server_worlds_in_profile(
         .await
         .ok();
 
-    let first_server_index = worlds.len();
     for (index, server) in servers.into_iter().enumerate() {
         if server.hidden {
             // TODO: Figure out whether we want to hide or show direct connect servers
@@ -436,31 +444,6 @@ async fn get_server_worlds_in_profile(
         };
         worlds.push(world);
     }
-
-    if let Some(join_log) = join_log {
-        let mut futures = JoinSet::new();
-        for (index, world) in worlds.iter().enumerate().skip(first_server_index)
-        {
-            // We can't check for the profile already having a last_played, in case the user joined
-            // the target address directly more recently. This is often the case when using
-            // quick-play before 1.20.
-            if let WorldDetails::Server { address, .. } = &world.details
-                && let Ok((host, port)) = parse_server_address(address)
-            {
-                let host = host.to_owned();
-                futures.spawn(async move {
-                    resolve_server_address(&host, port)
-                        .await
-                        .ok()
-                        .map(|x| (index, x))
-                });
-            }
-        }
-        for (index, address) in futures.join_all().await.into_iter().flatten() {
-            worlds[index].last_played = join_log.get(&address).copied();
-        }
-    }
-
     Ok(())
 }
 

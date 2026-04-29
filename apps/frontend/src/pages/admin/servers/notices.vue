@@ -282,7 +282,7 @@ import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-import AssignNoticeModal from '~/components/ui/servers/notice/AssignNoticeModal.vue'
+import AssignNoticeModal from '~/components/ui/admin/AssignNoticeModal.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 const { addNotification } = injectNotificationManager()

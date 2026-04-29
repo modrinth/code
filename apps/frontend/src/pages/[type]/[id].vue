@@ -439,6 +439,24 @@
 				}"
 			>
 				<div class="normal-page__header relative my-4">
+					<div class="mb-6">
+						<ModerationProjectNags
+							v-if="
+								projectV3 &&
+								currentMember &&
+								(project.status === 'draft' || tags.rejectedStatuses.includes(project.status))
+							"
+							:project="project"
+							:project-v3="projectV3"
+							:versions="versions ?? undefined"
+							:current-member="currentMember"
+							:collapsed="collapsedChecklist"
+							:route-name="route.name"
+							:tags="tags"
+							@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+							@set-processing="setProcessing"
+						/>
+					</div>
 					<ProjectHeader
 						v-if="projectV3Loaded"
 						:project="project"
@@ -647,7 +665,7 @@
 									<nuxt-link
 										v-else
 										v-tooltip="formatMessage(commonMessages.followButton)"
-										to="/auth/sign-in"
+										:to="signInRouteObj"
 										:aria-label="formatMessage(commonMessages.followButton)"
 									>
 										<HeartIcon aria-hidden="true" />
@@ -655,7 +673,7 @@
 									<template #fallback>
 										<nuxt-link
 											v-tooltip="formatMessage(commonMessages.followButton)"
-											to="/auth/sign-in"
+											:to="signInRouteObj"
 											:aria-label="formatMessage(commonMessages.followButton)"
 										>
 											<HeartIcon aria-hidden="true" />
@@ -715,7 +733,7 @@
 										</button>
 									</template>
 								</PopoutMenu>
-								<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+								<nuxt-link v-else v-tooltip="'Save'" :to="signInRouteObj" aria-label="Save">
 									<BookmarkIcon aria-hidden="true" />
 								</nuxt-link>
 							</ButtonStyled>
@@ -736,10 +754,7 @@
 										},
 										{
 											id: 'moderation-checklist',
-											action: () => {
-												moderationStore.setSingleProject(project.id)
-												showModerationChecklist = true
-											},
+											action: openModerationChecklistFromMenu,
 											color: 'orange',
 											hoverOnly: true,
 											shown:
@@ -768,7 +783,11 @@
 										{
 											id: 'report',
 											action: () =>
-												auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
+												auth.user
+													? reportProject(project.id)
+													: navigateTo(
+															getSignInRouteObj(route, getReportPath('project', project.id)),
+														),
 											color: 'red',
 											hoverOnly: true,
 											shown: !isMember,
@@ -1024,7 +1043,7 @@
 			>
 				<ModerationChecklist
 					:collapsed="collapsedModerationChecklist"
-					@exit="showModerationChecklist = false"
+					@exit="setModerationChecklistOpen(false)"
 					@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
 				/>
 			</div>
@@ -1116,13 +1135,19 @@ import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
+import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
+import { getSignInRouteObj } from '~/composables/auth.js'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
-import { useModerationStore } from '~/store/moderation.ts'
-import { reportProject } from '~/utils/report-helpers.ts'
+import {
+	loadChecklistOpenState,
+	saveChecklistOpenState,
+} from '~/services/moderation-checklist-storage.ts'
+import { useModerationQueue } from '~/services/moderation-queue.ts'
+import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
 	key: (route) => `${route.params.id}`,
@@ -1130,8 +1155,9 @@ definePageMeta({
 
 const data = useNuxtApp()
 const route = useRoute()
+const signInRouteObj = computed(() => getSignInRouteObj(route))
 const config = useRuntimeConfig()
-const moderationStore = useModerationStore()
+const moderationQueue = useModerationQueue()
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 
@@ -2489,15 +2515,83 @@ async function copyPermalink() {
 
 const collapsedChecklist = ref(false)
 
-const showModerationChecklist = useLocalStorage(
-	`show-moderation-checklist-${project.value?.id ?? 'unknown'}`,
-	false,
-)
+const showModerationChecklist = ref(false)
 const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
 
-if (import.meta.client && history && history.state && history.state.showChecklist) {
-	showModerationChecklist.value = true
+function consumeShowChecklistHistoryState() {
+	if (!import.meta.client) return false
+	if (!window.history?.state?.showChecklist) return false
+
+	const state = { ...window.history.state }
+	delete state.showChecklist
+	window.history.replaceState(state, '', window.location.href)
+	return true
 }
+
+function setModerationChecklistOpen(open, projectId = project.value?.id) {
+	showModerationChecklist.value = open
+	if (projectId) {
+		void saveChecklistOpenState(projectId, open)
+	}
+}
+
+function isProjectInActiveModerationQueue(projectId = project.value?.id) {
+	return (
+		!!projectId &&
+		moderationQueue.isQueueMode &&
+		moderationQueue.currentQueue.items.includes(projectId)
+	)
+}
+
+async function openModerationChecklistFromMenu() {
+	const projectId = project.value?.id
+	if (!projectId) return
+
+	await moderationQueue.ready
+	if (!isProjectInActiveModerationQueue(projectId)) {
+		await moderationQueue.setSingleProject(projectId)
+	}
+
+	setModerationChecklistOpen(true)
+}
+
+watch(
+	() => project.value?.id,
+	async (projectId, _previousProjectId, onCleanup) => {
+		if (!import.meta.client || !projectId) return
+
+		let cancelled = false
+		onCleanup(() => {
+			cancelled = true
+		})
+
+		const openedFromNavigation = consumeShowChecklistHistoryState()
+		await moderationQueue.ready
+		if (cancelled) return
+
+		if (openedFromNavigation) {
+			setModerationChecklistOpen(true)
+			return
+		}
+
+		const storedOpen = await loadChecklistOpenState(projectId)
+		if (cancelled) return
+
+		if (storedOpen !== null) {
+			showModerationChecklist.value = storedOpen
+			return
+		}
+
+		const shouldRecoverFromQueue =
+			moderationQueue.isQueueMode && moderationQueue.getCurrentProjectId() === projectId
+		showModerationChecklist.value = shouldRecoverFromQueue
+
+		if (shouldRecoverFromQueue) {
+			void saveChecklistOpenState(projectId, true)
+		}
+	},
+	{ immediate: true },
+)
 
 function closeDownloadModal(event) {
 	downloadModal.value.hide(event)

@@ -643,6 +643,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	LoaderIcon,
 	ModrinthServersPurchaseModal,
 	useFormatPrice,
 	useVIntl,
@@ -652,7 +653,6 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import OptionGroup from '~/components/ui/OptionGroup.vue'
-import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
 import MedalPlanPromotion from '~/components/ui/servers/marketing/MedalPlanPromotion.vue'
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
 import { products } from '~/generated/state.json'

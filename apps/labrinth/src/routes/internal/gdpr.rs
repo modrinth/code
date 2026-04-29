@@ -7,7 +7,7 @@ use crate::routes::ApiError;
 use actix_web::{HttpRequest, HttpResponse, post, web};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("gdpr").service(export));
+    cfg.service(web::scope("/gdpr").service(export));
 }
 
 #[post("/export")]

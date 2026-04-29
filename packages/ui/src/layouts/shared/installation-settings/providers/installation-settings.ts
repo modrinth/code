@@ -4,7 +4,6 @@ import type { ComputedRef, Ref } from 'vue'
 import { createContext } from '#ui/providers/create-context'
 
 import type {
-	ContentDiffItem,
 	ContentDiffPreview,
 	GameVersionOption,
 	InstallationInfoRow,
@@ -29,6 +28,9 @@ export interface InstallationSettingsContext {
 	resolveGameVersions: (loader: string, showSnapshots: boolean) => GameVersionOption[]
 	resolveLoaderVersions: (loader: string, gameVersion: string) => LoaderVersionEntry[]
 	resolveHasSnapshots: (loader: string) => boolean
+
+	/** Prefetch loader build lists when the user hovers a game version (e.g. Paper/Purpur). */
+	onGameVersionHover?: (option: GameVersionOption) => void
 
 	save: (platform: string, gameVersion: string, loaderVersionId: string | null) => Promise<void>
 	repair: () => Promise<void>
@@ -55,6 +57,9 @@ export interface InstallationSettingsContext {
 	/** When false, hides change-version and reinstall buttons in linked state (default: true) */
 	showModpackVersionActions?: boolean | ComputedRef<boolean>
 
+	/** True when the linked modpack was uploaded as a local file rather than from Modrinth */
+	isLocalFile?: boolean | ComputedRef<boolean>
+
 	repairing?: Ref<boolean>
 	reinstalling?: Ref<boolean>
 
@@ -67,10 +72,11 @@ export interface InstallationSettingsContext {
 	disableAllContent?: () => Promise<void>
 
 	/**
-	 * Disable only the incompatible addons identified in a content diff preview.
-	 * Used when the user chooses "Disable conflicts" instead of "Auto-fix".
+	 * Disable addons that are incompatible with the target game version.
+	 * Fetches version metadata in bulk, disables any addon whose game_versions
+	 * doesn't include the target, plus any custom (non-Modrinth) content.
 	 */
-	disableIncompatibleContent?: (diffs: ContentDiffItem[]) => Promise<void>
+	disableIncompatibleContent?: (targetGameVersion: string) => Promise<void>
 
 	/**
 	 * Save the installation settings without auto-resolving content.

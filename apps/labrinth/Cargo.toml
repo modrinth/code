@@ -80,6 +80,7 @@ murmur2 = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
 prometheus = { workspace = true }
+quick-xml = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
 redis = { workspace = true, features = ["ahash", "r2d2", "tokio-comp"] }
@@ -127,7 +128,7 @@ url = { workspace = true }
 urlencoding = { workspace = true }
 utoipa = { workspace = true, features = ["url"] }
 utoipa-actix-web = { workspace = true }
-utoipa-swagger-ui = { workspace = true }
+utoipa-scalar = { workspace = true, features = ["actix-web"] }
 uuid = { workspace = true, features = ["fast-rng", "serde", "v4"] }
 validator = { workspace = true, features = ["derive"] }
 webp = { workspace = true }

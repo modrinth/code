@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { getCategoryIcon, GlobeIcon, SERVER_CATEGORY_ICON_MAP, UserIcon } from '@modrinth/assets'
 import { sortedCategories } from '@modrinth/utils'
-import { computed, type Ref, ref } from 'vue'
+import { computed, type ComputedRef, type Ref, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { defineMessage, LOCALES, useVIntl } from '../composables/i18n'
@@ -128,6 +128,7 @@ export function useServerSearch(opts: {
 	query: Ref<string>
 	maxResults: Ref<number>
 	currentPage: Ref<number>
+	providedFilters?: ComputedRef<FilterValue[]>
 }) {
 	const { tags, query, maxResults, currentPage } = opts
 
@@ -138,7 +139,7 @@ export function useServerSearch(opts: {
 
 	const route = useRoute()
 
-	const serverCurrentSortType = ref<SortType>(SERVER_SORT_TYPES[0])
+	const serverCurrentSortType = shallowRef<SortType>(SERVER_SORT_TYPES[0])
 	const serverCurrentFilters = ref<FilterValue[]>([{ type: 'server_status', option: 'online' }])
 	const serverToggledGroups = ref<string[]>([])
 
@@ -369,6 +370,31 @@ export function useServerSearch(opts: {
 				const values = excluded.map((f) => `"${f.option}"`).join(', ')
 				parts.push(`${field} NOT IN [${values}]`)
 			}
+		}
+
+		const providedProjectIds = (opts.providedFilters?.value ?? [])
+			.filter((filter) => filter.type === 'project_id')
+			.map((filter) => ({
+				projectId: filter.option.startsWith('project_id:')
+					? filter.option.slice('project_id:'.length)
+					: filter.option,
+				negative: !!filter.negative,
+			}))
+			.filter((filter) => filter.projectId.length > 0)
+		const excludedProjectIds = providedProjectIds
+			.filter((filter) => filter.negative)
+			.map((filter) => filter.projectId)
+		const includedProjectIds = providedProjectIds
+			.filter((filter) => !filter.negative)
+			.map((filter) => filter.projectId)
+
+		if (includedProjectIds.length > 0) {
+			const values = includedProjectIds.map((projectId) => `"${projectId}"`).join(', ')
+			parts.push(`project_id IN [${values}]`)
+		}
+		if (excludedProjectIds.length > 0) {
+			const values = excludedProjectIds.map((projectId) => `"${projectId}"`).join(', ')
+			parts.push(`project_id NOT IN [${values}]`)
 		}
 
 		return parts.join(' AND ')

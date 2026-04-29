@@ -43,7 +43,7 @@ async function onLocaleChange(newLocale: string) {
 </script>
 
 <template>
-	<h2 class="m-0 text-lg font-extrabold text-contrast">Language</h2>
+	<h2 class="m-0 text-lg font-semibold text-contrast">Language</h2>
 
 	<Admonition type="warning" class="mt-2 mb-4">
 		{{ formatMessage(languageSelectorMessages.languageWarning, { platform }) }}

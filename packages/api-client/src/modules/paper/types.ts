@@ -6,8 +6,16 @@ export namespace Paper {
 				versions: Record<string, string[]>
 			}
 
+			export type BuildChannel = 'STABLE' | 'BETA' | 'ALPHA'
+
+			export type Build = {
+				id: number
+				time: string
+				channel: BuildChannel | string
+			}
+
 			export type VersionBuilds = {
-				builds: number[]
+				builds: Build[]
 			}
 		}
 	}

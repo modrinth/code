@@ -1,3 +1,5 @@
+@import '@modrinth/assets/styles/reset.scss';
+
 html {
 	--dark-color-text: #b0bac5;
 	--dark-color-text-dark: #ecf9fb;
@@ -456,9 +458,9 @@ kbd {
 	font-size: 0.85em !important;
 }
 
-@import '~/assets/styles/layout.scss';
-@import '~/assets/styles/utils.scss';
-@import '~/assets/styles/components.scss';
+@import './layout.scss';
+@import './utils.scss';
+@import './components.scss';
 
 // OMORPHIA FIXES
 .card {

@@ -1,6 +1,7 @@
 import type { AbstractModrinthClient } from '../core/abstract-client'
 import type { AbstractModule } from '../core/abstract-module'
 import { ArchonBackupsV1Module } from './archon/backups/v1'
+import { ArchonBackupsQueueV1Module } from './archon/backups-queue/v1'
 import { ArchonContentV1Module } from './archon/content/v1'
 import { ArchonOptionsV1Module } from './archon/options/v1'
 import { ArchonPropertiesV1Module } from './archon/properties/v1'
@@ -9,6 +10,7 @@ import { ArchonServersV1Module } from './archon/servers/v1'
 import { ISO3166Module } from './iso3166'
 import { KyrosContentV1Module } from './kyros/content/v1'
 import { KyrosFilesV0Module } from './kyros/files/v0'
+import { KyrosLogsV1Module } from './kyros/logs/v1'
 import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
 import { LabrinthAffiliateInternalModule } from './labrinth/affiliate/internal'
 import { LabrinthAuthInternalModule } from './labrinth/auth/internal'
@@ -18,6 +20,7 @@ import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthExternalProjectsInternalModule } from './labrinth/external-projects/internal'
 import { LabrinthGlobalsInternalModule } from './labrinth/globals/internal'
 import { LabrinthLimitsV3Module } from './labrinth/limits/v3'
+import { LabrinthModerationInternalModule } from './labrinth/moderation/internal'
 import { LabrinthNotificationsV2Module } from './labrinth/notifications/v2'
 import { LabrinthOAuthInternalModule } from './labrinth/oauth/internal'
 import { LabrinthOrganizationsV3Module } from './labrinth/organizations/v3'
@@ -37,6 +40,8 @@ import { LabrinthTechReviewInternalModule } from './labrinth/tech-review/interna
 import { LabrinthThreadsV3Module } from './labrinth/threads/v3'
 import { LabrinthUsersV2Module } from './labrinth/users/v2'
 import { LauncherMetaManifestV0Module } from './launcher-meta/v0'
+import { MclogsInsightsV1Module } from './mclogs/insights/v1'
+import { MclogsLogsV1Module } from './mclogs/logs/v1'
 import { PaperVersionsV3Module } from './paper/v3'
 import { PurpurVersionsV2Module } from './purpur/v2'
 
@@ -52,6 +57,7 @@ type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
  * TODO: Better way? Probably not
  */
 export const MODULE_REGISTRY = {
+	archon_backups_queue_v1: ArchonBackupsQueueV1Module,
 	archon_backups_v1: ArchonBackupsV1Module,
 	archon_content_v1: ArchonContentV1Module,
 	archon_options_v1: ArchonOptionsV1Module,
@@ -59,9 +65,12 @@ export const MODULE_REGISTRY = {
 	archon_servers_v0: ArchonServersV0Module,
 	archon_servers_v1: ArchonServersV1Module,
 	iso3166_data: ISO3166Module,
+	mclogs_insights_v1: MclogsInsightsV1Module,
+	mclogs_logs_v1: MclogsLogsV1Module,
 	launchermeta_manifest_v0: LauncherMetaManifestV0Module,
 	kyros_content_v1: KyrosContentV1Module,
 	kyros_files_v0: KyrosFilesV0Module,
+	kyros_logs_v1: KyrosLogsV1Module,
 	labrinth_affiliate_internal: LabrinthAffiliateInternalModule,
 	labrinth_auth_internal: LabrinthAuthInternalModule,
 	labrinth_auth_v2: LabrinthAuthV2Module,
@@ -69,6 +78,7 @@ export const MODULE_REGISTRY = {
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_external_projects_internal: LabrinthExternalProjectsInternalModule,
 	labrinth_globals_internal: LabrinthGlobalsInternalModule,
+	labrinth_moderation_internal: LabrinthModerationInternalModule,
 	labrinth_notifications_v2: LabrinthNotificationsV2Module,
 	labrinth_oauth_internal: LabrinthOAuthInternalModule,
 	labrinth_organizations_v3: LabrinthOrganizationsV3Module,

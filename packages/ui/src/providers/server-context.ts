@@ -1,26 +1,15 @@
-import type { Archon } from '@modrinth/api-client'
-import type { ComputedRef, Reactive, Ref } from 'vue'
+import type { Archon, UploadState } from '@modrinth/api-client'
+import type { Stats } from '@modrinth/utils'
+import type { ComputedRef, Ref } from 'vue'
 
 import type { MessageDescriptor } from '#ui/composables/i18n'
+import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 
 import { createContext } from '.'
 
 export interface BusyReason {
 	reason: MessageDescriptor
 }
-
-export type BackupTaskState = {
-	progress: number
-	state: Archon.Backups.v1.BackupState
-}
-
-export type BackupProgressEntry = {
-	file?: BackupTaskState
-	create?: BackupTaskState
-	restore?: BackupTaskState
-}
-
-export type BackupsState = Map<string, BackupProgressEntry>
 
 export interface FilesystemAuth {
 	url: string
@@ -34,10 +23,12 @@ export interface ModrinthServerContext {
 
 	// Websocket state
 	readonly isConnected: Ref<boolean>
+	readonly isWsAuthIncorrect: Ref<boolean>
 	readonly powerState: Ref<Archon.Websocket.v0.PowerState>
+	readonly powerStateDetails: Ref<{ oom_killed?: boolean; exit_code?: number } | undefined>
 	readonly isServerRunning: ComputedRef<boolean>
-	readonly backupsState: Reactive<BackupsState>
-	markBackupCancelled: (backupId: string) => void
+	readonly stats: Ref<Stats>
+	readonly uptimeSeconds: Ref<number>
 
 	// Content sync state
 	readonly isSyncingContent: Ref<boolean>
@@ -50,6 +41,14 @@ export interface ModrinthServerContext {
 	readonly fsOps: Ref<Archon.Websocket.v0.FilesystemOperation[]>
 	readonly fsQueuedOps: Ref<Archon.Websocket.v0.QueuedFilesystemOp[]>
 	refreshFsAuth: () => Promise<void>
+
+	// File upload state
+	readonly uploadState: Ref<UploadState>
+	readonly cancelUpload: Ref<(() => void) | null>
+
+	// File operations (extract, move, etc.)
+	readonly activeOperations: ComputedRef<FileOperation[]>
+	dismissOperation: (opId: string, action: 'dismiss' | 'cancel') => Promise<void>
 }
 
 export const [injectModrinthServerContext, provideModrinthServerContext] =

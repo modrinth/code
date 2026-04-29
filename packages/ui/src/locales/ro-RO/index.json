@@ -1406,9 +1406,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Metodă de plată"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "Facturat {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Alege un plan personalizat, cu specificațiile exacte de care ai nevoie."
   },
@@ -1424,17 +1421,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Cel mai Popular"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Alege un plan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Selectează un Plan"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfect pentru 1–5 prieteni cu câteva moduri simple."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Alege cantitatea de RAM și specificații care sunt potrivite pentru nevoile tale."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"

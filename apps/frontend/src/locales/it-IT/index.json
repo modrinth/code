@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Crea link affiliati"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Nessun codice affiliati trovato."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Errore nel caricamento dei link affiliati"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Cerca link affiliati..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "da {count, plural, one {# progetto} other {# progetti}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Download totali"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Follower totali"
   },
   "dashboard.collections.button.create-new": {
     "message": "Crea nuova"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Le tue raccolte"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Cerca tra le raccolte..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Nome (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Data di creazione"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Ultima modifica"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Scarica {formType}"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Hai consumato l'intero tuo limite di <b>{withdrawLimit}</b>. Dovrai compilare un modulo fiscale per prelevare di più."
   },
+  "dashboard.head-title": {
+    "message": "Bacheca"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Segna tutte come lette"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Mostra cronologia"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Hai letto tutte le notifiche."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Impossibile caricare le notifiche:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Cronologia"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Cronologia delle notifiche"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Mostra tutte"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Mostra cronologia notifiche"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Mostra {extraNotifs, plural, one {un'altra notifica} other {altre # notifiche}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Caricando le notifiche..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Crea organizzazione"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Crea un'organizzazione!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Impossibile ottenere le organizzazioni"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count, plural, one {# membro} other {# membri}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organizzazioni"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Puoi modificare più progetti contemporaneamente selezionandoli qui sotto."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Impossibile modificare più server contemporaneamente"
+  },
+  "dashboard.projects.empty": {
+    "message": "Non hai ancora alcun progetto. Clicca sul pulsante verde in alto per iniziare."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Progetti"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "e {count, plural, one {un altro ancora} other {altri #}}..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Rimuovi link"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Modifica link"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Le modifiche verranno applicate a <strong>{count}</strong> {count, plural, one {progetto} other {progetti}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Qualsiasi link specificato sotto sarà modificato per tutti i progetti selezionati. Quelli lasciati in bianco saranno ignorati. Puoi rimuovere un link da tutti i progetti selezionati col pulsante Rimuovi."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Un link di invito al tuo server Discord."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Invito a Discord"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Un posto dove gli utenti potranno segnalare bug o problemi riguardo al tuo progetto."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Issue tracker"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "I link esistenti saranno rimossi"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Inserisci un invito a Discord valido"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Inserisci un URL valido"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Mostra tutti i progetti"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Una pagina o repository che contiene il codice sorgente del tuo progetto"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Codice sorgente"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Una pagina che contiene informazioni, documentazioni e/o guide per il tuo progetto."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Pagina wiki"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Modifiche applicate con successo."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icona per {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Il progetto ha ricevuto un messaggio dai moderatori. Visitalo per leggerlo."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Si prega di rivedere i metadati d'ambiente"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Crescente"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Decrescente"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Nome"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Stato"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Tipo"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Icona"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nome"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Stato"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Tipo"
+  },
+  "dashboard.report.title": {
+    "message": "Segnala {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Segnalazioni aperte"
+  },
+  "dashboard.reports.title": {
+    "message": "Segnalazioni"
+  },
   "dashboard.revenue.available-now": {
     "message": "Disponibile ora"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Scarica come CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Storico delle transazioni"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transazioni"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "I tuoi pagamenti e prelievi appariranno qui."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Mese scorso"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Questo mese"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Mostra tutto"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Tutte"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "I tuoi prelievi sono temporaneamente bloccati perché il tuo TIN o SSN non corrisponde ai registri dell'IRS. Contatta l'assistenza per resettare e reinviare il tuo modulo fiscale."
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Preleva"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Segnalazioni aperte"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analitiche"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Creatori"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Bacheca"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notifiche"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organizzazioni"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Riepilogo"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Progetti"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Guadagni"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Account"
@@ -1301,60 +1526,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Scegli tra Vanilla, Fabric, Forge, Quilt e NeoForge. Se è su Modrinth, il tuo server può usarlo."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Errore nella modifica della versione del pacchetto"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Errore nel caricamento delle versioni"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Errore nel reinstallare il pacchetto"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Errore nella riparazione del server"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Errore nella reinizializzazione"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Errore nel salvataggio delle impostazioni"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Errore nello scollegamento del pacchetto"
-  },
-  "hosting.loader.loader-version": {
-    "message": "Versione {loader, select, null {del loader} other {di {loader}}}"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "L'installazione del server è stata riparata."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Riparazione completata"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Reimposta server"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Rimuove tutti i dati dal tuo server, inclusi i mondi, mod, e configurazioni. Eventuali backup rimarranno intatti e potranno essere ripristinati."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Reinizializza"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Il server verrà ripristinato alla configurazione iniziale così da poterlo riconfigurare. Vuoi davvero continuare?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Reinizializza"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "Il server è stato ripristinato alla configurazione iniziale."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Server reinizializzato"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Opzioni di assistenza"
-  },
   "hosting.plan.out-of-stock": {
     "message": "Non disponibile"
   },
@@ -1608,7 +1779,7 @@
     "message": "Note di versione"
   },
   "layout.footer.about.news": {
-    "message": "Novità"
+    "message": "Notizie"
   },
   "layout.footer.about.rewards-program": {
     "message": "Programma Premi"
@@ -2091,7 +2262,7 @@
     "message": "{count} download"
   },
   "profile.label.joined": {
-    "message": "Account creato"
+    "message": "Iscrizione"
   },
   "profile.label.no-collections": {
     "message": "Questo utente non ha raccolte!"
@@ -2271,7 +2442,7 @@
     "message": "Rivedi progetto"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting è il modo più facile per giocare coi tuoi amici senza problemi!"
+    "message": "Modrinth Hosting è il modo più facile per giocare insieme spensieratamente!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "A partire da {price}<small> al mese</small>"
@@ -2831,18 +3002,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizza col server"
   },
-  "servers.busy.backup-creating": {
-    "message": "È in corso la creazione di un backup"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "È in corso il ripristino da un backup"
-  },
-  "servers.busy.installing": {
-    "message": "È in corso l'installazione del server"
-  },
-  "servers.busy.syncing-content": {
-    "message": "È in corso la sincronizzazione dei contenuti"
-  },
   "servers.notice.actions": {
     "message": "Azioni"
   },
@@ -3209,6 +3368,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Addebiti precedenti"
+  },
   "settings.billing.expires": {
     "message": "Scade: {date}"
   },
@@ -3217,6 +3379,12 @@
   },
   "settings.billing.interval.monthly": {
     "message": "mensile"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "trimestre"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "trimestrale"
   },
   "settings.billing.interval.year": {
     "message": "anno"
@@ -3333,7 +3501,7 @@
     "message": "Errore nel riabbonamento"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Se il server è in sospensione, un nuovo tentativo di addebito potrebbe richiedere fino a 10 minuti."
+    "message": "Se il server è attualmente disattivato, potrebbero volerci 10-15 minuti per configurarlo."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Richiesta di riabbonamento inviata"
@@ -3597,10 +3765,10 @@
     "message": "Visualizzazione"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Novità da Modrinth"
+    "message": "Ultime notizie da Modrinth"
   },
   "ui.latest-news-row.view-all": {
-    "message": "Leggi tutte le novità"
+    "message": "Leggi tutte le notizie"
   },
   "ui.newsletter-button.subscribe": {
     "message": "Iscriviti"

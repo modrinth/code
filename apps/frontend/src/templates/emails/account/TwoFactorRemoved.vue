@@ -13,7 +13,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			You've disabled two-factor authentication security on your account.
 		</Heading>
 
-		<Text class="text-muted text-base">Hi {user.name},</Text>
+		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
 			At your request, we've removed two-factor authentication from your Modrinth account.
 		</Text>

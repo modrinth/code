@@ -6,13 +6,13 @@
     "message": "无法连接到身份验证服务器"
   },
   "app.browse.add-server-to-instance": {
-    "message": "将服务器添加到实例"
+    "message": "将服务器添加到实例实例"
   },
   "app.browse.add-servers-to-instance": {
     "message": "将服务器添加到你的实例"
   },
   "app.browse.add-to-instance": {
-    "message": "添加到实例"
+    "message": "添加到实例实例"
   },
   "app.browse.add-to-instance-name": {
     "message": "添加到 {instanceName}"
@@ -21,7 +21,7 @@
     "message": "已添加"
   },
   "app.browse.already-added": {
-    "message": "已添加过"
+    "message": "已添加"
   },
   "app.browse.discover-content": {
     "message": "发现内容"
@@ -33,7 +33,7 @@
     "message": "隐藏已添加的服务器"
   },
   "app.browse.hide-installed-content": {
-    "message": "隐藏已安装的实例"
+    "message": "隐藏已安装的内容"
   },
   "app.browse.install-content-to-instance": {
     "message": "将内容安装到实例中"
@@ -90,13 +90,13 @@
     "message": "项目"
   },
   "app.instance.mods.project-was-added": {
-    "message": "已添加“{name}”"
+    "message": "已添加 “{name}”"
   },
   "app.instance.mods.projects-were-added": {
     "message": "已添加 {count} 个项目"
   },
   "app.instance.mods.share-text": {
-    "message": "查看在我整合包中使用的项目！"
+    "message": "查看我在整合包中使用的项目！"
   },
   "app.instance.mods.share-title": {
     "message": "分享整合包内容"
@@ -117,7 +117,7 @@
     "message": "你确定要永久删除这个世界吗？"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "修改版"
+    "message": "模组适配"
   },
   "app.instance.worlds.filter-offline": {
     "message": "离线"
@@ -129,7 +129,7 @@
     "message": "原版"
   },
   "app.instance.worlds.no-worlds-description": {
-    "message": "添加一个服务器或点击浏览来开始"
+    "message": "通过添加一个服务器或点击浏览以开始"
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "未添加服务器或世界"
@@ -150,7 +150,7 @@
     "message": "此服务器"
   },
   "app.modal.install-to-play.content-required": {
-    "message": "内容需求"
+    "message": "需求内容"
   },
   "app.modal.install-to-play.header": {
     "message": "安装以游玩"
@@ -162,7 +162,7 @@
     "message": "{count} 个模组"
   },
   "app.modal.install-to-play.required-modpack": {
-    "message": "整合包需求"
+    "message": "需求整合包"
   },
   "app.modal.install-to-play.server-requires-mods": {
     "message": "此服务器需要安装模组才能游玩。点击安装，从 Modrinth 下载所需文件，然后直接进入服务器。"
@@ -441,7 +441,7 @@
     "message": "名称"
   },
   "instance.settings.tabs.hooks": {
-    "message": "启动Hooks"
+    "message": "启动 Hooks"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
     "message": "自定义启动Hooks"

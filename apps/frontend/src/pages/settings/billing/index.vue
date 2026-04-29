@@ -1,5 +1,6 @@
 <template>
 	<ServersUpgradeModalWrapper ref="upgradeModal" />
+	<ResubscribeModal ref="pyroResubscribeModal" @resubscribe="handlePyroResubscribeConfirm" />
 	<section class="universal-card experimental-styles-within">
 		<h2>{{ formatMessage(messages.subscriptionTitle) }}</h2>
 		<p>{{ formatMessage(messages.subscriptionDescription) }}</p>
@@ -279,11 +280,13 @@
 				<div class="flex flex-col justify-between gap-4">
 					<div class="flex flex-col gap-4">
 						<ModrinthServersIcon class="flex h-8 w-fit" />
-						<div class="flex flex-col gap-2">
+						<div class="flex flex-col gap-6">
 							<ServerListing
 								v-if="subscription.serverInfo"
 								v-bind="subscription.serverInfo"
 								:pending-change="getPendingChange(subscription)"
+								:cancellation-date="getCancellationDate(subscription)"
+								:on-download-backup="getBackupDownloadForServer(subscription.serverInfo)"
 							/>
 							<div v-else class="w-fit">
 								<p>
@@ -308,15 +311,16 @@
 									/>
 								</div>
 							</div>
-							<h3 class="m-0 mt-4 text-xl font-semibold leading-none text-contrast">
-								{{
-									formatMessage(messages.planTitle, {
-										size: getProductSize(getPyroProduct(subscription)),
-									})
-								}}
-							</h3>
+
 							<div class="flex flex-row justify-between">
-								<div class="mt-2 flex flex-col gap-2">
+								<div class="flex flex-col gap-2">
+									<h3 class="m-0 mb-1 text-xl font-semibold leading-none">
+										{{
+											formatMessage(messages.planTitle, {
+												size: getProductSize(getPyroProduct(subscription)),
+											})
+										}}
+									</h3>
 									<div class="flex items-center gap-2">
 										<CheckCircleIcon class="h-5 w-5 text-brand" />
 										<span>
@@ -367,8 +371,8 @@
 								</div>
 								<div class="flex flex-col items-end justify-between">
 									<div class="flex flex-col items-end gap-2">
-										<div class="flex text-2xl font-bold text-contrast">
-											<span class="text-contrast">
+										<h3 class="m-0 flex text-lg font-semibold text-contrast">
+											<span class="leading-none text-contrast">
 												{{
 													getProductPrice(getPyroProduct(subscription), subscription.interval)
 														? formatPrice(
@@ -380,14 +384,14 @@
 														: ''
 												}}
 											</span>
-											<span>
+											<span class="leading-none">
 												{{
 													formatMessage(messages.slashInterval, {
 														interval: getIntervalNounLabel(subscription.interval),
 													})
 												}}
 											</span>
-										</div>
+										</h3>
 										<div
 											v-if="
 												getPyroCharge(subscription) &&
@@ -514,15 +518,9 @@
 											"
 											color="green"
 										>
-											<button
-												@click="
-													resubscribePyro(
-														subscription.id,
-														$dayjs(getPyroCharge(subscription).due).isBefore($dayjs()),
-													)
-												"
-											>
-												{{ formatMessage(messages.resubscribe) }} <RightArrowIcon />
+											<button @click="openPyroResubscribeModal(subscription)">
+												{{ formatMessage(messages.resubscribe) }}
+												<RightArrowIcon />
 											</button>
 										</ButtonStyled>
 									</div>
@@ -709,21 +707,25 @@ import {
 	OverflowMenu,
 	paymentMethodMessages,
 	PurchaseModal,
+	ResubscribeModal,
 	ServerListing,
 	useFormatDateTime,
 	useFormatPrice,
+	useServerBackupDownload,
 	useVIntl,
 } from '@modrinth/ui'
 import { calculateSavings, getCurrency } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import { useIntervalFn } from '@vueuse/core'
+import { computed, ref, watch } from 'vue'
 
-import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
+import ModrinthServersIcon from '~/components/brand/ModrinthServersIcon.vue'
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import { products } from '~/generated/state.json'
 
 const { addNotification, handleError } = injectNotificationManager()
 const client = injectModrinthClient()
+const { getLatestBackupDownload } = useServerBackupDownload()
 definePageMeta({
 	middleware: 'auth',
 })
@@ -834,6 +836,14 @@ const messages = defineMessages({
 	intervalYear: {
 		id: 'settings.billing.interval.year',
 		defaultMessage: 'year',
+	},
+	intervalQuarter: {
+		id: 'settings.billing.interval.quarter',
+		defaultMessage: 'quarter',
+	},
+	intervalQuarterly: {
+		id: 'settings.billing.interval.quarterly.adjective',
+		defaultMessage: 'quarterly',
 	},
 	intervalMonthly: {
 		id: 'settings.billing.interval.monthly',
@@ -998,7 +1008,7 @@ const messages = defineMessages({
 	pyroResubscribeRequestSubmittedText: {
 		id: 'settings.billing.pyro.resubscribe.request-submitted.text',
 		defaultMessage:
-			'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+			'If the server is currently cancelled, it may take 10-15 minutes to set up the server.',
 	},
 	pyroResubscribeSuccessText: {
 		id: 'settings.billing.pyro.resubscribe.success.text',
@@ -1015,15 +1025,20 @@ const messages = defineMessages({
 })
 
 function getIntervalNounLabel(interval) {
+	console.log(interval)
 	return interval === 'yearly'
 		? formatMessage(messages.intervalYear)
-		: formatMessage(messages.intervalMonth)
+		: interval === 'quarterly'
+			? formatMessage(messages.intervalQuarter)
+			: formatMessage(messages.intervalMonth)
 }
 
 function getIntervalAdjectiveLabel(interval) {
 	return interval === 'yearly'
 		? formatMessage(messages.intervalYearly)
-		: formatMessage(messages.intervalMonthly)
+		: interval === 'quarterly'
+			? formatMessage(messages.intervalQuarterly)
+			: formatMessage(messages.intervalMonthly)
 }
 
 const queryClient = useQueryClient()
@@ -1051,6 +1066,11 @@ const { data: productsData } = useQuery({
 const { data: serversData } = useQuery({
 	queryKey: ['servers'],
 	queryFn: () => client.archon.servers_v0.list(),
+})
+
+const { data: serverFullList } = useQuery({
+	queryKey: ['servers', 'v1'],
+	queryFn: () => client.archon.servers_v1.list(),
 })
 
 const midasProduct = ref(products.find((x) => x.metadata?.type === 'midas'))
@@ -1082,16 +1102,38 @@ const pyroSubscriptions = computed(() => {
 	const pyroSubs = subscriptions.value?.filter((s) => s?.metadata?.type === 'pyro') || []
 	const servers = serversData.value?.servers || []
 
-	return pyroSubs.map((subscription) => {
-		const server = servers.find((s) => s.server_id === subscription.metadata.id)
-		return {
-			...subscription,
-			serverInfo: server,
-		}
-	})
+	return pyroSubs
+		.map((subscription) => {
+			const server = servers.find((s) => s.server_id === subscription.metadata.id)
+			const charge = getPyroCharge(subscription)
+
+			return {
+				...subscription,
+				serverInfo: {
+					...server,
+					isProvisioning:
+						subscription.status === 'unprovisioned' &&
+						(charge?.status === 'processing' || charge?.status === 'open'),
+				},
+			}
+		})
+		.filter((subscription) => {
+			// files expire 30 days after cancellation
+			const cancellationDate = getCancellationDate(subscription)
+			if (
+				!cancellationDate ||
+				subscription.serverInfo?.status !== 'suspended' ||
+				subscription.serverInfo?.suspension_reason !== 'cancelled'
+			)
+				return true
+			const cancellation = new Date(cancellationDate)
+			const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
+			return new Date() <= thirtyDaysLater
+		})
 })
 
 const midasPurchaseModal = ref()
+const pyroResubscribeModal = ref()
 const country = useUserCountry()
 const price = computed(() =>
 	midasProduct.value?.prices?.find((x) => x.currency_code === getCurrency(country.value)),
@@ -1201,11 +1243,18 @@ const getProductFromPriceId = (priceId) => {
 	return productsData.value.find((p) => p.prices?.some((x) => x.id === priceId))
 }
 
-const getPyroCharge = (subscription) => {
+function getPyroCharge(subscription) {
 	if (!subscription || !charges.value) return null
 	return charges.value.find(
 		(charge) => charge.subscription_id === subscription.id && charge.status !== 'succeeded',
 	)
+}
+
+function getCancellationDate(subscription) {
+	const charge = getPyroCharge(subscription)
+	if (!charge) return null
+	if (charge.status === 'cancelled') return charge.due
+	return null
 }
 
 const getProductSize = (product) => {
@@ -1243,12 +1292,38 @@ const showPyroUpgradeModal = (subscription) => {
 	upgradeModal.value?.open(subscription?.metadata?.id)
 }
 
+const CHARGE_POLL_INTERVAL_MS = 20_000
+
+const hasProvisioningSubscription = computed(() =>
+	pyroSubscriptions.value?.some((s) => s.serverInfo?.isProvisioning),
+)
+
+const { pause: pauseChargePoll, resume: resumeChargePoll } = useIntervalFn(
+	() => {
+		queryClient.invalidateQueries({ queryKey: ['billing', 'payments'] })
+		queryClient.invalidateQueries({ queryKey: ['billing', 'subscriptions'] })
+	},
+	CHARGE_POLL_INTERVAL_MS,
+	{ immediate: false },
+)
+
+watch(
+	hasProvisioningSubscription,
+	(isProvisioning) => {
+		if (isProvisioning) {
+			resumeChargePoll()
+		} else {
+			pauseChargePoll()
+		}
+	},
+	{ immediate: true },
+)
+
 const resubscribePyro = async (subscriptionId, wasSuspended) => {
 	try {
 		await client.labrinth.billing_internal.editSubscription(subscriptionId, {
 			cancelled: false,
 		})
-		await refresh()
 		if (wasSuspended) {
 			addNotification({
 				title: formatMessage(messages.pyroResubscribeRequestSubmittedTitle),
@@ -1269,6 +1344,35 @@ const resubscribePyro = async (subscriptionId, wasSuspended) => {
 			type: 'error',
 		})
 	}
+}
+
+function openPyroResubscribeModal(subscription) {
+	const charge = getPyroCharge(subscription)
+	const product = getPyroProduct(subscription)
+	const interval = charge?.subscription_interval || subscription?.interval
+	const productPrice = getProductPrice(product, interval)
+
+	pyroResubscribeModal.value?.show({
+		subscriptionId: subscription?.id ?? '',
+		wasSuspended: charge?.due ? new Date(charge.due).getTime() < Date.now() : false,
+		serverName: subscription?.serverInfo?.name ?? 'this server',
+		planName: `${getProductSize(product)} plan`,
+		ramGb: product?.metadata?.ram ? product.metadata.ram / 1024 : undefined,
+		storageGb: product?.metadata?.storage ? product.metadata.storage / 1024 : undefined,
+		sharedCpus: product?.metadata?.cpu ? product.metadata.cpu / 2 : undefined,
+		priceCents: charge?.amount ?? productPrice?.prices?.intervals?.[interval],
+		currencyCode: charge?.currency_code ?? productPrice?.currency_code,
+		interval,
+		nextChargeDate: charge?.due,
+	})
+}
+
+function handlePyroResubscribeConfirm({ subscriptionId, wasSuspended }) {
+	return resubscribePyro(subscriptionId, wasSuspended)
+}
+
+function getBackupDownloadForServer(serverInfo) {
+	return getLatestBackupDownload(serverInfo.server_id, serverFullList.value)
 }
 
 const refresh = async () => {
