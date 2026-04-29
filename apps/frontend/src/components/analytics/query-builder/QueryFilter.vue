@@ -13,6 +13,8 @@
 			:fit-content="true"
 			:trigger-class="previewTriggerClass"
 			@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
+			@open="openPreviewFilterDraft(preview.key)"
+			@close="commitPreviewFilterDraft(preview.key)"
 		>
 			<template #input-content="{ isOpen }">
 				<div class="flex min-w-0 items-center gap-2">
@@ -52,7 +54,7 @@
 		<Teleport to="#teleports">
 			<Transition
 				enter-active-class="transition-opacity duration-150"
-				leave-active-class="transition-opacity duration-150"
+				leave-active-class="transition-none duration-0"
 				enter-from-class="opacity-0"
 				leave-to-class="opacity-0"
 			>
@@ -80,10 +82,10 @@
 						<span>{{ category.label }}</span>
 						<div class="flex items-center gap-1">
 							<span
-								v-if="getCategorySelectionCount(category.key) > 0"
+								v-if="getCategorySelectionCount(category.key, 'draft') > 0"
 								class="rounded-full bg-surface-5 px-1.5 py-0.5 text-xs text-primary"
 							>
-								{{ getCategorySelectionCount(category.key) }}
+								{{ getCategorySelectionCount(category.key, 'draft') }}
 							</span>
 							<ChevronRightIcon class="size-5 text-secondary" />
 						</div>
@@ -160,36 +162,41 @@ import type { ComponentPublicInstance, CSSProperties } from 'vue'
 
 import {
 	type AnalyticsQueryFilterCategory,
+	type AnalyticsSelectedFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
-const ALL_FILTER_VALUE = '__all__'
-const ADD_MENU_WIDTH = 250
-const DROPDOWN_GAP = 12
-const DROPDOWN_VIEWPORT_MARGIN = 8
-
-type FilterOption = {
-	value: string
-	label: string
-}
-
-type FilterCategory = {
-	key: AnalyticsQueryFilterCategory
-	label: string
-	allLabel: string
-	options: FilterOption[]
-}
-
-type Point = {
-	x: number
-	y: number
-}
+import {
+	ADD_MENU_WIDTH,
+	ALL_FILTER_VALUE,
+	type FilterCategory,
+	type FilterOption,
+	type FilterSelectionSource,
+	type Point,
+	areSelectedFiltersEqual,
+	areStringArraysEqual,
+	cloneSelectedFilters,
+	getAddMenuPosition,
+	getCategorySelectionCount as getCategorySelectionCountValue,
+	getCategorySelectionSummary as getCategorySelectionSummaryValue,
+	getOptionsWithSelectedValues,
+	getSubmenuPosition,
+	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
+	isFilterValueSelected as getIsFilterValueSelected,
+	normalizeSelectedValues as normalizeSelectedFilterValues,
+} from './queryFilter'
 
 const { projects, selectedProjectIds, selectedFilters } = injectAnalyticsDashboardContext()
+const projectIds = computed(() => projects.value.map((project) => project.id))
 
 const isAddMenuOpen = ref(false)
 const activeCategoryKey = ref<AnalyticsQueryFilterCategory | null>(null)
 const pendingCategoryKey = ref<AnalyticsQueryFilterCategory | null>(null)
+const draftSelectedProjectIds = ref<string[]>([])
+const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
+	cloneSelectedFilters(selectedFilters.value),
+)
+const previewSelectedValueDrafts = ref<Partial<Record<AnalyticsQueryFilterCategory, string[]>>>({})
 const lastMousePosition = ref<Point | null>(null)
 const isCursorInsideSubmenu = ref(false)
 const hasSubmenuPosition = ref(false)
@@ -206,7 +213,6 @@ const submenuPosition = ref<Point>({ x: 0, y: 0 })
 const categoryButtonRefs = new Map<AnalyticsQueryFilterCategory, HTMLElement>()
 let pendingCategoryTimeout: NodeJS.Timeout | null = null
 let previousMousePosition: Point | null = null
-let addMenuPositionRaf: number | null = null
 
 const filterCategories = computed<FilterCategory[]>(() => [
 	{
@@ -304,11 +310,74 @@ const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const previewTriggerClass =
 	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 hover:bg-surface-5 hover:brightness-100 active:brightness-100'
 
+function resetAddMenuDraft() {
+	draftSelectedProjectIds.value = [...selectedProjectIds.value]
+	draftSelectedFilters.value = cloneSelectedFilters(selectedFilters.value)
+}
+
+function commitAddMenuDraft() {
+	if (!areStringArraysEqual(selectedProjectIds.value, draftSelectedProjectIds.value)) {
+		selectedProjectIds.value = [...draftSelectedProjectIds.value]
+	}
+
+	if (!areSelectedFiltersEqual(selectedFilters.value, draftSelectedFilters.value)) {
+		selectedFilters.value = cloneSelectedFilters(draftSelectedFilters.value)
+	}
+}
+
+function getSelectedValues(
+	categoryKey: AnalyticsQueryFilterCategory,
+	source: FilterSelectionSource = 'committed',
+): string[] {
+	if (source === 'draft') {
+		return categoryKey === 'project'
+			? draftSelectedProjectIds.value
+			: draftSelectedFilters.value[categoryKey]
+	}
+
+	return categoryKey === 'project' ? selectedProjectIds.value : selectedFilters.value[categoryKey]
+}
+
+function setSelectedValues(
+	categoryKey: AnalyticsQueryFilterCategory,
+	values: string[],
+	source: FilterSelectionSource = 'committed',
+) {
+	const normalizedValues = normalizeSelectedFilterValues(categoryKey, values, projectIds.value)
+
+	if (categoryKey === 'project') {
+		if (source === 'draft') {
+			draftSelectedProjectIds.value = normalizedValues
+		} else if (!areStringArraysEqual(selectedProjectIds.value, normalizedValues)) {
+			selectedProjectIds.value = normalizedValues
+		}
+		return
+	}
+
+	const currentFilters = source === 'draft' ? draftSelectedFilters.value : selectedFilters.value
+	if (areStringArraysEqual(currentFilters[categoryKey], normalizedValues)) {
+		return
+	}
+
+	const nextFilters = {
+		...currentFilters,
+		[categoryKey]: normalizedValues,
+	}
+
+	if (source === 'draft') {
+		draftSelectedFilters.value = nextFilters
+	} else {
+		selectedFilters.value = nextFilters
+	}
+}
+
 function openAddMenu() {
 	if (isAddMenuOpen.value) {
 		return
 	}
 
+	commitPreviewFilterDrafts()
+	resetAddMenuDraft()
 	isAddMenuOpen.value = true
 }
 
@@ -317,6 +386,7 @@ function closeAddMenu() {
 		return
 	}
 
+	commitAddMenuDraft()
 	isAddMenuOpen.value = false
 }
 
@@ -375,33 +445,13 @@ function withSelectedOptions(
 	categoryKey: AnalyticsQueryFilterCategory,
 	options: FilterOption[],
 ): FilterOption[] {
-	const knownValues = new Set(options.map((option) => option.value))
-	const selectedValues =
-		categoryKey === 'project' ? selectedProjectIds.value : selectedFilters.value[categoryKey]
-	const missingSelectedOptions = selectedValues
-		.filter((value) => !knownValues.has(value))
-		.map((value) => ({
-			value,
-			label: value,
-		}))
-
-	return [...options, ...missingSelectedOptions]
+	const selectedValues = getSelectedValues(categoryKey, isAddMenuOpen.value ? 'draft' : 'committed')
+	return getOptionsWithSelectedValues(options, selectedValues)
 }
 
 function isFilterValueSelected(categoryKey: AnalyticsQueryFilterCategory, value: string): boolean {
-	if (categoryKey === 'project') {
-		if (value === ALL_FILTER_VALUE) {
-			return selectedProjectIds.value.length === projects.value.length
-		}
-
-		return selectedProjectIds.value.includes(value)
-	}
-
-	const values = selectedFilters.value[categoryKey]
-	if (value === ALL_FILTER_VALUE) {
-		return values.length === 0
-	}
-	return values.includes(value)
+	const selectedValues = getSelectedValues(categoryKey, 'draft')
+	return getIsFilterValueSelected(categoryKey, value, selectedValues, projects.value.length)
 }
 
 function toggleFilterValue(
@@ -409,43 +459,25 @@ function toggleFilterValue(
 	value: string,
 	nextValue: boolean,
 ) {
-	if (categoryKey === 'project') {
-		if (value === ALL_FILTER_VALUE) {
-			if (nextValue) {
-				selectedProjectIds.value = projects.value.map((project) => project.id)
-			}
-			return
-		}
-
-		if (nextValue) {
-			if (!selectedProjectIds.value.includes(value)) {
-				selectedProjectIds.value = [...selectedProjectIds.value, value]
-			}
-			return
-		}
-
-		selectedProjectIds.value = selectedProjectIds.value.filter((projectId) => projectId !== value)
-		if (selectedProjectIds.value.length === 0) {
-			selectedProjectIds.value = projects.value.map((project) => project.id)
-		}
-		return
-	}
-
-	const currentValues = selectedFilters.value[categoryKey]
+	const currentValues = getSelectedValues(categoryKey, 'draft')
 
 	if (value === ALL_FILTER_VALUE) {
 		if (nextValue) {
-			selectedFilters.value[categoryKey] = []
+			setSelectedValues(categoryKey, [ALL_FILTER_VALUE], 'draft')
 		}
 		return
 	}
 
 	if (nextValue) {
 		if (!currentValues.includes(value)) {
-			selectedFilters.value[categoryKey] = [...currentValues, value]
+			setSelectedValues(categoryKey, [...currentValues, value], 'draft')
 		}
 	} else {
-		selectedFilters.value[categoryKey] = currentValues.filter((item) => item !== value)
+		setSelectedValues(
+			categoryKey,
+			currentValues.filter((item) => item !== value),
+			'draft',
+		)
 	}
 }
 
@@ -453,82 +485,81 @@ function toggleFilterOption(categoryKey: AnalyticsQueryFilterCategory, value: st
 	toggleFilterValue(categoryKey, value, !isFilterValueSelected(categoryKey, value))
 }
 
-function getCategorySelectionCount(categoryKey: AnalyticsQueryFilterCategory): number {
-	if (categoryKey === 'project') {
-		return selectedProjectIds.value.length === projects.value.length
-			? 0
-			: selectedProjectIds.value.length
-	}
-
-	return selectedFilters.value[categoryKey].length
+function getCategorySelectionCount(
+	categoryKey: AnalyticsQueryFilterCategory,
+	source: FilterSelectionSource = 'committed',
+): number {
+	const selectedValues = getSelectedValues(categoryKey, source)
+	return getCategorySelectionCountValue(categoryKey, selectedValues, projects.value.length)
 }
 
 function getCategorySelectionSummary(category: FilterCategory): string {
 	const count = getCategorySelectionCount(category.key)
-	if (count === 0) {
-		return category.allLabel
-	}
-
-	if (count === 1) {
-		const selectedValue =
-			category.key === 'project'
-				? selectedProjectIds.value.find((projectId) =>
-						projects.value.some((project) => project.id === projectId),
-					)
-				: selectedFilters.value[category.key][0]
-		return category.options.find((option) => option.value === selectedValue)?.label ?? '1 selected'
-	}
-
-	return `${count} selected`
+	return getCategorySelectionSummaryValue(
+		category,
+		getSelectedValues(category.key),
+		count,
+		projectIds.value,
+	)
 }
 
 function clearFilterCategory(categoryKey: AnalyticsQueryFilterCategory) {
-	if (categoryKey === 'project') {
-		selectedProjectIds.value = projects.value.map((project) => project.id)
-		return
-	}
-
-	selectedFilters.value[categoryKey] = []
+	commitPreviewFilterDrafts()
+	setSelectedValues(categoryKey, [ALL_FILTER_VALUE])
 }
 
 function clearAllFilters() {
-	selectedProjectIds.value = projects.value.map((project) => project.id)
+	commitPreviewFilterDrafts()
+	setSelectedValues('project', [ALL_FILTER_VALUE])
 	for (const category of filterCategories.value) {
 		if (category.key !== 'project') {
-			selectedFilters.value[category.key] = []
+			setSelectedValues(category.key, [])
 		}
 	}
 }
 
 function getPreviewSelectedValues(categoryKey: AnalyticsQueryFilterCategory): string[] {
-	if (categoryKey === 'project') {
-		return selectedProjectIds.value
+	const draftValues = previewSelectedValueDrafts.value[categoryKey]
+	if (draftValues !== undefined) {
+		return draftValues
 	}
 
-	return selectedFilters.value[categoryKey]
+	return getSelectedValues(categoryKey)
 }
 
 function setPreviewSelectedValues(categoryKey: AnalyticsQueryFilterCategory, values: string[]) {
-	if (categoryKey === 'project') {
-		if (values.includes(ALL_FILTER_VALUE)) {
-			selectedProjectIds.value = projects.value.map((project) => project.id)
-			return
-		}
+	previewSelectedValueDrafts.value = {
+		...previewSelectedValueDrafts.value,
+		[categoryKey]: normalizeSelectedFilterValues(categoryKey, values, projectIds.value),
+	}
+}
 
-		const allProjectIds = new Set(projects.value.map((project) => project.id))
-		const selectedProjects = values.filter((value) => allProjectIds.has(value))
+function openPreviewFilterDraft(categoryKey: AnalyticsQueryFilterCategory) {
+	commitPreviewFilterDrafts()
+	previewSelectedValueDrafts.value = {
+		...previewSelectedValueDrafts.value,
+		[categoryKey]: [...getSelectedValues(categoryKey)],
+	}
+}
 
-		selectedProjectIds.value =
-			selectedProjects.length > 0 ? selectedProjects : projects.value.map((project) => project.id)
+function commitPreviewFilterDraft(categoryKey: AnalyticsQueryFilterCategory) {
+	const draftValues = previewSelectedValueDrafts.value[categoryKey]
+	if (draftValues === undefined) {
 		return
 	}
 
-	if (values.includes(ALL_FILTER_VALUE) || values.length === 0) {
-		selectedFilters.value[categoryKey] = []
-		return
-	}
+	const nextDrafts = { ...previewSelectedValueDrafts.value }
+	delete nextDrafts[categoryKey]
+	previewSelectedValueDrafts.value = nextDrafts
+	setSelectedValues(categoryKey, draftValues)
+}
 
-	selectedFilters.value[categoryKey] = values.filter((value) => value !== ALL_FILTER_VALUE)
+function commitPreviewFilterDrafts() {
+	for (const categoryKey of Object.keys(
+		previewSelectedValueDrafts.value,
+	) as AnalyticsQueryFilterCategory[]) {
+		commitPreviewFilterDraft(categoryKey)
+	}
 }
 
 function activateCategory(categoryKey: AnalyticsQueryFilterCategory) {
@@ -596,42 +627,7 @@ function handleMenuMouseMove(event: MouseEvent, source: 'menu' | 'submenu') {
 }
 
 function isCursorAimingAtSubmenu(cursor: Point | null, origin: Point | null): boolean {
-	if (!submenu.value || !cursor || !origin) {
-		return false
-	}
-
-	const submenuRect = submenu.value.getBoundingClientRect()
-	const submenuTargetX =
-		origin.x <= submenuRect.left
-			? submenuRect.left
-			: origin.x >= submenuRect.right
-				? submenuRect.right
-				: cursor.x <= submenuRect.left
-					? submenuRect.left
-					: submenuRect.right
-	const upperTarget: Point = {
-		x: submenuTargetX,
-		y: submenuRect.top + 20,
-	}
-	const lowerTarget: Point = {
-		x: submenuTargetX,
-		y: submenuRect.bottom + 20,
-	}
-
-	return isPointInTriangle(cursor, origin, upperTarget, lowerTarget)
-}
-
-function isPointInTriangle(point: Point, a: Point, b: Point, c: Point): boolean {
-	const area = triangleArea(a, b, c)
-	const area1 = triangleArea(point, b, c)
-	const area2 = triangleArea(a, point, c)
-	const area3 = triangleArea(a, b, point)
-
-	return Math.abs(area - (area1 + area2 + area3)) < 0.5
-}
-
-function triangleArea(a: Point, b: Point, c: Point): number {
-	return Math.abs((a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)) / 2)
+	return getIsCursorAimingAtSubmenu(cursor, origin, submenu.value?.getBoundingClientRect() ?? null)
 }
 
 function clearPendingCategoryTimeout() {
@@ -656,26 +652,12 @@ function updateAddMenuPosition(): boolean {
 	}
 
 	const dropdownRect = menuContainer.value.getBoundingClientRect()
-	const hasSpaceBelow =
-		triggerRect.bottom + dropdownRect.height + DROPDOWN_GAP + DROPDOWN_VIEWPORT_MARGIN <=
-		window.innerHeight
-	const hasSpaceAbove =
-		triggerRect.top - dropdownRect.height - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN > 0
-	const opensUp = !hasSpaceBelow && hasSpaceAbove
-	const top = opensUp
-		? triggerRect.top - dropdownRect.height - DROPDOWN_GAP
-		: triggerRect.bottom + DROPDOWN_GAP
-	const left = Math.min(
-		triggerRect.left,
-		window.innerWidth - dropdownWidth - DROPDOWN_VIEWPORT_MARGIN,
-	)
-
-	addMenuStyle.value = {
-		left: `${Math.max(DROPDOWN_VIEWPORT_MARGIN, left)}px`,
-		minWidth: `${triggerRect.width}px`,
-		top: `${Math.max(DROPDOWN_VIEWPORT_MARGIN, top)}px`,
-		width: `${dropdownWidth}px`,
-	}
+	addMenuStyle.value = getAddMenuPosition({
+		triggerRect,
+		dropdownRect,
+		viewportWidth: window.innerWidth,
+		viewportHeight: window.innerHeight,
+	})
 	return true
 }
 
@@ -689,7 +671,7 @@ function scheduleAddMenuPositionUpdate(retries = 8) {
 			return
 		}
 
-		window.requestAnimationFrame(() => scheduleAddMenuPositionUpdate(retries - 1))
+		setTimeout(() => scheduleAddMenuPositionUpdate(retries - 1), 0)
 	})
 }
 
@@ -711,22 +693,14 @@ function updateSubmenuPosition(): boolean {
 	const submenuRect = submenu.value?.getBoundingClientRect()
 	const submenuWidth = submenuRect?.width ?? 256
 	const submenuHeight = submenuRect?.height ?? 320
-	const gap = 20
-	const viewportPadding = 8
-	const preferredLeft = buttonRect.right + gap
-	const left =
-		preferredLeft + submenuWidth + viewportPadding <= window.innerWidth
-			? preferredLeft
-			: Math.max(viewportPadding, buttonRect.left - submenuWidth - gap)
-	const top = Math.min(
-		Math.max(viewportPadding, buttonRect.top),
-		Math.max(viewportPadding, window.innerHeight - submenuHeight - viewportPadding),
-	)
 
-	submenuPosition.value = {
-		x: left,
-		y: top,
-	}
+	submenuPosition.value = getSubmenuPosition({
+		buttonRect,
+		submenuWidth,
+		submenuHeight,
+		viewportWidth: window.innerWidth,
+		viewportHeight: window.innerHeight,
+	})
 	hasSubmenuPosition.value = true
 	return true
 }
@@ -741,7 +715,7 @@ function scheduleSubmenuPositionUpdate(retries = 8) {
 			return
 		}
 
-		window.requestAnimationFrame(() => scheduleSubmenuPositionUpdate(retries - 1))
+		setTimeout(() => scheduleSubmenuPositionUpdate(retries - 1), 0)
 	})
 }
 
@@ -763,27 +737,31 @@ function handleSubmenuMouseLeave() {
 	isCursorInsideSubmenu.value = false
 }
 
-function startAddMenuPositionTracking() {
-	if (typeof window === 'undefined' || addMenuPositionRaf !== null) {
+function updateMenuPositions() {
+	if (!isAddMenuOpen.value) {
 		return
 	}
 
-	function track() {
-		updateAddMenuPosition()
-		updateSubmenuPosition()
-		addMenuPositionRaf = window.requestAnimationFrame(track)
+	updateAddMenuPosition()
+	updateSubmenuPosition()
+}
+
+function startAddMenuPositionTracking() {
+	if (typeof window === 'undefined') {
+		return
 	}
 
-	addMenuPositionRaf = window.requestAnimationFrame(track)
+	window.addEventListener('resize', updateMenuPositions)
+	window.addEventListener('scroll', updateMenuPositions, true)
 }
 
 function stopAddMenuPositionTracking() {
-	if (typeof window === 'undefined' || addMenuPositionRaf === null) {
+	if (typeof window === 'undefined') {
 		return
 	}
 
-	window.cancelAnimationFrame(addMenuPositionRaf)
-	addMenuPositionRaf = null
+	window.removeEventListener('resize', updateMenuPositions)
+	window.removeEventListener('scroll', updateMenuPositions, true)
 }
 
 onClickOutside(
@@ -811,6 +789,10 @@ watch(isAddMenuOpen, (isOpen) => {
 onBeforeUnmount(() => {
 	clearPendingCategoryTimeout()
 	stopAddMenuPositionTracking()
+	if (isAddMenuOpen.value) {
+		commitAddMenuDraft()
+	}
+	commitPreviewFilterDrafts()
 })
 </script>
 
