@@ -1,5 +1,6 @@
-const CACHE_MAX_AGE = 60 * 10
-const GITHUB_RELEASES_URL = 'https://api.github.com/repos/modrinth/code/releases?per_page=100'
+const CACHE_MAX_AGE = 60 * 30
+const GITHUB_RELEASES_URL = 'https://api.github.com/repos/modrinth/code/releases'
+const PAGE_SIZE = 100
 
 interface GitHubRelease {
 	tag_name: string
@@ -16,23 +17,36 @@ export interface AppRelease {
 
 export default defineCachedEventHandler(
 	async (): Promise<AppRelease[]> => {
-		const response = await fetch(GITHUB_RELEASES_URL, {
-			headers: {
-				Accept: 'application/vnd.github+json',
-				'User-Agent': 'modrinth-changelog',
-			},
-		})
+		const releases: GitHubRelease[] = []
+		let page = 1
 
-		if (!response.ok) {
-			throw createError({
-				statusCode: 502,
-				message: `GitHub releases request failed with ${response.status}`,
+		while (true) {
+			const response = await fetch(`${GITHUB_RELEASES_URL}?per_page=${PAGE_SIZE}&page=${page}`, {
+				headers: {
+					Accept: 'application/vnd.github+json',
+					'User-Agent': 'modrinth-changelog',
+				},
 			})
-		}
 
-		const releases = (await response.json()) as GitHubRelease[]
-		if (!Array.isArray(releases)) {
-			throw createError({ statusCode: 502, message: 'Invalid GitHub releases response' })
+			if (!response.ok) {
+				throw createError({
+					statusCode: 502,
+					message: `GitHub releases request failed with ${response.status}`,
+				})
+			}
+
+			const pageReleases = (await response.json()) as GitHubRelease[]
+			if (!Array.isArray(pageReleases)) {
+				throw createError({ statusCode: 502, message: 'Invalid GitHub releases response' })
+			}
+
+			releases.push(...pageReleases)
+
+			if (pageReleases.length < PAGE_SIZE) {
+				break
+			}
+
+			page++
 		}
 
 		return releases
