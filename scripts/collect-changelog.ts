@@ -6,6 +6,8 @@ import * as path from 'path'
 type Product = 'web' | 'app' | 'hosting'
 
 const CHANGELOG_MARKER = '<!-- changelog -->'
+const BAKE_STATUS_MARKER = '<!-- changelog:bake-status -->'
+const LEGACY_BAKED_NOTICE = '> This changelog has been baked.'
 const SECTION_ORDER = ['added', 'changed', 'deprecated', 'removed', 'fixed', 'security'] as const
 const SECTION_HEADERS: Record<string, string> = {
 	added: '## Added',
@@ -20,6 +22,18 @@ const PRODUCT_SUMMARY_MAP: Record<string, Product> = {
 	App: 'app',
 	Website: 'web',
 	Hosting: 'hosting',
+}
+
+const PRODUCT_LABELS: Record<Product, string> = {
+	app: 'App',
+	web: 'Website',
+	hosting: 'Hosting',
+}
+
+const PRODUCT_BAKE_MARKERS: Record<Product, string> = {
+	app: '<!-- changelog:product:app -->',
+	web: '<!-- changelog:product:web -->',
+	hosting: '<!-- changelog:product:hosting -->',
 }
 
 const GITHUB_API = 'https://api.github.com'
@@ -42,10 +56,12 @@ interface CommentInfo {
 function parseArgs(argv: string[]): {
 	version?: string
 	dryRun: boolean
+	noBake: boolean
 	pr?: number
 } {
 	let version: string | undefined
 	let dryRun = false
+	let noBake = false
 	let pr: number | undefined
 
 	let i = 0
@@ -65,6 +81,9 @@ function parseArgs(argv: string[]): {
 		} else if (argv[i] === '--dry-run') {
 			dryRun = true
 			i++
+		} else if (argv[i] === '--no-bake') {
+			noBake = true
+			i++
 		} else if (argv[i] === '--pr') {
 			i++
 			if (i >= argv.length || argv[i].startsWith('--')) {
@@ -83,7 +102,7 @@ function parseArgs(argv: string[]): {
 		}
 	}
 
-	return { version, dryRun, pr }
+	return { version, dryRun, noBake, pr }
 }
 
 async function getParser() {
@@ -91,9 +110,97 @@ async function getParser() {
 	return mod.parser
 }
 
+function getBakedProducts(body: string): Set<Product> {
+	if (body.includes(LEGACY_BAKED_NOTICE)) {
+		return new Set<Product>(['app', 'web', 'hosting'])
+	}
+
+	const baked = new Set<Product>()
+	for (const line of body.split('\n')) {
+		const normalized = line.replace(/^>\s?/, '').trim()
+
+		for (const product of Object.keys(PRODUCT_BAKE_MARKERS) as Product[]) {
+			if (!normalized.includes(PRODUCT_BAKE_MARKERS[product])) continue
+
+			if (/^-\s+\[[xX]\]/.test(normalized)) {
+				baked.add(product)
+			}
+		}
+	}
+
+	return baked
+}
+
+function buildBakeStatusBlock(bakedProducts: Set<Product>): string {
+	return [
+		BAKE_STATUS_MARKER,
+		'> [!NOTE]',
+		'> Changelog bake status:',
+		...(['app', 'web', 'hosting'] as Product[]).map(
+			(product) =>
+				`> - [${bakedProducts.has(product) ? 'x' : ' '}] ${PRODUCT_LABELS[product]} ${PRODUCT_BAKE_MARKERS[product]}`,
+		),
+	].join('\n')
+}
+
+function stripLegacyBakeNotice(body: string): string {
+	return body.replace(
+		/^> \[!NOTE\]\n> This changelog has been baked\. Any further edits will not be reflected\.\n\n/,
+		'',
+	)
+}
+
+function setBakeStatusBlock(body: string, bakedProducts: Set<Product>): string {
+	const bodyWithoutLegacyNotice = stripLegacyBakeNotice(body)
+	const lines = bodyWithoutLegacyNotice.split('\n')
+	const block = buildBakeStatusBlock(bakedProducts)
+	const statusIndex = lines.findIndex((line) => line.includes(BAKE_STATUS_MARKER))
+
+	if (statusIndex !== -1) {
+		let endIndex = statusIndex + 1
+		const seenProducts = new Set<Product>()
+
+		while (endIndex < lines.length) {
+			for (const product of Object.keys(PRODUCT_BAKE_MARKERS) as Product[]) {
+				if (lines[endIndex].includes(PRODUCT_BAKE_MARKERS[product])) {
+					seenProducts.add(product)
+				}
+			}
+
+			endIndex++
+
+			if (seenProducts.size === Object.keys(PRODUCT_BAKE_MARKERS).length) {
+				if (lines[endIndex]?.trim() === '') {
+					endIndex++
+				}
+				break
+			}
+		}
+
+		lines.splice(statusIndex, endIndex - statusIndex, block, '')
+		return lines.join('\n')
+	}
+
+	const markerIndex = lines.findIndex((line) => line.includes(CHANGELOG_MARKER))
+	if (markerIndex === -1) {
+		return [block, '', bodyWithoutLegacyNotice].join('\n')
+	}
+
+	let insertIndex = markerIndex + 1
+	if (lines[insertIndex]?.startsWith('## Pull request changelog')) {
+		insertIndex++
+		if (lines[insertIndex]?.trim() === '') {
+			insertIndex++
+		}
+	}
+	lines.splice(insertIndex, 0, block, '')
+	return lines.join('\n')
+}
+
 function parseChangelogComment(body: string, parse: Function): ParsedChangelog | null {
 	if (!body.includes(CHANGELOG_MARKER)) return null
 
+	const bakedProducts = getBakedProducts(body)
 	const entries = new Map<Product, Map<string, string[]>>()
 
 	const detailsRegex = /<details>\s*<summary>(.*?)<\/summary>([\s\S]*?)<\/details>/g
@@ -102,6 +209,7 @@ function parseChangelogComment(body: string, parse: Function): ParsedChangelog |
 		const summaryLabel = match[1].trim()
 		const product = PRODUCT_SUMMARY_MAP[summaryLabel]
 		if (!product) continue
+		if (bakedProducts.has(product)) continue
 
 		const content = match[2].replace(/<!--[\s\S]*?-->/g, '').trim()
 		const firstSection = content.search(/^### /m)
@@ -242,9 +350,18 @@ async function fetchBotComment(token: string, prNumber: number): Promise<Comment
 	return { id: comment.id, body: comment.body }
 }
 
-async function markCommentBaked(token: string, commentId: number, currentBody: string): Promise<void> {
-	const admonition = '> [!NOTE]\n> This changelog has been baked. Any further edits will not be reflected.\n\n'
-	const newBody = admonition + currentBody
+async function markCommentProductsBaked(
+	token: string,
+	commentId: number,
+	currentBody: string,
+	products: Set<Product>,
+): Promise<void> {
+	const bakedProducts = getBakedProducts(currentBody)
+	for (const product of products) {
+		bakedProducts.add(product)
+	}
+
+	const newBody = setBakeStatusBlock(currentBody, bakedProducts)
 
 	await githubFetch(`/repos/${REPO}/issues/comments/${commentId}`, token, {
 		method: 'PATCH',
@@ -258,11 +375,11 @@ function getCurrentUTCISO(): string {
 
 function generateEntry(product: string, body: string, version?: string): string {
 	const dateStr = getCurrentUTCISO()
+	const dateLine = product === 'app' && version ? '' : `\t\tdate: \`${dateStr}\`,\n`
 	const versionLine = version ? `\n\t\tversion: '${version}',` : ''
 
 	return `\t{
-\t\tdate: \`${dateStr}\`,
-\t\tproduct: '${product}',${versionLine}
+${dateLine}\t\tproduct: '${product}',${versionLine}
 \t\tbody: \`${body}\`,
 \t},`
 }
@@ -270,7 +387,7 @@ function generateEntry(product: string, body: string, version?: string): string 
 function insertIntoChangelog(changelogPath: string, entryString: string): void {
 	const content = fs.readFileSync(changelogPath, 'utf-8')
 
-	const marker = 'const VERSIONS: VersionEntry[] = ['
+	const marker = 'const VERSIONS: ChangelogEntry[] = (['
 	const markerIndex = content.indexOf(marker)
 
 	if (markerIndex === -1) {
@@ -301,6 +418,7 @@ async function main() {
 	const parse = await getParser()
 	const rootDir = path.resolve(__dirname, '..')
 	const changelogPath = path.join(rootDir, 'packages', 'blog', 'changelog.ts')
+	const targetProducts = new Set<Product>(args.version ? ['app', 'web', 'hosting'] : ['web', 'hosting'])
 
 	let prs: PRInfo[]
 
@@ -321,7 +439,8 @@ async function main() {
 	}
 
 	const allEntries = new Map<Product, { sections: Map<string, string[]>; prNumber: number }[]>()
-	const processedComments: { commentId: number; body: string }[] = []
+	const processedComments = new Map<number, { body: string; products: Set<Product> }>()
+	const unreleasedAppPRs: number[] = []
 
 	for (const pr of prs) {
 		const comment = await fetchBotComment(token, pr.number)
@@ -331,7 +450,7 @@ async function main() {
 		}
 
 		if (comment.body.includes('> This changelog has been baked.')) {
-			console.log(chalk.gray(`PR #${pr.number}: already baked, skipping`))
+			console.log(chalk.gray(`PR #${pr.number}: all changelog products already baked, skipping`))
 			continue
 		}
 
@@ -346,24 +465,38 @@ async function main() {
 		console.log(chalk.cyan(`PR #${pr.number}: ${products.join(', ')} — ${types.join(', ')}`))
 
 		for (const [product, sections] of parsed.entries) {
+			if (!targetProducts.has(product)) {
+				if (product === 'app') {
+					unreleasedAppPRs.push(pr.number)
+				}
+				continue
+			}
+
 			if (!allEntries.has(product)) {
 				allEntries.set(product, [])
 			}
 			allEntries.get(product)!.push({ sections, prNumber: pr.number })
-		}
 
-		processedComments.push({ commentId: comment.id, body: comment.body })
+			const processedComment = processedComments.get(comment.id) ?? {
+				body: comment.body,
+				products: new Set<Product>(),
+			}
+			processedComment.products.add(product)
+			processedComments.set(comment.id, processedComment)
+		}
+	}
+
+	if (unreleasedAppPRs.length > 0) {
+		console.log(
+			chalk.yellow(
+				`Unbaked App changelog entries found in PR(s) ${unreleasedAppPRs.join(', ')}. Run with --version to include them in an App release.`,
+			),
+		)
 	}
 
 	if (allEntries.size === 0) {
 		console.log(chalk.yellow('No changelog entries found in merged PRs'))
 		return
-	}
-
-	const hasApp = allEntries.has('app')
-	if (hasApp && !args.version) {
-		console.error(chalk.red('--version is required when app changelog entries exist'))
-		process.exit(1)
 	}
 
 	const products = [...allEntries.keys()].reverse()
@@ -385,10 +518,14 @@ async function main() {
 	}
 
 	if (!args.dryRun) {
-		for (const { commentId, body } of processedComments) {
-			await markCommentBaked(token, commentId, body)
+		if (args.noBake) {
+			console.log(chalk.yellow('Skipping PR comment bake status updates because --no-bake was passed'))
+		} else {
+			for (const [commentId, { body, products }] of processedComments) {
+				await markCommentProductsBaked(token, commentId, body, products)
+			}
+			console.log(chalk.gray(`Marked ${processedComments.size} comment(s) as baked`))
 		}
-		console.log(chalk.gray(`Marked ${processedComments.length} comment(s) as baked`))
 	}
 
 	console.log()

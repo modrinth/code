@@ -2,14 +2,22 @@ import dayjs from 'dayjs'
 
 export type Product = 'web' | 'hosting' | 'app'
 
-export type VersionEntry = {
-	date: dayjs.Dayjs
+export type ChangelogEntry = {
+	date?: dayjs.Dayjs
 	product: Product
 	version?: string
 	body: string
 }
 
-const VERSIONS: VersionEntry[] = [
+export type VersionEntry = ChangelogEntry & {
+	date: dayjs.Dayjs
+}
+
+type RawChangelogEntry = Omit<ChangelogEntry, 'date'> & {
+	date?: string
+}
+
+const VERSIONS: ChangelogEntry[] = ([
 	{
 		date: `2026-04-29T17:19:44+00:00`,
 		product: 'app',
@@ -2038,7 +2046,9 @@ Contributed by [IMB11](https://github.com/modrinth/code/pull/1301).`,
 ### Known Issues
 - Backups may occasionally take longer than expected or become stuck. If a backup is unresponsive, please submit a support inquiry, and we'll investigate further.`,
 	},
-].map((x) => ({ ...x, date: dayjs(x.date) }) as VersionEntry)
+] satisfies RawChangelogEntry[]).map(
+	(x) => ({ ...x, date: x.date ? dayjs(x.date) : undefined }) as ChangelogEntry,
+)
 
 export function getChangelog() {
 	return VERSIONS

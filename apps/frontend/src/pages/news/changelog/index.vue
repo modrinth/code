@@ -1,12 +1,22 @@
 <script setup lang="ts">
-import { getChangelog, type Product } from '@modrinth/blog'
+import type { Product } from '@modrinth/blog'
 import { ChangelogEntry, NavTabs } from '@modrinth/ui'
 import Timeline from '@modrinth/ui/src/components/base/Timeline.vue'
+import { useQuery } from '@tanstack/vue-query'
+
+import { resolveChangelogEntries, type AppRelease } from '~/helpers/changelog'
 
 const route = useRoute()
 
 const filter = ref<Product | undefined>(undefined)
-const allChangelogEntries = ref(getChangelog())
+const { data: appReleases, suspense: appReleasesSuspense } = useQuery({
+	queryKey: ['changelog', 'app-releases'],
+	queryFn: () => $fetch<AppRelease[]>('/api/changelog/app-releases'),
+})
+
+onServerPrefetch(async () => {
+	await appReleasesSuspense().catch(() => {})
+})
 
 function updateFilter() {
 	if (route.query.filter) {
@@ -24,7 +34,9 @@ watch(
 )
 
 const changelogEntries = computed(() =>
-	allChangelogEntries.value.filter((x) => !filter.value || x.product === filter.value),
+	resolveChangelogEntries(appReleases.value ?? []).filter(
+		(entry) => !filter.value || entry.product === filter.value,
+	),
 )
 </script>
 
@@ -54,7 +66,7 @@ const changelogEntries = computed(() =>
 	<Timeline fade-out-end>
 		<ChangelogEntry
 			v-for="(entry, index) in changelogEntries"
-			:key="entry.date"
+			:key="`${entry.product}-${entry.version ?? entry.date.unix()}`"
 			:entry="entry"
 			:first="index === 0"
 			:show-type="filter === undefined"

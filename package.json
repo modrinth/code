@@ -26,6 +26,8 @@
 		"icons:add": "pnpm --filter @modrinth/assets icons:add",
 		"changelog:collect": "node scripts/run.mjs collect-changelog",
 		"changelog:combine-for-app": "node scripts/run.mjs build-theseus-release-notes",
+		"release:prepare": "node scripts/run.mjs release-prepare",
+		"release:push": "node scripts/run.mjs release-push",
 		"scripts": "node scripts/run.mjs"
 	},
 	"devDependencies": {
