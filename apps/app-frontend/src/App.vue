@@ -63,7 +63,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { $fetch } from 'ofetch'
-import { computed, onMounted, onUnmounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
@@ -173,6 +173,7 @@ provideModalBehavior({
 
 const {
 	installationModal,
+	unknownPackWarningModal,
 	fetchExistingInstanceNames,
 	handleCreate,
 	handleBrowseModpacks,
@@ -573,7 +574,6 @@ const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
 const updateToPlayModal = ref()
-const unknownPackWarningModal = useTemplateRef('unknownPackWarningModal')
 
 const credentials = ref()
 

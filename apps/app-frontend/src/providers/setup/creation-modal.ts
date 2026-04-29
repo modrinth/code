@@ -198,6 +198,7 @@ export function setupCreationModal(
 
 	return {
 		installationModal,
+		unknownPackWarningModal,
 		fetchExistingInstanceNames,
 		handleCreate,
 		handleBrowseModpacks,
