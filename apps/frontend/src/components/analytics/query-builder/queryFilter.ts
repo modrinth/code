@@ -11,7 +11,7 @@ export const FILTER_VALUE_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'pro
 	'country',
 	'monetization',
 	'download_source',
-	'download_type',
+	'version_id',
 	'game_version',
 	'loader_type',
 ]
@@ -56,7 +56,7 @@ export function cloneSelectedFilters(filters: AnalyticsSelectedFilters): Analyti
 		country: [...filters.country],
 		monetization: [...filters.monetization],
 		download_source: [...filters.download_source],
-		download_type: [...filters.download_type],
+		version_id: [...filters.version_id],
 		game_version: [...filters.game_version],
 		loader_type: [...filters.loader_type],
 	}

@@ -48,7 +48,7 @@ const ANALYTICS_RELEVANT_STATS_BY_BREAKDOWN: Record<
 	country: ['views', 'downloads'],
 	monetization: ['views'],
 	download_source: ['downloads'],
-	download_type: ['downloads', 'playtime'],
+	version_id: ['downloads', 'playtime'],
 	loader: ['playtime'],
 	game_version: ['playtime'],
 }

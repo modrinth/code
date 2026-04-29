@@ -238,15 +238,12 @@ const filterCategories = computed<FilterCategory[]>(() => [
 		]),
 	},
 	{
-		key: 'download_type',
-		label: 'Download Type',
-		allLabel: 'All download types',
-		options: [
-			{ value: ALL_FILTER_VALUE, label: 'All download types' },
-			{ value: 'modpack', label: 'Modpack' },
-			{ value: 'standalone', label: 'Standalone' },
-			{ value: 'dependency', label: 'Dependency' },
-		],
+		key: 'version_id',
+		label: 'Project version',
+		allLabel: 'All project versions',
+		options: withSelectedOptions('version_id', [
+			{ value: ALL_FILTER_VALUE, label: 'All project versions' },
+		]),
 	},
 	{
 		key: 'game_version',

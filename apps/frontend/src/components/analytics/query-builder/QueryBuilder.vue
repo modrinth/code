@@ -194,7 +194,9 @@ function handleProjectSelectOpen() {
 	draftSelectedProjectIds.value = [...selectedProjectIds.value]
 }
 
-function handleProjectSelectClose(nextSelectedProjectIds: string[] = draftSelectedProjectIds.value) {
+function handleProjectSelectClose(
+	nextSelectedProjectIds: string[] = draftSelectedProjectIds.value,
+) {
 	isProjectSelectOpen.value = false
 	const nextProjectIds = normalizeProjectSelection(nextSelectedProjectIds)
 
@@ -240,7 +242,7 @@ const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
 	{ value: 'country', label: 'Country' },
 	{ value: 'monetization', label: 'Monetization' },
 	{ value: 'download_source', label: 'Download source' },
-	{ value: 'download_type', label: 'Download type' },
+	{ value: 'version_id', label: 'Project versions' },
 	{ value: 'loader', label: 'Loader' },
 	{ value: 'game_version', label: 'Game version' },
 ]
@@ -432,7 +434,7 @@ function withBreakdownFields(
 			views.push('domain')
 			downloads.push('domain')
 			break
-		case 'download_type':
+		case 'version_id':
 			downloads.push('version_id')
 			playtime.push('version_id')
 			break
@@ -460,7 +462,7 @@ function withBreakdownFields(
 		downloads.push('domain')
 	}
 
-	if (filters.download_type.length > 0) {
+	if (filters.version_id.length > 0) {
 		downloads.push('version_id')
 		playtime.push('version_id')
 	}
