@@ -1,4 +1,103 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Downloading Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Downloads"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Hide more running instances"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Make primary instance"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "No instances running"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Primary instance"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Show more running instances"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Stop instance"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "View active downloads"
+  },
+  "app.action-bar.view-instance": {
+    "message": "View instance"
+  },
+  "app.action-bar.view-logs": {
+    "message": "View logs"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Advanced rendering"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Select your preferred color theme for Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Color theme"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Change the page to which the launcher opens on."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Home"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Library"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Default landing page"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Disables the nametag above your player on the skins page."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Hide nametag"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Includes recent worlds in the \"Jump back in\" section on the Home page."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Jump back into worlds"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimize the launcher when a Minecraft process starts."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimize launcher"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Use system window frame (app restart required)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Native decorations"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Select an option"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Enables the ability to toggle the sidebar."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Toggle sidebar"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "If you attempt to install a Modrinth Pack file (.mrpack) that isn't hosted on Modrinth, we'll make sure you understand the risks before installing it."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Warn me before installing unknown modpacks"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft authentication servers may be down right now. Check your internet connection and try again later."
   },
@@ -49,6 +148,12 @@
   },
   "app.browse.server.installing": {
     "message": "Installing"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Installing modpack..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Enter modpack description..."
@@ -610,5 +715,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "A file is only reviewed if it’s uploaded to Modrinth, regardless of its file format (including .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Don't show this warning again"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Confirm installation"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Install anyway"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Malware is often distributed through modpack files by sharing them on platforms like Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "We couldn't find this file on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Unknown file warning"
   }
 }

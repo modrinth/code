@@ -6,11 +6,22 @@ export interface PopupNotificationButton {
 	color?: 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'standard'
 }
 
+export interface PopupNotificationProgressItem {
+	id: string
+	title: string
+	text?: string
+	progress: number
+	waiting: boolean
+}
+
 export interface PopupNotification {
 	id: string | number
 	title: string
 	text?: string
-	type?: 'error' | 'warning' | 'success' | 'info'
+	type?: 'error' | 'warning' | 'success' | 'info' | 'download'
+	progress?: number
+	waiting?: boolean
+	progressItems?: PopupNotificationProgressItem[]
 	buttons?: PopupNotificationButton[]
 	autoCloseMs?: number | null
 	timer?: NodeJS.Timeout
