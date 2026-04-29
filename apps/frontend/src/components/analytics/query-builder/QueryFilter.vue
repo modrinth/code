@@ -36,29 +36,34 @@
 			</template>
 		</MultiSelect>
 
-		<Menu
-			v-model:shown="isAddMenuOpen"
-			:triggers="['click']"
-			:delay="0"
-			:auto-hide="false"
-			:popper-triggers="[]"
-			no-auto-focus
-			placement="bottom-start"
-			@hide="resetPendingCategory"
+		<button
+			ref="addMenuTrigger"
+			type="button"
+			class="inline-flex h-10 items-center gap-2 rounded-xl border border-dashed border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-4"
+			:aria-expanded="isAddMenuOpen"
+			aria-haspopup="menu"
+			@click="handleAddMenuTriggerClick"
+			@keydown="handleAddMenuTriggerKeydown"
 		>
-			<button
-				ref="addMenuTrigger"
-				type="button"
-				class="inline-flex h-10 items-center gap-2 rounded-xl border border-dashed border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-4"
-			>
-				<PlusIcon class="size-5" />
-				Add
-			</button>
+			<PlusIcon class="size-5" />
+			Add
+		</button>
 
-			<template #popper>
+		<Teleport to="#teleports">
+			<Transition
+				enter-active-class="transition-opacity duration-150"
+				leave-active-class="transition-opacity duration-150"
+				enter-from-class="opacity-0"
+				leave-to-class="opacity-0"
+			>
 				<div
+					v-if="isAddMenuOpen"
 					ref="menuContainer"
-					class="flex w-[12rem] flex-col gap-1"
+					class="fixed z-[9999] flex flex-col gap-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 p-3 shadow-2xl"
+					:style="addMenuStyle"
+					role="menu"
+					@mousedown.stop
+					@keydown="handleAddMenuKeydown"
 					@mousemove="(event) => handleMenuMouseMove(event, 'menu')"
 				>
 					<button
@@ -66,8 +71,9 @@
 						:key="category.key"
 						:ref="(element) => setCategoryButtonRef(category.key, element)"
 						type="button"
-						class="flex w-full appearance-none items-center justify-between rounded-lg border-0 px-2 py-1.5 text-left text-base font-medium text-primary shadow-none transition-colors hover:bg-surface-4"
-						:class="category.key === activeCategoryKey ? 'bg-surface-4' : 'bg-transparent'"
+						class="flex w-full appearance-none items-center justify-between gap-1 rounded-xl border-0 p-3 text-left text-base font-medium text-primary shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
+						:class="category.key === activeCategoryKey ? 'bg-surface-5' : ''"
+						role="menuitem"
 						@mouseenter="handleCategoryMouseEnter(category.key)"
 						@focus="activateCategory(category.key)"
 					>
@@ -83,29 +89,54 @@
 						</div>
 					</button>
 				</div>
-			</template>
-		</Menu>
+			</Transition>
+		</Teleport>
 
-		<Teleport to="body">
+		<Teleport to="#teleports">
 			<div
 				v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 				ref="submenu"
-				class="fixed z-[10000] min-w-[16rem] rounded-xl border border-solid border-surface-5 bg-surface-3 p-3 shadow-xl"
+				class="fixed z-[10000] min-w-[16rem] rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
 				:style="submenuStyle"
 				@mouseenter="handleSubmenuMouseEnter"
 				@mouseleave="handleSubmenuMouseLeave"
 				@mousemove="(event) => handleMenuMouseMove(event, 'submenu')"
 			>
-				<div class="flex max-h-[min(70vh,32rem)] flex-col gap-2 overflow-y-auto pr-1">
-					<Checkbox
+				<div class="flex max-h-[min(70vh,32rem)] flex-col gap-2 overflow-y-auto p-3">
+					<button
 						v-for="option in activeCategory.options"
 						:key="`${activeCategory.key}-${option.value}`"
-						:model-value="isFilterValueSelected(activeCategory.key, option.value)"
-						:label="option.label"
-						@update:model-value="
-							(nextValue) => toggleFilterValue(activeCategory.key, option.value, nextValue)
-						"
-					/>
+						type="button"
+						class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
+						:aria-checked="isFilterValueSelected(activeCategory.key, option.value)"
+						role="checkbox"
+						@click="toggleFilterOption(activeCategory.key, option.value)"
+					>
+						<span
+							class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
+							:class="
+								isFilterValueSelected(activeCategory.key, option.value)
+									? 'border-button-border bg-brand text-brand-inverted'
+									: 'border-surface-5 bg-surface-2'
+							"
+						>
+							<CheckIcon
+								v-if="isFilterValueSelected(activeCategory.key, option.value)"
+								aria-hidden="true"
+								stroke-width="3"
+							/>
+						</span>
+						<span
+							class="font-semibold leading-tight"
+							:class="
+								isFilterValueSelected(activeCategory.key, option.value)
+									? 'text-contrast'
+									: 'text-primary'
+							"
+						>
+							{{ option.label }}
+						</span>
+					</button>
 				</div>
 			</div>
 		</Teleport>
@@ -122,9 +153,9 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, ChevronRightIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import { Checkbox, MultiSelect, type MultiSelectOption } from '@modrinth/ui'
-import { Menu } from 'floating-vue'
+import { CheckIcon, ChevronDownIcon, ChevronRightIcon, PlusIcon, XIcon } from '@modrinth/assets'
+import { MultiSelect, type MultiSelectOption } from '@modrinth/ui'
+import { onClickOutside } from '@vueuse/core'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 
 import {
@@ -133,6 +164,9 @@ import {
 } from '~/providers/analytics/analytics'
 
 const ALL_FILTER_VALUE = '__all__'
+const ADD_MENU_WIDTH = 250
+const DROPDOWN_GAP = 12
+const DROPDOWN_VIEWPORT_MARGIN = 8
 
 type FilterOption = {
 	value: string
@@ -162,10 +196,17 @@ const hasSubmenuPosition = ref(false)
 const addMenuTrigger = ref<HTMLElement | null>(null)
 const menuContainer = ref<HTMLElement | null>(null)
 const submenu = ref<HTMLElement | null>(null)
+const addMenuStyle = ref<CSSProperties>({
+	left: '0px',
+	minWidth: '0px',
+	top: '0px',
+	width: `${ADD_MENU_WIDTH}px`,
+})
 const submenuPosition = ref<Point>({ x: 0, y: 0 })
 const categoryButtonRefs = new Map<AnalyticsQueryFilterCategory, HTMLElement>()
 let pendingCategoryTimeout: NodeJS.Timeout | null = null
 let previousMousePosition: Point | null = null
+let addMenuPositionRaf: number | null = null
 
 const filterCategories = computed<FilterCategory[]>(() => [
 	{
@@ -263,6 +304,59 @@ const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const previewTriggerClass =
 	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 hover:bg-surface-5 hover:brightness-100 active:brightness-100'
 
+function openAddMenu() {
+	if (isAddMenuOpen.value) {
+		return
+	}
+
+	isAddMenuOpen.value = true
+}
+
+function closeAddMenu() {
+	if (!isAddMenuOpen.value) {
+		return
+	}
+
+	isAddMenuOpen.value = false
+}
+
+function handleAddMenuTriggerClick(event: MouseEvent) {
+	if (event.detail === 0) {
+		return
+	}
+
+	if (isAddMenuOpen.value) {
+		closeAddMenu()
+	} else {
+		openAddMenu()
+	}
+}
+
+function handleAddMenuTriggerKeydown(event: KeyboardEvent) {
+	switch (event.key) {
+		case 'Enter':
+		case ' ':
+		case 'ArrowDown':
+			event.preventDefault()
+			openAddMenu()
+			break
+		case 'Escape':
+			event.preventDefault()
+			closeAddMenu()
+			break
+	}
+}
+
+function handleAddMenuKeydown(event: KeyboardEvent) {
+	if (event.key !== 'Escape') {
+		return
+	}
+
+	event.preventDefault()
+	closeAddMenu()
+	nextTick(() => addMenuTrigger.value?.focus())
+}
+
 function setCategoryButtonRef(
 	categoryKey: AnalyticsQueryFilterCategory,
 	element: Element | ComponentPublicInstance | null,
@@ -353,6 +447,10 @@ function toggleFilterValue(
 	} else {
 		selectedFilters.value[categoryKey] = currentValues.filter((item) => item !== value)
 	}
+}
+
+function toggleFilterOption(categoryKey: AnalyticsQueryFilterCategory, value: string) {
+	toggleFilterValue(categoryKey, value, !isFilterValueSelected(categoryKey, value))
 }
 
 function getCategorySelectionCount(categoryKey: AnalyticsQueryFilterCategory): number {
@@ -543,6 +641,58 @@ function clearPendingCategoryTimeout() {
 	}
 }
 
+function updateAddMenuPosition(): boolean {
+	if (typeof window === 'undefined' || !addMenuTrigger.value || !menuContainer.value) {
+		return false
+	}
+
+	const triggerRect = addMenuTrigger.value.getBoundingClientRect()
+	const dropdownWidth = Math.max(ADD_MENU_WIDTH, triggerRect.width)
+
+	addMenuStyle.value = {
+		...addMenuStyle.value,
+		minWidth: `${triggerRect.width}px`,
+		width: `${dropdownWidth}px`,
+	}
+
+	const dropdownRect = menuContainer.value.getBoundingClientRect()
+	const hasSpaceBelow =
+		triggerRect.bottom + dropdownRect.height + DROPDOWN_GAP + DROPDOWN_VIEWPORT_MARGIN <=
+		window.innerHeight
+	const hasSpaceAbove =
+		triggerRect.top - dropdownRect.height - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN > 0
+	const opensUp = !hasSpaceBelow && hasSpaceAbove
+	const top = opensUp
+		? triggerRect.top - dropdownRect.height - DROPDOWN_GAP
+		: triggerRect.bottom + DROPDOWN_GAP
+	const left = Math.min(
+		triggerRect.left,
+		window.innerWidth - dropdownWidth - DROPDOWN_VIEWPORT_MARGIN,
+	)
+
+	addMenuStyle.value = {
+		left: `${Math.max(DROPDOWN_VIEWPORT_MARGIN, left)}px`,
+		minWidth: `${triggerRect.width}px`,
+		top: `${Math.max(DROPDOWN_VIEWPORT_MARGIN, top)}px`,
+		width: `${dropdownWidth}px`,
+	}
+	return true
+}
+
+function scheduleAddMenuPositionUpdate(retries = 8) {
+	if (typeof window === 'undefined') {
+		return
+	}
+
+	nextTick(() => {
+		if (!isAddMenuOpen.value || updateAddMenuPosition() || retries <= 0) {
+			return
+		}
+
+		window.requestAnimationFrame(() => scheduleAddMenuPositionUpdate(retries - 1))
+	})
+}
+
 function updateSubmenuPosition(): boolean {
 	if (typeof window === 'undefined') {
 		return false
@@ -561,7 +711,7 @@ function updateSubmenuPosition(): boolean {
 	const submenuRect = submenu.value?.getBoundingClientRect()
 	const submenuWidth = submenuRect?.width ?? 256
 	const submenuHeight = submenuRect?.height ?? 320
-	const gap = 8
+	const gap = 20
 	const viewportPadding = 8
 	const preferredLeft = buttonRect.right + gap
 	const left =
@@ -613,45 +763,59 @@ function handleSubmenuMouseLeave() {
 	isCursorInsideSubmenu.value = false
 }
 
-function handleDocumentPointerDown(event: PointerEvent) {
-	if (!isAddMenuOpen.value || !(event.target instanceof Node)) {
+function startAddMenuPositionTracking() {
+	if (typeof window === 'undefined' || addMenuPositionRaf !== null) {
 		return
 	}
 
-	if (
-		addMenuTrigger.value?.contains(event.target) ||
-		menuContainer.value?.contains(event.target) ||
-		submenu.value?.contains(event.target)
-	) {
-		return
+	function track() {
+		updateAddMenuPosition()
+		updateSubmenuPosition()
+		addMenuPositionRaf = window.requestAnimationFrame(track)
 	}
 
-	isAddMenuOpen.value = false
+	addMenuPositionRaf = window.requestAnimationFrame(track)
 }
+
+function stopAddMenuPositionTracking() {
+	if (typeof window === 'undefined' || addMenuPositionRaf === null) {
+		return
+	}
+
+	window.cancelAnimationFrame(addMenuPositionRaf)
+	addMenuPositionRaf = null
+}
+
+onClickOutside(
+	menuContainer,
+	() => {
+		closeAddMenu()
+	},
+	{ ignore: [addMenuTrigger, submenu] },
+)
 
 watch(isAddMenuOpen, (isOpen) => {
 	if (isOpen) {
 		activeCategoryKey.value = null
 		hasSubmenuPosition.value = false
-		scheduleSubmenuPositionUpdate()
-		window.addEventListener('resize', updateSubmenuPosition)
-		window.addEventListener('scroll', updateSubmenuPosition, true)
-		window.addEventListener('pointerdown', handleDocumentPointerDown)
+		scheduleAddMenuPositionUpdate()
+		startAddMenuPositionTracking()
 	} else {
 		activeCategoryKey.value = null
 		hasSubmenuPosition.value = false
-		window.removeEventListener('resize', updateSubmenuPosition)
-		window.removeEventListener('scroll', updateSubmenuPosition, true)
-		window.removeEventListener('pointerdown', handleDocumentPointerDown)
+		resetPendingCategory()
+		stopAddMenuPositionTracking()
 	}
 })
 
 onBeforeUnmount(() => {
 	clearPendingCategoryTimeout()
-	if (typeof window !== 'undefined') {
-		window.removeEventListener('resize', updateSubmenuPosition)
-		window.removeEventListener('scroll', updateSubmenuPosition, true)
-		window.removeEventListener('pointerdown', handleDocumentPointerDown)
-	}
+	stopAddMenuPositionTracking()
 })
 </script>
+
+<style lang="scss" scoped>
+.checkbox-shadow {
+	box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.08);
+}
+</style>

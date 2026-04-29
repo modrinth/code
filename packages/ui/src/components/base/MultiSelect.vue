@@ -171,7 +171,7 @@
 					<div
 						v-if="filteredOptions.length > 0"
 						ref="optionsContainerRef"
-						class="flex flex-col gap-2 overflow-y-auto px-3 pt-1.5"
+						class="flex flex-col gap-2 overflow-y-auto px-3 py-1.5"
 						:style="{ maxHeight: `${maxHeight}px` }"
 					>
 						<template v-for="(item, index) in filteredOptions" :key="String(item.value)">
