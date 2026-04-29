@@ -50,8 +50,13 @@ import {
 import { ref, useTemplateRef } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { get as getSettings, set as setSettings } from '@/helpers/settings'
+import { useTheming } from '@/store/state'
+import type { FeatureFlag } from '@/store/theme.ts'
 
 const { formatMessage } = useVIntl()
+const themeStore = useTheming()
+const skipUnknownPackWarningFeatureFlag = 'skip_unknown_pack_warning' as FeatureFlag
 
 const dontShowAgain = ref(false)
 const modal = useTemplateRef('modal')
@@ -95,6 +100,12 @@ function show(createInstance: () => Promise<void>, selectedFileName = '') {
 	fileName.value = selectedFileName
 	dontShowAgain.value = false
 
+	if (themeStore.getFeatureFlag(skipUnknownPackWarningFeatureFlag)) {
+		// noinspection ES6MissingAwait
+		createInstance()
+		return
+	}
+
 	modal.value?.show()
 }
 
@@ -107,9 +118,16 @@ function cancel() {
 	modal.value?.hide()
 }
 
-function proceed() {
+async function proceed() {
 	if (!onProceed.value) {
 		return
+	}
+
+	if (dontShowAgain.value) {
+		themeStore.featureFlags[skipUnknownPackWarningFeatureFlag] = true
+		const settings = await getSettings()
+		settings.feature_flags[skipUnknownPackWarningFeatureFlag] = true
+		await setSettings(settings)
 	}
 
 	const createInstance = onProceed.value
