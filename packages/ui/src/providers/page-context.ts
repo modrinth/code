@@ -10,10 +10,10 @@ export interface PageContext {
 		left: Ref<string> | ComputedRef<string>
 		right: Ref<string> | ComputedRef<string>
 	}
-	supportLauncher?: {
+	intercomBubble?: {
 		width: Ref<number> | ComputedRef<number>
 		horizontalPadding: Ref<number> | ComputedRef<number>
-		requestVerticalPadding: (id: symbol, padding: number | null) => void
+		requestVerticalClearance: (id: symbol, clearance: number | null) => void
 	}
 	featureFlags?: {
 		serverRamAsBytesAlwaysOn?: Ref<boolean>

@@ -10,7 +10,7 @@ const props = defineProps<{
 	belowModal?: boolean
 }>()
 
-const LAUNCHER_GAP = 8
+const INTERCOM_BUBBLE_GAP = 8
 
 const barEl = ref<HTMLElement | null>(null)
 const toolbarEl = ref<HTMLElement | null>(null)
@@ -19,7 +19,7 @@ const compact = ref(false)
 const { stackCount } = useModalStack()
 const pageContext = injectPageContext(null)
 const shown = computed(() => props.shown)
-const supportLauncherPaddingRequestId = Symbol('floating-action-bar')
+const intercomBubbleClearanceRequestId = Symbol('floating-action-bar')
 const zIndex = computed(() => 100 + stackCount.value * 10 + 8 + (!props.belowModal ? 1 : 0))
 const leftOffset = computed(
 	() => pageContext?.floatingActionBarOffsets?.left.value ?? 'var(--left-bar-width, 0px)',
@@ -51,34 +51,34 @@ function checkCompact() {
 	compact.value = needsCompact
 }
 
-function clearSupportLauncherPadding() {
-	pageContext?.supportLauncher?.requestVerticalPadding(supportLauncherPaddingRequestId, null)
+function clearIntercomBubbleClearance() {
+	pageContext?.intercomBubble?.requestVerticalClearance(intercomBubbleClearanceRequestId, null)
 }
 
-function updateSupportLauncherPadding() {
-	const supportLauncher = pageContext?.supportLauncher
-	if (!supportLauncher) return
+function updateIntercomBubbleClearance() {
+	const intercomBubble = pageContext?.intercomBubble
+	if (!intercomBubble) return
 
 	if (typeof window === 'undefined' || !shown.value || !barEl.value || !toolbarEl.value) {
-		clearSupportLauncherPadding()
+		clearIntercomBubbleClearance()
 		return
 	}
 
 	const barRect = barEl.value.getBoundingClientRect()
 	const toolbarRight = barRect.left + toolbarEl.value.offsetLeft + toolbarEl.value.offsetWidth
-	const launcherLeft =
-		window.innerWidth - supportLauncher.horizontalPadding.value - supportLauncher.width.value
+	const bubbleLeft =
+		window.innerWidth - intercomBubble.horizontalPadding.value - intercomBubble.width.value
 
-	if (toolbarRight + LAUNCHER_GAP <= launcherLeft) {
-		clearSupportLauncherPadding()
+	if (toolbarRight + INTERCOM_BUBBLE_GAP <= bubbleLeft) {
+		clearIntercomBubbleClearance()
 		return
 	}
 
 	const barStyle = window.getComputedStyle(barEl.value)
 	const bottomOffset = Number.parseFloat(barStyle.bottom) || 0
-	supportLauncher.requestVerticalPadding(
-		supportLauncherPaddingRequestId,
-		Math.ceil(bottomOffset + barEl.value.offsetHeight + LAUNCHER_GAP),
+	intercomBubble.requestVerticalClearance(
+		intercomBubbleClearanceRequestId,
+		Math.ceil(bottomOffset + barEl.value.offsetHeight + INTERCOM_BUBBLE_GAP),
 	)
 }
 
@@ -87,14 +87,14 @@ function updateBodyState(shown = props.shown) {
 
 	document.body.classList.toggle('floating-action-bar-shown', shown)
 	if (!shown) {
-		clearSupportLauncherPadding()
+		clearIntercomBubbleClearance()
 	}
 }
 
 let observer: ResizeObserver | null = null
 let updateFrame: number | null = null
 
-function scheduleSupportLauncherUpdate() {
+function scheduleIntercomBubbleClearanceUpdate() {
 	if (typeof window === 'undefined') return
 	if (updateFrame !== null) {
 		window.cancelAnimationFrame(updateFrame)
@@ -102,7 +102,7 @@ function scheduleSupportLauncherUpdate() {
 
 	updateFrame = window.requestAnimationFrame(() => {
 		updateFrame = null
-		updateSupportLauncherPadding()
+		updateIntercomBubbleClearance()
 	})
 }
 
@@ -113,11 +113,11 @@ watch(
 		if (!el) return
 		observer = new ResizeObserver(() => {
 			checkCompact()
-			scheduleSupportLauncherUpdate()
+			scheduleIntercomBubbleClearanceUpdate()
 		})
 		observer.observe(el.parentElement!)
 		checkCompact()
-		scheduleSupportLauncherUpdate()
+		scheduleIntercomBubbleClearanceUpdate()
 	},
 	{ immediate: true },
 )
@@ -127,7 +127,7 @@ watch(
 	async (shown) => {
 		await nextTick()
 		updateBodyState(shown)
-		scheduleSupportLauncherUpdate()
+		scheduleIntercomBubbleClearanceUpdate()
 	},
 	{ immediate: true },
 )
@@ -137,25 +137,25 @@ watch(
 		shown,
 		leftOffset,
 		rightOffset,
-		() => pageContext?.supportLauncher?.horizontalPadding.value,
-		() => pageContext?.supportLauncher?.width.value,
+		() => pageContext?.intercomBubble?.horizontalPadding.value,
+		() => pageContext?.intercomBubble?.width.value,
 	],
-	() => scheduleSupportLauncherUpdate(),
+	() => scheduleIntercomBubbleClearanceUpdate(),
 	{ immediate: true },
 )
 
 onMounted(() => {
-	window.addEventListener('resize', scheduleSupportLauncherUpdate)
-	scheduleSupportLauncherUpdate()
+	window.addEventListener('resize', scheduleIntercomBubbleClearanceUpdate)
+	scheduleIntercomBubbleClearanceUpdate()
 })
 
 onUnmounted(() => {
 	observer?.disconnect()
-	window.removeEventListener('resize', scheduleSupportLauncherUpdate)
+	window.removeEventListener('resize', scheduleIntercomBubbleClearanceUpdate)
 	if (updateFrame !== null) {
 		window.cancelAnimationFrame(updateFrame)
 	}
-	clearSupportLauncherPadding()
+	clearIntercomBubbleClearance()
 	if (typeof document === 'undefined') return
 	document.body.classList.remove('floating-action-bar-shown')
 })

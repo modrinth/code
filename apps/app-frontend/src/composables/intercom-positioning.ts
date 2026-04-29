@@ -41,23 +41,23 @@ export function useIntercomPositioning({
 			? APP_SIDEBAR_WIDTH + INTERCOM_BUBBLE_DEFAULT_PADDING
 			: INTERCOM_BUBBLE_DEFAULT_PADDING,
 	)
-	const intercomBubbleVerticalPadding = ref<number | null>(null)
+	const intercomBubbleVerticalClearance = ref<number | null>(null)
 	const intercomBubblePosition = computed(() => ({
 		horizontalPadding: intercomBubbleHorizontalPadding.value,
-		verticalPadding: intercomBubbleVerticalPadding.value ?? INTERCOM_BUBBLE_DEFAULT_PADDING,
+		verticalPadding: intercomBubbleVerticalClearance.value ?? INTERCOM_BUBBLE_DEFAULT_PADDING,
 	}))
-	const intercomBubbleVerticalPaddingRequests = new Map<symbol, number>()
+	const intercomBubbleClearanceRequests = new Map<symbol, number>()
 
-	function requestIntercomBubbleVerticalPadding(id: symbol, padding: number | null) {
-		if (padding === null) {
-			intercomBubbleVerticalPaddingRequests.delete(id)
+	function requestIntercomBubbleVerticalClearance(id: symbol, clearance: number | null) {
+		if (clearance === null) {
+			intercomBubbleClearanceRequests.delete(id)
 		} else {
-			intercomBubbleVerticalPaddingRequests.set(id, padding)
+			intercomBubbleClearanceRequests.set(id, clearance)
 		}
 
-		intercomBubbleVerticalPadding.value =
-			intercomBubbleVerticalPaddingRequests.size > 0
-				? Math.max(...intercomBubbleVerticalPaddingRequests.values())
+		intercomBubbleVerticalClearance.value =
+			intercomBubbleClearanceRequests.size > 0
+				? Math.max(...intercomBubbleClearanceRequests.values())
 				: null
 	}
 
@@ -90,10 +90,10 @@ export function useIntercomPositioning({
 				left: ref(APP_LEFT_NAV_WIDTH),
 				right: computed(() => (sidebarVisible.value ? `${APP_SIDEBAR_WIDTH}px` : '0px')),
 			},
-			supportLauncher: {
+			intercomBubble: {
 				width: ref(INTERCOM_BUBBLE_WIDTH),
 				horizontalPadding: intercomBubbleHorizontalPadding,
-				requestVerticalPadding: requestIntercomBubbleVerticalPadding,
+				requestVerticalClearance: requestIntercomBubbleVerticalClearance,
 			},
 		},
 	}

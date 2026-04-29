@@ -16,10 +16,10 @@ type Story = StoryObj<typeof meta>
 function setupPageContext({
 	leftOffset = '4rem',
 	rightOffset = '0px',
-	launcherPadding = 20,
-	launcherWidth = 72,
+	bubblePadding = 20,
+	bubbleWidth = 72,
 } = {}) {
-	const requestedLauncherPadding = ref<number | null>(null)
+	const requestedBubbleClearance = ref<number | null>(null)
 
 	providePageContext({
 		hierarchicalSidebarAvailable: ref(true),
@@ -28,11 +28,11 @@ function setupPageContext({
 			left: ref(leftOffset),
 			right: ref(rightOffset),
 		},
-		supportLauncher: {
-			width: ref(launcherWidth),
-			horizontalPadding: ref(launcherPadding),
-			requestVerticalPadding: (_id, padding) => {
-				requestedLauncherPadding.value = padding
+		intercomBubble: {
+			width: ref(bubbleWidth),
+			horizontalPadding: ref(bubblePadding),
+			requestVerticalClearance: (_id, clearance) => {
+				requestedBubbleClearance.value = clearance
 			},
 		},
 		openExternalUrl: () => {},
@@ -40,12 +40,12 @@ function setupPageContext({
 
 	return {
 		launcherStyle: computed(() => ({
-			right: `${launcherPadding}px`,
-			bottom: `${requestedLauncherPadding.value ?? 20}px`,
-			width: `${launcherWidth}px`,
-			height: `${launcherWidth}px`,
+			right: `${bubblePadding}px`,
+			bottom: `${requestedBubbleClearance.value ?? 20}px`,
+			width: `${bubbleWidth}px`,
+			height: `${bubbleWidth}px`,
 		})),
-		requestedLauncherPadding,
+		requestedBubbleClearance,
 	}
 }
 
@@ -101,11 +101,11 @@ export const WithSidebarOffset: Story = {
 	}),
 }
 
-export const AvoidingSupportLauncher: Story = {
+export const AvoidingIntercomBubble: Story = {
 	render: () => ({
 		components: { ButtonStyled, FloatingActionBar },
 		setup() {
-			return setupPageContext({ rightOffset: '300px', launcherPadding: 320 })
+			return setupPageContext({ rightOffset: '300px', bubblePadding: 320 })
 		},
 		template: /*html*/ `
 			<div class="h-40">
