@@ -186,13 +186,11 @@ import {
 	normalizeSelectedValues as normalizeSelectedFilterValues,
 } from './queryFilter'
 
-const { projects, selectedProjectIds, selectedFilters } = injectAnalyticsDashboardContext()
-const projectIds = computed(() => projects.value.map((project) => project.id))
+const { selectedFilters } = injectAnalyticsDashboardContext()
 
 const isAddMenuOpen = ref(false)
 const activeCategoryKey = ref<AnalyticsQueryFilterCategory | null>(null)
 const pendingCategoryKey = ref<AnalyticsQueryFilterCategory | null>(null)
-const draftSelectedProjectIds = ref<string[]>([])
 const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
 	cloneSelectedFilters(selectedFilters.value),
 )
@@ -215,15 +213,6 @@ let pendingCategoryTimeout: NodeJS.Timeout | null = null
 let previousMousePosition: Point | null = null
 
 const filterCategories = computed<FilterCategory[]>(() => [
-	{
-		key: 'project',
-		label: 'Project',
-		allLabel: 'All projects',
-		options: [
-			{ value: ALL_FILTER_VALUE, label: 'All projects' },
-			...projects.value.map((project) => ({ value: project.id, label: project.name })),
-		],
-	},
 	{
 		key: 'country',
 		label: 'Country',
@@ -311,15 +300,10 @@ const previewTriggerClass =
 	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 hover:bg-surface-5 hover:brightness-100 active:brightness-100'
 
 function resetAddMenuDraft() {
-	draftSelectedProjectIds.value = [...selectedProjectIds.value]
 	draftSelectedFilters.value = cloneSelectedFilters(selectedFilters.value)
 }
 
 function commitAddMenuDraft() {
-	if (!areStringArraysEqual(selectedProjectIds.value, draftSelectedProjectIds.value)) {
-		selectedProjectIds.value = [...draftSelectedProjectIds.value]
-	}
-
 	if (!areSelectedFiltersEqual(selectedFilters.value, draftSelectedFilters.value)) {
 		selectedFilters.value = cloneSelectedFilters(draftSelectedFilters.value)
 	}
@@ -330,12 +314,10 @@ function getSelectedValues(
 	source: FilterSelectionSource = 'committed',
 ): string[] {
 	if (source === 'draft') {
-		return categoryKey === 'project'
-			? draftSelectedProjectIds.value
-			: draftSelectedFilters.value[categoryKey]
+		return draftSelectedFilters.value[categoryKey]
 	}
 
-	return categoryKey === 'project' ? selectedProjectIds.value : selectedFilters.value[categoryKey]
+	return selectedFilters.value[categoryKey]
 }
 
 function setSelectedValues(
@@ -343,16 +325,7 @@ function setSelectedValues(
 	values: string[],
 	source: FilterSelectionSource = 'committed',
 ) {
-	const normalizedValues = normalizeSelectedFilterValues(categoryKey, values, projectIds.value)
-
-	if (categoryKey === 'project') {
-		if (source === 'draft') {
-			draftSelectedProjectIds.value = normalizedValues
-		} else if (!areStringArraysEqual(selectedProjectIds.value, normalizedValues)) {
-			selectedProjectIds.value = normalizedValues
-		}
-		return
-	}
+	const normalizedValues = normalizeSelectedFilterValues(categoryKey, values, [])
 
 	const currentFilters = source === 'draft' ? draftSelectedFilters.value : selectedFilters.value
 	if (areStringArraysEqual(currentFilters[categoryKey], normalizedValues)) {
@@ -451,7 +424,7 @@ function withSelectedOptions(
 
 function isFilterValueSelected(categoryKey: AnalyticsQueryFilterCategory, value: string): boolean {
 	const selectedValues = getSelectedValues(categoryKey, 'draft')
-	return getIsFilterValueSelected(categoryKey, value, selectedValues, projects.value.length)
+	return getIsFilterValueSelected(categoryKey, value, selectedValues, 0)
 }
 
 function toggleFilterValue(
@@ -490,17 +463,12 @@ function getCategorySelectionCount(
 	source: FilterSelectionSource = 'committed',
 ): number {
 	const selectedValues = getSelectedValues(categoryKey, source)
-	return getCategorySelectionCountValue(categoryKey, selectedValues, projects.value.length)
+	return getCategorySelectionCountValue(categoryKey, selectedValues, 0)
 }
 
 function getCategorySelectionSummary(category: FilterCategory): string {
 	const count = getCategorySelectionCount(category.key)
-	return getCategorySelectionSummaryValue(
-		category,
-		getSelectedValues(category.key),
-		count,
-		projectIds.value,
-	)
+	return getCategorySelectionSummaryValue(category, getSelectedValues(category.key), count, [])
 }
 
 function clearFilterCategory(categoryKey: AnalyticsQueryFilterCategory) {
@@ -510,11 +478,8 @@ function clearFilterCategory(categoryKey: AnalyticsQueryFilterCategory) {
 
 function clearAllFilters() {
 	commitPreviewFilterDrafts()
-	setSelectedValues('project', [ALL_FILTER_VALUE])
 	for (const category of filterCategories.value) {
-		if (category.key !== 'project') {
-			setSelectedValues(category.key, [])
-		}
+		setSelectedValues(category.key, [])
 	}
 }
 
@@ -530,7 +495,7 @@ function getPreviewSelectedValues(categoryKey: AnalyticsQueryFilterCategory): st
 function setPreviewSelectedValues(categoryKey: AnalyticsQueryFilterCategory, values: string[]) {
 	previewSelectedValueDrafts.value = {
 		...previewSelectedValueDrafts.value,
-		[categoryKey]: normalizeSelectedFilterValues(categoryKey, values, projectIds.value),
+		[categoryKey]: normalizeSelectedFilterValues(categoryKey, values, []),
 	}
 }
 
