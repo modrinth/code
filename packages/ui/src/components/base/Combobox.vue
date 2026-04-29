@@ -137,14 +137,14 @@
 											<div class="flex flex-col gap-1.5">
 												<span
 													class="font-semibold leading-tight"
-													:class="item.value === modelValue ? 'text-contrast' : 'text-primary'"
+													:class="item.value === modelValue ? 'text-green' : 'text-primary'"
 												>
 													{{ item.label }}
 												</span>
 												<span
 													v-if="item.subLabel"
 													class="text-sm"
-													:class="item.value === modelValue ? 'text-contrast' : 'text-secondary'"
+													:class="item.value === modelValue ? 'text-green' : 'text-secondary'"
 												>
 													{{ item.subLabel }}
 												</span>
@@ -343,12 +343,13 @@ const filteredOptions = computed(() => {
 })
 
 function getOptionClasses(item: ComboboxOption<T> & { key: string }, index: number) {
+	const isSelected = props.listbox && item.value === props.modelValue
+
 	return [
 		item.class,
 		{
-			'bg-surface-5':
-				(props.listbox && item.value === props.modelValue) ||
-				(focusedIndex.value === index && !(props.listbox && item.value === props.modelValue)),
+			'bg-highlight-green text-green hover:bg-highlight-green focus:bg-highlight-green': isSelected,
+			'bg-surface-5': focusedIndex.value === index && !isSelected,
 			'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
 		},
 	]
