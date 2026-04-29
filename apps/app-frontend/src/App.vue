@@ -83,7 +83,7 @@ import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
-import RunningAppBar from '@/components/ui/RunningAppBar.vue'
+import AppActionBar from '@/components/ui/AppActionBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
@@ -1372,7 +1372,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</ButtonStyled>
 				<div class="flex mr-3">
 					<Suspense>
-						<RunningAppBar />
+						<AppActionBar />
 					</Suspense>
 				</div>
 			</section>

@@ -127,6 +127,37 @@ export const Default: StoryObj = {
 				})
 			}
 
+			const showGroupedDownloads = () => {
+				popupManager.addPopupNotification({
+					title: 'Downloads',
+					type: 'download',
+					autoCloseMs: null,
+					progressItems: [
+						{
+							id: 'java-21',
+							title: 'Downloading Java 21',
+							text: '42% Downloading runtime',
+							progress: 0.42,
+							waiting: false,
+						},
+						{
+							id: 'pack-nebula',
+							title: 'Nebula Pack',
+							text: '8% Resolving files',
+							progress: 0.08,
+							waiting: false,
+						},
+						{
+							id: 'assets',
+							title: 'Assets',
+							text: 'Preparing...',
+							progress: 0,
+							waiting: true,
+						},
+					],
+				})
+			}
+
 			const clearAll = () => {
 				popupManager.clearAllNotifications()
 			}
@@ -140,6 +171,7 @@ export const Default: StoryObj = {
 				showPermanent,
 				showWaitingProgress,
 				showDeterminateProgress,
+				showGroupedDownloads,
 				clearAll,
 			}
 		},
@@ -169,6 +201,9 @@ export const Default: StoryObj = {
 					</ButtonStyled>
 					<ButtonStyled>
 						<button @click="showDeterminateProgress">Determinate Progress</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="showGroupedDownloads">Grouped Downloads</button>
 					</ButtonStyled>
 					<ButtonStyled>
 						<button @click="clearAll">Clear All</button>

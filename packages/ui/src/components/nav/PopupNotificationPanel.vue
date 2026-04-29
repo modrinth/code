@@ -24,11 +24,15 @@
 									:class="{
 										'text-red': item.type === 'error',
 										'text-orange': item.type === 'warning',
+										'text-green': item.type === 'download',
 										'text-contrast': item.type === 'success',
-										'text-blue': !item.type || !['error', 'warning', 'success'].includes(item.type),
+										'text-blue':
+											!item.type ||
+											!['error', 'warning', 'success', 'download'].includes(item.type),
 									}"
 								>
 									<IssuesIcon v-if="item.type === 'warning'" class="h-5 w-5" />
+									<DownloadIcon v-else-if="item.type === 'download'" class="h-5 w-5" />
 									<CheckCircleIcon v-else-if="item.type === 'success'" class="h-5 w-5" />
 									<XCircleIcon v-else-if="item.type === 'error'" class="h-5 w-5" />
 									<InfoIcon v-else class="h-5 w-5" />
@@ -47,8 +51,30 @@
 							{{ item.text }}
 						</span>
 					</div>
+					<div v-if="item.progressItems?.length" class="flex flex-col gap-2">
+						<div
+							v-for="progressItem in item.progressItems"
+							:key="progressItem.id"
+							class="flex flex-col gap-1.5"
+						>
+							<div class="text-contrast truncate">
+								{{ progressItem.title }}
+							</div>
+							<ProgressBar
+								:progress="progressItem.progress"
+								:max="1"
+								:waiting="progressItem.waiting"
+								:color="progressColorForType(item.type)"
+								:gradient-border="false"
+								full-width
+							/>
+							<div v-if="progressItem.text" class="text-sm text-secondary truncate">
+								{{ progressItem.text }}
+							</div>
+						</div>
+					</div>
 					<ProgressBar
-						v-if="item.progress != null || item.waiting"
+						v-else-if="item.progress != null || item.waiting"
 						:progress="item.progress ?? 0"
 						:max="1"
 						:waiting="item.waiting ?? false"
@@ -74,7 +100,14 @@
 </template>
 
 <script setup lang="ts">
-import { CheckCircleIcon, InfoIcon, IssuesIcon, XCircleIcon, XIcon } from '@modrinth/assets'
+import {
+	CheckCircleIcon,
+	DownloadIcon,
+	InfoIcon,
+	IssuesIcon,
+	XCircleIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { computed } from 'vue'
 
 import {
@@ -105,6 +138,8 @@ function progressColorForType(type: PopupNotification['type']) {
 		return 'red'
 	} else if (type === 'warning') {
 		return 'orange'
+	} else if (type === 'download') {
+		return 'green'
 	} else if (type === 'success') {
 		return 'green'
 	} else if (type === 'info') {
