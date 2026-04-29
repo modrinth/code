@@ -87,6 +87,12 @@
 						@pinned-drag="onPinnedDrag"
 					/>
 				</ClientOnly>
+				<div
+					v-if="showPinnedGuide"
+					aria-hidden="true"
+					class="pointer-events-none absolute bottom-0 top-0 z-10 mb-8 mt-2 border-0 border-l-[2px] border-dashed border-green opacity-75"
+					:style="{ transform: `translate(${hoverState.x}px, 0)` }"
+				/>
 				<AnalyticsChartTooltip
 					:visible="!isDataLoading && hoverState.visible"
 					:x="hoverState.x"
@@ -319,6 +325,13 @@ function onChartClick() {
 }
 
 const pinnedSliceIndex = computed(() => (isHoverPinned.value ? hoverState.sliceIndex : null))
+const showPinnedGuide = computed(
+	() =>
+		!isDataLoading.value &&
+		isHoverPinned.value &&
+		hoverState.visible &&
+		hoverState.sliceIndex !== null,
+)
 
 const legendEntries = computed<LegendEntry[]>(() =>
 	allChartDatasets.value

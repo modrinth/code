@@ -85,10 +85,6 @@ function getChartEvents(): ChartEvents {
 	return props.pinnedSliceIndex === null ? [...chartInteractionEvents] : []
 }
 
-function getPinnedPointBorderWidth() {
-	return props.pinnedSliceIndex === null ? 0 : 2
-}
-
 function getPinnedActiveElements(sliceIndex: number) {
 	if (!chartInstance) return []
 
@@ -166,18 +162,8 @@ function withAlpha(color: string, alpha: number): string {
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
-function darkenColor(color: string, amount: number): string {
-	const match = /^#([0-9a-f]{6})$/i.exec(color)
-	if (!match) return color
-	const r = Math.round(Number.parseInt(match[1].slice(0, 2), 16) * (1 - amount))
-	const g = Math.round(Number.parseInt(match[1].slice(2, 4), 16) * (1 - amount))
-	const b = Math.round(Number.parseInt(match[1].slice(4, 6), 16) * (1 - amount))
-	return `#${[r, g, b].map((value) => value.toString(16).padStart(2, '0')).join('')}`
-}
-
 function buildDatasets() {
 	return props.datasets.map((dataset, index) => {
-		const pointBorderColor = darkenColor(dataset.borderColor, 0.4)
 		const common = {
 			label: dataset.label,
 			data: dataset.data,
@@ -205,12 +191,10 @@ function buildDatasets() {
 			tension: 0.35,
 			pointRadius: 0,
 			pointBackgroundColor: dataset.borderColor,
-			pointBorderColor,
 			pointBorderWidth: 0,
 			pointHoverRadius: 4,
 			pointHoverBackgroundColor: dataset.borderColor,
-			pointHoverBorderColor: pointBorderColor,
-			pointHoverBorderWidth: getPinnedPointBorderWidth,
+			pointHoverBorderWidth: 0,
 			pointHitRadius: 16,
 			stack: props.stacked ? 'analytics' : undefined,
 		}
@@ -306,14 +290,9 @@ function applyPinnedSliceState() {
 	if (!chartInstance) return
 
 	chartInstance.options.events = getChartEvents()
-
-	if (props.pinnedSliceIndex === null) {
-		chartInstance.setActiveElements([])
-		chartInstance.update('none')
-		return
-	}
-
-	chartInstance.setActiveElements(getPinnedActiveElements(props.pinnedSliceIndex))
+	chartInstance.setActiveElements(
+		props.pinnedSliceIndex === null ? [] : getPinnedActiveElements(props.pinnedSliceIndex),
+	)
 	chartInstance.update('none')
 }
 
