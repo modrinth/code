@@ -1,17 +1,16 @@
 <template>
-	<div
-		class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
-	>
+	<div class="flex flex-col gap-3 pl-1">
 		<div v-if="showProjectRow" class="flex items-start gap-2">
 			<div class="my-1.5 flex w-32 items-center gap-2 text-primary">
 				<FolderOpenIcon class="size-5" />
 				<span class="text-base font-medium">Projects:</span>
 			</div>
-			<div class="grow">
+			<div class="w-48">
 				<MultiSelect
 					v-model="selectedProjectIds"
 					:options="projectOptions"
 					:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+					:dropdown-min-width="'24rem'"
 					placeholder="Select projects"
 					:searchable="projectOptions.length > 6"
 					:max-tag-rows="1"
@@ -21,33 +20,35 @@
 			</div>
 		</div>
 
-		<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+		<div class="flex flex-wrap items-center gap-4">
 			<div class="flex items-center gap-2">
 				<div class="flex w-32 items-center gap-2 text-primary">
 					<CalendarIcon class="size-5" />
 					<span class="text-base font-medium">Timeframe:</span>
 				</div>
-				<div class="w-48">
+				<div class="">
 					<Combobox
 						v-model="selectedTimeframe"
 						:options="timeframeOptions"
 						:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+						:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 					/>
 				</div>
 			</div>
 			<div class="flex items-center gap-2">
 				<span class="text-base font-medium text-primary">Grouped by</span>
-				<div class="w-48">
+				<div class="">
 					<Combobox
 						v-model="selectedGroupBy"
 						:options="groupByOptions"
 						:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+						:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 					/>
 				</div>
 			</div>
 		</div>
 
-		<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+		<div class="flex flex-wrap items-center gap-4">
 			<div class="flex items-center gap-2">
 				<div class="flex w-32 items-center gap-2 text-primary">
 					<BlocksIcon class="size-5" />
@@ -55,11 +56,12 @@
 				</div>
 				<div class="flex flex-col gap-2">
 					<div class="flex flex-wrap items-center gap-2">
-						<div class="w-48">
+						<div class="">
 							<Combobox
 								v-model="selectedBreakdown"
 								:options="breakdownOptions"
 								:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+								:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 							/>
 						</div>
 					</div>
@@ -90,6 +92,7 @@ import QueryBuilderFilter from './QueryFilter.vue'
 const MIN_RANGE_MS = 60 * 60 * 1000
 const MAX_TIME_SLICES = 1024
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
+const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
 const TIME_RANGE_ROUNDING_MS = 60 * 1000
 
 const {
@@ -99,6 +102,7 @@ const {
 	selectedGroupBy,
 	selectedBreakdown,
 	selectedFilters,
+	queryRefreshTimestamp,
 	setFetchRequest,
 } = injectAnalyticsDashboardContext()
 
@@ -152,13 +156,16 @@ function startOfDay(date: Date): Date {
 	return nextDate
 }
 
-function getRoundedNow(): Date {
-	const timestamp = Math.floor(Date.now() / TIME_RANGE_ROUNDING_MS) * TIME_RANGE_ROUNDING_MS
-	return new Date(timestamp)
+function getRoundedNow(timestamp: number): Date {
+	const roundedTimestamp = Math.floor(timestamp / TIME_RANGE_ROUNDING_MS) * TIME_RANGE_ROUNDING_MS
+	return new Date(roundedTimestamp)
 }
 
-function getTimeRangeForPreset(preset: AnalyticsTimeframePreset): { start: Date; end: Date } {
-	const now = getRoundedNow()
+function getTimeRangeForPreset(
+	preset: AnalyticsTimeframePreset,
+	nowTimestamp: number,
+): { start: Date; end: Date } {
+	const now = getRoundedNow(nowTimestamp)
 	const end = new Date(now)
 
 	switch (preset) {
@@ -214,6 +221,13 @@ function getTimeRangeForPreset(preset: AnalyticsTimeframePreset): { start: Date;
 	}
 }
 
+function getCurrentTimeRangeForPreset(preset: AnalyticsTimeframePreset): {
+	start: Date
+	end: Date
+} {
+	return getTimeRangeForPreset(preset, queryRefreshTimestamp.value)
+}
+
 function getGroupByMinutes(preset: AnalyticsGroupByPreset): number {
 	switch (preset) {
 		case '1h':
@@ -252,7 +266,7 @@ function ensureMinimumRange(start: Date, end: Date): { start: Date; end: Date } 
 }
 
 const selectedTimeframeDurationMinutes = computed(() => {
-	const rawRange = getTimeRangeForPreset(selectedTimeframe.value)
+	const rawRange = getCurrentTimeRangeForPreset(selectedTimeframe.value)
 	const { start, end } = ensureMinimumRange(rawRange.start, rawRange.end)
 	const durationMs = end.getTime() - start.getTime()
 	return Math.max(1, Math.floor(durationMs / (60 * 1000)))
@@ -373,7 +387,7 @@ function withBreakdownFields(
 }
 
 const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
-	const rawRange = getTimeRangeForPreset(selectedTimeframe.value)
+	const rawRange = getCurrentTimeRangeForPreset(selectedTimeframe.value)
 	const { start, end } = ensureMinimumRange(rawRange.start, rawRange.end)
 
 	const groupByMs = getGroupByMinutes(selectedGroupBy.value) * 60 * 1000

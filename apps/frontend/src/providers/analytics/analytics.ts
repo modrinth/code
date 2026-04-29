@@ -79,6 +79,7 @@ export interface AnalyticsDashboardContextValue {
 	selectedGroupBy: Ref<AnalyticsGroupByPreset>
 	selectedBreakdown: Ref<AnalyticsBreakdownPreset>
 	selectedFilters: Ref<AnalyticsSelectedFilters>
+	queryRefreshTimestamp: Ref<number>
 	fetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
 	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
@@ -95,6 +96,7 @@ export interface AnalyticsDashboardContextValue {
 		stat: AnalyticsDashboardStat,
 		breakdown: AnalyticsBreakdownPreset,
 	) => boolean
+	refreshAnalyticsQuery: () => Promise<void>
 	setFetchRequest: (fetchRequest: Labrinth.Analytics.v3.FetchRequest) => void
 	setActiveStat: (stat: AnalyticsDashboardStat) => void
 }
@@ -219,6 +221,7 @@ export function createAnalyticsDashboardContext(
 	const selectedGroupBy = ref<AnalyticsGroupByPreset>(initialQueryState.selectedGroupBy)
 	const selectedBreakdown = ref<AnalyticsBreakdownPreset>(initialQueryState.selectedBreakdown)
 	const selectedFilters = ref<AnalyticsSelectedFilters>(initialQueryState.selectedFilters)
+	const queryRefreshTimestamp = ref(Date.now())
 	const fetchRequest = ref<Labrinth.Analytics.v3.FetchRequest | null>(null)
 
 	const hasProjectContext = computed(() => Boolean(options.projectPageContext))
@@ -375,6 +378,7 @@ export function createAnalyticsDashboardContext(
 		data: currentTimeSliceData,
 		isPending: currentTimeSlicePending,
 		isFetching: currentFetching,
+		refetch: refetchCurrentTimeSlices,
 	} = useQuery({
 		queryKey: computed(() => ['analytics', 'dashboard', 'current', fetchRequest.value]),
 		queryFn: () =>
@@ -388,6 +392,7 @@ export function createAnalyticsDashboardContext(
 		data: previousTimeSliceData,
 		isPending: previousTimeSlicePending,
 		isFetching: previousFetching,
+		refetch: refetchPreviousTimeSlices,
 	} = useQuery({
 		queryKey: computed(() => ['analytics', 'dashboard', 'previous', previousFetchRequest.value]),
 		queryFn: () =>
@@ -451,6 +456,32 @@ export function createAnalyticsDashboardContext(
 	const isLoading = computed(() => currentTimeSlicePending.value || previousTimeSlicePending.value)
 	const isRefetching = computed(() => currentFetching.value || previousFetching.value)
 
+	async function refreshAnalyticsQuery() {
+		if (fetchRequest.value === null) {
+			return
+		}
+
+		const previousFetchRequestKey = JSON.stringify(fetchRequest.value)
+		const now = Date.now()
+		queryRefreshTimestamp.value =
+			now > queryRefreshTimestamp.value ? now : queryRefreshTimestamp.value + 1
+		await nextTick()
+
+		if (
+			fetchRequest.value === null ||
+			JSON.stringify(fetchRequest.value) !== previousFetchRequestKey
+		) {
+			return
+		}
+
+		const refetches = [refetchCurrentTimeSlices()]
+		if (previousFetchRequest.value !== null) {
+			refetches.push(refetchPreviousTimeSlices())
+		}
+
+		await Promise.all(refetches)
+	}
+
 	function setFetchRequest(nextFetchRequest: Labrinth.Analytics.v3.FetchRequest) {
 		fetchRequest.value = nextFetchRequest
 	}
@@ -470,6 +501,7 @@ export function createAnalyticsDashboardContext(
 		selectedGroupBy,
 		selectedBreakdown,
 		selectedFilters,
+		queryRefreshTimestamp,
 		fetchRequest,
 		timeSlices,
 		previousTimeSlices,
@@ -481,6 +513,7 @@ export function createAnalyticsDashboardContext(
 		percentChanges,
 		getRelevantAnalyticsDashboardStats,
 		isAnalyticsDashboardStatRelevant,
+		refreshAnalyticsQuery,
 		setFetchRequest,
 		setActiveStat,
 	}

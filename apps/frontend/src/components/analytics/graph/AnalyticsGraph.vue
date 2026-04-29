@@ -43,7 +43,7 @@
 					<button
 						v-if="canShowMoreLegendEntries"
 						type="button"
-						class="text-sm font-medium text-primary underline transition-all hover:brightness-125"
+						class="text-sm font-normal text-primary underline transition-all hover:brightness-125"
 						@click="showMoreLegendEntries"
 					>
 						Show more
@@ -51,7 +51,7 @@
 					<button
 						v-else-if="canShowLessLegendEntries"
 						type="button"
-						class="text-sm font-medium text-primary underline transition-all hover:brightness-125"
+						class="text-sm font-normal text-primary underline transition-all hover:brightness-125"
 						@click="showLessLegendEntries"
 					>
 						Show less

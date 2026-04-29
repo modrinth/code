@@ -58,7 +58,7 @@
 			<template #popper>
 				<div
 					ref="menuContainer"
-					class="flex w-[16rem] flex-col gap-1"
+					class="flex w-[12rem] flex-col gap-1"
 					@mousemove="(event) => handleMenuMouseMove(event, 'menu')"
 				>
 					<button
