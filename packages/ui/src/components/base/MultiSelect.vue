@@ -278,6 +278,10 @@ const props = withDefaults(
 		maxHeight?: number
 		triggerClass?: string
 		fitContent?: boolean
+		/** Width for the teleported dropdown; defaults to the trigger width */
+		dropdownWidth?: string | number
+		/** Minimum width for the teleported dropdown */
+		dropdownMinWidth?: string | number
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		noResultsMessage?: string
@@ -327,6 +331,7 @@ const dropdownStyle = ref({
 	top: '0px',
 	left: '0px',
 	width: '0px',
+	minWidth: '0px',
 })
 
 const openDirection = ref<'down' | 'up'>('down')
@@ -486,12 +491,35 @@ function calculateHorizontalPosition(
 	return left
 }
 
+function resolveDropdownWidth(triggerWidth: number): string {
+	if (props.dropdownWidth === undefined) return `${triggerWidth}px`
+	if (typeof props.dropdownWidth === 'number') return `${props.dropdownWidth}px`
+	return props.dropdownWidth
+}
+
+function resolveCssSize(size: string | number | undefined): string | undefined {
+	if (size === undefined) return undefined
+	if (typeof size === 'number') return `${size}px`
+	return size
+}
+
 async function updateDropdownPosition() {
 	if (!triggerRef.value || !dropdownRef.value) return
 
 	await nextTick()
 
 	const triggerRect = triggerRef.value.getBoundingClientRect()
+	const width = resolveDropdownWidth(triggerRect.width)
+	const minWidth = resolveCssSize(props.dropdownMinWidth) ?? '0px'
+
+	dropdownStyle.value = {
+		...dropdownStyle.value,
+		width,
+		minWidth,
+	}
+
+	await nextTick()
+
 	const dropdownRect = dropdownRef.value.getBoundingClientRect()
 	const viewportHeight = window.innerHeight
 	const viewportWidth = window.innerWidth
@@ -503,7 +531,8 @@ async function updateDropdownPosition() {
 	dropdownStyle.value = {
 		top: `${top}px`,
 		left: `${left}px`,
-		width: `${triggerRect.width}px`,
+		width,
+		minWidth,
 	}
 
 	openDirection.value = direction

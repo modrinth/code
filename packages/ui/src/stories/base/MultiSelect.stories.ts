@@ -61,6 +61,27 @@ export const WithSelectAll: Story = {
 	},
 }
 
+export const DropdownMinWidth: Story = {
+	args: {
+		...Default.args,
+		modelValue: ['en'],
+		dropdownMinWidth: 320,
+		placeholder: 'Languages',
+	},
+	render: (args) => ({
+		components: { MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			return { args, selected }
+		},
+		template: /*html*/ `
+			<div style="width: 11rem;">
+				<MultiSelect v-bind="args" v-model="selected" />
+			</div>
+		`,
+	}),
+}
+
 export const ManySelected: Story = {
 	args: {
 		...Default.args,

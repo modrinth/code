@@ -46,6 +46,30 @@ export const Searchable: Story = {
 	},
 }
 
+export const DropdownMinWidth: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: [
+				{ value: 'fabric', label: 'Fabric', subLabel: 'Lightweight modding toolchain' },
+				{ value: 'forge', label: 'Forge', subLabel: 'The original Minecraft modding API' },
+				{ value: 'neoforge', label: 'NeoForge', subLabel: 'Community-driven Forge fork' },
+			],
+		}),
+		template: /*html*/ `
+			<div style="width: 11rem;">
+				<Combobox
+					v-model="selected"
+					:options="options"
+					:dropdown-min-width="320"
+					placeholder="Loader"
+				/>
+			</div>
+		`,
+	}),
+}
+
 export const Disabled: Story = {
 	args: {
 		options: [{ value: '1', label: 'Option 1' }],
