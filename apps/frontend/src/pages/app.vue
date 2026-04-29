@@ -1175,7 +1175,7 @@ useSeoMeta({
 							<span>{{ formatMessage(messages.getItOnFlathub) }}</span>
 						</a>
 						<Accordion
-							class="mt-2 flex flex-col"
+							class="mt-2 flex flex-col items-center"
 							content-class="flex flex-col items-start gap-2 mt-2 text-sm"
 							button-class="text-sm text-secondary bg-transparent p-0 w-fit text-left m-0 active:scale-[0.98] transition-transform"
 						>
@@ -2185,10 +2185,6 @@ useSeoMeta({
 					span {
 						text-align: left;
 					}
-				}
-
-				&.apple {
-					align-items: flex-start;
 				}
 			}
 
