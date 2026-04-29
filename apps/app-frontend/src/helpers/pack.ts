@@ -96,7 +96,7 @@ export async function create_profile_and_install_from_file(
 	}
 
 	if (profile_creator.unknownFile && showUnknownPackWarningModal) {
-		const splitPath = path.split('/')
+		const splitPath = path.split(/[\\/]/)
 		const fileName = splitPath ? splitPath[splitPath.length - 1] : path
 		showUnknownPackWarningModal(createProfile, fileName)
 	} else {

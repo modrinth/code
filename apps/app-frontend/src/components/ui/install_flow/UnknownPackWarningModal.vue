@@ -1,5 +1,5 @@
 <template>
-	<ModalWrapper ref="modal" :header="formatMessage(messages.header)" :on-hide="reset">
+	<NewModal ref="modal" :header="formatMessage(messages.header)" :on-hide="reset">
 		<div class="max-w-[31rem] flex flex-col gap-6">
 			<Admonition
 				type="warning"
@@ -34,7 +34,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</ModalWrapper>
+	</NewModal>
 </template>
 
 <script setup lang="ts">
@@ -45,11 +45,11 @@ import {
 	Checkbox,
 	commonMessages,
 	defineMessages,
+	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { get as getSettings, set as setSettings } from '@/helpers/settings'
 import { useTheming } from '@/store/state'
 import type { FeatureFlag } from '@/store/theme.ts'

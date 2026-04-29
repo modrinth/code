@@ -134,7 +134,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { Dropdown } from 'floating-vue'
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
@@ -244,11 +244,16 @@ const refresh = async () => {
 await refresh()
 
 const offline = ref(!navigator.onLine)
-window.addEventListener('offline', () => {
+function handleOffline() {
 	offline.value = true
-})
-window.addEventListener('online', () => {
+}
+function handleOnline() {
 	offline.value = false
+}
+
+onMounted(() => {
+	window.addEventListener('offline', handleOffline)
+	window.addEventListener('online', handleOnline)
 })
 
 const unlistenProcess = await process_listener(async () => {
@@ -421,6 +426,8 @@ function selectProcess(process: RunningProcess) {
 onBeforeUnmount(() => {
 	removeNotification()
 	dismissed.value = false
+	window.removeEventListener('offline', handleOffline)
+	window.removeEventListener('online', handleOnline)
 	unlistenProcess()
 	unlistenLoading()
 })
