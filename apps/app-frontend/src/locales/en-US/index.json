@@ -1,4 +1,40 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Downloading Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Downloads"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Hide more running instances"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Make primary instance"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "No instances running"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Primary instance"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Show more running instances"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Stop instance"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "View active downloads"
+  },
+  "app.action-bar.view-instance": {
+    "message": "View instance"
+  },
+  "app.action-bar.view-logs": {
+    "message": "View logs"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft authentication servers may be down right now. Check your internet connection and try again later."
   },
@@ -49,6 +85,12 @@
   },
   "app.browse.server.installing": {
     "message": "Installing"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Installing modpack..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Enter modpack description..."
@@ -610,5 +652,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "A file is only reviewed if it’s uploaded to Modrinth, regardless of its file format (including .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Don't show this warning again"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Confirm installation"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Install anyway"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Malware is often distributed through modpack files by sharing them on platforms like Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "We couldn't find this file on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Unknown file warning"
   }
 }

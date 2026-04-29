@@ -57,7 +57,6 @@ const dontShowAgain = ref(false)
 const modal = useTemplateRef('modal')
 const onProceed = ref<() => Promise<void>>()
 const isProceeding = ref(false)
-const resolveShow = ref(null)
 const fileName = ref('')
 
 const messages = defineMessages({
