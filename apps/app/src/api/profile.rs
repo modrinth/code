@@ -8,6 +8,7 @@ use theseus::data::{ContentItem, Dependency, LinkedModpackInfo};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
 use theseus::server_address::ServerAddress;
+use theseus::util::fetch::DownloadReason;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile")
@@ -249,8 +250,9 @@ pub async fn profile_update_project(
 pub async fn profile_add_project_from_version(
     path: &str,
     version_id: &str,
+    reason: DownloadReason,
 ) -> Result<String> {
-    Ok(profile::add_project_from_version(path, version_id).await?)
+    Ok(profile::add_project_from_version(path, version_id, reason).await?)
 }
 
 // Adds a project to a profile from a path

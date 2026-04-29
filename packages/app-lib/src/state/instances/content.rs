@@ -21,7 +21,9 @@
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::profiles::{Profile, ProfileFile, ProjectType};
 use crate::state::{CacheBehaviour, CachedEntry};
-use crate::util::fetch::{FetchSemaphore, fetch_mirrors, sha1_async};
+use crate::util::fetch::{
+    DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
+};
 use async_zip::base::read::seek::ZipFileReader;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
@@ -880,9 +882,25 @@ async fn get_modpack_identifiers(
             ))
         })?;
 
+    // TODO: use profile's game_version/loader instead of picking first from version
+    let download_meta = DownloadMeta {
+        reason: DownloadReason::Modpack,
+        game_version: version
+            .game_versions
+            .first()
+            .cloned()
+            .unwrap_or_default(),
+        loader: version
+            .loaders
+            .first()
+            .cloned()
+            .unwrap_or_default(),
+    };
+
     let mrpack_bytes = fetch_mirrors(
         &[&primary_file.url],
         primary_file.hashes.get("sha1").map(|s| s.as_str()),
+        Some(&download_meta),
         fetch_semaphore,
         pool,
     )

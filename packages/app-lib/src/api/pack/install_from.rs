@@ -6,7 +6,9 @@ use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{
     CacheBehaviour, CachedEntry, LinkedData, ProfileInstallStage, SideType,
 };
-use crate::util::fetch::{fetch, fetch_advanced, write_cached_icon};
+use crate::util::fetch::{
+    DownloadMeta, DownloadReason, fetch, fetch_advanced, write_cached_icon,
+};
 use crate::util::io;
 
 use path_util::SafeRelativeUtf8UnixPathBuf;
@@ -287,12 +289,28 @@ pub async fn generate_pack_from_version_id(
             )
         })?;
 
+    // TODO: use profile's game_version/loader instead of picking first from version
+    let download_meta = DownloadMeta {
+        reason: DownloadReason::Modpack,
+        game_version: version
+            .game_versions
+            .first()
+            .cloned()
+            .unwrap_or_default(),
+        loader: version
+            .loaders
+            .first()
+            .cloned()
+            .unwrap_or_default(),
+    };
+
     let file = fetch_advanced(
         Method::GET,
         &url,
         hash.map(|x| &**x),
         None,
         None,
+        Some(&download_meta),
         Some((&loading_bar, 70.0)),
         &state.fetch_semaphore,
         &state.pool,
@@ -321,7 +339,7 @@ pub async fn generate_pack_from_version_id(
         let fetched = if let Some(icon_url) = project.icon_url {
             let state = State::get().await?;
             let icon_bytes =
-                fetch(&icon_url, None, &state.fetch_semaphore, &state.pool)
+                fetch(&icon_url, None, None, &state.fetch_semaphore, &state.pool)
                     .await?;
 
             let filename = icon_url.rsplit('/').next();

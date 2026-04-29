@@ -8,7 +8,9 @@ use crate::pack::install_from::{
 use crate::state::{
     CacheBehaviour, CachedEntry, ProfileInstallStage, SideType, cache_file_hash,
 };
-use crate::util::fetch::{fetch_mirrors, sha1_async, write};
+use crate::util::fetch::{
+    DownloadMeta, DownloadReason, fetch_mirrors, sha1_async, write,
+};
 use crate::util::io;
 use crate::{State, profile};
 use async_zip::base::read::seek::ZipFileReader;
@@ -207,6 +209,34 @@ pub async fn install_zipped_mrpack_files(
     )
     .await?;
 
+    // TODO: use profile's game_version/loader instead of deriving from pack deps
+    let download_meta = DownloadMeta {
+        reason: DownloadReason::Modpack,
+        game_version: pack
+            .dependencies
+            .get(&crate::pack::install_from::PackDependency::Minecraft)
+            .cloned()
+            .unwrap_or_default(),
+        loader: pack
+            .dependencies
+            .keys()
+            .find_map(|dep| match dep {
+                crate::pack::install_from::PackDependency::Forge => Some("forge"),
+                crate::pack::install_from::PackDependency::NeoForge => {
+                    Some("neoforge")
+                }
+                crate::pack::install_from::PackDependency::FabricLoader => {
+                    Some("fabric")
+                }
+                crate::pack::install_from::PackDependency::QuiltLoader => {
+                    Some("quilt")
+                }
+                _ => None,
+            })
+            .unwrap_or("")
+            .to_string(),
+    };
+
     let num_files = pack.files.len();
     loading_try_for_each_concurrent(
         futures::stream::iter(pack.files.into_iter())
@@ -218,6 +248,7 @@ pub async fn install_zipped_mrpack_files(
         None,
         |project| {
             let profile_path = profile_path.clone();
+            let download_meta = download_meta.clone();
             async move {
                 //TODO: Future update: prompt user for optional files in a modpack
                 if let Some(env) = project.env
@@ -235,6 +266,7 @@ pub async fn install_zipped_mrpack_files(
                         .map(|x| &**x)
                         .collect::<Vec<&str>>(),
                     project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
+                    Some(&download_meta),
                     &state.fetch_semaphore,
                     &state.pool,
                 )
