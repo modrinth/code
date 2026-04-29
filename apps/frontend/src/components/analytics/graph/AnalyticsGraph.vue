@@ -30,7 +30,7 @@
 					>
 						<button
 							type="button"
-							class="inline-flex cursor-pointer items-center gap-1.5 text-sm transition-opacity"
+							class="inline-flex cursor-pointer items-center gap-1.5 text-sm transition-all hover:brightness-125"
 							:class="legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary'"
 							:aria-pressed="!legendEntry.hidden"
 							@click="toggleLegendEntryVisibility(legendEntry.id)"

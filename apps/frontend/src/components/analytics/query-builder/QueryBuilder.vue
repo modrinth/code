@@ -5,18 +5,46 @@
 				<FolderOpenIcon class="size-5" />
 				<span class="text-base font-medium">Projects:</span>
 			</div>
-			<div class="w-48">
+			<div class="w-fit">
 				<MultiSelect
-					v-model="selectedProjectIds"
+					v-model="draftSelectedProjectIds"
 					:options="projectOptions"
 					:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
-					:dropdown-min-width="'24rem'"
+					dropdown-min-width="24rem"
 					placeholder="Select projects"
 					:searchable="projectOptions.length > 6"
 					:max-tag-rows="1"
 					include-select-all-option
 					select-all-label="All projects"
-				/>
+					@open="handleProjectSelectOpen"
+					@close="handleProjectSelectClose"
+				>
+					<template #input-content="{ isOpen, openDirection }">
+						<div class="flex min-h-8 min-w-0 flex-1 items-center gap-2">
+							<span class="min-w-0 flex-1 truncate px-1.5 py-1 font-medium text-primary">
+								{{ selectedProjectLabel }}
+							</span>
+							<div class="ml-2 flex shrink-0 items-center gap-1.5">
+								<button
+									v-if="isOpen && draftSelectedProjectIds.length > 0"
+									type="button"
+									class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+									aria-label="Clear projects"
+									@click.stop="clearDraftSelectedProjects"
+								>
+									<XIcon class="size-5" />
+								</button>
+								<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+								<ChevronLeftIcon
+									class="size-5 shrink-0 text-secondary transition-transform duration-150"
+									:class="
+										isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+									"
+								/>
+							</div>
+						</div>
+					</template>
+				</MultiSelect>
 			</div>
 		</div>
 
@@ -26,7 +54,7 @@
 					<CalendarIcon class="size-5" />
 					<span class="text-base font-medium">Timeframe:</span>
 				</div>
-				<div class="">
+				<div>
 					<Combobox
 						v-model="selectedTimeframe"
 						:options="timeframeOptions"
@@ -37,7 +65,7 @@
 			</div>
 			<div class="flex items-center gap-2">
 				<span class="text-base font-medium text-primary">Grouped by</span>
-				<div class="">
+				<div>
 					<Combobox
 						v-model="selectedGroupBy"
 						:options="groupByOptions"
@@ -56,7 +84,7 @@
 				</div>
 				<div class="flex flex-col gap-2">
 					<div class="flex flex-wrap items-center gap-2">
-						<div class="">
+						<div>
 							<Combobox
 								v-model="selectedBreakdown"
 								:options="breakdownOptions"
@@ -76,7 +104,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { BlocksIcon, CalendarIcon, FolderOpenIcon } from '@modrinth/assets'
+import { BlocksIcon, CalendarIcon, ChevronLeftIcon, FolderOpenIcon, XIcon } from '@modrinth/assets'
 import { Combobox, type ComboboxOption, MultiSelect, type MultiSelectOption } from '@modrinth/ui'
 
 import {
@@ -112,6 +140,73 @@ const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 		label: project.name,
 	})),
 )
+
+const allProjectIds = computed(() => projectOptions.value.map((project) => project.value))
+const isProjectSelectOpen = ref(false)
+const draftSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
+
+function isSameProjectSelection(left: string[], right: string[]) {
+	if (left.length !== right.length) {
+		return false
+	}
+
+	const rightProjectIds = new Set(right)
+	return left.every((projectId) => rightProjectIds.has(projectId))
+}
+
+function normalizeProjectSelection(projectIds: string[]) {
+	return projectIds.length > 0 ? [...projectIds] : [...allProjectIds.value]
+}
+
+watch(selectedProjectIds, (nextSelectedProjectIds) => {
+	if (isProjectSelectOpen.value) {
+		return
+	}
+
+	draftSelectedProjectIds.value = [...nextSelectedProjectIds]
+})
+
+const areAllProjectsSelected = computed(() => {
+	return isSameProjectSelection(draftSelectedProjectIds.value, allProjectIds.value)
+})
+
+const selectedProjectLabel = computed(() => {
+	if (areAllProjectsSelected.value) {
+		return 'All projects'
+	}
+
+	if (draftSelectedProjectIds.value.length === 0) {
+		return 'Select projects'
+	}
+
+	if (draftSelectedProjectIds.value.length === 1) {
+		const selectedProject = projectOptions.value.find(
+			(project) => project.value === draftSelectedProjectIds.value[0],
+		)
+		return selectedProject?.label ?? '1 project'
+	}
+
+	return `${draftSelectedProjectIds.value.length} projects`
+})
+
+function handleProjectSelectOpen() {
+	isProjectSelectOpen.value = true
+	draftSelectedProjectIds.value = [...selectedProjectIds.value]
+}
+
+function handleProjectSelectClose(nextSelectedProjectIds: string[] = draftSelectedProjectIds.value) {
+	isProjectSelectOpen.value = false
+	const nextProjectIds = normalizeProjectSelection(nextSelectedProjectIds)
+
+	draftSelectedProjectIds.value = [...nextProjectIds]
+	if (!isSameProjectSelection(selectedProjectIds.value, nextProjectIds)) {
+		selectedProjectIds.value = nextProjectIds
+	}
+}
+
+function clearDraftSelectedProjects() {
+	draftSelectedProjectIds.value = []
+}
 
 const showProjectRow = computed(() => projects.value.length > 1)
 
