@@ -10,6 +10,20 @@ export type VersionEntry = {
 }
 
 const VERSIONS: VersionEntry[] = [
+	// 	{
+	// 		date: `2026-04-29T03:54:14+00:00`,
+	// 		product: 'app',
+	// 		version: '0.13.7',
+	// 		body: `## Fixed
+	// - Fixed Java auto-installation not working on macOS
+	// - Fix a skin naming error.`,
+	// 	},
+	{
+		date: `2026-04-29T03:54:14+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Server settings save action bar not accessible due to being behind modal.`,
+	},
 	{
 		date: `2026-04-27T19:59:24+00:00`,
 		product: 'app',
