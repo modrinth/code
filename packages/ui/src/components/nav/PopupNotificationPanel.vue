@@ -51,11 +51,11 @@
 							{{ item.text }}
 						</span>
 					</div>
-					<div v-if="item.progressItems?.length" class="flex flex-col gap-2">
+					<div v-if="item.progressItems?.length" class="flex flex-col gap-3">
 						<div
 							v-for="progressItem in item.progressItems"
 							:key="progressItem.id"
-							class="flex flex-col gap-1.5"
+							class="flex flex-col gap-2"
 						>
 							<div class="text-contrast truncate">
 								{{ progressItem.title }}
