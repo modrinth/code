@@ -95,11 +95,11 @@ const messages = defineMessages({
 	},
 	modpackBaseTitle: {
 		id: 'creation-flow.modal.setup-type.option.modpack-base.title',
-		defaultMessage: 'Modpack base',
+		defaultMessage: 'Install modpack',
 	},
 	modpackBaseDescription: {
 		id: 'creation-flow.modal.setup-type.option.modpack-base.description',
-		defaultMessage: 'Use a popular modpack or upload one as your starting point.',
+		defaultMessage: 'Browse modpacks on Modrinth or import one from a file.',
 	},
 	importInstanceTitle: {
 		id: 'creation-flow.modal.setup-type.option.import-instance.title',

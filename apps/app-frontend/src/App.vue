@@ -68,11 +68,13 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
+import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
+import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
@@ -82,7 +84,6 @@ import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
-import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
@@ -172,6 +173,7 @@ provideModalBehavior({
 
 const {
 	installationModal,
+	unknownPackWarningModal,
 	fetchExistingInstanceNames,
 	handleCreate,
 	handleBrowseModpacks,
@@ -181,7 +183,7 @@ const {
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
-} = setupProviders(notificationManager)
+} = setupProviders(notificationManager, popupNotificationManager)
 
 const news = ref([])
 const availableSurvey = ref(false)
@@ -784,7 +786,9 @@ async function handleCommand(e) {
 	if (e.event === 'RunMRPack') {
 		// RunMRPack should directly install a local mrpack given a path
 		if (e.path.endsWith('.mrpack')) {
-			await create_profile_and_install_from_file(e.path).catch(handleError)
+			await create_profile_and_install_from_file(e.path, (createProfile, fileName) =>
+				unknownPackWarningModal.value?.show(createProfile, fileName),
+			).catch(handleError)
 			trackEvent('InstanceCreate', {
 				source: 'CreationModalFileDrop',
 			})
@@ -1171,7 +1175,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </script>
 
 <template>
-	<WindowControls />
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
 	<div
@@ -1211,6 +1214,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
 		/>
+		<UnknownPackWarningModal ref="unknownPackWarningModal" />
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
 		>
@@ -1367,9 +1371,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</ButtonStyled>
 				<div class="flex mr-3">
 					<Suspense>
-						<RunningAppBar />
+						<AppActionBar />
 					</Suspense>
 				</div>
+				<WindowControls />
 			</section>
 		</div>
 	</div>
