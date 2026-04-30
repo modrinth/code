@@ -18,6 +18,7 @@
 				wrapper-class="w-full"
 				min-date="1900-01-01"
 				:max-date="maxInputDate"
+				:default-view-date="defaultDobViewDate"
 				preserve-day
 				:placeholder="formatMessage(messages.dateOfBirthPlaceholder)"
 			/>
@@ -132,6 +133,8 @@ const tokenModel = defineModel<string>('token', { default: '' })
 const subscribeModel = defineModel<boolean>('subscribe', { default: false })
 
 const maxInputDate = computed(() => `${new Date().getFullYear()}-12-31`)
+
+const defaultDobViewDate = computed(() => `${new Date().getFullYear() - 13}-01-01`)
 
 const maxBirthDate = computed(() => {
 	const date = new Date()

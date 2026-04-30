@@ -347,6 +347,7 @@ const messages = defineMessages({
 }
 
 .oauth-provider-link--last {
+	border-width: 1px !important;
 	border-color: var(--color-green) !important;
 }
 

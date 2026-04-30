@@ -54,6 +54,12 @@ const props = withDefaults(
 		minDate?: string | Date
 		maxDate?: string | Date
 		/**
+		 * The date the calendar opens to when no value is selected. Does not set
+		 * the value — only controls which month/year is shown when the picker
+		 * first opens (and on subsequent opens while the value is empty).
+		 */
+		defaultViewDate?: string | Date
+		/**
 		 * The stored value format emitted by v-model. See https://flatpickr.js.org/formatting/
 		 *
 		 * Examples:
@@ -196,6 +202,7 @@ watch(
 			onReady: picker.value.config.onReady,
 			onMonthChange: picker.value.config.onMonthChange,
 			onYearChange: picker.value.config.onYearChange,
+			onOpen: picker.value.config.onOpen,
 		})
 
 		if (!isPreservingDay.value && props.mode === 'single') {
@@ -221,6 +228,10 @@ onMounted(async () => {
 	picker.value = flatpickr(inputRef.value, {
 		...flatpickrOptions(),
 		onReady: (_selectedDates, _dateStr, instance) => {
+			if (props.defaultViewDate && instance.selectedDates.length === 0) {
+				instance.jumpToDate(props.defaultViewDate)
+			}
+
 			instance.calendarContainer.addEventListener('mousedown', (event) => {
 				if (props.mode !== 'range') return
 				const target = event.target as HTMLElement | null
@@ -287,6 +298,11 @@ onMounted(async () => {
 		},
 		onYearChange: (_selectedDates, _dateStr, instance) => {
 			applyPreserveDay(instance)
+		},
+		onOpen: (_selectedDates, _dateStr, instance) => {
+			if (props.defaultViewDate && instance.selectedDates.length === 0) {
+				instance.jumpToDate(props.defaultViewDate)
+			}
 		},
 	})
 
