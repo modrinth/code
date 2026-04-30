@@ -14,6 +14,7 @@
 			:searchable="preview.category.searchable"
 			:search-placeholder="preview.category.searchPlaceholder"
 			:trigger-class="previewTriggerClass"
+			dropdown-min-width="18rem"
 			@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
 			@open="openPreviewFilterDraft(preview.key)"
 			@close="commitPreviewFilterDraft(preview.key)"
@@ -108,7 +109,7 @@
 			>
 				<div
 					v-if="activeCategory.searchable"
-					class="border-0 border-b border-solid border-b-surface-5 px-3 py-1.5 pb-2.5"
+					class="border-0 border-b border-solid border-b-surface-5 px-3 py-2.5"
 				>
 					<StyledInput
 						v-model="categorySearchQuery"
@@ -183,29 +184,29 @@ import type { ComponentPublicInstance, CSSProperties } from 'vue'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import {
+	injectAnalyticsDashboardContext,
 	type AnalyticsQueryFilterCategory,
 	type AnalyticsSelectedFilters,
-	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
 import {
 	ADD_MENU_WIDTH,
 	ALL_FILTER_VALUE,
-	type FilterCategory,
-	type FilterOption,
-	type FilterSelectionSource,
-	type Point,
 	areSelectedFiltersEqual,
 	areStringArraysEqual,
 	cloneSelectedFilters,
 	getAddMenuPosition,
 	getCategorySelectionCount as getCategorySelectionCountValue,
 	getCategorySelectionSummary as getCategorySelectionSummaryValue,
-	getOptionsWithSelectedValues,
-	getSubmenuPosition,
 	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
 	isFilterValueSelected as getIsFilterValueSelected,
+	getOptionsWithSelectedValues,
+	getSubmenuPosition,
 	normalizeSelectedValues as normalizeSelectedFilterValues,
+	type FilterCategory,
+	type FilterOption,
+	type FilterSelectionSource,
+	type Point,
 } from './queryFilter'
 
 const { filterOptions, selectedFilters, getVersionDisplayName } = injectAnalyticsDashboardContext()
