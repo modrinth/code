@@ -126,7 +126,7 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
-import QueryBuilderFilter from './QueryFilter.vue'
+import QueryBuilderFilter from './query-filter/QueryFilter.vue'
 import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 import { ensureMinimumTimeRange, useSelectedAnalyticsTimeRange } from './timeframe-picker/timeframe'
 
