@@ -24,7 +24,7 @@
 
 				<div class="flex shrink-0 items-center gap-2">
 					<PanelServerActionButton size="large" start-label="Start world" />
-					<ButtonStyled circular>
+					<ButtonStyled size="large" circular>
 						<button
 							v-tooltip="formatMessage(messages.worldSettings)"
 							@click="openServerSettings({ tabId: 'installation' })"
