@@ -191,7 +191,6 @@ import {
 
 import {
 	ADD_MENU_WIDTH,
-	ALL_FILTER_VALUE,
 	areSelectedFiltersEqual,
 	areStringArraysEqual,
 	cloneSelectedFilters,
@@ -241,20 +240,14 @@ const filterCategories = computed<FilterCategory[]>(() => [
 	{
 		key: 'country',
 		label: 'Country',
-		allLabel: 'All countries',
 		searchable: true,
 		searchPlaceholder: 'Search countries...',
-		options: withSelectedOptions('country', [
-			{ value: ALL_FILTER_VALUE, label: 'All countries' },
-			...countryFilterOptions.value,
-		]),
+		options: withSelectedOptions('country', countryFilterOptions.value),
 	},
 	{
 		key: 'monetization',
 		label: 'Monetization',
-		allLabel: 'All',
 		options: [
-			{ value: ALL_FILTER_VALUE, label: 'All' },
 			{ value: 'monetized', label: 'Monetized' },
 			{ value: 'unmonetized', label: 'Unmonetized' },
 		],
@@ -262,40 +255,26 @@ const filterCategories = computed<FilterCategory[]>(() => [
 	{
 		key: 'download_source',
 		label: 'Download Source',
-		allLabel: 'All download sources',
-		options: withSelectedOptions('download_source', [
-			{ value: ALL_FILTER_VALUE, label: 'All download sources' },
-		]),
+		options: withSelectedOptions('download_source', []),
 	},
 	{
 		key: 'version_id',
 		label: 'Project version',
-		allLabel: 'All project versions',
 		searchable: true,
 		searchPlaceholder: 'Search project versions...',
-		options: withSelectedOptions('version_id', [
-			{ value: ALL_FILTER_VALUE, label: 'All project versions' },
-			...versionFilterOptions.value,
-		]),
+		options: withSelectedOptions('version_id', versionFilterOptions.value),
 	},
 	{
 		key: 'game_version',
 		label: 'Game Version',
-		allLabel: 'All game versions',
 		searchable: true,
 		searchPlaceholder: 'Search game versions...',
-		options: withSelectedOptions('game_version', [
-			{ value: ALL_FILTER_VALUE, label: 'All game versions' },
-			...gameVersionFilterOptions.value,
-		]),
+		options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
 	},
 	{
 		key: 'loader_type',
 		label: 'Loader Type',
-		allLabel: 'All loader types',
-		options: withSelectedOptions('loader_type', [
-			{ value: ALL_FILTER_VALUE, label: 'All loader types' },
-		]),
+		options: withSelectedOptions('loader_type', loaderTypeFilterOptions.value),
 	},
 ])
 
@@ -308,8 +287,12 @@ const activeCategory = computed(() =>
 )
 
 const filteredActiveCategoryOptions = computed(() => {
-	if (!activeCategory.value?.searchable) {
-		return activeCategory.value?.options ?? []
+	if (!activeCategory.value) {
+		return []
+	}
+
+	if (!activeCategory.value.searchable) {
+		return activeCategory.value.options
 	}
 
 	const query = categorySearchQuery.value.trim().toLowerCase()
@@ -318,9 +301,6 @@ const filteredActiveCategoryOptions = computed(() => {
 	}
 
 	return activeCategory.value.options.filter((option) => {
-		if (option.value === ALL_FILTER_VALUE) {
-			return true
-		}
 		if (option.label.toLowerCase().includes(query)) {
 			return true
 		}
@@ -395,6 +375,16 @@ const gameVersionFilterOptions = computed<FilterOption[]>(() =>
 		.sort((left, right) => left.label.localeCompare(right.label)),
 )
 
+const loaderTypeFilterOptions = computed<FilterOption[]>(() =>
+	filterOptions.value.loaderTypes
+		.map((loaderType) => ({
+			value: loaderType,
+			label: getLoaderTypeFilterOptionLabel(loaderType),
+			searchTerms: [loaderType],
+		}))
+		.sort((left, right) => left.label.localeCompare(right.label)),
+)
+
 function getCountryFilterOptionLabel(countryCode: string): string {
 	const normalizedCode = countryCode.trim().toUpperCase()
 	if (normalizedCode === 'XX') {
@@ -402,6 +392,15 @@ function getCountryFilterOptionLabel(countryCode: string): string {
 	}
 
 	return countryLabelsByCode.value.get(normalizedCode) ?? countryCode
+}
+
+function getLoaderTypeFilterOptionLabel(loaderType: string): string {
+	const normalizedLoaderType = loaderType.trim()
+	if (normalizedLoaderType.length === 0) {
+		return loaderType
+	}
+
+	return `${normalizedLoaderType.charAt(0).toUpperCase()}${normalizedLoaderType.slice(1)}`
 }
 
 function resetAddMenuDraft() {
@@ -541,6 +540,9 @@ function getMissingSelectedOptionLabel(
 	if (categoryKey === 'version_id') {
 		return getVersionDisplayName
 	}
+	if (categoryKey === 'loader_type') {
+		return getLoaderTypeFilterOptionLabel
+	}
 	return undefined
 }
 
@@ -555,13 +557,6 @@ function toggleFilterValue(
 	nextValue: boolean,
 ) {
 	const currentValues = getSelectedValues(categoryKey, 'draft')
-
-	if (value === ALL_FILTER_VALUE) {
-		if (nextValue) {
-			setSelectedValues(categoryKey, [ALL_FILTER_VALUE], 'draft')
-		}
-		return
-	}
 
 	if (nextValue) {
 		if (!currentValues.includes(value)) {
@@ -595,7 +590,7 @@ function getCategorySelectionSummary(category: FilterCategory): string {
 
 function clearFilterCategory(categoryKey: AnalyticsQueryFilterCategory) {
 	commitPreviewFilterDrafts()
-	setSelectedValues(categoryKey, [ALL_FILTER_VALUE])
+	setSelectedValues(categoryKey, [])
 }
 
 function clearAllFilters() {

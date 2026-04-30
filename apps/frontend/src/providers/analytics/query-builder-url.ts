@@ -185,6 +185,23 @@ function parseListQueryValue(
 	return Array.from(new Set(parsedValues))
 }
 
+function normalizeFilterQueryValues(
+	category: Exclude<AnalyticsQueryFilterCategory, 'project'>,
+	values: string[],
+): string[] {
+	if (category !== 'loader_type') {
+		return values
+	}
+
+	return Array.from(
+		new Set(
+			values
+				.map((value) => value.trim().toLowerCase())
+				.filter((value) => value.length > 0),
+		),
+	)
+}
+
 function parsePresetQueryValue<T extends string>(
 	value: LocationQueryValue | LocationQueryValue[] | undefined,
 	allowedValues: readonly T[],
@@ -325,7 +342,10 @@ export function readAnalyticsQueryBuilderState(
 
 	const selectedFilters = buildEmptySelectedFilters()
 	for (const category of URL_FILTER_CATEGORIES) {
-		selectedFilters[category] = parseListQueryValue(query[FILTER_QUERY_KEY_BY_CATEGORY[category]])
+		selectedFilters[category] = normalizeFilterQueryValues(
+			category,
+			parseListQueryValue(query[FILTER_QUERY_KEY_BY_CATEGORY[category]]),
+		)
 	}
 
 	const selectedCustomTimeframeStartDate = parseDateQueryValue(

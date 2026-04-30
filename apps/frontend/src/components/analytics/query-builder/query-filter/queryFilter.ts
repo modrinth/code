@@ -25,7 +25,6 @@ export type FilterOption = {
 export type FilterCategory = {
 	key: AnalyticsQueryFilterCategory
 	label: string
-	allLabel: string
 	options: FilterOption[]
 	searchable?: boolean
 	searchPlaceholder?: string
@@ -134,7 +133,18 @@ export function normalizeSelectedValues(
 		return []
 	}
 
-	return uniqueValues.filter((value) => value !== ALL_FILTER_VALUE)
+	const selectedValues = uniqueValues.filter((value) => value !== ALL_FILTER_VALUE)
+	if (categoryKey === 'loader_type') {
+		return Array.from(
+			new Set(
+				selectedValues
+					.map((value) => value.trim().toLowerCase())
+					.filter((value) => value.length > 0),
+			),
+		)
+	}
+
+	return selectedValues
 }
 
 export function isFilterValueSelected(
@@ -176,7 +186,7 @@ export function getCategorySelectionSummary(
 	projectIds: string[],
 ): string {
 	if (count === 0) {
-		return category.allLabel
+		return ''
 	}
 
 	if (count === 1) {
