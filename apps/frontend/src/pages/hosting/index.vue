@@ -1249,8 +1249,12 @@ const PING_COUNT = 20
 const PING_INTERVAL = 200
 const MAX_PING_TIME = 1000
 
-function runPingTest(region, index = 1) {
-	if (index > 10) {
+const initialIndex = {
+	'eu-lim': 31,
+}
+
+function runPingTest(region, index = initialIndex[region.shortcode] ?? 1) {
+	if (index > (initialIndex[region.shortcode] ?? 1) + 10) {
 		regionPings.value.push({
 			region: region.shortcode,
 			ping: -1,
