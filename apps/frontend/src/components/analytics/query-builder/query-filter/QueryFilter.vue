@@ -101,7 +101,7 @@
 			<div
 				v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 				ref="submenu"
-				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] min-w-[16rem] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
+				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] w-64 max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
 				:style="submenuStyle"
 				@mouseenter="handleSubmenuMouseEnter"
 				@mouseleave="handleSubmenuMouseLeave"
@@ -796,7 +796,19 @@ function scheduleSubmenuPositionUpdate(retries = 8) {
 	}
 
 	nextTick(() => {
-		if (!isAddMenuOpen.value || updateSubmenuPosition() || retries <= 0) {
+		if (!isAddMenuOpen.value) {
+			return
+		}
+
+		const hasRenderedSubmenu = submenu.value !== null
+		if (updateSubmenuPosition()) {
+			if (!hasRenderedSubmenu) {
+				nextTick(() => updateSubmenuPosition())
+			}
+			return
+		}
+
+		if (retries <= 0) {
 			return
 		}
 
