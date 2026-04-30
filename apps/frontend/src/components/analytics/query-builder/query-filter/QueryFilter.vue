@@ -102,7 +102,8 @@
 			<div
 				v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 				ref="submenu"
-				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] w-72 max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
+				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
+				:class="activeCategory.key === 'game_version' ? 'w-[22rem]' : 'w-72'"
 				:style="submenuStyle"
 				@mouseenter="handleSubmenuMouseEnter"
 				@mouseleave="handleSubmenuMouseLeave"
@@ -164,6 +165,15 @@
 						</button>
 					</template>
 				</div>
+				<DownloadsThresholdInput
+					v-if="activeCategory.key === 'game_version'"
+					class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
+					label="Game Versions above"
+					input-aria-label="Game version downloads threshold"
+					:threshold="gameVersionDownloadsThreshold"
+					input-width-class="w-16"
+					@update:threshold="setGameVersionDownloadsThreshold"
+				/>
 			</div>
 		</Teleport>
 
@@ -199,6 +209,7 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
+import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
 import {
 	ADD_MENU_WIDTH,
 	areSelectedFiltersEqual,
@@ -221,6 +232,7 @@ import {
 
 const {
 	filterOptions,
+	gameVersionDownloadsByVersion,
 	selectedBreakdown,
 	selectedFilters,
 	getVersionDisplayName,
@@ -237,6 +249,7 @@ const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
 )
 const previewSelectedValueDrafts = ref<Partial<Record<AnalyticsQueryFilterCategory, string[]>>>({})
 const categorySearchQuery = ref('')
+const gameVersionDownloadsThreshold = ref<number | null>(null)
 const lastMousePosition = ref<Point | null>(null)
 const isCursorInsideSubmenu = ref(false)
 const hasSubmenuPosition = ref(false)
@@ -502,6 +515,28 @@ function compareOptionalDateStringsDescending(
 	}
 
 	return leftFallback.localeCompare(rightFallback)
+}
+
+function applyGameVersionDownloadsThreshold() {
+	const threshold = gameVersionDownloadsThreshold.value
+	if (threshold === null) {
+		return
+	}
+
+	setSelectedValues(
+		'game_version',
+		gameVersionFilterOptions.value
+			.filter((gameVersion) => {
+				return (gameVersionDownloadsByVersion.value.get(gameVersion.value) ?? 0) >= threshold
+			})
+			.map((gameVersion) => gameVersion.value),
+		'draft',
+	)
+}
+
+function setGameVersionDownloadsThreshold(threshold: number | null) {
+	gameVersionDownloadsThreshold.value = threshold
+	applyGameVersionDownloadsThreshold()
 }
 
 function resetAddMenuDraft() {
@@ -986,6 +1021,14 @@ watch(isAddMenuOpen, (isOpen) => {
 
 watch(categorySearchQuery, () => {
 	scheduleSubmenuPositionUpdate()
+})
+
+watch(gameVersionDownloadsByVersion, () => {
+	if (!isAddMenuOpen.value || activeCategoryKey.value !== 'game_version') {
+		return
+	}
+
+	applyGameVersionDownloadsThreshold()
 })
 
 watch(filterCategoriesByKey, (nextCategories) => {

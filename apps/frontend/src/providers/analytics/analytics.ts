@@ -89,6 +89,7 @@ export interface AnalyticsDashboardContextValue {
 	filterOptions: ComputedRef<AnalyticsDashboardFilterOptions>
 	versionNumbersById: ComputedRef<Map<string, string>>
 	versionPublishedDatesById: ComputedRef<Map<string, string>>
+	gameVersionDownloadsByVersion: ComputedRef<Map<string, number>>
 	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	isLoading: ComputedRef<boolean>
@@ -918,6 +919,25 @@ export function createAnalyticsDashboardContext(
 	const versionPublishedDatesById = computed(
 		() => new Map((versions.value ?? []).map((version) => [version.id, version.date_published])),
 	)
+	const gameVersionDownloadsByVersion = computed(() => {
+		const downloadsByVersion = new Map<string, number>()
+
+		for (const version of versions.value ?? []) {
+			for (const gameVersion of version.game_versions) {
+				const normalizedGameVersion = gameVersion.trim()
+				if (normalizedGameVersion.length === 0) {
+					continue
+				}
+
+				downloadsByVersion.set(
+					normalizedGameVersion,
+					(downloadsByVersion.get(normalizedGameVersion) ?? 0) + version.downloads,
+				)
+			}
+		}
+
+		return downloadsByVersion
+	})
 
 	const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 	const availableProjectIdSet = computed(() => new Set(availableProjectIds.value))
@@ -1014,6 +1034,7 @@ export function createAnalyticsDashboardContext(
 		filterOptions,
 		versionNumbersById,
 		versionPublishedDatesById,
+		gameVersionDownloadsByVersion,
 		timeSlices,
 		previousTimeSlices,
 		isLoading,

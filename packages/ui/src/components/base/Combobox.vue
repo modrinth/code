@@ -46,7 +46,7 @@
 			ref="triggerRef"
 			role="button"
 			tabindex="0"
-			class="relative flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 text-left transition-all duration-200 text-button-text"
+			class="relative flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 text-left transition-all duration-200 text-button-text gap-2.5"
 			:class="[
 				props.triggerClass,
 				{

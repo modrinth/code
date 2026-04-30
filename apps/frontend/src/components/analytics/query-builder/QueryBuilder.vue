@@ -45,21 +45,14 @@
 						</div>
 					</template>
 					<template #bottom>
-						<div
-							class="flex items-center gap-3 border-0 border-t border-solid border-surface-5 px-3 py-2.5"
-						>
-							<span class="shrink-0 text-sm font-semibold text-primary">Projects above</span>
-							<input
-								v-model="projectDownloadsThresholdInput"
-								type="text"
-								inputmode="numeric"
-								placeholder="0"
-								class="h-8 w-20 rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-center text-sm font-semibold text-primary outline-none transition-[box-shadow,color] focus:text-contrast focus:ring-4 focus:ring-brand-shadow"
-								aria-label="Project downloads threshold"
-								@blur="formatProjectDownloadsThresholdInput"
-							/>
-							<span class="shrink-0 text-sm font-semibold text-primary">downloads</span>
-						</div>
+						<DownloadsThresholdInput
+							class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
+							label="Projects above"
+							input-aria-label="Project downloads threshold"
+							:threshold="projectDownloadsThreshold"
+							input-width-class="w-20"
+							@update:threshold="setProjectDownloadsThreshold"
+						/>
 					</template>
 				</MultiSelect>
 			</div>
@@ -102,7 +95,20 @@
 								:options="breakdownOptions"
 								:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 								:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
-							/>
+							>
+								<template #suffix>
+									<button
+										v-if="selectedBreakdown !== 'none'"
+										type="button"
+										class="-mr-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+										aria-label="Clear breakdown"
+										@click.stop="clearSelectedBreakdown"
+										@keydown.stop
+									>
+										<XIcon class="size-4" />
+									</button>
+								</template>
+							</Combobox>
 						</div>
 					</div>
 				</div>
@@ -126,6 +132,7 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
+import DownloadsThresholdInput from './DownloadsThresholdInput.vue'
 import {
 	getAnalyticsStatsForBreakdown,
 	getAnalyticsStatsForFilterCategory,
@@ -159,7 +166,7 @@ const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 const allProjectIds = computed(() => projectOptions.value.map((project) => project.value))
 const isProjectSelectOpen = ref(false)
 const draftSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
-const projectDownloadsThresholdInput = ref('')
+const projectDownloadsThreshold = ref<number | null>(null)
 
 function isSameProjectSelection(left: string[], right: string[]) {
 	if (left.length !== right.length) {
@@ -226,49 +233,13 @@ function clearDraftSelectedProjects() {
 	draftSelectedProjectIds.value = []
 }
 
+function clearSelectedBreakdown() {
+	selectedBreakdown.value = 'none'
+}
+
 const showProjectRow = computed(() => projects.value.length > 1)
 
-function parseProjectDownloadsThreshold(value: string): number | null {
-	const normalizedValue = value.trim().toLowerCase().replace(/,/g, '')
-	if (!normalizedValue) {
-		return null
-	}
-
-	const match = normalizedValue.match(/^(\d+(?:\.\d+)?)([kmb])?$/)
-	if (!match) {
-		return null
-	}
-
-	const amount = Number.parseFloat(match[1])
-	if (!Number.isFinite(amount)) {
-		return null
-	}
-
-	const multiplierBySuffix: Record<string, number> = {
-		k: 1_000,
-		m: 1_000_000,
-		b: 1_000_000_000,
-	}
-
-	const multiplier = match[2] ? multiplierBySuffix[match[2]] : 1
-	return Math.max(0, Math.floor(amount * multiplier))
-}
-
-function formatCompactNumber(value: number): string {
-	const formatWithSuffix = (divisor: number, suffix: string) => {
-		const dividedValue = value / divisor
-		const fractionDigits = Number.isInteger(dividedValue) ? 0 : 1
-		return `${dividedValue.toFixed(fractionDigits).replace(/\.0$/, '')}${suffix}`
-	}
-
-	if (value >= 1_000_000_000) return formatWithSuffix(1_000_000_000, 'B')
-	if (value >= 1_000_000) return formatWithSuffix(1_000_000, 'M')
-	if (value >= 1_000) return formatWithSuffix(1_000, 'k')
-	return String(value)
-}
-
-function applyProjectDownloadsThreshold() {
-	const threshold = parseProjectDownloadsThreshold(projectDownloadsThresholdInput.value)
+function applyProjectDownloadsThreshold(threshold: number | null) {
 	if (threshold === null) {
 		return
 	}
@@ -278,18 +249,10 @@ function applyProjectDownloadsThreshold() {
 		.map((project) => project.id)
 }
 
-function formatProjectDownloadsThresholdInput() {
-	const threshold = parseProjectDownloadsThreshold(projectDownloadsThresholdInput.value)
-	if (threshold === null) {
-		return
-	}
-
-	projectDownloadsThresholdInput.value = formatCompactNumber(threshold)
+function setProjectDownloadsThreshold(threshold: number | null) {
+	projectDownloadsThreshold.value = threshold
+	applyProjectDownloadsThreshold(threshold)
 }
-
-watch(projectDownloadsThresholdInput, () => {
-	applyProjectDownloadsThreshold()
-})
 
 const groupByPresetOptions: Array<{
 	value: AnalyticsGroupByPreset
