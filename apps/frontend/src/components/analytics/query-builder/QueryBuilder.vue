@@ -126,9 +126,14 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
+import {
+	getAnalyticsStatsForBreakdown,
+	getAnalyticsStatsForFilterCategory,
+	getEnabledAnalyticsStatsForState,
+} from './query-filter/queryFilter'
 import QueryBuilderFilter from './query-filter/QueryFilter.vue'
-import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 import { ensureMinimumTimeRange, useSelectedAnalyticsTimeRange } from './timeframe-picker/timeframe'
+import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 
 const MAX_TIME_SLICES = 1024
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
@@ -367,6 +372,10 @@ function sortStrings<T extends string>(values: T[]): T[] {
 	return [...values].sort((left, right) => left.localeCompare(right))
 }
 
+function includesStat(stats: readonly string[], stat: string): boolean {
+	return stats.includes(stat)
+}
+
 function withBreakdownFields(
 	breakdown: AnalyticsBreakdownPreset,
 	filters: AnalyticsSelectedFilters,
@@ -380,58 +389,96 @@ function withBreakdownFields(
 	const downloads: Labrinth.Analytics.v3.ProjectDownloadsField[] = ['project_id']
 	const playtime: Labrinth.Analytics.v3.ProjectPlaytimeField[] = ['project_id']
 	const revenue: Labrinth.Analytics.v3.ProjectRevenueField[] = ['project_id']
+	const breakdownStats = getAnalyticsStatsForBreakdown(breakdown)
+	const enabledStats = getEnabledAnalyticsStatsForState(breakdown, filters)
 
 	switch (breakdown) {
 		case 'country':
-			views.push('country')
-			downloads.push('country')
+			if (includesStat(breakdownStats, 'views') && includesStat(enabledStats, 'views')) {
+				views.push('country')
+			}
+			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+				downloads.push('country')
+			}
 			break
 		case 'monetization':
-			views.push('monetized')
+			if (includesStat(breakdownStats, 'views') && includesStat(enabledStats, 'views')) {
+				views.push('monetized')
+			}
 			break
 		case 'download_source':
-			views.push('domain')
-			downloads.push('domain')
+			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+				downloads.push('domain')
+			}
 			break
 		case 'version_id':
-			downloads.push('version_id')
-			playtime.push('version_id')
+			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+				downloads.push('version_id')
+			}
+			if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
+				playtime.push('version_id')
+			}
 			break
 		case 'loader':
-			playtime.push('loader')
+			if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
+				playtime.push('loader')
+			}
 			break
 		case 'game_version':
-			playtime.push('game_version')
+			if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
+				playtime.push('game_version')
+			}
 			break
 		default:
 			break
 	}
 
 	if (filters.country.length > 0) {
-		views.push('country')
-		downloads.push('country')
+		const filterStats = getAnalyticsStatsForFilterCategory('country')
+		if (includesStat(filterStats, 'views') && includesStat(enabledStats, 'views')) {
+			views.push('country')
+		}
+		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+			downloads.push('country')
+		}
 	}
 
 	if (filters.monetization.length > 0) {
-		views.push('monetized')
+		const filterStats = getAnalyticsStatsForFilterCategory('monetization')
+		if (includesStat(filterStats, 'views') && includesStat(enabledStats, 'views')) {
+			views.push('monetized')
+		}
 	}
 
 	if (filters.download_source.length > 0) {
-		views.push('domain')
-		downloads.push('domain')
+		const filterStats = getAnalyticsStatsForFilterCategory('download_source')
+		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+			downloads.push('domain')
+		}
 	}
 
 	if (filters.version_id.length > 0) {
-		downloads.push('version_id')
-		playtime.push('version_id')
+		const filterStats = getAnalyticsStatsForFilterCategory('version_id')
+		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+			downloads.push('version_id')
+		}
+		if (includesStat(filterStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
+			playtime.push('version_id')
+		}
 	}
 
 	if (filters.game_version.length > 0) {
-		playtime.push('game_version')
+		const filterStats = getAnalyticsStatsForFilterCategory('game_version')
+		if (includesStat(filterStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
+			playtime.push('game_version')
+		}
 	}
 
 	if (filters.loader_type.length > 0) {
-		playtime.push('loader')
+		const filterStats = getAnalyticsStatsForFilterCategory('loader_type')
+		if (includesStat(filterStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
+			playtime.push('loader')
+		}
 	}
 
 	return {

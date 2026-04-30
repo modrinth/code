@@ -194,11 +194,7 @@ function normalizeFilterQueryValues(
 	}
 
 	return Array.from(
-		new Set(
-			values
-				.map((value) => value.trim().toLowerCase())
-				.filter((value) => value.length > 0),
-		),
+		new Set(values.map((value) => value.trim().toLowerCase()).filter((value) => value.length > 0)),
 	)
 }
 

@@ -1,5 +1,8 @@
 <template>
-	<canvas ref="canvasRef" :style="{ touchAction: props.pinnedSliceIndex === null ? undefined : 'none' }" />
+	<canvas
+		ref="canvasRef"
+		:style="{ touchAction: props.pinnedSliceIndex === null ? undefined : 'none' }"
+	/>
 </template>
 
 <script setup lang="ts">
@@ -52,8 +55,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-	(event: 'hover', payload: AnalyticsChartHoverPayload): void
-	(event: 'pinned-drag', payload: AnalyticsChartHoverPayload): void
+	(event: 'hover' | 'pinned-drag', payload: AnalyticsChartHoverPayload): void
 }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)

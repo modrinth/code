@@ -23,6 +23,7 @@
 </template>
 
 <script setup lang="ts">
+import { RefreshCwIcon } from '@modrinth/assets'
 import { ButtonStyled, injectProjectPageContext } from '@modrinth/ui'
 
 import {
@@ -31,7 +32,6 @@ import {
 } from '~/providers/analytics/analytics'
 import { injectOrganizationContext } from '~/providers/organization-context'
 
-import { RefreshCwIcon } from '@modrinth/assets'
 import AnalyticsGraph from './graph/AnalyticsGraph.vue'
 import QueryBuilder from './query-builder/QueryBuilder.vue'
 import StatCards from './stat-cards/StatCards.vue'

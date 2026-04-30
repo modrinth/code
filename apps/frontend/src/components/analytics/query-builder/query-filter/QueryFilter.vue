@@ -187,16 +187,16 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { MultiSelect, StyledInput, type MultiSelectOption } from '@modrinth/ui'
+import { MultiSelect, type MultiSelectOption, StyledInput } from '@modrinth/ui'
 import { onClickOutside } from '@vueuse/core'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import { useGeneratedState } from '~/composables/generated'
 import {
-	injectAnalyticsDashboardContext,
 	type AnalyticsQueryFilterCategory,
 	type AnalyticsSelectedFilters,
+	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
 import {
@@ -204,22 +204,28 @@ import {
 	areSelectedFiltersEqual,
 	areStringArraysEqual,
 	cloneSelectedFilters,
-	getAddMenuPosition,
-	getCategorySelectionCount as getCategorySelectionCountValue,
-	getCategorySelectionSummary as getCategorySelectionSummaryValue,
-	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
-	isFilterValueSelected as getIsFilterValueSelected,
-	getOptionsWithSelectedValues,
-	getSubmenuPosition,
-	normalizeSelectedValues as normalizeSelectedFilterValues,
 	type FilterCategory,
 	type FilterOption,
 	type FilterSelectionSource,
+	getAddMenuPosition,
+	getCategorySelectionCount as getCategorySelectionCountValue,
+	getCategorySelectionSummary as getCategorySelectionSummaryValue,
+	getOptionsWithSelectedValues,
+	getSubmenuPosition,
+	getVisibleAnalyticsFilterCategoriesForState,
+	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
+	isFilterValueSelected as getIsFilterValueSelected,
+	normalizeSelectedValues as normalizeSelectedFilterValues,
 	type Point,
 } from './queryFilter'
 
-const { filterOptions, selectedFilters, getVersionDisplayName, getVersionPublishedDate } =
-	injectAnalyticsDashboardContext()
+const {
+	filterOptions,
+	selectedBreakdown,
+	selectedFilters,
+	getVersionDisplayName,
+	getVersionPublishedDate,
+} = injectAnalyticsDashboardContext()
 const formattedCountries = useFormattedCountries()
 const generatedState = useGeneratedState()
 
@@ -248,49 +254,61 @@ const categoryButtonRefs = new Map<AnalyticsQueryFilterCategory, HTMLElement>()
 let pendingCategoryTimeout: NodeJS.Timeout | null = null
 let previousMousePosition: Point | null = null
 
-const filterCategories = computed<FilterCategory[]>(() => [
-	{
-		key: 'country',
-		label: 'Country',
-		searchable: true,
-		searchPlaceholder: 'Search countries...',
-		options: withSelectedOptions('country', countryFilterOptions.value),
-	},
-	{
-		key: 'monetization',
-		label: 'Monetization',
-		options: [
-			{ value: 'monetized', label: 'Monetized' },
-			{ value: 'unmonetized', label: 'Unmonetized' },
-		],
-	},
-	{
-		key: 'download_source',
-		label: 'Download Source',
-		searchable: true,
-		searchPlaceholder: 'Search download sources...',
-		options: withSelectedOptions('download_source', downloadSourceFilterOptions.value),
-	},
-	{
-		key: 'version_id',
-		label: 'Project version',
-		searchable: true,
-		searchPlaceholder: 'Search project versions...',
-		options: withSelectedOptions('version_id', versionFilterOptions.value),
-	},
-	{
-		key: 'game_version',
-		label: 'Game Version',
-		searchable: true,
-		searchPlaceholder: 'Search game versions...',
-		options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
-	},
-	{
-		key: 'loader_type',
-		label: 'Loader Type',
-		options: withSelectedOptions('loader_type', loaderTypeFilterOptions.value),
-	},
-])
+const filterCategories = computed<FilterCategory[]>(() => {
+	const filtersForAvailability = isAddMenuOpen.value
+		? draftSelectedFilters.value
+		: selectedFilters.value
+	const visibleCategoryKeys = new Set(
+		getVisibleAnalyticsFilterCategoriesForState(selectedBreakdown.value, filtersForAvailability),
+	)
+	const categories: FilterCategory[] = [
+		{
+			key: 'country',
+			label: 'Country',
+			searchable: true,
+			searchPlaceholder: 'Search countries...',
+			options: withSelectedOptions('country', countryFilterOptions.value),
+		},
+		{
+			key: 'monetization',
+			label: 'Monetization',
+			options: [
+				{ value: 'monetized', label: 'Monetized' },
+				{ value: 'unmonetized', label: 'Unmonetized' },
+			],
+		},
+		{
+			key: 'download_source',
+			label: 'Download Source',
+			searchable: true,
+			searchPlaceholder: 'Search download sources...',
+			options: withSelectedOptions('download_source', downloadSourceFilterOptions.value),
+		},
+		{
+			key: 'version_id',
+			label: 'Project version',
+			searchable: true,
+			searchPlaceholder: 'Search project versions...',
+			options: withSelectedOptions('version_id', versionFilterOptions.value),
+		},
+		{
+			key: 'game_version',
+			label: 'Game Version',
+			searchable: true,
+			searchPlaceholder: 'Search game versions...',
+			options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
+		},
+		{
+			key: 'loader_type',
+			label: 'Loader Type',
+			options: withSelectedOptions('loader_type', loaderTypeFilterOptions.value),
+		},
+	]
+
+	return categories.filter((category) =>
+		visibleCategoryKeys.has(category.key as Exclude<AnalyticsQueryFilterCategory, 'project'>),
+	)
+})
 
 const filterCategoriesByKey = computed(
 	() => new Map(filterCategories.value.map((category) => [category.key, category] as const)),
@@ -713,9 +731,9 @@ function commitPreviewFilterDraft(categoryKey: AnalyticsQueryFilterCategory) {
 		return
 	}
 
-	const nextDrafts = { ...previewSelectedValueDrafts.value }
-	delete nextDrafts[categoryKey]
-	previewSelectedValueDrafts.value = nextDrafts
+	previewSelectedValueDrafts.value = Object.fromEntries(
+		Object.entries(previewSelectedValueDrafts.value).filter(([key]) => key !== categoryKey),
+	)
 	setSelectedValues(categoryKey, draftValues)
 }
 
@@ -968,6 +986,13 @@ watch(isAddMenuOpen, (isOpen) => {
 
 watch(categorySearchQuery, () => {
 	scheduleSubmenuPositionUpdate()
+})
+
+watch(filterCategoriesByKey, (nextCategories) => {
+	if (activeCategoryKey.value && !nextCategories.has(activeCategoryKey.value)) {
+		activeCategoryKey.value = null
+		hasSubmenuPosition.value = false
+	}
 })
 
 onBeforeUnmount(() => {

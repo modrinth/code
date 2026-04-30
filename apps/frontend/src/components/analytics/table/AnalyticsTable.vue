@@ -98,10 +98,10 @@ import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import { Table, type TableColumn, useFormatNumber } from '@modrinth/ui'
 
 import {
-	doesAnalyticsPointMatchFilters,
-	injectAnalyticsDashboardContext,
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardStat,
+	doesAnalyticsPointMatchFilters,
+	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
 import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'

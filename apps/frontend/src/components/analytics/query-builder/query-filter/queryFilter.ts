@@ -1,7 +1,19 @@
 import type {
+	AnalyticsBreakdownPreset,
+	AnalyticsDashboardStat,
 	AnalyticsQueryFilterCategory,
 	AnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
+
+export type AnalyticsDashboardDimension =
+	| 'project'
+	| 'version_id'
+	| 'country'
+	| 'monetization'
+	| 'download_source'
+	| 'download_reason'
+	| 'game_version'
+	| 'loader_type'
 
 export const ALL_FILTER_VALUE = '__all__'
 export const ADD_MENU_WIDTH = 250
@@ -15,6 +27,52 @@ export const FILTER_VALUE_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'pro
 	'game_version',
 	'loader_type',
 ]
+
+const ANALYTICS_DASHBOARD_STAT_ORDER: AnalyticsDashboardStat[] = [
+	'views',
+	'downloads',
+	'revenue',
+	'playtime',
+]
+
+const ANALYTICS_STATS_BY_DIMENSION: Record<
+	AnalyticsDashboardDimension,
+	readonly AnalyticsDashboardStat[]
+> = {
+	project: ANALYTICS_DASHBOARD_STAT_ORDER,
+	version_id: ['downloads', 'playtime'],
+	country: ['views', 'downloads'],
+	monetization: ['views'],
+	download_source: ['downloads'],
+	download_reason: [],
+	game_version: ['playtime'],
+	loader_type: ['playtime'],
+}
+
+const ANALYTICS_DIMENSION_BY_BREAKDOWN: Record<
+	AnalyticsBreakdownPreset,
+	AnalyticsDashboardDimension
+> = {
+	none: 'project',
+	country: 'country',
+	monetization: 'monetization',
+	download_source: 'download_source',
+	version_id: 'version_id',
+	loader: 'loader_type',
+	game_version: 'game_version',
+}
+
+const ANALYTICS_DIMENSION_BY_FILTER_CATEGORY: Record<
+	Exclude<AnalyticsQueryFilterCategory, 'project'>,
+	AnalyticsDashboardDimension
+> = {
+	country: 'country',
+	monetization: 'monetization',
+	download_source: 'download_source',
+	version_id: 'version_id',
+	game_version: 'game_version',
+	loader_type: 'loader_type',
+}
 
 export type FilterOption = {
 	value: string
@@ -50,6 +108,104 @@ type SubmenuPositionOptions = {
 	submenuHeight: number
 	viewportWidth: number
 	viewportHeight: number
+}
+
+function intersectAnalyticsStats(
+	left: readonly AnalyticsDashboardStat[],
+	right: readonly AnalyticsDashboardStat[],
+): AnalyticsDashboardStat[] {
+	const rightStats = new Set(right)
+	return left.filter((stat) => rightStats.has(stat))
+}
+
+function haveAnalyticsStatOverlap(
+	left: readonly AnalyticsDashboardStat[],
+	right: readonly AnalyticsDashboardStat[],
+): boolean {
+	return left.some((stat) => right.includes(stat))
+}
+
+export function getAnalyticsStatsForDimension(
+	dimension: AnalyticsDashboardDimension,
+): readonly AnalyticsDashboardStat[] {
+	return ANALYTICS_STATS_BY_DIMENSION[dimension]
+}
+
+export function getAnalyticsStatsForBreakdown(
+	breakdown: AnalyticsBreakdownPreset,
+): readonly AnalyticsDashboardStat[] {
+	return getAnalyticsStatsForDimension(ANALYTICS_DIMENSION_BY_BREAKDOWN[breakdown])
+}
+
+export function getAnalyticsStatsForFilterCategory(
+	category: AnalyticsQueryFilterCategory,
+): readonly AnalyticsDashboardStat[] {
+	if (category === 'project') {
+		return ANALYTICS_DASHBOARD_STAT_ORDER
+	}
+
+	return getAnalyticsStatsForDimension(ANALYTICS_DIMENSION_BY_FILTER_CATEGORY[category])
+}
+
+function getAnalyticsStatsForFilterScope(
+	breakdown: AnalyticsBreakdownPreset,
+	filters: AnalyticsSelectedFilters,
+	ignoredCategory?: AnalyticsQueryFilterCategory,
+): readonly AnalyticsDashboardStat[] {
+	let stats = [...getAnalyticsStatsForBreakdown(breakdown)]
+
+	for (const category of FILTER_VALUE_CATEGORIES) {
+		if (category === ignoredCategory || filters[category].length === 0) {
+			continue
+		}
+
+		stats = intersectAnalyticsStats(stats, getAnalyticsStatsForFilterCategory(category))
+	}
+
+	return stats
+}
+
+export function getEnabledAnalyticsStatsForState(
+	breakdown: AnalyticsBreakdownPreset,
+	filters: AnalyticsSelectedFilters,
+): readonly AnalyticsDashboardStat[] {
+	return getAnalyticsStatsForFilterScope(breakdown, filters)
+}
+
+export function getVisibleAnalyticsFilterCategoriesForState(
+	breakdown: AnalyticsBreakdownPreset,
+	filters: AnalyticsSelectedFilters,
+): readonly Exclude<AnalyticsQueryFilterCategory, 'project'>[] {
+	return FILTER_VALUE_CATEGORIES.filter((category) =>
+		haveAnalyticsStatOverlap(
+			getAnalyticsStatsForFilterScope(breakdown, filters, category),
+			getAnalyticsStatsForFilterCategory(category),
+		),
+	)
+}
+
+export function sanitizeAnalyticsSelectedFilters(
+	breakdown: AnalyticsBreakdownPreset,
+	filters: AnalyticsSelectedFilters,
+): AnalyticsSelectedFilters {
+	const nextFilters = cloneSelectedFilters(filters)
+	let availableStats = [...getAnalyticsStatsForBreakdown(breakdown)]
+
+	for (const category of FILTER_VALUE_CATEGORIES) {
+		if (filters[category].length === 0) {
+			continue
+		}
+
+		const categoryStats = getAnalyticsStatsForFilterCategory(category)
+		if (!haveAnalyticsStatOverlap(availableStats, categoryStats)) {
+			nextFilters[category] = []
+			continue
+		}
+
+		availableStats = intersectAnalyticsStats(availableStats, categoryStats)
+	}
+
+	return nextFilters
 }
 
 export function cloneSelectedFilters(filters: AnalyticsSelectedFilters): AnalyticsSelectedFilters {
@@ -216,10 +372,7 @@ export function getAddMenuPosition({
 	const top = opensUp
 		? triggerRect.top - dropdownRect.height - DROPDOWN_GAP
 		: triggerRect.bottom + DROPDOWN_GAP
-	const left = Math.min(
-		triggerRect.left,
-		viewportWidth - dropdownWidth - DROPDOWN_VIEWPORT_MARGIN,
-	)
+	const left = Math.min(triggerRect.left, viewportWidth - dropdownWidth - DROPDOWN_VIEWPORT_MARGIN)
 
 	return {
 		left: `${Math.max(DROPDOWN_VIEWPORT_MARGIN, left)}px`,

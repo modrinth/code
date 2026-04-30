@@ -3,6 +3,10 @@ import { createContext, injectModrinthClient, type ProjectPageContext } from '@m
 import { useQuery } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 
+import {
+	getEnabledAnalyticsStatsForState,
+	sanitizeAnalyticsSelectedFilters,
+} from '~/components/analytics/query-builder/query-filter/queryFilter'
 import { fetchSegmentedWith } from '~/utils/fetch-helpers.ts'
 
 import type { OrganizationContext } from '../organization-context'
@@ -38,26 +42,6 @@ const ANALYTICS_START_TIMESTAMP = '2022-01-01T00:00:00.000Z'
 type ProjectTypeMetadata = {
 	project_type?: string | null
 	project_types?: readonly string[] | null
-}
-
-const ANALYTICS_DASHBOARD_STAT_ORDER: AnalyticsDashboardStat[] = [
-	'views',
-	'downloads',
-	'revenue',
-	'playtime',
-]
-
-const ANALYTICS_RELEVANT_STATS_BY_BREAKDOWN: Record<
-	AnalyticsBreakdownPreset,
-	readonly AnalyticsDashboardStat[]
-> = {
-	none: ANALYTICS_DASHBOARD_STAT_ORDER,
-	country: ['views', 'downloads'],
-	monetization: ['views'],
-	download_source: ['downloads'],
-	version_id: ['downloads', 'playtime'],
-	loader: ['playtime'],
-	game_version: ['playtime'],
 }
 
 export interface AnalyticsDashboardProject {
@@ -115,10 +99,12 @@ export interface AnalyticsDashboardContextValue {
 	percentChanges: ComputedRef<AnalyticsDashboardPercentChanges>
 	getRelevantAnalyticsDashboardStats: (
 		breakdown: AnalyticsBreakdownPreset,
+		filters?: AnalyticsSelectedFilters,
 	) => readonly AnalyticsDashboardStat[]
 	isAnalyticsDashboardStatRelevant: (
 		stat: AnalyticsDashboardStat,
 		breakdown: AnalyticsBreakdownPreset,
+		filters?: AnalyticsSelectedFilters,
 	) => boolean
 	refreshAnalyticsQuery: () => Promise<void>
 	getVersionDisplayName: (versionId: string) => string
@@ -415,7 +401,7 @@ function getMonetizationFilterValue(
 function getDownloadSourceFilterValue(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
 ): string | null {
-	if (dataPoint.metric_kind !== 'views' && dataPoint.metric_kind !== 'downloads') {
+	if (dataPoint.metric_kind !== 'downloads') {
 		return null
 	}
 
@@ -525,30 +511,43 @@ export function createAnalyticsDashboardContext(
 
 	function getRelevantAnalyticsDashboardStats(
 		breakdown: AnalyticsBreakdownPreset,
+		filters: AnalyticsSelectedFilters = selectedFilters.value,
 	): readonly AnalyticsDashboardStat[] {
-		return ANALYTICS_RELEVANT_STATS_BY_BREAKDOWN[breakdown] ?? ANALYTICS_DASHBOARD_STAT_ORDER
+		return getEnabledAnalyticsStatsForState(breakdown, filters)
 	}
 
 	function isAnalyticsDashboardStatRelevant(
 		stat: AnalyticsDashboardStat,
 		breakdown: AnalyticsBreakdownPreset,
+		filters: AnalyticsSelectedFilters = selectedFilters.value,
 	): boolean {
-		return getRelevantAnalyticsDashboardStats(breakdown).includes(stat)
+		return getRelevantAnalyticsDashboardStats(breakdown, filters).includes(stat)
 	}
 
 	watch(
-		[selectedBreakdown, activeStat],
-		([nextBreakdown, nextActiveStat]) => {
-			if (isAnalyticsDashboardStatRelevant(nextActiveStat, nextBreakdown)) {
+		[selectedBreakdown, selectedFilters, activeStat],
+		([nextBreakdown, nextFilters, nextActiveStat]) => {
+			if (isAnalyticsDashboardStatRelevant(nextActiveStat, nextBreakdown, nextFilters)) {
 				return
 			}
 
-			const fallbackStat = getRelevantAnalyticsDashboardStats(nextBreakdown)[0]
+			const fallbackStat = getRelevantAnalyticsDashboardStats(nextBreakdown, nextFilters)[0]
 			if (fallbackStat && fallbackStat !== nextActiveStat) {
 				activeStat.value = fallbackStat
 			}
 		},
-		{ immediate: true },
+		{ deep: true, immediate: true },
+	)
+
+	watch(
+		[selectedBreakdown, selectedFilters],
+		([nextBreakdown, nextFilters]) => {
+			const sanitizedFilters = sanitizeAnalyticsSelectedFilters(nextBreakdown, nextFilters)
+			if (!areSelectedFiltersEqual(nextFilters, sanitizedFilters)) {
+				selectedFilters.value = sanitizedFilters
+			}
+		},
+		{ deep: true, immediate: true },
 	)
 
 	watch(
@@ -571,6 +570,10 @@ export function createAnalyticsDashboardContext(
 		() => route.query,
 		(nextQuery) => {
 			const nextQueryState = readAnalyticsQueryBuilderState(nextQuery, availableProjectIds.value)
+			const nextSelectedFilters = sanitizeAnalyticsSelectedFilters(
+				nextQueryState.selectedBreakdown,
+				nextQueryState.selectedFilters,
+			)
 
 			if (!areStringArraysEqual(selectedProjectIds.value, nextQueryState.selectedProjectIds)) {
 				selectedProjectIds.value = nextQueryState.selectedProjectIds
@@ -601,8 +604,8 @@ export function createAnalyticsDashboardContext(
 			if (selectedBreakdown.value !== nextQueryState.selectedBreakdown) {
 				selectedBreakdown.value = nextQueryState.selectedBreakdown
 			}
-			if (!areSelectedFiltersEqual(selectedFilters.value, nextQueryState.selectedFilters)) {
-				selectedFilters.value = nextQueryState.selectedFilters
+			if (!areSelectedFiltersEqual(selectedFilters.value, nextSelectedFilters)) {
+				selectedFilters.value = nextSelectedFilters
 			}
 		},
 	)
@@ -985,7 +988,9 @@ export function createAnalyticsDashboardContext(
 	}
 
 	function setActiveStat(nextStat: AnalyticsDashboardStat) {
-		if (!isAnalyticsDashboardStatRelevant(nextStat, selectedBreakdown.value)) {
+		if (
+			!isAnalyticsDashboardStatRelevant(nextStat, selectedBreakdown.value, selectedFilters.value)
+		) {
 			return
 		}
 

@@ -153,11 +153,7 @@ export function buildChartDatasets(
 			const color = palette[index % palette.length]
 			return {
 				projectId: `breakdown:${breakdownValue}`,
-				label: formatBreakdownLabel(
-					breakdownValue,
-					selectedBreakdown,
-					getVersionDisplayName,
-				),
+				label: formatBreakdownLabel(breakdownValue, selectedBreakdown, getVersionDisplayName),
 				data,
 				borderColor: color,
 				backgroundColor: color,
