@@ -76,7 +76,7 @@
 						:key="category.key"
 						:ref="(element) => setCategoryButtonRef(category.key, element)"
 						type="button"
-						class="flex w-full appearance-none items-center justify-between gap-1 rounded-xl border-0 p-3 text-left text-base font-medium text-primary shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
+						class="group/filter-menu-button flex h-11 w-full appearance-none items-center justify-between gap-1 rounded-xl border-0 px-3 text-left text-base font-medium text-primary shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
 						:class="category.key === activeCategoryKey ? 'bg-surface-5' : ''"
 						role="menuitem"
 						@mouseenter="handleCategoryMouseEnter(category.key)"
@@ -86,7 +86,8 @@
 						<div class="flex items-center gap-1">
 							<span
 								v-if="getCategorySelectionCount(category.key, 'draft') > 0"
-								class="rounded-full bg-surface-5 px-1.5 py-0.5 text-xs text-primary"
+								class="grid aspect-square w-5 place-items-center rounded-full bg-surface-5 text-center text-xs font-medium text-primary transition-all group-hover/filter-menu-button:brightness-125"
+								:class="category.key === activeCategoryKey ? 'brightness-125' : ''"
 							>
 								{{ getCategorySelectionCount(category.key, 'draft') }}
 							</span>
@@ -101,7 +102,7 @@
 			<div
 				v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 				ref="submenu"
-				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] w-64 max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
+				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] w-72 max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
 				:style="submenuStyle"
 				@mouseenter="handleSubmenuMouseEnter"
 				@mouseleave="handleSubmenuMouseLeave"
@@ -120,40 +121,48 @@
 					/>
 				</div>
 				<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
-					<button
-						v-for="option in filteredActiveCategoryOptions"
-						:key="`${activeCategory.key}-${option.value}`"
-						type="button"
-						class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
-						:aria-checked="isFilterValueSelected(activeCategory.key, option.value)"
-						role="checkbox"
-						@click="toggleFilterOption(activeCategory.key, option.value)"
+					<div
+						v-if="filteredActiveCategoryOptions.length === 0"
+						class="px-3 py-2 text-sm font-medium text-secondary"
 					>
-						<span
-							class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
-							:class="
-								isFilterValueSelected(activeCategory.key, option.value)
-									? 'border-button-border bg-brand text-brand-inverted'
-									: 'border-surface-5 bg-surface-2'
-							"
+						{{ activeCategoryEmptyStateLabel }}
+					</div>
+					<template v-else>
+						<button
+							v-for="option in filteredActiveCategoryOptions"
+							:key="`${activeCategory.key}-${option.value}`"
+							type="button"
+							class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
+							:aria-checked="isFilterValueSelected(activeCategory.key, option.value)"
+							role="checkbox"
+							@click="toggleFilterOption(activeCategory.key, option.value)"
 						>
-							<CheckIcon
-								v-if="isFilterValueSelected(activeCategory.key, option.value)"
-								aria-hidden="true"
-								stroke-width="3"
-							/>
-						</span>
-						<span
-							class="font-semibold leading-tight"
-							:class="
-								isFilterValueSelected(activeCategory.key, option.value)
-									? 'text-contrast'
-									: 'text-primary'
-							"
-						>
-							{{ option.label }}
-						</span>
-					</button>
+							<span
+								class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
+								:class="
+									isFilterValueSelected(activeCategory.key, option.value)
+										? 'border-button-border bg-brand text-brand-inverted'
+										: 'border-surface-5 bg-surface-2'
+								"
+							>
+								<CheckIcon
+									v-if="isFilterValueSelected(activeCategory.key, option.value)"
+									aria-hidden="true"
+									stroke-width="3"
+								/>
+							</span>
+							<span
+								class="font-semibold leading-tight"
+								:class="
+									isFilterValueSelected(activeCategory.key, option.value)
+										? 'text-contrast'
+										: 'text-primary'
+								"
+							>
+								{{ option.label }}
+							</span>
+						</button>
+					</template>
 				</div>
 			</div>
 		</Teleport>
@@ -315,6 +324,12 @@ const filteredActiveCategoryOptions = computed(() => {
 		return option.searchTerms?.some((term) => term.toLowerCase().includes(query)) ?? false
 	})
 })
+
+const activeCategoryEmptyStateLabel = computed(() =>
+	activeCategory.value?.searchable && categorySearchQuery.value.trim().length > 0
+		? 'No options found.'
+		: 'No options available.',
+)
 
 const submenuStyle = computed<CSSProperties>(() => ({
 	left: `${submenuPosition.value.x}px`,
