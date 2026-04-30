@@ -1115,11 +1115,12 @@ impl Profile {
         fetch_semaphore: &FetchSemaphore,
         io_semaphore: &IoSemaphore,
     ) -> crate::Result<String> {
-        let profile = Self::get(profile_path, pool)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
-                    .as_error()
+        let profile =
+            Self::get(profile_path, pool).await?.ok_or_else(|| {
+                crate::ErrorKind::UnmanagedProfileError(
+                    profile_path.to_string(),
+                )
+                .as_error()
             })?;
 
         let download_meta = util::fetch::DownloadMeta {

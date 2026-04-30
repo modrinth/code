@@ -4,11 +4,11 @@ use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use theseus::DownloadReason;
 use theseus::data::{ContentItem, Dependency, LinkedModpackInfo};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
 use theseus::server_address::ServerAddress;
-use theseus::DownloadReason;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile")

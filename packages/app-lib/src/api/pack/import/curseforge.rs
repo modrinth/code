@@ -78,9 +78,14 @@ pub async fn import_curseforge(
         thumbnail_url: Some(thumbnail_url),
     }) = minecraft_instance.installed_modpack.clone()
     {
-        let icon_bytes =
-            fetch(&thumbnail_url, None, None, &state.fetch_semaphore, &state.pool)
-                .await?;
+        let icon_bytes = fetch(
+            &thumbnail_url,
+            None,
+            None,
+            &state.fetch_semaphore,
+            &state.pool,
+        )
+        .await?;
         let filename = thumbnail_url.rsplit('/').next_back();
         if let Some(filename) = filename {
             icon = Some(

@@ -409,7 +409,8 @@ pub async fn download_libraries(
                     // failed download here is not a fatal condition.
                     //
                     // See DEV-479.
-                    match fetch(&url, None, None, &st.fetch_semaphore, &st.pool).await
+                    match fetch(&url, None, None, &st.fetch_semaphore, &st.pool)
+                        .await
                     {
                         Ok(bytes) => {
                             write(&path, &bytes, &st.io_semaphore).await?;

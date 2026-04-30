@@ -290,12 +290,15 @@ pub async fn generate_pack_from_version_id(
             )
         })?;
 
-    let profile = Profile::get(&profile_path, &state.pool)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+    let profile =
+        Profile::get(&profile_path, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::UnmanagedProfileError(
+                    profile_path.to_string(),
+                )
                 .as_error()
-        })?;
+            })?;
 
     let download_meta = DownloadMeta {
         reason: DownloadReason::Modpack,
@@ -337,9 +340,14 @@ pub async fn generate_pack_from_version_id(
         emit_loading(&loading_bar, 10.0, Some("Retrieving icon"))?;
         let fetched = if let Some(icon_url) = project.icon_url {
             let state = State::get().await?;
-            let icon_bytes =
-                fetch(&icon_url, None, None, &state.fetch_semaphore, &state.pool)
-                    .await?;
+            let icon_bytes = fetch(
+                &icon_url,
+                None,
+                None,
+                &state.fetch_semaphore,
+                &state.pool,
+            )
+            .await?;
 
             let filename = icon_url.rsplit('/').next();
 

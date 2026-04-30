@@ -210,12 +210,15 @@ pub async fn install_zipped_mrpack_files(
     )
     .await?;
 
-    let profile = Profile::get(&profile_path, &state.pool)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+    let profile =
+        Profile::get(&profile_path, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::UnmanagedProfileError(
+                    profile_path.to_string(),
+                )
                 .as_error()
-        })?;
+            })?;
 
     let download_meta = DownloadMeta {
         reason: DownloadReason::Modpack,
