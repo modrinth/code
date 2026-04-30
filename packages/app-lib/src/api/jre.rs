@@ -90,6 +90,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             None,
             None,
             None,
+            None,
             Some((&loading_bar, 80.0)),
             &state.fetch_semaphore,
             &state.pool,
