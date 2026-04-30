@@ -1,10 +1,11 @@
 <template>
 	<Combobox
-		v-model="draftSelectedTimeframe"
+		:model-value="highlightedTimeframePreset"
 		:options="timeframeDropdownOptions"
 		:display-value="selectedTimeframeLabel"
 		:max-height="TIMEFRAME_DROPDOWN_MAX_HEIGHT"
 		:dropdown-min-width="'20rem'"
+		@update:model-value="handleTimeframeModelUpdate"
 		@open="handleTimeframeSelectOpen"
 		@close="handleTimeframeSelectClose"
 		@select="handleTimeframePresetSelect"
@@ -28,6 +29,7 @@
 					<CustomTimeframe
 						v-model:amount="draftSelectedLastTimeframeAmount"
 						v-model:unit="draftSelectedLastTimeframeUnit"
+						:active="draftSelectedTimeframeMode === 'last'"
 						:unit-options="lastTimeframeUnitOptions"
 						@activate="draftSelectedTimeframeMode = 'last'"
 					/>
@@ -127,6 +129,14 @@ const timeframeDropdownOptions = computed<ComboboxOption<AnalyticsTimeframePrese
 	draftSelectedTimeframeMode.value === 'custom_range' ? [] : timeframeOptions,
 )
 
+const highlightedTimeframePreset = computed<AnalyticsTimeframePreset | undefined>(() => {
+	if (draftSelectedTimeframeMode.value === 'preset') {
+		return draftSelectedTimeframe.value
+	}
+
+	return undefined
+})
+
 const selectedTimeframeLabel = computed(() => {
 	return getTimeframeLabel(
 		isTimeframeSelectOpen.value ? draftSelectedTimeframeMode.value : selectedTimeframeMode.value,
@@ -205,6 +215,12 @@ function handleTimeframeSelectOpen() {
 function handleTimeframeSelectClose() {
 	commitTimeframeDraft()
 	isTimeframeSelectOpen.value = false
+}
+
+function handleTimeframeModelUpdate(value: AnalyticsTimeframePreset | undefined) {
+	if (value !== undefined) {
+		draftSelectedTimeframe.value = value
+	}
 }
 
 watch(
