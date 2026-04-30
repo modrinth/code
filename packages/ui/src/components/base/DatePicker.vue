@@ -370,7 +370,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar) {
-	@apply mt-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-3 p-2 text-primary shadow-2xl;
+	@apply mt-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary;
 	box-sizing: content-box;
 }
 
@@ -388,14 +388,14 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-months),
 .modrinth-date-picker :deep(.flatpickr-month) {
-	@apply items-center h-10 flex;
+	@apply items-center h-10 flex mb-1;
 }
 
 .modrinth-date-picker :deep(.flatpickr-month),
 .modrinth-date-picker :deep(.flatpickr-current-month),
 .modrinth-date-picker :deep(.flatpickr-weekdays),
 .modrinth-date-picker :deep(.flatpickr-weekdaycontainer) {
-	@apply bg-surface-3 text-contrast;
+	@apply text-contrast shadow-none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month) {
@@ -408,7 +408,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply pr-4;
+	@apply pl-0.5;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year:focus),
@@ -426,7 +426,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-prev-month),
 .modrinth-date-picker :deep(.flatpickr-next-month) {
-	@apply top-3 mx-3 flex h-8 w-8 items-center justify-center rounded-xl p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
+	@apply top-3.5 mx-3.5 flex h-8 w-8 items-center justify-center rounded-xl p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
 }
 
 .modrinth-date-picker :deep(.flatpickr-prev-month svg),
