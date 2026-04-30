@@ -20,6 +20,9 @@ export type AnalyticsTimeframePreset =
 	| 'year_to_date'
 	| 'all_time'
 
+export type AnalyticsTimeframeMode = 'preset' | 'last' | 'custom_range'
+export type AnalyticsLastTimeframeUnit = 'hours' | 'days' | 'weeks' | 'months'
+
 export type AnalyticsGroupByPreset = '1h' | '6h' | 'day' | 'week' | 'month' | 'year'
 
 export type AnalyticsBreakdownPreset =
@@ -35,7 +38,12 @@ export type AnalyticsSelectedFilters = Record<AnalyticsQueryFilterCategory, stri
 
 export type AnalyticsQueryBuilderState = {
 	selectedProjectIds: string[]
+	selectedTimeframeMode: AnalyticsTimeframeMode
 	selectedTimeframe: AnalyticsTimeframePreset
+	selectedLastTimeframeAmount: number
+	selectedLastTimeframeUnit: AnalyticsLastTimeframeUnit
+	selectedCustomTimeframeStartDate: string
+	selectedCustomTimeframeEndDate: string
 	selectedGroupBy: AnalyticsGroupByPreset
 	selectedBreakdown: AnalyticsBreakdownPreset
 	selectedFilters: AnalyticsSelectedFilters
@@ -44,6 +52,9 @@ export type AnalyticsQueryBuilderState = {
 type MutableRouteQuery = Record<string, LocationQueryValueRaw | LocationQueryValueRaw[] | undefined>
 
 export const DEFAULT_TIMEFRAME_PRESET: AnalyticsTimeframePreset = 'yesterday'
+export const DEFAULT_TIMEFRAME_MODE: AnalyticsTimeframeMode = 'preset'
+export const DEFAULT_LAST_TIMEFRAME_AMOUNT = 1
+export const DEFAULT_LAST_TIMEFRAME_UNIT: AnalyticsLastTimeframeUnit = 'days'
 export const DEFAULT_GROUP_BY_PRESET: AnalyticsGroupByPreset = '1h'
 export const DEFAULT_BREAKDOWN_PRESET: AnalyticsBreakdownPreset = 'none'
 
@@ -57,6 +68,14 @@ const TIMEFRAME_PRESET_VALUES: AnalyticsTimeframePreset[] = [
 	'last_180_days',
 	'year_to_date',
 	'all_time',
+]
+
+const TIMEFRAME_MODE_VALUES: AnalyticsTimeframeMode[] = ['preset', 'last', 'custom_range']
+const LAST_TIMEFRAME_UNIT_VALUES: AnalyticsLastTimeframeUnit[] = [
+	'hours',
+	'days',
+	'weeks',
+	'months',
 ]
 
 const GROUP_BY_PRESET_VALUES: AnalyticsGroupByPreset[] = [
@@ -79,7 +98,12 @@ const BREAKDOWN_PRESET_VALUES: AnalyticsBreakdownPreset[] = [
 ]
 
 const QUERY_KEY_PROJECT_IDS = 'a_projects'
+const QUERY_KEY_TIMEFRAME_MODE = 'a_timeframe_mode'
 const QUERY_KEY_TIMEFRAME = 'a_timeframe'
+const QUERY_KEY_TIMEFRAME_LAST_AMOUNT = 'a_timeframe_last_amount'
+const QUERY_KEY_TIMEFRAME_LAST_UNIT = 'a_timeframe_last_unit'
+const QUERY_KEY_TIMEFRAME_START = 'a_timeframe_start'
+const QUERY_KEY_TIMEFRAME_END = 'a_timeframe_end'
 const QUERY_KEY_GROUP_BY = 'a_group_by'
 const QUERY_KEY_BREAKDOWN = 'a_breakdown'
 const QUERY_KEY_FILTER_COUNTRY = 'a_country'
@@ -112,7 +136,12 @@ const FILTER_QUERY_KEY_BY_CATEGORY: Record<
 
 const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_PROJECT_IDS,
+	QUERY_KEY_TIMEFRAME_MODE,
 	QUERY_KEY_TIMEFRAME,
+	QUERY_KEY_TIMEFRAME_LAST_AMOUNT,
+	QUERY_KEY_TIMEFRAME_LAST_UNIT,
+	QUERY_KEY_TIMEFRAME_START,
+	QUERY_KEY_TIMEFRAME_END,
 	QUERY_KEY_GROUP_BY,
 	QUERY_KEY_BREAKDOWN,
 	QUERY_KEY_FILTER_COUNTRY,
@@ -165,6 +194,49 @@ function parsePresetQueryValue<T extends string>(
 	if (!rawValue) return fallbackValue
 	if (!allowedValues.includes(rawValue as T)) return fallbackValue
 	return rawValue as T
+}
+
+function parsePositiveIntegerQueryValue(
+	value: LocationQueryValue | LocationQueryValue[] | undefined,
+	fallbackValue: number,
+): number {
+	const rawValue = Array.isArray(value) ? value[0] : value
+	if (!rawValue) return fallbackValue
+
+	const parsedValue = Number.parseInt(rawValue, 10)
+	if (!Number.isFinite(parsedValue) || parsedValue < 1) return fallbackValue
+	return parsedValue
+}
+
+function getLocalDateQueryValue(date: Date): string {
+	const year = date.getFullYear()
+	const month = String(date.getMonth() + 1).padStart(2, '0')
+	const day = String(date.getDate()).padStart(2, '0')
+	return `${year}-${month}-${day}`
+}
+
+function getDefaultCustomStartDate(): string {
+	const date = new Date()
+	date.setDate(date.getDate() - 1)
+	return getLocalDateQueryValue(date)
+}
+
+function getDefaultCustomEndDate(): string {
+	return getLocalDateQueryValue(new Date())
+}
+
+function parseDateQueryValue(
+	value: LocationQueryValue | LocationQueryValue[] | undefined,
+	fallbackValue: string,
+): string {
+	const rawValue = Array.isArray(value) ? value[0] : value
+	if (!rawValue || !/^\d{4}-\d{2}-\d{2}$/.test(rawValue)) return fallbackValue
+
+	const date = new Date(`${rawValue}T00:00:00`)
+	if (Number.isNaN(date.getTime())) return fallbackValue
+	if (getLocalDateQueryValue(date) !== rawValue) return fallbackValue
+
+	return rawValue
 }
 
 function serializeListQueryValue(values: string[]): string | undefined {
@@ -256,13 +328,42 @@ export function readAnalyticsQueryBuilderState(
 		selectedFilters[category] = parseListQueryValue(query[FILTER_QUERY_KEY_BY_CATEGORY[category]])
 	}
 
+	const selectedCustomTimeframeStartDate = parseDateQueryValue(
+		query[QUERY_KEY_TIMEFRAME_START],
+		getDefaultCustomStartDate(),
+	)
+	const rawCustomTimeframeEndDate = parseDateQueryValue(
+		query[QUERY_KEY_TIMEFRAME_END],
+		getDefaultCustomEndDate(),
+	)
+	const selectedCustomTimeframeEndDate =
+		rawCustomTimeframeEndDate < selectedCustomTimeframeStartDate
+			? selectedCustomTimeframeStartDate
+			: rawCustomTimeframeEndDate
+
 	return {
 		selectedProjectIds,
+		selectedTimeframeMode: parsePresetQueryValue(
+			query[QUERY_KEY_TIMEFRAME_MODE],
+			TIMEFRAME_MODE_VALUES,
+			DEFAULT_TIMEFRAME_MODE,
+		),
 		selectedTimeframe: parsePresetQueryValue(
 			query[QUERY_KEY_TIMEFRAME],
 			TIMEFRAME_PRESET_VALUES,
 			DEFAULT_TIMEFRAME_PRESET,
 		),
+		selectedLastTimeframeAmount: parsePositiveIntegerQueryValue(
+			query[QUERY_KEY_TIMEFRAME_LAST_AMOUNT],
+			DEFAULT_LAST_TIMEFRAME_AMOUNT,
+		),
+		selectedLastTimeframeUnit: parsePresetQueryValue(
+			query[QUERY_KEY_TIMEFRAME_LAST_UNIT],
+			LAST_TIMEFRAME_UNIT_VALUES,
+			DEFAULT_LAST_TIMEFRAME_UNIT,
+		),
+		selectedCustomTimeframeStartDate,
+		selectedCustomTimeframeEndDate,
 		selectedGroupBy: parsePresetQueryValue(
 			query[QUERY_KEY_GROUP_BY],
 			GROUP_BY_PRESET_VALUES,
@@ -291,8 +392,24 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 		: serializeListQueryValue(state.selectedProjectIds)
 
 	nextRouteQuery[QUERY_KEY_PROJECT_IDS] = projectIdsQueryValue
+	nextRouteQuery[QUERY_KEY_TIMEFRAME_MODE] =
+		state.selectedTimeframeMode !== DEFAULT_TIMEFRAME_MODE ? state.selectedTimeframeMode : undefined
 	nextRouteQuery[QUERY_KEY_TIMEFRAME] =
-		state.selectedTimeframe !== DEFAULT_TIMEFRAME_PRESET ? state.selectedTimeframe : undefined
+		state.selectedTimeframeMode === 'preset' && state.selectedTimeframe !== DEFAULT_TIMEFRAME_PRESET
+			? state.selectedTimeframe
+			: undefined
+	nextRouteQuery[QUERY_KEY_TIMEFRAME_LAST_AMOUNT] =
+		state.selectedTimeframeMode === 'last' ? String(state.selectedLastTimeframeAmount) : undefined
+	nextRouteQuery[QUERY_KEY_TIMEFRAME_LAST_UNIT] =
+		state.selectedTimeframeMode === 'last' ? state.selectedLastTimeframeUnit : undefined
+	nextRouteQuery[QUERY_KEY_TIMEFRAME_START] =
+		state.selectedTimeframeMode === 'custom_range'
+			? state.selectedCustomTimeframeStartDate
+			: undefined
+	nextRouteQuery[QUERY_KEY_TIMEFRAME_END] =
+		state.selectedTimeframeMode === 'custom_range'
+			? state.selectedCustomTimeframeEndDate
+			: undefined
 	nextRouteQuery[QUERY_KEY_GROUP_BY] =
 		state.selectedGroupBy !== DEFAULT_GROUP_BY_PRESET ? state.selectedGroupBy : undefined
 	nextRouteQuery[QUERY_KEY_BREAKDOWN] =

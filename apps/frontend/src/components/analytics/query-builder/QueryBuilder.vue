@@ -44,6 +44,23 @@
 							</div>
 						</div>
 					</template>
+					<template #bottom>
+						<div
+							class="flex items-center gap-3 border-0 border-t border-solid border-surface-5 px-3 py-2.5"
+						>
+							<span class="shrink-0 text-sm font-semibold text-primary">Projects above</span>
+							<input
+								v-model="projectDownloadsThresholdInput"
+								type="text"
+								inputmode="numeric"
+								placeholder="0"
+								class="h-8 w-20 rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-center text-sm font-semibold text-primary outline-none transition-[box-shadow,color] focus:text-contrast focus:ring-4 focus:ring-brand-shadow"
+								aria-label="Project downloads threshold"
+								@blur="formatProjectDownloadsThresholdInput"
+							/>
+							<span class="shrink-0 text-sm font-semibold text-primary">downloads</span>
+						</div>
+					</template>
 				</MultiSelect>
 			</div>
 		</div>
@@ -56,11 +73,50 @@
 				</div>
 				<div>
 					<Combobox
-						v-model="selectedTimeframe"
-						:options="timeframeOptions"
+						v-model="draftSelectedTimeframe"
+						:options="timeframeDropdownOptions"
+						:display-value="selectedTimeframeLabel"
 						:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
-						:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
-					/>
+						:dropdown-min-width="'20rem'"
+						@open="handleTimeframeSelectOpen"
+						@close="handleTimeframeSelectClose"
+						@select="handleTimeframePresetSelect"
+					>
+						<template #bottom>
+							<div
+								class="flex flex-col border-0 border-t border-solid border-surface-5 bg-surface-4"
+							>
+								<template v-if="draftSelectedTimeframeMode === 'custom_range'">
+									<CustomRangeTimeframe
+										v-model:start-date="draftSelectedCustomTimeframeStartDate"
+										v-model:end-date="draftSelectedCustomTimeframeEndDate"
+									/>
+									<button
+										type="button"
+										class="flex cursor-pointer items-center border-0 border-t border-solid border-surface-5 bg-transparent px-4 py-3 text-left text-sm font-semibold text-primary transition-colors hover:bg-surface-5"
+										@click.stop="draftSelectedTimeframeMode = 'preset'"
+									>
+										Preset timeframes...
+									</button>
+								</template>
+								<template v-else>
+									<CustomTimeframe
+										v-model:amount="draftSelectedLastTimeframeAmount"
+										v-model:unit="draftSelectedLastTimeframeUnit"
+										:unit-options="lastTimeframeUnitOptions"
+										@activate="draftSelectedTimeframeMode = 'last'"
+									/>
+									<button
+										type="button"
+										class="flex cursor-pointer items-center border-0 border-t border-solid border-surface-5 bg-transparent px-4 py-3 text-left text-sm font-semibold text-primary transition-colors hover:bg-surface-5"
+										@click.stop="switchDraftToCustomDateRange"
+									>
+										Custom fixed date range...
+									</button>
+								</template>
+							</div>
+						</template>
+					</Combobox>
 				</div>
 			</div>
 			<div class="flex items-center gap-2">
@@ -110,11 +166,15 @@ import { Combobox, type ComboboxOption, MultiSelect, type MultiSelectOption } fr
 import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsGroupByPreset,
+	type AnalyticsLastTimeframeUnit,
 	type AnalyticsSelectedFilters,
+	type AnalyticsTimeframeMode,
 	type AnalyticsTimeframePreset,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
+import CustomRangeTimeframe from './CustomRangeTimeframe.vue'
+import CustomTimeframe from './CustomTimeframe.vue'
 import QueryBuilderFilter from './QueryFilter.vue'
 
 const MIN_RANGE_MS = 60 * 60 * 1000
@@ -126,7 +186,12 @@ const TIME_RANGE_ROUNDING_MS = 60 * 1000
 const {
 	projects,
 	selectedProjectIds,
+	selectedTimeframeMode,
 	selectedTimeframe,
+	selectedLastTimeframeAmount,
+	selectedLastTimeframeUnit,
+	selectedCustomTimeframeStartDate,
+	selectedCustomTimeframeEndDate,
 	selectedGroupBy,
 	selectedBreakdown,
 	selectedFilters,
@@ -144,6 +209,14 @@ const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 const allProjectIds = computed(() => projectOptions.value.map((project) => project.value))
 const isProjectSelectOpen = ref(false)
 const draftSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
+const isTimeframeSelectOpen = ref(false)
+const draftSelectedTimeframeMode = ref(selectedTimeframeMode.value)
+const draftSelectedTimeframe = ref(selectedTimeframe.value)
+const draftSelectedLastTimeframeAmount = ref(selectedLastTimeframeAmount.value)
+const draftSelectedLastTimeframeUnit = ref(selectedLastTimeframeUnit.value)
+const draftSelectedCustomTimeframeStartDate = ref(selectedCustomTimeframeStartDate.value)
+const draftSelectedCustomTimeframeEndDate = ref(selectedCustomTimeframeEndDate.value)
+const projectDownloadsThresholdInput = ref('')
 
 function isSameProjectSelection(left: string[], right: string[]) {
 	if (left.length !== right.length) {
@@ -212,6 +285,72 @@ function clearDraftSelectedProjects() {
 
 const showProjectRow = computed(() => projects.value.length > 1)
 
+function parseProjectDownloadsThreshold(value: string): number | null {
+	const normalizedValue = value.trim().toLowerCase().replace(/,/g, '')
+	if (!normalizedValue) {
+		return null
+	}
+
+	const match = normalizedValue.match(/^(\d+(?:\.\d+)?)([kmb])?$/)
+	if (!match) {
+		return null
+	}
+
+	const amount = Number.parseFloat(match[1])
+	if (!Number.isFinite(amount)) {
+		return null
+	}
+
+	const multiplierBySuffix: Record<string, number> = {
+		k: 1_000,
+		m: 1_000_000,
+		b: 1_000_000_000,
+	}
+
+	const multiplier = match[2] ? multiplierBySuffix[match[2]] : 1
+	return Math.max(0, Math.floor(amount * multiplier))
+}
+
+function formatCompactNumber(value: number): string {
+	const formatWithSuffix = (divisor: number, suffix: string) => {
+		const dividedValue = value / divisor
+		const fractionDigits = Number.isInteger(dividedValue) ? 0 : 1
+		return `${dividedValue.toFixed(fractionDigits).replace(/\.0$/, '')}${suffix}`
+	}
+
+	if (value >= 1_000_000_000) return formatWithSuffix(1_000_000_000, 'B')
+	if (value >= 1_000_000) return formatWithSuffix(1_000_000, 'M')
+	if (value >= 1_000) return formatWithSuffix(1_000, 'k')
+	return String(value)
+}
+
+function applyProjectDownloadsThreshold() {
+	const threshold = parseProjectDownloadsThreshold(projectDownloadsThresholdInput.value)
+	if (threshold === null) {
+		return
+	}
+
+	draftSelectedProjectIds.value = projects.value
+		.filter((project) => project.downloads >= threshold)
+		.map((project) => project.id)
+}
+
+function formatProjectDownloadsThresholdInput() {
+	const threshold = parseProjectDownloadsThreshold(projectDownloadsThresholdInput.value)
+	if (threshold === null) {
+		return
+	}
+
+	projectDownloadsThresholdInput.value = formatCompactNumber(threshold)
+}
+
+watch(
+	projectDownloadsThresholdInput,
+	() => {
+		applyProjectDownloadsThreshold()
+	}
+)
+
 const timeframeOptions: ComboboxOption<AnalyticsTimeframePreset>[] = [
 	{ value: 'today', label: 'Today' },
 	{ value: 'yesterday', label: 'Yesterday' },
@@ -223,6 +362,79 @@ const timeframeOptions: ComboboxOption<AnalyticsTimeframePreset>[] = [
 	{ value: 'year_to_date', label: 'Year to date' },
 	{ value: 'all_time', label: 'All time' },
 ]
+
+const lastTimeframeUnitOptions: Array<{
+	value: AnalyticsLastTimeframeUnit
+	label: string
+	singularLabel: string
+}> = [
+	{ value: 'hours', label: 'hours', singularLabel: 'hour' },
+	{ value: 'days', label: 'days', singularLabel: 'day' },
+	{ value: 'weeks', label: 'weeks', singularLabel: 'week' },
+	{ value: 'months', label: 'months', singularLabel: 'month' },
+]
+
+const lastTimeframeValueByPreset: Partial<
+	Record<
+		AnalyticsTimeframePreset,
+		{
+			amount: number
+			unit: AnalyticsLastTimeframeUnit
+		}
+	>
+> = {
+	today: { amount: 1, unit: 'days' },
+	yesterday: { amount: 1, unit: 'days' },
+	last_7_days: { amount: 7, unit: 'days' },
+	last_14_days: { amount: 14, unit: 'days' },
+	last_30_days: { amount: 30, unit: 'days' },
+	last_90_days: { amount: 90, unit: 'days' },
+	last_180_days: { amount: 180, unit: 'days' },
+}
+
+const timeframeDropdownOptions = computed<ComboboxOption<AnalyticsTimeframePreset>[]>(() =>
+	draftSelectedTimeframeMode.value === 'custom_range' ? [] : timeframeOptions,
+)
+
+const selectedTimeframeLabel = computed(() => {
+	return getTimeframeLabel(
+		isTimeframeSelectOpen.value ? draftSelectedTimeframeMode.value : selectedTimeframeMode.value,
+		isTimeframeSelectOpen.value ? draftSelectedTimeframe.value : selectedTimeframe.value,
+		isTimeframeSelectOpen.value
+			? draftSelectedLastTimeframeAmount.value
+			: selectedLastTimeframeAmount.value,
+		isTimeframeSelectOpen.value
+			? draftSelectedLastTimeframeUnit.value
+			: selectedLastTimeframeUnit.value,
+		isTimeframeSelectOpen.value
+			? draftSelectedCustomTimeframeStartDate.value
+			: selectedCustomTimeframeStartDate.value,
+		isTimeframeSelectOpen.value
+			? draftSelectedCustomTimeframeEndDate.value
+			: selectedCustomTimeframeEndDate.value,
+	)
+})
+
+function getTimeframeLabel(
+	mode: AnalyticsTimeframeMode,
+	preset: AnalyticsTimeframePreset,
+	lastAmount: number,
+	lastUnit: AnalyticsLastTimeframeUnit,
+	customStartDate: string,
+	customEndDate: string,
+): string {
+	if (mode === 'last') {
+		const unit = lastTimeframeUnitOptions.find((option) => option.value === lastUnit)
+		const unitLabel = lastAmount === 1 ? unit?.singularLabel : unit?.label
+		return `In the last ${lastAmount} ${unitLabel ?? lastUnit}`
+	}
+
+	if (mode === 'custom_range') {
+		return `${customStartDate} to ${customEndDate}`
+	}
+
+	return timeframeOptions.find((option) => option.value === preset)?.label ?? 'Select timeframe'
+}
 
 const groupByPresetOptions: Array<{
 	value: AnalyticsGroupByPreset
@@ -256,6 +468,47 @@ function startOfDay(date: Date): Date {
 function getRoundedNow(timestamp: number): Date {
 	const roundedTimestamp = Math.floor(timestamp / TIME_RANGE_ROUNDING_MS) * TIME_RANGE_ROUNDING_MS
 	return new Date(roundedTimestamp)
+}
+
+function getDateInputValue(date: Date): string {
+	const year = date.getFullYear()
+	const month = String(date.getMonth() + 1).padStart(2, '0')
+	const day = String(date.getDate()).padStart(2, '0')
+	return `${year}-${month}-${day}`
+}
+
+function parseDateInputValue(value: string): Date {
+	const parsedDate = new Date(`${value}T00:00:00`)
+	return Number.isNaN(parsedDate.getTime()) ? startOfDay(new Date()) : parsedDate
+}
+
+function addDays(date: Date, days: number): Date {
+	const nextDate = new Date(date)
+	nextDate.setDate(nextDate.getDate() + days)
+	return nextDate
+}
+
+function isStartOfDay(date: Date): boolean {
+	return (
+		date.getHours() === 0 &&
+		date.getMinutes() === 0 &&
+		date.getSeconds() === 0 &&
+		date.getMilliseconds() === 0
+	)
+}
+
+function getInclusiveEndDateInputValue(end: Date): string {
+	return getDateInputValue(isStartOfDay(end) ? addDays(end, -1) : end)
+}
+
+function subtractCalendarMonths(date: Date, months: number): Date {
+	const nextDate = new Date(date)
+	const day = nextDate.getDate()
+	nextDate.setDate(1)
+	nextDate.setMonth(nextDate.getMonth() - months)
+	const daysInMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate()
+	nextDate.setDate(Math.min(day, daysInMonth))
+	return nextDate
 }
 
 function getTimeRangeForPreset(
@@ -325,6 +578,146 @@ function getCurrentTimeRangeForPreset(preset: AnalyticsTimeframePreset): {
 	return getTimeRangeForPreset(preset, queryRefreshTimestamp.value)
 }
 
+function getTimeRangeForLastTimeframe(
+	amountValue: number,
+	unit: AnalyticsLastTimeframeUnit,
+): { start: Date; end: Date } {
+	const end = getRoundedNow(queryRefreshTimestamp.value)
+	const amount = Math.max(1, Math.floor(amountValue))
+
+	switch (unit) {
+		case 'hours':
+			return { start: new Date(end.getTime() - amount * 60 * 60 * 1000), end }
+		case 'days':
+			return { start: new Date(end.getTime() - amount * 24 * 60 * 60 * 1000), end }
+		case 'weeks':
+			return { start: new Date(end.getTime() - amount * 7 * 24 * 60 * 60 * 1000), end }
+		case 'months':
+			return { start: subtractCalendarMonths(end, amount), end }
+		default:
+			return { start: new Date(end.getTime() - 24 * 60 * 60 * 1000), end }
+	}
+}
+
+function getCurrentTimeRangeForLastTimeframe(): { start: Date; end: Date } {
+	return getTimeRangeForLastTimeframe(
+		selectedLastTimeframeAmount.value,
+		selectedLastTimeframeUnit.value,
+	)
+}
+
+function getTimeRangeForCustomDateRange(
+	startDate: string,
+	endDate: string,
+): { start: Date; end: Date } {
+	const start = parseDateInputValue(startDate)
+	const inclusiveEnd = parseDateInputValue(endDate)
+	return {
+		start,
+		end: addDays(inclusiveEnd, 1),
+	}
+}
+
+function getCurrentTimeRangeForCustomDateRange(): { start: Date; end: Date } {
+	return getTimeRangeForCustomDateRange(
+		selectedCustomTimeframeStartDate.value,
+		selectedCustomTimeframeEndDate.value,
+	)
+}
+
+function getCurrentTimeRange(): { start: Date; end: Date } {
+	switch (selectedTimeframeMode.value) {
+		case 'last':
+			return getCurrentTimeRangeForLastTimeframe()
+		case 'custom_range':
+			return getCurrentTimeRangeForCustomDateRange()
+		case 'preset':
+		default:
+			return getCurrentTimeRangeForPreset(selectedTimeframe.value)
+	}
+}
+
+function getDraftTimeRange(): { start: Date; end: Date } {
+	switch (draftSelectedTimeframeMode.value) {
+		case 'last':
+			return getTimeRangeForLastTimeframe(
+				draftSelectedLastTimeframeAmount.value,
+				draftSelectedLastTimeframeUnit.value,
+			)
+		case 'custom_range':
+			return getTimeRangeForCustomDateRange(
+				draftSelectedCustomTimeframeStartDate.value,
+				draftSelectedCustomTimeframeEndDate.value,
+			)
+		case 'preset':
+		default:
+			return getCurrentTimeRangeForPreset(draftSelectedTimeframe.value)
+	}
+}
+
+function resetTimeframeDraft() {
+	draftSelectedTimeframeMode.value = selectedTimeframeMode.value
+	draftSelectedTimeframe.value = selectedTimeframe.value
+	draftSelectedLastTimeframeAmount.value = selectedLastTimeframeAmount.value
+	draftSelectedLastTimeframeUnit.value = selectedLastTimeframeUnit.value
+	draftSelectedCustomTimeframeStartDate.value = selectedCustomTimeframeStartDate.value
+	draftSelectedCustomTimeframeEndDate.value = selectedCustomTimeframeEndDate.value
+}
+
+function commitTimeframeDraft() {
+	selectedTimeframeMode.value = draftSelectedTimeframeMode.value
+	selectedTimeframe.value = draftSelectedTimeframe.value
+	selectedLastTimeframeAmount.value = draftSelectedLastTimeframeAmount.value
+	selectedLastTimeframeUnit.value = draftSelectedLastTimeframeUnit.value
+	selectedCustomTimeframeStartDate.value = draftSelectedCustomTimeframeStartDate.value
+	selectedCustomTimeframeEndDate.value = draftSelectedCustomTimeframeEndDate.value
+}
+
+function handleTimeframeSelectOpen() {
+	resetTimeframeDraft()
+	isTimeframeSelectOpen.value = true
+}
+
+function handleTimeframeSelectClose() {
+	commitTimeframeDraft()
+	isTimeframeSelectOpen.value = false
+}
+
+watch(
+	[
+		selectedTimeframeMode,
+		selectedTimeframe,
+		selectedLastTimeframeAmount,
+		selectedLastTimeframeUnit,
+		selectedCustomTimeframeStartDate,
+		selectedCustomTimeframeEndDate,
+	],
+	() => {
+		if (isTimeframeSelectOpen.value) {
+			return
+		}
+
+		resetTimeframeDraft()
+	},
+)
+
+function handleTimeframePresetSelect(option: ComboboxOption<AnalyticsTimeframePreset>) {
+	const lastTimeframeValue = lastTimeframeValueByPreset[option.value]
+	if (lastTimeframeValue) {
+		draftSelectedLastTimeframeAmount.value = lastTimeframeValue.amount
+		draftSelectedLastTimeframeUnit.value = lastTimeframeValue.unit
+	}
+
+	draftSelectedTimeframeMode.value = 'preset'
+}
+
+function switchDraftToCustomDateRange() {
+	const rawRange = getDraftTimeRange()
+	draftSelectedCustomTimeframeStartDate.value = getDateInputValue(rawRange.start)
+	draftSelectedCustomTimeframeEndDate.value = getInclusiveEndDateInputValue(rawRange.end)
+	draftSelectedTimeframeMode.value = 'custom_range'
+}
+
 function getGroupByMinutes(preset: AnalyticsGroupByPreset): number {
 	switch (preset) {
 		case '1h':
@@ -363,7 +756,7 @@ function ensureMinimumRange(start: Date, end: Date): { start: Date; end: Date } 
 }
 
 const selectedTimeframeDurationMinutes = computed(() => {
-	const rawRange = getCurrentTimeRangeForPreset(selectedTimeframe.value)
+	const rawRange = getCurrentTimeRange()
 	const { start, end } = ensureMinimumRange(rawRange.start, rawRange.end)
 	const durationMs = end.getTime() - start.getTime()
 	return Math.max(1, Math.floor(durationMs / (60 * 1000)))
@@ -484,7 +877,7 @@ function withBreakdownFields(
 }
 
 const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
-	const rawRange = getCurrentTimeRangeForPreset(selectedTimeframe.value)
+	const rawRange = getCurrentTimeRange()
 	const { start, end } = ensureMinimumRange(rawRange.start, rawRange.end)
 
 	const groupByMs = getGroupByMinutes(selectedGroupBy.value) * 60 * 1000

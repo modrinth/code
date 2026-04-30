@@ -96,13 +96,14 @@ export function areSelectedFiltersEqual(
 export function getOptionsWithSelectedValues(
 	options: FilterOption[],
 	selectedValues: string[],
+	getMissingSelectedOptionLabel: (value: string) => string = (value) => value,
 ): FilterOption[] {
 	const knownValues = new Set(options.map((option) => option.value))
 	const missingSelectedOptions = selectedValues
 		.filter((value) => !knownValues.has(value))
 		.map((value) => ({
 			value,
-			label: value,
+			label: getMissingSelectedOptionLabel(value),
 		}))
 
 	return [...options, ...missingSelectedOptions]
