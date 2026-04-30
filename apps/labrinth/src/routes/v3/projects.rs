@@ -1,7 +1,7 @@
 use std::any::type_name;
+use std::cmp::Reverse;
 use std::collections::HashMap;
 use std::sync::Arc;
-use std::cmp::Reverse;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};

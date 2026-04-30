@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc, cmp::Reverse};
+use std::{cmp::Reverse, collections::HashMap, sync::Arc};
 
 use super::{ApiError, oauth_clients::get_user_clients};
 use crate::database::PgPool;
