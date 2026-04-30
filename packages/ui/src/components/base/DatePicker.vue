@@ -416,6 +416,12 @@ defineExpose({
 	@apply outline-none ring-4 ring-brand-shadow;
 }
 
+.modrinth-date-picker :deep(.numInputWrapper span.arrowUp) {
+	@apply border-0 rounded-tr-xl;
+}
+.modrinth-date-picker :deep(.numInputWrapper span.arrowDown) {
+	@apply border-0 rounded-br-xl;
+}
 .modrinth-date-picker :deep(.numInputWrapper span.arrowUp::after) {
 	border-bottom-color: var(--color-text-secondary);
 }
@@ -489,6 +495,9 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-time .numInputWrapper) {
 	@apply h-full flex-1 rounded-xl bg-surface-4;
+}
+.modrinth-date-picker :deep(.numInputWrapper:hover) {
+	background: none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time input),
