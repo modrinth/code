@@ -126,7 +126,7 @@ const {
 const SOURCE_CODE_URL =
 	'https://github.com/modrinth/code/blob/main/apps/frontend/src/components/ui/auth/CreateAccount.vue'
 
-const dateOfBirthModel = defineModel<string>('dateOfBirth', { default: '' })
+const dateOfBirthModel = defineModel<string | null>('dateOfBirth', { default: '' })
 const usernameModel = defineModel<string>('username', { default: '' })
 const tokenModel = defineModel<string>('token', { default: '' })
 const subscribeModel = defineModel<boolean>('subscribe', { default: false })
@@ -139,16 +139,20 @@ const maxBirthDate = computed(() => {
 	return date.toISOString().slice(0, 10)
 })
 
-const getBirthYear = (dateOfBirth: string): number | null => {
+const getBirthYear = (dateOfBirth: string | null): number | null => {
+	if (!dateOfBirth) {
+		return null
+	}
+
 	const [yearPart = ''] = dateOfBirth.split('-')
 	const year = Number(yearPart)
 	return Number.isInteger(year) ? year : null
 }
 
-const isDateOfBirthMissing = computed(() => requiresDob && dateOfBirthModel.value === '')
+const isDateOfBirthMissing = computed(() => requiresDob && !dateOfBirthModel.value)
 
 const isDateOfBirthYearZero = computed(() => {
-	if (!requiresDob || dateOfBirthModel.value === '') {
+	if (!requiresDob || !dateOfBirthModel.value) {
 		return false
 	}
 
@@ -156,7 +160,7 @@ const isDateOfBirthYearZero = computed(() => {
 })
 
 const isUnder13 = computed(
-	() => requiresDob && dateOfBirthModel.value !== '' && dateOfBirthModel.value > maxBirthDate.value,
+	() => requiresDob && !!dateOfBirthModel.value && dateOfBirthModel.value > maxBirthDate.value,
 )
 
 const { addNotification } = injectNotificationManager()
