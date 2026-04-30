@@ -408,7 +408,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply pl-0.5;
+	@apply pl-0.5 min-w-28;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year:focus),
