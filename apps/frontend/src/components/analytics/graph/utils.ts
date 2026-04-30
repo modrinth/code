@@ -77,9 +77,13 @@ function formatLoaderLabel(loader: string): string {
 export function formatBreakdownLabel(
 	breakdownValue: string,
 	selectedBreakdown: AnalyticsBreakdownPreset,
+	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
 ): string {
 	if (selectedBreakdown === 'country') {
 		return formatCountryCode(breakdownValue)
+	}
+	if (selectedBreakdown === 'version_id') {
+		return getVersionDisplayName(breakdownValue)
 	}
 	if (selectedBreakdown === 'loader') {
 		return formatLoaderLabel(breakdownValue)
@@ -114,6 +118,7 @@ export function buildChartDatasets(
 	palette: string[],
 	selectedBreakdown: AnalyticsBreakdownPreset,
 	selectedFilters: AnalyticsSelectedFilters,
+	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
 ): ChartDataset[] {
 	const selectedProjectIds = new Set(selectedProjects.map((project) => project.id))
 	if (selectedProjectIds.size === 0) {
@@ -148,7 +153,11 @@ export function buildChartDatasets(
 			const color = palette[index % palette.length]
 			return {
 				projectId: `breakdown:${breakdownValue}`,
-				label: formatBreakdownLabel(breakdownValue, selectedBreakdown),
+				label: formatBreakdownLabel(
+					breakdownValue,
+					selectedBreakdown,
+					getVersionDisplayName,
+				),
 				data,
 				borderColor: color,
 				backgroundColor: color,

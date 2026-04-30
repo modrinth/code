@@ -19,6 +19,7 @@ export const FILTER_VALUE_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'pro
 export type FilterOption = {
 	value: string
 	label: string
+	searchTerms?: string[]
 }
 
 export type FilterCategory = {
@@ -26,6 +27,8 @@ export type FilterCategory = {
 	label: string
 	allLabel: string
 	options: FilterOption[]
+	searchable?: boolean
+	searchPlaceholder?: string
 }
 
 export type FilterSelectionSource = 'committed' | 'draft'

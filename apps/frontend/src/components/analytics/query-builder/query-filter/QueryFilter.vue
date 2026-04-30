@@ -11,6 +11,8 @@
 			:clearable="false"
 			:show-chevron="false"
 			:fit-content="true"
+			:searchable="preview.category.searchable"
+			:search-placeholder="preview.category.searchPlaceholder"
 			:trigger-class="previewTriggerClass"
 			@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
 			@open="openPreviewFilterDraft(preview.key)"
@@ -98,15 +100,27 @@
 			<div
 				v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 				ref="submenu"
-				class="fixed z-[10000] min-w-[16rem] rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
+				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] min-w-[16rem] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
 				:style="submenuStyle"
 				@mouseenter="handleSubmenuMouseEnter"
 				@mouseleave="handleSubmenuMouseLeave"
 				@mousemove="(event) => handleMenuMouseMove(event, 'submenu')"
 			>
-				<div class="flex max-h-[min(70vh,32rem)] flex-col gap-2 overflow-y-auto p-3">
+				<div
+					v-if="activeCategory.searchable"
+					class="border-0 border-b border-solid border-b-surface-5 px-3 py-1.5 pb-2.5"
+				>
+					<StyledInput
+						v-model="categorySearchQuery"
+						:icon="SearchIcon"
+						type="text"
+						:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
+						wrapper-class="w-full bg-surface-4"
+					/>
+				</div>
+				<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
 					<button
-						v-for="option in activeCategory.options"
+						v-for="option in filteredActiveCategoryOptions"
 						:key="`${activeCategory.key}-${option.value}`"
 						type="button"
 						class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
@@ -155,8 +169,15 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, ChevronDownIcon, ChevronRightIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import { MultiSelect, type MultiSelectOption } from '@modrinth/ui'
+import {
+	CheckIcon,
+	ChevronDownIcon,
+	ChevronRightIcon,
+	PlusIcon,
+	SearchIcon,
+	XIcon,
+} from '@modrinth/assets'
+import { MultiSelect, StyledInput, type MultiSelectOption } from '@modrinth/ui'
 import { onClickOutside } from '@vueuse/core'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 
@@ -187,7 +208,7 @@ import {
 	normalizeSelectedValues as normalizeSelectedFilterValues,
 } from './queryFilter'
 
-const { filterOptions, selectedFilters } = injectAnalyticsDashboardContext()
+const { filterOptions, selectedFilters, getVersionDisplayName } = injectAnalyticsDashboardContext()
 const formattedCountries = useFormattedCountries()
 
 const isAddMenuOpen = ref(false)
@@ -197,6 +218,7 @@ const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
 	cloneSelectedFilters(selectedFilters.value),
 )
 const previewSelectedValueDrafts = ref<Partial<Record<AnalyticsQueryFilterCategory, string[]>>>({})
+const categorySearchQuery = ref('')
 const lastMousePosition = ref<Point | null>(null)
 const isCursorInsideSubmenu = ref(false)
 const hasSubmenuPosition = ref(false)
@@ -219,6 +241,8 @@ const filterCategories = computed<FilterCategory[]>(() => [
 		key: 'country',
 		label: 'Country',
 		allLabel: 'All countries',
+		searchable: true,
+		searchPlaceholder: 'Search countries...',
 		options: withSelectedOptions('country', [
 			{ value: ALL_FILTER_VALUE, label: 'All countries' },
 			...countryFilterOptions.value,
@@ -246,16 +270,22 @@ const filterCategories = computed<FilterCategory[]>(() => [
 		key: 'version_id',
 		label: 'Project version',
 		allLabel: 'All project versions',
+		searchable: true,
+		searchPlaceholder: 'Search project versions...',
 		options: withSelectedOptions('version_id', [
 			{ value: ALL_FILTER_VALUE, label: 'All project versions' },
+			...versionFilterOptions.value,
 		]),
 	},
 	{
 		key: 'game_version',
 		label: 'Game Version',
 		allLabel: 'All game versions',
+		searchable: true,
+		searchPlaceholder: 'Search game versions...',
 		options: withSelectedOptions('game_version', [
 			{ value: ALL_FILTER_VALUE, label: 'All game versions' },
+			...gameVersionFilterOptions.value,
 		]),
 	},
 	{
@@ -276,6 +306,30 @@ const activeCategory = computed(() =>
 	activeCategoryKey.value ? filterCategoriesByKey.value.get(activeCategoryKey.value) : undefined,
 )
 
+const filteredActiveCategoryOptions = computed(() => {
+	if (!activeCategory.value?.searchable) {
+		return activeCategory.value?.options ?? []
+	}
+
+	const query = categorySearchQuery.value.trim().toLowerCase()
+	if (!query) {
+		return activeCategory.value.options
+	}
+
+	return activeCategory.value.options.filter((option) => {
+		if (option.value === ALL_FILTER_VALUE) {
+			return true
+		}
+		if (option.label.toLowerCase().includes(query)) {
+			return true
+		}
+		if (option.value.toLowerCase().includes(query)) {
+			return true
+		}
+		return option.searchTerms?.some((term) => term.toLowerCase().includes(query)) ?? false
+	})
+})
+
 const submenuStyle = computed<CSSProperties>(() => ({
 	left: `${submenuPosition.value.x}px`,
 	top: `${submenuPosition.value.y}px`,
@@ -292,6 +346,7 @@ const appliedFilterPreviews = computed(() =>
 			options: category.options.map((option) => ({
 				value: option.value,
 				label: option.label,
+				searchTerms: option.searchTerms,
 			})) as MultiSelectOption<string>[],
 		}))
 		.filter((preview) => preview.count > 0),
@@ -315,6 +370,26 @@ const countryFilterOptions = computed<FilterOption[]>(() =>
 		.map((countryCode) => ({
 			value: countryCode,
 			label: getCountryFilterOptionLabel(countryCode),
+			searchTerms: [countryCode],
+		}))
+		.sort((left, right) => left.label.localeCompare(right.label)),
+)
+
+const versionFilterOptions = computed<FilterOption[]>(() =>
+	filterOptions.value.versionIds
+		.map((versionId) => ({
+			value: versionId,
+			label: getVersionDisplayName(versionId),
+			searchTerms: [versionId],
+		}))
+		.sort((left, right) => left.label.localeCompare(right.label)),
+)
+
+const gameVersionFilterOptions = computed<FilterOption[]>(() =>
+	filterOptions.value.gameVersions
+		.map((gameVersion) => ({
+			value: gameVersion,
+			label: gameVersion,
 		}))
 		.sort((left, right) => left.label.localeCompare(right.label)),
 )
@@ -389,6 +464,7 @@ function closeAddMenu() {
 	}
 
 	commitAddMenuDraft()
+	categorySearchQuery.value = ''
 	isAddMenuOpen.value = false
 }
 
@@ -451,8 +527,20 @@ function withSelectedOptions(
 	return getOptionsWithSelectedValues(
 		options,
 		selectedValues,
-		categoryKey === 'country' ? getCountryFilterOptionLabel : undefined,
+		getMissingSelectedOptionLabel(categoryKey),
 	)
+}
+
+function getMissingSelectedOptionLabel(
+	categoryKey: AnalyticsQueryFilterCategory,
+): ((value: string) => string) | undefined {
+	if (categoryKey === 'country') {
+		return getCountryFilterOptionLabel
+	}
+	if (categoryKey === 'version_id') {
+		return getVersionDisplayName
+	}
+	return undefined
 }
 
 function isFilterValueSelected(categoryKey: AnalyticsQueryFilterCategory, value: string): boolean {
@@ -563,6 +651,9 @@ function commitPreviewFilterDrafts() {
 function activateCategory(categoryKey: AnalyticsQueryFilterCategory) {
 	clearPendingCategoryTimeout()
 	pendingCategoryKey.value = null
+	if (activeCategoryKey.value !== categoryKey) {
+		categorySearchQuery.value = ''
+	}
 	activeCategoryKey.value = categoryKey
 	scheduleSubmenuPositionUpdate()
 }
@@ -782,6 +873,10 @@ watch(isAddMenuOpen, (isOpen) => {
 		resetPendingCategory()
 		stopAddMenuPositionTracking()
 	}
+})
+
+watch(categorySearchQuery, () => {
+	scheduleSubmenuPositionUpdate()
 })
 
 onBeforeUnmount(() => {

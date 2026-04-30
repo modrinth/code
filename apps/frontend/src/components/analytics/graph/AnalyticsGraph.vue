@@ -148,6 +148,7 @@ const {
 	selectedBreakdown,
 	selectedFilters,
 	isLoading,
+	getVersionDisplayName,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 const isDataLoading = computed(() => isLoading.value)
@@ -214,6 +215,7 @@ const allChartDatasets = computed(() =>
 		legendPalette,
 		selectedBreakdown.value,
 		selectedFilters.value,
+		getVersionDisplayName,
 	),
 )
 

@@ -3,6 +3,8 @@ import { createContext, injectModrinthClient, type ProjectPageContext } from '@m
 import { useQuery } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 
+import { fetchSegmentedWith } from '~/utils/fetch-helpers.ts'
+
 import type { OrganizationContext } from '../organization-context'
 import {
 	type AnalyticsBreakdownPreset,
@@ -80,6 +82,8 @@ export interface AnalyticsDashboardPercentChanges {
 
 export interface AnalyticsDashboardFilterOptions {
 	countries: string[]
+	gameVersions: string[]
+	versionIds: string[]
 }
 
 export interface AnalyticsDashboardContextValue {
@@ -97,6 +101,7 @@ export interface AnalyticsDashboardContextValue {
 	queryRefreshTimestamp: Ref<number>
 	fetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
 	filterOptions: ComputedRef<AnalyticsDashboardFilterOptions>
+	versionNumbersById: ComputedRef<Map<string, string>>
 	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	isLoading: ComputedRef<boolean>
@@ -113,6 +118,7 @@ export interface AnalyticsDashboardContextValue {
 		breakdown: AnalyticsBreakdownPreset,
 	) => boolean
 	refreshAnalyticsQuery: () => Promise<void>
+	getVersionDisplayName: (versionId: string) => string
 	setFetchRequest: (fetchRequest: Labrinth.Analytics.v3.FetchRequest) => void
 	setActiveStat: (stat: AnalyticsDashboardStat) => void
 }
@@ -234,7 +240,7 @@ function sortStringValues(values: string[]): string[] {
 
 function getCountryFilterOptions(
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
-): AnalyticsDashboardFilterOptions {
+): string[] {
 	const countries = new Set<string>()
 
 	for (const timeSlice of timeSlices) {
@@ -255,9 +261,57 @@ function getCountryFilterOptions(
 		}
 	}
 
-	return {
-		countries: sortStringValues([...countries]),
+	return sortStringValues([...countries])
+}
+
+function addVersionIdsFromTimeSlices(
+	versionIds: Set<string>,
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+) {
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!('source_project' in dataPoint)) {
+				continue
+			}
+
+			if (
+				(dataPoint.metric_kind === 'downloads' || dataPoint.metric_kind === 'playtime') &&
+				dataPoint.version_id
+			) {
+				const versionId = dataPoint.version_id.trim()
+				if (versionId.length > 0) {
+					versionIds.add(versionId)
+				}
+			}
+		}
 	}
+}
+
+function getVersionFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
+	const versionIds = new Set<string>()
+	addVersionIdsFromTimeSlices(versionIds, timeSlices)
+	return sortStringValues([...versionIds])
+}
+
+function getGameVersionFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
+	const gameVersions = new Set<string>()
+
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!('source_project' in dataPoint)) {
+				continue
+			}
+
+			if (dataPoint.metric_kind === 'playtime' && dataPoint.game_version) {
+				const gameVersion = dataPoint.game_version.trim()
+				if (gameVersion.length > 0) {
+					gameVersions.add(gameVersion)
+				}
+			}
+		}
+	}
+
+	return sortStringValues([...gameVersions])
 }
 
 export function doesAnalyticsPointMatchFilters(
@@ -612,8 +666,52 @@ export function createAnalyticsDashboardContext(
 		enabled: computed(() => countryFilterOptionsRequest.value !== null),
 	})
 
+	const versionFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
+		if (sortedSelectedProjectIds.value.length === 0) {
+			return null
+		}
+
+		return {
+			time_range: {
+				start: ANALYTICS_START_TIMESTAMP,
+				end: new Date(queryRefreshTimestamp.value).toISOString(),
+				resolution: {
+					slices: 1,
+				},
+			},
+			project_ids: sortedSelectedProjectIds.value,
+			return_metrics: {
+				project_downloads: {
+					bucket_by: ['version_id'],
+				},
+				project_playtime: {
+					bucket_by: ['game_version', 'version_id'],
+				},
+			},
+		}
+	})
+
+	const { data: versionFilterOptionsData } = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			'filter-options',
+			'versions',
+			versionFilterOptionsRequest.value,
+		]),
+		queryFn: () =>
+			client.labrinth.analytics_v3.fetch(
+				versionFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
+			),
+		enabled: computed(() => versionFilterOptionsRequest.value !== null),
+	})
+
 	const filterOptions = computed<AnalyticsDashboardFilterOptions>(() =>
-		getCountryFilterOptions(countryFilterOptionsData.value ?? []),
+		({
+			countries: getCountryFilterOptions(countryFilterOptionsData.value ?? []),
+			gameVersions: getGameVersionFilterOptions(versionFilterOptionsData.value ?? []),
+			versionIds: getVersionFilterOptions(versionFilterOptionsData.value ?? []),
+		}),
 	)
 
 	const previousFetchRequest = computed(() => buildPreviousFetchRequest(fetchRequest.value))
@@ -661,6 +759,39 @@ export function createAnalyticsDashboardContext(
 		timeSlices.value = []
 		previousTimeSlices.value = []
 	})
+
+	const analyticsVersionIds = computed(() => {
+		const versionIds = new Set<string>()
+		for (const versionId of selectedFilters.value.version_id) {
+			const normalizedVersionId = versionId.trim()
+			if (normalizedVersionId.length > 0) {
+				versionIds.add(normalizedVersionId)
+			}
+		}
+
+		for (const versionId of filterOptions.value.versionIds) {
+			versionIds.add(versionId)
+		}
+
+		addVersionIdsFromTimeSlices(versionIds, timeSlices.value)
+		addVersionIdsFromTimeSlices(versionIds, previousTimeSlices.value)
+
+		return sortStringValues([...versionIds])
+	})
+
+	const { data: versions } = useQuery({
+		queryKey: computed(() => ['analytics', 'dashboard', 'versions', analyticsVersionIds.value]),
+		queryFn: () =>
+			fetchSegmentedWith(analyticsVersionIds.value, (ids) =>
+				client.labrinth.versions_v3.getVersions(ids),
+			),
+		enabled: computed(() => analyticsVersionIds.value.length > 0),
+		placeholderData: [],
+	})
+
+	const versionNumbersById = computed(
+		() => new Map((versions.value ?? []).map((version) => [version.id, version.version_number])),
+	)
 
 	const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 	const availableProjectIdSet = computed(() => new Set(availableProjectIds.value))
@@ -722,6 +853,10 @@ export function createAnalyticsDashboardContext(
 		fetchRequest.value = nextFetchRequest
 	}
 
+	function getVersionDisplayName(versionId: string): string {
+		return versionNumbersById.value.get(versionId) ?? versionId
+	}
+
 	function setActiveStat(nextStat: AnalyticsDashboardStat) {
 		if (!isAnalyticsDashboardStatRelevant(nextStat, selectedBreakdown.value)) {
 			return
@@ -745,6 +880,7 @@ export function createAnalyticsDashboardContext(
 		queryRefreshTimestamp,
 		fetchRequest,
 		filterOptions,
+		versionNumbersById,
 		timeSlices,
 		previousTimeSlices,
 		isLoading,
@@ -756,6 +892,7 @@ export function createAnalyticsDashboardContext(
 		getRelevantAnalyticsDashboardStats,
 		isAnalyticsDashboardStatRelevant,
 		refreshAnalyticsQuery,
+		getVersionDisplayName,
 		setFetchRequest,
 		setActiveStat,
 	}

@@ -137,6 +137,7 @@ const {
 	timeSlices,
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
+	getVersionDisplayName,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 const isDataLoading = computed(() => isLoading.value)
@@ -432,7 +433,7 @@ function getSortComparison(
 }
 
 function formatBreakdownDisplayValue(value: string): string {
-	return formatBreakdownLabel(value, selectedBreakdown.value)
+	return formatBreakdownLabel(value, selectedBreakdown.value, getVersionDisplayName)
 }
 
 function getCsvCellValue(row: AnalyticsTableRow, key: TableColumnKey): string | number {
@@ -440,7 +441,7 @@ function getCsvCellValue(row: AnalyticsTableRow, key: TableColumnKey): string | 
 		case 'date':
 			return row.date
 		case 'breakdown':
-			return row.breakdown
+			return formatBreakdownDisplayValue(row.breakdown)
 		case 'views':
 			return row.views
 		case 'downloads':
