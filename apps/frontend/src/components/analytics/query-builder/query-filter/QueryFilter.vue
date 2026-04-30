@@ -183,6 +183,7 @@ import { onClickOutside } from '@vueuse/core'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 
 import { useFormattedCountries } from '@/composables/country.ts'
+import { useGeneratedState } from '~/composables/generated'
 import {
 	injectAnalyticsDashboardContext,
 	type AnalyticsQueryFilterCategory,
@@ -208,8 +209,10 @@ import {
 	type Point,
 } from './queryFilter'
 
-const { filterOptions, selectedFilters, getVersionDisplayName } = injectAnalyticsDashboardContext()
+const { filterOptions, selectedFilters, getVersionDisplayName, getVersionPublishedDate } =
+	injectAnalyticsDashboardContext()
 const formattedCountries = useFormattedCountries()
+const generatedState = useGeneratedState()
 
 const isAddMenuOpen = ref(false)
 const activeCategoryKey = ref<AnalyticsQueryFilterCategory | null>(null)
@@ -255,7 +258,9 @@ const filterCategories = computed<FilterCategory[]>(() => [
 	{
 		key: 'download_source',
 		label: 'Download Source',
-		options: withSelectedOptions('download_source', []),
+		searchable: true,
+		searchPlaceholder: 'Search download sources...',
+		options: withSelectedOptions('download_source', downloadSourceFilterOptions.value),
 	},
 	{
 		key: 'version_id',
@@ -356,6 +361,24 @@ const countryFilterOptions = computed<FilterOption[]>(() =>
 		.sort((left, right) => left.label.localeCompare(right.label)),
 )
 
+const gameVersionReleaseDatesByVersion = computed(
+	() =>
+		new Map(
+			generatedState.value.gameVersions.map(
+				(gameVersion) => [gameVersion.version, gameVersion.date] as const,
+			),
+		),
+)
+
+const downloadSourceFilterOptions = computed<FilterOption[]>(() =>
+	filterOptions.value.downloadSources
+		.map((downloadSource) => ({
+			value: downloadSource,
+			label: downloadSource,
+		}))
+		.sort((left, right) => left.label.localeCompare(right.label)),
+)
+
 const versionFilterOptions = computed<FilterOption[]>(() =>
 	filterOptions.value.versionIds
 		.map((versionId) => ({
@@ -363,7 +386,14 @@ const versionFilterOptions = computed<FilterOption[]>(() =>
 			label: getVersionDisplayName(versionId),
 			searchTerms: [versionId],
 		}))
-		.sort((left, right) => left.label.localeCompare(right.label)),
+		.sort((left, right) =>
+			compareOptionalDateStringsDescending(
+				getVersionPublishedDate(left.value),
+				getVersionPublishedDate(right.value),
+				left.label,
+				right.label,
+			),
+		),
 )
 
 const gameVersionFilterOptions = computed<FilterOption[]>(() =>
@@ -372,7 +402,14 @@ const gameVersionFilterOptions = computed<FilterOption[]>(() =>
 			value: gameVersion,
 			label: gameVersion,
 		}))
-		.sort((left, right) => left.label.localeCompare(right.label)),
+		.sort((left, right) =>
+			compareOptionalDateStringsDescending(
+				gameVersionReleaseDatesByVersion.value.get(left.value),
+				gameVersionReleaseDatesByVersion.value.get(right.value),
+				left.label,
+				right.label,
+			),
+		),
 )
 
 const loaderTypeFilterOptions = computed<FilterOption[]>(() =>
@@ -401,6 +438,37 @@ function getLoaderTypeFilterOptionLabel(loaderType: string): string {
 	}
 
 	return `${normalizedLoaderType.charAt(0).toUpperCase()}${normalizedLoaderType.slice(1)}`
+}
+
+function getDateTimestamp(date: string | undefined): number | undefined {
+	if (!date) {
+		return undefined
+	}
+
+	const timestamp = new Date(date).getTime()
+	return Number.isFinite(timestamp) ? timestamp : undefined
+}
+
+function compareOptionalDateStringsDescending(
+	leftDate: string | undefined,
+	rightDate: string | undefined,
+	leftFallback: string,
+	rightFallback: string,
+): number {
+	const leftTimestamp = getDateTimestamp(leftDate)
+	const rightTimestamp = getDateTimestamp(rightDate)
+
+	if (leftTimestamp !== undefined && rightTimestamp !== undefined) {
+		return rightTimestamp - leftTimestamp
+	}
+	if (leftTimestamp !== undefined) {
+		return -1
+	}
+	if (rightTimestamp !== undefined) {
+		return 1
+	}
+
+	return leftFallback.localeCompare(rightFallback)
 }
 
 function resetAddMenuDraft() {

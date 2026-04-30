@@ -82,6 +82,7 @@ export interface AnalyticsDashboardPercentChanges {
 
 export interface AnalyticsDashboardFilterOptions {
 	countries: string[]
+	downloadSources: string[]
 	gameVersions: string[]
 	loaderTypes: string[]
 	versionIds: string[]
@@ -103,6 +104,7 @@ export interface AnalyticsDashboardContextValue {
 	fetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
 	filterOptions: ComputedRef<AnalyticsDashboardFilterOptions>
 	versionNumbersById: ComputedRef<Map<string, string>>
+	versionPublishedDatesById: ComputedRef<Map<string, string>>
 	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	isLoading: ComputedRef<boolean>
@@ -120,6 +122,7 @@ export interface AnalyticsDashboardContextValue {
 	) => boolean
 	refreshAnalyticsQuery: () => Promise<void>
 	getVersionDisplayName: (versionId: string) => string
+	getVersionPublishedDate: (versionId: string) => string | undefined
 	setFetchRequest: (fetchRequest: Labrinth.Analytics.v3.FetchRequest) => void
 	setActiveStat: (stat: AnalyticsDashboardStat) => void
 }
@@ -261,6 +264,27 @@ function getCountryFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]):
 	}
 
 	return sortStringValues([...countries])
+}
+
+function getDownloadSourceFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
+	const downloadSources = new Set<string>()
+
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!('source_project' in dataPoint)) {
+				continue
+			}
+
+			if (dataPoint.metric_kind === 'downloads' && dataPoint.domain) {
+				const downloadSource = dataPoint.domain.trim()
+				if (downloadSource.length > 0) {
+					downloadSources.add(downloadSource)
+				}
+			}
+		}
+	}
+
+	return sortStringValues([...downloadSources])
 }
 
 function addVersionIdsFromTimeSlices(
@@ -686,6 +710,45 @@ export function createAnalyticsDashboardContext(
 		enabled: computed(() => countryFilterOptionsRequest.value !== null),
 	})
 
+	const downloadSourceFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(
+		() => {
+			if (sortedSelectedProjectIds.value.length === 0) {
+				return null
+			}
+
+			return {
+				time_range: {
+					start: ANALYTICS_START_TIMESTAMP,
+					end: new Date(queryRefreshTimestamp.value).toISOString(),
+					resolution: {
+						slices: 1,
+					},
+				},
+				project_ids: sortedSelectedProjectIds.value,
+				return_metrics: {
+					project_downloads: {
+						bucket_by: ['domain'],
+					},
+				},
+			}
+		},
+	)
+
+	const { data: downloadSourceFilterOptionsData } = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			'filter-options',
+			'download-sources',
+			downloadSourceFilterOptionsRequest.value,
+		]),
+		queryFn: () =>
+			client.labrinth.analytics_v3.fetch(
+				downloadSourceFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
+			),
+		enabled: computed(() => downloadSourceFilterOptionsRequest.value !== null),
+	})
+
 	const versionFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
 		if (sortedSelectedProjectIds.value.length === 0) {
 			return null
@@ -765,6 +828,7 @@ export function createAnalyticsDashboardContext(
 
 	const filterOptions = computed<AnalyticsDashboardFilterOptions>(() => ({
 		countries: getCountryFilterOptions(countryFilterOptionsData.value ?? []),
+		downloadSources: getDownloadSourceFilterOptions(downloadSourceFilterOptionsData.value ?? []),
 		gameVersions: getGameVersionFilterOptions(versionFilterOptionsData.value ?? []),
 		loaderTypes: getLoaderFilterOptions(loaderFilterOptionsData.value ?? []),
 		versionIds: getVersionFilterOptions(versionFilterOptionsData.value ?? []),
@@ -848,6 +912,9 @@ export function createAnalyticsDashboardContext(
 	const versionNumbersById = computed(
 		() => new Map((versions.value ?? []).map((version) => [version.id, version.version_number])),
 	)
+	const versionPublishedDatesById = computed(
+		() => new Map((versions.value ?? []).map((version) => [version.id, version.date_published])),
+	)
 
 	const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 	const availableProjectIdSet = computed(() => new Set(availableProjectIds.value))
@@ -913,6 +980,10 @@ export function createAnalyticsDashboardContext(
 		return versionNumbersById.value.get(versionId) ?? versionId
 	}
 
+	function getVersionPublishedDate(versionId: string): string | undefined {
+		return versionPublishedDatesById.value.get(versionId)
+	}
+
 	function setActiveStat(nextStat: AnalyticsDashboardStat) {
 		if (!isAnalyticsDashboardStatRelevant(nextStat, selectedBreakdown.value)) {
 			return
@@ -937,6 +1008,7 @@ export function createAnalyticsDashboardContext(
 		fetchRequest,
 		filterOptions,
 		versionNumbersById,
+		versionPublishedDatesById,
 		timeSlices,
 		previousTimeSlices,
 		isLoading,
@@ -949,6 +1021,7 @@ export function createAnalyticsDashboardContext(
 		isAnalyticsDashboardStatRelevant,
 		refreshAnalyticsQuery,
 		getVersionDisplayName,
+		getVersionPublishedDate,
 		setFetchRequest,
 		setActiveStat,
 	}
