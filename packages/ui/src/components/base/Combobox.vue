@@ -161,6 +161,10 @@
 						{{ noOptionsMessage }}
 					</div>
 
+					<div v-if="$slots.bottom" @keydown.stop>
+						<slot name="bottom"></slot>
+					</div>
+
 					<slot name="dropdown-footer"></slot>
 				</div>
 			</Transition>

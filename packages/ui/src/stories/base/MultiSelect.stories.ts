@@ -152,6 +152,40 @@ export const CustomInputContent: Story = {
 	}),
 }
 
+export const WithBottomSlot: Story = {
+	args: {
+		...Default.args,
+		modelValue: ['en', 'es'],
+		searchable: true,
+		includeSelectAllOption: true,
+	},
+	render: (args) => ({
+		components: { MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			const minimum = ref('')
+			return { args, selected, minimum }
+		},
+		template: /*html*/ `
+			<div style="width: 400px;">
+				<MultiSelect v-bind="args" v-model="selected">
+					<template #bottom>
+						<div style="display: flex; align-items: center; gap: 0.75rem; border-top: 1px solid var(--color-surface-5); padding: 0.75rem;">
+							<span style="font-size: 0.875rem; font-weight: 600; color: var(--color-text-primary);">Projects above</span>
+							<input
+								v-model="minimum"
+								type="text"
+								style="height: 2rem; width: 5rem; border: 1px solid var(--color-surface-5); border-radius: 0.5rem; background: var(--color-surface-3); color: var(--color-text-primary); text-align: center; font-weight: 600;"
+							/>
+							<span style="font-size: 0.875rem; font-weight: 600; color: var(--color-text-primary);">downloads</span>
+						</div>
+					</template>
+				</MultiSelect>
+			</div>
+		`,
+	}),
+}
+
 export const NoOptions: Story = {
 	args: {
 		...Default.args,
