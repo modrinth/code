@@ -23,7 +23,7 @@
 				</div>
 
 				<div class="flex shrink-0 items-center gap-2">
-					<PanelServerActionButton size="standard" start-label="Start world" />
+					<PanelServerActionButton size="large" start-label="Start world" />
 					<ButtonStyled circular>
 						<button
 							v-tooltip="formatMessage(messages.worldSettings)"
