@@ -30,6 +30,8 @@
 import 'flatpickr/dist/flatpickr.css'
 
 import { CalendarIcon } from '@modrinth/assets'
+import chevronLeftIcon from '@modrinth/assets/icons/chevron-left.svg?raw'
+import chevronRightIcon from '@modrinth/assets/icons/chevron-right.svg?raw'
 import flatpickr from 'flatpickr'
 import type { Instance } from 'flatpickr/dist/types/instance'
 import type { Options } from 'flatpickr/dist/types/options'
@@ -316,6 +318,8 @@ function flatpickrOptions(): Options {
 		minDate: props.minDate,
 		mode: props.mode,
 		noCalendar: false,
+		nextArrow: chevronRightIcon,
+		prevArrow: chevronLeftIcon,
 		static: true,
 		time_24hr: props.time24hr,
 	}
@@ -427,7 +431,14 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-prev-month svg),
 .modrinth-date-picker :deep(.flatpickr-next-month svg) {
-	@apply h-4 w-4 fill-current;
+	@apply h-5 w-5 stroke-current text-secondary;
+	fill: none;
+	stroke-width: 3;
+}
+
+.modrinth-date-picker :deep(.flatpickr-prev-month:hover svg),
+.modrinth-date-picker :deep(.flatpickr-next-month:hover svg) {
+	fill: none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-weekday) {
@@ -435,7 +446,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day) {
-	@apply m-0 max-w-none rounded-xl border border-solid border-transparent text-primary hover:border-surface-5 hover:bg-surface-4 hover:text-contrast;
+	@apply m-0 max-w-none rounded-xl border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.today) {
