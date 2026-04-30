@@ -8,7 +8,7 @@ use theseus::data::{ContentItem, Dependency, LinkedModpackInfo};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
 use theseus::server_address::ServerAddress;
-use theseus::util::fetch::DownloadReason;
+use theseus::DownloadReason;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile")

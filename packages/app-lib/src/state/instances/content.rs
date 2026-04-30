@@ -321,6 +321,7 @@ pub async fn get_content_items(
             );
             match get_modpack_identifiers(
                 &linked_data.version_id,
+                profile,
                 pool,
                 fetch_semaphore,
             )
@@ -640,6 +641,7 @@ pub async fn get_linked_modpack_content(
 
     let modpack_ids = match get_modpack_identifiers(
         &linked_data.version_id,
+        profile,
         pool,
         fetch_semaphore,
     )
@@ -804,6 +806,7 @@ impl ModpackIdentifiers {
 /// Checks cache first, falls back to downloading mrpack if not cached.
 async fn get_modpack_identifiers(
     version_id: &str,
+    profile: &crate::state::Profile,
     pool: &SqlitePool,
     fetch_semaphore: &FetchSemaphore,
 ) -> crate::Result<ModpackIdentifiers> {
@@ -882,19 +885,10 @@ async fn get_modpack_identifiers(
             ))
         })?;
 
-    // TODO: use profile's game_version/loader instead of picking first from version
     let download_meta = DownloadMeta {
         reason: DownloadReason::Modpack,
-        game_version: version
-            .game_versions
-            .first()
-            .cloned()
-            .unwrap_or_default(),
-        loader: version
-            .loaders
-            .first()
-            .cloned()
-            .unwrap_or_default(),
+        game_version: profile.game_version.clone(),
+        loader: profile.loader.as_str().to_string(),
     };
 
     let mrpack_bytes = fetch_mirrors(

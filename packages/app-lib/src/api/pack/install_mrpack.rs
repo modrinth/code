@@ -6,7 +6,8 @@ use crate::pack::install_from::{
     EnvType, PackFile, PackFileHash, set_profile_information,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, ProfileInstallStage, SideType, cache_file_hash,
+    CacheBehaviour, CachedEntry, Profile, ProfileInstallStage, SideType,
+    cache_file_hash,
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, fetch_mirrors, sha1_async, write,
@@ -209,32 +210,17 @@ pub async fn install_zipped_mrpack_files(
     )
     .await?;
 
-    // TODO: use profile's game_version/loader instead of deriving from pack deps
+    let profile = Profile::get(&profile_path, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+                .as_error()
+        })?;
+
     let download_meta = DownloadMeta {
         reason: DownloadReason::Modpack,
-        game_version: pack
-            .dependencies
-            .get(&crate::pack::install_from::PackDependency::Minecraft)
-            .cloned()
-            .unwrap_or_default(),
-        loader: pack
-            .dependencies
-            .keys()
-            .find_map(|dep| match dep {
-                crate::pack::install_from::PackDependency::Forge => Some("forge"),
-                crate::pack::install_from::PackDependency::NeoForge => {
-                    Some("neoforge")
-                }
-                crate::pack::install_from::PackDependency::FabricLoader => {
-                    Some("fabric")
-                }
-                crate::pack::install_from::PackDependency::QuiltLoader => {
-                    Some("quilt")
-                }
-                _ => None,
-            })
-            .unwrap_or("")
-            .to_string(),
+        game_version: profile.game_version.clone(),
+        loader: profile.loader.as_str().to_string(),
     };
 
     let num_files = pack.files.len();

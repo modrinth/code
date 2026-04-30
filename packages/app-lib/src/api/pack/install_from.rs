@@ -4,7 +4,8 @@ use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{
-    CacheBehaviour, CachedEntry, LinkedData, ProfileInstallStage, SideType,
+    CacheBehaviour, CachedEntry, LinkedData, Profile, ProfileInstallStage,
+    SideType,
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, fetch, fetch_advanced, write_cached_icon,
@@ -289,19 +290,17 @@ pub async fn generate_pack_from_version_id(
             )
         })?;
 
-    // TODO: use profile's game_version/loader instead of picking first from version
+    let profile = Profile::get(&profile_path, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+                .as_error()
+        })?;
+
     let download_meta = DownloadMeta {
         reason: DownloadReason::Modpack,
-        game_version: version
-            .game_versions
-            .first()
-            .cloned()
-            .unwrap_or_default(),
-        loader: version
-            .loaders
-            .first()
-            .cloned()
-            .unwrap_or_default(),
+        game_version: profile.game_version.clone(),
+        loader: profile.loader.as_str().to_string(),
     };
 
     let file = fetch_advanced(

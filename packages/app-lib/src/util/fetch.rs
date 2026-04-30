@@ -326,6 +326,7 @@ pub async fn fetch_advanced_with_client(
         }
 
         if let Some((name, value)) = &download_meta_header {
+            tracing::info!("Sending download analytics: {value}");
             req = req.header(name.as_str(), value.as_str());
         }
 
