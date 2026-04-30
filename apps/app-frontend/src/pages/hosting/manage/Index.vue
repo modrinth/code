@@ -93,7 +93,7 @@ watch(
 			breadcrumbs.setName('Server', server.name)
 			breadcrumbs.setContext({
 				name: server.name,
-				link: `/hosting/manage/${serverId.value}/content`,
+				link: `/hosting/manage/${serverId.value}/worlds`,
 			})
 		}
 	},

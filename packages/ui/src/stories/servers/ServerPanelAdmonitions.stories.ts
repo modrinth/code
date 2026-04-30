@@ -22,7 +22,7 @@ const meta = {
 			setup() {
 				const router = useRouter()
 				onMounted(() => {
-					router.replace('/hosting/manage/demo-server/content')
+					router.replace('/hosting/manage/demo-server/worlds/demo-world')
 				})
 
 				const server = ref({

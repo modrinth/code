@@ -101,7 +101,7 @@ export function createServerInstallContent(opts: {
 		if (serverFlowFrom.value === 'reset-server') {
 			return `/hosting/manage/${sid}?openSettings=installation`
 		}
-		return `/hosting/manage/${sid}/content`
+		return getServerWorldContentPath(sid, effectiveServerWorldId.value)
 	})
 	const serverBackLabel = computed(() => {
 		if (serverFlowFrom.value === 'onboarding') return 'Back to setup'
@@ -351,7 +351,7 @@ export function createServerInstallContent(opts: {
 
 			if (serverFlowFrom.value === 'onboarding') {
 				await client.archon.servers_v1.endIntro(sid)
-				await router.push(`/hosting/manage/${sid}/content`)
+				await router.push(getServerWorldContentPath(sid, wid))
 				return
 			}
 
@@ -364,6 +364,11 @@ export function createServerInstallContent(opts: {
 
 	function markServerProjectInstalled(id: string) {
 		serverContentProjectIds.value = new Set([...serverContentProjectIds.value, id])
+	}
+
+	function getServerWorldContentPath(serverId: string, worldId: string | null) {
+		const base = `/hosting/manage/${encodeURIComponent(serverId)}/worlds`
+		return worldId ? `${base}/${encodeURIComponent(worldId)}` : base
 	}
 
 	return {

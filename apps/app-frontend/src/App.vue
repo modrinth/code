@@ -439,6 +439,11 @@ const sidebarOverlayScrollbarsOptions = Object.freeze({
 	},
 })
 
+router.beforeEach(async (to) => {
+	const redirect = await resolveLegacyServerWorldTabRedirect(to)
+	if (redirect) return redirect
+})
+
 router.beforeEach(() => {
 	suspensePending = false
 	if (routerToken) loading.end(routerToken)
@@ -468,6 +473,50 @@ function onSuspensePending() {
 	suspensePending = true
 	if (suspenseToken) loading.end(suspenseToken)
 	suspenseToken = loading.begin()
+}
+
+async function resolveLegacyServerWorldTabRedirect(to) {
+	if (!['ServerManageContent', 'ServerManageFiles', 'ServerManageBackups'].includes(to.name)) {
+		return null
+	}
+
+	const serverId = getRouteParam(to.params.id)
+	if (!serverId) return null
+
+	const tabPath =
+		to.name === 'ServerManageFiles' ? '/files' : to.name === 'ServerManageBackups' ? '/backups' : ''
+	const worldsPath = `/hosting/manage/${encodeURIComponent(serverId)}/worlds`
+
+	try {
+		const serverFull = await tauriApiClient.archon.servers_v1.get(serverId)
+		const world = serverFull.worlds.find((item) => item.is_active) ?? serverFull.worlds[0]
+		if (world) {
+			return {
+				path: `${worldsPath}/${encodeURIComponent(world.id)}${tabPath}`,
+				query: to.query,
+				hash: to.hash,
+				replace: true,
+			}
+		}
+	} catch {
+		return {
+			path: worldsPath,
+			query: to.query,
+			hash: to.hash,
+			replace: true,
+		}
+	}
+
+	return {
+		path: worldsPath,
+		query: to.query,
+		hash: to.hash,
+		replace: true,
+	}
+}
+
+function getRouteParam(param) {
+	return Array.isArray(param) ? param[0] : param
 }
 
 function onSuspenseResolve() {

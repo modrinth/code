@@ -8,10 +8,10 @@ import type { Stats } from '@modrinth/utils'
 import type { ComputedRef, Ref } from 'vue'
 import { computed, ref } from 'vue'
 
-import type { FileOperation } from '../layouts/shared/files-tab/types'
-import { injectModrinthClient, provideModrinthServerContext } from '../providers'
-import type { BusyReason } from '../providers/server-context'
-import { defineMessage } from './i18n'
+import type { FileOperation } from '../../layouts/shared/files-tab/types'
+import { injectModrinthClient, provideModrinthServerContext } from '../../providers'
+import type { BusyReason } from '../../providers/server-context'
+import { defineMessage } from '../i18n'
 import { useModrinthServersConsole } from './server-console'
 
 type ReadableRef<T> = Ref<T> | ComputedRef<T>

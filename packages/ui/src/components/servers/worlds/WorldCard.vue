@@ -121,9 +121,9 @@
 					<span>{{ formatMessage(commonMessages.modpackLabel) }}</span>
 					<div
 						v-if="world.linkedModpack"
-						class="flex min-w-0 items-center gap-2 text-right font-semibold text-contrast"
+						class="flex min-w-0 items-center gap-2 text-right font-semibold leading-5 text-contrast"
 					>
-						<AutoLink :to="world.linkedModpack.link" class="shrink-0">
+						<AutoLink :to="world.linkedModpack.link" class="flex shrink-0 items-center">
 							<Avatar
 								:src="world.linkedModpack.iconUrl"
 								:alt="world.linkedModpack.name"
@@ -134,13 +134,13 @@
 						</AutoLink>
 						<AutoLink
 							:to="world.linkedModpack.link"
-							class="min-w-0 font-semibold text-contrast"
+							class="flex min-w-0 items-center font-semibold leading-5 text-contrast"
 							:class="world.linkedModpack.link ? 'hover:underline' : ''"
 						>
 							<span
 								ref="modpackNameRef"
 								v-tooltip="truncatedTooltip(modpackNameRef, world.linkedModpack.name)"
-								class="block truncate"
+								class="block truncate leading-5"
 							>
 								{{ world.linkedModpack.name }}
 							</span>

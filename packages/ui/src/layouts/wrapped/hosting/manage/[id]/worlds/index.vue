@@ -17,7 +17,7 @@
 				:world="world"
 				@create="handleCreateWorld"
 				@edit="handleEditWorld"
-				@settings="handleEditWorld"
+				@settings="handleWorldSettings"
 			/>
 		</div>
 	</div>
@@ -27,7 +27,9 @@
 import type { Archon } from '@modrinth/api-client'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
+import WorldCard from '#ui/components/servers/worlds/WorldCard.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -35,8 +37,6 @@ import {
 	injectServerSettingsModal,
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
-
-import WorldCard from './components/WorldCard.vue'
 
 const messages = defineMessages({
 	worldSlotName: {
@@ -84,6 +84,7 @@ const client = injectModrinthClient()
 const { serverId, server, isServerRunning } = injectModrinthServerContext()
 const { openServerSettings } = injectServerSettingsModal()
 const { formatMessage } = useVIntl()
+const router = useRouter()
 
 const worldsQuery = useQuery({
 	queryKey: computed(() => ['servers', 'worlds', 'summary', 'v1', serverId]),
@@ -272,7 +273,13 @@ function createDummyWorldSlots(): WorldSlot[] {
 	]
 }
 
-function handleEditWorld() {
+function handleEditWorld(worldId: string) {
+	router.push(
+		`/hosting/manage/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}`,
+	)
+}
+
+function handleWorldSettings() {
 	openServerSettings({ tabId: 'installation' })
 }
 

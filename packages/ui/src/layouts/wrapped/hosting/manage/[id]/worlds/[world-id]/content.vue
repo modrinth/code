@@ -3,11 +3,24 @@ import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { useReadyState } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import ConfirmModpackUpdateModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
+import ConfirmUnlinkModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
+import ContentUpdaterModal from '#ui/layouts/shared/content-tab/components/modals/ContentUpdaterModal.vue'
+import ModpackContentModal from '#ui/layouts/shared/content-tab/components/modals/ModpackContentModal.vue'
+import ContentPageLayout from '#ui/layouts/shared/content-tab/layout.vue'
+import type { ContentModpackData } from '#ui/layouts/shared/content-tab/providers/content-manager'
+import { provideContentManager } from '#ui/layouts/shared/content-tab/providers/content-manager'
+import type {
+	ContentItem,
+	ContentModpackCardCategory,
+	ContentModpackCardProject,
+	ContentModpackCardVersion,
+} from '#ui/layouts/shared/content-tab/types'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -15,20 +28,6 @@ import {
 	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
-
-import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
-import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
-import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
-import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
-import ContentPageLayout from '../../../shared/content-tab/layout.vue'
-import type { ContentModpackData } from '../../../shared/content-tab/providers/content-manager'
-import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
-import type {
-	ContentItem,
-	ContentModpackCardCategory,
-	ContentModpackCardProject,
-	ContentModpackCardVersion,
-} from '../../../shared/content-tab/types'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
 
@@ -82,14 +81,12 @@ const messages = defineMessages({
 })
 
 const client = injectModrinthClient()
-const { server, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
+const { server, serverId, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
 	injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const { openServerSettings, browseServerContent } = injectServerSettingsModal()
-const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
-const serverId = route.params.id as string
 
 const type = computed(() => {
 	const loader = server.value?.loader?.toLowerCase()
@@ -98,7 +95,7 @@ const type = computed(() => {
 	return 'mod'
 })
 
-const queryKey = computed(() => ['content', 'list', 'v1', serverId])
+const queryKey = computed(() => ['content', 'list', 'v1', serverId, worldId.value])
 
 const contentQuery = useQuery({
 	queryKey,

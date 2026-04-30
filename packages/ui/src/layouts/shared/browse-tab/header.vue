@@ -7,7 +7,7 @@ import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import ContentPageHeader from '#ui/components/base/ContentPageHeader.vue'
-import { useServerImage } from '#ui/composables/use-server-image'
+import { useServerImage } from '#ui/composables/servers/use-server-image.ts'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import { injectBrowseManager } from './providers/browse-manager'

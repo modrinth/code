@@ -1,7 +1,7 @@
 import type { Archon } from '@modrinth/api-client'
 
-import { injectModrinthClient } from '../providers/api-client'
-import { injectNotificationManager } from '../providers/web-notifications'
+import { injectModrinthClient } from '../../providers/api-client'
+import { injectNotificationManager } from '../../providers/web-notifications'
 
 export function useServerBackupDownload() {
 	const client = injectModrinthClient()

@@ -66,6 +66,40 @@ export default new createRouter({
 					},
 				},
 				{
+					path: 'worlds/:world_id',
+					name: 'ServerManageWorld',
+					component: Hosting.World,
+					meta: {
+						breadcrumb: [{ name: '?Server' }],
+					},
+					children: [
+						{
+							path: '',
+							name: 'ServerManageWorldContent',
+							component: Hosting.Content,
+							meta: {
+								breadcrumb: [{ name: '?Server' }],
+							},
+						},
+						{
+							path: 'files',
+							name: 'ServerManageWorldFiles',
+							component: Hosting.Files,
+							meta: {
+								breadcrumb: [{ name: '?Server' }],
+							},
+						},
+						{
+							path: 'backups',
+							name: 'ServerManageWorldBackups',
+							component: Hosting.Backups,
+							meta: {
+								breadcrumb: [{ name: '?Server' }],
+							},
+						},
+					],
+				},
+				{
 					path: 'files',
 					name: 'ServerManageFiles',
 					component: Hosting.Files,

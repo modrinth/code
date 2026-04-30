@@ -186,7 +186,7 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 				queryFn: () => client.archon.properties_v1.getProperties(targetServerId, worldId.value!),
 			})
 			queryClient.prefetchQuery({
-				queryKey: ['content', 'list', 'v1', targetServerId],
+				queryKey: ['content', 'list', 'v1', targetServerId, worldId.value],
 				queryFn: () =>
 					client.archon.content_v1.getAddons(targetServerId, worldId.value!, {
 						from_modpack: false,
