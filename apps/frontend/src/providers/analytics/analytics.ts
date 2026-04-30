@@ -7,7 +7,9 @@ import type { OrganizationContext } from '../organization-context'
 import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsGroupByPreset,
+	type AnalyticsLastTimeframeUnit,
 	type AnalyticsSelectedFilters,
+	type AnalyticsTimeframeMode,
 	type AnalyticsTimeframePreset,
 	areSelectedFiltersEqual,
 	areStringArraysEqual,
@@ -19,14 +21,17 @@ import {
 export type {
 	AnalyticsBreakdownPreset,
 	AnalyticsGroupByPreset,
+	AnalyticsLastTimeframeUnit,
 	AnalyticsQueryFilterCategory,
 	AnalyticsSelectedFilters,
+	AnalyticsTimeframeMode,
 	AnalyticsTimeframePreset,
 } from './query-builder-url'
 
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
 
 const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
+const ANALYTICS_START_TIMESTAMP = '2022-01-01T00:00:00.000Z'
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -56,6 +61,7 @@ const ANALYTICS_RELEVANT_STATS_BY_BREAKDOWN: Record<
 export interface AnalyticsDashboardProject {
 	id: string
 	name: string
+	downloads: number
 }
 
 export interface AnalyticsDashboardTotals {
@@ -72,15 +78,25 @@ export interface AnalyticsDashboardPercentChanges {
 	playtime: number
 }
 
+export interface AnalyticsDashboardFilterOptions {
+	countries: string[]
+}
+
 export interface AnalyticsDashboardContextValue {
 	projects: ComputedRef<AnalyticsDashboardProject[]>
 	selectedProjectIds: Ref<string[]>
+	selectedTimeframeMode: Ref<AnalyticsTimeframeMode>
 	selectedTimeframe: Ref<AnalyticsTimeframePreset>
+	selectedLastTimeframeAmount: Ref<number>
+	selectedLastTimeframeUnit: Ref<AnalyticsLastTimeframeUnit>
+	selectedCustomTimeframeStartDate: Ref<string>
+	selectedCustomTimeframeEndDate: Ref<string>
 	selectedGroupBy: Ref<AnalyticsGroupByPreset>
 	selectedBreakdown: Ref<AnalyticsBreakdownPreset>
 	selectedFilters: Ref<AnalyticsSelectedFilters>
 	queryRefreshTimestamp: Ref<number>
 	fetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
+	filterOptions: ComputedRef<AnalyticsDashboardFilterOptions>
 	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	isLoading: ComputedRef<boolean>
@@ -153,6 +169,7 @@ function computeTotals(
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
 	selectedProjectIds: Set<string>,
 	availableProjectIds: Set<string>,
+	filters: AnalyticsSelectedFilters,
 ): AnalyticsDashboardTotals {
 	const totals: AnalyticsDashboardTotals = {
 		views: 0,
@@ -174,6 +191,10 @@ function computeTotals(
 			}
 
 			if (!effectiveProjectIds.has(dataPoint.source_project)) {
+				continue
+			}
+
+			if (!doesAnalyticsPointMatchFilters(dataPoint, filters)) {
 				continue
 			}
 
@@ -207,6 +228,128 @@ function isServerProject(project: ProjectTypeMetadata): boolean {
 	return project.project_types?.includes(MINECRAFT_JAVA_SERVER_PROJECT_TYPE) ?? false
 }
 
+function sortStringValues(values: string[]): string[] {
+	return [...values].sort((left, right) => left.localeCompare(right))
+}
+
+function getCountryFilterOptions(
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+): AnalyticsDashboardFilterOptions {
+	const countries = new Set<string>()
+
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!('source_project' in dataPoint)) {
+				continue
+			}
+
+			if (
+				(dataPoint.metric_kind === 'views' || dataPoint.metric_kind === 'downloads') &&
+				dataPoint.country
+			) {
+				const country = dataPoint.country.trim().toUpperCase()
+				if (country.length > 0) {
+					countries.add(country)
+				}
+			}
+		}
+	}
+
+	return {
+		countries: sortStringValues([...countries]),
+	}
+}
+
+export function doesAnalyticsPointMatchFilters(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+	filters: AnalyticsSelectedFilters,
+): boolean {
+	return (
+		doesAnalyticsPointMatchFilter(dataPoint, filters.country, getCountryFilterValue) &&
+		doesAnalyticsPointMatchFilter(dataPoint, filters.monetization, getMonetizationFilterValue) &&
+		doesAnalyticsPointMatchFilter(
+			dataPoint,
+			filters.download_source,
+			getDownloadSourceFilterValue,
+		) &&
+		doesAnalyticsPointMatchFilter(dataPoint, filters.version_id, getVersionFilterValue) &&
+		doesAnalyticsPointMatchFilter(dataPoint, filters.game_version, getGameVersionFilterValue) &&
+		doesAnalyticsPointMatchFilter(dataPoint, filters.loader_type, getLoaderFilterValue)
+	)
+}
+
+function doesAnalyticsPointMatchFilter(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+	filterValues: string[],
+	getPointValue: (dataPoint: Labrinth.Analytics.v3.ProjectAnalytics) => string | null,
+): boolean {
+	if (filterValues.length === 0) {
+		return true
+	}
+
+	const pointValue = getPointValue(dataPoint)
+	if (pointValue === null) {
+		return false
+	}
+
+	const normalizedPointValue = pointValue.trim().toLowerCase()
+	return filterValues.some((value) => value.trim().toLowerCase() === normalizedPointValue)
+}
+
+function getCountryFilterValue(dataPoint: Labrinth.Analytics.v3.ProjectAnalytics): string | null {
+	if (dataPoint.metric_kind !== 'views' && dataPoint.metric_kind !== 'downloads') {
+		return null
+	}
+
+	return dataPoint.country ?? null
+}
+
+function getMonetizationFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null {
+	if (dataPoint.metric_kind !== 'views' || typeof dataPoint.monetized !== 'boolean') {
+		return null
+	}
+
+	return dataPoint.monetized ? 'monetized' : 'unmonetized'
+}
+
+function getDownloadSourceFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null {
+	if (dataPoint.metric_kind !== 'views' && dataPoint.metric_kind !== 'downloads') {
+		return null
+	}
+
+	return dataPoint.domain ?? null
+}
+
+function getVersionFilterValue(dataPoint: Labrinth.Analytics.v3.ProjectAnalytics): string | null {
+	if (dataPoint.metric_kind !== 'downloads' && dataPoint.metric_kind !== 'playtime') {
+		return null
+	}
+
+	return dataPoint.version_id ?? null
+}
+
+function getGameVersionFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null {
+	if (dataPoint.metric_kind !== 'playtime') {
+		return null
+	}
+
+	return dataPoint.game_version ?? null
+}
+
+function getLoaderFilterValue(dataPoint: Labrinth.Analytics.v3.ProjectAnalytics): string | null {
+	if (dataPoint.metric_kind !== 'playtime') {
+		return null
+	}
+
+	return dataPoint.loader ?? null
+}
+
 export function createAnalyticsDashboardContext(
 	options: CreateAnalyticsDashboardContextOptions,
 ): AnalyticsDashboardContextValue {
@@ -217,7 +360,18 @@ export function createAnalyticsDashboardContext(
 
 	const activeStat = ref<AnalyticsDashboardStat>('views')
 	const selectedProjectIds = ref<string[]>(initialQueryState.selectedProjectIds)
+	const selectedTimeframeMode = ref<AnalyticsTimeframeMode>(initialQueryState.selectedTimeframeMode)
 	const selectedTimeframe = ref<AnalyticsTimeframePreset>(initialQueryState.selectedTimeframe)
+	const selectedLastTimeframeAmount = ref<number>(initialQueryState.selectedLastTimeframeAmount)
+	const selectedLastTimeframeUnit = ref<AnalyticsLastTimeframeUnit>(
+		initialQueryState.selectedLastTimeframeUnit,
+	)
+	const selectedCustomTimeframeStartDate = ref<string>(
+		initialQueryState.selectedCustomTimeframeStartDate,
+	)
+	const selectedCustomTimeframeEndDate = ref<string>(
+		initialQueryState.selectedCustomTimeframeEndDate,
+	)
 	const selectedGroupBy = ref<AnalyticsGroupByPreset>(initialQueryState.selectedGroupBy)
 	const selectedBreakdown = ref<AnalyticsBreakdownPreset>(initialQueryState.selectedBreakdown)
 	const selectedFilters = ref<AnalyticsSelectedFilters>(initialQueryState.selectedFilters)
@@ -244,7 +398,9 @@ export function createAnalyticsDashboardContext(
 	const projects = computed<AnalyticsDashboardProject[]>(() => {
 		if (hasProjectContext.value && options.projectPageContext) {
 			const project = options.projectPageContext.projectV2.value
-			return project && !isServerProject(project) ? [{ id: project.id, name: project.title }] : []
+			return project && !isServerProject(project)
+				? [{ id: project.id, name: project.title, downloads: project.downloads ?? 0 }]
+				: []
 		}
 
 		if (hasOrganizationContext.value && options.organizationContext?.projects.value) {
@@ -253,6 +409,7 @@ export function createAnalyticsDashboardContext(
 				.map((project) => ({
 					id: project.id,
 					name: project.name,
+					downloads: project.downloads ?? 0,
 				}))
 		}
 
@@ -261,10 +418,12 @@ export function createAnalyticsDashboardContext(
 			.map((project) => ({
 				id: project.id,
 				name: project.title,
+				downloads: project.downloads ?? 0,
 			}))
 	})
 
 	const availableProjectIds = computed(() => projects.value.map((project) => project.id))
+	const sortedSelectedProjectIds = computed(() => sortStringValues(selectedProjectIds.value))
 
 	function getRelevantAnalyticsDashboardStats(
 		breakdown: AnalyticsBreakdownPreset,
@@ -318,8 +477,25 @@ export function createAnalyticsDashboardContext(
 			if (!areStringArraysEqual(selectedProjectIds.value, nextQueryState.selectedProjectIds)) {
 				selectedProjectIds.value = nextQueryState.selectedProjectIds
 			}
+			if (selectedTimeframeMode.value !== nextQueryState.selectedTimeframeMode) {
+				selectedTimeframeMode.value = nextQueryState.selectedTimeframeMode
+			}
 			if (selectedTimeframe.value !== nextQueryState.selectedTimeframe) {
 				selectedTimeframe.value = nextQueryState.selectedTimeframe
+			}
+			if (selectedLastTimeframeAmount.value !== nextQueryState.selectedLastTimeframeAmount) {
+				selectedLastTimeframeAmount.value = nextQueryState.selectedLastTimeframeAmount
+			}
+			if (selectedLastTimeframeUnit.value !== nextQueryState.selectedLastTimeframeUnit) {
+				selectedLastTimeframeUnit.value = nextQueryState.selectedLastTimeframeUnit
+			}
+			if (
+				selectedCustomTimeframeStartDate.value !== nextQueryState.selectedCustomTimeframeStartDate
+			) {
+				selectedCustomTimeframeStartDate.value = nextQueryState.selectedCustomTimeframeStartDate
+			}
+			if (selectedCustomTimeframeEndDate.value !== nextQueryState.selectedCustomTimeframeEndDate) {
+				selectedCustomTimeframeEndDate.value = nextQueryState.selectedCustomTimeframeEndDate
 			}
 			if (selectedGroupBy.value !== nextQueryState.selectedGroupBy) {
 				selectedGroupBy.value = nextQueryState.selectedGroupBy
@@ -336,7 +512,12 @@ export function createAnalyticsDashboardContext(
 	watch(
 		[
 			selectedProjectIds,
+			selectedTimeframeMode,
 			selectedTimeframe,
+			selectedLastTimeframeAmount,
+			selectedLastTimeframeUnit,
+			selectedCustomTimeframeStartDate,
+			selectedCustomTimeframeEndDate,
 			selectedGroupBy,
 			selectedBreakdown,
 			selectedFilters,
@@ -351,7 +532,12 @@ export function createAnalyticsDashboardContext(
 				route.query,
 				{
 					selectedProjectIds: selectedProjectIds.value,
+					selectedTimeframeMode: selectedTimeframeMode.value,
 					selectedTimeframe: selectedTimeframe.value,
+					selectedLastTimeframeAmount: selectedLastTimeframeAmount.value,
+					selectedLastTimeframeUnit: selectedLastTimeframeUnit.value,
+					selectedCustomTimeframeStartDate: selectedCustomTimeframeStartDate.value,
+					selectedCustomTimeframeEndDate: selectedCustomTimeframeEndDate.value,
 					selectedGroupBy: selectedGroupBy.value,
 					selectedBreakdown: selectedBreakdown.value,
 					selectedFilters: selectedFilters.value,
@@ -385,6 +571,50 @@ export function createAnalyticsDashboardContext(
 			client.labrinth.analytics_v3.fetch(fetchRequest.value as Labrinth.Analytics.v3.FetchRequest),
 		enabled: computed(() => fetchRequest.value !== null),
 	})
+
+	const countryFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
+		if (sortedSelectedProjectIds.value.length === 0) {
+			return null
+		}
+
+		return {
+			time_range: {
+				start: ANALYTICS_START_TIMESTAMP,
+				end: new Date(queryRefreshTimestamp.value).toISOString(),
+				resolution: {
+					slices: 1,
+				},
+			},
+			project_ids: sortedSelectedProjectIds.value,
+			return_metrics: {
+				project_views: {
+					bucket_by: ['country'],
+				},
+				project_downloads: {
+					bucket_by: ['country'],
+				},
+			},
+		}
+	})
+
+	const { data: countryFilterOptionsData } = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			'filter-options',
+			'countries',
+			countryFilterOptionsRequest.value,
+		]),
+		queryFn: () =>
+			client.labrinth.analytics_v3.fetch(
+				countryFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
+			),
+		enabled: computed(() => countryFilterOptionsRequest.value !== null),
+	})
+
+	const filterOptions = computed<AnalyticsDashboardFilterOptions>(() =>
+		getCountryFilterOptions(countryFilterOptionsData.value ?? []),
+	)
 
 	const previousFetchRequest = computed(() => buildPreviousFetchRequest(fetchRequest.value))
 
@@ -436,13 +666,19 @@ export function createAnalyticsDashboardContext(
 	const availableProjectIdSet = computed(() => new Set(availableProjectIds.value))
 
 	const currentTotals = computed<AnalyticsDashboardTotals>(() =>
-		computeTotals(timeSlices.value, selectedProjectIdSet.value, availableProjectIdSet.value),
+		computeTotals(
+			timeSlices.value,
+			selectedProjectIdSet.value,
+			availableProjectIdSet.value,
+			selectedFilters.value,
+		),
 	)
 	const previousTotals = computed<AnalyticsDashboardTotals>(() =>
 		computeTotals(
 			previousTimeSlices.value,
 			selectedProjectIdSet.value,
 			availableProjectIdSet.value,
+			selectedFilters.value,
 		),
 	)
 
@@ -497,12 +733,18 @@ export function createAnalyticsDashboardContext(
 	return {
 		projects,
 		selectedProjectIds,
+		selectedTimeframeMode,
 		selectedTimeframe,
+		selectedLastTimeframeAmount,
+		selectedLastTimeframeUnit,
+		selectedCustomTimeframeStartDate,
+		selectedCustomTimeframeEndDate,
 		selectedGroupBy,
 		selectedBreakdown,
 		selectedFilters,
 		queryRefreshTimestamp,
 		fetchRequest,
+		filterOptions,
 		timeSlices,
 		previousTimeSlices,
 		isLoading,

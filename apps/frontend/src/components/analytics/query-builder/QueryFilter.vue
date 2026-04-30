@@ -160,6 +160,7 @@ import { MultiSelect, type MultiSelectOption } from '@modrinth/ui'
 import { onClickOutside } from '@vueuse/core'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 
+import { useFormattedCountries } from '@/composables/country.ts'
 import {
 	type AnalyticsQueryFilterCategory,
 	type AnalyticsSelectedFilters,
@@ -186,7 +187,8 @@ import {
 	normalizeSelectedValues as normalizeSelectedFilterValues,
 } from './queryFilter'
 
-const { selectedFilters } = injectAnalyticsDashboardContext()
+const { filterOptions, selectedFilters } = injectAnalyticsDashboardContext()
+const formattedCountries = useFormattedCountries()
 
 const isAddMenuOpen = ref(false)
 const activeCategoryKey = ref<AnalyticsQueryFilterCategory | null>(null)
@@ -217,7 +219,10 @@ const filterCategories = computed<FilterCategory[]>(() => [
 		key: 'country',
 		label: 'Country',
 		allLabel: 'All countries',
-		options: withSelectedOptions('country', [{ value: ALL_FILTER_VALUE, label: 'All countries' }]),
+		options: withSelectedOptions('country', [
+			{ value: ALL_FILTER_VALUE, label: 'All countries' },
+			...countryFilterOptions.value,
+		]),
 	},
 	{
 		key: 'monetization',
@@ -295,6 +300,33 @@ const appliedFilterPreviews = computed(() =>
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const previewTriggerClass =
 	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 hover:bg-surface-5 hover:brightness-100 active:brightness-100'
+
+const countryLabelsByCode = computed(
+	() =>
+		new Map(
+			formattedCountries.value.map(
+				(country) => [country.value.toUpperCase(), country.label] as const,
+			),
+		),
+)
+
+const countryFilterOptions = computed<FilterOption[]>(() =>
+	filterOptions.value.countries
+		.map((countryCode) => ({
+			value: countryCode,
+			label: getCountryFilterOptionLabel(countryCode),
+		}))
+		.sort((left, right) => left.label.localeCompare(right.label)),
+)
+
+function getCountryFilterOptionLabel(countryCode: string): string {
+	const normalizedCode = countryCode.trim().toUpperCase()
+	if (normalizedCode === 'XX') {
+		return 'Other'
+	}
+
+	return countryLabelsByCode.value.get(normalizedCode) ?? countryCode
+}
 
 function resetAddMenuDraft() {
 	draftSelectedFilters.value = cloneSelectedFilters(selectedFilters.value)
@@ -416,7 +448,11 @@ function withSelectedOptions(
 	options: FilterOption[],
 ): FilterOption[] {
 	const selectedValues = getSelectedValues(categoryKey, isAddMenuOpen.value ? 'draft' : 'committed')
-	return getOptionsWithSelectedValues(options, selectedValues)
+	return getOptionsWithSelectedValues(
+		options,
+		selectedValues,
+		categoryKey === 'country' ? getCountryFilterOptionLabel : undefined,
+	)
 }
 
 function isFilterValueSelected(categoryKey: AnalyticsQueryFilterCategory, value: string): boolean {

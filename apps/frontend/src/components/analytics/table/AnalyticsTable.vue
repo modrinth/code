@@ -97,11 +97,12 @@ import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import { Table, type TableColumn, useFormatNumber } from '@modrinth/ui'
 
-import type {
-	AnalyticsBreakdownPreset,
-	AnalyticsDashboardStat,
+import {
+	doesAnalyticsPointMatchFilters,
+	injectAnalyticsDashboardContext,
+	type AnalyticsBreakdownPreset,
+	type AnalyticsDashboardStat,
 } from '~/providers/analytics/analytics'
-import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 
 import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'
 import {
@@ -131,6 +132,7 @@ const {
 	selectedProjectIds,
 	selectedGroupBy,
 	selectedBreakdown,
+	selectedFilters,
 	fetchRequest,
 	timeSlices,
 	getRelevantAnalyticsDashboardStats,
@@ -194,6 +196,10 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 			}
 
 			if (!selectedProjectIdSet.value.has(point.source_project)) {
+				continue
+			}
+
+			if (!doesAnalyticsPointMatchFilters(point, selectedFilters.value)) {
 				continue
 			}
 

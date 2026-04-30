@@ -1,10 +1,12 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type {
-	AnalyticsBreakdownPreset,
-	AnalyticsDashboardProject,
-	AnalyticsDashboardStat,
-	AnalyticsGroupByPreset,
+import {
+	type AnalyticsBreakdownPreset,
+	type AnalyticsDashboardProject,
+	type AnalyticsDashboardStat,
+	type AnalyticsGroupByPreset,
+	type AnalyticsSelectedFilters,
+	doesAnalyticsPointMatchFilters,
 } from '~/providers/analytics/analytics'
 
 import { getAnalyticsBreakdownValue } from '../breakdown'
@@ -111,6 +113,7 @@ export function buildChartDatasets(
 	activeStat: AnalyticsDashboardStat,
 	palette: string[],
 	selectedBreakdown: AnalyticsBreakdownPreset,
+	selectedFilters: AnalyticsSelectedFilters,
 ): ChartDataset[] {
 	const selectedProjectIds = new Set(selectedProjects.map((project) => project.id))
 	if (selectedProjectIds.size === 0) {
@@ -124,6 +127,7 @@ export function buildChartDatasets(
 			for (const point of slice) {
 				if (!('source_project' in point)) continue
 				if (!selectedProjectIds.has(point.source_project)) continue
+				if (!doesAnalyticsPointMatchFilters(point, selectedFilters)) continue
 
 				const value = getMetricValue(point, activeStat)
 				if (value === 0) continue
@@ -161,6 +165,7 @@ export function buildChartDatasets(
 		for (const point of slice) {
 			if (!('source_project' in point)) continue
 			if (!selectedProjectIds.has(point.source_project)) continue
+			if (!doesAnalyticsPointMatchFilters(point, selectedFilters)) continue
 
 			const projectData = dataByProjectId.get(point.source_project)
 			if (!projectData) continue

@@ -146,6 +146,7 @@ const {
 	timeSlices,
 	selectedGroupBy,
 	selectedBreakdown,
+	selectedFilters,
 	isLoading,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
@@ -212,6 +213,7 @@ const allChartDatasets = computed(() =>
 		activeStat.value,
 		legendPalette,
 		selectedBreakdown.value,
+		selectedFilters.value,
 	),
 )
 
