@@ -86,6 +86,7 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
+import { useIntercomPositioning } from '@/composables/intercom-positioning'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -125,6 +126,17 @@ import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
 
 const themeStore = useTheming()
+const router = useRouter()
+const route = useRoute()
+const intercomBubblePositioning = useIntercomPositioning({ route, themeStore })
+const {
+	sidebarToggled,
+	forceSidebar,
+	sidebarVisible,
+	intercomBubblePosition,
+	updateIntercomBubbleStyles,
+	clearIntercomBubbleStyles,
+} = intercomBubblePositioning
 
 const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
@@ -158,6 +170,7 @@ provideModrinthClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
+	...intercomBubblePositioning.pageContext,
 	featureFlags: {
 		serverRamAsBytesAlwaysOn: computed(() =>
 			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
@@ -242,6 +255,7 @@ onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 	shutdownHostingIntercom()
+	clearIntercomBubbleStyles()
 
 	await unlistenUpdateDownload?.()
 })
@@ -422,9 +436,6 @@ const handleClose = async () => {
 	await saveWindowState(StateFlags.ALL)
 	await getCurrentWindow().close()
 }
-
-const router = useRouter()
-const route = useRoute()
 
 const loading = setupLoadingStateProvider()
 loading.setEnabled(false)
@@ -643,22 +654,10 @@ const hasPlus = computed(
 		(credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
 )
 
-const sidebarToggled = ref(true)
-
-themeStore.$subscribe(() => {
-	sidebarToggled.value = !themeStore.toggleSidebar
-})
-
-const forceSidebar = computed(
-	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
-)
-const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 const showAd = computed(
 	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
 )
 const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
-const INTERCOM_DEFAULT_PADDING = 20
-const INTERCOM_APP_SIDEBAR_WIDTH = 300
 
 let intercomBooting = false
 let intercomBooted = false
@@ -706,10 +705,8 @@ async function bootIntercom() {
 			intercom_user_jwt: token,
 			session_duration: 1000 * 60 * 60 * 24,
 			alignment: 'right',
-			horizontal_padding: sidebarVisible.value
-				? INTERCOM_APP_SIDEBAR_WIDTH + INTERCOM_DEFAULT_PADDING
-				: INTERCOM_DEFAULT_PADDING,
-			vertical_padding: INTERCOM_DEFAULT_PADDING,
+			horizontal_padding: intercomBubblePosition.value.horizontalPadding,
+			vertical_padding: intercomBubblePosition.value.verticalPadding,
 		})
 		intercomBooted = true
 	} catch (error) {
@@ -727,14 +724,13 @@ function shutdownHostingIntercom() {
 }
 
 watch(
-	sidebarVisible,
-	(visible) => {
+	intercomBubblePosition,
+	(position) => {
+		updateIntercomBubbleStyles(position)
 		if (intercomBooted) {
 			window.Intercom?.('update', {
-				horizontal_padding: visible
-					? INTERCOM_APP_SIDEBAR_WIDTH + INTERCOM_DEFAULT_PADDING
-					: INTERCOM_DEFAULT_PADDING,
-				vertical_padding: INTERCOM_DEFAULT_PADDING,
+				horizontal_padding: position.horizontalPadding,
+				vertical_padding: position.verticalPadding,
 			})
 		}
 	},
@@ -1770,6 +1766,14 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--os-handle-bg: var(--color-scrollbar) !important;
 	--os-handle-bg-hover: var(--color-scrollbar) !important;
 	--os-handle-bg-active: var(--color-scrollbar) !important;
+}
+
+.intercom-lightweight-app-launcher,
+.intercom-launcher-frame,
+iframe[name='intercom-launcher-frame'] {
+	right: var(--app-support-launcher-right, 20px) !important;
+	bottom: var(--app-support-launcher-bottom, 20px) !important;
+	z-index: 9 !important;
 }
 
 .mac {
