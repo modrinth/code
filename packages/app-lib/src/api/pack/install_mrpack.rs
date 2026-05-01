@@ -228,8 +228,7 @@ pub async fn install_zipped_mrpack_files(
 
     let num_files = pack.files.len();
     loading_try_for_each_concurrent(
-        futures::stream::iter(pack.files)
-            .map(Ok::<PackFile, crate::Error>),
+        futures::stream::iter(pack.files).map(Ok::<PackFile, crate::Error>),
         None,
         Some(&loading_bar),
         70.0,
