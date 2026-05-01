@@ -1,4 +1,5 @@
 use std::any::type_name;
+use std::cmp::Reverse;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -1359,10 +1360,10 @@ pub async fn dependency_list_internal(
         )
         .await?;
 
-        projects.sort_by(|a, b| b.published.cmp(&a.published));
+        projects.sort_by_key(|b| Reverse(b.published));
         projects.dedup_by(|a, b| a.id == b.id);
 
-        versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+        versions.sort_by_key(|b| Reverse(b.date_published));
         versions.dedup_by(|a, b| a.id == b.id);
 
         Ok(HttpResponse::Ok().json(DependencyInfo { projects, versions }))

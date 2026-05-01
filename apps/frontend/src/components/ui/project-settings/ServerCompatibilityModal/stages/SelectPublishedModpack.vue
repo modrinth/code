@@ -87,7 +87,7 @@ const currentProjectId = computed(() => projectV3.value?.id)
 const { selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()
 const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
-const auth = (await useAuth()) as { user?: { id: string } }
+const auth = await useAuth()
 
 interface VersionInfo {
 	id: string

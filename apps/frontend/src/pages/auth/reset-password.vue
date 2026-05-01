@@ -1,14 +1,24 @@
 <template>
-	<div>
-		<h1>{{ formatMessage(messages.longTitle) }}</h1>
-		<section class="auth-form">
-			<template v-if="step === 'choose_method'">
-				<p>
-					{{ formatMessage(methodChoiceMessages.description) }}
-				</p>
+	<div
+		class="universal-card flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+	>
+		<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
+			{{ formatMessage(messages.longTitle) }}
+		</h1>
+		<template v-if="step === 'choose_method'">
+			<Admonition :type="'info'">
+				<template #header>
+					<div class="-mb-2 flex flex-col gap-1.5 font-normal leading-normal">
+						<div>
+							{{ formatMessage(methodChoiceMessages.description) }}
+						</div>
+					</div>
+				</template>
+			</Admonition>
 
-				<label for="email" hidden>
-					{{ formatMessage(commonMessages.emailUsernameLabel) }}
+			<div class="flex flex-col gap-2.5">
+				<label class="text-md font-semibold text-contrast" for="email">
+					{{ formatMessage(commonMessages.emailLabel) }}
 				</label>
 				<StyledInput
 					id="email"
@@ -19,20 +29,37 @@
 					:placeholder="formatMessage(commonMessages.emailLabel)"
 					wrapper-class="w-full"
 				/>
+			</div>
 
+			<div class="flex flex-col gap-2.5">
+				<label class="text-md font-semibold text-contrast">{{
+					formatMessage(messages.securityCheckLabel)
+				}}</label>
 				<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
+			</div>
 
+			<ButtonStyled color="brand">
 				<button
-					class="btn btn-primary centered-btn"
+					class="!w-full"
 					:disabled="globals?.captcha_enabled ? !token : false"
 					@click="recovery"
 				>
 					<SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}
 				</button>
-			</template>
-			<template v-else-if="step === 'passed_challenge'">
-				<p>{{ formatMessage(postChallengeMessages.description) }}</p>
+			</ButtonStyled>
+		</template>
+		<template v-else-if="step === 'passed_challenge'">
+			<Admonition :type="'info'">
+				<template #header>
+					<div class="-mb-2 flex flex-col gap-1.5 font-normal leading-normal">
+						<div>
+							{{ formatMessage(postChallengeMessages.description) }}
+						</div>
+					</div>
+				</template>
+			</Admonition>
 
+			<div class="flex flex-col gap-2.5">
 				<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
 				<StyledInput
 					id="password"
@@ -57,16 +84,20 @@
 					wrapper-class="w-full"
 				/>
 
-				<button class="auth-form__input btn btn-primary continue-btn" @click="changePassword">
-					{{ formatMessage(postChallengeMessages.action) }}
-				</button>
-			</template>
-		</section>
+				<ButtonStyled color="brand">
+					<button class="!w-full" @click="changePassword">
+						{{ formatMessage(postChallengeMessages.action) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
 	</div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { KeyIcon, MailIcon, SendIcon } from '@modrinth/assets'
 import {
+	Admonition,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
@@ -75,8 +106,41 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
+import type { LocationQueryValue } from 'vue-router'
 
-import HCaptcha from '@/components/ui/HCaptcha.vue'
+import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
+
+interface AuthGlobalsResponse {
+	captcha_enabled?: boolean
+	[key: string]: unknown
+}
+
+interface ApiErrorShape {
+	data?: {
+		description?: string
+		error?: string
+	}
+}
+
+type ResetPasswordStep = 'choose_method' | 'passed_challenge'
+
+const getQueryString = (
+	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string => {
+	const firstValue = Array.isArray(value) ? value[0] : value
+	return typeof firstValue === 'string' ? firstValue : ''
+}
+
+const getErrorMessage = (error: unknown): string => {
+	const apiError = error as ApiErrorShape
+	if (typeof apiError?.data?.description === 'string') {
+		return apiError.data.description
+	}
+	if (error instanceof Error) {
+		return error.message
+	}
+	return String(error)
+}
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -144,6 +208,10 @@ const messages = defineMessages({
 		id: 'auth.reset-password.title.long',
 		defaultMessage: 'Reset your password',
 	},
+	securityCheckLabel: {
+		id: 'auth.create-account.security-check.label',
+		defaultMessage: 'Security check',
+	},
 })
 
 useHead({
@@ -157,15 +225,15 @@ if (auth.value.user) {
 
 const route = useNativeRoute()
 
-const step = ref('choose_method')
+const step = ref<ResetPasswordStep>('choose_method')
 
 if (route.query.flow) {
 	step.value = 'passed_challenge'
 }
 
-const captcha = ref()
+const captcha = ref<{ reset?: () => void } | null>(null)
 
-const { data: globals } = useQuery({
+const { data: globals } = useQuery<AuthGlobalsResponse>({
 	queryKey: ['auth-globals'],
 	queryFn: async () => {
 		try {
@@ -196,10 +264,10 @@ async function recovery() {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }
@@ -212,7 +280,7 @@ async function changePassword() {
 	try {
 		await client.labrinth.auth_v2.changePassword({
 			new_password: newPassword.value,
-			flow: route.query.flow,
+			flow: getQueryString(route.query.flow),
 		})
 
 		addNotification({
@@ -224,10 +292,10 @@ async function changePassword() {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }

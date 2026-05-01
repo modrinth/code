@@ -1,76 +1,126 @@
 <template>
-	<div>
+	<div
+		class="universal-card flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+	>
 		<template v-if="auth.user && auth.user.email_verified && !success">
-			<h1>{{ formatMessage(alreadyVerifiedMessages.title) }}</h1>
+			<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
+				{{ formatMessage(alreadyVerifiedMessages.title) }}
+			</h1>
 
-			<section class="auth-form">
-				<p>{{ formatMessage(alreadyVerifiedMessages.description) }}</p>
+			<Admonition type="success">
+				{{ formatMessage(alreadyVerifiedMessages.description) }}
+			</Admonition>
 
-				<NuxtLink class="btn" to="/settings/account">
-					<SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
-				</NuxtLink>
-			</section>
-		</template>
-
-		<template v-else-if="success">
-			<h1>{{ formatMessage(postVerificationMessages.title) }}</h1>
-
-			<section class="auth-form">
-				<p>{{ formatMessage(postVerificationMessages.description) }}</p>
-
-				<ButtonStyled v-if="auth.user">
-					<NuxtLink to="/settings/account">
+			<div class="grid grid-cols-2 gap-2">
+				<ButtonStyled>
+					<NuxtLink class="shadow-none" to="/settings/account">
 						<SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
 					</NuxtLink>
 				</ButtonStyled>
-				<ButtonStyled v-else>
-					<NuxtLink to="/auth/sign-in">
-						{{ formatMessage(commonMessages.signInButton) }}
+				<ButtonStyled color="brand">
+					<NuxtLink to="/discover/mods">
+						{{ formatMessage(messages.discoverMods) }}
 						<RightArrowIcon />
 					</NuxtLink>
 				</ButtonStyled>
-			</section>
+			</div>
+		</template>
+
+		<template v-else-if="success">
+			<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
+				{{ formatMessage(postVerificationMessages.title) }}
+			</h1>
+
+			<Admonition type="success">
+				{{ formatMessage(postVerificationMessages.description) }}
+			</Admonition>
+
+			<template v-if="auth.user">
+				<div class="grid grid-cols-2 gap-2">
+					<ButtonStyled>
+						<NuxtLink to="/settings/account">
+							<SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
+						</NuxtLink>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<NuxtLink to="/discover/mods">
+							{{ formatMessage(messages.discoverMods) }}
+							<RightArrowIcon />
+						</NuxtLink>
+					</ButtonStyled>
+				</div>
+			</template>
+			<ButtonStyled v-else color="brand">
+				<NuxtLink to="/auth/sign-in" class="!w-full">
+					{{ formatMessage(commonMessages.signInButton) }}
+					<RightArrowIcon />
+				</NuxtLink>
+			</ButtonStyled>
 		</template>
 
 		<template v-else>
-			<h1>{{ formatMessage(failedVerificationMessages.title) }}</h1>
+			<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
+				{{ formatMessage(failedVerificationMessages.title) }}
+			</h1>
 
-			<section class="auth-form">
-				<p>
-					<template v-if="auth.user">
-						{{ formatMessage(failedVerificationMessages.loggedInDescription) }}
-					</template>
-					<template v-else>
-						{{ formatMessage(failedVerificationMessages.description) }}
-					</template>
-				</p>
+			<Admonition v-if="auth.user" type="warning">
+				{{ formatMessage(failedVerificationMessages.loggedInDescription) }}
+			</Admonition>
+			<Admonition v-else type="warning">
+				{{ formatMessage(failedVerificationMessages.description) }}
+			</Admonition>
 
-				<ButtonStyled v-if="auth.user" color="brand">
-					<button @click="handleResendEmailVerification">
-						{{ formatMessage(failedVerificationMessages.action) }}
-						<RightArrowIcon />
-					</button>
-				</ButtonStyled>
-
-				<ButtonStyled v-else color="brand">
-					<NuxtLink to="/auth/sign-in">
-						{{ formatMessage(commonMessages.signInButton) }}
-						<RightArrowIcon />
-					</NuxtLink>
-				</ButtonStyled>
-			</section>
+			<ButtonStyled v-if="auth.user" color="brand">
+				<button class="!w-full" @click="handleResendEmailVerification">
+					{{ formatMessage(failedVerificationMessages.action) }}
+					<RightArrowIcon />
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-else color="brand">
+				<NuxtLink to="/auth/sign-in" class="!w-full">
+					{{ formatMessage(commonMessages.signInButton) }}
+					<RightArrowIcon />
+				</NuxtLink>
+			</ButtonStyled>
 		</template>
 	</div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
 import {
+	Admonition,
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
+import type { LocationQueryValue } from 'vue-router'
+
+interface ApiErrorShape {
+	data?: {
+		description?: string
+		error?: string
+	}
+}
+
+const getQueryString = (
+	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string => {
+	const firstValue = Array.isArray(value) ? value[0] : value
+	return typeof firstValue === 'string' ? firstValue : ''
+}
+
+const getErrorMessage = (error: unknown): string => {
+	const apiError = error as ApiErrorShape
+	if (typeof apiError?.data?.description === 'string') {
+		return apiError.data.description
+	}
+	if (error instanceof Error) {
+		return error.message
+	}
+	return String(error)
+}
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -83,6 +133,22 @@ const messages = defineMessages({
 	accountSettings: {
 		id: 'auth.verify-email.action.account-settings',
 		defaultMessage: 'Account settings',
+	},
+	discoverMods: {
+		id: 'auth.verify-email.action.discover-mods',
+		defaultMessage: 'Discover mods',
+	},
+	emailSentNotificationTitle: {
+		id: 'auth.verify-email.notification.email-sent.title',
+		defaultMessage: 'Email sent',
+	},
+	emailSentNotificationDescription: {
+		id: 'auth.verify-email.notification.email-sent.description',
+		defaultMessage: 'An email with a link to verify your account has been sent to {email}.',
+	},
+	errorOccurredTitle: {
+		id: 'auth.verify-email.notification.error-occurred.title',
+		defaultMessage: 'An error occurred',
 	},
 })
 
@@ -140,13 +206,13 @@ const route = useNativeRoute()
 
 if (route.query.flow) {
 	try {
-		const emailVerified = useState('emailVerified', () => null)
+		const emailVerified = useState<boolean | null>('emailVerified', () => null)
 
 		if (emailVerified.value === null) {
 			await useBaseFetch('auth/email/verify', {
 				method: 'POST',
 				body: {
-					flow: route.query.flow,
+					flow: getQueryString(route.query.flow),
 				},
 			})
 			emailVerified.value = true
@@ -169,14 +235,16 @@ async function handleResendEmailVerification() {
 	try {
 		await resendVerifyEmail()
 		addNotification({
-			title: 'Email sent',
-			text: `An email with a link to verify your account has been sent to ${auth.value.user.email}.`,
+			title: formatMessage(messages.emailSentNotificationTitle),
+			text: formatMessage(messages.emailSentNotificationDescription, {
+				email: auth.value.user?.email ?? '',
+			}),
 			type: 'success',
 		})
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
-			text: err.data.description,
+			title: formatMessage(messages.errorOccurredTitle),
+			text: getErrorMessage(err),
 			type: 'error',
 		})
 	}

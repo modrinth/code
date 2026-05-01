@@ -1,156 +1,81 @@
 <template>
-	<div>
-		<h1>{{ formatMessage(messages.signUpWithTitle) }}</h1>
-
-		<section class="third-party">
-			<a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">
-				<DiscordColorIcon />
-				<span>Discord</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('github', redirectTarget)">
-				<GitHubColorIcon />
-				<span>GitHub</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-				<MicrosoftColorIcon />
-				<span>Microsoft</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('google', redirectTarget)">
-				<GoogleColorIcon />
-				<span>Google</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-				<SteamColorIcon />
-				<span>Steam</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-				<GitLabColorIcon />
-				<span>GitLab</span>
-			</a>
-		</section>
-
-		<h1>{{ formatMessage(messages.createAccountTitle) }}</h1>
-
-		<section class="auth-form">
-			<label for="email" hidden>{{ formatMessage(commonMessages.emailLabel) }}</label>
-			<StyledInput
-				id="email"
-				v-model="email"
-				:icon="MailIcon"
-				type="email"
-				autocomplete="username"
-				:placeholder="formatMessage(commonMessages.emailLabel)"
-				wrapper-class="w-full"
-			/>
-
-			<label for="username" hidden>{{ formatMessage(commonMessages.usernameLabel) }}</label>
-			<StyledInput
-				id="username"
-				v-model="username"
-				:icon="UserIcon"
-				type="text"
-				autocomplete="username"
-				:placeholder="formatMessage(commonMessages.usernameLabel)"
-				wrapper-class="w-full"
-			/>
-
-			<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-			<StyledInput
-				id="password"
-				v-model="password"
-				:icon="KeyIcon"
-				type="password"
-				autocomplete="new-password"
-				:placeholder="formatMessage(commonMessages.passwordLabel)"
-				wrapper-class="w-full"
-			/>
-
-			<label for="confirm-password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-			<StyledInput
-				id="confirm-password"
-				v-model="confirmPassword"
-				:icon="KeyIcon"
-				type="password"
-				autocomplete="new-password"
-				:placeholder="formatMessage(commonMessages.confirmPasswordLabel)"
-				wrapper-class="w-full"
-			/>
-
-			<Checkbox
-				v-model="subscribe"
-				class="subscribe-btn"
-				:label="formatMessage(messages.subscribeLabel)"
-				:description="formatMessage(messages.subscribeLabel)"
-			/>
-
-			<p v-if="!route.query.launcher">
-				<IntlFormatted :message-id="messages.legalDisclaimer">
-					<template #terms-link="{ children }">
-						<NuxtLink to="/legal/terms" class="text-link">
-							<component :is="() => children" />
-						</NuxtLink>
-					</template>
-					<template #privacy-policy-link="{ children }">
-						<NuxtLink to="/legal/privacy" class="text-link">
-							<component :is="() => children" />
-						</NuxtLink>
-					</template>
-				</IntlFormatted>
-			</p>
-
-			<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
-
-			<button
-				class="btn btn-primary continue-btn centered-btn"
-				:disabled="globals?.captcha_enabled ? !token : false"
-				@click="createAccount"
-			>
-				{{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
-			</button>
-
-			<div class="auth-form__additional-options">
-				{{ formatMessage(messages.alreadyHaveAccountLabel) }}
-				<NuxtLink
-					class="text-link"
-					:to="{
-						path: '/auth/sign-in',
-						query: route.query,
-					}"
-				>
-					{{ formatMessage(commonMessages.signInButton) }}
-				</NuxtLink>
-			</div>
-		</section>
-	</div>
+	<SignUpView
+		v-if="!isCreateAccountStep"
+		v-model:email="email"
+		v-model:password="password"
+		:redirect-target="redirectTarget"
+		:show-other-options="showOtherOptions"
+		:route-query="route.query"
+		:on-toggle-other-options="toggleOtherOptions"
+		:on-continue-with-email="continueWithEmail"
+	/>
+	<CreateAccountView
+		v-else
+		v-model:date-of-birth="dateOfBirth"
+		v-model:username="username"
+		v-model:token="token"
+		v-model:subscribe="subscribe"
+		:globals="globals"
+		:on-complete-sign-up="createAccount"
+		:on-set-captcha-ref="setCaptchaRef"
+	/>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
-	DiscordColorIcon,
-	GitHubColorIcon,
-	GitLabColorIcon,
-	GoogleColorIcon,
-	KeyIcon,
-	MailIcon,
-	MicrosoftColorIcon,
-	RightArrowIcon,
-	SteamColorIcon,
-	UserIcon,
-} from '@modrinth/assets'
-import {
-	Checkbox,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	IntlFormatted,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
+import { useStorage } from '@vueuse/core'
+import type { LocationQueryValue } from 'vue-router'
 
-import HCaptcha from '@/components/ui/HCaptcha.vue'
-import { getAuthUrl } from '@/composables/auth.js'
+import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
+import SignUpView from '@/components/ui/auth/SignUp.vue'
+import {
+	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	promotePendingSignInOAuthProvider,
+} from '@/composables/auth.ts'
+
+interface AuthGlobalsResponse {
+	captcha_enabled?: boolean
+	[key: string]: unknown
+}
+
+interface ApiErrorShape {
+	data?: {
+		description?: string
+		error?: string
+	}
+	v1Error?: {
+		error?: string
+	}
+	responseData?: {
+		error?: string
+	}
+}
+
+const getQueryString = (
+	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string => {
+	const firstValue = Array.isArray(value) ? value[0] : value
+	return typeof firstValue === 'string' ? firstValue : ''
+}
+
+const getErrorMessage = (error: unknown): string => {
+	const apiError = error as ApiErrorShape
+	if (typeof apiError?.data?.description === 'string') {
+		return apiError.data.description
+	}
+	if (error instanceof Error) {
+		return error.message
+	}
+	return String(error)
+}
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -161,30 +86,13 @@ const messages = defineMessages({
 		id: 'auth.sign-up.title',
 		defaultMessage: 'Sign Up',
 	},
-	signUpWithTitle: {
-		id: 'auth.sign-up.title.sign-up-with',
-		defaultMessage: 'Sign up with',
+	ageRequirementWarningTitle: {
+		id: 'auth.sign-up.age-requirement.warning-title',
+		defaultMessage: 'Age requirement',
 	},
-	createAccountTitle: {
-		id: 'auth.sign-up.title.create-account',
-		defaultMessage: 'Or create an account yourself',
-	},
-	subscribeLabel: {
-		id: 'auth.sign-up.subscribe.label',
-		defaultMessage: 'Subscribe to updates about Modrinth',
-	},
-	legalDisclaimer: {
-		id: 'auth.sign-up.legal-dislaimer',
-		defaultMessage:
-			"By creating an account, you agree to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
-	},
-	createAccountButton: {
-		id: 'auth.sign-up.action.create-account',
-		defaultMessage: 'Create account',
-	},
-	alreadyHaveAccountLabel: {
-		id: 'auth.sign-up.sign-in-option.title',
-		defaultMessage: 'Already have an account?',
+	under13HelperText: {
+		id: 'auth.create-account.date-of-birth.under13-helper',
+		defaultMessage: 'You cannot create an account at Modrinth unless you are over 13 years old.',
 	},
 })
 
@@ -194,16 +102,36 @@ useHead({
 
 const auth = await useAuth()
 const route = useNativeRoute()
+const pendingSignInOAuthProvider = useStorage(
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+	undefined,
+	{ initOnMounted: true },
+)
+const lastSignInOAuthProvider = useStorage(
+	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+	undefined,
+	{ initOnMounted: true },
+)
 
-const redirectTarget = route.query.redirect
+const redirectTarget = getQueryString(route.query.redirect)
+const showOtherOptions = ref(false)
+const isCreateAccountStep = ref(false)
 
 if (auth.value.user) {
 	await navigateTo('/dashboard')
 }
 
-const captcha = ref()
+const captcha = ref<{ reset?: () => void } | null>(null)
+const setCaptchaRef = (captchaRef: unknown) => {
+	captcha.value = (captchaRef as { reset?: () => void } | null) ?? null
+}
+const toggleOtherOptions = () => {
+	showOtherOptions.value = !showOtherOptions.value
+}
 
-const { data: globals } = useQuery({
+const { data: globals } = useQuery<AuthGlobalsResponse>({
 	queryKey: ['auth-globals'],
 	queryFn: async () => {
 		try {
@@ -216,29 +144,117 @@ const { data: globals } = useQuery({
 })
 
 const email = ref('')
-const username = ref('')
 const password = ref('')
-const confirmPassword = ref('')
+const dateOfBirth = ref('')
+const username = ref('')
 const token = ref('')
 const subscribe = ref(false)
+const USERNAME_MAX_LENGTH = 39
+const MAX_USERNAME_SUFFIX_RETRIES = 10
+const MAX_RANDOM_USERNAME_ATTEMPTS = 10
+
+async function continueWithEmail() {
+	pendingSignInOAuthProvider.value = null
+	lastSignInOAuthProvider.value = null
+	startLoading()
+	try {
+		const generatedUsername = await findAvailableGeneratedUsername()
+
+		token.value = ''
+		username.value = generatedUsername
+		isCreateAccountStep.value = true
+	} catch (err) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: getErrorMessage(err),
+			type: 'error',
+		})
+	}
+	stopLoading()
+}
+
+function generateUsernameFromEmail(emailAddress: string): string {
+	const [localPart = ''] = emailAddress.trim().toLowerCase().split('@')
+	const sanitized = localPart
+		.replace(/[^a-zA-Z0-9_-]/g, '_')
+		.replace(/_+/g, '_')
+		.replace(/^_+|_+$/g, '')
+
+	return (sanitized || 'user').slice(0, USERNAME_MAX_LENGTH)
+}
+
+async function findAvailableGeneratedUsername(): Promise<string> {
+	const baseUsername = generateUsernameFromEmail(email.value)
+
+	for (let suffixAttempt = 0; suffixAttempt <= MAX_USERNAME_SUFFIX_RETRIES; suffixAttempt++) {
+		const candidateUsername = appendUsernameSuffix(baseUsername, suffixAttempt)
+
+		try {
+			await validateCreateAccountCandidate(candidateUsername)
+			return candidateUsername
+		} catch (err) {
+			if (!isUsernameTakenValidationError(err)) {
+				throw err
+			}
+		}
+	}
+
+	return await findAvailableRandomUsername()
+}
+
+function appendUsernameSuffix(baseUsername: string, suffixAttempt: number): string {
+	if (suffixAttempt === 0) {
+		return baseUsername
+	}
+
+	const suffix = String(suffixAttempt)
+	const maxBaseLength = Math.max(1, USERNAME_MAX_LENGTH - suffix.length)
+	return `${baseUsername.slice(0, maxBaseLength)}${suffix}`
+}
+
+function generateRandomUsername(): string {
+	const randomSuffix = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`
+	const base = `user_${randomSuffix}`
+	return base.slice(0, USERNAME_MAX_LENGTH)
+}
+
+async function findAvailableRandomUsername(): Promise<string> {
+	for (let attempt = 0; attempt < MAX_RANDOM_USERNAME_ATTEMPTS; attempt++) {
+		const candidateUsername = generateRandomUsername()
+
+		try {
+			await validateCreateAccountCandidate(candidateUsername)
+			return candidateUsername
+		} catch (err) {
+			if (!isUsernameTakenValidationError(err)) {
+				throw err
+			}
+		}
+	}
+
+	throw new Error('Unable to find an available username. Please choose one manually.')
+}
+
+async function validateCreateAccountCandidate(candidateUsername: string): Promise<void> {
+	await client.labrinth.auth_v2.validateCreateAccount({
+		username: candidateUsername,
+		password: password.value,
+		email: email.value,
+	})
+}
+
+function isUsernameTakenValidationError(error: unknown): boolean {
+	const apiError = error as ApiErrorShape
+	const errorCode =
+		apiError?.data?.error ?? apiError?.v1Error?.error ?? apiError?.responseData?.error
+	return errorCode === 'username_taken'
+}
 
 async function createAccount() {
 	startLoading()
 	try {
-		if (confirmPassword.value !== password.value) {
-			addNotification({
-				title: formatMessage(commonMessages.errorNotificationTitle),
-				text: formatMessage({
-					id: 'auth.sign-up.notification.password-mismatch.text',
-					defaultMessage: 'Passwords do not match!',
-				}),
-				type: 'error',
-			})
-			captcha.value?.reset()
-		}
-
 		const res = await client.labrinth.auth_v2.createAccount({
-			username: username.value,
+			username: username.value.trim() || generateUsernameFromEmail(email.value),
 			password: password.value,
 			email: email.value,
 			challenge: token.value,
@@ -248,23 +264,25 @@ async function createAccount() {
 		await useAuth(res.session)
 		await useUser()
 
+		promotePendingSignInOAuthProvider()
+
 		if (route.query.launcher) {
 			await navigateTo({ path: '/auth/sign-in', query: route.query })
 			return
 		}
 
 		if (route.query.redirect) {
-			await navigateTo(route.query.redirect)
+			await navigateTo(getQueryString(route.query.redirect))
 		} else {
 			await navigateTo('/dashboard')
 		}
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }

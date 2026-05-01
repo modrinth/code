@@ -41,9 +41,10 @@ pub enum Bucketing {
     BucketSize(u64),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum TextMatchType {
+    #[default]
     MaxScore,
     MaxWeight,
     SumScore,
@@ -56,12 +57,6 @@ impl TextMatchType {
             Self::MaxWeight => "max_weight",
             Self::SumScore => "sum_score",
         }
-    }
-}
-
-impl Default for TextMatchType {
-    fn default() -> Self {
-        Self::MaxWeight
     }
 }
 

@@ -12,7 +12,7 @@
 			<slot name="title" />
 		</div>
 
-		<div class="grid-area-[description] flex flex-col gap-[var(--gap-md)]">
+		<div class="grid-area-[description] flex flex-col gap-3">
 			<slot name="description" />
 		</div>
 

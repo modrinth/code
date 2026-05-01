@@ -1,3 +1,4 @@
+use std::cmp::Reverse;
 use std::collections::HashMap;
 
 use crate::database::PgPool;
@@ -86,7 +87,7 @@ pub async fn forge_updates(
     )
     .await?;
 
-    versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+    versions.sort_by_key(|b| Reverse(b.date_published));
 
     #[derive(Serialize)]
     struct ForgeUpdates {

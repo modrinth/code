@@ -10,6 +10,7 @@ use crate::database::models::{DBUser, DBUserId};
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
+use crate::models::error::ApiError as ApiErrorResponse;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
@@ -22,6 +23,8 @@ use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::validate::validation_errors_to_string;
+use actix_http::header::LOCATION;
+use actix_web::http::StatusCode;
 use actix_web::web::{Data, Query};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use argon2::password_hash::SaltString;
@@ -39,7 +42,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
-use tracing::info;
+use thiserror::Error;
+use tracing::{error, info};
+use url::Url;
 use validator::Validate;
 use zxcvbn::Score;
 
@@ -49,6 +54,8 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
             .service(init)
             .service(auth_callback)
             .service(delete_auth_provider)
+            .service(create_oauth_account)
+            .service(validate_create_account_with_password)
             .service(create_account_with_password)
             .service(login_password)
             .service(login_2fa)
@@ -65,7 +72,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     );
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct TempUser {
     pub id: String,
     pub username: String,
@@ -85,44 +92,26 @@ impl TempUser {
         client: &PgPool,
         file_host: &Arc<dyn FileHost + Send + Sync>,
         redis: &RedisPool,
-    ) -> Result<crate::database::models::DBUserId, AuthenticationError> {
+        username: String,
+        sign_up_newsletter: bool,
+    ) -> Result<DBUserId, AuthenticationError> {
         if let Some(email) = &self.email
             && crate::database::models::DBUser::get_by_email(email, client)
                 .await?
                 .is_some()
         {
-            return Err(AuthenticationError::DuplicateUser);
+            return Err(AuthenticationError::DuplicateEmail);
         }
 
         let user_id =
             crate::database::models::generate_user_id(transaction).await?;
 
-        let mut username_increment: i32 = 0;
-        let mut username = None;
+        let existing_id = DBUser::get(&username, client, redis)
+            .await
+            .wrap_err("failed to fetch existing user by id")?;
 
-        while username.is_none() {
-            let test_username = format!(
-                "{}{}",
-                self.username,
-                if username_increment > 0 {
-                    username_increment.to_string()
-                } else {
-                    "".to_string()
-                }
-            );
-
-            let new_id = crate::database::models::DBUser::get(
-                &test_username,
-                client,
-                redis,
-            )
-            .await?;
-
-            if new_id.is_none() {
-                username = Some(test_username);
-            } else {
-                username_increment += 1;
-            }
+        if existing_id.is_some() {
+            return Err(AuthenticationError::UsernameTaken);
         }
 
         let (avatar_url, raw_avatar_url) = if let Some(avatar_url) =
@@ -166,89 +155,86 @@ impl TempUser {
             (None, None)
         };
 
-        if let Some(username) = username {
-            crate::database::models::DBUser {
-                id: user_id,
-                github_id: if provider == AuthProvider::GitHub {
-                    Some(
-                        self.id.clone().parse().map_err(|_| {
-                            AuthenticationError::InvalidCredentials
-                        })?,
-                    )
-                } else {
-                    None
-                },
-                discord_id: if provider == AuthProvider::Discord {
-                    Some(
-                        self.id.parse().map_err(|_| {
-                            AuthenticationError::InvalidCredentials
-                        })?,
-                    )
-                } else {
-                    None
-                },
-                gitlab_id: if provider == AuthProvider::GitLab {
-                    Some(
-                        self.id.parse().map_err(|_| {
-                            AuthenticationError::InvalidCredentials
-                        })?,
-                    )
-                } else {
-                    None
-                },
-                google_id: if provider == AuthProvider::Google {
-                    Some(self.id.clone())
-                } else {
-                    None
-                },
-                steam_id: if provider == AuthProvider::Steam {
-                    Some(
-                        self.id.parse().map_err(|_| {
-                            AuthenticationError::InvalidCredentials
-                        })?,
-                    )
-                } else {
-                    None
-                },
-                microsoft_id: if provider == AuthProvider::Microsoft {
-                    Some(self.id.clone())
-                } else {
-                    None
-                },
-                password: None,
-                paypal_id: if provider == AuthProvider::PayPal {
-                    Some(self.id)
-                } else {
-                    None
-                },
-                paypal_country: self.country,
-                paypal_email: if provider == AuthProvider::PayPal {
-                    self.email.clone()
-                } else {
-                    None
-                },
-                venmo_handle: None,
-                stripe_customer_id: None,
-                totp_secret: None,
-                username,
-                email: self.email.clone(),
-                email_verified: self.email.is_some(),
-                avatar_url,
-                raw_avatar_url,
-                bio: self.bio,
-                created: Utc::now(),
-                role: Role::Developer.to_string(),
-                badges: Badges::default(),
-                allow_friend_requests: true,
-                is_subscribed_to_newsletter: false,
-            }
-            .insert(transaction)
-            .await?;
-
-            Ok(user_id)
-        } else {
-            Err(AuthenticationError::InvalidCredentials)
+        DBUser {
+            id: user_id,
+            github_id: if provider == AuthProvider::GitHub {
+                Some(
+                    self.id
+                        .clone()
+                        .parse()
+                        .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                )
+            } else {
+                None
+            },
+            discord_id: if provider == AuthProvider::Discord {
+                Some(
+                    self.id
+                        .parse()
+                        .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                )
+            } else {
+                None
+            },
+            gitlab_id: if provider == AuthProvider::GitLab {
+                Some(
+                    self.id
+                        .parse()
+                        .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                )
+            } else {
+                None
+            },
+            google_id: if provider == AuthProvider::Google {
+                Some(self.id.clone())
+            } else {
+                None
+            },
+            steam_id: if provider == AuthProvider::Steam {
+                Some(
+                    self.id
+                        .parse()
+                        .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                )
+            } else {
+                None
+            },
+            microsoft_id: if provider == AuthProvider::Microsoft {
+                Some(self.id.clone())
+            } else {
+                None
+            },
+            password: None,
+            paypal_id: if provider == AuthProvider::PayPal {
+                Some(self.id)
+            } else {
+                None
+            },
+            paypal_country: self.country,
+            paypal_email: if provider == AuthProvider::PayPal {
+                self.email.clone()
+            } else {
+                None
+            },
+            venmo_handle: None,
+            stripe_customer_id: None,
+            totp_secret: None,
+            username,
+            email: self.email.clone(),
+            email_verified: self.email.is_some(),
+            avatar_url,
+            raw_avatar_url,
+            bio: self.bio,
+            created: Utc::now(),
+            role: Role::Developer.to_string(),
+            badges: Badges::default(),
+            allow_friend_requests: true,
+            is_subscribed_to_newsletter: sign_up_newsletter,
         }
+        .insert(transaction)
+        .await?;
+
+        Ok(user_id)
     }
 }
 
@@ -1043,7 +1029,7 @@ impl AuthProvider {
 
 #[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct AuthorizationInit {
-    pub url: String,
+    pub url: Url,
     #[serde(default)]
     pub provider: AuthProvider,
     pub token: Option<String>,
@@ -1103,9 +1089,7 @@ pub async fn init(
         "Starting authentication flow"
     );
 
-    let url =
-        url::Url::parse(&info.url).map_err(|_| AuthenticationError::Url)?;
-
+    let url = info.url;
     let domain = url.host_str().ok_or(AuthenticationError::Url)?;
     if !ENV
         .ALLOWED_CALLBACK_URLS
@@ -1135,7 +1119,7 @@ pub async fn init(
 
     let state = DBFlow::OAuth {
         user_id,
-        url: info.url,
+        url,
         provider: info.provider,
         existing_user_id,
     }
@@ -1161,9 +1145,54 @@ pub async fn auth_callback(
     req: HttpRequest,
     Query(query): Query<HashMap<String, String>>,
     client: Data<PgPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     redis: Data<RedisPool>,
 ) -> Result<HttpResponse, crate::auth::templates::ErrorPage> {
+    /// Ensures that the OAuth flow is removed from Redis when dropped.
+    ///
+    /// A guard is used here since it's safer than manually removing the flow
+    /// in each branch.
+    struct FlowGuard {
+        state: Option<String>,
+        redis: Data<RedisPool>,
+    }
+
+    impl Drop for FlowGuard {
+        fn drop(&mut self) {
+            let Some(state) = self.state.clone() else {
+                // has been replaced
+                return;
+            };
+            let redis = self.redis.clone();
+            tokio::spawn(async move {
+                if let Err(err) = DBFlow::remove(&state, &redis).await {
+                    error!("failed to remove DB flow state: {err:#}");
+                }
+            });
+        }
+    }
+
+    impl FlowGuard {
+        /// Prevents this guard from removing `state` when dropped, instead
+        /// replacing the flow for `state` with the new given `flow`.
+        pub async fn replace_with(
+            mut self,
+            flow: DBFlow,
+        ) -> Result<(), ApiError> {
+            let state = self
+                .state
+                .clone()
+                .expect("`self` should not be dropped yet");
+            let redis = self.redis.clone();
+            self.state = None;
+
+            flow.insert_with_state(Duration::minutes(10), &redis, &state)
+                .await
+                .wrap_internal_err("failed to insert new flow state")?;
+
+            Ok(())
+        }
+    }
+
     let state_string = query
         .get("state")
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?
@@ -1189,9 +1218,10 @@ pub async fn auth_callback(
             )));
         };
 
-        DBFlow::remove(&state, &redis)
-            .await
-            .wrap_err("failed to remove flow")?;
+        let flow_guard = FlowGuard {
+            state: Some(state.clone()),
+            redis: redis.clone(),
+        };
 
         let token = provider
             .get_token(query)
@@ -1250,13 +1280,13 @@ pub async fn auth_callback(
             .wrap_err("failed to clear user caches")?;
 
             return Ok(HttpResponse::TemporaryRedirect()
-                .append_header(("Location", &*url))
+                .append_header(("Location", url.as_str()))
                 .json(serde_json::json!({ "url": url })));
         }
 
         if let Some(id) = user_id {
             if user_id_opt.is_some() {
-                return Err(AuthenticationError::DuplicateUser);
+                return Err(AuthenticationError::ProviderAlreadyLinked);
             }
 
             provider
@@ -1285,71 +1315,159 @@ pub async fn auth_callback(
             .await?;
 
             Ok(HttpResponse::TemporaryRedirect()
-                .append_header(("Location", &*url))
+                .append_header(("Location", url.as_str()))
                 .json(serde_json::json!({ "url": url })))
-        } else {
-            let user_id = if let Some(user_id) = user_id_opt {
-                let user = crate::database::models::DBUser::get_id(
-                    user_id, &**client, &redis,
-                )
-                .await?
-                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+        } else if let Some(user_id) = user_id_opt {
+            let user = crate::database::models::DBUser::get_id(
+                user_id, &**client, &redis,
+            )
+            .await?
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-                if user.totp_secret.is_some() {
-                    let flow = DBFlow::Login2FA { user_id: user.id }
-                        .insert(Duration::minutes(30), &redis)
-                        .await?;
-
-                    let redirect_url = format!(
-                        "{}{}error=2fa_required&flow={}",
-                        url,
-                        if url.contains('?') { "&" } else { "?" },
-                        flow
-                    );
-
-                    return Ok(HttpResponse::TemporaryRedirect()
-                        .append_header(("Location", &*redirect_url))
-                        .json(serde_json::json!({ "url": redirect_url })));
-                }
-
-                user_id
-            } else {
-                oauth_user
-                    .create_account(
-                        provider,
-                        &mut transaction,
-                        &client,
-                        &file_host,
-                        &redis,
-                    )
-                    .await?
-            };
-
-            let session =
-                issue_session(req, user_id, &mut transaction, &redis, None)
+            if user.totp_secret.is_some() {
+                let flow = DBFlow::Login2FA { user_id: user.id }
+                    .insert(Duration::minutes(30), &redis)
                     .await?;
-            transaction.commit().await?;
 
-            let redirect_url = format!(
-                "{}{}code={}{}",
-                url,
-                if url.contains('?') { '&' } else { '?' },
-                session.session,
-                if user_id_opt.is_none() {
-                    "&new_account=true"
-                } else {
-                    ""
-                }
-            );
+                let mut redirect_url = url.clone();
+                redirect_url
+                    .query_pairs_mut()
+                    .append_pair("error", "2fa_required")
+                    .append_pair("flow", &flow);
 
+                Ok(HttpResponse::TemporaryRedirect()
+                    .append_header((LOCATION, redirect_url.as_str()))
+                    .json(serde_json::json!({ "url": redirect_url })))
+            } else {
+                let session =
+                    issue_session(req, user_id, &mut transaction, &redis, None)
+                        .await?;
+                transaction.commit().await?;
+
+                let mut redirect_url = url.clone();
+                redirect_url
+                    .query_pairs_mut()
+                    .append_pair("code", &session.session);
+
+                Ok(HttpResponse::TemporaryRedirect()
+                    .append_header((LOCATION, redirect_url.as_str()))
+                    .json(serde_json::json!({ "url": redirect_url })))
+            }
+        } else {
+            // user doesn't already exist; the user wants to create a new Modrinth account
+            // linked to their OAuth account.
+            // for this, we redirect them to a frontend page which lets them set a username.
+            // then frontend will call `/create/oauth` with the same state parameter and
+            // chosen settings (username, subscribe to newsletter), and handle navigation.
+            let suggested_username = oauth_user.username.clone();
+
+            flow_guard
+                .replace_with(DBFlow::OAuthPending {
+                    url: url.clone(),
+                    provider,
+                    user: oauth_user,
+                })
+                .await
+                .wrap_err("failed to replace flow for state")?;
+
+            let mut redirect_url = url.clone();
+            redirect_url
+                .query_pairs_mut()
+                .append_pair("state", &state)
+                .append_pair(
+                    "requires_dob",
+                    &requires_dob(provider).to_string(),
+                )
+                .append_pair("username", &suggested_username);
+
+            let redirect_url = redirect_url.to_string();
             Ok(HttpResponse::TemporaryRedirect()
-                .append_header(("Location", &*redirect_url))
+                .append_header((LOCATION, &*redirect_url))
                 .json(serde_json::json!({ "url": redirect_url })))
         }
     }
     .await;
 
     Ok(res?)
+}
+
+fn requires_dob(provider: AuthProvider) -> bool {
+    matches!(
+        provider,
+        AuthProvider::GitHub | AuthProvider::GitLab | AuthProvider::Steam
+    )
+}
+
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
+struct NewOAuthAccount {
+    // keep in sync with NewAccount
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
+    pub username: String,
+    pub state: String,
+    pub challenge: String,
+    pub sign_up_newsletter: bool,
+}
+
+#[utoipa::path(
+    post,
+    operation_id = "createOAuthAccount",
+    responses(
+        (status = 200, description = "OAuth account created"),
+        (status = 400, description = "Invalid input")
+    )
+)]
+#[post("/create/oauth")]
+async fn create_oauth_account(
+    req: HttpRequest,
+    db: Data<PgPool>,
+    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    redis: Data<RedisPool>,
+    web::Json(new_account): web::Json<NewOAuthAccount>,
+) -> Result<HttpResponse, ApiError> {
+    new_account.validate().map_err(|err| {
+        ApiError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
+
+    if !check_hcaptcha(&req, &new_account.challenge).await? {
+        return Err(ApiError::Turnstile);
+    }
+
+    let flow = DBFlow::get(&new_account.state, &redis)
+        .await
+        .wrap_internal_err("failed to fetch flow state")?
+        .wrap_request_err("no flow for state")?;
+
+    let DBFlow::OAuthPending {
+        url: _url,
+        provider,
+        user,
+    } = flow
+    else {
+        return Err(ApiError::Internal(eyre!("invalid flow kind")));
+    };
+
+    let mut txn = db
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin transaction")?;
+
+    let user_id = user
+        .create_account(
+            provider,
+            &mut txn,
+            &db,
+            &file_host,
+            &redis,
+            new_account.username,
+            new_account.sign_up_newsletter,
+        )
+        .await?;
+
+    let session = issue_session(req, user_id, &mut txn, &redis, None).await?;
+    let res = crate::models::sessions::Session::from(session, true, None);
+    txn.commit().await?;
+
+    Ok(HttpResponse::Ok().json(res))
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
@@ -1453,14 +1571,271 @@ pub async fn check_sendy_subscription(
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct NewAccount {
-    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
+    // keep in sync with NewOAuthAccount
     pub username: String,
-    #[validate(length(min = 8, max = 256))]
     pub password: String,
-    #[validate(email)]
     pub email: String,
-    pub challenge: String,
+    pub challenge: Option<String>,
     pub sign_up_newsletter: Option<bool>,
+}
+
+#[derive(Debug, Validate)]
+struct AccountRegisterFlow {
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
+    username: String,
+    #[validate(length(min = 8, max = 256))]
+    password: String,
+    #[validate(email)]
+    email: String,
+    sign_up_newsletter: bool,
+}
+
+#[derive(Debug)]
+struct ReadyAccountRegisterFlow {
+    inner: AccountRegisterFlow,
+}
+
+#[derive(Debug, Error)]
+enum AccountRegisterValidateError {
+    #[error("Username is already taken on Modrinth.")]
+    UsernameTaken,
+    #[error(
+        "Email is already registered on Modrinth. Try 'Forgot password' to access your account."
+    )]
+    DuplicateEmail,
+    #[error("{}", match .0 {
+        Some(feedback) => format!("Password too weak: {feedback}"),
+        None => "Specified password is too weak! Please improve its strength.".to_string(),
+    })]
+    WeakPassword(Option<String>),
+    #[error("{0}")]
+    InvalidInput(String),
+}
+
+impl AccountRegisterValidateError {
+    fn error_code(&self) -> &'static str {
+        match self {
+            AccountRegisterValidateError::UsernameTaken => "username_taken",
+            AccountRegisterValidateError::DuplicateEmail => "duplicate_email",
+            AccountRegisterValidateError::WeakPassword(_) => "weak_password",
+            AccountRegisterValidateError::InvalidInput(_) => "invalid_input",
+        }
+    }
+}
+
+impl actix_web::ResponseError for AccountRegisterValidateError {
+    fn status_code(&self) -> StatusCode {
+        StatusCode::BAD_REQUEST
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::build(self.status_code()).json(ApiErrorResponse {
+            error: self.error_code(),
+            description: self.to_string(),
+            details: None,
+        })
+    }
+}
+
+impl From<AccountRegisterValidateError> for ApiError {
+    fn from(value: AccountRegisterValidateError) -> Self {
+        match &value {
+            AccountRegisterValidateError::UsernameTaken => {
+                ApiError::Authentication(AuthenticationError::UsernameTaken)
+            }
+            AccountRegisterValidateError::DuplicateEmail => {
+                ApiError::Authentication(AuthenticationError::DuplicateEmail)
+            }
+            _ => ApiError::InvalidInput(value.to_string()),
+        }
+    }
+}
+
+impl From<NewAccount> for AccountRegisterFlow {
+    fn from(account: NewAccount) -> Self {
+        Self {
+            username: account.username,
+            password: account.password,
+            email: account.email,
+            sign_up_newsletter: account.sign_up_newsletter.unwrap_or(false),
+        }
+    }
+}
+
+impl AccountRegisterFlow {
+    async fn validate(
+        self,
+        transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+    ) -> Result<ReadyAccountRegisterFlow, AccountRegisterValidateError> {
+        validator::Validate::validate(&self).map_err(|err| {
+            AccountRegisterValidateError::InvalidInput(
+                validation_errors_to_string(err, None),
+            )
+        })?;
+
+        if crate::database::models::DBUser::get(
+            &self.username,
+            &mut *transaction,
+            redis,
+        )
+        .await
+        .map_err(|err| {
+            AccountRegisterValidateError::InvalidInput(err.to_string())
+        })?
+        .is_some()
+        {
+            return Err(AccountRegisterValidateError::UsernameTaken);
+        }
+
+        let score =
+            zxcvbn::zxcvbn(&self.password, &[&self.username, &self.email]);
+
+        if score.score() < Score::Three {
+            let feedback = score
+                .feedback()
+                .and_then(|x| x.warning())
+                .map(|w| w.to_string());
+            return Err(AccountRegisterValidateError::WeakPassword(feedback));
+        }
+
+        if !crate::database::models::DBUser::get_by_case_insensitive_email(
+            &self.email,
+            &mut *transaction,
+        )
+        .await
+        .map_err(|err| {
+            AccountRegisterValidateError::InvalidInput(err.to_string())
+        })?
+        .is_empty()
+        {
+            return Err(AccountRegisterValidateError::DuplicateEmail);
+        }
+
+        Ok(ReadyAccountRegisterFlow { inner: self })
+    }
+}
+
+impl ReadyAccountRegisterFlow {
+    async fn execute(
+        self,
+        req: HttpRequest,
+        transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+        email_queue: &EmailQueue,
+    ) -> Result<crate::models::sessions::Session, ApiError> {
+        let register_flow = self.inner;
+
+        let user_id =
+            crate::database::models::generate_user_id(transaction).await?;
+
+        let hasher = Argon2::default();
+        let salt = SaltString::generate(&mut ChaCha20Rng::from_entropy());
+        let password_hash = hasher
+            .hash_password(register_flow.password.as_bytes(), &salt)?
+            .to_string();
+
+        crate::database::models::DBUser {
+            id: user_id,
+            github_id: None,
+            discord_id: None,
+            gitlab_id: None,
+            google_id: None,
+            steam_id: None,
+            microsoft_id: None,
+            password: Some(password_hash),
+            paypal_id: None,
+            paypal_country: None,
+            paypal_email: None,
+            venmo_handle: None,
+            stripe_customer_id: None,
+            totp_secret: None,
+            username: register_flow.username.clone(),
+            email: Some(register_flow.email.clone()),
+            email_verified: false,
+            avatar_url: None,
+            raw_avatar_url: None,
+            bio: None,
+            created: Utc::now(),
+            role: Role::Developer.to_string(),
+            badges: Badges::default(),
+            allow_friend_requests: true,
+            is_subscribed_to_newsletter: register_flow.sign_up_newsletter,
+        }
+        .insert(transaction)
+        .await
+        .map_err(|err| {
+            if let sqlx::Error::Database(database_error) = &err {
+                match database_error.constraint() {
+                    Some("username_unique" | "users_username_key") => {
+                        return ApiError::from(
+                            AccountRegisterValidateError::UsernameTaken,
+                        );
+                    }
+                    Some("email_unique" | "users_email_key") => {
+                        return ApiError::from(
+                            AccountRegisterValidateError::DuplicateEmail,
+                        );
+                    }
+                    _ => {}
+                }
+            }
+
+            ApiError::from(err)
+        })?;
+
+        let session =
+            issue_session(req, user_id, transaction, redis, None).await?;
+        let res = crate::models::sessions::Session::from(session, true, None);
+
+        let mailbox: Mailbox = register_flow.email.parse().map_err(|_| {
+            ApiError::InvalidInput("Invalid email address!".to_string())
+        })?;
+
+        let flow = DBFlow::ConfirmEmail {
+            user_id,
+            confirm_email: register_flow.email.clone(),
+        }
+        .insert(Duration::hours(24), redis)
+        .await?;
+
+        email_queue
+            .send_one(
+                transaction,
+                NotificationBody::VerifyEmail { flow },
+                user_id,
+                mailbox,
+            )
+            .await?
+            .as_user_error()?;
+
+        Ok(res)
+    }
+}
+
+#[utoipa::path(
+    post,
+    operation_id = "validateCreateAccountWithPassword",
+    responses(
+        (status = 200, description = "Account input is valid"),
+        (status = 400, description = "Invalid input")
+    )
+)]
+#[post("/create/validate")]
+pub async fn validate_create_account_with_password(
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    new_account: web::Json<NewAccount>,
+) -> Result<(), AccountRegisterValidateError> {
+    let mut transaction = pool.begin().await.map_err(|err| {
+        AccountRegisterValidateError::InvalidInput(err.to_string())
+    })?;
+
+    AccountRegisterFlow::from(new_account.into_inner())
+        .validate(&mut transaction, &redis)
+        .await?;
+
+    Ok(())
 }
 
 #[utoipa::path(
@@ -1479,122 +1854,23 @@ pub async fn create_account_with_password(
     new_account: web::Json<NewAccount>,
     email: web::Data<EmailQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    new_account.0.validate().map_err(|err| {
-        ApiError::InvalidInput(validation_errors_to_string(err, None))
-    })?;
+    let new_account = new_account.into_inner();
 
-    if !check_hcaptcha(&req, &new_account.challenge).await? {
+    if !check_hcaptcha(&req, new_account.challenge.as_deref().unwrap_or(""))
+        .await?
+    {
         return Err(ApiError::Turnstile);
     }
 
-    if crate::database::models::DBUser::get(
-        &new_account.username,
-        &**pool,
-        &redis,
-    )
-    .await?
-    .is_some()
-    {
-        return Err(ApiError::InvalidInput("Username is taken!".to_string()));
-    }
-
     let mut transaction = pool.begin().await?;
-    let user_id =
-        crate::database::models::generate_user_id(&mut transaction).await?;
 
-    let new_account = new_account.0;
+    let ready_flow = AccountRegisterFlow::from(new_account)
+        .validate(&mut transaction, &redis)
+        .await?;
 
-    let score = zxcvbn::zxcvbn(
-        &new_account.password,
-        &[&new_account.username, &new_account.email],
-    );
-
-    if score.score() < Score::Three {
-        return Err(ApiError::InvalidInput(
-            if let Some(feedback) = score.feedback().and_then(|x| x.warning()) {
-                format!("Password too weak: {feedback}")
-            } else {
-                "Specified password is too weak! Please improve its strength."
-                    .to_string()
-            },
-        ));
-    }
-
-    let hasher = Argon2::default();
-    let salt = SaltString::generate(&mut ChaCha20Rng::from_entropy());
-    let password_hash = hasher
-        .hash_password(new_account.password.as_bytes(), &salt)?
-        .to_string();
-
-    if !crate::database::models::DBUser::get_by_case_insensitive_email(
-        &new_account.email,
-        &**pool,
-    )
-    .await?
-    .is_empty()
-    {
-        return Err(ApiError::InvalidInput(
-            "Email is already registered on Modrinth! Try 'Forgot password' to access your account.".to_string(),
-        ));
-    }
-
-    crate::database::models::DBUser {
-        id: user_id,
-        github_id: None,
-        discord_id: None,
-        gitlab_id: None,
-        google_id: None,
-        steam_id: None,
-        microsoft_id: None,
-        password: Some(password_hash),
-        paypal_id: None,
-        paypal_country: None,
-        paypal_email: None,
-        venmo_handle: None,
-        stripe_customer_id: None,
-        totp_secret: None,
-        username: new_account.username.clone(),
-        email: Some(new_account.email.clone()),
-        email_verified: false,
-        avatar_url: None,
-        raw_avatar_url: None,
-        bio: None,
-        created: Utc::now(),
-        role: Role::Developer.to_string(),
-        badges: Badges::default(),
-        allow_friend_requests: true,
-        is_subscribed_to_newsletter: new_account
-            .sign_up_newsletter
-            .unwrap_or(false),
-    }
-    .insert(&mut transaction)
-    .await?;
-
-    let session =
-        issue_session(req, user_id, &mut transaction, &redis, None).await?;
-    let res = crate::models::sessions::Session::from(session, true, None);
-
-    let mailbox: Mailbox = new_account.email.parse().map_err(|_| {
-        ApiError::InvalidInput("Invalid email address!".to_string())
-    })?;
-
-    let flow = DBFlow::ConfirmEmail {
-        user_id,
-        confirm_email: new_account.email.clone(),
-    }
-    .insert(Duration::hours(24), &redis)
-    .await?;
-
-    email
-        .send_one(
-            &mut transaction,
-            NotificationBody::VerifyEmail { flow },
-            user_id,
-            mailbox,
-        )
-        .await?
-        .as_user_error()?;
-
+    let res = ready_flow
+        .execute(req, &mut transaction, &redis, &email)
+        .await?;
     transaction.commit().await?;
 
     Ok(HttpResponse::Ok().json(res))

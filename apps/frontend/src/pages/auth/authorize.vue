@@ -1,29 +1,33 @@
 <template>
-	<div>
-		<div v-if="error" class="oauth-items">
-			<div>
-				<h1>{{ formatMessage(commonMessages.errorLabel) }}</h1>
-			</div>
-			<p>
-				<span>{{ error.data?.error }}: </span>
-				{{ error.data?.description }}
+	<div
+		class="universal-card flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+	>
+		<div v-if="authorizationError" class="flex flex-col gap-2.5">
+			<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
+				{{ formatMessage(messages.errorTitle) }}
+			</h1>
+			<p class="m-0">
+				<span>{{ authorizationError.error }}: </span>
+				{{ authorizationError.description }}
 			</p>
 		</div>
-		<div v-else-if="app && createdBy && authorizationData" class="oauth-items">
-			<div class="connected-items">
-				<div class="profile-pics">
+		<div v-else-if="app && createdBy && authorizationData" class="flex flex-col gap-6">
+			<div class="mt-4 flex items-center justify-center">
+				<div class="flex w-full flex-row items-center justify-evenly">
 					<Avatar size="md" :src="app.icon_url" />
 					<!-- <img class="profile-pic" :src="app.icon_url" alt="User profile picture" /> -->
-					<div class="connection-indicator">→</div>
-					<Avatar size="md" circle :src="auth.user.avatar_url" />
+					<div class="flex select-none items-center justify-center text-[2rem] text-primary">→</div>
+					<Avatar size="md" circle :src="auth.user?.avatar_url" />
 					<!-- <img class="profile-pic" :src="auth.user.avatar_url" alt="User profile picture" /> -->
 				</div>
 			</div>
-			<div class="title">
-				<h1>{{ formatMessage(messages.title, { appName: app.name }) }}</h1>
+			<div class="mx-auto">
+				<h1 class="mb-0 ml-0 mr-0 mt-0 text-xl text-contrast">
+					{{ formatMessage(messages.title, { appName: app.name }) }}
+				</h1>
 			</div>
-			<div class="auth-info">
-				<div class="scope-heading">
+			<div class="flex flex-col gap-3">
+				<div class="mb-3">
 					<IntlFormatted
 						:message-id="messages.appInfo"
 						:values="{
@@ -43,32 +47,32 @@
 						</template>
 					</IntlFormatted>
 				</div>
-				<div class="scope-items">
+				<div class="flex flex-col gap-3">
 					<div v-for="scopeItem in scopeDefinitions" :key="scopeItem">
-						<div class="scope-item">
-							<div class="scope-icon">
-								<CheckIcon />
+						<div class="flex flex-row items-center gap-2">
+							<div class="grid h-5 min-h-5 w-5 min-w-5 place-content-center rounded-full bg-green">
+								<CheckIcon class="text-sm text-black" />
 							</div>
 							{{ scopeItem }}
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="button-row">
-				<Button class="wide-button" large :action="onReject" :disabled="pending">
+			<div class="flex flex-row justify-center gap-2">
+				<Button class="!w-full" large :action="onReject" :disabled="pending">
 					<XIcon />
 					{{ formatMessage(messages.decline) }}
 				</Button>
-				<Button class="wide-button" color="primary" large :action="onAuthorize" :disabled="pending">
+				<Button class="!w-full" color="primary" large :action="onAuthorize" :disabled="pending">
 					<CheckIcon />
 					{{ formatMessage(messages.authorize) }}
 				</Button>
 			</div>
-			<div class="redirection-notice">
-				<p class="redirect-instructions">
+			<div class="flex flex-col gap-2 text-center">
+				<p class="m-0 text-sm">
 					<IntlFormatted :message-id="messages.redirectUrl" :values="{ url: redirectUri }">
 						<template #redirect-url="{ children }">
-							<span class="redirect-url">
+							<span class="font-bold">
 								<component :is="() => normalizeChildren(children)" />
 							</span>
 						</template>
@@ -79,7 +83,7 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
@@ -94,9 +98,34 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
+import type { LocationQueryValue } from 'vue-router'
 
-import { useAuth } from '@/composables/auth.js'
 import { useScopes } from '@/composables/auth/scopes.ts'
+
+interface ApiErrorShape {
+	data?: {
+		description?: string
+		error?: string
+	}
+}
+
+const getQueryString = (
+	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string => {
+	const firstValue = Array.isArray(value) ? value[0] : value
+	return typeof firstValue === 'string' ? firstValue : ''
+}
+
+const getErrorMessage = (error: unknown): string => {
+	const apiError = error as ApiErrorShape
+	if (typeof apiError?.data?.description === 'string') {
+		return apiError.data.description
+	}
+	if (error instanceof Error) {
+		return error.message
+	}
+	return String(error)
+}
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -120,6 +149,10 @@ const messages = defineMessages({
 		id: 'auth.authorize.error.no-redirect-url',
 		defaultMessage: 'No redirect location found in response',
 	},
+	missingParametersError: {
+		id: 'auth.authorize.error.missing-parameters',
+		defaultMessage: 'Missing required OAuth query parameters.',
+	},
 	redirectUrl: {
 		id: 'auth.authorize.redirect-url',
 		defaultMessage: 'You will be redirected to <redirect-url>{url}</redirect-url>',
@@ -128,33 +161,35 @@ const messages = defineMessages({
 		id: 'auth.authorize.authorize-app-name',
 		defaultMessage: 'Authorize {appName}',
 	},
+	errorTitle: {
+		id: 'auth.authorize.errro-title',
+		defaultMessage: 'An Error Occured',
+	},
 })
 
 const router = useNativeRoute()
 const auth = await useAuth()
 const { scopesToDefinitions } = useScopes()
 
-const clientId = router.query?.client_id || false
-const redirectUri = router.query?.redirect_uri || false
-const scope = router.query?.scope || false
-const state = router.query?.state || false
+const clientId = computed(() => getQueryString(router.query.client_id))
+const redirectUri = computed(() => getQueryString(router.query.redirect_uri))
+const scope = computed(() => getQueryString(router.query.scope))
+const state = computed(() => getQueryString(router.query.state))
+const hasRequiredParams = computed(() => !!clientId.value && !!redirectUri.value && !!scope.value)
 
 const getFlowIdAuthorization = async () => {
-	const params = {
-		client_id: clientId,
-		redirect_uri: redirectUri,
-		scope,
-	}
-	if (state) {
-		params.state = state
-	}
-
-	const authorization = await client.labrinth.oauth_internal.authorize(params)
+	const authorization = await client.labrinth.oauth_internal.authorize({
+		client_id: clientId.value,
+		redirect_uri: redirectUri.value,
+		scope: scope.value,
+		...(state.value ? { state: state.value } : {}),
+	})
 
 	if (typeof authorization === 'string') {
 		await navigateTo(authorization, {
 			external: true,
 		})
+		return null
 	}
 
 	return authorization
@@ -166,27 +201,60 @@ const {
 	error,
 	suspense: authSusp,
 } = useQuery({
-	queryKey: computed(() => ['authorization', clientId, redirectUri, scope, state]),
+	queryKey: computed(() => [
+		'authorization',
+		clientId.value,
+		redirectUri.value,
+		scope.value,
+		state.value,
+	]),
 	queryFn: getFlowIdAuthorization,
-	enabled: computed(() => !!clientId && !!redirectUri && !!scope),
+	enabled: hasRequiredParams,
+})
+
+const authorizationError = computed(() => {
+	if (!hasRequiredParams.value) {
+		return {
+			error: 'invalid_request',
+			description: formatMessage(messages.missingParametersError),
+		}
+	}
+
+	const apiError = (error.value as ApiErrorShape | null)?.data
+	if (apiError) {
+		return apiError
+	}
+
+	if (error.value) {
+		return {
+			error: 'server_error',
+			description: getErrorMessage(error.value),
+		}
+	}
+
+	return null
 })
 
 const { data: app, suspense: appSusp } = useQuery({
-	queryKey: computed(() => ['oauth/app', clientId]),
-	queryFn: () => client.labrinth.oauth_internal.getApp(clientId),
-	enabled: computed(() => !!clientId),
+	queryKey: computed(() => ['oauth/app', clientId.value]),
+	queryFn: () => client.labrinth.oauth_internal.getApp(clientId.value),
+	enabled: computed(() => !!clientId.value),
 })
 
 const { data: createdBy, suspense: userSusp } = useQuery({
 	queryKey: computed(() => ['user', app.value?.created_by]),
-	queryFn: () => client.labrinth.users_v2.get(app.value.created_by),
+	queryFn: () => {
+		if (!app.value?.created_by) {
+			throw new Error('Missing OAuth app creator')
+		}
+
+		return client.labrinth.users_v2.get(app.value.created_by)
+	},
 	enabled: computed(() => !!app.value?.created_by),
 })
 
 onServerPrefetch(async () => {
-	await authSusp()
-	await appSusp()
-	await userSusp()
+	await Promise.allSettled([authSusp(), appSusp(), userSusp()])
 })
 
 const scopeDefinitions = computed(() =>
@@ -195,6 +263,10 @@ const scopeDefinitions = computed(() =>
 
 const onAuthorize = async () => {
 	try {
+		if (!authorizationData.value?.flow_id) {
+			throw new Error(formatMessage(messages.noRedirectUrlError))
+		}
+
 		const res = await client.labrinth.oauth_internal.accept({
 			flow: authorizationData.value.flow_id,
 		})
@@ -210,7 +282,7 @@ const onAuthorize = async () => {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -218,6 +290,10 @@ const onAuthorize = async () => {
 
 const onReject = async () => {
 	try {
+		if (!authorizationData.value?.flow_id) {
+			throw new Error(formatMessage(messages.noRedirectUrlError))
+		}
+
 		const res = await client.labrinth.oauth_internal.reject({
 			flow: authorizationData.value.flow_id,
 		})
@@ -233,7 +309,7 @@ const onReject = async () => {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -243,130 +319,3 @@ definePageMeta({
 	middleware: 'auth',
 })
 </script>
-
-<style scoped lang="scss">
-.oauth-items {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-xl);
-}
-
-.scope-items {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-sm);
-}
-
-.scope-item {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: var(--gap-sm);
-}
-
-.scope-icon {
-	display: flex;
-
-	color: var(--color-raised-bg);
-	background-color: var(--color-green);
-	aspect-ratio: 1;
-	border-radius: 50%;
-	padding: var(--gap-xs);
-}
-.title {
-	margin-inline: auto;
-
-	h1 {
-		margin-bottom: 0 !important;
-	}
-}
-.redirection-notice {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-xs);
-	text-align: center;
-
-	.redirect-instructions {
-		font-size: var(--font-size-sm);
-	}
-
-	.redirect-url {
-		font-weight: bold;
-	}
-}
-
-.wide-button {
-	width: 100% !important;
-}
-
-.button-row {
-	display: flex;
-	flex-direction: row;
-	gap: var(--gap-xs);
-	justify-content: center;
-}
-.auth-info {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-sm);
-}
-
-.scope-heading {
-	margin-bottom: var(--gap-sm);
-}
-
-.profile-pics {
-	width: 100%;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-evenly;
-
-	.connection-indicator {
-		// Make sure the text sits in the middle and is centered.
-		// Make the text large, and make sure it's not selectable.
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 2rem;
-		user-select: none;
-
-		color: var(--color-primary);
-	}
-}
-
-.profile-pic {
-	width: 6rem;
-	height: 6rem;
-	border-radius: 50%;
-	margin: 0 1rem;
-}
-
-.dotted-border-line {
-	width: 75%;
-	border: 0.1rem dashed var(--color-divider);
-}
-
-.connected-items {
-	// Display dotted-border-line under profile-pics and centered behind them
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	position: relative;
-	z-index: 1;
-	margin-top: 1rem;
-
-	// Display profile-pics on top of dotted-border-line
-	.profile-pics {
-		position: relative;
-		z-index: 2;
-	}
-
-	// Display dotted-border-line behind profile-pics
-	.dotted-border-line {
-		position: absolute;
-		z-index: 1;
-	}
-}
-</style>

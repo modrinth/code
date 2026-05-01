@@ -55,7 +55,6 @@ import { Avatar, defineMessages, injectModrinthClient, useVIntl } from '@modrint
 import { useQuery } from '@tanstack/vue-query'
 
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
-import { useAuth } from '~/composables/auth.js'
 
 const { formatMessage } = useVIntl()
 

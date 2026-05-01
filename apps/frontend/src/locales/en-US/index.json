@@ -218,11 +218,74 @@
   "auth.authorize.authorize-app-name": {
     "message": "Authorize {appName}"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "Missing required OAuth query parameters."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "No redirect location found in response"
   },
+  "auth.authorize.errro-title": {
+    "message": "An Error Occured"
+  },
   "auth.authorize.redirect-url": {
     "message": "You will be redirected to <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Continue with {provider}"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Age requirement"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Complete sign up"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Please enter a valid date of birth. Year cannot be 0000."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Invalid date of birth"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Date of birth"
+  },
+  "auth.create-account.date-of-birth.over13-helper": {
+    "message": "You must be over 13 years old to use Modrinth."
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Select your date of birth"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Please enter your date of birth before continuing."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Date of birth required"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "You cannot create an account at Modrinth unless you are over 13 years old."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Relevant source code"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "We do not store your date of birth, it is only used to confirm your age at sign up."
+  },
+  "auth.create-account.page-title": {
+    "message": "Create Account"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Security check"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Keep me updated on the cool things Modrinth is working on via email"
+  },
+  "auth.create-account.title": {
+    "message": "Create an Account"
+  },
+  "auth.create-account.username.optional-label": {
+    "message": "Username"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Enter username"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Send recovery email"
@@ -266,44 +329,56 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Enter code..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>"
+  "auth.sign-in.continue-with-email": {
+    "message": "Continue with Email"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Sign up"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Forgot password"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Last sign in"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Don't have an account?"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Sign in with"
+    "message": "Sign into Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Sign In"
   },
-  "auth.sign-in.use-password": {
-    "message": "Or use a password"
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Age requirement"
   },
-  "auth.sign-up.action.create-account": {
-    "message": "Create account"
+  "auth.sign-up.continue-with-email": {
+    "message": "Continue with Email"
   },
   "auth.sign-up.legal-dislaimer": {
     "message": "By creating an account, you agree to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
   },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Passwords do not match!"
+  "auth.sign-up.show-fewer-options": {
+    "message": "Show fewer options"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Show other options"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Already have an account?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Subscribe to updates about Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Sign Up"
   },
-  "auth.sign-up.title.create-account": {
-    "message": "Or create an account yourself"
-  },
   "auth.sign-up.title.sign-up-with": {
-    "message": "Sign up with"
+    "message": "Create an Account"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Account settings"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Discover mods"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Your email is already verified!"
@@ -323,6 +398,15 @@
   "auth.verify-email.failed-verification.title": {
     "message": "Email verification failed"
   },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "An email with a link to verify your account has been sent to {email}."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "Email sent"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "An error occurred"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "Your email address has been successfully verified!"
   },
@@ -331,21 +415,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verify Email"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Subscribe to updates about Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with amazing mods."
-  },
-  "auth.welcome.label.tos": {
-    "message": "By creating an account, you have agreed to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Welcome to Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Welcome"
   },
   "collection.button.edit-icon": {
     "message": "Edit icon"
