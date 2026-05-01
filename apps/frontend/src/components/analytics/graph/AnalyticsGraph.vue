@@ -10,14 +10,10 @@
 					</div>
 
 					<div class="flex items-center gap-2">
-						<Chips
-							v-model="activeViewMode"
-							:items="viewModeValues"
-							:format-label="formatViewModeLabel"
-							size="small"
-							hide-checkmark-icon
-							:capitalize="false"
-							aria-label="Chart view mode"
+						<Tabs
+							:value="activeViewMode"
+							:tabs="viewModeTabs"
+							@update:value="activeViewMode = $event as ViewMode"
 						/>
 					</div>
 				</div>
@@ -117,8 +113,13 @@
 </template>
 
 <script setup lang="ts">
-import { SpinnerIcon } from '@modrinth/assets'
-import { Chips, useFormatNumber } from '@modrinth/ui'
+import {
+	ChartAreaIcon,
+	ChartColumnBigIcon,
+	ChartSplineIcon,
+	SpinnerIcon,
+} from '@modrinth/assets'
+import { Tabs, type TabsTab, useFormatNumber } from '@modrinth/ui'
 
 import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
 import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
@@ -155,17 +156,11 @@ const isDataLoading = computed(() => isLoading.value)
 
 const activeViewMode = ref<ViewMode>('line')
 
-const viewModeLabels: Record<ViewMode, string> = {
-	line: 'Line',
-	area: 'Area',
-	bar: 'Bar',
-}
-
-const viewModeValues: ViewMode[] = ['line', 'area', 'bar']
-
-function formatViewModeLabel(value: ViewMode): string {
-	return viewModeLabels[value]
-}
+const viewModeTabs: TabsTab[] = [
+	{ value: 'line', label: 'Line', icon: ChartSplineIcon },
+	{ value: 'area', label: 'Area', icon: ChartAreaIcon },
+	{ value: 'bar', label: 'Bar', icon: ChartColumnBigIcon },
+]
 
 const titleByStat: Record<AnalyticsDashboardStat, string> = {
 	views: 'Views Over Time',
