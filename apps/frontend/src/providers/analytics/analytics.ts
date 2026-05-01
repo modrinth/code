@@ -7,6 +7,7 @@ import {
 	getEnabledAnalyticsStatsForState,
 	sanitizeAnalyticsSelectedFilters,
 } from '~/components/analytics/query-builder/query-filter/queryFilter'
+import { useGeneratedState } from '~/composables/generated'
 import { fetchSegmentedWith } from '~/utils/fetch-helpers.ts'
 
 import type { OrganizationContext } from '../organization-context'
@@ -38,6 +39,7 @@ export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playti
 
 const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
 const ANALYTICS_START_TIMESTAMP = '2022-01-01T00:00:00.000Z'
+const ANALYTICS_LOADER_TYPES = ['fabric', 'forge', 'neoforge', 'quilt', 'vanilla']
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -315,54 +317,6 @@ function addVersionIdsFromTimeSlices(
 	}
 }
 
-function getVersionFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
-	const versionIds = new Set<string>()
-	addVersionIdsFromTimeSlices(versionIds, timeSlices)
-	return sortStringValues([...versionIds])
-}
-
-function getGameVersionFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
-	const gameVersions = new Set<string>()
-
-	for (const timeSlice of timeSlices) {
-		for (const dataPoint of timeSlice) {
-			if (!('source_project' in dataPoint)) {
-				continue
-			}
-
-			if (dataPoint.metric_kind === 'playtime' && dataPoint.game_version) {
-				const gameVersion = dataPoint.game_version.trim()
-				if (gameVersion.length > 0) {
-					gameVersions.add(gameVersion)
-				}
-			}
-		}
-	}
-
-	return sortStringValues([...gameVersions])
-}
-
-function getLoaderFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
-	const loaderTypes = new Set<string>()
-
-	for (const timeSlice of timeSlices) {
-		for (const dataPoint of timeSlice) {
-			if (!('source_project' in dataPoint)) {
-				continue
-			}
-
-			if (dataPoint.metric_kind === 'playtime' && dataPoint.loader) {
-				const loaderType = dataPoint.loader.trim().toLowerCase()
-				if (loaderType.length > 0) {
-					loaderTypes.add(loaderType)
-				}
-			}
-		}
-	}
-
-	return sortStringValues([...loaderTypes])
-}
-
 export function doesAnalyticsPointMatchFilters(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
 	filters: AnalyticsSelectedFilters,
@@ -384,9 +338,7 @@ export function doesAnalyticsPointMatchFilters(
 function doesAnalyticsPointMatchFilter(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
 	filterValues: string[],
-	getPointValue: (
-		dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
-	) => string | null | undefined,
+	getPointValue: (dataPoint: Labrinth.Analytics.v3.ProjectAnalytics) => string | null | undefined,
 ): boolean {
 	if (filterValues.length === 0) {
 		return true
@@ -473,6 +425,7 @@ export function createAnalyticsDashboardContext(
 	const client = injectModrinthClient()
 	const route = useRoute()
 	const router = useRouter()
+	const generatedState = useGeneratedState()
 	const initialQueryState = readAnalyticsQueryBuilderState(route.query, [])
 
 	const activeStat = ref<AnalyticsDashboardStat>('views')
@@ -706,7 +659,8 @@ export function createAnalyticsDashboardContext(
 		enabled: computed(() => isAnalyticsFetchRequestReady(fetchRequest.value)),
 	})
 
-	const countryFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
+	const countryAndDownloadSourceFilterOptionsRequest =
+		computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
 		if (sortedSelectedProjectIds.value.length === 0) {
 			return null
 		}
@@ -725,150 +679,66 @@ export function createAnalyticsDashboardContext(
 					bucket_by: ['country'],
 				},
 				project_downloads: {
-					bucket_by: ['country'],
+					bucket_by: ['country', 'domain'],
 				},
 			},
 		}
 	})
 
-	const { data: countryFilterOptionsData } = useQuery({
+	const { data: countryAndDownloadSourceFilterOptionsData } = useQuery({
 		queryKey: computed(() => [
 			'analytics',
 			'dashboard',
 			'filter-options',
-			'countries',
-			countryFilterOptionsRequest.value,
+			'countries-download-sources',
+			countryAndDownloadSourceFilterOptionsRequest.value,
 		]),
 		queryFn: () =>
 			client.labrinth.analytics_v3.fetch(
-				countryFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
+				countryAndDownloadSourceFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
 			),
-		enabled: computed(() => countryFilterOptionsRequest.value !== null),
+		enabled: computed(() => countryAndDownloadSourceFilterOptionsRequest.value !== null),
 	})
 
-	const downloadSourceFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(
-		() => {
-			if (sortedSelectedProjectIds.value.length === 0) {
-				return null
-			}
-
-			return {
-				time_range: {
-					start: ANALYTICS_START_TIMESTAMP,
-					end: new Date(queryRefreshTimestamp.value).toISOString(),
-					resolution: {
-						slices: 1,
-					},
-				},
-				project_ids: sortedSelectedProjectIds.value,
-				return_metrics: {
-					project_downloads: {
-						bucket_by: ['domain'],
-					},
-				},
-			}
-		},
-	)
-
-	const { data: downloadSourceFilterOptionsData } = useQuery({
-		queryKey: computed(() => [
-			'analytics',
-			'dashboard',
-			'filter-options',
-			'download-sources',
-			downloadSourceFilterOptionsRequest.value,
-		]),
-		queryFn: () =>
-			client.labrinth.analytics_v3.fetch(
-				downloadSourceFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
-			),
-		enabled: computed(() => downloadSourceFilterOptionsRequest.value !== null),
-	})
-
-	const versionFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
-		if (sortedSelectedProjectIds.value.length === 0) {
-			return null
-		}
-
-		return {
-			time_range: {
-				start: ANALYTICS_START_TIMESTAMP,
-				end: new Date(queryRefreshTimestamp.value).toISOString(),
-				resolution: {
-					slices: 1,
-				},
-			},
-			project_ids: sortedSelectedProjectIds.value,
-			return_metrics: {
-				project_downloads: {
-					bucket_by: ['version_id'],
-				},
-				project_playtime: {
-					bucket_by: ['game_version', 'version_id'],
-				},
-			},
-		}
-	})
-
-	const { data: versionFilterOptionsData } = useQuery({
+	const { data: filterOptionProjectVersions } = useQuery({
 		queryKey: computed(() => [
 			'analytics',
 			'dashboard',
 			'filter-options',
 			'versions',
-			versionFilterOptionsRequest.value,
+			sortedSelectedProjectIds.value,
 		]),
-		queryFn: () =>
-			client.labrinth.analytics_v3.fetch(
-				versionFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
-			),
-		enabled: computed(() => versionFilterOptionsRequest.value !== null),
-	})
+		queryFn: async () => {
+			const projectVersions = await Promise.all(
+				sortedSelectedProjectIds.value.map((projectId) =>
+					client.labrinth.versions_v3.getProjectVersions(projectId, {
+						include_changelog: false,
+						apiVersion: 3,
+					}),
+				),
+			)
 
-	const loaderFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
-		if (sortedSelectedProjectIds.value.length === 0) {
-			return null
-		}
-
-		return {
-			time_range: {
-				start: ANALYTICS_START_TIMESTAMP,
-				end: new Date(queryRefreshTimestamp.value).toISOString(),
-				resolution: {
-					slices: 1,
-				},
-			},
-			project_ids: sortedSelectedProjectIds.value,
-			return_metrics: {
-				project_playtime: {
-					bucket_by: ['loader'],
-				},
-			},
-		}
-	})
-
-	const { data: loaderFilterOptionsData } = useQuery({
-		queryKey: computed(() => [
-			'analytics',
-			'dashboard',
-			'filter-options',
-			'loaders',
-			loaderFilterOptionsRequest.value,
-		]),
-		queryFn: () =>
-			client.labrinth.analytics_v3.fetch(
-				loaderFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
-			),
-		enabled: computed(() => loaderFilterOptionsRequest.value !== null),
+			return projectVersions.flat()
+		},
+		enabled: computed(() => sortedSelectedProjectIds.value.length > 0),
+		placeholderData: [],
 	})
 
 	const filterOptions = computed<AnalyticsDashboardFilterOptions>(() => ({
-		countries: getCountryFilterOptions(countryFilterOptionsData.value ?? []),
-		downloadSources: getDownloadSourceFilterOptions(downloadSourceFilterOptionsData.value ?? []),
-		gameVersions: getGameVersionFilterOptions(versionFilterOptionsData.value ?? []),
-		loaderTypes: getLoaderFilterOptions(loaderFilterOptionsData.value ?? []),
-		versionIds: getVersionFilterOptions(versionFilterOptionsData.value ?? []),
+		countries: getCountryFilterOptions(countryAndDownloadSourceFilterOptionsData.value ?? []),
+		downloadSources: getDownloadSourceFilterOptions(
+			countryAndDownloadSourceFilterOptionsData.value ?? [],
+		),
+		gameVersions: generatedState.value.gameVersions.map((gameVersion) => gameVersion.version),
+		loaderTypes: ANALYTICS_LOADER_TYPES,
+		versionIds: sortStringValues([
+			...new Set((filterOptionProjectVersions.value ?? []).map((version) => version.id)),
+		]),
 	}))
+
+	const filterOptionProjectVersionIds = computed(
+		() => new Set((filterOptionProjectVersions.value ?? []).map((version) => version.id)),
+	)
 
 	const previousFetchRequest = computed(() => buildPreviousFetchRequest(fetchRequest.value))
 
@@ -925,12 +795,12 @@ export function createAnalyticsDashboardContext(
 			}
 		}
 
-		for (const versionId of filterOptions.value.versionIds) {
-			versionIds.add(versionId)
-		}
-
 		addVersionIdsFromTimeSlices(versionIds, timeSlices.value)
 		addVersionIdsFromTimeSlices(versionIds, previousTimeSlices.value)
+
+		for (const versionId of filterOptionProjectVersionIds.value) {
+			versionIds.delete(versionId)
+		}
 
 		return sortStringValues([...versionIds])
 	})
@@ -945,16 +815,27 @@ export function createAnalyticsDashboardContext(
 		placeholderData: [],
 	})
 
+	const allVersionMetadata = computed(() => {
+		const versionsById = new Map<string, Labrinth.Versions.v3.Version>()
+		for (const version of filterOptionProjectVersions.value ?? []) {
+			versionsById.set(version.id, version)
+		}
+		for (const version of versions.value ?? []) {
+			versionsById.set(version.id, version)
+		}
+		return [...versionsById.values()]
+	})
+
 	const versionNumbersById = computed(
-		() => new Map((versions.value ?? []).map((version) => [version.id, version.version_number])),
+		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.version_number])),
 	)
 	const versionPublishedDatesById = computed(
-		() => new Map((versions.value ?? []).map((version) => [version.id, version.date_published])),
+		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.date_published])),
 	)
 	const gameVersionDownloadsByVersion = computed(() => {
 		const downloadsByVersion = new Map<string, number>()
 
-		for (const version of versions.value ?? []) {
+		for (const version of allVersionMetadata.value) {
 			for (const gameVersion of version.game_versions) {
 				const normalizedGameVersion = gameVersion.trim()
 				if (normalizedGameVersion.length === 0) {
@@ -1012,10 +893,7 @@ export function createAnalyticsDashboardContext(
 			now > queryRefreshTimestamp.value ? now : queryRefreshTimestamp.value + 1
 		await nextTick()
 
-		if (
-			fetchRequest.value === null ||
-			JSON.stringify(fetchRequest.value) !== fetchRequestKey
-		) {
+		if (fetchRequest.value === null || JSON.stringify(fetchRequest.value) !== fetchRequestKey) {
 			return
 		}
 

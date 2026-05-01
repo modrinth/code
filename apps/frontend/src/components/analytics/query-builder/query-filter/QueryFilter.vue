@@ -103,7 +103,7 @@
 				v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 				ref="submenu"
 				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
-				:class="activeCategory.key === 'game_version' ? 'w-[22rem]' : 'w-72'"
+				:class="activeCategory.key === 'game_version' ? 'w-[23rem]' : 'w-72'"
 				:style="submenuStyle"
 				@mouseenter="handleSubmenuMouseEnter"
 				@mouseleave="handleSubmenuMouseLeave"
