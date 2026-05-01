@@ -2,7 +2,7 @@
 	<button
 		v-tooltip="disabled ? 'Stat type not appicable to breakdown' : ''"
 		type="button"
-		class="flex h-full appearance-none flex-col gap-4 rounded-2xl border border-solid p-4 text-left transition-colors"
+		class="flex h-full appearance-none flex-col gap-4 rounded-2xl border border-solid p-5 px-4 text-left transition-colors"
 		:class="{
 			'cursor-not-allowed border-surface-5 bg-surface-2 opacity-60': disabled,
 			'cursor-default border-brand bg-highlight-green': !disabled && active,
@@ -13,7 +13,7 @@
 	>
 		<div class="flex items-center justify-between gap-3">
 			<div
-				class="text-base font-semibold"
+				class="text-base font-medium"
 				:class="{
 					'text-secondary': disabled,
 					'text-primary': !disabled,
@@ -22,18 +22,11 @@
 				{{ label }}
 			</div>
 
-			<div
-				class="inline-flex size-8 items-center justify-center rounded-lg border border-solid"
-				:class="{
-					'border-surface-5 bg-surface-3': disabled,
-					'border-brand bg-brand-highlight': !disabled && active,
-					'border-surface-5 bg-surface-4': !disabled && !active,
-				}"
-			>
+			<div class="inline-flex items-center justify-center">
 				<component
 					:is="iconComponent"
 					aria-hidden="true"
-					class="size-4"
+					class="size-6"
 					:class="{
 						'text-secondary': disabled,
 						'text-brand': !disabled && active,
@@ -45,7 +38,7 @@
 
 		<div class="flex flex-col gap-2.5">
 			<div
-				class="text-3xl font-semibold leading-none"
+				class="text-4xl font-semibold leading-none"
 				:class="{
 					'text-primary': disabled,
 					'text-contrast': !disabled,
@@ -93,8 +86,6 @@
 
 <script setup lang="ts">
 import {
-	ArrowDownLeftIcon,
-	ArrowUpRightIcon,
 	ClockIcon,
 	CurrencyIcon,
 	DownloadIcon,
@@ -102,6 +93,8 @@ import {
 	type IconComponent,
 	PlayIcon,
 	TimerIcon,
+	TrendingDownIcon,
+	TrendingUpIcon,
 } from '@modrinth/assets'
 
 const props = defineProps<{
@@ -143,6 +136,6 @@ const trendValue = computed(() => {
 const showTrendDirectionIcon = computed(() => !props.disabled && trendValue.value !== 0)
 
 const trendDirectionIcon = computed<IconComponent>(() =>
-	trendValue.value >= 0 ? ArrowUpRightIcon : ArrowDownLeftIcon,
+	trendValue.value >= 0 ? TrendingUpIcon : TrendingDownIcon,
 )
 </script>

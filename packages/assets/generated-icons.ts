@@ -368,6 +368,8 @@ import _ToggleRightIcon from './icons/toggle-right.svg?component'
 import _TransferIcon from './icons/transfer.svg?component'
 import _TrashIcon from './icons/trash.svg?component'
 import _TrashExclamationIcon from './icons/trash-exclamation.svg?component'
+import _TrendingDownIcon from './icons/trending-down.svg?component'
+import _TrendingUpIcon from './icons/trending-up.svg?component'
 import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
 import _UnderlineIcon from './icons/underline.svg?component'
 import _UndoIcon from './icons/undo.svg?component'
@@ -762,6 +764,8 @@ export const ToggleRightIcon = _ToggleRightIcon
 export const TransferIcon = _TransferIcon
 export const TrashIcon = _TrashIcon
 export const TrashExclamationIcon = _TrashExclamationIcon
+export const TrendingDownIcon = _TrendingDownIcon
+export const TrendingUpIcon = _TrendingUpIcon
 export const TriangleAlertIcon = _TriangleAlertIcon
 export const UnderlineIcon = _UnderlineIcon
 export const UndoIcon = _UndoIcon
