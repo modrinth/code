@@ -310,6 +310,7 @@ async fn version_create_inner(
                         project_id: d.project_id.map(|x| x.into()),
                         dependency_type: d.dependency_type.to_string(),
                         file_name: None,
+                        sha1: None,
                     })
                     .collect::<Vec<_>>();
 
@@ -737,6 +738,7 @@ async fn upload_file_to_version_inner(
                     version_id: x.version_id,
                     file_name: x.file_name.clone(),
                     dependency_type: x.dependency_type.clone(),
+                    sha1: None,
                 })
                 .collect();
 
@@ -901,6 +903,11 @@ pub async fn upload_file(
             .await?;
 
         for file in &format.files {
+            let sha1 = file
+                .hashes
+                .get(&PackFileHash::Sha1)
+                .map(|x| x.as_bytes().to_vec());
+
             if let Some(dep) = res.iter().find(|x| {
                 Some(&*x.hash)
                     == file
@@ -913,6 +920,7 @@ pub async fn upload_file(
                     version_id: Some(models::DBVersionId(dep.version_id)),
                     file_name: None,
                     dependency_type: DependencyType::Embedded.to_string(),
+                    sha1,
                 });
             } else if let Some(first_download) = file.downloads.first() {
                 dependencies.push(DependencyBuilder {
@@ -926,6 +934,7 @@ pub async fn upload_file(
                             .to_string(),
                     ),
                     dependency_type: DependencyType::Embedded.to_string(),
+                    sha1,
                 });
             }
         }
@@ -937,6 +946,7 @@ pub async fn upload_file(
                     version_id: None,
                     file_name: Some(file.to_string()),
                     dependency_type: DependencyType::Embedded.to_string(),
+                    sha1: None,
                 });
             }
         }

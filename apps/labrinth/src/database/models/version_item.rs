@@ -50,6 +50,7 @@ pub struct DependencyBuilder {
     pub version_id: Option<DBVersionId>,
     pub file_name: Option<String>,
     pub dependency_type: String,
+    pub sha1: Option<Vec<u8>>,
 }
 
 impl DependencyBuilder {
@@ -68,7 +69,8 @@ impl DependencyBuilder {
             );
         }
 
-        let (version_ids, dependency_types, dependency_ids, filenames): (
+        let (version_ids, dependency_types, dependency_ids, filenames, sha1s): (
+            Vec<_>,
             Vec<_>,
             Vec<_>,
             Vec<_>,
@@ -81,19 +83,21 @@ impl DependencyBuilder {
                     d.dependency_type,
                     d.version_id.map(|v| v.0),
                     d.file_name,
+                    d.sha1,
                 )
             })
             .multiunzip();
         sqlx::query!(
             "
-            INSERT INTO dependencies (dependent_id, dependency_type, dependency_id, mod_dependency_id, dependency_file_name)
-            SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::bigint[], $4::bigint[], $5::varchar[])
+            INSERT INTO dependencies (dependent_id, dependency_type, dependency_id, mod_dependency_id, dependency_file_name, dependency_sha1)
+            SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::bigint[], $4::bigint[], $5::varchar[], $6::bytea[])
             ",
             &version_ids[..],
             &dependency_types[..],
             &dependency_ids[..] as &[Option<i64>],
             &project_ids[..] as &[Option<i64>],
             &filenames[..] as &[Option<String>],
+            &sha1s[..] as &[Option<Vec<u8>>],
         )
         .execute(&mut *transaction)
         .await?;

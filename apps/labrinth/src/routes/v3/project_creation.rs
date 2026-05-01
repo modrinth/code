@@ -1090,6 +1090,7 @@ async fn create_initial_version(
             project_id: d.project_id.map(|x| x.into()),
             dependency_type: d.dependency_type.to_string(),
             file_name: None,
+            sha1: None,
         })
         .collect::<Vec<_>>();
 
