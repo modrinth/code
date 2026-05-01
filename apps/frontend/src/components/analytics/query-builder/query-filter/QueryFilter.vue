@@ -221,11 +221,11 @@ import {
 	getAddMenuPosition,
 	getCategorySelectionCount as getCategorySelectionCountValue,
 	getCategorySelectionSummary as getCategorySelectionSummaryValue,
-	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
-	isFilterValueSelected as getIsFilterValueSelected,
 	getOptionsWithSelectedValues,
 	getSubmenuPosition,
 	getVisibleAnalyticsFilterCategoriesForState,
+	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
+	isFilterValueSelected as getIsFilterValueSelected,
 	normalizeSelectedValues as normalizeSelectedFilterValues,
 	type Point,
 } from './queryFilter'
