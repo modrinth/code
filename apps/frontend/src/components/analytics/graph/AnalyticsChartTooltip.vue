@@ -5,7 +5,15 @@
 		class="analytics-chart-tooltip pointer-events-none absolute left-0 top-0 z-10 min-w-[14rem] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-2 text-sm shadow-lg"
 		:style="positionStyle"
 	>
-		<div class="mb-1 font-medium text-contrast">{{ rangeLabel }}</div>
+		<div class="mb-1 flex items-center justify-between gap-2 font-medium text-contrast">
+			<span>{{ rangeLabel }}</span>
+			<PinIcon
+				v-if="pinned"
+				v-tooltip="'Chart tooltip pinned'"
+				class="pointer-events-auto size-4 shrink-0 font-normal text-contrast"
+				aria-label="Pinned"
+			/>
+		</div>
 		<div class="flex flex-col gap-1">
 			<div
 				v-for="entry in entries"
@@ -23,6 +31,8 @@
 </template>
 
 <script setup lang="ts">
+import { PinIcon } from '@modrinth/assets'
+
 export type AnalyticsChartTooltipEntry = {
 	projectId: string
 	name: string
@@ -38,6 +48,7 @@ const props = defineProps<{
 	entries: AnalyticsChartTooltipEntry[]
 	containerWidth: number
 	containerHeight: number
+	pinned: boolean
 }>()
 
 const tooltipElement = ref<HTMLDivElement | null>(null)
@@ -48,7 +59,7 @@ const CURSOR_OFFSET = 12
 const EDGE_PADDING = 8
 
 watch(
-	() => [props.visible, props.entries, props.rangeLabel],
+	() => [props.visible, props.entries, props.rangeLabel, props.pinned],
 	() => {
 		nextTick(() => {
 			if (!tooltipElement.value) return

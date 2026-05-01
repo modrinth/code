@@ -104,6 +104,7 @@
 					:entries="hoverEntries"
 					:container-width="containerSize.width"
 					:container-height="containerSize.height"
+					:pinned="isHoverPinned"
 				/>
 			</template>
 		</div>
@@ -191,7 +192,7 @@ const chartLabels = computed(() => {
 	return buildTimeAxisLabels(
 		nextFetchRequest.time_range,
 		sliceCount.value,
-		showTimeInBucketLabel.value,
+		selectedGroupBy.value,
 	)
 })
 

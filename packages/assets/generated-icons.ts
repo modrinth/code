@@ -178,6 +178,7 @@ import _PaintbrushIcon from './icons/paintbrush.svg?component'
 import _PaletteIcon from './icons/palette.svg?component'
 import _PencilIcon from './icons/pencil.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
+import _PinIcon from './icons/pin.svg?component'
 import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
@@ -574,6 +575,7 @@ export const PaintbrushIcon = _PaintbrushIcon
 export const PaletteIcon = _PaletteIcon
 export const PencilIcon = _PencilIcon
 export const PickaxeIcon = _PickaxeIcon
+export const PinIcon = _PinIcon
 export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
