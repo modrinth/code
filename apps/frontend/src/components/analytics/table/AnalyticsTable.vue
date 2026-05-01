@@ -112,6 +112,7 @@ type AnalyticsTableRow = {
 }
 
 const {
+	projects,
 	selectedProjectIds,
 	selectedGroupBy,
 	selectedBreakdown,
@@ -138,6 +139,31 @@ const includeDate = computed<boolean>({
 	set: (value) => {
 		tableMode.value = value ? 'date_breakdown' : 'breakdown_only'
 	},
+})
+
+const projectNamesById = computed(
+	() => new Map(projects.value.map((project) => [project.id, project.name])),
+)
+
+const breakdownColumnLabel = computed(() => {
+	switch (selectedBreakdown.value) {
+		case 'none':
+			return 'Project'
+		case 'country':
+			return 'Country'
+		case 'monetization':
+			return 'Monetization'
+		case 'download_source':
+			return 'Download source'
+		case 'version_id':
+			return 'Project versions'
+		case 'loader':
+			return 'Loader'
+		case 'game_version':
+			return 'Game version'
+		default:
+			return 'Breakdown'
+	}
 })
 
 watch(
@@ -199,7 +225,10 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 				continue
 			}
 
-			const breakdown = getBreakdownValue(point, nextSelectedBreakdown)
+			const breakdown =
+				nextSelectedBreakdown === 'none'
+					? point.source_project
+					: getBreakdownValue(point, nextSelectedBreakdown)
 			if (nextSelectedBreakdown !== 'none' && breakdown === ALL_BREAKDOWN_VALUE) {
 				continue
 			}
@@ -245,7 +274,7 @@ const columns = computed<TableColumn<TableColumnKey>[]>(() => {
 
 	nextColumns.push({
 		key: 'breakdown',
-		label: 'Breakdown',
+		label: breakdownColumnLabel.value,
 		enableSorting: true,
 	})
 
@@ -423,6 +452,9 @@ function getSortComparison(
 }
 
 function formatBreakdownDisplayValue(value: string): string {
+	if (selectedBreakdown.value === 'none') {
+		return projectNamesById.value.get(value) ?? value
+	}
 	return formatBreakdownLabel(value, selectedBreakdown.value, getVersionDisplayName)
 }
 
