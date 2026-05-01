@@ -52,20 +52,27 @@
 					>
 						Show less
 					</button>
-
-					<span v-if="allChartDatasets.length === 0" class="text-sm text-secondary">
-						No projects selected
-					</span>
 				</div>
 			</div>
 		</div>
 
 		<div ref="chartContainer" class="relative h-96" @click="onChartClick">
 			<div
-				v-if="selectedProjects.length === 0"
-				class="flex h-full items-center justify-center rounded-xl border border-dashed border-surface-5 bg-surface-3"
+				v-if="isDataLoading"
+				class="flex h-full items-center justify-center rounded-xl bg-surface-3"
 			>
-				<div class="text-sm font-medium text-secondary">
+				<div
+					class="relative bottom-6 inline-flex items-center gap-2 text-sm font-medium text-secondary"
+				>
+					<SpinnerIcon class="size-5 animate-spin" />
+					<span>Loading data</span>
+				</div>
+			</div>
+			<div
+				v-else-if="selectedProjects.length === 0"
+				class="flex h-full items-center justify-center rounded-xl"
+			>
+				<div class="relative bottom-6 text-sm font-medium text-secondary">
 					Select at least one project to view data
 				</div>
 			</div>
@@ -90,7 +97,7 @@
 					:style="{ transform: `translate(${hoverState.x}px, 0)` }"
 				/>
 				<AnalyticsChartTooltip
-					:visible="!isDataLoading && hoverState.visible"
+					:visible="hoverState.visible"
 					:x="hoverState.x"
 					:y="hoverState.y"
 					:range-label="hoverRangeLabel"
@@ -98,27 +105,13 @@
 					:container-width="containerSize.width"
 					:container-height="containerSize.height"
 				/>
-				<div
-					v-if="isDataLoading"
-					class="absolute inset-0 z-20 flex items-center justify-center rounded-xl bg-surface-3"
-				>
-					<div class="inline-flex items-center gap-2 text-sm font-medium text-secondary">
-						<SpinnerIcon class="size-5 animate-spin" />
-						<span>Loading data</span>
-					</div>
-				</div>
 			</template>
 		</div>
 	</section>
 </template>
 
 <script setup lang="ts">
-import {
-	ChartAreaIcon,
-	ChartColumnBigIcon,
-	ChartSplineIcon,
-	SpinnerIcon,
-} from '@modrinth/assets'
+import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon, SpinnerIcon } from '@modrinth/assets'
 import { Tabs, type TabsTab, useFormatNumber } from '@modrinth/ui'
 
 import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
