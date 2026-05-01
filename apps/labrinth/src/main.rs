@@ -1,3 +1,5 @@
+#![recursion_limit = "256"]
+
 use actix_web::dev::Service;
 use actix_web::middleware::from_fn;
 use actix_web::{App, HttpServer};
