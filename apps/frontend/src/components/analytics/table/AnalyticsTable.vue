@@ -8,49 +8,27 @@
 			row-key="id"
 		>
 			<template #header>
-				<div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+				<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
 					<div class="text-xl font-semibold text-contrast">Breakdown</div>
 
 					<div class="flex flex-wrap items-center gap-2">
-						<button
-							type="button"
-							class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
-							:class="
-								tableMode === 'date_breakdown'
-									? 'border-brand bg-highlight-green text-brand'
-									: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
-							"
-							@click="tableMode = 'date_breakdown'"
-						>
-							Date + Breakdown
-						</button>
-						<button
-							v-if="showBreakdownOnlyMode"
-							type="button"
-							class="inline-flex items-center rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
-							:class="
-								tableMode === 'breakdown_only'
-									? 'border-brand bg-highlight-green text-brand'
-									: 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
-							"
-							@click="tableMode = 'breakdown_only'"
-						>
-							Breakdown only
-						</button>
-						<button
-							type="button"
-							class="inline-flex items-center gap-2 rounded-xl border border-solid px-3 py-1.5 text-sm font-semibold transition-colors"
-							:class="
-								sortedRows.length > 0
-									? 'border-surface-5 bg-surface-3 text-primary hover:bg-surface-4'
-									: 'cursor-not-allowed border-surface-5 bg-surface-2 text-secondary'
-							"
-							:disabled="sortedRows.length === 0"
-							@click="downloadCsv"
-						>
-							<DownloadIcon class="size-4" />
-							Export CSV
-						</button>
+						<Chips
+							v-model="tableMode"
+							:items="tableModeItems"
+							:format-label="formatTableModeLabel"
+							:capitalize="false"
+							:hide-checkmark-icon="true"
+							size="small"
+						/>
+
+						<div class="mx-1 h-6 w-px bg-surface-5"></div>
+
+						<ButtonStyled>
+							<button class="!shadow-none" :disabled="sortedRows.length === 0" @click="downloadCsv">
+								<DownloadIcon />
+								Export CSV
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 			</template>
@@ -95,7 +73,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
-import { Table, type TableColumn, useFormatNumber } from '@modrinth/ui'
+import { ButtonStyled, Chips, Table, type TableColumn, useFormatNumber } from '@modrinth/ui'
 
 import {
 	type AnalyticsBreakdownPreset,
@@ -149,6 +127,14 @@ const sortDirection = ref<SortDirection>('asc')
 const showBreakdownOnlyMode = computed(
 	() => selectedProjectIds.value.length > 1 || selectedBreakdown.value !== 'none',
 )
+
+const tableModeItems = computed<TableMode[]>(() =>
+	showBreakdownOnlyMode.value ? ['breakdown_only', 'date_breakdown'] : ['date_breakdown'],
+)
+
+function formatTableModeLabel(mode: TableMode): string {
+	return mode === 'breakdown_only' ? 'Breakdown' : 'Date with breakdown'
+}
 
 watch(
 	showBreakdownOnlyMode,
