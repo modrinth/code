@@ -799,7 +799,7 @@ pub async fn user_notifications(
             .map(Into::into)
             .collect();
 
-        notifications.sort_by(|a, b| b.created.cmp(&a.created));
+        notifications.sort_by_key(|b| std::cmp::Reverse(b.created));
         Ok(HttpResponse::Ok().json(notifications))
     } else {
         Err(ApiError::NotFound)

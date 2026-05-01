@@ -234,6 +234,7 @@ zip = { version = "6.0.0", default-features = false, features = [
 zxcvbn = "3.1.0"
 
 [workspace.lints.clippy]
+result_large_err = "allow"
 bool_to_int_with_if = "warn"
 borrow_as_ptr = "warn"
 cfg_not_test = "warn"
