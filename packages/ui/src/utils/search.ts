@@ -474,7 +474,7 @@ export function useSearch(
 					}
 					orGroups[field].push(val)
 				} else {
-					parts.push(`${field} = ${quoteSearchFilterLiteral(val)}`)
+					parts.push(`${field} = ${enquoteNonBools(val)}`)
 				}
 			}
 		}
@@ -482,15 +482,15 @@ export function useSearch(
 		for (const [field, values] of Object.entries(orGroups)) {
 			if (values.length === 1) {
 				const val = values[0]
-				parts.push(`${field} = ${quoteSearchFilterLiteral(val)}`)
+				parts.push(`${field} = ${enquoteNonBools(val)}`)
 			} else {
-				const quoted = values.map(quoteSearchFilterLiteral).join(', ')
+				const quoted = values.map(enquoteNonBools).join(', ')
 				parts.push(`${field} IN [${quoted}]`)
 			}
 		}
 
 		for (const [field, values] of Object.entries(negativeByType)) {
-			const quoted = values.map(quoteSearchFilterLiteral).join(', ')
+			const quoted = values.map(enquoteNonBools).join(', ')
 			parts.push(`${field} NOT IN [${quoted}]`)
 		}
 
@@ -504,11 +504,11 @@ export function useSearch(
 		for (const envGroup of getEnvironmentFilterGroups(client, server)) {
 			if (envGroup.length === 1) {
 				const [field, val] = envGroup[0].split(':')
-				parts.push(`${field} = ${quoteSearchFilterLiteral(val)}`)
+				parts.push(`${field} = ${enquoteNonBools(val)}`)
 			} else if (envGroup.length > 1) {
 				const conditions = envGroup.map((f) => {
 					const [field, val] = f.split(':')
-					return `${field} = ${quoteSearchFilterLiteral(val)}`
+					return `${field} = ${enquoteNonBools(val)}`
 				})
 				parts.push(`(${conditions.join(' OR ')})`)
 			}
@@ -517,9 +517,9 @@ export function useSearch(
 		// Project types
 		const mappedProjectTypes = projectTypes.value.map(mapProjectTypeToSearch)
 		if (mappedProjectTypes.length === 1) {
-			parts.push(`project_types = ${quoteSearchFilterLiteral(mappedProjectTypes[0])}`)
+			parts.push(`project_types = ${enquoteNonBools(mappedProjectTypes[0])}`)
 		} else if (mappedProjectTypes.length > 1) {
-			const quoted = mappedProjectTypes.map(quoteSearchFilterLiteral).join(', ')
+			const quoted = mappedProjectTypes.map(enquoteNonBools).join(', ')
 			parts.push(`project_types IN [${quoted}]`)
 		}
 
@@ -782,7 +782,7 @@ function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][
 	return groups
 }
 
-function quoteSearchFilterLiteral(value: string): string {
+function enquoteNonBools(value: string): string {
 	if (value === 'true' || value === 'false') {
 		return value
 	}
