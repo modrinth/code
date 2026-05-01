@@ -11,14 +11,19 @@
 				<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
 					<div class="text-xl font-semibold text-contrast">Breakdown</div>
 
-					<div class="flex flex-wrap items-center gap-2">
-						<Chips
-							v-model="tableMode"
-							:items="tableModeItems"
-							:format-label="formatTableModeLabel"
-							:capitalize="false"
-							:hide-checkmark-icon="true"
-							size="small"
+					<div class="flex flex-wrap items-center gap-1.5">
+						<label
+							for="analytics-include-date"
+							class="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary"
+							:class="{ 'cursor-not-allowed opacity-50': !showBreakdownOnlyMode }"
+						>
+							Include date
+						</label>
+						<Toggle
+							id="analytics-include-date"
+							v-model="includeDate"
+							:disabled="!showBreakdownOnlyMode"
+							small
 						/>
 
 						<div class="mx-1 h-6 w-px bg-surface-5"></div>
@@ -73,7 +78,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, Table, type TableColumn, useFormatNumber } from '@modrinth/ui'
+import { ButtonStyled, Table, type TableColumn, Toggle, useFormatNumber } from '@modrinth/ui'
 
 import {
 	type AnalyticsBreakdownPreset,
@@ -128,13 +133,12 @@ const showBreakdownOnlyMode = computed(
 	() => selectedProjectIds.value.length > 1 || selectedBreakdown.value !== 'none',
 )
 
-const tableModeItems = computed<TableMode[]>(() =>
-	showBreakdownOnlyMode.value ? ['breakdown_only', 'date_breakdown'] : ['date_breakdown'],
-)
-
-function formatTableModeLabel(mode: TableMode): string {
-	return mode === 'breakdown_only' ? 'Breakdown' : 'Date with breakdown'
-}
+const includeDate = computed<boolean>({
+	get: () => tableMode.value === 'date_breakdown',
+	set: (value) => {
+		tableMode.value = value ? 'date_breakdown' : 'breakdown_only'
+	},
+})
 
 watch(
 	showBreakdownOnlyMode,
