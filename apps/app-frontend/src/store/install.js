@@ -177,7 +177,7 @@ export const installVersionDependencies = async (profile, version, onDepInstalli
 		const batch = queuedInstalls.slice(i, i + batchSize)
 		await Promise.all(
 			batch.map(async ({ versionId }) => {
-				await add_project_from_version(profile.path, versionId)
+				await add_project_from_version(profile.path, versionId, 'dependency')
 			}),
 		)
 	}
