@@ -119,7 +119,7 @@ pub async fn loader_list(
         })
         .collect::<Vec<_>>();
 
-    results.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    results.sort_by_key(|a| a.name.to_lowercase());
 
     Ok(HttpResponse::Ok().json(results))
 }

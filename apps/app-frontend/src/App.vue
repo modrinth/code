@@ -1,4 +1,5 @@
 <script setup>
+import { Intercom, shutdown as shutdownIntercom } from '@intercom/messenger-js-sdk'
 import {
 	AuthFeature,
 	NodeAuthFeature,
@@ -67,11 +68,13 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
+import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
+import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
@@ -81,9 +84,9 @@ import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
-import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
+import { useIntercomPositioning } from '@/composables/intercom-positioning'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -123,6 +126,17 @@ import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
 
 const themeStore = useTheming()
+const router = useRouter()
+const route = useRoute()
+const intercomBubblePositioning = useIntercomPositioning({ route, themeStore })
+const {
+	sidebarToggled,
+	forceSidebar,
+	sidebarVisible,
+	intercomBubblePosition,
+	updateIntercomBubbleStyles,
+	clearIntercomBubbleStyles,
+} = intercomBubblePositioning
 
 const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
@@ -156,6 +170,7 @@ provideModrinthClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
+	...intercomBubblePositioning.pageContext,
 	featureFlags: {
 		serverRamAsBytesAlwaysOn: computed(() =>
 			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
@@ -171,15 +186,17 @@ provideModalBehavior({
 
 const {
 	installationModal,
+	unknownPackWarningModal,
 	fetchExistingInstanceNames,
 	handleCreate,
 	handleBrowseModpacks,
 	searchModpacks,
 	getProjectVersions,
+	getLoaderManifest,
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
-} = setupProviders(notificationManager)
+} = setupProviders(notificationManager, popupNotificationManager)
 
 const news = ref([])
 const availableSurvey = ref(false)
@@ -237,6 +254,8 @@ onMounted(async () => {
 onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
+	shutdownHostingIntercom()
+	clearIntercomBubbleStyles()
 
 	await unlistenUpdateDownload?.()
 })
@@ -417,9 +436,6 @@ const handleClose = async () => {
 	await saveWindowState(StateFlags.ALL)
 	await getCurrentWindow().close()
 }
-
-const router = useRouter()
-const route = useRoute()
 
 const loading = setupLoadingStateProvider()
 loading.setEnabled(false)
@@ -638,18 +654,99 @@ const hasPlus = computed(
 		(credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
 )
 
-const sidebarToggled = ref(true)
-
-themeStore.$subscribe(() => {
-	sidebarToggled.value = !themeStore.toggleSidebar
-})
-
-const forceSidebar = computed(
-	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
-)
-const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 const showAd = computed(
 	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
+)
+const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
+
+let intercomBooting = false
+let intercomBooted = false
+
+async function fetchIntercomToken() {
+	const creds = await getCreds()
+	if (!creds?.session) {
+		throw new Error('Not authenticated')
+	}
+
+	const params = new URLSearchParams()
+	if (route.path.startsWith('/hosting/manage/') && typeof route.params.id === 'string') {
+		params.set('server_id', route.params.id)
+	}
+	const query = params.size > 0 ? `?${params.toString()}` : ''
+
+	const response = await tauriFetch(`${config.siteUrl}/api/intercom/messenger-jwt${query}`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${creds.session}`,
+		},
+	})
+	if (!response.ok) {
+		throw new Error(`Failed to fetch Intercom token: ${response.status}`)
+	}
+	return await response.json()
+}
+
+async function bootIntercom() {
+	if (
+		intercomBooting ||
+		intercomBooted ||
+		!hostingRouteActive.value ||
+		!credentials.value?.session
+	) {
+		return
+	}
+
+	intercomBooting = true
+	console.debug('[APP][INTERCOM] initializing secure support chat')
+	try {
+		const { token } = await fetchIntercomToken()
+		Intercom({
+			app_id: 'ykeritl9',
+			intercom_user_jwt: token,
+			session_duration: 1000 * 60 * 60 * 24,
+			alignment: 'right',
+			horizontal_padding: intercomBubblePosition.value.horizontalPadding,
+			vertical_padding: intercomBubblePosition.value.verticalPadding,
+		})
+		intercomBooted = true
+	} catch (error) {
+		console.warn('[APP][INTERCOM] failed to initialize secure support chat', error)
+	} finally {
+		intercomBooting = false
+	}
+}
+
+function shutdownHostingIntercom() {
+	if (!intercomBooted && !intercomBooting) return
+	shutdownIntercom()
+	intercomBooting = false
+	intercomBooted = false
+}
+
+watch(
+	intercomBubblePosition,
+	(position) => {
+		updateIntercomBubbleStyles(position)
+		if (intercomBooted) {
+			window.Intercom?.('update', {
+				horizontal_padding: position.horizontalPadding,
+				vertical_padding: position.verticalPadding,
+			})
+		}
+	},
+	{ immediate: true },
+)
+
+watch(
+	[hostingRouteActive, credentials],
+	([active]) => {
+		if (active) {
+			void bootIntercom()
+		} else {
+			shutdownHostingIntercom()
+		}
+	},
+	{ immediate: true },
 )
 
 watch(showAd, () => {
@@ -685,7 +782,9 @@ async function handleCommand(e) {
 	if (e.event === 'RunMRPack') {
 		// RunMRPack should directly install a local mrpack given a path
 		if (e.path.endsWith('.mrpack')) {
-			await create_profile_and_install_from_file(e.path).catch(handleError)
+			await create_profile_and_install_from_file(e.path, (createProfile, fileName) =>
+				unknownPackWarningModal.value?.show(createProfile, fileName),
+			).catch(handleError)
 			trackEvent('InstanceCreate', {
 				source: 'CreationModalFileDrop',
 			})
@@ -1072,7 +1171,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </script>
 
 <template>
-	<WindowControls />
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
 	<div
@@ -1108,9 +1206,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			:fetch-existing-instance-names="fetchExistingInstanceNames"
 			:search-modpacks="searchModpacks"
 			:get-project-versions="getProjectVersions"
+			:get-loader-manifest="getLoaderManifest"
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
 		/>
+		<UnknownPackWarningModal ref="unknownPackWarningModal" />
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
 		>
@@ -1267,9 +1367,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</ButtonStyled>
 				<div class="flex mr-3">
 					<Suspense>
-						<RunningAppBar />
+						<AppActionBar />
 					</Suspense>
 				</div>
+				<WindowControls />
 			</section>
 		</div>
 	</div>
@@ -1665,6 +1766,14 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--os-handle-bg: var(--color-scrollbar) !important;
 	--os-handle-bg-hover: var(--color-scrollbar) !important;
 	--os-handle-bg-active: var(--color-scrollbar) !important;
+}
+
+.intercom-lightweight-app-launcher,
+.intercom-launcher-frame,
+iframe[name='intercom-launcher-frame'] {
+	right: var(--app-support-launcher-right, 20px) !important;
+	bottom: var(--app-support-launcher-bottom, 20px) !important;
+	z-index: 9 !important;
 }
 
 .mac {

@@ -9,6 +9,7 @@ use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
 use dashmap::{DashMap, DashSet};
 use redis::cmd;
 use std::collections::HashMap;
+use tracing::trace;
 
 pub mod cache;
 
@@ -262,6 +263,7 @@ impl AnalyticsQueue {
         }
 
         if !downloads_queue.is_empty() {
+            let downloads_count = downloads_queue.len();
             let mut downloads_keys = Vec::new();
             let raw_downloads = DashMap::new();
 
@@ -319,6 +321,11 @@ impl AnalyticsQueue {
             let mut version_downloads: HashMap<i64, i32> = HashMap::new();
             let mut project_downloads: HashMap<i64, i32> = HashMap::new();
 
+            trace!(
+                "inserting {} raw downloads out of {downloads_count} downloads",
+                raw_downloads.len()
+            );
+
             for (_, download) in raw_downloads {
                 *version_downloads
                     .entry(download.version_id as i64)
@@ -326,6 +333,8 @@ impl AnalyticsQueue {
                 *project_downloads
                     .entry(download.project_id as i64)
                     .or_default() += 1;
+
+                trace!("writing download {download:?}");
 
                 downloads.write(&download).await?;
             }

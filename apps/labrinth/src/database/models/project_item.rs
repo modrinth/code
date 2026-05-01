@@ -866,7 +866,7 @@ impl DBProject {
                         } = loaders_ptypes_games.remove(&project_id).map(|x|x.1).unwrap_or_default();
                         // Each version is a tuple of (DBVersionId, DateTime<Utc>)
                         let mut versions = versions.remove(&project_id).map(|x| x.1).unwrap_or_default();
-                        versions.sort_by(|a, b| a.1.cmp(&b.1));
+                        versions.sort_by_key(|a| a.1);
                         let mut gallery = mods_gallery.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let urls = links.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let version_fields = version_fields.remove(&project_id).map(|x| x.1).unwrap_or_default();
@@ -930,7 +930,7 @@ impl DBProject {
                             games,
                             versions: versions.into_iter().map(|x| x.0).collect(),
                             gallery_items: {
-                                gallery.sort_by(|a, b| a.ordering.cmp(&b.ordering));
+                                gallery.sort_by_key(|a| a.ordering);
                                 gallery
                             },
                             urls,

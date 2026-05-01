@@ -3,7 +3,7 @@
     "defaultMessage": "Crea link affiliati"
   },
   "affiliate.create.header": {
-    "defaultMessage": "Creando nuovo link affiliati"
+    "defaultMessage": "Creando un nuovo link affiliati"
   },
   "affiliate.create.title.description": {
     "defaultMessage": "Dai al tuo link affiliati un nome così da sapere da dove provengono gli utenti!"
@@ -42,7 +42,7 @@
     "defaultMessage": "Beta"
   },
   "badge.beta-release": {
-    "defaultMessage": "Rilascio in beta"
+    "defaultMessage": "Rilascio beta"
   },
   "badge.new": {
     "defaultMessage": "Novità"
@@ -525,7 +525,7 @@
     "defaultMessage": "es. config.yml"
   },
   "files.delete-modal.deleting-name": {
-    "defaultMessage": "Eliminare \"{name}\""
+    "defaultMessage": "Eliminare \"{name}\"?"
   },
   "files.delete-modal.header": {
     "defaultMessage": "Elimina file"
@@ -624,10 +624,10 @@
     "defaultMessage": "Attendi il termine dell'operazione precedente prima di effettuarne un'altra."
   },
   "files.layout.dry-run-failed-text": {
-    "defaultMessage": "Impossibile eseguire il test"
+    "defaultMessage": "Errore durante la simulazione"
   },
   "files.layout.dry-run-failed-title": {
-    "defaultMessage": "Test fallito"
+    "defaultMessage": "Simulazione fallita"
   },
   "files.layout.empty-folder-description": {
     "defaultMessage": "Non ci sono file o cartelle."
@@ -2745,7 +2745,7 @@
     "defaultMessage": "Nuovo server"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Gioca con i tuoi amici in un server unico, anche con mod, tramite la Modrinth App."
+    "defaultMessage": "Crea un server, con o senza mod, e invita chi vuoi tramite la Modrinth App."
   },
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "Ancora nessun server"
@@ -2760,7 +2760,7 @@
     "defaultMessage": "Invita chiunque desideri e senza problemi, tutto grazie alla Modrinth App."
   },
   "servers.list-empty.play-with-friends-title": {
-    "defaultMessage": "Gioca con gli amici"
+    "defaultMessage": "Gioca con chiunque"
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Accedi"
@@ -3044,6 +3044,9 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "Di quanta RAM hai bisogno per il tuo server?"
   },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "RAM"
+  },
   "servers.region.north-america": {
     "defaultMessage": "America settentrionale"
   },
@@ -3222,7 +3225,7 @@
     "defaultMessage": "Impegnativa"
   },
   "tag.category.classes": {
-    "defaultMessage": "Ceti"
+    "defaultMessage": "Classi"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "Luci colorate"
@@ -3240,7 +3243,7 @@
     "defaultMessage": "Modalità creativa"
   },
   "tag.category.creator-community": {
-    "defaultMessage": "Salotto creativo"
+    "defaultMessage": "Fiera creativa"
   },
   "tag.category.crossplay": {
     "defaultMessage": "Multipiattaforma"

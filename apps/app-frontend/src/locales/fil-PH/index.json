@@ -74,8 +74,14 @@
   "app.instance.confirm-delete.header": {
     "message": "Tanggalin ang instansiya"
   },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Naka-install na ang modpack sa instansiyang <bold>{instanceName}</bold>. Sigurado ka ba sa pag-ulit nito?"
+  },
   "app.instance.modpack-already-installed.create": {
     "message": "Ilikha"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Naka-install na ang modpack"
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instansiya"
@@ -88,6 +94,9 @@
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} proyekto ang nadagdag"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Tingnan ang mga proyektong ginagamit ko sa aking modpack!"
   },
   "app.instance.mods.share-title": {
     "message": "Binabahagi ang kontento ng modpack"

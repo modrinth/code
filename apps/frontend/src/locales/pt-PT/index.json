@@ -596,6 +596,12 @@
   "dashboard.collections.long-title": {
     "message": "As tuas coleções"
   },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Criado recentemente"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Atualizado recentemente"
+  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Transferir {formType}"
   },
@@ -848,6 +854,69 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Já utilizou o seu limite de levantamento de <b>{withdrawLimit}</b>. Deve preencher um formulário fiscal para levantar mais."
   },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Marcar tudo como lido"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Ver histórico"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Histórico"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Histórico de notificações"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Ver tudo"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Ver histórico de notificações"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Carregando notificações..."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projetos"
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Limpar link"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Editar links"
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Convite do Discord"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Código-fonte"
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Página da Wiki"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Nome"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Tipo"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Ícone"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nome"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Tipo"
+  },
   "dashboard.revenue.available-now": {
     "message": "Disponível agora"
   },
@@ -893,6 +962,12 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Os teus pagamentos e levantamentos aparecerão aqui."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Mês passado"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Esse mês"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Ver todas"
   },
@@ -907,6 +982,12 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Levantar"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Criadores"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notificações"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Conta"

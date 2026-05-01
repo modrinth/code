@@ -9,6 +9,7 @@ import {
 	ImageIcon,
 	ListIcon,
 	MoreVerticalIcon,
+	SpinnerIcon,
 } from '@modrinth/assets'
 import type { CardAction, CreationFlowContextValue } from '@modrinth/ui'
 import {
@@ -172,6 +173,43 @@ const serverIcon = computed(() => {
 })
 
 const serverHideInstalled = ref(false)
+const installingProjectIds = ref<Set<string>>(new Set())
+const optimisticallyInstalledProjectIds = ref<Set<string>>(new Set())
+const hiddenInstalledProjectIds = ref<Set<string>>(new Set())
+const hiddenInstalledProjectIdsInitialized = ref(false)
+
+function setProjectInstalling(projectId: string, installing: boolean) {
+	const next = new Set(installingProjectIds.value)
+	if (installing) {
+		next.add(projectId)
+	} else {
+		next.delete(projectId)
+	}
+	installingProjectIds.value = next
+}
+
+function markProjectInstalled(projectId: string) {
+	optimisticallyInstalledProjectIds.value = new Set([
+		...optimisticallyInstalledProjectIds.value,
+		projectId,
+	])
+}
+
+function getServerInstalledProjectIds(data = serverContentData.value) {
+	return new Set(
+		(data?.addons ?? [])
+			.map((addon) => addon.project_id)
+			.filter((projectId): projectId is string => !!projectId),
+	)
+}
+
+function syncHiddenInstalledProjectIds() {
+	hiddenInstalledProjectIds.value = new Set([
+		...getServerInstalledProjectIds(),
+		...optimisticallyInstalledProjectIds.value,
+	])
+	hiddenInstalledProjectIdsInitialized.value = true
+}
 
 const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
 const { data: serverContentData, error: serverContentError } = useQuery({
@@ -186,6 +224,17 @@ watch(serverContentError, (error) => {
 		handleError(error)
 	}
 })
+
+watch(
+	serverContentData,
+	(data) => {
+		if (!data) return
+		if (!hiddenInstalledProjectIdsInitialized.value) {
+			syncHiddenInstalledProjectIds()
+		}
+	},
+	{ immediate: true },
+)
 
 const installContentMutation = useMutation({
 	mutationFn: ({
@@ -211,6 +260,12 @@ const installContentMutation = useMutation({
 if (route.query.shi && projectType.value?.id !== 'modpack') {
 	serverHideInstalled.value = route.query.shi === 'true'
 }
+
+watch(serverHideInstalled, (hideInstalled) => {
+	if (hideInstalled) {
+		syncHiddenInstalledProjectIds()
+	}
+})
 
 const serverFilters = computed(() => {
 	debug(
@@ -242,19 +297,14 @@ const serverFilters = computed(() => {
 			filters.push({ type: 'environment', option: 'server' })
 		}
 
-		if (serverHideInstalled.value && serverContentData.value) {
-			const installedIds = (serverContentData.value.addons ?? [])
-				.filter((x) => x.project_id)
-				.map((x) => x.project_id)
-				.filter((id): id is string => id !== null)
-
-			installedIds
-				.map((x: string) => ({
+		if (serverHideInstalled.value && hiddenInstalledProjectIds.value.size > 0) {
+			for (const x of hiddenInstalledProjectIds.value) {
+				filters.push({
 					type: 'project_id',
 					option: `project_id:${x}`,
 					negative: true,
-				}))
-				.forEach((x) => filters.push(x))
+				})
+			}
 		}
 	}
 
@@ -269,7 +319,6 @@ const serverFilters = computed(() => {
 })
 
 interface InstallableSearchResult extends Labrinth.Search.v2.ResultSearchProject {
-	installing?: boolean
 	installed?: boolean
 }
 
@@ -278,7 +327,7 @@ async function serverInstall(project: InstallableSearchResult) {
 		handleError(new Error('No server to install to.'))
 		return
 	}
-	project.installing = true
+	setProjectInstalling(project.project_id, true)
 	try {
 		if (projectType.value?.id === 'modpack') {
 			const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id, {
@@ -287,7 +336,7 @@ async function serverInstall(project: InstallableSearchResult) {
 			const versionId = versions[0]?.id ?? project.latest_version
 			if (!versionId) {
 				handleError(new Error('No version found for this modpack'))
-				project.installing = false
+				setProjectInstalling(project.project_id, false)
 				return
 			}
 			const modalInstance = onboardingModalRef.value
@@ -326,7 +375,7 @@ async function serverInstall(project: InstallableSearchResult) {
 							: `No compatible version found for ${serverData.value!.mc_version} / ${serverData.value!.loader}`,
 					),
 				)
-				project.installing = false
+				setProjectInstalling(project.project_id, false)
 				return
 			}
 			await installContentMutation.mutateAsync({
@@ -334,13 +383,13 @@ async function serverInstall(project: InstallableSearchResult) {
 				projectId: version.project_id,
 				versionId: version.id,
 			})
-			project.installed = true
+			markProjectInstalled(project.project_id)
 		}
 	} catch (e) {
 		console.error(e)
 		handleError(new Error(`Error installing content ${e}`))
 	}
-	project.installing = false
+	setProjectInstalling(project.project_id, false)
 }
 
 function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
@@ -447,16 +496,19 @@ function getCardActions(
 	if (serverData.value) {
 		const isInstalled =
 			projectResult.installed ||
+			optimisticallyInstalledProjectIds.value.has(result.project_id) ||
 			(serverContentData.value &&
 				(serverContentData.value.addons ?? []).find((x) => x.project_id === result.project_id)) ||
 			serverData.value.upstream?.project_id === result.project_id
+		const isInstalling = installingProjectIds.value.has(result.project_id)
 
 		return [
 			{
 				key: 'install',
-				label: projectResult.installing ? 'Installing...' : isInstalled ? 'Installed' : 'Install',
-				icon: isInstalled ? CheckIcon : DownloadIcon,
-				disabled: !!isInstalled || !!projectResult.installing,
+				label: isInstalling ? 'Installing...' : isInstalled ? 'Installed' : 'Install',
+				icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : DownloadIcon,
+				iconClass: isInstalling ? 'animate-spin' : undefined,
+				disabled: !!isInstalled || isInstalling,
 				color: 'brand',
 				type: 'outlined',
 				onClick: () => serverInstall(projectResult),
@@ -472,7 +524,7 @@ const onboardingInstallingProject = ref<InstallableSearchResult | null>(null)
 
 function onOnboardingHide() {
 	if (onboardingInstallingProject.value) {
-		onboardingInstallingProject.value.installing = false
+		setProjectInstalling(onboardingInstallingProject.value.project_id, false)
 		onboardingInstallingProject.value = null
 	}
 }
@@ -587,6 +639,19 @@ const searchState = useBrowseSearch({
 	displayMode: resultsDisplayMode,
 })
 
+watch(
+	[
+		() => searchState.query.value,
+		() => searchState.currentFilters.value,
+		() => searchState.serverCurrentFilters.value,
+		() => projectTypeId.value,
+	],
+	() => {
+		syncHiddenInstalledProjectIds()
+	},
+	{ deep: true },
+)
+
 debug('calling initial refreshSearch')
 searchState.refreshSearch()
 
@@ -622,7 +687,7 @@ provideBrowseManager({
 	providedFilters: serverFilters,
 	hideInstalled: serverHideInstalled,
 	showHideInstalled: computed(() => !!serverData.value && projectType.value?.id !== 'modpack'),
-	hideInstalledLabel: computed(() => 'Hide installed content'),
+	hideInstalledLabel: computed(() => 'Hide already installed content'),
 	displayMode: resultsDisplayMode,
 	cycleDisplayMode: cycleSearchDisplayMode,
 	maxResultsOptions: currentMaxResultsOptions,

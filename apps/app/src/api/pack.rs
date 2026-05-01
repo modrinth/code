@@ -26,8 +26,8 @@ pub async fn pack_install(
 }
 
 #[tauri::command]
-pub fn pack_get_profile_from_pack(
+pub async fn pack_get_profile_from_pack(
     location: CreatePackLocation,
 ) -> Result<CreatePackProfile> {
-    Ok(pack::install_from::get_profile_from_pack(location))
+    Ok(pack::install_from::get_profile_from_pack(location).await?)
 }

@@ -11,6 +11,83 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'app',
+		version: '0.13.7',
+		body: `## Added
+- Added a warning when installing unknown modpack files to help prevent users from getting tricked into installing malware.
+
+## Changed
+- Updated the content downloading and installation notifications to be consistent with other types of notifications.
+- Updated the design of the running instances widget in the action bar to be more consistent with our current designs.
+- Increased the click target area of the window control buttons on Windows and Linux.
+- Changed the name of the button for creating an instance with a modpack to make it clearer what it's for.
+
+## Fixed
+- Fixed Java auto-installation not working on macOS.
+- Fix a skin naming error.`,
+	},
+	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Changed the name of the button for installing a modpack to make it clearer what it's for.`,
+	},
+	{
+		date: `2026-04-29T03:54:14+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Server settings save action bar not accessible due to being behind modal.`,
+	},
+	{
+		date: `2026-04-27T19:59:24+00:00`,
+		product: 'app',
+		version: '0.13.6',
+		body: `*Note: Modrinth App v0.13.5's release has been skipped - it's changes have been bundled into 0.13.6.*
+## Changed
+- Renamed the Browse page filter from "Hide installed content/added servers" to "Hide already installed content/added servers".
+- Content installed and servers added from an instance now stay visible on the Browse page until the search query or filters change.
+
+## Fixed
+- Fixed the instance creation modal incorrectly showing mod loaders as compatible with unsupported game versions.
+- Fixed the game version and loader version dropdowns appearing empty for a few seconds in the instance creation modal.`,
+	},
+	{
+		date: `2026-04-27T19:59:24+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Multi-select on the Backups tab for bulk deleting backups.
+- Manual and automatic backup filters on the Backups tab.
+
+## Changed
+- Server panel banners now stack more cleanly when multiple banners are shown.
+- The Backups tab now matches the rest of the server panel design.
+- Server panel banners now use clearer text.
+- Renamed the Discover page filter from "Hide installed content" to "Hide already installed content".
+- Content installed from the Discover page now stays visible until the search query or filters change.
+- The server console on the Overview tab now shows a loading animation until historical logs finish loading.
+
+## Fixed
+- Fixed backup creation and restoration failing in some cases.`,
+	},
+	{
+		date: `2026-04-27T17:30:17+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project data not reloading after migrating environment information from \`/project/[id]/environment\` or the migration warning modal.
+- Fixed the tax compliance step not appearing for some users in the withdrawal flow.
+
+## Security
+- Fixed email template variables rendering URLs.`,
+	},
+	{
+		date: `2026-04-27T17:30:17+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed the server setup and reset modals incorrectly showing mod loaders as compatible with unsupported game versions.
+- Fixed the game version and loader version dropdowns appearing empty for a few seconds in the server setup and reset modals.`,
+	},
+	{
 		date: `2026-04-20T20:48:51+00:00`,
 		product: 'app',
 		version: '0.13.4',

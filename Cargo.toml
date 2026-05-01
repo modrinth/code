@@ -44,6 +44,11 @@ async-tungstenite = { version = "0.31.0", default-features = false, features = [
 ] }
 async-walkdir = "2.1.0"
 async_zip = "0.0.18"
+aws-sdk-s3 = { version = "=1.122.0", default-features = false, features = [
+  "default-https-client",
+  "rt-tokio",
+  "rustls",
+] }
 base64 = "0.22.1"
 bitflags = "2.9.4"
 bytemuck = "1.24.0"
@@ -64,7 +69,7 @@ darling = { version = "0.23" }
 dashmap = "6.1.0"
 data-url = "0.3.2"
 deadpool-redis = { git = "https://github.com/modrinth/deadpool", rev = "db5fb00b036ecc8fe5f18853c559b745ffe47bde", version = "0.22.1" }
-derive_more = "2.0.1"
+derive_more = "2.1.1"
 directories = "6.0.0"
 dirs = "6.0.0"
 discord-rich-presence = "1.0.0"
@@ -258,6 +263,7 @@ read_zero_byte_vec = "warn"
 redundant_clone = "warn"
 redundant_feature_names = "warn"
 redundant_type_annotations = "warn"
+result_large_err = "allow"
 todo = "warn"
 too_many_arguments = "allow"
 uninlined_format_args = "warn"

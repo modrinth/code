@@ -103,12 +103,16 @@ const { data: allReports } = await useLazyAsyncData('new-moderation-reports', as
 	const enrichmentPromises: Promise<ExtendedReport[]>[] = []
 
 	let reports: Report[]
-	do {
+	let hasMoreReports = true
+	while (hasMoreReports) {
 		reports = (await useBaseFetch(`report?count=${REPORT_ENDPOINT_COUNT}&offset=${currentOffset}`, {
 			apiVersion: 3,
 		})) as Report[]
 
-		if (reports.length === 0) break
+		hasMoreReports = reports.length > 0
+		if (!hasMoreReports) {
+			break
+		}
 
 		const enrichmentPromise = enrichReportBatch(reports)
 		enrichmentPromises.push(enrichmentPromise)
@@ -119,7 +123,7 @@ const { data: allReports } = await useLazyAsyncData('new-moderation-reports', as
 			const completed = await Promise.all(enrichmentPromises.splice(0, 2))
 			allReports.push(...completed.flat())
 		}
-	} while (reports.length === REPORT_ENDPOINT_COUNT)
+	}
 
 	const remainingBatches = await Promise.all(enrichmentPromises)
 	allReports.push(...remainingBatches.flat())

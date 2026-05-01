@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Créer un lien affilié"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Aucun code d'affiliation trouvé."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Erreur lors du chargement des liens d'affiliation"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Rechercher des liens d'affiliation..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "de {count} {count, plural, one {projet} other {projets}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Total des téléchargements"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Total des adorateurs"
   },
   "dashboard.collections.button.create-new": {
     "message": "Créer un nouveau"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Vos collections"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Rechercher dans les collections..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Nom (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Créé récemment"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Mis à jour récemment"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Télécharger {formType}"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Vous avez atteint votre limite de retrait de <b>{withdrawLimit}</b>. Vous devez remplir un formulaire fiscal pour effectuer un retrait supplémentaire."
   },
+  "dashboard.head-title": {
+    "message": "Tableau de bord"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Marquer tout comme lu"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Voir l'historique"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Vous n'avez pas de notifications non lues."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Échec lors du chargement des notifications :"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Historique"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Historique des notifications"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Voir tout"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Historique des notifications"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Voir {extraNotifs} {extraNotifs, plural, one {notification} other {notifications}} de plus"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Chargement des notifications..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Créer une organisation"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Faites une organisation !"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Impossible de chercher des organisations"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {membre} other {membres}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisations"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Vous pouvez modifier plusieurs projets en même temps en les sélectionnant ci-dessous."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Les projets du serveur ne prennent pas en charge l'édition en masse"
+  },
+  "dashboard.projects.empty": {
+    "message": "Vous n'avez aucun projet. Cliquez sur le bouton vert ci-dessus pour commencer."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projets"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "en ajouter {count} de plus..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Effacer le lien"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Modifier les liens"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Les changements seront appliqués à <strong>{count}</strong> {count, plural,one {projet}other {projets}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Tous les liens que vous spécifiez ci-dessous seront écrasés sur chacun des projets sélectionnés. Tout ce que vous laissez en blanc sera ignoré. Vous pouvez effacer un lien de tous les projets sélectionnés à l'aide du bouton de la poubelle."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Une invitation en lien avec votre serveur Discord."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Invitation Discord"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Un endroit pour que les utilisateurs signalent des bugs, problèmes et préoccupations à propos de votre projet."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Traceur de problèmes"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Un lien existant sera nettoyé"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Entrez un URL Discord valide"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Entrez un URL valide"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Montrer tous les projets"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Une page/dépôt contenant le code source pour votre projet"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Code source"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Une page contenant des informations, de la documentation et de l'aide pour le projet."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Page wiki"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Éditer en gros les liens sélectionnés."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icône pour {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Le projet a un message des modérateurs. Regardez le projet pour voir plus."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Merci de revoir les métadonnées environnementales"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Ascendant"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Descendant"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Nom"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Statut"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Type"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Icône"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nom"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Statut"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Type"
+  },
+  "dashboard.report.title": {
+    "message": "Signaler {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Signalements actifs"
+  },
+  "dashboard.reports.title": {
+    "message": "Signalements"
+  },
   "dashboard.revenue.available-now": {
     "message": "Disponible Maintenant"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Télécharger comme CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Historique des transactions"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transactions"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Vos paiements et retraits apparaîtront ici."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Dernier mois"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Ce mois-ci"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Voir tout"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Tous les ans"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Vos retraits sont temporairement bloqués car votre NIF ou votre NSS ne correspond pas aux données de l'IRS. Veuillez contacter l'assistance pour réinitialiser votre compte et soumettre à nouveau votre déclaration de revenus."
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Retirer"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Signalements actifs"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analytiques"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Créateurs"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Tableau de bord"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notifications"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organisations"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Aperçu"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projets"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Revenu"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Compte"
@@ -3057,7 +3282,7 @@
     "message": "Vous êtes sur le point de supprimer cette application et retirer tous les jetons d'accès. (pour toujours !)"
   },
   "settings.applications.delete.confirm.title": {
-    "message": "Êtes-vous sûr.e de vouloir supprimer cette application ? "
+    "message": "Êtes-vous sûr.e de vouloir supprimer cette application ?"
   },
   "settings.applications.description.intro": {
     "message": "Les applications permettent d'authentifier les utilisateurs de Modrinth auprès de vos produits. Pour plus d'informations, consultez la <docs-link>documentation de l'API Modrinth</docs-link>."
@@ -3549,7 +3774,7 @@
     "message": "S'abonner"
   },
   "ui.newsletter-button.subscribed": {
-    "message": "Abonné ! "
+    "message": "Abonné !"
   },
   "ui.newsletter-button.tooltip": {
     "message": "S'abonner au journal Modrinth"

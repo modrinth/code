@@ -99,7 +99,7 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within relative mx-auto pb-6 box-border flex min-h-[calc(100svh-100px)] w-full min-w-0 flex-col gap-4 px-6 transition-all duration-300"
+		class="experimental-styles-within relative mx-auto box-border flex w-full min-w-0 flex-col gap-4 px-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
@@ -107,9 +107,7 @@
 		}"
 		:class="[
 			'server-panel-' + revealState,
-			{
-				'max-w-[1280px]': isNuxt,
-			},
+			isNuxt ? 'min-h-[100svh] max-w-[1280px] pb-16' : 'min-h-[calc(100svh-100px)] pb-6',
 		]"
 	>
 		<template v-if="revealState !== 'pending' || isOnboarding">
@@ -309,66 +307,13 @@
 						Hang on, we're reconnecting to your server.
 					</div>
 
-					<Transition
-						enter-active-class="transition-all duration-300 ease-out overflow-hidden"
-						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-40"
-						leave-active-class="transition-all duration-200 ease-in overflow-hidden"
-						leave-from-class="opacity-100 max-h-40"
-						leave-to-class="opacity-0 max-h-0"
-					>
-						<InstallingBanner
-							v-if="
-								(serverData.status === 'installing' || isSyncingContent || contentError) &&
-								syncProgress?.phase !== 'Analyzing'
-							"
-							data-pyro-server-installing
-							class="mb-4"
-							:progress="syncProgress"
-							:content-error="contentError"
-							@retry="handleContentRetry"
-						>
-							<template #icon>
-								<ServerIcon :image="serverImage" class="!h-6 !w-6" />
-							</template>
-						</InstallingBanner>
-					</Transition>
-					<Transition
-						enter-active-class="transition-all duration-300 ease-out overflow-hidden"
-						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-40"
-						leave-active-class="transition-all duration-200 ease-in overflow-hidden"
-						leave-from-class="opacity-100 max-h-40"
-						leave-to-class="opacity-0 max-h-0"
-					>
-						<Admonition v-if="uploadState.isUploading" type="info" class="mb-4">
-							<template #icon>
-								<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
-							</template>
-							<template #header>
-								Uploading files ({{ uploadState.completedFiles }}/{{ uploadState.totalFiles }})
-								<span v-if="uploadState.currentFileName" class="font-normal text-secondary">
-									— {{ uploadState.currentFileName }}
-								</span>
-							</template>
-							<span class="text-secondary">
-								{{ formatBytes(uploadState.uploadedBytes) }} /
-								{{ formatBytes(uploadState.totalBytes) }} ({{
-									Math.round(uploadOverallProgress * 100)
-								}}%)
-							</span>
-							<template v-if="cancelUpload" #top-right-actions>
-								<ButtonStyled type="outlined" color="blue">
-									<button class="!border" @click="cancelUpload?.()">Cancel</button>
-								</ButtonStyled>
-							</template>
-							<template #progress>
-								<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
-							</template>
-						</Admonition>
-					</Transition>
-					<FileOperationAdmonitions class="mb-4" />
-					<BackupProgressAdmonitions class="mb-4" />
+					<ServerPanelAdmonitions
+						class="mb-4"
+						:sync-progress="syncProgress"
+						:content-error="contentError"
+						:server-image="serverImage"
+						@content-retry="handleContentRetry"
+					/>
 					<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
 				</div>
 			</template>
@@ -417,11 +362,9 @@ import {
 	SettingsIcon,
 	TransferIcon,
 	TriangleAlertIcon,
-	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
-import { formatBytes } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage, useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
@@ -429,16 +372,12 @@ import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
-import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
-import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
-import BackupProgressAdmonitions from '#ui/components/servers/backups/BackupProgressAdmonitions.vue'
-import { ServerIcon } from '#ui/components/servers/icons'
-import InstallingBanner from '#ui/components/servers/InstallingBanner.vue'
+import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import {
 	PanelServerActionButton,
@@ -455,6 +394,7 @@ import {
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
@@ -465,7 +405,6 @@ import {
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
-import FileOperationAdmonitions from '../../../shared/files-tab/components/FileOperationAdmonitions.vue'
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
 
 interface Tab {
@@ -618,16 +557,16 @@ const worldId = computed(() => {
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
 
+const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQueue(
+	computed(() => props.serverId),
+	worldId,
+)
+
 const { image: serverImage } = useServerImage(
 	props.serverId,
 	computed(() => serverData.value?.upstream ?? null),
 )
 const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
-
-const cancelledBackups = new Set<string>()
-const markBackupCancelled = (backupId: string) => {
-	cancelledBackups.add(backupId)
-}
 
 const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
 const contentError = ref<Archon.Websocket.v0.SyncContentError | null>(null)
@@ -686,7 +625,6 @@ const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {
 }
 
 const {
-	backupsState,
 	cancelUpload,
 	cleanupCoreRuntime,
 	connectSocket,
@@ -704,19 +642,12 @@ const {
 	worldId,
 	server: serverData,
 	isSyncingContent,
-	markBackupCancelled,
-	includeBackupBusyReasons: true,
+	extraBusyReasons: backupsBusy,
 	setDisconnectedOnAuthIncorrect: false,
 	syncUptimeFromState: true,
 	incrementUptimeLocally: true,
 	eventGuard: () => isMounted.value,
 	onStateEvent,
-})
-
-const uploadOverallProgress = computed(() => {
-	const state = uploadState.value
-	if (!state.isUploading || state.totalFiles === 0) return 0
-	return Math.min((state.completedFiles + state.currentFileProgress) / state.totalFiles, 1)
 })
 
 const isUploading = computed(() => uploadState.value.isUploading)
@@ -981,69 +912,7 @@ async function handleContentRetry() {
 }
 
 const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) => {
-	if (data.task === 'file') return
-
-	const backupId = data.id
-
-	if (cancelledBackups.has(backupId)) return
-
-	const current = backupsState.get(backupId) ?? {}
-	const currentTaskState = current[data.task]?.state
-	const isIncomingTerminal =
-		data.state === 'done' || data.state === 'failed' || data.state === 'cancelled'
-
-	if (currentTaskState === data.state && isIncomingTerminal) return
-
-	const previousProgress = current[data.task]?.progress
-	if (currentTaskState !== data.state || previousProgress !== data.progress) {
-		backupsState.set(backupId, {
-			...current,
-			[data.task]: {
-				progress: data.progress,
-				state: data.state,
-			},
-		})
-	}
-
-	if (isIncomingTerminal) {
-		const attemptCleanup = (attempt: number = 1) => {
-			queryClient.invalidateQueries({ queryKey: ['backups', 'list', props.serverId] }).then(() => {
-				const backupData = queryClient.getQueryData<Archon.Backups.v1.Backup[]>([
-					'backups',
-					'list',
-					props.serverId,
-				])
-				const backup = backupData?.find((b) => b.id === backupId)
-				const isStillActive =
-					backup && (backup.status === 'in_progress' || backup.status === 'pending')
-
-				if (isStillActive && attempt < 6) {
-					setTimeout(() => attemptCleanup(attempt + 1), 1000 * Math.pow(2, attempt - 1))
-					return
-				}
-
-				if (isStillActive) {
-					queryClient.setQueryData<Archon.Backups.v1.Backup[]>(
-						['backups', 'list', props.serverId],
-						(old) =>
-							old?.map((b) => {
-								if (b.id !== backupId) return b
-								return {
-									...b,
-									status: data.state === 'done' ? ('done' as const) : ('error' as const),
-									ongoing: false,
-									interrupted: data.state === 'failed',
-								}
-							}),
-					)
-				}
-
-				backupsState.delete(backupId)
-			})
-		}
-
-		attemptCleanup()
-	}
+	handleWsBackupProgress(data)
 }
 
 const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => {
@@ -1455,19 +1324,22 @@ function initializeServer() {
 	}
 }
 
+let intercomInitialized = false
+
 const cleanup = () => {
 	isMounted.value = false
 
 	saveWsStateToCache()
 
-	shutdown()
+	if (intercomInitialized) {
+		shutdown()
+		intercomInitialized = false
+	}
 
 	cleanupCoreRuntime(props.serverId)
 
 	isReconnecting.value = false
 	isLoading.value = true
-
-	cancelledBackups.clear()
 
 	DOMPurify.removeHook('afterSanitizeAttributes')
 }
@@ -1486,19 +1358,36 @@ onMounted(() => {
 		})
 	}
 
-	let intercomInitialized = false
 	const tryInitIntercom = () => {
 		if (intercomInitialized) return
-		if (!props.authUser || !props.fetchIntercomToken) return
+		if (!props.authUser || !props.fetchIntercomToken) {
+			console.debug('[PYROSERVERS][INTERCOM] waiting for auth user and token fetcher', {
+				hasAuthUser: !!props.authUser,
+				hasFetchIntercomToken: !!props.fetchIntercomToken,
+			})
+			return
+		}
 		intercomInitialized = true
+		console.debug('[PYROSERVERS][INTERCOM] initializing secure support chat')
 		props
 			.fetchIntercomToken()
 			.then(({ token }) => {
+				console.debug('[PYROSERVERS][INTERCOM] fetched messenger JWT, booting widget')
 				Intercom({
 					app_id: props.intercomAppId!,
 					intercom_user_jwt: token,
 					session_duration: 1000 * 60 * 60 * 24,
 				})
+				window.setTimeout(() => {
+					const hasWidget = !!document.querySelector(
+						'.intercom-lightweight-app, #intercom-container, #intercom-frame',
+					)
+					if (!hasWidget) {
+						console.warn(
+							'[PYROSERVERS][INTERCOM] boot completed but no Intercom widget was detected',
+						)
+					}
+				}, 2500)
 			})
 			.catch((error) => {
 				intercomInitialized = false

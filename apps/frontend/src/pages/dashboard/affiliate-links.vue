@@ -44,7 +44,7 @@
 			v-else-if="!filteredAffiliates || filteredAffiliates.length === 0"
 			class="py-8 text-center"
 		>
-			<p class="text-secondary">No affiliate codes found.</p>
+			<p class="text-secondary">{{ formatMessage(messages.noAffiliateCodesFound) }}</p>
 		</div>
 		<div v-else class="space-y-3">
 			<AffiliateLinkCard
@@ -165,6 +165,10 @@ const messages = defineMessages({
 	errorTitle: {
 		id: 'dashboard.affiliate-links.error.title',
 		defaultMessage: 'Error loading affiliate links',
+	},
+	noAffiliateCodesFound: {
+		id: 'dashboard.affiliate-links.empty.no-codes',
+		defaultMessage: 'No affiliate codes found.',
 	},
 	revokeConfirmButton: {
 		id: 'dashboard.affiliate-links.revoke-confirm.button',

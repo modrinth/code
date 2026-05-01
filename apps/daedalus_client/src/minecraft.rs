@@ -144,7 +144,7 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
             .chain(existing_versions.into_iter())
             .collect::<Vec<_>>();
 
-        new_versions.sort_by(|a, b| b.release_time.cmp(&a.release_time));
+        new_versions.sort_by_key(|b| std::cmp::Reverse(b.release_time));
 
         // create and upload the new manifest
         let version_manifest_path = format!(

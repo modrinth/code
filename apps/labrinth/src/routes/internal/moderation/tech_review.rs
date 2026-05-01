@@ -14,7 +14,7 @@ use crate::{
         models::{
             DBFileId, DBProjectId, DBThread, DBThreadId, DBUser, DBVersion,
             DBVersionId, DelphiReportId, DelphiReportIssueDetailsId,
-            DelphiReportIssueId, ProjectTypeId,
+            DelphiReportIssueId,
             delphi_report_item::{
                 DBDelphiReport, DelphiSeverity, DelphiStatus, DelphiVerdict,
                 ReportIssueDetail,
@@ -72,7 +72,7 @@ fn default_sort_by() -> SearchProjectsSort {
 #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct SearchProjectsFilter {
     #[serde(default)]
-    pub project_type: Vec<ProjectTypeId>,
+    pub project_type: Vec<String>,
     #[serde(default)]
     pub replied_to: Option<RepliedTo>,
     #[serde(default)]
@@ -715,8 +715,6 @@ async fn search_projects(
             ON drid.issue_id = dri.id
         LEFT JOIN delphi_issue_detail_verdicts didv
             ON m.id = didv.project_id AND drid.key = didv.detail_key
-        LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-        LEFT JOIN categories c ON c.id = mc.joining_category_id
         LEFT JOIN threads_messages tm_last
             ON tm_last.thread_id = t.id
             AND tm_last.id = (
@@ -728,7 +726,36 @@ async fn search_projects(
         LEFT JOIN users u_last
             ON u_last.id = tm_last.author_id
         WHERE
-            (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
+            (
+                cardinality($4::text[]) = 0
+                OR (
+                    'minecraft_java_server' = ANY($4::text[])
+                    AND (
+                        m.components ? 'minecraft_server'
+                        OR m.components ? 'minecraft_java_server'
+                    )
+                )
+                OR EXISTS (
+                    SELECT 1
+                    FROM versions type_v
+                    INNER JOIN loaders_versions type_lv
+                        ON type_lv.version_id = type_v.id
+                    INNER JOIN loaders_project_types type_lpt
+                        ON type_lpt.joining_loader_id = type_lv.loader_id
+                    INNER JOIN project_types type_pt
+                        ON type_pt.id = type_lpt.joining_project_type_id
+                    WHERE
+                        type_v.mod_id = m.id
+                        AND type_pt.name = ANY($4::text[])
+                        AND (
+                            type_pt.name != 'modpack'
+                            OR NOT (
+                                m.components ? 'minecraft_server'
+                                OR m.components ? 'minecraft_java_server'
+                            )
+                        )
+                )
+            )
             AND m.status NOT IN ('draft', 'rejected', 'withheld')
             AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
             AND (cardinality($7::text[]) = 0 OR dri.issue_type = ANY($7::text[]))
@@ -751,12 +778,7 @@ async fn search_projects(
         limit,
         offset,
         &sort_by,
-        &search_req
-            .filter
-            .project_type
-            .iter()
-            .map(|ty| ty.0)
-            .collect::<Vec<_>>(),
+        &search_req.filter.project_type,
         replied_to_filter.as_deref(),
         &search_req
             .filter

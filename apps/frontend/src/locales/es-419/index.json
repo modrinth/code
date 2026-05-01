@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Crear enlace de afiliado"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "No se encontraron códigos de afiliado."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Error al cargar los enlaces de afiliado"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Buscar enlaces de afiliado..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "de {count} {count, plural,one {proyecto} other {proyectos}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Descargas totales"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Total de seguidores"
   },
   "dashboard.collections.button.create-new": {
     "message": "Crear nuevo"
@@ -3155,6 +3167,12 @@
   "settings.billing.interval.monthly": {
     "message": "mensual"
   },
+  "settings.billing.interval.quarter": {
+    "message": "trimestre"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "trimestralmente"
+  },
   "settings.billing.interval.year": {
     "message": "año"
   },
@@ -3268,6 +3286,9 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Error al renovar la suscripción"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Si el servidor se encuentra cancelado, puede tomar 10-15 minutos en preparar el servidor"
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Solicitud de renovación de suscripción enviada"

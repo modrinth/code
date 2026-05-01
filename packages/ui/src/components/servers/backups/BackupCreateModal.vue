@@ -1,6 +1,6 @@
 <template>
-	<NewModal ref="modal" header="Create backup" @show="focusInput">
-		<div class="flex flex-col gap-2 md:w-[600px] -mb-2">
+	<NewModal ref="modal" header="Create backup" width="500px" @show="focusInput">
+		<div class="flex flex-col gap-2 -mb-2">
 			<label for="backup-name-input">
 				<span class="text-lg font-semibold text-contrast">Name</span>
 			</label>
@@ -45,9 +45,9 @@
 			</Transition>
 		</div>
 		<template #actions>
-			<div class="w-full flex flex-row gap-2 justify-end">
+			<div class="flex gap-2 justify-end">
 				<ButtonStyled type="outlined">
-					<button class="!border-[1px] !border-surface-4" @click="hideModal">
+					<button class="!border !border-surface-4" @click="hideModal">
 						<XIcon />
 						Cancel
 					</button>
@@ -84,14 +84,14 @@ const queryClient = useQueryClient()
 const ctx = injectModrinthServerContext()
 
 const props = defineProps<{
-	backups?: Archon.Backups.v1.Backup[]
+	backups?: Archon.BackupsQueue.v1.BackupQueueBackup[]
 }>()
 
-const backupsQueryKey = ['backups', 'list', ctx.serverId]
+const backupsQueryKey = ['backups', 'queue', ctx.serverId]
 
 const createMutation = useMutation({
 	mutationFn: (name: string) =>
-		client.archon.backups_v1.create(ctx.serverId, ctx.worldId.value!, { name }),
+		client.archon.backups_queue_v1.create(ctx.serverId, ctx.worldId.value!, { name }),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
