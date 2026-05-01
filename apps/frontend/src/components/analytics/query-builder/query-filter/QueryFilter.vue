@@ -167,7 +167,7 @@
 				</div>
 				<DownloadsThresholdInput
 					v-if="activeCategory.key === 'game_version'"
-					class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
+					class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
 					label="Game Versions above"
 					input-aria-label="Game version downloads threshold"
 					:threshold="gameVersionDownloadsThreshold"
@@ -221,11 +221,11 @@ import {
 	getAddMenuPosition,
 	getCategorySelectionCount as getCategorySelectionCountValue,
 	getCategorySelectionSummary as getCategorySelectionSummaryValue,
+	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
+	isFilterValueSelected as getIsFilterValueSelected,
 	getOptionsWithSelectedValues,
 	getSubmenuPosition,
 	getVisibleAnalyticsFilterCategoriesForState,
-	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
-	isFilterValueSelected as getIsFilterValueSelected,
 	normalizeSelectedValues as normalizeSelectedFilterValues,
 	type Point,
 } from './queryFilter'

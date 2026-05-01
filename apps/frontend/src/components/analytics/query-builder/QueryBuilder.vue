@@ -46,7 +46,7 @@
 					</template>
 					<template #bottom>
 						<DownloadsThresholdInput
-							class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
+							class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
 							label="Projects above"
 							input-aria-label="Project downloads threshold"
 							:threshold="projectDownloadsThreshold"
