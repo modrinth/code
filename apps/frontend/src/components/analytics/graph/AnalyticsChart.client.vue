@@ -77,6 +77,9 @@ const chartInteractionEvents: ChartEvents = [
 	'touchmove',
 ]
 const PINNED_DRAG_THRESHOLD_PX = 6
+const EMPTY_DATA_Y_AXIS_MAX = 10
+const EMPTY_DATA_Y_AXIS_STEP = 2
+const SECONDS_PER_HOUR = 60 * 60
 
 let pinnedDragPointerId: number | null = null
 let pinnedDragStartX = 0
@@ -203,7 +206,27 @@ function buildDatasets() {
 	})
 }
 
+function hasMetricData() {
+	return props.datasets.some((dataset) =>
+		dataset.data.some((value) => Number.isFinite(value) && value > 0),
+	)
+}
+
+function getEmptyDataYAxisMax() {
+	return props.activeStat === 'playtime'
+		? EMPTY_DATA_Y_AXIS_MAX * SECONDS_PER_HOUR
+		: EMPTY_DATA_Y_AXIS_MAX
+}
+
+function getEmptyDataYAxisStepSize() {
+	return props.activeStat === 'playtime'
+		? EMPTY_DATA_Y_AXIS_STEP * SECONDS_PER_HOUR
+		: EMPTY_DATA_Y_AXIS_STEP
+}
+
 function buildConfig(): ChartConfiguration {
+	const hasData = hasMetricData()
+
 	return {
 		type: props.type,
 		data: {
@@ -240,12 +263,14 @@ function buildConfig(): ChartConfiguration {
 				y: {
 					stacked: props.stacked,
 					beginAtZero: true,
+					...(hasData ? {} : { max: getEmptyDataYAxisMax(), min: 0 }),
 					grid: {
 						color: 'rgba(148, 163, 184, 0.15)',
 					},
 					border: { display: false },
 					ticks: {
 						color: 'rgba(148, 163, 184, 0.9)',
+						...(hasData ? {} : { stepSize: getEmptyDataYAxisStepSize() }),
 						callback: (tickValue) => {
 							const numeric =
 								typeof tickValue === 'number' ? tickValue : Number.parseFloat(String(tickValue))
