@@ -10,14 +10,29 @@ export type VersionEntry = {
 }
 
 const VERSIONS: VersionEntry[] = [
-	// 	{
-	// 		date: `2026-04-29T03:54:14+00:00`,
-	// 		product: 'app',
-	// 		version: '0.13.7',
-	// 		body: `## Fixed
-	// - Fixed Java auto-installation not working on macOS
-	// - Fix a skin naming error.`,
-	// 	},
+	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'app',
+		version: '0.13.7',
+		body: `## Added
+- Added a warning when installing unknown modpack files to help prevent users from getting tricked into installing malware.
+
+## Changed
+- Updated the content downloading and installation notifications to be consistent with other types of notifications.
+- Updated the design of the running instances widget in the action bar to be more consistent with our current designs.
+- Increased the click target area of the window control buttons on Windows and Linux.
+- Changed the name of the button for creating an instance with a modpack to make it clearer what it's for.
+
+## Fixed
+- Fixed Java auto-installation not working on macOS.
+- Fix a skin naming error.`,
+	},
+	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Changed the name of the button for installing a modpack to make it clearer what it's for.`,
+	},
 	{
 		date: `2026-04-29T03:54:14+00:00`,
 		product: 'hosting',

@@ -107,10 +107,6 @@ import { useQuery } from '@tanstack/vue-query'
 import NotificationItem from '~/components/ui/NotificationItem.vue'
 import { fetchExtraNotificationData, groupNotifications } from '~/helpers/platform-notifications.ts'
 
-useHead({
-	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
-})
-
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -147,6 +143,10 @@ const messages = defineMessages({
 		id: 'dashboard.analytics.from-projects',
 		defaultMessage: 'from {count} {count, plural, one {project} other {projects}}',
 	},
+})
+
+useHead({
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
 const auth = await useAuth()

@@ -107,7 +107,7 @@ defineExpose({
 
 const install = async () => {
 	installing.value = true
-	await installMod(instance.value.path, selectedVersion.value.id).catch(handleError)
+	await installMod(instance.value.path, selectedVersion.value.id, 'standalone').catch(handleError)
 	installing.value = false
 	onInstall.value(selectedVersion.value.id)
 	incompatibleModal.value.hide()

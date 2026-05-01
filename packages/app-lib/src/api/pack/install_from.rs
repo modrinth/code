@@ -4,9 +4,12 @@ use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{
-    CacheBehaviour, CachedEntry, LinkedData, ProfileInstallStage, SideType,
+    CacheBehaviour, CachedEntry, LinkedData, Profile, ProfileInstallStage,
+    SideType,
 };
-use crate::util::fetch::{fetch, fetch_advanced, write_cached_icon};
+use crate::util::fetch::{
+    DownloadMeta, DownloadReason, fetch, fetch_advanced, write_cached_icon,
+};
 use crate::util::io;
 
 use path_util::SafeRelativeUtf8UnixPathBuf;
@@ -287,12 +290,29 @@ pub async fn generate_pack_from_version_id(
             )
         })?;
 
+    let profile =
+        Profile::get(&profile_path, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::UnmanagedProfileError(
+                    profile_path.to_string(),
+                )
+                .as_error()
+            })?;
+
+    let download_meta = DownloadMeta {
+        reason: DownloadReason::Modpack,
+        game_version: profile.game_version.clone(),
+        loader: profile.loader.as_str().to_string(),
+    };
+
     let file = fetch_advanced(
         Method::GET,
         &url,
         hash.map(|x| &**x),
         None,
         None,
+        Some(&download_meta),
         Some((&loading_bar, 70.0)),
         &state.fetch_semaphore,
         &state.pool,
@@ -320,9 +340,14 @@ pub async fn generate_pack_from_version_id(
         emit_loading(&loading_bar, 10.0, Some("Retrieving icon"))?;
         let fetched = if let Some(icon_url) = project.icon_url {
             let state = State::get().await?;
-            let icon_bytes =
-                fetch(&icon_url, None, &state.fetch_semaphore, &state.pool)
-                    .await?;
+            let icon_bytes = fetch(
+                &icon_url,
+                None,
+                None,
+                &state.fetch_semaphore,
+                &state.pool,
+            )
+            .await?;
 
             let filename = icon_url.rsplit('/').next();
 

@@ -184,8 +184,18 @@ export async function update_project(path: string, projectPath: string): Promise
 
 // Add a project to a profile from a version
 // Returns a path to the new project file
-export async function add_project_from_version(path: string, versionId: string): Promise<string> {
-	return await invoke('plugin:profile|profile_add_project_from_version', { path, versionId })
+export type DownloadReason = 'standalone' | 'dependency' | 'modpack'
+
+export async function add_project_from_version(
+	path: string,
+	versionId: string,
+	reason: DownloadReason,
+): Promise<string> {
+	return await invoke('plugin:profile|profile_add_project_from_version', {
+		path,
+		versionId,
+		reason,
+	})
 }
 
 // Add a project to a profile from a path + project_type
