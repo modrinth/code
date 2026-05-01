@@ -189,11 +189,7 @@ const showTimeInBucketLabel = computed(() => isTimeRelevantForGroupBy(selectedGr
 const chartLabels = computed(() => {
 	const nextFetchRequest = fetchRequest.value
 	if (!nextFetchRequest) return []
-	return buildTimeAxisLabels(
-		nextFetchRequest.time_range,
-		sliceCount.value,
-		selectedGroupBy.value,
-	)
+	return buildTimeAxisLabels(nextFetchRequest.time_range, sliceCount.value, selectedGroupBy.value)
 })
 
 const allChartDatasets = computed(() =>

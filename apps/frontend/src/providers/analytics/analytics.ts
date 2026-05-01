@@ -661,29 +661,29 @@ export function createAnalyticsDashboardContext(
 
 	const countryAndDownloadSourceFilterOptionsRequest =
 		computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
-		if (sortedSelectedProjectIds.value.length === 0) {
-			return null
-		}
+			if (sortedSelectedProjectIds.value.length === 0) {
+				return null
+			}
 
-		return {
-			time_range: {
-				start: ANALYTICS_START_TIMESTAMP,
-				end: new Date(queryRefreshTimestamp.value).toISOString(),
-				resolution: {
-					slices: 1,
+			return {
+				time_range: {
+					start: ANALYTICS_START_TIMESTAMP,
+					end: new Date(queryRefreshTimestamp.value).toISOString(),
+					resolution: {
+						slices: 1,
+					},
 				},
-			},
-			project_ids: sortedSelectedProjectIds.value,
-			return_metrics: {
-				project_views: {
-					bucket_by: ['country'],
+				project_ids: sortedSelectedProjectIds.value,
+				return_metrics: {
+					project_views: {
+						bucket_by: ['country'],
+					},
+					project_downloads: {
+						bucket_by: ['country', 'domain'],
+					},
 				},
-				project_downloads: {
-					bucket_by: ['country', 'domain'],
-				},
-			},
-		}
-	})
+			}
+		})
 
 	const { data: countryAndDownloadSourceFilterOptionsData } = useQuery({
 		queryKey: computed(() => [
