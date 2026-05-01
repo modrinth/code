@@ -15,16 +15,10 @@
 						<label
 							for="analytics-include-date"
 							class="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary"
-							:class="{ 'cursor-not-allowed opacity-50': !showBreakdownOnlyMode }"
 						>
 							Include date
 						</label>
-						<Toggle
-							id="analytics-include-date"
-							v-model="includeDate"
-							:disabled="!showBreakdownOnlyMode"
-							small
-						/>
+						<Toggle id="analytics-include-date" v-model="includeDate" small />
 
 						<div class="mx-1 h-6 w-px bg-surface-5"></div>
 
@@ -130,10 +124,6 @@ const tableMode = ref<TableMode>('date_breakdown')
 const sortColumn = ref<TableColumnKey | undefined>('date')
 const sortDirection = ref<SortDirection>('asc')
 
-const showBreakdownOnlyMode = computed(
-	() => selectedProjectIds.value.length > 1 || selectedBreakdown.value !== 'none',
-)
-
 const includeDate = computed<boolean>({
 	get: () => tableMode.value === 'date_breakdown',
 	set: (value) => {
@@ -165,17 +155,6 @@ const breakdownColumnLabel = computed(() => {
 			return 'Breakdown'
 	}
 })
-
-watch(
-	showBreakdownOnlyMode,
-	(nextValue) => {
-		if (!nextValue && tableMode.value === 'breakdown_only') {
-			tableMode.value = 'date_breakdown'
-		}
-	},
-	{ immediate: true },
-)
-
 watch(tableMode, (nextMode) => {
 	if (nextMode === 'breakdown_only' && sortColumn.value === 'date') {
 		sortColumn.value = 'breakdown'
