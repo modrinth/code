@@ -223,34 +223,56 @@ export function getSliceBucketRange(
 	}
 }
 
+const COMPACT_AXIS_THRESHOLD = 5
+
 export function buildTimeAxisLabels(
 	timeRange: Labrinth.Analytics.v3.TimeRange,
 	sliceCount: number,
-	includeTime: boolean,
+	groupBy: AnalyticsGroupByPreset,
 ): string[] {
 	const startMs = new Date(timeRange.start).getTime()
 	const endMs = new Date(timeRange.end).getTime()
 	const totalMs = endMs - startMs
 	const bucketMs = sliceCount > 0 ? totalMs / sliceCount : 0
-	const formatter = getBucketEndFormatter(includeTime)
+	const includeTime = isTimeRelevantForGroupBy(groupBy)
+	const includeYear = groupBy === 'year'
 
-	const labels: string[] = []
+	const dates: Date[] = []
+	const dateKeys: string[] = []
 	for (let i = 0; i < sliceCount; i++) {
-		labels.push(formatter.format(new Date(startMs + (i + 1) * bucketMs)))
+		const date = new Date(startMs + (i + 1) * bucketMs)
+		dates.push(date)
+		dateKeys.push(`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`)
 	}
-	return labels
-}
 
-function getBucketEndFormatter(includeTime: boolean): Intl.DateTimeFormat {
-	if (includeTime) {
-		return new Intl.DateTimeFormat(undefined, {
+	const dateFormatter = new Intl.DateTimeFormat(undefined, {
+		month: 'short',
+		day: 'numeric',
+		...(includeYear ? { year: 'numeric' } : {}),
+	})
+
+	if (!includeTime) {
+		return dates.map((date) => dateFormatter.format(date))
+	}
+
+	const timeFormatter = new Intl.DateTimeFormat(undefined, { hour: 'numeric' })
+	const uniqueDateCount = new Set(dateKeys).size
+
+	if (uniqueDateCount <= 1) {
+		return dates.map((date) => timeFormatter.format(date))
+	}
+
+	if (sliceCount <= COMPACT_AXIS_THRESHOLD) {
+		const dateAndTimeFormatter = new Intl.DateTimeFormat(undefined, {
 			month: 'short',
 			day: 'numeric',
 			hour: 'numeric',
-			minute: '2-digit',
+			...(includeYear ? { year: 'numeric' } : {}),
 		})
+		return dates.map((date) => dateAndTimeFormatter.format(date))
 	}
-	return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' })
+
+	return dates.map((date) => dateFormatter.format(date))
 }
 
 export function isTimeRelevantForGroupBy(groupBy: AnalyticsGroupByPreset): boolean {

@@ -254,7 +254,7 @@ function buildConfig(): ChartConfiguration {
 					stacked: props.stacked && props.type === 'bar',
 					grid: { display: false },
 					ticks: {
-						maxTicksLimit: 8,
+						maxTicksLimit: 12,
 						autoSkip: true,
 						color: 'rgba(148, 163, 184, 0.9)',
 					},
