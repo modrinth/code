@@ -44,6 +44,10 @@ type ProjectTypeMetadata = {
 	project_types?: readonly string[] | null
 }
 
+type AnalyticsProjectFetchRequest = Labrinth.Analytics.v3.FetchRequest & {
+	project_ids: string[]
+}
+
 export interface AnalyticsDashboardProject {
 	id: string
 	name: string
@@ -126,7 +130,7 @@ export const [injectAnalyticsDashboardContext, provideAnalyticsDashboardContext]
 function buildPreviousFetchRequest(
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
 ): Labrinth.Analytics.v3.FetchRequest | null {
-	if (!fetchRequest) {
+	if (!isAnalyticsFetchRequestReady(fetchRequest)) {
 		return null
 	}
 
@@ -148,7 +152,21 @@ function buildPreviousFetchRequest(
 			resolution: fetchRequest.time_range.resolution,
 		},
 		return_metrics: fetchRequest.return_metrics,
+		project_ids: fetchRequest.project_ids,
 	}
+}
+
+function isAnalyticsFetchRequestReady(
+	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+): fetchRequest is AnalyticsProjectFetchRequest {
+	return Array.isArray(fetchRequest?.project_ids) && fetchRequest.project_ids.length > 0
+}
+
+function areAnalyticsFetchRequestsEqual(
+	left: Labrinth.Analytics.v3.FetchRequest | null,
+	right: Labrinth.Analytics.v3.FetchRequest,
+): boolean {
+	return JSON.stringify(left) === JSON.stringify(right)
 }
 
 function getPercentChange(currentValue: number, previousValue: number): number {
@@ -366,13 +384,18 @@ export function doesAnalyticsPointMatchFilters(
 function doesAnalyticsPointMatchFilter(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
 	filterValues: string[],
-	getPointValue: (dataPoint: Labrinth.Analytics.v3.ProjectAnalytics) => string | null,
+	getPointValue: (
+		dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+	) => string | null | undefined,
 ): boolean {
 	if (filterValues.length === 0) {
 		return true
 	}
 
 	const pointValue = getPointValue(dataPoint)
+	if (pointValue === undefined) {
+		return true
+	}
 	if (pointValue === null) {
 		return false
 	}
@@ -381,9 +404,11 @@ function doesAnalyticsPointMatchFilter(
 	return filterValues.some((value) => value.trim().toLowerCase() === normalizedPointValue)
 }
 
-function getCountryFilterValue(dataPoint: Labrinth.Analytics.v3.ProjectAnalytics): string | null {
+function getCountryFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
 	if (dataPoint.metric_kind !== 'views' && dataPoint.metric_kind !== 'downloads') {
-		return null
+		return undefined
 	}
 
 	return dataPoint.country ?? null
@@ -391,8 +416,11 @@ function getCountryFilterValue(dataPoint: Labrinth.Analytics.v3.ProjectAnalytics
 
 function getMonetizationFilterValue(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
-): string | null {
-	if (dataPoint.metric_kind !== 'views' || typeof dataPoint.monetized !== 'boolean') {
+): string | null | undefined {
+	if (dataPoint.metric_kind !== 'views') {
+		return undefined
+	}
+	if (typeof dataPoint.monetized !== 'boolean') {
 		return null
 	}
 
@@ -401,17 +429,19 @@ function getMonetizationFilterValue(
 
 function getDownloadSourceFilterValue(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
-): string | null {
+): string | null | undefined {
 	if (dataPoint.metric_kind !== 'downloads') {
-		return null
+		return undefined
 	}
 
 	return dataPoint.domain ?? null
 }
 
-function getVersionFilterValue(dataPoint: Labrinth.Analytics.v3.ProjectAnalytics): string | null {
+function getVersionFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
 	if (dataPoint.metric_kind !== 'downloads' && dataPoint.metric_kind !== 'playtime') {
-		return null
+		return undefined
 	}
 
 	return dataPoint.version_id ?? null
@@ -419,17 +449,19 @@ function getVersionFilterValue(dataPoint: Labrinth.Analytics.v3.ProjectAnalytics
 
 function getGameVersionFilterValue(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
-): string | null {
+): string | null | undefined {
 	if (dataPoint.metric_kind !== 'playtime') {
-		return null
+		return undefined
 	}
 
 	return dataPoint.game_version ?? null
 }
 
-function getLoaderFilterValue(dataPoint: Labrinth.Analytics.v3.ProjectAnalytics): string | null {
+function getLoaderFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
 	if (dataPoint.metric_kind !== 'playtime') {
-		return null
+		return undefined
 	}
 
 	return dataPoint.loader ?? null
@@ -671,7 +703,7 @@ export function createAnalyticsDashboardContext(
 		queryKey: computed(() => ['analytics', 'dashboard', 'current', fetchRequest.value]),
 		queryFn: () =>
 			client.labrinth.analytics_v3.fetch(fetchRequest.value as Labrinth.Analytics.v3.FetchRequest),
-		enabled: computed(() => fetchRequest.value !== null),
+		enabled: computed(() => isAnalyticsFetchRequestReady(fetchRequest.value)),
 	})
 
 	const countryFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
@@ -877,7 +909,7 @@ export function createAnalyticsDashboardContext(
 	)
 
 	watch(fetchRequest, (nextFetchRequest) => {
-		if (nextFetchRequest !== null) {
+		if (isAnalyticsFetchRequestReady(nextFetchRequest)) {
 			return
 		}
 		timeSlices.value = []
@@ -974,7 +1006,7 @@ export function createAnalyticsDashboardContext(
 			return
 		}
 
-		const previousFetchRequestKey = JSON.stringify(fetchRequest.value)
+		const fetchRequestKey = JSON.stringify(fetchRequest.value)
 		const now = Date.now()
 		queryRefreshTimestamp.value =
 			now > queryRefreshTimestamp.value ? now : queryRefreshTimestamp.value + 1
@@ -982,7 +1014,7 @@ export function createAnalyticsDashboardContext(
 
 		if (
 			fetchRequest.value === null ||
-			JSON.stringify(fetchRequest.value) !== previousFetchRequestKey
+			JSON.stringify(fetchRequest.value) !== fetchRequestKey
 		) {
 			return
 		}
@@ -996,6 +1028,10 @@ export function createAnalyticsDashboardContext(
 	}
 
 	function setFetchRequest(nextFetchRequest: Labrinth.Analytics.v3.FetchRequest) {
+		if (areAnalyticsFetchRequestsEqual(fetchRequest.value, nextFetchRequest)) {
+			return
+		}
+
 		fetchRequest.value = nextFetchRequest
 	}
 

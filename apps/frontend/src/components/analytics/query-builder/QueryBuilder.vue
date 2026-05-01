@@ -457,7 +457,7 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 	const { start, end } = ensureMinimumTimeRange(rawRange.start, rawRange.end)
 
 	const groupByMs = getGroupByMinutes(selectedGroupBy.value) * 60 * 1000
-	const desiredSlices = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / groupByMs))
+	const desiredSlices = Math.max(1, Math.floor((end.getTime() - start.getTime()) / groupByMs))
 	const resolutionSlices = Math.min(MAX_TIME_SLICES, desiredSlices)
 
 	const bucketBy = withBreakdownFields(selectedBreakdown.value, selectedFilters.value)
