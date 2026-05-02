@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { computed, provide } from 'vue'
+import { RightArrowIcon } from '@modrinth/assets'
+import { computed } from 'vue'
 
 import { useFormatPrice } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
+import ButtonStyled from '../base/ButtonStyled.vue'
 import OptionGroup from '../base/OptionGroup.vue'
-import ModalBasedServerPlan from './ModalBasedServerPlan.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
+import ServersSpecs from './ServersSpecs.vue'
 
 const { formatMessage } = useVIntl()
 const formatPrice = useFormatPrice()
@@ -23,18 +25,10 @@ const availableBillingIntervals = ['monthly', 'quarterly']
 const selectedPlan = defineModel<Labrinth.Billing.Internal.Product>('plan')
 const selectedInterval = defineModel<ServerBillingInterval>('interval')
 const emit = defineEmits<{
-	(e: 'choose-custom'): void
+	(e: 'choose-custom' | 'proceed'): void
 }>()
 
 const messages = defineMessages({
-	title: {
-		id: 'servers.purchase.step.plan.prompt',
-		defaultMessage: 'Choose a plan',
-	},
-	subtitle: {
-		id: 'servers.purchase.step.plan.subtitle',
-		defaultMessage: 'Pick the amount of RAM and specs that fit your needs.',
-	},
 	selectPlan: {
 		id: 'servers.purchase.step.plan.select',
 		defaultMessage: 'Select Plan',
@@ -43,9 +37,17 @@ const messages = defineMessages({
 		id: 'servers.purchase.step.plan.get-started',
 		defaultMessage: 'Get started',
 	},
-	billed: {
-		id: 'servers.purchase.step.plan.billed',
-		defaultMessage: 'billed {interval}',
+	smallTitle: {
+		id: 'servers.purchase.step.plan.small',
+		defaultMessage: 'Small',
+	},
+	mediumTitle: {
+		id: 'servers.purchase.step.plan.medium',
+		defaultMessage: 'Medium',
+	},
+	largeTitle: {
+		id: 'servers.purchase.step.plan.large',
+		defaultMessage: 'Large',
 	},
 	smallDesc: {
 		id: 'servers.purchase.step.plan.small.desc',
@@ -66,6 +68,18 @@ const messages = defineMessages({
 	mostPopular: {
 		id: 'servers.purchase.step.plan.most-popular',
 		defaultMessage: 'Most Popular',
+	},
+	billingSubtitle: {
+		id: 'servers.purchase.step.plan.billing-subtitle',
+		defaultMessage: 'Available in North America, Europe, and Southeast Asia.',
+	},
+	customHeading: {
+		id: 'servers.purchase.step.plan.custom.heading',
+		defaultMessage: 'Know exactly what you need?',
+	},
+	yourCurrentPlan: {
+		id: 'servers.purchase.step.plan.your-current-plan',
+		defaultMessage: 'Your current plan',
 	},
 })
 
@@ -95,8 +109,12 @@ const plansByRam = computed(() => {
 	return byName
 })
 
-function handleCustomPlan() {
-	emit('choose-custom')
+function planSpecs(plan: Labrinth.Billing.Internal.Product) {
+	const m = plan.metadata
+	if (m.type === 'pyro' || m.type === 'medal') {
+		return { ram: m.ram, storage: m.storage, cpus: m.cpu }
+	}
+	return null
 }
 
 function pricePerMonth(plan?: Labrinth.Billing.Internal.Product) {
@@ -105,22 +123,6 @@ function pricePerMonth(plan?: Labrinth.Billing.Internal.Product) {
 	if (!total) return undefined
 	return total / monthsInInterval[selectedInterval.value]
 }
-
-const customPricePerGb = computed(() => {
-	// Calculate lowest price per GB among products for current interval
-	let min: number | undefined
-	for (const p of props.availableProducts) {
-		const perMonth = pricePerMonth(p)
-		const metadata = p?.metadata
-		if (!metadata || (metadata.type !== 'pyro' && metadata.type !== 'medal')) continue
-		const ramGb = metadata.ram / 1024
-		if (perMonth && ramGb > 0) {
-			const perGb = perMonth / ramGb
-			if (min === undefined || perGb < min) min = perGb
-		}
-	}
-	return min
-})
 
 const customStartingPrice = computed(() => {
 	let min: number | undefined
@@ -131,26 +133,47 @@ const customStartingPrice = computed(() => {
 	return min
 })
 
-provide('currency', props.currency)
-provide('selectedInterval', selectedInterval)
+const smallPrice = computed(() => pricePerMonth(plansByRam.value.small))
+const mediumPrice = computed(() => pricePerMonth(plansByRam.value.medium))
+const largePrice = computed(() => pricePerMonth(plansByRam.value.large))
+
+const smallSpecs = computed(() =>
+	plansByRam.value.small ? planSpecs(plansByRam.value.small) : null,
+)
+const mediumSpecs = computed(() =>
+	plansByRam.value.medium ? planSpecs(plansByRam.value.medium) : null,
+)
+const largeSpecs = computed(() =>
+	plansByRam.value.large ? planSpecs(plansByRam.value.large) : null,
+)
+
+function selectPlan(plan: Labrinth.Billing.Internal.Product) {
+	selectedPlan.value = plan
+	emit('proceed')
+}
+
+function selectCustom() {
+	emit('choose-custom')
+	emit('proceed')
+}
 </script>
 
 <template>
-	<div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 mb-5 !mt-0">
-		<span></span>
+	<div class="flex flex-col items-center gap-2 mb-5 !mt-0">
 		<OptionGroup
 			v-slot="{ option }"
 			v-model="selectedInterval"
 			class="!bg-button-bg !shadow-none"
 			:options="availableBillingIntervals"
 		>
-			<template v-if="option === 'monthly'"> Pay monthly </template>
-			<span v-else-if="option === 'quarterly'"> Pay quarterly </span>
-			<span v-else-if="option === 'yearly'"> Pay yearly </span>
+			<template v-if="option === 'monthly'">Monthly</template>
+			<span v-else-if="option === 'quarterly'">
+				Quarterly <span class="text-brand">(Save 16%)</span>
+			</span>
 		</OptionGroup>
-		<span class="bg-transparent p-0 text-sm text-xs font-bold text-brand">
-			{{ selectedInterval !== 'quarterly' ? 'Save' : 'Saving' }} 16% with quarterly billing!
-		</span>
+		<div class="text-sm text-secondary text-center">
+			{{ formatMessage(messages.billingSubtitle) }}
+		</div>
 	</div>
 	<Transition
 		enter-active-class="transition-all duration-300 ease-out"
@@ -164,68 +187,182 @@ provide('selectedInterval', selectedInterval)
 			Your server is already on this plan, choose a different plan.
 		</div>
 	</Transition>
-	<div class="grid grid-cols-1 sm:grid-cols-2 !gap-4">
-		<ModalBasedServerPlan
-			v-if="plansByRam.small"
-			:plan="plansByRam.small"
-			:title="{ id: 'servers.purchase.step.plan.small', defaultMessage: 'Small' }"
-			:description="messages.smallDesc"
-			:button-color="'blue'"
-			:selected="selectedPlan?.id === plansByRam.small.id"
-			@select="selectedPlan = $event"
-		/>
-		<ModalBasedServerPlan
-			v-if="plansByRam.medium"
-			:plan="plansByRam.medium"
-			:title="{ id: 'servers.purchase.step.plan.medium', defaultMessage: 'Medium' }"
-			:description="messages.mediumDesc"
-			most-popular
-			:button-color="'brand'"
-			:selected="selectedPlan?.id === plansByRam.medium.id"
-			@select="selectedPlan = $event"
-		/>
-		<ModalBasedServerPlan
-			v-if="plansByRam.large"
-			:plan="plansByRam.large"
-			:title="{ id: 'servers.purchase.step.plan.large', defaultMessage: 'Large' }"
-			:description="messages.largeDesc"
-			:button-color="'purple'"
-			:selected="selectedPlan?.id === plansByRam.large.id"
-			@select="selectedPlan = $event"
-		/>
+	<div class="grid grid-cols-3 gap-4 items-start">
+		<!-- Small -->
 		<div
-			v-if="customStartingPrice"
-			class="rounded-2xl p-4 font-semibold transition-all duration-300 experimental-styles-within h-full border-2 border-solid cursor-pointer select-none"
-			:class="!selectedPlan ? 'bg-brand-highlight border-brand' : 'bg-button-bg border-transparent'"
-			role="button"
-			tabindex="0"
-			:aria-pressed="!selectedPlan"
-			@click="handleCustomPlan"
-			@keydown.enter.prevent="handleCustomPlan"
-			@keydown.space.prevent="handleCustomPlan"
+			v-if="plansByRam.small && smallPrice"
+			class="flex flex-col gap-4 rounded-2xl bg-surface-2 border-2 border-solid border-transparent p-5 h-full"
 		>
-			<div class="flex h-full flex-col justify-between">
-				<div class="flex flex-col gap-2">
-					<div class="flex items-center justify-between">
-						<span class="text-2xl font-semibold text-contrast">Custom</span>
+			<div>
+				<div class="text-3xl font-semibold text-contrast leading-none">
+					{{ formatMessage(messages.smallTitle) }}
+				</div>
+				<div class="mt-1">
+					<span class="text-2xl font-bold text-contrast">
+						{{ formatPrice(smallPrice, currency, true) }}
+					</span>
+					<span class="text-sm">
+						/ month<template v-if="selectedInterval !== 'monthly'"
+							>, billed {{ selectedInterval }}</template
+						>
+					</span>
+				</div>
+				<div class="mt-2 text-sm text-primary">
+					{{ formatMessage(messages.smallDesc) }}
+				</div>
+			</div>
+			<div class="w-full">
+				<ButtonStyled color="blue" class="w-full">
+					<button
+						class="w-full"
+						:disabled="existingPlan?.id === plansByRam.small.id"
+						@click="selectPlan(plansByRam.small!)"
+					>
+						{{
+							existingPlan?.id === plansByRam.small.id
+								? formatMessage(messages.yourCurrentPlan)
+								: formatMessage(messages.selectPlan)
+						}}
+					</button>
+				</ButtonStyled>
+			</div>
+			<ServersSpecs
+				v-if="smallSpecs"
+				:ram="smallSpecs.ram"
+				:storage="smallSpecs.storage"
+				:cpus="smallSpecs.cpus"
+			/>
+		</div>
+
+		<!-- Medium (Most Popular) -->
+		<div v-if="plansByRam.medium && mediumPrice" class="flex flex-col items-center relative h-full">
+			<div
+				class="z-10 -mb-3.5 rounded-full text-sm font-medium text-brand whitespace-nowrap absolute -top-3 right-4 bg-surface-3"
+			>
+				<div
+					class="bg-brand-highlight border border-solid border-highlight-green px-2.5 py-0.5 rounded-full"
+				>
+					{{ formatMessage(messages.mostPopular) }}
+				</div>
+			</div>
+
+			<div
+				class="w-full flex flex-col gap-4 rounded-2xl bg-brand-inverted border-brand-highlight border border-solid p-5 h-full"
+				:style="{
+					backgroundImage:
+						'radial-gradient(86.12% 101.64% at 95.97% 94.07%, rgba(27, 217, 106, 0.23) 0%, rgba(14, 115, 56, 0.2) 100%)',
+				}"
+			>
+				<div>
+					<div class="text-3xl font-semibold text-contrast leading-none">
+						{{ formatMessage(messages.mediumTitle) }}
 					</div>
-					<span class="m-0 text-lg font-bold text-contrast">
-						{{ formatPrice(customStartingPrice, currency, true) }}
-						<span class="text-sm font-semibold text-secondary">
+					<div class="mt-1">
+						<span class="text-2xl font-bold text-contrast">
+							{{ formatPrice(mediumPrice, currency, true) }}
+						</span>
+						<span class="text-sm">
 							/ month<template v-if="selectedInterval !== 'monthly'"
 								>, billed {{ selectedInterval }}</template
 							>
 						</span>
-					</span>
-					<span class="text-sm">{{ formatMessage(messages.customDesc) }}</span>
-				</div>
-				<div class="flex flex-col gap-2">
-					<div class="flex items-center gap-3">
-						<span v-if="customPricePerGb" class="text-sm text-secondary">
-							From {{ formatPrice(customPricePerGb, currency, true) }} / GB
-						</span>
+					</div>
+					<div class="mt-2 text-sm text-primary">
+						{{ formatMessage(messages.mediumDesc) }}
 					</div>
 				</div>
+				<div class="w-full">
+					<ButtonStyled color="brand" class="w-full">
+						<button
+							class="w-full"
+							:disabled="existingPlan?.id === plansByRam.medium.id"
+							@click="selectPlan(plansByRam.medium!)"
+						>
+							{{
+								existingPlan?.id === plansByRam.medium.id
+									? formatMessage(messages.yourCurrentPlan)
+									: formatMessage(messages.selectPlan)
+							}}
+						</button>
+					</ButtonStyled>
+				</div>
+				<ServersSpecs
+					v-if="mediumSpecs"
+					:ram="mediumSpecs.ram"
+					:storage="mediumSpecs.storage"
+					:cpus="mediumSpecs.cpus"
+				/>
+			</div>
+		</div>
+
+		<!-- Large -->
+		<div
+			v-if="plansByRam.large && largePrice"
+			class="flex flex-col gap-4 rounded-2xl bg-surface-2 border-2 border-solid border-transparent p-5 h-full"
+		>
+			<div>
+				<div class="text-3xl font-semibold text-contrast leading-none">
+					{{ formatMessage(messages.largeTitle) }}
+				</div>
+				<div class="mt-1">
+					<span class="text-2xl font-bold text-contrast">
+						{{ formatPrice(largePrice, currency, true) }}
+					</span>
+					<span class="text-sm">
+						/ month<template v-if="selectedInterval !== 'monthly'"
+							>, billed {{ selectedInterval }}</template
+						>
+					</span>
+				</div>
+				<div class="mt-2 text-sm text-primary">
+					{{ formatMessage(messages.largeDesc) }}
+				</div>
+			</div>
+			<div class="w-full">
+				<ButtonStyled color="purple" class="w-full">
+					<button
+						class="w-full"
+						:disabled="existingPlan?.id === plansByRam.large.id"
+						@click="selectPlan(plansByRam.large!)"
+					>
+						{{
+							existingPlan?.id === plansByRam.large.id
+								? formatMessage(messages.yourCurrentPlan)
+								: formatMessage(messages.selectPlan)
+						}}
+					</button>
+				</ButtonStyled>
+			</div>
+			<ServersSpecs
+				v-if="largeSpecs"
+				:ram="largeSpecs.ram"
+				:storage="largeSpecs.storage"
+				:cpus="largeSpecs.cpus"
+			/>
+		</div>
+	</div>
+
+	<!-- Custom plan banner -->
+	<div
+		v-if="customStartingPrice"
+		class="mt-4 flex items-center justify-between gap-4 rounded-2xl bg-surface-2 border-2 border-solid border-transparent p-5"
+	>
+		<div class="flex flex-col gap-1">
+			<div class="text-2xl font-semibold text-contrast">
+				{{ formatMessage(messages.customHeading) }}
+			</div>
+			<div class="text-sm text-secondary">
+				{{ formatMessage(messages.customDesc) }}
+			</div>
+		</div>
+		<div class="flex flex-col items-end gap-2 shrink-0">
+			<ButtonStyled>
+				<button class="flex items-center gap-2" @click="selectCustom">
+					{{ formatMessage(messages.getStarted) }} <RightArrowIcon class="h-4 w-4" />
+				</button>
+			</ButtonStyled>
+			<div class="text-sm text-secondary whitespace-nowrap">
+				Starting at {{ formatPrice(customStartingPrice, currency, true) }}/mo
 			</div>
 		</div>
 	</div>

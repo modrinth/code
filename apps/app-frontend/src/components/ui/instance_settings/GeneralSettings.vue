@@ -18,8 +18,9 @@ import { useRouter } from 'vue-router'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { duplicate, edit, edit_icon, list, remove } from '@/helpers/profile'
+import { injectInstanceSettings } from '@/providers/instance-settings'
 
-import type { GameInstance, InstanceSettingsTabProps } from '../../../helpers/types'
+import type { GameInstance } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -27,21 +28,21 @@ const router = useRouter()
 
 const deleteConfirmModal = ref()
 
-const props = defineProps<InstanceSettingsTabProps>()
+const { instance } = injectInstanceSettings()
 
-const title = ref(props.instance.name)
-const icon: Ref<string | undefined> = ref(props.instance.icon_path)
-const groups = ref(props.instance.groups)
+const title = ref(instance.value.name)
+const icon: Ref<string | undefined> = ref(instance.value.icon_path)
+const groups = ref([...instance.value.groups])
 
 const newCategoryInput = ref('')
 
-const installing = computed(() => props.instance.install_stage !== 'installed')
+const installing = computed(() => instance.value.install_stage !== 'installed')
 
 async function duplicateProfile() {
-	await duplicate(props.instance.path).catch(handleError)
+	await duplicate(instance.value.path).catch(handleError)
 	trackEvent('InstanceDuplicate', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
+		loader: instance.value.loader,
+		game_version: instance.value.game_version,
 	})
 }
 
@@ -52,7 +53,7 @@ const availableGroups = computed(() => [
 
 async function resetIcon() {
 	icon.value = undefined
-	await edit_icon(props.instance.path, null).catch(handleError)
+	await edit_icon(instance.value.path, null).catch(handleError)
 	trackEvent('InstanceRemoveIcon')
 }
 
@@ -70,7 +71,7 @@ async function setIcon() {
 	if (!value) return
 
 	icon.value = value
-	await edit_icon(props.instance.path, icon.value).catch(handleError)
+	await edit_icon(instance.value.path, icon.value).catch(handleError)
 
 	trackEvent('InstanceSetIcon')
 }
@@ -101,7 +102,7 @@ watch(
 	[title, groups, groups],
 	async () => {
 		if (removing.value) return
-		await edit(props.instance.path, editProfileObject.value).catch(handleError)
+		await edit(instance.value.path, editProfileObject.value).catch(handleError)
 	},
 	{ deep: true },
 )
@@ -109,11 +110,11 @@ watch(
 const removing = ref(false)
 async function removeProfile() {
 	removing.value = true
-	const path = props.instance.path
+	const path = instance.value.path
 
 	trackEvent('InstanceRemove', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
+		loader: instance.value.loader,
+		game_version: instance.value.game_version,
 	})
 
 	await router.push({ path: '/' })
@@ -197,45 +198,48 @@ const messages = defineMessages({
 <template>
 	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="removeProfile" />
 	<div class="block">
-		<div class="float-end ml-4 relative group">
-			<OverflowMenu
-				v-tooltip="formatMessage(messages.editIcon)"
-				class="bg-transparent border-none appearance-none p-0 m-0 cursor-pointer group-active:scale-95 transition-transform"
-				:options="[
-					{
-						id: 'select',
-						action: () => setIcon(),
-					},
-					{
-						id: 'remove',
-						color: 'danger',
-						action: () => resetIcon(),
-						shown: !!icon,
-					},
-				]"
-			>
-				<Avatar
-					:src="icon ? convertFileSrc(icon) : icon"
-					size="108px"
-					class="!border-4 group-hover:brightness-75"
-					:tint-by="props.instance.path"
-					no-shadow
-				/>
-				<div class="absolute top-0 right-0 m-2">
-					<div
-						class="p-2 m-0 text-primary flex items-center justify-center aspect-square bg-button-bg rounded-full border-button-border border-solid border-[1px] hovering-icon-shadow"
+		<div class="float-end ml-10 relative group w-fit">
+			<div class="flex flex-col gap-1">
+				<span class="text-lg font-semibold text-contrast">Icon</span>
+				<div class="group relative w-fit">
+					<OverflowMenu
+						v-tooltip="formatMessage(messages.editIcon)"
+						class="bg-transparent border-none appearance-none p-0 m-0 cursor-pointer group-active:scale-95 transition-transform"
+						:options="[
+							{
+								id: 'select',
+								action: () => setIcon(),
+							},
+							{
+								id: 'remove',
+								color: 'danger',
+								action: () => resetIcon(),
+								shown: !!icon,
+							},
+						]"
 					>
-						<EditIcon aria-hidden="true" class="h-4 w-4 text-primary" />
-					</div>
+						<Avatar
+							:src="icon ? convertFileSrc(icon) : icon"
+							size="108px"
+							class="transition-[filter] group-hover:brightness-75"
+							:tint-by="instance.path"
+							no-shadow
+						/>
+						<div
+							class="absolute top-0 h-full w-full flex items-center justify-center opacity-0 transition-all group-hover:opacity-100"
+						>
+							<EditIcon aria-hidden="true" class="h-10 w-10 text-primary" />
+						</div>
+						<template #select>
+							<UploadIcon />
+							{{ icon ? formatMessage(messages.replaceIcon) : formatMessage(messages.selectIcon) }}
+						</template>
+						<template #remove> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
+					</OverflowMenu>
 				</div>
-				<template #select>
-					<UploadIcon />
-					{{ icon ? formatMessage(messages.replaceIcon) : formatMessage(messages.selectIcon) }}
-				</template>
-				<template #remove> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
-			</OverflowMenu>
+			</div>
 		</div>
-		<label for="instance-name" class="m-0 mb-1 text-lg font-extrabold text-contrast block">
+		<label for="instance-name" class="m-0 text-lg font-semibold text-contrast block">
 			{{ formatMessage(messages.name) }}
 		</label>
 		<div class="flex">
@@ -248,76 +252,82 @@ const messages = defineMessages({
 			/>
 		</div>
 		<template v-if="instance.install_stage == 'installed'">
-			<div>
-				<h2
-					id="duplicate-instance-label"
-					class="m-0 mt-4 mb-1 text-lg font-extrabold text-contrast block"
-				>
+			<div class="flex flex-col gap-2.5 mt-6">
+				<h2 id="duplicate-instance-label" class="m-0 text-lg font-semibold text-contrast block">
 					{{ formatMessage(messages.duplicateInstance) }}
 				</h2>
-				<p class="m-0 mb-2">
+				<ButtonStyled>
+					<button
+						v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
+						aria-labelledby="duplicate-instance-label"
+						:disabled="installing"
+						class="w-max !shadow-none"
+						@click="duplicateProfile"
+					>
+						<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
+					</button>
+				</ButtonStyled>
+				<p class="m-0">
 					{{ formatMessage(messages.duplicateInstanceDescription) }}
 				</p>
 			</div>
-			<ButtonStyled>
+		</template>
+		<div class="flex flex-col gap-2.5 mt-6">
+			<h2 class="m-0 text-lg font-semibold text-contrast block">
+				{{ formatMessage(messages.libraryGroups) }}
+			</h2>
+
+			<div class="flex flex-col gap-1">
+				<Checkbox
+					v-for="group in availableGroups"
+					:key="group"
+					:model-value="groups.includes(group)"
+					:label="group"
+					@click="toggleGroup(group)"
+				/>
+				<div class="flex gap-2 items-center">
+					<StyledInput
+						v-model="newCategoryInput"
+						:placeholder="formatMessage(messages.libraryGroupsEnterName)"
+						class="w-full max-w-[300px]"
+						@submit="() => addCategory"
+					/>
+					<ButtonStyled>
+						<button class="w-fit !shadow-none" @click="() => addCategory()">
+							<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+			<p class="m-0">
+				{{ formatMessage(messages.libraryGroupsDescription) }}
+			</p>
+		</div>
+
+		<div class="flex flex-col gap-2.5 mt-6">
+			<h2 id="delete-instance-label" class="m-0 text-lg font-semibold text-contrast block">
+				{{ formatMessage(messages.deleteInstance) }}
+			</h2>
+			<ButtonStyled color="red">
 				<button
-					v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
-					aria-labelledby="duplicate-instance-label"
-					:disabled="installing"
-					@click="duplicateProfile"
+					aria-labelledby="delete-instance-label"
+					:disabled="removing"
+					class="w-fit !shadow-none"
+					@click="deleteConfirmModal.show()"
 				>
-					<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
+					<SpinnerIcon v-if="removing" class="animate-spin" />
+					<TrashIcon v-else />
+					{{
+						removing
+							? formatMessage(messages.deletingInstanceButton)
+							: formatMessage(messages.deleteInstanceButton)
+					}}
 				</button>
 			</ButtonStyled>
-		</template>
-		<h2 class="m-0 mt-4 mb-1 text-lg font-extrabold text-contrast block">
-			{{ formatMessage(messages.libraryGroups) }}
-		</h2>
-		<p class="m-0 mb-2">
-			{{ formatMessage(messages.libraryGroupsDescription) }}
-		</p>
-		<div class="flex flex-col gap-1">
-			<Checkbox
-				v-for="group in availableGroups"
-				:key="group"
-				:model-value="groups.includes(group)"
-				:label="group"
-				@click="toggleGroup(group)"
-			/>
-			<div class="flex gap-2 items-center">
-				<StyledInput
-					v-model="newCategoryInput"
-					:placeholder="formatMessage(messages.libraryGroupsEnterName)"
-					@submit="() => addCategory"
-				/>
-				<ButtonStyled>
-					<button class="w-fit" @click="() => addCategory()">
-						<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
-					</button>
-				</ButtonStyled>
-			</div>
+			<p class="m-0">
+				{{ formatMessage(messages.deleteInstanceDescription) }}
+			</p>
 		</div>
-		<h2 id="delete-instance-label" class="m-0 mt-4 mb-1 text-lg font-extrabold text-contrast block">
-			{{ formatMessage(messages.deleteInstance) }}
-		</h2>
-		<p class="m-0 mb-2">
-			{{ formatMessage(messages.deleteInstanceDescription) }}
-		</p>
-		<ButtonStyled color="red">
-			<button
-				aria-labelledby="delete-instance-label"
-				:disabled="removing"
-				@click="deleteConfirmModal.show()"
-			>
-				<SpinnerIcon v-if="removing" class="animate-spin" />
-				<TrashIcon v-else />
-				{{
-					removing
-						? formatMessage(messages.deletingInstanceButton)
-						: formatMessage(messages.deleteInstanceButton)
-				}}
-			</button>
-		</ButtonStyled>
 	</div>
 </template>
 <style scoped lang="scss">

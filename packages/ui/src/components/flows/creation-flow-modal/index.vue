@@ -5,7 +5,7 @@
 		:context="ctx"
 		:fade="fade"
 		disable-progress
-		@hide="$emit('hide')"
+		@hide="handleHide"
 	/>
 </template>
 
@@ -18,6 +18,7 @@ import {
 	createCreationFlowContext,
 	type CreationFlowContextValue,
 	type FlowType,
+	type LoaderManifestResolver,
 	type ModpackSearchResult,
 	provideCreationFlowContext,
 } from './creation-flow-context'
@@ -36,6 +37,7 @@ const props = withDefaults(
 		fade?: 'standard' | 'warning' | 'danger'
 		searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
 		getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
+		getLoaderManifest?: LoaderManifestResolver
 	}>(),
 	{
 		type: 'world',
@@ -75,18 +77,25 @@ const ctx = createCreationFlowContext(
 		onBack: props.onBack ?? undefined,
 		searchModpacks: props.searchModpacks,
 		getProjectVersions: props.getProjectVersions,
+		getLoaderManifest: props.getLoaderManifest,
 	},
 )
 provideCreationFlowContext(ctx)
 
 async function show() {
 	await ctx.reset()
+	void ctx.prefetchLoaderMetadata()
 	modal.value?.setStage(0)
 	modal.value?.show()
 }
 
 function hide() {
 	modal.value?.hide()
+}
+
+function handleHide() {
+	ctx.cancelBackup.value?.()
+	emit('hide')
 }
 
 defineExpose({ show, hide, ctx })

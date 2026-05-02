@@ -4,8 +4,10 @@ use eyre::Result;
 use futures::TryStreamExt;
 use heck::ToKebabCase;
 use itertools::Itertools;
+use regex::Regex;
 use std::collections::HashMap;
-use tracing::info;
+use std::sync::LazyLock;
+use tracing::{info, warn};
 
 use crate::database::PgPool;
 use crate::database::models::loader_fields::{
@@ -13,8 +15,8 @@ use crate::database::models::loader_fields::{
     VersionField,
 };
 use crate::database::models::{
-    DBProjectId, DBVersionId, LoaderFieldEnumId, LoaderFieldEnumValueId,
-    LoaderFieldId,
+    DBOrganizationId, DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
+    LoaderFieldEnumValueId, LoaderFieldId,
 };
 use crate::database::redis::RedisPool;
 use crate::models::exp;
@@ -24,6 +26,20 @@ use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
 use crate::search::UploadSearchProject;
 use crate::util::error::Context;
+
+fn normalize_for_search(s: &str) -> String {
+    static SPECIAL_CHARS_RE: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"[^a-zA-Z0-9-.\s]").expect("valid regex"));
+
+    SPECIAL_CHARS_RE.replace_all(s, "").to_kebab_case()
+}
+
+struct ProjectOwner {
+    username: String,
+    user_id: DBUserId,
+    org_name: Option<String>,
+    org_id: Option<DBOrganizationId>,
+}
 
 pub async fn index_local(
     pool: &PgPool,
@@ -162,9 +178,9 @@ pub async fn index_local(
 
     info!("Indexing local org owners!");
 
-    let mods_org_owners: DashMap<DBProjectId, String> = sqlx::query!(
+    let mods_org_owners: DashMap<DBProjectId, ProjectOwner> = sqlx::query!(
         "
-        SELECT m.id mod_id, u.username
+        SELECT m.id mod_id, u.username, u.id uid, o.name orgname, o.id oid
         FROM mods m
         INNER JOIN organizations o ON o.id = m.organization_id
         INNER JOIN team_members tm ON tm.is_owner = TRUE and tm.team_id = o.team_id
@@ -174,17 +190,22 @@ pub async fn index_local(
         &*project_ids,
     )
     .fetch(pool)
-    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, String>, m| {
-        acc.insert(DBProjectId(m.mod_id), m.username);
+    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, ProjectOwner>, m| {
+        acc.insert(DBProjectId(m.mod_id), ProjectOwner {
+			username: m.username,
+			user_id: DBUserId(m.uid),
+			org_name: Some(m.orgname),
+			org_id: Some(DBOrganizationId(m.oid)),
+		});
         async move { Ok(acc) }
     })
     .await?;
 
     info!("Indexing local team owners!");
 
-    let mods_team_owners: DashMap<DBProjectId, String> = sqlx::query!(
+    let mods_team_owners: DashMap<DBProjectId, ProjectOwner> = sqlx::query!(
         "
-        SELECT m.id mod_id, u.username
+        SELECT m.id mod_id, u.username, u.id uid
         FROM mods m
         INNER JOIN team_members tm ON tm.is_owner = TRUE and tm.team_id = m.team_id
         INNER JOIN users u ON u.id = tm.user_id
@@ -193,8 +214,13 @@ pub async fn index_local(
         &project_ids,
     )
     .fetch(pool)
-    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, String>, m| {
-        acc.insert(DBProjectId(m.mod_id), m.username);
+    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, ProjectOwner>, m| {
+        acc.insert(DBProjectId(m.mod_id), ProjectOwner {
+			username: m.username,
+			user_id: DBUserId(m.uid),
+			org_name: None,
+			org_id: None,
+		});
         async move { Ok(acc) }
     })
     .await?;
@@ -253,21 +279,24 @@ pub async fn index_local(
         if count % 1000 == 0 {
             info!("projects index prog: {count}/{total_len}");
         }
-
-        let owner =
-            if let Some((_, org_owner)) = mods_org_owners.remove(&project.id) {
-                org_owner
-            } else if let Some((_, team_owner)) =
-                mods_team_owners.remove(&project.id)
-            {
-                team_owner
-            } else {
-                println!(
-                    "org owner not found for project {} id: {}!",
-                    project.name, project.id.0
-                );
-                continue;
-            };
+        let Some((
+            _,
+            ProjectOwner {
+                username,
+                user_id,
+                org_name,
+                org_id,
+            },
+        )) = mods_org_owners
+            .remove(&project.id)
+            .or_else(|| mods_team_owners.remove(&project.id))
+        else {
+            warn!(
+                "org owner not found for project {} id: {}!",
+                project.name, project.id.0
+            );
+            continue;
+        };
 
         let license = match project.license.split(' ').next() {
             Some(license) => license.to_string(),
@@ -427,7 +456,7 @@ pub async fn index_local(
                     project_id: crate::models::ids::ProjectId::from(project.id)
                         .to_string(),
                     name: project.name.clone(),
-                    indexed_title: project.name.to_kebab_case(),
+                    indexed_name: normalize_for_search(&project.name),
                     summary: project.summary.clone(),
                     categories: categories.clone(),
                     display_categories: display_categories.clone(),
@@ -435,8 +464,13 @@ pub async fn index_local(
                     downloads: project.downloads,
                     log_downloads: (project.downloads.max(1) as f64).ln(),
                     icon_url: project.icon_url.clone(),
-                    author: owner.clone(),
-                    indexed_author: owner.to_kebab_case(),
+                    author: username.clone(),
+                    author_id: ariadne::ids::UserId::from(user_id).to_string(),
+                    organization: org_name.clone(),
+                    organization_id: org_id.map(|e| {
+                        crate::models::ids::OrganizationId::from(e).to_string()
+                    }),
+                    indexed_author: normalize_for_search(&username),
                     date_created: project.approved,
                     created_timestamp: project.approved.timestamp(),
                     date_modified: project.updated,
@@ -513,8 +547,8 @@ async fn index_versions(
     }
 
     let all_version_ids = versions
-        .iter()
-        .flat_map(|(_, version_ids)| version_ids.iter())
+        .values()
+        .flat_map(|version_ids| version_ids.iter())
         .map(|(version_id, _)| version_id.0)
         .collect::<Vec<i64>>();
 
@@ -613,4 +647,32 @@ async fn index_versions(
     }
 
     Ok(res_versions)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_normalize_for_search_removes_special_chars() {
+        assert_eq!(normalize_for_search("Xaero's Minimap"), "xaeros-minimap");
+        assert_eq!(normalize_for_search("JourneyMap"), "journey-map");
+        assert_eq!(normalize_for_search("journey-map"), "journey-map");
+        assert_eq!(normalize_for_search("SomeUserName"), "some-user-name");
+    }
+
+    #[test]
+    fn test_normalize_for_search_handles_whitespace() {
+        assert_eq!(
+            normalize_for_search("Some  Project  Name"),
+            "some-project-name"
+        );
+        assert_eq!(normalize_for_search("  padded  "), "padded");
+    }
+
+    #[test]
+    fn test_normalize_for_search_handles_numbers() {
+        assert_eq!(normalize_for_search("Project 123"), "project-123");
+        assert_eq!(normalize_for_search("Test 1.0"), "test-1-0");
+    }
 }

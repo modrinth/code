@@ -145,6 +145,56 @@ import { ServersManageContentPage } from '@modrinth/ui'
 </template>
 ```
 
+### Platform route shells: prefetch with `ensureQueryData`
+
+#### Wrapped layout: `ReadyTransition` and `useReadyState`
+
+Many wrapped pages wrap the main UI in [`ReadyTransition`](../../packages/ui/src/components/base/ReadyTransition.vue) with `:pending` driven by [`useReadyState`](../../packages/ui/src/composables/use-ready-state.ts) on the **primary** TanStack query (true only on the first load while that query has no cached data yet—background refetches stay “ready”). That avoids flashing empty content before data exists.
+
+```vue
+<!-- Conceptual: inside packages/ui wrapped layout -->
+<ReadyTransition :pending="readyPending">
+	<SomePageLayout />
+</ReadyTransition>
+```
+
+```ts
+const primaryQuery = useQuery({ /* ... */ })
+const readyPending = useReadyState(primaryQuery)
+// or useReadyState({ isLoading, data }) when not using the full query object
+```
+
+Shell prefetch (below) warms the cache so that on navigation the query often **already has data** when the layout mounts; `pending` stays false and `ReadyTransition` can skip the enter animation on that fast path (see `ReadyTransition` docs and stories).
+
+#### Rule: `ensureQueryData` in each platform route shell
+
+When a wrapped layout uses that pattern, the **thin platform page** that imports the layout must **prefetch the same primary query** in `<script setup>` so the cache is warm before the layout mounts and `ReadyTransition`/`useReadyState` behave as intended.
+
+**Rule:** For each primary `useQuery` in the wrapped layout that gates first paint (and thus `useReadyState` / `ReadyTransition`), the website and app route shells must call `queryClient.ensureQueryData` with the **same** `queryKey`, `queryFn`, and `staleTime` as that query. Wrap the call in `try/catch` and swallow errors so navigation does not fail during setup; the mounted layout’s `useQuery` still runs and surfaces errors to the user.
+
+```ts
+import { injectModrinthClient, injectModrinthServerContext, ServersManageFilesPage } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
+
+const client = injectModrinthClient()
+const { serverId } = injectModrinthServerContext()
+const queryClient = useQueryClient()
+
+try {
+	await queryClient.ensureQueryData({
+		queryKey: ['files', serverId, '/'],
+		queryFn: () => client.kyros.files_v0.listDirectory('/', 1, 2000),
+		staleTime: 30_000,
+	})
+} catch {
+	// Let the mounted layout’s useQuery surface errors; do not fail route setup.
+}
+```
+
+If a route parameter is required for the query (e.g. `worldId`), only call `ensureQueryData` when that value is present, matching the layout’s `enabled` logic.
+
+Duplicating the query definition in the shell is intentional until a shared query-options module exists; keep keys and fetchers aligned when editing the layout or the shell.
+
 A wrapped page may still compose shared layouts internally — for example, the hosting content page uses the shared `content-tab` layout, providing its own `ContentManagerContext` with web API calls.
 
 ## Composables

@@ -5,6 +5,42 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nie udało się połączyć się z serwerami uwierzytelniania"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Dodaj serwer do instancji"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Dodaj serwery do swojej instancji"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Dodaj do instancji"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Dodaj do {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Dodano"
+  },
+  "app.browse.already-added": {
+    "message": "Już dodano"
+  },
+  "app.browse.discover-content": {
+    "message": "Odkrywaj zawartość"
+  },
+  "app.browse.discover-servers": {
+    "message": "Odkryj serwery"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Ukryj dodane serwery"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Ukryj zainstalowane zasoby"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Zainstaluj zasoby do instancji"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Wprowadź opis paczki modów..."
+  },
   "app.export-modal.export-button": {
     "message": "Eksportuj"
   },
@@ -16,6 +52,102 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nazwa paczki modów"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Wybierz pliki i foldery, które mają znaleźć się w paczce"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Numer wersji"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i wszystkie zainstalowane treści."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Tej akcji nie można odwrócić"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Usuń instancję"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Usuń instancję"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Ta paczka modów jest już zainstalowana w instancji <bold>{instanceName}</bold>. Czy na pewno chcesz utworzyć duplikat?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Utwórz"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Paczka modów jest już zainstalowana"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instalacja"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projekt"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "Dodano \"{name}\""
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "Dodano {count} {count, plural, one {projekt} few {projekty} other {projektów}}"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Sprawdź projekty, które używam w mojej paczce modów!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Udostępnianie zawartości paczki modów"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Przesyłanie powiodło się"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Dodaj serwer"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Szukaj serwerów"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' zostanie **permanentnie usunięty** i nie ma możliwości go odzyskać."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Czy na pewno chcesz trwale usunąć ten świat?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Zmodowany"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Dodaj serwer lub szukaj, aby rozpocząć"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Nie dodano żadnych światów ani serwerów"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' zostanie usunięty z twojej listy, również z gry, i nie będzie możliwości go odzyskać."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) zostanie usunięty z twojej listy, również z gry, i nie będzie możliwości go odzyskać."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Czy jesteś pewny, że chcesz usunąć {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Szukaj wśród {count} światów..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "ten serwer"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Wymagane treści"
@@ -64,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Domyślne opcje instancji"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Flagi funkcji"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalacje Java"
@@ -121,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Załaduj ponownie, aby zainstalować aktualizację"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Wybierz opcję"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Niekompatybilna wersja {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Jeszcze nie grano"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Dodaj znajomego"
@@ -220,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "Edytuj świat"
+  },
+  "instance.files.adding-files": {
+    "message": "Dodawanie plików ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Zapisz jako..."
   },
   "instance.server-modal.address": {
     "message": "Adres"
@@ -392,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Nie pokazuj na stronie głównej"
   },
-  "instance.worlds.filter.available": {
-    "message": "Dostępny"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instancja jest już otwarta"
   },
@@ -418,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Zagraj"
-  },
-  "instance.worlds.type.server": {
-    "message": "Serwer"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Tryb jednoosobowy"
   },
   "instance.worlds.view_instance": {
     "message": "Zobacz instancję"

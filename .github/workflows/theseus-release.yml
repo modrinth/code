@@ -1,47 +1,68 @@
 name: Modrinth App release
 on:
-  workflow_dispatch:
-    inputs:
-      version-tag:
-        description: Version tag to release to the wide public
-        type: string
-        required: true
-      release-notes:
-        description: Release notes to include in the Tauri version manifest
-        default: A new release of the Modrinth App is available!
-        type: string
-        required: true
+  workflow_run:
+    workflows: ['Modrinth App build']
+    types: [completed]
 
 jobs:
   release:
     name: Release Modrinth App
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      startsWith(github.event.workflow_run.head_branch, 'v')
     runs-on: ubuntu-latest
 
     env:
+      VERSION_TAG: ${{ github.event.workflow_run.head_branch }}
       LINUX_X64_BUNDLE_ARTIFACT_NAME: App bundle (x86_64-unknown-linux-gnu)
       WINDOWS_X64_BUNDLE_ARTIFACT_NAME: App bundle (x86_64-pc-windows-msvc)
       MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME: App bundle (universal-apple-darwin)
       LAUNCHER_FILES_BUCKET_BASE_URL: https://launcher-files.modrinth.com
 
     steps:
+      - name: 📥 Check out code
+        uses: actions/checkout@v4
+
+      - name: 🔒 Verify ref is a tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          tag_sha=$(gh api "repos/${{ github.repository }}/git/refs/tags/${VERSION_TAG}" --jq '.object.sha' 2>/dev/null || true)
+          if [ -z "$tag_sha" ]; then
+            echo "::error::${VERSION_TAG} is not a git tag in this repo"
+            exit 1
+          fi
+          if [ "$tag_sha" != "$HEAD_SHA" ]; then
+            commit_sha=$(gh api "repos/${{ github.repository }}/git/tags/${tag_sha}" --jq '.object.sha' 2>/dev/null || echo "$tag_sha")
+            if [ "$commit_sha" != "$HEAD_SHA" ]; then
+              echo "::error::Tag ${VERSION_TAG} (${commit_sha}) does not match build head_sha (${HEAD_SHA})"
+              exit 1
+            fi
+          fi
+          echo "Verified ${VERSION_TAG} is a tag pointing at ${HEAD_SHA}"
+
       - name: 📥 Download Modrinth App artifacts
         uses: dawidd6/action-download-artifact@v11
         with:
           workflow: theseus-build.yml
           workflow_conclusion: success
           event: push
-          branch: ${{ inputs.version-tag }}
+          branch: ${{ env.VERSION_TAG }}
           use_unzip: true
 
-      - name: 🛠️ Generate version manifest
+      - name: 📝 Extract app changelog
         env:
-          VERSION_TAG: ${{ inputs.version-tag }}
-          RELEASE_NOTES: ${{ inputs.release-notes }}
+          VERSION: ${{ env.VERSION_TAG }}
+        run: npx --yes tsx scripts/build-theseus-release-notes.ts
+
+      - name: 🛠️ Generate version manifest
         run: |
           # Reference: https://tauri.app/plugin/updater/#server-support
           jq -nc \
             --arg versionTag "${VERSION_TAG#v}" \
-            --arg releaseNotes "$RELEASE_NOTES" \
+            --rawfile releaseNotes release-notes.md \
             --rawfile macOsAarch64UpdateArtifactSignature "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz.sig" \
             --rawfile macOsX64UpdateArtifactSignature "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz.sig" \
             --rawfile linuxX64UpdateArtifactSignature "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION_TAG#v}_amd64.AppImage.tar.gz.sig" \
@@ -83,7 +104,6 @@ jobs:
 
       - name: 📤 Upload release artifacts
         env:
-          VERSION_TAG: ${{ inputs.version-tag }}
           AWS_ACCESS_KEY_ID: ${{ secrets.LAUNCHER_FILES_BUCKET_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.LAUNCHER_FILES_BUCKET_SECRET_ACCESS_KEY }}
           AWS_BUCKET: ${{ secrets.LAUNCHER_FILES_BUCKET_NAME }}
@@ -116,3 +136,18 @@ jobs:
           done
 
           aws s3 cp updates.json "s3://${AWS_BUCKET}"
+
+      - name: 🏷️ Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${VERSION_TAG#v}"
+
+          gh release create "$VERSION_TAG" \
+            --title "Modrinth App ${VERSION}" \
+            --notes-file release-notes.md \
+            "${WINDOWS_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/nsis/Modrinth App_${VERSION}_x64-setup.exe" \
+            "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/dmg/Modrinth App_${VERSION}_universal.dmg" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION}_amd64.AppImage" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/deb/Modrinth App_${VERSION}_amd64.deb" \
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/rpm/Modrinth App-${VERSION}-1.x86_64.rpm"

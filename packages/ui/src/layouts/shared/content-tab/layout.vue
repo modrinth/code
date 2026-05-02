@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
 	ArrowDownAZIcon,
-	ArrowDownZAIcon,
+	ArrowUpZAIcon,
 	ClockArrowDownIcon,
 	ClockArrowUpIcon,
 	CodeIcon,
@@ -15,20 +15,16 @@ import {
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
-	SpinnerIcon,
 	TextCursorInputIcon,
 	TrashIcon,
-	UploadIcon,
 } from '@modrinth/assets'
-import { formatBytes, formatProjectType } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 
-import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
-import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -39,6 +35,7 @@ import ConfirmBulkUpdateModal from './components/modals/ConfirmBulkUpdateModal.v
 import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
 import {
+	getClientWarningType,
 	isClientOnlyEnvironment,
 	useBulkOperation,
 	useChangingItems,
@@ -50,6 +47,16 @@ import { injectContentManager } from './providers/content-manager'
 import type { ContentCardTableItem, ContentItem } from './types'
 
 const { formatMessage } = useVIntl()
+const debug = useDebugLogger('ContentPageLayout')
+
+const props = withDefaults(
+	defineProps<{
+		bottomPadding?: boolean
+	}>(),
+	{
+		bottomPadding: true,
+	},
+)
 
 const messages = defineMessages({
 	loadingContent: {
@@ -132,17 +139,9 @@ const messages = defineMessages({
 		id: 'content.page-layout.share.label',
 		defaultMessage: 'Share',
 	},
-	uploadingFiles: {
-		id: 'content.page-layout.uploading-files',
-		defaultMessage: 'Uploading files ({completed}/{total})',
-	},
 	sortByLabel: {
 		id: 'content.page-layout.sort.label',
 		defaultMessage: 'Sort by {mode}',
-	},
-	busyDescription: {
-		id: 'content.page-layout.busy-description',
-		defaultMessage: 'Please wait for the operation to complete before editing content.',
 	},
 	pleaseWait: {
 		id: 'content.page-layout.please-wait',
@@ -151,12 +150,6 @@ const messages = defineMessages({
 })
 
 const ctx = injectContentManager()
-
-const uploadOverallProgress = computed(() => {
-	const state = ctx.uploadState?.value
-	if (!state || !state.isUploading || state.totalFiles === 0) return 0
-	return Math.min((state.completedFiles + state.currentFileProgress) / state.totalFiles, 1)
-})
 
 type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
 const sortMode = ref<SortMode>('alphabetical-asc')
@@ -171,8 +164,8 @@ const sortLabels: Record<SortMode, () => string> = {
 function cycleSortMode() {
 	const modes: SortMode[] = [
 		'alphabetical-asc',
-		'date-added-newest',
 		'alphabetical-desc',
+		'date-added-newest',
 		'date-added-oldest',
 	]
 	const idx = modes.indexOf(sortMode.value)
@@ -226,16 +219,14 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 	{
 		showTypeFilters: true,
 		showUpdateFilter: ctx.hasUpdateSupport,
-		showClientOnlyFilter: ctx.showClientOnlyFilter ?? false,
+		showWarningsFilter: true,
 		isPackLocked: ctx.isPackLocked,
-		formatProjectType,
 		persistKey: ctx.filterPersistKey,
 	},
 )
 
 const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
 	ctx.items,
-	ctx.getItemId,
 )
 
 const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = useBulkOperation()
@@ -268,7 +259,7 @@ const filteredItems = computed(() => {
 	return applyFilters(searched)
 })
 const tableItems = computed<ContentCardTableItem[]>(() => {
-	return filteredItems.value.map((item) => {
+	const items = filteredItems.value.map((item) => {
 		const base = ctx.mapToTableItem(item)
 		return {
 			...base,
@@ -278,21 +269,52 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 				isBulkOperating.value ||
 				item.installing === true,
 			installing: item.installing === true,
-			hasUpdate: !ctx.isPackLocked.value && item.has_update,
-			isClientOnly: isClientOnlyEnvironment(item.environment),
+			hasUpdate: item.has_update,
+			isClientOnly:
+				isClientOnlyEnvironment(item.environment) ||
+				!!item.pack_client_retained ||
+				!!item.pack_client_depends,
+			clientWarning: getClientWarningType(item),
+			hideSwitchVersion: !base.versionLink,
 			overflowOptions: ctx.getOverflowOptions?.(item),
 		}
 	})
+
+	const updatable = items.filter((i) => i.hasUpdate)
+	if (updatable.length > 0) {
+		debug('tableItems: items with hasUpdate=true', {
+			count: updatable.length,
+			ids: updatable.map((i) => i.id),
+			isPackLocked: ctx.isPackLocked.value,
+		})
+	}
+
+	return items
 })
 
-const hasOutdatedProjects = computed(() => ctx.items.value.some((p) => p.has_update))
+const hasOutdatedProjects = computed(() => {
+	const outdated = ctx.items.value.filter((p) => p.has_update)
+	if (outdated.length > 0) {
+		debug('hasOutdatedProjects: raw items with has_update=true', {
+			count: outdated.length,
+			items: outdated.map((p) => ({
+				id: p.id,
+				fileName: p.file_name,
+				title: p.project?.title,
+				has_update: p.has_update,
+				update_version_id: p.update_version_id,
+			})),
+		})
+	}
+	return outdated.length > 0
+})
 
 //  Deletion
 const pendingDeletionItems = ref<ContentItem[]>([])
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
 
 function handleDeleteById(id: string, event?: MouseEvent) {
-	const item = ctx.items.value.find((i) => ctx.getItemId(i) === id)
+	const item = ctx.items.value.find((i) => i.id === id)
 	if (item) {
 		pendingDeletionItems.value = [item]
 		if (event?.shiftKey) {
@@ -334,7 +356,7 @@ async function confirmDelete() {
 
 	if (itemsToDelete.length === 1) {
 		const item = itemsToDelete[0]
-		const id = ctx.getItemId(item)
+		const id = item.id
 		markChanging(id)
 		await ctx.deleteItem(item)
 		removeFromSelection(id)
@@ -347,14 +369,14 @@ async function confirmDelete() {
 		itemsToDelete,
 		async (item) => {
 			await ctx.deleteItem(item)
-			removeFromSelection(ctx.getItemId(item))
+			removeFromSelection(item.id)
 		},
 		{ onComplete: clearSelection },
 	)
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
-	const item = ctx.items.value.find((i) => ctx.getItemId(i) === id)
+	const item = ctx.items.value.find((i) => i.id === id)
 	if (!item) return
 	markChanging(id)
 	try {
@@ -406,6 +428,13 @@ async function bulkDisable() {
 
 function handleUpdateById(id: string) {
 	ctx.updateItem?.(id)
+}
+
+function handleSwitchVersionById(id: string) {
+	const item = ctx.items.value.find((i) => i.id === id)
+	if (item) {
+		ctx.switchVersion?.(item)
+	}
 }
 
 // Bulk updating
@@ -464,304 +493,259 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 </script>
 
 <template>
-	<div class="flex flex-col gap-4 pb-6">
-		<div
-			v-if="ctx.loading.value"
-			role="status"
-			aria-live="polite"
-			class="flex min-h-[50vh] w-full flex-col items-center justify-center gap-2 text-center text-secondary"
-		>
-			<SpinnerIcon class="animate-spin" />
-			{{ formatMessage(messages.loadingContent) }}
-		</div>
-
-		<div
-			v-else-if="ctx.error.value"
-			class="flex w-full flex-col items-center justify-center gap-4 p-4"
-		>
-			<div class="universal-card flex flex-col items-center gap-4 p-6">
-				<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
-				<p class="text-secondary">{{ ctx.error.value.message }}</p>
-				<ButtonStyled color="brand">
-					<button @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</button>
-				</ButtonStyled>
-			</div>
-		</div>
-
-		<template v-else>
-			<Admonition v-if="ctx.isBusy.value && ctx.busyMessage?.value" type="warning">
-				<template #header>{{ ctx.busyMessage.value }}</template>
-				{{ formatMessage(messages.busyDescription) }}
-			</Admonition>
-
-			<ContentModpackCard
-				v-if="ctx.modpack.value"
-				:project="ctx.modpack.value.project"
-				:project-link="ctx.modpack.value.projectLink"
-				:version="ctx.modpack.value.version"
-				:version-link="ctx.modpack.value.versionLink"
-				:owner="ctx.modpack.value.owner"
-				:categories="ctx.modpack.value.categories"
-				:has-update="ctx.modpack.value.hasUpdate"
-				:disabled="ctx.modpack.value.disabled || ctx.isBusy.value"
-				:disabled-text="
-					ctx.modpack.value.disabledText ??
-					ctx.busyMessage?.value ??
-					(ctx.isBusy.value ? formatMessage(messages.pleaseWait) : undefined)
-				"
-				:show-content-hint="
-					!!(ctx.showContentHint?.value && ctx.modpack.value && ctx.items.value.length === 0)
-				"
-				v-on="{
-					...(ctx.updateModpack ? { update: () => ctx.updateModpack?.() } : {}),
-					...(ctx.viewModpackContent ? { content: () => ctx.viewModpackContent?.() } : {}),
-					...(ctx.unlinkModpack ? { unlink: () => confirmUnlinkModal?.show() } : {}),
-					...(ctx.openSettings ? { settings: () => ctx.openSettings?.() } : {}),
-				}"
-				@dismiss-content-hint="ctx.dismissContentHint?.()"
-			/>
-
-			<Transition
-				enter-active-class="transition-all duration-300 ease-out overflow-hidden"
-				enter-from-class="opacity-0 max-h-0"
-				enter-to-class="opacity-100 max-h-40"
-				leave-active-class="transition-all duration-200 ease-in overflow-hidden"
-				leave-from-class="opacity-100 max-h-40"
-				leave-to-class="opacity-0 max-h-0"
-				aria-live="polite"
+	<div class="flex flex-col gap-4" :class="{ 'pb-6': props.bottomPadding }">
+		<template v-if="!ctx.loading.value">
+			<div
+				v-if="ctx.error.value"
+				class="flex w-full flex-col items-center justify-center gap-4 p-4"
 			>
-				<Admonition v-if="ctx.uploadState?.value?.isUploading" type="info" show-actions-underneath>
-					<template #icon>
-						<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
-					</template>
-					<template #header>
+				<div class="universal-card flex flex-col items-center gap-4 p-6">
+					<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
+					<p class="text-secondary">{{ ctx.error.value.message }}</p>
+					<ButtonStyled color="brand">
+						<button @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</button>
+					</ButtonStyled>
+				</div>
+			</div>
+
+			<template v-else>
+				<ContentModpackCard
+					v-if="ctx.modpack.value"
+					:project="ctx.modpack.value.project"
+					:project-link="ctx.modpack.value.projectLink"
+					:version="ctx.modpack.value.version"
+					:version-link="ctx.modpack.value.versionLink"
+					:owner="ctx.modpack.value.owner"
+					:categories="ctx.modpack.value.categories"
+					:has-update="ctx.modpack.value.hasUpdate"
+					:disabled="ctx.modpack.value.disabled || ctx.isBusy.value"
+					:disabled-text="
+						ctx.modpack.value.disabledText ??
+						ctx.busyMessage?.value ??
+						(ctx.isBusy.value ? formatMessage(messages.pleaseWait) : undefined)
+					"
+					:show-content-hint="
+						!!(ctx.showContentHint?.value && ctx.modpack.value && ctx.items.value.length === 0)
+					"
+					v-on="{
+						...(ctx.updateModpack ? { update: () => ctx.updateModpack?.() } : {}),
+						...(ctx.viewModpackContent ? { content: () => ctx.viewModpackContent?.() } : {}),
+						...(ctx.unlinkModpack ? { unlink: () => confirmUnlinkModal?.show() } : {}),
+						...(ctx.openSettings ? { settings: () => ctx.openSettings?.() } : {}),
+					}"
+					@dismiss-content-hint="ctx.dismissContentHint?.()"
+				/>
+
+				<template v-if="ctx.items.value.length > 0">
+					<div class="flex flex-col gap-4">
+						<span v-if="ctx.modpack.value" class="text-xl font-semibold text-contrast">
+							{{ formatMessage(messages.additionalContent) }}
+						</span>
+
+						<div class="flex flex-wrap items-center gap-2">
+							<StyledInput
+								v-model="searchQuery"
+								:icon="SearchIcon"
+								type="text"
+								autocomplete="off"
+								:spellcheck="false"
+								input-class="!h-10"
+								wrapper-class="flex-1 min-w-0"
+								clearable
+								:placeholder="
+									formatMessage(messages.searchPlaceholder, {
+										count: tableItems.length,
+										contentType: `${ctx.contentTypeLabel.value}${tableItems.length === 1 ? '' : 's'}`,
+									})
+								"
+							/>
+
+							<div class="flex gap-2">
+								<ButtonStyled color="brand">
+									<button
+										v-tooltip="
+											ctx.busyMessage?.value ??
+											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+										"
+										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+										class="!h-10 flex items-center gap-2"
+										@click="ctx.browse"
+									>
+										<CompassIcon class="size-5" />
+										<span>{{ formatMessage(messages.browseContent) }}</span>
+									</button>
+								</ButtonStyled>
+								<ButtonStyled type="outlined">
+									<button
+										v-tooltip="
+											ctx.busyMessage?.value ??
+											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+										"
+										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+										class="!h-10 !border-button-bg !border-[1px]"
+										@click="ctx.uploadFiles"
+									>
+										<FolderOpenIcon class="size-5" />
+										{{ formatMessage(messages.uploadFiles) }}
+									</button>
+								</ButtonStyled>
+							</div>
+						</div>
+
+						<div class="@container flex flex-wrap items-center justify-between gap-2">
+							<div class="flex flex-wrap items-center gap-1.5">
+								<FilterIcon class="size-5 text-secondary" />
+								<button
+									class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+									:class="
+										selectedFilters.length === 0
+											? 'border-green bg-brand-highlight text-brand'
+											: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+									"
+									:aria-pressed="selectedFilters.length === 0"
+									@click="selectedFilters = []"
+								>
+									{{ formatMessage(commonMessages.allProjectType) }}
+								</button>
+								<button
+									v-for="option in filterOptions"
+									:key="option.id"
+									class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+									:class="
+										selectedFilters.includes(option.id)
+											? 'border-green bg-brand-highlight text-brand'
+											: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+									"
+									:aria-pressed="selectedFilters.includes(option.id)"
+									@click="toggleFilter(option.id)"
+								>
+									{{ option.label }}
+								</button>
+								<div class="hidden @[900px]:block">
+									<ButtonStyled type="transparent">
+										<button
+											:aria-label="
+												formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+											"
+											@click="cycleSortMode"
+										>
+											<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+												v-else-if="sortMode === 'date-added-newest'"
+											/><ClockArrowUpIcon
+												v-else-if="sortMode === 'date-added-oldest'"
+											/><ArrowDownAZIcon v-else />
+											{{ sortLabels[sortMode]() }}
+										</button>
+									</ButtonStyled>
+								</div>
+							</div>
+
+							<div class="flex items-center gap-2">
+								<div class="@[900px]:hidden">
+									<ButtonStyled type="transparent">
+										<button
+											:aria-label="
+												formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+											"
+											@click="cycleSortMode"
+										>
+											<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+												v-else-if="sortMode === 'date-added-newest'"
+											/><ClockArrowUpIcon
+												v-else-if="sortMode === 'date-added-oldest'"
+											/><ArrowDownAZIcon v-else />
+											{{ sortLabels[sortMode]() }}
+										</button>
+									</ButtonStyled>
+								</div>
+
+								<ButtonStyled
+									v-if="hasBulkUpdateSupport && hasOutdatedProjects"
+									color="green"
+									type="transparent"
+									color-fill="text"
+									hover-color-fill="background"
+								>
+									<button :disabled="isBulkOperating || ctx.isBusy.value" @click="promptUpdateAll">
+										<DownloadIcon />
+										{{ formatMessage(messages.updateAll) }}
+									</button>
+								</ButtonStyled>
+
+								<ButtonStyled type="transparent">
+									<button :disabled="refreshing || ctx.isBusy.value" @click="handleRefresh">
+										<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
+										{{ formatMessage(commonMessages.refreshButton) }}
+									</button>
+								</ButtonStyled>
+							</div>
+						</div>
+
+						<ContentCardTable
+							v-model:selected-ids="selectedIds"
+							:items="tableItems"
+							:show-selection="true"
+							@update:enabled="handleToggleEnabledById"
+							@delete="handleDeleteById"
+							@update="handleUpdateById"
+							@switch-version="handleSwitchVersionById"
+						>
+							<template #empty>
+								<span>{{ formatMessage(messages.noContentFound) }}</span>
+							</template>
+						</ContentCardTable>
+					</div>
+				</template>
+
+				<EmptyState v-else type="empty-inbox">
+					<template #heading>
 						{{
-							formatMessage(messages.uploadingFiles, {
-								completed: ctx.uploadState?.value?.completedFiles ?? 0,
-								total: ctx.uploadState?.value?.totalFiles ?? 0,
-							})
+							formatMessage(
+								ctx.modpack.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
+							)
 						}}
 					</template>
-					<span class="text-secondary">
-						{{ formatBytes(ctx.uploadState?.value?.uploadedBytes ?? 0) }}
-						/ {{ formatBytes(ctx.uploadState?.value?.totalBytes ?? 0) }} ({{
-							Math.round(uploadOverallProgress * 100)
-						}}%)
-					</span>
-					<template #actions>
-						<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
+					<template #description>
+						{{
+							ctx.modpack.value
+								? formatMessage(messages.emptyModpackHint)
+								: formatMessage(messages.emptyHint, {
+										contentType: `${ctx.contentTypeLabel.value}s`,
+									})
+						}}
 					</template>
-				</Admonition>
-			</Transition>
-
-			<template v-if="ctx.items.value.length > 0">
-				<div class="flex flex-col gap-4">
-					<span v-if="ctx.modpack.value" class="text-xl font-semibold text-contrast">
-						{{ formatMessage(messages.additionalContent) }}
-					</span>
-
-					<div class="flex flex-wrap items-center gap-2">
-						<StyledInput
-							v-model="searchQuery"
-							:icon="SearchIcon"
-							type="text"
-							autocomplete="off"
-							:spellcheck="false"
-							input-class="!h-10"
-							wrapper-class="flex-1 min-w-0"
-							clearable
-							:placeholder="
-								formatMessage(messages.searchPlaceholder, {
-									count: tableItems.length,
-									contentType: `${ctx.contentTypeLabel.value}${tableItems.length === 1 ? '' : 's'}`,
-								})
-							"
-						/>
-
-						<div class="flex gap-2">
-							<ButtonStyled color="brand">
-								<button
-									v-tooltip="
-										ctx.busyMessage?.value ??
-										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-									"
-									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-									class="!h-10 flex items-center gap-2"
-									@click="ctx.browse"
-								>
-									<CompassIcon class="size-5" />
-									<span>{{ formatMessage(messages.browseContent) }}</span>
-								</button>
-							</ButtonStyled>
-							<ButtonStyled type="outlined">
-								<button
-									v-tooltip="
-										ctx.busyMessage?.value ??
-										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-									"
-									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-									class="!h-10 !border-button-bg !border-[1px]"
-									@click="ctx.uploadFiles"
-								>
-									<FolderOpenIcon class="size-5" />
-									{{ formatMessage(messages.uploadFiles) }}
-								</button>
-							</ButtonStyled>
-						</div>
-					</div>
-
-					<div class="@container flex flex-wrap items-center justify-between gap-2">
-						<div class="flex flex-wrap items-center gap-1.5">
-							<FilterIcon class="size-5 text-secondary" />
+					<template #actions>
+						<ButtonStyled type="outlined">
 							<button
-								class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-								:class="
-									selectedFilters.length === 0
-										? 'border-green bg-brand-highlight text-brand'
-										: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+								v-tooltip="
+									ctx.busyMessage?.value ??
+									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 								"
-								:aria-pressed="selectedFilters.length === 0"
-								@click="selectedFilters = []"
+								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+								class="!h-10 !border-button-bg !border-[1px]"
+								@click="ctx.uploadFiles"
 							>
-								{{ formatMessage(commonMessages.allProjectType) }}
+								<FolderOpenIcon class="size-5" />
+								{{ formatMessage(messages.uploadFiles) }}
 							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
 							<button
-								v-for="option in filterOptions"
-								:key="option.id"
-								class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-								:class="
-									selectedFilters.includes(option.id)
-										? 'border-green bg-brand-highlight text-brand'
-										: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+								v-tooltip="
+									ctx.busyMessage?.value ??
+									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 								"
-								:aria-pressed="selectedFilters.includes(option.id)"
-								@click="toggleFilter(option.id)"
+								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+								class="!h-10 flex items-center gap-2"
+								@click="ctx.browse"
 							>
-								{{ option.label }}
+								<CompassIcon class="size-5" />
+								<span>{{ formatMessage(messages.browseContent) }}</span>
 							</button>
-							<div class="hidden @[900px]:block">
-								<ButtonStyled type="transparent" hover-color-fill="none">
-									<button
-										:aria-label="
-											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-										"
-										@click="cycleSortMode"
-									>
-										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-											v-else-if="sortMode === 'date-added-newest'"
-										/><ClockArrowUpIcon
-											v-else-if="sortMode === 'date-added-oldest'"
-										/><ArrowDownAZIcon v-else />
-										{{ sortLabels[sortMode]() }}
-									</button>
-								</ButtonStyled>
-							</div>
-						</div>
-
-						<div class="flex items-center gap-2">
-							<div class="@[900px]:hidden">
-								<ButtonStyled type="transparent" hover-color-fill="none">
-									<button
-										:aria-label="
-											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-										"
-										@click="cycleSortMode"
-									>
-										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-											v-else-if="sortMode === 'date-added-newest'"
-										/><ClockArrowUpIcon
-											v-else-if="sortMode === 'date-added-oldest'"
-										/><ArrowDownAZIcon v-else />
-										{{ sortLabels[sortMode]() }}
-									</button>
-								</ButtonStyled>
-							</div>
-
-							<ButtonStyled
-								v-if="hasBulkUpdateSupport && !ctx.isPackLocked.value && hasOutdatedProjects"
-								color="green"
-								type="transparent"
-								color-fill="text"
-								hover-color-fill="background"
-							>
-								<button :disabled="isBulkOperating || ctx.isBusy.value" @click="promptUpdateAll">
-									<DownloadIcon />
-									{{ formatMessage(messages.updateAll) }}
-								</button>
-							</ButtonStyled>
-
-							<ButtonStyled type="transparent" hover-color-fill="none">
-								<button :disabled="refreshing || ctx.isBusy.value" @click="handleRefresh">
-									<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
-									{{ formatMessage(commonMessages.refreshButton) }}
-								</button>
-							</ButtonStyled>
-						</div>
-					</div>
-
-					<ContentCardTable
-						v-model:selected-ids="selectedIds"
-						:items="tableItems"
-						:show-selection="true"
-						@update:enabled="handleToggleEnabledById"
-						@delete="handleDeleteById"
-						@update="handleUpdateById"
-					>
-						<template #empty>
-							<span>{{ formatMessage(messages.noContentFound) }}</span>
-						</template>
-					</ContentCardTable>
-				</div>
+						</ButtonStyled>
+					</template>
+				</EmptyState>
 			</template>
-
-			<EmptyState v-else type="empty-inbox">
-				<template #heading>
-					{{
-						formatMessage(
-							ctx.modpack.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
-						)
-					}}
-				</template>
-				<template #description>
-					{{
-						ctx.modpack.value
-							? formatMessage(messages.emptyModpackHint)
-							: formatMessage(messages.emptyHint, {
-									contentType: `${ctx.contentTypeLabel.value}s`,
-								})
-					}}
-				</template>
-				<template #actions>
-					<ButtonStyled type="outlined">
-						<button
-							v-tooltip="
-								ctx.busyMessage?.value ??
-								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-							"
-							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-							class="!h-10 !border-button-bg !border-[1px]"
-							@click="ctx.uploadFiles"
-						>
-							<FolderOpenIcon class="size-5" />
-							{{ formatMessage(messages.uploadFiles) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button
-							v-tooltip="
-								ctx.busyMessage?.value ??
-								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-							"
-							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-							class="!h-10 flex items-center gap-2"
-							@click="ctx.browse"
-						>
-							<CompassIcon class="size-5" />
-							<span>{{ formatMessage(messages.browseContent) }}</span>
-						</button>
-					</ButtonStyled>
-				</template>
-			</EmptyState>
 		</template>
 
 		<ContentSelectionBar
@@ -780,19 +764,19 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		>
 			<template #actions>
 				<ButtonStyled
-					v-if="
-						hasBulkUpdateSupport &&
-						!ctx.isPackLocked.value &&
-						selectedItems.some((m) => m.has_update)
-					"
+					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update)"
 					type="transparent"
 					color="green"
 					color-fill="text"
 					hover-color-fill="background"
 				>
-					<button :disabled="ctx.isBusy.value" @click="promptUpdateSelected">
+					<button
+						v-tooltip="formatMessage(commonMessages.updateButton)"
+						:disabled="ctx.isBusy.value"
+						@click="promptUpdateSelected"
+					>
 						<DownloadIcon />
-						{{ formatMessage(commonMessages.updateButton) }}
+						<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
 					</button>
 				</ButtonStyled>
 
@@ -818,7 +802,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						]"
 					>
 						<ShareIcon />
-						{{ formatMessage(messages.share) }}
+						<span class="bar-label">{{ formatMessage(messages.share) }}</span>
 						<DropdownIcon />
 						<template #share-names>
 							<TextCursorInputIcon />
@@ -849,9 +833,13 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					color-fill="text"
 					hover-color-fill="background"
 				>
-					<button :disabled="ctx.isBusy.value" @click="showBulkDeleteModal">
+					<button
+						v-tooltip="formatMessage(commonMessages.deleteLabel)"
+						:disabled="ctx.isBusy.value"
+						@click="showBulkDeleteModal"
+					>
 						<TrashIcon />
-						{{ formatMessage(commonMessages.deleteLabel) }}
+						<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
 					</button>
 				</ButtonStyled>
 			</template>
@@ -862,6 +850,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
 			:variant="ctx.deletionContext ?? 'instance'"
+			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal
@@ -875,6 +864,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			v-if="ctx.unlinkModpack"
 			ref="confirmUnlinkModal"
 			:server="ctx.deletionContext === 'server'"
+			:backup-tip="ctx.modpack.value?.project.title"
 			@unlink="ctx.unlinkModpack!()"
 		/>
 

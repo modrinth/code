@@ -68,6 +68,10 @@ CSS custom properties are defined in `packages/assets/styles/variables.scss` wit
 
 **Color palette** (each with shades 50–950): red, orange, green, blue, purple, gray. Platform-specific colors also exist (fabric, forge, quilt, neoforge, etc.).
 
+## Storybook
+
+When modifying a component in `src/components/`, you must also update its corresponding Storybook story in `src/stories/` to reflect the changes. If a story file doesn't exist yet, create one. Stories should cover the component's key states and variants.
+
 ## Dependency Injection
 
 This package defines the DI layer using `createContext` from `src/providers/index.ts`. See the `dependency-injection` skill (`.claude/skills/dependency-injection/SKILL.md`) for full documentation.
@@ -76,3 +80,17 @@ Key providers exported from this package:
 
 - `provideModrinthClient` / `injectModrinthClient` — API client
 - `provideNotificationManager` / `injectNotificationManager` — Notifications
+
+## Vue Template Rules
+
+### Multi-statement event handlers
+
+Never use newline-separated statements in Vue template event handlers like `@click`. Vue's template compiler cannot parse multi-line expressions separated only by newlines. Always use semicolons on a single line:
+
+```vue
+<!-- BAD: will cause "Unexpected token" parse error -->
+@click=" foo = true $emit('bar') "
+
+<!-- GOOD -->
+@click="foo = true; $emit('bar')"
+```

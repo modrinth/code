@@ -8,7 +8,7 @@
 				<NavStack
 					:items="
 						[
-							{ type: 'heading', label: 'Display' },
+							{ type: 'heading', label: formatMessage(messages.display) },
 							{
 								link: '/settings',
 								label: formatMessage(commonSettingsMessages.appearance),
@@ -20,7 +20,14 @@
 								icon: LanguagesIcon,
 								badge: `${formatMessage(commonMessages.beta)}`,
 							},
-							auth.user ? { type: 'heading', label: 'Account' } : null,
+							flags.developerMode
+								? {
+										link: '/settings/flags',
+										label: formatMessage(commonSettingsMessages.featureFlags),
+										icon: ToggleRightIcon,
+									}
+								: null,
+							auth.user ? { type: 'heading', label: formatMessage(messages.account) } : null,
 							auth.user
 								? {
 										link: '/settings/profile',
@@ -56,7 +63,7 @@
 										icon: CardIcon,
 									}
 								: null,
-							auth.user ? { type: 'heading', label: 'Developer' } : null,
+							auth.user ? { type: 'heading', label: formatMessage(messages.developer) } : null,
 							auth.user
 								? {
 										link: '/settings/pats',
@@ -91,16 +98,33 @@ import {
 	PaintbrushIcon,
 	ServerIcon,
 	ShieldIcon,
+	ToggleRightIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import { commonMessages, commonSettingsMessages, useVIntl } from '@modrinth/ui'
+import { commonMessages, commonSettingsMessages, defineMessages, useVIntl } from '@modrinth/ui'
 
 import NavStack from '~/components/ui/NavStack.vue'
 
 const { formatMessage } = useVIntl()
 
+const messages = defineMessages({
+	display: {
+		id: 'settings.sidebar.label.display',
+		defaultMessage: 'Display',
+	},
+	account: {
+		id: 'settings.sidebar.label.account',
+		defaultMessage: 'Account',
+	},
+	developer: {
+		id: 'settings.sidebar.label.developer',
+		defaultMessage: 'Developer',
+	},
+})
+
 const route = useNativeRoute()
 const auth = await useAuth()
+const flags = useFeatureFlags()
 
 useSeoMeta({
 	robots: 'noindex',

@@ -2,19 +2,21 @@
 	<div class="flex flex-col gap-2">
 		<!-- Header -->
 		<div class="flex items-center justify-between">
-			<span class="font-semibold text-contrast">Launcher instances</span>
+			<span class="font-semibold text-contrast">{{
+				formatMessage(messages.launcherInstancesTitle)
+			}}</span>
 			<ButtonStyled
 				type="transparent"
 				size="small"
 				:class="{ invisible: totalSelectedCount === 0 }"
 			>
-				<button @click="clearAll">Clear all</button>
+				<button @click="clearAll">{{ formatMessage(messages.clearAll) }}</button>
 			</ButtonStyled>
 		</div>
 
 		<template v-if="loading">
 			<div class="flex items-center justify-center py-8 text-secondary text-sm">
-				Detecting launcher instances...
+				{{ formatMessage(messages.detectingLauncherInstances) }}
 			</div>
 		</template>
 		<template v-else>
@@ -23,7 +25,7 @@
 				v-if="ctx.importLaunchers.value.length > 0"
 				v-model="ctx.importSearchQuery.value"
 				:icon="SearchIcon"
-				placeholder="Search instance name"
+				:placeholder="formatMessage(messages.searchInstanceNamePlaceholder)"
 			/>
 
 			<!-- Launcher sections -->
@@ -75,7 +77,9 @@
 			<!-- Add launcher path -->
 			<div v-if="!showAddPath">
 				<ButtonStyled>
-					<button class="w-full !shadow-none" @click="showAddPath = true">Add launcher path</button>
+					<button class="w-full !shadow-none" @click="showAddPath = true">
+						{{ formatMessage(messages.addLauncherPath) }}
+					</button>
 				</ButtonStyled>
 			</div>
 			<div v-else class="flex items-center gap-2">
@@ -83,10 +87,14 @@
 					><button class="!shadow-none" @click="browseForLauncherPath">
 						<FolderSearchIcon class="size-5" /></button
 				></ButtonStyled>
-				<StyledInput v-model="newLauncherPath" placeholder="Path to launcher..." class="flex-1" />
+				<StyledInput
+					v-model="newLauncherPath"
+					:placeholder="formatMessage(messages.launcherPathPlaceholder)"
+					class="flex-1"
+				/>
 				<ButtonStyled>
 					<button class="!shadow-none" :disabled="!newLauncherPath.trim()" @click="addLauncherPath">
-						Add
+						{{ formatMessage(messages.add) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -96,9 +104,10 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, FolderSearchIcon, SearchIcon } from '@modrinth/assets'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 
-import { injectInstanceImport } from '../../../../providers'
+import { injectInstanceImport, injectNotificationManager } from '../../../../providers'
 import type { ImportableLauncher } from '../../../../providers/instance-import'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Checkbox from '../../../base/Checkbox.vue'
@@ -108,12 +117,57 @@ import { injectCreationFlowContext } from '../creation-flow-context'
 
 const ctx = injectCreationFlowContext()
 const importProvider = injectInstanceImport()
+const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 
 const loading = ref(false)
 const expandedLaunchers = ref(new Set<string>())
 const expandedBeforeSearch = ref<Set<string> | null>(null)
 const showAddPath = ref(false)
 const newLauncherPath = ref('')
+
+const messages = defineMessages({
+	launcherInstancesTitle: {
+		id: 'creation-flow.modal.import-instance.launcher-instances.title',
+		defaultMessage: 'Launcher instances',
+	},
+	clearAll: {
+		id: 'creation-flow.modal.import-instance.selection.clear-all',
+		defaultMessage: 'Clear all',
+	},
+	detectingLauncherInstances: {
+		id: 'creation-flow.modal.import-instance.detecting-launcher-instances',
+		defaultMessage: 'Detecting launcher instances...',
+	},
+	searchInstanceNamePlaceholder: {
+		id: 'creation-flow.modal.import-instance.search.placeholder',
+		defaultMessage: 'Search instance name',
+	},
+	addLauncherPath: {
+		id: 'creation-flow.modal.import-instance.launcher-path.add',
+		defaultMessage: 'Add launcher path',
+	},
+	launcherPathPlaceholder: {
+		id: 'creation-flow.modal.import-instance.launcher-path.placeholder',
+		defaultMessage: 'Path to launcher...',
+	},
+	add: {
+		id: 'creation-flow.modal.import-instance.action.add',
+		defaultMessage: 'Add',
+	},
+	noInstancesFoundTitle: {
+		id: 'creation-flow.modal.import-instance.notification.no-instances-found.title',
+		defaultMessage: 'No instances found',
+	},
+	noInstancesFoundText: {
+		id: 'creation-flow.modal.import-instance.notification.no-instances-found.text',
+		defaultMessage: 'No importable instances were found at the specified path.',
+	},
+	customLauncherName: {
+		id: 'creation-flow.modal.import-instance.custom-launcher.name',
+		defaultMessage: 'Custom ({pathName})',
+	},
+})
 
 // Load detected launchers on mount
 onMounted(async () => {
@@ -257,8 +311,18 @@ async function addLauncherPath() {
 
 	try {
 		const instances = await importProvider.getImportableInstances('Custom', path)
+		if (instances.length === 0) {
+			addNotification({
+				type: 'error',
+				title: formatMessage(messages.noInstancesFoundTitle),
+				text: formatMessage(messages.noInstancesFoundText),
+			})
+			return
+		}
 		const launcher: ImportableLauncher = {
-			name: `Custom (${path.split(/[\\/]/).pop() || path})`,
+			name: formatMessage(messages.customLauncherName, {
+				pathName: path.split(/[\\/]/).pop() || path,
+			}),
 			path,
 			instances,
 		}
@@ -266,13 +330,12 @@ async function addLauncherPath() {
 		expandedLaunchers.value.add(launcher.name)
 		expandedLaunchers.value = new Set(expandedLaunchers.value)
 	} catch {
-		// Failed to load — still add with empty instances
-		const launcher: ImportableLauncher = {
-			name: `Custom (${path.split(/[\\/]/).pop() || path})`,
-			path,
-			instances: [],
-		}
-		ctx.importLaunchers.value = [...ctx.importLaunchers.value, launcher]
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.noInstancesFoundTitle),
+			text: formatMessage(messages.noInstancesFoundText),
+		})
+		return
 	}
 
 	newLauncherPath.value = ''

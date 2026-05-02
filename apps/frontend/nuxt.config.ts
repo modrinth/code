@@ -115,7 +115,7 @@ export default defineNuxtConfig({
 				await import('./src/templates/docs/index.ts').then((m) => m.default),
 			)
 			const blogArticles = await import('@modrinth/blog').then((m) => m.articles)
-			const { getChangelog } = await import('@modrinth/utils')
+			const { getChangelog } = await import('@modrinth/blog')
 
 			nitroConfig.prerender = nitroConfig.prerender || {}
 			nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
@@ -207,10 +207,19 @@ export default defineNuxtConfig({
 		// @ts-ignore
 		rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
 		pyroBaseUrl: process.env.PYRO_BASE_URL,
+		intercomIdentitySecret:
+			process.env.INTERCOM_IDENTITY_SECRET ??
+			// @ts-ignore
+			globalThis.INTERCOM_IDENTITY_SECRET,
 		public: {
 			apiBaseUrl: getApiUrl(),
 			pyroBaseUrl: process.env.PYRO_BASE_URL,
 			siteUrl: getDomain(),
+			intercomAppId:
+				process.env.INTERCOM_APP_ID ||
+				// @ts-ignore
+				globalThis.INTERCOM_APP_ID ||
+				'ykeritl9',
 			production: isProduction(),
 			buildEnv: process.env.BUILD_ENV,
 			preview: process.env.PREVIEW === 'true',
@@ -249,7 +258,6 @@ export default defineNuxtConfig({
 		},
 	},
 	modules: [
-		'@pinia/nuxt',
 		'floating-vue/nuxt',
 		// Sentry causes rollup-plugin-inject errors in dev, only enable in production
 		...(isProduction() ? ['@sentry/nuxt/module'] : []),

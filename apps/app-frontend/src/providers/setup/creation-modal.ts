@@ -1,18 +1,54 @@
-import type { AbstractWebNotificationManager, CreationFlowContextValue } from '@modrinth/ui'
-import { provide, useTemplateRef } from 'vue'
+import type {
+	AbstractPopupNotificationManager,
+	AbstractWebNotificationManager,
+	CreationFlowContextValue,
+	CreationFlowModal,
+} from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@modrinth/ui'
+import { provide, ref, useTemplateRef } from 'vue'
+import type { ComponentExposed } from 'vue-component-type-helpers'
 import { useRouter } from 'vue-router'
 
+import type UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
+import type ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
+import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
 import { create_profile_and_install, create_profile_and_install_from_file } from '@/helpers/pack'
 import { create, list } from '@/helpers/profile.js'
+import type { InstanceLoader } from '@/helpers/types'
 
-export function setupCreationModal(notificationManager: AbstractWebNotificationManager) {
+export function setupCreationModal(
+	notificationManager: AbstractWebNotificationManager,
+	popupNotificationManager: AbstractPopupNotificationManager,
+) {
 	const { handleError } = notificationManager
+	const { formatMessage } = useVIntl()
 	const router = useRouter()
 
-	const installationModal = useTemplateRef('installationModal')
+	const messages = defineMessages({
+		installingModpackTitle: {
+			id: 'app.creation-modal.installing-modpack.title',
+			defaultMessage: 'Installing modpack...',
+		},
+		installingModpackDescription: {
+			id: 'app.creation-modal.installing-modpack.description',
+			defaultMessage: '{fileName}',
+		},
+	})
+
+	const installationModal =
+		useTemplateRef<ComponentExposed<typeof CreationFlowModal>>('installationModal')
+	const unknownPackWarningModal =
+		useTemplateRef<InstanceType<typeof UnknownPackWarningModal>>('unknownPackWarningModal')
+	const modpackAlreadyInstalledModal = ref<InstanceType<typeof ModpackAlreadyInstalledModal>>()
+
+	function setModpackAlreadyInstalledModal(
+		modal: InstanceType<typeof ModpackAlreadyInstalledModal>,
+	) {
+		modpackAlreadyInstalledModal.value = modal
+	}
 
 	async function fetchExistingInstanceNames(): Promise<string[]> {
 		const instances = await list().catch(handleError)
@@ -23,10 +59,34 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 		installationModal.value?.show()
 	})
 
-	async function handleCreate(config: CreationFlowContextValue) {
-		installationModal.value?.hide()
+	async function proceedWithModpackCreation(
+		projectId: string,
+		versionId: string,
+		name: string,
+		iconUrl?: string,
+	) {
+		await create_profile_and_install(projectId, versionId, name, iconUrl).catch(handleError)
+		trackEvent('InstanceCreate', { source: 'CreationModalModpack' })
+	}
 
+	async function handleCreate(config: CreationFlowContextValue) {
 		try {
+			if (config.modpackSelection.value) {
+				const { projectId, versionId, name, iconUrl } = config.modpackSelection.value
+
+				const instances = await list().catch(handleError)
+				const existingInstance = instances?.find((i) => i.linked_data?.project_id === projectId)
+
+				if (existingInstance) {
+					pendingModpackCreation.value = { projectId, versionId, name, iconUrl }
+					installationModal.value?.hide()
+					modpackAlreadyInstalledModal.value?.show(existingInstance.name, existingInstance.path)
+					return
+				}
+			}
+
+			installationModal.value?.hide()
+
 			if (config.isImportMode.value) {
 				for (const [launcherName, instanceSet] of Object.entries(
 					config.importSelectedInstances.value,
@@ -43,13 +103,29 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 
 			if (config.modpackSelection.value) {
 				const { projectId, versionId, name, iconUrl } = config.modpackSelection.value
-				await create_profile_and_install(projectId, versionId, name, iconUrl).catch(handleError)
-				trackEvent('InstanceCreate', { source: 'CreationModalModpack' })
+				await proceedWithModpackCreation(projectId, versionId, name, iconUrl)
 				return
 			}
 
 			if (config.modpackFilePath.value) {
-				await create_profile_and_install_from_file(config.modpackFilePath.value).catch(handleError)
+				const waitingNotification = popupNotificationManager.addPopupNotification({
+					title: formatMessage(messages.installingModpackTitle),
+					text: formatMessage(messages.installingModpackDescription, {
+						fileName: config.modpackFilePath.value.split('/').pop() ?? config.modpackFilePath.value,
+					}),
+					type: 'info',
+					autoCloseMs: null,
+					waiting: true,
+				})
+
+				await create_profile_and_install_from_file(
+					config.modpackFilePath.value,
+					(createProfile, fileName) => {
+						popupNotificationManager.removeNotification(waitingNotification.id)
+						unknownPackWarningModal.value?.show(createProfile, fileName)
+					},
+				).catch(handleError)
+				popupNotificationManager.removeNotification(waitingNotification.id)
 				trackEvent('InstanceCreate', { source: 'CreationModalModpackFile' })
 				return
 			}
@@ -66,24 +142,38 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 
 			await create(
 				name,
-				config.selectedGameVersion.value,
-				loader,
+				config.selectedGameVersion.value!,
+				loader as InstanceLoader,
 				loaderVersion,
 				iconPath,
 				false,
 			).catch(handleError)
 
 			trackEvent('InstanceCreate', {
-				profile_name: name,
-				game_version: config.selectedGameVersion.value,
-				loader,
-				loader_version: loaderVersion,
-				has_icon: !!iconPath,
 				source: 'CreationModal',
 			})
 		} catch (err) {
-			handleError(err)
+			handleError(err as Error)
 		}
+	}
+
+	const pendingModpackCreation = ref<{
+		projectId: string
+		versionId: string
+		name: string
+		iconUrl?: string
+	} | null>(null)
+
+	async function handleModpackDuplicateCreateAnyway() {
+		if (!pendingModpackCreation.value) return
+		const { projectId, versionId, name, iconUrl } = pendingModpackCreation.value
+		pendingModpackCreation.value = null
+		await proceedWithModpackCreation(projectId, versionId, name, iconUrl)
+	}
+
+	function handleModpackDuplicateGoToInstance(instancePath: string) {
+		pendingModpackCreation.value = null
+		router.push(`/instance/${encodeURIComponent(instancePath)}/`)
 	}
 
 	function handleBrowseModpacks() {
@@ -108,10 +198,15 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 
 	return {
 		installationModal,
+		unknownPackWarningModal,
 		fetchExistingInstanceNames,
 		handleCreate,
 		handleBrowseModpacks,
 		searchModpacks,
 		getProjectVersions,
+		getLoaderManifest,
+		setModpackAlreadyInstalledModal,
+		handleModpackDuplicateCreateAnyway,
+		handleModpackDuplicateGoToInstance,
 	}
 }

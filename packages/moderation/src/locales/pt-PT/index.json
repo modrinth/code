@@ -173,6 +173,9 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpa o nome"
   },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Seleciona etiquetas precisas"
+  },
   "nags.too-many-tags.description": {
     "defaultMessage": "Selecionaste {tagCount, plural, one {# etiqueta} other {# etiquetas}}. Considera reduzi-las para {maxTagCount} ou menos para garantir que o teu projeto apareça em resultados de pesquisa relevantes."
   },

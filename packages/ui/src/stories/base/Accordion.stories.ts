@@ -156,6 +156,35 @@ export const NestedContent: StoryObj = {
 	}),
 }
 
+export const Divider: StoryObj = {
+	render: () => ({
+		components: { Accordion },
+		template: /*html*/ `
+			<div class="flex flex-col gap-4">
+				<Accordion divider open-by-default>
+					<template #title>
+						<span class="text-base font-semibold text-contrast">Category A</span>
+					</template>
+					<div class="mt-2 flex flex-wrap gap-2">
+						<span class="px-3 py-2 bg-bg-raised rounded text-sm">Item 1</span>
+						<span class="px-3 py-2 bg-bg-raised rounded text-sm">Item 2</span>
+						<span class="px-3 py-2 bg-bg-raised rounded text-sm">Item 3</span>
+					</div>
+				</Accordion>
+				<Accordion divider>
+					<template #title>
+						<span class="text-base font-semibold text-contrast">Category B</span>
+					</template>
+					<div class="mt-2 flex flex-wrap gap-2">
+						<span class="px-3 py-2 bg-bg-raised rounded text-sm">Item 4</span>
+						<span class="px-3 py-2 bg-bg-raised rounded text-sm">Item 5</span>
+					</div>
+				</Accordion>
+			</div>
+		`,
+	}),
+}
+
 export const AllStates: StoryObj = {
 	render: () => ({
 		components: { Accordion },

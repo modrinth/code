@@ -11,24 +11,25 @@ import { computed, type Ref, ref, watch } from 'vue'
 
 import { edit } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
+import { injectInstanceSettings } from '@/providers/instance-settings'
 
-import type { AppSettings, InstanceSettingsTabProps } from '../../../helpers/types'
+import type { AppSettings } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
-const props = defineProps<InstanceSettingsTabProps>()
+const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
 const overrideWindowSettings = ref(
-	!!props.instance.game_resolution || !!props.instance.force_fullscreen,
+	!!instance.value.game_resolution || !!instance.value.force_fullscreen,
 )
 const resolution: Ref<[number, number]> = ref(
-	props.instance.game_resolution ?? (globalSettings.game_resolution.slice() as [number, number]),
+	instance.value.game_resolution ?? (globalSettings.game_resolution.slice() as [number, number]),
 )
 const fullscreenSetting: Ref<boolean> = ref(
-	props.instance.force_fullscreen ?? globalSettings.force_fullscreen,
+	instance.value.force_fullscreen ?? globalSettings.force_fullscreen,
 )
 
 const editProfileObject = computed(() => {
@@ -47,7 +48,7 @@ const editProfileObject = computed(() => {
 watch(
 	[overrideWindowSettings, resolution, fullscreenSetting],
 	async () => {
-		await edit(props.instance.path, editProfileObject.value)
+		await edit(instance.value.path, editProfileObject.value)
 	},
 	{ deep: true },
 )
@@ -93,14 +94,14 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<div>
+	<div class="flex flex-col gap-6">
 		<Checkbox
 			v-model="overrideWindowSettings"
 			:label="formatMessage(messages.customWindowSettings)"
 		/>
-		<div class="mt-2 flex items-center gap-4 justify-between">
-			<div>
-				<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.fullscreen) }}
 				</h2>
 				<p class="m-0">
@@ -119,9 +120,9 @@ const messages = defineMessages({
 			/>
 		</div>
 
-		<div class="mt-4 flex items-center gap-4 justify-between">
-			<div>
-				<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.width) }}
 				</h2>
 				<p class="m-0">
@@ -138,9 +139,9 @@ const messages = defineMessages({
 			/>
 		</div>
 
-		<div class="mt-4 flex items-center gap-4 justify-between">
-			<div>
-				<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.height) }}
 				</h2>
 				<p class="m-0">

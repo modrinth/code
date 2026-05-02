@@ -15,8 +15,9 @@ export interface InstallationModpackOwner {
 export interface InstallationModpackData {
 	iconUrl?: string
 	title: string
-	link: string | RouteLocationRaw
+	link?: string | RouteLocationRaw
 	versionNumber?: string
+	filename?: string
 	owner?: InstallationModpackOwner
 }
 
@@ -28,6 +29,10 @@ export interface GameVersionOption {
 export interface LoaderVersionEntry {
 	id: string
 	stable?: boolean
+	/** Shown in the loader-version combobox when set; defaults to `id` */
+	label?: string
+	/** Paper build channel for optional UI (e.g. combobox pill); not used by Combobox itself */
+	channelTag?: 'ALPHA' | 'BETA'
 }
 
 export interface ContentDiffItem {

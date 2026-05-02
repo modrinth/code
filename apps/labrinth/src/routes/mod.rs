@@ -25,17 +25,17 @@ pub use self::not_found::not_found;
 
 pub fn root_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("maven")
+        web::scope("/maven")
             .wrap(default_cors())
             .configure(maven::config),
     );
     cfg.service(
-        web::scope("updates")
+        web::scope("/updates")
             .wrap(default_cors())
             .configure(updates::config),
     );
     cfg.service(
-        web::scope("analytics")
+        web::scope("/analytics")
             .wrap(
                 Cors::default()
                     .allowed_origin_fn(|origin, _req_head| {
@@ -59,7 +59,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
             .configure(analytics::config),
     );
     cfg.service(
-        web::scope("api/v1")
+        web::scope("/api/v1")
             .wrap(default_cors())
             .wrap_fn(|req, _srv| {
             async {

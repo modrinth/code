@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { ref } from 'vue'
 
 import Admonition from '../../components/base/Admonition.vue'
+import ButtonStyled from '../../components/base/ButtonStyled.vue'
 
 const meta = {
 	title: 'Base/Admonition',
@@ -44,4 +46,126 @@ export const Success: Story = {
 		header: 'Operation Complete',
 		body: 'Everything went smoothly.',
 	},
+}
+
+export const Dismissible: Story = {
+	args: {
+		type: 'info',
+		header: 'Dismissible Notice',
+		body: 'This admonition can be dismissed by clicking the X button.',
+		dismissible: true,
+	},
+}
+
+export const HeaderWithTimestamp: Story = {
+	render: () => ({
+		components: { Admonition },
+		setup() {
+			const t = ref(Date.now() - 3600_000)
+			return { t }
+		},
+		template: /*html*/ `
+			<Admonition
+				type="info"
+				header="Creating backup"
+				:timestamp="t"
+			>
+				Saving world data for my-world.
+			</Admonition>
+		`,
+	}),
+}
+
+export const WithTopRightActions: Story = {
+	render: () => ({
+		components: { Admonition, ButtonStyled },
+		template: /*html*/ `
+			<div style="display: flex; flex-direction: column; gap: 1rem;">
+				<Admonition
+					type="info"
+					header="Uploading files (2/5)"
+					:dismissible="false"
+				>
+					Uploading server files...
+					<template #top-right-actions>
+						<ButtonStyled type="outlined" color="blue">
+							<button class="!border" type="button">Cancel</button>
+						</ButtonStyled>
+					</template>
+				</Admonition>
+				<Admonition
+					type="critical"
+					header="Extraction failed"
+					:dismissible="true"
+				>
+					Something went wrong while extracting the archive.
+					<template #top-right-actions>
+						<ButtonStyled color="red">
+							<button type="button">Retry</button>
+						</ButtonStyled>
+					</template>
+				</Admonition>
+				<Admonition type="success" header="Extraction complete" :dismissible="true">
+					All files have been extracted successfully.
+				</Admonition>
+			</div>
+		`,
+	}),
+}
+
+export const WithProgressBar: Story = {
+	render: () => ({
+		components: { Admonition, ButtonStyled },
+		template: /*html*/ `
+			<div style="display: flex; flex-direction: column; gap: 1rem;">
+				<Admonition
+					type="info"
+					header="Uploading files (2/5)"
+					:dismissible="false"
+					:progress="0.45"
+					progress-color="blue"
+				>
+					128 KB / 1.2 MB (45%)
+					<template #top-right-actions>
+						<ButtonStyled type="outlined" color="blue">
+							<button class="!border" type="button">Cancel</button>
+						</ButtonStyled>
+					</template>
+				</Admonition>
+				<Admonition
+					type="info"
+					header="Extracting modpack.zip"
+					:dismissible="false"
+					:progress="0.7"
+					progress-color="blue"
+				>
+					24 MB extracted — config/settings.yml
+					<template #top-right-actions>
+						<ButtonStyled type="outlined" color="blue">
+							<button class="!border" type="button">Cancel</button>
+						</ButtonStyled>
+					</template>
+				</Admonition>
+				<Admonition
+					type="success"
+					header="Extraction complete — Done"
+					:dismissible="true"
+					:progress="1"
+					progress-color="green"
+				>
+					56 MB extracted
+				</Admonition>
+				<Admonition
+					type="info"
+					header="Waiting for upload"
+					:dismissible="false"
+					:progress="0"
+					progress-color="blue"
+					waiting
+				>
+					Queued and waiting for available bandwidth.
+				</Admonition>
+			</div>
+		`,
+	}),
 }

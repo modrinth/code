@@ -1,9 +1,159 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Downloading Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Downloads"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Hide more running instances"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Make primary instance"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "No instances running"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Primary instance"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Show more running instances"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Stop instance"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "View active downloads"
+  },
+  "app.action-bar.view-instance": {
+    "message": "View instance"
+  },
+  "app.action-bar.view-logs": {
+    "message": "View logs"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Advanced rendering"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Select your preferred color theme for Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Color theme"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Change the page to which the launcher opens on."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Home"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Library"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Default landing page"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Disables the nametag above your player on the skins page."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Hide nametag"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Includes recent worlds in the \"Jump back in\" section on the Home page."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Jump back into worlds"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimize the launcher when a Minecraft process starts."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimize launcher"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Use system window frame (app restart required)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Native decorations"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Select an option"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Enables the ability to toggle the sidebar."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Toggle sidebar"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "If you attempt to install a Modrinth Pack file (.mrpack) that isn't hosted on Modrinth, we'll make sure you understand the risks before installing it."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Warn me before installing unknown modpacks"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft authentication servers may be down right now. Check your internet connection and try again later."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Cannot reach authentication servers"
+  },
+  "app.browse.add-server-to-instance": {
+    "message": "Add server to instance"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Add servers to your instance"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Add to instance"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Add to {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Added"
+  },
+  "app.browse.already-added": {
+    "message": "Already added"
+  },
+  "app.browse.discover-content": {
+    "message": "Discover content"
+  },
+  "app.browse.discover-servers": {
+    "message": "Discover servers"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Hide already added servers"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Hide already installed content"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Install content to instance"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpacks"
+  },
+  "app.browse.server.install": {
+    "message": "Install"
+  },
+  "app.browse.server.installed": {
+    "message": "Installed"
+  },
+  "app.browse.server.installing": {
+    "message": "Installing"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Installing modpack..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Enter modpack description..."
@@ -41,17 +191,20 @@
   "app.instance.confirm-delete.header": {
     "message": "Delete instance"
   },
+  "app.instance.modpack-already-installed.body": {
+    "message": "This modpack is already installed in the <bold>{instanceName}</bold> instance. Are you sure you want to duplicate it?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Create"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack already installed"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instance"
+  },
   "app.instance.mods.content-type-project": {
     "message": "project"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Copy link"
-  },
-  "app.instance.mods.installing": {
-    "message": "Installing..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Modpack"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was added"
@@ -65,20 +218,53 @@
   "app.instance.mods.share-title": {
     "message": "Sharing modpack content"
   },
-  "app.instance.mods.show-file": {
-    "message": "Show file"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
   },
-  "app.instance.mods.switch-version": {
-    "message": "Switch version"
+  "app.instance.worlds.add-server": {
+    "message": "Add server"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "Unknown"
+  "app.instance.worlds.browse-servers": {
+    "message": "Browse servers"
   },
-  "app.instance.mods.updating": {
-    "message": "Updating..."
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' will be **permanently deleted**, and there will be no way to recover it."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Are you sure you want to permanently delete this world?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modded"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Add a server or browse to get started"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "No servers or worlds added"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' will be removed from your list, including in-game, and there will be no way to recover it."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) will be removed from your list, including in-game, and there will be no way to recover it."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Are you sure you want to remove {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Search {count} worlds..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "this server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Content required"
@@ -127,9 +313,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Default instance options"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Feature flags"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installations"
@@ -184,6 +367,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Reload to install update"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Select an option"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Incompatible version {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Not played yet"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Add a friend"
@@ -283,6 +484,12 @@
   },
   "instance.edit-world.title": {
     "message": "Edit world"
+  },
+  "instance.files.adding-files": {
+    "message": "Adding files ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Save as..."
   },
   "instance.server-modal.address": {
     "message": "Address"
@@ -455,9 +662,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Don't show on Home"
   },
-  "instance.worlds.filter.available": {
-    "message": "Available"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instance is already open"
   },
@@ -481,12 +685,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Play instance"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Singleplayer"
   },
   "instance.worlds.view_instance": {
     "message": "View instance"
@@ -517,5 +715,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "A file is only reviewed if it’s uploaded to Modrinth, regardless of its file format (including .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Don't show this warning again"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Confirm installation"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Install anyway"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Malware is often distributed through modpack files by sharing them on platforms like Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "We couldn't find this file on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Unknown file warning"
   }
 }

@@ -198,13 +198,13 @@
     "message": "更多下載選項"
   },
   "app-marketing.hide-other-packages": {
-    "message": "隱藏其他套件"
+    "message": "隱藏其他軟體包"
   },
   "app-marketing.not-recommended": {
-    "message": "除非你清楚自己在做什麼，否則我們不建議使用這些套件。"
+    "message": "除非你清楚自己在做什麼，否則我們不建議使用這些軟體包。"
   },
   "app-marketing.show-other-packages": {
-    "message": "顯示其他套件"
+    "message": "顯示其他軟體包"
   },
   "auth.authorize.action.authorize": {
     "message": "授權"
@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "建立專案"
   },
-  "create.project.create-server-project": {
-    "message": "建立伺服器"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "缺少欄位：{fields}"
   },
@@ -557,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "建立聯盟連結"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "未找到推廣代碼。"
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "載入聯盟連結時發生錯誤"
   },
@@ -574,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "搜尋聯盟連結..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "來自 {count} {count, plural, one {project} other {projects}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "總下載量"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "總關注者"
   },
   "dashboard.collections.button.create-new": {
     "message": "新增"
@@ -598,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "你的收藏"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "搜尋收藏集…"
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "姓名（A-Z）"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "最近創建"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "最近更新"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "下載 {formType}"
@@ -850,6 +871,39 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "你已用盡你的提領額度：<b>{withdrawLimit}</b>。你必須填寫一份稅務表單才能提領更多金額。"
+  },
+  "dashboard.head-title": {
+    "message": "儀表板"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "全部標記為已讀"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "查看歷史記錄"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "您沒有任何未讀通知。"
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "載入通知時發生錯誤："
+  },
+  "dashboard.notifications.history.label": {
+    "message": "歷史"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "通知歷史記錄"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "看全部"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "查看通知記錄"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "看更多 {extraNotifs} 條 {extraNotifs, plural, one {通知} other {通知}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "正在載入通知…"
   },
   "dashboard.revenue.available-now": {
     "message": "可提領"
@@ -1206,7 +1260,7 @@
     "message": "內建備份服務"
   },
   "hosting-marketing.included.backups-included.description": {
-    "message": "每臺伺服器均包含 15 份安全儲存於異地的備份。"
+    "message": "每個伺服器均包含 15 份安全儲存於異地的備份。"
   },
   "hosting-marketing.included.custom-url": {
     "message": "自訂網址"
@@ -1215,13 +1269,13 @@
     "message": "使用自訂的 <contrast>modrinth.gg</contrast> 網址分享你的伺服器。"
   },
   "hosting-marketing.included.description": {
-    "message": "每臺伺服器都隨附一系列功能，旨在提供唯有 Modrinth 才能帶給你的託管體驗。"
+    "message": "每個伺服器都隨附一系列功能，旨在提供唯有 Modrinth 才能帶給你的託管體驗。"
   },
   "hosting-marketing.included.file-manager": {
     "message": "直覺好用的檔案管理員"
   },
   "hosting-marketing.included.file-manager.description": {
-    "message": "直接輕鬆地搜尋、管理、編輯及上傳檔案到你的伺服器。"
+    "message": "輕鬆搜尋、管理、編輯檔案，並直接上傳至你的伺服器。"
   },
   "hosting-marketing.included.heading": {
     "message": "隨附所有你需要的強大功能。"
@@ -1281,7 +1335,7 @@
     "message": "從 Modrinth 上的數千個模組包中挑選，或是打造你專屬的組合。準備好遊玩時，直接邀請你的好友加入。"
   },
   "hosting-marketing.why.heading": {
-    "message": "找到模組包，一鍵變身伺服器"
+    "message": "找到模組包，秒變伺服器。"
   },
   "hosting-marketing.why.modern-reliable-hosting": {
     "message": "體驗現代且可靠的託管服務"
@@ -1303,39 +1357,6 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "自由選擇原版、Fabric、Forge、Quilt 或 NeoForge。只要在 Modrinth 上找得到的，都能在你的伺服器上執行。"
-  },
-  "hosting.loader.failed-to-change-version": {
-    "message": "無法變更模組包版本"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "無法載入版本"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "無法重新安裝模組包"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "無法修復伺服器"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "無法儲存安裝設定"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "無法取消連結模組包"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {載入器} other {{loader}}} 版本"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "你的伺服器安裝已修復。"
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "修復完成"
-  },
-  "hosting.loader.reset-server": {
-    "message": "重設伺服器"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "將刪除你伺服器上的所有資料，包括你的世界、模組以及設定檔。備份將保留，並可供還原。"
   },
   "hosting.plan.out-of-stock": {
     "message": "缺貨"
@@ -1690,9 +1711,6 @@
   },
   "layout.nav.discover-content": {
     "message": "探索內容"
-  },
-  "layout.nav.feature-flags": {
-    "message": "功能旗標"
   },
   "layout.nav.get-modrinth-app": {
     "message": "取得 Modrinth App"
@@ -2816,18 +2834,6 @@
   "search.filter.locked.server.sync": {
     "message": "與伺服器同步"
   },
-  "servers.busy.backup-creating": {
-    "message": "正在建立備份"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "正在還原備份"
-  },
-  "servers.busy.installing": {
-    "message": "正在安裝伺服器"
-  },
-  "servers.busy.syncing-content": {
-    "message": "正在同步內容"
-  },
   "servers.notice.actions": {
     "message": "動作"
   },
@@ -2858,20 +2864,209 @@
   "servers.plan.large.description": {
     "message": "適合 15 到 25 位玩家、大型模組包或重度模組環境。"
   },
-  "servers.plan.large.name": {
-    "message": "大型"
-  },
   "servers.plan.medium.description": {
     "message": "適合 6 到 15 位玩家及多個模組。"
-  },
-  "servers.plan.medium.name": {
-    "message": "中型"
   },
   "servers.plan.small.description": {
     "message": "適合 1 到 5 位好友及少量輕量模組。"
   },
-  "servers.plan.small.name": {
-    "message": "小型"
+  "settings.account.button.complete-setup": {
+    "message": "完成設定"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "下載匯出"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "生成匯出"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "正在生成匯出..."
+  },
+  "settings.account.data-export.description": {
+    "message": "申請你上傳至 Modrinth 的所有個人資料複本。此程序可能需要幾分鐘的時間才能完成。"
+  },
+  "settings.account.data-export.title": {
+    "message": "資料匯出"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "這個動作將會**立即刪除您的所有使用者資料與追蹤清單**。這不會刪除你的專案。帳號刪除後將無法還原。<br><br>若你需要帳號相關協助，請至 [Modrinth Discord](https://discord.modrinth.com) 取得支援。"
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "刪除這個帳號"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "你確定要刪除你的帳號嗎？"
+  },
+  "settings.account.delete.section.action": {
+    "message": "刪除帳號"
+  },
+  "settings.account.delete.section.description": {
+    "message": "一旦刪除帳號，將無法復原。刪除帳號後，除了專案以外，所有關聯資料都將從我們的伺服器中移除。"
+  },
+  "settings.account.delete.section.title": {
+    "message": "刪除帳號"
+  },
+  "settings.account.email.action.save": {
+    "message": "儲存電子郵件"
+  },
+  "settings.account.email.field.label": {
+    "message": "電子郵件地址"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "輸入你的電子郵件地址..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "新增電子郵件"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "變更電子郵件"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "你的帳號資訊不會公開顯示。"
+  },
+  "settings.account.password.action.remove": {
+    "message": "移除密碼"
+  },
+  "settings.account.password.action.save": {
+    "message": "儲存"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "輸入的密碼不相符！"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "請輸入你的密碼以繼續。"
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "確認密碼"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "確認密碼"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "確認新密碼"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "確認新密碼"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "新密碼"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "新密碼"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "舊密碼"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "舊密碼"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "新增密碼"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "變更密碼"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "移除密碼"
+  },
+  "settings.account.providers.action.add": {
+    "message": "新增"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "驗證提供商"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "動作"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "提供商"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "新增電子郵件"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "變更電子郵件"
+  },
+  "settings.account.security.email.description": {
+    "message": "變更與你帳號相關聯的電子郵件。"
+  },
+  "settings.account.security.email.title": {
+    "message": "電子郵件"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "新增密碼"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "變更密碼"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "變更用於登入你帳號的密碼。"
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "變更或移除用於登入你帳號的密碼。"
+  },
+  "settings.account.security.password.description.set": {
+    "message": "請設定永久密碼，以便登入你的帳號。"
+  },
+  "settings.account.security.password.title": {
+    "message": "密碼"
+  },
+  "settings.account.security.providers.action.manage": {
+    "message": "管理登入提供商"
+  },
+  "settings.account.security.providers.description": {
+    "message": "從你的帳號新增或移除登入方式，包括 GitHub、GitLab、Microsoft、Discord、Steam 以及 Google。"
+  },
+  "settings.account.security.providers.title": {
+    "message": "管理驗證提供商"
+  },
+  "settings.account.security.title": {
+    "message": "帳號安全性"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "移除 2FA"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "設定 2FA"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "為你的帳號登入程序增加額外的安全防護。"
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "雙重驗證"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "請下載這些備用碼並將其儲存在安全的地方。若你失去裝置的存取權，可以使用這些備用碼替代 2FA 驗證碼！請務必像保護密碼一樣妥善保管這些代碼。"
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "備份碼只能使用一次。"
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "輸入的驗證碼不正確！"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "請輸入兩步驟驗證碼以繼續。"
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "輸入雙重驗證碼"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "輸入驗證碼..."
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "雙重驗證要求必須使用第二部裝置才能登入，藉此確保你的帳號安全性。"
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "如果無法掃描 QR code，你可以手動輸入金鑰："
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "請使用 <authy-link>Authy</authy-link>、<microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> 或任何其他兩步驟驗證 (2FA) 應用程式掃描 QR 碼以開始。"
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "請輸入驗證程式中的一次性驗證碼以驗證存取權。"
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "驗證碼"
   },
   "settings.applications.about": {
     "message": "關於"
@@ -2954,11 +3149,11 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.head-title": {
+    "message": "應用程式"
+  },
   "settings.applications.modal.header": {
     "message": "應用程式資訊"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "發生錯誤"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "你的應用程式的圖示已更新。"
@@ -2968,6 +3163,99 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "請立即儲存你的密碼，離開這個頁面後將不再顯示！"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "關於這個應用程式"
+  },
+  "settings.authorizations.by": {
+    "message": "作者"
+  },
+  "settings.authorizations.description": {
+    "message": "當你使用 Modrinth 帳號授權應用程式時，即代表你授予該應用程式存取你帳戶的權限。你可以隨時在這裡管理並審查帳號的存取權。"
+  },
+  "settings.authorizations.empty-state": {
+    "message": "目前無法顯示你已授權的應用程式，我們正在努力修正這個問題。請稍後再回來查看！"
+  },
+  "settings.authorizations.head-title": {
+    "message": "授權"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "撤銷"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "這將撤銷該應用程式存取你帳號的權限。你隨時可以於稍後重新授權。"
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "你確定要撤銷這個應用程式的授權嗎？"
+  },
+  "settings.billing.charges.description": {
+    "message": "你對 Modrinth 帳號的所有過往支付紀錄皆會列於這裡："
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Medal 伺服器試用方案"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.charges.title": {
+    "message": "過往支付紀錄"
+  },
+  "settings.billing.expires": {
+    "message": "到期日：{date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "月"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "每月"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "季"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "每季"
+  },
+  "settings.billing.interval.year": {
+    "message": "年"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "每年"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "在 modrinth.com 與 Modrinth App 上享受無廣告的瀏覽體驗"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "在你的個人檔案顯示 Modrinth+ 徽章"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "直接支持 Modrinth 與創作者"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "福利"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "改用年繳計費，每年現省 {amount}！"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "你已取消訂閱。"
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "在目前計費週期結束前，你仍可繼續享有福利。"
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "你的訂閱支付方式失敗。請更新你的支付方式。"
+  },
+  "settings.billing.midas.status.open": {
+    "message": "你目前訂閱的方案為："
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "我們正在處理你的付款。一旦付款完成，系統將立即啟用你的福利。"
+  },
+  "settings.billing.midas.upsell": {
+    "message": "立即訂閱 Modrinth Plus！"
   },
   "settings.billing.modal.cancel.action": {
     "message": "取消訂閱"
@@ -2986,6 +3274,12 @@
   },
   "settings.billing.modal.delete.title": {
     "message": "你確定要移除這個付款方式嗎？"
+  },
+  "settings.billing.next": {
+    "message": "下期："
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "或以每年 {price} 訂閱（現省 {percent}%！）"
   },
   "settings.billing.payment_method.action.add": {
     "message": "新增付款方式"
@@ -3008,17 +3302,98 @@
   "settings.billing.payment_method.title": {
     "message": "付款方式"
   },
+  "settings.billing.plan.title": {
+    "message": "{size}方案"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} 個共用 CPU（最高可爆發至 {bursts} 個 CPU）"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "找不到與這個訂閱相關聯的伺服器。這可能有幾種原因：如果你才剛購買伺服器，這屬於正常現象，伺服器的佈署過程最多可能需要一小時。若你已購買一段時間，則伺服器可能已被停用。如果這與你的預期不符，請將以下資訊提供給 Modrinth 客服團隊："
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "伺服器 ID：{id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "Stripe ID：{id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} GB 記憶體"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "重新訂閱你的 Modrinth 伺服器時發生錯誤。"
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "重新訂閱時發生錯誤"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "若伺服器目前處於取消狀態，可能需要 10 至 15 分鐘來完成伺服器設定。"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "已送出重新訂閱請求"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "伺服器方案已重新訂閱成功"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "你的訂閱扣款失敗。請更新你的付款方式，然後重新訂閱。"
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "你的付款正在處理中。完成付款後，系統將立即啟用你的伺服器。"
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB SSD"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} GB 置換空間"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "管理你的 Modrinth 伺服器訂閱。"
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth 伺服器訂閱"
   },
+  "settings.billing.renews": {
+    "message": "將於{date}續訂"
+  },
+  "settings.billing.resubscribe": {
+    "message": "重新訂閱"
+  },
+  "settings.billing.since": {
+    "message": "自{date}起"
+  },
+  "settings.billing.subscribe": {
+    "message": "訂閱"
+  },
   "settings.billing.subscription.description": {
     "message": "管理你的 Modrinth 訂閱。"
   },
   "settings.billing.subscription.title": {
     "message": "訂閱"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "正在切換至{interval}計費"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "切換至{interval}計費"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "每月帳單將額外收取 {amount}／年"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "於 {date} 轉換為 {interval} 付款週期"
+  },
+  "settings.billing.update-method": {
+    "message": "更新方式"
+  },
+  "settings.billing.upgrade": {
+    "message": "升級"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "停用開發人員模式"
@@ -3032,6 +3407,12 @@
   "settings.display.flags.title": {
     "message": "功能開關"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "開發者模式已被停用"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "開發者模式已停用"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "資料包頁面"
   },
@@ -3040,6 +3421,15 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "模組頁面"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "圖庫"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "網格"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "列"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "模組包頁面"
@@ -3101,6 +3491,9 @@
   "settings.display.theme.title": {
     "message": "色彩主題"
   },
+  "settings.head-title": {
+    "message": "顯示設定"
+  },
   "settings.pats.action.create": {
     "message": "建立個人存取權杖"
   },
@@ -3161,6 +3554,9 @@
   "settings.profile.description": {
     "message": "你的個人檔案資訊會公開顯示在 Modrinth 上，並可透過 <docs-link>Modrinth API</docs-link> 查詢。"
   },
+  "settings.profile.head-title": {
+    "message": "個人設定"
+  },
   "settings.profile.profile-info": {
     "message": "個人檔案資訊"
   },
@@ -3191,11 +3587,29 @@
   "settings.sessions.unknown-platform": {
     "message": "未知的平臺"
   },
+  "settings.sidebar.label.account": {
+    "message": "帳號"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "開發人員"
+  },
+  "settings.sidebar.label.display": {
+    "message": "顯示"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"
   },
   "ui.latest-news-row.view-all": {
     "message": "查看所有新聞"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "訂閱"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "已訂閱！"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "訂閱 Modrinth 的最新消息"
   },
   "version.environment.none.description": {
     "message": "此版本的執行環境尚未指定。"

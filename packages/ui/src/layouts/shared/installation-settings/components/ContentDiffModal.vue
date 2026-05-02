@@ -73,6 +73,7 @@
 				<InlineBackupCreator
 					ref="backupCreator"
 					backup-name="Before version change"
+					hide-shift-click-hint
 					@update:buttons-disabled="buttonsDisabled = $event"
 				/>
 			</div>
@@ -201,7 +202,7 @@ const diffTypeMessages = defineMessages({
 	},
 	removed: {
 		id: 'content.diff-modal.diff-type.removed',
-		defaultMessage: 'Removed',
+		defaultMessage: 'Disabled',
 	},
 	updated: {
 		id: 'content.diff-modal.diff-type.updated',

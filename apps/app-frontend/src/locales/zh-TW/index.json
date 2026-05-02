@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "無法連線到驗證伺服器"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "將伺服器新增到實例"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "將伺服器新增到實例"
+  },
+  "app.browse.add-to-instance": {
+    "message": "新增至實例"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "新增至「{instanceName}」"
+  },
+  "app.browse.added": {
+    "message": "已新增"
+  },
+  "app.browse.already-added": {
+    "message": "已新增"
+  },
+  "app.browse.discover-content": {
+    "message": "探索內容"
+  },
+  "app.browse.discover-servers": {
+    "message": "探索伺服器"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "隱藏已新增的伺服器"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "隱藏已安裝的內容"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "安裝至實例中"
+  },
   "app.export-modal.description-placeholder": {
     "message": "輸入模組包描述..."
   },
@@ -41,17 +74,20 @@
   "app.instance.confirm-delete.header": {
     "message": "刪除實例"
   },
+  "app.instance.modpack-already-installed.body": {
+    "message": "此模組包已經安裝在<bold>{instanceName}</bold> 實例中了，您確定要再次安裝嗎？"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "建立"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "模組包已經安裝"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "實例"
+  },
   "app.instance.mods.content-type-project": {
     "message": "專案"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "複製連結"
-  },
-  "app.instance.mods.installing": {
-    "message": "安裝中..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "模組包"
   },
   "app.instance.mods.project-was-added": {
     "message": "新增了「{name}」"
@@ -65,20 +101,53 @@
   "app.instance.mods.share-title": {
     "message": "分享模組包內容"
   },
-  "app.instance.mods.show-file": {
-    "message": "顯示檔案"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "上傳成功"
   },
-  "app.instance.mods.switch-version": {
-    "message": "切換版本"
+  "app.instance.worlds.add-server": {
+    "message": "新增伺服器"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "未知"
+  "app.instance.worlds.browse-servers": {
+    "message": "瀏覽伺服器"
   },
-  "app.instance.mods.updating": {
-    "message": "更新中..."
+  "app.instance.worlds.delete-world-description": {
+    "message": "「{name}」將會被**永久刪除**，且無法還原。"
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "你確定要永久刪除這個世界嗎？"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "模組"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "離線"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "線上"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "原版"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "新增伺服器或瀏覽以開始使用"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "未新增任何伺服器或世界"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "「{name}」將從你的清單中移除（包含遊戲內），且無法還原。"
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "「{name}」({address}) 將從你的清單中移除（包含遊戲內），且無法還原。"
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "你確定要移除「{name}」嗎？"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "搜尋 {count} 個世界..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "這個伺服器"
   },
   "app.modal.install-to-play.content-required": {
     "message": "所需內容"
@@ -128,9 +197,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "預設實例選項"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "功能開關"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java 安裝"
   },
@@ -150,7 +216,7 @@
     "message": "Modrinth App v{version} 已完成下載！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} 現已推出。請使用套件管理員進行更新，以取得最新的功能與修正！"
+    "message": "Modrinth App v{version} 現已推出。請使用軟體包管理員進行更新，以取得最新的功能與修正！"
   },
   "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} 現已推出！由於你目前使用的是計量付費網路，我們並未自動下載更新。"
@@ -184,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "重新載入即可安裝更新"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "選擇選項"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "不相容的版本 {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "尚未遊玩"
+  },
+  "app.world.world-item.offline": {
+    "message": "離線"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} 人在線上"
   },
   "friends.action.add-friend": {
     "message": "新增好友"
@@ -283,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "編輯世界"
+  },
+  "instance.files.adding-files": {
+    "message": "正在新增檔案 ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "另存新檔..."
   },
   "instance.server-modal.address": {
     "message": "位址"
@@ -455,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "不要在首頁顯示"
   },
-  "instance.worlds.filter.available": {
-    "message": "可用"
-  },
   "instance.worlds.game_already_open": {
     "message": "實例已經開啟"
   },
@@ -481,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "遊戲實例"
-  },
-  "instance.worlds.type.server": {
-    "message": "伺服器"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "單人遊戲"
   },
   "instance.worlds.view_instance": {
     "message": "檢視實例"

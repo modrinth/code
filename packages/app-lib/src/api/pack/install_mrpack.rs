@@ -6,9 +6,12 @@ use crate::pack::install_from::{
     EnvType, PackFile, PackFileHash, set_profile_information,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, ProfileInstallStage, SideType, cache_file_hash,
+    CacheBehaviour, CachedEntry, Profile, ProfileInstallStage, SideType,
+    cache_file_hash,
 };
-use crate::util::fetch::{fetch_mirrors, sha1_async, write};
+use crate::util::fetch::{
+    DownloadMeta, DownloadReason, fetch_mirrors, sha1_async, write,
+};
 use crate::util::io;
 use crate::{State, profile};
 use async_zip::base::read::seek::ZipFileReader;
@@ -149,13 +152,33 @@ pub async fn install_zipped_mrpack_files(
             file_hashes.push(hash);
         }
 
+        let project_ids: Vec<String> = pack
+            .files
+            .iter()
+            .filter_map(|f| {
+                f.downloads.iter().find_map(|url| {
+                    let parts: Vec<&str> = url.split('/').collect();
+                    let data_idx = parts.iter().position(|&p| p == "data")?;
+                    parts.get(data_idx + 1).map(|s| s.to_string())
+                })
+            })
+            .collect::<std::collections::HashSet<_>>()
+            .into_iter()
+            .collect();
+
         tracing::info!(
-            "Caching {} modpack file hashes for version {}",
+            "Caching {} modpack file hashes and {} project IDs for version {}",
             file_hashes.len(),
+            project_ids.len(),
             version_id
         );
-        CachedEntry::cache_modpack_files(version_id, file_hashes, &state.pool)
-            .await?;
+        CachedEntry::cache_modpack_files(
+            version_id,
+            file_hashes,
+            project_ids,
+            &state.pool,
+        )
+        .await?;
     } else {
         tracing::warn!(
             "No version_id available, skipping modpack file hash caching"
@@ -187,6 +210,22 @@ pub async fn install_zipped_mrpack_files(
     )
     .await?;
 
+    let profile =
+        Profile::get(&profile_path, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::UnmanagedProfileError(
+                    profile_path.to_string(),
+                )
+                .as_error()
+            })?;
+
+    let download_meta = DownloadMeta {
+        reason: DownloadReason::Modpack,
+        game_version: profile.game_version.clone(),
+        loader: profile.loader.as_str().to_string(),
+    };
+
     let num_files = pack.files.len();
     loading_try_for_each_concurrent(
         futures::stream::iter(pack.files.into_iter())
@@ -198,6 +237,7 @@ pub async fn install_zipped_mrpack_files(
         None,
         |project| {
             let profile_path = profile_path.clone();
+            let download_meta = download_meta.clone();
             async move {
                 //TODO: Future update: prompt user for optional files in a modpack
                 if let Some(env) = project.env
@@ -215,6 +255,7 @@ pub async fn install_zipped_mrpack_files(
                         .map(|x| &**x)
                         .collect::<Vec<&str>>(),
                     project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
+                    Some(&download_meta),
                     &state.fetch_semaphore,
                     &state.pool,
                 )

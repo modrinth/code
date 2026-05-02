@@ -25,16 +25,6 @@ export interface ContentModpackData {
 	disabledText?: string
 }
 
-export interface UploadState {
-	isUploading: boolean
-	currentFileName: string | null
-	currentFileProgress: number
-	uploadedBytes: number
-	totalBytes: number
-	completedFiles: number
-	totalFiles: number
-}
-
 export interface ContentManagerContext {
 	// Data
 	items: Ref<ContentItem[]> | ComputedRef<ContentItem[]>
@@ -51,8 +41,7 @@ export interface ContentManagerContext {
 	disableAddContent?: Ref<boolean> | ComputedRef<boolean>
 	disableAddContentTooltip?: string
 
-	// Identity & labelling
-	getItemId: (item: ContentItem) => string
+	// Labelling
 	contentTypeLabel: Ref<string> | ComputedRef<string>
 
 	// Core actions
@@ -79,17 +68,14 @@ export interface ContentManagerContext {
 	unlinkModpack?: () => void
 	openSettings?: () => void
 
+	// Switch version (optional)
+	switchVersion?: (item: ContentItem) => void
+
 	// Per-item overflow menu (optional)
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
 
 	// Share support (optional — when undefined, share button becomes hidden entirely)
 	shareItems?: (items: ContentItem[], format: 'names' | 'file-names' | 'urls' | 'markdown') => void
-
-	// Upload progress (optional)
-	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
-
-	// Show client-only environment filter pill
-	showClientOnlyFilter?: boolean
 
 	// Bulk operation guard — set by layout, checked by providers to suppress refreshes
 	isBulkOperating?: Ref<boolean>

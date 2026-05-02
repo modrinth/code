@@ -115,7 +115,7 @@ export function useSearch(
 		{ display: 'Date updated', name: 'updated' },
 	])
 
-	const currentSortType: Ref<SortType> = ref({ name: 'relevance', display: 'Relevance' })
+	const currentSortType: Ref<SortType> = ref(sortTypes[0])
 
 	const route = useRoute()
 	const currentPage = ref(1)
@@ -474,7 +474,7 @@ export function useSearch(
 					}
 					orGroups[field].push(val)
 				} else {
-					parts.push(`${field} = "${val}"`)
+					parts.push(`${field} = ${val === 'true' || val === 'false' ? val : `"${val}"`}`)
 				}
 			}
 		}
@@ -766,17 +766,17 @@ function mapProjectTypeToSearch(projectType: ProjectType): string {
 function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][] {
 	const groups: string[][] = []
 	if (client && server) {
-		groups.push(['client_side:required'], ['server_side:required'])
+		groups.push(
+			['client_side:required', 'client_side:optional', 'client_side:unsupported'],
+			['server_side:required', 'server_side:optional'],
+		)
 	} else if (client) {
 		groups.push(
 			['client_side:optional', 'client_side:required'],
 			['server_side:optional', 'server_side:unsupported'],
 		)
 	} else if (server) {
-		groups.push(
-			['client_side:optional', 'client_side:unsupported'],
-			['server_side:optional', 'server_side:required'],
-		)
+		groups.push(['server_side:optional', 'server_side:required'])
 	}
 	return groups
 }

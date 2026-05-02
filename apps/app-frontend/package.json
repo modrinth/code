@@ -13,6 +13,7 @@
 		"test": "vue-tsc --noEmit"
 	},
 	"dependencies": {
+		"@intercom/messenger-js-sdk": "^0.0.14",
 		"@modrinth/api-client": "workspace:^",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/ui": "workspace:*",
@@ -22,6 +23,7 @@
 		"@tanstack/vue-query": "^5.90.7",
 		"@tauri-apps/api": "^2.5.0",
 		"@tauri-apps/plugin-dialog": "^2.2.1",
+		"@tauri-apps/plugin-fs": "^2.4.5",
 		"@tauri-apps/plugin-http": "~2.5.7",
 		"@tauri-apps/plugin-opener": "^2.2.6",
 		"@tauri-apps/plugin-os": "^2.2.1",
@@ -34,6 +36,7 @@
 		"fuse.js": "^6.6.2",
 		"intl-messageformat": "^10.7.7",
 		"ofetch": "^1.3.4",
+		"overlayscrollbars": "^2.15.1",
 		"pinia": "^3.0.0",
 		"posthog-js": "^1.158.2",
 		"three": "^0.172.0",
@@ -58,7 +61,7 @@
 		"sass": "^1.74.1",
 		"tailwindcss": "^3.4.4",
 		"typescript": "^5.5.4",
-		"vite": "^6.0.0",
+		"vite": "^8.0.0",
 		"vue-component-type-helpers": "^3.1.8",
 		"vue-tsc": "^2.1.6"
 	},

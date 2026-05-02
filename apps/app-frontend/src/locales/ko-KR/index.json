@@ -5,8 +5,149 @@
   "app.auth-servers.unreachable.header": {
     "message": "인증 서버에 연결할 수 없습니다"
   },
-  "app.instance.mods.updating": {
-    "message": "업데이트 중..."
+  "app.browse.add-server-to-instance": {
+    "message": "인스턴스에 서버 추가"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "인스턴스에 서버 추가"
+  },
+  "app.browse.add-to-instance": {
+    "message": "인스턴스에 추가"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "{instanceName}에 추가"
+  },
+  "app.browse.added": {
+    "message": "추가됨"
+  },
+  "app.browse.already-added": {
+    "message": "이미 추가됨"
+  },
+  "app.browse.discover-content": {
+    "message": "콘텐츠 탐색하기"
+  },
+  "app.browse.discover-servers": {
+    "message": "서버 탐색하기"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "추가된 서버 숨기기"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "설치된 콘텐츠 숨기기"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "인스턴스에 콘텐츠 설치"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "모드팩 설명 입력..."
+  },
+  "app.export-modal.export-button": {
+    "message": "내보내기"
+  },
+  "app.export-modal.header": {
+    "message": "모드팩 내보내기"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "모드팩 이름"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "모드팩 이름"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "팩에 포함할 파일과 폴더 선택"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "버전 구분"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "인스턴스의 모든 데이터가 삭제됩니다. 세계 폴더, 설정 폴더 등 설치된 모든 컨텐츠가 포함됩니다."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "이 작업은 되돌릴 수 없습니다"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "인스턴스 삭제"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "인스턴스 삭제"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "이 모드팩은 이미 <bold>{instanceName}</bold> 인스턴스에 설치되어 있습니다. 정말로 복제하시겠습니까?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "생성"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "모드팩 이미 설치됨"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "인스턴스"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "프로젝트"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" 추가됨"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "프로젝트 {count}개 추가됨"
+  },
+  "app.instance.mods.share-text": {
+    "message": "제 모드팩에 사용중인 프로젝트를 확인해 보세요!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "모드팩 콘텐츠 공유"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "업로드 성공"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "서버 추가"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "서버 탐색하기"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}'이(가) **영구적으로 삭제**되며, 복구할 수 없습니다."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "정말로 이 세계를 영구적으로 삭제하시겠습니까?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "수정됨"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "오프라인"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "온라인"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "바닐라"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "서버를 추가하거나 탐색하여 시작"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "추가된 서버 또는 세계 없음"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}'이(가) 게임 내를 포함한 모든 목록에서 삭제되며, 복구할 수 없습니다."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address})이(가) 게임 내를 포함한 모든 목록에서 삭제되며, 복구할 수 없습니다."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "정말로 {name}을(를) 제거하시겠습니까?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "{count}개의 세계 검색..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "이 서버"
   },
   "app.modal.install-to-play.content-required": {
     "message": "콘텐츠 설치 필요"
@@ -56,9 +197,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "기본 인스턴스 옵션"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "기능 플래그"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java 설치"
   },
@@ -78,16 +216,16 @@
     "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} 버전을 사용할 수 있습니다. 최신 기능과 오류 수정을 적용하려면 패키지 관리자를 통해 업데이트하세요!"
+    "message": "Modrinth 앱 v{version}을 사용할 수 있습니다. 최신 기능과 오류 수정을 적용하려면 패키지 관리자를 통해 업데이트하세요!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version}을 지금 사용할 수 있습니다! 데이터 통신 연결을 사용 중이므로, 자동으로 다운로드하지 않았습니다."
+    "message": "Modrinth 앱 v{version}을 지금 사용할 수 있습니다! 데이터 통신 연결을 사용 중이므로, 자동으로 다운로드하지 않았습니다."
   },
   "app.update-popup.changelog": {
     "message": "변경 내역"
   },
   "app.update-popup.download": {
-    "message": "({size}) 다운로드"
+    "message": "다운로드 ({size})"
   },
   "app.update-popup.download-complete": {
     "message": "다운로드 완료"
@@ -112,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "새로고침하여 업데이트 설치"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "옵션 선택"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "{version} 버전에 호환되지 않음"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "플레이 안 함"
+  },
+  "app.world.world-item.offline": {
+    "message": "오프라인"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count}명 온라인"
   },
   "friends.action.add-friend": {
     "message": "친구 추가"
@@ -165,7 +321,7 @@
     "message": "대기 중"
   },
   "friends.no-friends-match": {
-    "message": "\"{query}\" 이름과 일치하는 친구 없음"
+    "message": "\"{query}\"과(와) 일치하는 친구 없음"
   },
   "friends.search-friends-placeholder": {
     "message": "친구 검색 중..."
@@ -211,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "세계 편집"
+  },
+  "instance.files.adding-files": {
+    "message": "파일 추가 중 ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "다른 이름으로 저장..."
   },
   "instance.server-modal.address": {
     "message": "주소"
@@ -258,7 +420,7 @@
     "message": "아이콘 제거"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "아이콘 대체"
+    "message": "아이콘 교체"
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "아이콘 선택"
@@ -383,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "홈에서 숨기기"
   },
-  "instance.worlds.filter.available": {
-    "message": "이용 가능"
-  },
   "instance.worlds.game_already_open": {
     "message": "이미 실행된 인스턴스"
   },
@@ -409,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "인스턴스 플레이"
-  },
-  "instance.worlds.type.server": {
-    "message": "서버"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "싱글 플레이"
   },
   "instance.worlds.view_instance": {
     "message": "인스턴스 보기"

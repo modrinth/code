@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Buat proyek"
   },
-  "create.project.create-server-project": {
-    "message": "Buat server"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Bidang hilang: {fields}"
   },
@@ -1395,7 +1392,7 @@
     "message": "server"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "pencorak"
+    "message": "efek gambar"
   },
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
@@ -1638,7 +1635,7 @@
     "message": "Hidup/matikan menu"
   },
   "layout.meta.description": {
-    "message": "Unduh mod, pasang-masuk, paket data, pencorak, paket sumber, dan paket mod untuk Minecraft di Modrinth. Temukan dan terbitkan proyek di Modrinth dengan antarmuka dan API yang modern dan mudah digunakan."
+    "message": "Unduh mod, pasang-masuk, paket data, efek gambar, paket sumber, dan paket mod untuk Minecraft di Modrinth. Temukan dan terbitkan proyek di Modrinth dengan antarmuka dan API yang modern dan mudah digunakan."
   },
   "layout.meta.og-description": {
     "message": "Temukan dan terbitkan konten Minecraft!"
@@ -1657,9 +1654,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Temukan konten"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Bendera fitur"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Dapatkan Modrinth App"
@@ -2187,10 +2181,10 @@
     "message": "Server"
   },
   "project-type.shader.plural": {
-    "message": "Pencorak"
+    "message": "Efek Gambar"
   },
   "project-type.shader.singular": {
-    "message": "Pencorak"
+    "message": "Efek Gambar"
   },
   "project.about.details.created": {
     "message": "Dibuat {date}"
@@ -2769,7 +2763,7 @@
     "message": "Tulis versi"
   },
   "search.filter.game-version-shader-message": {
-    "message": "Paket pencorak untuk versi lama kemungkinan besar dapat bekerja di versi yang lebih baru dengan beberapa masalah ringan."
+    "message": "Paket efek gambar untuk versi lama kemungkinan besar dapat bekerja di versi yang lebih baru dengan beberapa masalah ringan."
   },
   "search.filter.locked.server": {
     "message": "Disediakan oleh server"
@@ -2813,20 +2807,119 @@
   "servers.plan.large.description": {
     "message": "Cocok untuk 15—25 pemain, paket mod, atau yang penggunakan mod berat."
   },
-  "servers.plan.large.name": {
-    "message": "Besar"
-  },
   "servers.plan.medium.description": {
     "message": "Cocok untuk 6—15 orang pemain dan yang menggunakan beberapa mod."
-  },
-  "servers.plan.medium.name": {
-    "message": "Sedang"
   },
   "servers.plan.small.description": {
     "message": "Cocok untuk 1—5 orang teman dengan beberapa mod ringan."
   },
-  "servers.plan.small.name": {
-    "message": "Kecil"
+  "settings.account.delete.confirm.proceed": {
+    "message": "Hapus akun ini"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Apakah Anda yakin ingin menghapus akun ini?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Hapus akun"
+  },
+  "settings.account.delete.section.description": {
+    "message": "Setelah Anda menghapus akun Anda, tidak ada cara untuk kembali. Menghapus akun Anda akan menghapus semua data terkait, kecuali proyek, dari server kami."
+  },
+  "settings.account.delete.section.title": {
+    "message": "Hapus akun"
+  },
+  "settings.account.email.action.save": {
+    "message": "Simpan sur-el"
+  },
+  "settings.account.email.field.label": {
+    "message": "Alamat sur-el"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Masukkan alamat sur-el Anda..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Tambah sur-el"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Ubah sur-el"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "Informasi akun Anda tidak ditampilkan secara umum."
+  },
+  "settings.account.password.action.remove": {
+    "message": "Hapus kata sandi"
+  },
+  "settings.account.password.action.save": {
+    "message": "Simpan kata sandi"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "Kata sandi yang dimasukkan tidak cocok!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Mohon masukkan kata sandi Anda untuk melanjutkan."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Konfirmasi kata sandi"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Konfirmasi kata sandi"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Konfirmasi kata sandi baru"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Konfirmasi kata sandi baru"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Kata sandi baru"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Kata sandi baru"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Kata sandi lama"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Kata sandi lama"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Tambah kata sandi"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Ubah kata sandi"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Hapus kata sandi"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Tambah"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "Penyedia autentikasi"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Tindakan"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Penyedia"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Tambah sur-el"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Ubah sur-el"
+  },
+  "settings.account.security.email.description": {
+    "message": "Mengganti sur-el yang berkaitan dengan akun Anda."
+  },
+  "settings.account.security.email.title": {
+    "message": "Sur-el"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Tambah kata sandi"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Ubah kata sandi"
   },
   "settings.applications.about": {
     "message": "Tentang"
@@ -2911,9 +3004,6 @@
   },
   "settings.applications.modal.header": {
     "message": "Informasi aplikasi"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Terjadi kesalahan"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Ikon aplikasi Anda telah diperbarui."
@@ -3009,7 +3099,7 @@
     "message": "Halaman Server"
   },
   "settings.display.project-list-layouts.shader": {
-    "message": "Halaman Pencorak (Shader)"
+    "message": "Halaman Efek Gambar"
   },
   "settings.display.project-list-layouts.title": {
     "message": "Tata letak daftar proyek"
@@ -3151,6 +3241,12 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Lihat semua berita"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Berlangganan"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Sudah berlangganan!"
   },
   "version.environment.none.description": {
     "message": "Lingkungan untuk versi ini belum ditentukan."

@@ -5,8 +5,41 @@
   "app.auth-servers.unreachable.header": {
     "message": "无法连接到身份验证服务器"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "将服务器添加到实例实例"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "将服务器添加到你的实例"
+  },
+  "app.browse.add-to-instance": {
+    "message": "添加到实例实例"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "添加到 {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "已添加"
+  },
+  "app.browse.already-added": {
+    "message": "已添加"
+  },
+  "app.browse.discover-content": {
+    "message": "发现内容"
+  },
+  "app.browse.discover-servers": {
+    "message": "发现服务器"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "隐藏已添加的服务器"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "隐藏已安装的内容"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "将内容安装到实例中"
+  },
   "app.export-modal.description-placeholder": {
-    "message": "输入整合包描述内容..."
+    "message": "输入整合包描述……"
   },
   "app.export-modal.export-button": {
     "message": "导出"
@@ -41,47 +74,83 @@
   "app.instance.confirm-delete.header": {
     "message": "删除实例"
   },
+  "app.instance.modpack-already-installed.body": {
+    "message": "该整合包已经被安装到实例<bold>{instanceName}</bold>中了。你确定要重复安装吗？"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "创建"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "整合包已安装"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "实例"
+  },
   "app.instance.mods.content-type-project": {
     "message": "项目"
   },
-  "app.instance.mods.copy-link": {
-    "message": "复制链接"
-  },
-  "app.instance.mods.installing": {
-    "message": "正在安装……"
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "整合包"
-  },
   "app.instance.mods.project-was-added": {
-    "message": "已添加“{name}”"
+    "message": "已添加 “{name}”"
   },
   "app.instance.mods.projects-were-added": {
     "message": "已添加 {count} 个项目"
   },
   "app.instance.mods.share-text": {
-    "message": "查看在我整合包中使用的项目！"
+    "message": "查看我在整合包中使用的项目！"
   },
   "app.instance.mods.share-title": {
     "message": "分享整合包内容"
   },
-  "app.instance.mods.show-file": {
-    "message": "显示文件"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "上传成功"
   },
-  "app.instance.mods.switch-version": {
-    "message": "切换版本"
+  "app.instance.worlds.add-server": {
+    "message": "添加服务器"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "未知"
+  "app.instance.worlds.browse-servers": {
+    "message": "浏览服务器"
   },
-  "app.instance.mods.updating": {
-    "message": "正在更新……"
+  "app.instance.worlds.delete-world-description": {
+    "message": "“{name}”将被**永久删除**，并且无法恢复。"
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "你确定要永久删除这个世界吗？"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "模组适配"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "离线"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "在线"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "原版"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "通过添加一个服务器或点击浏览以开始"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "未添加服务器或世界"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "将从你的列表中删除“{name}”，包括游戏内，并且无法恢复。"
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "将从你的列表中删除“{name}”（{address}），包括游戏内，并且无法恢复。"
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "你确定要删除 {name} 吗？"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "搜索 {count} 个世界……"
+  },
+  "app.instance.worlds.this-server": {
+    "message": "此服务器"
   },
   "app.modal.install-to-play.content-required": {
-    "message": "内容需求"
+    "message": "需求内容"
   },
   "app.modal.install-to-play.header": {
     "message": "安装以游玩"
@@ -93,7 +162,7 @@
     "message": "{count} 个模组"
   },
   "app.modal.install-to-play.required-modpack": {
-    "message": "整合包需求"
+    "message": "需求整合包"
   },
   "app.modal.install-to-play.server-requires-mods": {
     "message": "此服务器需要安装模组才能游玩。点击安装，从 Modrinth 下载所需文件，然后直接进入服务器。"
@@ -127,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "默认实例选项"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "功能开关"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java 管理"
@@ -185,6 +251,24 @@
   "app.update.reload-to-update": {
     "message": "重启以安装更新"
   },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "选择一个选项"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "不兼容的版本 {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "暂未游玩"
+  },
+  "app.world.world-item.offline": {
+    "message": "离线"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} 人在线"
+  },
   "friends.action.add-friend": {
     "message": "添加好友"
   },
@@ -201,7 +285,7 @@
     "message": "这可能与对方的 Minecraft 用户名不同！"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "输入 Modrinth 用户名…"
+    "message": "输入 Modrinth 用户名……"
   },
   "friends.add-friend.username.title": {
     "message": "你好友的 Modrinth 用户名是什么？"
@@ -284,6 +368,12 @@
   "instance.edit-world.title": {
     "message": "编辑存档"
   },
+  "instance.files.adding-files": {
+    "message": "正在添加文件（{completed}/{total}）"
+  },
+  "instance.files.save-as": {
+    "message": "保存为……"
+  },
   "instance.server-modal.address": {
     "message": "地址"
   },
@@ -351,7 +441,7 @@
     "message": "名称"
   },
   "instance.settings.tabs.hooks": {
-    "message": "启动Hooks"
+    "message": "启动 Hooks"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
     "message": "自定义启动Hooks"
@@ -455,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "在主界面隐藏"
   },
-  "instance.worlds.filter.available": {
-    "message": "可用"
-  },
   "instance.worlds.game_already_open": {
     "message": "实例已启动"
   },
@@ -481,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "游玩实例"
-  },
-  "instance.worlds.type.server": {
-    "message": "服务器"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "单人游戏"
   },
   "instance.worlds.view_instance": {
     "message": "查看实例"

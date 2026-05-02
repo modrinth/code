@@ -9,6 +9,9 @@ use crate::env::ENV;
 use crate::queue::server_ping;
 use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
 
+pub const DOWNLOADS: &str = "downloads";
+pub const PLAYTIME: &str = "playtime";
+
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
     init_client_with_database(&ENV.CLICKHOUSE_DATABASE).await
 }
@@ -90,7 +93,7 @@ pub async fn init_client_with_database(
     client
         .query(&format!(
             "
-            CREATE TABLE IF NOT EXISTS {database}.downloads {cluster_line}
+            CREATE TABLE IF NOT EXISTS {database}.{DOWNLOADS} {cluster_line}
             (
                 recorded DateTime64(4),
                 domain String,
@@ -117,7 +120,7 @@ pub async fn init_client_with_database(
     client
         .query(&format!(
             "
-            CREATE TABLE IF NOT EXISTS {database}.playtime {cluster_line}
+            CREATE TABLE IF NOT EXISTS {database}.{PLAYTIME} {cluster_line}
             (
                 recorded DateTime64(4),
                 seconds UInt64,
@@ -233,6 +236,28 @@ pub async fn init_client_with_database(
             "
             ALTER TABLE {database}.{MINECRAFT_JAVA_SERVER_PINGS} {cluster_line}
             DROP COLUMN IF EXISTS port
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            ALTER TABLE {database}.{DOWNLOADS} {cluster_line}
+            ADD COLUMN IF NOT EXISTS reason String,
+            ADD COLUMN IF NOT EXISTS game_version String,
+            ADD COLUMN IF NOT EXISTS loader String
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            ALTER TABLE {database}.{PLAYTIME} {cluster_line}
+            ADD COLUMN IF NOT EXISTS country String
             "
         ))
         .execute()

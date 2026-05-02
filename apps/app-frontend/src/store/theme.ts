@@ -5,8 +5,10 @@ export const DEFAULT_FEATURE_FLAGS = {
 	page_path: false,
 	worlds_tab: false,
 	worlds_in_home: true,
-	servers_in_app: false,
 	server_project_qa: false,
+	server_ram_as_bytes_always_on: false,
+	always_show_app_controls: false,
+	skip_unknown_pack_warning: false,
 	i18n_debug: false,
 }
 

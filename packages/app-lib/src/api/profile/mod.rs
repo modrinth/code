@@ -294,19 +294,13 @@ pub async fn get_optimal_jre_key(
     let state = State::get().await?;
 
     if let Some(profile) = get(path).await? {
-        let minecraft = crate::api::metadata::get_minecraft_versions().await?;
-
-        // Fetch version info from stored profile game_version
-        let version = minecraft
-            .versions
-            .iter()
-            .find(|it| it.id == profile.game_version)
-            .ok_or_else(|| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Invalid or unknown Minecraft version: {}",
-                    profile.game_version
-                ))
-            })?;
+        let (minecraft, version_index) =
+            crate::launcher::resolve_minecraft_manifest(
+                &profile.game_version,
+                &state,
+            )
+            .await?;
+        let version = &minecraft.versions[version_index];
 
         let loader_version = crate::launcher::get_loader_version_from_profile(
             &profile.game_version,
@@ -352,14 +346,22 @@ pub async fn install(path: &str, force: bool) -> crate::Result<()> {
     if let Some(profile) = get(path).await? {
         let result =
             crate::launcher::install_minecraft(&profile, None, force).await;
-        if result.is_err()
-            && profile.install_stage != ProfileInstallStage::Installed
-        {
-            edit(path, |prof| {
-                prof.install_stage = ProfileInstallStage::NotInstalled;
-                async { Ok(()) }
-            })
-            .await?;
+        if result.is_err() {
+            // Re-read the profile to get the current install_stage, as
+            // install_minecraft may have changed it (e.g. to MinecraftInstalling)
+            let current_stage = get(path)
+                .await
+                .ok()
+                .flatten()
+                .map(|p| p.install_stage)
+                .unwrap_or(ProfileInstallStage::NotInstalled);
+            if current_stage != ProfileInstallStage::Installed {
+                edit(path, |prof| {
+                    prof.install_stage = ProfileInstallStage::NotInstalled;
+                    async { Ok(()) }
+                })
+                .await?;
+            }
         }
         result?;
     } else {
@@ -459,6 +461,7 @@ pub async fn update_project(
             let mut path = Profile::add_project_version(
                 profile_path,
                 update_version,
+                fetch::DownloadReason::Standalone,
                 &state.pool,
                 &state.fetch_semaphore,
                 &state.io_semaphore,
@@ -499,11 +502,14 @@ pub async fn update_project(
 pub async fn add_project_from_version(
     profile_path: &str,
     version_id: &str,
+    reason: fetch::DownloadReason,
 ) -> crate::Result<String> {
     let state = State::get().await?;
+
     let project_path = Profile::add_project_version(
         profile_path,
         version_id,
+        reason,
         &state.pool,
         &state.fetch_semaphore,
         &state.io_semaphore,
@@ -861,7 +867,7 @@ async fn run_credentials(
         if !project_id.trim().is_empty() {
             let server_id = uuid::Uuid::new_v4().to_string();
 
-            let join_result = fetch::REQWEST_CLIENT
+            let join_result = fetch::INSECURE_REQWEST_CLIENT
                 .post("https://sessionserver.mojang.com/session/minecraft/join")
                 .json(&json!({
                     "accessToken": &credentials.access_token,

@@ -7,6 +7,7 @@
 use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
 use tauri::{Listener, Manager};
+use tauri_plugin_fs::FsExt;
 use theseus::prelude::*;
 
 mod api;
@@ -35,6 +36,8 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
         .allow_directory(state.directories.caches_dir(), true)?;
     app.asset_protocol_scope()
         .allow_directory(state.directories.caches_dir().join("icons"), true)?;
+    app.fs_scope()
+        .allow_directory(state.directories.profiles_dir(), true)?;
 
     Ok(())
 }
@@ -152,6 +155,7 @@ fn main() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(
             tauri_plugin_window_state::Builder::default()
@@ -229,6 +233,7 @@ fn main() {
         .plugin(api::tags::init())
         .plugin(api::utils::init())
         .plugin(api::cache::init())
+        .plugin(api::files::init())
         .plugin(api::ads::init())
         .plugin(api::friends::init())
         .plugin(api::worlds::init())

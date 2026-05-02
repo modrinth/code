@@ -536,8 +536,14 @@
   "dashboard.affiliate-links.revoke-confirm.button": {
     "message": "Odvolat"
   },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Jste si jistý, že chcete zrušit svůj affiliate odkaz „{title}“?"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Vytvořit novou"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {project} other {projects}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Hledat ve vašich kolekcích"
@@ -547,6 +553,12 @@
   },
   "dashboard.creator-tax-form-modal.confirmation.title": {
     "message": "Hotovo! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Zahraniční subjekt"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Daňový formulář"
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Jste občan USA?"
@@ -1330,15 +1342,6 @@
   },
   "servers.notice.id": {
     "message": "ID"
-  },
-  "servers.plan.large.name": {
-    "message": "Velký"
-  },
-  "servers.plan.medium.name": {
-    "message": "Střední"
-  },
-  "servers.plan.small.name": {
-    "message": "Malý"
   },
   "settings.billing.payment_method.primary": {
     "message": "Hlavní"

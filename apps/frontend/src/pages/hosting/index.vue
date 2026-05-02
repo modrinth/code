@@ -643,6 +643,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	LoaderIcon,
 	ModrinthServersPurchaseModal,
 	useFormatPrice,
 	useVIntl,
@@ -652,7 +653,6 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import OptionGroup from '~/components/ui/OptionGroup.vue'
-import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
 import MedalPlanPromotion from '~/components/ui/servers/marketing/MedalPlanPromotion.vue'
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
 import { products } from '~/generated/state.json'
@@ -1249,8 +1249,12 @@ const PING_COUNT = 20
 const PING_INTERVAL = 200
 const MAX_PING_TIME = 1000
 
-function runPingTest(region, index = 1) {
-	if (index > 10) {
+const initialIndex = {
+	'eu-lim': 31,
+}
+
+function runPingTest(region, index = initialIndex[region.shortcode] ?? 1) {
+	if (index > (initialIndex[region.shortcode] ?? 1) + 10) {
 		regionPings.value.push({
 			region: region.shortcode,
 			ping: -1,

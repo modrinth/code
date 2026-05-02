@@ -1,28 +1,27 @@
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { ArrowLeftRightIcon, ClipboardCopyIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
+import { computed, nextTick, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
+import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
+import { useReadyState } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import ConfirmLeaveModal from '../../../shared/content-tab/components/modals/ConfirmLeaveModal.vue'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
 import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
 import ContentPageLayout from '../../../shared/content-tab/layout.vue'
-import type {
-	ContentModpackData,
-	UploadState,
-} from '../../../shared/content-tab/providers/content-manager'
+import type { ContentModpackData } from '../../../shared/content-tab/providers/content-manager'
 import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
 import type {
 	ContentItem,
@@ -30,6 +29,8 @@ import type {
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
 } from '../../../shared/content-tab/types'
+
+type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
 
 const { formatMessage } = useVIntl()
 
@@ -78,28 +79,13 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-bulk-update',
 		defaultMessage: 'Failed to update content',
 	},
-	switchVersion: {
-		id: 'hosting.content.switch-version',
-		defaultMessage: 'Switch version',
-	},
-	copyLink: {
-		id: 'hosting.content.copy-link',
-		defaultMessage: 'Copy link',
-	},
 })
 
-const props = withDefaults(
-	defineProps<{
-		showClientOnlyFilter?: boolean
-	}>(),
-	{
-		showClientOnlyFilter: false,
-	},
-)
-
 const client = injectModrinthClient()
-const { server, worldId, busyReasons, isSyncingContent } = injectModrinthServerContext()
+const { server, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
+	injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
+const { openServerSettings, browseServerContent } = injectServerSettingsModal()
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
@@ -119,9 +105,15 @@ const contentQuery = useQuery({
 	queryFn: () =>
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
+	staleTime: 0,
 })
 
-const modpackProjectId = computed(() => contentQuery.data.value?.modpack?.spec.project_id ?? null)
+const contentReadyPending = useReadyState(contentQuery)
+
+const modpackProjectId = computed(() => {
+	const spec = contentQuery.data.value?.modpack?.spec
+	return spec?.platform === 'modrinth' ? spec.project_id : null
+})
 
 const modpackVersionsQuery = useQuery({
 	queryKey: computed(() => ['labrinth', 'versions', 'v2', modpackProjectId.value]),
@@ -141,24 +133,32 @@ const projectQuery = useQuery({
 const modpack = computed<ContentModpackData | null>(() => {
 	const mp = contentQuery.data.value?.modpack
 	if (!mp) return null
+	const isLocal = mp.spec.platform === 'local_file'
 	const project = projectQuery.data.value
+	const projectId = isLocal ? null : mp.spec.project_id
 	return {
 		project: {
-			id: mp.spec.project_id,
-			slug: project?.slug ?? mp.spec.project_id,
-			title: mp.title ?? mp.spec.project_id,
+			id: projectId ?? mp.title ?? '',
+			slug: project?.slug ?? projectId ?? '',
+			title: mp.title ?? (isLocal ? mp.spec.name : projectId) ?? '',
 			icon_url: mp.icon_url ?? undefined,
 			description: mp.description ?? '',
-			downloads: mp.downloads ?? 0,
-			followers: mp.followers ?? 0,
+			downloads: mp.downloads,
+			followers: mp.followers,
+			filename: isLocal ? mp.spec.filename : undefined,
 		} as ContentModpackCardProject,
-		projectLink: `/project/${project?.slug ?? mp.spec.project_id}`,
-		version: {
-			id: mp.spec.version_id,
-			version_number: mp.version_number ?? '',
-			date_published: mp.date_published ?? '',
-		} as ContentModpackCardVersion,
-		versionLink: `/project/${project?.slug ?? mp.spec.project_id}/version/${mp.spec.version_id}`,
+		projectLink: projectId ? `/project/${project?.slug ?? projectId}` : undefined,
+		version: isLocal
+			? undefined
+			: ({
+					id: mp.spec.version_id,
+					version_number: mp.version_number ?? '',
+					date_published: mp.date_published ?? '',
+				} as ContentModpackCardVersion),
+		versionLink:
+			projectId && !isLocal
+				? `/project/${project?.slug ?? projectId}/version/${mp.spec.version_id}`
+				: undefined,
 		owner: mp.owner
 			? {
 					id: mp.owner.id,
@@ -171,7 +171,7 @@ const modpack = computed<ContentModpackData | null>(() => {
 							: `/user/${mp.owner.id}`,
 				}
 			: undefined,
-		categories: (project?.display_categories ?? []).map((name) => ({
+		categories: (project?.categories ?? []).map((name) => ({
 			name,
 			icon: name,
 			project_type: 'modpack',
@@ -337,62 +337,40 @@ async function handleBulkDisable(items: ContentItem[]) {
 	}
 }
 
-const uploadState = ref<UploadState>({
-	isUploading: false,
-	currentFileName: null,
-	currentFileProgress: 0,
-	uploadedBytes: 0,
-	totalBytes: 0,
-	completedFiles: 0,
-	totalFiles: 0,
-})
-
-const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const modpackUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal>>()
 
-let activeUploadCancel: (() => void) | null = null
-
-const isUploading = computed(() => uploadState.value.isUploading)
-
-function handleBeforeUnload(e: BeforeUnloadEvent) {
-	if (isUploading.value) {
-		e.preventDefault()
-		return ''
-	}
-}
-
-if (typeof window !== 'undefined') {
-	watch(isUploading, (uploading) => {
-		if (uploading) {
-			window.addEventListener('beforeunload', handleBeforeUnload)
-		} else {
-			window.removeEventListener('beforeunload', handleBeforeUnload)
-		}
-	})
-
-	onBeforeUnmount(() => {
-		window.removeEventListener('beforeunload', handleBeforeUnload)
-	})
-
-	onBeforeRouteLeave(async () => {
-		if (isUploading.value) {
-			const shouldLeave = (await confirmLeaveModal.value?.prompt()) ?? false
-			if (shouldLeave) {
-				activeUploadCancel?.()
-			}
-			return shouldLeave
-		}
-		return true
-	})
-}
-
 const updatingProject = ref<ContentItem | null>(null)
 const updatingModpack = ref(false)
-const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
-const loadingVersions = ref(false)
 const loadingChangelog = ref(false)
+
+const updatingProjectId = computed(() => updatingProject.value?.project?.id ?? null)
+
+const projectVersionsQuery = useQuery({
+	queryKey: computed(() => ['labrinth', 'versions', 'v2', updatingProjectId.value]),
+	queryFn: () =>
+		client.labrinth.versions_v2.getProjectVersions(updatingProjectId.value!, {
+			include_changelog: false,
+		}),
+	enabled: computed(() => !!updatingProjectId.value && !updatingModpack.value),
+})
+
+const updatingProjectVersions = computed(() => {
+	const source = updatingModpack.value
+		? modpackVersionsQuery.data.value
+		: projectVersionsQuery.data.value
+	if (!source) return []
+	return [...source].sort(
+		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+	)
+})
+
+const loadingVersions = computed(() =>
+	updatingModpack.value
+		? modpackVersionsQuery.isLoading.value
+		: projectVersionsQuery.isLoading.value,
+)
 
 const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
 const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
@@ -402,6 +380,16 @@ const currentGameVersion = computed(() => contentQuery.data.value?.game_version 
 const currentLoader = computed(() => contentQuery.data.value?.modloader ?? '')
 
 function handleBrowseContent() {
+	const contentType = type.value
+	if (browseServerContent && ['mod', 'plugin', 'datapack'].includes(contentType)) {
+		browseServerContent({
+			serverId,
+			worldId: worldId.value,
+			type: contentType as 'mod' | 'plugin' | 'datapack',
+		})
+		return
+	}
+
 	router.push({
 		path: `/discover/${type.value}s`,
 		query: { sid: serverId, wid: worldId.value },
@@ -436,7 +424,7 @@ function handleUploadFiles() {
 				uploadState.value.totalBytes = p.total
 			},
 		})
-		activeUploadCancel = () => handle.cancel()
+		cancelUpload.value = () => handle.cancel()
 
 		try {
 			await handle.promise
@@ -450,7 +438,7 @@ function handleUploadFiles() {
 				text: err instanceof Error ? err.message : undefined,
 			})
 		} finally {
-			activeUploadCancel = null
+			cancelUpload.value = null
 			uploadState.value = {
 				isUploading: false,
 				currentFileName: null,
@@ -465,7 +453,7 @@ function handleUploadFiles() {
 	input.click()
 }
 
-function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
+function addonToContentItem(addon: AddonWithUiState): ContentItem {
 	return {
 		project: {
 			id: addon.project_id ?? addon.filename,
@@ -487,12 +475,16 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 					link: `/${addon.owner.type}/${addon.owner.id}`,
 				}
 			: undefined,
+		id: addon.id ?? addon.filename,
 		enabled: !addon.disabled,
 		file_name: addon.filename,
 		project_type: addon.kind,
 		has_update: !!addon.has_update,
 		update_version_id: addon.has_update,
 		environment: addon.version?.environment ?? undefined,
+		pack_client_retained: addon.pack_client_retained,
+		pack_client_depends: addon.pack_client_depends,
+		installing: addon.installing,
 	}
 }
 
@@ -604,37 +596,17 @@ async function handleBulkUpdate(items: ContentItem[]) {
 	}
 }
 
-async function handleUpdateItem(fileNameKey: string) {
-	const item = contentItems.value.find((i) => i.file_name === fileNameKey)
+async function handleUpdateItem(id: string) {
+	const item = contentItems.value.find((i) => i.id === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
 	updatingModpack.value = false
 	updatingProject.value = item
-	updatingProjectVersions.value = []
-	loadingVersions.value = true
 	loadingChangelog.value = false
 
 	await nextTick()
 
 	contentUpdaterModal.value?.show(item.update_version_id ?? undefined)
-
-	try {
-		const versions = await client.labrinth.versions_v2.getProjectVersions(item.project.id, {
-			include_changelog: false,
-		})
-		versions.sort(
-			(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-		)
-		updatingProjectVersions.value = versions
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToLoadVersions),
-			text: err instanceof Error ? err.message : undefined,
-		})
-	} finally {
-		loadingVersions.value = false
-	}
 }
 
 async function handleSwitchVersion(item: ContentItem) {
@@ -642,76 +614,34 @@ async function handleSwitchVersion(item: ContentItem) {
 
 	updatingModpack.value = false
 	updatingProject.value = item
-	updatingProjectVersions.value = []
-	loadingVersions.value = true
 	loadingChangelog.value = false
 
 	await nextTick()
 
 	contentUpdaterModal.value?.show(item.version.id, { switchMode: true })
-
-	try {
-		const versions = await client.labrinth.versions_v2.getProjectVersions(item.project.id, {
-			include_changelog: false,
-		})
-		versions.sort(
-			(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-		)
-		updatingProjectVersions.value = versions
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToLoadVersions),
-			text: err instanceof Error ? err.message : undefined,
-		})
-	} finally {
-		loadingVersions.value = false
-	}
 }
 
 async function handleModpackUpdate() {
 	const mp = contentQuery.data.value?.modpack
-	if (!mp?.spec.project_id) return
+	if (!mp || mp.spec.platform !== 'modrinth') return
 
 	updatingModpack.value = true
 	updatingProject.value = null
 	loadingChangelog.value = false
 
-	const cached = modpackVersionsQuery.data.value
-	if (cached) {
-		const sorted = [...cached].sort(
-			(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-		)
-		updatingProjectVersions.value = sorted
-		loadingVersions.value = false
-	} else {
-		updatingProjectVersions.value = []
-		loadingVersions.value = true
-	}
-
 	await nextTick()
 
 	contentUpdaterModal.value?.show(mp.has_update ?? undefined)
+}
 
-	if (!cached) {
-		try {
-			const versions = await client.labrinth.versions_v2.getProjectVersions(mp.spec.project_id, {
-				include_changelog: false,
-			})
-			versions.sort(
-				(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-			)
-			updatingProjectVersions.value = versions
-		} catch (err) {
-			addNotification({
-				type: 'error',
-				title: formatMessage(messages.failedToLoadVersions),
-				text: err instanceof Error ? err.message : undefined,
-			})
-		} finally {
-			loadingVersions.value = false
-		}
-	}
+function spliceVersionInCache(fullVersion: Labrinth.Versions.v2.Version) {
+	const projectId = updatingModpack.value ? modpackProjectId.value : updatingProjectId.value
+	if (!projectId) return
+	const key = ['labrinth', 'versions', 'v2', projectId]
+	queryClient.setQueryData(key, (old: Labrinth.Versions.v2.Version[] | undefined) => {
+		if (!old) return old
+		return old.map((v) => (v.id === fullVersion.id ? fullVersion : v))
+	})
 }
 
 async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
@@ -719,12 +649,7 @@ async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	loadingChangelog.value = true
 	try {
 		const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
-		const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
-		if (index !== -1) {
-			const newVersions = [...updatingProjectVersions.value]
-			newVersions[index] = fullVersion
-			updatingProjectVersions.value = newVersions
-		}
+		spliceVersionInCache(fullVersion)
 	} catch {
 		// Silently fail on changelog fetch
 	} finally {
@@ -736,12 +661,7 @@ async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
 	if (version.changelog) return
 	try {
 		const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
-		const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
-		if (index !== -1) {
-			const newVersions = [...updatingProjectVersions.value]
-			newVersions[index] = fullVersion
-			updatingProjectVersions.value = newVersions
-		}
+		spliceVersionInCache(fullVersion)
 	} catch {
 		// Silently fail on hover prefetch
 	}
@@ -750,8 +670,6 @@ async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
 function resetUpdateState() {
 	updatingModpack.value = false
 	updatingProject.value = null
-	updatingProjectVersions.value = []
-	loadingVersions.value = false
 	loadingChangelog.value = false
 }
 
@@ -761,7 +679,8 @@ function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?
 			pendingModpackUpdateVersion.value = selectedVersion
 			handleModpackUpdateConfirm()
 		} else {
-			const currentVersionId = contentQuery.data.value?.modpack?.spec.version_id
+			const mpSpec = contentQuery.data.value?.modpack?.spec
+			const currentVersionId = mpSpec?.platform === 'modrinth' ? mpSpec.version_id : undefined
 			const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
 			isModpackUpdateDowngrade.value = currentVersion
 				? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
@@ -775,11 +694,27 @@ function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?
 	performUpdate(selectedVersion)
 }
 
+function setAddonInstalling(filename: string, installing: boolean) {
+	queryClient.setQueryData(queryKey.value, (oldData: Archon.Content.v1.Addons | undefined) => {
+		if (!oldData) return oldData
+		return {
+			...oldData,
+			addons: (oldData.addons ?? []).map((a) =>
+				a.filename === filename ? { ...a, installing } : a,
+			),
+		}
+	})
+}
+
 async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
+	const item = updatingProject.value
+	if (item) {
+		setAddonInstalling(item.file_name, true)
+	}
 	try {
 		if (updatingModpack.value) {
 			const mp = contentQuery.data.value?.modpack
-			if (!mp) return
+			if (!mp || mp.spec.platform !== 'modrinth') return
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
 				content_variant: 'modpack',
 				spec: {
@@ -789,8 +724,8 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 				},
 				soft_override: true,
 			})
-		} else if (updatingProject.value) {
-			const addon = addonLookup.value.get(updatingProject.value.file_name)
+		} else if (item) {
+			const addon = addonLookup.value.get(item.file_name)
 			if (addon) {
 				await client.archon.content_v1.updateAddon(serverId, worldId.value!, {
 					filename: addon.filename,
@@ -800,6 +735,9 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 		}
 		await contentQuery.refetch()
 	} catch (err) {
+		if (item) {
+			setAddonInstalling(item.file_name, false)
+		}
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.failedToUpdate),
@@ -822,19 +760,11 @@ function handleModpackUpdateCancel() {
 }
 
 function getOverflowOptions(item: ContentItem) {
-	const options: { id: string; icon?: typeof ArrowLeftRightIcon; action: () => void }[] = []
-
-	if (item.project?.id && item.version?.id && !item.has_update) {
-		options.push({
-			id: formatMessage(messages.switchVersion),
-			icon: ArrowLeftRightIcon,
-			action: () => handleSwitchVersion(item),
-		})
-	}
+	const options: { id: string; icon?: typeof ClipboardCopyIcon; action: () => void }[] = []
 
 	if (item.project?.slug) {
 		options.push({
-			id: formatMessage(messages.copyLink),
+			id: formatMessage(commonMessages.copyLinkButton),
 			icon: ClipboardCopyIcon,
 			action: async () => {
 				await navigator.clipboard.writeText(
@@ -872,7 +802,6 @@ provideContentManager({
 		})
 		return filteredReasons.length > 0 ? formatMessage(filteredReasons[0].reason) : null
 	}),
-	getItemId: (item) => item.file_path ?? item.file_name,
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,
 	deleteItem: handleDeleteItem,
@@ -884,8 +813,6 @@ provideContentManager({
 	},
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
-	uploadState,
-	showClientOnlyFilter: props.showClientOnlyFilter,
 	deletionContext: 'server',
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
@@ -893,17 +820,20 @@ provideContentManager({
 	updateModpack: handleModpackUpdate,
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
-	openSettings: () => router.push(`/hosting/manage/${serverId}/options/loader`),
+	openSettings: () => openServerSettings({ tabId: 'installation' }),
+	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
+		const addon = addonLookup.value.get(item.file_name)
+		const hasModrinthProject = !!addon?.project_id
 		return {
-			id: item.file_path ?? item.file_name,
+			id: item.id,
 			project: item.project,
-			projectLink: item.project?.id ? `/${projectType}/${item.project.id}` : undefined,
+			projectLink: hasModrinthProject ? `/${projectType}/${item.project.id}` : undefined,
 			version: item.version,
 			versionLink:
-				item.project?.id && item.version?.id
+				hasModrinthProject && item.version?.id
 					? `/${projectType}/${item.project.id}/version/${item.version.id}`
 					: undefined,
 			owner: item.owner
@@ -917,54 +847,62 @@ provideContentManager({
 </script>
 
 <template>
-	<ContentPageLayout>
-		<template #modals>
-			<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
-			<ModpackContentModal
-				ref="modpackContentModal"
-				:modpack-name="modpack?.project.title"
-				:modpack-icon-url="modpack?.project.icon_url"
-				enable-toggle
-				@update:enabled="handleModpackContentToggle"
-				@bulk:enable="handleModpackBulkToggle($event, true)"
-				@bulk:disable="handleModpackBulkToggle($event, false)"
-			/>
-			<ContentUpdaterModal
-				v-if="updatingProject || updatingModpack"
-				ref="contentUpdaterModal"
-				:versions="updatingProjectVersions"
-				:current-game-version="currentGameVersion"
-				:current-loader="currentLoader"
-				:current-version-id="
-					updatingModpack
-						? (contentQuery.data.value?.modpack?.spec.version_id ?? '')
-						: (updatingProject?.version?.id ?? '')
-				"
-				:is-app="false"
-				:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
-				:project-icon-url="
-					updatingModpack ? modpack?.project.icon_url : updatingProject?.project?.icon_url
-				"
-				:project-name="
-					updatingModpack
-						? (modpack?.project.title ?? formatMessage(commonMessages.modpackLabel))
-						: (updatingProject?.project?.title ?? updatingProject?.file_name)
-				"
-				:loading="loadingVersions"
-				:loading-changelog="loadingChangelog"
-				@update="handleModalUpdate"
-				@cancel="resetUpdateState"
-				@version-select="handleVersionSelect"
-				@version-hover="handleVersionHover"
-			/>
-		</template>
-	</ContentPageLayout>
+	<ReadyTransition :pending="contentReadyPending">
+		<ContentPageLayout :bottom-padding="false">
+			<template #modals>
+				<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
+				<ModpackContentModal
+					ref="modpackContentModal"
+					:modpack-name="modpack?.project.title"
+					:modpack-icon-url="modpack?.project.icon_url"
+					enable-toggle
+					@update:enabled="handleModpackContentToggle"
+					@bulk:enable="handleModpackBulkToggle($event, true)"
+					@bulk:disable="handleModpackBulkToggle($event, false)"
+				/>
+				<ContentUpdaterModal
+					v-if="updatingProject || updatingModpack"
+					ref="contentUpdaterModal"
+					:versions="updatingProjectVersions"
+					:current-game-version="currentGameVersion"
+					:current-loader="currentLoader"
+					:current-version-id="
+						updatingModpack
+							? contentQuery.data.value?.modpack?.spec.platform === 'modrinth'
+								? contentQuery.data.value.modpack.spec.version_id
+								: ''
+							: (updatingProject?.version?.id ?? '')
+					"
+					:is-app="false"
+					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
+					:project-icon-url="
+						updatingModpack ? modpack?.project.icon_url : updatingProject?.project?.icon_url
+					"
+					:project-name="
+						updatingModpack
+							? (modpack?.project.title ?? formatMessage(commonMessages.modpackLabel))
+							: (updatingProject?.project?.title ?? updatingProject?.file_name)
+					"
+					:loading="loadingVersions"
+					:loading-changelog="loadingChangelog"
+					@update="handleModalUpdate"
+					@cancel="resetUpdateState"
+					@version-select="handleVersionSelect"
+					@version-hover="handleVersionHover"
+				/>
+			</template>
+		</ContentPageLayout>
+	</ReadyTransition>
 	<ConfirmModpackUpdateModal
 		ref="modpackUpdateModal"
 		:downgrade="isModpackUpdateDowngrade"
+		:backup-tip="
+			[modpack?.project.title, pendingModpackUpdateVersion?.version_number]
+				.filter(Boolean)
+				.join(' ')
+		"
 		server
 		@confirm="handleModpackUpdateConfirm"
 		@cancel="handleModpackUpdateCancel"
 	/>
-	<ConfirmLeaveModal ref="confirmLeaveModal" />
 </template>

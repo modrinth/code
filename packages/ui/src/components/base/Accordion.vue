@@ -1,7 +1,30 @@
 <template>
 	<div v-bind="$attrs">
+		<div v-if="divider && !!slots.title" class="flex items-center gap-4 mb-4">
+			<button
+				:class="
+					buttonClass ??
+					'group flex items-center gap-1 bg-transparent m-0 p-0 border-none cursor-pointer'
+				"
+				@click="() => (forceOpen ? undefined : toggledOpen ? close() : open())"
+			>
+				<slot name="button" :open="isOpen">
+					<div
+						class="flex items-center gap-1 whitespace-nowrap transition-colors text-primary group-hover:text-contrast"
+					>
+						<slot name="title" :open="isOpen" />
+						<DropdownIcon
+							v-if="!forceOpen"
+							class="size-5 transition-transform duration-300 shrink-0 text-secondary group-hover:text-primary"
+							:class="{ 'rotate-180': isOpen }"
+						/>
+					</div>
+				</slot>
+			</button>
+			<hr class="h-px w-full border-none bg-divider" aria-hidden="true" />
+		</div>
 		<button
-			v-if="!!slots.title"
+			v-else-if="!!slots.title"
 			:class="buttonClass ?? 'flex flex-col gap-2 bg-transparent m-0 p-0 border-none'"
 			@click="() => (forceOpen ? undefined : toggledOpen ? close() : open())"
 		>
@@ -44,6 +67,7 @@ const props = withDefaults(
 		titleWrapperClass?: string
 		forceOpen?: boolean
 		overflowVisible?: boolean
+		divider?: boolean
 	}>(),
 	{
 		type: 'standard',
@@ -53,6 +77,7 @@ const props = withDefaults(
 		titleWrapperClass: null,
 		forceOpen: false,
 		overflowVisible: false,
+		divider: false,
 	},
 )
 

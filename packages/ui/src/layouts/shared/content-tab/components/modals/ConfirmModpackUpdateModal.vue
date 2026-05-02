@@ -13,11 +13,15 @@
 					formatMessage(messages.admonitionHeader, { action: downgrade ? 'downgrade' : 'update' })
 				"
 			>
-				{{ formatMessage(messages.admonitionBody) }}
+				{{
+					formatMessage(messages.admonitionBody, {
+						action: downgrade ? 'downgrade' : 'update',
+					})
+				}}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				:backup-name="downgrade ? 'Before modpack downgrade' : 'Before modpack update'"
+				:backup-name="backupName"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -45,7 +49,7 @@
 
 <script setup lang="ts">
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -55,12 +59,19 @@ import { commonMessages } from '#ui/utils/common-messages'
 
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
-defineProps<{
+const props = defineProps<{
 	downgrade?: boolean
-	server?: boolean
+	backupTip?: string
 }>()
 
 const { formatMessage } = useVIntl()
+
+const backupName = computed(() => {
+	const action = props.downgrade ? 'downgrade' : 'update'
+	return props.backupTip
+		? `Before modpack ${action} (${props.backupTip})`
+		: `Before modpack ${action}`
+})
 
 const messages = defineMessages({
 	header: {
@@ -73,7 +84,8 @@ const messages = defineMessages({
 	},
 	admonitionBody: {
 		id: 'content.confirm-modpack-update.admonition-body',
-		defaultMessage: 'Any mods or content you added on top of the modpack will be deleted.',
+		defaultMessage:
+			'{action, select, downgrade {Downgrading} other {Updating}} may cause compatibility issues. Mods or content you added on top of the modpack will be kept, but may not be compatible with the new version.',
 	},
 	confirmButton: {
 		id: 'content.confirm-modpack-update.confirm-button',

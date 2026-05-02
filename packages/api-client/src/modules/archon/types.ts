@@ -27,6 +27,8 @@ export namespace Archon {
 				disabled: boolean
 				kind: AddonKind
 				from_modpack: boolean
+				pack_client_retained: boolean
+				pack_client_depends: boolean
 				has_update: string | null
 				name: string | null
 				project_id: string | null
@@ -68,11 +70,20 @@ export namespace Archon {
 				| 'purpur'
 				| 'vanilla'
 
-			export type ModpackSpec = {
+			export type ModpackSpecModrinth = {
 				platform: 'modrinth'
 				project_id: string
 				version_id: string
 			}
+
+			export type ModpackSpecLocalFile = {
+				platform: 'local_file'
+				filename: string
+				name: string
+				description: string | null
+			}
+
+			export type ModpackSpec = ModpackSpecModrinth | ModpackSpecLocalFile
 
 			export type ModpackOwner = {
 				id: string
@@ -393,6 +404,9 @@ export namespace Archon {
 				name: string
 				created_at: string
 				is_active: boolean
+				/**
+				 * @deprecated Prefer `client.archon.backups_queue_v1.list()` for queue-aware backup state.
+				 */
 				backups: Archon.Backups.v1.Backup[]
 				content: WorldContentInfo | null
 				readiness: WorldReadiness
@@ -423,16 +437,24 @@ export namespace Archon {
 	}
 
 	export namespace Backups {
+		/**
+		 * @deprecated Use {@link Archon.BackupsQueue.v1} and `client.archon.backups_queue_v1` instead.
+		 */
 		export namespace v1 {
+			/** @deprecated Use {@link Archon.BackupsQueue.v1} instead. */
 			export type BackupState = 'ongoing' | 'done' | 'failed' | 'cancelled' | 'unchanged'
+			/** @deprecated Use {@link Archon.BackupsQueue.v1} instead. */
 			export type BackupTask = 'file' | 'create' | 'restore'
+			/** @deprecated Use {@link Archon.BackupsQueue.v1} instead. */
 			export type BackupStatus = 'pending' | 'in_progress' | 'timed_out' | 'error' | 'done'
 
+			/** @deprecated Use {@link Archon.BackupsQueue.v1} instead. */
 			export type BackupTaskProgress = {
 				progress: number // 0.0 to 1.0
 				state: BackupState
 			}
 
+			/** @deprecated Use {@link Archon.BackupsQueue.v1.BackupQueueBackup} instead. */
 			export type Backup = {
 				id: string
 				physical_id: string
@@ -450,16 +472,83 @@ export namespace Archon {
 				}
 			}
 
+			/** @deprecated Use {@link Archon.BackupsQueue.v1.BackupRequest} instead. */
 			export type BackupRequest = {
 				name: string
 			}
 
+			/** @deprecated Use {@link Archon.BackupsQueue.v1} instead. */
 			export type PatchBackup = {
 				name?: string
 			}
 
+			/** @deprecated Use {@link Archon.BackupsQueue.v1.PostBackupQueueResponse} instead. */
 			export type PostBackupResponse = {
 				id: string
+			}
+		}
+	}
+
+	export namespace BackupsQueue {
+		export namespace v1 {
+			export type BackupQueueOperationType = 'create' | 'restore'
+
+			export type BackupQueueState =
+				| 'pending'
+				| 'ongoing'
+				| 'completed'
+				| 'cancelled'
+				| 'failed'
+				| 'timed_out'
+
+			export type BackupStatus = 'pending' | 'in_progress' | 'timed_out' | 'error' | 'done'
+
+			export type BackupRequest = {
+				name: string
+			}
+
+			export type PostBackupQueueResponse = {
+				id: string
+			}
+
+			export type DeleteManyBackupRequest = {
+				backup_ids: string[]
+			}
+
+			export type ActiveOperation = {
+				backup_id: string
+				operation_type: BackupQueueOperationType
+				operation_id?: number | null
+				has_parent: boolean
+				scheduled_for: string
+				synthetic_legacy: boolean
+			}
+
+			export type BackupQueueOperation = {
+				operation_type: BackupQueueOperationType
+				operation_id?: number | null
+				state: BackupQueueState
+				scheduled_for: string
+				completed_at?: string | null
+				has_parent: boolean
+				error?: string | null
+				should_prompt: boolean
+				synthetic_legacy: boolean
+			}
+
+			export type BackupQueueBackup = {
+				id: string
+				name: string
+				created_at: string
+				status: BackupStatus
+				locked: boolean
+				automated: boolean
+				history: BackupQueueOperation[]
+			}
+
+			export type BackupsQueueResponse = {
+				active_operations: ActiveOperation[]
+				backups: BackupQueueBackup[]
 			}
 		}
 	}
@@ -471,7 +560,14 @@ export namespace Archon {
 				token: string
 			}
 
-			export type BackupState = 'ongoing' | 'done' | 'failed' | 'cancelled' | 'unchanged'
+			export type BackupState =
+				| 'pending'
+				| 'ongoing'
+				| 'done'
+				| 'failed'
+				| 'cancelled'
+				| 'unchanged'
+				| 'damaged'
 			export type BackupTask = 'file' | 'create' | 'restore'
 
 			export type WSBackupProgressEvent = {
@@ -480,12 +576,24 @@ export namespace Archon {
 				task: BackupTask
 				state: BackupState
 				progress: number
+				start_time?: number | null
+				finish_time?: number | null
 			}
 
 			export type WSLogEvent = {
 				event: 'log'
 				stream: 'stdout' | 'stderr'
 				message: string
+			}
+
+			export type WSLog4jEvent = {
+				event: 'log4j'
+				logger_name?: string
+				level?: string
+				thread_name?: string
+				timestamp_millis?: number
+				message?: string
+				throwable?: string
 			}
 
 			export type WSStatsEvent = {
@@ -600,6 +708,11 @@ export namespace Archon {
 				percent: number
 			}
 
+			export type SyncContentError = {
+				step: string
+				description: string
+			}
+
 			export type WSStateEvent = {
 				event: 'state'
 				debug: string
@@ -609,6 +722,7 @@ export namespace Archon {
 				target: 'start' | 'stop' | 'restart' | null
 				uptime: number
 				progress: SyncContentProgress | null
+				content_error: SyncContentError | null
 			}
 
 			// Outgoing messages (client -> server)
@@ -627,6 +741,7 @@ export namespace Archon {
 			export type WSEvent =
 				| WSBackupProgressEvent
 				| WSLogEvent
+				| WSLog4jEvent
 				| WSStatsEvent
 				| WSPowerStateEvent
 				| WSStateEvent

@@ -509,10 +509,10 @@ fn get_gv_range(
     mut all_game_versions: Vec<MinecraftGameVersion>,
 ) -> Vec<String> {
     // both -> least to greatest
-    game_versions.sort_by(|a, b| a.created.cmp(&b.created));
+    game_versions.sort_by_key(|a| a.created);
     game_versions.dedup_by(|a, b| a.version == b.version);
 
-    all_game_versions.sort_by(|a, b| a.created.cmp(&b.created));
+    all_game_versions.sort_by_key(|a| a.created);
 
     let all_releases = all_game_versions
         .iter()
