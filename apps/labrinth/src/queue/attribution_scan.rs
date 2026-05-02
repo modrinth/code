@@ -6,7 +6,7 @@ use eyre::{Result, eyre};
 use hex::ToHex;
 use sha1::Digest;
 use tokio::task::spawn_blocking;
-use tracing::info;
+use tracing::{Instrument, info, info_span, warn};
 use zip::ZipArchive;
 
 use crate::database::models::moderation_external_item::ExternalLicense;
@@ -14,6 +14,7 @@ use crate::database::models::{DBFileId, DBUserId, DBVersion};
 use crate::database::{PgPool, PgTransaction, redis::RedisPool};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
+use crate::models::ids::FileId;
 use crate::queue::moderation::{
     ApprovalType, FingerprintResponse, FlameProject, FlameResponse,
 };
@@ -46,27 +47,39 @@ pub async fn scan_all_file_override_attributions(
     let mut scanned_ids = Vec::new();
 
     for row in files_to_scan {
-        let file_id = row.file_id;
+        let human_file_id = FileId::from(row.file_id);
+        let span = info_span!("scan", file_id = %human_file_id);
+        async {
+            info!("Scanning file");
 
-        info!("Scanning {file_id:?}");
+            let file_id = row.file_id;
 
-        let overrides =
-            extract_override_files_from_storage(file_host, file_id, &row.url)
-                .await
-                .wrap_err_with(|| {
-                    eyre!("extracting overrides for file {file_id:?}")
-                })?;
+            let overrides = extract_override_files_from_storage(
+                file_host, file_id, &row.url,
+            )
+            .await
+            .wrap_err_with(|| {
+                eyre!("extracting overrides for file {file_id:?}")
+            })?;
 
-        if !overrides.is_empty() {
-            resolve_overrides(&overrides, redis, &mut txn)
-                .await
-                .wrap_err_with(|| {
-                    eyre!("resolving overrides for file {file_id:?}")
-                })?;
+            if overrides.is_empty() {
+                info!("Found no overrides");
+            } else {
+                info!("Found {} overrides", overrides.len());
+
+                let resolved = resolve_overrides(&overrides, redis, &mut txn)
+                    .await
+                    .wrap_err_with(|| {
+                        eyre!("resolving overrides for file {file_id:?}")
+                    })?;
+                info!("Resolved: {resolved:#?}");
+            }
+
+            scanned_ids.push(file_id.0);
+            eyre::Ok(())
         }
-
-        scanned_ids.push(file_id.0);
-        info!("Scanned {file_id:?}, found {} overrides", overrides.len());
+        .instrument(span)
+        .await?;
     }
 
     if !scanned_ids.is_empty() {
@@ -320,6 +333,10 @@ async fn resolve_overrides(
         .send()
         .await;
 
+    if let Err(e) = &res {
+        warn!("Flame fingerprint request failed: {e}");
+    }
+
     if let Ok(res) = res {
         let body = res
             .text()
@@ -426,7 +443,10 @@ async fn resolve_overrides(
                     })
                     .map(|x| x.data)
                     .unwrap_or_default(),
-                Err(_) => Vec::new(),
+                Err(e) => {
+                    warn!("Flame projects request failed: {e}");
+                    Vec::new()
+                }
             };
 
             for (sha1, flame_project_id) in &flame_matches {
