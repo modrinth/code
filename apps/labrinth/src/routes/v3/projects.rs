@@ -1359,10 +1359,10 @@ pub async fn dependency_list_internal(
         )
         .await?;
 
-        projects.sort_by(|a, b| b.published.cmp(&a.published));
+        projects.sort_by_key(|b| std::cmp::Reverse(b.published));
         projects.dedup_by(|a, b| a.id == b.id);
 
-        versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+        versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
         versions.dedup_by(|a, b| a.id == b.id);
 
         Ok(HttpResponse::Ok().json(DependencyInfo { projects, versions }))

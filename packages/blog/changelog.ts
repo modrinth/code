@@ -11,6 +11,23 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-02T22:09:01+00:00`,
+		product: 'app',
+		version: '0.13.8',
+		body: `## Fixed
+- Fixed exclude open source filter not working.
+- Fixed Central Europe server region not displaying ping in the Modrinth Hosting region selector.`,
+	},
+	{
+		date: `2026-05-02T22:09:01+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed exclude open source filter not working.
+- Fixed 404 error when returning to collections dashboard from a collection page.
+- Fixed error loading revenue transfer history page.
+- Fixed Central Europe server region not displaying ping in the Modrinth Hosting region selector.`,
+	},
+	{
 		date: `2026-04-29T17:19:44+00:00`,
 		product: 'app',
 		version: '0.13.7',
