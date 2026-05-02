@@ -32,7 +32,7 @@
     "@clack/prompts": "^1.0.0",
     "@modrinth/tooling-config": "workspace:*",
     "@tailwindcss/container-queries": "^0.1.1",
-    "@types/node": "^24.0.0",
+    "@types/node": "^24",
     "@vue/compiler-dom": "^3.5.26",
     "@vue/compiler-sfc": "^3.5.26",
     "chalk": "^5.6.2",
@@ -44,6 +44,9 @@
     "yaml": "^2.8.2"
   },
   "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=24.15.0"
+  },
   "pnpm": {
     "patchedDependencies": {
       "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
