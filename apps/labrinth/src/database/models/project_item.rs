@@ -239,7 +239,7 @@ impl ProjectBuilder {
         for mut version in self.initial_versions {
             version.project_id = self.project_id;
             version
-                .insert(&mut *transaction, redis, file_host, http)
+                .insert(transaction, redis, file_host, http)
                 .await?;
         }
 

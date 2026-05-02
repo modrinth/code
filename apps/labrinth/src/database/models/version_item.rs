@@ -8,6 +8,7 @@ use crate::database::models::loader_fields::{
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::exp;
+
 use crate::models::projects::{FileType, VersionStatus};
 use crate::queue::attribution_scan::scan_file_override_attributions;
 use crate::routes::internal::delphi::DelphiRunParameters;
@@ -886,14 +887,14 @@ impl DBVersion {
             })
     }
 
-    pub async fn get_files_from_hash<'a, 'b, E>(
+    pub async fn get_files_from_hash<'a, E>(
         algorithm: String,
         hashes: &[String],
         executor: E,
         redis: &RedisPool,
     ) -> Result<Vec<DBFile>, DatabaseError>
     where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis.get_cached_keys(
             VERSION_FILES_NAMESPACE,
