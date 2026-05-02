@@ -59,6 +59,14 @@ const chartOptions = {
 			enabled: true,
 		},
 		parentHeightOffset: 0,
+		animations: {
+			enabled: false,
+		},
+		events: {
+			click: undefined,
+			mouseover: undefined,
+			mouseout: undefined,
+		},
 	},
 	stroke: {
 		curve: 'smooth',
@@ -66,19 +74,8 @@ const chartOptions = {
 	},
 	fill: {
 		colors: [props.color],
-		type: 'gradient',
+		type: 'solid',
 		opacity: 1,
-		gradient: {
-			shade: 'light',
-			type: 'vertical',
-			shadeIntensity: 0,
-			gradientToColors: [props.color],
-			inverseColors: true,
-			opacityFrom: 0.5,
-			opacityTo: 0,
-			stops: [0, 100],
-			colorStops: [],
-		},
 	},
 	grid: {
 		show: false,
@@ -102,6 +99,9 @@ const chartOptions = {
 		tooltip: {
 			enabled: false,
 		},
+		crosshairs: {
+			show: false,
+		},
 	},
 	yaxis: {
 		labels: {
@@ -119,6 +119,18 @@ const chartOptions = {
 	},
 	tooltip: {
 		enabled: false,
+	},
+	states: {
+		hover: {
+			filter: {
+				type: 'none',
+			},
+		},
+		active: {
+			filter: {
+				type: 'none',
+			},
+		},
 	},
 }
 
@@ -149,7 +161,7 @@ defineExpose({
 			{{ title }}
 		</div>
 		<div class="chart">
-			<VueApexCharts ref="chart" type="area" :options="chartOptions" :series="data" height="70" />
+			<VueApexCharts ref="chart" type="bar" :options="chartOptions" :series="data" height="70" />
 		</div>
 	</Card>
 </template>

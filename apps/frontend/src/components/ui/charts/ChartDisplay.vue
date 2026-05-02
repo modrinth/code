@@ -107,9 +107,7 @@
 								<Chart
 									v-if="analytics.formattedData.value.downloads && selectedChart === 'downloads'"
 									ref="downloadsChart"
-									type="line"
 									name="Download data"
-									:hide-legend="true"
 									:data="analytics.formattedData.value.downloads.chart.data"
 									:labels="analytics.formattedData.value.downloads.chart.labels"
 									suffix="<svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' /></svg>"
@@ -122,9 +120,7 @@
 								<Chart
 									v-if="analytics.formattedData.value.views && selectedChart === 'views'"
 									ref="viewsChart"
-									type="line"
 									name="View data"
-									:hide-legend="true"
 									:data="analytics.formattedData.value.views.chart.data"
 									:labels="analytics.formattedData.value.views.chart.labels"
 									suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>"
@@ -137,9 +133,7 @@
 								<Chart
 									v-if="analytics.formattedData.value.revenue && selectedChart === 'revenue'"
 									ref="revenueChart"
-									type="line"
 									name="Revenue data"
-									:hide-legend="true"
 									:data="analytics.formattedData.value.revenue.chart.data"
 									:labels="analytics.formattedData.value.revenue.chart.labels"
 									is-money
@@ -217,8 +211,8 @@
 									</template>
 								</div>
 								<div class="country-text">
-									<strong class="country-name"
-										><template v-if="name.toLowerCase() === 'xx' || !name">Other</template>
+									<strong class="country-name">
+										<template v-if="name.toLowerCase() === 'xx' || !name">Other</template>
 										<template v-else>{{ countryCodeToName(name) }}</template>
 									</strong>
 									<span class="data-point">{{ formatCompactNumber(count) }}</span>
@@ -788,10 +782,8 @@ const defaultRanges: RangeObject[] = [
 
 .chart-area {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	gap: var(--gap-md);
-
-	height: 100%;
 
 	.chart {
 		flex-grow: 1;
@@ -803,15 +795,15 @@ const defaultRanges: RangeObject[] = [
 	}
 
 	.legend {
-		margin-top: 24px;
+		margin-top: 0;
 		overflow: hidden;
 
-		max-width: 26ch;
-		width: fit-content;
+		width: 100%;
 
 		.legend__items {
 			display: flex;
-			flex-direction: column;
+			flex-direction: row;
+			flex-wrap: wrap;
 			gap: var(--gap-xs);
 
 			.legend__item {
@@ -820,7 +812,6 @@ const defaultRanges: RangeObject[] = [
 				align-items: center;
 				gap: var(--gap-xs);
 				font-size: var(--font-size-sm);
-				width: 100%;
 
 				.legend__item__text {
 					white-space: nowrap;

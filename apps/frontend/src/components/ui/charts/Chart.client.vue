@@ -36,11 +36,11 @@ const props = defineProps({
 	},
 	hideLegend: {
 		type: Boolean,
-		default: false,
+		default: true,
 	},
 	stacked: {
 		type: Boolean,
-		default: false,
+		default: true,
 	},
 	type: {
 		type: String,
@@ -158,6 +158,10 @@ function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
 	return tooltip
 }
 
+function formatY(val) {
+	return props.isMoney ? formatMoney(val) : formatNumber(val)
+}
+
 const chartOptions = computed(() => {
 	return {
 		chart: {
@@ -199,6 +203,9 @@ const chartOptions = computed(() => {
 			},
 		},
 		yaxis: {
+			labels: {
+				formatter: formatY,
+			},
 			tooltip: {
 				enabled: false,
 			},

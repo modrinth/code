@@ -158,7 +158,7 @@ export const analyticsSetToCSVString = (analytics) => {
 	return [header, ...data].join(newline)
 }
 
-export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, chartName, theme) => {
+export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, chartName, theme, startDate, endDate, timeResolution) => {
 	if (!category || !projects) {
 		return emptyAnalytics
 	}
@@ -179,12 +179,82 @@ export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, cha
 		.map((data) => data.sort(sortFn))
 		.map((data) => (mapFn ? data.map(mapFn) : data))
 
-	// Each project may not include the same timestamps, so we should use the union of all timestamps
-	const timestamps = Array.from(
-		new Set(projectData.flatMap((data) => data.map(([ts]) => ts))),
-	).sort()
+	// Generate all expected timestamps for the date range and resolution
+	// Match backend logic: round start down to resolution boundary, round end up
+	let timestamps = []
+	let aggregateFn = null
 
-	const chartData = projectData
+	if (startDate && endDate && timeResolution) {
+		const stepSeconds = timeResolution * 60 // convert minutes to seconds
+		const startTs = startDate.unix()
+		const endTs = endDate.unix()
+
+		// For "All time" (start near unix 0) or very large ranges, use actual data timestamps
+		const durationDays = (endTs - startTs) / 86400
+		const isAllTime = startTs < 86400 * 365 // Started before 1971
+
+		if (isAllTime || durationDays > 365 * 5) {
+			// Use union of actual data timestamps instead of generating all timestamps
+			timestamps = Array.from(
+				new Set(projectData.flatMap((data) => data.map(([ts]) => ts))),
+			).sort()
+		} else {
+			// Round start_date down to nearest resolution (like backend does)
+			const diff = startTs % stepSeconds
+			const alignedStart = startTs - diff
+			// Round end_date up to nearest resolution (like backend does)
+			const endDiff = endTs % stepSeconds
+			const alignedEnd = endTs + (stepSeconds - endDiff)
+
+			// For large time ranges, aggregate by week or month
+			if (durationDays > 365) {
+				// Aggregate by month
+				aggregateFn = (ts) => {
+					const d = dayjs.unix(parseInt(ts))
+					return d.startOf('month').unix().toString()
+				}
+			} else if (durationDays > 90) {
+				// Aggregate by week
+				aggregateFn = (ts) => {
+					const d = dayjs.unix(parseInt(ts))
+					return d.startOf('week').unix().toString()
+				}
+			}
+
+			const expected = []
+			let currentTs = alignedStart
+			while (currentTs <= alignedEnd) {
+				expected.push(currentTs.toString())
+				currentTs += stepSeconds
+			}
+			timestamps = expected
+		}
+	} else {
+		// Fallback to union of project timestamps if date range is not provided
+		timestamps = Array.from(
+			new Set(projectData.flatMap((data) => data.map(([ts]) => ts))),
+		).sort()
+	}
+
+	// If we need to aggregate, process the data
+	let finalProjectData = projectData
+	let finalTimestamps = timestamps
+
+	if (aggregateFn) {
+		// Aggregate timestamps
+		finalTimestamps = [...new Set(timestamps.map((ts) => aggregateFn(ts)))].sort()
+		// Aggregate project data
+		finalProjectData = projectData.map((data) => {
+			const aggregated = {}
+			data.forEach(([ts, val]) => {
+				const key = aggregateFn(ts)
+				aggregated[key] = (aggregated[key] || 0) + val
+			})
+			return Object.entries(aggregated).sort(sortFn)
+		})
+	}
+
+	const chartData = finalProjectData
 		.map((data, i) => {
 			const project = projects.find((p) => p.id === loadedProjectIds[i])
 			if (!project) {
@@ -193,43 +263,49 @@ export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, cha
 
 			return {
 				name: `${project.title}`,
-				data: timestamps.map((ts) => {
+				data: finalTimestamps.map((ts) => {
 					const entry = data.find(([ets]) => ets === ts)
-					return entry ? entry[1] : 0
+					return entry ? entry[1] : null
 				}),
 				id: project.id,
 				color: project.color,
 			}
 		})
+		.filter((project) => {
+			// Filter out projects with no data at all (all nulls/zeros)
+			return project.data.some((val) => val !== null && val > 0)
+		})
 		.sort(
 			(a, b) =>
-				b.data.reduce((acc, cur) => acc + cur, 0) - a.data.reduce((acc, cur) => acc + cur, 0),
+				b.data.reduce((acc, cur) => (cur !== null ? acc + cur : acc), 0) -
+				a.data.reduce((acc, cur) => (cur !== null ? acc + cur : acc), 0),
 		)
 
 	const projectIdsSortedBySum = chartData.map((p) => p.id)
 
 	return {
 		// The total count of all the values across all projects
-		sum: projectData.reduce((acc, cur) => acc + cur.reduce((a, c) => a + c[1], 0), 0),
-		len: timestamps.length,
+		sum: finalProjectData.reduce((acc, cur) => acc + cur.reduce((a, c) => a + c[1], 0), 0),
+		len: finalTimestamps.length,
 		chart: {
-			labels: timestamps.map(labelFn),
+			labels: finalTimestamps.map(labelFn),
 			data: chartData.map((x) => ({ name: x.name, data: x.data })),
-			sumData: [
-				{
-					name: chartName,
-					data: timestamps.map((ts) => {
-						const entries = projectData.flat().filter(([ets]) => ets === ts)
-						return entries.reduce((acc, cur) => acc + cur[1], 0)
-					}),
-				},
-			],
-			colors: projectData.map((_, i) => {
+		sumData: [
+			{
+				name: chartName,
+				data: finalTimestamps.map((ts) => {
+					const entries = finalProjectData.flat().filter(([ets]) => ets === ts)
+					if (entries.length === 0) return null
+					return entries.reduce((acc, cur) => acc + cur[1], 0)
+				}),
+			},
+		],
+			colors: finalProjectData.map((_, i) => {
 				const project = chartData[i]
 
 				return intToRgba(project.color, project.id, theme)
 			}),
-			defaultColors: projectData.map((_, i) => {
+			defaultColors: finalProjectData.map((_, i) => {
 				const project = chartData[i]
 				return getDefaultColor(project.id)
 			}),
@@ -285,13 +361,13 @@ export const processAnalyticsByCountry = (category, projects, sortFn) => {
 
 const sortCount = ([, a], [, b]) => b - a
 const sortTimestamp = ([a], [b]) => a - b
-const roundValue = ([ts, value]) => [ts, Math.round(parseFloat(value) * 100) / 100]
+const roundValue = ([ts, value]) => [ts, Math.round(parseFloat(value) * 1000000) / 1000000]
 
 const processCountryAnalytics = (c, projects) => processAnalyticsByCountry(c, projects, sortCount)
-const processNumberAnalytics = (c, projects, theme) =>
-	processAnalytics(c, projects, formatTimestamp, sortTimestamp, null, 'Downloads', theme)
-const processRevAnalytics = (c, projects, theme) =>
-	processAnalytics(c, projects, formatTimestamp, sortTimestamp, roundValue, 'Revenue', theme)
+const processNumberAnalytics = (c, projects, theme, startDate, endDate, timeResolution) =>
+	processAnalytics(c, projects, formatTimestamp, sortTimestamp, null, 'Downloads', theme, startDate, endDate, timeResolution)
+const processRevAnalytics = (c, projects, theme, startDate, endDate, timeResolution) =>
+	processAnalytics(c, projects, formatTimestamp, sortTimestamp, roundValue, 'Revenue', theme, startDate, endDate, timeResolution)
 
 const useFetchAnalytics = (
 	url,
@@ -332,9 +408,9 @@ export const useFetchAllAnalytics = (
 	const error = ref(null)
 
 	const formattedData = computed(() => ({
-		downloads: processNumberAnalytics(downloadData.value, selectedProjects.value),
-		views: processNumberAnalytics(viewData.value, selectedProjects.value),
-		revenue: processRevAnalytics(revenueData.value, selectedProjects.value),
+		downloads: processNumberAnalytics(downloadData.value, selectedProjects.value, undefined, startDate.value, endDate.value, timeResolution.value),
+		views: processNumberAnalytics(viewData.value, selectedProjects.value, undefined, startDate.value, endDate.value, timeResolution.value),
+		revenue: processRevAnalytics(revenueData.value, selectedProjects.value, theme.active, startDate.value, endDate.value, timeResolution.value),
 		downloadsByCountry: processCountryAnalytics(downloadsByCountry.value, selectedProjects.value),
 		viewsByCountry: processCountryAnalytics(viewsByCountry.value, selectedProjects.value),
 	}))
@@ -342,9 +418,9 @@ export const useFetchAllAnalytics = (
 	const theme = useTheme()
 
 	const totalData = computed(() => ({
-		downloads: processNumberAnalytics(downloadData.value, projects.value, theme.active),
-		views: processNumberAnalytics(viewData.value, projects.value, theme.active),
-		revenue: processRevAnalytics(revenueData.value, projects.value, theme.active),
+		downloads: processNumberAnalytics(downloadData.value, projects.value, theme.active, startDate.value, endDate.value, timeResolution.value),
+		views: processNumberAnalytics(viewData.value, projects.value, theme.active, startDate.value, endDate.value, timeResolution.value),
+		revenue: processRevAnalytics(revenueData.value, projects.value, theme.active, startDate.value, endDate.value, timeResolution.value),
 	}))
 
 	const buildQuery = () => {
