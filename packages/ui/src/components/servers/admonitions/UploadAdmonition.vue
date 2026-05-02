@@ -25,12 +25,14 @@
 
 <script setup lang="ts">
 import { UploadIcon } from '@modrinth/assets'
-import { formatBytes } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { useFormatBytes } from '#ui/composables'
 import { injectModrinthServerContext } from '#ui/providers'
+
+const formatBytes = useFormatBytes()
 
 const ctx = injectModrinthServerContext()
 

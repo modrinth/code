@@ -436,9 +436,10 @@ import {
 	injectProjectPageContext,
 	MultiSelect,
 	StyledInput,
+	useFormatBytes,
 	useFormatDateTime,
 } from '@modrinth/ui'
-import { formatBytes, renderHighlightedString } from '@modrinth/utils'
+import { renderHighlightedString } from '@modrinth/utils'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
@@ -466,6 +467,7 @@ const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 })
 const formatDate = useFormatDateTime({ dateStyle: 'medium' })
+const formatBytes = useFormatBytes()
 
 // Helper for accessing nuxt app $formatVersion
 const formatVersionDisplay = (versions: string[]) => (data as any).$formatVersion(versions)

@@ -1,5 +1,6 @@
 export * from './debug-logger'
 export * from './dynamic-font-size'
+export * from './format-bytes'
 export * from './format-date-time'
 export * from './format-money'
 export * from './format-number'
