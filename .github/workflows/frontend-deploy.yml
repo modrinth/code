@@ -21,6 +21,10 @@ on:
         type: string
         description: 'The environment to deploy to (staging-preview or production-preview)'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
+
 jobs:
   deploy:
     runs-on: blacksmith-4vcpu-ubuntu-2404

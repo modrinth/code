@@ -17,6 +17,10 @@ on:
   merge_group:
     types: [checks_requested]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
+
 jobs:
   docker:
     runs-on: blacksmith-4vcpu-ubuntu-2404

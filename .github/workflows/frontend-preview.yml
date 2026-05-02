@@ -11,6 +11,10 @@ on:
       - '**/pnpm-*.yaml'
       - '.github/workflows/frontend-preview.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
+
 jobs:
   deploy:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
