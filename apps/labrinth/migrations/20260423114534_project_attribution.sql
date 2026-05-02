@@ -2,7 +2,7 @@ alter table dependencies
     add column dependency_sha1 bytea;
 
 create table file_attributions (
-	file_id bigint primary key references versions(id),
+	file_id bigint primary key references files(id),
 	-- if a file..
 	-- - does not have a row
 	--   -> was created before attributions system

@@ -37,7 +37,7 @@ pub async fn scan_all_file_override_attributions(
         where fa.scanned_at is null
         "#
     )
-    .fetch_all(&*db)
+    .fetch_all(&mut txn)
     .await
     .wrap_err("fetching files to scan")?;
 
@@ -47,6 +47,9 @@ pub async fn scan_all_file_override_attributions(
 
     for row in files_to_scan {
         let file_id = row.file_id;
+
+        info!("Scanning {file_id:?}");
+
         let overrides =
             extract_override_files_from_storage(file_host, file_id, &row.url)
                 .await
@@ -63,6 +66,7 @@ pub async fn scan_all_file_override_attributions(
         }
 
         scanned_ids.push(file_id.0);
+        info!("Scanned {file_id:?}, found {} overrides", overrides.len());
     }
 
     if !scanned_ids.is_empty() {
@@ -81,6 +85,8 @@ pub async fn scan_all_file_override_attributions(
         .await
         .wrap_err("marking files as scanned")?;
     }
+
+    info!("Marked {} files as scanned", scanned_ids.len());
 
     txn.commit().await.wrap_err("committing transaction")?;
 
@@ -248,10 +254,7 @@ async fn resolve_overrides(
         .wrap_err("fetching versions")?;
 
     for file in &files {
-        if !versions_data
-            .iter()
-            .any(|v| v.inner.id == file.version_id)
-        {
+        if !versions_data.iter().any(|v| v.inner.id == file.version_id) {
             continue;
         }
 
@@ -403,7 +406,7 @@ async fn resolve_overrides(
 
         if !flame_matches.is_empty() {
             let flame_projects_res = HTTP_CLIENT
-                .post(format!("{}v1/mods", ENV.FLAME_ANVIL_URL))
+                .post(format!("{}/v1/mods", ENV.FLAME_ANVIL_URL))
                 .json(&serde_json::json!({
                     "modIds": flame_matches.iter().map(|x| x.1).collect::<Vec<_>>()
                 }))

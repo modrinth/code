@@ -570,7 +570,7 @@ impl AutomatedModerationQueue {
                                             Vec::new()
                                         } else {
                                             let res = client
-                                                .post(format!("{}v1/mods", ENV.FLAME_ANVIL_URL))
+                                                .post(format!("{}/v1/mods", ENV.FLAME_ANVIL_URL))
                                             .json(&serde_json::json!({
                                                 "modIds": flame_files.iter().map(|x| x.1).collect::<Vec<_>>()
                                             }))

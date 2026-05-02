@@ -179,6 +179,16 @@ impl VersionFileBuilder {
             .await?;
         }
 
+        sqlx::query!(
+            "
+            INSERT INTO file_attributions (file_id)
+            VALUES ($1)
+            ",
+            file_id as DBFileId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+
         if let Err(err) = crate::routes::internal::delphi::run(
             &mut *transaction,
             DelphiRunParameters {
