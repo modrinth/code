@@ -20,6 +20,9 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Get pnpm store path
         id: pnpm-store
         run: echo "store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
