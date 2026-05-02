@@ -129,7 +129,7 @@ jobs:
           LABRINTH_TEST_STATUS=$(pnpm turbo run test --filter=@modrinth/labrinth --dry-run=json | jq -r '.tasks[] | select(.task == "test") | .cache.status')
           echo "Labrinth test cache status: $LABRINTH_TEST_STATUS"
           if [ "$LABRINTH_TEST_STATUS" = "HIT" ]; then
-            echo "needs_services=false" >> $GITHUB_OUTPUT
+            echo "needs_services=true" >> $GITHUB_OUTPUT
           else
             echo "needs_services=true" >> $GITHUB_OUTPUT
           fi
