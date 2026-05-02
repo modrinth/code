@@ -20,10 +20,15 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6.0.5
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
-          cache: true
+          path: ${{ steps.pnpm-store.outputs.store-path }}
+          key: pnpm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Install dependencies
         run: pnpm recursive install --frozen-lockfile
