@@ -59,31 +59,28 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 .nth(1)
                                 .map(|x| x.as_os_str());
                             if first_file_name
-                                .filter(|x| *x == "crash-reports")
-                                .is_some()
+                                .as_ref()
+                                .is_some_and(|x| *x == "crash-reports")
                                 && e.path
                                     .extension()
-                                    .filter(|x| *x == "txt")
-                                    .is_some()
+                                    .as_ref()
+                                    .is_some_and(|x| *x == "txt")
                             {
                                 crash_task(profile_path_str);
                             } else if !visited_profiles.contains(&profile_path)
                             {
                                 let event = if first_file_name
-                                    .filter(|x| *x == "servers.dat")
-                                    .is_some()
+                                    .as_ref()
+                                    .is_some_and(|x| *x == "servers.dat")
                                 {
                                     Some(ProfilePayloadType::ServersUpdated)
-                                } else if first_file_name
-                                    .filter(|x| {
-                                        *x == "saves"
-                                            && e.path
-                                                .file_name()
-                                                .filter(|x| *x == "level.dat")
-                                                .is_some()
-                                    })
-                                    .is_some()
-                                {
+                                } else if first_file_name.as_ref().is_some_and(|x| {
+                                    *x == "saves"
+                                        && e.path
+                                            .file_name()
+                                            .as_ref()
+                                            .is_some_and(|x| *x == "level.dat")
+                                }) {
                                     tracing::info!(
                                         "World updated: {}",
                                         e.path.display()
@@ -113,8 +110,8 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     }
                                     Some(ProfilePayloadType::WorldUpdated { world })
                                 } else if first_file_name
-                                    .filter(|x| *x == "saves")
-                                    .is_none()
+                                    .as_ref()
+                                    .is_none_or(|x| *x != "saves")
                                 {
                                     Some(ProfilePayloadType::Synced)
                                 } else {
