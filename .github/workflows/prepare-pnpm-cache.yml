@@ -2,7 +2,10 @@ name: Prepare pnpm cache
 
 on:
   push:
-    # branches: [main]
+    paths:
+      - .github/workflows/prepare-pnpm-cache.yml
+      - package.json
+      - pnpm-lock.yaml
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
