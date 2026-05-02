@@ -2,6 +2,7 @@ name: Prepare pnpm cache
 
 on:
   push:
+    # branches: [main]
 
 jobs:
   prepare:

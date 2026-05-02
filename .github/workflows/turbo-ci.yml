@@ -25,17 +25,17 @@ jobs:
       RUSTFLAGS: -Dwarnings
 
     steps:
-      - name: 📥 Check out code
+      - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 2
 
-      - name: 🧰 Install build dependencies
+      - name: Install build dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -yq libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
-      - name: 🧰 Install pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@a0ea98b2dc7d387a59324835f7421c1d5f8357b4 # v6.0.5
 
       - name: Setup Node
@@ -55,19 +55,19 @@ jobs:
           restore-keys: |
             pnpm-cache-
 
-      - name: 🧰 Setup Rust toolchain
+      - name: Setup Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@2b1f5e9b395427c92ee4e3331786ca3c37afe2d7 # v1.16.0
         with:
           rustflags: ''
           components: clippy, rustfmt
           cache: false
 
-      - name: 🧰 Setup nextest
+      - name: Setup nextest
         uses: taiki-e/install-action@831231fdad2d3455d6c38b8144fa99d3adaca36e # nextest
 
       # cargo-binstall does not have pre-built binaries for sqlx-cli, so we fall
       # back to a cached cargo install
-      - name: 🧰 Setup cargo-sqlx
+      - name: Setup cargo-sqlx
         uses: taiki-e/cache-cargo-install-action@f9eed3e4680f27610dc6d8c67be1b88593f7dade # v3.0.6
         with:
           tool: sqlx-cli
@@ -75,18 +75,18 @@ jobs:
           no-default-features: true
           features: rustls,postgres
 
-      - name: 💨 Setup Turbo cache
+      - name: Setup Turbo cache
         uses: rharkor/caching-for-turbo@56219402aacc0d06b650d898c222996dbc1191ec # v2.3.14
 
-      - name: 🧰 Install dependencies
+      - name: Install dependencies
         run: pnpm install
 
-      - name: ⚙️ Set app environment
+      - name: Set app environment
         working-directory: packages/app-lib
         run: cp .env.staging .env
 
       # check if labrinth tests will actually run (cache miss)
-      - name: 🔍 Check if labrinth tests need to run
+      - name: Check if labrinth tests need to run
         id: check-labrinth
         run: |
           LABRINTH_TEST_STATUS=$(pnpm turbo run test --filter=@modrinth/labrinth --dry-run=json | jq -r '.tasks[] | select(.task == "test") | .cache.status')
@@ -97,21 +97,21 @@ jobs:
             echo "needs_services=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: ⚙️ Start services
+      - name: Start services
         if: steps.check-labrinth.outputs.needs_services == 'true'
         run: docker compose up --wait
 
-      - name: ⚙️ Setup labrinth environment and database
+      - name: Setup labrinth environment and database
         if: steps.check-labrinth.outputs.needs_services == 'true'
         working-directory: apps/labrinth
         run: |
           cp .env.local .env
           sqlx database setup
 
-      - name: 🔍 Lint and test
+      - name: Lint and test
         run: pnpm run ci
 
-      - name: 🔍 Verify intl:extract has been run
+      - name: Verify intl:extract has been run
         run: |
           pnpm turbo run intl:extract --force
           git diff --exit-code --color */*/src/locales/en-US/index.json
