@@ -39,13 +39,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, windows-latest, ubuntu-latest]
+        platform:
+          [
+            blacksmith-6vcpu-macos-26,
+            blacksmith-8vcpu-windows-2025,
+            blacksmith-8vcpu-ubuntu-2404,
+          ]
         include:
-          - platform: macos-latest
+          - platform: blacksmith-6vcpu-macos-26
             artifact-target-name: universal-apple-darwin
-          - platform: windows-latest
+          - platform: blacksmith-8vcpu-windows-2025
             artifact-target-name: x86_64-pc-windows-msvc
-          - platform: ubuntu-latest
+          - platform: blacksmith-8vcpu-ubuntu-2404
             artifact-target-name: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
@@ -60,7 +65,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@2b1f5e9b395427c92ee4e3331786ca3c37afe2d7 # v1.16.0
         with:
           rustflags: ''
-          target: ${{ startsWith(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
+          target: ${{ contains(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@a0ea98b2dc7d387a59324835f7421c1d5f8357b4 # v6.0.5
@@ -87,7 +92,7 @@ jobs:
           EOF
 
       - name: Install Linux build dependencies
-        if: startsWith(matrix.platform, 'ubuntu')
+        if: contains(matrix.platform, 'ubuntu')
         run: |
           sudo apt-get update
           sudo apt-get install -yq libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
@@ -98,7 +103,7 @@ jobs:
           repo: TomWright/dasel
           tag: v2.8.1
           extension-matching: disable
-          rename-to: ${{ startsWith(matrix.platform, 'windows') && 'dasel.exe' || 'dasel' }}
+          rename-to: ${{ contains(matrix.platform, 'windows') && 'dasel.exe' || 'dasel' }}
           chmod: 0755
 
       - name: Set application version and environment
@@ -121,7 +126,7 @@ jobs:
         run: pnpm install
 
       - name: Set up Windows code signing
-        if: startsWith(matrix.platform, 'windows')
+        if: contains(matrix.platform, 'windows')
         shell: bash
         run: |
           if [ '${{ startsWith(github.ref, 'refs/tags/v') || inputs.sign-windows-binaries }}' = 'true' ]; then
@@ -132,7 +137,7 @@ jobs:
 
       - name: Build macOS app
         run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
-        if: startsWith(matrix.platform, 'macos')
+        if: contains(matrix.platform, 'macos')
         env:
           ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
@@ -146,7 +151,7 @@ jobs:
 
       - name: Build Linux app
         run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json' }}
-        if: startsWith(matrix.platform, 'ubuntu')
+        if: contains(matrix.platform, 'ubuntu')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
@@ -158,7 +163,7 @@ jobs:
           $env:JAVA_HOME = "$env:JAVA_HOME_17_X64"
           ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles "nsis,updater"' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json --verbose --bundles "nsis,updater"' }}
           Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
-        if: startsWith(matrix.platform, 'windows')
+        if: contains(matrix.platform, 'windows')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
