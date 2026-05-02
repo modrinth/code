@@ -28,7 +28,7 @@ jobs:
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
       - name: Generate Docker image metadata
-        id: docker_meta
+        id: docker-meta
         uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
@@ -55,8 +55,8 @@ jobs:
         with:
           file: ./apps/daedalus_client/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
-          annotations: ${{ steps.docker_meta.outputs.annotations }}
+          tags: ${{ steps.docker-meta.outputs.tags }}
+          labels: ${{ steps.docker-meta.outputs.labels }}
+          annotations: ${{ steps.docker-meta.outputs.annotations }}
           cache-from: type=registry,ref=ghcr.io/modrinth/daedalus:main
           cache-to: type=inline

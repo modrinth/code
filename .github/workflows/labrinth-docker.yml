@@ -30,7 +30,7 @@ jobs:
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
       - name: Generate Docker image metadata
-        id: docker_meta
+        id: docker-meta
         uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
         env:
           # GitHub Packages requires annotations metadata in at least the index descriptor to show them
@@ -61,10 +61,10 @@ jobs:
         with:
           file: ./apps/labrinth/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
-          annotations: ${{ steps.docker_meta.outputs.annotations }}
+          tags: ${{ steps.docker-meta.outputs.tags }}
+          labels: ${{ steps.docker-meta.outputs.labels }}
+          annotations: ${{ steps.docker-meta.outputs.annotations }}
           build-args: |
-            GIT_HASH=${{ fromJSON(steps.docker_meta.outputs.json).labels['org.opencontainers.image.revision'] }}
+            GIT_HASH=${{ fromJSON(steps.docker-meta.outputs.json).labels['org.opencontainers.image.revision'] }}
           cache-from: type=registry,ref=ghcr.io/modrinth/labrinth:main
           cache-to: type=inline
