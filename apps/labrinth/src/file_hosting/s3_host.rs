@@ -175,12 +175,17 @@ impl FileHost for S3Host {
         file_name: &str,
         file_publicity: FileHostPublicity,
     ) -> Result<Bytes, FileHostingError> {
-        let response = self
-            .get_bucket(file_publicity)
-            .get_object(format!("/{file_name}"))
-            .await
-            .map_err(|e| FileHostingError::S3Error("reading file", e))?;
+        let bucket = self.get_bucket(file_publicity);
 
-        Ok(response.into_bytes())
+        let response = bucket
+            .client
+            .get_object()
+            .bucket(bucket.name.as_str())
+            .key(file_name)
+            .send()
+            .await
+            .map_err(|e| s3_error("reading file", e))?;
+
+        Ok(response.body.collect().await.map_err(|e| s3_error("reading file body", e))?.into_bytes())
     }
 }
