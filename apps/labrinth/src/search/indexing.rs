@@ -631,13 +631,12 @@ async fn index_versions(
     //
     // Returned Data:
     //  dependent_version_id (vID: 400) = Project A v1.0.0 (This is the version which is declaring a dependency aka The Dependent)
-    //  dependency_project_id (pID: 2) = Project B (The Dependency) (this is technically nullable, but I'm not sure if there's any cases in which it'd be null)
+    //  dependency_project_id (pID: 2) = Project B (The Dependency) (nullable)
     //  dependency_version_id (vID: 500) = Project B v2.0.0 (The version required by the dependency) (nullable)
     //  dependency_type = "required"
     //
     // And the returned data ends up saying in plain words:
     // Version (Project A v1.0.0, vID: 400) has a (required) dependency on the version (Project B v2.0.0, vID: 500) from the Project (Project B, pID: 2)
-    // ~ @ithundxr
     let dependencies: DashMap<DBVersionId, Dependencies> = sqlx::query!(
         "
             SELECT
