@@ -70,7 +70,12 @@
 								date: date.date ? formatDate(date.date) : '',
 							})
 						}}
-						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
+						<Tooltip
+							theme="dismissable-prompt"
+							:triggers="['hover', 'focus']"
+							no-auto-focus
+							:aria-id="`${baseId}-date-segment-tooltip-${i}`"
+						>
 							<nuxt-link
 								class="inline-flex items-center justify-center text-link"
 								to="/legal/cmp-info#pending"
@@ -99,7 +104,12 @@
 							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg opacity-90 md:size-5"
 						></span>
 						{{ formatMessage(messages.processing) }}
-						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
+						<Tooltip
+							theme="dismissable-prompt"
+							:triggers="['hover', 'focus']"
+							no-auto-focus
+							:aria-id="`${baseId}-processing-tooltip`"
+						>
 							<InProgressIcon class="inline-block size-4 align-middle md:size-5" />
 							<template #popper>
 								<div class="w-[250px] font-semibold text-contrast">
@@ -291,6 +301,8 @@ type RevenueBarSegment = {
 }
 
 const hoveredSeg = ref<string | null>(null)
+
+const baseId = useId()
 
 const withdrawModal = ref<InstanceType<typeof CreatorWithdrawModal>>()
 async function openWithdrawModal() {
