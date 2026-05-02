@@ -35,6 +35,7 @@ impl ModrinthCredentials {
                     None,
                     Some(("Authorization", &*creds.session)),
                     None,
+                    None,
                     semaphore,
                     exec,
                 )
@@ -225,6 +226,7 @@ async fn fetch_info(
         None,
         None,
         Some(("Authorization", token)),
+        None,
         None,
         semaphore,
         exec,

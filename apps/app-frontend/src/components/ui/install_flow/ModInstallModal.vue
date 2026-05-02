@@ -116,7 +116,7 @@ async function install(instance) {
 		return
 	}
 
-	await installMod(instance.path, version.id).catch(handleError)
+	await installMod(instance.path, version.id, 'standalone').catch(handleError)
 	await installVersionDependencies(instance, version).catch(handleError)
 
 	instance.installedMod = true
@@ -188,7 +188,7 @@ const createInstance = async () => {
 
 	const id = await create(name.value, gameVersion, loader, 'latest', icon.value).catch(handleError)
 
-	await installMod(id, versions.value[0].id).catch(handleError)
+	await installMod(id, versions.value[0].id, 'standalone').catch(handleError)
 
 	await router.push(`/instance/${encodeURIComponent(id)}/`)
 

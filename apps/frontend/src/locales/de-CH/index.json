@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Partnerlink erstellen"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Keine Partnercodes gefunden."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Fehler beim laden von Partnerlinks"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Partnerlinks durchsuchen..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "von {count} {count, plural, one {Projekt} other {Projekten}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Gesamtzahl der Downloads"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Gesamtzahl der Follower"
   },
   "dashboard.collections.button.create-new": {
     "message": "Erstellen"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Deine Kollektionen"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Kollektionen durchsuchen..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Name (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Kürzlich erstellt"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Kürzlich aktualisiert"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} herunterladen"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Du hast dein Auszahlungslimit von <b>{withdrawLimit}</b> aufgebraucht. Du musst ein Steuerformular ausfüllen, um merh abzuheben."
   },
+  "dashboard.head-title": {
+    "message": "Dashboard"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Alle als gelesen markieren"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Verlauf ansehen"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Du hast keine ungelesenen Nachrichten."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Fehler beim laden von Benachrichtigungen:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Verlauf"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Benachrichtigungsverlauf"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Alle ansehen"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Benachrichtigungsverlauf ansehen"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Siehe {extraNotifs} weitere {extraNotifs, plural, one {Benachrichtigung} other {Benachrichtigungen}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Lade Benachrichtigungen..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Organisation erstellen"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Erstelle eine Organisation!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Fehler beim laden der Organisationen"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one  {Mitglied} other {Mitglieder}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisationen"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Du kannst mehrere Projekte gleichzeitig bearbeiten, indem du sie unden auswählst."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Serverprojekte understützen Massenbearbeitung nicht"
+  },
+  "dashboard.projects.empty": {
+    "message": "Du hast noch keine Projekte. Drücke auf den grünen Knopf oben um anzufangen."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projekte"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "und {count} weitere..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Link entfernen"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Links bearbeiten"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Änderungen werden auf <strong>{count}</strong> {count, plural, one {Projekt} other {Projekte}} angewendet."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Jeder Link welchen du unten angibst wird in jedem der ausgewählten Projekte überschrieben. Sämtliche leergelassenen werden ignoriert. Du kannst einen Link von allen ausgewählten Projekten entfernen, indem du auf den Mülleimer-Knopf drückst."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Ein Einladungslink zu deinem Discordserver."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord Einladung"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Ein Ort für Benutzer um Bugs, Probleme und Bedenken über dein Projekt zu melden."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Issue Tracker"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Existierende Links werden entfernt"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Gib eine gültige Discord Einladungs-URL ein"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Gib eine gültige URL ein"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Alle Projekte anzeigen"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Eine Seite/Repository welche den Quellcode deines Projekts enthält"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Quellcode"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Eine Seite welche Informationen, Dokumentationen und Hilfe für dein Projekt enthält."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Wikiseite"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Links von Projekten wurden massenbearbeitet."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icon für {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Projekt hat eine Nachricht von den Moderatoren. Schaue dir das Projekt an um mehr zu sehen."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Bitte überprüfe die Umgebungsmetadaten"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Aufsteigend"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Absteigend"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Name"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Art"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Icon"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Name"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Art"
+  },
+  "dashboard.report.title": {
+    "message": "{id} melden"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Aktive Meldungen"
+  },
+  "dashboard.reports.title": {
+    "message": "Meldungen"
+  },
   "dashboard.revenue.available-now": {
     "message": "Jetzt verfügbar"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Als CSV herunterladen"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Zahlungsverlauf"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transaktionen"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Deine Auszahlungen und Abhebungen erscheinen hier."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Letzen Monat"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Diesen Monat"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Alle anzeigen"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Ganzes Jahr"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Deine Auszahlungen sind vorrübergehend gesperrt, da deine TIN oder SSN nicht mit den IRS-Aufzeichnungen übereinstimmt. Bitte kontaktiere den Support um dein Steuerformular zurückzusetzen und erneut einzureichen."
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Abheben"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Aktive Meldungen"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analysen"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Ersteller"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Dashboard"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Benachrichtigungen"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organisationen"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Überblick"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projekte"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Einnahmen"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Konto"
@@ -1300,60 +1525,6 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Wähle zwischen Vanilla, Fabric, Forge, Quilt und NeoForge. Was auf Modrinth ist, kann auf deinem Server laufen."
-  },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Änder der Modpackversion fehlgeschlagen"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Versionen konnten nicht geladen werden"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Neuinstallation des Modpack fehlgeschlagen"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Reparatur des Servers fehlgeschlagen"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Server konnte nicht in den Onboarding-Zustand zurückgesetzt werden"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Speichern der Installationseinstellungen fehlgeschlagen"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Entkoppeln von Modpack fehlgeschlagen"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {Loader} other {{loader}}}version"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Deine Server-Installation wurde repariert."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Reparatur abgeschlossen"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Server zurücksetzen"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Entfernt sämtliche daten von deinem Server, inklusive deiner Welten, Mods und Konfigurationsdateien. Sicherung bleiben und können wiederhergestellt werden."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Auf Onboarding zurücksetzen"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Dadurch wird der Server in den Onboarding-Zustand zurückgesetzt, sodass die Einrichtung erneut abgeschlossen werden kann. Möchtest du wirklich fortfahren?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Auf Onboarding zurücksetzen"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "Der Server wurde in den Onboarding-Ablauf zurückgesetzt."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Server auf Onboarding zurückgesetzt"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Supportoptionen"
   },
   "hosting.plan.out-of-stock": {
     "message": "Nicht verfügbar"
@@ -2831,18 +3002,6 @@
   "search.filter.locked.server.sync": {
     "message": "Mit Server synchronisieren"
   },
-  "servers.busy.backup-creating": {
-    "message": "Backup-Erstellung im gange"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Wiederherstellung aus Sicherung läuft"
-  },
-  "servers.busy.installing": {
-    "message": "Server wird installiert"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Inhalt wird synchronisiert"
-  },
   "servers.notice.actions": {
     "message": "Aktionen"
   },
@@ -3209,6 +3368,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Vergangene Abbuchungen"
+  },
   "settings.billing.expires": {
     "message": "Läuft ab am {date}"
   },
@@ -3217,6 +3379,12 @@
   },
   "settings.billing.interval.monthly": {
     "message": "monatlich"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "Quartal"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "vierteljährlich"
   },
   "settings.billing.interval.year": {
     "message": "Jahr"
@@ -3333,7 +3501,7 @@
     "message": "Fehler beim erneuten Abonnieren"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Falls der Server momentan pausiert ist, kann es bis zu 10 Minuten dauern, bis ein weiterer Zahlungsversuch unternommen wird."
+    "message": "Falls der Server derzeit abgesagt ist, kann die Einrichtung des Servers 10-15 Minuten dauern."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Anfrage zum erneuten Abonnieren übermittelt"

@@ -22,10 +22,51 @@ jobs:
     with:
       environment: ${{ matrix.environment }}
 
+  deploy-storybook:
+    if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        working-directory: ./packages/ui
+        run: pnpm install
+
+      - name: Build Storybook
+        working-directory: ./packages/ui
+        run: pnpm run build-storybook
+
+      - name: Configure short SHA
+        id: meta
+        run: echo "sha_short=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
+      - name: Deploy Storybook preview
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          workingDirectory: ./packages/ui
+          packageManager: pnpm
+          wranglerVersion: '4.54.0'
+          command: versions upload --preview-alias git-${{ steps.meta.outputs.sha_short }}
+
   comment:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: [deploy, deploy-storybook]
     steps:
       - name: Download deployment URLs
         uses: actions/download-artifact@v7
@@ -44,6 +85,7 @@ jobs:
 
           echo "staging-preview-url=$STAGING_PREVIEW_URL" >> $GITHUB_OUTPUT
           echo "production-preview-url=$PRODUCTION_PREVIEW_URL" >> $GITHUB_OUTPUT
+          echo "storybook-preview-url=https://git-${GITHUB_SHA::8}-storybook.modrinth.workers.dev" >> $GITHUB_OUTPUT
 
       - name: Find comment
         if: github.event_name == 'pull_request'
@@ -70,4 +112,5 @@ jobs:
             |-------------|-----|
             | staging     | ${{ steps.urls.outputs.staging-preview-url }} |
             | production  | ${{ steps.urls.outputs.production-preview-url }} |
+            | storybook   | ${{ steps.urls.outputs.storybook-preview-url }} |
           edit-mode: replace

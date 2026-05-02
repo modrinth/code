@@ -150,8 +150,8 @@ pub async fn resolve_server_address(
         match resolver.srv_lookup(format!("_minecraft._tcp.{host}")).await {
             Err(e)
                 if e.proto()
-                    .filter(|x| x.kind().is_no_records_found())
-                    .is_some() =>
+                    .as_ref()
+                    .is_some_and(|x| x.kind().is_no_records_found()) =>
             {
                 None
             }

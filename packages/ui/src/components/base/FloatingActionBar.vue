@@ -1,13 +1,37 @@
 <script setup lang="ts">
-import { onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+
+import { useModalStack } from '../../composables/modal-stack'
+import { injectPageContext } from '../../providers'
 
 const props = defineProps<{
 	shown: boolean
 	ariaLabel?: string
+	belowModal?: boolean
 }>()
 
+const INTERCOM_BUBBLE_GAP = 8
+
+const barEl = ref<HTMLElement | null>(null)
 const toolbarEl = ref<HTMLElement | null>(null)
 const compact = ref(false)
+
+const { stackCount } = useModalStack()
+const pageContext = injectPageContext(null)
+const shown = computed(() => props.shown)
+const intercomBubbleClearanceRequestId = Symbol('floating-action-bar')
+const zIndex = computed(() => 100 + stackCount.value * 10 + 8 + (!props.belowModal ? 1 : 0))
+const leftOffset = computed(
+	() => pageContext?.floatingActionBarOffsets?.left.value ?? 'var(--left-bar-width, 0px)',
+)
+const rightOffset = computed(
+	() => pageContext?.floatingActionBarOffsets?.right.value ?? 'var(--right-bar-width, 0px)',
+)
+const barStyle = computed(() => ({
+	zIndex: zIndex.value,
+	'--floating-action-bar-left-offset': leftOffset.value,
+	'--floating-action-bar-right-offset': rightOffset.value,
+}))
 
 function checkCompact() {
 	const el = toolbarEl.value
@@ -27,7 +51,60 @@ function checkCompact() {
 	compact.value = needsCompact
 }
 
+function clearIntercomBubbleClearance() {
+	pageContext?.intercomBubble?.requestVerticalClearance(intercomBubbleClearanceRequestId, null)
+}
+
+function updateIntercomBubbleClearance() {
+	const intercomBubble = pageContext?.intercomBubble
+	if (!intercomBubble) return
+
+	if (typeof window === 'undefined' || !shown.value || !barEl.value || !toolbarEl.value) {
+		clearIntercomBubbleClearance()
+		return
+	}
+
+	const barRect = barEl.value.getBoundingClientRect()
+	const toolbarRight = barRect.left + toolbarEl.value.offsetLeft + toolbarEl.value.offsetWidth
+	const bubbleLeft =
+		window.innerWidth - intercomBubble.horizontalPadding.value - intercomBubble.width.value
+
+	if (toolbarRight + INTERCOM_BUBBLE_GAP <= bubbleLeft) {
+		clearIntercomBubbleClearance()
+		return
+	}
+
+	const barStyle = window.getComputedStyle(barEl.value)
+	const bottomOffset = Number.parseFloat(barStyle.bottom) || 0
+	intercomBubble.requestVerticalClearance(
+		intercomBubbleClearanceRequestId,
+		Math.ceil(bottomOffset + barEl.value.offsetHeight + INTERCOM_BUBBLE_GAP),
+	)
+}
+
+function updateBodyState(shown = props.shown) {
+	if (typeof document === 'undefined') return
+
+	document.body.classList.toggle('floating-action-bar-shown', shown)
+	if (!shown) {
+		clearIntercomBubbleClearance()
+	}
+}
+
 let observer: ResizeObserver | null = null
+let updateFrame: number | null = null
+
+function scheduleIntercomBubbleClearanceUpdate() {
+	if (typeof window === 'undefined') return
+	if (updateFrame !== null) {
+		window.cancelAnimationFrame(updateFrame)
+	}
+
+	updateFrame = window.requestAnimationFrame(() => {
+		updateFrame = null
+		updateIntercomBubbleClearance()
+	})
+}
 
 watch(
 	toolbarEl,
@@ -36,51 +113,82 @@ watch(
 		if (!el) return
 		observer = new ResizeObserver(() => {
 			checkCompact()
+			scheduleIntercomBubbleClearanceUpdate()
 		})
 		observer.observe(el.parentElement!)
 		checkCompact()
+		scheduleIntercomBubbleClearanceUpdate()
 	},
 	{ immediate: true },
 )
 
 watch(
 	() => props.shown,
-	(shown) => {
-		document?.body.classList.toggle('floating-action-bar-shown', shown)
+	async (shown) => {
+		await nextTick()
+		updateBodyState(shown)
+		scheduleIntercomBubbleClearanceUpdate()
 	},
 	{ immediate: true },
 )
 
+watch(
+	[
+		shown,
+		leftOffset,
+		rightOffset,
+		() => pageContext?.intercomBubble?.horizontalPadding.value,
+		() => pageContext?.intercomBubble?.width.value,
+	],
+	() => scheduleIntercomBubbleClearanceUpdate(),
+	{ immediate: true },
+)
+
+onMounted(() => {
+	window.addEventListener('resize', scheduleIntercomBubbleClearanceUpdate)
+	scheduleIntercomBubbleClearanceUpdate()
+})
+
 onUnmounted(() => {
 	observer?.disconnect()
-	document?.body.classList.remove('floating-action-bar-shown')
+	window.removeEventListener('resize', scheduleIntercomBubbleClearanceUpdate)
+	if (updateFrame !== null) {
+		window.cancelAnimationFrame(updateFrame)
+	}
+	clearIntercomBubbleClearance()
+	if (typeof document === 'undefined') return
+	document.body.classList.remove('floating-action-bar-shown')
 })
 </script>
 
 <template>
-	<Transition name="floating-action-bar" appear>
-		<div
-			v-if="shown"
-			class="floating-action-bar drop-shadow-2xl fixed z-[21] p-4 bottom-0"
-			aria-live="polite"
-		>
+	<Teleport to="body">
+		<Transition name="floating-action-bar" appear>
 			<div
-				ref="toolbarEl"
-				role="toolbar"
-				:aria-label="ariaLabel"
-				class="relative overflow-clip flex items-center gap-2 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto max-w-[60vw] px-4 py-3 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
-				:class="{ 'bar-compact': compact }"
+				v-if="shown"
+				ref="barEl"
+				class="floating-action-bar drop-shadow-2xl fixed p-4 bottom-0"
+				:style="barStyle"
+				aria-live="polite"
 			>
-				<slot />
+				<div
+					ref="toolbarEl"
+					role="toolbar"
+					:aria-label="ariaLabel"
+					class="relative overflow-clip flex items-center gap-2 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto max-w-[60vw] px-4 py-3 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
+					:class="{ 'bar-compact': compact }"
+				>
+					<slot />
+				</div>
 			</div>
-		</div>
-	</Transition>
+		</Transition>
+	</Teleport>
 </template>
 
 <style scoped>
 .floating-action-bar {
-	left: var(--left-bar-width, 0px);
-	right: var(--right-bar-width, 0px);
+	left: var(--floating-action-bar-left-offset, var(--left-bar-width, 0px));
+	right: var(--floating-action-bar-right-offset, var(--right-bar-width, 0px));
 	transition: bottom 0.25s ease-in-out;
 }
 
@@ -118,10 +226,6 @@ onUnmounted(() => {
 </style>
 
 <style>
-.intercom-lightweight-app-launcher {
-	z-index: 9 !important;
-}
-
 .bar-compact .bar-label {
 	display: none;
 }

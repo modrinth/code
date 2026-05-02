@@ -1,10 +1,11 @@
 <template>
-	<div class="h-full w-full py-6">
+	<div class="h-full w-full pt-6">
 		<ServersManageRootLayout
 			:server-id="serverId"
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
 			:show-copy-id-action="themeStore.devMode"
+			:auth-user="authUser"
 			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
 			:browse-modpacks="
@@ -33,9 +34,6 @@
 								@reinstall="onReinstall"
 								@reinstall-failed="onReinstallFailed"
 							/>
-							<template #fallback>
-								<LoadingIndicator />
-							</template>
 						</Suspense>
 					</template>
 				</RouterView>
@@ -46,8 +44,8 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { injectAuth, LoadingIndicator, ServersManageRootLayout } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import { injectAuth, injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -60,6 +58,8 @@ import { useTheming } from '@/store/theme'
 const route = useRoute()
 const router = useRouter()
 const auth = injectAuth()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const themeStore = useTheming()
 const breadcrumbs = useBreadcrumbs()
 
@@ -67,6 +67,18 @@ const serverId = computed(() => {
 	const rawId = route.params.id
 	return Array.isArray(rawId) ? rawId[0] : (rawId ?? '')
 })
+
+if (serverId.value) {
+	try {
+		await queryClient.ensureQueryData({
+			queryKey: ['servers', 'detail', serverId.value],
+			queryFn: () => client.archon.servers_v0.get(serverId.value)!,
+			staleTime: 30_000,
+		})
+	} catch {
+		// Let mounted layouts' useQuery surface errors; do not fail route setup.
+	}
+}
 
 const { data: serverData } = useQuery({
 	queryKey: computed(() => ['servers', 'detail', serverId.value]),
@@ -96,6 +108,17 @@ watch(
 		void router.replace('/hosting/manage')
 	},
 )
+
+const authUser = computed(() => {
+	const user = auth.user.value
+	if (!user?.id) return undefined
+	return {
+		id: user.id,
+		username: user.username,
+		email: user.email ?? '',
+		created: user.created,
+	}
+})
 
 async function resolveViewer(): Promise<{ userId: string | null; userRole: string | null }> {
 	const credentials = await getCreds().catch(() => null)

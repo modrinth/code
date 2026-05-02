@@ -57,7 +57,11 @@ export default defineEventHandler(async (event): Promise<IntercomTokenResponse> 
 		})
 	}
 
-	const authToken = getCookie(event, 'auth-token')
+	const authHeader = getRequestHeader(event, 'authorization')
+	const bearerToken = authHeader?.toLowerCase().startsWith('bearer ')
+		? authHeader.slice(7).trim()
+		: undefined
+	const authToken = bearerToken || getCookie(event, 'auth-token')
 	if (!authToken) {
 		throw createError({
 			statusCode: 401,

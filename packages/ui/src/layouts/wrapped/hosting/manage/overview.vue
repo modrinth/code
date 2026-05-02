@@ -1,12 +1,12 @@
 <template>
 	<div class="relative flex select-none flex-col gap-6" data-pyro-server-manager-root>
-		<div class="flex flex-col gap-6">
+		<div class="flex flex-col gap-4">
 			<ServerManageStats
 				:data="!isWsAuthIncorrect ? stats : undefined"
 				:loading="isWsAuthIncorrect"
 			/>
 
-			<div class="flex min-h-[700px] flex-col gap-4">
+			<div class="flex min-h-[700px] flex-col gap-2">
 				<span class="text-2xl font-semibold text-contrast">Console</span>
 
 				<ConsolePageLayout />
@@ -35,6 +35,7 @@
 </template>
 
 <script setup lang="ts">
+// No ReadyTransition wrapper: console and ServerManageStats own their loading UX; there is no single TanStack "ready" gate for this tab.
 import type { Mclogs } from '@modrinth/api-client'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
@@ -116,7 +117,12 @@ provideConsoleManager({
 	},
 	showCommandInput: true,
 	disableCommandInput: computed(() => serverPowerState.value !== 'running'),
-	loading: computed(() => !isConnected.value || isWsAuthIncorrect.value),
+	loading: computed(
+		() =>
+			!isConnected.value ||
+			modrinthServersConsole.isInitialLogHydrating.value ||
+			isWsAuthIncorrect.value,
+	),
 	onClear: async () => {
 		modrinthServersConsole.clear()
 		try {

@@ -5,6 +5,27 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentificeringsservere"
   },
+  "app.browse.add-to-instance-name": {
+    "message": "Tilføjet til {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Tilføjet"
+  },
+  "app.browse.already-added": {
+    "message": "Allerede tilføjet"
+  },
+  "app.browse.discover-content": {
+    "message": "Opdag indhold"
+  },
+  "app.browse.discover-servers": {
+    "message": "Opdag servere"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Gem tilføjet servere"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Gem installeret indhold"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Indtast modpack beskrivelse..."
   },
@@ -40,6 +61,12 @@
   },
   "app.instance.confirm-delete.header": {
     "message": "Slet instance"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Denne modpack er allerede installeret i <bold>{instanceName}</bold> instancen. Er du sikker på du vil duplikere den?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Opret"
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"

@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
+import { useReadyState } from '#ui/composables'
 import { useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -112,6 +114,8 @@ const {
 })
 
 const items = computed<FileItem[]>(() => directoryData.value?.items ?? [])
+
+const filesReadyPending = useReadyState({ isLoading, data: directoryData })
 
 // Prefetching
 function prefetchDirectory(path: string) {
@@ -473,8 +477,10 @@ provideFileManager({
 </script>
 
 <template>
-	<FilePageLayout
-		:show-debug-info="props.showDebugInfo"
-		:show-refresh-button="props.showRefreshButton"
-	/>
+	<ReadyTransition :pending="filesReadyPending">
+		<FilePageLayout
+			:show-debug-info="props.showDebugInfo"
+			:show-refresh-button="props.showRefreshButton"
+		/>
+	</ReadyTransition>
 </template>

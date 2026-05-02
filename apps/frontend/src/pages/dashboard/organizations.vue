@@ -3,11 +3,11 @@
 		<OrganizationCreateModal ref="createOrgModal" />
 		<section class="universal-card">
 			<div class="header__row">
-				<h2 class="header__title text-2xl">Organizations</h2>
+				<h2 class="header__title text-2xl">{{ formatMessage(messages.organizationsTitle) }}</h2>
 				<div class="input-group">
 					<button class="iconified-button brand-button" @click="openCreateOrgModal">
 						<PlusIcon aria-hidden="true" />
-						Create organization
+						{{ formatMessage(messages.createOrganization) }}
 					</button>
 				</div>
 			</div>
@@ -32,10 +32,11 @@
 								<div class="stats">
 									<UsersIcon aria-hidden="true" />
 									<span>
-										{{ onlyAcceptedMembers(org.members).length }}
-										member<template v-if="onlyAcceptedMembers(org.members).length !== 1"
-											>s</template
-										>
+										{{
+											formatMessage(messages.memberCount, {
+												count: onlyAcceptedMembers(org.members).length,
+											})
+										}}
 									</span>
 								</div>
 							</span>
@@ -43,18 +44,43 @@
 					</nuxt-link>
 				</div>
 			</template>
-			<template v-else> Make an organization! </template>
+			<template v-else> {{ formatMessage(messages.makeOrganization) }} </template>
 		</section>
 	</div>
 </template>
 
 <script setup>
 import { PlusIcon, UsersIcon } from '@modrinth/assets'
-import { Avatar, injectModrinthClient } from '@modrinth/ui'
+import { Avatar, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import { useAuth } from '~/composables/auth.js'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	organizationsTitle: {
+		id: 'dashboard.organizations.title',
+		defaultMessage: 'Organizations',
+	},
+	createOrganization: {
+		id: 'dashboard.organizations.button.create',
+		defaultMessage: 'Create organization',
+	},
+	memberCount: {
+		id: 'dashboard.organizations.member-count',
+		defaultMessage: '{count} {count, plural, one {member} other {members}}',
+	},
+	makeOrganization: {
+		id: 'dashboard.organizations.empty.cta',
+		defaultMessage: 'Make an organization!',
+	},
+	fetchOrganizationsFailed: {
+		id: 'dashboard.organizations.error.fetch',
+		defaultMessage: 'Failed to fetch organizations',
+	},
+})
 
 const createOrgModal = ref(null)
 
@@ -77,7 +103,7 @@ const onlyAcceptedMembers = (members) => members.filter((member) => member?.acce
 if (error.value) {
 	createError({
 		statusCode: 500,
-		message: 'Failed to fetch organizations',
+		message: formatMessage(messages.fetchOrganizationsFailed),
 	})
 }
 

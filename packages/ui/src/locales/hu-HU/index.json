@@ -12,7 +12,7 @@
     "defaultMessage": "Társult link címe"
   },
   "affiliate.create.title.placeholder": {
-    "defaultMessage": "pl: YouTube"
+    "defaultMessage": "pl. YouTube"
   },
   "affiliate.create.user.description": {
     "defaultMessage": "A felhasználónak a felhasználóneve a partner kód létrehozásához"
@@ -30,7 +30,13 @@
     "defaultMessage": "Társulati link visszavonása"
   },
   "affiliate.viewAnalytics": {
-    "defaultMessage": "Statisztikák megtekintése"
+    "defaultMessage": "Statisztika megtekintése"
+  },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Nem sikerült betölteni a szerverbeállításokat"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
   },
   "badge.beta": {
     "defaultMessage": "Béta"
@@ -40,6 +46,54 @@
   },
   "badge.new": {
     "defaultMessage": "Új"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Mégse"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} Megosztott CPU-k"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Ön újra elő fog fizetni  <server-name>{serverName}</server-name> szerverre. Az előfizetése újra fog aktiválódni és a szervere kimaradás nélkül tovább fog működni."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Újrafeliratkozás sikertelen, nem sikerült betölteni az előfizetés adatait."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Hiba"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Nem sikerült betölteni az előfizetés adatait."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 nap"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/hónap"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/negyedév"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/év"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Következő befizetés: <charge-date>{date}</charge-date> napon."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Csomag"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB memória"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Feliratkozás újra"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB tárhely"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Újra feliratkozás szerverre"
   },
   "button.accept": {
     "defaultMessage": "Elfogadás"
@@ -63,7 +117,7 @@
     "defaultMessage": "Törlés"
   },
   "button.close": {
-    "defaultMessage": "Bezárt"
+    "defaultMessage": "Bezárás"
   },
   "button.continue": {
     "defaultMessage": "Tovább"
@@ -71,8 +125,14 @@
   "button.copy-filename": {
     "defaultMessage": "Fájlnév másolása"
   },
+  "button.copy-full-path": {
+    "defaultMessage": "Teljes cím másolása"
+  },
   "button.copy-id": {
     "defaultMessage": "Azonosító másolása"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Link másolása"
   },
   "button.copy-permalink": {
     "defaultMessage": "Állandó link másolása"
@@ -83,6 +143,9 @@
   "button.decline": {
     "defaultMessage": "Elutasítás"
   },
+  "button.disable": {
+    "defaultMessage": "Letiltás"
+  },
   "button.download": {
     "defaultMessage": "Letöltés"
   },
@@ -91,6 +154,12 @@
   },
   "button.edit": {
     "defaultMessage": "Szerkesztés"
+  },
+  "button.enable": {
+    "defaultMessage": "Engedélyezés"
+  },
+  "button.extract": {
+    "defaultMessage": "Kibontás"
   },
   "button.follow": {
     "defaultMessage": "Követés"
@@ -104,11 +173,17 @@
   "button.more-options": {
     "defaultMessage": "További opciók"
   },
+  "button.move": {
+    "defaultMessage": "Áthelyezés"
+  },
   "button.next": {
     "defaultMessage": "Következő"
   },
   "button.open-folder": {
     "defaultMessage": "Mappa megnyitása"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Megnyitás mappában"
   },
   "button.play": {
     "defaultMessage": "Játék"
@@ -157,6 +232,9 @@
   },
   "button.show-all-versions": {
     "defaultMessage": "Összes verzió mutatása"
+  },
+  "button.show-file": {
+    "defaultMessage": "Fájl megtekintése"
   },
   "button.sign-in": {
     "defaultMessage": "Bejelentkezés"
@@ -209,6 +287,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Projektek frissítése"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Tartsd lenyomva a Shift-et, miközben az „Összes frissítése” gombra kattintasz, hogy a jövőben elkerüld ezt a megerősítést."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "{count} projekt frissítése"
   },
@@ -223,9 +304,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Projekt{count, plural, one {} other {ek}} törlése"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "A modpackhez hozzáadott modok és tartalmak törlésre kerülnek."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Visszaváltás korábbi verzióra – figyelmeztetés} other {Frissítési figyelmeztetés}}"
@@ -288,7 +366,7 @@
     "defaultMessage": "Biztonsági mentés létrehozása"
   },
   "content.inline-backup.shift-click-hint": {
-    "defaultMessage": "A megerősítés kihagyásához tartsa lenyomva a Shift billentyűt a kattintás közben."
+    "defaultMessage": "A megerősítés kihagyásához tartsd lenyomva a Shift billentyűt a kattintás közben."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Javasoljuk a biztonsági másolat készítését a továbbhaladás előtt, hogy ha valami nem működne, vissza tudd állítani a(z) {type, select, server {world} other {instance}}-t."
@@ -312,7 +390,7 @@
     "defaultMessage": "Kérlek várd meg a művelet befejezését a tartalom szerkesztése előtt."
   },
   "content.page-layout.empty.hint": {
-    "defaultMessage": "Böngésszen vagy töltsön fel projekteket a kezdéshez"
+    "defaultMessage": "Böngéssz vagy tölts fel projekteket a kezdéshez"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "További tartalom hozzáadása ehhez a modpackhez"
@@ -410,11 +488,20 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} db kiválasztva"
   },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Felülírás"
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} fájl felülírva"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "{type, select, directory {Mappa} other {Fájl}} létrehozása"
+  },
   "files.create-modal.header": {
     "defaultMessage": "{type, select, directory {Mappa} other {Fájl}} létrehozása"
   },
   "files.create-modal.placeholder-directory": {
-    "defaultMessage": "pl. a-mappám"
+    "defaultMessage": "pl. saját-mappa"
   },
   "files.create-modal.placeholder-file": {
     "defaultMessage": "pl. config.yml"
@@ -428,11 +515,38 @@
   "files.delete-modal.warning": {
     "defaultMessage": "{type, select, directory {Ez a mappa és annak teljes tartalma véglegesen törlődik. A műveletet nem lehet visszavonni.} other {Ez a fájl véglegesen törlődik. A műveletet nem lehet visszavonni.}}"
   },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "A fájl tartalmát nem sikerült betölteni."
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "A fájl megnyitása nem sikerült"
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Nem sikerült megosztani a fájlt"
+  },
   "files.editor.file-saved-text": {
     "defaultMessage": "A fájl elmentésre került."
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "A fájl mentve"
+  },
+  "files.editor.find-close": {
+    "defaultMessage": "Bezárás"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Keresés"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} / {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Következő találat"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Nincs találat"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Előző találat"
   },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "A naplófájl linkje másolva lett a vágólapra."
@@ -440,11 +554,44 @@
   "files.editor.log-url-copied-title": {
     "defaultMessage": "Napló linkje másolva"
   },
+  "files.editor.replace": {
+    "defaultMessage": "Csere"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Csere"
+  },
   "files.editor.save-failed-text": {
     "defaultMessage": "A fájl mentése nem sikerült."
   },
   "files.editor.save-failed-title": {
     "defaultMessage": "A mentés nem sikerült"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Újra"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "A kép túl nagy a megjelenítéshez (maximum {maxDimension}x{maxDimension} pixel)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "Hibás vagy üres fájl."
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Nem sikerült a fájlt betölteni."
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "Nem sikerült betölteni a fájlokat"
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "{count} kiválasztva"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "Vannak nem mentett módosításaid."
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "pl. /saját-mappa"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "Létrehozás…"
   },
   "files.navbar.home": {
     "defaultMessage": "Kezdőlap"
@@ -463,12 +610,6 @@
   },
   "files.operations.failed": {
     "defaultMessage": "Sikertelen"
-  },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Fájlok feltöltése ({completed}/{total})"
   },
   "files.rename-modal.header": {
     "defaultMessage": "{name} átnevezése"
@@ -541,6 +682,9 @@
   },
   "files.zip-url-modal.step-select-title": {
     "defaultMessage": "Válassz ki egy verziót"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "Ismeretlen hiba történt"
   },
   "form.label.address-line": {
     "defaultMessage": "Cím"
@@ -644,6 +788,9 @@
   "hosting.content.failed-to-update": {
     "defaultMessage": "A frissítés nem sikerült"
   },
+  "hosting.content.failed-to-upload": {
+    "defaultMessage": "Nem sikerült feltölteni a fájlt"
+  },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB RAM"
   },
@@ -716,6 +863,9 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Játékverzió keresése"
   },
+  "installation-settings.verifying": {
+    "defaultMessage": "Ellenőrzés…"
+  },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Kaland mód"
   },
@@ -736,6 +886,9 @@
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Meglévő profil"
+  },
+  "instances.content-install.game-version-placeholder": {
+    "defaultMessage": "Játékverzió kiválasztása"
   },
   "instances.content-install.header": {
     "defaultMessage": "Projekt letöltése"
@@ -846,7 +999,7 @@
     "defaultMessage": "A frissítés meghibásodást okozhat a világban. Először nézd át a változásnaplót, és készíts biztonsági másolatot."
   },
   "label.actions": {
-    "defaultMessage": "Akciók"
+    "defaultMessage": "Műveletek"
   },
   "label.available": {
     "defaultMessage": "{amount} elérhető."
@@ -904,6 +1057,9 @@
   },
   "label.game-version": {
     "defaultMessage": "Játékverzió"
+  },
+  "label.installing": {
+    "defaultMessage": "Letöltés..."
   },
   "label.loading": {
     "defaultMessage": "Betöltés..."
@@ -973,6 +1129,9 @@
   },
   "label.search": {
     "defaultMessage": "Keresés"
+  },
+  "label.select-all": {
+    "defaultMessage": "Összes kiválasztása"
   },
   "label.selection-actions": {
     "defaultMessage": "Műveletek kiválasztása"
@@ -1086,7 +1245,7 @@
     "defaultMessage": "portugál (Brazília)"
   },
   "locale.pt-PT": {
-    "defaultMessage": "portugál (Portugláia)"
+    "defaultMessage": "portugál (Portugália)"
   },
   "locale.ro-RO": {
     "defaultMessage": "román"
@@ -1457,14 +1616,38 @@
   "project.about.links.wiki": {
     "defaultMessage": "Wiki megtekintése"
   },
+  "project.about.server.address.tooltip": {
+    "defaultMessage": "A Java szerver címének másolása"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Kimásolva!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "A szerver címe a vágólapra másolva"
+  },
+  "project.about.server.downloadModpack": {
+    "defaultMessage": "Modcsomag letöltése"
+  },
   "project.about.server.languages": {
     "defaultMessage": "Nyelvek"
+  },
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(Ajánlott)"
+  },
+  "project.about.server.region": {
+    "defaultMessage": "Régió"
   },
   "project.about.server.requiredContent": {
     "defaultMessage": "Szükséges tartalom"
   },
+  "project.about.server.title": {
+    "defaultMessage": "Szerveradatok"
+  },
   "project.about.tags.title": {
     "defaultMessage": "Címkék"
+  },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} letöltés"
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Kliens és szerver, mindkettőn kötelező"
@@ -1502,6 +1685,9 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Ismeretlen környezet"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} követő"
+  },
   "project.online-player-count.tooltip": {
     "defaultMessage": "{count} játékos online"
   },
@@ -1510,6 +1696,9 @@
   },
   "project.recent-plays.tooltip": {
     "defaultMessage": "{count} {countPlural, plural,one {jelenleg játszott} other {jelenleg játszottak}} Modrinth-től az elmúlt 2 hétben"
+  },
+  "project.server.customModpackTooltip": {
+    "defaultMessage": "Ez a projekt egy egyedi modcsomagot használ"
   },
   "project.server.language.af": {
     "defaultMessage": "afrikai"
@@ -1733,11 +1922,44 @@
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
   },
+  "project.server.region.asia": {
+    "defaultMessage": "Ázsia"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Ausztrália"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Európa"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Közel-Kelet"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "Oroszország"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "Dél-Amerika"
+  },
   "project.server.region.tooltip": {
     "defaultMessage": "A szerver {regionName} régióban található"
   },
+  "project.server.region.us_east": {
+    "defaultMessage": "Kelet-Amerika"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "Nyugat-Amerika"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "Offline"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "A szerver offline állapotban van"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "Online"
+  },
   "project.settings.analytics.title": {
-    "defaultMessage": "Statisztikák"
+    "defaultMessage": "Statisztika"
   },
   "project.settings.content.title": {
     "defaultMessage": "Tartalom"
@@ -1851,7 +2073,7 @@
     "defaultMessage": "R"
   },
   "project.visibility.archived": {
-    "defaultMessage": "Archíválva"
+    "defaultMessage": "Archiválva"
   },
   "project.visibility.draft": {
     "defaultMessage": "Piszkozat"
@@ -2021,9 +2243,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Fizetési mód"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "számlázva {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Válassz egy személyre szabott csomagot, ami pontosan az igényeidnek megfelelő specifikációkkal rendelkezik."
   },
@@ -2039,17 +2258,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Legnépszerűbb"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Válasz előfizetést"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Válasz előfizetést"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Tökéletes 1–5 barát számára, néhány kisebb moddal."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Válaszd ki az igényeidnek megfelelő RAM-mennyiséget és specifikációkat."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Előfizetés"
@@ -2187,7 +2400,10 @@
     "defaultMessage": "Felfedezés"
   },
   "tag.category.adventure-mode": {
-    "defaultMessage": "Kaland Mód"
+    "defaultMessage": "Kaland mód"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Anarchia"
   },
   "tag.category.atmosphere": {
     "defaultMessage": "Atmoszféra"
@@ -2195,14 +2411,44 @@
   "tag.category.audio": {
     "defaultMessage": "Hang"
   },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Battle Royale"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Bed Wars"
+  },
   "tag.category.blocks": {
     "defaultMessage": "Blokkok"
+  },
+  "tag.category.bosses": {
+    "defaultMessage": "Főellenségek"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Rajzfilmes"
   },
   "tag.category.challenging": {
     "defaultMessage": "Kihívó"
   },
+  "tag.category.classes": {
+    "defaultMessage": "Osztályok"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Színes világítás"
+  },
   "tag.category.combat": {
     "defaultMessage": "Harc"
+  },
+  "tag.category.competitive": {
+    "defaultMessage": "Versengő"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "Alap shaderek"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Kreatív mód"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Fejlesztői közösség"
   },
   "tag.category.cursed": {
     "defaultMessage": "Elátkozott"
@@ -2212,6 +2458,9 @@
   },
   "tag.category.decoration": {
     "defaultMessage": "Dekoráció"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Kazamaták"
   },
   "tag.category.economy": {
     "defaultMessage": "Gazdaság"
@@ -2228,6 +2477,9 @@
   "tag.category.fantasy": {
     "defaultMessage": "Fantázia"
   },
+  "tag.category.foliage": {
+    "defaultMessage": "Növényzet"
+  },
   "tag.category.fonts": {
     "defaultMessage": "Betűtípusok"
   },
@@ -2237,11 +2489,14 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "Játékmechanikák"
   },
+  "tag.category.gens": {
+    "defaultMessage": "Gens"
+  },
   "tag.category.gui": {
     "defaultMessage": "GUI"
   },
   "tag.category.hardcore-mode": {
-    "defaultMessage": "Hardcore Mód"
+    "defaultMessage": "Hardcore mód"
   },
   "tag.category.high": {
     "defaultMessage": "Magas"
@@ -2250,10 +2505,13 @@
     "defaultMessage": "Tárgyak"
   },
   "tag.category.keep-inventory": {
-    "defaultMessage": "Inventory megtartása"
+    "defaultMessage": "Eszköztár megtartása"
   },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Konyhai csap"
+  },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PvP"
   },
   "tag.category.library": {
     "defaultMessage": "Könyvtár"
@@ -2279,11 +2537,17 @@
   "tag.category.medium": {
     "defaultMessage": "Közepes"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Minijátékok"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Minijáték"
   },
   "tag.category.minigames": {
     "defaultMessage": "Minijátékok"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
     "defaultMessage": "Mobok"
@@ -2301,7 +2565,7 @@
     "defaultMessage": "Hálózat"
   },
   "tag.category.offline-mode": {
-    "defaultMessage": "Offline Mód"
+    "defaultMessage": "Offline mód"
   },
   "tag.category.oneblock": {
     "defaultMessage": "Egy Blokk"
@@ -2315,8 +2579,17 @@
   "tag.category.parkour": {
     "defaultMessage": "Parkúr"
   },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
   "tag.category.personal-worlds": {
-    "defaultMessage": "Saját Világok"
+    "defaultMessage": "Saját világok"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Telkek"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokémon"
   },
   "tag.category.potato": {
     "defaultMessage": "Krumpli"
@@ -2329,6 +2602,9 @@
   },
   "tag.category.pvp": {
     "defaultMessage": "PvP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Küldetések"
   },
   "tag.category.quests": {
     "defaultMessage": "Kalandok"
@@ -2376,13 +2652,19 @@
     "defaultMessage": "Tárhely"
   },
   "tag.category.survival-mode": {
-    "defaultMessage": "Túlélő Mód"
+    "defaultMessage": "Túlélő mód"
   },
   "tag.category.teams": {
     "defaultMessage": "Csapatok"
   },
+  "tag.category.technical": {
+    "defaultMessage": "Technikai"
+  },
   "tag.category.technology": {
     "defaultMessage": "Technológia"
+  },
+  "tag.category.themed": {
+    "defaultMessage": "Tematikus"
   },
   "tag.category.towns": {
     "defaultMessage": "Városok"

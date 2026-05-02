@@ -1,4 +1,5 @@
 use crate::api::Result;
+use tauri::Runtime;
 use theseus::prelude::*;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
@@ -28,10 +29,10 @@ pub async fn settings_set(settings: Settings) -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn cancel_directory_change() -> Result<()> {
-    let state = State::get().await?;
-    let identifier = &state.app_identifier;
-
+pub async fn cancel_directory_change<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<()> {
+    let identifier = &app.config().identifier;
     settings::cancel_directory_change(identifier).await?;
     Ok(())
 }

@@ -58,9 +58,10 @@
 			ref="terminalRef"
 			class="min-h-0 flex-1"
 			:show-input="resolvedShowInput"
-			:disable-input="resolvedDisableInput"
+			:disable-input="resolvedInputDisabled"
 			:fullscreen="isFullscreen"
 			:empty-state-type="ctx.emptyStateType"
+			:loading="resolvedLoading"
 			@command="handleCommand"
 			@ready="handleTerminalReady"
 		/>
@@ -111,7 +112,14 @@ import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
-import { colorize, rewriteTerminal, useConsoleFilters } from './composables'
+import {
+	clearSearchHighlights,
+	colorize,
+	getHighlightVersion,
+	highlightAppendedRange,
+	rewriteTerminal,
+	useConsoleFilters,
+} from './composables'
 import type { ConditionalLevel } from './composables/console-filtering'
 import { injectConsoleManager } from './providers'
 import type { LogLevel, LogLine } from './types'
@@ -199,6 +207,15 @@ const resolvedDisableInput = computed(() => {
 	return isRef(v) ? v.value : v
 })
 
+// needs historical log start/end flags on ws to be properly useful
+const resolvedLoading = computed(() => {
+	const v = ctx.loading
+	if (!v) return false
+	return v.value
+})
+
+const resolvedInputDisabled = computed(() => resolvedDisableInput.value || resolvedLoading.value)
+
 const resolvedShareDisabled = computed(() => {
 	const v = ctx.shareDisabled
 	if (!v) return false
@@ -230,6 +247,11 @@ function rewriteFiltered() {
 	const term = terminalRef.value?.terminal
 	if (!term) return
 	const lines = ctx.logLines.value
+	if (resolvedLoading.value && lines.length === 0 && isLiveSource.value) {
+		terminalRef.value?.clearEmptyState()
+		lastWrittenIndex = 0
+		return
+	}
 	if (lines.length === 0 && isLiveSource.value) {
 		writeEmptyState()
 		return
@@ -264,6 +286,12 @@ watch(ctx.logLines, (lines, oldLines) => {
 	if (!term) return
 
 	if (lines.length === 0 && isLiveSource.value) {
+		if (resolvedLoading.value) {
+			terminalRef.value?.clearEmptyState()
+			lastWrittenIndex = 0
+			return
+		}
+
 		writeEmptyState()
 		return
 	}
@@ -279,18 +307,21 @@ watch(ctx.logLines, (lines, oldLines) => {
 	}
 
 	const predicate = buildCombinedPredicate()
-	const query = activeSearchQuery()
 	const newLines: string[] = []
 	for (let i = lastWrittenIndex; i < lines.length; i++) {
 		if (!predicate || predicate(lines[i])) {
-			newLines.push(colorize(lines[i], query))
+			newLines.push(colorize(lines[i]))
 		}
 	}
 	if (newLines.length > 0) {
 		const buffer = term.buffer.active
 		const onFreshLine = buffer.cursorX === 0
 		const data = onFreshLine ? newLines.join('\r\n') : '\r\n' + newLines.join('\r\n')
-		term.write(data)
+		const fromRow = buffer.baseY + buffer.cursorY
+		const version = getHighlightVersion(term)
+		term.write(data, () => {
+			highlightAppendedRange(term, fromRow, version)
+		})
 	}
 	lastWrittenIndex = lines.length
 })
@@ -302,11 +333,19 @@ watch(searchQuery, () => {
 	}, 200)
 })
 
+watch(resolvedLoading, (loading) => {
+	if (!loading) {
+		rewriteFiltered()
+	}
+})
+
 function handleCommand(cmd: string) {
 	ctx.sendCommand?.(cmd)
 }
 
 function handleClear() {
+	const term = terminalRef.value?.terminal
+	if (term) clearSearchHighlights(term)
 	terminalRef.value?.reset()
 	lastWrittenIndex = 0
 	ctx.onClear?.()

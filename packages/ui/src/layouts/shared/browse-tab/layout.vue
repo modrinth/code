@@ -59,7 +59,6 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			:model-value="ctx.effectiveCurrentSortType.value"
 			:options="sortOptions"
 			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[16rem]'"
-			placeholder="Sort by"
 			@update:model-value="(val: SortType) => (ctx.effectiveCurrentSortType.value = val)"
 		>
 			<template #prefix>
@@ -161,7 +160,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 					@mouseenter="ctx.onServerProjectHover?.(result)"
 					@mouseleave="ctx.onProjectHoverEnd?.()"
 				>
-					<template v-if="ctx.getCardActions" #actions>
+					<template v-if="ctx.getCardActions?.(result, ctx.projectType.value)?.length" #actions>
 						<div class="flex gap-2">
 							<ButtonStyled
 								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
@@ -175,7 +174,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
-									<component :is="action.icon" />
+									<component :is="action.icon" :class="action.iconClass" />
 									<template v-if="!action.circular">{{ action.label }}</template>
 								</button>
 							</ButtonStyled>
@@ -191,11 +190,15 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 					:title="result.title"
 					:icon-url="result.icon_url"
 					:author="{
-						name: result.author,
+						name: result.organization == null ? result.author : result.organization,
 						link:
-							ctx.variant === 'web'
-								? `/user/${result.author}`
-								: `https://modrinth.com/user/${result.author}`,
+							result.organization_id == null
+								? ctx.variant === 'web'
+									? `/user/${result.author_id ?? result.author}`
+									: `https://modrinth.com/user/${result.author_id ?? result.author}`
+								: ctx.variant === 'web'
+									? `/organization/${result.organization_id}`
+									: `https://modrinth.com/organization/${result.organization_id}`,
 					}"
 					:date-updated="result.date_modified"
 					:date-published="result.date_created"
@@ -224,7 +227,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 					@mouseenter="ctx.onProjectHover?.(result)"
 					@mouseleave="ctx.onProjectHoverEnd?.()"
 				>
-					<template v-if="ctx.getCardActions" #actions>
+					<template v-if="ctx.getCardActions?.(result, ctx.projectType.value)?.length" #actions>
 						<div class="flex gap-2">
 							<ButtonStyled
 								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
@@ -238,7 +241,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
-									<component :is="action.icon" />
+									<component :is="action.icon" :class="action.iconClass" />
 									<template v-if="!action.circular">{{ action.label }}</template>
 								</button>
 							</ButtonStyled>
@@ -248,7 +251,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			</template>
 		</ProjectCardList>
 
-		<div :class="ctx.variant === 'web' ? 'pagination-after' : 'flex justify-end'">
+		<div :class="ctx.variant === 'web' ? 'pagination-after my-3' : 'flex justify-end'">
 			<Pagination
 				:page="ctx.currentPage.value"
 				:count="ctx.pageCount.value"

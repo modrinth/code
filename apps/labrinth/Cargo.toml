@@ -29,6 +29,7 @@ async-stripe = { workspace = true, features = [
   "webhook-events"
 ] }
 async-trait = { workspace = true }
+aws-sdk-s3 = { workspace = true }
 base64 = { workspace = true }
 bitflags = { workspace = true }
 bytes = { workspace = true }
@@ -80,6 +81,7 @@ murmur2 = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
 prometheus = { workspace = true }
+quick-xml = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
 redis = { workspace = true, features = ["ahash", "r2d2", "tokio-comp"] }
@@ -95,7 +97,6 @@ rust_decimal = { workspace = true, features = [
   "serde-with-str"
 ] }
 rust_iso3166 = { workspace = true }
-rust-s3 = { workspace = true }
 rustls.workspace = true
 rusty-money = { workspace = true }
 sentry = { workspace = true }

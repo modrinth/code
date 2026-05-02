@@ -100,7 +100,13 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		serverFilterTypes,
 		serverRequestParams,
 		createServerPageParams,
-	} = useServerSearch({ tags: options.tags, query, maxResults, currentPage })
+	} = useServerSearch({
+		tags: options.tags,
+		query,
+		maxResults,
+		currentPage,
+		providedFilters: options.providedFilters,
+	})
 
 	const effectiveRequestParams = computed(() =>
 		isServerType.value ? serverRequestParams.value : requestParams.value,
@@ -276,7 +282,9 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		() => options.projectType.value,
 		(newType, oldType) => {
 			debug('projectType changed', { from: oldType, to: newType })
-			currentSortType.value = { display: 'Relevance', name: 'relevance' }
+			effectiveCurrentSortType.value =
+				effectiveSortTypes.value.find((sortType) => sortType.name === 'relevance') ??
+				effectiveSortTypes.value[0]
 			query.value = ''
 		},
 	)

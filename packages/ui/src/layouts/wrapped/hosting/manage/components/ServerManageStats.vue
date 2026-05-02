@@ -2,7 +2,7 @@
 	<div
 		data-pyro-server-stats
 		style="font-variant-numeric: tabular-nums"
-		class="flex select-none flex-col items-center gap-4 md:flex-row"
+		class="flex select-none flex-col items-center gap-3 md:flex-row"
 		:class="{ 'pointer-events-none': loading }"
 		:aria-hidden="loading"
 	>
@@ -31,7 +31,12 @@
 					</span>
 				</div>
 				<span class="stat-drop-shadow text-4xl font-bold text-contrast">
-					{{ metric.value }}
+					{{ metric.value
+					}}<span
+						v-if="metric.secondary"
+						class="ml-1 text-sm font-normal stat-drop-shadow text-secondary"
+						>{{ metric.secondary }}</span
+					>
 				</span>
 				<!-- <div
 					class="absolute -left-8 -top-4 -z-10 h-28 w-56 rounded-full bg-surface-3 opacity-50 blur-lg"
@@ -40,7 +45,7 @@
 
 			<div v-if="metric.showGraph" class="chart-space absolute bottom-0 left-0 right-0">
 				<VueApexCharts
-					v-if="!loading && metric.chartOptions"
+					v-if="isClient && !loading && metric.chartOptions"
 					type="area"
 					height="142"
 					:options="metric.chartOptions"
@@ -57,14 +62,22 @@
 import { CpuIcon, DatabaseIcon, FolderOpenIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
-import { computed, defineAsyncComponent, ref, shallowRef, watch } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
-import { injectModrinthServerContext } from '#ui/providers'
+import { injectModrinthServerContext, injectPageContext } from '#ui/providers'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
 
+// apexcharts touches `window` at module load time, so we must not let SSR
+// resolve the async component. Render only after mount on the client.
+const isClient = ref(false)
+onMounted(() => {
+	isClient.value = true
+})
+
 const { serverId } = injectModrinthServerContext()
+const { featureFlags } = injectPageContext()
 
 const props = withDefaults(
 	defineProps<{
@@ -83,6 +96,16 @@ const chartsReady = ref(new Set<number>())
 const userPreferences = useStorage(`pyro-server-${serverId || 'unknown'}-preferences`, {
 	ramAsNumber: false,
 })
+const isRamAsBytesForcedByFeatureFlag = computed(
+	() => featureFlags?.serverRamAsBytesAlwaysOn?.value ?? false,
+)
+
+const showRamAsBytes = computed(
+	() =>
+		props.showMemoryAsBytes ||
+		isRamAsBytesForcedByFeatureFlag.value ||
+		userPreferences.value.ramAsNumber,
+)
 
 const stats = shallowRef(
 	props.data?.current || {
@@ -170,6 +193,7 @@ const metrics = computed(() => {
 	const storageMetric = {
 		title: 'Storage',
 		value: props.loading ? '0 B' : formatBytes(stats.value.storage_usage_bytes ?? 0),
+		secondary: null as string | null,
 		icon: FolderOpenIcon,
 		showGraph: false,
 		chartOptions: null as ReturnType<typeof buildChartOptions> | null,
@@ -182,6 +206,7 @@ const metrics = computed(() => {
 			{
 				title: 'CPU',
 				value: '0.00%',
+				secondary: null as string | null,
 				icon: CpuIcon,
 				showGraph: true,
 				chartOptions: cpuChartOptions.value,
@@ -191,6 +216,7 @@ const metrics = computed(() => {
 			{
 				title: 'Memory',
 				value: '0.00%',
+				secondary: null as string | null,
 				icon: DatabaseIcon,
 				showGraph: true,
 				chartOptions: ramChartOptions.value,
@@ -205,6 +231,7 @@ const metrics = computed(() => {
 		{
 			title: 'CPU',
 			value: `${cpuPercent.value.toFixed(2)}%`,
+			secondary: null as string | null,
 			icon: CpuIcon,
 			showGraph: true,
 			chartOptions: cpuChartOptions.value,
@@ -213,10 +240,12 @@ const metrics = computed(() => {
 		},
 		{
 			title: 'Memory',
-			value:
-				props.showMemoryAsBytes || userPreferences.value.ramAsNumber
-					? formatBytes(stats.value.ram_usage_bytes ?? 0)
-					: `${ramPercent.value.toFixed(2)}%`,
+			value: showRamAsBytes.value
+				? formatBytes(stats.value.ram_usage_bytes ?? 0)
+				: `${ramPercent.value.toFixed(2)}%`,
+			secondary: showRamAsBytes.value
+				? `/ ${formatBytes(stats.value.ram_total_bytes ?? 0)}`
+				: (null as string | null),
 			icon: DatabaseIcon,
 			showGraph: true,
 			chartOptions: ramChartOptions.value,

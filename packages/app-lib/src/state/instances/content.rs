@@ -21,7 +21,9 @@
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::profiles::{Profile, ProfileFile, ProjectType};
 use crate::state::{CacheBehaviour, CachedEntry};
-use crate::util::fetch::{FetchSemaphore, fetch_mirrors, sha1_async};
+use crate::util::fetch::{
+    DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
+};
 use async_zip::base::read::seek::ZipFileReader;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
@@ -281,7 +283,7 @@ fn check_modpack_update(
         .collect();
 
     // Sort by date_published descending (newest first)
-    compatible_versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+    compatible_versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
 
     // Find the newest compatible version
     if let Some(newest) = compatible_versions.first() {
@@ -319,6 +321,7 @@ pub async fn get_content_items(
             );
             match get_modpack_identifiers(
                 &linked_data.version_id,
+                profile,
                 pool,
                 fetch_semaphore,
             )
@@ -638,6 +641,7 @@ pub async fn get_linked_modpack_content(
 
     let modpack_ids = match get_modpack_identifiers(
         &linked_data.version_id,
+        profile,
         pool,
         fetch_semaphore,
     )
@@ -802,6 +806,7 @@ impl ModpackIdentifiers {
 /// Checks cache first, falls back to downloading mrpack if not cached.
 async fn get_modpack_identifiers(
     version_id: &str,
+    profile: &crate::state::Profile,
     pool: &SqlitePool,
     fetch_semaphore: &FetchSemaphore,
 ) -> crate::Result<ModpackIdentifiers> {
@@ -880,9 +885,16 @@ async fn get_modpack_identifiers(
             ))
         })?;
 
+    let download_meta = DownloadMeta {
+        reason: DownloadReason::Modpack,
+        game_version: profile.game_version.clone(),
+        loader: profile.loader.as_str().to_string(),
+    };
+
     let mrpack_bytes = fetch_mirrors(
         &[&primary_file.url],
         primary_file.hashes.get("sha1").map(|s| s.as_str()),
+        Some(&download_meta),
         fetch_semaphore,
         pool,
     )

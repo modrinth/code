@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Criar link de afiliado"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Nenhum código de afiliado encontrado."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Erro ao carregar links de afiliado"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Procurar links de afiliado..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "de {count} {count, plural, one {projeto} other {projetos}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Downloads totais"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Seguidores totais"
   },
   "dashboard.collections.button.create-new": {
     "message": "Criar nova"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Suas coleções"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Buscar coleções..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Nome (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Criado recentemente"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Atualizado recentemente"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Baixar {formType}"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Você esgotou seu limite de retirada <b>{withdrawLimit}</b>. Você deve completar o formulário fiscal para retirar mais."
   },
+  "dashboard.head-title": {
+    "message": "Painel de controle"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Marcar tudo como lido"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Ver histórico"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Você não tem nenhuma notificação não lida."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Erro ao carregar as notificações:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Histórico"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Histórico de notificações"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Ver todas"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Ver histórico de notificações"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Ver mais {extraNotifs} {extraNotifs, plural, one {notificação} other {notificações}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Carregando notificações..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Criar organização"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Crie uma organização!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Falha ao buscar organizações"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {membro} other {membros}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organizações"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Você pode editar vários projetos em simultâneo, selecionando-os abaixo."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Os projetos de servidor não suportam edição em massa"
+  },
+  "dashboard.projects.empty": {
+    "message": "Você ainda não tem nenhum projeto. Clique no botão verde acima para começar."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projetos"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "e {count} mais..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Apagar link"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Editar links"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "As alterações serão aplicadas a <strong>{count}</strong> {count, plural, one {projeto} other {projetos}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Quaisquer links que você especificar abaixo serão sobrescritos em todos os projetos selecionados. Os links que você deixar em branco serão ignorados. Você pode remover um link de todos os projetos selecionados usando o botão de lixeira."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Um link de convite para o seu servidor do Discord."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Convite do Discord"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Um espaço para os usuários relatarem erros, problemas e dúvidas sobre o seu projeto."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Rastreador de problemas"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "O link existente será apagado"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Insira um URL de convite do Discord válido"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Insira um URL válido"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Mostrar todos os projetos"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Uma página/repositório contendo o código-fonte do seu projeto"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Código-fonte"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Uma pagina contendo informações, documentação, e ajuda para o projeto."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Página da Wiki"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Links dos projetos selecionados editados em massa."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Ícone para {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "O projeto tem uma mensagem dos moderadores. Veja o projeto para saber mais."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Por favor, revise os metadados do ambiente"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Crescente"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Decrescente"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Nome"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Tipo"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Ícone"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nome"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Tipo"
+  },
+  "dashboard.report.title": {
+    "message": "Denunciar {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Relatórios ativos"
+  },
+  "dashboard.reports.title": {
+    "message": "Relatórios"
+  },
   "dashboard.revenue.available-now": {
     "message": "Disponível agora"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Baixar como CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Histórico de transações"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transações"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Seus pagamentos e retiradas aparecerão aqui."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Mês passado"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Este mês"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Ver todas"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Todos os anos"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Suas restiradas estão temporariamente bloqueadas devido a seu TIN ou SSN não coincidirem com seus registros do IRS. Por favor, contate o suporte para reestabelecer e reenviar seu formulário fiscal."
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Retirar"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Relatórios ativos"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Estatísticas"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Criadores"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Painel de controle"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notificações"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organizações"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Visão geral"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projetos"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Faturamento"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Conta"
@@ -1300,60 +1525,6 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Escolha entre Jogo padrão, Fabric, Forge, Quilt e NeoForge. Se estiver no Modrinth, pode ser executado no seu servidor."
-  },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Falha ao alterar a versão do pacote de mods"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Falha ao carregar as versões"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Falha ao reinstalar o pacote de mods"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Falha ao reparar o servidor"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Falha ao redefinir o servidor para a integração"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Falha ao salvar as configurações de instalação"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Falha ao desvincular o pacote de mods"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {Carregador} other {{loader}}} versão"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "A instalação do seu servidor foi reparada."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Reparo concluído"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Reiniciar servidor"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Remove todos os dados do seu servidor, incluindo seus mundos, mods e arquivos de configuração. As cópias de segurança permanecerão e poderão ser restauradas."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Redefinir para a integração"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Isso enviará o servidor de volta para a integração, para que a configuração possa ser concluída novamente. Tem certeza de que deseja continuar?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Redefinir para a integração"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "O servidor foi retornado ao fluxo de integração."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Servidor redefinido para a integração"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Opções de suporte"
   },
   "hosting.plan.out-of-stock": {
     "message": "Esgotado"
@@ -2831,18 +3002,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar com o servidor"
   },
-  "servers.busy.backup-creating": {
-    "message": "Criação de cópia de segurança em andamento"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Restauração da cópia de segurança em andamento"
-  },
-  "servers.busy.installing": {
-    "message": "O servidor está sendo instalado"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Sincronização de conteúdo em andamento"
-  },
   "servers.notice.actions": {
     "message": "Ações"
   },
@@ -3209,6 +3368,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Cobranças anteriores"
+  },
   "settings.billing.expires": {
     "message": "Expira em {date}"
   },
@@ -3217,6 +3379,12 @@
   },
   "settings.billing.interval.monthly": {
     "message": "mensal"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "trimestre"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "trimestral"
   },
   "settings.billing.interval.year": {
     "message": "ano"
@@ -3327,19 +3495,19 @@
     "message": "{gb} GB de RAM"
   },
   "settings.billing.pyro.resubscribe.error.text": {
-    "message": "Ocorreu um erro ao se reinscrever no seu Modrinth server."
+    "message": "Ocorreu um erro ao reassinar o seu Modrinth server."
   },
   "settings.billing.pyro.resubscribe.error.title": {
-    "message": "Erro ao reativar a assinatura"
+    "message": "Erro ao reassinar"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Se o servidor estiver suspenso, pode levar até 10 minutos para que outra tentativa de cobrança seja feita."
+    "message": "Se o servidor estiver cancelado no momento, a configuração pode levar de 10–15 minutos."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
-    "message": "Solicitação de reativação enviada"
+    "message": "Solicitação de reassinar enviada"
   },
   "settings.billing.pyro.resubscribe.success.text": {
-    "message": "Assinatura do servidor reativada com sucesso"
+    "message": "Assinatura do servidor reassinada com sucesso"
   },
   "settings.billing.pyro.status.failed": {
     "message": "O pagamento da sua assinatura falhou. Por favor, atualize sua forma de pagamento, e tente assinar novamente."
@@ -3363,7 +3531,7 @@
     "message": "Renova {date}"
   },
   "settings.billing.resubscribe": {
-    "message": "Reativar assinatura"
+    "message": "Reassinar"
   },
   "settings.billing.since": {
     "message": "Desde {date}"

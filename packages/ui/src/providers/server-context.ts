@@ -1,6 +1,6 @@
 import type { Archon, UploadState } from '@modrinth/api-client'
 import type { Stats } from '@modrinth/utils'
-import type { ComputedRef, Reactive, Ref } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 
 import type { MessageDescriptor } from '#ui/composables/i18n'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
@@ -10,19 +10,6 @@ import { createContext } from '.'
 export interface BusyReason {
 	reason: MessageDescriptor
 }
-
-export type BackupTaskState = {
-	progress: number
-	state: Archon.Backups.v1.BackupState
-}
-
-export type BackupProgressEntry = {
-	file?: BackupTaskState
-	create?: BackupTaskState
-	restore?: BackupTaskState
-}
-
-export type BackupsState = Map<string, BackupProgressEntry>
 
 export interface FilesystemAuth {
 	url: string
@@ -42,8 +29,6 @@ export interface ModrinthServerContext {
 	readonly isServerRunning: ComputedRef<boolean>
 	readonly stats: Ref<Stats>
 	readonly uptimeSeconds: Ref<number>
-	readonly backupsState: Reactive<BackupsState>
-	markBackupCancelled: (backupId: string) => void
 
 	// Content sync state
 	readonly isSyncingContent: Ref<boolean>

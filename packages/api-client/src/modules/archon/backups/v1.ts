@@ -1,11 +1,17 @@
 import { AbstractModule } from '../../../core/abstract-module'
 import type { Archon } from '../types'
 
+/**
+ * @deprecated Use `client.archon.backups_queue_v1` (Backups Queue API) instead.
+ */
 export class ArchonBackupsV1Module extends AbstractModule {
 	public getModuleID(): string {
 		return 'archon_backups_v1'
 	}
 
+	/**
+	 * @deprecated Use `client.archon.backups_queue_v1.list` instead.
+	 */
 	/** GET /v1/servers/:server_id/worlds/:world_id/backups */
 	public async list(serverId: string, worldId: string): Promise<Archon.Backups.v1.Backup[]> {
 		return this.client.request<Archon.Backups.v1.Backup[]>(
@@ -14,6 +20,9 @@ export class ArchonBackupsV1Module extends AbstractModule {
 		)
 	}
 
+	/**
+	 * @deprecated Use `client.archon.backups_queue_v1.list` instead.
+	 */
 	/** GET /v1/servers/:server_id/worlds/:world_id/backups/:backup_id */
 	public async get(
 		serverId: string,
@@ -26,6 +35,9 @@ export class ArchonBackupsV1Module extends AbstractModule {
 		)
 	}
 
+	/**
+	 * @deprecated Use `client.archon.backups_queue_v1.create` instead.
+	 */
 	/** POST /v1/servers/:server_id/worlds/:world_id/backups */
 	public async create(
 		serverId: string,
@@ -38,6 +50,9 @@ export class ArchonBackupsV1Module extends AbstractModule {
 		)
 	}
 
+	/**
+	 * @deprecated Use `client.archon.backups_queue_v1.restore` instead.
+	 */
 	/** POST /v1/servers/:server_id/worlds/:world_id/backups/:backup_id/restore */
 	public async restore(serverId: string, worldId: string, backupId: string): Promise<void> {
 		await this.client.request<void>(
@@ -50,6 +65,9 @@ export class ArchonBackupsV1Module extends AbstractModule {
 		)
 	}
 
+	/**
+	 * @deprecated Use `client.archon.backups_queue_v1.delete` instead.
+	 */
 	/** DELETE /v1/servers/:server_id/worlds/:world_id/backups/:backup_id */
 	public async delete(serverId: string, worldId: string, backupId: string): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/backups/${backupId}`, {
@@ -59,6 +77,9 @@ export class ArchonBackupsV1Module extends AbstractModule {
 		})
 	}
 
+	/**
+	 * @deprecated Use `client.archon.backups_queue_v1.retry` instead.
+	 */
 	/** POST /v1/servers/:server_id/worlds/:world_id/backups/:backup_id/retry */
 	public async retry(serverId: string, worldId: string, backupId: string): Promise<void> {
 		await this.client.request<void>(
@@ -71,6 +92,9 @@ export class ArchonBackupsV1Module extends AbstractModule {
 		)
 	}
 
+	/**
+	 * @deprecated Legacy backups only; no queue equivalent. Prefer renaming via other supported flows if available.
+	 */
 	/** PATCH /v1/servers/:server_id/worlds/:world_id/backups/:backup_id */
 	public async rename(
 		serverId: string,

@@ -1,6 +1,6 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Os servidores de autenticação do Minecraft podem estar indisponíveis no momento. Verifique sua conexão com a internet e tente novamente mais tarde."
+    "message": "Os servidores de autenticação do Minecraft podem estar indisponíveis no momento. Verifique sua conexão com a rede e tente novamente mais tarde."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Não foi possível acessar os servidores de autenticação"
@@ -39,7 +39,7 @@
     "message": "Instalar conteúdo na instância"
   },
   "app.export-modal.description-placeholder": {
-    "message": "Insira a descrição do pacote de mods..."
+    "message": "Insira uma descrição para o pacote de mods..."
   },
   "app.export-modal.export-button": {
     "message": "Exportar"
@@ -102,7 +102,7 @@
     "message": "Compartilhando conteúdo do pacote de mods\n\n\n    \t\t\t\t\t\t\n    \t\t\t\t\t\t\t\n    \t\t\t\t\t\t\n    \t\t\t\t\t\t"
   },
   "app.instance.mods.successfully-uploaded": {
-    "message": "Enviado com sucesso"
+    "message": "Adicionado com sucesso"
   },
   "app.instance.worlds.add-server": {
     "message": "Adicionar servidor"

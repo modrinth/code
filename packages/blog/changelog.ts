@@ -11,6 +11,192 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'app',
+		version: '0.13.7',
+		body: `## Added
+- Added a warning when installing unknown modpack files to help prevent users from getting tricked into installing malware.
+
+## Changed
+- Updated the content downloading and installation notifications to be consistent with other types of notifications.
+- Updated the design of the running instances widget in the action bar to be more consistent with our current designs.
+- Increased the click target area of the window control buttons on Windows and Linux.
+- Changed the name of the button for creating an instance with a modpack to make it clearer what it's for.
+
+## Fixed
+- Fixed Java auto-installation not working on macOS.
+- Fix a skin naming error.`,
+	},
+	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Changed the name of the button for installing a modpack to make it clearer what it's for.`,
+	},
+	{
+		date: `2026-04-29T03:54:14+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Server settings save action bar not accessible due to being behind modal.`,
+	},
+	{
+		date: `2026-04-27T19:59:24+00:00`,
+		product: 'app',
+		version: '0.13.6',
+		body: `*Note: Modrinth App v0.13.5's release has been skipped - it's changes have been bundled into 0.13.6.*
+## Changed
+- Renamed the Browse page filter from "Hide installed content/added servers" to "Hide already installed content/added servers".
+- Content installed and servers added from an instance now stay visible on the Browse page until the search query or filters change.
+
+## Fixed
+- Fixed the instance creation modal incorrectly showing mod loaders as compatible with unsupported game versions.
+- Fixed the game version and loader version dropdowns appearing empty for a few seconds in the instance creation modal.`,
+	},
+	{
+		date: `2026-04-27T19:59:24+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Multi-select on the Backups tab for bulk deleting backups.
+- Manual and automatic backup filters on the Backups tab.
+
+## Changed
+- Server panel banners now stack more cleanly when multiple banners are shown.
+- The Backups tab now matches the rest of the server panel design.
+- Server panel banners now use clearer text.
+- Renamed the Discover page filter from "Hide installed content" to "Hide already installed content".
+- Content installed from the Discover page now stays visible until the search query or filters change.
+- The server console on the Overview tab now shows a loading animation until historical logs finish loading.
+
+## Fixed
+- Fixed backup creation and restoration failing in some cases.`,
+	},
+	{
+		date: `2026-04-27T17:30:17+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project data not reloading after migrating environment information from \`/project/[id]/environment\` or the migration warning modal.
+- Fixed the tax compliance step not appearing for some users in the withdrawal flow.
+
+## Security
+- Fixed email template variables rendering URLs.`,
+	},
+	{
+		date: `2026-04-27T17:30:17+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed the server setup and reset modals incorrectly showing mod loaders as compatible with unsupported game versions.
+- Fixed the game version and loader version dropdowns appearing empty for a few seconds in the server setup and reset modals.`,
+	},
+	{
+		date: `2026-04-20T20:48:51+00:00`,
+		product: 'app',
+		version: '0.13.4',
+		body: `## Fixed
+- Browse page not using relevanced as default search type.
+- Fixed problem with the sticky header on scroll in the Files tab of instance pages.`,
+	},
+	{
+		date: `2026-04-20T20:48:51+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Browse page not using relevanced as default search type.`,
+	},
+	{
+		date: `2026-04-19T00:07:46+00:00`,
+		product: 'app',
+		version: '0.13.3',
+		body: `## Fixed
+- Fixed overlap of window controls with the instance status card in the top bar of the app.`,
+	},
+	{
+		date: `2026-04-19T00:07:46+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed "You have unsaved changes" popup appearing behind the settings modal fade.
+- Fixed broken loader version dropdown in the platform settings.
+- Fixed "window not found" error that sometimes happens when loading the server panel.`,
+	},
+	{
+		date: `2026-04-18T19:00:59+00:00`,
+		product: 'app',
+		version: '0.13.2',
+		body: `## Added
+- Instances on the Library page are now grouped into collapsible accordions if they have an associated group. Thanks to [@kirushkinx](https://github.com/kirushkinx)!
+
+## Changed
+- Redesigned the "Find and Replace" tool in the instance Files tab editor to match the rest of the platform. Thanks to [@Creeperkatze](https://github.com/Creeperkatze)!
+
+## Fixed
+- Worlds and servers in the instance Worlds tab now load almost instantly instead of taking one to two seconds.
+- Fixed the Modrinth+ upgrade button and ad banner not staying pinned to the bottom right.
+- Fixed servers in the "Jump back in" section of the home page loading slowly. Thanks to [@Creeperkatze](https://github.com/Creeperkatze)!
+- Fixed several issues with the splash screen.
+- Fixed the cancel button when changing the install directory.
+- Fixed symlinks breaking directory moves.`,
+	},
+	{
+		date: `2026-04-18T19:00:59+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Alpha and beta indicators next to Paper build numbers in the server onboarding and reset modals and on the platform settings page.
+
+## Changed
+- Moved the "Kill server" action into a joined dropdown button with the "Stop" action.
+- Swapped the positions of the "Restart" and "Stop" actions in the server panel.
+- Redesigned the "Find and Replace" tool in the Files tab editor to match the rest of the platform. Thanks to [@Creeperkatze](https://github.com/Creeperkatze)!
+
+## Fixed
+- Fixed slow tab switching in the server panel.
+- Fixed slow loading of the "Manage servers" page in the Modrinth App and slow interactions with it on the website.`,
+	},
+	{
+		date: `2026-04-18T19:00:59+00:00`,
+		product: 'web',
+		body: `## Added
+- Tabs in the version edit modal for switching between version pages.
+
+## Fixed
+- Fixed incorrect margins on project cards.
+- Fixed slow loading of the 404 page. Thanks to [@IsQuyet](https://github.com/IsQuyet)!`,
+	},
+	{
+		date: `2026-04-15T19:39:48+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Server stats inside server settings modal, in info card.
+- Feature flag to always display RAM as bytes.
+
+## Changed
+- Console search highlighting is clearer and more accurate.
+- When memory is shown as bytes, the max RAM is now displayed alongside it.
+- Consolidated spacing between server and instance pages in the Modrinth App.
+- Moved the "Kill server" action into a dropdown under the "Restart" button.
+
+## Fixed
+- The support bubble is now available on hosting pages in the Modrinth App.
+- Paper and Purpur build versions can be selected when resetting a server in the Modrinth App.
+- Server CPU and memory graphs no longer freeze on the last value after a hard crash or out-of-memory kill.`,
+	},
+	{
+		date: `2026-04-15T19:39:48+00:00`,
+		product: 'web',
+		body: `## Added
+- Publishing checklist added back to project page.
+
+## Fixed
+- Fixed version-specific links returning 404.
+- Fixed overflow in the project page header on mobile.
+- Fixed markdown tables causing the project page to overflow.
+- Fixed menu anchoring in the Discover content menu.`,
+	},
+	{
+		date: `2026-04-15T19:39:48+00:00`,
+		product: 'app',
+		version: '0.13.1',
+		body: `## Fixed
+- Fixed the sidebar gutter margin on macOS when the scrollbar is set to auto-hide.`,
+	},
+	{
 		date: `2026-04-12T22:12:15+00:00`,
 		product: 'app',
 		version: '0.13.0',

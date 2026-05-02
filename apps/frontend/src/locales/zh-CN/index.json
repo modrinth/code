@@ -423,7 +423,7 @@
     "message": "输入收藏夹名称………"
   },
   "create.collection.summary-description": {
-    "message": "一两句话描述你的收藏夹。"
+    "message": "用一两句话描述你的收藏夹。"
   },
   "create.collection.summary-label": {
     "message": "简介"
@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "创建推广链接"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "没有找到推广代码。"
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "加载推广链接时出错"
   },
@@ -572,11 +575,20 @@
   "dashboard.affiliate-links.search": {
     "message": "搜索推广链接…"
   },
+  "dashboard.analytics.from-projects": {
+    "message": "来自{count}个项目"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "总下载量"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "总关注者"
+  },
   "dashboard.collections.button.create-new": {
     "message": "新建"
   },
   "dashboard.collections.empty.get-started-hint": {
-    "message": "创建你的首个收藏夹，开始吧！"
+    "message": "创建您的第一个收藏夹，开始新的旅程！"
   },
   "dashboard.collections.empty.no-collections": {
     "message": "你还没有任何收藏夹"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "你的收藏夹"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "搜索收藏夹……"
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "名称（A-Z）"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "最近发布"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "最近更新"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "下载{formType}"
@@ -714,7 +738,7 @@
     "message": "国民身份证号码"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
-    "message": "输入国民身份证号码"
+    "message": "输入居民身份证号码"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
     "message": "护照号码"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "你已用尽<b>{withdrawLimit}</b>的提现额度。若需继续提现，请先完成税务表格填写。"
   },
+  "dashboard.head-title": {
+    "message": "数据面板"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "标记全部已读"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "查看历史"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "你没有未读通知。"
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "加载通知时出错："
+  },
+  "dashboard.notifications.history.label": {
+    "message": "历史"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "历史通知"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "查看所有"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "查看历史通知"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "查看更多 {extraNotifs} 个通知"
+  },
+  "dashboard.notifications.loading": {
+    "message": "加载通知……"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "创建组织"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "建立一个组织！"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "获取组织失败"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} 个成员"
+  },
+  "dashboard.organizations.title": {
+    "message": "组织"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "你可以通过下方复选框选择多个项目来一次性编辑。"
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "服务器项目不支持批量编辑"
+  },
+  "dashboard.projects.empty": {
+    "message": "你还没有任何项目。点击上面的绿色按钮开始。"
+  },
+  "dashboard.projects.head-title": {
+    "message": "项目"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "还有 {count} 个……"
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "清除链接"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "编辑链接"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "将应用更改到 <strong>{count}</strong> 个项目"
+  },
+  "dashboard.projects.links.description": {
+    "message": "以下你指定的任何链接，都会覆盖所选项目上的现有链接。留空的内容将被忽略。你可以使用垃圾桶按钮从所有选定的项目中清除某个链接。"
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "你 Discord 服务器的邀请链接。"
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord 邀请"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "一个供用户报告你项目中的错误、问题及疑虑的地方。"
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "问题追踪器"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "现有链接将被清除"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "请输入有效的 Discord 邀请链接"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "输入一个有效的网址"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "显示所有项目"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "一个包含你项目源代码的页面/仓库"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "源代码"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "一个包含项目信息、文档和帮助的页面。"
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "维基页面"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "已批量编辑所选项目的链接。"
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "{title} 的图标"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "项目有一则来自版主的消息。查看项目以了解更多。"
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "请复核运行环境元数据"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "正序"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "降序"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "名称"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "状态"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "类型"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "图标"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "名称"
+  },
+  "dashboard.projects.table.status": {
+    "message": "状态"
+  },
+  "dashboard.projects.table.type": {
+    "message": "类型"
+  },
+  "dashboard.report.title": {
+    "message": "举报 {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "处理中的举报"
+  },
+  "dashboard.reports.title": {
+    "message": "举报"
+  },
   "dashboard.revenue.available-now": {
     "message": "可用"
   },
@@ -855,7 +1041,7 @@
     "message": "余额"
   },
   "dashboard.revenue.estimated-tooltip.msg1": {
-    "message": "预估收入可能随时变更，直至正式公布为止。"
+    "message": "预计收入在公布前可能会有所调整。"
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
     "message": "点击了解 Modrinth 如何处理你的收入。"
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "以 CSV 格式下载"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "交易记录"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "账单"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "你的支付和提现记录将在此区域显示。"
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "上个月"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "这个月"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "查看所有"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "所有年份"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "由于你的纳税人识别号或社会安全号码与美国国税局记录不符，你的提现被暂时锁定。请联系客服重置并重新提交你的税表。"
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "提现"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "处理中的举报"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "分析"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "作者"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "数据面板"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "通知"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "组织"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "概述"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "项目"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "收益"
   },
   "dashboard.withdraw.completion.account": {
     "message": "账户"
@@ -1300,60 +1525,6 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "随心选择原版、Fabric、Forge、Quilt 和 NeoForge。只要它在 Modrinth，你的服务器就能运行它。"
-  },
-  "hosting.loader.failed-to-change-version": {
-    "message": "更改整合包版本失败"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "加载版本失败"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "重新下载整合包失败"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "修复服务器失败"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "将服务器重置至引导流程失败"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "保存安装设置失败"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "链接整合包包失败"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {加载器} other {{loader}}} 版本"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "你的服务器安装已被修复。"
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "修复完成"
-  },
-  "hosting.loader.reset-server": {
-    "message": "重置服务器"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "删除服务器上的所有数据，包括你的世界、模组和配置文件。备份将保留并可以恢复。"
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "重置至引导流程"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "这将使服务器重新进入引导流程，以便再次完成设置。你确定要继续吗？"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "重置至引导流程"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "服务器已返回至引导流程。"
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "服务器已重置至引导流程"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "支持选项"
   },
   "hosting.plan.out-of-stock": {
     "message": "缺货"
@@ -2169,7 +2340,7 @@
     "message": "提交审核"
   },
   "project-moderation-nags.submit-for-review-desc": {
-    "message": "你的项目现在只能被项目成员查看。必须经过管理员审核才能公开发布项目。"
+    "message": "您的项目仅对项目成员可见。必须经过管理员审核后才能发布。"
   },
   "project-moderation-nags.suggestion": {
     "message": "建议"
@@ -2831,18 +3002,6 @@
   "search.filter.locked.server.sync": {
     "message": "跟随服务器"
   },
-  "servers.busy.backup-creating": {
-    "message": "备份正在创建中"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "备份正在恢复"
-  },
-  "servers.busy.installing": {
-    "message": "正在安装服务器"
-  },
-  "servers.busy.syncing-content": {
-    "message": "进行内容同步中"
-  },
   "servers.notice.actions": {
     "message": "操作"
   },
@@ -2910,7 +3069,7 @@
     "message": "注销账户"
   },
   "settings.account.delete.section.description": {
-    "message": "一旦删除账户，将无法复原，请谨慎度量。删除你的账户将从我们的服务器上删除所有附加的数据，但项目除外。"
+    "message": "删除账户后将无法恢复，请慎重。账户删除后，除项目外，所有关联数据都将从服务器中移除。"
   },
   "settings.account.delete.section.title": {
     "message": "删除账户"
@@ -3009,13 +3168,13 @@
     "message": "更改密码"
   },
   "settings.account.security.password.description.change": {
-    "message": "更改用于登录你账户的密码。"
+    "message": "更改登录账户时使用的密码。"
   },
   "settings.account.security.password.description.change-or-remove": {
-    "message": "更改或删除用于登录你账户的密码。"
+    "message": "更改或删除用于登录账户的密码。"
   },
   "settings.account.security.password.description.set": {
-    "message": "设置一个永久密码以登录你的账户。"
+    "message": "设置一个永久密码来登录您的账户。"
   },
   "settings.account.security.password.title": {
     "message": "密码"
@@ -3024,7 +3183,7 @@
     "message": "管理供应商"
   },
   "settings.account.security.providers.description": {
-    "message": "向你的账户添加或移除登录方式，包括 GitHub、GitLab、Microsoft、Discord、Steam 和 Google。"
+    "message": "向您的账户添加或移除登录方式，包括 GitHub、GitLab、Microsoft、Discord、Steam 和 Google。"
   },
   "settings.account.security.providers.title": {
     "message": "管理身份验证提供程序"
@@ -3039,7 +3198,7 @@
     "message": "设置 2FA"
   },
   "settings.account.security.two-factor.description": {
-    "message": "在登录时为你的账户增加一层额外的安全保障。"
+    "message": "在登录时为您的账户增加一层额外的安全保障。"
   },
   "settings.account.security.two-factor.title": {
     "message": "双因素认证"
@@ -3171,7 +3330,7 @@
     "message": "图标已更新"
   },
   "settings.applications.secret.disclaimer": {
-    "message": "请立即保存你的密钥，离开当前页面后将不再显示！"
+    "message": "请立即保存您的密钥，离开当前页面后将不再显示！"
   },
   "settings.authorizations.about-this-app": {
     "message": "关于此应用"
@@ -3180,10 +3339,10 @@
     "message": "by"
   },
   "settings.authorizations.description": {
-    "message": "当你使用 Modrinth 账户授权某个应用程序时，即表示你授予其访问你账户的权限。你可以随时在此处管理和审查对你账户的访问权限。"
+    "message": "当您使用 Modrinth 账户授权某个应用程序时，即表示您授予其访问您账户的权限。您可以随时在此处管理和审查对您账户的访问权限。"
   },
   "settings.authorizations.empty-state": {
-    "message": "我们目前无法显示你授权的应用程序，我们正在努力解决这个问题。请稍后再访问此页面！"
+    "message": "我们目前无法显示您授权的应用程序，我们正在努力解决这个问题。请稍后再访问此页面！"
   },
   "settings.authorizations.head-title": {
     "message": "授权"
@@ -3192,22 +3351,25 @@
     "message": "撤销"
   },
   "settings.authorizations.revoke.confirm.description": {
-    "message": "这将撤销该应用程序对你账户的访问权限。你随时可以之后重新授权。"
+    "message": "这将撤销该应用程序对您账户的访问权限。您随时可以之后重新授权。"
   },
   "settings.authorizations.revoke.confirm.title": {
-    "message": "你确定要撤销此申请吗？"
+    "message": "您确定要撤销此申请吗？"
   },
   "settings.billing.charges.description": {
-    "message": "你过去所有支付给Modrinth账户的款项都将列在这里："
+    "message": "您过去所有支付给Modrinth账户的款项都将列在这里："
   },
   "settings.billing.charges.product.medal-trial": {
-    "message": "服务器试用版"
+    "message": "Medal 服务器试用"
   },
   "settings.billing.charges.product.midas": {
     "message": "Modrinth Plus"
   },
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth托管服务"
+  },
+  "settings.billing.charges.title": {
+    "message": "过去费用"
   },
   "settings.billing.expires": {
     "message": "有效期至{date}"
@@ -3217,6 +3379,12 @@
   },
   "settings.billing.interval.monthly": {
     "message": "每月"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "季度"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "季度"
   },
   "settings.billing.interval.year": {
     "message": "年"
@@ -3315,7 +3483,7 @@
     "message": "{shared} 共享 CPU（突发高达 {bursts} 个 CPU）"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "我们未能找到与此订阅关联的服务器。可能存在以下几种情况：若你刚刚购买服务器，此为正常现象，服务器配置可能需要一小时左右；若你已购买一段时间，服务器可能已被暂停使用。如有不符预期的情况，请提供以下信息联系 Modrinth 支持团队："
+    "message": "我们未能找到与此订阅关联的服务器。可能存在以下几种情况：若你刚刚购买服务器，此为正常现象，服务器配置可能需要一小时左右；若你已购买一段时间，服务器可能已被停用。如有不符预期的情况，请提供以下信息联系 Modrinth 支持团队："
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "服务器ID：{id}"
@@ -3333,7 +3501,7 @@
     "message": "重新订阅时出错"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "如果服务器当前已暂停，再次尝试扣费可能最多需要10分钟。"
+    "message": "如果服务器当前已被取消，设置服务器可能需要10-15分钟。"
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "重新订阅请求已提交"
@@ -3429,7 +3597,7 @@
     "message": "网格"
   },
   "settings.display.project-list-layouts.mode.rows": {
-    "message": "行"
+    "message": "列表"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "整合包页面"
@@ -3588,13 +3756,13 @@
     "message": "未知平台"
   },
   "settings.sidebar.label.account": {
-    "message": "账户选项"
+    "message": "账户设置"
   },
   "settings.sidebar.label.developer": {
-    "message": "开发者选项"
+    "message": "开发者设置"
   },
   "settings.sidebar.label.display": {
-    "message": "显示选项"
+    "message": "显示设置"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"

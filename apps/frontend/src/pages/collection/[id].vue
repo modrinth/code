@@ -186,7 +186,9 @@
 												getProjectTypeSentenceMessage(
 													projectTypes.length === 1 ? projectTypes[0] : 'project',
 												),
-												{ count: formatCompactNumberPlural(projects?.length || 0) },
+												{
+													count: formatCompactNumberPlural(projects?.length || 0),
+												},
 											),
 										}"
 									>
@@ -532,8 +534,8 @@ const returnLink = computed(() => {
 	return null
 })
 
-const isFollowingCollection = computed(() => route.params.id === 'following')
 const collectionId = computed(() => route.params.id)
+const isFollowingCollection = computed(() => collectionId.value === 'following')
 
 // Static collection for "following" page
 const followingCollection = computed(() =>
@@ -560,13 +562,13 @@ const {
 } = useQuery({
 	queryKey: computed(() => ['collection', collectionId.value]),
 	queryFn: () => api.labrinth.collections.get(collectionId.value),
-	enabled: computed(() => !isFollowingCollection.value),
+	enabled: computed(() => !!collectionId.value && !isFollowingCollection.value),
 })
 
 watch(
 	collectionError,
 	(error) => {
-		if (error && !isFollowingCollection.value) {
+		if (error && collectionId.value && !isFollowingCollection.value) {
 			const status = error.statusCode ?? error.status ?? 404
 			showError({
 				fatal: true,

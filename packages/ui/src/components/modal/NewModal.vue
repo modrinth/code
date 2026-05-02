@@ -288,7 +288,8 @@ defineExpose({
 const mouseX = ref(0)
 const mouseY = ref(0)
 
-const stackZBase = computed(() => stackDepth.value * 10)
+const MODAL_STACK_BASE_Z = 100
+const stackZBase = computed(() => MODAL_STACK_BASE_Z + stackDepth.value * 10)
 const stackOverlayZ = computed(() => stackZBase.value + 19)
 const stackTauriZ = computed(() => stackZBase.value + 20)
 const stackContainerZ = computed(() => stackZBase.value + 21)
@@ -367,6 +368,8 @@ function handleKeyDown(event: KeyboardEvent) {
 	inset: -5rem;
 	z-index: v-bind(stackOverlayZ);
 	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
 	transition: all 0.2s ease-out;
 	//transform: translate(
 	//    calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 2),
@@ -396,6 +399,7 @@ function handleKeyDown(event: KeyboardEvent) {
 	&.shown {
 		opacity: 1;
 		visibility: visible;
+		pointer-events: auto;
 		backdrop-filter: blur(5px);
 	}
 

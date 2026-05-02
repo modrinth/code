@@ -461,6 +461,7 @@ pub async fn update_project(
             let mut path = Profile::add_project_version(
                 profile_path,
                 update_version,
+                fetch::DownloadReason::Standalone,
                 &state.pool,
                 &state.fetch_semaphore,
                 &state.io_semaphore,
@@ -501,11 +502,14 @@ pub async fn update_project(
 pub async fn add_project_from_version(
     profile_path: &str,
     version_id: &str,
+    reason: fetch::DownloadReason,
 ) -> crate::Result<String> {
     let state = State::get().await?;
+
     let project_path = Profile::add_project_version(
         profile_path,
         version_id,
+        reason,
         &state.pool,
         &state.fetch_semaphore,
         &state.io_semaphore,
@@ -863,7 +867,7 @@ async fn run_credentials(
         if !project_id.trim().is_empty() {
             let server_id = uuid::Uuid::new_v4().to_string();
 
-            let join_result = fetch::REQWEST_CLIENT
+            let join_result = fetch::INSECURE_REQWEST_CLIENT
                 .post("https://sessionserver.mojang.com/session/minecraft/join")
                 .json(&json!({
                     "accessToken": &credentials.access_token,

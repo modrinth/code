@@ -37,22 +37,109 @@
 		:description="formatMessage(messages.deleteWorldDescription, { name: worldToDelete?.name })"
 		@proceed="proceedDeleteWorld"
 	/>
-	<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
-		<div class="flex flex-wrap items-center gap-2">
-			<StyledInput
-				v-model="searchFilter"
-				:icon="SearchIcon"
-				type="text"
-				autocomplete="off"
-				:spellcheck="false"
-				input-class="!h-10"
-				wrapper-class="flex-1 min-w-0"
-				clearable
-				:placeholder="
-					formatMessage(messages.searchWorldsPlaceholder, { count: dedupedWorlds.length })
-				"
-			/>
-			<div class="flex gap-2">
+	<ReadyTransition :pending="worldsReadyPending">
+		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
+			<div class="flex flex-wrap items-center gap-2">
+				<StyledInput
+					v-model="searchFilter"
+					:icon="SearchIcon"
+					type="text"
+					autocomplete="off"
+					:spellcheck="false"
+					input-class="!h-10"
+					wrapper-class="flex-1 min-w-0"
+					clearable
+					:placeholder="
+						formatMessage(messages.searchWorldsPlaceholder, { count: dedupedWorlds.length })
+					"
+				/>
+				<div class="flex gap-2">
+					<ButtonStyled type="outlined">
+						<button class="!h-10 !border-button-bg !border-[1px]" @click="addServerModal?.show()">
+							<PlusIcon class="size-5" />
+							{{ formatMessage(messages.addServer) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button
+							class="!h-10 flex items-center gap-2"
+							@click="
+								router.push({ path: '/browse/server', query: { i: instance.path, from: 'worlds' } })
+							"
+						>
+							<CompassIcon class="size-5" />
+							<span>{{ formatMessage(messages.browseServers) }}</span>
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+			<div class="flex flex-wrap items-center justify-between gap-2">
+				<div class="flex flex-wrap items-center gap-1.5">
+					<FilterIcon class="size-5 text-secondary" />
+					<button
+						:class="filterPillClass(selectedFilters.length === 0)"
+						@click="selectedFilters = []"
+					>
+						{{ formatMessage(commonMessages.allProjectType) }}
+					</button>
+					<button
+						v-for="option in filterOptions"
+						:key="option.id"
+						:class="filterPillClass(selectedFilters.includes(option.id))"
+						@click="toggleFilter(option.id)"
+					>
+						{{ option.label }}
+					</button>
+				</div>
+				<ButtonStyled type="transparent" hover-color-fill="none">
+					<button :disabled="refreshingAll" @click="refreshAllWorlds">
+						<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
+						{{ formatMessage(commonMessages.refreshButton) }}
+					</button>
+				</ButtonStyled>
+			</div>
+			<div class="flex flex-col w-full gap-2">
+				<WorldItem
+					v-for="world in filteredWorlds"
+					:key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
+					:world="world"
+					:managed="world.type === 'server' ? isManagedServerWorld(world) : false"
+					:highlighted="highlightedWorld === getWorldIdentifier(world)"
+					:supports-server-quick-play="supportsServerQuickPlay"
+					:supports-world-quick-play="supportsWorldQuickPlay"
+					:current-protocol="protocolVersion"
+					:playing-instance="playing"
+					:playing-world="worldsMatch(world, worldPlaying)"
+					:starting-instance="startingInstance"
+					:refreshing="world.type === 'server' ? serverData[world.address]?.refreshing : undefined"
+					:server-status="world.type === 'server' ? serverData[world.address]?.status : undefined"
+					:rendered-motd="
+						world.type === 'server' ? serverData[world.address]?.renderedMotd : undefined
+					"
+					:game-mode="world.type === 'singleplayer' ? GAME_MODES[world.game_mode] : undefined"
+					@play="() => joinWorld(world)"
+					@stop="() => emit('stop')"
+					@refresh="() => refreshServer((world as ServerWorld).address)"
+					@edit="
+						() =>
+							world.type === 'singleplayer'
+								? editWorldModal?.show(world)
+								: isManagedServerWorld(world)
+									? undefined
+									: editServerModal?.show(world)
+					"
+					@delete="() => !isManagedServerWorld(world) && promptToRemoveWorld(world)"
+					@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.path, world.path)"
+				/>
+			</div>
+		</div>
+		<EmptyState
+			v-else
+			type="empty-inbox"
+			:heading="formatMessage(messages.noWorldsHeading)"
+			:description="formatMessage(messages.noWorldsDescription)"
+		>
+			<template #actions>
 				<ButtonStyled type="outlined">
 					<button class="!h-10 !border-button-bg !border-[1px]" @click="addServerModal?.show()">
 						<PlusIcon class="size-5" />
@@ -70,94 +157,9 @@
 						<span>{{ formatMessage(messages.browseServers) }}</span>
 					</button>
 				</ButtonStyled>
-			</div>
-		</div>
-		<div class="flex flex-wrap items-center justify-between gap-2">
-			<div class="flex flex-wrap items-center gap-1.5">
-				<FilterIcon class="size-5 text-secondary" />
-				<button
-					:class="filterPillClass(selectedFilters.length === 0)"
-					@click="selectedFilters = []"
-				>
-					{{ formatMessage(commonMessages.allProjectType) }}
-				</button>
-				<button
-					v-for="option in filterOptions"
-					:key="option.id"
-					:class="filterPillClass(selectedFilters.includes(option.id))"
-					@click="toggleFilter(option.id)"
-				>
-					{{ option.label }}
-				</button>
-			</div>
-			<ButtonStyled type="transparent" hover-color-fill="none">
-				<button :disabled="refreshingAll" @click="refreshAllWorlds">
-					<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
-					{{ formatMessage(commonMessages.refreshButton) }}
-				</button>
-			</ButtonStyled>
-		</div>
-		<div class="flex flex-col w-full gap-2">
-			<WorldItem
-				v-for="world in filteredWorlds"
-				:key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
-				:world="world"
-				:managed="world.type === 'server' ? isManagedServerWorld(world) : false"
-				:highlighted="highlightedWorld === getWorldIdentifier(world)"
-				:supports-server-quick-play="supportsServerQuickPlay"
-				:supports-world-quick-play="supportsWorldQuickPlay"
-				:current-protocol="protocolVersion"
-				:playing-instance="playing"
-				:playing-world="worldsMatch(world, worldPlaying)"
-				:starting-instance="startingInstance"
-				:refreshing="world.type === 'server' ? serverData[world.address]?.refreshing : undefined"
-				:server-status="world.type === 'server' ? serverData[world.address]?.status : undefined"
-				:rendered-motd="
-					world.type === 'server' ? serverData[world.address]?.renderedMotd : undefined
-				"
-				:game-mode="world.type === 'singleplayer' ? GAME_MODES[world.game_mode] : undefined"
-				@play="() => joinWorld(world)"
-				@stop="() => emit('stop')"
-				@refresh="() => refreshServer((world as ServerWorld).address)"
-				@edit="
-					() =>
-						world.type === 'singleplayer'
-							? editWorldModal?.show(world)
-							: isManagedServerWorld(world)
-								? undefined
-								: editServerModal?.show(world)
-				"
-				@delete="() => !isManagedServerWorld(world) && promptToRemoveWorld(world)"
-				@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.path, world.path)"
-			/>
-		</div>
-	</div>
-	<EmptyState
-		v-else
-		type="empty-inbox"
-		:heading="formatMessage(messages.noWorldsHeading)"
-		:description="formatMessage(messages.noWorldsDescription)"
-	>
-		<template #actions>
-			<ButtonStyled type="outlined">
-				<button class="!h-10 !border-button-bg !border-[1px]" @click="addServerModal?.show()">
-					<PlusIcon class="size-5" />
-					{{ formatMessage(messages.addServer) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled color="brand">
-				<button
-					class="!h-10 flex items-center gap-2"
-					@click="
-						router.push({ path: '/browse/server', query: { i: instance.path, from: 'worlds' } })
-					"
-				>
-					<CompassIcon class="size-5" />
-					<span>{{ formatMessage(messages.browseServers) }}</span>
-				</button>
-			</ButtonStyled>
-		</template>
-	</EmptyState>
+			</template>
+		</EmptyState>
+	</ReadyTransition>
 </template>
 <script setup lang="ts">
 import { CompassIcon, FilterIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
@@ -169,11 +171,14 @@ import {
 	GAME_MODES,
 	type GameVersion,
 	injectNotificationManager,
+	ReadyTransition,
 	StyledInput,
+	useReadyState,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { platform } from '@tauri-apps/plugin-os'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -344,10 +349,20 @@ function toggleFilter(id: string) {
 	}
 }
 
+const queryClient = useQueryClient()
+
 const refreshingAll = ref(false)
 const hadNoWorlds = ref(true)
 const startingInstance = ref(false)
 const worldPlaying = ref<World>()
+
+const worldsQuery = useQuery({
+	queryKey: computed(() => ['worlds', instance.value.path]),
+	queryFn: () => refreshWorlds(instance.value.path),
+	staleTime: 30_000,
+})
+
+const worldsReadyPending = useReadyState(worldsQuery)
 
 const worlds = ref<World[]>([])
 const serverData = ref<Record<string, ServerData>>({})
@@ -358,6 +373,26 @@ const isLinux = platform() === 'linux'
 const linuxRefreshCount = ref(0)
 
 const protocolVersion = ref<ProtocolVersion | null>(null)
+
+const gameVersions = ref<GameVersion[]>([])
+const supportsServerQuickPlay = computed(() =>
+	hasServerQuickPlaySupport(gameVersions.value, instance.value.game_version),
+)
+const supportsWorldQuickPlay = computed(() =>
+	hasWorldQuickPlaySupport(gameVersions.value, instance.value.game_version),
+)
+
+watch(
+	() => worldsQuery.data.value,
+	(data) => {
+		if (data) {
+			worlds.value = [...data]
+			refreshServers(worlds.value, serverData.value, protocolVersion.value)
+			hadNoWorlds.value = worlds.value.length === 0
+		}
+	},
+	{ immediate: true },
+)
 const managedServerName = ref<string | null>(null)
 const managedServerAddress = ref<string | null>(null)
 
@@ -385,8 +420,8 @@ async function refreshManagedServerMetadata() {
 
 	try {
 		const [project, projectV3] = await Promise.all([
-			get_project(projectId, 'bypass'),
-			get_project_v3(projectId, 'bypass'),
+			get_project(projectId),
+			get_project_v3(projectId),
 		])
 
 		if (projectV3?.minecraft_server == null) {
@@ -422,27 +457,40 @@ watch(
 	{ immediate: true },
 )
 
-const [unlistenProfile, , resolvedProtocolVersion, resolvedGameVersions] = await Promise.all([
-	profile_listener(async (e: ProfileEvent) => {
-		if (e.profile_path_id !== instance.value.path) return
+let unlistenProfile: (() => void) | null = null
+let worldsTabAlive = true
 
-		console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
+async function initWorldsTab() {
+	const [_unlistenProfile, resolvedProtocolVersion, resolvedGameVersions] = await Promise.all([
+		profile_listener(async (e: ProfileEvent) => {
+			if (e.profile_path_id !== instance.value.path) return
 
-		if (e.event === 'servers_updated') {
-			if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return
-			if (isLinux) linuxRefreshCount.value++
+			console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
 
-			await refreshAllWorlds()
-		}
+			if (e.event === 'servers_updated') {
+				if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return
+				if (isLinux) linuxRefreshCount.value++
 
-		await handleDefaultProfileUpdateEvent(worlds.value, instance.value.path, e)
-	}),
-	refreshAllWorlds(),
-	get_profile_protocol_version(instance.value.path).catch(() => null),
-	get_game_versions().catch(() => [] as GameVersion[]),
-])
+				await refreshAllWorlds()
+			}
 
-protocolVersion.value = resolvedProtocolVersion
+			await handleDefaultProfileUpdateEvent(worlds.value, instance.value.path, e)
+		}),
+		get_profile_protocol_version(instance.value.path).catch(() => null),
+		get_game_versions().catch(() => [] as GameVersion[]),
+	])
+
+	if (!worldsTabAlive) {
+		_unlistenProfile()
+		return
+	}
+
+	unlistenProfile = _unlistenProfile
+	protocolVersion.value = resolvedProtocolVersion
+	gameVersions.value = resolvedGameVersions
+}
+
+await initWorldsTab()
 
 async function refreshServer(address: string) {
 	if (!serverData.value[address]) {
@@ -458,26 +506,10 @@ async function refreshAllWorlds() {
 		console.log(`Already refreshing, cancelling refresh.`)
 		return
 	}
-	await refreshManagedServerMetadata()
 
 	refreshingAll.value = true
-
-	worlds.value = await refreshWorlds(instance.value.path).finally(
-		() => (refreshingAll.value = false),
-	)
-	refreshServers(worlds.value, serverData.value, protocolVersion.value)
-
-	const hasNoWorlds = worlds.value.length === 0
-
-	if (hadNoWorlds.value && hasNoWorlds) {
-		setTimeout(() => {
-			refreshingAll.value = false
-		}, 1000)
-	} else {
-		refreshingAll.value = false
-	}
-
-	hadNoWorlds.value = hasNoWorlds
+	await queryClient.invalidateQueries({ queryKey: ['worlds', instance.value.path] })
+	refreshingAll.value = false
 }
 
 async function addServer(server: ServerWorld) {
@@ -591,14 +623,6 @@ function worldsMatch(world: World, other: World | undefined) {
 	}
 	return false
 }
-
-const gameVersions = ref<GameVersion[]>(resolvedGameVersions)
-const supportsServerQuickPlay = computed(() =>
-	hasServerQuickPlaySupport(gameVersions.value, instance.value.game_version),
-)
-const supportsWorldQuickPlay = computed(() =>
-	hasWorldQuickPlaySupport(gameVersions.value, instance.value.game_version),
-)
 
 const dedupedWorlds = computed(() => {
 	const visibleWorlds: World[] = []
@@ -749,7 +773,8 @@ async function proceedDeleteWorld() {
 	worldToDelete.value = undefined
 }
 
-onUnmounted(() => {
-	unlistenProfile()
+onBeforeUnmount(() => {
+	worldsTabAlive = false
+	unlistenProfile?.()
 })
 </script>

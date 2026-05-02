@@ -180,7 +180,7 @@ type MedalServerListingProps = {
 
 const props = defineProps<MedalServerListingProps>()
 
-const emit = defineEmits<{ (e: 'upgrade'): void }>()
+const emit = defineEmits<{ (e: 'upgrade', serverId: string): void }>()
 const { formatMessage } = useVIntl()
 
 const client = injectModrinthClient()
@@ -257,7 +257,7 @@ const expiryDate = computed(() => (props.medal_expires ? dayjs(props.medal_expir
 
 function handleUpgrade(event: Event) {
 	event.stopPropagation()
-	emit('upgrade')
+	emit('upgrade', props.server_id)
 }
 
 function navigateToServer(event: MouseEvent | KeyboardEvent) {

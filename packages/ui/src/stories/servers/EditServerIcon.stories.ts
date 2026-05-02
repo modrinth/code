@@ -1,7 +1,7 @@
 import type { Archon, UploadState } from '@modrinth/api-client'
 import type { Stats } from '@modrinth/utils'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import EditServerIcon from '../../components/servers/edit-server-icon/EditServerIcon.vue'
 import { provideModrinthServerContext } from '../../providers'
@@ -66,8 +66,6 @@ const meta = {
 					isServerRunning: computed(() => true),
 					stats,
 					uptimeSeconds: ref(0),
-					backupsState: reactive(new Map()),
-					markBackupCancelled: () => {},
 					isSyncingContent: ref(false),
 					busyReasons: computed(() => []),
 					fsAuth: ref(null),

@@ -2,20 +2,19 @@
 import type { Archon } from '@modrinth/api-client'
 import {
 	ClipboardCopyIcon,
-	ClockIcon,
 	DownloadIcon,
 	EditIcon,
 	MoreVerticalIcon,
 	RotateCounterClockwiseIcon,
+	ShieldIcon,
 	TrashIcon,
 	UserRoundIcon,
-	XIcon,
 } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
-import { commonMessages } from '../../../utils'
+import { commonMessages, truncatedTooltip } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'
 
@@ -26,19 +25,20 @@ const formatDateTime = useFormatDateTime({
 })
 
 const emit = defineEmits<{
-	(e: 'download' | 'rename' | 'restore' | 'retry'): void
+	(e: 'download' | 'rename' | 'restore'): void
 	(e: 'delete', skipConfirmation?: boolean): void
 }>()
 
 const props = withDefaults(
 	defineProps<{
-		backup: Archon.Backups.v1.Backup
+		backup: Archon.BackupsQueue.v1.BackupQueueBackup
 		preview?: boolean
 		kyrosUrl?: string
 		jwt?: string
 		showCopyIdAction?: boolean
 		showDebugInfo?: boolean
 		restoreDisabled?: string
+		selected?: boolean
 	}>(),
 	{
 		preview: false,
@@ -47,45 +47,15 @@ const props = withDefaults(
 		showCopyIdAction: false,
 		showDebugInfo: false,
 		restoreDisabled: undefined,
+		selected: false,
 	},
 )
 
-const failedToCreate = computed(
-	() => props.backup.status === 'error' || props.backup.status === 'timed_out',
-)
-
-const inactiveStates = ['failed', 'cancelled', 'done']
-
-const creating = computed(() => {
-	const task = props.backup.task?.create
-	if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
-		return true
-	}
-
-	if (
-		(props.backup.status === 'in_progress' || props.backup.status === 'pending') &&
-		!props.backup.task?.restore
-	) {
-		return true
-	}
-	return false
-})
-
-const restoring = computed(() => {
-	const task = props.backup.task?.restore
-	if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
-		return true
-	}
-	return false
-})
-
-const failedToRestore = computed(() => props.backup.task?.restore?.state === 'failed')
-
-const activeOperation = computed(() => creating.value || restoring.value)
+const nameRef = ref<HTMLElement | null>(null)
 
 const backupIcon = computed(() => {
 	if (props.backup.automated) {
-		return ClockIcon
+		return ShieldIcon
 	}
 	return UserRoundIcon
 })
@@ -100,29 +70,25 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 		})
 	}
 
-	if (!activeOperation.value) {
-		if (options.length > 0) {
-			options.push({ divider: true })
-		}
-
-		options.push({
-			id: 'download',
-			action: () => emit('download'),
-			link: `https://${props.kyrosUrl}/modrinth/v0/backups/${props.backup.id}/download?auth=${props.jwt}`,
-			disabled: !props.kyrosUrl || !props.jwt,
-		})
+	if (options.length > 0) {
+		options.push({ divider: true })
 	}
+
+	options.push({
+		id: 'download',
+		action: () => emit('download'),
+		link: `https://${props.kyrosUrl}/modrinth/v0/backups/${props.backup.id}/download?auth=${props.jwt}`,
+		disabled: !props.kyrosUrl || !props.jwt,
+	})
 
 	options.push({ id: 'rename', action: () => emit('rename') })
 
-	if (!activeOperation.value) {
-		options.push({ divider: true })
-		options.push({
-			id: 'delete',
-			color: 'red',
-			action: () => emit('delete'),
-		})
-	}
+	options.push({ divider: true })
+	options.push({
+		id: 'delete',
+		color: 'red',
+		action: () => emit('delete'),
+	})
 
 	return options
 })
@@ -130,13 +96,6 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 async function copyId() {
 	await navigator.clipboard.writeText(props.backup.id)
 }
-
-// TODO: Uncomment when API supports size field
-// const formatBytes = (bytes?: number) => {
-// 	if (!bytes) return ''
-// 	const mb = bytes / (1024 * 1024)
-// 	return `${mb.toFixed(0)} MiB`
-// }
 
 const messages = defineMessages({
 	restore: {
@@ -146,14 +105,6 @@ const messages = defineMessages({
 	rename: {
 		id: 'servers.backups.item.rename',
 		defaultMessage: 'Rename',
-	},
-	failedToCreateBackup: {
-		id: 'servers.backups.item.failed-to-create-backup',
-		defaultMessage: 'Failed to create backup',
-	},
-	failedToRestoreBackup: {
-		id: 'servers.backups.item.failed-to-restore-backup',
-		defaultMessage: 'Failed to restore from backup',
 	},
 	auto: {
 		id: 'servers.backups.item.auto',
@@ -171,78 +122,67 @@ const messages = defineMessages({
 </script>
 <template>
 	<div
-		class="grid items-center gap-4 rounded-2xl bg-bg-raised p-4 shadow-md"
-		:class="
-			preview
-				? 'grid-cols-1'
-				: 'grid-cols-[auto_1fr_auto] md:grid-cols-[minmax(0,1fr)_400px_minmax(0,1fr)]'
-		"
+		class="flex items-center gap-4 rounded-[20px] border border-solid bg-surface-3 p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.3),0px_1px_3px_0px_rgba(0,0,0,0.15)]"
+		:class="props.selected ? 'border-brand-green' : 'border-transparent'"
 	>
-		<div class="flex flex-row gap-4 items-center">
+		<div class="flex min-w-0 flex-1 items-center gap-4">
+			<!-- Icon tile -->
 			<div
-				class="flex size-12 shrink-0 items-center justify-center rounded-2xl border-solid border-[1px] border-surface-5 bg-surface-4 md:size-16"
+				class="flex shrink-0 items-center justify-center rounded-2xl border border-solid border-surface-5 bg-surface-4"
+				:class="preview ? 'size-10' : 'size-14'"
 			>
-				<component :is="backupIcon" class="size-7 text-secondary md:size-10" />
+				<component
+					:is="backupIcon"
+					class="text-secondary"
+					:class="preview ? 'size-6' : 'size-10'"
+				/>
 			</div>
 
+			<!-- Name + badge + subtitle -->
 			<div class="flex min-w-0 flex-col gap-1.5">
-				<div class="flex flex-wrap items-center gap-2">
-					<span class="truncate font-semibold text-contrast max-w-[400px]">{{ backup.name }}</span>
+				<div class="flex min-w-0 items-center gap-2">
+					<span
+						ref="nameRef"
+						v-tooltip="truncatedTooltip(nameRef, backup.name)"
+						class="min-w-0 truncate font-semibold text-contrast"
+					>
+						{{ backup.name }}
+					</span>
 					<span
 						v-if="backup.automated"
-						class="rounded-full border-solid border-[1px] border-surface-5 bg-surface-4 px-2.5 py-1 text-sm text-secondary"
+						class="shrink-0 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-secondary"
 					>
 						{{ formatMessage(messages.auto) }}
 					</span>
 				</div>
-				<div class="flex items-center gap-1.5 text-sm text-secondary">
+				<div class="flex items-center gap-1.5 text-sm font-medium text-secondary">
 					<template v-if="preview">
 						<span>{{ formatDateTime(backup.created_at) }}</span>
 					</template>
-					<template v-else-if="failedToCreate || failedToRestore">
-						<XIcon class="size-4 text-red" />
-						<span class="text-red">
-							{{
-								formatMessage(
-									failedToCreate ? messages.failedToCreateBackup : messages.failedToRestoreBackup,
-								)
-							}}
-						</span>
-					</template>
 					<template v-else>
-						<!-- TODO: Uncomment when API supports creator_id field -->
-						<!-- <template v-if="backup.creator_id && backup.creator_id !== 'auto'">
-						<Avatar ... class="size-6 rounded-full" />
-						<span>{{ creatorName }}</span>
-					</template>
-					<template v-else> -->
 						<span>
 							{{
 								formatMessage(backup.automated ? messages.backupSchedule : messages.manualBackup)
 							}}
 						</span>
-						<!-- </template> -->
 					</template>
 				</div>
 			</div>
 		</div>
 
-		<div
-			v-if="!preview"
-			class="col-span-full row-start-2 flex flex-col gap-2 md:col-span-1 md:row-start-auto md:items-center"
-		>
-			<span class="w-full font-medium text-contrast md:text-center">
-				{{ formatDateTime(backup.created_at) }}
-			</span>
-			<!-- TODO: Uncomment when API supports size field -->
-			<!-- <span class="text-secondary">{{ formatBytes(backup.size) }}</span> -->
+		<!-- Date (middle column) -->
+		<div v-if="!preview" class="flex shrink-0 items-center">
+			<span class="whitespace-nowrap font-medium text-contrast">{{
+				formatDateTime(backup.created_at)
+			}}</span>
 		</div>
 
-		<div v-if="!preview" class="flex shrink-0 items-center gap-2 md:justify-self-end">
-			<ButtonStyled v-if="!activeOperation" color="brand" type="outlined">
+		<!-- Right side actions -->
+		<div v-if="!preview" class="flex min-w-0 flex-1 items-center justify-end gap-2">
+			<ButtonStyled color="brand" type="outlined">
 				<button
 					v-tooltip="props.restoreDisabled"
-					class="!border-[1px]"
+					class="!border"
 					:disabled="!!props.restoreDisabled"
 					@click="() => emit('restore')"
 				>

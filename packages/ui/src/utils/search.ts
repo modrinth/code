@@ -115,7 +115,7 @@ export function useSearch(
 		{ display: 'Date updated', name: 'updated' },
 	])
 
-	const currentSortType: Ref<SortType> = ref({ name: 'relevance', display: 'Relevance' })
+	const currentSortType: Ref<SortType> = ref(sortTypes[0])
 
 	const route = useRoute()
 	const currentPage = ref(1)
@@ -474,22 +474,23 @@ export function useSearch(
 					}
 					orGroups[field].push(val)
 				} else {
-					parts.push(`${field} = "${val}"`)
+					parts.push(`${field} = ${enquoteNonBools(val)}`)
 				}
 			}
 		}
 
 		for (const [field, values] of Object.entries(orGroups)) {
 			if (values.length === 1) {
-				parts.push(`${field} = "${values[0]}"`)
+				const val = values[0]
+				parts.push(`${field} = ${enquoteNonBools(val)}`)
 			} else {
-				const quoted = values.map((v) => `"${v}"`).join(', ')
+				const quoted = values.map(enquoteNonBools).join(', ')
 				parts.push(`${field} IN [${quoted}]`)
 			}
 		}
 
 		for (const [field, values] of Object.entries(negativeByType)) {
-			const quoted = values.map((v) => `"${v}"`).join(', ')
+			const quoted = values.map(enquoteNonBools).join(', ')
 			parts.push(`${field} NOT IN [${quoted}]`)
 		}
 
@@ -503,11 +504,11 @@ export function useSearch(
 		for (const envGroup of getEnvironmentFilterGroups(client, server)) {
 			if (envGroup.length === 1) {
 				const [field, val] = envGroup[0].split(':')
-				parts.push(`${field} = "${val}"`)
+				parts.push(`${field} = ${enquoteNonBools(val)}`)
 			} else if (envGroup.length > 1) {
 				const conditions = envGroup.map((f) => {
 					const [field, val] = f.split(':')
-					return `${field} = "${val}"`
+					return `${field} = ${enquoteNonBools(val)}`
 				})
 				parts.push(`(${conditions.join(' OR ')})`)
 			}
@@ -516,9 +517,9 @@ export function useSearch(
 		// Project types
 		const mappedProjectTypes = projectTypes.value.map(mapProjectTypeToSearch)
 		if (mappedProjectTypes.length === 1) {
-			parts.push(`project_types = "${mappedProjectTypes[0]}"`)
+			parts.push(`project_types = ${enquoteNonBools(mappedProjectTypes[0])}`)
 		} else if (mappedProjectTypes.length > 1) {
-			const quoted = mappedProjectTypes.map((v) => `"${v}"`).join(', ')
+			const quoted = mappedProjectTypes.map(enquoteNonBools).join(', ')
 			parts.push(`project_types IN [${quoted}]`)
 		}
 
@@ -779,6 +780,13 @@ function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][
 		groups.push(['server_side:optional', 'server_side:required'])
 	}
 	return groups
+}
+
+function enquoteNonBools(value: string): string {
+	if (value === 'true' || value === 'false') {
+		return value
+	}
+	return `"${value}"`
 }
 
 function getOptionValue(option: FilterOption, negative?: boolean): string {

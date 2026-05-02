@@ -32,14 +32,68 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Pokaż dane analityczne"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Nie udało się załadować ustawień serwera"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
   "badge.beta-release": {
-    "defaultMessage": "Wersja Beta"
+    "defaultMessage": "Wersja beta"
   },
   "badge.new": {
     "defaultMessage": "Nowe"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Anuluj"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} współdzielonych procesorów"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Zamierzasz ponownie subskrybować <server-name>{serverName}</server-name>. Twoja subskrybcja zostanie ponownie aktywowana i twój serwer będzie pracował bez przerywania."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Nie można ponownie aktywować subskrypcji, nie udało się załadować szczegółów subskrybcji."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Błąd"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Nie udało się załadować detalów subskrypcji."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 dni"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/miesiąc"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/kwartał"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/rok"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Następna opłata zostanie pobrana dnia <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Plan"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB pamięci RAM"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Zasubskrybuj ponownie"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB miejsca na dysku"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Wznów subskrypcję serwera"
   },
   "button.accept": {
     "defaultMessage": "Akceptuj"
@@ -233,6 +287,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Aktualizuj projekty"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Przytrzymaj Shift klikając \"Zaktualizuj wszystko\" by pominąć ten dialog w przyszłości."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Aktualizuj {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
   },
@@ -249,10 +306,7 @@
     "defaultMessage": "Usuń {itemType} ({count, plural, one {1 sztuka} other {{count} szt.Mapping}}) "
   },
   "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Wszystkie mody i treści dodane dodatkowo do tej paczki zostaną usunięte."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Wszystkie mody i treści dodane dodatkowo do tej paczki zostaną zachowane."
+    "defaultMessage": "{action, select, downgrade {Aktualizacja do starszej} other {Aktualizacja do nowszej}} wersji może powodować problemy związane z kompatybilnością. Modyfikacje lub treści, które zostały dodane do paczki modów zostaną zachowane, ale mogą być niekompatybilne z nową wersją."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Ostrzeżenie o {action, select, downgrade {degradowaniu} other {aktualizowaniu}}"
@@ -357,7 +411,7 @@
     "defaultMessage": "Ładowanie zawartości..."
   },
   "content.page-layout.no-content-found": {
-    "defaultMessage": "Nie znaleziono zawartości."
+    "defaultMessage": "Nie znaleziono żadnych zawartości."
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Proszę czekać"
@@ -497,11 +551,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Plik zapisany"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Zamknij"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Znajdź"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} na {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Następne dopasowanie"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Brak rezultatów"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Poprzednie dopasowanie"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Przełącz zamianę"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "Adres URL do twojego pliku logów został skopiowany do schowka."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "Skopiowano adres URL dziennika"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Zamień"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Zamień Wszystkie"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Zamień"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "Nie udało się zapisać pliku."
@@ -560,9 +644,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Rozpoczęto rozpakowywanie"
   },
-  "files.layout.loading": {
-    "defaultMessage": "Ładowanie plików..."
-  },
   "files.layout.selected-count": {
     "defaultMessage": "Wybrano {count}"
   },
@@ -592,6 +673,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "Nawigacja plików"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Znajdź w pliku"
   },
   "files.navbar.home": {
     "defaultMessage": "Strona główna"
@@ -631,12 +715,6 @@
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "paczka modów z linku"
-  },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Przesyłanie plików ({completed}/{total})"
   },
   "files.rename-modal.header": {
     "defaultMessage": "Zmień nazwę {name}"
@@ -777,7 +855,7 @@
     "defaultMessage": "Adres, wiersz 2 (niewymagane)"
   },
   "form.label.amount": {
-    "defaultMessage": "Ilość"
+    "defaultMessage": "Kwota"
   },
   "form.label.bank-name": {
     "defaultMessage": "Nazwa banku"
@@ -905,6 +983,60 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Nie udało się przesłać pliku"
   },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "Nie udało się zmienić wersji paczki modów"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "Nie udało się załadować wersji"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "Nie udało się przeinstalować paczki modów"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "Nie udało się naprawić serwera"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Nie udało się zresetować serwera do trybu onboardingu"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "Nie udało się zapisać ustawień instalacji"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "Nie udało się odłączyć paczki modów"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "Wersja {loader, select, null {loadera} other {{loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "Twój serwer został naprawiony."
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "Naprawa ukończona"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Zresetuj serwer"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Usuwa wszystkie dane na twoim serwerze, wliczając w to światy, modyfikacje i pliki konfiguracyjne. Kopie zapasowe zostaną nieruszone i będzie możliwość ich przywrócenia."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Resetuj do trybu onboardingu"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "To przywróci serwer do trybu onboardingu, skąd będzie można ustawić go od nowa. Czy na pewno chesz kontynuować?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "Resetuj do trybu onboardingu"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Serwer został przywrócony do trybu onboardingu."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Serwer zresetowany do trybu onboardingu"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Opcje pomocy"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Możliwość burstu do {cpus} procesorów"
   },
@@ -976,6 +1108,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Nie polecamy edytowania twoich ustawień instalacji, po zainstalowaniu zasobów. Jeśli chcesz je edytować, zresetuj swój serwer."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Napraw automatycznie"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Zmień loader"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Wyłącz konfliktujące"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Przy zmianie wersji gry możemy albo wyłączyć niekompatybilne zainstalowane treści, albo spróbować rozwiązać konflikty."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Ostrzeżenie o niekompatybilności"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Zainstalowano niekompatybilne treści"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Przy zmianie loadera wszystkie zainstalowane treści zostaną wyłączone. Zamiast tego zalecamy resetowanie serwera."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Zmiana loadera jest destruktywna"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Połączone {projectType, select, server {projekty serwera} other {paczki zasobów}}"
@@ -1200,7 +1356,7 @@
     "defaultMessage": "Zależność tego moda jest wymagana po stronie klienta i może powodować problemy z włączaniem Twojego serwera"
   },
   "label.client-only-warning": {
-    "defaultMessage": "To jest mod po stronie klienta, i może on wywołać problemy. Zostawiliśmy go, ponieważ jakiś autor błędnie oznaczył środowisko, i silnik powinien naprawić problem."
+    "defaultMessage": "Ta modyfikacja jest przeznaczona dla instancji użytkownika, może powodować problemy podczas uruchamiania serwera"
   },
   "label.client-retained-warning": {
     "defaultMessage": "Ten mod, zainstalowany jako zależność, działa tylko po stronie klienta i może powodować problemy z włączaniem Twojego serwera"
@@ -2564,6 +2720,234 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Przywróć"
   },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Trwa tworzenie kopii zapasowej"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Trwa przywracanie kopii zapasowej"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "Serwer jest instalowany"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "Synchronizacja zawartości w toku"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "Posiadasz serwer?"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Dowiedz się więcej na temat Modrinth Hosting"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "Nowy serwer"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "Instaluj modyfikacje, zapraszaj znajomych i graj z nimi przy użyciu Modrinth App."
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "Brak serwerów"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "Wybierz swoje ulubione modyfikacje, a my zajmiemy się resztą."
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "Instalacja modyfikacji za jednym kliknięciem"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "Zaproś znajomych i przygotuj dla nich wszystko w Modrinth App."
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "Graj z przyjaciółmi"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Zaloguj się"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "Ustaw serwer tak, jak zwykły świat w trybie jednoosobowym."
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "Prosta konfiguracja"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Skopiowano"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "Skopiuj kod do schowka"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "Kopiuj ID"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "Pobierz najnowszy backup"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "Zarządzaj rozliczaniem"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Nowe"
+  },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Twoje pliki nie zostaną usunięte przez <days-remaining>{daysRemaining} {daysRemaining, plural, one {dzień} other {dni} }</days-remaining>. Skontaktuj się ze wsparciem technicznym, aby pobrać pliki, przed ich usunięciem "
+  },
+  "servers.listing.notice.files-preserved-after-cancellation": {
+    "defaultMessage": "Twoje pliki zostaną zachowane na okres 30 dni po anulowaniu subskrybcji."
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "Twój serwer został zawieszony poprzez działania moderatorskie. "
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Twój serwer zostanie {verb} do planu {planSize} dnia <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.provisioning": {
+    "defaultMessage": "Prosimy o cierpliwość, podczas gdy ustawiamy Twój serwer. Może to potrwać nawet 10 minut."
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "Twoja subskrypcja została anulowana."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "Twoja subskrypcja została anulowana dnia <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed": {
+    "defaultMessage": "Twoja subskrypcja została anulowana przez nieudaną płatność."
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
+    "defaultMessage": "Twoja subskrypcja została anulowana przez nieudaną płatność dnia <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.subscription-set-to-cancel": {
+    "defaultMessage": "Twoja subskrypcja zostanie anulowana."
+  },
+  "servers.listing.notice.subscription-set-to-cancel-on-date": {
+    "defaultMessage": "Twoja subskrypcja zostanie anulowana dnia <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.suspended": {
+    "defaultMessage": "Twój serwer został zawieszony. Skontaktuj się z obsługą Modrinth, by dowiedzieć się więcej."
+  },
+  "servers.listing.notice.upgrading": {
+    "defaultMessage": "Twój serwer jest aktualnie ulepszany i wkrótce zostanie włączony ponownie."
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "Zasubskrybuj ponownie"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "Ikona serwera"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Wsparcie"
+  },
+  "servers.listing.using-project-label": {
+    "defaultMessage": "Używa {projectTitle}"
+  },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "Szukanie nowych serwerów..."
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "Trwa przesyłanie pliku. Opuszczenie tej strony spowoduje przerwanie przesyłania."
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "Przesyłanie w toku"
+  },
+  "servers.manage.contact-support-button": {
+    "defaultMessage": "Skontaktuj się z obsługą Modrinth"
+  },
+  "servers.manage.error.alert-notice": {
+    "defaultMessage": "Nasze systemy automatycznie zawiadamiają nasz zespół, gdy występuje jakakolwiek awaria. Aktualnie przywracamy serwery do działania."
+  },
+  "servers.manage.error.description": {
+    "defaultMessage": "Możemy mieć chwilowe problemy z naszymi serwerami."
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "Informacje na temat błędu:"
+  },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "Świeżo kupione serwery Modrinth Hosting są najpierw wstawiane do kolejki i będą pokazane tutaj, gdy będą gotowe. <warning>Nie próbuj kupować od nowa serwera.</warning>"
+  },
+  "servers.manage.error.support-notice": {
+    "defaultMessage": "Jeżeli potrzebujesz spersonalizowanego wsparcia dla stanu Twojego serwera, skontaktuj się z obsługą Modrinth."
+  },
+  "servers.manage.error.title": {
+    "defaultMessage": "Serwery nie mogły zostać załadowane :("
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "Wystąpił błąd"
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "Nowy serwer"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "Nie znaleziono żadnych serwerów."
+  },
+  "servers.manage.purchase-unavailable.text": {
+    "defaultMessage": "Trwa ładowanie informacji o płatności. Kasa zostanie otwarta, gdy ładowanie się zakończy."
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "Zakup niedostępny"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "Załaduj ponownie"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "Wystąpił błąd podczas ponawiania subskrypcji do serwera Modrinth."
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "Błąd resubskrybcji"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "Jeżeli płatność za serwer jest aktualnie anulowana, następna próba pobrania opłaty może potrwać około 10 minut."
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "Wysłano wniosek o ponowienie subskrypcji"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "Pomyślnie ponowiono subskrypcję serwera"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "Sukces"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Szukaj wśród {count} {count, plural, one {serweru} other {serwerów}}..."
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "Teraz mogą być znalezione tutaj!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Nie pokazuj ponownie"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Ustawienia twojego serwera zostały przeniesione"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {dzień} other {dni}}, <hours-count>{hours}</hours-count> {hours, plural, one {godzina} few {godziny} other {godzin}}, <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minuta} few {minuty} other {minut}}, <seconds-count>{seconds}</seconds-count> {seconds, plural, one {sekunda} few {sekundy} other {sekund}} do końca..."
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "Nowy serwer"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "Okres próbny serwera od Medal zakończył się, więc Twój serwer został zawieszony. Musisz wybrać plan, by dalej móc korzystać z serwera."
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "Twój serwer został zawieszony. Zaktualizuj swoje dane rozliczeniowe lub skontaktuj się z obsługą Modrinth, by dowiedzieć się więcej."
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "Twój serwer został zawieszony: {reason}. Zaktualizuj swoje dane rozliczeniowe lub skontaktuj się z obsługą Modrinth, by dowiedzieć się więcej."
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "Twój serwer jest aktualnie ulepszany i wkrótce zostanie włączony ponownie."
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "Ikona serwera"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "Ulepsz"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "Używa {projectTitle}"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Odrzuć"
   },
@@ -2591,6 +2975,12 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Nieodrzucalne"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "Zakup Modrinth Hosting zakończony sukcesem."
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "Zakup przebiegł pomyślnie"
+  },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "Nie zostaniesz jeszcze obciążony."
   },
@@ -2600,17 +2990,26 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Metoda płatności"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "rozliczane {interval}"
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "Dostępne w Północnej Ameryce, Europie i Południowowschodniej Azji."
   },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Wybierz dostosowany plan ze specyfikacją, której potrzebujesz."
   },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "Wiesz, czego dokładnie potrzebujesz?"
+  },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Rozpocznij"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "Duży"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "Idealne dla 15–25 graczy, paczek modów, lub dużej ilości modów."
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "Średni"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "Świetne dla 6–15 graczy i wielu modów."
@@ -2618,20 +3017,20 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Najbardziej popularny"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Wybierz plan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Wybierz plan"
+  },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "Mały"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Idealny dla 1–5 przyjaciół z kilkoma lekkimi modami."
   },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Wybierz ilość pamięci RAM i specyfikacje, która pasuje do Twoich potrzeb."
-  },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "Twój obecny plan"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Region"
@@ -2644,6 +3043,9 @@
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "Ile pamięci RAM chcesz, aby miał Twój serwer?"
+  },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "RAM"
   },
   "servers.region.north-america": {
     "defaultMessage": "Ameryka Północna"

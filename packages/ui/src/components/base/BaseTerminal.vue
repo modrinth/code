@@ -1,11 +1,16 @@
 <template>
 	<div
-		class="flex w-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
-		:style="!fullscreen && componentHeight ? { minHeight: componentHeight + 'px' } : {}"
-		:class="{ 'h-full': fullscreen }"
+		class="flex h-full w-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
 	>
 		<div ref="wrapperRef" class="relative min-h-0 flex-1 overflow-hidden pb-2 pt-1">
 			<div ref="containerRef" class="size-full" />
+			<Transition name="terminal-loading-fade">
+				<div
+					v-if="loading"
+					class="pointer-events-none absolute inset-0 z-20 animate-bpulse bg-surface-3"
+					aria-hidden="true"
+				/>
+			</Transition>
 			<div v-if="!isAtBottom" class="absolute bottom-4 right-4 z-10">
 				<ButtonStyled circular type="highlight" size="large">
 					<button class="!shadow-2xl" aria-label="Scroll to bottom" @click="scrollToBottom">
@@ -48,6 +53,7 @@ const props = withDefaults(
 		disableInput?: boolean
 		fullscreen?: boolean
 		emptyStateType?: 'server' | 'instance'
+		loading?: boolean
 	}>(),
 	{
 		scrollback: Infinity,
@@ -55,6 +61,7 @@ const props = withDefaults(
 		disableInput: false,
 		fullscreen: false,
 		emptyStateType: undefined,
+		loading: false,
 	},
 )
 
@@ -93,7 +100,6 @@ const containerRef = ref<HTMLElement | null>(null)
 const wrapperRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLElement | null>(null)
 const commandInput = ref('')
-const componentHeight = ref(0)
 
 const snappedHeight = ref<number | null>(null)
 
@@ -114,13 +120,9 @@ const {
 	scrollback: props.scrollback,
 	onReady: (term) => {
 		nextTick(() => {
-			updateComponentHeight()
 			snapToRows()
 		})
 		emit('ready', term)
-	},
-	onResize: () => {
-		updateComponentHeight()
 	},
 })
 
@@ -175,12 +177,21 @@ function handleWindowResize() {
 	}, 50)
 }
 
+function handleDocumentPointerDown(event: PointerEvent) {
+	if (!terminal.value?.hasSelection()) return
+	const target = event.target as Node | null
+	if (target && containerRef.value?.contains(target)) return
+	terminal.value.clearSelection()
+}
+
 onMounted(() => {
 	window.addEventListener('resize', handleWindowResize)
+	document.addEventListener('pointerdown', handleDocumentPointerDown)
 })
 
 onBeforeUnmount(() => {
 	window.removeEventListener('resize', handleWindowResize)
+	document.removeEventListener('pointerdown', handleDocumentPointerDown)
 	if (resizeDebounce) clearTimeout(resizeDebounce)
 })
 
@@ -199,19 +210,9 @@ watch(
 			})
 		} else {
 			snappedHeight.value = null
-			componentHeight.value = 0
 		}
 	},
 )
-
-function updateComponentHeight() {
-	const screen = containerRef.value?.querySelector('.xterm-screen') as HTMLElement | null
-	if (!screen) return
-	const screenH = screen.offsetHeight
-	const inputH = inputRef.value?.offsetHeight ?? 0
-	const borderW = 2
-	componentHeight.value = screenH + getWrapperMargins() + inputH + borderW
-}
 
 const submitCommand = () => {
 	const cmd = commandInput.value.trim()
@@ -238,6 +239,15 @@ defineExpose({
 </script>
 
 <style>
+@keyframes bpulse {
+	50% {
+		filter: brightness(75%);
+	}
+}
+.animate-bpulse {
+	animation: bpulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 .xterm {
 	height: 100% !important;
 }
@@ -276,5 +286,15 @@ defineExpose({
 	width: 6px !important;
 	border-radius: 8px !important;
 	contain: layout style !important;
+}
+
+.terminal-loading-fade-enter-active,
+.terminal-loading-fade-leave-active {
+	transition: opacity 250ms ease-in-out;
+}
+
+.terminal-loading-fade-enter-from,
+.terminal-loading-fade-leave-to {
+	opacity: 0;
 }
 </style>

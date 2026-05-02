@@ -37,7 +37,7 @@
 										<nuxt-link
 											:to="`/${projectV2.project_type}/${
 												projectV2.slug ? projectV2.slug : projectV2.id
-											}/version/${encodeURI(version.displayUrlEnding)}`"
+											}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`"
 										>
 											{{ version.name }}
 										</nuxt-link>

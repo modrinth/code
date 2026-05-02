@@ -6,7 +6,7 @@ import {
 } from '@modrinth/api-client'
 import type { Stats } from '@modrinth/utils'
 import type { ComputedRef, Ref } from 'vue'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 import type { FileOperation } from '../layouts/shared/files-tab/types'
 import { injectModrinthClient, provideModrinthServerContext } from '../providers'
@@ -27,8 +27,7 @@ type UseServerManageCoreRuntimeOptions = {
 	worldId: ReadableRef<string | null>
 	server: ReadableRef<Archon.Servers.v0.Server | null | undefined>
 	isSyncingContent: ReadableRef<boolean>
-	markBackupCancelled?: (backupId: string) => void
-	includeBackupBusyReasons?: boolean
+	extraBusyReasons?: ComputedRef<BusyReason[]>
 	setDisconnectedOnAuthIncorrect?: boolean
 	syncUptimeFromState?: boolean
 	incrementUptimeLocally?: boolean
@@ -63,6 +62,9 @@ const appendGraphData = (dataArray: number[], newValue: number): number[] => {
 	return updated
 }
 
+const STALE_STATS_THRESHOLD_MS = 5000
+const STALE_STATS_PUSH_INTERVAL_MS = 1000
+
 const mapPowerStateFromStateEvent = (
 	data: Archon.Websocket.v0.WSStateEvent,
 ): Archon.Websocket.v0.PowerState => {
@@ -91,7 +93,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	const isServerRunning = computed(() => serverPowerState.value === 'running')
 	const stats = ref<Stats>(createInitialStats())
 	const uptimeSeconds = ref(0)
-	const backupsState = reactive(new Map())
 	const fsAuth = ref<{ url: string; token: string } | null>(null)
 	const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
 	const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
@@ -101,12 +102,8 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	const ramData = ref<number[]>([])
 
 	let uptimeIntervalId: ReturnType<typeof setInterval> | null = null
-
-	const markBackupCancelled =
-		options.markBackupCancelled ??
-		((backupId: string) => {
-			backupsState.delete(backupId)
-		})
+	let staleStatsTimeoutId: ReturnType<typeof setTimeout> | null = null
+	let staleStatsIntervalId: ReturnType<typeof setInterval> | null = null
 
 	const busyReasons = computed<BusyReason[]>(() => {
 		const reasons: BusyReason[] = []
@@ -126,28 +123,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 				}),
 			})
 		}
-		if (options.includeBackupBusyReasons) {
-			for (const entry of backupsState.values()) {
-				if (entry.create?.state === 'ongoing') {
-					reasons.push({
-						reason: defineMessage({
-							id: 'servers.busy.backup-creating',
-							defaultMessage: 'Backup creation in progress',
-						}),
-					})
-					break
-				}
-				if (entry.restore?.state === 'ongoing') {
-					reasons.push({
-						reason: defineMessage({
-							id: 'servers.busy.backup-restoring',
-							defaultMessage: 'Backup restore in progress',
-						}),
-					})
-					break
-				}
-			}
-		}
+		if (options.extraBusyReasons) reasons.push(...options.extraBusyReasons.value)
 		return reasons
 	})
 
@@ -183,6 +159,43 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		}
 	}
 
+	const clearStaleStatsTimers = () => {
+		if (staleStatsTimeoutId) {
+			clearTimeout(staleStatsTimeoutId)
+			staleStatsTimeoutId = null
+		}
+		if (staleStatsIntervalId) {
+			clearInterval(staleStatsIntervalId)
+			staleStatsIntervalId = null
+		}
+	}
+
+	const pushZeroStats = () => {
+		if (!shouldProcessEvent()) return
+		cpuData.value = appendGraphData(cpuData.value, 0)
+		ramData.value = appendGraphData(ramData.value, 0)
+		stats.value = {
+			current: {
+				...stats.value.current,
+				cpu_percent: 0,
+				ram_usage_bytes: 0,
+			},
+			past: { ...stats.value.current },
+			graph: {
+				cpu: cpuData.value,
+				ram: ramData.value,
+			},
+		}
+	}
+
+	const armStaleStatsWatchdog = () => {
+		clearStaleStatsTimers()
+		staleStatsTimeoutId = setTimeout(() => {
+			pushZeroStats()
+			staleStatsIntervalId = setInterval(pushZeroStats, STALE_STATS_PUSH_INTERVAL_MS)
+		}, STALE_STATS_THRESHOLD_MS)
+	}
+
 	const updatePowerState = (
 		state: Archon.Websocket.v0.PowerState,
 		details?: { oom_killed?: boolean; exit_code?: number },
@@ -209,6 +222,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	}
 
 	const handleStats = (data: Archon.Websocket.v0.WSStatsEvent) => {
+		armStaleStatsWatchdog()
 		updateStats({
 			cpu_percent: data.cpu_percent,
 			ram_usage_bytes: data.ram_usage_bytes,
@@ -280,6 +294,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		}
 
 		stopUptimeTicker()
+		clearStaleStatsTimers()
 		connectedSocketServerId.value = null
 		isConnected.value = false
 		isWsAuthIncorrect.value = false
@@ -309,6 +324,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			isWsAuthIncorrect.value = false
 
 			modrinthServersConsole.clear()
+			modrinthServersConsole.beginInitialLogHydration()
 
 			const baseSubscriptions: SocketUnsubscriber[] = [
 				client.archon.sockets.on(targetServerId, 'log', handleLog),
@@ -361,20 +377,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		}
 	}
 
-	watch(
-		() => fsOps.value,
-		(newOps) => {
-			for (const op of newOps) {
-				if (op.state === 'done' && op.id && !dismissedOpIds.value.has(op.id)) {
-					setTimeout(() => {
-						dismissOperation(op.id!, 'dismiss')
-					}, 3000)
-				}
-			}
-		},
-		{ deep: true },
-	)
-
 	const refreshFsAuth = async () => {
 		if (!options.serverId.value) {
 			fsAuth.value = null
@@ -396,8 +398,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		isServerRunning,
 		stats,
 		uptimeSeconds,
-		backupsState,
-		markBackupCancelled,
 		isSyncingContent: options.isSyncingContent as Ref<boolean>,
 		busyReasons,
 		fsAuth,
@@ -419,7 +419,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 
 	return {
 		activeOperations,
-		backupsState,
 		busyReasons,
 		cancelUpload,
 		cleanupCoreRuntime,

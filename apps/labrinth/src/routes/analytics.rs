@@ -214,6 +214,8 @@ async fn playtime_ingest(
     )
     .await?;
 
+    let headers = req.headers();
+
     for (id, playtime) in playtimes {
         if playtime.seconds > 300 {
             continue;
@@ -230,6 +232,10 @@ async fn playtime_ingest(
                 loader: playtime.loader,
                 game_version: playtime.game_version,
                 parent: playtime.parent.map_or(0, |x| x.0),
+                country: headers
+                    .get("cf-ipcountry")
+                    .and_then(|c| c.to_str().map(|s| s.to_string()).ok())
+                    .unwrap_or_default(),
             });
         }
     }
