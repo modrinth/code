@@ -49,6 +49,9 @@ jobs:
           rustflags: ''
           cache: false
 
+      - name: Setup mold
+        uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
+
       - name: Cache Cargo registry and index
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
