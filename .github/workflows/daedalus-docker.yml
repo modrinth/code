@@ -110,5 +110,3 @@ jobs:
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
           annotations: ${{ steps.docker-meta.outputs.annotations }}
-          cache-from: type=registry,ref=ghcr.io/modrinth/daedalus:main
-          cache-to: type=inline
