@@ -144,8 +144,7 @@ watch(
 
 		<div class="flex flex-col gap-6">
 			<p class="m-0 leading-tight">
-				Commands support $INST_NAME, $INST_ID, $INST_DIR/$INST_MC_DIR, $INST_JAVA,
-				$INST_JAVA_ARGS.
+				Commands support $INST_NAME, $INST_ID, $INST_DIR/$INST_MC_DIR, $INST_JAVA, $INST_JAVA_ARGS.
 			</p>
 
 			<div class="flex flex-col gap-2.5">
