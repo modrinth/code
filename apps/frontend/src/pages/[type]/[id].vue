@@ -707,7 +707,7 @@
 										</div>
 										<ButtonStyled>
 											<button
-											class="mx-3 mb-3"
+												class="mx-3 mb-3"
 												@click="(event) => $refs.modal_collection.show(event)"
 											>
 												<PlusIcon aria-hidden="true" />

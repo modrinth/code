@@ -156,7 +156,7 @@ defineExpose({
 				<ButtonStyled circular type="transparent">
 					<button
 						v-tooltip="'Copy QR code'"
-						class="absolute top-0 right-0 m-2 "
+						class="absolute top-0 right-0 m-2"
 						aria-label="Copy QR code"
 						@click="copyImage"
 					>
@@ -164,14 +164,20 @@ defineExpose({
 					</button>
 				</ButtonStyled>
 			</div>
-			<StyledInput v-else v-model="content" multiline resize="vertical" wrapper-class="h-full w-[30rem]">
+			<StyledInput
+				v-else
+				v-model="content"
+				multiline
+				resize="vertical"
+				wrapper-class="h-full w-[30rem]"
+			>
 				<template #right>
 					<ButtonStyled circular type="transparent">
 						<button
 							v-tooltip="'Copy Text'"
 							type="button"
 							aria-label="Copy Text"
-							class="absolute top-0 right-0 m-2 "
+							class="absolute top-0 right-0 m-2"
 							@click="copyText"
 						>
 							<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
@@ -218,46 +224,45 @@ defineExpose({
 						</a>
 					</ButtonStyled>
 					<ButtonStyled circular>
-
-					<a
-						v-if="link"
-						v-tooltip="'Open link in browser'"
-						:target="targetParameter"
-						:href="url"
-						aria-label="Open link in browser"
-					>
-						<GlobeIcon aria-hidden="true" />
-					</a>
+						<a
+							v-if="link"
+							v-tooltip="'Open link in browser'"
+							:target="targetParameter"
+							:href="url"
+							aria-label="Open link in browser"
+						>
+							<GlobeIcon aria-hidden="true" />
+						</a>
 					</ButtonStyled>
 					<ButtonStyled circular>
-					<a
-						v-tooltip="'Toot about it'"
-						:target="targetParameter"
-						:href="sendToot"
-						aria-label="Toot about it"
-					>
-						<MastodonIcon aria-hidden="true" />
-					</a>
+						<a
+							v-tooltip="'Toot about it'"
+							:target="targetParameter"
+							:href="sendToot"
+							aria-label="Toot about it"
+						>
+							<MastodonIcon aria-hidden="true" />
+						</a>
 					</ButtonStyled>
 					<ButtonStyled circular>
-					<a
-						v-tooltip="'Tweet about it'"
-						:target="targetParameter"
-						:href="sendTweet"
-						aria-label="Tweet about it"
-					>
-						<TwitterIcon aria-hidden="true" />
-					</a>
+						<a
+							v-tooltip="'Tweet about it'"
+							:target="targetParameter"
+							:href="sendTweet"
+							aria-label="Tweet about it"
+						>
+							<TwitterIcon aria-hidden="true" />
+						</a>
 					</ButtonStyled>
 					<ButtonStyled circular>
-					<a
-						v-tooltip="'Share on Reddit'"
-						:target="targetParameter"
-						:href="postOnReddit"
-						aria-label="Share on Reddit"
-					>
-						<RedditIcon aria-hidden="true" />
-					</a>
+						<a
+							v-tooltip="'Share on Reddit'"
+							:target="targetParameter"
+							:href="postOnReddit"
+							aria-label="Share on Reddit"
+						>
+							<RedditIcon aria-hidden="true" />
+						</a>
 					</ButtonStyled>
 				</div>
 			</div>

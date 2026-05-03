@@ -55,7 +55,7 @@
 								</div>
 								<ButtonStyled color="brand" type="transparent">
 									<a
-									class="ml-auto"
+										class="ml-auto"
 										:href="version.primaryFile?.url"
 										:title="`Download ${version.name}`"
 									>

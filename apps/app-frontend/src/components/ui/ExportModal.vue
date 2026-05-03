@@ -180,15 +180,12 @@ const exportPack = async () => {
 					<div class="table-cell row-wise">
 						{{ formatMessage(messages.selectFilesLabel) }}
 						<ButtonStyled circular>
-							<button
-								@click="() => (showingFiles = !showingFiles)"
-							>
+							<button @click="() => (showingFiles = !showingFiles)">
 								<PlusIcon v-if="!showingFiles" />
 								<XIcon v-else />
 							</button>
 						</ButtonStyled>
 					</div>
-
 				</div>
 				<div v-if="showingFiles" class="table-content">
 					<div v-for="[path, children] in folders" :key="path.name" class="table-row">

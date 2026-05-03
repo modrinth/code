@@ -75,13 +75,13 @@
 					</span>
 				</label>
 				<ButtonStyled v-if="!editFeatured">
-					<button class="w-fit" id="gallery-image-featured" @click="editFeatured = true">
+					<button id="gallery-image-featured" class="w-fit" @click="editFeatured = true">
 						<StarIcon aria-hidden="true" />
 						Set as banner
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-else>
-					<button class="w-fit" id="gallery-image-featured" @click="editFeatured = false">
+					<button id="gallery-image-featured" class="w-fit" @click="editFeatured = false">
 						<StarIcon fill="currentColor" aria-hidden="true" />
 						Unset as banner
 					</button>

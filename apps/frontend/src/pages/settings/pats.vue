@@ -66,7 +66,7 @@
 					<p></p>
 				</div>
 
-				<div class="flex gap-2 ml-auto">
+				<div class="ml-auto flex gap-2">
 					<ButtonStyled type="outlined">
 						<button @click="$refs.patModal.hide()">
 							<XIcon />

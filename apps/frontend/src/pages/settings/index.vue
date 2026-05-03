@@ -10,7 +10,7 @@
 				</template>
 			</IntlFormatted>
 			<ButtonStyled color="red" type="highlight">
-				<button @click="disableDeveloperMode()" class="mt-3">
+				<button class="mt-3" @click="disableDeveloperMode()">
 					{{ formatMessage(developerModeBanner.deactivate) }}
 				</button>
 			</ButtonStyled>

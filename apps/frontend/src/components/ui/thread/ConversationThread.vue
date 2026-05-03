@@ -99,14 +99,15 @@
 			<div class="input-group">
 				<ButtonStyled color="brand">
 					<button
-					v-if="sortedMessages.length > 0"
+						v-if="sortedMessages.length > 0"
 						:disabled="!replyBody"
 						@click="isApproved(project) && !isStaff(auth.user) ? openReplyModal() : sendReply()"
 					>
 						<ReplyIcon aria-hidden="true" />
 						Reply
 					</button>
-					<button v-else
+					<button
+						v-else
 						:disabled="!replyBody"
 						@click="isApproved(project) && !isStaff(auth.user) ? openReplyModal() : sendReply()"
 					>
@@ -122,7 +123,7 @@
 				</ButtonStyled>
 				<template v-if="currentMember && !isStaff(auth.user)">
 					<template v-if="isRejected(project)">
-						<ButtonStyled  color="orange">
+						<ButtonStyled color="orange">
 							<button v-if="replyBody" @click="openResubmitModal(true)">
 								<ScaleIcon aria-hidden="true" />
 								Resubmit for review with reply
@@ -138,7 +139,7 @@
 				<div class="input-group extra-options">
 					<template v-if="report">
 						<template v-if="isStaff(auth.user)">
-							<ButtonStyled  color="red">
+							<ButtonStyled color="red">
 								<button v-if="replyBody" @click="closeReport(true)">
 									<CheckCircleIcon aria-hidden="true" />
 									Close with reply

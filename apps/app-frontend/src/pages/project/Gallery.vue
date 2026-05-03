@@ -45,17 +45,17 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled circular>
-						<a
-							class="open btn icon-only"
-							target="_blank"
-							:href="
-								expandedGalleryItem.raw_url
-									? expandedGalleryItem.raw_url
-									: 'https://cdn.modrinth.com/placeholder-banner.svg'
-							"
-						>
-							<ExternalIcon aria-hidden="true" />
-						</a>
+							<a
+								class="open btn icon-only"
+								target="_blank"
+								:href="
+									expandedGalleryItem.raw_url
+										? expandedGalleryItem.raw_url
+										: 'https://cdn.modrinth.com/placeholder-banner.svg'
+								"
+							>
+								<ExternalIcon aria-hidden="true" />
+							</a>
 						</ButtonStyled>
 						<ButtonStyled circular>
 							<button @click="zoomedIn = !zoomedIn">
