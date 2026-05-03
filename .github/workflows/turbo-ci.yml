@@ -8,10 +8,14 @@ on:
   merge_group:
     types: [checks_requested]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
+
 jobs:
   build:
     name: Lint and Test
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     env:
       # Ensure pnpm output is colored in GitHub Actions logs
@@ -23,59 +27,103 @@ jobs:
       # since we don't want warnings to become errors
       # while developing)
       RUSTFLAGS: -Dwarnings
+      # sccache config
+      SCCACHE_DIR: '/mnt/sccache'
+      SCCACHE_CACHE_SIZE: '10G'
+      SCCACHE_MULTILEVEL_CHAIN: 'disk,s3'
+      SCCACHE_S3_KEY_PREFIX: '${{ github.repository }}/'
+      SCCACHE_BUCKET: ${{ secrets.SCCACHE_BUCKET }}
+      SCCACHE_REGION: ${{ secrets.SCCACHE_REGION }}
+      SCCACHE_ENDPOINT: ${{ secrets.SCCACHE_ENDPOINT }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.SCCACHE_S3_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SCCACHE_S3_SECRET_ACCESS_KEY }}
+      RUSTC_WRAPPER: 'sccache'
 
     steps:
-      - name: 📥 Check out code
-        uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 2
 
-      - name: 🧰 Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -yq libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+      - name: Install build dependencies
+        uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
+        with:
+          packages: libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+          version: v1 # cache key
 
-      - name: 🧰 Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: 🧰 Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version-file: .nvmrc
-          cache: pnpm
 
-      - name: 🧰 Setup Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.pnpm-store.outputs.store-path }}
+          key: pnpm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-cache-
+
+      - name: Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@2b1f5e9b395427c92ee4e3331786ca3c37afe2d7 # v1.16.0
         with:
           rustflags: ''
           components: clippy, rustfmt
           cache: false
 
-      - name: 🧰 Setup nextest
-        uses: taiki-e/install-action@nextest
+      - name: Cache Cargo registry and index
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae #v5.0.5
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin
+          key: ${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Mount sccache disk cache
+        uses: useblacksmith/stickydisk@13af8883542ca949a717e70fef89d15edbb29d88 # v1.2.0
+        with:
+          key: ${{ github.repository }}-turbo-sccache
+          path: /mnt/sccache
+
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
+
+      - name: Setup binstall
+        uses: cargo-bins/cargo-binstall@dc19f1e48450eefe5a29b8da6c6b00a87d730b37 # v1.18.1
+
+      - name: Setup nextest
+        run: cargo binstall --no-confirm --secure cargo-nextest@0.9.133
 
       # cargo-binstall does not have pre-built binaries for sqlx-cli, so we fall
       # back to a cached cargo install
-      - name: 🧰 Setup cargo-sqlx
-        uses: taiki-e/cache-cargo-install-action@v2
+      - name: Setup cargo-sqlx
+        uses: taiki-e/cache-cargo-install-action@f9eed3e4680f27610dc6d8c67be1b88593f7dade # v3.0.6
         with:
-          tool: sqlx-cli
+          tool: sqlx-cli@0.8.6
           locked: false
           no-default-features: true
           features: rustls,postgres
 
-      - name: 💨 Setup Turbo cache
-        uses: rharkor/caching-for-turbo@v1.8
+      - name: Setup Turbo cache
+        uses: rharkor/caching-for-turbo@56219402aacc0d06b650d898c222996dbc1191ec # v2.3.14
 
-      - name: 🧰 Install dependencies
+      - name: Install dependencies
         run: pnpm install
 
-      - name: ⚙️ Set app environment
+      - name: Set app environment
         working-directory: packages/app-lib
         run: cp .env.staging .env
 
       # check if labrinth tests will actually run (cache miss)
-      - name: 🔍 Check if labrinth tests need to run
+      - name: Check if labrinth tests need to run
         id: check-labrinth
         run: |
           LABRINTH_TEST_STATUS=$(pnpm turbo run test --filter=@modrinth/labrinth --dry-run=json | jq -r '.tasks[] | select(.task == "test") | .cache.status')
@@ -86,21 +134,21 @@ jobs:
             echo "needs_services=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: ⚙️ Start services
+      - name: Start services
         if: steps.check-labrinth.outputs.needs_services == 'true'
         run: docker compose up --wait
 
-      - name: ⚙️ Setup labrinth environment and database
+      - name: Setup labrinth environment and database
         if: steps.check-labrinth.outputs.needs_services == 'true'
         working-directory: apps/labrinth
         run: |
           cp .env.local .env
           sqlx database setup
 
-      - name: 🔍 Lint and test
+      - name: Lint and test
         run: pnpm run ci
 
-      - name: 🔍 Verify intl:extract has been run
+      - name: Verify intl:extract has been run
         run: |
           pnpm turbo run intl:extract --force
           git diff --exit-code --color */*/src/locales/en-US/index.json

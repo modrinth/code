@@ -16,19 +16,77 @@ jobs:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/frontend-deploy.yml
     secrets: inherit
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.environment }}
+      cancel-in-progress: true
     strategy:
       matrix:
         environment: [staging-preview, production-preview]
     with:
       environment: ${{ matrix.environment }}
 
+  deploy-storybook:
+    if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-storybook
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.pnpm-store.outputs.store-path }}
+          key: pnpm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-cache-
+
+      - name: Install dependencies
+        working-directory: ./packages/ui
+        run: pnpm install
+
+      - name: Build Storybook
+        working-directory: ./packages/ui
+        run: pnpm run build-storybook
+
+      - name: Configure short SHA
+        id: meta
+        run: echo "sha_short=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
+      - name: Deploy Storybook preview
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          workingDirectory: ./packages/ui
+          packageManager: pnpm
+          wranglerVersion: '4.54.0'
+          command: versions upload --preview-alias git-${{ steps.meta.outputs.sha_short }}
+
   comment:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: [deploy, deploy-storybook]
     steps:
       - name: Download deployment URLs
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: deployment-url-*
           merge-multiple: true
@@ -44,10 +102,11 @@ jobs:
 
           echo "staging-preview-url=$STAGING_PREVIEW_URL" >> $GITHUB_OUTPUT
           echo "production-preview-url=$PRODUCTION_PREVIEW_URL" >> $GITHUB_OUTPUT
+          echo "storybook-preview-url=https://git-${GITHUB_SHA::8}-storybook.modrinth.workers.dev" >> $GITHUB_OUTPUT
 
       - name: Find comment
         if: github.event_name == 'pull_request'
-        uses: peter-evans/find-comment@v3
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
         id: fc
         with:
           token: ${{ secrets.CROWDIN_GH_TOKEN }}
@@ -56,7 +115,7 @@ jobs:
 
       - name: Comment deploy URL on PR
         if: github.event_name == 'pull_request'
-        uses: peter-evans/create-or-update-comment@v5
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
         with:
           token: ${{ secrets.CROWDIN_GH_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
@@ -70,4 +129,5 @@ jobs:
             |-------------|-----|
             | staging     | ${{ steps.urls.outputs.staging-preview-url }} |
             | production  | ${{ steps.urls.outputs.production-preview-url }} |
+            | storybook   | ${{ steps.urls.outputs.storybook-preview-url }} |
           edit-mode: replace
