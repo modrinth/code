@@ -10,7 +10,7 @@ import type {
 
 export interface ActionState {
 	selected: boolean
-	value?: Set<number> | number | string | unknown
+	value?: Set<string | number> | number | string | unknown
 }
 
 export interface MessagePart {
@@ -91,7 +91,7 @@ export function initializeActionState(action: Action): ActionState {
 	} else if (action.type === 'multi-select-chips') {
 		return {
 			selected: false,
-			value: new Set<number>(),
+			value: new Set<string | number>(),
 		}
 	} else {
 		return {

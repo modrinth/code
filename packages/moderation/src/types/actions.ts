@@ -19,6 +19,12 @@ export type Action =
 export type ModerationStatus = 'approved' | 'rejected' | 'flagged'
 export type ModerationSeverity = 'low' | 'medium' | 'high' | 'critical'
 
+export interface ChecklistActionContext {
+	project: Labrinth.Projects.v2.Project
+	projectV3: Labrinth.Projects.v3.Project
+	versions?: Labrinth.Versions.v2.Version[] | null
+}
+
 export interface BaseAction {
 	/**
 	 * The type of action, which determines how the action is presented to the moderator and what it does.
@@ -63,6 +69,7 @@ export interface BaseAction {
 	shouldShow?: (
 		project: Labrinth.Projects.v2.Project,
 		projectV3: Labrinth.Projects.v3.Project,
+		context?: ChecklistActionContext,
 	) => boolean
 }
 
@@ -171,6 +178,7 @@ export interface DropdownActionOption extends WeightedMessage {
 	shouldShow?: (
 		project: Labrinth.Projects.v2.Project,
 		projectV3: Labrinth.Projects.v3.Project,
+		context?: ChecklistActionContext,
 	) => boolean
 }
 
@@ -195,6 +203,11 @@ export interface DropdownAction extends BaseAction {
 
 export interface MultiSelectChipsOption extends WeightedMessage {
 	/**
+	 * Stable identifier for the option. If omitted, the label is used.
+	 */
+	id?: string
+
+	/**
 	 * The label of the chip, which is displayed to the moderator.
 	 */
 	label: string
@@ -207,8 +220,13 @@ export interface MultiSelectChipsOption extends WeightedMessage {
 	shouldShow?: (
 		project: Labrinth.Projects.v2.Project,
 		projectV3: Labrinth.Projects.v3.Project,
+		context?: ChecklistActionContext,
 	) => boolean
 }
+
+export type MultiSelectChipsOptionsResolver = (
+	context: ChecklistActionContext,
+) => MultiSelectChipsOption[]
 
 export interface MultiSelectChipsAction extends BaseAction {
 	type: 'multi-select-chips'
@@ -221,7 +239,7 @@ export interface MultiSelectChipsAction extends BaseAction {
 	/**
 	 * The options available in the multi-select chips.
 	 */
-	options: MultiSelectChipsOption[]
+	options: MultiSelectChipsOption[] | MultiSelectChipsOptionsResolver
 
 	/**
 	 * If set, all selected option messages are joined with this string and emitted as a single
