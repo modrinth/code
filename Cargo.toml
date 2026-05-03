@@ -283,7 +283,7 @@ panic = "abort"  # Strip expensive panic clean-up logic
 # Specific profile for labrinth production builds
 [profile.release-labrinth]
 inherits = "release"
-strip = false  # Keep debug symbols for Sentry
-panic = "unwind"  # Don't exit the whole app on panic in production
-lto = "thin"	# Enable LTO but keep compile times reasonable
 opt-level = 2
+strip = false  # Keep debug symbols for Sentry
+lto = "thin"  # Enable LTO but keep compile times reasonable
+panic = "unwind"  # Don't exit the whole app on panic in production
