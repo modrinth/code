@@ -430,19 +430,16 @@ pub async fn project_edit_internal(
             && !user.role.is_admin()
             && project_item.inner.status == ProjectStatus::Processing
             && status != &ProjectStatus::Processing
-        {
-            if let Some(lock) =
+            && let Some(lock) =
                 DBModerationLock::get_with_user(project_item.inner.id, &pool)
                     .await?
-            {
-                let user_id = db_ids::DBUserId::from(user.id);
-                if lock.moderator_id != user_id && !lock.expired {
-                    return Err(ApiError::CustomAuthentication(format!(
-                        "This project is currently being moderated by @{}. Please wait for them to finish or for the lock to expire.",
-                        lock.moderator_username
-                    )));
-                }
-            }
+            && lock.moderator_id != db_ids::DBUserId::from(user.id)
+            && !lock.expired
+        {
+            return Err(ApiError::CustomAuthentication(format!(
+                "This project is currently being moderated by @{}. Please wait for them to finish or for the lock to expire.",
+                lock.moderator_username
+            )));
         }
 
         if status == &ProjectStatus::Processing {
