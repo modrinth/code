@@ -40,6 +40,16 @@ jobs:
     name: Build
     env:
       VITE_STRIPE_PUBLISHABLE_KEY: pk_live_51JbFxJJygY5LJFfKLVVldb10HlLt24p421OWRsTOWc5sXYFOnFUXWieSc6HD3PHo25ktx8db1WcHr36XGFvZFVUz00V9ixrCs5
+      # SCCACHE_DIR: '/mnt/sccache'
+      # SCCACHE_CACHE_SIZE: '10G'
+      # SCCACHE_MULTILEVEL_CHAIN: 'disk,s3'
+      SCCACHE_S3_KEY_PREFIX: '${{ github.repository }}/'
+      SCCACHE_BUCKET: ${{ secrets.SCCACHE_BUCKET }}
+      SCCACHE_REGION: ${{ secrets.SCCACHE_REGION }}
+      SCCACHE_ENDPOINT: ${{ secrets.SCCACHE_ENDPOINT }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.SCCACHE_S3_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SCCACHE_S3_SECRET_ACCESS_KEY }}
+      RUSTC_WRAPPER: 'sccache'
     strategy:
       fail-fast: false
       matrix:
@@ -71,25 +81,17 @@ jobs:
           rustflags: ''
           target: ${{ contains(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
 
-      - name: Setup Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version-file: .nvmrc
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Get pnpm store path
-        id: pnpm-store
-        run: echo "store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Restore pnpm cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
-          path: ${{ steps.pnpm-store.outputs.store-path }}
-          key: pnpm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-cache-
+          node-version-file: .nvmrc
+          cache: 'pnpm'
 
       - name: Generate tauri-dev.conf.json
         shell: bash
