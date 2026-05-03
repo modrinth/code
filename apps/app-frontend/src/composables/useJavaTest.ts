@@ -31,14 +31,15 @@ export default function useJavaTest() {
 	}
 
 	function testJavaInstallationDebounced(path: string, version: number, delay = 600) {
-		if (!path) return
 		if (testDebounceTimer) clearTimeout(testDebounceTimer)
+		if (!path) {
+			javaTestResult.value = null
+			return
+		}
 		testDebounceTimer = setTimeout(() => runJavaTest(path, version, false), delay)
 	}
 
 	async function testJavaInstallation(path: string, version: number, track = false) {
-		if (!path) return
-		if (testDebounceTimer) clearTimeout(testDebounceTimer)
 		await runJavaTest(path, version, track)
 	}
 
