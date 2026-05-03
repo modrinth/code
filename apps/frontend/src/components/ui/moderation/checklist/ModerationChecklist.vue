@@ -17,7 +17,8 @@
 	>
 		<div class="flex grow-0 items-center gap-2">
 			<h1 class="m-0 mr-auto flex items-center gap-2 text-2xl font-extrabold text-contrast">
-				<ScaleIcon class="text-orange" /> Moderation
+				<ScaleIcon class="text-orange" />
+				{{ currentStageObj.id ? kebabToTitleCase(currentStageObj.id) : currentStageObj.title }}
 			</h1>
 			<ButtonStyled circular>
 				<button v-tooltip="`Keyboard shortcuts`" @click="keybindsModal?.show($event)">
