@@ -81,15 +81,21 @@
 							</span>
 						</h2>
 						<div class="chart-controls__buttons">
-							<Button v-tooltip="'Toggle project colors'" icon-only @click="onToggleColors">
-								<PaletteIcon />
-							</Button>
-							<Button v-tooltip="'Download this data as CSV'" icon-only @click="onDownloadSetAsCSV">
-								<DownloadIcon />
-							</Button>
-							<Button v-tooltip="'Refresh the chart'" icon-only @click="resetCharts">
-								<UpdatedIcon />
-							</Button>
+							<ButtonStyled circular type="outlined">
+								<button v-tooltip="'Toggle project colors'" @click="onToggleColors">
+									<PaletteIcon />
+								</button>
+							</ButtonStyled>
+							<ButtonStyled circular type="outlined">
+								<button v-tooltip="'Download this data as CSV'" @click="onDownloadSetAsCSV">
+									<DownloadIcon />
+								</button>
+							</ButtonStyled>
+							<ButtonStyled circular type="outlined">
+								<button v-tooltip="'Refresh the chart'" @click="resetCharts">
+									<UpdatedIcon />
+								</button>
+							</ButtonStyled>
 							<DropdownSelect
 								v-model="selectedRange"
 								class="range-dropdown"
@@ -156,8 +162,8 @@
 								<template v-for="project in selectedDataSetProjects" :key="project">
 									<button
 										v-tooltip="project.title"
-										:class="`legend__item button-base btn-transparent ${
-											!projectIsOnDisplay(project.id) ? 'btn-dimmed' : ''
+										:class="`legend__item button-base legend__item-transparent ${
+											!projectIsOnDisplay(project.id) ? 'legend__item-dimmed' : ''
 										}`"
 										@click="
 											() =>
@@ -311,7 +317,7 @@
 <script setup lang="ts">
 import { DownloadIcon, PaletteIcon, UpdatedIcon } from '@modrinth/assets'
 import {
-	Button,
+	ButtonStyled,
 	Card,
 	DropdownSelect,
 	useCompactNumber,
@@ -842,7 +848,7 @@ const defaultRanges: RangeObject[] = [
 	}
 }
 
-.btn-transparent {
+.legend__item-transparent {
 	background-color: transparent;
 	border: none;
 	cursor: pointer;
@@ -851,7 +857,7 @@ const defaultRanges: RangeObject[] = [
 	font-weight: var(--font-weight-regular);
 }
 
-.btn-dimmed {
+.legend__item-dimmed {
 	opacity: 0.5;
 }
 

@@ -43,19 +43,23 @@
 					v-html="renderHighlightedString(linkMarkdown)"
 				/>
 			</div>
-			<div class="input-group push-right">
-				<Button :action="() => linkModal?.hide()"><XIcon /> Cancel</Button>
-				<Button
-					color="primary"
-					:disabled="!!linkValidationErrorMessage || !linkUrl"
-					:action="
-						() => {
-							if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
-							linkModal?.hide()
-						}
-					"
-					><PlusIcon /> Insert</Button
-				>
+			<div class="flex gap-2 justify-end mt-4">
+				<ButtonStyled type="outlined">
+					<button @click="() => linkModal?.hide()"><XIcon /> Cancel</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
+						:disabled="!!linkValidationErrorMessage || !linkUrl"
+						@click="
+							() => {
+								if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
+								linkModal?.hide()
+							}
+						"
+					>
+						<PlusIcon /> Insert
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -125,20 +129,23 @@
 					v-html="renderHighlightedString(imageMarkdown)"
 				/>
 			</div>
-			<div class="input-group push-right">
-				<Button :action="() => imageModal?.hide()"><XIcon /> Cancel</Button>
-				<Button
-					color="primary"
-					:disabled="!canInsertImage"
-					:action="
-						() => {
-							if (editor) markdownCommands.replaceSelection(editor, imageMarkdown)
-							imageModal?.hide()
-						}
-					"
-				>
-					<PlusIcon /> Insert
-				</Button>
+			<div class="flex gap-2 justify-end mt-4">
+				<ButtonStyled type="outlined">
+					<button @click="() => imageModal?.hide()"><XIcon /> Cancel</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
+						:disabled="!canInsertImage"
+						@click="
+							() => {
+								if (editor) markdownCommands.replaceSelection(editor, imageMarkdown)
+								imageModal?.hide()
+							}
+						"
+					>
+						<PlusIcon /> Insert
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -176,20 +183,23 @@
 					v-html="renderHighlightedString(videoMarkdown)"
 				/>
 			</div>
-			<div class="input-group push-right">
-				<Button :action="() => videoModal?.hide()"><XIcon /> Cancel</Button>
-				<Button
-					color="primary"
-					:disabled="!!linkValidationErrorMessage || !linkUrl"
-					:action="
-						() => {
-							if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
-							videoModal?.hide()
-						}
-					"
-				>
-					<PlusIcon /> Insert
-				</Button>
+			<div class="flex gap-2 justify-end mt-4">
+				<ButtonStyled type="outlined">
+					<button @click="() => videoModal?.hide()"><XIcon /> Cancel</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
+						:disabled="!!linkValidationErrorMessage || !linkUrl"
+						@click="
+							() => {
+								if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
+								videoModal?.hide()
+							}
+						"
+					>
+						<PlusIcon /> Insert
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
@@ -202,16 +212,17 @@
 				>
 					<div class="divider"></div>
 					<template v-for="button in buttonGroup.buttons" :key="button.label">
-						<Button
-							v-tooltip="button.label"
-							icon-only
-							:aria-label="button.label"
-							:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
-							:action="() => button.action(editor)"
-							:disabled="previewMode || disabled"
-						>
-							<component :is="button.icon" />
-						</Button>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="button.label"
+								:aria-label="button.label"
+								:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
+								:disabled="previewMode || disabled"
+								@click="() => button.action(editor)"
+							>
+								<component :is="button.icon" />
+							</button>
+						</ButtonStyled>
 					</template>
 				</template>
 				<div class="preview">
@@ -288,7 +299,7 @@ import { renderHighlightedString } from '@modrinth/utils/highlightjs'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 
 import NewModal from '../modal/NewModal.vue'
-import Button from './Button.vue'
+import ButtonStyled from './ButtonStyled.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
 import StyledInput from './StyledInput.vue'

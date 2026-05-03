@@ -1,21 +1,16 @@
 <template>
 	<div class="joined-buttons">
-		<ButtonStyled
-			:color="color"
-			:size="size"
-			:class="{ 'joined-buttons__primary--muted': primaryMuted }"
-		>
-			<button :disabled="primaryDisabledResolved" @click="handlePrimaryAction">
+		<ButtonStyled :color="color" :size="size">
+			<button
+				:class="{ 'joined-buttons__primary--muted': primaryMuted }"
+				:disabled="primaryDisabledResolved"
+				@click="handlePrimaryAction"
+			>
 				<component :is="primaryAction.icon" v-if="primaryAction.icon" aria-hidden="true" />
 				{{ primaryAction.label }}
 			</button>
 		</ButtonStyled>
-		<ButtonStyled
-			v-if="dropdownActions.length > 0"
-			:color="color"
-			:size="size"
-			class="joined-buttons__dropdown"
-		>
+		<ButtonStyled v-if="dropdownActions.length > 0" :color="color" :size="size">
 			<OverflowMenu
 				class="btn-dropdown-animation !w-10"
 				:options="dropdownOptions"

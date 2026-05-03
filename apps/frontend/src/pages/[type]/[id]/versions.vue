@@ -1,5 +1,5 @@
 <template>
-	<section class="experimental-styles-within overflow-visible">
+	<section class="overflow-visible">
 		<!-- Loading state -->
 		<div
 			v-if="versionsLoading && !versions?.length"

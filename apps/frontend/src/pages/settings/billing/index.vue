@@ -1,7 +1,7 @@
 <template>
 	<ServersUpgradeModalWrapper ref="upgradeModal" />
 	<ResubscribeModal ref="pyroResubscribeModal" @resubscribe="handlePyroResubscribeConfirm" />
-	<section class="universal-card experimental-styles-within">
+	<section class="universal-card">
 		<h2>{{ formatMessage(messages.subscriptionTitle) }}</h2>
 		<p>{{ formatMessage(messages.subscriptionDescription) }}</p>
 		<div class="universal-card recessed">
@@ -533,7 +533,7 @@
 		</div>
 	</section>
 
-	<section class="universal-card experimental-styles-within">
+	<section class="universal-card">
 		<ConfirmModal
 			ref="modal_confirm"
 			:title="formatMessage(deleteModalMessages.title)"
@@ -573,12 +573,16 @@
 			<div class="header__title">
 				<h2 class="text-2xl">{{ formatMessage(messages.paymentMethodTitle) }}</h2>
 			</div>
-			<nuxt-link class="btn" to="/settings/billing/charges">
-				<HistoryIcon /> {{ formatMessage(messages.paymentMethodHistory) }}
-			</nuxt-link>
-			<button class="btn" @click="addPaymentMethod">
-				<PlusIcon /> {{ formatMessage(messages.paymentMethodAdd) }}
-			</button>
+			<ButtonStyled>
+				<nuxt-link to="/settings/billing/charges">
+					<HistoryIcon /> {{ formatMessage(messages.paymentMethodHistory) }}
+				</nuxt-link>
+			</ButtonStyled>
+			<ButtonStyled>
+				<button @click="addPaymentMethod">
+					<PlusIcon /> {{ formatMessage(messages.paymentMethodAdd) }}
+				</button>
+			</ButtonStyled>
 		</div>
 		<div
 			v-if="!paymentMethods || paymentMethods.length === 0"
@@ -637,41 +641,43 @@
 						</div>
 					</div>
 				</div>
-				<OverflowMenu
-					:dropdown-id="`${baseId}-payment-method-overflow-${index}`"
-					class="btn icon-only transparent"
-					:options="
-						[
-							{
-								id: 'primary',
-								action: () => editPaymentMethod(index, true),
-							},
-							{
-								id: 'remove',
-								action: () => {
-									removePaymentMethodIndex = index
-									$refs.modal_confirm.show()
+				<ButtonStyled circular type="transparent">
+					<OverflowMenu
+						:dropdown-id="`${baseId}-payment-method-overflow-${index}`"
+						class="btn-dropdown-animation !w-10"
+						:options="
+							[
+								{
+									id: 'primary',
+									action: () => editPaymentMethod(index, true),
 								},
-								color: 'red',
-								hoverOnly: true,
-							},
-						].slice(primaryPaymentMethodId === method.id ? 1 : 0, 2)
-					"
-				>
-					<MoreVerticalIcon />
-					<template #primary>
-						<StarIcon />
-						{{ formatMessage(messages.paymentMethodMakePrimary) }}
-					</template>
-					<template #edit>
-						<EditIcon />
-						{{ formatMessage(commonMessages.editButton) }}
-					</template>
-					<template #remove>
-						<TrashIcon />
-						{{ formatMessage(commonMessages.deleteLabel) }}
-					</template>
-				</OverflowMenu>
+								{
+									id: 'remove',
+									action: () => {
+										removePaymentMethodIndex = index
+										$refs.modal_confirm.show()
+									},
+									color: 'red',
+									hoverOnly: true,
+								},
+							].slice(primaryPaymentMethodId === method.id ? 1 : 0, 2)
+						"
+					>
+						<MoreVerticalIcon />
+						<template #primary>
+							<StarIcon />
+							{{ formatMessage(messages.paymentMethodMakePrimary) }}
+						</template>
+						<template #edit>
+							<EditIcon />
+							{{ formatMessage(commonMessages.editButton) }}
+						</template>
+						<template #remove>
+							<TrashIcon />
+							{{ formatMessage(commonMessages.deleteLabel) }}
+						</template>
+					</OverflowMenu>
+				</ButtonStyled>
 			</div>
 		</div>
 	</section>
