@@ -34,10 +34,14 @@
 				</tbody>
 			</table>
 			<div class="button-group">
-				<Button @click="() => incompatibleModal.hide()"><XIcon />Cancel</Button>
-				<Button color="primary" :disabled="installing" @click="install()">
-					<DownloadIcon /> {{ installing ? 'Installing' : 'Install' }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="() => incompatibleModal.hide()"><XIcon />Cancel</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="installing" @click="install()">
+						<DownloadIcon /> {{ installing ? 'Installing' : 'Install' }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</ModalWrapper>
@@ -45,7 +49,13 @@
 
 <script setup>
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { Button, Combobox, formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Combobox,
+	formatLoader,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'

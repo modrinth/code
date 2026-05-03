@@ -41,31 +41,33 @@
 					@keypress.enter="inviteTeamMember()"
 				/>
 				<label for="username" class="hidden">Username</label>
-				<button
-					class="iconified-button brand-button"
-					:disabled="(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
-					@click="inviteTeamMember()"
-				>
-					<UserPlusIcon />
-					Invite
-				</button>
+				<ButtonStyled color="brand">
+					<button
+						:disabled="(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
+						@click="inviteTeamMember()"
+					>
+						<UserPlusIcon />
+						Invite
+					</button>
+				</ButtonStyled>
 			</div>
 			<div class="adjacent-input">
 				<span class="label">
 					<span class="label__title">Leave project</span>
 					<span class="label__description"> Remove yourself as a member of this project. </span>
 				</span>
-				<button
-					class="iconified-button danger-button"
-					:disabled="currentMember?.is_owner"
-					:title="
-						currentMember?.is_owner ? 'You cannot leave the project if you are the owner!' : ''
-					"
-					@click="leaveProject()"
-				>
-					<UserXIcon />
-					Leave project
-				</button>
+				<ButtonStyled color="red">
+					<button
+						:disabled="currentMember?.is_owner"
+						:title="
+							currentMember?.is_owner ? 'You cannot leave the project if you are the owner!' : ''
+						"
+						@click="leaveProject()"
+					>
+						<UserXIcon />
+						Leave project
+					</button>
+				</ButtonStyled>
 			</div>
 		</Card>
 		<div
@@ -88,16 +90,18 @@
 				<div class="side-buttons">
 					<Badge v-if="member.accepted" type="accepted" />
 					<Badge v-else type="pending" />
-					<button
-						class="square-button dropdown-icon"
-						@click="
-							openTeamMembers.indexOf(member.user.id) === -1
-								? openTeamMembers.push(member.user.id)
-								: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
-						"
-					>
-						<DropdownIcon />
-					</button>
+					<ButtonStyled circular>
+						<button
+							class="dropdown-icon"
+							@click="
+								openTeamMembers.indexOf(member.user.id) === -1
+									? openTeamMembers.push(member.user.id)
+									: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
+							"
+						>
+							<DropdownIcon />
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 			<div class="content">
@@ -225,31 +229,30 @@
 					</div>
 				</template>
 				<div class="input-group">
-					<button
-						class="iconified-button brand-button"
-						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
-						@click="updateTeamMember(index)"
-					>
-						<SaveIcon />
-						Save changes
-					</button>
-					<button
-						v-if="!member.is_owner"
-						class="iconified-button danger-button"
-						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
-						@click="removeTeamMember(index)"
-					>
-						<UserXIcon />
-						Remove member
-					</button>
-					<button
-						v-if="!member.is_owner && currentMember?.is_owner && member.accepted"
-						class="iconified-button"
-						@click="openTransferModal(index, $event)"
-					>
-						<TransferIcon />
-						Transfer ownership
-					</button>
+					<ButtonStyled color="brand">
+						<button
+							:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+							@click="updateTeamMember(index)"
+						>
+							<SaveIcon />
+							Save changes
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="!member.is_owner" color="red">
+						<button
+							:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+							@click="removeTeamMember(index)"
+						>
+							<UserXIcon />
+							Remove member
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="!member.is_owner && currentMember?.is_owner && member.accepted">
+						<button @click="openTransferModal(index, $event)">
+							<TransferIcon />
+							Transfer ownership
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>
@@ -305,19 +308,19 @@
 					force-direction="up"
 					:disabled="!currentMember?.is_owner || organizationOptions.length === 0"
 				/>
-				<button
-					class="btn btn-primary"
-					:disabled="!selectedOrganization"
-					@click="openTransferToOrgModal($event)"
-				>
-					<CheckIcon />
-					<span class="w-max"> Transfer management </span>
-				</button>
+				<ButtonStyled color="brand">
+					<button :disabled="!selectedOrganization" @click="openTransferToOrgModal($event)">
+						<CheckIcon />
+						<span class="w-max"> Transfer management </span>
+					</button>
+				</ButtonStyled>
 			</div>
-			<button v-if="organization" class="btn" @click="$refs.modal_remove.show()">
-				<OrganizationIcon />
-				Remove from organization
-			</button>
+			<ButtonStyled v-if="organization">
+				<button @click="$refs.modal_remove.show()">
+					<OrganizationIcon />
+					Remove from organization
+				</button>
+			</ButtonStyled>
 		</section>
 		<div
 			v-for="(member, index) in allOrgMembers"
@@ -339,16 +342,18 @@
 				<div class="side-buttons">
 					<Badge v-if="member.accepted" type="accepted" />
 					<Badge v-else type="pending" />
-					<button
-						class="square-button dropdown-icon"
-						@click="
-							openTeamMembers.indexOf(member.user.id) === -1
-								? openTeamMembers.push(member.user.id)
-								: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
-						"
-					>
-						<DropdownIcon />
-					</button>
+					<ButtonStyled circular>
+						<button
+							class="dropdown-icon"
+							@click="
+								openTeamMembers.indexOf(member.user.id) === -1
+									? openTeamMembers.push(member.user.id)
+									: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
+							"
+						>
+							<DropdownIcon />
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 			<div class="content">
@@ -522,17 +527,18 @@
 
 					we don't allow clicking the button in that last case.
 					-->
-					<button
-						class="iconified-button brand-button"
-						:disabled="
-							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-							(!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)
-						"
-						@click="updateOrgMember(index)"
-					>
-						<SaveIcon />
-						Save changes
-					</button>
+					<ButtonStyled color="brand">
+						<button
+							:disabled="
+								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+								(!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)
+							"
+							@click="updateOrgMember(index)"
+						>
+							<SaveIcon />
+							Save changes
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>
@@ -554,6 +560,7 @@ import {
 import {
 	Avatar,
 	Badge,
+	ButtonStyled,
 	Card,
 	Checkbox,
 	Combobox,

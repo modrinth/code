@@ -21,10 +21,10 @@
 				</span>
 			</div>
 		</div>
-		<ButtonStyled color="medal-promo" type="outlined" size="large" class="z-10 my-auto mt-2">
+		<ButtonStyled color="medal-promo" type="outlined" size="large">
 			<nuxt-link
 				to="https://medal.tv/modrinth"
-				class="z-10 flex w-full items-center justify-center gap-1 md:mt-0 md:w-auto"
+				class="z-10 my-auto mt-2 flex w-full items-center justify-center gap-1 md:mt-0 md:w-auto"
 				>{{ formatMessage(messages.learnMoreButton) }} <ExternalIcon
 			/></nuxt-link>
 		</ButtonStyled>

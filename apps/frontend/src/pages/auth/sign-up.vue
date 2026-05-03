@@ -3,30 +3,42 @@
 		<h1>{{ formatMessage(messages.signUpWithTitle) }}</h1>
 
 		<section class="third-party">
-			<a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">
-				<DiscordColorIcon />
-				<span>Discord</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('github', redirectTarget)">
-				<GitHubColorIcon />
-				<span>GitHub</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-				<MicrosoftColorIcon />
-				<span>Microsoft</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('google', redirectTarget)">
-				<GoogleColorIcon />
-				<span>Google</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-				<SteamColorIcon />
-				<span>Steam</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-				<GitLabColorIcon />
-				<span>GitLab</span>
-			</a>
+			<ButtonStyled>
+				<a class="discord-btn" :href="getAuthUrl('discord', redirectTarget)">
+					<DiscordColorIcon />
+					<span>Discord</span>
+				</a>
+			</ButtonStyled>
+			<ButtonStyled>
+				<a :href="getAuthUrl('github', redirectTarget)">
+					<GitHubColorIcon />
+					<span>GitHub</span>
+				</a>
+			</ButtonStyled>
+			<ButtonStyled>
+				<a :href="getAuthUrl('microsoft', redirectTarget)">
+					<MicrosoftColorIcon />
+					<span>Microsoft</span>
+				</a>
+			</ButtonStyled>
+			<ButtonStyled>
+				<a :href="getAuthUrl('google', redirectTarget)">
+					<GoogleColorIcon />
+					<span>Google</span>
+				</a>
+			</ButtonStyled>
+			<ButtonStyled>
+				<a :href="getAuthUrl('steam', redirectTarget)">
+					<SteamColorIcon />
+					<span>Steam</span>
+				</a>
+			</ButtonStyled>
+			<ButtonStyled>
+				<a :href="getAuthUrl('gitlab', redirectTarget)">
+					<GitLabColorIcon />
+					<span>GitLab</span>
+				</a>
+			</ButtonStyled>
 		</section>
 
 		<h1>{{ formatMessage(messages.createAccountTitle) }}</h1>
@@ -100,13 +112,15 @@
 
 			<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
 
-			<button
-				class="btn btn-primary continue-btn centered-btn"
-				:disabled="globals?.captcha_enabled ? !token : false"
-				@click="createAccount"
-			>
-				{{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
-			</button>
+			<ButtonStyled color="brand">
+				<button
+					class="continue-btn centered-btn"
+					:disabled="globals?.captcha_enabled ? !token : false"
+					@click="createAccount"
+				>
+					{{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
+				</button>
+			</ButtonStyled>
 
 			<div class="auth-form__additional-options">
 				{{ formatMessage(messages.alreadyHaveAccountLabel) }}
@@ -138,6 +152,7 @@ import {
 	UserIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	defineMessages,

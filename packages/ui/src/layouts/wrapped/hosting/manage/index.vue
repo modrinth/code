@@ -1,7 +1,7 @@
 <template>
 	<div
 		data-pyro-server-list-root
-		class="experimental-styles-within relative mx-auto mb-6 flex w-full flex-col p-6"
+		class="relative mx-auto mb-6 flex w-full flex-col p-6"
 		:class="serverList.length ? 'min-h-screen' : 'min-h-[calc(100vh-4.5rem)]'"
 	>
 		<ServersGuestPlanModal
