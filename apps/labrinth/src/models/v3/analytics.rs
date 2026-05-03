@@ -33,7 +33,15 @@ pub struct Download {
 
 /// Why a project was downloaded.
 #[derive(
-    Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize,
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
     utoipa::ToSchema,
 )]
 #[serde(rename_all = "snake_case")]
