@@ -46,6 +46,30 @@ export const Searchable: Story = {
 	},
 }
 
+export const DropdownMinWidth: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: [
+				{ value: 'fabric', label: 'Fabric', subLabel: 'Lightweight modding toolchain' },
+				{ value: 'forge', label: 'Forge', subLabel: 'The original Minecraft modding API' },
+				{ value: 'neoforge', label: 'NeoForge', subLabel: 'Community-driven Forge fork' },
+			],
+		}),
+		template: /*html*/ `
+			<div style="width: 11rem;">
+				<Combobox
+					v-model="selected"
+					:options="options"
+					:dropdown-min-width="320"
+					placeholder="Loader"
+				/>
+			</div>
+		`,
+	}),
+}
+
 export const Disabled: Story = {
 	args: {
 		options: [{ value: '1', label: 'Option 1' }],
@@ -172,6 +196,38 @@ export const WithDropdownFooter: StoryObj = {
 					</button>
 				</template>
 			</Combobox>
+		`,
+	}),
+}
+
+export const WithBottomSlot: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: 'day',
+			count: 7,
+			options: [
+				{ value: 'day', label: 'Day' },
+				{ value: 'week', label: 'Week' },
+				{ value: 'month', label: 'Month' },
+			],
+		}),
+		template: /*html*/ `
+			<div style="width: 240px;">
+				<Combobox v-model="selected" :options="options" dropdown-min-width="260">
+					<template #bottom>
+						<div style="display: flex; align-items: center; gap: 0.75rem; border-top: 1px solid var(--color-surface-5); padding: 0.75rem;">
+							<span style="font-size: 0.875rem; font-weight: 600; color: var(--color-text-primary);">In the last</span>
+							<input
+								v-model.number="count"
+								type="number"
+								min="1"
+								style="height: 2rem; width: 4rem; border: 1px solid var(--color-surface-5); border-radius: 0.5rem; background: var(--color-surface-3); color: var(--color-text-primary); text-align: center; font-weight: 600;"
+							/>
+						</div>
+					</template>
+				</Combobox>
+			</div>
 		`,
 	}),
 }

@@ -1,0 +1,968 @@
+import type { Labrinth } from '@modrinth/api-client'
+import { createContext, injectModrinthClient, type ProjectPageContext } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
+import type { ComputedRef, Ref } from 'vue'
+
+import {
+	getEnabledAnalyticsStatsForState,
+	sanitizeAnalyticsSelectedFilters,
+} from '~/components/analytics/query-builder/query-filter/queryFilter'
+import { useGeneratedState } from '~/composables/generated'
+import { fetchSegmentedWith } from '~/utils/fetch-helpers.ts'
+
+import type { OrganizationContext } from '../organization-context'
+import {
+	type AnalyticsBreakdownPreset,
+	type AnalyticsGroupByPreset,
+	type AnalyticsLastTimeframeUnit,
+	type AnalyticsSelectedFilters,
+	type AnalyticsTimeframeMode,
+	type AnalyticsTimeframePreset,
+	areSelectedFiltersEqual,
+	areStringArraysEqual,
+	buildAnalyticsQueryBuilderRouteQuery,
+	hasAnalyticsQueryBuilderRouteChange,
+	readAnalyticsQueryBuilderState,
+} from './query-builder-url'
+
+export type {
+	AnalyticsBreakdownPreset,
+	AnalyticsGroupByPreset,
+	AnalyticsLastTimeframeUnit,
+	AnalyticsQueryFilterCategory,
+	AnalyticsSelectedFilters,
+	AnalyticsTimeframeMode,
+	AnalyticsTimeframePreset,
+} from './query-builder-url'
+
+export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
+
+const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
+const ANALYTICS_START_TIMESTAMP = '2022-01-01T00:00:00.000Z'
+const ANALYTICS_LOADER_TYPES = ['fabric', 'forge', 'neoforge', 'quilt', 'vanilla']
+
+type ProjectTypeMetadata = {
+	project_type?: string | null
+	project_types?: readonly string[] | null
+}
+
+type AnalyticsProjectFetchRequest = Labrinth.Analytics.v3.FetchRequest & {
+	project_ids: string[]
+}
+
+export interface AnalyticsDashboardProject {
+	id: string
+	name: string
+	downloads: number
+}
+
+export interface AnalyticsDashboardTotals {
+	views: number
+	downloads: number
+	revenue: number
+	playtime: number
+}
+
+export interface AnalyticsDashboardPercentChanges {
+	views: number
+	downloads: number
+	revenue: number
+	playtime: number
+}
+
+export interface AnalyticsDashboardFilterOptions {
+	countries: string[]
+	downloadSources: string[]
+	gameVersions: string[]
+	loaderTypes: string[]
+	versionIds: string[]
+}
+
+export interface AnalyticsDashboardContextValue {
+	projects: ComputedRef<AnalyticsDashboardProject[]>
+	selectedProjectIds: Ref<string[]>
+	selectedTimeframeMode: Ref<AnalyticsTimeframeMode>
+	selectedTimeframe: Ref<AnalyticsTimeframePreset>
+	selectedLastTimeframeAmount: Ref<number>
+	selectedLastTimeframeUnit: Ref<AnalyticsLastTimeframeUnit>
+	selectedCustomTimeframeStartDate: Ref<string>
+	selectedCustomTimeframeEndDate: Ref<string>
+	selectedGroupBy: Ref<AnalyticsGroupByPreset>
+	selectedBreakdown: Ref<AnalyticsBreakdownPreset>
+	selectedFilters: Ref<AnalyticsSelectedFilters>
+	queryRefreshTimestamp: Ref<number>
+	fetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
+	filterOptions: ComputedRef<AnalyticsDashboardFilterOptions>
+	versionNumbersById: ComputedRef<Map<string, string>>
+	versionPublishedDatesById: ComputedRef<Map<string, string>>
+	gameVersionDownloadsByVersion: ComputedRef<Map<string, number>>
+	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
+	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
+	isLoading: ComputedRef<boolean>
+	isRefetching: ComputedRef<boolean>
+	activeStat: Ref<AnalyticsDashboardStat>
+	currentTotals: ComputedRef<AnalyticsDashboardTotals>
+	previousTotals: ComputedRef<AnalyticsDashboardTotals>
+	percentChanges: ComputedRef<AnalyticsDashboardPercentChanges>
+	getRelevantAnalyticsDashboardStats: (
+		breakdown: AnalyticsBreakdownPreset,
+		filters?: AnalyticsSelectedFilters,
+	) => readonly AnalyticsDashboardStat[]
+	isAnalyticsDashboardStatRelevant: (
+		stat: AnalyticsDashboardStat,
+		breakdown: AnalyticsBreakdownPreset,
+		filters?: AnalyticsSelectedFilters,
+	) => boolean
+	refreshAnalyticsQuery: () => Promise<void>
+	getVersionDisplayName: (versionId: string) => string
+	getVersionPublishedDate: (versionId: string) => string | undefined
+	setFetchRequest: (fetchRequest: Labrinth.Analytics.v3.FetchRequest) => void
+	setActiveStat: (stat: AnalyticsDashboardStat) => void
+}
+
+export type CreateAnalyticsDashboardContextOptions = {
+	auth: Ref<{ user?: { id?: string } | null }>
+	projectPageContext?: ProjectPageContext | null
+	organizationContext?: OrganizationContext | null
+}
+
+export const [injectAnalyticsDashboardContext, provideAnalyticsDashboardContext] =
+	createContext<AnalyticsDashboardContextValue>('AnalyticsDashboard')
+
+function buildPreviousFetchRequest(
+	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+): Labrinth.Analytics.v3.FetchRequest | null {
+	if (!isAnalyticsFetchRequestReady(fetchRequest)) {
+		return null
+	}
+
+	const startTimestamp = new Date(fetchRequest.time_range.start).getTime()
+	const endTimestamp = new Date(fetchRequest.time_range.end).getTime()
+	const duration = endTimestamp - startTimestamp
+
+	if (!Number.isFinite(duration) || duration <= 0) {
+		return null
+	}
+
+	const previousEnd = new Date(startTimestamp)
+	const previousStart = new Date(startTimestamp - duration)
+
+	return {
+		time_range: {
+			start: previousStart.toISOString(),
+			end: previousEnd.toISOString(),
+			resolution: fetchRequest.time_range.resolution,
+		},
+		return_metrics: fetchRequest.return_metrics,
+		project_ids: fetchRequest.project_ids,
+	}
+}
+
+function isAnalyticsFetchRequestReady(
+	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+): fetchRequest is AnalyticsProjectFetchRequest {
+	return Array.isArray(fetchRequest?.project_ids) && fetchRequest.project_ids.length > 0
+}
+
+function areAnalyticsFetchRequestsEqual(
+	left: Labrinth.Analytics.v3.FetchRequest | null,
+	right: Labrinth.Analytics.v3.FetchRequest,
+): boolean {
+	return JSON.stringify(left) === JSON.stringify(right)
+}
+
+function getPercentChange(currentValue: number, previousValue: number): number {
+	if (previousValue === 0) {
+		if (currentValue === 0) {
+			return 0
+		}
+		return 100
+	}
+
+	return ((currentValue - previousValue) / previousValue) * 100
+}
+
+function computeTotals(
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+	selectedProjectIds: Set<string>,
+	availableProjectIds: Set<string>,
+	filters: AnalyticsSelectedFilters,
+): AnalyticsDashboardTotals {
+	const totals: AnalyticsDashboardTotals = {
+		views: 0,
+		downloads: 0,
+		revenue: 0,
+		playtime: 0,
+	}
+
+	if (availableProjectIds.size === 0) {
+		return totals
+	}
+
+	const effectiveProjectIds = selectedProjectIds.size > 0 ? selectedProjectIds : availableProjectIds
+
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!('source_project' in dataPoint)) {
+				continue
+			}
+
+			if (!effectiveProjectIds.has(dataPoint.source_project)) {
+				continue
+			}
+
+			if (!doesAnalyticsPointMatchFilters(dataPoint, filters)) {
+				continue
+			}
+
+			switch (dataPoint.metric_kind) {
+				case 'views':
+					totals.views += dataPoint.views
+					break
+				case 'downloads':
+					totals.downloads += dataPoint.downloads
+					break
+				case 'playtime':
+					totals.playtime += dataPoint.seconds
+					break
+				case 'revenue': {
+					const value = Number.parseFloat(dataPoint.revenue)
+					totals.revenue += Number.isFinite(value) ? value : 0
+					break
+				}
+			}
+		}
+	}
+
+	return totals
+}
+
+function isServerProject(project: ProjectTypeMetadata): boolean {
+	if (project.project_type === MINECRAFT_JAVA_SERVER_PROJECT_TYPE) {
+		return true
+	}
+
+	return project.project_types?.includes(MINECRAFT_JAVA_SERVER_PROJECT_TYPE) ?? false
+}
+
+function sortStringValues(values: string[]): string[] {
+	return [...values].sort((left, right) => left.localeCompare(right))
+}
+
+function getCountryFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
+	const countries = new Set<string>()
+
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!('source_project' in dataPoint)) {
+				continue
+			}
+
+			if (
+				(dataPoint.metric_kind === 'views' || dataPoint.metric_kind === 'downloads') &&
+				dataPoint.country
+			) {
+				const country = dataPoint.country.trim().toUpperCase()
+				if (country.length > 0) {
+					countries.add(country)
+				}
+			}
+		}
+	}
+
+	return sortStringValues([...countries])
+}
+
+function getDownloadSourceFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
+	const downloadSources = new Set<string>()
+
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!('source_project' in dataPoint)) {
+				continue
+			}
+
+			if (dataPoint.metric_kind === 'downloads' && dataPoint.domain) {
+				const downloadSource = dataPoint.domain.trim()
+				if (downloadSource.length > 0) {
+					downloadSources.add(downloadSource)
+				}
+			}
+		}
+	}
+
+	return sortStringValues([...downloadSources])
+}
+
+function addVersionIdsFromTimeSlices(
+	versionIds: Set<string>,
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+) {
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!('source_project' in dataPoint)) {
+				continue
+			}
+
+			if (
+				(dataPoint.metric_kind === 'downloads' || dataPoint.metric_kind === 'playtime') &&
+				dataPoint.version_id
+			) {
+				const versionId = dataPoint.version_id.trim()
+				if (versionId.length > 0) {
+					versionIds.add(versionId)
+				}
+			}
+		}
+	}
+}
+
+export function doesAnalyticsPointMatchFilters(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+	filters: AnalyticsSelectedFilters,
+): boolean {
+	return (
+		doesAnalyticsPointMatchFilter(dataPoint, filters.country, getCountryFilterValue) &&
+		doesAnalyticsPointMatchFilter(dataPoint, filters.monetization, getMonetizationFilterValue) &&
+		doesAnalyticsPointMatchFilter(
+			dataPoint,
+			filters.download_source,
+			getDownloadSourceFilterValue,
+		) &&
+		doesAnalyticsPointMatchFilter(dataPoint, filters.version_id, getVersionFilterValue) &&
+		doesAnalyticsPointMatchFilter(dataPoint, filters.game_version, getGameVersionFilterValue) &&
+		doesAnalyticsPointMatchFilter(dataPoint, filters.loader_type, getLoaderFilterValue)
+	)
+}
+
+function doesAnalyticsPointMatchFilter(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+	filterValues: string[],
+	getPointValue: (dataPoint: Labrinth.Analytics.v3.ProjectAnalytics) => string | null | undefined,
+): boolean {
+	if (filterValues.length === 0) {
+		return true
+	}
+
+	const pointValue = getPointValue(dataPoint)
+	if (pointValue === undefined) {
+		return true
+	}
+	if (pointValue === null) {
+		return false
+	}
+
+	const normalizedPointValue = pointValue.trim().toLowerCase()
+	return filterValues.some((value) => value.trim().toLowerCase() === normalizedPointValue)
+}
+
+function getCountryFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
+	if (dataPoint.metric_kind !== 'views' && dataPoint.metric_kind !== 'downloads') {
+		return undefined
+	}
+
+	return dataPoint.country ?? null
+}
+
+function getMonetizationFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
+	if (dataPoint.metric_kind !== 'views') {
+		return undefined
+	}
+	if (typeof dataPoint.monetized !== 'boolean') {
+		return null
+	}
+
+	return dataPoint.monetized ? 'monetized' : 'unmonetized'
+}
+
+function getDownloadSourceFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
+	if (dataPoint.metric_kind !== 'downloads') {
+		return undefined
+	}
+
+	return dataPoint.domain ?? null
+}
+
+function getVersionFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
+	if (dataPoint.metric_kind !== 'downloads' && dataPoint.metric_kind !== 'playtime') {
+		return undefined
+	}
+
+	return dataPoint.version_id ?? null
+}
+
+function getGameVersionFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
+	if (dataPoint.metric_kind !== 'playtime') {
+		return undefined
+	}
+
+	return dataPoint.game_version ?? null
+}
+
+function getLoaderFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
+	if (dataPoint.metric_kind !== 'playtime') {
+		return undefined
+	}
+
+	return dataPoint.loader ?? null
+}
+
+export function createAnalyticsDashboardContext(
+	options: CreateAnalyticsDashboardContextOptions,
+): AnalyticsDashboardContextValue {
+	const client = injectModrinthClient()
+	const route = useRoute()
+	const router = useRouter()
+	const generatedState = useGeneratedState()
+	const initialQueryState = readAnalyticsQueryBuilderState(route.query, [])
+
+	const activeStat = ref<AnalyticsDashboardStat>('views')
+	const selectedProjectIds = ref<string[]>(initialQueryState.selectedProjectIds)
+	const selectedTimeframeMode = ref<AnalyticsTimeframeMode>(initialQueryState.selectedTimeframeMode)
+	const selectedTimeframe = ref<AnalyticsTimeframePreset>(initialQueryState.selectedTimeframe)
+	const selectedLastTimeframeAmount = ref<number>(initialQueryState.selectedLastTimeframeAmount)
+	const selectedLastTimeframeUnit = ref<AnalyticsLastTimeframeUnit>(
+		initialQueryState.selectedLastTimeframeUnit,
+	)
+	const selectedCustomTimeframeStartDate = ref<string>(
+		initialQueryState.selectedCustomTimeframeStartDate,
+	)
+	const selectedCustomTimeframeEndDate = ref<string>(
+		initialQueryState.selectedCustomTimeframeEndDate,
+	)
+	const selectedGroupBy = ref<AnalyticsGroupByPreset>(initialQueryState.selectedGroupBy)
+	const selectedBreakdown = ref<AnalyticsBreakdownPreset>(initialQueryState.selectedBreakdown)
+	const selectedFilters = ref<AnalyticsSelectedFilters>(initialQueryState.selectedFilters)
+	const queryRefreshTimestamp = ref(Date.now())
+	const fetchRequest = ref<Labrinth.Analytics.v3.FetchRequest | null>(null)
+
+	const hasProjectContext = computed(() => Boolean(options.projectPageContext))
+	const hasOrganizationContext = computed(
+		() => !hasProjectContext.value && Boolean(options.organizationContext),
+	)
+
+	const { data: userProjects } = useQuery({
+		queryKey: computed(() => ['analytics', 'dashboard', options.auth.value?.user?.id, 'projects']),
+		queryFn: () => client.labrinth.users_v2.getProjects(options.auth.value.user?.id ?? ''),
+		enabled: computed(
+			() =>
+				Boolean(options.auth.value.user?.id) &&
+				!hasProjectContext.value &&
+				!hasOrganizationContext.value,
+		),
+		placeholderData: [],
+	})
+
+	const projects = computed<AnalyticsDashboardProject[]>(() => {
+		if (hasProjectContext.value && options.projectPageContext) {
+			const project = options.projectPageContext.projectV2.value
+			return project && !isServerProject(project)
+				? [{ id: project.id, name: project.title, downloads: project.downloads ?? 0 }]
+				: []
+		}
+
+		if (hasOrganizationContext.value && options.organizationContext?.projects.value) {
+			return options.organizationContext.projects.value
+				.filter((project) => !isServerProject(project))
+				.map((project) => ({
+					id: project.id,
+					name: project.name,
+					downloads: project.downloads ?? 0,
+				}))
+		}
+
+		return (userProjects.value ?? [])
+			.filter((project) => !isServerProject(project))
+			.map((project) => ({
+				id: project.id,
+				name: project.title,
+				downloads: project.downloads ?? 0,
+			}))
+	})
+
+	const availableProjectIds = computed(() => projects.value.map((project) => project.id))
+	const sortedSelectedProjectIds = computed(() => sortStringValues(selectedProjectIds.value))
+
+	function getRelevantAnalyticsDashboardStats(
+		breakdown: AnalyticsBreakdownPreset,
+		filters: AnalyticsSelectedFilters = selectedFilters.value,
+	): readonly AnalyticsDashboardStat[] {
+		return getEnabledAnalyticsStatsForState(breakdown, filters)
+	}
+
+	function isAnalyticsDashboardStatRelevant(
+		stat: AnalyticsDashboardStat,
+		breakdown: AnalyticsBreakdownPreset,
+		filters: AnalyticsSelectedFilters = selectedFilters.value,
+	): boolean {
+		return getRelevantAnalyticsDashboardStats(breakdown, filters).includes(stat)
+	}
+
+	watch(
+		[selectedBreakdown, selectedFilters, activeStat],
+		([nextBreakdown, nextFilters, nextActiveStat]) => {
+			if (isAnalyticsDashboardStatRelevant(nextActiveStat, nextBreakdown, nextFilters)) {
+				return
+			}
+
+			const fallbackStat = getRelevantAnalyticsDashboardStats(nextBreakdown, nextFilters)[0]
+			if (fallbackStat && fallbackStat !== nextActiveStat) {
+				activeStat.value = fallbackStat
+			}
+		},
+		{ deep: true, immediate: true },
+	)
+
+	watch(
+		[selectedBreakdown, selectedFilters],
+		([nextBreakdown, nextFilters]) => {
+			const sanitizedFilters = sanitizeAnalyticsSelectedFilters(nextBreakdown, nextFilters)
+			if (!areSelectedFiltersEqual(nextFilters, sanitizedFilters)) {
+				selectedFilters.value = sanitizedFilters
+			}
+		},
+		{ deep: true, immediate: true },
+	)
+
+	watch(
+		projects,
+		(nextProjects) => {
+			if (nextProjects.length === 0) {
+				return
+			}
+
+			const availableProjectIds = new Set(nextProjects.map((project) => project.id))
+			const retainedSelection = selectedProjectIds.value.filter((id) => availableProjectIds.has(id))
+
+			selectedProjectIds.value =
+				retainedSelection.length > 0 ? retainedSelection : nextProjects.map((project) => project.id)
+		},
+		{ immediate: true },
+	)
+
+	watch(
+		() => route.query,
+		(nextQuery) => {
+			const nextQueryState = readAnalyticsQueryBuilderState(nextQuery, availableProjectIds.value)
+			const nextSelectedFilters = sanitizeAnalyticsSelectedFilters(
+				nextQueryState.selectedBreakdown,
+				nextQueryState.selectedFilters,
+			)
+
+			if (!areStringArraysEqual(selectedProjectIds.value, nextQueryState.selectedProjectIds)) {
+				selectedProjectIds.value = nextQueryState.selectedProjectIds
+			}
+			if (selectedTimeframeMode.value !== nextQueryState.selectedTimeframeMode) {
+				selectedTimeframeMode.value = nextQueryState.selectedTimeframeMode
+			}
+			if (selectedTimeframe.value !== nextQueryState.selectedTimeframe) {
+				selectedTimeframe.value = nextQueryState.selectedTimeframe
+			}
+			if (selectedLastTimeframeAmount.value !== nextQueryState.selectedLastTimeframeAmount) {
+				selectedLastTimeframeAmount.value = nextQueryState.selectedLastTimeframeAmount
+			}
+			if (selectedLastTimeframeUnit.value !== nextQueryState.selectedLastTimeframeUnit) {
+				selectedLastTimeframeUnit.value = nextQueryState.selectedLastTimeframeUnit
+			}
+			if (
+				selectedCustomTimeframeStartDate.value !== nextQueryState.selectedCustomTimeframeStartDate
+			) {
+				selectedCustomTimeframeStartDate.value = nextQueryState.selectedCustomTimeframeStartDate
+			}
+			if (selectedCustomTimeframeEndDate.value !== nextQueryState.selectedCustomTimeframeEndDate) {
+				selectedCustomTimeframeEndDate.value = nextQueryState.selectedCustomTimeframeEndDate
+			}
+			if (selectedGroupBy.value !== nextQueryState.selectedGroupBy) {
+				selectedGroupBy.value = nextQueryState.selectedGroupBy
+			}
+			if (selectedBreakdown.value !== nextQueryState.selectedBreakdown) {
+				selectedBreakdown.value = nextQueryState.selectedBreakdown
+			}
+			if (!areSelectedFiltersEqual(selectedFilters.value, nextSelectedFilters)) {
+				selectedFilters.value = nextSelectedFilters
+			}
+		},
+	)
+
+	watch(
+		[
+			selectedProjectIds,
+			selectedTimeframeMode,
+			selectedTimeframe,
+			selectedLastTimeframeAmount,
+			selectedLastTimeframeUnit,
+			selectedCustomTimeframeStartDate,
+			selectedCustomTimeframeEndDate,
+			selectedGroupBy,
+			selectedBreakdown,
+			selectedFilters,
+			availableProjectIds,
+		],
+		() => {
+			if (import.meta.server) {
+				return
+			}
+
+			const nextRouteQuery = buildAnalyticsQueryBuilderRouteQuery(
+				route.query,
+				{
+					selectedProjectIds: selectedProjectIds.value,
+					selectedTimeframeMode: selectedTimeframeMode.value,
+					selectedTimeframe: selectedTimeframe.value,
+					selectedLastTimeframeAmount: selectedLastTimeframeAmount.value,
+					selectedLastTimeframeUnit: selectedLastTimeframeUnit.value,
+					selectedCustomTimeframeStartDate: selectedCustomTimeframeStartDate.value,
+					selectedCustomTimeframeEndDate: selectedCustomTimeframeEndDate.value,
+					selectedGroupBy: selectedGroupBy.value,
+					selectedBreakdown: selectedBreakdown.value,
+					selectedFilters: selectedFilters.value,
+				},
+				availableProjectIds.value,
+			)
+
+			const hasAnalyticsQueryChange = hasAnalyticsQueryBuilderRouteChange(
+				route.query,
+				nextRouteQuery,
+			)
+
+			if (!hasAnalyticsQueryChange) return
+
+			router.replace({
+				path: route.path,
+				query: nextRouteQuery,
+			})
+		},
+		{ deep: true, immediate: true },
+	)
+
+	const {
+		data: currentTimeSliceData,
+		isPending: currentTimeSlicePending,
+		isFetching: currentFetching,
+		refetch: refetchCurrentTimeSlices,
+	} = useQuery({
+		queryKey: computed(() => ['analytics', 'dashboard', 'current', fetchRequest.value]),
+		queryFn: () =>
+			client.labrinth.analytics_v3.fetch(fetchRequest.value as Labrinth.Analytics.v3.FetchRequest),
+		enabled: computed(() => isAnalyticsFetchRequestReady(fetchRequest.value)),
+	})
+
+	const countryAndDownloadSourceFilterOptionsRequest =
+		computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
+			if (sortedSelectedProjectIds.value.length === 0) {
+				return null
+			}
+
+			return {
+				time_range: {
+					start: ANALYTICS_START_TIMESTAMP,
+					end: new Date(queryRefreshTimestamp.value).toISOString(),
+					resolution: {
+						slices: 1,
+					},
+				},
+				project_ids: sortedSelectedProjectIds.value,
+				return_metrics: {
+					project_views: {
+						bucket_by: ['country'],
+					},
+					project_downloads: {
+						bucket_by: ['country', 'domain'],
+					},
+				},
+			}
+		})
+
+	const { data: countryAndDownloadSourceFilterOptionsData } = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			'filter-options',
+			'countries-download-sources',
+			countryAndDownloadSourceFilterOptionsRequest.value,
+		]),
+		queryFn: () =>
+			client.labrinth.analytics_v3.fetch(
+				countryAndDownloadSourceFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
+			),
+		enabled: computed(() => countryAndDownloadSourceFilterOptionsRequest.value !== null),
+	})
+
+	const { data: filterOptionProjectVersions } = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			'filter-options',
+			'versions',
+			sortedSelectedProjectIds.value,
+		]),
+		queryFn: async () => {
+			const projectVersions = await Promise.all(
+				sortedSelectedProjectIds.value.map((projectId) =>
+					client.labrinth.versions_v3.getProjectVersions(projectId, {
+						include_changelog: false,
+						apiVersion: 3,
+					}),
+				),
+			)
+
+			return projectVersions.flat()
+		},
+		enabled: computed(() => sortedSelectedProjectIds.value.length > 0),
+		placeholderData: [],
+	})
+
+	const filterOptions = computed<AnalyticsDashboardFilterOptions>(() => ({
+		countries: getCountryFilterOptions(countryAndDownloadSourceFilterOptionsData.value ?? []),
+		downloadSources: getDownloadSourceFilterOptions(
+			countryAndDownloadSourceFilterOptionsData.value ?? [],
+		),
+		gameVersions: generatedState.value.gameVersions.map((gameVersion) => gameVersion.version),
+		loaderTypes: ANALYTICS_LOADER_TYPES,
+		versionIds: sortStringValues([
+			...new Set((filterOptionProjectVersions.value ?? []).map((version) => version.id)),
+		]),
+	}))
+
+	const filterOptionProjectVersionIds = computed(
+		() => new Set((filterOptionProjectVersions.value ?? []).map((version) => version.id)),
+	)
+
+	const previousFetchRequest = computed(() => buildPreviousFetchRequest(fetchRequest.value))
+
+	const {
+		data: previousTimeSliceData,
+		isPending: previousTimeSlicePending,
+		isFetching: previousFetching,
+		refetch: refetchPreviousTimeSlices,
+	} = useQuery({
+		queryKey: computed(() => ['analytics', 'dashboard', 'previous', previousFetchRequest.value]),
+		queryFn: () =>
+			client.labrinth.analytics_v3.fetch(
+				previousFetchRequest.value as Labrinth.Analytics.v3.FetchRequest,
+			),
+		enabled: computed(() => previousFetchRequest.value !== null),
+	})
+
+	const timeSlices = ref<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const previousTimeSlices = ref<Labrinth.Analytics.v3.TimeSlice[]>([])
+
+	watch(
+		currentTimeSliceData,
+		(nextTimeSlices) => {
+			if (nextTimeSlices === undefined) {
+				return
+			}
+			timeSlices.value = nextTimeSlices
+		},
+		{ immediate: true },
+	)
+
+	watch(
+		previousTimeSliceData,
+		(nextTimeSlices) => {
+			previousTimeSlices.value = nextTimeSlices ?? []
+		},
+		{ immediate: true },
+	)
+
+	watch(fetchRequest, (nextFetchRequest) => {
+		if (isAnalyticsFetchRequestReady(nextFetchRequest)) {
+			return
+		}
+		timeSlices.value = []
+		previousTimeSlices.value = []
+	})
+
+	const analyticsVersionIds = computed(() => {
+		const versionIds = new Set<string>()
+		for (const versionId of selectedFilters.value.version_id) {
+			const normalizedVersionId = versionId.trim()
+			if (normalizedVersionId.length > 0) {
+				versionIds.add(normalizedVersionId)
+			}
+		}
+
+		addVersionIdsFromTimeSlices(versionIds, timeSlices.value)
+		addVersionIdsFromTimeSlices(versionIds, previousTimeSlices.value)
+
+		for (const versionId of filterOptionProjectVersionIds.value) {
+			versionIds.delete(versionId)
+		}
+
+		return sortStringValues([...versionIds])
+	})
+
+	const { data: versions } = useQuery({
+		queryKey: computed(() => ['analytics', 'dashboard', 'versions', analyticsVersionIds.value]),
+		queryFn: () =>
+			fetchSegmentedWith(analyticsVersionIds.value, (ids) =>
+				client.labrinth.versions_v3.getVersions(ids),
+			),
+		enabled: computed(() => analyticsVersionIds.value.length > 0),
+		placeholderData: [],
+	})
+
+	const allVersionMetadata = computed(() => {
+		const versionsById = new Map<string, Labrinth.Versions.v3.Version>()
+		for (const version of filterOptionProjectVersions.value ?? []) {
+			versionsById.set(version.id, version)
+		}
+		for (const version of versions.value ?? []) {
+			versionsById.set(version.id, version)
+		}
+		return [...versionsById.values()]
+	})
+
+	const versionNumbersById = computed(
+		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.version_number])),
+	)
+	const versionPublishedDatesById = computed(
+		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.date_published])),
+	)
+	const gameVersionDownloadsByVersion = computed(() => {
+		const downloadsByVersion = new Map<string, number>()
+
+		for (const version of allVersionMetadata.value) {
+			for (const gameVersion of version.game_versions) {
+				const normalizedGameVersion = gameVersion.trim()
+				if (normalizedGameVersion.length === 0) {
+					continue
+				}
+
+				downloadsByVersion.set(
+					normalizedGameVersion,
+					(downloadsByVersion.get(normalizedGameVersion) ?? 0) + version.downloads,
+				)
+			}
+		}
+
+		return downloadsByVersion
+	})
+
+	const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
+	const availableProjectIdSet = computed(() => new Set(availableProjectIds.value))
+
+	const currentTotals = computed<AnalyticsDashboardTotals>(() =>
+		computeTotals(
+			timeSlices.value,
+			selectedProjectIdSet.value,
+			availableProjectIdSet.value,
+			selectedFilters.value,
+		),
+	)
+	const previousTotals = computed<AnalyticsDashboardTotals>(() =>
+		computeTotals(
+			previousTimeSlices.value,
+			selectedProjectIdSet.value,
+			availableProjectIdSet.value,
+			selectedFilters.value,
+		),
+	)
+
+	const percentChanges = computed<AnalyticsDashboardPercentChanges>(() => ({
+		views: getPercentChange(currentTotals.value.views, previousTotals.value.views),
+		downloads: getPercentChange(currentTotals.value.downloads, previousTotals.value.downloads),
+		revenue: getPercentChange(currentTotals.value.revenue, previousTotals.value.revenue),
+		playtime: getPercentChange(currentTotals.value.playtime, previousTotals.value.playtime),
+	}))
+
+	const isLoading = computed(() => currentTimeSlicePending.value || previousTimeSlicePending.value)
+	const isRefetching = computed(() => currentFetching.value || previousFetching.value)
+
+	async function refreshAnalyticsQuery() {
+		if (fetchRequest.value === null) {
+			return
+		}
+
+		const fetchRequestKey = JSON.stringify(fetchRequest.value)
+		const now = Date.now()
+		queryRefreshTimestamp.value =
+			now > queryRefreshTimestamp.value ? now : queryRefreshTimestamp.value + 1
+		await nextTick()
+
+		if (fetchRequest.value === null || JSON.stringify(fetchRequest.value) !== fetchRequestKey) {
+			return
+		}
+
+		const refetches = [refetchCurrentTimeSlices()]
+		if (previousFetchRequest.value !== null) {
+			refetches.push(refetchPreviousTimeSlices())
+		}
+
+		await Promise.all(refetches)
+	}
+
+	function setFetchRequest(nextFetchRequest: Labrinth.Analytics.v3.FetchRequest) {
+		if (areAnalyticsFetchRequestsEqual(fetchRequest.value, nextFetchRequest)) {
+			return
+		}
+
+		fetchRequest.value = nextFetchRequest
+	}
+
+	function getVersionDisplayName(versionId: string): string {
+		return versionNumbersById.value.get(versionId) ?? versionId
+	}
+
+	function getVersionPublishedDate(versionId: string): string | undefined {
+		return versionPublishedDatesById.value.get(versionId)
+	}
+
+	function setActiveStat(nextStat: AnalyticsDashboardStat) {
+		if (
+			!isAnalyticsDashboardStatRelevant(nextStat, selectedBreakdown.value, selectedFilters.value)
+		) {
+			return
+		}
+
+		activeStat.value = nextStat
+	}
+
+	return {
+		projects,
+		selectedProjectIds,
+		selectedTimeframeMode,
+		selectedTimeframe,
+		selectedLastTimeframeAmount,
+		selectedLastTimeframeUnit,
+		selectedCustomTimeframeStartDate,
+		selectedCustomTimeframeEndDate,
+		selectedGroupBy,
+		selectedBreakdown,
+		selectedFilters,
+		queryRefreshTimestamp,
+		fetchRequest,
+		filterOptions,
+		versionNumbersById,
+		versionPublishedDatesById,
+		gameVersionDownloadsByVersion,
+		timeSlices,
+		previousTimeSlices,
+		isLoading,
+		isRefetching,
+		activeStat,
+		currentTotals,
+		previousTotals,
+		percentChanges,
+		getRelevantAnalyticsDashboardStats,
+		isAnalyticsDashboardStatRelevant,
+		refreshAnalyticsQuery,
+		getVersionDisplayName,
+		getVersionPublishedDate,
+		setFetchRequest,
+		setActiveStat,
+	}
+}

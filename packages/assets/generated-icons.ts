@@ -45,6 +45,9 @@ import _CalendarArrowDownIcon from './icons/calendar-arrow-down.svg?component'
 import _CardIcon from './icons/card.svg?component'
 import _ChangeSkinIcon from './icons/change-skin.svg?component'
 import _ChartIcon from './icons/chart.svg?component'
+import _ChartAreaIcon from './icons/chart-area.svg?component'
+import _ChartColumnBigIcon from './icons/chart-column-big.svg?component'
+import _ChartSplineIcon from './icons/chart-spline.svg?component'
 import _CheckIcon from './icons/check.svg?component'
 import _CheckCheckIcon from './icons/check-check.svg?component'
 import _CheckCircleIcon from './icons/check-circle.svg?component'
@@ -178,6 +181,7 @@ import _PaintbrushIcon from './icons/paintbrush.svg?component'
 import _PaletteIcon from './icons/palette.svg?component'
 import _PencilIcon from './icons/pencil.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
+import _PinIcon from './icons/pin.svg?component'
 import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
@@ -368,6 +372,8 @@ import _ToggleRightIcon from './icons/toggle-right.svg?component'
 import _TransferIcon from './icons/transfer.svg?component'
 import _TrashIcon from './icons/trash.svg?component'
 import _TrashExclamationIcon from './icons/trash-exclamation.svg?component'
+import _TrendingDownIcon from './icons/trending-down.svg?component'
+import _TrendingUpIcon from './icons/trending-up.svg?component'
 import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
 import _UnderlineIcon from './icons/underline.svg?component'
 import _UndoIcon from './icons/undo.svg?component'
@@ -435,6 +441,9 @@ export const CalendarArrowDownIcon = _CalendarArrowDownIcon
 export const CardIcon = _CardIcon
 export const ChangeSkinIcon = _ChangeSkinIcon
 export const ChartIcon = _ChartIcon
+export const ChartAreaIcon = _ChartAreaIcon
+export const ChartColumnBigIcon = _ChartColumnBigIcon
+export const ChartSplineIcon = _ChartSplineIcon
 export const CheckIcon = _CheckIcon
 export const CheckCheckIcon = _CheckCheckIcon
 export const CheckCircleIcon = _CheckCircleIcon
@@ -568,6 +577,7 @@ export const PaintbrushIcon = _PaintbrushIcon
 export const PaletteIcon = _PaletteIcon
 export const PencilIcon = _PencilIcon
 export const PickaxeIcon = _PickaxeIcon
+export const PinIcon = _PinIcon
 export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
@@ -758,6 +768,8 @@ export const ToggleRightIcon = _ToggleRightIcon
 export const TransferIcon = _TransferIcon
 export const TrashIcon = _TrashIcon
 export const TrashExclamationIcon = _TrashExclamationIcon
+export const TrendingDownIcon = _TrendingDownIcon
+export const TrendingUpIcon = _TrendingUpIcon
 export const TriangleAlertIcon = _TriangleAlertIcon
 export const UnderlineIcon = _UnderlineIcon
 export const UndoIcon = _UndoIcon

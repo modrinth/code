@@ -1,5 +1,11 @@
 <template>
 	<div class="overflow-hidden rounded-2xl border border-solid border-surface-5">
+		<div
+			v-if="hasHeaderSlot"
+			class="border-solid border-0 border-b border-surface-5 bg-surface-3 p-4"
+		>
+			<slot name="header" />
+		</div>
 		<table class="w-full table-fixed border-separate border-spacing-0 border-surface-5">
 			<thead class="">
 				<tr class="bg-surface-3">
@@ -45,36 +51,50 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr
-					v-for="(row, rowIndex) in data"
-					:key="rowIndex"
-					:class="rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
-				>
-					<td v-if="showSelection" class="w-10 border-solid border-0 border-t border-surface-5">
-						<Checkbox
-							:model-value="isSelected(row)"
-							class="shrink-0 p-4"
-							@update:model-value="toggleSelection(row)"
-						/>
-					</td>
+				<tr v-if="data.length === 0" class="bg-surface-2">
 					<td
-						v-for="column in columns"
-						:key="column.key"
-						class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-5"
-						:class="`text-${column.align ?? 'left'}`"
-						:style="column.width ? { width: column.width } : undefined"
+						:colspan="Math.max(columns.length + (showSelection ? 1 : 0), 1)"
+						class="border-solid border-0 border-t border-surface-5 p-0"
 					>
-						<slot
-							:name="`cell-${column.key}`"
-							:row="row"
-							:value="row[column.key]"
-							:column="column"
-							:index="rowIndex"
-						>
-							{{ row[column.key] ?? '' }}
+						<slot name="empty-state">
+							<div class="text-secondary flex h-64 items-center justify-center">
+								No data available.
+							</div>
 						</slot>
 					</td>
 				</tr>
+				<template v-else>
+					<tr
+						v-for="(row, rowIndex) in data"
+						:key="rowIndex"
+						:class="rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
+					>
+						<td v-if="showSelection" class="w-10 border-solid border-0 border-t border-surface-5">
+							<Checkbox
+								:model-value="isSelected(row)"
+								class="shrink-0 p-4"
+								@update:model-value="toggleSelection(row)"
+							/>
+						</td>
+						<td
+							v-for="column in columns"
+							:key="column.key"
+							class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-5"
+							:class="`text-${column.align ?? 'left'}`"
+							:style="column.width ? { width: column.width } : undefined"
+						>
+							<slot
+								:name="`cell-${column.key}`"
+								:row="row"
+								:value="row[column.key]"
+								:column="column"
+								:index="rowIndex"
+							>
+								{{ row[column.key] ?? '' }}
+							</slot>
+						</td>
+					</tr>
+				</template>
 			</tbody>
 		</table>
 	</div>
@@ -86,7 +106,7 @@
 	generic="K extends string = string, T extends Record<string, unknown> = Record<K, unknown>"
 >
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
 
 import Checkbox from './Checkbox.vue'
 
@@ -125,6 +145,8 @@ const props = withDefaults(
 const selectedIds = defineModel<unknown[]>('selectedIds', { default: () => [] })
 const sortColumn = defineModel<string | undefined>('sortColumn')
 const sortDirection = defineModel<SortDirection>('sortDirection', { default: 'asc' })
+const slots = useSlots()
+const hasHeaderSlot = computed(() => Boolean(slots.header))
 
 const emit = defineEmits<{
 	sort: [column: string, direction: SortDirection]
