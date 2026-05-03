@@ -56,15 +56,15 @@ jobs:
         platform:
           [
             blacksmith-6vcpu-macos-26,
-            blacksmith-8vcpu-windows-2025,
-            blacksmith-8vcpu-ubuntu-2404,
+            blacksmith-4vcpu-windows-2025,
+            blacksmith-4vcpu-ubuntu-2404,
           ]
         include:
           - platform: blacksmith-6vcpu-macos-26
             artifact-target-name: universal-apple-darwin
-          - platform: blacksmith-8vcpu-windows-2025
+          - platform: blacksmith-4vcpu-windows-2025
             artifact-target-name: x86_64-pc-windows-msvc
-          - platform: blacksmith-8vcpu-ubuntu-2404
+          - platform: blacksmith-4vcpu-ubuntu-2404
             artifact-target-name: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
