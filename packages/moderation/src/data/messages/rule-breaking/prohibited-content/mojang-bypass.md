@@ -1,0 +1,1 @@
+- Content bypassing restrictions placed by Mojang to prevent users from joining certain in-game servers (1.12)

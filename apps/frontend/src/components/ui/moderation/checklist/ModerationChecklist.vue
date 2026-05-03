@@ -1731,16 +1731,43 @@ async function processAction(
 		const multiSelectAction = action as MultiSelectChipsAction
 		const selectedIndices = state.value as Set<number>
 
-		for (const index of selectedIndices) {
-			const option = multiSelectAction.options[index]
-			if (option && 'message' in option && 'weight' in option) {
-				const message = (await option.message()) as string
+		if (multiSelectAction.joinWith !== undefined) {
+			const parts: { weight: number; content: string }[] = []
+			for (const index of selectedIndices) {
+				const option = multiSelectAction.options[index]
+				if (option && 'message' in option && 'weight' in option) {
+					parts.push({
+						weight: option.weight,
+						content: processMessage(
+							(await option.message()) as string,
+							action,
+							stageIndex,
+							textInputValues.value,
+						),
+					})
+				}
+			}
+			if (parts.length > 0) {
+				parts.sort((a, b) => a.weight - b.weight)
 				messageParts.push({
-					weight: option.weight,
-					content: processMessage(message, action, stageIndex, textInputValues.value),
-					actionId: `${actionId}-option-${index}`,
+					weight: parts[0].weight,
+					content: parts.map((p) => p.content.trim()).join(multiSelectAction.joinWith),
+					actionId: `${actionId}-combined`,
 					stageIndex,
 				})
+			}
+		} else {
+			for (const index of selectedIndices) {
+				const option = multiSelectAction.options[index]
+				if (option && 'message' in option && 'weight' in option) {
+					const message = (await option.message()) as string
+					messageParts.push({
+						weight: option.weight,
+						content: processMessage(message, action, stageIndex, textInputValues.value),
+						actionId: `${actionId}-option-${index}`,
+						stageIndex,
+					})
+				}
 			}
 		}
 	}

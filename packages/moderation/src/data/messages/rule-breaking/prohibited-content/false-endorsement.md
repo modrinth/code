@@ -1,0 +1,1 @@
+- Content giving a false impression of endorsement by Modrinth or any other person or entity (1.9)
