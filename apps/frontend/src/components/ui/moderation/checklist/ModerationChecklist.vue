@@ -16,9 +16,31 @@
 		:class="{ '!w-fit': collapsed, locked: lockStatus?.locked && !lockStatus?.isOwnLock }"
 	>
 		<div class="flex grow-0 items-center gap-2">
-			<h1 class="m-0 mr-auto flex items-center gap-2 text-2xl font-extrabold text-contrast">
-				<ScaleIcon class="text-orange" />
-				{{ currentStageObj.id ? kebabToTitleCase(currentStageObj.id) : currentStageObj.title }}
+			<h1 class="m-0 mr-auto">
+				<OverflowMenu
+					:options="stageOptions"
+					:disabled="!canOpenStageSelectorFromTitle"
+					placement="center"
+					dropdown-class="title-stage-selector-dropdown"
+					:class="{ 'title-stage-selector-disabled': !canOpenStageSelectorFromTitle }"
+					class="bg-transparent p-0"
+				>
+					<span
+						class="inline-flex items-center gap-2 text-2xl font-extrabold text-contrast"
+						:class="{
+							'cursor-pointer': canOpenStageSelectorFromTitle,
+							'cursor-default': !canOpenStageSelectorFromTitle,
+						}"
+					>
+						<ScaleIcon class="text-orange" />
+						{{ checklistTitleText }}
+					</span>
+
+					<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
+						<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+						{{ opt.text }}
+					</template>
+				</OverflowMenu>
 			</h1>
 			<ButtonStyled circular>
 				<button v-tooltip="`Keyboard shortcuts`" @click="keybindsModal?.show($event)">
@@ -358,6 +380,21 @@
 							</div>
 
 							<div v-else-if="generatedMessage" class="flex items-center gap-2">
+								<OverflowMenu
+									:options="stageOptions"
+									class="bg-transparent p-0"
+								>
+									<ButtonStyled circular>
+										<button v-tooltip="`Stages`">
+											<ListBulletedIcon />
+										</button>
+									</ButtonStyled>
+
+									<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
+										<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+										{{ opt.text }}
+									</template>
+								</OverflowMenu>
 								<ButtonStyled>
 									<button :disabled="loadingModerationDecision" @click="goBackToStages">
 										<LeftArrowIcon aria-hidden="true" />
@@ -1118,6 +1155,21 @@ function findFirstValidStage(): number {
 }
 
 const currentStageObj = computed(() => checklist[currentStage.value])
+const isLockedByOther = computed(() => lockStatus.value?.locked && !lockStatus.value?.isOwnLock)
+const canOpenStageSelectorFromTitle = computed(
+	() =>
+		!alreadyReviewed.value &&
+		!done.value &&
+		!isLockedByOther.value,
+)
+const checklistTitleText = computed(() => {
+	if (alreadyReviewed.value || done.value) return 'Moderation'
+	if (generatedMessage.value) return 'Generated Message'
+
+	return currentStageObj.value.id
+		? kebabToTitleCase(currentStageObj.value.id)
+		: currentStageObj.value.title
+})
 const persistedStage = import.meta.client
 	? await loadChecklistStage(checklistPersistenceProjectSlug)
 	: null
@@ -2303,6 +2355,15 @@ const stageOptionsForSlots = computed(() =>
 			opacity: 1;
 			transform: translateY(0);
 		}
+	}
+
+	:deep(.title-stage-selector-dropdown .v-popper__inner) {
+		max-height: min(70vh, 28rem) !important;
+		overflow-y: auto;
+	}
+
+	:deep(.title-stage-selector-disabled > button) {
+		cursor: default;
 	}
 }
 </style>
