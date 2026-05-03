@@ -274,10 +274,7 @@
 				</div>
 			</div>
 
-			<div
-				v-if="!isServerProject && flags.projectMonetizationToggle"
-				class="mt-4 flex flex-col gap-2"
-			>
+			<div v-if="!isServerProject" class="mt-4 flex flex-col gap-2">
 				<div class="grid grid-cols-[1fr_auto] items-center gap-6">
 					<label for="project-monetization-toggle">
 						<span class="mb-1 block text-lg font-semibold text-contrast">Monetization</span>
