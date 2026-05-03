@@ -1,1 +1,1 @@
-- Sexually explicit or pornographic material, or content promoting violence or discrimination based on race, sex, gender, religion, nationality, disability, sexual orientation, or age (1.2)
+- 1.2: Sexually explicit or pornographic material, or content promoting violence or discrimination based on race, sex, gender, religion, nationality, disability, sexual orientation, or age

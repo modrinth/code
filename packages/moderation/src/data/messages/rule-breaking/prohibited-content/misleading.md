@@ -1,1 +1,1 @@
-- Intentionally wrong or misleading claims (1.7)
+- 1.7: Intentionally wrong or misleading claims

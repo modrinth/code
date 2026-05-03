@@ -1,1 +1,1 @@
-- Excessive profanity (1.10)
+- 1.10: Excessive profanity
