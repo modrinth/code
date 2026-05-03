@@ -1470,7 +1470,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<h3 class="text-base text-primary font-medium m-0">Playing as</h3>
 						<suspense>
-							<AccountsCard ref="accounts" mode="small" />
+							<AccountsCard ref="accounts" />
 						</suspense>
 					</div>
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
