@@ -130,7 +130,9 @@ const dismiss = (id: string | number) => popupNotificationManager.removeNotifica
 
 function handleButtonClick(id: string | number, btn: PopupNotificationButton) {
 	btn.action()
-	popupNotificationManager.removeNotification(id)
+	if (!btn.keepOpen) {
+		popupNotificationManager.removeNotification(id)
+	}
 }
 
 function progressColorForType(type: PopupNotification['type']) {

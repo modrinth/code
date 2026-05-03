@@ -920,6 +920,7 @@ async function checkUpdates() {
 						{
 							label: formatMessage(updatePopupMessages.changelog),
 							action: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+							keepOpen: true,
 						},
 					],
 				})
@@ -1002,6 +1003,7 @@ async function downloadUpdate(versionToDownload) {
 					{
 						label: formatMessage(updatePopupMessages.changelog),
 						action: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+						keepOpen: true,
 					},
 				],
 			})
