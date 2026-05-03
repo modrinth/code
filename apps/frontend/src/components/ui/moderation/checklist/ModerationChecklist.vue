@@ -257,10 +257,10 @@
 										<div class="mb-2 font-semibold">{{ action.label }}</div>
 										<div class="flex flex-wrap gap-2">
 											<ButtonStyled
-												v-for="(option, optIndex) in getVisibleMultiSelectOptions(action)"
-												:key="`${getActionId(action)}-chip-${optIndex}`"
-												:color="isChipSelected(action, optIndex) ? 'brand' : 'standard'"
-												@click="toggleChip(action, optIndex)"
+															v-for="(option, optIndex) in getVisibleMultiSelectOptions(action)"
+															:key="getMultiSelectOptionKey(action, option, optIndex)"
+															:color="isChipSelected(action, option) ? 'brand' : 'standard'"
+															@click="toggleChip(action, option)"
 											>
 												<button>
 													{{ option.label }}
@@ -459,13 +459,20 @@ import {
 	ToggleRightIcon,
 	XIcon,
 } from '@modrinth/assets'
+import type {
+	Action,
+	ActionState,
+	ButtonAction,
+	ChecklistActionContext,
+	ConditionalButtonAction,
+	DropdownAction,
+	MultiSelectChipsAction,
+	MultiSelectChipsOption,
+	Stage,
+	ToggleAction,
+} from '@modrinth/moderation'
 import {
-	type Action,
-	type ActionState,
-	type ButtonAction,
 	checklist,
-	type ConditionalButtonAction,
-	type DropdownAction,
 	expandVariables,
 	finalPermissionMessages,
 	findMatchingVariant,
@@ -479,11 +486,9 @@ import {
 	initializeActionState,
 	kebabToTitleCase,
 	keybinds,
-	type MultiSelectChipsAction,
 	processMessage,
-	type Stage,
-	type ToggleAction,
 } from '@modrinth/moderation'
+import type { OverflowMenuOption } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
@@ -495,16 +500,11 @@ import {
 	injectProjectPageContext,
 	MarkdownEditor,
 	OverflowMenu,
-	type OverflowMenuOption,
 	StyledInput,
 	useDebugLogger,
 } from '@modrinth/ui'
-import {
-	type ModerationJudgements,
-	type ModerationModpackItem,
-	type ProjectStatus,
-	renderHighlightedString,
-} from '@modrinth/utils'
+import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from '@modrinth/utils'
+import { renderHighlightedString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computedAsync, useDebounceFn } from '@vueuse/core'
 import type { Component } from 'vue'
@@ -525,7 +525,8 @@ import {
 	saveChecklistTextInputs,
 	saveGeneratedMessageState,
 } from '~/services/moderation-checklist-storage.ts'
-import { type LockAcquireResponse, useModerationQueue } from '~/services/moderation-queue.ts'
+import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
+import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
@@ -541,7 +542,7 @@ const props = defineProps<{
 	collapsed: boolean
 }>()
 
-const { projectV2, projectV3, invalidate } = injectProjectPageContext()
+const { projectV2, projectV3, versions, loadVersions, invalidate } = injectProjectPageContext()
 
 const moderationQueue = useModerationQueue()
 const queryClient = useQueryClient()
@@ -735,6 +736,12 @@ const variables = computed(() => {
 		...flattenProjectV3Variables(projectV3.value),
 	}
 })
+
+const checklistActionContext = computed<ChecklistActionContext>(() => ({
+	project: projectV2.value,
+	projectV3: projectV3.value,
+	versions: versions.value,
+}))
 
 const modpackPermissionsComplete = ref(false)
 const modpackJudgements = ref<ModerationJudgements>({})
@@ -1227,7 +1234,7 @@ function handleKeybinds(event: KeyboardEvent) {
 					if (action && action.type === 'multi-select-chips') {
 						const visibleOptions = getVisibleMultiSelectOptions(action)
 						if (chipIndex < visibleOptions.length) {
-							toggleChip(action, chipIndex)
+							toggleChip(action, visibleOptions[chipIndex])
 						}
 					}
 				},
@@ -1375,6 +1382,16 @@ watch(
 	{ immediate: true },
 )
 
+watch(
+	() => currentStageObj.value.id,
+	(stageId) => {
+		if (stageId === 'versions') {
+			loadVersions()
+		}
+	},
+	{ immediate: true },
+)
+
 function initializeStageActions(stage: Stage, stageIndex: number) {
 	stage.actions.forEach((action, index) => {
 		const actionId = getActionIdForStage(action, stageIndex, index)
@@ -1472,17 +1489,62 @@ const dropdownActions = computed(() =>
 )
 
 const multiSelectActions = computed(() =>
-	visibleActions.value.filter((action) => action.type === 'multi-select-chips'),
+	visibleActions.value.filter(
+		(action) =>
+			action.type === 'multi-select-chips' && getVisibleMultiSelectOptions(action).length > 0,
+	),
 )
+
+function resolveMultiSelectOptions(action: MultiSelectChipsAction) {
+	return typeof action.options === 'function'
+		? action.options(checklistActionContext.value)
+		: action.options
+}
+
+function getMultiSelectOptionId(option: MultiSelectChipsOption): string {
+	return option.id ?? option.label
+}
+
+function getMultiSelectOptionKey(
+	action: MultiSelectChipsAction,
+	option: MultiSelectChipsOption,
+	optionIndex: number,
+) {
+	return `${getActionId(action)}-chip-${getMultiSelectOptionId(option) || optionIndex}`
+}
+
+function getSelectedChipIds(action: MultiSelectChipsAction, state?: ActionState): Set<string> {
+	const selectedValues = state?.value
+	if (!(selectedValues instanceof Set)) {
+		return new Set<string>()
+	}
+
+	const optionIds = new Set<string>()
+	const resolvedOptions = resolveMultiSelectOptions(action)
+
+	for (const selectedValue of selectedValues) {
+		if (typeof selectedValue === 'string') {
+			optionIds.add(selectedValue)
+		} else if (typeof selectedValue === 'number') {
+			const option = resolvedOptions[selectedValue]
+			if (option) {
+				optionIds.add(getMultiSelectOptionId(option))
+			}
+		}
+	}
+
+	return optionIds
+}
 
 function getDropdownValue(action: DropdownAction) {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
 	const visibleOptions = getVisibleDropdownOptions(action)
-	const currentValue = actionStates.value[actionId]?.value ?? action.defaultOption ?? 0
+	const storedValue = actionStates.value[actionId]?.value
+	const currentValue: number = typeof storedValue === 'number' ? storedValue : (action.defaultOption ?? 0)
 
 	const allOptions = action.options
-	const storedOption = allOptions[currentValue]
+	const storedOption = allOptions.at(currentValue)
 
 	if (storedOption && visibleOptions.includes(storedOption)) {
 		return storedOption
@@ -1524,36 +1586,30 @@ function selectDropdownOption(action: DropdownAction, selected: any) {
 	}
 }
 
-function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): boolean {
+
+function isChipSelected(action: MultiSelectChipsAction, option: MultiSelectChipsOption): boolean {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
-	const selectedSet = actionStates.value[actionId]?.value as Set<number> | undefined
-
-	const visibleOptions = getVisibleMultiSelectOptions(action)
-	const visibleOption = visibleOptions[optionIndex]
-	const originalIndex = action.options.findIndex((opt) => opt === visibleOption)
-
-	return selectedSet?.has(originalIndex) || false
+	return getSelectedChipIds(action, actionStates.value[actionId]).has(getMultiSelectOptionId(option))
 }
 
-function toggleChip(action: MultiSelectChipsAction, optionIndex: number) {
+function toggleChip(action: MultiSelectChipsAction, option: MultiSelectChipsOption) {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
 	const state = actionStates.value[actionId]
-	if (state && state.value instanceof Set) {
-		const visibleOptions = getVisibleMultiSelectOptions(action)
-		const visibleOption = visibleOptions[optionIndex]
-		const originalIndex = action.options.findIndex((opt) => opt === visibleOption)
+	if (state) {
+		const selectedOptionIds = getSelectedChipIds(action, state)
+		const optionId = getMultiSelectOptionId(option)
 
-		if (originalIndex !== -1) {
-			if (state.value.has(originalIndex)) {
-				state.value.delete(originalIndex)
-			} else {
-				state.value.add(originalIndex)
-			}
-			state.selected = state.value.size > 0
-			persistState()
+		if (selectedOptionIds.has(optionId)) {
+			selectedOptionIds.delete(optionId)
+		} else {
+			selectedOptionIds.add(optionId)
 		}
+
+		state.value = selectedOptionIds
+		state.selected = selectedOptionIds.size > 0
+		persistState()
 	}
 }
 
@@ -1715,8 +1771,8 @@ async function processAction(
 		})
 	} else if (action.type === 'dropdown') {
 		const dropdownAction = action as DropdownAction
-		const selectedIndex = state.value ?? 0
-		const selectedOption = dropdownAction.options[selectedIndex]
+		const selectedIndex: number = typeof state.value === 'number' ? state.value : 0
+		const selectedOption = dropdownAction.options.at(selectedIndex)
 
 		if (selectedOption && 'message' in selectedOption && 'weight' in selectedOption) {
 			const message = (await selectedOption.message()) as string
@@ -1729,13 +1785,13 @@ async function processAction(
 		}
 	} else if (action.type === 'multi-select-chips') {
 		const multiSelectAction = action as MultiSelectChipsAction
-		const selectedIndices = state.value as Set<number>
+		const visibleOptions = getVisibleMultiSelectOptions(multiSelectAction)
+		const selectedOptionIds = getSelectedChipIds(multiSelectAction, state)
 
 		if (multiSelectAction.joinWith !== undefined) {
 			const parts: { weight: number; content: string }[] = []
-			for (const index of selectedIndices) {
-				const option = multiSelectAction.options[index]
-				if (option && 'message' in option && 'weight' in option) {
+			for (const option of visibleOptions) {
+				if (selectedOptionIds.has(getMultiSelectOptionId(option))) {
 					parts.push({
 						weight: option.weight,
 						content: processMessage(
@@ -1757,14 +1813,13 @@ async function processAction(
 				})
 			}
 		} else {
-			for (const index of selectedIndices) {
-				const option = multiSelectAction.options[index]
-				if (option && 'message' in option && 'weight' in option) {
+			for (const option of visibleOptions) {
+				if (selectedOptionIds.has(getMultiSelectOptionId(option))) {
 					const message = (await option.message()) as string
 					messageParts.push({
 						weight: option.weight,
 						content: processMessage(message, action, stageIndex, textInputValues.value),
-						actionId: `${actionId}-option-${index}`,
+						actionId: `${actionId}-option-${getMultiSelectOptionId(option)}`,
 						stageIndex,
 					})
 				}
@@ -1795,7 +1850,7 @@ function shouldShowStage(stage: Stage): boolean {
 
 function shouldShowAction(action: Action): boolean {
 	if (typeof action.shouldShow === 'function') {
-		return action.shouldShow(projectV2.value, projectV3.value)
+		return action.shouldShow(projectV2.value, projectV3.value, checklistActionContext.value)
 	}
 
 	return true
@@ -1804,16 +1859,16 @@ function shouldShowAction(action: Action): boolean {
 function getVisibleDropdownOptions(action: DropdownAction) {
 	return action.options.filter((option) => {
 		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value, projectV3.value)
+			return option.shouldShow(projectV2.value, projectV3.value, checklistActionContext.value)
 		}
 		return true
 	})
 }
 
 function getVisibleMultiSelectOptions(action: MultiSelectChipsAction) {
-	return action.options.filter((option) => {
+	return resolveMultiSelectOptions(action).filter((option) => {
 		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value, projectV3.value)
+			return option.shouldShow(projectV2.value, projectV3.value, checklistActionContext.value)
 		}
 		return true
 	})
