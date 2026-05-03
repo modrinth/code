@@ -2,14 +2,17 @@ use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
 use crate::models::ids::{ProjectId, VersionId};
+use crate::models::projects::DependencyType;
 use crate::queue::server_ping;
 use crate::routes::ApiError;
 use crate::{database::PgPool, env::ENV};
 use ariadne::ids::base62_impl::parse_base62;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use serde::de::{Error, Visitor};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Value;
+use std::fmt::Formatter;
 use std::{collections::HashMap, str::FromStr};
 use thiserror::Error;
 use utoipa::ToSchema;
@@ -192,6 +195,9 @@ pub enum SearchField {
     ProjectTypes,
     ProjectId,
     OpenSource,
+    RequiredDependencies,
+    OptionalDependencies,
+    Incompatibilities,
     Environment,
     GameVersions,
     ClientSide,
@@ -217,6 +223,89 @@ impl FromStr for SearchBackendKind {
             "typesense" => SearchBackendKind::Typesense,
             _ => return Err(InvalidSearchBackendKind),
         })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Dependency {
+    project: ProjectId,
+    version: Option<VersionId>,
+}
+
+impl Serialize for Dependency {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = match self.version {
+            Some(version) => format!("{}:{}", self.project, version),
+            None => self.project.to_string(),
+        };
+        serializer.serialize_str(&s)
+    }
+}
+
+impl<'de> Deserialize<'de> for Dependency {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        struct DependencyVisitor;
+
+        impl<'de> Visitor<'de> for DependencyVisitor {
+            type Value = Dependency;
+
+            fn expecting(&self, formatter: &mut Formatter) -> std::fmt::Result {
+                formatter
+                    .write_str("a string in the format 'project[:version]'")
+            }
+
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            where
+                E: Error,
+            {
+                let mut parts = v.splitn(2, ":");
+
+                let project = parts
+                    .next()
+                    .and_then(|x| parse_base62(x).ok())
+                    .map(ProjectId)
+                    .ok_or_else(|| E::custom("ProjectId is missing"))?;
+                let version = parts
+                    .next()
+                    .and_then(|x| parse_base62(x).ok())
+                    .map(VersionId);
+
+                Ok(Dependency { project, version })
+            }
+        }
+
+        deserializer.deserialize_str(DependencyVisitor)
+    }
+}
+
+#[derive(Serialize, Deserialize, Default, Debug, Clone)]
+pub struct Dependencies {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub required_dependencies: Vec<Dependency>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub optional_dependencies: Vec<Dependency>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub incompatibilities: Vec<Dependency>,
+}
+
+impl Dependencies {
+    pub fn add_dependency(
+        &mut self,
+        dependency_type: DependencyType,
+        dep: Dependency,
+    ) {
+        match dependency_type {
+            DependencyType::Required => self.required_dependencies.push(dep),
+            DependencyType::Optional => self.optional_dependencies.push(dep),
+            DependencyType::Incompatible => self.incompatibilities.push(dep),
+            _ => {}
+        }
     }
 }
 
@@ -256,6 +345,9 @@ pub struct UploadSearchProject {
     pub version_published_timestamp: i64,
     pub open_source: bool,
     pub color: Option<u32>,
+
+    #[serde(flatten)]
+    pub dependencies: Dependencies,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -304,6 +396,9 @@ pub struct ResultSearchProject {
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
 
+    #[serde(flatten)]
+    pub dependencies: Dependencies,
+
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
     pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
@@ -340,6 +435,7 @@ impl From<UploadSearchProject> for ResultSearchProject {
             gallery: source.gallery,
             featured_gallery: source.featured_gallery,
             color: source.color,
+            dependencies: source.dependencies,
             loaders: source.loaders,
             project_loader_fields: source.project_loader_fields,
             components: source.components,
@@ -362,5 +458,44 @@ pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
             let config = backend::TypesenseConfig::new(meta_namespace);
             Box::new(backend::Typesense::new(config))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Dummy data, no real point in randomly generating them for tests
+    const PROJECT_ID: ProjectId = ProjectId(123456789);
+    const VERSION_ID: VersionId = VersionId(987654321);
+
+    #[test]
+    fn test_dependency_serialize_then_deserialize_with_version() {
+        let dependency = Dependency {
+            project: PROJECT_ID,
+            version: Some(VERSION_ID),
+        };
+
+        let serialized = serde_json::to_string(&dependency).unwrap();
+        let deserialized: Dependency =
+            serde_json::from_str(&serialized).unwrap();
+
+        assert_eq!(dependency.project, deserialized.project);
+        assert_eq!(dependency.version, deserialized.version);
+    }
+
+    #[test]
+    fn test_dependency_serialize_then_deserialize_without_version() {
+        let dependency = Dependency {
+            project: PROJECT_ID,
+            version: None,
+        };
+
+        let serialized = serde_json::to_string(&dependency).unwrap();
+        let deserialized: Dependency =
+            serde_json::from_str(&serialized).unwrap();
+
+        assert_eq!(dependency.project, deserialized.project);
+        assert_eq!(dependency.version, deserialized.version);
     }
 }

@@ -416,6 +416,27 @@ impl SearchField {
                 sort: false,
                 optional: true,
             },
+            SearchField::RequiredDependencies => TypesenseFieldSpec {
+                path: "required_dependencies",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::OptionalDependencies => TypesenseFieldSpec {
+                path: "optional_dependencies",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::Incompatibilities => TypesenseFieldSpec {
+                path: "incompatibilities",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
             SearchField::Environment => TypesenseFieldSpec {
                 path: "environment",
                 ty: "string[]",

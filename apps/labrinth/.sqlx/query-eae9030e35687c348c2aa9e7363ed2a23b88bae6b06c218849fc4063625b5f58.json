@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                d.dependent_id as \"dependent_version_id: DBVersionId\",\n                d.mod_dependency_id as \"dependency_project_id: DBProjectId\",\n                d.dependency_id as \"dependency_version_id: DBVersionId\",\n                d.dependency_type as \"dependency_type: DependencyType\"\n            FROM dependencies d\n            INNER JOIN mods m ON m.id = d.mod_dependency_id\n            WHERE dependent_id = ANY($1) AND dependency_type != 'embedded'\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "dependent_version_id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "dependency_project_id: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "dependency_version_id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "dependency_type: DependencyType",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "eae9030e35687c348c2aa9e7363ed2a23b88bae6b06c218849fc4063625b5f58"
+}
