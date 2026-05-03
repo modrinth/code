@@ -238,9 +238,7 @@ impl ProjectBuilder {
 
         for mut version in self.initial_versions {
             version.project_id = self.project_id;
-            version
-                .insert(transaction, redis, file_host, http)
-                .await?;
+            version.insert(transaction, redis, file_host, http).await?;
         }
 
         LinkUrl::insert_many_projects(

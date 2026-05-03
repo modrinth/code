@@ -1,5 +1,6 @@
 use ariadne::ids::base62_id;
 
+base62_id!(AttributionGroupId);
 base62_id!(ChargeId);
 base62_id!(CollectionId);
 base62_id!(FileId);

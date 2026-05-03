@@ -142,6 +142,7 @@ impl VersionFileBuilder {
     pub async fn insert(
         self,
         version_id: DBVersionId,
+        project_id: DBProjectId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         file_host: &dyn FileHost,
@@ -205,6 +206,7 @@ impl VersionFileBuilder {
             &mut *transaction,
             redis,
             file_host,
+            project_id,
             file_id,
             &self.url,
         )
@@ -270,8 +272,15 @@ impl VersionBuilder {
         } = self;
 
         for file in files {
-            file.insert(version_id, transaction, redis, file_host, http)
-                .await?;
+            file.insert(
+                version_id,
+                self.project_id,
+                transaction,
+                redis,
+                file_host,
+                http,
+            )
+            .await?;
         }
 
         DependencyBuilder::insert_many(

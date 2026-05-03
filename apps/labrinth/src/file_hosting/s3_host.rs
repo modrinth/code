@@ -186,6 +186,11 @@ impl FileHost for S3Host {
             .await
             .map_err(|e| s3_error("reading file", e))?;
 
-        Ok(response.body.collect().await.map_err(|e| s3_error("reading file body", e))?.into_bytes())
+        Ok(response
+            .body
+            .collect()
+            .await
+            .map_err(|e| s3_error("reading file body", e))?
+            .into_bytes())
     }
 }

@@ -781,9 +781,18 @@ async fn upload_file_to_version_inner(
             "At least one file must be specified".to_string(),
         ));
     } else {
+        let project_id = version.inner.project_id;
+
         for file in file_builders {
-            file.insert(version_id, &mut *transaction, &redis, file_host, http)
-                .await?;
+            file.insert(
+                version_id,
+                project_id,
+                &mut *transaction,
+                &redis,
+                file_host,
+                http,
+            )
+            .await?;
         }
     }
 
