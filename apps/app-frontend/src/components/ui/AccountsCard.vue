@@ -1,12 +1,11 @@
 <template>
-	<div v-if="accounts.length === 0" class="flex flex-col gap-3 bg-button-bg border border-solid border-surface-5 rounded-xl p-3 mt-2">
+	<div
+		v-if="accounts.length === 0"
+		class="flex flex-col gap-3 bg-button-bg border border-solid border-surface-5 rounded-xl p-3 mt-2"
+	>
 		<span>{{ formatMessage(messages.notSignedIn) }}</span>
 		<ButtonStyled color="brand">
-			<button
-				color="primary"
-				:disabled="loginDisabled"
-				@click="login()"
-			>
+			<button color="primary" :disabled="loginDisabled" @click="login()">
 				<LogInIcon v-if="!loginDisabled" />
 				<SpinnerIcon v-else class="animate-spin" />
 				{{ formatMessage(messages.signInToMinecraft) }}
@@ -96,7 +95,6 @@ import {
 import {
 	Accordion,
 	Avatar,
-	Button,
 	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
@@ -143,9 +141,7 @@ async function refreshValues() {
 	defaultUser.value = await get_default_user().catch(handleError)
 	const userList = await users().catch(handleError)
 	accounts.value = Array.isArray(userList) ? [...userList] : []
-	accounts.value.sort((a, b) =>
-		(a.profile?.name ?? '').localeCompare(b.profile?.name ?? ''),
-	)
+	accounts.value.sort((a, b) => (a.profile?.name ?? '').localeCompare(b.profile?.name ?? ''))
 
 	try {
 		const skins = await get_available_skins()
@@ -206,7 +202,6 @@ function getAccountAvatarUrl(account: MinecraftCredential) {
 	}
 	return `https://mc-heads.net/avatar/${account.profile.id}/128`
 }
-
 
 async function setAccount(account: MinecraftCredential) {
 	defaultUser.value = account.profile.id
@@ -270,8 +265,8 @@ const messages = defineMessages({
 		defaultMessage: 'Minecraft account',
 	},
 	signInToMinecraft: {
-	    id:'minecraft-account.sign-in',
-	    defaultMessage: 'Sign in to Minecraft'
-	}
+		id: 'minecraft-account.sign-in',
+		defaultMessage: 'Sign in to Minecraft',
+	},
 })
 </script>
