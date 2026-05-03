@@ -17,7 +17,7 @@ pnpm run docs:dev
 
 When ready, you will have a hot-reloading environment of the docs site running on port 4321.
 
-#### Ready to open a PR?
+## Ready to open a PR?
 
 While there is no linting requirement on Docs, we do ask that you quickly check your writing before contributing.
 
