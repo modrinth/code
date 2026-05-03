@@ -26,10 +26,20 @@ jobs:
 
             const sections = ['### Added', '', '### Changed', '', '### Deprecated', '', '### Removed', '', '### Fixed', '', '### Security'].join('\n');
             const productBlock = (name) => `<details>\n<summary>${name}</summary>\n\n${sections}\n\n</details>`;
+            const bakeStatus = [
+              '<!-- changelog:bake-status -->',
+              '> [!NOTE]',
+              '> Changelog bake status:',
+              '> - [ ] App <!-- changelog:product:app -->',
+              '> - [ ] Website <!-- changelog:product:web -->',
+              '> - [ ] Hosting <!-- changelog:product:hosting -->',
+            ].join('\n');
 
             const template = [
               marker,
               '## Pull request changelog',
+              '',
+              bakeStatus,
               '',
               '<!-- Fill in the changelog under each product area this PR affects.',
               '     Empty sections are ignored. Leave a product collapsed/empty',

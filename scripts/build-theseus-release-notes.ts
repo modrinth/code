@@ -18,7 +18,7 @@ const REPO_ROOT = join(__dirname, '..')
 type Product = 'web' | 'app' | 'hosting'
 
 interface ChangelogEntry {
-	date: string
+	date?: string
 	product: Product
 	version: string | undefined
 	body: string
@@ -78,7 +78,7 @@ function parseArgs(argv: string[]): { dryRun: boolean; version: string; outFile:
  */
 function parseChangelogEntries(src: string): ChangelogEntry[] {
 	const entryRe =
-		/\{\s*date:\s*`([^`]+)`,\s*product:\s*'(\w+)',(?:\s*version:\s*[`']([^`']+)[`'],)?\s*body:\s*`([\s\S]*?)`,\s*\}/g
+		/\{\s*(?:date:\s*`((?:\\`|[^`])*)`,\s*)?product:\s*'(\w+)',(?:\s*version:\s*[`']([^`']+)[`'],)?\s*body:\s*`((?:\\`|[^`])*)`,\s*\}/g
 	const entries: ChangelogEntry[] = []
 	let match: RegExpExecArray | null
 	while ((match = entryRe.exec(src)) !== null) {

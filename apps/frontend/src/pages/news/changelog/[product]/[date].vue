@@ -1,26 +1,31 @@
 <script setup lang="ts">
 import { ChevronLeftIcon } from '@modrinth/assets'
-import { getChangelog } from '@modrinth/blog'
 import { ChangelogEntry, Timeline } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
+
+import {
+	findChangelogEntry,
+	resolveChangelogEntries,
+	type AppRelease,
+} from '~/helpers/changelog'
 
 const route = useRoute()
 
+const { data: appReleases, suspense: appReleasesSuspense } = useQuery({
+	queryKey: ['changelog', 'app-releases'],
+	queryFn: () => $fetch<AppRelease[]>('/api/changelog/app-releases'),
+})
+
+await appReleasesSuspense().catch(() => {})
+
+const changelogEntries = computed(() => resolveChangelogEntries(appReleases.value ?? []))
 const changelogEntry = computed(() =>
-	route.params.date
-		? getChangelog().find((x) => {
-				if (x.product === route.params.product) {
-					if (x.version && x.version === route.params.date) {
-						return x
-					} else if (x.date.unix() === Number(route.params.date as string)) {
-						return x
-					}
-				}
-				return undefined
-			})
+	route.params.date && route.params.product
+		? findChangelogEntry(changelogEntries.value, route.params.product, route.params.date)
 		: undefined,
 )
 
-const isFirst = computed(() => changelogEntry.value?.date === getChangelog()[0].date)
+const isFirst = computed(() => changelogEntry.value === changelogEntries.value[0])
 
 if (!changelogEntry.value) {
 	throw createError({ statusCode: 404, statusMessage: 'Version not found' })
