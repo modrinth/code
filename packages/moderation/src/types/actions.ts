@@ -222,6 +222,12 @@ export interface MultiSelectChipsAction extends BaseAction {
 	 * The options available in the multi-select chips.
 	 */
 	options: MultiSelectChipsOption[]
+
+	/**
+	 * If set, all selected option messages are joined with this string and emitted as a single
+	 * message part rather than individual parts. Useful for building bullet lists under a shared header.
+	 */
+	joinWith?: string
 }
 
 export interface AdditionalTextInput {
