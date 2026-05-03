@@ -251,12 +251,13 @@ pub const MAX_TIME_SLICES: usize = 1024;
 // response
 
 /// Response for a [`GetRequest`].
-///
-/// This is a list of N [`TimeSlice`]s, where each slice represents an equal
-/// time interval of metrics collection. The number of slices is determined
-/// by [`GetRequest::time_range`].
 #[derive(Debug, Default, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct FetchResponse(pub Vec<TimeSlice>);
+pub struct FetchResponse {
+    /// List of N [`TimeSlice`]s, where each slice represents an equal
+    /// time interval of metrics collection. The number of slices is determined
+    /// by [`GetRequest::time_range`].
+    pub metrics: Vec<TimeSlice>,
+}
 
 /// Single time interval of metrics collection.
 #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
