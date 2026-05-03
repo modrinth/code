@@ -9,54 +9,56 @@
 	>
 		<ModalCreation ref="modal_creation" :organization-id="organization.id" />
 		<template v-if="routeHasSettings">
-			<div class="normal-page__sidebar">
-				<div
-					class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
-				>
-					<div class="flex items-center gap-4">
-						<Avatar size="sm" :src="organization.icon_url" />
-						<div class="flex flex-col justify-center gap-1">
-							<h2 class="m-0 text-base">
-								<nuxt-link :to="`/organization/${organization.slug}/settings`">
-									{{ organization.name }}
-								</nuxt-link>
-							</h2>
-							<span>
-								{{ formatCompactNumber(acceptedMembers?.length || 0) }}
-								member<template v-if="acceptedMembers?.length !== 1">s</template>
-							</span>
+			<template v-if="canAccessSettings">
+				<div class="normal-page__sidebar">
+					<div
+						class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
+					>
+						<div class="flex items-center gap-4">
+							<Avatar size="sm" :src="organization.icon_url" />
+							<div class="flex flex-col justify-center gap-1">
+								<h2 class="m-0 text-base">
+									<nuxt-link :to="`/organization/${organization.slug}/settings`">
+										{{ organization.name }}
+									</nuxt-link>
+								</h2>
+								<span>
+									{{ formatCompactNumber(acceptedMembers?.length || 0) }}
+									member<template v-if="acceptedMembers?.length !== 1">s</template>
+								</span>
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<NavStack
-					:items="[
-						{
-							link: `/organization/${organization.slug}/settings`,
-							label: 'Overview',
-							icon: SettingsIcon,
-						},
-						{
-							link: `/organization/${organization.slug}/settings/members`,
-							label: 'Members',
-							icon: UsersIcon,
-						},
-						{
-							link: `/organization/${organization.slug}/settings/projects`,
-							label: 'Projects',
-							icon: BoxIcon,
-						},
-						{
-							link: `/organization/${organization.slug}/settings/analytics`,
-							label: 'Analytics',
-							icon: ChartIcon,
-						},
-					]"
-				/>
-			</div>
-			<div class="normal-page__content">
-				<NuxtPage />
-			</div>
+					<NavStack
+						:items="[
+							{
+								link: `/organization/${organization.slug}/settings`,
+								label: 'Overview',
+								icon: SettingsIcon,
+							},
+							{
+								link: `/organization/${organization.slug}/settings/members`,
+								label: 'Members',
+								icon: UsersIcon,
+							},
+							{
+								link: `/organization/${organization.slug}/settings/projects`,
+								label: 'Projects',
+								icon: BoxIcon,
+							},
+							{
+								link: `/organization/${organization.slug}/settings/analytics`,
+								label: 'Analytics',
+								icon: ChartIcon,
+							},
+						]"
+					/>
+				</div>
+				<div class="normal-page__content">
+					<NuxtPage />
+				</div>
+			</template>
 		</template>
 		<template v-else>
 			<div class="normal-page__header py-4">
@@ -526,6 +528,22 @@ const organizationContext = new OrganizationContext(
 const { currentMember } = organizationContext
 
 provideOrganizationContext(organizationContext)
+
+const canAccessSettings = computed(() => !!currentMember.value?.accepted)
+
+watch(
+	[routeHasSettings, currentMember],
+	() => {
+		if (routeHasSettings.value && !canAccessSettings.value) {
+			showError({
+				fatal: true,
+				statusCode: 401,
+				statusMessage: 'Unauthorized',
+			})
+		}
+	},
+	{ flush: 'sync', immediate: true },
+)
 
 watch(
 	organization,

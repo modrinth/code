@@ -19,7 +19,7 @@ import { FolderIcon, ReportIcon, ShieldCheckIcon } from '@modrinth/assets'
 import { Chips, defineMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 definePageMeta({
-	middleware: 'auth',
+	middleware: ['auth', 'staff'],
 })
 
 useSeoMeta({

@@ -7,13 +7,51 @@
 				<Logo404 />
 			</div>
 			<div class="error-box" :class="{ 'has-bot': !is404 }">
-				<img v-if="!is404" :src="SadRinthbot" alt="Sad Modrinth bot" class="error-box__sad-bot" />
+				<img
+					v-if="is401"
+					:src="AnnoyedRinthbot"
+					alt="Annoyed Modrinth bot"
+					class="error-box__sad-bot"
+				/>
+				<img
+					v-else-if="!is404"
+					:src="SadRinthbot"
+					alt="Sad Modrinth bot"
+					class="error-box__sad-bot"
+				/>
 				<div v-if="!is404" class="error-box__top-glow" />
 				<div class="error-box__body">
 					<h1 class="error-box__title">{{ formatMessage(errorMessages.title) }}</h1>
 					<p v-if="errorMessages.subtitle" class="error-box__subtitle">
 						{{ formatMessage(errorMessages.subtitle) }}
 					</p>
+				</div>
+				<div v-if="is401" class="flex flex-col gap-4">
+					<template v-if="auth.user">
+						<p class="m-0">
+							{{ formatMessage(unauthorizedMessages.signedInAsLabel) }}
+						</p>
+						<div
+							class="flex items-center gap-2 rounded-2xl border border-solid border-surface-5 bg-surface-4 p-4"
+						>
+							<Avatar :src="auth.user.avatar_url" size="32px" />
+							<span class="font-medium text-contrast">{{ auth.user.username }}</span>
+
+							<ButtonStyled color="red" type="transparent">
+								<button type="button" class="ml-auto" @click="logout">
+									{{ formatMessage(commonMessages.signOutButton) }}
+								</button>
+							</ButtonStyled>
+						</div>
+					</template>
+					<template v-else>
+						<ButtonStyled color="brand">
+							<nuxt-link class="button-like w-fit" :to="signInRoute">
+								<LogInIcon />
+								{{ formatMessage(commonMessages.signInButton) }}
+							</nuxt-link>
+						</ButtonStyled>
+					</template>
 				</div>
 				<div class="error-box__body">
 					<p v-if="errorMessages.list_title" class="error-box__list-title">
@@ -51,9 +89,13 @@
 </template>
 
 <script setup>
-import { SadRinthbot } from '@modrinth/assets'
+import { AnnoyedRinthbot, LogInIcon, SadRinthbot } from '@modrinth/assets'
 import {
+	Avatar,
+	ButtonStyled,
+	commonMessages,
 	defineMessage,
+	defineMessages,
 	IntlFormatted,
 	LoadingBar,
 	normalizeChildren,
@@ -65,6 +107,8 @@ import {
 } from '@modrinth/ui'
 
 import Logo404 from '~/assets/images/404.svg'
+import { getSignInRouteObj } from '~/composables/auth.js'
+import { logout } from '~/composables/user.js'
 
 import { createModrinthClient } from './helpers/api.ts'
 import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
@@ -103,6 +147,17 @@ const props = defineProps({
 })
 
 const is404 = computed(() => props.error.statusCode === 404)
+const is401 = computed(() => props.error.statusCode === 401)
+
+const unauthorizedMessages = defineMessages({
+	signedInAsLabel: {
+		id: 'error.generic.401.signed-in-as',
+		defaultMessage: "You're currently signed in as:",
+	},
+})
+
+const signInRoute = computed(() => getSignInRouteObj(route))
+
 const errorMessages = computed(
 	() =>
 		routeMessages.find((x) => x.match(route))?.messages[props.error.statusCode] ??
@@ -111,10 +166,6 @@ const errorMessages = computed(
 )
 
 const route = useRoute()
-
-watch(route, () => {
-	console.log(route)
-})
 
 const messages = {
 	404: {
@@ -136,6 +187,12 @@ const messages = {
 			id: 'error.generic.451.subtitle',
 			defaultMessage:
 				'This page has been blocked for legal reasons, such as government censorship or ongoing legal proceedings.',
+		}),
+	},
+	401: {
+		title: defineMessage({
+			id: 'error.generic.401.title',
+			defaultMessage: `You don't have access to this page`,
 		}),
 	},
 	default: {
@@ -345,7 +402,7 @@ const routeMessages = [
 		margin: 0;
 	}
 
-	a {
+	a:not(.button-like) {
 		color: var(--color-brand);
 		font-weight: 600;
 
@@ -387,20 +444,24 @@ const routeMessages = [
 	}
 
 	&__title {
-		font-size: 2rem;
-		font-weight: 900;
+		font-size: 1.5rem;
+		font-weight: 600;
 		margin: 0;
 	}
 
 	&__subtitle {
-		font-size: 1.25rem;
-		font-weight: 600;
+		font-size: 1rem;
+		font-weight: 400;
 	}
 
 	&__body {
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
+
+		&:empty {
+			display: none;
+		}
 	}
 
 	&__list-title {

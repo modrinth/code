@@ -1244,6 +1244,12 @@
   "error.collection.404.title": {
     "message": "Collection not found"
   },
+  "error.generic.401.signed-in-as": {
+    "message": "You're currently signed in as:"
+  },
+  "error.generic.401.title": {
+    "message": "You don't have access to this page"
+  },
   "error.generic.404.subtitle": {
     "message": "The page you were looking for doesn't seem to exist."
   },
@@ -2539,6 +2545,9 @@
   },
   "project.error.project-not-found": {
     "message": "Project not found"
+  },
+  "project.error.settings-unauthorized": {
+    "message": "Unauthorized"
   },
   "project.gallery.title": {
     "message": "Gallery"

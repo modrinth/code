@@ -3,47 +3,49 @@
 		<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
-		<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
-			<div class="normal-page__header">
-				<div
-					class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
-				>
-					<nuxt-link
-						:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
-						class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
+		<template v-if="isSettings">
+			<div v-if="canAccessSettings" class="normal-page no-sidebar">
+				<div class="normal-page__header">
+					<div
+						class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
 					>
-						<Avatar :src="project.icon_url" size="32px" />
-						{{ project.title }}
-					</nuxt-link>
-					<ChevronRightIcon />
-					<span class="flex grow font-extrabold text-contrast">{{
-						formatMessage(messages.settingsTitle)
-					}}</span>
-					<div class="flex gap-2">
-						<ButtonStyled>
-							<nuxt-link to="/dashboard/projects"
-								><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
-							</nuxt-link>
-						</ButtonStyled>
+						<nuxt-link
+							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
+							class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
+						>
+							<Avatar :src="project.icon_url" size="32px" />
+							{{ project.title }}
+						</nuxt-link>
+						<ChevronRightIcon />
+						<span class="flex grow font-extrabold text-contrast">{{
+							formatMessage(messages.settingsTitle)
+						}}</span>
+						<div class="flex gap-2">
+							<ButtonStyled>
+								<nuxt-link to="/dashboard/projects"
+									><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
+								</nuxt-link>
+							</ButtonStyled>
+						</div>
 					</div>
+					<ProjectMemberHeader
+						v-if="currentMember && false"
+						:project="project"
+						:versions="versions"
+						:current-member="currentMember"
+						:is-settings="isSettings"
+						:set-processing="setProcessing"
+						:all-members="allMembers"
+						:update-members="invalidateProject"
+						:auth="auth"
+						:tags="tags"
+					/>
 				</div>
-				<ProjectMemberHeader
-					v-if="currentMember && false"
-					:project="project"
-					:versions="versions"
-					:current-member="currentMember"
-					:is-settings="route.name.startsWith('type-id-settings')"
-					:set-processing="setProcessing"
-					:all-members="allMembers"
-					:update-members="invalidateProject"
-					:auth="auth"
-					:tags="tags"
-				/>
+				<div class="normal-page__content">
+					<NuxtPage />
+				</div>
 			</div>
-			<div class="normal-page__content">
-				<NuxtPage />
-			</div>
-		</div>
+		</template>
 
 		<div v-else>
 			<NewModal
@@ -811,7 +813,7 @@
 						:project="project"
 						:versions="versions"
 						:current-member="currentMember"
-						:is-settings="route.name.startsWith('type-id-settings')"
+						:is-settings="isSettings"
 						:route-name="route.name"
 						:set-processing="setProcessing"
 						:collapsed="collapsedChecklist"
@@ -1452,6 +1454,10 @@ const messages = defineMessages({
 		id: 'project.error.project-not-found',
 		defaultMessage: 'Project not found',
 	},
+	projectSettingsUnauthorized: {
+		id: 'project.error.settings-unauthorized',
+		defaultMessage: 'Unauthorized',
+	},
 	projectUpdated: {
 		id: 'project.notification.updated.title',
 		defaultMessage: 'Project updated',
@@ -1825,6 +1831,8 @@ const { data: organizationRaw } = useQuery({
 // When project is removed from org, enabled becomes false but TanStack keeps stale data.
 // Return null when the project no longer belongs to an organization.
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
+
+const isSettings = computed(() => route.name.startsWith('type-id-settings'))
 
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {
@@ -2262,10 +2270,27 @@ const currentMember = computed(() => {
 	return val
 })
 
+const canAccessSettings = computed(() => !!currentMember.value?.accepted)
+
 const hasEditDetailsPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
 	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
 })
+
+watch(
+	[isSettings, currentMember],
+	() => {
+		if (isSettings.value && !canAccessSettings.value) {
+			showError({
+				fatal: true,
+				statusCode: 401,
+				statusMessage: 'Unauthorized',
+				message: formatMessage(messages.projectSettingsUnauthorized),
+			})
+		}
+	},
+	{ flush: 'sync', immediate: true },
+)
 
 const projectTypeDisplay = computed(() => {
 	if (!project.value) return ''

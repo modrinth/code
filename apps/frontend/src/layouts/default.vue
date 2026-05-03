@@ -311,7 +311,7 @@
 							{
 								id: 'review-projects',
 								color: 'orange',
-								link: '/moderation/',
+								link: '/moderation',
 							},
 							{
 								id: 'tech-review',
