@@ -180,9 +180,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	let searchVersion = 0
 	let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
-	const providedFiltersOrEmpty = computed(
-		() => options.providedFilters?.value ?? [],
-	)
+	const providedFiltersOrEmpty = computed(() => options.providedFilters?.value ?? [])
 
 	watch(
 		[
