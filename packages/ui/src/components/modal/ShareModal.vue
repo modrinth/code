@@ -14,7 +14,7 @@ import { computed, nextTick, ref } from 'vue'
 
 import { injectNotificationManager } from '#ui/providers'
 
-import { Button, ButtonStyled, NewModal, StyledInput } from '../index'
+import { ButtonStyled, NewModal, StyledInput } from '../index'
 
 const props = defineProps({
 	header: {
@@ -148,15 +148,15 @@ defineExpose({
 
 <template>
 	<NewModal ref="shareModal" :header="header" :noblur="noblur" :on-hide="onHide">
-		<div class="flex flex-row flex-wrap items-center gap-2">
+		<div class="flex flex-col flex-wrap items-center gap-2">
 			<div v-if="link" class="group relative mx-auto">
 				<div ref="qrCode">
 					<QrcodeVue :value="url" class="!bg-white rounded-[var(--radius-md)]" margin="3" />
 				</div>
-				<ButtonStyled circular>
+				<ButtonStyled circular type="transparent">
 					<button
 						v-tooltip="'Copy QR code'"
-						class="absolute top-0 right-0 m-2 opacity-0 transition-all duration-200 ease-in-out group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none"
+						class="absolute top-0 right-0 m-2 "
 						aria-label="Copy QR code"
 						@click="copyImage"
 					>
@@ -164,17 +164,19 @@ defineExpose({
 					</button>
 				</ButtonStyled>
 			</div>
-			<StyledInput v-else v-model="content" multiline resize="vertical" wrapper-class="h-full">
+			<StyledInput v-else v-model="content" multiline resize="vertical" wrapper-class="h-full w-[30rem]">
 				<template #right>
-					<button
-						v-tooltip="'Copy Text'"
-						type="button"
-						aria-label="Copy Text"
-						class="absolute top-0 right-0 m-2 grid h-10 w-10 cursor-pointer place-content-center rounded-lg border-none bg-button-bg text-primary transition-all hover:bg-button-bg-hover hover:brightness-125 active:scale-95"
-						@click="copyText"
-					>
-						<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
-					</button>
+					<ButtonStyled circular type="transparent">
+						<button
+							v-tooltip="'Copy Text'"
+							type="button"
+							aria-label="Copy Text"
+							class="absolute top-0 right-0 m-2 "
+							@click="copyText"
+						>
+							<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
+						</button>
+					</ButtonStyled>
 				</template>
 			</StyledInput>
 			<div class="flex flex-grow flex-col justify-center gap-2">
@@ -199,56 +201,64 @@ defineExpose({
 						<ExternalIcon aria-hidden="true" />
 					</a>
 				</ButtonStyled>
-				<div v-if="socialButtons" class="flex flex-row gap-2">
-					<Button v-if="canShare" v-tooltip="'Share'" aria-label="Share" icon-only @click="share">
-						<ShareIcon aria-hidden="true" />
-					</Button>
-					<a
-						v-tooltip="'Send as an email'"
-						class="btn icon-only fill-contrast text-contrast"
-						:href="sendEmail"
-						:target="targetParameter"
-						aria-label="Send as an email"
-					>
-						<MailIcon aria-hidden="true" />
-					</a>
+				<div v-if="socialButtons" class="flex flex-row gap-1">
+					<ButtonStyled v-if="canShare" circular>
+						<button v-tooltip="'Share'" aria-label="Share" @click="share">
+							<ShareIcon aria-hidden="true" />
+						</button>
+					</ButtonStyled>
+					<ButtonStyled circular>
+						<a
+							v-tooltip="'Send as an email'"
+							:href="sendEmail"
+							:target="targetParameter"
+							aria-label="Send as an email"
+						>
+							<MailIcon aria-hidden="true" />
+						</a>
+					</ButtonStyled>
+					<ButtonStyled circular>
+
 					<a
 						v-if="link"
 						v-tooltip="'Open link in browser'"
-						class="btn icon-only fill-contrast text-contrast"
 						:target="targetParameter"
 						:href="url"
 						aria-label="Open link in browser"
 					>
 						<GlobeIcon aria-hidden="true" />
 					</a>
+					</ButtonStyled>
+					<ButtonStyled circular>
 					<a
 						v-tooltip="'Toot about it'"
-						class="btn icon-only fill-contrast text-contrast bg-[#563acc]"
 						:target="targetParameter"
 						:href="sendToot"
 						aria-label="Toot about it"
 					>
 						<MastodonIcon aria-hidden="true" />
 					</a>
+					</ButtonStyled>
+					<ButtonStyled circular>
 					<a
 						v-tooltip="'Tweet about it'"
-						class="btn icon-only fill-contrast text-contrast bg-[#1da1f2]"
 						:target="targetParameter"
 						:href="sendTweet"
 						aria-label="Tweet about it"
 					>
 						<TwitterIcon aria-hidden="true" />
 					</a>
+					</ButtonStyled>
+					<ButtonStyled circular>
 					<a
 						v-tooltip="'Share on Reddit'"
-						class="btn icon-only fill-contrast text-contrast bg-[#ff4500]"
 						:target="targetParameter"
 						:href="postOnReddit"
 						aria-label="Share on Reddit"
 					>
 						<RedditIcon aria-hidden="true" />
 					</a>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>

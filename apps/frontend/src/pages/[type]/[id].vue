@@ -456,30 +456,19 @@
 						:member="!!currentMember"
 					>
 						<template #actions>
-							<ButtonStyled
-								v-if="auth.user && currentMember"
-								size="large"
-								color="brand"
-								class="lg:!hidden"
-								circular
-							>
+							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand" circular>
 								<nuxt-link
 									v-tooltip="'Edit project'"
 									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-									class="!font-bold"
+									class="!font-bold lg:!hidden"
 								>
 									<SettingsIcon aria-hidden="true" />
 								</nuxt-link>
 							</ButtonStyled>
-							<ButtonStyled
-								v-if="auth.user && currentMember"
-								size="large"
-								color="brand"
-								class="max-lg:!hidden"
-							>
+							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
 								<nuxt-link
 									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-									class="!font-bold"
+									class="!font-bold max-lg:!hidden"
 								>
 									<SettingsIcon aria-hidden="true" />
 									Edit project
@@ -716,13 +705,15 @@
 										<div v-else class="menu-text">
 											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
 										</div>
-										<button
-											class="btn collection-button"
-											@click="(event) => $refs.modal_collection.show(event)"
-										>
-											<PlusIcon aria-hidden="true" />
-											{{ formatMessage(messages.createNewCollection) }}
-										</button>
+										<ButtonStyled>
+											<button
+											class="mx-3 mb-3"
+												@click="(event) => $refs.modal_collection.show(event)"
+											>
+												<PlusIcon aria-hidden="true" />
+												{{ formatMessage(messages.createNewCollection) }}
+											</button>
+										</ButtonStyled>
 									</template>
 								</PopoutMenu>
 								<nuxt-link v-else v-tooltip="'Save'" :to="signInRouteObj" aria-label="Save">
@@ -898,10 +889,7 @@
 						:link-target="$external()"
 						class="card flex-card"
 					/>
-					<ProjectSidebarTags
-						:project="project"
-						class="card flex-card"
-					/>
+					<ProjectSidebarTags :project="project" class="card flex-card" />
 					<ProjectSidebarCreators
 						:organization="organization"
 						:members="members"
@@ -2737,11 +2725,6 @@ provideProjectPageContext({
 	padding-bottom: 0;
 	font-size: var(--font-size-nm);
 	color: var(--color-secondary);
-}
-
-.collection-button {
-	margin: var(--gap-sm) var(--gap-md);
-	white-space: nowrap;
 }
 
 .menu-text {

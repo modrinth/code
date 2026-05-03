@@ -14,34 +14,38 @@
 				<h2>{{ version.name }}</h2>
 			</div>
 			<div class="button-group">
-				<Button
-					color="primary"
-					:action="() => install(version.id)"
-					:disabled="installing || (installed && installedVersion === version.id)"
-				>
-					<DownloadIcon v-if="!installed" />
-					<SwapIcon v-else-if="installedVersion !== version.id" />
-					<CheckIcon v-else />
-					{{
-						installing
-							? 'Installing...'
-							: installed && installedVersion === version.id
-								? 'Installed'
-								: 'Install'
-					}}
-				</Button>
-				<Button>
-					<ReportIcon />
-					Report
-				</Button>
-				<a
-					:href="`https://modrinth.com/mod/${route.params.id}/version/${route.params.version}`"
-					rel="external"
-					class="btn"
-				>
-					<ExternalIcon />
-					Modrinth website
-				</a>
+				<ButtonStyled color="brand">
+					<button
+						:disabled="installing || (installed && installedVersion === version.id)"
+						@click="() => install(version.id)"
+					>
+						<DownloadIcon v-if="!installed" />
+						<SwapIcon v-else-if="installedVersion !== version.id" />
+						<CheckIcon v-else />
+						{{
+							installing
+								? 'Installing...'
+								: installed && installedVersion === version.id
+									? 'Installed'
+									: 'Install'
+						}}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button>
+						<ReportIcon />
+						Report
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a
+						:href="`https://modrinth.com/mod/${route.params.id}/version/${route.params.version}`"
+						rel="external"
+					>
+						Modrinth website
+						<ExternalIcon />
+					</a>
+				</ButtonStyled>
 			</div>
 		</Card>
 		<div class="version-container">
@@ -68,16 +72,13 @@
 								<span v-if="file.primary" class="primary-label"> Primary </span>
 							</span>
 						</span>
-						<Button
-							v-if="project.project_type !== 'modpack' || file.primary"
-							class="download"
-							:action="() => install(version.id)"
-							:disabled="installed"
-						>
-							<DownloadIcon v-if="!installed" />
-							<CheckIcon v-else />
-							{{ installed ? 'Installed' : 'Install' }}
-						</Button>
+						<ButtonStyled v-if="project.project_type !== 'modpack' || file.primary" color="brand">
+							<button class="download" :disabled="installed" @click="() => install(version.id)">
+								<DownloadIcon v-if="!installed" />
+								<CheckIcon v-else />
+								{{ installed ? 'Installed' : 'Install' }}
+							</button>
+						</ButtonStyled>
 					</Card>
 				</Card>
 				<Card v-if="displayDependencies.length > 0">
@@ -168,7 +169,15 @@
 
 <script setup>
 import { CheckIcon, DownloadIcon, ExternalIcon, FileIcon, ReportIcon } from '@modrinth/assets'
-import { Avatar, Badge, Breadcrumbs, Button, Card, CopyCode, useFormatDateTime } from '@modrinth/ui'
+import {
+	Avatar,
+	Badge,
+	Breadcrumbs,
+	ButtonStyled,
+	Card,
+	CopyCode,
+	useFormatDateTime,
+} from '@modrinth/ui'
 import { formatBytes, renderString } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'

@@ -6,9 +6,11 @@
 			<section class="auth-form">
 				<p>{{ formatMessage(alreadyVerifiedMessages.description) }}</p>
 
-				<NuxtLink class="btn" to="/settings/account">
-					<SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
-				</NuxtLink>
+				<ButtonStyled>
+					<NuxtLink to="/settings/account">
+						<SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
+					</NuxtLink>
+				</ButtonStyled>
 			</section>
 		</template>
 

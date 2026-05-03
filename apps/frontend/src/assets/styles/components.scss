@@ -546,15 +546,6 @@ button {
 	}
 }
 
-.input-stack {
-	display: flex;
-	flex-direction: column;
-
-	> *:not(:last-child) {
-		margin-bottom: var(--spacing-card-sm);
-	}
-}
-
 .text-input-wrapper {
 	display: flex;
 	flex-direction: row;

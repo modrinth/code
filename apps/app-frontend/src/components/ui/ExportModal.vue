@@ -1,7 +1,7 @@
 <script setup>
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
-	Button,
+	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	defineMessages,
@@ -179,15 +179,16 @@ const exportPack = async () => {
 				<div class="table-head">
 					<div class="table-cell row-wise">
 						{{ formatMessage(messages.selectFilesLabel) }}
-						<Button
-							class="sleek-primary collapsed-button"
-							icon-only
-							@click="() => (showingFiles = !showingFiles)"
-						>
-							<PlusIcon v-if="!showingFiles" />
-							<XIcon v-else />
-						</Button>
+						<ButtonStyled circular>
+							<button
+								@click="() => (showingFiles = !showingFiles)"
+							>
+								<PlusIcon v-if="!showingFiles" />
+								<XIcon v-else />
+							</button>
+						</ButtonStyled>
 					</div>
+
 				</div>
 				<div v-if="showingFiles" class="table-content">
 					<div v-for="[path, children] in folders" :key="path.name" class="table-row">
@@ -235,14 +236,18 @@ const exportPack = async () => {
 				</div>
 			</div>
 			<div class="button-row push-right">
-				<Button @click="exportModal.hide">
-					<XIcon />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-				<Button color="primary" @click="exportPack">
-					<PackageIcon />
-					{{ formatMessage(messages.exportButton) }}
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="exportModal.hide">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button @click="exportPack">
+						<PackageIcon />
+						{{ formatMessage(messages.exportButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</ModalWrapper>

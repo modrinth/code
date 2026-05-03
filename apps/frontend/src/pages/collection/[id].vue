@@ -116,14 +116,14 @@
 					</RadioButtons>
 				</div>
 				<div class="flex justify-end gap-2">
-					<ButtonStyled class="w-24">
-						<button @click="() => editModal?.hide()">
+					<ButtonStyled>
+						<button class="w-24" @click="() => editModal?.hide()">
 							<XIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
 					</ButtonStyled>
-					<ButtonStyled color="brand" class="w-36">
-						<button :disabled="saving" @click="save()">
+					<ButtonStyled color="brand">
+						<button class="w-36" :disabled="saving" @click="save()">
 							<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
 							<SaveIcon v-else aria-hidden="true" />
 							{{
@@ -333,24 +333,19 @@
 					"
 				>
 					<template v-if="canEdit || collection.id === 'following'" #actions>
-						<button
-							v-if="canEdit"
-							class="iconified-button remove-btn"
-							:disabled="removing"
-							@click="() => removeProject(project)"
-						>
-							<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
-							<XIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.removeProjectButton) }}
-						</button>
-						<button
-							v-if="collection.id === 'following'"
-							class="iconified-button"
-							@click="unfollowProject(project)"
-						>
-							<HeartMinusIcon aria-hidden="true" />
-							{{ formatMessage(messages.unfollowProjectButton) }}
-						</button>
+						<ButtonStyled v-if="canEdit">
+							<button class="remove-btn" :disabled="removing" @click="() => removeProject(project)">
+								<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
+								<XIcon v-else aria-hidden="true" />
+								{{ formatMessage(messages.removeProjectButton) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-if="collection.id === 'following'">
+							<button @click="unfollowProject(project)">
+								<HeartMinusIcon aria-hidden="true" />
+								{{ formatMessage(messages.unfollowProjectButton) }}
+							</button>
+						</ButtonStyled>
 					</template>
 				</ProjectCard>
 			</ProjectCardList>

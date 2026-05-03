@@ -39,9 +39,12 @@
 				</div>
 				<div class="controls">
 					<div class="buttons">
-						<Button class="close" icon-only @click="hideImage">
-							<XIcon aria-hidden="true" />
-						</Button>
+						<ButtonStyled circular>
+							<button class="close" @click="hideImage">
+								<XIcon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled circular>
 						<a
 							class="open btn icon-only"
 							target="_blank"
@@ -53,21 +56,23 @@
 						>
 							<ExternalIcon aria-hidden="true" />
 						</a>
-						<Button icon-only @click="zoomedIn = !zoomedIn">
-							<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-							<ContractIcon v-else aria-hidden="true" />
-						</Button>
-						<Button
-							v-if="filteredGallery.length > 1"
-							class="previous"
-							icon-only
-							@click="previousImage()"
-						>
-							<LeftArrowIcon aria-hidden="true" />
-						</Button>
-						<Button v-if="filteredGallery.length > 1" class="next" icon-only @click="nextImage()">
-							<RightArrowIcon aria-hidden="true" />
-						</Button>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<button @click="zoomedIn = !zoomedIn">
+								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
+								<ContractIcon v-else aria-hidden="true" />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-if="filteredGallery.length > 1" circular>
+							<button class="previous" @click="previousImage()">
+								<LeftArrowIcon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-if="filteredGallery.length > 1" circular>
+							<button class="next" @click="nextImage()">
+								<RightArrowIcon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 			</div>
@@ -85,7 +90,7 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, Card, useFormatDateTime } from '@modrinth/ui'
+import { ButtonStyled, Card, useFormatDateTime } from '@modrinth/ui'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'

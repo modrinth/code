@@ -176,14 +176,18 @@
 					<h2>Invitation to join {{ organization.name }}</h2>
 					<p>You have been invited to join {{ organization.name }}.</p>
 					<div class="input-group">
-						<button class="iconified-button brand-button" @click="onAcceptInvite">
-							<CheckIcon />
-							Accept
-						</button>
-						<button class="iconified-button danger-button" @click="onDeclineInvite">
-							<XIcon />
-							Decline
-						</button>
+						<ButtonStyled color="brand">
+							<button @click="onAcceptInvite">
+								<CheckIcon />
+								Accept
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="red">
+							<button @click="onDeclineInvite">
+								<XIcon />
+								Decline
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">

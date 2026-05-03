@@ -23,7 +23,7 @@
 		<template #actions>
 			<div class="flex gap-2 justify-end">
 				<ButtonStyled type="outlined">
-					<button class="!border !border-surface-4" @click="hide">
+					<button @click="hide">
 						<XIcon />
 						Cancel
 					</button>

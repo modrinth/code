@@ -31,50 +31,49 @@
 					<h4>{{ selectedAccount.profile.name }}</h4>
 					<p>Selected</p>
 				</div>
-				<Button
-					v-tooltip="'Log out'"
-					icon-only
-					color="raised"
-					@click="logout(selectedAccount.profile.id)"
-				>
-					<TrashIcon />
-				</Button>
+				<ButtonStyled circular type="transparent">
+					<button v-tooltip="'Log out'" @click="logout(selectedAccount.profile.id)">
+						<TrashIcon />
+					</button>
+				</ButtonStyled>
 			</div>
 			<div v-else class="logged-out account">
 				<h4>Not signed in</h4>
-				<Button
-					v-tooltip="'Log in'"
-					:disabled="loginDisabled"
-					icon-only
-					color="primary"
-					@click="login()"
-				>
-					<LogInIcon v-if="!loginDisabled" />
-					<SpinnerIcon v-else class="animate-spin" />
-				</Button>
+				<ButtonStyled circular color="brand">
+					<button v-tooltip="'Log in'" :disabled="loginDisabled" @click="login()">
+						<LogInIcon v-if="!loginDisabled" />
+						<SpinnerIcon v-else class="animate-spin" />
+					</button>
+				</ButtonStyled>
 			</div>
 			<div v-if="displayAccounts.length > 0" class="account-group">
 				<div v-for="account in displayAccounts" :key="account.profile.id" class="account-row">
-					<Button class="option account" @click="setAccount(account)">
-						<Avatar :src="getAccountAvatarUrl(account)" class="icon" />
-						<p>{{ account.profile.name }}</p>
-					</Button>
-					<Button v-tooltip="'Log out'" icon-only @click="logout(account.profile.id)">
-						<TrashIcon />
-					</Button>
+					<ButtonStyled>
+						<button class="option account" @click="setAccount(account)">
+							<Avatar :src="getAccountAvatarUrl(account)" class="icon" />
+							<p>{{ account.profile.name }}</p>
+						</button>
+					</ButtonStyled>
+					<ButtonStyled circular type="transparent">
+						<button v-tooltip="'Log out'" @click="logout(account.profile.id)">
+							<TrashIcon />
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
-			<Button v-if="accounts.length > 0" @click="login()">
-				<PlusIcon />
-				Add account
-			</Button>
+			<ButtonStyled v-if="accounts.length > 0">
+				<button @click="login()">
+					<PlusIcon />
+					Add account
+				</button>
+			</ButtonStyled>
 		</Card>
 	</transition>
 </template>
 
 <script setup>
 import { DropdownIcon, LogInIcon, PlusIcon, SpinnerIcon, TrashIcon } from '@modrinth/assets'
-import { Avatar, Button, Card, injectNotificationManager } from '@modrinth/ui'
+import { Avatar, ButtonStyled, Card, injectNotificationManager } from '@modrinth/ui'
 import { computed, onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue'
 
 import { trackEvent } from '@/helpers/analytics'

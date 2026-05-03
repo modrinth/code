@@ -181,15 +181,6 @@
 	margin-right: 0;
 }
 
-.input-stack {
-	display: flex;
-	flex-direction: column;
-
-	> * {
-		margin-bottom: var(--gap-md);
-	}
-}
-
 .standard-body {
 	:last-child {
 		margin-bottom: 0;

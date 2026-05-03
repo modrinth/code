@@ -265,7 +265,6 @@ onUnmounted(() => {
 
 						<ButtonStyled v-if="hasSettingsListener" type="outlined" circular>
 							<button
-								class="!border !border-surface-4"
 								@click="
 									() => {
 										emit('settings')
@@ -301,7 +300,6 @@ onUnmounted(() => {
 							><TeleportOverflowMenu
 								:options="collapsedOptions"
 								class="flex @[700px]:hidden"
-								btn-class="!border-surface-4 !border"
 								@open="emit('dismiss-content-hint')"
 							>
 								<MoreVerticalIcon class="size-5" />

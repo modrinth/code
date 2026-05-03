@@ -1298,7 +1298,8 @@ const { cycle: changeTheme } = useTheme()
 			justify-content: center;
 			padding: 1rem;
 
-			.iconified-button {
+			> button,
+			> a {
 				width: 100%;
 				max-width: 500px;
 				padding: 0.75rem;

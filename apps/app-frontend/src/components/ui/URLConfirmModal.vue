@@ -1,5 +1,5 @@
 <script setup>
-import { Button, injectNotificationManager, ProjectCard } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager, ProjectCard } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
@@ -12,7 +12,6 @@ const { install: installVersion } = injectContentInstall()
 const confirmModal = ref(null)
 const project = ref(null)
 const version = ref(null)
-const installing = ref(false)
 
 defineExpose({
 	async show(event) {
@@ -70,7 +69,9 @@ async function install() {
 					</p>
 				</div>
 				<div class="button-group">
-					<Button :loading="installing" color="primary" @click="install">Install</Button>
+					<ButtonStyled color="brand">
+						<button @click="install">Install</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>

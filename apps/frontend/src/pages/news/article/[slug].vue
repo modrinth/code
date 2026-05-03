@@ -122,7 +122,7 @@ onMounted(() => {
 						<RssIcon />
 					</a>
 				</ButtonStyled>
-				<ButtonStyled circular icon-only>
+				<ButtonStyled circular>
 					<a v-tooltip="`Changelog`" href="/news/changelog" aria-label="Changelog">
 						<GitGraphIcon />
 					</a>
