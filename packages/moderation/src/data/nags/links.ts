@@ -3,7 +3,15 @@ import { defineMessage, useVIntl } from '@modrinth/ui'
 import type { Nag, NagContext } from '../../types/nags'
 
 export const commonLinkDomains = {
-	source: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'git.sr.ht', 'tangled.org', 'git.gay'],
+	source: [
+		'github.com',
+		'gitlab.com',
+		'bitbucket.org',
+		'codeberg.org',
+		'git.sr.ht',
+		'tangled.org',
+		'git.gay',
+	],
 	issues: [
 		'github.com',
 		'gitlab.com',
