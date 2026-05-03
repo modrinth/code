@@ -987,7 +987,9 @@ pub async fn fetch_analytics(
         }
     }
 
-    Ok(web::Json(FetchResponse(time_slices)))
+    Ok(web::Json(FetchResponse {
+        metrics: time_slices,
+    }))
 }
 
 fn none_if_empty(s: String) -> Option<String> {
