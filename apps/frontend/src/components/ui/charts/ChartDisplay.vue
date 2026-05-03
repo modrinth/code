@@ -324,6 +324,7 @@ import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import { UiChartsChart as Chart, UiChartsCompactChart as CompactChart } from '#components'
+import { useTheme } from '~/composables/nuxt-accessors.ts'
 import {
 	analyticsSetToCSVString,
 	countryCodeToFlag,
