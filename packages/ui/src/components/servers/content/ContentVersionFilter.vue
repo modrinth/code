@@ -1,5 +1,5 @@
 <template>
-	<div class="experimental-styles-within flex w-full flex-col items-center gap-2">
+	<div class="flex w-full flex-col items-center gap-2">
 		<ManySelect
 			v-model="selectedPlatforms"
 			:tooltip="

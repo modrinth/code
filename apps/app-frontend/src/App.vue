@@ -1175,7 +1175,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<div id="teleports"></div>
 	<div
 		v-if="stateInitialized"
-		class="app-grid-layout experimental-styles-within relative"
+		class="app-grid-layout relative"
 		:class="{ 'disable-advanced-rendering': !themeStore.advancedRendering }"
 	>
 		<Transition name="fade">
@@ -1376,7 +1376,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	</div>
 	<div
 		v-if="stateInitialized"
-		class="app-contents experimental-styles-within"
+		class="app-contents"
 		:class="{
 			'sidebar-enabled': sidebarVisible,
 			'disable-advanced-rendering': !themeStore.advancedRendering,

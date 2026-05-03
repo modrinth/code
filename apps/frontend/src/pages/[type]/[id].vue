@@ -46,14 +46,6 @@
 		</div>
 
 		<div v-else class="experimental-styles-within">
-			<NewModal ref="settingsModal">
-				<template #title>
-					<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-					<span class="text-lg font-extrabold text-contrast">
-						{{ formatMessage(messages.settingsTitle) }}
-					</span>
-				</template>
-			</NewModal>
 			<NewModal
 				ref="modalLicense"
 				:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"

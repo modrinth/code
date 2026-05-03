@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="popup-notification-group experimental-styles-within"
+		class="popup-notification-group"
 		:class="{
 			'has-sidebar': hasSidebar,
 		}"

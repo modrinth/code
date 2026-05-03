@@ -4,7 +4,7 @@
 	</div>
 	<div
 		v-else-if="organization"
-		class="experimental-styles-within new-page sidebar"
+		class="new-page sidebar"
 		:class="{ 'alt-layout': cosmetics.leftContentLayout || routeHasSettings }"
 	>
 		<ModalCreation ref="modal_creation" :organization-id="organization.id" />

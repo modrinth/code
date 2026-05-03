@@ -108,7 +108,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="page experimental-styles-within py-6">
+	<div class="page py-6">
 		<div
 			class="flex flex-wrap items-center justify-between gap-4 border-0 border-b-[1px] border-solid border-divider px-6 pb-6"
 		>

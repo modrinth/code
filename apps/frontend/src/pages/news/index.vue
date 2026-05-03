@@ -41,7 +41,7 @@ useSeoMeta({
 </script>
 
 <template>
-	<div class="page experimental-styles-within py-6">
+	<div class="page py-6">
 		<div class="flex flex-wrap items-center justify-between gap-4 px-6">
 			<div>
 				<h1 class="m-0 text-3xl font-extrabold">News</h1>

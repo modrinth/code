@@ -1,7 +1,7 @@
 <template>
 	<ServersUpgradeModalWrapper ref="upgradeModal" />
 	<ResubscribeModal ref="pyroResubscribeModal" @resubscribe="handlePyroResubscribeConfirm" />
-	<section class="universal-card experimental-styles-within">
+	<section class="universal-card">
 		<h2>{{ formatMessage(messages.subscriptionTitle) }}</h2>
 		<p>{{ formatMessage(messages.subscriptionDescription) }}</p>
 		<div class="universal-card recessed">
@@ -533,7 +533,7 @@
 		</div>
 	</section>
 
-	<section class="universal-card experimental-styles-within">
+	<section class="universal-card">
 		<ConfirmModal
 			ref="modal_confirm"
 			:title="formatMessage(deleteModalMessages.title)"

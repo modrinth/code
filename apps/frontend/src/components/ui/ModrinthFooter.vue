@@ -224,7 +224,7 @@ function developerModeIncrement() {
 
 <template>
 	<footer
-		class="footer-brand-background experimental-styles-within border-0 border-t-[1px] border-solid"
+		class="footer-brand-background border-0 border-t-[1px] border-solid"
 	>
 		<div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
 			<div
