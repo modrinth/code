@@ -226,7 +226,11 @@ const messages = defineMessages({
 						/>
 						<ButtonStyled
 							:color="
-								!hoveringTest && !testingJava ? (javaTestResult === true ? 'green' : 'red') : 'standard'
+								!hoveringTest && !testingJava
+									? javaTestResult === true
+										? 'green'
+										: 'red'
+									: 'standard'
 							"
 							color-fill="text"
 						>

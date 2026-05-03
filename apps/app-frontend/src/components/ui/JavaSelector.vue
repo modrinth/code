@@ -19,7 +19,11 @@
 			/>
 			<ButtonStyled
 				:color="
-					!hoveringTest && !testingJava ? (testingJavaSuccess === true ? 'green' : 'red') : 'standard'
+					!hoveringTest && !testingJava
+						? testingJavaSuccess === true
+							? 'green'
+							: 'red'
+						: 'standard'
 				"
 				color-fill="text"
 			>
