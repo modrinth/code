@@ -2546,9 +2546,6 @@
   "project.error.project-not-found": {
     "message": "Project not found"
   },
-  "project.error.settings-unauthorized": {
-    "message": "Unauthorized"
-  },
   "project.gallery.title": {
     "message": "Gallery"
   },
