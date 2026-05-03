@@ -118,19 +118,6 @@ useHead({
 const auth = await useAuth()
 const client = injectModrinthClient()
 
-const { data: projects } = useQuery({
-	queryKey: computed(() => ['user', auth.value?.user?.id, 'projects']),
-	queryFn: () => client.labrinth.users_v2.getProjects(auth.value?.user?.id),
-	placeholderData: [],
-})
-
-const downloadsProjectCount = computed(
-	() => projects.value.filter((project) => project.downloads > 0).length,
-)
-const followersProjectCount = computed(
-	() => projects.value.filter((project) => project.followers > 0).length,
-)
-
 const { data, refetch } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'notifications']),
 	queryFn: async () => {

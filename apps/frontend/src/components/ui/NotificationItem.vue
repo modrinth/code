@@ -620,6 +620,6 @@ function getLoaderCategories(ver) {
 }
 
 .title-link {
-	@apply underline hover:brightness-[--hover-brightness]
+	@apply underline hover:brightness-[--hover-brightness];
 }
 </style>

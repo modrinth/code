@@ -603,9 +603,7 @@
 						</h2>
 					</div>
 
-					<div
-						class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center"
-					>
+					<div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
 						<ButtonStyled color="standard" size="large">
 							<button class="w-full md:w-fit" @click="selectProduct('custom')">
 								{{ formatMessage(messages.getStartedButton) }}

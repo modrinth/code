@@ -45,7 +45,7 @@
 			</div>
 		</div>
 
-		<div v-else class="experimental-styles-within">
+		<div v-else>
 			<NewModal
 				ref="modalLicense"
 				:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"
@@ -586,7 +586,7 @@
 									</nuxt-link>
 								</ButtonStyled>
 								<template #popper>
-									<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+									<div class="grid grid-cols-[min-content] gap-1">
 										<div class="flex min-w-60 items-center justify-between gap-4">
 											<h3
 												class="m-0 flex items-center gap-2 whitespace-nowrap text-base font-bold text-contrast"
@@ -882,32 +882,32 @@
 						:supported-versions="serverSupportedVersions"
 						:loaders="serverModpackLoaders"
 						:status-online="projectV3?.minecraft_java_server?.ping?.data != null"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
 					<ProjectSidebarCompatibility
 						v-if="projectV3Loaded && !isServerProject"
 						:project="project"
 						:tags="tags"
 						:project-v3="projectV3"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
 					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
 					<ProjectSidebarLinks
 						:project="project"
 						:project-v3="projectV3"
 						:link-target="$external()"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
 					<ProjectSidebarTags
 						:project="project"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
 					<ProjectSidebarCreators
 						:organization="organization"
 						:members="members"
 						:org-link="(slug) => `/organization/${slug}`"
 						:user-link="(username) => `/user/${username}`"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
 					<!-- TODO: Finish license modal and enable -->
 					<ProjectSidebarDetails
@@ -916,9 +916,9 @@
 						:has-versions="versions.length > 0"
 						:link-target="$external()"
 						:show-followers="isServerProject"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
-					<div class="card flex-card experimental-styles-within">
+					<div class="card flex-card">
 						<h2>{{ formatMessage(detailsMessages.title) }}</h2>
 
 						<div class="details-list">
@@ -1169,7 +1169,6 @@ const formatDateTime = useFormatDateTime({
 
 const debug = useDebugLogger('DownloadModal')
 
-const settingsModal = ref()
 const downloadModal = ref()
 const openInAppModal = ref()
 const overTheTopDownloadAnimation = ref()
