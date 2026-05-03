@@ -1,5 +1,6 @@
 pub mod admin;
 pub mod affiliate;
+pub mod attribution;
 pub mod billing;
 pub mod delphi;
 pub mod external_notifications;
@@ -99,5 +100,10 @@ pub fn utoipa_config(
         utoipa_actix_web::scope("/_internal/server-ping")
             .wrap(default_cors())
             .configure(server_ping::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/_internal/attribution")
+            .wrap(default_cors())
+            .configure(attribution::config),
     );
 }
