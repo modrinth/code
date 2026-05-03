@@ -141,7 +141,7 @@ export function formatVersionsForDisplay(
 		output = [...releaseVersionsAsRanges, ...output]
 	}
 
-	if (latestSnapshot && !output.includes(latestSnapshot)) {
+	if (releaseVersionsAsRanges.length > 0 && latestSnapshot) {
 		output = [latestSnapshot, ...output]
 	}
 	return output

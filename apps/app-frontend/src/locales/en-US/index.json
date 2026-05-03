@@ -713,6 +713,24 @@
   "instance.worlds.world_in_use": {
     "message": "World is in use"
   },
+  "minecraft-account.add-account": {
+    "message": "Add account"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft account"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Not signed in"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Remove account"
+  },
+  "minecraft-account.select-account": {
+    "message": "Select account"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Sign in to Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"
   },

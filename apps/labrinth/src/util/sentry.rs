@@ -3,7 +3,7 @@
 //
 // TODO: PR something into sentry_actix to let us customize this
 
-use std::{borrow::Cow, pin::Pin, rc::Rc};
+use std::{borrow::Cow, pin::Pin, rc::Rc, sync::Arc};
 
 use actix_http::{
     StatusCode,
@@ -83,7 +83,11 @@ where
     }
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
-        let hub = Hub::current();
+        // Fork a Hub per request so the scope mutations below (event processor
+        // capturing the request, span attachment) live only for this request
+        // and are dropped when the future completes. Mutating the shared
+        // thread-local hub instead would leak one event processor per request.
+        let hub = Arc::new(Hub::new_from_top(Hub::main()));
         let client = hub.client();
 
         let max_request_body_size = client
@@ -110,7 +114,6 @@ where
             );
 
             let transaction = hub.start_transaction(ctx);
-            transaction.set_request(sentry_req.clone());
             transaction.set_origin("auto.http.actix");
             transaction
         };
@@ -127,13 +130,13 @@ where
                 sentry_req.data = Some(capture_request_body(&mut req).await);
             }
 
-            let parent_span = hub.configure_scope(|scope| {
-                let parent_span = scope.get_span();
+            transaction.set_request(sentry_req.clone());
+
+            hub.configure_scope(|scope| {
                 scope.set_span(Some(transaction.clone().into()));
                 scope.add_event_processor(move |event| {
                     Some(process_event(event, &sentry_req))
                 });
-                parent_span
             });
 
             let fut =
@@ -150,7 +153,6 @@ where
                         transaction.set_status(status);
                     }
                     transaction.finish();
-                    hub.configure_scope(|scope| scope.set_span(parent_span));
                     return Err(actix_err);
                 }
             };
@@ -167,7 +169,6 @@ where
                 transaction.set_status(status);
             }
             transaction.finish();
-            hub.configure_scope(|scope| scope.set_span(parent_span));
 
             Ok(res)
         }

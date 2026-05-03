@@ -12,9 +12,11 @@
 			<div class="modal-body">
 				<div v-if="header" class="header">
 					<strong>{{ header }}</strong>
-					<button class="iconified-button icon-only transparent" @click="hide">
-						<XIcon />
-					</button>
+					<ButtonStyled circular type="transparent">
+						<button @click="hide">
+							<XIcon />
+						</button>
+					</ButtonStyled>
 				</div>
 				<div class="content">
 					<slot />
@@ -27,9 +29,11 @@
 
 <script>
 import { XIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
 
 export default {
 	components: {
+		ButtonStyled,
 		XIcon,
 	},
 	props: {

@@ -4,6 +4,7 @@ export interface PopupNotificationButton {
 	label: string
 	action: () => void
 	color?: 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'standard'
+	keepOpen?: boolean
 }
 
 export interface PopupNotificationProgressItem {

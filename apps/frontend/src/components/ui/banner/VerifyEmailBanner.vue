@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { SettingsIcon } from '@modrinth/assets'
-import { defineMessages, injectNotificationManager, PagewideBanner, useVIntl } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	defineMessages,
+	injectNotificationManager,
+	PagewideBanner,
+	useVIntl,
+} from '@modrinth/ui'
 import { FetchError } from 'ofetch'
 
 const { addNotification } = injectNotificationManager()
@@ -91,13 +97,17 @@ async function handleResendEmailVerification() {
 			</span>
 		</template>
 		<template #actions>
-			<button v-if="hasEmail" class="btn" @click="handleResendEmailVerification">
-				{{ formatMessage(verifyEmailBannerMessages.action) }}
-			</button>
-			<nuxt-link v-else class="btn" to="/settings/account">
-				<SettingsIcon aria-hidden="true" />
-				{{ formatMessage(addEmailBannerMessages.action) }}
-			</nuxt-link>
+			<ButtonStyled v-if="hasEmail">
+				<button @click="handleResendEmailVerification">
+					{{ formatMessage(verifyEmailBannerMessages.action) }}
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-else>
+				<nuxt-link to="/settings/account">
+					<SettingsIcon aria-hidden="true" />
+					{{ formatMessage(addEmailBannerMessages.action) }}
+				</nuxt-link>
+			</ButtonStyled>
 		</template>
 	</PagewideBanner>
 </template>

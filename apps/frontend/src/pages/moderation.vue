@@ -1,7 +1,5 @@
 <template>
-	<div
-		class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
-	>
+	<div class="relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6">
 		<h1>Moderation</h1>
 		<NavTabs :links="moderationLinks" class="mb-4 hidden sm:flex" />
 		<div class="mb-4 sm:hidden">

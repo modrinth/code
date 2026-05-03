@@ -2,7 +2,7 @@
 	<NuxtLayout>
 		<LoadingBar />
 		<NotificationPanel />
-		<div class="main experimental-styles-within">
+		<div class="main">
 			<div v-if="is404" class="error-graphic">
 				<Logo404 />
 			</div>

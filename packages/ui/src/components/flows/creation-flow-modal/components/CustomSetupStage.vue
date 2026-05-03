@@ -5,13 +5,13 @@
 			<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="5rem" />
 			<div class="flex flex-col gap-2">
 				<ButtonStyled type="outlined">
-					<button class="!border-surface-5" @click="triggerIconInput">
+					<button @click="triggerIconInput">
 						<UploadIcon />
 						{{ formatMessage(messages.selectIcon) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled type="outlined">
-					<button class="!border-surface-5" :disabled="!ctx.instanceIcon.value" @click="removeIcon">
+					<button :disabled="!ctx.instanceIcon.value" @click="removeIcon">
 						<XIcon />
 						{{ formatMessage(messages.removeIcon) }}
 					</button>

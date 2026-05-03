@@ -635,10 +635,7 @@ const messages = defineMessages({
 								</button>
 							</ButtonStyled>
 							<ButtonStyled type="outlined">
-								<button
-									class="!border !border-surface-5 !shadow-none"
-									@click="form.cancelEditing()"
-								>
+								<button @click="form.cancelEditing()">
 									<XIcon />
 									{{ formatMessage(commonMessages.cancelButton) }}
 								</button>

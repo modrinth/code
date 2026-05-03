@@ -17,12 +17,13 @@
 					}
 				"
 			/>
-			<Button
-				:disabled="testingJava || props.disabled"
-				@click="runTest(props.modelValue?.path)"
-				@mouseenter="!props.disabled && (hoveringTest = true)"
-				@mouseleave="hoveringTest = false"
-			>
+			<ButtonStyled>
+        <button
+          :disabled="testingJava || props.disabled"
+          @click="runTest(props.modelValue?.path)"
+          @mouseenter="!props.disabled && (hoveringTest = true)"
+          @mouseleave="hoveringTest = false"
+        >
 				<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
 				<CheckCircleIcon
 					v-else-if="testingJavaSuccess === true && !hoveringTest"
@@ -33,26 +34,29 @@
 					class="h-4 w-4 text-brand-red"
 				/>
 				<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
-			</Button>
+		  </button>
+    </ButtonStyled>
 		</div>
-		<span class="installation-buttons">
-			<Button
-				v-if="props.version"
-				:disabled="props.disabled || installingJava"
-				@click="reinstallJava"
-			>
-				<DownloadIcon />
-				{{ installingJava ? 'Installing...' : 'Install recommended' }}
-			</Button>
-			<Button :disabled="props.disabled" @click="autoDetect">
-				<SearchIcon />
-				Detect
-			</Button>
-			<Button :disabled="props.disabled" @click="handleJavaFileInput()">
-				<FolderSearchIcon />
-				Browse
-			</Button>
-		</span>
+    <span class="installation-buttons">
+        <ButtonStyled v-if="props.version">
+            <button :disabled="props.disabled || installingJava" @click="reinstallJava">
+                <DownloadIcon />
+                {{ installingJava ? 'Installing...' : 'Install recommended' }}
+            </button>
+        </ButtonStyled>
+        <ButtonStyled>
+            <button :disabled="props.disabled" @click="autoDetect">
+                <SearchIcon />
+                Detect
+            </button>
+        </ButtonStyled>
+        <ButtonStyled>
+            <button :disabled="props.disabled" @click="handleJavaFileInput()">
+                <FolderSearchIcon />
+                Browse
+            </button>
+        </ButtonStyled>
+    </span>
 	</div>
 </template>
 
@@ -66,7 +70,7 @@ import {
 	SpinnerIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
-import { Button, injectNotificationManager, StyledInput } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref, watch } from 'vue'
 
@@ -236,9 +240,5 @@ async function reinstallJava() {
 	align-items: center;
 	gap: 0.5rem;
 	margin: 0;
-
-	.btn {
-		width: max-content;
-	}
 }
 </style>
