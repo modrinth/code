@@ -618,4 +618,8 @@ function getLoaderCategories(ver) {
 		color: var(--color-blue);
 	}
 }
+
+.title-link {
+	@apply underline hover:brightness-[--hover-brightness]
+}
 </style>

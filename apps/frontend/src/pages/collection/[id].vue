@@ -193,7 +193,7 @@
 										}"
 									>
 										<template #stat="{ children }">
-											<span class="primary-stat__counter">
+											<span>
 												<component :is="() => normalizeChildren(children)" />
 											</span>
 										</template>
