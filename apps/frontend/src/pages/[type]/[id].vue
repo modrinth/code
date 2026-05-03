@@ -1454,10 +1454,6 @@ const messages = defineMessages({
 		id: 'project.error.project-not-found',
 		defaultMessage: 'Project not found',
 	},
-	projectSettingsUnauthorized: {
-		id: 'project.error.settings-unauthorized',
-		defaultMessage: 'Unauthorized',
-	},
 	projectUpdated: {
 		id: 'project.notification.updated.title',
 		defaultMessage: 'Project updated',
@@ -2285,7 +2281,6 @@ watch(
 				fatal: true,
 				statusCode: 401,
 				statusMessage: 'Unauthorized',
-				message: formatMessage(messages.projectSettingsUnauthorized),
 			})
 		}
 	},
