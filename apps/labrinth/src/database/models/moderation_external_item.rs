@@ -72,8 +72,7 @@ impl ExternalLicense {
         let nows: Vec<DateTime<Utc>> = vec![now; license_ids.len()];
         let user_ids: Vec<i64> = vec![user_id.0; license_ids.len()];
 
-        let filenames: Vec<Option<String>> =
-            filenames.iter().cloned().collect();
+        let filenames: Vec<Option<String>> = filenames.to_vec();
 
         sqlx::query!(
             r#"
