@@ -11,6 +11,24 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-03T18:07:44+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added git.gay as a recognized sources link domain.
+
+## Fixed
+- Fixed useTheme not defined error on project pages.
+- Fixed latest snapshot sometimes appearing a second time outside of a version range.`,
+	},
+	{
+		date: `2026-05-03T18:07:44+00:00`,
+		product: 'app',
+		version: '0.13.9',
+		body: `## Fixed
+- Fixed update notification closing when pressing the Changelog button.
+- Fixed latest snapshot sometimes appearing a second time outside of a version range.`,
+	},
+	{
 		date: `2026-05-02T22:09:01+00:00`,
 		product: 'app',
 		version: '0.13.8',
