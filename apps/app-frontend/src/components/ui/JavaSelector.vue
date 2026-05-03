@@ -17,46 +17,48 @@
 					}
 				"
 			/>
-			<ButtonStyled>
-        <button
-          :disabled="testingJava || props.disabled"
-          @click="runTest(props.modelValue?.path)"
-          @mouseenter="!props.disabled && (hoveringTest = true)"
-          @mouseleave="hoveringTest = false"
-        >
-				<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
-				<CheckCircleIcon
-					v-else-if="testingJavaSuccess === true && !hoveringTest"
-					class="h-4 w-4 text-brand-green"
-				/>
-				<XCircleIcon
-					v-else-if="testingJavaSuccess !== true && !hoveringTest"
-					class="h-4 w-4 text-brand-red"
-				/>
-				<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
-		  </button>
-    </ButtonStyled>
+			<ButtonStyled
+				:color="
+					!hoveringTest && !testingJava ? (testingJavaSuccess === true ? 'green' : 'red') : 'standard'
+				"
+				color-fill="text"
+			>
+				<button
+					:disabled="testingJava || props.disabled"
+					@click="runTest(props.modelValue?.path)"
+					@mouseenter="!props.disabled && (hoveringTest = true)"
+					@mouseleave="hoveringTest = false"
+				>
+					<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
+					<CheckCircleIcon
+						v-else-if="testingJavaSuccess === true && !hoveringTest"
+						class="h-4 w-4"
+					/>
+					<XCircleIcon v-else-if="testingJavaSuccess !== true && !hoveringTest" class="h-4 w-4" />
+					<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
+				</button>
+			</ButtonStyled>
 		</div>
-    <span class="installation-buttons">
-        <ButtonStyled v-if="props.version">
-            <button :disabled="props.disabled || installingJava" @click="reinstallJava">
-                <DownloadIcon />
-                {{ installingJava ? 'Installing...' : 'Install recommended' }}
-            </button>
-        </ButtonStyled>
-        <ButtonStyled>
-            <button :disabled="props.disabled" @click="autoDetect">
-                <SearchIcon />
-                Detect
-            </button>
-        </ButtonStyled>
-        <ButtonStyled>
-            <button :disabled="props.disabled" @click="handleJavaFileInput()">
-                <FolderSearchIcon />
-                Browse
-            </button>
-        </ButtonStyled>
-    </span>
+		<span class="installation-buttons">
+			<ButtonStyled v-if="props.version">
+				<button :disabled="props.disabled || installingJava" @click="reinstallJava">
+					<DownloadIcon />
+					{{ installingJava ? 'Installing...' : 'Install recommended' }}
+				</button>
+			</ButtonStyled>
+			<ButtonStyled>
+				<button :disabled="props.disabled" @click="autoDetect">
+					<SearchIcon />
+					Detect
+				</button>
+			</ButtonStyled>
+			<ButtonStyled>
+				<button :disabled="props.disabled" @click="handleJavaFileInput()">
+					<FolderSearchIcon />
+					Browse
+				</button>
+			</ButtonStyled>
+		</span>
 	</div>
 </template>
 
