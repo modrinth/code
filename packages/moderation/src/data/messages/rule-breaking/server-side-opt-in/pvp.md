@@ -1,1 +1,1 @@
-- Automatic or assisted PvP combat
+- 3.3d: Automatic or assisted PvP combat

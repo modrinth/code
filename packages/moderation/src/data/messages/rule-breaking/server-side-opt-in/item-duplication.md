@@ -1,1 +1,1 @@
-- Item duplication
+- 3.3f: Item duplication

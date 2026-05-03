@@ -1,1 +1,1 @@
-- Promotion of illegal activity, or advocacy of unlawful acts including real-life drugs or illicit substances (1.5)
+- 1.5: Promotion of illegal activity, or advocacy of unlawful acts including real-life drugs or illicit substances
