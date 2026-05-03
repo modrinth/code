@@ -4,6 +4,10 @@ on:
     workflows: ['Modrinth App build']
     types: [completed]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
+
 jobs:
   release:
     name: Release Modrinth App
@@ -11,8 +15,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
       startsWith(github.event.workflow_run.head_branch, 'v')
-    runs-on: ubuntu-latest
-
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     env:
       VERSION_TAG: ${{ github.event.workflow_run.head_branch }}
       LINUX_X64_BUNDLE_ARTIFACT_NAME: App bundle (x86_64-unknown-linux-gnu)
@@ -21,10 +24,10 @@ jobs:
       LAUNCHER_FILES_BUCKET_BASE_URL: https://launcher-files.modrinth.com
 
     steps:
-      - name: 📥 Check out code
-        uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: 🔒 Verify ref is a tag
+      - name: Verify ref is a tag
         env:
           GH_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
@@ -43,8 +46,8 @@ jobs:
           fi
           echo "Verified ${VERSION_TAG} is a tag pointing at ${HEAD_SHA}"
 
-      - name: 📥 Download Modrinth App artifacts
-        uses: dawidd6/action-download-artifact@v11
+      - name: Download Modrinth App artifacts
+        uses: dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151 # v21
         with:
           workflow: theseus-build.yml
           workflow_conclusion: success
@@ -52,12 +55,12 @@ jobs:
           branch: ${{ env.VERSION_TAG }}
           use_unzip: true
 
-      - name: 📝 Extract app changelog
+      - name: Extract app changelog
         env:
           VERSION: ${{ env.VERSION_TAG }}
         run: npx --yes tsx scripts/build-theseus-release-notes.ts
 
-      - name: 🛠️ Generate version manifest
+      - name: Generate version manifest
         run: |
           # Reference: https://tauri.app/plugin/updater/#server-support
           jq -nc \
@@ -102,7 +105,7 @@ jobs:
           echo "Generated manifest for version ${VERSION_TAG}:"
           cat updates.json
 
-      - name: 📤 Upload release artifacts
+      - name: Upload release artifacts
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.LAUNCHER_FILES_BUCKET_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.LAUNCHER_FILES_BUCKET_SECRET_ACCESS_KEY }}
@@ -137,7 +140,7 @@ jobs:
 
           aws s3 cp updates.json "s3://${AWS_BUCKET}"
 
-      - name: 🏷️ Create GitHub release
+      - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
