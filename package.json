@@ -1,59 +1,73 @@
 {
-	"name": "@modrinth/monorepo",
-	"version": "0.0.0",
-	"private": true,
-	"scripts": {
-		"web:dev": "turbo run dev --filter=@modrinth/frontend",
-		"web:build": "turbo run build --filter=@modrinth/frontend",
-		"app:dev": "turbo run dev --filter=@modrinth/app",
-		"app:build": "turbo run build --filter=@modrinth/app",
-		"docs:dev": "turbo run dev --filter=@modrinth/docs",
-		"pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
-		"build": "turbo run build --continue",
-		"lint": "turbo run lint lint:ancillary --continue",
-		"lint:ancillary": "prettier --check .github *.*",
-		"test": "turbo run test --continue",
-		"fix": "turbo run fix fix:ancillary --continue",
-		"fix:ancillary": "prettier --write .github *.*",
-		"ci": "turbo run lint test --continue",
-		"prepr": "turbo run prepr --continue",
-		"prepr:frontend": "turbo run prepr --filter=@modrinth/frontend --filter=@modrinth/app-frontend",
-		"prepr:frontend:lib": "turbo run prepr --filter=@modrinth/ui --filter=@modrinth/moderation --filter=@modrinth/assets --filter=@modrinth/blog --filter=@modrinth/api-client --filter=@modrinth/utils --filter=@modrinth/tooling-config",
-		"prepr:frontend:web": "turbo run prepr --filter=@modrinth/frontend",
-		"prepr:frontend:app": "turbo run prepr --filter=@modrinth/app-frontend",
-		"storybook": "pnpm --filter @modrinth/ui storybook",
-		"build-storybook": "pnpm --filter @modrinth/ui build-storybook",
-		"icons:add": "pnpm --filter @modrinth/assets icons:add",
-		"changelog:collect": "node scripts/run.mjs collect-changelog",
-		"changelog:combine-for-app": "node scripts/run.mjs build-theseus-release-notes",
-		"scripts": "node scripts/run.mjs"
-	},
-	"devDependencies": {
-		"@clack/prompts": "^1.0.0",
-		"@modrinth/tooling-config": "workspace:*",
-		"@tailwindcss/container-queries": "^0.1.1",
-		"@types/node": "^20.1.0",
-		"@vue/compiler-dom": "^3.5.26",
-		"@vue/compiler-sfc": "^3.5.26",
-		"chalk": "^5.6.2",
-		"if-ci": "^3.0.0",
-		"keep-a-changelog": "^3.0.2",
-		"prettier": "^3.3.2",
-		"turbo": "^2.5.4",
-		"vue": "^3.5.13",
-		"yaml": "^2.8.2"
-	},
-	"packageManager": "pnpm@9.15.0",
-	"pnpm": {
-		"patchedDependencies": {
-			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
-		},
-		"peerDependencyRules": {
-			"allowedVersions": {
-				"vite": "8",
-				"esbuild": "0"
-			}
-		}
-	},
-	"prettier": "@modrinth/tooling-config/prettier.config.cjs"
+  "name": "@modrinth/monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "web:dev": "turbo run dev --filter=@modrinth/frontend",
+    "web:build": "turbo run build --filter=@modrinth/frontend",
+    "app:dev": "turbo run dev --filter=@modrinth/app",
+    "app:build": "turbo run build --filter=@modrinth/app",
+    "docs:dev": "turbo run dev --filter=@modrinth/docs",
+    "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
+    "build": "turbo run build --continue",
+    "lint": "turbo run lint lint:ancillary --continue",
+    "lint:ancillary": "prettier --check .github *.*",
+    "test": "turbo run test --continue",
+    "fix": "turbo run fix fix:ancillary --continue",
+    "fix:ancillary": "prettier --write .github *.*",
+    "ci": "turbo run lint test --continue",
+    "prepr": "turbo run prepr --continue",
+    "prepr:frontend": "turbo run prepr --filter=@modrinth/frontend --filter=@modrinth/app-frontend",
+    "prepr:frontend:lib": "turbo run prepr --filter=@modrinth/ui --filter=@modrinth/moderation --filter=@modrinth/assets --filter=@modrinth/blog --filter=@modrinth/api-client --filter=@modrinth/utils --filter=@modrinth/tooling-config",
+    "prepr:frontend:web": "turbo run prepr --filter=@modrinth/frontend",
+    "prepr:frontend:app": "turbo run prepr --filter=@modrinth/app-frontend",
+    "storybook": "pnpm --filter @modrinth/ui storybook",
+    "build-storybook": "pnpm --filter @modrinth/ui build-storybook",
+    "icons:add": "pnpm --filter @modrinth/assets icons:add",
+    "changelog:collect": "node scripts/run.mjs collect-changelog",
+    "changelog:combine-for-app": "node scripts/run.mjs build-theseus-release-notes",
+    "scripts": "node scripts/run.mjs"
+  },
+  "devDependencies": {
+    "@clack/prompts": "^1.0.0",
+    "@modrinth/tooling-config": "workspace:*",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@types/node": "^24",
+    "@vue/compiler-dom": "^3.5.26",
+    "@vue/compiler-sfc": "^3.5.26",
+    "chalk": "^5.6.2",
+    "if-ci": "^3.0.0",
+    "keep-a-changelog": "^3.0.2",
+    "prettier": "^3.3.2",
+    "turbo": "^2.5.4",
+    "vue": "^3.5.13",
+    "yaml": "^2.8.2"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "vite": "8",
+        "esbuild": "0"
+      }
+    },
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@sentry/cli",
+      "core-js",
+      "esbuild",
+      "protobufjs",
+      "sharp",
+      "unrs-resolver",
+      "vue-demi",
+      "workerd"
+    ]
+  },
+  "prettier": "@modrinth/tooling-config/prettier.config.cjs"
 }
