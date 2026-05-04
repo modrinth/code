@@ -29,12 +29,6 @@
   "app.browse.discover-servers": {
     "message": "Khám phá máy chủ"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Ẩn các máy chủ đã thêm"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Ẩn các nội dung đã được tải xuống"
-  },
   "app.browse.install-content-to-instance": {
     "message": "Tải nội dung này vào hồ sơ"
   },

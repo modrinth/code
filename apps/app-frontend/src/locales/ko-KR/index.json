@@ -1,4 +1,103 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Java {version} 다운로드 중"
+  },
+  "app.action-bar.downloads": {
+    "message": "다운로드"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "실행 중인 인스턴스 숨기기"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "기본 인스턴스로 지정"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "실행 중인 인스턴스 없음"
+  },
+  "app.action-bar.offline": {
+    "message": "오프라인"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "기본 인스턴스"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "실행 중인 인스턴스 보이기"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "인스턴스 중지"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "다운로드 목록 보기"
+  },
+  "app.action-bar.view-instance": {
+    "message": "인스턴스 보기"
+  },
+  "app.action-bar.view-logs": {
+    "message": "로그 보기"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "블러 효과와 같은 고급 렌더링 기능을 활성화합니다. 하드웨어 가속 없이는 성능 저하가 발생할 수 있습니다."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "고급 렌더링"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Modrinth App에서 선호하는 색상 테마를 선택합니다."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "색상 테마"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "런처의 기본 시작 화면을 변경합니다."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "홈"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "라이브러리"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "기본 시작 화면"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "스킨 화면에서 플레이어 위에 있는 이름표를 비활성화합니다."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "이름표 숨기기"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "홈 화면의 \"바로 입장\" 부분에 최근 플레이한 월드를 표시합니다."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "세계로 바로 입장"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "마인크래프트 실행 시 런처를 최소화합니다."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "런처 최소화"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "시스템 창 테두리 (앱 재시작 필요)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "네이티브 제목 표시줄"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "옵션 선택"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "사이드바를 접거나 펼칠 수 있는 기능을 활성화합니다."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "사이드바 토글"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Modrinth 외부에서 가져온 모드팩 파일(.mrpack)을 설치할 때, 사용자가 위험성을 인지할 수 있도록 경고를 표시합니다."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "출처를 알 수 없는 모드팩 설치 전 경고"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft 인증 서버가 일시적으로 중단되었을 수 있습니다. 인터넷 연결을 확인한 후 나중에 다시 시도하세요."
   },
@@ -30,13 +129,31 @@
     "message": "서버 탐색하기"
   },
   "app.browse.hide-added-servers": {
-    "message": "추가된 서버 숨기기"
+    "message": "이미 추가된 서버 숨기기"
   },
   "app.browse.hide-installed-content": {
-    "message": "설치된 콘텐츠 숨기기"
+    "message": "이미 설치된 콘텐츠 숨기기"
   },
   "app.browse.install-content-to-instance": {
     "message": "인스턴스에 콘텐츠 설치"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "모드팩"
+  },
+  "app.browse.server.install": {
+    "message": "설치"
+  },
+  "app.browse.server.installed": {
+    "message": "설치됨"
+  },
+  "app.browse.server.installing": {
+    "message": "설치 중"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "모드팩 설치중..."
   },
   "app.export-modal.description-placeholder": {
     "message": "모드팩 설명 입력..."
@@ -598,5 +715,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "로더가 서버에 의해 제공됩니다"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "모든 파일은 형식(.mrpack 포함)에 무관하게 Modrinth에 업로드되어야만 검수를 거칩니다."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "이 경고를 다시 표시하지 않음"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "설치 확인"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "무시하고 설치"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "악성코드는 흔히 디스코드와 같은 플랫폼을 통해 모드팩 파일을 공유하는 방식으로 유포됩니다."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "이 파일을 Modrinth에서 찾을 수 없습니다. 신뢰할 수 있는 출처의 파일만 설치하는 것을 권장합니다."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "출처를 알 수 없는 파일 경고"
   }
 }

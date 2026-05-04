@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "제휴 링크 생성"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "제휴 코드가 없습니다."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "제휴 링크 로드 중 오류 발생"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "제휴 링크 검색..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "프로젝트 {count}개"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "다운로드 수"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "팔로워 수"
   },
   "dashboard.collections.button.create-new": {
     "message": "새로 만들기"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "내 컬렉션"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "컬렉션 검색..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "이름 (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "최근 생성"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "최근 업데이트"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} 다운로드"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "귀하의 <b>{withdrawLimit}</b> 출금 한도를 모두 사용하셨습니다. 추가 출금을 위해서는 세금 신고서를 작성하셔야 합니다."
   },
+  "dashboard.head-title": {
+    "message": "대시보드"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "모두 읽음으로 표시"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "기록 보기"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "읽지 않은 알림이 없습니다."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "알림 불러오기 오류:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "기록"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "알림 기록"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "모두 보기"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "알림 기록 보기"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "알림 {extraNotifs}개 더 보기"
+  },
+  "dashboard.notifications.loading": {
+    "message": "알림 불러오는 중..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "조직 생성"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "조직을 만듭니다!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "조직 정보 가져오기 실패"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "멤버 {count}명"
+  },
+  "dashboard.organizations.title": {
+    "message": "조직"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "아래에서 여러 프로젝트를 선택하면 한 번에 편집할 수 있습니다."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "서버 프로젝트는 일괄 편집을 지원하지 않습니다"
+  },
+  "dashboard.projects.empty": {
+    "message": "아직 프로젝트가 없습니다. 시작하려면 위의 녹색 버튼을 클릭하세요."
+  },
+  "dashboard.projects.head-title": {
+    "message": "프로젝트"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "그 외 {count}개..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "링크 지우기"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "링크 편집"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "변경사항이 <strong>{count}개</strong>의 프로젝트에 적용됩니다."
+  },
+  "dashboard.projects.links.description": {
+    "message": "아래 지정한 링크는 선택한 각 프로젝트에서 덮어쓰게 됩니다. 비워 둔 항목은 무시됩니다. 휴지통 버튼을 클릭하면 선택한 모든 프로젝트에서 링크를 삭제할 수 있습니다."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Discord 서버 초대 링크입니다."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord 초대"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "사용자들이 프로젝트와 관련된 버그, 문제점 및 우려 사항을 보고할 수 있는 공간입니다."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "이슈 트래커"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "기존 링크가 삭제됩니다"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "유효한 Discord 초대 URL 입력"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "유효한 URL 입력"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "모든 프로젝트 보기"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "프로젝트의 소스 코드가 포함된 페이지/리포지토리"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "소스 코드"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "프로젝트에 대한 정보, 문서 및 도움말을 제공하는 페이지입니다."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "위키 페이지"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "선택한 프로젝트의 링크를 일괄 편집했습니다."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "{title}의 아이콘"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "이 프로젝트에 운영진의 안내문이 있습니다. 자세한 내용은 프로젝트를 확인해 주세요."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "환경 메타데이터를 검토해 주세요"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "오름차순"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "내림차순"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "이름"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "상태"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "유형"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "아이콘"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "이름"
+  },
+  "dashboard.projects.table.status": {
+    "message": "상태"
+  },
+  "dashboard.projects.table.type": {
+    "message": "유형"
+  },
+  "dashboard.report.title": {
+    "message": "{id} 신고"
+  },
+  "dashboard.reports.active-title": {
+    "message": "활성된 신고"
+  },
+  "dashboard.reports.title": {
+    "message": "신고"
+  },
   "dashboard.revenue.available-now": {
     "message": "지금 이용 가능"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "CSV로 다운로드"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "거래 내역"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "거래 기록"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "귀하의 결제 및 출금 내역이 여기에 표시됩니다."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "지난달"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "이번 달"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "모두 보기"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "모든 연도"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "귀하의 출금이 일시적으로 제한되었습니다. 귀하의 TIN 또는 SSN이 국세청(IRS) 기록과 일치하지 않았기 때문입니다. 세금 신고서를 다시 작성하고 재제출하려면 고객지원팀에 문의해 주세요."
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "출금"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "활성된 신고"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "분석"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "크리에이터"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "대시보드"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "알림"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "조직"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "개요"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "프로젝트"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "수익"
   },
   "dashboard.withdraw.completion.account": {
     "message": "계정"
@@ -2493,7 +2718,7 @@
     "message": "통계 읽기"
   },
   "scopes.category.analytics": {
-    "message": "해석학"
+    "message": "분석"
   },
   "scopes.category.collections": {
     "message": "컬렉션"
@@ -3228,7 +3453,7 @@
     "message": "결제 수단 추가"
   },
   "settings.billing.payment_method.action.history": {
-    "message": "과거 요금 보기"
+    "message": "과거 결제 보기"
   },
   "settings.billing.payment_method.action.primary": {
     "message": "기본으로 설정"

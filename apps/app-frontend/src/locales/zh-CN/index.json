@@ -1,4 +1,103 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "正在下载 Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "下载"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "隐藏更多运行中的实例"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "设为主实例"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "没有实例正在运行"
+  },
+  "app.action-bar.offline": {
+    "message": "离线"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "主实例"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "显示更多运行中的实例"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "停止实例"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "查看正在下载内容"
+  },
+  "app.action-bar.view-instance": {
+    "message": "查看实例"
+  },
+  "app.action-bar.view-logs": {
+    "message": "查看日志"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "启用模糊效果等高级渲染。可能会在没有硬件加速渲染的情况下造成性能问题。"
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "高级渲染"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "为 Modrinth App 选择偏好的色彩主题。"
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "色彩主题"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "更改启动器打开的页面。"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "首页"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "库"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "默认起始页"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "在皮肤页面中禁用你玩家头顶上的名称标签。"
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "隐藏名称标签"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "在主页的“快速回到”部分包含最近的世界。"
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "快速回到世界"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "当 Minecraft 进程启动时，将启动器最小化。"
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "最小化启动器"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "使用系统窗口边框（需要重启应用）。"
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "原生窗口"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "选择一个选项"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "启用切换侧边栏的功能。"
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "切换侧边栏"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "如果你尝试安装一个未托管在 Modrinth 上的 Modrinth 打包文件（.mrpack），我们会确保你在安装之前了解相关风险。"
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "安装未知整合包前提醒我"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft 身份验证服务器现在可能无法使用。请检查你的网络连接，并稍后再试。"
   },
@@ -37,6 +136,24 @@
   },
   "app.browse.install-content-to-instance": {
     "message": "将内容安装到实例中"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "整合包"
+  },
+  "app.browse.server.install": {
+    "message": "安装"
+  },
+  "app.browse.server.installed": {
+    "message": "已安装"
+  },
+  "app.browse.server.installing": {
+    "message": "安装中"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "正在安装整合包……"
   },
   "app.export-modal.description-placeholder": {
     "message": "输入整合包描述……"
@@ -575,6 +692,24 @@
   "instance.worlds.world_in_use": {
     "message": "世界正在使用中"
   },
+  "minecraft-account.add-account": {
+    "message": "添加账户"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft 账户"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "未登录"
+  },
+  "minecraft-account.remove-account": {
+    "message": "移除账户"
+  },
+  "minecraft-account.select-account": {
+    "message": "选择账户"
+  },
+  "minecraft-account.sign-in": {
+    "message": "登录 Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "由该实例提供"
   },
@@ -598,5 +733,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "加载器由服务器提供"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "只有上传到 Modrinth 的文件才会经过审核，无论其文件格式如何（包括 .mrpack）。"
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "不再显示此警告"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "确认安装"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "仍然安装"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "恶意软件常常通过模组包文件在 Discord 等平台上分享而传播。"
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "我们在 Modrinth 上找不到此文件。强烈建议你仅从可信来源安装文件。"
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "未知文件警告"
   }
 }

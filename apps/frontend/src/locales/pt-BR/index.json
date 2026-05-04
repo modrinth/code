@@ -936,7 +936,7 @@
     "message": "e {count} mais..."
   },
   "dashboard.projects.links.button.clear-link": {
-    "message": "Apagar link"
+    "message": "Limpar link"
   },
   "dashboard.projects.links.button.edit": {
     "message": "Editar links"

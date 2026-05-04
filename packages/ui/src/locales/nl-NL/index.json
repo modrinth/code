@@ -452,9 +452,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Upload bestanden"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Bestanden aan het uploaden ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Alle geselecteerde content is al uitgeschakeld"
   },
@@ -709,9 +706,6 @@
   },
   "files.operations.extracting": {
     "defaultMessage": "{bron} Uitpakken"
-  },
-  "files.operations.failed": {
-    "defaultMessage": "Mislukt"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "Modpack via URL"
@@ -1216,12 +1210,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Onbekende spelmodus"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "De bestanden worden nog geüpload. Als u deze pagina verlaat, wordt het uploaden afgebroken en gaan uw wijzigingen mogelijk verloren."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Bezig met uploaden"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} compatibel met {count, plural, one {instance} other {instances}}"
@@ -2678,20 +2666,11 @@
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Er is een fout opgetreden tijdens het terugzetten vanuit {backupName}. Probeer het nog eens of neem contact op met de helpdesk als het probleem zich blijft voordoen."
   },
-  "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Het herstellen vanuit de back-up is mislukt"
-  },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Het terugzetten vanuit {backupName} staat in de wachtrij en begint binnenkort."
   },
-  "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Herstel vanuit back-up staat in de wachtrij"
-  },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Uw server is teruggezet naar {backupName} en is klaar om te starten."
-  },
-  "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Het terugzetten vanuit de back-up is gelukt"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Uw server wordt hersteld vanuit {backupName}. Dit kan enkele minuten duren."
@@ -2704,12 +2683,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Back-up planning"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Het maken van een back-up is mislukt"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Herstellen vanuit back-up is mislukt"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Handmatige back-up"

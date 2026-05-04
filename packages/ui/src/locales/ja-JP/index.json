@@ -452,9 +452,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "ファイルをアップロード"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "ファイルをアップロード中 ({completed} / {total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "選択されたすべてのコンテンツは、既に無効化されています"
   },
@@ -490,6 +487,276 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number}項目を選択中"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "インスタンスを作成"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "ワールドを作成"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "終了"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "インポート"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "{count} 件のインスタンスをインポート"
+  },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "サーバーをセットアップ"
+  },
+  "creation-flow.modal.custom-setup.build-number.label": {
+    "defaultMessage": "ビルド番号"
+  },
+  "creation-flow.modal.custom-setup.build-number.placeholder": {
+    "defaultMessage": "ビルド番号を選択"
+  },
+  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
+    "defaultMessage": "ビルド番号を検索"
+  },
+  "creation-flow.modal.custom-setup.content-loader.label": {
+    "defaultMessage": "コンテンツローダー"
+  },
+  "creation-flow.modal.custom-setup.game-version.placeholder": {
+    "defaultMessage": "ゲームバージョンを選択"
+  },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "ゲームバージョンを検索…"
+  },
+  "creation-flow.modal.custom-setup.icon.remove": {
+    "defaultMessage": "アイコンを削除"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "アイコンを選択"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "最新"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "その他"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "安定"
+  },
+  "creation-flow.modal.custom-setup.loader-version.label": {
+    "defaultMessage": "ローダーのバージョン"
+  },
+  "creation-flow.modal.custom-setup.loader-version.placeholder": {
+    "defaultMessage": "ローダーのバージョンを選択"
+  },
+  "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
+    "defaultMessage": "ローダーのバージョンを検索"
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "ローダー"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "名前"
+  },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "インスタンス名を入力"
+  },
+  "creation-flow.modal.custom-setup.options.no-versions-available": {
+    "defaultMessage": "利用可能なバージョンがありません"
+  },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "追加の設定"
+  },
+  "creation-flow.modal.final-config.backup.before-reset-server.name": {
+    "defaultMessage": "サーバーのリセット前"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "イージー"
+  },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "ハード"
+  },
+  "creation-flow.modal.final-config.difficulty.label": {
+    "defaultMessage": "難易度"
+  },
+  "creation-flow.modal.final-config.difficulty.normal": {
+    "defaultMessage": "ノーマル"
+  },
+  "creation-flow.modal.final-config.difficulty.peaceful": {
+    "defaultMessage": "ピースフル"
+  },
+  "creation-flow.modal.final-config.game-version.placeholder": {
+    "defaultMessage": "ゲームバージョンを選択"
+  },
+  "creation-flow.modal.final-config.gamemode.creative": {
+    "defaultMessage": "クリエイティブ"
+  },
+  "creation-flow.modal.final-config.gamemode.hardcore": {
+    "defaultMessage": "ハードコア"
+  },
+  "creation-flow.modal.final-config.gamemode.label": {
+    "defaultMessage": "ゲームモード"
+  },
+  "creation-flow.modal.final-config.gamemode.survival": {
+    "defaultMessage": "サバイバル"
+  },
+  "creation-flow.modal.final-config.generate-structures.description": {
+    "defaultMessage": "村や要塞などの構造物が新しいチャンクに生成されるかを管理します"
+  },
+  "creation-flow.modal.final-config.generate-structures.label": {
+    "defaultMessage": "構造物を生成"
+  },
+  "creation-flow.modal.final-config.generator-settings-json.placeholder": {
+    "defaultMessage": "ジェネレーターの設定用JSONを入力"
+  },
+  "creation-flow.modal.final-config.generator-settings.custom": {
+    "defaultMessage": "カスタム"
+  },
+  "creation-flow.modal.final-config.generator-settings.default": {
+    "defaultMessage": "デフォルト"
+  },
+  "creation-flow.modal.final-config.generator-settings.description": {
+    "defaultMessage": "カスタムスーパーフラットの地層など、高度なワールドカスタマイズに使用されます"
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "フラット"
+  },
+  "creation-flow.modal.final-config.generator-settings.label": {
+    "defaultMessage": "ジェネレーターの設定"
+  },
+  "creation-flow.modal.final-config.generator-settings.placeholder": {
+    "defaultMessage": "ジェネレーターの設定を選択"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "ワールドの名前"
+  },
+  "creation-flow.modal.final-config.world-name.placeholder": {
+    "defaultMessage": "ワールドの名前を入力"
+  },
+  "creation-flow.modal.final-config.world-seed.description": {
+    "defaultMessage": "空欄にしてシードをランダムにします"
+  },
+  "creation-flow.modal.final-config.world-seed.label-with-optional": {
+    "defaultMessage": "ワールドのシード値 <optional>(任意)</optional>"
+  },
+  "creation-flow.modal.final-config.world-seed.placeholder": {
+    "defaultMessage": "ワールドのシード値を入力"
+  },
+  "creation-flow.modal.final-config.world-type.amplified": {
+    "defaultMessage": "アンプリファイド"
+  },
+  "creation-flow.modal.final-config.world-type.default": {
+    "defaultMessage": "デフォルト"
+  },
+  "creation-flow.modal.final-config.world-type.label": {
+    "defaultMessage": "ワールドタイプ"
+  },
+  "creation-flow.modal.final-config.world-type.large-biomes": {
+    "defaultMessage": "大きなバイオーム"
+  },
+  "creation-flow.modal.final-config.world-type.placeholder": {
+    "defaultMessage": "ワールドタイプを選択"
+  },
+  "creation-flow.modal.final-config.world-type.single-biome": {
+    "defaultMessage": "シングルバイオーム"
+  },
+  "creation-flow.modal.final-config.world-type.superflat": {
+    "defaultMessage": "スーパーフラット"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "追加"
+  },
+  "creation-flow.modal.import-instance.custom-launcher.name": {
+    "defaultMessage": "カスタム ({pathName})"
+  },
+  "creation-flow.modal.import-instance.detecting-launcher-instances": {
+    "defaultMessage": "ランチャーのインスタンスを検出しています..."
+  },
+  "creation-flow.modal.import-instance.launcher-instances.title": {
+    "defaultMessage": "ランチャーのインスタンス"
+  },
+  "creation-flow.modal.import-instance.launcher-path.add": {
+    "defaultMessage": "ランチャーのパスを追加"
+  },
+  "creation-flow.modal.import-instance.launcher-path.placeholder": {
+    "defaultMessage": "ランチャーのパス"
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.text": {
+    "defaultMessage": "指定されたパスではインポート可能なインスタンスは見つかりませんでした"
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.title": {
+    "defaultMessage": "インスタンスは見つかりませんでした"
+  },
+  "creation-flow.modal.import-instance.search.placeholder": {
+    "defaultMessage": "インスタンス名を検索"
+  },
+  "creation-flow.modal.import-instance.selection.clear-all": {
+    "defaultMessage": "全ての選択を解除"
+  },
+  "creation-flow.modal.modpack.action.browse": {
+    "defaultMessage": "Modパックを探す"
+  },
+  "creation-flow.modal.modpack.action.import": {
+    "defaultMessage": "Modパックをインポート"
+  },
+  "creation-flow.modal.modpack.known-modpack.prompt": {
+    "defaultMessage": "インストールしたいMODパックは既に決まっていますか？"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "見つかりません"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "Modパックを検索"
+  },
+  "creation-flow.modal.setup-type.instance.description": {
+    "defaultMessage": "インスタンスとは、特定のローダー、バージョン、およびModを備えたMinecraftの起動構成のことです"
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.description": {
+    "defaultMessage": "ローダーとゲームのバージョンを選択して、最初から始めましょう"
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.title": {
+    "defaultMessage": "カスタム設定"
+  },
+  "creation-flow.modal.setup-type.option.import-instance.description": {
+    "defaultMessage": "Prism、CurseForge、または同様のサービスからインスタンスをインポートします。"
+  },
+  "creation-flow.modal.setup-type.option.import-instance.title": {
+    "defaultMessage": "インスタンスをインポート"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "Modrinthでモッドパックを閲覧するか、ファイルからインポートしてください。"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "modpackをインストール"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
+    "defaultMessage": "MODやプラグインを一切使用していない、クラシックなMinecraft。"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
+    "defaultMessage": "マインクラフト"
+  },
+  "creation-flow.modal.setup-type.title.installation": {
+    "defaultMessage": "インストールタイプを選択してください"
+  },
+  "creation-flow.modal.setup-type.title.instance": {
+    "defaultMessage": "インスタンスタイプを選択してください"
+  },
+  "creation-flow.modal.setup-type.title.world": {
+    "defaultMessage": "ワールドタイプを選択してください"
+  },
+  "creation-flow.title.choose-modpack": {
+    "defaultMessage": "モッドパックを選択"
+  },
+  "creation-flow.title.create-instance": {
+    "defaultMessage": "インスタンスを作成する"
+  },
+  "creation-flow.title.create-world": {
+    "defaultMessage": "世界を作る"
+  },
+  "creation-flow.title.import-instance": {
+    "defaultMessage": "インスタンスをインポート"
+  },
+  "creation-flow.title.reset-server": {
+    "defaultMessage": "サーバーをリセット"
+  },
+  "creation-flow.title.set-up-server": {
+    "defaultMessage": "サーバーの設定"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "概要を書き出す"
@@ -704,14 +971,20 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": ".zip URLからアップロード"
   },
+  "files.operations.current-file": {
+    "defaultMessage": "現在のファイル: {file}"
+  },
   "files.operations.extracted": {
     "defaultMessage": "{size} 展開済み"
   },
   "files.operations.extracting": {
     "defaultMessage": "{source} を展開中"
   },
-  "files.operations.failed": {
-    "defaultMessage": "失敗"
+  "files.operations.extracting-completed": {
+    "defaultMessage": "{source}の抽出が完了しました"
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "{source} の抽出に失敗しました"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpackのURL"
@@ -1216,12 +1489,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "不明なゲームモード"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "ファイルはまだアップロード中です。このページを離れるとアップロードがキャンセルされ、変更が失われます。"
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "進行中のアップロード"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count}件の互換性のあるインスタンス"
@@ -2567,6 +2834,9 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "スタッフにより限定公開"
   },
+  "s.bg": {
+    "defaultMessage": "バックグラウンドタスクが実行中です"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "フィルターロック済み"
   },
@@ -2654,6 +2924,21 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "バニラ(Mod非導入)"
   },
+  "servers.admonitions.background-task-running": {
+    "defaultMessage": "バックグラウンドタスクが実行中です"
+  },
+  "servers.backups.admonition.backup-cancelled.description": {
+    "defaultMessage": "バックアップ{backupName}はキャンセルされました。"
+  },
+  "servers.backups.admonition.backup-cancelled.title": {
+    "defaultMessage": "バックアップがキャンセルされました"
+  },
+  "servers.backups.admonition.backup-completed.description": {
+    "defaultMessage": "{backupName} は正常に完了しました。"
+  },
+  "servers.backups.admonition.backup-completed.title": {
+    "defaultMessage": "バックアップが完了しました"
+  },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "{backupName}の作成中に問題が発生しました。問題が継続する場合は再試行するかサポートに連絡してください。"
   },
@@ -2666,6 +2951,12 @@
   "servers.backups.admonition.backup-queued.title": {
     "defaultMessage": "待機中のバックアップ"
   },
+  "servers.backups.admonition.backup-timed-out.description": {
+    "defaultMessage": "{backupName} の作成がタイムアウトしました。もう一度お試しいただくか、問題が解決しない場合はサポートにお問い合わせください。"
+  },
+  "servers.backups.admonition.backup-timed-out.title": {
+    "defaultMessage": "バックアップがタイムアウトしました"
+  },
   "servers.backups.admonition.creating-backup.description": {
     "defaultMessage": "ワールドデータとサーバー構成を{backupName}に保存しています。これには数分かかることがあります。"
   },
@@ -2675,23 +2966,35 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "保存したバックアップ"
   },
+  "servers.backups.admonition.restore-cancelled.description": {
+    "defaultMessage": "{backupName}からの復元はキャンセルされました。"
+  },
+  "servers.backups.admonition.restore-cancelled.title": {
+    "defaultMessage": "復元がキャンセルされました"
+  },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "{backupName}からの復元中に問題が発生しました。問題が継続する場合は再試行するかサポートに連絡してください。"
   },
   "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "バックアップからの復元に失敗"
+    "defaultMessage": "復元に失敗しました"
   },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "{backupName}からの復元は待機中ですが、すぐに開始します。"
   },
   "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "待機中のバックアップからの復元"
+    "defaultMessage": "復元キュー"
   },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "あなたのサーバーは{backupName}から復元され、開始の準備ができています。"
   },
   "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "バックアップからの復元に成功しました"
+    "defaultMessage": "修復完了"
+  },
+  "servers.backups.admonition.restore-timed-out.description": {
+    "defaultMessage": "{backupName}からの復元がタイムアウトしました。もう一度お試しいただくか、問題が解決しない場合はサポートにお問い合わせください。"
+  },
+  "servers.backups.admonition.restore-timed-out.title": {
+    "defaultMessage": "復元がタイムアウトしました"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "{backupName}からサーバーを復元しています。これには数分かかる可能性があります。"
@@ -2699,17 +3002,20 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "バックアップから復元しています"
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "{count, plural, one {選択したバックアップ1件に対する一括操作} other {選択したバックアップ#件に対する一括操作}}"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "{total, plural,one {#バックアップ} other {{#バックアップ}}を削除しています..."
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural,one {# バックアップが選択されました} other {# バックアップが選択されました}}"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "自動"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "バックアップスケジュール"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "バックアップの作成に失敗しました"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "バックアップからの復元に失敗しました"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "手動バックアップ"
@@ -3126,7 +3432,7 @@
     "defaultMessage": "Kit PvP"
   },
   "tag.category.library": {
-    "defaultMessage": "前提Mod"
+    "defaultMessage": "ライブラリ"
   },
   "tag.category.lifesteal": {
     "defaultMessage": "ライフスティール"
