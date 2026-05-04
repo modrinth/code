@@ -629,6 +629,7 @@ type ServerWithOwner = Archon.Servers.v0.Server & { owner?: ServerListingOwner }
 
 const sharedServerOwner: ServerListingOwner = {
 	username: 'Prospector',
+	avatarUrl: 'https://github.com/Prospector.png',
 }
 
 const demoSharedServers = computed<ServerWithOwner[]>(() => {
