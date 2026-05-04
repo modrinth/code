@@ -127,11 +127,11 @@
 								:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 							>
 								<template #suffix>
-									<div class="mr-0.5 flex gap-2">
+									<div class="mr-0.5 flex gap-1.5">
 										<button
 											v-if="selectedBreakdown !== 'none'"
 											type="button"
-											class="-mr-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+											class="inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent shadow-none transition-colors hover:bg-transparent hover:text-contrast"
 											aria-label="Clear breakdown"
 											@click.stop="clearSelectedBreakdown"
 											@keydown.stop
