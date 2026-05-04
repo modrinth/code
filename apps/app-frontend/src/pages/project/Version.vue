@@ -176,9 +176,10 @@ import {
 	ButtonStyled,
 	Card,
 	CopyCode,
+	useFormatBytes,
 	useFormatDateTime,
 } from '@modrinth/ui'
-import { formatBytes, renderString } from '@modrinth/utils'
+import { renderString } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -191,6 +192,7 @@ const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
 })
+const formatBytes = useFormatBytes()
 
 const breadcrumbs = useBreadcrumbs()
 

@@ -81,10 +81,18 @@
 
 <script setup lang="ts">
 import { FileIcon, SpinnerIcon, UploadIcon } from '@modrinth/assets'
-import { Admonition, Avatar, CopyCode, injectNotificationManager } from '@modrinth/ui'
-import { formatBytes, type Project, type Version } from '@modrinth/utils'
+import {
+	Admonition,
+	Avatar,
+	CopyCode,
+	injectNotificationManager,
+	useFormatBytes,
+} from '@modrinth/ui'
+import type { Project, Version } from '@modrinth/utils'
 
 const { addNotification } = injectNotificationManager()
+
+const formatBytes = useFormatBytes()
 
 const fileInput = ref<HTMLInputElement>()
 const selectedFile = ref<File | null>(null)

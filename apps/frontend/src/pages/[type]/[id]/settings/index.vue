@@ -146,7 +146,11 @@
 											const input = e.target
 											if (input.files?.length) {
 												if (
-													fileIsValid(input.files[0], { maxSize: 524288000, alertOnInvalid: true })
+													fileIsValid(
+														input.files[0],
+														{ maxSize: 524288000, alertOnInvalid: true },
+														formatBytes,
+													)
 												)
 													showBannerPreview(Array.from(input.files))
 											}
@@ -379,6 +383,7 @@ import {
 	StyledInput,
 	Toggle,
 	UnsavedChangesPopup,
+	useFormatBytes,
 	usePageLeaveSafety,
 } from '@modrinth/ui'
 import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
@@ -404,6 +409,8 @@ const flags = useFeatureFlags()
 
 const tags = useGeneratedState()
 const router = useNativeRouter()
+
+const formatBytes = useFormatBytes()
 
 const name = ref(project.value.title)
 const slug = ref(project.value.slug)

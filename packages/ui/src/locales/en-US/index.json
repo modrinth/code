@@ -1199,6 +1199,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Enter state/province"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, one {# byte} other {# bytes}}"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
+  },
   "header.category.category": {
     "defaultMessage": "Category"
   },
