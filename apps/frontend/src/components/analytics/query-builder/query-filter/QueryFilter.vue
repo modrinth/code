@@ -15,6 +15,7 @@
 			:search-placeholder="preview.category.searchPlaceholder"
 			:trigger-class="previewTriggerClass"
 			dropdown-min-width="18rem"
+			show-selection-actions
 			@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
 			@open="openPreviewFilterDraft(preview.key)"
 			@close="commitPreviewFilterDraft(preview.key)"
@@ -121,6 +122,21 @@
 						wrapper-class="w-full bg-surface-4"
 					/>
 				</div>
+				<div
+					v-if="activeCategorySelectionCount > 0"
+					class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-6 py-2.5 text-sm"
+				>
+					<span class="font-semibold text-secondary">{{ activeCategorySelectionLabel }}</span>
+					<button
+						type="button"
+						class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+						@click="clearActiveCategorySelection"
+						@keydown.enter.stop
+						@keydown.space.stop
+					>
+						Deselect all
+					</button>
+				</div>
 				<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
 					<div
 						v-if="filteredActiveCategoryOptions.length === 0"
@@ -221,11 +237,11 @@ import {
 	getAddMenuPosition,
 	getCategorySelectionCount as getCategorySelectionCountValue,
 	getCategorySelectionSummary as getCategorySelectionSummaryValue,
+	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
+	isFilterValueSelected as getIsFilterValueSelected,
 	getOptionsWithSelectedValues,
 	getSubmenuPosition,
 	getVisibleAnalyticsFilterCategoriesForState,
-	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
-	isFilterValueSelected as getIsFilterValueSelected,
 	normalizeSelectedValues as normalizeSelectedFilterValues,
 	type Point,
 } from './queryFilter'
@@ -329,6 +345,14 @@ const filterCategoriesByKey = computed(
 
 const activeCategory = computed(() =>
 	activeCategoryKey.value ? filterCategoriesByKey.value.get(activeCategoryKey.value) : undefined,
+)
+const activeCategorySelectionCount = computed(() => {
+	return activeCategory.value ? getCategorySelectionCount(activeCategory.value.key, 'draft') : 0
+})
+const activeCategorySelectionLabel = computed(() =>
+	activeCategorySelectionCount.value === 1
+		? '1 selected'
+		: `${activeCategorySelectionCount.value} selected`,
 )
 
 const filteredActiveCategoryOptions = computed(() => {
@@ -579,6 +603,9 @@ function setSelectedValues(
 
 	if (source === 'draft') {
 		draftSelectedFilters.value = nextFilters
+		if (isAddMenuOpen.value && activeCategoryKey.value === categoryKey) {
+			scheduleSubmenuPositionUpdate()
+		}
 	} else {
 		selectedFilters.value = nextFilters
 	}
@@ -734,6 +761,14 @@ function clearAllFilters() {
 	for (const category of filterCategories.value) {
 		setSelectedValues(category.key, [])
 	}
+}
+
+function clearActiveCategorySelection() {
+	if (!activeCategory.value) {
+		return
+	}
+
+	setSelectedValues(activeCategory.value.key, [], 'draft')
 }
 
 function getPreviewSelectedValues(categoryKey: AnalyticsQueryFilterCategory): string[] {

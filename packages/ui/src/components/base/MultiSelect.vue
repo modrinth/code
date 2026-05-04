@@ -166,6 +166,32 @@
 								</span>
 							</div>
 						</div>
+
+						<div v-if="$slots.top" class="border-0 border-b border-solid border-b-surface-5 py-1.5">
+							<slot
+								name="top"
+								:model-value="modelValue"
+								:selected-options="selectedOptions"
+								:clear-all="clearAll"
+								:is-open="isOpen"
+							></slot>
+						</div>
+
+						<div
+							v-if="shouldShowSelectionActions"
+							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-6 py-2.5 text-sm"
+						>
+							<span class="font-semibold text-secondary">{{ selectionActionsLabel }}</span>
+							<button
+								type="button"
+								class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+								@click="clearAll"
+								@keydown.enter.stop
+								@keydown.space.stop
+							>
+								{{ selectionActionsClearLabel }}
+							</button>
+						</div>
 					</div>
 
 					<div
@@ -292,6 +318,8 @@ const props = withDefaults(
 		disableSearchFilter?: boolean
 		includeSelectAllOption?: boolean
 		selectAllLabel?: string
+		showSelectionActions?: boolean
+		selectionActionsClearLabel?: string
 		maxTagRows?: number
 	}>(),
 	{
@@ -307,6 +335,8 @@ const props = withDefaults(
 		noResultsMessage: 'No results found',
 		includeSelectAllOption: false,
 		selectAllLabel: 'Select all',
+		showSelectionActions: false,
+		selectionActionsClearLabel: 'Deselect all',
 		maxTagRows: 1,
 	},
 )
@@ -388,6 +418,12 @@ const filteredOptions = computed(() => {
 
 const isNoOptionsState = computed(() => props.options.length === 0 && !searchQuery.value)
 const shouldShowSelectAll = computed(() => props.includeSelectAllOption && props.options.length > 0)
+const shouldShowSelectionActions = computed(
+	() => props.showSelectionActions && props.modelValue.length > 0,
+)
+const selectionActionsLabel = computed(() => {
+	return props.modelValue.length === 1 ? '1 selected' : `${props.modelValue.length} selected`
+})
 
 function isSelected(value: T) {
 	return props.modelValue.includes(value)
@@ -758,6 +794,9 @@ watch(
 	() => props.modelValue,
 	() => {
 		calculateVisibleTags()
+		if (isOpen.value) {
+			updateDropdownPosition()
+		}
 	},
 	{ deep: true },
 )

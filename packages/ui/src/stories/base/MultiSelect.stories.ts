@@ -1,5 +1,6 @@
+import { CheckIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import MultiSelect from '../../components/base/MultiSelect.vue'
 
@@ -59,6 +60,68 @@ export const WithSelectAll: Story = {
 		includeSelectAllOption: true,
 		searchPlaceholder: 'Search versions',
 	},
+}
+
+export const WithSelectionActions: Story = {
+	args: {
+		...Default.args,
+		searchable: true,
+		showSelectionActions: true,
+		searchPlaceholder: 'Search versions',
+	},
+}
+
+export const WithTopSlot: Story = {
+	args: {
+		...Default.args,
+		modelValue: [],
+		searchable: true,
+		showSelectionActions: true,
+		searchPlaceholder: 'Search languages',
+		placeholder: 'All languages',
+	},
+	render: (args) => ({
+		components: { CheckIcon, MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			const isAllLanguagesSelected = computed(() => selected.value.length === 0)
+			const selectAllLanguages = () => {
+				selected.value = []
+			}
+			return { args, isAllLanguagesSelected, selectAllLanguages, selected }
+		},
+		template: /*html*/ `
+			<div style="width: 400px;">
+				<MultiSelect v-bind="args" v-model="selected">
+					<template #top>
+						<div class="px-3">
+							<button
+								type="button"
+								class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
+								:aria-selected="isAllLanguagesSelected"
+								role="option"
+								@click="selectAllLanguages"
+								@keydown.enter.stop
+								@keydown.space.stop
+							>
+								<span
+									class="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
+									:class="
+										isAllLanguagesSelected
+											? 'border-button-border bg-brand text-brand-inverted'
+											: 'border-surface-5 bg-surface-2'
+									"
+								>
+									<CheckIcon v-if="isAllLanguagesSelected" aria-hidden="true" stroke-width="3" />
+								</span>
+								<span class="font-semibold leading-tight text-primary">All languages</span>
+							</button>
+						</div>
+					</template>
+				</MultiSelect>
+			</div>
+		`,
+	}),
 }
 
 export const DropdownMinWidth: Story = {

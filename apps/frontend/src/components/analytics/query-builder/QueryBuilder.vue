@@ -14,8 +14,7 @@
 					placeholder="Select projects"
 					:searchable="projectOptions.length > 6"
 					:max-tag-rows="1"
-					include-select-all-option
-					select-all-label="All projects"
+					show-selection-actions
 					@open="handleProjectSelectOpen"
 					@close="handleProjectSelectClose"
 				>
@@ -42,6 +41,35 @@
 									"
 								/>
 							</div>
+						</div>
+					</template>
+					<template #top>
+						<div class="px-3">
+							<button
+								type="button"
+								class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
+								:aria-selected="isAllProjectsOptionSelected"
+								role="option"
+								@click="selectAllProjectsMode"
+								@keydown.enter.stop
+								@keydown.space.stop
+							>
+								<span
+									class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
+									:class="
+										isAllProjectsOptionSelected
+											? 'border-button-border bg-brand text-brand-inverted'
+											: 'border-surface-5 bg-surface-2'
+									"
+								>
+									<CheckIcon
+										v-if="isAllProjectsOptionSelected"
+										aria-hidden="true"
+										stroke-width="3"
+									/>
+								</span>
+								<span class="font-semibold leading-tight text-primary">All projects</span>
+							</button>
 						</div>
 					</template>
 					<template #bottom>
@@ -122,7 +150,14 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { BlocksIcon, CalendarIcon, ChevronLeftIcon, FolderOpenIcon, XIcon } from '@modrinth/assets'
+import {
+	BlocksIcon,
+	CalendarIcon,
+	CheckIcon,
+	ChevronLeftIcon,
+	FolderOpenIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { Combobox, type ComboboxOption, MultiSelect, type MultiSelectOption } from '@modrinth/ui'
 
 import {
@@ -192,14 +227,11 @@ watch(selectedProjectIds, (nextSelectedProjectIds) => {
 const areAllProjectsSelected = computed(() => {
 	return isSameProjectSelection(draftSelectedProjectIds.value, allProjectIds.value)
 })
+const isAllProjectsOptionSelected = computed(() => draftSelectedProjectIds.value.length === 0)
 
 const selectedProjectLabel = computed(() => {
-	if (areAllProjectsSelected.value) {
+	if (isAllProjectsOptionSelected.value || areAllProjectsSelected.value) {
 		return 'All projects'
-	}
-
-	if (draftSelectedProjectIds.value.length === 0) {
-		return 'Select projects'
 	}
 
 	if (draftSelectedProjectIds.value.length === 1) {
@@ -214,7 +246,9 @@ const selectedProjectLabel = computed(() => {
 
 function handleProjectSelectOpen() {
 	isProjectSelectOpen.value = true
-	draftSelectedProjectIds.value = [...selectedProjectIds.value]
+	draftSelectedProjectIds.value = isSameProjectSelection(selectedProjectIds.value, allProjectIds.value)
+		? []
+		: [...selectedProjectIds.value]
 }
 
 function handleProjectSelectClose(
@@ -230,6 +264,10 @@ function handleProjectSelectClose(
 }
 
 function clearDraftSelectedProjects() {
+	draftSelectedProjectIds.value = []
+}
+
+function selectAllProjectsMode() {
 	draftSelectedProjectIds.value = []
 }
 
@@ -500,3 +538,9 @@ defineExpose({
 	fetchRequest,
 })
 </script>
+
+<style lang="scss" scoped>
+.checkbox-shadow {
+	box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.08);
+}
+</style>
