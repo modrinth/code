@@ -180,20 +180,20 @@ strum = "0.27.2"
 syn = { version = "2.0" }
 sysinfo = { version = "0.37.2", default-features = false }
 tar = "0.4.44"
-tauri = "2.8.5"
-tauri-build = "2.4.1"
-tauri-plugin-deep-link = "2.4.3"
-tauri-plugin-dialog = "2.4.0"
-tauri-plugin-fs = "2.4.5"
-tauri-plugin-http = "2.5.7"
-tauri-plugin-opener = "2.5.0"
-tauri-plugin-os = "2.3.1"
-tauri-plugin-single-instance = "2.3.4"
-tauri-plugin-updater = { version = "2.9.0", default-features = false, features = [
+tauri = "2.11.0"
+tauri-build = "2.6.0"
+tauri-plugin-deep-link = "2.4.9"
+tauri-plugin-dialog = "2.7.1"
+tauri-plugin-fs = "2.5.1"
+tauri-plugin-http = "2.5.9"
+tauri-plugin-opener = "2.5.4"
+tauri-plugin-os = "2.3.2"
+tauri-plugin-single-instance = "2.4.2"
+tauri-plugin-updater = { version = "2.10.1", default-features = false, features = [
   "rustls-tls",
   "zip",
 ] }
-tauri-plugin-window-state = "2.4.0"
+tauri-plugin-window-state = "2.4.1"
 tempfile = "3.23.0"
 theseus = { path = "packages/app-lib" }
 thiserror = "2.0.17"
