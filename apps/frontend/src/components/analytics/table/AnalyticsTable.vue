@@ -12,13 +12,13 @@
 					<div class="text-xl font-semibold text-contrast">Breakdown</div>
 
 					<div class="flex flex-wrap items-center gap-1.5">
-						<label
-							for="analytics-include-date"
-							class="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary"
+						<ButtonStyled
+							type="chip"
+							:color="includeDate ? 'brand' : 'standard'"
+							:highlighted="includeDate"
 						>
-							Include date
-						</label>
-						<Toggle id="analytics-include-date" v-model="includeDate" small />
+							<button @click="includeDate = !includeDate">Date</button>
+						</ButtonStyled>
 
 						<div class="mx-1 h-6 w-px bg-surface-5"></div>
 
@@ -72,7 +72,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
-import { ButtonStyled, Table, type TableColumn, Toggle, useFormatNumber } from '@modrinth/ui'
+import { ButtonStyled, Table, type TableColumn, useFormatNumber } from '@modrinth/ui'
 
 import {
 	type AnalyticsBreakdownPreset,

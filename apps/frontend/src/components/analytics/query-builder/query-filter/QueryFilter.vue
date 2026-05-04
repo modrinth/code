@@ -45,7 +45,7 @@
 		<button
 			ref="addMenuTrigger"
 			type="button"
-			class="inline-flex h-10 items-center gap-2 rounded-xl border border-dashed border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-4"
+			class="inline-flex h-10 items-center gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-4"
 			:aria-expanded="isAddMenuOpen"
 			aria-haspopup="menu"
 			@click="handleAddMenuTriggerClick"

@@ -10,7 +10,7 @@
 					v-model="draftSelectedProjectIds"
 					:options="projectOptions"
 					:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
-					dropdown-min-width="24rem"
+					dropdown-min-width="330px"
 					placeholder="Select projects"
 					:searchable="projectOptions.length > 6"
 					:max-tag-rows="1"
@@ -25,7 +25,7 @@
 							</span>
 							<div class="ml-2 flex shrink-0 items-center gap-1.5">
 								<button
-									v-if="isOpen && draftSelectedProjectIds.length > 0"
+									v-if="canClearDraftSelectedProjects"
 									type="button"
 									class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
 									aria-label="Clear projects"
@@ -86,7 +86,7 @@
 			</div>
 		</div>
 
-		<div class="flex flex-wrap items-center gap-4">
+		<div class="flex flex-wrap items-center gap-6">
 			<div class="flex items-center gap-2">
 				<div class="flex w-32 items-center gap-2 text-primary">
 					<CalendarIcon class="size-5" />
@@ -109,7 +109,7 @@
 			</div>
 		</div>
 
-		<div class="flex flex-wrap items-center gap-4">
+		<div class="flex flex-wrap items-center gap-6">
 			<div class="flex items-center gap-2">
 				<div class="flex w-32 items-center gap-2 text-primary">
 					<BlocksIcon class="size-5" />
@@ -228,6 +228,9 @@ const areAllProjectsSelected = computed(() => {
 	return isSameProjectSelection(draftSelectedProjectIds.value, allProjectIds.value)
 })
 const isAllProjectsOptionSelected = computed(() => draftSelectedProjectIds.value.length === 0)
+const canClearDraftSelectedProjects = computed(() => {
+	return !isAllProjectsOptionSelected.value && !areAllProjectsSelected.value
+})
 
 const selectedProjectLabel = computed(() => {
 	if (isAllProjectsOptionSelected.value || areAllProjectsSelected.value) {
@@ -246,7 +249,10 @@ const selectedProjectLabel = computed(() => {
 
 function handleProjectSelectOpen() {
 	isProjectSelectOpen.value = true
-	draftSelectedProjectIds.value = isSameProjectSelection(selectedProjectIds.value, allProjectIds.value)
+	draftSelectedProjectIds.value = isSameProjectSelection(
+		selectedProjectIds.value,
+		allProjectIds.value,
+	)
 		? []
 		: [...selectedProjectIds.value]
 }
@@ -265,6 +271,9 @@ function handleProjectSelectClose(
 
 function clearDraftSelectedProjects() {
 	draftSelectedProjectIds.value = []
+	if (!isProjectSelectOpen.value) {
+		handleProjectSelectClose()
+	}
 }
 
 function selectAllProjectsMode() {
