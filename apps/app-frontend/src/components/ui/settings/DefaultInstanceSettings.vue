@@ -143,6 +143,10 @@ watch(
 		<hr class="my-6 bg-button-border border-none h-[1px]" />
 
 		<div class="flex flex-col gap-6">
+			<p class="m-0 leading-tight">
+				Commands support $INST_NAME, $INST_ID, $INST_DIR/$INST_MC_DIR, $INST_JAVA, $INST_JAVA_ARGS.
+			</p>
+
 			<div class="flex flex-col gap-2.5">
 				<h3 class="m-0 text-lg font-semibold text-contrast">Pre launch hook</h3>
 				<StyledInput

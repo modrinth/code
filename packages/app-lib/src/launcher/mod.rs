@@ -28,6 +28,7 @@ use std::path::PathBuf;
 use tokio::process::Command;
 
 mod args;
+pub(crate) mod hooks;
 
 pub mod download;
 pub mod quick_play_version;
@@ -189,6 +190,60 @@ pub async fn get_loader_version_from_profile(
     } else {
         Ok(None)
     }
+}
+
+pub(crate) async fn resolve_java_for_launch(
+    profile: &Profile,
+) -> crate::Result<JavaVersion> {
+    let state = State::get().await?;
+    let (minecraft, version_index) =
+        resolve_minecraft_manifest(&profile.game_version, &state).await?;
+    let version = &minecraft.versions[version_index];
+
+    let mut loader_version = get_loader_version_from_profile(
+        &profile.game_version,
+        profile.loader,
+        profile.loader_version.as_deref(),
+    )
+    .await?;
+
+    if profile.loader != ModLoader::Vanilla && loader_version.is_none() {
+        loader_version = get_loader_version_from_profile(
+            &profile.game_version,
+            profile.loader,
+            Some("stable"),
+        )
+        .await?;
+    }
+
+    let version_info = download::download_version_info(
+        &state,
+        version,
+        loader_version.as_ref(),
+        None,
+        None,
+    )
+    .await?;
+
+    let key = version_info
+        .java_version
+        .as_ref()
+        .map_or(8, |it| it.major_version);
+    let (java_path, set_java) = if let Some(java_version) =
+        get_java_version_from_profile(profile, &version_info).await?
+    {
+        (PathBuf::from(java_version.path), false)
+    } else {
+        (crate::api::jre::auto_install_java(key).await?, true)
+    };
+
+    let java_version = crate::api::jre::check_jre(java_path).await?;
+
+    if set_java {
+        java_version.upsert(&state.pool).await?;
+    }
+
+    Ok(java_version)
 }
 
 /// Resolves the Minecraft version manifest and finds the index for the given
@@ -747,7 +802,7 @@ pub async fn launch_minecraft(
     // Java options should be set in instance options (the existence of _JAVA_OPTIONS overwrites them)
     command.env_remove("_JAVA_OPTIONS");
 
-    command.envs(env_args);
+    command.envs(env_args.iter().cloned());
 
     // Overwrites the minecraft options.txt file with the settings from the profile
     // Uses 'a:b' syntax which is not quite yaml
@@ -831,6 +886,7 @@ pub async fn launch_minecraft(
             &profile.path,
             command,
             post_exit_hook,
+            env_args,
             state.directories.profile_logs_dir(&profile.path),
             version_info.logging.is_some(),
             main_class_keep_alive,

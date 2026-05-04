@@ -105,6 +105,7 @@ impl ProcessManager {
         profile_path: &str,
         mut mc_command: Command,
         post_exit_command: Option<String>,
+        post_exit_env_vars: Vec<(String, String)>,
         logs_folder: PathBuf,
         xml_logging: bool,
         main_class_keep_alive: TempDir,
@@ -208,6 +209,7 @@ impl ProcessManager {
         tokio::spawn(Process::sequential_process_manager(
             profile_path.to_string(),
             post_exit_command,
+            post_exit_env_vars,
             metadata.uuid,
         ));
 
@@ -737,6 +739,7 @@ impl Process {
     async fn sequential_process_manager(
         profile_path: String,
         post_exit_command: Option<String>,
+        post_exit_env_vars: Vec<(String, String)>,
         uuid: Uuid,
     ) -> crate::Result<()> {
         async fn update_playtime(
@@ -854,7 +857,7 @@ impl Process {
 
                 if let Some(command) = cmd.next() {
                     let mut command = Command::new(command);
-                    command.args(cmd).current_dir(
+                    command.args(cmd).envs(post_exit_env_vars).current_dir(
                         profile::get_full_path(&profile_path).await?,
                     );
                     command.spawn().map_err(IOError::from)?;
