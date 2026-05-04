@@ -336,6 +336,11 @@ const filterCategories = computed<FilterCategory[]>(() => {
 			options: withSelectedOptions('download_source', downloadSourceFilterOptions.value),
 		},
 		{
+			key: 'download_reason',
+			label: 'Download Type',
+			options: withSelectedOptions('download_reason', downloadReasonFilterOptions.value),
+		},
+		{
 			key: 'version_id',
 			label: 'Project version',
 			searchable: versionFilterOptions.value.length > 6,
@@ -479,6 +484,13 @@ const downloadSourceFilterOptions = computed<FilterOption[]>(() =>
 		.sort((left, right) => left.label.localeCompare(right.label)),
 )
 
+const downloadReasonFilterOptions = computed<FilterOption[]>(() =>
+	filterOptions.value.downloadReasons.map((downloadReason) => ({
+		value: downloadReason,
+		label: getDownloadReasonFilterOptionLabel(downloadReason),
+	})),
+)
+
 const versionFilterOptions = computed<FilterOption[]>(() =>
 	filterOptions.value.versionIds
 		.map((versionId) => ({
@@ -544,6 +556,19 @@ function getLoaderTypeFilterOptionLabel(loaderType: string): string {
 	}
 
 	return `${normalizedLoaderType.charAt(0).toUpperCase()}${normalizedLoaderType.slice(1)}`
+}
+
+function getDownloadReasonFilterOptionLabel(reason: string): string {
+	switch (reason) {
+		case 'standalone':
+			return 'Standalone'
+		case 'dependency':
+			return 'Dependency'
+		case 'modpack':
+			return 'Modpack'
+		default:
+			return reason
+	}
 }
 
 function getDateTimestamp(date: string | undefined): number | undefined {
@@ -760,6 +785,9 @@ function getMissingSelectedOptionLabel(
 	}
 	if (categoryKey === 'version_id') {
 		return getVersionDisplayName
+	}
+	if (categoryKey === 'download_reason') {
+		return getDownloadReasonFilterOptionLabel
 	}
 	if (categoryKey === 'loader_type') {
 		return getLoaderTypeFilterOptionLabel

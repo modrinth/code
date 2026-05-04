@@ -23,6 +23,7 @@ export const FILTER_VALUE_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'pro
 	'country',
 	'monetization',
 	'download_source',
+	'download_reason',
 	'version_id',
 	'game_version',
 	'loader_type',
@@ -41,12 +42,12 @@ const ANALYTICS_STATS_BY_DIMENSION: Record<
 > = {
 	project: ANALYTICS_DASHBOARD_STAT_ORDER,
 	version_id: ['downloads', 'playtime'],
-	country: ['views', 'downloads'],
+	country: ['views', 'downloads', 'playtime'],
 	monetization: ['views'],
 	download_source: ['downloads'],
-	download_reason: [],
-	game_version: ['playtime'],
-	loader_type: ['playtime'],
+	download_reason: ['downloads'],
+	game_version: ['downloads', 'playtime'],
+	loader_type: ['downloads', 'playtime'],
 }
 
 const ANALYTICS_DIMENSION_BY_BREAKDOWN: Record<
@@ -57,6 +58,7 @@ const ANALYTICS_DIMENSION_BY_BREAKDOWN: Record<
 	country: 'country',
 	monetization: 'monetization',
 	download_source: 'download_source',
+	download_reason: 'download_reason',
 	version_id: 'version_id',
 	loader: 'loader_type',
 	game_version: 'game_version',
@@ -69,6 +71,7 @@ const ANALYTICS_DIMENSION_BY_FILTER_CATEGORY: Record<
 	country: 'country',
 	monetization: 'monetization',
 	download_source: 'download_source',
+	download_reason: 'download_reason',
 	version_id: 'version_id',
 	game_version: 'game_version',
 	loader_type: 'loader_type',
@@ -214,6 +217,7 @@ export function cloneSelectedFilters(filters: AnalyticsSelectedFilters): Analyti
 		country: [...filters.country],
 		monetization: [...filters.monetization],
 		download_source: [...filters.download_source],
+		download_reason: [...filters.download_reason],
 		version_id: [...filters.version_id],
 		game_version: [...filters.game_version],
 		loader_type: [...filters.loader_type],

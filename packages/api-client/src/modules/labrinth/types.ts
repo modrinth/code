@@ -281,10 +281,20 @@ export namespace Labrinth {
 				| 'domain'
 				| 'site_path'
 				| 'country'
+				| 'reason'
+				| 'game_version'
+				| 'loader'
 
-			export type ProjectPlaytimeField = 'project_id' | 'version_id' | 'loader' | 'game_version'
+			export type ProjectPlaytimeField =
+				| 'project_id'
+				| 'version_id'
+				| 'loader'
+				| 'game_version'
+				| 'country'
 
 			export type ProjectRevenueField = 'project_id'
+
+			export type DownloadReason = 'standalone' | 'dependency' | 'modpack'
 
 			export type AffiliateCodeClicksField = 'affiliate_code_id'
 
@@ -323,6 +333,9 @@ export namespace Labrinth {
 				site_path?: string
 				version_id?: string
 				country?: string
+				reason?: DownloadReason
+				game_version?: string
+				loader?: string
 				downloads: number
 			}
 
@@ -330,6 +343,7 @@ export namespace Labrinth {
 				version_id?: string
 				loader?: string
 				game_version?: string
+				country?: string
 				seconds: number
 			}
 
@@ -998,6 +1012,7 @@ export namespace Labrinth {
 				include_changelog?: boolean
 				limit?: number
 				offset?: number
+				apiVersion?: 2 | 3
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'

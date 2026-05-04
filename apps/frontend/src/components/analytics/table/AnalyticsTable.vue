@@ -145,6 +145,8 @@ const breakdownColumnLabel = computed(() => {
 			return 'Monetization'
 		case 'download_source':
 			return 'Download source'
+		case 'download_reason':
+			return 'Download type'
 		case 'version_id':
 			return 'Project version'
 		case 'loader':

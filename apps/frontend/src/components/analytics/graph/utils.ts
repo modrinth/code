@@ -88,8 +88,24 @@ export function formatBreakdownLabel(
 	if (selectedBreakdown === 'loader') {
 		return formatLoaderLabel(breakdownValue)
 	}
+	if (selectedBreakdown === 'download_reason') {
+		return formatDownloadReasonLabel(breakdownValue)
+	}
 
 	return breakdownValue
+}
+
+function formatDownloadReasonLabel(reason: string): string {
+	switch (reason) {
+		case 'standalone':
+			return 'Standalone'
+		case 'dependency':
+			return 'Dependency'
+		case 'modpack':
+			return 'Modpack'
+		default:
+			return reason
+	}
 }
 
 export function getMetricValue(
