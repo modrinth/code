@@ -164,6 +164,36 @@
   "collections.label.private": {
     "defaultMessage": "Privat"
   },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Er du sikker på du vil opdatere {count, plural, one {# projekt} other {# projekter}} til den nyeste understøttede version? Det anbefales at opdatere indholdet et ad gangen."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Opdaterings Advarsel"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Opdater projekter"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Hold Shift imens du klikker \"Opdater alle\" for at springe denne bekræftelse over fremover."
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Opdater {count, plural, one {# projekt} other {# projekter}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Ved at slette et mod kan det have permanente konsekvenser for din verden og vil muligvis være skyld i manglende indhold eller uforudsigelige problemer når det bliver læst igen."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Advarsel ved sletning"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Slet {count} {itemType}{count, plural, one {} other {er}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Slet {itemType}{count, plural, one {} other {er}}"
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Vent venligst"
+  },
   "form.label.address-line": {
     "defaultMessage": "Adresse"
   },
@@ -1084,12 +1114,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Sikkerhedskopiering plan"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Fejlede sikkerhedskopiering"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Fejlede at genoprette sikkerhedskopi"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuel sikkerhedskopiering"

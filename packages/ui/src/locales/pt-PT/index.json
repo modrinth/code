@@ -299,6 +299,27 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Aviso de eliminação"
   },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Eliminar {count} {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Eliminar {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {Reverter} other {Atualizar}} pode causar incompatibilidades. Mods ou conteúdo que tu adicionar ao modpack será mantido, mas pode não ser compatível com a nova versão."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "Aviso de {action, select, downgrade {Reversão} other {Atualização}}"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "{action, select, downgrade {Reverter} other {Atualizar}} modpack"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "{action, select, downgrade {Reverter} other {Atualizar}} modpack"
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Os mods e conteúdos serão mesclados com o que adicionares ao modpack, e ele deixará de receber atualizações."
+  },
   "content.confirm-unlink.admonition-header": {
     "defaultMessage": "Desassociar modpack"
   },
@@ -338,6 +359,12 @@
   "content.inline-backup.backup-failed": {
     "defaultMessage": "Criação do backup falhou. Você ainda pode proceder."
   },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "Um backup está a decorrer, recomenda-se esperar que ele termine antes de realizar esta ação."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "A criação do backup pode levar vários minutos, dependendo do tamanho do teu servidor."
+  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Criar cópia de segurança"
   },
@@ -347,11 +374,29 @@
   "content.inline-backup.warning-body": {
     "defaultMessage": "Recomendamos a criação de um backup antes de proceder para que você possa restaurar {type, select, server {seu mundo} other {sua instância}} se alguma coisa quebrar."
   },
+  "content.modpack-card.content-hint-description": {
+    "defaultMessage": "O conteúdo do teu modpack agora pode ser encontrado aqui!"
+  },
+  "content.modpack-card.content-hint-title": {
+    "defaultMessage": "Conteúdo do modpack foi movido"
+  },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Não mostrar novamente"
   },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Conteúdo adicional"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Navegar conteúdo"
+  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Aguarde essa operação ser finalizada antes de editar o conteúdo."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Navegue ou envie {contentType} para começar"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Adicione mais conteúdo a este modpack"
   },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Nenhum conteúdo instalado"
@@ -407,20 +452,122 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Enviar arquivos"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Enviando arquivos ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Todo conteúdo selecionado já está desabilitado"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "Todo o conteúdo selecionado já está habilitado"
+  },
+  "content.selection-bar.bulk.deleting": {
+    "defaultMessage": "A eliminar {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.deleting-waiting": {
+    "defaultMessage": "A eliminar {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling": {
+    "defaultMessage": "A desabilitar {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-waiting": {
+    "defaultMessage": "A desabilitar {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling": {
+    "defaultMessage": "A habilitar {progress}/{total} {contentType}..."
   },
   "content.selection-bar.bulk.enabling-waiting": {
     "defaultMessage": "Habilitando {contentType}..."
   },
+  "content.selection-bar.bulk.updating": {
+    "defaultMessage": "A atualizar {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "A atualizar {contentType}..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "Selecionou {count} {contentType}"
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "{count, number} selecionado"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Resumo da extração"
   },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Substituir"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "Mais de 100 ficheiros serão substituídos se você prosseguires com a extração; eis alguns deles."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "Os {count} ficheiros a seguir já existem no teu servidor e serão substituídos se prosseguires com a extração."
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} a substituir"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "Conflito"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "Os ficheiros serão substituídos"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Criar {type, select, directory {pasta} other {arquivo}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Criar {type, select, directory {uma pasta} other {um arquivo}}"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "ex.: meu-diretorio"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "ex.: config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "A eliminar \"{name}\""
+  },
   "files.delete-modal.header": {
     "defaultMessage": "Eliminar ficheiro"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {Este diretório e todo o seu conteúdo serão permanentemente apagados. Esta ação não pode ser desfeita.} other {Esse ficheiro será permanentemente apagado. Esta ação não pode ser desfeita.}}"
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "Não foi possível carregar o conteúdo do ficheiro"
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "Falha ao abrir ficheiro"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "Não foi possível enviar ao mclo.gs."
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Falha ao compartilhar ficheiro"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "Teu ficheiro foi salvo."
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "Ficheiro salvo"
+  },
+  "files.editor.find-close": {
+    "defaultMessage": "Fechar"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Encontrar"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} de {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Seguinte"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "Sem resultados"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Anterior"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Alternar substituição"
   },
   "files.error.try-again": {
     "defaultMessage": "Tentar novamente"
@@ -448,9 +595,6 @@
   },
   "files.navbar.upload-file": {
     "defaultMessage": "Carregar ficheiro"
-  },
-  "files.operations.failed": {
-    "defaultMessage": "Falhou"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack a partir de URL"
@@ -605,6 +749,9 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolução"
   },
+  "hosting.content.failed-to-bulk-delete": {
+    "defaultMessage": "Falha ao excluir conteúdo"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Turbo até {cpus} CPUs"
   },
@@ -730,6 +877,12 @@
   },
   "label.delete": {
     "defaultMessage": "Eliminar"
+  },
+  "label.delete-failed": {
+    "defaultMessage": "Exclusão falhou"
+  },
+  "label.delete-immediately": {
+    "defaultMessage": "Excluir imediatamente"
   },
   "label.description": {
     "defaultMessage": "Descrição"
@@ -1867,12 +2020,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Horário de Backup"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Falha a criar backup"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Falha a restaurar do backup"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Fazer backup manual"

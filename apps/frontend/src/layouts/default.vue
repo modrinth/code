@@ -54,7 +54,7 @@
 			:api-url="config.public.apiBaseUrl"
 		/>
 		<header
-			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
+			class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
 			<div>
 				<NuxtLink
@@ -311,7 +311,7 @@
 							{
 								id: 'review-projects',
 								color: 'orange',
-								link: '/moderation/',
+								link: '/moderation',
 							},
 							{
 								id: 'tech-review',
@@ -1298,7 +1298,8 @@ const { cycle: changeTheme } = useTheme()
 			justify-content: center;
 			padding: 1rem;
 
-			.iconified-button {
+			> button,
+			> a {
 				width: 100%;
 				max-width: 500px;
 				padding: 0.75rem;

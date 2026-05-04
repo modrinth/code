@@ -31,17 +31,19 @@ useSeoMeta({
 	margin: 0;
 }
 
-.auth-container .btn {
+.auth-container .btn-wrapper :is(a, button) {
 	font-weight: 700;
 	min-height: 2.5rem;
 	text-decoration: none;
 }
 
-.centered-btn {
+.centered-btn :is(a, button),
+.centered-btn:is(a, button) {
 	margin-inline: auto;
 }
 
-.btn.continue-btn svg {
+.continue-btn :is(a, button) svg,
+.continue-btn:is(a, button) svg {
 	margin: 0 0 0 0.5rem;
 }
 
@@ -52,19 +54,19 @@ useSeoMeta({
 	width: 100%;
 }
 
-.third-party .btn {
+.third-party a {
 	width: 100%;
 	vertical-align: middle;
 }
 
-.third-party .btn svg {
+.third-party a svg {
 	margin-right: var(--gap-sm);
 	width: 1.25rem;
 	height: 1.25rem;
 }
 
 @media screen and (max-width: 25.5rem) {
-	.third-party .btn {
+	.third-party a {
 		grid-column: 1 / 3;
 	}
 }

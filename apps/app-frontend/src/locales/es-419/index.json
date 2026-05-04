@@ -1,4 +1,103 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Descargando Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Descargas"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Ocultar más instancias en ejecución"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Hacer instancia principal"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Ninguna instancia en ejecución"
+  },
+  "app.action-bar.offline": {
+    "message": "Sin conexión"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Instancia principal"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Mostrar mas instancias en ejecución"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Finalizar instancia"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Mostrar descargas activas"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Mostrar instancia"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Mostrar registros"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Habilita el renderizado avanzado, como los efectos de desenfoque, que pueden causar problemas de rendimiento sin renderizado acelerado por hardware."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Renderizado avanzado"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Seleccione su tema de color preferido para Modrinth en este dispositivo."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Tema de color"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Cambia la página en la que el launcher se abre en."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Inicio"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Librería"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Página predeterminada"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Desactiva la etiqueta arriba de tu personaje en la página de skins."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Ocultar etiqueta"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Incluye los mundos más recientes en la sección \"Vuelve a jugar tus mundos\" en la página de inicio."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Vuelve a jugar tus mundos"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimiza el launcher cuando un proceso de Minecraft empieza."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimiza el launcher"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Usa los sistemas de frame de Windows (se requiere resetear la aplicación)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Decoraciones nativas"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Selecciona una opción"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Activa la posibilidad de alternar la barra lateral."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Alternar barra lateral"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Si intentas instalar un archivo de paquete de Modrinth (.mrpack) que no esté alojado en Modrinth, te advertiremos de los riesgos antes de instalarlo."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Adviérteme antes de instalarme modpacks desconocidos"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Los servidores de autenticación de Minecraft pueden no estar funcionando en este momento. Verifica tu conexión a internet e inténtalo de nuevo más tarde."
   },
@@ -30,13 +129,31 @@
     "message": "Descubrir servidores"
   },
   "app.browse.hide-added-servers": {
-    "message": "Ocultar servidores añadidos"
+    "message": "Ocultar servidores ya añadidos"
   },
   "app.browse.hide-installed-content": {
     "message": "Ocultar contenido instalado"
   },
   "app.browse.install-content-to-instance": {
     "message": "Instalar contenido a la instancia"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpacks"
+  },
+  "app.browse.server.install": {
+    "message": "Instalar"
+  },
+  "app.browse.server.installed": {
+    "message": "Instalado"
+  },
+  "app.browse.server.installing": {
+    "message": "Instalando"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Instalando el modpack..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Introduce la descripción del modpack..."
@@ -96,7 +213,7 @@
     "message": "Se añadieron {count} proyectos"
   },
   "app.instance.mods.share-text": {
-    "message": "¡Mira a los proyectos que estoy usando en mi modpack!"
+    "message": "¡Mira los proyectos que estoy usando en mi modpack!"
   },
   "app.instance.mods.share-title": {
     "message": "Compartiendo contenido del modpack"
@@ -598,5 +715,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "El loader es proporcionado por el servidor"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "Un archivo solo es revisado si es subido a Modrinth, independientemente de su formato de archivo (incluyendo .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "No mostrar esta advertencia otra vez"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Confirmar instalación"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Instalar de todos modos"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "El malware es normalmente distribuido por archivos de modpack que son normalmente compartidas en aplicaciones como Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "No pudimos encontrar este archivo en Modrinth. Recomendamos solo instalar archivos de sitios de confianza."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Advertencia de archivo desconocido"
   }
 }

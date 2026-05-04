@@ -341,9 +341,6 @@
   "files.navbar.new-file": {
     "defaultMessage": "Bagong talaksan"
   },
-  "files.operations.failed": {
-    "defaultMessage": "Nabigo"
-  },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Bagong pangalan"
   },
@@ -1903,12 +1900,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Backup schedule"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Bigong makalikha ng backup"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Bigong ma-restore galing sa backup"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"

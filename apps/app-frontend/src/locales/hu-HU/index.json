@@ -1,4 +1,25 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "A Java {version} letöltése"
+  },
+  "app.action-bar.downloads": {
+    "message": "Letöltések"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "További futó példányok elrejtése"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Elsődleges példány létrehozása"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Nincsenek futó példányok"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Elsődleges példány"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "A Minecraft hitelesítő szerverek lehet, hogy nem üzemelnek. Bizonyosodj meg róla, hogy van internetkapcsolatod és próbáld meg újra."
   },
@@ -30,13 +51,25 @@
     "message": "Szerverek böngészése"
   },
   "app.browse.hide-added-servers": {
-    "message": "Hozzáadott szerverek elrejtése"
+    "message": "Már hozzáadott szerverek elrejtése"
   },
   "app.browse.hide-installed-content": {
-    "message": "A telepített tartalmak elrejtése"
+    "message": "Már telepített tartalom elrejtése"
   },
   "app.browse.install-content-to-instance": {
     "message": "Tartalom letöltése a profilhoz"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modcsomagok"
+  },
+  "app.browse.server.install": {
+    "message": "Letöltés"
+  },
+  "app.browse.server.installed": {
+    "message": "Letöltve"
+  },
+  "app.browse.server.installing": {
+    "message": "Letöltés..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Írd be a modcsomag leírását..."
@@ -210,10 +243,10 @@
     "message": "Erőforráskezelés"
   },
   "app.update-popup.body": {
-    "message": "A Modrinth App v{version} telepítésre kész! Frissítéshez Töltsd újra az oldalt, vagy a Modrinth App bezárásakor automatikusan frissül."
+    "message": "A Modrinth App v{version} telepítésre kész! Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás bezárásakor automatikusan frissül."
   },
   "app.update-popup.body.download-complete": {
-    "message": "A Modrinth App v{version} letöltése befejeződött. Frissítéshez Töltsd újra az oldalt, vagy a Modrinth App bezárásakor automatikusan frissül."
+    "message": "A Modrinth App v{version} letöltése befejeződött. Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás bezárásakor automatikusan frissül."
   },
   "app.update-popup.body.linux": {
     "message": "A Modrinth App v{version} elérhető. Használd a csomagkezelőt a legújabb funkciók és javítások frissítéséhez!"
@@ -231,7 +264,7 @@
     "message": "Sikeres letöltés"
   },
   "app.update-popup.reload": {
-    "message": "Újratöltés"
+    "message": "Frissítés"
   },
   "app.update-popup.title": {
     "message": "Frissítés elérhető"
@@ -555,7 +588,7 @@
     "message": "A szerver nem kompatibilis"
   },
   "instance.worlds.linked_server": {
-    "message": "Szerverprojekt által kezelt"
+    "message": "A szerver projektje által kezelt"
   },
   "instance.worlds.no_contact": {
     "message": "A szerverrel nem lehet kapcsolatot létesíteni"

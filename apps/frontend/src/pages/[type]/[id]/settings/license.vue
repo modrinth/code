@@ -104,7 +104,7 @@
 					>
 				</label>
 
-				<div class="input-stack w-1/2">
+				<div class="flex w-1/2 flex-col gap-2">
 					<StyledInput
 						v-if="!current.nonSpdxLicense"
 						id="license-spdx"

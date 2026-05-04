@@ -81,29 +81,28 @@
 							size="md"
 							class="project__icon"
 						/>
-						<div class="input-stack">
-							<FileInput
-								id="project-icon"
-								:max-size="262144000"
-								:show-icon="true"
-								accept="image/png,image/jpeg,image/gif,image/webp"
-								class="choose-image iconified-button"
-								prompt="Upload icon"
-								aria-label="Upload icon"
-								:disabled="!hasPermission"
-								@change="showPreviewImage"
-							>
-								<UploadIcon aria-hidden="true" />
-							</FileInput>
-							<button
-								v-if="!deletedIcon && (previewImage || project.icon_url)"
-								class="iconified-button"
-								:disabled="!hasPermission"
-								@click="markIconForDeletion"
-							>
-								<TrashIcon aria-hidden="true" />
-								Remove icon
-							</button>
+						<div class="flex flex-col gap-2">
+							<ButtonStyled>
+								<FileInput
+									id="project-icon"
+									:max-size="262144000"
+									:show-icon="true"
+									accept="image/png,image/jpeg,image/gif,image/webp"
+									class="button-like choose-image"
+									prompt="Upload icon"
+									aria-label="Upload icon"
+									:disabled="!hasPermission"
+									@change="showPreviewImage"
+								>
+									<UploadIcon aria-hidden="true" />
+								</FileInput>
+							</ButtonStyled>
+							<ButtonStyled v-if="!deletedIcon && (previewImage || project.icon_url)">
+								<button :disabled="!hasPermission" @click="markIconForDeletion">
+									<TrashIcon aria-hidden="true" />
+									Remove icon
+								</button>
+							</ButtonStyled>
 						</div>
 					</div>
 				</div>
@@ -161,26 +160,25 @@
 							</label>
 						</div>
 						<div class="mt-2 flex items-center gap-2">
-							<FileInput
-								:max-size="524288"
-								:show-icon="true"
-								accept="image/png,image/jpeg,image/gif,image/webp"
-								class="iconified-button"
-								prompt="Upload banner"
-								:disabled="!hasPermission"
-								@change="showBannerPreview"
-							>
-								<UploadIcon aria-hidden="true" />
-							</FileInput>
-							<button
-								v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)"
-								class="iconified-button"
-								:disabled="!hasPermission"
-								@click="markBannerForDeletion"
-							>
-								<TrashIcon aria-hidden="true" />
-								Remove banner
-							</button>
+							<ButtonStyled>
+								<FileInput
+									:max-size="524288"
+									:show-icon="true"
+									accept="image/png,image/jpeg,image/gif,image/webp"
+									class="button-like"
+									prompt="Upload banner"
+									:disabled="!hasPermission"
+									@change="showBannerPreview"
+								>
+									<UploadIcon aria-hidden="true" />
+								</FileInput>
+							</ButtonStyled>
+							<ButtonStyled v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)">
+								<button :disabled="!hasPermission" @click="markBannerForDeletion">
+									<TrashIcon aria-hidden="true" />
+									Remove banner
+								</button>
+							</ButtonStyled>
 						</div>
 						<div class="mt-2 text-secondary">Gif, 468×60px recommended.</div>
 					</div>
@@ -277,6 +275,60 @@
 					</div>
 				</div>
 			</div>
+
+			<div v-if="!isServerProject" class="mt-4 flex flex-col gap-2">
+				<div class="grid grid-cols-[1fr_auto] items-center gap-6">
+					<label for="project-monetization-toggle">
+						<span class="mb-1 block text-lg font-semibold text-contrast">Monetization</span>
+						<span class="block">
+							When enabled, this project can earn revenue through Modrinth's
+							<nuxt-link to="/legal/cmp-info" target="_blank" class="text-link"
+								>Rewards Program</nuxt-link
+							>. If you don't want to (or can't for legal reasons) earn revenue from this project,
+							you can turn it off here.
+						</span>
+					</label>
+					<Toggle
+						id="project-monetization-toggle"
+						v-model="monetizationEnabled"
+						:disabled="monetizationToggleDisabled"
+					/>
+				</div>
+				<div v-if="isForceDemonetized" class="mt-2 flex flex-wrap items-center gap-2 text-orange">
+					<TriangleAlertIcon aria-hidden="true" />
+					<span>
+						Your project is not eligible for monetization. If you think this is a mistake, please
+						<a
+							class="text-orange underline hover:brightness-110"
+							href="https://support.modrinth.com"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							contact support</a
+						>.
+					</span>
+				</div>
+				<div v-if="isStaff" class="mt-2">
+					<ButtonStyled color="orange">
+						<button
+							v-if="!isForceDemonetized"
+							:disabled="loadingModeratorMonetization"
+							@click="updateMonetizationStatus('force-demonetized')"
+						>
+							<ScaleIcon aria-hidden="true" />
+							Disable monetization
+						</button>
+						<button
+							v-else
+							:disabled="loadingModeratorMonetization"
+							@click="updateMonetizationStatus('monetized')"
+						>
+							<ScaleIcon aria-hidden="true" />
+							Allow monetization
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
 		</section>
 
 		<section class="universal-card">
@@ -289,15 +341,12 @@
 				Removes your project from Modrinth's servers and search. Clicking on this will delete your
 				project, so be extra careful!
 			</p>
-			<button
-				type="button"
-				class="iconified-button danger-button"
-				:disabled="!hasDeletePermission"
-				@click="$refs.modal_confirm.show()"
-			>
-				<TrashIcon aria-hidden="true" />
-				Delete project
-			</button>
+			<ButtonStyled color="red">
+				<button :disabled="!hasDeletePermission" @click="$refs.modal_confirm.show()">
+					<TrashIcon aria-hidden="true" />
+					Delete project
+				</button>
+			</ButtonStyled>
 		</section>
 		<UnsavedChangesPopup
 			:original="original"
@@ -315,6 +364,7 @@ import {
 	CheckIcon,
 	ImageIcon,
 	IssuesIcon,
+	ScaleIcon,
 	TrashIcon,
 	TriangleAlertIcon,
 	UploadIcon,
@@ -323,6 +373,7 @@ import {
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
+	ButtonStyled,
 	Combobox,
 	ConfirmLeaveModal,
 	ConfirmModal,
@@ -330,6 +381,7 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
+	Toggle,
 	UnsavedChangesPopup,
 	useFormatBytes,
 	usePageLeaveSafety,
@@ -337,7 +389,10 @@ import {
 import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
 
 import FileInput from '~/components/ui/FileInput.vue'
+import { useAuth } from '~/composables/auth.js'
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
+
+const auth = await useAuth()
 
 const { addNotification } = injectNotificationManager()
 const {
@@ -371,6 +426,22 @@ const visibility = ref(
 		: project.value.requested_status,
 )
 
+const monetizationEnabled = ref(project.value.monetization_status === 'monetized')
+const loadingModeratorMonetization = ref(false)
+
+watch(
+	() => project.value.monetization_status,
+	() => {
+		monetizationEnabled.value = project.value.monetization_status === 'monetized'
+	},
+)
+
+const isStaff = computed(
+	() => !!auth.value.user && tags.value.staffRoles.includes(auth.value.user.role),
+)
+
+const isForceDemonetized = computed(() => project.value.monetization_status === 'force-demonetized')
+
 // Server project specific refs
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
@@ -384,6 +455,8 @@ const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
 	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
 })
+
+const monetizationToggleDisabled = computed(() => !hasPermission.value || isForceDemonetized.value)
 
 const hasDeletePermission = computed(() => {
 	const DELETE_PROJECT = 1 << 7
@@ -457,6 +530,13 @@ const basePatchData = computed(() => {
 		data.requested_status = visibility.value
 	}
 
+	if (project.value.monetization_status !== 'force-demonetized') {
+		const wasMonetized = project.value.monetization_status === 'monetized'
+		if (monetizationEnabled.value !== wasMonetized) {
+			data.monetization_status = monetizationEnabled.value ? 'monetized' : 'demonetized'
+		}
+	}
+
 	return data
 })
 
@@ -475,6 +555,7 @@ const original = computed(() => ({
 	deletedIcon: false,
 	bannerFile: null,
 	deletedBanner: false,
+	monetizationEnabled: project.value.monetization_status === 'monetized',
 }))
 
 const modified = computed(() => ({
@@ -488,6 +569,7 @@ const modified = computed(() => ({
 	deletedIcon: deletedIcon.value,
 	bannerFile: bannerFile.value,
 	deletedBanner: deletedBanner.value,
+	monetizationEnabled: monetizationEnabled.value,
 }))
 
 const hasChanges = computed(() =>
@@ -511,6 +593,16 @@ function resetChanges() {
 	bannerFile.value = null
 	bannerPreview.value = null
 	deletedBanner.value = false
+	monetizationEnabled.value = project.value.monetization_status === 'monetized'
+}
+
+async function updateMonetizationStatus(status) {
+	loadingModeratorMonetization.value = true
+	try {
+		await patchProject({ monetization_status: status })
+	} finally {
+		loadingModeratorMonetization.value = false
+	}
 }
 
 const hasModifiedVisibility = () => {

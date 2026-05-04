@@ -9,9 +9,11 @@
 					</strong>
 				</template>
 			</IntlFormatted>
-			<Button :action="() => disableDeveloperMode()">
-				{{ formatMessage(developerModeBanner.deactivate) }}
-			</Button>
+			<ButtonStyled color="red" type="highlight">
+				<button class="mt-3" @click="disableDeveloperMode()">
+					{{ formatMessage(developerModeBanner.deactivate) }}
+				</button>
+			</ButtonStyled>
 		</MessageBanner>
 		<section class="universal-card">
 			<h2 class="text-2xl">{{ formatMessage(colorTheme.title) }}</h2>
@@ -178,7 +180,7 @@
 <script setup lang="ts">
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import {
-	Button,
+	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
@@ -505,10 +507,6 @@ const listTypes = computed(() => {
 		vertical-align: middle;
 		margin-bottom: 2px;
 		margin-right: 0.5rem;
-	}
-
-	.btn {
-		margin-top: var(--gap-sm);
 	}
 }
 </style>

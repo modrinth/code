@@ -105,15 +105,12 @@
 				/>
 			</div>
 			<div class="button-group">
-				<button
-					type="button"
-					class="iconified-button brand-button"
-					:disabled="!hasServerChanges"
-					@click="saveServerChanges()"
-				>
-					<SaveIcon />
-					Save changes
-				</button>
+				<ButtonStyled color="brand">
+					<button :disabled="!hasServerChanges" @click="saveServerChanges()">
+						<SaveIcon />
+						Save changes
+					</button>
+				</ButtonStyled>
 			</div>
 		</section>
 
@@ -275,15 +272,12 @@
 				/>
 			</div>
 			<div class="button-group">
-				<button
-					type="button"
-					class="iconified-button brand-button"
-					:disabled="!hasChanges"
-					@click="saveChanges()"
-				>
-					<SaveIcon />
-					Save changes
-				</button>
+				<ButtonStyled color="brand">
+					<button :disabled="!hasChanges" @click="saveChanges()">
+						<SaveIcon />
+						Save changes
+					</button>
+				</ButtonStyled>
 			</div>
 		</section>
 	</div>
@@ -293,6 +287,7 @@
 import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@modrinth/moderation'
 import {
+	ButtonStyled,
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,

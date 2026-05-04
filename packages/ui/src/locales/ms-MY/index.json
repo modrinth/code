@@ -449,9 +449,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Muat naik fail"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Sedang memuat naik fail ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Semua kandungan yang dipilih sudah pun dinyahdayakan"
   },
@@ -487,6 +484,12 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} dipilih"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "Nama"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "Tambah"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Ringkasan pengekstrakan"
@@ -706,9 +709,6 @@
   },
   "files.operations.extracting": {
     "defaultMessage": "Mengekstrak {source}"
-  },
-  "files.operations.failed": {
-    "defaultMessage": "Gagal"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "pek mod daripada URL"
@@ -1213,12 +1213,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mod permainan yang tidak diketahui"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "Fail masih dimuat naik. Meninggalkan laman ini akan membatalkan muat naik dan perubahan anda mungkin hilang."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Muat naik sedang berjalan"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} {count, plural, other {pemasangan}} serasi"
@@ -2675,20 +2669,11 @@
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Sesuatu telah berlaku semasa memulihkan daripada {backupName}. Sila cuba lagi atau hubungi sokongan jika masalah berterusan."
   },
-  "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Pemulihan daripada sandaran gagal"
-  },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Pemulihan dari {backupName} telah dimasukkan ke barisan dan akan bermula sebentar lagi."
   },
-  "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Pemulihan sandaran dalam barisan"
-  },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Pelayan anda telah dipulihkan kepada {backupName} dan sedia untuk dimulakan."
-  },
-  "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Pemulihan daripada sandaran berjaya"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Memulihkan pelayan anda daripada {backupName}. Ini mungkin mengambil masa beberapa minit."
@@ -2701,12 +2686,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Jadual penyandaran"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Gagal mencipta sandaran"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Gagal memulihkan daripada sandaran"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Penyandaran manual"
@@ -3040,6 +3019,9 @@
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "Berapa banyak RAM yang anda mahu pelayan anda ada?"
+  },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "RAM"
   },
   "servers.region.north-america": {
     "defaultMessage": "Amerika Utara"

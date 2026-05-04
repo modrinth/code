@@ -8,7 +8,7 @@
 		proceed-label="Cancel transfer"
 		@proceed="confirmCancel"
 	/>
-	<div class="experimental-styles-within mx-auto max-w-[78.5rem] p-4">
+	<div class="mx-auto max-w-[78.5rem] p-4">
 		<div
 			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
 		>

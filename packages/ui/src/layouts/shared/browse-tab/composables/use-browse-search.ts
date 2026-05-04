@@ -180,6 +180,26 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	let searchVersion = 0
 	let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
+	const providedFiltersOrEmpty = computed(() => options.providedFilters?.value ?? [])
+
+	watch(
+		[
+			query,
+			maxResults,
+			options.projectType,
+			currentSortType,
+			serverCurrentSortType,
+			currentFilters,
+			serverCurrentFilters,
+			overriddenProvidedFilterTypes,
+			providedFiltersOrEmpty,
+		],
+		() => {
+			currentPage.value = 1
+		},
+		{ deep: true },
+	)
+
 	watch(effectiveRequestParams, (newVal, oldVal) => {
 		debug('effectiveRequestParams changed', {
 			from: oldVal?.substring(0, 80),

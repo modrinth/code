@@ -69,19 +69,19 @@
 			</div>
 
 			<div class="input-group">
-				<Button
-					color="danger"
-					icon-only
-					@click="
-						() => {
-							revokingId = authorization.app_id
-							$refs.modal_confirm.show()
-						}
-					"
-				>
-					<TrashIcon />
-					{{ formatMessage(messages.revokeAction) }}
-				</Button>
+				<ButtonStyled color="red">
+					<button
+						@click="
+							() => {
+								revokingId = authorization.app_id
+								$refs.modal_confirm.show()
+							}
+						"
+					>
+						<TrashIcon />
+						{{ formatMessage(messages.revokeAction) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</div>
@@ -90,7 +90,7 @@
 import { CheckIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
+	ButtonStyled,
 	commonMessages,
 	commonSettingsMessages,
 	ConfirmModal,

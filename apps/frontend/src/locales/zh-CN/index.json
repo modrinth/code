@@ -873,7 +873,7 @@
     "message": "你已用尽<b>{withdrawLimit}</b>的提现额度。若需继续提现，请先完成税务表格填写。"
   },
   "dashboard.head-title": {
-    "message": "数据面板"
+    "message": "仪表盘"
   },
   "dashboard.notifications.button.mark-all-as-read": {
     "message": "标记全部已读"
@@ -1113,10 +1113,10 @@
     "message": "分析"
   },
   "dashboard.sidebar.label.creators": {
-    "message": "作者"
+    "message": "创作者"
   },
   "dashboard.sidebar.label.dashboard": {
-    "message": "数据面板"
+    "message": "仪表盘"
   },
   "dashboard.sidebar.label.notifications": {
     "message": "通知"
@@ -1374,7 +1374,7 @@
     "message": "Modrinth Hosting 服务器有多快？"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Modrinth 代理服务器搭载了极为现代的高性能硬件，但要具体反映到你的服务器会有多快，还是很难预测的，因为实际性能受诸多因素影响，例如在你的服务器上运行的模组、数据包、插件，甚至用户行为模式都是影响的因素。"
+    "message": "Modrinth Hosting 服务器搭载了极为现代的高性能硬件，但要具体反映到你的服务器会有多快，还是很难预测的，因为实际性能受诸多因素影响，例如在你的服务器上运行的模组、数据包、插件，甚至用户行为模式都是影响的因素。"
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "大多数性能问题，往往是未优化的整合包、模组、数据包或插件导致服务器卡顿。由于我们的服务器配置非常高端，只要你针对服务器上运行的内容，选择合适的套餐方案，通常不会遇到太大问题。"
@@ -1386,7 +1386,7 @@
     "message": "可以，你可以给你的服务器增加存储空间，而且无需额外费用。如果需要更多存储空间，请联系 Modrinth 支持团队。"
   },
   "hosting-marketing.faq.location": {
-    "message": "Modrinth 代理的服务器位于哪里？我可以选择地区吗？"
+    "message": "Modrinth Hosting 的服务器位于哪里？我可以选择地区吗？"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "目前我们提供北美、欧洲和东南亚的服务器，供你在购买时选择。未来还会增加更多地区！如需更换服务器地区，请联系技术支持。"
@@ -1416,7 +1416,7 @@
     "message": "你的下一个服务器，就交给 Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth 代理可让你以最便捷的方式，托管你专属的 Minecraft Java 版服务器。无缝安装并畅玩你心爱的模组和模组包，全在 Modrinth 平台搞定。"
+    "message": "Modrinth Hosting 可让你以最便捷的方式，托管你专属的 Minecraft Java 版服务器。无缝安装并畅玩你心爱的模组和模组包，全在 Modrinth 平台搞定。"
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "高级网络管理"
@@ -1464,7 +1464,7 @@
     "message": "SFTP 访问"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "通过 Modrinth  代理内置的 SFTP 功能，直接访问你的服务器文件。"
+    "message": "通过 Modrinth Hosting 内置的 SFTP 功能，直接访问你的服务器文件。"
   },
   "hosting-marketing.included.with-your-server": {
     "message": "随服务器一并提供"
@@ -1515,10 +1515,10 @@
     "message": "模组在哪，就在哪玩"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth 代理将模组与整合包的安装流程无缝集成到你的服务器中。"
+    "message": "Modrinth Hosting 将模组与整合包的安装流程无缝集成到你的服务器中。"
   },
   "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "为什么选择 Modrinth代理？"
+    "message": "为什么选择 Modrinth Hosting？"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "你最喜欢的模组都在这里"
@@ -3570,7 +3570,7 @@
     "message": "<strong>开发者模式</strong>已激活。该模式可让你查看 Modrinth 各种对象的内部 ID，对于使用 Modrinth API 的开发者会有所帮助。点击页面底部的 Modrinth 徽标 5 次可开关开发者模式。"
   },
   "settings.display.flags.description": {
-    "message": "对于当前设备，开启或关闭特定功能。"
+    "message": "为当前设备开启或关闭特定功能。"
   },
   "settings.display.flags.title": {
     "message": "功能开关"
@@ -3585,7 +3585,7 @@
     "message": "数据包页面"
   },
   "settings.display.project-list-layouts.description": {
-    "message": "对于当前设备，选择你喜欢的含项目列表页面的布局。"
+    "message": "为当前设备选择你喜欢的含项目列表页面的布局。"
   },
   "settings.display.project-list-layouts.mod": {
     "message": "模组页面"
@@ -3756,7 +3756,7 @@
     "message": "未知平台"
   },
   "settings.sidebar.label.account": {
-    "message": "账户设置"
+    "message": "账户"
   },
   "settings.sidebar.label.developer": {
     "message": "开发者设置"

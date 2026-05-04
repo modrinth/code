@@ -21,7 +21,7 @@
 		"@types/dompurify": "^3.0.5",
 		"@types/iso-3166-2": "^1.0.4",
 		"@types/js-yaml": "^4.0.9",
-		"@types/node": "^20.1.0",
+		"@types/node": "^24",
 		"@types/semver": "^7.7.1",
 		"autoprefixer": "^10.4.19",
 		"glob": "^10.2.7",

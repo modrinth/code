@@ -1,4 +1,103 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Java {version} indiriliyor"
+  },
+  "app.action-bar.downloads": {
+    "message": "İndirmeler"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Diğer çalışan kurulumları gizle"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Birincil kurulum yap"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Herhangi bir kurulum çalışmıyor"
+  },
+  "app.action-bar.offline": {
+    "message": "Çevrimdışı"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Birincil kurulum"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Daha fazla çalışan kurulum göster"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Kurulumu durdur"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Şu anda indirilienleri göster"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Kurulumu göster"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Günlükleri görüntüle"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Donanım hızlandırmalı işleme kapalıyken, performans sorunlarına yol açabilecek bulanıklık efektleri gibi gelişmiş işlemeleri aktif eder."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Gelişmiş işleme"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Modrinth App için tercih ettiğiniz temayı seçin."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Tema"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Launcher açıldığında varsayılan olarak açılacak sayfayı seçin."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Ana Sayfa"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Kütüphane"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Varsayılan karşılama sayfası"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Kostümler sayfasındaki karakterinizin üzerindeki isim etiketini devre dışı bırakır."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "İsim etiketini gizle"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Ana sayfadaki 'Hızlıca Geri Dön' bölümünde son oynanan dünyaları gösterir."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Dünyalara hızlıca geri dön"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minecraft başlatıldığında launcher'i simge durumuna at."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Launcher'i simge durumuna at"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Sistem pencere kenarlıklarını kullan (Yeniden başlatma gerekli)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Yerel pencere öğeleri"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Bir seçenek seçin"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Kenar çubuğunu ayarlama özelliğini aktifleştirir."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Kenar çubuğunu ayarla"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Modrinth üzerinde barındırılmayan bir Modrinth Paket dosyasını (.mrpack) yüklemeye çalışırsanız, yükleme öncesinde riskleri anladığınızdan emin oluruz."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Bilinmeyen mod paketlerini indirmeden önce beni uyar"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft doğrulama sunucuları kapalı olabilir. İnternet bağlantını kontrol et ve daha sonra tekrar dene."
   },
@@ -6,7 +105,7 @@
     "message": "Doğrulama sunucularına erişilemedi"
   },
   "app.browse.add-server-to-instance": {
-    "message": "Kurulumunuza sunucu ekleyin"
+    "message": "Sunucuyu kurulumu ekle"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Kurulumunuza sunucular ekleyin"
@@ -30,13 +129,31 @@
     "message": "Sunucu keşfet"
   },
   "app.browse.hide-added-servers": {
-    "message": "Ekli sunucuları gizle"
+    "message": "Zaten eklenmiş sunucuları gizle"
   },
   "app.browse.hide-installed-content": {
-    "message": "Kurulu içerikleri gizle"
+    "message": "Zaten yüklenmiş içerikleri gizle"
   },
   "app.browse.install-content-to-instance": {
     "message": "İçeriği kuruluma yükle"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Mod paketleri"
+  },
+  "app.browse.server.install": {
+    "message": "Yükle"
+  },
+  "app.browse.server.installed": {
+    "message": "Yüklü"
+  },
+  "app.browse.server.installing": {
+    "message": "Yükleniyor"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Mod paketi indiriliyor..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Mod paketi açıklaması girin..."
@@ -598,5 +715,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Yükleyici sunucu tarafından sağlanıyor"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "Dosya formatı ne olursa olsun (.mrpack dahil), bir dosya yalnızca Modrinth'e yüklendiğinde denetlenir."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Bu uyarıyı tekrar gösterme"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "İndirmeyi onayla"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Yine de indir"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Kötü amaçlı yazılımlar genellikle Discord gibi platformlarda paylaşılan mod paketi dosyaları aracılığıyla yayılır."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "Bu dosyayı Modrinth üzerinde bulamadık. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle öneririz."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Bilinmeyen dosya uyarısı"
   }
 }
