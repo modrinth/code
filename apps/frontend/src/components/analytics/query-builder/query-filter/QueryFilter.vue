@@ -85,13 +85,6 @@
 					>
 						<span>{{ category.label }}</span>
 						<div class="flex items-center gap-1">
-							<span
-								v-if="getCategorySelectionCount(category.key, 'draft') > 0"
-								class="grid aspect-square w-5 place-items-center rounded-full bg-surface-5 text-center text-xs font-medium text-primary transition-all group-hover/filter-menu-button:brightness-125"
-								:class="category.key === activeCategoryKey ? 'brightness-125' : ''"
-							>
-								{{ getCategorySelectionCount(category.key, 'draft') }}
-							</span>
 							<ChevronRightIcon class="size-5 text-secondary" />
 						</div>
 					</button>
@@ -104,7 +97,13 @@
 				v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 				ref="submenu"
 				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
-				:class="activeCategory.key === 'game_version' ? 'w-[360px]' : 'w-72'"
+				:class="
+					activeCategory.key === 'game_version'
+						? 'w-[360px]'
+						: activeCategory.key === 'version_id'
+							? 'w-[368px]'
+							: 'w-72'
+				"
 				:style="submenuStyle"
 				@mouseenter="handleSubmenuMouseEnter"
 				@mouseleave="handleSubmenuMouseLeave"
@@ -160,8 +159,7 @@
 							v-for="option in filteredActiveCategoryOptions"
 							:key="`${activeCategory.key}-${option.value}`"
 							type="button"
-							class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
-							:aria-checked="isFilterValueSelected(activeCategory.key, option.value)"
+							class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5"
 							role="checkbox"
 							@click="toggleFilterOption(activeCategory.key, option.value)"
 						>
@@ -193,7 +191,16 @@
 					</template>
 				</div>
 				<DownloadsThresholdInput
-					v-if="activeCategory.key === 'game_version'"
+					v-if="activeCategory.key === 'version_id'"
+					class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+					label="Project versions above"
+					input-aria-label="Project version downloads threshold"
+					:threshold="projectVersionDownloadsThreshold"
+					input-width-class="w-16"
+					@update:threshold="setProjectVersionDownloadsThreshold"
+				/>
+				<DownloadsThresholdInput
+					v-else-if="activeCategory.key === 'game_version'"
 					class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
 					label="Game Versions above"
 					input-aria-label="Game version downloads threshold"
@@ -259,6 +266,7 @@ import {
 
 const {
 	filterOptions,
+	projectVersionDownloadsById,
 	gameVersionDownloadsByVersion,
 	selectedBreakdown,
 	selectedFilters,
@@ -277,6 +285,7 @@ const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
 const previewSelectedValueDrafts = ref<Partial<Record<AnalyticsQueryFilterCategory, string[]>>>({})
 const categorySearchQuery = ref('')
 const gameVersionType = ref<'release' | 'all'>('release')
+const projectVersionDownloadsThreshold = ref<number | null>(null)
 const gameVersionDownloadsThreshold = ref<number | null>(null)
 const lastMousePosition = ref<Point | null>(null)
 const isCursorInsideSubmenu = ref(false)
@@ -583,6 +592,28 @@ function applyGameVersionDownloadsThreshold() {
 			.map((gameVersion) => gameVersion.value),
 		'draft',
 	)
+}
+
+function applyProjectVersionDownloadsThreshold() {
+	const threshold = projectVersionDownloadsThreshold.value
+	if (threshold === null) {
+		return
+	}
+
+	setSelectedValues(
+		'version_id',
+		versionFilterOptions.value
+			.filter((version) => {
+				return (projectVersionDownloadsById.value.get(version.value) ?? 0) >= threshold
+			})
+			.map((version) => version.value),
+		'draft',
+	)
+}
+
+function setProjectVersionDownloadsThreshold(threshold: number | null) {
+	projectVersionDownloadsThreshold.value = threshold
+	applyProjectVersionDownloadsThreshold()
 }
 
 function setGameVersionDownloadsThreshold(threshold: number | null) {
@@ -1100,6 +1131,14 @@ watch(gameVersionDownloadsByVersion, () => {
 	}
 
 	applyGameVersionDownloadsThreshold()
+})
+
+watch(projectVersionDownloadsById, () => {
+	if (!isAddMenuOpen.value || activeCategoryKey.value !== 'version_id') {
+		return
+	}
+
+	applyProjectVersionDownloadsThreshold()
 })
 
 watch(filterCategoriesByKey, (nextCategories) => {

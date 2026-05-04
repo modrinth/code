@@ -207,7 +207,7 @@
 								:aria-selected="isSelected(item.value)"
 								:aria-disabled="item.disabled || undefined"
 								:data-focused="focusedIndex === index"
-								class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 rounded-xl"
+								class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 rounded-xl"
 								:class="[
 									item.class,
 									{

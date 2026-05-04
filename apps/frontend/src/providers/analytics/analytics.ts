@@ -7,7 +7,6 @@ import {
 	getEnabledAnalyticsStatsForState,
 	sanitizeAnalyticsSelectedFilters,
 } from '~/components/analytics/query-builder/query-filter/queryFilter'
-import { useGeneratedState } from '~/composables/generated'
 import { fetchSegmentedWith } from '~/utils/fetch-helpers.ts'
 
 import type { OrganizationContext } from '../organization-context'
@@ -39,7 +38,6 @@ export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playti
 
 const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
 const ANALYTICS_START_TIMESTAMP = '2022-01-01T00:00:00.000Z'
-const ANALYTICS_LOADER_TYPES = ['fabric', 'forge', 'neoforge', 'quilt', 'vanilla']
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -250,6 +248,60 @@ function sortStringValues(values: string[]): string[] {
 	return [...values].sort((left, right) => left.localeCompare(right))
 }
 
+function getProjectVersionGameVersions(versions: Labrinth.Versions.v3.Version[]): string[] {
+	const gameVersions = new Set<string>()
+
+	for (const version of versions) {
+		for (const gameVersion of version.game_versions) {
+			const normalizedGameVersion = gameVersion.trim()
+			if (normalizedGameVersion.length > 0) {
+				gameVersions.add(normalizedGameVersion)
+			}
+		}
+	}
+
+	return sortStringValues([...gameVersions])
+}
+
+function getProjectVersionLoaders(versions: Labrinth.Versions.v3.Version[]): string[] {
+	const loaders = new Set<string>()
+
+	for (const version of versions) {
+		const versionLoaders =
+			version.mrpack_loaders && version.mrpack_loaders.length > 0
+				? version.mrpack_loaders
+				: version.loaders
+
+		for (const loader of versionLoaders) {
+			const normalizedLoader = loader.trim().toLowerCase()
+			if (normalizedLoader.length > 0 && normalizedLoader !== 'mrpack') {
+				loaders.add(normalizedLoader)
+			}
+		}
+	}
+
+	return sortStringValues([...loaders])
+}
+
+function retainAvailableSelectedFilterValues(values: string[], availableValues: string[]): string[] {
+	const availableValueSet = new Set(availableValues)
+	return values.filter((value) => availableValueSet.has(value))
+}
+
+function sanitizeAnalyticsSelectedFiltersForAvailableOptions(
+	filters: AnalyticsSelectedFilters,
+	filterOptions: AnalyticsDashboardFilterOptions,
+): AnalyticsSelectedFilters {
+	return {
+		...filters,
+		game_version: retainAvailableSelectedFilterValues(
+			filters.game_version,
+			filterOptions.gameVersions,
+		),
+		loader_type: retainAvailableSelectedFilterValues(filters.loader_type, filterOptions.loaderTypes),
+	}
+}
+
 function getCountryFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
 	const countries = new Set<string>()
 
@@ -426,7 +478,6 @@ export function createAnalyticsDashboardContext(
 	const client = injectModrinthClient()
 	const route = useRoute()
 	const router = useRouter()
-	const generatedState = useGeneratedState()
 	const initialQueryState = readAnalyticsQueryBuilderState(route.query, [])
 
 	const activeStat = ref<AnalyticsDashboardStat>('views')
@@ -707,7 +758,10 @@ export function createAnalyticsDashboardContext(
 		enabled: computed(() => countryAndDownloadSourceFilterOptionsRequest.value !== null),
 	})
 
-	const { data: filterOptionProjectVersions } = useQuery({
+	const {
+		data: filterOptionProjectVersions,
+		isFetched: hasFetchedFilterOptionProjectVersions,
+	} = useQuery({
 		queryKey: computed(() => [
 			'analytics',
 			'dashboard',
@@ -736,12 +790,30 @@ export function createAnalyticsDashboardContext(
 		downloadSources: getDownloadSourceFilterOptions(
 			countryAndDownloadSourceFilterOptionsData.value ?? [],
 		),
-		gameVersions: generatedState.value.gameVersions.map((gameVersion) => gameVersion.version),
-		loaderTypes: ANALYTICS_LOADER_TYPES,
+		gameVersions: getProjectVersionGameVersions(filterOptionProjectVersions.value ?? []),
+		loaderTypes: getProjectVersionLoaders(filterOptionProjectVersions.value ?? []),
 		versionIds: sortStringValues([
 			...new Set((filterOptionProjectVersions.value ?? []).map((version) => version.id)),
 		]),
 	}))
+
+	watch(
+		[selectedFilters, filterOptions, hasFetchedFilterOptionProjectVersions],
+		([nextSelectedFilters, nextFilterOptions, hasFetchedFilterOptions]) => {
+			if (!hasFetchedFilterOptions) {
+				return
+			}
+
+			const sanitizedFilters = sanitizeAnalyticsSelectedFiltersForAvailableOptions(
+				nextSelectedFilters,
+				nextFilterOptions,
+			)
+			if (!areSelectedFiltersEqual(nextSelectedFilters, sanitizedFilters)) {
+				selectedFilters.value = sanitizedFilters
+			}
+		},
+		{ deep: true },
+	)
 
 	const filterOptionProjectVersionIds = computed(
 		() => new Set((filterOptionProjectVersions.value ?? []).map((version) => version.id)),

@@ -1,7 +1,7 @@
 <template>
 	<div
 		v-if="tabs.length > 0"
-		class="inline-flex w-fit items-center overflow-x-auto rounded-xl border border-solid border-surface-5 bg-surface-2 p-0.5 shadow-sm gap-1"
+		class="inline-flex w-fit items-center overflow-x-auto rounded-xl border border-solid border-surface-5 p-0.5 shadow-sm gap-1"
 		role="tablist"
 	>
 		<button
@@ -21,7 +21,7 @@
 			@click="selectTab(tab)"
 			@keydown="onTabKeydown($event, index)"
 		>
-			<component :is="tab.icon" v-if="tab.icon" class="size-5 shrink-0" />
+			<component :is="tab.icon" v-if="tab.icon" class="size-5 shrink-0 text-secondary" />
 			<span class="text-nowrap">{{ tab.label }}</span>
 		</button>
 	</div>
