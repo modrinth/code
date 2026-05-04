@@ -55,6 +55,15 @@ const ruleFollowing: Stage = {
 			],
 		} as ButtonAction,
 		{
+			id: 'cheat_or_hack_advertising',
+			type: 'button',
+			label: 'Hacks',
+			weight: 150,
+			suggestedStatus: 'rejected',
+			severity: 'critical',
+			message: async () => (await import('../messages/rule-breaking/cheat-or-hack-advertising.md?raw')).default,
+		} as ButtonAction,
+		{
 			id: 'server_side_opt_out',
 			type: 'button',
 			label: 'Opt-out',
