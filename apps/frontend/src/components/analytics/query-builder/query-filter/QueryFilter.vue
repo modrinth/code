@@ -45,7 +45,7 @@
 		<button
 			ref="addMenuTrigger"
 			type="button"
-			class="inline-flex h-10 items-center gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-4"
+			class="inline-flex h-10 items-center gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-all hover:brightness-125"
 			:aria-expanded="isAddMenuOpen"
 			aria-haspopup="menu"
 			@click="handleAddMenuTriggerClick"
@@ -104,7 +104,7 @@
 				v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 				ref="submenu"
 				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
-				:class="activeCategory.key === 'game_version' ? 'w-[23rem]' : 'w-72'"
+				:class="activeCategory.key === 'game_version' ? 'w-[360px]' : 'w-72'"
 				:style="submenuStyle"
 				@mouseenter="handleSubmenuMouseEnter"
 				@mouseleave="handleSubmenuMouseLeave"
@@ -112,16 +112,27 @@
 			>
 				<div
 					v-if="activeCategory.searchable"
-					class="border-0 border-b border-solid border-b-surface-5 px-3 py-2.5"
+					class="flex justify-between border-0 border-b border-solid border-b-surface-5 px-3 py-2.5"
 				>
 					<StyledInput
 						v-model="categorySearchQuery"
 						:icon="SearchIcon"
 						type="text"
 						:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
-						wrapper-class="w-full bg-surface-4"
+						wrapper-class="grow bg-surface-4"
 					/>
+					<div v-if="activeCategory.key === 'game_version'" class="flex w-40 justify-end">
+						<Chips
+							v-model="gameVersionType"
+							:items="gameVersionTypeOptions"
+							:never-empty="true"
+							aria-label="Game version type"
+							size="small"
+							hide-checkmark-icon
+						/>
+					</div>
 				</div>
+
 				<div
 					v-if="activeCategorySelectionCount > 0"
 					class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-6 py-2.5 text-sm"
@@ -213,7 +224,7 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { MultiSelect, type MultiSelectOption, StyledInput } from '@modrinth/ui'
+import { Chips, MultiSelect, type MultiSelectOption, StyledInput } from '@modrinth/ui'
 import { onClickOutside } from '@vueuse/core'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 
@@ -265,6 +276,7 @@ const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
 )
 const previewSelectedValueDrafts = ref<Partial<Record<AnalyticsQueryFilterCategory, string[]>>>({})
 const categorySearchQuery = ref('')
+const gameVersionType = ref<'release' | 'all'>('release')
 const gameVersionDownloadsThreshold = ref<number | null>(null)
 const lastMousePosition = ref<Point | null>(null)
 const isCursorInsideSubmenu = ref(false)
@@ -282,6 +294,7 @@ const submenuPosition = ref<Point>({ x: 0, y: 0 })
 const categoryButtonRefs = new Map<AnalyticsQueryFilterCategory, HTMLElement>()
 let pendingCategoryTimeout: NodeJS.Timeout | null = null
 let previousMousePosition: Point | null = null
+const gameVersionTypeOptions: Array<'release' | 'all'> = ['release', 'all']
 
 const filterCategories = computed<FilterCategory[]>(() => {
 	const filtersForAvailability = isAddMenuOpen.value
@@ -294,7 +307,7 @@ const filterCategories = computed<FilterCategory[]>(() => {
 		{
 			key: 'country',
 			label: 'Country',
-			searchable: true,
+			searchable: countryFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search countries...',
 			options: withSelectedOptions('country', countryFilterOptions.value),
 		},
@@ -309,14 +322,14 @@ const filterCategories = computed<FilterCategory[]>(() => {
 		{
 			key: 'download_source',
 			label: 'Download Source',
-			searchable: true,
+			searchable: downloadSourceFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search download sources...',
 			options: withSelectedOptions('download_source', downloadSourceFilterOptions.value),
 		},
 		{
 			key: 'version_id',
 			label: 'Project version',
-			searchable: true,
+			searchable: versionFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search project versions...',
 			options: withSelectedOptions('version_id', versionFilterOptions.value),
 		},
@@ -324,7 +337,7 @@ const filterCategories = computed<FilterCategory[]>(() => {
 			key: 'game_version',
 			label: 'Game Version',
 			searchable: true,
-			searchPlaceholder: 'Search game versions...',
+			searchPlaceholder: 'Search versions...',
 			options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
 		},
 		{
@@ -439,6 +452,14 @@ const gameVersionReleaseDatesByVersion = computed(
 			),
 		),
 )
+const gameVersionTypesByVersion = computed(
+	() =>
+		new Map(
+			generatedState.value.gameVersions.map(
+				(gameVersion) => [gameVersion.version, gameVersion.version_type] as const,
+			),
+		),
+)
 
 const downloadSourceFilterOptions = computed<FilterOption[]>(() =>
 	filterOptions.value.downloadSources
@@ -468,6 +489,12 @@ const versionFilterOptions = computed<FilterOption[]>(() =>
 
 const gameVersionFilterOptions = computed<FilterOption[]>(() =>
 	filterOptions.value.gameVersions
+		.filter((gameVersion) => {
+			const versionType = gameVersionTypesByVersion.value.get(gameVersion)
+			return (
+				gameVersionType.value === 'all' || versionType === undefined || versionType === 'release'
+			)
+		})
 		.map((gameVersion) => ({
 			value: gameVersion,
 			label: gameVersion,
@@ -1055,6 +1082,15 @@ watch(isAddMenuOpen, (isOpen) => {
 })
 
 watch(categorySearchQuery, () => {
+	scheduleSubmenuPositionUpdate()
+})
+
+watch(gameVersionType, () => {
+	if (!isAddMenuOpen.value || activeCategoryKey.value !== 'game_version') {
+		return
+	}
+
+	applyGameVersionDownloadsThreshold()
 	scheduleSubmenuPositionUpdate()
 })
 

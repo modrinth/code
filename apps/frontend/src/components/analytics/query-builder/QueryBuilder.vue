@@ -319,7 +319,7 @@ const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
 	{ value: 'country', label: 'Country' },
 	{ value: 'monetization', label: 'Monetization' },
 	{ value: 'download_source', label: 'Download source' },
-	{ value: 'version_id', label: 'Project versions' },
+	{ value: 'version_id', label: 'Project version' },
 	{ value: 'loader', label: 'Loader' },
 	{ value: 'game_version', label: 'Game version' },
 ]

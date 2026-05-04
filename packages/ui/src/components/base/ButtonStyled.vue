@@ -188,7 +188,7 @@ const colorVariables = computed(() => {
 		}
 		const hoverColors = JSON.parse(JSON.stringify(colors))
 		const boxShadow =
-			props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : defaultShadow
+			props.type === 'chip' && colorVar.value ? `0 0 0 1px ${colorVar.value}` : defaultShadow
 		return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon}; --_box-shadow: ${boxShadow};`
 	}
 
@@ -229,7 +229,7 @@ const colorVariables = computed(() => {
 	}
 
 	const boxShadow =
-		props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : defaultShadow
+		props.type === 'chip' && colorVar.value ? `0 0 0 1px ${colorVar.value}` : defaultShadow
 	return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_box-shadow: ${boxShadow};`
 })
 

@@ -146,7 +146,7 @@ const breakdownColumnLabel = computed(() => {
 		case 'download_source':
 			return 'Download source'
 		case 'version_id':
-			return 'Project versions'
+			return 'Project version'
 		case 'loader':
 			return 'Loader'
 		case 'game_version':
