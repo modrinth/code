@@ -20,24 +20,29 @@
 			@open="openPreviewFilterDraft(preview.key)"
 			@close="commitPreviewFilterDraft(preview.key)"
 		>
-			<template #input-content="{ isOpen }">
-				<div class="flex min-w-0 items-center gap-2">
-					<span class="truncate">
+			<template #input-content="{ isOpen, openDirection }">
+				<div class="flex min-h-8 min-w-0 items-center gap-2">
+					<span class="min-w-0 flex-1 truncate">
 						<span class="font-medium">{{ preview.label }}:</span>
 						<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
 					</span>
-					<ChevronDownIcon
-						class="size-4 shrink-0 text-secondary transition-transform duration-150"
-						:class="isOpen ? 'rotate-180' : ''"
-					/>
-					<button
-						type="button"
-						class="-mr-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
-						:aria-label="`Clear ${preview.label} filter`"
-						@click.stop="clearFilterCategory(preview.key)"
-					>
-						<XIcon class="size-4" />
-					</button>
+					<div class="flex shrink-0 items-center gap-1.5">
+						<button
+							type="button"
+							class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+							:aria-label="`Clear ${preview.label} filter`"
+							@click.stop="clearFilterCategory(preview.key)"
+						>
+							<XIcon class="size-4 text-primary" />
+						</button>
+						<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+						<ChevronLeftIcon
+							class="size-5 shrink-0 text-secondary transition-transform duration-150"
+							:class="
+								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+							"
+						/>
+					</div>
 				</div>
 			</template>
 		</MultiSelect>
@@ -225,7 +230,7 @@
 <script setup lang="ts">
 import {
 	CheckIcon,
-	ChevronDownIcon,
+	ChevronLeftIcon,
 	ChevronRightIcon,
 	PlusIcon,
 	SearchIcon,

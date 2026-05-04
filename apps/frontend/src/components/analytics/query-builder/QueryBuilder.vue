@@ -19,23 +19,25 @@
 					@close="handleProjectSelectClose"
 				>
 					<template #input-content="{ isOpen, openDirection }">
-						<div class="flex min-h-8 min-w-0 flex-1 items-center gap-2">
-							<span class="min-w-0 flex-1 truncate px-1.5 py-1 font-medium text-primary">
+						<div class="flex min-h-8 min-w-0 flex-1 items-center gap-2 pr-1">
+							<span class="min-w-0 flex-1 truncate px-1.5 py-1 font-semibold text-primary">
 								{{ selectedProjectLabel }}
 							</span>
-							<div class="ml-2 flex shrink-0 items-center gap-1.5">
-								<button
-									v-if="canClearDraftSelectedProjects"
-									type="button"
-									class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
-									aria-label="Clear projects"
-									@click.stop="clearDraftSelectedProjects"
-								>
-									<XIcon class="size-5" />
-								</button>
-								<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+							<div class="flex shrink-0 items-center gap-1.5">
+								<template v-if="canClearDraftSelectedProjects">
+									<button
+										type="button"
+										class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+										aria-label="Clear projects"
+										@click.stop="clearDraftSelectedProjects"
+									>
+										<XIcon class="size-4 text-primary" />
+									</button>
+									<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+								</template>
+
 								<ChevronLeftIcon
-									class="size-5 shrink-0 text-secondary transition-transform duration-150"
+									class="size-5 shrink-0 text-primary transition-transform duration-150"
 									:class="
 										isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
 									"
@@ -125,16 +127,19 @@
 								:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 							>
 								<template #suffix>
-									<button
-										v-if="selectedBreakdown !== 'none'"
-										type="button"
-										class="-mr-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent shadow-none transition-colors hover:bg-transparent hover:text-contrast"
-										aria-label="Clear breakdown"
-										@click.stop="clearSelectedBreakdown"
-										@keydown.stop
-									>
-										<XIcon class="size-4" />
-									</button>
+									<div class="mr-0.5 flex gap-2">
+										<button
+											v-if="selectedBreakdown !== 'none'"
+											type="button"
+											class="-mr-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+											aria-label="Clear breakdown"
+											@click.stop="clearSelectedBreakdown"
+											@keydown.stop
+										>
+											<XIcon class="size-4 text-primary" />
+										</button>
+										<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+									</div>
 								</template>
 							</Combobox>
 						</div>
