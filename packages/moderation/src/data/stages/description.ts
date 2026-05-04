@@ -1,6 +1,6 @@
 import { LibraryIcon } from '@modrinth/assets'
 
-import type { ButtonAction } from '../../types/actions'
+import type { ButtonAction, MultiSelectChipsAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'
 
 const description: Stage = {
@@ -12,64 +12,85 @@ const description: Stage = {
 	navigate: '/',
 	actions: [
 		{
-			id: 'description_insufficient_packs',
-			type: 'button',
-			label: 'Insufficient',
-			weight: 400,
-			suggestedStatus: 'flagged',
-			severity: 'medium',
-			shouldShow: (project, projectV3) =>
-				project.project_type === 'modpack' && !projectV3?.minecraft_server,
-			message: async () =>
-				(
-					await import('../messages/checklist-messages/description/insufficient/insufficient-packs.md?raw')
-				).default,
-		} as ButtonAction,
-		{
-			id: 'description_insufficient_projects',
-			type: 'button',
-			label: 'Insufficient',
-			weight: 400,
-			suggestedStatus: 'flagged',
-			severity: 'medium',
-			shouldShow: (project, projectV3) =>
-				project.project_type !== 'modpack' && !projectV3?.minecraft_server,
-			message: async () =>
-				(
-					await import('../messages/checklist-messages/description/insufficient/insufficient-projects.md?raw')
-				).default,
-		} as ButtonAction,
-		{
-			id: 'description_insufficient_servers',
-			type: 'button',
-			label: 'Insufficient',
-			weight: 400,
-			suggestedStatus: 'flagged',
-			severity: 'medium',
-			shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
-			message: async () =>
-				(
-					await import('../messages/checklist-messages/description/insufficient/insufficient-servers.md?raw')
-				).default,
-		} as ButtonAction,
-		{
 			id: 'description_insufficient',
 			type: 'button',
-			label: 'Insufficient (custom)',
-			weight: 401,
+			label: 'Insufficient',
+			weight: 400,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			message: async () =>
-				(
-					await import('../messages/checklist-messages/description/insufficient/insufficient.md?raw')
-				).default,
-			relevantExtraInput: [
+				(await import('../messages/description/insufficient/insufficient-header.md?raw')).default,
+			enablesActions: [
 				{
-					label: 'Please elaborate on how the author can improve their description.',
-					variable: 'EXPLAINER',
-					large: true,
-					required: true,
-				},
+					id: 'description_insufficient_options',
+					type: 'multi-select-chips',
+					label: 'Which details are missing from the description?',
+					options: [
+						{
+							id: 'description_insufficient_packs',
+							label: 'Missing basic details (modpacks)',
+							weight: 401,
+							shouldShow: (project, projectV3) =>
+								project.project_type === 'modpack' && !projectV3?.minecraft_server,
+							message: async () =>
+								(await import('../messages/checklist-messages/description/insufficient/insufficient-packs.md?raw'))
+									.default,
+						},
+						{
+							id: 'description_insufficient_projects',
+							label: 'Missing basic details',
+							weight: 402,
+							shouldShow: (project, projectV3) =>
+								project.project_type !== 'modpack' && !projectV3?.minecraft_server,
+							message: async () =>(
+								await import('../messages/checklist-messages/description/insufficient/insufficient-projects.md?raw'))
+									.default,
+						},
+						{
+							id: 'description_insufficient_servers',
+							label: 'Missing basic details',
+							weight: 403,
+							shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
+							message: async () =>(
+								await import('../messages/checklist-messages/description/insufficient/insufficient-servers.md?raw'))
+									.default,
+						},
+						{
+							id: 'description_insufficient_fork',
+							label: 'Fork',
+							weight: 404,
+							message: async () =>
+								(await import('../messages/description/insufficient/insufficient-fork.md?raw'))
+									.default,
+						},
+						{
+							id: 'description_insufficient_port',
+							label: 'Port',
+							weight: 405,
+							message: async () =>
+								(await import('../messages/description/insufficient/insufficient-port.md?raw'))
+									.default,
+						},
+					],
+				} as MultiSelectChipsAction,
+				{
+					id: 'description_insufficient_custom',
+					type: 'button',
+					label: 'Insufficient (custom)',
+					weight: 406,
+					suggestedStatus: 'flagged',
+					severity: 'medium',
+					message: async () =>(
+						await import('../messages/checklist-messages/description/insufficient/insufficient.md?raw')).default,
+					relevantExtraInput: [
+						{
+							label: 'Please elaborate on how the author can improve their description.',
+							variable: 'EXPLAINER',
+							large: true,
+							required: true,
+						},
+					],
+				} as ButtonAction,
 			],
 		} as ButtonAction,
 		{
