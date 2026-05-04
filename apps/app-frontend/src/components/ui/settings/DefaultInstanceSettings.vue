@@ -143,10 +143,6 @@ watch(
 		<hr class="my-6 bg-button-border border-none h-[1px]" />
 
 		<div class="flex flex-col gap-6">
-			<p class="m-0 leading-tight">
-				Commands support $INST_NAME, $INST_ID, $INST_DIR/$INST_MC_DIR, $INST_JAVA, $INST_JAVA_ARGS.
-			</p>
-
 			<div class="flex flex-col gap-2.5">
 				<h3 class="m-0 text-lg font-semibold text-contrast">Pre launch hook</h3>
 				<StyledInput
@@ -184,6 +180,18 @@ watch(
 					wrapper-class="w-full"
 				/>
 				<p class="m-0 leading-tight">Ran after the game closes.</p>
+			</div>
+
+			<div class="m-0 leading-tight">
+				Hooks run in the working directory of the instance, with the following variables:
+				<ul>
+					<li>$INST_NAME: The name of the instance</li>
+					<li>$INST_ID: The name of the instance's folder</li>
+					<li>$INST_DIR: The absolute path to the instance's folder</li>
+					<li>$INST_MC_DIR: An alias for $INST_DIR</li>
+					<li>$INST_JAVA: The absolute path to the java binary</li>
+					<li>$INST_JAVA_ARGS: The JVM Arguments provided to the game</li>
+				</ul>
 			</div>
 		</div>
 	</div>
