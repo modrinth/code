@@ -3,7 +3,7 @@
 		<div v-if="showProjectRow" class="flex items-start gap-2">
 			<div class="my-1.5 flex w-32 items-center gap-2 text-primary">
 				<FolderOpenIcon class="size-5" />
-				<span class="text-base font-medium">Projects:</span>
+				<span class="text-base font-medium">Project:</span>
 			</div>
 			<div class="w-fit">
 				<MultiSelect

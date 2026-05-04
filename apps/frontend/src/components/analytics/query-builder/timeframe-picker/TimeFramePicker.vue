@@ -1,5 +1,6 @@
 <template>
 	<Combobox
+		:key="timeframeSelectKey"
 		:model-value="highlightedTimeframePreset"
 		:options="timeframeDropdownOptions"
 		:display-value="selectedTimeframeLabel"
@@ -12,18 +13,27 @@
 	>
 		<template #bottom>
 			<div class="flex flex-col border-0 border-t border-solid border-surface-5 bg-surface-4">
-				<template v-if="draftSelectedTimeframeMode === 'custom_range'">
+				<template v-if="activeTimeframePanel === 'custom_range'">
 					<CustomRangeTimeframe
 						v-model:start-date="draftSelectedCustomTimeframeStartDate"
 						v-model:end-date="draftSelectedCustomTimeframeEndDate"
 					/>
-					<button
-						type="button"
-						class="flex cursor-pointer items-center border-0 border-t border-solid border-surface-5 bg-transparent px-4 py-3 text-left text-sm font-semibold text-primary transition-colors hover:bg-surface-5"
-						@click.stop="draftSelectedTimeframeMode = 'preset'"
+					<div
+						class="flex items-center justify-between gap-3 border-0 border-t border-solid border-surface-5 px-4 py-3"
 					>
-						Preset timeframes...
-					</button>
+						<div class="min-w-0 truncate text-sm text-secondary">
+							Selected period:
+							<span class="font-semibold text-primary">{{ draftCustomTimeframeRangeLabel }}</span>
+						</div>
+						<div class="flex shrink-0 items-center gap-2">
+							<ButtonStyled type="outlined">
+								<button type="button" @click.stop="cancelCustomDateRange">Cancel</button>
+							</ButtonStyled>
+							<ButtonStyled color="brand">
+								<button type="button" @click.stop="applyCustomDateRange">Apply</button>
+							</ButtonStyled>
+						</div>
+					</div>
 				</template>
 				<template v-else>
 					<CustomTimeframe
@@ -47,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { Combobox, type ComboboxOption } from '@modrinth/ui'
+import { ButtonStyled, Combobox, type ComboboxOption } from '@modrinth/ui'
 
 import {
 	type AnalyticsLastTimeframeUnit,
@@ -65,6 +75,15 @@ import {
 } from './timeframe'
 
 const TIMEFRAME_DROPDOWN_MAX_HEIGHT = 500
+const CUSTOM_RANGE_DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+	month: 'long',
+	day: 'numeric',
+	year: 'numeric',
+})
+const CUSTOM_RANGE_MONTH_DAY_FORMATTER = new Intl.DateTimeFormat('en-US', {
+	month: 'long',
+	day: 'numeric',
+})
 
 const {
 	selectedTimeframeMode,
@@ -77,6 +96,9 @@ const {
 } = injectAnalyticsDashboardContext()
 
 const isTimeframeSelectOpen = ref(false)
+const timeframeSelectKey = ref(0)
+const activeTimeframePanel = ref<'preset' | 'custom_range'>('preset')
+const shouldCommitTimeframeDraftOnClose = ref(true)
 const draftSelectedTimeframeMode = ref(selectedTimeframeMode.value)
 const draftSelectedTimeframe = ref(selectedTimeframe.value)
 const draftSelectedLastTimeframeAmount = ref(selectedLastTimeframeAmount.value)
@@ -126,7 +148,7 @@ const lastTimeframeValueByPreset: Partial<
 }
 
 const timeframeDropdownOptions = computed<ComboboxOption<AnalyticsTimeframePreset>[]>(() =>
-	draftSelectedTimeframeMode.value === 'custom_range' ? [] : timeframeOptions,
+	activeTimeframePanel.value === 'custom_range' ? [] : timeframeOptions,
 )
 
 const highlightedTimeframePreset = computed<AnalyticsTimeframePreset | undefined>(() => {
@@ -138,23 +160,33 @@ const highlightedTimeframePreset = computed<AnalyticsTimeframePreset | undefined
 })
 
 const selectedTimeframeLabel = computed(() => {
+	const useDraftTimeframeLabel =
+		isTimeframeSelectOpen.value && shouldCommitTimeframeDraftOnClose.value
+
 	return getTimeframeLabel(
-		isTimeframeSelectOpen.value ? draftSelectedTimeframeMode.value : selectedTimeframeMode.value,
-		isTimeframeSelectOpen.value ? draftSelectedTimeframe.value : selectedTimeframe.value,
-		isTimeframeSelectOpen.value
+		useDraftTimeframeLabel ? draftSelectedTimeframeMode.value : selectedTimeframeMode.value,
+		useDraftTimeframeLabel ? draftSelectedTimeframe.value : selectedTimeframe.value,
+		useDraftTimeframeLabel
 			? draftSelectedLastTimeframeAmount.value
 			: selectedLastTimeframeAmount.value,
-		isTimeframeSelectOpen.value
+		useDraftTimeframeLabel
 			? draftSelectedLastTimeframeUnit.value
 			: selectedLastTimeframeUnit.value,
-		isTimeframeSelectOpen.value
+		useDraftTimeframeLabel
 			? draftSelectedCustomTimeframeStartDate.value
 			: selectedCustomTimeframeStartDate.value,
-		isTimeframeSelectOpen.value
+		useDraftTimeframeLabel
 			? draftSelectedCustomTimeframeEndDate.value
 			: selectedCustomTimeframeEndDate.value,
 	)
 })
+
+const draftCustomTimeframeRangeLabel = computed(() =>
+	formatCustomTimeframeRangeLabel(
+		draftSelectedCustomTimeframeStartDate.value,
+		draftSelectedCustomTimeframeEndDate.value,
+	),
+)
 
 function getTimeframeLabel(
 	mode: AnalyticsTimeframeMode,
@@ -171,7 +203,7 @@ function getTimeframeLabel(
 	}
 
 	if (mode === 'custom_range') {
-		return `${customStartDate} to ${customEndDate}`
+		return formatCustomTimeframeRangeLabel(customStartDate, customEndDate)
 	}
 
 	return timeframeOptions.find((option) => option.value === preset)?.label ?? 'Select timeframe'
@@ -187,6 +219,39 @@ function getDraftTimeRange() {
 		customEndDate: draftSelectedCustomTimeframeEndDate.value,
 		nowTimestamp: queryRefreshTimestamp.value,
 	})
+}
+
+function getDateFromInputValue(value: string): Date | undefined {
+	const date = new Date(`${value}T00:00:00`)
+	if (Number.isNaN(date.getTime()) || getDateInputValue(date) !== value) {
+		return undefined
+	}
+
+	return date
+}
+
+function formatCustomTimeframeRangeLabel(startDateValue: string, endDateValue: string): string {
+	const startDate = getDateFromInputValue(startDateValue)
+	const endDate = getDateFromInputValue(endDateValue)
+	if (!startDate || !endDate) {
+		return `${startDateValue} - ${endDateValue}`
+	}
+
+	const sameYear = startDate.getFullYear() === endDate.getFullYear()
+
+	if (startDateValue === endDateValue) {
+		return CUSTOM_RANGE_DATE_FORMATTER.format(startDate)
+	}
+
+	if (sameYear) {
+		const startLabel = CUSTOM_RANGE_MONTH_DAY_FORMATTER.format(startDate)
+		const endLabel = CUSTOM_RANGE_MONTH_DAY_FORMATTER.format(endDate)
+		return `${startLabel} - ${endLabel}, ${startDate.getFullYear()}`
+	}
+
+	const startLabel = CUSTOM_RANGE_DATE_FORMATTER.format(startDate)
+	const endLabel = CUSTOM_RANGE_DATE_FORMATTER.format(endDate)
+	return `${startLabel} - ${endLabel}`
 }
 
 function resetTimeframeDraft() {
@@ -209,11 +274,18 @@ function commitTimeframeDraft() {
 
 function handleTimeframeSelectOpen() {
 	resetTimeframeDraft()
+	activeTimeframePanel.value = 'preset'
+	shouldCommitTimeframeDraftOnClose.value = true
 	isTimeframeSelectOpen.value = true
 }
 
 function handleTimeframeSelectClose() {
-	commitTimeframeDraft()
+	if (shouldCommitTimeframeDraftOnClose.value) {
+		commitTimeframeDraft()
+	} else {
+		resetTimeframeDraft()
+	}
+
 	isTimeframeSelectOpen.value = false
 }
 
@@ -256,5 +328,21 @@ function switchDraftToCustomDateRange() {
 	draftSelectedCustomTimeframeStartDate.value = getDateInputValue(rawRange.start)
 	draftSelectedCustomTimeframeEndDate.value = getInclusiveEndDateInputValue(rawRange.end)
 	draftSelectedTimeframeMode.value = 'custom_range'
+	activeTimeframePanel.value = 'custom_range'
+	shouldCommitTimeframeDraftOnClose.value = false
+}
+
+function cancelCustomDateRange() {
+	resetTimeframeDraft()
+	activeTimeframePanel.value = 'preset'
+	shouldCommitTimeframeDraftOnClose.value = true
+}
+
+function applyCustomDateRange() {
+	commitTimeframeDraft()
+	activeTimeframePanel.value = 'preset'
+	shouldCommitTimeframeDraftOnClose.value = true
+	isTimeframeSelectOpen.value = false
+	timeframeSelectKey.value++
 }
 </script>
