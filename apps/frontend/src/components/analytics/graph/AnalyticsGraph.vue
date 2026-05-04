@@ -1,7 +1,8 @@
 <template>
 	<section
-		class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
+		class="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
 	>
+		<AnalyticsLoadingBar :loading="isDataLoading" />
 		<div class="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
 			<div class="flex w-full flex-col gap-3">
 				<div class="flex items-center justify-between">
@@ -18,7 +19,7 @@
 					</div>
 				</div>
 
-				<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+				<div v-if="!isDataLoading" class="flex flex-wrap items-center gap-x-4 gap-y-2">
 					<div
 						v-for="legendEntry in displayedLegendEntries"
 						:key="legendEntry.id"
@@ -58,55 +59,64 @@
 
 		<div ref="chartContainer" class="relative h-96" @click="onChartClick">
 			<div
-				v-if="isDataLoading"
-				class="flex h-full items-center justify-center rounded-xl bg-surface-3"
+				:class="[
+					'h-full transition-opacity',
+					isDataLoading ? 'pointer-events-none opacity-75' : '',
+				]"
 			>
 				<div
-					class="relative bottom-6 inline-flex items-center gap-2 text-sm font-medium text-secondary"
+					v-if="selectedProjects.length === 0"
+					class="flex h-full items-center justify-center rounded-xl"
 				>
-					<SpinnerIcon class="size-5 animate-spin" />
-					<span>Loading data</span>
+					<div class="relative bottom-6 text-sm font-medium text-secondary">
+						Select at least one project to view data
+					</div>
 				</div>
+				<template v-else>
+					<ClientOnly>
+						<AnalyticsChart
+							:type="chartType"
+							:fill="isArea"
+							:stacked="isStacked"
+							:datasets="visibleChartDatasets"
+							:labels="chartLabels"
+							:active-stat="activeStat"
+							:pinned-slice-index="pinnedSliceIndex"
+							@hover="onChartHover"
+							@pinned-drag="onPinnedDrag"
+						/>
+					</ClientOnly>
+					<div
+						v-if="showPinnedGuide"
+						aria-hidden="true"
+						class="pointer-events-none absolute bottom-0 top-0 z-10 mb-8 mt-2 border-0 border-l-[2px] border-dashed border-green opacity-75"
+						:style="{ transform: `translate(${hoverState.x}px, 0)` }"
+					/>
+					<AnalyticsChartTooltip
+						:visible="hoverState.visible"
+						:x="hoverState.x"
+						:y="hoverState.y"
+						:range-label="hoverRangeLabel"
+						:entries="hoverEntries"
+						:container-width="containerSize.width"
+						:container-height="containerSize.height"
+						:pinned="isHoverPinned"
+					/>
+				</template>
 			</div>
 			<div
-				v-else-if="selectedProjects.length === 0"
-				class="flex h-full items-center justify-center rounded-xl"
+				v-if="isDataLoading"
+				class="absolute inset-0 z-20 overflow-hidden rounded-xl"
 			>
-				<div class="relative bottom-6 text-sm font-medium text-secondary">
-					Select at least one project to view data
+				<div class="absolute inset-0 bg-surface-3 opacity-50" />
+				<div class="absolute inset-0 backdrop-blur-[4px]" />
+				<div class="absolute inset-0 flex items-center justify-center">
+					<div class="relative bottom-6 inline-flex items-center gap-2 text-lg font-semibold text-primary">
+						<SpinnerIcon class="size-5 animate-spin" />
+						<span>Fetching results...</span>
+					</div>
 				</div>
 			</div>
-			<template v-else>
-				<ClientOnly>
-					<AnalyticsChart
-						:type="chartType"
-						:fill="isArea"
-						:stacked="isStacked"
-						:datasets="visibleChartDatasets"
-						:labels="chartLabels"
-						:active-stat="activeStat"
-						:pinned-slice-index="pinnedSliceIndex"
-						@hover="onChartHover"
-						@pinned-drag="onPinnedDrag"
-					/>
-				</ClientOnly>
-				<div
-					v-if="showPinnedGuide"
-					aria-hidden="true"
-					class="pointer-events-none absolute bottom-0 top-0 z-10 mb-8 mt-2 border-0 border-l-[2px] border-dashed border-green opacity-75"
-					:style="{ transform: `translate(${hoverState.x}px, 0)` }"
-				/>
-				<AnalyticsChartTooltip
-					:visible="hoverState.visible"
-					:x="hoverState.x"
-					:y="hoverState.y"
-					:range-label="hoverRangeLabel"
-					:entries="hoverEntries"
-					:container-width="containerSize.width"
-					:container-height="containerSize.height"
-					:pinned="isHoverPinned"
-				/>
-			</template>
 		</div>
 	</section>
 </template>
@@ -121,6 +131,7 @@ import type {
 } from '~/providers/analytics/analytics'
 import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 
+import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import AnalyticsChart from './AnalyticsChart.client.vue'
 import AnalyticsChartTooltip, { type AnalyticsChartTooltipEntry } from './AnalyticsChartTooltip.vue'
 import {
@@ -138,14 +149,14 @@ type ViewMode = 'line' | 'area' | 'bar'
 
 const {
 	activeStat,
-	selectedProjectIds,
+	displayedSelectedProjectIds: selectedProjectIds,
 	projects,
-	fetchRequest,
-	timeSlices,
-	selectedGroupBy,
-	selectedBreakdown,
-	selectedFilters,
-	filterOptions,
+	displayedFetchRequest: fetchRequest,
+	displayedTimeSlices: timeSlices,
+	displayedSelectedGroupBy: selectedGroupBy,
+	displayedSelectedBreakdown: selectedBreakdown,
+	displayedSelectedFilters: selectedFilters,
+	displayedFilterOptions: filterOptions,
 	isLoading,
 	getVersionDisplayName,
 } = injectAnalyticsDashboardContext()
@@ -205,13 +216,9 @@ function getFallbackBreakdownValues(breakdown: AnalyticsBreakdownPreset): readon
 		case 'monetization':
 			return filters.monetization.length > 0 ? filters.monetization : ['monetized', 'unmonetized']
 		case 'download_source':
-			return filters.download_source.length > 0
-				? filters.download_source
-				: options.downloadSources
+			return filters.download_source.length > 0 ? filters.download_source : options.downloadSources
 		case 'download_reason':
-			return filters.download_reason.length > 0
-				? filters.download_reason
-				: options.downloadReasons
+			return filters.download_reason.length > 0 ? filters.download_reason : options.downloadReasons
 		case 'version_id':
 			return filters.version_id.length > 0 ? filters.version_id : options.versionIds
 		case 'loader':

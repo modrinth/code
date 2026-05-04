@@ -1,5 +1,6 @@
 <template>
-	<div class="relative">
+	<div class="relative overflow-hidden rounded-2xl">
+		<AnalyticsLoadingBar :loading="isDataLoading" />
 		<Table
 			v-model:sort-column="sortColumn"
 			v-model:sort-direction="sortDirection"
@@ -23,7 +24,11 @@
 						<div class="mx-1 h-6 w-px bg-surface-5"></div>
 
 						<ButtonStyled>
-							<button class="!shadow-none" :disabled="sortedRows.length === 0" @click="downloadCsv">
+							<button
+								class="!shadow-none"
+								:disabled="isDataLoading || sortedRows.length === 0"
+								@click="downloadCsv"
+							>
 								<DownloadIcon />
 								Export CSV
 							</button>
@@ -59,11 +64,15 @@
 		</Table>
 		<div
 			v-if="isDataLoading"
-			class="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-surface-3"
+			class="absolute inset-0 z-10 overflow-hidden rounded-xl"
 		>
-			<div class="inline-flex items-center gap-2 text-sm font-medium text-secondary">
-				<SpinnerIcon class="size-5 animate-spin" />
-				<span>Loading data</span>
+			<div class="absolute inset-0 bg-surface-3 opacity-50" />
+			<div class="absolute inset-0 backdrop-blur-[4px]" />
+			<div class="absolute inset-0 flex h-full items-start justify-center pt-52">
+				<div class="inline-flex items-center gap-2 text-lg font-semibold text-primary opacity-100">
+					<SpinnerIcon class="size-6 animate-spin" />
+					<span>Fetching results...</span>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -81,6 +90,7 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
+import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'
 import {
 	formatBreakdownLabel,
@@ -107,13 +117,13 @@ type AnalyticsTableRow = {
 
 const {
 	projects,
-	selectedProjectIds,
-	selectedGroupBy,
-	selectedBreakdown,
-	selectedFilters,
-	fetchRequest,
-	timeSlices,
-	filterOptions,
+	displayedSelectedProjectIds: selectedProjectIds,
+	displayedSelectedGroupBy: selectedGroupBy,
+	displayedSelectedBreakdown: selectedBreakdown,
+	displayedSelectedFilters: selectedFilters,
+	displayedFetchRequest: fetchRequest,
+	displayedTimeSlices: timeSlices,
+	displayedFilterOptions: filterOptions,
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
 	getVersionDisplayName,
@@ -167,7 +177,7 @@ watch(tableMode, (nextMode) => {
 
 const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 const relevantStats = computed(
-	() => new Set(getRelevantAnalyticsDashboardStats(selectedBreakdown.value)),
+	() => new Set(getRelevantAnalyticsDashboardStats(selectedBreakdown.value, selectedFilters.value)),
 )
 
 const showTimeInBucketLabel = computed(() => isTimeRelevantForGroupBy(selectedGroupBy.value))
@@ -294,7 +304,7 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 const columns = computed<TableColumn<TableColumnKey>[]>(() => {
 	const nextColumns: TableColumn<TableColumnKey>[] = []
 
-	const stats = getRelevantAnalyticsDashboardStats(selectedBreakdown.value)
+	const stats = getRelevantAnalyticsDashboardStats(selectedBreakdown.value, selectedFilters.value)
 
 	if (tableMode.value === 'date_breakdown') {
 		nextColumns.push({
@@ -466,13 +476,9 @@ function getFallbackBreakdownValues(breakdown: AnalyticsBreakdownPreset): readon
 		case 'monetization':
 			return filters.monetization.length > 0 ? filters.monetization : ['monetized', 'unmonetized']
 		case 'download_source':
-			return filters.download_source.length > 0
-				? filters.download_source
-				: options.downloadSources
+			return filters.download_source.length > 0 ? filters.download_source : options.downloadSources
 		case 'download_reason':
-			return filters.download_reason.length > 0
-				? filters.download_reason
-				: options.downloadReasons
+			return filters.download_reason.length > 0 ? filters.download_reason : options.downloadReasons
 		case 'version_id':
 			return filters.version_id.length > 0 ? filters.version_id : options.versionIds
 		case 'loader':

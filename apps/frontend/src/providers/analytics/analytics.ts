@@ -91,12 +91,19 @@ export interface AnalyticsDashboardContextValue {
 	selectedFilters: Ref<AnalyticsSelectedFilters>
 	queryRefreshTimestamp: Ref<number>
 	fetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
+	displayedSelectedProjectIds: Ref<string[]>
+	displayedSelectedGroupBy: Ref<AnalyticsGroupByPreset>
+	displayedSelectedBreakdown: Ref<AnalyticsBreakdownPreset>
+	displayedSelectedFilters: Ref<AnalyticsSelectedFilters>
+	displayedFetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
+	displayedFilterOptions: Ref<AnalyticsDashboardFilterOptions>
 	filterOptions: ComputedRef<AnalyticsDashboardFilterOptions>
 	versionNumbersById: ComputedRef<Map<string, string>>
 	versionPublishedDatesById: ComputedRef<Map<string, string>>
 	projectVersionDownloadsById: ComputedRef<Map<string, number>>
 	gameVersionDownloadsByVersion: ComputedRef<Map<string, number>>
 	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
+	displayedTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	isLoading: ComputedRef<boolean>
 	isRefetching: ComputedRef<boolean>
@@ -311,6 +318,44 @@ function sanitizeAnalyticsSelectedFiltersForAvailableOptions(
 			filterOptions.loaderTypes,
 		),
 	}
+}
+
+function cloneAnalyticsSelectedFilters(filters: AnalyticsSelectedFilters): AnalyticsSelectedFilters {
+	return {
+		project: [...filters.project],
+		country: [...filters.country],
+		monetization: [...filters.monetization],
+		download_source: [...filters.download_source],
+		download_reason: [...filters.download_reason],
+		version_id: [...filters.version_id],
+		game_version: [...filters.game_version],
+		loader_type: [...filters.loader_type],
+	}
+}
+
+function cloneAnalyticsFilterOptions(
+	filterOptions: AnalyticsDashboardFilterOptions,
+): AnalyticsDashboardFilterOptions {
+	return {
+		countries: [...filterOptions.countries],
+		downloadSources: [...filterOptions.downloadSources],
+		downloadReasons: [...filterOptions.downloadReasons],
+		gameVersions: [...filterOptions.gameVersions],
+		loaderTypes: [...filterOptions.loaderTypes],
+		versionIds: [...filterOptions.versionIds],
+	}
+}
+
+function cloneAnalyticsFetchRequest(
+	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+): Labrinth.Analytics.v3.FetchRequest | null {
+	return fetchRequest ? JSON.parse(JSON.stringify(fetchRequest)) : null
+}
+
+function cloneAnalyticsTimeSlices(
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+): Labrinth.Analytics.v3.TimeSlice[] {
+	return timeSlices.map((slice) => [...slice])
 }
 
 function getCountryFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
@@ -959,6 +1004,29 @@ export function createAnalyticsDashboardContext(
 
 	const timeSlices = ref<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const previousTimeSlices = ref<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const displayedSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
+	const displayedSelectedGroupBy = ref<AnalyticsGroupByPreset>(selectedGroupBy.value)
+	const displayedSelectedBreakdown = ref<AnalyticsBreakdownPreset>(selectedBreakdown.value)
+	const displayedSelectedFilters = ref<AnalyticsSelectedFilters>(
+		cloneAnalyticsSelectedFilters(selectedFilters.value),
+	)
+	const displayedFetchRequest = ref<Labrinth.Analytics.v3.FetchRequest | null>(
+		cloneAnalyticsFetchRequest(fetchRequest.value),
+	)
+	const displayedFilterOptions = ref<AnalyticsDashboardFilterOptions>(
+		cloneAnalyticsFilterOptions(filterOptions.value),
+	)
+	const displayedTimeSlices = ref<Labrinth.Analytics.v3.TimeSlice[]>([])
+
+	function commitDisplayedAnalyticsState() {
+		displayedSelectedProjectIds.value = [...selectedProjectIds.value]
+		displayedSelectedGroupBy.value = selectedGroupBy.value
+		displayedSelectedBreakdown.value = selectedBreakdown.value
+		displayedSelectedFilters.value = cloneAnalyticsSelectedFilters(selectedFilters.value)
+		displayedFetchRequest.value = cloneAnalyticsFetchRequest(fetchRequest.value)
+		displayedFilterOptions.value = cloneAnalyticsFilterOptions(filterOptions.value)
+		displayedTimeSlices.value = cloneAnalyticsTimeSlices(timeSlices.value)
+	}
 
 	watch(
 		currentTimeSliceData,
@@ -1085,6 +1153,32 @@ export function createAnalyticsDashboardContext(
 
 	const isLoading = computed(() => currentTimeSlicePending.value || previousTimeSlicePending.value)
 	const isRefetching = computed(() => currentFetching.value || previousFetching.value)
+	watch(
+		[
+			isLoading,
+			currentTimeSliceData,
+			fetchRequest,
+			selectedProjectIds,
+			selectedGroupBy,
+			selectedBreakdown,
+			selectedFilters,
+			filterOptions,
+		],
+		() => {
+			if (isLoading.value) {
+				return
+			}
+			if (
+				isAnalyticsFetchRequestReady(fetchRequest.value) &&
+				currentTimeSliceData.value === undefined
+			) {
+				return
+			}
+
+			commitDisplayedAnalyticsState()
+		},
+		{ deep: true, flush: 'post', immediate: true },
+	)
 
 	async function refreshAnalyticsQuery() {
 		if (fetchRequest.value === null) {
@@ -1149,12 +1243,19 @@ export function createAnalyticsDashboardContext(
 		selectedFilters,
 		queryRefreshTimestamp,
 		fetchRequest,
+		displayedSelectedProjectIds,
+		displayedSelectedGroupBy,
+		displayedSelectedBreakdown,
+		displayedSelectedFilters,
+		displayedFetchRequest,
+		displayedFilterOptions,
 		filterOptions,
 		versionNumbersById,
 		versionPublishedDatesById,
 		projectVersionDownloadsById,
 		gameVersionDownloadsByVersion,
 		timeSlices,
+		displayedTimeSlices,
 		previousTimeSlices,
 		isLoading,
 		isRefetching,
