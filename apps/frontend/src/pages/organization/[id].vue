@@ -4,59 +4,61 @@
 	</div>
 	<div
 		v-else-if="organization"
-		class="experimental-styles-within new-page sidebar"
+		class="new-page sidebar"
 		:class="{ 'alt-layout': cosmetics.leftContentLayout || routeHasSettings }"
 	>
 		<ModalCreation ref="modal_creation" :organization-id="organization.id" />
 		<template v-if="routeHasSettings">
-			<div class="normal-page__sidebar">
-				<div
-					class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
-				>
-					<div class="flex items-center gap-4">
-						<Avatar size="sm" :src="organization.icon_url" />
-						<div class="flex flex-col justify-center gap-1">
-							<h2 class="m-0 text-base">
-								<nuxt-link :to="`/organization/${organization.slug}/settings`">
-									{{ organization.name }}
-								</nuxt-link>
-							</h2>
-							<span>
-								{{ formatCompactNumber(acceptedMembers?.length || 0) }}
-								member<template v-if="acceptedMembers?.length !== 1">s</template>
-							</span>
+			<template v-if="canAccessSettings">
+				<div class="normal-page__sidebar">
+					<div
+						class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
+					>
+						<div class="flex items-center gap-4">
+							<Avatar size="sm" :src="organization.icon_url" />
+							<div class="flex flex-col justify-center gap-1">
+								<h2 class="m-0 text-base">
+									<nuxt-link :to="`/organization/${organization.slug}/settings`">
+										{{ organization.name }}
+									</nuxt-link>
+								</h2>
+								<span>
+									{{ formatCompactNumber(acceptedMembers?.length || 0) }}
+									member<template v-if="acceptedMembers?.length !== 1">s</template>
+								</span>
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<NavStack
-					:items="[
-						{
-							link: `/organization/${organization.slug}/settings`,
-							label: 'Overview',
-							icon: SettingsIcon,
-						},
-						{
-							link: `/organization/${organization.slug}/settings/members`,
-							label: 'Members',
-							icon: UsersIcon,
-						},
-						{
-							link: `/organization/${organization.slug}/settings/projects`,
-							label: 'Projects',
-							icon: BoxIcon,
-						},
-						{
-							link: `/organization/${organization.slug}/settings/analytics`,
-							label: 'Analytics',
-							icon: ChartIcon,
-						},
-					]"
-				/>
-			</div>
-			<div class="normal-page__content">
-				<NuxtPage />
-			</div>
+					<NavStack
+						:items="[
+							{
+								link: `/organization/${organization.slug}/settings`,
+								label: 'Overview',
+								icon: SettingsIcon,
+							},
+							{
+								link: `/organization/${organization.slug}/settings/members`,
+								label: 'Members',
+								icon: UsersIcon,
+							},
+							{
+								link: `/organization/${organization.slug}/settings/projects`,
+								label: 'Projects',
+								icon: BoxIcon,
+							},
+							{
+								link: `/organization/${organization.slug}/settings/analytics`,
+								label: 'Analytics',
+								icon: ChartIcon,
+							},
+						]"
+					/>
+				</div>
+				<div class="normal-page__content">
+					<NuxtPage />
+				</div>
+			</template>
 		</template>
 		<template v-else>
 			<div class="normal-page__header py-4">
@@ -176,14 +178,18 @@
 					<h2>Invitation to join {{ organization.name }}</h2>
 					<p>You have been invited to join {{ organization.name }}.</p>
 					<div class="input-group">
-						<button class="iconified-button brand-button" @click="onAcceptInvite">
-							<CheckIcon />
-							Accept
-						</button>
-						<button class="iconified-button danger-button" @click="onDeclineInvite">
-							<XIcon />
-							Decline
-						</button>
+						<ButtonStyled color="brand">
+							<button @click="onAcceptInvite">
+								<CheckIcon />
+								Accept
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="red">
+							<button @click="onDeclineInvite">
+								<XIcon />
+								Decline
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
@@ -522,6 +528,22 @@ const organizationContext = new OrganizationContext(
 const { currentMember } = organizationContext
 
 provideOrganizationContext(organizationContext)
+
+const canAccessSettings = computed(() => !!currentMember.value?.accepted)
+
+watch(
+	[routeHasSettings, currentMember],
+	() => {
+		if (routeHasSettings.value && !canAccessSettings.value) {
+			showError({
+				fatal: true,
+				statusCode: 401,
+				statusMessage: 'Unauthorized',
+			})
+		}
+	},
+	{ flush: 'sync', immediate: true },
+)
 
 watch(
 	organization,

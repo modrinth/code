@@ -848,6 +848,30 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "لقد استنفدت رصيدك <b>{withdrawLimit}</b> حد السحب. يجب عليك تعبئة نموذج ضريبي لسحب مبلغ أكبر."
   },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "قم بتحرير روابط المشاريع المحددة دفعة واحدة."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "أيقونة {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "يحتوي المشروع على رسالة من المشرفين. اطلع على المشروع للمزيد."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "يرجى مراجعة بيانات تعريف البيئة"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "صعوداً"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "نزولا"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "الإسم"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "الحالة"
+  },
   "dashboard.revenue.available-now": {
     "message": "متاح الآن"
   },
@@ -1444,5 +1468,41 @@
   },
   "layout.footer.resources.help-center": {
     "message": "مركز المساعدة"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "الصفحة الرئيسة لمودرينث"
+  },
+  "layout.nav.my-servers": {
+    "message": "خوادمي"
+  },
+  "layout.nav.saved-projects": {
+    "message": "المشاريع المحفوظة"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "نوع رقم الحساب"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "عنوان المحفظة"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "أدخل CUIT أو CUIL"
+  },
+  "profile.user-id": {
+    "message": "معرّف المستخدم: {id}"
+  },
+  "project-member-header.success-decline": {
+    "message": "لقد رفضت دعوة الفريق"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "حزم ال"
+  },
+  "project.environment.migration.message": {
+    "message": "لقد قمنا بتحديث نظام البيئات في مودرينث، وأصبحت الخيارات الجديدة متاحة الآن. يرجى التأكد من صحة البيانات الوصفية."
+  },
+  "project.environment.migration.review-button": {
+    "message": "مراجعة إعدادات البيئة"
+  },
+  "project.environment.migration.title": {
+    "message": "يرجى مراجعة بيانات تعريف البيئة"
   }
 }

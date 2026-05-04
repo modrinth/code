@@ -1,6 +1,8 @@
 ---
 title: Minotaur (Gradle plugin)
 description: Guide for contributing to Modrinth's gradle plugin
+sidebar:
+  order: 5
 ---
 
 [Minotaur][minotaur] is the Gradle plugin used to automatically publish artifacts to Modrinth. To run your copy of the plugin in a project, publish it to your local Maven with `./gradlew publishToMavenLocal` and add `mavenLocal()` to your buildscript.

@@ -57,7 +57,7 @@
 					</Combobox>
 				</div>
 
-				<ButtonStyled color="orange" class="w-full sm:w-auto">
+				<ButtonStyled color="orange">
 					<button
 						class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
 						:disabled="paginatedProjects?.length === 0"

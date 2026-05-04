@@ -342,7 +342,7 @@
     "message": "Creando un''account, hai accettato i <terms-link>termini d''utilizzo</terms-link> e l''<privacy-policy-link>informativa sulla privacy</privacy-policy-link> di Modrinth."
   },
   "auth.welcome.long-title": {
-    "message": "Ti diamo il benvenuto su Modrinth!"
+    "message": "Modrinth ti dà il benvenuto!"
   },
   "auth.welcome.title": {
     "message": "Ciao"
@@ -924,7 +924,7 @@
     "message": "Puoi modificare più progetti contemporaneamente selezionandoli qui sotto."
   },
   "dashboard.projects.bulk-edit.server-disabled": {
-    "message": "Impossibile modificare più server contemporaneamente"
+    "message": "Non puoi modificare più server contemporaneamente"
   },
   "dashboard.projects.empty": {
     "message": "Non hai ancora alcun progetto. Clicca sul pulsante verde in alto per iniziare."
@@ -1125,7 +1125,7 @@
     "message": "Organizzazioni"
   },
   "dashboard.sidebar.label.overview": {
-    "message": "Riepilogo"
+    "message": "Panoramica"
   },
   "dashboard.sidebar.label.projects": {
     "message": "Progetti"

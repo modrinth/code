@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Skapa affiliatelänk"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Inga affiliatekoder hittades."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Fel vid laddning av affiliatelänk"
   },
@@ -571,6 +574,9 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Sök affiliatelänkar..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "från {count} {count, plural, one {projekt} other {projekt}}"
   },
   "dashboard.analytics.total-downloads": {
     "message": "Antal nedladdningar"
@@ -859,6 +865,57 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit": {
     "message": "Uttagsgräns"
+  },
+  "dashboard.head-title": {
+    "message": "Instrumentpanel"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Markera allt som läst"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Visa historik"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Du har inga olästa notifikationer."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Misslyckades att ladda notifikationer:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Historik"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Notifikationshistorik"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Visa alla"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Visa notifikationshistorik"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Visa {extraNotifs} ytterligare {extraNotifs, plural, one {notifikation} other {notifikationer}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Laddar notifikationer..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Skapa organization"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Skapa en organisation!"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisationer"
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projekt"
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Rensa länk"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Ändra länkar"
   },
   "dashboard.revenue.available-now": {
     "message": "Tillgängligt nu"

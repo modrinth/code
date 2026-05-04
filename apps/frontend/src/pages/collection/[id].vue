@@ -116,14 +116,14 @@
 					</RadioButtons>
 				</div>
 				<div class="flex justify-end gap-2">
-					<ButtonStyled class="w-24">
-						<button @click="() => editModal?.hide()">
+					<ButtonStyled>
+						<button class="w-24" @click="() => editModal?.hide()">
 							<XIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
 					</ButtonStyled>
-					<ButtonStyled color="brand" class="w-36">
-						<button :disabled="saving" @click="save()">
+					<ButtonStyled color="brand">
+						<button class="w-36" :disabled="saving" @click="save()">
 							<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
 							<SaveIcon v-else aria-hidden="true" />
 							{{
@@ -186,12 +186,14 @@
 												getProjectTypeSentenceMessage(
 													projectTypes.length === 1 ? projectTypes[0] : 'project',
 												),
-												{ count: formatCompactNumberPlural(projects?.length || 0) },
+												{
+													count: formatCompactNumberPlural(projects?.length || 0),
+												},
 											),
 										}"
 									>
 										<template #stat="{ children }">
-											<span class="primary-stat__counter">
+											<span>
 												<component :is="() => normalizeChildren(children)" />
 											</span>
 										</template>
@@ -331,24 +333,19 @@
 					"
 				>
 					<template v-if="canEdit || collection.id === 'following'" #actions>
-						<button
-							v-if="canEdit"
-							class="iconified-button remove-btn"
-							:disabled="removing"
-							@click="() => removeProject(project)"
-						>
-							<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
-							<XIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.removeProjectButton) }}
-						</button>
-						<button
-							v-if="collection.id === 'following'"
-							class="iconified-button"
-							@click="unfollowProject(project)"
-						>
-							<HeartMinusIcon aria-hidden="true" />
-							{{ formatMessage(messages.unfollowProjectButton) }}
-						</button>
+						<ButtonStyled v-if="canEdit">
+							<button class="remove-btn" :disabled="removing" @click="() => removeProject(project)">
+								<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
+								<XIcon v-else aria-hidden="true" />
+								{{ formatMessage(messages.removeProjectButton) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-if="collection.id === 'following'">
+							<button @click="unfollowProject(project)">
+								<HeartMinusIcon aria-hidden="true" />
+								{{ formatMessage(messages.unfollowProjectButton) }}
+							</button>
+						</ButtonStyled>
 					</template>
 				</ProjectCard>
 			</ProjectCardList>
@@ -532,8 +529,8 @@ const returnLink = computed(() => {
 	return null
 })
 
-const isFollowingCollection = computed(() => route.params.id === 'following')
 const collectionId = computed(() => route.params.id)
+const isFollowingCollection = computed(() => collectionId.value === 'following')
 
 // Static collection for "following" page
 const followingCollection = computed(() =>
@@ -560,13 +557,13 @@ const {
 } = useQuery({
 	queryKey: computed(() => ['collection', collectionId.value]),
 	queryFn: () => api.labrinth.collections.get(collectionId.value),
-	enabled: computed(() => !isFollowingCollection.value),
+	enabled: computed(() => !!collectionId.value && !isFollowingCollection.value),
 })
 
 watch(
 	collectionError,
 	(error) => {
-		if (error && !isFollowingCollection.value) {
+		if (error && collectionId.value && !isFollowingCollection.value) {
 			const status = error.statusCode ?? error.status ?? 404
 			showError({
 				fatal: true,

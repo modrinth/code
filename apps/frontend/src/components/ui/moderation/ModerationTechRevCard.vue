@@ -1201,7 +1201,6 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								:href="file.download_url"
 								:title="`Download ${file.file_name}`"
 								:download="file.file_name"
-								class="!border-px !border-surface-4"
 								tabindex="0"
 							>
 								<DownloadIcon /> Download
@@ -1362,7 +1361,6 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 												"
 											>
 												<button
-													class="!border-[1px]"
 													:disabled="updatingDetails.has(flag.detail.id)"
 													@click="updateDetailStatus(flag.detail.id, 'safe')"
 												>
@@ -1379,7 +1377,6 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 												"
 											>
 												<button
-													class="!border-[1px]"
 													:disabled="updatingDetails.has(flag.detail.id)"
 													@click="updateDetailStatus(flag.detail.id, 'unsafe')"
 												>

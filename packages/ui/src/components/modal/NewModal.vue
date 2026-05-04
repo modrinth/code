@@ -18,7 +18,7 @@
 				]"
 				@click="() => (closeOnClickOutside && closable ? hide() : {})"
 			/>
-			<div class="modal-container experimental-styles-within" :class="{ shown: visible }">
+			<div class="modal-container" :class="{ shown: visible }">
 				<div
 					ref="modalBodyRef"
 					role="dialog"

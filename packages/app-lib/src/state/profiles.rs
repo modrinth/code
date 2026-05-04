@@ -1110,10 +1110,25 @@ impl Profile {
     pub async fn add_project_version(
         profile_path: &str,
         version_id: &str,
+        reason: util::fetch::DownloadReason,
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
         io_semaphore: &IoSemaphore,
     ) -> crate::Result<String> {
+        let profile =
+            Self::get(profile_path, pool).await?.ok_or_else(|| {
+                crate::ErrorKind::UnmanagedProfileError(
+                    profile_path.to_string(),
+                )
+                .as_error()
+            })?;
+
+        let download_meta = util::fetch::DownloadMeta {
+            reason,
+            game_version: profile.game_version.clone(),
+            loader: profile.loader.as_str().to_string(),
+        };
+
         let version =
             CachedEntry::get_version(version_id, None, pool, fetch_semaphore)
                 .await?
@@ -1139,6 +1154,7 @@ impl Profile {
         let bytes = util::fetch::fetch(
             &file.url,
             file.hashes.get("sha1").map(|x| &**x),
+            Some(&download_meta),
             fetch_semaphore,
             pool,
         )

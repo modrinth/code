@@ -1,4 +1,103 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Java {version} をダウンロード中"
+  },
+  "app.action-bar.downloads": {
+    "message": "ダウンロード"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "実行中のインスタンスの一部を非表示"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "デフォルトのインスタンスを作成"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "実行中のインスタンスはありません"
+  },
+  "app.action-bar.offline": {
+    "message": "オフライン"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "デフォルトのインスタンス"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "実行中のインスタンスをさらに表示"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "インスタンスを停止"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "進行中のダウンロードを表示"
+  },
+  "app.action-bar.view-instance": {
+    "message": "インスタンスを表示"
+  },
+  "app.action-bar.view-logs": {
+    "message": "ログを表示"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "ぼかし効果などの高度なレンダリングを有効にします。グラフィックアクセラレーションが使用できない場合は、パフォーマンスが低下する可能性があります。"
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "高度なレンダリング"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Modrinth Appでのお好みのテーマを選択してください"
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "テーマ"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "ランチャー起動時に表示するページを変更します"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "ホーム"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "ライブラリ"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "デフォルトの起動ページ"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "スキンページで、プレイヤー名の上にある名前タグを無効にします。"
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "名札を非表示にする"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "ホームページの「ジャンプバック」セクションには、最近追加されたワールドが含まれています。"
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "再び世界へ飛び込もう"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minecraftが起動した時、ランチャーを最小化します"
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "ランチャーを最小化"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "OSデフォルトのウィンドウUIを使用します(アプリの再起動が必要です)"
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "OSのウィンドウUIを使用"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "オプションを選択してください"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "サイドバーの表示/非表示を切り替える機能を有効にします。"
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "サイドバーの表示/非表示を切り替える"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Modrinth上にホストされていないModrinth Packファイル（.mrpack）をインストールしようとした場合、インストール前にそのリスクを理解していただけるよう確認します。"
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "未知のMODパックをインストールする前に警告してください"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraftの認証サーバーは現在停止している可能性があります。インターネット接続を確認し、しばらくしてからもう一度お試しください。"
   },
@@ -30,13 +129,31 @@
     "message": "サーバーを探す"
   },
   "app.browse.hide-added-servers": {
-    "message": "追加済みのサーバーを隠す"
+    "message": "既に追加済みのサーバーを非表示にする"
   },
   "app.browse.hide-installed-content": {
-    "message": "インストール済みのコンテンツを隠す"
+    "message": "既にインストールされているコンテンツを非表示にする"
   },
   "app.browse.install-content-to-instance": {
     "message": "コンテンツをインスタンスにインストールする"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modパック"
+  },
+  "app.browse.server.install": {
+    "message": "インストール"
+  },
+  "app.browse.server.installed": {
+    "message": "インストール済み"
+  },
+  "app.browse.server.installing": {
+    "message": "インストール中"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Modパックをインストール中..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Modパックの説明を入力…"
@@ -598,5 +715,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "ローダーはサーバーによる条件です"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "ファイル形式に関わらず、Modrinthにアップロードされたファイルのみが確認されます。(.mrpackを含む)"
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "この警告を次回から表示しない"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "インストールの確認"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "インストールを続行"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "一般的にマルウェアは、Discord等のプラットフォーム上でModパックファイルを配布して拡散されます"
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "このファイルをModrinth上で見つけることができませんでした。信頼できるソースからインストールすることを強くお勧めします。"
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "不明なファイルの警告"
   }
 }

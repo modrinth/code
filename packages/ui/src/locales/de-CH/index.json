@@ -452,9 +452,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Dateien hochladen"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Lade Dateien hoch ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Alle ausgewählten Inhalte sind bereits deaktiviert"
   },
@@ -490,6 +487,276 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} ausgewählt"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "Instanz erstellen"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "Welt erstellen"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Fertigstellen"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "Importieren"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "Importiere {count, plural, one {# Instanz} other {# Instanzen}}"
+  },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "Server einrichten"
+  },
+  "creation-flow.modal.custom-setup.build-number.label": {
+    "defaultMessage": "Build-Nummer"
+  },
+  "creation-flow.modal.custom-setup.build-number.placeholder": {
+    "defaultMessage": "Build-Nummer auswählen"
+  },
+  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
+    "defaultMessage": "Build-Nummer suchen..."
+  },
+  "creation-flow.modal.custom-setup.content-loader.label": {
+    "defaultMessage": "Inhalts-Loader"
+  },
+  "creation-flow.modal.custom-setup.game-version.placeholder": {
+    "defaultMessage": "Spielversion auswählen"
+  },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "Spielversionen durchsuchen..."
+  },
+  "creation-flow.modal.custom-setup.icon.remove": {
+    "defaultMessage": "Icon entfernen"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "Icon auswählen"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "Neuste"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "Andere"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "Stabil"
+  },
+  "creation-flow.modal.custom-setup.loader-version.label": {
+    "defaultMessage": "Loader-Version"
+  },
+  "creation-flow.modal.custom-setup.loader-version.placeholder": {
+    "defaultMessage": "Loader-Version auswählen"
+  },
+  "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
+    "defaultMessage": "Loader-Version suchen..."
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "Loader"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "Name"
+  },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "Instanzname eingeben"
+  },
+  "creation-flow.modal.custom-setup.options.no-versions-available": {
+    "defaultMessage": "Keine Versionen verfügbar"
+  },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "Weitere Einstellungen"
+  },
+  "creation-flow.modal.final-config.backup.before-reset-server.name": {
+    "defaultMessage": "Vor dem Zurücksetzen des Servers"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "Einfach"
+  },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "Schwer"
+  },
+  "creation-flow.modal.final-config.difficulty.label": {
+    "defaultMessage": "Schwierigkeit"
+  },
+  "creation-flow.modal.final-config.difficulty.normal": {
+    "defaultMessage": "Normal"
+  },
+  "creation-flow.modal.final-config.difficulty.peaceful": {
+    "defaultMessage": "Friedlich"
+  },
+  "creation-flow.modal.final-config.game-version.placeholder": {
+    "defaultMessage": "Spielversion auswählen"
+  },
+  "creation-flow.modal.final-config.gamemode.creative": {
+    "defaultMessage": "Kreativ"
+  },
+  "creation-flow.modal.final-config.gamemode.hardcore": {
+    "defaultMessage": "Hardcore"
+  },
+  "creation-flow.modal.final-config.gamemode.label": {
+    "defaultMessage": "Spielmodus"
+  },
+  "creation-flow.modal.final-config.gamemode.survival": {
+    "defaultMessage": "Überleben"
+  },
+  "creation-flow.modal.final-config.generate-structures.description": {
+    "defaultMessage": "Bestimmt ob Dörfer, Festungen und andere Strukturen in neuen Chunks generiert werden."
+  },
+  "creation-flow.modal.final-config.generate-structures.label": {
+    "defaultMessage": "Bauwerke generieren"
+  },
+  "creation-flow.modal.final-config.generator-settings-json.placeholder": {
+    "defaultMessage": "JSON-Datei mit Generatoreinstellungen eingeben"
+  },
+  "creation-flow.modal.final-config.generator-settings.custom": {
+    "defaultMessage": "Benutzerdefiniert"
+  },
+  "creation-flow.modal.final-config.generator-settings.default": {
+    "defaultMessage": "Standard"
+  },
+  "creation-flow.modal.final-config.generator-settings.description": {
+    "defaultMessage": "Wird für erweiterte Weltanpassungen wie benutzerdefinierte Flachland-Ebenen verwendet."
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "Flach"
+  },
+  "creation-flow.modal.final-config.generator-settings.label": {
+    "defaultMessage": "Generator-Optionen"
+  },
+  "creation-flow.modal.final-config.generator-settings.placeholder": {
+    "defaultMessage": "Generatoreinstellungen auswählen"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "Weltname"
+  },
+  "creation-flow.modal.final-config.world-name.placeholder": {
+    "defaultMessage": "Weltnamen eingeben"
+  },
+  "creation-flow.modal.final-config.world-seed.description": {
+    "defaultMessage": "Leer lassen für einen zufälligen Startwert."
+  },
+  "creation-flow.modal.final-config.world-seed.label-with-optional": {
+    "defaultMessage": "Startwert <optional>(Optional)</optional>"
+  },
+  "creation-flow.modal.final-config.world-seed.placeholder": {
+    "defaultMessage": "Welt-Startwert eingeben"
+  },
+  "creation-flow.modal.final-config.world-type.amplified": {
+    "defaultMessage": "Zerklüftet"
+  },
+  "creation-flow.modal.final-config.world-type.default": {
+    "defaultMessage": "Standard"
+  },
+  "creation-flow.modal.final-config.world-type.label": {
+    "defaultMessage": "Welttyp"
+  },
+  "creation-flow.modal.final-config.world-type.large-biomes": {
+    "defaultMessage": "Grosse Biome"
+  },
+  "creation-flow.modal.final-config.world-type.placeholder": {
+    "defaultMessage": "Welttyp auswählen"
+  },
+  "creation-flow.modal.final-config.world-type.single-biome": {
+    "defaultMessage": "Einzelnes Biom"
+  },
+  "creation-flow.modal.final-config.world-type.superflat": {
+    "defaultMessage": "Flachland"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "Hinzufügen"
+  },
+  "creation-flow.modal.import-instance.custom-launcher.name": {
+    "defaultMessage": "Benutzerdefiniert ({pathName})"
+  },
+  "creation-flow.modal.import-instance.detecting-launcher-instances": {
+    "defaultMessage": "Launcher-Instanzen werden erkannt..."
+  },
+  "creation-flow.modal.import-instance.launcher-instances.title": {
+    "defaultMessage": "Launcher-Instanzen"
+  },
+  "creation-flow.modal.import-instance.launcher-path.add": {
+    "defaultMessage": "Launcher-Pfad hinzufügen"
+  },
+  "creation-flow.modal.import-instance.launcher-path.placeholder": {
+    "defaultMessage": "Pfad zum Launcher..."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.text": {
+    "defaultMessage": "Keine importierbaren Instanzen unter dem angegebenen Pfad gefunden."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.title": {
+    "defaultMessage": "Keine Instanzen gefunden"
+  },
+  "creation-flow.modal.import-instance.search.placeholder": {
+    "defaultMessage": "Instanznamen suchen"
+  },
+  "creation-flow.modal.import-instance.selection.clear-all": {
+    "defaultMessage": "Alle entfernen"
+  },
+  "creation-flow.modal.modpack.action.browse": {
+    "defaultMessage": "Modpacks durchsuchen"
+  },
+  "creation-flow.modal.modpack.action.import": {
+    "defaultMessage": "Modpack importieren"
+  },
+  "creation-flow.modal.modpack.known-modpack.prompt": {
+    "defaultMessage": "Weisst du schon, welches Modpack du installieren möchtest?"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Keine Ergebnisse gefunden"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "Nach Modpack suchen"
+  },
+  "creation-flow.modal.setup-type.instance.description": {
+    "defaultMessage": "Eine Instanz ist eine Einrichtung von Minecraft mit einem bestimmten Loader, einer bestimmten Version und Mods."
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.description": {
+    "defaultMessage": "Beginne von vorne, indem du einen Loader und eine Spielversion auswählst."
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.title": {
+    "defaultMessage": "Individuelle Einrichtung"
+  },
+  "creation-flow.modal.setup-type.option.import-instance.description": {
+    "defaultMessage": "Importiere eine Instanz aus Prism, CurseForge oder ähnlichen."
+  },
+  "creation-flow.modal.setup-type.option.import-instance.title": {
+    "defaultMessage": "Instanz importieren"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "Durchsuche Modpacks auf Modrinth oder importiere eines aus einer Datei."
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "Modpack installieren"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
+    "defaultMessage": "Klassisches Minecraft ohne Mods oder Plugins."
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
+    "defaultMessage": "Vanilla Minecraft"
+  },
+  "creation-flow.modal.setup-type.title.installation": {
+    "defaultMessage": "Installationstyp auswählen"
+  },
+  "creation-flow.modal.setup-type.title.instance": {
+    "defaultMessage": "Instanztyp auswählen"
+  },
+  "creation-flow.modal.setup-type.title.world": {
+    "defaultMessage": "Welttyp auswählen"
+  },
+  "creation-flow.title.choose-modpack": {
+    "defaultMessage": "Modpack auswählen"
+  },
+  "creation-flow.title.create-instance": {
+    "defaultMessage": "Instanz erstellen"
+  },
+  "creation-flow.title.create-world": {
+    "defaultMessage": "Welt erstellen"
+  },
+  "creation-flow.title.import-instance": {
+    "defaultMessage": "Instanz importieren"
+  },
+  "creation-flow.title.reset-server": {
+    "defaultMessage": "Server zurücksetzen"
+  },
+  "creation-flow.title.set-up-server": {
+    "defaultMessage": "Server einrichten"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Zusammenfassung der Extrahierung"
@@ -704,14 +971,20 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Aus .zip-URL hochladen"
   },
+  "files.operations.current-file": {
+    "defaultMessage": "Aktuelle Datei: {file}"
+  },
   "files.operations.extracted": {
     "defaultMessage": "{size} extrahiert"
   },
   "files.operations.extracting": {
     "defaultMessage": "{source} wird extrahiert"
   },
-  "files.operations.failed": {
-    "defaultMessage": "Fehlgeschlagen"
+  "files.operations.extracting-completed": {
+    "defaultMessage": "Extrahieren von {source} abgeschlossen"
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "Extrahieren von {source} fehlgeschlagen"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "Modpack aus URL"
@@ -1216,12 +1489,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unbekannter Spielmodus"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "Dateien werden noch hochgeladen. Das verlassen dieser Seite bricht den Upload ab und deine Änderungen gehen eventuell verloren."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Upload im Gange"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} kompatible {count, plural, one {Instanz} other {Instanzen}}"
@@ -2567,6 +2834,9 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Von Mitarbeitern entlistet"
   },
+  "s.bg": {
+    "defaultMessage": "Hintergrundaufgabe wird ausgeführt"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "Filter gesperrt"
   },
@@ -2654,6 +2924,21 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "servers.admonitions.background-task-running": {
+    "defaultMessage": "Hintergrundaufgabe wird ausgeführt"
+  },
+  "servers.backups.admonition.backup-cancelled.description": {
+    "defaultMessage": "Die Sicherung {backupName} wurde abgebrochen."
+  },
+  "servers.backups.admonition.backup-cancelled.title": {
+    "defaultMessage": "Sicherung abgebrochen"
+  },
+  "servers.backups.admonition.backup-completed.description": {
+    "defaultMessage": "{backupName} erfolgreich abgeschlossen."
+  },
+  "servers.backups.admonition.backup-completed.title": {
+    "defaultMessage": "Sicherung abgeschlossen"
+  },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Beim Erstellen von {backupName} ist ein Fehler aufgetreten. Bitte versuche es erneut oder wende dich an den Support, falls das Problem weiterhin besteht."
   },
@@ -2666,6 +2951,12 @@
   "servers.backups.admonition.backup-queued.title": {
     "defaultMessage": "Sicherung in der Warteschlange"
   },
+  "servers.backups.admonition.backup-timed-out.description": {
+    "defaultMessage": "Zeitüberschreitung beim Erstellen von {backupName}. Du kannst es erneut versuchen oder dich an den Support wenden, falls das Problem weiterhin besteht."
+  },
+  "servers.backups.admonition.backup-timed-out.title": {
+    "defaultMessage": "Zeitüberschreitung bei der Sicherung"
+  },
   "servers.backups.admonition.creating-backup.description": {
     "defaultMessage": "Weltdaten und Serverkonfiguration für {backupName} werden gespeichert. Dies kann einige Minuten dauern."
   },
@@ -2675,23 +2966,35 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "Deine Sicherung"
   },
+  "servers.backups.admonition.restore-cancelled.description": {
+    "defaultMessage": "Wiederherstellung aus {backupName} wurde abgebrochen."
+  },
+  "servers.backups.admonition.restore-cancelled.title": {
+    "defaultMessage": "Wiederherstellung abgebrochen"
+  },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Bei der Wiederherstellung aus {backupName} ist ein Fehler aufgetreten. Bitte versuche es erneut oder wende dich an den Support, falls das Problem weiterhin besteht."
   },
   "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Wiederherstellung aus Sicherung ist fehlgeschlagen"
+    "defaultMessage": "Wiederherstellung fehlgeschlagen"
   },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Die Wiederherstellung aus {backupName} wurde in die Warteschlange hinzugefügt und beginnt in Kürze."
   },
   "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Wiederherstellung aus Sicherung in der Warteschlange"
+    "defaultMessage": "Wiederherstellung in Warteschlange"
   },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Dein Server wurde auf {backupName} wiederhergestellt und ist startklar."
   },
   "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Wiederherstellung aus Sicherung erfolgreich"
+    "defaultMessage": "Wiederherstellung abgeschlossen"
+  },
+  "servers.backups.admonition.restore-timed-out.description": {
+    "defaultMessage": "Zeitüberschreitung bei der Wiederherstellung aus {backupName}. Du kannst es erneut versuchen oder dich an den Support wenden, falls das Problem weiterhin besteht."
+  },
+  "servers.backups.admonition.restore-timed-out.title": {
+    "defaultMessage": "Zeitüberschreitung bei der Wiederherstellung"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Wiederherstellung deines Servers aus {backupName}. Dies kann einige Minuten dauern."
@@ -2699,17 +3002,50 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Wiederherstellung aus Sicherung"
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "Massenactionen für {count, plural, one {ein ausgewähltes Backup} other {# ausgewählte Backups}}"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "Lösche {total, plural, one {eine Sicherung} other {# Sicherungen}}..."
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# Sicherung ausgewählt} other {# Sicherungen ausgewählt}}"
+  },
+  "servers.backups.delete-modal.admonition-body": {
+    "defaultMessage": "Nach dem Löschen {count, plural, one {kann dieses Backup} other {können diese Backups}} nicht wiederhergestellt werden. Das Löschen ist endgültig."
+  },
+  "servers.backups.delete-modal.admonition-header": {
+    "defaultMessage": "Löschwarnung"
+  },
+  "servers.backups.delete-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {Sicherung} other {Sicherungen ({count})}}"
+  },
+  "servers.backups.delete-modal.confirm": {
+    "defaultMessage": "{count, plural, one {Sicherung} other {# Sicherungen}} löschen"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "{count, plural, one {Sicherung} other {Sicherungen}} löschen"
+  },
+  "servers.backups.empty.description": {
+    "defaultMessage": "Erstelle deine erste Sicherung"
+  },
+  "servers.backups.empty.heading": {
+    "defaultMessage": "Noch keine Sicherungen"
+  },
+  "servers.backups.filtered-empty.clear-filters": {
+    "defaultMessage": "Filter entfernen"
+  },
+  "servers.backups.filtered-empty.description": {
+    "defaultMessage": "Versuche es mit einem anderen Filter oder entferne alle Filter, um alle Sicherungen anzuzeigen."
+  },
+  "servers.backups.filtered-empty.heading": {
+    "defaultMessage": "Keine übereinstimmenden Sicherungen"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Sicherungszeitplan"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Erstellung eines Backup fehlgeschlagen"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Wiederherstellung von Backup fehlgeschlagen"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuelle Sicherung"
@@ -2719,6 +3055,21 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Wiederherstellen"
+  },
+  "servers.backups.select-backup-aria": {
+    "defaultMessage": "Sicherung {name} auswählen"
+  },
+  "servers.backups.toolbar.create-backup": {
+    "defaultMessage": "Sicherung erstellen"
+  },
+  "servers.backups.toolbar.filter-auto": {
+    "defaultMessage": "Automatisch"
+  },
+  "servers.backups.toolbar.filter-manual": {
+    "defaultMessage": "Manuell"
+  },
+  "servers.backups.toolbar.select-all": {
+    "defaultMessage": "Alle auswählen"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Backup-Erstellung im gange"
@@ -3061,6 +3412,51 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Westeuropa"
+  },
+  "servers.setup.onboarding.installation-failed.text": {
+    "defaultMessage": "Bei der Installation ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
+  },
+  "servers.setup.onboarding.installation-failed.title": {
+    "defaultMessage": "Installation fehlgeschlagen"
+  },
+  "servers.setup.onboarding.modpack-upload-failed.text": {
+    "defaultMessage": "Beim Hochladen ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
+  },
+  "servers.setup.onboarding.modpack-upload-failed.title": {
+    "defaultMessage": "Hochladen des Modpacks ist fehlgeschlagen"
+  },
+  "servers.setup.onboarding.setup-server.button": {
+    "defaultMessage": "Server einrichten"
+  },
+  "servers.setup.onboarding.step.choose.description": {
+    "defaultMessage": "Wähle dein Lieblings-Modpack von Modrinth aus oder wähle einen Loader und füge die gewünschten Mods hinzu."
+  },
+  "servers.setup.onboarding.step.choose.title": {
+    "defaultMessage": "Wähle, was du spielen möchtest"
+  },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "Konfiguriere deine Welt genau wie im Einzelspielermodus. Wähle deinen Spielmodus und den Startwert der Welt aus."
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Konfiguriere deine Welt"
+  },
+  "servers.setup.onboarding.step.invite-friends.description": {
+    "defaultMessage": "Teile deinen Server mit Freunden, indem du die Adresse kopierst und ihnen mitteilst, welche Mods sie zum Beitreten benötigen."
+  },
+  "servers.setup.onboarding.step.invite-friends.title": {
+    "defaultMessage": "Lade deine Freunde ein"
+  },
+  "servers.setup.onboarding.steps.heading": {
+    "defaultMessage": "Richte deinen Server ein (~2 Min.)"
+  },
+  "servers.setup.onboarding.uploading.progress": {
+    "defaultMessage": "Wird hochgeladen ({percent, number}%)"
+  },
+  "servers.setup.onboarding.welcome.description": {
+    "defaultMessage": "Dein Server ist startklar. Hier erfährst du, was du tun musst, um zu spielen!"
+  },
+  "servers.setup.onboarding.welcome.title": {
+    "defaultMessage": "Willkommen bei Modrinth Hosting"
   },
   "servers.setup.rate-limit.text": {
     "defaultMessage": "Du wirst begrenzt! Versuch es später erneut."
@@ -3604,6 +4000,12 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Seite verlassen?"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count, plural, one {# Mitteilung} other {# Mitteilungen}}"
+  },
+  "ui.stacked-admonitions.dismiss-all": {
+    "defaultMessage": "Alle ausblenden"
   }
 }
 

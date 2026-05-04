@@ -4,9 +4,12 @@ use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{
-    CacheBehaviour, CachedEntry, LinkedData, ProfileInstallStage, SideType,
+    CacheBehaviour, CachedEntry, LinkedData, Profile, ProfileInstallStage,
+    SideType,
 };
-use crate::util::fetch::{fetch, fetch_advanced, write_cached_icon};
+use crate::util::fetch::{
+    DownloadMeta, DownloadReason, fetch, fetch_advanced, write_cached_icon,
+};
 use crate::util::io;
 
 use path_util::SafeRelativeUtf8UnixPathBuf;
@@ -108,6 +111,7 @@ pub struct CreatePackProfile {
     pub icon: Option<PathBuf>,          // the icon for the profile
     pub icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
     pub linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
+    pub unknown_file: bool, // true when pack file isn't found on Modrinth via hash lookup
     pub skip_install_profile: Option<bool>,
     pub no_watch: Option<bool>,
 }
@@ -123,6 +127,7 @@ impl Default for CreatePackProfile {
             icon: None,
             icon_url: None,
             linked_data: None,
+            unknown_file: false,
             skip_install_profile: Some(true),
             no_watch: Some(false),
         }
@@ -145,16 +150,16 @@ pub struct CreatePackDescription {
     pub profile_path: String,
 }
 
-pub fn get_profile_from_pack(
+pub async fn get_profile_from_pack(
     location: CreatePackLocation,
-) -> CreatePackProfile {
+) -> crate::Result<CreatePackProfile> {
     match location {
         CreatePackLocation::FromVersionId {
             project_id,
             version_id,
             title,
             icon_url,
-        } => CreatePackProfile {
+        } => Ok(CreatePackProfile {
             name: title,
             icon_url,
             linked_data: Some(LinkedData {
@@ -163,7 +168,7 @@ pub fn get_profile_from_pack(
                 locked: true,
             }),
             ..Default::default()
-        },
+        }),
         CreatePackLocation::FromFile { path } => {
             let file_name = path
                 .file_stem()
@@ -171,10 +176,35 @@ pub fn get_profile_from_pack(
                 .to_string_lossy()
                 .to_string();
 
-            CreatePackProfile {
+            let state = State::get().await?;
+            let file_bytes = io::read(&path).await?;
+            let hash =
+                crate::util::fetch::sha1_async(bytes::Bytes::from(file_bytes))
+                    .await?;
+            let is_known_file = match CachedEntry::get_file_many(
+                &[&hash],
+                Some(CacheBehaviour::StaleWhileRevalidateSkipOffline),
+                &state.pool,
+                &state.api_semaphore,
+            )
+            .await
+            {
+                Ok(files) => !files.is_empty(),
+                Err(err) => {
+                    tracing::warn!(
+                        "Failed to check Modrinth file hash for {}: {}",
+                        path.display(),
+                        err
+                    );
+                    false
+                }
+            };
+
+            Ok(CreatePackProfile {
                 name: file_name,
+                unknown_file: !is_known_file,
                 ..Default::default()
-            }
+            })
         }
     }
 }
@@ -260,12 +290,29 @@ pub async fn generate_pack_from_version_id(
             )
         })?;
 
+    let profile =
+        Profile::get(&profile_path, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::UnmanagedProfileError(
+                    profile_path.to_string(),
+                )
+                .as_error()
+            })?;
+
+    let download_meta = DownloadMeta {
+        reason: DownloadReason::Modpack,
+        game_version: profile.game_version.clone(),
+        loader: profile.loader.as_str().to_string(),
+    };
+
     let file = fetch_advanced(
         Method::GET,
         &url,
         hash.map(|x| &**x),
         None,
         None,
+        Some(&download_meta),
         Some((&loading_bar, 70.0)),
         &state.fetch_semaphore,
         &state.pool,
@@ -293,9 +340,14 @@ pub async fn generate_pack_from_version_id(
         emit_loading(&loading_bar, 10.0, Some("Retrieving icon"))?;
         let fetched = if let Some(icon_url) = project.icon_url {
             let state = State::get().await?;
-            let icon_bytes =
-                fetch(&icon_url, None, &state.fetch_semaphore, &state.pool)
-                    .await?;
+            let icon_bytes = fetch(
+                &icon_url,
+                None,
+                None,
+                &state.fetch_semaphore,
+                &state.pool,
+            )
+            .await?;
 
             let filename = icon_url.rsplit('/').next();
 

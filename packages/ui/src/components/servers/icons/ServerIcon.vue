@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="experimental-styles-within relative flex size-16 shrink-0 overflow-hidden rounded-2xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+		class="relative flex size-16 shrink-0 overflow-hidden rounded-2xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 	>
 		<template v-if="hasMounted">
 			<img

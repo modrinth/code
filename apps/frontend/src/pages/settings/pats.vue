@@ -66,31 +66,25 @@
 					<p></p>
 				</div>
 
-				<div class="input-group push-right">
-					<button class="iconified-button" @click="$refs.patModal.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-					<button
-						v-if="editPatId !== null"
-						:disabled="loading || !name || !expires"
-						type="button"
-						class="iconified-button brand-button"
-						@click="editPat"
-					>
-						<SaveIcon />
-						{{ formatMessage(commonMessages.saveChangesButton) }}
-					</button>
-					<button
-						v-else
-						:disabled="loading || !name || !expires"
-						type="button"
-						class="iconified-button brand-button"
-						@click="createPat"
-					>
-						<PlusIcon />
-						{{ formatMessage(createModalMessages.action) }}
-					</button>
+				<div class="ml-auto flex gap-2">
+					<ButtonStyled type="outlined">
+						<button @click="$refs.patModal.hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="editPatId !== null" color="brand">
+						<button :disabled="loading || !name || !expires" @click="editPat">
+							<SaveIcon />
+							{{ formatMessage(commonMessages.saveChangesButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-else color="brand">
+						<button :disabled="loading || !name || !expires" @click="createPat">
+							<PlusIcon />
+							{{ formatMessage(createModalMessages.action) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</NewModal>
@@ -99,20 +93,21 @@
 			<div class="header__title">
 				<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.pats) }}</h2>
 			</div>
-			<button
-				class="btn btn-primary"
-				@click="
-					() => {
-						name = null
-						scopesVal = 0
-						expires = null
-						editPatId = null
-						$refs.patModal.show()
-					}
-				"
-			>
-				<PlusIcon /> {{ formatMessage(messages.create) }}
-			</button>
+			<ButtonStyled color="brand">
+				<button
+					@click="
+						() => {
+							name = null
+							scopesVal = 0
+							expires = null
+							editPatId = null
+							$refs.patModal.show()
+						}
+					"
+				>
+					<PlusIcon /> {{ formatMessage(messages.create) }}
+				</button>
+			</ButtonStyled>
 		</div>
 		<p>
 			<IntlFormatted :message-id="messages.description">
@@ -172,31 +167,33 @@
 				</div>
 			</div>
 			<div class="token-actions ml-auto flex flex-col gap-2">
-				<button
-					class="iconified-button raised-button"
-					@click="
-						() => {
-							editPatId = pat.id
-							name = pat.name
-							scopesVal = pat.scopes
-							expires = $dayjs(pat.expires).format('YYYY-MM-DD')
-							$refs.patModal.show()
-						}
-					"
-				>
-					<EditIcon /> {{ formatMessage(tokenMessages.edit) }}
-				</button>
-				<button
-					class="iconified-button raised-button"
-					@click="
-						() => {
-							deletePatIndex = pat.id
-							$refs.modal_confirm.show()
-						}
-					"
-				>
-					<TrashIcon /> {{ formatMessage(tokenMessages.revoke) }}
-				</button>
+				<ButtonStyled>
+					<button
+						@click="
+							() => {
+								editPatId = pat.id
+								name = pat.name
+								scopesVal = pat.scopes
+								expires = $dayjs(pat.expires).format('YYYY-MM-DD')
+								$refs.patModal.show()
+							}
+						"
+					>
+						<EditIcon /> {{ formatMessage(tokenMessages.edit) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button
+						@click="
+							() => {
+								deletePatIndex = pat.id
+								$refs.modal_confirm.show()
+							}
+						"
+					>
+						<TrashIcon /> {{ formatMessage(tokenMessages.revoke) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</div>
@@ -204,6 +201,7 @@
 <script setup>
 import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	commonSettingsMessages,

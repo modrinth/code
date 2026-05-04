@@ -426,7 +426,7 @@ export function createContentInstall(opts: {
 		}
 
 		try {
-			await add_project_from_version(instance.id, version.id)
+			await add_project_from_version(instance.id, version.id, 'standalone')
 			await installVersionDependencies(
 				profile,
 				version,
@@ -484,7 +484,7 @@ export function createContentInstall(opts: {
 			)
 			if (!id) return
 
-			await add_project_from_version(id, version.id)
+			await add_project_from_version(id, version.id, 'standalone')
 			await opts.router.push(`/instance/${encodeURIComponent(id)}/`)
 
 			const instance = await get(id)
@@ -585,7 +585,7 @@ export function createContentInstall(opts: {
 				const installedProjectIds: string[] = [project.id]
 				addInstallingItem(instancePath, project, version)
 				try {
-					await add_project_from_version(instance.path, version.id)
+					await add_project_from_version(instance.path, version.id, 'standalone')
 					await installVersionDependencies(
 						instance,
 						version,

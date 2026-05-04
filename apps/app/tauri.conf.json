@@ -30,7 +30,22 @@
 			"exceptionDomain": "",
 			"frameworks": [],
 			"providerShortName": null,
-			"signingIdentity": null
+			"signingIdentity": null,
+			"dmg": {
+				"background": "./dmg/dmg-background.png",
+				"windowSize": {
+					"width": 661,
+					"height": 432
+				},
+				"appPosition": {
+					"x": 188,
+					"y": 212
+				},
+				"applicationFolderPosition": {
+					"x": 475,
+					"y": 212
+				}
+			}
 		},
 		"shortDescription": "",
 		"linux": {

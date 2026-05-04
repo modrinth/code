@@ -1,7 +1,9 @@
 <template>
 	<NuxtLayout>
 		<NuxtRouteAnnouncer />
-		<LoadingBar />
+		<ClientOnly>
+			<LoadingBar />
+		</ClientOnly>
 		<NotificationPanel />
 		<I18nDebugPanel />
 		<NuxtPage />

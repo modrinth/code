@@ -579,10 +579,10 @@
     "message": "de {count} {count, plural,one {proyecto} other {proyectos}}"
   },
   "dashboard.analytics.total-downloads": {
-    "message": "Descargas totales"
+    "message": "Todas las descargas"
   },
   "dashboard.analytics.total-followers": {
-    "message": "Total de seguidores"
+    "message": "Todos los seguidores"
   },
   "dashboard.collections.button.create-new": {
     "message": "Crear nuevo"
@@ -607,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Tus colecciones"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Buscar en colecciones..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Nombre (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Creado recientemente"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Actualizado recientemente"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Descargar {formType}"
@@ -860,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Has agotado tu límite de retiro <b>{withdrawLimit}</b>. Debes completar un formulario de impuestos para retirar más."
   },
+  "dashboard.head-title": {
+    "message": "Panel de control"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Marcar todas cómo leídas"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Ver historial"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "No tienes ningúna notificación sin leer."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Error al cargar las notificaciones:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Historial"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Historial de notificaciones"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Ver todas"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Ver historial de notificaciones"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Ver {extraNotifs} {extraNotifs, plural,one {notificación} other {notificaciones}} más"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Cargando notificaciones..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Crear organización"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "¡Haz una organización!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "No se pudo obtener las organizaciones"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural,one {miembro} other {miembros}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organizaciones"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Puedes editar varios proyectos a la vez seleccionándolos a continuación."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Proyectos de servidor no soportan edición masiva"
+  },
+  "dashboard.projects.empty": {
+    "message": "Aún no tienes ningún proyecto. Haz clic en el botón verde de arriba para empezar."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Proyectos"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "y {count} más..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Borrar enlace"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Editar enlaces"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Cambios seran a aplicados a {count} {count, plural,one {proyecto} other {proyectos}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Los enlaces que especifique a continuación se sobrescribirán en cada uno de los proyectos seleccionados. Los que deje en blanco se ignorarán. Puede eliminar un enlace de todos los proyectos seleccionados mediante el botón de la papelera."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Un link de invitación a tu servidor de Discord."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Invitación de Discord"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Un lugar para usuarios para reportar bugs, errores, y preocupaciones sobre tu proyecto."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Registro de errores"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Se borrarán los enlaces existentes"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Introduce una URL de invitación de Discord válida"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Introduce una URL válida"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Mostrar todos los proyectos"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Una página/repositorio que contenga el código fuente de tu proyecto"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Código fuente"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Una página que contenga información y documentación que ayude al proyecto."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Página wiki"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Edición masiva seleccionada de tus links de proyecto."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icono de {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "El proyecto tiene un mensaje de los moderadores. Entra al proyecto para obtener más información."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Por favor revisa los metadatos de entorno"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Ascendente"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Descendente"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Nombre"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Estado"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Tipo"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Icono"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nombre"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Estado"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Tipo"
+  },
+  "dashboard.report.title": {
+    "message": "Reporte {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Reportes activos"
+  },
+  "dashboard.reports.title": {
+    "message": "Reportes"
+  },
   "dashboard.revenue.available-now": {
     "message": "Disponible ahora"
   },
@@ -896,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Descargar como CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Historial de transacciones"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transacciones"
   },
@@ -905,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Tus pagos y retiros aparecerán aquí."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Mes anterior"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Este mes"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Ver todo"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Todos los años"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Tus retiros están temporalmente bloqueados por que tu TIN o SSN no coinciden con los registros del IRS. Conte en contacto con el equipo de soporte para restablecerlos y reenviar tu formulario fiscal."
@@ -919,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Retirar"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Reportes activos"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Estadísticas"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Creadores"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Panel de control"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notificaciones"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organizaciones"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Resumen"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Proyectos"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Ingresos"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Cuenta"

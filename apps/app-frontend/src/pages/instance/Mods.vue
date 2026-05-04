@@ -343,7 +343,7 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 	}
 	try {
 		await remove_project(props.instance.path, mod.file_path!)
-		const newPath = await add_project_from_version(props.instance.path, version.id)
+		const newPath = await add_project_from_version(props.instance.path, version.id, 'standalone')
 
 		const profile = await get(props.instance.path).catch(handleError)
 		if (profile) {

@@ -11,6 +11,86 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-04T19:57:12+00:00`,
+		product: 'web',
+		body: `## Changed
+- Users who are not members of a project or organization can no longer view settings pages.
+
+## Fixed
+- Fixed some project pages failing to load due to invalid iframe links in their descriptions.`,
+	},
+	{
+		date: `2026-05-04T19:57:12+00:00`,
+		product: 'app',
+		version: '0.13.10',
+		body: `## Fixed
+- Fixed some project pages failing to load due to invalid iframe links in their descriptions.`,
+	},
+	{
+		date: `2026-05-03T18:07:44+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added git.gay as a recognized sources link domain.
+
+## Fixed
+- Fixed useTheme not defined error on project pages.
+- Fixed latest snapshot sometimes appearing a second time outside of a version range.`,
+	},
+	{
+		date: `2026-05-03T18:07:44+00:00`,
+		product: 'app',
+		version: '0.13.9',
+		body: `## Fixed
+- Fixed update notification closing when pressing the Changelog button.
+- Fixed latest snapshot sometimes appearing a second time outside of a version range.`,
+	},
+	{
+		date: `2026-05-02T22:09:01+00:00`,
+		product: 'app',
+		version: '0.13.8',
+		body: `## Fixed
+- Fixed exclude open source filter not working.
+- Fixed Central Europe server region not displaying ping in the Modrinth Hosting region selector.`,
+	},
+	{
+		date: `2026-05-02T22:09:01+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed exclude open source filter not working.
+- Fixed 404 error when returning to collections dashboard from a collection page.
+- Fixed error loading revenue transfer history page.
+- Fixed Central Europe server region not displaying ping in the Modrinth Hosting region selector.`,
+	},
+	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'app',
+		version: '0.13.7',
+		body: `## Added
+- Added a warning when installing unknown modpack files to help prevent users from getting tricked into installing malware.
+
+## Changed
+- Updated the content downloading and installation notifications to be consistent with other types of notifications.
+- Updated the design of the running instances widget in the action bar to be more consistent with our current designs.
+- Increased the click target area of the window control buttons on Windows and Linux.
+- Changed the name of the button for creating an instance with a modpack to make it clearer what it's for.
+
+## Fixed
+- Fixed Java auto-installation not working on macOS.
+- Fix a skin naming error.`,
+	},
+	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Changed the name of the button for installing a modpack to make it clearer what it's for.`,
+	},
+	{
+		date: `2026-04-29T03:54:14+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Server settings save action bar not accessible due to being behind modal.`,
+	},
+	{
 		date: `2026-04-27T19:59:24+00:00`,
 		product: 'app',
 		version: '0.13.6',

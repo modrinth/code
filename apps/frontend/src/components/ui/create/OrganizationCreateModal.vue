@@ -59,13 +59,13 @@
 				{{ formatMessage(messages.ownershipInfo) }}
 			</p>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled class="w-24">
+				<ButtonStyled type="outlined">
 					<button @click="hide">
 						<XIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled color="brand" class="w-40">
+				<ButtonStyled color="brand">
 					<button :disabled="hasHitLimit" @click="createOrganization">
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createOrganization) }}

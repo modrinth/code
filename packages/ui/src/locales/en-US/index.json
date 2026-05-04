@@ -720,10 +720,10 @@
     "defaultMessage": "Import instance"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Use a popular modpack or upload one as your starting point."
+    "defaultMessage": "Browse modpacks on Modrinth or import one from a file."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Modpack base"
+    "defaultMessage": "Install modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Classic Minecraft with no mods or plugins."
@@ -757,6 +757,24 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Set up server"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "No"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Permanent no"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Unidentified"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "With attribution"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "With attribution and source"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Yes"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Extract summary"
@@ -2788,6 +2806,9 @@
   },
   "project.settings.upload.title": {
     "defaultMessage": "Upload"
+  },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Permissions"
   },
   "project.settings.versions.title": {
     "defaultMessage": "Versions"

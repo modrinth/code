@@ -785,7 +785,7 @@ async fn get_tremendous_payout_methods(
                     .into_iter()
                     .map(|x| PayoutDecimal(x.min))
                     .collect::<Vec<_>>();
-                values.sort_by(|a, b| a.0.cmp(&b.0));
+                values.sort_by_key(|a| a.0);
 
                 PayoutInterval::Fixed { values }
             } else if let Some(first) = product.skus.first() {

@@ -86,7 +86,7 @@ pub async fn forge_updates(
     )
     .await?;
 
-    versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+    versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
 
     #[derive(Serialize)]
     struct ForgeUpdates {

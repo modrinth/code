@@ -3,6 +3,8 @@
 
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
+export type IconComponent = FunctionalComponent<SVGAttributes>
+
 import _AffiliateIcon from './icons/affiliate.svg?component'
 import _AlignLeftIcon from './icons/align-left.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
@@ -24,6 +26,7 @@ import _BadgeDollarSignIcon from './icons/badge-dollar-sign.svg?component'
 import _BanIcon from './icons/ban.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BellRingIcon from './icons/bell-ring.svg?component'
+import _BinaryIcon from './icons/binary.svg?component'
 import _BlendIcon from './icons/blend.svg?component'
 import _BlocksIcon from './icons/blocks.svg?component'
 import _BoldIcon from './icons/bold.svg?component'
@@ -54,6 +57,7 @@ import _ChevronLeftIcon from './icons/chevron-left.svg?component'
 import _ChevronRightIcon from './icons/chevron-right.svg?component'
 import _ChevronUpIcon from './icons/chevron-up.svg?component'
 import _CircleAlertIcon from './icons/circle-alert.svg?component'
+import _CircleArrowRightIcon from './icons/circle-arrow-right.svg?component'
 import _CircleUserIcon from './icons/circle-user.svg?component'
 import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
@@ -212,6 +216,7 @@ import _ShieldIcon from './icons/shield.svg?component'
 import _ShieldAlertIcon from './icons/shield-alert.svg?component'
 import _ShieldCheckIcon from './icons/shield-check.svg?component'
 import _SignalIcon from './icons/signal.svg?component'
+import _SignatureIcon from './icons/signature.svg?component'
 import _SkullIcon from './icons/skull.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
 import _SortAscIcon from './icons/sort-asc.svg?component'
@@ -398,8 +403,6 @@ import _XCircleIcon from './icons/x-circle.svg?component'
 import _ZoomInIcon from './icons/zoom-in.svg?component'
 import _ZoomOutIcon from './icons/zoom-out.svg?component'
 
-export type IconComponent = FunctionalComponent<SVGAttributes>
-
 export const AffiliateIcon = _AffiliateIcon
 export const AlignLeftIcon = _AlignLeftIcon
 export const ArchiveIcon = _ArchiveIcon
@@ -421,6 +424,7 @@ export const BadgeDollarSignIcon = _BadgeDollarSignIcon
 export const BanIcon = _BanIcon
 export const BellIcon = _BellIcon
 export const BellRingIcon = _BellRingIcon
+export const BinaryIcon = _BinaryIcon
 export const BlendIcon = _BlendIcon
 export const BlocksIcon = _BlocksIcon
 export const BoldIcon = _BoldIcon
@@ -451,6 +455,7 @@ export const ChevronLeftIcon = _ChevronLeftIcon
 export const ChevronRightIcon = _ChevronRightIcon
 export const ChevronUpIcon = _ChevronUpIcon
 export const CircleAlertIcon = _CircleAlertIcon
+export const CircleArrowRightIcon = _CircleArrowRightIcon
 export const CircleUserIcon = _CircleUserIcon
 export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
@@ -609,6 +614,7 @@ export const ShieldIcon = _ShieldIcon
 export const ShieldAlertIcon = _ShieldAlertIcon
 export const ShieldCheckIcon = _ShieldCheckIcon
 export const SignalIcon = _SignalIcon
+export const SignatureIcon = _SignatureIcon
 export const SkullIcon = _SkullIcon
 export const SlashIcon = _SlashIcon
 export const SortAscIcon = _SortAscIcon

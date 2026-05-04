@@ -547,8 +547,8 @@ async fn index_versions(
     }
 
     let all_version_ids = versions
-        .iter()
-        .flat_map(|(_, version_ids)| version_ids.iter())
+        .values()
+        .flat_map(|version_ids| version_ids.iter())
         .map(|(version_id, _)| version_id.0)
         .collect::<Vec<i64>>();
 

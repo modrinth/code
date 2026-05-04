@@ -582,7 +582,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 										"
 										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-										class="!h-10 !border-button-bg !border-[1px]"
+										class="!h-10"
 										@click="ctx.uploadFiles"
 									>
 										<FolderOpenIcon class="size-5" />
@@ -722,7 +722,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 								"
 								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-								class="!h-10 !border-button-bg !border-[1px]"
+								class="!h-10"
 								@click="ctx.uploadFiles"
 							>
 								<FolderOpenIcon class="size-5" />

@@ -3,57 +3,51 @@
 		<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
-		<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
-			<div class="normal-page__header">
-				<div
-					class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
-				>
-					<nuxt-link
-						:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
-						class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
+		<template v-if="isSettings">
+			<div v-if="canAccessSettings" class="normal-page no-sidebar">
+				<div class="normal-page__header">
+					<div
+						class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
 					>
-						<Avatar :src="project.icon_url" size="32px" />
-						{{ project.title }}
-					</nuxt-link>
-					<ChevronRightIcon />
-					<span class="flex grow font-extrabold text-contrast">{{
-						formatMessage(messages.settingsTitle)
-					}}</span>
-					<div class="flex gap-2">
-						<ButtonStyled>
-							<nuxt-link to="/dashboard/projects"
-								><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
-							</nuxt-link>
-						</ButtonStyled>
+						<nuxt-link
+							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
+							class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
+						>
+							<Avatar :src="project.icon_url" size="32px" />
+							{{ project.title }}
+						</nuxt-link>
+						<ChevronRightIcon />
+						<span class="flex grow font-extrabold text-contrast">{{
+							formatMessage(messages.settingsTitle)
+						}}</span>
+						<div class="flex gap-2">
+							<ButtonStyled>
+								<nuxt-link to="/dashboard/projects"
+									><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
+								</nuxt-link>
+							</ButtonStyled>
+						</div>
 					</div>
+					<ProjectMemberHeader
+						v-if="currentMember && false"
+						:project="project"
+						:versions="versions"
+						:current-member="currentMember"
+						:is-settings="isSettings"
+						:set-processing="setProcessing"
+						:all-members="allMembers"
+						:update-members="invalidateProject"
+						:auth="auth"
+						:tags="tags"
+					/>
 				</div>
-				<ProjectMemberHeader
-					v-if="currentMember && false"
-					:project="project"
-					:versions="versions"
-					:current-member="currentMember"
-					:is-settings="route.name.startsWith('type-id-settings')"
-					:set-processing="setProcessing"
-					:all-members="allMembers"
-					:update-members="invalidateProject"
-					:auth="auth"
-					:tags="tags"
-				/>
+				<div class="normal-page__content">
+					<NuxtPage />
+				</div>
 			</div>
-			<div class="normal-page__content">
-				<NuxtPage />
-			</div>
-		</div>
+		</template>
 
-		<div v-else class="experimental-styles-within">
-			<NewModal ref="settingsModal">
-				<template #title>
-					<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-					<span class="text-lg font-extrabold text-contrast">
-						{{ formatMessage(messages.settingsTitle) }}
-					</span>
-				</template>
-			</NewModal>
+		<div v-else>
 			<NewModal
 				ref="modalLicense"
 				:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"
@@ -464,30 +458,19 @@
 						:member="!!currentMember"
 					>
 						<template #actions>
-							<ButtonStyled
-								v-if="auth.user && currentMember"
-								size="large"
-								color="brand"
-								class="lg:!hidden"
-								circular
-							>
+							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand" circular>
 								<nuxt-link
 									v-tooltip="'Edit project'"
 									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-									class="!font-bold"
+									class="!font-bold lg:!hidden"
 								>
 									<SettingsIcon aria-hidden="true" />
 								</nuxt-link>
 							</ButtonStyled>
-							<ButtonStyled
-								v-if="auth.user && currentMember"
-								size="large"
-								color="brand"
-								class="max-lg:!hidden"
-							>
+							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
 								<nuxt-link
 									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-									class="!font-bold"
+									class="!font-bold max-lg:!hidden"
 								>
 									<SettingsIcon aria-hidden="true" />
 									Edit project
@@ -594,7 +577,7 @@
 									</nuxt-link>
 								</ButtonStyled>
 								<template #popper>
-									<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+									<div class="grid grid-cols-[min-content] gap-1">
 										<div class="flex min-w-60 items-center justify-between gap-4">
 											<h3
 												class="m-0 flex items-center gap-2 whitespace-nowrap text-base font-bold text-contrast"
@@ -724,13 +707,15 @@
 										<div v-else class="menu-text">
 											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
 										</div>
-										<button
-											class="btn collection-button"
-											@click="(event) => $refs.modal_collection.show(event)"
-										>
-											<PlusIcon aria-hidden="true" />
-											{{ formatMessage(messages.createNewCollection) }}
-										</button>
+										<ButtonStyled>
+											<button
+												class="mx-3 mb-3"
+												@click="(event) => $refs.modal_collection.show(event)"
+											>
+												<PlusIcon aria-hidden="true" />
+												{{ formatMessage(messages.createNewCollection) }}
+											</button>
+										</ButtonStyled>
 									</template>
 								</PopoutMenu>
 								<nuxt-link v-else v-tooltip="'Save'" :to="signInRouteObj" aria-label="Save">
@@ -828,7 +813,7 @@
 						:project="project"
 						:versions="versions"
 						:current-member="currentMember"
-						:is-settings="route.name.startsWith('type-id-settings')"
+						:is-settings="isSettings"
 						:route-name="route.name"
 						:set-processing="setProcessing"
 						:collapsed="collapsedChecklist"
@@ -890,32 +875,29 @@
 						:supported-versions="serverSupportedVersions"
 						:loaders="serverModpackLoaders"
 						:status-online="projectV3?.minecraft_java_server?.ping?.data != null"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
 					<ProjectSidebarCompatibility
 						v-if="projectV3Loaded && !isServerProject"
 						:project="project"
 						:tags="tags"
 						:project-v3="projectV3"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
 					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
 					<ProjectSidebarLinks
 						:project="project"
 						:project-v3="projectV3"
 						:link-target="$external()"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
-					<ProjectSidebarTags
-						:project="project"
-						class="card flex-card experimental-styles-within"
-					/>
+					<ProjectSidebarTags :project="project" class="card flex-card" />
 					<ProjectSidebarCreators
 						:organization="organization"
 						:members="members"
 						:org-link="(slug) => `/organization/${slug}`"
 						:user-link="(username) => `/user/${username}`"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
 					<!-- TODO: Finish license modal and enable -->
 					<ProjectSidebarDetails
@@ -924,9 +906,9 @@
 						:has-versions="versions.length > 0"
 						:link-target="$external()"
 						:show-followers="isServerProject"
-						class="card flex-card experimental-styles-within"
+						class="card flex-card"
 					/>
-					<div class="card flex-card experimental-styles-within">
+					<div class="card flex-card">
 						<h2>{{ formatMessage(detailsMessages.title) }}</h2>
 
 						<div class="details-list">
@@ -1177,7 +1159,6 @@ const formatDateTime = useFormatDateTime({
 
 const debug = useDebugLogger('DownloadModal')
 
-const settingsModal = ref()
 const downloadModal = ref()
 const openInAppModal = ref()
 const overTheTopDownloadAnimation = ref()
@@ -1847,6 +1828,8 @@ const { data: organizationRaw } = useQuery({
 // Return null when the project no longer belongs to an organization.
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
+const isSettings = computed(() => route.name.startsWith('type-id-settings'))
+
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {
 	return (versionsV3.value ?? []).map((v) => {
@@ -2283,10 +2266,26 @@ const currentMember = computed(() => {
 	return val
 })
 
+const canAccessSettings = computed(() => !!currentMember.value?.accepted)
+
 const hasEditDetailsPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
 	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
 })
+
+watch(
+	[isSettings, currentMember],
+	() => {
+		if (isSettings.value && !canAccessSettings.value) {
+			showError({
+				fatal: true,
+				statusCode: 401,
+				statusMessage: 'Unauthorized',
+			})
+		}
+	},
+	{ flush: 'sync', immediate: true },
+)
 
 const projectTypeDisplay = computed(() => {
 	if (!project.value) return ''
@@ -2746,11 +2745,6 @@ provideProjectPageContext({
 	padding-bottom: 0;
 	font-size: var(--font-size-nm);
 	color: var(--color-secondary);
-}
-
-.collection-button {
-	margin: var(--gap-sm) var(--gap-md);
-	white-space: nowrap;
 }
 
 .menu-text {

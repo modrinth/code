@@ -1,0 +1,83 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            mel.id,\n            mel.title,\n            mel.status,\n            mel.link,\n            mel.exceptions,\n            mel.proof,\n            mel.flame_project_id,\n            mel.inserted_at,\n            mel.inserted_by,\n            mel.updated_at,\n            mel.updated_by\n        FROM moderation_external_licenses mel\n        WHERE ($1::text IS NULL OR mel.title ILIKE '%' || $1 || '%')\n          AND ($2::integer IS NULL OR mel.flame_project_id = $2)\n        ORDER BY mel.id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "link",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "exceptions",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "proof",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "flame_project_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "inserted_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "inserted_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_by",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "6542c79dffa73e462c527f1bd4ba67e658814d7a788259dc4b3874c54cb5ae57"
+}
