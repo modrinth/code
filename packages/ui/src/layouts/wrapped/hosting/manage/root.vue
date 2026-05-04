@@ -360,6 +360,7 @@ import {
 	SettingsIcon,
 	TransferIcon,
 	TriangleAlertIcon,
+	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
@@ -820,6 +821,12 @@ const navLinks = computed<Tab[]>(() => [
 		label: 'Backups',
 		href: `/hosting/manage/${props.serverId}/backups`,
 		icon: DatabaseBackupIcon,
+		subpages: [],
+	},
+	{
+		label: 'Access',
+		href: `/hosting/manage/${props.serverId}/access`,
+		icon: UsersIcon,
 		subpages: [],
 	},
 	...props.additionalTabs,

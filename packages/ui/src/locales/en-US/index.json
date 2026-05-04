@@ -3188,8 +3188,215 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "servers.access-page.activity-log-title": {
+    "defaultMessage": "Activity log"
+  },
+  "servers.access-page.invite-friends": {
+    "defaultMessage": "Invite friends"
+  },
+  "servers.access-page.notification.invite-cancelled.text": {
+    "defaultMessage": "Cancelled the invite for {target}."
+  },
+  "servers.access-page.notification.invite-cancelled.title": {
+    "defaultMessage": "Invite cancelled"
+  },
+  "servers.access-page.notification.invite-resent.text": {
+    "defaultMessage": "Sent another invite to {target}."
+  },
+  "servers.access-page.notification.invite-resent.title": {
+    "defaultMessage": "Invite resent"
+  },
+  "servers.access-page.notification.invite-sent.text": {
+    "defaultMessage": "Invited {target} as {role}."
+  },
+  "servers.access-page.notification.invite-sent.title": {
+    "defaultMessage": "Invite sent"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "Removed {target} from this server."
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "Access removed"
+  },
+  "servers.access-page.notification.role-updated.text": {
+    "defaultMessage": "Changed {target} to {role}."
+  },
+  "servers.access-page.notification.role-updated.title": {
+    "defaultMessage": "Role updated"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "Role: All"
+  },
+  "servers.access-page.role.editor": {
+    "defaultMessage": "Editor"
+  },
+  "servers.access-page.role.editor-description": {
+    "defaultMessage": "Manage server content, files, backups, and other settings."
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "Owner"
+  },
+  "servers.access-page.role.owner-description": {
+    "defaultMessage": "Full access including billing, members, and destructive actions."
+  },
+  "servers.access-page.role.viewer": {
+    "defaultMessage": "Viewer"
+  },
+  "servers.access-page.role.viewer-description": {
+    "defaultMessage": "Start, stop, restart, and view the server without making changes."
+  },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Search {count} {count, plural, one {user} other {users}}..."
+  },
+  "servers.access-role.editor": {
+    "defaultMessage": "Editor"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "Owner"
+  },
+  "servers.access-role.viewer": {
+    "defaultMessage": "Viewer"
+  },
+  "servers.access-table.action.cancel-invite": {
+    "defaultMessage": "Cancel invite"
+  },
+  "servers.access-table.action.remove-user": {
+    "defaultMessage": "Remove user"
+  },
+  "servers.access-table.action.resend-invite": {
+    "defaultMessage": "Resend invite"
+  },
+  "servers.access-table.column.actions": {
+    "defaultMessage": "Actions"
+  },
+  "servers.access-table.column.joined": {
+    "defaultMessage": "Joined"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Role"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "User"
+  },
+  "servers.access-table.empty": {
+    "defaultMessage": "No users match your filters."
+  },
+  "servers.access-table.member-actions-label": {
+    "defaultMessage": "Actions for {username}"
+  },
+  "servers.access-table.pending": {
+    "defaultMessage": "Pending"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "Unknown"
+  },
+  "servers.access-table.user-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Background task running"
+  },
+  "servers.audit-log.action.file-edited": {
+    "defaultMessage": "Edited file: {file}"
+  },
+  "servers.audit-log.action.member-invited": {
+    "defaultMessage": "Invited user: {target}"
+  },
+  "servers.audit-log.action.member-removed": {
+    "defaultMessage": "Removed user: {target}"
+  },
+  "servers.audit-log.action.mod-installed": {
+    "defaultMessage": "Installed mod: {name}"
+  },
+  "servers.audit-log.action.modpack-installed": {
+    "defaultMessage": "Installed modpack: {name}"
+  },
+  "servers.audit-log.action.role-changed": {
+    "defaultMessage": "Changed role: {target}"
+  },
+  "servers.audit-log.action.world-started": {
+    "defaultMessage": "Started world: {worldName}"
+  },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "Support"
+  },
+  "servers.audit-log.column.action": {
+    "defaultMessage": "Action"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Time"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "User"
+  },
+  "servers.audit-log.column.world": {
+    "defaultMessage": "World"
+  },
+  "servers.audit-log.content-icon-alt": {
+    "defaultMessage": "{name}'s icon"
+  },
+  "servers.audit-log.empty": {
+    "defaultMessage": "No activity matches your filters."
+  },
+  "servers.audit-log.time-range.all-time": {
+    "defaultMessage": "All Time"
+  },
+  "servers.audit-log.time-range.last-30-days": {
+    "defaultMessage": "Last 30 days"
+  },
+  "servers.audit-log.time-range.last-month": {
+    "defaultMessage": "Last month"
+  },
+  "servers.audit-log.time-range.last-quarter": {
+    "defaultMessage": "Last quarter"
+  },
+  "servers.audit-log.time-range.last-week": {
+    "defaultMessage": "Last week"
+  },
+  "servers.audit-log.time-range.last-year": {
+    "defaultMessage": "Last year"
+  },
+  "servers.audit-log.time-range.previous-12-hours": {
+    "defaultMessage": "Previous 12 hours"
+  },
+  "servers.audit-log.time-range.previous-24-hours": {
+    "defaultMessage": "Previous 24 hours"
+  },
+  "servers.audit-log.time-range.previous-30-minutes": {
+    "defaultMessage": "Previous 30 minutes"
+  },
+  "servers.audit-log.time-range.previous-7-days": {
+    "defaultMessage": "Previous 7 days"
+  },
+  "servers.audit-log.time-range.previous-hour": {
+    "defaultMessage": "Previous hour"
+  },
+  "servers.audit-log.time-range.previous-two-years": {
+    "defaultMessage": "Previous two years"
+  },
+  "servers.audit-log.time-range.previous-year": {
+    "defaultMessage": "Previous year"
+  },
+  "servers.audit-log.time-range.this-month": {
+    "defaultMessage": "This month"
+  },
+  "servers.audit-log.time-range.this-quarter": {
+    "defaultMessage": "This quarter"
+  },
+  "servers.audit-log.time-range.this-week": {
+    "defaultMessage": "This week"
+  },
+  "servers.audit-log.time-range.this-year": {
+    "defaultMessage": "This year"
+  },
+  "servers.audit-log.time-range.today": {
+    "defaultMessage": "Today"
+  },
+  "servers.audit-log.time-range.yesterday": {
+    "defaultMessage": "Yesterday"
+  },
+  "servers.audit-log.user-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
   },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "Backup {backupName} was cancelled."
@@ -3347,6 +3554,51 @@
   "servers.busy.syncing-content": {
     "defaultMessage": "Content sync in progress"
   },
+  "servers.grant-access-modal.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "servers.grant-access-modal.friend-request": {
+    "defaultMessage": "Also send a friend request"
+  },
+  "servers.grant-access-modal.header": {
+    "defaultMessage": "Invite a friend"
+  },
+  "servers.grant-access-modal.invite": {
+    "defaultMessage": "Invite"
+  },
+  "servers.grant-access-modal.permissions-help": {
+    "defaultMessage": "View the full list of permissions for each role <link>here</link>."
+  },
+  "servers.grant-access-modal.role.editor": {
+    "defaultMessage": "Editor"
+  },
+  "servers.grant-access-modal.role.editor-description": {
+    "defaultMessage": "Manage server content, files, backups, and other settings."
+  },
+  "servers.grant-access-modal.role.label": {
+    "defaultMessage": "Select role"
+  },
+  "servers.grant-access-modal.role.viewer": {
+    "defaultMessage": "Viewer"
+  },
+  "servers.grant-access-modal.role.viewer-description": {
+    "defaultMessage": "Start, stop, and view the server without making changes."
+  },
+  "servers.grant-access-modal.suggestion-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.grant-access-modal.target.help": {
+    "defaultMessage": "Use their Modrinth username, or invite a new user by email."
+  },
+  "servers.grant-access-modal.target.label": {
+    "defaultMessage": "Username or email"
+  },
+  "servers.grant-access-modal.target.no-suggestions": {
+    "defaultMessage": "Keep typing to invite by email or username."
+  },
+  "servers.grant-access-modal.target.placeholder": {
+    "defaultMessage": "Enter a username or email"
+  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installation failed"
   },
@@ -3491,6 +3743,12 @@
   "servers.listing.notice.upgrading": {
     "defaultMessage": "Your server's hardware is currently being upgraded and will be back online shortly."
   },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.listing.owner-tooltip": {
+    "defaultMessage": "Owned by {username}"
+  },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "Resubscribe"
   },
@@ -3539,8 +3797,14 @@
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
   },
+  "servers.manage.no-owned-servers-found": {
+    "defaultMessage": "No servers you own match your search."
+  },
   "servers.manage.no-servers-found": {
     "defaultMessage": "No servers found."
+  },
+  "servers.manage.no-shared-servers-found": {
+    "defaultMessage": "No shared servers match your search."
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Payment information is still loading. Opening checkout as soon as it is ready."
@@ -3584,6 +3848,12 @@
   "servers.manage.settings-hint.title": {
     "defaultMessage": "Your server settings have moved"
   },
+  "servers.manage.shared-servers-title": {
+    "defaultMessage": "Shared servers"
+  },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "Your servers"
+  },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} remaining..."
   },
@@ -3601,6 +3871,12 @@
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "Your server's hardware is currently being upgraded and will be back online shortly."
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.medal-listing.owner-tooltip": {
+    "defaultMessage": "Owned by {username}"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "Server icon"

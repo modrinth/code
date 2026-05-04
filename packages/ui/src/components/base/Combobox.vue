@@ -96,6 +96,7 @@
 					class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 border border-solid border-surface-5"
 					:class="[
 						openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',
+						props.dropdownClass,
 					]"
 					:style="dropdownStyle"
 					:role="listbox ? 'listbox' : 'menu'"
@@ -159,7 +160,7 @@
 						</template>
 					</div>
 
-					<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
+					<div v-else-if="searchQuery" class="p-4 text-center text-sm text-secondary">
 						{{ noOptionsMessage }}
 					</div>
 
@@ -232,6 +233,8 @@ const props = withDefaults(
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
+		dropdownClass?: string
+		dropdownMinWidth?: string
 		/** Keep the selected option's label in the input after selection, and show all options on focus */
 		syncWithSelection?: boolean
 		/** Select the searchable input text when the field receives focus */
@@ -290,6 +293,7 @@ const dropdownStyle = ref({
 	top: '0px',
 	left: '0px',
 	width: '0px',
+	minWidth: '0px',
 })
 
 const openDirection = ref<'down' | 'up'>('down')
@@ -441,6 +445,7 @@ async function updateDropdownPosition() {
 		top: `${top}px`,
 		left: `${left}px`,
 		width: `${triggerRect.width}px`,
+		minWidth: props.dropdownMinWidth ?? `${triggerRect.width}px`,
 	}
 
 	openDirection.value = direction

@@ -143,7 +143,7 @@
 					/>
 				</div>
 
-				<div v-else key="list">
+				<div v-else key="list" class="flex flex-col gap-6">
 					<Transition
 						enter-active-class="transition-all duration-300 ease-out"
 						enter-from-class="opacity-0 max-h-0"
@@ -161,29 +161,67 @@
 						</div>
 					</Transition>
 
-					<TransitionGroup
-						v-if="filteredData.length > 0 || isPollingForNewServers"
-						name="list"
-						tag="ul"
-						class="m-0 flex flex-col gap-3 p-0"
-					>
-						<MedalServerListing
-							v-for="server in filteredData.filter((s) => s.is_medal)"
-							:key="server.server_id"
-							v-bind="server"
-							@upgrade="openMedalUpgradeModal"
-						/>
-						<ServerListing
-							v-for="server in filteredData.filter((s) => !s.is_medal)"
-							:key="server.server_id"
-							v-bind="server"
-							:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
-							:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
-							:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
-							:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
-						/>
-					</TransitionGroup>
-					<div v-else>{{ formatMessage(messages.noServersFound) }}</div>
+					<section v-if="ownedServerList.length > 0" class="flex flex-col gap-3">
+						<h2 class="m-0 text-xl font-semibold text-primary">
+							{{ formatMessage(messages.yourServersTitle) }}
+						</h2>
+						<TransitionGroup
+							v-if="ownedFilteredData.length > 0"
+							name="list"
+							tag="ul"
+							class="m-0 flex flex-col gap-3 p-0"
+						>
+							<MedalServerListing
+								v-for="server in ownedFilteredData.filter((s) => s.is_medal)"
+								:key="`owned-medal-${server.server_id}`"
+								v-bind="server"
+								@upgrade="openMedalUpgradeModal"
+							/>
+							<ServerListing
+								v-for="server in ownedFilteredData.filter((s) => !s.is_medal)"
+								:key="`owned-${server.server_id}`"
+								v-bind="server"
+								:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
+								:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
+								:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
+								:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
+							/>
+						</TransitionGroup>
+						<div v-else class="text-secondary">
+							{{ formatMessage(messages.noOwnedServersFound) }}
+						</div>
+					</section>
+
+					<section v-if="sharedServerList.length > 0" class="flex flex-col gap-3">
+						<h2 class="m-0 text-xl font-semibold text-primary">
+							{{ formatMessage(messages.sharedServersTitle) }}
+						</h2>
+						<TransitionGroup
+							v-if="sharedFilteredData.length > 0"
+							name="list"
+							tag="ul"
+							class="m-0 flex flex-col gap-3 p-0"
+						>
+							<MedalServerListing
+								v-for="server in sharedFilteredData.filter((s) => s.is_medal)"
+								:key="`shared-medal-${server.server_id}`"
+								v-bind="server"
+								@upgrade="openMedalUpgradeModal"
+							/>
+							<ServerListing
+								v-for="server in sharedFilteredData.filter((s) => !s.is_medal)"
+								:key="`shared-${server.server_id}`"
+								v-bind="server"
+							/>
+						</TransitionGroup>
+						<div v-else class="text-secondary">
+							{{ formatMessage(messages.noSharedServersFound) }}
+						</div>
+					</section>
+
+					<div v-if="filteredData.length === 0 && !isPollingForNewServers">
+						{{ formatMessage(messages.noServersFound) }}
+					</div>
 				</div>
 			</Transition>
 		</template>
@@ -220,6 +258,7 @@ import { type ComponentPublicInstance, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeModalWrapper.vue'
+import type { ServerListingOwner } from '#ui/components/servers/access'
 import MedalServerListing from '#ui/components/servers/marketing/MedalServerListing.vue'
 import ServerListing from '#ui/components/servers/ServerListing.vue'
 import { createHostingPurchaseIntentContext, provideHostingPurchaseIntent } from '#ui/providers'
@@ -270,11 +309,27 @@ const messages = defineMessages({
 		defaultMessage: 'Search {count} {count, plural, one {server} other {servers}}...',
 	},
 	newServerButton: { id: 'servers.manage.new-server-button', defaultMessage: 'New server' },
+	yourServersTitle: {
+		id: 'servers.manage.your-servers-title',
+		defaultMessage: 'Your servers',
+	},
+	sharedServersTitle: {
+		id: 'servers.manage.shared-servers-title',
+		defaultMessage: 'Shared servers',
+	},
 	checkingForNewServers: {
 		id: 'servers.manage.checking-for-new-servers',
 		defaultMessage: 'Checking for new servers...',
 	},
 	noServersFound: { id: 'servers.manage.no-servers-found', defaultMessage: 'No servers found.' },
+	noOwnedServersFound: {
+		id: 'servers.manage.no-owned-servers-found',
+		defaultMessage: 'No servers you own match your search.',
+	},
+	noSharedServersFound: {
+		id: 'servers.manage.no-shared-servers-found',
+		defaultMessage: 'No shared servers match your search.',
+	},
 	handleErrorTitle: {
 		id: 'servers.manage.handle-error.title',
 		defaultMessage: 'An error occurred',
@@ -562,18 +617,51 @@ const serverList = computed<Archon.Servers.v0.Server[]>(() => {
 
 const showEmptyState = computed(
 	() =>
-		!showServersListLoading.value && serverList.value.length === 0 && !isPollingForNewServers.value,
+		!showServersListLoading.value &&
+		ownedServerList.value.length === 0 &&
+		sharedServerList.value.length === 0 &&
+		!isPollingForNewServers.value,
 )
 
 const searchInput = ref('')
 
-const fuse = computed(() => {
-	if (serverList.value.length === 0) return null
-	return new Fuse(serverList.value, {
-		keys: ['name', 'loader', 'mc_version', 'game', 'state'],
-		includeScore: true,
-		threshold: 0.4,
-	})
+type ServerWithOwner = Archon.Servers.v0.Server & { owner?: ServerListingOwner }
+
+const sharedServerOwner: ServerListingOwner = {
+	username: 'Prospector',
+}
+
+const demoSharedServers = computed<ServerWithOwner[]>(() => {
+	if (!loggedIn.value) return []
+
+	const template =
+		serverList.value.find((server) => server.status !== 'suspended') ?? serverList.value[0]
+	if (template) {
+		return [
+			{
+				...template,
+				name: template.name || 'A Minecraft Server',
+				owner: sharedServerOwner,
+			},
+		]
+	}
+
+	return [
+		{
+			server_id: 'shared-demo-server',
+			name: 'A Minecraft Server',
+			status: 'available',
+			game: 'Minecraft',
+			mc_version: '1.21.1',
+			loader: 'Fabric',
+			loader_version: '0.16.14',
+			net: {
+				domain: 'tough-ghast44',
+			},
+			online: true,
+			owner: sharedServerOwner,
+		} as ServerWithOwner,
+	]
 })
 
 function isSetToCancel(server: Archon.Servers.v0.Server): boolean {
@@ -611,14 +699,35 @@ function filesExpired(server: Archon.Servers.v0.Server): boolean {
 	return new Date() > thirtyDaysLater
 }
 
-const filteredData = computed<Archon.Servers.v0.Server[]>(() => {
-	const base = !searchInput.value.trim()
-		? sortServers(serverList.value)
-		: fuse.value
-			? sortServers(fuse.value.search(searchInput.value).map((result) => result.item))
-			: []
-	return base.filter((server) => !filesExpired(server))
-})
+const ownedServerList = computed<ServerWithOwner[]>(() =>
+	serverList.value.filter((server) => !filesExpired(server)),
+)
+const sharedServerList = computed<ServerWithOwner[]>(() => demoSharedServers.value)
+
+function filterServersBySearch(servers: ServerWithOwner[]): ServerWithOwner[] {
+	const normalizedSearch = searchInput.value.trim()
+	if (!normalizedSearch) return sortServers(servers) as ServerWithOwner[]
+
+	const fuse = new Fuse(servers, {
+		keys: ['name', 'loader', 'mc_version', 'game', 'state', 'owner.username'],
+		includeScore: true,
+		threshold: 0.4,
+	})
+	return sortServers(
+		fuse.search(normalizedSearch).map((result) => result.item),
+	) as ServerWithOwner[]
+}
+
+const ownedFilteredData = computed<ServerWithOwner[]>(() =>
+	filterServersBySearch(ownedServerList.value),
+)
+const sharedFilteredData = computed<ServerWithOwner[]>(() =>
+	filterServersBySearch(sharedServerList.value),
+)
+const filteredData = computed<ServerWithOwner[]>(() => [
+	...ownedFilteredData.value,
+	...sharedFilteredData.value,
+])
 
 // Start polling only after initial data is available so the baseline is correct
 watch(serverResponse, (response) => {
