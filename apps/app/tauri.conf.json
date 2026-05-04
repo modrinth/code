@@ -35,7 +35,7 @@
 				"background": "./dmg/dmg-background.png",
 				"windowSize": {
 					"width": 677,
-					"height": 460
+					"height": 432
 				},
 				"appPosition": {
 					"x": 188,
