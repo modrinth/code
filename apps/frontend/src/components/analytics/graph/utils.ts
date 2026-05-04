@@ -332,6 +332,16 @@ export function formatMetricValue(
 	}
 }
 
+function formatSmallAxisNumber(value: number): string {
+	const rounded = Math.round(value)
+	if (Math.abs(value - rounded) < 0.0000001) {
+		return String(rounded)
+	}
+
+	const formattedValue = Math.abs(value) < 1 ? value.toFixed(2) : value.toFixed(1)
+	return formattedValue.replace(/\.?0+$/, '')
+}
+
 export function formatAxisValue(
 	value: number,
 	activeStat: AnalyticsDashboardStat,
@@ -345,6 +355,9 @@ export function formatAxisValue(
 		case 'views':
 		case 'downloads':
 		default:
+			if (Math.abs(value) < 10) {
+				return formatSmallAxisNumber(value)
+			}
 			return formatCompact(Math.round(value))
 	}
 }

@@ -13,7 +13,7 @@
 			:class="
 				tab.value === value
 					? 'border-green bg-highlight-green text-green'
-					: 'border-transparent bg-transparent text-contrast hover:bg-surface-4'
+					: 'border-transparent bg-transparent text-primary hover:bg-surface-4'
 			"
 			role="tab"
 			:aria-selected="tab.value === value"
@@ -21,7 +21,12 @@
 			@click="selectTab(tab)"
 			@keydown="onTabKeydown($event, index)"
 		>
-			<component :is="tab.icon" v-if="tab.icon" class="size-5 shrink-0 text-secondary" />
+			<component
+				:is="tab.icon"
+				v-if="tab.icon"
+				class="size-5 shrink-0"
+				:class="tab.value === value ? 'text-green' : 'text-secondary'"
+			/>
 			<span class="text-nowrap">{{ tab.label }}</span>
 		</button>
 	</div>
