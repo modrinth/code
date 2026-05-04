@@ -1160,55 +1160,59 @@ mod tests {
         let test_project_2 = ProjectId(456);
         let test_project_3 = ProjectId(789);
 
-        let src = FetchResponse(vec![
-            TimeSlice(vec![
-                AnalyticsData::Project(ProjectAnalytics {
-                    source_project: test_project_1,
-                    metrics: ProjectMetrics::Views(ProjectViews {
-                        domain: Some("youtube.com".into()),
-                        views: 100,
-                        ..Default::default()
+        let src = FetchResponse {
+            metrics: vec![
+                TimeSlice(vec![
+                    AnalyticsData::Project(ProjectAnalytics {
+                        source_project: test_project_1,
+                        metrics: ProjectMetrics::Views(ProjectViews {
+                            domain: Some("youtube.com".into()),
+                            views: 100,
+                            ..Default::default()
+                        }),
                     }),
-                }),
-                AnalyticsData::Project(ProjectAnalytics {
-                    source_project: test_project_2,
-                    metrics: ProjectMetrics::Downloads(ProjectDownloads {
-                        domain: Some("discord.com".into()),
-                        downloads: 150,
-                        ..Default::default()
+                    AnalyticsData::Project(ProjectAnalytics {
+                        source_project: test_project_2,
+                        metrics: ProjectMetrics::Downloads(ProjectDownloads {
+                            domain: Some("discord.com".into()),
+                            downloads: 150,
+                            ..Default::default()
+                        }),
                     }),
-                }),
-            ]),
-            TimeSlice(vec![AnalyticsData::Project(ProjectAnalytics {
-                source_project: test_project_3,
-                metrics: ProjectMetrics::Revenue(ProjectRevenue {
-                    revenue: Decimal::new(20000, 2),
-                }),
-            })]),
-        ]);
-        let target = json!([
-            [
-                {
-                    "source_project": test_project_1.to_string(),
-                    "metric_kind": "views",
-                    "domain": "youtube.com",
-                    "views": 100,
-                },
-                {
-                    "source_project": test_project_2.to_string(),
-                    "metric_kind": "downloads",
-                    "domain": "discord.com",
-                    "downloads": 150,
-                }
+                ]),
+                TimeSlice(vec![AnalyticsData::Project(ProjectAnalytics {
+                    source_project: test_project_3,
+                    metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                        revenue: Decimal::new(20000, 2),
+                    }),
+                })]),
             ],
-            [
-                {
-                    "source_project": test_project_3.to_string(),
-                    "metric_kind": "revenue",
-                    "revenue": "200.00",
-                }
+        };
+        let target = json!({
+            "metrics": [
+                [
+                    {
+                        "source_project": test_project_1.to_string(),
+                        "metric_kind": "views",
+                        "domain": "youtube.com",
+                        "views": 100,
+                    },
+                    {
+                        "source_project": test_project_2.to_string(),
+                        "metric_kind": "downloads",
+                        "domain": "discord.com",
+                        "downloads": 150,
+                    }
+                ],
+                [
+                    {
+                        "source_project": test_project_3.to_string(),
+                        "metric_kind": "revenue",
+                        "revenue": "200.00",
+                    }
+                ]
             ]
-        ]);
+        });
 
         assert_eq!(serde_json::to_value(src).unwrap(), target);
     }
