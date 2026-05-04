@@ -135,14 +135,25 @@ export function buildChartDatasets(
 	selectedBreakdown: AnalyticsBreakdownPreset,
 	selectedFilters: AnalyticsSelectedFilters,
 	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
+	expectedBreakdownValues: readonly string[] = [],
+	sliceCount: number = timeSlices.length,
 ): ChartDataset[] {
 	const selectedProjectIds = new Set(selectedProjects.map((project) => project.id))
 	if (selectedProjectIds.size === 0) {
 		return []
 	}
 
+	const dataLength = Math.max(sliceCount, timeSlices.length)
+
 	if (selectedBreakdown !== 'none') {
 		const dataByBreakdown = new Map<string, number[]>()
+
+		for (const expectedValue of expectedBreakdownValues) {
+			if (expectedValue === ALL_BREAKDOWN_VALUE) continue
+			if (!dataByBreakdown.has(expectedValue)) {
+				dataByBreakdown.set(expectedValue, new Array(dataLength).fill(0))
+			}
+		}
 
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
@@ -150,19 +161,16 @@ export function buildChartDatasets(
 				if (!selectedProjectIds.has(point.source_project)) continue
 				if (!doesAnalyticsPointMatchFilters(point, selectedFilters)) continue
 
-				const value = getMetricValue(point, activeStat)
-				if (value === 0) continue
-
 				const breakdownValue = getAnalyticsBreakdownValue(point, selectedBreakdown)
 				if (breakdownValue === ALL_BREAKDOWN_VALUE) continue
 
 				let breakdownData = dataByBreakdown.get(breakdownValue)
 				if (!breakdownData) {
-					breakdownData = new Array(timeSlices.length).fill(0)
+					breakdownData = new Array(dataLength).fill(0)
 					dataByBreakdown.set(breakdownValue, breakdownData)
 				}
 
-				breakdownData[sliceIndex] += value
+				breakdownData[sliceIndex] += getMetricValue(point, activeStat)
 			}
 		})
 
@@ -180,7 +188,7 @@ export function buildChartDatasets(
 
 	const dataByProjectId = new Map<string, number[]>()
 	for (const project of selectedProjects) {
-		dataByProjectId.set(project.id, new Array(timeSlices.length).fill(0))
+		dataByProjectId.set(project.id, new Array(dataLength).fill(0))
 	}
 
 	timeSlices.forEach((slice, sliceIndex) => {

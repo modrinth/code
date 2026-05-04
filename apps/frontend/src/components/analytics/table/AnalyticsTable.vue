@@ -113,6 +113,7 @@ const {
 	selectedFilters,
 	fetchRequest,
 	timeSlices,
+	filterOptions,
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
 	getVersionDisplayName,
@@ -176,17 +177,82 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 	const nextTimeSlices = timeSlices.value
 	const nextSelectedBreakdown = selectedBreakdown.value
 
-	if (!nextFetchRequest || nextTimeSlices.length === 0 || selectedProjectIdSet.value.size === 0) {
+	if (!nextFetchRequest || selectedProjectIdSet.value.size === 0) {
+		return []
+	}
+
+	const sliceCount = getSliceCount(nextFetchRequest.time_range, nextTimeSlices.length)
+	const includeDate = tableMode.value === 'date_breakdown'
+
+	const breakdownValues = new Set<string>()
+	if (nextSelectedBreakdown === 'none') {
+		for (const projectId of selectedProjectIds.value) {
+			breakdownValues.add(projectId)
+		}
+	} else {
+		for (const fallback of getFallbackBreakdownValues(nextSelectedBreakdown)) {
+			breakdownValues.add(fallback)
+		}
+		for (const slice of nextTimeSlices) {
+			for (const point of slice) {
+				if (!('source_project' in point)) continue
+				if (!selectedProjectIdSet.value.has(point.source_project)) continue
+				if (!doesAnalyticsPointMatchFilters(point, selectedFilters.value)) continue
+
+				const pointStat = getStatForMetric(point.metric_kind)
+				if (!pointStat || !relevantStats.value.has(pointStat)) continue
+
+				const breakdownValue = getBreakdownValue(point, nextSelectedBreakdown)
+				if (breakdownValue === ALL_BREAKDOWN_VALUE) continue
+				breakdownValues.add(breakdownValue)
+			}
+		}
+	}
+
+	if (breakdownValues.size === 0) {
 		return []
 	}
 
 	const nextRows = new Map<string, AnalyticsTableRow>()
-	const sliceCount = getSliceCount(nextFetchRequest.time_range, nextTimeSlices.length)
+
+	if (includeDate) {
+		for (let sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++) {
+			const bucketRange = getSliceBucketRange(nextFetchRequest.time_range, sliceCount, sliceIndex)
+			const dateMs = bucketRange.end.getTime()
+			const dateLabel = formatBucketEndLabel(bucketRange.end, showTimeInBucketLabel.value)
+
+			for (const breakdown of breakdownValues) {
+				const rowId = `${dateMs}::${breakdown}`
+				nextRows.set(rowId, {
+					id: rowId,
+					date: dateLabel,
+					dateMs,
+					breakdown,
+					views: 0,
+					downloads: 0,
+					revenue: 0,
+					playtime: 0,
+				})
+			}
+		}
+	} else {
+		for (const breakdown of breakdownValues) {
+			nextRows.set(breakdown, {
+				id: breakdown,
+				date: '',
+				dateMs: 0,
+				breakdown,
+				views: 0,
+				downloads: 0,
+				revenue: 0,
+				playtime: 0,
+			})
+		}
+	}
 
 	nextTimeSlices.forEach((slice, sliceIndex) => {
 		const bucketRange = getSliceBucketRange(nextFetchRequest.time_range, sliceCount, sliceIndex)
 		const dateMs = bucketRange.end.getTime()
-		const dateLabel = formatBucketEndLabel(bucketRange.end, showTimeInBucketLabel.value)
 
 		for (const point of slice) {
 			if (!('source_project' in point)) {
@@ -214,25 +280,11 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 				continue
 			}
 
-			const rowId = tableMode.value === 'date_breakdown' ? `${dateMs}::${breakdown}` : breakdown
-
-			let row = nextRows.get(rowId)
-
-			if (!row) {
-				row = {
-					id: rowId,
-					date: tableMode.value === 'date_breakdown' ? dateLabel : '',
-					dateMs: tableMode.value === 'date_breakdown' ? dateMs : 0,
-					breakdown,
-					views: 0,
-					downloads: 0,
-					revenue: 0,
-					playtime: 0,
-				}
-				nextRows.set(rowId, row)
+			const rowId = includeDate ? `${dateMs}::${breakdown}` : breakdown
+			const row = nextRows.get(rowId)
+			if (row) {
+				addMetricToRow(row, point)
 			}
-
-			addMetricToRow(row, point)
 		}
 	})
 
@@ -403,6 +455,33 @@ function getBreakdownValue(
 	selectedBreakdown: AnalyticsBreakdownPreset,
 ): string {
 	return getAnalyticsBreakdownValue(point, selectedBreakdown)
+}
+
+function getFallbackBreakdownValues(breakdown: AnalyticsBreakdownPreset): readonly string[] {
+	const filters = selectedFilters.value
+	const options = filterOptions.value
+	switch (breakdown) {
+		case 'country':
+			return filters.country.length > 0 ? filters.country : options.countries
+		case 'monetization':
+			return filters.monetization.length > 0 ? filters.monetization : ['monetized', 'unmonetized']
+		case 'download_source':
+			return filters.download_source.length > 0
+				? filters.download_source
+				: options.downloadSources
+		case 'download_reason':
+			return filters.download_reason.length > 0
+				? filters.download_reason
+				: options.downloadReasons
+		case 'version_id':
+			return filters.version_id.length > 0 ? filters.version_id : options.versionIds
+		case 'loader':
+			return filters.loader_type.length > 0 ? filters.loader_type : options.loaderTypes
+		case 'game_version':
+			return filters.game_version.length > 0 ? filters.game_version : options.gameVersions
+		default:
+			return []
+	}
 }
 
 function getSortComparison(
