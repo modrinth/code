@@ -11,7 +11,7 @@ export class LabrinthAnalyticsV3Module extends AbstractModule {
 	 * and affiliate codes.
 	 *
 	 * @param data - Analytics request body defining time range and requested metrics
-	 * @returns Promise resolving to analytics time slices
+	 * @returns Promise resolving to the analytics response, with time slices in `metrics`
 	 *
 	 * @example
 	 * ```typescript
@@ -26,6 +26,7 @@ export class LabrinthAnalyticsV3Module extends AbstractModule {
 	 *     project_views: { bucket_by: ['project_id'] },
 	 *   },
 	 * })
+	 * const timeSlices = response.metrics
 	 * ```
 	 */
 	public async fetch(

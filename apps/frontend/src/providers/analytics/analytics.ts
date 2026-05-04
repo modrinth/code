@@ -95,6 +95,7 @@ export interface AnalyticsDashboardContextValue {
 	filterOptions: ComputedRef<AnalyticsDashboardFilterOptions>
 	versionNumbersById: ComputedRef<Map<string, string>>
 	versionPublishedDatesById: ComputedRef<Map<string, string>>
+	projectVersionDownloadsById: ComputedRef<Map<string, number>>
 	gameVersionDownloadsByVersion: ComputedRef<Map<string, number>>
 	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
@@ -654,8 +655,12 @@ export function createAnalyticsDashboardContext(
 		refetch: refetchCurrentTimeSlices,
 	} = useQuery({
 		queryKey: computed(() => ['analytics', 'dashboard', 'current', fetchRequest.value]),
-		queryFn: () =>
-			client.labrinth.analytics_v3.fetch(fetchRequest.value as Labrinth.Analytics.v3.FetchRequest),
+		queryFn: async () => {
+			const response = await client.labrinth.analytics_v3.fetch(
+				fetchRequest.value as Labrinth.Analytics.v3.FetchRequest,
+			)
+			return response.metrics
+		},
 		enabled: computed(() => isAnalyticsFetchRequestReady(fetchRequest.value)),
 	})
 
@@ -693,10 +698,12 @@ export function createAnalyticsDashboardContext(
 			'countries-download-sources',
 			countryAndDownloadSourceFilterOptionsRequest.value,
 		]),
-		queryFn: () =>
-			client.labrinth.analytics_v3.fetch(
+		queryFn: async () => {
+			const response = await client.labrinth.analytics_v3.fetch(
 				countryAndDownloadSourceFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
-			),
+			)
+			return response.metrics
+		},
 		enabled: computed(() => countryAndDownloadSourceFilterOptionsRequest.value !== null),
 	})
 
@@ -749,10 +756,12 @@ export function createAnalyticsDashboardContext(
 		refetch: refetchPreviousTimeSlices,
 	} = useQuery({
 		queryKey: computed(() => ['analytics', 'dashboard', 'previous', previousFetchRequest.value]),
-		queryFn: () =>
-			client.labrinth.analytics_v3.fetch(
+		queryFn: async () => {
+			const response = await client.labrinth.analytics_v3.fetch(
 				previousFetchRequest.value as Labrinth.Analytics.v3.FetchRequest,
-			),
+			)
+			return response.metrics
+		},
 		enabled: computed(() => previousFetchRequest.value !== null),
 	})
 
@@ -831,6 +840,9 @@ export function createAnalyticsDashboardContext(
 	)
 	const versionPublishedDatesById = computed(
 		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.date_published])),
+	)
+	const projectVersionDownloadsById = computed(
+		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.downloads])),
 	)
 	const gameVersionDownloadsByVersion = computed(() => {
 		const downloadsByVersion = new Map<string, number>()
@@ -948,6 +960,7 @@ export function createAnalyticsDashboardContext(
 		filterOptions,
 		versionNumbersById,
 		versionPublishedDatesById,
+		projectVersionDownloadsById,
 		gameVersionDownloadsByVersion,
 		timeSlices,
 		previousTimeSlices,

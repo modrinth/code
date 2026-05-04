@@ -292,7 +292,9 @@ export namespace Labrinth {
 
 			export type AffiliateCodeRevenueField = 'affiliate_code_id'
 
-			export type FetchResponse = TimeSlice[]
+			export type FetchResponse = {
+				metrics: TimeSlice[]
+			}
 
 			export type TimeSlice = AnalyticsData[]
 
