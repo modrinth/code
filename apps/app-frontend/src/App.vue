@@ -1177,7 +1177,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<div id="teleports"></div>
 	<div
 		v-if="stateInitialized"
-		class="app-grid-layout experimental-styles-within relative"
+		class="app-grid-layout relative"
 		:class="{ 'disable-advanced-rendering': !themeStore.advancedRendering }"
 	>
 		<Transition name="fade">
@@ -1378,7 +1378,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	</div>
 	<div
 		v-if="stateInitialized"
-		class="app-contents experimental-styles-within"
+		class="app-contents"
 		:class="{
 			'sidebar-enabled': sidebarVisible,
 			'disable-advanced-rendering': !themeStore.advancedRendering,
@@ -1472,7 +1472,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<h3 class="text-base text-primary font-medium m-0">Playing as</h3>
 						<suspense>
-							<AccountsCard ref="accounts" mode="small" />
+							<AccountsCard ref="accounts" />
 						</suspense>
 					</div>
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">

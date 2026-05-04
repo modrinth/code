@@ -1,6 +1,6 @@
 <template>
 	<LoadingIndicator v-if="!projectV3" class="py-6" />
-	<div v-else-if="showEnvironmentMigration" class="card experimental-styles-within">
+	<div v-else-if="showEnvironmentMigration" class="card">
 		<h2 class="m-0 mb-2 block text-lg font-extrabold text-contrast">Project environment</h2>
 		<EnvironmentMigration />
 	</div>

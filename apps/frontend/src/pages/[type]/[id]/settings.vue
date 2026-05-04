@@ -164,7 +164,7 @@ watch(route, () => {
 			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 			@set-processing="setProcessing"
 		/>
-		<div class="experimental-styles-within grid gap-4 lg:grid-cols-[1fr_3fr]">
+		<div class="grid gap-4 lg:grid-cols-[1fr_3fr]">
 			<div>
 				<NavStack :items="navItems" />
 			</div>

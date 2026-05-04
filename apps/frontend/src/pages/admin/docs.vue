@@ -96,8 +96,8 @@ onMounted(() => {
 						</div>
 
 						<div class="mt-auto flex gap-2">
-							<ButtonStyled color="brand" class="flex-1">
-								<button class="w-full justify-center" @click="openPreview(id)">
+							<ButtonStyled color="brand">
+								<button class="w-full flex-1 justify-center" @click="openPreview(id)">
 									<PlayIcon class="h-4 w-4" aria-hidden="true" />
 									Preview
 								</button>

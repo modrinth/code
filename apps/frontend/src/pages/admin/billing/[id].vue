@@ -132,7 +132,7 @@
 			</div>
 		</div>
 	</NewModal>
-	<div class="page experimental-styles-within">
+	<div class="page">
 		<div
 			class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
 		>

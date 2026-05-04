@@ -67,50 +67,55 @@
 						</div>
 
 						<div class="table-cell">
-							<nuxt-link
-								class="btn icon-only"
-								:to="`/project/${project.slug ? project.slug : project.id}/settings`"
-							>
-								<SettingsIcon />
-							</nuxt-link>
+							<ButtonStyled circular>
+								<nuxt-link :to="`/project/${project.slug ? project.slug : project.id}/settings`">
+									<SettingsIcon />
+								</nuxt-link>
+							</ButtonStyled>
 						</div>
 					</div>
 				</div>
 				<div class="push-right input-group">
-					<Button @click="$refs.modalOpen?.hide()">
-						<XIcon />
-						Cancel
-					</Button>
-					<Button :disabled="!selectedProjects?.length" color="primary" @click="onSubmitHandler()">
-						<TransferIcon />
-						<span>
-							Transfer
+					<ButtonStyled type="outlined">
+						<button @click="$refs.modalOpen?.hide()">
+							<XIcon />
+							Cancel
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button :disabled="!selectedProjects?.length" @click="onSubmitHandler()">
+							<TransferIcon />
 							<span>
-								{{
-									selectedProjects.length === props.projects.length
-										? 'All'
-										: selectedProjects.length
-								}}
+								Transfer
+								<span>
+									{{
+										selectedProjects.length === props.projects.length
+											? 'All'
+											: selectedProjects.length
+									}}
+								</span>
+								<span>
+									{{ ' ' }}
+									{{ selectedProjects.length === 1 ? 'project' : 'projects' }}
+								</span>
 							</span>
-							<span>
-								{{ ' ' }}
-								{{ selectedProjects.length === 1 ? 'project' : 'projects' }}
-							</span>
-						</span>
-					</Button>
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</Modal>
-		<Button @click="$refs.modalOpen?.show()">
-			<TransferIcon />
-			<span>Transfer projects</span>
-		</Button>
+		<ButtonStyled>
+			<button @click="$refs.modalOpen?.show()">
+				<TransferIcon />
+				<span>Transfer projects</span>
+			</button>
+		</ButtonStyled>
 	</div>
 </template>
 
 <script setup>
 import { BoxIcon, SettingsIcon, TransferIcon, XIcon } from '@modrinth/assets'
-import { Avatar, Button, Checkbox, CopyCode, Modal } from '@modrinth/ui'
+import { Avatar, ButtonStyled, Checkbox, CopyCode, Modal } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 
 const EDIT_DETAILS = 1 << 2

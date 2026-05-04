@@ -174,7 +174,6 @@
 				>
 					<button
 						v-tooltip="formatMessage(messages.downloadLatestBackupTooltip)"
-						class="!border-surface-4"
 						data-server-listing-button
 						@click="onDownloadBackup"
 					>
@@ -184,7 +183,6 @@
 				<ButtonStyled v-if="noticeButtons.copyId" type="outlined">
 					<button
 						v-tooltip="formatMessage(messages.copyCodeToClipboardTooltip)"
-						class="!border-surface-4"
 						data-server-listing-button
 						@click="copyToClipboard(server_id)"
 					>
