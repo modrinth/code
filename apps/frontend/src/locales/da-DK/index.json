@@ -1949,11 +1949,17 @@
   "report.could-not-find": {
     "message": "Kunne ikke finde {item, select, project {projekt} version {version} user {bruger} other {indhold}}"
   },
+  "report.for.violation.description": {
+    "message": "Eksempler inkluderer ondsindet, spam, stødende, vildledende, misvisende og ulovligt indhold."
+  },
   "report.not-for.dmca": {
     "message": "DMCA-fjernelser"
   },
   "report.not-for.dmca.description": {
     "message": "Se vores <policy-link>Politik Om Pphavsret</policy-link>."
+  },
+  "report.note.copyright.1": {
+    "message": "Bemærk venligst, at du *ikke* indsender en anmodning om fjernelse i henhold til DMCA, men derimod en anmeldelse af genuploadet indhold."
   },
   "report.please-report": {
     "message": "Venligst anmeld:"
@@ -2041,6 +2047,9 @@
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Side til shaders"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Flytter sidebjælken til venstre for sidens indhold."
   },
   "settings.pats.modal.create.name.label": {
     "message": "Navn"

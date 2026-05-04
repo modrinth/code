@@ -177,7 +177,7 @@
     "message": "amit eddig használtál"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "A Modrinth alkalmazás képernyőképe, amelyen a Cobblemon profil a „Tartalom” oldalon van megnyitva."
+    "message": "A Modrinth App képernyőképe, amelyen a Cobblemon profil a „Tartalom” oldalon van megnyitva."
   },
   "app-marketing.hero.description": {
     "message": "A Modrinth App egy egyedülálló, nyílt forráskódú kliens, amely lehetővé teszi, hogy kedvenc modjaidat játssz, és naprakészen tartsd őket, mindezt egy kis, praktikus csomagban."
@@ -228,7 +228,7 @@
     "message": "Visszaállítási e-mail küldése"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Írja be az e-mail címét az alábbi mezőbe, és küldünk Önnek egy hivatkozást, amivel vissza tudja állítani a fiókját."
+    "message": "Írd be az e-mail címedet az alábbi mezőbe, és küldünk neked egy hivatkozást, amivel vissza tudja állítani a fiókod."
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Egy e-mail el lett küldve önnek az email-címére amennyiben az email-cím el volt mente a fiókjában."
@@ -267,7 +267,7 @@
     "message": "Kód beírása..."
   },
   "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Elfelejtted a jelszavad?</forgot-password-link> • <create-account-link>Hozz létre egy fiókót</create-account-link>"
+    "message": "<forgot-password-link>Elfelejtetted a jelszavad?</forgot-password-link> • <create-account-link>Hozz létre egy fiókot</create-account-link>"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Bejelentkezés ezzel"
@@ -282,7 +282,7 @@
     "message": "Fiók létrehozása"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Fiók létrehozásával Ön elfogadja a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
+    "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "A jelszavak nem jegyeznek!"
@@ -339,7 +339,7 @@
     "message": "Most már része vagy annak a fantasztikus fejlesztők és felfedezők közösségének, akik már építenek, letöltenek és naprakészek maradnak a csodálatos modokkal kapcsolatban."
   },
   "auth.welcome.label.tos": {
-    "message": "Fiók létrehozásával Ön elfogadja a Modrinth <terms-link>felhasználási feltételeit</terms-link> és <privacy-policy-link>adatvédelmi irányelveit</privacy-policy-link>."
+    "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
   },
   "auth.welcome.long-title": {
     "message": "Üdvözlünk a Modrinth-onl!"
@@ -572,6 +572,15 @@
   "dashboard.affiliate-links.search": {
     "message": "Társulati linkek keresése..."
   },
+  "dashboard.analytics.from-projects": {
+    "message": "{count} projektből"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Összes letöltés"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Összes követő"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Új létrehozása"
   },
@@ -595,6 +604,15 @@
   },
   "dashboard.collections.long-title": {
     "message": "Gyűjteményeid"
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Név (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Nemrég létrehozott"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Nemrég frissített"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Letöltés {formType}"
@@ -663,7 +681,7 @@
     "message": "Üzleti szervezet"
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
-    "message": "Az \"Üzleti szervezet\" egy olyan regisztrált szervezetre utal, mint egy vállalat, partnerség vagy LLC."
+    "message": "Az „üzleti szervezet” egy olyan regisztrált szervezetre utal, mint egy vállalat, partnerség vagy Kft."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
     "message": "Szervezetként vagy személyként veszel fel?"
@@ -848,6 +866,150 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Elérted a(z) <b>{withdrawLimit}</b> kifizetési limitet. További kifizetésekhez ki kell töltened egy adózási űrlapot."
   },
+  "dashboard.head-title": {
+    "message": "Irányítópult"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Összes megjelölése olvasottként"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Előzmények megtekintése"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Nincsenek olvasatlan értesítéseid."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Hiba az értesítések betöltése során:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Előzmények"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Értesítési előzmények"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Összes megtekintése"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Értesítési előzmények megtekintése"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "További {extraNotifs} értesítés megtekintése"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Értesítések betöltése"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Szervezet létrehozása"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Hozz létre egy szervezetet!"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} tag"
+  },
+  "dashboard.organizations.title": {
+    "message": "Szervezetek"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Több projektet is szerkeszthetsz egyszerre, ha kiválasztod őket alább."
+  },
+  "dashboard.projects.empty": {
+    "message": "Még nincsenek projektjeid. Kattints a fenti zöld gombra a kezdéshez."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projektek"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "és még {count} további..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Link törlése"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Linkek szerkesztése"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "A változtatások <strong>{count}</strong> projektre vonatkoznak."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Meghívólink a Discord szerveredre."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord meghívó"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Egy hely, ahol a felhasználók hibákat, problémákat és aggályokat jelenthetnek a projekteddel kapcsolatban."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Hibakereső"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Adj meg egy érvényes Discord-meghívólinket"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Adj meg egy érvényes linket"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Összes projekt megjelenítése"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Egy oldal/kódtár, amely a projekt forráskódját tartalmazza"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Forráskód"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Egy oldal, amely információkat, dokumentációt és segítséget tartalmaz a projekthez."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Wiki oldal"
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "{title} ikonja"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "A projekt üzenetet kapott a moderátoroktól. További információkért nézd meg a projektet."
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Növekvő"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Csökkenő"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Név"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Állapot"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Típus"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Ikon"
+  },
+  "dashboard.projects.table.id": {
+    "message": "Azonosító"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Név"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Állapot"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Típus"
+  },
+  "dashboard.report.title": {
+    "message": "{id} jelentése"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Aktív jelentések"
+  },
+  "dashboard.reports.title": {
+    "message": "Jelentések"
+  },
   "dashboard.revenue.available-now": {
     "message": "Elérhető most"
   },
@@ -884,6 +1046,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Letöltés CSV formátumban"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Tranzakcióelőzmények"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Tranzakciók"
   },
@@ -893,8 +1058,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "A kifizetések és a felvételek itt jelennek meg."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Múlt hónapban"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Ebben a hónapban"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Összes megtekintése"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Minden év"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "A kifizetéseid ideiglenesen zárolva vannak, mert az adóazonosító számod vagy a társadalombiztosítási számod nem egyezik az adóhatóság (IRS) nyilvántartásában szereplő adatokkal. Kérjük, vedd fel a kapcsolatot az ügyfélszolgálattal az adóbevallásod visszaállításához és újbóli benyújtásához."
@@ -907,6 +1081,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Pénzfelvétel"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Aktív jelentések"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Statisztika"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Fejlesztők"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Irányítópult"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Értesítések"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Szervezetek"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Áttekintés"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projektek"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Bevétel"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Fiók"
@@ -1200,7 +1401,7 @@
     "message": "Add hozzá saját domainedet a szerveredhez, foglalj le akár 15 portot azokhoz a modokhoz, amelyeknek szükségük van rá, és még sok más."
   },
   "hosting-marketing.included.backups-included": {
-    "message": "Tartalmaz biztonsági másolatokat"
+    "message": "Tartalmaz biztonsági mentéseket"
   },
   "hosting-marketing.included.backups-included.description": {
     "message": "Minden szerverhez 15 biztonságosan tárolt, külső helyszínen tárolt biztonsági másolat tartozik."
@@ -1248,7 +1449,7 @@
     "message": "Pontosan tudod, mire van szükséged?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Próbáld ki 5 napig ingyen egy <orange>3 GB-os szervert</orange>, amelyet a <orange>Medal</orange> biztosít"
+    "message": "Próbálj ki 5 napig ingyen egy <orange>3 GB-os szervert</orange>, amelyet a <orange>Medal</orange> biztosít"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "További információk"
@@ -1461,7 +1662,7 @@
     "message": "Új gyűjtemény"
   },
   "layout.action.new-organization": {
-    "message": "Új Szervezet"
+    "message": "Új szervezet"
   },
   "layout.action.new-project": {
     "message": "Új projekt"
@@ -2979,7 +3180,7 @@
     "message": "Kétlépcsős hitelesítés"
   },
   "settings.account.two-factor.backup.intro": {
-    "message": "Töltse le ezeket a biztonsági kódokat, és őrizze meg őket biztonságos helyen. Ha valaha is elveszítené a hozzáférését az eszközéhez, ezeket a kódokat használhatja a kétlépcsős hitelesítés kódja helyett! Ezeket a kódokat ugyanúgy óvnia kell, mint a jelszavát."
+    "message": "Töltsd le ezeket a biztonsági kódokat, és őrizd meg őket biztonságos helyen. Ha valaha is elveszítenéd a hozzáférésedet az eszközödhöz, ezeket a kódokat használhatod a kétlépcsős hitelesítés kódja helyett! Ezeket a kódokat ugyanúgy óvnod kell, mint a jelszavadat."
   },
   "settings.account.two-factor.backup.single-use": {
     "message": "A biztonsági kódok csak egyszer használhatók fel."

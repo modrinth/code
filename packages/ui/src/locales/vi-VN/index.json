@@ -452,9 +452,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Tải tệp lên"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Đang tải tệp lên ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Tất cả nội dung đã chọn đều đã được tắt"
   },
@@ -706,9 +703,6 @@
   },
   "files.operations.extracting": {
     "defaultMessage": "Đang giải nén {source}"
-  },
-  "files.operations.failed": {
-    "defaultMessage": "Thất bại"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack từ URL"
@@ -1132,12 +1126,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Chế độ chơi không xác định"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "Các file đang trong quá trình upload. Rời khỏi trang này sẽ hủy upload và mất các thay đổi của bạn."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Đang trong quá trình upload"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "Tương thích {count} cái với {count, plural, other {instance}}"
@@ -2588,20 +2576,11 @@
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Đã có lỗi xảy ra khi đang khôi phục từ bản sao lưu {backupName}. Vui lòng thử lại hoặc liên hệ bộ phận hỗ trợ nếu lỗi vẫn tiếp diễn."
   },
-  "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Khôi phục từ bản sao lưu thất bại"
-  },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Khôi phục từ bản sao lưu {backupName} đã được đưa vào hàng chờ và sẽ sớm bắt đầu."
   },
-  "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Khôi phục từ bản sao lưu đã được đưa vào hàng chờ"
-  },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Máy chủ của bạn đã được khôi phục từ bản sao lưu {backupName} và sẵn sàng để khởi động."
-  },
-  "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Khôi phục từ bản sao lưu thành công"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Đang khôi phục máy chủ của bạn từ bản sao lưu {backupName}. Điều này có thể mất vài phút."
@@ -2614,12 +2593,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Lịch sao lưu"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Tạo sao lưu thất bại"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Khôi phục từ sao lưu thất bại"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Sao lưu thủ công"

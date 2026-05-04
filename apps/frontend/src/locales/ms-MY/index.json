@@ -848,6 +848,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Anda telah menggunakan had pengeluaran anda sebanyak <b>{withdrawLimit}</b>. Anda mesti melengkapkan borang cukai untuk mengeluarkan lebih banyak wang."
   },
+  "dashboard.projects.sort.option.name": {
+    "message": "Nama"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Jenis"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Ikon"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nama"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Jenis"
+  },
   "dashboard.revenue.available-now": {
     "message": "Tersedia sekarang"
   },

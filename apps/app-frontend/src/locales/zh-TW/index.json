@@ -1,4 +1,103 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "正在下載 Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "下載"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "隱藏更多執行中的實例"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "設為主要實例"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "沒有執行中的實例"
+  },
+  "app.action-bar.offline": {
+    "message": "離線"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "主要實例"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "顯示更多執行中的實例"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "停止實例"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "查看正在下載的項目"
+  },
+  "app.action-bar.view-instance": {
+    "message": "查看實例"
+  },
+  "app.action-bar.view-logs": {
+    "message": "查看紀錄檔"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "啟用進階繪製（如模糊效果）；若無硬體加速可能會導致效能問題。"
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "進階繪製"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "請選擇你偏好的 Modrinth App 色彩主題。"
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "色彩主題"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "變更啟動器開啟時的頁面。"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "首頁"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "遊戲庫"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "預設起始頁面"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "在外觀頁面中隱藏玩家上方的名牌。"
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "隱藏名牌"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "在首頁的「繼續遊玩」區塊中顯示最近進入的世界。"
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "繼續遊玩世界"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "當 Minecraft 處理程序啟動時最小化啟動器。"
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "最小化啟動器"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "使用系統視窗外框（需要重新啟動應用程式）。"
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "原生裝飾"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "選擇選項"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "啟用切換側邊欄的功能。"
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "切換側邊欄"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "如果你嘗試安裝非 Modrinth 代管的 Modrinth 封裝檔案 (.mrpack)，我們會在安裝前確保你已了解相關風險。"
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "在安裝未知模組包前發出警告"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft 驗證伺服器現在可能無法使用。請檢查網際網路連線，然後再試一次。"
   },
@@ -38,6 +137,24 @@
   "app.browse.install-content-to-instance": {
     "message": "安裝至實例中"
   },
+  "app.browse.project-type.modpacks": {
+    "message": "模組包"
+  },
+  "app.browse.server.install": {
+    "message": "安裝"
+  },
+  "app.browse.server.installed": {
+    "message": "已安裝"
+  },
+  "app.browse.server.installing": {
+    "message": "安裝中"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "正在安裝模組包..."
+  },
   "app.export-modal.description-placeholder": {
     "message": "輸入模組包描述..."
   },
@@ -75,7 +192,7 @@
     "message": "刪除實例"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "此模組包已經安裝在<bold>{instanceName}</bold> 實例中了，您確定要再次安裝嗎？"
+    "message": "這個模組包已經安裝在實例「<bold>{instanceName}</bold>」中了，確定要再次安裝嗎？"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "建立"
@@ -90,10 +207,10 @@
     "message": "專案"
   },
   "app.instance.mods.project-was-added": {
-    "message": "新增了「{name}」"
+    "message": "已新增「{name}」"
   },
   "app.instance.mods.projects-were-added": {
-    "message": "新增了 {count} 個專案"
+    "message": "已新增 {count} 個專案"
   },
   "app.instance.mods.share-text": {
     "message": "快來看看我在模組包中使用的專案！"
@@ -102,7 +219,7 @@
     "message": "分享模組包內容"
   },
   "app.instance.mods.successfully-uploaded": {
-    "message": "上傳成功"
+    "message": "已成功上傳"
   },
   "app.instance.worlds.add-server": {
     "message": "新增伺服器"
@@ -111,10 +228,10 @@
     "message": "瀏覽伺服器"
   },
   "app.instance.worlds.delete-world-description": {
-    "message": "「{name}」將會被**永久刪除**，且無法還原。"
+    "message": "「{name}」將**永久刪除**，且無法還原。"
   },
   "app.instance.worlds.delete-world-title": {
-    "message": "你確定要永久刪除這個世界嗎？"
+    "message": "確定要永久刪除這個世界嗎？"
   },
   "app.instance.worlds.filter-modded": {
     "message": "模組"
@@ -141,7 +258,7 @@
     "message": "「{name}」({address}) 將從你的清單中移除（包含遊戲內），且無法還原。"
   },
   "app.instance.worlds.remove-server-title": {
-    "message": "你確定要移除「{name}」嗎？"
+    "message": "確定要移除「{name}」嗎？"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜尋 {count} 個世界..."
@@ -321,7 +438,7 @@
     "message": "待處理"
   },
   "friends.no-friends-match": {
-    "message": "沒有符合「{query}」的好友"
+    "message": "找不到相符「{query}」的好友"
   },
   "friends.search-friends-placeholder": {
     "message": "搜尋好友..."
@@ -426,13 +543,13 @@
     "message": "選擇圖示"
   },
   "instance.settings.tabs.general.library-groups": {
-    "message": "實例庫群組"
+    "message": "遊戲庫群組"
   },
   "instance.settings.tabs.general.library-groups.create": {
     "message": "建立新的群組"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "實例庫群組讓你可以將實例整理到實例庫中的不同分類。"
+    "message": "遊戲庫群組讓你可以將實例整理到遊戲庫中的不同分類。"
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "輸入群組名稱"
@@ -447,10 +564,10 @@
     "message": "自訂啟動掛勾"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "掛勾讓進階使用者能在遊戲啟動前和啟動後執行特定的系統命令。"
+    "message": "掛勾讓進階使用者能在遊戲啟動前和啟動後執行特定的系統指令。"
   },
   "instance.settings.tabs.hooks.post-exit": {
-    "message": "結束後執行"
+    "message": "結束後"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
     "message": "遊戲關閉後執行。"
@@ -575,6 +692,24 @@
   "instance.worlds.world_in_use": {
     "message": "世界正在使用中"
   },
+  "minecraft-account.add-account": {
+    "message": "添加賬號"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft 賬號"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "未登錄"
+  },
+  "minecraft-account.remove-account": {
+    "message": "移除賬號"
+  },
+  "minecraft-account.select-account": {
+    "message": "選擇賬號"
+  },
+  "minecraft-account.sign-in": {
+    "message": "登錄 Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "由該實例提供"
   },
@@ -598,5 +733,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "載入器由伺服器提供"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "只有上傳至 Modrinth 的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "不要再顯示這則警告"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "確認安裝"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "仍要安裝"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "惡意軟體經常透過 Discord 等平臺分享模組包檔案來進行傳播。"
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "我們在 Modrinth 上找不到這個檔案。強烈建議你僅安裝來自信任來源的檔案。"
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "未知檔案警告"
   }
 }

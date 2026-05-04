@@ -23,12 +23,6 @@
   "app.browse.already-added": {
     "message": "เพิ่มแล้ว"
   },
-  "app.browse.hide-added-servers": {
-    "message": "ซ่อนเซิร์ฟเวอร์ที่เพิ่มแล้ว"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "ซ่อนเนื้อหาที่ติดตั้งแล้ว"
-  },
   "app.browse.install-content-to-instance": {
     "message": "ติดตั้งเนื้อหาลงในอินสแตนซ์"
   },

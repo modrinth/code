@@ -108,7 +108,7 @@
     "message": "Pourcentage du processeur"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n'utilisant que 150 Mo de RAM !"
+    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n'utilisant que 150 Mo de mémoire vive !"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"

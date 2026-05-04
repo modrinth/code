@@ -20,12 +20,6 @@
   "app.browse.discover-servers": {
     "message": "Opdag servere"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Gem tilføjet servere"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Gem installeret indhold"
-  },
   "app.export-modal.description-placeholder": {
     "message": "Indtast modpack beskrivelse..."
   },

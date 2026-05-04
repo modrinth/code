@@ -1,4 +1,103 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Pobieranie Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Pobrania"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Ukryj włączone instancje"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Ustaw jako główną instancję"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Żadna instancja nie jest włączona"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Główna instancja"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Pokaż więcej włączonych instancji"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Zatrzymaj instancję"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Pokaż aktualnie pobierane"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Pokaż instancję"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Pokaż logi"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Włącza zaawansowane renderowanie, takie jak efekty rozmycia, które może powodować problemy z wydajnością bez sprzętowej akceleracji renderowania."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Zaawansowane renderowanie"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Wybierz preferowany motyw w Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Motyw"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Ustaw stronę, która pojawia się po włączeniu launchera."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Strona główna"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Biblioteka"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Domyślna strona główna"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Wyłącza nazwę użytkownika na stronie skórek."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Schowaj nazwę"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Pokazuje ostatnie światy w sekcji \"Wskocz z powrotem do światów\" na stronie głównej."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Wskocz z powrotem do światów"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimalizuj launcher po włączeniu procesu Minecraft."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimalizuj launcher"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Używaj systemowej ramki okna (wymaga ponownego uruchomienia)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Systemowe dekoracje"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Wybierz opcję"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Umożliwia przełączenie paska bocznego."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Przełącz pasek boczny"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Jeżeli spróbujesz zainstalować plik Modrinth Pack (.mrpack) którego nie można znaleźć na Modrinth, poinformujemy cię o możliwym ryzyku, zanim go zainstalujesz."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Ostrzegaj mnie przed instalowaniem nieznanych paczek modów"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Serwery uwierzytelniania Minecraft mogą aktualnie nie działać. Sprawdź swoje połączenie z internetem i spróbuj ponownie później."
   },
@@ -30,13 +129,31 @@
     "message": "Odkryj serwery"
   },
   "app.browse.hide-added-servers": {
-    "message": "Ukryj dodane serwery"
+    "message": "Ukryj już dodane serwery"
   },
   "app.browse.hide-installed-content": {
-    "message": "Ukryj zainstalowane zasoby"
+    "message": "Ukryj już dodane zasoby"
   },
   "app.browse.install-content-to-instance": {
     "message": "Zainstaluj zasoby do instancji"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Paczki modów"
+  },
+  "app.browse.server.install": {
+    "message": "Zainstaluj"
+  },
+  "app.browse.server.installed": {
+    "message": "Zainstalowano"
+  },
+  "app.browse.server.installing": {
+    "message": "Instalowanie"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Instalowanie paczki modów..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Wprowadź opis paczki modów..."
@@ -598,5 +715,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader jest dostarczony przez serwer"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "Plik jest sprawdzony tylko, jeżeli został przesłany na Modrinth, niezależnie od formatu (w tym pliki .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Nie pokazuj ponownie"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Potwierdź instalację"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Instaluj mimo to"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Wirusy są często kryte w plikach paczek modów przesyłanych na platformach takich jak Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "Nie mogliśmy znaleźć tego pliku na Modrinth. Stanowczo zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Ostrzeżenie o nieznanym pliku"
   }
 }

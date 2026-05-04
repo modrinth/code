@@ -548,12 +548,6 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ukjent spillmodus"
   },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "Filer blir fortsatt oppdatert. Viss du går ut av denne sida, så avbryter du opplastinga og endringene dine kan forsvinne."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Opplasting foregår"
-  },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} kompatable {count, plural, one {instanse} other {instanser}}"
   },
@@ -1648,12 +1642,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Sikkerhetskopiplan"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Kunne ikke gjenopprette fra backup"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Kunne ikke gjenopprette fra backup"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuell sikkerhetskopiering"
