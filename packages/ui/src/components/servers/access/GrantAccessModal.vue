@@ -43,9 +43,9 @@
 						</div>
 					</template>
 				</Combobox>
-				<p class="m-0 text-base text-primary">
+				<span class="m-0 text-base text-primary">
 					{{ formatMessage(messages.targetHelp) }}
-				</p>
+				</span>
 			</div>
 
 			<div class="flex flex-col gap-2">
