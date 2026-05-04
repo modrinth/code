@@ -29,12 +29,6 @@
   "app.browse.discover-servers": {
     "message": "Ontdek servers"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Verstop toegevoegde servers"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Verberg Geïnstalleerde inhoud"
-  },
   "app.browse.install-content-to-instance": {
     "message": "Installeer inhoud naar instantie"
   },

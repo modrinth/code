@@ -384,7 +384,7 @@
     "message": "Koleksiyon bulunamadı"
   },
   "collection.label.created-at": {
-    "message": "{ago} tarihinde yaratıldı"
+    "message": "{ago} tarihinde oluşturuldu"
   },
   "collection.label.curated-by": {
     "message": "Hazırlayan"
@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Ortaklık bağlantısı oluştur"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Yönlendirme kodu bulunamadı."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Ortaklık bağlantıları yüklenemedi"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Ortaklık bağlantılarını ara..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "{count} {count, plural, one {project} other {projects}}'den"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Toplam indirmeler"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Toplam takipçiler"
   },
   "dashboard.collections.button.create-new": {
     "message": "Yeni oluştur"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Koleksiyonların"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Koleksiyonlarda ara..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "İsim (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Son oluşturulanlar"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Son Güncellenen"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} İndirin"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "<b>{withdrawLimit}</b> çekme limitinizi kadarını kullandınız. Daha fazla çekmek için vergi formunu gerekir."
   },
+  "dashboard.head-title": {
+    "message": "Kontrol Paneli"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Hepsini okundu işaretle"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Geçmişi görüntüle"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Okunmamış bildiriminiz yok."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Bildirimler yüklenirken hata oluştu:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Geçmiş"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Bildirim geçmişi"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Hepsi"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Bildirim geçmişini gör"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "{extraNotifs} daha fazla {extraNotifs, plural, one {notification} other {notifications}} görüntüle"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Bildirimler yükleniyor..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Organizasyon oluştur"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Organizasyon oluştur!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Kuruluşlar alınamadı"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {üye} other {üyeler}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organizasyonlar"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Aşağıdan seçerek birden fazla projeyi düzenleyebilirsiniz."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Sunucu projeleri toplu düzenlemeyi desteklemez"
+  },
+  "dashboard.projects.empty": {
+    "message": "Henüz projeniz yok. Aşağıdaki yeşil butona basarak başlayın."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projeler"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "ve {count} daha..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Bağlantıyı temizle"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Bağlantıları düzenle"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Değişiklikler <strong>{count}</strong> {count, plural, one {proje} other {projeler}} için uygulanacaktır."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Aşağıda belirttiğiniz tüm bağlantılar, seçilen her projede üzerine yazılacaktır. Boş bıraktıklarınız dikkate alınmayacaktır. Çöp kutusu düğmesini kullanarak tüm seçili projelerden bir bağlantıyı silebilirsiniz."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Discord sunucunuzun davet bağlantısı."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord daveti"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Kullanıcıların projenizle ilgili hataları, sorunları ve endişelerini bildirebilecekleri bir alan."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Hata izleme"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Mevcut bağlantı silinecek"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Geçerli bir Discord davet URL'si girin"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Geçerli bir URL girin"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Tüm projeleri göster"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Projenizin kaynak kodunu içeren bir sayfa/depo"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Kaynak kodu"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Projeyle ilgili bilgiler, belgeler ve yardım içeren bir sayfa."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Viki sayfası"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Seçilen projelerin bağlantılarını toplu olarak düzenlendi."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "{title} için simge"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Projede moderatörlerden bir mesaj var. Daha fazla bilgi için projeyi inceleyin."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Lütfen ortam meta verilerini inceleyin"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Artan"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Azalan sırada sırala"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "İsim"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Durum"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Tip"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Simge"
+  },
+  "dashboard.projects.table.id": {
+    "message": "Kimlik"
+  },
+  "dashboard.projects.table.name": {
+    "message": "İsim"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Durum"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Tip"
+  },
+  "dashboard.report.title": {
+    "message": "Rapor {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Aktif raporlar"
+  },
+  "dashboard.reports.title": {
+    "message": "Raporlar"
+  },
   "dashboard.revenue.available-now": {
     "message": "Şu anda mevcut"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "CSV olarak indir"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "İşlem geçmişi"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "İşlemler"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Ödeme ve para çekimleriniz burada görünür."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Geçen ay"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Bu ay"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Hepsini göster"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Tüm zamanlar"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "TIN veya SSN numaranız IRS kayıtlarıyla eşleşmediği için para çekme işlemleriniz geçici olarak engellendi. Vergi formunuzu sıfırlamak ve yeniden göndermek için destekle iletişime geçin."
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Para Çek"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Aktif raporlar"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analitik"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Yaratıcılar"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Gösterge paneli"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Bildirimler"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organizasyonlar"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Genel Görünüm"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projeler"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Gelir"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Hesap"
@@ -2954,8 +3179,14 @@
   "settings.account.security.password.title": {
     "message": "Parola"
   },
+  "settings.account.security.providers.action.manage": {
+    "message": "Sağlayıcıları yönet"
+  },
   "settings.account.security.providers.description": {
     "message": "Hesabınıza giriş yöntemleri ekleyin veya kaldırın; GitHub, GitLab, Microsoft, Discord, Steam ve Google dahil."
+  },
+  "settings.account.security.providers.title": {
+    "message": "Kimlik doğrulama sağlayıcılarını yönet"
   },
   "settings.account.security.title": {
     "message": "Hesap güvenliği"
@@ -2972,14 +3203,35 @@
   "settings.account.security.two-factor.title": {
     "message": "İki aşamalı doğrulama"
   },
+  "settings.account.two-factor.backup.intro": {
+    "message": "Bu yedek kodları indirip güvenli bir yerde saklayın. Cihazınıza erişiminizi kaybederseniz, 2FA kodu yerine bu kodları kullanabilirsiniz. Bu kodları şifreniz gibi korumalısınız."
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "Yedek kodlar saece bir kere kullanılabilinir."
+  },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "Girilen kod yanlış!"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Devam etmek için iki aşamalı doğrulama kodunuzu girin."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Çift aşamalı kodu girin"
   },
   "settings.account.two-factor.field.code.placeholder": {
     "message": "Kodu girin..."
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "İki faktörlü kimlik doğrulama, oturum açmak için ikinci bir cihaza erişim gerektirerek hesabınızı güvenli tutar."
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "QR kod taranmazsa, gizli anahtarı manuel olarak girebilirsiniz:"
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "QR kodunu <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> veya başka bir 2FA uygulamasıyla tarayarak başlayın."
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "Erişimi doğrulamak için kimlik doğrulayıcıdan tek kullanımlık kodu girin."
   },
   "settings.account.two-factor.verify.label": {
     "message": "Kodu onayla"
@@ -3065,6 +3317,9 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://ornek.com"
   },
+  "settings.applications.head-title": {
+    "message": "Uygulamalar"
+  },
   "settings.applications.modal.header": {
     "message": "Proje bilgileri"
   },
@@ -3095,6 +3350,24 @@
   "settings.authorizations.revoke.action": {
     "message": "Kaldır"
   },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Bu işlem, uygulamanın hesabınıza erişimini iptal edecektir. Daha sonra istediğiniz zaman yeniden yetkilendirebilirsiniz."
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "Bu uygulamanın yetkisini kaldırmak istediğinizden emin misiniz?"
+  },
+  "settings.billing.charges.description": {
+    "message": "Modrinth hesabınıza geçmişte yapılan tüm ödemeleriniz burada listelenir:"
+  },
+  "settings.billing.charges.title": {
+    "message": "Past charges"
+  },
+  "settings.billing.expires": {
+    "message": "Son kullanma tarihi {date}"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "ay"
+  },
   "settings.billing.interval.quarter": {
     "message": "çeyrek"
   },
@@ -3117,7 +3390,10 @@
     "message": "Modrinth ve üreticilerini direkt olarak destekleyin"
   },
   "settings.billing.midas.benefits.title": {
-    "message": "Yararlar"
+    "message": "Ayrıcalıklar"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "Yıllık faturalandırmaya geçerek yılda {amount} tasarruf edin!"
   },
   "settings.billing.midas.upsell": {
     "message": "Modrinth Plus’a abone olun!"
@@ -3176,6 +3452,12 @@
   "settings.billing.price.slash-interval": {
     "message": "/{interval}"
   },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} Paylaşımlı CPU ( {bursts} CPU’ya kadar ani yükselme)"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "Bu abonelik için bağlı bir sunucu bulunamadı. Bunun birkaç olası nedeni vardır. Sunucunuzu yeni satın aldıysanız bu normaldir. Sunucunuzun hazırlanması bir saate kadar sürebilir. Eğer sunucuyu bir süre önce satın aldıysanız, büyük ihtimalle askıya alınmıştır. Eğer bunu beklemiyorsanız, lütfen aşağıdaki bilgilerle birlikte Modrinth Destek ile iletişime geçin:"
+  },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "Sunucu Kimliği:{id}"
   },
@@ -3187,6 +3469,18 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Yeniden abone olurken hata"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Sunucu şu anda iptal durumundaysa, sunucunun kurulması 10-15 dakika sürebilir."
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "Yeniden abonelik talebi gönderildi"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "Sunucu aboneliği başarıyla yeniden aktifleştirildi"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "Abonelik ödemen başarısız oldu. Lütfen ödeme yöntemini güncelle, ardından yeniden abonelik oluştur."
   },
   "settings.billing.pyro.status.processing": {
     "message": "Ödemeniz işleniyor. Sunucunuz ödeme tamamlandığında aktifleşecektir."
@@ -3203,6 +3497,15 @@
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Sunucu Abonelikleri"
   },
+  "settings.billing.renews": {
+    "message": "{date} tarihinde yenilenir"
+  },
+  "settings.billing.resubscribe": {
+    "message": "Yeniden abone ol"
+  },
+  "settings.billing.since": {
+    "message": "{date} tarihinden beri"
+  },
   "settings.billing.subscribe": {
     "message": "Abone ol"
   },
@@ -3211,6 +3514,12 @@
   },
   "settings.billing.subscription.title": {
     "message": "Abonelikler"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "{interval} planına geçiliyor"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "{interval} planına geç"
   },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Aylık faturalandırma size yıllık ek olarak {amount} maliyet çıkaracaktır"
@@ -3253,6 +3562,9 @@
   },
   "settings.display.project-list-layouts.mode.gallery": {
     "message": "Galeri"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "Izgara"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Mod paketleri sayfası"

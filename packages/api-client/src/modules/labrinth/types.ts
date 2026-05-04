@@ -1462,6 +1462,52 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace ExternalProjects {
+		export namespace Internal {
+			export type ExternalLicenseStatus =
+				| 'yes'
+				| 'with-attribution-and-source'
+				| 'with-attribution'
+				| 'no'
+				| 'permanent-no'
+				| 'unidentified'
+
+			export type LinkedFile = {
+				name: string | null
+				sha1: string
+			}
+
+			export type ExternalProject = {
+				id: number
+				title: string | null
+				status: ExternalLicenseStatus
+				link: string | null
+				exceptions: string | null
+				proof: string | null
+				flame_project_id: number | null
+				inserted_at: string | null
+				inserted_by: number | null
+				updated_at: string | null
+				updated_by: number | null
+				linked_files: LinkedFile[]
+			}
+
+			export type SearchRequest = {
+				title?: string
+				flame_id?: number
+			}
+
+			export type UpdateLicenseRequest = {
+				title?: string
+				status: ExternalLicenseStatus
+				link?: string
+				exceptions?: string
+				proof?: string
+				flame_project_id?: number
+			}
+		}
+	}
+
 	export namespace TechReview {
 		export namespace Internal {
 			export type SearchProjectsRequest = {

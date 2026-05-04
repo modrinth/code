@@ -1,4 +1,13 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Sedang memuat turun Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Muat Turun"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Laman utama"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Pelayan pengesahan Minecraft mungkin sedang tergendala sekarang. Periksa sambungan internet anda dan cuba lagi kemudian."
   },
@@ -28,12 +37,6 @@
   },
   "app.browse.discover-servers": {
     "message": "Temui pelayan"
-  },
-  "app.browse.hide-added-servers": {
-    "message": "Sembunyikan pelayan yang ditambah"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Sembunyikan kandungan yang dipasang"
   },
   "app.browse.install-content-to-instance": {
     "message": "Pasang kandungan ke dalam pemasangan"

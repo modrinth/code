@@ -33,7 +33,16 @@ pub struct Download {
 
 /// Why a project was downloaded.
 #[derive(
-    Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize,
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[display(rename_all = "snake_case")]
@@ -45,6 +54,15 @@ pub enum DownloadReason {
     Dependency,
     /// Project was downloaded as part of a modpack.
     Modpack,
+}
+
+impl std::str::FromStr for DownloadReason {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        serde_json::from_value(serde_json::Value::String(s.to_string()))
+            .map_err(|_| ())
+    }
 }
 
 #[derive(Debug, Row, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]

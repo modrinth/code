@@ -342,7 +342,7 @@
     "message": "建立帳號即表示您已同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
   },
   "auth.welcome.long-title": {
-    "message": "歡迎來到 Modrinth！"
+    "message": "歡迎使用 Modrinth！"
   },
   "auth.welcome.title": {
     "message": "歡迎"
@@ -369,7 +369,7 @@
     "message": "這將永久刪除這個收藏。此動作無法復原。"
   },
   "collection.delete-modal.title": {
-    "message": "你確定要刪除這個收藏嗎？"
+    "message": "確定要刪除這個收藏嗎？"
   },
   "collection.description": {
     "message": "{description} — 前往 Modrinth 查看 {username} 的收藏「{name}」"
@@ -555,7 +555,7 @@
     "message": "建立聯盟連結"
   },
   "dashboard.affiliate-links.empty.no-codes": {
-    "message": "未找到推廣代碼。"
+    "message": "找不到聯盟代碼。"
   },
   "dashboard.affiliate-links.error.title": {
     "message": "載入聯盟連結時發生錯誤"
@@ -570,19 +570,19 @@
     "message": "撤銷"
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "你確定要撤銷「{title}」聯盟連結嗎？"
+    "message": "確定要撤銷「{title}」聯盟連結嗎？"
   },
   "dashboard.affiliate-links.search": {
     "message": "搜尋聯盟連結..."
   },
   "dashboard.analytics.from-projects": {
-    "message": "來自 {count} {count, plural, one {project} other {projects}}"
+    "message": "來自 {count} 個專案"
   },
   "dashboard.analytics.total-downloads": {
     "message": "總下載量"
   },
   "dashboard.analytics.total-followers": {
-    "message": "總關注者"
+    "message": "總追蹤者人數"
   },
   "dashboard.collections.button.create-new": {
     "message": "新增"
@@ -609,13 +609,13 @@
     "message": "你的收藏"
   },
   "dashboard.collections.placeholder.search": {
-    "message": "搜尋收藏集…"
+    "message": "搜尋收藏..."
   },
   "dashboard.collections.sort.name-ascending": {
-    "message": "姓名（A-Z）"
+    "message": "名稱（A-Z）"
   },
   "dashboard.collections.sort.recently-created": {
-    "message": "最近創建"
+    "message": "最近建立"
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "最近更新"
@@ -879,7 +879,7 @@
     "message": "全部標記為已讀"
   },
   "dashboard.notifications.button.view-history": {
-    "message": "查看歷史記錄"
+    "message": "查看紀錄"
   },
   "dashboard.notifications.empty.no-unread": {
     "message": "您沒有任何未讀通知。"
@@ -888,22 +888,151 @@
     "message": "載入通知時發生錯誤："
   },
   "dashboard.notifications.history.label": {
-    "message": "歷史"
+    "message": "紀錄"
   },
   "dashboard.notifications.history.title": {
-    "message": "通知歷史記錄"
+    "message": "通知紀錄"
   },
   "dashboard.notifications.link.see-all": {
-    "message": "看全部"
+    "message": "查看全部"
   },
   "dashboard.notifications.link.view-history": {
-    "message": "查看通知記錄"
+    "message": "查看通知紀錄"
   },
   "dashboard.notifications.link.view-more": {
-    "message": "看更多 {extraNotifs} 條 {extraNotifs, plural, one {通知} other {通知}}"
+    "message": "查看另外 {extraNotifs} 則通知"
   },
   "dashboard.notifications.loading": {
-    "message": "正在載入通知…"
+    "message": "正在載入通知..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "建立組織"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "建立組織！"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "無法取得組織資訊"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural,one {成員} other {成員}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "組織"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "您可以透過在下方選擇項目來同時編輯多個項目。"
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "伺服器專案不支援大量編輯"
+  },
+  "dashboard.projects.empty": {
+    "message": "您目前還沒有任何項目。點擊上方綠色按鈕開始。"
+  },
+  "dashboard.projects.head-title": {
+    "message": "專案"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "{count}還有更多…"
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "清晰連結"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "編輯連結"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "更改將應用於<strong>{count}</strong>{count, plural,one {專案} other {專案}}。"
+  },
+  "dashboard.projects.links.description": {
+    "message": "您在下方指定的任何連結都將被覆蓋到每個選定的項目中。留空的連結將被忽略。您可以使用垃圾桶按鈕從所有選定的項目中清除連結。"
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "您的 Discord 伺服器邀請連結。"
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord 邀請"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "供使用者回報關於你專案的錯誤、問題與疑慮之處。"
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "問題追蹤器"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "將清除現有的連結"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "輸入有效的 Discord 邀請網址"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "輸入有效的網址"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "顯示所有專案"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "包含你專案原始碼的頁面或儲存庫"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "原始碼"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "包含專案資訊、文件及說明的頁面。"
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Wiki 頁面"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "已批次編輯所選專案的連結。"
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "{title} 的圖示"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "專案有一則來自管理員的訊息。請查看專案以了解更多資訊。"
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "請審查環境詮釋資料"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "遞增"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "遞減"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "名稱"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "狀態"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "類型"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "圖示"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "名稱"
+  },
+  "dashboard.projects.table.status": {
+    "message": "狀態"
+  },
+  "dashboard.projects.table.type": {
+    "message": "類型"
+  },
+  "dashboard.report.title": {
+    "message": "檢舉 {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "處理中的檢舉"
+  },
+  "dashboard.reports.title": {
+    "message": "檢舉"
   },
   "dashboard.revenue.available-now": {
     "message": "可提領"
@@ -941,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "下載為 CSV 檔案"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "交易紀錄"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "交易"
   },
@@ -950,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "你的付款和提領紀錄將顯示在這裡。"
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "上個月"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "這個月"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "查看全部"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "所有年份"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "由於你的稅務識別碼 (TIN) 或社會安全號碼 (SSN) 與美國國稅局 (IRS) 的紀錄不符，你的提領功能已暫時鎖定。請聯絡客服以重設並重新提交你的稅務表單。"
@@ -964,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "提領"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "處理中的檢舉"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "數據分析"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "創作者"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "資訊主頁"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "通知"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "組織"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "總覽"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "專案"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "收益"
   },
   "dashboard.withdraw.completion.account": {
     "message": "帳戶"
@@ -1539,7 +1707,7 @@
     "message": "技術審查"
   },
   "layout.avatar.alt": {
-    "message": "你的頭貼"
+    "message": "你的顯示圖片"
   },
   "layout.banner.account-action": {
     "message": "帳號需採取行動"
@@ -2895,7 +3063,7 @@
     "message": "刪除這個帳號"
   },
   "settings.account.delete.confirm.title": {
-    "message": "你確定要刪除你的帳號嗎？"
+    "message": "確定要刪除你的帳號嗎？"
   },
   "settings.account.delete.section.action": {
     "message": "刪除帳號"
@@ -3114,7 +3282,7 @@
     "message": "這將永久刪除這個應用程式並撤銷所有存取權杖。（永遠！）"
   },
   "settings.applications.delete.confirm.title": {
-    "message": "你確定要刪除這個應用程式？"
+    "message": "確定要刪除這個應用程式？"
   },
   "settings.applications.description.intro": {
     "message": "應用程式可用於在你的產品中驗證 Modrinth 使用者的身分。如需更多資訊，請參閱 <docs-link>Modrinth 的 API 文件</docs-link>。"
@@ -3186,7 +3354,7 @@
     "message": "這將撤銷該應用程式存取你帳號的權限。你隨時可以於稍後重新授權。"
   },
   "settings.authorizations.revoke.confirm.title": {
-    "message": "你確定要撤銷這個應用程式的授權嗎？"
+    "message": "確定要撤銷這個應用程式的授權嗎？"
   },
   "settings.billing.charges.description": {
     "message": "你對 Modrinth 帳號的所有過往支付紀錄皆會列於這裡："
@@ -3261,10 +3429,10 @@
     "message": "取消訂閱"
   },
   "settings.billing.modal.cancel.description": {
-    "message": "這將取消你的訂閱。你將保留你的權益，直到本期計費週期結束。"
+    "message": "這會取消你的訂閱。你的福利將保留到本期計費週期結束。"
   },
   "settings.billing.modal.cancel.title": {
-    "message": "你確定要取消訂閱嗎？"
+    "message": "確定要取消訂閱嗎？"
   },
   "settings.billing.modal.delete.action": {
     "message": "移除這個付款方式"
@@ -3273,7 +3441,7 @@
     "message": "這將會永遠移除這個付款方式（真的，再也回不去了）。"
   },
   "settings.billing.modal.delete.title": {
-    "message": "你確定要移除這個付款方式嗎？"
+    "message": "確定要移除這個付款方式嗎？"
   },
   "settings.billing.next": {
     "message": "下期："
@@ -3522,7 +3690,7 @@
     "message": "這將會永遠移除這個權杖（真的，再也回不去了）。"
   },
   "settings.pats.modal.delete.title": {
-    "message": "你確定要刪除這個權杖嗎？"
+    "message": "確定要刪除這個權杖嗎？"
   },
   "settings.pats.modal.edit.title": {
     "message": "編輯個人存取權杖"

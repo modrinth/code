@@ -1355,12 +1355,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Programul de backup"
   },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Nu s-a putut crea o copie de rezervă"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Restaurarea din backup nu a reușit"
-  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Copiere de rezervă manuală"
   },

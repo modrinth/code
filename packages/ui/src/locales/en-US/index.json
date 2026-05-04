@@ -758,6 +758,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Set up server"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "No"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Permanent no"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Unidentified"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "With attribution"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "With attribution and source"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Yes"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Extract summary"
   },
@@ -2788,6 +2806,9 @@
   },
   "project.settings.upload.title": {
     "defaultMessage": "Upload"
+  },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Permissions"
   },
   "project.settings.versions.title": {
     "defaultMessage": "Versions"

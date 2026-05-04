@@ -29,12 +29,6 @@
   "app.browse.discover-servers": {
     "message": "Otkrij servere"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Sakrije dodate servere"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Sakrije instalirani sadržaj"
-  },
   "app.browse.install-content-to-instance": {
     "message": "Instaliraj sadržaj na instancu"
   },
