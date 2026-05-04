@@ -419,6 +419,9 @@ function withBreakdownFields(
 			if (includesStat(breakdownStats, 'views') && includesStat(enabledStats, 'views')) {
 				views.push('monetized')
 			}
+			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+				downloads.push('monetized')
+			}
 			break
 		case 'download_source':
 			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
@@ -475,6 +478,9 @@ function withBreakdownFields(
 		const filterStats = getAnalyticsStatsForFilterCategory('monetization')
 		if (includesStat(filterStats, 'views') && includesStat(enabledStats, 'views')) {
 			views.push('monetized')
+		}
+		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+			downloads.push('monetized')
 		}
 	}
 

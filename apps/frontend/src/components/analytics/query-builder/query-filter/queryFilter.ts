@@ -43,7 +43,7 @@ const ANALYTICS_STATS_BY_DIMENSION: Record<
 	project: ANALYTICS_DASHBOARD_STAT_ORDER,
 	version_id: ['downloads', 'playtime'],
 	country: ['views', 'downloads', 'playtime'],
-	monetization: ['views'],
+	monetization: ['views', 'downloads'],
 	download_source: ['downloads'],
 	download_reason: ['downloads'],
 	game_version: ['downloads', 'playtime'],

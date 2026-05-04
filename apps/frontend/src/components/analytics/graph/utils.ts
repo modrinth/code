@@ -9,7 +9,7 @@ import {
 	doesAnalyticsPointMatchFilters,
 } from '~/providers/analytics/analytics'
 
-import { getAnalyticsBreakdownValue } from '../breakdown'
+import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'
 
 export type ChartDataset = {
 	projectId: string
@@ -154,6 +154,7 @@ export function buildChartDatasets(
 				if (value === 0) continue
 
 				const breakdownValue = getAnalyticsBreakdownValue(point, selectedBreakdown)
+				if (breakdownValue === ALL_BREAKDOWN_VALUE) continue
 
 				let breakdownData = dataByBreakdown.get(breakdownValue)
 				if (!breakdownData) {

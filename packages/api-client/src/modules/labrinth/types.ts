@@ -281,6 +281,7 @@ export namespace Labrinth {
 				| 'domain'
 				| 'site_path'
 				| 'country'
+				| 'monetized'
 				| 'reason'
 				| 'game_version'
 				| 'loader'
@@ -333,6 +334,7 @@ export namespace Labrinth {
 				site_path?: string
 				version_id?: string
 				country?: string
+				monetized?: boolean
 				reason?: DownloadReason
 				game_version?: string
 				loader?: string

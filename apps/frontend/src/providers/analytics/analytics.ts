@@ -512,7 +512,7 @@ function getCountryFilterValue(
 function getMonetizationFilterValue(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
 ): string | null | undefined {
-	if (dataPoint.metric_kind !== 'views') {
+	if (dataPoint.metric_kind !== 'views' && dataPoint.metric_kind !== 'downloads') {
 		return undefined
 	}
 	if (typeof dataPoint.monetized !== 'boolean') {
