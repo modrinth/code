@@ -34,16 +34,16 @@
 			"dmg": {
 				"background": "./dmg/dmg-background.png",
 				"windowSize": {
-					"width": 660,
-					"height": 400
+					"width": 679,
+					"height": 462
 				},
 				"appPosition": {
-					"x": 139,
-					"y": 165
+					"x": 188,
+					"y": 212
 				},
 				"applicationFolderPosition": {
-					"x": 428,
-					"y": 165
+					"x": 475,
+					"y": 223
 				}
 			}
 		},
