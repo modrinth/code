@@ -2274,9 +2274,9 @@ const hasEditDetailsPermission = computed(() => {
 })
 
 watch(
-	[isSettings, currentMember],
+	[isSettings, allMembers, canAccessSettings],
 	() => {
-		if (isSettings.value && !canAccessSettings.value) {
+		if (isSettings.value && allMembers.value.length > 0 && !canAccessSettings.value) {
 			showError({
 				fatal: true,
 				statusCode: 401,

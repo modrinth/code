@@ -532,9 +532,9 @@ provideOrganizationContext(organizationContext)
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
 
 watch(
-	[routeHasSettings, currentMember],
+	[routeHasSettings, acceptedMembers, currentMember],
 	() => {
-		if (routeHasSettings.value && !canAccessSettings.value) {
+		if (routeHasSettings.value && acceptedMembers.value.length > 0 && !canAccessSettings.value) {
 			showError({
 				fatal: true,
 				statusCode: 401,
