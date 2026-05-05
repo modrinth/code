@@ -1,7 +1,7 @@
 import type { AbstractModrinthClient } from '../core/abstract-client'
 import type { AbstractModule } from '../core/abstract-module'
-import { ArchonBackupsV1Module } from './archon/backups/v1'
 import { ArchonBackupsQueueV1Module } from './archon/backups-queue/v1'
+import { ArchonBackupsV1Module } from './archon/backups/v1'
 import { ArchonContentV1Module } from './archon/content/v1'
 import { ArchonOptionsV1Module } from './archon/options/v1'
 import { ArchonPropertiesV1Module } from './archon/properties/v1'
@@ -39,6 +39,7 @@ import { LabrinthTeamsV3Module } from './labrinth/teams/v3'
 import { LabrinthTechReviewInternalModule } from './labrinth/tech-review/internal'
 import { LabrinthThreadsV3Module } from './labrinth/threads/v3'
 import { LabrinthUsersV2Module } from './labrinth/users/v2'
+import { LabrinthUsersV3Module } from './labrinth/users/v3'
 import { LauncherMetaManifestV0Module } from './launcher-meta/v0'
 import { MclogsInsightsV1Module } from './mclogs/insights/v1'
 import { MclogsLogsV1Module } from './mclogs/logs/v1'
@@ -98,6 +99,7 @@ export const MODULE_REGISTRY = {
 	labrinth_tech_review_internal: LabrinthTechReviewInternalModule,
 	labrinth_threads_v3: LabrinthThreadsV3Module,
 	labrinth_users_v2: LabrinthUsersV2Module,
+	labrinth_users_v3: LabrinthUsersV3Module,
 	labrinth_versions_v2: LabrinthVersionsV2Module,
 	labrinth_versions_v3: LabrinthVersionsV3Module,
 	paper_versions_v3: PaperVersionsV3Module,

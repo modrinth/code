@@ -2219,10 +2219,16 @@
   "profile.button.remove-affiliate": {
     "message": "Ortaklıktan kaldır"
   },
-  "profile.button.set-affiliate": {
-    "message": "Ortak olarak ayarla"
-  },
-  "profile.details.label.auth-providers": {
+   "profile.button.set-affiliate": {
+     "message": "Ortak olarak ayarla"
+   },
+   "profile.button.set-featured": {
+     "message": "Set as featured"
+   },
+   "profile.button.remove-featured": {
+     "message": "Remove from featured"
+   },
+   "profile.details.label.auth-providers": {
     "message": "Kimlik doğrulama sağlayıcıları"
   },
   "profile.details.label.email": {
@@ -2282,10 +2288,16 @@
   "profile.label.projects": {
     "message": "{count} {countPlural, plural, one {proje} other {projeler}}"
   },
-  "profile.label.saving": {
-    "message": "Kaydediliyor..."
-  },
-  "profile.meta.description": {
+   "profile.label.saving": {
+     "message": "Kaydediliyor..."
+   },
+   "profile.label.no-featured-projects": {
+     "message": "This user has no featured projects yet!"
+   },
+   "profile.tab.featured": {
+     "message": "Featured"
+   },
+   "profile.meta.description": {
     "message": "{username} kullanıcısının Modrinth'teki projelerini indir"
   },
   "profile.meta.description-with-bio": {

@@ -5,6 +5,7 @@ pub mod categories;
 pub mod charge_item;
 pub mod collection_item;
 pub mod delphi_report_item;
+pub mod featured_project_item;
 pub mod flow_item;
 pub mod friend_item;
 pub mod ids;
@@ -44,6 +45,7 @@ pub mod version_item;
 
 pub use affiliate_code_item::DBAffiliateCode;
 pub use collection_item::DBCollection;
+pub use featured_project_item::DBFeaturedProject;
 pub use ids::*;
 pub use image_item::DBImage;
 pub use oauth_client_item::DBOAuthClient;

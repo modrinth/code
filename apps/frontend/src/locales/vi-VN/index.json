@@ -1994,10 +1994,16 @@
   "profile.button.remove-affiliate": {
     "message": "Xóa affiliate"
   },
-  "profile.button.set-affiliate": {
-    "message": "Đặt làm affiliate"
-  },
-  "profile.details.label.auth-providers": {
+   "profile.button.set-affiliate": {
+     "message": "Đặt làm affiliate"
+   },
+   "profile.button.set-featured": {
+     "message": "Set as featured"
+   },
+   "profile.button.remove-featured": {
+     "message": "Remove from featured"
+   },
+   "profile.details.label.auth-providers": {
     "message": "Nhà cung cấp xác thực"
   },
   "profile.details.label.email": {
@@ -2057,10 +2063,16 @@
   "profile.label.projects": {
     "message": "{count} {countPlural, plural, one {dự án} other {dự án}}"
   },
-  "profile.label.saving": {
-    "message": "Đang lưu..."
-  },
-  "profile.meta.description": {
+   "profile.label.saving": {
+     "message": "Đang lưu..."
+   },
+   "profile.label.no-featured-projects": {
+     "message": "This user has no featured projects yet!"
+   },
+   "profile.tab.featured": {
+     "message": "Featured"
+   },
+   "profile.meta.description": {
     "message": "Tải xuống các dự án của {username} trên Modrinth"
   },
   "profile.meta.description-with-bio": {

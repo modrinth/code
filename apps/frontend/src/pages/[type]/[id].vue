@@ -664,6 +664,20 @@
 									</template>
 								</ClientOnly>
 							</ButtonStyled>
+							<ButtonStyled v-if="isOwner" size="large" circular type="transparent">
+								<button
+									v-tooltip="isProjectFeatured ? 'Remove from featured' : 'Add to featured'"
+									@click="toggleProjectFeatured"
+								>
+									<StarIcon
+										class="h-5 w-5"
+										:class="{
+											'text-yellow-400 fill-current': isProjectFeatured,
+											'text-secondary': !isProjectFeatured,
+										}"
+									/>
+								</button>
+							</ButtonStyled>
 							<ButtonStyled size="large" circular>
 								<PopoutMenu
 									v-if="auth.user"
@@ -1060,6 +1074,7 @@ import {
 	ScaleIcon,
 	ScanEyeIcon,
 	SearchIcon,
+	StarIcon,
 	ServerPlusIcon,
 	SettingsIcon,
 	VersionIcon,
@@ -1145,6 +1160,27 @@ const { addNotification } = notifications
 
 const auth = await useAuth()
 const user = await useUser()
+
+const isOwner = computed(() => auth.user && auth.user.id === project.value?.team)
+
+const { data: featuredProjects } = useQuery({
+	queryKey: computed(() => ['user', auth.user?.id, 'featured']),
+	queryFn: () => auth.user ? client.labrinth.users_v3.getFeaturedProjects(auth.user.id) : [],
+	enabled: !!auth.user,
+})
+
+const isFeatured = computed(() => featuredProjects.value?.some(p => p.id === project.value?.id) ?? false)
+
+async function toggleFeatured() {
+	if (!auth.user || !project.value) return
+
+	try {
+		await client.labrinth.users_v3.toggleFeaturedProject(auth.user.id, project.value.id)
+		queryClient.invalidateQueries({ queryKey: ['user', auth.user.id, 'featured'] })
+	} catch (error) {
+		console.warn('Failed to toggle featured project:', error)
+	}
+}
 
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
@@ -1626,6 +1662,63 @@ const routeProjectId = computed(() => route.params.id)
 // Use DI client for TanStack Query
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+
+	const { data: userFeaturedProjects } = useQuery({
+		queryKey: computed(() => ['user', auth.user?.id, 'featured']),
+		queryFn: async () => {
+			if (!auth.user) return []
+			try {
+				const featured = await client.labrinth.users_v3.getFeaturedProjects(auth.user.id)
+				// Save to localStorage as backup
+				if (typeof localStorage !== 'undefined') {
+					localStorage.setItem(`featured_${auth.user.id}`, JSON.stringify(featured))
+				}
+				return featured
+			} catch (error) {
+				console.warn('Failed to load featured projects from API, using localStorage:', error)
+				// Fallback to localStorage
+				if (typeof localStorage !== 'undefined') {
+					const stored = localStorage.getItem(`featured_${auth.user.id}`)
+					if (stored) {
+						try {
+							return JSON.parse(stored)
+						} catch (e) {
+							console.warn('Failed to parse localStorage featured projects:', e)
+						}
+					}
+				}
+				return []
+			}
+		},
+		enabled: !!auth.user,
+	})
+
+const isProjectFeatured = computed(() => userFeaturedProjects.value?.some(p => p.id === project.value?.id) ?? false)
+
+async function toggleProjectFeatured() {
+	if (!auth.user || !project.value) return
+
+	try {
+		await client.labrinth.users_v3.toggleFeaturedProject(auth.user.id, project.value.id)
+		queryClient.invalidateQueries({ queryKey: ['user', auth.user.id, 'featured'] })
+	} catch (error) {
+		console.warn('Failed to toggle featured project on backend, keeping local state:', error)
+		// Update localStorage
+		const current = userFeaturedProjects.value || []
+		const isCurrentlyFeatured = current.some(p => p.id === project.value.id)
+		let newFeatured
+		if (isCurrentlyFeatured) {
+			newFeatured = current.filter(p => p.id !== project.value.id)
+		} else {
+			newFeatured = [...current, project.value]
+		}
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem(`featured_${auth.user.id}`, JSON.stringify(newFeatured))
+		}
+		// Update reactive data
+		userFeaturedProjects.value = newFeatured
+	}
+}
 
 // V2 Project - hits middleware cache (uses route param for lookup)
 const { data: projectRaw, error: projectV2Error } = useQuery({

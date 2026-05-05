@@ -2234,6 +2234,12 @@
   "profile.button.set-affiliate": {
     "message": "Set as affiliate"
   },
+  "profile.button.set-featured": {
+    "message": "Set as featured"
+  },
+  "profile.button.remove-featured": {
+    "message": "Remove from featured"
+  },
   "profile.details.label.auth-providers": {
     "message": "Auth providers"
   },
@@ -2296,6 +2302,12 @@
   },
   "profile.label.saving": {
     "message": "Saving..."
+  },
+  "profile.label.no-featured-projects": {
+    "message": "This user has no featured projects yet!"
+  },
+  "profile.tab.featured": {
+    "message": "Featured"
   },
   "profile.meta.description": {
     "message": "Download {username}'s projects on Modrinth"
