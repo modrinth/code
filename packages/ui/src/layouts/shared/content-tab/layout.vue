@@ -214,16 +214,15 @@ const { searchQuery, search } = useContentSearch(sortedItems, [
 	'file_name',
 ])
 
-const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useContentFilters(
-	ctx.items,
-	{
+const { selectedFilters, filterOptions, toggleFilter, cycleStatusFilter, applyFilters } =
+	useContentFilters(ctx.items, {
 		showTypeFilters: true,
 		showUpdateFilter: ctx.hasUpdateSupport,
 		showWarningsFilter: true,
 		isPackLocked: ctx.isPackLocked,
 		persistKey: ctx.filterPersistKey,
-	},
-)
+		showBothStatusFilters: ctx.showBothContentStatusFilters,
+	})
 
 const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
 	ctx.items,
@@ -437,6 +436,13 @@ function handleSwitchVersionById(id: string) {
 	}
 }
 
+function handleFilterContextMenu(event: MouseEvent, filterId: string) {
+	if (filterId === 'enabled' || filterId === 'disabled') {
+		event.preventDefault()
+		cycleStatusFilter(filterId)
+	}
+}
+
 // Bulk updating
 const confirmBulkUpdateModal = ref<InstanceType<typeof ConfirmBulkUpdateModal>>()
 const pendingBulkUpdateItems = ref<ContentItem[]>([])
@@ -618,6 +624,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 									"
 									:aria-pressed="selectedFilters.includes(option.id)"
 									@click="toggleFilter(option.id)"
+									@contextmenu="handleFilterContextMenu($event, option.id)"
 								>
 									{{ option.label }}
 								</button>

@@ -12,6 +12,7 @@ const { formatMessage } = useVIntl()
 
 const worldsInHomeFeatureFlag = 'worlds_in_home' as FeatureFlag
 const skipUnknownPackWarningFeatureFlag = 'skip_unknown_pack_warning' as FeatureFlag
+const showBothContentStatusFiltersFeatureFlag = 'content_filter_show_both_statuses' as FeatureFlag
 
 const messages = defineMessages({
 	colorThemeTitle: {
@@ -99,6 +100,22 @@ const messages = defineMessages({
 		id: 'app.appearance-settings.unknown-pack-warning.description',
 		defaultMessage:
 			"If you attempt to install a Modrinth Pack file (.mrpack) that isn't hosted on Modrinth, we'll make sure you understand the risks before installing it.",
+	},
+	contentStatusFilterModeTitle: {
+		id: 'app.appearance-settings.content-status-filter-mode.title',
+		defaultMessage: 'Content status filter buttons',
+	},
+	contentStatusFilterModeDescription: {
+		id: 'app.appearance-settings.content-status-filter-mode.description',
+		defaultMessage: 'Choose how the Enabled and Disabled filters appear on instance content pages.',
+	},
+	contentStatusFilterModeRightClick: {
+		id: 'app.appearance-settings.content-status-filter-mode.right-click',
+		defaultMessage: 'Right-click to switch between them',
+	},
+	contentStatusFilterModeBoth: {
+		id: 'app.appearance-settings.content-status-filter-mode.both',
+		defaultMessage: 'Always show both buttons',
 	},
 })
 
@@ -243,6 +260,45 @@ watch(
 					const skipUnknownPackWarning = !warnBeforeUnknownPackInstall
 					themeStore.featureFlags[skipUnknownPackWarningFeatureFlag] = skipUnknownPackWarning
 					settings.feature_flags[skipUnknownPackWarningFeatureFlag] = skipUnknownPackWarning
+				}
+			"
+		/>
+	</div>
+
+	<div class="mt-6 flex items-center justify-between gap-4">
+		<div>
+			<h2 class="m-0 text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.contentStatusFilterModeTitle) }}
+			</h2>
+			<p class="m-0 mt-1">{{ formatMessage(messages.contentStatusFilterModeDescription) }}</p>
+		</div>
+		<Combobox
+			id="content-status-filter-mode"
+			name="Content status filter mode dropdown"
+			class="max-w-56"
+			:model-value="
+				themeStore.getFeatureFlag(showBothContentStatusFiltersFeatureFlag) ? 'both' : 'right-click'
+			"
+			:options="[
+				{
+					value: 'right-click',
+					label: formatMessage(messages.contentStatusFilterModeRightClick),
+				},
+				{
+					value: 'both',
+					label: formatMessage(messages.contentStatusFilterModeBoth),
+				},
+			]"
+			:display-value="
+				themeStore.getFeatureFlag(showBothContentStatusFiltersFeatureFlag)
+					? formatMessage(messages.contentStatusFilterModeBoth)
+					: formatMessage(messages.contentStatusFilterModeRightClick)
+			"
+			@update:model-value="
+				(value) => {
+					const showBoth = value === 'both'
+					themeStore.featureFlags[showBothContentStatusFiltersFeatureFlag] = showBoth
+					settings.feature_flags[showBothContentStatusFiltersFeatureFlag] = showBoth
 				}
 			"
 		/>

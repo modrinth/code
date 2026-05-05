@@ -120,6 +120,8 @@ import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
 import { installVersionDependencies } from '@/store/install'
+import { useTheming } from '@/store/state'
+import type { FeatureFlag } from '@/store/theme.ts'
 
 const messages = defineMessages({
 	shareTitle: {
@@ -155,6 +157,8 @@ const { handleError, addNotification } = injectNotificationManager()
 const { installingItems } = injectContentInstall()
 const router = useRouter()
 const debug = useDebugLogger('Mods:ContentUpdate')
+const themeStore = useTheming()
+const showBothContentStatusFiltersFeatureFlag = 'content_filter_show_both_statuses' as FeatureFlag
 
 const props = defineProps<{
 	instance: GameInstance
@@ -842,6 +846,9 @@ provideContentManager({
 		installing: item.installing,
 	}),
 	filterPersistKey: props.instance.path,
+	showBothContentStatusFilters: computed(() =>
+		themeStore.getFeatureFlag(showBothContentStatusFiltersFeatureFlag),
+	),
 })
 
 await initProjects()

@@ -47,6 +47,18 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Color theme"
   },
+  "app.appearance-settings.content-status-filter-mode.both": {
+    "message": "Both buttons in UI always"
+  },
+  "app.appearance-settings.content-status-filter-mode.description": {
+    "message": "Choose how Enabled and Disabled filters appear on instance content pages."
+  },
+  "app.appearance-settings.content-status-filter-mode.right-click": {
+    "message": "Right click to switch button"
+  },
+  "app.appearance-settings.content-status-filter-mode.title": {
+    "message": "Content status filters"
+  },
   "app.appearance-settings.default-landing-page.description": {
     "message": "Change the page to which the launcher opens on."
   },
