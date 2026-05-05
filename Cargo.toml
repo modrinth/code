@@ -90,6 +90,7 @@ hex = "0.4.3"
 hickory-resolver = "0.25.2"
 hmac = "0.12.1"
 hyper = "1.7.0"
+adblock = "0.12.2"
 hyper-rustls = { version = "0.27.7", default-features = false, features = [
   "aws-lc-rs",
   "http1",
