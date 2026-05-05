@@ -2219,10 +2219,16 @@
   "profile.button.remove-affiliate": {
     "message": "移除聯盟行銷夥伴資格"
   },
-  "profile.button.set-affiliate": {
-    "message": "設為聯盟行銷夥伴"
-  },
-  "profile.details.label.auth-providers": {
+   "profile.button.set-affiliate": {
+     "message": "設為聯盟行銷夥伴"
+   },
+   "profile.button.set-featured": {
+     "message": "Set as featured"
+   },
+   "profile.button.remove-featured": {
+     "message": "Remove from featured"
+   },
+   "profile.details.label.auth-providers": {
     "message": "驗證提供者"
   },
   "profile.details.label.email": {
@@ -2282,10 +2288,16 @@
   "profile.label.projects": {
     "message": "{count} 個專案"
   },
-  "profile.label.saving": {
-    "message": "儲存中..."
-  },
-  "profile.meta.description": {
+   "profile.label.saving": {
+     "message": "儲存中..."
+   },
+   "profile.label.no-featured-projects": {
+     "message": "This user has no featured projects yet!"
+   },
+   "profile.tab.featured": {
+     "message": "Featured"
+   },
+   "profile.meta.description": {
     "message": "前往 Modrinth 下載 {username} 的專案"
   },
   "profile.meta.description-with-bio": {

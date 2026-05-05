@@ -2219,10 +2219,16 @@
   "profile.button.remove-affiliate": {
     "message": "解除作为联盟伙伴"
   },
-  "profile.button.set-affiliate": {
-    "message": "设置为联盟伙伴"
-  },
-  "profile.details.label.auth-providers": {
+   "profile.button.set-affiliate": {
+     "message": "设置为联盟伙伴"
+   },
+   "profile.button.set-featured": {
+     "message": "Set as featured"
+   },
+   "profile.button.remove-featured": {
+     "message": "Remove from featured"
+   },
+   "profile.details.label.auth-providers": {
     "message": "身份验证提供者"
   },
   "profile.details.label.email": {
@@ -2282,10 +2288,16 @@
   "profile.label.projects": {
     "message": "{count} {countPlural, plural, other {个项目}}"
   },
-  "profile.label.saving": {
-    "message": "正在保存…"
-  },
-  "profile.meta.description": {
+   "profile.label.saving": {
+     "message": "正在保存…"
+   },
+   "profile.label.no-featured-projects": {
+     "message": "This user has no featured projects yet!"
+   },
+   "profile.tab.featured": {
+     "message": "Featured"
+   },
+   "profile.meta.description": {
     "message": "前往 Modrinth 下载 {username} 的项目"
   },
   "profile.meta.description-with-bio": {

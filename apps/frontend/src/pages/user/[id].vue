@@ -182,7 +182,7 @@
 					</template>
 					<template #actions>
 						<ButtonStyled size="large">
-							<NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
+							<NuxtLink v-if="isOwner" to="/settings/profile">
 								<EditIcon aria-hidden="true" />
 								{{ formatMessage(commonMessages.editButton) }}
 							</NuxtLink>
@@ -194,16 +194,16 @@
 										id: 'manage-projects',
 										action: () => navigateTo('/dashboard/projects'),
 										hoverOnly: true,
-										shown: auth.user && auth.user.id === user.id,
+										shown: isOwner,
 									},
-									{ divider: true, shown: auth.user && auth.user.id === user.id },
+									{ divider: true, shown: isOwner },
 									{
 										id: 'report',
 										action: () =>
 											auth.user ? reportUser(user.id) : navigateTo(getSignInRouteObj(route)),
 										color: 'red',
 										hoverOnly: true,
-										shown: auth.user?.id !== user.id,
+										shown: !isOwner,
 									},
 									{ id: 'copy-id', action: () => copyId() },
 									{ id: 'copy-permalink', action: () => copyPermalink() },
@@ -280,7 +280,63 @@
 				</ContentPageHeader>
 			</div>
 			<div class="normal-page__content">
-				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
+				<div v-if="featuredProjects !== undefined" class="mb-8">
+					<div class="mb-4 flex flex-row items-center gap-2">
+						<div class="rounded-full bg-bg-raised px-4 py-2 text-sm font-bold shadow-sm">
+							{{ formatMessage(messages.featuredTabLabel) }}
+						</div>
+					</div>
+					<div v-if="localFeaturedProjects?.length > 0">
+						<ProjectCardList layout="grid">
+							<ProjectCard
+								v-for="project in localFeaturedProjects"
+								:key="project.id"
+								class="group/card relative"
+								:link="`/${project.project_type ?? 'project'}/${project.slug ? project.slug : project.id}`"
+								:title="project.title"
+								:icon-url="project.icon_url"
+								:date-updated="project.updated"
+								:downloads="project.downloads"
+								:followers="project.followers"
+								:summary="project.description"
+								:tags="[...project.categories]"
+								:banner="project.gallery.find((element) => element.featured)?.url"
+							>
+								<template v-if="isOwner" #actions>
+									<div class="absolute right-2 top-2 z-10">
+										<ButtonStyled
+											circular
+											type="transparent"
+											class="!bg-surface-2/50 shadow-sm backdrop-blur-sm hover:!bg-surface-2"
+										>
+											<button
+												v-tooltip="
+													isFeatured(project.id)
+														? formatMessage(messages.removeFeaturedButton)
+														: formatMessage(messages.setFeaturedButton)
+												"
+												@click.prevent="toggleFeatured(project.id)"
+											>
+												<StarIcon
+													class="h-5 w-5"
+													:class="{
+														'fill-current text-yellow-400': isFeatured(project.id),
+														'text-secondary': !isFeatured(project.id),
+													}"
+												/>
+											</button>
+										</ButtonStyled>
+									</div>
+								</template>
+							</ProjectCard>
+						</ProjectCardList>
+					</div>
+					<div v-else class="py-8 text-center text-secondary">
+						{{ formatMessage(messages.profileNoFeaturedProjectsLabel) }}
+					</div>
+				</div>
+
+				<div v-if="navLinks.length > 1" class="mb-4 max-w-full overflow-x-auto">
 					<NavTabs :links="navLinks" replace />
 				</div>
 				<div v-if="projects?.length > 0">
@@ -300,6 +356,7 @@
 								.slice()
 								.sort((a, b) => b.downloads - a.downloads)"
 							:key="project.id"
+							class="group/card relative"
 							:link="`/${project.project_type ?? 'project'}/${project.slug ? project.slug : project.id}`"
 							:title="project.title"
 							:icon-url="project.icon_url"
@@ -326,7 +383,34 @@
 									: 'list'
 							"
 							:status="project.status"
-						/>
+						>
+							<template v-if="isOwner" #actions>
+								<div class="absolute right-2 top-2 z-10">
+									<ButtonStyled
+										circular
+										type="transparent"
+										class="!bg-surface-2/50 shadow-sm backdrop-blur-sm hover:!bg-surface-2"
+									>
+										<button
+											v-tooltip="
+												isFeatured(project.id)
+													? formatMessage(messages.removeFeaturedButton)
+													: formatMessage(messages.setFeaturedButton)
+											"
+											@click.prevent="toggleFeatured(project.id)"
+										>
+											<StarIcon
+												class="h-5 w-5"
+												:class="{
+													'fill-current text-yellow-400': isFeatured(project.id),
+													'text-secondary': !isFeatured(project.id),
+												}"
+											/>
+										</button>
+									</ButtonStyled>
+								</div>
+							</template>
+						</ProjectCard>
 					</ProjectCardList>
 				</div>
 				<div
@@ -338,7 +422,7 @@
 				>
 					<UpToDate class="icon" />
 					<br />
-					<span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
+					<span v-if="isOwner" class="preserve-lines text">
 						<IntlFormatted :message-id="messages.profileNoProjectsAuthLabel">
 							<template #create-link="{ children }">
 								<a class="link" @click.prevent="$refs.modal_creation.show()">
@@ -408,7 +492,7 @@
 				>
 					<UpToDate class="icon" />
 					<br />
-					<span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
+					<span v-if="isOwner" class="preserve-lines text">
 						<IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
 							<template #create-link="{ children }">
 								<a
@@ -482,6 +566,7 @@ import {
 	ReportIcon,
 	SaveIcon,
 	SpinnerIcon,
+	StarIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -508,7 +593,7 @@ import {
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { onServerPrefetch } from 'vue'
+import { computed, onServerPrefetch, ref, watch } from 'vue'
 
 import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
 import AlphaTesterBadge from '~/assets/images/badges/alpha-tester.svg?component'
@@ -627,6 +712,22 @@ const messages = defineMessages({
 		id: 'profile.button.manage-projects',
 		defaultMessage: 'Manage projects',
 	},
+	featuredTabLabel: {
+		id: 'profile.tab.featured',
+		defaultMessage: 'Featured Projects',
+	},
+	setFeaturedButton: {
+		id: 'profile.button.set-featured',
+		defaultMessage: 'Set as featured',
+	},
+	removeFeaturedButton: {
+		id: 'profile.button.remove-featured',
+		defaultMessage: 'Remove from featured',
+	},
+	profileNoFeaturedProjectsLabel: {
+		id: 'profile.label.no-featured-projects',
+		defaultMessage: 'This user has no featured projects yet!',
+	},
 	profileMetaDescription: {
 		id: 'profile.meta.description',
 		defaultMessage: "Download {username}'s projects on Modrinth",
@@ -693,6 +794,9 @@ const {
 	queryKey: computed(() => ['user', route.params.id]),
 	queryFn: () => client.labrinth.users_v2.get(route.params.id),
 })
+const isOwner = computed(
+	() => !!auth.value?.user && !!user.value && auth.value.user.id === user.value.id,
+)
 
 watch(
 	userError,
@@ -735,12 +839,73 @@ const { data: collections, suspense: collectionsSuspense } = useQuery({
 	queryFn: () => client.labrinth.users_v2.getCollections(route.params.id),
 })
 
+const { data: featuredProjects, suspense: featuredProjectsSuspense } = useQuery({
+	queryKey: computed(() => ['user', route.params.id, 'featured']),
+	queryFn: async () => {
+		try {
+			const featured = await client.labrinth.users_v3.getFeaturedProjects(route.params.id)
+			for (const project of featured) {
+				project.categories = project.categories.concat(project.loaders)
+				project.project_type = data.$getProjectTypeForUrl(
+					project.project_type,
+					project.categories,
+					tags.value,
+				)
+			}
+			// Save to localStorage as backup
+			if (typeof localStorage !== 'undefined') {
+				localStorage.setItem(`featured_${route.params.id}`, JSON.stringify(featured))
+			}
+			return featured
+		} catch (error) {
+			console.warn('Failed to load featured projects from API, using localStorage:', error)
+			// Fallback to localStorage
+			if (typeof localStorage !== 'undefined') {
+				const stored = localStorage.getItem(`featured_${route.params.id}`)
+				if (stored) {
+					try {
+						const featured = JSON.parse(stored)
+						for (const project of featured) {
+							project.categories = project.categories.concat(project.loaders)
+							project.project_type = data.$getProjectTypeForUrl(
+								project.project_type,
+								project.categories,
+								tags.value,
+							)
+						}
+						return featured
+					} catch (e) {
+						console.warn('Failed to parse localStorage featured projects:', e)
+					}
+				}
+			}
+			return []
+		}
+	},
+})
+
+const localFeaturedProjects = ref([])
+let featuredInitialized = false
+watch(
+	featuredProjects,
+	(val) => {
+		if (val && !featuredInitialized) {
+			localFeaturedProjects.value = [...val]
+			featuredInitialized = true
+		}
+	},
+	{ immediate: true },
+)
+
+const isFeatured = (projectId) => localFeaturedProjects.value.some((p) => p.id === projectId)
+
 onServerPrefetch(async () => {
 	await Promise.allSettled([
-		userSuspense(),
-		projectsSuspense(),
-		orgsSuspense(),
-		collectionsSuspense(),
+		userSuspense().catch(() => {}),
+		projectsSuspense().catch(() => {}),
+		orgsSuspense().catch(() => {}),
+		collectionsSuspense().catch(() => {}),
+		featuredProjectsSuspense().catch(() => {}),
 	])
 })
 
@@ -809,6 +974,7 @@ const MODRINTH_BETA_END_DATE = new Date('2022-02-27T08:00:00.000Z')
 const MODRINTH_ALPHA_END_DATE = new Date('2020-11-30T08:00:00.000Z')
 
 const badges = computed(() => {
+	if (!user.value) return []
 	const badges = []
 
 	if (user.value.role === 'admin') {
@@ -853,10 +1019,12 @@ const badges = computed(() => {
 })
 
 async function copyId() {
+	if (!user.value) return
 	await navigator.clipboard.writeText(user.value.id)
 }
 
 async function copyPermalink() {
+	if (!user.value) return
 	await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`)
 }
 
@@ -864,25 +1032,31 @@ const isAffiliate = computed(() => user.value?.badges & UserBadge.AFFILIATE)
 const isAdminViewing = computed(() => isAdmin(auth.value.user))
 
 async function toggleAffiliate(id) {
+	if (!user.value) return
 	await client.labrinth.users_v2.patch(id, { badges: user.value.badges ^ (1 << 7) })
 	queryClient.invalidateQueries({ queryKey: ['user', route.params.id] })
 }
 
-const navLinks = computed(() => [
-	{
-		label: formatMessage(commonMessages.allProjectType),
-		href: `/user/${user.value.username}`,
-	},
-	...projectTypes.value
-		.map((x) => {
-			return {
-				label: formatMessage(getProjectTypeMessage(x, true)),
-				href: `/user/${user.value.username}/${x}s`,
-			}
-		})
-		.slice()
-		.sort((a, b) => a.label.localeCompare(b.label)),
-])
+const navLinks = computed(() => {
+	if (!user.value) return []
+	const links = [
+		{
+			label: formatMessage(commonMessages.allProjectType),
+			href: `/user/${user.value.username}`,
+		},
+		...projectTypes.value
+			.map((x) => {
+				return {
+					label: formatMessage(getProjectTypeMessage(x, true)),
+					href: `/user/${user.value.username}/${x}s`,
+				}
+			})
+			.slice()
+			.sort((a, b) => a.label.localeCompare(b.label)),
+	]
+
+	return links
+})
 
 const selectedRole = ref(user.value?.role)
 const isSavingRole = ref(false)
@@ -896,17 +1070,19 @@ const roleOptions = [
 const editRoleModal = useTemplateRef('editRoleModal')
 
 const openRoleEditModal = () => {
+	if (!user.value) return
 	selectedRole.value = user.value.role
 	editRoleModal.value?.show()
 }
 
 const cancelRoleEdit = () => {
+	if (!user.value) return
 	selectedRole.value = user.value.role
 	editRoleModal.value?.hide()
 }
 
 function saveRoleEdit() {
-	if (!selectedRole.value || selectedRole.value === user.value.role) {
+	if (!user.value || !selectedRole.value || selectedRole.value === user.value.role) {
 		return
 	}
 
@@ -919,7 +1095,7 @@ function saveRoleEdit() {
 
 			editRoleModal.value?.hide()
 		})
-		.catch(() => {
+		.catch((error) => {
 			console.error('Failed to update user role:', error)
 
 			addNotification({
@@ -931,6 +1107,34 @@ function saveRoleEdit() {
 		.finally(() => {
 			isSavingRole.value = false
 		})
+}
+
+async function toggleFeatured(projectId) {
+	if (!user.value) return
+
+	const currentlyFeatured = isFeatured(projectId)
+
+	// Optimistic update
+	if (currentlyFeatured) {
+		localFeaturedProjects.value = localFeaturedProjects.value.filter((p) => p.id !== projectId)
+	} else {
+		const project = projects.value?.find((p) => p.id === projectId)
+		if (project) {
+			localFeaturedProjects.value.push(project)
+		}
+	}
+
+	// Save to localStorage immediately
+	if (typeof localStorage !== 'undefined') {
+		localStorage.setItem(`featured_${route.params.id}`, JSON.stringify(localFeaturedProjects.value))
+	}
+
+	try {
+		await client.labrinth.users_v3.toggleFeaturedProject(user.value.id, projectId)
+		queryClient.invalidateQueries({ queryKey: ['user', route.params.id, 'featured'] })
+	} catch (error) {
+		console.warn('Failed to toggle featured project on backend, keeping local state:', error)
+	}
 }
 </script>
 <script>

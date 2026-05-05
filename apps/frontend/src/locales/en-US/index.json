@@ -2231,8 +2231,14 @@
   "profile.button.remove-affiliate": {
     "message": "Remove as affiliate"
   },
+  "profile.button.remove-featured": {
+    "message": "Remove from featured"
+  },
   "profile.button.set-affiliate": {
     "message": "Set as affiliate"
+  },
+  "profile.button.set-featured": {
+    "message": "Set as featured"
   },
   "profile.details.label.auth-providers": {
     "message": "Auth providers"
@@ -2282,6 +2288,9 @@
   "profile.label.no-collections-auth": {
     "message": "You don't have any collections.\nWould you like to <create-link>create one</create-link>?"
   },
+  "profile.label.no-featured-projects": {
+    "message": "This user has no featured projects yet!"
+  },
   "profile.label.no-projects": {
     "message": "This user has no projects!"
   },
@@ -2305,6 +2314,9 @@
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
+  },
+  "profile.tab.featured": {
+    "message": "Featured Projects"
   },
   "profile.user-id": {
     "message": "User ID: {id}"

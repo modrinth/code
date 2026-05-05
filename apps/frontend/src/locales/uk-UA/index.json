@@ -1994,10 +1994,16 @@
   "profile.button.remove-affiliate": {
     "message": "Усунути як партнера"
   },
-  "profile.button.set-affiliate": {
-    "message": "Установити як партнера"
-  },
-  "profile.details.label.auth-providers": {
+   "profile.button.set-affiliate": {
+     "message": "Установити як партнера"
+   },
+   "profile.button.set-featured": {
+     "message": "Set as featured"
+   },
+   "profile.button.remove-featured": {
+     "message": "Remove from featured"
+   },
+   "profile.details.label.auth-providers": {
     "message": "Провайдери автентифікації"
   },
   "profile.details.label.email": {
@@ -2057,10 +2063,16 @@
   "profile.label.projects": {
     "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
   },
-  "profile.label.saving": {
-    "message": "Збереження…"
-  },
-  "profile.meta.description": {
+   "profile.label.saving": {
+     "message": "Збереження…"
+   },
+   "profile.label.no-featured-projects": {
+     "message": "This user has no featured projects yet!"
+   },
+   "profile.tab.featured": {
+     "message": "Featured"
+   },
+   "profile.meta.description": {
     "message": "Завантажте проєкти {username} на Modrinth"
   },
   "profile.meta.description-with-bio": {
