@@ -1,5 +1,5 @@
 <template>
-	<div class="dashboard-overview">
+	<div>
 		<section class="universal-card dashboard-header">
 			<Avatar :src="auth.user.avatar_url" size="md" circle :alt="auth.user.username" />
 			<div class="username">
@@ -12,7 +12,7 @@
 				</NuxtLink>
 			</div>
 		</section>
-		<div class="dashboard-notifications">
+		<div>
 			<section class="universal-card">
 				<div class="header__row">
 					<h2 class="header__title text-2xl">
@@ -50,44 +50,12 @@
 				</template>
 				<div v-else class="universal-body">
 					<p>{{ formatMessage(messages.noUnreadNotifications) }}</p>
-					<nuxt-link class="iconified-button !mt-4" to="/dashboard/notifications/history">
-						<HistoryIcon />
-						{{ formatMessage(messages.viewNotificationHistory) }}
-					</nuxt-link>
-				</div>
-			</section>
-		</div>
-
-		<div class="dashboard-analytics">
-			<section class="universal-card">
-				<h2>{{ formatMessage(commonMessages.analyticsButton) }}</h2>
-				<div class="grid-display">
-					<div class="grid-display__item">
-						<div class="label">{{ formatMessage(messages.totalDownloads) }}</div>
-						<div class="value">
-							{{ $formatNumber(projects.reduce((agg, x) => agg + x.downloads, 0)) }}
-						</div>
-						<span>{{
-							formatMessage(messages.fromProjects, { count: downloadsProjectCount })
-						}}</span>
-						<!--          <NuxtLink class="goto-link" to="/dashboard/analytics"-->
-						<!--            >View breakdown-->
-						<!--            <ChevronRightIcon-->
-						<!--              class="featured-header-chevron"-->
-						<!--              aria-hidden="true"-->
-						<!--          /></NuxtLink>-->
-					</div>
-					<div class="grid-display__item">
-						<div class="label">{{ formatMessage(messages.totalFollowers) }}</div>
-						<div class="value">
-							{{ $formatNumber(projects.reduce((agg, x) => agg + x.followers, 0)) }}
-						</div>
-						<span>
-							<span>{{
-								formatMessage(messages.fromProjects, { count: followersProjectCount })
-							}}</span>
-						</span>
-					</div>
+					<ButtonStyled>
+						<nuxt-link to="/dashboard/notifications/history" class="!mt-4 w-fit">
+							<HistoryIcon />
+							{{ formatMessage(messages.viewNotificationHistory) }}
+						</nuxt-link>
+					</ButtonStyled>
 				</div>
 			</section>
 		</div>
@@ -97,6 +65,7 @@
 import { ChevronRightIcon, HistoryIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
@@ -152,19 +121,6 @@ useHead({
 const auth = await useAuth()
 const client = injectModrinthClient()
 
-const { data: projects } = useQuery({
-	queryKey: computed(() => ['user', auth.value?.user?.id, 'projects']),
-	queryFn: () => client.labrinth.users_v2.getProjects(auth.value?.user?.id),
-	placeholderData: [],
-})
-
-const downloadsProjectCount = computed(
-	() => projects.value.filter((project) => project.downloads > 0).length,
-)
-const followersProjectCount = computed(
-	() => projects.value.filter((project) => project.followers > 0).length,
-)
-
 const { data, refetch } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'notifications']),
 	queryFn: async () => {
@@ -190,40 +146,6 @@ const notifications = computed(() => {
 const extraNotifs = computed(() => (data.value ? data.value.extraNotifs : 0))
 </script>
 <style lang="scss">
-.dashboard-overview {
-	display: grid;
-	grid-template:
-		'header header'
-		'notifications analytics' / 1fr auto;
-	gap: var(--spacing-card-md);
-
-	> .universal-card {
-		margin: 0;
-	}
-
-	@media screen and (max-width: 750px) {
-		display: flex;
-		flex-direction: column;
-	}
-}
-
-.dashboard-notifications {
-	grid-area: notifications;
-	//display: flex;
-	//flex-direction: column;
-	//gap: var(--spacing-card-md);
-
-	a.view-more-notifs {
-		display: flex;
-		width: fit-content;
-		margin-left: auto;
-	}
-}
-
-.dashboard-analytics {
-	grid-area: analytics;
-}
-
 .dashboard-header {
 	display: flex;
 	gap: var(--spacing-card-bg);

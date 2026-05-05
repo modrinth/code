@@ -114,7 +114,7 @@
 				<ButtonStyled v-if="showRefreshButton" type="outlined">
 					<button
 						type="button"
-						class="flex !h-10 items-center gap-2 !border-[1px] !border-surface-5"
+						class="flex !h-10 items-center gap-2"
 						:disabled="refreshing"
 						@click="handleRefresh"
 					>
@@ -135,7 +135,7 @@
 						:aria-label="formatMessage(messages.createNew)"
 						:disabled="disabled"
 						:tooltip="disabled ? disabledTooltip : undefined"
-						class="!h-10 justify-center gap-2 !border-[1px] !border-surface-5"
+						class="!h-10 justify-center gap-2"
 						:options="[
 							{ id: 'file', action: () => $emit('create', 'file') },
 							{ id: 'directory', action: () => $emit('create', 'directory') },

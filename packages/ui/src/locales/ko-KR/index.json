@@ -452,9 +452,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "파일 업로드"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "파일 업로드 중 ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "선택한 모든 콘텐츠가 이미 비활성화 됨"
   },
@@ -490,6 +487,276 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number}개 선택됨"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "인스턴스 생성"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "세계 생성"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "완료"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "가져오기"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "인스턴스 {count, plural, other {#}}개 가져오기"
+  },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "서버 설정"
+  },
+  "creation-flow.modal.custom-setup.build-number.label": {
+    "defaultMessage": "빌드 번호"
+  },
+  "creation-flow.modal.custom-setup.build-number.placeholder": {
+    "defaultMessage": "빌드 번호 선택"
+  },
+  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
+    "defaultMessage": "빌드 번호 검색..."
+  },
+  "creation-flow.modal.custom-setup.content-loader.label": {
+    "defaultMessage": "콘텐츠 로더"
+  },
+  "creation-flow.modal.custom-setup.game-version.placeholder": {
+    "defaultMessage": "게임 버전 선택"
+  },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "게임 버전 검색..."
+  },
+  "creation-flow.modal.custom-setup.icon.remove": {
+    "defaultMessage": "아이콘 제거"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "아이콘 선택"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "최신"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "기타"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "안정"
+  },
+  "creation-flow.modal.custom-setup.loader-version.label": {
+    "defaultMessage": "로더 버전"
+  },
+  "creation-flow.modal.custom-setup.loader-version.placeholder": {
+    "defaultMessage": "로더 버전 선택"
+  },
+  "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
+    "defaultMessage": "로더 버전 검색..."
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "로더"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "이름"
+  },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "인스턴스 이름 입력"
+  },
+  "creation-flow.modal.custom-setup.options.no-versions-available": {
+    "defaultMessage": "사용 가능한 버전 없음"
+  },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "추가 설정"
+  },
+  "creation-flow.modal.final-config.backup.before-reset-server.name": {
+    "defaultMessage": "서버 초기화 전에"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "쉬움"
+  },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "어려움"
+  },
+  "creation-flow.modal.final-config.difficulty.label": {
+    "defaultMessage": "난이도"
+  },
+  "creation-flow.modal.final-config.difficulty.normal": {
+    "defaultMessage": "보통"
+  },
+  "creation-flow.modal.final-config.difficulty.peaceful": {
+    "defaultMessage": "평화로움"
+  },
+  "creation-flow.modal.final-config.game-version.placeholder": {
+    "defaultMessage": "게임 버전 선택"
+  },
+  "creation-flow.modal.final-config.gamemode.creative": {
+    "defaultMessage": "크리에이티브"
+  },
+  "creation-flow.modal.final-config.gamemode.hardcore": {
+    "defaultMessage": "하드코어"
+  },
+  "creation-flow.modal.final-config.gamemode.label": {
+    "defaultMessage": "게임 모드"
+  },
+  "creation-flow.modal.final-config.gamemode.survival": {
+    "defaultMessage": "서바이벌"
+  },
+  "creation-flow.modal.final-config.generate-structures.description": {
+    "defaultMessage": "새로운 청크에 마을, 요새 및 기타 구조물이 생성되는지 여부를 제어합니다."
+  },
+  "creation-flow.modal.final-config.generate-structures.label": {
+    "defaultMessage": "구조물 생성"
+  },
+  "creation-flow.modal.final-config.generator-settings-json.placeholder": {
+    "defaultMessage": "생성 설정 JSON 입력"
+  },
+  "creation-flow.modal.final-config.generator-settings.custom": {
+    "defaultMessage": "사용자 지정"
+  },
+  "creation-flow.modal.final-config.generator-settings.default": {
+    "defaultMessage": "기본값"
+  },
+  "creation-flow.modal.final-config.generator-settings.description": {
+    "defaultMessage": "사용자 정의 완전한 평지 레이어와 같은 고급 세계 설정에 사용됩니다."
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "평지"
+  },
+  "creation-flow.modal.final-config.generator-settings.label": {
+    "defaultMessage": "생성 설정"
+  },
+  "creation-flow.modal.final-config.generator-settings.placeholder": {
+    "defaultMessage": "생성 설정 선택"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "세계 이름"
+  },
+  "creation-flow.modal.final-config.world-name.placeholder": {
+    "defaultMessage": "세계 이름 입력"
+  },
+  "creation-flow.modal.final-config.world-seed.description": {
+    "defaultMessage": "비워두면 무작위 시드가 지정됩니다."
+  },
+  "creation-flow.modal.final-config.world-seed.label-with-optional": {
+    "defaultMessage": "세계 시드 <optional>(선택)</optional>"
+  },
+  "creation-flow.modal.final-config.world-seed.placeholder": {
+    "defaultMessage": "세계 시드 입력"
+  },
+  "creation-flow.modal.final-config.world-type.amplified": {
+    "defaultMessage": "증폭"
+  },
+  "creation-flow.modal.final-config.world-type.default": {
+    "defaultMessage": "기본"
+  },
+  "creation-flow.modal.final-config.world-type.label": {
+    "defaultMessage": "세계 유형"
+  },
+  "creation-flow.modal.final-config.world-type.large-biomes": {
+    "defaultMessage": "넓은 생물 군계"
+  },
+  "creation-flow.modal.final-config.world-type.placeholder": {
+    "defaultMessage": "세계 유형 선택"
+  },
+  "creation-flow.modal.final-config.world-type.single-biome": {
+    "defaultMessage": "단일 생물 군계"
+  },
+  "creation-flow.modal.final-config.world-type.superflat": {
+    "defaultMessage": "완전한 평지"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "추가"
+  },
+  "creation-flow.modal.import-instance.custom-launcher.name": {
+    "defaultMessage": "사용자 지정 ({pathName})"
+  },
+  "creation-flow.modal.import-instance.detecting-launcher-instances": {
+    "defaultMessage": "런처 인스턴스 감지 중..."
+  },
+  "creation-flow.modal.import-instance.launcher-instances.title": {
+    "defaultMessage": "런처 인스턴스"
+  },
+  "creation-flow.modal.import-instance.launcher-path.add": {
+    "defaultMessage": "런처 경로 추가"
+  },
+  "creation-flow.modal.import-instance.launcher-path.placeholder": {
+    "defaultMessage": "런처 경로..."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.text": {
+    "defaultMessage": "지정된 경로에서 가져올 수 있는 인스턴스가 발견되지 않았습니다."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.title": {
+    "defaultMessage": "발견된 인스턴스 없음"
+  },
+  "creation-flow.modal.import-instance.search.placeholder": {
+    "defaultMessage": "인스턴스 이름 검색"
+  },
+  "creation-flow.modal.import-instance.selection.clear-all": {
+    "defaultMessage": "모두 해제"
+  },
+  "creation-flow.modal.modpack.action.browse": {
+    "defaultMessage": "모드팩 둘러보기"
+  },
+  "creation-flow.modal.modpack.action.import": {
+    "defaultMessage": "모드팩 가져오기"
+  },
+  "creation-flow.modal.modpack.known-modpack.prompt": {
+    "defaultMessage": "설치하고 싶은 모드팩을 이미 알고 계신가요?"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "결과 없음"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "모드팩 검색"
+  },
+  "creation-flow.modal.setup-type.instance.description": {
+    "defaultMessage": "인스턴스란 특정 로더, 버전 및 모드가 적용된 Minecraft 환경을 의미합니다."
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.description": {
+    "defaultMessage": "로더와 게임 버전을 선택하여 처음부터 시작합니다."
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.title": {
+    "defaultMessage": "사용자 지정 설정"
+  },
+  "creation-flow.modal.setup-type.option.import-instance.description": {
+    "defaultMessage": "Prism, CurseForge 또는 유사한 플랫폼에서 인스턴스를 가져옵니다."
+  },
+  "creation-flow.modal.setup-type.option.import-instance.title": {
+    "defaultMessage": "인스턴스 가져오기"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "Modrinth에서 모드팩을 찾아보거나 파일에서 직접 가져오세요."
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "모드팩 설치"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
+    "defaultMessage": "모드나 플러그인이 없는 기본 Minecraft입니다."
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
+    "defaultMessage": "바닐라 Minecraft"
+  },
+  "creation-flow.modal.setup-type.title.installation": {
+    "defaultMessage": "설치 방식 선택"
+  },
+  "creation-flow.modal.setup-type.title.instance": {
+    "defaultMessage": "인스턴스 방식 선택"
+  },
+  "creation-flow.modal.setup-type.title.world": {
+    "defaultMessage": "세계 방식 선택"
+  },
+  "creation-flow.title.choose-modpack": {
+    "defaultMessage": "모드팩 선택"
+  },
+  "creation-flow.title.create-instance": {
+    "defaultMessage": "인스턴스 생성"
+  },
+  "creation-flow.title.create-world": {
+    "defaultMessage": "세계 생성"
+  },
+  "creation-flow.title.import-instance": {
+    "defaultMessage": "인스턴스 가져오기"
+  },
+  "creation-flow.title.reset-server": {
+    "defaultMessage": "서버 초기화"
+  },
+  "creation-flow.title.set-up-server": {
+    "defaultMessage": "서버 설정"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "내보내기 요약"
@@ -704,14 +971,20 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": ".zip URL에서 업로드"
   },
+  "files.operations.current-file": {
+    "defaultMessage": "현재 파일: {file}"
+  },
   "files.operations.extracted": {
     "defaultMessage": "{size} 내보냄"
   },
   "files.operations.extracting": {
     "defaultMessage": "{source} 내보내는 중"
   },
-  "files.operations.failed": {
-    "defaultMessage": "실패"
+  "files.operations.extracting-completed": {
+    "defaultMessage": "{source} 내보내기 완료"
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "{source} 내보내기 실패"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "모드팩 URL"
@@ -927,7 +1200,7 @@
     "defaultMessage": "주/도 입력"
   },
   "header.category.category": {
-    "defaultMessage": "범주"
+    "defaultMessage": "카테고리"
   },
   "header.category.feature": {
     "defaultMessage": "기능"
@@ -1041,7 +1314,7 @@
     "defaultMessage": "최대 {cpus} CPU까지 버스트 가능"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "CPU 버스팅은 서버가 TPS 급증을 완화하기 위해 일시적으로 추가 스레드를 사용할 수 있도록 합니다. 자세한 내용은 여기를 클릭하세요."
+    "defaultMessage": "CPU 버스팅은 서버가 TPS 급증을 완화하기 위해 일시적으로 추가 스레드를 사용할 수 있도록 합니다. 자세한 내용을 보려면 클릭하세요."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB RAM"
@@ -1216,12 +1489,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "알 수 없는 게임 모드"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "파일 업로드가 진행 중입니다. 이 페이지를 떠나면 업로드가 취소되고 변경 내용이 사라질 수 있습니다."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "업로드 진행 중"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "호환되는 인스턴스 {count}개"
@@ -1473,7 +1740,7 @@
     "defaultMessage": "중형"
   },
   "label.plan-small": {
-    "defaultMessage": "소형"
+    "defaultMessage": "라이트"
   },
   "label.plan-unknown": {
     "defaultMessage": "알 수 없음"
@@ -2373,7 +2640,7 @@
     "defaultMessage": "유럽"
   },
   "project.server.region.middle_east": {
-    "defaultMessage": "중동아시아"
+    "defaultMessage": "중동"
   },
   "project.server.region.russia": {
     "defaultMessage": "러시아"
@@ -2567,6 +2834,9 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "운영진에 의해 숨겨짐"
   },
+  "s.bg": {
+    "defaultMessage": "백그라운드 작업 실행 중"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "필터 잠김"
   },
@@ -2654,6 +2924,21 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "바닐라"
   },
+  "servers.admonitions.background-task-running": {
+    "defaultMessage": "백그라운드 작업 실행 중"
+  },
+  "servers.backups.admonition.backup-cancelled.description": {
+    "defaultMessage": "{backupName} 백업이 취소되었습니다."
+  },
+  "servers.backups.admonition.backup-cancelled.title": {
+    "defaultMessage": "백업 취소됨"
+  },
+  "servers.backups.admonition.backup-completed.description": {
+    "defaultMessage": "{backupName} 백업을 성공적으로 완료했습니다."
+  },
+  "servers.backups.admonition.backup-completed.title": {
+    "defaultMessage": "백업 완료"
+  },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "{backupName}을(를) 생성하는 동안 문제가 발생했습니다. 다시 시도하거나 문제가 지속되면 지원 센터에 문의하세요."
   },
@@ -2666,6 +2951,12 @@
   "servers.backups.admonition.backup-queued.title": {
     "defaultMessage": "백업 대기 중"
   },
+  "servers.backups.admonition.backup-timed-out.description": {
+    "defaultMessage": "{backupName} 생성 중 시간 초과가 발생했습니다. 다시 시도하거나 문제가 계속되면 지원 센터에 문의하세요."
+  },
+  "servers.backups.admonition.backup-timed-out.title": {
+    "defaultMessage": "백업 시간 초과"
+  },
   "servers.backups.admonition.creating-backup.description": {
     "defaultMessage": "{backupName}의 세계 데이터 및 서버 설정을 저장하는 중입니다. 몇 분 정도 소요될 수 있습니다."
   },
@@ -2675,23 +2966,35 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "백업"
   },
+  "servers.backups.admonition.restore-cancelled.description": {
+    "defaultMessage": "{backupName} 복원 작업이 취소되었습니다."
+  },
+  "servers.backups.admonition.restore-cancelled.title": {
+    "defaultMessage": "복원 취소됨"
+  },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "{backupName}(으)로 복원하는 동안 문제가 발생했습니다. 다시 시도하거나 문제가 지속되면 지원 센터에 문의하세요."
   },
   "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "백업으로부터 복원 실패"
+    "defaultMessage": "복원 실패"
   },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "{backupName}(으)로 복원 작업이 대기열에 추가되었으며 곧 시작합니다."
   },
   "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "백업으로부터 복원 대기 중"
+    "defaultMessage": "복원 대기열 추가됨"
   },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "서버가 {backupName}(으)로 복원되었으며 시작할 수 있습니다."
   },
   "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "백업으로부터 복원 성공"
+    "defaultMessage": "복원 완료"
+  },
+  "servers.backups.admonition.restore-timed-out.description": {
+    "defaultMessage": "{backupName} 복원 중 시간 초과가 발생했습니다. 다시 시도하거나 문제가 계속되면 지원 센터에 문의하세요."
+  },
+  "servers.backups.admonition.restore-timed-out.title": {
+    "defaultMessage": "복원 시간 초과"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "{backupName}(으)로 서버를 복원하고 있습니다. 몇 분 정도 소요될 수 있습니다."
@@ -2699,17 +3002,50 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "백업으로부터 복원하는 중"
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "백업 {count, plural, other {#}}개 선택됨"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "백업 {total, plural, other {#}}개 삭제 중..."
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "백업 {count, plural, other {#}}개 선택됨"
+  },
+  "servers.backups.delete-modal.admonition-body": {
+    "defaultMessage": "삭제하면 {count, plural, one {해당 백업은} other {해당 백업들은}} 복구할 수 없습니다. 되돌릴 수 없습니다."
+  },
+  "servers.backups.delete-modal.admonition-header": {
+    "defaultMessage": "삭제 주의"
+  },
+  "servers.backups.delete-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {백업} other {백업 ({count})}}"
+  },
+  "servers.backups.delete-modal.confirm": {
+    "defaultMessage": "백업 {count, plural, one {삭제} other {#개 삭제}}"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "백업 삭제"
+  },
+  "servers.backups.empty.description": {
+    "defaultMessage": "첫 백업 생성하기"
+  },
+  "servers.backups.empty.heading": {
+    "defaultMessage": "백업이 없습니다"
+  },
+  "servers.backups.filtered-empty.clear-filters": {
+    "defaultMessage": "필터 초기화"
+  },
+  "servers.backups.filtered-empty.description": {
+    "defaultMessage": "다른 필터를 적용하거나 필터를 모두 해제하여 모든 백업을 확인해 보세요."
+  },
+  "servers.backups.filtered-empty.heading": {
+    "defaultMessage": "일치하는 백업 없음"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "자동"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "백업 스케쥴"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "백업 생성에 실패했습니다"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "백업을 복구하는데 실패했습니다"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "백업 메뉴얼"
@@ -2719,6 +3055,21 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "복원"
+  },
+  "servers.backups.select-backup-aria": {
+    "defaultMessage": "{name} 백업 선택"
+  },
+  "servers.backups.toolbar.create-backup": {
+    "defaultMessage": "백업 생성"
+  },
+  "servers.backups.toolbar.filter-auto": {
+    "defaultMessage": "자동"
+  },
+  "servers.backups.toolbar.filter-manual": {
+    "defaultMessage": "수동"
+  },
+  "servers.backups.toolbar.select-all": {
+    "defaultMessage": "모두 선택"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "백업 생성 진행 중"
@@ -2760,7 +3111,7 @@
     "defaultMessage": "Modrinth 앱에서 친구들을 초대해 설정을 도울 수 있습니다."
   },
   "servers.list-empty.play-with-friends-title": {
-    "defaultMessage": "친구들과 플레이하세요"
+    "defaultMessage": "친구들과 플레이"
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "로그인"
@@ -2985,7 +3336,7 @@
     "defaultMessage": "아직은 요금이 청구되지 않습니다."
   },
   "servers.purchase.step.payment.prompt": {
-    "defaultMessage": "결제 수단을 선택하십시오"
+    "defaultMessage": "결제 수단 선택"
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "결제 수단"
@@ -3003,13 +3354,13 @@
     "defaultMessage": "시작하기"
   },
   "servers.purchase.step.plan.large": {
-    "defaultMessage": "대형"
+    "defaultMessage": "프리미엄"
   },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "15–25명의 플레이어, 모드팩 또는 무거운 모드에 적합합니다."
   },
   "servers.purchase.step.plan.medium": {
-    "defaultMessage": "중형"
+    "defaultMessage": "레귤러"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "6–15명의 플레이어와 여러개의 모드에 적합합니다."
@@ -3039,7 +3390,7 @@
     "defaultMessage": "검토"
   },
   "servers.region.central-europe": {
-    "defaultMessage": "중앙유럽"
+    "defaultMessage": "중부유럽"
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "RAM이 얼마나 있었으면 좋겠나요?"
@@ -3062,6 +3413,51 @@
   "servers.region.western-europe": {
     "defaultMessage": "서유럽"
   },
+  "servers.setup.onboarding.installation-failed.text": {
+    "defaultMessage": "설치 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+  },
+  "servers.setup.onboarding.installation-failed.title": {
+    "defaultMessage": "설치 실패"
+  },
+  "servers.setup.onboarding.modpack-upload-failed.text": {
+    "defaultMessage": "업로드 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+  },
+  "servers.setup.onboarding.modpack-upload-failed.title": {
+    "defaultMessage": "모드팩 업로드 실패"
+  },
+  "servers.setup.onboarding.setup-server.button": {
+    "defaultMessage": "서버 설정"
+  },
+  "servers.setup.onboarding.step.choose.description": {
+    "defaultMessage": "Modrinth에서 마음에 드는 모드팩을 고르거나, 로더를 선택하고 원하는 모드를 추가하세요."
+  },
+  "servers.setup.onboarding.step.choose.title": {
+    "defaultMessage": "플레이할 콘텐츠 선택"
+  },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "싱글플레이와 똑같이 세계를 설정합니다. 게임 모드와 세계 생성 시드를 선택합니다."
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "세계 구성하기"
+  },
+  "servers.setup.onboarding.step.invite-friends.description": {
+    "defaultMessage": "서버 주소를 복사해서 친구들과 공유하고, 접속에 필요한 모드를 알려주세요."
+  },
+  "servers.setup.onboarding.step.invite-friends.title": {
+    "defaultMessage": "친구 초대하기"
+  },
+  "servers.setup.onboarding.steps.heading": {
+    "defaultMessage": "서버 설정 (약 2분)"
+  },
+  "servers.setup.onboarding.uploading.progress": {
+    "defaultMessage": "업로드 중 ({percent, number}%)"
+  },
+  "servers.setup.onboarding.welcome.description": {
+    "defaultMessage": "서버가 준비되었습니다. 플레이하려면 다음 단계를 따라주세요!"
+  },
+  "servers.setup.onboarding.welcome.title": {
+    "defaultMessage": "Modrinth Hosting에 오신 것을 환영합니다"
+  },
   "servers.setup.rate-limit.text": {
     "defaultMessage": "제한에 도달했습니다. 나중에 다시 시도하세요."
   },
@@ -3069,7 +3465,7 @@
     "defaultMessage": "서버를 재설치 할 수 없음"
   },
   "servers.setup.reinstall-failed.text": {
-    "defaultMessage": "재설치 중 예기치 못한 오류가 발생했습니다. 나중에 다시 시도하세요."
+    "defaultMessage": "재설치 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
   },
   "servers.setup.reinstall-failed.title": {
     "defaultMessage": "재설치 실패"
@@ -3096,13 +3492,13 @@
     "defaultMessage": "결제 및 구독"
   },
   "settings.display.theme.dark": {
-    "defaultMessage": "어둡게"
+    "defaultMessage": "어두운 테마"
   },
   "settings.display.theme.description": {
     "defaultMessage": "이 디바이스에서 선호하는 Modrinth의 색상 테마를 선택합니다."
   },
   "settings.display.theme.light": {
-    "defaultMessage": "밝게"
+    "defaultMessage": "밝은 테마"
   },
   "settings.display.theme.oled": {
     "defaultMessage": "OLED"
@@ -3204,10 +3600,10 @@
     "defaultMessage": "소리"
   },
   "tag.category.battle-royale": {
-    "defaultMessage": "배틀 로엄"
+    "defaultMessage": "배틀 로얄"
   },
   "tag.category.bedwars": {
-    "defaultMessage": "베드 워즈"
+    "defaultMessage": "베드워즈"
   },
   "tag.category.blocks": {
     "defaultMessage": "블록"
@@ -3291,7 +3687,7 @@
     "defaultMessage": "게임 동작"
   },
   "tag.category.gens": {
-    "defaultMessage": "세대"
+    "defaultMessage": "Gens"
   },
   "tag.category.gui": {
     "defaultMessage": "GUI"
@@ -3348,7 +3744,7 @@
     "defaultMessage": "미니게임"
   },
   "tag.category.minigames": {
-    "defaultMessage": "미니 게임"
+    "defaultMessage": "미니게임"
   },
   "tag.category.mmo": {
     "defaultMessage": "MMO"
@@ -3411,7 +3807,7 @@
     "defaultMessage": "PvP"
   },
   "tag.category.questing": {
-    "defaultMessage": "퀴스트"
+    "defaultMessage": "퀘스트"
   },
   "tag.category.quests": {
     "defaultMessage": "퀘스트"
@@ -3465,7 +3861,7 @@
     "defaultMessage": "팀"
   },
   "tag.category.technical": {
-    "defaultMessage": "테크니컈"
+    "defaultMessage": "기술"
   },
   "tag.category.technology": {
     "defaultMessage": "기술"
@@ -3486,7 +3882,7 @@
     "defaultMessage": "도구"
   },
   "tag.category.vanilla-like": {
-    "defaultMessage": "바닐라 같은"
+    "defaultMessage": "바닐라풍"
   },
   "tag.category.whitelisted": {
     "defaultMessage": "화이트리스트"
@@ -3604,6 +4000,12 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "페이지를 떠나겠습니까?"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "알림 {count}개"
+  },
+  "ui.stacked-admonitions.dismiss-all": {
+    "defaultMessage": "모두 닫기"
   }
 }
 

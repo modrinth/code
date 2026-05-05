@@ -279,7 +279,7 @@
     "defaultMessage": "私人"
   },
   "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "你確定要將這 {count} 更新至最新的相容版本嗎？建議你逐一進行更新。"
+    "defaultMessage": "確定要將這 {count} 個專案更新至最新的相容版本嗎？建議你逐一進行更新。"
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "更新警告"
@@ -393,7 +393,7 @@
     "defaultMessage": "請待操作完成後再進行編輯。"
   },
   "content.page-layout.empty.hint": {
-    "defaultMessage": "瀏覽或上傳 {contentType} 即可開始"
+    "defaultMessage": "瀏覽或上傳{contentType}即可開始"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "在這個模組包之上新增額外內容"
@@ -452,9 +452,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "上傳檔案"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "正在上傳檔案 ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "所有已選擇的內容已經停用"
   },
@@ -490,6 +487,276 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "已選取 {count, number} 個項目"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "建立實例"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "建立世界"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "完成"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "匯入"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "匯入 {count} 個實例"
+  },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "設定伺服器"
+  },
+  "creation-flow.modal.custom-setup.build-number.label": {
+    "defaultMessage": "組建編號"
+  },
+  "creation-flow.modal.custom-setup.build-number.placeholder": {
+    "defaultMessage": "選擇組建編號"
+  },
+  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
+    "defaultMessage": "搜尋組建編號..."
+  },
+  "creation-flow.modal.custom-setup.content-loader.label": {
+    "defaultMessage": "內容載入器"
+  },
+  "creation-flow.modal.custom-setup.game-version.placeholder": {
+    "defaultMessage": "選擇遊戲版本"
+  },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "搜尋遊戲版本..."
+  },
+  "creation-flow.modal.custom-setup.icon.remove": {
+    "defaultMessage": "移除圖示"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "選擇圖示"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "最新版"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "其他"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "穩定版"
+  },
+  "creation-flow.modal.custom-setup.loader-version.label": {
+    "defaultMessage": "載入器版本"
+  },
+  "creation-flow.modal.custom-setup.loader-version.placeholder": {
+    "defaultMessage": "選擇載入器版本"
+  },
+  "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
+    "defaultMessage": "搜尋載入器版本..."
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "載入器"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "名稱"
+  },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "輸入實例名稱"
+  },
+  "creation-flow.modal.custom-setup.options.no-versions-available": {
+    "defaultMessage": "沒有可用的版本"
+  },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "其他設定"
+  },
+  "creation-flow.modal.final-config.backup.before-reset-server.name": {
+    "defaultMessage": "重設伺服器前"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "簡單"
+  },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "困難"
+  },
+  "creation-flow.modal.final-config.difficulty.label": {
+    "defaultMessage": "難易度"
+  },
+  "creation-flow.modal.final-config.difficulty.normal": {
+    "defaultMessage": "普通"
+  },
+  "creation-flow.modal.final-config.difficulty.peaceful": {
+    "defaultMessage": "和平"
+  },
+  "creation-flow.modal.final-config.game-version.placeholder": {
+    "defaultMessage": "選擇遊戲版本"
+  },
+  "creation-flow.modal.final-config.gamemode.creative": {
+    "defaultMessage": "創造"
+  },
+  "creation-flow.modal.final-config.gamemode.hardcore": {
+    "defaultMessage": "極限"
+  },
+  "creation-flow.modal.final-config.gamemode.label": {
+    "defaultMessage": "遊戲模式"
+  },
+  "creation-flow.modal.final-config.gamemode.survival": {
+    "defaultMessage": "生存"
+  },
+  "creation-flow.modal.final-config.generate-structures.description": {
+    "defaultMessage": "控制是否在新的區塊中生成村莊、要塞及其他結構。"
+  },
+  "creation-flow.modal.final-config.generate-structures.label": {
+    "defaultMessage": "生成結構"
+  },
+  "creation-flow.modal.final-config.generator-settings-json.placeholder": {
+    "defaultMessage": "輸入生成設定 JSON"
+  },
+  "creation-flow.modal.final-config.generator-settings.custom": {
+    "defaultMessage": "自訂"
+  },
+  "creation-flow.modal.final-config.generator-settings.default": {
+    "defaultMessage": "預設"
+  },
+  "creation-flow.modal.final-config.generator-settings.description": {
+    "defaultMessage": "用於進階世界自訂，例如自訂超平坦層。"
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "平坦"
+  },
+  "creation-flow.modal.final-config.generator-settings.label": {
+    "defaultMessage": "生成設定"
+  },
+  "creation-flow.modal.final-config.generator-settings.placeholder": {
+    "defaultMessage": "選擇生成設定"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "世界名稱"
+  },
+  "creation-flow.modal.final-config.world-name.placeholder": {
+    "defaultMessage": "輸入世界名稱"
+  },
+  "creation-flow.modal.final-config.world-seed.description": {
+    "defaultMessage": "若不填則隨機生成種子碼。"
+  },
+  "creation-flow.modal.final-config.world-seed.label-with-optional": {
+    "defaultMessage": "世界種子碼<optional>（可選）</optional>"
+  },
+  "creation-flow.modal.final-config.world-seed.placeholder": {
+    "defaultMessage": "輸入世界種子碼"
+  },
+  "creation-flow.modal.final-config.world-type.amplified": {
+    "defaultMessage": "巨大化世界"
+  },
+  "creation-flow.modal.final-config.world-type.default": {
+    "defaultMessage": "預設"
+  },
+  "creation-flow.modal.final-config.world-type.label": {
+    "defaultMessage": "世界類型"
+  },
+  "creation-flow.modal.final-config.world-type.large-biomes": {
+    "defaultMessage": "大型生態域"
+  },
+  "creation-flow.modal.final-config.world-type.placeholder": {
+    "defaultMessage": "選擇世界類型"
+  },
+  "creation-flow.modal.final-config.world-type.single-biome": {
+    "defaultMessage": "單一生態域"
+  },
+  "creation-flow.modal.final-config.world-type.superflat": {
+    "defaultMessage": "超平坦"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "新增"
+  },
+  "creation-flow.modal.import-instance.custom-launcher.name": {
+    "defaultMessage": "自訂（{pathName}）"
+  },
+  "creation-flow.modal.import-instance.detecting-launcher-instances": {
+    "defaultMessage": "正在偵測啟動器實例..."
+  },
+  "creation-flow.modal.import-instance.launcher-instances.title": {
+    "defaultMessage": "啟動器實例"
+  },
+  "creation-flow.modal.import-instance.launcher-path.add": {
+    "defaultMessage": "新增啟動器路徑"
+  },
+  "creation-flow.modal.import-instance.launcher-path.placeholder": {
+    "defaultMessage": "啟動器路徑..."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.text": {
+    "defaultMessage": "在指定的路徑中找不到可匯入的實例。"
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.title": {
+    "defaultMessage": "找不到實例"
+  },
+  "creation-flow.modal.import-instance.search.placeholder": {
+    "defaultMessage": "搜尋實例名稱"
+  },
+  "creation-flow.modal.import-instance.selection.clear-all": {
+    "defaultMessage": "清除全部"
+  },
+  "creation-flow.modal.modpack.action.browse": {
+    "defaultMessage": "瀏覽模組包"
+  },
+  "creation-flow.modal.modpack.action.import": {
+    "defaultMessage": "匯入模組包"
+  },
+  "creation-flow.modal.modpack.known-modpack.prompt": {
+    "defaultMessage": "已經選好想要安裝的模組包了嗎？"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "找不到結果"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "搜尋模組包"
+  },
+  "creation-flow.modal.setup-type.instance.description": {
+    "defaultMessage": "實例是指具有特定載入器、版本及模組的 Minecraft 設定。"
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.description": {
+    "defaultMessage": "從頭開始，先選擇載入器與遊戲版本。"
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.title": {
+    "defaultMessage": "自訂設定"
+  },
+  "creation-flow.modal.setup-type.option.import-instance.description": {
+    "defaultMessage": "從 Prism、CurseForge 或類似啟動器匯入實例。"
+  },
+  "creation-flow.modal.setup-type.option.import-instance.title": {
+    "defaultMessage": "匯入實例"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "在 Modrinth 上瀏覽模組包，或從檔案匯入。"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "安裝模組包"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
+    "defaultMessage": "不含任何模組或插件的經典 Minecraft。"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
+    "defaultMessage": "原版 Minecraft"
+  },
+  "creation-flow.modal.setup-type.title.installation": {
+    "defaultMessage": "選擇安裝類型"
+  },
+  "creation-flow.modal.setup-type.title.instance": {
+    "defaultMessage": "選擇實例類型"
+  },
+  "creation-flow.modal.setup-type.title.world": {
+    "defaultMessage": "選擇世界類型"
+  },
+  "creation-flow.title.choose-modpack": {
+    "defaultMessage": "選擇模組包"
+  },
+  "creation-flow.title.create-instance": {
+    "defaultMessage": "建立實例"
+  },
+  "creation-flow.title.create-world": {
+    "defaultMessage": "建立世界"
+  },
+  "creation-flow.title.import-instance": {
+    "defaultMessage": "匯入實例"
+  },
+  "creation-flow.title.reset-server": {
+    "defaultMessage": "重設伺服器"
+  },
+  "creation-flow.title.set-up-server": {
+    "defaultMessage": "設定伺服器"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "解壓縮摘要"
@@ -567,10 +834,10 @@
     "defaultMessage": "沒有結果"
   },
   "files.editor.find-previous-match": {
-    "defaultMessage": "上一場相符項"
+    "defaultMessage": "上一個相符項"
   },
   "files.editor.find-toggle-replace": {
-    "defaultMessage": "切換替換"
+    "defaultMessage": "切換取代功能"
   },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "你的記錄檔網址已複製到剪貼簿。"
@@ -684,10 +951,10 @@
     "defaultMessage": "安裝 CurseForge 整合包"
   },
   "files.navbar.new-file": {
-    "defaultMessage": "新檔案"
+    "defaultMessage": "新增檔案"
   },
   "files.navbar.new-folder": {
-    "defaultMessage": "新資料夾"
+    "defaultMessage": "新增資料夾"
   },
   "files.navbar.search-files": {
     "defaultMessage": "搜尋檔案"
@@ -704,17 +971,23 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "從 .zip 網址上傳"
   },
+  "files.operations.current-file": {
+    "defaultMessage": "目前檔案：{file}"
+  },
   "files.operations.extracted": {
     "defaultMessage": "已解壓縮 {size}"
   },
   "files.operations.extracting": {
     "defaultMessage": "正在解壓縮 {source}"
   },
-  "files.operations.failed": {
-    "defaultMessage": "失敗"
+  "files.operations.extracting-completed": {
+    "defaultMessage": "已完成解壓縮 {source}"
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "無法解壓縮 {source}"
   },
   "files.operations.modpack-from-url": {
-    "defaultMessage": "來自網址的整合包"
+    "defaultMessage": "來自網址的模組包"
   },
   "files.rename-modal.header": {
     "defaultMessage": "重新命名 {name}"
@@ -1216,12 +1489,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "未知的遊戲模式"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "檔案還在上傳中，離開此頁面將取消上傳，並且你所做的變更可能會遺失。"
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "正在執行上傳作業"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} 個相容實例"
@@ -2139,7 +2406,7 @@
     "defaultMessage": "過去 2 週內來自 Modrinth 的 {count} 次最近遊玩次數"
   },
   "project.server.customModpackTooltip": {
-    "defaultMessage": "這個專案用了一個自定義模組包"
+    "defaultMessage": "這個專案使用了自訂模組包"
   },
   "project.server.language.af": {
     "defaultMessage": "南非文"
@@ -2567,6 +2834,9 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "由工作人員設為不公開"
   },
+  "s.bg": {
+    "defaultMessage": "背景工作執行中"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "篩選器已鎖定"
   },
@@ -2649,10 +2919,25 @@
     "defaultMessage": "載入器"
   },
   "search.server_content_type.modpack": {
-    "defaultMessage": "模組版"
+    "defaultMessage": "模組支援"
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "原版"
+  },
+  "servers.admonitions.background-task-running": {
+    "defaultMessage": "背景工作執行中"
+  },
+  "servers.backups.admonition.backup-cancelled.description": {
+    "defaultMessage": "已取消備份「{backupName}」。"
+  },
+  "servers.backups.admonition.backup-cancelled.title": {
+    "defaultMessage": "備份已取消"
+  },
+  "servers.backups.admonition.backup-completed.description": {
+    "defaultMessage": "已成功完成備份「{backupName}」。"
+  },
+  "servers.backups.admonition.backup-completed.title": {
+    "defaultMessage": "備份完成"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "建立「{backupName}」時發生錯誤。請再試一次，若問題持續發生，請聯絡支援團隊。"
@@ -2666,6 +2951,12 @@
   "servers.backups.admonition.backup-queued.title": {
     "defaultMessage": "備份作業已加入佇列"
   },
+  "servers.backups.admonition.backup-timed-out.description": {
+    "defaultMessage": "建立「{backupName}」時發生逾時。你可以再試一次，若問題持續發生，請聯絡客服。"
+  },
+  "servers.backups.admonition.backup-timed-out.title": {
+    "defaultMessage": "備份逾時"
+  },
   "servers.backups.admonition.creating-backup.description": {
     "defaultMessage": "正在為 {backupName} 保存世界資料和伺服器配置。這可能需要幾分鐘。"
   },
@@ -2675,23 +2966,35 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "你的備份"
   },
+  "servers.backups.admonition.restore-cancelled.description": {
+    "defaultMessage": "已取消從「{backupName}」還原。"
+  },
+  "servers.backups.admonition.restore-cancelled.title": {
+    "defaultMessage": "還原已取消"
+  },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "還原「{backupName}」時發生錯誤。請再試一次，若問題持續發生，請聯絡支援團隊。"
   },
   "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "無法從備份還原"
+    "defaultMessage": "無法還原"
   },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "從 {backupName} 還原已加入佇列，即將開始。"
   },
   "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "備份還原作業已加入佇列"
+    "defaultMessage": "還原已排入佇列"
   },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "你的伺服器以還原至 {backupName} ，可以啟動了。"
   },
   "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "成功從備份還原"
+    "defaultMessage": "還原完成"
+  },
+  "servers.backups.admonition.restore-timed-out.description": {
+    "defaultMessage": "從「{backupName}」還原時發生逾時。你可以再試一次，若問題持續發生，請聯絡客服。"
+  },
+  "servers.backups.admonition.restore-timed-out.title": {
+    "defaultMessage": "還原逾時"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "正在從 {backupName} 還原你的伺服器。這可能需要幾分鐘。"
@@ -2699,17 +3002,50 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "從備份還原"
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "對 {count} 個選取的備份執行批次動作"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "正在刪除 {total} 個備份..."
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "已選取 {count} 個備份"
+  },
+  "servers.backups.delete-modal.admonition-body": {
+    "defaultMessage": "一旦刪除，{count, plural, one {這個備份} other {這些備份}}將無法還原。刪除後即永久消失。"
+  },
+  "servers.backups.delete-modal.admonition-header": {
+    "defaultMessage": "刪除警告"
+  },
+  "servers.backups.delete-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {備份} other {備份 ({count})}}"
+  },
+  "servers.backups.delete-modal.confirm": {
+    "defaultMessage": "刪除{count, plural, one {備份} other {# 個備份}}"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "刪除備份"
+  },
+  "servers.backups.empty.description": {
+    "defaultMessage": "建立你的第一個備份"
+  },
+  "servers.backups.empty.heading": {
+    "defaultMessage": "尚無備份"
+  },
+  "servers.backups.filtered-empty.clear-filters": {
+    "defaultMessage": "清除篩選條件"
+  },
+  "servers.backups.filtered-empty.description": {
+    "defaultMessage": "試試使用不同的篩選條件，或清除篩選條件以查看所有備份。"
+  },
+  "servers.backups.filtered-empty.heading": {
+    "defaultMessage": "沒有相符的備份"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "自動備份"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "備份排程"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "建立備份失敗"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "從備份還原失敗"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "手動備份"
@@ -2719,6 +3055,21 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "還原"
+  },
+  "servers.backups.select-backup-aria": {
+    "defaultMessage": "選擇備份「{name}」"
+  },
+  "servers.backups.toolbar.create-backup": {
+    "defaultMessage": "建立備份"
+  },
+  "servers.backups.toolbar.filter-auto": {
+    "defaultMessage": "自動備份"
+  },
+  "servers.backups.toolbar.filter-manual": {
+    "defaultMessage": "手動備份"
+  },
+  "servers.backups.toolbar.select-all": {
+    "defaultMessage": "全選"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "正在建立備份"
@@ -2811,7 +3162,7 @@
     "defaultMessage": "您的訂閱已於 <date>{formattedDate}</date>取消。"
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
-    "defaultMessage": "由於付款失敗，您的訂閱已被取消。"
+    "defaultMessage": "由於付款失敗，已取消你的訂閱。"
   },
   "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
     "defaultMessage": "由於付款失敗，您的訂閱已於<date>{formattedDate}</date>取消。"
@@ -2823,10 +3174,10 @@
     "defaultMessage": "你的訂閱設定於 <date>{formattedDate}</date> 取消。"
   },
   "servers.listing.notice.suspended": {
-    "defaultMessage": "您的伺服器已被暫停。請聯絡 Modrinth 客服以了解更多資訊。"
+    "defaultMessage": "你的伺服器已暫停服務。請聯絡 Modrinth 客服以取得更多資訊。"
   },
   "servers.listing.notice.upgrading": {
-    "defaultMessage": "您的伺服器硬體正在升級，很快就會恢復上線。"
+    "defaultMessage": "你的伺服器硬體目前正在升級中，稍後將恢復上線。"
   },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "重新訂閱"
@@ -3061,6 +3412,51 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "西歐"
+  },
+  "servers.setup.onboarding.installation-failed.text": {
+    "defaultMessage": "安裝時發生非預期的錯誤。請稍後再試。"
+  },
+  "servers.setup.onboarding.installation-failed.title": {
+    "defaultMessage": "無法安裝"
+  },
+  "servers.setup.onboarding.modpack-upload-failed.text": {
+    "defaultMessage": "上傳時發生非預期的錯誤。請稍後再試。"
+  },
+  "servers.setup.onboarding.modpack-upload-failed.title": {
+    "defaultMessage": "無法上傳模組包"
+  },
+  "servers.setup.onboarding.setup-server.button": {
+    "defaultMessage": "設定伺服器"
+  },
+  "servers.setup.onboarding.step.choose.description": {
+    "defaultMessage": "從 Modrinth 挑選你喜愛的模組包，或是選擇載入器並自行加入想要的模組。"
+  },
+  "servers.setup.onboarding.step.choose.title": {
+    "defaultMessage": "選擇你想玩的內容"
+  },
+  "servers.setup.onboarding.step.configure-world.description": {
+    "defaultMessage": "你可以像在單人遊戲中一樣設定世界。選擇遊戲模式與世界種子碼。"
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "設定你的世界"
+  },
+  "servers.setup.onboarding.step.invite-friends.description": {
+    "defaultMessage": "複製位址並告訴好友加入時需要哪些模組，即可將你的伺服器分享給他們。"
+  },
+  "servers.setup.onboarding.step.invite-friends.title": {
+    "defaultMessage": "邀請好友"
+  },
+  "servers.setup.onboarding.steps.heading": {
+    "defaultMessage": "設定伺服器（約需 2 分鐘）"
+  },
+  "servers.setup.onboarding.uploading.progress": {
+    "defaultMessage": "正在上傳 ({percent, number}%}"
+  },
+  "servers.setup.onboarding.welcome.description": {
+    "defaultMessage": "你的伺服器已準備就緒。以下是開始遊戲前需要完成的操作！"
+  },
+  "servers.setup.onboarding.welcome.title": {
+    "defaultMessage": "歡迎使用 Modrinth Hosting"
   },
   "servers.setup.rate-limit.text": {
     "defaultMessage": "你的操作過於頻繁。請稍後再試。"
@@ -3604,6 +4000,12 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "離開頁面？"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count} 個警示"
+  },
+  "ui.stacked-admonitions.dismiss-all": {
+    "defaultMessage": "忽略全部"
   }
 }
 

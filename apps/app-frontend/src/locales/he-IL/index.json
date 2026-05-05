@@ -29,12 +29,6 @@
   "app.browse.discover-servers": {
     "message": "גלה שרתים"
   },
-  "app.browse.hide-added-servers": {
-    "message": "הסתר שרתים שנוספו"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "הסתר תוכן מותקן"
-  },
   "app.browse.install-content-to-instance": {
     "message": "הוספת התוכן להתקנה"
   },

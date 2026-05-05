@@ -47,8 +47,10 @@ const navItems = computed(() => {
 		projectV3.value?.project_types?.some((type) => ['mod', 'modpack'].includes(type)) &&
 		isStaff(currentMember.value?.user)
 
-	const hasPermissionsPage = computed(() =>
-		projectV3.value?.project_types?.some((type) => ['modpack'].includes(type)),
+	const hasPermissionsPage = computed(
+		() =>
+			flags.value.modpackPermissionsPage &&
+			projectV3.value?.project_types?.some((type) => ['modpack'].includes(type)),
 	)
 
 	const items = [
@@ -162,7 +164,7 @@ watch(route, () => {
 			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 			@set-processing="setProcessing"
 		/>
-		<div class="experimental-styles-within grid gap-4 lg:grid-cols-[1fr_3fr]">
+		<div class="grid gap-4 lg:grid-cols-[1fr_3fr]">
 			<div>
 				<NavStack :items="navItems" />
 			</div>

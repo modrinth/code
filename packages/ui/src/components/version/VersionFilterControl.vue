@@ -1,5 +1,5 @@
 <template>
-	<div class="experimental-styles-within flex flex-col gap-3">
+	<div class="flex flex-col gap-3">
 		<div class="flex flex-wrap items-center gap-2">
 			<ManySelect
 				v-model="selectedPlatforms"

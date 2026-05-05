@@ -21,33 +21,38 @@
 					circle
 					:alt="auth.user.username"
 				/>
-				<div class="input-stack">
-					<FileInput
-						:max-size="262144"
-						:show-icon="true"
-						class="btn"
-						:prompt="formatMessage(commonMessages.uploadImageButton)"
-						accept="image/png,image/jpeg,image/gif,image/webp"
-						@change="showPreviewImage"
-					>
-						<UploadIcon />
-					</FileInput>
-					<Button v-if="avatarUrl !== null" :action="removePreviewImage">
-						<TrashIcon />
-						{{ formatMessage(commonMessages.removeImageButton) }}
-					</Button>
-					<Button
-						v-if="previewImage"
-						:action="
-							() => {
-								icon = null
-								previewImage = null
-							}
-						"
-					>
-						<UndoIcon />
-						{{ formatMessage(commonMessages.resetButton) }}
-					</Button>
+				<div class="flex flex-col gap-2">
+					<ButtonStyled>
+						<FileInput
+							:max-size="262144"
+							:show-icon="true"
+							class="button-like"
+							:prompt="formatMessage(commonMessages.uploadImageButton)"
+							accept="image/png,image/jpeg,image/gif,image/webp"
+							@change="showPreviewImage"
+						>
+							<UploadIcon />
+						</FileInput>
+					</ButtonStyled>
+					<ButtonStyled v-if="avatarUrl !== null">
+						<button @click="removePreviewImage">
+							<TrashIcon />
+							{{ formatMessage(commonMessages.removeImageButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="previewImage">
+						<button
+							@click="
+								() => {
+									icon = null
+									previewImage = null
+								}
+							"
+						>
+							<UndoIcon />
+							{{ formatMessage(commonMessages.resetButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 			<label for="username-field">
@@ -65,9 +70,11 @@
 			</label>
 			<StyledInput id="bio-field" v-model="current.bio" multiline />
 			<div class="input-group mt-4">
-				<Button :link="`/user/${auth.user.username}`">
-					<UserIcon /> {{ formatMessage(commonMessages.visitYourProfile) }}
-				</Button>
+				<ButtonStyled>
+					<NuxtLink :to="`/user/${auth.user.username}`">
+						<UserIcon /> {{ formatMessage(commonMessages.visitYourProfile) }}
+					</NuxtLink>
+				</ButtonStyled>
 			</div>
 		</section>
 		<UnsavedChangesPopup
@@ -84,7 +91,7 @@
 import { TrashIcon, UndoIcon, UploadIcon, UserIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	FileInput,

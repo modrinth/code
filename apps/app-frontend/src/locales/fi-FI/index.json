@@ -29,12 +29,6 @@
   "app.browse.discover-servers": {
     "message": "Löydä palvelimia"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Piilota lisätyt palvelimet"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Piilota asennettu sisältö"
-  },
   "app.browse.install-content-to-instance": {
     "message": "Lataa sisältöä instanssiin"
   },

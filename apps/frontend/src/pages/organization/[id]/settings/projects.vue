@@ -25,15 +25,17 @@
 							"
 							:maxlength="2048"
 						/>
-						<button
-							v-tooltip="'Clear link'"
-							aria-label="Clear link"
-							class="square-button label-button"
-							:data-active="editLinks.issues.clear"
-							@click="editLinks.issues.clear = !editLinks.issues.clear"
-						>
-							<TrashIcon />
-						</button>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="'Clear link'"
+								class="label-button"
+								aria-label="Clear link"
+								:data-active="editLinks.issues.clear"
+								@click="editLinks.issues.clear = !editLinks.issues.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 					<label
 						for="source-code-input"
@@ -52,15 +54,17 @@
 								editLinks.source.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
 						/>
-						<button
-							v-tooltip="'Clear link'"
-							aria-label="Clear link"
-							class="square-button label-button"
-							:data-active="editLinks.source.clear"
-							@click="editLinks.source.clear = !editLinks.source.clear"
-						>
-							<TrashIcon />
-						</button>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="'Clear link'"
+								class="label-button"
+								aria-label="Clear link"
+								:data-active="editLinks.source.clear"
+								@click="editLinks.source.clear = !editLinks.source.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 					<label
 						for="wiki-page-input"
@@ -79,15 +83,17 @@
 								editLinks.wiki.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
 						/>
-						<button
-							v-tooltip="'Clear link'"
-							aria-label="Clear link"
-							class="square-button label-button"
-							:data-active="editLinks.wiki.clear"
-							@click="editLinks.wiki.clear = !editLinks.wiki.clear"
-						>
-							<TrashIcon />
-						</button>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="'Clear link'"
+								class="label-button"
+								aria-label="Clear link"
+								:data-active="editLinks.wiki.clear"
+								@click="editLinks.wiki.clear = !editLinks.wiki.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 					<label for="discord-invite-input" title="An invitation link to your Discord server.">
 						<span class="label__title">Discord invite</span>
@@ -105,15 +111,17 @@
 									: 'Enter a valid Discord invite URL'
 							"
 						/>
-						<button
-							v-tooltip="'Clear link'"
-							aria-label="Clear link"
-							class="square-button label-button"
-							:data-active="editLinks.discord.clear"
-							@click="editLinks.discord.clear = !editLinks.discord.clear"
-						>
-							<TrashIcon />
-						</button>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="'Clear link'"
+								class="label-button"
+								aria-label="Clear link"
+								:data-active="editLinks.discord.clear"
+								@click="editLinks.discord.clear = !editLinks.discord.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 				</section>
 				<p>
@@ -143,14 +151,18 @@
 					description="Show all projects"
 				/>
 				<div class="push-right input-group">
-					<button class="iconified-button" @click="$refs.editLinksModal.hide()">
-						<XIcon />
-						Cancel
-					</button>
-					<button class="iconified-button brand-button" @click="onBulkEditLinks">
-						<SaveIcon />
-						Save changes
-					</button>
+					<ButtonStyled>
+						<button @click="$refs.editLinksModal.hide()">
+							<XIcon />
+							Cancel
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button @click="onBulkEditLinks">
+							<SaveIcon />
+							Save changes
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</NewModal>
@@ -159,10 +171,12 @@
 			<div class="header__row">
 				<h2 class="header__title text-2xl">Projects</h2>
 				<div class="input-group">
-					<button class="iconified-button brand-button" @click="$refs.modal_creation.show($event)">
-						<PlusIcon />
-						{{ formatMessage(commonMessages.createAProjectButton) }}
-					</button>
+					<ButtonStyled color="brand">
+						<button @click="$refs.modal_creation.show($event)">
+							<PlusIcon />
+							{{ formatMessage(commonMessages.createAProjectButton) }}
+						</button>
+					</ButtonStyled>
 					<OrganizationProjectTransferModal
 						:projects="usersOwnedProjects || []"
 						@submit="onProjectTransferSubmit"
@@ -175,14 +189,12 @@
 			<template v-else>
 				<p>You can edit multiple projects at once by selecting them below.</p>
 				<div class="input-group">
-					<button
-						class="iconified-button"
-						:disabled="selectedProjects.length === 0"
-						@click="$refs.editLinksModal.show()"
-					>
-						<EditIcon />
-						Edit links
-					</button>
+					<ButtonStyled>
+						<button :disabled="selectedProjects.length === 0" @click="$refs.editLinksModal.show()">
+							<EditIcon />
+							Edit links
+						</button>
+					</ButtonStyled>
 					<div class="push-right">
 						<div class="labeled-control-row">
 							Sort by
@@ -193,14 +205,15 @@
 								:options="sortOptions"
 								@change="sortedProjects = updateSort(sortedProjects, sortBy, descending)"
 							/>
-							<button
-								v-tooltip="descending ? 'Descending' : 'Ascending'"
-								class="square-button"
-								@click="updateDescending()"
-							>
-								<SortDescIcon v-if="descending" />
-								<SortAscIcon v-else />
-							</button>
+							<ButtonStyled circular>
+								<button
+									v-tooltip="descending ? 'Descending' : 'Ascending'"
+									@click="updateDescending()"
+								>
+									<SortDescIcon v-if="descending" />
+									<SortAscIcon v-else />
+								</button>
+							</ButtonStyled>
 						</div>
 					</div>
 				</div>

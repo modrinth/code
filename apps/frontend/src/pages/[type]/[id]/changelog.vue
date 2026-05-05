@@ -53,14 +53,16 @@
 										{{ formatDate(version.date_published) }}</span
 									>
 								</div>
-								<a
-									:href="version.primaryFile?.url"
-									class="iconified-button download"
-									:title="`Download ${version.name}`"
-								>
-									<DownloadIcon aria-hidden="true" />
-									Download
-								</a>
+								<ButtonStyled color="brand" type="transparent">
+									<a
+										class="ml-auto"
+										:href="version.primaryFile?.url"
+										:title="`Download ${version.name}`"
+									>
+										<DownloadIcon aria-hidden="true" />
+										Download
+									</a>
+								</ButtonStyled>
 							</div>
 							<div
 								v-if="version.changelog && !version.duplicate"
@@ -87,6 +89,7 @@
 <script setup>
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	injectModrinthClient,
 	injectProjectPageContext,
 	Pagination,

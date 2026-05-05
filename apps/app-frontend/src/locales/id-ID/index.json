@@ -1,4 +1,28 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Mengunduh Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Mengunduh"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Sembunyikan lebih banyak instance yang sedang berjalan"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Jadikan sebagai instance utama"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Tidak ada instance yang sedang berjalan"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Instance utama"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Tampilkan lebih banyak instance yang sedang berjalan"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Server autentikasi Minecraft mungkin sedang tidak tersedia saat ini. Periksa koneksi internet Anda dan coba lagi nanti."
   },
@@ -28,12 +52,6 @@
   },
   "app.browse.discover-servers": {
     "message": "Temukan server"
-  },
-  "app.browse.hide-added-servers": {
-    "message": "Sembuyikan server tertambah"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Sembunyikan konten terpasang"
   },
   "app.browse.install-content-to-instance": {
     "message": "Pasang konten ke instans"

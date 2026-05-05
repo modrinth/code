@@ -347,9 +347,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Nahrát soubory"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Nahrávnání souborů ({completed}/{total})"
-  },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Aktualizování {contentType}..."
   },
@@ -1240,12 +1237,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Plán zálohování"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Nepodařilo se vytvořit zálohu"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Obnovení ze zálohy se nezdařilo"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Ruční zálohování"

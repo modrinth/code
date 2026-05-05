@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PlusIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager, NavTabs } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager, NavTabs } from '@modrinth/ui'
 import { inject, onUnmounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -55,10 +55,12 @@ onUnmounted(() => {
 				<NewInstanceImage />
 			</div>
 			<h3>No instances found</h3>
-			<Button color="primary" :disabled="offline" @click="showCreationModal?.()">
-				<PlusIcon />
-				Create new instance
-			</Button>
+			<ButtonStyled color="brand">
+				<button :disabled="offline" @click="showCreationModal?.()">
+					<PlusIcon />
+					Create new instance
+				</button>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>

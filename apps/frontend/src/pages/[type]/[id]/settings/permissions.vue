@@ -12,10 +12,18 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import ExternalProjectPermissionsCard from '@modrinth/ui/src/components/external_files/ExternalProjectPermissionsCard.vue'
 import { ref } from 'vue'
 
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
+
+if (!flags.value.modpackPermissionsPage) {
+	throw createError({
+		fatal: true,
+		statusCode: 404,
+	})
+}
 
 const externalFiles = ref([{}])
 const searchQuery = ref('')
@@ -161,6 +169,9 @@ function dismissInfoBanner() {
 					</template>
 				</Combobox>
 			</div>
+		</div>
+		<div class="mt-4 flex flex-col gap-3">
+			<ExternalProjectPermissionsCard title="FTB Library" />
 		</div>
 	</template>
 	<template v-else>

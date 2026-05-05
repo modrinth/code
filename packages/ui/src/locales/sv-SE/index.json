@@ -431,9 +431,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Ladda upp filer"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Laddar upp filler ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Det valda innehållet är redan inaktiverat"
   },
@@ -958,12 +955,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Okänt spelläge"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "Filer laddas fortfarande upp. Om du lämnar sidan kommer uppladdningen avbrytas och dina ändringar kommer förloras."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Uppladdning pågår"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} {count, plural, one {kompatibel} other {kompatibla}} {count, plural, one {instans} other {instanser}}"
@@ -2378,20 +2369,11 @@
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Något gick fel när vi försökte återställa från säkerhetskopian {backupName}. Vänligen försök igen eller kontakta support om felet återkommer."
   },
-  "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Äterställning från säkerhetskopia misslyckades"
-  },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Återställning från {backupName} är köad och kommer att börja strax."
   },
-  "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Återställning från säkerhetskopia köad"
-  },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Din server har återställts till {backupName} och är redo för att startas."
-  },
-  "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Äterställning från säkerhetskopia lyckades"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Återställer din server från {backupName}. Detta kan ta några minuter."
@@ -2404,12 +2386,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Säkerhetskopieringschema"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Misslyckades med att skapa säkerhetskopia"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Misslyckades med att återställa från säkerhetskopia"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuel säkerhetskopiering"

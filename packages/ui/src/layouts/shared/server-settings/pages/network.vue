@@ -97,18 +97,18 @@
 							</template>
 							<template #cell-actions="{ row }">
 								<div class="flex items-center justify-end gap-2">
-									<ButtonStyled icon-only type="transparent" circular>
+									<ButtonStyled type="transparent" circular>
 										<button @click="copyText(`${serverIP}:${row.port}`)">
 											<CopyIcon />
 										</button>
 									</ButtonStyled>
 									<template v-if="!row.primary">
-										<ButtonStyled icon-only type="transparent" circular>
+										<ButtonStyled type="transparent" circular>
 											<button @click="showEditAllocationModal(row.port)">
 												<PencilIcon />
 											</button>
 										</ButtonStyled>
-										<ButtonStyled icon-only type="outlined" circular color="red">
+										<ButtonStyled type="outlined" circular color="red">
 											<button @click="showConfirmDeleteModal(row.port)">
 												<TrashIcon />
 											</button>

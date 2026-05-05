@@ -242,7 +242,7 @@ onUnmounted(() => {
 								</button>
 							</ButtonStyled>
 							<template #popper>
-								<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+								<div class="grid grid-cols-[min-content] gap-1">
 									<div class="flex min-w-48 items-center justify-between gap-8">
 										<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
 											{{ formatMessage(messages.contentHintTitle) }}
@@ -265,7 +265,6 @@ onUnmounted(() => {
 
 						<ButtonStyled v-if="hasSettingsListener" type="outlined" circular>
 							<button
-								class="!border !border-surface-4"
 								@click="
 									() => {
 										emit('settings')
@@ -301,7 +300,6 @@ onUnmounted(() => {
 							><TeleportOverflowMenu
 								:options="collapsedOptions"
 								class="flex @[700px]:hidden"
-								btn-class="!border-surface-4 !border"
 								@open="emit('dismiss-content-hint')"
 							>
 								<MoreVerticalIcon class="size-5" />
@@ -316,7 +314,7 @@ onUnmounted(() => {
 							</TeleportOverflowMenu></ButtonStyled
 						>
 						<template #popper>
-							<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+							<div class="grid grid-cols-[min-content] gap-1">
 								<div class="flex min-w-48 items-center justify-between gap-8">
 									<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
 										{{ formatMessage(messages.contentHintTitle) }}
