@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        select id as \"id: DBAttributionGroupId\", flame_project_id\n        from project_attribution_groups\n        where project_id = $1 and flame_project_id is not null\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id: DBAttributionGroupId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "flame_project_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      true
+    ]
+  },
+  "hash": "226ef980e0f95db3487528a950b493cf2f8d5fd7a7681ef73bafe41954ebb351"
+}

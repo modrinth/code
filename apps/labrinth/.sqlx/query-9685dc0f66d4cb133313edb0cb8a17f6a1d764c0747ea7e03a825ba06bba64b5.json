@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tupdate project_attribution_groups\n\t\tset attribution = $1\n\t\twhere id = $2\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Jsonb",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9685dc0f66d4cb133313edb0cb8a17f6a1d764c0747ea7e03a825ba06bba64b5"
+}

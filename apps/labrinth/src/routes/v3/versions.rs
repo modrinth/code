@@ -411,7 +411,6 @@ pub async fn version_edit_helper(
                         version_id: x.version_id.map(|x| x.into()),
                         file_name: x.file_name.clone(),
                         dependency_type: x.dependency_type.to_string(),
-                        sha1: None,
                     })
                     .collect::<Vec<database::models::version_item::DependencyBuilder>>();
 

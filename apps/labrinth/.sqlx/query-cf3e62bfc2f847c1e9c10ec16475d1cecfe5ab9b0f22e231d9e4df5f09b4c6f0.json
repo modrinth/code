@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                insert into project_attribution_groups (id, project_id, flame_project_id, flame_project_title)\n                values ($1, $2, $3, $4)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cf3e62bfc2f847c1e9c10ec16475d1cecfe5ab9b0f22e231d9e4df5f09b4c6f0"
+}
