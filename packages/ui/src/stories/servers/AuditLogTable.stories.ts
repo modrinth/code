@@ -58,6 +58,33 @@ const entries: ServerAuditLogEntry[] = [
 		timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
 	},
 	{
+		id: 'modpack',
+		actor: users[1].user,
+		world: worlds[1],
+		action: {
+			type: 'content_installed',
+			contentType: 'modpack',
+			name: 'Cobblemon x Create',
+			href: '/modpack/cobblemon-x-create',
+			version: '2.1.4',
+		},
+		timestamp: new Date(Date.now() - 6.5 * 60 * 60 * 1000).toISOString(),
+	},
+	{
+		id: 'member-invited',
+		actor: users[0].user,
+		world: null,
+		action: { type: 'member_invited', target: 'IMB', role: 'viewer' },
+		timestamp: new Date(Date.now() - 6.75 * 60 * 60 * 1000).toISOString(),
+	},
+	{
+		id: 'member-removed',
+		actor: users[0].user,
+		world: null,
+		action: { type: 'member_removed', target: 'Fetch' },
+		timestamp: new Date(Date.now() - 6.85 * 60 * 60 * 1000).toISOString(),
+	},
+	{
 		id: 'role-change',
 		actor: users[0].user,
 		world: null,

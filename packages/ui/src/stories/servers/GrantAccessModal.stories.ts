@@ -21,22 +21,22 @@ export const Default: Story = {
 		components: { ButtonStyled, GrantAccessModal },
 		setup() {
 			const modalRef = ref<InstanceType<typeof GrantAccessModal> | null>(null)
-			const lastInvite = ref('')
+			const lastAddedUser = ref('')
 			const suggestions = [
-				{ id: 'fetch', username: 'Fetch', email: 'fetch@example.com' },
-				{ id: 'emma', username: 'Emma', email: 'emma@example.com' },
+				{ id: 'fetch', username: 'Fetch' },
+				{ id: 'emma', username: 'Emma' },
 			]
 			function handleGrant(payload: GrantServerAccessPayload) {
-				lastInvite.value = `${payload.target} as ${payload.role}`
+				lastAddedUser.value = `${payload.target} as ${payload.role}`
 			}
-			return { modalRef, suggestions, lastInvite, handleGrant }
+			return { modalRef, suggestions, lastAddedUser, handleGrant }
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
 				<ButtonStyled color="brand">
-					<button @click="modalRef?.show($event)">Invite a user</button>
+					<button @click="modalRef?.show($event)">Add a user</button>
 				</ButtonStyled>
-				<p v-if="lastInvite" class="m-0 text-sm text-secondary">Last invite: {{ lastInvite }}</p>
+				<p v-if="lastAddedUser" class="m-0 text-sm text-secondary">Last added: {{ lastAddedUser }}</p>
 				<GrantAccessModal ref="modalRef" :suggestions="suggestions" @grant="handleGrant" />
 			</div>
 		`,
