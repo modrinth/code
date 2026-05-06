@@ -65,6 +65,35 @@ export const Range: Story = {
 	}),
 }
 
+export const DraggableRange: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref(['2026-04-27', '2026-05-04'])
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[420px] max-w-sm flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[350px]"
+					mode="range"
+					placeholder="Select a date range..."
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const MinMaxDates: Story = {
 	render: () => ({
 		components: { DatePicker },

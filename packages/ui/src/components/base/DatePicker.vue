@@ -5,6 +5,8 @@
 			wrapperClass,
 			disabled ? 'cursor-not-allowed opacity-50' : '',
 			showToday ? 'show-today' : '',
+			props.mode === 'range' && selectedDates.length === 2 ? 'can-drag-range' : '',
+			rangeDragState ? 'is-dragging-range' : '',
 		]"
 	>
 		<CalendarIcon
@@ -38,6 +40,15 @@ import type { Options } from 'flatpickr/dist/types/options'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 type DatePickerValue = string | Date | null | undefined
+type RangeEdge = 'start' | 'end'
+type RangeDayElement = HTMLElement & { dateObj?: Date }
+type RangeDragState = {
+	edge: RangeEdge
+	anchorDate: Date
+	draggedEndpointDate: Date
+	pointerId: number
+	lastDateTime: number
+}
 
 const model = defineModel<DatePickerValue | DatePickerValue[]>()
 
@@ -115,6 +126,9 @@ const isSyncingFromModel = ref(false)
 const intendedViewMonth = ref<{ month: number; year: number } | null>(null)
 const intendedDay = ref<number | null>(null)
 const isPreservingDay = ref(false)
+const rangeDragState = ref<RangeDragState | null>(null)
+const suppressNextRangeClick = ref(false)
+let rangeClickSuppressionTimeout: ReturnType<typeof window.setTimeout> | null = null
 
 function getDayFromDateStr(dateStr: string): number | null {
 	const parts = dateStr.split('-')
@@ -167,6 +181,162 @@ function syncHeaderControlState(instance: Instance) {
 		instance.monthsDropdownContainer.disabled = monthSelectDisabled
 		instance.monthsDropdownContainer.setAttribute('aria-disabled', String(monthSelectDisabled))
 	}
+}
+
+function getRangeDayElement(target: EventTarget | null): RangeDayElement | null {
+	if (!(target instanceof Element)) return null
+	return target.closest<RangeDayElement>('.flatpickr-day')
+}
+
+function isSelectableDay(dayElem: RangeDayElement) {
+	return Boolean(dayElem.dateObj) && !dayElem.classList.contains('flatpickr-disabled')
+}
+
+function getRangeEdge(dayElem: RangeDayElement): RangeEdge | null {
+	if (props.mode !== 'range') return null
+	if (picker.value?.selectedDates.length !== 2) return null
+	if (!isSelectableDay(dayElem)) return null
+	if (dayElem.classList.contains('startRange') && !dayElem.classList.contains('endRange')) {
+		return 'start'
+	}
+	if (dayElem.classList.contains('endRange') && !dayElem.classList.contains('startRange')) {
+		return 'end'
+	}
+	return null
+}
+
+function dateTime(date: Date) {
+	return date.getTime()
+}
+
+function dateOnlyTime(date: Date) {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
+}
+
+function withEndpointTime(date: Date, endpoint: Date) {
+	return new Date(
+		date.getFullYear(),
+		date.getMonth(),
+		date.getDate(),
+		endpoint.getHours(),
+		endpoint.getMinutes(),
+		endpoint.getSeconds(),
+		endpoint.getMilliseconds(),
+	)
+}
+
+function clearRangeClickSuppressionTimeout() {
+	if (rangeClickSuppressionTimeout === null) return
+
+	window.clearTimeout(rangeClickSuppressionTimeout)
+	rangeClickSuppressionTimeout = null
+}
+
+function clearRangeClickSuppressionSoon() {
+	clearRangeClickSuppressionTimeout()
+	rangeClickSuppressionTimeout = window.setTimeout(() => {
+		suppressNextRangeClick.value = false
+		rangeClickSuppressionTimeout = null
+	}, 50)
+}
+
+function startRangeDrag(event: PointerEvent) {
+	if (event.button !== 0) return
+
+	const instance = picker.value
+	const dayElem = getRangeDayElement(event.target)
+	if (!instance || !dayElem) return
+
+	const edge = getRangeEdge(dayElem)
+	if (!edge) return
+
+	const [startDate, endDate] = instance.selectedDates
+	if (!startDate || !endDate) return
+
+	const draggedEndpointDate = new Date(edge === 'start' ? startDate : endDate)
+	rangeDragState.value = {
+		edge,
+		anchorDate: new Date(edge === 'start' ? endDate : startDate),
+		draggedEndpointDate,
+		pointerId: event.pointerId,
+		lastDateTime: dateTime(draggedEndpointDate),
+	}
+	clearRangeClickSuppressionTimeout()
+	suppressNextRangeClick.value = true
+
+	document.addEventListener('pointermove', updateRangeDrag, true)
+	document.addEventListener('pointerup', stopRangeDrag, true)
+	document.addEventListener('pointercancel', stopRangeDrag, true)
+
+	event.preventDefault()
+	event.stopImmediatePropagation()
+}
+
+function updateRangeDrag(event: PointerEvent) {
+	const state = rangeDragState.value
+	const instance = picker.value
+	if (!state || !instance || event.pointerId !== state.pointerId) return
+
+	const target = document.elementFromPoint(event.clientX, event.clientY)
+	const dayElem = getRangeDayElement(target)
+	if (!dayElem || !instance.calendarContainer.contains(dayElem) || !isSelectableDay(dayElem)) return
+
+	const draggedDate = withEndpointTime(dayElem.dateObj!, state.draggedEndpointDate)
+	let nextStartDate = state.edge === 'start' ? draggedDate : state.anchorDate
+	let nextEndDate = state.edge === 'end' ? draggedDate : state.anchorDate
+
+	if (state.edge === 'start' && dateOnlyTime(nextStartDate) > dateOnlyTime(state.anchorDate)) {
+		nextStartDate = state.anchorDate
+	} else if (state.edge === 'end' && dateOnlyTime(nextEndDate) < dateOnlyTime(state.anchorDate)) {
+		nextEndDate = state.anchorDate
+	}
+
+	const nextDraggedTime = dateTime(state.edge === 'start' ? nextStartDate : nextEndDate)
+	if (nextDraggedTime === state.lastDateTime) return
+
+	if (dayElem.classList.contains('prevMonthDay') || dayElem.classList.contains('nextMonthDay')) {
+		intendedViewMonth.value = {
+			month: instance.currentMonth,
+			year: instance.currentYear,
+		}
+	}
+
+	state.lastDateTime = nextDraggedTime
+	instance.setDate([nextStartDate, nextEndDate], true)
+	syncHeaderControlState(instance)
+
+	event.preventDefault()
+	event.stopImmediatePropagation()
+}
+
+function stopRangeDrag(event: PointerEvent) {
+	const state = rangeDragState.value
+	if (!state || event.pointerId !== state.pointerId) return
+
+	rangeDragState.value = null
+	document.removeEventListener('pointermove', updateRangeDrag, true)
+	document.removeEventListener('pointerup', stopRangeDrag, true)
+	document.removeEventListener('pointercancel', stopRangeDrag, true)
+	clearRangeClickSuppressionSoon()
+
+	event.preventDefault()
+	event.stopImmediatePropagation()
+}
+
+function stopRangeEndpointMouseEvent(event: MouseEvent) {
+	if (rangeDragState.value || suppressNextRangeClick.value) {
+		event.preventDefault()
+		event.stopImmediatePropagation()
+	}
+}
+
+function suppressRangeDragClick(event: MouseEvent) {
+	if (!suppressNextRangeClick.value) return
+
+	clearRangeClickSuppressionTimeout()
+	suppressNextRangeClick.value = false
+	event.preventDefault()
+	event.stopImmediatePropagation()
 }
 
 const resolvedDateFormat = computed(
@@ -245,6 +415,11 @@ onMounted(async () => {
 			if (props.defaultViewDate && instance.selectedDates.length === 0) {
 				instance.jumpToDate(props.defaultViewDate)
 			}
+
+			instance.calendarContainer.addEventListener('pointerdown', startRangeDrag, true)
+			instance.calendarContainer.addEventListener('mousedown', stopRangeEndpointMouseEvent, true)
+			instance.calendarContainer.addEventListener('mouseup', stopRangeEndpointMouseEvent, true)
+			instance.calendarContainer.addEventListener('click', suppressRangeDragClick, true)
 
 			instance.calendarContainer.addEventListener('mousedown', (event) => {
 				if (props.mode !== 'range') return
@@ -338,6 +513,10 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+	clearRangeClickSuppressionTimeout()
+	document.removeEventListener('pointermove', updateRangeDrag, true)
+	document.removeEventListener('pointerup', stopRangeDrag, true)
+	document.removeEventListener('pointercancel', stopRangeDrag, true)
 	picker.value?.destroy()
 })
 
@@ -409,7 +588,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar) {
-	@apply mt-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary;
+	@apply mt-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary select-none;
 	box-sizing: content-box;
 }
 
@@ -553,6 +732,17 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-day.endRange:not(.startRange)) {
 	@apply rounded-l-none border-l-0 border-surface-3;
+}
+
+.modrinth-date-picker.can-drag-range
+	:deep(.flatpickr-day.startRange:not(.endRange):not(.flatpickr-disabled)),
+.modrinth-date-picker.can-drag-range
+	:deep(.flatpickr-day.endRange:not(.startRange):not(.flatpickr-disabled)) {
+	cursor: grab;
+}
+
+.modrinth-date-picker.is-dragging-range :deep(.flatpickr-day) {
+	cursor: grabbing !important;
 }
 
 .modrinth-date-picker
