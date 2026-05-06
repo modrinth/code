@@ -420,11 +420,14 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year),
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply rounded-xl bg-surface-4 px-2 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-8;
+	@apply rounded-xl bg-surface-4 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-8;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply pl-0.5 min-w-28;
+	@apply min-w-28  px-2;
+}
+.modrinth-date-picker :deep(.flatpickr-current-month input.cur-year) {
+	@apply min-w-[72px] px-3;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year:focus),
@@ -433,10 +436,10 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.numInputWrapper span.arrowUp) {
-	@apply border-0 rounded-tr-xl;
+	@apply border-0 rounded-tr-xl -right-1.5;
 }
 .modrinth-date-picker :deep(.numInputWrapper span.arrowDown) {
-	@apply border-0 rounded-br-xl;
+	@apply border-0 rounded-br-xl -right-1.5;
 }
 .modrinth-date-picker :deep(.numInputWrapper span.arrowUp::after) {
 	border-bottom-color: var(--color-text-secondary);
@@ -468,7 +471,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day) {
-	@apply m-0 max-w-none rounded-xl border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast;
+	@apply m-0 max-w-none rounded-xl border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.today) {
@@ -506,7 +509,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-time) {
-	@apply mt-2 flex h-11 max-h-none items-center gap-2 border-0 border-t border-solid border-surface-5 px-1 pt-2 leading-none;
+	@apply mt-2 flex h-11 max-h-none items-center  gap-2 border-0 border-t border-solid border-surface-5 px-1 pt-2 leading-none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .numInputWrapper) {
@@ -522,7 +525,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .flatpickr-time-separator) {
-	@apply flex h-full items-center text-secondary;
+	@apply flex h-full items-center justify-center text-secondary text-center;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .flatpickr-am-pm) {
