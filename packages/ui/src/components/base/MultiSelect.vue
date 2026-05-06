@@ -1,11 +1,12 @@
 <template>
-	<div ref="containerRef" class="relative inline-block w-full">
+	<div ref="containerRef" class="relative inline-block" :class="fitContent ? 'w-auto' : 'w-full'">
 		<span
 			ref="triggerRef"
 			role="button"
 			tabindex="0"
-			class="relative flex w-full items-center overflow-hidden rounded-xl bg-surface-4 px-3 py-1 text-left transition-all duration-200"
+			class="relative flex items-center overflow-hidden rounded-xl bg-surface-4 px-3 py-1 text-left transition-all duration-200"
 			:class="[
+				fitContent ? 'w-auto max-w-full' : 'w-full',
 				triggerClass,
 				{
 					'z-[9999]': isOpen,
@@ -19,68 +20,80 @@
 			@click="handleTriggerClick($event)"
 			@keydown="handleTriggerKeydown"
 		>
-			<div
-				ref="tagsContainerRef"
-				class="flex flex-1 items-center gap-1.5 overflow-hidden flex-wrap min-h-8"
-				:style="{ maxHeight: `calc(${maxTagRows} * 30px + ${maxTagRows - 1} * 6px)` }"
-			>
-				<span
-					v-for="tag in visibleTags"
-					:key="String(tag.value)"
-					class="inline-flex items-center gap-1 rounded-full bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary transition-colors border-solid border border-surface-5 hover:brightness-110"
-					@click.stop="removeTag(tag.value)"
-				>
-					{{ tag.label }}
-					<XIcon class="size-3.5 shrink-0 text-secondary" />
-				</span>
-				<Menu
-					v-show="overflowCount > 0"
-					:delay="{ hide: 50, show: 0 }"
-					no-auto-focus
-					:auto-hide="false"
-					@apply-show="popperOverflowTags = [...overflowTags]"
+			<slot
+				v-if="hasCustomInputContent"
+				name="input-content"
+				:is-open="isOpen"
+				:model-value="modelValue"
+				:selected-options="selectedOptions"
+				:clear-all="clearAll"
+				:toggle-open="toggleDropdown"
+				:open-direction="openDirection"
+			/>
+			<template v-else>
+				<div
+					ref="tagsContainerRef"
+					class="flex min-h-8 flex-1 flex-wrap items-center gap-1.5 overflow-hidden"
+					:style="{ maxHeight: `calc(${maxTagRows} * 30px + ${maxTagRows - 1} * 6px)` }"
 				>
 					<span
-						class="inline-flex items-center rounded-full bg-surface-4 px-2 py-1 text-sm font-medium text-secondary border-solid border border-surface-5 select-none cursor-default"
-						@click.stop
+						v-for="tag in visibleTags"
+						:key="String(tag.value)"
+						class="inline-flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary transition-colors hover:brightness-110"
+						@click.stop="removeTag(tag.value)"
 					>
-						+{{ overflowCount }}
+						{{ tag.label }}
+						<XIcon class="size-3.5 shrink-0 text-secondary" />
 					</span>
-					<template #popper>
-						<div class="flex gap-1 flex-wrap max-w-[20rem]" @mousedown.prevent>
-							<span
-								v-for="tag in overflowTags"
-								:key="String(tag.value)"
-								class="inline-flex items-center gap-1 rounded-full bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary border-solid border border-surface-5 cursor-pointer hover:brightness-110"
-								@click.stop="removeTag(tag.value)"
-							>
-								{{ tag.label }}
-								<XIcon class="size-3.5 shrink-0 text-secondary" />
-							</span>
-						</div>
-					</template>
-				</Menu>
-				<span v-if="selectedOptions.length === 0" class="py-1 px-1.5 text-secondary">
-					{{ placeholder }}
-				</span>
-			</div>
-			<div class="ml-2 flex shrink-0 items-center gap-1.5">
-				<button
-					v-if="clearable && modelValue.length > 0"
-					type="button"
-					class="flex items-center justify-center rounded p-0.5 bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer"
-					aria-label="Clear all"
-					@click.stop="clearAll"
-				>
-					<XIcon class="size-5" />
-				</button>
-				<div class="w-[1px] h-5 bg-surface-5 shrink-0"></div>
-				<ChevronLeftIcon
-					v-if="showChevron"
-					class="size-5 shrink-0 text-secondary transition-transform duration-150"
-					:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
-				/>
-			</div>
+					<Menu
+						v-show="overflowCount > 0"
+						:delay="{ hide: 50, show: 0 }"
+						no-auto-focus
+						:auto-hide="false"
+						@apply-show="popperOverflowTags = [...overflowTags]"
+					>
+						<span
+							class="inline-flex cursor-default select-none items-center rounded-full border border-solid border-surface-5 bg-surface-4 px-2 py-1 text-sm font-medium text-secondary"
+							@click.stop
+						>
+							+{{ overflowCount }}
+						</span>
+						<template #popper>
+							<div class="flex max-w-[20rem] flex-wrap gap-1" @mousedown.prevent>
+								<span
+									v-for="tag in overflowTags"
+									:key="String(tag.value)"
+									class="inline-flex cursor-pointer items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary hover:brightness-110"
+									@click.stop="removeTag(tag.value)"
+								>
+									{{ tag.label }}
+									<XIcon class="size-3.5 shrink-0 text-secondary" />
+								</span>
+							</div>
+						</template>
+					</Menu>
+					<span v-if="selectedOptions.length === 0" class="px-1.5 py-1 text-secondary">
+						{{ placeholder }}
+					</span>
+				</div>
+				<div class="ml-2 flex shrink-0 items-center gap-1.5">
+					<button
+						v-if="clearable && modelValue.length > 0"
+						type="button"
+						class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+						aria-label="Clear all"
+						@click.stop="clearAll"
+					>
+						<XIcon class="size-5" />
+					</button>
+					<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+					<ChevronLeftIcon
+						v-if="showChevron"
+						class="size-5 shrink-0 text-secondary transition-transform duration-150"
+						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
+					/>
+				</div>
+			</template>
 		</span>
 
 		<Teleport to="#teleports">
@@ -153,12 +166,38 @@
 								</span>
 							</div>
 						</div>
+
+						<div v-if="$slots.top" class="border-0 border-b border-solid border-b-surface-5 py-1.5">
+							<slot
+								name="top"
+								:model-value="modelValue"
+								:selected-options="selectedOptions"
+								:clear-all="clearAll"
+								:is-open="isOpen"
+							></slot>
+						</div>
+
+						<div
+							v-if="shouldShowSelectionActions"
+							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-6 py-2.5 text-sm"
+						>
+							<span class="font-semibold text-secondary">{{ selectionActionsLabel }}</span>
+							<button
+								type="button"
+								class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+								@click="clearAll"
+								@keydown.enter.stop
+								@keydown.space.stop
+							>
+								{{ selectionActionsClearLabel }}
+							</button>
+						</div>
 					</div>
 
 					<div
 						v-if="filteredOptions.length > 0"
 						ref="optionsContainerRef"
-						class="flex flex-col gap-2 overflow-y-auto px-3 pt-1.5"
+						class="flex flex-col gap-2 overflow-y-auto px-3 py-1.5"
 						:style="{ maxHeight: `${maxHeight}px` }"
 					>
 						<template v-for="(item, index) in filteredOptions" :key="String(item.value)">
@@ -168,7 +207,7 @@
 								:aria-selected="isSelected(item.value)"
 								:aria-disabled="item.disabled || undefined"
 								:data-focused="focusedIndex === index"
-								class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 rounded-xl"
+								class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 rounded-xl"
 								:class="[
 									item.class,
 									{
@@ -214,6 +253,10 @@
 						{{ noResultsMessage }}
 					</div>
 
+					<div v-if="$slots.bottom" @keydown.stop>
+						<slot name="bottom"></slot>
+					</div>
+
 					<slot name="dropdown-footer"></slot>
 				</div>
 			</Transition>
@@ -233,6 +276,7 @@ import {
 	onUnmounted,
 	ref,
 	shallowRef,
+	useSlots,
 	watch,
 } from 'vue'
 
@@ -263,12 +307,19 @@ const props = withDefaults(
 		clearable?: boolean
 		maxHeight?: number
 		triggerClass?: string
+		fitContent?: boolean
+		/** Width for the teleported dropdown; defaults to the trigger width */
+		dropdownWidth?: string | number
+		/** Minimum width for the teleported dropdown */
+		dropdownMinWidth?: string | number
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		noResultsMessage?: string
 		disableSearchFilter?: boolean
 		includeSelectAllOption?: boolean
 		selectAllLabel?: string
+		showSelectionActions?: boolean
+		selectionActionsClearLabel?: string
 		maxTagRows?: number
 	}>(),
 	{
@@ -279,10 +330,13 @@ const props = withDefaults(
 		showChevron: true,
 		clearable: true,
 		maxHeight: DEFAULT_MAX_HEIGHT,
+		fitContent: false,
 		noOptionsMessage: 'No options available',
 		noResultsMessage: 'No results found',
 		includeSelectAllOption: false,
 		selectAllLabel: 'Select all',
+		showSelectionActions: false,
+		selectionActionsClearLabel: 'Deselect all',
 		maxTagRows: 1,
 	},
 )
@@ -294,6 +348,7 @@ const emit = defineEmits<{
 	searchInput: [query: string]
 }>()
 
+const slots = useSlots()
 const isOpen = ref(false)
 const searchQuery = ref('')
 const focusedIndex = ref(-1)
@@ -310,9 +365,11 @@ const dropdownStyle = ref({
 	top: '0px',
 	left: '0px',
 	width: '0px',
+	minWidth: '0px',
 })
 
 const openDirection = ref<'down' | 'up'>('down')
+const hasCustomInputContent = computed(() => Boolean(slots['input-content']))
 
 const selectedOptions = computed(() => {
 	return props.options.filter((opt) => props.modelValue.includes(opt.value))
@@ -361,6 +418,12 @@ const filteredOptions = computed(() => {
 
 const isNoOptionsState = computed(() => props.options.length === 0 && !searchQuery.value)
 const shouldShowSelectAll = computed(() => props.includeSelectAllOption && props.options.length > 0)
+const shouldShowSelectionActions = computed(
+	() => props.showSelectionActions && props.modelValue.length > 0,
+)
+const selectionActionsLabel = computed(() => {
+	return props.modelValue.length === 1 ? '1 selected' : `${props.modelValue.length} selected`
+})
 
 function isSelected(value: T) {
 	return props.modelValue.includes(value)
@@ -385,6 +448,14 @@ function removeTag(value: T) {
 
 function clearAll() {
 	emit('update:modelValue', [])
+}
+
+function toggleDropdown() {
+	if (isOpen.value) {
+		closeDropdown()
+	} else {
+		openDropdown()
+	}
 }
 
 function toggleSelectAll() {
@@ -460,12 +531,35 @@ function calculateHorizontalPosition(
 	return left
 }
 
+function resolveDropdownWidth(triggerWidth: number): string {
+	if (props.dropdownWidth === undefined) return `${triggerWidth}px`
+	if (typeof props.dropdownWidth === 'number') return `${props.dropdownWidth}px`
+	return props.dropdownWidth
+}
+
+function resolveCssSize(size: string | number | undefined): string | undefined {
+	if (size === undefined) return undefined
+	if (typeof size === 'number') return `${size}px`
+	return size
+}
+
 async function updateDropdownPosition() {
 	if (!triggerRef.value || !dropdownRef.value) return
 
 	await nextTick()
 
 	const triggerRect = triggerRef.value.getBoundingClientRect()
+	const width = resolveDropdownWidth(triggerRect.width)
+	const minWidth = resolveCssSize(props.dropdownMinWidth) ?? '0px'
+
+	dropdownStyle.value = {
+		...dropdownStyle.value,
+		width,
+		minWidth,
+	}
+
+	await nextTick()
+
 	const dropdownRect = dropdownRef.value.getBoundingClientRect()
 	const viewportHeight = window.innerHeight
 	const viewportWidth = window.innerWidth
@@ -477,7 +571,8 @@ async function updateDropdownPosition() {
 	dropdownStyle.value = {
 		top: `${top}px`,
 		left: `${left}px`,
-		width: `${triggerRect.width}px`,
+		width,
+		minWidth,
 	}
 
 	openDirection.value = direction
@@ -699,6 +794,9 @@ watch(
 	() => props.modelValue,
 	() => {
 		calculateVisibleTags()
+		if (isOpen.value) {
+			updateDropdownPosition()
+		}
 	},
 	{ deep: true },
 )
