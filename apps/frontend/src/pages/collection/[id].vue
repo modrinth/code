@@ -675,9 +675,9 @@ watch(
 				link: [
 					{
 						rel: 'canonical',
-						href: canonicalUrl
-					}
-				]
+						href: canonicalUrl,
+					},
+				],
 			})
 		}
 	},

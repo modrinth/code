@@ -2317,15 +2317,16 @@ const canCreateServerFrom = computed(() => {
 	return project.value.project_type === 'modpack' && project.value.server_side !== 'unsupported'
 })
 
-const createCanonicalUrl = () => project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
+const createCanonicalUrl = () =>
+	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
 
 useHead({
-		link: [
-			{
-				rel: 'canonical',
-				href: createCanonicalUrl
-			}
-		]
+	link: [
+		{
+			rel: 'canonical',
+			href: createCanonicalUrl,
+		},
+	],
 })
 
 if (!route.name.startsWith('type-id-settings')) {
