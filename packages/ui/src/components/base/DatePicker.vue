@@ -155,6 +155,20 @@ function applyPreserveDay(instance: Instance) {
 	})
 }
 
+function syncHeaderControlState(instance: Instance) {
+	const prevDisabled = instance.prevMonthNav.classList.contains('flatpickr-disabled')
+	const nextDisabled = instance.nextMonthNav.classList.contains('flatpickr-disabled')
+
+	instance.prevMonthNav.setAttribute('aria-disabled', String(prevDisabled))
+	instance.nextMonthNav.setAttribute('aria-disabled', String(nextDisabled))
+
+	if (instance.monthsDropdownContainer) {
+		const monthSelectDisabled = instance.monthsDropdownContainer.options.length <= 1
+		instance.monthsDropdownContainer.disabled = monthSelectDisabled
+		instance.monthsDropdownContainer.setAttribute('aria-disabled', String(monthSelectDisabled))
+	}
+}
+
 const resolvedDateFormat = computed(
 	() => props.dateFormat ?? (props.enableTime ? 'Y-m-d H:i' : 'Y-m-d'),
 )
@@ -265,6 +279,8 @@ onMounted(async () => {
 				},
 				true,
 			)
+
+			syncHeaderControlState(instance)
 		},
 		onChange: (_selectedDates, dateStr, instance) => {
 			if (isSyncingFromModel.value) return
@@ -283,6 +299,8 @@ onMounted(async () => {
 					(intendedViewMonth.value.year - instance.currentYear) * 12
 				if (monthDelta !== 0) instance.changeMonth(monthDelta)
 			}
+
+			syncHeaderControlState(instance)
 		},
 		onClose: (_selectedDates, dateStr, instance) => {
 			if (!props.clearable || dateStr) return
@@ -295,14 +313,17 @@ onMounted(async () => {
 		},
 		onMonthChange: (_selectedDates, _dateStr, instance) => {
 			applyPreserveDay(instance)
+			syncHeaderControlState(instance)
 		},
 		onYearChange: (_selectedDates, _dateStr, instance) => {
 			applyPreserveDay(instance)
+			syncHeaderControlState(instance)
 		},
 		onOpen: (_selectedDates, _dateStr, instance) => {
 			if (props.defaultViewDate && instance.selectedDates.length === 0) {
 				instance.jumpToDate(props.defaultViewDate)
 			}
+			syncHeaderControlState(instance)
 		},
 	})
 
@@ -313,6 +334,7 @@ onMounted(async () => {
 
 	syncAltInputState()
 	syncPickerFromModel()
+	syncHeaderControlState(picker.value)
 })
 
 onBeforeUnmount(() => {
@@ -357,6 +379,7 @@ function syncPickerFromModel() {
 	}
 
 	isSyncingFromModel.value = false
+	syncHeaderControlState(picker.value)
 }
 
 function syncAltInputState() {
@@ -431,11 +454,26 @@ defineExpose({
 	background-repeat: no-repeat;
 	background-size: 16px 16px;
 }
+.modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months:disabled) {
+	@apply cursor-not-allowed opacity-40 hover:bg-surface-4;
+}
 .modrinth-date-picker :deep(.flatpickr-current-month .numInputWrapper:has(input.cur-year)) {
 	@apply w-[76px];
 }
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year) {
 	@apply min-w-[76px] px-2 text-center;
+}
+.modrinth-date-picker
+	:deep(.flatpickr-current-month .numInputWrapper:has(input.cur-year:disabled)) {
+	@apply cursor-not-allowed;
+	background: none;
+}
+.modrinth-date-picker :deep(.flatpickr-current-month input.cur-year:disabled) {
+	@apply opacity-40 bg-surface-4 hover:bg-surface-4;
+}
+.modrinth-date-picker
+	:deep(.flatpickr-current-month .numInputWrapper:has(input.cur-year:disabled) span) {
+	@apply pointer-events-none opacity-0;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year:focus),
@@ -463,6 +501,11 @@ defineExpose({
 	@apply top-2.5 mx-3.5 flex h-10 w-10 items-center justify-center rounded-full p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
 }
 
+.modrinth-date-picker :deep(.flatpickr-prev-month.flatpickr-disabled),
+.modrinth-date-picker :deep(.flatpickr-next-month.flatpickr-disabled) {
+	@apply cursor-not-allowed opacity-40 hover:bg-transparent hover:text-secondary;
+}
+
 .modrinth-date-picker :deep(.flatpickr-prev-month svg),
 .modrinth-date-picker :deep(.flatpickr-next-month svg) {
 	@apply h-5 w-5 stroke-current text-secondary;
@@ -480,7 +523,10 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day) {
-	@apply m-0 max-w-none rounded-xl border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
+	@apply m-0 max-w-none rounded-full border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
+}
+.modrinth-date-picker :deep(.flatpickr-day.flatpickr-disabled) {
+	@apply hover:bg-transparent;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.today) {
@@ -494,7 +540,7 @@ defineExpose({
 .modrinth-date-picker :deep(.flatpickr-day.selected),
 .modrinth-date-picker :deep(.flatpickr-day.startRange),
 .modrinth-date-picker :deep(.flatpickr-day.endRange) {
-	@apply border-brand bg-brand text-brand-inverted !shadow-none hover:border-brand hover:bg-brand hover:text-brand-inverted hover:shadow-none rounded-xl;
+	@apply border-brand bg-brand text-brand-inverted !shadow-none hover:border-brand hover:bg-brand hover:text-brand-inverted hover:shadow-none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.inRange) {

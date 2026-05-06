@@ -70,11 +70,19 @@ export const MinMaxDates: Story = {
 		components: { DatePicker },
 		setup() {
 			const value = ref('2026-04-27')
-			return { value }
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
 		},
 		template: /* html */ `
-			<div class="flex max-w-sm flex-col gap-2">
+			<div class="flex h-[420px] max-w-sm flex-col gap-2">
 				<DatePicker
+					ref="datePicker"
 					v-model="value"
 					wrapperClass="w-[350px]"
 					min-date="2026-04-01"
