@@ -48,8 +48,21 @@ const entries: ServerAuditLogEntry[] = [
 		id: 'mod',
 		actor: users[1].user,
 		world: worlds[1],
-		action: { type: 'content_installed', contentType: 'mod', name: 'Create Aeronautics' },
+		action: {
+			type: 'content_installed',
+			contentType: 'mod',
+			name: 'Create Aeronautics',
+			href: '/mod/create-aeronautics',
+			version: '1.20.1-0.6.0',
+		},
 		timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+	},
+	{
+		id: 'role-change',
+		actor: users[0].user,
+		world: null,
+		action: { type: 'role_changed', target: 'Geometrically', role: 'viewer' },
+		timestamp: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
 	},
 ]
 

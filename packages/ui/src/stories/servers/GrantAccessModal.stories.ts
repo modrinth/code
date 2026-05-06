@@ -34,7 +34,7 @@ export const Default: Story = {
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
 				<ButtonStyled color="brand">
-					<button @click="modalRef?.show($event)">Invite friend</button>
+					<button @click="modalRef?.show($event)">Invite a user</button>
 				</ButtonStyled>
 				<p v-if="lastInvite" class="m-0 text-sm text-secondary">Last invite: {{ lastInvite }}</p>
 				<GrantAccessModal ref="modalRef" :suggestions="suggestions" @grant="handleGrant" />

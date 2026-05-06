@@ -17,8 +17,10 @@
 					:search-placeholder="formatMessage(messages.targetPlaceholder)"
 					:placeholder="formatMessage(messages.targetPlaceholder)"
 					:no-options-message="formatMessage(messages.noSuggestions)"
+					:min-search-length-to-open="suggestionMinimumLength"
 					searchable
 					show-search-icon
+					:show-chevron="false"
 					@search-input="target = $event"
 					@select="(option) => (target = option.value)"
 				>
@@ -32,14 +34,12 @@
 								circle
 								no-shadow
 							/>
-							<div class="flex min-w-0 flex-col">
-								<span
-									class="truncate font-semibold"
-									:class="isSelected ? 'text-contrast' : 'text-primary'"
-								>
-									{{ item.label }}
-								</span>
-							</div>
+							<span
+								class="min-w-0 truncate font-semibold"
+								:class="isSelected ? 'text-contrast' : 'text-primary'"
+							>
+								{{ item.label }}
+							</span>
 						</div>
 					</template>
 				</Combobox>
@@ -149,11 +149,12 @@ const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const target = ref('')
 const selectedRole = ref<Exclude<ServerAccessRole, 'owner'>>('editor')
 const sendFriendRequest = ref(true)
+const suggestionMinimumLength = 2
 
 const messages = defineMessages({
 	header: {
 		id: 'servers.grant-access-modal.header',
-		defaultMessage: 'Invite a friend',
+		defaultMessage: 'Invite a user',
 	},
 	targetLabel: {
 		id: 'servers.grant-access-modal.target.label',
@@ -165,7 +166,7 @@ const messages = defineMessages({
 	},
 	noSuggestions: {
 		id: 'servers.grant-access-modal.target.no-suggestions',
-		defaultMessage: 'Keep typing to invite by email or username.',
+		defaultMessage: 'No matching users found.',
 	},
 	targetHelp: {
 		id: 'servers.grant-access-modal.target.help',
@@ -185,7 +186,7 @@ const messages = defineMessages({
 	},
 	viewerRole: {
 		id: 'servers.grant-access-modal.role.viewer',
-		defaultMessage: 'Viewer',
+		defaultMessage: 'Limited',
 	},
 	viewerDescription: {
 		id: 'servers.grant-access-modal.role.viewer-description',
@@ -228,16 +229,15 @@ const grantableRoles = computed(() => [
 	},
 ])
 
+const normalizedTarget = computed(() => target.value.trim())
+const canInvite = computed(() => normalizedTarget.value.length > 0 && !!selectedRole.value)
 const suggestionOptions = computed<ComboboxOption<string>[]>(() =>
 	props.suggestions.map((suggestion) => ({
 		value: suggestion.username,
 		label: suggestion.username,
-		searchTerms: [suggestion.username],
+		searchTerms: [suggestion.username, suggestion.email].filter(Boolean) as string[],
 	})),
 )
-
-const normalizedTarget = computed(() => target.value.trim())
-const canInvite = computed(() => normalizedTarget.value.length > 0 && !!selectedRole.value)
 
 function findSuggestion(value: string) {
 	return props.suggestions.find(

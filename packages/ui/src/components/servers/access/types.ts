@@ -11,6 +11,7 @@ export interface ServerAccessMember {
 	user: ServerAccessUser
 	role: ServerAccessRole
 	joinedAt: string | null
+	inviteResendAvailableAt?: string | null
 	pending?: boolean
 	isOwner?: boolean
 }
@@ -18,8 +19,17 @@ export interface ServerAccessMember {
 export type ServerAuditAction =
 	| { type: 'file_edited'; file: string }
 	| { type: 'world_started'; worldName: string }
-	| { type: 'content_installed'; contentType: 'mod' | 'modpack'; name: string; iconUrl?: string }
-	| { type: 'member_invited' | 'member_removed' | 'role_changed'; target: string }
+	| {
+			type: 'content_installed'
+			contentType: 'mod' | 'modpack'
+			name: string
+			iconUrl?: string
+			href?: string
+			version?: string
+	  }
+	| { type: 'member_invited'; target: string; role?: Exclude<ServerAccessRole, 'owner'> }
+	| { type: 'member_removed'; target: string }
+	| { type: 'role_changed'; target: string; role?: ServerAccessRole }
 
 export type ServerAuditActionType = ServerAuditAction['type']
 

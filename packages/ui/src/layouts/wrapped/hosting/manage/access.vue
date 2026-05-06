@@ -15,7 +15,11 @@
 					:options="roleFilterOptions"
 					:display-value="selectedRoleFilterLabel"
 					trigger-class="min-w-[225px]"
-				/>
+				>
+					<template #prefix>
+						<FilterIcon class="size-5 text-secondary" aria-hidden="true" />
+					</template>
+				</Combobox>
 				<ButtonStyled color="brand">
 					<button class="!h-10 w-full md:w-fit" @click="grantAccessModal?.show($event)">
 						<UserPlusIcon aria-hidden="true" />
@@ -30,8 +34,8 @@
 			:roles="roleOptions"
 			@update-role="updateMemberRole"
 			@resend-invite="resendInvite"
-			@cancel-invite="cancelInvite"
-			@remove-member="removeMember"
+			@cancel-invite="requestCancelInvite"
+			@remove-member="requestRemoveMember"
 		/>
 
 		<div class="flex flex-col gap-4">
@@ -52,11 +56,17 @@
 			:suggestions="inviteSuggestions"
 			@grant="grantAccess"
 		/>
+		<RemoveAccessModal
+			ref="removeMemberConfirmModal"
+			:username="pendingRemovalMember?.user.username ?? ''"
+			:should-cancel="shouldCancelInvite"
+			@remove="confirmAccessRemoval"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { SearchIcon, UserPlusIcon } from '@modrinth/assets'
+import { FilterIcon, SearchIcon, UserPlusIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -66,6 +76,7 @@ import {
 	AccessTable,
 	AuditLogTable,
 	GrantAccessModal,
+	RemoveAccessModal,
 	type GrantServerAccessPayload,
 	type ServerAccessInviteSuggestion,
 	type ServerAccessMember,
@@ -82,6 +93,10 @@ type RoleFilter = ServerAccessRole | 'all'
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
+const removeMemberConfirmModal = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
+const pendingRemovalMember = ref<ServerAccessMember | null>(null)
+const shouldCancelInvite = ref(false)
+const resendInviteCooldownMs = 60 * 1000
 
 const messages = defineMessages({
 	searchUsersPlaceholder: {
@@ -90,7 +105,7 @@ const messages = defineMessages({
 	},
 	inviteFriends: {
 		id: 'servers.access-page.invite-friends',
-		defaultMessage: 'Invite friends',
+		defaultMessage: 'Add user',
 	},
 	activityLogTitle: {
 		id: 'servers.access-page.activity-log-title',
@@ -98,7 +113,11 @@ const messages = defineMessages({
 	},
 	allRoles: {
 		id: 'servers.access-page.role-filter.all',
-		defaultMessage: 'Role: All',
+		defaultMessage: 'All',
+	},
+	selectedRoleFilter: {
+		id: 'servers.access-page.role-filter.selected',
+		defaultMessage: 'Role: {role}',
 	},
 	ownerRole: {
 		id: 'servers.access-page.role.owner',
@@ -118,7 +137,7 @@ const messages = defineMessages({
 	},
 	viewerRole: {
 		id: 'servers.access-page.role.viewer',
-		defaultMessage: 'Viewer',
+		defaultMessage: 'Limited',
 	},
 	viewerDescription: {
 		id: 'servers.access-page.role.viewer-description',
@@ -199,14 +218,16 @@ const roleFilterOptions = computed<ComboboxOption<RoleFilter>[]>(() => [
 	...roleOptions.value.map((role) => ({
 		value: role.value,
 		label: role.label,
-		subLabel: role.description,
 	})),
 ])
 
 const selectedRoleFilterLabel = computed(
 	() =>
-		roleFilterOptions.value.find((option) => option.value === roleFilter.value)?.label ??
-		formatMessage(messages.allRoles),
+		formatMessage(messages.selectedRoleFilter, {
+			role:
+				roleFilterOptions.value.find((option) => option.value === roleFilter.value)?.label ??
+				formatMessage(messages.allRoles),
+		}),
 )
 
 const members = ref<ServerAccessMember[]>([
@@ -265,14 +286,26 @@ const auditEntries = ref<ServerAuditLogEntry[]>([
 		id: 'audit-mod-install',
 		actor: members.value[1].user,
 		world: worldOptions[1],
-		action: { type: 'content_installed', contentType: 'mod', name: 'Create Aeronautics' },
+		action: {
+			type: 'content_installed',
+			contentType: 'mod',
+			name: 'Create Aeronautics',
+			href: '/mod/create-aeronautics',
+			version: '1.20.1-0.6.0',
+		},
 		timestamp: nowMinus(5, 'hour'),
 	},
 	{
 		id: 'audit-modpack-install',
 		actor: members.value[1].user,
 		world: worldOptions[1],
-		action: { type: 'content_installed', contentType: 'modpack', name: 'Cobblemon x Create' },
+		action: {
+			type: 'content_installed',
+			contentType: 'modpack',
+			name: 'Cobblemon x Create',
+			href: '/modpack/cobblemon-x-create',
+			version: '2.1.4',
+		},
 		timestamp: nowMinus(5, 'hour'),
 	},
 	{
@@ -286,7 +319,7 @@ const auditEntries = ref<ServerAuditLogEntry[]>([
 		id: 'audit-role-change',
 		actor: members.value[0].user,
 		world: null,
-		action: { type: 'role_changed', target: 'Geometrically' },
+		action: { type: 'role_changed', target: 'Geometrically', role: 'editor' },
 		timestamp: nowMinus(2, 'day'),
 	},
 ])
@@ -345,7 +378,7 @@ function updateMemberRole(member: ServerAccessMember, role: ServerAccessRole) {
 	pushAuditEntry({
 		actor: members.value[0].user,
 		world: null,
-		action: { type: 'role_changed', target: member.user.username },
+		action: { type: 'role_changed', target: member.user.username, role },
 	})
 	addNotification({
 		type: 'success',
@@ -358,6 +391,16 @@ function updateMemberRole(member: ServerAccessMember, role: ServerAccessRole) {
 }
 
 function resendInvite(member: ServerAccessMember) {
+	if (isResendInviteCoolingDown(member)) return
+
+	members.value = members.value.map((existingMember) =>
+		existingMember.id === member.id
+			? {
+					...existingMember,
+					inviteResendAvailableAt: new Date(Date.now() + resendInviteCooldownMs).toISOString(),
+				}
+			: existingMember,
+	)
 	addNotification({
 		type: 'success',
 		title: formatMessage(messages.inviteResentTitle),
@@ -377,6 +420,33 @@ function cancelInvite(member: ServerAccessMember) {
 		title: formatMessage(messages.inviteCancelledTitle),
 		text: formatMessage(messages.inviteCancelledText, { target: member.user.username }),
 	})
+}
+
+function requestRemoveMember(member: ServerAccessMember) {
+	pendingRemovalMember.value = member
+	shouldCancelInvite.value = false
+	removeMemberConfirmModal.value?.show()
+}
+
+function requestCancelInvite(member: ServerAccessMember) {
+	pendingRemovalMember.value = member
+	shouldCancelInvite.value = true
+	removeMemberConfirmModal.value?.show()
+}
+
+function confirmAccessRemoval() {
+	const member = pendingRemovalMember.value
+	const shouldCancel = shouldCancelInvite.value
+	pendingRemovalMember.value = null
+	shouldCancelInvite.value = false
+	if (!member) return
+
+	if (shouldCancel) {
+		cancelInvite(member)
+		return
+	}
+
+	removeMember(member)
 }
 
 function removeMember(member: ServerAccessMember) {
@@ -425,7 +495,7 @@ function grantAccess(payload: GrantServerAccessPayload) {
 	pushAuditEntry({
 		actor: members.value.find((existingMember) => existingMember.isOwner)?.user ?? member.user,
 		world: null,
-		action: { type: 'member_invited', target: username },
+		action: { type: 'member_invited', target: username, role: payload.role },
 	})
 	addNotification({
 		type: 'success',
@@ -435,5 +505,12 @@ function grantAccess(payload: GrantServerAccessPayload) {
 			role: formatRole(payload.role),
 		}),
 	})
+}
+
+function isResendInviteCoolingDown(member: ServerAccessMember) {
+	return (
+		!!member.inviteResendAvailableAt &&
+		new Date(member.inviteResendAvailableAt).getTime() > Date.now()
+	)
 }
 </script>
