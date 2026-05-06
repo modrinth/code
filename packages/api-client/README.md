@@ -3,7 +3,9 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-c78aff?style=for-the-badge)](https://www.typescriptlang.org/)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-c78aff?style=for-the-badge)](LICENSE)
 
-Platform-agnostic TypeScript client for Modrinth services. It supports Labrinth, Archon, and Kyros across Node.js, browsers, Nuxt, and Tauri.
+Platform-agnostic TypeScript client for Modrinth's API across Node.js, browsers, Nuxt, and Tauri.
+
+**⚠️ We use this internally to power modrinth.com, Modrinth App, and Modrinth Hosting frontends. It may break without any notice, but you are welcome to use it.**
 
 ## Installation
 
@@ -31,7 +33,6 @@ const client = new GenericModrinthClient({
 
 const project: Labrinth.Projects.v2.Project = await client.labrinth.projects_v2.get('sodium')
 const members = await client.labrinth.projects_v3.getMembers(project.id)
-const servers = await client.archon.servers_v0.list({ limit: 10 })
 ```
 
 You can still make direct requests through the same platform layer:
@@ -46,12 +47,7 @@ const project = await client.request<Labrinth.Projects.v2.Project>('/project/sod
 ### Nuxt
 
 ```ts
-import {
-	AuthFeature,
-	CircuitBreakerFeature,
-	NuxtCircuitBreakerStorage,
-	NuxtModrinthClient,
-} from '@modrinth/api-client'
+import { AuthFeature, CircuitBreakerFeature, NuxtCircuitBreakerStorage, NuxtModrinthClient } from '@modrinth/api-client'
 
 export const useModrinthClient = async () => {
 	const config = useRuntimeConfig()
@@ -87,37 +83,33 @@ const client = new TauriModrinthClient({
 const project = await client.labrinth.projects_v2.get('sodium')
 ```
 
-## Modules
+## API Modules
 
 Modules are available as nested properties on the client:
-
-> [!WARNING]
-> Modrinth Hosting API modules: You are welcome to use them to access your own server through the API, but they may break at any time because Archon and Kyros are internal services only used by Modrinth. Abuse may lead to your server being suspended without notice.
 
 ```ts
 client.labrinth.projects_v2
 client.labrinth.projects_v3
 client.labrinth.versions_v3
-client.archon.servers_v0
-client.archon.backups_v1
-client.kyros.files_v0
 ```
 
 Types are exported from the package root:
 
 ```ts
-import type { Archon, Kyros, Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@modrinth/api-client'
 
 const project: Labrinth.Projects.v3.Project = await client.labrinth.projects_v3.get('sodium')
-const server: Archon.Servers.v0.Server = await client.archon.servers_v0.get('server-id')
 ```
+
+## Modrinth Hosting API Modules
+
+- These modules are internal to Modrinth and are only supported inside the Modrinth Hosting panel in Modrinth App and on modrinth.com. They should not be expected to work in third-party clients today. We are discussing how to safely expose access to your own server through these APIs in the future.
 
 ## Base URLs
 
 By default, the client uses Modrinth production services:
 
 - `labrinthBaseUrl`: `https://api.modrinth.com`
-- `archonBaseUrl`: `https://archon.modrinth.com`
 
 Override them for staging or custom deployments:
 
@@ -125,7 +117,6 @@ Override them for staging or custom deployments:
 const client = new GenericModrinthClient({
 	userAgent: 'my-app/1.0.0',
 	labrinthBaseUrl: 'https://staging-api.modrinth.com',
-	archonBaseUrl: 'https://staging-archon.modrinth.com',
 })
 ```
 
@@ -147,11 +138,7 @@ Features wrap requests before they reach the platform implementation:
 import { AuthFeature, CircuitBreakerFeature, RetryFeature } from '@modrinth/api-client'
 
 const client = new GenericModrinthClient({
-	features: [
-		new AuthFeature({ token: async () => getToken() }),
-		new RetryFeature({ maxAttempts: 3, backoffStrategy: 'exponential' }),
-		new CircuitBreakerFeature({ maxFailures: 3, resetTimeout: 30_000 }),
-	],
+	features: [new AuthFeature({ token: async () => getToken() }), new RetryFeature({ maxAttempts: 3, backoffStrategy: 'exponential' }), new CircuitBreakerFeature({ maxFailures: 3, resetTimeout: 30_000 })],
 })
 ```
 

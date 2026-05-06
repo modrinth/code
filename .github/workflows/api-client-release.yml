@@ -127,7 +127,8 @@ jobs:
 
       - name: Check package contents
         if: steps.changes.outputs.changed == 'true'
-        run: pnpm --dir "$PACKAGE_DIR" pack --dry-run
+        working-directory: packages/api-client
+        run: pnpm pack --dry-run
 
       - name: Configure git
         if: steps.changes.outputs.changed == 'true' && steps.version.outputs.bumped == 'true'
@@ -154,4 +155,5 @@ jobs:
 
       - name: Publish api-client
         if: steps.changes.outputs.changed == 'true'
-        run: pnpm --dir "$PACKAGE_DIR" publish --access public --provenance --no-git-checks
+        working-directory: packages/api-client
+        run: pnpm publish --access public --provenance --no-git-checks
