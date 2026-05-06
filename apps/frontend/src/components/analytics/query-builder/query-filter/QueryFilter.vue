@@ -1,269 +1,72 @@
 <template>
-	<span class="flex h-10 items-center text-nowrap text-base font-medium text-primary"
-		>Filtered by</span
-	>
-
-	<MultiSelect
-		v-for="preview in appliedFilterPreviews"
-		:key="preview.key"
-		:model-value="getPreviewSelectedValues(preview.key)"
-		:options="preview.options"
-		:max-height="500"
-		:clearable="false"
-		:show-chevron="false"
-		:fit-content="true"
-		:searchable="preview.category.searchable"
-		:search-placeholder="preview.category.searchPlaceholder"
-		:trigger-class="previewTriggerClass"
-		dropdown-min-width="18rem"
-		show-selection-actions
-		@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
-		@open="openPreviewFilterDraft(preview.key)"
-		@close="commitPreviewFilterDraft(preview.key)"
-	>
-		<template #input-content="{ isOpen, openDirection }">
-			<div class="flex min-h-8 max-w-80 items-center gap-2">
-				<span class="min-w-0 flex-1 truncate">
-					<span class="font-medium">{{ preview.label }}:</span>
-					<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
-				</span>
-				<div class="flex shrink-0 items-center gap-1.5">
-					<button
-						type="button"
-						class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
-						:aria-label="`Clear ${preview.label} filter`"
-						@click.stop="clearFilterCategory(preview.key)"
-					>
-						<XIcon class="size-4 text-primary" />
-					</button>
-					<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
-					<ChevronLeftIcon
-						class="size-5 shrink-0 text-secondary transition-transform duration-150"
-						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
-					/>
-				</div>
+	<DropdownFilterBar v-model="selectedFilterValue" :categories="filterCategories">
+		<template #search-actions="{ category, setSelectedValues }">
+			<div v-if="category.key === 'game_version'" class="flex w-40 justify-end">
+				<Chips
+					:model-value="gameVersionType"
+					:items="gameVersionTypeOptions"
+					:never-empty="true"
+					aria-label="Game version type"
+					size="small"
+					hide-checkmark-icon
+					@update:model-value="(type) => setGameVersionType(type, setSelectedValues)"
+				/>
 			</div>
 		</template>
-	</MultiSelect>
 
-	<div class="flex h-10 items-center gap-2">
-		<ButtonStyled type="outlined">
-			<button
-				ref="addMenuTrigger"
-				type="button"
-				:aria-expanded="isAddMenuOpen"
-				aria-haspopup="menu"
-				@click="handleAddMenuTriggerClick"
-				@keydown="handleAddMenuTriggerKeydown"
-			>
-				<PlusIcon />
-				Add
-			</button>
-		</ButtonStyled>
-
-		<ButtonStyled v-if="hasAppliedFilters" type="transparent">
-			<button type="button" @click="clearAllFilters">Clear</button>
-		</ButtonStyled>
-	</div>
-
-	<Teleport to="#teleports">
-		<Transition
-			enter-active-class="transition-opacity duration-150"
-			leave-active-class="transition-none duration-0"
-			enter-from-class="opacity-0"
-			leave-to-class="opacity-0"
-		>
-			<div
-				v-if="isAddMenuOpen"
-				ref="menuContainer"
-				class="fixed z-[9999] flex flex-col gap-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 p-3 shadow-2xl"
-				:style="addMenuStyle"
-				role="menu"
-				@mousedown.stop
-				@keydown="handleAddMenuKeydown"
-				@mousemove="(event) => handleMenuMouseMove(event, 'menu')"
-			>
-				<button
-					v-for="category in filterCategories"
-					:key="category.key"
-					:ref="(element) => setCategoryButtonRef(category.key, element)"
-					type="button"
-					class="group/filter-menu-button flex h-11 w-full appearance-none items-center justify-between gap-1 rounded-xl border-0 px-3 text-left text-base font-medium text-primary shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
-					:class="category.key === activeCategoryKey ? 'bg-surface-5' : ''"
-					role="menuitem"
-					@mouseenter="handleCategoryMouseEnter(category.key)"
-					@focus="activateCategory(category.key)"
-				>
-					<span>{{ category.label }}</span>
-					<div class="flex items-center gap-1">
-						<ChevronRightIcon class="size-5 text-secondary" />
-					</div>
-				</button>
-			</div>
-		</Transition>
-	</Teleport>
-
-	<Teleport to="#teleports">
-		<div
-			v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
-			ref="submenu"
-			class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
-			:class="
-				activeCategory.key === 'game_version'
-					? 'w-[360px]'
-					: activeCategory.key === 'version_id'
-						? 'w-[368px]'
-						: 'w-72'
-			"
-			:style="submenuStyle"
-			@mouseenter="handleSubmenuMouseEnter"
-			@mouseleave="handleSubmenuMouseLeave"
-			@mousemove="(event) => handleMenuMouseMove(event, 'submenu')"
-		>
-			<div
-				v-if="activeCategory.searchable"
-				class="flex justify-between border-0 border-b border-solid border-b-surface-5 px-3 py-2.5"
-			>
-				<StyledInput
-					v-model="categorySearchQuery"
-					:icon="SearchIcon"
-					type="text"
-					:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
-					wrapper-class="grow bg-surface-4"
-				/>
-				<div v-if="activeCategory.key === 'game_version'" class="flex w-40 justify-end">
-					<Chips
-						v-model="gameVersionType"
-						:items="gameVersionTypeOptions"
-						:never-empty="true"
-						aria-label="Game version type"
-						size="small"
-						hide-checkmark-icon
-					/>
-				</div>
-			</div>
-
-			<div
-				v-if="activeCategorySelectionCount > 0"
-				class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-6 py-2.5 text-sm"
-			>
-				<span class="font-semibold text-secondary">{{ activeCategorySelectionLabel }}</span>
-				<button
-					type="button"
-					class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
-					@click="clearActiveCategorySelection"
-					@keydown.enter.stop
-					@keydown.space.stop
-				>
-					Deselect all
-				</button>
-			</div>
-			<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
-				<div
-					v-if="filteredActiveCategoryOptions.length === 0"
-					class="px-3 py-2 text-sm font-medium text-secondary"
-				>
-					{{ activeCategoryEmptyStateLabel }}
-				</div>
-				<template v-else>
-					<button
-						v-for="option in filteredActiveCategoryOptions"
-						:key="`${activeCategory.key}-${option.value}`"
-						type="button"
-						class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5"
-						role="checkbox"
-						@click="toggleFilterOption(activeCategory.key, option.value)"
-					>
-						<span
-							class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
-							:class="
-								isFilterValueSelected(activeCategory.key, option.value)
-									? 'border-button-border bg-brand text-brand-inverted'
-									: 'border-surface-5 bg-surface-2'
-							"
-						>
-							<CheckIcon
-								v-if="isFilterValueSelected(activeCategory.key, option.value)"
-								aria-hidden="true"
-								stroke-width="3"
-							/>
-						</span>
-						<span
-							class="font-semibold leading-tight"
-							:class="
-								isFilterValueSelected(activeCategory.key, option.value)
-									? 'text-contrast'
-									: 'text-primary'
-							"
-						>
-							{{ option.label }}
-						</span>
-					</button>
-				</template>
-			</div>
+		<template #category-footer="{ category, setSelectedValues }">
 			<DownloadsThresholdInput
-				v-if="activeCategory.key === 'version_id'"
+				v-if="category.key === 'version_id'"
 				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
 				label="Project versions above"
 				input-aria-label="Project version downloads threshold"
 				:threshold="projectVersionDownloadsThreshold"
 				input-width-class="w-16"
-				@update:threshold="setProjectVersionDownloadsThreshold"
+				@update:threshold="
+					(threshold) => setProjectVersionDownloadsThreshold(threshold, setSelectedValues)
+				"
 			/>
 			<DownloadsThresholdInput
-				v-else-if="activeCategory.key === 'game_version'"
+				v-else-if="category.key === 'game_version'"
 				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
 				label="Game Versions above"
 				input-aria-label="Game version downloads threshold"
 				:threshold="gameVersionDownloadsThreshold"
 				input-width-class="w-16"
-				@update:threshold="setGameVersionDownloadsThreshold"
+				@update:threshold="
+					(threshold) => setGameVersionDownloadsThreshold(threshold, setSelectedValues)
+				"
 			/>
-		</div>
-	</Teleport>
+		</template>
+	</DropdownFilterBar>
 </template>
 
 <script setup lang="ts">
 import {
-	CheckIcon,
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	PlusIcon,
-	SearchIcon,
-	XIcon,
-} from '@modrinth/assets'
-import { ButtonStyled, Chips, MultiSelect, type MultiSelectOption, StyledInput } from '@modrinth/ui'
-import { onClickOutside } from '@vueuse/core'
-import type { ComponentPublicInstance, CSSProperties } from 'vue'
+	Chips,
+	DropdownFilterBar,
+	type DropdownFilterBarCategory,
+	type DropdownFilterBarOption,
+} from '@modrinth/ui'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import { useGeneratedState } from '~/composables/generated'
 import {
 	type AnalyticsQueryFilterCategory,
-	type AnalyticsSelectedFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
 import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
 import {
-	ADD_MENU_WIDTH,
-	areSelectedFiltersEqual,
-	areStringArraysEqual,
+	FILTER_VALUE_CATEGORIES,
 	cloneSelectedFilters,
-	type FilterCategory,
-	type FilterOption,
-	type FilterSelectionSource,
-	getAddMenuPosition,
-	getCategorySelectionCount as getCategorySelectionCountValue,
-	getCategorySelectionSummary as getCategorySelectionSummaryValue,
-	isCursorAimingAtSubmenu as getIsCursorAimingAtSubmenu,
-	isFilterValueSelected as getIsFilterValueSelected,
 	getOptionsWithSelectedValues,
-	getSubmenuPosition,
 	getVisibleAnalyticsFilterCategoriesForState,
 	normalizeSelectedValues as normalizeSelectedFilterValues,
-	type Point,
 } from './queryFilter'
+
+type AnalyticsFilterValueCategory = Exclude<AnalyticsQueryFilterCategory, 'project'>
+type SetDropdownFilterValues = (values: string[]) => void
 
 const {
 	filterOptions,
@@ -277,43 +80,34 @@ const {
 const formattedCountries = useFormattedCountries()
 const generatedState = useGeneratedState()
 
-const isAddMenuOpen = ref(false)
-const activeCategoryKey = ref<AnalyticsQueryFilterCategory | null>(null)
-const pendingCategoryKey = ref<AnalyticsQueryFilterCategory | null>(null)
-const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
-	cloneSelectedFilters(selectedFilters.value),
-)
-const previewSelectedValueDrafts = ref<Partial<Record<AnalyticsQueryFilterCategory, string[]>>>({})
-const categorySearchQuery = ref('')
 const gameVersionType = ref<'release' | 'all'>('release')
 const projectVersionDownloadsThreshold = ref<number | null>(null)
 const gameVersionDownloadsThreshold = ref<number | null>(null)
-const lastMousePosition = ref<Point | null>(null)
-const isCursorInsideSubmenu = ref(false)
-const hasSubmenuPosition = ref(false)
-const addMenuTrigger = ref<HTMLElement | null>(null)
-const menuContainer = ref<HTMLElement | null>(null)
-const submenu = ref<HTMLElement | null>(null)
-const addMenuStyle = ref<CSSProperties>({
-	left: '0px',
-	minWidth: '0px',
-	top: '0px',
-	width: `${ADD_MENU_WIDTH}px`,
-})
-const submenuPosition = ref<Point>({ x: 0, y: 0 })
-const categoryButtonRefs = new Map<AnalyticsQueryFilterCategory, HTMLElement>()
-let pendingCategoryTimeout: NodeJS.Timeout | null = null
-let previousMousePosition: Point | null = null
 const gameVersionTypeOptions: Array<'release' | 'all'> = ['release', 'all']
+const filterValueCategoryKeys = new Set<string>(FILTER_VALUE_CATEGORIES)
 
-const filterCategories = computed<FilterCategory[]>(() => {
-	const filtersForAvailability = isAddMenuOpen.value
-		? draftSelectedFilters.value
-		: selectedFilters.value
+const selectedFilterValue = computed<Record<string, string[]>>({
+	get: () => selectedFilters.value,
+	set: (nextValue) => {
+		const nextFilters = cloneSelectedFilters(selectedFilters.value)
+
+		for (const [categoryKey, values] of Object.entries(nextValue)) {
+			if (!isAnalyticsFilterValueCategory(categoryKey)) {
+				continue
+			}
+
+			nextFilters[categoryKey] = normalizeSelectedFilterValues(categoryKey, values, [])
+		}
+
+		selectedFilters.value = nextFilters
+	},
+})
+
+const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	const visibleCategoryKeys = new Set(
-		getVisibleAnalyticsFilterCategoriesForState(selectedBreakdown.value, filtersForAvailability),
+		getVisibleAnalyticsFilterCategoriesForState(selectedBreakdown.value, selectedFilters.value),
 	)
-	const categories: FilterCategory[] = [
+	const categories: DropdownFilterBarCategory[] = [
 		{
 			key: 'country',
 			label: 'Country',
@@ -324,10 +118,10 @@ const filterCategories = computed<FilterCategory[]>(() => {
 		{
 			key: 'monetization',
 			label: 'Monetization',
-			options: [
+			options: withSelectedOptions('monetization', [
 				{ value: 'monetized', label: 'Monetized' },
 				{ value: 'unmonetized', label: 'Unmonetized' },
-			],
+			]),
 		},
 		{
 			key: 'download_source',
@@ -346,6 +140,7 @@ const filterCategories = computed<FilterCategory[]>(() => {
 			label: 'Project version',
 			searchable: versionFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search project versions...',
+			submenuClass: 'w-[368px]',
 			options: withSelectedOptions('version_id', versionFilterOptions.value),
 		},
 		{
@@ -353,6 +148,7 @@ const filterCategories = computed<FilterCategory[]>(() => {
 			label: 'Game Version',
 			searchable: true,
 			searchPlaceholder: 'Search versions...',
+			submenuClass: 'w-[360px]',
 			options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
 		},
 		{
@@ -363,82 +159,9 @@ const filterCategories = computed<FilterCategory[]>(() => {
 	]
 
 	return categories.filter((category) =>
-		visibleCategoryKeys.has(category.key as Exclude<AnalyticsQueryFilterCategory, 'project'>),
+		visibleCategoryKeys.has(category.key as AnalyticsFilterValueCategory),
 	)
 })
-
-const filterCategoriesByKey = computed(
-	() => new Map(filterCategories.value.map((category) => [category.key, category] as const)),
-)
-
-const activeCategory = computed(() =>
-	activeCategoryKey.value ? filterCategoriesByKey.value.get(activeCategoryKey.value) : undefined,
-)
-const activeCategorySelectionCount = computed(() => {
-	return activeCategory.value ? getCategorySelectionCount(activeCategory.value.key, 'draft') : 0
-})
-const activeCategorySelectionLabel = computed(() =>
-	activeCategorySelectionCount.value === 1
-		? '1 selected'
-		: `${activeCategorySelectionCount.value} selected`,
-)
-
-const filteredActiveCategoryOptions = computed(() => {
-	if (!activeCategory.value) {
-		return []
-	}
-
-	if (!activeCategory.value.searchable) {
-		return activeCategory.value.options
-	}
-
-	const query = categorySearchQuery.value.trim().toLowerCase()
-	if (!query) {
-		return activeCategory.value.options
-	}
-
-	return activeCategory.value.options.filter((option) => {
-		if (option.label.toLowerCase().includes(query)) {
-			return true
-		}
-		if (option.value.toLowerCase().includes(query)) {
-			return true
-		}
-		return option.searchTerms?.some((term) => term.toLowerCase().includes(query)) ?? false
-	})
-})
-
-const activeCategoryEmptyStateLabel = computed(() =>
-	activeCategory.value?.searchable && categorySearchQuery.value.trim().length > 0
-		? 'No options found.'
-		: 'No options available.',
-)
-
-const submenuStyle = computed<CSSProperties>(() => ({
-	left: `${submenuPosition.value.x}px`,
-	top: `${submenuPosition.value.y}px`,
-}))
-
-const appliedFilterPreviews = computed(() =>
-	filterCategories.value
-		.map((category) => ({
-			key: category.key,
-			label: category.label,
-			summary: getCategorySelectionSummary(category),
-			count: getCategorySelectionCount(category.key),
-			category,
-			options: category.options.map((option) => ({
-				value: option.value,
-				label: option.label,
-				searchTerms: option.searchTerms,
-			})) as MultiSelectOption<string>[],
-		}))
-		.filter((preview) => preview.count > 0),
-)
-
-const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
-const previewTriggerClass =
-	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 hover:bg-surface-5 hover:brightness-100 active:brightness-100'
 
 const countryLabelsByCode = computed(
 	() =>
@@ -449,7 +172,7 @@ const countryLabelsByCode = computed(
 		),
 )
 
-const countryFilterOptions = computed<FilterOption[]>(() =>
+const countryFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.countries
 		.map((countryCode) => ({
 			value: countryCode,
@@ -476,7 +199,7 @@ const gameVersionTypesByVersion = computed(
 		),
 )
 
-const downloadSourceFilterOptions = computed<FilterOption[]>(() =>
+const downloadSourceFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.downloadSources
 		.map((downloadSource) => ({
 			value: downloadSource,
@@ -485,14 +208,14 @@ const downloadSourceFilterOptions = computed<FilterOption[]>(() =>
 		.sort((left, right) => left.label.localeCompare(right.label)),
 )
 
-const downloadReasonFilterOptions = computed<FilterOption[]>(() =>
+const downloadReasonFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.downloadReasons.map((downloadReason) => ({
 		value: downloadReason,
 		label: getDownloadReasonFilterOptionLabel(downloadReason),
 	})),
 )
 
-const versionFilterOptions = computed<FilterOption[]>(() =>
+const versionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.versionIds
 		.map((versionId) => ({
 			value: versionId,
@@ -509,7 +232,7 @@ const versionFilterOptions = computed<FilterOption[]>(() =>
 		),
 )
 
-const gameVersionFilterOptions = computed<FilterOption[]>(() =>
+const gameVersionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.gameVersions
 		.filter((gameVersion) => {
 			const versionType = gameVersionTypesByVersion.value.get(gameVersion)
@@ -531,7 +254,7 @@ const gameVersionFilterOptions = computed<FilterOption[]>(() =>
 		),
 )
 
-const loaderTypeFilterOptions = computed<FilterOption[]>(() =>
+const loaderTypeFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.loaderTypes
 		.map((loaderType) => ({
 			value: loaderType,
@@ -540,6 +263,41 @@ const loaderTypeFilterOptions = computed<FilterOption[]>(() =>
 		}))
 		.sort((left, right) => left.label.localeCompare(right.label)),
 )
+
+function isAnalyticsFilterValueCategory(
+	categoryKey: string,
+): categoryKey is AnalyticsFilterValueCategory {
+	return filterValueCategoryKeys.has(categoryKey)
+}
+
+function withSelectedOptions(
+	categoryKey: AnalyticsFilterValueCategory,
+	options: DropdownFilterBarOption[],
+): DropdownFilterBarOption[] {
+	return getOptionsWithSelectedValues(
+		options,
+		selectedFilters.value[categoryKey],
+		getMissingSelectedOptionLabel(categoryKey),
+	)
+}
+
+function getMissingSelectedOptionLabel(
+	categoryKey: AnalyticsFilterValueCategory,
+): ((value: string) => string) | undefined {
+	if (categoryKey === 'country') {
+		return getCountryFilterOptionLabel
+	}
+	if (categoryKey === 'version_id') {
+		return getVersionDisplayName
+	}
+	if (categoryKey === 'download_reason') {
+		return getDownloadReasonFilterOptionLabel
+	}
+	if (categoryKey === 'loader_type') {
+		return getLoaderTypeFilterOptionLabel
+	}
+	return undefined
+}
 
 function getCountryFilterOptionLabel(countryCode: string): string {
 	const normalizedCode = countryCode.trim().toUpperCase()
@@ -603,592 +361,61 @@ function compareOptionalDateStringsDescending(
 	return leftFallback.localeCompare(rightFallback)
 }
 
-function applyGameVersionDownloadsThreshold() {
+function applyGameVersionDownloadsThreshold(setSelectedValues: SetDropdownFilterValues) {
 	const threshold = gameVersionDownloadsThreshold.value
 	if (threshold === null) {
 		return
 	}
 
 	setSelectedValues(
-		'game_version',
 		gameVersionFilterOptions.value
 			.filter((gameVersion) => {
 				return (gameVersionDownloadsByVersion.value.get(gameVersion.value) ?? 0) >= threshold
 			})
 			.map((gameVersion) => gameVersion.value),
-		'draft',
 	)
 }
 
-function applyProjectVersionDownloadsThreshold() {
+function applyProjectVersionDownloadsThreshold(setSelectedValues: SetDropdownFilterValues) {
 	const threshold = projectVersionDownloadsThreshold.value
 	if (threshold === null) {
 		return
 	}
 
 	setSelectedValues(
-		'version_id',
 		versionFilterOptions.value
 			.filter((version) => {
 				return (projectVersionDownloadsById.value.get(version.value) ?? 0) >= threshold
 			})
 			.map((version) => version.value),
-		'draft',
 	)
 }
 
-function setProjectVersionDownloadsThreshold(threshold: number | null) {
+function setProjectVersionDownloadsThreshold(
+	threshold: number | null,
+	setSelectedValues: SetDropdownFilterValues,
+) {
 	projectVersionDownloadsThreshold.value = threshold
-	applyProjectVersionDownloadsThreshold()
+	applyProjectVersionDownloadsThreshold(setSelectedValues)
 }
 
-function setGameVersionDownloadsThreshold(threshold: number | null) {
+function setGameVersionDownloadsThreshold(
+	threshold: number | null,
+	setSelectedValues: SetDropdownFilterValues,
+) {
 	gameVersionDownloadsThreshold.value = threshold
-	applyGameVersionDownloadsThreshold()
+	applyGameVersionDownloadsThreshold(setSelectedValues)
 }
 
-function resetAddMenuDraft() {
-	draftSelectedFilters.value = cloneSelectedFilters(selectedFilters.value)
-}
-
-function commitAddMenuDraft() {
-	if (!areSelectedFiltersEqual(selectedFilters.value, draftSelectedFilters.value)) {
-		selectedFilters.value = cloneSelectedFilters(draftSelectedFilters.value)
-	}
-}
-
-function getSelectedValues(
-	categoryKey: AnalyticsQueryFilterCategory,
-	source: FilterSelectionSource = 'committed',
-): string[] {
-	if (source === 'draft') {
-		return draftSelectedFilters.value[categoryKey]
-	}
-
-	return selectedFilters.value[categoryKey]
-}
-
-function setSelectedValues(
-	categoryKey: AnalyticsQueryFilterCategory,
-	values: string[],
-	source: FilterSelectionSource = 'committed',
+function setGameVersionType(
+	type: 'release' | 'all' | null | undefined,
+	setSelectedValues: SetDropdownFilterValues,
 ) {
-	const normalizedValues = normalizeSelectedFilterValues(categoryKey, values, [])
-
-	const currentFilters = source === 'draft' ? draftSelectedFilters.value : selectedFilters.value
-	if (areStringArraysEqual(currentFilters[categoryKey], normalizedValues)) {
+	if (type === null || type === undefined) {
 		return
 	}
 
-	const nextFilters = {
-		...currentFilters,
-		[categoryKey]: normalizedValues,
-	}
-
-	if (source === 'draft') {
-		draftSelectedFilters.value = nextFilters
-		if (isAddMenuOpen.value && activeCategoryKey.value === categoryKey) {
-			scheduleSubmenuPositionUpdate()
-		}
-	} else {
-		selectedFilters.value = nextFilters
-	}
+	gameVersionType.value = type
+	applyGameVersionDownloadsThreshold(setSelectedValues)
 }
-
-function openAddMenu() {
-	if (isAddMenuOpen.value) {
-		return
-	}
-
-	commitPreviewFilterDrafts()
-	resetAddMenuDraft()
-	isAddMenuOpen.value = true
-}
-
-function closeAddMenu() {
-	if (!isAddMenuOpen.value) {
-		return
-	}
-
-	commitAddMenuDraft()
-	categorySearchQuery.value = ''
-	isAddMenuOpen.value = false
-}
-
-function handleAddMenuTriggerClick(event: MouseEvent) {
-	if (event.detail === 0) {
-		return
-	}
-
-	if (isAddMenuOpen.value) {
-		closeAddMenu()
-	} else {
-		openAddMenu()
-	}
-}
-
-function handleAddMenuTriggerKeydown(event: KeyboardEvent) {
-	switch (event.key) {
-		case 'Enter':
-		case ' ':
-		case 'ArrowDown':
-			event.preventDefault()
-			openAddMenu()
-			break
-		case 'Escape':
-			event.preventDefault()
-			closeAddMenu()
-			break
-	}
-}
-
-function handleAddMenuKeydown(event: KeyboardEvent) {
-	if (event.key !== 'Escape') {
-		return
-	}
-
-	event.preventDefault()
-	closeAddMenu()
-	nextTick(() => addMenuTrigger.value?.focus())
-}
-
-function setCategoryButtonRef(
-	categoryKey: AnalyticsQueryFilterCategory,
-	element: Element | ComponentPublicInstance | null,
-) {
-	if (element instanceof HTMLElement) {
-		categoryButtonRefs.set(categoryKey, element)
-		if (isAddMenuOpen.value && categoryKey === activeCategoryKey.value) {
-			scheduleSubmenuPositionUpdate()
-		}
-	} else {
-		categoryButtonRefs.delete(categoryKey)
-	}
-}
-
-function withSelectedOptions(
-	categoryKey: AnalyticsQueryFilterCategory,
-	options: FilterOption[],
-): FilterOption[] {
-	const selectedValues = getSelectedValues(categoryKey, isAddMenuOpen.value ? 'draft' : 'committed')
-	return getOptionsWithSelectedValues(
-		options,
-		selectedValues,
-		getMissingSelectedOptionLabel(categoryKey),
-	)
-}
-
-function getMissingSelectedOptionLabel(
-	categoryKey: AnalyticsQueryFilterCategory,
-): ((value: string) => string) | undefined {
-	if (categoryKey === 'country') {
-		return getCountryFilterOptionLabel
-	}
-	if (categoryKey === 'version_id') {
-		return getVersionDisplayName
-	}
-	if (categoryKey === 'download_reason') {
-		return getDownloadReasonFilterOptionLabel
-	}
-	if (categoryKey === 'loader_type') {
-		return getLoaderTypeFilterOptionLabel
-	}
-	return undefined
-}
-
-function isFilterValueSelected(categoryKey: AnalyticsQueryFilterCategory, value: string): boolean {
-	const selectedValues = getSelectedValues(categoryKey, 'draft')
-	return getIsFilterValueSelected(categoryKey, value, selectedValues, 0)
-}
-
-function toggleFilterValue(
-	categoryKey: AnalyticsQueryFilterCategory,
-	value: string,
-	nextValue: boolean,
-) {
-	const currentValues = getSelectedValues(categoryKey, 'draft')
-
-	if (nextValue) {
-		if (!currentValues.includes(value)) {
-			setSelectedValues(categoryKey, [...currentValues, value], 'draft')
-		}
-	} else {
-		setSelectedValues(
-			categoryKey,
-			currentValues.filter((item) => item !== value),
-			'draft',
-		)
-	}
-}
-
-function toggleFilterOption(categoryKey: AnalyticsQueryFilterCategory, value: string) {
-	toggleFilterValue(categoryKey, value, !isFilterValueSelected(categoryKey, value))
-}
-
-function getCategorySelectionCount(
-	categoryKey: AnalyticsQueryFilterCategory,
-	source: FilterSelectionSource = 'committed',
-): number {
-	const selectedValues = getSelectedValues(categoryKey, source)
-	return getCategorySelectionCountValue(categoryKey, selectedValues, 0)
-}
-
-function getCategorySelectionSummary(category: FilterCategory): string {
-	const count = getCategorySelectionCount(category.key)
-	return getCategorySelectionSummaryValue(category, getSelectedValues(category.key), count, [])
-}
-
-function clearFilterCategory(categoryKey: AnalyticsQueryFilterCategory) {
-	commitPreviewFilterDrafts()
-	setSelectedValues(categoryKey, [])
-}
-
-function clearAllFilters() {
-	commitPreviewFilterDrafts()
-	for (const category of filterCategories.value) {
-		setSelectedValues(category.key, [])
-	}
-}
-
-function clearActiveCategorySelection() {
-	if (!activeCategory.value) {
-		return
-	}
-
-	setSelectedValues(activeCategory.value.key, [], 'draft')
-}
-
-function getPreviewSelectedValues(categoryKey: AnalyticsQueryFilterCategory): string[] {
-	const draftValues = previewSelectedValueDrafts.value[categoryKey]
-	if (draftValues !== undefined) {
-		return draftValues
-	}
-
-	return getSelectedValues(categoryKey)
-}
-
-function setPreviewSelectedValues(categoryKey: AnalyticsQueryFilterCategory, values: string[]) {
-	previewSelectedValueDrafts.value = {
-		...previewSelectedValueDrafts.value,
-		[categoryKey]: normalizeSelectedFilterValues(categoryKey, values, []),
-	}
-}
-
-function openPreviewFilterDraft(categoryKey: AnalyticsQueryFilterCategory) {
-	commitPreviewFilterDrafts()
-	previewSelectedValueDrafts.value = {
-		...previewSelectedValueDrafts.value,
-		[categoryKey]: [...getSelectedValues(categoryKey)],
-	}
-}
-
-function commitPreviewFilterDraft(categoryKey: AnalyticsQueryFilterCategory) {
-	const draftValues = previewSelectedValueDrafts.value[categoryKey]
-	if (draftValues === undefined) {
-		return
-	}
-
-	previewSelectedValueDrafts.value = Object.fromEntries(
-		Object.entries(previewSelectedValueDrafts.value).filter(([key]) => key !== categoryKey),
-	)
-	setSelectedValues(categoryKey, draftValues)
-}
-
-function commitPreviewFilterDrafts() {
-	for (const categoryKey of Object.keys(
-		previewSelectedValueDrafts.value,
-	) as AnalyticsQueryFilterCategory[]) {
-		commitPreviewFilterDraft(categoryKey)
-	}
-}
-
-function activateCategory(categoryKey: AnalyticsQueryFilterCategory) {
-	clearPendingCategoryTimeout()
-	pendingCategoryKey.value = null
-	if (activeCategoryKey.value !== categoryKey) {
-		categorySearchQuery.value = ''
-	}
-	activeCategoryKey.value = categoryKey
-	scheduleSubmenuPositionUpdate()
-}
-
-function handleCategoryMouseEnter(categoryKey: AnalyticsQueryFilterCategory) {
-	if (!activeCategoryKey.value) {
-		activateCategory(categoryKey)
-		return
-	}
-
-	if (categoryKey === activeCategoryKey.value) {
-		clearPendingCategoryTimeout()
-		pendingCategoryKey.value = null
-		return
-	}
-
-	if (!isCursorAimingAtSubmenu(lastMousePosition.value, previousMousePosition)) {
-		activateCategory(categoryKey)
-		return
-	}
-
-	pendingCategoryKey.value = categoryKey
-	clearPendingCategoryTimeout()
-	pendingCategoryTimeout = setTimeout(() => {
-		if (pendingCategoryKey.value !== categoryKey) {
-			return
-		}
-
-		if (
-			isCursorInsideSubmenu.value ||
-			isCursorAimingAtSubmenu(lastMousePosition.value, previousMousePosition)
-		) {
-			pendingCategoryKey.value = null
-			return
-		}
-
-		activateCategory(categoryKey)
-	}, 180)
-}
-
-function handleMenuMouseMove(event: MouseEvent, source: 'menu' | 'submenu') {
-	previousMousePosition = lastMousePosition.value
-	lastMousePosition.value = {
-		x: event.clientX,
-		y: event.clientY,
-	}
-
-	if (source !== 'menu') {
-		return
-	}
-
-	if (
-		!pendingCategoryKey.value ||
-		isCursorAimingAtSubmenu(lastMousePosition.value, previousMousePosition)
-	) {
-		return
-	}
-
-	activateCategory(pendingCategoryKey.value)
-}
-
-function isCursorAimingAtSubmenu(cursor: Point | null, origin: Point | null): boolean {
-	return getIsCursorAimingAtSubmenu(cursor, origin, submenu.value?.getBoundingClientRect() ?? null)
-}
-
-function clearPendingCategoryTimeout() {
-	if (pendingCategoryTimeout) {
-		clearTimeout(pendingCategoryTimeout)
-		pendingCategoryTimeout = null
-	}
-}
-
-function updateAddMenuPosition(): boolean {
-	if (typeof window === 'undefined' || !addMenuTrigger.value || !menuContainer.value) {
-		return false
-	}
-
-	const triggerRect = addMenuTrigger.value.getBoundingClientRect()
-	const dropdownWidth = Math.max(ADD_MENU_WIDTH, triggerRect.width)
-
-	addMenuStyle.value = {
-		...addMenuStyle.value,
-		minWidth: `${triggerRect.width}px`,
-		width: `${dropdownWidth}px`,
-	}
-
-	const dropdownRect = menuContainer.value.getBoundingClientRect()
-	addMenuStyle.value = getAddMenuPosition({
-		triggerRect,
-		dropdownRect,
-		viewportWidth: window.innerWidth,
-		viewportHeight: window.innerHeight,
-	})
-	return true
-}
-
-function scheduleAddMenuPositionUpdate(retries = 8) {
-	if (typeof window === 'undefined') {
-		return
-	}
-
-	nextTick(() => {
-		if (!isAddMenuOpen.value || updateAddMenuPosition() || retries <= 0) {
-			return
-		}
-
-		setTimeout(() => scheduleAddMenuPositionUpdate(retries - 1), 0)
-	})
-}
-
-function updateSubmenuPosition(): boolean {
-	if (typeof window === 'undefined') {
-		return false
-	}
-
-	if (!activeCategoryKey.value) {
-		return false
-	}
-
-	const activeButton = categoryButtonRefs.get(activeCategoryKey.value)
-	if (!activeButton) {
-		return false
-	}
-
-	const buttonRect = activeButton.getBoundingClientRect()
-	const submenuRect = submenu.value?.getBoundingClientRect()
-	const submenuWidth = submenuRect?.width ?? 256
-	const submenuHeight = submenuRect?.height ?? 320
-
-	submenuPosition.value = getSubmenuPosition({
-		buttonRect,
-		submenuWidth,
-		submenuHeight,
-		viewportWidth: window.innerWidth,
-		viewportHeight: window.innerHeight,
-	})
-	hasSubmenuPosition.value = true
-	return true
-}
-
-function scheduleSubmenuPositionUpdate(retries = 8) {
-	if (typeof window === 'undefined') {
-		return
-	}
-
-	nextTick(() => {
-		if (!isAddMenuOpen.value) {
-			return
-		}
-
-		const hasRenderedSubmenu = submenu.value !== null
-		if (updateSubmenuPosition()) {
-			if (!hasRenderedSubmenu) {
-				nextTick(() => updateSubmenuPosition())
-			}
-			return
-		}
-
-		if (retries <= 0) {
-			return
-		}
-
-		setTimeout(() => scheduleSubmenuPositionUpdate(retries - 1), 0)
-	})
-}
-
-function resetPendingCategory() {
-	clearPendingCategoryTimeout()
-	pendingCategoryKey.value = null
-	isCursorInsideSubmenu.value = false
-	lastMousePosition.value = null
-	previousMousePosition = null
-}
-
-function handleSubmenuMouseEnter() {
-	isCursorInsideSubmenu.value = true
-	clearPendingCategoryTimeout()
-	pendingCategoryKey.value = null
-}
-
-function handleSubmenuMouseLeave() {
-	isCursorInsideSubmenu.value = false
-}
-
-function updateMenuPositions() {
-	if (!isAddMenuOpen.value) {
-		return
-	}
-
-	updateAddMenuPosition()
-	updateSubmenuPosition()
-}
-
-function startAddMenuPositionTracking() {
-	if (typeof window === 'undefined') {
-		return
-	}
-
-	window.addEventListener('resize', updateMenuPositions)
-	window.addEventListener('scroll', updateMenuPositions, true)
-}
-
-function stopAddMenuPositionTracking() {
-	if (typeof window === 'undefined') {
-		return
-	}
-
-	window.removeEventListener('resize', updateMenuPositions)
-	window.removeEventListener('scroll', updateMenuPositions, true)
-}
-
-onClickOutside(
-	menuContainer,
-	() => {
-		closeAddMenu()
-	},
-	{ ignore: [addMenuTrigger, submenu] },
-)
-
-watch(isAddMenuOpen, (isOpen) => {
-	if (isOpen) {
-		activeCategoryKey.value = null
-		hasSubmenuPosition.value = false
-		scheduleAddMenuPositionUpdate()
-		startAddMenuPositionTracking()
-	} else {
-		activeCategoryKey.value = null
-		hasSubmenuPosition.value = false
-		resetPendingCategory()
-		stopAddMenuPositionTracking()
-	}
-})
-
-watch(categorySearchQuery, () => {
-	scheduleSubmenuPositionUpdate()
-})
-
-watch(gameVersionType, () => {
-	if (!isAddMenuOpen.value || activeCategoryKey.value !== 'game_version') {
-		return
-	}
-
-	applyGameVersionDownloadsThreshold()
-	scheduleSubmenuPositionUpdate()
-})
-
-watch(gameVersionDownloadsByVersion, () => {
-	if (!isAddMenuOpen.value || activeCategoryKey.value !== 'game_version') {
-		return
-	}
-
-	applyGameVersionDownloadsThreshold()
-})
-
-watch(projectVersionDownloadsById, () => {
-	if (!isAddMenuOpen.value || activeCategoryKey.value !== 'version_id') {
-		return
-	}
-
-	applyProjectVersionDownloadsThreshold()
-})
-
-watch(filterCategoriesByKey, (nextCategories) => {
-	if (activeCategoryKey.value && !nextCategories.has(activeCategoryKey.value)) {
-		activeCategoryKey.value = null
-		hasSubmenuPosition.value = false
-	}
-})
-
-onBeforeUnmount(() => {
-	clearPendingCategoryTimeout()
-	stopAddMenuPositionTracking()
-	if (isAddMenuOpen.value) {
-		commitAddMenuDraft()
-	}
-	commitPreviewFilterDrafts()
-})
 </script>
-
-<style lang="scss" scoped>
-.checkbox-shadow {
-	box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.08);
-}
-</style>
