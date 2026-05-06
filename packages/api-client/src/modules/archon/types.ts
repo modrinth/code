@@ -220,6 +220,28 @@ export namespace Archon {
 		}
 	}
 
+	export namespace ServerUsers {
+		export namespace v1 {
+			export type ServerUserRole = 'Owner' | 'Editor' | 'Viewer' | 'Unknown'
+
+			export type AssignableServerUserRole = Exclude<ServerUserRole, 'Owner' | 'Unknown'>
+
+			export type ServerUser = {
+				server_id: string | null
+				user_id: string
+				added_on: string | null
+				role: ServerUserRole
+			}
+
+			export type AddServerUserRequest = {
+				server_id?: string | null
+				user_id: string
+				added_on?: string | null
+				role: AssignableServerUserRole
+			}
+		}
+	}
+
 	export namespace Servers {
 		export namespace v0 {
 			export type ServerGetResponse = {

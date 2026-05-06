@@ -62,7 +62,10 @@
 			<template #cell-action="{ row: entry }">
 				<div v-tooltip="actionTooltip(entry, 'desktop')" class="flex min-w-0 items-center gap-1.5">
 					<template v-if="entry.action.type === 'content_installed'">
-						<span class="shrink-0 text-secondary">{{ contentInstalledPrefix(entry.action) }}</span>
+						<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
+						<span class="shrink-0 text-secondary">{{
+							contentTypeLabel(entry.action.contentType)
+						}}</span>
 						<AutoLink
 							:to="entry.action.href"
 							class="inline-flex min-w-0 items-center gap-1.5"
@@ -89,7 +92,7 @@
 						</span>
 					</template>
 					<template v-else-if="isMemberAuditAction(entry.action)">
-						<span class="shrink-0 text-secondary">{{ memberActionPrefix(entry.action) }}</span>
+						<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
 						<AutoLink
 							:to="userProfilePath(entry.action.target)"
 							class="inline-flex min-w-0 items-center gap-1.5"
@@ -116,13 +119,15 @@
 							{{ memberActionSuffix(entry.action) }}
 						</span>
 					</template>
-					<span
-						v-else
-						:ref="(element) => setActionLabelRef(actionLabelRefKey(entry.id, 'desktop'), element)"
-						class="min-w-0 truncate"
-					>
-						{{ formatAction(entry.action) }}
-					</span>
+					<template v-else>
+						<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
+						<span
+							:ref="(element) => setActionLabelRef(actionLabelRefKey(entry.id, 'desktop'), element)"
+							class="min-w-0 truncate text-primary"
+						>
+							{{ actionMetadata(entry.action) }}
+						</span>
+					</template>
 				</div>
 			</template>
 
@@ -173,8 +178,9 @@
 				<div class="min-w-0 py-3 pr-2">
 					<div v-tooltip="actionTooltip(entry, 'mobile')" class="flex min-w-0 items-center gap-1.5">
 						<template v-if="entry.action.type === 'content_installed'">
+							<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
 							<span class="shrink-0 text-secondary">{{
-								contentInstalledPrefix(entry.action)
+								contentTypeLabel(entry.action.contentType)
 							}}</span>
 							<AutoLink
 								:to="entry.action.href"
@@ -202,7 +208,7 @@
 							</span>
 						</template>
 						<template v-else-if="isMemberAuditAction(entry.action)">
-							<span class="shrink-0 text-secondary">{{ memberActionPrefix(entry.action) }}</span>
+							<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
 							<AutoLink
 								:to="userProfilePath(entry.action.target)"
 								class="inline-flex min-w-0 items-center gap-1.5"
@@ -229,13 +235,17 @@
 								{{ memberActionSuffix(entry.action) }}
 							</span>
 						</template>
-						<span
-							v-else
-							:ref="(element) => setActionLabelRef(actionLabelRefKey(entry.id, 'mobile'), element)"
-							class="min-w-0 truncate text-secondary"
-						>
-							{{ formatAction(entry.action) }}
-						</span>
+						<template v-else>
+							<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
+							<span
+								:ref="
+									(element) => setActionLabelRef(actionLabelRefKey(entry.id, 'mobile'), element)
+								"
+								class="min-w-0 truncate text-primary"
+							>
+								{{ actionMetadata(entry.action) }}
+							</span>
+						</template>
 					</div>
 					<span
 						v-tooltip="entry.world?.name"
@@ -273,7 +283,7 @@
 			<div
 				class="border-0 border-t border-solid border-surface-5 bg-surface-2 px-4 py-8 text-center text-secondary"
 			>
-				{{ formatMessage(messages.emptyState) }}
+				{{ formatMessage(emptyStateMessage) }}
 			</div>
 		</div>
 	</div>
@@ -441,6 +451,10 @@ const messages = defineMessages({
 		id: 'servers.audit-log.empty',
 		defaultMessage: 'No activity matches your filters.',
 	},
+	noActivityEmptyState: {
+		id: 'servers.audit-log.empty.no-activity',
+		defaultMessage: 'Perform an action on your server and you will see it here!',
+	},
 	userAvatarAlt: {
 		id: 'servers.audit-log.user-avatar-alt',
 		defaultMessage: "{username}'s avatar",
@@ -449,25 +463,37 @@ const messages = defineMessages({
 		id: 'servers.audit-log.content-icon-alt',
 		defaultMessage: "{name}'s icon",
 	},
-	modInstalledPrefix: {
-		id: 'servers.audit-log.action-prefix.mod-installed',
-		defaultMessage: 'Installed mod:',
+	editedVerb: {
+		id: 'servers.audit-log.action-verb.edited',
+		defaultMessage: 'Edited',
 	},
-	modpackInstalledPrefix: {
-		id: 'servers.audit-log.action-prefix.modpack-installed',
-		defaultMessage: 'Installed modpack:',
+	startedVerb: {
+		id: 'servers.audit-log.action-verb.started',
+		defaultMessage: 'Started',
 	},
-	memberInvitedPrefix: {
-		id: 'servers.audit-log.action-prefix.member-invited',
-		defaultMessage: 'Invited user:',
+	installedVerb: {
+		id: 'servers.audit-log.action-verb.installed',
+		defaultMessage: 'Installed',
 	},
-	memberRemovedPrefix: {
-		id: 'servers.audit-log.action-prefix.member-removed',
-		defaultMessage: 'Removed user:',
+	invitedVerb: {
+		id: 'servers.audit-log.action-verb.invited',
+		defaultMessage: 'Invited',
 	},
-	roleChangedPrefix: {
-		id: 'servers.audit-log.action-prefix.role-changed',
-		defaultMessage: 'Changed role:',
+	removedVerb: {
+		id: 'servers.audit-log.action-verb.removed',
+		defaultMessage: 'Removed',
+	},
+	changedVerb: {
+		id: 'servers.audit-log.action-verb.changed',
+		defaultMessage: 'Changed',
+	},
+	modContentType: {
+		id: 'servers.audit-log.content-type.mod',
+		defaultMessage: 'mod',
+	},
+	modpackContentType: {
+		id: 'servers.audit-log.content-type.modpack',
+		defaultMessage: 'modpack',
 	},
 	memberInvitedRoleSuffix: {
 		id: 'servers.audit-log.action-suffix.member-invited-role',
@@ -479,31 +505,31 @@ const messages = defineMessages({
 	},
 	fileEditedAction: {
 		id: 'servers.audit-log.action.file-edited',
-		defaultMessage: 'Edited file: {file}',
+		defaultMessage: 'Edited: {file}',
 	},
 	worldStartedAction: {
 		id: 'servers.audit-log.action.world-started',
-		defaultMessage: 'Started world: {worldName}',
+		defaultMessage: 'Started: {worldName}',
 	},
 	modInstalledAction: {
 		id: 'servers.audit-log.action.mod-installed',
-		defaultMessage: 'Installed mod: {name}{version}',
+		defaultMessage: 'Installed: mod {name}{version}',
 	},
 	modpackInstalledAction: {
 		id: 'servers.audit-log.action.modpack-installed',
-		defaultMessage: 'Installed modpack: {name}{version}',
+		defaultMessage: 'Installed: modpack {name}{version}',
 	},
 	memberInvitedAction: {
 		id: 'servers.audit-log.action.member-invited',
-		defaultMessage: 'Invited user: {target}{role}',
+		defaultMessage: 'Invited: {target}{role}',
 	},
 	memberRemovedAction: {
 		id: 'servers.audit-log.action.member-removed',
-		defaultMessage: 'Removed user: {target}',
+		defaultMessage: 'Removed: {target}',
 	},
 	roleChangedAction: {
 		id: 'servers.audit-log.action.role-changed',
-		defaultMessage: 'Changed role: {target}{role}',
+		defaultMessage: 'Changed: {target}{role}',
 	},
 	ownerRole: {
 		id: 'servers.audit-log.role.owner',
@@ -590,6 +616,20 @@ const filteredEntries = computed(() => {
 
 const tableEntries = computed<AuditLogTableRow[]>(() => filteredEntries.value as AuditLogTableRow[])
 
+const hasActiveFilters = computed(
+	() =>
+		query.value.trim().length > 0 ||
+		!!filters.value.userId ||
+		!!filters.value.worldId ||
+		!!filters.value.actionType,
+)
+
+const emptyStateMessage = computed(() =>
+	props.entries.length === 0 && !hasActiveFilters.value
+		? messages.noActivityEmptyState
+		: messages.emptyState,
+)
+
 function formatAction(action: ServerAuditAction): string {
 	switch (action.type) {
 		case 'file_edited':
@@ -609,14 +649,14 @@ function formatAction(action: ServerAuditAction): string {
 		case 'member_invited':
 			return formatMessage(messages.memberInvitedAction, {
 				target: action.target,
-				role: action.role ? ` as ${formatRole(action.role)}` : '',
+				role: memberActionSuffix(action) ? ` ${memberActionSuffix(action)}` : '',
 			})
 		case 'member_removed':
 			return formatMessage(messages.memberRemovedAction, { target: action.target })
 		case 'role_changed':
 			return formatMessage(messages.roleChangedAction, {
 				target: action.target,
-				role: action.role ? ` to ${formatRole(action.role)}` : '',
+				role: memberActionSuffix(action) ? ` ${memberActionSuffix(action)}` : '',
 			})
 	}
 }
@@ -638,11 +678,45 @@ function actionSearchValue(action: ServerAuditAction): string {
 	}
 }
 
-function contentInstalledPrefix(action: ServerAuditAction): string {
-	if (action.type !== 'content_installed') return ''
-	return action.contentType === 'mod'
-		? formatMessage(messages.modInstalledPrefix)
-		: formatMessage(messages.modpackInstalledPrefix)
+function actionVerb(action: ServerAuditAction): string {
+	switch (action.type) {
+		case 'file_edited':
+			return formatMessage(messages.editedVerb)
+		case 'world_started':
+			return formatMessage(messages.startedVerb)
+		case 'content_installed':
+			return formatMessage(messages.installedVerb)
+		case 'member_invited':
+			return formatMessage(messages.invitedVerb)
+		case 'member_removed':
+			return formatMessage(messages.removedVerb)
+		case 'role_changed':
+			return formatMessage(messages.changedVerb)
+	}
+}
+
+function actionMetadata(action: ServerAuditAction): string {
+	switch (action.type) {
+		case 'file_edited':
+			return action.file
+		case 'world_started':
+			return action.worldName
+		case 'content_installed':
+			return `${contentTypeLabel(action.contentType)} ${action.name}${formatVersionSuffix(action.version)}`
+		case 'member_invited':
+		case 'role_changed':
+			return `${action.target}${memberActionSuffix(action) ? ` ${memberActionSuffix(action)}` : ''}`
+		case 'member_removed':
+			return action.target
+	}
+}
+
+function contentTypeLabel(
+	contentType: Extract<ServerAuditAction, { type: 'content_installed' }>['contentType'],
+) {
+	return contentType === 'mod'
+		? formatMessage(messages.modContentType)
+		: formatMessage(messages.modpackContentType)
 }
 
 function isMemberAuditAction(action: ServerAuditAction): action is MemberAuditAction {
@@ -651,19 +725,6 @@ function isMemberAuditAction(action: ServerAuditAction): action is MemberAuditAc
 		action.type === 'member_removed' ||
 		action.type === 'role_changed'
 	)
-}
-
-function memberActionPrefix(action: MemberAuditAction): string {
-	switch (action.type) {
-		case 'member_invited':
-			return formatMessage(messages.memberInvitedPrefix)
-		case 'member_removed':
-			return formatMessage(messages.memberRemovedPrefix)
-		case 'role_changed':
-			return formatMessage(messages.roleChangedPrefix)
-		default:
-			return ''
-	}
 }
 
 function memberActionSuffix(action: MemberAuditAction): string {

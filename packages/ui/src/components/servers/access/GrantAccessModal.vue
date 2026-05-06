@@ -91,13 +91,6 @@
 					</IntlFormatted>
 				</p>
 			</div>
-
-			<Checkbox
-				:model-value="sendFriendRequest"
-				:label="formatMessage(messages.friendRequestLabel)"
-				label-class="font-medium text-contrast"
-				@update:model-value="sendFriendRequest = $event"
-			/>
 		</div>
 
 		<template #actions>
@@ -126,7 +119,6 @@ import { computed, ref } from 'vue'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
-import Checkbox from '../../base/Checkbox.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import IntlFormatted from '../../base/IntlFormatted.vue'
 import NewModal from '../../modal/NewModal.vue'
@@ -148,21 +140,20 @@ const { formatMessage } = useVIntl()
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const target = ref('')
 const selectedRole = ref<Exclude<ServerAccessRole, 'owner'>>('editor')
-const sendFriendRequest = ref(true)
 const suggestionMinimumLength = 2
 
 const messages = defineMessages({
 	header: {
 		id: 'servers.grant-access-modal.header',
-		defaultMessage: 'Invite a user',
+		defaultMessage: 'Add a user',
 	},
 	targetLabel: {
 		id: 'servers.grant-access-modal.target.label',
-		defaultMessage: 'Username or email',
+		defaultMessage: 'Username',
 	},
 	targetPlaceholder: {
 		id: 'servers.grant-access-modal.target.placeholder',
-		defaultMessage: 'Enter a username or email',
+		defaultMessage: 'Enter a username',
 	},
 	noSuggestions: {
 		id: 'servers.grant-access-modal.target.no-suggestions',
@@ -170,7 +161,7 @@ const messages = defineMessages({
 	},
 	targetHelp: {
 		id: 'servers.grant-access-modal.target.help',
-		defaultMessage: 'Use their Modrinth username, or invite a new user by email.',
+		defaultMessage: 'Use their Modrinth username.',
 	},
 	roleLabel: {
 		id: 'servers.grant-access-modal.role.label',
@@ -196,17 +187,13 @@ const messages = defineMessages({
 		id: 'servers.grant-access-modal.permissions-help',
 		defaultMessage: 'View the full list of permissions for each role <link>here</link>.',
 	},
-	friendRequestLabel: {
-		id: 'servers.grant-access-modal.friend-request',
-		defaultMessage: 'Also send a friend request',
-	},
 	cancelButton: {
 		id: 'servers.grant-access-modal.cancel',
 		defaultMessage: 'Cancel',
 	},
 	inviteButton: {
 		id: 'servers.grant-access-modal.invite',
-		defaultMessage: 'Invite',
+		defaultMessage: 'Add user',
 	},
 	suggestionAvatarAlt: {
 		id: 'servers.grant-access-modal.suggestion-avatar-alt',
@@ -248,7 +235,6 @@ function findSuggestion(value: string) {
 function reset() {
 	target.value = ''
 	selectedRole.value = 'editor'
-	sendFriendRequest.value = true
 }
 
 function show(event?: MouseEvent) {
@@ -266,7 +252,6 @@ function submit() {
 	emit('grant', {
 		target: normalizedTarget.value,
 		role: selectedRole.value,
-		sendFriendRequest: sendFriendRequest.value,
 	})
 	hide()
 }

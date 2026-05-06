@@ -66,8 +66,10 @@
 </template>
 
 <script setup lang="ts">
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { FilterIcon, SearchIcon, UserPlusIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
@@ -82,21 +84,30 @@ import {
 	type ServerAccessMember,
 	type ServerAccessRole,
 	type ServerAccessRoleOption,
+	type ServerAccessUser,
 	type ServerAuditLogEntry,
 	type ServerAuditLogFilters,
 } from '#ui/components/servers/access'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { injectNotificationManager } from '#ui/providers'
+import {
+	injectAuth,
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+} from '#ui/providers'
 
 type RoleFilter = ServerAccessRole | 'all'
 
 const { formatMessage } = useVIntl()
+const auth = injectAuth()
+const client = injectModrinthClient()
+const { serverId, server } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
+const queryClient = useQueryClient()
 const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 const removeMemberConfirmModal = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
 const pendingRemovalMember = ref<ServerAccessMember | null>(null)
 const shouldCancelInvite = ref(false)
-const resendInviteCooldownMs = 60 * 1000
 
 const messages = defineMessages({
 	searchUsersPlaceholder: {
@@ -183,17 +194,43 @@ const messages = defineMessages({
 		id: 'servers.access-page.notification.role-updated.text',
 		defaultMessage: 'Changed {target} to {role}.',
 	},
+	loadFailedTitle: {
+		id: 'servers.access-page.notification.load-failed.title',
+		defaultMessage: 'Access could not be loaded',
+	},
+	loadFailedText: {
+		id: 'servers.access-page.notification.load-failed.text',
+		defaultMessage: 'Refresh the page to try again.',
+	},
+	userLookupFailedTitle: {
+		id: 'servers.access-page.notification.user-lookup-failed.title',
+		defaultMessage: 'User could not be found',
+	},
+	userLookupFailedText: {
+		id: 'servers.access-page.notification.user-lookup-failed.text',
+		defaultMessage: 'Could not find {target}. Check the username and try again.',
+	},
+	inviteFailedTitle: {
+		id: 'servers.access-page.notification.invite-failed.title',
+		defaultMessage: 'User could not be added',
+	},
+	inviteResendUnavailableTitle: {
+		id: 'servers.access-page.notification.invite-resend-unavailable.title',
+		defaultMessage: 'Invite cannot be resent',
+	},
+	inviteResendUnavailableText: {
+		id: 'servers.access-page.notification.invite-resend-unavailable.text',
+		defaultMessage: 'Invites are accepted automatically for this server.',
+	},
+	removeFailedTitle: {
+		id: 'servers.access-page.notification.remove-failed.title',
+		defaultMessage: 'Access could not be removed',
+	},
+	roleUpdateFailedTitle: {
+		id: 'servers.access-page.notification.role-update-failed.title',
+		defaultMessage: 'Role could not be updated',
+	},
 })
-
-const nowMinus = (amount: number, unit: 'hour' | 'day' | 'week' | 'month') => {
-	const unitMs = {
-		hour: 60 * 60 * 1000,
-		day: 24 * 60 * 60 * 1000,
-		week: 7 * 24 * 60 * 60 * 1000,
-		month: 30 * 24 * 60 * 60 * 1000,
-	}[unit]
-	return new Date(Date.now() - amount * unitMs).toISOString()
-}
 
 const roleOptions = computed<ServerAccessRoleOption[]>(() => [
 	{
@@ -221,115 +258,75 @@ const roleFilterOptions = computed<ComboboxOption<RoleFilter>[]>(() => [
 	})),
 ])
 
-const selectedRoleFilterLabel = computed(
-	() =>
-		formatMessage(messages.selectedRoleFilter, {
-			role:
-				roleFilterOptions.value.find((option) => option.value === roleFilter.value)?.label ??
-				formatMessage(messages.allRoles),
+const selectedRoleFilterLabel = computed(() =>
+	formatMessage(messages.selectedRoleFilter, {
+		role:
+			roleFilterOptions.value.find((option) => option.value === roleFilter.value)?.label ??
+			formatMessage(messages.allRoles),
+	}),
+)
+
+const serverUsersQueryKey = ['servers', 'users', 'v1', serverId]
+const serverUsersQuery = useQuery({
+	queryKey: serverUsersQueryKey,
+	queryFn: () => client.archon.server_users_v1.list(serverId),
+})
+
+const serverFullQuery = useQuery({
+	queryKey: ['servers', 'v1', 'detail', serverId],
+	queryFn: () => client.archon.servers_v1.get(serverId),
+})
+
+const userIds = computed(() => [
+	...new Set((serverUsersQuery.data.value ?? []).map((user) => user.user_id)),
+])
+
+const userProfilesQuery = useQuery({
+	queryKey: computed(() => ['labrinth', 'users', 'v2', userIds.value]),
+	queryFn: () => client.labrinth.users_v2.getMultiple(userIds.value),
+	enabled: computed(() => userIds.value.length > 0),
+})
+
+const userProfiles = computed(() => {
+	const profiles = new Map<string, Labrinth.Users.v2.User>()
+	for (const user of userProfilesQuery.data.value ?? []) {
+		profiles.set(user.id, user)
+	}
+	return profiles
+})
+
+const members = computed<ServerAccessMember[]>(() =>
+	(serverUsersQuery.data.value ?? [])
+		.map((serverUser) => {
+			const profile = userProfiles.value.get(serverUser.user_id)
+			const username = profile?.username ?? serverUser.user_id
+
+			return {
+				id: `${serverId}-${serverUser.user_id}`,
+				user: {
+					id: serverUser.user_id,
+					username,
+					avatarUrl: profile?.avatar_url,
+				},
+				role: apiRoleToAccessRole(serverUser.role),
+				joinedAt: serverUser.added_on,
+				isOwner: serverUser.role === 'Owner' || serverUser.user_id === server.value?.owner_id,
+			}
+		})
+		.sort((a, b) => {
+			const ownerSort = Number(b.isOwner) - Number(a.isOwner)
+			return ownerSort === 0 ? a.user.username.localeCompare(b.user.username) : ownerSort
 		}),
 )
 
-const members = ref<ServerAccessMember[]>([
-	{
-		id: 'member-owner',
-		user: {
-			id: 'user-prospector',
-			username: 'Prospector',
-		},
-		role: 'owner',
-		joinedAt: nowMinus(1, 'month'),
-		isOwner: true,
-	},
-	{
-		id: 'member-geometrically',
-		user: {
-			id: 'user-geometrically',
-			username: 'Geometrically',
-		},
-		role: 'editor',
-		joinedAt: nowMinus(3, 'week'),
-	},
-	{
-		id: 'member-imb',
-		user: {
-			id: 'user-imb',
-			username: 'IMB',
-		},
-		role: 'viewer',
-		joinedAt: null,
-		pending: true,
-	},
-])
+const worldOptions = computed(
+	() =>
+		serverFullQuery.data.value?.worlds.map((world) => ({ id: world.id, name: world.name })) ?? [],
+)
 
-const worldOptions = [
-	{ id: 'world-create-smp', name: 'Create SMP' },
-	{ id: 'world-smp-season-4', name: 'SMP Season 4' },
-]
-
-const auditEntries = ref<ServerAuditLogEntry[]>([
-	{
-		id: 'audit-support-file',
-		actor: { id: 'support', username: 'Support' },
-		world: null,
-		action: { type: 'file_edited', file: 'server.properties' },
-		timestamp: nowMinus(1, 'hour'),
-	},
-	{
-		id: 'audit-world-start',
-		actor: members.value[1].user,
-		world: null,
-		action: { type: 'world_started', worldName: 'Create SMP' },
-		timestamp: nowMinus(5, 'hour'),
-	},
-	{
-		id: 'audit-mod-install',
-		actor: members.value[1].user,
-		world: worldOptions[1],
-		action: {
-			type: 'content_installed',
-			contentType: 'mod',
-			name: 'Create Aeronautics',
-			href: '/mod/create-aeronautics',
-			version: '1.20.1-0.6.0',
-		},
-		timestamp: nowMinus(5, 'hour'),
-	},
-	{
-		id: 'audit-modpack-install',
-		actor: members.value[1].user,
-		world: worldOptions[1],
-		action: {
-			type: 'content_installed',
-			contentType: 'modpack',
-			name: 'Cobblemon x Create',
-			href: '/modpack/cobblemon-x-create',
-			version: '2.1.4',
-		},
-		timestamp: nowMinus(5, 'hour'),
-	},
-	{
-		id: 'audit-file-edit',
-		actor: members.value[1].user,
-		world: worldOptions[1],
-		action: { type: 'file_edited', file: 'server.properties' },
-		timestamp: nowMinus(5, 'hour'),
-	},
-	{
-		id: 'audit-role-change',
-		actor: members.value[0].user,
-		world: null,
-		action: { type: 'role_changed', target: 'Geometrically', role: 'editor' },
-		timestamp: nowMinus(2, 'day'),
-	},
-])
-
-const inviteSuggestions: ServerAccessInviteSuggestion[] = [
-	{ id: 'user-fetch', username: 'Fetch', email: 'fetch@example.com' },
-	{ id: 'user-emma', username: 'Emma', email: 'emma@example.com' },
-	{ id: 'user-boris', username: 'Boris', email: 'boris@example.com' },
-	{ id: 'user-coolbot', username: 'Coolbot', email: 'coolbot@example.com' },
-]
+const auditEntries = ref<ServerAuditLogEntry[]>([])
+const inviteSuggestions: ServerAccessInviteSuggestion[] = []
+const hasShownLoadError = ref(false)
 
 const memberSearch = ref('')
 const roleFilter = ref<RoleFilter>('all')
@@ -358,10 +355,83 @@ function formatRole(role: ServerAccessRole) {
 	return roleOptions.value.find((option) => option.value === role)?.label ?? role
 }
 
-function pushAuditEntry(entry: Omit<ServerAuditLogEntry, 'id' | 'timestamp'>) {
+const currentActor = computed<ServerAccessUser | null>(() => {
+	if (auth.user.value) return labrinthUserToAccessUser(auth.user.value)
+	return members.value.find((member) => member.isOwner)?.user ?? null
+})
+
+watch(
+	() => [serverUsersQuery.error.value, userProfilesQuery.error.value],
+	([serverUsersError, userProfilesError]) => {
+		if (hasShownLoadError.value || (!serverUsersError && !userProfilesError)) return
+
+		hasShownLoadError.value = true
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.loadFailedTitle),
+			text:
+				formatErrorMessage(serverUsersError ?? userProfilesError) ??
+				formatMessage(messages.loadFailedText),
+		})
+	},
+)
+
+function labrinthUserToAccessUser(user: Labrinth.Users.v2.User): ServerAccessUser {
+	return {
+		id: user.id,
+		username: user.username,
+		avatarUrl: user.avatar_url,
+	}
+}
+
+function apiRoleToAccessRole(role: Archon.ServerUsers.v1.ServerUserRole): ServerAccessRole {
+	switch (role) {
+		case 'Owner':
+			return 'owner'
+		case 'Editor':
+			return 'editor'
+		case 'Viewer':
+		case 'Unknown':
+			return 'viewer'
+	}
+}
+
+function accessRoleToApiRole(
+	role: Exclude<ServerAccessRole, 'owner'>,
+): Archon.ServerUsers.v1.AssignableServerUserRole {
+	switch (role) {
+		case 'editor':
+			return 'Editor'
+		case 'viewer':
+			return 'Viewer'
+	}
+}
+
+function formatErrorMessage(error: unknown): string | undefined {
+	return error instanceof Error ? error.message : undefined
+}
+
+async function invalidateServerUsers() {
+	await queryClient.invalidateQueries({ queryKey: serverUsersQueryKey })
+}
+
+function findMemberByTarget(target: string) {
+	const normalizedTarget = target.trim().toLowerCase()
+	return members.value.find(
+		(member) =>
+			member.user.username.toLowerCase() === normalizedTarget ||
+			member.user.id.toLowerCase() === normalizedTarget,
+	)
+}
+
+function pushAuditEntry(entry: Omit<ServerAuditLogEntry, 'id' | 'timestamp' | 'actor'>) {
+	const actor = currentActor.value
+	if (!actor) return
+
 	auditEntries.value = [
 		{
 			...entry,
+			actor,
 			id: `audit-${Date.now()}-${Math.random().toString(36).slice(2)}`,
 			timestamp: new Date().toISOString(),
 		},
@@ -369,57 +439,43 @@ function pushAuditEntry(entry: Omit<ServerAuditLogEntry, 'id' | 'timestamp'>) {
 	]
 }
 
-function updateMemberRole(member: ServerAccessMember, role: ServerAccessRole) {
-	if (member.isOwner || member.role === role) return
+async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRole) {
+	if (member.isOwner || member.role === role || role === 'owner') return
 
-	members.value = members.value.map((existingMember) =>
-		existingMember.id === member.id ? { ...existingMember, role } : existingMember,
-	)
-	pushAuditEntry({
-		actor: members.value[0].user,
-		world: null,
-		action: { type: 'role_changed', target: member.user.username, role },
-	})
-	addNotification({
-		type: 'success',
-		title: formatMessage(messages.roleUpdatedTitle),
-		text: formatMessage(messages.roleUpdatedText, {
-			target: member.user.username,
-			role: formatRole(role),
-		}),
-	})
+	try {
+		await client.archon.server_users_v1.update(serverId, member.user.id, accessRoleToApiRole(role))
+		await invalidateServerUsers()
+		pushAuditEntry({
+			world: null,
+			action: { type: 'role_changed', target: member.user.username, role },
+		})
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.roleUpdatedTitle),
+			text: formatMessage(messages.roleUpdatedText, {
+				target: member.user.username,
+				role: formatRole(role),
+			}),
+		})
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.roleUpdateFailedTitle),
+			text: formatErrorMessage(error),
+		})
+	}
 }
 
 function resendInvite(member: ServerAccessMember) {
-	if (isResendInviteCoolingDown(member)) return
-
-	members.value = members.value.map((existingMember) =>
-		existingMember.id === member.id
-			? {
-					...existingMember,
-					inviteResendAvailableAt: new Date(Date.now() + resendInviteCooldownMs).toISOString(),
-				}
-			: existingMember,
-	)
 	addNotification({
-		type: 'success',
-		title: formatMessage(messages.inviteResentTitle),
-		text: formatMessage(messages.inviteResentText, { target: member.user.username }),
+		type: 'error',
+		title: formatMessage(messages.inviteResendUnavailableTitle),
+		text: formatMessage(messages.inviteResendUnavailableText, { target: member.user.username }),
 	})
 }
 
-function cancelInvite(member: ServerAccessMember) {
-	members.value = members.value.filter((existingMember) => existingMember.id !== member.id)
-	pushAuditEntry({
-		actor: members.value[0].user,
-		world: null,
-		action: { type: 'member_removed', target: member.user.username },
-	})
-	addNotification({
-		type: 'success',
-		title: formatMessage(messages.inviteCancelledTitle),
-		text: formatMessage(messages.inviteCancelledText, { target: member.user.username }),
-	})
+async function cancelInvite(member: ServerAccessMember) {
+	await removeMemberAccess(member, true)
 }
 
 function requestRemoveMember(member: ServerAccessMember) {
@@ -434,7 +490,7 @@ function requestCancelInvite(member: ServerAccessMember) {
 	removeMemberConfirmModal.value?.show()
 }
 
-function confirmAccessRemoval() {
+async function confirmAccessRemoval() {
 	const member = pendingRemovalMember.value
 	const shouldCancel = shouldCancelInvite.value
 	pendingRemovalMember.value = null
@@ -442,75 +498,98 @@ function confirmAccessRemoval() {
 	if (!member) return
 
 	if (shouldCancel) {
-		cancelInvite(member)
+		await cancelInvite(member)
 		return
 	}
 
-	removeMember(member)
+	await removeMember(member)
 }
 
-function removeMember(member: ServerAccessMember) {
-	members.value = members.value.filter((existingMember) => existingMember.id !== member.id)
-	pushAuditEntry({
-		actor: members.value[0].user,
-		world: null,
-		action: { type: 'member_removed', target: member.user.username },
-	})
-	addNotification({
-		type: 'success',
-		title: formatMessage(messages.memberRemovedTitle),
-		text: formatMessage(messages.memberRemovedText, { target: member.user.username }),
-	})
+async function removeMember(member: ServerAccessMember) {
+	await removeMemberAccess(member, false)
 }
 
-function grantAccess(payload: GrantServerAccessPayload) {
-	const suggestion = inviteSuggestions.find(
-		(item) => item.username === payload.target || item.email === payload.target,
-	)
-	const username = suggestion?.username ?? payload.target
-	const existingMember = members.value.find(
-		(member) =>
-			member.user.username.toLowerCase() === username.toLowerCase() ||
-			member.user.id === suggestion?.id,
-	)
+async function removeMemberAccess(member: ServerAccessMember, shouldCancel: boolean) {
+	try {
+		await client.archon.server_users_v1.delete(serverId, member.user.id)
+		await invalidateServerUsers()
+		pushAuditEntry({
+			world: null,
+			action: { type: 'member_removed', target: member.user.username },
+		})
+		addNotification({
+			type: 'success',
+			title: formatMessage(
+				shouldCancel ? messages.inviteCancelledTitle : messages.memberRemovedTitle,
+			),
+			text: formatMessage(
+				shouldCancel ? messages.inviteCancelledText : messages.memberRemovedText,
+				{
+					target: member.user.username,
+				},
+			),
+		})
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.removeFailedTitle),
+			text: formatErrorMessage(error),
+		})
+	}
+}
 
+async function grantAccess(payload: GrantServerAccessPayload) {
+	const target = payload.target.trim()
+	if (!target) return
+
+	const existingMember = findMemberByTarget(target)
 	if (existingMember) {
-		updateMemberRole(existingMember, payload.role)
+		await updateMemberRole(existingMember, payload.role)
 		return
 	}
 
-	const member: ServerAccessMember = {
-		id: `member-${Date.now()}`,
-		user: {
-			id: suggestion?.id ?? `pending-${payload.target.toLowerCase()}`,
-			username,
-			avatarUrl: suggestion?.avatarUrl,
-		},
-		role: payload.role,
-		joinedAt: null,
-		pending: true,
+	let user: Labrinth.Users.v2.User
+	try {
+		user = await client.labrinth.users_v2.get(target)
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.userLookupFailedTitle),
+			text: formatErrorMessage(error) ?? formatMessage(messages.userLookupFailedText, { target }),
+		})
+		return
 	}
 
-	members.value = [member, ...members.value]
-	pushAuditEntry({
-		actor: members.value.find((existingMember) => existingMember.isOwner)?.user ?? member.user,
-		world: null,
-		action: { type: 'member_invited', target: username, role: payload.role },
-	})
-	addNotification({
-		type: 'success',
-		title: formatMessage(messages.inviteSentTitle),
-		text: formatMessage(messages.inviteSentText, {
-			target: username,
-			role: formatRole(payload.role),
-		}),
-	})
-}
+	const resolvedMember = findMemberByTarget(user.id)
+	if (resolvedMember) {
+		await updateMemberRole(resolvedMember, payload.role)
+		return
+	}
 
-function isResendInviteCoolingDown(member: ServerAccessMember) {
-	return (
-		!!member.inviteResendAvailableAt &&
-		new Date(member.inviteResendAvailableAt).getTime() > Date.now()
-	)
+	try {
+		await client.archon.server_users_v1.add(serverId, {
+			user_id: user.id,
+			role: accessRoleToApiRole(payload.role),
+		})
+		await invalidateServerUsers()
+		pushAuditEntry({
+			world: null,
+			action: { type: 'member_invited', target: user.username, role: payload.role },
+		})
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.inviteSentTitle),
+			text: formatMessage(messages.inviteSentText, {
+				target: user.username,
+				role: formatRole(payload.role),
+			}),
+		})
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.inviteFailedTitle),
+			text: formatErrorMessage(error),
+		})
+	}
 }
 </script>
