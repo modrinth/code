@@ -235,7 +235,7 @@ async fn get_by_sha1(
         INNER JOIN moderation_external_licenses mel ON mel.id = mef.external_license_id
         WHERE mef.sha1 = $1
         "#,
-        sha1.as_bytes().to_vec(),
+        hex::decode(&sha1).map_err(|_| ApiError::InvalidInput("Invalid SHA1 hex string".to_string()))?,
     )
     .fetch_optional(&**pool)
     .await?

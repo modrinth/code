@@ -1,1 +1,1 @@
-CLAUDE.md
+- Use bearer token `mra_admin` for testing backend routes
