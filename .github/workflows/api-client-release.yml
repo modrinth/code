@@ -1,0 +1,157 @@
+name: API client release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/api-client-release.yml
+      - packages/api-client/**
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump to use when the current version has already been published.
+        required: true
+        default: minor
+        type: choice
+        options:
+          - minor
+          - patch
+          - major
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    if: github.repository_owner == 'modrinth'
+    # npm Trusted Publishing requires a GitHub-hosted runner.
+    runs-on: ubuntu-latest
+    env:
+      FORCE_COLOR: 3
+      PACKAGE_DIR: packages/api-client
+      PACKAGE_NAME: '@modrinth/api-client'
+      BUMP_TYPE: ${{ github.event.inputs.bump || 'minor' }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Check for api-client changes
+        id: changes
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if git diff --quiet "${{ github.event.before }}" "$GITHUB_SHA" -- "$PACKAGE_DIR"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+
+      - name: Enable Corepack
+        if: steps.changes.outputs.changed == 'true'
+        run: corepack enable
+
+      - name: Get pnpm store path
+        if: steps.changes.outputs.changed == 'true'
+        id: pnpm-store
+        run: echo "store-path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore pnpm cache
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.pnpm-store.outputs.store-path }}
+          key: pnpm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-cache-
+
+      - name: Install dependencies
+        if: steps.changes.outputs.changed == 'true'
+        run: pnpm install --frozen-lockfile --filter @modrinth/api-client...
+
+      - name: Resolve release version
+        if: steps.changes.outputs.changed == 'true'
+        id: version
+        run: |
+          CURRENT_VERSION="$(node --print "require('./${PACKAGE_DIR}/package.json').version")"
+
+          set +e
+          PUBLISHED_VERSION_JSON="$(pnpm view "${PACKAGE_NAME}" version --json)"
+          VIEW_STATUS="$?"
+          set -e
+
+          if [ "$VIEW_STATUS" -eq 0 ]; then
+            PUBLISHED_VERSION="$(node --eval "const raw = process.argv[1] || ''; const value = raw ? JSON.parse(raw) : ''; console.log(Array.isArray(value) ? value.at(-1) || '' : value || '')" "$PUBLISHED_VERSION_JSON")"
+          else
+            PUBLISHED_VERSION=""
+          fi
+
+          VERSION_RESULT="$(node --eval "const [current, published, bumpType] = process.argv.slice(1); const parse = (version) => { const match = /^([0-9]+)\\.([0-9]+)\\.([0-9]+)$/.exec(version || ''); if (!match) throw new Error('Unsupported semver version: ' + version); return match.slice(1).map(Number); }; const compare = (left, right) => { const a = parse(left); const b = parse(right); for (let i = 0; i < 3; i++) { if (a[i] !== b[i]) return a[i] - b[i]; } return 0; }; const bump = (version, type) => { const next = parse(version); if (type === 'major') { next[0]++; next[1] = 0; next[2] = 0; } else if (type === 'minor') { next[1]++; next[2] = 0; } else if (type === 'patch') { next[2]++; } else { throw new Error('Unsupported bump type: ' + type); } return next.join('.'); }; const shouldBump = Boolean(published) && compare(current, published) <= 0; const next = shouldBump ? bump(published, bumpType) : current; console.log(JSON.stringify({ current, published, next, shouldBump }));" "$CURRENT_VERSION" "$PUBLISHED_VERSION" "$BUMP_TYPE")"
+
+          NEXT_VERSION="$(node --eval "console.log(JSON.parse(process.argv[1]).next)" "$VERSION_RESULT")"
+          SHOULD_BUMP="$(node --eval "console.log(JSON.parse(process.argv[1]).shouldBump ? 'true' : 'false')" "$VERSION_RESULT")"
+
+          if [ "$SHOULD_BUMP" = "true" ]; then
+            node --eval "const fs = require('node:fs'); const path = process.argv[1]; const version = process.argv[2]; const pkg = JSON.parse(fs.readFileSync(path, 'utf8')); pkg.version = version; fs.writeFileSync(path, JSON.stringify(pkg, null, '\t') + '\n');" "$PACKAGE_DIR/package.json" "$NEXT_VERSION"
+          fi
+
+          echo "current_version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "published_version=$PUBLISHED_VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=$NEXT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "bumped=$SHOULD_BUMP" >> "$GITHUB_OUTPUT"
+
+      - name: Build api-client
+        if: steps.changes.outputs.changed == 'true'
+        run: pnpm --filter @modrinth/api-client build
+
+      - name: Check package contents
+        if: steps.changes.outputs.changed == 'true'
+        run: pnpm --dir "$PACKAGE_DIR" pack --dry-run
+
+      - name: Configure git
+        if: steps.changes.outputs.changed == 'true' && steps.version.outputs.bumped == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit version bump
+        if: steps.changes.outputs.changed == 'true' && steps.version.outputs.bumped == 'true'
+        run: |
+          git add "$PACKAGE_DIR/package.json"
+          git commit -m "Release @modrinth/api-client v${{ steps.version.outputs.version }} [skip ci]"
+
+      - name: Push version bump
+        if: steps.changes.outputs.changed == 'true' && steps.version.outputs.bumped == 'true'
+        env:
+          GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+        run: |
+          if [ -n "$GH_ACCESS_TOKEN" ]; then
+            git remote set-url origin "https://x-access-token:${GH_ACCESS_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          fi
+
+          git push origin HEAD:main
+
+      - name: Publish api-client
+        if: steps.changes.outputs.changed == 'true'
+        run: pnpm --dir "$PACKAGE_DIR" publish --access public --provenance --no-git-checks
