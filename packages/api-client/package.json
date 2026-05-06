@@ -2,7 +2,7 @@
 	"name": "@modrinth/api-client",
 	"version": "0.0.0",
 	"description": "An API client for Modrinth's API for use in nuxt, tauri and plain node/browser environments.",
-	"license": "GPL-3.0-only",
+	"license": "LGPL-3.0-only",
 	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",

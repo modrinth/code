@@ -1,7 +1,7 @@
 # @modrinth/api-client
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-c78aff?style=for-the-badge)](https://www.typescriptlang.org/)
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-c78aff?style=for-the-badge)](LICENSE)
+[![License: LGPL-3.0](https://img.shields.io/badge/License-LGPL%203.0-c78aff?style=for-the-badge)](LICENSE)
 
 Platform-agnostic TypeScript client for Modrinth's API across Node.js, browsers, Nuxt, and Tauri.
 
@@ -176,4 +176,4 @@ When adding a module, add it to `src/modules/index.ts` so it is included in the 
 
 ## License
 
-Licensed under GPL-3.0. See [LICENSE](LICENSE).
+Licensed under LGPL-3.0. See [LICENSE](LICENSE).
