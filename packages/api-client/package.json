@@ -22,7 +22,7 @@
 	"sideEffects": false,
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/modrinth/code.git",
+		"url": "https://github.com/modrinth/code.git",
 		"directory": "packages/api-client"
 	},
 	"bugs": {

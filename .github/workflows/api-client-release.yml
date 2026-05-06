@@ -6,17 +6,6 @@ on:
     paths:
       - .github/workflows/api-client-release.yml
       - packages/api-client/**
-  workflow_dispatch:
-    inputs:
-      bump:
-        description: Version bump to use when the current version has already been published.
-        required: true
-        default: minor
-        type: choice
-        options:
-          - minor
-          - patch
-          - major
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,14 +17,14 @@ permissions:
 
 jobs:
   release:
-    if: github.repository_owner == 'modrinth'
+    if: github.repository_owner == 'modrinth' && github.ref == 'refs/heads/main'
     # npm Trusted Publishing requires a GitHub-hosted runner.
     runs-on: ubuntu-latest
     env:
       FORCE_COLOR: 3
       PACKAGE_DIR: packages/api-client
       PACKAGE_NAME: '@modrinth/api-client'
-      BUMP_TYPE: ${{ github.event.inputs.bump || 'minor' }}
+      BUMP_TYPE: minor
     steps:
       - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -45,11 +34,6 @@ jobs:
       - name: Check for api-client changes
         id: changes
         run: |
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
           if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             exit 0
