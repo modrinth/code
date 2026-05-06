@@ -404,7 +404,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-months),
 .modrinth-date-picker :deep(.flatpickr-month) {
-	@apply items-center h-10 flex mb-1;
+	@apply items-center h-10 flex mb-1 overflow-visible;
 }
 
 .modrinth-date-picker :deep(.flatpickr-month),
@@ -420,22 +420,22 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year),
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply rounded-xl bg-surface-4 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-8;
+	@apply rounded-xl bg-surface-4 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-10;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply min-w-28 pl-3.5 pr-8;
+	@apply min-w-28 pl-3 pr-8;
 	appearance: none;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-	background-position: calc(100% - 10px) calc(50%);
+	background-position: calc(100% - 8px) calc(50%);
 	background-repeat: no-repeat;
 	background-size: 16px 16px;
 }
 .modrinth-date-picker :deep(.flatpickr-current-month .numInputWrapper:has(input.cur-year)) {
-	@apply w-[80px];
+	@apply w-[76px];
 }
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year) {
-	@apply min-w-[80px] px-2 text-center;
+	@apply min-w-[76px] px-2 text-center;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year:focus),
@@ -460,7 +460,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-prev-month),
 .modrinth-date-picker :deep(.flatpickr-next-month) {
-	@apply top-3.5 mx-3.5 flex h-8 w-8 items-center justify-center rounded-xl p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
+	@apply top-2.5 mx-3.5 flex h-10 w-10 items-center justify-center rounded-full p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
 }
 
 .modrinth-date-picker :deep(.flatpickr-prev-month svg),
@@ -480,7 +480,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day) {
-	@apply m-0 max-w-none rounded-xl border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold;
+	@apply m-0 max-w-none rounded-xl border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.today) {
