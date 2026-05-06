@@ -232,6 +232,7 @@ const props = withDefaults(
 		disableSearchFilter?: boolean
 		dropdownClass?: string
 		dropdownMinWidth?: string
+		minSearchLengthToOpen?: number
 		/** Keep the selected option's label in the input after selection, and show all options on focus */
 		syncWithSelection?: boolean
 		/** Show a search icon in the searchable input */
@@ -247,6 +248,7 @@ const props = withDefaults(
 		showIconInSelected: false,
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		noOptionsMessage: 'No results found',
+		minSearchLengthToOpen: 0,
 		syncWithSelection: true,
 		showSearchIcon: false,
 	},
@@ -319,6 +321,12 @@ const triggerText = computed(() => {
 	if (selectedOption.value) return selectedOption.value.label
 	return props.placeholder
 })
+
+const hasMinimumSearchLength = computed(
+	() =>
+		!props.searchable ||
+		searchQuery.value.trim().length >= props.minSearchLengthToOpen,
+)
 
 const optionsWithKeys = computed(() => {
 	return props.options.map((opt, index) => ({
@@ -438,6 +446,7 @@ async function updateDropdownPosition() {
 
 async function openDropdown() {
 	if (props.disabled || isOpen.value) return
+	if (!hasMinimumSearchLength.value) return
 
 	isOpen.value = true
 	emit('open')
@@ -627,6 +636,10 @@ function handleSearchKeydown(event: KeyboardEvent) {
 function handleSearchInput() {
 	userHasTyped.value = true
 	emit('searchInput', searchQuery.value)
+	if (!hasMinimumSearchLength.value) {
+		closeDropdown()
+		return
+	}
 	if (!isOpen.value) {
 		openDropdown()
 	}
@@ -694,10 +707,16 @@ watch(filteredOptions, () => {
 	}
 })
 
+watch(hasMinimumSearchLength, (canOpen) => {
+	if (!canOpen) {
+		closeDropdown()
+	}
+})
+
 watch(
 	[() => props.modelValue, () => props.options],
 	([val]) => {
-		if (props.searchable && props.syncWithSelection && !isOpen.value) {
+		if (props.searchable && props.syncWithSelection && !isOpen.value && !userHasTyped.value) {
 			const opt = props.options.find((o) => isDropdownOption(o) && o.value === val)
 			searchQuery.value = opt && isDropdownOption(opt) ? opt.label : ''
 		}

@@ -21,7 +21,7 @@ const roleOptions: ServerAccessRoleOption[] = [
 	},
 	{
 		value: 'viewer',
-		label: 'Viewer',
+		label: 'Limited',
 		description: 'Start, stop, restart, and view the server without making changes.',
 	},
 ]
@@ -95,6 +95,18 @@ export const Default: Story = {
 export const PendingInvite: Story = {
 	args: {
 		members: [members[2]],
+		roles: roleOptions,
+	},
+}
+
+export const PendingInviteCooldown: Story = {
+	args: {
+		members: [
+			{
+				...members[2],
+				inviteResendAvailableAt: new Date(Date.now() + 45 * 1000).toISOString(),
+			},
+		],
 		roles: roleOptions,
 	},
 }

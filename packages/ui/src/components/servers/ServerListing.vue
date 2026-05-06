@@ -42,7 +42,7 @@
 					<div
 						v-if="owner"
 						v-tooltip="formatMessage(messages.ownerTooltip, { username: owner.username })"
-						class="flex min-w-0 items-center gap-1 rounded-full bg-surface-4 px-2 pr-2.5 py-1 text-sm font-medium text-primary"
+						class="flex min-w-0 items-center gap-1 rounded-full bg-surface-4 px-2 pr-2.5 py-1 text-sm font-medium text-primary !border !border-surface-5 border-solid"
 						:class="{ 'opacity-50': isDisabled }"
 					>
 						<Avatar

@@ -1,13 +1,19 @@
 <template>
 	<Table
 		v-if="members.length > 0"
+		v-model:sort-column="sortColumn"
+		v-model:sort-direction="sortDirection"
 		class="hidden sm:block"
 		:columns="columns"
 		:data="tableMembers"
 		row-key="id"
 	>
 		<template #cell-user="{ row: member }">
-			<div class="flex min-w-0 items-center gap-2">
+			<AutoLink
+				:to="userProfilePath(member.user.username)"
+				class="flex min-w-0 items-center gap-2"
+				:class="userProfilePath(member.user.username) ? 'text-primary hover:text-contrast' : ''"
+			>
 				<Avatar
 					:src="member.user.avatarUrl"
 					:alt="formatMessage(messages.userAvatarAlt, { username: member.user.username })"
@@ -19,7 +25,7 @@
 				<span class="min-w-0 truncate font-medium">
 					{{ member.user.username }}
 				</span>
-			</div>
+			</AutoLink>
 		</template>
 
 		<template #cell-role="{ row: member }">
@@ -70,10 +76,11 @@
 			<div v-if="!member.isOwner" class="flex items-center justify-end gap-1">
 				<ButtonStyled v-if="member.pending" circular type="transparent">
 					<button
-						v-tooltip="formatMessage(messages.resendInvite)"
-						:aria-label="formatMessage(messages.resendInvite)"
-						class="text-secondary hover:text-contrast"
-						@click="emit('resendInvite', member)"
+						v-tooltip="resendInviteTooltip(member)"
+						:aria-label="resendInviteTooltip(member)"
+						:disabled="resendInviteDisabled(member)"
+						class="text-secondary hover:text-contrast disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
+						@click="handleResendInvite(member)"
 					>
 						<SendIcon aria-hidden="true" />
 					</button>
@@ -107,26 +114,54 @@
 	>
 		<div class="grid min-h-14 grid-cols-[3.75rem_7.25rem_minmax(0,1fr)_2.75rem] bg-surface-3">
 			<div class="flex items-center pl-4 font-semibold text-secondary">
-				{{ formatMessage(messages.userColumn) }}
+				<button
+					type="button"
+					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold text-secondary"
+					:class="sortColumn === 'user' ? 'text-contrast' : ''"
+					@click="toggleSort('user')"
+				>
+					{{ formatMessage(messages.userColumn) }}
+					<component :is="sortIcon('user')" v-if="sortIcon('user')" class="size-4" />
+				</button>
 			</div>
 			<div class="flex items-center font-semibold text-secondary">
-				{{ formatMessage(messages.roleColumn) }}
+				<button
+					type="button"
+					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold text-secondary"
+					:class="sortColumn === 'role' ? 'text-contrast' : ''"
+					@click="toggleSort('role')"
+				>
+					{{ formatMessage(messages.roleColumn) }}
+					<component :is="sortIcon('role')" v-if="sortIcon('role')" class="size-4" />
+				</button>
 			</div>
 			<div class="flex items-center justify-end font-semibold text-secondary">
-				{{ formatMessage(messages.joinedColumn) }}
+				<button
+					type="button"
+					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold text-secondary"
+					:class="sortColumn === 'joined' ? 'text-contrast' : ''"
+					@click="toggleSort('joined')"
+				>
+					{{ formatMessage(messages.joinedColumn) }}
+					<component :is="sortIcon('joined')" v-if="sortIcon('joined')" class="size-4" />
+				</button>
 			</div>
 			<div class="flex items-center justify-end pr-4 font-semibold text-secondary">
 				<span class="sr-only">{{ formatMessage(messages.actionsColumn) }}</span>
 			</div>
 		</div>
 		<div
-			v-for="(member, index) in members"
+			v-for="(member, index) in sortedMembers"
 			:key="member.id"
 			class="grid min-h-16 grid-cols-[3.75rem_7.25rem_minmax(0,1fr)_2.75rem] items-center border-0 border-t border-solid border-surface-5"
 			:class="index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 		>
 			<div class="flex min-w-0 items-center pl-4">
-				<span v-tooltip="member.user.username" class="inline-flex shrink-0">
+				<AutoLink
+					v-tooltip="member.user.username"
+					:to="userProfilePath(member.user.username)"
+					class="inline-flex shrink-0"
+				>
 					<Avatar
 						:src="member.user.avatarUrl"
 						:alt="formatMessage(messages.userAvatarAlt, { username: member.user.username })"
@@ -135,7 +170,7 @@
 						circle
 						no-shadow
 					/>
-				</span>
+				</AutoLink>
 			</div>
 			<div class="min-w-0 py-3 pr-2">
 				<span
@@ -195,7 +230,7 @@
 						</span>
 						<template #resend-invite>
 							<SendIcon aria-hidden="true" />
-							{{ formatMessage(messages.resendInvite) }}
+							{{ resendInviteTooltip(member) }}
 						</template>
 						<template #cancel-invite>
 							<XIcon aria-hidden="true" />
@@ -237,15 +272,23 @@
 </template>
 
 <script setup lang="ts">
-import { MoreVerticalIcon, SendIcon, UserXIcon, XIcon } from '@modrinth/assets'
-import { type Component, computed } from 'vue'
+import {
+	ChevronDownIcon,
+	ChevronUpIcon,
+	MoreVerticalIcon,
+	SendIcon,
+	UserXIcon,
+	XIcon,
+} from '@modrinth/assets'
+import { type Component, computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
+import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
-import Table, { type TableColumn } from '../../base/Table.vue'
+import Table, { type SortDirection, type TableColumn } from '../../base/Table.vue'
 import TeleportOverflowMenu from '../../base/TeleportOverflowMenu.vue'
 import type { ServerAccessMember, ServerAccessRole, ServerAccessRoleOption } from './types'
 
@@ -324,11 +367,16 @@ const messages = defineMessages({
 	},
 	viewerRole: {
 		id: 'servers.access-role.viewer',
-		defaultMessage: 'Viewer',
+		defaultMessage: 'Limited',
+	},
+	resendInviteCooldown: {
+		id: 'servers.access-table.action.resend-invite-cooldown',
+		defaultMessage: 'Resend in {seconds}s',
 	},
 })
 
 type AccessTableColumn = 'user' | 'role' | 'joined' | 'actions'
+type AccessTableSortableColumn = Exclude<AccessTableColumn, 'actions'>
 type AccessTableRow = ServerAccessMember & Record<string, unknown>
 type OverflowMenuOption = {
 	id: string
@@ -336,16 +384,51 @@ type OverflowMenuOption = {
 	action: () => void
 	shown?: boolean
 	color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
+	disabled?: boolean
+	tooltip?: string
 }
 
 const columns = computed<TableColumn<AccessTableColumn>[]>(() => [
-	{ key: 'user', label: formatMessage(messages.userColumn), width: '32%' },
-	{ key: 'role', label: formatMessage(messages.roleColumn), width: '28%' },
-	{ key: 'joined', label: formatMessage(messages.joinedColumn), width: '28%' },
+	{ key: 'user', label: formatMessage(messages.userColumn), width: '32%', enableSorting: true },
+	{ key: 'role', label: formatMessage(messages.roleColumn), width: '28%', enableSorting: true },
+	{ key: 'joined', label: formatMessage(messages.joinedColumn), width: '28%', enableSorting: true },
 	{ key: 'actions', label: formatMessage(messages.actionsColumn), align: 'right', width: '12%' },
 ])
 
-const tableMembers = computed<AccessTableRow[]>(() => props.members as AccessTableRow[])
+const sortColumn = ref<string | undefined>('joined')
+const sortDirection = ref<SortDirection>('desc')
+const now = ref(Date.now())
+let nowInterval: ReturnType<typeof setInterval> | null = null
+
+const roleSortOrder: Record<ServerAccessRole, number> = {
+	owner: 0,
+	editor: 1,
+	viewer: 2,
+}
+
+const sortedMembers = computed(() => {
+	const direction = sortDirection.value === 'asc' ? 1 : -1
+	const column = normalizeSortColumn(sortColumn.value)
+
+	return [...props.members].sort((a, b) => {
+		const compared = compareMembers(a, b, column)
+		if (compared !== 0) return compared * direction
+
+		return a.user.username.localeCompare(b.user.username)
+	})
+})
+
+const tableMembers = computed<AccessTableRow[]>(() => sortedMembers.value as AccessTableRow[])
+
+onMounted(() => {
+	nowInterval = setInterval(() => {
+		now.value = Date.now()
+	}, 1000)
+})
+
+onUnmounted(() => {
+	if (nowInterval) clearInterval(nowInterval)
+})
 
 function formatRole(role: ServerAccessRole): string {
 	switch (role) {
@@ -367,6 +450,44 @@ const roleComboboxOptions = computed<ComboboxOption<ServerAccessRole>[]>(() =>
 			subLabel: role.description,
 		})),
 )
+
+function compareMembers(
+	a: ServerAccessMember,
+	b: ServerAccessMember,
+	column: AccessTableSortableColumn,
+): number {
+	switch (column) {
+		case 'user':
+			return a.user.username.localeCompare(b.user.username)
+		case 'role':
+			return roleSortOrder[a.role] - roleSortOrder[b.role]
+		case 'joined':
+			return joinedTimestamp(a) - joinedTimestamp(b)
+	}
+}
+
+function normalizeSortColumn(column: string | undefined): AccessTableSortableColumn {
+	return column === 'user' || column === 'role' || column === 'joined' ? column : 'joined'
+}
+
+function joinedTimestamp(member: ServerAccessMember): number {
+	return member.joinedAt ? new Date(member.joinedAt).getTime() : 0
+}
+
+function toggleSort(column: AccessTableSortableColumn) {
+	if (sortColumn.value === column) {
+		sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+		return
+	}
+
+	sortColumn.value = column
+	sortDirection.value = 'asc'
+}
+
+function sortIcon(column: AccessTableSortableColumn): Component | null {
+	if (sortColumn.value !== column) return null
+	return sortDirection.value === 'asc' ? ChevronUpIcon : ChevronDownIcon
+}
 
 function roleClasses(role: ServerAccessRole): string {
 	switch (role) {
@@ -394,13 +515,43 @@ function roleTriggerClass(role: ServerAccessRole): string {
 	return roleClasses(role)
 }
 
+function userProfilePath(username: string): string | undefined {
+	if (!username || username.includes('@')) return undefined
+	return `/user/${encodeURIComponent(username)}`
+}
+
+function resendInviteCooldownSeconds(member: ServerAccessMember): number {
+	const availableAt = member.inviteResendAvailableAt
+		? new Date(member.inviteResendAvailableAt).getTime()
+		: 0
+	return Math.max(0, Math.ceil((availableAt - now.value) / 1000))
+}
+
+function resendInviteDisabled(member: ServerAccessMember): boolean {
+	return resendInviteCooldownSeconds(member) > 0
+}
+
+function resendInviteTooltip(member: ServerAccessMember): string {
+	const seconds = resendInviteCooldownSeconds(member)
+	return seconds > 0
+		? formatMessage(messages.resendInviteCooldown, { seconds })
+		: formatMessage(messages.resendInvite)
+}
+
+function handleResendInvite(member: ServerAccessMember) {
+	if (resendInviteDisabled(member)) return
+	emit('resendInvite', member)
+}
+
 function memberActionOptions(member: ServerAccessMember): OverflowMenuOption[] {
 	return [
 		{
 			id: 'resend-invite',
 			icon: SendIcon,
-			action: () => emit('resendInvite', member),
+			action: () => handleResendInvite(member),
 			shown: member.pending,
+			disabled: resendInviteDisabled(member),
+			tooltip: resendInviteTooltip(member),
 		},
 		{
 			id: 'cancel-invite',
