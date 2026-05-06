@@ -128,7 +128,7 @@ const intendedDay = ref<number | null>(null)
 const isPreservingDay = ref(false)
 const rangeDragState = ref<RangeDragState | null>(null)
 const suppressNextRangeClick = ref(false)
-let rangeClickSuppressionTimeout: ReturnType<typeof window.setTimeout> | null = null
+let rangeClickSuppressionTimeout: number | null = null
 
 function getDayFromDateStr(dateStr: string): number | null {
 	const parts = dateStr.split('-')
