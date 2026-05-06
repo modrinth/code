@@ -424,10 +424,18 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply min-w-28  px-2;
+	@apply min-w-28 pl-3.5 pr-8;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+	background-position: calc(100% - 10px) calc(50%);
+	background-repeat: no-repeat;
+	background-size: 16px 16px;
+}
+.modrinth-date-picker :deep(.flatpickr-current-month .numInputWrapper:has(input.cur-year)) {
+	@apply w-[80px];
 }
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year) {
-	@apply min-w-[72px] px-3;
+	@apply min-w-[80px] px-2 text-center;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year:focus),
@@ -436,11 +444,12 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.numInputWrapper span.arrowUp) {
-	@apply border-0 rounded-tr-xl -right-1.5;
+	@apply border-0 rounded-tr-xl;
 }
 .modrinth-date-picker :deep(.numInputWrapper span.arrowDown) {
-	@apply border-0 rounded-br-xl -right-1.5;
+	@apply border-0 rounded-br-xl;
 }
+
 .modrinth-date-picker :deep(.numInputWrapper span.arrowUp::after) {
 	border-bottom-color: var(--color-text-secondary);
 }
@@ -514,9 +523,6 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-time .numInputWrapper) {
 	@apply h-full flex-1 rounded-xl bg-surface-4;
-}
-.modrinth-date-picker :deep(.numInputWrapper:hover) {
-	background: none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time input),

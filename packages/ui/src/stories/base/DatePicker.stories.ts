@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 
 import DatePicker from '../../components/base/DatePicker.vue'
 
@@ -80,6 +80,34 @@ export const MinMaxDates: Story = {
 					min-date="2026-04-01"
 					max-date="2026-04-30"
 					placeholder="Select an April date..."
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const OpenCalendar: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-06-15')
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[420px] max-w-sm flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[300px]"
+					default-view-date="2026-06-01"
 				/>
 				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
 			</div>
