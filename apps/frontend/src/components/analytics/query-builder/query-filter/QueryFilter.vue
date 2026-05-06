@@ -1,230 +1,226 @@
 <template>
-	<div class="flex flex-wrap items-center gap-2">
-		<span class="text-base font-medium text-primary">Filtered by</span>
+	<span class="flex h-10 items-center text-nowrap text-base font-medium text-primary"
+		>Filtered by</span
+	>
 
-		<MultiSelect
-			v-for="preview in appliedFilterPreviews"
-			:key="preview.key"
-			:model-value="getPreviewSelectedValues(preview.key)"
-			:options="preview.options"
-			:max-height="500"
-			:clearable="false"
-			:show-chevron="false"
-			:fit-content="true"
-			:searchable="preview.category.searchable"
-			:search-placeholder="preview.category.searchPlaceholder"
-			:trigger-class="previewTriggerClass"
-			dropdown-min-width="18rem"
-			show-selection-actions
-			@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
-			@open="openPreviewFilterDraft(preview.key)"
-			@close="commitPreviewFilterDraft(preview.key)"
-		>
-			<template #input-content="{ isOpen, openDirection }">
-				<div class="flex min-h-8 min-w-0 items-center gap-2">
-					<span class="min-w-0 flex-1 truncate">
-						<span class="font-medium">{{ preview.label }}:</span>
-						<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
-					</span>
-					<div class="flex shrink-0 items-center gap-1.5">
-						<button
-							type="button"
-							class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
-							:aria-label="`Clear ${preview.label} filter`"
-							@click.stop="clearFilterCategory(preview.key)"
-						>
-							<XIcon class="size-4 text-primary" />
-						</button>
-						<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
-						<ChevronLeftIcon
-							class="size-5 shrink-0 text-secondary transition-transform duration-150"
-							:class="
-								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
-							"
-						/>
-					</div>
-				</div>
-			</template>
-		</MultiSelect>
-
-		<button
-			ref="addMenuTrigger"
-			type="button"
-			class="inline-flex h-10 items-center gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 px-3 py-1.5 text-sm font-semibold text-primary transition-all hover:brightness-125"
-			:aria-expanded="isAddMenuOpen"
-			aria-haspopup="menu"
-			@click="handleAddMenuTriggerClick"
-			@keydown="handleAddMenuTriggerKeydown"
-		>
-			<PlusIcon class="size-5" />
-			Add
-		</button>
-
-		<Teleport to="#teleports">
-			<Transition
-				enter-active-class="transition-opacity duration-150"
-				leave-active-class="transition-none duration-0"
-				enter-from-class="opacity-0"
-				leave-to-class="opacity-0"
-			>
-				<div
-					v-if="isAddMenuOpen"
-					ref="menuContainer"
-					class="fixed z-[9999] flex flex-col gap-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 p-3 shadow-2xl"
-					:style="addMenuStyle"
-					role="menu"
-					@mousedown.stop
-					@keydown="handleAddMenuKeydown"
-					@mousemove="(event) => handleMenuMouseMove(event, 'menu')"
-				>
+	<MultiSelect
+		v-for="preview in appliedFilterPreviews"
+		:key="preview.key"
+		:model-value="getPreviewSelectedValues(preview.key)"
+		:options="preview.options"
+		:max-height="500"
+		:clearable="false"
+		:show-chevron="false"
+		:fit-content="true"
+		:searchable="preview.category.searchable"
+		:search-placeholder="preview.category.searchPlaceholder"
+		:trigger-class="previewTriggerClass"
+		dropdown-min-width="18rem"
+		show-selection-actions
+		@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
+		@open="openPreviewFilterDraft(preview.key)"
+		@close="commitPreviewFilterDraft(preview.key)"
+	>
+		<template #input-content="{ isOpen, openDirection }">
+			<div class="flex min-h-8 max-w-80 items-center gap-2">
+				<span class="min-w-0 flex-1 truncate">
+					<span class="font-medium">{{ preview.label }}:</span>
+					<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
+				</span>
+				<div class="flex shrink-0 items-center gap-1.5">
 					<button
-						v-for="category in filterCategories"
-						:key="category.key"
-						:ref="(element) => setCategoryButtonRef(category.key, element)"
 						type="button"
-						class="group/filter-menu-button flex h-11 w-full appearance-none items-center justify-between gap-1 rounded-xl border-0 px-3 text-left text-base font-medium text-primary shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
-						:class="category.key === activeCategoryKey ? 'bg-surface-5' : ''"
-						role="menuitem"
-						@mouseenter="handleCategoryMouseEnter(category.key)"
-						@focus="activateCategory(category.key)"
+						class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+						:aria-label="`Clear ${preview.label} filter`"
+						@click.stop="clearFilterCategory(preview.key)"
 					>
-						<span>{{ category.label }}</span>
-						<div class="flex items-center gap-1">
-							<ChevronRightIcon class="size-5 text-secondary" />
-						</div>
+						<XIcon class="size-4 text-primary" />
 					</button>
-				</div>
-			</Transition>
-		</Teleport>
-
-		<Teleport to="#teleports">
-			<div
-				v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
-				ref="submenu"
-				class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
-				:class="
-					activeCategory.key === 'game_version'
-						? 'w-[360px]'
-						: activeCategory.key === 'version_id'
-							? 'w-[368px]'
-							: 'w-72'
-				"
-				:style="submenuStyle"
-				@mouseenter="handleSubmenuMouseEnter"
-				@mouseleave="handleSubmenuMouseLeave"
-				@mousemove="(event) => handleMenuMouseMove(event, 'submenu')"
-			>
-				<div
-					v-if="activeCategory.searchable"
-					class="flex justify-between border-0 border-b border-solid border-b-surface-5 px-3 py-2.5"
-				>
-					<StyledInput
-						v-model="categorySearchQuery"
-						:icon="SearchIcon"
-						type="text"
-						:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
-						wrapper-class="grow bg-surface-4"
+					<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+					<ChevronLeftIcon
+						class="size-5 shrink-0 text-secondary transition-transform duration-150"
+						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
 					/>
-					<div v-if="activeCategory.key === 'game_version'" class="flex w-40 justify-end">
-						<Chips
-							v-model="gameVersionType"
-							:items="gameVersionTypeOptions"
-							:never-empty="true"
-							aria-label="Game version type"
-							size="small"
-							hide-checkmark-icon
-						/>
-					</div>
 				</div>
-
-				<div
-					v-if="activeCategorySelectionCount > 0"
-					class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-6 py-2.5 text-sm"
-				>
-					<span class="font-semibold text-secondary">{{ activeCategorySelectionLabel }}</span>
-					<button
-						type="button"
-						class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
-						@click="clearActiveCategorySelection"
-						@keydown.enter.stop
-						@keydown.space.stop
-					>
-						Deselect all
-					</button>
-				</div>
-				<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
-					<div
-						v-if="filteredActiveCategoryOptions.length === 0"
-						class="px-3 py-2 text-sm font-medium text-secondary"
-					>
-						{{ activeCategoryEmptyStateLabel }}
-					</div>
-					<template v-else>
-						<button
-							v-for="option in filteredActiveCategoryOptions"
-							:key="`${activeCategory.key}-${option.value}`"
-							type="button"
-							class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5"
-							role="checkbox"
-							@click="toggleFilterOption(activeCategory.key, option.value)"
-						>
-							<span
-								class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
-								:class="
-									isFilterValueSelected(activeCategory.key, option.value)
-										? 'border-button-border bg-brand text-brand-inverted'
-										: 'border-surface-5 bg-surface-2'
-								"
-							>
-								<CheckIcon
-									v-if="isFilterValueSelected(activeCategory.key, option.value)"
-									aria-hidden="true"
-									stroke-width="3"
-								/>
-							</span>
-							<span
-								class="font-semibold leading-tight"
-								:class="
-									isFilterValueSelected(activeCategory.key, option.value)
-										? 'text-contrast'
-										: 'text-primary'
-								"
-							>
-								{{ option.label }}
-							</span>
-						</button>
-					</template>
-				</div>
-				<DownloadsThresholdInput
-					v-if="activeCategory.key === 'version_id'"
-					class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
-					label="Project versions above"
-					input-aria-label="Project version downloads threshold"
-					:threshold="projectVersionDownloadsThreshold"
-					input-width-class="w-16"
-					@update:threshold="setProjectVersionDownloadsThreshold"
-				/>
-				<DownloadsThresholdInput
-					v-else-if="activeCategory.key === 'game_version'"
-					class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
-					label="Game Versions above"
-					input-aria-label="Game version downloads threshold"
-					:threshold="gameVersionDownloadsThreshold"
-					input-width-class="w-16"
-					@update:threshold="setGameVersionDownloadsThreshold"
-				/>
 			</div>
-		</Teleport>
+		</template>
+	</MultiSelect>
 
-		<button
-			v-if="hasAppliedFilters"
-			type="button"
-			class="border-0 bg-transparent px-1.5 py-1 text-sm font-medium text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
-			@click="clearAllFilters"
-		>
-			Clear
-		</button>
+	<div class="flex h-10 items-center gap-2">
+		<ButtonStyled type="outlined">
+			<button
+				ref="addMenuTrigger"
+				type="button"
+				:aria-expanded="isAddMenuOpen"
+				aria-haspopup="menu"
+				@click="handleAddMenuTriggerClick"
+				@keydown="handleAddMenuTriggerKeydown"
+			>
+				<PlusIcon />
+				Add
+			</button>
+		</ButtonStyled>
+
+		<ButtonStyled v-if="hasAppliedFilters" type="transparent">
+			<button type="button" @click="clearAllFilters">Clear</button>
+		</ButtonStyled>
 	</div>
+
+	<Teleport to="#teleports">
+		<Transition
+			enter-active-class="transition-opacity duration-150"
+			leave-active-class="transition-none duration-0"
+			enter-from-class="opacity-0"
+			leave-to-class="opacity-0"
+		>
+			<div
+				v-if="isAddMenuOpen"
+				ref="menuContainer"
+				class="fixed z-[9999] flex flex-col gap-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 p-3 shadow-2xl"
+				:style="addMenuStyle"
+				role="menu"
+				@mousedown.stop
+				@keydown="handleAddMenuKeydown"
+				@mousemove="(event) => handleMenuMouseMove(event, 'menu')"
+			>
+				<button
+					v-for="category in filterCategories"
+					:key="category.key"
+					:ref="(element) => setCategoryButtonRef(category.key, element)"
+					type="button"
+					class="group/filter-menu-button flex h-11 w-full appearance-none items-center justify-between gap-1 rounded-xl border-0 px-3 text-left text-base font-medium text-primary shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
+					:class="category.key === activeCategoryKey ? 'bg-surface-5' : ''"
+					role="menuitem"
+					@mouseenter="handleCategoryMouseEnter(category.key)"
+					@focus="activateCategory(category.key)"
+				>
+					<span>{{ category.label }}</span>
+					<div class="flex items-center gap-1">
+						<ChevronRightIcon class="size-5 text-secondary" />
+					</div>
+				</button>
+			</div>
+		</Transition>
+	</Teleport>
+
+	<Teleport to="#teleports">
+		<div
+			v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
+			ref="submenu"
+			class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
+			:class="
+				activeCategory.key === 'game_version'
+					? 'w-[360px]'
+					: activeCategory.key === 'version_id'
+						? 'w-[368px]'
+						: 'w-72'
+			"
+			:style="submenuStyle"
+			@mouseenter="handleSubmenuMouseEnter"
+			@mouseleave="handleSubmenuMouseLeave"
+			@mousemove="(event) => handleMenuMouseMove(event, 'submenu')"
+		>
+			<div
+				v-if="activeCategory.searchable"
+				class="flex justify-between border-0 border-b border-solid border-b-surface-5 px-3 py-2.5"
+			>
+				<StyledInput
+					v-model="categorySearchQuery"
+					:icon="SearchIcon"
+					type="text"
+					:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
+					wrapper-class="grow bg-surface-4"
+				/>
+				<div v-if="activeCategory.key === 'game_version'" class="flex w-40 justify-end">
+					<Chips
+						v-model="gameVersionType"
+						:items="gameVersionTypeOptions"
+						:never-empty="true"
+						aria-label="Game version type"
+						size="small"
+						hide-checkmark-icon
+					/>
+				</div>
+			</div>
+
+			<div
+				v-if="activeCategorySelectionCount > 0"
+				class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-6 py-2.5 text-sm"
+			>
+				<span class="font-semibold text-secondary">{{ activeCategorySelectionLabel }}</span>
+				<button
+					type="button"
+					class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+					@click="clearActiveCategorySelection"
+					@keydown.enter.stop
+					@keydown.space.stop
+				>
+					Deselect all
+				</button>
+			</div>
+			<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
+				<div
+					v-if="filteredActiveCategoryOptions.length === 0"
+					class="px-3 py-2 text-sm font-medium text-secondary"
+				>
+					{{ activeCategoryEmptyStateLabel }}
+				</div>
+				<template v-else>
+					<button
+						v-for="option in filteredActiveCategoryOptions"
+						:key="`${activeCategory.key}-${option.value}`"
+						type="button"
+						class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5"
+						role="checkbox"
+						@click="toggleFilterOption(activeCategory.key, option.value)"
+					>
+						<span
+							class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
+							:class="
+								isFilterValueSelected(activeCategory.key, option.value)
+									? 'border-button-border bg-brand text-brand-inverted'
+									: 'border-surface-5 bg-surface-2'
+							"
+						>
+							<CheckIcon
+								v-if="isFilterValueSelected(activeCategory.key, option.value)"
+								aria-hidden="true"
+								stroke-width="3"
+							/>
+						</span>
+						<span
+							class="font-semibold leading-tight"
+							:class="
+								isFilterValueSelected(activeCategory.key, option.value)
+									? 'text-contrast'
+									: 'text-primary'
+							"
+						>
+							{{ option.label }}
+						</span>
+					</button>
+				</template>
+			</div>
+			<DownloadsThresholdInput
+				v-if="activeCategory.key === 'version_id'"
+				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				label="Project versions above"
+				input-aria-label="Project version downloads threshold"
+				:threshold="projectVersionDownloadsThreshold"
+				input-width-class="w-16"
+				@update:threshold="setProjectVersionDownloadsThreshold"
+			/>
+			<DownloadsThresholdInput
+				v-else-if="activeCategory.key === 'game_version'"
+				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				label="Game Versions above"
+				input-aria-label="Game version downloads threshold"
+				:threshold="gameVersionDownloadsThreshold"
+				input-width-class="w-16"
+				@update:threshold="setGameVersionDownloadsThreshold"
+			/>
+		</div>
+	</Teleport>
 </template>
 
 <script setup lang="ts">
@@ -236,7 +232,7 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Chips, MultiSelect, type MultiSelectOption, StyledInput } from '@modrinth/ui'
+import { ButtonStyled, Chips, MultiSelect, type MultiSelectOption, StyledInput } from '@modrinth/ui'
 import { onClickOutside } from '@vueuse/core'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 

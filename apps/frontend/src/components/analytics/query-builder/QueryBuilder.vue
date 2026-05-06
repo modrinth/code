@@ -88,7 +88,7 @@
 			</div>
 		</div>
 
-		<div class="flex flex-wrap items-center gap-6">
+		<div class="flex flex-wrap items-center gap-2">
 			<div class="flex items-center gap-2">
 				<div class="flex w-32 items-center gap-2 text-primary">
 					<CalendarIcon class="size-5" />
@@ -111,7 +111,7 @@
 			</div>
 		</div>
 
-		<div class="flex flex-wrap items-center gap-6">
+		<div class="flex flex-wrap items-start gap-2">
 			<div class="flex items-center gap-2">
 				<div class="flex w-32 items-center gap-2 text-primary">
 					<BlocksIcon class="size-5" />
@@ -138,7 +138,10 @@
 										>
 											<XIcon class="size-4 text-primary" />
 										</button>
-										<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+										<div
+											v-if="selectedBreakdown !== 'none'"
+											class="h-5 w-[1px] shrink-0 bg-surface-5"
+										></div>
 									</div>
 								</template>
 							</Combobox>
@@ -146,9 +149,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="flex items-center gap-2">
-				<QueryBuilderFilter />
-			</div>
+			<QueryBuilderFilter />
 		</div>
 	</div>
 </template>
