@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
   id-token: write
 
 jobs:
@@ -78,32 +78,37 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         id: version
         run: |
-          CURRENT_VERSION="$(node --print "require('./${PACKAGE_DIR}/package.json').version")"
+          CURRENT_VERSION_JSON="$(npm view "${PACKAGE_NAME}" version --json)"
+          CURRENT_VERSION="$(
+            jq -nr \
+              --argjson version "$CURRENT_VERSION_JSON" \
+              'if ($version | type) == "array" then $version[-1] else $version end'
+          )"
 
-          set +e
-          PUBLISHED_VERSION_JSON="$(pnpm view "${PACKAGE_NAME}" version --json)"
-          VIEW_STATUS="$?"
-          set -e
+          NEXT_VERSION="$(
+            jq -nr \
+              --arg version "$CURRENT_VERSION" \
+              --arg bump "$BUMP_TYPE" '
+                def semver:
+                  capture("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)\\.(?<patch>[0-9]+)$")
+                  | with_entries(.value |= tonumber);
 
-          if [ "$VIEW_STATUS" -eq 0 ]; then
-            PUBLISHED_VERSION="$(node --eval "const raw = process.argv[1] || ''; const value = raw ? JSON.parse(raw) : ''; console.log(Array.isArray(value) ? value.at(-1) || '' : value || '')" "$PUBLISHED_VERSION_JSON")"
-          else
-            PUBLISHED_VERSION=""
-          fi
+                ($version | semver) as $current
+                | if $bump == "major" then "\($current.major + 1).0.0"
+                  elif $bump == "minor" then "\($current.major).\($current.minor + 1).0"
+                  elif $bump == "patch" then "\($current.major).\($current.minor).\($current.patch + 1)"
+                  else error("Unsupported bump type: \($bump)")
+                  end
+              '
+          )"
 
-          VERSION_RESULT="$(node --eval "const [current, published, bumpType] = process.argv.slice(1); const parse = (version) => { const match = /^([0-9]+)\\.([0-9]+)\\.([0-9]+)$/.exec(version || ''); if (!match) throw new Error('Unsupported semver version: ' + version); return match.slice(1).map(Number); }; const compare = (left, right) => { const a = parse(left); const b = parse(right); for (let i = 0; i < 3; i++) { if (a[i] !== b[i]) return a[i] - b[i]; } return 0; }; const bump = (version, type) => { const next = parse(version); if (type === 'major') { next[0]++; next[1] = 0; next[2] = 0; } else if (type === 'minor') { next[1]++; next[2] = 0; } else if (type === 'patch') { next[2]++; } else { throw new Error('Unsupported bump type: ' + type); } return next.join('.'); }; const shouldBump = Boolean(published) && compare(current, published) <= 0; const next = shouldBump ? bump(published, bumpType) : current; console.log(JSON.stringify({ current, published, next, shouldBump }));" "$CURRENT_VERSION" "$PUBLISHED_VERSION" "$BUMP_TYPE")"
-
-          NEXT_VERSION="$(node --eval "console.log(JSON.parse(process.argv[1]).next)" "$VERSION_RESULT")"
-          SHOULD_BUMP="$(node --eval "console.log(JSON.parse(process.argv[1]).shouldBump ? 'true' : 'false')" "$VERSION_RESULT")"
-
-          if [ "$SHOULD_BUMP" = "true" ]; then
-            node --eval "const fs = require('node:fs'); const path = process.argv[1]; const version = process.argv[2]; const pkg = JSON.parse(fs.readFileSync(path, 'utf8')); pkg.version = version; fs.writeFileSync(path, JSON.stringify(pkg, null, '\t') + '\n');" "$PACKAGE_DIR/package.json" "$NEXT_VERSION"
-          fi
+          PACKAGE_JSON="$(mktemp)"
+          jq --tab --arg version "$NEXT_VERSION" '.version = $version' "$PACKAGE_DIR/package.json" > "$PACKAGE_JSON"
+          mv "$PACKAGE_JSON" "$PACKAGE_DIR/package.json"
 
           echo "current_version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
-          echo "published_version=$PUBLISHED_VERSION" >> "$GITHUB_OUTPUT"
+          echo "published_version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
           echo "version=$NEXT_VERSION" >> "$GITHUB_OUTPUT"
-          echo "bumped=$SHOULD_BUMP" >> "$GITHUB_OUTPUT"
 
       - name: Build api-client
         if: steps.changes.outputs.changed == 'true'
@@ -113,29 +118,6 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         working-directory: packages/api-client
         run: pnpm pack --dry-run
-
-      - name: Configure git
-        if: steps.changes.outputs.changed == 'true' && steps.version.outputs.bumped == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Commit version bump
-        if: steps.changes.outputs.changed == 'true' && steps.version.outputs.bumped == 'true'
-        run: |
-          git add "$PACKAGE_DIR/package.json"
-          git commit -m "Release @modrinth/api-client v${{ steps.version.outputs.version }} [skip ci]"
-
-      - name: Push version bump
-        if: steps.changes.outputs.changed == 'true' && steps.version.outputs.bumped == 'true'
-        env:
-          GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
-        run: |
-          if [ -n "$GH_ACCESS_TOKEN" ]; then
-            git remote set-url origin "https://x-access-token:${GH_ACCESS_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          fi
-
-          git push origin HEAD:main
 
       - name: Publish api-client
         if: steps.changes.outputs.changed == 'true'
