@@ -1,7 +1,9 @@
 use std::collections::HashSet;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime};
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime, WindowEvent};
 use tauri_plugin_opener::OpenerExt;
 use theseus::settings;
 use tokio::sync::RwLock;
@@ -14,6 +16,21 @@ pub struct AdsState {
 }
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
+
+fn set_webview_visible<R: Runtime>(webview: &tauri::Webview<R>, visible: bool) {
+    webview
+        .with_webview(
+            #[allow(unused_variables)]
+            |wv| {
+                #[cfg(windows)]
+                {
+                    let controller = wv.controller();
+                    unsafe { controller.SetIsVisible(visible) }.ok();
+                }
+            },
+        )
+        .ok();
+}
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::<R>::new("ads")
@@ -42,6 +59,27 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                         .await;
                 }
             });
+
+            if let Some(main_window) = app.get_window("main") {
+                let app_handle = app.clone();
+                let win = main_window.clone();
+                let was_minimized = Arc::new(AtomicBool::new(false));
+
+                win.on_window_event(move |event| {
+                    if let WindowEvent::Resized(_) = event {
+                        let is_minimized = win.is_minimized().unwrap_or(false);
+                        let was = was_minimized.load(Ordering::SeqCst);
+
+                        if is_minimized != was {
+                            was_minimized.store(is_minimized, Ordering::SeqCst);
+
+                            for webview in app_handle.webviews().into_values() {
+                                set_webview_visible(&webview, !is_minimized);
+                            }
+                        }
+                    }
+                });
+            }
 
             Ok(())
         })
