@@ -52,13 +52,13 @@ export const Range: Story = {
 	render: () => ({
 		components: { DatePicker },
 		setup() {
-			const value = ref(['2026-04-27', '2026-05-04'])
+			const value = ref(['2026-04-13', '2026-04-29'])
 			return { value }
 		},
 		template: /* html */ `
 			<div class="flex max-w-sm flex-col gap-2">
 				<DatePicker v-model="value"
-				wrapperClass="w-[350px]" mode="range" placeholder="Select a date range..." />
+				wrapperClass="w-[350px]" mode="range" default-view-date="2026-04-01" placeholder="Select a date range..." />
 				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
 			</div>
 		`,
@@ -69,7 +69,7 @@ export const DraggableRange: Story = {
 	render: () => ({
 		components: { DatePicker },
 		setup() {
-			const value = ref(['2026-04-27', '2026-05-04'])
+			const value = ref(['2026-04-13', '2026-04-29'])
 			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
 
 			onMounted(async () => {
@@ -86,6 +86,7 @@ export const DraggableRange: Story = {
 					v-model="value"
 					wrapperClass="w-[350px]"
 					mode="range"
+					default-view-date="2026-04-01"
 					placeholder="Select a date range..."
 				/>
 				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>

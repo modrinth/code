@@ -702,10 +702,18 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day) {
-	@apply m-0 max-w-none rounded-full border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
+	@apply relative z-0 m-0 max-w-none rounded-full border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
 }
 .modrinth-date-picker :deep(.flatpickr-day.flatpickr-disabled) {
 	@apply hover:bg-transparent;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day::before) {
+	content: '';
+	position: absolute;
+	inset: 0 0;
+	z-index: -1;
+	background: transparent;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.today) {
@@ -719,19 +727,62 @@ defineExpose({
 .modrinth-date-picker :deep(.flatpickr-day.selected),
 .modrinth-date-picker :deep(.flatpickr-day.startRange),
 .modrinth-date-picker :deep(.flatpickr-day.endRange) {
-	@apply border-brand bg-brand text-brand-inverted !shadow-none hover:border-brand hover:bg-brand hover:text-brand-inverted hover:shadow-none;
+	@apply z-[1] border-brand bg-brand text-brand-inverted !shadow-none hover:border-brand hover:bg-brand hover:text-brand-inverted hover:shadow-none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.inRange) {
-	@apply rounded-none border-x-0 border-y-surface-3 bg-brand-highlight text-contrast shadow-none hover:rounded-none hover:bg-brand-highlight;
+	@apply rounded-none border-transparent bg-transparent text-contrast shadow-none hover:rounded-none hover:border-transparent hover:bg-transparent;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.inRange::before),
+.modrinth-date-picker :deep(.flatpickr-day.startRange:not(.endRange)::before),
+.modrinth-date-picker :deep(.flatpickr-day.endRange:not(.startRange)::before) {
+	background: var(--color-brand-highlight);
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.inRange::before) {
+	left: -1px;
+	right: -1px;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.inRange:nth-child(7n + 1)::before) {
+	@apply rounded-l-xl;
+	left: 0;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.inRange:nth-child(7n)::before) {
+	@apply rounded-r-xl;
+	right: 0;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.startRange:not(.endRange)) {
-	@apply rounded-r-none border-r-0 border-surface-3;
+	@apply rounded-full border-brand;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.startRange:not(.endRange)::before) {
+	@apply rounded-l-xl;
+	left: 50%;
+	right: -1px;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.startRange:nth-child(7n):not(.endRange)::before) {
+	@apply rounded-r-xl;
+	right: 0;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.endRange:not(.startRange)) {
-	@apply rounded-l-none border-l-0 border-surface-3;
+	@apply rounded-full border-brand;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.endRange:not(.startRange)::before) {
+	@apply rounded-r-xl;
+	left: -1px;
+	right: 50%;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.endRange:nth-child(7n + 1):not(.startRange)::before) {
+	@apply rounded-l-xl;
+	left: 0;
 }
 
 .modrinth-date-picker.can-drag-range
