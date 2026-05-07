@@ -7,7 +7,7 @@
 			<EnvironmentMigration ref="environmentMigration" :show-floating-save="false" />
 		</div>
 		<template #actions>
-			<div v-if="canSave" class="flex justify-end gap-2">
+			<div v-if="canSave" class="flex justify-end gap-2 mt-2">
 				<ButtonStyled v-if="canReset" type="transparent">
 					<button :disabled="saving || !hasChanges" @click="resetEnvironment">
 						<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
@@ -78,7 +78,11 @@ function resetEnvironment() {
 }
 
 function saveEnvironment() {
+	let shouldVerify = !!needsToVerify.value
 	environmentMigration.value?.save()
+	if (shouldVerify) {
+		hide()
+	}
 }
 
 onMounted(() => {
