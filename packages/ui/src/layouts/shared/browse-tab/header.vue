@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { BoxIcon, LeftArrowIcon } from '@modrinth/assets'
-import { computed } from 'vue'
+import { BoxIcon, LeftArrowIcon, XIcon } from '@modrinth/assets'
+import { Tooltip } from 'floating-vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -40,6 +41,13 @@ const metadataItems = computed(() => {
 })
 
 const queuedCount = computed(() => installContext.value?.queuedCount ?? 0)
+const returnToInstallTooltipDismissed = ref(false)
+const showReturnToInstallTooltip = computed(
+	() =>
+		queuedCount.value > 0 &&
+		!!installContext.value?.clearQueued &&
+		!returnToInstallTooltipDismissed.value,
+)
 const queuedLabel = computed(() => {
 	if (installContext.value?.queuedLabel) return installContext.value.queuedLabel
 	return `${queuedCount.value} ${queuedCount.value === 1 ? 'Mod' : 'Mods'}`
@@ -62,14 +70,39 @@ async function clearQueued() {
 
 <template>
 	<template v-if="installContext">
-		<div class="mb-2 flex flex-col gap-2">
+		<div class="flex flex-col gap-2">
 			<div class="flex flex-wrap items-center justify-between gap-4">
 				<div class="flex min-w-0 items-center gap-4">
-					<ButtonStyled circular size="large">
-						<button :aria-label="installContext.backLabel" @click="handleBack">
-							<LeftArrowIcon />
-						</button>
-					</ButtonStyled>
+					<Tooltip
+						theme="dismissable-prompt"
+						:triggers="[]"
+						:shown="showReturnToInstallTooltip"
+						:auto-hide="false"
+						placement="bottom-start"
+						popper-class="!z-[60]"
+					>
+						<ButtonStyled circular size="large">
+							<button :aria-label="installContext.backLabel" @click="handleBack">
+								<LeftArrowIcon />
+							</button>
+						</ButtonStyled>
+						<template #popper>
+							<div class="grid max-w-64 gap-1">
+								<div class="flex items-center justify-between gap-4">
+									<h3 class="m-0 text-base font-bold text-contrast">Return to install content</h3>
+									<ButtonStyled size="small" circular>
+										<button v-tooltip="'Dismiss'" @click="returnToInstallTooltipDismissed = true">
+											<XIcon aria-hidden="true" />
+										</button>
+									</ButtonStyled>
+								</div>
+								<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+									The content you have queued will be installed when you return to your server
+									panel.
+								</p>
+							</div>
+						</template>
+					</Tooltip>
 
 					<Avatar v-if="iconSrc" :src="iconSrc" size="48px" class="shrink-0" />
 

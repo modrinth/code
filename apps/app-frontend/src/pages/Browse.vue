@@ -5,51 +5,48 @@ import {
 	ClipboardCopyIcon,
 	ExternalIcon,
 	GlobeIcon,
-	PlayIcon,
 	PlusIcon,
 	SpinnerIcon,
-	StopCircleIcon,
 } from '@modrinth/assets'
-import type { CardAction, ProjectType, Tags } from '@modrinth/ui'
+import type { BrowseInstallContentType, CardAction, ProjectType, Tags } from '@modrinth/ui'
 import {
 	BrowsePageLayout,
 	BrowseSidebar,
-	commonMessages,
 	CreationFlowModal,
 	defineMessages,
+	getLatestMatchingInstallVersion,
+	getSelectedInstallPreferences,
+	getTargetInstallPreferences,
 	injectNotificationManager,
+	preferencesDiffer,
 	provideBrowseManager,
+	requestInstall,
 	useBrowseSearch,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
-import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
+import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
 import {
 	get_project,
 	get_project_v3,
 	get_search_results_v3,
 	get_version_many,
 } from '@/helpers/cache.js'
-import { process_listener } from '@/helpers/events'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
-import { get_by_profile_path } from '@/helpers/process'
 import {
 	get as getInstance,
 	get_installed_project_ids as getInstalledProjectIds,
-	kill,
-	list as listInstances,
 } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import type { GameInstance } from '@/helpers/types'
-import { add_server_to_profile, get_profile_worlds, getServerLatency } from '@/helpers/worlds'
+import { get_profile_worlds } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import {
@@ -57,7 +54,6 @@ import {
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress } from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -93,8 +89,9 @@ const {
 	searchServerModpacks,
 	getServerProjectVersions,
 	enforceSetupModpackRoute,
-	installProjectToServer,
-	getServerAddonInstallVersion,
+	getQueuedServerInstallPlans,
+	setQueuedServerInstallPlans,
+	openServerModpackInstallFlow,
 	onServerFlowBack,
 	handleServerModpackFlowCreate,
 	markServerProjectInstalled,
@@ -323,134 +320,24 @@ const combinedProvidedFilters = computed(() =>
 	isServerContext.value ? serverContextFilters.value : instanceFilters.value,
 )
 
-const serverPings = shallowRef<Record<string, number | undefined>>({})
-const serverPingCache = new Map<string, number | undefined>()
-const pendingServerPings = new Map<string, Promise<number | undefined>>()
-let serverPingCacheActive = true
-const runningServerProjects = ref<Record<string, string>>({})
-
-async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
-	debugLog('checkServerRunningStates', { hitCount: hits.length })
-	const packs = await listInstances()
-	const newRunning: Record<string, string> = {}
-	for (const hit of hits) {
-		const inst = packs.find((p: GameInstance) => p.linked_data?.project_id === hit.project_id)
-		if (inst) {
-			const processes = await get_by_profile_path(inst.path).catch(() => [])
-			if (Array.isArray(processes) && processes.length > 0) {
-				newRunning[hit.project_id] = inst.path
-			}
-		}
-	}
-	debugLog('runningServerProjects updated', newRunning)
-	runningServerProjects.value = newRunning
-}
-
-async function handleStopServerProject(projectId: string) {
-	debugLog('handleStopServerProject', projectId)
-	const instancePath = runningServerProjects.value[projectId]
-	if (!instancePath) return
-	await kill(instancePath).catch(() => {})
-	const { [projectId]: _, ...rest } = runningServerProjects.value
-	runningServerProjects.value = rest
-}
-
-async function handlePlayServerProject(projectId: string) {
-	debugLog('handlePlayServerProject', projectId)
-	await playServerProject(projectId)
-	checkServerRunningStates(lastServerHits.value)
-}
-
-const lastServerHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
-
-async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
-	debugLog('handleAddServerToInstance', { projectId: project.project_id, name: project.name })
-	const address = getServerAddress(project.minecraft_java_server)
-	if (!address) return
-
-	if (instance.value) {
-		try {
-			await add_server_to_profile(
-				instance.value.path,
-				project.name,
-				address,
-				'prompt',
-				project.project_id,
-				project.minecraft_java_server?.content?.kind,
-			)
-			newlyInstalled.value.push(project.project_id)
-		} catch (err) {
-			handleError(err as Error)
-		}
-	} else {
-		showAddServerToInstanceModal(project.name, address)
-	}
-}
-
-async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
-	debugLog('pingServerHits', { hitCount: hits.length })
-	const pingsToFetch = hits.flatMap((hit) => {
-		const address = hit.minecraft_java_server?.address
-		if (!address) return []
-		return [{ hit, address }]
-	})
-	const nextPings = { ...serverPings.value }
-	for (const { hit, address } of pingsToFetch) {
-		if (serverPingCache.has(address)) {
-			nextPings[hit.project_id] = serverPingCache.get(address)
-		}
-	}
-	serverPings.value = nextPings
-
-	await Promise.all(
-		pingsToFetch.map(async ({ hit, address }) => {
-			if (serverPingCache.has(address)) return
-
-			let pending = pendingServerPings.get(address)
-			if (!pending) {
-				pending = getServerLatency(address)
-					.then((latency) => {
-						if (serverPingCacheActive) serverPingCache.set(address, latency)
-						return latency
-					})
-					.catch((err) => {
-						console.error(`Failed to ping server ${address}:`, err)
-						if (serverPingCacheActive) serverPingCache.set(address, undefined)
-						return undefined
-					})
-					.finally(() => {
-						pendingServerPings.delete(address)
-					})
-				pendingServerPings.set(address, pending)
-			}
-
-			const latency = await pending
-			if (!serverPingCacheActive) return
-			serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
-		}),
-	)
-}
-
-const unlistenProcesses = await process_listener(
-	(e: { event: string; profile_path_id: string }) => {
-		debugLog('process event', e)
-		if (e.event === 'finished') {
-			const projectId = Object.entries(runningServerProjects.value).find(
-				([, path]) => path === e.profile_path_id,
-			)?.[0]
-			if (projectId) {
-				const { [projectId]: _, ...rest } = runningServerProjects.value
-				runningServerProjects.value = rest
-			}
-		}
-	},
-)
-
-onUnmounted(() => {
-	serverPingCacheActive = false
-	unlistenProcesses()
-	serverPingCache.clear()
-	pendingServerPings.clear()
+const {
+	serverPings,
+	contextMenuRef,
+	updateServerHits,
+	getServerModpackContent,
+	getServerCardActions,
+	handleRightClick,
+	handleOptionsClick,
+} = useAppServerBrowse({
+	instance,
+	isFromWorlds,
+	allInstalledIds,
+	newlyInstalled,
+	installingServerProjects,
+	playServerProject,
+	showAddServerToInstanceModal,
+	handleError,
+	router,
 })
 
 const offline = ref(!navigator.onLine)
@@ -668,46 +555,6 @@ const selectableProjectTypes = computed(() => {
 	]
 })
 
-const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject) => {
-	const content = project.minecraft_java_server?.content
-	if (content?.kind === 'modpack') {
-		const { project_name, project_icon, project_id } = content
-		if (!project_name) return undefined
-		return {
-			name: project_name,
-			icon: project_icon ?? undefined,
-			onclick:
-				project_id !== project.project_id
-					? () => {
-							router.push(`/project/${project_id}`)
-						}
-					: undefined,
-			showCustomModpackTooltip: project_id === project.project_id,
-		}
-	}
-	return undefined
-}
-
-const contextMenuRef = ref(null)
-// @ts-expect-error - no event types
-const handleRightClick = (event, result) => {
-	// @ts-ignore
-	contextMenuRef.value?.showMenu(event, result, [{ name: 'open_link' }, { name: 'copy_link' }])
-}
-// @ts-expect-error - no event types
-const handleOptionsClick = (args) => {
-	switch (args.option) {
-		case 'open_link':
-			openUrl(`https://modrinth.com/${args.item.project_types?.[0] ?? 'project'}/${args.item.slug}`)
-			break
-		case 'copy_link':
-			navigator.clipboard.writeText(
-				`https://modrinth.com/${args.item.project_types?.[0] ?? 'project'}/${args.item.slug}`,
-			)
-			break
-	}
-}
-
 const installContext = computed(() => {
 	if (isServerContext.value && serverContextServerData.value) {
 		return {
@@ -761,134 +608,46 @@ function setProjectInstalling(projectId: string, installing: boolean) {
 	installingProjectIds.value = next
 }
 
-type InstallPreferences = {
-	gameVersions?: string[]
-	loaders?: string[]
+const serverInstallQueue = {
+	get: getQueuedServerInstallPlans,
+	set: setQueuedServerInstallPlans,
 }
 
-type ServerAddonProjectType = 'mod' | 'plugin' | 'datapack'
-
-function getLoaderFilterTypes(projectTypeValue: string) {
-	if (projectTypeValue === 'mod') return ['mod_loader']
-	if (projectTypeValue === 'plugin') return ['plugin_loader', 'plugin_platform']
-	if (projectTypeValue === 'modpack') return ['modpack_loader']
-	return []
+function getCurrentSelectedInstallPreferences(projectTypeValue: string) {
+	return getSelectedInstallPreferences({
+		contentType: projectTypeValue,
+		selectedFilters: searchState.currentFilters.value,
+		providedFilters: combinedProvidedFilters.value,
+		overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+	})
 }
 
-function getEffectiveInstallFilters() {
-	const providedFilters = (combinedProvidedFilters.value ?? []).filter(
-		(providedFilter) =>
-			!searchState.overriddenProvidedFilterTypes.value.includes(providedFilter.type),
-	)
-	const userFilters = searchState.currentFilters.value.filter(
-		(userFilter) =>
-			!providedFilters.some((providedFilter) => providedFilter.type === userFilter.type),
-	)
-	return [...userFilters, ...providedFilters].filter((filter) => !filter.negative)
-}
-
-function getSelectedInstallPreferences(projectTypeValue: string): InstallPreferences {
-	const filters = getEffectiveInstallFilters()
-	const loaderFilterTypes = getLoaderFilterTypes(projectTypeValue)
-	const gameVersions = filters
-		.filter((filter) => filter.type === 'game_version')
-		.map((filter) => filter.option)
-	const loaders = filters
-		.filter((filter) => loaderFilterTypes.includes(filter.type))
-		.map((filter) => filter.option)
-
-	return {
-		gameVersions: gameVersions.length > 0 ? gameVersions : undefined,
-		loaders: loaders.length > 0 ? loaders : undefined,
-	}
-}
-
-function getServerTargetPreferences(): InstallPreferences {
-	return {
-		gameVersions: serverContextServerData.value?.mc_version
-			? [serverContextServerData.value.mc_version]
-			: undefined,
-		loaders: serverContextServerData.value?.loader ? [serverContextServerData.value.loader] : undefined,
-	}
-}
-
-function getInstanceTargetPreferences(): InstallPreferences {
-	return {
-		gameVersions: instance.value?.game_version ? [instance.value.game_version] : undefined,
-		loaders: instance.value?.loader ? [instance.value.loader] : undefined,
-	}
-}
-
-function preferencesDiffer(selected: InstallPreferences, target: InstallPreferences) {
-	const targetGameVersion = target.gameVersions?.[0]
-	const targetLoader = target.loaders?.[0]
-	return (
-		(!!selected.gameVersions?.length &&
-			!!targetGameVersion &&
-			!selected.gameVersions.includes(targetGameVersion)) ||
-		(!!selected.loaders?.length &&
-			!!targetLoader &&
-			!selected.loaders.some((loader) => loader.toLowerCase() === targetLoader.toLowerCase()))
+function getServerInstallTargetPreferences(contentType: BrowseInstallContentType) {
+	return getTargetInstallPreferences(
+		{
+			gameVersion: serverContextServerData.value?.mc_version,
+			loader: serverContextServerData.value?.loader,
+		},
+		contentType,
 	)
 }
 
-async function chooseServerInstallPreferences(
-	project: Labrinth.Search.v2.ResultSearchProject & Labrinth.Search.v3.ResultSearchProject,
-	projectTypeValue: ServerAddonProjectType,
-) {
-	const selectedPreferences = getSelectedInstallPreferences(projectTypeValue)
-	const targetPreferences = getServerTargetPreferences()
-	if (!preferencesDiffer(selectedPreferences, targetPreferences)) {
-		return selectedPreferences
-	}
-
-	const hasSelectedVersion = await getServerAddonInstallVersion(
-		project,
+function getInstanceInstallTargetPreferences(projectTypeValue: string) {
+	return getTargetInstallPreferences(
+		{
+			gameVersion: instance.value?.game_version,
+			loader: instance.value?.loader,
+		},
 		projectTypeValue,
-		selectedPreferences,
 	)
-		.then(() => true)
-		.catch(() => false)
-
-	if (!hasSelectedVersion) {
-		return targetPreferences
-	}
-
-	return selectedPreferences
 }
 
-async function findInstallVersion(
-	projectId: string,
-	projectTypeValue: string,
-	preferences: InstallPreferences,
-) {
+async function getInstallProjectVersions(projectId: string) {
 	const project = await get_project(projectId, 'must_revalidate')
-	const versions = (await get_version_many(
+	return (await get_version_many(
 		project.versions,
 		'must_revalidate',
 	)) as Labrinth.Versions.v2.Version[]
-	const loaderFilterTypes = getLoaderFilterTypes(projectTypeValue)
-	const shouldMatchLoaders = loaderFilterTypes.length > 0 && !!preferences.loaders?.length
-
-	return versions
-		.filter((version) => {
-			const gameVersionMatches =
-				!preferences.gameVersions?.length ||
-				version.game_versions.some((gameVersion) =>
-					preferences.gameVersions?.includes(gameVersion),
-				)
-			const loaderMatches =
-				!shouldMatchLoaders ||
-				version.loaders.some((loader) =>
-					preferences.loaders?.some(
-						(preferredLoader) => preferredLoader.toLowerCase() === loader.toLowerCase(),
-					),
-				)
-			return gameVersionMatches && loaderMatches
-		})
-		.sort(
-			(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-		)[0]
 }
 
 async function chooseInstanceInstallVersion(
@@ -900,16 +659,16 @@ async function chooseInstanceInstallVersion(
 		return { versionId: null as string | null }
 	}
 
-	const selectedPreferences = getSelectedInstallPreferences(projectTypeValue)
-	const targetPreferences = getInstanceTargetPreferences()
+	const selectedPreferences = getCurrentSelectedInstallPreferences(projectTypeValue)
+	const targetPreferences = getInstanceInstallTargetPreferences(projectTypeValue)
 	if (!preferencesDiffer(selectedPreferences, targetPreferences)) {
 		return { versionId: null as string | null }
 	}
 
-	const selectedVersion = await findInstallVersion(
-		project.project_id,
-		projectTypeValue,
+	const selectedVersion = getLatestMatchingInstallVersion(
+		await getInstallProjectVersions(project.project_id),
 		selectedPreferences,
+		projectTypeValue,
 	)
 
 	if (!selectedVersion) {
@@ -924,66 +683,7 @@ function getCardActions(
 	currentProjectType: string,
 ): CardAction[] {
 	if (currentProjectType === 'server') {
-		const serverResult = result as Labrinth.Search.v3.ResultSearchProject
-		const isInstalled = allInstalledIds.value.has(serverResult.project_id)
-
-		if (isFromWorlds.value && instance.value) {
-			return [
-				{
-					key: 'add-to-instance',
-					label: formatMessage(isInstalled ? messages.added : messages.addToInstance),
-					icon: isInstalled ? CheckIcon : PlusIcon,
-					disabled: isInstalled,
-					color: 'brand',
-					type: 'outlined',
-					onClick: () => handleAddServerToInstance(serverResult),
-				},
-			]
-		}
-
-		const actions: CardAction[] = []
-
-		actions.push({
-			key: 'add',
-			label: '',
-			icon: isInstalled ? CheckIcon : PlusIcon,
-			disabled: isInstalled,
-			circular: true,
-			tooltip: isInstalled
-				? formatMessage(messages.alreadyAdded)
-				: instance.value
-					? formatMessage(messages.addToInstanceName, { instanceName: instance.value.name })
-					: formatMessage(messages.addServerToInstance),
-			onClick: () => handleAddServerToInstance(serverResult),
-		})
-
-		if (runningServerProjects.value[serverResult.project_id]) {
-			actions.push({
-				key: 'stop',
-				label: formatMessage(commonMessages.stopButton),
-				icon: StopCircleIcon,
-				color: 'red',
-				type: 'outlined',
-				onClick: () => handleStopServerProject(serverResult.project_id),
-			})
-		} else {
-			const isInstalling = (installingServerProjects.value as string[]).includes(
-				serverResult.project_id,
-			)
-			actions.push({
-				key: 'play',
-				label: formatMessage(
-					isInstalling ? commonMessages.installingLabel : commonMessages.playButton,
-				),
-				icon: PlayIcon,
-				disabled: isInstalling,
-				color: 'brand',
-				type: 'outlined',
-				onClick: () => handlePlayServerProject(serverResult.project_id),
-			})
-		}
-
-		return actions
+		return getServerCardActions(result as Labrinth.Search.v3.ResultSearchProject)
 	}
 
 	// Non-server project actions
@@ -995,7 +695,8 @@ function getCardActions(
 	const isInstalled =
 		projectResult.installed ||
 		allInstalledIds.value.has(projectResult.project_id || '') ||
-		serverContentProjectIds.value.has(projectResult.project_id || '')
+		serverContentProjectIds.value.has(projectResult.project_id || '') ||
+		serverContextServerData.value?.upstream?.project_id === projectResult.project_id
 	const isInstalling = installingProjectIds.value.has(projectResult.project_id)
 
 	if (
@@ -1004,7 +705,9 @@ function getCardActions(
 	) {
 		const isQueued = queuedServerInstallProjectIds.value.has(projectResult.project_id)
 		const installLabel = isQueued
-			? messages.queuedToServer
+			? isInstalling
+				? messages.installingToServer
+				: messages.queuedToServer
 			: isInstalling
 				? messages.installingToServer
 				: isInstalled
@@ -1014,26 +717,36 @@ function getCardActions(
 			{
 				key: 'install',
 				label: formatMessage(installLabel),
-				icon: isQueued || isInstalled ? CheckIcon : PlusIcon,
+				icon: isInstalling ? SpinnerIcon : isQueued || isInstalled ? CheckIcon : PlusIcon,
 				iconClass: isInstalling ? 'animate-spin' : undefined,
-				disabled: isInstalled || isInstalling || isQueued,
-				color: isQueued ? 'green' : 'brand',
+				disabled: isInstalled || isInstalling,
+				color: isQueued && !isInstalling ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: async () => {
-					const shouldShowInstalling = currentProjectType === 'modpack'
+					const contentType = currentProjectType as BrowseInstallContentType
+					const shouldShowInstalling = contentType === 'modpack' || !isQueued
 					if (shouldShowInstalling) {
 						setProjectInstalling(projectResult.project_id, true)
 					}
 					try {
-						const installPreferences =
-							currentProjectType === 'modpack'
-								? undefined
-								: await chooseServerInstallPreferences(
-										projectResult,
-										currentProjectType as ServerAddonProjectType,
-									)
-						if (installPreferences === null) return
-						await installProjectToServer(projectResult, installPreferences)
+						await requestInstall({
+							project: projectResult,
+							contentType,
+							mode: contentType === 'modpack' ? 'immediate' : 'queue',
+							selectedFilters: searchState.currentFilters.value,
+							providedFilters: combinedProvidedFilters.value,
+							overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+							targetPreferences: getServerInstallTargetPreferences(contentType),
+							getProjectVersions: getInstallProjectVersions,
+							queue: serverInstallQueue,
+							install: (plan) =>
+								openServerModpackInstallFlow({
+									projectId: plan.projectId,
+									versionId: plan.versionId,
+									name: plan.project.name,
+									iconUrl: plan.project.icon_url ?? undefined,
+								}),
+						})
 					} catch (err) {
 						handleError(err as Error)
 					} finally {
@@ -1074,7 +787,7 @@ function getCardActions(
 						setProjectInstalling(projectResult.project_id, false)
 						return
 					}
-					const selectedPreferences = getSelectedInstallPreferences(currentProjectType)
+					const selectedPreferences = getCurrentSelectedInstallPreferences(currentProjectType)
 					await installVersion(
 						projectResult.project_id,
 						selectedInstall.versionId,
@@ -1138,9 +851,7 @@ async function search(requestParams: string) {
 
 	if (isServer) {
 		const hits = rawResults.result.hits ?? []
-		lastServerHits.value = hits
-		pingServerHits(hits)
-		checkServerRunningStates(hits)
+		updateServerHits(hits)
 		return {
 			projectHits: [],
 			serverHits: hits,

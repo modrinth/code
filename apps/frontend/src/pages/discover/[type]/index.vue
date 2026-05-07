@@ -11,18 +11,27 @@ import {
 	MoreVerticalIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import type { CardAction, CreationFlowContextValue } from '@modrinth/ui'
+import type {
+	BrowseInstallContentType,
+	BrowseInstallPlan,
+	CardAction,
+	CreationFlowContextValue,
+} from '@modrinth/ui'
 import {
 	BrowseInstallHeader,
 	BrowsePageLayout,
 	BrowseSidebar,
 	CreationFlowModal,
 	defineMessages,
+	flushInstallQueue,
+	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
 	provideBrowseManager,
+	requestInstall,
 	useBrowseSearch,
 	useDebugLogger,
+	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
 import { cycleValue } from '@modrinth/utils'
@@ -44,6 +53,11 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 const filtersMenuOpen = ref(false)
+const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
+const { isStuck: isInstallHeaderStuck } = useStickyObserver(
+	stickyInstallHeaderRef,
+	'DiscoverInstallHeader',
+)
 
 const route = useRoute()
 
@@ -182,23 +196,15 @@ interface InstallableSearchResult extends Labrinth.Search.v2.ResultSearchProject
 	installed?: boolean
 }
 
-type ServerInstallableType = 'modpack' | 'mod' | 'plugin' | 'datapack'
-type ServerAddonInstallType = Exclude<ServerInstallableType, 'modpack'>
-
-interface QueuedServerInstall {
-	project: InstallableSearchResult
-	contentType: ServerAddonInstallType
-	preferences?: InstallPreferences
-}
-
-type InstallPreferences = {
-	gameVersions?: string[]
-	loaders?: string[]
-}
-
-const queuedServerInstalls = ref<Map<string, QueuedServerInstall>>(new Map())
+const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(new Map())
 const queuedServerInstallProjectIds = computed(() => new Set(queuedServerInstalls.value.keys()))
 const queuedServerInstallCount = computed(() => queuedServerInstalls.value.size)
+const serverInstallQueue = {
+	get: () => queuedServerInstalls.value,
+	set: (plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>) => {
+		queuedServerInstalls.value = plans
+	},
+}
 
 function setProjectInstalling(projectId: string, installing: boolean) {
 	const next = new Set(installingProjectIds.value)
@@ -229,7 +235,6 @@ function syncHiddenInstalledProjectIds() {
 	hiddenInstalledProjectIds.value = new Set([
 		...getServerInstalledProjectIds(),
 		...optimisticallyInstalledProjectIds.value,
-		...queuedServerInstallProjectIds.value,
 	])
 	hiddenInstalledProjectIdsInitialized.value = true
 }
@@ -341,7 +346,7 @@ const serverFilters = computed(() => {
 	return filters
 })
 
-function getCurrentServerInstallType(): ServerInstallableType {
+function getCurrentServerInstallType(): BrowseInstallContentType {
 	const type = projectType.value?.id
 	if (type === 'modpack' || type === 'mod' || type === 'plugin' || type === 'datapack') {
 		return type
@@ -349,122 +354,20 @@ function getCurrentServerInstallType(): ServerInstallableType {
 	throw new Error('This content type cannot be installed to a server from browse.')
 }
 
-async function resolveServerAddonVersion(
-	project: InstallableSearchResult,
-	contentType: ServerAddonInstallType,
-	preferences?: InstallPreferences,
-) {
-	const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id)
-	const isDatapack = contentType === 'datapack'
-	const gameVersions =
-		preferences?.gameVersions && preferences.gameVersions.length > 0
-			? new Set(preferences.gameVersions)
-			: serverData.value?.mc_version
-				? new Set([serverData.value.mc_version])
-				: new Set<string>()
-	const loaders =
-		preferences?.loaders && preferences.loaders.length > 0
-			? new Set(preferences.loaders.map((loader) => loader.toLowerCase()))
-			: serverData.value?.loader
-				? new Set([serverData.value.loader.toLowerCase()])
-				: new Set<string>()
-	const matchingVersions = versions.filter((x) => {
-		if (gameVersions.size > 0 && !x.game_versions.some((version) => gameVersions.has(version))) {
-			return false
-		}
-		if (isDatapack) return true
-		return loaders.size === 0 || x.loaders.some((loader) => loaders.has(loader.toLowerCase()))
+function getServerInstallTargetPreferences(contentType: BrowseInstallContentType) {
+	return getTargetInstallPreferences(
+		{
+			gameVersion: serverData.value?.mc_version,
+			loader: serverData.value?.loader,
+		},
+		contentType,
+	)
+}
+
+function getInstallProjectVersions(projectId: string) {
+	return client.labrinth.versions_v2.getProjectVersions(projectId, {
+		include_changelog: false,
 	})
-	const version = [...matchingVersions].sort(
-		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-	)[0]
-	if (!version) {
-		const versionLabel =
-			gameVersions.size > 0 ? Array.from(gameVersions).join(', ') : serverData.value!.mc_version
-		const loaderLabel =
-			loaders.size > 0 ? Array.from(loaders).join(', ') : serverData.value!.loader
-		throw new Error(
-			isDatapack
-				? `No compatible version found for ${versionLabel}`
-				: `No compatible version found for ${versionLabel} / ${loaderLabel}`,
-		)
-	}
-	return version
-}
-
-function getLoaderFilterTypes(projectTypeValue: string) {
-	if (projectTypeValue === 'mod') return ['mod_loader']
-	if (projectTypeValue === 'plugin') return ['plugin_loader', 'plugin_platform']
-	if (projectTypeValue === 'modpack') return ['modpack_loader']
-	return []
-}
-
-function getEffectiveInstallFilters() {
-	const providedFilters = (serverFilters.value ?? []).filter(
-		(providedFilter) =>
-			!searchState.overriddenProvidedFilterTypes.value.includes(providedFilter.type),
-	)
-	const userFilters = searchState.currentFilters.value.filter(
-		(userFilter) =>
-			!providedFilters.some((providedFilter) => providedFilter.type === userFilter.type),
-	)
-	return [...userFilters, ...providedFilters].filter((filter) => !filter.negative)
-}
-
-function getSelectedInstallPreferences(projectTypeValue: string): InstallPreferences {
-	const filters = getEffectiveInstallFilters()
-	const loaderFilterTypes = getLoaderFilterTypes(projectTypeValue)
-	const gameVersions = filters
-		.filter((filter) => filter.type === 'game_version')
-		.map((filter) => filter.option)
-	const loaders = filters
-		.filter((filter) => loaderFilterTypes.includes(filter.type))
-		.map((filter) => filter.option)
-
-	return {
-		gameVersions: gameVersions.length > 0 ? gameVersions : undefined,
-		loaders: loaders.length > 0 ? loaders : undefined,
-	}
-}
-
-function getServerTargetPreferences(): InstallPreferences {
-	return {
-		gameVersions: serverData.value?.mc_version ? [serverData.value.mc_version] : undefined,
-		loaders: serverData.value?.loader ? [serverData.value.loader] : undefined,
-	}
-}
-
-function preferencesDiffer(selected: InstallPreferences, target: InstallPreferences) {
-	const targetGameVersion = target.gameVersions?.[0]
-	const targetLoader = target.loaders?.[0]
-	return (
-		(!!selected.gameVersions?.length &&
-			!!targetGameVersion &&
-			!selected.gameVersions.includes(targetGameVersion)) ||
-		(!!selected.loaders?.length &&
-			!!targetLoader &&
-			!selected.loaders.some((loader) => loader.toLowerCase() === targetLoader.toLowerCase()))
-	)
-}
-
-async function chooseServerInstallPreferences(
-	project: InstallableSearchResult,
-	contentType: ServerAddonInstallType,
-) {
-	const selectedPreferences = getSelectedInstallPreferences(contentType)
-	const targetPreferences = getServerTargetPreferences()
-	if (!preferencesDiffer(selectedPreferences, targetPreferences)) {
-		return selectedPreferences
-	}
-
-	const hasSelectedVersion = await resolveServerAddonVersion(project, contentType, selectedPreferences)
-		.then(() => true)
-		.catch(() => false)
-	if (!hasSelectedVersion) {
-		return targetPreferences
-	}
-
-	return selectedPreferences
 }
 
 function clearQueuedServerInstalls() {
@@ -478,37 +381,27 @@ watch([currentServerId, currentWorldId], ([serverId, worldId], [prevServerId, pr
 })
 
 async function flushQueuedServerInstalls() {
-	const queuedInstalls = Array.from(queuedServerInstalls.value.values())
-	if (queuedInstalls.length === 0) return true
+	if (queuedServerInstalls.value.size === 0) return true
 
 	if (!serverData.value || !currentServerId.value || !currentWorldId.value) {
 		handleError(new Error('No server world is available for install.'))
 		return false
 	}
 
-	const failedInstalls = new Map<string, QueuedServerInstall>()
-
-	for (const queuedInstall of queuedInstalls) {
-		try {
-			const version = await resolveServerAddonVersion(
-				queuedInstall.project,
-				queuedInstall.contentType,
-				queuedInstall.preferences,
-			)
+	const result = await flushInstallQueue({
+		queue: serverInstallQueue,
+		install: async (plan) => {
 			await installContentMutation.mutateAsync({
-				serverId: currentServerId.value,
-				projectId: version.project_id,
-				versionId: version.id,
+				serverId: currentServerId.value!,
+				projectId: plan.projectId,
+				versionId: plan.versionId,
 			})
-			markProjectInstalled(queuedInstall.project.project_id)
-		} catch (e) {
-			failedInstalls.set(queuedInstall.project.project_id, queuedInstall)
-			handleError(e as Error)
-		}
-	}
+			markProjectInstalled(plan.projectId)
+		},
+		onError: (error) => handleError(error as Error),
+	})
 
-	queuedServerInstalls.value = failedInstalls
-	return failedInstalls.size === 0
+	return result.ok
 }
 
 async function serverInstall(project: InstallableSearchResult) {
@@ -516,51 +409,55 @@ async function serverInstall(project: InstallableSearchResult) {
 		handleError(new Error('No server to install to.'))
 		return
 	}
-	try {
-		const contentType = getCurrentServerInstallType()
+	const contentType = getCurrentServerInstallType()
+	const isModpack = contentType === 'modpack'
 
-		if (contentType === 'modpack') {
+	try {
+		if (isModpack || !queuedServerInstallProjectIds.value.has(project.project_id)) {
 			setProjectInstalling(project.project_id, true)
-			const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id, {
-				include_changelog: false,
-			})
-			const versionId = versions[0]?.id ?? project.latest_version
-			if (!versionId) {
-				handleError(new Error('No version found for this modpack'))
-				setProjectInstalling(project.project_id, false)
-				return
-			}
-			const modalInstance = onboardingModalRef.value
-			if (modalInstance) {
-				onboardingInstallingProject.value = project
+		}
+
+		await requestInstall({
+			project,
+			contentType,
+			mode: isModpack ? 'immediate' : 'queue',
+			selectedFilters: searchState.currentFilters.value,
+			providedFilters: serverFilters.value,
+			overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+			targetPreferences: getServerInstallTargetPreferences(contentType),
+			getProjectVersions: getInstallProjectVersions,
+			queue: serverInstallQueue,
+			install: async (plan) => {
+				const modalInstance = onboardingModalRef.value
+				if (!modalInstance) {
+					setProjectInstalling(plan.projectId, false)
+					return
+				}
+
+				onboardingInstallingProject.value = plan.project
 				modalInstance.show()
 				await nextTick()
 				const ctx = modalInstance.ctx
 				ctx.setupType.value = 'modpack'
 				ctx.modpackSelection.value = {
-					projectId: project.project_id,
-					versionId,
-					name: project.title,
-					iconUrl: project.icon_url ?? undefined,
+					projectId: plan.projectId,
+					versionId: plan.versionId,
+					name: plan.project.title,
+					iconUrl: plan.project.icon_url ?? undefined,
 				}
 				ctx.modal.value?.setStage('final-config')
-			}
-			return
-		}
-
-		const installPreferences = await chooseServerInstallPreferences(project, contentType)
-		if (installPreferences === null) return
-
-		const nextQueuedInstalls = new Map(queuedServerInstalls.value)
-		nextQueuedInstalls.set(project.project_id, {
-			project,
-			contentType,
-			preferences: installPreferences,
+			},
 		})
-		queuedServerInstalls.value = nextQueuedInstalls
 	} catch (e) {
 		console.error(e)
-		handleError(new Error(`Error installing content ${e}`))
+		if (isModpack) {
+			setProjectInstalling(project.project_id, false)
+		}
+		handleError(e instanceof Error ? e : new Error(`Error installing content ${e}`))
+	} finally {
+		if (!isModpack) {
+			setProjectInstalling(project.project_id, false)
+		}
 	}
 }
 
@@ -669,16 +566,15 @@ function getCardActions(
 		const isQueued = queuedServerInstallProjectIds.value.has(result.project_id)
 		const isInstalled =
 			projectResult.installed ||
-			isQueued ||
 			optimisticallyInstalledProjectIds.value.has(result.project_id) ||
 			(serverContentData.value &&
 				(serverContentData.value.addons ?? []).find((x) => x.project_id === result.project_id)) ||
 			serverData.value.upstream?.project_id === result.project_id
 		const isInstalling = installingProjectIds.value.has(result.project_id)
-		const installLabel = isQueued
-			? 'Queued'
-			: isInstalling
-				? 'Installing...'
+		const installLabel = isInstalling
+			? 'Installing...'
+			: isQueued
+				? 'Queued'
 				: isInstalled
 					? 'Installed'
 					: 'Install'
@@ -687,10 +583,10 @@ function getCardActions(
 			{
 				key: 'install',
 				label: installLabel,
-				icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : DownloadIcon,
+				icon: isInstalling ? SpinnerIcon : isQueued || isInstalled ? CheckIcon : DownloadIcon,
 				iconClass: isInstalling ? 'animate-spin' : undefined,
 				disabled: !!isInstalled || isInstalling,
-				color: isQueued ? 'green' : 'brand',
+				color: isQueued && !isInstalling ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: () => serverInstall(projectResult),
 			},
@@ -897,7 +793,11 @@ provideBrowseManager({
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
 		<div class="search-background"></div>
 	</Teleport>
-	<div v-if="installContext" class="normal-page__header mb-4 flex flex-col gap-2">
+	<div
+		v-if="installContext"
+		ref="stickyInstallHeaderRef"
+		class="normal-page__header browse-install-header-bleed sticky top-0 z-20 mb-4 flex flex-col gap-2 border-0 bg-surface-1 py-3"
+	>
 		<BrowseInstallHeader />
 	</div>
 	<aside class="normal-page__sidebar" aria-label="Filters">
@@ -928,6 +828,22 @@ provideBrowseManager({
 	</section>
 </template>
 <style lang="scss" scoped>
+.browse-install-header-bleed {
+	grid-column: 1 / -1;
+	margin-inline: -1.5rem;
+	padding-inline: 0.75rem !important;
+
+	&::after {
+		content: '';
+		position: absolute;
+		right: 50%;
+		bottom: 0;
+		width: 100vw;
+		border-bottom: 1px solid var(--surface-5);
+		transform: translateX(50%);
+	}
+}
+
 .normal-page__content {
 	display: contents;
 
