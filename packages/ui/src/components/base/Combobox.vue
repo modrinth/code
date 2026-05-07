@@ -94,6 +94,7 @@
 					ref="dropdownRef"
 					class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 border border-solid border-surface-5"
 					:class="[
+						props.dropdownClass,
 						openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',
 					]"
 					:style="dropdownStyle"
@@ -230,6 +231,7 @@ const props = withDefaults(
 		maxHeight?: number
 		displayValue?: string
 		triggerClass?: string
+		dropdownClass?: string
 		/** Width for the teleported dropdown; defaults to the trigger/input width */
 		dropdownWidth?: string | number
 		/** Minimum width for the teleported dropdown */

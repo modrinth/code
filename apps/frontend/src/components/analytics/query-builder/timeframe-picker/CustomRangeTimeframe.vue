@@ -1,29 +1,23 @@
 <template>
-	<div class="flex flex-col gap-2 p-3">
-		<label class="flex items-center justify-between gap-3 text-sm font-semibold text-primary">
-			<span>Start</span>
-			<input
-				v-model="startDate"
-				type="date"
-				class="h-8 rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-sm font-semibold text-primary outline-none transition-[box-shadow,color] focus:text-contrast focus:ring-4 focus:ring-brand-shadow"
-				@change="handleStartDateChange"
-			/>
-		</label>
-		<label class="flex items-center justify-between gap-3 text-sm font-semibold text-primary">
-			<span>End</span>
-			<input
-				v-model="endDate"
-				type="date"
-				class="h-8 rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-sm font-semibold text-primary outline-none transition-[box-shadow,color] focus:text-contrast focus:ring-4 focus:ring-brand-shadow"
-				@change="handleEndDateChange"
-			/>
-		</label>
-	</div>
+	<DatePicker
+		v-model="pickerRange"
+		mode="range"
+		:show-months="2"
+		:clearable="false"
+		:default-view-date="startDate"
+		calendar-only
+		wrapper-class="w-full"
+	/>
 </template>
 
 <script setup lang="ts">
+import { DatePicker } from '@modrinth/ui'
+
+type DatePickerValue = string | Date | null | undefined
+
 const startDate = defineModel<string>('startDate', { required: true })
 const endDate = defineModel<string>('endDate', { required: true })
+const pickerRange = ref<DatePickerValue[]>([startDate.value, endDate.value])
 
 function getDateInputValue(date: Date): string {
 	const year = date.getFullYear()
@@ -41,31 +35,56 @@ function isValidDateInputValue(value: string): boolean {
 	return !Number.isNaN(parsedDate.getTime()) && getDateInputValue(parsedDate) === value
 }
 
-function handleStartDateChange() {
-	if (!isValidDateInputValue(startDate.value)) {
-		startDate.value = isValidDateInputValue(endDate.value)
-			? endDate.value
-			: getDateInputValue(new Date())
+function getDatePickerValueString(value: DatePickerValue): string | null {
+	if (typeof value === 'string') {
+		return isValidDateInputValue(value) ? value : null
 	}
-	if (!isValidDateInputValue(endDate.value)) {
-		endDate.value = startDate.value
+	if (value instanceof Date && !Number.isNaN(value.getTime())) {
+		return getDateInputValue(value)
 	}
-	if (startDate.value > endDate.value) {
-		endDate.value = startDate.value
-	}
+
+	return null
 }
 
-function handleEndDateChange() {
-	if (!isValidDateInputValue(endDate.value)) {
-		endDate.value = isValidDateInputValue(startDate.value)
-			? startDate.value
-			: getDateInputValue(new Date())
+function getOrderedRange(values: DatePickerValue[]): [string, string] | null {
+	const dates = values
+		.map(getDatePickerValueString)
+		.filter((value): value is string => Boolean(value))
+	if (dates.length < 2) {
+		return null
 	}
-	if (!isValidDateInputValue(startDate.value)) {
-		startDate.value = endDate.value
+
+	const firstDate = dates[0]
+	const secondDate = dates[1]
+	if (!firstDate || !secondDate) {
+		return null
 	}
-	if (endDate.value < startDate.value) {
-		startDate.value = endDate.value
-	}
+
+	return firstDate <= secondDate ? [firstDate, secondDate] : [secondDate, firstDate]
 }
+
+function syncPickerRangeFromModels() {
+	if (
+		pickerRange.value.length === 2 &&
+		pickerRange.value[0] === startDate.value &&
+		pickerRange.value[1] === endDate.value
+	) {
+		return
+	}
+
+	pickerRange.value = [startDate.value, endDate.value]
+}
+
+watch([startDate, endDate], syncPickerRangeFromModels)
+
+watch(pickerRange, (nextRange) => {
+	const orderedRange = getOrderedRange(nextRange)
+	if (!orderedRange) {
+		return
+	}
+
+	const [nextStartDate, nextEndDate] = orderedRange
+	startDate.value = nextStartDate
+	endDate.value = nextEndDate
+})
 </script>

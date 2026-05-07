@@ -3,6 +3,7 @@
 		class="modrinth-date-picker relative inline-flex items-center"
 		:class="[
 			wrapperClass,
+			calendarOnly ? 'calendar-only' : '',
 			disabled ? 'cursor-not-allowed opacity-50' : '',
 			showToday ? 'show-today' : '',
 			props.mode === 'range' && selectedDates.length === 2 ? 'can-drag-range' : '',
@@ -10,7 +11,7 @@
 		]"
 	>
 		<CalendarIcon
-			v-if="showIcon"
+			v-if="showIcon && !calendarOnly"
 			class="pointer-events-none absolute left-3 z-[1] h-5 w-5 text-secondary opacity-60 transition-colors"
 			aria-hidden="true"
 		/>
@@ -23,6 +24,8 @@
 			:readonly="readonly"
 			:autocomplete="autocomplete"
 			:class="inputClasses"
+			:tabindex="calendarOnly ? -1 : undefined"
+			:aria-hidden="calendarOnly ? 'true' : undefined"
 			type="text"
 		/>
 	</div>
@@ -91,6 +94,7 @@ const props = withDefaults(
 		clearable?: boolean
 		showIcon?: boolean
 		showToday?: boolean
+		calendarOnly?: boolean
 		/**
 		 * When true (single mode only), navigating between months/years preserves the
 		 * originally selected day number. If the target month has fewer days, the day
@@ -112,6 +116,7 @@ const props = withDefaults(
 		clearable: true,
 		showIcon: true,
 		showToday: false,
+		calendarOnly: false,
 		preserveDay: false,
 	},
 )
@@ -474,10 +479,15 @@ const resolvedShowMonths = computed(() =>
 )
 
 const inputClasses = computed(() => [
-	'w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow !outline-0',
-	props.showIcon ? 'pl-10' : 'pl-3',
-	'pr-3 h-9 py-2 text-base outline-none bg-surface-4 border-none rounded-xl',
-	props.disabled ? 'cursor-not-allowed' : '',
+	props.calendarOnly
+		? 'sr-only pointer-events-none absolute h-0 w-0 opacity-0'
+		: 'w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow !outline-0',
+	!props.calendarOnly && props.showIcon ? 'pl-10' : '',
+	!props.calendarOnly && !props.showIcon ? 'pl-3' : '',
+	!props.calendarOnly
+		? 'pr-3 h-9 py-2 text-base outline-none bg-surface-4 border-none rounded-xl'
+		: '',
+	props.disabled && !props.calendarOnly ? 'cursor-not-allowed' : '',
 	props.inputClass,
 ])
 
@@ -503,6 +513,7 @@ watch(
 		props.dateFormat,
 		props.altFormat,
 		props.time24hr,
+		props.calendarOnly,
 	],
 	() => {
 		if (!picker.value) return
@@ -676,15 +687,16 @@ onBeforeUnmount(() => {
 
 function flatpickrOptions(): Options {
 	return {
-		allowInput: true,
-		altInput: true,
-		altInputClass: inputClasses.value.filter(Boolean).join(' '),
+		allowInput: !props.calendarOnly,
+		altInput: !props.calendarOnly,
+		altInputClass: props.calendarOnly ? undefined : inputClasses.value.filter(Boolean).join(' '),
 		altFormat: resolvedAltFormat.value,
-		appendTo: inputRef.value?.parentElement ?? undefined,
+		appendTo: props.calendarOnly ? undefined : (inputRef.value?.parentElement ?? undefined),
 		closeOnSelect: false,
 		dateFormat: resolvedDateFormat.value,
 		disableMobile: true,
 		enableTime: props.enableTime,
+		inline: props.calendarOnly,
 		maxDate: props.maxDate,
 		minDate: props.minDate,
 		mode: props.mode,
@@ -692,7 +704,7 @@ function flatpickrOptions(): Options {
 		nextArrow: chevronRightIcon,
 		prevArrow: chevronLeftIcon,
 		showMonths: resolvedShowMonths.value,
-		static: true,
+		static: !props.calendarOnly,
 		time_24hr: props.time24hr,
 	}
 }
@@ -747,6 +759,19 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-calendar) {
 	@apply mt-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary select-none;
+	box-sizing: content-box;
+}
+
+.modrinth-date-picker.calendar-only {
+	@apply block;
+}
+
+.modrinth-date-picker.calendar-only :deep(.flatpickr-wrapper) {
+	@apply block w-full;
+}
+
+.modrinth-date-picker.calendar-only :deep(.flatpickr-calendar) {
+	@apply m-0;
 	box-sizing: content-box;
 }
 

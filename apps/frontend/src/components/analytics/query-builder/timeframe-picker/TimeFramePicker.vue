@@ -1,63 +1,52 @@
 <template>
 	<Combobox
-		:key="timeframeSelectKey"
 		:model-value="highlightedTimeframePreset"
 		:options="timeframeDropdownOptions"
 		:display-value="selectedTimeframeLabel"
 		:max-height="TIMEFRAME_DROPDOWN_MAX_HEIGHT"
-		:dropdown-min-width="'20rem'"
+		:dropdown-min-width="timeframeDropdownMinWidth"
 		@update:model-value="handleTimeframeModelUpdate"
 		@open="handleTimeframeSelectOpen"
 		@close="handleTimeframeSelectClose"
 		@select="handleTimeframePresetSelect"
+		:dropdown-class="
+			activeTimeframePanel === 'custom_range'
+				? 'bg-transparent border-0 -mt-1 pb-2 shadow-none'
+				: ''
+		"
 	>
 		<template #bottom>
-			<div class="flex flex-col border-0 border-t border-solid border-surface-5 bg-surface-4">
-				<template v-if="activeTimeframePanel === 'custom_range'">
-					<CustomRangeTimeframe
-						v-model:start-date="draftSelectedCustomTimeframeStartDate"
-						v-model:end-date="draftSelectedCustomTimeframeEndDate"
-					/>
-					<div
-						class="flex items-center justify-between gap-3 border-0 border-t border-solid border-surface-5 px-4 py-3"
-					>
-						<div class="min-w-0 truncate text-sm text-secondary">
-							Selected period:
-							<span class="font-semibold text-primary">{{ draftCustomTimeframeRangeLabel }}</span>
-						</div>
-						<div class="flex shrink-0 items-center gap-2">
-							<ButtonStyled type="outlined">
-								<button type="button" @click.stop="cancelCustomDateRange">Cancel</button>
-							</ButtonStyled>
-							<ButtonStyled color="brand">
-								<button type="button" @click.stop="applyCustomDateRange">Apply</button>
-							</ButtonStyled>
-						</div>
-					</div>
-				</template>
-				<template v-else>
-					<CustomTimeframe
-						v-model:amount="draftSelectedLastTimeframeAmount"
-						v-model:unit="draftSelectedLastTimeframeUnit"
-						:active="draftSelectedTimeframeMode === 'last'"
-						:unit-options="lastTimeframeUnitOptions"
-						@activate="draftSelectedTimeframeMode = 'last'"
-					/>
-					<button
-						type="button"
-						class="flex cursor-pointer items-center border-0 border-t border-solid border-surface-5 bg-transparent px-4 py-3 text-left text-sm font-semibold text-primary transition-colors hover:bg-surface-5"
-						@click.stop="switchDraftToCustomDateRange"
-					>
-						Custom fixed date range...
-					</button>
-				</template>
+			<template v-if="activeTimeframePanel === 'custom_range'">
+				<CustomRangeTimeframe
+					v-model:start-date="draftSelectedCustomTimeframeStartDate"
+					v-model:end-date="draftSelectedCustomTimeframeEndDate"
+				/>
+			</template>
+			<div
+				v-else
+				class="flex flex-col border-0 border-t border-solid border-surface-5 bg-surface-4"
+			>
+				<CustomTimeframe
+					v-model:amount="draftSelectedLastTimeframeAmount"
+					v-model:unit="draftSelectedLastTimeframeUnit"
+					:active="draftSelectedTimeframeMode === 'last'"
+					:unit-options="lastTimeframeUnitOptions"
+					@activate="draftSelectedTimeframeMode = 'last'"
+				/>
+				<button
+					type="button"
+					class="flex cursor-pointer items-center border-0 border-t border-solid border-surface-5 bg-transparent px-4 py-3 text-left text-sm font-semibold text-primary transition-colors hover:bg-surface-5"
+					@click.stop="switchDraftToCustomDateRange"
+				>
+					Custom fixed date range...
+				</button>
 			</div>
 		</template>
 	</Combobox>
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, Combobox, type ComboboxOption } from '@modrinth/ui'
+import { Combobox, type ComboboxOption } from '@modrinth/ui'
 
 import {
 	type AnalyticsLastTimeframeUnit,
@@ -96,9 +85,7 @@ const {
 } = injectAnalyticsDashboardContext()
 
 const isTimeframeSelectOpen = ref(false)
-const timeframeSelectKey = ref(0)
 const activeTimeframePanel = ref<'preset' | 'custom_range'>('preset')
-const shouldCommitTimeframeDraftOnClose = ref(true)
 const draftSelectedTimeframeMode = ref(selectedTimeframeMode.value)
 const draftSelectedTimeframe = ref(selectedTimeframe.value)
 const draftSelectedLastTimeframeAmount = ref(selectedLastTimeframeAmount.value)
@@ -150,6 +137,9 @@ const lastTimeframeValueByPreset: Partial<
 const timeframeDropdownOptions = computed<ComboboxOption<AnalyticsTimeframePreset>[]>(() =>
 	activeTimeframePanel.value === 'custom_range' ? [] : timeframeOptions,
 )
+const timeframeDropdownMinWidth = computed(() =>
+	activeTimeframePanel.value === 'custom_range' ? '40.5rem' : '20rem',
+)
 
 const highlightedTimeframePreset = computed<AnalyticsTimeframePreset | undefined>(() => {
 	if (draftSelectedTimeframeMode.value === 'preset') {
@@ -160,8 +150,7 @@ const highlightedTimeframePreset = computed<AnalyticsTimeframePreset | undefined
 })
 
 const selectedTimeframeLabel = computed(() => {
-	const useDraftTimeframeLabel =
-		isTimeframeSelectOpen.value && shouldCommitTimeframeDraftOnClose.value
+	const useDraftTimeframeLabel = isTimeframeSelectOpen.value
 
 	return getTimeframeLabel(
 		useDraftTimeframeLabel ? draftSelectedTimeframeMode.value : selectedTimeframeMode.value,
@@ -169,9 +158,7 @@ const selectedTimeframeLabel = computed(() => {
 		useDraftTimeframeLabel
 			? draftSelectedLastTimeframeAmount.value
 			: selectedLastTimeframeAmount.value,
-		useDraftTimeframeLabel
-			? draftSelectedLastTimeframeUnit.value
-			: selectedLastTimeframeUnit.value,
+		useDraftTimeframeLabel ? draftSelectedLastTimeframeUnit.value : selectedLastTimeframeUnit.value,
 		useDraftTimeframeLabel
 			? draftSelectedCustomTimeframeStartDate.value
 			: selectedCustomTimeframeStartDate.value,
@@ -180,13 +167,6 @@ const selectedTimeframeLabel = computed(() => {
 			: selectedCustomTimeframeEndDate.value,
 	)
 })
-
-const draftCustomTimeframeRangeLabel = computed(() =>
-	formatCustomTimeframeRangeLabel(
-		draftSelectedCustomTimeframeStartDate.value,
-		draftSelectedCustomTimeframeEndDate.value,
-	),
-)
 
 function getTimeframeLabel(
 	mode: AnalyticsTimeframeMode,
@@ -275,17 +255,11 @@ function commitTimeframeDraft() {
 function handleTimeframeSelectOpen() {
 	resetTimeframeDraft()
 	activeTimeframePanel.value = 'preset'
-	shouldCommitTimeframeDraftOnClose.value = true
 	isTimeframeSelectOpen.value = true
 }
 
 function handleTimeframeSelectClose() {
-	if (shouldCommitTimeframeDraftOnClose.value) {
-		commitTimeframeDraft()
-	} else {
-		resetTimeframeDraft()
-	}
-
+	commitTimeframeDraft()
 	isTimeframeSelectOpen.value = false
 }
 
@@ -329,20 +303,5 @@ function switchDraftToCustomDateRange() {
 	draftSelectedCustomTimeframeEndDate.value = getInclusiveEndDateInputValue(rawRange.end)
 	draftSelectedTimeframeMode.value = 'custom_range'
 	activeTimeframePanel.value = 'custom_range'
-	shouldCommitTimeframeDraftOnClose.value = false
-}
-
-function cancelCustomDateRange() {
-	resetTimeframeDraft()
-	activeTimeframePanel.value = 'preset'
-	shouldCommitTimeframeDraftOnClose.value = true
-}
-
-function applyCustomDateRange() {
-	commitTimeframeDraft()
-	activeTimeframePanel.value = 'preset'
-	shouldCommitTimeframeDraftOnClose.value = true
-	isTimeframeSelectOpen.value = false
-	timeframeSelectKey.value++
 }
 </script>

@@ -70,6 +70,30 @@ export const DropdownMinWidth: StoryObj = {
 	}),
 }
 
+export const DropdownClass: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: [
+				{ value: 'fabric', label: 'Fabric' },
+				{ value: 'forge', label: 'Forge' },
+				{ value: 'neoforge', label: 'NeoForge' },
+			],
+		}),
+		template: /*html*/ `
+			<div style="width: 14rem;">
+				<Combobox
+					v-model="selected"
+					:options="options"
+					dropdown-class="!border-brand"
+					placeholder="Loader"
+				/>
+			</div>
+		`,
+	}),
+}
+
 export const Disabled: Story = {
 	args: {
 		options: [{ value: '1', label: 'Option 1' }],

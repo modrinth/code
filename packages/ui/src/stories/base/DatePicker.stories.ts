@@ -125,6 +125,29 @@ export const TwoMonthRange: Story = {
 	}),
 }
 
+export const TwoMonthCalendarOnlyRange: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref(['2033-11-16', '2033-12-21'])
+			return { value }
+		},
+		template: /* html */ `
+			<div class="flex max-w-[700px] flex-col gap-2">
+				<DatePicker
+					v-model="value"
+					wrapperClass="w-full"
+					mode="range"
+					:show-months="2"
+					calendar-only
+					default-view-date="2033-11-01"
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const DraggableRange: Story = {
 	render: () => ({
 		components: { DatePicker },
