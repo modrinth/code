@@ -62,6 +62,7 @@ const props = withDefaults(
 		readonly?: boolean
 		enableTime?: boolean
 		mode?: 'single' | 'multiple' | 'range'
+		showMonths?: number
 		minDate?: string | Date
 		maxDate?: string | Date
 		/**
@@ -106,6 +107,7 @@ const props = withDefaults(
 		readonly: false,
 		enableTime: false,
 		mode: 'single',
+		showMonths: 1,
 		time24hr: false,
 		clearable: true,
 		showIcon: true,
@@ -189,7 +191,11 @@ function getRangeDayElement(target: EventTarget | null): RangeDayElement | null 
 }
 
 function isSelectableDay(dayElem: RangeDayElement) {
-	return Boolean(dayElem.dateObj) && !dayElem.classList.contains('flatpickr-disabled')
+	return (
+		Boolean(dayElem.dateObj) &&
+		!dayElem.classList.contains('flatpickr-disabled') &&
+		!dayElem.classList.contains('hidden')
+	)
 }
 
 function getRangeEdge(dayElem: RangeDayElement): RangeEdge | null {
@@ -294,11 +300,9 @@ function updateRangeDrag(event: PointerEvent) {
 	const nextDraggedTime = dateTime(state.edge === 'start' ? nextStartDate : nextEndDate)
 	if (nextDraggedTime === state.lastDateTime) return
 
-	if (dayElem.classList.contains('prevMonthDay') || dayElem.classList.contains('nextMonthDay')) {
-		intendedViewMonth.value = {
-			month: instance.currentMonth,
-			year: instance.currentYear,
-		}
+	intendedViewMonth.value = {
+		month: instance.currentMonth,
+		year: instance.currentYear,
 	}
 
 	state.lastDateTime = nextDraggedTime
@@ -337,6 +341,28 @@ function suppressRangeDragClick(event: MouseEvent) {
 	suppressNextRangeClick.value = false
 	event.preventDefault()
 	event.stopImmediatePropagation()
+}
+
+function syncSingleRangeHoverState(event: MouseEvent) {
+	const instance = picker.value
+	const dayElem = getRangeDayElement(event.target)
+	const selectedDate = instance?.selectedDates[0]
+
+	const isHoveringSelectedRangeDate =
+		props.mode === 'range' &&
+		instance?.selectedDates.length === 1 &&
+		selectedDate &&
+		dayElem?.dateObj &&
+		dateOnlyTime(dayElem.dateObj) === dateOnlyTime(selectedDate)
+
+	instance?.calendarContainer.classList.toggle(
+		'is-hovering-selected-range-date',
+		Boolean(isHoveringSelectedRangeDate),
+	)
+}
+
+function clearSingleRangeHoverState() {
+	picker.value?.calendarContainer.classList.remove('is-hovering-selected-range-date')
 }
 
 function isTimeInput(target: EventTarget | null): target is HTMLInputElement {
@@ -431,6 +457,9 @@ const resolvedDateFormat = computed(
 const resolvedAltFormat = computed(
 	() => props.altFormat ?? (props.enableTime ? 'F j, Y at h:i K' : 'F j, Y'),
 )
+const resolvedShowMonths = computed(() =>
+	Number.isFinite(props.showMonths) ? Math.max(1, Math.floor(props.showMonths)) : 1,
+)
 
 const inputClasses = computed(() => [
 	'w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow !outline-0',
@@ -458,6 +487,7 @@ watch(
 		props.maxDate,
 		props.enableTime,
 		props.mode,
+		props.showMonths,
 		props.dateFormat,
 		props.altFormat,
 		props.time24hr,
@@ -507,8 +537,18 @@ onMounted(async () => {
 			instance.calendarContainer.addEventListener('mousedown', stopRangeEndpointMouseEvent, true)
 			instance.calendarContainer.addEventListener('mouseup', stopRangeEndpointMouseEvent, true)
 			instance.calendarContainer.addEventListener('click', suppressRangeDragClick, true)
-			instance.calendarContainer.addEventListener('click', normalizeTimeInputForArrowIncrement, true)
-			instance.calendarContainer.addEventListener('keydown', normalizeTimeInputForKeyboardIncrement, true)
+			instance.calendarContainer.addEventListener('mouseover', syncSingleRangeHoverState)
+			instance.calendarContainer.addEventListener('mouseleave', clearSingleRangeHoverState)
+			instance.calendarContainer.addEventListener(
+				'click',
+				normalizeTimeInputForArrowIncrement,
+				true,
+			)
+			instance.calendarContainer.addEventListener(
+				'keydown',
+				normalizeTimeInputForKeyboardIncrement,
+				true,
+			)
 			instance.calendarContainer.addEventListener('beforeinput', preventNonNumericTimeInput, true)
 			instance.calendarContainer.addEventListener('keydown', preventNonNumericTimeKeydown, true)
 			instance.calendarContainer.addEventListener('input', sanitizeNumericTimeInput, true)
@@ -516,14 +556,18 @@ onMounted(async () => {
 			instance.calendarContainer.addEventListener('mousedown', (event) => {
 				if (props.mode !== 'range') return
 				const target = event.target as HTMLElement | null
-				const dayElem = target?.closest('.flatpickr-day')
+				const dayElem = target?.closest<RangeDayElement>('.flatpickr-day')
 				if (!dayElem) return
-				if (
+
+				if (resolvedShowMonths.value > 1) {
+					if (!isSelectableDay(dayElem)) return
+				} else if (
 					!dayElem.classList.contains('prevMonthDay') &&
 					!dayElem.classList.contains('nextMonthDay')
 				) {
 					return
 				}
+
 				intendedViewMonth.value = {
 					month: instance.currentMonth,
 					year: instance.currentYear,
@@ -631,6 +675,7 @@ function flatpickrOptions(): Options {
 		noCalendar: false,
 		nextArrow: chevronRightIcon,
 		prevArrow: chevronLeftIcon,
+		showMonths: resolvedShowMonths.value,
 		static: true,
 		time_24hr: props.time24hr,
 	}
@@ -687,11 +732,21 @@ defineExpose({
 	box-sizing: content-box;
 }
 
-.modrinth-date-picker :deep(.flatpickr-innerContainer),
-.modrinth-date-picker :deep(.flatpickr-rContainer),
-.modrinth-date-picker :deep(.flatpickr-days),
 .modrinth-date-picker :deep(.dayContainer) {
 	@apply max-w-[307.875px] min-w-[307.875px] w-[307.875px];
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-rContainer),
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-days) {
+	@apply max-w-none;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-days) {
+	overflow: visible;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .dayContainer + .dayContainer) {
+	box-shadow: none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar::before),
@@ -829,6 +884,10 @@ defineExpose({
 	@apply rounded-none border-transparent bg-transparent text-contrast shadow-none hover:rounded-none hover:border-transparent hover:bg-transparent;
 }
 
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-day.inRange) {
+	box-shadow: none !important;
+}
+
 .modrinth-date-picker :deep(.flatpickr-day.inRange::before),
 .modrinth-date-picker :deep(.flatpickr-day.startRange:not(.endRange)::before),
 .modrinth-date-picker :deep(.flatpickr-day.endRange:not(.startRange)::before) {
@@ -860,6 +919,14 @@ defineExpose({
 	right: -1px;
 }
 
+.modrinth-date-picker
+	:deep(
+		.flatpickr-calendar.is-hovering-selected-range-date
+			.flatpickr-day.selected.startRange:not(.endRange)::before
+	) {
+	background: transparent;
+}
+
 .modrinth-date-picker :deep(.flatpickr-day.startRange:nth-child(7n):not(.endRange)::before) {
 	@apply rounded-r-xl;
 	right: 0;
@@ -878,6 +945,33 @@ defineExpose({
 .modrinth-date-picker :deep(.flatpickr-day.endRange:nth-child(7n + 1):not(.startRange)::before) {
 	@apply rounded-l-xl;
 	left: 0;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-day.hidden::before) {
+	display: none;
+}
+
+.modrinth-date-picker
+	:deep(.flatpickr-calendar.multiMonth .flatpickr-day.hidden + .flatpickr-day.inRange::before),
+.modrinth-date-picker
+	:deep(
+		.flatpickr-calendar.multiMonth
+			.flatpickr-day.hidden
+			+ .flatpickr-day.endRange:not(.startRange)::before
+	) {
+	@apply rounded-l-xl;
+	left: 0;
+}
+
+.modrinth-date-picker
+	:deep(.flatpickr-calendar.multiMonth .flatpickr-day.inRange:has(+ .hidden)::before),
+.modrinth-date-picker
+	:deep(
+		.flatpickr-calendar.multiMonth
+			.flatpickr-day.startRange:not(.endRange):has(+ .hidden)::before
+	) {
+	@apply rounded-r-xl;
+	right: 0;
 }
 
 .modrinth-date-picker.can-drag-range
