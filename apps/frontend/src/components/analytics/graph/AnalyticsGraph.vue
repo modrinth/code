@@ -104,15 +104,13 @@
 					/>
 				</template>
 			</div>
-			<div
-				v-if="isDataLoading"
-				class="absolute inset-0 z-20 overflow-hidden rounded-xl"
-			>
+			<div v-if="isDataLoading" class="absolute inset-0 z-20 overflow-hidden rounded-xl">
 				<div class="absolute inset-0 bg-surface-3 opacity-50" />
 				<div class="absolute inset-0 backdrop-blur-[4px]" />
 				<div class="absolute inset-0 flex items-center justify-center">
-					<div class="relative bottom-6 inline-flex items-center gap-2 text-lg font-semibold text-primary">
-						<SpinnerIcon class="size-5 animate-spin" />
+					<div
+						class="relative bottom-6 inline-flex items-center gap-2 text-lg font-semibold text-primary"
+					>
 						<span>Fetching results...</span>
 					</div>
 				</div>
@@ -122,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon, SpinnerIcon } from '@modrinth/assets'
+import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
 import { Tabs, type TabsTab, useFormatNumber } from '@modrinth/ui'
 
 import type {

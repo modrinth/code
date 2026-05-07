@@ -63,15 +63,11 @@
 				<span>{{ formatInteger(row.playtime) }}</span>
 			</template>
 		</Table>
-		<div
-			v-if="isDataLoading"
-			class="absolute inset-0 z-10 overflow-hidden rounded-xl"
-		>
+		<div v-if="isDataLoading" class="absolute inset-0 z-10 overflow-hidden rounded-xl">
 			<div class="absolute inset-0 bg-surface-3 opacity-50" />
 			<div class="absolute inset-0 backdrop-blur-[4px]" />
 			<div class="absolute inset-0 flex h-full items-start justify-center pt-52">
 				<div class="inline-flex items-center gap-2 text-lg font-semibold text-primary opacity-100">
-					<SpinnerIcon class="size-6 animate-spin" />
 					<span>Fetching results...</span>
 				</div>
 			</div>
@@ -81,7 +77,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
+import { DownloadIcon } from '@modrinth/assets'
 import { ButtonStyled, Table, type TableColumn, useFormatNumber } from '@modrinth/ui'
 
 import {
