@@ -16,7 +16,6 @@ import {
 	BrowseInstallHeader,
 	BrowsePageLayout,
 	BrowseSidebar,
-	BrowseVersionChoiceModal,
 	CreationFlowModal,
 	defineMessages,
 	injectModrinthClient,
@@ -45,7 +44,6 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 const filtersMenuOpen = ref(false)
-const versionChoiceModalRef = ref<InstanceType<typeof BrowseVersionChoiceModal> | null>(null)
 
 const route = useRoute()
 
@@ -449,13 +447,6 @@ function preferencesDiffer(selected: InstallPreferences, target: InstallPreferen
 	)
 }
 
-function modalOptionFromPreferences(preferences: InstallPreferences) {
-	return {
-		gameVersion: preferences.gameVersions?.[0],
-		loader: preferences.loaders?.[0],
-	}
-}
-
 async function chooseServerInstallPreferences(
 	project: InstallableSearchResult,
 	contentType: ServerAddonInstallType,
@@ -469,25 +460,11 @@ async function chooseServerInstallPreferences(
 	const hasSelectedVersion = await resolveServerAddonVersion(project, contentType, selectedPreferences)
 		.then(() => true)
 		.catch(() => false)
-	const hasTargetVersion = await resolveServerAddonVersion(project, contentType, targetPreferences)
-		.then(() => true)
-		.catch(() => false)
-	if (!hasTargetVersion) {
-		return selectedPreferences
-	}
 	if (!hasSelectedVersion) {
 		return targetPreferences
 	}
 
-	const choice = await versionChoiceModalRef.value?.show({
-		projectName: project.title,
-		targetType: 'server',
-		selected: modalOptionFromPreferences(selectedPreferences),
-		target: modalOptionFromPreferences(targetPreferences),
-	})
-
-	if (!choice) return null
-	return choice === 'target' ? targetPreferences : selectedPreferences
+	return selectedPreferences
 }
 
 function clearQueuedServerInstalls() {
@@ -947,7 +924,6 @@ provideBrowseManager({
 				@browse-modpacks="() => {}"
 				@create="onModpackFlowCreate"
 			/>
-			<BrowseVersionChoiceModal ref="versionChoiceModalRef" />
 		</div>
 	</section>
 </template>

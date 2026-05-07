@@ -14,7 +14,6 @@ import type { CardAction, ProjectType, Tags } from '@modrinth/ui'
 import {
 	BrowsePageLayout,
 	BrowseSidebar,
-	BrowseVersionChoiceModal,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
@@ -58,7 +57,7 @@ import {
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress, isVersionCompatible } from '@/store/install.js'
+import { getServerAddress } from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -71,7 +70,6 @@ const debugLog = useDebugLogger('Browse')
 const router = useRouter()
 const route = useRoute()
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
-const versionChoiceModalRef = ref<InstanceType<typeof BrowseVersionChoiceModal> | null>(null)
 const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
 provideServerInstallContent(serverInstallContent)
 const {
@@ -834,19 +832,6 @@ function preferencesDiffer(selected: InstallPreferences, target: InstallPreferen
 	)
 }
 
-function modalOptionFromPreferences(preferences: InstallPreferences) {
-	return {
-		gameVersion: preferences.gameVersions?.[0],
-		loader: preferences.loaders?.[0],
-	}
-}
-
-function getProjectDisplayName(
-	project: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
-) {
-	return 'title' in project ? project.title : project.name
-}
-
 async function chooseServerInstallPreferences(
 	project: Labrinth.Search.v2.ResultSearchProject & Labrinth.Search.v3.ResultSearchProject,
 	projectTypeValue: ServerAddonProjectType,
@@ -864,30 +849,12 @@ async function chooseServerInstallPreferences(
 	)
 		.then(() => true)
 		.catch(() => false)
-	const hasTargetVersion = await getServerAddonInstallVersion(
-		project,
-		projectTypeValue,
-		targetPreferences,
-	)
-		.then(() => true)
-		.catch(() => false)
 
-	if (!hasTargetVersion) {
-		return selectedPreferences
-	}
 	if (!hasSelectedVersion) {
 		return targetPreferences
 	}
 
-	const choice = await versionChoiceModalRef.value?.show({
-		projectName: getProjectDisplayName(project),
-		targetType: 'server',
-		selected: modalOptionFromPreferences(selectedPreferences),
-		target: modalOptionFromPreferences(targetPreferences),
-	})
-
-	if (!choice) return null
-	return choice === 'target' ? targetPreferences : selectedPreferences
+	return selectedPreferences
 }
 
 async function findInstallVersion(
@@ -939,40 +906,17 @@ async function chooseInstanceInstallVersion(
 		return { versionId: null as string | null }
 	}
 
-	const projectData = await get_project(project.project_id, 'must_revalidate')
-	const versions = (await get_version_many(
-		projectData.versions,
-		'must_revalidate',
-	)) as Labrinth.Versions.v2.Version[]
-	const sortedVersions = versions.sort(
-		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-	)
-	const targetVersion = sortedVersions.find((version) =>
-		isVersionCompatible(version, projectData, targetInstance),
-	)
 	const selectedVersion = await findInstallVersion(
 		project.project_id,
 		projectTypeValue,
 		selectedPreferences,
 	)
 
-	if (!targetVersion) {
-		return { versionId: selectedVersion?.id ?? null }
-	}
 	if (!selectedVersion) {
 		return { versionId: null as string | null }
 	}
 
-	const choice = await versionChoiceModalRef.value?.show({
-		projectName: getProjectDisplayName(project),
-		targetType: 'instance',
-		selected: modalOptionFromPreferences(selectedPreferences),
-		target: modalOptionFromPreferences(targetPreferences),
-	})
-
-	if (!choice) return null
-	if (choice === 'target') return { versionId: null as string | null }
-	return { versionId: selectedVersion?.id ?? null }
+	return { versionId: selectedVersion.id }
 }
 
 function getCardActions(
@@ -1360,7 +1304,6 @@ provideBrowseManager({
 			@browse-modpacks="() => {}"
 			@create="handleServerModpackFlowCreate"
 		/>
-		<BrowseVersionChoiceModal ref="versionChoiceModalRef" />
 		<Teleport to="#sidebar-teleport-target">
 			<BrowseSidebar />
 		</Teleport>
