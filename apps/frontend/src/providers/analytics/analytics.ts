@@ -253,6 +253,16 @@ function isServerProject(project: ProjectTypeMetadata): boolean {
 	return project.project_types?.includes(MINECRAFT_JAVA_SERVER_PROJECT_TYPE) ?? false
 }
 
+function isDraftProject(project: { status?: string | null }): boolean {
+	return project.status === 'draft'
+}
+
+function isAnalyticsEligibleProject(
+	project: ProjectTypeMetadata & { status?: string | null },
+): boolean {
+	return !isServerProject(project) && !isDraftProject(project)
+}
+
 function sortStringValues(values: string[]): string[] {
 	return [...values].sort((left, right) => left.localeCompare(right))
 }
@@ -696,14 +706,14 @@ export function createAnalyticsDashboardContext(
 	const projects = computed<AnalyticsDashboardProject[]>(() => {
 		if (hasProjectContext.value && options.projectPageContext) {
 			const project = options.projectPageContext.projectV2.value
-			return project && !isServerProject(project)
+			return project && isAnalyticsEligibleProject(project)
 				? [{ id: project.id, name: project.title, downloads: project.downloads ?? 0 }]
 				: []
 		}
 
 		if (hasOrganizationContext.value && options.organizationContext?.projects.value) {
 			return options.organizationContext.projects.value
-				.filter((project) => !isServerProject(project))
+				.filter((project) => isAnalyticsEligibleProject(project))
 				.map((project) => ({
 					id: project.id,
 					name: project.name,
@@ -712,7 +722,7 @@ export function createAnalyticsDashboardContext(
 		}
 
 		return (userProjects.value ?? [])
-			.filter((project) => !isServerProject(project))
+			.filter((project) => isAnalyticsEligibleProject(project))
 			.map((project) => ({
 				id: project.id,
 				name: project.title,
