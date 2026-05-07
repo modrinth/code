@@ -1,4 +1,5 @@
 use crate::state::CacheBehaviour;
+use crate::util::fetch::DownloadReason;
 use crate::{
     LoadingBarType,
     event::{
@@ -162,7 +163,8 @@ async fn replace_managed_modrinth(
                 profile.name.clone(),
                 None,
                 profile_path.to_string(),
-                Some(shared_loading_bar.clone())
+                Some(shared_loading_bar.clone()),
+                DownloadReason::Update,
             ),
             generate_pack_from_version_id(
                 project_id.clone(),
@@ -170,7 +172,8 @@ async fn replace_managed_modrinth(
                 profile.name.clone(),
                 None,
                 profile_path.to_string(),
-                Some(shared_loading_bar)
+                Some(shared_loading_bar),
+                DownloadReason::Update,
             )
         )?
     } else {
@@ -182,6 +185,7 @@ async fn replace_managed_modrinth(
             None,
             profile_path.to_string(),
             None,
+            DownloadReason::Update,
         )
         .await?;
         old_pack_creator.description.existing_loading_bar = None;
@@ -205,6 +209,7 @@ async fn replace_managed_modrinth(
     pack::install_mrpack::install_zipped_mrpack_files(
         new_pack_creator,
         ignore_lock,
+        DownloadReason::Update,
     )
     .await?;
 

@@ -1,58 +1,60 @@
-![Modrinth Monorepo Cover](/.github/assets/monorepo_cover.png)
-
 # @modrinth/api-client
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-c78aff?style=for-the-badge)](https://www.typescriptlang.org/)
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-c78aff?style=for-the-badge)](LICENSE)
+[![License: LGPL-3.0](https://img.shields.io/badge/License-LGPL%203.0-c78aff?style=for-the-badge)](LICENSE)
 
-A flexible, type-safe API client for Modrinth's APIs (Labrinth, Kyros & Archon). Works across Node.js, browsers, Nuxt, and Tauri with a feature system for authentication, retries, circuit breaking and other custom processing of requests and responses.
+Platform-agnostic TypeScript client for Modrinth's API across Node.js, browsers, Nuxt, and Tauri.
+
+**⚠️ We use this internally to power modrinth.com, Modrinth App, and Modrinth Hosting frontends. It may break without any notice, but you are welcome to use it.**
 
 ## Installation
 
 ```bash
 pnpm add @modrinth/api-client
-# or
-npm install @modrinth/api-client
-# or
-yarn add @modrinth/api-client
+```
+
+Tauri apps also need the optional peer dependency:
+
+```bash
+pnpm add @modrinth/api-client @tauri-apps/plugin-http
 ```
 
 ## Usage
 
-### Plain JavaScript/Node.js
+### Generic Node.js or Browser Client
 
-```typescript
-import { GenericModrinthClient, AuthFeature, ProjectV2 } from '@modrinth/api-client'
+```ts
+import { AuthFeature, GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
 
 const client = new GenericModrinthClient({
 	userAgent: 'my-app/1.0.0',
 	features: [new AuthFeature({ token: 'mrp_...' })],
 })
 
-// Explicitly make a request using client.request
-const project: any = await client.request('/project/sodium', { api: 'labrinth', version: 2 })
+const project: Labrinth.Projects.v2.Project = await client.labrinth.projects_v2.get('sodium')
+const members = await client.labrinth.projects_v3.getMembers(project.id)
+```
 
-// Example for archon (Modrinth Hosting)
-const servers = await client.request('/servers?limit=10', { api: 'archon', version: 0 })
+You can still make direct requests through the same platform layer:
 
-// Or use the provided wrappers for better type support.
-const project: ProjectV2 = await client.projects_v2.get('sodium')
+```ts
+const project = await client.request<Labrinth.Projects.v2.Project>('/project/sodium', {
+	api: 'labrinth',
+	version: 2,
+})
 ```
 
 ### Nuxt
 
-```typescript
-import { NuxtModrinthClient, AuthFeature, NuxtCircuitBreakerStorage } from '@modrinth/api-client'
+```ts
+import { AuthFeature, CircuitBreakerFeature, NuxtCircuitBreakerStorage, NuxtModrinthClient } from '@modrinth/api-client'
 
-// Alternatively you can create a singleton of the client and provide it via DI.
-export const useModrinthClient = () => {
+export const useModrinthClient = async () => {
 	const config = useRuntimeConfig()
-
-	// example using the useAuth composable from our frontend, replace this with whatever you're using to store auth token
 	const auth = await useAuth()
 
 	return new NuxtModrinthClient({
-		userAgent: 'my-nuxt-app/1.0.0', // leave blank to use default user agent from fetch function
+		userAgent: 'my-nuxt-app/1.0.0',
 		rateLimitKey: import.meta.server ? config.rateLimitKey : undefined,
 		features: [
 			new AuthFeature({
@@ -64,16 +66,13 @@ export const useModrinthClient = () => {
 		],
 	})
 }
-
-const client = useModrinthClient()
-const project = await client.request('/project/sodium', { api: 'labrinth', version: 2 })
 ```
 
 ### Tauri
 
-```typescript
-import { TauriModrinthClient, AuthFeature } from '@modrinth/api-client'
+```ts
 import { getVersion } from '@tauri-apps/api/app'
+import { AuthFeature, TauriModrinthClient } from '@modrinth/api-client'
 
 const version = await getVersion()
 const client = new TauriModrinthClient({
@@ -81,99 +80,100 @@ const client = new TauriModrinthClient({
 	features: [new AuthFeature({ token: 'mrp_...' })],
 })
 
-const project = await client.request('/project/sodium', { api: 'labrinth', version: 2 })
+const project = await client.labrinth.projects_v2.get('sodium')
 ```
 
-### Overriding Base URLs
+## API Modules
 
-By default, the client uses the production base URLs:
+Modules are available as nested properties on the client:
 
-- `labrinthBaseUrl`: `https://api.modrinth.com/` (Labrinth API)
-- `archonBaseUrl`: `https://archon.modrinth.com/` (Archon/Servers API)
+```ts
+client.labrinth.projects_v2
+client.labrinth.projects_v3
+client.labrinth.versions_v3
+```
 
-You can override these for staging environments or custom instances:
+Types are exported from the package root:
 
-```typescript
+```ts
+import type { Labrinth } from '@modrinth/api-client'
+
+const project: Labrinth.Projects.v3.Project = await client.labrinth.projects_v3.get('sodium')
+```
+
+## Modrinth Hosting API Modules
+
+- These modules are internal to Modrinth and are only supported inside the Modrinth Hosting panel in Modrinth App and on modrinth.com. They should not be expected to work in third-party clients today. We are discussing how to safely expose access to your own server through these APIs in the future.
+
+## Base URLs
+
+By default, the client uses Modrinth production services:
+
+- `labrinthBaseUrl`: `https://api.modrinth.com`
+
+Override them for staging or custom deployments:
+
+```ts
 const client = new GenericModrinthClient({
 	userAgent: 'my-app/1.0.0',
-	labrinthBaseUrl: 'https://staging-api.modrinth.com/',
-	archonBaseUrl: 'https://staging-archon.modrinth.com/',
-	features: [new AuthFeature({ token: 'mrp_...' })],
+	labrinthBaseUrl: 'https://staging-api.modrinth.com',
 })
-
-// Now requests will use the staging URLs
-await client.request('/project/sodium', { api: 'labrinth', version: 2 })
-// -> https://staging-api.modrinth.com/v2/project/sodium
 ```
 
-You can also use custom URLs directly in requests:
+External APIs can be targeted per request by passing a full URL as `api` and disabling auth:
 
-```typescript
-// One-off custom URL (useful for Kyros nodes or dynamic endpoints)
-await client.request('/some-endpoint', {
-	api: 'https://eu-lim16.nodes.modrinth.com/',
-	version: 0,
+```ts
+await client.request('/endpoint', {
+	api: 'https://example.com',
+	version: 1,
+	skipAuth: true,
 })
 ```
 
 ## Features
 
-### Authentication
+Features wrap requests before they reach the platform implementation:
 
-Supports both static and dynamic tokens:
+```ts
+import { AuthFeature, CircuitBreakerFeature, RetryFeature } from '@modrinth/api-client'
 
-```typescript
-// Static token
-new AuthFeature({ token: 'mrp_...' })
-
-// Dynamic token (e.g., from auth state)
-const auth = await useAuth()
-new AuthFeature({
-	token: async () => auth.value.token,
+const client = new GenericModrinthClient({
+	features: [new AuthFeature({ token: async () => getToken() }), new RetryFeature({ maxAttempts: 3, backoffStrategy: 'exponential' }), new CircuitBreakerFeature({ maxFailures: 3, resetTimeout: 30_000 })],
 })
 ```
 
-### Retry
+Built-in features include authentication, node auth, retries, circuit breaking, panel version headers, and verbose logging.
 
-Automatically retries failed requests with configurable backoff:
+## Uploads
 
-```typescript
-new RetryFeature({
-	maxAttempts: 3,
-	backoffStrategy: 'exponential',
-	initialDelay: 1000,
-	maxDelay: 15000,
+Upload endpoints return an `UploadHandle<T>` with progress and cancellation support:
+
+```ts
+const upload = client.kyros.files_v0.uploadFile(path, file)
+
+upload.onProgress(({ progress }) => {
+	console.log(Math.round(progress * 100))
 })
+
+await upload.promise
 ```
 
-### Circuit Breaker
+Uploads use `XMLHttpRequest` for progress tracking and are only available in browser-capable contexts. `NuxtModrinthClient.upload()` throws during SSR.
 
-Prevents cascade failures by opening circuits after repeated failures:
+## Third-Party API Typings
 
-```typescript
-new CircuitBreakerFeature({
-	maxFailures: 3,
-	resetTimeout: 30000,
-	failureStatusCodes: [500, 502, 503, 504],
-})
+- This package also includes some third-party API modules and typings used by Modrinth internals. They are not part of the stable public API surface and should be used at your own risk.
+
+## Development
+
+```bash
+pnpm --filter @modrinth/api-client build
+pnpm --filter @modrinth/api-client lint
+# or pnpm prepr:frontend:lib in turborepo root.
 ```
 
-## Documentation
-
-This package is **self-documenting** through TypeScript types and JSDoc comments. Use your IDE's IntelliSense to explore available methods, classes, and configuration options.
-
-For Modrinth API endpoints and routes, refer to the [Modrinth API Documentation](https://docs.modrinth.com).
-
-## Contributing
-
-- Modules are available in the `modules/<api>/...` folders.
-  - When a module has different versions available, you should do it like so: `modules/labrinth/projects/v2.ts` etc.
-  - Types for a module's requests should be made available in `modules/<api>/module/types.ts` or `.../types/v2.ts`.
-  - You should expose these types in the `modules/types.ts` file.
-- When creating a new module, add it to the `modules/index.ts`'s `MODULE_REGISTRY` for it to become available in the api client class.
-
-Dont forget to run `pnpm fix` before committing.
+When adding a module, add it to `src/modules/index.ts` so it is included in the typed client structure.
 
 ## License
 
-Licensed under GPL-3.0 - see the [LICENSE](LICENSE) file for details.
+Licensed under LGPL-3.0. See [LICENSE](LICENSE).

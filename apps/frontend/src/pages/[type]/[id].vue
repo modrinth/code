@@ -2274,9 +2274,9 @@ const hasEditDetailsPermission = computed(() => {
 })
 
 watch(
-	[isSettings, currentMember],
+	[isSettings, allMembers, canAccessSettings],
 	() => {
-		if (isSettings.value && !canAccessSettings.value) {
+		if (isSettings.value && allMembers.value.length > 0 && !canAccessSettings.value) {
 			showError({
 				fatal: true,
 				statusCode: 401,
@@ -2317,6 +2317,18 @@ const canCreateServerFrom = computed(() => {
 	return project.value.project_type === 'modpack' && project.value.server_side !== 'unsupported'
 })
 
+const createCanonicalUrl = () =>
+	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
+
+useHead({
+	link: [
+		{
+			rel: 'canonical',
+			href: createCanonicalUrl,
+		},
+	],
+})
+
 if (!route.name.startsWith('type-id-settings')) {
 	useSeoMeta({
 		title: () => title.value,
@@ -2324,6 +2336,7 @@ if (!route.name.startsWith('type-id-settings')) {
 		ogTitle: () => title.value,
 		ogDescription: () => project.value?.description ?? '',
 		ogImage: () => project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+		ogUrl: createCanonicalUrl,
 		robots: () =>
 			project.value?.status === 'approved' || project.value?.status === 'archived'
 				? 'all'
@@ -2332,6 +2345,7 @@ if (!route.name.startsWith('type-id-settings')) {
 } else {
 	useSeoMeta({
 		robots: 'noindex',
+		ogUrl: createCanonicalUrl,
 	})
 }
 

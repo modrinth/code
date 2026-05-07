@@ -9,7 +9,7 @@ import { XHRUploadClient } from './xhr-upload-client'
 /**
  * Generic platform client using ofetch
  *
- * This client works in any JavaScript environment (Node.js, browser, workers).
+ * This client works in any JavaScript environment (Node.js, browser, workers, etc).
  *
  * @example
  * ```typescript
