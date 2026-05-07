@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n\t\tselect group_id, name from project_attribution_files\n\t\twhere sha1 = $1\n\t\t",
+  "query": "\n\t\tselect paf.group_id, paf.name from project_attribution_files paf\n\t\tinner join project_attribution_groups pag on pag.id = paf.group_id\n\t\twhere paf.sha1 = $1 and pag.project_id = $2\n\t\t",
   "describe": {
     "columns": [
       {
@@ -16,7 +16,8 @@
     ],
     "parameters": {
       "Left": [
-        "Bytea"
+        "Bytea",
+        "Int8"
       ]
     },
     "nullable": [
@@ -24,5 +25,5 @@
       false
     ]
   },
-  "hash": "083340292899d383a307700ada8bb51d2f23aacd5fb04819906875bd3851feb7"
+  "hash": "ce9b408d416b4782ad501e14cb1ff006964818e81855bb299b269ffaa4c3f7fa"
 }

@@ -823,7 +823,7 @@ pub enum ApprovalType {
 }
 
 impl ApprovalType {
-    fn approved(&self) -> bool {
+    pub fn approved(&self) -> bool {
         match self {
             ApprovalType::Yes => true,
             ApprovalType::WithAttributionAndSource => true,

@@ -22,6 +22,11 @@ create index on project_attribution_groups (project_id);
 create table project_attribution_files (
 	group_id bigint not null references project_attribution_groups(id),
 	name text not null,
+	sha1 bytea not null
+);
+
+create table override_file_sources (
 	sha1 bytea not null,
-	unique (sha1)
+	file_id bigint not null references files(id),
+	primary key (sha1, file_id)
 );

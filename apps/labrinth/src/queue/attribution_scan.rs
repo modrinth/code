@@ -81,6 +81,7 @@ pub async fn scan_all_file_override_attributions(
 
                 persist_attribution_results(
                     row.project_id,
+                    file_id,
                     &overrides,
                     &resolved,
                     &mut txn,
@@ -144,7 +145,7 @@ pub async fn scan_file_override_attributions(
                 eyre!("resolving overrides for file {file_id:?}")
             })?;
 
-        persist_attribution_results(project_id, &overrides, &resolved, txn)
+        persist_attribution_results(project_id, file_id, &overrides, &resolved, txn)
             .await
             .wrap_err_with(|| {
                 eyre!("persisting attribution results for file {file_id:?}")
@@ -263,21 +264,24 @@ fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
 
 async fn persist_attribution_results(
     project_id: DBProjectId,
+    file_id: DBFileId,
     overrides: &[OverrideFile],
     resolved: &HashMap<String, OverrideResolution>,
     txn: &mut PgTransaction<'_>,
 ) -> Result<()> {
-    let existing_sha1s: Vec<Vec<u8>> = overrides
+    let all_sha1s: Vec<Vec<u8>> = overrides
         .iter()
         .map(|f| f.sha1.as_bytes().to_vec())
         .collect();
 
     let already_persisted: Vec<Vec<u8>> = sqlx::query_scalar!(
         "
-        select sha1 from project_attribution_files
-        where sha1 = ANY($1)
+        select paf.sha1 from project_attribution_files paf
+        inner join project_attribution_groups pag on pag.id = paf.group_id
+        where pag.project_id = $1 and paf.sha1 = ANY($2)
         ",
-        &existing_sha1s,
+        project_id as DBProjectId,
+        &all_sha1s,
     )
     .fetch_all(&mut *txn)
     .await
@@ -297,9 +301,11 @@ async fn persist_attribution_results(
 
         match resolved.get(&file.sha1) {
             Some(OverrideResolution::OnModrinth) => continue,
-            Some(OverrideResolution::ExternalLicense(_)) => {
-                // TODO: handle external license attribution
-                continue;
+            Some(OverrideResolution::ExternalLicense(approval)) => {
+                if approval.approved() {
+                    continue;
+                }
+                unknown_files.push(file);
             }
             Some(OverrideResolution::Flame {
                 project_id: fp_id,
@@ -399,6 +405,21 @@ async fn persist_attribution_results(
         .execute(&mut *txn)
         .await
         .wrap_err("inserting unknown attribution file")?;
+    }
+
+    if !all_sha1s.is_empty() {
+        sqlx::query!(
+            "
+            insert into override_file_sources (sha1, file_id)
+            select unnest($1::bytea[]), $2
+            on conflict do nothing
+            ",
+            &all_sha1s,
+            file_id as DBFileId,
+        )
+        .execute(&mut *txn)
+        .await
+        .wrap_err("inserting override file sources")?;
     }
 
     Ok(())
