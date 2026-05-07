@@ -2,7 +2,8 @@
 	<div
 		v-show="visible"
 		ref="tooltipElement"
-		class="analytics-chart-tooltip pointer-events-none absolute left-0 top-0 z-10 min-w-[14rem] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-2 text-sm shadow-lg"
+		class="analytics-chart-tooltip absolute left-0 top-0 z-10 max-h-[360px] min-w-[14rem] overflow-y-auto rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-2 text-sm shadow-lg"
+		:class="pinned ? '' : 'pointer-events-none'"
 		:style="positionStyle"
 	>
 		<div class="mb-1 flex items-center justify-between gap-2 font-medium text-contrast">
@@ -13,6 +14,10 @@
 				class="pointer-events-auto size-4 shrink-0 font-normal text-contrast"
 				aria-label="Pinned"
 			/>
+		</div>
+		<div class="mb-1.5 flex items-center justify-between gap-4">
+			<span class="font-medium text-primary">Total</span>
+			<span class="font-semibold text-contrast">{{ formattedTotal }}</span>
 		</div>
 		<div class="flex flex-col gap-1">
 			<div
@@ -45,6 +50,7 @@ const props = defineProps<{
 	x: number
 	y: number
 	rangeLabel: string
+	formattedTotal: string
 	entries: AnalyticsChartTooltipEntry[]
 	containerWidth: number
 	containerHeight: number

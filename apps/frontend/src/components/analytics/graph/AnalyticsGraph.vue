@@ -57,7 +57,7 @@
 			</div>
 		</div>
 
-		<div ref="chartContainer" class="relative h-96" @click="onChartClick">
+		<div ref="chartContainer" class="relative h-[420px]" @click="onChartClick">
 			<div
 				:class="[
 					'h-full transition-opacity',
@@ -97,6 +97,7 @@
 						:x="hoverState.x"
 						:y="hoverState.y"
 						:range-label="hoverRangeLabel"
+						:formatted-total="hoverFormattedTotal"
 						:entries="hoverEntries"
 						:container-width="containerSize.width"
 						:container-height="containerSize.height"
@@ -481,6 +482,19 @@ const hoverRangeLabel = computed(() => {
 		showYearInBucketLabel.value,
 	)
 })
+
+const hoverTotalValue = computed(() => {
+	if (hoverState.sliceIndex === null) return 0
+	const sliceIndex = hoverState.sliceIndex
+	return visibleChartDatasets.value.reduce(
+		(sum, dataset) => sum + (dataset.data[sliceIndex] ?? 0),
+		0,
+	)
+})
+
+const hoverFormattedTotal = computed(() =>
+	formatMetricValue(hoverTotalValue.value, activeStat.value, formatNumber),
+)
 
 const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 	if (hoverState.sliceIndex === null) return []
