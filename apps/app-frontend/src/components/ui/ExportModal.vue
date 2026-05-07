@@ -1,5 +1,5 @@
 <script setup>
-import { DropdownIcon, WrenchIcon,XIcon } from '@modrinth/assets'
+import { WrenchIcon,XIcon } from '@modrinth/assets'
 import {
     Accordion,
 	ButtonStyled,
