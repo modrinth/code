@@ -140,7 +140,7 @@ async function clearQueued() {
 					</div>
 					<div class="h-[18px] w-px bg-surface-5" />
 					<ButtonStyled type="transparent">
-						<button type="button" @click="clearQueued">Clear</button>
+						<button type="button" class="-ml-2 mr-1" @click="clearQueued">Clear</button>
 					</ButtonStyled>
 				</div>
 			</div>
