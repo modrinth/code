@@ -78,7 +78,7 @@ function resetEnvironment() {
 }
 
 function saveEnvironment() {
-	let shouldVerify = !!needsToVerify.value
+	const shouldVerify = !!needsToVerify.value
 	environmentMigration.value?.save()
 	if (shouldVerify) {
 		hide()
