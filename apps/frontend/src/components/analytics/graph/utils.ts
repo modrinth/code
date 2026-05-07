@@ -260,7 +260,7 @@ export function buildTimeAxisLabels(
 	const totalMs = endMs - startMs
 	const bucketMs = sliceCount > 0 ? totalMs / sliceCount : 0
 	const includeTime = isTimeRelevantForGroupBy(groupBy)
-	const includeYear = groupBy === 'year'
+	const includeYear = isYearRelevantForTimeRange(timeRange) || groupBy === 'year'
 
 	const dates: Date[] = []
 	const dateKeys: string[] = []
@@ -304,11 +304,19 @@ export function isTimeRelevantForGroupBy(groupBy: AnalyticsGroupByPreset): boole
 	return groupBy === '1h' || groupBy === '6h'
 }
 
-export function formatBucketEndLabel(end: Date, includeTime: boolean): string {
+export function isYearRelevantForTimeRange(timeRange: Labrinth.Analytics.v3.TimeRange): boolean {
+	const startYear = new Date(timeRange.start).getFullYear()
+	const endYear = new Date(timeRange.end).getFullYear()
+
+	return startYear !== endYear
+}
+
+export function formatBucketEndLabel(end: Date, includeTime: boolean, includeYear = false): string {
 	if (includeTime) {
 		return new Intl.DateTimeFormat(undefined, {
 			month: 'short',
 			day: 'numeric',
+			...(includeYear ? { year: 'numeric' } : {}),
 			hour: 'numeric',
 			minute: '2-digit',
 		}).format(end)
@@ -317,6 +325,7 @@ export function formatBucketEndLabel(end: Date, includeTime: boolean): string {
 	return new Intl.DateTimeFormat(undefined, {
 		month: 'short',
 		day: 'numeric',
+		...(includeYear ? { year: 'numeric' } : {}),
 	}).format(end)
 }
 

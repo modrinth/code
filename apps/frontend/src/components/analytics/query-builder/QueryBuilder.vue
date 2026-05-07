@@ -82,6 +82,7 @@
 							:threshold="projectDownloadsThreshold"
 							input-width-class="w-20"
 							@update:threshold="setProjectDownloadsThreshold"
+							@submit="runProjectDownloadsThresholdQuery"
 						/>
 					</template>
 				</MultiSelect>
@@ -193,6 +194,7 @@ const {
 	selectedGroupBy,
 	selectedBreakdown,
 	selectedFilters,
+	refreshAnalyticsQuery,
 	setFetchRequest,
 } = injectAnalyticsDashboardContext()
 const { selectedTimeRange, selectedTimeframeDurationMinutes } = useSelectedAnalyticsTimeRange()
@@ -267,6 +269,12 @@ function handleProjectSelectClose(
 	nextSelectedProjectIds: string[] = draftSelectedProjectIds.value,
 ) {
 	isProjectSelectOpen.value = false
+	commitDraftSelectedProjects(nextSelectedProjectIds)
+}
+
+function commitDraftSelectedProjects(
+	nextSelectedProjectIds: string[] = draftSelectedProjectIds.value,
+) {
 	const nextProjectIds = normalizeProjectSelection(nextSelectedProjectIds)
 
 	draftSelectedProjectIds.value = [...nextProjectIds]
@@ -305,6 +313,29 @@ function applyProjectDownloadsThreshold(threshold: number | null) {
 function setProjectDownloadsThreshold(threshold: number | null) {
 	projectDownloadsThreshold.value = threshold
 	applyProjectDownloadsThreshold(threshold)
+}
+
+function closeProjectSelectDropdown(event: KeyboardEvent) {
+	const eventTarget = event.target
+	if (!(eventTarget instanceof HTMLElement)) {
+		isProjectSelectOpen.value = false
+		return
+	}
+
+	const dropdown = eventTarget.closest('[role="listbox"][aria-multiselectable="true"]')
+	if (!dropdown) {
+		isProjectSelectOpen.value = false
+		return
+	}
+
+	dropdown.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+}
+
+async function runProjectDownloadsThresholdQuery(event: KeyboardEvent) {
+	commitDraftSelectedProjects()
+	closeProjectSelectDropdown(event)
+	await nextTick()
+	await refreshAnalyticsQuery()
 }
 
 const groupByPresetOptions: Array<{
@@ -351,11 +382,16 @@ function getGroupByMinutes(preset: AnalyticsGroupByPreset): number {
 }
 
 const groupByOptions = computed<ComboboxOption<AnalyticsGroupByPreset>[]>(() => {
-	const options = groupByPresetOptions.map((option) => ({
-		value: option.value,
-		label: option.label,
-		disabled: option.minutes >= selectedTimeframeDurationMinutes.value,
-	}))
+	const timeframeMinutes = selectedTimeframeDurationMinutes.value
+	const options = groupByPresetOptions.map((option) => {
+		const isTooCoarse = option.minutes >= timeframeMinutes
+		const isTooFine = timeframeMinutes / option.minutes > MAX_TIME_SLICES
+		return {
+			value: option.value,
+			label: option.label,
+			disabled: isTooCoarse || isTooFine,
+		}
+	})
 
 	if (options.every((option) => option.disabled)) {
 		options[0].disabled = false
@@ -372,8 +408,7 @@ watch(
 			return
 		}
 
-		const fallbackOption =
-			[...nextOptions].reverse().find((option) => !option.disabled) ?? nextOptions[0]
+		const fallbackOption = nextOptions.find((option) => !option.disabled) ?? nextOptions[0]
 		if (fallbackOption && selectedGroupBy.value !== fallbackOption.value) {
 			selectedGroupBy.value = fallbackOption.value
 		}

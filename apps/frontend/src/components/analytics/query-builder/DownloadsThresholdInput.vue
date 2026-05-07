@@ -12,6 +12,7 @@
 			:class="props.inputWidthClass"
 			:aria-label="props.inputAriaLabel"
 			@blur="formatInput"
+			@keydown.enter.prevent.stop="submitInput"
 		/>
 		<span class="shrink-0 text-sm font-semibold text-primary">{{ props.suffix }}</span>
 	</div>
@@ -34,6 +35,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	'update:threshold': [threshold: number | null]
+	submit: [event: KeyboardEvent]
 }>()
 
 const inputValue = ref('')
@@ -87,6 +89,20 @@ function formatInput() {
 	}
 
 	inputValue.value = formatCompactNumber(threshold)
+}
+
+function submitInput(event: KeyboardEvent) {
+	const threshold = parseDownloadsThreshold(inputValue.value)
+	if (threshold === undefined) {
+		return
+	}
+
+	if (threshold !== null) {
+		inputValue.value = formatCompactNumber(threshold)
+	}
+
+	emit('update:threshold', threshold)
+	emit('submit', event)
 }
 
 watch(inputValue, (value) => {

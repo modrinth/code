@@ -32,6 +32,7 @@
 					:active="draftSelectedTimeframeMode === 'last'"
 					:unit-options="lastTimeframeUnitOptions"
 					@activate="draftSelectedTimeframeMode = 'last'"
+					@submit="runCustomTimeframeQuery"
 				/>
 				<button
 					type="button"
@@ -49,6 +50,7 @@
 import { Combobox, type ComboboxOption } from '@modrinth/ui'
 
 import {
+	type AnalyticsGroupByPreset,
 	type AnalyticsLastTimeframeUnit,
 	type AnalyticsTimeframeMode,
 	type AnalyticsTimeframePreset,
@@ -58,8 +60,10 @@ import {
 import CustomRangeTimeframe from './CustomRangeTimeframe.vue'
 import CustomTimeframe from './CustomTimeframe.vue'
 import {
+	ensureMinimumTimeRange,
 	getAnalyticsTimeRange,
 	getDateInputValue,
+	getDefaultAnalyticsGroupByForDurationMinutes,
 	getInclusiveEndDateInputValue,
 } from './timeframe'
 
@@ -81,7 +85,9 @@ const {
 	selectedLastTimeframeUnit,
 	selectedCustomTimeframeStartDate,
 	selectedCustomTimeframeEndDate,
+	selectedGroupBy,
 	queryRefreshTimestamp,
+	refreshAnalyticsQuery,
 } = injectAnalyticsDashboardContext()
 
 const isTimeframeSelectOpen = ref(false)
@@ -92,6 +98,7 @@ const draftSelectedLastTimeframeAmount = ref(selectedLastTimeframeAmount.value)
 const draftSelectedLastTimeframeUnit = ref(selectedLastTimeframeUnit.value)
 const draftSelectedCustomTimeframeStartDate = ref(selectedCustomTimeframeStartDate.value)
 const draftSelectedCustomTimeframeEndDate = ref(selectedCustomTimeframeEndDate.value)
+const draftSelectedGroupBy = ref(selectedGroupBy.value)
 
 const timeframeOptions: ComboboxOption<AnalyticsTimeframePreset>[] = [
 	{ value: 'today', label: 'Today' },
@@ -132,6 +139,17 @@ const lastTimeframeValueByPreset: Partial<
 	last_30_days: { amount: 30, unit: 'days' },
 	last_90_days: { amount: 90, unit: 'days' },
 	last_180_days: { amount: 180, unit: 'days' },
+}
+
+const defaultGroupByForPreset: Partial<Record<AnalyticsTimeframePreset, AnalyticsGroupByPreset>> = {
+	today: '1h',
+	yesterday: '1h',
+	last_7_days: '6h',
+	last_14_days: '6h',
+	last_30_days: 'day',
+	last_90_days: 'day',
+	last_180_days: 'week',
+	year_to_date: 'week',
 }
 
 const timeframeDropdownOptions = computed<ComboboxOption<AnalyticsTimeframePreset>[]>(() =>
@@ -241,6 +259,7 @@ function resetTimeframeDraft() {
 	draftSelectedLastTimeframeUnit.value = selectedLastTimeframeUnit.value
 	draftSelectedCustomTimeframeStartDate.value = selectedCustomTimeframeStartDate.value
 	draftSelectedCustomTimeframeEndDate.value = selectedCustomTimeframeEndDate.value
+	draftSelectedGroupBy.value = selectedGroupBy.value
 }
 
 function commitTimeframeDraft() {
@@ -250,6 +269,7 @@ function commitTimeframeDraft() {
 	selectedLastTimeframeUnit.value = draftSelectedLastTimeframeUnit.value
 	selectedCustomTimeframeStartDate.value = draftSelectedCustomTimeframeStartDate.value
 	selectedCustomTimeframeEndDate.value = draftSelectedCustomTimeframeEndDate.value
+	selectedGroupBy.value = draftSelectedGroupBy.value
 }
 
 function handleTimeframeSelectOpen() {
@@ -261,6 +281,29 @@ function handleTimeframeSelectOpen() {
 function handleTimeframeSelectClose() {
 	commitTimeframeDraft()
 	isTimeframeSelectOpen.value = false
+}
+
+function closeTimeframeSelectDropdown(event: KeyboardEvent) {
+	const eventTarget = event.target
+	if (!(eventTarget instanceof HTMLElement)) {
+		isTimeframeSelectOpen.value = false
+		return
+	}
+
+	const dropdown = eventTarget.closest('[role="listbox"], [role="menu"]')
+	if (!dropdown) {
+		isTimeframeSelectOpen.value = false
+		return
+	}
+
+	dropdown.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+}
+
+async function runCustomTimeframeQuery(event: KeyboardEvent) {
+	commitTimeframeDraft()
+	closeTimeframeSelectDropdown(event)
+	await nextTick()
+	await refreshAnalyticsQuery()
 }
 
 function handleTimeframeModelUpdate(value: AnalyticsTimeframePreset | undefined) {
@@ -277,6 +320,7 @@ watch(
 		selectedLastTimeframeUnit,
 		selectedCustomTimeframeStartDate,
 		selectedCustomTimeframeEndDate,
+		selectedGroupBy,
 	],
 	() => {
 		if (isTimeframeSelectOpen.value) {
@@ -288,14 +332,46 @@ watch(
 )
 
 function handleTimeframePresetSelect(option: ComboboxOption<AnalyticsTimeframePreset>) {
+	draftSelectedTimeframeMode.value = 'preset'
+
 	const lastTimeframeValue = lastTimeframeValueByPreset[option.value]
 	if (lastTimeframeValue) {
 		draftSelectedLastTimeframeAmount.value = lastTimeframeValue.amount
 		draftSelectedLastTimeframeUnit.value = lastTimeframeValue.unit
 	}
 
-	draftSelectedTimeframeMode.value = 'preset'
+	const defaultGroupBy = defaultGroupByForPreset[option.value]
+	if (defaultGroupBy) {
+		draftSelectedGroupBy.value = defaultGroupBy
+	}
 }
+
+watch(
+	[
+		draftSelectedTimeframeMode,
+		draftSelectedLastTimeframeAmount,
+		draftSelectedLastTimeframeUnit,
+		draftSelectedCustomTimeframeStartDate,
+		draftSelectedCustomTimeframeEndDate,
+	],
+	() => {
+		if (!isTimeframeSelectOpen.value) {
+			return
+		}
+		if (
+			draftSelectedTimeframeMode.value !== 'last' &&
+			draftSelectedTimeframeMode.value !== 'custom_range'
+		) {
+			return
+		}
+
+		const range = getDraftTimeRange()
+		const { start, end } = ensureMinimumTimeRange(range.start, range.end)
+		const durationMinutes = Math.max(1, Math.floor((end.getTime() - start.getTime()) / 60000))
+		draftSelectedGroupBy.value = getDefaultAnalyticsGroupByForDurationMinutes(durationMinutes)
+	},
+	{ flush: 'sync' },
+)
 
 function switchDraftToCustomDateRange() {
 	const rawRange = getDraftTimeRange()

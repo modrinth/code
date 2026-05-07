@@ -28,6 +28,7 @@
 					@focus="activate"
 					@input="handleAmountInput"
 					@blur="commitAmountInput"
+					@keydown.enter.prevent.stop="submitAmountInput"
 				/>
 				<button
 					type="button"
@@ -71,6 +72,7 @@ const amountInput = ref(String(amount.value))
 
 const emit = defineEmits<{
 	activate: []
+	submit: [event: KeyboardEvent]
 }>()
 
 function activate() {
@@ -104,6 +106,11 @@ function commitAmountInput() {
 	amount.value = nextAmount
 	amountInput.value = String(nextAmount)
 	activate()
+}
+
+function submitAmountInput(event: KeyboardEvent) {
+	commitAmountInput()
+	emit('submit', event)
 }
 
 function incrementAmount() {

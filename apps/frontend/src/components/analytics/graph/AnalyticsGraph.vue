@@ -143,6 +143,7 @@ import {
 	getSliceBucketRange,
 	getSliceCount,
 	isTimeRelevantForGroupBy,
+	isYearRelevantForTimeRange,
 } from './utils'
 
 type ViewMode = 'line' | 'area' | 'bar'
@@ -200,6 +201,12 @@ const sliceCount = computed(() => {
 })
 
 const showTimeInBucketLabel = computed(() => isTimeRelevantForGroupBy(selectedGroupBy.value))
+const showYearInBucketLabel = computed(() => {
+	const nextFetchRequest = fetchRequest.value
+	return nextFetchRequest
+		? isYearRelevantForTimeRange(nextFetchRequest.time_range) || selectedGroupBy.value === 'year'
+		: false
+})
 
 const chartLabels = computed(() => {
 	const nextFetchRequest = fetchRequest.value
@@ -470,7 +477,11 @@ const hoverBucketRange = computed(() => {
 
 const hoverRangeLabel = computed(() => {
 	if (!hoverBucketRange.value) return ''
-	return formatBucketEndLabel(hoverBucketRange.value.end, showTimeInBucketLabel.value)
+	return formatBucketEndLabel(
+		hoverBucketRange.value.end,
+		showTimeInBucketLabel.value,
+		showYearInBucketLabel.value,
+	)
 })
 
 const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {

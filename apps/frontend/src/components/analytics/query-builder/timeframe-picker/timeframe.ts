@@ -1,4 +1,5 @@
 import {
+	type AnalyticsGroupByPreset,
 	type AnalyticsLastTimeframeUnit,
 	type AnalyticsTimeframeMode,
 	type AnalyticsTimeframePreset,
@@ -185,6 +186,18 @@ export function getAnalyticsTimeRange({
 		default:
 			return getTimeRangeForPreset(preset, nowTimestamp)
 	}
+}
+
+export function getDefaultAnalyticsGroupByForDurationMinutes(
+	durationMinutes: number,
+): AnalyticsGroupByPreset {
+	const days = durationMinutes / (24 * 60)
+	if (days <= 2) return '1h'
+	if (days <= 14) return '6h'
+	if (days <= 90) return 'day'
+	if (days <= 365) return 'week'
+	if (days <= 365 * 3) return 'month'
+	return 'year'
 }
 
 export function ensureMinimumTimeRange(start: Date, end: Date): AnalyticsTimeRange {

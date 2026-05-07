@@ -14,6 +14,7 @@
 
 					<div class="flex flex-wrap items-center gap-1.5">
 						<ButtonStyled
+							v-if="showDateToggle"
 							type="chip"
 							:color="includeDate ? 'brand' : 'standard'"
 							:highlighted="includeDate"
@@ -21,7 +22,7 @@
 							<button @click="includeDate = !includeDate">Date</button>
 						</ButtonStyled>
 
-						<div class="mx-1 h-6 w-px bg-surface-5"></div>
+						<div v-if="showDateToggle" class="mx-1 h-6 w-px bg-surface-5"></div>
 
 						<ButtonStyled>
 							<button
@@ -98,6 +99,7 @@ import {
 	getSliceBucketRange,
 	getSliceCount,
 	isTimeRelevantForGroupBy,
+	isYearRelevantForTimeRange,
 } from '../graph/utils'
 
 type TableMode = 'date_breakdown' | 'breakdown_only'
@@ -131,7 +133,7 @@ const {
 const formatNumber = useFormatNumber()
 const isDataLoading = computed(() => isLoading.value)
 
-const tableMode = ref<TableMode>('date_breakdown')
+const tableMode = ref<TableMode>('breakdown_only')
 const sortColumn = ref<TableColumnKey | undefined>('date')
 const sortDirection = ref<SortDirection>('asc')
 
@@ -141,6 +143,15 @@ const includeDate = computed<boolean>({
 		tableMode.value = value ? 'date_breakdown' : 'breakdown_only'
 	},
 })
+
+const isSingleProjectView = computed(() => selectedProjectIds.value.length === 1)
+const showBreakdownColumn = computed(
+	() => selectedBreakdown.value !== 'none' || !isSingleProjectView.value,
+)
+const showDateToggle = computed(() => showBreakdownColumn.value)
+const includeDateColumn = computed(
+	() => tableMode.value === 'date_breakdown' || !showBreakdownColumn.value,
+)
 
 const projectNamesById = computed(
 	() => new Map(projects.value.map((project) => [project.id, project.name])),
@@ -168,9 +179,14 @@ const breakdownColumnLabel = computed(() => {
 			return 'Breakdown'
 	}
 })
-watch(tableMode, (nextMode) => {
-	if (nextMode === 'breakdown_only' && sortColumn.value === 'date') {
+watch([tableMode, showBreakdownColumn], () => {
+	if (!includeDateColumn.value && sortColumn.value === 'date') {
 		sortColumn.value = 'breakdown'
+		sortDirection.value = 'asc'
+	}
+
+	if (!showBreakdownColumn.value && sortColumn.value === 'breakdown') {
+		sortColumn.value = 'date'
 		sortDirection.value = 'asc'
 	}
 })
@@ -181,6 +197,12 @@ const relevantStats = computed(
 )
 
 const showTimeInBucketLabel = computed(() => isTimeRelevantForGroupBy(selectedGroupBy.value))
+const showYearInBucketLabel = computed(() => {
+	const nextFetchRequest = fetchRequest.value
+	return nextFetchRequest
+		? isYearRelevantForTimeRange(nextFetchRequest.time_range) || selectedGroupBy.value === 'year'
+		: false
+})
 
 const tableRows = computed<AnalyticsTableRow[]>(() => {
 	const nextFetchRequest = fetchRequest.value
@@ -192,7 +214,7 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 	}
 
 	const sliceCount = getSliceCount(nextFetchRequest.time_range, nextTimeSlices.length)
-	const includeDate = tableMode.value === 'date_breakdown'
+	const includeDate = includeDateColumn.value
 
 	const breakdownValues = new Set<string>()
 	if (nextSelectedBreakdown === 'none') {
@@ -229,7 +251,11 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 		for (let sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++) {
 			const bucketRange = getSliceBucketRange(nextFetchRequest.time_range, sliceCount, sliceIndex)
 			const dateMs = bucketRange.end.getTime()
-			const dateLabel = formatBucketEndLabel(bucketRange.end, showTimeInBucketLabel.value)
+			const dateLabel = formatBucketEndLabel(
+				bucketRange.end,
+				showTimeInBucketLabel.value,
+				showYearInBucketLabel.value,
+			)
 
 			for (const breakdown of breakdownValues) {
 				const rowId = `${dateMs}::${breakdown}`
@@ -306,7 +332,7 @@ const columns = computed<TableColumn<TableColumnKey>[]>(() => {
 
 	const stats = getRelevantAnalyticsDashboardStats(selectedBreakdown.value, selectedFilters.value)
 
-	if (tableMode.value === 'date_breakdown') {
+	if (includeDateColumn.value) {
 		nextColumns.push({
 			key: 'date',
 			label: 'Date',
@@ -315,11 +341,13 @@ const columns = computed<TableColumn<TableColumnKey>[]>(() => {
 		})
 	}
 
-	nextColumns.push({
-		key: 'breakdown',
-		label: breakdownColumnLabel.value,
-		enableSorting: true,
-	})
+	if (showBreakdownColumn.value) {
+		nextColumns.push({
+			key: 'breakdown',
+			label: breakdownColumnLabel.value,
+			enableSorting: true,
+		})
+	}
 
 	for (const stat of stats) {
 		const column = getMetricColumnForStat(stat)
@@ -339,7 +367,7 @@ watch(
 			return
 		}
 
-		sortColumn.value = tableMode.value === 'breakdown_only' ? 'breakdown' : 'date'
+		sortColumn.value = nextColumns.find((column) => column.key === 'date')?.key ?? 'breakdown'
 		sortDirection.value = 'asc'
 	},
 	{ immediate: true },
@@ -578,7 +606,7 @@ function downloadCsv() {
 	downloadLink.setAttribute('href', url)
 	downloadLink.setAttribute(
 		'download',
-		`analytics-${tableMode.value === 'breakdown_only' ? 'breakdown-only' : 'date-breakdown'}.csv`,
+		`analytics-${includeDateColumn.value ? 'date-breakdown' : 'breakdown-only'}.csv`,
 	)
 	downloadLink.style.visibility = 'hidden'
 
