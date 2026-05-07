@@ -67,7 +67,9 @@ export const configuredXss = new FilterXSS({
 					url.search = newSearchParams.toString()
 					return `${name}="${escapeAttrValue(url.toString())}"`
 				}
-			} catch {}
+			} catch {
+				// ..
+			}
 		}
 
 		// For Highlight.JS
