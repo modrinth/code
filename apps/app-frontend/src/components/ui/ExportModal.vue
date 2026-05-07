@@ -206,7 +206,7 @@ const exportPack = async () => {
 									"
 									@click.stop
 								/>
-								<span class="ml-2 group-active:scale-95">{{ path.name }}</span>
+								<span class="ml-2 group-active:scale-95">{{ path.name }}/</span>
 							</template>
 							<div v-for="child in children" :key="child.path">
 								<Checkbox
