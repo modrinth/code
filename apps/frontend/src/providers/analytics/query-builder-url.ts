@@ -53,11 +53,11 @@ export type AnalyticsQueryBuilderState = {
 
 type MutableRouteQuery = Record<string, LocationQueryValueRaw | LocationQueryValueRaw[] | undefined>
 
-export const DEFAULT_TIMEFRAME_PRESET: AnalyticsTimeframePreset = 'yesterday'
+export const DEFAULT_TIMEFRAME_PRESET: AnalyticsTimeframePreset = 'last_30_days'
 export const DEFAULT_TIMEFRAME_MODE: AnalyticsTimeframeMode = 'preset'
 export const DEFAULT_LAST_TIMEFRAME_AMOUNT = 1
 export const DEFAULT_LAST_TIMEFRAME_UNIT: AnalyticsLastTimeframeUnit = 'days'
-export const DEFAULT_GROUP_BY_PRESET: AnalyticsGroupByPreset = '1h'
+export const DEFAULT_GROUP_BY_PRESET: AnalyticsGroupByPreset = 'day'
 export const DEFAULT_BREAKDOWN_PRESET: AnalyticsBreakdownPreset = 'none'
 
 const TIMEFRAME_PRESET_VALUES: AnalyticsTimeframePreset[] = [

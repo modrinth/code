@@ -30,7 +30,7 @@
 							class="inline-flex cursor-pointer items-center gap-1.5 text-sm transition-all hover:brightness-125"
 							:class="legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary'"
 							:aria-pressed="!legendEntry.hidden"
-							@click="toggleLegendEntryVisibility(legendEntry.id)"
+							@click="onLegendEntryClick($event, legendEntry.id)"
 						>
 							<span class="size-2 rounded-full" :style="{ backgroundColor: legendEntry.color }" />
 							<span :class="{ 'line-through': legendEntry.hidden }">{{ legendEntry.name }}</span>
@@ -430,6 +430,24 @@ function toggleLegendEntryVisibility(datasetId: string) {
 		nextHiddenDatasetIds.add(datasetId)
 	}
 	hiddenDatasetIds.value = nextHiddenDatasetIds
+}
+
+function soloLegendEntry(datasetId: string) {
+	const otherIds = legendEntries.value
+		.map((entry) => entry.id)
+		.filter((id) => id !== datasetId)
+	const isAlreadySolo =
+		!hiddenDatasetIds.value.has(datasetId) &&
+		otherIds.every((id) => hiddenDatasetIds.value.has(id))
+	hiddenDatasetIds.value = isAlreadySolo ? new Set() : new Set(otherIds)
+}
+
+function onLegendEntryClick(event: MouseEvent, datasetId: string) {
+	if (event.shiftKey) {
+		soloLegendEntry(datasetId)
+		return
+	}
+	toggleLegendEntryVisibility(datasetId)
 }
 
 function showMoreLegendEntries() {
