@@ -317,11 +317,19 @@ function stopRangeDrag(event: PointerEvent) {
 	const state = rangeDragState.value
 	if (!state || event.pointerId !== state.pointerId) return
 
+	const instance = picker.value
 	rangeDragState.value = null
 	document.removeEventListener('pointermove', updateRangeDrag, true)
 	document.removeEventListener('pointerup', stopRangeDrag, true)
 	document.removeEventListener('pointercancel', stopRangeDrag, true)
 	clearRangeClickSuppressionSoon()
+
+	if (
+		document.activeElement instanceof HTMLElement &&
+		instance?.calendarContainer.contains(document.activeElement)
+	) {
+		document.activeElement.blur()
+	}
 
 	event.preventDefault()
 	event.stopImmediatePropagation()
@@ -854,6 +862,22 @@ defineExpose({
 .modrinth-date-picker :deep(.flatpickr-day) {
 	@apply relative z-0 m-0 max-w-none rounded-full border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
 }
+.modrinth-date-picker
+	:deep(
+		.flatpickr-day:focus:not(:focus-visible):not(.selected):not(.startRange):not(
+				.endRange
+			):not(.inRange)
+	) {
+	@apply border-transparent bg-transparent text-primary outline-none;
+}
+.modrinth-date-picker
+	:deep(
+		.flatpickr-day:focus-visible:not(.selected):not(.startRange):not(.endRange):not(
+				.inRange
+			)
+	) {
+	@apply border-transparent bg-surface-4 text-contrast outline-none;
+}
 .modrinth-date-picker :deep(.flatpickr-day.flatpickr-disabled) {
 	@apply hover:bg-transparent;
 }
@@ -983,6 +1007,17 @@ defineExpose({
 
 .modrinth-date-picker.is-dragging-range :deep(.flatpickr-day) {
 	cursor: grabbing !important;
+}
+
+.modrinth-date-picker.is-dragging-range
+	:deep(
+		.flatpickr-day:not(.selected):not(.startRange):not(.endRange):not(.inRange):hover
+	),
+.modrinth-date-picker.is-dragging-range
+	:deep(
+		.flatpickr-day:not(.selected):not(.startRange):not(.endRange):not(.inRange):focus
+	) {
+	@apply border-transparent bg-transparent text-primary;
 }
 
 .modrinth-date-picker
