@@ -252,7 +252,7 @@ function buildConfig(): ChartConfiguration {
 			scales: {
 				x: {
 					stacked: props.stacked && props.type === 'bar',
-					offset: true,
+					offset: props.type === 'bar',
 					grid: { display: false },
 					ticks: {
 						maxTicksLimit: 12,
