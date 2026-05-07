@@ -102,6 +102,7 @@ export interface AnalyticsDashboardContextValue {
 	versionPublishedDatesById: ComputedRef<Map<string, string>>
 	projectVersionDownloadsById: ComputedRef<Map<string, number>>
 	gameVersionDownloadsByVersion: ComputedRef<Map<string, number>>
+	countryDownloadsByCode: ComputedRef<Map<string, number>>
 	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	displayedTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
@@ -382,6 +383,36 @@ function getCountryFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]):
 	}
 
 	return sortStringValues([...countries])
+}
+
+function getCountryDownloadsByCode(
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+): Map<string, number> {
+	const downloadsByCountry = new Map<string, number>()
+
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!('source_project' in dataPoint)) {
+				continue
+			}
+
+			if (dataPoint.metric_kind !== 'downloads' || !dataPoint.country) {
+				continue
+			}
+
+			const country = dataPoint.country.trim().toUpperCase()
+			if (country.length === 0) {
+				continue
+			}
+
+			downloadsByCountry.set(
+				country,
+				(downloadsByCountry.get(country) ?? 0) + dataPoint.downloads,
+			)
+		}
+	}
+
+	return downloadsByCountry
 }
 
 function getDownloadSourceFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
@@ -1104,6 +1135,9 @@ export function createAnalyticsDashboardContext(
 	const projectVersionDownloadsById = computed(
 		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.downloads])),
 	)
+	const countryDownloadsByCode = computed(() =>
+		getCountryDownloadsByCode(analyticsFilterOptionsData.value ?? []),
+	)
 	const gameVersionDownloadsByVersion = computed(() => {
 		const downloadsByVersion = new Map<string, number>()
 
@@ -1254,6 +1288,7 @@ export function createAnalyticsDashboardContext(
 		versionPublishedDatesById,
 		projectVersionDownloadsById,
 		gameVersionDownloadsByVersion,
+		countryDownloadsByCode,
 		timeSlices,
 		displayedTimeSlices,
 		previousTimeSlices,

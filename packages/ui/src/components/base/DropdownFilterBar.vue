@@ -134,6 +134,7 @@
 					:category="activeCategory"
 					:selected-values="activeCategorySelectedValues"
 					:set-selected-values="setActiveCategorySelectedValues"
+					:close-menu="closeAddMenu"
 				></slot>
 			</div>
 
@@ -203,6 +204,7 @@
 				:category="activeCategory"
 				:selected-values="activeCategorySelectedValues"
 				:set-selected-values="setActiveCategorySelectedValues"
+				:close-menu="closeAddMenu"
 			></slot>
 		</div>
 	</Teleport>

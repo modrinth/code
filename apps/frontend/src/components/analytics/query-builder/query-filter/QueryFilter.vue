@@ -14,9 +14,28 @@
 			</div>
 		</template>
 
-		<template #category-footer="{ category, setSelectedValues }">
+		<template #category-footer="{ category, setSelectedValues, closeMenu }">
 			<DownloadsThresholdInput
-				v-if="category.key === 'version_id'"
+				v-if="category.key === 'country'"
+				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				label="Countries above"
+				input-aria-label="Country downloads threshold"
+				:threshold="countryDownloadsThreshold"
+				input-width-class="w-16"
+				@update:threshold="
+					(threshold) => setCountryDownloadsThreshold(threshold, setSelectedValues)
+				"
+				@submit="
+					() =>
+						runDownloadsThresholdQuery(
+							applyCountryDownloadsThreshold,
+							setSelectedValues,
+							closeMenu,
+						)
+				"
+			/>
+			<DownloadsThresholdInput
+				v-else-if="category.key === 'version_id'"
 				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
 				label="Project versions above"
 				input-aria-label="Project version downloads threshold"
@@ -24,6 +43,14 @@
 				input-width-class="w-16"
 				@update:threshold="
 					(threshold) => setProjectVersionDownloadsThreshold(threshold, setSelectedValues)
+				"
+				@submit="
+					() =>
+						runDownloadsThresholdQuery(
+							applyProjectVersionDownloadsThreshold,
+							setSelectedValues,
+							closeMenu,
+						)
 				"
 			/>
 			<DownloadsThresholdInput
@@ -35,6 +62,14 @@
 				input-width-class="w-16"
 				@update:threshold="
 					(threshold) => setGameVersionDownloadsThreshold(threshold, setSelectedValues)
+				"
+				@submit="
+					() =>
+						runDownloadsThresholdQuery(
+							applyGameVersionDownloadsThreshold,
+							setSelectedValues,
+							closeMenu,
+						)
 				"
 			/>
 		</template>
@@ -67,13 +102,16 @@ import {
 
 type AnalyticsFilterValueCategory = Exclude<AnalyticsQueryFilterCategory, 'project'>
 type SetDropdownFilterValues = (values: string[]) => void
+type ApplyDownloadsThreshold = (setSelectedValues: SetDropdownFilterValues) => void
 
 const {
 	filterOptions,
 	projectVersionDownloadsById,
 	gameVersionDownloadsByVersion,
+	countryDownloadsByCode,
 	selectedBreakdown,
 	selectedFilters,
+	refreshAnalyticsQuery,
 	getVersionDisplayName,
 	getVersionPublishedDate,
 } = injectAnalyticsDashboardContext()
@@ -81,6 +119,7 @@ const formattedCountries = useFormattedCountries()
 const generatedState = useGeneratedState()
 
 const gameVersionType = ref<'release' | 'all'>('release')
+const countryDownloadsThreshold = ref<number | null>(null)
 const projectVersionDownloadsThreshold = ref<number | null>(null)
 const gameVersionDownloadsThreshold = ref<number | null>(null)
 const gameVersionTypeOptions: Array<'release' | 'all'> = ['release', 'all']
@@ -114,6 +153,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			searchable: countryFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search countries...',
 			options: withSelectedOptions('country', countryFilterOptions.value),
+			submenuClass: 'w-[324px]',
 		},
 		{
 			key: 'monetization',
@@ -376,6 +416,23 @@ function applyGameVersionDownloadsThreshold(setSelectedValues: SetDropdownFilter
 	)
 }
 
+function applyCountryDownloadsThreshold(setSelectedValues: SetDropdownFilterValues) {
+	const threshold = countryDownloadsThreshold.value
+	if (threshold === null) {
+		return
+	}
+
+	setSelectedValues(
+		countryFilterOptions.value
+			.filter((country) => {
+				return (
+					(countryDownloadsByCode.value.get(country.value.trim().toUpperCase()) ?? 0) >= threshold
+				)
+			})
+			.map((country) => country.value),
+	)
+}
+
 function applyProjectVersionDownloadsThreshold(setSelectedValues: SetDropdownFilterValues) {
 	const threshold = projectVersionDownloadsThreshold.value
 	if (threshold === null) {
@@ -389,6 +446,14 @@ function applyProjectVersionDownloadsThreshold(setSelectedValues: SetDropdownFil
 			})
 			.map((version) => version.value),
 	)
+}
+
+function setCountryDownloadsThreshold(
+	threshold: number | null,
+	setSelectedValues: SetDropdownFilterValues,
+) {
+	countryDownloadsThreshold.value = threshold
+	applyCountryDownloadsThreshold(setSelectedValues)
 }
 
 function setProjectVersionDownloadsThreshold(
@@ -405,6 +470,17 @@ function setGameVersionDownloadsThreshold(
 ) {
 	gameVersionDownloadsThreshold.value = threshold
 	applyGameVersionDownloadsThreshold(setSelectedValues)
+}
+
+async function runDownloadsThresholdQuery(
+	applyDownloadsThreshold: ApplyDownloadsThreshold,
+	setSelectedValues: SetDropdownFilterValues,
+	closeMenu: () => void,
+) {
+	applyDownloadsThreshold(setSelectedValues)
+	closeMenu()
+	await nextTick()
+	await refreshAnalyticsQuery()
 }
 
 function setGameVersionType(
