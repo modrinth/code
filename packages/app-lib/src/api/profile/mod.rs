@@ -22,6 +22,7 @@ use async_zip::{Compression, ZipEntryBuilder};
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde_json::json;
 use tracing::{info, warn};
+use url::Url;
 
 use std::collections::{HashMap, HashSet};
 use std::time::Duration;
@@ -1003,6 +1004,23 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
     res
 }
 
+fn append_mrpack_download_metadata(
+    download_url: &str,
+    game_version: &str,
+    loader: crate::prelude::ModLoader,
+) -> String {
+    let Ok(mut url) = Url::parse(download_url) else {
+        return download_url.to_string();
+    };
+    {
+        let mut q = url.query_pairs_mut();
+        q.append_pair("mr_download_reason", "modpack");
+        q.append_pair("mr_game_version", game_version);
+        q.append_pair("mr_loader", loader.as_str()); // ModLoader::as_str will give tag-compatible name like "neoforge" instead of "neo"
+    }
+    url.to_string()
+}
+
 /// Creates a json configuration for a .mrpack zipped file
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
 #[tracing::instrument(skip_all)]
@@ -1080,7 +1098,11 @@ pub async fn create_mrpack_json(
                 };
 
                 let file_size = primary_file.size;
-                let downloads = vec![primary_file.url.clone()];
+                let downloads = vec![append_mrpack_download_metadata(
+                    &primary_file.url,
+                    &profile.game_version,
+                    profile.loader,
+                )];
                 let hashes = primary_file
                     .hashes
                     .clone()
