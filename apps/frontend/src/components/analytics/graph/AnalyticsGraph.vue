@@ -87,9 +87,15 @@
 						/>
 					</ClientOnly>
 					<div
+						v-if="showHoverGuide"
+						aria-hidden="true"
+						class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-8 mt-2 border-0 border-l border-solid border-contrast opacity-25"
+						:style="{ transform: `translate(${hoverState.x}px, 0)` }"
+					/>
+					<div
 						v-if="showPinnedGuide"
 						aria-hidden="true"
-						class="pointer-events-none absolute bottom-0 top-0 z-10 mb-8 mt-2 border-0 border-l-[2px] border-dashed border-green opacity-75"
+						class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-8 mt-2 border-0 border-l-[2px] border-dashed border-green opacity-75"
 						:style="{ transform: `translate(${hoverState.x}px, 0)` }"
 					/>
 					<AnalyticsChartTooltip
@@ -364,6 +370,13 @@ function onChartClick() {
 }
 
 const pinnedSliceIndex = computed(() => (isHoverPinned.value ? hoverState.sliceIndex : null))
+const showHoverGuide = computed(
+	() =>
+		!isDataLoading.value &&
+		!isHoverPinned.value &&
+		hoverState.visible &&
+		hoverState.sliceIndex !== null,
+)
 const showPinnedGuide = computed(
 	() =>
 		!isDataLoading.value &&
@@ -433,12 +446,9 @@ function toggleLegendEntryVisibility(datasetId: string) {
 }
 
 function soloLegendEntry(datasetId: string) {
-	const otherIds = legendEntries.value
-		.map((entry) => entry.id)
-		.filter((id) => id !== datasetId)
+	const otherIds = legendEntries.value.map((entry) => entry.id).filter((id) => id !== datasetId)
 	const isAlreadySolo =
-		!hiddenDatasetIds.value.has(datasetId) &&
-		otherIds.every((id) => hiddenDatasetIds.value.has(id))
+		!hiddenDatasetIds.value.has(datasetId) && otherIds.every((id) => hiddenDatasetIds.value.has(id))
 	hiddenDatasetIds.value = isAlreadySolo ? new Set() : new Set(otherIds)
 }
 
