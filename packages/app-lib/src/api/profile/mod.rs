@@ -461,7 +461,7 @@ pub async fn update_project(
             let mut path = Profile::add_project_version(
                 profile_path,
                 update_version,
-                fetch::DownloadReason::Standalone,
+                fetch::DownloadReason::Update,
                 &state.pool,
                 &state.fetch_semaphore,
                 &state.io_semaphore,
