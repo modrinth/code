@@ -74,6 +74,37 @@ function readQueryString(value: unknown): string | null {
 	return typeof value === 'string' && value.length > 0 ? value : null
 }
 
+function getQueueStorageKey(serverId: string | null, worldId: string | null) {
+	if (!serverId || !worldId) return null
+	return `server-install-queue:${serverId}:${worldId}`
+}
+
+function readStoredQueue(serverId: string | null, worldId: string | null) {
+	const key = getQueueStorageKey(serverId, worldId)
+	if (!key) return new Map<string, BrowseInstallPlan<InstallableSearchResult>>()
+	try {
+		const raw = localStorage.getItem(key)
+		if (!raw) return new Map<string, BrowseInstallPlan<InstallableSearchResult>>()
+		return new Map<string, BrowseInstallPlan<InstallableSearchResult>>(JSON.parse(raw))
+	} catch {
+		return new Map<string, BrowseInstallPlan<InstallableSearchResult>>()
+	}
+}
+
+function writeStoredQueue(
+	serverId: string | null,
+	worldId: string | null,
+	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
+) {
+	const key = getQueueStorageKey(serverId, worldId)
+	if (!key) return
+	if (plans.size === 0) {
+		localStorage.removeItem(key)
+		return
+	}
+	localStorage.setItem(key, JSON.stringify(Array.from(plans.entries())))
+}
+
 export function createServerInstallContent(opts: {
 	serverSetupModalRef: Ref<ServerSetupModalHandle | null>
 }) {
@@ -108,7 +139,7 @@ export function createServerInstallContent(opts: {
 	const serverInstallQueue = {
 		get: () => queuedServerInstalls.value,
 		set: (plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>) => {
-			queuedServerInstalls.value = plans
+			setQueuedServerInstallPlans(plans)
 		},
 	}
 
@@ -179,6 +210,7 @@ export function createServerInstallContent(opts: {
 		}
 
 		if (resolvedWorldId) {
+			queuedServerInstalls.value = readStoredQueue(sid, resolvedWorldId)
 			await refreshServerInstalledContent(sid, resolvedWorldId)
 		}
 	}
@@ -188,13 +220,13 @@ export function createServerInstallContent(opts: {
 			if (!sid) {
 				serverContextServerData.value = null
 				serverContentProjectIds.value = new Set()
-				queuedServerInstalls.value = new Map()
+				setQueuedServerInstallPlans(new Map())
 				return
 			}
 
 			if (sid !== prevSid) {
 				serverContentProjectIds.value = new Set()
-				queuedServerInstalls.value = new Map()
+				queuedServerInstalls.value = readStoredQueue(sid, wid)
 				try {
 					serverContextServerData.value = await client.archon.servers_v0.get(sid)
 				} catch (err) {
@@ -203,7 +235,7 @@ export function createServerInstallContent(opts: {
 			}
 
 			if (wid !== prevWid) {
-				queuedServerInstalls.value = new Map()
+				queuedServerInstalls.value = readStoredQueue(sid, wid)
 			}
 
 			if (wid && (sid !== prevSid || wid !== prevWid)) {
@@ -259,7 +291,7 @@ export function createServerInstallContent(opts: {
 	}
 
 	function clearQueuedServerInstalls() {
-		queuedServerInstalls.value = new Map()
+		setQueuedServerInstallPlans(new Map())
 	}
 
 	async function flushQueuedServerInstalls() {
@@ -303,6 +335,7 @@ export function createServerInstallContent(opts: {
 		plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
 	) {
 		queuedServerInstalls.value = plans
+		writeStoredQueue(serverIdQuery.value, effectiveServerWorldId.value, plans)
 	}
 
 	function onServerFlowBack() {

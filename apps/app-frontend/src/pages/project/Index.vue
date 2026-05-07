@@ -45,7 +45,13 @@
 			/>
 		</Teleport>
 		<div class="flex flex-col gap-4 p-6">
-			<InstanceIndicator v-if="instance" :instance="instance" />
+			<div
+				v-if="projectInstallContext"
+				class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 p-3 border-surface-5"
+			>
+				<BrowseInstallHeader :install-context="projectInstallContext" />
+			</div>
+			<InstanceIndicator v-if="instance && !projectInstallContext" :instance="instance" />
 			<template v-if="data">
 				<Teleport
 					v-if="themeStore.featureFlags.project_background"
@@ -166,7 +172,7 @@
 					:links="[
 						{
 							label: 'Description',
-							href: `/project/${$route.params.id}`,
+							href: projectDescriptionHref,
 						},
 						{
 							label: 'Versions',
@@ -176,7 +182,7 @@
 						},
 						{
 							label: 'Gallery',
-							href: `/project/${$route.params.id}/gallery`,
+							href: projectGalleryHref,
 							shown: data.gallery.length > 0,
 						},
 					]"
@@ -219,6 +225,7 @@ import {
 	StopCircleIcon,
 } from '@modrinth/assets'
 import {
+	BrowseInstallHeader,
 	ButtonStyled,
 	injectNotificationManager,
 	NavTabs,
@@ -232,6 +239,7 @@ import {
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
 } from '@modrinth/ui'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -260,6 +268,7 @@ import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { getServerLatency } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
+import { createServerInstallContent } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
@@ -296,6 +305,11 @@ const serverPing = ref(undefined)
 const serverStatusOnline = ref(false)
 const serverInstancePath = ref(null)
 const serverPlaying = ref(false)
+const serverSetupModalRef = ref(null)
+const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
+
+serverInstallContent.watchServerContextChanges()
+await serverInstallContent.initServerContext()
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
@@ -315,11 +329,9 @@ const instanceFilters = computed(() => {
 	return { l: loaders, g: instance.value.game_version }
 })
 
-const versionsHref = computed(() => {
-	const base = `/project/${route.params.id}/versions`
-	const filters = instanceFilters.value
+function buildProjectHref(path, extraQuery = {}) {
 	const params = new URLSearchParams()
-	for (const [key, val] of Object.entries(filters)) {
+	for (const [key, val] of Object.entries({ ...route.query, ...extraQuery })) {
 		if (Array.isArray(val)) {
 			for (const v of val) params.append(key, v)
 		} else if (val) {
@@ -327,7 +339,57 @@ const versionsHref = computed(() => {
 		}
 	}
 	const qs = params.toString()
-	return qs ? `${base}?${qs}` : base
+	return qs ? `${path}?${qs}` : path
+}
+
+const projectDescriptionHref = computed(() => buildProjectHref(`/project/${route.params.id}`))
+const versionsHref = computed(() =>
+	buildProjectHref(`/project/${route.params.id}/versions`, instanceFilters.value),
+)
+const projectGalleryHref = computed(() => buildProjectHref(`/project/${route.params.id}/gallery`))
+
+const projectBrowseBackUrl = computed(() => {
+	const browsePath = route.query.b
+	if (typeof browsePath === 'string' && browsePath.startsWith('/browse/')) return browsePath
+	const type = data.value?.project_type ? `${data.value.project_type}s` : 'mods'
+	return `/browse/${type}`
+})
+
+const projectInstallContext = computed(() => {
+	const serverData = serverInstallContent.serverContextServerData.value
+	if (serverData) {
+		return {
+			name: serverData.name,
+			loader: serverData.loader ?? '',
+			gameVersion: serverData.mc_version ?? '',
+			serverId: serverInstallContent.serverIdQuery.value,
+			upstream: serverData.upstream,
+			iconSrc: null,
+			isMedal: serverData.is_medal,
+			backUrl: projectBrowseBackUrl.value,
+			backLabel: 'Back to browse',
+			heading: serverInstallContent.serverBrowseHeading.value,
+			queuedCount: serverInstallContent.queuedServerInstallCount.value,
+			queuedLabel: `${serverInstallContent.queuedServerInstallCount.value} ${
+				serverInstallContent.queuedServerInstallCount.value === 1 ? 'Mod' : 'Mods'
+			}`,
+			clearQueued: serverInstallContent.clearQueuedServerInstalls,
+		}
+	}
+
+	if (instance.value) {
+		return {
+			name: instance.value.name,
+			loader: instance.value.loader,
+			gameVersion: instance.value.game_version,
+			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+			backUrl: projectBrowseBackUrl.value,
+			backLabel: 'Back to browse',
+			heading: 'Install content to instance',
+		}
+	}
+
+	return null
 })
 
 const [allLoaders, allGameVersions] = await Promise.all([

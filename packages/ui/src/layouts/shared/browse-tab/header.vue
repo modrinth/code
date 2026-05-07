@@ -11,12 +11,16 @@ import { useServerImage } from '#ui/composables/use-server-image'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import { injectBrowseManager } from './providers/browse-manager'
+import type { BrowseInstallContext } from './types'
 
 const MEDAL_ICON_URL = 'https://cdn-raw.modrinth.com/medal_icon.webp'
 
-const ctx = injectBrowseManager()
 const router = useRouter()
-const installContext = computed(() => ctx.installContext?.value ?? null)
+const props = defineProps<{
+	installContext?: BrowseInstallContext | null
+}>()
+const ctx = injectBrowseManager(null)
+const installContext = computed(() => props.installContext ?? ctx?.installContext?.value ?? null)
 
 const serverId = computed(() => installContext.value?.serverId ?? '')
 const upstream = computed(() => installContext.value?.upstream ?? null)
@@ -135,13 +139,9 @@ async function clearQueued() {
 						<span>{{ queuedLabel }}</span>
 					</div>
 					<div class="h-[18px] w-px bg-surface-5" />
-					<button
-						type="button"
-						class="border-0 bg-transparent p-0 text-base font-medium leading-6 text-primary hover:text-contrast"
-						@click="clearQueued"
-					>
-						Clear
-					</button>
+					<ButtonStyled type="transparent">
+						<button type="button" @click="clearQueued">Clear</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>

@@ -948,16 +948,27 @@ if (instance.value?.game_version) {
 
 await searchState.refreshSearch()
 
+function getProjectBrowseQuery() {
+	if (!installContext.value) return undefined
+	return {
+		...route.query,
+		b: route.fullPath,
+	}
+}
+
 provideBrowseManager({
 	tags,
 	projectType,
 	...searchState,
 	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) => ({
 		path: `/project/${result.project_id ?? result.slug}`,
-		query: instance.value ? { i: instance.value.path } : undefined,
+		query: getProjectBrowseQuery(),
 	}),
 	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
-		`/project/${result.slug ?? result.project_id}`,
+		({
+			path: `/project/${result.slug ?? result.project_id}`,
+			query: getProjectBrowseQuery(),
+		}),
 	selectableProjectTypes,
 	showProjectTypeTabs: computed(() => !isServerContext.value),
 	variant: 'app',
