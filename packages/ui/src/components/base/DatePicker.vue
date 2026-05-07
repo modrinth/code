@@ -950,11 +950,8 @@ defineExpose({
 }
 
 .modrinth-date-picker
-	:deep(
-		.flatpickr-calendar.is-missing-range-end .flatpickr-day.startRange:not(.endRange)::before
-	),
-.modrinth-date-picker
-	:deep(.flatpickr-calendar.is-missing-range-end .flatpickr-day:hover::before) {
+	:deep(.flatpickr-calendar.is-missing-range-end .flatpickr-day.startRange:not(.endRange)::before),
+.modrinth-date-picker :deep(.flatpickr-calendar.is-missing-range-end .flatpickr-day:hover::before) {
 	background: transparent;
 }
 
