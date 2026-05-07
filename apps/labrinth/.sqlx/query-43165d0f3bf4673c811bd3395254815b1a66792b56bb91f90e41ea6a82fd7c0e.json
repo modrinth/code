@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        select distinct f.version_id as \"version_id: DBVersionId\", f.id as \"file_id: DBFileId\"\n        from files f\n        inner join override_file_sources ofs on ofs.file_id = f.id\n        inner join project_attribution_files paf on paf.sha1 = ofs.sha1\n        inner join project_attribution_groups pag on pag.id = paf.group_id\n        where f.version_id = ANY($1) and pag.attribution is null\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "file_id: DBFileId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "43165d0f3bf4673c811bd3395254815b1a66792b56bb91f90e41ea6a82fd7c0e"
+}

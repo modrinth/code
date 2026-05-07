@@ -10,7 +10,7 @@ use tracing::{Instrument, info, info_span, warn};
 use zip::ZipArchive;
 
 use crate::database::models::ids::{
-    DBAttributionGroupId, DBProjectId, generate_attribution_group_id,
+    DBAttributionGroupId, DBProjectId, DBVersionId, generate_attribution_group_id,
 };
 use crate::database::models::moderation_external_item::ExternalLicense;
 use crate::database::models::{DBFileId, DBUserId, DBVersion};
@@ -681,4 +681,41 @@ fn hash_flame_murmur32(input: Vec<u8>) -> u32 {
             .collect::<Vec<u8>>(),
         1,
     )
+}
+
+pub async fn get_files_missing_attribution<'a, E>(
+    exec: E,
+    version_ids: &[DBVersionId],
+) -> Result<std::collections::HashMap<DBVersionId, Vec<DBFileId>>>
+where
+    E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+{
+    if version_ids.is_empty() {
+        return Ok(std::collections::HashMap::new());
+    }
+
+    let rows = sqlx::query!(
+        r#"
+        select distinct f.version_id as "version_id: DBVersionId", f.id as "file_id: DBFileId"
+        from files f
+        inner join override_file_sources ofs on ofs.file_id = f.id
+        inner join project_attribution_files paf on paf.sha1 = ofs.sha1
+        inner join project_attribution_groups pag on pag.id = paf.group_id
+        where f.version_id = ANY($1) and pag.attribution is null
+        "#,
+        &version_ids.iter().map(|v| v.0).collect::<Vec<_>>(),
+    )
+    .fetch_all(exec)
+    .await
+    .wrap_err("fetching files missing attribution")?;
+
+    let mut result = std::collections::HashMap::new();
+    for row in rows {
+        result
+            .entry(row.version_id)
+            .or_insert_with(Vec::new)
+            .push(row.file_id);
+    }
+
+    Ok(result)
 }

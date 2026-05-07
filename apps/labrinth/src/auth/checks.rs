@@ -5,7 +5,9 @@ use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
+use crate::models::ids::FileId;
 use crate::models::users::User;
+use crate::queue::attribution_scan::get_files_missing_attribution;
 use crate::routes::ApiError;
 use futures::TryStreamExt;
 use itertools::Itertools;
@@ -204,7 +206,27 @@ pub async fn filter_visible_versions(
     )
     .await?;
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
-    Ok(versions.into_iter().map(|x| x.into()).collect())
+
+    let version_ids: Vec<_> = versions.iter().map(|v| v.inner.id).collect();
+    let missing =
+        get_files_missing_attribution(pool, &version_ids).await.unwrap_or_default();
+
+    Ok(versions
+        .into_iter()
+        .map(|v| {
+            let files_missing = missing
+                .get(&v.inner.id)
+                .map(|ids| {
+                    ids.iter()
+                        .map(|id| FileId(id.0 as u64))
+                        .collect::<Vec<_>>()
+                })
+                .unwrap_or_default();
+            let mut version = crate::models::projects::Version::from(v);
+            version.files_missing_attribution = files_missing;
+            version
+        })
+        .collect())
 }
 
 impl ValidateAuthorized for models::DBOAuthClient {

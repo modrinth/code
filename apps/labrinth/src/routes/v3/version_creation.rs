@@ -480,6 +480,7 @@ async fn version_create_inner(
         loaders: version_data.loaders,
         fields: version_data.fields,
         components: exp::VersionQuery::default(),
+        files_missing_attribution: Vec::new(),
     };
 
     let project_id = builder.project_id;

@@ -681,6 +681,9 @@ pub struct Version {
 
     /// A list of files available for download for this version.
     pub files: Vec<VersionFile>,
+    /// Files in this version that contain override files not yet attributed.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub files_missing_attribution: Vec<FileId>,
     /// A list of projects that this version depends on.
     pub dependencies: Vec<Dependency>,
 
@@ -768,6 +771,7 @@ impl From<VersionQueryResult> for Version {
                 .map(|vf| (vf.field_name, vf.value.serialize_internal()))
                 .collect(),
             components: data.components,
+            files_missing_attribution: Vec::new(),
         }
     }
 }
