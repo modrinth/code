@@ -108,6 +108,7 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 import ShareModal from '#ui/components/modal/ShareModal.vue'
 import { injectModrinthClient } from '#ui/providers'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
+import { injectPageContext } from '#ui/providers/page-context'
 import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
@@ -127,6 +128,7 @@ import type { LogLevel, LogLine } from './types'
 const ctx = injectConsoleManager()
 const client = injectModrinthClient()
 const modalBehavior = injectModalBehavior()
+const pageContext = injectPageContext(null)
 const { addNotification } = injectNotificationManager()
 
 const crashHeader = computed(() => {
@@ -149,6 +151,9 @@ const deleteModal = ref<InstanceType<typeof NewModal> | null>(null)
 const isDeleting = ref(false)
 const searchQuery = ref('')
 const isFullscreen = ref(false)
+const fullscreenBodyClass = 'modrinth-console-fullscreen-active'
+const fullscreenIntercomPadding = 20
+const fullscreenIntercomPaddingRequestId = Symbol('console-fullscreen')
 const isApp =
 	typeof window !== 'undefined' && !!(window as Record<string, unknown>).__TAURI_INTERNALS__
 const isSharing = ref(false)
@@ -187,6 +192,11 @@ function buildCombinedPredicate(): ((line: LogLine) => boolean) | null {
 onBeforeUnmount(() => {
 	if (isFullscreen.value) {
 		document.body.style.overflow = ''
+		document.body.classList.remove(fullscreenBodyClass)
+		pageContext?.intercomBubble?.requestHorizontalPadding?.(
+			fullscreenIntercomPaddingRequestId,
+			null,
+		)
 		modalBehavior?.onHide?.()
 	}
 })
@@ -266,9 +276,19 @@ function toggleFullscreen() {
 	isFullscreen.value = !isFullscreen.value
 	if (isFullscreen.value) {
 		document.body.style.overflow = 'hidden'
+		document.body.classList.add(fullscreenBodyClass)
+		pageContext?.intercomBubble?.requestHorizontalPadding?.(
+			fullscreenIntercomPaddingRequestId,
+			fullscreenIntercomPadding,
+		)
 		modalBehavior?.onShow?.()
 	} else {
 		document.body.style.overflow = ''
+		document.body.classList.remove(fullscreenBodyClass)
+		pageContext?.intercomBubble?.requestHorizontalPadding?.(
+			fullscreenIntercomPaddingRequestId,
+			null,
+		)
 		modalBehavior?.onHide?.()
 	}
 	nextTick(() => {
@@ -396,3 +416,17 @@ async function handleShare() {
 	}
 }
 </script>
+
+<style>
+.modrinth-console-fullscreen-active .intercom-lightweight-app,
+.modrinth-console-fullscreen-active .intercom-lightweight-app-launcher,
+.modrinth-console-fullscreen-active .intercom-lightweight-app-messenger,
+.modrinth-console-fullscreen-active .intercom-launcher-frame,
+.modrinth-console-fullscreen-active .intercom-messenger-frame,
+.modrinth-console-fullscreen-active #intercom-container,
+.modrinth-console-fullscreen-active #intercom-frame,
+.modrinth-console-fullscreen-active iframe[name='intercom-launcher-frame'],
+.modrinth-console-fullscreen-active iframe[name='intercom-messenger-frame'] {
+	z-index: 14 !important;
+}
+</style>
