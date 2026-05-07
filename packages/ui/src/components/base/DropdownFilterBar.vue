@@ -19,7 +19,8 @@
 		:searchable="preview.category.searchable"
 		:search-placeholder="preview.category.searchPlaceholder"
 		:trigger-class="previewTriggerClass"
-		:dropdown-min-width="preview.category.previewDropdownMinWidth ?? '18rem'"
+		:dropdown-width="getPreviewDropdownWidth(preview.category)"
+		:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
 		show-selection-actions
 		@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
 		@open="openPreviewFilterDraft(preview.key)"
@@ -47,6 +48,15 @@
 					/>
 				</div>
 			</div>
+		</template>
+		<template v-if="$slots['preview-footer']" #bottom>
+			<slot
+				name="preview-footer"
+				:category="preview.category"
+				:selected-values="getPreviewSelectedValues(preview.key)"
+				:set-selected-values="(values) => setPreviewSelectedValues(preview.key, values)"
+				:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
+			></slot>
 		</template>
 	</MultiSelect>
 
@@ -242,6 +252,7 @@ export type DropdownFilterBarCategory = {
 	searchable?: boolean
 	searchPlaceholder?: string
 	submenuClass?: string
+	previewDropdownWidth?: string | number
 	previewDropdownMinWidth?: string | number
 }
 
@@ -270,6 +281,10 @@ type SubmenuPositionOptions = {
 const ADD_MENU_WIDTH = 250
 const DROPDOWN_GAP = 12
 const DROPDOWN_VIEWPORT_MARGIN = 8
+const DEFAULT_PREVIEW_DROPDOWN_MIN_WIDTH = '18rem'
+const TAILWIND_WIDTH_CLASS_SIZE: Record<string, string> = {
+	'w-72': '18rem',
+}
 
 const props = withDefaults(
 	defineProps<{
@@ -704,6 +719,50 @@ function commitPreviewFilterDrafts() {
 	for (const categoryKey of Object.keys(previewSelectedValueDrafts.value)) {
 		commitPreviewFilterDraft(categoryKey)
 	}
+}
+
+function closePreviewFilterMenu(categoryKey: string, event?: Event) {
+	commitPreviewFilterDraft(categoryKey)
+
+	const eventTarget = event?.target
+	if (!(eventTarget instanceof HTMLElement)) {
+		return
+	}
+
+	const dropdown = eventTarget.closest('[role="listbox"][aria-multiselectable="true"]')
+	if (!dropdown) {
+		return
+	}
+
+	dropdown.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+}
+
+function getPreviewDropdownWidth(category: DropdownFilterBarCategory): string | number | undefined {
+	return category.previewDropdownWidth ?? getWidthFromClass(category.submenuClass)
+}
+
+function getPreviewDropdownMinWidth(category: DropdownFilterBarCategory): string | number {
+	return (
+		category.previewDropdownMinWidth ??
+		getPreviewDropdownWidth(category) ??
+		DEFAULT_PREVIEW_DROPDOWN_MIN_WIDTH
+	)
+}
+
+function getWidthFromClass(className: string | undefined): string | undefined {
+	if (!className) {
+		return undefined
+	}
+
+	const arbitraryWidth = className.match(/(?:^|\s)w-\[([^\]]+)\](?:\s|$)/)
+	if (arbitraryWidth) {
+		return arbitraryWidth[1]
+	}
+
+	return className
+		.split(/\s+/)
+		.map((name) => TAILWIND_WIDTH_CLASS_SIZE[name])
+		.find((width) => width !== undefined)
 }
 
 function activateCategory(categoryKey: string) {

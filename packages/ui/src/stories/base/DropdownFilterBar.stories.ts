@@ -154,7 +154,10 @@ export const CustomControls: Story = {
 	render: () => ({
 		components: { DropdownFilterBar },
 		setup() {
-			const selected = ref<Record<string, string[]>>({})
+			const selected = ref<Record<string, string[]>>({
+				version: ['1.21.5'],
+			})
+			const minimumDownloads = ref('1k')
 			const releaseOnly = ref(true)
 			const categories = [
 				{
@@ -171,7 +174,7 @@ export const CustomControls: Story = {
 					],
 				},
 			]
-			return { categories, releaseOnly, selected }
+			return { categories, minimumDownloads, releaseOnly, selected }
 		},
 		template: /* html */ `
 			<div class="flex flex-wrap items-center gap-2">
@@ -193,12 +196,33 @@ export const CustomControls: Story = {
 							</button>
 						</div>
 					</template>
+					<template #preview-footer="{ category, setSelectedValues, closeMenu }">
+						<div
+							v-if="category.key === 'version'"
+							class="flex flex-wrap items-center gap-3 border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+						>
+							<span class="shrink-0 whitespace-nowrap text-sm font-semibold text-primary">
+								Versions above
+							</span>
+							<input
+								v-model="minimumDownloads"
+								type="text"
+								inputmode="numeric"
+								class="h-8 w-16 rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-center text-sm font-semibold text-primary outline-none"
+								aria-label="Version downloads threshold"
+								@keydown.enter.prevent.stop="setSelectedValues(['1.21.5', '1.21.4']); closeMenu($event)"
+							/>
+							<span class="shrink-0 text-sm font-semibold text-primary">downloads</span>
+						</div>
+					</template>
 				</DropdownFilterBar>
 			</div>
 		`,
 	}),
 	args: {
-		modelValue: {},
+		modelValue: {
+			version: ['1.21.5'],
+		},
 		categories: searchableCategories,
 	},
 }

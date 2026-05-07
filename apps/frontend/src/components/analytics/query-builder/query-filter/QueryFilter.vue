@@ -26,11 +26,12 @@
 					(threshold) => setCountryDownloadsThreshold(threshold, setSelectedValues)
 				"
 				@submit="
-					() =>
+					(event) =>
 						runDownloadsThresholdQuery(
 							applyCountryDownloadsThreshold,
 							setSelectedValues,
 							closeMenu,
+							event,
 						)
 				"
 			/>
@@ -45,11 +46,12 @@
 					(threshold) => setProjectVersionDownloadsThreshold(threshold, setSelectedValues)
 				"
 				@submit="
-					() =>
+					(event) =>
 						runDownloadsThresholdQuery(
 							applyProjectVersionDownloadsThreshold,
 							setSelectedValues,
 							closeMenu,
+							event,
 						)
 				"
 			/>
@@ -64,11 +66,75 @@
 					(threshold) => setGameVersionDownloadsThreshold(threshold, setSelectedValues)
 				"
 				@submit="
-					() =>
+					(event) =>
 						runDownloadsThresholdQuery(
 							applyGameVersionDownloadsThreshold,
 							setSelectedValues,
 							closeMenu,
+							event,
+						)
+				"
+			/>
+		</template>
+
+		<template #preview-footer="{ category, setSelectedValues, closeMenu }">
+			<DownloadsThresholdInput
+				v-if="category.key === 'country'"
+				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				label="Countries above"
+				input-aria-label="Country downloads threshold"
+				:threshold="countryDownloadsThreshold"
+				input-width-class="w-16"
+				@update:threshold="
+					(threshold) => setCountryDownloadsThreshold(threshold, setSelectedValues)
+				"
+				@submit="
+					(event) =>
+						runDownloadsThresholdQuery(
+							applyCountryDownloadsThreshold,
+							setSelectedValues,
+							closeMenu,
+							event,
+						)
+				"
+			/>
+			<DownloadsThresholdInput
+				v-else-if="category.key === 'version_id'"
+				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				label="Project versions above"
+				input-aria-label="Project version downloads threshold"
+				:threshold="projectVersionDownloadsThreshold"
+				input-width-class="w-16"
+				@update:threshold="
+					(threshold) => setProjectVersionDownloadsThreshold(threshold, setSelectedValues)
+				"
+				@submit="
+					(event) =>
+						runDownloadsThresholdQuery(
+							applyProjectVersionDownloadsThreshold,
+							setSelectedValues,
+							closeMenu,
+							event,
+						)
+				"
+			/>
+			<DownloadsThresholdInput
+				v-else-if="category.key === 'game_version'"
+				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				label="Game Versions above"
+				input-aria-label="Game version downloads threshold"
+				:threshold="gameVersionDownloadsThreshold"
+				input-width-class="w-16"
+				@update:threshold="
+					(threshold) => setGameVersionDownloadsThreshold(threshold, setSelectedValues)
+				"
+				@submit="
+					(event) =>
+						runDownloadsThresholdQuery(
+							applyGameVersionDownloadsThreshold,
+							setSelectedValues,
+							closeMenu,
+							event,
 						)
 				"
 			/>
@@ -103,6 +169,7 @@ import {
 type AnalyticsFilterValueCategory = Exclude<AnalyticsQueryFilterCategory, 'project'>
 type SetDropdownFilterValues = (values: string[]) => void
 type ApplyDownloadsThreshold = (setSelectedValues: SetDropdownFilterValues) => void
+type CloseDownloadsThresholdMenu = (event?: Event) => void
 
 const {
 	filterOptions,
@@ -475,10 +542,11 @@ function setGameVersionDownloadsThreshold(
 async function runDownloadsThresholdQuery(
 	applyDownloadsThreshold: ApplyDownloadsThreshold,
 	setSelectedValues: SetDropdownFilterValues,
-	closeMenu: () => void,
+	closeMenu: CloseDownloadsThresholdMenu,
+	event?: KeyboardEvent,
 ) {
 	applyDownloadsThreshold(setSelectedValues)
-	closeMenu()
+	closeMenu(event)
 	await nextTick()
 	await refreshAnalyticsQuery()
 }
