@@ -351,26 +351,30 @@ function suppressRangeDragClick(event: MouseEvent) {
 	event.stopImmediatePropagation()
 }
 
-function syncSingleRangeHoverState(event: MouseEvent) {
-	const instance = picker.value
-	const dayElem = getRangeDayElement(event.target)
-	const selectedDate = instance?.selectedDates[0]
-
-	const isHoveringSelectedRangeDate =
-		props.mode === 'range' &&
-		instance?.selectedDates.length === 1 &&
-		selectedDate &&
-		dayElem?.dateObj &&
-		dateOnlyTime(dayElem.dateObj) === dateOnlyTime(selectedDate)
-
-	instance?.calendarContainer.classList.toggle(
-		'is-hovering-selected-range-date',
-		Boolean(isHoveringSelectedRangeDate),
+function hasRangeEnd(instance: Instance) {
+	return (
+		instance.selectedDates.length === 2 ||
+		Boolean(instance.calendarContainer.querySelector('.flatpickr-day.endRange:not(.startRange)'))
 	)
 }
 
-function clearSingleRangeHoverState() {
-	picker.value?.calendarContainer.classList.remove('is-hovering-selected-range-date')
+function shouldSuppressMissingRangeEndBackground(instance?: Instance) {
+	if (props.mode !== 'range' || !instance) return false
+
+	const hasRangeStart = Boolean(
+		instance.calendarContainer.querySelector('.flatpickr-day.startRange:not(.endRange)'),
+	)
+
+	return hasRangeStart && !hasRangeEnd(instance)
+}
+
+function syncMissingRangeEndState() {
+	const instance = picker.value
+
+	instance?.calendarContainer.classList.toggle(
+		'is-missing-range-end',
+		shouldSuppressMissingRangeEndBackground(instance),
+	)
 }
 
 function isTimeInput(target: EventTarget | null): target is HTMLInputElement {
@@ -545,8 +549,8 @@ onMounted(async () => {
 			instance.calendarContainer.addEventListener('mousedown', stopRangeEndpointMouseEvent, true)
 			instance.calendarContainer.addEventListener('mouseup', stopRangeEndpointMouseEvent, true)
 			instance.calendarContainer.addEventListener('click', suppressRangeDragClick, true)
-			instance.calendarContainer.addEventListener('mouseover', syncSingleRangeHoverState)
-			instance.calendarContainer.addEventListener('mouseleave', clearSingleRangeHoverState)
+			instance.calendarContainer.addEventListener('mouseover', syncMissingRangeEndState)
+			instance.calendarContainer.addEventListener('mouseleave', syncMissingRangeEndState)
 			instance.calendarContainer.addEventListener(
 				'click',
 				normalizeTimeInputForArrowIncrement,
@@ -621,6 +625,7 @@ onMounted(async () => {
 			}
 
 			syncHeaderControlState(instance)
+			syncMissingRangeEndState()
 		},
 		onClose: (_selectedDates, dateStr, instance) => {
 			if (!props.clearable || dateStr) return
@@ -634,10 +639,12 @@ onMounted(async () => {
 		onMonthChange: (_selectedDates, _dateStr, instance) => {
 			applyPreserveDay(instance)
 			syncHeaderControlState(instance)
+			syncMissingRangeEndState()
 		},
 		onYearChange: (_selectedDates, _dateStr, instance) => {
 			applyPreserveDay(instance)
 			syncHeaderControlState(instance)
+			syncMissingRangeEndState()
 		},
 		onOpen: (_selectedDates, _dateStr, instance) => {
 			if (props.defaultViewDate && instance.selectedDates.length === 0) {
@@ -645,6 +652,7 @@ onMounted(async () => {
 			}
 			syncTimeInputTypes(instance)
 			syncHeaderControlState(instance)
+			syncMissingRangeEndState()
 		},
 	})
 
@@ -707,6 +715,7 @@ function syncPickerFromModel() {
 
 	isSyncingFromModel.value = false
 	syncHeaderControlState(picker.value)
+	syncMissingRangeEndState()
 }
 
 function syncAltInputState() {
@@ -724,6 +733,7 @@ defineExpose({
 		const nextValue = props.mode === 'single' ? null : []
 		model.value = nextValue
 		picker.value?.clear(false)
+		syncMissingRangeEndState()
 		emit('clear')
 		emit('change', nextValue)
 	},
@@ -864,18 +874,14 @@ defineExpose({
 }
 .modrinth-date-picker
 	:deep(
-		.flatpickr-day:focus:not(:focus-visible):not(.selected):not(.startRange):not(
-				.endRange
-			):not(.inRange)
+		.flatpickr-day:focus:not(:focus-visible):not(.selected):not(.startRange):not(.endRange):not(
+				.inRange
+			)
 	) {
 	@apply border-transparent bg-transparent text-primary outline-none;
 }
 .modrinth-date-picker
-	:deep(
-		.flatpickr-day:focus-visible:not(.selected):not(.startRange):not(.endRange):not(
-				.inRange
-			)
-	) {
+	:deep(.flatpickr-day:focus-visible:not(.selected):not(.startRange):not(.endRange):not(.inRange)) {
 	@apply border-transparent bg-surface-4 text-contrast outline-none;
 }
 .modrinth-date-picker :deep(.flatpickr-day.flatpickr-disabled) {
@@ -945,9 +951,10 @@ defineExpose({
 
 .modrinth-date-picker
 	:deep(
-		.flatpickr-calendar.is-hovering-selected-range-date
-			.flatpickr-day.selected.startRange:not(.endRange)::before
-	) {
+		.flatpickr-calendar.is-missing-range-end .flatpickr-day.startRange:not(.endRange)::before
+	),
+.modrinth-date-picker
+	:deep(.flatpickr-calendar.is-missing-range-end .flatpickr-day:hover::before) {
 	background: transparent;
 }
 
@@ -991,8 +998,7 @@ defineExpose({
 	:deep(.flatpickr-calendar.multiMonth .flatpickr-day.inRange:has(+ .hidden)::before),
 .modrinth-date-picker
 	:deep(
-		.flatpickr-calendar.multiMonth
-			.flatpickr-day.startRange:not(.endRange):has(+ .hidden)::before
+		.flatpickr-calendar.multiMonth .flatpickr-day.startRange:not(.endRange):has(+ .hidden)::before
 	) {
 	@apply rounded-r-xl;
 	right: 0;
@@ -1010,13 +1016,9 @@ defineExpose({
 }
 
 .modrinth-date-picker.is-dragging-range
-	:deep(
-		.flatpickr-day:not(.selected):not(.startRange):not(.endRange):not(.inRange):hover
-	),
+	:deep(.flatpickr-day:not(.selected):not(.startRange):not(.endRange):not(.inRange):hover),
 .modrinth-date-picker.is-dragging-range
-	:deep(
-		.flatpickr-day:not(.selected):not(.startRange):not(.endRange):not(.inRange):focus
-	) {
+	:deep(.flatpickr-day:not(.selected):not(.startRange):not(.endRange):not(.inRange):focus) {
 	@apply border-transparent bg-transparent text-primary;
 }
 
