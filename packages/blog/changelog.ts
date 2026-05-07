@@ -11,6 +11,35 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-06T22:11:04+00:00`,
+		product: 'app',
+		version: '0.13.11',
+		body: `## Fixed
+- Fixed modpack export including duplicated files as overrides.`,
+	},
+	{
+		date: `2026-05-05T01:34:18+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed unauthorized error when loading a user's own project or organization settings.`,
+	},
+	{
+		date: `2026-05-04T19:57:12+00:00`,
+		product: 'web',
+		body: `## Changed
+- Users who are not members of a project or organization can no longer view settings pages.
+
+## Fixed
+- Fixed some project pages failing to load due to invalid iframe links in their descriptions.`,
+	},
+	{
+		date: `2026-05-04T19:57:12+00:00`,
+		product: 'app',
+		version: '0.13.10',
+		body: `## Fixed
+- Fixed some project pages failing to load due to invalid iframe links in their descriptions.`,
+	},
+	{
 		date: `2026-05-03T18:07:44+00:00`,
 		product: 'web',
 		body: `## Changed

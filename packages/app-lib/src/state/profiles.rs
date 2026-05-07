@@ -951,15 +951,13 @@ impl Profile {
             InitialScanFile,
         > = keys.into_iter().map(|k| (k.path.clone(), k)).collect();
 
-        let mut file_info_by_hash: std::collections::HashMap<
-            String,
-            CachedFile,
-        > = file_info.into_iter().map(|f| (f.hash.clone(), f)).collect();
+        let file_info_by_hash: std::collections::HashMap<String, CachedFile> =
+            file_info.into_iter().map(|f| (f.hash.clone(), f)).collect();
 
         let files = DashMap::new();
 
         for hash in file_hashes {
-            let file = file_info_by_hash.remove(&hash.hash);
+            let file = file_info_by_hash.get(&hash.hash).cloned();
             let trimmed = hash.path.trim_end_matches(".disabled");
 
             if let Some(initial_file) = keys_by_path.remove(trimmed) {
