@@ -14,6 +14,7 @@ import type { CardAction, ProjectType, Tags } from '@modrinth/ui'
 import {
 	BrowsePageLayout,
 	BrowseSidebar,
+	BrowseVersionChoiceModal,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
@@ -32,7 +33,12 @@ import type { LocationQuery } from 'vue-router'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
+import {
+	get_project,
+	get_project_v3,
+	get_search_results_v3,
+	get_version_many,
+} from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_profile_path } from '@/helpers/process'
@@ -52,7 +58,7 @@ import {
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress } from '@/store/install.js'
+import { getServerAddress, isVersionCompatible } from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -65,6 +71,7 @@ const debugLog = useDebugLogger('Browse')
 const router = useRouter()
 const route = useRoute()
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
+const versionChoiceModalRef = ref<InstanceType<typeof BrowseVersionChoiceModal> | null>(null)
 const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
 provideServerInstallContent(serverInstallContent)
 const {
@@ -76,15 +83,20 @@ const {
 	effectiveServerWorldId,
 	serverContextServerData,
 	serverContentProjectIds,
+	queuedServerInstallProjectIds,
+	queuedServerInstallCount,
 	serverBackUrl,
 	serverBackLabel,
 	serverBrowseHeading,
+	clearQueuedServerInstalls,
+	flushQueuedServerInstalls,
 	initServerContext,
 	watchServerContextChanges,
 	searchServerModpacks,
 	getServerProjectVersions,
 	enforceSetupModpackRoute,
 	installProjectToServer,
+	getServerAddonInstallVersion,
 	onServerFlowBack,
 	handleServerModpackFlowCreate,
 	markServerProjectInstalled,
@@ -460,7 +472,7 @@ const messages = defineMessages({
 	},
 	addServersToInstance: {
 		id: 'app.browse.add-servers-to-instance',
-		defaultMessage: 'Add servers to your instance',
+		defaultMessage: 'Adding server to instance',
 	},
 	addToInstance: {
 		id: 'app.browse.add-to-instance',
@@ -508,7 +520,7 @@ const messages = defineMessages({
 	},
 	installContentToInstance: {
 		id: 'app.browse.install-content-to-instance',
-		defaultMessage: 'Install content to instance',
+		defaultMessage: 'Installing content',
 	},
 	installToServer: {
 		id: 'app.browse.server.install',
@@ -521,6 +533,10 @@ const messages = defineMessages({
 	installingToServer: {
 		id: 'app.browse.server.installing',
 		defaultMessage: 'Installing',
+	},
+	queuedToServer: {
+		id: 'app.browse.server.queued',
+		defaultMessage: 'Queued',
 	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
@@ -707,6 +723,12 @@ const installContext = computed(() => {
 			backUrl: serverBackUrl.value,
 			backLabel: serverBackLabel.value,
 			heading: serverBrowseHeading.value,
+			queuedCount: queuedServerInstallCount.value,
+			queuedLabel: `${queuedServerInstallCount.value} ${
+				queuedServerInstallCount.value === 1 ? 'Mod' : 'Mods'
+			}`,
+			clearQueued: clearQueuedServerInstalls,
+			onBack: flushQueuedServerInstalls,
 		}
 	}
 	if (instance.value) {
@@ -739,6 +761,218 @@ function setProjectInstalling(projectId: string, installing: boolean) {
 		next.delete(projectId)
 	}
 	installingProjectIds.value = next
+}
+
+type InstallPreferences = {
+	gameVersions?: string[]
+	loaders?: string[]
+}
+
+type ServerAddonProjectType = 'mod' | 'plugin' | 'datapack'
+
+function getLoaderFilterTypes(projectTypeValue: string) {
+	if (projectTypeValue === 'mod') return ['mod_loader']
+	if (projectTypeValue === 'plugin') return ['plugin_loader', 'plugin_platform']
+	if (projectTypeValue === 'modpack') return ['modpack_loader']
+	return []
+}
+
+function getEffectiveInstallFilters() {
+	const providedFilters = (combinedProvidedFilters.value ?? []).filter(
+		(providedFilter) =>
+			!searchState.overriddenProvidedFilterTypes.value.includes(providedFilter.type),
+	)
+	const userFilters = searchState.currentFilters.value.filter(
+		(userFilter) =>
+			!providedFilters.some((providedFilter) => providedFilter.type === userFilter.type),
+	)
+	return [...userFilters, ...providedFilters].filter((filter) => !filter.negative)
+}
+
+function getSelectedInstallPreferences(projectTypeValue: string): InstallPreferences {
+	const filters = getEffectiveInstallFilters()
+	const loaderFilterTypes = getLoaderFilterTypes(projectTypeValue)
+	const gameVersions = filters
+		.filter((filter) => filter.type === 'game_version')
+		.map((filter) => filter.option)
+	const loaders = filters
+		.filter((filter) => loaderFilterTypes.includes(filter.type))
+		.map((filter) => filter.option)
+
+	return {
+		gameVersions: gameVersions.length > 0 ? gameVersions : undefined,
+		loaders: loaders.length > 0 ? loaders : undefined,
+	}
+}
+
+function getServerTargetPreferences(): InstallPreferences {
+	return {
+		gameVersions: serverContextServerData.value?.mc_version
+			? [serverContextServerData.value.mc_version]
+			: undefined,
+		loaders: serverContextServerData.value?.loader ? [serverContextServerData.value.loader] : undefined,
+	}
+}
+
+function getInstanceTargetPreferences(): InstallPreferences {
+	return {
+		gameVersions: instance.value?.game_version ? [instance.value.game_version] : undefined,
+		loaders: instance.value?.loader ? [instance.value.loader] : undefined,
+	}
+}
+
+function preferencesDiffer(selected: InstallPreferences, target: InstallPreferences) {
+	const targetGameVersion = target.gameVersions?.[0]
+	const targetLoader = target.loaders?.[0]
+	return (
+		(!!selected.gameVersions?.length &&
+			!!targetGameVersion &&
+			!selected.gameVersions.includes(targetGameVersion)) ||
+		(!!selected.loaders?.length &&
+			!!targetLoader &&
+			!selected.loaders.some((loader) => loader.toLowerCase() === targetLoader.toLowerCase()))
+	)
+}
+
+function modalOptionFromPreferences(preferences: InstallPreferences) {
+	return {
+		gameVersion: preferences.gameVersions?.[0],
+		loader: preferences.loaders?.[0],
+	}
+}
+
+function getProjectDisplayName(
+	project: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
+) {
+	return 'title' in project ? project.title : project.name
+}
+
+async function chooseServerInstallPreferences(
+	project: Labrinth.Search.v2.ResultSearchProject & Labrinth.Search.v3.ResultSearchProject,
+	projectTypeValue: ServerAddonProjectType,
+) {
+	const selectedPreferences = getSelectedInstallPreferences(projectTypeValue)
+	const targetPreferences = getServerTargetPreferences()
+	if (!preferencesDiffer(selectedPreferences, targetPreferences)) {
+		return selectedPreferences
+	}
+
+	const hasSelectedVersion = await getServerAddonInstallVersion(
+		project,
+		projectTypeValue,
+		selectedPreferences,
+	)
+		.then(() => true)
+		.catch(() => false)
+	const hasTargetVersion = await getServerAddonInstallVersion(
+		project,
+		projectTypeValue,
+		targetPreferences,
+	)
+		.then(() => true)
+		.catch(() => false)
+
+	if (!hasTargetVersion) {
+		return selectedPreferences
+	}
+	if (!hasSelectedVersion) {
+		return targetPreferences
+	}
+
+	const choice = await versionChoiceModalRef.value?.show({
+		projectName: getProjectDisplayName(project),
+		targetType: 'server',
+		selected: modalOptionFromPreferences(selectedPreferences),
+		target: modalOptionFromPreferences(targetPreferences),
+	})
+
+	if (!choice) return null
+	return choice === 'target' ? targetPreferences : selectedPreferences
+}
+
+async function findInstallVersion(
+	projectId: string,
+	projectTypeValue: string,
+	preferences: InstallPreferences,
+) {
+	const project = await get_project(projectId, 'must_revalidate')
+	const versions = (await get_version_many(
+		project.versions,
+		'must_revalidate',
+	)) as Labrinth.Versions.v2.Version[]
+	const loaderFilterTypes = getLoaderFilterTypes(projectTypeValue)
+	const shouldMatchLoaders = loaderFilterTypes.length > 0 && !!preferences.loaders?.length
+
+	return versions
+		.filter((version) => {
+			const gameVersionMatches =
+				!preferences.gameVersions?.length ||
+				version.game_versions.some((gameVersion) =>
+					preferences.gameVersions?.includes(gameVersion),
+				)
+			const loaderMatches =
+				!shouldMatchLoaders ||
+				version.loaders.some((loader) =>
+					preferences.loaders?.some(
+						(preferredLoader) => preferredLoader.toLowerCase() === loader.toLowerCase(),
+					),
+				)
+			return gameVersionMatches && loaderMatches
+		})
+		.sort(
+			(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+		)[0]
+}
+
+async function chooseInstanceInstallVersion(
+	project: Labrinth.Search.v2.ResultSearchProject & Labrinth.Search.v3.ResultSearchProject,
+	projectTypeValue: string,
+) {
+	const targetInstance = instance.value
+	if (!targetInstance) {
+		return { versionId: null as string | null }
+	}
+
+	const selectedPreferences = getSelectedInstallPreferences(projectTypeValue)
+	const targetPreferences = getInstanceTargetPreferences()
+	if (!preferencesDiffer(selectedPreferences, targetPreferences)) {
+		return { versionId: null as string | null }
+	}
+
+	const projectData = await get_project(project.project_id, 'must_revalidate')
+	const versions = (await get_version_many(
+		projectData.versions,
+		'must_revalidate',
+	)) as Labrinth.Versions.v2.Version[]
+	const sortedVersions = versions.sort(
+		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+	)
+	const targetVersion = sortedVersions.find((version) =>
+		isVersionCompatible(version, projectData, targetInstance),
+	)
+	const selectedVersion = await findInstallVersion(
+		project.project_id,
+		projectTypeValue,
+		selectedPreferences,
+	)
+
+	if (!targetVersion) {
+		return { versionId: selectedVersion?.id ?? null }
+	}
+	if (!selectedVersion) {
+		return { versionId: null as string | null }
+	}
+
+	const choice = await versionChoiceModalRef.value?.show({
+		projectName: getProjectDisplayName(project),
+		targetType: 'instance',
+		selected: modalOptionFromPreferences(selectedPreferences),
+		target: modalOptionFromPreferences(targetPreferences),
+	})
+
+	if (!choice) return null
+	if (choice === 'target') return { versionId: null as string | null }
+	return { versionId: selectedVersion?.id ?? null }
 }
 
 function getCardActions(
@@ -824,32 +1058,44 @@ function getCardActions(
 		isServerContext.value &&
 		['modpack', 'mod', 'plugin', 'datapack'].includes(currentProjectType)
 	) {
+		const isQueued = queuedServerInstallProjectIds.value.has(projectResult.project_id)
+		const installLabel = isQueued
+			? messages.queuedToServer
+			: isInstalling
+				? messages.installingToServer
+				: isInstalled
+					? messages.installedToServer
+					: messages.installToServer
 		return [
 			{
 				key: 'install',
-				label: formatMessage(
-					isInstalling
-						? messages.installingToServer
-						: isInstalled
-							? messages.installedToServer
-							: messages.installToServer,
-				),
-				icon: isInstalled ? CheckIcon : PlusIcon,
+				label: formatMessage(installLabel),
+				icon: isQueued || isInstalled ? CheckIcon : PlusIcon,
 				iconClass: isInstalling ? 'animate-spin' : undefined,
-				disabled: isInstalled || isInstalling,
-				color: 'brand',
+				disabled: isInstalled || isInstalling || isQueued,
+				color: isQueued ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: async () => {
-					setProjectInstalling(projectResult.project_id, true)
+					const shouldShowInstalling = currentProjectType === 'modpack'
+					if (shouldShowInstalling) {
+						setProjectInstalling(projectResult.project_id, true)
+					}
 					try {
-						const didInstall = await installProjectToServer(projectResult)
-						if (didInstall !== false) {
-							onSearchResultInstalled(projectResult.project_id)
-						}
+						const installPreferences =
+							currentProjectType === 'modpack'
+								? undefined
+								: await chooseServerInstallPreferences(
+										projectResult,
+										currentProjectType as ServerAddonProjectType,
+									)
+						if (installPreferences === null) return
+						await installProjectToServer(projectResult, installPreferences)
 					} catch (err) {
 						handleError(err as Error)
 					} finally {
-						setProjectInstalling(projectResult.project_id, false)
+						if (shouldShowInstalling) {
+							setProjectInstalling(projectResult.project_id, false)
+						}
 					}
 				},
 			},
@@ -876,28 +1122,39 @@ function getCardActions(
 			type: 'outlined',
 			onClick: async () => {
 				setProjectInstalling(projectResult.project_id, true)
-				await installVersion(
-					projectResult.project_id,
-					null,
-					instance.value ? instance.value.path : null,
-					'SearchCard',
-					(versionId) => {
+				try {
+					const selectedInstall = instance.value
+						? await chooseInstanceInstallVersion(projectResult, currentProjectType)
+						: { versionId: null as string | null }
+					if (selectedInstall === null) {
 						setProjectInstalling(projectResult.project_id, false)
-						if (versionId) {
-							onSearchResultInstalled(projectResult.project_id)
-						}
-					},
-					(profile) => {
-						router.push(`/instance/${profile}`)
-					},
-					{
-						preferredLoader: instance.value?.loader ?? undefined,
-						preferredGameVersion: instance.value?.game_version ?? undefined,
-					},
-				).catch((err) => {
+						return
+					}
+					const selectedPreferences = getSelectedInstallPreferences(currentProjectType)
+					await installVersion(
+						projectResult.project_id,
+						selectedInstall.versionId,
+						instance.value ? instance.value.path : null,
+						'SearchCard',
+						(versionId) => {
+							setProjectInstalling(projectResult.project_id, false)
+							if (versionId) {
+								onSearchResultInstalled(projectResult.project_id)
+							}
+						},
+						(profile) => {
+							router.push(`/instance/${profile}`)
+						},
+						{
+							preferredLoader: instance.value?.loader ?? selectedPreferences.loaders?.[0],
+							preferredGameVersion:
+								instance.value?.game_version ?? selectedPreferences.gameVersions?.[0],
+						},
+					)
+				} catch (err) {
 					setProjectInstalling(projectResult.project_id, false)
 					handleError(err)
-				})
+				}
 			},
 		},
 	]
@@ -1103,6 +1360,7 @@ provideBrowseManager({
 			@browse-modpacks="() => {}"
 			@create="handleServerModpackFlowCreate"
 		/>
+		<BrowseVersionChoiceModal ref="versionChoiceModalRef" />
 		<Teleport to="#sidebar-teleport-target">
 			<BrowseSidebar />
 		</Teleport>

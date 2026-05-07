@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { GameIcon, LeftArrowIcon, MinecraftServerIcon } from '@modrinth/assets'
+import { BoxIcon, LeftArrowIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import ContentPageHeader from '#ui/components/base/ContentPageHeader.vue'
 import { useServerImage } from '#ui/composables/use-server-image'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
@@ -27,35 +26,92 @@ const { image: fetchedIcon } = useServerImage(serverId, upstream, {
 
 const iconSrc = computed(() => {
 	if (installContext.value?.isMedal) return MEDAL_ICON_URL
-	return fetchedIcon.value ?? installContext.value?.iconSrc ?? MinecraftServerIcon
+	return fetchedIcon.value ?? installContext.value?.iconSrc ?? null
 })
+
+const metadataItems = computed(() => {
+	const context = installContext.value
+	if (!context) return []
+	return [
+		context.heading,
+		context.gameVersion ? `MC ${context.gameVersion}` : '',
+		context.loader ? formatLoaderLabel(context.loader) : '',
+	].filter(Boolean)
+})
+
+const queuedCount = computed(() => installContext.value?.queuedCount ?? 0)
+const queuedLabel = computed(() => {
+	if (installContext.value?.queuedLabel) return installContext.value.queuedLabel
+	return `${queuedCount.value} ${queuedCount.value === 1 ? 'Mod' : 'Mods'}`
+})
+
+async function handleBack() {
+	const context = installContext.value
+	if (!context) return
+
+	const shouldNavigate = await context.onBack?.()
+	if (shouldNavigate === false) return
+
+	await router.push(context.backUrl)
+}
+
+async function clearQueued() {
+	await installContext.value?.clearQueued?.()
+}
 </script>
 
 <template>
 	<template v-if="installContext">
-		<ContentPageHeader class="mb-2">
-			<template #icon>
-				<Avatar :src="iconSrc" size="64px" />
-			</template>
-			<template #title>
-				{{ installContext.name }}
-			</template>
-			<template #summary>
-				<span class="flex items-center gap-2 text-sm font-semibold text-secondary">
-					<GameIcon class="h-5 w-5 text-secondary" />
-					{{ formatLoaderLabel(installContext.loader) }} {{ installContext.gameVersion }}
-				</span>
-			</template>
-			<template #actions>
-				<ButtonStyled>
-					<button @click="router.push(installContext.backUrl)">
-						<LeftArrowIcon />
-						{{ installContext.backLabel }}
+		<div class="mb-2 flex flex-col gap-2">
+			<div class="flex flex-wrap items-center justify-between gap-4">
+				<div class="flex min-w-0 items-center gap-4">
+					<ButtonStyled circular size="large">
+						<button :aria-label="installContext.backLabel" @click="handleBack">
+							<LeftArrowIcon />
+						</button>
+					</ButtonStyled>
+
+					<Avatar v-if="iconSrc" :src="iconSrc" size="48px" class="shrink-0" />
+
+					<div class="flex min-w-0 flex-col justify-center gap-1">
+						<h1 class="m-0 truncate text-2xl font-semibold leading-8 text-contrast">
+							{{ installContext.name }}
+						</h1>
+						<div
+							v-if="metadataItems.length"
+							class="flex flex-wrap items-center gap-2 text-base font-medium leading-6 text-primary"
+						>
+							<template v-for="(item, index) in metadataItems" :key="item">
+								<span
+									v-if="index > 0"
+									class="h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-60"
+								/>
+								<span>{{ item }}</span>
+							</template>
+						</div>
+					</div>
+				</div>
+
+				<div
+					v-if="queuedCount > 0 && installContext.clearQueued"
+					class="flex shrink-0 items-center gap-4 text-base font-medium leading-6 text-primary"
+				>
+					<div class="flex items-center gap-1.5">
+						<span>Queued</span>
+						<BoxIcon class="h-5 w-5" />
+						<span>{{ queuedLabel }}</span>
+					</div>
+					<div class="h-[18px] w-px bg-surface-5" />
+					<button
+						type="button"
+						class="border-0 bg-transparent p-0 text-base font-medium leading-6 text-primary hover:text-contrast"
+						@click="clearQueued"
+					>
+						Clear
 					</button>
-				</ButtonStyled>
-			</template>
-		</ContentPageHeader>
-		<h1 class="m-0 mb-1 text-xl font-extrabold">{{ installContext.heading }}</h1>
+				</div>
+			</div>
+		</div>
 		<Admonition v-if="installContext.warning" type="warning" class="mb-1">
 			{{ installContext.warning }}
 		</Admonition>

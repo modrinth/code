@@ -24,6 +24,10 @@ export interface BrowseInstallContext {
 	backLabel: string
 	heading: string
 	warning?: string
+	queuedCount?: number
+	queuedLabel?: string
+	clearQueued?: () => void | Promise<void>
+	onBack?: () => boolean | void | Promise<boolean | void>
 }
 
 export interface CardAction {
@@ -32,7 +36,7 @@ export interface CardAction {
 	icon: Component
 	iconClass?: string
 	disabled?: boolean
-	color?: 'brand' | 'red'
+	color?: 'brand' | 'red' | 'green'
 	type?: 'standard' | 'outlined' | 'transparent'
 	circular?: boolean
 	tooltip?: string

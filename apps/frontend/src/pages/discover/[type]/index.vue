@@ -16,6 +16,7 @@ import {
 	BrowseInstallHeader,
 	BrowsePageLayout,
 	BrowseSidebar,
+	BrowseVersionChoiceModal,
 	CreationFlowModal,
 	defineMessages,
 	injectModrinthClient,
@@ -44,6 +45,7 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 const filtersMenuOpen = ref(false)
+const versionChoiceModalRef = ref<InstanceType<typeof BrowseVersionChoiceModal> | null>(null)
 
 const route = useRoute()
 
@@ -178,6 +180,28 @@ const optimisticallyInstalledProjectIds = ref<Set<string>>(new Set())
 const hiddenInstalledProjectIds = ref<Set<string>>(new Set())
 const hiddenInstalledProjectIdsInitialized = ref(false)
 
+interface InstallableSearchResult extends Labrinth.Search.v2.ResultSearchProject {
+	installed?: boolean
+}
+
+type ServerInstallableType = 'modpack' | 'mod' | 'plugin' | 'datapack'
+type ServerAddonInstallType = Exclude<ServerInstallableType, 'modpack'>
+
+interface QueuedServerInstall {
+	project: InstallableSearchResult
+	contentType: ServerAddonInstallType
+	preferences?: InstallPreferences
+}
+
+type InstallPreferences = {
+	gameVersions?: string[]
+	loaders?: string[]
+}
+
+const queuedServerInstalls = ref<Map<string, QueuedServerInstall>>(new Map())
+const queuedServerInstallProjectIds = computed(() => new Set(queuedServerInstalls.value.keys()))
+const queuedServerInstallCount = computed(() => queuedServerInstalls.value.size)
+
 function setProjectInstalling(projectId: string, installing: boolean) {
 	const next = new Set(installingProjectIds.value)
 	if (installing) {
@@ -207,6 +231,7 @@ function syncHiddenInstalledProjectIds() {
 	hiddenInstalledProjectIds.value = new Set([
 		...getServerInstalledProjectIds(),
 		...optimisticallyInstalledProjectIds.value,
+		...queuedServerInstallProjectIds.value,
 	])
 	hiddenInstalledProjectIdsInitialized.value = true
 }
@@ -318,18 +343,207 @@ const serverFilters = computed(() => {
 	return filters
 })
 
-interface InstallableSearchResult extends Labrinth.Search.v2.ResultSearchProject {
-	installed?: boolean
+function getCurrentServerInstallType(): ServerInstallableType {
+	const type = projectType.value?.id
+	if (type === 'modpack' || type === 'mod' || type === 'plugin' || type === 'datapack') {
+		return type
+	}
+	throw new Error('This content type cannot be installed to a server from browse.')
+}
+
+async function resolveServerAddonVersion(
+	project: InstallableSearchResult,
+	contentType: ServerAddonInstallType,
+	preferences?: InstallPreferences,
+) {
+	const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id)
+	const isDatapack = contentType === 'datapack'
+	const gameVersions =
+		preferences?.gameVersions && preferences.gameVersions.length > 0
+			? new Set(preferences.gameVersions)
+			: serverData.value?.mc_version
+				? new Set([serverData.value.mc_version])
+				: new Set<string>()
+	const loaders =
+		preferences?.loaders && preferences.loaders.length > 0
+			? new Set(preferences.loaders.map((loader) => loader.toLowerCase()))
+			: serverData.value?.loader
+				? new Set([serverData.value.loader.toLowerCase()])
+				: new Set<string>()
+	const matchingVersions = versions.filter((x) => {
+		if (gameVersions.size > 0 && !x.game_versions.some((version) => gameVersions.has(version))) {
+			return false
+		}
+		if (isDatapack) return true
+		return loaders.size === 0 || x.loaders.some((loader) => loaders.has(loader.toLowerCase()))
+	})
+	const version = [...matchingVersions].sort(
+		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+	)[0]
+	if (!version) {
+		const versionLabel =
+			gameVersions.size > 0 ? Array.from(gameVersions).join(', ') : serverData.value!.mc_version
+		const loaderLabel =
+			loaders.size > 0 ? Array.from(loaders).join(', ') : serverData.value!.loader
+		throw new Error(
+			isDatapack
+				? `No compatible version found for ${versionLabel}`
+				: `No compatible version found for ${versionLabel} / ${loaderLabel}`,
+		)
+	}
+	return version
+}
+
+function getLoaderFilterTypes(projectTypeValue: string) {
+	if (projectTypeValue === 'mod') return ['mod_loader']
+	if (projectTypeValue === 'plugin') return ['plugin_loader', 'plugin_platform']
+	if (projectTypeValue === 'modpack') return ['modpack_loader']
+	return []
+}
+
+function getEffectiveInstallFilters() {
+	const providedFilters = (serverFilters.value ?? []).filter(
+		(providedFilter) =>
+			!searchState.overriddenProvidedFilterTypes.value.includes(providedFilter.type),
+	)
+	const userFilters = searchState.currentFilters.value.filter(
+		(userFilter) =>
+			!providedFilters.some((providedFilter) => providedFilter.type === userFilter.type),
+	)
+	return [...userFilters, ...providedFilters].filter((filter) => !filter.negative)
+}
+
+function getSelectedInstallPreferences(projectTypeValue: string): InstallPreferences {
+	const filters = getEffectiveInstallFilters()
+	const loaderFilterTypes = getLoaderFilterTypes(projectTypeValue)
+	const gameVersions = filters
+		.filter((filter) => filter.type === 'game_version')
+		.map((filter) => filter.option)
+	const loaders = filters
+		.filter((filter) => loaderFilterTypes.includes(filter.type))
+		.map((filter) => filter.option)
+
+	return {
+		gameVersions: gameVersions.length > 0 ? gameVersions : undefined,
+		loaders: loaders.length > 0 ? loaders : undefined,
+	}
+}
+
+function getServerTargetPreferences(): InstallPreferences {
+	return {
+		gameVersions: serverData.value?.mc_version ? [serverData.value.mc_version] : undefined,
+		loaders: serverData.value?.loader ? [serverData.value.loader] : undefined,
+	}
+}
+
+function preferencesDiffer(selected: InstallPreferences, target: InstallPreferences) {
+	const targetGameVersion = target.gameVersions?.[0]
+	const targetLoader = target.loaders?.[0]
+	return (
+		(!!selected.gameVersions?.length &&
+			!!targetGameVersion &&
+			!selected.gameVersions.includes(targetGameVersion)) ||
+		(!!selected.loaders?.length &&
+			!!targetLoader &&
+			!selected.loaders.some((loader) => loader.toLowerCase() === targetLoader.toLowerCase()))
+	)
+}
+
+function modalOptionFromPreferences(preferences: InstallPreferences) {
+	return {
+		gameVersion: preferences.gameVersions?.[0],
+		loader: preferences.loaders?.[0],
+	}
+}
+
+async function chooseServerInstallPreferences(
+	project: InstallableSearchResult,
+	contentType: ServerAddonInstallType,
+) {
+	const selectedPreferences = getSelectedInstallPreferences(contentType)
+	const targetPreferences = getServerTargetPreferences()
+	if (!preferencesDiffer(selectedPreferences, targetPreferences)) {
+		return selectedPreferences
+	}
+
+	const hasSelectedVersion = await resolveServerAddonVersion(project, contentType, selectedPreferences)
+		.then(() => true)
+		.catch(() => false)
+	const hasTargetVersion = await resolveServerAddonVersion(project, contentType, targetPreferences)
+		.then(() => true)
+		.catch(() => false)
+	if (!hasTargetVersion) {
+		return selectedPreferences
+	}
+	if (!hasSelectedVersion) {
+		return targetPreferences
+	}
+
+	const choice = await versionChoiceModalRef.value?.show({
+		projectName: project.title,
+		targetType: 'server',
+		selected: modalOptionFromPreferences(selectedPreferences),
+		target: modalOptionFromPreferences(targetPreferences),
+	})
+
+	if (!choice) return null
+	return choice === 'target' ? targetPreferences : selectedPreferences
+}
+
+function clearQueuedServerInstalls() {
+	queuedServerInstalls.value = new Map()
+}
+
+watch([currentServerId, currentWorldId], ([serverId, worldId], [prevServerId, prevWorldId]) => {
+	if (serverId !== prevServerId || worldId !== prevWorldId) {
+		clearQueuedServerInstalls()
+	}
+})
+
+async function flushQueuedServerInstalls() {
+	const queuedInstalls = Array.from(queuedServerInstalls.value.values())
+	if (queuedInstalls.length === 0) return true
+
+	if (!serverData.value || !currentServerId.value || !currentWorldId.value) {
+		handleError(new Error('No server world is available for install.'))
+		return false
+	}
+
+	const failedInstalls = new Map<string, QueuedServerInstall>()
+
+	for (const queuedInstall of queuedInstalls) {
+		try {
+			const version = await resolveServerAddonVersion(
+				queuedInstall.project,
+				queuedInstall.contentType,
+				queuedInstall.preferences,
+			)
+			await installContentMutation.mutateAsync({
+				serverId: currentServerId.value,
+				projectId: version.project_id,
+				versionId: version.id,
+			})
+			markProjectInstalled(queuedInstall.project.project_id)
+		} catch (e) {
+			failedInstalls.set(queuedInstall.project.project_id, queuedInstall)
+			handleError(e as Error)
+		}
+	}
+
+	queuedServerInstalls.value = failedInstalls
+	return failedInstalls.size === 0
 }
 
 async function serverInstall(project: InstallableSearchResult) {
-	if (!serverData.value || !currentServerId.value) {
+	if (!serverData.value || !currentServerId.value || !currentWorldId.value) {
 		handleError(new Error('No server to install to.'))
 		return
 	}
-	setProjectInstalling(project.project_id, true)
 	try {
-		if (projectType.value?.id === 'modpack') {
+		const contentType = getCurrentServerInstallType()
+
+		if (contentType === 'modpack') {
+			setProjectInstalling(project.project_id, true)
 			const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id, {
 				include_changelog: false,
 			})
@@ -355,41 +569,22 @@ async function serverInstall(project: InstallableSearchResult) {
 				ctx.modal.value?.setStage('final-config')
 			}
 			return
-		} else if (
-			projectType.value?.id === 'mod' ||
-			projectType.value?.id === 'plugin' ||
-			projectType.value?.id === 'datapack'
-		) {
-			const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id)
-			const isDatapack = projectType.value?.id === 'datapack'
-			const version = versions.find((x) => {
-				if (!x.game_versions.includes(serverData.value!.mc_version!)) return false
-				if (isDatapack) return true
-				return x.loaders.includes(serverData.value!.loader!.toLowerCase())
-			})
-			if (!version) {
-				handleError(
-					new Error(
-						isDatapack
-							? `No compatible version found for ${serverData.value!.mc_version}`
-							: `No compatible version found for ${serverData.value!.mc_version} / ${serverData.value!.loader}`,
-					),
-				)
-				setProjectInstalling(project.project_id, false)
-				return
-			}
-			await installContentMutation.mutateAsync({
-				serverId: currentServerId.value,
-				projectId: version.project_id,
-				versionId: version.id,
-			})
-			markProjectInstalled(project.project_id)
 		}
+
+		const installPreferences = await chooseServerInstallPreferences(project, contentType)
+		if (installPreferences === null) return
+
+		const nextQueuedInstalls = new Map(queuedServerInstalls.value)
+		nextQueuedInstalls.set(project.project_id, {
+			project,
+			contentType,
+			preferences: installPreferences,
+		})
+		queuedServerInstalls.value = nextQueuedInstalls
 	} catch (e) {
 		console.error(e)
 		handleError(new Error(`Error installing content ${e}`))
 	}
-	setProjectInstalling(project.project_id, false)
 }
 
 function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
@@ -494,22 +689,31 @@ function getCardActions(
 	}
 
 	if (serverData.value) {
+		const isQueued = queuedServerInstallProjectIds.value.has(result.project_id)
 		const isInstalled =
 			projectResult.installed ||
+			isQueued ||
 			optimisticallyInstalledProjectIds.value.has(result.project_id) ||
 			(serverContentData.value &&
 				(serverContentData.value.addons ?? []).find((x) => x.project_id === result.project_id)) ||
 			serverData.value.upstream?.project_id === result.project_id
 		const isInstalling = installingProjectIds.value.has(result.project_id)
+		const installLabel = isQueued
+			? 'Queued'
+			: isInstalling
+				? 'Installing...'
+				: isInstalled
+					? 'Installed'
+					: 'Install'
 
 		return [
 			{
 				key: 'install',
-				label: isInstalling ? 'Installing...' : isInstalled ? 'Installed' : 'Install',
+				label: installLabel,
 				icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : DownloadIcon,
 				iconClass: isInstalling ? 'animate-spin' : undefined,
 				disabled: !!isInstalled || isInstalling,
-				color: 'brand',
+				color: isQueued ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: () => serverInstall(projectResult),
 			},
@@ -577,8 +781,8 @@ const serverBackLabel = computed(() => {
 
 const serverBrowseHeading = computed(() =>
 	fromContext.value === 'reset-server'
-		? 'Select modpack to install after reset'
-		: 'Install content to server',
+		? 'Selecting modpack to install after reset'
+		: 'Installing content',
 )
 
 const installContext = computed(() => {
@@ -594,6 +798,12 @@ const installContext = computed(() => {
 		backUrl: serverBackUrl.value,
 		backLabel: serverBackLabel.value,
 		heading: serverBrowseHeading.value,
+		queuedCount: queuedServerInstallCount.value,
+		queuedLabel: `${queuedServerInstallCount.value} ${
+			queuedServerInstallCount.value === 1 ? 'Mod' : 'Mods'
+		}`,
+		clearQueued: clearQueuedServerInstalls,
+		onBack: flushQueuedServerInstalls,
 	}
 })
 
@@ -737,6 +947,7 @@ provideBrowseManager({
 				@browse-modpacks="() => {}"
 				@create="onModpackFlowCreate"
 			/>
+			<BrowseVersionChoiceModal ref="versionChoiceModalRef" />
 		</div>
 	</section>
 </template>
