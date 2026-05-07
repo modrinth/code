@@ -1,12 +1,16 @@
-use actix_web::{get, patch, post, web};
+use actix_web::{HttpRequest, get, patch, post, web};
 use serde::{Deserialize, Serialize};
 use sqlx::Row;
 
-use crate::database::PgPool;
+use crate::auth::get_user_from_headers;
 use crate::database::models::ids::{
 	DBAttributionGroupId, DBProjectId, generate_attribution_group_id,
 };
+use crate::database::redis::RedisPool;
+use crate::database::PgPool;
 use crate::models::ids::{ProjectId, VersionId};
+use crate::models::pats::Scopes;
+use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
@@ -25,7 +29,16 @@ struct AttributionGroupResponse {
 	flame_project_id: Option<i64>,
 	flame_project_title: Option<String>,
 	attribution: Option<serde_json::Value>,
+	attributed_at: Option<chrono::DateTime<chrono::Utc>>,
+	attributed_by: Option<ariadne::ids::UserId>,
 	files: Vec<AttributionFileResponse>,
+	versions: std::collections::HashMap<VersionId, VersionInfo>,
+}
+
+#[derive(Clone, Serialize)]
+struct VersionInfo {
+	name: String,
+	version_number: String,
 }
 
 #[derive(Serialize)]
@@ -49,7 +62,9 @@ async fn list(
 			g.id as "id: DBAttributionGroupId",
 			g.flame_project_id,
 			g.flame_project_title,
-			g.attribution
+			g.attribution,
+			g.attributed_at,
+			g.attributed_by as "attributed_by: i64"
 		from project_attribution_groups g
 		where g.project_id = $1
 		"#,
@@ -79,6 +94,40 @@ async fn list(
 		.await?
 	};
 
+	let mut all_version_ids: Vec<i64> = files
+		.iter()
+		.filter_map(|f| f.get::<Option<Vec<i64>>, _>("version_ids"))
+		.flatten()
+		.collect();
+	all_version_ids.sort_unstable();
+	all_version_ids.dedup();
+
+	let versions = if all_version_ids.is_empty() {
+		std::collections::HashMap::new()
+	} else {
+		let rows = sqlx::query!(
+			"
+			select id, name, version_number
+			from versions
+			where id = ANY($1)
+			",
+			&all_version_ids,
+		)
+		.fetch_all(pool.as_ref())
+		.await?;
+		rows.into_iter()
+			.map(|v| {
+				(
+					VersionId(v.id as u64),
+					VersionInfo {
+						name: v.name,
+						version_number: v.version_number,
+					},
+				)
+			})
+			.collect()
+	};
+
 	let mut result = Vec::new();
 	for group in groups {
 		let group_files: Vec<AttributionFileResponse> = files
@@ -101,7 +150,10 @@ async fn list(
 			flame_project_id: group.flame_project_id,
 			flame_project_title: group.flame_project_title,
 			attribution: group.attribution,
+			attributed_at: group.attributed_at,
+			attributed_by: group.attributed_by.map(|id| ariadne::ids::UserId(id as u64)),
 			files: group_files,
+			versions: versions.clone(),
 		});
 	}
 
@@ -116,19 +168,33 @@ struct UpdateGroupBody {
 #[utoipa::path]
 #[patch("group/{group_id}")]
 async fn update_group(
+	req: HttpRequest,
 	pool: web::Data<PgPool>,
+	redis: web::Data<RedisPool>,
+	session_queue: web::Data<AuthQueue>,
 	path: web::Path<i64>,
 	web::Json(body): web::Json<UpdateGroupBody>,
 ) -> Result<(), ApiError> {
 	let group_id = path.into_inner();
+	let user = get_user_from_headers(
+		&req,
+		&**pool,
+		&redis,
+		&session_queue,
+		Scopes::VERSION_WRITE,
+	)
+	.await?
+	.1;
+
 	let result = sqlx::query!(
 		"
 		update project_attribution_groups
-		set attribution = $1
+		set attribution = $1, attributed_at = now(), attributed_by = $3
 		where id = $2
 		",
 		&body.attribution,
 		group_id,
+		user.id.0 as i64,
 	)
 	.execute(pool.as_ref())
 	.await?;

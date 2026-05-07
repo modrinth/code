@@ -15,7 +15,9 @@ create table project_attribution_groups (
 	project_id bigint not null references mods(id),
 	flame_project_id bigint,
 	flame_project_title text,
-	attribution jsonb
+	attribution jsonb,
+	attributed_at timestamptz,
+	attributed_by bigint references users(id)
 );
 create index on project_attribution_groups (project_id);
 

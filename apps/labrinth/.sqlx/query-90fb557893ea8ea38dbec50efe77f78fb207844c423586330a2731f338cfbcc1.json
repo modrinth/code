@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n\t\tselect\n\t\t\tg.id as \"id: DBAttributionGroupId\",\n\t\t\tg.flame_project_id,\n\t\t\tg.flame_project_title,\n\t\t\tg.attribution\n\t\tfrom project_attribution_groups g\n\t\twhere g.project_id = $1\n\t\t",
+  "query": "\n\t\tselect\n\t\t\tg.id as \"id: DBAttributionGroupId\",\n\t\t\tg.flame_project_id,\n\t\t\tg.flame_project_title,\n\t\t\tg.attribution,\n\t\t\tg.attributed_at,\n\t\t\tg.attributed_by as \"attributed_by: i64\"\n\t\tfrom project_attribution_groups g\n\t\twhere g.project_id = $1\n\t\t",
   "describe": {
     "columns": [
       {
@@ -22,6 +22,16 @@
         "ordinal": 3,
         "name": "attribution",
         "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "attributed_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "attributed_by: i64",
+        "type_info": "Int8"
       }
     ],
     "parameters": {
@@ -33,8 +43,10 @@
       false,
       true,
       true,
+      true,
+      true,
       true
     ]
   },
-  "hash": "132cc4eee5ef7d6dcc22c65f5a406a63ff87e840a100d9b5ff787908d74e669b"
+  "hash": "90fb557893ea8ea38dbec50efe77f78fb207844c423586330a2731f338cfbcc1"
 }
