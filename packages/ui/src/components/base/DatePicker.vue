@@ -339,6 +339,92 @@ function suppressRangeDragClick(event: MouseEvent) {
 	event.stopImmediatePropagation()
 }
 
+function isTimeInput(target: EventTarget | null): target is HTMLInputElement {
+	return (
+		target instanceof HTMLInputElement &&
+		target.matches('input.flatpickr-hour, input.flatpickr-minute, input.flatpickr-second')
+	)
+}
+
+function getTimeInputFromArrow(target: EventTarget | null): HTMLInputElement | null {
+	if (!(target instanceof Element)) return null
+	if (!target.classList.contains('arrowUp') && !target.classList.contains('arrowDown')) return null
+
+	return target.closest('.numInputWrapper')?.querySelector<HTMLInputElement>('input') ?? null
+}
+
+function getTimeInputDigits(value: string) {
+	return value.replace(/\D/g, '').slice(0, 2)
+}
+
+function sanitizeTimeInputValue(input: HTMLInputElement) {
+	const nextValue = getTimeInputDigits(input.value)
+	if (input.value === nextValue) return
+
+	const cursorPosition = input.selectionStart ?? nextValue.length
+	const removedBeforeCursor =
+		input.value.slice(0, cursorPosition).length -
+		getTimeInputDigits(input.value.slice(0, cursorPosition)).length
+	const nextCursorPosition = Math.max(0, cursorPosition - removedBeforeCursor)
+
+	input.value = nextValue
+	input.setSelectionRange(nextCursorPosition, nextCursorPosition)
+}
+
+function normalizeTimeInputValue(input: HTMLInputElement) {
+	sanitizeTimeInputValue(input)
+	if (input.value.length === 2) return
+
+	const minValue = Number.parseInt(input.min, 10)
+	const maxValue = Number.parseInt(input.max, 10)
+	const parsedValue = Number.parseInt(input.value, 10)
+	const fallbackValue = Number.isFinite(minValue) ? minValue : 0
+	let nextValue = Number.isFinite(parsedValue) ? parsedValue : fallbackValue
+
+	if (Number.isFinite(minValue)) nextValue = Math.max(nextValue, minValue)
+	if (Number.isFinite(maxValue)) nextValue = Math.min(nextValue, maxValue)
+
+	input.value = String(nextValue).padStart(2, '0')
+}
+
+function normalizeTimeInputForArrowIncrement(event: MouseEvent) {
+	const input = getTimeInputFromArrow(event.target)
+	if (input && isTimeInput(input)) normalizeTimeInputValue(input)
+}
+
+function normalizeTimeInputForKeyboardIncrement(event: KeyboardEvent) {
+	if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return
+	if (isTimeInput(event.target)) normalizeTimeInputValue(event.target)
+}
+
+function preventNonNumericTimeInput(event: InputEvent) {
+	if (!isTimeInput(event.target)) return
+	if (event.data && /\D/.test(event.data)) event.preventDefault()
+}
+
+function preventNonNumericTimeKeydown(event: KeyboardEvent) {
+	if (!isTimeInput(event.target)) return
+	if (event.metaKey || event.ctrlKey || event.altKey) return
+	if (event.key.length === 1 && /\D/.test(event.key)) event.preventDefault()
+}
+
+function sanitizeNumericTimeInput(event: Event) {
+	if (isTimeInput(event.target)) sanitizeTimeInputValue(event.target)
+}
+
+function syncTimeInputTypes(instance: Instance) {
+	const timeInputs = [instance.hourElement, instance.minuteElement, instance.secondElement].filter(
+		(input): input is HTMLInputElement => Boolean(input),
+	)
+
+	for (const input of timeInputs) {
+		input.type = 'text'
+		input.inputMode = 'numeric'
+		input.pattern = '[0-9]*'
+		normalizeTimeInputValue(input)
+	}
+}
+
 const resolvedDateFormat = computed(
 	() => props.dateFormat ?? (props.enableTime ? 'Y-m-d H:i' : 'Y-m-d'),
 )
@@ -400,6 +486,7 @@ watch(
 		}
 
 		syncAltInputState()
+		syncTimeInputTypes(picker.value)
 		syncPickerFromModel()
 	},
 	{ deep: true },
@@ -420,6 +507,11 @@ onMounted(async () => {
 			instance.calendarContainer.addEventListener('mousedown', stopRangeEndpointMouseEvent, true)
 			instance.calendarContainer.addEventListener('mouseup', stopRangeEndpointMouseEvent, true)
 			instance.calendarContainer.addEventListener('click', suppressRangeDragClick, true)
+			instance.calendarContainer.addEventListener('click', normalizeTimeInputForArrowIncrement, true)
+			instance.calendarContainer.addEventListener('keydown', normalizeTimeInputForKeyboardIncrement, true)
+			instance.calendarContainer.addEventListener('beforeinput', preventNonNumericTimeInput, true)
+			instance.calendarContainer.addEventListener('keydown', preventNonNumericTimeKeydown, true)
+			instance.calendarContainer.addEventListener('input', sanitizeNumericTimeInput, true)
 
 			instance.calendarContainer.addEventListener('mousedown', (event) => {
 				if (props.mode !== 'range') return
@@ -455,6 +547,7 @@ onMounted(async () => {
 				true,
 			)
 
+			syncTimeInputTypes(instance)
 			syncHeaderControlState(instance)
 		},
 		onChange: (_selectedDates, dateStr, instance) => {
@@ -498,6 +591,7 @@ onMounted(async () => {
 			if (props.defaultViewDate && instance.selectedDates.length === 0) {
 				instance.jumpToDate(props.defaultViewDate)
 			}
+			syncTimeInputTypes(instance)
 			syncHeaderControlState(instance)
 		},
 	})
@@ -547,6 +641,7 @@ function syncPickerFromModel() {
 
 	isSyncingFromModel.value = true
 	picker.value.setDate(selectedDates.value, false, resolvedDateFormat.value)
+	syncTimeInputTypes(picker.value)
 
 	if (intendedViewMonth.value !== null) {
 		const monthDelta =
