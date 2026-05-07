@@ -876,6 +876,7 @@ export namespace Labrinth {
 				include_changelog?: boolean
 				limit?: number
 				offset?: number
+				apiVersion?: 2 | 3
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'

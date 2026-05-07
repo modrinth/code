@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-06T22:11:04+00:00`,
+		product: 'app',
+		version: '0.13.11',
+		body: `## Fixed
+- Fixed modpack export including duplicated files as overrides.`,
+	},
+	{
 		date: `2026-05-05T01:34:18+00:00`,
 		product: 'web',
 		body: `## Fixed

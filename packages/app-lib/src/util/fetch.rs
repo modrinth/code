@@ -27,6 +27,7 @@ pub enum DownloadReason {
     Standalone,
     Dependency,
     Modpack,
+    Update,
 }
 
 #[derive(Debug, Clone, Serialize)]

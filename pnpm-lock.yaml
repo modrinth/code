@@ -440,9 +440,6 @@ importers:
 
   packages/api-client:
     dependencies:
-      '@tauri-apps/plugin-http':
-        specifier: ^2.0.0
-        version: 2.5.7
       mitt:
         specifier: ^3.0.1
         version: 3.0.1
@@ -453,6 +450,15 @@ importers:
       '@modrinth/tooling-config':
         specifier: workspace:*
         version: link:../tooling-config
+      '@tauri-apps/plugin-http':
+        specifier: ^2.0.0
+        version: 2.5.7
+      esbuild:
+        specifier: 0.27.2
+        version: 0.27.2
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
   packages/app-lib: {}
 
