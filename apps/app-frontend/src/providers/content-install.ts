@@ -430,6 +430,7 @@ export function createContentInstall(opts: {
 			await installVersionDependencies(
 				profile,
 				version,
+				'dependency',
 				(depProject: Labrinth.Projects.v2.Project, depVersion?: Labrinth.Versions.v2.Version) => {
 					addInstallingItem(instance.id, depProject, depVersion)
 					installedProjectIds.push(depProject.id)
@@ -488,7 +489,7 @@ export function createContentInstall(opts: {
 			await opts.router.push(`/instance/${encodeURIComponent(id)}/`)
 
 			const instance = await get(id)
-			await installVersionDependencies(instance, version)
+			await installVersionDependencies(instance, version, 'dependency')
 
 			trackEvent('InstanceCreate', {
 				source: 'ProjectInstallModal',
@@ -589,6 +590,7 @@ export function createContentInstall(opts: {
 					await installVersionDependencies(
 						instance,
 						version,
+						'dependency',
 						(
 							depProject: Labrinth.Projects.v2.Project,
 							depVersion?: Labrinth.Versions.v2.Version,
