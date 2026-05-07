@@ -58,7 +58,12 @@ pub async fn install_zipped_mrpack(
     };
 
     // Install pack files, and if it fails, fail safely by removing the profile
-    let result = install_zipped_mrpack_files(create_pack, false, DownloadReason::Modpack).await;
+    let result = install_zipped_mrpack_files(
+        create_pack,
+        false,
+        DownloadReason::Modpack,
+    )
+    .await;
 
     match result {
         Ok(profile) => Ok(profile),
