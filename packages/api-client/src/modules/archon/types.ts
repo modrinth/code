@@ -391,7 +391,28 @@ export namespace Archon {
 
 			export type AssignableServerUserRole = Exclude<ServerUserRole, 'Owner' | 'Unknown'>
 
-			export type UserScope = string
+			export enum UserScope {
+				NONE = 0,
+
+				SERVER_ADMIN = -0x100000000000000,
+				EDITOR = -0x400000000000000,
+				VIEWER = -0x4000000000000000,
+				RESERVED_BITS = 0x7fff,
+
+				BASE_READ = -0x8000000000000000,
+				POWER_ACTIONS = 0x4000000000000000,
+				FILES_WRITE = 0x2000000000000000,
+				SETUP = 0x1000000000000000,
+				BACKUPS = 0x800000000000000,
+				ADVANCED = 0x400000000000000,
+				RESET_SERVER = 0x200000000000000,
+				MANAGE_USERS = 0x100000000000000,
+
+				SUPPORT_AGENT = 0x1,
+				INFRA_MANAGER = 0x2,
+				INFRA_MANAGER_READ = 0x4,
+				INFRA_SERVERS_XFER = 0x8,
+			}
 
 			export type UserResp = {
 				username: string

@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon, Labrinth } from '@modrinth/api-client'
+import { Archon, type Labrinth } from '@modrinth/api-client'
 import { FilterIcon, SearchIcon, UserPlusIcon } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
@@ -112,6 +112,9 @@ const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 const removeMemberConfirmModal = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
 const pendingRemovalMember = ref<ServerAccessMember | null>(null)
 const shouldCancelInvite = ref(false)
+const UserScope = Archon.ServerUsers.v1.UserScope
+const userScopeByte = 2 ** 56
+const userScopeSignedOffset = 2 ** 64
 
 const messages = defineMessages({
 	searchUsersPlaceholder: {
@@ -382,27 +385,37 @@ function accessRoleToApiRole(
 function apiPermissionsToAccessRole(
 	permissions: Archon.ServerUsers.v1.UserScope,
 ): ServerAccessRole {
-	const scopes = apiPermissionsToScopes(permissions)
-	if (scopes.has('SERVER_ADMIN') || scopes.has('MANAGE_USERS')) return 'owner'
 	if (
-		scopes.has('FILES_WRITE') ||
-		scopes.has('SETUP') ||
-		scopes.has('BACKUPS') ||
-		scopes.has('ADVANCED') ||
-		scopes.has('RESET_SERVER')
+		hasApiPermission(permissions, UserScope.SERVER_ADMIN) ||
+		hasApiPermission(permissions, UserScope.MANAGE_USERS)
+	) {
+		return 'owner'
+	}
+	if (
+		hasApiPermission(permissions, UserScope.FILES_WRITE) ||
+		hasApiPermission(permissions, UserScope.SETUP) ||
+		hasApiPermission(permissions, UserScope.BACKUPS) ||
+		hasApiPermission(permissions, UserScope.ADVANCED) ||
+		hasApiPermission(permissions, UserScope.RESET_SERVER)
 	) {
 		return 'editor'
 	}
 	return 'viewer'
 }
 
-function apiPermissionsToScopes(permissions: Archon.ServerUsers.v1.UserScope) {
-	return new Set(
-		permissions
-			.split('|')
-			.map((scope) => scope.trim())
-			.filter(Boolean),
-	)
+function hasApiPermission(
+	permissions: Archon.ServerUsers.v1.UserScope,
+	scope: Archon.ServerUsers.v1.UserScope,
+) {
+	const permissionByte = apiUserScopeToByte(permissions)
+	const scopeByte = apiUserScopeToByte(scope)
+	return (permissionByte & scopeByte) === scopeByte
+}
+
+function apiUserScopeToByte(scope: Archon.ServerUsers.v1.UserScope) {
+	const scopeNumber = Number(scope)
+	const unsignedScope = scopeNumber < 0 ? scopeNumber + userScopeSignedOffset : scopeNumber
+	return Math.trunc(unsignedScope / userScopeByte)
 }
 
 function formatErrorMessage(error: unknown): string | undefined {
