@@ -3078,7 +3078,7 @@
     "defaultMessage": "Pending"
   },
   "servers.access-table.unknown-joined-date": {
-    "defaultMessage": "Unknown"
+    "defaultMessage": "—"
   },
   "servers.access-table.user-avatar-alt": {
     "defaultMessage": "{username}'s avatar"

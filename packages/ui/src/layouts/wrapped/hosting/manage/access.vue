@@ -526,7 +526,6 @@ async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRo
 	try {
 		const userId = await resolveMemberUserId(member)
 		await client.archon.server_users_v1.update(serverId, userId, accessRoleToApiRole(role))
-		await invalidateServerUsers()
 	} catch (error) {
 		setCachedMemberRole(member, previousRole)
 		removeAuditEntry(optimisticAuditEntry)
@@ -536,7 +535,10 @@ async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRo
 			title: formatMessage(messages.roleUpdateFailedTitle),
 			text: formatErrorMessage(error),
 		})
+		return
 	}
+
+	await invalidateServerUsers()
 }
 
 function resendInvite(member: ServerAccessMember) {
