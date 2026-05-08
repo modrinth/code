@@ -139,6 +139,7 @@
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
 import { Tabs, type TabsTab, useFormatNumber } from '@modrinth/ui'
 
+import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
 import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 
@@ -193,7 +194,32 @@ const selectedProjects = computed(() =>
 	projects.value.filter((project) => selectedProjectIdSet.value.has(project.id)),
 )
 
-const legendPalette = ['#00D084', '#A78BFA', '#F59E0B', '#38BDF8', '#FB7185', '#34D399']
+const lightLegendPalette = [
+	'#00AF5C',
+	'#D55E00',
+	'#0072B2',
+	'#CC79A7',
+	'#E69F00',
+	'#332288',
+	'#44AA99',
+	'#882255',
+]
+
+const darkLegendPalette = [
+	'#1BD96A',
+	'#FFB000',
+	'#56B4E9',
+	'#E78AC3',
+	'#F0E442',
+	'#A78BFA',
+	'#FF7A59',
+	'#4DD0C8',
+]
+
+const theme = useTheme()
+const legendPalette = computed(() =>
+	isDarkTheme(theme.active) ? darkLegendPalette : lightLegendPalette,
+)
 
 const graphTitle = computed(() => titleByStat[activeStat.value])
 
@@ -226,7 +252,7 @@ const allChartDatasets = computed(() =>
 		timeSlices.value,
 		selectedProjects.value,
 		activeStat.value,
-		legendPalette,
+		legendPalette.value,
 		selectedBreakdown.value,
 		selectedFilters.value,
 		getVersionDisplayName,
@@ -372,7 +398,14 @@ const legendEntries = computed<LegendEntry[]>(() =>
 				hidden: hiddenDatasetIds.value.has(dataset.projectId),
 			}
 		})
-		.sort((a, b) => b.totalValue - a.totalValue || a.name.localeCompare(b.name)),
+		.sort((a, b) => b.totalValue - a.totalValue || a.name.localeCompare(b.name))
+		.map((entry, index) => ({
+			...entry,
+			color:
+				selectedBreakdown.value === 'loader'
+					? entry.color
+					: legendPalette.value[index % legendPalette.value.length],
+		})),
 )
 
 const displayedLegendEntries = computed(() =>
@@ -397,7 +430,16 @@ const chartDatasetById = computed(() => {
 const visibleChartDatasets = computed(() =>
 	displayedLegendEntries.value
 		.filter((legendEntry) => !legendEntry.hidden)
-		.map((legendEntry) => chartDatasetById.value.get(legendEntry.id))
+		.map((legendEntry) => {
+			const dataset = chartDatasetById.value.get(legendEntry.id)
+			if (!dataset) return null
+
+			return {
+				...dataset,
+				borderColor: legendEntry.color,
+				backgroundColor: legendEntry.color,
+			}
+		})
 		.filter((dataset): dataset is ChartDataset => Boolean(dataset)),
 )
 
