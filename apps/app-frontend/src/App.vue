@@ -146,8 +146,9 @@ const popupNotificationManager = new AppPopupNotificationManager()
 providePopupNotificationManager(popupNotificationManager)
 const { addPopupNotification } = popupNotificationManager
 
+const appVersion = getVersion()
 const tauriApiClient = new TauriModrinthClient({
-	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
+	userAgent: async () => `modrinth/theseus/${await appVersion} (support@modrinth.com)`,
 	labrinthBaseUrl: config.labrinthBaseUrl,
 	archonBaseUrl: config.archonBaseUrl,
 	features: [
