@@ -17,6 +17,7 @@ import {
 	BrowsePageLayout,
 	BrowseSidebar,
 	CreationFlowModal,
+	PROJECT_DEP_MARKER_QUERY,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -403,7 +404,13 @@ function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject
 			name: project_name,
 			icon: project_icon ?? undefined,
 			onclick:
-				project_id !== project.project_id ? () => navigateTo(`/project/${project_id}`) : undefined,
+				project_id !== project.project_id
+					? () =>
+							navigateTo({
+								path: `/project/${project_id}`,
+								query: { ...PROJECT_DEP_MARKER_QUERY },
+							})
+					: undefined,
 			showCustomModpackTooltip: project_id === project.project_id,
 		}
 	}

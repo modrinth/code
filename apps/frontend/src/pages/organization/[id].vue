@@ -307,6 +307,7 @@ import {
 	injectModrinthClient,
 	NavTabs,
 	OverflowMenu,
+	PROJECT_DEP_MARKER_QUERY,
 	ProjectCard,
 	ProjectCardList,
 	useCompactNumber,
@@ -489,7 +490,10 @@ function getServerModpackContent(project: ProjectV3) {
 			onclick:
 				project_id !== project.id
 					? () => {
-							navigateTo(`/project/${project_id}`)
+							navigateTo({
+								path: `/project/${project_id}`,
+								query: { ...PROJECT_DEP_MARKER_QUERY },
+							})
 						}
 					: undefined,
 			showCustomModpackTooltip: project_id === project.id,
