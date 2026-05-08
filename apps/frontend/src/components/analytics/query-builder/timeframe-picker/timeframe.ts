@@ -115,7 +115,7 @@ export function getTimeRangeForPreset(
 		}
 		case 'all_time':
 			return {
-				start: new Date(Date.UTC(2022, 0, 1, 0, 0, 0, 0)),
+				start: new Date(Date.UTC(2023, 0, 1, 0, 0, 0, 0)),
 				end,
 			}
 		default:

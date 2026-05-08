@@ -7,7 +7,12 @@
 		:style="positionStyle"
 	>
 		<div class="mb-1 flex items-center justify-between gap-2 font-medium text-contrast">
-			<span>{{ rangeLabel }}</span>
+			<span>
+				{{ rangeLabel }}
+				<span v-if="durationLabel" class="text-xs font-normal text-secondary">
+					({{ durationLabel }})
+				</span>
+			</span>
 			<PinIcon
 				v-if="pinned"
 				v-tooltip="'Chart tooltip pinned'"
@@ -49,13 +54,94 @@ const props = defineProps<{
 	visible: boolean
 	x: number
 	y: number
-	rangeLabel: string
+	start: Date | null
+	end: Date | null
+	chartStart: Date | null
+	chartEnd: Date | null
 	formattedTotal: string
 	entries: AnalyticsChartTooltipEntry[]
 	containerWidth: number
 	containerHeight: number
 	pinned: boolean
 }>()
+
+const ONE_DAY_MS = 24 * 60 * 60 * 1000
+const ONE_HOUR_MS = 60 * 60 * 1000
+const ONE_MINUTE_MS = 60 * 1000
+
+function formatRangeLabel(
+	start: Date,
+	end: Date,
+	chartStart: Date | null,
+	chartEnd: Date | null,
+): string {
+	const includeTime = end.getTime() - start.getTime() < ONE_DAY_MS
+	const yearsDiffer = start.getFullYear() !== end.getFullYear()
+	const chartYearsDiffer =
+		chartStart !== null &&
+		chartEnd !== null &&
+		chartStart.getFullYear() !== chartEnd.getFullYear()
+	const showTrailingYear = !yearsDiffer && chartYearsDiffer
+	const monthsDiffer = yearsDiffer || start.getMonth() !== end.getMonth()
+	const daysDiffer = monthsDiffer || start.getDate() !== end.getDate()
+
+	const timeOptions: Intl.DateTimeFormatOptions = includeTime
+		? { hour: 'numeric', minute: '2-digit' }
+		: {}
+
+	const startOptions: Intl.DateTimeFormatOptions = {
+		month: 'short',
+		day: 'numeric',
+		...(yearsDiffer ? { year: 'numeric' } : {}),
+		...timeOptions,
+	}
+
+	let endOptions: Intl.DateTimeFormatOptions
+	if (!daysDiffer && includeTime) {
+		endOptions = { ...timeOptions }
+	} else if (yearsDiffer) {
+		endOptions = { month: 'short', day: 'numeric', year: 'numeric', ...timeOptions }
+	} else if (monthsDiffer || includeTime) {
+		endOptions = { month: 'short', day: 'numeric', ...timeOptions }
+	} else {
+		endOptions = { day: 'numeric' }
+	}
+
+	const startLabel = new Intl.DateTimeFormat(undefined, startOptions).format(start)
+	const endLabel = new Intl.DateTimeFormat(undefined, endOptions).format(end)
+	const range = `${startLabel}–${endLabel}`
+
+	if (!showTrailingYear) return range
+
+	const yearLabel = new Intl.DateTimeFormat(undefined, { year: 'numeric' }).format(end)
+	return `${range}, ${yearLabel}`
+}
+
+function formatDurationLabel(start: Date, end: Date): string {
+	const durationMs = end.getTime() - start.getTime()
+	if (!Number.isFinite(durationMs) || durationMs <= 0) return ''
+
+	if (durationMs >= ONE_DAY_MS) {
+		const days = Math.round(durationMs / ONE_DAY_MS)
+		return `${days} ${days === 1 ? 'day' : 'days'}`
+	}
+	if (durationMs >= ONE_HOUR_MS) {
+		const hours = Math.round(durationMs / ONE_HOUR_MS)
+		return `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+	}
+	const minutes = Math.max(1, Math.round(durationMs / ONE_MINUTE_MS))
+	return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`
+}
+
+const rangeLabel = computed(() =>
+	props.start && props.end
+		? formatRangeLabel(props.start, props.end, props.chartStart, props.chartEnd)
+		: '',
+)
+
+const durationLabel = computed(() =>
+	props.start && props.end ? formatDurationLabel(props.start, props.end) : '',
+)
 
 const tooltipElement = ref<HTMLDivElement | null>(null)
 const tooltipWidth = ref(0)
@@ -65,7 +151,7 @@ const CURSOR_OFFSET = 12
 const EDGE_PADDING = 8
 
 watch(
-	() => [props.visible, props.entries, props.rangeLabel, props.pinned],
+	() => [props.visible, props.entries, rangeLabel.value, durationLabel.value, props.pinned],
 	() => {
 		nextTick(() => {
 			if (!tooltipElement.value) return

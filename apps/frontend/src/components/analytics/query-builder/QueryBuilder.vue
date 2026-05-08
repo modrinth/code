@@ -191,6 +191,8 @@ const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
 const {
 	projects,
 	selectedProjectIds,
+	selectedTimeframeMode,
+	selectedTimeframe,
 	selectedGroupBy,
 	selectedBreakdown,
 	selectedFilters,
@@ -379,6 +381,12 @@ function getGroupByMinutes(preset: AnalyticsGroupByPreset): number {
 		default:
 			return 60
 	}
+}
+
+function getAllTimeYearGroupStart(end: Date): Date {
+	const start = new Date(end)
+	start.setFullYear(2021)
+	return start
 }
 
 const groupByOptions = computed<ComboboxOption<AnalyticsGroupByPreset>[]>(() => {
@@ -579,7 +587,13 @@ function withBreakdownFields(
 
 const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 	const rawRange = selectedTimeRange.value
-	const { start, end } = ensureMinimumTimeRange(rawRange.start, rawRange.end)
+	const rawStart =
+		selectedTimeframeMode.value === 'preset' &&
+		selectedTimeframe.value === 'all_time' &&
+		selectedGroupBy.value === 'year'
+			? getAllTimeYearGroupStart(rawRange.end)
+			: rawRange.start
+	const { start, end } = ensureMinimumTimeRange(rawStart, rawRange.end)
 
 	const groupByMs = getGroupByMinutes(selectedGroupBy.value) * 60 * 1000
 	const desiredSlices = Math.max(1, Math.floor((end.getTime() - start.getTime()) / groupByMs))

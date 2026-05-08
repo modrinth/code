@@ -248,7 +248,12 @@ export function getSliceBucketRange(
 	}
 }
 
+const ONE_DAY_MS = 24 * 60 * 60 * 1000
+const ONE_MINUTE_MS = 60 * 1000
 const COMPACT_AXIS_THRESHOLD = 5
+const SHORT_HOURLY_TIME_LABEL_DURATION_MS = 6 * ONE_DAY_MS
+export const DEFAULT_X_AXIS_TICK_LIMIT = 12
+export const SHORT_HOURLY_AXIS_TICK_LIMIT = 8
 
 export function buildTimeAxisLabels(
 	timeRange: Labrinth.Analytics.v3.TimeRange,
@@ -259,7 +264,7 @@ export function buildTimeAxisLabels(
 	const endMs = new Date(timeRange.end).getTime()
 	const totalMs = endMs - startMs
 	const bucketMs = sliceCount > 0 ? totalMs / sliceCount : 0
-	const includeTime = isTimeRelevantForGroupBy(groupBy)
+	const includeTime = shouldShowTimeForHourlyAxis(timeRange, groupBy)
 	const includeYear = isYearRelevantForTimeRange(timeRange) || groupBy === 'year'
 
 	const dates: Date[] = []
@@ -283,11 +288,11 @@ export function buildTimeAxisLabels(
 	const timeFormatter = new Intl.DateTimeFormat(undefined, { hour: 'numeric' })
 	const uniqueDateCount = new Set(dateKeys).size
 
-	if (uniqueDateCount <= 1) {
+	if (uniqueDateCount <= 1 || isSingleFullDayTimeRange(new Date(startMs), new Date(endMs))) {
 		return dates.map((date) => timeFormatter.format(date))
 	}
 
-	if (sliceCount <= COMPACT_AXIS_THRESHOLD) {
+	if (includeTime || sliceCount <= COMPACT_AXIS_THRESHOLD) {
 		const dateAndTimeFormatter = new Intl.DateTimeFormat(undefined, {
 			month: 'short',
 			day: 'numeric',
@@ -302,6 +307,56 @@ export function buildTimeAxisLabels(
 
 export function isTimeRelevantForGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
 	return groupBy === '1h' || groupBy === '6h'
+}
+
+export function shouldUseShortHourlyAxis(
+	timeRange: Labrinth.Analytics.v3.TimeRange,
+	groupBy: AnalyticsGroupByPreset,
+): boolean {
+	if (!isTimeRelevantForGroupBy(groupBy)) {
+		return false
+	}
+
+	const durationMs = getTimeRangeDurationMs(timeRange)
+
+	return (
+		Number.isFinite(durationMs) &&
+		durationMs > 0 &&
+		durationMs <= DEFAULT_X_AXIS_TICK_LIMIT * ONE_DAY_MS
+	)
+}
+
+export function getShortHourlyAxisTickLimit(
+	timeRange: Labrinth.Analytics.v3.TimeRange,
+	groupBy: AnalyticsGroupByPreset,
+): number | undefined {
+	if (!shouldUseShortHourlyAxis(timeRange, groupBy)) {
+		return undefined
+	}
+
+	const durationMs = getTimeRangeDurationMs(timeRange)
+	if (durationMs > SHORT_HOURLY_TIME_LABEL_DURATION_MS) {
+		return Math.min(DEFAULT_X_AXIS_TICK_LIMIT, Math.ceil(durationMs / ONE_DAY_MS))
+	}
+
+	return SHORT_HOURLY_AXIS_TICK_LIMIT
+}
+
+function shouldShowTimeForHourlyAxis(
+	timeRange: Labrinth.Analytics.v3.TimeRange,
+	groupBy: AnalyticsGroupByPreset,
+): boolean {
+	const durationMs = getTimeRangeDurationMs(timeRange)
+	return (
+		isTimeRelevantForGroupBy(groupBy) &&
+		Number.isFinite(durationMs) &&
+		durationMs > 0 &&
+		durationMs <= SHORT_HOURLY_TIME_LABEL_DURATION_MS
+	)
+}
+
+function getTimeRangeDurationMs(timeRange: Labrinth.Analytics.v3.TimeRange): number {
+	return new Date(timeRange.end).getTime() - new Date(timeRange.start).getTime()
 }
 
 export function isYearRelevantForTimeRange(timeRange: Labrinth.Analytics.v3.TimeRange): boolean {
@@ -327,6 +382,22 @@ export function formatBucketEndLabel(end: Date, includeTime: boolean, includeYea
 		day: 'numeric',
 		...(includeYear ? { year: 'numeric' } : {}),
 	}).format(end)
+}
+
+function isStartOfDay(date: Date): boolean {
+	return (
+		date.getHours() === 0 &&
+		date.getMinutes() === 0 &&
+		date.getSeconds() === 0 &&
+		date.getMilliseconds() === 0
+	)
+}
+
+function isSingleFullDayTimeRange(start: Date, end: Date): boolean {
+	const durationMs = end.getTime() - start.getTime()
+	return (
+		Math.abs(durationMs - ONE_DAY_MS) < ONE_MINUTE_MS && isStartOfDay(start) && isStartOfDay(end)
+	)
 }
 
 export function formatMetricValue(

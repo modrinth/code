@@ -23,7 +23,7 @@ import {
 
 import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
 
-import { type ChartDataset, formatAxisValue } from './utils'
+import { type ChartDataset, DEFAULT_X_AXIS_TICK_LIMIT, formatAxisValue } from './utils'
 
 Chart.register(
 	LineController,
@@ -50,6 +50,7 @@ const props = defineProps<{
 	stacked: boolean
 	datasets: ChartDataset[]
 	labels: string[]
+	xAxisTickLimit?: number
 	activeStat: AnalyticsDashboardStat
 	pinnedSliceIndex: number | null
 }>()
@@ -206,6 +207,19 @@ function buildDatasets() {
 	})
 }
 
+function getVisibleXAxisLabelIndexes(labelCount: number, limit: number): Set<number> {
+	if (limit <= 0 || labelCount <= limit) {
+		return new Set(Array.from({ length: labelCount }, (_, index) => index))
+	}
+
+	const indexes = new Set<number>()
+	for (let i = 0; i < limit; i++) {
+		indexes.add(Math.floor((i * labelCount) / limit))
+	}
+
+	return indexes
+}
+
 function hasMetricData() {
 	return props.datasets.some((dataset) =>
 		dataset.data.some((value) => Number.isFinite(value) && value > 0),
@@ -226,6 +240,10 @@ function getEmptyDataYAxisStepSize() {
 
 function buildConfig(): ChartConfiguration {
 	const hasData = hasMetricData()
+	const visibleXAxisLabelIndexes =
+		props.xAxisTickLimit === undefined
+			? null
+			: getVisibleXAxisLabelIndexes(props.labels.length, props.xAxisTickLimit)
 
 	return {
 		type: props.type,
@@ -255,9 +273,16 @@ function buildConfig(): ChartConfiguration {
 					offset: props.type === 'bar',
 					grid: { display: false },
 					ticks: {
-						maxTicksLimit: 12,
-						autoSkip: true,
+						maxTicksLimit: props.xAxisTickLimit ?? DEFAULT_X_AXIS_TICK_LIMIT,
+						autoSkip: !props.xAxisTickLimit,
 						color: 'rgba(148, 163, 184, 0.9)',
+						callback: (tickValue, index) => {
+							if (visibleXAxisLabelIndexes && !visibleXAxisLabelIndexes.has(index)) {
+								return ''
+							}
+
+							return props.labels[Number(tickValue)] ?? ''
+						},
 					},
 					border: { color: 'rgba(148, 163, 184, 0.35)' },
 				},
@@ -395,7 +420,7 @@ watch(
 )
 
 watch(
-	() => [props.datasets, props.labels, props.activeStat],
+	() => [props.datasets, props.labels, props.xAxisTickLimit, props.activeStat],
 	() => {
 		refreshChart()
 	},

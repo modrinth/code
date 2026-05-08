@@ -80,6 +80,7 @@
 							:stacked="isStacked"
 							:datasets="visibleChartDatasets"
 							:labels="chartLabels"
+							:x-axis-tick-limit="xAxisTickLimit"
 							:active-stat="activeStat"
 							:pinned-slice-index="pinnedSliceIndex"
 							@hover="onChartHover"
@@ -102,7 +103,10 @@
 						:visible="hoverState.visible"
 						:x="hoverState.x"
 						:y="hoverState.y"
-						:range-label="hoverRangeLabel"
+						:start="hoverBucketRange?.start ?? null"
+						:end="hoverBucketRange?.end ?? null"
+						:chart-start="chartRangeBounds?.start ?? null"
+						:chart-end="chartRangeBounds?.end ?? null"
 						:formatted-total="hoverFormattedTotal"
 						:entries="hoverEntries"
 						:container-width="containerSize.width"
@@ -143,12 +147,10 @@ import {
 	buildChartDatasets,
 	buildTimeAxisLabels,
 	type ChartDataset,
-	formatBucketEndLabel,
 	formatMetricValue,
+	getShortHourlyAxisTickLimit,
 	getSliceBucketRange,
 	getSliceCount,
-	isTimeRelevantForGroupBy,
-	isYearRelevantForTimeRange,
 } from './utils'
 
 type ViewMode = 'line' | 'area' | 'bar'
@@ -205,18 +207,17 @@ const sliceCount = computed(() => {
 	return getSliceCount(nextFetchRequest.time_range, fallback)
 })
 
-const showTimeInBucketLabel = computed(() => isTimeRelevantForGroupBy(selectedGroupBy.value))
-const showYearInBucketLabel = computed(() => {
-	const nextFetchRequest = fetchRequest.value
-	return nextFetchRequest
-		? isYearRelevantForTimeRange(nextFetchRequest.time_range) || selectedGroupBy.value === 'year'
-		: false
-})
-
 const chartLabels = computed(() => {
 	const nextFetchRequest = fetchRequest.value
 	if (!nextFetchRequest) return []
 	return buildTimeAxisLabels(nextFetchRequest.time_range, sliceCount.value, selectedGroupBy.value)
+})
+
+const xAxisTickLimit = computed(() => {
+	const nextFetchRequest = fetchRequest.value
+	return nextFetchRequest
+		? getShortHourlyAxisTickLimit(nextFetchRequest.time_range, selectedGroupBy.value)
+		: undefined
 })
 
 function getFallbackBreakdownValues(breakdown: AnalyticsBreakdownPreset): readonly string[] {
@@ -502,13 +503,13 @@ const hoverBucketRange = computed(() => {
 	return getSliceBucketRange(nextFetchRequest.time_range, sliceCount.value, hoverState.sliceIndex)
 })
 
-const hoverRangeLabel = computed(() => {
-	if (!hoverBucketRange.value) return ''
-	return formatBucketEndLabel(
-		hoverBucketRange.value.end,
-		showTimeInBucketLabel.value,
-		showYearInBucketLabel.value,
-	)
+const chartRangeBounds = computed(() => {
+	const nextFetchRequest = fetchRequest.value
+	if (!nextFetchRequest) return null
+	return {
+		start: new Date(nextFetchRequest.time_range.start),
+		end: new Date(nextFetchRequest.time_range.end),
+	}
 })
 
 const hoverTotalValue = computed(() => {

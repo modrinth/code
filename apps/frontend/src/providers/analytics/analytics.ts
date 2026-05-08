@@ -37,7 +37,7 @@ export type {
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
 
 const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
-const ANALYTICS_START_TIMESTAMP = '2022-01-01T00:00:00.000Z'
+const ANALYTICS_START_TIMESTAMP = '2023-01-01T00:00:00.000Z'
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -331,7 +331,9 @@ function sanitizeAnalyticsSelectedFiltersForAvailableOptions(
 	}
 }
 
-function cloneAnalyticsSelectedFilters(filters: AnalyticsSelectedFilters): AnalyticsSelectedFilters {
+function cloneAnalyticsSelectedFilters(
+	filters: AnalyticsSelectedFilters,
+): AnalyticsSelectedFilters {
 	return {
 		project: [...filters.project],
 		country: [...filters.country],
@@ -415,10 +417,7 @@ function getCountryDownloadsByCode(
 				continue
 			}
 
-			downloadsByCountry.set(
-				country,
-				(downloadsByCountry.get(country) ?? 0) + dataPoint.downloads,
-			)
+			downloadsByCountry.set(country, (downloadsByCountry.get(country) ?? 0) + dataPoint.downloads)
 		}
 	}
 
