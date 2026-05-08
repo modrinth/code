@@ -14,15 +14,11 @@
 				<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
 					<div class="text-xl font-semibold text-contrast">Breakdown</div>
 
-					<div class="flex flex-wrap items-center gap-1.5">
-						<ButtonStyled
-							v-if="showDateToggle"
-							type="chip"
-							:color="includeDate ? 'brand' : 'standard'"
-							:highlighted="includeDate"
-						>
-							<button @click="includeDate = !includeDate">Date</button>
-						</ButtonStyled>
+					<div class="flex flex-wrap items-center gap-3">
+						<div v-if="showDateToggle" class="inline-flex items-center gap-2">
+							<label for="date-toggle" class="cursor-pointer text-sm text-secondary">Date</label>
+							<Toggle id="date-toggle" v-model="includeDate" small />
+						</div>
 
 						<div v-if="showDateToggle" class="mx-1 h-6 w-px bg-surface-5"></div>
 
@@ -85,7 +81,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon } from '@modrinth/assets'
-import { ButtonStyled, Table, type TableColumn, useFormatNumber } from '@modrinth/ui'
+import { ButtonStyled, Table, type TableColumn, Toggle, useFormatNumber } from '@modrinth/ui'
 
 import {
 	type AnalyticsBreakdownPreset,

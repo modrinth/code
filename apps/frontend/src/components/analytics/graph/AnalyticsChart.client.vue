@@ -48,6 +48,7 @@ const props = defineProps<{
 	type: 'line' | 'bar'
 	fill: boolean
 	stacked: boolean
+	ratioMode: boolean
 	datasets: ChartDataset[]
 	labels: string[]
 	xAxisTickLimit?: number
@@ -300,18 +301,27 @@ function buildConfig(): ChartConfiguration {
 				y: {
 					stacked: props.stacked,
 					beginAtZero: true,
-					...(hasData ? {} : { max: getEmptyDataYAxisMax(), min: 0 }),
+					...(props.ratioMode
+						? { max: 100, min: 0 }
+						: hasData
+							? {}
+							: { max: getEmptyDataYAxisMax(), min: 0 }),
 					grid: {
 						color: 'rgba(148, 163, 184, 0.15)',
 					},
 					border: { display: false },
 					ticks: {
 						color: 'rgba(148, 163, 184, 0.9)',
-						...(hasData ? {} : { stepSize: getEmptyDataYAxisStepSize() }),
+						...(props.ratioMode
+							? { stepSize: 25 }
+							: hasData
+								? {}
+								: { stepSize: getEmptyDataYAxisStepSize() }),
 						callback: (tickValue) => {
 							const numeric =
 								typeof tickValue === 'number' ? tickValue : Number.parseFloat(String(tickValue))
 							if (!Number.isFinite(numeric)) return String(tickValue)
+							if (props.ratioMode) return `${numeric}%`
 							return formatAxisValue(numeric, props.activeStat, formatCompactNumber)
 						},
 					},

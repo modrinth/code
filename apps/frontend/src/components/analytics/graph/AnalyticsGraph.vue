@@ -10,7 +10,13 @@
 						{{ graphTitle }}
 					</div>
 
-					<div class="flex items-center gap-2">
+					<div class="flex items-center gap-3">
+						<div v-if="canUseRatioMode" class="inline-flex items-center gap-2">
+							<label for="ratio-mode-toggle" class="cursor-pointer text-sm text-secondary"
+								>Ratio</label
+							>
+							<Toggle id="ratio-mode-toggle" v-model="isRatioMode" small />
+						</div>
 						<Tabs
 							:value="activeViewMode"
 							:tabs="viewModeTabs"
@@ -83,6 +89,7 @@
 							:type="chartType"
 							:fill="isArea"
 							:stacked="isStacked"
+							:ratio-mode="isRatioMode"
 							:datasets="visibleChartDatasets"
 							:labels="chartLabels"
 							:x-axis-tick-limit="xAxisTickLimit"
@@ -137,7 +144,7 @@
 
 <script setup lang="ts">
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
-import { Tabs, type TabsTab, useFormatNumber } from '@modrinth/ui'
+import { Tabs, type TabsTab, Toggle, useFormatNumber } from '@modrinth/ui'
 
 import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
@@ -177,6 +184,7 @@ const formatNumber = useFormatNumber()
 const isDataLoading = computed(() => isLoading.value)
 
 const activeViewMode = ref<ViewMode>('line')
+const isRatioMode = ref(false)
 
 const viewModeTabs: TabsTab[] = [
 	{ value: 'line', label: 'Line', icon: ChartSplineIcon },
@@ -236,8 +244,21 @@ const legendPalette = computed(() =>
 const graphTitle = computed(() => titleByStat[activeStat.value])
 
 const chartType = computed<'line' | 'bar'>(() => (activeViewMode.value === 'bar' ? 'bar' : 'line'))
+const canUseRatioMode = computed(
+	() =>
+		(activeViewMode.value === 'area' || activeViewMode.value === 'bar') &&
+		displayedLegendEntries.value.length > 1,
+)
 const isArea = computed(() => activeViewMode.value === 'area')
-const isStacked = computed(() => activeViewMode.value === 'area' || activeViewMode.value === 'bar')
+const isStacked = computed(
+	() => isRatioMode.value || activeViewMode.value === 'area' || activeViewMode.value === 'bar',
+)
+
+watch(canUseRatioMode, (canUse) => {
+	if (!canUse) {
+		isRatioMode.value = false
+	}
+})
 
 const sliceCount = computed(() => {
 	const nextFetchRequest = fetchRequest.value
@@ -439,7 +460,7 @@ const chartDatasetById = computed(() => {
 	return datasets
 })
 
-const visibleChartDatasets = computed(() =>
+const baseVisibleChartDatasets = computed(() =>
 	displayedLegendEntries.value
 		.filter((legendEntry) => !legendEntry.hidden)
 		.map((legendEntry) => {
@@ -454,6 +475,24 @@ const visibleChartDatasets = computed(() =>
 		})
 		.filter((dataset): dataset is ChartDataset => Boolean(dataset)),
 )
+
+const visibleChartDatasets = computed<ChartDataset[]>(() => {
+	const datasets = baseVisibleChartDatasets.value
+	if (!isRatioMode.value || datasets.length === 0) return datasets
+
+	const sliceLength = datasets[0]?.data.length ?? 0
+	const totals = new Array<number>(sliceLength).fill(0)
+	for (const dataset of datasets) {
+		for (let i = 0; i < sliceLength; i++) {
+			totals[i] += dataset.data[i] ?? 0
+		}
+	}
+
+	return datasets.map((dataset) => ({
+		...dataset,
+		data: dataset.data.map((value, i) => (totals[i] === 0 ? 0 : (value / totals[i]) * 100)),
+	}))
+})
 
 const visibleChartDatasetById = computed(() => {
 	const datasets = new Map<string, ChartDataset>()
@@ -553,9 +592,12 @@ const hoverTotalValue = computed(() => {
 	)
 })
 
-const hoverFormattedTotal = computed(() =>
-	formatMetricValue(hoverTotalValue.value, activeStat.value, formatNumber),
-)
+const hoverFormattedTotal = computed(() => {
+	if (isRatioMode.value) {
+		return hoverTotalValue.value > 0 ? '100%' : '0%'
+	}
+	return formatMetricValue(hoverTotalValue.value, activeStat.value, formatNumber)
+})
 
 const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 	if (hoverState.sliceIndex === null) return []
@@ -570,7 +612,9 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 				projectId: legendEntry.id,
 				name: legendEntry.name,
 				color: legendEntry.color,
-				formattedValue: formatMetricValue(value, activeStat.value, formatNumber),
+				formattedValue: isRatioMode.value
+					? `${value.toFixed(1)}%`
+					: formatMetricValue(value, activeStat.value, formatNumber),
 			}
 		})
 })
