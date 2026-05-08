@@ -46,7 +46,7 @@
 							class="flex items-center gap-2 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
 						>
 							<span class="text-sm text-secondary">Requesting</span>
-							<Badge :type="queueEntry.project.requested_status" class="status" />
+							<Badge :type="queueEntry.project.requested_status" class="text-sm" />
 						</div>
 					</div>
 					<div v-if="queueEntry.ownership?.kind === 'user'">
