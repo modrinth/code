@@ -1,6 +1,6 @@
 <script setup>
 import { CheckIcon } from '@modrinth/assets'
-import { Badge, Button } from '@modrinth/ui'
+import { Badge, ButtonStyled } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { SwapIcon } from '@/assets/icons/index.js'
@@ -74,15 +74,18 @@ const onHide = () => {
 							@click="$router.push(`/project/${version.project_id}/version/${version.id}`)"
 						>
 							<div class="table-cell table-text">
-								<Button
-									:color="version.id === installedVersion ? '' : 'primary'"
-									icon-only
-									:disabled="inProgress || installing || version.id === installedVersion"
-									@click.stop="() => switchVersion(version.id)"
+								<ButtonStyled
+									circular
+									:color="version.id === installedVersion ? 'standard' : 'brand'"
 								>
-									<SwapIcon v-if="version.id !== installedVersion" />
-									<CheckIcon v-else />
-								</Button>
+									<button
+										:disabled="inProgress || installing || version.id === installedVersion"
+										@click.stop="() => switchVersion(version.id)"
+									>
+										<SwapIcon v-if="version.id !== installedVersion" />
+										<CheckIcon v-else />
+									</button>
+								</ButtonStyled>
 							</div>
 							<div class="name-cell table-cell table-text">
 								<div class="version-link">

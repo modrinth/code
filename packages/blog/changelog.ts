@@ -11,6 +11,85 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-08T09:58:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed some buttons appearing as disabled even when they weren't, such as the project icon settings.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'app',
+		version: '0.13.12',
+		body: `## Changed
+- Updated the modpack exporting experience, fixing issues with it and excluding /mods/.connector from the exports.
+
+## Fixed
+- Fixed page width changing based on if there is scrollable content or not, causing things to move when you switch tabs between scrollable and non-scrollable content.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed failed \`mrpack\` uploads when uploading via the Modrinth App.
+- Fixed support bubble being broken when the console is in full screen/expand mode.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'web',
+		body: `## Changed
+- Project pages now have canonical permalink URLs to hopefully optimize SEO a bit.
+
+## Fixed
+- Fixed error around editing org member permissions.`,
+	},
+	{
+		date: `2026-05-06T22:11:04+00:00`,
+		product: 'app',
+		version: '0.13.11',
+		body: `## Fixed
+- Fixed modpack export including duplicated files as overrides.`,
+	},
+	{
+		date: `2026-05-05T01:34:18+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed unauthorized error when loading a user's own project or organization settings.`,
+	},
+	{
+		date: `2026-05-04T19:57:12+00:00`,
+		product: 'web',
+		body: `## Changed
+- Users who are not members of a project or organization can no longer view settings pages.
+
+## Fixed
+- Fixed some project pages failing to load due to invalid iframe links in their descriptions.`,
+	},
+	{
+		date: `2026-05-04T19:57:12+00:00`,
+		product: 'app',
+		version: '0.13.10',
+		body: `## Fixed
+- Fixed some project pages failing to load due to invalid iframe links in their descriptions.`,
+	},
+	{
+		date: `2026-05-03T18:07:44+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added git.gay as a recognized sources link domain.
+
+## Fixed
+- Fixed useTheme not defined error on project pages.
+- Fixed latest snapshot sometimes appearing a second time outside of a version range.`,
+	},
+	{
+		date: `2026-05-03T18:07:44+00:00`,
+		product: 'app',
+		version: '0.13.9',
+		body: `## Fixed
+- Fixed update notification closing when pressing the Changelog button.
+- Fixed latest snapshot sometimes appearing a second time outside of a version range.`,
+	},
+	{
 		date: `2026-05-02T22:09:01+00:00`,
 		product: 'app',
 		version: '0.13.8',

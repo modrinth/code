@@ -120,7 +120,7 @@
 		</div>
 	</NewModal>
 	<AssignNoticeModal ref="assignNoticeModal" @close="refreshNotices" />
-	<div class="page experimental-styles-within">
+	<div class="page">
 		<div
 			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
 		>

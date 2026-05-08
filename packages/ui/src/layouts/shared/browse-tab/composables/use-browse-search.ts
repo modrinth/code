@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import type { FilterType, FilterValue, ProjectType, SortType } from '#ui/utils/search'
-import { useSearch } from '#ui/utils/search'
+import { LOADER_FILTER_TYPES, useSearch } from '#ui/utils/search'
 import { useServerSearch } from '#ui/utils/server-search'
 
 import type { BrowseSearchResponse } from '../types'
@@ -59,14 +59,6 @@ export interface BrowseSearchState {
 	clearSearch: () => void
 	onFilterChange: () => void
 }
-
-const LOADER_FILTER_TYPES = [
-	'mod_loader',
-	'plugin_loader',
-	'modpack_loader',
-	'shader_loader',
-	'plugin_platform',
-] as const
 
 export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchState {
 	const debug = useDebugLogger('BrowseSearch')
@@ -179,6 +171,26 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 
 	let searchVersion = 0
 	let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
+	const providedFiltersOrEmpty = computed(() => options.providedFilters?.value ?? [])
+
+	watch(
+		[
+			query,
+			maxResults,
+			options.projectType,
+			currentSortType,
+			serverCurrentSortType,
+			currentFilters,
+			serverCurrentFilters,
+			overriddenProvidedFilterTypes,
+			providedFiltersOrEmpty,
+		],
+		() => {
+			currentPage.value = 1
+		},
+		{ deep: true },
+	)
 
 	watch(effectiveRequestParams, (newVal, oldVal) => {
 		debug('effectiveRequestParams changed', {

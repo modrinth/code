@@ -55,7 +55,7 @@
 				/>
 				<div class="flex gap-2">
 					<ButtonStyled type="outlined">
-						<button class="!h-10 !border-button-bg !border-[1px]" @click="addServerModal?.show()">
+						<button class="!h-10" @click="addServerModal?.show()">
 							<PlusIcon class="size-5" />
 							{{ formatMessage(messages.addServer) }}
 						</button>
@@ -141,7 +141,7 @@
 		>
 			<template #actions>
 				<ButtonStyled type="outlined">
-					<button class="!h-10 !border-button-bg !border-[1px]" @click="addServerModal?.show()">
+					<button class="!h-10" @click="addServerModal?.show()">
 						<PlusIcon class="size-5" />
 						{{ formatMessage(messages.addServer) }}
 					</button>

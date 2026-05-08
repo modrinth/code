@@ -134,10 +134,6 @@ const [loaders, gameVersions] = await Promise.all([
 	display: flex;
 	gap: 0.5rem;
 	flex-grow: 1;
-
-	.multiselect {
-		flex-grow: 1;
-	}
 }
 
 .card-row {

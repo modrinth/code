@@ -29,7 +29,7 @@
 		</div>
 		<div class="flex gap-3">
 			<ButtonStyled type="outlined">
-				<button class="flex-1 !border-surface-4" @click="triggerFileInput">
+				<button class="flex-1" @click="triggerFileInput">
 					<ImportIcon />
 					{{ formatMessage(messages.importModpack) }}
 				</button>

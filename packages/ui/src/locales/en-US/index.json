@@ -758,6 +758,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Set up server"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "No"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Permanent no"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Unidentified"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "With attribution"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "With attribution and source"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Yes"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Extract summary"
   },
@@ -1980,7 +1998,7 @@
     "defaultMessage": "Failed"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listed"
+    "defaultMessage": "Public"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
@@ -2019,7 +2037,7 @@
     "defaultMessage": "Fail"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Withheld"
+    "defaultMessage": "Unlisted by staff"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copy code to clipboard"
@@ -2788,6 +2806,9 @@
   },
   "project.settings.upload.title": {
     "defaultMessage": "Upload"
+  },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Permissions"
   },
   "project.settings.versions.title": {
     "defaultMessage": "Versions"

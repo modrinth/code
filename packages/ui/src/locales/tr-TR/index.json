@@ -50,6 +50,9 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "İptal"
   },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} Paylaşılan CPUlar"
+  },
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "Hata"
   },
@@ -437,9 +440,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Dosya yükle"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Dosyalar yükleniyor ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Tüm seçili içerik zaten devre dışı"
   },
@@ -475,6 +475,129 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} seçildi"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "Kurulum oluştur"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "Dünya oluştur"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Tamamla"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "İçe aktar"
+  },
+  "creation-flow.modal.custom-setup.game-version.placeholder": {
+    "defaultMessage": "Oyun sürümü seç"
+  },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "Oyun sürümü ara..."
+  },
+  "creation-flow.modal.custom-setup.icon.remove": {
+    "defaultMessage": "Simgeyi kaldır"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "Simge seç"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "En Son"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "Diğer"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "Stabil"
+  },
+  "creation-flow.modal.custom-setup.loader-version.label": {
+    "defaultMessage": "Yükleyici sürümü"
+  },
+  "creation-flow.modal.custom-setup.loader-version.placeholder": {
+    "defaultMessage": "Yükleyici sürümü seç"
+  },
+  "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
+    "defaultMessage": "Yükleyici sürümü ara..."
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "Yükleyici"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "Ad"
+  },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "Kurulum adı girin"
+  },
+  "creation-flow.modal.custom-setup.options.no-versions-available": {
+    "defaultMessage": "Uygun sürüm yok"
+  },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "Diğer ayarlar"
+  },
+  "creation-flow.modal.final-config.backup.before-reset-server.name": {
+    "defaultMessage": "Sunucu sıfırlamadan önce"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "Kolay"
+  },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "Zor"
+  },
+  "creation-flow.modal.final-config.difficulty.label": {
+    "defaultMessage": "Zorluk"
+  },
+  "creation-flow.modal.final-config.difficulty.normal": {
+    "defaultMessage": "Normal"
+  },
+  "creation-flow.modal.final-config.difficulty.peaceful": {
+    "defaultMessage": "Barışçıl"
+  },
+  "creation-flow.modal.final-config.game-version.placeholder": {
+    "defaultMessage": "Oyun sürümü seç"
+  },
+  "creation-flow.modal.final-config.gamemode.creative": {
+    "defaultMessage": "Yaratıcı"
+  },
+  "creation-flow.modal.final-config.gamemode.hardcore": {
+    "defaultMessage": "Zorlayıcı"
+  },
+  "creation-flow.modal.final-config.gamemode.label": {
+    "defaultMessage": "Oyun modu"
+  },
+  "creation-flow.modal.final-config.gamemode.survival": {
+    "defaultMessage": "Hayatta Kalma"
+  },
+  "creation-flow.modal.final-config.generator-settings.custom": {
+    "defaultMessage": "Özel"
+  },
+  "creation-flow.modal.final-config.generator-settings.default": {
+    "defaultMessage": "Sıradan"
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "Düz"
+  },
+  "creation-flow.modal.final-config.generator-settings.label": {
+    "defaultMessage": "Oluşturucu ayarları"
+  },
+  "creation-flow.modal.final-config.generator-settings.placeholder": {
+    "defaultMessage": "Oluşturucu ayarları seçin"
+  },
+  "creation-flow.modal.modpack.known-modpack.prompt": {
+    "defaultMessage": "Yüklemek istediğiniz mod paketini zaten biliyor musunuz?"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Sonuç bulunamadı"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "Mod paketi ara"
+  },
+  "creation-flow.modal.setup-type.instance.description": {
+    "defaultMessage": "Her bir 'kurulum', kendine has yükleyicisi (modloader), sürümü ve modları olan bir Minecraft kurulumudur."
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.description": {
+    "defaultMessage": "Bir yükleyici ve sürüm seçerek başlayın."
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
+    "defaultMessage": "Vanilla Minecraft"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Özeti ayıkla"
@@ -694,9 +817,6 @@
   },
   "files.operations.extracting": {
     "defaultMessage": "{source} çıkarılıyor"
-  },
-  "files.operations.failed": {
-    "defaultMessage": "Başarısız"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "URL'den mod paketi"
@@ -1189,12 +1309,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Bilinmeyen oyun modu"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "Dosyalar hâlâ yükleniyor. Bu sayfadan ayrılmak yüklemeyi iptal eder ve değişiklikleriniz yok olabilir."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Yükleme devam etmekte"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} uyumlu kurulum"
@@ -2651,20 +2765,11 @@
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "{backupName}'den geri yüklerken bir hata yaşandı. Lütfen tekrar deneyin veya sorun devam ederse desteğe ulaşın."
   },
-  "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Yedekten geri yükleme başarısız"
-  },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "{backupName}'den geri yükleme sırada ve kısa sürede başlayacak."
   },
-  "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Yedekten geri yükleme sırada"
-  },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Sunucunuz {backupName} olarak kurtarıldı ve başlamaya hazır."
-  },
-  "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Yedekten geri yükleme başarılı"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Sunucunuz {backupName}'den geri yükleniyor. Bir kaç dakika sürebilir."
@@ -2678,12 +2783,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Yedekleme zamanları"
   },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Yedekleme başarısız"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Yedekten geri yükleme başarısız"
-  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuel yedekleme"
   },
@@ -2692,6 +2791,15 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Geri yükle"
+  },
+  "servers.backups.toolbar.filter-auto": {
+    "defaultMessage": "Otomatik"
+  },
+  "servers.backups.toolbar.filter-manual": {
+    "defaultMessage": "Manüel"
+  },
+  "servers.backups.toolbar.select-all": {
+    "defaultMessage": "Hepsini seç"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Yedek oluşturma sürüyor"
@@ -2722,6 +2830,24 @@
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Tek-tıklamada mod kurma"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Giriş yap"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Kopyalandı"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "Kodu panoya kopyala"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "ID'yi Kopyala"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Yeni"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Destek"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Görmezden gel"

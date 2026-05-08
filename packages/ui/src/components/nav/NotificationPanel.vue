@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="vue-notification-group experimental-styles-within"
+		class="vue-notification-group"
 		:class="{
 			'intercom-present': isIntercomPresent,
 			'location-left': notificationLocation === 'left',

@@ -155,8 +155,8 @@ defineExpose({
 							<div class="font-semibold text-contrast">Sign in to continue your purchase</div>
 							<div class="">You need a Modrinth account to add your billing details.</div>
 						</div>
-						<ButtonStyled color="brand" class="mt-2">
-							<button @click="continueToAuth">
+						<ButtonStyled color="brand">
+							<button class="mt-2" @click="continueToAuth">
 								Sign in or create an account
 								<ExternalIcon class="size-4" />
 							</button>

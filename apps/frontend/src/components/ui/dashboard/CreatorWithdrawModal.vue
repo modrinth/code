@@ -58,24 +58,20 @@
 		</div>
 		<template #actions>
 			<div v-if="currentStage === 'completion'" class="mt-4 flex w-full gap-3">
-				<ButtonStyled class="flex-1">
-					<button class="w-full text-contrast" @click="handleClose">
+				<ButtonStyled>
+					<button class="w-full flex-1 text-contrast" @click="handleClose">
 						{{ formatMessage(commonMessages.closeButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled class="flex-1">
-					<button class="w-full text-contrast" @click="handleViewTransactions">
+				<ButtonStyled>
+					<button class="w-full flex-1 text-contrast" @click="handleViewTransactions">
 						{{ formatMessage(messages.transactionsButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
 			<div v-else class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
 				<ButtonStyled type="outlined">
-					<button
-						class="!border-surface-5"
-						:disabled="leftButtonConfig.disabled"
-						@click="leftButtonConfig.handler"
-					>
+					<button :disabled="leftButtonConfig.disabled" @click="leftButtonConfig.handler">
 						<component :is="leftButtonConfig.icon" />
 						{{ leftButtonConfig.label }}
 					</button>

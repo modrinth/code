@@ -40,11 +40,7 @@
 					</div>
 				</div>
 				<ButtonStyled v-if="content" type="outlined">
-					<button
-						class="!border-[1px]"
-						:disabled="!hasPermission"
-						@click="handleSwitchCompatibility"
-					>
+					<button :disabled="!hasPermission" @click="handleSwitchCompatibility">
 						<ArrowLeftRightIcon />
 						Switch type
 					</button>

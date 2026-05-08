@@ -24,10 +24,12 @@
 				:description="formatMessage(messages.subscribeCheckbox)"
 			/>
 
-			<button class="btn btn-primary centered-btn" @click="continueSignUp">
-				{{ formatMessage(commonMessages.continueButton) }}
-				<RightArrowIcon />
-			</button>
+			<ButtonStyled color="brand">
+				<button class="centered-btn" @click="continueSignUp">
+					{{ formatMessage(commonMessages.continueButton) }}
+					<RightArrowIcon />
+				</button>
+			</ButtonStyled>
 
 			<p class="tos-text">
 				<IntlFormatted :message-id="messages.tosLabel">
@@ -50,6 +52,7 @@
 <script setup>
 import { RightArrowIcon, WavingRinthbot } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	defineMessages,

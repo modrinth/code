@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Partnerlink erstellen"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Keine Partnercodes gefunden."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Fehler beim Laden von Partnerlinks"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Partnerlinks durchsuchen..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "von {count} {count, plural, one {Projekt} other {Projekten}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Anzahl der Downloads"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Anzahl der Follower"
   },
   "dashboard.collections.button.create-new": {
     "message": "Erstellen"
@@ -596,8 +608,17 @@
   "dashboard.collections.long-title": {
     "message": "Deine Kollektionen"
   },
+  "dashboard.collections.placeholder.search": {
+    "message": "Kollektionen durchsuchen..."
+  },
   "dashboard.collections.sort.name-ascending": {
     "message": "Name (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Kürzlich erstellt"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Kürzlich aktualisiert"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Lade {formType} herunter"
@@ -857,20 +878,128 @@
   "dashboard.notifications.button.mark-all-as-read": {
     "message": "Alle als gelesen markieren"
   },
+  "dashboard.notifications.button.view-history": {
+    "message": "Verlauf ansehen"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Du hast keine ungelesenen Benachrichtigungen."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Fehler beim Laden von Benachrichtigungen:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Verlauf"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Benachrichtigungsverlauf"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Alle ansehen"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Benachrichtigungsverlauf ansehen"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Siehe {extraNotifs} weitere {extraNotifs, plural, one {Benachrichtigung} other {Benachrichtigungen}} an"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Benachrichtigungen werden geladen..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Organisation erstellen"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Erstelle eine Organisation!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Fehler beim Laden der Organisationen"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {Mitglied} other {Mitglieder}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisationen"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Du kannst mehrere Projekte gleichzeitig bearbeiten, indem du sie unten auswählst."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Serverprojekte unterstützen Massenbearbeitung nicht"
+  },
+  "dashboard.projects.empty": {
+    "message": "Du hast noch keine Projekte. Klicke auf den grünen Knopf oben um loszulegen."
+  },
   "dashboard.projects.head-title": {
     "message": "Projekte"
   },
   "dashboard.projects.links.and-more": {
     "message": "und {count} weitere..."
   },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Link entfernen"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Links bearbeiten"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Änderungen werden auf <strong>{count}</strong> {count, plural, one {Projekt} other {Projekte}} angewendet."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Alle Links, die du unten angibst, werden in jedem der ausgewählten Projekte überschrieben. Alle, die du leer lässt, werden ignoriert. Du kannst einen Link mithilfe der Papierkorb-Schaltfläche aus allen ausgewählten Projekten entfernen."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Ein Einladungslink zu deinem Discord-Server."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord-Einladung"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Ein Ort, an dem Nutzer Fehler, Probleme und Bedenken zu deinem Projekt melden können."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Issue-Tracker"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Der vorhandene Link wird gelöscht"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Gib eine gültige Discordeinladungs-URL ein"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Gib eine gültige URL ein"
+  },
   "dashboard.projects.links.show-all-projects": {
     "message": "Alle Projekte anzeigen"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Ein Seite/ein Repository mit dem Quellcode deines Projekts"
   },
   "dashboard.projects.links.source-code.label": {
     "message": "Quellcode"
   },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Eine Seite mit Informationen, Dokumentation und Hilfe zum Projekt."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Wikiseite"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Links von Projekten wurden massenbearbeitet."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icon für {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Projekt hat eine Nachricht von den Moderatoren. Rufe das Projekt auf, um mehr zu erfahren."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Bitte überprüfe die Umgebungsmetadaten"
+  },
   "dashboard.projects.sort.ascending": {
     "message": "Aufsteigend"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Absteigend"
   },
   "dashboard.projects.sort.option.name": {
     "message": "Name"
@@ -895,6 +1024,9 @@
   },
   "dashboard.projects.table.type": {
     "message": "Typ"
+  },
+  "dashboard.report.title": {
+    "message": "Meldung {id}"
   },
   "dashboard.reports.active-title": {
     "message": "Aktive Meldungen"

@@ -53,18 +53,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          [
+        platform: [
             blacksmith-6vcpu-macos-26,
-            blacksmith-8vcpu-windows-2025,
-            blacksmith-8vcpu-ubuntu-2404,
+            blacksmith-8vcpu-windows-2025, # At time of writing, Windows 4 vCPU VMs don't seem to actually exist
+            blacksmith-4vcpu-ubuntu-2404,
           ]
         include:
           - platform: blacksmith-6vcpu-macos-26
             artifact-target-name: universal-apple-darwin
           - platform: blacksmith-8vcpu-windows-2025
             artifact-target-name: x86_64-pc-windows-msvc
-          - platform: blacksmith-8vcpu-ubuntu-2404
+          - platform: blacksmith-4vcpu-ubuntu-2404
             artifact-target-name: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
@@ -157,6 +156,7 @@ jobs:
         run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
         if: contains(matrix.platform, 'macos')
         env:
+          TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
           ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}

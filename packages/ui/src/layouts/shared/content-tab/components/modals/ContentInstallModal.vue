@@ -70,7 +70,6 @@
 				<ButtonStyled type="outlined" circular>
 					<button
 						v-tooltip="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
-						class="!border-surface-4 !border"
 						@click="hideUninstallable = !hideUninstallable"
 					>
 						<EyeOffIcon v-if="hideUninstallable" />
@@ -134,17 +133,13 @@
 				<Avatar :src="iconPreviewUrl ?? undefined" size="5rem" rounded="2xl" />
 				<div class="flex flex-col gap-2">
 					<ButtonStyled type="outlined">
-						<button class="!border-surface-4 !border" @click="selectIcon">
+						<button @click="selectIcon">
 							<UploadIcon />
 							{{ formatMessage(messages.selectIcon) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled type="outlined">
-						<button
-							class="!border-surface-4 !border"
-							:disabled="!iconPreviewUrl"
-							@click="removeIcon"
-						>
+						<button :disabled="!iconPreviewUrl" @click="removeIcon">
 							<XIcon />
 							{{ formatMessage(messages.removeIcon) }}
 						</button>
@@ -213,7 +208,7 @@
 					</span>
 				</div>
 				<ButtonStyled type="outlined">
-					<button class="!border-surface-4 !border" @click="modal?.hide()">
+					<button @click="modal?.hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
@@ -222,7 +217,7 @@
 
 			<div v-else class="flex items-center justify-end gap-2">
 				<ButtonStyled type="outlined">
-					<button class="!border-surface-4 !border" @click="modal?.hide()">
+					<button @click="modal?.hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>

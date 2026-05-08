@@ -29,14 +29,20 @@
   "app.browse.discover-servers": {
     "message": "Upptäck servrar"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Dölj tillagda servrar"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Dölj installerat innehåll"
-  },
   "app.browse.install-content-to-instance": {
     "message": "Installera innehåll till instans"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpaket"
+  },
+  "app.browse.server.install": {
+    "message": "Installera"
+  },
+  "app.browse.server.installed": {
+    "message": "Installerad"
+  },
+  "app.browse.server.installing": {
+    "message": "Installerar"
   },
   "app.export-modal.description-placeholder": {
     "message": "Ange modpaketets beskrivning..."

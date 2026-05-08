@@ -26,6 +26,19 @@ pub mod util;
 const DEFAULT_EXPIRY: i64 = 60 * 60 * 12; // 12 hours
 const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
 
+// Bound how many commands we send in a single Redis pipeline. The multiplexed
+// connection's BytesMut write buffer keeps its peak capacity for the life of
+// the connection, so larger pipelines cause higher steady-state RSS.
+const PIPELINE_CHUNK_SIZE: usize = 25;
+// Bound how many keys we send in a single MGET. Each MGET response must fit
+// into the connection's read buffer, which also retains its peak capacity. At
+// ~1 MB per cached value, 32 keys caps any single response at ~32 MB.
+const MGET_CHUNK_SIZE: usize = 32;
+// How long a pooled Redis connection lives before being recycled, regardless
+// of activity. Forced recycling is the only way to release the per-connection
+// BytesMut peak capacity that builds up under steady load.
+const REDIS_MAX_CONN_AGE: Duration = Duration::from_secs(120);
+
 #[derive(Clone)]
 pub struct RedisPool {
     pub url: String,
@@ -85,14 +98,19 @@ impl RedisPool {
         });
 
         let interval = Duration::from_secs(30);
-        let max_age = Duration::from_secs(5 * 60); // 5 minutes
+        let max_idle = Duration::from_secs(5 * 60); // 5 minutes
         let pool_ref = pool.clone();
         tokio::spawn(async move {
             loop {
                 tokio::time::sleep(interval).await;
-                pool_ref
-                    .pool
-                    .retain(|_, metrics| metrics.last_used() < max_age);
+                pool_ref.pool.retain(|_, metrics| {
+                    // Drop connections that have been idle too long, OR that
+                    // are older than REDIS_MAX_CONN_AGE regardless of use.
+                    // The age-based recycle is what releases the per-connection
+                    // BytesMut peak capacity under steady traffic.
+                    metrics.last_used() < max_idle
+                        && metrics.created.elapsed() < REDIS_MAX_CONN_AGE
+                });
             }
         });
 
@@ -303,13 +321,16 @@ impl RedisPool {
                             })
                             .collect::<Vec<_>>();
 
-                        let v = cmd("MGET")
-                            .arg(&args)
-                            .query_async::<Vec<Option<String>>>(&mut connection)
-                            .await?
-                            .into_iter()
-                            .flatten()
-                            .collect::<Vec<_>>();
+                        let mut v = Vec::new();
+                        for chunk in args.chunks(MGET_CHUNK_SIZE) {
+                            let part = cmd("MGET")
+                                .arg(chunk)
+                                .query_async::<Vec<Option<String>>>(
+                                    &mut connection,
+                                )
+                                .await?;
+                            v.extend(part.into_iter().flatten());
+                        }
                         Ok::<_, DatabaseError>(v)
                     }
                     .instrument(info_span!("get slug ids"))
@@ -331,19 +352,20 @@ impl RedisPool {
                     .map(|x| format!("{}_{namespace}:{x}", self.meta_namespace))
                     .collect::<Vec<_>>();
 
-                let cached_values = cmd("MGET")
-                    .arg(&args)
-                    .query_async::<Vec<Option<String>>>(&mut connection)
-                    .await?
-                    .into_iter()
-                    .filter_map(|x| {
+                let mut cached_values = HashMap::new();
+                for chunk in args.chunks(MGET_CHUNK_SIZE) {
+                    let part = cmd("MGET")
+                        .arg(chunk)
+                        .query_async::<Vec<Option<String>>>(&mut connection)
+                        .await?;
+                    cached_values.extend(part.into_iter().filter_map(|x| {
                         x.and_then(|val| {
                             serde_json::from_str::<RedisValue<T, K, S>>(&val)
                                 .ok()
                         })
                         .map(|val| (val.key.clone(), val))
-                    })
-                    .collect::<HashMap<_, _>>();
+                    }));
+                }
 
                 Ok::<_, DatabaseError>((cached_values, ids))
             }
@@ -440,6 +462,8 @@ impl RedisPool {
                 let mut return_values = HashMap::new();
 
                 let mut pipe = redis_pipe();
+                let mut pipe_cmds: usize = 0;
+                let mut connection = self.pool.get().await?;
                 // Doesn't need to be atomic
 
                 if !vals.is_empty() {
@@ -459,6 +483,7 @@ impl RedisPool {
                             serde_json::to_string(&value)?,
                             DEFAULT_EXPIRY as u64,
                         );
+                        pipe_cmds += 1;
 
                         if let Some(slug) = slug {
                             ids.remove(&slug.to_string());
@@ -478,46 +503,31 @@ impl RedisPool {
                                     key.to_string(),
                                     DEFAULT_EXPIRY as u64,
                                 );
-
-                                /*
-                                if let Some(_sentinel) =
-                                    cache_writers.remove(&actual_slug)
-                                {
-                                    // drop it
-                                }
-                                */
+                                pipe_cmds += 1;
                             }
                         }
 
                         let key_str = key.to_string();
                         ids.remove(&key_str);
 
-                        /*
-                        if let Some(_sentinel) = cache_writers.remove(&key_str)
-                        {
-                            // drop it
-                        }
-                        */
-
                         if let Ok(value) = key_str.parse::<u64>() {
                             let base62 = to_base62(value);
                             ids.remove(&base62);
-
-                            /*
-                            if let Some(_sentinel) =
-                                cache_writers.remove(&base62)
-                            {
-                                // drop it
-                            }
-                            */
                         }
 
                         return_values.insert(key, value);
+
+                        if pipe_cmds >= PIPELINE_CHUNK_SIZE {
+                            pipe.query_async::<()>(&mut connection).await?;
+                            pipe = redis_pipe();
+                            pipe_cmds = 0;
+                        }
                     }
                 }
 
-                let mut connection = self.pool.get().await?;
-                pipe.query_async::<()>(&mut connection).await?;
+                if pipe_cmds > 0 {
+                    pipe.query_async::<()>(&mut connection).await?;
+                }
 
                 drop(cache_writers);
 

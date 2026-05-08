@@ -952,6 +952,10 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.versions.title',
 		defaultMessage: 'Versions',
 	},
+	permissions: {
+		id: 'project.settings.versions.permissions',
+		defaultMessage: 'Permissions',
+	},
 	view: {
 		id: 'project.settings.view.title',
 		defaultMessage: 'View',
@@ -1088,5 +1092,32 @@ export const paymentMethodMessages = defineMessages({
 	charityPlural: {
 		id: 'payment-method.charity-plural',
 		defaultMessage: 'Charities',
+	},
+})
+
+export const externalProjectLicenseStatusMessages = defineMessages({
+	yes: {
+		id: 'external-project-license-status.yes',
+		defaultMessage: 'Yes',
+	},
+	'with-attribution-and-source': {
+		id: 'external-project-license-status.with-attribution-and-source',
+		defaultMessage: 'With attribution and source',
+	},
+	'with-attribution': {
+		id: 'external-project-license-status.with-attribution',
+		defaultMessage: 'With attribution',
+	},
+	no: {
+		id: 'external-project-license-status.no',
+		defaultMessage: 'No',
+	},
+	'permanent-no': {
+		id: 'external-project-license-status.permanent-no',
+		defaultMessage: 'Permanent no',
+	},
+	unidentified: {
+		id: 'external-project-license-status.unidentified',
+		defaultMessage: 'Unidentified',
 	},
 })

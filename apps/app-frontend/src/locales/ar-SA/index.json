@@ -29,14 +29,11 @@
   "app.browse.discover-servers": {
     "message": "استكشف خوادم"
   },
-  "app.browse.hide-added-servers": {
-    "message": "إخفاء الخوادم المضافة"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "إخفاء المحتوى المضاف"
-  },
   "app.browse.install-content-to-instance": {
     "message": "تثبيت محتوى لنموذجك"
+  },
+  "app.browse.server.installing": {
+    "message": "جاري التثبيت"
   },
   "app.export-modal.description-placeholder": {
     "message": "أدخل وصف التعديل..."

@@ -83,10 +83,11 @@
 				</ButtonStyled>
 			</div>
 			<div v-else class="flex items-center gap-2">
-				<ButtonStyled icon-only
-					><button class="!shadow-none" @click="browseForLauncherPath">
-						<FolderSearchIcon class="size-5" /></button
-				></ButtonStyled>
+				<ButtonStyled circular>
+					<button class="!shadow-none" @click="browseForLauncherPath">
+						<FolderSearchIcon />
+					</button>
+				</ButtonStyled>
 				<StyledInput
 					v-model="newLauncherPath"
 					:placeholder="formatMessage(messages.launcherPathPlaceholder)"

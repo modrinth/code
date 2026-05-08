@@ -43,19 +43,20 @@
 					@keypress.enter="() => onInviteTeamMember(organization.team, currentUsername)"
 				/>
 				<label for="username" class="hidden">Username</label>
-				<Button
-					color="primary"
-					:disabled="
-						!isPermission(
-							currentMember.organization_permissions,
-							organizationPermissions.MANAGE_INVITES,
-						)
-					"
-					@click="() => onInviteTeamMember(organization.team_id, currentUsername)"
-				>
-					<UserPlusIcon />
-					Invite
-				</Button>
+				<ButtonStyled color="brand">
+					<button
+						:disabled="
+							!isPermission(
+								currentMember.organization_permissions,
+								organizationPermissions.MANAGE_INVITES,
+							)
+						"
+						@click="() => onInviteTeamMember(organization.team_id, currentUsername)"
+					>
+						<UserPlusIcon />
+						Invite
+					</button>
+				</ButtonStyled>
 			</div>
 			<div class="adjacent-input">
 				<span class="label">
@@ -64,14 +65,15 @@
 						Remove yourself as a member of this organization.
 					</span>
 				</span>
-				<Button
-					color="danger"
-					:disabled="currentMember.is_owner"
-					@click="() => onLeaveProject(organization.team_id, auth.user.id)"
-				>
-					<UserRemoveIcon />
-					Leave organization
-				</Button>
+				<ButtonStyled color="red">
+					<button
+						:disabled="currentMember.is_owner"
+						@click="() => onLeaveProject(organization.team_id, auth.user.id)"
+					>
+						<UserRemoveIcon />
+						Leave organization
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 		<div
@@ -94,18 +96,18 @@
 				<div class="side-buttons">
 					<Badge v-if="member.accepted" type="accepted" />
 					<Badge v-else type="pending" />
-					<Button
-						icon-only
-						transparent
-						class="dropdown-icon"
-						@click="
-							openTeamMembers.indexOf(member.user.id) === -1
-								? openTeamMembers.push(member.user.id)
-								: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
-						"
-					>
-						<DropdownIcon />
-					</Button>
+					<ButtonStyled circular type="transparent">
+						<button
+							class="dropdown-icon"
+							@click="
+								openTeamMembers.indexOf(member.user.id) === -1
+									? openTeamMembers.push(member.user.id)
+									: (openTeamMembers = openTeamMembers.filter((it) => it !== member.user.id))
+							"
+						>
+							<DropdownIcon />
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 			<div class="content">
@@ -188,44 +190,44 @@
 					</div>
 				</template>
 				<div class="input-group">
-					<Button
-						color="primary"
-						:disabled="
-							!isPermission(
-								currentMember.organization_permissions,
-								organizationPermissions.EDIT_MEMBER,
-							)
-						"
-						@click="onUpdateTeamMember(organization.team_id, member)"
-					>
-						<SaveIcon />
-						Save changes
-					</Button>
-					<Button
-						v-if="!member.is_owner"
-						color="danger"
-						:disabled="
-							!isPermission(
-								currentMember.organization_permissions,
-								organizationPermissions.EDIT_MEMBER,
-							) &&
-							!isPermission(
-								currentMember.organization_permissions,
-								organizationPermissions.REMOVE_MEMBER,
-							)
-						"
-						@click="onRemoveMember(organization.team_id, member)"
-					>
-						<UserRemoveIcon />
-						Remove member
-					</Button>
-					<Button
-						v-if="!member.is_owner && currentMember.is_owner && member.accepted"
-						@click="(e) => openTransferModal(member, e)"
-					>
-						<TransferIcon />
-						Transfer ownership
-					</Button>
+					<ButtonStyled color="brand">
+						<button
+							:disabled="
+								!isPermission(
+									currentMember.organization_permissions,
+									organizationPermissions.EDIT_MEMBER,
+								)
+							"
+							@click="onUpdateTeamMember(organization.team_id, member)"
+						>
+							<SaveIcon />
+							Save changes
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="!member.is_owner" color="red">
+						<button
+							:disabled="
+								!isPermission(
+									currentMember.organization_permissions,
+									organizationPermissions.EDIT_MEMBER,
+								) &&
+								!isPermission(
+									currentMember.organization_permissions,
+									organizationPermissions.REMOVE_MEMBER,
+								)
+							"
+							@click="onRemoveMember(organization.team_id, member)"
+						>
+							<UserRemoveIcon />
+							Remove member
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="!member.is_owner && currentMember.is_owner && member.accepted">
+						<button @click="(e) => openTransferModal(member, e)">
+							<TransferIcon />
+							Transfer ownership
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>
@@ -244,7 +246,7 @@ import {
 import {
 	Avatar,
 	Badge,
-	Button,
+	ButtonStyled,
 	Checkbox,
 	injectNotificationManager,
 	StyledInput,

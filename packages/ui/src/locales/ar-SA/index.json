@@ -35,6 +35,9 @@
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "عذر تحميل خادم الإعدادات"
   },
+  "badge.alpha": {
+    "defaultMessage": "نسخه أوليه"
+  },
   "badge.beta": {
     "defaultMessage": "تجريبي"
   },
@@ -46,6 +49,51 @@
   },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "إلغاء"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} وحدات المعالجة المركزية المشتركة"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "أنت على وشك إعادة الاشتراك في <server-name>{serverName}</server-name>. سيتم إعادة تنشيط اشتراكك وسيستمر الخادم الخاص بك في العمل دون انقطاع."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "لا يمكن إعادة الاشتراك، فشل في تحميل تفاصيل الاشتراك."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "خطأ"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "فشل تحميل تفاصيل الاشتراك."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 أيام"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/شهر"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/ربع"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/سنة"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "سيتم تحصيل الرسوم التالية في <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "خطة"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} جيجا بايت رام"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "إعادة الاشتراك"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB مساحة تخزين"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "إعادة الاشتراك في الخادم"
   },
   "button.accept": {
     "defaultMessage": "اقبل"
@@ -73,6 +121,9 @@
   },
   "button.continue": {
     "defaultMessage": "استمر"
+  },
+  "button.copy-filename": {
+    "defaultMessage": "انسخ اسم الملف"
   },
   "button.copy-id": {
     "defaultMessage": "نسخ المعرف"

@@ -29,12 +29,6 @@
   "app.browse.discover-servers": {
     "message": "Prozkoumat servery"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Skrýt přidané servery"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Skrýt nainstalovaný obsah"
-  },
   "app.browse.install-content-to-instance": {
     "message": "Nainstalovat obsah do instnce"
   },

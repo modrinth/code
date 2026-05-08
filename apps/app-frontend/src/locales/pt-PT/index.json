@@ -29,12 +29,6 @@
   "app.browse.discover-servers": {
     "message": "Descobrir servidores"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Esconder servidores adicionados"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Esconder conteúdo instalado"
-  },
   "app.browse.install-content-to-instance": {
     "message": "Instalar conteúdo à instância"
   },
