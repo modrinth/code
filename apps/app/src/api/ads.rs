@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime, WindowEvent};
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime};
 use tauri_plugin_opener::OpenerExt;
 use theseus::settings;
 use tokio::sync::RwLock;
@@ -47,107 +47,167 @@ fn ads_user_agent_override_params() -> String {
     .to_string()
 }
 
+#[cfg(windows)]
+fn configure_ads_cookie_debugging(
+    core_webview2: &webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2,
+) {
+    use webview2_com::Microsoft::Web::WebView2::Win32::{
+        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL,
+        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE, ICoreWebView2,
+        ICoreWebView2_13, ICoreWebView2DevToolsProtocolEventReceivedEventArgs,
+        ICoreWebView2Profile3,
+    };
+    use webview2_com::{
+        CallDevToolsProtocolMethodCompletedHandler,
+        DevToolsProtocolEventReceivedEventHandler, take_pwstr,
+    };
+    use windows_core::{HSTRING, Interface, PWSTR};
+
+    match core_webview2
+        .cast::<ICoreWebView2_13>()
+        .and_then(|core_webview2| unsafe { core_webview2.Profile() })
+        .and_then(|profile| profile.cast::<ICoreWebView2Profile3>())
+    {
+        Ok(profile) => {
+            let mut previous_level = COREWEBVIEW2_TRACKING_PREVENTION_LEVEL(0);
+
+            if let Err(error) = unsafe {
+                profile.PreferredTrackingPreventionLevel(&mut previous_level)
+            } {
+                tracing::warn!(
+                    ?error,
+                    "Failed to read ads WebView2 tracking prevention level"
+                );
+            }
+
+            if let Err(error) = unsafe {
+                profile.SetPreferredTrackingPreventionLevel(
+                    COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE,
+                )
+            } {
+                tracing::warn!(
+                    ?error,
+                    "Failed to disable ads WebView2 tracking prevention"
+                );
+            } else {
+                tracing::info!(
+                    previous_level = previous_level.0,
+                    "Disabled ads WebView2 tracking prevention"
+                );
+            }
+        }
+        Err(error) => {
+            tracing::warn!(
+                ?error,
+                "Failed to access ads WebView2 profile tracking prevention settings"
+            );
+        }
+    }
+
+    if let Ok(receiver) = unsafe {
+        core_webview2.GetDevToolsProtocolEventReceiver(&HSTRING::from(
+            "Network.responseReceivedExtraInfo",
+        ))
+    } {
+        let handler = DevToolsProtocolEventReceivedEventHandler::create(
+            Box::new(
+                move |_: Option<ICoreWebView2>,
+                      args: Option<
+                    ICoreWebView2DevToolsProtocolEventReceivedEventArgs,
+                >| {
+                    let Some(args) = args else {
+                        return Ok(());
+                    };
+
+                    let mut json = PWSTR::null();
+
+                    if let Err(error) =
+                        unsafe { args.ParameterObjectAsJson(&mut json) }
+                    {
+                        tracing::warn!(
+                            ?error,
+                            "Failed to read ads WebView2 network debug event"
+                        );
+                        return Ok(());
+                    }
+
+                    let payload = take_pwstr(json);
+
+                    if let Ok(payload_json) =
+                        serde_json::from_str::<serde_json::Value>(&payload)
+                    {
+                        if payload_json
+                            .get("blockedCookies")
+                            .and_then(|blocked_cookies| {
+                                blocked_cookies.as_array()
+                            })
+                            .is_some_and(|blocked_cookies| {
+                                !blocked_cookies.is_empty()
+                            })
+                        {
+                            tracing::warn!(
+                                payload = %payload,
+                                "Ads WebView2 blocked cookies"
+                            );
+                        }
+                    }
+
+                    Ok(())
+                },
+            ) as Box<_>,
+        );
+
+        let mut token = 0;
+        if let Err(error) = unsafe {
+            receiver.add_DevToolsProtocolEventReceived(&handler, &mut token)
+        } {
+            tracing::warn!(
+                ?error,
+                "Failed to subscribe to ads WebView2 cookie debug events"
+            );
+        }
+    }
+
+    let handler = CallDevToolsProtocolMethodCompletedHandler::create(Box::new(
+        |result: windows_core::Result<()>, _| {
+            if let Err(error) = result {
+                tracing::warn!(
+                    ?error,
+                    "Failed to enable ads WebView2 network debugging"
+                );
+            }
+
+            Ok(())
+        },
+    )
+        as Box<_>);
+
+    if let Err(error) = unsafe {
+        core_webview2.CallDevToolsProtocolMethod(
+            &HSTRING::from("Network.enable"),
+            &HSTRING::from("{}"),
+            &handler,
+        )
+    } {
+        tracing::warn!(
+            ?error,
+            "Failed to install ads WebView2 network debugging"
+        );
+    }
+}
+
 fn set_webview_visible<R: Runtime>(
     webview: &tauri::Webview<R>,
     _visible: bool,
 ) {
-    let label = webview.label().to_string();
-
-    tracing::info!(
-        webview = %label,
-        visible = _visible,
-        "Setting ads webview native visibility"
-    );
-
     webview
         .with_webview(
             #[allow(unused_variables)]
             move |wv| {
                 #[cfg(windows)]
                 {
-                    use webview2_com::ExecuteScriptCompletedHandler;
-                    use windows_core::BOOL;
-                    use windows_core::HSTRING;
-
                     let controller = wv.controller();
-                    let mut visible_before = BOOL::default();
-
-                    unsafe {
-                        controller.IsVisible(&mut visible_before).ok();
-                    }
-
-                    tracing::info!(
-                        webview = %label,
-                        requested_visible = _visible,
-                        native_visible_before = visible_before.as_bool(),
-                        "Calling WebView2 SetIsVisible"
-                    );
-
-                    if let Err(error) =
-                        unsafe { controller.SetIsVisible(_visible) }
-                    {
-                        tracing::error!(
-                            ?error,
-                            webview = %label,
-                            requested_visible = _visible,
-                            "WebView2 SetIsVisible failed"
-                        );
-                        return;
-                    }
-
-                    let mut visible_after = BOOL::default();
-
-                    unsafe {
-                        controller.IsVisible(&mut visible_after).ok();
-                    }
-
-                    tracing::info!(
-                        webview = %label,
-                        requested_visible = _visible,
-                        native_visible_after = visible_after.as_bool(),
-                        "WebView2 SetIsVisible completed"
-                    );
-
-                    let Ok(core_webview2) =
-                        (unsafe { controller.CoreWebView2() })
-                    else {
-                        tracing::warn!(
-                            webview = %label,
-                            "Could not get CoreWebView2 to inspect document.hidden"
-                        );
-                        return;
-                    };
-
-                    let hidden_label = label.clone();
-                    let handler = ExecuteScriptCompletedHandler::create(
-                        Box::new(
-                            move |result: windows_core::Result<()>, value: String| {
-                                match result {
-                                    Ok(()) => tracing::info!(
-                                        webview = %hidden_label,
-                                        document_hidden = %value,
-                                        "Read ads webview document.hidden after visibility update"
-                                    ),
-                                    Err(error) => tracing::error!(
-                                        ?error,
-                                        webview = %hidden_label,
-                                        "Failed to read ads webview document.hidden"
-                                    ),
-                                }
-
-                                Ok(())
-                            },
-                        ) as Box<_>,
-                    );
-
-                    unsafe {
-                        core_webview2
-                            .ExecuteScript(
-                                &HSTRING::from("document.hidden"),
-                                &handler,
-                            )
-                            .ok();
-                    }
+                    unsafe { controller.SetIsVisible(_visible) }.ok();
                 }
             },
         )
@@ -167,46 +227,13 @@ fn set_webview_visible_for_window<R: Runtime>(
     set_webview_visible(webview, visible && !is_minimized);
 }
 
-fn window_event_label(event: &WindowEvent) -> String {
-    match event {
-        WindowEvent::Resized(size) => {
-            format!("resized:{}x{}", size.width, size.height)
-        }
-        WindowEvent::Moved(position) => {
-            format!("moved:{},{}", position.x, position.y)
-        }
-        WindowEvent::CloseRequested { .. } => "close-requested".to_string(),
-        WindowEvent::Destroyed => "destroyed".to_string(),
-        WindowEvent::Focused(focused) => format!("focused:{focused}"),
-        WindowEvent::ScaleFactorChanged {
-            scale_factor,
-            new_inner_size,
-            ..
-        } => format!(
-            "scale-factor-changed:{scale_factor}:{}x{}",
-            new_inner_size.width, new_inner_size.height
-        ),
-        WindowEvent::DragDrop(_) => "drag-drop".to_string(),
-        WindowEvent::ThemeChanged(_) => "theme-changed".to_string(),
-        _ => "unknown".to_string(),
-    }
-}
-
 fn sync_webview_visibility_for_main_window<R: Runtime>(
     app: &tauri::AppHandle<R>,
     main_window: &tauri::Window<R>,
     was_minimized: &AtomicBool,
-    trigger: &str,
 ) {
     let is_minimized = main_window.is_minimized().unwrap_or(false);
     let was = was_minimized.load(Ordering::SeqCst);
-
-    tracing::info!(
-        trigger,
-        is_minimized,
-        was_minimized = was,
-        "Checking main window minimized state for ads webviews"
-    );
 
     if is_minimized == was {
         return;
@@ -219,13 +246,7 @@ fn sync_webview_visibility_for_main_window<R: Runtime>(
     } else {
         match app.state::<RwLock<AdsState>>().try_read() {
             Ok(state) => state.shown && !state.modal_shown,
-            Err(error) => {
-                tracing::warn!(
-                    ?error,
-                    "Could not read ads state while restoring webview visibility"
-                );
-                false
-            }
+            Err(_) => false,
         }
     };
 
@@ -243,24 +264,9 @@ fn sync_webview_visibility_for_main_window<R: Runtime>(
         }
     }
 
-    tracing::info!(
-        trigger,
-        is_minimized,
-        ads_visible,
-        webview_count = webviews.len(),
-        "Applying main window minimized state to webviews"
-    );
-
     for webview in webviews {
         let visible =
             !is_minimized && (webview.label() != "ads-window" || ads_visible);
-
-        tracing::info!(
-            trigger,
-            webview = webview.label(),
-            visible,
-            "Applying computed native webview visibility"
-        );
 
         set_webview_visible(&webview, visible);
     }
@@ -297,23 +303,14 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 
             if let Some(main_window) = app.get_window("main") {
                 let app_handle = app.clone();
-                let win = main_window.clone();
-                let event_window = win.clone();
+                let event_window = main_window.clone();
                 let was_minimized = Arc::new(AtomicBool::new(false));
 
-                win.on_window_event(move |event| {
-                    let event_label = window_event_label(event);
-
-                    tracing::info!(
-                        event = %event_label,
-                        "Main window event received for ads visibility sync"
-                    );
-
+                main_window.on_window_event(move |_| {
                     sync_webview_visibility_for_main_window(
                         &app_handle,
                         &event_window,
                         &was_minimized,
-                        &event_label,
                     );
 
                     let delayed_app_handle = app_handle.clone();
@@ -327,7 +324,6 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                             &delayed_app_handle,
                             &delayed_event_window,
                             &delayed_was_minimized,
-                            "delayed-window-event-check",
                         );
                     });
                 });
@@ -455,6 +451,8 @@ pub async fn init_ads_window<R: Runtime>(
                         unsafe { webview2.controller().CoreWebView2() };
 
                     if let Ok(core_webview2) = core_webview2 {
+                        configure_ads_cookie_debugging(&core_webview2);
+
                         let navigate_webview = core_webview2.clone();
                         let handler =
                             CallDevToolsProtocolMethodCompletedHandler::create(
