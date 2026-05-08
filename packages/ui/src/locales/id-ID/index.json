@@ -449,9 +449,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Unggah berkas"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Mengunggah berkas ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Semua konten terpilih telah dimatikan"
   },
@@ -1960,12 +1957,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Jadwal pencadangan"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Gagal membuat cadangan"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Gagal memulihkan dari cadangan"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Pencadangan manual"

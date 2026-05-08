@@ -15,6 +15,37 @@
 			@proceed="deleteVersion()"
 		/>
 
+		<Admonition
+			v-if="flags.modpackPermissionsPage && withheldVersions.length > 0"
+			type="warning"
+			class="mb-4"
+			:header="
+				formatMessage(messages.withheldVersionsWarningTitle, {
+					count: withheldVersions.length,
+					version_name: withheldVersions.length === 1 ? withheldVersions[0] : undefined,
+				})
+			"
+			:body="
+				formatMessage(messages.withheldVersionsWarningDescription, {
+					count: withheldVersions.length,
+					version_name: withheldVersions.length === 1 ? withheldVersions[0] : undefined,
+				})
+			"
+		>
+			<template #actions>
+				<div class="flex">
+					<ButtonStyled color="orange">
+						<nuxt-link
+							:to="`/${project.project_type}/${
+								project.slug ? project.slug : project.id
+							}/settings/permissions`"
+						>
+							{{ formatMessage(messages.withheldVersionsWarningResolve) }} <RightArrowIcon />
+						</nuxt-link>
+					</ButtonStyled>
+				</div>
+			</template>
+		</Admonition>
 		<ProjectPageVersions
 			v-if="versions?.length"
 			:project="project"
@@ -79,7 +110,7 @@
 								id: 'download',
 								color: 'primary',
 								hoverFilled: true,
-								link: getPrimaryFile(version).url,
+								link: createDownloadUrl(version),
 								action: () => {
 									emit('onDownload')
 								},
@@ -293,19 +324,23 @@ import {
 	MoreVerticalIcon,
 	PlusIcon,
 	ReportIcon,
+	RightArrowIcon,
 	ShareIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	ButtonStyled,
 	ConfirmModal,
+	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	OverflowMenu,
 	ProjectPageVersions,
+	useVIntl,
 } from '@modrinth/ui'
-import { useTemplateRef } from 'vue'
+import { useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
@@ -313,14 +348,18 @@ import { reportVersion } from '~/utils/report-helpers.ts'
 
 const route = useRoute()
 
+const { createProjectDownloadUrl, updateVersionsFilterContext } = useCdnDownloadContext()
+
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const {
 	projectV2: project,
 	currentMember,
 	versions,
 	invalidate,
 	loadVersions,
+	cdnDownloadReason,
 } = injectProjectPageContext()
 
 // Load versions on mount (client-side)
@@ -365,6 +404,23 @@ function getPrimaryFile(version: Labrinth.Versions.v3.Version) {
 	return version.files.find((x) => x.primary) || version.files[0]
 }
 
+watch(
+	() => [route.query.g, route.query.l],
+	() => {
+		updateVersionsFilterContext(
+			queryAsStringArray(route.query.g),
+			queryAsStringArray(route.query.l),
+		)
+	},
+	{ immediate: true },
+)
+
+function createDownloadUrl(version: Labrinth.Versions.v3.Version) {
+	return createProjectDownloadUrl(getPrimaryFile(version).url, {
+		reason: cdnDownloadReason.value,
+	})
+}
+
 async function copyToClipboard(text: string) {
 	await navigator.clipboard.writeText(text)
 }
@@ -396,4 +452,23 @@ async function deleteVersion() {
 
 	stopLoading()
 }
+
+const withheldVersions = computed(() => ['4.0.0'])
+
+const messages = defineMessages({
+	withheldVersionsWarningTitle: {
+		id: 'project.versions.withheld-versions-warning.title',
+		defaultMessage:
+			'{count, plural, one {Version {version_name}} other {Versions}} withheld due to unknown embedded content',
+	},
+	withheldVersionsWarningDescription: {
+		id: 'project.versions.withheld-versions-warning.description',
+		defaultMessage:
+			'{count, plural, one {This version is} other {These versions are}} currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included in the modpack {count, plural, one {version} other {versions}}.',
+	},
+	withheldVersionsWarningResolve: {
+		id: 'project.versions.withheld-versions-warning.resolve-button',
+		defaultMessage: 'Resolve',
+	},
+})
 </script>

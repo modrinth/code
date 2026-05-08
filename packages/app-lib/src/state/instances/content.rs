@@ -283,7 +283,7 @@ fn check_modpack_update(
         .collect();
 
     // Sort by date_published descending (newest first)
-    compatible_versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+    compatible_versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
 
     // Find the newest compatible version
     if let Some(newest) = compatible_versions.first() {

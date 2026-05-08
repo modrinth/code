@@ -86,7 +86,7 @@ const EMPTY_STATE_BUBBLES: Record<string, string[]> = {
 	instance: [
 		'   _____________________________________________________________',
 		' /  Start your instance in the top right to start               \\',
-		'|   recieving live logs!                                        |',
+		'|   receiving live logs!                                        |',
 		' \\_____________________________________________________________/',
 	],
 }

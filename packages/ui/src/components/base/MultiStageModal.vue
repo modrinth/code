@@ -74,7 +74,6 @@
 			>
 				<ButtonStyled v-if="leftButtonConfig" type="outlined">
 					<button
-						class="!border-surface-5 !shadow-none"
 						:class="leftButtonConfig.buttonClass"
 						:disabled="leftButtonConfig.disabled"
 						@click="leftButtonConfig.onClick"

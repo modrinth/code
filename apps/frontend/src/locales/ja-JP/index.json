@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "アフィリエイトリンクを作成"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "アフィリエイトコードが見つかりませんでした"
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "アフィリエイトリンクの読み込みエラー"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "アフィリエイトリンクを検索…"
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "{count} 件のプロジェクトから"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "総ダウンロード数"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "総フォロワー数"
   },
   "dashboard.collections.button.create-new": {
     "message": "新規作成"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "コレクション"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "コレクションを検索"
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "名前順(昇順)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "作成順(新しい順)"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "更新順(新しい順)"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} をダウンロード"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "出金限度額の <b>{withdrawLimit}</b> に達しました。これ以上の額を出金するには、納税申告書類を記入する必要があります。"
   },
+  "dashboard.head-title": {
+    "message": "ダッシュボード"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "全て既読にする"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "履歴を表示"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "未読の通知はありません"
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "通知の読み込み中にエラーが発生しました:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "履歴"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "通知履歴"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "すべて見る"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "通知履歴を表示"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "{extraNotifs} 件の通知をさらに表示"
+  },
+  "dashboard.notifications.loading": {
+    "message": "通知を読み込み中..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "組織を作成"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "組織を作成しましょう！"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "組織の取得に失敗しました"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} 人のメンバー"
+  },
+  "dashboard.organizations.title": {
+    "message": "組織"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "以下で選択することで、複数のプロジェクトを一括で編集できます"
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "サーバープロジェクトでは一括編集を利用できません"
+  },
+  "dashboard.projects.empty": {
+    "message": "まだプロジェクトがありません。上にある緑のボタンを押して始めましょう"
+  },
+  "dashboard.projects.head-title": {
+    "message": "プロジェクト"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "さらに {count} 件..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "リンクを削除"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "リンクを編集"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "変更は <strong>{count}</strong> 件のプロジェクトに適用されます"
+  },
+  "dashboard.projects.links.description": {
+    "message": "下記に入力したリンクは、選択した各プロジェクトに上書きされます。空欄のままにしたリンクは無視されます。ゴミ箱ボタンを使用すると、選択したすべてのプロジェクトからリンクを削除できます。"
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Discordサーバーへの招待リンク"
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discordの招待"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "ユーザーがプロジェクトに関するバグ、問題、懸念事項を報告できる場所"
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "問題の報告と追跡"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "現在のリンクは削除されます"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "有効なDiscordの招待URLを入力してください"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "有効なURLを入力してください"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "全てのプロジェクトを表示"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "プロジェクトのソースコードを含むページやリポジトリ"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "ソースコード"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "プロジェクトに関する情報、ドキュメント、ヘルプが掲載されているページ"
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "ウィキページ"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "選択されたプロジェクトのリンクを一括編集しました"
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "{title} のアイコン"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "プロジェクトにモデレーターからのメッセージがあります。プロジェクトの詳細をご覧ください。"
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "環境メタデータを確認してください"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "昇順"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "降順"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "名前"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "ステータス"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "種類"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "アイコン"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "名前"
+  },
+  "dashboard.projects.table.status": {
+    "message": "ステータス"
+  },
+  "dashboard.projects.table.type": {
+    "message": "種類"
+  },
+  "dashboard.report.title": {
+    "message": "通報 {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "アクティブな通報"
+  },
+  "dashboard.reports.title": {
+    "message": "通報"
+  },
   "dashboard.revenue.available-now": {
     "message": "現在出金可能"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "CSVでダウンロード"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "取引履歴"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "取引"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "支払いおよび出金の履歴がここに表示されます。"
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "先月"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "今月"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "すべて見る"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "全ての年"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "入力された納税者番号または社会保障番号が米国内国歳入庁の記録と一致しなかったため、出金が一時的にロックされています。サポートに連絡して、納税申告書類のリセットと再提出を行ってください。"
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "出金"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "アクティブな通報"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "アナリティクス"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "クリエイター"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "ダッシュボード"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "通知"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "組織"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "概要"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "プロジェクト"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "収益"
   },
   "dashboard.withdraw.completion.account": {
     "message": "アカウント"
@@ -3155,6 +3380,12 @@
   "settings.billing.interval.monthly": {
     "message": "月間"
   },
+  "settings.billing.interval.quarter": {
+    "message": "四半期"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "3ヶ月ごと"
+  },
   "settings.billing.interval.year": {
     "message": "年"
   },
@@ -3268,6 +3499,9 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "再登録エラー"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "サーバーが現在キャンセルされている場合、サーバーの設定に10~15分かかる場合があります"
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "再加入申請を受け付けました"

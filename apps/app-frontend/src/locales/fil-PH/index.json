@@ -29,12 +29,6 @@
   "app.browse.discover-servers": {
     "message": "Tumuklas ng mga server"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Taguin ang mga nadagdag na server"
-  },
-  "app.browse.hide-installed-content": {
-    "message": "Taguin ang mga na-install na kontento"
-  },
   "app.browse.install-content-to-instance": {
     "message": "I-install ang kontento sa instansiya"
   },

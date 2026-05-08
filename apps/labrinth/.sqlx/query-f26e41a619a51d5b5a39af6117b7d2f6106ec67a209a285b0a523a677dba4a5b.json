@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO moderation_external_files (sha1, filename, external_license_id, inserted_at, inserted_by, updated_at, updated_by)\n            SELECT * FROM UNNEST ($1::bytea[], $2::varchar[], $3::bigint[], $4::timestamptz[], $5::bigint[], $4::timestamptz[], $5::bigint[])\n            ON CONFLICT (sha1) DO UPDATE SET\n                filename = COALESCE(EXCLUDED.filename, moderation_external_files.filename),\n                external_license_id = EXCLUDED.external_license_id,\n                updated_at = EXCLUDED.updated_at,\n                updated_by = EXCLUDED.updated_by\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "ByteaArray",
+        "VarcharArray",
+        "Int8Array",
+        "TimestamptzArray",
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f26e41a619a51d5b5a39af6117b7d2f6106ec67a209a285b0a523a677dba4a5b"
+}

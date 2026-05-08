@@ -154,8 +154,8 @@
 					@update-thread="updateThread"
 				>
 					<template #closedActions>
-						<ButtonStyled v-if="isStaff(auth.user)" color="green" class="mt-2">
-							<button class="w-full gap-2 sm:w-auto" @click="reopenReport()">
+						<ButtonStyled v-if="isStaff(auth.user)" color="green">
+							<button class="mt-2 w-full gap-2 sm:w-auto" @click="reopenReport()">
 								<CheckCircleIcon class="size-4" />
 								Reopen Thread
 							</button>

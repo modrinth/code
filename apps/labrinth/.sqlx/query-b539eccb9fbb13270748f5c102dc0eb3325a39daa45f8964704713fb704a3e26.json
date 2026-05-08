@@ -1,0 +1,90 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE moderation_external_licenses\n        SET title = COALESCE($2, title),\n            status = $3,\n            link = COALESCE($4, link),\n            exceptions = COALESCE($5, exceptions),\n            proof = COALESCE($6, proof),\n            flame_project_id = COALESCE($7, flame_project_id),\n            updated_at = $8,\n            updated_by = $9\n        WHERE id = $1\n        RETURNING id, title, status, link, exceptions, proof, flame_project_id,\n                  inserted_at, inserted_by, updated_at, updated_by\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "link",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "exceptions",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "proof",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "flame_project_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "inserted_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "inserted_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_by",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int4",
+        "Timestamptz",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "b539eccb9fbb13270748f5c102dc0eb3325a39daa45f8964704713fb704a3e26"
+}

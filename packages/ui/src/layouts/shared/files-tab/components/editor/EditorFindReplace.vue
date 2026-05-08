@@ -94,7 +94,7 @@
 				</div>
 				<ButtonStyled type="outlined">
 					<button
-						class="!h-8 whitespace-nowrap !border !border-surface-5 px-2 text-sm disabled:opacity-50"
+						class="!h-8 whitespace-nowrap px-2 text-sm disabled:opacity-50"
 						:disabled="findMatchCount === 0"
 						@click="emit('replace', replaceQuery)"
 					>
@@ -103,7 +103,7 @@
 				</ButtonStyled>
 				<ButtonStyled type="outlined">
 					<button
-						class="!h-8 whitespace-nowrap !border !border-surface-5 px-2 text-sm disabled:opacity-50"
+						class="!h-8 whitespace-nowrap px-2 text-sm disabled:opacity-50"
 						:disabled="findMatchCount === 0"
 						@click="emit('replaceAll', replaceQuery)"
 					>

@@ -61,7 +61,7 @@ defineExpose({
 			errorType.value = 'directory_move'
 			supportLink.value = 'https://support.modrinth.com'
 
-			if (errorVal.message.includes('directory is not writeable')) {
+			if (errorVal.message.includes('directory is not writable')) {
 				metadata.value.readOnly = true
 			}
 

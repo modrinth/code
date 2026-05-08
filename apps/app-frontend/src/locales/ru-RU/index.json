@@ -1,4 +1,103 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Скачивание Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Скачивания"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Скрыть другие активные сборки"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Сделать основной сборкой"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Нет активных сборок"
+  },
+  "app.action-bar.offline": {
+    "message": "Офлайн"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Основная сборка"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Показать другие активные сборки"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Остановить сборку"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Посмотреть текущие скачивания"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Посмотреть сборку"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Посмотреть журнал"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Включает продвинутые эффекты вроде размытия, но может снизить производительность на устройствах без аппаратного ускорения."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Расширенные эффекты"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Выберите тему для Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Тема"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Страница, которая открывается при запуске лаунчера."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Главная"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Библиотека"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Стартовая страница"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Скрывать имя над игроком на странице скинов."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Без имени над скином"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Показывать недавние миры в разделе «Jump back in» на главной."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Миры на главной"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Сворачивать окно лаунчера при запуске Minecraft."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Сворачивание лаунчера"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Использовать системную рамку окна (требуется перезапуск)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Системное оформление"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Выберите вариант"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Показывать кнопку скрытия боковой панели."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Переключатель боковой панели"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Предупреждать о рисках перед установкой файлов .mrpack, не размещённых на Modrinth."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Предупреждение о сторонних сборках"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Серверы аутентификации Minecraft сейчас могут быть недоступны. Проверьте подключение к интернету и повторите попытку позже."
   },
@@ -37,6 +136,24 @@
   },
   "app.browse.install-content-to-instance": {
     "message": "Установка контента в сборку"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Сборки"
+  },
+  "app.browse.server.install": {
+    "message": "Установить"
+  },
+  "app.browse.server.installed": {
+    "message": "Установлено"
+  },
+  "app.browse.server.installing": {
+    "message": "Установка"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Установка сборки..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Введите описание сборки..."
@@ -90,10 +207,10 @@
     "message": "проект"
   },
   "app.instance.mods.project-was-added": {
-    "message": "\"{name}\" был добавлен"
+    "message": "«{name}» добавлен"
   },
   "app.instance.mods.projects-were-added": {
-    "message": "{count} Проектов было добавлено"
+    "message": "{count, plural, one {Добавлен # проект} few {Добавлено # проекта} other {Добавлено # проектов}}"
   },
   "app.instance.mods.share-text": {
     "message": "Что в моей сборке:"
@@ -369,7 +486,7 @@
     "message": "Настройка мира"
   },
   "instance.files.adding-files": {
-    "message": "Добавление файлов ({completed}/{total})"
+    "message": "Добавление файлов ({completed, number}/⁠{total, number})"
   },
   "instance.files.save-as": {
     "message": "Сохранить как..."
@@ -598,5 +715,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Загрузчик управляется сервером"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "Проверяются только файлы, загруженные на Modrinth, в том числе файлы .mrpack."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Больше не предупреждать"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Подтверждение установки"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Всё равно установить"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Вредоносное ПО часто распространяется через сборки на таких платформах, как Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "Этот файл не найден на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Предупреждение о неизвестном файле"
   }
 }

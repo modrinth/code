@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Создать ссылку"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Партнёрские коды не найдены."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Ошибка загрузки партнёрских ссылок"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Поиск ссылок..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "с {count, plural, one {# проекта} other {# проектов}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Всего скачиваний"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Всего подписчиков"
   },
   "dashboard.collections.button.create-new": {
     "message": "Создать новую"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Ваши коллекции"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Поиск коллекций..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Название (А–Я)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Дата создания"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Дата обновления"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Скачать {formType}"
@@ -678,7 +702,7 @@
     "message": "Поиск стран..."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-text": {
-    "message": "Не удалось получить список доступных способов вывода. Повторите попытку позже."
+    "message": "Не удалось получить доступные способы вывода. Повторите попытку позже."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-title": {
     "message": "Ошибка загрузки способов вывода"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Достигнут лимит вывода в <b>{withdrawLimit}</b>. Для снятия лимита заполните налоговую форму."
   },
+  "dashboard.head-title": {
+    "message": "Панель управления"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Отметить всё как прочитанное"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Посмотреть историю"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "У вас нет непрочитанных уведомлений."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Ошибка загрузки уведомлений:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "История"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "История уведомлений"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Посмотреть все"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "История уведомлений"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Ещё {extraNotifs, plural, one {# уведомление} few {# уведомления} other {# уведомлений}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Загрузка уведомлений..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Создать организацию"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Создайте организацию!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Не удалось получить организации"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count, plural, one {# участник} few {# участника} other {# участников}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Организации"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Выберите проекты ниже, чтобы настроить их вместе."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Серверные проекты не поддерживают массовые операции"
+  },
+  "dashboard.projects.empty": {
+    "message": "Вы не имеете никаких либо проектов. Нажмите зелёную кнопку сверху, чтобы начать."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Проекты"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "и ещё {count}..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Отчистить ссылку"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Изменить ссылки"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Изменения были приняты для <strong>{count}</strong> {count, plural, one {проекта} other {проектов}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Любые ссылки, указанные вами ниже, будут перезаписаны во всех заполненных полях. Поля, оставленные пустыми, будут проигнорированы. Вы можете удалить ссылку из всех выбранных проектов с помощью кнопки в виде корзины."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Ссылка приглашения на ваш Discord сервер."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Сайт на котором можно будет пожаловаться на баг, ошибку или написать отзыв об вашем проекте."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Трекер проблем"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Существующая ссылка будет отчищена"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Введите ссылку приглашение на Discord"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Введите ссылку"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Показывать все проекты"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Страница/репозиторий с открытым кодом проекта"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Исходный код"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Страница содержит информацию, документацию и помощь для проекта."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Вики"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Ссылки обновлены в выбранных проектах."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Иконка для {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Проект получил сообщение от модерации. Посмотрите страницу проекта чтобы увидеть больше."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Пожалуйста, проверьте файл metadata"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "По возрастанию"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "По убыванию"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Название"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Статус"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Тип"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Иконка"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Название"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Статус"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Тип"
+  },
+  "dashboard.report.title": {
+    "message": "Жалоба {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Активные жалобы"
+  },
+  "dashboard.reports.title": {
+    "message": "Жалобы"
+  },
   "dashboard.revenue.available-now": {
     "message": "Доступно"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Скачать в формате CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "История транзакций"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Транзакции"
   },
@@ -916,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Вывод средств"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Активные жалобы"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Аналитика"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Авторам"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Панель управления"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Уведомления"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Организации"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Обзор"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Проекты"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Доход"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Счёт"
@@ -3408,7 +3624,7 @@
     "message": "Коллекция"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Включает продвинутые эффекты вроде размытия. Возможно снижение производительности на устройствах без аппаратного ускорения."
+    "message": "Включает продвинутые эффекты вроде размытия, но может снизить производительность на устройствах без аппаратного ускорения."
   },
   "settings.display.sidebar.advanced-rendering.title": {
     "message": "Расширенные эффекты"
@@ -3543,7 +3759,7 @@
     "message": "Аккаунт"
   },
   "settings.sidebar.label.developer": {
-    "message": "Разработка"
+    "message": "Разработчикам"
   },
   "settings.sidebar.label.display": {
     "message": "Отображение"

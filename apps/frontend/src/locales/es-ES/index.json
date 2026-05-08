@@ -608,6 +608,18 @@
   "dashboard.collections.long-title": {
     "message": "Tus colecciones"
   },
+  "dashboard.collections.placeholder.search": {
+    "message": "Buscar colecciones..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Nombre (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Creados recientemente"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Actualizados recientemente"
+  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Descarga {formType}"
   },
@@ -860,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Has agotado tu límite de retiro de <b>{withdrawLimit}</b>. Debes completar un formulario de impuestos para retirar más."
   },
+  "dashboard.head-title": {
+    "message": "Panel de control"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Marcar todo como leido"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Ver historial"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "No tienes ninguna notificación sin leer."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Error al cargar las notificaciones:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Historial"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Historial de notificaciones"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Ver todos"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Mostrar historial de notificaciones"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Mostrar {extraNotifs} {extraNotifs, plural,one {notificación}other {otras notificaciones}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Cargando notificaciones..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Crear organización"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "¡Crea una organicación!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "No se pudo obtener las organizaciones"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural,one {miembro}other {miembros}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organizaciones"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Puedes editar múltiples proyectos a la vez seleccionándolos abajo."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Proyectos de servidor no soportan edición masiva"
+  },
+  "dashboard.projects.empty": {
+    "message": "No tienes ningún proyecto todavía. Haz clic en el botón verte de arriba para comenzar."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Proyectos"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "y {count} más..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Borrar link"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Editar links"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Cambios seran a aplicados a {count} {count, plural,one {proyecto} other {proyectos}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Los enlaces que especifique a continuación se sobrescribirán en cada uno de los proyectos seleccionados. Los que deje en blanco se ignorarán. Puede eliminar un enlace de todos los proyectos seleccionados mediante el botón de la papelera."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Un link de invitación a tu servidor de Discord."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Invitación de Discord"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Un lugar para usuarios para reportar bugs, errores, y preocupaciones sobre tu proyecto."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Seguimientos de errores"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Link existente será borrado"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Ingrese una URL de invitación de Discord válida"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Ingrese una URL válida"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Mostrar todos los proyectos"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Una página/repostorio que contiene él código base de tu proyecto"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Código base"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Una página que contiene información, documentación, y ayuda sobre el proyecto."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Página de wiki"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Edición masiva seleccionada de tus links de proyecto."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icono para {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "El proyecto tiene un mensaje de los moderadores. Mire el proyecto para ver más."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Por favor revise el entorno del metadata"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Ascendiendo"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Descendiendo"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Nombre"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Estado"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Tipo"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Icono"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nombre"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Estado"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Tipo"
+  },
+  "dashboard.report.title": {
+    "message": "Reporte {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Informes activos"
+  },
+  "dashboard.reports.title": {
+    "message": "Reportes"
+  },
   "dashboard.revenue.available-now": {
     "message": "Ya disponible"
   },
@@ -896,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Descargar como CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Historia de transacciones"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transacciones"
   },
@@ -905,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Tus pagos y retiros aparecerán aquí."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Último mes"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Este mes"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Ver todos"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "De todos los años"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Tus retiros están temporalmente bloqueados porque tú NIF o NUSS no coincidió con tus registros del IRS. Por favor ponte en contacto con el soporte técnico para resetear y reenviar tu formulario de impuestos."
@@ -919,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Retirar"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Reportes activos"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analíticas"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Creadores"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Panel de control"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notificaciones"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organizaciones"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Descripción general"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Proyectos"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Ingresos"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Cuenta"

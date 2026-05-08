@@ -26,6 +26,7 @@ import _BadgeDollarSignIcon from './icons/badge-dollar-sign.svg?component'
 import _BanIcon from './icons/ban.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BellRingIcon from './icons/bell-ring.svg?component'
+import _BinaryIcon from './icons/binary.svg?component'
 import _BlendIcon from './icons/blend.svg?component'
 import _BlocksIcon from './icons/blocks.svg?component'
 import _BoldIcon from './icons/bold.svg?component'
@@ -211,6 +212,7 @@ import _ShieldIcon from './icons/shield.svg?component'
 import _ShieldAlertIcon from './icons/shield-alert.svg?component'
 import _ShieldCheckIcon from './icons/shield-check.svg?component'
 import _SignalIcon from './icons/signal.svg?component'
+import _SignatureIcon from './icons/signature.svg?component'
 import _SkullIcon from './icons/skull.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
 import _SortAscIcon from './icons/sort-asc.svg?component'
@@ -416,6 +418,7 @@ export const BadgeDollarSignIcon = _BadgeDollarSignIcon
 export const BanIcon = _BanIcon
 export const BellIcon = _BellIcon
 export const BellRingIcon = _BellRingIcon
+export const BinaryIcon = _BinaryIcon
 export const BlendIcon = _BlendIcon
 export const BlocksIcon = _BlocksIcon
 export const BoldIcon = _BoldIcon
@@ -601,6 +604,7 @@ export const ShieldIcon = _ShieldIcon
 export const ShieldAlertIcon = _ShieldAlertIcon
 export const ShieldCheckIcon = _ShieldCheckIcon
 export const SignalIcon = _SignalIcon
+export const SignatureIcon = _SignatureIcon
 export const SkullIcon = _SkullIcon
 export const SlashIcon = _SlashIcon
 export const SortAscIcon = _SortAscIcon

@@ -56,7 +56,7 @@ bytes = "1.10.1"
 censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.42"
-cidre = { version = "0.11.3", default-features = false, features = [
+cidre = { version = "0.15.0", default-features = false, features = [
   "macos_15_0"
 ] }
 clap = "4.5.48"
@@ -279,10 +279,11 @@ opt-level = "s"  # Optimize for binary size
 strip = true  # Remove debug symbols
 lto = true  # Enables link to optimizations
 panic = "abort"  # Strip expensive panic clean-up logic
-codegen-units = 1  # Compile crates one after another so the compiler can optimize better
 
 # Specific profile for labrinth production builds
 [profile.release-labrinth]
 inherits = "release"
+opt-level = 2
 strip = false  # Keep debug symbols for Sentry
+lto = "thin"  # Enable LTO but keep compile times reasonable
 panic = "unwind"  # Don't exit the whole app on panic in production

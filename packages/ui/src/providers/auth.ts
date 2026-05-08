@@ -1,4 +1,4 @@
-import type { Labrinth } from '@modrinth/api-client/src/modules/labrinth/types'
+import type { Labrinth } from '@modrinth/api-client'
 import type { Ref } from 'vue'
 
 import { createContext } from './create-context'

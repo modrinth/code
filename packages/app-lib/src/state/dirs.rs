@@ -213,7 +213,7 @@ impl DirectoryInfo {
                 .as_ref()
                 .map_or_else(|| app_dir.clone(), PathBuf::from);
 
-            async fn is_dir_writeable(
+            async fn is_dir_writable(
                 new_config_dir: &Path,
             ) -> crate::Result<bool> {
                 let temp_path = new_config_dir.join(".tmp");
@@ -259,8 +259,8 @@ impl DirectoryInfo {
                 )
                 .await?;
 
-                if !is_dir_writeable(&move_dir).await? {
-                    return Err(crate::ErrorKind::DirectoryMoveError(format!("Cannot move directory to {}: directory is not writeable", move_dir.display())).into());
+                if !is_dir_writable(&move_dir).await? {
+                    return Err(crate::ErrorKind::DirectoryMoveError(format!("Cannot move directory to {}: directory is not writable", move_dir.display())).into());
                 }
 
                 const MOVE_DIRS: &[&str] = &[
