@@ -8,6 +8,8 @@
 			:show-months="2"
 			:clearable="false"
 			:default-view-date="startDate"
+			:max-date="todayInputValue"
+			show-today
 			calendar-only
 			wrapper-class="w-full"
 			calendar-class="!border-none !p-0 !pt-3"
@@ -44,6 +46,8 @@ defineEmits<{
 const startDate = defineModel<string>('startDate', { required: true })
 const endDate = defineModel<string>('endDate', { required: true })
 const pickerRange = ref<DatePickerValue[]>([startDate.value, endDate.value])
+
+const todayInputValue = computed(() => getDateInputValue(new Date()))
 
 const rangeFormatter = new Intl.DateTimeFormat(undefined, {
 	month: 'short',
