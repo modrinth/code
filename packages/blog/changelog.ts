@@ -11,6 +11,38 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-08T09:58:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed some buttons appearing as disabled even when they weren't, such as the project icon settings.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'app',
+		version: '0.13.12',
+		body: `## Changed
+- Updated the modpack exporting experience, fixing issues with it and excluding /mods/.connector from the exports.
+
+## Fixed
+- Fixed page width changing based on if there is scrollable content or not, causing things to move when you switch tabs between scrollable and non-scrollable content.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed failed \`mrpack\` uploads when uploading via the Modrinth App.
+- Fixed support bubble being broken when the console is in full screen/expand mode.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'web',
+		body: `## Changed
+- Project pages now have canonical permalink URLs to hopefully optimize SEO a bit.
+
+## Fixed
+- Fixed error around editing org member permissions.`,
+	},
+	{
 		date: `2026-05-06T22:11:04+00:00`,
 		product: 'app',
 		version: '0.13.11',

@@ -56,7 +56,7 @@
 								<ButtonStyled color="brand" type="transparent">
 									<a
 										class="ml-auto"
-										:href="version.primaryFile?.url"
+										:href="createDownloadUrl(version)"
 										:title="`Download ${version.name}`"
 									>
 										<DownloadIcon aria-hidden="true" />
@@ -98,7 +98,9 @@ import {
 import VersionFilterControl from '@modrinth/ui/src/components/version/VersionFilterControl.vue'
 import { renderHighlightedString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
+
+const { createProjectDownloadUrl, updateVersionsFilterContext } = useCdnDownloadContext()
 
 const formatDate = useFormatDateTime({
 	month: 'short',
@@ -106,7 +108,8 @@ const formatDate = useFormatDateTime({
 	year: 'numeric',
 })
 
-const { projectV2, versions, versionsLoading, loadVersions } = injectProjectPageContext()
+const { projectV2, versions, versionsLoading, loadVersions, cdnDownloadReason } =
+	injectProjectPageContext()
 
 // Load versions on mount (client-side)
 onMounted(() => {
@@ -214,6 +217,23 @@ function updateQuery(newQueries) {
 			...route.query,
 			...newQueries,
 		},
+	})
+}
+
+watch(
+	() => [route.query.g, route.query.l],
+	() => {
+		updateVersionsFilterContext(
+			queryAsStringArray(route.query.g),
+			queryAsStringArray(route.query.l),
+		)
+	},
+	{ immediate: true },
+)
+
+function createDownloadUrl(version) {
+	return createProjectDownloadUrl(getPrimaryFile(version).url, {
+		reason: cdnDownloadReason.value,
 	})
 }
 </script>

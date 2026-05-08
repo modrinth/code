@@ -139,7 +139,7 @@
 				<ButtonStyled v-if="primaryFile && !currentMember" color="brand">
 					<a
 						v-tooltip="primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'"
-						:href="primaryFile.url"
+						:href="decoratedPrimaryFileUrl"
 						@click="emit('onDownload')"
 					>
 						<DownloadIcon aria-hidden="true" />
@@ -213,14 +213,19 @@
 					:key="index"
 					class="dependency"
 					:class="{ 'button-transparent': !isEditing }"
-					@click="!isEditing ? router.push(dependency.link) : {}"
+					@click="!isEditing ? navigateToDependency(dependency) : {}"
 				>
 					<Avatar
 						:src="dependency.project ? dependency.project.icon_url : null"
 						alt="dependency-icon"
 						size="sm"
 					/>
-					<nuxt-link v-if="!isEditing" :to="dependency.link" class="info">
+					<nuxt-link
+						v-if="!isEditing"
+						:to="{ path: dependency.link, query: PROJECT_DEP_MARKER_QUERY }"
+						class="info"
+						@click.stop
+					>
 						<span class="project-title">
 							{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
 						</span>
@@ -299,7 +304,7 @@
 				</span>
 				<ButtonStyled>
 					<a
-						:href="file.url"
+						:href="decorateDownloadUrl(file.url)"
 						class="raised-button"
 						:title="`Download ${file.filename}`"
 						tabindex="0"
@@ -435,6 +440,7 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	MultiSelect,
+	PROJECT_DEP_MARKER_QUERY,
 	StyledInput,
 	useFormatDateTime,
 } from '@modrinth/ui'
@@ -461,6 +467,7 @@ const auth = await useAuth()
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const { addNotification } = injectNotificationManager()
+const { createProjectDownloadUrl } = useCdnDownloadContext()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
@@ -481,6 +488,7 @@ const {
 	dependenciesLoading: contextDependenciesLoading,
 	loadDependencies,
 	invalidate,
+	cdnDownloadReason,
 } = injectProjectPageContext()
 
 // Load versions and dependencies in parallel
@@ -751,6 +759,21 @@ const sortedDeps = computed(() => {
 		(a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type),
 	)
 })
+
+const decoratedPrimaryFileUrl = computed(() =>
+	createProjectDownloadUrl(primaryFile.value?.url, { reason: cdnDownloadReason.value }),
+)
+
+function decorateDownloadUrl(url: string) {
+	return createProjectDownloadUrl(url, { reason: cdnDownloadReason.value })
+}
+
+function navigateToDependency(dependency: { link: string }) {
+	return router.push({
+		path: dependency.link,
+		query: { ...PROJECT_DEP_MARKER_QUERY },
+	})
+}
 
 const environment = computed(
 	() => ENVIRONMENTS_COPY[version.value.environment as keyof typeof ENVIRONMENTS_COPY],
