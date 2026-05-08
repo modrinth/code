@@ -78,9 +78,7 @@ function formatRangeLabel(
 	const includeTime = end.getTime() - start.getTime() < ONE_DAY_MS
 	const yearsDiffer = start.getFullYear() !== end.getFullYear()
 	const chartYearsDiffer =
-		chartStart !== null &&
-		chartEnd !== null &&
-		chartStart.getFullYear() !== chartEnd.getFullYear()
+		chartStart !== null && chartEnd !== null && chartStart.getFullYear() !== chartEnd.getFullYear()
 	const showTrailingYear = !yearsDiffer && chartYearsDiffer
 	const monthsDiffer = yearsDiffer || start.getMonth() !== end.getMonth()
 	const daysDiffer = monthsDiffer || start.getDate() !== end.getDate()

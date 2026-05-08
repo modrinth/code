@@ -203,9 +203,7 @@ function buildDatasets() {
 
 		return {
 			...common,
-			backgroundColor: props.fill
-				? withAlpha(backgroundColor, 0.3)
-				: backgroundColor,
+			backgroundColor: props.fill ? withAlpha(backgroundColor, 0.3) : backgroundColor,
 			fill: lineFill,
 			tension: 0.35,
 			pointRadius: 0,

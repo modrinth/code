@@ -5,15 +5,15 @@
 		:display-value="selectedTimeframeLabel"
 		:max-height="TIMEFRAME_DROPDOWN_MAX_HEIGHT"
 		:dropdown-min-width="timeframeDropdownMinWidth"
-		@update:model-value="handleTimeframeModelUpdate"
-		@open="handleTimeframeSelectOpen"
-		@close="handleTimeframeSelectClose"
-		@select="handleTimeframePresetSelect"
 		:dropdown-class="
 			activeTimeframePanel === 'custom_range'
 				? 'bg-transparent border-0 -mt-1 pb-2 shadow-none'
 				: ''
 		"
+		@update:model-value="handleTimeframeModelUpdate"
+		@open="handleTimeframeSelectOpen"
+		@close="handleTimeframeSelectClose"
+		@select="handleTimeframePresetSelect"
 	>
 		<template #bottom>
 			<template v-if="activeTimeframePanel === 'custom_range'">

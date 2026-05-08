@@ -159,8 +159,8 @@ import {
 
 import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
 import {
-	FILTER_VALUE_CATEGORIES,
 	cloneSelectedFilters,
+	FILTER_VALUE_CATEGORIES,
 	getOptionsWithSelectedValues,
 	getVisibleAnalyticsFilterCategoriesForState,
 	normalizeSelectedValues as normalizeSelectedFilterValues,
