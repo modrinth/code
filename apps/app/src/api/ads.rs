@@ -229,15 +229,29 @@ fn sync_webview_visibility_for_main_window<R: Runtime>(
         }
     };
 
+    let mut webviews = Vec::new();
+    let mut seen_webviews = HashSet::new();
+
+    for webview in main_window.webviews() {
+        seen_webviews.insert(webview.label().to_string());
+        webviews.push(webview);
+    }
+
+    for webview in app.webviews().into_values() {
+        if seen_webviews.insert(webview.label().to_string()) {
+            webviews.push(webview);
+        }
+    }
+
     tracing::info!(
         trigger,
         is_minimized,
         ads_visible,
-        webview_count = app.webviews().len(),
+        webview_count = webviews.len(),
         "Applying main window minimized state to webviews"
     );
 
-    for webview in app.webviews().into_values() {
+    for webview in webviews {
         let visible =
             !is_minimized && (webview.label() != "ads-window" || ads_visible);
 
