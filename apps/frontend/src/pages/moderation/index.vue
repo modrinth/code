@@ -447,10 +447,6 @@ const paginatedProjects = computed(() => {
 	return filteredProjects.value.slice(start, end)
 })
 
-const hasActiveFilters = computed(
-	() => Boolean(query.value) || currentFilterType.value !== DEFAULT_FILTER_TYPE,
-)
-
 const emptyStateHeading = computed(() => {
 	if (query.value) {
 		return 'Not finding anything...'

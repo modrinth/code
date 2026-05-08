@@ -49,18 +49,18 @@
 							<Badge :type="queueEntry.project.requested_status" class="status" />
 						</div>
 					</div>
-					<div v-if="queueEntry.ownership?.kind === 'user'" class="flex items-center gap-1">
-						<Avatar
-							:src="queueEntry.ownership.icon_url"
-							size="1.5rem"
-							circle
-							class="border border-surface-5 bg-surface-4 !shadow-none"
-						/>
+					<div v-if="queueEntry.ownership?.kind === 'user'">
 						<NuxtLink
 							:to="`/user/${queueEntry.ownership.id}`"
 							target="_blank"
-							class="text-sm font-medium text-secondary hover:underline"
+							class="flex w-fit min-w-40 items-center gap-1 text-sm font-medium text-secondary hover:underline"
 						>
+							<Avatar
+								:src="queueEntry.ownership.icon_url"
+								size="1.5rem"
+								circle
+								class="border border-surface-5 bg-surface-4 !shadow-none"
+							/>
 							{{ queueEntry.ownership.name }}
 						</NuxtLink>
 					</div>
@@ -107,7 +107,7 @@
 							<LinkIcon />
 						</button>
 					</ButtonStyled>
-					<ButtonStyled circular color="orange">
+					<ButtonStyled v-tooltip="'Begin review'" circular color="orange">
 						<button @click="openProjectForReview">
 							<ScaleIcon />
 						</button>
