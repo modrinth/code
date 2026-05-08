@@ -17,12 +17,12 @@ const roleOptions: ServerAccessRoleOption[] = [
 	{
 		value: 'editor',
 		label: 'Editor',
-		description: 'Manage server content, files, backups, and other settings.',
+		description: 'Manage instance content, files, backups, and other settings.',
 	},
 	{
 		value: 'viewer',
 		label: 'Limited',
-		description: 'Start, stop, restart, and view the server without making changes.',
+		description: 'Start, stop, and view the server without making changes.',
 	},
 ]
 

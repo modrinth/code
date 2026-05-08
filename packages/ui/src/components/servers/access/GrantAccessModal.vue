@@ -173,7 +173,7 @@ const messages = defineMessages({
 	},
 	editorDescription: {
 		id: 'servers.grant-access-modal.role.editor-description',
-		defaultMessage: 'Manage server content, files, backups, and other settings.',
+		defaultMessage: 'Manage instance content, files, backups, and other settings.',
 	},
 	viewerRole: {
 		id: 'servers.grant-access-modal.role.viewer',

@@ -330,9 +330,7 @@ const triggerText = computed(() => {
 })
 
 const hasMinimumSearchLength = computed(
-	() =>
-		!props.searchable ||
-		searchQuery.value.trim().length >= props.minSearchLengthToOpen,
+	() => !props.searchable || searchQuery.value.trim().length >= props.minSearchLengthToOpen,
 )
 
 const optionsWithKeys = computed(() => {

@@ -59,6 +59,10 @@
 		<RemoveAccessModal
 			ref="removeMemberConfirmModal"
 			:username="pendingRemovalMember?.user.username ?? ''"
+			:avatar-url="pendingRemovalMember?.user.avatarUrl"
+			:role="pendingRemovalMember?.role"
+			:joined-at="pendingRemovalMember?.joinedAt"
+			:pending="pendingRemovalMember?.pending"
 			:should-cancel="shouldCancelInvite"
 			@remove="confirmAccessRemoval"
 		/>
@@ -78,8 +82,8 @@ import {
 	AccessTable,
 	AuditLogTable,
 	GrantAccessModal,
-	RemoveAccessModal,
 	type GrantServerAccessPayload,
+	RemoveAccessModal,
 	type ServerAccessInviteSuggestion,
 	type ServerAccessMember,
 	type ServerAccessRole,
@@ -101,7 +105,7 @@ type RoleFilter = ServerAccessRole | 'all'
 const { formatMessage } = useVIntl()
 const auth = injectAuth()
 const client = injectModrinthClient()
-const { serverId, server } = injectModrinthServerContext()
+const { serverId } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
@@ -144,7 +148,7 @@ const messages = defineMessages({
 	},
 	editorDescription: {
 		id: 'servers.access-page.role.editor-description',
-		defaultMessage: 'Manage server content, files, backups, and other settings.',
+		defaultMessage: 'Manage instance content, files, backups, and other settings.',
 	},
 	viewerRole: {
 		id: 'servers.access-page.role.viewer',
@@ -152,7 +156,7 @@ const messages = defineMessages({
 	},
 	viewerDescription: {
 		id: 'servers.access-page.role.viewer-description',
-		defaultMessage: 'Start, stop, restart, and view the server without making changes.',
+		defaultMessage: 'Start, stop, and view the server without making changes.',
 	},
 	inviteSentTitle: {
 		id: 'servers.access-page.notification.invite-sent.title',
@@ -277,40 +281,23 @@ const serverFullQuery = useQuery({
 	queryFn: () => client.archon.servers_v1.get(serverId),
 })
 
-const userIds = computed(() => [
-	...new Set((serverUsersQuery.data.value ?? []).map((user) => user.user_id)),
-])
-
-const userProfilesQuery = useQuery({
-	queryKey: computed(() => ['labrinth', 'users', 'v2', userIds.value]),
-	queryFn: () => client.labrinth.users_v2.getMultiple(userIds.value),
-	enabled: computed(() => userIds.value.length > 0),
-})
-
-const userProfiles = computed(() => {
-	const profiles = new Map<string, Labrinth.Users.v2.User>()
-	for (const user of userProfilesQuery.data.value ?? []) {
-		profiles.set(user.id, user)
-	}
-	return profiles
-})
-
 const members = computed<ServerAccessMember[]>(() =>
 	(serverUsersQuery.data.value ?? [])
 		.map((serverUser) => {
-			const profile = userProfiles.value.get(serverUser.user_id)
-			const username = profile?.username ?? serverUser.user_id
+			const username = serverUser.user.username
+			const role = apiPermissionsToAccessRole(serverUser.permissions)
 
 			return {
-				id: `${serverId}-${serverUser.user_id}`,
+				id: `${serverId}-${username}`,
 				user: {
-					id: serverUser.user_id,
+					id: username,
 					username,
-					avatarUrl: profile?.avatar_url,
+					avatarUrl: serverUser.user.avatar_url || undefined,
 				},
-				role: apiRoleToAccessRole(serverUser.role),
-				joinedAt: serverUser.added_on,
-				isOwner: serverUser.role === 'Owner' || serverUser.user_id === server.value?.owner_id,
+				role,
+				joinedAt: serverUser.added_on ?? null,
+				pending: !serverUser.added_on && role !== 'owner',
+				isOwner: role === 'owner',
 			}
 		})
 		.sort((a, b) => {
@@ -361,17 +348,15 @@ const currentActor = computed<ServerAccessUser | null>(() => {
 })
 
 watch(
-	() => [serverUsersQuery.error.value, userProfilesQuery.error.value],
-	([serverUsersError, userProfilesError]) => {
-		if (hasShownLoadError.value || (!serverUsersError && !userProfilesError)) return
+	() => serverUsersQuery.error.value,
+	(serverUsersError) => {
+		if (hasShownLoadError.value || !serverUsersError) return
 
 		hasShownLoadError.value = true
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.loadFailedTitle),
-			text:
-				formatErrorMessage(serverUsersError ?? userProfilesError) ??
-				formatMessage(messages.loadFailedText),
+			text: formatErrorMessage(serverUsersError) ?? formatMessage(messages.loadFailedText),
 		})
 	},
 )
@@ -384,18 +369,6 @@ function labrinthUserToAccessUser(user: Labrinth.Users.v2.User): ServerAccessUse
 	}
 }
 
-function apiRoleToAccessRole(role: Archon.ServerUsers.v1.ServerUserRole): ServerAccessRole {
-	switch (role) {
-		case 'Owner':
-			return 'owner'
-		case 'Editor':
-			return 'editor'
-		case 'Viewer':
-		case 'Unknown':
-			return 'viewer'
-	}
-}
-
 function accessRoleToApiRole(
 	role: Exclude<ServerAccessRole, 'owner'>,
 ): Archon.ServerUsers.v1.AssignableServerUserRole {
@@ -405,6 +378,32 @@ function accessRoleToApiRole(
 		case 'viewer':
 			return 'Viewer'
 	}
+}
+
+function apiPermissionsToAccessRole(
+	permissions: Archon.ServerUsers.v1.UserScope,
+): ServerAccessRole {
+	const scopes = apiPermissionsToScopes(permissions)
+	if (scopes.has('SERVER_ADMIN') || scopes.has('MANAGE_USERS')) return 'owner'
+	if (
+		scopes.has('FILES_WRITE') ||
+		scopes.has('SETUP') ||
+		scopes.has('BACKUPS') ||
+		scopes.has('ADVANCED') ||
+		scopes.has('RESET_SERVER')
+	) {
+		return 'editor'
+	}
+	return 'viewer'
+}
+
+function apiPermissionsToScopes(permissions: Archon.ServerUsers.v1.UserScope) {
+	return new Set(
+		permissions
+			.split('|')
+			.map((scope) => scope.trim())
+			.filter(Boolean),
+	)
 }
 
 function formatErrorMessage(error: unknown): string | undefined {
@@ -422,6 +421,15 @@ function findMemberByTarget(target: string) {
 			member.user.username.toLowerCase() === normalizedTarget ||
 			member.user.id.toLowerCase() === normalizedTarget,
 	)
+}
+
+async function resolveMemberUserId(member: ServerAccessMember): Promise<string> {
+	try {
+		const user = await client.labrinth.users_v2.get(member.user.username)
+		return user.id
+	} catch {
+		return member.user.id
+	}
 }
 
 function pushAuditEntry(entry: Omit<ServerAuditLogEntry, 'id' | 'timestamp' | 'actor'>) {
@@ -443,7 +451,8 @@ async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRo
 	if (member.isOwner || member.role === role || role === 'owner') return
 
 	try {
-		await client.archon.server_users_v1.update(serverId, member.user.id, accessRoleToApiRole(role))
+		const userId = await resolveMemberUserId(member)
+		await client.archon.server_users_v1.update(serverId, userId, accessRoleToApiRole(role))
 		await invalidateServerUsers()
 		pushAuditEntry({
 			world: null,
@@ -511,7 +520,8 @@ async function removeMember(member: ServerAccessMember) {
 
 async function removeMemberAccess(member: ServerAccessMember, shouldCancel: boolean) {
 	try {
-		await client.archon.server_users_v1.delete(serverId, member.user.id)
+		const userId = await resolveMemberUserId(member)
+		await client.archon.server_users_v1.delete(serverId, userId)
 		await invalidateServerUsers()
 		pushAuditEntry({
 			world: null,
@@ -560,7 +570,7 @@ async function grantAccess(payload: GrantServerAccessPayload) {
 		return
 	}
 
-	const resolvedMember = findMemberByTarget(user.id)
+	const resolvedMember = findMemberByTarget(user.id) ?? findMemberByTarget(user.username)
 	if (resolvedMember) {
 		await updateMemberRole(resolvedMember, payload.role)
 		return

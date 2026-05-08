@@ -32,7 +32,13 @@ export const Default: Story = {
 					<button @click="modalRef?.show()">Remove user</button>
 				</ButtonStyled>
 				<p v-if="removed" class="m-0 text-sm text-secondary">User removed</p>
-				<RemoveAccessModal ref="modalRef" username="Geometrically" @remove="handleRemove" />
+				<RemoveAccessModal
+					ref="modalRef"
+					username="Geometrically"
+					role="editor"
+					:joined-at="new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString()"
+					@remove="handleRemove"
+				/>
 			</div>
 		`,
 	}),
@@ -58,6 +64,9 @@ export const CancelInvite: Story = {
 				<RemoveAccessModal
 					ref="modalRef"
 					username="Geometrically"
+					role="viewer"
+					:joined-at="null"
+					pending
 					should-cancel
 					@remove="handleCancel"
 				/>

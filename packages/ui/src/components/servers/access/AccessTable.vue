@@ -11,8 +11,8 @@
 		<template #cell-user="{ row: member }">
 			<AutoLink
 				:to="userProfilePath(member.user.username)"
-				class="flex min-w-0 items-center gap-2"
-				:class="userProfilePath(member.user.username) ? 'text-primary hover:text-contrast' : ''"
+				class="inline-flex max-w-full min-w-0 items-center gap-2"
+				:class="userProfilePath(member.user.username) ? 'text-primary hover:underline' : ''"
 			>
 				<Avatar
 					:src="member.user.avatarUrl"
@@ -116,8 +116,8 @@
 			<div class="flex items-center pl-4 font-semibold text-secondary">
 				<button
 					type="button"
-					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold text-secondary"
-					:class="sortColumn === 'user' ? 'text-contrast' : ''"
+					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold transition-colors hover:text-contrast"
+					:class="sortColumn === 'user' ? 'text-contrast' : 'text-secondary'"
 					@click="toggleSort('user')"
 				>
 					{{ formatMessage(messages.userColumn) }}
@@ -127,8 +127,8 @@
 			<div class="flex items-center font-semibold text-secondary">
 				<button
 					type="button"
-					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold text-secondary"
-					:class="sortColumn === 'role' ? 'text-contrast' : ''"
+					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold transition-colors hover:text-contrast"
+					:class="sortColumn === 'role' ? 'text-contrast' : 'text-secondary'"
 					@click="toggleSort('role')"
 				>
 					{{ formatMessage(messages.roleColumn) }}
@@ -138,8 +138,8 @@
 			<div class="flex items-center justify-end font-semibold text-secondary">
 				<button
 					type="button"
-					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold text-secondary"
-					:class="sortColumn === 'joined' ? 'text-contrast' : ''"
+					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold transition-colors hover:text-contrast"
+					:class="sortColumn === 'joined' ? 'text-contrast' : 'text-secondary'"
 					@click="toggleSort('joined')"
 				>
 					{{ formatMessage(messages.joinedColumn) }}
@@ -471,6 +471,7 @@ function normalizeSortColumn(column: string | undefined): AccessTableSortableCol
 }
 
 function joinedTimestamp(member: ServerAccessMember): number {
+	if (member.pending) return Number.NEGATIVE_INFINITY
 	return member.joinedAt ? new Date(member.joinedAt).getTime() : 0
 }
 
