@@ -1,5 +1,4 @@
 import type { Archon, UploadState } from '@modrinth/api-client'
-import type { Stats } from '@modrinth/utils'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -8,7 +7,7 @@ import ServerPanelAdmonitions from '../../components/servers/admonitions/ServerP
 import { defineMessage } from '../../composables/i18n'
 import type { FileOperation } from '../../layouts/shared/files-tab/types'
 import { provideModrinthServerContext } from '../../providers'
-import type { ModrinthServerContext } from '../../providers/server-context'
+import type { ModrinthServerContext, ServerStats } from '../../providers/server-context'
 
 const meta = {
 	title: 'Servers/ServerPanelAdmonitions',
@@ -31,7 +30,7 @@ const meta = {
 					upstream: null,
 				} as Archon.Servers.v0.Server)
 
-				const stats = ref<Stats>({
+				const stats = ref<ServerStats>({
 					current: {
 						cpu_percent: 0,
 						ram_usage_bytes: 0,

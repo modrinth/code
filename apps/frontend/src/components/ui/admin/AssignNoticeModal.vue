@@ -1,20 +1,22 @@
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	ButtonStyled,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	ServerNotice,
 	StyledInput,
 	TagItem,
 } from '@modrinth/ui'
-import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
 import { ref } from 'vue'
 
-import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
-
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
+
+type ServerNoticeType = Archon.Notices.v0.ListedNotice
 
 const modal = ref<InstanceType<typeof NewModal>>()
 
@@ -32,28 +34,23 @@ const assignedNodes = computed(() => assigned.value.filter((n) => n.kind === 'no
 const inputField = ref('')
 
 async function refresh() {
-	await useServersFetch('notices').then((res) => {
-		const notices = res as ServerNoticeType[]
-		assigned.value = notices.find((n) => n.id === notice.value?.id)?.assigned ?? []
-	})
+	const notices = await client.archon.notices_v0.list()
+	assigned.value = notices.find((n) => n.id === notice.value?.id)?.assigned ?? []
 }
 
 async function assign(server: boolean = true) {
 	const input = inputField.value.trim()
 
 	if (input !== '' && notice.value) {
-		await useServersFetch(
-			`notices/${notice.value.id}/assign?${server ? 'server' : 'node'}=${input}`,
-			{
-				method: 'PUT',
-			},
-		).catch((err) => {
-			addNotification({
-				title: 'Error assigning notice',
-				text: err,
-				type: 'error',
+		await client.archon.notices_v0
+			.assign(notice.value.id, server ? { server: input } : { node: input })
+			.catch((err) => {
+				addNotification({
+					title: 'Error assigning notice',
+					text: err,
+					type: 'error',
+				})
 			})
-		})
 	} else {
 		addNotification({
 			title: 'Error assigning notice',
@@ -84,18 +81,15 @@ async function unassignDetect() {
 
 async function unassign(id: string, server: boolean = true) {
 	if (notice.value) {
-		await useServersFetch(
-			`notices/${notice.value.id}/unassign?${server ? 'server' : 'node'}=${id}`,
-			{
-				method: 'PUT',
-			},
-		).catch((err) => {
-			addNotification({
-				title: 'Error unassigning notice',
-				text: err,
-				type: 'error',
+		await client.archon.notices_v0
+			.unassign(notice.value.id, server ? { server: id } : { node: id })
+			.catch((err) => {
+				addNotification({
+					title: 'Error unassigning notice',
+					text: err,
+					type: 'error',
+				})
 			})
-		})
 	}
 	await refresh()
 }
@@ -125,7 +119,7 @@ defineExpose({ show, hide })
 				:level="notice.level"
 				:message="notice.message"
 				:dismissable="notice.dismissable"
-				:title="notice.title"
+				:title="notice.title ?? undefined"
 				preview
 			/>
 			<div class="flex flex-col gap-2">

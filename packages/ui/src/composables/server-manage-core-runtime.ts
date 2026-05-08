@@ -4,13 +4,12 @@ import {
 	setNodeAuthState,
 	type UploadState,
 } from '@modrinth/api-client'
-import type { Stats } from '@modrinth/utils'
 import type { ComputedRef, Ref } from 'vue'
 import { computed, ref } from 'vue'
 
 import type { FileOperation } from '../layouts/shared/files-tab/types'
 import { injectModrinthClient, provideModrinthServerContext } from '../providers'
-import type { BusyReason } from '../providers/server-context'
+import type { BusyReason, ServerStats } from '../providers/server-context'
 import { defineMessage } from './i18n'
 import { useModrinthServersConsole } from './server-console'
 
@@ -35,7 +34,7 @@ type UseServerManageCoreRuntimeOptions = {
 	onStateEvent?: (data: Archon.Websocket.v0.WSStateEvent) => void
 }
 
-const createInitialStats = (): Stats => ({
+const createInitialStats = (): ServerStats => ({
 	current: {
 		cpu_percent: 0,
 		ram_usage_bytes: 0,
@@ -91,7 +90,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	const serverPowerState = ref<Archon.Websocket.v0.PowerState>('stopped')
 	const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>()
 	const isServerRunning = computed(() => serverPowerState.value === 'running')
-	const stats = ref<Stats>(createInitialStats())
+	const stats = ref<ServerStats>(createInitialStats())
 	const uptimeSeconds = ref(0)
 	const fsAuth = ref<{ url: string; token: string } | null>(null)
 	const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
@@ -141,7 +140,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		}, 1000)
 	}
 
-	const updateStats = (currentStats: Stats['current']) => {
+	const updateStats = (currentStats: ServerStats['current']) => {
 		if (!shouldProcessEvent()) return
 		if (!isConnected.value) isConnected.value = true
 		cpuData.value = appendGraphData(cpuData.value, currentStats.cpu_percent)

@@ -16,13 +16,14 @@
 					:options="suggestionOptions"
 					:search-placeholder="formatMessage(messages.targetPlaceholder)"
 					:placeholder="formatMessage(messages.targetPlaceholder)"
-					:no-options-message="formatMessage(messages.noSuggestions)"
+					:no-options-message="targetLookupMessage"
 					:min-search-length-to-open="suggestionMinimumLength"
+					:disable-search-filter="usesRemoteLookup"
 					searchable
 					show-search-icon
 					:show-chevron="false"
-					@search-input="target = $event"
-					@select="(option) => (target = option.value)"
+					@search-input="handleTargetSearch"
+					@select="handleTargetSelect"
 				>
 					<template #option="{ item, isSelected }">
 						<div class="flex min-w-0 items-center gap-2">
@@ -114,6 +115,7 @@
 
 <script setup lang="ts">
 import { EyeIcon, PencilIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
+import { useDebounceFn } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
@@ -128,9 +130,15 @@ import type {
 	ServerAccessRole,
 } from './types'
 
-const props = defineProps<{
-	suggestions: ServerAccessInviteSuggestion[]
-}>()
+const props = withDefaults(
+	defineProps<{
+		suggestions?: ServerAccessInviteSuggestion[]
+		resolveUser?: (target: string) => Promise<ServerAccessInviteSuggestion | null>
+	}>(),
+	{
+		suggestions: () => [],
+	},
+)
 
 const emit = defineEmits<{
 	grant: [payload: GrantServerAccessPayload]
@@ -141,6 +149,9 @@ const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const target = ref('')
 const selectedRole = ref<Exclude<ServerAccessRole, 'owner'>>('editor')
 const suggestionMinimumLength = 2
+const resolvedSuggestion = ref<ServerAccessInviteSuggestion | null>(null)
+const targetLookupStatus = ref<'idle' | 'loading' | 'loaded'>('idle')
+const targetLookupRequestId = ref(0)
 
 const messages = defineMessages({
 	header: {
@@ -158,6 +169,10 @@ const messages = defineMessages({
 	noSuggestions: {
 		id: 'servers.grant-access-modal.target.no-suggestions',
 		defaultMessage: 'No matching users found.',
+	},
+	searching: {
+		id: 'servers.grant-access-modal.target.searching',
+		defaultMessage: 'Searching...',
 	},
 	targetHelp: {
 		id: 'servers.grant-access-modal.target.help',
@@ -217,24 +232,96 @@ const grantableRoles = computed(() => [
 ])
 
 const normalizedTarget = computed(() => target.value.trim())
-const canInvite = computed(() => normalizedTarget.value.length > 0 && !!selectedRole.value)
+const usesRemoteLookup = computed(() => !!props.resolveUser)
+const canInvite = computed(
+	() =>
+		normalizedTarget.value.length > 0 &&
+		!!selectedRole.value &&
+		(!usesRemoteLookup.value ||
+			(targetLookupStatus.value === 'loaded' && !!findSuggestion(normalizedTarget.value))),
+)
+const targetLookupMessage = computed(() =>
+	usesRemoteLookup.value && targetLookupStatus.value !== 'loaded'
+		? formatMessage(messages.searching)
+		: formatMessage(messages.noSuggestions),
+)
+const inviteSuggestions = computed(() => {
+	if (!resolvedSuggestion.value) return props.suggestions
+
+	const hasResolvedSuggestion = props.suggestions.some(
+		(suggestion) =>
+			suggestion.id === resolvedSuggestion.value?.id ||
+			suggestion.username.toLowerCase() === resolvedSuggestion.value?.username.toLowerCase(),
+	)
+
+	return hasResolvedSuggestion
+		? props.suggestions
+		: [resolvedSuggestion.value, ...props.suggestions]
+})
 const suggestionOptions = computed<ComboboxOption<string>[]>(() =>
-	props.suggestions.map((suggestion) => ({
+	inviteSuggestions.value.map((suggestion) => ({
 		value: suggestion.username,
 		label: suggestion.username,
-		searchTerms: [suggestion.username, suggestion.email].filter(Boolean) as string[],
+		searchTerms: [suggestion.username, suggestion.id, suggestion.email].filter(Boolean) as string[],
 	})),
 )
 
 function findSuggestion(value: string) {
-	return props.suggestions.find(
-		(suggestion) => suggestion.username === value || suggestion.email === value,
+	const normalizedValue = value.trim().toLowerCase()
+	return inviteSuggestions.value.find(
+		(suggestion) =>
+			suggestion.username.toLowerCase() === normalizedValue ||
+			suggestion.id.toLowerCase() === normalizedValue ||
+			suggestion.email?.toLowerCase() === normalizedValue,
 	)
+}
+
+const resolveTarget = useDebounceFn(async (query: string, requestId: number) => {
+	const resolveUser = props.resolveUser
+	if (!resolveUser) return
+
+	try {
+		const user = await resolveUser(query)
+		if (requestId !== targetLookupRequestId.value || query !== normalizedTarget.value) return
+
+		resolvedSuggestion.value = user
+	} catch {
+		if (requestId !== targetLookupRequestId.value || query !== normalizedTarget.value) return
+
+		resolvedSuggestion.value = null
+	} finally {
+		if (requestId === targetLookupRequestId.value && query === normalizedTarget.value) {
+			targetLookupStatus.value = 'loaded'
+		}
+	}
+}, 250)
+
+function handleTargetSearch(value: string) {
+	target.value = value
+	resolvedSuggestion.value = null
+	targetLookupRequestId.value += 1
+
+	if (!usesRemoteLookup.value) return
+
+	if (normalizedTarget.value.length < suggestionMinimumLength) {
+		targetLookupStatus.value = 'idle'
+		return
+	}
+
+	targetLookupStatus.value = 'loading'
+	void resolveTarget(normalizedTarget.value, targetLookupRequestId.value)
+}
+
+function handleTargetSelect(option: ComboboxOption<string>) {
+	target.value = option.value
 }
 
 function reset() {
 	target.value = ''
 	selectedRole.value = 'editor'
+	resolvedSuggestion.value = null
+	targetLookupStatus.value = 'idle'
+	targetLookupRequestId.value += 1
 }
 
 function show(event?: MouseEvent) {

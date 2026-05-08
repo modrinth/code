@@ -18,9 +18,9 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 	upload<T = void>(path: string, options: UploadRequestOptions): UploadHandle<T> {
 		let baseUrl: string
 		if (options.api === 'labrinth') {
-			baseUrl = this.config.labrinthBaseUrl!
+			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
 		} else if (options.api === 'archon') {
-			baseUrl = this.config.archonBaseUrl!
+			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
 		} else {
 			baseUrl = options.api
 		}

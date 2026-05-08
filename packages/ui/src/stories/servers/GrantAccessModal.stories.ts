@@ -12,7 +12,8 @@ const meta = {
 		layout: 'centered',
 		docs: {
 			description: {
-				component: 'Role descriptions use the same instance-focused copy as the access page.',
+				component:
+					'Role descriptions use the same instance-focused copy as the access page. The username field resolves users asynchronously before showing the empty state.',
 			},
 		},
 	},
@@ -27,14 +28,19 @@ export const Default: Story = {
 		setup() {
 			const modalRef = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 			const lastAddedUser = ref('')
-			const suggestions = [
+			const users = [
 				{ id: 'fetch', username: 'Fetch' },
 				{ id: 'emma', username: 'Emma' },
 			]
+			async function resolveUser(target: string) {
+				await new Promise((resolve) => setTimeout(resolve, 250))
+				const normalizedTarget = target.trim().toLowerCase()
+				return users.find((user) => user.username.toLowerCase() === normalizedTarget) ?? null
+			}
 			function handleGrant(payload: GrantServerAccessPayload) {
 				lastAddedUser.value = `${payload.target} as ${payload.role}`
 			}
-			return { modalRef, suggestions, lastAddedUser, handleGrant }
+			return { modalRef, resolveUser, lastAddedUser, handleGrant }
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
@@ -42,7 +48,7 @@ export const Default: Story = {
 					<button @click="modalRef?.show($event)">Add a user</button>
 				</ButtonStyled>
 				<p v-if="lastAddedUser" class="m-0 text-sm text-secondary">Last added: {{ lastAddedUser }}</p>
-				<GrantAccessModal ref="modalRef" :suggestions="suggestions" @grant="handleGrant" />
+				<GrantAccessModal ref="modalRef" :resolve-user="resolveUser" @grant="handleGrant" />
 			</div>
 		`,
 	}),

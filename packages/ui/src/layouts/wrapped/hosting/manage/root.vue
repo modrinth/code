@@ -365,7 +365,6 @@ import {
 	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage, useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
@@ -404,6 +403,7 @@ import {
 	injectNotificationManager,
 	provideServerSettingsModal,
 } from '#ui/providers'
+import type { ServerStats } from '#ui/providers/server-context'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
@@ -684,7 +684,7 @@ if (typeof window !== 'undefined') {
 }
 
 type CachedWsState = {
-	stats: Stats
+	stats: ServerStats
 	cpuData: number[]
 	ramData: number[]
 	powerState: Archon.Websocket.v0.PowerState

@@ -68,7 +68,7 @@
 						<li v-if="fetchError" class="text-red">
 							<p>{{ formatMessage(messages.errorDetails) }}</p>
 							<CopyCode
-								:text="(fetchError as ModrinthServersFetchError).message || 'Unknown error'"
+								:text="formatFetchError(fetchError)"
 								:copyable="false"
 								:selectable="false"
 								:language="'json'"
@@ -248,7 +248,6 @@ import {
 	useServerBackupDownload,
 	useVIntl,
 } from '@modrinth/ui'
-import type { ModrinthServersFetchError } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -790,6 +789,10 @@ function handleError(err: unknown) {
 		type: 'error',
 		text: error?.message ?? error?.data?.description ?? String(err),
 	})
+}
+
+function formatFetchError(error: unknown) {
+	return error instanceof Error && error.message ? error.message : 'Unknown error'
 }
 
 function handleSignIn() {
