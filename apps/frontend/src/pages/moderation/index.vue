@@ -246,8 +246,7 @@ const itemsPerPageOptions: ComboboxOption<number>[] = [
 	{ value: 60, label: '60' },
 	{ value: 80, label: '80' },
 	{ value: 100, label: '100' },
-	{ value: 1000, label: '1000' },
-	{ value: 9999, label: '9999' },
+	{ value: 200, label: '200' },
 ]
 const itemsPerPageValues = itemsPerPageOptions.map((option) => option.value)
 const DEFAULT_ITEMS_PER_PAGE = 40
