@@ -956,8 +956,22 @@ defineExpose({
 	@apply border-transparent;
 }
 
-.modrinth-date-picker.show-today :deep(.flatpickr-day.today) {
-	@apply border-brand text-contrast;
+.modrinth-date-picker.show-today :deep(.flatpickr-day.today::after) {
+	content: '';
+	position: absolute;
+	bottom: 6px;
+	left: 50%;
+	width: 4px;
+	height: 4px;
+	border-radius: 9999px;
+	transform: translateX(-50%);
+	@apply bg-brand;
+}
+
+.modrinth-date-picker.show-today :deep(.flatpickr-day.today.selected::after),
+.modrinth-date-picker.show-today :deep(.flatpickr-day.today.startRange::after),
+.modrinth-date-picker.show-today :deep(.flatpickr-day.today.endRange::after) {
+	@apply bg-brand-inverted;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.selected),
