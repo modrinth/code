@@ -370,18 +370,21 @@
 							<VersionSummary
 								v-if="filteredRelease"
 								:version="filteredRelease"
+								:decorate-download-url="decorateModalDownloadUrl"
 								@on-download="onDownload"
 								@on-navigate="onVersionNavigate"
 							/>
 							<VersionSummary
 								v-if="filteredBeta"
 								:version="filteredBeta"
+								:decorate-download-url="decorateModalDownloadUrl"
 								@on-download="onDownload"
 								@on-navigate="onVersionNavigate"
 							/>
 							<VersionSummary
 								v-if="filteredAlpha"
 								:version="filteredAlpha"
+								:decorate-download-url="decorateModalDownloadUrl"
 								@on-download="onDownload"
 								@on-navigate="onVersionNavigate"
 							/>
@@ -1082,6 +1085,7 @@ import {
 	OpenInAppModal,
 	OverflowMenu,
 	PopoutMenu,
+	PROJECT_DEP_MARKER_QUERY,
 	ProjectBackgroundGradient,
 	ProjectEnvironmentModal,
 	ProjectHeader,
@@ -1108,7 +1112,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
-import { nextTick, useTemplateRef, watch } from 'vue'
+import { nextTick, readonly, ref, useTemplateRef, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
@@ -1137,6 +1141,7 @@ definePageMeta({
 
 const data = useNuxtApp()
 const route = useRoute()
+const router = useRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const config = useRuntimeConfig()
 const moderationQueue = useModerationQueue()
@@ -1145,6 +1150,23 @@ const { addNotification } = notifications
 
 const auth = await useAuth()
 const user = await useUser()
+
+const { createProjectDownloadUrl } = useCdnDownloadContext()
+
+const downloadReason = ref('standalone')
+
+function absorbDepQuery() {
+	if (route.query.dep === PROJECT_DEP_MARKER_QUERY.dep) {
+		downloadReason.value = 'dependency'
+		if (import.meta.client) {
+			const newQuery = { ...route.query }
+			delete newQuery.dep
+			void router.replace({ path: route.path, query: newQuery, hash: route.hash })
+		}
+	}
+}
+
+watch(() => route.query.dep, absorbDepQuery, { immediate: true })
 
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
@@ -1209,6 +1231,14 @@ const currentPlatformText = computed(() => {
 	if (!currentPlatform.value) return null
 	return formatMessage(getTagMessage(currentPlatform.value, 'loader'))
 })
+
+function decorateModalDownloadUrl(url) {
+	return createProjectDownloadUrl(url, {
+		reason: downloadReason.value,
+		gameVersion: currentGameVersion.value ?? undefined,
+		loader: currentPlatform.value ?? undefined,
+	})
+}
 
 const releaseVersions = computed(() => {
 	const set = new Set()
@@ -1715,15 +1745,27 @@ const serverRequiredContent = computed(() => {
 		icon: content.project_icon,
 		onclickName:
 			content.project_id && content.project_id !== projectId.value
-				? () => navigateTo(`/project/${content.project_id}`)
+				? () => {
+						navigateTo({
+							path: `/project/${content.project_id}`,
+							query: { ...PROJECT_DEP_MARKER_QUERY },
+						})
+					}
 				: undefined,
 		onclickVersion:
 			content.project_id && content.project_id !== projectId.value
-				? () =>
-						navigateTo(`/project/${content.project_id}/version/${serverModpackVersion.value?.id}`)
+				? () => {
+						navigateTo({
+							path: `/project/${content.project_id}/version/${serverModpackVersion.value?.id}`,
+							query: { ...PROJECT_DEP_MARKER_QUERY },
+						})
+					}
 				: undefined,
 		onclickDownload: primaryFile?.url
-			? () => navigateTo(primaryFile.url, { external: true })
+			? () =>
+					navigateTo(createProjectDownloadUrl(primaryFile.url, { reason: 'dependency' }), {
+						external: true,
+					})
 			: undefined,
 		showCustomModpackTooltip: content.project_id === projectId.value,
 	}
@@ -2703,6 +2745,7 @@ provideProjectPageContext({
 	// Lazy dependencies loading
 	dependencies,
 	dependenciesLoading: computed(() => dependenciesLoading.value),
+	cdnDownloadReason: readonly(downloadReason),
 
 	// Invalidate all project queries (auto-refetches active ones)
 	invalidate: invalidateProject,

@@ -1,6 +1,7 @@
 <script setup>
-import { PlusIcon, XIcon } from '@modrinth/assets'
+import { WrenchIcon, XIcon } from '@modrinth/assets'
 import {
+	Accordion,
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
@@ -9,7 +10,7 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import { open } from '@tauri-apps/plugin-dialog'
+import { save } from '@tauri-apps/plugin-dialog'
 import { ref } from 'vue'
 
 import { PackageIcon, VersionIcon } from '@/assets/icons'
@@ -40,9 +41,13 @@ const messages = defineMessages({
 	},
 	selectFilesLabel: {
 		id: 'app.export-modal.select-files-label',
-		defaultMessage: 'Select files and folders to include in pack',
+		defaultMessage: 'Configure which files are included in this export',
 	},
 	exportButton: { id: 'app.export-modal.export-button', defaultMessage: 'Export' },
+	includeFile: {
+		id: 'app.export-modal.include-file-accessibility-label',
+		defaultMessage: 'Include "{file}"?',
+	},
 })
 
 const props = defineProps({
@@ -65,7 +70,6 @@ const exportDescription = ref('')
 const versionInput = ref('1.0.0')
 const files = ref([])
 const folders = ref([])
-const showingFiles = ref(false)
 
 const initFiles = async () => {
 	const newFolders = new Map()
@@ -87,7 +91,12 @@ const initFiles = async () => {
 					folder.startsWith('modrinth_logs') ||
 					folder.startsWith('.fabric'),
 			}))
-			.filter((pathData) => !pathData.path.includes('.DS_Store'))
+			.filter(
+				(pathData) =>
+					!pathData.path.includes('.DS_Store') &&
+					pathData.path !== 'mods/.connector' &&
+					!pathData.path.startsWith('mods/.connector/'),
+			)
 			.forEach((pathData) => {
 				const parent = pathData.path.split(sep).slice(0, -1).join(sep)
 				if (parent !== '') {
@@ -121,15 +130,20 @@ const exportPack = async () => {
 			}
 		})
 	})
-	const outputPath = await open({
-		directory: true,
-		multiple: false,
+	const outputPath = await save({
+		defaultPath: `${nameInput.value} ${versionInput.value}.mrpack`,
+		filters: [
+			{
+				name: 'Modrinth Modpack',
+				extensions: ['mrpack'],
+			},
+		],
 	})
 
 	if (outputPath) {
 		export_profile_mrpack(
 			props.instance.path,
-			outputPath + `/${nameInput.value} ${versionInput.value}.mrpack`,
+			outputPath,
 			filesToExport,
 			versionInput.value,
 			exportDescription.value,
@@ -142,97 +156,91 @@ const exportPack = async () => {
 
 <template>
 	<ModalWrapper ref="exportModal" :header="formatMessage(messages.header)">
-		<div class="modal-body">
-			<div class="labeled_input">
-				<p>{{ formatMessage(messages.modpackNameLabel) }}</p>
-				<StyledInput
-					v-model="nameInput"
-					:icon="PackageIcon"
-					type="text"
-					:placeholder="formatMessage(messages.modpackNamePlaceholder)"
-					clearable
-				/>
-			</div>
-			<div class="labeled_input">
-				<p>{{ formatMessage(messages.versionNumberLabel) }}</p>
-				<StyledInput
-					v-model="versionInput"
-					:icon="VersionIcon"
-					type="text"
-					:placeholder="formatMessage(messages.versionNumberPlaceholder)"
-					clearable
-				/>
-			</div>
-			<div class="adjacent-input">
+		<div class="flex flex-col gap-4 w-[40rem]">
+			<div class="grid grid-cols-2 gap-4">
 				<div class="labeled_input">
-					<p>{{ formatMessage(commonMessages.descriptionLabel) }}</p>
-
+					<p>{{ formatMessage(messages.modpackNameLabel) }}</p>
 					<StyledInput
-						v-model="exportDescription"
-						multiline
-						:placeholder="formatMessage(messages.descriptionPlaceholder)"
+						v-model="nameInput"
+						:icon="PackageIcon"
+						type="text"
+						:placeholder="formatMessage(messages.modpackNamePlaceholder)"
+						clearable
+					/>
+				</div>
+				<div class="labeled_input">
+					<p>{{ formatMessage(messages.versionNumberLabel) }}</p>
+					<StyledInput
+						v-model="versionInput"
+						:icon="VersionIcon"
+						type="text"
+						:placeholder="formatMessage(messages.versionNumberPlaceholder)"
+						clearable
 					/>
 				</div>
 			</div>
-
-			<div class="table">
-				<div class="table-head">
-					<div class="table-cell row-wise">
-						{{ formatMessage(messages.selectFilesLabel) }}
-						<ButtonStyled circular>
-							<button @click="() => (showingFiles = !showingFiles)">
-								<PlusIcon v-if="!showingFiles" />
-								<XIcon v-else />
-							</button>
-						</ButtonStyled>
-					</div>
-				</div>
-				<div v-if="showingFiles" class="table-content">
-					<div v-for="[path, children] in folders" :key="path.name" class="table-row">
-						<div class="table-cell file-entry">
-							<div class="file-primary">
+			<div class="flex flex-col gap-2">
+				<p class="m-0">{{ formatMessage(commonMessages.descriptionLabel) }}</p>
+				<StyledInput
+					v-model="exportDescription"
+					multiline
+					:placeholder="formatMessage(messages.descriptionPlaceholder)"
+				/>
+			</div>
+			<Accordion
+				class="w-full bg-surface-4 border border-solid border-surface-5 rounded-2xl overflow-clip"
+				button-class="p-4 w-full border-b border-solid border-b-surface-5 bg-surface-2 -mb-px hover:brightness-[--hover-brightness] group"
+			>
+				<template #title>
+					<span class="flex items-center gap-3 text-contrast group-active:scale-[0.98]">
+						<WrenchIcon aria-hidden="true" class="size-5 text-secondary" />
+						Configure which files are included in this export
+					</span>
+				</template>
+				<div class="flex flex-col [&>*:nth-child(even)]:bg-surface-3">
+					<div v-for="[path, children] in folders" :key="path.name" class="flex flex-col">
+						<Accordion
+							class="flex flex-col"
+							button-class="flex gap-3 pr-4 hover:bg-surface-5 group"
+						>
+							<template #title>
 								<Checkbox
 									:model-value="children.every((child) => child.selected)"
-									:label="path.name"
-									class="select-checkbox"
+									:indeterminate="
+										!children.every((child) => child.selected) &&
+										children.some((child) => child.selected)
+									"
+									:description="formatMessage(messages.includeFile, { file: path.name })"
+									class="pl-4 py-2"
 									:disabled="children.every((x) => x.disabled)"
 									@update:model-value="
 										(newValue) => children.forEach((child) => (child.selected = newValue))
 									"
+									@click.stop
 								/>
+								<span class="ml-2 group-active:scale-95">{{ path.name }}/</span>
+							</template>
+							<div v-for="child in children" :key="child.path">
 								<Checkbox
-									v-model="path.showingMore"
-									class="select-checkbox dropdown"
-									collapsing-toggle-style
+									v-model="child.selected"
+									:label="child.name"
+									class="w-full px-8 py-2 hover:bg-surface-4 text-primary"
+									:disabled="child.disabled"
 								/>
 							</div>
-							<div v-if="path.showingMore" class="file-secondary">
-								<div v-for="child in children" :key="child.path" class="file-secondary-row">
-									<Checkbox
-										v-model="child.selected"
-										:label="child.name"
-										class="select-checkbox"
-										:disabled="child.disabled"
-									/>
-								</div>
-							</div>
-						</div>
+						</Accordion>
 					</div>
-					<div v-for="file in files" :key="file.path" class="table-row">
-						<div class="table-cell file-entry">
-							<div class="file-primary">
-								<Checkbox
-									v-model="file.selected"
-									:label="file.name"
-									:disabled="file.disabled"
-									class="select-checkbox"
-								/>
-							</div>
-						</div>
-					</div>
+					<Checkbox
+						v-for="file in files"
+						:key="file.path"
+						v-model="file.selected"
+						:label="file.name"
+						:disabled="file.disabled"
+						class="w-full px-4 py-2 hover:bg-surface-4 text-primary"
+					/>
 				</div>
-			</div>
-			<div class="button-row push-right">
+			</Accordion>
+			<div class="flex items-center justify-end gap-2">
 				<ButtonStyled type="outlined">
 					<button @click="exportModal.hide">
 						<XIcon />
@@ -249,83 +257,3 @@ const exportPack = async () => {
 		</div>
 	</ModalWrapper>
 </template>
-
-<style scoped lang="scss">
-.modal-body {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-md);
-}
-
-.labeled_input {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-sm);
-
-	p {
-		margin: 0;
-	}
-}
-
-.select-checkbox {
-	gap: var(--gap-sm);
-
-	button.checkbox {
-		border: none;
-	}
-
-	&.dropdown {
-		margin-left: auto;
-	}
-}
-
-.table-content {
-	max-height: 18rem;
-	overflow-y: auto;
-}
-
-.table {
-	border: 1px solid var(--color-bg);
-}
-
-.file-entry {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-sm);
-}
-
-.file-primary {
-	display: flex;
-	align-items: center;
-	gap: var(--gap-sm);
-}
-
-.file-secondary {
-	margin-left: var(--gap-xl);
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-sm);
-	height: 100%;
-	vertical-align: center;
-}
-
-.file-secondary-row {
-	display: flex;
-	align-items: center;
-	gap: var(--gap-sm);
-}
-
-.button-row {
-	display: flex;
-	gap: var(--gap-sm);
-	align-items: center;
-}
-
-.row-wise {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	gap: 1rem;
-}
-</style>

@@ -110,7 +110,7 @@
 								id: 'download',
 								color: 'primary',
 								hoverFilled: true,
-								link: getPrimaryFile(version).url,
+								link: createDownloadUrl(version),
 								action: () => {
 									emit('onDownload')
 								},
@@ -340,13 +340,15 @@ import {
 	ProjectPageVersions,
 	useVIntl,
 } from '@modrinth/ui'
-import { useTemplateRef } from 'vue'
+import { useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const route = useRoute()
+
+const { createProjectDownloadUrl, updateVersionsFilterContext } = useCdnDownloadContext()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -357,6 +359,7 @@ const {
 	versions,
 	invalidate,
 	loadVersions,
+	cdnDownloadReason,
 } = injectProjectPageContext()
 
 // Load versions on mount (client-side)
@@ -399,6 +402,23 @@ const baseDropdownId = useId()
 
 function getPrimaryFile(version: Labrinth.Versions.v3.Version) {
 	return version.files.find((x) => x.primary) || version.files[0]
+}
+
+watch(
+	() => [route.query.g, route.query.l],
+	() => {
+		updateVersionsFilterContext(
+			queryAsStringArray(route.query.g),
+			queryAsStringArray(route.query.l),
+		)
+	},
+	{ immediate: true },
+)
+
+function createDownloadUrl(version: Labrinth.Versions.v3.Version) {
+	return createProjectDownloadUrl(getPrimaryFile(version).url, {
+		reason: cdnDownloadReason.value,
+	})
 }
 
 async function copyToClipboard(text: string) {
