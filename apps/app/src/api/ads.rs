@@ -48,20 +48,14 @@ fn ads_user_agent_override_params() -> String {
 }
 
 #[cfg(windows)]
-fn configure_ads_cookie_debugging(
+fn configure_ads_cookie_settings(
     core_webview2: &webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2,
 ) {
     use webview2_com::Microsoft::Web::WebView2::Win32::{
-        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL,
         COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE, ICoreWebView2,
-        ICoreWebView2_13, ICoreWebView2DevToolsProtocolEventReceivedEventArgs,
-        ICoreWebView2Profile3,
+        ICoreWebView2_13, ICoreWebView2Profile3,
     };
-    use webview2_com::{
-        CallDevToolsProtocolMethodCompletedHandler,
-        DevToolsProtocolEventReceivedEventHandler, take_pwstr,
-    };
-    use windows_core::{HSTRING, Interface, PWSTR};
+    use windows_core::Interface;
 
     match core_webview2
         .cast::<ICoreWebView2_13>()
@@ -69,17 +63,6 @@ fn configure_ads_cookie_debugging(
         .and_then(|profile| profile.cast::<ICoreWebView2Profile3>())
     {
         Ok(profile) => {
-            let mut previous_level = COREWEBVIEW2_TRACKING_PREVENTION_LEVEL(0);
-
-            if let Err(error) = unsafe {
-                profile.PreferredTrackingPreventionLevel(&mut previous_level)
-            } {
-                tracing::warn!(
-                    ?error,
-                    "Failed to read ads WebView2 tracking prevention level"
-                );
-            }
-
             if let Err(error) = unsafe {
                 profile.SetPreferredTrackingPreventionLevel(
                     COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE,
@@ -89,11 +72,6 @@ fn configure_ads_cookie_debugging(
                     ?error,
                     "Failed to disable ads WebView2 tracking prevention"
                 );
-            } else {
-                tracing::info!(
-                    previous_level = previous_level.0,
-                    "Disabled ads WebView2 tracking prevention"
-                );
             }
         }
         Err(error) => {
@@ -102,97 +80,6 @@ fn configure_ads_cookie_debugging(
                 "Failed to access ads WebView2 profile tracking prevention settings"
             );
         }
-    }
-
-    if let Ok(receiver) = unsafe {
-        core_webview2.GetDevToolsProtocolEventReceiver(&HSTRING::from(
-            "Network.responseReceivedExtraInfo",
-        ))
-    } {
-        let handler = DevToolsProtocolEventReceivedEventHandler::create(
-            Box::new(
-                move |_: Option<ICoreWebView2>,
-                      args: Option<
-                    ICoreWebView2DevToolsProtocolEventReceivedEventArgs,
-                >| {
-                    let Some(args) = args else {
-                        return Ok(());
-                    };
-
-                    let mut json = PWSTR::null();
-
-                    if let Err(error) =
-                        unsafe { args.ParameterObjectAsJson(&mut json) }
-                    {
-                        tracing::warn!(
-                            ?error,
-                            "Failed to read ads WebView2 network debug event"
-                        );
-                        return Ok(());
-                    }
-
-                    let payload = take_pwstr(json);
-
-                    if let Ok(payload_json) =
-                        serde_json::from_str::<serde_json::Value>(&payload)
-                    {
-                        if payload_json
-                            .get("blockedCookies")
-                            .and_then(|blocked_cookies| {
-                                blocked_cookies.as_array()
-                            })
-                            .is_some_and(|blocked_cookies| {
-                                !blocked_cookies.is_empty()
-                            })
-                        {
-                            tracing::warn!(
-                                payload = %payload,
-                                "Ads WebView2 blocked cookies"
-                            );
-                        }
-                    }
-
-                    Ok(())
-                },
-            ) as Box<_>,
-        );
-
-        let mut token = 0;
-        if let Err(error) = unsafe {
-            receiver.add_DevToolsProtocolEventReceived(&handler, &mut token)
-        } {
-            tracing::warn!(
-                ?error,
-                "Failed to subscribe to ads WebView2 cookie debug events"
-            );
-        }
-    }
-
-    let handler = CallDevToolsProtocolMethodCompletedHandler::create(Box::new(
-        |result: windows_core::Result<()>, _| {
-            if let Err(error) = result {
-                tracing::warn!(
-                    ?error,
-                    "Failed to enable ads WebView2 network debugging"
-                );
-            }
-
-            Ok(())
-        },
-    )
-        as Box<_>);
-
-    if let Err(error) = unsafe {
-        core_webview2.CallDevToolsProtocolMethod(
-            &HSTRING::from("Network.enable"),
-            &HSTRING::from("{}"),
-            &handler,
-        )
-    } {
-        tracing::warn!(
-            ?error,
-            "Failed to install ads WebView2 network debugging"
-        );
     }
 }
 
@@ -451,7 +338,7 @@ pub async fn init_ads_window<R: Runtime>(
                         unsafe { webview2.controller().CoreWebView2() };
 
                     if let Ok(core_webview2) = core_webview2 {
-                        configure_ads_cookie_debugging(&core_webview2);
+                        configure_ads_cookie_settings(&core_webview2);
 
                         let navigate_webview = core_webview2.clone();
                         let handler =
