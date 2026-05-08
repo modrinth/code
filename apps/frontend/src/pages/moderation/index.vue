@@ -13,7 +13,7 @@
 				@input="goToPage(1)"
 			/>
 
-			<div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0 flex-wrap">
+			<div class="flex flex-col flex-wrap justify-end gap-2 sm:flex-row lg:flex-shrink-0">
 				<div class="flex flex-col gap-2 sm:flex-row">
 					<Combobox
 						v-model="currentFilterType"
@@ -82,7 +82,13 @@
 
 		<div v-if="totalPages > 1" class="flex items-center justify-between">
 			<div>
-				Showing {{ (itemsPerPage * (currentPage - 1)) + 1 }}–{{ itemsPerPage * (currentPage - 1) + Math.min(itemsPerPage, paginatedProjects.length) }} of {{ filteredProjects.length }} {{ currentFilterType === DEFAULT_FILTER_TYPE ? 'projects' : currentFilterType.toLowerCase() }}
+				Showing {{ itemsPerPage * (currentPage - 1) + 1 }}–{{
+					itemsPerPage * (currentPage - 1) + Math.min(itemsPerPage, paginatedProjects.length)
+				}}
+				of {{ filteredProjects.length }}
+				{{
+					currentFilterType === DEFAULT_FILTER_TYPE ? 'projects' : currentFilterType.toLowerCase()
+				}}
 			</div>
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 			<ConfettiExplosion v-if="visible" />
@@ -105,13 +111,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import {
-	ListFilterIcon,
-	ScaleIcon,
-	SearchIcon,
-	SortAscIcon,
-	SortDescIcon,
-} from '@modrinth/assets'
+import { ListFilterIcon, ScaleIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,

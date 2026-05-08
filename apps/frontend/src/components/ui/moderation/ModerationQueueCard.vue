@@ -1,5 +1,5 @@
 <template>
-	<div class="shadow-card rounded-2xl border border-surface-5 bg-surface-3 p-4 border-solid">
+	<div class="shadow-card rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-4">
 				<NuxtLink
@@ -33,7 +33,11 @@
 							/>
 							<span class="text-sm font-medium text-secondary">
 								{{
-									queueEntry.project.project_types.length === 0 ? '???' : queueEntry.project.project_types.map((t) => formatProjectType(t, true)).join(', ')
+									queueEntry.project.project_types.length === 0
+										? '???'
+										: queueEntry.project.project_types
+												.map((t) => formatProjectType(t, true))
+												.join(', ')
 								}}
 							</span>
 						</div>
@@ -93,12 +97,12 @@
 				</span>
 
 				<div class="flex items-center gap-2">
-					<ButtonStyled circular >
+					<ButtonStyled circular>
 						<button v-tooltip="'Copy ID'" @click="copyId">
 							<ClipboardCopyIcon />
 						</button>
 					</ButtonStyled>
-					<ButtonStyled circular >
+					<ButtonStyled circular>
 						<button v-tooltip="'Copy link'" @click="copyLink">
 							<LinkIcon />
 						</button>
