@@ -134,7 +134,7 @@ const messages = defineMessages({
 	},
 	listedLabel: {
 		id: 'omorphia.component.badge.label.listed',
-		defaultMessage: 'Listed',
+		defaultMessage: 'Public',
 	},
 	moderatorLabel: {
 		id: 'omorphia.component.badge.label.moderator',
@@ -186,7 +186,7 @@ const messages = defineMessages({
 	},
 	withheldLabel: {
 		id: 'omorphia.component.badge.label.withheld',
-		defaultMessage: 'Withheld',
+		defaultMessage: 'Unlisted by staff',
 	},
 })
 const { formatMessage } = useVIntl()
