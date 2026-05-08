@@ -51,14 +51,103 @@ fn set_webview_visible<R: Runtime>(
     webview: &tauri::Webview<R>,
     _visible: bool,
 ) {
+    let label = webview.label().to_string();
+
+    tracing::info!(
+        webview = %label,
+        visible = _visible,
+        "Setting ads webview native visibility"
+    );
+
     webview
         .with_webview(
             #[allow(unused_variables)]
             move |wv| {
                 #[cfg(windows)]
                 {
+                    use webview2_com::ExecuteScriptCompletedHandler;
+                    use windows_core::BOOL;
+                    use windows_core::HSTRING;
+
                     let controller = wv.controller();
-                    unsafe { controller.SetIsVisible(_visible) }.ok();
+                    let mut visible_before = BOOL::default();
+
+                    unsafe {
+                        controller.IsVisible(&mut visible_before).ok();
+                    }
+
+                    tracing::info!(
+                        webview = %label,
+                        requested_visible = _visible,
+                        native_visible_before = visible_before.as_bool(),
+                        "Calling WebView2 SetIsVisible"
+                    );
+
+                    if let Err(error) =
+                        unsafe { controller.SetIsVisible(_visible) }
+                    {
+                        tracing::error!(
+                            ?error,
+                            webview = %label,
+                            requested_visible = _visible,
+                            "WebView2 SetIsVisible failed"
+                        );
+                        return;
+                    }
+
+                    let mut visible_after = BOOL::default();
+
+                    unsafe {
+                        controller.IsVisible(&mut visible_after).ok();
+                    }
+
+                    tracing::info!(
+                        webview = %label,
+                        requested_visible = _visible,
+                        native_visible_after = visible_after.as_bool(),
+                        "WebView2 SetIsVisible completed"
+                    );
+
+                    let Ok(core_webview2) =
+                        (unsafe { controller.CoreWebView2() })
+                    else {
+                        tracing::warn!(
+                            webview = %label,
+                            "Could not get CoreWebView2 to inspect document.hidden"
+                        );
+                        return;
+                    };
+
+                    let hidden_label = label.clone();
+                    let handler = ExecuteScriptCompletedHandler::create(
+                        Box::new(
+                            move |result: windows_core::Result<()>, value: String| {
+                                match result {
+                                    Ok(()) => tracing::info!(
+                                        webview = %hidden_label,
+                                        document_hidden = %value,
+                                        "Read ads webview document.hidden after visibility update"
+                                    ),
+                                    Err(error) => tracing::error!(
+                                        ?error,
+                                        webview = %hidden_label,
+                                        "Failed to read ads webview document.hidden"
+                                    ),
+                                }
+
+                                Ok(())
+                            },
+                        ) as Box<_>,
+                    );
+
+                    unsafe {
+                        core_webview2
+                            .ExecuteScript(
+                                &HSTRING::from("document.hidden"),
+                                &handler,
+                            )
+                            .ok();
+                    }
                 }
             },
         )
@@ -76,6 +165,91 @@ fn set_webview_visible_for_window<R: Runtime>(
         .unwrap_or(false);
 
     set_webview_visible(webview, visible && !is_minimized);
+}
+
+fn window_event_label(event: &WindowEvent) -> String {
+    match event {
+        WindowEvent::Resized(size) => {
+            format!("resized:{}x{}", size.width, size.height)
+        }
+        WindowEvent::Moved(position) => {
+            format!("moved:{},{}", position.x, position.y)
+        }
+        WindowEvent::CloseRequested { .. } => "close-requested".to_string(),
+        WindowEvent::Destroyed => "destroyed".to_string(),
+        WindowEvent::Focused(focused) => format!("focused:{focused}"),
+        WindowEvent::ScaleFactorChanged {
+            scale_factor,
+            new_inner_size,
+            ..
+        } => format!(
+            "scale-factor-changed:{scale_factor}:{}x{}",
+            new_inner_size.width, new_inner_size.height
+        ),
+        WindowEvent::DragDrop(_) => "drag-drop".to_string(),
+        WindowEvent::ThemeChanged(_) => "theme-changed".to_string(),
+        _ => "unknown".to_string(),
+    }
+}
+
+fn sync_webview_visibility_for_main_window<R: Runtime>(
+    app: &tauri::AppHandle<R>,
+    main_window: &tauri::Window<R>,
+    was_minimized: &AtomicBool,
+    trigger: &str,
+) {
+    let is_minimized = main_window.is_minimized().unwrap_or(false);
+    let was = was_minimized.load(Ordering::SeqCst);
+
+    tracing::info!(
+        trigger,
+        is_minimized,
+        was_minimized = was,
+        "Checking main window minimized state for ads webviews"
+    );
+
+    if is_minimized == was {
+        return;
+    }
+
+    was_minimized.store(is_minimized, Ordering::SeqCst);
+
+    let ads_visible = if is_minimized {
+        false
+    } else {
+        match app.state::<RwLock<AdsState>>().try_read() {
+            Ok(state) => state.shown && !state.modal_shown,
+            Err(error) => {
+                tracing::warn!(
+                    ?error,
+                    "Could not read ads state while restoring webview visibility"
+                );
+                false
+            }
+        }
+    };
+
+    tracing::info!(
+        trigger,
+        is_minimized,
+        ads_visible,
+        webview_count = app.webviews().len(),
+        "Applying main window minimized state to webviews"
+    );
+
+    for webview in app.webviews().into_values() {
+        let visible =
+            !is_minimized && (webview.label() != "ads-window" || ads_visible);
+
+        tracing::info!(
+            trigger,
+            webview = webview.label(),
+            visible,
+            "Applying computed native webview visibility"
+        );
+
+        set_webview_visible(&webview, visible);
+    }
 }
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
@@ -114,35 +288,34 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 let was_minimized = Arc::new(AtomicBool::new(false));
 
                 win.on_window_event(move |event| {
-                    if let WindowEvent::Resized(_) = event {
-                        let is_minimized =
-                            event_window.is_minimized().unwrap_or(false);
-                        let was = was_minimized.load(Ordering::SeqCst);
+                    let event_label = window_event_label(event);
 
-                        if is_minimized != was {
-                            was_minimized.store(is_minimized, Ordering::SeqCst);
+                    tracing::info!(
+                        event = %event_label,
+                        "Main window event received for ads visibility sync"
+                    );
 
-                            let ads_visible = if is_minimized {
-                                false
-                            } else {
-                                app_handle
-                                    .state::<RwLock<AdsState>>()
-                                    .try_read()
-                                    .map(|state| {
-                                        state.shown && !state.modal_shown
-                                    })
-                                    .unwrap_or(false)
-                            };
+                    sync_webview_visibility_for_main_window(
+                        &app_handle,
+                        &event_window,
+                        &was_minimized,
+                        &event_label,
+                    );
 
-                            for webview in app_handle.webviews().into_values() {
-                                let visible = !is_minimized
-                                    && (webview.label() != "ads-window"
-                                        || ads_visible);
+                    let delayed_app_handle = app_handle.clone();
+                    let delayed_event_window = event_window.clone();
+                    let delayed_was_minimized = was_minimized.clone();
 
-                                set_webview_visible(&webview, visible);
-                            }
-                        }
-                    }
+                    tauri::async_runtime::spawn(async move {
+                        tokio::time::sleep(Duration::from_millis(100)).await;
+
+                        sync_webview_visibility_for_main_window(
+                            &delayed_app_handle,
+                            &delayed_event_window,
+                            &delayed_was_minimized,
+                            "delayed-window-event-check",
+                        );
+                    });
                 });
             }
 
