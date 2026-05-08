@@ -38,34 +38,36 @@
 							<Badge :type="queueEntry.project.requested_status" class="status" />
 						</div>
 					</div>
-					<div v-if="queueEntry.owner" class="flex items-center gap-1">
+					<div v-if="queueEntry.ownership?.kind === 'user'" class="flex items-center gap-1">
 						<Avatar
-							:src="queueEntry.owner.user.avatar_url"
+							:src="queueEntry.ownership.icon_url"
 							size="1.5rem"
 							circle
 							class="border border-surface-5 bg-surface-4 !shadow-none"
 						/>
 						<NuxtLink
-							:to="`/user/${queueEntry.owner.user.username}`"
+							:to="`/user/${queueEntry.ownership.id}`"
 							target="_blank"
 							class="text-sm font-medium text-secondary hover:underline"
 						>
-							{{ queueEntry.owner.user.username }}
+							{{ queueEntry.ownership.name }}
 						</NuxtLink>
 					</div>
-					<div v-else-if="queueEntry.org" class="flex items-center gap-1">
+					<div
+						v-else-if="queueEntry.ownership?.kind === 'organization'"
+						class="flex items-center gap-1"
+					>
 						<Avatar
-							:src="queueEntry.org.icon_url"
+							:src="queueEntry.ownership.icon_url"
 							size="1.5rem"
-							circle
 							class="border border-surface-5 bg-surface-4 !shadow-none"
 						/>
 						<NuxtLink
-							:to="`/organization/${queueEntry.org.slug}`"
+							:to="`/organization/${queueEntry.ownership.id}`"
 							target="_blank"
 							class="text-sm font-medium text-secondary hover:underline"
 						>
-							{{ queueEntry.org.name }}
+							{{ queueEntry.ownership.name }}
 						</NuxtLink>
 					</div>
 				</div>

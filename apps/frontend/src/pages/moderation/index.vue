@@ -83,8 +83,6 @@
 				v-else
 				:key="item.project.id"
 				:queue-entry="item"
-				:owner="item.owner"
-				:org="item.org"
 				@start-from-project="startFromProject"
 			/>
 		</div>
@@ -111,7 +109,11 @@ import Fuse from 'fuse.js'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
-import { enrichProjectBatch, type ModerationProject } from '~/helpers/moderation.ts'
+import {
+	type ModerationProject,
+	type ProjectWithOwnership,
+	toModerationProjects,
+} from '~/helpers/moderation.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 useHead({ title: 'Projects queue - Modrinth' })
@@ -147,33 +149,20 @@ const { data: allProjects } = await useLazyAsyncData('moderation-projects', asyn
 	const PROJECT_ENDPOINT_COUNT = 350
 	const allProjects: ModerationProject[] = []
 
-	const enrichmentPromises: Promise<ModerationProject[]>[] = []
-
-	let projects: any[] = []
+	let projects: ProjectWithOwnership[] = []
 	do {
 		projects = (await useBaseFetch(
 			`moderation/projects?count=${PROJECT_ENDPOINT_COUNT}&offset=${currentOffset}`,
 			{ internal: true },
-		)) as any[]
+		)) as ProjectWithOwnership[]
 
 		if (projects.length === 0) break
 
-		const enrichmentPromise = enrichProjectBatch(projects)
-		enrichmentPromises.push(enrichmentPromise)
-
+		allProjects.push(...toModerationProjects(projects))
 		currentOffset += projects.length
-
-		if (enrichmentPromises.length >= 3) {
-			const completed = await Promise.all(enrichmentPromises.splice(0, 2))
-			allProjects.push(...completed.flat())
-		}
 	} while (projects.length === PROJECT_ENDPOINT_COUNT)
 
-	const remainingBatches = await Promise.all(enrichmentPromises)
-	allProjects.push(...remainingBatches.flat())
-
-	const endTime = performance.now()
-	const duration = endTime - startTime
+	const duration = performance.now() - startTime
 
 	console.debug(
 		`Projects fetched and processed in ${duration.toFixed(2)}ms (${(duration / 1000).toFixed(2)}s)`,
@@ -325,9 +314,7 @@ const fuse = computed(() => {
 				name: 'project.project_type',
 				weight: 1,
 			},
-			'owner.user.username',
-			'org.name',
-			'org.slug',
+			'ownership.name',
 		],
 		includeScore: true,
 		threshold: 0.4,

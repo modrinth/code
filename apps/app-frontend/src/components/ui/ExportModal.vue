@@ -1,7 +1,7 @@
 <script setup>
-import { WrenchIcon,XIcon } from '@modrinth/assets'
+import { WrenchIcon, XIcon } from '@modrinth/assets'
 import {
-    Accordion,
+	Accordion,
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
@@ -44,7 +44,10 @@ const messages = defineMessages({
 		defaultMessage: 'Configure which files are included in this export',
 	},
 	exportButton: { id: 'app.export-modal.export-button', defaultMessage: 'Export' },
-	includeFile: { id: 'app.export-modal.include-file-accessibility-label', defaultMessage: 'Include "{file}"?' },
+	includeFile: {
+		id: 'app.export-modal.include-file-accessibility-label',
+		defaultMessage: 'Include "{file}"?',
+	},
 })
 
 const props = defineProps({
@@ -184,7 +187,10 @@ const exportPack = async () => {
 					:placeholder="formatMessage(messages.descriptionPlaceholder)"
 				/>
 			</div>
-			<Accordion class="w-full bg-surface-4 border border-solid border-surface-5 rounded-2xl overflow-clip" button-class="p-4 w-full border-b border-solid border-b-surface-5 bg-surface-2 -mb-px hover:brightness-[--hover-brightness] group">
+			<Accordion
+				class="w-full bg-surface-4 border border-solid border-surface-5 rounded-2xl overflow-clip"
+				button-class="p-4 w-full border-b border-solid border-b-surface-5 bg-surface-2 -mb-px hover:brightness-[--hover-brightness] group"
+			>
 				<template #title>
 					<span class="flex items-center gap-3 text-contrast group-active:scale-[0.98]">
 						<WrenchIcon aria-hidden="true" class="size-5 text-secondary" />
@@ -193,11 +199,17 @@ const exportPack = async () => {
 				</template>
 				<div class="flex flex-col [&>*:nth-child(even)]:bg-surface-3">
 					<div v-for="[path, children] in folders" :key="path.name" class="flex flex-col">
-						<Accordion class="flex flex-col" button-class="flex gap-3 pr-4 hover:bg-surface-5 group">
+						<Accordion
+							class="flex flex-col"
+							button-class="flex gap-3 pr-4 hover:bg-surface-5 group"
+						>
 							<template #title>
 								<Checkbox
 									:model-value="children.every((child) => child.selected)"
-									:indeterminate="!children.every((child) => child.selected) && children.some((child) => child.selected)"
+									:indeterminate="
+										!children.every((child) => child.selected) &&
+										children.some((child) => child.selected)
+									"
 									:description="formatMessage(messages.includeFile, { file: path.name })"
 									class="pl-4 py-2"
 									:disabled="children.every((x) => x.disabled)"
@@ -219,7 +231,8 @@ const exportPack = async () => {
 						</Accordion>
 					</div>
 					<Checkbox
-					v-for="file in files" :key="file.path"
+						v-for="file in files"
+						:key="file.path"
 						v-model="file.selected"
 						:label="file.name"
 						:disabled="file.disabled"
