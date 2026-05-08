@@ -38,6 +38,7 @@
 import { computed } from 'vue'
 
 import { injectServerSettingsModal } from '#ui/providers/server-settings-modal'
+import type { ServerLoader } from '#ui/utils/loaders'
 
 import AutoLink from '../../base/AutoLink.vue'
 import LoaderIcon from '../icons/LoaderIcon.vue'
@@ -45,7 +46,7 @@ import Separator from './Separator.vue'
 
 defineProps<{
 	noSeparator?: boolean
-	loader?: 'Fabric' | 'Quilt' | 'Forge' | 'NeoForge' | 'Paper' | 'Spigot' | 'Bukkit' | 'Vanilla'
+	loader?: ServerLoader
 	loaderVersion?: string
 	isLink?: boolean
 }>()

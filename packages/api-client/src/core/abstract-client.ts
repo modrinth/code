@@ -1,6 +1,6 @@
 import type { InferredClientModules } from '../modules'
 import { buildModuleStructure } from '../modules'
-import type { ClientConfig } from '../types/client'
+import type { BaseUrlConfig, ClientConfig } from '../types/client'
 import type { RequestContext, RequestOptions } from '../types/request'
 import type { UploadMetadata, UploadProgress, UploadRequestOptions } from '../types/upload'
 import type { AbstractFeature } from './abstract-feature'
@@ -116,9 +116,9 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	async request<T>(path: string, options: RequestOptions): Promise<T> {
 		let baseUrl: string
 		if (options.api === 'labrinth') {
-			baseUrl = this.config.labrinthBaseUrl!
+			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
 		} else if (options.api === 'archon') {
-			baseUrl = this.config.archonBaseUrl!
+			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
 		} else {
 			baseUrl = options.api
 		}
@@ -241,6 +241,10 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 		const cleanPath = path.startsWith('/') ? path : `/${path}`
 
 		return `${base}${versionPath}${cleanPath}`
+	}
+
+	protected resolveBaseUrl(baseUrl: BaseUrlConfig): string {
+		return typeof baseUrl === 'function' ? baseUrl() : baseUrl
 	}
 
 	/**

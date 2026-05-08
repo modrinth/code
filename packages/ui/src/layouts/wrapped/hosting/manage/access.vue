@@ -53,7 +53,7 @@
 
 		<GrantAccessModal
 			ref="grantAccessModal"
-			:suggestions="inviteSuggestions"
+			:resolve-user="resolveInviteUser"
 			@grant="grantAccess"
 		/>
 		<RemoveAccessModal
@@ -312,7 +312,6 @@ const worldOptions = computed(
 )
 
 const auditEntries = ref<ServerAuditLogEntry[]>([])
-const inviteSuggestions: ServerAccessInviteSuggestion[] = []
 const hasShownLoadError = ref(false)
 
 const memberSearch = ref('')
@@ -421,6 +420,15 @@ function findMemberByTarget(target: string) {
 			member.user.username.toLowerCase() === normalizedTarget ||
 			member.user.id.toLowerCase() === normalizedTarget,
 	)
+}
+
+async function resolveInviteUser(target: string): Promise<ServerAccessInviteSuggestion | null> {
+	const user = await client.labrinth.users_v2.get(target)
+	return {
+		id: user.id,
+		username: user.username,
+		avatarUrl: user.avatar_url || undefined,
+	}
 }
 
 async function resolveMemberUserId(member: ServerAccessMember): Promise<string> {
