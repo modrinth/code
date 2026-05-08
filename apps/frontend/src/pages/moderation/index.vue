@@ -212,7 +212,6 @@ watch(
 	},
 )
 
-const currentFilterType = ref('All projects')
 const filterTypes: ComboboxOption<string>[] = [
 	{ value: 'All projects', label: 'All projects' },
 	{ value: 'Modpacks', label: 'Modpacks' },
@@ -223,12 +222,84 @@ const filterTypes: ComboboxOption<string>[] = [
 	{ value: 'Shaders', label: 'Shaders' },
 	{ value: 'Servers', label: 'Servers' },
 ]
+const filterTypeValues = filterTypes.map((option) => option.value)
+const DEFAULT_FILTER_TYPE = filterTypeValues[0]
 
-const currentSortType = ref('Oldest')
 const sortTypes: ComboboxOption<string>[] = [
 	{ value: 'Oldest', label: 'Oldest' },
 	{ value: 'Newest', label: 'Newest' },
 ]
+const sortTypeValues = sortTypes.map((option) => option.value)
+const DEFAULT_SORT_TYPE = sortTypeValues[0]
+
+function parseFilterTypeFromQuery(value: LocationQueryValue | LocationQueryValue[]): string {
+	const query = queryAsStringOrEmpty(value)
+	return filterTypeValues.includes(query) ? query : DEFAULT_FILTER_TYPE
+}
+
+function parseSortTypeFromQuery(value: LocationQueryValue | LocationQueryValue[]): string {
+	const query = queryAsStringOrEmpty(value)
+	return sortTypeValues.includes(query) ? query : DEFAULT_SORT_TYPE
+}
+
+const currentFilterType = ref(parseFilterTypeFromQuery(route.query.filter))
+const currentSortType = ref(parseSortTypeFromQuery(route.query.sort))
+
+watch(
+	currentFilterType,
+	(newFilter) => {
+		const currentQuery = { ...route.query }
+		if (newFilter && newFilter !== DEFAULT_FILTER_TYPE) {
+			currentQuery.filter = newFilter
+		} else {
+			delete currentQuery.filter
+		}
+
+		router.replace({
+			path: route.path,
+			query: currentQuery,
+		})
+	},
+	{ immediate: false },
+)
+
+watch(
+	() => route.query.filter,
+	(newFilterParam) => {
+		const newValue = parseFilterTypeFromQuery(newFilterParam)
+		if (currentFilterType.value !== newValue) {
+			currentFilterType.value = newValue
+		}
+	},
+)
+
+watch(
+	currentSortType,
+	(newSort) => {
+		const currentQuery = { ...route.query }
+		if (newSort && newSort !== DEFAULT_SORT_TYPE) {
+			currentQuery.sort = newSort
+		} else {
+			delete currentQuery.sort
+		}
+
+		router.replace({
+			path: route.path,
+			query: currentQuery,
+		})
+	},
+	{ immediate: false },
+)
+
+watch(
+	() => route.query.sort,
+	(newSortParam) => {
+		const newValue = parseSortTypeFromQuery(newSortParam)
+		if (currentSortType.value !== newValue) {
+			currentSortType.value = newValue
+		}
+	},
+)
 
 const currentPage = ref(1)
 const itemsPerPage = 15
