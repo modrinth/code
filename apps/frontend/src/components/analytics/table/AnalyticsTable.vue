@@ -86,8 +86,8 @@ import { ButtonStyled, Table, type TableColumn, Toggle, useFormatNumber } from '
 import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardStat,
-	doesProjectStatusMatchFilters,
 	doesAnalyticsPointMatchFilters,
+	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
