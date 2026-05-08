@@ -95,7 +95,19 @@
 		</div>
 
 		<div class="flex flex-col gap-3">
-			<div v-if="paginatedProjects.length === 0" class="universal-card h-24 animate-pulse"></div>
+			<template v-if="pending">
+				<div
+					v-for="i in 3"
+					:key="`loading-skeleton-${i}`"
+					class="flex h-[98px] w-full animate-pulse rounded-2xl bg-surface-3"
+				></div>
+			</template>
+			<EmptyState
+				v-else-if="paginatedProjects.length === 0"
+				:type="!!query ? 'no-search-result' : 'no-tasks'"
+				:heading="emptyStateHeading"
+				:description="emptyStateDescription"
+			/>
 			<ModerationQueueCard
 				v-for="item in paginatedProjects"
 				v-else
@@ -118,6 +130,7 @@ import {
 	type ComboboxOption,
 	commonMessages,
 	defineMessages,
+	EmptyState,
 	injectNotificationManager,
 	Pagination,
 	StyledInput,
@@ -161,7 +174,7 @@ const messages = defineMessages({
 	},
 })
 
-const { data: allProjects } = await useLazyAsyncData('moderation-projects', async () => {
+const { data: allProjects, pending } = await useLazyAsyncData('moderation-projects', async () => {
 	const startTime = performance.now()
 	let currentOffset = 0
 	const PROJECT_ENDPOINT_COUNT = 350
@@ -432,6 +445,30 @@ const paginatedProjects = computed(() => {
 	const start = (currentPage.value - 1) * itemsPerPage.value
 	const end = start + itemsPerPage.value
 	return filteredProjects.value.slice(start, end)
+})
+
+const hasActiveFilters = computed(
+	() => Boolean(query.value) || currentFilterType.value !== DEFAULT_FILTER_TYPE,
+)
+
+const emptyStateHeading = computed(() => {
+	if (query.value) {
+		return 'Not finding anything...'
+	}
+	if (currentFilterType.value !== DEFAULT_FILTER_TYPE) {
+		return 'All done here!'
+	}
+	return 'The queue is empty!'
+})
+
+const emptyStateDescription = computed(() => {
+	if (query.value) {
+		return 'Check that your search query is correct!'
+	}
+	if (currentFilterType.value !== DEFAULT_FILTER_TYPE) {
+		return `There are no ${currentFilterType.value.toLowerCase()} in the queue`
+	}
+	return 'you will probably never see this but if you do, congrats!!! :D'
 })
 
 function goToPage(page: number) {
