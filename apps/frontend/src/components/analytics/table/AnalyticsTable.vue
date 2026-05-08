@@ -176,18 +176,6 @@ const breakdownColumnLabel = computed(() => {
 			return 'Breakdown'
 	}
 })
-watch([tableMode, showBreakdownColumn], () => {
-	if (!includeDateColumn.value && sortColumn.value === 'date') {
-		sortColumn.value = 'breakdown'
-		sortDirection.value = 'asc'
-	}
-
-	if (!showBreakdownColumn.value && sortColumn.value === 'breakdown') {
-		sortColumn.value = 'date'
-		sortDirection.value = 'asc'
-	}
-})
-
 const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 const relevantStats = computed(
 	() => new Set(getRelevantAnalyticsDashboardStats(selectedBreakdown.value, selectedFilters.value)),
@@ -361,11 +349,14 @@ watch(
 			return
 		}
 
-		sortColumn.value = nextColumns.find((column) => column.key === 'date')?.key ?? 'breakdown'
-		sortDirection.value = 'asc'
+		applyDefaultSort(nextColumns)
 	},
 	{ immediate: true },
 )
+
+watch(includeDateColumn, () => {
+	applyDefaultSort()
+})
 
 const sortedRows = computed<AnalyticsTableRow[]>(() => {
 	const rows = [...tableRows.value]
@@ -480,6 +471,29 @@ function getMetricColumnForStat(stat: AnalyticsDashboardStat): TableColumn<Table
 		default:
 			return null
 	}
+}
+
+function applyDefaultSort(nextColumns = columns.value) {
+	const nextSortColumn = getDefaultSortColumn(nextColumns)
+	sortColumn.value = nextSortColumn
+	sortDirection.value = getDefaultSortDirection(nextSortColumn)
+}
+
+function getDefaultSortColumn(nextColumns: TableColumn<TableColumnKey>[]): TableColumnKey | undefined {
+	const availableColumns = new Set(nextColumns.map((column) => column.key))
+	if (availableColumns.has('date')) {
+		return 'date'
+	}
+
+	if (availableColumns.has('downloads')) {
+		return 'downloads'
+	}
+
+	return nextColumns[0]?.key
+}
+
+function getDefaultSortDirection(column: TableColumnKey | undefined): SortDirection {
+	return column === 'date' || column === 'breakdown' ? 'asc' : 'desc'
 }
 
 function getBreakdownValue(
