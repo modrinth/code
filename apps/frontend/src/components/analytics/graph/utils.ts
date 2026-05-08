@@ -19,6 +19,29 @@ export type ChartDataset = {
 	backgroundColor: string
 }
 
+const LOADER_CHART_COLORS: Record<string, string> = {
+	fabric: 'var(--color-platform-fabric)',
+	'legacy-fabric': 'var(--color-platform-fabric)',
+	quilt: 'var(--color-platform-quilt)',
+	forge: 'var(--color-platform-forge)',
+	neoforge: 'var(--color-platform-neoforge)',
+	neo_forge: 'var(--color-platform-neoforge)',
+	liteloader: 'var(--color-platform-liteloader)',
+	bukkit: 'var(--color-platform-bukkit)',
+	bungeecord: 'var(--color-platform-bungeecord)',
+	folia: 'var(--color-platform-folia)',
+	paper: 'var(--color-platform-paper)',
+	purpur: 'var(--color-platform-purpur)',
+	spigot: 'var(--color-platform-spigot)',
+	velocity: 'var(--color-platform-velocity)',
+	waterfall: 'var(--color-platform-waterfall)',
+	sponge: 'var(--color-platform-sponge)',
+	ornithe: 'var(--color-platform-ornithe)',
+	'bta-babric': 'var(--color-platform-bta-babric)',
+	nilloader: 'var(--color-platform-nilloader)',
+}
+const UNKNOWN_LOADER_CHART_COLOR = 'var(--color-gray)'
+
 const REGION_CODE_PATTERN = /^[a-z]{2}$/i
 const OTHER_COUNTRY_CODE = 'XX'
 const OTHER_COUNTRY_LABEL = 'Other'
@@ -108,6 +131,19 @@ function formatDownloadReasonLabel(reason: string): string {
 	}
 }
 
+function getBreakdownColor(
+	breakdownValue: string,
+	selectedBreakdown: AnalyticsBreakdownPreset,
+	fallbackColor: string,
+): string {
+	if (selectedBreakdown !== 'loader') {
+		return fallbackColor
+	}
+
+	const normalizedLoader = breakdownValue.trim().toLowerCase()
+	return LOADER_CHART_COLORS[normalizedLoader] ?? UNKNOWN_LOADER_CHART_COLOR
+}
+
 export function getMetricValue(
 	point: Labrinth.Analytics.v3.ProjectAnalytics,
 	activeStat: AnalyticsDashboardStat,
@@ -175,7 +211,8 @@ export function buildChartDatasets(
 		})
 
 		return Array.from(dataByBreakdown.entries()).map(([breakdownValue, data], index) => {
-			const color = palette[index % palette.length]
+			const fallbackColor = palette[index % palette.length]
+			const color = getBreakdownColor(breakdownValue, selectedBreakdown, fallbackColor)
 			return {
 				projectId: `breakdown:${breakdownValue}`,
 				label: formatBreakdownLabel(breakdownValue, selectedBreakdown, getVersionDisplayName),

@@ -81,6 +81,7 @@ const PINNED_DRAG_THRESHOLD_PX = 6
 const EMPTY_DATA_Y_AXIS_MAX = 10
 const EMPTY_DATA_Y_AXIS_STEP = 2
 const SECONDS_PER_HOUR = 60 * 60
+const CSS_VARIABLE_COLOR_PATTERN = /^var\(\s*(--[a-z0-9-_]+)\s*\)$/i
 
 let pinnedDragPointerId: number | null = null
 let pinnedDragStartX = 0
@@ -168,19 +169,31 @@ function withAlpha(color: string, alpha: number): string {
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
+function resolveCssColor(color: string): string {
+	const match = CSS_VARIABLE_COLOR_PATTERN.exec(color)
+	if (!match || typeof document === 'undefined') {
+		return color
+	}
+
+	const resolvedColor = getComputedStyle(document.documentElement).getPropertyValue(match[1]).trim()
+	return resolvedColor || color
+}
+
 function buildDatasets() {
 	return props.datasets.map((dataset, index) => {
+		const borderColor = resolveCssColor(dataset.borderColor)
+		const backgroundColor = resolveCssColor(dataset.backgroundColor)
 		const common = {
 			label: dataset.label,
 			data: dataset.data,
-			borderColor: dataset.borderColor,
+			borderColor,
 			borderWidth: 2,
 		}
 
 		if (props.type === 'bar') {
 			return {
 				...common,
-				backgroundColor: withAlpha(dataset.backgroundColor, 0.85),
+				backgroundColor: withAlpha(backgroundColor, 0.85),
 				borderWidth: 0,
 				stack: props.stacked ? 'analytics' : undefined,
 			}
@@ -191,15 +204,15 @@ function buildDatasets() {
 		return {
 			...common,
 			backgroundColor: props.fill
-				? withAlpha(dataset.backgroundColor, 0.3)
-				: dataset.backgroundColor,
+				? withAlpha(backgroundColor, 0.3)
+				: backgroundColor,
 			fill: lineFill,
 			tension: 0.35,
 			pointRadius: 0,
-			pointBackgroundColor: dataset.borderColor,
+			pointBackgroundColor: borderColor,
 			pointBorderWidth: 0,
 			pointHoverRadius: 4,
-			pointHoverBackgroundColor: dataset.borderColor,
+			pointHoverBackgroundColor: borderColor,
 			pointHoverBorderWidth: 0,
 			pointHitRadius: 16,
 			stack: props.stacked ? 'analytics' : undefined,
