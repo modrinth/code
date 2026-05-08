@@ -79,6 +79,12 @@
 				<span v-if="message.body.new_status === 'processing'">
 					submitted the project for review.
 				</span>
+				<span v-else-if="message.body.old_status === 'processing'">
+					reviewed the project and set its status to <Badge :type="message.body.new_status" />.
+				</span>
+				<span v-else-if="message.body.new_status === 'draft'">
+					reverted this project back to a <Badge :type="message.body.new_status" />.
+				</span>
 				<span v-else>
 					changed the project's status from <Badge :type="message.body.old_status" /> to
 					<Badge :type="message.body.new_status" />.
