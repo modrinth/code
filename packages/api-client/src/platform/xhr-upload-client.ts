@@ -27,50 +27,57 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 
 		const url = this.buildUrl(path, baseUrl, options.version)
 
-		// For FormData uploads, don't set Content-Type (let browser set multipart boundary)
-		// For file uploads, use application/octet-stream
-		const isFormData = 'formData' in options && options.formData instanceof FormData
-		const baseHeaders = this.buildDefaultHeaders()
-		// Remove Content-Type for FormData so browser can set multipart/form-data with boundary
-		if (isFormData) {
-			delete baseHeaders['Content-Type']
-		} else {
-			baseHeaders['Content-Type'] = 'application/octet-stream'
-		}
-
-		const mergedOptions: UploadRequestOptions = {
-			retry: false, // default: don't retry uploads
-			...options,
-			headers: {
-				...baseHeaders,
-				...options.headers,
-			},
-		}
-		this.attachArchonSentryCaptureHeader(mergedOptions)
-
-		const context = this.buildUploadContext(url, path, mergedOptions)
-
 		const progressCallbacks: Array<(p: UploadProgress) => void> = []
-		if (mergedOptions.onProgress) {
-			progressCallbacks.push(mergedOptions.onProgress)
+		if (options.onProgress) {
+			progressCallbacks.push(options.onProgress)
 		}
 		const abortController = new AbortController()
 
-		if (mergedOptions.signal) {
-			mergedOptions.signal.addEventListener('abort', () => abortController.abort())
+		if (options.signal) {
+			options.signal.addEventListener('abort', () => abortController.abort())
 		}
 
+		let context: RequestContext | undefined
 		const handle: UploadHandle<T> = {
-			promise: this.executeUploadFeatureChain<T>(context, progressCallbacks, abortController)
-				.then(async (result) => {
-					await this.config.hooks?.onResponse?.(result, context)
-					return result
-				})
-				.catch(async (error) => {
-					const apiError = this.normalizeError(error, context)
+			promise: (async () => {
+				const isFormData = 'formData' in options && options.formData instanceof FormData
+				const baseHeaders = await this.buildDefaultHeaders()
+				if (isFormData) {
+					delete baseHeaders['Content-Type']
+				} else {
+					baseHeaders['Content-Type'] = 'application/octet-stream'
+				}
+
+				const mergedOptions: UploadRequestOptions = {
+					retry: false,
+					...options,
+					headers: {
+						...baseHeaders,
+						...options.headers,
+					},
+				}
+				this.attachArchonSentryCaptureHeader(mergedOptions)
+
+				const uploadContext = this.buildUploadContext(url, path, mergedOptions)
+				context = uploadContext
+				if (abortController.signal.aborted) {
+					throw new ModrinthApiError('Upload cancelled')
+				}
+
+				const result = await this.executeUploadFeatureChain<T>(
+					uploadContext,
+					progressCallbacks,
+					abortController,
+				)
+				await this.config.hooks?.onResponse?.(result, uploadContext)
+				return result
+			})().catch(async (error) => {
+				const apiError = this.normalizeError(error, context)
+				if (context) {
 					await this.config.hooks?.onError?.(apiError, context)
-					throw apiError
-				}),
+				}
+				throw apiError
+			}),
 			onProgress: (callback) => {
 				progressCallbacks.push(callback)
 				return handle
