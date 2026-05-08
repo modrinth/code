@@ -1,6 +1,6 @@
 import { EditIcon, MoreVerticalIcon, TrashIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import Badge from '../../components/base/Badge.vue'
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
@@ -400,6 +400,124 @@ export const FullFeatured: StoryObj = {
 	}),
 }
 
+export const VirtualizedLargeData: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table, Badge },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Name', enableSorting: true },
+				{ key: 'email', label: 'Email', enableSorting: true },
+				{ key: 'status', label: 'Status', align: 'center' as const, width: '140px' },
+				{ key: 'role', label: 'Role', enableSorting: true, align: 'right' as const },
+			]
+			const statuses: User['status'][] = ['active', 'inactive', 'pending']
+			const roles = ['Admin', 'Editor', 'Maintainer', 'Reviewer', 'User']
+			const largeData = Array.from({ length: 10000 }, (_, index): User => {
+				const id = String(index + 1)
+				const paddedId = id.padStart(5, '0')
+
+				return {
+					id,
+					name: `User ${paddedId}`,
+					email: `user-${paddedId}@example.com`,
+					status: statuses[index % statuses.length],
+					role: roles[index % roles.length],
+				}
+			})
+			const selectedIds = ref<string[]>([])
+			const sortColumn = ref<string | undefined>('name')
+			const sortDirection = ref<'asc' | 'desc'>('asc')
+			const data = computed(() => {
+				const sorted = [...largeData]
+				const activeSortColumn = sortColumn.value
+
+				if (!activeSortColumn) {
+					return sorted
+				}
+
+				const directionFactor = sortDirection.value === 'asc' ? 1 : -1
+				sorted.sort((left, right) => {
+					return (
+						String(left[activeSortColumn as keyof User]).localeCompare(
+							String(right[activeSortColumn as keyof User]),
+							undefined,
+							{ numeric: true, sensitivity: 'base' },
+						) * directionFactor
+					)
+				})
+
+				return sorted
+			})
+
+			const statusColor = (status: string) => {
+				switch (status) {
+					case 'active':
+						return 'green'
+					case 'inactive':
+						return 'red'
+					case 'pending':
+						return 'orange'
+					default:
+						return 'gray'
+				}
+			}
+
+			function handleSort(column: string, direction: 'asc' | 'desc') {
+				console.log(`Sorting ${largeData.length} rows by ${column} ${direction}`)
+			}
+
+			return {
+				columns,
+				data,
+				selectedIds,
+				sortColumn,
+				sortDirection,
+				statusColor,
+				handleSort,
+			}
+		},
+		template: /* html */ `
+			<div class="space-y-4 max-h-[60vh] overflow-y-scroll">
+				<Table
+					:columns="columns"
+					:data="data"
+					show-selection
+					row-key="id"
+					virtualized
+					:virtual-row-height="56"
+					v-model:selected-ids="selectedIds"
+					v-model:sort-column="sortColumn"
+					v-model:sort-direction="sortDirection"
+					@sort="handleSort"
+				>
+					<template #header>
+						<div class="flex items-center justify-between gap-4">
+							<div class="text-lg font-semibold text-contrast">Virtualized members</div>
+							<div class="text-sm text-secondary">{{ data.length.toLocaleString() }} rows</div>
+						</div>
+					</template>
+					<template #cell-name="{ value, index }">
+						<div class="flex items-center gap-2">
+							<span class="text-secondary tabular-nums">#{{ index + 1 }}</span>
+							<span class="font-semibold">{{ value }}</span>
+						</div>
+					</template>
+					<template #cell-status="{ value }">
+						<div class="flex justify-center">
+							<Badge :color="statusColor(value)">{{ value }}</Badge>
+						</div>
+					</template>
+				</Table>
+				<div class="flex gap-4 text-secondary text-sm">
+					<span>Selected: {{ selectedIds.length }} items</span>
+					<span>Sort: {{ sortColumn }} ({{ sortDirection }})</span>
+				</div>
+			</div>
+		`,
+	}),
+}
+
 export const WithOverflowMenu: StoryObj = {
 	args: {},
 	render: () => ({
@@ -410,7 +528,7 @@ export const WithOverflowMenu: StoryObj = {
 				{ key: 'email', label: 'Email' },
 				{ key: 'status', label: 'Status', align: 'center' as const, width: '20%' },
 				{ key: 'role', label: 'Role' },
-				{ key: 'actions', label: '', width: '48px' },
+				{ key: 'actions', label: '', width: '68px' },
 			]
 			const data = sampleUsers
 

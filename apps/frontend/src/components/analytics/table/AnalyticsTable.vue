@@ -7,6 +7,8 @@
 			:columns="columns"
 			:data="sortedRows"
 			row-key="id"
+			virtualized
+			:virtual-row-height="56"
 		>
 			<template #header>
 				<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
