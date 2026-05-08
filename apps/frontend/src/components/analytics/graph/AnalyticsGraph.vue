@@ -124,6 +124,7 @@
 						:container-width="containerSize.width"
 						:container-height="containerSize.height"
 						:pinned="isHoverPinned"
+						:ratio-mode="isRatioMode"
 					/>
 				</template>
 			</div>

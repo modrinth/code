@@ -20,7 +20,7 @@
 				aria-label="Pinned"
 			/>
 		</div>
-		<div class="mb-1.5 flex items-center justify-between gap-4">
+		<div v-if="!ratioMode" class="mb-1.5 flex items-center justify-between gap-4">
 			<span class="font-medium text-primary">Total</span>
 			<span class="font-semibold text-contrast">{{ formattedTotal }}</span>
 		</div>
@@ -63,6 +63,7 @@ const props = defineProps<{
 	containerWidth: number
 	containerHeight: number
 	pinned: boolean
+	ratioMode: boolean
 }>()
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
