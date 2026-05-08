@@ -13,6 +13,7 @@
 		:intercom-app-id="config.public.intercomAppId as string"
 		:navigate-to-billing="() => router.push('/settings/billing')"
 		:navigate-to-servers="() => router.push('/hosting/manage')"
+		constrain-width
 		:browse-modpacks="
 			({ serverId: sid, worldId: wid, from }) => {
 				navigateTo({

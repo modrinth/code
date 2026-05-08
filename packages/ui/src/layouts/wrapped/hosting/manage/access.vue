@@ -106,7 +106,7 @@ const { formatMessage } = useVIntl()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const { serverId } = injectModrinthServerContext()
-const { addNotification } = injectNotificationManager()
+const { addNotification, removeNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 const removeMemberConfirmModal = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
@@ -382,6 +382,15 @@ function accessRoleToApiRole(
 	}
 }
 
+function accessRoleToApiPermissions(role: Exclude<ServerAccessRole, 'owner'>) {
+	switch (role) {
+		case 'editor':
+			return UserScope.EDITOR
+		case 'viewer':
+			return UserScope.VIEWER
+	}
+}
+
 function apiPermissionsToAccessRole(
 	permissions: Archon.ServerUsers.v1.UserScope,
 ): ServerAccessRole {
@@ -426,6 +435,18 @@ async function invalidateServerUsers() {
 	await queryClient.invalidateQueries({ queryKey: serverUsersQueryKey })
 }
 
+function setCachedMemberRole(member: ServerAccessMember, role: Exclude<ServerAccessRole, 'owner'>) {
+	const normalizedUsername = member.user.username.toLowerCase()
+
+	queryClient.setQueryData<Archon.ServerUsers.v1.ServerUser[]>(serverUsersQueryKey, (serverUsers) =>
+		serverUsers?.map((serverUser) =>
+			serverUser.user.username.toLowerCase() === normalizedUsername
+				? { ...serverUser, permissions: accessRoleToApiPermissions(role) }
+				: serverUser,
+		),
+	)
+}
+
 function findMemberByTarget(target: string) {
 	const normalizedTarget = target.trim().toLowerCase()
 	return members.value.find(
@@ -453,41 +474,63 @@ async function resolveMemberUserId(member: ServerAccessMember): Promise<string> 
 	}
 }
 
-function pushAuditEntry(entry: Omit<ServerAuditLogEntry, 'id' | 'timestamp' | 'actor'>) {
+function pushAuditEntry(
+	entry: Omit<ServerAuditLogEntry, 'id' | 'timestamp' | 'actor'>,
+): ServerAuditLogEntry | null {
 	const actor = currentActor.value
-	if (!actor) return
+	if (!actor) return null
 
-	auditEntries.value = [
-		{
-			...entry,
-			actor,
-			id: `audit-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-			timestamp: new Date().toISOString(),
-		},
-		...auditEntries.value,
-	]
+	const auditEntry: ServerAuditLogEntry = {
+		...entry,
+		actor,
+		id: `audit-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+		timestamp: new Date().toISOString(),
+	}
+	auditEntries.value = [auditEntry, ...auditEntries.value]
+	return auditEntry
+}
+
+function removeAuditEntry(entry: ServerAuditLogEntry | null) {
+	if (!entry) return
+	auditEntries.value = auditEntries.value.filter((auditEntry) => auditEntry.id !== entry.id)
+}
+
+function revertNotification(notification: { id: string | number; count?: number }) {
+	if (notification.count && notification.count > 1) {
+		notification.count -= 1
+		return
+	}
+	removeNotification(notification.id)
 }
 
 async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRole) {
 	if (member.isOwner || member.role === role || role === 'owner') return
+	const previousRole = member.role
+	if (previousRole === 'owner') return
+
+	await queryClient.cancelQueries({ queryKey: serverUsersQueryKey })
+	setCachedMemberRole(member, role)
+	const optimisticAuditEntry = pushAuditEntry({
+		world: null,
+		action: { type: 'role_changed', target: member.user.username, role },
+	})
+	const optimisticNotification = addNotification({
+		type: 'success',
+		title: formatMessage(messages.roleUpdatedTitle),
+		text: formatMessage(messages.roleUpdatedText, {
+			target: member.user.username,
+			role: formatRole(role),
+		}),
+	})
 
 	try {
 		const userId = await resolveMemberUserId(member)
 		await client.archon.server_users_v1.update(serverId, userId, accessRoleToApiRole(role))
 		await invalidateServerUsers()
-		pushAuditEntry({
-			world: null,
-			action: { type: 'role_changed', target: member.user.username, role },
-		})
-		addNotification({
-			type: 'success',
-			title: formatMessage(messages.roleUpdatedTitle),
-			text: formatMessage(messages.roleUpdatedText, {
-				target: member.user.username,
-				role: formatRole(role),
-			}),
-		})
 	} catch (error) {
+		setCachedMemberRole(member, previousRole)
+		removeAuditEntry(optimisticAuditEntry)
+		revertNotification(optimisticNotification)
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.roleUpdateFailedTitle),
