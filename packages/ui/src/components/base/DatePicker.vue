@@ -105,6 +105,7 @@ const props = withDefaults(
 		preserveDay?: boolean
 		wrapperClass?: string
 		inputClass?: string
+		calendarClass?: string
 	}>(),
 	{
 		disabled: false,
@@ -174,6 +175,29 @@ function applyPreserveDay(instance: Instance) {
 	nextTick(() => {
 		isPreservingDay.value = false
 	})
+}
+
+let appliedCalendarClasses: string[] = []
+
+function parseClassString(value: string | undefined): string[] {
+	if (!value) return []
+	return value.split(/\s+/).filter(Boolean)
+}
+
+function syncCalendarClasses(instance?: Instance) {
+	const container = (instance ?? picker.value)?.calendarContainer
+	if (!container) return
+
+	for (const cls of appliedCalendarClasses) {
+		container.classList.remove(cls)
+	}
+
+	const nextClasses = parseClassString(props.calendarClass)
+	for (const cls of nextClasses) {
+		container.classList.add(cls)
+	}
+
+	appliedCalendarClasses = nextClasses
 }
 
 function syncHeaderControlState(instance: Instance) {
@@ -541,8 +565,14 @@ watch(
 		syncAltInputState()
 		syncTimeInputTypes(picker.value)
 		syncPickerFromModel()
+		syncCalendarClasses()
 	},
 	{ deep: true },
+)
+
+watch(
+	() => props.calendarClass,
+	() => syncCalendarClasses(),
 )
 
 onMounted(async () => {
@@ -616,6 +646,7 @@ onMounted(async () => {
 
 			syncTimeInputTypes(instance)
 			syncHeaderControlState(instance)
+			syncCalendarClasses(instance)
 		},
 		onChange: (_selectedDates, dateStr, instance) => {
 			if (isSyncingFromModel.value) return
@@ -758,7 +789,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar) {
-	@apply mt-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary select-none;
+	@apply mt-2 rounded-2xl border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary select-none;
 	box-sizing: content-box;
 }
 

@@ -1,23 +1,67 @@
 <template>
-	<DatePicker
-		v-model="pickerRange"
-		mode="range"
-		:show-months="2"
-		:clearable="false"
-		:default-view-date="startDate"
-		calendar-only
-		wrapper-class="w-full"
-	/>
+	<div
+		class="flex flex-col gap-2.5 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4 pt-1"
+	>
+		<DatePicker
+			v-model="pickerRange"
+			mode="range"
+			:show-months="2"
+			:clearable="false"
+			:default-view-date="startDate"
+			calendar-only
+			wrapper-class="w-full"
+			calendar-class="!border-none !p-0 !pt-3"
+		/>
+		<div class="flex items-center justify-between pl-1">
+			<div class="flex gap-1.5">
+				<span v-if="formattedRange" class="text-sm font-medium text-primary">Selected:</span>
+				<span v-if="formattedRange" class="text-sm font-normal text-primary">{{
+					formattedRange
+				}}</span>
+			</div>
+			<div class="flex items-center gap-2">
+				<ButtonStyled type="outlined">
+					<button type="button" @click="$emit('cancel', $event)">Cancel</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button type="button" @click="$emit('apply', $event)">Apply</button>
+				</ButtonStyled>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
-import { DatePicker } from '@modrinth/ui'
+import { ButtonStyled, DatePicker } from '@modrinth/ui'
 
 type DatePickerValue = string | Date | null | undefined
+
+defineEmits<{
+	cancel: [event: MouseEvent]
+	apply: [event: MouseEvent]
+}>()
 
 const startDate = defineModel<string>('startDate', { required: true })
 const endDate = defineModel<string>('endDate', { required: true })
 const pickerRange = ref<DatePickerValue[]>([startDate.value, endDate.value])
+
+const rangeFormatter = new Intl.DateTimeFormat(undefined, {
+	month: 'short',
+	day: 'numeric',
+	year: 'numeric',
+})
+
+function formatDateString(value: string): string {
+	const parsed = new Date(`${value}T00:00:00`)
+	if (Number.isNaN(parsed.getTime())) return value
+	return rangeFormatter.format(parsed)
+}
+
+const formattedRange = computed(() => {
+	if (!startDate.value || !endDate.value) return ''
+	if (startDate.value === endDate.value) return formatDateString(startDate.value)
+	return `${formatDateString(startDate.value)} – ${formatDateString(endDate.value)}`
+})
 
 function getDateInputValue(date: Date): string {
 	const year = date.getFullYear()

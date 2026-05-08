@@ -20,6 +20,8 @@
 				<CustomRangeTimeframe
 					v-model:start-date="draftSelectedCustomTimeframeStartDate"
 					v-model:end-date="draftSelectedCustomTimeframeEndDate"
+					@cancel="handleCustomRangeCancel"
+					@apply="handleCustomRangeApply"
 				/>
 			</template>
 			<div
@@ -168,7 +170,8 @@ const highlightedTimeframePreset = computed<AnalyticsTimeframePreset | undefined
 })
 
 const selectedTimeframeLabel = computed(() => {
-	const useDraftTimeframeLabel = isTimeframeSelectOpen.value
+	const useDraftTimeframeLabel =
+		isTimeframeSelectOpen.value && activeTimeframePanel.value !== 'custom_range'
 
 	return getTimeframeLabel(
 		useDraftTimeframeLabel ? draftSelectedTimeframeMode.value : selectedTimeframeMode.value,
@@ -279,11 +282,13 @@ function handleTimeframeSelectOpen() {
 }
 
 function handleTimeframeSelectClose() {
-	commitTimeframeDraft()
+	if (activeTimeframePanel.value !== 'custom_range') {
+		commitTimeframeDraft()
+	}
 	isTimeframeSelectOpen.value = false
 }
 
-function closeTimeframeSelectDropdown(event: KeyboardEvent) {
+function closeTimeframeSelectDropdown(event: Event) {
 	const eventTarget = event.target
 	if (!(eventTarget instanceof HTMLElement)) {
 		isTimeframeSelectOpen.value = false
@@ -300,6 +305,19 @@ function closeTimeframeSelectDropdown(event: KeyboardEvent) {
 }
 
 async function runCustomTimeframeQuery(event: KeyboardEvent) {
+	commitTimeframeDraft()
+	closeTimeframeSelectDropdown(event)
+	await nextTick()
+	await refreshAnalyticsQuery()
+}
+
+function handleCustomRangeCancel() {
+	resetTimeframeDraft()
+	activeTimeframePanel.value = 'preset'
+}
+
+async function handleCustomRangeApply(event: MouseEvent) {
+	draftSelectedTimeframeMode.value = 'custom_range'
 	commitTimeframeDraft()
 	closeTimeframeSelectDropdown(event)
 	await nextTick()

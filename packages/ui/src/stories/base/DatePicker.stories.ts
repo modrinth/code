@@ -299,3 +299,31 @@ export const Disabled: Story = {
 		disabled: true,
 	},
 }
+
+export const CalendarClass: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-04-27')
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[420px] max-w-sm flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[300px]"
+					calendar-class="ring-2 ring-brand"
+				/>
+				<p class="text-sm text-secondary">Calendar has a brand-colored ring applied via calendarClass.</p>
+			</div>
+		`,
+	}),
+}
