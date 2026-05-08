@@ -163,6 +163,13 @@ export function getMetricValue(
 	}
 }
 
+function isMetricKindForStat(
+	point: Labrinth.Analytics.v3.ProjectAnalytics,
+	activeStat: AnalyticsDashboardStat,
+): boolean {
+	return point.metric_kind === activeStat
+}
+
 export function buildChartDatasets(
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
 	selectedProjects: AnalyticsDashboardProject[],
@@ -171,7 +178,6 @@ export function buildChartDatasets(
 	selectedBreakdown: AnalyticsBreakdownPreset,
 	selectedFilters: AnalyticsSelectedFilters,
 	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
-	expectedBreakdownValues: readonly string[] = [],
 	sliceCount: number = timeSlices.length,
 ): ChartDataset[] {
 	const selectedProjectIds = new Set(selectedProjects.map((project) => project.id))
@@ -184,18 +190,12 @@ export function buildChartDatasets(
 	if (selectedBreakdown !== 'none') {
 		const dataByBreakdown = new Map<string, number[]>()
 
-		for (const expectedValue of expectedBreakdownValues) {
-			if (expectedValue === ALL_BREAKDOWN_VALUE) continue
-			if (!dataByBreakdown.has(expectedValue)) {
-				dataByBreakdown.set(expectedValue, new Array(dataLength).fill(0))
-			}
-		}
-
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
 				if (!('source_project' in point)) continue
 				if (!selectedProjectIds.has(point.source_project)) continue
 				if (!doesAnalyticsPointMatchFilters(point, selectedFilters)) continue
+				if (!isMetricKindForStat(point, activeStat)) continue
 
 				const breakdownValue = getAnalyticsBreakdownValue(point, selectedBreakdown)
 				if (breakdownValue === ALL_BREAKDOWN_VALUE) continue

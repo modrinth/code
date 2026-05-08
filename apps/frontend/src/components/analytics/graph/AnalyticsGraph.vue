@@ -139,10 +139,7 @@
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
 import { Tabs, type TabsTab, useFormatNumber } from '@modrinth/ui'
 
-import type {
-	AnalyticsBreakdownPreset,
-	AnalyticsDashboardStat,
-} from '~/providers/analytics/analytics'
+import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
 import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
@@ -169,7 +166,6 @@ const {
 	displayedSelectedGroupBy: selectedGroupBy,
 	displayedSelectedBreakdown: selectedBreakdown,
 	displayedSelectedFilters: selectedFilters,
-	displayedFilterOptions: filterOptions,
 	isLoading,
 	getVersionDisplayName,
 } = injectAnalyticsDashboardContext()
@@ -225,33 +221,6 @@ const xAxisTickLimit = computed(() => {
 		: undefined
 })
 
-function getFallbackBreakdownValues(breakdown: AnalyticsBreakdownPreset): readonly string[] {
-	const filters = selectedFilters.value
-	const options = filterOptions.value
-	switch (breakdown) {
-		case 'country':
-			return filters.country.length > 0 ? filters.country : options.countries
-		case 'monetization':
-			return filters.monetization.length > 0 ? filters.monetization : ['monetized', 'unmonetized']
-		case 'download_source':
-			return filters.download_source.length > 0 ? filters.download_source : options.downloadSources
-		case 'download_reason':
-			return filters.download_reason.length > 0 ? filters.download_reason : options.downloadReasons
-		case 'version_id':
-			return filters.version_id.length > 0 ? filters.version_id : options.versionIds
-		case 'loader':
-			return filters.loader_type.length > 0 ? filters.loader_type : options.loaderTypes
-		case 'game_version':
-			return filters.game_version.length > 0 ? filters.game_version : options.gameVersions
-		default:
-			return []
-	}
-}
-
-const expectedBreakdownValues = computed(() =>
-	selectedBreakdown.value === 'none' ? [] : getFallbackBreakdownValues(selectedBreakdown.value),
-)
-
 const allChartDatasets = computed(() =>
 	buildChartDatasets(
 		timeSlices.value,
@@ -261,7 +230,6 @@ const allChartDatasets = computed(() =>
 		selectedBreakdown.value,
 		selectedFilters.value,
 		getVersionDisplayName,
-		expectedBreakdownValues.value,
 		sliceCount.value,
 	),
 )

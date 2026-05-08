@@ -121,7 +121,6 @@ const {
 	displayedSelectedFilters: selectedFilters,
 	displayedFetchRequest: fetchRequest,
 	displayedTimeSlices: timeSlices,
-	displayedFilterOptions: filterOptions,
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
 	getVersionDisplayName,
@@ -218,9 +217,6 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 			breakdownValues.add(projectId)
 		}
 	} else {
-		for (const fallback of getFallbackBreakdownValues(nextSelectedBreakdown)) {
-			breakdownValues.add(fallback)
-		}
 		for (const slice of nextTimeSlices) {
 			for (const point of slice) {
 				if (!('source_project' in point)) continue
@@ -489,29 +485,6 @@ function getBreakdownValue(
 	selectedBreakdown: AnalyticsBreakdownPreset,
 ): string {
 	return getAnalyticsBreakdownValue(point, selectedBreakdown)
-}
-
-function getFallbackBreakdownValues(breakdown: AnalyticsBreakdownPreset): readonly string[] {
-	const filters = selectedFilters.value
-	const options = filterOptions.value
-	switch (breakdown) {
-		case 'country':
-			return filters.country.length > 0 ? filters.country : options.countries
-		case 'monetization':
-			return filters.monetization.length > 0 ? filters.monetization : ['monetized', 'unmonetized']
-		case 'download_source':
-			return filters.download_source.length > 0 ? filters.download_source : options.downloadSources
-		case 'download_reason':
-			return filters.download_reason.length > 0 ? filters.download_reason : options.downloadReasons
-		case 'version_id':
-			return filters.version_id.length > 0 ? filters.version_id : options.versionIds
-		case 'loader':
-			return filters.loader_type.length > 0 ? filters.loader_type : options.loaderTypes
-		case 'game_version':
-			return filters.game_version.length > 0 ? filters.game_version : options.gameVersions
-		default:
-			return []
-	}
 }
 
 function getSortComparison(

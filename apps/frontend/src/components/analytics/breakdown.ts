@@ -13,7 +13,7 @@ export function getAnalyticsBreakdownValue(
 		case 'none':
 			return ALL_BREAKDOWN_VALUE
 		case 'country':
-			return normalizeBreakdownValue('country' in point ? point.country : undefined)
+			return normalizeBreakdownValue('country' in point ? point.country?.toUpperCase() : undefined)
 		case 'monetization': {
 			if ('monetized' in point && typeof point.monetized === 'boolean') {
 				return point.monetized ? 'monetized' : 'unmonetized'
