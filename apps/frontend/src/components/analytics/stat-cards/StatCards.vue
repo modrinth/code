@@ -38,7 +38,7 @@ const compactNumberFormatter = computed(
 	() =>
 		new Intl.NumberFormat(undefined, {
 			notation: 'compact',
-			maximumFractionDigits: 1,
+			maximumSignificantDigits: 3,
 		}),
 )
 
