@@ -3668,11 +3668,11 @@
   "servers.grant-access-modal.target.no-suggestions": {
     "defaultMessage": "No matching users found."
   },
-  "servers.grant-access-modal.target.searching": {
-    "defaultMessage": "Searching..."
-  },
   "servers.grant-access-modal.target.placeholder": {
     "defaultMessage": "Enter a username"
+  },
+  "servers.grant-access-modal.target.searching": {
+    "defaultMessage": "Searching..."
   },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installation failed"
