@@ -105,7 +105,7 @@
 			/>
 		</div>
 
-		<div v-if="totalPages > 1" class="mt-4 flex justify-end">
+		<div v-if="totalPages > 1" class="flex justify-end">
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 		</div>
 	</div>
