@@ -122,7 +122,7 @@
 					<div class="flex flex-wrap items-center gap-2">
 						<div>
 							<Combobox
-								v-model="selectedBreakdown"
+								v-model="selectedBreakdownValue"
 								:options="breakdownOptions"
 								:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 								:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
@@ -130,7 +130,7 @@
 								<template #suffix>
 									<div class="mr-0.5 flex gap-1.5">
 										<button
-											v-if="selectedBreakdown !== 'none'"
+											v-if="selectedBreakdownValue !== 'none'"
 											type="button"
 											class="inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent shadow-none transition-colors hover:bg-transparent hover:text-contrast"
 											aria-label="Clear breakdown"
@@ -140,7 +140,7 @@
 											<XIcon class="size-4 text-primary" />
 										</button>
 										<div
-											v-if="selectedBreakdown !== 'none'"
+											v-if="selectedBreakdownValue !== 'none'"
 											class="h-5 w-[1px] shrink-0 bg-surface-5"
 										></div>
 									</div>
@@ -176,6 +176,8 @@ import {
 
 import DownloadsThresholdInput from './DownloadsThresholdInput.vue'
 import {
+	cloneSelectedFilters,
+	getAnalyticsFilterCategoryForBreakdown,
 	getAnalyticsStatsForBreakdown,
 	getAnalyticsStatsForFilterCategory,
 	getEnabledAnalyticsStatsForState,
@@ -295,6 +297,22 @@ function clearDraftSelectedProjects() {
 function selectAllProjectsMode() {
 	draftSelectedProjectIds.value = []
 }
+
+const selectedBreakdownValue = computed<AnalyticsBreakdownPreset>({
+	get: () => selectedBreakdown.value,
+	set: (nextBreakdown) => {
+		selectedBreakdown.value = nextBreakdown
+
+		const filterCategory = getAnalyticsFilterCategoryForBreakdown(nextBreakdown)
+		if (!filterCategory || selectedFilters.value[filterCategory].length === 0) {
+			return
+		}
+
+		const nextFilters = cloneSelectedFilters(selectedFilters.value)
+		nextFilters[filterCategory] = []
+		selectedFilters.value = nextFilters
+	},
+})
 
 function clearSelectedBreakdown() {
 	selectedBreakdown.value = 'none'

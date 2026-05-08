@@ -74,6 +74,20 @@ const ANALYTICS_DIMENSION_BY_FILTER_CATEGORY: Record<
 	loader_type: 'loader_type',
 }
 
+const ANALYTICS_FILTER_CATEGORY_BY_BREAKDOWN: Record<
+	AnalyticsBreakdownPreset,
+	Exclude<AnalyticsQueryFilterCategory, 'project'> | null
+> = {
+	none: null,
+	country: 'country',
+	monetization: 'monetization',
+	download_source: 'download_source',
+	download_reason: 'download_reason',
+	version_id: 'version_id',
+	loader: 'loader_type',
+	game_version: 'game_version',
+}
+
 export type FilterOption = {
 	value: string
 	label: string
@@ -115,6 +129,12 @@ export function getAnalyticsStatsForFilterCategory(
 	}
 
 	return getAnalyticsStatsForDimension(ANALYTICS_DIMENSION_BY_FILTER_CATEGORY[category])
+}
+
+export function getAnalyticsFilterCategoryForBreakdown(
+	breakdown: AnalyticsBreakdownPreset,
+): Exclude<AnalyticsQueryFilterCategory, 'project'> | null {
+	return ANALYTICS_FILTER_CATEGORY_BY_BREAKDOWN[breakdown]
 }
 
 function getAnalyticsStatsForFilterScope(
