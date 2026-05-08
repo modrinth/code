@@ -27,8 +27,13 @@
 					>
 						<button
 							type="button"
-							class="inline-flex cursor-pointer items-center gap-1.5 text-sm transition-all hover:brightness-125"
-							:class="legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary'"
+							class="inline-flex items-center gap-1.5 text-sm !outline-0 transition-all focus-within:!outline-0 focus:!outline-0 focus-visible:!outline-0"
+							:class="[
+								legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary',
+								isLegendEntryToggleDisabled(legendEntry)
+									? 'cursor-default'
+									: 'cursor-pointer hover:brightness-125',
+							]"
 							:aria-pressed="!legendEntry.hidden"
 							@click="onLegendEntryClick($event, legendEntry.id)"
 						>
@@ -436,11 +441,16 @@ const visibleChartDatasetById = computed(() => {
 	return datasets
 })
 
+function isLegendEntryToggleDisabled(legendEntry: LegendEntry) {
+	return !legendEntry.hidden && legendEntries.value.length <= 1
+}
+
 function toggleLegendEntryVisibility(datasetId: string) {
 	const nextHiddenDatasetIds = new Set(hiddenDatasetIds.value)
 	if (nextHiddenDatasetIds.has(datasetId)) {
 		nextHiddenDatasetIds.delete(datasetId)
 	} else {
+		if (legendEntries.value.length <= 1) return
 		nextHiddenDatasetIds.add(datasetId)
 	}
 	hiddenDatasetIds.value = nextHiddenDatasetIds

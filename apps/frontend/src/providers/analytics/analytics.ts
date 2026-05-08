@@ -899,6 +899,9 @@ export function createAnalyticsDashboardContext(
 		},
 		enabled: computed(() => isAnalyticsFetchRequestReady(fetchRequest.value)),
 	})
+	const isCurrentTimeSliceLoading = computed(
+		() => isAnalyticsFetchRequestReady(fetchRequest.value) && currentTimeSlicePending.value,
+	)
 
 	const analyticsFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
 		if (sortedSelectedProjectIds.value.length === 0) {
@@ -1028,7 +1031,6 @@ export function createAnalyticsDashboardContext(
 
 	const {
 		data: previousTimeSliceData,
-		isPending: previousTimeSlicePending,
 		isFetching: previousFetching,
 		refetch: refetchPreviousTimeSlices,
 	} = useQuery({
@@ -1089,6 +1091,7 @@ export function createAnalyticsDashboardContext(
 
 	watch(fetchRequest, (nextFetchRequest) => {
 		if (isAnalyticsFetchRequestReady(nextFetchRequest)) {
+			previousTimeSlices.value = []
 			return
 		}
 		timeSlices.value = []
@@ -1194,7 +1197,7 @@ export function createAnalyticsDashboardContext(
 		playtime: getPercentChange(currentTotals.value.playtime, previousTotals.value.playtime),
 	}))
 
-	const isLoading = computed(() => currentTimeSlicePending.value || previousTimeSlicePending.value)
+	const isLoading = computed(() => isCurrentTimeSliceLoading.value)
 	const isRefetching = computed(() => currentFetching.value || previousFetching.value)
 	watch(
 		[
