@@ -181,56 +181,35 @@ export async function enrichReportBatch(reports: Report[]): Promise<ExtendedRepo
 }
 
 // Doesn't need to be in @modrinth/moderation because it is specific to the frontend.
-export interface ModerationProject {
-	project: any
-	owner: TeamMember | null
-	org: Organization | null
+export interface ModerationOwnershipUser {
+	kind: 'user'
+	id: string
+	name: string
+	icon_url: string | null
 }
 
-export async function enrichProjectBatch(projects: any[]): Promise<ModerationProject[]> {
-	const teamIds = [...new Set(projects.map((p) => p.team_id).filter(Boolean))]
-	const orgIds = [...new Set(projects.map((p) => p.organization).filter(Boolean))]
+export interface ModerationOwnershipOrganization {
+	kind: 'organization'
+	id: string
+	name: string
+	icon_url: string | null
+}
 
-	const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
-		teamIds.length > 0
-			? fetchSegmented(teamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
-			: Promise.resolve([]),
-		orgIds.length > 0
-			? fetchSegmented(orgIds, (ids) => `organizations?ids=${asEncodedJsonArray(ids)}`, {
-					apiVersion: 3,
-				})
-			: Promise.resolve([]),
-	])
+export type ModerationOwnership = ModerationOwnershipUser | ModerationOwnershipOrganization
 
-	const cache = useModerationCache()
+export interface ProjectWithOwnership {
+	ownership: ModerationOwnership
+	[key: string]: any
+}
 
-	teamsData.forEach((team) => {
-		if (team.length > 0) cache.teams.value.set(team[0].team_id, team)
-	})
+export interface ModerationProject {
+	project: any
+	ownership: ModerationOwnership | null
+}
 
-	orgsData.forEach((org: Organization) => {
-		cache.orgs.value.set(org.id, org)
-	})
-
-	return projects.map((project) => {
-		let owner: TeamMember | null = null
-		let org: Organization | null = null
-
-		if (project.team_id) {
-			const teamMembers = cache.teams.value.get(project.team_id)
-			if (teamMembers) {
-				owner = teamMembers.find((member) => member.role === 'Owner') || null
-			}
-		}
-
-		if (project.organization) {
-			org = cache.orgs.value.get(project.organization) || null
-		}
-
-		return {
-			project,
-			owner,
-			org,
-		} as ModerationProject
-	})
+export function toModerationProjects(projects: ProjectWithOwnership[]): ModerationProject[] {
+	return projects.map(({ ownership, ...project }) => ({
+		project,
+		ownership: ownership ?? null,
+	}))
 }

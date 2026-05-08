@@ -1998,7 +1998,7 @@
     "defaultMessage": "Failed"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listed"
+    "defaultMessage": "Public"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
@@ -2037,7 +2037,7 @@
     "defaultMessage": "Fail"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Withheld"
+    "defaultMessage": "Unlisted by staff"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copy code to clipboard"

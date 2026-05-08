@@ -164,6 +164,9 @@
   "app.export-modal.header": {
     "message": "Export modpack"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Include \"{file}\"?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpack Name"
   },
@@ -171,7 +174,7 @@
     "message": "Modpack name"
   },
   "app.export-modal.select-files-label": {
-    "message": "Select files and folders to include in pack"
+    "message": "Configure which files are included in this export"
   },
   "app.export-modal.version-number-label": {
     "message": "Version number"
