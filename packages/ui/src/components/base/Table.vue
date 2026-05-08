@@ -120,7 +120,6 @@ import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
 import { computed, toRef, useSlots } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
-
 import Checkbox from './Checkbox.vue'
 
 export type TableColumnAlign = 'left' | 'center' | 'right'
