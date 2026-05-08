@@ -40,7 +40,6 @@ const LOADER_CHART_COLORS: Record<string, string> = {
 	'bta-babric': 'var(--color-platform-bta-babric)',
 	nilloader: 'var(--color-platform-nilloader)',
 }
-const UNKNOWN_LOADER_CHART_COLOR = 'var(--color-gray)'
 
 const REGION_CODE_PATTERN = /^[a-z]{2}$/i
 const OTHER_COUNTRY_CODE = 'XX'
@@ -141,7 +140,7 @@ function getBreakdownColor(
 	}
 
 	const normalizedLoader = breakdownValue.trim().toLowerCase()
-	return LOADER_CHART_COLORS[normalizedLoader] ?? UNKNOWN_LOADER_CHART_COLOR
+	return LOADER_CHART_COLORS[normalizedLoader] ?? fallbackColor
 }
 
 export function getMetricValue(

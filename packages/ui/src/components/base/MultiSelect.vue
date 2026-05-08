@@ -216,7 +216,7 @@
 									},
 								]"
 								tabindex="-1"
-								@click="toggleOption(item)"
+								@click="toggleOption(item, $event)"
 								@mouseenter="!item.disabled && (focusedIndex = index)"
 							>
 								<span
@@ -403,6 +403,8 @@ const overflowTags = computed(() => {
 
 const popperOverflowTags = shallowRef<MultiSelectOption<T>[]>([])
 
+const lastClickedValue = shallowRef<{ value: T } | null>(null)
+
 const filteredOptions = computed(() => {
 	if (!searchQuery.value || !props.searchable || props.disableSearchFilter) {
 		return props.options
@@ -429,14 +431,43 @@ function isSelected(value: T) {
 	return props.modelValue.includes(value)
 }
 
-function toggleOption(option: MultiSelectOption<T>) {
+function toggleOption(option: MultiSelectOption<T>, event?: MouseEvent | KeyboardEvent) {
 	if (option.disabled) return
+
+	if (event?.shiftKey && lastClickedValue.value) {
+		const anchorValue = lastClickedValue.value.value
+		const anchorIndex = filteredOptions.value.findIndex((opt) => opt.value === anchorValue)
+		const currentIndex = filteredOptions.value.findIndex((opt) => opt.value === option.value)
+
+		if (anchorIndex !== -1 && currentIndex !== -1 && anchorIndex !== currentIndex) {
+			const start = Math.min(anchorIndex, currentIndex)
+			const end = Math.max(anchorIndex, currentIndex)
+			const shouldSelect = !isSelected(option.value)
+			const newValue = [...props.modelValue]
+
+			for (let i = start; i <= end; i++) {
+				const opt = filteredOptions.value[i]
+				if (opt.disabled) continue
+				const idx = newValue.indexOf(opt.value)
+				if (shouldSelect && idx === -1) {
+					newValue.push(opt.value)
+				} else if (!shouldSelect && idx !== -1) {
+					newValue.splice(idx, 1)
+				}
+			}
+
+			emit('update:modelValue', newValue)
+			lastClickedValue.value = { value: option.value }
+			return
+		}
+	}
 
 	const newValue = isSelected(option.value)
 		? props.modelValue.filter((v) => v !== option.value)
 		: [...props.modelValue, option.value]
 
 	emit('update:modelValue', newValue)
+	lastClickedValue.value = { value: option.value }
 }
 
 function removeTag(value: T) {
@@ -687,7 +718,7 @@ function handleDropdownKeydown(event: KeyboardEvent) {
 				toggleSelectAll()
 			} else if (focusedIndex.value >= 0) {
 				const option = filteredOptions.value[focusedIndex.value]
-				if (option) toggleOption(option)
+				if (option) toggleOption(option, event)
 			}
 			break
 		case 'Tab':
@@ -718,7 +749,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
 				toggleSelectAll()
 			} else if (focusedIndex.value >= 0) {
 				const option = filteredOptions.value[focusedIndex.value]
-				if (option) toggleOption(option)
+				if (option) toggleOption(option, event)
 			}
 		}
 	} else if (event.key === 'Tab' && isOpen.value) {

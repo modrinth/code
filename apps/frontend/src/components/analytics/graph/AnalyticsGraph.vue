@@ -224,6 +224,14 @@ const lightLegendPalette = [
 	'#332288',
 	'#44AA99',
 	'#882255',
+	'#A04500',
+	'#007F3A',
+	'#8E4070',
+	'#004A74',
+	'#5C45D3',
+	'#A37100',
+	'#B83377',
+	'#2F756A',
 ]
 
 const darkLegendPalette = [
@@ -235,6 +243,14 @@ const darkLegendPalette = [
 	'#A78BFA',
 	'#FF7A59',
 	'#4DD0C8',
+	'#B87C00',
+	'#119547',
+	'#B05690',
+	'#2D7AB5',
+	'#6F58CC',
+	'#B8AD30',
+	'#2A938B',
+	'#CC5239',
 ]
 
 const theme = useTheme()
@@ -339,6 +355,9 @@ const hiddenDatasetIds = ref<Set<string>>(new Set())
 const showAllLegendEntries = ref(false)
 
 const LEGEND_MAX_ITEMS = 8
+const LEGEND_EXPANDED_MAX_ITEMS = 24
+const OTHER_LEGEND_ENTRY_ID = '__analytics_other__'
+const OTHER_LEGEND_ENTRY_COLOR = '#9ca3af'
 
 type LegendEntry = {
 	id: string
@@ -442,9 +461,36 @@ const legendEntries = computed<LegendEntry[]>(() =>
 		})),
 )
 
-const displayedLegendEntries = computed(() =>
-	showAllLegendEntries.value ? legendEntries.value : legendEntries.value.slice(0, LEGEND_MAX_ITEMS),
-)
+const otherBundledLegendIds = computed<string[]>(() => {
+	if (!showAllLegendEntries.value) return []
+	if (legendEntries.value.length <= LEGEND_EXPANDED_MAX_ITEMS) return []
+	return legendEntries.value.slice(LEGEND_EXPANDED_MAX_ITEMS - 1).map((entry) => entry.id)
+})
+
+const otherLegendEntry = computed<LegendEntry | null>(() => {
+	const bundledIds = otherBundledLegendIds.value
+	if (bundledIds.length === 0) return null
+	const idSet = new Set(bundledIds)
+	const totalValue = legendEntries.value
+		.filter((entry) => idSet.has(entry.id))
+		.reduce((sum, entry) => sum + entry.totalValue, 0)
+	return {
+		id: OTHER_LEGEND_ENTRY_ID,
+		name: 'Other',
+		color: OTHER_LEGEND_ENTRY_COLOR,
+		totalValue,
+		hidden: hiddenDatasetIds.value.has(OTHER_LEGEND_ENTRY_ID),
+	}
+})
+
+const displayedLegendEntries = computed<LegendEntry[]>(() => {
+	if (!showAllLegendEntries.value) {
+		return legendEntries.value.slice(0, LEGEND_MAX_ITEMS)
+	}
+	const other = otherLegendEntry.value
+	if (!other) return legendEntries.value
+	return [...legendEntries.value.slice(0, LEGEND_EXPANDED_MAX_ITEMS - 1), other]
+})
 
 const canShowMoreLegendEntries = computed(
 	() => !showAllLegendEntries.value && legendEntries.value.length > LEGEND_MAX_ITEMS,
@@ -453,10 +499,38 @@ const canShowLessLegendEntries = computed(
 	() => showAllLegendEntries.value && legendEntries.value.length > LEGEND_MAX_ITEMS,
 )
 
+const otherChartDataset = computed<ChartDataset | null>(() => {
+	const bundledIds = otherBundledLegendIds.value
+	if (bundledIds.length === 0) return null
+	const idSet = new Set(bundledIds)
+	const datasets = allChartDatasets.value.filter((dataset) => idSet.has(dataset.projectId))
+	if (datasets.length === 0) return null
+
+	const sliceLength = datasets[0].data.length
+	const data = new Array<number>(sliceLength).fill(0)
+	for (const dataset of datasets) {
+		for (let i = 0; i < sliceLength; i++) {
+			data[i] += dataset.data[i] ?? 0
+		}
+	}
+
+	return {
+		...datasets[0],
+		projectId: OTHER_LEGEND_ENTRY_ID,
+		label: 'Other',
+		data,
+		borderColor: OTHER_LEGEND_ENTRY_COLOR,
+		backgroundColor: OTHER_LEGEND_ENTRY_COLOR,
+	}
+})
+
 const chartDatasetById = computed(() => {
 	const datasets = new Map<string, ChartDataset>()
 	for (const dataset of allChartDatasets.value) {
 		datasets.set(dataset.projectId, dataset)
+	}
+	if (otherChartDataset.value) {
+		datasets.set(OTHER_LEGEND_ENTRY_ID, otherChartDataset.value)
 	}
 	return datasets
 })
@@ -504,7 +578,9 @@ const visibleChartDatasetById = computed(() => {
 })
 
 function isLegendEntryToggleDisabled(legendEntry: LegendEntry) {
-	return !legendEntry.hidden && legendEntries.value.length <= 1
+	if (legendEntry.hidden) return false
+	const visibleCount = displayedLegendEntries.value.filter((entry) => !entry.hidden).length
+	return visibleCount <= 1
 }
 
 function toggleLegendEntryVisibility(datasetId: string) {
@@ -512,14 +588,17 @@ function toggleLegendEntryVisibility(datasetId: string) {
 	if (nextHiddenDatasetIds.has(datasetId)) {
 		nextHiddenDatasetIds.delete(datasetId)
 	} else {
-		if (legendEntries.value.length <= 1) return
+		const visibleCount = displayedLegendEntries.value.filter((entry) => !entry.hidden).length
+		if (visibleCount <= 1) return
 		nextHiddenDatasetIds.add(datasetId)
 	}
 	hiddenDatasetIds.value = nextHiddenDatasetIds
 }
 
 function soloLegendEntry(datasetId: string) {
-	const otherIds = legendEntries.value.map((entry) => entry.id).filter((id) => id !== datasetId)
+	const otherIds = displayedLegendEntries.value
+		.map((entry) => entry.id)
+		.filter((id) => id !== datasetId)
 	const isAlreadySolo =
 		!hiddenDatasetIds.value.has(datasetId) && otherIds.every((id) => hiddenDatasetIds.value.has(id))
 	hiddenDatasetIds.value = isAlreadySolo ? new Set() : new Set(otherIds)
@@ -554,6 +633,7 @@ watch(isDataLoading, (loading) => {
 
 watch(allChartDatasets, (datasets) => {
 	const availableDatasetIds = new Set(datasets.map((dataset) => dataset.projectId))
+	availableDatasetIds.add(OTHER_LEGEND_ENTRY_ID)
 	if (hiddenDatasetIds.value.size > 0) {
 		const nextHiddenDatasetIds = new Set(
 			Array.from(hiddenDatasetIds.value).filter((datasetId) => availableDatasetIds.has(datasetId)),
