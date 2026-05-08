@@ -229,6 +229,7 @@ const filterTypes: ComboboxOption<string>[] = [
 	{ value: 'Plugins', label: 'Plugins' },
 	{ value: 'Shaders', label: 'Shaders' },
 	{ value: 'Servers', label: 'Servers' },
+	{ value: 'Fucked up', label: 'Fucked up' },
 ]
 const filterTypeValues = filterTypes.map((option) => option.value)
 const DEFAULT_FILTER_TYPE = filterTypeValues[0]
@@ -381,7 +382,11 @@ const baseFiltered = computed(() => {
 })
 
 const typeFiltered = computed(() => {
-	if (currentFilterType.value === 'All projects') return baseFiltered.value
+	if (currentFilterType.value === 'All projects') {
+		return baseFiltered.value
+	} else if (currentFilterType.value === 'Fucked up') {
+		return baseFiltered.value.filter((queueItem) => queueItem.project.project_types.length === 0)
+	}
 
 	const filterMap: Record<string, string> = {
 		Modpacks: 'modpack',
