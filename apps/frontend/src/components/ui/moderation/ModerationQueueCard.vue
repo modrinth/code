@@ -33,7 +33,7 @@
 							/>
 							<span class="text-sm font-medium text-secondary">
 								{{
-									queueEntry.project.project_types.map((t) => formatProjectType(t, true)).join(', ')
+									queueEntry.project.project_types.length === 0 ? '???' : queueEntry.project.project_types.map((t) => formatProjectType(t, true)).join(', ')
 								}}
 							</span>
 						</div>
@@ -94,12 +94,12 @@
 
 				<div class="flex items-center gap-2">
 					<ButtonStyled circular >
-						<button @click="copyId" v-tooltip="'Copy ID'">
+						<button v-tooltip="'Copy ID'" @click="copyId">
 							<ClipboardCopyIcon />
 						</button>
 					</ButtonStyled>
 					<ButtonStyled circular >
-						<button @click="copyLink" v-tooltip="'Copy link'">
+						<button v-tooltip="'Copy link'" @click="copyLink">
 							<LinkIcon />
 						</button>
 					</ButtonStyled>

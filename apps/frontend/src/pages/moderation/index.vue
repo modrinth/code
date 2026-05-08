@@ -106,7 +106,6 @@
 </template>
 <script setup lang="ts">
 import {
-	HashIcon,
 	ListFilterIcon,
 	ScaleIcon,
 	SearchIcon,
