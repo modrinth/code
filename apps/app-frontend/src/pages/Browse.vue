@@ -754,7 +754,8 @@ function getCardActions(
 					}
 
 					const contentType = currentProjectType as BrowseInstallContentType
-					const shouldShowInstalling = contentType === 'modpack' || !isQueued
+					const isModpack = contentType === 'modpack'
+					const shouldShowInstalling = isModpack || !isQueued
 					if (shouldShowInstalling) {
 						setProjectInstalling(projectResult.project_id, true)
 					}
@@ -762,10 +763,12 @@ function getCardActions(
 						await requestInstall({
 							project: projectResult,
 							contentType,
-							mode: contentType === 'modpack' ? 'immediate' : 'queue',
-							selectedFilters: searchState.currentFilters.value,
-							providedFilters: combinedProvidedFilters.value,
-							overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+							mode: isModpack ? 'immediate' : 'queue',
+							selectedFilters: isModpack ? [] : searchState.currentFilters.value,
+							providedFilters: isModpack ? [] : combinedProvidedFilters.value,
+							overriddenProvidedFilterTypes: isModpack
+								? []
+								: searchState.overriddenProvidedFilterTypes.value,
 							targetPreferences: getServerInstallTargetPreferences(contentType),
 							getProjectVersions: getInstallProjectVersions,
 							queue: serverInstallQueue,

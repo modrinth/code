@@ -17,7 +17,7 @@
 			:class="{
 				'bg-brand border-button-border text-brand-inverted': modelValue,
 				'bg-surface-2 border-surface-5 text-primary': !modelValue,
-				'checkbox-shadow group-active:scale-95': disabled,
+				'checkbox-shadow group-active:scale-95': !disabled,
 			}"
 		>
 			<MinusIcon v-if="indeterminate" aria-hidden="true" stroke-width="3" />

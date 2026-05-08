@@ -478,9 +478,11 @@ async function serverInstall(project: InstallableSearchResult) {
 			project,
 			contentType,
 			mode: isModpack ? 'immediate' : 'queue',
-			selectedFilters: searchState.currentFilters.value,
-			providedFilters: serverFilters.value,
-			overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+			selectedFilters: isModpack ? [] : searchState.currentFilters.value,
+			providedFilters: isModpack ? [] : serverFilters.value,
+			overriddenProvidedFilterTypes: isModpack
+				? []
+				: searchState.overriddenProvidedFilterTypes.value,
 			targetPreferences: getServerInstallTargetPreferences(contentType),
 			getProjectVersions: getInstallProjectVersions,
 			queue: serverInstallQueue,

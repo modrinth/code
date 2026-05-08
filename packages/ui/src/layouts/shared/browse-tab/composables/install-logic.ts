@@ -211,10 +211,11 @@ export function getTargetInstallPreferences(
 ): BrowseInstallPreferences {
 	const gameVersion = target.gameVersion?.trim()
 	const loader = target.loader?.trim()
+	const shouldUseTargetRuntime = contentType !== 'modpack'
 
 	return normalizeInstallPreferences({
-		gameVersions: gameVersion ? [gameVersion] : undefined,
-		loaders: loader && contentType !== 'modpack' ? [loader] : undefined,
+		gameVersions: gameVersion && shouldUseTargetRuntime ? [gameVersion] : undefined,
+		loaders: loader && shouldUseTargetRuntime ? [loader] : undefined,
 	})
 }
 
