@@ -108,7 +108,7 @@
     "message": "Add server to instance"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Add servers to your instance"
+    "message": "Adding server to instance"
   },
   "app.browse.add-to-instance": {
     "message": "Add to instance"
@@ -135,7 +135,7 @@
     "message": "Hide already installed content"
   },
   "app.browse.install-content-to-instance": {
-    "message": "Install content to instance"
+    "message": "Installing content"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -148,6 +148,12 @@
   },
   "app.browse.server.installing": {
     "message": "Installing"
+  },
+  "app.browse.server.queued": {
+    "message": "Selected"
+  },
+  "app.browse.server.validating": {
+    "message": "Validating"
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"

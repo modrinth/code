@@ -1,12 +1,12 @@
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import {
+	type BrowseInstallPlan,
+	type BrowseSelectedProject,
 	createContext,
 	type CreationFlowContextValue,
 	flushInstallQueue,
 	injectModrinthClient,
 	injectNotificationManager,
-	type BrowseInstallPlan,
-	type BrowseSelectedProject,
 } from '@modrinth/ui'
 import { computed, type ComputedRef, nextTick, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

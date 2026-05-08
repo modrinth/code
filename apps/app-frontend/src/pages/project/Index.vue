@@ -288,6 +288,7 @@ import {
 	get_version_many,
 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
+import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_profile_path } from '@/helpers/process'
 import {
 	get as getInstance,
@@ -295,7 +296,6 @@ import {
 	kill,
 	list as listInstances,
 } from '@/helpers/profile'
-import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { getServerLatency } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'

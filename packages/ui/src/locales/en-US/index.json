@@ -95,6 +95,42 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Resubscribe to Server"
   },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Selected projects"
+  },
+  "browse.selected-projects-floating-bar.clear": {
+    "defaultMessage": "Clear"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Install {count, plural, one {# project} other {# projects}}"
+  },
+  "browse.selected-projects-floating-bar.installing": {
+    "defaultMessage": "Installing"
+  },
+  "browse.selected-projects-floating-bar.leave-installing-warning": {
+    "defaultMessage": "Selected projects are still being installed. Are you sure you want to leave?"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# project selected} other {# projects selected}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "You have selected {count, plural, one {# project} other {# projects}} to install. Install them now or go back without installing them."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Selected projects not installed yet"
+  },
+  "browse.selected-projects-leave-modal.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Discard"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Selected projects not installed yet"
+  },
+  "browse.selected-projects-leave-modal.install": {
+    "defaultMessage": "Install"
+  },
   "button.accept": {
     "defaultMessage": "Accept"
   },

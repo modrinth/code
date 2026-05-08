@@ -994,11 +994,10 @@ provideBrowseManager({
 		path: `/project/${result.project_id ?? result.slug}`,
 		query: getProjectBrowseQuery(),
 	}),
-	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
-		({
-			path: `/project/${result.slug ?? result.project_id}`,
-			query: getProjectBrowseQuery(),
-		}),
+	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
+		path: `/project/${result.slug ?? result.project_id}`,
+		query: getProjectBrowseQuery(),
+	}),
 	selectableProjectTypes,
 	showProjectTypeTabs: computed(() => !isServerContext.value),
 	variant: 'app',

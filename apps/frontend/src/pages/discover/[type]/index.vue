@@ -55,10 +55,8 @@ const queryClient = useQueryClient()
 
 const filtersMenuOpen = ref(false)
 const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
-const { isStuck: isInstallHeaderStuck } = useStickyObserver(
-	stickyInstallHeaderRef,
-	'DiscoverInstallHeader',
-)
+
+useStickyObserver(stickyInstallHeaderRef, 'DiscoverInstallHeader')
 
 const route = useRoute()
 

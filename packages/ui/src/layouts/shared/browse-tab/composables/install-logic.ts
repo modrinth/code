@@ -87,8 +87,9 @@ export interface SelectedInstallPreferencesOptions {
  * Version fetching is injected so this module stays platform-agnostic and can be used by both web
  * and app frontends.
  */
-export interface ResolveInstallPlanOptions<TProject extends BrowseInstallProject>
-	extends SelectedInstallPreferencesOptions {
+export interface ResolveInstallPlanOptions<
+	TProject extends BrowseInstallProject,
+> extends SelectedInstallPreferencesOptions {
 	project: TProject
 	contentType: BrowseInstallContentType
 	targetPreferences?: BrowseInstallPreferences
@@ -100,8 +101,9 @@ export interface ResolveInstallPlanOptions<TProject extends BrowseInstallProject
  *
  * Queue mode stores the resolved plan; immediate mode passes it to the caller's install handler.
  */
-export interface RequestInstallOptions<TProject extends BrowseInstallProject>
-	extends ResolveInstallPlanOptions<TProject> {
+export interface RequestInstallOptions<
+	TProject extends BrowseInstallProject,
+> extends ResolveInstallPlanOptions<TProject> {
 	mode: 'queue' | 'immediate'
 	queue?: BrowseInstallQueue<TProject>
 	install?: (plan: BrowseInstallPlan<TProject>) => void | Promise<void>
@@ -197,10 +199,7 @@ export function getInstallPreferencesFromFilters(
 export function getSelectedInstallPreferences(
 	options: SelectedInstallPreferencesOptions,
 ): BrowseInstallPreferences {
-	return getInstallPreferencesFromFilters(
-		options.contentType,
-		getEffectiveInstallFilters(options),
-	)
+	return getInstallPreferencesFromFilters(options.contentType, getEffectiveInstallFilters(options))
 }
 
 /**
@@ -410,7 +409,10 @@ function getInstallCandidates(
 		candidates.push({ preferences: {}, source: 'filtered' })
 	}
 
-	if (hasPreferences(targetPreferences) && preferencesDiffer(filteredPreferences, targetPreferences)) {
+	if (
+		hasPreferences(targetPreferences) &&
+		preferencesDiffer(filteredPreferences, targetPreferences)
+	) {
 		candidates.push({ preferences: targetPreferences, source: 'target' })
 	}
 
@@ -508,11 +510,7 @@ function normalizeInstallPreferences(
 
 function uniqueDefined(values: readonly (string | null | undefined)[] = []) {
 	return Array.from(
-		new Set(
-			values
-				.map((value) => value?.trim())
-				.filter((value): value is string => !!value),
-		),
+		new Set(values.map((value) => value?.trim()).filter((value): value is string => !!value)),
 	)
 }
 

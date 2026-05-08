@@ -87,7 +87,9 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		})
 		const newRunning: Record<string, string> = {}
 		for (const hit of hits) {
-			const inst = packs.find((pack: GameInstance) => pack.linked_data?.project_id === hit.project_id)
+			const inst = packs.find(
+				(pack: GameInstance) => pack.linked_data?.project_id === hit.project_id,
+			)
 			if (inst) {
 				const processes = await get_by_profile_path(inst.path).catch(() => [])
 				if (Array.isArray(processes) && processes.length > 0) {
@@ -208,7 +210,9 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		return undefined
 	}
 
-	function getServerCardActions(serverResult: Labrinth.Search.v3.ResultSearchProject): CardAction[] {
+	function getServerCardActions(
+		serverResult: Labrinth.Search.v3.ResultSearchProject,
+	): CardAction[] {
 		const isInstalled = options.allInstalledIds.value.has(serverResult.project_id)
 
 		if (options.isFromWorlds.value && options.instance.value) {
