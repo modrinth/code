@@ -14,31 +14,30 @@
 					<th
 						v-for="column in columns"
 						:key="column.key"
-						class="h-14 first:pl-4 last:pr-4"
-						:class="[
-							`text-${column.align ?? 'left'}`,
-							column.enableSorting ? 'cursor-pointer select-none' : '',
-						]"
+						class="h-14 text-secondary first:pl-4 last:pr-4"
+						:class="`text-${column.align ?? 'left'}`"
 						:style="column.width ? { width: column.width } : undefined"
-						@click="column.enableSorting ? handleSort(column.key) : undefined"
 					>
 						<slot :name="`header-${column.key}`" :column="column">
-							<span
-								v-if="column.label || column.enableSorting"
-								class="inline-flex items-center gap-1 font-semibold"
-								:class="`${sortColumn === column.key ? 'text-contrast' : ''}`"
+							<button
+								v-if="column.enableSorting"
+								type="button"
+								class="inline-flex max-w-full cursor-pointer select-none items-center gap-1 border-none bg-transparent p-0 font-semibold transition-colors hover:text-contrast"
+								:class="sortColumn === column.key ? 'text-contrast' : 'text-secondary'"
+								@click="handleSort(column.key)"
 							>
 								{{ column.label ?? '' }}
-								<template v-if="column.enableSorting">
-									<ChevronUpIcon
-										v-if="sortColumn === column.key && sortDirection === 'asc'"
-										class="size-4"
-									/>
-									<ChevronDownIcon
-										v-else-if="sortColumn === column.key && sortDirection === 'desc'"
-										class="size-4"
-									/>
-								</template>
+								<ChevronUpIcon
+									v-if="sortColumn === column.key && sortDirection === 'asc'"
+									class="size-4"
+								/>
+								<ChevronDownIcon
+									v-else-if="sortColumn === column.key && sortDirection === 'desc'"
+									class="size-4"
+								/>
+							</button>
+							<span v-else-if="column.label" class="inline-flex items-center gap-1 font-semibold">
+								{{ column.label }}
 							</span>
 						</slot>
 					</th>

@@ -437,7 +437,7 @@ const messages = defineMessages({
 	},
 	worldColumn: {
 		id: 'servers.audit-log.column.world',
-		defaultMessage: 'World',
+		defaultMessage: 'Instance',
 	},
 	actionColumn: {
 		id: 'servers.audit-log.column.action',

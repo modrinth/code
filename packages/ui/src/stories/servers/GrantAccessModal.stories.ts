@@ -10,6 +10,11 @@ const meta = {
 	component: GrantAccessModal,
 	parameters: {
 		layout: 'centered',
+		docs: {
+			description: {
+				component: 'Role descriptions use the same instance-focused copy as the access page.',
+			},
+		},
 	},
 } satisfies Meta<typeof GrantAccessModal>
 

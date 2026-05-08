@@ -226,18 +226,24 @@ export namespace Archon {
 
 			export type AssignableServerUserRole = Exclude<ServerUserRole, 'Owner' | 'Unknown'>
 
+			export type UserScope = string
+
+			export type UserResp = {
+				username: string
+				avatar_url: string
+			}
+
 			export type ServerUser = {
-				server_id: string | null
-				user_id: string
-				added_on: string | null
-				role: ServerUserRole
+				user: UserResp
+				added_on?: string | null
+				permissions: UserScope
 			}
 
 			export type AddServerUserRequest = {
 				server_id?: string | null
 				user_id: string
 				added_on?: string | null
-				role: AssignableServerUserRole
+				role: ServerUserRole
 			}
 		}
 	}

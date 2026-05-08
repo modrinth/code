@@ -98,6 +98,11 @@ const meta = {
 	component: AuditLogTable,
 	parameters: {
 		layout: 'padded',
+		docs: {
+			description: {
+				component: 'Audit entries include an Instance column for server instance context.',
+			},
+		},
 	},
 	decorators: [
 		(story) => ({

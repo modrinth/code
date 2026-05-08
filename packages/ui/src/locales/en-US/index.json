@@ -2936,6 +2936,15 @@
   "servers.access-page.notification.invite-cancelled.title": {
     "defaultMessage": "Invite cancelled"
   },
+  "servers.access-page.notification.invite-failed.title": {
+    "defaultMessage": "User could not be added"
+  },
+  "servers.access-page.notification.invite-resend-unavailable.text": {
+    "defaultMessage": "Invites are accepted automatically for this server."
+  },
+  "servers.access-page.notification.invite-resend-unavailable.title": {
+    "defaultMessage": "Invite cannot be resent"
+  },
   "servers.access-page.notification.invite-resent.text": {
     "defaultMessage": "Sent another invite to {target}."
   },
@@ -2948,17 +2957,35 @@
   "servers.access-page.notification.invite-sent.title": {
     "defaultMessage": "Invite sent"
   },
+  "servers.access-page.notification.load-failed.text": {
+    "defaultMessage": "Refresh the page to try again."
+  },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "Access could not be loaded"
+  },
   "servers.access-page.notification.member-removed.text": {
     "defaultMessage": "Removed {target} from this server."
   },
   "servers.access-page.notification.member-removed.title": {
     "defaultMessage": "Access removed"
   },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "Access could not be removed"
+  },
+  "servers.access-page.notification.role-update-failed.title": {
+    "defaultMessage": "Role could not be updated"
+  },
   "servers.access-page.notification.role-updated.text": {
     "defaultMessage": "Changed {target} to {role}."
   },
   "servers.access-page.notification.role-updated.title": {
     "defaultMessage": "Role updated"
+  },
+  "servers.access-page.notification.user-lookup-failed.text": {
+    "defaultMessage": "Could not find {target}. Check the username and try again."
+  },
+  "servers.access-page.notification.user-lookup-failed.title": {
+    "defaultMessage": "User could not be found"
   },
   "servers.access-page.role-filter.all": {
     "defaultMessage": "All"
@@ -2970,7 +2997,7 @@
     "defaultMessage": "Editor"
   },
   "servers.access-page.role.editor-description": {
-    "defaultMessage": "Manage server content, files, backups, and other settings."
+    "defaultMessage": "Manage instance content, files, backups, and other settings."
   },
   "servers.access-page.role.owner": {
     "defaultMessage": "Owner"
@@ -2982,7 +3009,7 @@
     "defaultMessage": "Limited"
   },
   "servers.access-page.role.viewer-description": {
-    "defaultMessage": "Start, stop, restart, and view the server without making changes."
+    "defaultMessage": "Start, stop, and view the server without making changes."
   },
   "servers.access-page.search-users-placeholder": {
     "defaultMessage": "Search {count} {count, plural, one {user} other {users}}..."
@@ -3038,47 +3065,50 @@
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Background task running"
   },
-  "servers.audit-log.action.file-edited": {
-    "defaultMessage": "Edited file: {file}"
-  },
-  "servers.audit-log.action-prefix.member-invited": {
-    "defaultMessage": "Invited user:"
-  },
-  "servers.audit-log.action-prefix.member-removed": {
-    "defaultMessage": "Removed user:"
-  },
-  "servers.audit-log.action-prefix.mod-installed": {
-    "defaultMessage": "Installed mod:"
-  },
-  "servers.audit-log.action-prefix.modpack-installed": {
-    "defaultMessage": "Installed modpack:"
-  },
-  "servers.audit-log.action-prefix.role-changed": {
-    "defaultMessage": "Changed role:"
-  },
   "servers.audit-log.action-suffix.member-invited-role": {
     "defaultMessage": "as {role}"
   },
   "servers.audit-log.action-suffix.role-changed-role": {
     "defaultMessage": "to {role}"
   },
+  "servers.audit-log.action-verb.changed": {
+    "defaultMessage": "Changed"
+  },
+  "servers.audit-log.action-verb.edited": {
+    "defaultMessage": "Edited"
+  },
+  "servers.audit-log.action-verb.installed": {
+    "defaultMessage": "Installed"
+  },
+  "servers.audit-log.action-verb.invited": {
+    "defaultMessage": "Invited"
+  },
+  "servers.audit-log.action-verb.removed": {
+    "defaultMessage": "Removed"
+  },
+  "servers.audit-log.action-verb.started": {
+    "defaultMessage": "Started"
+  },
+  "servers.audit-log.action.file-edited": {
+    "defaultMessage": "Edited: {file}"
+  },
   "servers.audit-log.action.member-invited": {
-    "defaultMessage": "Invited user: {target}{role}"
+    "defaultMessage": "Invited: {target}{role}"
   },
   "servers.audit-log.action.member-removed": {
-    "defaultMessage": "Removed user: {target}"
+    "defaultMessage": "Removed: {target}"
   },
   "servers.audit-log.action.mod-installed": {
-    "defaultMessage": "Installed mod: {name}{version}"
+    "defaultMessage": "Installed: mod {name}{version}"
   },
   "servers.audit-log.action.modpack-installed": {
-    "defaultMessage": "Installed modpack: {name}{version}"
+    "defaultMessage": "Installed: modpack {name}{version}"
   },
   "servers.audit-log.action.role-changed": {
-    "defaultMessage": "Changed role: {target}{role}"
+    "defaultMessage": "Changed: {target}{role}"
   },
   "servers.audit-log.action.world-started": {
-    "defaultMessage": "Started world: {worldName}"
+    "defaultMessage": "Started: {worldName}"
   },
   "servers.audit-log.actor.support": {
     "defaultMessage": "Support"
@@ -3093,13 +3123,22 @@
     "defaultMessage": "User"
   },
   "servers.audit-log.column.world": {
-    "defaultMessage": "World"
+    "defaultMessage": "Instance"
   },
   "servers.audit-log.content-icon-alt": {
     "defaultMessage": "{name}'s icon"
   },
+  "servers.audit-log.content-type.mod": {
+    "defaultMessage": "mod"
+  },
+  "servers.audit-log.content-type.modpack": {
+    "defaultMessage": "modpack"
+  },
   "servers.audit-log.empty": {
     "defaultMessage": "No activity matches your filters."
+  },
+  "servers.audit-log.empty.no-activity": {
+    "defaultMessage": "Perform an action on your server and you will see it here!"
   },
   "servers.audit-log.role.editor": {
     "defaultMessage": "Editor"
@@ -3329,14 +3368,11 @@
   "servers.grant-access-modal.cancel": {
     "defaultMessage": "Cancel"
   },
-  "servers.grant-access-modal.friend-request": {
-    "defaultMessage": "Also send a friend request"
-  },
   "servers.grant-access-modal.header": {
-    "defaultMessage": "Invite a user"
+    "defaultMessage": "Add a user"
   },
   "servers.grant-access-modal.invite": {
-    "defaultMessage": "Invite"
+    "defaultMessage": "Add user"
   },
   "servers.grant-access-modal.permissions-help": {
     "defaultMessage": "View the full list of permissions for each role <link>here</link>."
@@ -3345,7 +3381,7 @@
     "defaultMessage": "Editor"
   },
   "servers.grant-access-modal.role.editor-description": {
-    "defaultMessage": "Manage server content, files, backups, and other settings."
+    "defaultMessage": "Manage instance content, files, backups, and other settings."
   },
   "servers.grant-access-modal.role.label": {
     "defaultMessage": "Select role"
@@ -3360,16 +3396,16 @@
     "defaultMessage": "{username}'s avatar"
   },
   "servers.grant-access-modal.target.help": {
-    "defaultMessage": "Use their Modrinth username, or invite a new user by email."
+    "defaultMessage": "Use their Modrinth username."
   },
   "servers.grant-access-modal.target.label": {
-    "defaultMessage": "Username or email"
+    "defaultMessage": "Username"
   },
   "servers.grant-access-modal.target.no-suggestions": {
     "defaultMessage": "No matching users found."
   },
   "servers.grant-access-modal.target.placeholder": {
-    "defaultMessage": "Enter a username or email"
+    "defaultMessage": "Enter a username"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Already have a server?"
@@ -3611,30 +3647,6 @@
   "servers.medal-listing.using-project-label": {
     "defaultMessage": "Using {projectTitle}"
   },
-  "servers.remove-access-modal.admonition-body": {
-    "defaultMessage": "{username} will no longer be able to manage or view this server. You can add them again later."
-  },
-  "servers.remove-access-modal.admonition-header": {
-    "defaultMessage": "Removal warning"
-  },
-  "servers.remove-access-modal.cancel-admonition-body": {
-    "defaultMessage": "{username} will need a new invitation before they can join this server."
-  },
-  "servers.remove-access-modal.cancel-admonition-header": {
-    "defaultMessage": "Cancellation warning"
-  },
-  "servers.remove-access-modal.cancel-button": {
-    "defaultMessage": "Cancel invite"
-  },
-  "servers.remove-access-modal.cancel-header": {
-    "defaultMessage": "Cancel invite"
-  },
-  "servers.remove-access-modal.header": {
-    "defaultMessage": "Remove user"
-  },
-  "servers.remove-access-modal.remove-button": {
-    "defaultMessage": "Remove user"
-  },
   "servers.notice.dismiss": {
     "defaultMessage": "Dismiss"
   },
@@ -3748,6 +3760,57 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Western Europe"
+  },
+  "servers.remove-access-modal.added-label": {
+    "defaultMessage": "Added {time}"
+  },
+  "servers.remove-access-modal.cancel-button": {
+    "defaultMessage": "Cancel invite"
+  },
+  "servers.remove-access-modal.cancel-effect-access": {
+    "defaultMessage": "They will not be added to this server"
+  },
+  "servers.remove-access-modal.cancel-effect-invite": {
+    "defaultMessage": "You can send them another invite later"
+  },
+  "servers.remove-access-modal.cancel-header": {
+    "defaultMessage": "Cancel invite"
+  },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "If you cancel this invite, {username} will need a new invitation before they can join this server."
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "Remove user"
+  },
+  "servers.remove-access-modal.invited-label": {
+    "defaultMessage": "Invited {time}"
+  },
+  "servers.remove-access-modal.pending-invite-label": {
+    "defaultMessage": "Pending invite"
+  },
+  "servers.remove-access-modal.pending-label": {
+    "defaultMessage": "Pending"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "Remove user"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "They will immediately lose access to the server panel and will no longer be able to edit content"
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "They will still be able to join and play on the server unless you make separate changes"
+  },
+  "servers.remove-access-modal.unknown-added-label": {
+    "defaultMessage": "Added date unknown"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "If you remove a user from your server, you'll need to re-invite them to restore access."
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "What happens?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "An unexpected error occurred while installing. Please try again later."
