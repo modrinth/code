@@ -259,14 +259,11 @@ function isServerProject(project: ProjectTypeMetadata): boolean {
 	return project.project_types?.includes(MINECRAFT_JAVA_SERVER_PROJECT_TYPE) ?? false
 }
 
-function isDraftProject(project: { status?: string | null }): boolean {
-	return project.status === 'draft'
-}
-
 function isAnalyticsEligibleProject(
 	project: ProjectTypeMetadata & { status?: string | null },
 ): boolean {
-	return !isServerProject(project) && !isDraftProject(project)
+	return !isServerProject(project)
+	// && project.status !== 'draft'
 }
 
 function sortStringValues(values: string[]): string[] {
@@ -696,7 +693,7 @@ export function createAnalyticsDashboardContext(
 		() => !hasProjectContext.value && Boolean(options.organizationContext),
 	)
 
-	const { data: userProjects } = useQuery({
+	const { data: userProjects, isFetched: hasFetchedUserProjects } = useQuery({
 		queryKey: computed(() => ['analytics', 'dashboard', options.auth.value?.user?.id, 'projects']),
 		queryFn: () => client.labrinth.users_v2.getProjects(options.auth.value.user?.id ?? ''),
 		enabled: computed(
@@ -706,6 +703,18 @@ export function createAnalyticsDashboardContext(
 				!hasOrganizationContext.value,
 		),
 		placeholderData: [],
+	})
+
+	const areProjectsLoaded = computed(() => {
+		if (hasProjectContext.value) {
+			return true
+		}
+
+		if (hasOrganizationContext.value) {
+			return options.organizationContext?.projects.value !== null
+		}
+
+		return hasFetchedUserProjects.value
 	})
 
 	const projects = computed<AnalyticsDashboardProject[]>(() => {
@@ -780,9 +789,12 @@ export function createAnalyticsDashboardContext(
 	)
 
 	watch(
-		projects,
-		(nextProjects) => {
+		[projects, areProjectsLoaded],
+		([nextProjects, nextAreProjectsLoaded]) => {
 			if (nextProjects.length === 0) {
+				if (nextAreProjectsLoaded && selectedProjectIds.value.length > 0) {
+					selectedProjectIds.value = []
+				}
 				return
 			}
 
@@ -799,13 +811,17 @@ export function createAnalyticsDashboardContext(
 		() => route.query,
 		(nextQuery) => {
 			const nextQueryState = readAnalyticsQueryBuilderState(nextQuery, availableProjectIds.value)
+			const availableProjectIdSet = new Set(availableProjectIds.value)
+			const nextSelectedProjectIds = nextQueryState.selectedProjectIds.filter((projectId) =>
+				availableProjectIdSet.has(projectId),
+			)
 			const nextSelectedFilters = sanitizeAnalyticsSelectedFilters(
 				nextQueryState.selectedBreakdown,
 				nextQueryState.selectedFilters,
 			)
 
-			if (!areStringArraysEqual(selectedProjectIds.value, nextQueryState.selectedProjectIds)) {
-				selectedProjectIds.value = nextQueryState.selectedProjectIds
+			if (!areStringArraysEqual(selectedProjectIds.value, nextSelectedProjectIds)) {
+				selectedProjectIds.value = nextSelectedProjectIds
 			}
 			if (selectedTimeframeMode.value !== nextQueryState.selectedTimeframeMode) {
 				selectedTimeframeMode.value = nextQueryState.selectedTimeframeMode
@@ -1234,7 +1250,7 @@ export function createAnalyticsDashboardContext(
 	)
 
 	async function refreshAnalyticsQuery() {
-		if (fetchRequest.value === null) {
+		if (!isAnalyticsFetchRequestReady(fetchRequest.value)) {
 			return
 		}
 

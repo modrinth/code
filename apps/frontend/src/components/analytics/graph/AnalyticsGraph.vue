@@ -73,8 +73,8 @@
 					v-if="selectedProjects.length === 0"
 					class="flex h-full items-center justify-center rounded-xl"
 				>
-					<div class="relative bottom-6 text-sm font-medium text-secondary">
-						Select at least one project to view data
+					<div class="relative bottom-6 text-base font-normal text-secondary">
+						{{ emptyChartMessage }}
 					</div>
 				</div>
 				<template v-else>
@@ -189,9 +189,14 @@ const titleByStat: Record<AnalyticsDashboardStat, string> = {
 }
 
 const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
+const hasAvailableProjects = computed(() => projects.value.length > 0)
 
 const selectedProjects = computed(() =>
 	projects.value.filter((project) => selectedProjectIdSet.value.has(project.id)),
+)
+
+const emptyChartMessage = computed(() =>
+	hasAvailableProjects.value ? 'Select at least one project to view data' : 'No projects available',
 )
 
 const lightLegendPalette = [

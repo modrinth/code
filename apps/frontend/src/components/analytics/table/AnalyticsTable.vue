@@ -64,6 +64,11 @@
 			<template #cell-playtime="{ row }">
 				<span>{{ formatInteger(row.playtime) }}</span>
 			</template>
+			<template #empty-state>
+				<div class="flex h-64 items-center justify-center text-secondary">
+					{{ emptyTableMessage }}
+				</div>
+			</template>
 		</Table>
 		<div v-if="isDataLoading" class="absolute inset-0 z-10 overflow-hidden rounded-xl">
 			<div class="absolute inset-0 bg-surface-3 opacity-50" />
@@ -152,6 +157,10 @@ const includeDateColumn = computed(
 
 const projectNamesById = computed(
 	() => new Map(projects.value.map((project) => [project.id, project.name])),
+)
+const hasAvailableProjects = computed(() => projects.value.length > 0)
+const emptyTableMessage = computed(() =>
+	hasAvailableProjects.value ? 'No data available' : 'No projects available',
 )
 
 const breakdownColumnLabel = computed(() => {
@@ -479,7 +488,9 @@ function applyDefaultSort(nextColumns = columns.value) {
 	sortDirection.value = getDefaultSortDirection(nextSortColumn)
 }
 
-function getDefaultSortColumn(nextColumns: TableColumn<TableColumnKey>[]): TableColumnKey | undefined {
+function getDefaultSortColumn(
+	nextColumns: TableColumn<TableColumnKey>[],
+): TableColumnKey | undefined {
 	const availableColumns = new Set(nextColumns.map((column) => column.key))
 	if (availableColumns.has('date')) {
 		return 'date'

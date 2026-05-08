@@ -9,9 +9,11 @@
 				<MultiSelect
 					v-model="draftSelectedProjectIds"
 					:options="projectOptions"
+					:disabled="!hasProjectOptions"
 					:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 					dropdown-min-width="330px"
 					placeholder="Select projects"
+					no-options-message="No projects available"
 					:searchable="projectOptions.length > 6"
 					:max-tag-rows="1"
 					show-selection-actions
@@ -45,7 +47,7 @@
 							</div>
 						</div>
 					</template>
-					<template #top>
+					<template v-if="hasProjectOptions" #top>
 						<div class="px-3">
 							<button
 								type="button"
@@ -74,7 +76,7 @@
 							</button>
 						</div>
 					</template>
-					<template #bottom>
+					<template v-if="hasProjectOptions" #bottom>
 						<DownloadsThresholdInput
 							class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
 							label="Projects above"
@@ -201,6 +203,7 @@ const {
 	refreshAnalyticsQuery,
 	setFetchRequest,
 } = injectAnalyticsDashboardContext()
+const route = useRoute()
 const { selectedTimeRange, selectedTimeframeDurationMinutes } = useSelectedAnalyticsTimeRange()
 
 const projectOptions = computed<MultiSelectOption<string>[]>(() =>
@@ -211,6 +214,7 @@ const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 )
 
 const allProjectIds = computed(() => projectOptions.value.map((project) => project.value))
+const hasProjectOptions = computed(() => projectOptions.value.length > 0)
 const isProjectSelectOpen = ref(false)
 const draftSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
 const projectDownloadsThreshold = ref<number | null>(null)
@@ -245,6 +249,10 @@ const canClearDraftSelectedProjects = computed(() => {
 })
 
 const selectedProjectLabel = computed(() => {
+	if (!hasProjectOptions.value) {
+		return 'No projects available'
+	}
+
 	if (isAllProjectsOptionSelected.value || areAllProjectsSelected.value) {
 		return 'All projects'
 	}
@@ -318,7 +326,10 @@ function clearSelectedBreakdown() {
 	selectedBreakdown.value = 'none'
 }
 
-const showProjectRow = computed(() => projects.value.length > 1)
+const isDashboardAnalyticsRoute = computed(
+	() => route.path.replace(/\/$/, '') === '/dashboard/analytics',
+)
+const showProjectRow = computed(() => isDashboardAnalyticsRoute.value || projects.value.length > 1)
 
 function applyProjectDownloadsThreshold(threshold: number | null) {
 	if (threshold === null) {

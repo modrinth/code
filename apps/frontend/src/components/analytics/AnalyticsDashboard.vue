@@ -6,7 +6,7 @@
 				<ButtonStyled type="outlined">
 					<button
 						type="button"
-						:disabled="!fetchRequest || isRefetching"
+						:disabled="projects.length === 0 || !fetchRequest || isRefetching"
 						@click="refreshAnalyticsQuery"
 					>
 						<RefreshCwIcon :class="isRefetching ? 'animate-spin' : ''" />
@@ -46,7 +46,7 @@ const analyticsDashboardContext = createAnalyticsDashboardContext({
 	projectPageContext,
 	organizationContext,
 })
-const { fetchRequest, isRefetching, refreshAnalyticsQuery } = analyticsDashboardContext
+const { fetchRequest, isRefetching, projects, refreshAnalyticsQuery } = analyticsDashboardContext
 
 provideAnalyticsDashboardContext(analyticsDashboardContext)
 </script>
