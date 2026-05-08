@@ -29,6 +29,7 @@ const {
 	setActiveStat,
 	currentTotals,
 	percentChanges,
+	hasPreviousPeriodComparison,
 	selectedBreakdown,
 	isAnalyticsDashboardStatRelevant,
 } = injectAnalyticsDashboardContext()
@@ -58,12 +59,20 @@ function formatPercent(value: number): string {
 	return `${signPrefix}${rounded.toFixed(1)}%`
 }
 
+function formatPreviousPeriodPercent(value: number): string | null {
+	if (!hasPreviousPeriodComparison.value) {
+		return null
+	}
+
+	return formatPercent(value)
+}
+
 const statCards = computed<
 	{
 		key: AnalyticsDashboardStat
 		label: string
 		statLabel: string
-		vsPrevPeriodPercent: string
+		vsPrevPeriodPercent: string | null
 		icon: string
 		disabled: boolean
 	}[]
@@ -72,7 +81,7 @@ const statCards = computed<
 		key: 'views',
 		label: 'Views',
 		statLabel: formatStatNumber(currentTotals.value.views),
-		vsPrevPeriodPercent: formatPercent(percentChanges.value.views),
+		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.views),
 		icon: 'eye',
 		disabled: !isAnalyticsDashboardStatRelevant('views', selectedBreakdown.value),
 	},
@@ -80,7 +89,7 @@ const statCards = computed<
 		key: 'downloads',
 		label: 'Downloads',
 		statLabel: formatStatNumber(currentTotals.value.downloads),
-		vsPrevPeriodPercent: formatPercent(percentChanges.value.downloads),
+		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.downloads),
 		icon: 'download',
 		disabled: !isAnalyticsDashboardStatRelevant('downloads', selectedBreakdown.value),
 	},
@@ -88,7 +97,7 @@ const statCards = computed<
 		key: 'revenue',
 		label: 'Revenue',
 		statLabel: `$${formatStatNumber(currentTotals.value.revenue)}`,
-		vsPrevPeriodPercent: formatPercent(percentChanges.value.revenue),
+		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.revenue),
 		icon: 'dollar',
 		disabled: !isAnalyticsDashboardStatRelevant('revenue', selectedBreakdown.value),
 	},
@@ -96,7 +105,7 @@ const statCards = computed<
 		key: 'playtime',
 		label: 'Playtime',
 		statLabel: `${formatStatNumber(currentTotals.value.playtime / 3600)} hrs`,
-		vsPrevPeriodPercent: formatPercent(percentChanges.value.playtime),
+		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.playtime),
 		icon: 'clock',
 		disabled: !isAnalyticsDashboardStatRelevant('playtime', selectedBreakdown.value),
 	},

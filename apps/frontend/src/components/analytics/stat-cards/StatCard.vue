@@ -51,7 +51,7 @@
 				<span class="inline-flex items-center gap-1 text-xs text-secondary">N/A</span>
 			</template>
 			<template v-else>
-				<div class="flex items-center gap-1 text-sm">
+				<div v-if="vsPrevPeriodPercent" class="flex items-center gap-1 text-sm">
 					<span
 						class="inline-flex items-center gap-1 font-semibold"
 						:class="{
@@ -100,7 +100,7 @@ import {
 const props = defineProps<{
 	label: string
 	statLabel: string
-	vsPrevPeriodPercent: string
+	vsPrevPeriodPercent: string | null
 	icon: string
 	active?: boolean
 	disabled?: boolean
@@ -129,7 +129,7 @@ const iconComponent = computed<IconComponent>(() => {
 })
 
 const trendValue = computed(() => {
-	const parsed = Number.parseFloat(props.vsPrevPeriodPercent.replace(/[^0-9.-]/gu, ''))
+	const parsed = Number.parseFloat(props.vsPrevPeriodPercent?.replace(/[^0-9.-]/gu, '') ?? '')
 	return Number.isNaN(parsed) ? 0 : parsed
 })
 

@@ -38,6 +38,7 @@ export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playti
 
 const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
 const ANALYTICS_START_TIMESTAMP = '2023-01-01T00:00:00.000Z'
+const ANALYTICS_START_TIME = new Date(ANALYTICS_START_TIMESTAMP).getTime()
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -112,6 +113,7 @@ export interface AnalyticsDashboardContextValue {
 	currentTotals: ComputedRef<AnalyticsDashboardTotals>
 	previousTotals: ComputedRef<AnalyticsDashboardTotals>
 	percentChanges: ComputedRef<AnalyticsDashboardPercentChanges>
+	hasPreviousPeriodComparison: ComputedRef<boolean>
 	getRelevantAnalyticsDashboardStats: (
 		breakdown: AnalyticsBreakdownPreset,
 		filters?: AnalyticsSelectedFilters,
@@ -154,6 +156,10 @@ function buildPreviousFetchRequest(
 
 	const previousEnd = new Date(startTimestamp)
 	const previousStart = new Date(startTimestamp - duration)
+
+	if (previousStart.getTime() < ANALYTICS_START_TIME) {
+		return null
+	}
 
 	return {
 		time_range: {
@@ -1028,6 +1034,7 @@ export function createAnalyticsDashboardContext(
 	)
 
 	const previousFetchRequest = computed(() => buildPreviousFetchRequest(fetchRequest.value))
+	const hasPreviousPeriodComparison = computed(() => previousFetchRequest.value !== null)
 
 	const {
 		data: previousTimeSliceData,
@@ -1310,6 +1317,7 @@ export function createAnalyticsDashboardContext(
 		currentTotals,
 		previousTotals,
 		percentChanges,
+		hasPreviousPeriodComparison,
 		getRelevantAnalyticsDashboardStats,
 		isAnalyticsDashboardStatRelevant,
 		refreshAnalyticsQuery,
