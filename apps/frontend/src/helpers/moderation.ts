@@ -197,7 +197,7 @@ export interface ModerationOwnershipOrganization {
 
 export type ModerationOwnership = ModerationOwnershipUser | ModerationOwnershipOrganization
 
-export interface FetchedProject {
+export interface ProjectWithOwnership {
 	ownership: ModerationOwnership
 	[key: string]: any
 }
@@ -207,7 +207,7 @@ export interface ModerationProject {
 	ownership: ModerationOwnership | null
 }
 
-export function toModerationProjects(projects: FetchedProject[]): ModerationProject[] {
+export function toModerationProjects(projects: ProjectWithOwnership[]): ModerationProject[] {
 	return projects.map(({ ownership, ...project }) => ({
 		project,
 		ownership: ownership ?? null,
