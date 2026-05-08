@@ -8,17 +8,12 @@
 				autocomplete="off"
 				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 				clearable
-				wrapper-class="flex-1 lg:max-w-52"
-				input-class="h-[40px]"
+				wrapper-class="flex-1"
+				input-class="h-[40px] w-full"
 				@input="goToPage(1)"
 			/>
 
-			<div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
-				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
-				<ConfettiExplosion v-if="visible" />
-			</div>
-
-			<div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0">
+			<div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0 flex-wrap">
 				<div class="flex flex-col gap-2 sm:flex-row">
 					<Combobox
 						v-model="currentFilterType"
@@ -55,6 +50,20 @@
 							</span>
 						</template>
 					</Combobox>
+
+					<Combobox
+						v-model="itemsPerPage"
+						class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0 lg:!w-[140px]"
+						:options="itemsPerPageOptions"
+						placeholder="Items per page"
+						@select="goToPage(1)"
+					>
+						<template #selected>
+							<span class="flex flex-row gap-2 align-middle font-semibold">
+								<span class="truncate text-contrast">{{ itemsPerPage }} items</span>
+							</span>
+						</template>
+					</Combobox>
 				</div>
 
 				<ButtonStyled color="orange">
@@ -71,12 +80,15 @@
 			</div>
 		</div>
 
-		<div v-if="totalPages > 1" class="flex justify-center lg:hidden">
+		<div v-if="totalPages > 1" class="flex items-center justify-between">
+			<div>
+				Showing {{ (itemsPerPage * (currentPage - 1)) + 1 }}–{{ itemsPerPage * (currentPage - 1) + Math.min(itemsPerPage, paginatedProjects.length) }} of {{ filteredProjects.length }} {{ currentFilterType === DEFAULT_FILTER_TYPE ? 'projects' : currentFilterType.toLowerCase() }}
+			</div>
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 			<ConfettiExplosion v-if="visible" />
 		</div>
 
-		<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-3">
 			<div v-if="paginatedProjects.length === 0" class="universal-card h-24 animate-pulse"></div>
 			<ModerationQueueCard
 				v-for="item in paginatedProjects"
@@ -87,13 +99,20 @@
 			/>
 		</div>
 
-		<div v-if="totalPages > 1" class="mt-4 flex justify-center">
+		<div v-if="totalPages > 1" class="mt-4 flex justify-end">
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
-import { ListFilterIcon, ScaleIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
+import {
+	HashIcon,
+	ListFilterIcon,
+	ScaleIcon,
+	SearchIcon,
+	SortAscIcon,
+	SortDescIcon,
+} from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,
@@ -221,6 +240,18 @@ const sortTypes: ComboboxOption<string>[] = [
 const sortTypeValues = sortTypes.map((option) => option.value)
 const DEFAULT_SORT_TYPE = sortTypeValues[0]
 
+const itemsPerPageOptions: ComboboxOption<number>[] = [
+	{ value: 20, label: '20' },
+	{ value: 40, label: '40' },
+	{ value: 60, label: '60' },
+	{ value: 80, label: '80' },
+	{ value: 100, label: '100' },
+	{ value: 1000, label: '1000' },
+	{ value: 9999, label: '9999' },
+]
+const itemsPerPageValues = itemsPerPageOptions.map((option) => option.value)
+const DEFAULT_ITEMS_PER_PAGE = 40
+
 function parseFilterTypeFromQuery(value: LocationQueryValue | LocationQueryValue[]): string {
 	const query = queryAsStringOrEmpty(value)
 	return filterTypeValues.includes(query) ? query : DEFAULT_FILTER_TYPE
@@ -290,9 +321,27 @@ watch(
 	},
 )
 
+const itemsPerPageCookie = useCookie<number>('moderation-items-per-page', {
+	default: () => DEFAULT_ITEMS_PER_PAGE,
+	maxAge: 60 * 60 * 24 * 365,
+	sameSite: 'lax',
+	path: '/',
+})
+
+const itemsPerPage = computed({
+	get() {
+		const value = Number(itemsPerPageCookie.value)
+		return itemsPerPageValues.includes(value) ? value : DEFAULT_ITEMS_PER_PAGE
+	},
+	set(value: number) {
+		itemsPerPageCookie.value = value
+	},
+})
+
 const currentPage = ref(1)
-const itemsPerPage = 15
-const totalPages = computed(() => Math.ceil((filteredProjects.value?.length || 0) / itemsPerPage))
+const totalPages = computed(() =>
+	Math.ceil((filteredProjects.value?.length || 0) / itemsPerPage.value),
+)
 
 const fuse = computed(() => {
 	if (!allProjects.value || allProjects.value.length === 0) return null
@@ -377,8 +426,8 @@ const filteredProjects = computed(() => {
 
 const paginatedProjects = computed(() => {
 	if (!filteredProjects.value) return []
-	const start = (currentPage.value - 1) * itemsPerPage
-	const end = start + itemsPerPage
+	const start = (currentPage.value - 1) * itemsPerPage.value
+	const end = start + itemsPerPage.value
 	return filteredProjects.value.slice(start, end)
 })
 
@@ -426,7 +475,7 @@ async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
 
 async function moderateAllInFilter() {
 	// Start from the current page - get projects from current page onwards
-	const startIndex = (currentPage.value - 1) * itemsPerPage
+	const startIndex = (currentPage.value - 1) * itemsPerPage.value
 	const projectsFromCurrentPage = filteredProjects.value.slice(startIndex)
 	const projectIds = projectsFromCurrentPage.map((queueItem) => queueItem.project.id)
 	await moderationQueue.setQueue(projectIds)

@@ -1,12 +1,19 @@
 <template>
-	<div class="shadow-card rounded-2xl border border-surface-5 bg-surface-3 p-4">
+	<div class="shadow-card rounded-2xl border border-surface-5 bg-surface-3 p-4 border-solid">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-4">
-				<Avatar
-					:src="queueEntry.project.icon_url"
-					size="4rem"
-					class="rounded-2xl border border-surface-5 bg-surface-4 !shadow-none"
-				/>
+				<NuxtLink
+					:to="`/project/${queueEntry.project.slug}`"
+					target="_blank"
+					tabindex="-1"
+					class="flex"
+				>
+					<Avatar
+						:src="queueEntry.project.icon_url"
+						size="4rem"
+						class="rounded-2xl border border-surface-5 bg-surface-4 !shadow-none"
+					/>
+				</NuxtLink>
 				<div class="flex flex-col gap-1.5">
 					<div class="flex items-center gap-2">
 						<NuxtLink
@@ -22,7 +29,7 @@
 							<component
 								:is="getProjectTypeIcon(queueEntry.project.project_types[0] as any)"
 								aria-hidden="true"
-								class="h-4 w-4"
+								class="size-4"
 							/>
 							<span class="text-sm font-medium text-secondary">
 								{{
@@ -86,25 +93,20 @@
 				</span>
 
 				<div class="flex items-center gap-2">
-					<ButtonStyled circular color="orange">
-						<button @click="openProjectForReview">
-							<ScaleIcon class="size-5" />
+					<ButtonStyled circular >
+						<button @click="copyId" v-tooltip="'Copy ID'">
+							<ClipboardCopyIcon />
 						</button>
 					</ButtonStyled>
-					<ButtonStyled circular>
-						<OverflowMenu :options="quickActions" :dropdown-id="`${baseId}-quick-actions`">
-							<template #default>
-								<EllipsisVerticalIcon class="size-4" />
-							</template>
-							<template #copy-id>
-								<ClipboardCopyIcon />
-								<span class="hidden sm:inline">Copy ID</span>
-							</template>
-							<template #copy-link>
-								<LinkIcon />
-								<span class="hidden sm:inline">Copy link</span>
-							</template>
-						</OverflowMenu>
+					<ButtonStyled circular >
+						<button @click="copyLink" v-tooltip="'Copy link'">
+							<LinkIcon />
+						</button>
+					</ButtonStyled>
+					<ButtonStyled circular color="orange">
+						<button @click="openProjectForReview">
+							<ScaleIcon />
+						</button>
 					</ButtonStyled>
 				</div>
 			</div>
@@ -113,15 +115,13 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, EllipsisVerticalIcon, LinkIcon, ScaleIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, LinkIcon, ScaleIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Badge,
 	ButtonStyled,
 	getProjectTypeIcon,
 	injectNotificationManager,
-	OverflowMenu,
-	type OverflowMenuOption,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
@@ -144,8 +144,6 @@ const formatDateTimeFull = useFormatDateTime({
 	timeZoneName: 'short',
 	timeZone: 'UTC',
 })
-
-const baseId = useId()
 
 const props = defineProps<{
 	queueEntry: ModerationProject
@@ -187,34 +185,27 @@ const formattedDate = computed(() => {
 	}
 })
 
-const quickActions: OverflowMenuOption[] = [
-	{
-		id: 'copy-link',
-		action: () => {
-			const base = window.location.origin
-			const projectUrl = `${base}/project/${props.queueEntry.project.slug}`
-			navigator.clipboard.writeText(projectUrl).then(() => {
-				addNotification({
-					type: 'success',
-					title: 'Project link copied',
-					text: 'The link to this project has been copied to your clipboard.',
-				})
-			})
-		},
-	},
-	{
-		id: 'copy-id',
-		action: () => {
-			navigator.clipboard.writeText(props.queueEntry.project.id).then(() => {
-				addNotification({
-					type: 'success',
-					title: 'Project ID copied',
-					text: 'The ID of this project has been copied to your clipboard.',
-				})
-			})
-		},
-	},
-]
+function copyLink() {
+	const base = window.location.origin
+	const projectUrl = `${base}/project/${props.queueEntry.project.slug}`
+	navigator.clipboard.writeText(projectUrl).then(() => {
+		addNotification({
+			type: 'success',
+			title: 'Project link copied',
+			text: 'The link to this project has been copied to your clipboard.',
+		})
+	})
+}
+
+function copyId() {
+	navigator.clipboard.writeText(props.queueEntry.project.id).then(() => {
+		addNotification({
+			type: 'success',
+			title: 'Project ID copied',
+			text: 'The ID of this project has been copied to your clipboard.',
+		})
+	})
+}
 
 function openProjectForReview() {
 	emit('startFromProject', props.queueEntry.project.id)
