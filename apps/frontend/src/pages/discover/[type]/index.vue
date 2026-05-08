@@ -40,6 +40,8 @@ import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('Discover')
 
+const { updateDiscoverFilterContext } = useCdnDownloadContext()
+
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
@@ -638,6 +640,15 @@ const searchState = useBrowseSearch({
 	maxResultsOptions: currentMaxResultsOptions,
 	displayMode: resultsDisplayMode,
 })
+
+watch(
+	() =>
+		searchState.isServerType.value
+			? searchState.serverCurrentFilters.value
+			: searchState.currentFilters.value,
+	(filters) => updateDiscoverFilterContext(filters),
+	{ deep: true, immediate: true },
+)
 
 watch(
 	[
