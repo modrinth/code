@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="message"
+		class="message px-4 py-3"
 		:class="{
 			'has-body': message.body.type === 'text' && !forceCompact,
 			'no-actions': noLinks,
@@ -228,8 +228,6 @@ async function deleteMessage() {
 	gap: var(--gap-size);
 	flex-wrap: wrap;
 	align-items: center;
-	border-radius: var(--size-rounded-card);
-	padding: var(--spacing-card-md);
 	word-break: break-word;
 
 	.avatar,
@@ -260,7 +258,7 @@ async function deleteMessage() {
 
 	&:not(.no-actions):hover,
 	&:not(.no-actions):focus-within {
-		background-color: var(--color-table-alternate-row);
+		background-color: var(--surface-4);
 
 		.message__actions {
 			opacity: 1;
@@ -363,6 +361,7 @@ a:active + .message__author a,
 				'icon body actions'
 				'date date date';
 			grid-template-columns: min-content auto 1fr;
+			grid-template-rows: min-content 1fr auto;
 		}
 	}
 }
@@ -377,7 +376,7 @@ a:active + .message__author a,
 				'icon author date actions'
 				'icon body body actions';
 			grid-template-columns: min-content auto 1fr;
-			grid-template-rows: min-content 1fr auto;
+			grid-template-rows: min-content 1fr;
 		}
 	}
 }

@@ -1079,6 +1079,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 				mode="local"
 				:links="navTabsLinks"
 				:active-index="activeTabIndex"
+				class="bg-surface-3! shadow-none!"
 				@tab-click="handleTabClick"
 			/>
 		</div>
@@ -1091,7 +1092,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					collapse-text="Collapse thread"
 					class="border-x border-b border-solid border-surface-3"
 				>
-					<div class="bg-surface-2 p-4 pt-0">
+					<div class="bg-surface-2 pt-0">
 						<!-- DEV-531 -->
 						<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
 						<ThreadView

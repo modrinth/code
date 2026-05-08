@@ -1,137 +1,294 @@
 <template>
-	<div v-if="canAccess">
-		<section class="universal-card">
-			<h2>Project status</h2>
-			<Badge :type="project.status" />
-			<p v-if="isApproved(project)">
-				Your project has been approved by the moderators and you may freely change project
-				visibility in
-				<router-link :to="`${getProjectLink(project)}/settings`" class="text-link"
-					>your project's settings</router-link
-				>.
-			</p>
-			<div v-else-if="isUnderReview(project)">
-				<p>
-					Modrinth's team of content moderators work hard to review all submitted projects.
-					Typically, you can expect a new project to be reviewed within 24 to 48 hours. Please keep
-					in mind that larger projects, especially modpacks, may require more time to review.
-					Certain holidays or events may also lead to delays depending on moderator availability.
-					Modrinth's moderators will leave a message below if they have any questions or concerns
-					for you.
+	<template v-if="canAccess">
+		<div v-if="currentMember?.staffOnly" class="mb-6">
+			<Toggle v-model="moderatorSeeUserUi" />
+			{{ formatMessage(messages.seeUserUiLabel) }}
+		</div>
+		<template v-if="currentMember && (!currentMember.staffOnly || moderatorSeeUserUi)">
+			<Admonition
+				v-if="project.status === 'draft'"
+				type="info"
+				:header="formatMessage(messages.admonitionDraftHeader)"
+			>
+				<p class="m-0 leading-tight">
+					{{ formatMessage(messages.admonitionDraftBody) }}
 				</p>
-				<p>
-					If your review has taken more than 48 hours, check our
-					<a
-						class="text-link"
-						href="https://support.modrinth.com/en/articles/8793355-modrinth-project-review-times"
-						target="_blank"
+			</Admonition>
+			<Admonition
+				v-else-if="isApproved(project)"
+				type="success"
+				:header="formatMessage(messages.admonitionApprovedHeader)"
+			>
+				<p class="m-0 leading-tight">
+					<IntlFormatted
+						v-if="project.status === 'approved' || project.status === 'archived'"
+						:message-id="messages.admonitionApprovedPublishedFull"
 					>
-						support article on review times
-					</a>
-					for moderation delays.
+						<template #settings-link="{ children }">
+							<router-link :to="`${getProjectLink(project)}/settings`" class="text-link">
+								<component :is="() => children" />
+							</router-link>
+						</template>
+					</IntlFormatted>
+					<IntlFormatted
+						v-else-if="project.status === 'unlisted'"
+						:message-id="messages.admonitionApprovedUnlistedFull"
+					>
+						<template #settings-link="{ children }">
+							<router-link :to="`${getProjectLink(project)}/settings`" class="text-link">
+								<component :is="() => children" />
+							</router-link>
+						</template>
+					</IntlFormatted>
+					<IntlFormatted
+						v-else-if="project.status === 'private'"
+						:message-id="messages.admonitionApprovedPrivateFull"
+					>
+						<template #settings-link="{ children }">
+							<router-link :to="`${getProjectLink(project)}/settings`" class="text-link">
+								<component :is="() => children" />
+							</router-link>
+						</template>
+					</IntlFormatted>
+				</p>
+			</Admonition>
+			<Admonition
+				v-else-if="isUnderReview(project)"
+				type="moderation"
+				:header="formatMessage(messages.admonitionUnderReviewHeader)"
+			>
+				<p class="m-0">
+					{{ formatMessage(messages.admonitionUnderReviewBody) }}
+				</p>
+				<p class="mb-0 mt-2 font-semibold">
+					{{ formatMessage(messages.admonitionUnderReviewTiming) }}
+				</p>
+			</Admonition>
+			<Admonition
+				v-else-if="project.status === 'withheld'"
+				type="warning"
+				:header="formatMessage(messages.admonitionChangesRequestedHeader)"
+			>
+				<p class="m-0">
+					<IntlFormatted :message-id="messages.admonitionWithheldBody">
+						<template #rules-link="{ children }">
+							<nuxt-link to="/legal/rules" class="text-link" target="_blank">
+								<component :is="() => children" />
+							</nuxt-link>
+						</template>
+					</IntlFormatted>
+				</p>
+				<p class="mb-0 mt-2">
+					<IntlFormatted :message-id="messages.admonitionResubmitNote">
+						<template #warning-strong="{ children }">
+							<span class="font-semibold">
+								<component :is="() => normalizeChildren(children)" />
+							</span>
+						</template>
+					</IntlFormatted>
+				</p>
+			</Admonition>
+			<Admonition
+				v-else-if="isRejected(project)"
+				type="critical"
+				:header="formatMessage(messages.admonitionChangesRequestedHeader)"
+			>
+				<p class="m-0">
+					<IntlFormatted :message-id="messages.admonitionRejectedBody">
+						<template #rules-link="{ children }">
+							<nuxt-link to="/legal/rules" class="text-link" target="_blank">
+								<component :is="() => children" />
+							</nuxt-link>
+						</template>
+					</IntlFormatted>
+				</p>
+				<p class="mb-0 mt-2">
+					<IntlFormatted :message-id="messages.admonitionResubmitNote">
+						<template #warning-strong="{ children }">
+							<span class="font-semibold">
+								<component :is="() => normalizeChildren(children)" />
+							</span>
+						</template>
+					</IntlFormatted>
+				</p>
+			</Admonition>
+			<div class="mb-4 flex flex-col">
+				<h2 id="messages" class="mb-2 mt-4 text-xl font-semibold text-contrast">
+					{{ formatMessage(messages.threadSectionTitle) }}
+				</h2>
+				<p class="m-0 leading-tight">
+					{{ formatMessage(messages.threadPrivateDescription) }}
+				</p>
+				<p class="mb-0 mt-3 leading-tight">
+					<IntlFormatted :message-id="messages.threadHelpCenterNote">
+						<template #help-center-link="{ children }">
+							<a class="text-link" href="https://support.modrinth.com" target="_blank">
+								<component :is="() => children" />
+							</a>
+						</template>
+					</IntlFormatted>
+				</p>
+				<p
+					v-if="isApproved(project)"
+					class="mb-0 mt-3 flex items-center gap-2 font-semibold text-orange"
+				>
+					<IssuesIcon /> {{ formatMessage(messages.threadApprovedWarning) }}
 				</p>
 			</div>
-			<template v-else-if="isRejected(project)">
-				<p>
-					Your project does not currently meet Modrinth's
-					<nuxt-link to="/legal/rules" class="text-link" target="_blank">content rules</nuxt-link>
-					and the moderators have requested you make changes before it can be approved. Read the
-					messages from the moderators below and address their comments before resubmitting.
-				</p>
-				<p class="warning">
-					<IssuesIcon /> Repeated submissions without addressing the moderators' comments may result
-					in an account suspension.
-				</p>
-			</template>
-			<h3>Current visibility</h3>
-			<ul class="visibility-info">
-				<li v-if="isListed(project)">
-					<CheckIcon class="good" />
-					Listed in search results
-				</li>
-				<li v-else>
-					<XIcon class="bad" />
-					Not listed in search results
-				</li>
-				<li v-if="isListed(project)">
-					<CheckIcon class="good" />
-					Listed on the profiles of members
-				</li>
-				<li v-else>
-					<XIcon class="bad" />
-					Not listed on the profiles of members
-				</li>
-				<li v-if="isPrivate(project)">
-					<XIcon class="bad" />
-					Not accessible with a direct link
-				</li>
-				<li v-else>
-					<CheckIcon class="good" />
-					Accessible with a direct link
-				</li>
-			</ul>
-		</section>
-		<section id="messages" class="universal-card">
-			<h2>Messages</h2>
-			<p>
-				This is a private conversation thread with the Modrinth moderators. They may message you
-				with issues concerning this project. This thread is only checked when you submit your
-				project for review. For additional inquiries, please go to the
-				<a class="text-link" href="https://support.modrinth.com" target="_blank">
-					Modrinth Help Center
-				</a>
-				and click the green bubble to contact support.
-			</p>
-			<p v-if="isApproved(project)" class="warning">
-				<IssuesIcon /> The moderators do not actively monitor this chat. However, they may still see
-				messages here if there is a problem with your project.
-			</p>
-			<ConversationThread
-				v-if="thread"
-				:thread="thread"
-				:project="project"
-				:set-status="setStatus"
-				:current-member="currentMember"
-				:auth="auth"
-				@update-thread="updateThread"
-			/>
-		</section>
-	</div>
+		</template>
+		<ConversationThread
+			v-if="thread"
+			:thread="thread"
+			:project="project"
+			:set-status="setStatus"
+			:current-member="currentMember"
+			:auth="auth"
+			@update-thread="updateThread"
+		/>
+	</template>
 </template>
 <script setup>
-import { CheckIcon, IssuesIcon, XIcon } from '@modrinth/assets'
+import { IssuesIcon } from '@modrinth/assets'
 import {
-	Badge,
+	Admonition,
+	commonMessages,
+	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	IntlFormatted,
+	normalizeChildren,
+	Toggle,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
-import {
-	getProjectLink,
-	isApproved,
-	isListed,
-	isPrivate,
-	isRejected,
-	isUnderReview,
-} from '~/helpers/projects.js'
+import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	seeUserUiLabel: {
+		id: 'project.moderation.see-user-ui',
+		defaultMessage: 'See what users see',
+	},
+	admonitionApprovedHeader: {
+		id: 'project.moderation.admonition.approved.header',
+		defaultMessage: 'Project approved',
+	},
+	admonitionApprovedPublishedFull: {
+		id: 'project.moderation.admonition.approved.published-full',
+		defaultMessage:
+			"Your project is published and discoverable on Modrinth. You can change the visibility of your project in <settings-link>your project's settings</settings-link>.",
+	},
+	admonitionApprovedUnlistedFull: {
+		id: 'project.moderation.admonition.approved.unlisted-full',
+		defaultMessage:
+			"Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth. You can change the visibility of your project in <settings-link>your project's settings</settings-link>.",
+	},
+	admonitionApprovedPrivateFull: {
+		id: 'project.moderation.admonition.approved.private-full',
+		defaultMessage:
+			"Your project is private, meaning it can only be accessed by you and people you invite. You can change the visibility of your project in <settings-link>your project's settings</settings-link>.",
+	},
+	admonitionDraftHeader: {
+		id: 'project.moderation.admonition.draft.header',
+		defaultMessage: 'Draft project',
+	},
+	admonitionDraftBody: {
+		id: 'project.moderation.admonition.draft.body',
+		defaultMessage:
+			'This is a draft project that needs to be submitted for review before it can be accessed by others. To submit, check out the publishing checklist at the top.',
+	},
+	admonitionUnderReviewHeader: {
+		id: 'project.moderation.admonition.under-review.header',
+		defaultMessage: 'Project under review',
+	},
+	admonitionUnderReviewBody: {
+		id: 'project.moderation.admonition.under-review.body',
+		defaultMessage:
+			"Your project won't be available for people to use until it's manually reviewed by our moderation team. Please be patient and ensure your project follows all our rules!",
+	},
+	admonitionUnderReviewTiming: {
+		id: 'project.moderation.admonition.under-review.timing',
+		defaultMessage:
+			'Our goal is always to review projects in 24–48 hours, however due to an increase in submissions, do not be alarmed if your project takes longer to be reviewed.',
+	},
+	admonitionChangesRequestedHeader: {
+		id: 'project.moderation.admonition.changes-requested.header',
+		defaultMessage: 'Changes requested',
+	},
+	admonitionWithheldBody: {
+		id: 'project.moderation.admonition.withheld.body',
+		defaultMessage:
+			"Your project does not currently meet Modrinth's <rules-link>content rules</rules-link> in order to be publicly listed on Modrinth. The moderators have requested you make changes before it can be fully approved, but it can currently be accessed with a direct link.",
+	},
+	admonitionRejectedBody: {
+		id: 'project.moderation.admonition.rejected.body',
+		defaultMessage:
+			"Your project does not currently meet Modrinth's <rules-link>content rules</rules-link> and the moderators have requested you make changes before it can be approved.",
+	},
+	admonitionResubmitNote: {
+		id: 'project.moderation.admonition.resubmit-note',
+		defaultMessage:
+			"Read the messages from the moderators below and address their comments before resubmitting. <warning-strong>Repeated submissions without addressing the moderators' comments may result in an account suspension.</warning-strong>",
+	},
+	threadSectionTitle: {
+		id: 'project.moderation.thread.title',
+		defaultMessage: 'Message the moderators',
+	},
+	threadPrivateDescription: {
+		id: 'project.moderation.thread.private-description',
+		defaultMessage:
+			'This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project.',
+	},
+	threadHelpCenterNote: {
+		id: 'project.moderation.thread.help-center-note',
+		defaultMessage:
+			'This thread is only checked when you submit your project for review. For additional inquiries, please go to the <help-center-link>Modrinth Help Center</help-center-link> and click the green bubble to contact support.',
+	},
+	threadApprovedWarning: {
+		id: 'project.moderation.thread.approved-warning',
+		defaultMessage:
+			'Moderators are not actively monitoring this chat because your project has already been approved.',
+	},
+	unauthorizedStatus: {
+		id: 'project.moderation.error.unauthorized',
+		defaultMessage: 'Unauthorized',
+	},
+})
 
 const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, invalidate } = injectProjectPageContext()
+const { projectV2: project, currentMember, invalidate, allMembers } = injectProjectPageContext()
 
 const canAccess = computed(() => !!currentMember.value)
 
+const moderatorSeeUserUiCookie = useCookie('moderation-see-user-ui', {
+	default: () => false,
+	maxAge: 60 * 60 * 24 * 365,
+	sameSite: 'lax',
+	path: '/',
+})
+
+const moderatorSeeUserUi = computed({
+	get() {
+		return moderatorSeeUserUiCookie.value
+	},
+	set(value) {
+		moderatorSeeUserUiCookie.value = value
+	},
+})
+
 watch(
-	[currentMember, project],
+	[currentMember, allMembers],
 	() => {
-		if (project.value && !canAccess.value) {
+		if (allMembers.value.length > 0 && !canAccess.value) {
 			showError({
 				fatal: true,
 				statusCode: 401,
-				statusMessage: 'Unauthorized',
+				statusMessage: formatMessage(messages.unauthorizedStatus),
 			})
 		}
 	},
@@ -166,7 +323,7 @@ async function setStatus(status) {
 		await queryClient.invalidateQueries({ queryKey: ['thread', project.value?.thread_id] })
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -175,60 +332,3 @@ async function setStatus(status) {
 	stopLoading()
 }
 </script>
-<style lang="scss" scoped>
-.stacked {
-	display: flex;
-	flex-direction: column;
-}
-
-.status-message {
-	:deep(.badge) {
-		display: contents;
-
-		svg {
-			vertical-align: top;
-			margin: 0;
-		}
-	}
-
-	p:last-child {
-		margin-bottom: 0;
-	}
-}
-
-.unavailable-error {
-	.code {
-		margin-top: var(--spacing-card-sm);
-	}
-
-	svg {
-		vertical-align: top;
-	}
-}
-
-.visibility-info {
-	padding: 0;
-	list-style: none;
-
-	li {
-		display: flex;
-		align-items: center;
-		gap: var(--spacing-card-xs);
-	}
-}
-
-svg {
-	&.good {
-		color: var(--color-green);
-	}
-
-	&.bad {
-		color: var(--color-red);
-	}
-}
-
-.warning {
-	color: var(--color-orange);
-	font-weight: bold;
-}
-</style>

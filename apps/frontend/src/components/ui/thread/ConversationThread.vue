@@ -82,7 +82,10 @@
 			Thread ID:
 			<CopyCode :text="thread.id" />
 		</div>
-		<div v-if="sortedMessages.length > 0" class="messages universal-card recessed">
+		<div
+			v-if="sortedMessages.length > 0"
+			class="card-shadow flex flex-col overflow-clip rounded-2xl border border-solid border-surface-4 bg-surface-3"
+		>
 			<ThreadMessage
 				v-for="message in sortedMessages"
 				:key="'message-' + message.id"
@@ -106,7 +109,7 @@
 			</ButtonStyled>
 		</template>
 		<template v-else-if="!report || !report.closed">
-			<div class="markdown-editor-spacing">
+			<div class="markdown-editor-spacing mt-4">
 				<MarkdownEditor
 					v-model="replyBody"
 					:placeholder="sortedMessages.length > 0 ? 'Reply to thread...' : 'Send a message...'"
@@ -156,7 +159,7 @@
 						Add private note
 					</button>
 				</ButtonStyled>
-				<template v-if="currentMember && !isStaff(auth.user)">
+				<template v-if="currentMember && !currentMember.staffOnly">
 					<template v-if="isRejected(project)">
 						<ButtonStyled color="orange">
 							<button v-if="replyBody" :disabled="isLoading" @click="openResubmitModal(true)">
@@ -609,12 +612,6 @@ const requestedStatus = computed(() => props.project.requested_status ?? 'approv
 <style lang="scss" scoped>
 .markdown-editor-spacing {
 	margin-bottom: var(--gap-md);
-}
-
-.messages {
-	display: flex;
-	flex-direction: column;
-	padding: var(--spacing-card-md);
 }
 
 .thread-id {

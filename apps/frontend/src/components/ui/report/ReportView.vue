@@ -1,15 +1,21 @@
 <template>
 	<div>
-		<section class="universal-card">
+		<section>
 			<Breadcrumbs
 				v-if="breadcrumbsStack"
 				:current-title="`Report ${reportId}`"
 				:link-stack="breadcrumbsStack"
 			/>
 			<h2>Report details</h2>
-			<ReportInfo :report="report" :show-thread="false" :show-message="false" :auth="auth" />
+			<ReportInfo
+				:report="report"
+				:show-thread="false"
+				:show-message="false"
+				:auth="auth"
+				class="card-shadow mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-2 p-4"
+			/>
 		</section>
-		<section v-if="report && thread" class="universal-card">
+		<section v-if="report && thread" class="">
 			<h2>Messages</h2>
 			<ConversationThread
 				:thread="thread"

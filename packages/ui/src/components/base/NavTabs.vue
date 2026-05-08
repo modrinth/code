@@ -2,8 +2,8 @@
 	<nav
 		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
-		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold drop-shadow-xl"
-		:class="{ 'shadow-sm': mode === 'navigation' }"
+		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
+		:class="{ 'drop-shadow-xl': mode === 'navigation' }"
 	>
 		<template v-if="mode === 'navigation'">
 			<RouterLink

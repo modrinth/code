@@ -25,6 +25,7 @@ import {
 	PayPalIcon,
 	PlugIcon,
 	PolygonIcon,
+	ScaleIcon,
 	UnknownIcon,
 	UpdatedIcon,
 	USDCColorIcon,
@@ -68,6 +69,7 @@ export const SEVERITY_ICONS: Record<string, Component> = {
 	error: XCircleIcon,
 	critical: XCircleIcon,
 	success: CheckCircleIcon,
+	moderation: ScaleIcon,
 }
 
 export const PROJECT_STATUS_ICONS: Record<ProjectStatus, Component> = {

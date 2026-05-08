@@ -2564,6 +2564,63 @@
   "project.license.title": {
     "message": "License"
   },
+  "project.moderation.admonition.approved.header": {
+    "message": "Project approved"
+  },
+  "project.moderation.admonition.approved.private-full": {
+    "message": "Your project is private, meaning it can only be accessed by you and people you invite. You can change the visibility of your project in <settings-link>your project's settings</settings-link>."
+  },
+  "project.moderation.admonition.approved.published-full": {
+    "message": "Your project is published and discoverable on Modrinth. You can change the visibility of your project in <settings-link>your project's settings</settings-link>."
+  },
+  "project.moderation.admonition.approved.unlisted-full": {
+    "message": "Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth. You can change the visibility of your project in <settings-link>your project's settings</settings-link>."
+  },
+  "project.moderation.admonition.changes-requested.header": {
+    "message": "Changes requested"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "This is a draft project that needs to be submitted for review before it can be accessed by others. To submit, check out the publishing checklist at the top."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Draft project"
+  },
+  "project.moderation.admonition.rejected.body": {
+    "message": "Your project does not currently meet Modrinth's <rules-link>content rules</rules-link> and the moderators have requested you make changes before it can be approved."
+  },
+  "project.moderation.admonition.resubmit-note": {
+    "message": "Read the messages from the moderators below and address their comments before resubmitting. <warning-strong>Repeated submissions without addressing the moderators' comments may result in an account suspension.</warning-strong>"
+  },
+  "project.moderation.admonition.under-review.body": {
+    "message": "Your project won't be available for people to use until it's manually reviewed by our moderation team. Please be patient and ensure your project follows all our rules!"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Project under review"
+  },
+  "project.moderation.admonition.under-review.timing": {
+    "message": "Our goal is always to review projects in 24–48 hours, however due to an increase in submissions, do not be alarmed if your project takes longer to be reviewed."
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "Your project does not currently meet Modrinth's <rules-link>content rules</rules-link> in order to be publicly listed on Modrinth. The moderators have requested you make changes before it can be fully approved, but it can currently be accessed with a direct link."
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Unauthorized"
+  },
+  "project.moderation.see-user-ui": {
+    "message": "See what users see"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "Moderators are not actively monitoring this chat because your project has already been approved."
+  },
+  "project.moderation.thread.help-center-note": {
+    "message": "This thread is only checked when you submit your project for review. For additional inquiries, please go to the <help-center-link>Modrinth Help Center</help-center-link> and click the green bubble to contact support."
+  },
+  "project.moderation.thread.private-description": {
+    "message": "This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project."
+  },
+  "project.moderation.thread.title": {
+    "message": "Message the moderators"
+  },
   "project.moderation.title": {
     "message": "Moderation"
   },
