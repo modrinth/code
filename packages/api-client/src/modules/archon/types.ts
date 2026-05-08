@@ -394,7 +394,7 @@ export namespace Archon {
 			export enum UserScope {
 				NONE = 0,
 
-				SERVER_ADMIN = -0x100000000000000,
+				SERVER_ADMIN = -0x8000,
 				EDITOR = -0x400000000000000,
 				VIEWER = -0x4000000000000000,
 				RESERVED_BITS = 0x7fff,
