@@ -90,6 +90,7 @@ import { ButtonStyled, Table, type TableColumn, useFormatNumber } from '@modrint
 import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardStat,
+	doesProjectStatusMatchFilters,
 	doesAnalyticsPointMatchFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
@@ -146,7 +147,19 @@ const includeDate = computed<boolean>({
 	},
 })
 
-const isSingleProjectView = computed(() => selectedProjectIds.value.length === 1)
+const selectedProjectIdSet = computed(
+	() =>
+		new Set(
+			projects.value
+				.filter(
+					(project) =>
+						selectedProjectIds.value.includes(project.id) &&
+						doesProjectStatusMatchFilters(project.status, selectedFilters.value),
+				)
+				.map((project) => project.id),
+		),
+)
+const isSingleProjectView = computed(() => selectedProjectIdSet.value.size === 1)
 const showBreakdownColumn = computed(
 	() => selectedBreakdown.value !== 'none' || !isSingleProjectView.value,
 )
@@ -185,7 +198,6 @@ const breakdownColumnLabel = computed(() => {
 			return 'Breakdown'
 	}
 })
-const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 const relevantStats = computed(
 	() => new Set(getRelevantAnalyticsDashboardStats(selectedBreakdown.value, selectedFilters.value)),
 )
@@ -212,7 +224,7 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 
 	const breakdownValues = new Set<string>()
 	if (nextSelectedBreakdown === 'none') {
-		for (const projectId of selectedProjectIds.value) {
+		for (const projectId of selectedProjectIdSet.value) {
 			breakdownValues.add(projectId)
 		}
 	} else {

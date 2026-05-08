@@ -2,6 +2,7 @@ import type { LocationQuery, LocationQueryValue, LocationQueryValueRaw } from 'v
 
 export type AnalyticsQueryFilterCategory =
 	| 'project'
+	| 'project_status'
 	| 'country'
 	| 'monetization'
 	| 'download_source'
@@ -100,6 +101,17 @@ const BREAKDOWN_PRESET_VALUES: AnalyticsBreakdownPreset[] = [
 	'game_version',
 ]
 
+const PROJECT_STATUS_FILTER_VALUES = [
+	'approved',
+	'archived',
+	'rejected',
+	'draft',
+	'unlisted',
+	'withheld',
+	'private',
+	'other',
+]
+
 const QUERY_KEY_PROJECT_IDS = 'a_projects'
 const QUERY_KEY_TIMEFRAME_MODE = 'a_timeframe_mode'
 const QUERY_KEY_TIMEFRAME = 'a_timeframe'
@@ -109,6 +121,7 @@ const QUERY_KEY_TIMEFRAME_START = 'a_timeframe_start'
 const QUERY_KEY_TIMEFRAME_END = 'a_timeframe_end'
 const QUERY_KEY_GROUP_BY = 'a_group_by'
 const QUERY_KEY_BREAKDOWN = 'a_breakdown'
+const QUERY_KEY_FILTER_PROJECT_STATUS = 'a_project_status'
 const QUERY_KEY_FILTER_COUNTRY = 'a_country'
 const QUERY_KEY_FILTER_MONETIZATION = 'a_monetization'
 const QUERY_KEY_FILTER_DOWNLOAD_SOURCE = 'a_download_source'
@@ -118,6 +131,7 @@ const QUERY_KEY_FILTER_GAME_VERSION = 'a_game_version'
 const QUERY_KEY_FILTER_LOADER_TYPE = 'a_loader_type'
 
 const URL_FILTER_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'project'>[] = [
+	'project_status',
 	'country',
 	'monetization',
 	'download_source',
@@ -131,6 +145,7 @@ const FILTER_QUERY_KEY_BY_CATEGORY: Record<
 	Exclude<AnalyticsQueryFilterCategory, 'project'>,
 	string
 > = {
+	project_status: QUERY_KEY_FILTER_PROJECT_STATUS,
 	country: QUERY_KEY_FILTER_COUNTRY,
 	monetization: QUERY_KEY_FILTER_MONETIZATION,
 	download_source: QUERY_KEY_FILTER_DOWNLOAD_SOURCE,
@@ -150,6 +165,7 @@ const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_TIMEFRAME_END,
 	QUERY_KEY_GROUP_BY,
 	QUERY_KEY_BREAKDOWN,
+	QUERY_KEY_FILTER_PROJECT_STATUS,
 	QUERY_KEY_FILTER_COUNTRY,
 	QUERY_KEY_FILTER_MONETIZATION,
 	QUERY_KEY_FILTER_DOWNLOAD_SOURCE,
@@ -162,6 +178,7 @@ const ANALYTICS_QUERY_KEYS = [
 export function buildEmptySelectedFilters(): AnalyticsSelectedFilters {
 	return {
 		project: [],
+		project_status: [],
 		country: [],
 		monetization: [],
 		download_source: [],
@@ -197,6 +214,12 @@ function normalizeFilterQueryValues(
 	category: Exclude<AnalyticsQueryFilterCategory, 'project'>,
 	values: string[],
 ): string[] {
+	if (category === 'project_status') {
+		return values
+			.map((value) => value.trim().toLowerCase())
+			.filter((value) => PROJECT_STATUS_FILTER_VALUES.includes(value))
+	}
+
 	if (category !== 'loader_type') {
 		return values
 	}

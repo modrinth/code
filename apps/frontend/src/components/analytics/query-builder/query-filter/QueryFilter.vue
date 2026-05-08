@@ -173,6 +173,7 @@ type ApplyDownloadsThreshold = (setSelectedValues: SetDropdownFilterValues) => v
 type CloseDownloadsThresholdMenu = (event?: Event) => void
 
 const {
+	availableProjectStatuses,
 	filterOptions,
 	projectVersionDownloadsById,
 	gameVersionDownloadsByVersion,
@@ -192,6 +193,12 @@ const projectVersionDownloadsThreshold = ref<number | null>(null)
 const gameVersionDownloadsThreshold = ref<number | null>(null)
 const gameVersionTypeOptions: Array<'release' | 'all'> = ['release', 'all']
 const filterValueCategoryKeys = new Set<string>(FILTER_VALUE_CATEGORIES)
+const projectStatusFilterOptions = computed<DropdownFilterBarOption[]>(() =>
+	availableProjectStatuses.value.map((status) => ({
+		value: status,
+		label: getProjectStatusFilterOptionLabel(status),
+	})),
+)
 
 const selectedFilterValue = computed<Record<string, string[]>>({
 	get: () => selectedFilters.value,
@@ -220,6 +227,11 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 		getVisibleAnalyticsFilterCategoriesForState(selectedBreakdown.value, selectedFilters.value),
 	)
 	const categories: DropdownFilterBarCategory[] = [
+		{
+			key: 'project_status',
+			label: 'Project status',
+			options: withSelectedOptions('project_status', projectStatusFilterOptions.value),
+		},
 		{
 			key: 'country',
 			label: 'Country',
@@ -419,6 +431,15 @@ function getCountryFilterOptionLabel(countryCode: string): string {
 	}
 
 	return countryLabelsByCode.value.get(normalizedCode) ?? countryCode
+}
+
+function getProjectStatusFilterOptionLabel(status: string): string {
+	const normalizedStatus = status.trim()
+	if (normalizedStatus.length === 0) {
+		return status
+	}
+
+	return `${normalizedStatus.charAt(0).toUpperCase()}${normalizedStatus.slice(1)}`
 }
 
 function getLoaderTypeFilterOptionLabel(loaderType: string): string {

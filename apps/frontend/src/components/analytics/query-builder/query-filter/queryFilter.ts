@@ -7,6 +7,7 @@ import type {
 
 export type AnalyticsDashboardDimension =
 	| 'project'
+	| 'project_status'
 	| 'version_id'
 	| 'country'
 	| 'monetization'
@@ -17,6 +18,7 @@ export type AnalyticsDashboardDimension =
 
 export const ALL_FILTER_VALUE = '__all__'
 export const FILTER_VALUE_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'project'>[] = [
+	'project_status',
 	'country',
 	'monetization',
 	'download_source',
@@ -45,6 +47,7 @@ const ANALYTICS_STATS_BY_DIMENSION: Record<
 	download_reason: ['downloads'],
 	game_version: ['downloads', 'playtime'],
 	loader_type: ['downloads', 'playtime'],
+	project_status: ANALYTICS_DASHBOARD_STAT_ORDER,
 }
 
 const ANALYTICS_DIMENSION_BY_BREAKDOWN: Record<
@@ -65,6 +68,7 @@ const ANALYTICS_DIMENSION_BY_FILTER_CATEGORY: Record<
 	Exclude<AnalyticsQueryFilterCategory, 'project'>,
 	AnalyticsDashboardDimension
 > = {
+	project_status: 'project_status',
 	country: 'country',
 	monetization: 'monetization',
 	download_source: 'download_source',
@@ -201,6 +205,7 @@ export function sanitizeAnalyticsSelectedFilters(
 export function cloneSelectedFilters(filters: AnalyticsSelectedFilters): AnalyticsSelectedFilters {
 	return {
 		project: [...filters.project],
+		project_status: [...filters.project_status],
 		country: [...filters.country],
 		monetization: [...filters.monetization],
 		download_source: [...filters.download_source],
@@ -281,6 +286,11 @@ export function normalizeSelectedValues(
 	}
 
 	const selectedValues = uniqueValues.filter((value) => value !== ALL_FILTER_VALUE)
+	if (categoryKey === 'project_status') {
+		return selectedValues
+			.map((value) => value.trim().toLowerCase())
+			.filter(isProjectStatusFilterValue)
+	}
 	if (categoryKey === 'loader_type') {
 		return Array.from(
 			new Set(
@@ -292,4 +302,30 @@ export function normalizeSelectedValues(
 	}
 
 	return selectedValues
+}
+
+export const PROJECT_STATUS_FILTER_VALUES = [
+	'approved',
+	'archived',
+	'rejected',
+	'draft',
+	'unlisted',
+	'withheld',
+	'private',
+	'other',
+] as const
+
+export type ProjectStatusFilterValue = (typeof PROJECT_STATUS_FILTER_VALUES)[number]
+
+const projectStatusFilterValueSet = new Set<string>(PROJECT_STATUS_FILTER_VALUES)
+
+export function isProjectStatusFilterValue(value: string): value is ProjectStatusFilterValue {
+	return projectStatusFilterValueSet.has(value)
+}
+
+export function getProjectStatusFilterValue(
+	status: string | null | undefined,
+): ProjectStatusFilterValue {
+	const normalizedStatus = status?.trim().toLowerCase() ?? ''
+	return isProjectStatusFilterValue(normalizedStatus) ? normalizedStatus : 'other'
 }

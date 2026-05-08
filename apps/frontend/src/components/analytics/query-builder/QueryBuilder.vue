@@ -173,6 +173,7 @@ import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsGroupByPreset,
 	type AnalyticsSelectedFilters,
+	getProjectIdsMatchingStatusFilter,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
@@ -200,6 +201,7 @@ const {
 	selectedGroupBy,
 	selectedBreakdown,
 	selectedFilters,
+	projectStatusById,
 	refreshAnalyticsQuery,
 	setFetchRequest,
 } = injectAnalyticsDashboardContext()
@@ -629,6 +631,11 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 	const resolutionSlices = Math.min(MAX_TIME_SLICES, desiredSlices)
 
 	const bucketBy = withBreakdownFields(selectedBreakdown.value, selectedFilters.value)
+	const filteredProjectIds = getProjectIdsMatchingStatusFilter(
+		selectedProjectIds.value,
+		projectStatusById.value,
+		selectedFilters.value,
+	)
 
 	return {
 		time_range: {
@@ -638,7 +645,7 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 				slices: resolutionSlices,
 			},
 		},
-		project_ids: sortStrings(selectedProjectIds.value),
+		project_ids: sortStrings(filteredProjectIds),
 		return_metrics: {
 			project_views: {
 				bucket_by: sortStrings(bucketBy.views),

@@ -141,7 +141,10 @@ import { Tabs, type TabsTab, useFormatNumber } from '@modrinth/ui'
 
 import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
-import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
+import {
+	doesProjectStatusMatchFilters,
+	injectAnalyticsDashboardContext,
+} from '~/providers/analytics/analytics'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import AnalyticsChart from './AnalyticsChart.client.vue'
@@ -192,7 +195,11 @@ const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 const hasAvailableProjects = computed(() => projects.value.length > 0)
 
 const selectedProjects = computed(() =>
-	projects.value.filter((project) => selectedProjectIdSet.value.has(project.id)),
+	projects.value.filter(
+		(project) =>
+			selectedProjectIdSet.value.has(project.id) &&
+			doesProjectStatusMatchFilters(project.status, selectedFilters.value),
+	),
 )
 
 const emptyChartMessage = computed(() =>

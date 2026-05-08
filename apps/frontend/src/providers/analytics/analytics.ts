@@ -5,6 +5,9 @@ import type { ComputedRef, Ref } from 'vue'
 
 import {
 	getEnabledAnalyticsStatsForState,
+	getProjectStatusFilterValue,
+	PROJECT_STATUS_FILTER_VALUES,
+	type ProjectStatusFilterValue,
 	sanitizeAnalyticsSelectedFilters,
 } from '~/components/analytics/query-builder/query-filter/queryFilter'
 import { fetchSegmentedWith } from '~/utils/fetch-helpers.ts'
@@ -53,6 +56,7 @@ export interface AnalyticsDashboardProject {
 	id: string
 	name: string
 	downloads: number
+	status: ProjectStatusFilterValue
 }
 
 export interface AnalyticsDashboardTotals {
@@ -101,6 +105,8 @@ export interface AnalyticsDashboardContextValue {
 	filterOptions: ComputedRef<AnalyticsDashboardFilterOptions>
 	versionNumbersById: ComputedRef<Map<string, string>>
 	versionPublishedDatesById: ComputedRef<Map<string, string>>
+	projectStatusById: ComputedRef<Map<string, ProjectStatusFilterValue>>
+	availableProjectStatuses: ComputedRef<ProjectStatusFilterValue[]>
 	projectVersionDownloadsById: ComputedRef<Map<string, number>>
 	gameVersionDownloadsByVersion: ComputedRef<Map<string, number>>
 	countryDownloadsByCode: ComputedRef<Map<string, number>>
@@ -200,6 +206,7 @@ function computeTotals(
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
 	selectedProjectIds: Set<string>,
 	availableProjectIds: Set<string>,
+	projectStatusById: Map<string, ProjectStatusFilterValue>,
 	filters: AnalyticsSelectedFilters,
 ): AnalyticsDashboardTotals {
 	const totals: AnalyticsDashboardTotals = {
@@ -214,6 +221,12 @@ function computeTotals(
 	}
 
 	const effectiveProjectIds = selectedProjectIds.size > 0 ? selectedProjectIds : availableProjectIds
+	const filteredProjectIds = new Set(
+		getProjectIdsMatchingStatusFilter([...effectiveProjectIds], projectStatusById, filters),
+	)
+	if (filteredProjectIds.size === 0) {
+		return totals
+	}
 
 	for (const timeSlice of timeSlices) {
 		for (const dataPoint of timeSlice) {
@@ -221,7 +234,7 @@ function computeTotals(
 				continue
 			}
 
-			if (!effectiveProjectIds.has(dataPoint.source_project)) {
+			if (!filteredProjectIds.has(dataPoint.source_project)) {
 				continue
 			}
 
@@ -264,6 +277,31 @@ function isAnalyticsEligibleProject(
 ): boolean {
 	return !isServerProject(project)
 	// && project.status !== 'draft'
+}
+
+export function doesProjectStatusMatchFilters(
+	status: string | null | undefined,
+	filters: AnalyticsSelectedFilters,
+): boolean {
+	if (filters.project_status.length === 0) {
+		return true
+	}
+
+	return filters.project_status.includes(getProjectStatusFilterValue(status))
+}
+
+export function getProjectIdsMatchingStatusFilter(
+	projectIds: string[],
+	projectStatusById: Map<string, ProjectStatusFilterValue>,
+	filters: AnalyticsSelectedFilters,
+): string[] {
+	if (filters.project_status.length === 0) {
+		return projectIds
+	}
+
+	return projectIds.filter((projectId) =>
+		doesProjectStatusMatchFilters(projectStatusById.get(projectId), filters),
+	)
 }
 
 function sortStringValues(values: string[]): string[] {
@@ -339,6 +377,7 @@ function cloneAnalyticsSelectedFilters(
 ): AnalyticsSelectedFilters {
 	return {
 		project: [...filters.project],
+		project_status: [...filters.project_status],
 		country: [...filters.country],
 		monetization: [...filters.monetization],
 		download_source: [...filters.download_source],
@@ -721,7 +760,14 @@ export function createAnalyticsDashboardContext(
 		if (hasProjectContext.value && options.projectPageContext) {
 			const project = options.projectPageContext.projectV2.value
 			return project && isAnalyticsEligibleProject(project)
-				? [{ id: project.id, name: project.title, downloads: project.downloads ?? 0 }]
+				? [
+						{
+							id: project.id,
+							name: project.title,
+							downloads: project.downloads ?? 0,
+							status: getProjectStatusFilterValue(project.status),
+						},
+					]
 				: []
 		}
 
@@ -732,6 +778,7 @@ export function createAnalyticsDashboardContext(
 					id: project.id,
 					name: project.name,
 					downloads: project.downloads ?? 0,
+					status: getProjectStatusFilterValue(project.status),
 				}))
 		}
 
@@ -741,10 +788,18 @@ export function createAnalyticsDashboardContext(
 				id: project.id,
 				name: project.title,
 				downloads: project.downloads ?? 0,
+				status: getProjectStatusFilterValue(project.status),
 			}))
 	})
 
 	const availableProjectIds = computed(() => projects.value.map((project) => project.id))
+	const projectStatusById = computed(
+		() => new Map(projects.value.map((project) => [project.id, project.status])),
+	)
+	const availableProjectStatuses = computed<ProjectStatusFilterValue[]>(() => {
+		const presentStatuses = new Set(projects.value.map((project) => project.status))
+		return PROJECT_STATUS_FILTER_VALUES.filter((status) => presentStatuses.has(status))
+	})
 	const sortedSelectedProjectIds = computed(() => sortStringValues(selectedProjectIds.value))
 
 	function getRelevantAnalyticsDashboardStats(
@@ -1201,6 +1256,7 @@ export function createAnalyticsDashboardContext(
 			timeSlices.value,
 			selectedProjectIdSet.value,
 			availableProjectIdSet.value,
+			projectStatusById.value,
 			selectedFilters.value,
 		),
 	)
@@ -1209,6 +1265,7 @@ export function createAnalyticsDashboardContext(
 			previousTimeSlices.value,
 			selectedProjectIdSet.value,
 			availableProjectIdSet.value,
+			projectStatusById.value,
 			selectedFilters.value,
 		),
 	)
@@ -1321,6 +1378,8 @@ export function createAnalyticsDashboardContext(
 		filterOptions,
 		versionNumbersById,
 		versionPublishedDatesById,
+		projectStatusById,
+		availableProjectStatuses,
 		projectVersionDownloadsById,
 		gameVersionDownloadsByVersion,
 		countryDownloadsByCode,
