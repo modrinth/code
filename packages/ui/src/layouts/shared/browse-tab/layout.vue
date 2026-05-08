@@ -15,6 +15,7 @@ import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import type { SortType } from '#ui/utils/search'
 
+import SelectedProjectsFloatingBar from './components/SelectedProjectsFloatingBar.vue'
 import BrowseInstallHeader from './header.vue'
 import { injectBrowseManager } from './providers/browse-manager'
 
@@ -51,6 +52,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 			<BrowseInstallHeader />
 		</div>
 	</template>
+	<SelectedProjectsFloatingBar v-if="ctx.installContext?.value && ctx.variant !== 'web'" />
 
 	<NavTabs v-if="ctx.showProjectTypeTabs.value" :links="ctx.selectableProjectTypes.value" />
 

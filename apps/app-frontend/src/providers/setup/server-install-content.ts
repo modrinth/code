@@ -6,6 +6,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	type BrowseInstallPlan,
+	type BrowseSelectedProject,
 } from '@modrinth/ui'
 import { computed, type ComputedRef, nextTick, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -43,11 +44,17 @@ export interface ServerInstallContentContext {
 	serverContentProjectIds: Ref<Set<string>>
 	queuedServerInstallProjectIds: ComputedRef<Set<string>>
 	queuedServerInstallCount: ComputedRef<number>
+	selectedServerInstallProjects: ComputedRef<BrowseSelectedProject[]>
+	isInstallingQueuedServerInstalls: Ref<boolean>
+	queuedInstallProgress: Ref<{ completed: number; total: number }>
 	serverBackUrl: ComputedRef<string>
 	serverBackLabel: ComputedRef<string>
 	serverBrowseHeading: ComputedRef<string>
 	clearQueuedServerInstalls: () => void
+	removeQueuedServerInstall: (projectId: string) => void
 	flushQueuedServerInstalls: () => Promise<boolean>
+	discardQueuedServerInstallsAndBack: () => Promise<void>
+	installQueuedServerInstallsAndBack: () => Promise<boolean>
 	initServerContext: () => Promise<void>
 	watchServerContextChanges: () => void
 	searchServerModpacks: (
@@ -112,7 +119,7 @@ export function createServerInstallContent(opts: {
 	const route = useRoute()
 	const router = useRouter()
 	const client = injectModrinthClient()
-	const { handleError } = injectNotificationManager()
+	const { addNotification, handleError } = injectNotificationManager()
 
 	const serverIdQuery = computed(() => readQueryString(route.query.sid))
 	const worldIdQuery = computed(() => readQueryString(route.query.wid))
@@ -135,6 +142,15 @@ export function createServerInstallContent(opts: {
 	)
 	const queuedServerInstallProjectIds = computed(() => new Set(queuedServerInstalls.value.keys()))
 	const queuedServerInstallCount = computed(() => queuedServerInstalls.value.size)
+	const selectedServerInstallProjects = computed<BrowseSelectedProject[]>(() =>
+		Array.from(queuedServerInstalls.value.values()).map((plan) => ({
+			id: plan.projectId,
+			name: plan.project.title ?? plan.project.name ?? 'Project',
+			iconUrl: plan.project.icon_url ?? null,
+		})),
+	)
+	const isInstallingQueuedServerInstalls = ref(false)
+	const queuedInstallProgress = ref({ completed: 0, total: 0 })
 	const effectiveServerWorldId = computed(() => worldIdQuery.value ?? serverContextWorldId.value)
 	const serverInstallQueue = {
 		get: () => queuedServerInstalls.value,
@@ -294,8 +310,15 @@ export function createServerInstallContent(opts: {
 		setQueuedServerInstallPlans(new Map())
 	}
 
+	function removeQueuedServerInstall(projectId: string) {
+		const nextPlans = new Map(queuedServerInstalls.value)
+		nextPlans.delete(projectId)
+		setQueuedServerInstallPlans(nextPlans)
+	}
+
 	async function flushQueuedServerInstalls() {
 		if (queuedServerInstalls.value.size === 0) return true
+		if (isInstallingQueuedServerInstalls.value) return false
 
 		const sid = serverIdQuery.value
 		const wid = effectiveServerWorldId.value
@@ -305,26 +328,60 @@ export function createServerInstallContent(opts: {
 		}
 
 		const installedProjectIds = new Set<string>()
-		const result = await flushInstallQueue({
-			queue: serverInstallQueue,
-			install: async (plan) => {
-				await client.archon.content_v1.addAddon(sid, wid, {
-					project_id: plan.projectId,
-					version_id: plan.versionId,
-				})
-				installedProjectIds.add(plan.projectId)
-			},
-			onError: (error) => handleError(error as Error),
-		})
-
-		if (installedProjectIds.size > 0) {
-			serverContentProjectIds.value = new Set([
-				...serverContentProjectIds.value,
-				...installedProjectIds,
-			])
+		isInstallingQueuedServerInstalls.value = true
+		queuedInstallProgress.value = {
+			completed: 0,
+			total: queuedServerInstalls.value.size,
 		}
 
-		return result.ok
+		try {
+			const result = await flushInstallQueue({
+				queue: serverInstallQueue,
+				install: async (plan) => {
+					await client.archon.content_v1.addAddon(sid, wid, {
+						project_id: plan.projectId,
+						version_id: plan.versionId,
+					})
+					installedProjectIds.add(plan.projectId)
+				},
+				onError: (error) => handleError(error as Error),
+				onProgress: (completed, total) => {
+					queuedInstallProgress.value = { completed, total }
+				},
+			})
+
+			if (installedProjectIds.size > 0) {
+				serverContentProjectIds.value = new Set([
+					...serverContentProjectIds.value,
+					...installedProjectIds,
+				])
+			}
+
+			return result.ok
+		} finally {
+			isInstallingQueuedServerInstalls.value = false
+			queuedInstallProgress.value = { completed: 0, total: 0 }
+		}
+	}
+
+	async function discardQueuedServerInstallsAndBack() {
+		clearQueuedServerInstalls()
+		await router.push(serverBackUrl.value)
+	}
+
+	async function installQueuedServerInstallsAndBack() {
+		const ok = await flushQueuedServerInstalls()
+		if (ok) {
+			await router.push(serverBackUrl.value)
+			return true
+		}
+
+		addNotification({
+			type: 'error',
+			title: 'Some projects failed to install',
+			text: 'Failed projects are still selected. You can retry or clear them.',
+		})
+		return false
 	}
 
 	function getQueuedServerInstallPlans() {
@@ -393,11 +450,17 @@ export function createServerInstallContent(opts: {
 		serverContentProjectIds,
 		queuedServerInstallProjectIds,
 		queuedServerInstallCount,
+		selectedServerInstallProjects,
+		isInstallingQueuedServerInstalls,
+		queuedInstallProgress,
 		serverBackUrl,
 		serverBackLabel,
 		serverBrowseHeading,
 		clearQueuedServerInstalls,
+		removeQueuedServerInstall,
 		flushQueuedServerInstalls,
+		discardQueuedServerInstallsAndBack,
+		installQueuedServerInstallsAndBack,
 		initServerContext,
 		watchServerContextChanges,
 		searchServerModpacks,

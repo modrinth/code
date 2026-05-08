@@ -12,6 +12,12 @@ export interface BrowseSearchResponse {
 	per_page: number
 }
 
+export interface BrowseSelectedProject {
+	id: string
+	name: string
+	iconUrl?: string | null
+}
+
 export interface BrowseInstallContext {
 	name: string
 	loader: string
@@ -28,6 +34,15 @@ export interface BrowseInstallContext {
 	queuedLabel?: string
 	clearQueued?: () => void | Promise<void>
 	onBack?: () => boolean | void | Promise<boolean | void>
+	selectedProjects?: BrowseSelectedProject[]
+	isInstallingSelected?: boolean
+	installProgress?: {
+		completed: number
+		total: number
+	}
+	clearSelected?: () => void | Promise<void>
+	discardSelectedAndBack?: () => void | Promise<void>
+	installSelected?: () => boolean | void | Promise<boolean | void>
 }
 
 export interface CardAction {

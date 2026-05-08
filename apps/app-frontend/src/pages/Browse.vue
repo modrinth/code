@@ -79,11 +79,17 @@ const {
 	serverContentProjectIds,
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
+	selectedServerInstallProjects,
+	isInstallingQueuedServerInstalls,
+	queuedInstallProgress,
 	serverBackUrl,
 	serverBackLabel,
 	serverBrowseHeading,
 	clearQueuedServerInstalls,
+	removeQueuedServerInstall,
 	flushQueuedServerInstalls,
+	discardQueuedServerInstallsAndBack,
+	installQueuedServerInstallsAndBack,
 	initServerContext,
 	watchServerContextChanges,
 	searchServerModpacks,
@@ -419,9 +425,13 @@ const messages = defineMessages({
 		id: 'app.browse.server.installing',
 		defaultMessage: 'Installing',
 	},
+	validatingToServer: {
+		id: 'app.browse.server.validating',
+		defaultMessage: 'Validating',
+	},
 	queuedToServer: {
 		id: 'app.browse.server.queued',
-		defaultMessage: 'Queued',
+		defaultMessage: 'Selected',
 	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
@@ -569,11 +579,14 @@ const installContext = computed(() => {
 			backLabel: serverBackLabel.value,
 			heading: serverBrowseHeading.value,
 			queuedCount: queuedServerInstallCount.value,
-			queuedLabel: `${queuedServerInstallCount.value} ${
-				queuedServerInstallCount.value === 1 ? 'Mod' : 'Mods'
-			}`,
+			selectedProjects: selectedServerInstallProjects.value,
+			isInstallingSelected: isInstallingQueuedServerInstalls.value,
+			installProgress: queuedInstallProgress.value,
 			clearQueued: clearQueuedServerInstalls,
+			clearSelected: clearQueuedServerInstalls,
 			onBack: flushQueuedServerInstalls,
+			discardSelectedAndBack: discardQueuedServerInstallsAndBack,
+			installSelected: installQueuedServerInstallsAndBack,
 		}
 	}
 	if (instance.value) {
@@ -704,25 +717,42 @@ function getCardActions(
 		['modpack', 'mod', 'plugin', 'datapack'].includes(currentProjectType)
 	) {
 		const isQueued = queuedServerInstallProjectIds.value.has(projectResult.project_id)
-		const installLabel = isQueued
-			? isInstalling
-				? messages.installingToServer
-				: messages.queuedToServer
-			: isInstalling
-				? messages.installingToServer
-				: isInstalled
-					? messages.installedToServer
+		const isInstallingSelection = isInstallingQueuedServerInstalls.value
+		const validatingInstall =
+			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
+		const installLabel = isInstalled
+			? messages.installedToServer
+			: isQueued
+				? isInstalling || isInstallingSelection
+					? validatingInstall
+						? messages.validatingToServer
+						: messages.installingToServer
+					: messages.queuedToServer
+				: isInstalling || isInstallingSelection
+					? validatingInstall
+						? messages.validatingToServer
+						: messages.installingToServer
 					: messages.installToServer
 		return [
 			{
 				key: 'install',
 				label: formatMessage(installLabel),
-				icon: isInstalling ? SpinnerIcon : isQueued || isInstalled ? CheckIcon : PlusIcon,
-				iconClass: isInstalling ? 'animate-spin' : undefined,
-				disabled: isInstalled || isInstalling,
-				color: isQueued && !isInstalling ? 'green' : 'brand',
+				icon:
+					isInstalling || isInstallingSelection
+						? SpinnerIcon
+						: isQueued || isInstalled
+							? CheckIcon
+							: PlusIcon,
+				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
+				disabled: isInstalled || isInstalling || isInstallingSelection,
+				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: async () => {
+					if (isQueued) {
+						removeQueuedServerInstall(projectResult.project_id)
+						return
+					}
+
 					const contentType = currentProjectType as BrowseInstallContentType
 					const shouldShowInstalling = contentType === 'modpack' || !isQueued
 					if (shouldShowInstalling) {

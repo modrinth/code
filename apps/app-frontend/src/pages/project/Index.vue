@@ -117,13 +117,17 @@
 					<template v-else #actions>
 						<ButtonStyled size="large" color="brand">
 							<button
-								v-tooltip="installed ? `This project is already installed` : null"
-								:disabled="installed || installing"
+								v-tooltip="installButtonTooltip"
+								:disabled="installButtonDisabled"
 								@click="install(null)"
 							>
-								<DownloadIcon v-if="!installed && !installing" />
-								<CheckIcon v-else-if="installed" />
-								{{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
+								<SpinnerIcon
+									v-if="installButtonLoading && !installButtonInstalled"
+									class="animate-spin"
+								/>
+								<DownloadIcon v-else-if="!installButtonInstalled && !serverProjectSelected" />
+								<CheckIcon v-else />
+								{{ installButtonLabel }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled size="large" circular type="transparent">
@@ -201,11 +205,33 @@
 			</template>
 			<template v-else> Project data couldn't not be loaded. </template>
 		</div>
+		<SelectedProjectsFloatingBar
+			v-if="projectInstallContext"
+			:install-context="projectInstallContext"
+		/>
 		<ContextMenu ref="options" @option-clicked="handleOptionsClick">
 			<template #install> <DownloadIcon /> Install </template>
 			<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
 			<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
 		</ContextMenu>
+		<CreationFlowModal
+			v-if="serverInstallContent.isServerContext.value && data?.project_type === 'modpack'"
+			ref="serverSetupModalRef"
+			:type="
+				serverInstallContent.serverFlowFrom.value === 'reset-server'
+					? 'reset-server'
+					: 'server-onboarding'
+			"
+			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
+			:show-snapshot-toggle="true"
+			:on-back="serverInstallContent.onServerFlowBack"
+			:search-modpacks="serverInstallContent.searchServerModpacks"
+			:get-project-versions="serverInstallContent.getServerProjectVersions"
+			:get-loader-manifest="getLoaderManifest"
+			@hide="() => {}"
+			@browse-modpacks="() => {}"
+			@create="serverInstallContent.handleServerModpackFlowCreate"
+		/>
 	</div>
 </template>
 
@@ -222,11 +248,14 @@ import {
 	PlayIcon,
 	PlusIcon,
 	ReportIcon,
+	SpinnerIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
 import {
 	BrowseInstallHeader,
 	ButtonStyled,
+	CreationFlowModal,
+	getTargetInstallPreferences,
 	injectNotificationManager,
 	NavTabs,
 	OverflowMenu,
@@ -238,6 +267,8 @@ import {
 	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
+	requestInstall,
+	SelectedProjectsFloatingBar,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -264,6 +295,7 @@ import {
 	kill,
 	list as listInstances,
 } from '@/helpers/profile'
+import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { getServerLatency } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
@@ -370,10 +402,13 @@ const projectInstallContext = computed(() => {
 			backLabel: 'Back to browse',
 			heading: serverInstallContent.serverBrowseHeading.value,
 			queuedCount: serverInstallContent.queuedServerInstallCount.value,
-			queuedLabel: `${serverInstallContent.queuedServerInstallCount.value} ${
-				serverInstallContent.queuedServerInstallCount.value === 1 ? 'Mod' : 'Mods'
-			}`,
+			selectedProjects: serverInstallContent.selectedServerInstallProjects.value,
+			isInstallingSelected: serverInstallContent.isInstallingQueuedServerInstalls.value,
+			installProgress: serverInstallContent.queuedInstallProgress.value,
 			clearQueued: serverInstallContent.clearQueuedServerInstalls,
+			clearSelected: serverInstallContent.clearQueuedServerInstalls,
+			discardSelectedAndBack: serverInstallContent.discardQueuedServerInstallsAndBack,
+			installSelected: serverInstallContent.installQueuedServerInstallsAndBack,
 		}
 	}
 
@@ -389,6 +424,48 @@ const projectInstallContext = computed(() => {
 		}
 	}
 
+	return null
+})
+
+const serverProjectInstallContext = computed(
+	() =>
+		!!serverInstallContent.serverContextServerData.value &&
+		['modpack', 'mod', 'plugin', 'datapack'].includes(data.value?.project_type),
+)
+const serverProjectSelected = computed(
+	() => !!data.value && serverInstallContent.queuedServerInstallProjectIds.value.has(data.value.id),
+)
+const serverProjectInstalled = computed(
+	() =>
+		!!data.value &&
+		(serverInstallContent.serverContentProjectIds.value.has(data.value.id) ||
+			serverInstallContent.serverContextServerData.value?.upstream?.project_id === data.value.id),
+)
+const installButtonLoading = computed(
+	() => installing.value || serverInstallContent.isInstallingQueuedServerInstalls.value,
+)
+const installButtonValidating = computed(
+	() =>
+		serverProjectInstallContext.value &&
+		installing.value &&
+		data.value?.project_type !== 'modpack' &&
+		!serverInstallContent.isInstallingQueuedServerInstalls.value,
+)
+const installButtonInstalled = computed(() =>
+	serverProjectInstallContext.value ? serverProjectInstalled.value : installed.value,
+)
+const installButtonDisabled = computed(
+	() => installButtonInstalled.value || installButtonLoading.value,
+)
+const installButtonLabel = computed(() => {
+	if (installButtonInstalled.value) return 'Installed'
+	if (installButtonValidating.value) return 'Validating'
+	if (installButtonLoading.value) return 'Installing...'
+	if (serverProjectSelected.value) return 'Selected'
+	return 'Install'
+})
+const installButtonTooltip = computed(() => {
+	if (installButtonInstalled.value) return 'This project is already installed'
 	return null
 })
 
@@ -561,6 +638,55 @@ watch(
 )
 
 async function install(version) {
+	if (serverProjectInstallContext.value && data.value) {
+		if (serverProjectSelected.value) {
+			serverInstallContent.removeQueuedServerInstall(data.value.id)
+			return
+		}
+		if (installButtonDisabled.value) return
+
+		installing.value = true
+		try {
+			const contentType = data.value.project_type
+			await requestInstall({
+				project: {
+					...data.value,
+					project_id: data.value.id,
+					icon_url: data.value.icon_url,
+				},
+				contentType,
+				mode: contentType === 'modpack' ? 'immediate' : 'queue',
+				selectedFilters: [],
+				providedFilters: [],
+				overriddenProvidedFilterTypes: [],
+				targetPreferences: getTargetInstallPreferences(
+					{
+						gameVersion: serverInstallContent.serverContextServerData.value?.mc_version,
+						loader: serverInstallContent.serverContextServerData.value?.loader,
+					},
+					contentType,
+				),
+				getProjectVersions: async () => versions.value,
+				queue: {
+					get: serverInstallContent.getQueuedServerInstallPlans,
+					set: serverInstallContent.setQueuedServerInstallPlans,
+				},
+				install: (plan) =>
+					serverInstallContent.openServerModpackInstallFlow({
+						projectId: plan.projectId,
+						versionId: plan.versionId,
+						name: plan.project.title ?? plan.project.name ?? data.value.title,
+						iconUrl: plan.project.icon_url ?? undefined,
+					}),
+			})
+		} catch (err) {
+			handleError(err)
+		} finally {
+			installing.value = false
+		}
+		return
+	}
+
 	installing.value = true
 	await installVersion(
 		data.value.id,

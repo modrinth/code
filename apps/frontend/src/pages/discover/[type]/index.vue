@@ -29,6 +29,7 @@ import {
 	injectNotificationManager,
 	provideBrowseManager,
 	requestInstall,
+	SelectedProjectsFloatingBar,
 	useBrowseSearch,
 	useDebugLogger,
 	useStickyObserver,
@@ -66,7 +67,7 @@ const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
-const { handleError } = injectNotificationManager()
+const { addNotification, handleError } = injectNotificationManager()
 
 let prefetchTimeout: ReturnType<typeof useTimeoutFn> | null = null
 const HOVER_DURATION_TO_PREFETCH_MS = 500
@@ -199,6 +200,15 @@ interface InstallableSearchResult extends Labrinth.Search.v2.ResultSearchProject
 const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(new Map())
 const queuedServerInstallProjectIds = computed(() => new Set(queuedServerInstalls.value.keys()))
 const queuedServerInstallCount = computed(() => queuedServerInstalls.value.size)
+const selectedServerInstallProjects = computed(() =>
+	Array.from(queuedServerInstalls.value.values()).map((plan) => ({
+		id: plan.projectId,
+		name: plan.project.title ?? 'Project',
+		iconUrl: plan.project.icon_url ?? null,
+	})),
+)
+const isInstallingQueuedServerInstalls = ref(false)
+const queuedInstallProgress = ref({ completed: 0, total: 0 })
 const serverInstallQueue = {
 	get: () => queuedServerInstalls.value,
 	set: (plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>) => {
@@ -374,6 +384,12 @@ function clearQueuedServerInstalls() {
 	queuedServerInstalls.value = new Map()
 }
 
+function removeQueuedServerInstall(projectId: string) {
+	const nextPlans = new Map(queuedServerInstalls.value)
+	nextPlans.delete(projectId)
+	queuedServerInstalls.value = nextPlans
+}
+
 watch([currentServerId, currentWorldId], ([serverId, worldId], [prevServerId, prevWorldId]) => {
 	if (serverId !== prevServerId || worldId !== prevWorldId) {
 		clearQueuedServerInstalls()
@@ -382,26 +398,61 @@ watch([currentServerId, currentWorldId], ([serverId, worldId], [prevServerId, pr
 
 async function flushQueuedServerInstalls() {
 	if (queuedServerInstalls.value.size === 0) return true
+	if (isInstallingQueuedServerInstalls.value) return false
 
 	if (!serverData.value || !currentServerId.value || !currentWorldId.value) {
 		handleError(new Error('No server world is available for install.'))
 		return false
 	}
 
-	const result = await flushInstallQueue({
-		queue: serverInstallQueue,
-		install: async (plan) => {
-			await installContentMutation.mutateAsync({
-				serverId: currentServerId.value!,
-				projectId: plan.projectId,
-				versionId: plan.versionId,
-			})
-			markProjectInstalled(plan.projectId)
-		},
-		onError: (error) => handleError(error as Error),
-	})
+	isInstallingQueuedServerInstalls.value = true
+	queuedInstallProgress.value = {
+		completed: 0,
+		total: queuedServerInstalls.value.size,
+	}
 
-	return result.ok
+	try {
+		const result = await flushInstallQueue({
+			queue: serverInstallQueue,
+			install: async (plan) => {
+				await installContentMutation.mutateAsync({
+					serverId: currentServerId.value!,
+					projectId: plan.projectId,
+					versionId: plan.versionId,
+				})
+				markProjectInstalled(plan.projectId)
+			},
+			onError: (error) => handleError(error as Error),
+			onProgress: (completed, total) => {
+				queuedInstallProgress.value = { completed, total }
+			},
+		})
+
+		return result.ok
+	} finally {
+		isInstallingQueuedServerInstalls.value = false
+		queuedInstallProgress.value = { completed: 0, total: 0 }
+	}
+}
+
+async function discardQueuedServerInstallsAndBack() {
+	clearQueuedServerInstalls()
+	await navigateTo(serverBackUrl.value)
+}
+
+async function installQueuedServerInstallsAndBack() {
+	const ok = await flushQueuedServerInstalls()
+	if (ok) {
+		await navigateTo(serverBackUrl.value)
+		return true
+	}
+
+	addNotification({
+		type: 'error',
+		title: 'Some projects failed to install',
+		text: 'Failed projects are still selected. You can retry or clear them.',
+	})
+	return false
 }
 
 async function serverInstall(project: InstallableSearchResult) {
@@ -413,6 +464,11 @@ async function serverInstall(project: InstallableSearchResult) {
 	const isModpack = contentType === 'modpack'
 
 	try {
+		if (!isModpack && queuedServerInstallProjectIds.value.has(project.project_id)) {
+			removeQueuedServerInstall(project.project_id)
+			return
+		}
+
 		if (isModpack || !queuedServerInstallProjectIds.value.has(project.project_id)) {
 			setProjectInstalling(project.project_id, true)
 		}
@@ -571,22 +627,36 @@ function getCardActions(
 				(serverContentData.value.addons ?? []).find((x) => x.project_id === result.project_id)) ||
 			serverData.value.upstream?.project_id === result.project_id
 		const isInstalling = installingProjectIds.value.has(result.project_id)
-		const installLabel = isInstalling
-			? 'Installing...'
+		const isInstallingSelection = isInstallingQueuedServerInstalls.value
+		const validatingInstall =
+			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
+		const installLabel = isInstalled
+			? 'Installed'
 			: isQueued
-				? 'Queued'
-				: isInstalled
-					? 'Installed'
+				? isInstalling || isInstallingSelection
+					? validatingInstall
+						? 'Validating'
+						: 'Installing...'
+					: 'Selected'
+				: isInstalling || isInstallingSelection
+					? validatingInstall
+						? 'Validating'
+						: 'Installing...'
 					: 'Install'
 
 		return [
 			{
 				key: 'install',
 				label: installLabel,
-				icon: isInstalling ? SpinnerIcon : isQueued || isInstalled ? CheckIcon : DownloadIcon,
-				iconClass: isInstalling ? 'animate-spin' : undefined,
-				disabled: !!isInstalled || isInstalling,
-				color: isQueued && !isInstalling ? 'green' : 'brand',
+				icon:
+					isInstalling || isInstallingSelection
+						? SpinnerIcon
+						: isQueued || isInstalled
+							? CheckIcon
+							: DownloadIcon,
+				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
+				disabled: !!isInstalled || isInstalling || isInstallingSelection,
+				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: () => serverInstall(projectResult),
 			},
@@ -672,11 +742,14 @@ const installContext = computed(() => {
 		backLabel: serverBackLabel.value,
 		heading: serverBrowseHeading.value,
 		queuedCount: queuedServerInstallCount.value,
-		queuedLabel: `${queuedServerInstallCount.value} ${
-			queuedServerInstallCount.value === 1 ? 'Mod' : 'Mods'
-		}`,
+		selectedProjects: selectedServerInstallProjects.value,
+		isInstallingSelected: isInstallingQueuedServerInstalls.value,
+		installProgress: queuedInstallProgress.value,
 		clearQueued: clearQueuedServerInstalls,
+		clearSelected: clearQueuedServerInstalls,
 		onBack: flushQueuedServerInstalls,
+		discardSelectedAndBack: discardQueuedServerInstallsAndBack,
+		installSelected: installQueuedServerInstallsAndBack,
 	}
 })
 
@@ -800,6 +873,7 @@ provideBrowseManager({
 	>
 		<BrowseInstallHeader />
 	</div>
+	<SelectedProjectsFloatingBar v-if="installContext" :install-context="installContext" />
 	<aside class="normal-page__sidebar" aria-label="Filters">
 		<AdPlaceholder v-if="!auth.user && !serverData" />
 		<BrowseSidebar />

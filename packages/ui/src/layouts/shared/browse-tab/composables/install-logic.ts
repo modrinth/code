@@ -114,6 +114,11 @@ export interface FlushInstallQueueOptions<TProject extends BrowseInstallProject>
 	queue: BrowseInstallQueue<TProject>
 	install: (plan: BrowseInstallPlan<TProject>) => void | Promise<void>
 	onError?: (error: unknown, plan: BrowseInstallPlan<TProject>) => void
+	onProgress?: (
+		completed: number,
+		total: number,
+		plan: BrowseInstallPlan<TProject>,
+	) => void | Promise<void>
 }
 
 /**
@@ -357,10 +362,12 @@ export async function flushInstallQueue<TProject extends BrowseInstallProject>({
 	queue,
 	install,
 	onError,
+	onProgress,
 }: FlushInstallQueueOptions<TProject>): Promise<FlushInstallQueueResult<TProject>> {
 	const queuedPlans = Array.from(queue.get().values())
 	const failedPlans = new Map<string, BrowseInstallPlan<TProject>>()
 	const successfulPlans: BrowseInstallPlan<TProject>[] = []
+	let completed = 0
 
 	for (const plan of queuedPlans) {
 		try {
@@ -369,6 +376,9 @@ export async function flushInstallQueue<TProject extends BrowseInstallProject>({
 		} catch (error) {
 			failedPlans.set(plan.projectId, plan)
 			onError?.(error, plan)
+		} finally {
+			completed++
+			await onProgress?.(completed, queuedPlans.length, plan)
 		}
 	}
 

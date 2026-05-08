@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { BoxIcon, LeftArrowIcon, XIcon } from '@modrinth/assets'
-import { Tooltip } from 'floating-vue'
+import { LeftArrowIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -10,6 +9,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { useServerImage } from '#ui/composables/use-server-image'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
+import SelectedProjectsLeaveModal from './components/SelectedProjectsLeaveModal.vue'
 import { injectBrowseManager } from './providers/browse-manager'
 import type { BrowseInstallContext } from './types'
 
@@ -19,8 +19,11 @@ const router = useRouter()
 const props = defineProps<{
 	installContext?: BrowseInstallContext | null
 }>()
+type SelectedProjectsLeaveResult = 'cancel' | 'discard' | 'install'
+
 const ctx = injectBrowseManager(null)
 const installContext = computed(() => props.installContext ?? ctx?.installContext?.value ?? null)
+const selectedProjectsLeaveModal = ref<InstanceType<typeof SelectedProjectsLeaveModal>>()
 
 const serverId = computed(() => installContext.value?.serverId ?? '')
 const upstream = computed(() => installContext.value?.upstream ?? null)
@@ -44,22 +47,18 @@ const metadataItems = computed(() => {
 	].filter(Boolean)
 })
 
-const queuedCount = computed(() => installContext.value?.queuedCount ?? 0)
-const returnToInstallTooltipDismissed = ref(false)
-const showReturnToInstallTooltip = computed(
-	() =>
-		queuedCount.value > 0 &&
-		!!installContext.value?.clearQueued &&
-		!returnToInstallTooltipDismissed.value,
-)
-const queuedLabel = computed(() => {
-	if (installContext.value?.queuedLabel) return installContext.value.queuedLabel
-	return `${queuedCount.value} ${queuedCount.value === 1 ? 'Mod' : 'Mods'}`
-})
+const selectedCount = computed(() => installContext.value?.selectedProjects?.length ?? 0)
+const isInstallingSelected = computed(() => installContext.value?.isInstallingSelected ?? false)
 
 async function handleBack() {
 	const context = installContext.value
 	if (!context) return
+
+	if (selectedCount.value > 0 && !isInstallingSelected.value) {
+		const result = await selectedProjectsLeaveModal.value?.prompt()
+		await handleSelectedProjectsLeaveResult(result ?? 'cancel', context)
+		return
+	}
 
 	const shouldNavigate = await context.onBack?.()
 	if (shouldNavigate === false) return
@@ -67,46 +66,42 @@ async function handleBack() {
 	await router.push(context.backUrl)
 }
 
-async function clearQueued() {
-	await installContext.value?.clearQueued?.()
+async function handleSelectedProjectsLeaveResult(
+	result: SelectedProjectsLeaveResult,
+	context: BrowseInstallContext,
+) {
+	if (result === 'cancel') return
+	if (result === 'install') {
+		const shouldNavigate = await context.installSelected?.()
+		if (shouldNavigate === false) return
+		return
+	}
+
+	if (context.discardSelectedAndBack) {
+		await context.discardSelectedAndBack()
+		return
+	}
+
+	await (context.clearSelected ?? context.clearQueued)?.()
+	await router.push(context.backUrl)
 }
 </script>
 
 <template>
 	<template v-if="installContext">
+		<SelectedProjectsLeaveModal
+			ref="selectedProjectsLeaveModal"
+			:count="selectedCount"
+			:installing="isInstallingSelected"
+		/>
 		<div class="flex flex-col gap-2">
 			<div class="flex flex-wrap items-center justify-between gap-4">
 				<div class="flex min-w-0 items-center gap-4">
-					<Tooltip
-						theme="dismissable-prompt"
-						:triggers="[]"
-						:shown="showReturnToInstallTooltip"
-						:auto-hide="false"
-						placement="bottom-start"
-						popper-class="!z-[60]"
-					>
-						<ButtonStyled circular size="large">
-							<button :aria-label="installContext.backLabel" @click="handleBack">
-								<LeftArrowIcon />
-							</button>
-						</ButtonStyled>
-						<template #popper>
-							<div class="grid max-w-64 gap-1">
-								<div class="flex items-center justify-between gap-4">
-									<h3 class="m-0 text-base font-bold text-contrast">Return to install content</h3>
-									<ButtonStyled size="small" circular>
-										<button v-tooltip="'Dismiss'" @click="returnToInstallTooltipDismissed = true">
-											<XIcon aria-hidden="true" />
-										</button>
-									</ButtonStyled>
-								</div>
-								<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-									The content you have queued will be installed when you return to your server
-									panel.
-								</p>
-							</div>
-						</template>
-					</Tooltip>
+					<ButtonStyled circular size="large">
+						<button :aria-label="installContext.backLabel" @click="handleBack">
+							<LeftArrowIcon />
+						</button>
+					</ButtonStyled>
 
 					<Avatar v-if="iconSrc" :src="iconSrc" size="48px" class="shrink-0" />
 
@@ -127,21 +122,6 @@ async function clearQueued() {
 							</template>
 						</div>
 					</div>
-				</div>
-
-				<div
-					v-if="queuedCount > 0 && installContext.clearQueued"
-					class="flex shrink-0 items-center gap-4 text-base font-medium leading-6 text-primary"
-				>
-					<div class="flex items-center gap-1.5">
-						<span>Queued</span>
-						<BoxIcon class="h-5 w-5" />
-						<span>{{ queuedLabel }}</span>
-					</div>
-					<div class="h-[18px] w-px bg-surface-5" />
-					<ButtonStyled type="transparent">
-						<button type="button" class="-ml-2 mr-1" @click="clearQueued">Clear</button>
-					</ButtonStyled>
 				</div>
 			</div>
 		</div>
