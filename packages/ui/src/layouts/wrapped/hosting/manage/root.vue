@@ -107,9 +107,7 @@
 		}"
 		:class="[
 			'server-panel-' + revealState,
-			constrainWidth
-				? 'min-h-[100svh] max-w-[1280px] pb-16'
-				: 'min-h-[calc(100svh-100px)] pb-6',
+			constrainWidth ? 'min-h-[100svh] max-w-[1280px] pb-16' : 'min-h-[calc(100svh-100px)] pb-6',
 		]"
 	>
 		<template v-if="revealState !== 'pending' || isOnboarding">
