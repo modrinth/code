@@ -11,11 +11,32 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-05-09T18:25:51+00:00`,
+		date: `2026-05-09T19:06:18+00:00`,
 		product: 'app',
 		version: '0.13.13',
-		body: `## Fixed
-- Fixed issue with instances redirects causing a broken page state.`,
+		body: `## Changed
+- Improved the Browse page header so the back button no longer shifts the layout.
+
+## Fixed
+- Fixed instance redirects opening a broken page state.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved performance on search pages.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated Modrinth Hosting content browsing so multiple projects can be selected before installation.
+- After installing selected content, the Modrinth Hosting content page now reopens immediately and shows pending projects as installing.
+- Project icons now appear in the action bar when selecting multiple projects in the Content tab.
+
+## Fixed
+- Fixed selected content and dependencies not staying marked as installing.
+- Fixed page shifts while dependencies resolve during installation.`,
 	},
 	{
 		date: `2026-05-08T09:58:39+00:00`,
