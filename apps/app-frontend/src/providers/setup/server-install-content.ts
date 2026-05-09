@@ -5,16 +5,17 @@ import {
 	type BrowseSelectedProject,
 	createContext,
 	type CreationFlowContextValue,
-	flushInstallQueue,
+	flushStoredServerAddonInstallQueue,
+	getStoredServerAddonInstallQueue,
 	injectModrinthClient,
 	injectNotificationManager,
 	type PendingServerContentInstall,
 	type PendingServerContentInstallType,
-	readStoredServerInstallQueue,
 	readPendingServerContentInstalls,
+	readStoredServerInstallQueue,
 	removePendingServerContentInstall,
-	writeStoredServerInstallQueue,
 	writePendingServerContentInstallBaseline,
+	writeStoredServerInstallQueue,
 } from '@modrinth/ui'
 import { computed, type ComputedRef, nextTick, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -403,11 +404,21 @@ export function createServerInstallContent(opts: {
 		setQueuedServerInstallPlans(nextPlans)
 	}
 
+	function setStoredServerInstallPlans(
+		serverId: string,
+		worldId: string,
+		plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
+	) {
+		if (serverId === serverIdQuery.value && worldId === effectiveServerWorldId.value) {
+			queuedServerInstalls.value = plans
+		}
+		writeStoredServerInstallQueue(serverId, worldId, plans)
+	}
+
 	async function flushQueuedServerInstalls(
 		serverId: string | null = serverIdQuery.value,
 		worldId: string | null = effectiveServerWorldId.value,
 	) {
-		if (queuedServerInstalls.value.size === 0) return true
 		if (isInstallingQueuedServerInstalls.value) return false
 
 		if (!serverId || !worldId) {
@@ -415,50 +426,53 @@ export function createServerInstallContent(opts: {
 			return false
 		}
 
-		const installedProjectIds = new Set<string>()
+		const queuedPlans = getStoredServerAddonInstallQueue<InstallableSearchResult>(serverId, worldId)
+		if (queuedPlans.size === 0) return true
+
 		isInstallingQueuedServerInstalls.value = true
 		queuedInstallProgress.value = {
 			completed: 0,
-			total: queuedServerInstalls.value.size,
+			total: queuedPlans.size,
 		}
 
 		try {
-			const result = await flushInstallQueue({
-				queue: {
-					get: () => queuedServerInstalls.value,
-					set: (plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>) => {
-						queuedServerInstalls.value = plans
-						writeStoredServerInstallQueue(serverId, worldId, plans)
-					},
-				},
-				install: async (plan) => {
-					await client.archon.content_v1.addAddon(serverId, worldId, {
-						project_id: plan.projectId,
-						version_id: plan.versionId,
-					})
-					installedProjectIds.add(plan.projectId)
-				},
-				onError: (error, plan) => {
-					removePendingServerContentInstall(serverId, worldId, plan.projectId)
-					handleError(error as Error)
-				},
-				onProgress: (completed, total) => {
-					queuedInstallProgress.value = { completed, total }
-				},
+			const result = await flushStoredServerAddonInstallQueue({
+				serverId,
+				worldId,
+				install: (plans) =>
+					client.archon.content_v1.addAddons(
+						serverId,
+						worldId,
+						plans.map((plan) => ({
+							project_id: plan.projectId,
+							version_id: plan.versionId,
+						})),
+					),
+				onQueueChange: (plans) => setStoredServerInstallPlans(serverId, worldId, plans),
 			})
 
-			if (installedProjectIds.size > 0) {
-				serverContentProjectIds.value = new Set([
-					...serverContentProjectIds.value,
-					...installedProjectIds,
-				])
-				serverContentInstallKeys.value = new Set([
-					...serverContentInstallKeys.value,
-					...installedProjectIds,
-				])
+			if (!result.ok) {
+				for (const plan of result.attemptedPlans) {
+					removePendingServerContentInstall(serverId, worldId, plan.projectId)
+				}
+				handleError(result.error as Error)
+				return false
 			}
 
-			return result.ok
+			queuedInstallProgress.value = {
+				completed: result.flushedPlans.length,
+				total: result.flushedPlans.length,
+			}
+			serverContentProjectIds.value = new Set([
+				...serverContentProjectIds.value,
+				...result.flushedPlans.map((plan) => plan.projectId),
+			])
+			serverContentInstallKeys.value = new Set([
+				...serverContentInstallKeys.value,
+				...result.flushedPlans.map((plan) => plan.projectId),
+			])
+
+			return true
 		} finally {
 			isInstallingQueuedServerInstalls.value = false
 			queuedInstallProgress.value = { completed: 0, total: 0 }
@@ -493,6 +507,7 @@ export function createServerInstallContent(opts: {
 				.catch((err) => handleError(err as Error))
 		}
 		await router.push(backUrl)
+		void flushQueuedServerInstalls(sid, wid)
 
 		return true
 	}

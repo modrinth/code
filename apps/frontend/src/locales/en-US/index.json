@@ -1241,12 +1241,6 @@
   "discover.install.error.no-server-world": {
     "message": "No server world is available for install."
   },
-  "discover.install.error.some-projects-failed.description": {
-    "message": "Failed projects were not added. You can try installing them again."
-  },
-  "discover.install.error.some-projects-failed.title": {
-    "message": "Some projects failed to install"
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "This content type cannot be installed to a server from browse."
   },

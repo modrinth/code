@@ -23,11 +23,8 @@ import {
 } from '#ui/utils/server-content-installing'
 
 import {
-	type BrowseInstallPlan,
-	type BrowseInstallProject,
-	flushInstallQueue,
-	readStoredServerInstallQueue,
-	writeStoredServerInstallQueue,
+	flushStoredServerAddonInstallQueue,
+	getStoredServerAddonInstallQueue,
 } from '../../../shared/browse-tab/composables/install-logic'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
@@ -291,53 +288,42 @@ function syncContentInstallKeys(
 	contentInstallAddedKeys.value = new Set()
 }
 
-function getStoredAddonInstallPlans(
-	sid: string,
-	wid: string,
-): Map<string, BrowseInstallPlan<BrowseInstallProject>> {
-	const storedPlans = readStoredServerInstallQueue<BrowseInstallProject>(sid, wid)
-	const addonPlans = new Map(
-		Array.from(storedPlans).filter(([, plan]) => plan.contentType !== 'modpack'),
-	)
-
-	if (addonPlans.size !== storedPlans.size) {
-		writeStoredServerInstallQueue(sid, wid, addonPlans)
-	}
-
-	return addonPlans
-}
-
 async function flushStoredServerInstalls() {
 	const wid = worldId.value
 	if (!wid || isFlushingStoredServerInstalls.value) return
-	if (readPendingServerContentInstalls(serverId, wid).length === 0) return
 
-	const queuedPlans = getStoredAddonInstallPlans(serverId, wid)
+	const queuedPlans = getStoredServerAddonInstallQueue(serverId, wid)
 	if (queuedPlans.size === 0) return
 
 	isFlushingStoredServerInstalls.value = true
 	try {
-		const result = await flushInstallQueue({
-			queue: {
-				get: () => getStoredAddonInstallPlans(serverId, wid),
-				set: (plans) => writeStoredServerInstallQueue(serverId, wid, plans),
-			},
-			install: (plan) =>
-				client.archon.content_v1.addAddon(serverId, wid, {
-					project_id: plan.projectId,
-					version_id: plan.versionId,
-				}),
-			onError: (err, plan) => {
-				removePendingServerContentInstall(serverId, wid, plan.projectId)
-				addNotification({
-					type: 'error',
-					title: formatMessage(messages.failedToInstallContent),
-					text: err instanceof Error ? err.message : undefined,
-				})
-			},
+		const result = await flushStoredServerAddonInstallQueue({
+			serverId,
+			worldId: wid,
+			install: (plans) =>
+				client.archon.content_v1.addAddons(
+					serverId,
+					wid,
+					plans.map((plan) => ({
+						project_id: plan.projectId,
+						version_id: plan.versionId,
+					})),
+				),
 		})
 
-		if (result.successfulPlans.length > 0) {
+		if (!result.ok) {
+			for (const plan of result.attemptedPlans) {
+				removePendingServerContentInstall(serverId, wid, plan.projectId)
+			}
+			addNotification({
+				type: 'error',
+				title: formatMessage(messages.failedToInstallContent),
+				text: result.error instanceof Error ? result.error.message : undefined,
+			})
+			return
+		}
+
+		if (result.flushedPlans.length > 0) {
 			await queryClient.invalidateQueries({ queryKey: queryKey.value })
 		}
 	} finally {
