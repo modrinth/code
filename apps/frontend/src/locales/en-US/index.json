@@ -206,6 +206,9 @@
   "app-marketing.show-other-packages": {
     "message": "Show other packages"
   },
+  "app.browse.hide-selected-content": {
+    "message": "Hide selected content"
+  },
   "auth.authorize.action.authorize": {
     "message": "Authorize"
   },

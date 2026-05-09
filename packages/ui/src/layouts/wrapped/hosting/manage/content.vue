@@ -15,10 +15,10 @@ import {
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 import {
+	type PendingServerContentInstall,
 	pendingServerContentInstallsEvent,
 	readPendingServerContentInstallBaseline,
 	readPendingServerContentInstalls,
-	type PendingServerContentInstall,
 } from '#ui/utils/server-content-installing'
 
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
@@ -229,14 +229,12 @@ const contentInstallBaselineKeys = ref<Set<string> | null>(null)
 const contentInstallAddedKeys = ref<Set<string>>(new Set())
 
 function syncPendingServerContentInstalls() {
-	pendingServerContentInstalls.value = readPendingServerContentInstalls(
-		serverId,
-		worldId.value,
-	)
+	pendingServerContentInstalls.value = readPendingServerContentInstalls(serverId, worldId.value)
 }
 
 function handlePendingServerContentInstallsChanged(event: Event) {
-	const detail = (event as CustomEvent<{ serverId?: string | null; worldId?: string | null }>).detail
+	const detail = (event as CustomEvent<{ serverId?: string | null; worldId?: string | null }>)
+		.detail
 	if (detail?.serverId !== serverId || detail?.worldId !== worldId.value) return
 	syncPendingServerContentInstalls()
 }
@@ -314,7 +312,9 @@ function pendingInstallToContentItem(item: PendingServerContentInstall): Content
 
 const rawContentItems = computed<ContentItem[]>(() => {
 	const addons = contentQuery.data.value?.addons ?? []
-	const pendingProjectIds = new Set(pendingServerContentInstalls.value.map((item) => item.projectId))
+	const pendingProjectIds = new Set(
+		pendingServerContentInstalls.value.map((item) => item.projectId),
+	)
 	const pendingInstallByProjectId = new Map(
 		pendingServerContentInstalls.value.map((item) => [item.projectId, item]),
 	)

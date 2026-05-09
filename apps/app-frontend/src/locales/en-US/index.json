@@ -134,6 +134,9 @@
   "app.browse.hide-installed-content": {
     "message": "Hide already installed content"
   },
+  "app.browse.hide-selected-content": {
+    "message": "Hide selected content"
+  },
   "app.browse.install-content-to-instance": {
     "message": "Installing content"
   },

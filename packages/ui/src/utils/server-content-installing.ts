@@ -89,10 +89,7 @@ function emitPendingServerContentInstallsChanged(serverId: string | null, worldI
 	)
 }
 
-export function readPendingServerContentInstalls(
-	serverId: string | null,
-	worldId: string | null,
-) {
+export function readPendingServerContentInstalls(serverId: string | null, worldId: string | null) {
 	const key = getPendingServerContentInstallsKey(serverId, worldId)
 	if (!key || typeof localStorage === 'undefined') return []
 

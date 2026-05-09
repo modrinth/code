@@ -111,7 +111,9 @@ const visibleProjects = computed(() => selectedProjects.value.slice(0, 3))
 const overflowCount = computed(() => Math.max(0, selectedCount.value - 3))
 const iconStackWidth = computed(() => {
 	if (selectedCount.value === 0) return 0
-	return 32 + (visibleProjects.value.length - 1 + (overflowCount.value > 0 ? 1 : 0)) * iconStackOffset
+	return (
+		32 + (visibleProjects.value.length - 1 + (overflowCount.value > 0 ? 1 : 0)) * iconStackOffset
+	)
 })
 const selectedCountText = computed(() =>
 	formatMessage(messages.selectedCount, { count: selectedCount.value }),

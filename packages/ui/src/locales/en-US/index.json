@@ -104,12 +104,6 @@
   "browse.selected-projects-floating-bar.install": {
     "defaultMessage": "Install {count, plural, one {# project} other {# projects}}"
   },
-  "browse.selected-projects-floating-bar.installing": {
-    "defaultMessage": "Installing"
-  },
-  "browse.selected-projects-floating-bar.leave-installing-warning": {
-    "defaultMessage": "Selected projects are still being installed. Are you sure you want to leave?"
-  },
   "browse.selected-projects-floating-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# project selected} other {# projects selected}}"
   },

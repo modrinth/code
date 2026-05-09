@@ -619,7 +619,8 @@ function syncPendingServerContentInstalls() {
 }
 
 function handlePendingServerContentInstallsChanged(event: Event) {
-	const detail = (event as CustomEvent<{ serverId?: string | null; worldId?: string | null }>).detail
+	const detail = (event as CustomEvent<{ serverId?: string | null; worldId?: string | null }>)
+		.detail
 	if (detail?.serverId !== props.serverId || detail?.worldId !== worldId.value) return
 	syncPendingServerContentInstalls()
 }

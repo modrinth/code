@@ -62,8 +62,7 @@ const bannerCoversInstalling = computed(
 		ctx.isSyncingContent.value ||
 		ctx.busyReasons.value.some(
 			(r) =>
-				r.reason.id === 'servers.busy.installing' ||
-				r.reason.id === 'servers.busy.syncing-content',
+				r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content',
 		),
 )
 
@@ -170,8 +169,7 @@ type ServerAdmonitionItem = StackedAdmonitionItem & {
 
 const showInstallingBanner = computed(() => {
 	if (!ctx.server.value) return false
-	const installing =
-		bannerCoversInstalling.value || !!props.contentError
+	const installing = bannerCoversInstalling.value || !!props.contentError
 	if (!installing) return false
 	if (contentErrorKey.value && dismissedContentErrorKey.value === contentErrorKey.value)
 		return false
