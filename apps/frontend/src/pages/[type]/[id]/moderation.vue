@@ -1,52 +1,46 @@
 <template>
 	<template v-if="canAccess">
-		<div v-if="currentMember?.staffOnly" class="mb-6">
-			<Toggle v-model="moderatorSeeUserUi" />
-			{{ formatMessage(messages.seeUserUiLabel) }}
-		</div>
 		<template v-if="currentMember && (!currentMember.staffOnly || moderatorSeeUserUi)">
 			<Admonition
 				v-if="project.status === 'draft'"
 				type="info"
+				class="mb-4"
 				:header="formatMessage(messages.admonitionDraftHeader)"
 			>
 				<p class="m-0 leading-tight">
 					{{ formatMessage(messages.admonitionDraftBody) }}
 				</p>
+				<p class="mb-0 mt-2 leading-tight">
+					<IntlFormatted :message-id="messages.admonitionDraftSubmitForReview">
+						<template #rules-link="{ children }">
+							<nuxt-link to="/legal/rules" class="text-link" target="_blank">
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+					</IntlFormatted>
+				</p>
 			</Admonition>
 			<Admonition
 				v-else-if="isApproved(project)"
 				type="success"
+				class="mb-4"
 				:header="formatMessage(messages.admonitionApprovedHeader)"
 			>
 				<p class="m-0 leading-tight">
 					<IntlFormatted
-						v-if="project.status === 'approved' || project.status === 'archived'"
-						:message-id="messages.admonitionApprovedPublishedFull"
+						:message-id="
+							project.status === 'approved' || project.status === 'archived'
+								? messages.admonitionApprovedPublishedFull
+								: project.status === 'unlisted'
+									? messages.admonitionApprovedUnlistedFull
+									: project.status === 'private'
+										? messages.admonitionApprovedPrivateFull
+										: ''
+						"
 					>
-						<template #settings-link="{ children }">
-							<router-link :to="`${getProjectLink(project)}/settings`" class="text-link">
-								<component :is="() => children" />
-							</router-link>
-						</template>
-					</IntlFormatted>
-					<IntlFormatted
-						v-else-if="project.status === 'unlisted'"
-						:message-id="messages.admonitionApprovedUnlistedFull"
-					>
-						<template #settings-link="{ children }">
-							<router-link :to="`${getProjectLink(project)}/settings`" class="text-link">
-								<component :is="() => children" />
-							</router-link>
-						</template>
-					</IntlFormatted>
-					<IntlFormatted
-						v-else-if="project.status === 'private'"
-						:message-id="messages.admonitionApprovedPrivateFull"
-					>
-						<template #settings-link="{ children }">
-							<router-link :to="`${getProjectLink(project)}/settings`" class="text-link">
-								<component :is="() => children" />
+						<template #visibility-settings-link="{ children }">
+							<router-link :to="`${getProjectLink(project)}/settings#visibility`" class="text-link">
+								<component :is="() => normalizeChildren(children)" />
 							</router-link>
 						</template>
 					</IntlFormatted>
@@ -55,96 +49,138 @@
 			<Admonition
 				v-else-if="isUnderReview(project)"
 				type="moderation"
+				class="mb-4"
 				:header="formatMessage(messages.admonitionUnderReviewHeader)"
 			>
-				<p class="m-0">
-					{{ formatMessage(messages.admonitionUnderReviewBody) }}
+				<p class="m-0 leading-tight">
+					<IntlFormatted :message-id="messages.admonitionUnderReviewBody">
+						<template #rules-link="{ children }">
+							<nuxt-link to="/legal/rules" class="text-link" target="_blank">
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+						<template #terms-link="{ children }">
+							<nuxt-link to="/legal/terms" class="text-link" target="_blank">
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+					</IntlFormatted>
 				</p>
-				<p class="mb-0 mt-2 font-semibold">
+				<p class="mb-0 mt-2 leading-tight">
+					{{ formatMessage(messages.admonitionUnderReviewFreeToEdit) }}
+				</p>
+				<p class="mb-0 mt-2 leading-tight">
 					{{ formatMessage(messages.admonitionUnderReviewTiming) }}
+				</p>
+				<p class="mb-0 mt-2 font-semibold leading-tight">
+					{{ formatMessage(messages.admonitionUnderReviewTimingDelay) }}
 				</p>
 			</Admonition>
 			<Admonition
 				v-else-if="project.status === 'withheld'"
 				type="warning"
-				:header="formatMessage(messages.admonitionChangesRequestedHeader)"
+				class="mb-4"
+				:header="formatMessage(messages.admonitionWithheldHeader)"
 			>
-				<p class="m-0">
-					<IntlFormatted :message-id="messages.admonitionWithheldBody">
+				<p class="m-0 leading-tight">
+					<IntlFormatted :message-id="messages.admonitionRejectedBody">
 						<template #rules-link="{ children }">
 							<nuxt-link to="/legal/rules" class="text-link" target="_blank">
-								<component :is="() => children" />
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+						<template #terms-link="{ children }">
+							<nuxt-link to="/legal/terms" class="text-link" target="_blank">
+								<component :is="() => normalizeChildren(children)" />
 							</nuxt-link>
 						</template>
 					</IntlFormatted>
 				</p>
-				<p class="mb-0 mt-2">
-					<IntlFormatted :message-id="messages.admonitionResubmitNote">
-						<template #warning-strong="{ children }">
-							<span class="font-semibold">
+				<p class="m-0 mt-2 leading-tight">
+					<IntlFormatted
+						:message-id="messages.admonitionWithheldStillAccessible"
+						:values="{ requestedWithheld: project.requested_status === 'unlisted' }"
+					>
+						<template #visibility-settings-link="{ children }">
+							<nuxt-link :to="`/project/${project.id}/settings#visibility`" class="text-link">
 								<component :is="() => normalizeChildren(children)" />
-							</span>
+							</nuxt-link>
 						</template>
 					</IntlFormatted>
+				</p>
+				<p class="mb-0 mt-2 leading-tight">
+					{{ formatMessage(messages.admonitionRejectedSpamNotice) }}
 				</p>
 			</Admonition>
 			<Admonition
 				v-else-if="isRejected(project)"
 				type="critical"
-				:header="formatMessage(messages.admonitionChangesRequestedHeader)"
+				class="mb-4"
+				:header="formatMessage(messages.admonitionRejectedHeader)"
 			>
-				<p class="m-0">
+				<p class="m-0 leading-tight">
 					<IntlFormatted :message-id="messages.admonitionRejectedBody">
 						<template #rules-link="{ children }">
 							<nuxt-link to="/legal/rules" class="text-link" target="_blank">
-								<component :is="() => children" />
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+						<template #terms-link="{ children }">
+							<nuxt-link to="/legal/terms" class="text-link" target="_blank">
+								<component :is="() => normalizeChildren(children)" />
 							</nuxt-link>
 						</template>
 					</IntlFormatted>
 				</p>
-				<p class="mb-0 mt-2">
-					<IntlFormatted :message-id="messages.admonitionResubmitNote">
-						<template #warning-strong="{ children }">
-							<span class="font-semibold">
-								<component :is="() => normalizeChildren(children)" />
-							</span>
-						</template>
-					</IntlFormatted>
+				<p class="mb-0 mt-2 leading-tight">
+					{{ formatMessage(messages.admonitionRejectedAddressAllConcerns) }}
+				</p>
+				<p class="mb-0 mt-2 leading-tight">
+					{{ formatMessage(messages.admonitionRejectedSpamNotice) }}
 				</p>
 			</Admonition>
-			<div class="mb-4 flex flex-col">
-				<h2 id="messages" class="mb-2 mt-4 text-xl font-semibold text-contrast">
-					{{ formatMessage(messages.threadSectionTitle) }}
-				</h2>
-				<p class="m-0 leading-tight">
+		</template>
+		<div class="card-shadow rounded-2xl border border-solid border-surface-4 bg-surface-3">
+			<div class="flex flex-col p-4">
+				<div class="flex items-center justify-between">
+					<h2 id="messages" class="m-0 text-xl font-semibold text-contrast">
+						{{ formatMessage(messages.threadSectionTitle) }}
+					</h2>
+					<div v-if="currentMember?.staffOnly" class="flex items-center gap-2">
+						<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
+						<label for="moderator-see-user-ui-toggle">See what users see</label>
+					</div>
+				</div>
+				<p v-if="!currentMember.staffOnly || moderatorSeeUserUi" class="m-0 mt-2 leading-tight">
 					{{ formatMessage(messages.threadPrivateDescription) }}
 				</p>
-				<p class="mb-0 mt-3 leading-tight">
+				<p v-if="!currentMember.staffOnly || moderatorSeeUserUi" class="mb-0 mt-3 leading-tight">
 					<IntlFormatted :message-id="messages.threadHelpCenterNote">
 						<template #help-center-link="{ children }">
 							<a class="text-link" href="https://support.modrinth.com" target="_blank">
-								<component :is="() => children" />
+								<component :is="() => normalizeChildren(children)" />
 							</a>
 						</template>
 					</IntlFormatted>
 				</p>
 				<p
-					v-if="isApproved(project)"
+					v-if="isApproved(project) && (!currentMember.staffOnly || moderatorSeeUserUi)"
 					class="mb-0 mt-3 flex items-center gap-2 font-semibold text-orange"
 				>
 					<IssuesIcon /> {{ formatMessage(messages.threadApprovedWarning) }}
 				</p>
 			</div>
-		</template>
-		<ConversationThread
-			v-if="thread"
-			:thread="thread"
-			:project="project"
-			:set-status="setStatus"
-			:current-member="currentMember"
-			:auth="auth"
-			@update-thread="updateThread"
-		/>
+			<ConversationThread
+				v-if="thread"
+				:thread="thread"
+				:project="project"
+				:set-status="setStatus"
+				:current-member="currentMember"
+				:auth="auth"
+				class="overflow-clip rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2"
+				@update-thread="updateThread"
+			/>
+		</div>
 	</template>
 </template>
 <script setup>
@@ -170,10 +206,6 @@ import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	seeUserUiLabel: {
-		id: 'project.moderation.see-user-ui',
-		defaultMessage: 'See what users see',
-	},
 	admonitionApprovedHeader: {
 		id: 'project.moderation.admonition.approved.header',
 		defaultMessage: 'Project approved',
@@ -181,7 +213,7 @@ const messages = defineMessages({
 	admonitionApprovedPublishedFull: {
 		id: 'project.moderation.admonition.approved.published-full',
 		defaultMessage:
-			"Your project is published and discoverable on Modrinth. You can change the visibility of your project in <settings-link>your project's settings</settings-link>.",
+			"Your project is published and discoverable on Modrinth. You can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>.",
 	},
 	admonitionApprovedUnlistedFull: {
 		id: 'project.moderation.admonition.approved.unlisted-full',
@@ -200,7 +232,11 @@ const messages = defineMessages({
 	admonitionDraftBody: {
 		id: 'project.moderation.admonition.draft.body',
 		defaultMessage:
-			'This is a draft project that needs to be submitted for review before it can be accessed by others. To submit, check out the publishing checklist at the top.',
+			'This is a draft project that cannot be seen by others until submitted for review and approved by our content moderation team.',
+	},
+	admonitionDraftSubmitForReview: {
+		id: 'project.moderation.admonition.draft.submit-for-review',
+		defaultMessage: `Once you have completed all required steps and ensured your project complies with <rules-link>Modrinth's Content Rules</rules-link> you can submit your project for review in the publishing checklist above.`,
 	},
 	admonitionUnderReviewHeader: {
 		id: 'project.moderation.admonition.under-review.header',
@@ -209,26 +245,48 @@ const messages = defineMessages({
 	admonitionUnderReviewBody: {
 		id: 'project.moderation.admonition.under-review.body',
 		defaultMessage:
-			"Your project won't be available for people to use until it's manually reviewed by our moderation team. Please be patient and ensure your project follows all our rules!",
+			"Your project is in queue to be reviewed by our content moderation team. While you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>.",
+	},
+	admonitionUnderReviewFreeToEdit: {
+		id: 'project.moderation.admonition.under-review.free-to-edit',
+		defaultMessage: `You may freely modify your project as needed while under review. It won't affect your position in the queue.`,
 	},
 	admonitionUnderReviewTiming: {
 		id: 'project.moderation.admonition.under-review.timing',
-		defaultMessage:
-			'Our goal is always to review projects in 24–48 hours, however due to an increase in submissions, do not be alarmed if your project takes longer to be reviewed.',
+		defaultMessage: 'We aim to review projects within 24-48 hours of submission.',
 	},
-	admonitionChangesRequestedHeader: {
-		id: 'project.moderation.admonition.changes-requested.header',
+	admonitionUnderReviewTimingDelay: {
+		id: 'project.moderation.admonition.under-review.timing-delay',
+		defaultMessage: `Due to an increase in submissions, some project reviews may be delayed, this does not reflect an issue with your submission and there is no cause for alarm.
+We appreciate your patience during this time while our content moderation team works hard to keep Modrinth safe.`,
+	},
+	admonitionRejectedHeader: {
+		id: 'project.moderation.admonition.rejected.header',
 		defaultMessage: 'Changes requested',
 	},
-	admonitionWithheldBody: {
-		id: 'project.moderation.admonition.withheld.body',
-		defaultMessage:
-			"Your project does not currently meet Modrinth's <rules-link>content rules</rules-link> in order to be publicly listed on Modrinth. The moderators have requested you make changes before it can be fully approved, but it can currently be accessed with a direct link.",
+	admonitionWithheldHeader: {
+		id: 'project.moderation.admonition.withheld.header',
+		defaultMessage: 'Unlisted by staff',
 	},
 	admonitionRejectedBody: {
 		id: 'project.moderation.admonition.rejected.body',
 		defaultMessage:
-			"Your project does not currently meet Modrinth's <rules-link>content rules</rules-link> and the moderators have requested you make changes before it can be approved.",
+			"Our content moderation team found issues with this project that prevent it from being published on Modrinth, this may include violations of <rules-link>Modrinth's Content Rules</rules-link> or <terms-link>Terms of Use</terms-link>.",
+	},
+	admonitionWithheldStillAccessible: {
+		id: 'project.moderation.admonition.withheld.still-accessible',
+		defaultMessage:
+			'Your project can still be accessed via a direct link, but will not appear publicly.{requestedWithheld, select, true { This matches your selected <visibility-settings-link>visibility settings</visibility-settings-link>, so no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}',
+	},
+	admonitionRejectedAddressAllConcerns: {
+		id: 'project.moderation.admonition.rejected.address-all-concerns',
+		defaultMessage:
+			'Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.',
+	},
+	admonitionRejectedSpamNotice: {
+		id: 'project.moderation.admonition.rejected.spam-notice',
+		defaultMessage:
+			'Spam, or repeatedly resubmitting your project without addressing all moderation concerns first, may result in account suspension.',
 	},
 	admonitionResubmitNote: {
 		id: 'project.moderation.admonition.resubmit-note',
@@ -237,7 +295,7 @@ const messages = defineMessages({
 	},
 	threadSectionTitle: {
 		id: 'project.moderation.thread.title',
-		defaultMessage: 'Message the moderators',
+		defaultMessage: 'Moderation messages',
 	},
 	threadPrivateDescription: {
 		id: 'project.moderation.thread.private-description',
@@ -252,7 +310,7 @@ const messages = defineMessages({
 	threadApprovedWarning: {
 		id: 'project.moderation.thread.approved-warning',
 		defaultMessage:
-			'Moderators are not actively monitoring this chat because your project has already been approved.',
+			'This thread is not actively monitored, but may be reviewed for information about your project as needed.',
 	},
 	unauthorizedStatus: {
 		id: 'project.moderation.error.unauthorized',

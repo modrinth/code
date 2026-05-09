@@ -15,9 +15,17 @@
 				class="card-shadow mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-2 p-4"
 			/>
 		</section>
-		<section v-if="report && thread" class="">
-			<h2>Messages</h2>
+		<section
+			v-if="report && thread"
+			class="card-shadow rounded-2xl border border-solid border-surface-4 bg-surface-3"
+		>
+			<h2 class="m-4 mb-2 text-xl font-semibold text-contrast">Messages with the moderators</h2>
+			<p class="mx-4 mt-0">
+				Make sure to include evidence of all claims you make, or your report may be closed without
+				action.
+			</p>
 			<ConversationThread
+				class="overflow-clip rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2"
 				:thread="thread"
 				:report="report"
 				:auth="auth"

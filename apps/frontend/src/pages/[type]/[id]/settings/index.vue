@@ -226,7 +226,7 @@
 						/>
 					</div>
 				</template>
-				<div>
+				<div id="visibility">
 					<label>
 						<span class="label__title">Visibility</span>
 					</label>
