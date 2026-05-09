@@ -36,7 +36,7 @@
 				</template>
 			</p>
 		</Admonition>
-		<div class="card-shadow rounded-2xl border border-solid border-surface-4 bg-surface-3">
+		<div class="card-shadow mb-6 rounded-2xl border border-solid border-surface-4 bg-surface-3">
 			<div class="flex flex-col p-4">
 				<div class="flex items-center justify-between">
 					<h2 id="messages" class="m-0 text-xl font-semibold text-contrast">
