@@ -53,6 +53,9 @@ export interface BrowseInstallPlan<TProject extends BrowseInstallProject = Brows
 	project: TProject
 	projectId: string
 	versionId: string
+	versionName?: string
+	versionNumber?: string
+	fileName?: string
 	contentType: BrowseInstallContentType
 	preferences: BrowseInstallPreferences
 	source: BrowseInstallPlanSource
@@ -311,10 +314,15 @@ export async function resolveInstallPlan<TProject extends BrowseInstallProject>(
 		)
 
 		if (version) {
+			const fileName =
+				version.files.find((file) => file.primary)?.filename ?? version.files[0]?.filename
 			return {
 				project: options.project,
 				projectId,
 				versionId: version.id,
+				versionName: version.name,
+				versionNumber: version.version_number,
+				fileName,
 				contentType: options.contentType,
 				preferences: candidate.preferences,
 				source: candidate.source,

@@ -16,8 +16,11 @@ import type {
 	BrowseInstallPlan,
 	CardAction,
 	CreationFlowContextValue,
+	PendingServerContentInstall,
+	PendingServerContentInstallType,
 } from '@modrinth/ui'
 import {
+	addPendingServerContentInstalls,
 	BrowseInstallHeader,
 	BrowsePageLayout,
 	BrowseSidebar,
@@ -29,12 +32,15 @@ import {
 	injectNotificationManager,
 	PROJECT_DEP_MARKER_QUERY,
 	provideBrowseManager,
+	readPendingServerContentInstalls,
 	requestInstall,
+	removePendingServerContentInstall,
 	SelectedProjectsFloatingBar,
 	useBrowseSearch,
 	useDebugLogger,
 	useStickyObserver,
 	useVIntl,
+	writePendingServerContentInstallBaseline,
 } from '@modrinth/ui'
 import { cycleValue } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -189,6 +195,7 @@ const serverIcon = computed(() => {
 })
 
 const serverHideInstalled = ref(false)
+const hideSelectedServerInstalls = ref(false)
 const installingProjectIds = ref<Set<string>>(new Set())
 const optimisticallyInstalledProjectIds = ref<Set<string>>(new Set())
 const hiddenInstalledProjectIds = ref<Set<string>>(new Set())
@@ -197,6 +204,7 @@ const hiddenInstalledProjectIdsInitialized = ref(false)
 interface InstallableSearchResult extends Labrinth.Search.v2.ResultSearchProject {
 	installed?: boolean
 }
+type PendingServerContentInstallInput = Omit<PendingServerContentInstall, 'createdAt'>
 
 const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(new Map())
 const queuedServerInstallProjectIds = computed(() => new Set(queuedServerInstalls.value.keys()))
@@ -215,6 +223,109 @@ const serverInstallQueue = {
 	set: (plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>) => {
 		queuedServerInstalls.value = plans
 	},
+}
+
+function getQueuedInstallOwnerFallback(project: InstallableSearchResult) {
+	if (project.organization) {
+		const ownerId = project.organization_id ?? project.organization
+		return {
+			id: ownerId,
+			name: project.organization,
+			type: 'organization' as const,
+			link: `/organization/${ownerId}`,
+		}
+	}
+
+	if (!project.author) return null
+
+	const ownerId = project.author_id ?? project.author
+	return {
+		id: ownerId,
+		name: project.author,
+		type: 'user' as const,
+		link: `/user/${ownerId}`,
+	}
+}
+
+async function getQueuedInstallOwner(project: InstallableSearchResult) {
+	const fallback = getQueuedInstallOwnerFallback(project)
+
+	try {
+		if (project.organization) {
+			const organization = await client.labrinth.projects_v3.getOrganization(project.project_id)
+			if (organization) {
+				return {
+					id: organization.id,
+					name: organization.name,
+					type: 'organization' as const,
+					avatar_url: organization.icon_url ?? undefined,
+					link: `/organization/${organization.slug}`,
+				}
+			}
+		}
+
+		const members = await client.labrinth.projects_v3.getMembers(project.project_id)
+		const owner =
+			members.find((member) => member.user.id === project.author_id)?.user ??
+			members.find((member) => member.is_owner || member.role === 'Owner')?.user ??
+			members[0]?.user
+
+		if (owner) {
+			return {
+				id: owner.id,
+				name: owner.username,
+				type: 'user' as const,
+				avatar_url: owner.avatar_url,
+				link: `/user/${owner.username}`,
+			}
+		}
+	} catch {
+		return fallback
+	}
+
+	return fallback
+}
+
+function getQueuedAddonInstallPlans(
+	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
+) {
+	return Array.from(plans.values()).filter((plan) => plan.contentType !== 'modpack')
+}
+
+function getQueuedInstallPlaceholder(
+	plan: BrowseInstallPlan<InstallableSearchResult>,
+	owner: PendingServerContentInstallInput['owner'],
+): PendingServerContentInstallInput {
+	return {
+		projectId: plan.projectId,
+		versionId: plan.versionId,
+		contentType: plan.contentType as PendingServerContentInstallType,
+		title: plan.project.title ?? 'Project',
+		versionName: plan.versionName ?? null,
+		versionNumber: plan.versionNumber ?? null,
+		fileName: plan.fileName ?? null,
+		owner,
+		slug: plan.project.slug ?? plan.projectId,
+		iconUrl: plan.project.icon_url ?? null,
+	}
+}
+
+function getQueuedInstallPlaceholderFallbacks(
+	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
+) {
+	return getQueuedAddonInstallPlans(plans).map((plan) =>
+		getQueuedInstallPlaceholder(plan, getQueuedInstallOwnerFallback(plan.project)),
+	)
+}
+
+async function getQueuedInstallPlaceholders(
+	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
+) {
+	return Promise.all(
+		getQueuedAddonInstallPlans(plans).map(async (plan) =>
+			getQueuedInstallPlaceholder(plan, await getQueuedInstallOwner(plan.project)),
+		),
+	)
 }
 
 function setProjectInstalling(projectId: string, installing: boolean) {
@@ -240,6 +351,10 @@ function getServerInstalledProjectIds(data = serverContentData.value) {
 			.map((addon) => addon.project_id)
 			.filter((projectId): projectId is string => !!projectId),
 	)
+}
+
+function getServerInstalledContentKeys(data = serverContentData.value) {
+	return new Set((data?.addons ?? []).map((addon) => addon.project_id ?? addon.filename))
 }
 
 function syncHiddenInstalledProjectIds() {
@@ -278,21 +393,22 @@ watch(
 const installContentMutation = useMutation({
 	mutationFn: ({
 		serverId,
+		worldId,
 		projectId,
 		versionId,
 	}: {
 		serverId: string
+		worldId: string
 		projectId: string
 		versionId: string
 	}) =>
-		client.archon.content_v1.addAddon(serverId, currentWorldId.value!, {
+		client.archon.content_v1.addAddon(serverId, worldId, {
 			project_id: projectId,
 			version_id: versionId,
 		}),
-	onSuccess: () => {
-		if (currentServerId.value) {
-			queryClient.refetchQueries({ queryKey: ['content', 'list', currentServerId.value] })
-		}
+	onSuccess: (_data, variables) => {
+		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', variables.serverId] })
+		queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
 	},
 })
 
@@ -341,6 +457,16 @@ const serverFilters = computed(() => {
 				filters.push({
 					type: 'project_id',
 					option: `project_id:${x}`,
+					negative: true,
+				})
+			}
+		}
+
+		if (hideSelectedServerInstalls.value && queuedServerInstallProjectIds.value.size > 0) {
+			for (const id of queuedServerInstallProjectIds.value) {
+				filters.push({
+					type: 'project_id',
+					option: `project_id:${id}`,
 					negative: true,
 				})
 			}
@@ -397,11 +523,14 @@ watch([currentServerId, currentWorldId], ([serverId, worldId], [prevServerId, pr
 	}
 })
 
-async function flushQueuedServerInstalls() {
+async function flushQueuedServerInstalls(
+	serverId: string | null = currentServerId.value,
+	worldId: string | null = currentWorldId.value,
+) {
 	if (queuedServerInstalls.value.size === 0) return true
 	if (isInstallingQueuedServerInstalls.value) return false
 
-	if (!serverData.value || !currentServerId.value || !currentWorldId.value) {
+	if (!serverId || !worldId) {
 		handleError(new Error('No server world is available for install.'))
 		return false
 	}
@@ -417,13 +546,17 @@ async function flushQueuedServerInstalls() {
 			queue: serverInstallQueue,
 			install: async (plan) => {
 				await installContentMutation.mutateAsync({
-					serverId: currentServerId.value!,
+					serverId,
+					worldId,
 					projectId: plan.projectId,
 					versionId: plan.versionId,
 				})
 				markProjectInstalled(plan.projectId)
 			},
-			onError: (error) => handleError(error as Error),
+			onError: (error, plan) => {
+				removePendingServerContentInstall(serverId, worldId, plan.projectId)
+				handleError(error as Error)
+			},
 			onProgress: (completed, total) => {
 				queuedInstallProgress.value = { completed, total }
 			},
@@ -442,18 +575,43 @@ async function discardQueuedServerInstallsAndBack() {
 }
 
 async function installQueuedServerInstallsAndBack() {
-	const ok = await flushQueuedServerInstalls()
-	if (ok) {
-		await navigateTo(serverBackUrl.value)
-		return true
+	const sid = currentServerId.value
+	const wid = currentWorldId.value
+	const backUrl = serverBackUrl.value
+	const plans = new Map(queuedServerInstalls.value)
+
+	if (sid && wid) {
+		writePendingServerContentInstallBaseline(sid, wid, [
+			...getServerInstalledContentKeys(),
+			...optimisticallyInstalledProjectIds.value,
+		])
+		addPendingServerContentInstalls(sid, wid, getQueuedInstallPlaceholderFallbacks(plans))
+		void getQueuedInstallPlaceholders(plans)
+			.then((items) => {
+				const pendingProjectIds = new Set(
+					readPendingServerContentInstalls(sid, wid).map((item) => item.projectId),
+				)
+				addPendingServerContentInstalls(
+					sid,
+					wid,
+					items.filter((item) => pendingProjectIds.has(item.projectId)),
+				)
+			})
+			.catch((err) => handleError(err as Error))
+	}
+	await navigateTo(backUrl)
+
+	const ok = await flushQueuedServerInstalls(sid, wid)
+	if (!ok) {
+		queuedServerInstalls.value = new Map()
+		addNotification({
+			type: 'error',
+			title: 'Some projects failed to install',
+			text: 'Failed projects were not added. You can try installing them again.',
+		})
 	}
 
-	addNotification({
-		type: 'error',
-		title: 'Some projects failed to install',
-		text: 'Failed projects are still selected. You can retry or clear them.',
-	})
-	return false
+	return true
 }
 
 async function serverInstall(project: InstallableSearchResult) {
@@ -779,6 +937,10 @@ const messages = defineMessages({
 		id: 'search.filter.locked.server.sync',
 		defaultMessage: 'Sync with server',
 	},
+	hideSelectedContent: {
+		id: 'app.browse.hide-selected-content',
+		defaultMessage: 'Hide selected content',
+	},
 	gameVersionShaderMessage: {
 		id: 'search.filter.game-version-shader-message',
 		defaultMessage:
@@ -802,6 +964,12 @@ const searchState = useBrowseSearch({
 	}),
 	maxResultsOptions: currentMaxResultsOptions,
 	displayMode: resultsDisplayMode,
+})
+
+watch(queuedServerInstallCount, (count) => {
+	if (count === 0) {
+		hideSelectedServerInstalls.value = false
+	}
 })
 
 watch(
@@ -862,6 +1030,14 @@ provideBrowseManager({
 	hideInstalled: serverHideInstalled,
 	showHideInstalled: computed(() => !!serverData.value && projectType.value?.id !== 'modpack'),
 	hideInstalledLabel: computed(() => 'Hide already installed content'),
+	hideSelected: hideSelectedServerInstalls,
+	showHideSelected: computed(
+		() =>
+			!!serverData.value &&
+			projectType.value?.id !== 'modpack' &&
+			queuedServerInstallCount.value > 0,
+	),
+	hideSelectedLabel: computed(() => formatMessage(messages.hideSelectedContent)),
 	displayMode: resultsDisplayMode,
 	cycleDisplayMode: cycleSearchDisplayMode,
 	maxResultsOptions: currentMaxResultsOptions,

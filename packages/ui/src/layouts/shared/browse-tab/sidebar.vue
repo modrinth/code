@@ -89,16 +89,25 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		</div>
 
 		<div
-			v-if="ctx.showHideInstalled?.value"
+			v-if="ctx.showHideInstalled?.value || ctx.showHideSelected?.value"
 			:class="
 				isApp
-					? 'border-0 border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid'
-					: 'card-shadow rounded-2xl bg-bg-raised p-4'
+					? 'flex flex-col gap-3 border-0 border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid'
+					: 'card-shadow flex flex-col gap-3 rounded-2xl bg-bg-raised p-4'
 			"
 		>
 			<Checkbox
+				v-if="ctx.showHideInstalled?.value"
 				v-model="ctx.hideInstalled!.value"
 				:label="ctx.hideInstalledLabel?.value ?? 'Hide already installed content'"
+				class="filter-checkbox"
+				@update:model-value="ctx.onFilterChange()"
+				@click.prevent.stop
+			/>
+			<Checkbox
+				v-if="ctx.showHideSelected?.value"
+				v-model="ctx.hideSelected!.value"
+				:label="ctx.hideSelectedLabel?.value ?? 'Hide selected content'"
 				class="filter-checkbox"
 				@update:model-value="ctx.onFilterChange()"
 				@click.prevent.stop

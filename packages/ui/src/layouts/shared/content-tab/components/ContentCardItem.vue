@@ -111,7 +111,10 @@ const deleteHovered = ref(false)
 	<div
 		role="row"
 		class="flex h-[74px] items-center justify-between gap-4 px-3"
-		:class="{ 'opacity-50': disabled }"
+		:class="{
+			'opacity-50 grayscale': disabled && !installing,
+			'opacity-50': installing,
+		}"
 	>
 		<div
 			class="flex min-w-0 items-center gap-4"

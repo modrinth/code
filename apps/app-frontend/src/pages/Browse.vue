@@ -267,6 +267,7 @@ const instanceFilters = computed(() => {
 })
 
 const serverHideInstalled = ref(false)
+const hideSelectedServerInstalls = ref(false)
 if (route.query.shi) {
 	serverHideInstalled.value = route.query.shi === 'true'
 }
@@ -304,6 +305,12 @@ const serverContextFilters = computed(() => {
 			filters.push({ type: 'plugin_loader', option: platform })
 
 		if (pt === 'mod') filters.push({ type: 'environment', option: 'server' })
+
+		if (hideSelectedServerInstalls.value && queuedServerInstallProjectIds.value.size > 0) {
+			for (const id of queuedServerInstallProjectIds.value) {
+				filters.push({ type: 'project_id', option: `project_id:${id}`, negative: true })
+			}
+		}
 	}
 
 	if (pt === 'modpack') {
@@ -408,6 +415,10 @@ const messages = defineMessages({
 	hideInstalledContent: {
 		id: 'app.browse.hide-installed-content',
 		defaultMessage: 'Hide already installed content',
+	},
+	hideSelectedContent: {
+		id: 'app.browse.hide-selected-content',
+		defaultMessage: 'Hide selected content',
 	},
 	installContentToInstance: {
 		id: 'app.browse.install-content-to-instance',
@@ -969,6 +980,12 @@ watch(
 	{ deep: true },
 )
 
+watch(queuedServerInstallCount, (count) => {
+	if (count === 0) {
+		hideSelectedServerInstalls.value = false
+	}
+})
+
 if (instance.value?.game_version) {
 	const gv = instance.value.game_version
 	const alreadyHasGv = searchState.serverCurrentFilters.value.some(
@@ -1025,6 +1042,14 @@ provideBrowseManager({
 	hideInstalledLabel: computed(() =>
 		formatMessage(isFromWorlds.value ? messages.hideAddedServers : messages.hideInstalledContent),
 	),
+	hideSelected: hideSelectedServerInstalls,
+	showHideSelected: computed(
+		() =>
+			isServerContext.value &&
+			projectType.value !== 'modpack' &&
+			queuedServerInstallCount.value > 0,
+	),
+	hideSelectedLabel: computed(() => formatMessage(messages.hideSelectedContent)),
 	onInstalled: onSearchResultInstalled,
 	serverPings,
 	getServerModpackContent,

@@ -7,18 +7,13 @@
 		:waiting="isWaiting"
 		@dismiss="emit('dismiss')"
 	>
-		<template #icon>
-			<slot v-if="!contentError" name="icon">
-				<SpinnerIcon class="h-6 w-6 flex-none animate-spin text-brand-blue" />
-			</slot>
-		</template>
 		<template #header>
-			{{ contentError ? 'Installation failed' : "We're preparing your server" }}
+			{{ headerLabel }}
 		</template>
 		<template v-if="contentError">
 			{{ errorLabel }}
 		</template>
-		<template v-else-if="progress">{{ phaseLabel }}</template>
+		<template v-else-if="effectivePhase">{{ phaseLabel }}</template>
 		<div v-else class="ticker-container">
 			<div class="ticker-content">
 				<div
@@ -44,7 +39,6 @@
 
 <script setup lang="ts">
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
-import SpinnerIcon from '@modrinth/assets/icons/spinner.svg'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import Admonition from '../base/Admonition.vue'
@@ -62,6 +56,7 @@ export interface ContentError {
 
 const props = defineProps<{
 	progress?: SyncProgress | null
+	fallbackPhase?: SyncProgress['phase'] | null
 	contentError?: ContentError | null
 	dismissible?: boolean
 }>()
@@ -99,8 +94,16 @@ const errorLabel = computed(() => {
 	return props.contentError?.description ?? 'An unexpected error occurred during installation.'
 })
 
+const effectivePhase = computed(() => props.progress?.phase ?? props.fallbackPhase ?? null)
+
+const headerLabel = computed(() => {
+	if (props.contentError) return 'Installation failed'
+	if (effectivePhase.value === 'Addons') return 'Installing content'
+	return "We're preparing your server"
+})
+
 const phaseLabel = computed(() => {
-	switch (props.progress?.phase) {
+	switch (effectivePhase.value) {
 		case 'InstallingLoader':
 			return 'Installing platform...'
 		case 'InstallingPack':
