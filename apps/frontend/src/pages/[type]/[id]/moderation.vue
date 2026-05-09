@@ -72,7 +72,7 @@
 				<p class="mb-0 mt-2 leading-tight">
 					{{ formatMessage(messages.admonitionUnderReviewTiming) }}
 				</p>
-				<p class="mb-0 mt-2 font-semibold leading-tight">
+				<p v-if="showDelayMessage" class="mb-0 mt-2 font-semibold leading-tight">
 					{{ formatMessage(messages.admonitionUnderReviewTimingDelay) }}
 				</p>
 			</Admonition>
@@ -204,6 +204,8 @@ import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
 
 const { formatMessage } = useVIntl()
+
+const showDelayMessage = ref(true)
 
 const messages = defineMessages({
 	admonitionApprovedHeader: {
