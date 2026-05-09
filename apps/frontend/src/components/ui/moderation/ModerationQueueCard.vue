@@ -107,8 +107,8 @@
 							<LinkIcon />
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-tooltip="'Begin review'" circular color="orange">
-						<button @click="openProjectForReview">
+					<ButtonStyled circular color="orange">
+						<button v-tooltip="'Begin review'" @click="openProjectForReview">
 							<ScaleIcon />
 						</button>
 					</ButtonStyled>
