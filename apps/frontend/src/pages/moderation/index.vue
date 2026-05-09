@@ -8,17 +8,12 @@
 				autocomplete="off"
 				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 				clearable
-				wrapper-class="flex-1 lg:max-w-52"
-				input-class="h-[40px]"
+				wrapper-class="flex-1"
+				input-class="h-[40px] w-full"
 				@input="goToPage(1)"
 			/>
 
-			<div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
-				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
-				<ConfettiExplosion v-if="visible" />
-			</div>
-
-			<div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0">
+			<div class="flex flex-col flex-wrap justify-end gap-2 sm:flex-row lg:flex-shrink-0">
 				<div class="flex flex-col gap-2 sm:flex-row">
 					<Combobox
 						v-model="currentFilterType"
@@ -55,6 +50,20 @@
 							</span>
 						</template>
 					</Combobox>
+
+					<Combobox
+						v-model="itemsPerPage"
+						class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0 lg:!w-[140px]"
+						:options="itemsPerPageOptions"
+						placeholder="Items per page"
+						@select="goToPage(1)"
+					>
+						<template #selected>
+							<span class="flex flex-row gap-2 align-middle font-semibold">
+								<span class="truncate text-contrast">{{ itemsPerPage }} items</span>
+							</span>
+						</template>
+					</Combobox>
 				</div>
 
 				<ButtonStyled color="orange">
@@ -71,25 +80,44 @@
 			</div>
 		</div>
 
-		<div v-if="totalPages > 1" class="flex justify-center lg:hidden">
+		<div v-if="totalPages > 1" class="flex items-center justify-between">
+			<div>
+				Showing {{ itemsPerPage * (currentPage - 1) + 1 }}–{{
+					itemsPerPage * (currentPage - 1) + Math.min(itemsPerPage, paginatedProjects.length)
+				}}
+				of {{ filteredProjects.length }}
+				{{
+					currentFilterType === DEFAULT_FILTER_TYPE ? 'projects' : currentFilterType.toLowerCase()
+				}}
+			</div>
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 			<ConfettiExplosion v-if="visible" />
 		</div>
 
-		<div class="flex flex-col gap-4">
-			<div v-if="paginatedProjects.length === 0" class="universal-card h-24 animate-pulse"></div>
+		<div class="flex flex-col gap-3">
+			<template v-if="pending">
+				<div
+					v-for="i in 3"
+					:key="`loading-skeleton-${i}`"
+					class="flex h-[98px] w-full animate-pulse rounded-2xl bg-surface-3"
+				></div>
+			</template>
+			<EmptyState
+				v-else-if="paginatedProjects.length === 0"
+				:type="!!query ? 'no-search-result' : 'no-tasks'"
+				:heading="emptyStateHeading"
+				:description="emptyStateDescription"
+			/>
 			<ModerationQueueCard
 				v-for="item in paginatedProjects"
 				v-else
 				:key="item.project.id"
 				:queue-entry="item"
-				:owner="item.owner"
-				:org="item.org"
 				@start-from-project="startFromProject"
 			/>
 		</div>
 
-		<div v-if="totalPages > 1" class="mt-4 flex justify-center">
+		<div v-if="totalPages > 1" class="flex justify-end">
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 		</div>
 	</div>
@@ -102,6 +130,7 @@ import {
 	type ComboboxOption,
 	commonMessages,
 	defineMessages,
+	EmptyState,
 	injectNotificationManager,
 	Pagination,
 	StyledInput,
@@ -111,7 +140,11 @@ import Fuse from 'fuse.js'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
-import { enrichProjectBatch, type ModerationProject } from '~/helpers/moderation.ts'
+import {
+	type ModerationProject,
+	type ProjectWithOwnership,
+	toModerationProjects,
+} from '~/helpers/moderation.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 useHead({ title: 'Projects queue - Modrinth' })
@@ -141,39 +174,26 @@ const messages = defineMessages({
 	},
 })
 
-const { data: allProjects } = await useLazyAsyncData('moderation-projects', async () => {
+const { data: allProjects, pending } = await useLazyAsyncData('moderation-projects', async () => {
 	const startTime = performance.now()
 	let currentOffset = 0
 	const PROJECT_ENDPOINT_COUNT = 350
 	const allProjects: ModerationProject[] = []
 
-	const enrichmentPromises: Promise<ModerationProject[]>[] = []
-
-	let projects: any[] = []
+	let projects: ProjectWithOwnership[] = []
 	do {
 		projects = (await useBaseFetch(
 			`moderation/projects?count=${PROJECT_ENDPOINT_COUNT}&offset=${currentOffset}`,
 			{ internal: true },
-		)) as any[]
+		)) as ProjectWithOwnership[]
 
 		if (projects.length === 0) break
 
-		const enrichmentPromise = enrichProjectBatch(projects)
-		enrichmentPromises.push(enrichmentPromise)
-
+		allProjects.push(...toModerationProjects(projects))
 		currentOffset += projects.length
-
-		if (enrichmentPromises.length >= 3) {
-			const completed = await Promise.all(enrichmentPromises.splice(0, 2))
-			allProjects.push(...completed.flat())
-		}
 	} while (projects.length === PROJECT_ENDPOINT_COUNT)
 
-	const remainingBatches = await Promise.all(enrichmentPromises)
-	allProjects.push(...remainingBatches.flat())
-
-	const endTime = performance.now()
-	const duration = endTime - startTime
+	const duration = performance.now() - startTime
 
 	console.debug(
 		`Projects fetched and processed in ${duration.toFixed(2)}ms (${(duration / 1000).toFixed(2)}s)`,
@@ -212,7 +232,6 @@ watch(
 	},
 )
 
-const currentFilterType = ref('All projects')
 const filterTypes: ComboboxOption<string>[] = [
 	{ value: 'All projects', label: 'All projects' },
 	{ value: 'Modpacks', label: 'Modpacks' },
@@ -222,17 +241,119 @@ const filterTypes: ComboboxOption<string>[] = [
 	{ value: 'Plugins', label: 'Plugins' },
 	{ value: 'Shaders', label: 'Shaders' },
 	{ value: 'Servers', label: 'Servers' },
+	{ value: 'Fucked up', label: 'Fucked up' },
 ]
+const filterTypeValues = filterTypes.map((option) => option.value)
+const DEFAULT_FILTER_TYPE = filterTypeValues[0]
 
-const currentSortType = ref('Oldest')
 const sortTypes: ComboboxOption<string>[] = [
 	{ value: 'Oldest', label: 'Oldest' },
 	{ value: 'Newest', label: 'Newest' },
 ]
+const sortTypeValues = sortTypes.map((option) => option.value)
+const DEFAULT_SORT_TYPE = sortTypeValues[0]
+
+const itemsPerPageOptions: ComboboxOption<number>[] = [
+	{ value: 20, label: '20' },
+	{ value: 40, label: '40' },
+	{ value: 60, label: '60' },
+	{ value: 80, label: '80' },
+	{ value: 100, label: '100' },
+	{ value: 200, label: '200' },
+]
+const itemsPerPageValues = itemsPerPageOptions.map((option) => option.value)
+const DEFAULT_ITEMS_PER_PAGE = 40
+
+function parseFilterTypeFromQuery(value: LocationQueryValue | LocationQueryValue[]): string {
+	const query = queryAsStringOrEmpty(value)
+	return filterTypeValues.includes(query) ? query : DEFAULT_FILTER_TYPE
+}
+
+function parseSortTypeFromQuery(value: LocationQueryValue | LocationQueryValue[]): string {
+	const query = queryAsStringOrEmpty(value)
+	return sortTypeValues.includes(query) ? query : DEFAULT_SORT_TYPE
+}
+
+const currentFilterType = ref(parseFilterTypeFromQuery(route.query.filter))
+const currentSortType = ref(parseSortTypeFromQuery(route.query.sort))
+
+watch(
+	currentFilterType,
+	(newFilter) => {
+		const currentQuery = { ...route.query }
+		if (newFilter && newFilter !== DEFAULT_FILTER_TYPE) {
+			currentQuery.filter = newFilter
+		} else {
+			delete currentQuery.filter
+		}
+
+		router.replace({
+			path: route.path,
+			query: currentQuery,
+		})
+	},
+	{ immediate: false },
+)
+
+watch(
+	() => route.query.filter,
+	(newFilterParam) => {
+		const newValue = parseFilterTypeFromQuery(newFilterParam)
+		if (currentFilterType.value !== newValue) {
+			currentFilterType.value = newValue
+		}
+	},
+)
+
+watch(
+	currentSortType,
+	(newSort) => {
+		const currentQuery = { ...route.query }
+		if (newSort && newSort !== DEFAULT_SORT_TYPE) {
+			currentQuery.sort = newSort
+		} else {
+			delete currentQuery.sort
+		}
+
+		router.replace({
+			path: route.path,
+			query: currentQuery,
+		})
+	},
+	{ immediate: false },
+)
+
+watch(
+	() => route.query.sort,
+	(newSortParam) => {
+		const newValue = parseSortTypeFromQuery(newSortParam)
+		if (currentSortType.value !== newValue) {
+			currentSortType.value = newValue
+		}
+	},
+)
+
+const itemsPerPageCookie = useCookie<number>('moderation-items-per-page', {
+	default: () => DEFAULT_ITEMS_PER_PAGE,
+	maxAge: 60 * 60 * 24 * 365,
+	sameSite: 'lax',
+	path: '/',
+})
+
+const itemsPerPage = computed({
+	get() {
+		const value = Number(itemsPerPageCookie.value)
+		return itemsPerPageValues.includes(value) ? value : DEFAULT_ITEMS_PER_PAGE
+	},
+	set(value: number) {
+		itemsPerPageCookie.value = value
+	},
+})
 
 const currentPage = ref(1)
-const itemsPerPage = 15
-const totalPages = computed(() => Math.ceil((filteredProjects.value?.length || 0) / itemsPerPage))
+const totalPages = computed(() =>
+	Math.ceil((filteredProjects.value?.length || 0) / itemsPerPage.value),
+)
 
 const fuse = computed(() => {
 	if (!allProjects.value || allProjects.value.length === 0) return null
@@ -254,9 +375,7 @@ const fuse = computed(() => {
 				name: 'project.project_type',
 				weight: 1,
 			},
-			'owner.user.username',
-			'org.name',
-			'org.slug',
+			'ownership.name',
 		],
 		includeScore: true,
 		threshold: 0.4,
@@ -274,7 +393,11 @@ const baseFiltered = computed(() => {
 })
 
 const typeFiltered = computed(() => {
-	if (currentFilterType.value === 'All projects') return baseFiltered.value
+	if (currentFilterType.value === 'All projects') {
+		return baseFiltered.value
+	} else if (currentFilterType.value === 'Fucked up') {
+		return baseFiltered.value.filter((queueItem) => queueItem.project.project_types.length === 0)
+	}
 
 	const filterMap: Record<string, string> = {
 		Modpacks: 'modpack',
@@ -319,9 +442,29 @@ const filteredProjects = computed(() => {
 
 const paginatedProjects = computed(() => {
 	if (!filteredProjects.value) return []
-	const start = (currentPage.value - 1) * itemsPerPage
-	const end = start + itemsPerPage
+	const start = (currentPage.value - 1) * itemsPerPage.value
+	const end = start + itemsPerPage.value
 	return filteredProjects.value.slice(start, end)
+})
+
+const emptyStateHeading = computed(() => {
+	if (query.value) {
+		return 'Not finding anything...'
+	}
+	if (currentFilterType.value !== DEFAULT_FILTER_TYPE) {
+		return 'All done here!'
+	}
+	return 'The queue is empty!'
+})
+
+const emptyStateDescription = computed(() => {
+	if (query.value) {
+		return 'Check that your search query is correct!'
+	}
+	if (currentFilterType.value !== DEFAULT_FILTER_TYPE) {
+		return `There are no ${currentFilterType.value.toLowerCase()} in the queue`
+	}
+	return 'you will probably never see this but if you do, congrats!!! :D'
 })
 
 function goToPage(page: number) {
@@ -368,7 +511,7 @@ async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
 
 async function moderateAllInFilter() {
 	// Start from the current page - get projects from current page onwards
-	const startIndex = (currentPage.value - 1) * itemsPerPage
+	const startIndex = (currentPage.value - 1) * itemsPerPage.value
 	const projectsFromCurrentPage = filteredProjects.value.slice(startIndex)
 	const projectIds = projectsFromCurrentPage.map((queueItem) => queueItem.project.id)
 	await moderationQueue.setQueue(projectIds)

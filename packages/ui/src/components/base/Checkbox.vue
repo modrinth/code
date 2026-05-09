@@ -14,12 +14,11 @@
 	>
 		<span
 			class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid"
-			:class="
-				(modelValue
-					? 'bg-brand border-button-border text-brand-inverted'
-					: 'bg-surface-2 border-surface-5') +
-				(disabled ? '' : ' checkbox-shadow group-active:scale-95')
-			"
+			:class="{
+				'bg-brand border-button-border text-brand-inverted': modelValue,
+				'bg-surface-2 border-surface-5 text-primary': !modelValue,
+				'checkbox-shadow group-active:scale-95': !disabled,
+			}"
 		>
 			<MinusIcon v-if="indeterminate" aria-hidden="true" stroke-width="3" />
 			<CheckIcon v-else-if="modelValue" aria-hidden="true" stroke-width="3" />

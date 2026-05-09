@@ -89,6 +89,7 @@ const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems } = u
 	{
 		itemHeight: 74,
 		bufferSize: 5,
+		initialItemCount: 20,
 		enabled: toRef(props, 'virtualized'),
 	},
 )

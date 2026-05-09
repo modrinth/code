@@ -66,13 +66,17 @@ export interface NuxtClientConfig extends ClientConfig {
  * ```typescript
  * // In a Nuxt composable
  * const config = useRuntimeConfig()
- * const auth = await useAuth()
  *
  * const client = new NuxtModrinthClient({
  *   userAgent: 'my-nuxt-app/1.0.0',
  *   rateLimitKey: import.meta.server ? config.rateLimitKey : undefined,
  *   features: [
- *     new AuthFeature({ token: () => auth.value.token })
+ *     new AuthFeature({
+ *       token: async () => getOAuthToken()
+ *     }),
+ *     new CircuitBreakerFeature({
+ *       storage: new NuxtCircuitBreakerStorage()
+ *     })
  *   ]
  * })
  *
@@ -171,9 +175,9 @@ export class NuxtModrinthClient extends XHRUploadClient {
 		return super.normalizeError(error)
 	}
 
-	protected buildDefaultHeaders(): Record<string, string> {
+	protected async buildDefaultHeaders(): Promise<Record<string, string>> {
 		const headers: Record<string, string> = {
-			...super.buildDefaultHeaders(),
+			...(await super.buildDefaultHeaders()),
 		}
 
 		// Use the resolved key (populated by resolveRateLimitKey in request())

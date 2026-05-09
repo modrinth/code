@@ -29,6 +29,10 @@ export const commonMessages = defineMessages({
 		id: 'project-type.all',
 		defaultMessage: 'All',
 	},
+	addServerToInstanceButton: {
+		id: 'button.add-server-to-instance',
+		defaultMessage: 'Add server to instance',
+	},
 	backButton: {
 		id: 'button.back',
 		defaultMessage: 'Back',
@@ -133,6 +137,10 @@ export const commonMessages = defineMessages({
 		id: 'label.filter-by',
 		defaultMessage: 'Filter by',
 	},
+	filtersLabel: {
+		id: 'label.filters',
+		defaultMessage: 'Filters',
+	},
 	followButton: {
 		id: 'button.follow',
 		defaultMessage: 'Follow',
@@ -188,6 +196,10 @@ export const commonMessages = defineMessages({
 	openFolderButton: {
 		id: 'button.open-folder',
 		defaultMessage: 'Open folder',
+	},
+	openInModrinthButton: {
+		id: 'button.open-in-modrinth',
+		defaultMessage: 'Open in Modrinth',
 	},
 	orLabel: {
 		id: 'label.or',
@@ -385,6 +397,34 @@ export const commonMessages = defineMessages({
 		id: 'label.installation-info',
 		defaultMessage: 'Installation info',
 	},
+	installButton: {
+		id: 'button.install',
+		defaultMessage: 'Install',
+	},
+	installedLabel: {
+		id: 'label.installed',
+		defaultMessage: 'Installed',
+	},
+	validatingLabel: {
+		id: 'label.validating',
+		defaultMessage: 'Validating',
+	},
+	selectedLabel: {
+		id: 'label.selected',
+		defaultMessage: 'Selected',
+	},
+	installingContentLabel: {
+		id: 'label.installing-content',
+		defaultMessage: 'Installing content',
+	},
+	hideInstalledContentLabel: {
+		id: 'label.hide-installed-content',
+		defaultMessage: 'Hide already installed content',
+	},
+	hideSelectedContentLabel: {
+		id: 'label.hide-selected-content',
+		defaultMessage: 'Hide selected content',
+	},
 	installedModpackTitle: {
 		id: 'label.installed-modpack',
 		defaultMessage: 'Installed modpack',
@@ -450,6 +490,10 @@ export const commonMessages = defineMessages({
 	versionLabel: {
 		id: 'label.version',
 		defaultMessage: 'Version',
+	},
+	viewLabel: {
+		id: 'label.view',
+		defaultMessage: 'View',
 	},
 	projectLabel: {
 		id: 'label.project',
