@@ -26,6 +26,7 @@ import {
 	PlugIcon,
 	PolygonIcon,
 	ScaleIcon,
+	ServerIcon,
 	UnknownIcon,
 	UpdatedIcon,
 	USDCColorIcon,
@@ -35,7 +36,6 @@ import {
 import type { ProjectStatus, ProjectType } from '@modrinth/utils'
 import type { Component } from 'vue'
 
-import { ServerIcon } from '../components'
 import {
 	FILE_ARCHIVE_EXTENSIONS,
 	FILE_CODE_EXTENSIONS,
