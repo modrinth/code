@@ -35,6 +35,7 @@ import {
 import type { ProjectStatus, ProjectType } from '@modrinth/utils'
 import type { Component } from 'vue'
 
+import { ServerIcon } from '../components'
 import {
 	FILE_ARCHIVE_EXTENSIONS,
 	FILE_CODE_EXTENSIONS,
@@ -50,6 +51,7 @@ export const PROJECT_TYPE_ICONS: Record<ProjectType, Component> = {
 	plugin: PlugIcon,
 	datapack: BracesIcon,
 	project: BoxIcon,
+	minecraft_java_server: ServerIcon,
 }
 
 export const PAYMENT_METHOD_ICONS: Record<string, Component> = {
