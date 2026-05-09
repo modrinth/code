@@ -2577,7 +2577,7 @@
 		"message": "Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth. \nYou can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>."
 	},
 	"project.moderation.admonition.draft.body": {
-		"message": "This is a draft project that cannot be seen by others until submitted for review and approved by our content moderation team."
+		"message": "This is a draft project that cannot be seen by others until submitted for review and approved by Modrinth's moderation team."
 	},
 	"project.moderation.admonition.draft.header": {
 		"message": "Draft project"
@@ -2589,7 +2589,7 @@
 		"message": "Please address all moderation concerns, including any issues listed in messages below before resubmitting this project."
 	},
 	"project.moderation.admonition.rejected.body": {
-		"message": "Our content moderation team found issues with this project that prevent it from being published on Modrinth, this may include violations of <rules-link>Modrinth's Content Rules</rules-link> or <terms-link>Terms of Use</terms-link>."
+		"message": "Modrinth's moderation team found issues with this project that prevent it from being published on Modrinth, this may include violations of <rules-link>Modrinth's Content Rules</rules-link> or <terms-link>Terms of Use</terms-link>."
 	},
 	"project.moderation.admonition.rejected.header": {
 		"message": "Changes requested"
@@ -2598,7 +2598,7 @@
 		"message": "Repeatedly submitting your project without addressing all moderation concerns first may result in account suspension."
 	},
 	"project.moderation.admonition.under-review.body": {
-		"message": "Your project is in queue to be reviewed by our content moderation team. \nWhile you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>."
+		"message": "Your project is in queue to be reviewed by Modrinth's moderation team. \nWhile you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>."
 	},
 	"project.moderation.admonition.under-review.free-to-edit": {
 		"message": "You may freely modify your project as needed while under review. It won't affect your position in the queue."
@@ -2610,7 +2610,7 @@
 		"message": "We aim to review projects within 24-48 hours of submission."
 	},
 	"project.moderation.admonition.under-review.timing-delay": {
-		"message": "Due to an increase in submissions, some project reviews may be delayed, this does not reflect an issue with your submission and there is no cause for alarm.\nWe appreciate your patience during this time while our content moderation team works hard to keep Modrinth safe."
+		"message": "Some reviews may take longer then expected, this does not reflect an issue with your submission and is not a cause for alarm. \nWe appreciate your patience while our content moderators work hard to keep Modrinth safe."
 	},
 	"project.moderation.admonition.withheld.header": {
 		"message": "Unlisted by staff"
@@ -2625,7 +2625,7 @@
 		"message": "This thread is not actively monitored, but may be reviewed for information about your project as needed."
 	},
 	"project.moderation.thread.help-center-note": {
-		"message": "This thread is only checked when you submit your project for review. For additional inquiries, please go to the <help-center-link>Modrinth Help Center</help-center-link> and click the green bubble to contact support."
+		"message": "Content moderators cannot provide support for most issues and messages to this thread do not notify staff. \nIf you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support."
 	},
 	"project.moderation.thread.moderator-see-user-ui-toggle": {
 		"message": "See what users see"
