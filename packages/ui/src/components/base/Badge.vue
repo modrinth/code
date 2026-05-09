@@ -21,10 +21,10 @@
 			<CheckIcon aria-hidden="true" /> {{ formatMessage(messages.approvedLabel) }}
 		</template>
 		<template v-else-if="type === 'unlisted'">
-			<EyeOffIcon aria-hidden="true" /> {{ formatMessage(messages.unlistedLabel) }}
+			<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.unlistedLabel) }}
 		</template>
 		<template v-else-if="type === 'withheld'">
-			<EyeOffIcon aria-hidden="true" /> {{ formatMessage(messages.withheldLabel) }}
+			<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.withheldLabel) }}
 		</template>
 		<template v-else-if="type === 'private'">
 			<LockIcon aria-hidden="true" /> {{ formatMessage(messages.privateLabel) }}
@@ -89,7 +89,7 @@ import {
 	BugIcon,
 	CalendarIcon,
 	CheckIcon,
-	EyeOffIcon,
+	LinkIcon,
 	FileTextIcon,
 	GlobeIcon,
 	LockIcon,
