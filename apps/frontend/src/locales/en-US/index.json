@@ -875,23 +875,8 @@
   "dashboard.head-title": {
     "message": "Dashboard"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Mark all as read"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "View history"
-  },
   "dashboard.notifications.empty.no-unread": {
-    "message": "You don't have any unread notifications."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Error loading notifications:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "History"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Notification history"
+    "message": "You have no unread notifications."
   },
   "dashboard.notifications.link.see-all": {
     "message": "See all"
@@ -901,9 +886,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "View {extraNotifs} more {extraNotifs, plural, one {notification} other {notifications}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Loading notifications..."
   },
   "dashboard.organizations.button.create": {
     "message": "Create organization"
@@ -919,6 +901,27 @@
   },
   "dashboard.organizations.title": {
     "message": "Organizations"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Mark all as read"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "View history"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "You don't have any unread notifications."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Error loading notifications:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "History"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Notification history"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Loading notifications..."
   },
   "dashboard.projects.bulk-edit-hint": {
     "message": "You can edit multiple projects at once by selecting them below."
@@ -2564,17 +2567,20 @@
   "project.license.title": {
     "message": "License"
   },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Your project is private, meaning it can only be accessed by you and people you invite"
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Your project is published and discoverable on Modrinth."
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "You can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>."
+  },
   "project.moderation.admonition.approved.header": {
     "message": "Project approved"
-  },
-  "project.moderation.admonition.approved.private-full": {
-    "message": "Your project is private, meaning it can only be accessed by you and people you invite. \nYou can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>."
-  },
-  "project.moderation.admonition.approved.published-full": {
-    "message": "Your project is published and discoverable on Modrinth. \nYou can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>."
-  },
-  "project.moderation.admonition.approved.unlisted-full": {
-    "message": ""
   },
   "project.moderation.admonition.draft.body": {
     "message": "This is a draft project that cannot be seen by others until submitted for review and approved by Modrinth's moderation team."
@@ -2597,26 +2603,32 @@
   "project.moderation.admonition.rejected.spam-notice": {
     "message": "Repeatedly submitting your project without addressing all moderation concerns first may result in account suspension."
   },
-  "project.moderation.admonition.under-review.body": {
-    "message": "Your project is in queue to be reviewed by Modrinth's moderation team. \nWhile you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>."
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Your project is in queue to be reviewed by Modrinth's moderation team."
   },
-  "project.moderation.admonition.under-review.free-to-edit": {
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "While you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>."
+  },
+  "project.moderation.admonition.under-review.body.3": {
     "message": "You may freely modify or update your project while under review. It won't affect your position in the queue."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "We aim to review projects within 24-48 hours of submission."
+  },
+  "project.moderation.admonition.under-review.body.delay.1": {
+    "message": "<emphasis>Due to delays, some reviews may take longer than expected, this does not reflect an issue with your submission and is not a cause for alarm.</emphasis>"
+  },
+  "project.moderation.admonition.under-review.body.delay.2": {
+    "message": "<emphasis>We appreciate your patience while our content moderators work hard to keep Modrinth safe.</emphasis>"
   },
   "project.moderation.admonition.under-review.header": {
     "message": "Project under review"
-  },
-  "project.moderation.admonition.under-review.timing": {
-    "message": "We aim to review projects within 24-48 hours of submission."
-  },
-  "project.moderation.admonition.under-review.timing-delay": {
-    "message": "Due to delays, some reviews may take longer than expected, this does not reflect an issue with your submission and is not a cause for alarm. \nWe appreciate your patience while our content moderators work hard to keep Modrinth safe."
   },
   "project.moderation.admonition.withheld.header": {
     "message": "Unlisted by staff"
   },
   "project.moderation.admonition.withheld.still-accessible": {
-    "message": "Your project can still be accessed via a direct link, but will not appear publicly.{requestedWithheld, select, true { Based on your selected <visibility-settings-link>visibility settings</visibility-settings-link>, most likely no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}"
+    "message": "Your project can still be accessed via a direct link, but will not appear publicly.{requestedStatus, select, unlisted { Based on your selected <visibility-settings-link>visibility settings</visibility-settings-link>, most likely no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}"
   },
   "project.moderation.error.unauthorized": {
     "message": "Unauthorized"
@@ -2624,8 +2636,11 @@
   "project.moderation.thread.approved-warning": {
     "message": "This thread is not actively monitored, but may be reviewed for information about your project if needed."
   },
-  "project.moderation.thread.help-center-note": {
-    "message": "Content moderators cannot provide support for most issues and messages to this thread do not notify staff. \nIf you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support."
+  "project.moderation.thread.help-center-note.1": {
+    "message": "Content moderators cannot provide support for most issues and messages to this thread do not notify staff."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "If you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support."
   },
   "project.moderation.thread.moderator-see-user-ui-toggle": {
     "message": "See what users see"

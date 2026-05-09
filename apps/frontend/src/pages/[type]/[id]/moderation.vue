@@ -6,35 +6,40 @@
 			class="mb-4"
 			:header="formatMessage(moderationAdmonition.header)"
 		>
-			<p
-				v-for="item in moderationAdmonition.body"
-				:key="item.key"
-				class="mb-0 mt-2 leading-tight first:mt-0"
-				:class="{
-					'font-semibold': item.emphasis,
-				}"
+			<template
+				v-for="(message, index) in moderationAdmonition.body"
+				:key="`moderation-admonition.${project.status}+${project.requested_status ?? 'none'}.body.${index}`"
 			>
-				<IntlFormatted v-if="item.formatted" :message-id="item.message" :values="item.values">
-					<template #rules-link="{ children }">
-						<nuxt-link to="/legal/rules" class="text-link" target="_blank">
-							<component :is="() => normalizeChildren(children)" />
-						</nuxt-link>
-					</template>
-					<template #terms-link="{ children }">
-						<nuxt-link to="/legal/terms" class="text-link" target="_blank">
-							<component :is="() => normalizeChildren(children)" />
-						</nuxt-link>
-					</template>
-					<template #visibility-settings-link="{ children }">
-						<router-link :to="`${getProjectLink(project)}/settings#visibility`" class="text-link">
-							<component :is="() => normalizeChildren(children)" />
-						</router-link>
-					</template>
-				</IntlFormatted>
-				<template v-else>
-					{{ formatMessage(item.message) }}
-				</template>
-			</p>
+				<p v-if="message" class="preserve-lines mb-0 mt-2 leading-tight first:mt-0">
+					<IntlFormatted
+						:message-id="message"
+						:values="{
+							requestedStatus: project.requested_status ?? 'none',
+						}"
+					>
+						<template #rules-link="{ children }">
+							<nuxt-link to="/legal/rules" class="text-link" target="_blank">
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+						<template #terms-link="{ children }">
+							<nuxt-link to="/legal/terms" class="text-link" target="_blank">
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+						<template #visibility-settings-link="{ children }">
+							<router-link :to="`${getProjectLink(project)}/settings#visibility`" class="text-link">
+								<component :is="() => normalizeChildren(children)" />
+							</router-link>
+						</template>
+						<template #emphasis="{ children }">
+							<span class="font-semibold">
+								<component :is="() => normalizeChildren(children)" />
+							</span>
+						</template>
+					</IntlFormatted>
+				</p>
+			</template>
 		</Admonition>
 		<div class="card-shadow mb-6 rounded-2xl border border-solid border-surface-4 bg-surface-3">
 			<div class="flex flex-col p-4">
@@ -49,25 +54,36 @@
 						</label>
 					</div>
 				</div>
-				<p v-if="userFacingUiVisible" class="m-0 mt-2 leading-tight">
-					{{ formatMessage(messages.threadPrivateDescription) }}
-				</p>
-				<p v-if="userFacingUiVisible" class="mb-0 mt-3 leading-tight">
-					<IntlFormatted :message-id="messages.threadHelpCenterNote">
-						<template #help-center-link="{ children }">
-							<a class="text-link" href="https://support.modrinth.com" target="_blank">
-								<component :is="() => normalizeChildren(children)" />
-							</a>
-						</template>
-					</IntlFormatted>
-				</p>
-				<p
-					v-if="isApproved(project) && userFacingUiVisible"
-					class="mb-0 mt-3 flex items-center gap-2 font-semibold text-orange"
-				>
-					<IssuesIcon />
-					{{ formatMessage(messages.threadApprovedWarning) }}
-				</p>
+				<template v-if="userFacingUiVisible">
+					<p class="m-0 mt-2 leading-tight">
+						{{ formatMessage(messages.threadPrivateDescription) }}
+					</p>
+					<p class="mb-0 mt-3 leading-tight">
+						<IntlFormatted :message-id="messages.threadHelpCenterNote1">
+							<template #help-center-link="{ children }">
+								<a class="text-link" href="https://support.modrinth.com" target="_blank">
+									<component :is="() => normalizeChildren(children)" />
+								</a>
+							</template>
+						</IntlFormatted>
+					</p>
+					<p class="mb-0 mt-2 leading-tight">
+						<IntlFormatted :message-id="messages.threadHelpCenterNote2">
+							<template #help-center-link="{ children }">
+								<a class="text-link" href="https://support.modrinth.com" target="_blank">
+									<component :is="() => normalizeChildren(children)" />
+								</a>
+							</template>
+						</IntlFormatted>
+					</p>
+					<p
+						v-if="isApproved(project)"
+						class="mb-0 mt-3 flex items-center gap-2 font-semibold text-orange"
+					>
+						<IssuesIcon />
+						{{ formatMessage(messages.threadApprovedWarning) }}
+					</p>
+				</template>
 			</div>
 			<ConversationThread
 				v-if="thread"
@@ -109,7 +125,6 @@ const { formatMessage } = useVIntl()
 
 const showDelayMessage = ref(true)
 
-type IntlValue = string | number | boolean
 type ProjectPageMember = Labrinth.Projects.v3.TeamMember & { staffOnly?: boolean }
 
 const messages = defineMessages({
@@ -136,15 +151,25 @@ const messages = defineMessages({
 		defaultMessage:
 			'This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project.',
 	},
-	threadHelpCenterNote: {
-		id: 'project.moderation.thread.help-center-note',
+	threadHelpCenterNote1: {
+		id: 'project.moderation.thread.help-center-note.1',
 		defaultMessage:
-			'Content moderators cannot provide support for most issues and messages to this thread do not notify staff. \nIf you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support.',
+			'Content moderators cannot provide support for most issues and messages to this thread do not notify staff.',
+	},
+	threadHelpCenterNote2: {
+		id: 'project.moderation.thread.help-center-note.2',
+		defaultMessage:
+			'If you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support.',
 	},
 	threadApprovedWarning: {
 		id: 'project.moderation.thread.approved-warning',
 		defaultMessage:
 			'This thread is not actively monitored, but may be reviewed for information about your project if needed.',
+	},
+	approvedProjectVisibilityMessage: {
+		id: 'project.moderation.admonition.approved.body.visibility-message',
+		defaultMessage:
+			"You can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>.",
 	},
 })
 
@@ -167,38 +192,31 @@ const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
 		case 'approved':
 		case 'archived':
 			return defineMessage({
-				id: 'project.moderation.admonition.approved.published-full',
-				defaultMessage:
-					"Your project is published and discoverable on Modrinth. \nYou can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>.",
+				id: 'project.moderation.admonition.approved.body.public',
+				defaultMessage: 'Your project is published and discoverable on Modrinth.',
 			})
 		case 'unlisted':
 			return defineMessage({
-				id: 'project.moderation.admonition.approved.unlisted-full',
-				defaultMessage: '',
+				id: 'project.moderation.admonition.approved.body.unlisted',
+				defaultMessage:
+					'Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth.',
 			})
+
 		case 'private':
 			return defineMessage({
-				id: 'project.moderation.admonition.approved.private-full',
+				id: 'project.moderation.admonition.approved.body.private',
 				defaultMessage:
-					"Your project is private, meaning it can only be accessed by you and people you invite. \nYou can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>.",
+					'Your project is private, meaning it can only be accessed by you and people you invite',
 			})
 		default:
 			return null
 	}
 })
 
-interface ModerationAdmonitionItem {
-	key: string
-	message: MessageDescriptor
-	formatted?: boolean
-	values?: Record<string, IntlValue>
-	emphasis?: boolean
-}
-
 const moderationAdmonition = computed<{
 	type: InstanceType<typeof Admonition>['type']
 	header: MessageDescriptor
-	body: ModerationAdmonitionItem[]
+	body: (MessageDescriptor | null)[]
 } | null>(() => {
 	const currentProject = project.value
 
@@ -210,21 +228,15 @@ const moderationAdmonition = computed<{
 				defaultMessage: 'Draft project',
 			}),
 			body: [
-				createItem(
-					'draft-body',
-					defineMessage({
-						id: 'project.moderation.admonition.draft.body',
-						defaultMessage:
-							"This is a draft project that cannot be seen by others until submitted for review and approved by Modrinth's moderation team.",
-					}),
-				),
-				createFormattedItem(
-					'draft-submit-for-review',
-					defineMessage({
-						id: 'project.moderation.admonition.draft.submit-for-review',
-						defaultMessage: `Once you have completed all required steps and ensured your project complies with <rules-link>Modrinth's Content Rules</rules-link> you can submit your project for review.`,
-					}),
-				),
+				defineMessage({
+					id: 'project.moderation.admonition.draft.body',
+					defaultMessage:
+						"This is a draft project that cannot be seen by others until submitted for review and approved by Modrinth's moderation team.",
+				}),
+				defineMessage({
+					id: 'project.moderation.admonition.draft.submit-for-review',
+					defaultMessage: `Once you have completed all required steps and ensured your project complies with <rules-link>Modrinth's Content Rules</rules-link> you can submit your project for review.`,
+				}),
 			],
 		}
 	}
@@ -236,7 +248,7 @@ const moderationAdmonition = computed<{
 				id: 'project.moderation.admonition.approved.header',
 				defaultMessage: 'Project approved',
 			}),
-			body: [createFormattedItem('approved-body', approvedAdmonitionMessage.value)],
+			body: [approvedAdmonitionMessage.value, messages.approvedProjectVisibilityMessage],
 		}
 	}
 
@@ -248,40 +260,34 @@ const moderationAdmonition = computed<{
 				defaultMessage: 'Project under review',
 			}),
 			body: [
-				createFormattedItem(
-					'under-review-body',
-					defineMessage({
-						id: 'project.moderation.admonition.under-review.body',
-						defaultMessage:
-							"Your project is in queue to be reviewed by Modrinth's moderation team. \nWhile you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>.",
-					}),
-				),
-				createItem(
-					'under-review-free-to-edit',
-					defineMessage({
-						id: 'project.moderation.admonition.under-review.free-to-edit',
-						defaultMessage: `You may freely modify or update your project while under review. It won't affect your position in the queue.`,
-					}),
-				),
-				createItem(
-					'under-review-timing',
-					defineMessage({
-						id: 'project.moderation.admonition.under-review.timing',
-						defaultMessage: 'We aim to review projects within 24-48 hours of submission.',
-					}),
-				),
-				...(showDelayMessage.value
-					? [
-							createItem(
-								'under-review-timing-delay',
-								defineMessage({
-									id: 'project.moderation.admonition.under-review.timing-delay',
-									defaultMessage: `Due to delays, some reviews may take longer than expected, this does not reflect an issue with your submission and is not a cause for alarm. \nWe appreciate your patience while our content moderators work hard to keep Modrinth safe.`,
-								}),
-								{ emphasis: true },
-							),
-						]
-					: []),
+				defineMessage({
+					id: 'project.moderation.admonition.under-review.body.1',
+					defaultMessage: `Your project is in queue to be reviewed by Modrinth's moderation team.`,
+				}),
+				defineMessage({
+					id: 'project.moderation.admonition.under-review.body.2',
+					defaultMessage: `While you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>.`,
+				}),
+				defineMessage({
+					id: 'project.moderation.admonition.under-review.body.3',
+					defaultMessage: `You may freely modify or update your project while under review. It won't affect your position in the queue.`,
+				}),
+				defineMessage({
+					id: 'project.moderation.admonition.under-review.body.4',
+					defaultMessage: `We aim to review projects within 24-48 hours of submission.`,
+				}),
+				showDelayMessage.value
+					? defineMessage({
+							id: 'project.moderation.admonition.under-review.body.delay.1',
+							defaultMessage: `<emphasis>Due to delays, some reviews may take longer than expected, this does not reflect an issue with your submission and is not a cause for alarm.</emphasis>`,
+						})
+					: null,
+				showDelayMessage.value
+					? defineMessage({
+							id: 'project.moderation.admonition.under-review.body.delay.2',
+							defaultMessage: `<emphasis>We appreciate your patience while our content moderators work hard to keep Modrinth safe.</emphasis>`,
+						})
+					: null,
 			],
 		}
 	}
@@ -294,17 +300,13 @@ const moderationAdmonition = computed<{
 				defaultMessage: 'Unlisted by staff',
 			}),
 			body: [
-				createFormattedItem('withheld-rejected-body', messages.admonitionRejectedBody),
-				createFormattedItem(
-					'withheld-still-accessible',
-					defineMessage({
-						id: 'project.moderation.admonition.withheld.still-accessible',
-						defaultMessage:
-							'Your project can still be accessed via a direct link, but will not appear publicly.{requestedWithheld, select, true { Based on your selected <visibility-settings-link>visibility settings</visibility-settings-link>, most likely no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}',
-					}),
-					{ values: { requestedWithheld: currentProject.requested_status === 'unlisted' } },
-				),
-				createItem('withheld-spam-notice', messages.admonitionRejectedSpamNotice),
+				messages.admonitionRejectedBody,
+				defineMessage({
+					id: 'project.moderation.admonition.withheld.still-accessible',
+					defaultMessage:
+						'Your project can still be accessed via a direct link, but will not appear publicly.{requestedStatus, select, unlisted { Based on your selected <visibility-settings-link>visibility settings</visibility-settings-link>, most likely no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}',
+				}),
+				messages.admonitionRejectedSpamNotice,
 			],
 		}
 	}
@@ -317,16 +319,13 @@ const moderationAdmonition = computed<{
 				defaultMessage: 'Changes requested',
 			}),
 			body: [
-				createFormattedItem('rejected-body', messages.admonitionRejectedBody),
-				createItem(
-					'rejected-address-all-concerns',
-					defineMessage({
-						id: 'project.moderation.admonition.rejected.address-all-concerns',
-						defaultMessage:
-							'Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.',
-					}),
-				),
-				createItem('rejected-spam-notice', messages.admonitionRejectedSpamNotice),
+				messages.admonitionRejectedBody,
+				defineMessage({
+					id: 'project.moderation.admonition.rejected.address-all-concerns',
+					defaultMessage:
+						'Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.',
+				}),
+				messages.admonitionRejectedSpamNotice,
 			],
 		}
 	}
@@ -349,22 +348,6 @@ const moderatorSeeUserUi = computed<boolean>({
 		moderatorSeeUserUiCookie.value = value
 	},
 })
-
-function createItem(
-	key: string,
-	message: MessageDescriptor,
-	options: Partial<Pick<ModerationAdmonitionItem, 'emphasis' | 'values'>> = {},
-): ModerationAdmonitionItem {
-	return { key, message, ...options }
-}
-
-function createFormattedItem(
-	key: string,
-	message: MessageDescriptor,
-	options: Partial<Pick<ModerationAdmonitionItem, 'emphasis' | 'values'>> = {},
-): ModerationAdmonitionItem {
-	return { key, message, formatted: true, ...options }
-}
 
 watch(
 	[currentMember, allMembers],
