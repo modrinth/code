@@ -104,6 +104,7 @@ import { computed, ref } from 'vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
+import { useFormatBytes } from '#ui/composables'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
@@ -164,8 +165,6 @@ const isDropTarget = computed(
 )
 const isDragSource = computed(() => fileDragActive.value && fileDragData.value?.path === props.path)
 
-const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])
-
 const formatDateTime = useFormatDateTime({
 	year: '2-digit',
 	month: '2-digit',
@@ -173,6 +172,7 @@ const formatDateTime = useFormatDateTime({
 	hour: 'numeric',
 	minute: 'numeric',
 })
+const formatBytes = useFormatBytes()
 
 const containerClasses = computed(() => {
 	const dropTarget = isDropTarget.value
@@ -307,12 +307,7 @@ const formattedSize = computed(() => {
 	}
 
 	if (props.size === undefined) return ''
-	const bytes = props.size
-	if (bytes === 0) return '0 B'
-
-	const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
-	const size = (bytes / Math.pow(1024, exponent)).toFixed(2)
-	return `${size} ${units[exponent]}`
+	return formatBytes(props.size)
 })
 
 function openContextMenu(event: MouseEvent) {
