@@ -2568,13 +2568,13 @@
     "message": "Project approved"
   },
   "project.moderation.admonition.approved.private-full": {
-    "message": "Your project is private, meaning it can only be accessed by you and people you invite. You can change the visibility of your project in <settings-link>your project's settings</settings-link>."
+    "message": "Your project is private, meaning it can only be accessed by you and people you invite. You can change the visibility of your project inyour project's <visibility-settings-link>visibility settings</visibility-settings-link>."
   },
   "project.moderation.admonition.approved.published-full": {
     "message": "Your project is published and discoverable on Modrinth. You can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>."
   },
   "project.moderation.admonition.approved.unlisted-full": {
-    "message": "Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth. You can change the visibility of your project in <settings-link>your project's settings</settings-link>."
+    "message": "Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth. You can change the visibility of your project inyour project's <visibility-settings-link>visibility settings</visibility-settings-link>."
   },
   "project.moderation.admonition.draft.body": {
     "message": "This is a draft project that cannot be seen by others until submitted for review and approved by our content moderation team."
@@ -2596,9 +2596,6 @@
   },
   "project.moderation.admonition.rejected.spam-notice": {
     "message": "Spam, or repeatedly resubmitting your project without addressing all moderation concerns first, may result in account suspension."
-  },
-  "project.moderation.admonition.resubmit-note": {
-    "message": "Read the messages from the moderators below and address their comments before resubmitting. <warning-strong>Repeated submissions without addressing the moderators' comments may result in an account suspension.</warning-strong>"
   },
   "project.moderation.admonition.under-review.body": {
     "message": "Your project is in queue to be reviewed by our content moderation team. While you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>."
@@ -2629,6 +2626,9 @@
   },
   "project.moderation.thread.help-center-note": {
     "message": "This thread is only checked when you submit your project for review. For additional inquiries, please go to the <help-center-link>Modrinth Help Center</help-center-link> and click the green bubble to contact support."
+  },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "See what users see"
   },
   "project.moderation.thread.private-description": {
     "message": "This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project."
