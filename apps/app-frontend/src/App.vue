@@ -1647,6 +1647,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	&.app-contents::before {
 		box-shadow: none;
 	}
+
+	*,
+	:deep(*) {
+		box-shadow: none !important;
+		--tw-drop-shadow:;
+	}
 }
 
 .app-sidebar::before {
