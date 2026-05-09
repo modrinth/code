@@ -1073,10 +1073,7 @@ impl Profile {
                     if subdirectory.is_file()
                         && let Some(file_name) =
                             subdirectory.file_name().and_then(|x| x.to_str())
-                        && is_scannable_project_file(
-                            project_type,
-                            file_name,
-                        )
+                        && is_scannable_project_file(project_type, file_name)
                     {
                         let file_size = subdirectory
                             .metadata()
