@@ -27,11 +27,10 @@ interface HttpError extends Error {
  * ```typescript
  * import { getVersion } from '@tauri-apps/api/app'
  *
- * const version = await getVersion()
  * const client = new TauriModrinthClient({
- *   userAgent: `modrinth/theseus/${version} (support@modrinth.com)`,
+ *   userAgent: async () => `modrinth/theseus/${await getVersion()} (support@modrinth.com)`,
  *   features: [
- *     new AuthFeature({ token: 'mrp_...' })
+ *     new AuthFeature({ token: async () => getOAuthToken() })
  *   ]
  * })
  *
