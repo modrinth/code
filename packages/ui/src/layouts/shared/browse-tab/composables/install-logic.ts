@@ -71,6 +71,57 @@ export interface BrowseInstallQueue<TProject extends BrowseInstallProject = Brow
 	set: (plans: Map<string, BrowseInstallPlan<TProject>>) => void
 }
 
+const serverInstallQueueStoragePrefix = 'server-install-queue'
+
+export function getStoredServerInstallQueueKey(
+	serverId: string | null,
+	worldId: string | null,
+) {
+	if (!serverId || !worldId) return null
+	return `${serverInstallQueueStoragePrefix}:${serverId}:${worldId}`
+}
+
+export function readStoredServerInstallQueue<
+	TProject extends BrowseInstallProject = BrowseInstallProject,
+>(serverId: string | null, worldId: string | null) {
+	const key = getStoredServerInstallQueueKey(serverId, worldId)
+	if (!key || typeof localStorage === 'undefined') {
+		return new Map<string, BrowseInstallPlan<TProject>>()
+	}
+
+	try {
+		const raw = localStorage.getItem(key)
+		if (!raw) return new Map<string, BrowseInstallPlan<TProject>>()
+
+		const parsed = JSON.parse(raw)
+		if (!Array.isArray(parsed)) return new Map<string, BrowseInstallPlan<TProject>>()
+
+		return new Map<string, BrowseInstallPlan<TProject>>(
+			parsed.filter(isStoredServerInstallQueueEntry),
+		)
+	} catch {
+		return new Map<string, BrowseInstallPlan<TProject>>()
+	}
+}
+
+export function writeStoredServerInstallQueue<
+	TProject extends BrowseInstallProject = BrowseInstallProject,
+>(
+	serverId: string | null,
+	worldId: string | null,
+	plans: Map<string, BrowseInstallPlan<TProject>>,
+) {
+	const key = getStoredServerInstallQueueKey(serverId, worldId)
+	if (!key || typeof localStorage === 'undefined') return
+
+	if (plans.size === 0) {
+		localStorage.removeItem(key)
+		return
+	}
+
+	localStorage.setItem(key, JSON.stringify(Array.from(plans.entries())))
+}
+
 /**
  * Filter inputs for deriving selected install preferences.
  *
@@ -381,6 +432,10 @@ export async function flushInstallQueue<TProject extends BrowseInstallProject>({
 		try {
 			await install(plan)
 			successfulPlans.push(plan)
+
+			const remainingPlans = new Map(queue.get())
+			remainingPlans.delete(plan.projectId)
+			queue.set(remainingPlans)
 		} catch (error) {
 			failedPlans.set(plan.projectId, plan)
 			onError?.(error, plan)
@@ -389,9 +444,6 @@ export async function flushInstallQueue<TProject extends BrowseInstallProject>({
 			await onProgress?.(completed, queuedPlans.length, plan)
 		}
 	}
-
-	queue.set(failedPlans)
-
 	return {
 		ok: failedPlans.size === 0,
 		successfulPlans,
@@ -521,6 +573,52 @@ function uniqueDefined(values: readonly (string | null | undefined)[] = []) {
 	return Array.from(
 		new Set(values.map((value) => value?.trim()).filter((value): value is string => !!value)),
 	)
+}
+
+function isStoredServerInstallQueueEntry(
+	value: unknown,
+): value is [string, BrowseInstallPlan<BrowseInstallProject>] {
+	if (!Array.isArray(value) || value.length !== 2) return false
+	const [key, plan] = value
+	return typeof key === 'string' && isStoredBrowseInstallPlan(plan)
+}
+
+function isStoredBrowseInstallPlan(value: unknown): value is BrowseInstallPlan<BrowseInstallProject> {
+	if (!value || typeof value !== 'object') return false
+	const record = value as Record<string, unknown>
+	return (
+		isStoredBrowseInstallProject(record.project) &&
+		typeof record.projectId === 'string' &&
+		typeof record.versionId === 'string' &&
+		isStoredBrowseInstallContentType(record.contentType) &&
+		isStoredBrowseInstallPreferences(record.preferences) &&
+		(record.source === 'filtered' || record.source === 'target')
+	)
+}
+
+function isStoredBrowseInstallProject(value: unknown): value is BrowseInstallProject {
+	return (
+		!!value &&
+		typeof value === 'object' &&
+		typeof (value as Record<string, unknown>).project_id === 'string'
+	)
+}
+
+function isStoredBrowseInstallContentType(value: unknown): value is BrowseInstallContentType {
+	return value === 'modpack' || value === 'mod' || value === 'plugin' || value === 'datapack'
+}
+
+function isStoredBrowseInstallPreferences(value: unknown): value is BrowseInstallPreferences {
+	if (!value || typeof value !== 'object') return false
+	const record = value as Record<string, unknown>
+	return (
+		isOptionalStringArray(record.gameVersions) &&
+		isOptionalStringArray(record.loaders)
+	)
+}
+
+function isOptionalStringArray(value: unknown) {
+	return value === undefined || (Array.isArray(value) && value.every((item) => typeof item === 'string'))
 }
 
 function createNoCompatibleVersionError(

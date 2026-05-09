@@ -33,6 +33,7 @@ import {
 	injectNotificationManager,
 	PROJECT_DEP_MARKER_QUERY,
 	provideBrowseManager,
+	readStoredServerInstallQueue,
 	readPendingServerContentInstalls,
 	removePendingServerContentInstall,
 	requestInstall,
@@ -41,6 +42,7 @@ import {
 	useDebugLogger,
 	useStickyObserver,
 	useVIntl,
+	writeStoredServerInstallQueue,
 	writePendingServerContentInstallBaseline,
 } from '@modrinth/ui'
 import { cycleValue } from '@modrinth/utils'
@@ -75,7 +77,7 @@ const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
-const { addNotification, handleError } = injectNotificationManager()
+const { handleError } = injectNotificationManager()
 
 let prefetchTimeout: ReturnType<typeof useTimeoutFn> | null = null
 const HOVER_DURATION_TO_PREFETCH_MS = 500
@@ -207,7 +209,9 @@ interface InstallableSearchResult extends Labrinth.Search.v2.ResultSearchProject
 }
 type PendingServerContentInstallInput = Omit<PendingServerContentInstall, 'createdAt'>
 
-const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(new Map())
+const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(
+	readStoredServerInstallQueue(currentServerId.value, currentWorldId.value),
+)
 const queuedServerInstallProjectIds = computed(() => new Set(queuedServerInstalls.value.keys()))
 const queuedServerInstallCount = computed(() => queuedServerInstalls.value.size)
 const selectedServerInstallProjects = computed(() =>
@@ -223,6 +227,7 @@ const serverInstallQueue = {
 	get: () => queuedServerInstalls.value,
 	set: (plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>) => {
 		queuedServerInstalls.value = plans
+		writeStoredServerInstallQueue(currentServerId.value, currentWorldId.value, plans)
 	},
 }
 
@@ -509,18 +514,18 @@ function getInstallProjectVersions(projectId: string) {
 }
 
 function clearQueuedServerInstalls() {
-	queuedServerInstalls.value = new Map()
+	serverInstallQueue.set(new Map())
 }
 
 function removeQueuedServerInstall(projectId: string) {
 	const nextPlans = new Map(queuedServerInstalls.value)
 	nextPlans.delete(projectId)
-	queuedServerInstalls.value = nextPlans
+	serverInstallQueue.set(nextPlans)
 }
 
 watch([currentServerId, currentWorldId], ([serverId, worldId], [prevServerId, prevWorldId]) => {
 	if (serverId !== prevServerId || worldId !== prevWorldId) {
-		clearQueuedServerInstalls()
+		queuedServerInstalls.value = readStoredServerInstallQueue(serverId, worldId)
 	}
 })
 
@@ -582,6 +587,7 @@ async function installQueuedServerInstallsAndBack() {
 	const plans = new Map(queuedServerInstalls.value)
 
 	if (sid && wid) {
+		writeStoredServerInstallQueue(sid, wid, plans)
 		writePendingServerContentInstallBaseline(sid, wid, [
 			...getServerInstalledContentKeys(),
 			...optimisticallyInstalledProjectIds.value,
@@ -601,16 +607,6 @@ async function installQueuedServerInstallsAndBack() {
 			.catch((err) => handleError(err as Error))
 	}
 	await navigateTo(backUrl)
-
-	const ok = await flushQueuedServerInstalls(sid, wid)
-	if (!ok) {
-		queuedServerInstalls.value = new Map()
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.someProjectsFailedTitle),
-			text: formatMessage(messages.someProjectsFailedText),
-		})
-	}
 
 	return true
 }

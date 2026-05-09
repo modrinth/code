@@ -10,8 +10,10 @@ import {
 	injectNotificationManager,
 	type PendingServerContentInstall,
 	type PendingServerContentInstallType,
+	readStoredServerInstallQueue,
 	readPendingServerContentInstalls,
 	removePendingServerContentInstall,
+	writeStoredServerInstallQueue,
 	writePendingServerContentInstallBaseline,
 } from '@modrinth/ui'
 import { computed, type ComputedRef, nextTick, type Ref, ref, watch } from 'vue'
@@ -87,37 +89,6 @@ export const [injectServerInstallContent, provideServerInstallContent] =
 function readQueryString(value: unknown): string | null {
 	if (Array.isArray(value)) return value[0] ?? null
 	return typeof value === 'string' && value.length > 0 ? value : null
-}
-
-function getQueueStorageKey(serverId: string | null, worldId: string | null) {
-	if (!serverId || !worldId) return null
-	return `server-install-queue:${serverId}:${worldId}`
-}
-
-function readStoredQueue(serverId: string | null, worldId: string | null) {
-	const key = getQueueStorageKey(serverId, worldId)
-	if (!key) return new Map<string, BrowseInstallPlan<InstallableSearchResult>>()
-	try {
-		const raw = localStorage.getItem(key)
-		if (!raw) return new Map<string, BrowseInstallPlan<InstallableSearchResult>>()
-		return new Map<string, BrowseInstallPlan<InstallableSearchResult>>(JSON.parse(raw))
-	} catch {
-		return new Map<string, BrowseInstallPlan<InstallableSearchResult>>()
-	}
-}
-
-function writeStoredQueue(
-	serverId: string | null,
-	worldId: string | null,
-	plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
-) {
-	const key = getQueueStorageKey(serverId, worldId)
-	if (!key) return
-	if (plans.size === 0) {
-		localStorage.removeItem(key)
-		return
-	}
-	localStorage.setItem(key, JSON.stringify(Array.from(plans.entries())))
 }
 
 function getQueuedInstallOwnerFallback(project: InstallableSearchResult) {
@@ -235,7 +206,7 @@ export function createServerInstallContent(opts: {
 	const route = useRoute()
 	const router = useRouter()
 	const client = injectModrinthClient()
-	const { addNotification, handleError } = injectNotificationManager()
+	const { handleError } = injectNotificationManager()
 
 	const serverIdQuery = computed(() => readQueryString(route.query.sid))
 	const worldIdQuery = computed(() => readQueryString(route.query.wid))
@@ -340,7 +311,7 @@ export function createServerInstallContent(opts: {
 		}
 
 		if (resolvedWorldId) {
-			queuedServerInstalls.value = readStoredQueue(sid, resolvedWorldId)
+			queuedServerInstalls.value = readStoredServerInstallQueue(sid, resolvedWorldId)
 			await refreshServerInstalledContent(sid, resolvedWorldId)
 		}
 	}
@@ -358,7 +329,7 @@ export function createServerInstallContent(opts: {
 			if (sid !== prevSid) {
 				serverContentProjectIds.value = new Set()
 				serverContentInstallKeys.value = new Set()
-				queuedServerInstalls.value = readStoredQueue(sid, wid)
+				queuedServerInstalls.value = readStoredServerInstallQueue(sid, wid)
 				try {
 					serverContextServerData.value = await client.archon.servers_v0.get(sid)
 				} catch (err) {
@@ -367,7 +338,7 @@ export function createServerInstallContent(opts: {
 			}
 
 			if (wid !== prevWid) {
-				queuedServerInstalls.value = readStoredQueue(sid, wid)
+				queuedServerInstalls.value = readStoredServerInstallQueue(sid, wid)
 			}
 
 			if (wid && (sid !== prevSid || wid !== prevWid)) {
@@ -457,7 +428,7 @@ export function createServerInstallContent(opts: {
 					get: () => queuedServerInstalls.value,
 					set: (plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>) => {
 						queuedServerInstalls.value = plans
-						writeStoredQueue(serverId, worldId, plans)
+						writeStoredServerInstallQueue(serverId, worldId, plans)
 					},
 				},
 				install: async (plan) => {
@@ -523,17 +494,6 @@ export function createServerInstallContent(opts: {
 		}
 		await router.push(backUrl)
 
-		const ok = await flushQueuedServerInstalls(sid, wid)
-		if (!ok) {
-			queuedServerInstalls.value = new Map()
-			writeStoredQueue(sid, wid, new Map())
-			addNotification({
-				type: 'error',
-				title: 'Some projects failed to install',
-				text: 'Failed projects were not added. You can try installing them again.',
-			})
-		}
-
 		return true
 	}
 
@@ -545,7 +505,7 @@ export function createServerInstallContent(opts: {
 		plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
 	) {
 		queuedServerInstalls.value = plans
-		writeStoredQueue(serverIdQuery.value, effectiveServerWorldId.value, plans)
+		writeStoredServerInstallQueue(serverIdQuery.value, effectiveServerWorldId.value, plans)
 	}
 
 	function onServerFlowBack() {

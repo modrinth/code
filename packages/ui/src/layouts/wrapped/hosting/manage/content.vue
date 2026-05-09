@@ -19,8 +19,16 @@ import {
 	pendingServerContentInstallsEvent,
 	readPendingServerContentInstallBaseline,
 	readPendingServerContentInstalls,
+	removePendingServerContentInstall,
 } from '#ui/utils/server-content-installing'
 
+import {
+	type BrowseInstallPlan,
+	type BrowseInstallProject,
+	flushInstallQueue,
+	readStoredServerInstallQueue,
+	writeStoredServerInstallQueue,
+} from '../../../shared/browse-tab/composables/install-logic'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
@@ -96,6 +104,10 @@ const messages = defineMessages({
 	failedToBulkUpdate: {
 		id: 'hosting.content.failed-to-bulk-update',
 		defaultMessage: 'Failed to update content',
+	},
+	failedToInstallContent: {
+		id: 'hosting.content.failed-to-install',
+		defaultMessage: 'Failed to install content',
 	},
 })
 
@@ -227,6 +239,7 @@ const pendingServerContentInstalls = ref<PendingServerContentInstall[]>([])
 const lastStableContentKeys = ref<Set<string>>(new Set())
 const contentInstallBaselineKeys = ref<Set<string> | null>(null)
 const contentInstallAddedKeys = ref<Set<string>>(new Set())
+const isFlushingStoredServerInstalls = ref(false)
 
 function syncPendingServerContentInstalls() {
 	pendingServerContentInstalls.value = readPendingServerContentInstalls(serverId, worldId.value)
@@ -237,6 +250,7 @@ function handlePendingServerContentInstallsChanged(event: Event) {
 		.detail
 	if (detail?.serverId !== serverId || detail?.worldId !== worldId.value) return
 	syncPendingServerContentInstalls()
+	void flushStoredServerInstalls()
 }
 
 function getAddonInstallKey(addon: Archon.Content.v1.Addon) {
@@ -275,6 +289,61 @@ function syncContentInstallKeys(
 	lastStableContentKeys.value = currentKeys
 	contentInstallBaselineKeys.value = null
 	contentInstallAddedKeys.value = new Set()
+}
+
+function getStoredAddonInstallPlans(
+	sid: string,
+	wid: string,
+): Map<string, BrowseInstallPlan<BrowseInstallProject>> {
+	const storedPlans = readStoredServerInstallQueue<BrowseInstallProject>(sid, wid)
+	const addonPlans = new Map(
+		Array.from(storedPlans).filter(([, plan]) => plan.contentType !== 'modpack'),
+	)
+
+	if (addonPlans.size !== storedPlans.size) {
+		writeStoredServerInstallQueue(sid, wid, addonPlans)
+	}
+
+	return addonPlans
+}
+
+async function flushStoredServerInstalls() {
+	const wid = worldId.value
+	if (!wid || isFlushingStoredServerInstalls.value) return
+	if (readPendingServerContentInstalls(serverId, wid).length === 0) return
+
+	const queuedPlans = getStoredAddonInstallPlans(serverId, wid)
+	if (queuedPlans.size === 0) return
+
+	isFlushingStoredServerInstalls.value = true
+	try {
+		const result = await flushInstallQueue({
+			queue: {
+				get: () => getStoredAddonInstallPlans(serverId, wid),
+				set: (plans) => writeStoredServerInstallQueue(serverId, wid, plans),
+			},
+			install: (plan) =>
+				client.archon.content_v1.addAddon(serverId, wid, {
+					project_id: plan.projectId,
+					version_id: plan.versionId,
+				}),
+			onError: (err, plan) => {
+				removePendingServerContentInstall(serverId, wid, plan.projectId)
+				addNotification({
+					type: 'error',
+					title: formatMessage(messages.failedToInstallContent),
+					text: err instanceof Error ? err.message : undefined,
+				})
+			},
+		})
+
+		if (result.successfulPlans.length > 0) {
+			await queryClient.invalidateQueries({ queryKey: queryKey.value })
+		}
+	} finally {
+		isFlushingStoredServerInstalls.value = false
+		syncPendingServerContentInstalls()
+	}
 }
 
 function pendingInstallToContentItem(item: PendingServerContentInstall): ContentItem {
@@ -428,12 +497,14 @@ watch(
 	() => {
 		syncPendingServerContentInstalls()
 		syncContentInstallKeys()
+		void flushStoredServerInstalls()
 	},
 	{ immediate: true },
 )
 
 onMounted(() => {
 	syncPendingServerContentInstalls()
+	void flushStoredServerInstalls()
 	window.addEventListener(
 		pendingServerContentInstallsEvent,
 		handlePendingServerContentInstallsChanged,
