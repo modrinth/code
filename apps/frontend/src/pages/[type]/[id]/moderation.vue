@@ -116,12 +116,12 @@ const messages = defineMessages({
 	admonitionRejectedBody: {
 		id: 'project.moderation.admonition.rejected.body',
 		defaultMessage:
-			"Our content moderation team found issues with this project that prevent it from being published on Modrinth, this may include violations of <rules-link>Modrinth's Content Rules</rules-link> or <terms-link>Terms of Use</terms-link>.",
+			"Modrinth's moderation team found issues with this project that prevent it from being published on Modrinth, this may include violations of <rules-link>Modrinth's Content Rules</rules-link> or <terms-link>Terms of Use</terms-link>.",
 	},
 	admonitionRejectedSpamNotice: {
 		id: 'project.moderation.admonition.rejected.spam-notice',
 		defaultMessage:
-			'Spam, or repeatedly resubmitting your project without addressing all moderation concerns first, may result in account suspension.',
+			'Repeatedly submitting your project without addressing all moderation concerns first may result in account suspension.',
 	},
 	threadSectionTitle: {
 		id: 'project.moderation.thread.title',
@@ -139,12 +139,12 @@ const messages = defineMessages({
 	threadHelpCenterNote: {
 		id: 'project.moderation.thread.help-center-note',
 		defaultMessage:
-			'This thread is only checked when you submit your project for review. For additional inquiries, please go to the <help-center-link>Modrinth Help Center</help-center-link> and click the green bubble to contact support.',
+			'Content moderators cannot provide support for most issues and messages to this thread do not notify staff. \nIf you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support.',
 	},
 	threadApprovedWarning: {
 		id: 'project.moderation.thread.approved-warning',
 		defaultMessage:
-			'This thread is not actively monitored, but may be reviewed for information about your project as needed.',
+			'This thread is not actively monitored, but may be reviewed for information about your project if needed.',
 	},
 })
 
@@ -169,19 +169,18 @@ const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
 			return defineMessage({
 				id: 'project.moderation.admonition.approved.published-full',
 				defaultMessage:
-					"Your project is published and discoverable on Modrinth. You can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>.",
+					"Your project is published and discoverable on Modrinth. \nYou can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>.",
 			})
 		case 'unlisted':
 			return defineMessage({
 				id: 'project.moderation.admonition.approved.unlisted-full',
-				defaultMessage:
-					"Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth. You can change the visibility of your project inyour project's <visibility-settings-link>visibility settings</visibility-settings-link>.",
+				defaultMessage: '',
 			})
 		case 'private':
 			return defineMessage({
 				id: 'project.moderation.admonition.approved.private-full',
 				defaultMessage:
-					"Your project is private, meaning it can only be accessed by you and people you invite. You can change the visibility of your project inyour project's <visibility-settings-link>visibility settings</visibility-settings-link>.",
+					"Your project is private, meaning it can only be accessed by you and people you invite. \nYou can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>.",
 			})
 		default:
 			return null
@@ -216,14 +215,14 @@ const moderationAdmonition = computed<{
 					defineMessage({
 						id: 'project.moderation.admonition.draft.body',
 						defaultMessage:
-							'This is a draft project that cannot be seen by others until submitted for review and approved by our content moderation team.',
+							"This is a draft project that cannot be seen by others until submitted for review and approved by Modrinth's moderation team.",
 					}),
 				),
 				createFormattedItem(
 					'draft-submit-for-review',
 					defineMessage({
 						id: 'project.moderation.admonition.draft.submit-for-review',
-						defaultMessage: `Once you have completed all required steps and ensured your project complies with <rules-link>Modrinth's Content Rules</rules-link> you can submit your project for review in the publishing checklist above.`,
+						defaultMessage: `Once you have completed all required steps and ensured your project complies with <rules-link>Modrinth's Content Rules</rules-link> you can submit your project for review.`,
 					}),
 				),
 			],
@@ -254,14 +253,14 @@ const moderationAdmonition = computed<{
 					defineMessage({
 						id: 'project.moderation.admonition.under-review.body',
 						defaultMessage:
-							"Your project is in queue to be reviewed by our content moderation team. While you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>.",
+							"Your project is in queue to be reviewed by Modrinth's moderation team. \nWhile you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>.",
 					}),
 				),
 				createItem(
 					'under-review-free-to-edit',
 					defineMessage({
 						id: 'project.moderation.admonition.under-review.free-to-edit',
-						defaultMessage: `You may freely modify your project as needed while under review. It won't affect your position in the queue.`,
+						defaultMessage: `You may freely modify or update your project while under review. It won't affect your position in the queue.`,
 					}),
 				),
 				createItem(
@@ -277,8 +276,7 @@ const moderationAdmonition = computed<{
 								'under-review-timing-delay',
 								defineMessage({
 									id: 'project.moderation.admonition.under-review.timing-delay',
-									defaultMessage: `Due to an increase in submissions, some project reviews may be delayed, this does not reflect an issue with your submission and there is no cause for alarm.
-We appreciate your patience during this time while our content moderation team works hard to keep Modrinth safe.`,
+									defaultMessage: `Due to delays, some reviews may take longer than expected, this does not reflect an issue with your submission and is not a cause for alarm. \nWe appreciate your patience while our content moderators work hard to keep Modrinth safe.`,
 								}),
 								{ emphasis: true },
 							),
@@ -302,7 +300,7 @@ We appreciate your patience during this time while our content moderation team w
 					defineMessage({
 						id: 'project.moderation.admonition.withheld.still-accessible',
 						defaultMessage:
-							'Your project can still be accessed via a direct link, but will not appear publicly.{requestedWithheld, select, true { This matches your selected <visibility-settings-link>visibility settings</visibility-settings-link>, so no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}',
+							'Your project can still be accessed via a direct link, but will not appear publicly.{requestedWithheld, select, true { Based on your selected <visibility-settings-link>visibility settings</visibility-settings-link>, most likely no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}',
 					}),
 					{ values: { requestedWithheld: currentProject.requested_status === 'unlisted' } },
 				),
