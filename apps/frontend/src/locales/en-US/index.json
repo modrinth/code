@@ -2663,6 +2663,9 @@
   "project.settings.permissions.learn-more": {
     "message": "Learn more"
   },
+  "project.settings.permissions.no-results": {
+    "message": "No external projects match your search."
+  },
   "project.settings.permissions.search-placeholder": {
     "message": "Search {count} {count, plural, one {external project} other {external projects}}..."
   },

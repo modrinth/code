@@ -238,6 +238,76 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Attribution {
+		export namespace Internal {
+			export type AttributionPermissionType =
+				| 'license'
+				| 'my_project'
+				| 'special_permission'
+				| 'no_permission'
+
+			export type AttributionData =
+				| {
+						type: 'license'
+						license_id: string
+						link?: string
+						notes?: string
+				  }
+				| {
+						type: 'my_project'
+						license_id: string
+						notes?: string
+				  }
+				| {
+						type: 'special_permission'
+						link?: string
+						proof?: string
+						notes?: string
+				  }
+				| {
+						type: 'no_permission'
+						notes?: string
+				  }
+
+			export type AttributionFile = {
+				name: string
+				sha1: string
+				versions: string[]
+			}
+
+			export type AttributionVersionInfo = {
+				name: string
+				version_number: string
+			}
+
+			export type AttributionGroup = {
+				id: string
+				flame_project_id: number | null
+				flame_project_title: string | null
+				attribution: AttributionData | null
+				attributed_at: string | null
+				attributed_by: string | null
+				files: AttributionFile[]
+				versions: Record<string, AttributionVersionInfo>
+			}
+
+			export type UpdateGroupRequest = {
+				attribution: AttributionData
+			}
+
+			export type AssignRequest = {
+				sha1: string
+				target_group_id: number
+				project_id: string
+			}
+
+			export type SplitRequest = {
+				sha1: string
+				project_id: string
+			}
+		}
+	}
+
 	export namespace Auth {
 		export namespace Internal {
 			export type SubscriptionStatus = {
@@ -926,6 +996,7 @@ export namespace Labrinth {
 				date_published: string
 				downloads: number
 				files: VersionFile[]
+				files_missing_attribution?: string[]
 				environment?: Labrinth.Projects.v3.Environment
 				mrpack_loaders?: string[]
 

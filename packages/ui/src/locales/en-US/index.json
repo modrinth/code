@@ -488,57 +488,6 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selected"
   },
-  "external-files.lookup-card.allowed-label": {
-    "defaultMessage": "Allowed:"
-  },
-  "external-files.lookup-card.curseforge-project": {
-    "defaultMessage": "CurseForge project"
-  },
-  "external-files.lookup-card.files-heading": {
-    "defaultMessage": "Files"
-  },
-  "external-files.lookup-card.first-identified-name": {
-    "defaultMessage": "First identified name:"
-  },
-  "external-files.lookup-card.last-edited": {
-    "defaultMessage": "Last edited on {date} by {user}"
-  },
-  "external-files.lookup-card.no-files": {
-    "defaultMessage": "No files available for external project."
-  },
-  "external-files.lookup-card.notes-label": {
-    "defaultMessage": "Notes:"
-  },
-  "external-files.lookup-card.project-link": {
-    "defaultMessage": "Project link"
-  },
-  "external-files.lookup-card.proof-label": {
-    "defaultMessage": "Proof:"
-  },
-  "external-files.lookup-card.sha1-label": {
-    "defaultMessage": "SHA-1:"
-  },
-  "external-files.lookup-card.status.no": {
-    "defaultMessage": "No"
-  },
-  "external-files.lookup-card.status.permanent-no": {
-    "defaultMessage": "Permanent no"
-  },
-  "external-files.lookup-card.status.unidentified": {
-    "defaultMessage": "Unidentified"
-  },
-  "external-files.lookup-card.status.with-attribution": {
-    "defaultMessage": "With attribution"
-  },
-  "external-files.lookup-card.status.with-attribution-and-source": {
-    "defaultMessage": "With attribution and source"
-  },
-  "external-files.lookup-card.status.yes": {
-    "defaultMessage": "Yes"
-  },
-  "external-files.lookup-card.unknown-file-name": {
-    "defaultMessage": "Unknown"
-  },
   "creation-flow.button.create-instance": {
     "defaultMessage": "Create instance"
   },
@@ -808,6 +757,105 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Set up server"
+  },
+  "external-files.permissions-card.add": {
+    "defaultMessage": "Add attribution"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Attributed"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "Pending"
+  },
+  "external-files.permissions-card.error.license-required": {
+    "defaultMessage": "Please select a license."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "Please provide a link."
+  },
+  "external-files.permissions-card.error.proof-required": {
+    "defaultMessage": "Please provide proof and explanation."
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "Attribution group {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural, one {# file} other {# files}}"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "Included in versions"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "Last updated on {date} by {user}"
+  },
+  "external-files.permissions-card.license-label": {
+    "defaultMessage": "License"
+  },
+  "external-files.permissions-card.license.description": {
+    "defaultMessage": "The license of this work permits you to redistribute it in your modpack."
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Licensed:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "Link to work"
+  },
+  "external-files.permissions-card.link-placeholder": {
+    "defaultMessage": "https://example.com/link-to-work"
+  },
+  "external-files.permissions-card.my-project.description": {
+    "defaultMessage": "Original work created by you."
+  },
+  "external-files.permissions-card.no-permission.description": {
+    "defaultMessage": "You don't have permission to use this work."
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "These files are not currently used by any version."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Notes:"
+  },
+  "external-files.permissions-card.notes-optional": {
+    "defaultMessage": "(optional)"
+  },
+  "external-files.permissions-card.notes-placeholder": {
+    "defaultMessage": "Write something here..."
+  },
+  "external-files.permissions-card.proof-description": {
+    "defaultMessage": "Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack."
+  },
+  "external-files.permissions-card.proof-label": {
+    "defaultMessage": "Proof and explanation"
+  },
+  "external-files.permissions-card.proof-warning.body": {
+    "defaultMessage": "If you are found to have lied or manipulated the images uploaded, your project and account may be terminated."
+  },
+  "external-files.permissions-card.proof-warning.title": {
+    "defaultMessage": "Modrinth staff may attempt to verify submitted proof"
+  },
+  "external-files.permissions-card.save": {
+    "defaultMessage": "Save attribution"
+  },
+  "external-files.permissions-card.special-permission.description": {
+    "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
+  },
+  "external-files.permissions-card.type-label": {
+    "defaultMessage": "Type"
+  },
+  "external-files.permissions-card.type.license": {
+    "defaultMessage": "License"
+  },
+  "external-files.permissions-card.type.my-project": {
+    "defaultMessage": "My project"
+  },
+  "external-files.permissions-card.type.no-permission": {
+    "defaultMessage": "No permission"
+  },
+  "external-files.permissions-card.type.special-permission": {
+    "defaultMessage": "Special permission"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} + {count} more"
   },
   "external-project-license-status.no": {
     "defaultMessage": "No"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { RightArrowIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -8,15 +9,20 @@ import {
 	commonMessages,
 	defineMessages,
 	EmptyState,
+	ExternalProjectPermissionsCard,
+	injectModrinthClient,
+	injectProjectPageContext,
 	IntlFormatted,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import ExternalProjectPermissionsCard from '@modrinth/ui/src/components/external_files/ExternalProjectPermissionsCard.vue'
-import { ref } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import { computed, ref } from 'vue'
 
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
+const { projectV2: project } = injectProjectPageContext()
+const { labrinth } = injectModrinthClient()
 
 if (!flags.value.modpackPermissionsPage) {
 	throw createError({
@@ -25,14 +31,75 @@ if (!flags.value.modpackPermissionsPage) {
 	})
 }
 
-const externalFiles = ref([{}])
-const searchQuery = ref('')
-const currentSortType = ref('Oldest')
+type SortType = 'Oldest' | 'Newest'
 
-const sortTypes: ComboboxOption<string>[] = [
+const searchQuery = ref('')
+const currentSortType = ref<SortType>('Oldest')
+
+const {
+	data: attributionData,
+	error: attributionError,
+	isPending: pending,
+} = useQuery({
+	queryKey: ['project-attribution', project.value.id],
+	queryFn: () => labrinth.attribution_internal.listProjectAttribution(project.value.id),
+})
+
+const sortTypes: ComboboxOption<SortType>[] = [
 	{ value: 'Oldest', label: 'Oldest' },
 	{ value: 'Newest', label: 'Newest' },
 ]
+
+function isAttributed(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
+	return group.attribution !== null && group.attribution !== undefined
+}
+
+function isNoPermission(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
+	const a = group.attribution
+	if (!a || typeof a !== 'object') return false
+	return (a as { type?: string }).type === 'no_permission'
+}
+
+const filteredGroups = computed(() => {
+	const groups = attributionData.value ?? []
+	const query = searchQuery.value.trim().toLowerCase()
+	const filtered = query
+		? groups.filter((group) => {
+				if (group.flame_project_title?.toLowerCase().includes(query)) return true
+				return (group.files ?? []).some((file) => file.name.toLowerCase().includes(query))
+			})
+		: [...groups]
+	const direction = currentSortType.value === 'Newest' ? -1 : 1
+	filtered.sort((a, b) => {
+		const aTime = a.attributed_at ? Date.parse(a.attributed_at) : 0
+		const bTime = b.attributed_at ? Date.parse(b.attributed_at) : 0
+		if (aTime !== bTime) return (aTime - bTime) * direction
+		return a.id.localeCompare(b.id) * direction
+	})
+	return filtered
+})
+
+const totalGroups = computed(() => attributionData.value?.length ?? 0)
+
+const stats = computed(() => {
+	const groups = attributionData.value ?? []
+	let attributed = 0
+	let pending = 0
+	let noPermission = 0
+	for (const group of groups) {
+		if (isNoPermission(group)) {
+			noPermission++
+		} else if (isAttributed(group)) {
+			attributed++
+		} else {
+			pending++
+		}
+	}
+	return { total: groups.length, attributed, pending, noPermission }
+})
+
+const projectIsApproved = computed(() => project.value.status === 'approved')
+
 const messages = defineMessages({
 	searchPlaceholder: {
 		id: 'project.settings.permissions.search-placeholder',
@@ -87,6 +154,10 @@ const messages = defineMessages({
 		id: 'project.settings.permissions.attention-needed.description.proj-draft',
 		defaultMessage: `Please provide proof that you have permission to redistribute all of the following files before you can submit your project for review.`,
 	},
+	noResults: {
+		id: 'project.settings.permissions.no-results',
+		defaultMessage: 'No external projects match your search.',
+	},
 })
 
 function dismissInfoBanner() {
@@ -95,44 +166,59 @@ function dismissInfoBanner() {
 }
 </script>
 <template>
-	<template v-if="externalFiles.length > 0">
-		<Admonition
-			v-if="!flags.dismissedExternalProjectsInfo"
-			type="info"
-			class="mb-4"
-			:header="formatMessage(messages.infoBannerTitle)"
-			dismissible
-			@dismiss="dismissInfoBanner"
-		>
-			<IntlFormatted :message-id="messages.infoBannerDescription">
-				<template #link="{ children }">
-					<a class="text-link" target="_blank"> <component :is="() => children" /> </a>
-				</template>
-			</IntlFormatted>
-			<template #actions>
-				<div class="flex">
-					<ButtonStyled color="blue">
-						<a> {{ formatMessage(messages.learnMore) }} <RightArrowIcon /> </a>
-					</ButtonStyled>
-				</div>
+	<Admonition
+		v-if="!flags.dismissedExternalProjectsInfo"
+		type="info"
+		class="mb-4"
+		:header="formatMessage(messages.infoBannerTitle)"
+		dismissible
+		@dismiss="dismissInfoBanner"
+	>
+		<IntlFormatted :message-id="messages.infoBannerDescription">
+			<template #link="{ children }">
+				<a class="text-link" target="_blank"> <component :is="() => children" /> </a>
 			</template>
-		</Admonition>
+		</IntlFormatted>
+		<template #actions>
+			<div class="flex">
+				<ButtonStyled color="blue">
+					<a> {{ formatMessage(messages.learnMore) }} <RightArrowIcon /> </a>
+				</ButtonStyled>
+			</div>
+		</template>
+	</Admonition>
+	<template v-if="pending">
+		<div class="flex flex-col gap-3">
+			<div
+				v-for="i in 3"
+				:key="i"
+				class="h-[56px] w-full animate-pulse rounded-2xl bg-surface-3"
+			></div>
+		</div>
+	</template>
+	<template v-else-if="totalGroups > 0">
 		<Admonition
-			v-if="true"
+			v-if="stats.pending === 0 && stats.noPermission === 0"
 			type="success"
 			class="mb-4"
 			:header="formatMessage(messages.completedTitle)"
 			:body="formatMessage(messages.completedDescription)"
 		/>
 		<Admonition
-			v-if="true"
+			v-if="stats.pending > 0"
 			type="warning"
 			class="mb-4"
 			:header="formatMessage(messages.attentionNeededTitle)"
-			:body="formatMessage(messages.attentionNeededDescriptionDraft)"
+			:body="
+				formatMessage(
+					projectIsApproved
+						? messages.attentionNeededDescriptionApproved
+						: messages.attentionNeededDescriptionDraft,
+				)
+			"
 		/>
 		<Admonition
-			v-if="true"
+			v-if="stats.noPermission > 0"
 			type="critical"
 			class="mb-4"
 			:header="formatMessage(messages.failTitle)"
@@ -144,7 +230,7 @@ function dismissInfoBanner() {
 				type="search"
 				:placeholder="
 					formatMessage(messages.searchPlaceholder, {
-						count: externalFiles.length,
+						count: totalGroups,
 					})
 				"
 				:icon="SearchIcon"
@@ -171,8 +257,24 @@ function dismissInfoBanner() {
 			</div>
 		</div>
 		<div class="mt-4 flex flex-col gap-3">
-			<ExternalProjectPermissionsCard title="FTB Library" />
+			<TransitionGroup name="list">
+				<ExternalProjectPermissionsCard
+					v-for="group in filteredGroups"
+					:key="group.id"
+					:project-id="project.id"
+					:group="group"
+				/>
+				<EmptyState
+					v-if="filteredGroups.length === 0"
+					:heading="formatMessage(messages.noResults)"
+					type="no-search-result"
+				/>
+			</TransitionGroup>
 		</div>
+
+		<p v-if="attributionError" class="mt-4 text-sm text-red">
+			{{ String(attributionError) }}
+		</p>
 	</template>
 	<template v-else>
 		<EmptyState
@@ -182,3 +284,18 @@ function dismissInfoBanner() {
 		/>
 	</template>
 </template>
+<style scoped>
+.list-enter-from {
+	opacity: 0;
+	transform: translateY(-10px);
+}
+
+.list-leave-to {
+	opacity: 0;
+	transform: translateY(10px);
+}
+
+.list-move {
+	transition: transform 200ms ease-in-out;
+}
+</style>

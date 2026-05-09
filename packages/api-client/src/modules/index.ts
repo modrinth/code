@@ -15,6 +15,7 @@ import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
 import { LabrinthAffiliateInternalModule } from './labrinth/affiliate/internal'
 import { LabrinthAuthInternalModule } from './labrinth/auth/internal'
 import { LabrinthAuthV2Module } from './labrinth/auth/v2'
+import { LabrinthAttributionInternalModule } from './labrinth/attribution/internal'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthExternalProjectsInternalModule } from './labrinth/external-projects/internal'
@@ -74,6 +75,7 @@ export const MODULE_REGISTRY = {
 	labrinth_affiliate_internal: LabrinthAffiliateInternalModule,
 	labrinth_auth_internal: LabrinthAuthInternalModule,
 	labrinth_auth_v2: LabrinthAuthV2Module,
+	labrinth_attribution_internal: LabrinthAttributionInternalModule,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_external_projects_internal: LabrinthExternalProjectsInternalModule,
