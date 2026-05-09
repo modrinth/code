@@ -49,6 +49,9 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	labrinthApiCanary: false,
 	dismissedExternalProjectsInfo: false,
 	modpackPermissionsPage: false,
+	showAllBanners: false,
+	alwaysIgnoreErrorBanner: false,
+	showViewProdRouteBanner: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

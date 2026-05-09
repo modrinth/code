@@ -29,8 +29,8 @@ const messages = defineMessages({
 		<template #description>
 			<span>{{ formatMessage(messages.description) }}</span>
 		</template>
-		<template #actions>
-			<ButtonStyled>
+		<template #actions_right>
+			<ButtonStyled color="red">
 				<nuxt-link to="/settings/billing">
 					<SettingsIcon aria-hidden="true" />
 					{{ formatMessage(messages.action) }}

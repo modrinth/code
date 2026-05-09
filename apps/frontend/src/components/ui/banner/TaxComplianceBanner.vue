@@ -55,7 +55,7 @@ function openTaxForm(e: MouseEvent) {
 				formatMessage(messages.description, { threshold: formatMoney(taxThreshold) })
 			}}</span>
 		</template>
-		<template #actions>
+		<template #actions_right>
 			<ButtonStyled color="orange">
 				<button @click="openTaxForm"><FileTextIcon /> {{ formatMessage(messages.action) }}</button>
 			</ButtonStyled>

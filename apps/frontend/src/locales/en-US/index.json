@@ -1730,14 +1730,20 @@
   "layout.banner.add-email.description": {
     "message": "For security reasons, Modrinth needs you to register an email address to your account."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Always ignore"
+  },
   "layout.banner.build-fail.description": {
     "message": "This deploy of Modrinth's frontend failed to generate state from the API. This may be due to an outage or an error in configuration. Rebuild when the API is available. Error codes: {errors}; Current API URL is: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Ignore"
   },
   "layout.banner.build-fail.title": {
     "message": "Error generating state from API when building."
   },
   "layout.banner.preview.description": {
-    "message": "If you meant to access the official Modrinth website, visit <link>https://modrinth.com</link>. This preview deploy is used by Modrinth staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "If you meant to access the official Modrinth website, visit {url}. This preview deploy is used by Modrinth staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "This is a preview deploy of the Modrinth website."
