@@ -32,13 +32,15 @@ struct AttributionGroupResponse {
 	attributed_at: Option<chrono::DateTime<chrono::Utc>>,
 	attributed_by: Option<ariadne::ids::UserId>,
 	files: Vec<AttributionFileResponse>,
-	versions: std::collections::HashMap<VersionId, VersionInfo>,
+	versions: Vec<VersionInfo>,
 }
 
 #[derive(Clone, Serialize)]
 struct VersionInfo {
+	id: VersionId,
 	name: String,
 	version_number: String,
+	date_created: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(Serialize)]
@@ -102,31 +104,34 @@ async fn list(
 	all_version_ids.sort_unstable();
 	all_version_ids.dedup();
 
-	let versions = if all_version_ids.is_empty() {
-		std::collections::HashMap::new()
+	let version_infos = if all_version_ids.is_empty() {
+		Vec::new()
 	} else {
 		let rows = sqlx::query!(
 			"
-			select id, name, version_number
+			select id, name, version_number, date_published
 			from versions
 			where id = ANY($1)
+			order by date_published desc
 			",
 			&all_version_ids,
 		)
 		.fetch_all(pool.as_ref())
 		.await?;
 		rows.into_iter()
-			.map(|v| {
-				(
-					VersionId(v.id as u64),
-					VersionInfo {
-						name: v.name,
-						version_number: v.version_number,
-					},
-				)
+			.map(|v| VersionInfo {
+				id: VersionId(v.id as u64),
+				name: v.name,
+				version_number: v.version_number,
+				date_created: v.date_published,
 			})
 			.collect()
 	};
+	let version_order = version_infos
+		.iter()
+		.enumerate()
+		.map(|(index, version)| (version.id, index))
+		.collect::<std::collections::HashMap<_, _>>();
 
 	let mut result = Vec::new();
 	for group in groups {
@@ -136,12 +141,18 @@ async fn list(
 			.map(|f| AttributionFileResponse {
 				name: f.get("name"),
 				sha1: f.get("sha1"),
-				versions: f
-					.get::<Option<Vec<i64>>, _>("version_ids")
-					.unwrap_or_default()
-					.into_iter()
-					.map(|id| VersionId(id as u64))
-					.collect(),
+				versions: {
+					let mut versions: Vec<_> = f
+						.get::<Option<Vec<i64>>, _>("version_ids")
+						.unwrap_or_default()
+						.into_iter()
+						.map(|id| VersionId(id as u64))
+						.collect();
+					versions.sort_by_key(|id| {
+						version_order.get(id).copied().unwrap_or(usize::MAX)
+					});
+					versions
+				},
 			})
 			.collect();
 
@@ -153,7 +164,7 @@ async fn list(
 			attributed_at: group.attributed_at,
 			attributed_by: group.attributed_by.map(|id| ariadne::ids::UserId(id as u64)),
 			files: group_files,
-			versions: versions.clone(),
+			versions: version_infos.clone(),
 		});
 	}
 
