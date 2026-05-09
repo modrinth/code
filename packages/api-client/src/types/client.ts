@@ -1,6 +1,7 @@
 import type { AbstractFeature } from '../core/abstract-feature'
 import type { RequestContext } from './request'
 
+export type BaseUrlConfig = string | (() => string)
 export type MaybePromise<T> = T | Promise<T>
 export type UserAgentProvider = string | (() => MaybePromise<string | undefined>)
 
@@ -39,13 +40,15 @@ export interface ClientConfig {
 	 * Base URL for Labrinth API (main Modrinth API)
 	 * @default 'https://api.modrinth.com'
 	 */
-	labrinthBaseUrl?: string
+	labrinthBaseUrl?: BaseUrlConfig
 
 	/**
 	 * Base URL for Archon API (Modrinth Hosting API)
+	 * Can be a callback so apps can drive this from runtime feature flags.
+	 *
 	 * @default 'https://archon.modrinth.com'
 	 */
-	archonBaseUrl?: string
+	archonBaseUrl?: BaseUrlConfig
 
 	/**
 	 * Default request timeout in milliseconds

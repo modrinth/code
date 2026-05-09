@@ -1,6 +1,169 @@
 import type { Labrinth } from '../labrinth/types'
 
 export namespace Archon {
+	export namespace Nodes {
+		export namespace Internal {
+			export type Node = {
+				id: string
+				hostname: string
+				region: string
+				created_at: string | null
+				locked: boolean
+			}
+
+			export type Server = {
+				id: string
+				available: boolean
+			}
+
+			export type NodeFull = Node & {
+				servers: Server[]
+			}
+
+			export type Overview = {
+				node_hostnames: string[]
+				regions: Region[]
+				total_servers_active: number
+			}
+
+			export type Region = {
+				display_name: string
+				country_code: string
+				key: string
+				server_count: number
+				node_count: number
+			}
+
+			export type RegionWithStatistics = {
+				region: Region
+				active_servers: string[]
+			}
+		}
+	}
+
+	export namespace Notices {
+		export namespace v0 {
+			export type Notice = {
+				id: number
+				dismissable: boolean
+				title: string | null
+				message: string
+				level: string
+				announced: string
+			}
+
+			export type ListedNotice = {
+				id: number
+				dismissable: boolean
+				message: string
+				title: string | null
+				level: string
+				announce_at: string
+				expires: string | null
+				assigned: Assignment[]
+				dismissed_by: Dismisser[]
+			}
+
+			export type Dismisser = {
+				server: string
+				dismissed_on: string
+			}
+
+			export type Assignment = {
+				kind: string
+				id: string
+				name: string
+			}
+
+			export type AssignmentTarget = { server: string } | { node: string }
+
+			export type Announce = {
+				message: string
+				title?: string | null
+				level: string
+				dismissable: boolean
+				announce_at: string
+				expires?: string | null
+			}
+
+			export type AnnouncePatch = {
+				message?: string
+				title?: string | null
+				level?: string
+				dismissable?: boolean
+				announce_at?: string
+				expires?: string | null
+			}
+
+			export type PostNoticeResponseBody = {
+				id: number
+			}
+		}
+	}
+
+	export namespace Transfers {
+		export namespace Internal {
+			export type ProvisionOptions = {
+				region?: string | null
+				node_tags: string[]
+			}
+
+			export type ScheduleServerTransfersRequest = {
+				server_ids: string[]
+				scheduled_at?: string | null
+				target_region?: string | null
+				node_tags?: string[]
+				reason?: string | null
+			}
+
+			export type ScheduleNodeTransfersRequest = {
+				node_hostnames: string[]
+				scheduled_at?: string | null
+				target_region?: string | null
+				node_tags?: string[]
+				reason?: string | null
+				cordon_nodes?: boolean
+				tag_nodes?: string | null
+			}
+
+			export type ScheduleTransfersResponse = {
+				batch_id: number
+				scheduled_count: number
+			}
+
+			export type CancelTransfersRequest = {
+				batch_ids: number[]
+			}
+
+			export type CancelTransfersResponse = {
+				cancelled_count: number
+			}
+
+			export type TransferLogBatchEntry = {
+				id: number
+				created_by: string
+				created_at: string
+				reason?: string | null
+				scheduled_at: string
+				cancelled: boolean
+				log_count: number
+				provision_options: ProvisionOptions
+			}
+
+			export type TransferHistoryQuery = {
+				page?: number
+				page_size?: number
+			}
+
+			export type TransferHistoryResponse = {
+				batches: TransferLogBatchEntry[]
+				total: number
+				page: number
+				page_size: number
+			}
+		}
+	}
+
 	export namespace Content {
 		export namespace v1 {
 			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'
@@ -216,6 +379,55 @@ export namespace Archon {
 				new_game_version: string
 				new_loader_version: string
 				has_unknown_content: boolean
+			}
+		}
+	}
+
+	export namespace ServerUsers {
+		export namespace v1 {
+			export type ServerUserRole = 'Owner' | 'Editor' | 'Viewer' | 'Unknown'
+
+			export type AssignableServerUserRole = Exclude<ServerUserRole, 'Owner' | 'Unknown'>
+
+			export enum UserScope {
+				NONE = 0,
+
+				SERVER_ADMIN = -0x8000,
+				EDITOR = -0x400000000000000,
+				VIEWER = -0x4000000000000000,
+				RESERVED_BITS = 0x7fff,
+
+				BASE_READ = -0x8000000000000000,
+				POWER_ACTIONS = 0x4000000000000000,
+				FILES_WRITE = 0x2000000000000000,
+				SETUP = 0x1000000000000000,
+				BACKUPS = 0x800000000000000,
+				ADVANCED = 0x400000000000000,
+				RESET_SERVER = 0x200000000000000,
+				MANAGE_USERS = 0x100000000000000,
+
+				SUPPORT_AGENT = 0x1,
+				INFRA_MANAGER = 0x2,
+				INFRA_MANAGER_READ = 0x4,
+				INFRA_SERVERS_XFER = 0x8,
+			}
+
+			export type UserResp = {
+				username: string
+				avatar_url: string
+			}
+
+			export type ServerUser = {
+				user: UserResp
+				added_on?: string | null
+				permissions: UserScope
+			}
+
+			export type AddServerUserRequest = {
+				server_id?: string | null
+				user_id: string
+				added_on?: string | null
+				role: ServerUserRole
 			}
 		}
 	}

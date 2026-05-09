@@ -114,6 +114,21 @@ export const SearchableNoFilter: Story = {
 	},
 }
 
+export const SearchableMinimumLength: Story = {
+	args: {
+		options: [
+			{ value: 'fetch', label: 'Fetch' },
+			{ value: 'emma', label: 'Emma' },
+			{ value: 'boris', label: 'Boris' },
+			{ value: 'coolbot', label: 'Coolbot' },
+		],
+		searchable: true,
+		searchPlaceholder: 'Enter a username or email',
+		minSearchLengthToOpen: 2,
+		noOptionsMessage: 'No matching users found.',
+	},
+}
+
 export const SearchableModpacks: Story = {
 	args: {
 		options: [

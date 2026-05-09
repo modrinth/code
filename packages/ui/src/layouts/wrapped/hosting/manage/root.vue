@@ -3,7 +3,7 @@
 		v-if="filteredNotices.length > 0"
 		class="relative mx-auto mb-4 flex w-full min-w-0 flex-col gap-3 px-6"
 		:class="{
-			'max-w-[1280px]': isNuxt,
+			'max-w-[1280px]': constrainWidth,
 		}"
 	>
 		<ServerNotice
@@ -107,7 +107,7 @@
 		}"
 		:class="[
 			'server-panel-' + revealState,
-			isNuxt ? 'min-h-[100svh] max-w-[1280px] pb-16' : 'min-h-[calc(100svh-100px)] pb-6',
+			constrainWidth ? 'min-h-[100svh] max-w-[1280px] pb-16' : 'min-h-[calc(100svh-100px)] pb-6',
 		]"
 	>
 		<template v-if="revealState !== 'pending' || isOnboarding">
@@ -346,7 +346,7 @@
 <script setup lang="ts">
 import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
+import { ModrinthApiError } from '@modrinth/api-client'
 import {
 	BoxesIcon,
 	CheckIcon,
@@ -362,9 +362,9 @@ import {
 	SettingsIcon,
 	TransferIcon,
 	TriangleAlertIcon,
+	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage, useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
@@ -403,6 +403,7 @@ import {
 	injectNotificationManager,
 	provideServerSettingsModal,
 } from '#ui/providers'
+import type { ServerStats } from '#ui/providers/server-context'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
@@ -441,6 +442,7 @@ const props = withDefaults(
 			worldId: string | null
 			type: 'mod' | 'plugin' | 'datapack'
 		}) => void | Promise<void>
+		constrainWidth?: boolean
 	}>(),
 	{
 		showCopyIdAction: false,
@@ -457,6 +459,7 @@ const props = withDefaults(
 		navigateToServers: undefined,
 		browseModpacks: undefined,
 		browseContent: undefined,
+		constrainWidth: false,
 	},
 )
 
@@ -493,7 +496,7 @@ const DISABLE_LOADING_ANIM = true
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-const isNuxt = computed(() => client instanceof NuxtModrinthClient)
+const constrainWidth = computed(() => props.constrainWidth)
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
@@ -683,7 +686,7 @@ if (typeof window !== 'undefined') {
 }
 
 type CachedWsState = {
-	stats: Stats
+	stats: ServerStats
 	cpuData: number[]
 	ramData: number[]
 	powerState: Archon.Websocket.v0.PowerState
@@ -789,6 +792,12 @@ const navLinks = computed<Tab[]>(() => [
 		label: 'Backups',
 		href: `/hosting/manage/${props.serverId}/backups`,
 		icon: DatabaseBackupIcon,
+		subpages: [],
+	},
+	{
+		label: 'Access',
+		href: `/hosting/manage/${props.serverId}/access`,
+		icon: UsersIcon,
 		subpages: [],
 	},
 	...props.additionalTabs,

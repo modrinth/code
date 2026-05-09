@@ -47,6 +47,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showDiscoverProjectButtons: false,
 	useV1ContentTabAPI: true,
 	labrinthApiCanary: false,
+	archonApiStaging: false,
 	dismissedExternalProjectsInfo: false,
 	modpackPermissionsPage: false,
 } as const)

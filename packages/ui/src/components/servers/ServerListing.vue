@@ -40,6 +40,22 @@
 						{{ name }}
 					</h2>
 					<div
+						v-if="owner"
+						v-tooltip="formatMessage(messages.ownerTooltip, { username: owner.username })"
+						class="flex min-w-0 items-center gap-1 rounded-full bg-surface-4 px-2 pr-2.5 py-1 text-sm font-medium text-primary !border !border-surface-5 border-solid"
+						:class="{ 'opacity-50': isDisabled }"
+					>
+						<Avatar
+							:src="owner.avatarUrl"
+							:alt="formatMessage(messages.ownerAvatarAlt, { username: owner.username })"
+							:tint-by="owner.username"
+							size="1.25rem"
+							circle
+							no-shadow
+						/>
+						<span class="max-w-32 truncate">{{ owner.username }}</span>
+					</div>
+					<div
 						v-if="isConfiguring && noticeType !== 'cancelled' && noticeType !== 'setToCancel'"
 						class="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 h-[28px]"
 					>
@@ -262,6 +278,7 @@ import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
 import IntlFormatted from '../base/IntlFormatted.vue'
 import ServersSpecs from '../billing/ServersSpecs.vue'
+import type { ServerListingOwner } from './access/types'
 import ServerIcon from './icons/ServerIcon.vue'
 import ServerInfoLabels from './labels/ServerInfoLabels.vue'
 
@@ -280,6 +297,14 @@ const messages = defineMessages({
 	usingProjectLabel: {
 		id: 'servers.listing.using-project-label',
 		defaultMessage: 'Using {projectTitle}',
+	},
+	ownerTooltip: {
+		id: 'servers.listing.owner-tooltip',
+		defaultMessage: 'Owned by {username}',
+	},
+	ownerAvatarAlt: {
+		id: 'servers.listing.owner-avatar-alt',
+		defaultMessage: "{username}'s avatar",
 	},
 	provisioningNotice: {
 		id: 'servers.listing.notice.provisioning',
@@ -402,6 +427,7 @@ type ServerListingProps = {
 	cancellationDate?: string | Date | null
 	onResubscribe?: (() => void) | null
 	onDownloadBackup?: (() => void) | null
+	owner?: ServerListingOwner
 }
 
 const props = defineProps<ServerListingProps>()

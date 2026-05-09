@@ -95,6 +95,7 @@
 					class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 border border-solid border-surface-5"
 					:class="[
 						openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',
+						props.dropdownClass,
 					]"
 					:style="dropdownStyle"
 					:role="listbox ? 'listbox' : 'menu'"
@@ -157,7 +158,7 @@
 						</template>
 					</div>
 
-					<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
+					<div v-else-if="searchQuery" class="p-4 text-center text-sm text-secondary">
 						{{ noOptionsMessage }}
 					</div>
 
@@ -229,6 +230,9 @@ const props = withDefaults(
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
+		dropdownClass?: string
+		dropdownMinWidth?: string
+		minSearchLengthToOpen?: number
 		/** Keep the selected option's label in the input after selection, and show all options on focus */
 		syncWithSelection?: boolean
 		/** Show a search icon in the searchable input */
@@ -244,6 +248,7 @@ const props = withDefaults(
 		showIconInSelected: false,
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		noOptionsMessage: 'No results found',
+		minSearchLengthToOpen: 0,
 		syncWithSelection: true,
 		showSearchIcon: false,
 	},
@@ -283,6 +288,7 @@ const dropdownStyle = ref({
 	top: '0px',
 	left: '0px',
 	width: '0px',
+	minWidth: '0px',
 })
 
 const openDirection = ref<'down' | 'up'>('down')
@@ -315,6 +321,10 @@ const triggerText = computed(() => {
 	if (selectedOption.value) return selectedOption.value.label
 	return props.placeholder
 })
+
+const hasMinimumSearchLength = computed(
+	() => !props.searchable || searchQuery.value.trim().length >= props.minSearchLengthToOpen,
+)
 
 const optionsWithKeys = computed(() => {
 	return props.options.map((opt, index) => ({
@@ -426,6 +436,7 @@ async function updateDropdownPosition() {
 		top: `${top}px`,
 		left: `${left}px`,
 		width: `${triggerRect.width}px`,
+		minWidth: props.dropdownMinWidth ?? `${triggerRect.width}px`,
 	}
 
 	openDirection.value = direction
@@ -433,6 +444,7 @@ async function updateDropdownPosition() {
 
 async function openDropdown() {
 	if (props.disabled || isOpen.value) return
+	if (!hasMinimumSearchLength.value) return
 
 	isOpen.value = true
 	emit('open')
@@ -622,6 +634,10 @@ function handleSearchKeydown(event: KeyboardEvent) {
 function handleSearchInput() {
 	userHasTyped.value = true
 	emit('searchInput', searchQuery.value)
+	if (!hasMinimumSearchLength.value) {
+		closeDropdown()
+		return
+	}
 	if (!isOpen.value) {
 		openDropdown()
 	}
@@ -689,10 +705,16 @@ watch(filteredOptions, () => {
 	}
 })
 
+watch(hasMinimumSearchLength, (canOpen) => {
+	if (!canOpen) {
+		closeDropdown()
+	}
+})
+
 watch(
 	[() => props.modelValue, () => props.options],
 	([val]) => {
-		if (props.searchable && props.syncWithSelection && !isOpen.value) {
+		if (props.searchable && props.syncWithSelection && !isOpen.value && !userHasTyped.value) {
 			const opt = props.options.find((o) => isDropdownOption(o) && o.value === val)
 			searchQuery.value = opt && isDropdownOption(opt) ? opt.label : ''
 		}

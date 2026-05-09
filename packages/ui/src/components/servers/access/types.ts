@@ -1,0 +1,71 @@
+export type ServerAccessRole = 'owner' | 'editor' | 'viewer'
+
+export interface ServerAccessUser {
+	id: string
+	username: string
+	avatarUrl?: string
+}
+
+export interface ServerAccessMember {
+	id: string
+	user: ServerAccessUser
+	role: ServerAccessRole
+	joinedAt: string | null
+	inviteResendAvailableAt?: string | null
+	pending?: boolean
+	isOwner?: boolean
+}
+
+export type ServerAuditAction =
+	| { type: 'file_edited'; file: string }
+	| { type: 'world_started'; worldName: string }
+	| {
+			type: 'content_installed'
+			contentType: 'mod' | 'modpack'
+			name: string
+			iconUrl?: string
+			href?: string
+			version?: string
+	  }
+	| { type: 'member_invited'; target: string; role?: Exclude<ServerAccessRole, 'owner'> }
+	| { type: 'member_removed'; target: string }
+	| { type: 'role_changed'; target: string; role?: ServerAccessRole }
+
+export type ServerAuditActionType = ServerAuditAction['type']
+
+export interface ServerAuditLogEntry {
+	id: string
+	actor: ServerAccessUser | { id: 'support'; username: 'Support' }
+	world: { id: string; name: string } | null
+	action: ServerAuditAction
+	timestamp: string
+}
+
+export interface ServerAuditLogFilters {
+	userId: string | null
+	worldId: string | null
+	actionType: ServerAuditActionType | null
+}
+
+export interface ServerAccessRoleOption {
+	value: ServerAccessRole
+	label: string
+	description?: string
+}
+
+export interface ServerAccessInviteSuggestion {
+	id: string
+	username: string
+	avatarUrl?: string
+	email?: string
+}
+
+export interface GrantServerAccessPayload {
+	target: string
+	role: Exclude<ServerAccessRole, 'owner'>
+}
+
+export interface ServerListingOwner {
+	username: string
+	avatarUrl?: string
+}
