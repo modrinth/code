@@ -78,7 +78,7 @@
 				</div>
 			</div>
 		</Modal>
-		<div v-if="flags.developerMode" class="thread-id">
+		<div v-if="flags.developerMode" class="thread-id mx-4">
 			Thread ID:
 			<CopyCode :text="thread.id" />
 		</div>
