@@ -39,11 +39,13 @@ import { ButtonStyled, VersionChannelIndicator } from '../index'
 
 const props = defineProps<{
 	version: Version
+	decorateDownloadUrl?: (url: string) => string
 }>()
 
 const downloadUrl = computed(() => {
 	const primary: VersionFile = props.version.files.find((x) => x.primary) || props.version.files[0]
-	return primary.url
+	const raw = primary.url
+	return props.decorateDownloadUrl ? props.decorateDownloadUrl(raw) : raw
 })
 
 const emit = defineEmits<{

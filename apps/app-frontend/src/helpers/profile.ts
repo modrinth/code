@@ -184,7 +184,7 @@ export async function update_project(path: string, projectPath: string): Promise
 
 // Add a project to a profile from a version
 // Returns a path to the new project file
-export type DownloadReason = 'standalone' | 'dependency' | 'modpack'
+export type DownloadReason = 'standalone' | 'dependency' | 'modpack' | 'update'
 
 export async function add_project_from_version(
 	path: string,

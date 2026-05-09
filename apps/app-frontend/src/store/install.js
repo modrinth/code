@@ -48,7 +48,7 @@ export const isVersionCompatible = (version, project, instance) => {
 	)
 }
 
-export const installVersionDependencies = async (profile, version, onDepInstalling) => {
+export const installVersionDependencies = async (profile, version, reason, onDepInstalling) => {
 	const projectNames = new Map()
 	const storeProjectName = (p) => {
 		if (p?.id && p.title) projectNames.set(p.id, p.title)
@@ -177,7 +177,7 @@ export const installVersionDependencies = async (profile, version, onDepInstalli
 		const batch = queuedInstalls.slice(i, i + batchSize)
 		await Promise.all(
 			batch.map(async ({ versionId }) => {
-				await add_project_from_version(profile.path, versionId, 'dependency')
+				await add_project_from_version(profile.path, versionId, reason)
 			}),
 		)
 	}

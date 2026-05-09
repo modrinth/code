@@ -288,16 +288,12 @@ import {
 	Pagination,
 	TagItem,
 	useCompactNumber,
+	useFormatBytes,
 	useFormatDateTime,
 	VersionChannelIndicator,
 	VersionFilterControl,
 } from '@modrinth/ui'
-import {
-	formatBytes,
-	formatVersionsForDisplay,
-	type GameVersionTag,
-	type Version,
-} from '@modrinth/utils'
+import { formatVersionsForDisplay, type GameVersionTag, type Version } from '@modrinth/utils'
 import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -313,6 +309,7 @@ const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
 })
+const formatBytes = useFormatBytes()
 
 type VersionWithDisplayUrlEnding = Version & {
 	displayUrlEnding: string

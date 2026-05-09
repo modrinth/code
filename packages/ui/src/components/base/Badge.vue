@@ -15,7 +15,7 @@
 
 		<!-- Project statuses -->
 		<template v-else-if="type === 'approved'">
-			<ListIcon aria-hidden="true" /> {{ formatMessage(messages.listedLabel) }}
+			<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.listedLabel) }}
 		</template>
 		<template v-else-if="type === 'approved-general'">
 			<CheckIcon aria-hidden="true" /> {{ formatMessage(messages.approvedLabel) }}
@@ -91,7 +91,7 @@ import {
 	CheckIcon,
 	EyeOffIcon,
 	FileTextIcon,
-	ListIcon,
+	GlobeIcon,
 	LockIcon,
 	ModrinthIcon,
 	ScaleIcon,
@@ -134,7 +134,7 @@ const messages = defineMessages({
 	},
 	listedLabel: {
 		id: 'omorphia.component.badge.label.listed',
-		defaultMessage: 'Listed',
+		defaultMessage: 'Public',
 	},
 	moderatorLabel: {
 		id: 'omorphia.component.badge.label.moderator',
@@ -186,7 +186,7 @@ const messages = defineMessages({
 	},
 	withheldLabel: {
 		id: 'omorphia.component.badge.label.withheld',
-		defaultMessage: 'Withheld',
+		defaultMessage: 'Unlisted by staff',
 	},
 })
 const { formatMessage } = useVIntl()
