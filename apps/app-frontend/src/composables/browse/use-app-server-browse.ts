@@ -45,10 +45,6 @@ export interface UseAppServerBrowseOptions {
 }
 
 const messages = defineMessages({
-	addServerToInstance: {
-		id: 'app.browse.add-server-to-instance',
-		defaultMessage: 'Add server to instance',
-	},
 	addToInstance: {
 		id: 'app.browse.add-to-instance',
 		defaultMessage: 'Add to instance',
@@ -243,7 +239,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 					? formatMessage(messages.addToInstanceName, {
 							instanceName: options.instance.value.name,
 						})
-					: formatMessage(messages.addServerToInstance),
+					: formatMessage(commonMessages.addServerToInstanceButton),
 			onClick: () => handleAddServerToInstance(serverResult),
 		})
 

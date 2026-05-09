@@ -24,6 +24,7 @@ import {
 	BrowseInstallHeader,
 	BrowsePageLayout,
 	BrowseSidebar,
+	commonMessages,
 	CreationFlowModal,
 	defineMessages,
 	flushInstallQueue,
@@ -162,7 +163,7 @@ function cycleSearchDisplayMode() {
 
 const currentServerId = computed(() => queryAsString(route.query.sid) || null)
 const fromContext = computed(() => queryAsString(route.query.from) || null)
-const currentWorldId = computed(() => queryAsString(route.query.wid) || undefined)
+const currentWorldId = computed(() => queryAsString(route.query.wid) || null)
 
 const {
 	data: serverData,
@@ -212,7 +213,7 @@ const queuedServerInstallCount = computed(() => queuedServerInstalls.value.size)
 const selectedServerInstallProjects = computed(() =>
 	Array.from(queuedServerInstalls.value.values()).map((plan) => ({
 		id: plan.projectId,
-		name: plan.project.title ?? 'Project',
+		name: plan.project.title ?? formatMessage(commonMessages.projectLabel),
 		iconUrl: plan.project.icon_url ?? null,
 	})),
 )
@@ -300,7 +301,7 @@ function getQueuedInstallPlaceholder(
 		projectId: plan.projectId,
 		versionId: plan.versionId,
 		contentType: plan.contentType as PendingServerContentInstallType,
-		title: plan.project.title ?? 'Project',
+		title: plan.project.title ?? formatMessage(commonMessages.projectLabel),
 		versionName: plan.versionName ?? null,
 		versionNumber: plan.versionNumber ?? null,
 		fileName: plan.fileName ?? null,
@@ -488,7 +489,7 @@ function getCurrentServerInstallType(): BrowseInstallContentType {
 	if (type === 'modpack' || type === 'mod' || type === 'plugin' || type === 'datapack') {
 		return type
 	}
-	throw new Error('This content type cannot be installed to a server from browse.')
+	throw new Error(formatMessage(messages.unsupportedContentType))
 }
 
 function getServerInstallTargetPreferences(contentType: BrowseInstallContentType) {
@@ -531,7 +532,7 @@ async function flushQueuedServerInstalls(
 	if (isInstallingQueuedServerInstalls.value) return false
 
 	if (!serverId || !worldId) {
-		handleError(new Error('No server world is available for install.'))
+		handleError(new Error(formatMessage(messages.noServerWorld)))
 		return false
 	}
 
@@ -606,8 +607,8 @@ async function installQueuedServerInstallsAndBack() {
 		queuedServerInstalls.value = new Map()
 		addNotification({
 			type: 'error',
-			title: 'Some projects failed to install',
-			text: 'Failed projects were not added. You can try installing them again.',
+			title: formatMessage(messages.someProjectsFailedTitle),
+			text: formatMessage(messages.someProjectsFailedText),
 		})
 	}
 
@@ -798,18 +799,18 @@ function getCardActions(
 		const validatingInstall =
 			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
 		const installLabel = isInstalled
-			? 'Installed'
+			? formatMessage(commonMessages.installedLabel)
 			: isQueued
 				? isInstalling || isInstallingSelection
 					? validatingInstall
-						? 'Validating'
-						: 'Installing...'
-					: 'Selected'
+						? formatMessage(commonMessages.validatingLabel)
+						: formatMessage(commonMessages.installingLabel)
+					: formatMessage(commonMessages.selectedLabel)
 				: isInstalling || isInstallingSelection
 					? validatingInstall
-						? 'Validating'
-						: 'Installing...'
-					: 'Install'
+						? formatMessage(commonMessages.validatingLabel)
+						: formatMessage(commonMessages.installingLabel)
+					: formatMessage(commonMessages.installButton)
 
 		return [
 			{
@@ -884,15 +885,15 @@ const serverBackUrl = computed(() => {
 })
 
 const serverBackLabel = computed(() => {
-	if (fromContext.value === 'onboarding') return 'Back to setup'
-	if (fromContext.value === 'reset-server') return 'Cancel reset'
-	return 'Back to server'
+	if (fromContext.value === 'onboarding') return formatMessage(messages.backToSetup)
+	if (fromContext.value === 'reset-server') return formatMessage(messages.cancelReset)
+	return formatMessage(messages.backToServer)
 })
 
 const serverBrowseHeading = computed(() =>
 	fromContext.value === 'reset-server'
-		? 'Selecting modpack to install after reset'
-		: 'Installing content',
+		? formatMessage(messages.resetModpackHeading)
+		: formatMessage(commonMessages.installingContentLabel),
 )
 
 const installContext = computed(() => {
@@ -921,6 +922,38 @@ const installContext = computed(() => {
 })
 
 const messages = defineMessages({
+	unsupportedContentType: {
+		id: 'discover.install.error.unsupported-content-type',
+		defaultMessage: 'This content type cannot be installed to a server from browse.',
+	},
+	noServerWorld: {
+		id: 'discover.install.error.no-server-world',
+		defaultMessage: 'No server world is available for install.',
+	},
+	someProjectsFailedTitle: {
+		id: 'discover.install.error.some-projects-failed.title',
+		defaultMessage: 'Some projects failed to install',
+	},
+	someProjectsFailedText: {
+		id: 'discover.install.error.some-projects-failed.description',
+		defaultMessage: 'Failed projects were not added. You can try installing them again.',
+	},
+	backToSetup: {
+		id: 'discover.install.back-to-setup',
+		defaultMessage: 'Back to setup',
+	},
+	cancelReset: {
+		id: 'discover.install.cancel-reset',
+		defaultMessage: 'Cancel reset',
+	},
+	backToServer: {
+		id: 'discover.install.back-to-server',
+		defaultMessage: 'Back to server',
+	},
+	resetModpackHeading: {
+		id: 'discover.install.heading.reset-modpack',
+		defaultMessage: 'Selecting modpack to install after reset',
+	},
 	gameVersionProvidedByServer: {
 		id: 'search.filter.locked.server-game-version.title',
 		defaultMessage: 'Game version is provided by the server',
@@ -937,9 +970,20 @@ const messages = defineMessages({
 		id: 'search.filter.locked.server.sync',
 		defaultMessage: 'Sync with server',
 	},
-	hideSelectedContent: {
-		id: 'app.browse.hide-selected-content',
-		defaultMessage: 'Hide selected content',
+	seoTitle: {
+		id: 'discover.seo.title',
+		defaultMessage:
+			'Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}',
+	},
+	seoTitleWithQuery: {
+		id: 'discover.seo.title-with-query',
+		defaultMessage:
+			'Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}',
+	},
+	seoDescription: {
+		id: 'discover.seo.description',
+		defaultMessage:
+			'Search and browse thousands of Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}.',
 	},
 	gameVersionShaderMessage: {
 		id: 'search.filter.game-version-shader-message',
@@ -997,13 +1041,16 @@ watch(
 debug('calling initial refreshSearch')
 searchState.refreshSearch()
 
-const ogTitle = computed(
-	() =>
-		`Search ${projectType.value?.display ?? 'project'}s${searchState.query.value ? ' | ' + searchState.query.value : ''}`,
+const ogTitle = computed(() =>
+	searchState.query.value
+		? formatMessage(messages.seoTitleWithQuery, {
+				projectType: projectType.value?.id ?? 'project',
+				query: searchState.query.value,
+			})
+		: formatMessage(messages.seoTitle, { projectType: projectType.value?.id ?? 'project' }),
 )
-const description = computed(
-	() =>
-		`Search and browse thousands of Minecraft ${projectType.value?.display ?? 'project'}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value?.display ?? 'project'}s.`,
+const description = computed(() =>
+	formatMessage(messages.seoDescription, { projectType: projectType.value?.id ?? 'project' }),
 )
 
 useSeoMeta({
@@ -1029,7 +1076,7 @@ provideBrowseManager({
 	providedFilters: serverFilters,
 	hideInstalled: serverHideInstalled,
 	showHideInstalled: computed(() => !!serverData.value && projectType.value?.id !== 'modpack'),
-	hideInstalledLabel: computed(() => 'Hide already installed content'),
+	hideInstalledLabel: computed(() => formatMessage(commonMessages.hideInstalledContentLabel)),
 	hideSelected: hideSelectedServerInstalls,
 	showHideSelected: computed(
 		() =>
@@ -1037,7 +1084,7 @@ provideBrowseManager({
 			projectType.value?.id !== 'modpack' &&
 			queuedServerInstallCount.value > 0,
 	),
-	hideSelectedLabel: computed(() => formatMessage(messages.hideSelectedContent)),
+	hideSelectedLabel: computed(() => formatMessage(commonMessages.hideSelectedContentLabel)),
 	displayMode: resultsDisplayMode,
 	cycleDisplayMode: cycleSearchDisplayMode,
 	maxResultsOptions: currentMaxResultsOptions,
@@ -1068,7 +1115,7 @@ provideBrowseManager({
 		<BrowseInstallHeader />
 	</div>
 	<SelectedProjectsFloatingBar v-if="installContext" :install-context="installContext" />
-	<aside class="normal-page__sidebar" aria-label="Filters">
+	<aside class="normal-page__sidebar" :aria-label="formatMessage(commonMessages.filtersLabel)">
 		<AdPlaceholder v-if="!auth.user && !serverData" />
 		<BrowseSidebar />
 	</aside>

@@ -1,14 +1,25 @@
 <script setup lang="ts">
 import {
+	commonMessages,
+	defineMessages,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	ServersManageContentPage,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
 const client = injectModrinthClient()
 const { server, serverId, worldId } = injectModrinthServerContext()
 const queryClient = useQueryClient()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	title: {
+		id: 'servers.manage.content.title',
+		defaultMessage: 'Content - {serverName} - Modrinth',
+	},
+})
 
 async function getContentWorldId() {
 	if (worldId.value) return worldId.value
@@ -49,7 +60,10 @@ if (contentWorldId) {
 }
 
 useHead({
-	title: `Content - ${server.value?.name ?? 'Server'} - Modrinth`,
+	title: () =>
+		formatMessage(messages.title, {
+			serverName: server.value?.name ?? formatMessage(commonMessages.serverLabel),
+		}),
 })
 </script>
 

@@ -9,7 +9,7 @@
 				<ButtonStyled type="outlined">
 					<button @click="resolve('cancel')">
 						<XIcon />
-						{{ formatMessage(messages.cancelButton) }}
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="red">
@@ -21,7 +21,7 @@
 				<ButtonStyled color="green">
 					<button :disabled="installing" @click="resolve('install')">
 						<PlusIcon />
-						{{ formatMessage(messages.installButton) }}
+						{{ formatMessage(commonMessages.installButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -36,6 +36,7 @@ import { ref } from 'vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
 
 const { formatMessage } = useVIntl()
 
@@ -53,17 +54,9 @@ const messages = defineMessages({
 		defaultMessage:
 			'You have selected {count, plural, one {# project} other {# projects}} to install. Install them now or go back without installing them.',
 	},
-	cancelButton: {
-		id: 'browse.selected-projects-leave-modal.cancel',
-		defaultMessage: 'Cancel',
-	},
 	discardButton: {
 		id: 'browse.selected-projects-leave-modal.discard',
 		defaultMessage: 'Discard',
-	},
-	installButton: {
-		id: 'browse.selected-projects-leave-modal.install',
-		defaultMessage: 'Install',
 	},
 })
 

@@ -12,6 +12,7 @@ import type { BrowseInstallContentType, CardAction, ProjectType, Tags } from '@m
 import {
 	BrowsePageLayout,
 	BrowseSidebar,
+	commonMessages,
 	CreationFlowModal,
 	defineMessages,
 	getLatestMatchingInstallVersion,
@@ -364,29 +365,13 @@ window.addEventListener('online', () => {
 })
 
 const messages = defineMessages({
-	addServerToInstance: {
-		id: 'app.browse.add-server-to-instance',
-		defaultMessage: 'Add server to instance',
-	},
 	addServersToInstance: {
 		id: 'app.browse.add-servers-to-instance',
 		defaultMessage: 'Adding server to instance',
 	},
-	addToInstance: {
-		id: 'app.browse.add-to-instance',
-		defaultMessage: 'Add to instance',
-	},
-	addToInstanceName: {
-		id: 'app.browse.add-to-instance-name',
-		defaultMessage: 'Add to {instanceName}',
-	},
-	added: {
-		id: 'app.browse.added',
-		defaultMessage: 'Added',
-	},
-	alreadyAdded: {
-		id: 'app.browse.already-added',
-		defaultMessage: 'Already added',
+	addToAnInstance: {
+		id: 'app.browse.add-to-an-instance',
+		defaultMessage: 'Add to an instance',
 	},
 	discoverContent: {
 		id: 'app.browse.discover-content',
@@ -412,37 +397,18 @@ const messages = defineMessages({
 		id: 'app.browse.hide-added-servers',
 		defaultMessage: 'Hide already added servers',
 	},
-	hideInstalledContent: {
-		id: 'app.browse.hide-installed-content',
-		defaultMessage: 'Hide already installed content',
-	},
-	hideSelectedContent: {
-		id: 'app.browse.hide-selected-content',
-		defaultMessage: 'Hide selected content',
-	},
-	installContentToInstance: {
-		id: 'app.browse.install-content-to-instance',
-		defaultMessage: 'Installing content',
-	},
-	installToServer: {
-		id: 'app.browse.server.install',
-		defaultMessage: 'Install',
-	},
-	installedToServer: {
-		id: 'app.browse.server.installed',
-		defaultMessage: 'Installed',
-	},
 	installingToServer: {
 		id: 'app.browse.server.installing',
 		defaultMessage: 'Installing',
 	},
-	validatingToServer: {
-		id: 'app.browse.server.validating',
-		defaultMessage: 'Validating',
+	backToInstance: {
+		id: 'app.browse.back-to-instance',
+		defaultMessage: 'Back to instance',
 	},
-	queuedToServer: {
-		id: 'app.browse.server.queued',
-		defaultMessage: 'Selected',
+	serverInstanceContentWarning: {
+		id: 'app.browse.server-instance-content-warning',
+		defaultMessage:
+			'Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content.',
 	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
@@ -607,13 +573,13 @@ const installContext = computed(() => {
 			gameVersion: instance.value.game_version,
 			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 			backUrl: `/instance/${encodeURIComponent(instance.value.path)}${isFromWorlds.value ? '/worlds' : ''}`,
-			backLabel: 'Back to instance',
+			backLabel: formatMessage(messages.backToInstance),
 			heading: formatMessage(
-				isFromWorlds.value ? messages.addServersToInstance : messages.installContentToInstance,
+				isFromWorlds.value ? messages.addServersToInstance : commonMessages.installingContentLabel,
 			),
 			warning:
 				isServerInstance.value && !isFromWorlds.value
-					? 'Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content.'
+					? formatMessage(messages.serverInstanceContentWarning)
 					: undefined,
 		}
 	}
@@ -732,18 +698,18 @@ function getCardActions(
 		const validatingInstall =
 			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
 		const installLabel = isInstalled
-			? messages.installedToServer
+			? commonMessages.installedLabel
 			: isQueued
 				? isInstalling || isInstallingSelection
 					? validatingInstall
-						? messages.validatingToServer
+						? commonMessages.validatingLabel
 						: messages.installingToServer
-					: messages.queuedToServer
+					: commonMessages.selectedLabel
 				: isInstalling || isInstallingSelection
 					? validatingInstall
-						? messages.validatingToServer
+						? commonMessages.validatingLabel
 						: messages.installingToServer
-					: messages.installToServer
+					: commonMessages.installButton
 		return [
 			{
 				key: 'install',
@@ -809,13 +775,15 @@ function getCardActions(
 	return [
 		{
 			key: 'install',
-			label: isInstalling
-				? 'Installing'
-				: isInstalled
-					? 'Installed'
-					: shouldUseInstallIcon
-						? 'Install'
-						: 'Add to an instance',
+			label: formatMessage(
+				isInstalling
+					? messages.installingToServer
+					: isInstalled
+						? commonMessages.installedLabel
+						: shouldUseInstallIcon
+							? commonMessages.installButton
+							: messages.addToAnInstance,
+			),
 			icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : PlusIcon,
 			iconClass: isInstalling ? 'animate-spin' : undefined,
 			disabled: isInstalled || isInstalling,
@@ -1040,7 +1008,9 @@ provideBrowseManager({
 		() => (isServerContext.value && projectType.value !== 'modpack') || !!instance.value,
 	),
 	hideInstalledLabel: computed(() =>
-		formatMessage(isFromWorlds.value ? messages.hideAddedServers : messages.hideInstalledContent),
+		formatMessage(
+			isFromWorlds.value ? messages.hideAddedServers : commonMessages.hideInstalledContentLabel,
+		),
 	),
 	hideSelected: hideSelectedServerInstalls,
 	showHideSelected: computed(
@@ -1049,7 +1019,7 @@ provideBrowseManager({
 			projectType.value !== 'modpack' &&
 			queuedServerInstallCount.value > 0,
 	),
-	hideSelectedLabel: computed(() => formatMessage(messages.hideSelectedContent)),
+	hideSelectedLabel: computed(() => formatMessage(commonMessages.hideSelectedContentLabel)),
 	onInstalled: onSearchResultInstalled,
 	serverPings,
 	getServerModpackContent,
@@ -1064,8 +1034,12 @@ provideBrowseManager({
 		<BrowsePageLayout>
 			<template #after>
 				<ContextMenu ref="contextMenuRef" @option-clicked="handleOptionsClick">
-					<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
-					<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+					<template #open_link>
+						<GlobeIcon /> {{ formatMessage(commonMessages.openInModrinthButton) }} <ExternalIcon />
+					</template>
+					<template #copy_link>
+						<ClipboardCopyIcon /> {{ formatMessage(commonMessages.copyLinkButton) }}
+					</template>
 				</ContextMenu>
 			</template>
 		</BrowsePageLayout>

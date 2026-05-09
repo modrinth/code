@@ -70,7 +70,7 @@
 						<ButtonStyled v-if="serverPlaying" size="large" color="red">
 							<button @click="handleStopServer">
 								<StopCircleIcon />
-								Stop
+								{{ formatMessage(commonMessages.stopButton) }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled v-else size="large" color="brand">
@@ -79,11 +79,18 @@
 								@click="handleClickPlay"
 							>
 								<PlayIcon />
-								{{ data && installingServerProjects.includes(data.id) ? 'Installing...' : 'Play' }}
+								{{
+									data && installingServerProjects.includes(data.id)
+										? formatMessage(commonMessages.installingLabel)
+										: formatMessage(commonMessages.playButton)
+								}}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled size="large" circular>
-							<button v-tooltip="'Add server to instance'" @click="handleAddServerToInstance">
+							<button
+								v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
+								@click="handleAddServerToInstance"
+							>
 								<PlusIcon />
 							</button>
 						</ButtonStyled>
@@ -210,9 +217,15 @@
 			:install-context="projectInstallContext"
 		/>
 		<ContextMenu ref="options" @option-clicked="handleOptionsClick">
-			<template #install> <DownloadIcon /> Install </template>
-			<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
-			<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+			<template #install>
+				<DownloadIcon /> {{ formatMessage(commonMessages.installButton) }}
+			</template>
+			<template #open_link>
+				<GlobeIcon /> {{ formatMessage(commonMessages.openInModrinthButton) }} <ExternalIcon />
+			</template>
+			<template #copy_link>
+				<ClipboardCopyIcon /> {{ formatMessage(commonMessages.copyLinkButton) }}
+			</template>
 		</ContextMenu>
 		<CreationFlowModal
 			v-if="serverInstallContent.isServerContext.value && data?.project_type === 'modpack'"
@@ -254,7 +267,9 @@ import {
 import {
 	BrowseInstallHeader,
 	ButtonStyled,
+	commonMessages,
 	CreationFlowModal,
+	defineMessages,
 	getTargetInstallPreferences,
 	injectNotificationManager,
 	NavTabs,
@@ -269,6 +284,7 @@ import {
 	ProjectSidebarTags,
 	requestInstall,
 	SelectedProjectsFloatingBar,
+	useVIntl,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -313,6 +329,22 @@ const route = useRoute()
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	backToBrowse: {
+		id: 'app.project.install-context.back-to-browse',
+		defaultMessage: 'Back to browse',
+	},
+	installContentToInstance: {
+		id: 'app.project.install-context.install-content-to-instance',
+		defaultMessage: 'Install content to instance',
+	},
+	alreadyInstalled: {
+		id: 'app.project.install-button.already-installed',
+		defaultMessage: 'This project is already installed',
+	},
+})
 
 const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
 	injectServerInstall()
@@ -399,7 +431,7 @@ const projectInstallContext = computed(() => {
 			iconSrc: null,
 			isMedal: serverData.is_medal,
 			backUrl: projectBrowseBackUrl.value,
-			backLabel: 'Back to browse',
+			backLabel: formatMessage(messages.backToBrowse),
 			heading: serverInstallContent.serverBrowseHeading.value,
 			queuedCount: serverInstallContent.queuedServerInstallCount.value,
 			selectedProjects: serverInstallContent.selectedServerInstallProjects.value,
@@ -419,8 +451,8 @@ const projectInstallContext = computed(() => {
 			gameVersion: instance.value.game_version,
 			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 			backUrl: projectBrowseBackUrl.value,
-			backLabel: 'Back to browse',
-			heading: 'Install content to instance',
+			backLabel: formatMessage(messages.backToBrowse),
+			heading: formatMessage(messages.installContentToInstance),
 		}
 	}
 
@@ -458,14 +490,14 @@ const installButtonDisabled = computed(
 	() => installButtonInstalled.value || installButtonLoading.value,
 )
 const installButtonLabel = computed(() => {
-	if (installButtonInstalled.value) return 'Installed'
-	if (installButtonValidating.value) return 'Validating'
-	if (installButtonLoading.value) return 'Installing...'
-	if (serverProjectSelected.value) return 'Selected'
-	return 'Install'
+	if (installButtonInstalled.value) return formatMessage(commonMessages.installedLabel)
+	if (installButtonValidating.value) return formatMessage(commonMessages.validatingLabel)
+	if (installButtonLoading.value) return formatMessage(commonMessages.installingLabel)
+	if (serverProjectSelected.value) return formatMessage(commonMessages.selectedLabel)
+	return formatMessage(commonMessages.installButton)
 })
 const installButtonTooltip = computed(() => {
-	if (installButtonInstalled.value) return 'This project is already installed'
+	if (installButtonInstalled.value) return formatMessage(messages.alreadyInstalled)
 	return null
 })
 

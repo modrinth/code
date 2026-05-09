@@ -47,7 +47,7 @@
 					:disabled="isInstallingSelected"
 					@click="clearSelected"
 				>
-					<span>{{ formatMessage(messages.clearButton) }}</span>
+					<span>{{ formatMessage(commonMessages.clearButton) }}</span>
 				</button>
 			</ButtonStyled>
 		</div>
@@ -71,6 +71,7 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import { injectBrowseManager } from '../providers/browse-manager'
 import type { BrowseInstallContext } from '../types'
@@ -85,10 +86,6 @@ const messages = defineMessages({
 	selectedCount: {
 		id: 'browse.selected-projects-floating-bar.selected-count',
 		defaultMessage: '{count, plural, one {# project selected} other {# projects selected}}',
-	},
-	clearButton: {
-		id: 'browse.selected-projects-floating-bar.clear',
-		defaultMessage: 'Clear',
 	},
 	installButton: {
 		id: 'browse.selected-projects-floating-bar.install',
