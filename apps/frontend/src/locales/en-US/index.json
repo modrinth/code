@@ -2568,13 +2568,13 @@
 		"message": "Project approved"
 	},
 	"project.moderation.admonition.approved.private-full": {
-		"message": "Your project is private, meaning it can only be accessed by you and people you invite. You can change the visibility of your project inyour project's <visibility-settings-link>visibility settings</visibility-settings-link>."
+		"message": "Your project is private, meaning it can only be accessed by you and people you invite. \nYou can change the visibility of your project inyour project's <visibility-settings-link>visibility settings</visibility-settings-link>."
 	},
 	"project.moderation.admonition.approved.published-full": {
-		"message": "Your project is published and discoverable on Modrinth. You can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>."
+		"message": "Your project is published and discoverable on Modrinth. \nYou can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>."
 	},
 	"project.moderation.admonition.approved.unlisted-full": {
-		"message": "Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth. You can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>."
+		"message": "Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth. \nYou can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>."
 	},
 	"project.moderation.admonition.draft.body": {
 		"message": "This is a draft project that cannot be seen by others until submitted for review and approved by our content moderation team."
@@ -2598,7 +2598,7 @@
 		"message": "Repeatedly submitting your project without addressing all moderation concerns first may result in account suspension."
 	},
 	"project.moderation.admonition.under-review.body": {
-		"message": "Your project is in queue to be reviewed by our content moderation team. While you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>."
+		"message": "Your project is in queue to be reviewed by our content moderation team. \nWhile you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>."
 	},
 	"project.moderation.admonition.under-review.free-to-edit": {
 		"message": "You may freely modify your project as needed while under review. It won't affect your position in the queue."
