@@ -11,6 +11,51 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-09T21:42:48+00:00`,
+		product: 'app',
+		version: '0.13.14',
+		body: `## Fixed
+- Fixed hidden files showing up in the Content tab on instances.
+- Fixed 'Advanced rendering' option not being applied to most of the interface.`,
+	},
+	{
+		date: `2026-05-09T21:42:48+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Improved stability of content install flow.
+
+## Fixed
+- Fixed content install flow breaking if you refresh the page mid-install.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'app',
+		version: '0.13.13',
+		body: `## Changed
+- Improved the Browse page header so the back button no longer shifts the layout.
+
+## Fixed
+- Fixed instance redirects opening a broken page state.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved performance on search pages.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated Modrinth Hosting content browsing so multiple projects can be selected before installation.
+- After installing selected content, the Modrinth Hosting content page now reopens immediately and shows pending projects as installing.
+- Project icons now appear in the action bar when selecting multiple projects in the Content tab.
+
+## Fixed
+- Fixed selected content and dependencies not staying marked as installing.
+- Fixed page shifts while dependencies resolve during installation.`,
+	},
+	{
 		date: `2026-05-08T09:58:39+00:00`,
 		product: 'web',
 		body: `## Fixed

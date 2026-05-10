@@ -51,6 +51,8 @@ export namespace Archon {
 				kind?: AddonKind
 			}
 
+			export type AddAddonsRequest = AddAddonRequest[]
+
 			export type RemoveAddonRequest = {
 				kind: AddonKind
 				filename: string

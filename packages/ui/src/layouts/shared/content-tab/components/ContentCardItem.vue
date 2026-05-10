@@ -21,7 +21,7 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
-import { useVIntl } from '#ui/composables/i18n'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 import { truncatedTooltip } from '#ui/utils/truncate'
 
@@ -33,6 +33,13 @@ import type {
 } from '../types'
 
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	selectProject: {
+		id: 'content.card.select-project',
+		defaultMessage: 'Select {project}',
+	},
+})
 
 interface Props {
 	project: ContentCardProject
@@ -111,7 +118,10 @@ const deleteHovered = ref(false)
 	<div
 		role="row"
 		class="flex h-[74px] items-center justify-between gap-4 px-3"
-		:class="{ 'opacity-50': disabled }"
+		:class="{
+			'opacity-50 grayscale': disabled && !installing,
+			'opacity-50': installing,
+		}"
 	>
 		<div
 			class="flex min-w-0 items-center gap-4"
@@ -122,7 +132,7 @@ const deleteHovered = ref(false)
 			<Checkbox
 				v-if="showCheckbox"
 				:model-value="selected ?? false"
-				:aria-label="`Select ${project.title}`"
+				:aria-label="formatMessage(messages.selectProject, { project: project.title })"
 				class="shrink-0"
 				@update:model-value="selected = $event"
 			/>

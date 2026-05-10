@@ -8,6 +8,7 @@ const props = defineProps<{
 	shown: boolean
 	ariaLabel?: string
 	belowModal?: boolean
+	hideWhenModalOpen?: boolean
 }>()
 
 const INTERCOM_BUBBLE_GAP = 8
@@ -18,7 +19,7 @@ const compact = ref(false)
 
 const { stackCount } = useModalStack()
 const pageContext = injectPageContext(null)
-const shown = computed(() => props.shown)
+const shown = computed(() => props.shown && (!props.hideWhenModalOpen || stackCount.value === 0))
 const intercomBubbleClearanceRequestId = Symbol('floating-action-bar')
 const zIndex = computed(() => 100 + stackCount.value * 10 + 8 + (!props.belowModal ? 1 : 0))
 const leftOffset = computed(
@@ -82,11 +83,11 @@ function updateIntercomBubbleClearance() {
 	)
 }
 
-function updateBodyState(shown = props.shown) {
+function updateBodyState(isShown = shown.value) {
 	if (typeof document === 'undefined') return
 
-	document.body.classList.toggle('floating-action-bar-shown', shown)
-	if (!shown) {
+	document.body.classList.toggle('floating-action-bar-shown', isShown)
+	if (!isShown) {
 		clearIntercomBubbleClearance()
 	}
 }
@@ -123,10 +124,10 @@ watch(
 )
 
 watch(
-	() => props.shown,
-	async (shown) => {
+	shown,
+	async (isShown) => {
 		await nextTick()
-		updateBodyState(shown)
+		updateBodyState(isShown)
 		scheduleIntercomBubbleClearanceUpdate()
 	},
 	{ immediate: true },
@@ -175,7 +176,7 @@ onUnmounted(() => {
 					ref="toolbarEl"
 					role="toolbar"
 					:aria-label="ariaLabel"
-					class="relative overflow-clip flex items-center gap-2 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto max-w-[60vw] px-4 py-3 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
+					class="relative overflow-clip flex items-center gap-1.5 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto max-w-[60vw] px-3 py-2.5 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
 					:class="{ 'bar-compact': compact }"
 				>
 					<slot />

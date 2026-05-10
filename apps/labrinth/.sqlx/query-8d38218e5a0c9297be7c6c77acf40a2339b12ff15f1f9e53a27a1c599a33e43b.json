@@ -1,0 +1,37 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                WIDTH_BUCKET(\n                    EXTRACT(EPOCH FROM created)::bigint,\n                    EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,\n                    EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,\n                    $3::integer\n                ) AS bucket,\n                mod_id,\n                SUM(amount) amount_sum\n            FROM payouts_values\n            WHERE\n                -- only project revenue is counted here\n                -- for affiliate code revenue, see `affiliate_code_revenue`\n                payouts_values.mod_id IS NOT NULL\n                AND payouts_values.mod_id = ANY($4)\n                AND created BETWEEN $1 AND $2\n            GROUP BY bucket, mod_id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "bucket",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "amount_sum",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Timestamptz",
+        "Int4",
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      null,
+      true,
+      null
+    ]
+  },
+  "hash": "8d38218e5a0c9297be7c6c77acf40a2339b12ff15f1f9e53a27a1c599a33e43b"
+}

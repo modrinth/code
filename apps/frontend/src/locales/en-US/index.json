@@ -1229,6 +1229,33 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Please complete tax form"
   },
+  "discover.install.back-to-server": {
+    "message": "Back to server"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Back to setup"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Cancel reset"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "No server world is available for install."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "This content type cannot be installed to a server from browse."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Selecting modpack to install after reset"
+  },
+  "discover.seo.description": {
+    "message": "Search and browse thousands of Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
+  },
+  "discover.seo.title": {
+    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
   },
@@ -3061,6 +3088,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
+  },
+  "servers.manage.content.title": {
+    "message": "Content - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "Actions"

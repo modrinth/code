@@ -65,6 +65,7 @@ import { useStorage } from '@vueuse/core'
 import { computed, defineAsyncComponent, onMounted, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
+import { useFormatBytes } from '#ui/composables'
 import { injectModrinthServerContext, injectPageContext } from '#ui/providers'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
@@ -91,6 +92,8 @@ const props = withDefaults(
 		showMemoryAsBytes: false,
 	},
 )
+
+const formatBytes = useFormatBytes()
 
 const chartsReady = ref(new Set<number>())
 const userPreferences = useStorage(`pyro-server-${serverId || 'unknown'}-preferences`, {
@@ -178,21 +181,10 @@ const ramChartOptions = computed(() => buildChartOptions(ramWarning.value, 1, ra
 const cpuSeries = computed(() => [{ name: 'CPU', data: cpuData.value }])
 const ramSeries = computed(() => [{ name: 'Memory', data: ramData.value }])
 
-const formatBytes = (bytes: number) => {
-	const units = ['B', 'KB', 'MB', 'GB']
-	let value = bytes
-	let unit = 0
-	while (value >= 1024 && unit < units.length - 1) {
-		value /= 1024
-		unit++
-	}
-	return `${Math.round(value * 10) / 10} ${units[unit]}`
-}
-
 const metrics = computed(() => {
 	const storageMetric = {
 		title: 'Storage',
-		value: props.loading ? '0 B' : formatBytes(stats.value.storage_usage_bytes ?? 0),
+		value: formatBytes(props.loading ? 0 : (stats.value.storage_usage_bytes ?? 0), 1),
 		secondary: null as string | null,
 		icon: FolderOpenIcon,
 		showGraph: false,
@@ -241,10 +233,10 @@ const metrics = computed(() => {
 		{
 			title: 'Memory',
 			value: showRamAsBytes.value
-				? formatBytes(stats.value.ram_usage_bytes ?? 0)
+				? formatBytes(stats.value.ram_usage_bytes ?? 0, 1)
 				: `${ramPercent.value.toFixed(2)}%`,
 			secondary: showRamAsBytes.value
-				? `/ ${formatBytes(stats.value.ram_total_bytes ?? 0)}`
+				? `/ ${formatBytes(stats.value.ram_total_bytes ?? 0, 1)}`
 				: (null as string | null),
 			icon: DatabaseIcon,
 			showGraph: true,

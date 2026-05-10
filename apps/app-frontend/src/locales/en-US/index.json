@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Cannot reach authentication servers"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Add server to instance"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "Add servers to your instance"
+    "message": "Adding server to instance"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Add to an instance"
   },
   "app.browse.add-to-instance": {
     "message": "Add to instance"
@@ -122,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Already added"
   },
+  "app.browse.back-to-instance": {
+    "message": "Back to instance"
+  },
   "app.browse.discover-content": {
     "message": "Discover content"
   },
@@ -131,20 +134,11 @@
   "app.browse.hide-added-servers": {
     "message": "Hide already added servers"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Hide already installed content"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Install content to instance"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
   },
-  "app.browse.server.install": {
-    "message": "Install"
-  },
-  "app.browse.server.installed": {
-    "message": "Installed"
+  "app.browse.server-instance-content-warning": {
+    "message": "Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content."
   },
   "app.browse.server.installing": {
     "message": "Installing"
@@ -304,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to the latest version to launch the game."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "This project is already installed"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Back to browse"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Install content to instance"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
