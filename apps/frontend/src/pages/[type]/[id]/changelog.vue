@@ -57,6 +57,7 @@
 									<a
 										class="ml-auto"
 										:href="createDownloadUrl(version)"
+										:download="getPrimaryFile(version).filename"
 										:title="`Download ${version.name}`"
 									>
 										<DownloadIcon aria-hidden="true" />
@@ -230,6 +231,10 @@ watch(
 	},
 	{ immediate: true },
 )
+
+function getPrimaryFile(version) {
+	return version.files.find((x) => x.primary) || version.files[0]
+}
 
 function createDownloadUrl(version) {
 	return createProjectDownloadUrl(getPrimaryFile(version).url, {
