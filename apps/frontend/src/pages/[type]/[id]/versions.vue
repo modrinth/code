@@ -47,6 +47,7 @@
 						<a
 							v-tooltip="`Download`"
 							:href="createDownloadUrl(version)"
+							:download="getPrimaryFile(version).filename"
 							class="hover:!bg-button-bg [&>svg]:!text-green"
 							aria-label="Download"
 							@click="emit('onDownload')"
