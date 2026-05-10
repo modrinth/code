@@ -1,1 +1,10 @@
-CLAUDE.md
+- Use `ApiError` as the error type for API routes
+- Prefer `ApiError::Internal` and `ApiError::Request` over `ApiError::InvalidInput`
+  - Use `eyre!` to construct a value for `Internal` and `Request` variants
+- Error messages (both for errors and exceptions) must be formatted as per the Rust API guidelines:
+  - lowercase message
+  - no trailing punctuation
+  - wrap code items e.g. type names in backticks
+- Prefer `wrap_internal_err`, `wrap_request_err` when attaching context to an existing error (like Anyhow `context` or Eyre `wrap_err`)
+- All operations should ideally have some context attached
+  - Database operations can have a message like `.wrap_internal_err("failed to fetch XYZ")`
