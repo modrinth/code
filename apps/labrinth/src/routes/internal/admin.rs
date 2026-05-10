@@ -1,7 +1,5 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::models::loader_fields::Loader;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::{Download, DownloadReason};
 use crate::models::ids::ProjectId;
@@ -13,65 +11,14 @@ use crate::search::SearchBackend;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
+use crate::util::tags::valid_download_tags;
 use actix_web::{HttpRequest, HttpResponse, patch, post, web};
-use arc_swap::ArcSwapOption;
 use eyre::eyre;
 use serde::Deserialize;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
 use tracing::trace;
-
-const DOWNLOAD_TAGS_CACHE_TTL: Duration = Duration::from_secs(60 * 5);
-
-struct DownloadTagsCache {
-    expires: Instant,
-    loaders: HashSet<String>,
-    game_versions: HashSet<String>,
-}
-
-static DOWNLOAD_TAGS_CACHE: ArcSwapOption<DownloadTagsCache> =
-    ArcSwapOption::const_empty();
-
-/// Fetches download tags from the database or returns a cached version.
-///
-/// We cache tags since we get a large volume of download ingests, and querying
-/// the database or even Redis for each request is too expensive.
-async fn valid_download_tags(
-    pool: &PgPool,
-    redis: &RedisPool,
-) -> Result<Arc<DownloadTagsCache>, ApiError> {
-    let now = Instant::now();
-    let cached = DOWNLOAD_TAGS_CACHE.load();
-    if let Some(cached) = &*cached
-        && cached.expires > now
-    {
-        return Ok(cached.clone());
-    }
-
-    let loaders = Loader::list(pool, redis)
-        .await
-        .wrap_internal_err("failed to fetch loaders")?
-        .into_iter()
-        .map(|loader| loader.loader)
-        .collect();
-    let game_versions = MinecraftGameVersion::list(None, None, pool, redis)
-        .await
-        .wrap_internal_err("failed to fetch game versions")?
-        .into_iter()
-        .map(|game_version| game_version.version)
-        .collect();
-
-    let cache = Arc::new(DownloadTagsCache {
-        expires: now + DOWNLOAD_TAGS_CACHE_TTL,
-        loaders,
-        game_versions,
-    });
-    DOWNLOAD_TAGS_CACHE.store(Some(cache.clone()));
-
-    Ok(cache)
-}
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
