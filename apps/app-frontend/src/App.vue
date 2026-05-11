@@ -2,6 +2,7 @@
 import { Intercom, shutdown as shutdownIntercom } from '@intercom/messenger-js-sdk'
 import {
 	AuthFeature,
+	ModrinthApiError,
 	NodeAuthFeature,
 	nodeAuthState,
 	PanelVersionFeature,
@@ -98,6 +99,7 @@ import { command_listener, warning_listener } from '@/helpers/events.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { create_profile_and_install_from_file } from '@/helpers/pack'
 import { list } from '@/helpers/profile.js'
+import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import {
@@ -1028,6 +1030,28 @@ async function installUpdate() {
 	}, 250)
 }
 
+async function openModrinthProjectLinkInApp(parsed) {
+	const { slug, pathSuffix, url } = parsed
+	const loadToken = loading.begin()
+	try {
+		const { id } = await tauriApiClient.labrinth.projects_v2.check(slug)
+		const query = mergeUrlQuery(route.query, url)
+		await router.push({
+			path: `/project/${id}${pathSuffix}`,
+			query,
+			hash: url.hash || undefined,
+		})
+	} catch (err) {
+		if (err instanceof ModrinthApiError && err.statusCode === 404) {
+			openUrl(url.href)
+		} else {
+			handleError(err)
+		}
+	} finally {
+		loading.end(loadToken)
+	}
+}
+
 function handleClick(e) {
 	let target = e.target
 	while (target != null) {
@@ -1040,7 +1064,12 @@ function handleClick(e) {
 				!target.href.startsWith('https://tauri.localhost') &&
 				!target.href.startsWith('http://tauri.localhost')
 			) {
-				openUrl(target.href)
+				const parsed = parseModrinthLink(target.href)
+				if (parsed) {
+					void openModrinthProjectLinkInApp(parsed)
+				} else {
+					openUrl(target.href)
+				}
 			}
 			e.preventDefault()
 			break
