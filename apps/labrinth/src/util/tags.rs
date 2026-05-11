@@ -8,6 +8,7 @@ use arc_swap::ArcSwapOption;
 use std::collections::HashSet;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
+use tokio::sync::Mutex;
 
 /// Cached set of valid loaders and game version tags.
 ///
@@ -31,6 +32,17 @@ pub async fn valid_download_tags(
 
     static DOWNLOAD_TAGS_CACHE: ArcSwapOption<DownloadTagsCache> =
         ArcSwapOption::const_empty();
+    static DOWNLOAD_TAGS_CACHE_REFRESH_LOCK: Mutex<()> = Mutex::const_new(());
+
+    let now = Instant::now();
+    let cached = DOWNLOAD_TAGS_CACHE.load();
+    if let Some(cached) = &*cached
+        && cached.expires > now
+    {
+        return Ok(cached.clone());
+    }
+
+    let _refresh_lock = DOWNLOAD_TAGS_CACHE_REFRESH_LOCK.lock().await;
 
     let now = Instant::now();
     let cached = DOWNLOAD_TAGS_CACHE.load();
