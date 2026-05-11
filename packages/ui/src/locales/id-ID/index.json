@@ -1109,9 +1109,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Gagal"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Terdaftar"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
@@ -1147,9 +1144,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Gagal"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Ditahan"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Salin kode ke papan klip"

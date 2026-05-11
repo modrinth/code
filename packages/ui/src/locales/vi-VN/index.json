@@ -1610,9 +1610,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Thất bại"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Công khai"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Kiểm duyệt viên"
   },
@@ -1648,9 +1645,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Không đạt"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Bị giữ lại"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Sao chép mã vào bảng nhớ tạm"

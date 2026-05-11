@@ -95,8 +95,47 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Server erneut abonnieren"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Resultate filtern..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Keine Resultate für deine Anfrage gefunden!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Du bist aktuell Offline. Verbinde dich mit dem Internet um Modrinth zu durchstöbern!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Durchsuche {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} server {Server} other {Projekte}}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Ausgewählte Projekte"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Installiere {count, plural, one {# Projekt} other {# Projekte}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# Projekt} other {# Projekte}} ausgewählt"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Du hast {count, plural, one {# Projekt} other {# Projekte}} zum installieren. Installiere {count, plural, one {es} other {sie}} jetzt oder gehe ohne installation zurück."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Ausgewählte Projekte noch nicht installiert"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Verwerfen"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Ausgewählte Projekte noch nicht installiert"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Ansehen:"
+  },
   "button.accept": {
     "defaultMessage": "Akzeptieren"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Server zu Instanz hinzufügen"
   },
   "button.affiliate-links": {
     "defaultMessage": "Partnerlinks"
@@ -167,6 +206,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Snapshots ausblenden"
   },
+  "button.install": {
+    "defaultMessage": "Installieren"
+  },
   "button.max": {
     "defaultMessage": "Max"
   },
@@ -184,6 +226,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "In Ordner öffnen"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "In Modrinth öffnen"
   },
   "button.play": {
     "defaultMessage": "Spielen"
@@ -277,6 +322,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "Privat"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "{project} auswählen"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Bist du sicher, dass du {count, plural, one {# Projekt} other {# Projekte}} auf die neuste kompatible version aktualisieren willst? Es wird empfohlen, Inhalte einzeln zu aktualisieren."
@@ -758,6 +806,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Server einrichten"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "Nein"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Permanentes Nein"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Unbekannt"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "Mit Quellenangabe"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "Mit Quelle und Quellenangabe"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Ja"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Zusammenfassung der Extrahierung"
   },
@@ -1199,6 +1265,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Bundesland/Kanton/Provinz eingeben"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, one {# Byte} other {# Bytes}}"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
+  },
   "header.category.category": {
     "defaultMessage": "Kategorie"
   },
@@ -1234,6 +1315,9 @@
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Aktualisieren von Inhalten fehlgeschlagen"
+  },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "Installieren von Inhalten fehlgeschlagen"
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Laden von Modpack Inhalten fehlgeschlagen"
@@ -1688,20 +1772,35 @@
   "label.filter-by": {
     "defaultMessage": "Filtern nach"
   },
+  "label.filters": {
+    "defaultMessage": "Filter"
+  },
   "label.followed-projects": {
     "defaultMessage": "Gefolgte Projekte"
   },
   "label.game-version": {
     "defaultMessage": "Spielversion"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "Bereits installierte Inhalte ausblenden"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "Ausgewählte Inhalte ausblenden"
+  },
   "label.installation-info": {
     "defaultMessage": "Installationsinfo"
+  },
+  "label.installed": {
+    "defaultMessage": "Installiert"
   },
   "label.installed-modpack": {
     "defaultMessage": "Installiertes Modpack"
   },
   "label.installing": {
     "defaultMessage": "Wird installiert..."
+  },
+  "label.installing-content": {
+    "defaultMessage": "Installiere Inhalt"
   },
   "label.loading": {
     "defaultMessage": "Lade..."
@@ -1778,6 +1877,9 @@
   "label.select-all": {
     "defaultMessage": "Alle auswählen"
   },
+  "label.selected": {
+    "defaultMessage": "Ausgewählt"
+  },
   "label.selection-actions": {
     "defaultMessage": "Auswahlaktionen"
   },
@@ -1820,8 +1922,14 @@
   "label.username": {
     "defaultMessage": "Benutzername"
   },
+  "label.validating": {
+    "defaultMessage": "Bestätige"
+  },
   "label.version": {
     "defaultMessage": "Version"
+  },
+  "label.view": {
+    "defaultMessage": "Ansehen"
   },
   "label.visibility": {
     "defaultMessage": "Sichtbarkeit"
@@ -1980,7 +2088,7 @@
     "defaultMessage": "Fehlgeschlagen"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Gelistet"
+    "defaultMessage": "Öffentlich"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
@@ -2019,7 +2127,7 @@
     "defaultMessage": "Durchgefallen"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Vorenthalten"
+    "defaultMessage": "Von Mitarbeitern entlistet"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Code in Zwischenablage kopieren"
@@ -2789,6 +2897,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "Hochladen"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Berechtigungen"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "Versionen"
   },
@@ -3082,6 +3193,54 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "Inhalt wird synchronisiert"
+  },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "Installation fehlgeschlagen"
+  },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "Ein interner Fehler ist beim Installieren der Platform aufgetreten. Bitte versuch es später erneut."
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "Der angegebene Loader oder Minecraft Version konnte nicht installiert werden. Sie ist womöglich ungültig oder nicht unterstützt."
+  },
+  "servers.installing-banner.error.modpack-install-failed": {
+    "defaultMessage": "Das Modpack konnte nicht installiert werden. Es könnte womöglich beschädigt oder inkompatibel sein."
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "Diese Modpack-Version enthält keine hrunterladbare Datei. Es wurde womöglich inkorrekt erstellt."
+  },
+  "servers.installing-banner.error.unknown": {
+    "defaultMessage": "Ein unerwarteter Fehler ist während der Installation aufgetreten."
+  },
+  "servers.installing-banner.error.unsupported-loader-version": {
+    "defaultMessage": "Diese Version von Minecraft oder des Loaders werden aktuell noch nicht von Modrinth Hosting unterstützt."
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "Installiere Addons..."
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "Installiere Modpack..."
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "Installiere Platform..."
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "Wir bereiten deinen Server vor"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "Füge Java hinzu..."
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "Konfiguriere Server..."
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "Lade Mods herunter..."
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "Organisiere Dateien..."
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "Richte die Umgebung ein..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Du hast bereits einen Server?"

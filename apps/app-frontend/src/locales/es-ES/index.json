@@ -104,12 +104,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "No se puede conectar con los servidores de autenticación"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Añadir servidor a la instancia"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Añadir servidor a tu instancia"
-  },
   "app.browse.add-to-instance": {
     "message": "Añadir a la instancia"
   },
@@ -131,20 +125,8 @@
   "app.browse.hide-added-servers": {
     "message": "Ocultar servidores ya añadidos"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Ocultar contenido instalado"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Instalar contenido a una instancia"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
-  },
-  "app.browse.server.install": {
-    "message": "Instalar"
-  },
-  "app.browse.server.installed": {
-    "message": "Instalado"
   },
   "app.browse.server.installing": {
     "message": "Instalando"
@@ -169,9 +151,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nombre del modpack"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Seleccione archivos y carpetas para incluir en el paquete"
   },
   "app.export-modal.version-number-label": {
     "message": "Número de versión"

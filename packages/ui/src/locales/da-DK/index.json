@@ -560,9 +560,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Mislykkedes"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listet"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
@@ -595,9 +592,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Fejl"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Tilbageholdt"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopiér kode til udklipsholder"

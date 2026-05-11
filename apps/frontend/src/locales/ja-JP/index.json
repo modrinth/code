@@ -1244,6 +1244,12 @@
   "error.collection.404.title": {
     "message": "コレクションが見つかりません"
   },
+  "error.generic.401.signed-in-as": {
+    "message": "現在サインイン中のアカウント:"
+  },
+  "error.generic.401.title": {
+    "message": "このページにアクセスする権限がありません"
+  },
   "error.generic.404.subtitle": {
     "message": "お探しのページは存在しないようです。"
   },
@@ -1670,6 +1676,9 @@
   "layout.action.create-new": {
     "message": "新規作成…"
   },
+  "layout.action.external-projects": {
+    "message": "外部プロジェクト"
+  },
   "layout.action.file-lookup": {
     "message": "ファイル検索"
   },
@@ -1922,6 +1931,9 @@
   "moderation.moderate": {
     "message": "適度"
   },
+  "moderation.page.external-projects": {
+    "message": "外部プロジェクト"
+  },
   "moderation.page.projects": {
     "message": "プロジェクト"
   },
@@ -1929,7 +1941,7 @@
     "message": "レポート"
   },
   "moderation.page.technicalReview": {
-    "message": "技術的レビュー"
+    "message": "技術評価"
   },
   "muralpay.account-type.checking": {
     "message": "チェック中"

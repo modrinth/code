@@ -758,6 +758,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "서버 설정"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "아니오"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "영구 거부"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "식별 불가"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "출처 표기 시"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "출처 및 소스 표기 시"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "예"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "내보내기 요약"
   },
@@ -1198,6 +1216,21 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "주/도 입력"
+  },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, other {# 바이트}}"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
   },
   "header.category.category": {
     "defaultMessage": "카테고리"
@@ -2019,7 +2052,7 @@
     "defaultMessage": "실패"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "보류됨"
+    "defaultMessage": "운영진에 의해 숨겨짐"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "클립보드에 코드 복사"
@@ -2788,6 +2821,9 @@
   },
   "project.settings.upload.title": {
     "defaultMessage": "업로드"
+  },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "권한"
   },
   "project.settings.versions.title": {
     "defaultMessage": "버전"

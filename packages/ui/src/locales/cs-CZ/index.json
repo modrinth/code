@@ -689,9 +689,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Selhalo"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Zařazeno"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderátor"
   },
@@ -727,9 +724,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Fail"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Odmítnuto"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Zkopírovat kód do schránky"

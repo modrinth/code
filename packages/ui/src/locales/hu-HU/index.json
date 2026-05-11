@@ -98,6 +98,9 @@
   "button.accept": {
     "defaultMessage": "Elfogadás"
   },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Szerver hozzáadása a profilhoz"
+  },
   "button.affiliate-links": {
     "defaultMessage": "Társulati linkek"
   },
@@ -166,6 +169,9 @@
   },
   "button.hide-snapshots": {
     "defaultMessage": "Snapshotok elrejtése"
+  },
+  "button.install": {
+    "defaultMessage": "Letöltés"
   },
   "button.max": {
     "defaultMessage": "Max"
@@ -369,7 +375,7 @@
     "defaultMessage": "A megerősítés kihagyásához tartsd lenyomva a Shift billentyűt a kattintás közben."
   },
   "content.inline-backup.warning-body": {
-    "defaultMessage": "Javasoljuk a biztonsági mentés készítését a továbbhaladás előtt, hogy ha valami nem működne, vissza tudd állítani a(z) {type, select, server {world} other {instance}}-t."
+    "defaultMessage": "Javasoljuk a biztonsági mentés készítését a továbbhaladás előtt, hogy ha valami nem működne, vissza tudd állítani a {type, select, server {világot} other {profilt}}."
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "A modpacked tartalma itt tallható!"
@@ -506,6 +512,9 @@
   "creation-flow.modal.custom-setup.game-version.placeholder": {
     "defaultMessage": "Válaszd ki a játékverziót"
   },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "Játékverzió keresése..."
+  },
   "creation-flow.modal.custom-setup.icon.remove": {
     "defaultMessage": "Ikon eltávolítása"
   },
@@ -526,6 +535,9 @@
   },
   "creation-flow.modal.custom-setup.loader-version.placeholder": {
     "defaultMessage": "Válaszd ki a betöltő verzióját"
+  },
+  "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
+    "defaultMessage": "Betöltőverzió keresése"
   },
   "creation-flow.modal.custom-setup.loader.label": {
     "defaultMessage": "Betöltő"
@@ -638,8 +650,14 @@
   "creation-flow.modal.import-instance.custom-launcher.name": {
     "defaultMessage": "Egyéni ({pathName})"
   },
+  "creation-flow.modal.import-instance.notification.no-instances-found.text": {
+    "defaultMessage": "Nem találtak importálható profilokat a megadott útvonalon."
+  },
   "creation-flow.modal.import-instance.notification.no-instances-found.title": {
     "defaultMessage": "Nem található profil"
+  },
+  "creation-flow.modal.import-instance.search.placeholder": {
+    "defaultMessage": "Profilnév keresése"
   },
   "creation-flow.modal.modpack.action.browse": {
     "defaultMessage": "Modcsomagok böngészése"
@@ -657,7 +675,7 @@
     "defaultMessage": "Modcsomag keresése"
   },
   "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "A profil (instance) egy Minecraft beállítás egy adott betöltővel, verzióval és modokkal."
+    "defaultMessage": "A profil egy külön Minecraft-környezet adott modbetöltővel, verzióval és modokkal."
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Kezdés alapoktól: válassz betöltőt és játékverziót."
@@ -670,6 +688,9 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Profil importálása"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "Modcsomag letöltése"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Klasszikus Minecraft modok és bővítmények nélkül."
@@ -842,6 +863,9 @@
   "files.navbar.home": {
     "defaultMessage": "Kezdőlap"
   },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "CurseForge csomag telepítése"
+  },
   "files.navbar.new-file": {
     "defaultMessage": "Új fájl"
   },
@@ -899,8 +923,14 @@
   "files.unsaved-changes-modal.header": {
     "defaultMessage": "Nem mentett módosítások"
   },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Hiba – {error}"
+  },
   "files.upload-dropdown.file": {
     "defaultMessage": "Fájl"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Váratlan hiba történt."
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "A név kizárólag betűket, számokat, kötőjeleket, aláhúzásokat vagy szóközöket tartalmazhat."
@@ -917,6 +947,9 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "CurseForge modcsomag letöltése"
   },
+  "files.zip-url-modal.cf-header": {
+    "defaultMessage": "CurseForge modcsomag telepítése"
+  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Link beírása"
   },
@@ -931,6 +964,9 @@
   },
   "files.zip-url-modal.install-button": {
     "defaultMessage": "Telepítés"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "A telepítés sikertelen volt"
   },
   "files.zip-url-modal.step-copy-description": {
     "defaultMessage": "Másold ki a verzióoldal linkjét, és illeszd be ide."
@@ -1064,6 +1100,9 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Nem sikerült feltölteni a fájlt"
   },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "A modcsomag újratelepítése nem sikerült"
+  },
   "hosting.loader.failed-to-unlink": {
     "defaultMessage": "Nem sikerült leválasztani a modcsomagot"
   },
@@ -1124,6 +1163,9 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Megerősítés"
   },
+  "installation-settings.confirm-version-change-header": {
+    "defaultMessage": "Tartalomváltozások áttekintése"
+  },
   "installation-settings.edit-installation.title": {
     "defaultMessage": "Telepítés szerkesztése"
   },
@@ -1132,6 +1174,12 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "A tartalom telepítése után nem javasoljuk a telepítési beállítások módosítását. Ha mégis módosítani szeretnéd őket, állítsd vissza a szervert."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Automatikus javítás"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Betöltő megváltoztatása"
   },
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Nem kompatibilis tartalom van telepítve"
@@ -1147,6 +1195,12 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "A betöltő megváltoztatásához vissza kell állítanod a szervert."
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "Re-installing the modpack resets the {type, select, server {server's} other {instance's}} content to its original state, removing any mods or content you have added."
+  },
+  "installation-settings.repair.instance-description": {
+    "defaultMessage": "Újratelepíti a Minecraft függőségeit, és ellenőrzi, hogy nincsenek-e sérült fájlok. Ez megoldhatja azokat a problémákat, ha a játék az indítóval kapcsolatos hibák miatt nem indul el."
   },
   "installation-settings.repair.instance-title": {
     "defaultMessage": "Profil javítása"
@@ -1372,6 +1426,9 @@
   },
   "label.installation-info": {
     "defaultMessage": "Telepítési információk"
+  },
+  "label.installed": {
+    "defaultMessage": "Letöltve"
   },
   "label.installing": {
     "defaultMessage": "Letöltés..."
@@ -1643,9 +1700,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Sikertelen"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listázott"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderátor"
   },
@@ -1678,9 +1732,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Sikertelen"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Vissztartva"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kód másolása a vágólapra"
@@ -2662,6 +2713,9 @@
   },
   "servers.manage.contact-support-button": {
     "defaultMessage": "Kapcsolatfelvétel a Modrinth ügyfélszolgálatával"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "Hiba történt"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Új szerver"

@@ -95,8 +95,47 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Server erneut abonnieren"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Ergebnisse filtern..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Keine Ergebnisse für deine Suchanfrage gefunden!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Du bist derzeit offline. Verbinde dich mit dem Internet, um Modrinth zu durchsuchen!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Durchsuche {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} server {Server} other {Projekte}}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Ausgewählte Projekte"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Installiere {count, plural, one {# Projekt} other {# Projekte}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# Projekt} other {# Projekte}} ausgewählt"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Du hast {count, plural, one {# Projekt} other {# Projekte}} zur Installation ausgewählt. Installiere {count, plural, one {es} other {sie}} jetzt oder gehe ohne installation zurück."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Ausgewählte Projekte noch nicht installiert"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Verwerfen"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Ausgewählte Projekte noch nicht installiert"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Ansehen:"
+  },
   "button.accept": {
     "defaultMessage": "Akzeptieren"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Server zu Instanz hinzufügen"
   },
   "button.affiliate-links": {
     "defaultMessage": "Partnerlinks"
@@ -167,6 +206,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Snapshots ausblenden"
   },
+  "button.install": {
+    "defaultMessage": "Installieren"
+  },
   "button.max": {
     "defaultMessage": "Max"
   },
@@ -184,6 +226,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "In Ordner öffnen"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "In Modrinth öffnen"
   },
   "button.play": {
     "defaultMessage": "Spielen"
@@ -277,6 +322,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "Privat"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "{project} auswählen"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Möchtest du wirklich {count, plural, one {# Projekt} other {# Projekte}} auf die neueste kompatible Version aktualisieren? Es wird empfohlen, die Inhalte einzeln zu aktualisieren."
@@ -758,6 +806,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Server einrichten"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "Nein"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Permanentes nein"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Unbekannt"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "Mit Quellenangabe"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "Mit Quellenangabe und Quelle"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Ja"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Zusammenfassung der Extrahierung"
   },
@@ -1198,6 +1264,21 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Bundesland eingeben"
+  },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, one {# Byte} other {# Bytes}}"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
   },
   "header.category.category": {
     "defaultMessage": "Kategorie"
@@ -1688,20 +1769,35 @@
   "label.filter-by": {
     "defaultMessage": "Filtern nach"
   },
+  "label.filters": {
+    "defaultMessage": "Filter"
+  },
   "label.followed-projects": {
     "defaultMessage": "Projekte, denen du folgst"
   },
   "label.game-version": {
     "defaultMessage": "Spielversion"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "Bereits installierte Inhalte ausblenden"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "Ausgewählte Inhalte ausblenden"
+  },
   "label.installation-info": {
     "defaultMessage": "Installationsinfo"
+  },
+  "label.installed": {
+    "defaultMessage": "Installiert"
   },
   "label.installed-modpack": {
     "defaultMessage": "Installiertes Modpack"
   },
   "label.installing": {
     "defaultMessage": "Wird installiert..."
+  },
+  "label.installing-content": {
+    "defaultMessage": "Inhalt wird installiert"
   },
   "label.loading": {
     "defaultMessage": "Lädt..."
@@ -1778,6 +1874,9 @@
   "label.select-all": {
     "defaultMessage": "Alle auswählen"
   },
+  "label.selected": {
+    "defaultMessage": "Ausgewählt"
+  },
   "label.selection-actions": {
     "defaultMessage": "Auswahlaktionen"
   },
@@ -1820,8 +1919,14 @@
   "label.username": {
     "defaultMessage": "Benutzername"
   },
+  "label.validating": {
+    "defaultMessage": "Wird bestätigt"
+  },
   "label.version": {
     "defaultMessage": "Version"
+  },
+  "label.view": {
+    "defaultMessage": "Ansehen"
   },
   "label.visibility": {
     "defaultMessage": "Sichtbarkeit"
@@ -1980,7 +2085,7 @@
     "defaultMessage": "Fehlgeschlagen"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Gelistet"
+    "defaultMessage": "Öffentlich"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
@@ -2019,7 +2124,7 @@
     "defaultMessage": "Durchgefallen"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Zurückgehalten"
+    "defaultMessage": "Von Mitarbeitern entlistet"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Code in die Zwischenablage kopieren"
@@ -2789,6 +2894,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "Hochladen"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Berechtigungen"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "Versionen"
   },
@@ -3082,6 +3190,36 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "Inhalt wird synchronisiert"
+  },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "Installation fehlgeschlagen"
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "Addons werden installiert..."
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "Modpack wird installiert..."
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "Plattform wird installiert..."
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "Wir bereiten deinen Server vor"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "Java wird hinzugefügt..."
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "Server wird konfiguriert..."
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "Mods werden heruntergeladen..."
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "Dateien werden organisiert..."
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "Umgebung wird eingerichtet..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Du hast bereits einen Server?"
