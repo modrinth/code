@@ -307,7 +307,7 @@
 			width="500px"
 			:header="formatMessage(messages.manageProvidersModalHeader)"
 		>
-			<div class="flex flex-col gap-6">
+			<div class="flex flex-col gap-4">
 				<Table :columns="manageProvidersColumns" :data="authProviders" row-key="id">
 					<template #cell-provider="{ row }">
 						<span class="inline-flex items-center gap-1.5">
@@ -316,20 +316,19 @@
 						</span>
 					</template>
 					<template #cell-actions="{ row }">
-						<ButtonStyled v-if="auth.user.auth_providers.includes(provider.id)">
-							<button @click="handleRemoveAuthProvider(provider.id)">
+						<ButtonStyled v-if="auth.user.auth_providers.includes(row.id)">
+							<button @click="handleRemoveAuthProvider(row.id)" class="!w-full">
 								<TrashIcon /> {{ formatMessage(commonMessages.removeButton) }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled v-else>
-							<a :href="`${getAuthUrl(provider.id, '/settings/account')}&token=${auth.token}`">
+							<a :href="`${getAuthUrl(row.id, '/settings/account')}&token=${auth.token}`">
 								<ExternalIcon /> {{ formatMessage(messages.providerAddButton) }}
 							</a>
 						</ButtonStyled>
 					</template>
 				</Table>
-				<p class="m-0"></p>
-				<div class="input-group push-right">
+				<div class="self-end">
 					<ButtonStyled>
 						<button @click="$refs.manageProvidersModal.hide()">
 							<XIcon />
