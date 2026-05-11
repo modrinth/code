@@ -28,14 +28,18 @@ export function createLoaderParsers(
 			if (metadata.dependencies) {
 				const neoForgeDependency = Object.values(metadata.dependencies)
 					.flat()
-					.find((dependency: any) => dependency.modId === 'neoforge')
+					.filter((dependency: any) => dependency.modId === 'neoforge')
+					.map((dependency: any) => dependency.versionRange)
+					.find((range) => range)
 				const minecraftDependency = Object.values(metadata.dependencies)
 					.flat()
-					.find((dependency: any) => dependency.modId === 'minecraft')
+					.filter((dependency: any) => dependency.modId === 'minecraft')
+					.map((dependency: any) => dependency.versionRange)
+					.find((range) => range)
 
 				if (minecraftDependency) {
 					newGameVersions = getGameVersionsMatchingMavenRange(
-						(minecraftDependency as any).versionRange,
+						minecraftDependency,
 						simplifiedGameVersions,
 					)
 				} else if (neoForgeDependency) {
@@ -46,7 +50,7 @@ export function createLoaderParsers(
 						/^(?<mc_year>\d+)(?:\.(?<mc_drop>\d+))?(?:\.(?<mc_patch>\d+)?)?(?:\.(\d+))?$/
 
 					newGameVersions = getGameVersionsMatchingMavenRange(
-						(neoForgeDependency as any).versionRange.replace('-beta', ''),
+						neoForgeDependency.replace('-beta', ''),
 						simplifiedGameVersions,
 						(version) => {
 							const matchPre26 = version.match(neoPre26Regex)
