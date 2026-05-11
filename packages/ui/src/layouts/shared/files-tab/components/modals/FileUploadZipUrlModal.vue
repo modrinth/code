@@ -63,7 +63,7 @@
 		<template #actions>
 			<div class="flex w-full items-center justify-end gap-2">
 				<ButtonStyled type="outlined">
-					<button type="button" class="!border !border-surface-4" @click="hide">
+					<button type="button" @click="hide">
 						<XIcon />
 						{{
 							submitted

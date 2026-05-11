@@ -212,7 +212,7 @@ function selectCustom() {
 				</div>
 			</div>
 			<div class="w-full">
-				<ButtonStyled color="blue" class="w-full">
+				<ButtonStyled color="blue">
 					<button
 						class="w-full"
 						:disabled="existingPlan?.id === plansByRam.small.id"

@@ -15,7 +15,7 @@
 			<span>
 				{{
 					formatMessage(messages.extracted, {
-						size: 'bytes_processed' in op ? formatBytes(op.bytes_processed ?? 0) : '0 B',
+						size: formatBytes(op.bytes_processed ?? 0),
 					})
 				}}
 			</span>
@@ -35,11 +35,11 @@
 
 <script setup lang="ts">
 import { PackageOpenIcon } from '@modrinth/assets'
-import { formatBytes } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { useFormatBytes } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 import { injectModrinthServerContext } from '#ui/providers'
@@ -53,6 +53,7 @@ const props = defineProps<{
 }>()
 
 const { formatMessage } = useVIntl()
+const formatBytes = useFormatBytes()
 const ctx = injectModrinthServerContext()
 
 const messages = defineMessages({

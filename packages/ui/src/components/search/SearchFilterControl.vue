@@ -1,5 +1,5 @@
 <template>
-	<div class="experimental-styles-within flex flex-wrap items-center gap-1 empty:hidden">
+	<div class="flex flex-wrap items-center gap-1 empty:hidden">
 		<TagItem
 			v-if="selectedItems.length > 1"
 			class="transition-transform active:scale-[0.95]"

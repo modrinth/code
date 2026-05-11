@@ -426,10 +426,11 @@ export function createContentInstall(opts: {
 		}
 
 		try {
-			await add_project_from_version(instance.id, version.id)
+			await add_project_from_version(instance.id, version.id, 'standalone')
 			await installVersionDependencies(
 				profile,
 				version,
+				'dependency',
 				(depProject: Labrinth.Projects.v2.Project, depVersion?: Labrinth.Versions.v2.Version) => {
 					addInstallingItem(instance.id, depProject, depVersion)
 					installedProjectIds.push(depProject.id)
@@ -484,11 +485,11 @@ export function createContentInstall(opts: {
 			)
 			if (!id) return
 
-			await add_project_from_version(id, version.id)
-			await opts.router.push(`/instance/${encodeURIComponent(id)}/`)
+			await add_project_from_version(id, version.id, 'standalone')
+			await opts.router.push(`/instance/${encodeURIComponent(id)}`)
 
 			const instance = await get(id)
-			await installVersionDependencies(instance, version)
+			await installVersionDependencies(instance, version, 'dependency')
 
 			trackEvent('InstanceCreate', {
 				source: 'ProjectInstallModal',
@@ -512,7 +513,7 @@ export function createContentInstall(opts: {
 
 	function handleNavigate(instance: ContentInstallInstance) {
 		modalRef?.hide()
-		opts.router.push(`/instance/${encodeURIComponent(instance.id)}/`)
+		opts.router.push(`/instance/${encodeURIComponent(instance.id)}`)
 	}
 
 	function handleCancel() {
@@ -585,10 +586,11 @@ export function createContentInstall(opts: {
 				const installedProjectIds: string[] = [project.id]
 				addInstallingItem(instancePath, project, version)
 				try {
-					await add_project_from_version(instance.path, version.id)
+					await add_project_from_version(instance.path, version.id, 'standalone')
 					await installVersionDependencies(
 						instance,
 						version,
+						'dependency',
 						(
 							depProject: Labrinth.Projects.v2.Project,
 							depVersion?: Labrinth.Versions.v2.Version,
@@ -664,7 +666,7 @@ export function createContentInstall(opts: {
 		},
 		handleModpackDuplicateGoToInstance(instancePath: string) {
 			pendingModpackInstall = null
-			opts.router.push(`/instance/${encodeURIComponent(instancePath)}/`)
+			opts.router.push(`/instance/${encodeURIComponent(instancePath)}`)
 		},
 		setIncompatibilityWarningModal(ref: IncompatibilityWarningModalRef) {
 			incompatibilityWarningModalRef = ref

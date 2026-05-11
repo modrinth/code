@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 
 import DatePicker from '../../components/base/DatePicker.vue'
 
@@ -48,17 +48,107 @@ export const WithTime: Story = {
 	}),
 }
 
+export const OpenWithTime: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-04-27 03:05')
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[460px] max-w-sm flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[350px]"
+					enable-time
+					placeholder="Select a date and time..."
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const Range: Story = {
 	render: () => ({
 		components: { DatePicker },
 		setup() {
-			const value = ref(['2026-04-27', '2026-05-04'])
+			const value = ref(['2026-04-13', '2026-04-29'])
 			return { value }
 		},
 		template: /* html */ `
 			<div class="flex max-w-sm flex-col gap-2">
 				<DatePicker v-model="value"
-				wrapperClass="w-[350px]" mode="range" placeholder="Select a date range..." />
+				wrapperClass="w-[350px]" mode="range" default-view-date="2026-04-01" placeholder="Select a date range..." />
+				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const TwoMonthRange: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref(['2033-11-16', '2033-12-21'])
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[460px] max-w-[700px] flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[350px]"
+					mode="range"
+					:show-months="2"
+					default-view-date="2033-11-01"
+					placeholder="Select a date range..."
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const DraggableRange: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref(['2026-04-13', '2026-04-29'])
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[420px] max-w-sm flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[350px]"
+					mode="range"
+					default-view-date="2026-04-01"
+					placeholder="Select a date range..."
+				/>
 				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
 			</div>
 		`,
@@ -70,16 +160,52 @@ export const MinMaxDates: Story = {
 		components: { DatePicker },
 		setup() {
 			const value = ref('2026-04-27')
-			return { value }
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
 		},
 		template: /* html */ `
-			<div class="flex max-w-sm flex-col gap-2">
+			<div class="flex h-[420px] max-w-sm flex-col gap-2">
 				<DatePicker
+					ref="datePicker"
 					v-model="value"
 					wrapperClass="w-[350px]"
 					min-date="2026-04-01"
 					max-date="2026-04-30"
 					placeholder="Select an April date..."
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const OpenCalendar: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-06-15')
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[420px] max-w-sm flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[300px]"
+					default-view-date="2026-06-01"
 				/>
 				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
 			</div>

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div v-if="canAccess">
 		<section class="universal-card">
 			<h2>Project status</h2>
 			<Badge :type="project.status" />
@@ -107,7 +107,7 @@ import {
 	injectProjectPageContext,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import {
@@ -121,6 +121,22 @@ import {
 
 const { addNotification } = injectNotificationManager()
 const { projectV2: project, currentMember, invalidate } = injectProjectPageContext()
+
+const canAccess = computed(() => !!currentMember.value)
+
+watch(
+	[currentMember, project],
+	() => {
+		if (project.value && !canAccess.value) {
+			showError({
+				fatal: true,
+				statusCode: 401,
+				statusMessage: 'Unauthorized',
+			})
+		}
+	},
+	{ flush: 'sync', immediate: true },
+)
 
 const auth = await useAuth()
 const client = injectModrinthClient()

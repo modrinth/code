@@ -31,7 +31,7 @@ const props = defineProps({
 const modal = useTemplateRef('modal')
 
 defineExpose({
-	show: (e: MouseEvent) => {
+	show: (e?: MouseEvent) => {
 		modal.value?.show(e)
 	},
 	hide: () => {

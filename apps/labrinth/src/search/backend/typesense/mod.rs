@@ -46,6 +46,7 @@ pub enum Bucketing {
 pub enum TextMatchType {
     #[default]
     MaxScore,
+    #[default]
     MaxWeight,
     SumScore,
 }

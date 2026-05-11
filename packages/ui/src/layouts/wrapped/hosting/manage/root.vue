@@ -1,7 +1,7 @@
 <template>
 	<div
 		v-if="filteredNotices.length > 0"
-		class="experimental-styles-within relative mx-auto mb-4 flex w-full min-w-0 flex-col gap-3 px-6"
+		class="relative mx-auto mb-4 flex w-full min-w-0 flex-col gap-3 px-6"
 		:class="{
 			'max-w-[1280px]': isNuxt,
 		}"
@@ -99,7 +99,7 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within relative mx-auto box-border flex w-full min-w-0 flex-col gap-4 px-6 transition-all duration-300"
+		class="relative mx-auto box-border flex w-full min-w-0 flex-col gap-4 px-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
@@ -144,7 +144,7 @@
 								</button>
 							</ButtonStyled>
 							<template #popper>
-								<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+								<div class="grid grid-cols-[min-content] gap-1">
 									<div class="flex min-w-48 items-center justify-between gap-8">
 										<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
 											{{ formatMessage(settingsHintMessages.title) }}
@@ -311,7 +311,6 @@
 						class="mb-4"
 						:sync-progress="syncProgress"
 						:content-error="contentError"
-						:server-image="serverImage"
 						@content-retry="handleContentRetry"
 					/>
 					<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
@@ -321,7 +320,7 @@
 	</div>
 	<div
 		v-if="showAdvancedDebugInfo"
-		class="experimental-styles-within relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
+		class="relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
 	>
 		<h2 class="m-0 text-lg font-extrabold text-contrast">Server data</h2>
 		<pre class="markdown-body w-full overflow-auto rounded-2xl bg-bg-raised p-4 text-sm">{{
@@ -404,6 +403,11 @@ import {
 	provideServerSettingsModal,
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
+import {
+	pendingServerContentInstallsEvent,
+	readPendingServerContentInstalls,
+	writePendingServerContentInstalls,
+} from '#ui/utils/server-content-installing'
 
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
 
@@ -571,6 +575,8 @@ const { data: serverProject } = useServerProject(computed(() => serverData.value
 const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
 const contentError = ref<Archon.Websocket.v0.SyncContentError | null>(null)
 const syncProgressActive = ref(false)
+const hasPendingServerContentInstalls = ref(false)
+const hasSeenPendingServerContentSync = ref(false)
 const isAwaitingPostInstallRefresh = ref(false)
 const { start: startSyncHide, stop: cancelSyncHide } = useTimeoutFn(
 	() => (syncProgressActive.value = false),
@@ -582,14 +588,44 @@ watch(syncProgress, (progress) => {
 	if (progress != null) {
 		cancelSyncHide()
 		syncProgressActive.value = true
+		if (progress.phase !== 'Analyzing' && hasPendingServerContentInstalls.value) {
+			hasSeenPendingServerContentSync.value = true
+		}
 	} else if (syncProgressActive.value) {
 		startSyncHide()
+		if (hasSeenPendingServerContentSync.value) {
+			writePendingServerContentInstalls(props.serverId, worldId.value, [])
+			hasSeenPendingServerContentSync.value = false
+		}
 	}
 })
 
+watch(contentError, (error) => {
+	if (!error || !hasPendingServerContentInstalls.value) return
+	writePendingServerContentInstalls(props.serverId, worldId.value, [])
+	hasSeenPendingServerContentSync.value = false
+})
+
 const isSyncingContent = computed(
-	() => syncProgressActive.value || isAwaitingPostInstallRefresh.value,
+	() =>
+		syncProgressActive.value ||
+		isAwaitingPostInstallRefresh.value ||
+		hasPendingServerContentInstalls.value,
 )
+
+function syncPendingServerContentInstalls() {
+	hasPendingServerContentInstalls.value =
+		readPendingServerContentInstalls(props.serverId, worldId.value).length > 0
+}
+
+function handlePendingServerContentInstallsChanged(event: Event) {
+	const detail = (event as CustomEvent<{ serverId?: string | null; worldId?: string | null }>)
+		.detail
+	if (detail?.serverId !== props.serverId || detail?.worldId !== worldId.value) return
+	syncPendingServerContentInstalls()
+}
+
+watch(worldId, syncPendingServerContentInstalls, { immediate: true })
 
 let hasSeenInstallProgress = false
 
@@ -1346,6 +1382,11 @@ const cleanup = () => {
 
 onMounted(() => {
 	isMounted.value = true
+	syncPendingServerContentInstalls()
+	window.addEventListener(
+		pendingServerContentInstallsEvent,
+		handlePendingServerContentInstallsChanged,
+	)
 
 	if (serverData.value) {
 		initializeServer()
@@ -1434,6 +1475,10 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+	window.removeEventListener(
+		pendingServerContentInstallsEvent,
+		handlePendingServerContentInstallsChanged,
+	)
 	cleanup()
 })
 </script>

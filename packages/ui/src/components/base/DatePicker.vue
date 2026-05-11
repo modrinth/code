@@ -5,6 +5,8 @@
 			wrapperClass,
 			disabled ? 'cursor-not-allowed opacity-50' : '',
 			showToday ? 'show-today' : '',
+			props.mode === 'range' && selectedDates.length === 2 ? 'can-drag-range' : '',
+			rangeDragState ? 'is-dragging-range' : '',
 		]"
 	>
 		<CalendarIcon
@@ -38,6 +40,15 @@ import type { Options } from 'flatpickr/dist/types/options'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 type DatePickerValue = string | Date | null | undefined
+type RangeEdge = 'start' | 'end'
+type RangeDayElement = HTMLElement & { dateObj?: Date }
+type RangeDragState = {
+	edge: RangeEdge
+	anchorDate: Date
+	draggedEndpointDate: Date
+	pointerId: number
+	lastDateTime: number
+}
 
 const model = defineModel<DatePickerValue | DatePickerValue[]>()
 
@@ -51,6 +62,7 @@ const props = withDefaults(
 		readonly?: boolean
 		enableTime?: boolean
 		mode?: 'single' | 'multiple' | 'range'
+		showMonths?: number
 		minDate?: string | Date
 		maxDate?: string | Date
 		/**
@@ -95,6 +107,7 @@ const props = withDefaults(
 		readonly: false,
 		enableTime: false,
 		mode: 'single',
+		showMonths: 1,
 		time24hr: false,
 		clearable: true,
 		showIcon: true,
@@ -115,6 +128,9 @@ const isSyncingFromModel = ref(false)
 const intendedViewMonth = ref<{ month: number; year: number } | null>(null)
 const intendedDay = ref<number | null>(null)
 const isPreservingDay = ref(false)
+const rangeDragState = ref<RangeDragState | null>(null)
+const suppressNextRangeClick = ref(false)
+let rangeClickSuppressionTimeout: number | null = null
 
 function getDayFromDateStr(dateStr: string): number | null {
 	const parts = dateStr.split('-')
@@ -155,11 +171,306 @@ function applyPreserveDay(instance: Instance) {
 	})
 }
 
+function syncHeaderControlState(instance: Instance) {
+	const prevDisabled = instance.prevMonthNav.classList.contains('flatpickr-disabled')
+	const nextDisabled = instance.nextMonthNav.classList.contains('flatpickr-disabled')
+
+	instance.prevMonthNav.setAttribute('aria-disabled', String(prevDisabled))
+	instance.nextMonthNav.setAttribute('aria-disabled', String(nextDisabled))
+
+	if (instance.monthsDropdownContainer) {
+		const monthSelectDisabled = instance.monthsDropdownContainer.options.length <= 1
+		instance.monthsDropdownContainer.disabled = monthSelectDisabled
+		instance.monthsDropdownContainer.setAttribute('aria-disabled', String(monthSelectDisabled))
+	}
+}
+
+function getRangeDayElement(target: EventTarget | null): RangeDayElement | null {
+	if (!(target instanceof Element)) return null
+	return target.closest<RangeDayElement>('.flatpickr-day')
+}
+
+function isSelectableDay(dayElem: RangeDayElement) {
+	return (
+		Boolean(dayElem.dateObj) &&
+		!dayElem.classList.contains('flatpickr-disabled') &&
+		!dayElem.classList.contains('hidden')
+	)
+}
+
+function getRangeEdge(dayElem: RangeDayElement): RangeEdge | null {
+	if (props.mode !== 'range') return null
+	if (picker.value?.selectedDates.length !== 2) return null
+	if (!isSelectableDay(dayElem)) return null
+	if (dayElem.classList.contains('startRange') && !dayElem.classList.contains('endRange')) {
+		return 'start'
+	}
+	if (dayElem.classList.contains('endRange') && !dayElem.classList.contains('startRange')) {
+		return 'end'
+	}
+	return null
+}
+
+function dateTime(date: Date) {
+	return date.getTime()
+}
+
+function dateOnlyTime(date: Date) {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
+}
+
+function withEndpointTime(date: Date, endpoint: Date) {
+	return new Date(
+		date.getFullYear(),
+		date.getMonth(),
+		date.getDate(),
+		endpoint.getHours(),
+		endpoint.getMinutes(),
+		endpoint.getSeconds(),
+		endpoint.getMilliseconds(),
+	)
+}
+
+function clearRangeClickSuppressionTimeout() {
+	if (rangeClickSuppressionTimeout === null) return
+
+	window.clearTimeout(rangeClickSuppressionTimeout)
+	rangeClickSuppressionTimeout = null
+}
+
+function clearRangeClickSuppressionSoon() {
+	clearRangeClickSuppressionTimeout()
+	rangeClickSuppressionTimeout = window.setTimeout(() => {
+		suppressNextRangeClick.value = false
+		rangeClickSuppressionTimeout = null
+	}, 50)
+}
+
+function startRangeDrag(event: PointerEvent) {
+	if (event.button !== 0) return
+
+	const instance = picker.value
+	const dayElem = getRangeDayElement(event.target)
+	if (!instance || !dayElem) return
+
+	const edge = getRangeEdge(dayElem)
+	if (!edge) return
+
+	const [startDate, endDate] = instance.selectedDates
+	if (!startDate || !endDate) return
+
+	const draggedEndpointDate = new Date(edge === 'start' ? startDate : endDate)
+	rangeDragState.value = {
+		edge,
+		anchorDate: new Date(edge === 'start' ? endDate : startDate),
+		draggedEndpointDate,
+		pointerId: event.pointerId,
+		lastDateTime: dateTime(draggedEndpointDate),
+	}
+	clearRangeClickSuppressionTimeout()
+	suppressNextRangeClick.value = true
+
+	document.addEventListener('pointermove', updateRangeDrag, true)
+	document.addEventListener('pointerup', stopRangeDrag, true)
+	document.addEventListener('pointercancel', stopRangeDrag, true)
+
+	event.preventDefault()
+	event.stopImmediatePropagation()
+}
+
+function updateRangeDrag(event: PointerEvent) {
+	const state = rangeDragState.value
+	const instance = picker.value
+	if (!state || !instance || event.pointerId !== state.pointerId) return
+
+	const target = document.elementFromPoint(event.clientX, event.clientY)
+	const dayElem = getRangeDayElement(target)
+	if (!dayElem || !instance.calendarContainer.contains(dayElem) || !isSelectableDay(dayElem)) return
+
+	const draggedDate = withEndpointTime(dayElem.dateObj!, state.draggedEndpointDate)
+	let nextStartDate = state.edge === 'start' ? draggedDate : state.anchorDate
+	let nextEndDate = state.edge === 'end' ? draggedDate : state.anchorDate
+
+	if (state.edge === 'start' && dateOnlyTime(nextStartDate) > dateOnlyTime(state.anchorDate)) {
+		nextStartDate = state.anchorDate
+	} else if (state.edge === 'end' && dateOnlyTime(nextEndDate) < dateOnlyTime(state.anchorDate)) {
+		nextEndDate = state.anchorDate
+	}
+
+	const nextDraggedTime = dateTime(state.edge === 'start' ? nextStartDate : nextEndDate)
+	if (nextDraggedTime === state.lastDateTime) return
+
+	intendedViewMonth.value = {
+		month: instance.currentMonth,
+		year: instance.currentYear,
+	}
+
+	state.lastDateTime = nextDraggedTime
+	instance.setDate([nextStartDate, nextEndDate], true)
+	syncHeaderControlState(instance)
+
+	event.preventDefault()
+	event.stopImmediatePropagation()
+}
+
+function stopRangeDrag(event: PointerEvent) {
+	const state = rangeDragState.value
+	if (!state || event.pointerId !== state.pointerId) return
+
+	const instance = picker.value
+	rangeDragState.value = null
+	document.removeEventListener('pointermove', updateRangeDrag, true)
+	document.removeEventListener('pointerup', stopRangeDrag, true)
+	document.removeEventListener('pointercancel', stopRangeDrag, true)
+	clearRangeClickSuppressionSoon()
+
+	if (
+		document.activeElement instanceof HTMLElement &&
+		instance?.calendarContainer.contains(document.activeElement)
+	) {
+		document.activeElement.blur()
+	}
+
+	event.preventDefault()
+	event.stopImmediatePropagation()
+}
+
+function stopRangeEndpointMouseEvent(event: MouseEvent) {
+	if (rangeDragState.value || suppressNextRangeClick.value) {
+		event.preventDefault()
+		event.stopImmediatePropagation()
+	}
+}
+
+function suppressRangeDragClick(event: MouseEvent) {
+	if (!suppressNextRangeClick.value) return
+
+	clearRangeClickSuppressionTimeout()
+	suppressNextRangeClick.value = false
+	event.preventDefault()
+	event.stopImmediatePropagation()
+}
+
+function hasRangeEnd(instance: Instance) {
+	return (
+		instance.selectedDates.length === 2 ||
+		Boolean(instance.calendarContainer.querySelector('.flatpickr-day.endRange:not(.startRange)'))
+	)
+}
+
+function shouldSuppressMissingRangeEndBackground(instance?: Instance) {
+	if (props.mode !== 'range' || !instance) return false
+
+	const hasRangeStart = Boolean(
+		instance.calendarContainer.querySelector('.flatpickr-day.startRange:not(.endRange)'),
+	)
+
+	return hasRangeStart && !hasRangeEnd(instance)
+}
+
+function syncMissingRangeEndState() {
+	const instance = picker.value
+
+	instance?.calendarContainer.classList.toggle(
+		'is-missing-range-end',
+		shouldSuppressMissingRangeEndBackground(instance),
+	)
+}
+
+function isTimeInput(target: EventTarget | null): target is HTMLInputElement {
+	return (
+		target instanceof HTMLInputElement &&
+		target.matches('input.flatpickr-hour, input.flatpickr-minute, input.flatpickr-second')
+	)
+}
+
+function getTimeInputFromArrow(target: EventTarget | null): HTMLInputElement | null {
+	if (!(target instanceof Element)) return null
+	if (!target.classList.contains('arrowUp') && !target.classList.contains('arrowDown')) return null
+
+	return target.closest('.numInputWrapper')?.querySelector<HTMLInputElement>('input') ?? null
+}
+
+function getTimeInputDigits(value: string) {
+	return value.replace(/\D/g, '').slice(0, 2)
+}
+
+function sanitizeTimeInputValue(input: HTMLInputElement) {
+	const nextValue = getTimeInputDigits(input.value)
+	if (input.value === nextValue) return
+
+	const cursorPosition = input.selectionStart ?? nextValue.length
+	const removedBeforeCursor =
+		input.value.slice(0, cursorPosition).length -
+		getTimeInputDigits(input.value.slice(0, cursorPosition)).length
+	const nextCursorPosition = Math.max(0, cursorPosition - removedBeforeCursor)
+
+	input.value = nextValue
+	input.setSelectionRange(nextCursorPosition, nextCursorPosition)
+}
+
+function normalizeTimeInputValue(input: HTMLInputElement) {
+	sanitizeTimeInputValue(input)
+	if (input.value.length === 2) return
+
+	const minValue = Number.parseInt(input.min, 10)
+	const maxValue = Number.parseInt(input.max, 10)
+	const parsedValue = Number.parseInt(input.value, 10)
+	const fallbackValue = Number.isFinite(minValue) ? minValue : 0
+	let nextValue = Number.isFinite(parsedValue) ? parsedValue : fallbackValue
+
+	if (Number.isFinite(minValue)) nextValue = Math.max(nextValue, minValue)
+	if (Number.isFinite(maxValue)) nextValue = Math.min(nextValue, maxValue)
+
+	input.value = String(nextValue).padStart(2, '0')
+}
+
+function normalizeTimeInputForArrowIncrement(event: MouseEvent) {
+	const input = getTimeInputFromArrow(event.target)
+	if (input && isTimeInput(input)) normalizeTimeInputValue(input)
+}
+
+function normalizeTimeInputForKeyboardIncrement(event: KeyboardEvent) {
+	if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return
+	if (isTimeInput(event.target)) normalizeTimeInputValue(event.target)
+}
+
+function preventNonNumericTimeInput(event: InputEvent) {
+	if (!isTimeInput(event.target)) return
+	if (event.data && /\D/.test(event.data)) event.preventDefault()
+}
+
+function preventNonNumericTimeKeydown(event: KeyboardEvent) {
+	if (!isTimeInput(event.target)) return
+	if (event.metaKey || event.ctrlKey || event.altKey) return
+	if (event.key.length === 1 && /\D/.test(event.key)) event.preventDefault()
+}
+
+function sanitizeNumericTimeInput(event: Event) {
+	if (isTimeInput(event.target)) sanitizeTimeInputValue(event.target)
+}
+
+function syncTimeInputTypes(instance: Instance) {
+	const timeInputs = [instance.hourElement, instance.minuteElement, instance.secondElement].filter(
+		(input): input is HTMLInputElement => Boolean(input),
+	)
+
+	for (const input of timeInputs) {
+		input.type = 'text'
+		input.inputMode = 'numeric'
+		input.pattern = '[0-9]*'
+		normalizeTimeInputValue(input)
+	}
+}
+
 const resolvedDateFormat = computed(
 	() => props.dateFormat ?? (props.enableTime ? 'Y-m-d H:i' : 'Y-m-d'),
 )
 const resolvedAltFormat = computed(
 	() => props.altFormat ?? (props.enableTime ? 'F j, Y at h:i K' : 'F j, Y'),
+)
+const resolvedShowMonths = computed(() =>
+	Number.isFinite(props.showMonths) ? Math.max(1, Math.floor(props.showMonths)) : 1,
 )
 
 const inputClasses = computed(() => [
@@ -188,6 +499,7 @@ watch(
 		props.maxDate,
 		props.enableTime,
 		props.mode,
+		props.showMonths,
 		props.dateFormat,
 		props.altFormat,
 		props.time24hr,
@@ -216,6 +528,7 @@ watch(
 		}
 
 		syncAltInputState()
+		syncTimeInputTypes(picker.value)
 		syncPickerFromModel()
 	},
 	{ deep: true },
@@ -232,17 +545,41 @@ onMounted(async () => {
 				instance.jumpToDate(props.defaultViewDate)
 			}
 
+			instance.calendarContainer.addEventListener('pointerdown', startRangeDrag, true)
+			instance.calendarContainer.addEventListener('mousedown', stopRangeEndpointMouseEvent, true)
+			instance.calendarContainer.addEventListener('mouseup', stopRangeEndpointMouseEvent, true)
+			instance.calendarContainer.addEventListener('click', suppressRangeDragClick, true)
+			instance.calendarContainer.addEventListener('mouseover', syncMissingRangeEndState)
+			instance.calendarContainer.addEventListener('mouseleave', syncMissingRangeEndState)
+			instance.calendarContainer.addEventListener(
+				'click',
+				normalizeTimeInputForArrowIncrement,
+				true,
+			)
+			instance.calendarContainer.addEventListener(
+				'keydown',
+				normalizeTimeInputForKeyboardIncrement,
+				true,
+			)
+			instance.calendarContainer.addEventListener('beforeinput', preventNonNumericTimeInput, true)
+			instance.calendarContainer.addEventListener('keydown', preventNonNumericTimeKeydown, true)
+			instance.calendarContainer.addEventListener('input', sanitizeNumericTimeInput, true)
+
 			instance.calendarContainer.addEventListener('mousedown', (event) => {
 				if (props.mode !== 'range') return
 				const target = event.target as HTMLElement | null
-				const dayElem = target?.closest('.flatpickr-day')
+				const dayElem = target?.closest<RangeDayElement>('.flatpickr-day')
 				if (!dayElem) return
-				if (
+
+				if (resolvedShowMonths.value > 1) {
+					if (!isSelectableDay(dayElem)) return
+				} else if (
 					!dayElem.classList.contains('prevMonthDay') &&
 					!dayElem.classList.contains('nextMonthDay')
 				) {
 					return
 				}
+
 				intendedViewMonth.value = {
 					month: instance.currentMonth,
 					year: instance.currentYear,
@@ -265,6 +602,9 @@ onMounted(async () => {
 				},
 				true,
 			)
+
+			syncTimeInputTypes(instance)
+			syncHeaderControlState(instance)
 		},
 		onChange: (_selectedDates, dateStr, instance) => {
 			if (isSyncingFromModel.value) return
@@ -283,6 +623,9 @@ onMounted(async () => {
 					(intendedViewMonth.value.year - instance.currentYear) * 12
 				if (monthDelta !== 0) instance.changeMonth(monthDelta)
 			}
+
+			syncHeaderControlState(instance)
+			syncMissingRangeEndState()
 		},
 		onClose: (_selectedDates, dateStr, instance) => {
 			if (!props.clearable || dateStr) return
@@ -295,14 +638,21 @@ onMounted(async () => {
 		},
 		onMonthChange: (_selectedDates, _dateStr, instance) => {
 			applyPreserveDay(instance)
+			syncHeaderControlState(instance)
+			syncMissingRangeEndState()
 		},
 		onYearChange: (_selectedDates, _dateStr, instance) => {
 			applyPreserveDay(instance)
+			syncHeaderControlState(instance)
+			syncMissingRangeEndState()
 		},
 		onOpen: (_selectedDates, _dateStr, instance) => {
 			if (props.defaultViewDate && instance.selectedDates.length === 0) {
 				instance.jumpToDate(props.defaultViewDate)
 			}
+			syncTimeInputTypes(instance)
+			syncHeaderControlState(instance)
+			syncMissingRangeEndState()
 		},
 	})
 
@@ -313,9 +663,14 @@ onMounted(async () => {
 
 	syncAltInputState()
 	syncPickerFromModel()
+	syncHeaderControlState(picker.value)
 })
 
 onBeforeUnmount(() => {
+	clearRangeClickSuppressionTimeout()
+	document.removeEventListener('pointermove', updateRangeDrag, true)
+	document.removeEventListener('pointerup', stopRangeDrag, true)
+	document.removeEventListener('pointercancel', stopRangeDrag, true)
 	picker.value?.destroy()
 })
 
@@ -336,6 +691,7 @@ function flatpickrOptions(): Options {
 		noCalendar: false,
 		nextArrow: chevronRightIcon,
 		prevArrow: chevronLeftIcon,
+		showMonths: resolvedShowMonths.value,
 		static: true,
 		time_24hr: props.time24hr,
 	}
@@ -346,6 +702,7 @@ function syncPickerFromModel() {
 
 	isSyncingFromModel.value = true
 	picker.value.setDate(selectedDates.value, false, resolvedDateFormat.value)
+	syncTimeInputTypes(picker.value)
 
 	if (intendedViewMonth.value !== null) {
 		const monthDelta =
@@ -357,6 +714,8 @@ function syncPickerFromModel() {
 	}
 
 	isSyncingFromModel.value = false
+	syncHeaderControlState(picker.value)
+	syncMissingRangeEndState()
 }
 
 function syncAltInputState() {
@@ -374,6 +733,7 @@ defineExpose({
 		const nextValue = props.mode === 'single' ? null : []
 		model.value = nextValue
 		picker.value?.clear(false)
+		syncMissingRangeEndState()
 		emit('clear')
 		emit('change', nextValue)
 	},
@@ -386,15 +746,25 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar) {
-	@apply mt-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary;
+	@apply mt-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary select-none;
 	box-sizing: content-box;
 }
 
-.modrinth-date-picker :deep(.flatpickr-innerContainer),
-.modrinth-date-picker :deep(.flatpickr-rContainer),
-.modrinth-date-picker :deep(.flatpickr-days),
 .modrinth-date-picker :deep(.dayContainer) {
 	@apply max-w-[307.875px] min-w-[307.875px] w-[307.875px];
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-rContainer),
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-days) {
+	@apply max-w-none;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-days) {
+	overflow: visible;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .dayContainer + .dayContainer) {
+	box-shadow: none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar::before),
@@ -404,7 +774,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-months),
 .modrinth-date-picker :deep(.flatpickr-month) {
-	@apply items-center h-10 flex mb-1;
+	@apply items-center h-10 flex mb-1 overflow-visible;
 }
 
 .modrinth-date-picker :deep(.flatpickr-month),
@@ -420,11 +790,37 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year),
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply rounded-xl bg-surface-4 px-2 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-8;
+	@apply rounded-xl bg-surface-4 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-10;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply pl-0.5 min-w-28;
+	@apply min-w-28 pl-3 pr-8;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+	background-position: calc(100% - 8px) calc(50%);
+	background-repeat: no-repeat;
+	background-size: 16px 16px;
+}
+.modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months:disabled) {
+	@apply cursor-not-allowed opacity-40 hover:bg-surface-4;
+}
+.modrinth-date-picker :deep(.flatpickr-current-month .numInputWrapper:has(input.cur-year)) {
+	@apply w-[76px];
+}
+.modrinth-date-picker :deep(.flatpickr-current-month input.cur-year) {
+	@apply min-w-[76px] px-2 text-center;
+}
+.modrinth-date-picker
+	:deep(.flatpickr-current-month .numInputWrapper:has(input.cur-year:disabled)) {
+	@apply cursor-not-allowed;
+	background: none;
+}
+.modrinth-date-picker :deep(.flatpickr-current-month input.cur-year:disabled) {
+	@apply opacity-40 bg-surface-4 hover:bg-surface-4;
+}
+.modrinth-date-picker
+	:deep(.flatpickr-current-month .numInputWrapper:has(input.cur-year:disabled) span) {
+	@apply pointer-events-none opacity-0;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year:focus),
@@ -438,6 +834,7 @@ defineExpose({
 .modrinth-date-picker :deep(.numInputWrapper span.arrowDown) {
 	@apply border-0 rounded-br-xl;
 }
+
 .modrinth-date-picker :deep(.numInputWrapper span.arrowUp::after) {
 	border-bottom-color: var(--color-text-secondary);
 }
@@ -448,7 +845,12 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-prev-month),
 .modrinth-date-picker :deep(.flatpickr-next-month) {
-	@apply top-3.5 mx-3.5 flex h-8 w-8 items-center justify-center rounded-xl p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
+	@apply top-2.5 mx-3.5 flex h-10 w-10 items-center justify-center rounded-full p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
+}
+
+.modrinth-date-picker :deep(.flatpickr-prev-month.flatpickr-disabled),
+.modrinth-date-picker :deep(.flatpickr-next-month.flatpickr-disabled) {
+	@apply cursor-not-allowed opacity-40 hover:bg-transparent hover:text-secondary;
 }
 
 .modrinth-date-picker :deep(.flatpickr-prev-month svg),
@@ -468,7 +870,30 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day) {
-	@apply m-0 max-w-none rounded-xl border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast;
+	@apply relative z-0 m-0 max-w-none rounded-full border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
+}
+.modrinth-date-picker
+	:deep(
+		.flatpickr-day:focus:not(:focus-visible):not(.selected):not(.startRange):not(.endRange):not(
+				.inRange
+			)
+	) {
+	@apply border-transparent bg-transparent text-primary outline-none;
+}
+.modrinth-date-picker
+	:deep(.flatpickr-day:focus-visible:not(.selected):not(.startRange):not(.endRange):not(.inRange)) {
+	@apply border-transparent bg-surface-4 text-contrast outline-none;
+}
+.modrinth-date-picker :deep(.flatpickr-day.flatpickr-disabled) {
+	@apply hover:bg-transparent;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day::before) {
+	content: '';
+	position: absolute;
+	inset: 0 0;
+	z-index: -1;
+	background: transparent;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.today) {
@@ -482,19 +907,116 @@ defineExpose({
 .modrinth-date-picker :deep(.flatpickr-day.selected),
 .modrinth-date-picker :deep(.flatpickr-day.startRange),
 .modrinth-date-picker :deep(.flatpickr-day.endRange) {
-	@apply border-brand bg-brand text-brand-inverted !shadow-none hover:border-brand hover:bg-brand hover:text-brand-inverted hover:shadow-none rounded-xl;
+	@apply z-[1] border-brand bg-brand text-brand-inverted !shadow-none hover:border-brand hover:bg-brand hover:text-brand-inverted hover:shadow-none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.inRange) {
-	@apply rounded-none border-x-0 border-y-surface-3 bg-brand-highlight text-contrast shadow-none hover:rounded-none hover:bg-brand-highlight;
+	@apply rounded-none border-transparent bg-transparent text-contrast shadow-none hover:rounded-none hover:border-transparent hover:bg-transparent;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-day.inRange) {
+	box-shadow: none !important;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.inRange::before),
+.modrinth-date-picker :deep(.flatpickr-day.startRange:not(.endRange)::before),
+.modrinth-date-picker :deep(.flatpickr-day.endRange:not(.startRange)::before) {
+	background: var(--color-brand-highlight);
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.inRange::before) {
+	left: -1px;
+	right: -1px;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.inRange:nth-child(7n + 1)::before) {
+	@apply rounded-l-xl;
+	left: 0;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.inRange:nth-child(7n)::before) {
+	@apply rounded-r-xl;
+	right: 0;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.startRange:not(.endRange)) {
-	@apply rounded-r-none border-r-0 border-surface-3;
+	@apply rounded-full border-brand;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.startRange:not(.endRange)::before) {
+	@apply rounded-l-xl;
+	left: 50%;
+	right: -1px;
+}
+
+.modrinth-date-picker
+	:deep(.flatpickr-calendar.is-missing-range-end .flatpickr-day.startRange:not(.endRange)::before),
+.modrinth-date-picker :deep(.flatpickr-calendar.is-missing-range-end .flatpickr-day:hover::before) {
+	background: transparent;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.startRange:nth-child(7n):not(.endRange)::before) {
+	@apply rounded-r-xl;
+	right: 0;
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.endRange:not(.startRange)) {
-	@apply rounded-l-none border-l-0 border-surface-3;
+	@apply rounded-full border-brand;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.endRange:not(.startRange)::before) {
+	@apply rounded-r-xl;
+	left: -1px;
+	right: 50%;
+}
+
+.modrinth-date-picker :deep(.flatpickr-day.endRange:nth-child(7n + 1):not(.startRange)::before) {
+	@apply rounded-l-xl;
+	left: 0;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-day.hidden::before) {
+	display: none;
+}
+
+.modrinth-date-picker
+	:deep(.flatpickr-calendar.multiMonth .flatpickr-day.hidden + .flatpickr-day.inRange::before),
+.modrinth-date-picker
+	:deep(
+		.flatpickr-calendar.multiMonth
+			.flatpickr-day.hidden
+			+ .flatpickr-day.endRange:not(.startRange)::before
+	) {
+	@apply rounded-l-xl;
+	left: 0;
+}
+
+.modrinth-date-picker
+	:deep(.flatpickr-calendar.multiMonth .flatpickr-day.inRange:has(+ .hidden)::before),
+.modrinth-date-picker
+	:deep(
+		.flatpickr-calendar.multiMonth .flatpickr-day.startRange:not(.endRange):has(+ .hidden)::before
+	) {
+	@apply rounded-r-xl;
+	right: 0;
+}
+
+.modrinth-date-picker.can-drag-range
+	:deep(.flatpickr-day.startRange:not(.endRange):not(.flatpickr-disabled)),
+.modrinth-date-picker.can-drag-range
+	:deep(.flatpickr-day.endRange:not(.startRange):not(.flatpickr-disabled)) {
+	cursor: grab;
+}
+
+.modrinth-date-picker.is-dragging-range :deep(.flatpickr-day) {
+	cursor: grabbing !important;
+}
+
+.modrinth-date-picker.is-dragging-range
+	:deep(.flatpickr-day:not(.selected):not(.startRange):not(.endRange):not(.inRange):hover),
+.modrinth-date-picker.is-dragging-range
+	:deep(.flatpickr-day:not(.selected):not(.startRange):not(.endRange):not(.inRange):focus) {
+	@apply border-transparent bg-transparent text-primary;
 }
 
 .modrinth-date-picker
@@ -506,14 +1028,11 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-time) {
-	@apply mt-2 flex h-11 max-h-none items-center gap-2 border-0 border-t border-solid border-surface-5 px-1 pt-2 leading-none;
+	@apply mt-2 flex h-11 max-h-none items-center  gap-2 border-0 border-t border-solid border-surface-5 px-1 pt-2 leading-none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .numInputWrapper) {
 	@apply h-full flex-1 rounded-xl bg-surface-4;
-}
-.modrinth-date-picker :deep(.numInputWrapper:hover) {
-	background: none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time input),
@@ -522,7 +1041,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .flatpickr-time-separator) {
-	@apply flex h-full items-center text-secondary;
+	@apply flex h-full items-center justify-center text-secondary text-center;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .flatpickr-am-pm) {

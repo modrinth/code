@@ -54,7 +54,7 @@
 			:api-url="config.public.apiBaseUrl"
 		/>
 		<header
-			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
+			class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
 			<div>
 				<NuxtLink
@@ -311,7 +311,7 @@
 							{
 								id: 'review-projects',
 								color: 'orange',
-								link: '/moderation/',
+								link: '/moderation',
 							},
 							{
 								id: 'tech-review',
@@ -322,6 +322,11 @@
 								id: 'review-reports',
 								color: 'orange',
 								link: '/moderation/reports',
+							},
+							{
+								id: 'external-projects',
+								color: 'orange',
+								link: '/moderation/external-projects',
 							},
 							{
 								divider: true,
@@ -376,6 +381,9 @@
 						</template>
 						<template #review-reports>
 							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
+						</template>
+						<template #external-projects>
+							<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.externalProjects) }}
 						</template>
 						<template #user-lookup>
 							<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
@@ -705,6 +713,7 @@ import {
 	DropdownIcon,
 	FileIcon,
 	GlassesIcon,
+	GlobeIcon,
 	HamburgerIcon,
 	HomeIcon,
 	IssuesIcon,
@@ -879,6 +888,10 @@ const messages = defineMessages({
 	reports: {
 		id: 'layout.action.reports',
 		defaultMessage: 'Review reports',
+	},
+	externalProjects: {
+		id: 'layout.action.external-projects',
+		defaultMessage: 'External projects',
 	},
 	lookupByEmail: {
 		id: 'layout.action.lookup-by-email',
@@ -1298,7 +1311,8 @@ const { cycle: changeTheme } = useTheme()
 			justify-content: center;
 			padding: 1rem;
 
-			.iconified-button {
+			> button,
+			> a {
 				width: 100%;
 				max-width: 500px;
 				padding: 0.75rem;

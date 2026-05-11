@@ -1298,6 +1298,33 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Please complete tax form"
   },
+  "discover.install.back-to-server": {
+    "message": "Back to server"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Back to setup"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Cancel reset"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "No server world is available for install."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "This content type cannot be installed to a server from browse."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Selecting modpack to install after reset"
+  },
+  "discover.seo.description": {
+    "message": "Search and browse thousands of Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
+  },
+  "discover.seo.title": {
+    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
   },
@@ -1312,6 +1339,12 @@
   },
   "error.collection.404.title": {
     "message": "Collection not found"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "You're currently signed in as:"
+  },
+  "error.generic.401.title": {
+    "message": "You don't have access to this page"
   },
   "error.generic.404.subtitle": {
     "message": "The page you were looking for doesn't seem to exist."
@@ -1739,6 +1772,9 @@
   "layout.action.create-new": {
     "message": "Create new..."
   },
+  "layout.action.external-projects": {
+    "message": "External projects"
+  },
   "layout.action.file-lookup": {
     "message": "File lookup"
   },
@@ -1991,6 +2027,9 @@
   "moderation.moderate": {
     "message": "Moderate"
   },
+  "moderation.page.external-projects": {
+    "message": "External projects"
+  },
   "moderation.page.projects": {
     "message": "Projects"
   },
@@ -1998,7 +2037,7 @@
     "message": "Reports"
   },
   "moderation.page.technicalReview": {
-    "message": "Technical Review"
+    "message": "Tech review"
   },
   "muralpay.account-type.checking": {
     "message": "Checking"
@@ -2684,6 +2723,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Please provide proof that you have permission to redistribute all of the following files and any withheld versions will be automatically published."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Please provide proof that you have permission to redistribute all of the following files before you can submit your project for review."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Unknown embedded content"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "All external content has attributions provided."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Attributions completed!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "None of your versions contain external content, so you don't need to worry about obtaining permissions."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "You're all set!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "You don't have permission to redistribute some of the external content you've added. In order to publish on Modrinth, remove the infringing content."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Some content can't be included"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our guide</link> to learn about how to do this properly!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Learn how attributions work"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Learn more"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Search {count} {count, plural, one {external project} other {external projects}}..."
+  },
   "project.settings.title": {
     "message": "Settings"
   },
@@ -2701,6 +2779,15 @@
   },
   "project.versions.title": {
     "message": "Versions"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {This version is} other {These versions are}} currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included in the modpack {count, plural, one {version} other {versions}}."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Resolve"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Version {version_name}} other {Versions}} withheld due to unknown embedded content"
   },
   "report.already-reported": {
     "message": "You've already reported {title}"
@@ -3070,6 +3157,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
+  },
+  "servers.manage.content.title": {
+    "message": "Content - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "Actions"

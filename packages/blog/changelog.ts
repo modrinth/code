@@ -11,6 +11,202 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-11T20:16:06+00:00`,
+		product: 'app',
+		version: '0.13.15',
+		body: `## Changed
+- Updated translations.
+
+## Fixed
+- Fixed app launch speed being dramatically slowed by having lots of instances.`,
+	},
+	{
+		date: `2026-05-11T20:16:06+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations.
+
+## Fixed
+- Fixed NeoForge version inferring on Minecraft versions 26.1 and newer.
+- Improved how NeoForge Minecraft versions are inferred to support more cases.`,
+	},
+	{
+		date: `2026-05-11T20:16:06+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations.`,
+	},
+	{
+		date: `2026-05-09T21:42:48+00:00`,
+		product: 'app',
+		version: '0.13.14',
+		body: `## Fixed
+- Fixed hidden files showing up in the Content tab on instances.
+- Fixed 'Advanced rendering' option not being applied to most of the interface.`,
+	},
+	{
+		date: `2026-05-09T21:42:48+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Improved stability of content install flow.
+
+## Fixed
+- Fixed content install flow breaking if you refresh the page mid-install.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'app',
+		version: '0.13.13',
+		body: `## Changed
+- Improved the Browse page header so the back button no longer shifts the layout.
+
+## Fixed
+- Fixed instance redirects opening a broken page state.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved performance on search pages.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated Modrinth Hosting content browsing so multiple projects can be selected before installation.
+- After installing selected content, the Modrinth Hosting content page now reopens immediately and shows pending projects as installing.
+- Project icons now appear in the action bar when selecting multiple projects in the Content tab.
+
+## Fixed
+- Fixed selected content and dependencies not staying marked as installing.
+- Fixed page shifts while dependencies resolve during installation.`,
+	},
+	{
+		date: `2026-05-08T09:58:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed some buttons appearing as disabled even when they weren't, such as the project icon settings.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'app',
+		version: '0.13.12',
+		body: `## Changed
+- Updated the modpack exporting experience, fixing issues with it and excluding /mods/.connector from the exports.
+
+## Fixed
+- Fixed page width changing based on if there is scrollable content or not, causing things to move when you switch tabs between scrollable and non-scrollable content.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed failed \`mrpack\` uploads when uploading via the Modrinth App.
+- Fixed support bubble being broken when the console is in full screen/expand mode.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'web',
+		body: `## Changed
+- Project pages now have canonical permalink URLs to hopefully optimize SEO a bit.
+
+## Fixed
+- Fixed error around editing org member permissions.`,
+	},
+	{
+		date: `2026-05-06T22:11:04+00:00`,
+		product: 'app',
+		version: '0.13.11',
+		body: `## Fixed
+- Fixed modpack export including duplicated files as overrides.`,
+	},
+	{
+		date: `2026-05-05T01:34:18+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed unauthorized error when loading a user's own project or organization settings.`,
+	},
+	{
+		date: `2026-05-04T19:57:12+00:00`,
+		product: 'web',
+		body: `## Changed
+- Users who are not members of a project or organization can no longer view settings pages.
+
+## Fixed
+- Fixed some project pages failing to load due to invalid iframe links in their descriptions.`,
+	},
+	{
+		date: `2026-05-04T19:57:12+00:00`,
+		product: 'app',
+		version: '0.13.10',
+		body: `## Fixed
+- Fixed some project pages failing to load due to invalid iframe links in their descriptions.`,
+	},
+	{
+		date: `2026-05-03T18:07:44+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added git.gay as a recognized sources link domain.
+
+## Fixed
+- Fixed useTheme not defined error on project pages.
+- Fixed latest snapshot sometimes appearing a second time outside of a version range.`,
+	},
+	{
+		date: `2026-05-03T18:07:44+00:00`,
+		product: 'app',
+		version: '0.13.9',
+		body: `## Fixed
+- Fixed update notification closing when pressing the Changelog button.
+- Fixed latest snapshot sometimes appearing a second time outside of a version range.`,
+	},
+	{
+		date: `2026-05-02T22:09:01+00:00`,
+		product: 'app',
+		version: '0.13.8',
+		body: `## Fixed
+- Fixed exclude open source filter not working.
+- Fixed Central Europe server region not displaying ping in the Modrinth Hosting region selector.`,
+	},
+	{
+		date: `2026-05-02T22:09:01+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed exclude open source filter not working.
+- Fixed 404 error when returning to collections dashboard from a collection page.
+- Fixed error loading revenue transfer history page.
+- Fixed Central Europe server region not displaying ping in the Modrinth Hosting region selector.`,
+	},
+	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'app',
+		version: '0.13.7',
+		body: `## Added
+- Added a warning when installing unknown modpack files to help prevent users from getting tricked into installing malware.
+
+## Changed
+- Updated the content downloading and installation notifications to be consistent with other types of notifications.
+- Updated the design of the running instances widget in the action bar to be more consistent with our current designs.
+- Increased the click target area of the window control buttons on Windows and Linux.
+- Changed the name of the button for creating an instance with a modpack to make it clearer what it's for.
+
+## Fixed
+- Fixed Java auto-installation not working on macOS.
+- Fix a skin naming error.`,
+	},
+	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Changed the name of the button for installing a modpack to make it clearer what it's for.`,
+	},
+	{
+		date: `2026-04-29T03:54:14+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Server settings save action bar not accessible due to being behind modal.`,
+	},
+	{
 		date: `2026-04-27T19:59:24+00:00`,
 		product: 'app',
 		version: '0.13.6',

@@ -873,7 +873,7 @@
     "message": "你已用尽<b>{withdrawLimit}</b>的提现额度。若需继续提现，请先完成税务表格填写。"
   },
   "dashboard.head-title": {
-    "message": "数据面板"
+    "message": "仪表盘"
   },
   "dashboard.notifications.button.mark-all-as-read": {
     "message": "标记全部已读"
@@ -1113,10 +1113,10 @@
     "message": "分析"
   },
   "dashboard.sidebar.label.creators": {
-    "message": "作者"
+    "message": "创作者"
   },
   "dashboard.sidebar.label.dashboard": {
-    "message": "数据面板"
+    "message": "仪表盘"
   },
   "dashboard.sidebar.label.notifications": {
     "message": "通知"
@@ -1229,6 +1229,24 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "请完成税务表格"
   },
+  "discover.install.back-to-server": {
+    "message": "返回服务器"
+  },
+  "discover.install.back-to-setup": {
+    "message": "返回设置"
+  },
+  "discover.install.cancel-reset": {
+    "message": "取消重置"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "没有可供安装的服务器世界。"
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "无法通过浏览将此内容类型安装到服务器。"
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "重置后选择要安装的 modpack"
+  },
   "error.collection.404.list_item.1": {
     "message": "你可能输错了收藏夹的连接。"
   },
@@ -1243,6 +1261,12 @@
   },
   "error.collection.404.title": {
     "message": "未找到收藏夹"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "你目前登录的账号："
+  },
+  "error.generic.401.title": {
+    "message": "你没有该页面的访问权限"
   },
   "error.generic.404.subtitle": {
     "message": "你在找的页面似乎不存在。"
@@ -1374,7 +1398,7 @@
     "message": "Modrinth Hosting 服务器有多快？"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Modrinth 代理服务器搭载了极为现代的高性能硬件，但要具体反映到你的服务器会有多快，还是很难预测的，因为实际性能受诸多因素影响，例如在你的服务器上运行的模组、数据包、插件，甚至用户行为模式都是影响的因素。"
+    "message": "Modrinth Hosting 服务器搭载了极为现代的高性能硬件，但要具体反映到你的服务器会有多快，还是很难预测的，因为实际性能受诸多因素影响，例如在你的服务器上运行的模组、数据包、插件，甚至用户行为模式都是影响的因素。"
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "大多数性能问题，往往是未优化的整合包、模组、数据包或插件导致服务器卡顿。由于我们的服务器配置非常高端，只要你针对服务器上运行的内容，选择合适的套餐方案，通常不会遇到太大问题。"
@@ -1386,7 +1410,7 @@
     "message": "可以，你可以给你的服务器增加存储空间，而且无需额外费用。如果需要更多存储空间，请联系 Modrinth 支持团队。"
   },
   "hosting-marketing.faq.location": {
-    "message": "Modrinth 代理的服务器位于哪里？我可以选择地区吗？"
+    "message": "Modrinth Hosting 的服务器位于哪里？我可以选择地区吗？"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "目前我们提供北美、欧洲和东南亚的服务器，供你在购买时选择。未来还会增加更多地区！如需更换服务器地区，请联系技术支持。"
@@ -1416,7 +1440,7 @@
     "message": "你的下一个服务器，就交给 Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth 代理可让你以最便捷的方式，托管你专属的 Minecraft Java 版服务器。无缝安装并畅玩你心爱的模组和模组包，全在 Modrinth 平台搞定。"
+    "message": "Modrinth Hosting 可让你以最便捷的方式，托管你专属的 Minecraft Java 版服务器。无缝安装并畅玩你心爱的模组和模组包，全在 Modrinth 平台搞定。"
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "高级网络管理"
@@ -1464,7 +1488,7 @@
     "message": "SFTP 访问"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "通过 Modrinth  代理内置的 SFTP 功能，直接访问你的服务器文件。"
+    "message": "通过 Modrinth Hosting 内置的 SFTP 功能，直接访问你的服务器文件。"
   },
   "hosting-marketing.included.with-your-server": {
     "message": "随服务器一并提供"
@@ -1515,10 +1539,10 @@
     "message": "模组在哪，就在哪玩"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth 代理将模组与整合包的安装流程无缝集成到你的服务器中。"
+    "message": "Modrinth Hosting 将模组与整合包的安装流程无缝集成到你的服务器中。"
   },
   "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "为什么选择 Modrinth代理？"
+    "message": "为什么选择 Modrinth Hosting？"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "你最喜欢的模组都在这里"
@@ -1669,6 +1693,9 @@
   },
   "layout.action.create-new": {
     "message": "新建…"
+  },
+  "layout.action.external-projects": {
+    "message": "外部项目"
   },
   "layout.action.file-lookup": {
     "message": "文件查询"
@@ -1921,6 +1948,9 @@
   },
   "moderation.moderate": {
     "message": "审核"
+  },
+  "moderation.page.external-projects": {
+    "message": "外部项目"
   },
   "moderation.page.projects": {
     "message": "项目"
@@ -2615,6 +2645,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "请提供证明你拥有重新分发以下所有文件的权限，任何未提供的版本将被自动发布。"
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "在提交项目以供审查之前，请提供证明你有权重新分发以下所有文件。"
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "未知的嵌入内容"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "所有外部内容均已注明出处。"
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "署名完成！"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "你的所有版本都不包含外部内容，因此无需担心存在权限问题。"
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "搞定啦！"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "你没有权限重新分发你添加的部分外部内容。为了在 Modrinth 上发布，请移除侵权内容。"
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "某些内容无法被包含"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "如果你使用了非 Modrinth 托管的内容，你需要告知我们这些内容的来源，并证明你有权分发这些文件。请查阅 <link>我们的指南</link> 了解如何正确操作！"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "了解署名机制的工作原理"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "了解详情"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "搜索 {count} 个外部项目……"
+  },
   "project.settings.title": {
     "message": "设置"
   },
@@ -2632,6 +2701,15 @@
   },
   "project.versions.title": {
     "message": "版本"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {此版本已保留且未公开列出。} other {这些版本已保留且未公开列出。}} 请提供证明，证明你有权重新分发该模组包{count, plural, one {版本} other {各版本}}中包含的某些文件。"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "完成"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {版本 {version_name}} other {这些版本}} 因未知嵌入内容被保留"
   },
   "report.already-reported": {
     "message": "你已举报过 {title}"
@@ -3001,6 +3079,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "跟随服务器"
+  },
+  "servers.manage.content.title": {
+    "message": "内容 - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "操作"
@@ -3570,7 +3651,7 @@
     "message": "<strong>开发者模式</strong>已激活。该模式可让你查看 Modrinth 各种对象的内部 ID，对于使用 Modrinth API 的开发者会有所帮助。点击页面底部的 Modrinth 徽标 5 次可开关开发者模式。"
   },
   "settings.display.flags.description": {
-    "message": "对于当前设备，开启或关闭特定功能。"
+    "message": "为当前设备开启或关闭特定功能。"
   },
   "settings.display.flags.title": {
     "message": "功能开关"
@@ -3585,7 +3666,7 @@
     "message": "数据包页面"
   },
   "settings.display.project-list-layouts.description": {
-    "message": "对于当前设备，选择你喜欢的含项目列表页面的布局。"
+    "message": "为当前设备选择你喜欢的含项目列表页面的布局。"
   },
   "settings.display.project-list-layouts.mod": {
     "message": "模组页面"
@@ -3756,7 +3837,7 @@
     "message": "未知平台"
   },
   "settings.sidebar.label.account": {
-    "message": "账户设置"
+    "message": "账户"
   },
   "settings.sidebar.label.developer": {
     "message": "开发者设置"

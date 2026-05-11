@@ -10,23 +10,24 @@
 					<div class="file-header">
 						<ImageIcon aria-hidden="true" />
 						<strong>{{ editFile ? editFile.name : 'Current image' }}</strong>
-						<FileInput
-							v-if="editIndex === -1"
-							class="iconified-button raised-button"
-							prompt="Replace"
-							:accept="acceptFileTypes"
-							:max-size="5242880"
-							should-always-reset
-							aria-label="Replace image"
-							@change="
-								(x) => {
-									editFile = x[0]
-									showPreviewImage()
-								}
-							"
-						>
-							<TransferIcon aria-hidden="true" />
-						</FileInput>
+						<ButtonStyled v-if="editIndex === -1" type="outlined">
+							<FileInput
+								class="button-like"
+								prompt="Replace"
+								:accept="acceptFileTypes"
+								:max-size="5242880"
+								should-always-reset
+								aria-label="Replace image"
+								@change="
+									(x) => {
+										editFile = x[0]
+										showPreviewImage()
+									}
+								"
+							>
+								<TransferIcon aria-hidden="true" />
+							</FileInput>
+						</ButtonStyled>
 					</div>
 					<img
 						:src="
@@ -68,53 +69,42 @@
 					placeholder="Enter order index..."
 				/>
 				<label for="gallery-image-featured">
-					<span class="label__title">Featured</span>
+					<span class="label__title">Banner image</span>
 					<span class="label__description">
-						A featured gallery image shows up in search and your project card. Only one gallery
-						image can be featured.
+						You can feature one image on your project to be used as a banner image.
 					</span>
 				</label>
-				<button
-					v-if="!editFeatured"
-					id="gallery-image-featured"
-					class="iconified-button"
-					@click="editFeatured = true"
-				>
-					<StarIcon aria-hidden="true" />
-					Feature image
-				</button>
-				<button
-					v-else
-					id="gallery-image-featured"
-					class="iconified-button"
-					@click="editFeatured = false"
-				>
-					<StarIcon fill="currentColor" aria-hidden="true" />
-					Unfeature image
-				</button>
+				<ButtonStyled v-if="!editFeatured">
+					<button id="gallery-image-featured" class="w-fit" @click="editFeatured = true">
+						<StarIcon aria-hidden="true" />
+						Set as banner
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else>
+					<button id="gallery-image-featured" class="w-fit" @click="editFeatured = false">
+						<StarIcon fill="currentColor" aria-hidden="true" />
+						Unset as banner
+					</button>
+				</ButtonStyled>
 				<div class="button-group">
-					<button class="iconified-button" @click="modalEditItem?.hide()">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-					<button
-						v-if="editIndex === -1"
-						class="iconified-button brand-button"
-						:disabled="shouldPreventActions"
-						@click="createGalleryItem"
-					>
-						<PlusIcon aria-hidden="true" />
-						Add gallery image
-					</button>
-					<button
-						v-else
-						class="iconified-button brand-button"
-						:disabled="shouldPreventActions"
-						@click="editGalleryItem"
-					>
-						<SaveIcon aria-hidden="true" />
-						Save changes
-					</button>
+					<ButtonStyled type="outlined">
+						<button @click="modalEditItem?.hide()">
+							<XIcon aria-hidden="true" />
+							Cancel
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="editIndex === -1" color="brand">
+						<button :disabled="shouldPreventActions" @click="createGalleryItem">
+							<PlusIcon aria-hidden="true" />
+							Add gallery image
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-else color="brand">
+						<button :disabled="shouldPreventActions" @click="editGalleryItem">
+							<SaveIcon aria-hidden="true" />
+							Save changes
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</Modal>
@@ -155,39 +145,41 @@
 						</p>
 					</div>
 					<div class="controls">
-						<div class="buttons">
-							<button class="close circle-button" @click="expandedGalleryItem = null">
-								<XIcon aria-hidden="true" />
-							</button>
-							<a
-								class="open circle-button"
-								target="_blank"
-								:href="
-									expandedGalleryItem?.raw_url
-										? expandedGalleryItem?.raw_url
-										: 'https://cdn.modrinth.com/placeholder-banner.svg'
-								"
-							>
-								<ExternalIcon aria-hidden="true" />
-							</a>
-							<button class="circle-button" @click="zoomedIn = !zoomedIn">
-								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-								<ContractIcon v-else aria-hidden="true" />
-							</button>
-							<button
-								v-if="filteredGallery.length > 1"
-								class="previous circle-button"
-								@click="previousImage()"
-							>
-								<LeftArrowIcon aria-hidden="true" />
-							</button>
-							<button
-								v-if="filteredGallery.length > 1"
-								class="next circle-button"
-								@click="nextImage()"
-							>
-								<RightArrowIcon aria-hidden="true" />
-							</button>
+						<div class="flex gap-2">
+							<ButtonStyled circular>
+								<button class="close" @click="expandedGalleryItem = null">
+									<XIcon aria-hidden="true" />
+								</button>
+							</ButtonStyled>
+							<ButtonStyled circular>
+								<a
+									class="open"
+									target="_blank"
+									:href="
+										expandedGalleryItem?.raw_url
+											? expandedGalleryItem?.raw_url
+											: 'https://cdn.modrinth.com/placeholder-banner.svg'
+									"
+								>
+									<ExternalIcon aria-hidden="true" />
+								</a>
+							</ButtonStyled>
+							<ButtonStyled circular>
+								<button @click="zoomedIn = !zoomedIn">
+									<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
+									<ContractIcon v-else aria-hidden="true" />
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-if="filteredGallery.length > 1" circular>
+								<button class="previous" @click="previousImage()">
+									<LeftArrowIcon aria-hidden="true" />
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-if="filteredGallery.length > 1" circular>
+								<button class="next" @click="nextImage()">
+									<RightArrowIcon aria-hidden="true" />
+								</button>
+							</ButtonStyled>
 						</div>
 					</div>
 				</div>
@@ -195,17 +187,19 @@
 		</div>
 
 		<div v-if="currentMember && filteredGallery.length" class="card header-buttons">
-			<FileInput
-				:max-size="5242880"
-				:accept="acceptFileTypes"
-				prompt="Upload an image"
-				aria-label="Upload an image"
-				class="iconified-button brand-button"
-				:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
-				@change="handleFiles"
-			>
-				<UploadIcon aria-hidden="true" />
-			</FileInput>
+			<ButtonStyled color="brand">
+				<FileInput
+					:max-size="5242880"
+					:accept="acceptFileTypes"
+					prompt="Upload an image"
+					aria-label="Upload an image"
+					class="button-like"
+					:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
+					@change="handleFiles"
+				>
+					<UploadIcon aria-hidden="true" />
+				</FileInput>
+			</ButtonStyled>
 			<span class="indicator">
 				<InfoIcon aria-hidden="true" /> Click to choose an image or drag one onto this page
 			</span>
@@ -239,35 +233,37 @@
 						{{ formatDate(item.created) }}
 					</div>
 					<div v-if="currentMember" class="gallery-buttons input-group">
-						<button
-							class="iconified-button"
-							@click="
-								() => {
-									resetEdit()
-									editIndex = index
-									editTitle = item.title ?? ''
-									editDescription = item.description ?? ''
-									editFeatured = item.featured
-									editOrder = item.ordering
-									modalEditItem?.show()
-								}
-							"
-						>
-							<EditIcon aria-hidden="true" />
-							Edit
-						</button>
-						<button
-							class="iconified-button"
-							@click="
-								() => {
-									deleteIndex = index
-									modalConfirm?.show()
-								}
-							"
-						>
-							<TrashIcon aria-hidden="true" />
-							Remove
-						</button>
+						<ButtonStyled>
+							<button
+								@click="
+									() => {
+										resetEdit()
+										editIndex = index
+										editTitle = item.title ?? ''
+										editDescription = item.description ?? ''
+										editFeatured = item.featured
+										editOrder = item.ordering
+										modalEditItem?.show()
+									}
+								"
+							>
+								<EditIcon aria-hidden="true" />
+								Edit
+							</button>
+						</ButtonStyled>
+						<ButtonStyled>
+							<button
+								@click="
+									() => {
+										deleteIndex = index
+										modalConfirm?.show()
+									}
+								"
+							>
+								<TrashIcon aria-hidden="true" />
+								Remove
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 			</div>
@@ -304,6 +300,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	ConfirmModal,
 	DropArea,
 	FileInput,
@@ -541,43 +538,6 @@ async function deleteGalleryImage() {
 		width: calc(100vw - 2 * var(--spacing-card-lg));
 		height: calc(100vh - 2 * var(--spacing-card-lg));
 
-		.circle-button {
-			padding: 0.5rem;
-			line-height: 1;
-			display: flex;
-			max-width: 2rem;
-			color: var(--color-button-text);
-			background-color: var(--color-button-bg);
-			border-radius: var(--size-rounded-max);
-			margin: 0;
-			box-shadow: inset 0px -1px 1px rgb(17 24 39 / 10%);
-
-			&:not(:last-child) {
-				margin-right: 0.5rem;
-			}
-
-			&:hover {
-				background-color: var(--color-button-bg-hover) !important;
-
-				svg {
-					color: var(--color-button-text-hover) !important;
-				}
-			}
-
-			&:active {
-				background-color: var(--color-button-bg-active) !important;
-
-				svg {
-					color: var(--color-button-text-active) !important;
-				}
-			}
-
-			svg {
-				height: 1rem;
-				width: 1rem;
-			}
-		}
-
 		.image {
 			position: absolute;
 			left: 50%;
@@ -650,14 +610,6 @@ async function deleteGalleryImage() {
 					transform 0.25s ease-in-out;
 			}
 		}
-	}
-}
-
-.buttons {
-	display: flex;
-
-	button {
-		margin-right: 0.5rem;
 	}
 }
 
@@ -762,10 +714,6 @@ async function deleteGalleryImage() {
 			strong {
 				word-wrap: anywhere;
 			}
-
-			.iconified-button {
-				margin-left: auto;
-			}
 		}
 
 		img {
@@ -777,9 +725,5 @@ async function deleteGalleryImage() {
 			background-color: #000000;
 		}
 	}
-}
-
-.brand-button {
-	color: var(--color-accent-contrast);
 }
 </style>

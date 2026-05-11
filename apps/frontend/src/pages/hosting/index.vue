@@ -603,9 +603,7 @@
 						</h2>
 					</div>
 
-					<div
-						class="experimental-styles-within flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center"
-					>
+					<div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
 						<ButtonStyled color="standard" size="large">
 							<button class="w-full md:w-fit" @click="selectProduct('custom')">
 								{{ formatMessage(messages.getStartedButton) }}
@@ -1249,8 +1247,12 @@ const PING_COUNT = 20
 const PING_INTERVAL = 200
 const MAX_PING_TIME = 1000
 
-function runPingTest(region, index = 1) {
-	if (index > 10) {
+const initialIndex = {
+	'eu-lim': 31,
+}
+
+function runPingTest(region, index = initialIndex[region.shortcode] ?? 1) {
+	if (index > (initialIndex[region.shortcode] ?? 1) + 10) {
 		regionPings.value.push({
 			region: region.shortcode,
 			ping: -1,

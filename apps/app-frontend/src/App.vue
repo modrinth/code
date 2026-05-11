@@ -51,9 +51,10 @@ import {
 	providePageContext,
 	providePopupNotificationManager,
 	useDebugLogger,
+	useFormatBytes,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatBytes, renderString } from '@modrinth/utils'
+import { renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
@@ -68,11 +69,13 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
+import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
+import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
@@ -82,9 +85,9 @@ import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
-import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
+import { useIntercomPositioning } from '@/composables/intercom-positioning'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -124,6 +127,17 @@ import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
 
 const themeStore = useTheming()
+const router = useRouter()
+const route = useRoute()
+const intercomBubblePositioning = useIntercomPositioning({ route, themeStore })
+const {
+	sidebarToggled,
+	forceSidebar,
+	sidebarVisible,
+	intercomBubblePosition,
+	updateIntercomBubbleStyles,
+	clearIntercomBubbleStyles,
+} = intercomBubblePositioning
 
 const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
@@ -133,8 +147,9 @@ const popupNotificationManager = new AppPopupNotificationManager()
 providePopupNotificationManager(popupNotificationManager)
 const { addPopupNotification } = popupNotificationManager
 
+const appVersion = getVersion()
 const tauriApiClient = new TauriModrinthClient({
-	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
+	userAgent: async () => `modrinth/theseus/${await appVersion} (support@modrinth.com)`,
 	labrinthBaseUrl: config.labrinthBaseUrl,
 	archonBaseUrl: config.archonBaseUrl,
 	features: [
@@ -157,6 +172,7 @@ provideModrinthClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
+	...intercomBubblePositioning.pageContext,
 	featureFlags: {
 		serverRamAsBytesAlwaysOn: computed(() =>
 			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
@@ -172,6 +188,7 @@ provideModalBehavior({
 
 const {
 	installationModal,
+	unknownPackWarningModal,
 	fetchExistingInstanceNames,
 	handleCreate,
 	handleBrowseModpacks,
@@ -181,7 +198,7 @@ const {
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
-} = setupProviders(notificationManager)
+} = setupProviders(notificationManager, popupNotificationManager)
 
 const news = ref([])
 const availableSurvey = ref(false)
@@ -240,11 +257,14 @@ onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 	shutdownHostingIntercom()
+	clearIntercomBubbleStyles()
 
 	await unlistenUpdateDownload?.()
 })
 
 const { formatMessage } = useVIntl()
+const formatBytes = useFormatBytes()
+
 const messages = defineMessages({
 	updateInstalledToastTitle: {
 		id: 'app.update.complete-toast.title',
@@ -420,9 +440,6 @@ const handleClose = async () => {
 	await saveWindowState(StateFlags.ALL)
 	await getCurrentWindow().close()
 }
-
-const router = useRouter()
-const route = useRoute()
 
 const loading = setupLoadingStateProvider()
 loading.setEnabled(false)
@@ -641,22 +658,10 @@ const hasPlus = computed(
 		(credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
 )
 
-const sidebarToggled = ref(true)
-
-themeStore.$subscribe(() => {
-	sidebarToggled.value = !themeStore.toggleSidebar
-})
-
-const forceSidebar = computed(
-	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
-)
-const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 const showAd = computed(
 	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
 )
 const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
-const INTERCOM_DEFAULT_PADDING = 20
-const INTERCOM_APP_SIDEBAR_WIDTH = 300
 
 let intercomBooting = false
 let intercomBooted = false
@@ -704,10 +709,8 @@ async function bootIntercom() {
 			intercom_user_jwt: token,
 			session_duration: 1000 * 60 * 60 * 24,
 			alignment: 'right',
-			horizontal_padding: sidebarVisible.value
-				? INTERCOM_APP_SIDEBAR_WIDTH + INTERCOM_DEFAULT_PADDING
-				: INTERCOM_DEFAULT_PADDING,
-			vertical_padding: INTERCOM_DEFAULT_PADDING,
+			horizontal_padding: intercomBubblePosition.value.horizontalPadding,
+			vertical_padding: intercomBubblePosition.value.verticalPadding,
 		})
 		intercomBooted = true
 	} catch (error) {
@@ -725,14 +728,13 @@ function shutdownHostingIntercom() {
 }
 
 watch(
-	sidebarVisible,
-	(visible) => {
+	intercomBubblePosition,
+	(position) => {
+		updateIntercomBubbleStyles(position)
 		if (intercomBooted) {
 			window.Intercom?.('update', {
-				horizontal_padding: visible
-					? INTERCOM_APP_SIDEBAR_WIDTH + INTERCOM_DEFAULT_PADDING
-					: INTERCOM_DEFAULT_PADDING,
-				vertical_padding: INTERCOM_DEFAULT_PADDING,
+				horizontal_padding: position.horizontalPadding,
+				vertical_padding: position.verticalPadding,
 			})
 		}
 	},
@@ -784,7 +786,9 @@ async function handleCommand(e) {
 	if (e.event === 'RunMRPack') {
 		// RunMRPack should directly install a local mrpack given a path
 		if (e.path.endsWith('.mrpack')) {
-			await create_profile_and_install_from_file(e.path).catch(handleError)
+			await create_profile_and_install_from_file(e.path, (createProfile, fileName) =>
+				unknownPackWarningModal.value?.show(createProfile, fileName),
+			).catch(handleError)
 			trackEvent('InstanceCreate', {
 				source: 'CreationModalFileDrop',
 			})
@@ -920,6 +924,7 @@ async function checkUpdates() {
 						{
 							label: formatMessage(updatePopupMessages.changelog),
 							action: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+							keepOpen: true,
 						},
 					],
 				})
@@ -1002,6 +1007,7 @@ async function downloadUpdate(versionToDownload) {
 					{
 						label: formatMessage(updatePopupMessages.changelog),
 						action: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+						keepOpen: true,
 					},
 				],
 			})
@@ -1171,12 +1177,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </script>
 
 <template>
-	<WindowControls />
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
 	<div
 		v-if="stateInitialized"
-		class="app-grid-layout experimental-styles-within relative"
+		class="app-grid-layout relative"
 		:class="{ 'disable-advanced-rendering': !themeStore.advancedRendering }"
 	>
 		<Transition name="fade">
@@ -1211,6 +1216,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
 		/>
+		<UnknownPackWarningModal ref="unknownPackWarningModal" />
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
 		>
@@ -1367,15 +1373,16 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</ButtonStyled>
 				<div class="flex mr-3">
 					<Suspense>
-						<RunningAppBar />
+						<AppActionBar />
 					</Suspense>
 				</div>
+				<WindowControls />
 			</section>
 		</div>
 	</div>
 	<div
 		v-if="stateInitialized"
-		class="app-contents experimental-styles-within"
+		class="app-contents"
 		:class="{
 			'sidebar-enabled': sidebarVisible,
 			'disable-advanced-rendering': !themeStore.advancedRendering,
@@ -1469,7 +1476,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<h3 class="text-base text-primary font-medium m-0">Playing as</h3>
 						<suspense>
-							<AccountsCard ref="accounts" mode="small" />
+							<AccountsCard ref="accounts" />
 						</suspense>
 					</div>
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
@@ -1564,11 +1571,15 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 .app-grid-navbar {
 	grid-area: nav;
+	position: relative;
+	z-index: 2;
 }
 
 .app-grid-statusbar {
 	grid-area: status;
 	padding-right: var(--window-controls-width, 0px);
+	position: relative;
+	z-index: 2;
 }
 
 [data-tauri-drag-region-exclude] {
@@ -1636,6 +1647,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	&.app-contents::before {
 		box-shadow: none;
 	}
+
+	*,
+	:deep(*) {
+		box-shadow: none !important;
+		--tw-drop-shadow:;
+	}
 }
 
 .app-sidebar::before {
@@ -1654,10 +1671,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	height: 100%;
 	overflow: auto;
 	overflow-x: hidden;
+	scrollbar-gutter: stable;
 }
 
 .app-contents::before {
-	z-index: 1;
+	z-index: 30;
 	content: '';
 	position: fixed;
 	left: var(--left-bar-width);
@@ -1765,6 +1783,14 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--os-handle-bg: var(--color-scrollbar) !important;
 	--os-handle-bg-hover: var(--color-scrollbar) !important;
 	--os-handle-bg-active: var(--color-scrollbar) !important;
+}
+
+.intercom-lightweight-app-launcher,
+.intercom-launcher-frame,
+iframe[name='intercom-launcher-frame'] {
+	right: var(--app-support-launcher-right, 20px) !important;
+	bottom: var(--app-support-launcher-bottom, 20px) !important;
+	z-index: 9 !important;
 }
 
 .mac {

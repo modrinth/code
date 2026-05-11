@@ -4,6 +4,7 @@ use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use theseus::DownloadReason;
 use theseus::data::{ContentItem, Dependency, LinkedModpackInfo};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
@@ -249,8 +250,9 @@ pub async fn profile_update_project(
 pub async fn profile_add_project_from_version(
     path: &str,
     version_id: &str,
+    reason: DownloadReason,
 ) -> Result<String> {
-    Ok(profile::add_project_from_version(path, version_id).await?)
+    Ok(profile::add_project_from_version(path, version_id, reason).await?)
 }
 
 // Adds a project to a profile from a path

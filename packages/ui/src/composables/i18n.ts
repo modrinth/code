@@ -30,6 +30,7 @@ export interface LocaleDefinition {
 	name: string
 	translatedName: MessageDescriptor
 	numeric?: Intl.RelativeTimeFormatNumeric
+	compactNumberPlural?: number
 	dir?: 'ltr' | 'rtl'
 	serverLanguageCode?: string
 }
@@ -92,6 +93,7 @@ export const LOCALES: LocaleDefinition[] = [
 		code: 'fil-PH',
 		name: 'Filipino',
 		translatedName: defineMessage({ id: 'locale.fil-PH', defaultMessage: 'Filipino' }),
+		compactNumberPlural: 1,
 		serverLanguageCode: 'tl',
 	},
 	{

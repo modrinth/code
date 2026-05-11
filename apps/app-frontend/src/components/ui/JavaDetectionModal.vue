@@ -15,10 +15,12 @@
 						<span>{{ javaInstall.path }}</span>
 					</div>
 					<div class="table-cell table-text manage">
-						<Button v-if="currentSelected.path === javaInstall.path" disabled
-							><CheckIcon /> Selected</Button
-						>
-						<Button v-else @click="setJavaInstall(javaInstall)"><PlusIcon /> Select</Button>
+						<ButtonStyled v-if="currentSelected.path === javaInstall.path">
+							<button disabled><CheckIcon /> Selected</button>
+						</ButtonStyled>
+						<ButtonStyled v-else>
+							<button @click="setJavaInstall(javaInstall)"><PlusIcon /> Select</button>
+						</ButtonStyled>
 					</div>
 				</div>
 				<div v-if="chosenInstallOptions.length === 0" class="table-row entire-row">
@@ -26,17 +28,19 @@
 				</div>
 			</div>
 			<div class="input-group push-right">
-				<Button @click="$refs.detectJavaModal.hide()">
-					<XIcon />
-					Cancel
-				</Button>
+				<ButtonStyled type="outlined">
+					<button @click="$refs.detectJavaModal.hide()">
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</ModalWrapper>
 </template>
 <script setup>
 import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'

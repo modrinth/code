@@ -109,6 +109,7 @@ pub async fn profile_create(
                 let fetched = crate::util::fetch::fetch(
                     icon,
                     None,
+                    None,
                     &state.fetch_semaphore,
                     &state.pool,
                 )

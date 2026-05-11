@@ -119,9 +119,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "อัปโหลดไฟล์"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "กำลังอัปเดตไฟล์ ({completed}/{total})"
-  },
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "กำลังลบ {progress}/{total}{contentType}..."
   },
@@ -451,9 +448,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "ไม่ผ่าน"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "ถูกระงับ"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "คัดลอกโค้ดไปยังคลิปบอร์ด"

@@ -1,5 +1,5 @@
 <template>
-	<div v-if="user" class="experimental-styles-within">
+	<div v-if="user">
 		<ModalCreation ref="modal_creation" />
 		<CollectionCreateModal ref="modal_collection_creation" />
 		<NewModal ref="editRoleModal" header="Edit role">

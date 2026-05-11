@@ -110,13 +110,13 @@
 				<span>{{ formatMessage(messages.summaryDescription) }}</span>
 			</div>
 			<div class="flex justify-end gap-2.5">
-				<ButtonStyled class="w-24">
+				<ButtonStyled type="outlined">
 					<button @click="cancel">
 						<XIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled color="brand" class="w-32">
+				<ButtonStyled color="brand">
 					<button v-tooltip="missingFieldsTooltip" :disabled="disableCreate" @click="createProject">
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createProject) }}

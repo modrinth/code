@@ -49,8 +49,7 @@ impl ApiProject for ApiV3 {
         let resp = self.create_project(creation_data, pat).await;
         assert_status!(&resp, StatusCode::OK);
 
-        // Approve as admin so fixture setup is not blocked by the moderation-lock guard
-        // (non-admin moderators must hold a lock to move a project out of processing).
+        // Approve as admin so fixture setup is not affected by moderation-lock contention.
         let req = TestRequest::patch()
             .uri(&format!("/v3/project/{slug}"))
             .append_pat(ADMIN_USER_PAT)

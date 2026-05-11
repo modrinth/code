@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Opprett tilknytningslenke"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Ingen tilknytte koder funnet."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Feil ved lasting av tilknytningslenker"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Søk i tilknytningslenker..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "fra{count} {count, plural, one {projekt} other {projekt}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Totale nedlastinger"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Totale følgere"
   },
   "dashboard.collections.button.create-new": {
     "message": "Lag ny"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Dine samlinger"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Søk etter samlinger..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Navn (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Nylig lagde"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Nylig lasta opp"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Last ned {formType}"
@@ -847,6 +871,78 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Du har brukt opp uttakingsgrensa di <b>{withdrawLimit}</b>. Du må fullføre et skatteskjema for å ta flere uttak."
+  },
+  "dashboard.head-title": {
+    "message": "Kontrollpanel"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Marker alt som lest"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Gå gjennom historie"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Du har ingen uleste varslinger."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Error innen lasting av varsler:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Historie"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Varslingshistorie"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Se alle"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Vis varslingshistorie"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Vis {extraNotifs} flere {extraNotifs, plural, one {varsling} other {varslinger}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Laster inn varsler..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Lag organisering"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Lag ei organisering!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Kunne ikke få tak i organiseringer"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {medlem} other {medlemmer}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organiseringer"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Du kan redigere flere prosjekt samtidig ved å velge dem nedafor."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Serverprosjekt støtter ikke massredigering"
+  },
+  "dashboard.projects.empty": {
+    "message": "Du har ingen prosjekt ennå. Klikk på den grønne knappen oppi høgre hjørne for å begynne."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Prosjekt"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "og {count} flere..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Visk vekk lenka"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Rediger lenker"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Endringer blir utført på <strong>{count}</strong> {count, plural, one {prosjekt} other {prosjekt}}."
   },
   "dashboard.revenue.available-now": {
     "message": "Tilgjengelig nå"
@@ -1702,9 +1798,6 @@
   },
   "moderation.page.reports": {
     "message": "Rapporteringer"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Teknisk forhandsvisning"
   },
   "muralpay.account-type.checking": {
     "message": "Sjekking"

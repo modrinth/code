@@ -355,12 +355,12 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_ping_server_success() {
-        let _status = ping_server("mc.hypixel.net", None).await.unwrap();
+        let _status = ping_server("play.cubecraft.net", None).await.unwrap();
     }
 
     #[actix_rt::test]
     async fn test_follow_srv_record() {
-        _ = ping_server("hypixel.net", None).await.unwrap();
+        _ = ping_server("cubecraft.net", None).await.unwrap();
     }
 
     #[actix_rt::test]
@@ -370,7 +370,7 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_ping_zero_timeout() {
-        _ = ping_server("mc.hypixel.net", Some(Duration::ZERO))
+        _ = ping_server("play.cubecraft.net", Some(Duration::ZERO))
             .await
             .unwrap_err();
     }

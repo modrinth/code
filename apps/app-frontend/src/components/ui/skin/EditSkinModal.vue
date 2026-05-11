@@ -25,7 +25,9 @@
 			<div class="flex flex-col gap-4 w-full min-h-[20rem]">
 				<section>
 					<h2 class="text-base font-semibold mb-2">Texture</h2>
-					<Button @click="openUploadSkinModal"> <UploadIcon /> Replace texture </Button>
+					<ButtonStyled>
+						<button @click="openUploadSkinModal"><UploadIcon /> Replace texture</button>
+					</ButtonStyled>
 				</section>
 
 				<section>
@@ -79,7 +81,7 @@
 		</div>
 
 		<div class="flex gap-2 mt-12">
-			<ButtonStyled color="brand" :disabled="disableSave || isSaving">
+			<ButtonStyled color="brand">
 				<button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
 					<SpinnerIcon v-if="isSaving" class="animate-spin" />
 					<CheckIcon v-else-if="mode === 'new'" />
@@ -87,7 +89,9 @@
 					{{ mode === 'new' ? 'Add skin' : 'Save skin' }}
 				</button>
 			</ButtonStyled>
-			<Button :disabled="isSaving" @click="hide"><XIcon />Cancel</Button>
+			<ButtonStyled type="outlined">
+				<button :disabled="isSaving" @click="hide"><XIcon />Cancel</button>
+			</ButtonStyled>
 		</div>
 	</ModalWrapper>
 
@@ -109,7 +113,6 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	Button,
 	ButtonStyled,
 	CapeButton,
 	CapeLikeTextButton,

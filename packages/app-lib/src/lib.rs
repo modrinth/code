@@ -25,6 +25,7 @@ pub use event::{
 };
 pub use logger::start_logger;
 pub use state::State;
+pub use util::fetch::DownloadReason;
 
 pub fn launcher_user_agent() -> String {
     const LAUNCHER_BASE_USER_AGENT: &str =

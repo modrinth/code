@@ -23,14 +23,20 @@
 					I confirm that I have properly addressed the moderators' comments.
 				</Checkbox>
 				<div class="input-group push-right">
-					<button
-						class="iconified-button moderation-button"
-						:disabled="!submissionConfirmation"
-						@click="resubmit()"
-					>
-						<ScaleIcon aria-hidden="true" />
-						Resubmit for review
-					</button>
+					<ButtonStyled color="orange">
+						<button
+							:disabled="!submissionConfirmation || isLoading"
+							@click="runBlockingAction('resubmit-modal', resubmit)"
+						>
+							<SpinnerIcon
+								v-if="loadingAction === 'resubmit-modal'"
+								class="animate-spin"
+								aria-hidden="true"
+							/>
+							<ScaleIcon v-else aria-hidden="true" />
+							Resubmit for review
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</Modal>
@@ -55,14 +61,20 @@
 					I acknowledge that the moderators do not actively monitor the thread.
 				</Checkbox>
 				<div class="input-group push-right">
-					<button
-						class="btn btn-primary"
-						:disabled="!replyConfirmation"
-						@click="sendReplyFromModal()"
-					>
-						<ReplyIcon aria-hidden="true" />
-						Reply to thread
-					</button>
+					<ButtonStyled color="brand">
+						<button
+							:disabled="!replyConfirmation || isLoading"
+							@click="runBlockingAction('reply-modal', () => sendReplyFromModal())"
+						>
+							<SpinnerIcon
+								v-if="loadingAction === 'reply-modal'"
+								class="animate-spin"
+								aria-hidden="true"
+							/>
+							<ReplyIcon v-else aria-hidden="true" />
+							Reply to thread
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</Modal>
@@ -85,10 +97,13 @@
 		</div>
 		<template v-if="report && report.closed">
 			<p>This thread is closed and new messages cannot be sent to it.</p>
-			<button v-if="isStaff(auth.user)" class="iconified-button" @click="reopenReport()">
-				<CheckCircleIcon aria-hidden="true" />
-				Reopen thread
-			</button>
+			<ButtonStyled v-if="isStaff(auth.user)">
+				<button :disabled="isLoading" @click="runBlockingAction('reopen', () => reopenReport())">
+					<SpinnerIcon v-if="loadingAction === 'reopen'" class="animate-spin" aria-hidden="true" />
+					<CheckCircleIcon v-else aria-hidden="true" />
+					Reopen thread
+				</button>
+			</ButtonStyled>
 		</template>
 		<template v-else-if="!report || !report.closed">
 			<div class="markdown-editor-spacing">
@@ -99,196 +114,241 @@
 				/>
 			</div>
 			<div class="input-group">
-				<button
-					v-if="sortedMessages.length > 0"
-					class="btn btn-primary"
-					:disabled="!replyBody"
-					@click="isApproved(project) && !isStaff(auth.user) ? openReplyModal() : sendReply()"
-				>
-					<ReplyIcon aria-hidden="true" />
-					Reply
-				</button>
-				<button
-					v-else
-					class="btn btn-primary"
-					:disabled="!replyBody"
-					@click="isApproved(project) && !isStaff(auth.user) ? openReplyModal() : sendReply()"
-				>
-					<SendIcon aria-hidden="true" />
-					Send
-				</button>
-				<button
-					v-if="isStaff(auth.user)"
-					class="btn"
-					:disabled="!replyBody"
-					@click="sendReply(null, true)"
-				>
-					<ScaleIcon aria-hidden="true" />
-					Add private note
-				</button>
+				<ButtonStyled color="brand">
+					<button
+						v-if="sortedMessages.length > 0"
+						:disabled="!replyBody || isLoading"
+						@click="
+							isApproved(project) && !isStaff(auth.user)
+								? openReplyModal()
+								: runBlockingAction('reply', () => sendReply())
+						"
+					>
+						<SpinnerIcon v-if="loadingAction === 'reply'" class="animate-spin" aria-hidden="true" />
+						<ReplyIcon v-else aria-hidden="true" />
+						Reply
+					</button>
+					<button
+						v-else
+						:disabled="!replyBody || isLoading"
+						@click="
+							isApproved(project) && !isStaff(auth.user)
+								? openReplyModal()
+								: runBlockingAction('send', () => sendReply())
+						"
+					>
+						<SpinnerIcon v-if="loadingAction === 'send'" class="animate-spin" aria-hidden="true" />
+						<SendIcon v-else aria-hidden="true" />
+						Send
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-if="isStaff(auth.user)">
+					<button
+						:disabled="!replyBody || isLoading"
+						@click="runBlockingAction('private-note', () => sendReply(null, true))"
+					>
+						<SpinnerIcon
+							v-if="loadingAction === 'private-note'"
+							class="animate-spin"
+							aria-hidden="true"
+						/>
+						<ScaleIcon v-else aria-hidden="true" />
+						Add private note
+					</button>
+				</ButtonStyled>
 				<template v-if="currentMember && !isStaff(auth.user)">
 					<template v-if="isRejected(project)">
-						<button
-							v-if="replyBody"
-							class="iconified-button moderation-button"
-							@click="openResubmitModal(true)"
-						>
-							<ScaleIcon aria-hidden="true" />
-							Resubmit for review with reply
-						</button>
-						<button
-							v-else
-							class="iconified-button moderation-button"
-							@click="openResubmitModal(false)"
-						>
-							<ScaleIcon aria-hidden="true" />
-							Resubmit for review
-						</button>
+						<ButtonStyled color="orange">
+							<button v-if="replyBody" :disabled="isLoading" @click="openResubmitModal(true)">
+								<ScaleIcon aria-hidden="true" />
+								Resubmit for review with reply
+							</button>
+							<button v-else :disabled="isLoading" @click="openResubmitModal(false)">
+								<ScaleIcon aria-hidden="true" />
+								Resubmit for review
+							</button>
+						</ButtonStyled>
 					</template>
 				</template>
 				<div class="spacer"></div>
 				<div class="input-group extra-options">
 					<template v-if="report">
 						<template v-if="isStaff(auth.user)">
-							<button
-								v-if="replyBody"
-								class="iconified-button danger-button"
-								@click="closeReport(true)"
-							>
-								<CheckCircleIcon aria-hidden="true" />
-								Close with reply
-							</button>
-							<button v-else class="iconified-button danger-button" @click="closeReport()">
-								<CheckCircleIcon aria-hidden="true" />
-								Close thread
-							</button>
+							<ButtonStyled color="red">
+								<button
+									v-if="replyBody"
+									:disabled="isLoading"
+									@click="runBlockingAction('close-with-reply', () => closeReport(true))"
+								>
+									<SpinnerIcon
+										v-if="loadingAction === 'close-with-reply'"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<CheckCircleIcon v-else aria-hidden="true" />
+									Close with reply
+								</button>
+								<button
+									v-else
+									:disabled="isLoading"
+									@click="runBlockingAction('close', () => closeReport())"
+								>
+									<SpinnerIcon
+										v-if="loadingAction === 'close'"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<CheckCircleIcon v-else aria-hidden="true" />
+									Close thread
+								</button>
+							</ButtonStyled>
 						</template>
 					</template>
 					<template v-if="project">
 						<template v-if="isStaff(auth.user)">
-							<button
-								v-if="replyBody"
-								class="btn btn-green"
-								:disabled="isApproved(project)"
-								@click="sendReply(requestedStatus)"
-							>
-								<CheckIcon aria-hidden="true" />
-								Approve with reply
-							</button>
-							<button
-								v-else
-								class="btn btn-green"
-								:disabled="isApproved(project)"
-								@click="setStatus(requestedStatus)"
-							>
-								<CheckIcon aria-hidden="true" />
-								Approve
-							</button>
+							<ButtonStyled v-if="replyBody" color="green">
+								<button
+									:disabled="isApproved(project) || isLoading"
+									@click="runBlockingAction('approve-with-reply', () => sendReply(requestedStatus))"
+								>
+									<SpinnerIcon
+										v-if="loadingAction === 'approve-with-reply'"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<CheckIcon v-else aria-hidden="true" />
+									Approve with reply
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else color="green">
+								<button
+									:disabled="isApproved(project) || isLoading"
+									@click="runBlockingAction('approve', () => setStatus(requestedStatus))"
+								>
+									<SpinnerIcon
+										v-if="loadingAction === 'approve'"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<CheckIcon v-else aria-hidden="true" />
+									Approve
+								</button>
+							</ButtonStyled>
 							<div class="joined-buttons">
-								<button
-									v-if="replyBody"
-									class="btn btn-danger"
-									:disabled="project.status === 'rejected'"
-									@click="sendReply('rejected')"
-								>
-									<XIcon aria-hidden="true" />
-									Reject with reply
-								</button>
-								<button
-									v-else
-									class="btn btn-danger"
-									:disabled="project.status === 'rejected'"
-									@click="setStatus('rejected')"
-								>
-									<XIcon aria-hidden="true" />
-									Reject
-								</button>
-								<OverflowMenu
-									class="btn btn-danger btn-dropdown-animation icon-only"
-									:options="
-										replyBody
-											? [
-													{
-														id: 'withhold-reply',
-														color: 'danger',
-														action: () => {
-															sendReply('withheld')
+								<ButtonStyled v-if="replyBody" color="red">
+									<button
+										:disabled="project.status === 'rejected' || isLoading"
+										@click="runBlockingAction('reject-with-reply', () => sendReply('rejected'))"
+									>
+										<SpinnerIcon
+											v-if="loadingAction === 'reject-with-reply'"
+											class="animate-spin"
+											aria-hidden="true"
+										/>
+										<XIcon v-else aria-hidden="true" />
+										Reject with reply
+									</button>
+								</ButtonStyled>
+								<ButtonStyled v-else color="red">
+									<button
+										:disabled="project.status === 'rejected' || isLoading"
+										@click="runBlockingAction('reject', () => setStatus('rejected'))"
+									>
+										<SpinnerIcon
+											v-if="loadingAction === 'reject'"
+											class="animate-spin"
+											aria-hidden="true"
+										/>
+										<XIcon v-else aria-hidden="true" />
+										Reject
+									</button>
+								</ButtonStyled>
+								<ButtonStyled color="red">
+									<OverflowMenu
+										class="btn-dropdown-animation"
+										:disabled="isLoading"
+										:options="
+											replyBody
+												? [
+														{
+															id: 'withhold-reply',
+															color: 'danger',
+															action: () =>
+																runBlockingAction('withhold-reply', () => sendReply('withheld')),
+															hoverFilled: true,
+															disabled: project.status === 'withheld' || isLoading,
 														},
-														hoverFilled: true,
-														disabled: project.status === 'withheld',
-													},
-													{
-														id: 'set-to-draft-reply',
-														action: () => {
-															sendReply('draft')
+														{
+															id: 'set-to-draft-reply',
+															action: () =>
+																runBlockingAction('set-to-draft-reply', () => sendReply('draft')),
+															hoverFilled: true,
+															disabled: project.status === 'draft' || isLoading,
 														},
-														hoverFilled: true,
-														disabled: project.status === 'draft',
-													},
-													{
-														id: 'send-to-review-reply',
-														action: () => {
-															sendReply('processing', true)
+														{
+															id: 'send-to-review-reply',
+															action: () =>
+																runBlockingAction('send-to-review-reply', () =>
+																	sendReply('processing', true),
+																),
+															hoverFilled: true,
+															disabled: project.status === 'processing' || isLoading,
 														},
-														hoverFilled: true,
-														disabled: project.status === 'processing',
-													},
-												]
-											: [
-													{
-														id: 'withhold',
-														color: 'danger',
-														action: () => {
-															setStatus('withheld')
+													]
+												: [
+														{
+															id: 'withhold',
+															color: 'danger',
+															action: () =>
+																runBlockingAction('withhold', () => setStatus('withheld')),
+															hoverFilled: true,
+															disabled: project.status === 'withheld' || isLoading,
 														},
-														hoverFilled: true,
-														disabled: project.status === 'withheld',
-													},
-													{
-														id: 'set-to-draft',
-														action: () => {
-															setStatus('draft')
+														{
+															id: 'set-to-draft',
+															action: () =>
+																runBlockingAction('set-to-draft', () => setStatus('draft')),
+															hoverFilled: true,
+															disabled: project.status === 'draft' || isLoading,
 														},
-														hoverFilled: true,
-														disabled: project.status === 'draft',
-													},
-													{
-														id: 'send-to-review',
-														action: () => {
-															setStatus('processing')
+														{
+															id: 'send-to-review',
+															action: () =>
+																runBlockingAction('send-to-review', () => setStatus('processing')),
+															hoverFilled: true,
+															disabled: project.status === 'processing' || isLoading,
 														},
-														hoverFilled: true,
-														disabled: project.status === 'processing',
-													},
-												]
-									"
-								>
-									<DropdownIcon style="rotate: 180deg" aria-hidden="true" />
-									<template #withhold-reply>
-										<EyeOffIcon aria-hidden="true" />
-										Withhold with reply
-									</template>
-									<template #withhold>
-										<EyeOffIcon aria-hidden="true" />
-										Withhold
-									</template>
-									<template #set-to-draft-reply>
-										<FileTextIcon aria-hidden="true" />
-										Set to draft with reply
-									</template>
-									<template #set-to-draft>
-										<FileTextIcon aria-hidden="true" />
-										Set to draft
-									</template>
-									<template #send-to-review-reply>
-										<ScaleIcon aria-hidden="true" />
-										Send to review with reply
-									</template>
-									<template #send-to-review>
-										<ScaleIcon aria-hidden="true" />
-										Send to review
-									</template>
-								</OverflowMenu>
+													]
+										"
+									>
+										<SpinnerIcon v-if="isDropdownLoading" class="animate-spin" aria-hidden="true" />
+										<DropdownIcon v-else aria-hidden="true" />
+										<template #withhold-reply>
+											<EyeOffIcon aria-hidden="true" />
+											Withhold with reply
+										</template>
+										<template #withhold>
+											<EyeOffIcon aria-hidden="true" />
+											Withhold
+										</template>
+										<template #set-to-draft-reply>
+											<FileTextIcon aria-hidden="true" />
+											Set to draft with reply
+										</template>
+										<template #set-to-draft>
+											<FileTextIcon aria-hidden="true" />
+											Set to draft
+										</template>
+										<template #send-to-review-reply>
+											<ScaleIcon aria-hidden="true" />
+											Send to review with reply
+										</template>
+										<template #send-to-review>
+											<ScaleIcon aria-hidden="true" />
+											Send to review
+										</template>
+									</OverflowMenu>
+								</ButtonStyled>
 							</div>
 						</template>
 					</template>
@@ -308,9 +368,11 @@ import {
 	ReplyIcon,
 	ScaleIcon,
 	SendIcon,
+	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Checkbox,
 	CopyCode,
 	injectNotificationManager,
@@ -385,6 +447,30 @@ const sortedMessages = computed(() => {
 const modalSubmit = ref(null)
 const modalReply = ref(null)
 
+const loadingAction = ref(null)
+const isLoading = computed(() => loadingAction.value !== null)
+const dropdownActionIds = [
+	'withhold',
+	'withhold-reply',
+	'set-to-draft',
+	'set-to-draft-reply',
+	'send-to-review',
+	'send-to-review-reply',
+]
+const isDropdownLoading = computed(() => dropdownActionIds.includes(loadingAction.value))
+
+async function runBlockingAction(actionId, action) {
+	if (loadingAction.value !== null) {
+		return
+	}
+	loadingAction.value = actionId
+	try {
+		await action()
+	} finally {
+		loadingAction.value = null
+	}
+}
+
 async function updateThreadLocal() {
 	let threadId = null
 	if (props.project) {
@@ -412,8 +498,8 @@ async function onUploadImage(file) {
 }
 
 async function sendReplyFromModal(status = null, privateMessage = false) {
-	modalReply.value.hide()
 	await sendReply(status, privateMessage)
+	modalReply.value.hide()
 }
 
 async function sendReply(status = null, privateMessage = false) {

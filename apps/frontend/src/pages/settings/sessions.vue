@@ -34,9 +34,11 @@
 			</div>
 			<div class="input-group">
 				<i v-if="session.current">{{ formatMessage(messages.currentSessionLabel) }}</i>
-				<button v-else class="iconified-button raised-button" @click="revokeSession(session.id)">
-					<XIcon /> {{ formatMessage(messages.revokeSessionButton) }}
-				</button>
+				<ButtonStyled v-else>
+					<button @click="revokeSession(session.id)">
+						<XIcon /> {{ formatMessage(messages.revokeSessionButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</div>
@@ -44,6 +46,7 @@
 <script setup>
 import { XIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	commonMessages,
 	commonSettingsMessages,
 	defineMessages,

@@ -3,6 +3,7 @@ use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::PgPool;
 use crate::database::models::DBModerationLock;
+use crate::database::models::moderation_external_item;
 use crate::database::redis::RedisPool;
 use crate::models::ids::OrganizationId;
 use crate::models::projects::{Project, ProjectStatus};
@@ -20,6 +21,7 @@ use ownership::get_projects_ownership;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+mod external_license;
 mod ownership;
 mod tech_review;
 
@@ -36,6 +38,10 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(
             utoipa_actix_web::scope("/tech-review")
                 .configure(tech_review::config),
+        )
+        .service(
+            utoipa_actix_web::scope("/external-license")
+                .configure(external_license::config),
         );
 }
 
@@ -412,7 +418,7 @@ async fn set_project_meta(
     session_queue: web::Data<AuthQueue>,
     judgements: web::Json<HashMap<String, Judgement>>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    let user = check_is_moderator_from_headers(
         &req,
         &**pool,
         &redis,
@@ -423,14 +429,10 @@ async fn set_project_meta(
 
     let mut transaction = pool.begin().await?;
 
-    let mut ids = Vec::new();
-    let mut titles = Vec::new();
-    let mut statuses = Vec::new();
-    let mut links = Vec::new();
-    let mut proofs = Vec::new();
-    let mut flame_ids = Vec::new();
-
+    let mut licenses = Vec::new();
     let mut file_hashes = Vec::new();
+    let mut file_filenames = Vec::new();
+    let mut file_license_ids = Vec::new();
 
     for (hash, judgement) in judgements.0 {
         let id = random_base62(8);
@@ -456,41 +458,38 @@ async fn set_project_meta(
             } => (title, status, link, proof, None),
         };
 
-        ids.push(id as i64);
-        titles.push(title);
-        statuses.push(status.as_str());
-        links.push(link);
-        proofs.push(proof);
-        flame_ids.push(flame_id);
+        licenses.push(moderation_external_item::ExternalLicense {
+            id: id as i64,
+            title,
+            status: status.as_str().to_string(),
+            link,
+            proof,
+            flame_project_id: flame_id,
+        });
         file_hashes.push(hash);
+        file_filenames.push(None);
+        file_license_ids.push(id as i64);
     }
 
-    sqlx::query(
-    "
-        INSERT INTO moderation_external_licenses (id, title, status, link, proof, flame_project_id)
-        SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::varchar[], $4::varchar[], $5::varchar[], $6::integer[])
-        "
-    )
-        .bind(&ids[..])
-        .bind(&titles[..])
-        .bind(&statuses[..])
-        .bind(&links[..])
-        .bind(&proofs[..])
-        .bind(&flame_ids[..])
-        .execute(&mut transaction)
-        .await?;
+    let user_id = database::models::ids::DBUserId::from(user.id);
 
-    sqlx::query(
-        "
-        INSERT INTO moderation_external_files (sha1, external_license_id)
-        SELECT * FROM UNNEST ($1::bytea[], $2::bigint[])
-        ON CONFLICT (sha1)
-        DO NOTHING
-        ",
+    moderation_external_item::ExternalLicense::insert_many(
+        &mut transaction,
+        &licenses,
+        user_id,
     )
-    .bind(&file_hashes[..])
-    .bind(&ids[..])
-    .execute(&mut transaction)
+    .await?;
+
+    moderation_external_item::ExternalLicense::insert_files(
+        &mut transaction,
+        &file_hashes
+            .iter()
+            .map(|x| x.as_bytes().to_vec())
+            .collect::<Vec<_>>(),
+        &file_filenames,
+        &file_license_ids,
+        user_id,
+    )
     .await?;
 
     transaction.commit().await?;

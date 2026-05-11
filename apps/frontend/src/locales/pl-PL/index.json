@@ -1229,6 +1229,9 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Wypełnij formularz podatkowy"
   },
+  "discover.install.cancel-reset": {
+    "message": "Anuluj resetowanie"
+  },
   "error.collection.404.list_item.1": {
     "message": "Mogłeś źle napisać URL kolekcji."
   },
@@ -1243,6 +1246,12 @@
   },
   "error.collection.404.title": {
     "message": "Nie znaleziono kolekcji"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Jesteś obecnie zalogowany jako:"
+  },
+  "error.generic.401.title": {
+    "message": "Nie masz dostępu do tej strony"
   },
   "error.generic.404.subtitle": {
     "message": "Strona, której szukasz, prawdopodobnie nie istnieje."
@@ -1670,6 +1679,9 @@
   "layout.action.create-new": {
     "message": "Stwórz nowy..."
   },
+  "layout.action.external-projects": {
+    "message": "Zewnętrzne projekty"
+  },
   "layout.action.file-lookup": {
     "message": "Wyszukiwarka plików"
   },
@@ -1921,6 +1933,9 @@
   },
   "moderation.moderate": {
     "message": "Moderuj"
+  },
+  "moderation.page.external-projects": {
+    "message": "Zewnętrzne projekty"
   },
   "moderation.page.projects": {
     "message": "Projekty"
@@ -2615,6 +2630,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Prosimy o dostarczenie dowodu, że posiadasz pozwolenie na rozpowszechnianie wszystkich poniższych plików, a wszelkie wstrzymane wersje zostaną automatycznie opublikowane."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Przed przesłaniem projektu do oceny prosimy o pokazanie, że posiadasz pozwolenie na rozpowszechnianie wszystkich poniższych plików."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Nieznana osadzona treść"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Wszystkie zewnętrzne treści mają podane źródła."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Atrybuty przypisane!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Żadna z Twoich wersji nie zawiera treści zewnętrznych, więc nie musisz martwić się o uzyskanie zezwoleń."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Wszystko gotowe!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Nie masz uprawnień do redystrybucji części dodanych przez siebie treści zewnętrznych. Aby publikować na Modrinth, usuń treści naruszające prawa autorskie."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Niektórych treści nie można uwzględnić"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Jeśli zamieszczasz treści, które nie są hostowane na Modrinth, musisz poinformować nas, skąd pochodzą i potwierdzić, że masz pozwolenie na ich dystrybucję. Sprawdź <link>nasz poradnik</link>, aby dowiedzieć się, jak to zrobić poprawnie!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Dowiedz się, jak działają atrybuty"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Dowiedz się więcej"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Szukaj w {count} {count, plural, one {projekcie zewnętrznym} other {projektach zewnętrznych}}..."
+  },
   "project.settings.title": {
     "message": "Ustawienia"
   },
@@ -2632,6 +2686,15 @@
   },
   "project.versions.title": {
     "message": "Wersje"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Ta wersja jest} other {Te wersje są}} obecnie wstrzymane i nie widnieją na publicznej liście. Proszę o przesłanie potwierdzenia posiadania zgody na redystrybucję określonych plików zawartych w {count, plural, one {tej wersji} other {tych wersjach}} modpacka."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Rozwiąż"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Wersja {version_name}} other {Wersje}} wstrzymane ze względu na nieznaną osadzoną zawartość"
   },
   "report.already-reported": {
     "message": "Zgłosiłeś już {title}"

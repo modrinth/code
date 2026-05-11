@@ -1,6 +1,6 @@
 <script setup>
 import { BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager, Slider, StyledInput } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager, Slider, StyledInput } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref, watch } from 'vue'
 
@@ -73,9 +73,11 @@ async function findLauncherDir() {
 				wrapper-class="w-full"
 			>
 				<template #right>
-					<Button class="ml-1.5" @click="findLauncherDir">
-						<FolderSearchIcon />
-					</Button>
+					<ButtonStyled circular>
+						<button class="ml-1.5" @click="findLauncherDir">
+							<FolderSearchIcon />
+						</button>
+					</ButtonStyled>
 				</template>
 			</StyledInput>
 			<p class="m-0 leading-tight text-secondary">

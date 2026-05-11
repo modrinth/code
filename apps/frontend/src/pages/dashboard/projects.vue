@@ -7,68 +7,77 @@
 					<label for="issue-tracker-input" :title="formatMessage(messages.issueTrackerDescription)">
 						<span class="label__title">{{ formatMessage(messages.issueTrackerLabel) }}</span>
 					</label>
-					<div class="input-group shrink-first">
+					<div class="flex gap-2">
 						<StyledInput
 							id="issue-tracker-input"
 							v-model="editLinks.issues.val"
 							:disabled="editLinks.issues.clear"
 							type="url"
+							class="w-full"
 							:placeholder="getLinkInputPlaceholder(editLinks.issues.clear)"
 							:maxlength="2048"
 						/>
-						<button
-							v-tooltip="formatMessage(messages.clearLinkLabel)"
-							:aria-label="formatMessage(messages.clearLinkLabel)"
-							class="square-button label-button"
-							:data-active="editLinks.issues.clear"
-							@click="editLinks.issues.clear = !editLinks.issues.clear"
-						>
-							<TrashIcon />
-						</button>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="formatMessage(messages.clearLinkLabel)"
+								class="label-button"
+								:aria-label="formatMessage(messages.clearLinkLabel)"
+								:data-active="editLinks.issues.clear"
+								@click="editLinks.issues.clear = !editLinks.issues.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 					<label for="source-code-input" :title="formatMessage(messages.sourceCodeDescription)">
 						<span class="label__title">{{ formatMessage(messages.sourceCodeLabel) }}</span>
 					</label>
-					<div class="input-group shrink-first">
+					<div class="flex gap-2">
 						<StyledInput
 							id="source-code-input"
 							v-model="editLinks.source.val"
 							:disabled="editLinks.source.clear"
 							type="url"
+							class="w-full"
 							:maxlength="2048"
 							:placeholder="getLinkInputPlaceholder(editLinks.source.clear)"
 						/>
-						<button
-							v-tooltip="formatMessage(messages.clearLinkLabel)"
-							:aria-label="formatMessage(messages.clearLinkLabel)"
-							class="square-button label-button"
-							:data-active="editLinks.source.clear"
-							@click="editLinks.source.clear = !editLinks.source.clear"
-						>
-							<TrashIcon />
-						</button>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="formatMessage(messages.clearLinkLabel)"
+								class="label-button"
+								:aria-label="formatMessage(messages.clearLinkLabel)"
+								:data-active="editLinks.source.clear"
+								@click="editLinks.source.clear = !editLinks.source.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 					<label for="wiki-page-input" :title="formatMessage(messages.wikiPageDescription)">
 						<span class="label__title">{{ formatMessage(messages.wikiPageLabel) }}</span>
 					</label>
-					<div class="input-group shrink-first">
+					<div class="flex gap-2">
 						<StyledInput
 							id="wiki-page-input"
 							v-model="editLinks.wiki.val"
 							:disabled="editLinks.wiki.clear"
 							type="url"
+							class="w-full"
 							:maxlength="2048"
 							:placeholder="getLinkInputPlaceholder(editLinks.wiki.clear)"
 						/>
-						<button
-							v-tooltip="formatMessage(messages.clearLinkLabel)"
-							:aria-label="formatMessage(messages.clearLinkLabel)"
-							class="square-button label-button"
-							:data-active="editLinks.wiki.clear"
-							@click="editLinks.wiki.clear = !editLinks.wiki.clear"
-						>
-							<TrashIcon />
-						</button>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="formatMessage(messages.clearLinkLabel)"
+								class="label-button"
+								:aria-label="formatMessage(messages.clearLinkLabel)"
+								:data-active="editLinks.wiki.clear"
+								@click="editLinks.wiki.clear = !editLinks.wiki.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 					<label
 						for="discord-invite-input"
@@ -76,24 +85,27 @@
 					>
 						<span class="label__title">{{ formatMessage(messages.discordInviteLabel) }}</span>
 					</label>
-					<div class="input-group shrink-first">
+					<div class="flex gap-2">
 						<StyledInput
 							id="discord-invite-input"
 							v-model="editLinks.discord.val"
 							:disabled="editLinks.discord.clear"
+							class="w-full"
 							type="url"
 							:maxlength="2048"
 							:placeholder="getLinkInputPlaceholder(editLinks.discord.clear, true)"
 						/>
-						<button
-							v-tooltip="formatMessage(messages.clearLinkLabel)"
-							:aria-label="formatMessage(messages.clearLinkLabel)"
-							class="square-button label-button"
-							:data-active="editLinks.discord.clear"
-							@click="editLinks.discord.clear = !editLinks.discord.clear"
-						>
-							<TrashIcon />
-						</button>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="formatMessage(messages.clearLinkLabel)"
+								class="label-button"
+								:aria-label="formatMessage(messages.clearLinkLabel)"
+								:data-active="editLinks.discord.clear"
+								@click="editLinks.discord.clear = !editLinks.discord.clear"
+							>
+								<TrashIcon />
+							</button>
+						</ButtonStyled>
 					</div>
 				</section>
 				<p>
@@ -128,15 +140,19 @@
 					:label="formatMessage(messages.showAllProjects)"
 					:description="formatMessage(messages.showAllProjects)"
 				/>
-				<div class="push-right input-group">
-					<button class="iconified-button" @click="$refs.editLinksModal.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-					<button class="iconified-button brand-button" @click="bulkEditLinks()">
-						<SaveIcon />
-						{{ formatMessage(commonMessages.saveChangesButton) }}
-					</button>
+				<div class="input-group ml-auto mt-4">
+					<ButtonStyled type="outlined">
+						<button @click="$refs.editLinksModal.hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button @click="bulkEditLinks()">
+							<SaveIcon />
+							{{ formatMessage(commonMessages.saveChangesButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</NewModal>
@@ -145,10 +161,12 @@
 			<div class="header__row">
 				<h2 class="header__title text-2xl">{{ formatMessage(messages.headTitle) }}</h2>
 				<div class="input-group">
-					<button class="iconified-button brand-button" @click="$refs.modal_creation.show($event)">
-						<PlusIcon />
-						{{ formatMessage(commonMessages.createAProjectButton) }}
-					</button>
+					<ButtonStyled color="brand">
+						<button @click="$refs.modal_creation.show($event)">
+							<PlusIcon />
+							{{ formatMessage(commonMessages.createAProjectButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 			<p v-if="projects.length < 1">
@@ -157,14 +175,12 @@
 			<template v-else>
 				<p>{{ formatMessage(messages.bulkEditHint) }}</p>
 				<div class="input-group">
-					<button
-						class="iconified-button"
-						:disabled="selectedProjects.length === 0"
-						@click="$refs.editLinksModal.show()"
-					>
-						<EditIcon />
-						{{ formatMessage(messages.editLinksButton) }}
-					</button>
+					<ButtonStyled>
+						<button :disabled="selectedProjects.length === 0" @click="$refs.editLinksModal.show()">
+							<EditIcon />
+							{{ formatMessage(messages.editLinksButton) }}
+						</button>
+					</ButtonStyled>
 					<div class="push-right">
 						<div class="labeled-control-row">
 							{{ formatMessage(commonMessages.sortByLabel) }}
@@ -175,14 +191,15 @@
 								:options="sortOptions"
 								@update:model-value="projects = updateSort(projects, sortBy, descending)"
 							/>
-							<button
-								v-tooltip="formatMessage(descending ? messages.descending : messages.ascending)"
-								class="square-button"
-								@click="updateDescending()"
-							>
-								<SortDescIcon v-if="descending" />
-								<SortAscIcon v-else />
-							</button>
+							<ButtonStyled circular>
+								<button
+									v-tooltip="formatMessage(descending ? messages.descending : messages.ascending)"
+									@click="updateDescending()"
+								>
+									<SortDescIcon v-if="descending" />
+									<SortAscIcon v-else />
+								</button>
+							</ButtonStyled>
 						</div>
 					</div>
 				</div>

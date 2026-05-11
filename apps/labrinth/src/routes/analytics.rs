@@ -252,9 +252,8 @@ struct MinecraftProfile {
 #[derive(Deserialize)]
 pub struct MinecraftJavaServerPlayInput {
     project_id: ProjectId,
-    username: Option<String>,
-    server_id: Option<String>,
-    minecraft_uuid: Option<Uuid>,
+    username: String,
+    server_id: String,
 }
 
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
@@ -292,44 +291,36 @@ async fn minecraft_server_play_ingest(
         )));
     }
 
-    let minecraft_uuid = if let (Some(username), Some(server_id)) =
-        (&play_input.username, &play_input.server_id)
+    let has_joined = http
+        .get("https://sessionserver.mojang.com/session/minecraft/hasJoined")
+        .query(&[
+            ("username", play_input.username.as_str()),
+            ("serverId", play_input.server_id.as_str()),
+        ])
+        .send()
+        .await
+        .wrap_internal_err("failed to contact Mojang session server")?;
+
+    if has_joined.status() == reqwest::StatusCode::NO_CONTENT
+        || !has_joined.status().is_success()
     {
-        let has_joined = http
-            .get("https://sessionserver.mojang.com/session/minecraft/hasJoined")
-            .query(&[
-                ("username", username.as_str()),
-                ("serverId", server_id.as_str()),
-            ])
-            .send()
-            .await
-            .wrap_internal_err("failed to contact Mojang session server")?;
+        return Err(ApiError::Request(eyre!(
+            "Minecraft session verification failed"
+        )));
+    }
 
-        if has_joined.status() == reqwest::StatusCode::NO_CONTENT
-            || !has_joined.status().is_success()
-        {
-            return Err(ApiError::Request(eyre!(
-                "Minecraft session verification failed"
-            )));
-        }
+    let profile = has_joined
+        .json::<MinecraftProfile>()
+        .await
+        .wrap_internal_err("invalid Mojang session response")?;
 
-        let profile = has_joined
-            .json::<MinecraftProfile>()
-            .await
-            .wrap_internal_err("invalid Mojang session response")?;
+    if profile.name != play_input.username {
+        return Err(ApiError::Request(eyre!(
+            "returned Mojang profile name does not match username"
+        )));
+    }
 
-        if profile.name != *username {
-            return Err(ApiError::Request(eyre!(
-                "returned Mojang profile name does not match username"
-            )));
-        }
-
-        profile.id
-    } else {
-        play_input
-            .minecraft_uuid
-            .wrap_request_err("missing `minecraft_uuid`")?
-    };
+    let minecraft_uuid = profile.id;
 
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
     let headers = req

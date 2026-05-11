@@ -417,6 +417,25 @@ struct InitialScanFile {
     cache_key: String,
 }
 
+fn is_scannable_project_file(
+    project_type: ProjectType,
+    file_name: &str,
+) -> bool {
+    let Some(extension) = Path::new(file_name.trim_end_matches(".disabled"))
+        .extension()
+        .and_then(|ext| ext.to_str())
+    else {
+        return false;
+    };
+
+    match project_type {
+        ProjectType::Mod => extension.eq_ignore_ascii_case("jar"),
+        ProjectType::DataPack
+        | ProjectType::ResourcePack
+        | ProjectType::ShaderPack => extension.eq_ignore_ascii_case("zip"),
+    }
+}
+
 impl Profile {
     pub async fn get(
         path: &str,
@@ -648,8 +667,10 @@ impl Profile {
                             && let Some(file_name) = subdirectory
                                 .file_name()
                                 .and_then(|x| x.to_str())
-                            && !(project_type == ProjectType::ShaderPack
-                                && file_name.ends_with(".txt"))
+                            && is_scannable_project_file(
+                                project_type,
+                                file_name,
+                            )
                         {
                             let file_size = subdirectory
                                 .metadata()
@@ -951,15 +972,13 @@ impl Profile {
             InitialScanFile,
         > = keys.into_iter().map(|k| (k.path.clone(), k)).collect();
 
-        let mut file_info_by_hash: std::collections::HashMap<
-            String,
-            CachedFile,
-        > = file_info.into_iter().map(|f| (f.hash.clone(), f)).collect();
+        let file_info_by_hash: std::collections::HashMap<String, CachedFile> =
+            file_info.into_iter().map(|f| (f.hash.clone(), f)).collect();
 
         let files = DashMap::new();
 
         for hash in file_hashes {
-            let file = file_info_by_hash.remove(&hash.hash);
+            let file = file_info_by_hash.get(&hash.hash).cloned();
             let trimmed = hash.path.trim_end_matches(".disabled");
 
             if let Some(initial_file) = keys_by_path.remove(trimmed) {
@@ -1054,8 +1073,7 @@ impl Profile {
                     if subdirectory.is_file()
                         && let Some(file_name) =
                             subdirectory.file_name().and_then(|x| x.to_str())
-                        && !(project_type == ProjectType::ShaderPack
-                            && file_name.ends_with(".txt"))
+                        && is_scannable_project_file(project_type, file_name)
                     {
                         let file_size = subdirectory
                             .metadata()
@@ -1110,10 +1128,25 @@ impl Profile {
     pub async fn add_project_version(
         profile_path: &str,
         version_id: &str,
+        reason: util::fetch::DownloadReason,
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
         io_semaphore: &IoSemaphore,
     ) -> crate::Result<String> {
+        let profile =
+            Self::get(profile_path, pool).await?.ok_or_else(|| {
+                crate::ErrorKind::UnmanagedProfileError(
+                    profile_path.to_string(),
+                )
+                .as_error()
+            })?;
+
+        let download_meta = util::fetch::DownloadMeta {
+            reason,
+            game_version: profile.game_version.clone(),
+            loader: profile.loader.as_str().to_string(),
+        };
+
         let version =
             CachedEntry::get_version(version_id, None, pool, fetch_semaphore)
                 .await?
@@ -1139,6 +1172,7 @@ impl Profile {
         let bytes = util::fetch::fetch(
             &file.url,
             file.hashes.get("sha1").map(|x| &**x),
+            Some(&download_meta),
             fetch_semaphore,
             pool,
         )
