@@ -148,7 +148,7 @@ export const TwoMonthCalendarOnlyRange: Story = {
 	}),
 }
 
-export const DraggableRange: Story = {
+export const AdjustableRange: Story = {
 	render: () => ({
 		components: { DatePicker },
 		setup() {
@@ -173,6 +173,9 @@ export const DraggableRange: Story = {
 					placeholder="Select a date range..."
 				/>
 				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+				<p class="text-xs text-secondary">
+					Drag either endpoint, or click an endpoint, hover to preview, and click another day to move it.
+				</p>
 			</div>
 		`,
 	}),

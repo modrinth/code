@@ -6,8 +6,11 @@
 			calendarOnly ? 'calendar-only' : '',
 			disabled ? 'cursor-not-allowed opacity-50' : '',
 			showToday ? 'show-today' : '',
+			props.mode === 'range' && selectedDates.length < 2 ? 'can-select-range' : '',
+			props.mode === 'range' && selectedDates.length === 1 ? 'is-selecting-range' : '',
 			props.mode === 'range' && selectedDates.length === 2 ? 'can-drag-range' : '',
 			rangeDragState ? 'is-dragging-range' : '',
+			rangeEndpointMoveState ? 'is-moving-range-end' : '',
 		]"
 	>
 		<CalendarIcon
@@ -51,6 +54,13 @@ type RangeDragState = {
 	draggedEndpointDate: Date
 	pointerId: number
 	lastDateTime: number
+	hasMoved: boolean
+}
+type RangeEndpointMoveState = {
+	edge: RangeEdge
+	anchorDate: Date
+	endpointDate: Date
+	lastPreviewDateTime: number
 }
 
 const model = defineModel<DatePickerValue | DatePickerValue[]>()
@@ -135,6 +145,7 @@ const intendedViewMonth = ref<{ month: number; year: number } | null>(null)
 const intendedDay = ref<number | null>(null)
 const isPreservingDay = ref(false)
 const rangeDragState = ref<RangeDragState | null>(null)
+const rangeEndpointMoveState = ref<RangeEndpointMoveState | null>(null)
 const suppressNextRangeClick = ref(false)
 let rangeClickSuppressionTimeout: number | null = null
 
@@ -260,6 +271,131 @@ function withEndpointTime(date: Date, endpoint: Date) {
 	)
 }
 
+function resolveRangeEndpointMove(
+	edge: RangeEdge,
+	targetDate: Date,
+	endpointDate: Date,
+	anchorDate: Date,
+) {
+	const movedDate = withEndpointTime(targetDate, endpointDate)
+	let nextStartDate = edge === 'start' ? movedDate : anchorDate
+	let nextEndDate = edge === 'end' ? movedDate : anchorDate
+
+	if (edge === 'start' && dateOnlyTime(nextStartDate) > dateOnlyTime(anchorDate)) {
+		nextStartDate = anchorDate
+	} else if (edge === 'end' && dateOnlyTime(nextEndDate) < dateOnlyTime(anchorDate)) {
+		nextEndDate = anchorDate
+	}
+
+	return {
+		nextStartDate,
+		nextEndDate,
+		nextEndpointDate: edge === 'start' ? nextStartDate : nextEndDate,
+	}
+}
+
+function withPreservedCalendarView(instance: Instance, callback: () => void) {
+	const currentMonth = instance.currentMonth
+	const currentYear = instance.currentYear
+
+	callback()
+
+	const monthDelta =
+		currentMonth - instance.currentMonth + (currentYear - instance.currentYear) * 12
+	if (monthDelta !== 0) instance.changeMonth(monthDelta)
+}
+
+function syncRangeEndpointMoveState(instance = picker.value) {
+	if (!instance) return
+
+	for (const dayElem of instance.calendarContainer.querySelectorAll('.is-moving-range-end')) {
+		dayElem.classList.remove('is-moving-range-end')
+	}
+
+	const state = rangeEndpointMoveState.value
+	if (!state || props.mode !== 'range' || instance.selectedDates.length !== 2) return
+
+	const selector =
+		state.edge === 'start'
+			? '.flatpickr-day.startRange:not(.endRange)'
+			: '.flatpickr-day.endRange:not(.startRange)'
+	instance.calendarContainer.querySelector(selector)?.classList.add('is-moving-range-end')
+}
+
+function setRangeEndpointMoveState(state: RangeEndpointMoveState | null) {
+	rangeEndpointMoveState.value = state
+	syncRangeEndpointMoveState()
+}
+
+function selectRangeEndpointForMove(edge: RangeEdge, startDate: Date, endDate: Date) {
+	setRangeEndpointMoveState({
+		edge,
+		anchorDate: new Date(edge === 'start' ? endDate : startDate),
+		endpointDate: new Date(edge === 'start' ? startDate : endDate),
+		lastPreviewDateTime: dateTime(edge === 'start' ? startDate : endDate),
+	})
+}
+
+function cancelRangeEndpointMovePreview() {
+	if (!rangeEndpointMoveState.value) return
+
+	setRangeEndpointMoveState(null)
+	syncPickerFromModel()
+}
+
+function previewSelectedRangeEndpoint(event: MouseEvent) {
+	const state = rangeEndpointMoveState.value
+	const instance = picker.value
+	if (!state || !instance) return
+
+	const dayElem = getRangeDayElement(event.target)
+	if (!dayElem || !instance.calendarContainer.contains(dayElem) || !isSelectableDay(dayElem)) return
+
+	const { nextStartDate, nextEndDate, nextEndpointDate } = resolveRangeEndpointMove(
+		state.edge,
+		dayElem.dateObj!,
+		state.endpointDate,
+		state.anchorDate,
+	)
+	const nextPreviewDateTime = dateTime(nextEndpointDate)
+	if (nextPreviewDateTime === state.lastPreviewDateTime) return
+
+	state.lastPreviewDateTime = nextPreviewDateTime
+	withPreservedCalendarView(instance, () => {
+		instance.setDate([nextStartDate, nextEndDate], false)
+	})
+	syncHeaderControlState(instance)
+	syncMissingRangeEndState()
+	syncRangeEndpointMoveState(instance)
+}
+
+function moveSelectedRangeEndpoint(dayElem: RangeDayElement) {
+	const state = rangeEndpointMoveState.value
+	const instance = picker.value
+	if (!state || !instance || !dayElem.dateObj) return false
+
+	const { nextStartDate, nextEndDate, nextEndpointDate } = resolveRangeEndpointMove(
+		state.edge,
+		dayElem.dateObj,
+		state.endpointDate,
+		state.anchorDate,
+	)
+
+	setRangeEndpointMoveState(null)
+
+	if (dateTime(nextEndpointDate) === dateTime(state.endpointDate)) return true
+
+	intendedViewMonth.value = {
+		month: instance.currentMonth,
+		year: instance.currentYear,
+	}
+
+	instance.setDate([nextStartDate, nextEndDate], true)
+	syncHeaderControlState(instance)
+
+	return true
+}
+
 function clearRangeClickSuppressionTimeout() {
 	if (rangeClickSuppressionTimeout === null) return
 
@@ -277,6 +413,7 @@ function clearRangeClickSuppressionSoon() {
 
 function startRangeDrag(event: PointerEvent) {
 	if (event.button !== 0) return
+	if (rangeEndpointMoveState.value) return
 
 	const instance = picker.value
 	const dayElem = getRangeDayElement(event.target)
@@ -295,6 +432,7 @@ function startRangeDrag(event: PointerEvent) {
 		draggedEndpointDate,
 		pointerId: event.pointerId,
 		lastDateTime: dateTime(draggedEndpointDate),
+		hasMoved: false,
 	}
 	clearRangeClickSuppressionTimeout()
 	suppressNextRangeClick.value = true
@@ -316,17 +454,14 @@ function updateRangeDrag(event: PointerEvent) {
 	const dayElem = getRangeDayElement(target)
 	if (!dayElem || !instance.calendarContainer.contains(dayElem) || !isSelectableDay(dayElem)) return
 
-	const draggedDate = withEndpointTime(dayElem.dateObj!, state.draggedEndpointDate)
-	let nextStartDate = state.edge === 'start' ? draggedDate : state.anchorDate
-	let nextEndDate = state.edge === 'end' ? draggedDate : state.anchorDate
+	const { nextStartDate, nextEndDate, nextEndpointDate } = resolveRangeEndpointMove(
+		state.edge,
+		dayElem.dateObj!,
+		state.draggedEndpointDate,
+		state.anchorDate,
+	)
 
-	if (state.edge === 'start' && dateOnlyTime(nextStartDate) > dateOnlyTime(state.anchorDate)) {
-		nextStartDate = state.anchorDate
-	} else if (state.edge === 'end' && dateOnlyTime(nextEndDate) < dateOnlyTime(state.anchorDate)) {
-		nextEndDate = state.anchorDate
-	}
-
-	const nextDraggedTime = dateTime(state.edge === 'start' ? nextStartDate : nextEndDate)
+	const nextDraggedTime = dateTime(nextEndpointDate)
 	if (nextDraggedTime === state.lastDateTime) return
 
 	intendedViewMonth.value = {
@@ -335,6 +470,7 @@ function updateRangeDrag(event: PointerEvent) {
 	}
 
 	state.lastDateTime = nextDraggedTime
+	state.hasMoved = true
 	instance.setDate([nextStartDate, nextEndDate], true)
 	syncHeaderControlState(instance)
 
@@ -352,6 +488,15 @@ function stopRangeDrag(event: PointerEvent) {
 	document.removeEventListener('pointerup', stopRangeDrag, true)
 	document.removeEventListener('pointercancel', stopRangeDrag, true)
 	clearRangeClickSuppressionSoon()
+	if (state.hasMoved) {
+		setRangeEndpointMoveState(null)
+	} else {
+		selectRangeEndpointForMove(
+			state.edge,
+			state.edge === 'start' ? state.draggedEndpointDate : state.anchorDate,
+			state.edge === 'end' ? state.draggedEndpointDate : state.anchorDate,
+		)
+	}
 
 	if (
 		document.activeElement instanceof HTMLElement &&
@@ -365,7 +510,11 @@ function stopRangeDrag(event: PointerEvent) {
 }
 
 function stopRangeEndpointMouseEvent(event: MouseEvent) {
-	if (rangeDragState.value || suppressNextRangeClick.value) {
+	if (
+		rangeDragState.value ||
+		suppressNextRangeClick.value ||
+		(rangeEndpointMoveState.value && getRangeDayElement(event.target))
+	) {
 		event.preventDefault()
 		event.stopImmediatePropagation()
 	}
@@ -376,6 +525,37 @@ function suppressRangeDragClick(event: MouseEvent) {
 
 	clearRangeClickSuppressionTimeout()
 	suppressNextRangeClick.value = false
+	event.preventDefault()
+	event.stopImmediatePropagation()
+}
+
+function handleRangeEndpointMoveClick(event: MouseEvent) {
+	if (suppressNextRangeClick.value) {
+		suppressRangeDragClick(event)
+		return
+	}
+
+	const instance = picker.value
+	const dayElem = getRangeDayElement(event.target)
+	if (!instance || !dayElem || props.mode !== 'range') return
+
+	const moveState = rangeEndpointMoveState.value
+	if (moveState) {
+		if (!isSelectableDay(dayElem)) return
+
+		moveSelectedRangeEndpoint(dayElem)
+		event.preventDefault()
+		event.stopImmediatePropagation()
+		return
+	}
+
+	const edge = getRangeEdge(dayElem)
+	if (!edge) return
+
+	const [startDate, endDate] = instance.selectedDates
+	if (!startDate || !endDate) return
+
+	selectRangeEndpointForMove(edge, startDate, endDate)
 	event.preventDefault()
 	event.stopImmediatePropagation()
 }
@@ -564,6 +744,7 @@ watch(
 
 		syncAltInputState()
 		syncTimeInputTypes(picker.value)
+		if (props.mode !== 'range' || selectedDates.value.length !== 2) cancelRangeEndpointMovePreview()
 		syncPickerFromModel()
 		syncCalendarClasses()
 	},
@@ -589,7 +770,8 @@ onMounted(async () => {
 			instance.calendarContainer.addEventListener('pointerdown', startRangeDrag, true)
 			instance.calendarContainer.addEventListener('mousedown', stopRangeEndpointMouseEvent, true)
 			instance.calendarContainer.addEventListener('mouseup', stopRangeEndpointMouseEvent, true)
-			instance.calendarContainer.addEventListener('click', suppressRangeDragClick, true)
+			instance.calendarContainer.addEventListener('click', handleRangeEndpointMoveClick, true)
+			instance.calendarContainer.addEventListener('mouseover', previewSelectedRangeEndpoint, true)
 			instance.calendarContainer.addEventListener('mouseover', syncMissingRangeEndState)
 			instance.calendarContainer.addEventListener('mouseleave', syncMissingRangeEndState)
 			instance.calendarContainer.addEventListener(
@@ -647,6 +829,7 @@ onMounted(async () => {
 			syncTimeInputTypes(instance)
 			syncHeaderControlState(instance)
 			syncCalendarClasses(instance)
+			syncRangeEndpointMoveState(instance)
 		},
 		onChange: (_selectedDates, dateStr, instance) => {
 			if (isSyncingFromModel.value) return
@@ -668,8 +851,10 @@ onMounted(async () => {
 
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
+			syncRangeEndpointMoveState(instance)
 		},
 		onClose: (_selectedDates, dateStr, instance) => {
+			cancelRangeEndpointMovePreview()
 			if (!props.clearable || dateStr) return
 
 			const nextValue = props.mode === 'single' ? null : []
@@ -682,11 +867,13 @@ onMounted(async () => {
 			applyPreserveDay(instance)
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
+			syncRangeEndpointMoveState(instance)
 		},
 		onYearChange: (_selectedDates, _dateStr, instance) => {
 			applyPreserveDay(instance)
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
+			syncRangeEndpointMoveState(instance)
 		},
 		onOpen: (_selectedDates, _dateStr, instance) => {
 			if (props.defaultViewDate && instance.selectedDates.length === 0) {
@@ -695,6 +882,7 @@ onMounted(async () => {
 			syncTimeInputTypes(instance)
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
+			syncRangeEndpointMoveState(instance)
 		},
 	})
 
@@ -706,6 +894,7 @@ onMounted(async () => {
 	syncAltInputState()
 	syncPickerFromModel()
 	syncHeaderControlState(picker.value)
+	syncRangeEndpointMoveState(picker.value)
 })
 
 onBeforeUnmount(() => {
@@ -759,6 +948,7 @@ function syncPickerFromModel() {
 	isSyncingFromModel.value = false
 	syncHeaderControlState(picker.value)
 	syncMissingRangeEndState()
+	syncRangeEndpointMoveState()
 }
 
 function syncAltInputState() {
@@ -776,6 +966,7 @@ defineExpose({
 		const nextValue = props.mode === 'single' ? null : []
 		model.value = nextValue
 		picker.value?.clear(false)
+		setRangeEndpointMoveState(null)
 		syncMissingRangeEndState()
 		emit('clear')
 		emit('change', nextValue)
@@ -981,7 +1172,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day.inRange) {
-	@apply rounded-none border-transparent bg-transparent text-contrast shadow-none hover:rounded-none hover:border-transparent hover:bg-transparent;
+	@apply rounded-none border-transparent bg-transparent text-brand shadow-none hover:rounded-none hover:border-transparent hover:bg-transparent;
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .flatpickr-day.inRange) {
@@ -1071,11 +1262,26 @@ defineExpose({
 	right: 0;
 }
 
+.modrinth-date-picker.can-select-range
+	:deep(.flatpickr-day:not(.flatpickr-disabled):not(.hidden)) {
+	cursor: pointer;
+}
+
+.modrinth-date-picker.is-selecting-range
+	:deep(.flatpickr-day:not(.flatpickr-disabled):not(.hidden)) {
+	cursor: grabbing;
+}
+
 .modrinth-date-picker.can-drag-range
 	:deep(.flatpickr-day.startRange:not(.endRange):not(.flatpickr-disabled)),
 .modrinth-date-picker.can-drag-range
 	:deep(.flatpickr-day.endRange:not(.startRange):not(.flatpickr-disabled)) {
 	cursor: grab;
+}
+
+.modrinth-date-picker.is-moving-range-end
+	:deep(.flatpickr-day:not(.flatpickr-disabled):not(.hidden)) {
+	cursor: grabbing !important;
 }
 
 .modrinth-date-picker.is-dragging-range :deep(.flatpickr-day) {
