@@ -134,7 +134,7 @@ const subscribeModel = defineModel<boolean>('subscribe', { default: false })
 
 const maxInputDate = computed(() => `${new Date().getFullYear()}-12-31`)
 
-const defaultDobViewDate = computed(() => `${new Date().getFullYear() - 13}-01-01`)
+const defaultDobViewDate = computed(() => `${new Date().getFullYear()}-01-01`)
 
 const maxBirthDate = computed(() => {
 	const date = new Date()
