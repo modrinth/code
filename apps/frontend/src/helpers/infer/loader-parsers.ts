@@ -29,25 +29,39 @@ export function createLoaderParsers(
 				const neoForgeDependency = Object.values(metadata.dependencies)
 					.flat()
 					.find((dependency: any) => dependency.modId === 'neoforge')
+				const minecraftDependency = Object.values(metadata.dependencies)
+					.flat()
+					.find((dependency: any) => dependency.modId === 'minecraft')
 
-				if (neoForgeDependency) {
-					try {
-						// https://docs.neoforged.net/docs/gettingstarted/versioning/#neoforge
-						const mcVersionRange = (neoForgeDependency as any).versionRange
-							.replace('-beta', '')
-							.replace(
-								/(\d+)(?:\.(\d+))?(?:\.(\d+)?)?/g,
-								(_match: string, major: string, minor: string) => {
-									return `1.${major}${minor ? '.' + minor : ''}`
-								},
-							)
-						newGameVersions = getGameVersionsMatchingMavenRange(
-							mcVersionRange,
-							simplifiedGameVersions,
-						)
-					} catch {
-						// Ignore parsing errors, just leave game_versions empty
-					}
+				if (minecraftDependency) {
+					newGameVersions = getGameVersionsMatchingMavenRange(
+						(minecraftDependency as any).versionRange,
+						simplifiedGameVersions,
+					)
+				} else if (neoForgeDependency) {
+					// https://docs.neoforged.net/docs/gettingstarted/versioning/#neoforge
+					// NeoForge's versioning changed after Mojang changed from 1.<major>.<minor> to <year>.<drop>.<patch>, so both cases need to be handled
+					const neoPre26Regex = /^(?<mc_major>\d+)(?:\.(?<mc_minor>\d+))?(?:\.(?<neo>\d+)?)?$/
+					const neoPost26Regex =
+						/^(?<mc_year>\d+)(?:\.(?<mc_drop>\d+))?(?:\.(?<mc_patch>\d+)?)?(?:\.(\d+))?$/
+
+					newGameVersions = getGameVersionsMatchingMavenRange(
+						(neoForgeDependency as any).versionRange.replace('-beta', ''),
+						simplifiedGameVersions,
+						(version) => {
+							const matchPre26 = version.match(neoPre26Regex)
+							if (matchPre26 && matchPre26.groups) {
+								const { mc_major, mc_minor } = matchPre26.groups
+								return mc_minor ? `1.${mc_major}.${mc_minor}` : `1.${mc_major}`
+							}
+							const matchPost26 = version.match(neoPost26Regex)
+							if (matchPost26 && matchPost26.groups) {
+								const { mc_year, mc_drop, mc_patch } = matchPost26.groups
+								return `${mc_year}${mc_drop ? `.${mc_drop}` : ''}${mc_patch ? `.${mc_patch}` : ''}`
+							}
+							return version
+						},
+					)
 				}
 			}
 
