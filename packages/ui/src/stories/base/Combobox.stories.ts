@@ -46,6 +46,15 @@ export const Searchable: Story = {
 	},
 }
 
+export const SearchableEmpty: Story = {
+	args: {
+		options: [],
+		searchable: true,
+		searchPlaceholder: 'Search projects...',
+		noOptionsMessage: 'No projects found',
+	},
+}
+
 export const Disabled: Story = {
 	args: {
 		options: [{ value: '1', label: 'Option 1' }],

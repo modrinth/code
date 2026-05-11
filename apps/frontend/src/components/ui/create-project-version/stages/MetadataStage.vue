@@ -161,41 +161,31 @@
 		</template>
 
 		<template v-if="!noDependenciesProject">
-			<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-1">
-				<div class="flex items-center justify-between">
-					<span class="font-semibold text-contrast"> Suggested dependencies </span>
-
-					<ButtonStyled type="transparent" size="standard">
-						<button @click="editDependencies">
-							<EditIcon />
-							Edit
-						</button>
-					</ButtonStyled>
-				</div>
-				<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
-			</div>
-
-			<div
-				v-if="!visibleSuggestedDependencies.length || draftVersion.dependencies?.length"
-				class="flex flex-col gap-1"
-			>
+			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast"> Dependencies </span>
 
 					<ButtonStyled type="transparent" size="standard">
-						<button @click="editDependencies">
-							<EditIcon />
-							Edit
+						<button @click="addDependency">
+							<PlusIcon />
+							Add dependency
 						</button>
 					</ButtonStyled>
 				</div>
 
 				<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
-					<DependenciesList disable-remove />
+					<DependenciesList />
 				</div>
 				<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
 					<span class="text-sm font-medium">No dependencies added.</span>
 				</div>
+			</div>
+
+			<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-1">
+				<div class="flex items-center justify-between">
+					<span class="font-semibold text-contrast"> Suggested dependencies </span>
+				</div>
+				<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
 			</div>
 		</template>
 	</div>
@@ -203,7 +193,7 @@
 
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
-import { EditIcon, getLoaderIcon, UnknownIcon } from '@modrinth/assets'
+import { EditIcon, getLoaderIcon, PlusIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	defineMessages,
@@ -279,7 +269,7 @@ const editEnvironment = () => {
 const editFiles = () => {
 	modal.value?.setStage('from-details-files')
 }
-const editDependencies = () => {
+const addDependency = () => {
 	modal.value?.setStage('from-details-dependencies')
 }
 

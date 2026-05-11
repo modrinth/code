@@ -90,7 +90,7 @@
 				leave-to-class="opacity-0"
 			>
 				<div
-					v-if="isOpen"
+					v-if="shouldRenderDropdown"
 					ref="dropdownRef"
 					class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 border border-solid border-surface-5"
 					:class="[
@@ -335,6 +335,13 @@ const filteredOptions = computed(() => {
 		if (opt.searchTerms?.some((term) => term.toLowerCase().includes(query))) return true
 		return false
 	})
+})
+
+const shouldRenderDropdown = computed(() => {
+	return (
+		isOpen.value &&
+		(filteredOptions.value.length > 0 || !!searchQuery.value || !!slots['dropdown-footer'])
+	)
 })
 
 function getOptionClasses(item: ComboboxOption<T> & { key: string }, index: number) {
@@ -678,6 +685,12 @@ onUnmounted(() => {
 })
 
 watch(isOpen, (value) => {
+	if (value) {
+		updateDropdownPosition()
+	}
+})
+
+watch(shouldRenderDropdown, (value) => {
 	if (value) {
 		updateDropdownPosition()
 	}
