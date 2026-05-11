@@ -267,7 +267,7 @@
     "message": "Relevant source code"
   },
   "auth.create-account.info-panel.text": {
-    "message": "We do not store your date of birth, it is only used to confirm your age at sign up."
+    "message": "We do not store your date of birth, only whether you are over 13 to use Modrinth."
   },
   "auth.create-account.page-title": {
     "message": "Create Account"

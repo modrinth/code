@@ -317,7 +317,7 @@
 					</template>
 					<template #cell-actions="{ row }">
 						<ButtonStyled v-if="auth.user.auth_providers.includes(row.id)">
-							<button @click="handleRemoveAuthProvider(row.id)" class="!w-full">
+							<button class="!w-full" @click="handleRemoveAuthProvider(row.id)">
 								<TrashIcon /> {{ formatMessage(commonMessages.removeButton) }}
 							</button>
 						</ButtonStyled>

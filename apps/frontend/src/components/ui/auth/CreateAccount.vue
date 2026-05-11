@@ -249,7 +249,7 @@ const messages = defineMessages({
 	infoPanelText: {
 		id: 'auth.create-account.info-panel.text',
 		defaultMessage:
-			'We do not store your date of birth, it is only used to confirm your age at sign up.',
+			'We do not store your date of birth, only whether you are over 13 to use Modrinth.',
 	},
 	relevantSourceCodeText: {
 		id: 'auth.create-account.info-panel.source-code-link',
