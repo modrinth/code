@@ -126,7 +126,7 @@ watch(
 function fakeLoadingIncrease() {
 	if (loadingProgress.value < 95) {
 		setTimeout(() => {
-			loadingProgress.value += 1
+			loadingProgress.value += 2
 			fakeLoadingIncrease()
 		}, 5)
 	}
