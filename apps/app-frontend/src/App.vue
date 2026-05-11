@@ -107,6 +107,7 @@ import {
 	getUpdateSize,
 	isDev,
 	isNetworkMetered,
+	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
 import i18n from '@/i18n.config'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
@@ -1023,6 +1024,13 @@ async function downloadUpdate(versionToDownload) {
 
 async function installUpdate() {
 	restarting.value = true
+	try {
+		await setRestartAfterPendingUpdate(true)
+	} catch (e) {
+		restarting.value = false
+		handleError(e)
+		return
+	}
 	setTimeout(async () => {
 		await handleClose()
 	}, 250)

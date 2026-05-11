@@ -96,6 +96,17 @@ fn restart_app(app: tauri::AppHandle) {
     app.restart();
 }
 
+#[derive(Default)]
+struct RestartAfterPendingUpdate(std::sync::Mutex<bool>);
+
+#[tauri::command]
+fn set_restart_after_pending_update(
+    should_restart: bool,
+    state: tauri::State<'_, RestartAfterPendingUpdate>,
+) {
+    *state.0.lock().unwrap() = should_restart;
+}
+
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
@@ -238,6 +249,7 @@ fn main() {
         .plugin(api::friends::init())
         .plugin(api::worlds::init())
         .manage(PendingUpdateData::default())
+        .manage(RestartAfterPendingUpdate::default())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
@@ -245,6 +257,7 @@ fn main() {
             get_update_size,
             enqueue_update_for_installation,
             remove_enqueued_update,
+            set_restart_after_pending_update,
             toggle_decorations,
             show_window,
             restart_app,
@@ -262,6 +275,11 @@ fn main() {
                 #[cfg(feature = "updater")]
                 if matches!(event, tauri::RunEvent::Exit) {
                     let update_data = app.state::<PendingUpdateData>().inner();
+                    let should_restart = *app
+                        .state::<RestartAfterPendingUpdate>()
+                        .0
+                        .lock()
+                        .unwrap();
                     if let Some((update, data)) = &*update_data.0.lock().unwrap() {
                         fn set_changelog_toast(version: Option<String>) {
                             let toast_result: theseus::Result<()> = tauri::async_runtime::block_on(async move {
@@ -276,19 +294,25 @@ fn main() {
                         }
 
                         set_changelog_toast(Some(update.version.clone()));
-                        if let Err(e) = update.install(data) {
-                            tracing::error!("Error while updating: {e}");
-                            set_changelog_toast(None);
+                        match update.install(data) {
+                            Ok(()) => {
+                                if should_restart {
+                                    app.restart();
+                                }
+                            }
+                            Err(e) => {
+                                tracing::error!("Error while updating: {e}");
+                                set_changelog_toast(None);
 
-                            DialogBuilder::message()
-                                .set_level(MessageLevel::Error)
-                                .set_title("Update error")
-                                .set_text(format!("Failed to install update due to an error:\n{e}"))
-                                .alert()
-                                .show()
-                                .unwrap();
+                                DialogBuilder::message()
+                                    .set_level(MessageLevel::Error)
+                                    .set_title("Update error")
+                                    .set_text(format!("Failed to install update due to an error:\n{e}"))
+                                    .alert()
+                                    .show()
+                                    .unwrap();
+                            }
                         }
-                        app.restart();
                     }
                 }
 
