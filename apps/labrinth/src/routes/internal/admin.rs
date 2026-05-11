@@ -42,9 +42,9 @@ pub struct DownloadBody {
 /// [`DOWNLOAD_META_HEADER`] header.
 #[derive(Debug, Clone, Deserialize)]
 pub struct DownloadMeta {
-    pub reason: DownloadReason,
-    pub game_version: String,
-    pub loader: String,
+    pub reason: Option<DownloadReason>,
+    pub game_version: Option<String>,
+    pub loader: Option<String>,
 }
 
 pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
@@ -145,15 +145,16 @@ pub async fn count_download(
         let valid_download_tags = valid_download_tags(&pool, &redis)
             .await
             .wrap_internal_err("failed to fetch valid download tags")?;
-        if !valid_download_tags.loaders.contains(&meta.loader) {
+        if let Some(loader) = &meta.loader
+            && !valid_download_tags.loaders.contains(loader)
+        {
             return Err(ApiError::Request(eyre!(
                 "invalid download loader specified"
             )));
         }
 
-        if !valid_download_tags
-            .game_versions
-            .contains(&meta.game_version)
+        if let Some(game_version) = &meta.game_version
+            && !valid_download_tags.game_versions.contains(game_version)
         {
             return Err(ApiError::Request(eyre!(
                 "invalid download game version specified"
@@ -198,13 +199,19 @@ pub async fn count_download(
             .collect(),
         reason: meta
             .as_ref()
-            .map(|m| m.reason.to_string())
+            .and_then(|m| m.reason.as_ref())
+            .map(|s| s.to_string())
             .unwrap_or_default(),
         game_version: meta
             .as_ref()
-            .map(|m| m.game_version.clone())
+            .and_then(|m| m.game_version.as_ref())
+            .map(|s| s.to_string())
             .unwrap_or_default(),
-        loader: meta.as_ref().map(|m| m.loader.clone()).unwrap_or_default(),
+        loader: meta
+            .as_ref()
+            .and_then(|m| m.loader.as_ref())
+            .map(|s| s.to_string())
+            .unwrap_or_default(),
     };
     trace!("added download {download:#?}");
 
