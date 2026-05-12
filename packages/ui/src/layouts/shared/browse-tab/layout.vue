@@ -296,7 +296,7 @@ const messages = defineMessages({
 			</template>
 		</ProjectCardList>
 
-		<div :class="ctx.variant === 'web' ? 'pagination-after my-3' : 'flex justify-end mt-3'">
+		<div :class="ctx.variant === 'web' ? 'pagination-after mt-3' : 'flex justify-end mt-3'">
 			<Pagination
 				:page="ctx.currentPage.value"
 				:count="ctx.pageCount.value"
