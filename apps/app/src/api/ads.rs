@@ -17,20 +17,18 @@ pub struct AdsState {
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
 #[cfg(not(target_os = "linux"))]
+const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
+#[cfg(not(target_os = "linux"))]
 const ADS_USER_AGENT: &str = concat!(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ",
     "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 ",
     "ModrinthApp/",
-    env!("CARGO_PKG_VERSION"),
+    APP_VERSION,
     " (Modrinth App)",
 );
 
 #[cfg(windows)]
 fn ads_user_agent_override_params() -> String {
-    let app_version = env!("CARGO_PKG_VERSION");
-    let app_semver = app_version.split_once('-').map_or(app_version, |(version, _)| version);
-    let app_major_version = app_semver.split('.').next().unwrap_or(app_semver);
-
     serde_json::json!({
         "userAgent": ADS_USER_AGENT,
         "platform": "Win32",
@@ -38,14 +36,14 @@ fn ads_user_agent_override_params() -> String {
             "brands": [
                 { "brand": "Chromium", "version": "128" },
                 { "brand": "Google Chrome", "version": "128" },
-                { "brand": "Modrinth App", "version": app_major_version },
+                { "brand": "Modrinth App", "version": APP_VERSION },
                 { "brand": "Not=A?Brand", "version": "99" },
             ],
             "fullVersion": "128.0.0.0",
             "fullVersionList": [
                 { "brand": "Chromium", "version": "128.0.0.0" },
                 { "brand": "Google Chrome", "version": "128.0.0.0" },
-                { "brand": "Modrinth App", "version": app_semver },
+                { "brand": "Modrinth App", "version": APP_VERSION },
                 { "brand": "Not=A?Brand", "version": "99.0.0.0" },
             ],
             "platform": "Windows",
