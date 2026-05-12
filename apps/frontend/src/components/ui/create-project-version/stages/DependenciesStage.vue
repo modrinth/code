@@ -40,10 +40,6 @@ import { Combobox } from '@modrinth/ui'
 import DependencySelect from '~/components/ui/create-project-version/components/DependencySelect.vue'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
-const {
-	newDependencyProjectId,
-	newDependencyType,
-	newDependencyVersionId,
-	newDependencyVersions,
-} = injectManageVersionContext()
+const { newDependencyProjectId, newDependencyType, newDependencyVersionId, newDependencyVersions } =
+	injectManageVersionContext()
 </script>
