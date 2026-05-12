@@ -3,11 +3,12 @@
 		v-model="projectId"
 		placeholder="Select project"
 		:options="options"
-		:searchable="true"
 		search-placeholder="Search by name or paste ID..."
 		:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
-		:disable-search-filter="true"
-		:select-search-text-on-focus="true"
+		searchable
+		disable-search-filter
+		select-search-text-on-focus
+		:show-chevron="false"
 		@search-input="(query) => handleSearch(query)"
 	/>
 </template>
@@ -83,6 +84,14 @@ const search = async (query: string) => {
 const throttledSearch = useDebounceFn(search, 500)
 
 const handleSearch = async (query: string) => {
+	query = query.trim()
+
+	if (!query) {
+		searchLoading.value = false
+		options.value = []
+		return
+	}
+
 	searchLoading.value = true
 	await throttledSearch(query)
 }
