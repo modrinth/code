@@ -161,31 +161,33 @@
 		</template>
 
 		<template v-if="!noDependenciesProject">
-			<div class="flex flex-col gap-1">
-				<div class="flex items-center justify-between">
-					<span class="font-semibold text-contrast"> Dependencies </span>
+			<div class="flex flex-col gap-2.5">
+				<div class="flex flex-col gap-1">
+					<div class="flex items-center justify-between">
+						<span class="font-semibold text-contrast"> Dependencies </span>
 
-					<ButtonStyled type="transparent" size="standard">
-						<button @click="addDependency">
-							<PlusIcon />
-							Add dependency
-						</button>
-					</ButtonStyled>
+						<ButtonStyled type="transparent" size="standard">
+							<button @click="addDependency">
+								<PlusIcon />
+								Add dependency
+							</button>
+						</ButtonStyled>
+					</div>
+
+					<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
+						<DependenciesList />
+					</div>
+					<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
+						<span class="text-sm font-medium">No dependencies added.</span>
+					</div>
 				</div>
 
-				<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
-					<DependenciesList />
+				<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-2.5">
+					<div class="flex items-center justify-between">
+						<span class="font-medium"> Suggested </span>
+					</div>
+					<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
 				</div>
-				<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
-					<span class="text-sm font-medium">No dependencies added.</span>
-				</div>
-			</div>
-
-			<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-1">
-				<div class="flex items-center justify-between">
-					<span class="font-semibold text-contrast"> Suggested dependencies </span>
-				</div>
-				<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
 			</div>
 		</template>
 	</div>
