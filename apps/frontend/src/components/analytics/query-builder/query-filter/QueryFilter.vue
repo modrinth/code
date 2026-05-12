@@ -178,6 +178,7 @@ type ApplyDownloadsThreshold = (setSelectedValues: SetDropdownFilterValues) => v
 type CloseDownloadsThresholdMenu = (event?: Event) => void
 
 const {
+	hasProjectContext,
 	availableProjectStatuses,
 	filterOptions,
 	projectVersionDownloadsById,
@@ -235,12 +236,17 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	const visibleCategoryKeys = new Set(
 		getVisibleAnalyticsFilterCategoriesForState(selectedBreakdown.value, selectedFilters.value),
 	)
-	const categories: DropdownFilterBarCategory[] = [
-		{
+	const categories: DropdownFilterBarCategory[] = []
+
+	if (!hasProjectContext.value) {
+		categories.push({
 			key: 'project_status',
 			label: 'Project status',
 			options: withSelectedOptions('project_status', projectStatusFilterOptions.value),
-		},
+		})
+	}
+
+	categories.push(
 		{
 			key: 'country',
 			label: 'Country',
@@ -290,7 +296,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			label: 'Loader Type',
 			options: withSelectedOptions('loader_type', loaderTypeFilterOptions.value),
 		},
-	]
+	)
 
 	return categories.filter((category) =>
 		visibleCategoryKeys.has(category.key as AnalyticsFilterValueCategory),

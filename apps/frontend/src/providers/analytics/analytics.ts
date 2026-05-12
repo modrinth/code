@@ -85,6 +85,7 @@ export interface AnalyticsDashboardFilterOptions {
 }
 
 export interface AnalyticsDashboardContextValue {
+	hasProjectContext: ComputedRef<boolean>
 	projects: ComputedRef<AnalyticsDashboardProject[]>
 	selectedProjectIds: Ref<string[]>
 	selectedTimeframeMode: Ref<AnalyticsTimeframeMode>
@@ -840,6 +841,21 @@ export function createAnalyticsDashboardContext(
 		return getRelevantAnalyticsDashboardStats(breakdown, filters).includes(stat)
 	}
 
+	function sanitizeAnalyticsSelectedFiltersForContext(
+		breakdown: AnalyticsBreakdownPreset,
+		filters: AnalyticsSelectedFilters,
+	): AnalyticsSelectedFilters {
+		const nextFilters = sanitizeAnalyticsSelectedFilters(breakdown, filters)
+		if (hasProjectContext.value && nextFilters.project_status.length > 0) {
+			return {
+				...nextFilters,
+				project_status: [],
+			}
+		}
+
+		return nextFilters
+	}
+
 	watch(
 		[selectedBreakdown, selectedFilters, activeStat],
 		([nextBreakdown, nextFilters, nextActiveStat]) => {
@@ -858,7 +874,10 @@ export function createAnalyticsDashboardContext(
 	watch(
 		[selectedBreakdown, selectedFilters],
 		([nextBreakdown, nextFilters]) => {
-			const sanitizedFilters = sanitizeAnalyticsSelectedFilters(nextBreakdown, nextFilters)
+			const sanitizedFilters = sanitizeAnalyticsSelectedFiltersForContext(
+				nextBreakdown,
+				nextFilters,
+			)
 			if (!areSelectedFiltersEqual(nextFilters, sanitizedFilters)) {
 				selectedFilters.value = sanitizedFilters
 			}
@@ -893,7 +912,7 @@ export function createAnalyticsDashboardContext(
 			const nextSelectedProjectIds = nextQueryState.selectedProjectIds.filter((projectId) =>
 				availableProjectIdSet.has(projectId),
 			)
-			const nextSelectedFilters = sanitizeAnalyticsSelectedFilters(
+			const nextSelectedFilters = sanitizeAnalyticsSelectedFiltersForContext(
 				nextQueryState.selectedBreakdown,
 				nextQueryState.selectedFilters,
 			)
@@ -1399,6 +1418,7 @@ export function createAnalyticsDashboardContext(
 	}
 
 	return {
+		hasProjectContext,
 		projects,
 		selectedProjectIds,
 		selectedTimeframeMode,
