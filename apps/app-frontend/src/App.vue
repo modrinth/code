@@ -214,7 +214,6 @@ window.addEventListener('online', () => {
 })
 
 const showOnboarding = ref(false)
-const nativeDecorations = ref(false)
 
 const os = ref('')
 const isDevEnvironment = ref(false)
@@ -330,8 +329,9 @@ async function setupApp() {
 	const version = await getVersion()
 	showOnboarding.value = !onboarded
 
-	nativeDecorations.value = native_decorations
-	if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
+	if (os.value !== 'MacOS' && os.value !== 'Linux') {
+		await getCurrentWindow().setDecorations(native_decorations)
+	}
 
 	themeStore.setThemeState(theme)
 	themeStore.collapsedNavigation = collapsed_navigation

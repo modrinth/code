@@ -163,7 +163,7 @@ watch(
 		<Toggle id="hide-nametag-skins-page" v-model="settings.hide_nametag_skins_page" />
 	</div>
 
-	<div v-if="os !== 'MacOS'" class="mt-6 flex items-center justify-between gap-4">
+	<div v-if="os !== 'MacOS' && os !== 'Linux'" class="mt-6 flex items-center justify-between gap-4">
 		<div>
 			<h2 class="m-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.nativeDecorationsTitle) }}

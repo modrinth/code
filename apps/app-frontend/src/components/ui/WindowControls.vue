@@ -51,7 +51,7 @@ const alwaysShowAppControls = computed(() => themeStore.getFeatureFlag('always_s
 const showControls = computed(
 	() =>
 		alwaysShowAppControls.value ||
-		(!nativeDecorations.value && (os.value === 'Windows' || os.value === 'Linux')),
+		(!nativeDecorations.value && os.value !== 'MacOS' && os.value !== 'Linux'),
 )
 
 onMounted(async () => {
@@ -60,7 +60,7 @@ onMounted(async () => {
 	const settings = await getSettings()
 	nativeDecorations.value = settings.native_decorations
 
-	if (os.value !== 'MacOS') {
+	if (os.value !== 'MacOS' && os.value !== 'Linux') {
 		await getCurrentWindow().setDecorations(nativeDecorations.value)
 	}
 
