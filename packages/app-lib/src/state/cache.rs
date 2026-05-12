@@ -904,7 +904,8 @@ impl CachedEntry {
                     remaining_keys.retain(|x| {
                         x != &&*row.id
                             && !row.alias.as_ref().is_some_and(|y| {
-                                if type_.case_sensitive_alias().unwrap_or(true) {
+                                if type_.case_sensitive_alias().unwrap_or(true)
+                                {
                                     x == y
                                 } else {
                                     y.to_lowercase() == x.to_lowercase()
