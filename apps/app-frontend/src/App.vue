@@ -1065,7 +1065,7 @@ function handleClick(e) {
 				!target.href.startsWith('http://tauri.localhost')
 			) {
 				const parsed = parseModrinthLink(target.href)
-				if (parsed) {
+				if (target.target !== '_blank' && parsed) {
 					void openModrinthProjectLinkInApp(parsed)
 				} else {
 					openUrl(target.href)
