@@ -340,11 +340,12 @@ const filteredOptions = computed(() => {
 	})
 })
 
+const hasDropdownContent = computed(() => {
+	return filteredOptions.value.length > 0 || !!searchQuery.value || !!slots['dropdown-footer']
+})
+
 const shouldRenderDropdown = computed(() => {
-	return (
-		isOpen.value &&
-		(filteredOptions.value.length > 0 || !!searchQuery.value || !!slots['dropdown-footer'])
-	)
+	return isOpen.value && hasDropdownContent.value
 })
 
 function getOptionClasses(item: ComboboxOption<T> & { key: string }, index: number) {
@@ -442,7 +443,7 @@ async function updateDropdownPosition() {
 }
 
 async function openDropdown() {
-	if (props.disabled || isOpen.value) return
+	if (props.disabled || isOpen.value || !hasDropdownContent.value) return
 
 	isOpen.value = true
 	emit('open')
@@ -513,15 +514,20 @@ function handleOptionMouseEnter(option: ComboboxOption<T>, index: number) {
 
 function findNextFocusableOption(currentIndex: number, direction: 'next' | 'previous'): number {
 	const length = filteredOptions.value.length
+	if (length === 0) return -1
+
 	let index = currentIndex
-	let option
 
-	do {
+	for (let i = 0; i < length; i++) {
 		index = direction === 'next' ? (index + 1) % length : (index - 1 + length) % length
-		option = filteredOptions.value[index]
-	} while (isDivider(option) || option.disabled)
+		const option = filteredOptions.value[index]
 
-	return index
+		if (!isDivider(option) && !option.disabled) {
+			return index
+		}
+	}
+
+	return -1
 }
 
 function focusOption(index: number) {
@@ -711,6 +717,12 @@ watch(shouldRenderDropdown, (value) => {
 watch(filteredOptions, () => {
 	if (isOpen.value) {
 		updateDropdownPosition()
+	}
+})
+
+watch(hasDropdownContent, (value) => {
+	if (!value && isOpen.value) {
+		closeDropdown()
 	}
 })
 

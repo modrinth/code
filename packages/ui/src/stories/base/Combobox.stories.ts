@@ -54,6 +54,14 @@ export const SearchableEmpty: Story = {
 		searchPlaceholder: 'Search projects...',
 		noOptionsMessage: 'No projects found',
 	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers the idle empty searchable state: focusing the input should not open an empty dropdown until there is a query or footer content.',
+			},
+		},
+	},
 }
 
 export const Disabled: Story = {
