@@ -1,5 +1,10 @@
 <template>
-	<DropdownFilterBar v-model="selectedFilterValue" :categories="filterCategories">
+	<DropdownFilterBar
+		v-model="selectedFilterValue"
+		:categories="filterCategories"
+		:show-clear="selectedBreakdown !== 'none'"
+		@clear="clearSelectedBreakdown"
+	>
 		<template #search-actions="{ category, setSelectedValues }">
 			<div v-if="category.key === 'game_version'" class="flex w-40 justify-end">
 				<Chips
@@ -221,6 +226,10 @@ const selectedFilterValue = computed<Record<string, string[]>>({
 		selectedFilters.value = nextFilters
 	},
 })
+
+function clearSelectedBreakdown() {
+	selectedBreakdown.value = 'none'
+}
 
 const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	const visibleCategoryKeys = new Set(

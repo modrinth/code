@@ -90,11 +90,21 @@ export const WithAppliedFilters: Story = {
 				status: ['active'],
 				type: ['mod', 'plugin'],
 			})
-			return { categories: defaultCategories, selected }
+			const clearEvents = ref(0)
+			function handleClear() {
+				clearEvents.value += 1
+			}
+
+			return { categories: defaultCategories, clearEvents, handleClear, selected }
 		},
 		template: /* html */ `
 			<div class="flex flex-wrap items-center gap-2">
-				<DropdownFilterBar v-model="selected" :categories="categories" />
+				<DropdownFilterBar
+					v-model="selected"
+					:categories="categories"
+					@clear="handleClear"
+				/>
+				<span class="text-sm font-medium text-secondary">Clear events: {{ clearEvents }}</span>
 			</div>
 		`,
 	}),
@@ -104,6 +114,37 @@ export const WithAppliedFilters: Story = {
 			type: ['mod', 'plugin'],
 		},
 		categories: defaultCategories,
+	},
+}
+
+export const WithClearOverride: Story = {
+	render: () => ({
+		components: { DropdownFilterBar },
+		setup() {
+			const selected = ref<Record<string, string[]>>({})
+			const clearEvents = ref(0)
+			function handleClear() {
+				clearEvents.value += 1
+			}
+
+			return { categories: defaultCategories, clearEvents, handleClear, selected }
+		},
+		template: /* html */ `
+			<div class="flex flex-wrap items-center gap-2">
+				<DropdownFilterBar
+					v-model="selected"
+					:categories="categories"
+					show-clear
+					@clear="handleClear"
+				/>
+				<span class="text-sm font-medium text-secondary">Clear events: {{ clearEvents }}</span>
+			</div>
+		`,
+	}),
+	args: {
+		modelValue: {},
+		categories: defaultCategories,
+		showClear: true,
 	},
 }
 

@@ -75,7 +75,7 @@
 			</button>
 		</ButtonStyled>
 
-		<ButtonStyled v-if="hasAppliedFilters" type="transparent">
+		<ButtonStyled v-if="shouldShowClear" type="transparent">
 			<button type="button" @click="clearAllFilters">{{ clearLabel }}</button>
 		</ButtonStyled>
 	</div>
@@ -293,6 +293,7 @@ const props = withDefaults(
 		label?: string
 		addLabel?: string
 		clearLabel?: string
+		showClear?: boolean
 		useFilterIcon?: boolean
 		emptyOptionsLabel?: string
 		emptySearchLabel?: string
@@ -301,6 +302,7 @@ const props = withDefaults(
 		label: 'Filtered by',
 		addLabel: 'Add',
 		clearLabel: 'Clear',
+		showClear: false,
 		useFilterIcon: false,
 		emptyOptionsLabel: 'No options available.',
 		emptySearchLabel: 'No options found.',
@@ -309,6 +311,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	'update:modelValue': [value: DropdownFilterBarValue]
+	clear: []
 }>()
 
 const isAddMenuOpen = ref(false)
@@ -419,6 +422,7 @@ const appliedFilterPreviews = computed(() =>
 )
 
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
+const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
 const previewTriggerClass =
 	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 hover:bg-surface-5 hover:brightness-100 active:brightness-100'
 
@@ -669,6 +673,8 @@ function clearAllFilters() {
 	if (!areSelectedFiltersEqual(props.modelValue, nextFilters)) {
 		emit('update:modelValue', nextFilters)
 	}
+
+	emit('clear')
 }
 
 function clearActiveCategorySelection() {
