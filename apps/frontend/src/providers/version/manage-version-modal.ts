@@ -1,6 +1,7 @@
 import type { Labrinth, UploadProgress } from '@modrinth/api-client'
 import { SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import {
+	type ComboboxOption,
 	createContext,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -49,16 +50,16 @@ export type VersionStage =
 	| 'add-loaders'
 	| 'add-mc-versions'
 	| 'add-environment'
-	| 'add-dependencies'
 	| 'add-changelog'
 	| 'from-details-loaders'
 	| 'from-details-mc-versions'
 	| 'from-details-environment'
+	| 'from-details-dependencies'
 
 export type SuggestedDependency = Labrinth.Versions.v3.Dependency & {
 	name?: string
 	icon?: string
-	versionName?: string
+	versionNumber?: string
 }
 
 export interface PrimaryFile {
@@ -79,6 +80,10 @@ export interface ManageVersionContextValue {
 	projectsFetchLoading: Ref<boolean>
 	handlingNewFiles: Ref<boolean>
 	suggestedDependencies: Ref<SuggestedDependency[] | null>
+	newDependencyProjectId: Ref<string | undefined>
+	newDependencyType: Ref<Labrinth.Versions.v2.DependencyType>
+	newDependencyVersionId: Ref<string | null>
+	newDependencyVersions: Ref<ComboboxOption<string>[]>
 	visibleSuggestedDependencies: ComputedRef<SuggestedDependency[]>
 	primaryFile: ComputedRef<PrimaryFile | null>
 
@@ -105,6 +110,8 @@ export interface ManageVersionContextValue {
 	replacePrimaryFile: (file: File) => Promise<void>
 	getProject: (projectId: string) => Promise<Labrinth.Projects.v3.Project>
 	getVersion: (versionId: string) => Promise<Labrinth.Versions.v3.Version>
+	resetNewDependency: () => void
+	addNewDependency: () => boolean
 
 	// Submission methods
 	handleCreateVersion: () => Promise<void>
@@ -178,6 +185,10 @@ export function createManageVersionContext(
 	const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
 	const projectsFetchLoading = ref(false)
 	const suggestedDependencies = ref<SuggestedDependency[] | null>(null)
+	const newDependencyProjectId = ref<string>()
+	const newDependencyType = ref<Labrinth.Versions.v2.DependencyType>('required')
+	const newDependencyVersionId = ref<string | null>(null)
+	const newDependencyVersions = ref<ComboboxOption<string>[]>([])
 
 	const isSubmitting = ref(false)
 	const isUploading = ref(false)
@@ -254,6 +265,7 @@ export function createManageVersionContext(
 		filesToAdd.value = []
 		existingFilesToDelete.value = []
 		inferredVersionData.value = undefined
+		resetNewDependency()
 	}
 
 	async function handleNewFiles(newFiles: File[]) {
@@ -453,6 +465,44 @@ export function createManageVersionContext(
 		return version
 	}
 
+	function resetNewDependency() {
+		newDependencyProjectId.value = undefined
+		newDependencyVersionId.value = null
+		newDependencyType.value = 'required'
+		newDependencyVersions.value = []
+	}
+
+	function addNewDependency() {
+		if (!newDependencyProjectId.value) return false
+		if (!draftVersion.value.dependencies) draftVersion.value.dependencies = []
+
+		const dependency: Labrinth.Versions.v3.Dependency = {
+			project_id: newDependencyProjectId.value,
+			version_id: newDependencyVersionId.value || undefined,
+			dependency_type: newDependencyType.value,
+		}
+
+		const alreadyAdded = draftVersion.value.dependencies.some((existing) => {
+			if (existing.project_id !== dependency.project_id) return false
+			if (!existing.version_id && !dependency.version_id) return true
+			return existing.version_id === dependency.version_id
+		})
+
+		if (alreadyAdded) {
+			addNotification({
+				title: 'Dependency already added',
+				text: 'You cannot add the same dependency twice.',
+				type: 'error',
+			})
+			return false
+		}
+
+		projectsFetchLoading.value = true
+		draftVersion.value.dependencies.push(dependency)
+		resetNewDependency()
+		return true
+	}
+
 	// Primary file computed
 	const primaryFile = computed<PrimaryFile | null>(() => {
 		const existingPrimaryFile = draftVersion.value.existing_files?.[0]
@@ -537,6 +587,30 @@ export function createManageVersionContext(
 		{ immediate: true, deep: true },
 	)
 
+	watch(newDependencyProjectId, async () => {
+		newDependencyVersionId.value = null
+		newDependencyType.value = 'required'
+
+		if (!newDependencyProjectId.value) {
+			newDependencyVersions.value = []
+			return
+		}
+
+		try {
+			const versions = await labrinth.versions_v3.getProjectVersions(newDependencyProjectId.value)
+			newDependencyVersions.value = versions.map((version) => ({
+				label: version.version_number,
+				value: version.id,
+			}))
+		} catch (error: any) {
+			addNotification({
+				title: 'An error occurred',
+				text: error.data ? error.data.description : error,
+				type: 'error',
+			})
+		}
+	})
+
 	// Watch loaders to infer environment if not set
 	watch(
 		() => draftVersion.value.loaders,
@@ -603,7 +677,7 @@ export function createManageVersionContext(
 
 						if (dep.version_id) {
 							const version = await getVersion(dep.version_id)
-							dep.versionName = version.name
+							dep.versionNumber = version.version_number
 						}
 					} catch (error: any) {
 						console.error(`Failed to fetch project/version data for dependency:`, error)
@@ -766,8 +840,6 @@ export function createManageVersionContext(
 				return editingVersion.value ? 'Edit loaders' : 'Set loaders'
 			case 'add-mc-versions':
 				return editingVersion.value ? 'Edit game versions' : 'Set game versions'
-			case 'add-dependencies':
-				return editingVersion.value ? 'Edit dependencies' : 'Set dependencies'
 			case 'add-environment':
 				return editingVersion.value ? 'Edit environment' : 'Add environment'
 			case 'add-changelog':
@@ -801,6 +873,10 @@ export function createManageVersionContext(
 		handlingNewFiles,
 		projectsFetchLoading,
 		suggestedDependencies,
+		newDependencyProjectId,
+		newDependencyType,
+		newDependencyVersionId,
+		newDependencyVersions,
 		visibleSuggestedDependencies,
 		primaryFile,
 
@@ -826,6 +902,8 @@ export function createManageVersionContext(
 		replacePrimaryFile,
 		getProject,
 		getVersion,
+		resetNewDependency,
+		addNewDependency,
 		handleNewFiles,
 		handleCreateVersion,
 		handleSaveVersionEdits,
