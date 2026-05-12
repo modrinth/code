@@ -26,6 +26,7 @@ const searchLoading = ref(false)
 const options = ref<ComboboxOption<string>[]>([])
 
 const { labrinth } = injectModrinthClient()
+let latestSearchQuery = ''
 
 const search = async (query: string) => {
 	query = query.trim()
@@ -55,6 +56,8 @@ const search = async (query: string) => {
 			facets: [[`project_id:${query.replace(/[^a-zA-Z0-9]/g, '')}`]], // remove any non-alphanumeric characters
 		})
 
+		if (query !== latestSearchQuery) return
+
 		options.value = [...resultsByProjectId.hits, ...results.hits].map((hit) => ({
 			label: hit.title,
 			value: hit.project_id,
@@ -72,23 +75,30 @@ const search = async (query: string) => {
 			),
 		}))
 	} catch (error: any) {
+		if (query !== latestSearchQuery) return
+
 		addNotification({
 			title: 'An error occurred',
 			text: error.data ? error.data.description : error,
 			type: 'error',
 		})
 	}
-	searchLoading.value = false
+
+	if (query === latestSearchQuery) {
+		searchLoading.value = false
+	}
 }
 
 const throttledSearch = useDebounceFn(search, 500)
 
 const handleSearch = async (query: string) => {
 	query = query.trim()
+	latestSearchQuery = query
 
 	if (!query) {
 		searchLoading.value = false
 		options.value = []
+		await throttledSearch(query)
 		return
 	}
 
