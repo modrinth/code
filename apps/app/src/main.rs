@@ -96,15 +96,11 @@ fn restart_app(app: tauri::AppHandle) {
     app.restart();
 }
 
-#[derive(Default)]
-struct RestartAfterPendingUpdate(std::sync::Mutex<bool>);
-
 #[tauri::command]
-fn set_restart_after_pending_update(
-    should_restart: bool,
-    state: tauri::State<'_, RestartAfterPendingUpdate>,
-) {
-    *state.0.lock().unwrap() = should_restart;
+async fn set_restart_after_pending_update(should_restart: bool) -> api::Result<()> {
+    let state = State::get().await?;
+    *state.restart_after_pending_update.lock().unwrap() = should_restart;
+    Ok(())
 }
 
 // if Tauri app is called with arguments, then those arguments will be treated as commands
@@ -249,7 +245,6 @@ fn main() {
         .plugin(api::friends::init())
         .plugin(api::worlds::init())
         .manage(PendingUpdateData::default())
-        .manage(RestartAfterPendingUpdate::default())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
@@ -275,11 +270,9 @@ fn main() {
                 #[cfg(feature = "updater")]
                 if matches!(event, tauri::RunEvent::Exit) {
                     let update_data = app.state::<PendingUpdateData>().inner();
-                    let should_restart = *app
-                        .state::<RestartAfterPendingUpdate>()
-                        .0
-                        .lock()
-                        .unwrap();
+                    let should_restart = State::get_if_initialized()
+                        .map(|s| *s.restart_after_pending_update.lock().unwrap())
+                        .unwrap_or(false);
                     if let Some((update, data)) = &*update_data.0.lock().unwrap() {
                         fn set_changelog_toast(version: Option<String>) {
                             let toast_result: theseus::Result<()> = tauri::async_runtime::block_on(async move {
