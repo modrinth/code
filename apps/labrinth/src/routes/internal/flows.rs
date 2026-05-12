@@ -230,6 +230,7 @@ impl TempUser {
             badges: Badges::default(),
             allow_friend_requests: true,
             is_subscribed_to_newsletter: sign_up_newsletter,
+            eligibility_verified_at: Some(Utc::now()),
         }
         .insert(transaction)
         .await?;
@@ -1761,6 +1762,7 @@ impl ReadyAccountRegisterFlow {
             badges: Badges::default(),
             allow_friend_requests: true,
             is_subscribed_to_newsletter: register_flow.sign_up_newsletter,
+            eligibility_verified_at: Some(Utc::now()),
         }
         .insert(transaction)
         .await

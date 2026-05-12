@@ -18,3 +18,4 @@
   - `Authorization: Bearer mra_user` for a regular user
   - `Modrinth-Admin: feedbeef` as admin key
 - If some steps require you to create a project/mod or version for testing, ask the user to go into the web frontend and manually create a project/version
+- DO NOT use `()` as an error type for operations, unless you have a very good reason. Either make a new error type, or use `eyre::Report`.

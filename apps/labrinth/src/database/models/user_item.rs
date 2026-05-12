@@ -52,6 +52,8 @@ pub struct DBUser {
     pub allow_friend_requests: bool,
 
     pub is_subscribed_to_newsletter: bool,
+
+    pub eligibility_verified_at: Option<DateTime<Utc>>,
 }
 
 impl DBUser {
@@ -66,13 +68,15 @@ impl DBUser {
                 avatar_url, raw_avatar_url, bio, created,
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                 email_verified, password, paypal_id, paypal_country, paypal_email,
-                venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
+                venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
+                eligibility_verified_at
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9, $10, $11, $12, $13,
-                $14, $15, $16, $17, $18, $19, $20, $21, $22
+                $14, $15, $16, $17, $18, $19, $20, $21, $22,
+                $23
             )
             ",
             self.id as DBUserId,
@@ -97,6 +101,7 @@ impl DBUser {
             self.stripe_customer_id,
             self.allow_friend_requests,
             self.is_subscribed_to_newsletter,
+            self.eligibility_verified_at,
         )
         .execute(&mut *transaction)
         .await?;
@@ -182,7 +187,8 @@ impl DBUser {
                         created, role, badges,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                         email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
-                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
+                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
+                        eligibility_verified_at
                     FROM users
                     WHERE id = ANY($1) OR LOWER(username) = ANY($2)
                     ",
@@ -217,6 +223,7 @@ impl DBUser {
                             totp_secret: u.totp_secret,
                             allow_friend_requests: u.allow_friend_requests,
                             is_subscribed_to_newsletter: u.is_subscribed_to_newsletter,
+                            eligibility_verified_at: u.eligibility_verified_at,
                         };
 
                         acc.insert(u.id, (Some(u.username), user));

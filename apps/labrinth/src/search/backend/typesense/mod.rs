@@ -44,7 +44,6 @@ pub enum Bucketing {
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum TextMatchType {
-    #[default]
     MaxScore,
     #[default]
     MaxWeight,
