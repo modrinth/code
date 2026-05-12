@@ -29,6 +29,7 @@
 				@input="handleSearchInput"
 				@keydown="handleSearchKeydown"
 				@focusin="handleSearchFocus"
+				@focusout="handleSearchFocusout"
 				@click="handleSearchClick"
 			>
 				<template v-if="showChevron" #right>
@@ -122,6 +123,7 @@
 								class="group/option flex items-center gap-2.5 cursor-pointer rounded-xl p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
 								:class="getOptionClasses(item, index)"
 								tabindex="-1"
+								@mousedown.prevent
 								@click="handleOptionClick(item, index)"
 								@mouseenter="handleOptionMouseEnter(item, index)"
 							>
@@ -225,6 +227,7 @@ const props = withDefaults(
 		showIconInSelected?: boolean
 		maxHeight?: number
 		displayValue?: string
+		searchValue?: string
 		triggerClass?: string
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
@@ -259,6 +262,7 @@ const emit = defineEmits<{
 	open: []
 	close: []
 	searchInput: [query: string]
+	searchBlur: [query: string]
 }>()
 
 const slots = useSlots()
@@ -656,6 +660,18 @@ function handleSearchFocus(event: FocusEvent) {
 	if (!isOpen.value) {
 		openDropdown()
 	}
+}
+
+function handleSearchFocusout(event: FocusEvent) {
+	const nextTarget = event.relatedTarget
+	if (nextTarget instanceof Node && containerRef.value?.contains(nextTarget)) return
+	if (nextTarget instanceof Node && dropdownRef.value?.contains(nextTarget)) return
+
+	emit('searchBlur', searchQuery.value)
+	if (props.searchValue !== undefined) {
+		searchQuery.value = props.searchValue
+	}
+	closeDropdown()
 }
 
 function handleSearchClick() {

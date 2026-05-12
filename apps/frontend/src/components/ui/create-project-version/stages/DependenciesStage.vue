@@ -11,7 +11,8 @@
 				<Combobox
 					v-model="newDependencyVersionId"
 					placeholder="Select version"
-					:options="[{ label: 'Any version', value: null }, ...newDependencyVersions]"
+					:options="newDependencyVersionOptions"
+					:search-value="selectedNewDependencyVersionLabel"
 					:searchable="true"
 					:select-search-text-on-focus="true"
 				/>
@@ -36,10 +37,22 @@
 
 <script lang="ts" setup>
 import { Combobox } from '@modrinth/ui'
+import { computed } from 'vue'
 
 import DependencySelect from '~/components/ui/create-project-version/components/DependencySelect.vue'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 const { newDependencyProjectId, newDependencyType, newDependencyVersionId, newDependencyVersions } =
 	injectManageVersionContext()
+
+const newDependencyVersionOptions = computed(() => [
+	{ label: 'Any version', value: null },
+	...newDependencyVersions.value,
+])
+const selectedNewDependencyVersionLabel = computed(
+	() =>
+		newDependencyVersionOptions.value.find(
+			(option) => option.value === newDependencyVersionId.value,
+		)?.label,
+)
 </script>
