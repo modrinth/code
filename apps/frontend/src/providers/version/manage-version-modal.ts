@@ -1,8 +1,8 @@
 import type { Labrinth, UploadProgress } from '@modrinth/api-client'
 import { SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import {
-	createContext,
 	type ComboboxOption,
+	createContext,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -59,7 +59,7 @@ export type VersionStage =
 export type SuggestedDependency = Labrinth.Versions.v3.Dependency & {
 	name?: string
 	icon?: string
-	versionName?: string
+	versionNumber?: string
 }
 
 export interface PrimaryFile {
@@ -599,7 +599,7 @@ export function createManageVersionContext(
 		try {
 			const versions = await labrinth.versions_v3.getProjectVersions(newDependencyProjectId.value)
 			newDependencyVersions.value = versions.map((version) => ({
-				label: version.name,
+				label: version.version_number,
 				value: version.id,
 			}))
 		} catch (error: any) {
@@ -677,7 +677,7 @@ export function createManageVersionContext(
 
 						if (dep.version_id) {
 							const version = await getVersion(dep.version_id)
-							dep.versionName = version.name
+							dep.versionNumber = version.version_number
 						}
 					} catch (error: any) {
 						console.error(`Failed to fetch project/version data for dependency:`, error)
