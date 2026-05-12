@@ -189,7 +189,7 @@ import QueryBuilderFilter from './query-filter/QueryFilter.vue'
 import { ensureMinimumTimeRange, useSelectedAnalyticsTimeRange } from './timeframe-picker/timeframe'
 import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 
-const MAX_TIME_SLICES = 1024
+const MAX_TIME_SLICES = 256
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
 
