@@ -202,6 +202,7 @@ const {
 	selectedBreakdown,
 	selectedFilters,
 	projectStatusById,
+	queryResetToken,
 	refreshAnalyticsQuery,
 	setFetchRequest,
 } = injectAnalyticsDashboardContext()
@@ -240,6 +241,17 @@ watch(selectedProjectIds, (nextSelectedProjectIds) => {
 	}
 
 	draftSelectedProjectIds.value = [...nextSelectedProjectIds]
+})
+
+watch(queryResetToken, () => {
+	isProjectSelectOpen.value = false
+	projectDownloadsThreshold.value = null
+	draftSelectedProjectIds.value = isSameProjectSelection(
+		selectedProjectIds.value,
+		allProjectIds.value,
+	)
+		? []
+		: [...selectedProjectIds.value]
 })
 
 const areAllProjectsSelected = computed(() => {

@@ -1,18 +1,29 @@
 <template>
 	<div class="flex flex-col gap-4 pb-20 lg:pl-4 lg:pt-1.5">
 		<div class="flex flex-col gap-2">
-			<div class="flex justify-between">
+			<div class="flex items-center justify-between gap-2">
 				<span class="text-xl font-semibold text-contrast md:text-2xl">Analytics</span>
-				<ButtonStyled type="outlined">
-					<button
-						type="button"
-						:disabled="projects.length === 0 || !fetchRequest || isRefetching"
-						@click="refreshAnalyticsQuery"
-					>
-						<RefreshCwIcon :class="isRefetching ? 'animate-spin' : ''" />
-						Refresh
-					</button>
-				</ButtonStyled>
+				<div class="flex flex-wrap items-center justify-end gap-2">
+					<ButtonStyled type="transparent">
+						<button
+							type="button"
+							:disabled="isAnalyticsQueryBuilderDefault"
+							@click="resetAnalyticsQueryBuilder"
+						>
+							Reset
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="outlined">
+						<button
+							type="button"
+							:disabled="projects.length === 0 || !fetchRequest || isRefetching"
+							@click="refreshAnalyticsQuery"
+						>
+							<RefreshCwIcon :class="isRefetching ? 'animate-spin' : ''" />
+							Refresh
+						</button>
+					</ButtonStyled>
+				</div>
 			</div>
 			<QueryBuilder />
 		</div>
@@ -46,7 +57,14 @@ const analyticsDashboardContext = createAnalyticsDashboardContext({
 	projectPageContext,
 	organizationContext,
 })
-const { fetchRequest, isRefetching, projects, refreshAnalyticsQuery } = analyticsDashboardContext
+const {
+	fetchRequest,
+	isAnalyticsQueryBuilderDefault,
+	isRefetching,
+	projects,
+	refreshAnalyticsQuery,
+	resetAnalyticsQueryBuilder,
+} = analyticsDashboardContext
 
 provideAnalyticsDashboardContext(analyticsDashboardContext)
 </script>

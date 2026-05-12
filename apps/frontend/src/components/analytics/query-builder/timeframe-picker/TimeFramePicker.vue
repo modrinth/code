@@ -147,7 +147,7 @@ const defaultGroupByForPreset: Partial<Record<AnalyticsTimeframePreset, Analytic
 	today: '1h',
 	yesterday: '1h',
 	last_7_days: '6h',
-	last_14_days: '6h',
+	last_14_days: 'day',
 	last_30_days: 'day',
 	last_90_days: 'day',
 	last_180_days: 'week',

@@ -283,6 +283,47 @@ function parseDateQueryValue(
 	return rawValue
 }
 
+export function buildDefaultAnalyticsQueryBuilderState(
+	availableProjectIds: string[],
+): AnalyticsQueryBuilderState {
+	return {
+		selectedProjectIds: [...availableProjectIds],
+		selectedTimeframeMode: DEFAULT_TIMEFRAME_MODE,
+		selectedTimeframe: DEFAULT_TIMEFRAME_PRESET,
+		selectedLastTimeframeAmount: DEFAULT_LAST_TIMEFRAME_AMOUNT,
+		selectedLastTimeframeUnit: DEFAULT_LAST_TIMEFRAME_UNIT,
+		selectedCustomTimeframeStartDate: getDefaultCustomStartDate(),
+		selectedCustomTimeframeEndDate: getDefaultCustomEndDate(),
+		selectedGroupBy: DEFAULT_GROUP_BY_PRESET,
+		selectedBreakdown: DEFAULT_BREAKDOWN_PRESET,
+		selectedFilters: buildEmptySelectedFilters(),
+	}
+}
+
+export function isAnalyticsQueryBuilderStateDefault(
+	state: AnalyticsQueryBuilderState,
+	availableProjectIds: string[],
+): boolean {
+	const defaultState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds)
+	const areDefaultProjectsSelected =
+		availableProjectIds.length === 0
+			? state.selectedProjectIds.length === 0
+			: areAllProjectsSelected(state.selectedProjectIds, availableProjectIds)
+
+	return (
+		areDefaultProjectsSelected &&
+		state.selectedTimeframeMode === defaultState.selectedTimeframeMode &&
+		state.selectedTimeframe === defaultState.selectedTimeframe &&
+		state.selectedLastTimeframeAmount === defaultState.selectedLastTimeframeAmount &&
+		state.selectedLastTimeframeUnit === defaultState.selectedLastTimeframeUnit &&
+		state.selectedCustomTimeframeStartDate === defaultState.selectedCustomTimeframeStartDate &&
+		state.selectedCustomTimeframeEndDate === defaultState.selectedCustomTimeframeEndDate &&
+		state.selectedGroupBy === defaultState.selectedGroupBy &&
+		state.selectedBreakdown === defaultState.selectedBreakdown &&
+		areSelectedFiltersEqual(state.selectedFilters, defaultState.selectedFilters)
+	)
+}
+
 function serializeListQueryValue(values: string[]): string | undefined {
 	if (values.length === 0) return undefined
 	return values.join(',')
@@ -363,9 +404,12 @@ export function readAnalyticsQueryBuilderState(
 	query: LocationQuery,
 	availableProjectIds: string[],
 ): AnalyticsQueryBuilderState {
+	const defaultState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds)
 	const selectedProjectIdsFromQuery = parseListQueryValue(query[QUERY_KEY_PROJECT_IDS])
 	const selectedProjectIds =
-		selectedProjectIdsFromQuery.length > 0 ? selectedProjectIdsFromQuery : availableProjectIds
+		selectedProjectIdsFromQuery.length > 0
+			? selectedProjectIdsFromQuery
+			: defaultState.selectedProjectIds
 
 	const selectedFilters = buildEmptySelectedFilters()
 	for (const category of URL_FILTER_CATEGORIES) {
@@ -377,11 +421,11 @@ export function readAnalyticsQueryBuilderState(
 
 	const selectedCustomTimeframeStartDate = parseDateQueryValue(
 		query[QUERY_KEY_TIMEFRAME_START],
-		getDefaultCustomStartDate(),
+		defaultState.selectedCustomTimeframeStartDate,
 	)
 	const rawCustomTimeframeEndDate = parseDateQueryValue(
 		query[QUERY_KEY_TIMEFRAME_END],
-		getDefaultCustomEndDate(),
+		defaultState.selectedCustomTimeframeEndDate,
 	)
 	const selectedCustomTimeframeEndDate =
 		rawCustomTimeframeEndDate < selectedCustomTimeframeStartDate
@@ -393,33 +437,33 @@ export function readAnalyticsQueryBuilderState(
 		selectedTimeframeMode: parsePresetQueryValue(
 			query[QUERY_KEY_TIMEFRAME_MODE],
 			TIMEFRAME_MODE_VALUES,
-			DEFAULT_TIMEFRAME_MODE,
+			defaultState.selectedTimeframeMode,
 		),
 		selectedTimeframe: parsePresetQueryValue(
 			query[QUERY_KEY_TIMEFRAME],
 			TIMEFRAME_PRESET_VALUES,
-			DEFAULT_TIMEFRAME_PRESET,
+			defaultState.selectedTimeframe,
 		),
 		selectedLastTimeframeAmount: parsePositiveIntegerQueryValue(
 			query[QUERY_KEY_TIMEFRAME_LAST_AMOUNT],
-			DEFAULT_LAST_TIMEFRAME_AMOUNT,
+			defaultState.selectedLastTimeframeAmount,
 		),
 		selectedLastTimeframeUnit: parsePresetQueryValue(
 			query[QUERY_KEY_TIMEFRAME_LAST_UNIT],
 			LAST_TIMEFRAME_UNIT_VALUES,
-			DEFAULT_LAST_TIMEFRAME_UNIT,
+			defaultState.selectedLastTimeframeUnit,
 		),
 		selectedCustomTimeframeStartDate,
 		selectedCustomTimeframeEndDate,
 		selectedGroupBy: parsePresetQueryValue(
 			query[QUERY_KEY_GROUP_BY],
 			GROUP_BY_PRESET_VALUES,
-			DEFAULT_GROUP_BY_PRESET,
+			defaultState.selectedGroupBy,
 		),
 		selectedBreakdown: parsePresetQueryValue(
 			query[QUERY_KEY_BREAKDOWN],
 			BREAKDOWN_PRESET_VALUES,
-			DEFAULT_BREAKDOWN_PRESET,
+			defaultState.selectedBreakdown,
 		),
 		selectedFilters,
 	}

@@ -23,7 +23,9 @@ import {
 	areSelectedFiltersEqual,
 	areStringArraysEqual,
 	buildAnalyticsQueryBuilderRouteQuery,
+	buildDefaultAnalyticsQueryBuilderState,
 	hasAnalyticsQueryBuilderRouteChange,
+	isAnalyticsQueryBuilderStateDefault,
 	readAnalyticsQueryBuilderState,
 } from './query-builder-url'
 
@@ -95,6 +97,8 @@ export interface AnalyticsDashboardContextValue {
 	selectedBreakdown: Ref<AnalyticsBreakdownPreset>
 	selectedFilters: Ref<AnalyticsSelectedFilters>
 	queryRefreshTimestamp: Ref<number>
+	queryResetToken: Ref<number>
+	isAnalyticsQueryBuilderDefault: ComputedRef<boolean>
 	fetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
 	displayedSelectedProjectIds: Ref<string[]>
 	displayedSelectedGroupBy: Ref<AnalyticsGroupByPreset>
@@ -130,6 +134,7 @@ export interface AnalyticsDashboardContextValue {
 		filters?: AnalyticsSelectedFilters,
 	) => boolean
 	refreshAnalyticsQuery: () => Promise<void>
+	resetAnalyticsQueryBuilder: () => void
 	getVersionDisplayName: (versionId: string) => string
 	getVersionPublishedDate: (versionId: string) => string | undefined
 	setFetchRequest: (fetchRequest: Labrinth.Analytics.v3.FetchRequest) => void
@@ -725,6 +730,7 @@ export function createAnalyticsDashboardContext(
 	const selectedBreakdown = ref<AnalyticsBreakdownPreset>(initialQueryState.selectedBreakdown)
 	const selectedFilters = ref<AnalyticsSelectedFilters>(initialQueryState.selectedFilters)
 	const queryRefreshTimestamp = ref(Date.now())
+	const queryResetToken = ref(0)
 	const fetchRequest = ref<Labrinth.Analytics.v3.FetchRequest | null>(null)
 
 	const hasProjectContext = computed(() => Boolean(options.projectPageContext))
@@ -801,6 +807,23 @@ export function createAnalyticsDashboardContext(
 		return PROJECT_STATUS_FILTER_VALUES.filter((status) => presentStatuses.has(status))
 	})
 	const sortedSelectedProjectIds = computed(() => sortStringValues(selectedProjectIds.value))
+	const isAnalyticsQueryBuilderDefault = computed(() =>
+		isAnalyticsQueryBuilderStateDefault(
+			{
+				selectedProjectIds: selectedProjectIds.value,
+				selectedTimeframeMode: selectedTimeframeMode.value,
+				selectedTimeframe: selectedTimeframe.value,
+				selectedLastTimeframeAmount: selectedLastTimeframeAmount.value,
+				selectedLastTimeframeUnit: selectedLastTimeframeUnit.value,
+				selectedCustomTimeframeStartDate: selectedCustomTimeframeStartDate.value,
+				selectedCustomTimeframeEndDate: selectedCustomTimeframeEndDate.value,
+				selectedGroupBy: selectedGroupBy.value,
+				selectedBreakdown: selectedBreakdown.value,
+				selectedFilters: selectedFilters.value,
+			},
+			availableProjectIds.value,
+		),
+	)
 
 	function getRelevantAnalyticsDashboardStats(
 		breakdown: AnalyticsBreakdownPreset,
@@ -1329,6 +1352,26 @@ export function createAnalyticsDashboardContext(
 		await Promise.all(refetches)
 	}
 
+	function resetAnalyticsQueryBuilder() {
+		if (isAnalyticsQueryBuilderDefault.value) {
+			return
+		}
+
+		const defaultQueryState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds.value)
+
+		selectedProjectIds.value = defaultQueryState.selectedProjectIds
+		selectedTimeframeMode.value = defaultQueryState.selectedTimeframeMode
+		selectedTimeframe.value = defaultQueryState.selectedTimeframe
+		selectedLastTimeframeAmount.value = defaultQueryState.selectedLastTimeframeAmount
+		selectedLastTimeframeUnit.value = defaultQueryState.selectedLastTimeframeUnit
+		selectedCustomTimeframeStartDate.value = defaultQueryState.selectedCustomTimeframeStartDate
+		selectedCustomTimeframeEndDate.value = defaultQueryState.selectedCustomTimeframeEndDate
+		selectedGroupBy.value = defaultQueryState.selectedGroupBy
+		selectedBreakdown.value = defaultQueryState.selectedBreakdown
+		selectedFilters.value = defaultQueryState.selectedFilters
+		queryResetToken.value += 1
+	}
+
 	function setFetchRequest(nextFetchRequest: Labrinth.Analytics.v3.FetchRequest) {
 		if (areAnalyticsFetchRequestsEqual(fetchRequest.value, nextFetchRequest)) {
 			return
@@ -1368,6 +1411,8 @@ export function createAnalyticsDashboardContext(
 		selectedBreakdown,
 		selectedFilters,
 		queryRefreshTimestamp,
+		queryResetToken,
+		isAnalyticsQueryBuilderDefault,
 		fetchRequest,
 		displayedSelectedProjectIds,
 		displayedSelectedGroupBy,
@@ -1396,6 +1441,7 @@ export function createAnalyticsDashboardContext(
 		getRelevantAnalyticsDashboardStats,
 		isAnalyticsDashboardStatRelevant,
 		refreshAnalyticsQuery,
+		resetAnalyticsQueryBuilder,
 		getVersionDisplayName,
 		getVersionPublishedDate,
 		setFetchRequest,
