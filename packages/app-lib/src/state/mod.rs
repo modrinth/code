@@ -1,6 +1,7 @@
 //! Theseus state management system
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
 use tokio::sync::{OnceCell, Semaphore};
 
 use crate::state::fs_watcher::FileWatcher;
@@ -83,7 +84,7 @@ pub struct State {
     /// Friends socket
     pub friends_socket: FriendsSocket,
 
-    pub restart_after_pending_update: Mutex<bool>,
+    pub restart_after_pending_update: AtomicBool,
 
     pub(crate) pool: SqlitePool,
 
@@ -200,7 +201,7 @@ impl State {
             discord_rpc,
             process_manager,
             friends_socket,
-            restart_after_pending_update: Mutex::new(false),
+            restart_after_pending_update: AtomicBool::new(false),
             pool,
             file_watcher,
             // app_identifier,

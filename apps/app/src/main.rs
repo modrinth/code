@@ -6,6 +6,7 @@
 
 use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
+use std::sync::atomic::Ordering;
 use tauri::{Listener, Manager};
 use tauri_plugin_fs::FsExt;
 use theseus::prelude::*;
@@ -97,9 +98,13 @@ fn restart_app(app: tauri::AppHandle) {
 }
 
 #[tauri::command]
-async fn set_restart_after_pending_update(should_restart: bool) -> api::Result<()> {
+async fn set_restart_after_pending_update(
+    should_restart: bool,
+) -> api::Result<()> {
     let state = State::get().await?;
-    *state.restart_after_pending_update.lock().unwrap() = should_restart;
+    state
+        .restart_after_pending_update
+        .store(should_restart, Ordering::Relaxed);
     Ok(())
 }
 
@@ -271,9 +276,12 @@ fn main() {
                 if matches!(event, tauri::RunEvent::Exit) {
                     let update_data = app.state::<PendingUpdateData>().inner();
                     let should_restart = State::get_if_initialized()
-                        .map(|s| *s.restart_after_pending_update.lock().unwrap())
+                        .map(|s| {
+                            s.restart_after_pending_update.load(Ordering::Relaxed)
+                        })
                         .unwrap_or(false);
-                    if let Some((update, data)) = &*update_data.0.lock().unwrap() {
+                    if let Some((update, data)) = &*update_data.0.lock().unwrap()
+                    {
                         fn set_changelog_toast(version: Option<String>) {
                             let toast_result: theseus::Result<()> = tauri::async_runtime::block_on(async move {
                                 let mut settings = settings::get().await?;
@@ -282,7 +290,9 @@ fn main() {
                                 Ok(())
                             });
                             if let Err(e) = toast_result {
-                                tracing::warn!("Failed to set pending_update_toast: {e}")
+                                tracing::warn!(
+                                    "Failed to set pending_update_toast: {e}"
+                                )
                             }
                         }
 
@@ -320,7 +330,6 @@ fn main() {
                         }
                     }
                 }
-
                 #[cfg(target_os = "macos")]
                 if let tauri::RunEvent::Opened { urls } = event {
                     tracing::info!("Handling webview open {urls:?}");
