@@ -221,6 +221,7 @@ const hasProjectOptions = computed(() => projectOptions.value.length > 0)
 const isProjectSelectOpen = ref(false)
 const draftSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
 const projectDownloadsThreshold = ref<number | null>(null)
+const projectDownloadsThresholdProjectIds = ref<string[] | null>(null)
 
 function isSameProjectSelection(left: string[], right: string[]) {
 	if (left.length !== right.length) {
@@ -243,9 +244,28 @@ watch(selectedProjectIds, (nextSelectedProjectIds) => {
 	draftSelectedProjectIds.value = [...nextSelectedProjectIds]
 })
 
+watch(draftSelectedProjectIds, (nextSelectedProjectIds) => {
+	if (projectDownloadsThreshold.value === null) {
+		return
+	}
+
+	const normalizedProjectIds = normalizeProjectSelection(nextSelectedProjectIds)
+	if (
+		projectDownloadsThresholdProjectIds.value &&
+		isSameProjectSelection(
+			normalizedProjectIds,
+			projectDownloadsThresholdProjectIds.value,
+		)
+	) {
+		return
+	}
+
+	clearProjectDownloadsThreshold()
+})
+
 watch(queryResetToken, () => {
 	isProjectSelectOpen.value = false
-	projectDownloadsThreshold.value = null
+	clearProjectDownloadsThreshold()
 	draftSelectedProjectIds.value = isSameProjectSelection(
 		selectedProjectIds.value,
 		allProjectIds.value,
@@ -310,6 +330,7 @@ function commitDraftSelectedProjects(
 }
 
 function clearDraftSelectedProjects() {
+	clearProjectDownloadsThreshold()
 	draftSelectedProjectIds.value = []
 	if (!isProjectSelectOpen.value) {
 		handleProjectSelectClose()
@@ -317,6 +338,7 @@ function clearDraftSelectedProjects() {
 }
 
 function selectAllProjectsMode() {
+	clearProjectDownloadsThreshold()
 	draftSelectedProjectIds.value = []
 }
 
@@ -350,14 +372,28 @@ function applyProjectDownloadsThreshold(threshold: number | null) {
 		return
 	}
 
-	draftSelectedProjectIds.value = projects.value
+	const projectIds = projects.value
 		.filter((project) => project.downloads >= threshold)
 		.map((project) => project.id)
+
+	projectDownloadsThresholdProjectIds.value = projectIds
+	draftSelectedProjectIds.value = projectIds
 }
 
 function setProjectDownloadsThreshold(threshold: number | null) {
 	projectDownloadsThreshold.value = threshold
+	if (threshold === null) {
+		projectDownloadsThresholdProjectIds.value = null
+		draftSelectedProjectIds.value = []
+		return
+	}
+
 	applyProjectDownloadsThreshold(threshold)
+}
+
+function clearProjectDownloadsThreshold() {
+	projectDownloadsThreshold.value = null
+	projectDownloadsThresholdProjectIds.value = null
 }
 
 function closeProjectSelectDropdown(event: KeyboardEvent) {

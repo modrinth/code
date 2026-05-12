@@ -3,7 +3,7 @@
 		v-model="selectedFilterValue"
 		:categories="filterCategories"
 		:show-clear="selectedBreakdown !== 'none'"
-		@clear="clearSelectedBreakdown"
+		@clear="clearFilterBar"
 	>
 		<template #search-actions="{ category, setSelectedValues }">
 			<div v-if="category.key === 'game_version'" class="flex w-40 justify-end">
@@ -159,6 +159,7 @@ import { useFormattedCountries } from '@/composables/country.ts'
 import { useGeneratedState } from '~/composables/generated'
 import {
 	type AnalyticsQueryFilterCategory,
+	type AnalyticsSelectedFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
@@ -186,6 +187,7 @@ const {
 	countryDownloadsByCode,
 	selectedBreakdown,
 	selectedFilters,
+	queryResetToken,
 	refreshAnalyticsQuery,
 	getVersionDisplayName,
 	getVersionPublishedDate,
@@ -199,6 +201,11 @@ const projectVersionDownloadsThreshold = ref<number | null>(null)
 const gameVersionDownloadsThreshold = ref<number | null>(null)
 const gameVersionTypeOptions: Array<'release' | 'all'> = ['release', 'all']
 const filterValueCategoryKeys = new Set<string>(FILTER_VALUE_CATEGORIES)
+const downloadsThresholdFilterCategories = ['country', 'version_id', 'game_version'] as const
+type DownloadsThresholdFilterCategory = (typeof downloadsThresholdFilterCategories)[number]
+const downloadsThresholdSelections = ref<Partial<Record<DownloadsThresholdFilterCategory, string[]>>>(
+	{},
+)
 const projectStatusFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	availableProjectStatuses.value.map((status) => ({
 		value: status,
@@ -231,6 +238,23 @@ const selectedFilterValue = computed<Record<string, string[]>>({
 function clearSelectedBreakdown() {
 	selectedBreakdown.value = 'none'
 }
+
+function clearFilterBar() {
+	clearSelectedBreakdown()
+	clearDownloadsThresholds()
+}
+
+watch(queryResetToken, () => {
+	clearDownloadsThresholds()
+})
+
+watch(
+	selectedFilters,
+	(nextFilters, previousFilters) => {
+		clearDownloadsThresholdsForChangedFilters(previousFilters, nextFilters)
+	},
+	{ deep: true },
+)
 
 const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	const visibleCategoryKeys = new Set(
@@ -516,13 +540,13 @@ function applyGameVersionDownloadsThreshold(setSelectedValues: SetDropdownFilter
 		return
 	}
 
-	setSelectedValues(
-		gameVersionFilterOptions.value
-			.filter((gameVersion) => {
-				return (gameVersionDownloadsByVersion.value.get(gameVersion.value) ?? 0) >= threshold
-			})
-			.map((gameVersion) => gameVersion.value),
-	)
+	const selectedValues = gameVersionFilterOptions.value
+		.filter((gameVersion) => {
+			return (gameVersionDownloadsByVersion.value.get(gameVersion.value) ?? 0) >= threshold
+		})
+		.map((gameVersion) => gameVersion.value)
+
+	setDownloadsThresholdSelectedValues('game_version', selectedValues, setSelectedValues)
 }
 
 function applyCountryDownloadsThreshold(setSelectedValues: SetDropdownFilterValues) {
@@ -531,15 +555,15 @@ function applyCountryDownloadsThreshold(setSelectedValues: SetDropdownFilterValu
 		return
 	}
 
-	setSelectedValues(
-		countryFilterOptions.value
-			.filter((country) => {
-				return (
-					(countryDownloadsByCode.value.get(country.value.trim().toUpperCase()) ?? 0) >= threshold
-				)
-			})
-			.map((country) => country.value),
-	)
+	const selectedValues = countryFilterOptions.value
+		.filter((country) => {
+			return (
+				(countryDownloadsByCode.value.get(country.value.trim().toUpperCase()) ?? 0) >= threshold
+			)
+		})
+		.map((country) => country.value)
+
+	setDownloadsThresholdSelectedValues('country', selectedValues, setSelectedValues)
 }
 
 function applyProjectVersionDownloadsThreshold(setSelectedValues: SetDropdownFilterValues) {
@@ -548,13 +572,13 @@ function applyProjectVersionDownloadsThreshold(setSelectedValues: SetDropdownFil
 		return
 	}
 
-	setSelectedValues(
-		versionFilterOptions.value
-			.filter((version) => {
-				return (projectVersionDownloadsById.value.get(version.value) ?? 0) >= threshold
-			})
-			.map((version) => version.value),
-	)
+	const selectedValues = versionFilterOptions.value
+		.filter((version) => {
+			return (projectVersionDownloadsById.value.get(version.value) ?? 0) >= threshold
+		})
+		.map((version) => version.value)
+
+	setDownloadsThresholdSelectedValues('version_id', selectedValues, setSelectedValues)
 }
 
 function setCountryDownloadsThreshold(
@@ -562,6 +586,12 @@ function setCountryDownloadsThreshold(
 	setSelectedValues: SetDropdownFilterValues,
 ) {
 	countryDownloadsThreshold.value = threshold
+	if (threshold === null) {
+		clearDownloadsThreshold('country')
+		setSelectedValues([])
+		return
+	}
+
 	applyCountryDownloadsThreshold(setSelectedValues)
 }
 
@@ -570,6 +600,12 @@ function setProjectVersionDownloadsThreshold(
 	setSelectedValues: SetDropdownFilterValues,
 ) {
 	projectVersionDownloadsThreshold.value = threshold
+	if (threshold === null) {
+		clearDownloadsThreshold('version_id')
+		setSelectedValues([])
+		return
+	}
+
 	applyProjectVersionDownloadsThreshold(setSelectedValues)
 }
 
@@ -578,7 +614,84 @@ function setGameVersionDownloadsThreshold(
 	setSelectedValues: SetDropdownFilterValues,
 ) {
 	gameVersionDownloadsThreshold.value = threshold
+	if (threshold === null) {
+		clearDownloadsThreshold('game_version')
+		setSelectedValues([])
+		return
+	}
+
 	applyGameVersionDownloadsThreshold(setSelectedValues)
+}
+
+function clearDownloadsThresholdsForChangedFilters(
+	previousFilters: AnalyticsSelectedFilters,
+	nextFilters: AnalyticsSelectedFilters,
+) {
+	for (const categoryKey of downloadsThresholdFilterCategories) {
+		if (areFilterSelectionsEqual(previousFilters[categoryKey], nextFilters[categoryKey])) {
+			continue
+		}
+
+		const thresholdSelection = downloadsThresholdSelections.value[categoryKey]
+		if (
+			thresholdSelection &&
+			areFilterSelectionsEqual(thresholdSelection, nextFilters[categoryKey])
+		) {
+			continue
+		}
+
+		if (previousFilters[categoryKey].length > 0 || nextFilters[categoryKey].length > 0) {
+			clearDownloadsThreshold(categoryKey)
+		}
+	}
+}
+
+function setDownloadsThresholdSelectedValues(
+	categoryKey: DownloadsThresholdFilterCategory,
+	selectedValues: string[],
+	setSelectedValues: SetDropdownFilterValues,
+) {
+	downloadsThresholdSelections.value = {
+		...downloadsThresholdSelections.value,
+		[categoryKey]: normalizeSelectedFilterValues(categoryKey, selectedValues, []),
+	}
+	setSelectedValues(selectedValues)
+}
+
+function clearDownloadsThreshold(
+	categoryKey: DownloadsThresholdFilterCategory,
+) {
+	switch (categoryKey) {
+		case 'country':
+			countryDownloadsThreshold.value = null
+			break
+		case 'version_id':
+			projectVersionDownloadsThreshold.value = null
+			break
+		case 'game_version':
+			gameVersionDownloadsThreshold.value = null
+			break
+	}
+
+	const nextSelections = { ...downloadsThresholdSelections.value }
+	delete nextSelections[categoryKey]
+	downloadsThresholdSelections.value = nextSelections
+}
+
+function clearDownloadsThresholds() {
+	for (const categoryKey of downloadsThresholdFilterCategories) {
+		clearDownloadsThreshold(categoryKey)
+	}
+}
+
+function areFilterSelectionsEqual(left: string[], right: string[]): boolean {
+	const leftValues = new Set(left)
+	const rightValues = new Set(right)
+	if (leftValues.size !== rightValues.size) {
+		return false
+	}
+
+	return [...leftValues].every((value) => rightValues.has(value))
 }
 
 async function runDownloadsThresholdQuery(
