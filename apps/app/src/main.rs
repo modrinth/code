@@ -297,11 +297,23 @@ fn main() {
                         match update.install(data) {
                             Ok(()) => {
                                 if should_restart {
+                                    tracing::info!(
+                                        "Pending update installed successfully (version {}); restarting because user requested reload",
+                                        update.version
+                                    );
                                     app.restart();
+                                } else {
+                                    tracing::info!(
+                                        "Pending update installed successfully (version {}); exiting without relaunch (user did not request reload)",
+                                        update.version
+                                    );
                                 }
                             }
                             Err(e) => {
-                                tracing::error!("Error while updating: {e}");
+                                tracing::error!(
+                                    "Pending update install failed (version {}): {e}",
+                                    update.version
+                                );
                                 set_changelog_toast(None);
 
                                 DialogBuilder::message()

@@ -23,7 +23,7 @@ export async function removeEnqueuedUpdate() {
 }
 
 export async function setRestartAfterPendingUpdate(should_restart) {
-	return await invoke('set_restart_after_pending_update', { should_restart })
+	return await invoke('set_restart_after_pending_update', { shouldRestart: should_restart })
 }
 
 // One of 'Windows', 'Linux', 'MacOS'
