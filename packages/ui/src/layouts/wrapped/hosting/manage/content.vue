@@ -19,8 +19,13 @@ import {
 	pendingServerContentInstallsEvent,
 	readPendingServerContentInstallBaseline,
 	readPendingServerContentInstalls,
+	removePendingServerContentInstall,
 } from '#ui/utils/server-content-installing'
 
+import {
+	flushStoredServerAddonInstallQueue,
+	getStoredServerAddonInstallQueue,
+} from '../../../shared/browse-tab/composables/install-logic'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
@@ -96,6 +101,10 @@ const messages = defineMessages({
 	failedToBulkUpdate: {
 		id: 'hosting.content.failed-to-bulk-update',
 		defaultMessage: 'Failed to update content',
+	},
+	failedToInstallContent: {
+		id: 'hosting.content.failed-to-install',
+		defaultMessage: 'Failed to install content',
 	},
 })
 
@@ -227,6 +236,7 @@ const pendingServerContentInstalls = ref<PendingServerContentInstall[]>([])
 const lastStableContentKeys = ref<Set<string>>(new Set())
 const contentInstallBaselineKeys = ref<Set<string> | null>(null)
 const contentInstallAddedKeys = ref<Set<string>>(new Set())
+const isFlushingStoredServerInstalls = ref(false)
 
 function syncPendingServerContentInstalls() {
 	pendingServerContentInstalls.value = readPendingServerContentInstalls(serverId, worldId.value)
@@ -237,6 +247,7 @@ function handlePendingServerContentInstallsChanged(event: Event) {
 		.detail
 	if (detail?.serverId !== serverId || detail?.worldId !== worldId.value) return
 	syncPendingServerContentInstalls()
+	void flushStoredServerInstalls()
 }
 
 function getAddonInstallKey(addon: Archon.Content.v1.Addon) {
@@ -275,6 +286,50 @@ function syncContentInstallKeys(
 	lastStableContentKeys.value = currentKeys
 	contentInstallBaselineKeys.value = null
 	contentInstallAddedKeys.value = new Set()
+}
+
+async function flushStoredServerInstalls() {
+	const wid = worldId.value
+	if (!wid || isFlushingStoredServerInstalls.value) return
+
+	const queuedPlans = getStoredServerAddonInstallQueue(serverId, wid)
+	if (queuedPlans.size === 0) return
+
+	isFlushingStoredServerInstalls.value = true
+	try {
+		const result = await flushStoredServerAddonInstallQueue({
+			serverId,
+			worldId: wid,
+			install: (plans) =>
+				client.archon.content_v1.addAddons(
+					serverId,
+					wid,
+					plans.map((plan) => ({
+						project_id: plan.projectId,
+						version_id: plan.versionId,
+					})),
+				),
+		})
+
+		if (!result.ok) {
+			for (const plan of result.attemptedPlans) {
+				removePendingServerContentInstall(serverId, wid, plan.projectId)
+			}
+			addNotification({
+				type: 'error',
+				title: formatMessage(messages.failedToInstallContent),
+				text: result.error instanceof Error ? result.error.message : undefined,
+			})
+			return
+		}
+
+		if (result.flushedPlans.length > 0) {
+			await queryClient.invalidateQueries({ queryKey: queryKey.value })
+		}
+	} finally {
+		isFlushingStoredServerInstalls.value = false
+		syncPendingServerContentInstalls()
+	}
 }
 
 function pendingInstallToContentItem(item: PendingServerContentInstall): ContentItem {
@@ -428,12 +483,14 @@ watch(
 	() => {
 		syncPendingServerContentInstalls()
 		syncContentInstallKeys()
+		void flushStoredServerInstalls()
 	},
 	{ immediate: true },
 )
 
 onMounted(() => {
 	syncPendingServerContentInstalls()
+	void flushStoredServerInstalls()
 	window.addEventListener(
 		pendingServerContentInstallsEvent,
 		handlePendingServerContentInstallsChanged,

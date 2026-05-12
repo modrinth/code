@@ -1316,6 +1316,9 @@
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Failed to update content"
   },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "Failed to install content"
+  },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Failed to load modpack content"
   },

@@ -35,6 +35,9 @@
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Gagal memuat tetapan pelayan"
   },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -91,6 +94,12 @@
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Langgan semula ke Pelayan"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Cari {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} server {pelayan} other {projek}}..."
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Lihat:"
   },
   "button.accept": {
     "defaultMessage": "Terima"
@@ -485,11 +494,41 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} dipilih"
   },
+  "creation-flow.button.import": {
+    "defaultMessage": "Import"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "Terkini"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "Lain-lain"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "Stabil"
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "Pemuat"
+  },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Nama"
   },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "Sukar"
+  },
+  "creation-flow.modal.final-config.generator-settings.custom": {
+    "defaultMessage": "Tersuai"
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "Datar"
+  },
   "creation-flow.modal.import-instance.action.add": {
     "defaultMessage": "Tambah"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "Tidak"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Ya"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Ringkasan pengekstrakan"
@@ -1547,6 +1586,9 @@
   "label.version": {
     "defaultMessage": "Versi"
   },
+  "label.view": {
+    "defaultMessage": "Lihat"
+  },
   "label.visibility": {
     "defaultMessage": "Keterlihatan"
   },
@@ -1704,7 +1746,7 @@
     "defaultMessage": "Gagal"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Disenaraikan"
+    "defaultMessage": "Awam"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Penyederhana"
@@ -1741,9 +1783,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Gagal"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Ditahan"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Salin kod ke papan keratan"
@@ -2695,6 +2734,12 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Pulihkan"
+  },
+  "servers.backups.toolbar.filter-auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.toolbar.filter-manual": {
+    "defaultMessage": "Manual"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Penciptaan sandaran sedang dijalankan"

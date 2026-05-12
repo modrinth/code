@@ -758,6 +758,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "設定伺服器"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "否"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "永久禁止"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "未識別"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "附帶引用標註"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "附帶引用標註與來源"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "是"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "解壓縮摘要"
   },
@@ -1198,6 +1216,21 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "輸入縣市／省／州"
+  },
+  "format.bytes.0": {
+    "defaultMessage": "{count} 位元組"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
   },
   "header.category.category": {
     "defaultMessage": "類別"
@@ -2019,7 +2052,7 @@
     "defaultMessage": "不通過"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "已擱置"
+    "defaultMessage": "由工作人員設為不公開"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "將程式碼複製到剪貼簿"
@@ -2788,6 +2821,9 @@
   },
   "project.settings.upload.title": {
     "defaultMessage": "上傳"
+  },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "權限"
   },
   "project.settings.versions.title": {
     "defaultMessage": "版本"

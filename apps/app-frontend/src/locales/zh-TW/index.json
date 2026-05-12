@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "無法連線到驗證伺服器"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "將伺服器新增到實例"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "將伺服器新增到實例"
+    "message": "將伺服器新增至實例"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "新增至實例"
   },
   "app.browse.add-to-instance": {
     "message": "新增至實例"
@@ -120,7 +120,10 @@
     "message": "已新增"
   },
   "app.browse.already-added": {
-    "message": "已新增"
+    "message": "已經新增"
+  },
+  "app.browse.back-to-instance": {
+    "message": "回到實例"
   },
   "app.browse.discover-content": {
     "message": "探索內容"
@@ -131,20 +134,11 @@
   "app.browse.hide-added-servers": {
     "message": "隱藏已新增的伺服器"
   },
-  "app.browse.hide-installed-content": {
-    "message": "隱藏已安裝的內容"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "安裝至實例中"
-  },
   "app.browse.project-type.modpacks": {
     "message": "模組包"
   },
-  "app.browse.server.install": {
-    "message": "安裝"
-  },
-  "app.browse.server.installed": {
-    "message": "已安裝"
+  "app.browse.server-instance-content-warning": {
+    "message": "加入內容可能會導致加入伺服器時發生相容性問題。當你更新伺服器實例內容時，任何新增的內容也會遺失。"
   },
   "app.browse.server.installing": {
     "message": "安裝中"
@@ -164,6 +158,9 @@
   "app.export-modal.header": {
     "message": "匯出模組包"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "要包含「{file}」嗎？"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "模組包名稱"
   },
@@ -171,7 +168,7 @@
     "message": "模組包名稱"
   },
   "app.export-modal.select-files-label": {
-    "message": "選擇要包含在模組包中的檔案與資料夾"
+    "message": "設定要包含在此匯出檔案中的檔案"
   },
   "app.export-modal.version-number-label": {
     "message": "版本號碼"
@@ -198,7 +195,7 @@
     "message": "建立"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "模組包已經安裝"
+    "message": "模組包已安裝"
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "實例"
@@ -301,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "需要更新才能遊玩「{name}」。請更新至最新版本以啟動遊戲。"
+  },
+  "app.project.install-button.already-installed": {
+    "message": "這個專案已安裝"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "回到瀏覽頁面"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "將內容安裝至實例"
   },
   "app.settings.developer-mode-enabled": {
     "message": "開發人員模式已啟用。"
@@ -693,22 +699,22 @@
     "message": "世界正在使用中"
   },
   "minecraft-account.add-account": {
-    "message": "添加賬號"
+    "message": "新增帳號"
   },
   "minecraft-account.label": {
-    "message": "Minecraft 賬號"
+    "message": "Minecraft 帳號"
   },
   "minecraft-account.not-signed-in": {
-    "message": "未登錄"
+    "message": "未登入"
   },
   "minecraft-account.remove-account": {
-    "message": "移除賬號"
+    "message": "移除帳號"
   },
   "minecraft-account.select-account": {
-    "message": "選擇賬號"
+    "message": "選擇帳號"
   },
   "minecraft-account.sign-in": {
-    "message": "登錄 Minecraft"
+    "message": "登入 Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "由該實例提供"

@@ -27,6 +27,23 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 	}
 
 	/**
+	 * Check that a project slug or ID exists and return its canonical project ID.
+	 *
+	 * @param idOrSlug - Project ID or slug (e.g. `sodium` or `AANobbMI`)
+	 */
+	public async check(idOrSlug: string): Promise<Labrinth.Projects.v2.ProjectCheckResponse> {
+		const encoded = encodeURIComponent(idOrSlug)
+		return this.client.request<Labrinth.Projects.v2.ProjectCheckResponse>(
+			`/project/${encoded}/check`,
+			{
+				api: 'labrinth',
+				version: 2,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
 	 * Get multiple projects by IDs
 	 *
 	 * @param ids - Array of project IDs or slugs

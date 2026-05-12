@@ -506,6 +506,12 @@
   "create.project.title": {
     "message": "Vytvořit projekt"
   },
+  "create.project.type-project": {
+    "message": "Projekt"
+  },
+  "create.project.type-server": {
+    "message": "Server"
+  },
   "create.project.url-label": {
     "message": "URL"
   },
@@ -943,9 +949,6 @@
   },
   "moderation.page.reports": {
     "message": "Hlášení"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Technické hodnocení"
   },
   "muralpay.country.at": {
     "message": "Rakousko"

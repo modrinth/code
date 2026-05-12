@@ -1229,6 +1229,27 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Bitte Steuerformular ausfüllen"
   },
+  "discover.install.back-to-server": {
+    "message": "Zurück zum Server"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Zurück zur Einrichtung"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Zurücksetzung abbrechen"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Keine Serverwelt ist zur Installation verfügbar."
+  },
+  "discover.seo.description": {
+    "message": "Durchsuche und entdecke tausende Minecraft {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} other {Projekte}} auf Modrinth mit sofortigen und präzisen Suchergebnissen. Unsere Filter helfen dir dabei, schnell die besten Minecraft {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} other {Projekte}} zu finden."
+  },
+  "discover.seo.title": {
+    "message": "Durchsuche {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} other {Projekte}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Durchsuche {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} other {Projekte}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "Eventuell hast du die URL der Kollektion falsch eingegeben."
   },
@@ -1243,6 +1264,12 @@
   },
   "error.collection.404.title": {
     "message": "Kollektion nicht gefunden"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Du bist aktuell angemeldet als:"
+  },
+  "error.generic.401.title": {
+    "message": "Du hast keinen Zugriff auf diese Seite"
   },
   "error.generic.404.subtitle": {
     "message": "Die von dir gesuchte Seite scheint nicht zu existieren."
@@ -1670,6 +1697,9 @@
   "layout.action.create-new": {
     "message": "Erstellen..."
   },
+  "layout.action.external-projects": {
+    "message": "Externe Projekte"
+  },
   "layout.action.file-lookup": {
     "message": "Dateisuche"
   },
@@ -1921,6 +1951,9 @@
   },
   "moderation.moderate": {
     "message": "Moderieren"
+  },
+  "moderation.page.external-projects": {
+    "message": "Externe Projekte"
   },
   "moderation.page.projects": {
     "message": "Projekte"
@@ -2615,6 +2648,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Bitte lege Nachweise vor, dass du die Erlaubnis zur Weiterverbreitung folgender Dateien hast; alle zurückgehaltenen Versionen werden automatisch veröffentlicht."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Bitte lege Nachweise vor, dass du die Erlaubnis zur Weiterverbreitung aller folgenden Dateien hast, bevor du dein Projekt zur Überprüfung einreichen kannst."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Unbekannter eingebetteter Inhalt"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Alle externen Inhalte haben Quellenangaben."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Quellenangaben vollständig!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Keine deiner Versionen enthält externe Inhalte, du musst du dir keine Gedanken über die Einholung von Genehmigungen machen."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Du bist startklar!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Du hast keine Berechtigung, einige der von dir hinzugefügten externen Inhalte weiterzuverbreiten. Entferne die urheberrechtsverletzenden Inhalte, um auf Modrinth veröffentlichen zu können."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Bestimmte Inhalte können nicht enthalten sein"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Wenn du Inhalte einbindest, welche nicht auf Modrinth gehostet werden, musst du uns deren Quelle mitteilen und bestätigen, dass du die Berechtigung zur Verbreitung der Dateien hast. In <link>unserer Anleitung</link> lernst du, wie du dies am besten machst!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "So funktionieren Quellenangaben"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Mehr erfahren"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Durchsuche {count} {count, plural, one {externes Projekt} other {externe Projekte}}..."
+  },
   "project.settings.title": {
     "message": "Einstellungen"
   },
@@ -2632,6 +2704,15 @@
   },
   "project.versions.title": {
     "message": "Versionen"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Diese Version ist} other {Diese Versionen sind}} derzeit zurückgehalten und nicht öffentlich gelistet. Bitte stelle einen Nachweis bereit, dass du die Erlaubnis hast, bestimmte Dateien weiterzuverbreiten, die im Modpack in {count, plural, one {Version} other {Versionen}} enthalten sind."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Beheben"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Version {version_name} wurde} other {Versionen wurden}} aufgrund unbekannter eingebetteter Inhalte zurückgehalten"
   },
   "report.already-reported": {
     "message": "Du hast {title} bereits gemeldet"
@@ -3001,6 +3082,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Mit Server synchronisieren"
+  },
+  "servers.manage.content.title": {
+    "message": "Inhalt - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "Aktionen"

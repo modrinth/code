@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Authentifizierungsserver sind nicht erreichbar"
   },
-  "app.browse.add-server-to-instance": {
+  "app.browse.add-servers-to-instance": {
     "message": "Server zu Instanz hinzufügen"
   },
-  "app.browse.add-servers-to-instance": {
-    "message": "Server zu deiner Instanz hinzufügen"
+  "app.browse.add-to-an-instance": {
+    "message": "Zu Instanz hinzufügen"
   },
   "app.browse.add-to-instance": {
     "message": "Zu Instanz hinzufügen"
@@ -122,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Bereits hinzugefügt"
   },
+  "app.browse.back-to-instance": {
+    "message": "Zu Instanz zurückgehen"
+  },
   "app.browse.discover-content": {
     "message": "Inhalte entdecken"
   },
@@ -131,20 +134,11 @@
   "app.browse.hide-added-servers": {
     "message": "Bereits hinzugefügte Server ausblenden"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Bereits installierte Inhalte ausblenden"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Inhalt in Instanz installieren"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
   },
-  "app.browse.server.install": {
-    "message": "Installieren"
-  },
-  "app.browse.server.installed": {
-    "message": "Installiert"
+  "app.browse.server-instance-content-warning": {
+    "message": "Das hinzufügen von Inhalten kann Kompatibilitätsprobleme beim beitreten eines Servers verursachen. Sämtliche hinzugefügte Inhalten gehen ausserdem beim aktualisieren der Server Instanz-Inhalte verloren."
   },
   "app.browse.server.installing": {
     "message": "Wird installiert"
@@ -164,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Modpack exportieren"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "\"{file}\" einschliessen?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpaketname"
   },
@@ -171,7 +168,7 @@
     "message": "Modpaketname"
   },
   "app.export-modal.select-files-label": {
-    "message": "Wähle Dateien und Ordner zum hinzufügen im Paket aus"
+    "message": "Konfiguriere, welche Dateien in diesem Export miteinbezogen werden"
   },
   "app.export-modal.version-number-label": {
     "message": "Versionsnummer"
@@ -301,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Eine aktualisierung zum spielen von {name} ist benötigt. Bitte aktualisiere auf die neuste Version um das Spiel zu starten."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Dieses Projekt ist bereits installiert"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Zurück zum Durchstöbern"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Inhalt in Instanz installieren"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Entwicklermodus aktiviert."

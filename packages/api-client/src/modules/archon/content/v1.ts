@@ -59,7 +59,7 @@ export class ArchonContentV1Module extends AbstractModule {
 			api: 'archon',
 			version: 1,
 			method: 'POST',
-			body: { addons } satisfies Archon.Content.v1.AddAddonsRequest,
+			body: addons satisfies Archon.Content.v1.AddAddonsRequest,
 		})
 	}
 

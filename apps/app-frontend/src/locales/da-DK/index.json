@@ -1,4 +1,88 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Downloader Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Downloads"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Gem flere kørende instances"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Gør til primære instance"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Ingen instances kørende"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Primære instance"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Vis flere kørende instances"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Stop instance"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Vis aktive downloads"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Vis instance"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Vis logs"
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Avanceret rendering"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Vælg dit foretrukne farvetema til Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Farvetema"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Skift hvilken side launcheren åbner i."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Hjem"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Bibliotek"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Standard startside"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Slår nametagget over din spiller på skins siden fra."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Gem nametag"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Inkluderer de sidste verdener i afsnittet \"Hop tilbage\" på startsiden."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Hop tilbage ind i verdener"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimer launcheren når Minecraft starter."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimer launcher"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Vælg en mulighed"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Hvis du prøver at installere en Modrinth Pack fil (.mrpack) som ikke er hosted på Modrinth, så skal vi nok sikre os du forstår riskoen før du installere den."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Advar mig før jeg installere en ukendt modpacks"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft authentication servere kan måske være nede lige nu. Tjek din internet forbindelse og prøv igen senere."
   },
@@ -34,9 +118,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpack navn"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Vælg filer og mapper til at inkludere i pakken"
   },
   "app.export-modal.version-number-label": {
     "message": "Versionsnummer"

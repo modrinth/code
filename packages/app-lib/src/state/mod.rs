@@ -95,6 +95,12 @@ impl State {
             .await?;
 
         tokio::task::spawn(async move {
+            fs_watcher::watch_profiles_init(
+                &state.file_watcher,
+                &state.directories,
+            )
+            .await;
+
             let res = tokio::try_join!(
                 state.discord_rpc.clear_to_default(true),
                 Profile::refresh_all(),
@@ -175,7 +181,6 @@ impl State {
 
         tracing::info!("Initializing file watcher");
         let file_watcher = fs_watcher::init_watcher().await?;
-        fs_watcher::watch_profiles_init(&file_watcher, &directories).await;
 
         let process_manager = ProcessManager::new();
 

@@ -924,7 +924,7 @@
     "message": "Puedes editar varios proyectos a la vez seleccionándolos a continuación."
   },
   "dashboard.projects.bulk-edit.server-disabled": {
-    "message": "Proyectos de servidor no soportan edición masiva"
+    "message": "Los proyectos no son compatible con la edición masiva de servidores"
   },
   "dashboard.projects.empty": {
     "message": "Aún no tienes ningún proyecto. Haz clic en el botón verde de arriba para empezar."
@@ -942,19 +942,19 @@
     "message": "Editar enlaces"
   },
   "dashboard.projects.links.changes-applied": {
-    "message": "Cambios seran a aplicados a {count} {count, plural,one {proyecto} other {proyectos}}."
+    "message": "Los cambios se aplicaran en <strong>{count}</strong>{count, plural,one {proyecto}other {proyectos}}."
   },
   "dashboard.projects.links.description": {
-    "message": "Los enlaces que especifique a continuación se sobrescribirán en cada uno de los proyectos seleccionados. Los que deje en blanco se ignorarán. Puede eliminar un enlace de todos los proyectos seleccionados mediante el botón de la papelera."
+    "message": "Cualquier enlace escrito más abajo se modificará en los proyectos seleccionados. Los que dejes en blanco serán ignorados. Puedes quitar un enlace de todos los proyectos seleccionados usando el botón de basurero."
   },
   "dashboard.projects.links.discord-invite.description": {
-    "message": "Un link de invitación a tu servidor de Discord."
+    "message": "Una invitación a tu servidor de Discord."
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Invitación de Discord"
   },
   "dashboard.projects.links.issue-tracker.description": {
-    "message": "Un lugar para usuarios para reportar bugs, errores, y preocupaciones sobre tu proyecto."
+    "message": "Un lugar donde los usuarios reporten errores, problemas y preocupaciones sobre tu proyecto."
   },
   "dashboard.projects.links.issue-tracker.label": {
     "message": "Registro de errores"
@@ -984,7 +984,7 @@
     "message": "Página wiki"
   },
   "dashboard.projects.notification.bulk-edit-success": {
-    "message": "Edición masiva seleccionada de tus links de proyecto."
+    "message": "Se editaron los enlaces de los proyectos seleccionados."
   },
   "dashboard.projects.project.icon-alt": {
     "message": "Icono de {title}"
@@ -1243,6 +1243,12 @@
   },
   "error.collection.404.title": {
     "message": "Colección no encontrada"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Has iniciado sesión como:"
+  },
+  "error.generic.401.title": {
+    "message": "No tienes acceso a esta página"
   },
   "error.generic.404.subtitle": {
     "message": "Parece que la página que estabas buscando no existe."
@@ -1659,7 +1665,7 @@
     "message": "Para jugadores"
   },
   "landing.section.for-players.tagline": {
-    "message": "Descubre sobre las creaciones de {count, number}"
+    "message": "Descubre más de {count, number} creaciones"
   },
   "landing.subheading": {
     "message": "Descubre, juega y comparte contenido de Minecraft a través de nuestra plataforma de código abierto creada para la comunidad."
@@ -1669,6 +1675,9 @@
   },
   "layout.action.create-new": {
     "message": "Crear nuevo..."
+  },
+  "layout.action.external-projects": {
+    "message": "Proyectos externos"
   },
   "layout.action.file-lookup": {
     "message": "Buscar archivo"
@@ -1921,6 +1930,9 @@
   },
   "moderation.moderate": {
     "message": "Moderar"
+  },
+  "moderation.page.external-projects": {
+    "message": "Proyectos externos"
   },
   "moderation.page.projects": {
     "message": "Proyectos"
@@ -2615,6 +2627,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Por favor proporciona pruebas de que tienes permiso para redistribuir todos estos archivos y cualquier versión retenida se publicará automáticamente."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Por favor proporciona pruebas de que tienes permiso para redistribuir todos estos archivos antes de enviar tu proyecto a revisión."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Incluye contenido desconocido"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Todo el contenido externo proporciona atribuciones."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "¡Atribuciones completadas!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Ninguna de tus versiones presenta contenido externo, por lo que no necesitas preocuparte de obtener permisos."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "¡Ya estás listo!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "No tienes permiso de redistribuir parte del contenido externo que añadiste. Para poder publicar en Modrinth, quite el contenido infractor."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "No se puede incluir parte del contenido"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Si incluyes contenido que no está en Modrinth, debes dejarnos saber de donde es y verificar que tienes permiso de distribuir los archivos. ¡Mira <link>nuestra guía</link> para aprender como hacerlo!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Aprende cómo funcionan las atribuciones"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Aprende más"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Busca {count} {count, plural, one {proyecto externo} other {proyectos externos}}..."
+  },
   "project.settings.title": {
     "message": "Configuración"
   },
@@ -2633,14 +2684,23 @@
   "project.versions.title": {
     "message": "Versiones"
   },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Esta versión se encuentra retenida y no listada} other {Estas versiones se encuentran retenidas y no listadas}} publicamente. Por favor proporcione pruebas que tiene permiso de redistribuir algunos de los archivos presentes en {count, plural, one {la versión} other {las versiones}} del modpack."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Resolver"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Versión {version_name} retenida} other {Versiones retenidas}} debido a que incluye contenido desconocido"
+  },
   "report.already-reported": {
     "message": "Ya has reportado {title}"
   },
   "report.already-reported-description": {
-    "message": "Ya tienes un reporte abierto para este {item, select, project {project} version {version} user {user} other {content}}. Puedes añadir más detalles a tu reporte si tienes más información que agregar."
+    "message": "Ya tienes un reporte abierto para {item, select, project {este proyecto} version {esta versión} user {este usuario} other {este contenido}}. Puedes añadir más detalles a tu reporte si tienes más información que agregar."
   },
   "report.back-to-item": {
-    "message": "Volver a {item, select, project {proyecto} version {version} user {usuario} other {contenido}}"
+    "message": "Volver {item, select, project {al proyecto} version {a la versión} user {al usuario} other {al contenido}}"
   },
   "report.body.description": {
     "message": "Incluye enlaces e imágenes si es posible y relevante. Los reportes vacíos o insuficientes serán cerrados e ignorados."

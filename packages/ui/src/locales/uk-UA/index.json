@@ -1925,9 +1925,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Невдало"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "У списку"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Модератор"
   },
@@ -1963,9 +1960,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Невдача"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Утримується"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Скопіювати код у буфер обміну"
