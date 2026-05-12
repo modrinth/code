@@ -43,6 +43,7 @@ export const Searchable: Story = {
 		],
 		searchable: true,
 		searchPlaceholder: 'Search loaders...',
+		selectSearchTextOnFocus: true,
 	},
 }
 

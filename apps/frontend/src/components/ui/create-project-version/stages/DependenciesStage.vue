@@ -13,6 +13,7 @@
 					placeholder="Select version"
 					:options="[{ label: 'Any version', value: null }, ...newDependencyVersions]"
 					:searchable="true"
+					:select-search-text-on-focus="true"
 				/>
 			</div>
 

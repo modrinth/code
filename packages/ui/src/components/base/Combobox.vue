@@ -28,7 +28,7 @@
 				class="relative z-[1]"
 				@input="handleSearchInput"
 				@keydown="handleSearchKeydown"
-				@focus="handleSearchFocus"
+				@focusin="handleSearchFocus"
 				@click="handleSearchClick"
 			>
 				<template v-if="showChevron" #right>
@@ -231,6 +231,8 @@ const props = withDefaults(
 		disableSearchFilter?: boolean
 		/** Keep the selected option's label in the input after selection, and show all options on focus */
 		syncWithSelection?: boolean
+		/** Select the searchable input text when the field receives focus */
+		selectSearchTextOnFocus?: boolean
 		/** Show a search icon in the searchable input */
 		showSearchIcon?: boolean
 	}>(),
@@ -245,6 +247,7 @@ const props = withDefaults(
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		noOptionsMessage: 'No results found',
 		syncWithSelection: true,
+		selectSearchTextOnFocus: false,
 		showSearchIcon: false,
 	},
 )
@@ -634,7 +637,16 @@ function handleSearchInput() {
 	}
 }
 
-function handleSearchFocus() {
+function handleSearchFocus(event: FocusEvent) {
+	const target = event.target
+	if (props.selectSearchTextOnFocus && target instanceof HTMLInputElement) {
+		window.setTimeout(() => {
+			if (document.activeElement === target) {
+				target.select()
+			}
+		})
+	}
+
 	if (!isOpen.value) {
 		openDropdown()
 	}

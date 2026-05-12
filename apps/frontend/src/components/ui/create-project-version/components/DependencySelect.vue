@@ -7,6 +7,7 @@
 		search-placeholder="Search by name or paste ID..."
 		:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
 		:disable-search-filter="true"
+		:select-search-text-on-focus="true"
 		@search-input="(query) => handleSearch(query)"
 	/>
 </template>
