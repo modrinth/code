@@ -96,6 +96,7 @@
 								:pinned-slice-index="pinnedSliceIndex"
 								@hover="onChartHover"
 								@pinned-drag="onPinnedDrag"
+								@range-select="onRangeSelect"
 							/>
 						</ClientOnly>
 						<div
@@ -155,8 +156,12 @@ import {
 } from '~/providers/analytics/analytics'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
-import AnalyticsChart from './AnalyticsChart.client.vue'
+import AnalyticsChart, { type AnalyticsChartRangeSelectPayload } from './AnalyticsChart.client.vue'
 import AnalyticsChartTooltip, { type AnalyticsChartTooltipEntry } from './AnalyticsChartTooltip.vue'
+import {
+	ensureMinimumTimeRange,
+	getDefaultAnalyticsGroupByForDurationMinutes,
+} from '../query-builder/timeframe-picker/timeframe'
 import {
 	buildChartDatasets,
 	buildTimeAxisLabels,
@@ -172,6 +177,10 @@ type ViewMode = 'line' | 'area' | 'bar'
 const {
 	activeStat,
 	hasProjectContext,
+	selectedTimeframeMode,
+	selectedCustomTimeframeStartDate,
+	selectedCustomTimeframeEndDate,
+	selectedGroupBy: selectedDashboardGroupBy,
 	displayedSelectedProjectIds: selectedProjectIds,
 	projects,
 	displayedFetchRequest: fetchRequest,
@@ -392,8 +401,7 @@ function onChartHover(payload: HoverState) {
 	setHoverState(payload)
 }
 
-function onPinnedDrag(payload: HoverState) {
-	if (isDataLoading.value || !isHoverPinned.value) return
+function ignoreUpcomingChartClick() {
 	ignoreNextChartClick.value = true
 	if (clearIgnoredChartClickTimeout) {
 		clearTimeout(clearIgnoredChartClickTimeout)
@@ -402,7 +410,65 @@ function onPinnedDrag(payload: HoverState) {
 		ignoreNextChartClick.value = false
 		clearIgnoredChartClickTimeout = null
 	}, 350)
+}
+
+function onPinnedDrag(payload: HoverState) {
+	if (isDataLoading.value || !isHoverPinned.value) return
+	ignoreUpcomingChartClick()
 	setHoverState(payload)
+}
+
+function getDefaultGroupByForRange(start: Date, end: Date) {
+	const ensuredRange = ensureMinimumTimeRange(start, end)
+	const durationMinutes = Math.max(
+		1,
+		Math.floor((ensuredRange.end.getTime() - ensuredRange.start.getTime()) / 60000),
+	)
+
+	return getDefaultAnalyticsGroupByForDurationMinutes(durationMinutes)
+}
+
+function onRangeSelect(payload: AnalyticsChartRangeSelectPayload) {
+	if (isDataLoading.value) return
+
+	const nextFetchRequest = fetchRequest.value
+	if (!nextFetchRequest) return
+
+	if (payload.startSliceIndex === payload.endSliceIndex) {
+		ignoreUpcomingChartClick()
+		return
+	}
+
+	const startSliceIndex = Math.min(payload.startSliceIndex, payload.endSliceIndex)
+	const endSliceIndex = Math.max(payload.startSliceIndex, payload.endSliceIndex)
+	const startBucketRange = getSliceBucketRange(
+		nextFetchRequest.time_range,
+		sliceCount.value,
+		startSliceIndex,
+	)
+	const endBucketRange = getSliceBucketRange(
+		nextFetchRequest.time_range,
+		sliceCount.value,
+		endSliceIndex,
+	)
+	const start = startBucketRange.start
+	const end = endBucketRange.end
+
+	if (
+		!Number.isFinite(start.getTime()) ||
+		!Number.isFinite(end.getTime()) ||
+		end.getTime() <= start.getTime()
+	) {
+		return
+	}
+
+	ignoreUpcomingChartClick()
+	isHoverPinned.value = false
+	clearHoverState()
+	selectedTimeframeMode.value = 'custom_datetime_range'
+	selectedCustomTimeframeStartDate.value = start.toISOString()
+	selectedCustomTimeframeEndDate.value = end.toISOString()
+	selectedDashboardGroupBy.value = getDefaultGroupByForRange(start, end)
 }
 
 function onChartClick() {

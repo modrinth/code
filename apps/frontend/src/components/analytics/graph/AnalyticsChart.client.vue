@@ -1,8 +1,17 @@
 <template>
-	<canvas
-		ref="canvasRef"
-		:style="{ touchAction: props.pinnedSliceIndex === null ? undefined : 'none' }"
-	/>
+	<div class="relative h-full">
+		<canvas
+			ref="canvasRef"
+			class="h-full w-full"
+			:style="{ touchAction: props.pinnedSliceIndex === null ? 'pan-y' : 'none' }"
+		/>
+		<div
+			v-if="rangeSelection.visible"
+			aria-hidden="true"
+			class="pointer-events-none absolute z-10 rounded-sm border border-dashed border-brand bg-brand-highlight opacity-20"
+			:style="rangeSelectionStyle"
+		/>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -44,6 +53,11 @@ export type AnalyticsChartHoverPayload = {
 	sliceIndex: number | null
 }
 
+export type AnalyticsChartRangeSelectPayload = {
+	startSliceIndex: number
+	endSliceIndex: number
+}
+
 const props = defineProps<{
 	type: 'line' | 'bar'
 	fill: boolean
@@ -58,6 +72,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	(event: 'hover' | 'pinned-drag', payload: AnalyticsChartHoverPayload): void
+	(event: 'range-select', payload: AnalyticsChartRangeSelectPayload): void
 }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -79,6 +94,7 @@ const chartInteractionEvents: ChartEvents = [
 	'touchmove',
 ]
 const PINNED_DRAG_THRESHOLD_PX = 6
+const RANGE_SELECT_THRESHOLD_PX = 8
 const EMPTY_DATA_Y_AXIS_MAX = 10
 const EMPTY_DATA_Y_AXIS_STEP = 2
 const Y_AXIS_WIDTH = 40
@@ -89,6 +105,32 @@ let pinnedDragPointerId: number | null = null
 let pinnedDragStartX = 0
 let pinnedDragStartY = 0
 let isPinnedDragging = false
+let rangeSelectPointerId: number | null = null
+let rangeSelectStartX = 0
+let rangeSelectStartY = 0
+let rangeSelectStartSliceIndex: number | null = null
+let rangeSelectLastSliceIndex: number | null = null
+let isRangeSelecting = false
+
+const rangeSelection = reactive({
+	visible: false,
+	startX: 0,
+	currentX: 0,
+	top: 0,
+	bottom: 0,
+})
+
+const rangeSelectionStyle = computed(() => {
+	const left = Math.min(rangeSelection.startX, rangeSelection.currentX)
+	const width = Math.max(1, Math.abs(rangeSelection.currentX - rangeSelection.startX))
+
+	return {
+		top: `${rangeSelection.top}px`,
+		bottom: `${rangeSelection.bottom}px`,
+		transform: `translate(${left}px, 0)`,
+		width: `${width}px`,
+	}
+})
 
 function getChartEvents(): ChartEvents {
 	return props.pinnedSliceIndex === null ? [...chartInteractionEvents] : []
@@ -126,6 +168,36 @@ function getNearestSliceIndex(clientX: number) {
 	return Math.min(props.labels.length - 1, Math.max(0, Math.round(rawIndex)))
 }
 
+function getSliceChartPosition(sliceIndex: number) {
+	if (!chartInstance || !canvasRef.value) return null
+
+	const rect = canvasRef.value.getBoundingClientRect()
+	const chartArea = chartInstance.chartArea
+	const xScale = chartInstance.scales.x
+	const x = xScale.getPixelForValue(sliceIndex)
+	if (!Number.isFinite(x)) return null
+
+	return {
+		x: Math.min(chartArea.right, Math.max(chartArea.left, x)),
+		top: chartArea.top,
+		bottom: rect.height - chartArea.bottom,
+	}
+}
+
+function updateRangeSelection(sliceIndex: number) {
+	const chartPosition = getSliceChartPosition(sliceIndex)
+	if (!chartPosition) return
+
+	rangeSelection.visible = true
+	rangeSelection.currentX = chartPosition.x
+	rangeSelection.top = chartPosition.top
+	rangeSelection.bottom = chartPosition.bottom
+}
+
+function clearRangeSelection() {
+	rangeSelection.visible = false
+}
+
 function getPinnedTooltipPosition(sliceIndex: number) {
 	if (!chartInstance) return null
 
@@ -158,6 +230,19 @@ function emitPinnedDragHover(sliceIndex: number) {
 		visible: true,
 		x: position.x,
 		y: position.y,
+		sliceIndex,
+	})
+}
+
+function emitRangeDragHover(sliceIndex: number) {
+	const position = getPinnedTooltipPosition(sliceIndex)
+	const fallbackPosition = getSliceChartPosition(sliceIndex)
+	if (!position && !fallbackPosition) return
+
+	emit('hover', {
+		visible: true,
+		x: position?.x ?? fallbackPosition?.x ?? 0,
+		y: position?.y ?? fallbackPosition?.top ?? 0,
 		sliceIndex,
 	})
 }
@@ -414,9 +499,84 @@ function handlePinnedPointerEnd(event: PointerEvent) {
 	isPinnedDragging = false
 }
 
+function handleRangePointerDown(event: PointerEvent) {
+	if (rangeSelectPointerId !== null) return
+	if (!canvasRef.value || props.labels.length === 0) return
+	if (event.pointerType === 'mouse' && event.button !== 0) return
+	if (props.pinnedSliceIndex !== null && event.pointerType === 'touch') return
+
+	const sliceIndex = getNearestSliceIndex(event.clientX)
+	if (sliceIndex === null) return
+
+	const chartPosition = getSliceChartPosition(sliceIndex)
+	if (!chartPosition) return
+
+	rangeSelectPointerId = event.pointerId
+	rangeSelectStartX = event.clientX
+	rangeSelectStartY = event.clientY
+	rangeSelectStartSliceIndex = sliceIndex
+	rangeSelectLastSliceIndex = sliceIndex
+	isRangeSelecting = false
+	rangeSelection.startX = chartPosition.x
+	rangeSelection.currentX = chartPosition.x
+	rangeSelection.top = chartPosition.top
+	rangeSelection.bottom = chartPosition.bottom
+	canvasRef.value.setPointerCapture(event.pointerId)
+}
+
+function handleRangePointerMove(event: PointerEvent) {
+	if (event.pointerId !== rangeSelectPointerId) return
+
+	const distance = Math.hypot(event.clientX - rangeSelectStartX, event.clientY - rangeSelectStartY)
+	if (!isRangeSelecting && distance < RANGE_SELECT_THRESHOLD_PX) return
+
+	const sliceIndex = getNearestSliceIndex(event.clientX)
+	if (sliceIndex === null) return
+
+	isRangeSelecting = true
+	rangeSelectLastSliceIndex = sliceIndex
+	event.preventDefault()
+	updateRangeSelection(sliceIndex)
+	emitRangeDragHover(sliceIndex)
+}
+
+function handleRangePointerEnd(event: PointerEvent) {
+	if (event.pointerId !== rangeSelectPointerId) return
+
+	canvasRef.value?.releasePointerCapture(event.pointerId)
+	const startSliceIndex = rangeSelectStartSliceIndex
+	const endSliceIndex = rangeSelectLastSliceIndex
+
+	if (isRangeSelecting && startSliceIndex !== null && endSliceIndex !== null) {
+		event.preventDefault()
+		emit('range-select', { startSliceIndex, endSliceIndex })
+	}
+
+	rangeSelectPointerId = null
+	rangeSelectStartSliceIndex = null
+	rangeSelectLastSliceIndex = null
+	isRangeSelecting = false
+	clearRangeSelection()
+}
+
+function handleRangePointerCancel(event: PointerEvent) {
+	if (event.pointerId !== rangeSelectPointerId) return
+
+	canvasRef.value?.releasePointerCapture(event.pointerId)
+	rangeSelectPointerId = null
+	rangeSelectStartSliceIndex = null
+	rangeSelectLastSliceIndex = null
+	isRangeSelecting = false
+	clearRangeSelection()
+}
+
 onMounted(() => {
 	createChart()
 	canvasRef.value?.addEventListener('mouseleave', handleCanvasLeave)
+	canvasRef.value?.addEventListener('pointerdown', handleRangePointerDown)
+	canvasRef.value?.addEventListener('pointermove', handleRangePointerMove)
+	canvasRef.value?.addEventListener('pointerup', handleRangePointerEnd)
+	canvasRef.value?.addEventListener('pointercancel', handleRangePointerCancel)
 	canvasRef.value?.addEventListener('pointerdown', handlePinnedPointerDown)
 	canvasRef.value?.addEventListener('pointermove', handlePinnedPointerMove)
 	canvasRef.value?.addEventListener('pointerup', handlePinnedPointerEnd)
@@ -425,6 +585,10 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
 	canvasRef.value?.removeEventListener('mouseleave', handleCanvasLeave)
+	canvasRef.value?.removeEventListener('pointerdown', handleRangePointerDown)
+	canvasRef.value?.removeEventListener('pointermove', handleRangePointerMove)
+	canvasRef.value?.removeEventListener('pointerup', handleRangePointerEnd)
+	canvasRef.value?.removeEventListener('pointercancel', handleRangePointerCancel)
 	canvasRef.value?.removeEventListener('pointerdown', handlePinnedPointerDown)
 	canvasRef.value?.removeEventListener('pointermove', handlePinnedPointerMove)
 	canvasRef.value?.removeEventListener('pointerup', handlePinnedPointerEnd)

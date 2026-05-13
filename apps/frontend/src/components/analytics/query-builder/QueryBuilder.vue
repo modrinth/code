@@ -202,10 +202,14 @@ import {
 	getEnabledAnalyticsStatsForState,
 } from './query-filter/queryFilter'
 import QueryBuilderFilter from './query-filter/QueryFilter.vue'
-import { ensureMinimumTimeRange, useSelectedAnalyticsTimeRange } from './timeframe-picker/timeframe'
+import {
+	ensureMinimumTimeRange,
+	getAnalyticsGroupByPresetMinutes,
+	MAX_ANALYTICS_TIME_SLICES,
+	useSelectedAnalyticsTimeRange,
+} from './timeframe-picker/timeframe'
 import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 
-const MAX_TIME_SLICES = 256
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
 
@@ -509,14 +513,13 @@ async function runProjectDownloadsThresholdQuery(event: KeyboardEvent) {
 const groupByPresetOptions: Array<{
 	value: AnalyticsGroupByPreset
 	label: string
-	minutes: number
 }> = [
-	{ value: '1h', label: '1h', minutes: 60 },
-	{ value: '6h', label: '6h', minutes: 360 },
-	{ value: 'day', label: 'Day', minutes: 24 * 60 },
-	{ value: 'week', label: 'Week', minutes: 7 * 24 * 60 },
-	{ value: 'month', label: 'Month', minutes: 30 * 24 * 60 },
-	{ value: 'year', label: 'Year', minutes: 365 * 24 * 60 },
+	{ value: '1h', label: '1h' },
+	{ value: '6h', label: '6h' },
+	{ value: 'day', label: 'Day' },
+	{ value: 'week', label: 'Week' },
+	{ value: 'month', label: 'Month' },
+	{ value: 'year', label: 'Year' },
 ]
 
 const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
@@ -530,25 +533,6 @@ const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
 	{ value: 'game_version', label: 'Game version' },
 ]
 
-function getGroupByMinutes(preset: AnalyticsGroupByPreset): number {
-	switch (preset) {
-		case '1h':
-			return 60
-		case '6h':
-			return 360
-		case 'day':
-			return 24 * 60
-		case 'week':
-			return 7 * 24 * 60
-		case 'month':
-			return 30 * 24 * 60
-		case 'year':
-			return 365 * 24 * 60
-		default:
-			return 60
-	}
-}
-
 function getAllTimeYearGroupStart(end: Date): Date {
 	const start = new Date(end)
 	start.setFullYear(2021)
@@ -558,8 +542,9 @@ function getAllTimeYearGroupStart(end: Date): Date {
 const groupByOptions = computed<ComboboxOption<AnalyticsGroupByPreset>[]>(() => {
 	const timeframeMinutes = selectedTimeframeDurationMinutes.value
 	const options = groupByPresetOptions.map((option) => {
-		const isTooCoarse = option.minutes >= timeframeMinutes
-		const isTooFine = timeframeMinutes / option.minutes > MAX_TIME_SLICES
+		const groupByMinutes = getAnalyticsGroupByPresetMinutes(option.value)
+		const isTooCoarse = groupByMinutes >= timeframeMinutes
+		const isTooFine = timeframeMinutes / groupByMinutes > MAX_ANALYTICS_TIME_SLICES
 		return {
 			value: option.value,
 			label: option.label,
@@ -761,9 +746,9 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 			: rawRange.start
 	const { start, end } = ensureMinimumTimeRange(rawStart, rawRange.end)
 
-	const groupByMs = getGroupByMinutes(selectedGroupBy.value) * 60 * 1000
+	const groupByMs = getAnalyticsGroupByPresetMinutes(selectedGroupBy.value) * 60 * 1000
 	const desiredSlices = Math.max(1, Math.floor((end.getTime() - start.getTime()) / groupByMs))
-	const resolutionSlices = Math.min(MAX_TIME_SLICES, desiredSlices)
+	const resolutionSlices = Math.min(MAX_ANALYTICS_TIME_SLICES, desiredSlices)
 
 	const bucketBy = withBreakdownFields(selectedBreakdown.value, selectedFilters.value)
 	const filteredProjectIds = getProjectIdsMatchingStatusFilter(

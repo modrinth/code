@@ -79,6 +79,19 @@ const CUSTOM_RANGE_MONTH_DAY_FORMATTER = new Intl.DateTimeFormat('en-US', {
 	month: 'long',
 	day: 'numeric',
 })
+const CUSTOM_DATE_TIME_RANGE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+	month: 'short',
+	day: 'numeric',
+	year: 'numeric',
+	hour: 'numeric',
+	minute: '2-digit',
+})
+const CUSTOM_DATE_TIME_RANGE_MONTH_DAY_FORMATTER = new Intl.DateTimeFormat('en-US', {
+	month: 'short',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: '2-digit',
+})
 
 const {
 	selectedTimeframeMode,
@@ -207,6 +220,10 @@ function getTimeframeLabel(
 		return formatCustomTimeframeRangeLabel(customStartDate, customEndDate)
 	}
 
+	if (mode === 'custom_datetime_range') {
+		return formatCustomDateTimeRangeLabel(customStartDate, customEndDate)
+	}
+
 	return timeframeOptions.find((option) => option.value === preset)?.label ?? 'Select timeframe'
 }
 
@@ -252,6 +269,38 @@ function formatCustomTimeframeRangeLabel(startDateValue: string, endDateValue: s
 
 	const startLabel = CUSTOM_RANGE_DATE_FORMATTER.format(startDate)
 	const endLabel = CUSTOM_RANGE_DATE_FORMATTER.format(endDate)
+	return `${startLabel} - ${endLabel}`
+}
+
+function getDateTimeFromInputValue(value: string): Date | undefined {
+	const date = new Date(value)
+	if (Number.isNaN(date.getTime())) {
+		return undefined
+	}
+
+	return date
+}
+
+function formatCustomDateTimeRangeLabel(startDateValue: string, endDateValue: string): string {
+	const startDate = getDateTimeFromInputValue(startDateValue)
+	const endDate = getDateTimeFromInputValue(endDateValue)
+	if (!startDate || !endDate) {
+		return `${startDateValue} - ${endDateValue}`
+	}
+
+	if (startDate.getTime() === endDate.getTime()) {
+		return CUSTOM_DATE_TIME_RANGE_FORMATTER.format(startDate)
+	}
+
+	const sameYear = startDate.getFullYear() === endDate.getFullYear()
+	if (sameYear) {
+		const startLabel = CUSTOM_DATE_TIME_RANGE_MONTH_DAY_FORMATTER.format(startDate)
+		const endLabel = CUSTOM_DATE_TIME_RANGE_MONTH_DAY_FORMATTER.format(endDate)
+		return `${startLabel} - ${endLabel}, ${startDate.getFullYear()}`
+	}
+
+	const startLabel = CUSTOM_DATE_TIME_RANGE_FORMATTER.format(startDate)
+	const endLabel = CUSTOM_DATE_TIME_RANGE_FORMATTER.format(endDate)
 	return `${startLabel} - ${endLabel}`
 }
 

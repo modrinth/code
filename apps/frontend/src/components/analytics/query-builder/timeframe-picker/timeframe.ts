@@ -8,6 +8,16 @@ import {
 
 const MIN_RANGE_MS = 60 * 60 * 1000
 const TIME_RANGE_ROUNDING_MS = 60 * 1000
+export const MAX_ANALYTICS_TIME_SLICES = 256
+
+const GROUP_BY_PRESET_MINUTES: Record<AnalyticsGroupByPreset, number> = {
+	'1h': 60,
+	'6h': 360,
+	day: 24 * 60,
+	week: 7 * 24 * 60,
+	month: 30 * 24 * 60,
+	year: 365 * 24 * 60,
+}
 
 export type AnalyticsTimeRange = {
 	start: Date
@@ -35,6 +45,11 @@ export function getDateInputValue(date: Date): string {
 export function parseDateInputValue(value: string): Date {
 	const parsedDate = new Date(`${value}T00:00:00`)
 	return Number.isNaN(parsedDate.getTime()) ? startOfDay(new Date()) : parsedDate
+}
+
+export function parseDateTimeInputValue(value: string): Date {
+	const parsedDate = new Date(value)
+	return Number.isNaN(parsedDate.getTime()) ? getRoundedNow(Date.now()) : parsedDate
 }
 
 export function addDays(date: Date, days: number): Date {
@@ -160,6 +175,16 @@ export function getTimeRangeForCustomDateRange(
 	}
 }
 
+export function getTimeRangeForCustomDateTimeRange(
+	startDateTime: string,
+	endDateTime: string,
+): AnalyticsTimeRange {
+	return {
+		start: parseDateTimeInputValue(startDateTime),
+		end: parseDateTimeInputValue(endDateTime),
+	}
+}
+
 export function getAnalyticsTimeRange({
 	mode,
 	preset,
@@ -182,6 +207,8 @@ export function getAnalyticsTimeRange({
 			return getTimeRangeForLastTimeframe(lastAmount, lastUnit, nowTimestamp)
 		case 'custom_range':
 			return getTimeRangeForCustomDateRange(customStartDate, customEndDate)
+		case 'custom_datetime_range':
+			return getTimeRangeForCustomDateTimeRange(customStartDate, customEndDate)
 		case 'preset':
 		default:
 			return getTimeRangeForPreset(preset, nowTimestamp)
@@ -193,11 +220,26 @@ export function getDefaultAnalyticsGroupByForDurationMinutes(
 ): AnalyticsGroupByPreset {
 	const days = durationMinutes / (24 * 60)
 	if (days <= 2) return '1h'
-	if (days <= 14) return '6h'
+	if (days <= 7) return '6h'
 	if (days <= 90) return 'day'
 	if (days <= 365) return 'week'
 	if (days <= 365 * 3) return 'month'
 	return 'year'
+}
+
+export function getAnalyticsGroupByPresetMinutes(preset: AnalyticsGroupByPreset): number {
+	return GROUP_BY_PRESET_MINUTES[preset]
+}
+
+export function isAnalyticsGroupByAvailableForDurationMinutes(
+	preset: AnalyticsGroupByPreset,
+	durationMinutes: number,
+): boolean {
+	const groupByMinutes = getAnalyticsGroupByPresetMinutes(preset)
+	const isTooCoarse = groupByMinutes >= durationMinutes
+	const isTooFine = durationMinutes / groupByMinutes > MAX_ANALYTICS_TIME_SLICES
+
+	return !isTooCoarse && !isTooFine
 }
 
 export function ensureMinimumTimeRange(start: Date, end: Date): AnalyticsTimeRange {

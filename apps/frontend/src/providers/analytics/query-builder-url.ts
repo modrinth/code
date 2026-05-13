@@ -22,7 +22,11 @@ export type AnalyticsTimeframePreset =
 	| 'year_to_date'
 	| 'all_time'
 
-export type AnalyticsTimeframeMode = 'preset' | 'last' | 'custom_range'
+export type AnalyticsTimeframeMode =
+	| 'preset'
+	| 'last'
+	| 'custom_range'
+	| 'custom_datetime_range'
 export type AnalyticsLastTimeframeUnit = 'hours' | 'days' | 'weeks' | 'months'
 
 export type AnalyticsGroupByPreset = '1h' | '6h' | 'day' | 'week' | 'month' | 'year'
@@ -73,7 +77,12 @@ const TIMEFRAME_PRESET_VALUES: AnalyticsTimeframePreset[] = [
 	'all_time',
 ]
 
-const TIMEFRAME_MODE_VALUES: AnalyticsTimeframeMode[] = ['preset', 'last', 'custom_range']
+const TIMEFRAME_MODE_VALUES: AnalyticsTimeframeMode[] = [
+	'preset',
+	'last',
+	'custom_range',
+	'custom_datetime_range',
+]
 const LAST_TIMEFRAME_UNIT_VALUES: AnalyticsLastTimeframeUnit[] = [
 	'hours',
 	'days',
@@ -269,6 +278,10 @@ function getDefaultCustomEndDate(): string {
 	return getLocalDateQueryValue(new Date())
 }
 
+function getDefaultCustomDateTimeValue(value: string): string {
+	return new Date(`${value}T00:00:00`).toISOString()
+}
+
 function parseDateQueryValue(
 	value: LocationQueryValue | LocationQueryValue[] | undefined,
 	fallbackValue: string,
@@ -281,6 +294,31 @@ function parseDateQueryValue(
 	if (getLocalDateQueryValue(date) !== rawValue) return fallbackValue
 
 	return rawValue
+}
+
+function parseDateTimeQueryValue(
+	value: LocationQueryValue | LocationQueryValue[] | undefined,
+	fallbackValue: string,
+): string {
+	const rawValue = Array.isArray(value) ? value[0] : value
+	if (!rawValue || !/^\d{4}-\d{2}-\d{2}T/.test(rawValue)) return fallbackValue
+
+	const date = new Date(rawValue)
+	if (Number.isNaN(date.getTime())) return fallbackValue
+
+	return date.toISOString()
+}
+
+function isTimeframeRangeEndBeforeStart(
+	mode: AnalyticsTimeframeMode,
+	startValue: string,
+	endValue: string,
+): boolean {
+	if (mode === 'custom_datetime_range') {
+		return new Date(endValue).getTime() < new Date(startValue).getTime()
+	}
+
+	return endValue < startValue
 }
 
 export function buildDefaultAnalyticsQueryBuilderState(
@@ -419,26 +457,41 @@ export function readAnalyticsQueryBuilderState(
 		)
 	}
 
-	const selectedCustomTimeframeStartDate = parseDateQueryValue(
+	const selectedTimeframeMode = parsePresetQueryValue(
+		query[QUERY_KEY_TIMEFRAME_MODE],
+		TIMEFRAME_MODE_VALUES,
+		defaultState.selectedTimeframeMode,
+	)
+	const isCustomDateTimeRange = selectedTimeframeMode === 'custom_datetime_range'
+	const parseTimeframeRangeQueryValue = isCustomDateTimeRange
+		? parseDateTimeQueryValue
+		: parseDateQueryValue
+	const customTimeframeStartFallback = isCustomDateTimeRange
+		? getDefaultCustomDateTimeValue(defaultState.selectedCustomTimeframeStartDate)
+		: defaultState.selectedCustomTimeframeStartDate
+	const customTimeframeEndFallback = isCustomDateTimeRange
+		? getDefaultCustomDateTimeValue(defaultState.selectedCustomTimeframeEndDate)
+		: defaultState.selectedCustomTimeframeEndDate
+
+	const selectedCustomTimeframeStartDate = parseTimeframeRangeQueryValue(
 		query[QUERY_KEY_TIMEFRAME_START],
-		defaultState.selectedCustomTimeframeStartDate,
+		customTimeframeStartFallback,
 	)
-	const rawCustomTimeframeEndDate = parseDateQueryValue(
+	const rawCustomTimeframeEndDate = parseTimeframeRangeQueryValue(
 		query[QUERY_KEY_TIMEFRAME_END],
-		defaultState.selectedCustomTimeframeEndDate,
+		customTimeframeEndFallback,
 	)
-	const selectedCustomTimeframeEndDate =
-		rawCustomTimeframeEndDate < selectedCustomTimeframeStartDate
-			? selectedCustomTimeframeStartDate
-			: rawCustomTimeframeEndDate
+	const selectedCustomTimeframeEndDate = isTimeframeRangeEndBeforeStart(
+		selectedTimeframeMode,
+		selectedCustomTimeframeStartDate,
+		rawCustomTimeframeEndDate,
+	)
+		? selectedCustomTimeframeStartDate
+		: rawCustomTimeframeEndDate
 
 	return {
 		selectedProjectIds,
-		selectedTimeframeMode: parsePresetQueryValue(
-			query[QUERY_KEY_TIMEFRAME_MODE],
-			TIMEFRAME_MODE_VALUES,
-			defaultState.selectedTimeframeMode,
-		),
+		selectedTimeframeMode,
 		selectedTimeframe: parsePresetQueryValue(
 			query[QUERY_KEY_TIMEFRAME],
 			TIMEFRAME_PRESET_VALUES,
@@ -485,6 +538,9 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 	const projectIdsQueryValue = areAllProjectsSelected(state.selectedProjectIds, availableProjectIds)
 		? undefined
 		: serializeListQueryValue(state.selectedProjectIds)
+	const isCustomTimeframeMode =
+		state.selectedTimeframeMode === 'custom_range' ||
+		state.selectedTimeframeMode === 'custom_datetime_range'
 
 	nextRouteQuery[QUERY_KEY_PROJECT_IDS] = projectIdsQueryValue
 	nextRouteQuery[QUERY_KEY_TIMEFRAME_MODE] =
@@ -498,13 +554,9 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 	nextRouteQuery[QUERY_KEY_TIMEFRAME_LAST_UNIT] =
 		state.selectedTimeframeMode === 'last' ? state.selectedLastTimeframeUnit : undefined
 	nextRouteQuery[QUERY_KEY_TIMEFRAME_START] =
-		state.selectedTimeframeMode === 'custom_range'
-			? state.selectedCustomTimeframeStartDate
-			: undefined
+		isCustomTimeframeMode ? state.selectedCustomTimeframeStartDate : undefined
 	nextRouteQuery[QUERY_KEY_TIMEFRAME_END] =
-		state.selectedTimeframeMode === 'custom_range'
-			? state.selectedCustomTimeframeEndDate
-			: undefined
+		isCustomTimeframeMode ? state.selectedCustomTimeframeEndDate : undefined
 	nextRouteQuery[QUERY_KEY_GROUP_BY] =
 		state.selectedGroupBy !== DEFAULT_GROUP_BY_PRESET ? state.selectedGroupBy : undefined
 	nextRouteQuery[QUERY_KEY_BREAKDOWN] =
