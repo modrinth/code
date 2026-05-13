@@ -182,7 +182,7 @@ const messages = defineMessages({
 	},
 	moderatorSeeUserUiToggle: {
 		id: 'project.moderation.thread.moderator-see-user-ui-toggle',
-		defaultMessage: 'See what users see',
+		defaultMessage: 'Show member UI',
 	},
 	threadPrivateDescription: {
 		id: 'project.moderation.thread.private-description',

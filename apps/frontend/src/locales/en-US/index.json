@@ -2781,7 +2781,7 @@
     "message": "If you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support."
   },
   "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "See what users see"
+    "message": "Show member UI"
   },
   "project.moderation.thread.private-description": {
     "message": "This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project."
