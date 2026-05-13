@@ -346,7 +346,7 @@ pub async fn user_notes_edit(
     transaction.commit().await?;
     DBModerationNote::clear_user_cache(user_data.id, &redis).await?;
 
-    Ok(HttpResponse::NoContent().body(""))
+    Ok(HttpResponse::NoContent().finish())
 }
 
 pub async fn collections_list(

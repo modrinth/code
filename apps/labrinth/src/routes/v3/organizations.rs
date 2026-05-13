@@ -372,7 +372,7 @@ pub async fn organization_notes_edit(
     transaction.commit().await?;
     DBModerationNote::clear_organization_cache(organization.id, &redis).await?;
 
-    Ok(HttpResponse::NoContent().body(""))
+    Ok(HttpResponse::NoContent().finish())
 }
 
 #[derive(Deserialize)]
