@@ -143,7 +143,7 @@
 			:expand-text="expandText"
 			collapse-text="Collapse thread"
 		>
-			<div class="bg-surface-2 p-4 pt-2">
+			<div class="bg-surface-2 pt-2">
 				<ThreadView
 					v-if="threadWithReportBody"
 					ref="reportThread"
@@ -154,8 +154,8 @@
 					@update-thread="updateThread"
 				>
 					<template #closedActions>
-						<ButtonStyled v-if="isStaff(auth.user)" color="green" class="mt-2">
-							<button class="w-full gap-2 sm:w-auto" @click="reopenReport()">
+						<ButtonStyled v-if="isStaff(auth.user)" color="green">
+							<button class="mt-2 w-full gap-2 sm:w-auto" @click="reopenReport()">
 								<CheckCircleIcon class="size-4" />
 								Reopen Thread
 							</button>
@@ -273,7 +273,7 @@ async function closeReport(reply = false) {
 				closed: true,
 			},
 		})
-		updateThread(props.report.thread)
+		await refreshReportCaches()
 		didCloseReport.value = true
 	} catch (err: any) {
 		addNotification({
@@ -292,7 +292,7 @@ async function reopenReport() {
 				closed: false,
 			},
 		})
-		updateThread(props.report.thread)
+		await refreshReportCaches()
 		didCloseReport.value = false
 	} catch (err: any) {
 		addNotification({
@@ -308,6 +308,18 @@ const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
 })
+
+async function refreshReportCaches() {
+	await Promise.allSettled([refreshThread(), refreshNuxtData('new-moderation-reports')])
+}
+
+async function refreshThread() {
+	const threadId = props.report.thread?.id ?? props.report.thread_id
+	if (!threadId) return
+
+	const thread = await useBaseFetch(`thread/${threadId}`)
+	updateThread(thread)
+}
 
 function updateThread(newThread: any) {
 	if (props.report.thread) {

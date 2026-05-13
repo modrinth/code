@@ -1,12 +1,13 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
+import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import {
 	injectAppBackup,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
-} from '#ui/providers/'
+} from '#ui/providers'
 
 export function useInlineBackup(backupName: string | (() => string)) {
 	const serverCtx = injectModrinthServerContext(null)
@@ -60,110 +61,65 @@ export function useInlineBackup(backupName: string | (() => string)) {
 
 	const client = injectModrinthClient()
 	const { addNotification } = injectNotificationManager()
-	const { serverId, worldId, backupsState, markBackupCancelled } = serverCtx
+	const { serverId, worldId } = serverCtx
 
-	const isBackingUp = ref(false)
+	const { activeOperationByBackupId, backups, hasActiveCreate, invalidate } = useServerBackupsQueue(
+		computed(() => serverId),
+		worldId,
+	)
+
+	const createdBackupId = ref<string | null>(null)
+	const pendingCreate = ref(false)
 	const backupFailed = ref(false)
 	const backupComplete = ref(false)
 	const backupCancelled = ref(false)
 	const isCancelling = ref(false)
-	const createdBackupId = ref<string | null>(null)
 
-	const externalBackupInProgress = computed(() => {
-		for (const [id, entry] of backupsState.entries()) {
-			if (id !== createdBackupId.value && entry.create?.state === 'ongoing') return true
-		}
-		return false
-	})
-
-	// Watch backupsState for websocket progress events from Kyros
-	watch(
-		() => {
-			if (!createdBackupId.value) return null
-			return backupsState.get(createdBackupId.value)
-		},
-		(entry) => {
-			if (!entry?.create) return
-
-			if (entry.create.state === 'done') {
-				stopPolling()
-				isBackingUp.value = false
-				backupComplete.value = true
-			} else if (entry.create.state === 'cancelled') {
-				stopPolling()
-				isBackingUp.value = false
-				isCancelling.value = false
-				backupCancelled.value = true
-			} else if (entry.create.state === 'failed') {
-				stopPolling()
-				isBackingUp.value = false
-				backupFailed.value = true
-			}
-		},
-		{ deep: true },
+	const myBackup = computed(() =>
+		createdBackupId.value ? backups.value.find((b) => b.id === createdBackupId.value) : undefined,
+	)
+	const myActiveOp = computed(() =>
+		createdBackupId.value ? activeOperationByBackupId.value.get(createdBackupId.value) : undefined,
 	)
 
-	// Fallback: poll the REST API in case websocket events don't arrive
-	let pollTimer: ReturnType<typeof setInterval> | null = null
+	const isBackingUp = computed(
+		() =>
+			!backupComplete.value &&
+			!backupFailed.value &&
+			!backupCancelled.value &&
+			(!!createdBackupId.value || pendingCreate.value),
+	)
 
-	function stopPolling() {
-		if (pollTimer !== null) {
-			clearInterval(pollTimer)
-			pollTimer = null
-		}
-	}
+	const externalBackupInProgress = computed(() => hasActiveCreate.value && !myActiveOp.value)
 
-	async function pollBackupStatus(backupId: string) {
-		if (!isBackingUp.value) {
-			stopPolling()
-			return
-		}
-
-		try {
-			const backup = await client.archon.backups_v1.get(serverId, worldId.value!, backupId)
-			const isTerminal =
-				backup.status === 'done' || backup.status === 'error' || backup.status === 'timed_out'
-
-			if (isTerminal) {
-				stopPolling()
-				if (!isBackingUp.value) return
-				if (backup.status === 'error' || backup.status === 'timed_out') {
-					isBackingUp.value = false
-					backupFailed.value = true
-				} else {
-					isBackingUp.value = false
-					backupComplete.value = true
-				}
-			}
-		} catch {
-			stopPolling()
-			isBackingUp.value = false
-			backupFailed.value = true
-		}
-	}
+	watch(
+		myBackup,
+		(b) => {
+			if (!createdBackupId.value || !b) return
+			if (b.status === 'done') backupComplete.value = true
+			else if (b.status === 'error' || b.status === 'timed_out') backupFailed.value = true
+		},
+		{ immediate: true },
+	)
 
 	async function startBackup() {
 		if (!worldId.value) return
 
 		const name = typeof backupName === 'function' ? backupName() : backupName
 
-		isBackingUp.value = true
 		backupFailed.value = false
 		backupComplete.value = false
 		backupCancelled.value = false
 		isCancelling.value = false
 		createdBackupId.value = null
+		pendingCreate.value = true
 
 		try {
-			const { id } = await client.archon.backups_v1.create(serverId, worldId.value, { name })
+			const { id } = await client.archon.backups_queue_v1.create(serverId, worldId.value, { name })
 			createdBackupId.value = id
-
-			stopPolling()
-			pollTimer = setInterval(() => pollBackupStatus(id), 3000)
+			await invalidate()
 		} catch (error) {
-			isBackingUp.value = false
 			backupFailed.value = true
-
 			const message = error instanceof Error ? error.message : String(error)
 			const isRateLimit = message.includes('429')
 			addNotification({
@@ -171,6 +127,8 @@ export function useInlineBackup(backupName: string | (() => string)) {
 				title: 'Error creating backup',
 				text: isRateLimit ? "You're creating backups too fast." : message,
 			})
+		} finally {
+			pendingCreate.value = false
 		}
 	}
 
@@ -178,23 +136,19 @@ export function useInlineBackup(backupName: string | (() => string)) {
 		if (!worldId.value || !createdBackupId.value || !isBackingUp.value) return
 
 		isCancelling.value = true
-		stopPolling()
-		markBackupCancelled(createdBackupId.value)
-
 		try {
 			await client.archon.backups_v1.delete(serverId, worldId.value, createdBackupId.value)
-			isBackingUp.value = false
-			isCancelling.value = false
 			backupCancelled.value = true
+			isCancelling.value = false
+			await invalidate()
 			addNotification({
 				type: 'info',
 				title: 'Backup cancelled',
 				text: 'The backup has been cancelled. You can create a new one or proceed without a backup.',
 			})
 		} catch {
-			isBackingUp.value = false
-			isCancelling.value = false
 			backupFailed.value = true
+			isCancelling.value = false
 		}
 	}
 
@@ -216,7 +170,6 @@ export function useInlineBackup(backupName: string | (() => string)) {
 
 		onBeforeUnmount(() => {
 			window.removeEventListener('beforeunload', handleBeforeUnload)
-			stopPolling()
 		})
 
 		onBeforeRouteLeave(() => {

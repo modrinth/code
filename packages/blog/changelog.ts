@@ -11,6 +11,282 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-13T05:24:14+00:00`,
+		product: 'web',
+		body: `## Changed
+- Overhauled the 'Moderation' tab on project pages to make the moderation status of your project clearer.
+- Updated the report page to a more modern style.
+- Adjusted the colors of certain status banner buttons to make them more readable.
+- Updated the DMCA registered agent listed on the coypright policy page.
+
+## Fixed
+- Fixed status banners at the top of the page having really long buttons.
+- Fixed status banners at the top of the page having an unusual amount of padding on the bottom when they didn't have an action.`,
+	},
+	{
+		date: `2026-05-12T20:06:07+00:00`,
+		product: 'app',
+		version: '0.13.17',
+		body: `## Fixed
+- Fixed the app automatically re-opening after installing a pending update when the user closes the app.
+- Fixed "Open in browser" not working.
+- Fixed the lack of margin above the pagination links at the bottom of Discover pages.
+- Fixed longstanding issue "Unable to read category tags from any source" that occurs sometimes when the app has cached invalid tags.
+- Fixed Windows app control buttons not being clickable at the exact top right corner.
+- Fixed Modrinth project links opening inside a broken in-app web browser rather than going to the project's page in the app.
+- Fixed not being able to hover over project card tooltip items.`,
+	},
+	{
+		date: `2026-05-12T20:06:07+00:00`,
+		product: 'web',
+		body: `## Changed
+- Changed how dependencies are added and edited on versions to make it clearer when a dependency is added or not when saving.`,
+	},
+	{
+		date: `2026-05-11T20:16:06+00:00`,
+		product: 'app',
+		version: '0.13.15',
+		body: `## Changed
+- Updated translations.
+
+## Fixed
+- Fixed app launch speed being dramatically slowed by having lots of instances.`,
+	},
+	{
+		date: `2026-05-11T20:16:06+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations.
+
+## Fixed
+- Fixed NeoForge version inferring on Minecraft versions 26.1 and newer.
+- Improved how NeoForge Minecraft versions are inferred to support more cases.`,
+	},
+	{
+		date: `2026-05-11T20:16:06+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations.`,
+	},
+	{
+		date: `2026-05-09T21:42:48+00:00`,
+		product: 'app',
+		version: '0.13.14',
+		body: `## Fixed
+- Fixed hidden files showing up in the Content tab on instances.
+- Fixed 'Advanced rendering' option not being applied to most of the interface.`,
+	},
+	{
+		date: `2026-05-09T21:42:48+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Improved stability of content install flow.
+
+## Fixed
+- Fixed content install flow breaking if you refresh the page mid-install.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'app',
+		version: '0.13.13',
+		body: `## Changed
+- Improved the Browse page header so the back button no longer shifts the layout.
+
+## Fixed
+- Fixed instance redirects opening a broken page state.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved performance on search pages.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated Modrinth Hosting content browsing so multiple projects can be selected before installation.
+- After installing selected content, the Modrinth Hosting content page now reopens immediately and shows pending projects as installing.
+- Project icons now appear in the action bar when selecting multiple projects in the Content tab.
+
+## Fixed
+- Fixed selected content and dependencies not staying marked as installing.
+- Fixed page shifts while dependencies resolve during installation.`,
+	},
+	{
+		date: `2026-05-08T09:58:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed some buttons appearing as disabled even when they weren't, such as the project icon settings.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'app',
+		version: '0.13.12',
+		body: `## Changed
+- Updated the modpack exporting experience, fixing issues with it and excluding /mods/.connector from the exports.
+
+## Fixed
+- Fixed page width changing based on if there is scrollable content or not, causing things to move when you switch tabs between scrollable and non-scrollable content.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed failed \`mrpack\` uploads when uploading via the Modrinth App.
+- Fixed support bubble being broken when the console is in full screen/expand mode.`,
+	},
+	{
+		date: `2026-05-08T02:24:09+00:00`,
+		product: 'web',
+		body: `## Changed
+- Project pages now have canonical permalink URLs to hopefully optimize SEO a bit.
+
+## Fixed
+- Fixed error around editing org member permissions.`,
+	},
+	{
+		date: `2026-05-06T22:11:04+00:00`,
+		product: 'app',
+		version: '0.13.11',
+		body: `## Fixed
+- Fixed modpack export including duplicated files as overrides.`,
+	},
+	{
+		date: `2026-05-05T01:34:18+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed unauthorized error when loading a user's own project or organization settings.`,
+	},
+	{
+		date: `2026-05-04T19:57:12+00:00`,
+		product: 'web',
+		body: `## Changed
+- Users who are not members of a project or organization can no longer view settings pages.
+
+## Fixed
+- Fixed some project pages failing to load due to invalid iframe links in their descriptions.`,
+	},
+	{
+		date: `2026-05-04T19:57:12+00:00`,
+		product: 'app',
+		version: '0.13.10',
+		body: `## Fixed
+- Fixed some project pages failing to load due to invalid iframe links in their descriptions.`,
+	},
+	{
+		date: `2026-05-03T18:07:44+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added git.gay as a recognized sources link domain.
+
+## Fixed
+- Fixed useTheme not defined error on project pages.
+- Fixed latest snapshot sometimes appearing a second time outside of a version range.`,
+	},
+	{
+		date: `2026-05-03T18:07:44+00:00`,
+		product: 'app',
+		version: '0.13.9',
+		body: `## Fixed
+- Fixed update notification closing when pressing the Changelog button.
+- Fixed latest snapshot sometimes appearing a second time outside of a version range.`,
+	},
+	{
+		date: `2026-05-02T22:09:01+00:00`,
+		product: 'app',
+		version: '0.13.8',
+		body: `## Fixed
+- Fixed exclude open source filter not working.
+- Fixed Central Europe server region not displaying ping in the Modrinth Hosting region selector.`,
+	},
+	{
+		date: `2026-05-02T22:09:01+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed exclude open source filter not working.
+- Fixed 404 error when returning to collections dashboard from a collection page.
+- Fixed error loading revenue transfer history page.
+- Fixed Central Europe server region not displaying ping in the Modrinth Hosting region selector.`,
+	},
+	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'app',
+		version: '0.13.7',
+		body: `## Added
+- Added a warning when installing unknown modpack files to help prevent users from getting tricked into installing malware.
+
+## Changed
+- Updated the content downloading and installation notifications to be consistent with other types of notifications.
+- Updated the design of the running instances widget in the action bar to be more consistent with our current designs.
+- Increased the click target area of the window control buttons on Windows and Linux.
+- Changed the name of the button for creating an instance with a modpack to make it clearer what it's for.
+
+## Fixed
+- Fixed Java auto-installation not working on macOS.
+- Fix a skin naming error.`,
+	},
+	{
+		date: `2026-04-29T17:19:44+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Changed the name of the button for installing a modpack to make it clearer what it's for.`,
+	},
+	{
+		date: `2026-04-29T03:54:14+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Server settings save action bar not accessible due to being behind modal.`,
+	},
+	{
+		date: `2026-04-27T19:59:24+00:00`,
+		product: 'app',
+		version: '0.13.6',
+		body: `*Note: Modrinth App v0.13.5's release has been skipped - it's changes have been bundled into 0.13.6.*
+## Changed
+- Renamed the Browse page filter from "Hide installed content/added servers" to "Hide already installed content/added servers".
+- Content installed and servers added from an instance now stay visible on the Browse page until the search query or filters change.
+
+## Fixed
+- Fixed the instance creation modal incorrectly showing mod loaders as compatible with unsupported game versions.
+- Fixed the game version and loader version dropdowns appearing empty for a few seconds in the instance creation modal.`,
+	},
+	{
+		date: `2026-04-27T19:59:24+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Multi-select on the Backups tab for bulk deleting backups.
+- Manual and automatic backup filters on the Backups tab.
+
+## Changed
+- Server panel banners now stack more cleanly when multiple banners are shown.
+- The Backups tab now matches the rest of the server panel design.
+- Server panel banners now use clearer text.
+- Renamed the Discover page filter from "Hide installed content" to "Hide already installed content".
+- Content installed from the Discover page now stays visible until the search query or filters change.
+- The server console on the Overview tab now shows a loading animation until historical logs finish loading.
+
+## Fixed
+- Fixed backup creation and restoration failing in some cases.`,
+	},
+	{
+		date: `2026-04-27T17:30:17+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project data not reloading after migrating environment information from \`/project/[id]/environment\` or the migration warning modal.
+- Fixed the tax compliance step not appearing for some users in the withdrawal flow.
+
+## Security
+- Fixed email template variables rendering URLs.`,
+	},
+	{
+		date: `2026-04-27T17:30:17+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed the server setup and reset modals incorrectly showing mod loaders as compatible with unsupported game versions.
+- Fixed the game version and loader version dropdowns appearing empty for a few seconds in the server setup and reset modals.`,
+	},
+	{
 		date: `2026-04-20T20:48:51+00:00`,
 		product: 'app',
 		version: '0.13.4',

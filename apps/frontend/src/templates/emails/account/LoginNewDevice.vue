@@ -11,7 +11,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold"> Sign in from new device </Heading>
 
-		<Text class="text-muted text-base">Hi {user.name},</Text>
+		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
 			We noticed that your account was just signed into from a new device or location. If this was
 			you, you can safely ignore this email.

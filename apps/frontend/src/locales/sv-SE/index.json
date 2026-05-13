@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Skapa affiliatelänk"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Inga affiliatekoder hittades."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Fel vid laddning av affiliatelänk"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Sök affiliatelänkar..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "från {count} {count, plural, one {projekt} other {projekt}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Antal nedladdningar"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Antal följare"
   },
   "dashboard.collections.button.create-new": {
     "message": "Skapa ny"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Dina samlingar"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Sök samlingar..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Namn (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Nyligen skapat"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Nyligen uppdaterade"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Ladda ner {formType}"
@@ -794,6 +818,12 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Skatteformulär krävs"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Tillgängliga valutor"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Ditt saldo av {usdBalance} är för tillfället värt {localBalance}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "Hitta presentkort nära detta värde."
   },
@@ -815,6 +845,12 @@
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Sök antal"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Välj en valuta:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Vänligen välj en valuta för att fortsätta"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Overifierad e-postadress"
   },
@@ -829,6 +865,57 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit": {
     "message": "Uttagsgräns"
+  },
+  "dashboard.head-title": {
+    "message": "Instrumentpanel"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Markera allt som läst"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Visa historik"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Du har inga olästa notifikationer."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Misslyckades att ladda notifikationer:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Historik"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Notifikationshistorik"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Visa alla"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Visa notifikationshistorik"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Visa {extraNotifs} ytterligare {extraNotifs, plural, one {notifikation} other {notifikationer}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Laddar notifikationer..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Skapa organization"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Skapa en organisation!"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisationer"
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projekt"
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Rensa länk"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Ändra länkar"
   },
   "dashboard.revenue.available-now": {
     "message": "Tillgängligt nu"
@@ -920,6 +1007,9 @@
   "dashboard.withdraw.error.email-verification.title": {
     "message": "E-post verifiering krävs"
   },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Kan inte ta ut pengar"
+  },
   "dashboard.withdraw.error.insufficient-balance.title": {
     "message": "Otillräcklig saldo"
   },
@@ -946,6 +1036,15 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Belopp för lågt"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "PayPal-regionen matchar inte"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "Du måste fylla i en skatteblankett för att fullfölja din uttagsbeställning."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Vänligen fyll i skatteblanketten"
   },
   "error.collection.404.list_item.1": {
     "message": "Du kan ha skrivit fel på samlingens URL."
@@ -1463,6 +1562,9 @@
   "layout.banner.tin-mismatch.action": {
     "message": "Kontakta support"
   },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Skatteblanketten avvisades"
+  },
   "layout.banner.verify-email.action": {
     "message": "Skicka nytt bekräftelsemejl"
   },
@@ -1628,8 +1730,11 @@
   "moderation.page.reports": {
     "message": "Rapporter"
   },
-  "moderation.page.technicalReview": {
-    "message": "Teknisk recension"
+  "muralpay.account-type.checking": {
+    "message": "Checkkonto"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Sparkonto"
   },
   "muralpay.country.at": {
     "message": "Österrike"
@@ -1694,6 +1799,9 @@
   "muralpay.document-type.resident-id": {
     "message": "Medborgar ID"
   },
+  "muralpay.document-type.tax-id": {
+    "message": "Skatte-ID"
+  },
   "muralpay.field.account-number": {
     "message": "Kontonummer"
   },
@@ -1709,8 +1817,20 @@
   "muralpay.field.country": {
     "message": "Land"
   },
+  "muralpay.field.document-type": {
+    "message": "Dokumenttyp"
+  },
   "muralpay.field.phone-number": {
     "message": "Telefonnummer"
+  },
+  "muralpay.field.random-key": {
+    "message": "Slumpmässigt genererad nyckel"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Plånboksadress"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme eller Clave Virtual Uniforme"
   },
   "muralpay.pix-type.bank-account": {
     "message": "Bankkonto"
@@ -1720,6 +1840,12 @@
   },
   "muralpay.pix-type.phone": {
     "message": "Telefonnummer"
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
   },
   "muralpay.rail.fiat-ars.name": {
     "message": "Banköverföring (ARS)"

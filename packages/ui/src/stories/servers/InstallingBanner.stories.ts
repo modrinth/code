@@ -23,6 +23,15 @@ export const WithProgress: Story = {
 	},
 }
 
+export const IndeterminateLoaderInstall: Story = {
+	args: {
+		progress: {
+			phase: 'InstallingLoader',
+			percent: 0,
+		},
+	},
+}
+
 export const InstallingModpack: Story = {
 	args: {
 		progress: {
@@ -97,6 +106,7 @@ export const AllStates: Story = {
 		template: /*html*/ `
 			<div style="display: flex; flex-direction: column; gap: 1rem;">
 				<InstallingBanner />
+				<InstallingBanner :progress="{ phase: 'InstallingLoader', percent: 0 }" />
 				<InstallingBanner :progress="{ phase: 'InstallingLoader', percent: 45 }" />
 				<InstallingBanner :content-error="{ step: 'modloader', description: 'the specified version may be incorrect' }" />
 				<InstallingBanner :content-error="{ step: 'modloader', description: 'this version is not yet supported' }" />

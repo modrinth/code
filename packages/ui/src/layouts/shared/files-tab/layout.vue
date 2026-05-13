@@ -32,10 +32,6 @@
 		>
 	</FileContextMenu>
 	<div v-if="!(ctx.loading.value && items.length === 0)" class="contents">
-		<Admonition v-if="ctx.busyWarning?.value" type="warning" class="mb-5">
-			<template #header>{{ ctx.busyWarning.value }}</template>
-			{{ formatMessage(messages.busyWarning) }}
-		</Admonition>
 		<div class="relative flex w-full flex-col">
 			<div class="relative isolate flex w-full flex-col gap-4">
 				<FileNavbar
@@ -210,7 +206,6 @@ import {
 import type { Component } from 'vue'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 
-import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -244,10 +239,6 @@ import type { FileContextMenuOption, FileItem } from './types'
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	busyWarning: {
-		id: 'files.layout.busy-warning',
-		defaultMessage: 'File operations are disabled while the operation is in progress.',
-	},
 	emptyFolderTitle: {
 		id: 'files.layout.empty-folder-title',
 		defaultMessage: 'This folder is empty',

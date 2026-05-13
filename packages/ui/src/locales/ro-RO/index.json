@@ -710,9 +710,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Eșuat"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listat"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
@@ -748,9 +745,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Esuat"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Reținut"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copiați codul în clipboard"
@@ -1354,12 +1348,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Programul de backup"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Nu s-a putut crea o copie de rezervă"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Restaurarea din backup nu a reușit"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Copiere de rezervă manuală"

@@ -11,11 +11,14 @@ use crate::search::SearchBackend;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
+use crate::util::tags::valid_download_tags;
 use actix_web::{HttpRequest, HttpResponse, patch, post, web};
+use eyre::eyre;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
+use tracing::trace;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
@@ -39,9 +42,9 @@ pub struct DownloadBody {
 /// [`DOWNLOAD_META_HEADER`] header.
 #[derive(Debug, Clone, Deserialize)]
 pub struct DownloadMeta {
-    pub reason: DownloadReason,
-    pub game_version: String,
-    pub loader: String,
+    pub reason: Option<DownloadReason>,
+    pub game_version: Option<String>,
+    pub loader: Option<String>,
 }
 
 pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
@@ -129,12 +132,37 @@ pub async fn count_download(
     let ip = crate::util::ip::convert_to_ip_v6(&download_body.ip)
         .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
 
-    let meta = download_body
-        .headers
-        .get(DOWNLOAD_META_HEADER)
-        .and_then(|v| serde_json::from_str::<DownloadMeta>(v).ok());
+    let meta =
+        if let Some(meta) = download_body.headers.get(DOWNLOAD_META_HEADER) {
+            serde_json::from_str::<DownloadMeta>(meta)
+                .map(Some)
+                .wrap_request_err("invalid download meta")?
+        } else {
+            None
+        };
 
-    analytics_queue.add_download(Download {
+    if let Some(meta) = &meta {
+        let valid_download_tags = valid_download_tags(&pool, &redis)
+            .await
+            .wrap_internal_err("failed to fetch valid download tags")?;
+        if let Some(loader) = &meta.loader
+            && !valid_download_tags.loaders.contains(loader)
+        {
+            return Err(ApiError::Request(eyre!(
+                "invalid download loader specified"
+            )));
+        }
+
+        if let Some(game_version) = &meta.game_version
+            && !valid_download_tags.game_versions.contains(game_version)
+        {
+            return Err(ApiError::Request(eyre!(
+                "invalid download game version specified"
+            )));
+        }
+    }
+
+    let download = Download {
         recorded: get_current_tenths_of_ms(),
         domain: url.host_str().unwrap_or_default().to_string(),
         site_path: url.path().to_string(),
@@ -169,10 +197,25 @@ pub async fn count_download(
                     .contains(&&*x.0.to_lowercase())
             })
             .collect(),
-        reason: meta.as_ref().map(|m| m.reason),
-        game_version: meta.as_ref().map(|m| m.game_version.clone()),
-        loader: meta.as_ref().map(|m| m.loader.clone()),
-    });
+        reason: meta
+            .as_ref()
+            .and_then(|m| m.reason.as_ref())
+            .map(|s| s.to_string())
+            .unwrap_or_default(),
+        game_version: meta
+            .as_ref()
+            .and_then(|m| m.game_version.as_ref())
+            .map(|s| s.to_string())
+            .unwrap_or_default(),
+        loader: meta
+            .as_ref()
+            .and_then(|m| m.loader.as_ref())
+            .map(|s| s.to_string())
+            .unwrap_or_default(),
+    };
+    trace!("added download {download:#?}");
+
+    analytics_queue.add_download(download);
 
     Ok(HttpResponse::NoContent().body(""))
 }

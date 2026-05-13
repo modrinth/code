@@ -8,6 +8,7 @@ interface PackProfileCreator {
 	gameVersion: string
 	modloader: InstanceLoader
 	loaderVersion: string | null
+	unknownFile: boolean
 }
 
 interface PackLocationVersionId {
@@ -69,7 +70,10 @@ export async function install_to_existing_profile(
 	return await invoke('plugin:pack|pack_install', { location, profile: profilePath })
 }
 
-export async function create_profile_and_install_from_file(path: string): Promise<void> {
+export async function create_profile_and_install_from_file(
+	path: string,
+	showUnknownPackWarningModal?: (createProfile: () => Promise<void>, fileName: string) => void,
+): Promise<void> {
 	const location: PackLocationFile = {
 		type: 'fromFile',
 		path,
@@ -78,13 +82,24 @@ export async function create_profile_and_install_from_file(path: string): Promis
 		'plugin:pack|pack_get_profile_from_pack',
 		{ location },
 	)
-	const profile = await create(
-		profile_creator.name,
-		profile_creator.gameVersion,
-		profile_creator.modloader,
-		profile_creator.loaderVersion,
-		null,
-		true,
-	)
-	return await invoke('plugin:pack|pack_install', { location, profile })
+
+	const createProfile = async () => {
+		const profile = await create(
+			profile_creator.name,
+			profile_creator.gameVersion,
+			profile_creator.modloader,
+			profile_creator.loaderVersion,
+			null,
+			true,
+		)
+		await invoke('plugin:pack|pack_install', { location, profile })
+	}
+
+	if (profile_creator.unknownFile && showUnknownPackWarningModal) {
+		const splitPath = path.split(/[\\/]/)
+		const fileName = splitPath ? splitPath[splitPath.length - 1] : path
+		showUnknownPackWarningModal(createProfile, fileName)
+	} else {
+		await createProfile()
+	}
 }

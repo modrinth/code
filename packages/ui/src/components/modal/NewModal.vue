@@ -18,13 +18,14 @@
 				]"
 				@click="() => (closeOnClickOutside && closable ? hide() : {})"
 			/>
-			<div class="modal-container experimental-styles-within" :class="{ shown: visible }">
+			<div class="modal-container" :class="{ shown: visible }">
 				<div
 					ref="modalBodyRef"
 					role="dialog"
 					aria-modal="true"
 					:aria-labelledby="headerId"
 					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
+					v-bind="$attrs"
 					@keydown="handleKeyDown"
 				>
 					<div
@@ -345,6 +346,10 @@ function handleKeyDown(event: KeyboardEvent) {
 		}
 	}
 }
+
+defineOptions({
+	inheritAttrs: false,
+})
 </script>
 
 <style lang="scss" scoped>
@@ -368,6 +373,8 @@ function handleKeyDown(event: KeyboardEvent) {
 	inset: -5rem;
 	z-index: v-bind(stackOverlayZ);
 	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
 	transition: all 0.2s ease-out;
 	//transform: translate(
 	//    calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 2),
@@ -397,6 +404,7 @@ function handleKeyDown(event: KeyboardEvent) {
 	&.shown {
 		opacity: 1;
 		visibility: visible;
+		pointer-events: auto;
 		backdrop-filter: blur(5px);
 	}
 

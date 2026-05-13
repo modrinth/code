@@ -55,14 +55,18 @@
 				</div>
 			</div>
 			<div class="button-row">
-				<Button class="wide-button" large :action="onReject" :disabled="pending">
-					<XIcon />
-					{{ formatMessage(messages.decline) }}
-				</Button>
-				<Button class="wide-button" color="primary" large :action="onAuthorize" :disabled="pending">
-					<CheckIcon />
-					{{ formatMessage(messages.authorize) }}
-				</Button>
+				<ButtonStyled size="large">
+					<button class="wide-button" :disabled="pending" @click="onReject">
+						<XIcon />
+						{{ formatMessage(messages.decline) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand" size="large">
+					<button class="wide-button" :disabled="pending" @click="onAuthorize">
+						<CheckIcon />
+						{{ formatMessage(messages.authorize) }}
+					</button>
+				</ButtonStyled>
 			</div>
 			<div class="redirection-notice">
 				<p class="redirect-instructions">
@@ -83,7 +87,7 @@
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,

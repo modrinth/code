@@ -506,6 +506,12 @@
   "create.project.title": {
     "message": "Vytvořit projekt"
   },
+  "create.project.type-project": {
+    "message": "Projekt"
+  },
+  "create.project.type-server": {
+    "message": "Server"
+  },
   "create.project.url-label": {
     "message": "URL"
   },
@@ -542,6 +548,9 @@
   "dashboard.collections.button.create-new": {
     "message": "Vytvořit novou"
   },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {project} other {projects}}"
+  },
   "dashboard.collections.label.search-input": {
     "message": "Hledat ve vašich kolekcích"
   },
@@ -550,6 +559,12 @@
   },
   "dashboard.creator-tax-form-modal.confirmation.title": {
     "message": "Hotovo! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Zahraniční subjekt"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Daňový formulář"
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Jste občan USA?"
@@ -934,9 +949,6 @@
   },
   "moderation.page.reports": {
     "message": "Hlášení"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Technické hodnocení"
   },
   "muralpay.country.at": {
     "message": "Rakousko"

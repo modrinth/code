@@ -557,7 +557,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     // - https://minecraft.wiki/w/Mounts_of_Mayhem_(skin_pack)
     Skin {
         texture_key: Arc::from("e0bae80c765f9ef3c3050dd72ea4d4bc53ae00e39c8a376a886d419abdc5dd84"),
-        name: Some(Arc::from("Copper Chemist")),
+        name: Some(Arc::from("Zombie Horse Onesie")),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(

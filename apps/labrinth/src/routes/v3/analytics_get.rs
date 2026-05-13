@@ -33,6 +33,7 @@ use crate::{
         ids::{AffiliateCodeId, ProjectId, VersionId},
         pats::Scopes,
         teams::ProjectPermissions,
+        v3::analytics::DownloadReason,
     },
     queue::session::AuthQueue,
     routes::ApiError,
@@ -54,10 +55,12 @@ pub struct GetRequest {
     /// What time range to return statistics for.
     pub time_range: TimeRange,
     /// What analytics metrics to return data for.
+    #[serde(default)]
     pub return_metrics: ReturnMetrics,
     /// What project IDs to return data for.
     ///
     /// If this is empty, all of the user's projects will be included.
+    #[serde(default)]
     pub project_ids: Vec<ProjectId>,
 }
 
@@ -166,10 +169,18 @@ pub enum ProjectDownloadsField {
     Domain,
     /// Modrinth site path which was visited, e.g. `/mod/foo`.
     SitePath,
-    /// What country these views came from.
+    /// Whether these downloads were monetized or not.
+    Monetized,
+    /// What country these downloads came from.
     ///
     /// To anonymize the data, the country may be reported as `XX`.
     Country,
+    /// Download reason.
+    Reason,
+    /// Game version used for this download.
+    GameVersion,
+    /// Mod loader used for this download.
+    Loader,
 }
 
 /// Fields for [`ReturnMetrics::project_playtime`].
@@ -186,6 +197,10 @@ pub enum ProjectPlaytimeField {
     Loader,
     /// Game version which this project was played on.
     GameVersion,
+    /// What country this playtime came from.
+    ///
+    /// To anonymize the data, the country may be reported as `XX`.
+    Country,
 }
 
 /// Fields for [`ReturnMetrics::project_revenue`].
@@ -238,12 +253,13 @@ pub const MAX_TIME_SLICES: usize = 1024;
 // response
 
 /// Response for a [`GetRequest`].
-///
-/// This is a list of N [`TimeSlice`]s, where each slice represents an equal
-/// time interval of metrics collection. The number of slices is determined
-/// by [`GetRequest::time_range`].
 #[derive(Debug, Default, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct FetchResponse(pub Vec<TimeSlice>);
+pub struct FetchResponse {
+    /// List of N [`TimeSlice`]s, where each slice represents an equal
+    /// time interval of metrics collection. The number of slices is determined
+    /// by [`GetRequest::time_range`].
+    pub metrics: Vec<TimeSlice>,
+}
 
 /// Single time interval of metrics collection.
 #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
@@ -315,9 +331,21 @@ pub struct ProjectDownloads {
     /// [`ProjectDownloadsField::VersionId`].
     #[serde(skip_serializing_if = "Option::is_none")]
     version_id: Option<VersionId>,
+    /// [`ProjectDownloadsField::Monetized`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    monetized: Option<bool>,
     /// [`ProjectDownloadsField::Country`].
     #[serde(skip_serializing_if = "Option::is_none")]
     country: Option<String>,
+    /// [`ProjectDownloadsField::Reason`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reason: Option<DownloadReason>,
+    /// [`ProjectDownloadsField::GameVersion`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    game_version: Option<String>,
+    /// [`ProjectDownloadsField::Loader`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    loader: Option<String>,
     /// Total number of downloads for this bucket.
     downloads: u64,
 }
@@ -334,6 +362,9 @@ pub struct ProjectPlaytime {
     /// [`ProjectPlaytimeField::GameVersion`].
     #[serde(skip_serializing_if = "Option::is_none")]
     game_version: Option<String>,
+    /// [`ProjectPlaytimeField::Country`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    country: Option<String>,
     /// Total number of seconds of playtime for this bucket.
     seconds: u64,
 }
@@ -447,7 +478,11 @@ mod query {
         pub domain: String,
         pub site_path: String,
         pub version_id: DBVersionId,
+        pub monetized: i8,
         pub country: String,
+        pub reason: String,
+        pub game_version: String,
+        pub loader: String,
         pub downloads: u64,
     }
 
@@ -456,7 +491,11 @@ mod query {
         const USE_DOMAIN: &str = "{use_domain: Bool}";
         const USE_SITE_PATH: &str = "{use_site_path: Bool}";
         const USE_VERSION_ID: &str = "{use_version_id: Bool}";
+        const USE_MONETIZED: &str = "{use_monetized: Bool}";
         const USE_COUNTRY: &str = "{use_country: Bool}";
+        const USE_REASON: &str = "{use_reason: Bool}";
+        const USE_GAME_VERSION: &str = "{use_game_version: Bool}";
+        const USE_LOADER: &str = "{use_loader: Bool}";
 
         formatcp!(
             "SELECT
@@ -465,7 +504,11 @@ mod query {
                 if({USE_DOMAIN}, domain, '') AS domain,
                 if({USE_SITE_PATH}, site_path, '') AS site_path,
                 if({USE_VERSION_ID}, version_id, 0) AS version_id,
+                if({USE_MONETIZED}, CAST(user_id != 0 AS Int8), -1) AS monetized,
                 if({USE_COUNTRY}, country, '') AS country,
+                if({USE_REASON}, reason, '') AS reason,
+                if({USE_GAME_VERSION}, game_version, '') AS game_version,
+                if({USE_LOADER}, loader, '') AS loader,
                 COUNT(*) AS downloads
             FROM downloads
             WHERE
@@ -474,7 +517,7 @@ mod query {
                 -- not the possibly-zero one,
                 -- by using `downloads.project_id` instead of `project_id`
                 AND downloads.project_id IN {PROJECT_IDS}
-            GROUP BY bucket, project_id, domain, site_path, version_id, country"
+            GROUP BY bucket, project_id, domain, site_path, version_id, monetized, country, reason, game_version, loader"
         )
     };
 
@@ -485,6 +528,7 @@ mod query {
         pub version_id: DBVersionId,
         pub loader: String,
         pub game_version: String,
+        pub country: String,
         pub seconds: u64,
     }
 
@@ -493,6 +537,7 @@ mod query {
         const USE_VERSION_ID: &str = "{use_version_id: Bool}";
         const USE_LOADER: &str = "{use_loader: Bool}";
         const USE_GAME_VERSION: &str = "{use_game_version: Bool}";
+        const USE_COUNTRY: &str = "{use_country: Bool}";
 
         formatcp!(
             "SELECT
@@ -501,6 +546,7 @@ mod query {
                 if({USE_VERSION_ID}, version_id, 0) AS version_id,
                 if({USE_LOADER}, loader, '') AS loader,
                 if({USE_GAME_VERSION}, game_version, '') AS game_version,
+                if({USE_COUNTRY}, country, '') AS country,
                 SUM(seconds) AS seconds
             FROM playtime
             WHERE
@@ -509,7 +555,7 @@ mod query {
                 -- not the possibly-zero one,
                 -- by using `playtime.project_id` instead of `project_id`
                 AND playtime.project_id IN {PROJECT_IDS}
-            GROUP BY bucket, project_id, version_id, loader, game_version"
+            GROUP BY bucket, project_id, version_id, loader, game_version, country"
         )
     };
 
@@ -693,7 +739,11 @@ pub async fn fetch_analytics(
                 ("use_domain", uses(F::Domain)),
                 ("use_site_path", uses(F::SitePath)),
                 ("use_version_id", uses(F::VersionId)),
+                ("use_monetized", uses(F::Monetized)),
                 ("use_country", uses(F::Country)),
+                ("use_reason", uses(F::Reason)),
+                ("use_game_version", uses(F::GameVersion)),
+                ("use_loader", uses(F::Loader)),
             ],
             |row| row.bucket,
             |row| {
@@ -708,7 +758,16 @@ pub async fn fetch_analytics(
                         domain: none_if_empty(row.domain),
                         site_path: none_if_empty(row.site_path),
                         version_id: none_if_zero_version_id(row.version_id),
+                        monetized: match row.monetized {
+                            0 => Some(false),
+                            1 => Some(true),
+                            _ => None,
+                        },
                         country,
+                        reason: none_if_empty(row.reason)
+                            .and_then(|s| s.parse().ok()),
+                        game_version: none_if_empty(row.game_version),
+                        loader: none_if_empty(row.loader),
                         downloads: row.downloads,
                     }),
                 })
@@ -729,15 +788,22 @@ pub async fn fetch_analytics(
                 ("use_version_id", uses(F::VersionId)),
                 ("use_loader", uses(F::Loader)),
                 ("use_game_version", uses(F::GameVersion)),
+                ("use_country", uses(F::Country)),
             ],
             |row| row.bucket,
             |row| {
+                let country = if uses(F::Country) {
+                    Some(condense_country(row.country, row.seconds))
+                } else {
+                    None
+                };
                 AnalyticsData::Project(ProjectAnalytics {
                     source_project: row.project_id.into(),
                     metrics: ProjectMetrics::Playtime(ProjectPlaytime {
                         version_id: none_if_zero_version_id(row.version_id),
                         loader: none_if_empty(row.loader),
                         game_version: none_if_empty(row.game_version),
+                        country,
                         seconds: row.seconds,
                     }),
                 })
@@ -769,10 +835,13 @@ pub async fn fetch_analytics(
         .await?;
     }
 
-    if let Some(metrics) = &req.return_metrics.project_revenue {
+    if req.return_metrics.project_revenue.is_some() {
         if !scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(AuthenticationError::InvalidCredentials.into());
         }
+
+        let project_id_values =
+            project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
 
         let mut rows = sqlx::query!(
             "SELECT
@@ -782,21 +851,20 @@ pub async fn fetch_analytics(
                     EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                     $3::integer
                 ) AS bucket,
-                CASE WHEN $5 THEN mod_id ELSE 0 END AS mod_id,
+                mod_id,
                 SUM(amount) amount_sum
             FROM payouts_values
             WHERE
-                user_id = $4
                 -- only project revenue is counted here
-                -- for affiliate code revenue, see `affiliate_code_revenue``
-                AND payouts_values.mod_id IS NOT NULL
+                -- for affiliate code revenue, see `affiliate_code_revenue`
+                payouts_values.mod_id IS NOT NULL
+                AND payouts_values.mod_id = ANY($4)
                 AND created BETWEEN $1 AND $2
             GROUP BY bucket, mod_id",
             req.time_range.start,
             req.time_range.end,
             num_time_slices as i64,
-            DBUserId::from(user.id) as DBUserId,
-            metrics.bucket_by.contains(&ProjectRevenueField::ProjectId),
+            &project_id_values,
         )
         .fetch(&**pool);
         while let Some(row) = rows.next().await.transpose()? {
@@ -935,7 +1003,9 @@ pub async fn fetch_analytics(
         }
     }
 
-    Ok(web::Json(FetchResponse(time_slices)))
+    Ok(web::Json(FetchResponse {
+        metrics: time_slices,
+    }))
 }
 
 fn none_if_empty(s: String) -> Option<String> {
@@ -1106,55 +1176,59 @@ mod tests {
         let test_project_2 = ProjectId(456);
         let test_project_3 = ProjectId(789);
 
-        let src = FetchResponse(vec![
-            TimeSlice(vec![
-                AnalyticsData::Project(ProjectAnalytics {
-                    source_project: test_project_1,
-                    metrics: ProjectMetrics::Views(ProjectViews {
-                        domain: Some("youtube.com".into()),
-                        views: 100,
-                        ..Default::default()
+        let src = FetchResponse {
+            metrics: vec![
+                TimeSlice(vec![
+                    AnalyticsData::Project(ProjectAnalytics {
+                        source_project: test_project_1,
+                        metrics: ProjectMetrics::Views(ProjectViews {
+                            domain: Some("youtube.com".into()),
+                            views: 100,
+                            ..Default::default()
+                        }),
                     }),
-                }),
-                AnalyticsData::Project(ProjectAnalytics {
-                    source_project: test_project_2,
-                    metrics: ProjectMetrics::Downloads(ProjectDownloads {
-                        domain: Some("discord.com".into()),
-                        downloads: 150,
-                        ..Default::default()
+                    AnalyticsData::Project(ProjectAnalytics {
+                        source_project: test_project_2,
+                        metrics: ProjectMetrics::Downloads(ProjectDownloads {
+                            domain: Some("discord.com".into()),
+                            downloads: 150,
+                            ..Default::default()
+                        }),
                     }),
-                }),
-            ]),
-            TimeSlice(vec![AnalyticsData::Project(ProjectAnalytics {
-                source_project: test_project_3,
-                metrics: ProjectMetrics::Revenue(ProjectRevenue {
-                    revenue: Decimal::new(20000, 2),
-                }),
-            })]),
-        ]);
-        let target = json!([
-            [
-                {
-                    "source_project": test_project_1.to_string(),
-                    "metric_kind": "views",
-                    "domain": "youtube.com",
-                    "views": 100,
-                },
-                {
-                    "source_project": test_project_2.to_string(),
-                    "metric_kind": "downloads",
-                    "domain": "discord.com",
-                    "downloads": 150,
-                }
+                ]),
+                TimeSlice(vec![AnalyticsData::Project(ProjectAnalytics {
+                    source_project: test_project_3,
+                    metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                        revenue: Decimal::new(20000, 2),
+                    }),
+                })]),
             ],
-            [
-                {
-                    "source_project": test_project_3.to_string(),
-                    "metric_kind": "revenue",
-                    "revenue": "200.00",
-                }
+        };
+        let target = json!({
+            "metrics": [
+                [
+                    {
+                        "source_project": test_project_1.to_string(),
+                        "metric_kind": "views",
+                        "domain": "youtube.com",
+                        "views": 100,
+                    },
+                    {
+                        "source_project": test_project_2.to_string(),
+                        "metric_kind": "downloads",
+                        "domain": "discord.com",
+                        "downloads": 150,
+                    }
+                ],
+                [
+                    {
+                        "source_project": test_project_3.to_string(),
+                        "metric_kind": "revenue",
+                        "revenue": "200.00",
+                    }
+                ]
             ]
-        ]);
+        });
 
         assert_eq!(serde_json::to_value(src).unwrap(), target);
     }

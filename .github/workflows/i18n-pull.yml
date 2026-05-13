@@ -51,14 +51,14 @@ jobs:
           CROWDIN_GH_TOKEN_DEFINED: ${{ secrets.CROWDIN_GH_TOKEN != '' }}
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: ${{ github.ref }}
           token: ${{ secrets.CROWDIN_GH_TOKEN }}
 
       - name: Configure Git author
         id: git-author
-        uses: MarcoIeni/git-config@v0.1
+        uses: MarcoIeni/git-config@59144859caf016f8b817a2ac9b051578729173c4 # v0.1.2
         env:
           GITHUB_TOKEN: ${{ secrets.CROWDIN_GH_TOKEN }}
 
@@ -79,7 +79,7 @@ jobs:
           echo "safe_branch_name=$SAFE_BRANCH_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Download translations from Crowdin
-        uses: crowdin/github-action@v2
+        uses: crowdin/github-action@8868a33591d21088edfc398968173a3b98d51706 # v2.16.2
         with:
           upload_sources: false
           upload_translations: false
@@ -96,7 +96,7 @@ jobs:
         run: sudo chown -R $USER:$USER .
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           title: 'New translations from Crowdin (${{ steps.branch-name.outputs.branch_name }})'
           body-path: .github/templates/crowdin-pr.md

@@ -1,11 +1,10 @@
 <template>
-	<NavTabs
+	<Tabs
 		v-if="editingVersion"
-		mode="local"
-		:links="editTabLinks"
-		:active-index="1"
-		class="mb-4 border border-solid border-surface-5 shadow-none drop-shadow-none"
-		@tab-click="setEditTab"
+		value="add-details"
+		:tabs="editTabs"
+		class="mb-5 border border-solid border-surface-5 !shadow-none !drop-shadow-none"
+		@change="setEditTab"
 	/>
 	<div class="flex w-full flex-col gap-6">
 		<div class="flex flex-col gap-2">
@@ -18,6 +17,7 @@
 				:never-empty="true"
 				:capitalize="true"
 				:disabled="isUploading"
+				hide-checkmark-icon
 			/>
 		</div>
 		<div class="flex flex-col gap-2">
@@ -61,25 +61,21 @@
 </template>
 
 <script lang="ts" setup>
-import { Chips, MarkdownEditor, NavTabs, StyledInput } from '@modrinth/ui'
+import { Chips, MarkdownEditor, StyledInput, Tabs, type TabsTab } from '@modrinth/ui'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 const { draftVersion, isUploading, editingVersion, modal } = injectManageVersionContext()
 
-const editTabs = [
-	{ label: 'Metadata', href: 'metadata', stage: 'metadata' },
-	{ label: 'Details', href: 'details', stage: 'add-details' },
-	{ label: 'Files', href: 'files', stage: 'add-files' },
-] as const
+const editTabs: TabsTab[] = [
+	{ label: 'Metadata', value: 'metadata' },
+	{ label: 'Details', value: 'add-details' },
+	{ label: 'Files', value: 'add-files' },
+]
 
-const editTabLinks = editTabs.map(({ label, href }) => ({ label, href }))
-
-function setEditTab(index: number) {
-	const tab = editTabs[index]
-	if (!tab) return
-	modal.value?.setStage(tab.stage)
+function setEditTab(tab: TabsTab) {
+	modal.value?.setStage(tab.value)
 }
 
 async function onImageUpload(file: File) {

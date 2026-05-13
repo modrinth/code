@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Tạo link affiliate"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Không tìm thấy mã liên kết nào."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Lỗi tải link affiliate"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Tìm kiếm link affiliate..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "từ {count} {count, plural, one {dự án} other {dự án}} khác"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Tổng số lượt tải xuống"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Tổng số người theo dõi"
   },
   "dashboard.collections.button.create-new": {
     "message": "Tạo mới"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Bộ sưu tập của bạn"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Tìm kiếm các bộ sưu tập..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Tên (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Mới tạo gần đây"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Mới được cập nhật"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Tải xuống {formType}"
@@ -847,6 +871,39 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Bạn đã sử dụng hết giới hạn rút tiền <b>{withdrawLimit}</b>. Bạn cần hoàn thành biểu mẫu thuế để rút thêm."
+  },
+  "dashboard.head-title": {
+    "message": "Bảng điều khiển"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Đánh dấu tất cả là đã đọc"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Xem lịch sử"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Bạn không có thông báo nào chưa đọc."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Lỗi khi tải thông báo:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Lịch sử"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Lịch sử thông báo"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Xem tất cả"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Xem lịch sử thông báo"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Xem thêm {extraNotifs} {extraNotifs, plural, one {thông báo} other {thông báo}} khác"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Đang tải thông báo..."
   },
   "dashboard.revenue.available-now": {
     "message": "Khả dụng ngay"
@@ -1702,9 +1759,6 @@
   },
   "moderation.page.reports": {
     "message": "Báo cáo"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Đánh giá kỹ thuật"
   },
   "muralpay.account-type.checking": {
     "message": "Tài khoản thanh toán"

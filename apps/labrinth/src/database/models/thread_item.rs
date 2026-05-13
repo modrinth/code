@@ -161,7 +161,7 @@ impl DBThread {
                     )
                         .ok()
                         .unwrap_or_default();
-                    messages.sort_by(|a, b| a.created.cmp(&b.created));
+                    messages.sort_by_key(|a| a.created);
                     messages
                 },
                 members: x.members.unwrap_or_default().into_iter().map(DBUserId).collect(),

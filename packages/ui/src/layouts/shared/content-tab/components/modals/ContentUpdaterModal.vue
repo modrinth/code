@@ -205,7 +205,7 @@
 			</div>
 			<div class="flex flex-row gap-2 shrink-0">
 				<ButtonStyled type="outlined">
-					<button class="!border-[1px] !border-surface-4" @click="handleCancel">
+					<button @click="handleCancel">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>

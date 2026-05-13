@@ -16,7 +16,7 @@ import { computed } from 'vue'
 
 const { formatMessage } = useVIntl()
 
-const { currentMember, projectV2, projectV3, refreshProject } = injectProjectPageContext()
+const { currentMember, projectV2, projectV3, invalidate } = injectProjectPageContext()
 const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
 
@@ -53,7 +53,7 @@ const { saved, current, saving, reset, save } = useSavable(
 				environment,
 				side_types_migration_review_status: 'reviewed',
 			})
-			await refreshProject()
+			await invalidate()
 			reset()
 		} catch (err) {
 			handleError(err as Error)

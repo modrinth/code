@@ -9,6 +9,11 @@ import { AbstractUploadClient } from './abstract-upload-client'
 import type { AbstractWebSocketClient } from './abstract-websocket'
 import { ModrinthApiError, ModrinthServerError } from './errors'
 
+type ArchonClientModules = Omit<InferredClientModules['archon'], 'backups_v1'> & {
+	/** @deprecated Use `backups_queue_v1` for the Backups Queue API. */
+	backups_v1: InferredClientModules['archon']['backups_v1']
+}
+
 /**
  * Abstract base client for Modrinth APIs
  */
@@ -27,7 +32,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	private _moduleNamespaces: Map<string, Record<string, AbstractModule>> = new Map()
 
 	public readonly labrinth!: InferredClientModules['labrinth']
-	public readonly archon!: InferredClientModules['archon'] & { sockets: AbstractWebSocketClient }
+	public readonly archon!: ArchonClientModules & { sockets: AbstractWebSocketClient }
 	public readonly kyros!: InferredClientModules['kyros']
 	public readonly iso3166!: InferredClientModules['iso3166']
 	public readonly mclogs!: InferredClientModules['mclogs']
@@ -120,13 +125,15 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 
 		const url = this.buildUrl(path, baseUrl, options.version)
 
+		const defaultHeaders = await this.buildDefaultHeaders()
+
 		// Merge options with defaults
 		const mergedOptions: RequestOptions = {
 			method: 'GET',
 			timeout: this.config.timeout,
 			...options,
 			headers: {
-				...this.buildDefaultHeaders(),
+				...defaultHeaders,
 				...options.headers,
 			},
 		}
@@ -301,17 +308,23 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	 * Subclasses can override this to add platform-specific headers
 	 * (e.g., Nuxt rate limit key)
 	 */
-	protected buildDefaultHeaders(): Record<string, string> {
+	protected async buildDefaultHeaders(): Promise<Record<string, string>> {
 		const headers: Record<string, string> = {
 			'Content-Type': 'application/json',
 			...this.config.headers,
 		}
 
-		if (this.config.userAgent) {
-			headers['User-Agent'] = this.config.userAgent
+		const userAgent = await this.resolveUserAgent()
+		if (userAgent) {
+			headers['User-Agent'] = userAgent
 		}
 
 		return headers
+	}
+
+	private async resolveUserAgent(): Promise<string | undefined> {
+		const userAgent = this.config.userAgent
+		return typeof userAgent === 'function' ? await userAgent() : userAgent
 	}
 
 	protected attachArchonSentryCaptureHeader(options: RequestOptions): void {
@@ -399,7 +412,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	 * @example
 	 * ```typescript
 	 * const client = new GenericModrinthClient()
-	 * client.addFeature(new AuthFeature({ token: 'mrp_...' }))
+	 * client.addFeature(new AuthFeature({ token: async () => getOAuthToken() }))
 	 * client.addFeature(new RetryFeature({ maxAttempts: 3 }))
 	 * ```
 	 */

@@ -204,9 +204,6 @@ const colorVariables = computed(() => {
 
 	if (props.type === 'outlined' || props.type === 'transparent') {
 		colors.bg = 'transparent'
-		if (props.hoverColorFill === 'none') {
-			hoverColors.bg = 'transparent'
-		}
 		colors = setColorFill(colors, props.colorFill === 'auto' ? 'text' : props.colorFill)
 		hoverColors = setColorFill(
 			hoverColors,
@@ -244,8 +241,11 @@ const fontSize = computed(() => {
 <template>
 	<div
 		class="btn-wrapper"
-		:class="[{ outline: type === 'outlined', chip: type === 'chip' }, fontSize]"
-		:style="`${colorVariables}--_height:${height};--_width:${width};--_radius: ${radius};--_padding-x:${paddingX};--_padding-y:${paddingY};--_gap:${gap};--_font-weight:${fontWeight};--_icon-size:${iconSize};`"
+		:class="[
+			{ outline: type === 'outlined', transparent: type === 'transparent', chip: type === 'chip' },
+			fontSize,
+		]"
+		:style="`${colorVariables}--_height:${height};--_width:${width};--_radius: ${radius};--_padding-x:${paddingX};--_padding-y:${paddingY};--_gap:${gap};--_font-weight:${fontWeight};--_icon-size:${iconSize};--_outline-color:${color === 'standard' && type === 'outlined' ? 'var(--surface-5)' : 'currentColor'}`"
 	>
 		<slot />
 	</div>
@@ -266,10 +266,8 @@ const fontSize = computed(() => {
 	> *:first-child
 	> *:first-child
 	> :is(button, a, .button-like):first-child {
-	@apply flex cursor-pointer flex-row items-center justify-center border-solid border border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
+	@apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
 	box-shadow: var(--_box-shadow, inset 0 0 0 transparent);
-	-webkit-font-smoothing: antialiased;
-	will-change: filter;
 	transition:
 		scale 0.125s ease-in-out,
 		background-color 0.25s ease-in-out,
@@ -282,20 +280,20 @@ const fontSize = computed(() => {
 		flex-shrink: 0;
 	}
 
-	&[disabled],
+	&[disabled]:not([disabled='false']),
 	&[disabled='true'],
 	&.disabled,
 	&.looks-disabled {
 		@apply opacity-50;
 	}
 
-	&[disabled],
+	&[disabled]:not([disabled='false']),
 	&[disabled='true'],
 	&.disabled {
 		@apply cursor-not-allowed;
 	}
 
-	&:not([disabled]):not([disabled='true']):not(.disabled) {
+	&:not([disabled]:not([disabled='false'])):not([disabled='true']):not(.disabled) {
 		@apply hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness] hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text];
 
 		&:hover svg:first-child,
@@ -314,8 +312,27 @@ const fontSize = computed(() => {
 	> *:first-child
 	> *:first-child
 	> :is(button, a, .button-like):first-child {
-	&:not([disabled]):not([disabled='true']):not(.disabled) {
+	&:not([disabled]:not([disabled='false'])):not([disabled='true']):not(.disabled) {
 		@apply active:scale-95;
+	}
+}
+
+.disable-advanced-rendering {
+	.btn-wrapper:not(.outline):not(.transparent) :deep(:is(button, a, .button-like):first-child),
+	.btn-wrapper:not(.outline):not(.transparent) :slotted(:is(button, a, .button-like):first-child),
+	.btn-wrapper:not(.outline):not(.transparent)
+		:slotted(*)
+		> :is(button, a, .button-like):first-child,
+	.btn-wrapper:not(.outline):not(.transparent)
+		:slotted(*)
+		> *:first-child
+		> :is(button, a, .button-like):first-child,
+	.btn-wrapper
+		:slotted(*)
+		> *:first-child
+		> *:first-child
+		> :is(button, a, .button-like):first-child {
+		@apply border border-[rgba(0,0,0,0.2)];
 	}
 }
 
@@ -328,7 +345,7 @@ const fontSize = computed(() => {
 	> *:first-child
 	> *:first-child
 	> :is(button, a, .button-like):first-child {
-	@apply border-current;
+	@apply border-[--_outline-color,currentColor];
 }
 
 /*noinspection CssUnresolvedCustomProperty*/

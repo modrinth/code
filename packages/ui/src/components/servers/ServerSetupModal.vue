@@ -207,6 +207,8 @@ function emitReinstall(args?: { loader: string; lVersion: string; mVersion: stri
 }
 
 function show() {
+	void creationFlowRef.value?.ctx?.fetchLoaderMetadata('paper')
+	void creationFlowRef.value?.ctx?.fetchLoaderMetadata('purpur')
 	creationFlowRef.value?.show()
 }
 

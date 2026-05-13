@@ -2,12 +2,10 @@
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
-import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
-import { useReadyState } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -16,16 +14,24 @@ import {
 	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
+import {
+	type PendingServerContentInstall,
+	pendingServerContentInstallsEvent,
+	readPendingServerContentInstallBaseline,
+	readPendingServerContentInstalls,
+	removePendingServerContentInstall,
+} from '#ui/utils/server-content-installing'
 
+import {
+	flushStoredServerAddonInstallQueue,
+	getStoredServerAddonInstallQueue,
+} from '../../../shared/browse-tab/composables/install-logic'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
 import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
 import ContentPageLayout from '../../../shared/content-tab/layout.vue'
-import type {
-	ContentModpackData,
-	UploadState,
-} from '../../../shared/content-tab/providers/content-manager'
+import type { ContentModpackData } from '../../../shared/content-tab/providers/content-manager'
 import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
 import type {
 	ContentItem,
@@ -35,6 +41,19 @@ import type {
 } from '../../../shared/content-tab/types'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
+type ContentOwnerAvatarSource = {
+	id: string
+	name: string
+	type: 'user' | 'organization'
+}
+const props = withDefaults(
+	defineProps<{
+		ownerAvatarUrlBase?: string
+	}>(),
+	{
+		ownerAvatarUrlBase: 'https://modrinth.com',
+	},
+)
 
 const { formatMessage } = useVIntl()
 
@@ -83,22 +102,15 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-bulk-update',
 		defaultMessage: 'Failed to update content',
 	},
-})
-
-const leaveMessages = defineMessages({
-	uploadInProgress: {
-		id: 'instances.confirm-leave-modal.upload-in-progress',
-		defaultMessage: 'Upload in progress',
-	},
-	leavePageBody: {
-		id: 'instances.confirm-leave-modal.body',
-		defaultMessage:
-			'Files are still being uploaded. Leaving this page will cancel the upload and your changes may be lost.',
+	failedToInstallContent: {
+		id: 'hosting.content.failed-to-install',
+		defaultMessage: 'Failed to install content',
 	},
 })
 
 const client = injectModrinthClient()
-const { server, worldId, busyReasons, isSyncingContent } = injectModrinthServerContext()
+const { server, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
+	injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const { openServerSettings, browseServerContent } = injectServerSettingsModal()
 const route = useRoute()
@@ -115,6 +127,11 @@ const type = computed(() => {
 
 const queryKey = computed(() => ['content', 'list', 'v1', serverId])
 
+function getContentOwnerAvatarUrl(owner: ContentOwnerAvatarSource) {
+	const ownerId = owner.type === 'user' ? owner.name || owner.id : owner.id
+	return `${props.ownerAvatarUrlBase}/${owner.type}/${encodeURIComponent(ownerId)}/avatar`
+}
+
 const contentQuery = useQuery({
 	queryKey,
 	queryFn: () =>
@@ -122,8 +139,6 @@ const contentQuery = useQuery({
 	enabled: computed(() => worldId.value !== null),
 	staleTime: 0,
 })
-
-const contentReadyPending = useReadyState(contentQuery)
 
 const modpackProjectId = computed(() => {
 	const spec = contentQuery.data.value?.modpack?.spec
@@ -178,8 +193,8 @@ const modpack = computed<ContentModpackData | null>(() => {
 			? {
 					id: mp.owner.id,
 					name: mp.owner.name,
-					avatar_url: mp.owner.icon_url ?? undefined,
 					type: mp.owner.type,
+					avatar_url: getContentOwnerAvatarUrl(mp.owner),
 					link:
 						mp.owner.type === 'organization'
 							? `/organization/${mp.owner.id}`
@@ -217,8 +232,276 @@ const addonLookup = computed(() => {
 	return map
 })
 
-const contentItems = computed<ContentItem[]>(() => {
-	return (contentQuery.data.value?.addons ?? []).map(addonToContentItem)
+const pendingServerContentInstalls = ref<PendingServerContentInstall[]>([])
+const lastStableContentKeys = ref<Set<string>>(new Set())
+const contentInstallBaselineKeys = ref<Set<string> | null>(null)
+const contentInstallAddedKeys = ref<Set<string>>(new Set())
+const isFlushingStoredServerInstalls = ref(false)
+
+function syncPendingServerContentInstalls() {
+	pendingServerContentInstalls.value = readPendingServerContentInstalls(serverId, worldId.value)
+}
+
+function handlePendingServerContentInstallsChanged(event: Event) {
+	const detail = (event as CustomEvent<{ serverId?: string | null; worldId?: string | null }>)
+		.detail
+	if (detail?.serverId !== serverId || detail?.worldId !== worldId.value) return
+	syncPendingServerContentInstalls()
+	void flushStoredServerInstalls()
+}
+
+function getAddonInstallKey(addon: Archon.Content.v1.Addon) {
+	return addon.project_id ?? addon.filename
+}
+
+function getAddonInstallKeys(addons: Archon.Content.v1.Addon[]) {
+	const keys = new Set<string>()
+	for (const addon of addons) {
+		keys.add(getAddonInstallKey(addon))
+	}
+	return keys
+}
+
+function syncContentInstallKeys(
+	addons: Archon.Content.v1.Addon[] = contentQuery.data.value?.addons ?? [],
+) {
+	const currentKeys = getAddonInstallKeys(addons)
+	if (isSyncingContent.value) {
+		if (!contentInstallBaselineKeys.value) {
+			contentInstallBaselineKeys.value =
+				readPendingServerContentInstallBaseline(serverId, worldId.value) ??
+				new Set(lastStableContentKeys.value)
+		}
+
+		const nextAddedKeys = new Set(contentInstallAddedKeys.value)
+		for (const key of currentKeys) {
+			if (!contentInstallBaselineKeys.value.has(key)) {
+				nextAddedKeys.add(key)
+			}
+		}
+		contentInstallAddedKeys.value = nextAddedKeys
+		return
+	}
+
+	lastStableContentKeys.value = currentKeys
+	contentInstallBaselineKeys.value = null
+	contentInstallAddedKeys.value = new Set()
+}
+
+async function flushStoredServerInstalls() {
+	const wid = worldId.value
+	if (!wid || isFlushingStoredServerInstalls.value) return
+
+	const queuedPlans = getStoredServerAddonInstallQueue(serverId, wid)
+	if (queuedPlans.size === 0) return
+
+	isFlushingStoredServerInstalls.value = true
+	try {
+		const result = await flushStoredServerAddonInstallQueue({
+			serverId,
+			worldId: wid,
+			install: (plans) =>
+				client.archon.content_v1.addAddons(
+					serverId,
+					wid,
+					plans.map((plan) => ({
+						project_id: plan.projectId,
+						version_id: plan.versionId,
+					})),
+				),
+		})
+
+		if (!result.ok) {
+			for (const plan of result.attemptedPlans) {
+				removePendingServerContentInstall(serverId, wid, plan.projectId)
+			}
+			addNotification({
+				type: 'error',
+				title: formatMessage(messages.failedToInstallContent),
+				text: result.error instanceof Error ? result.error.message : undefined,
+			})
+			return
+		}
+
+		if (result.flushedPlans.length > 0) {
+			await queryClient.invalidateQueries({ queryKey: queryKey.value })
+		}
+	} finally {
+		isFlushingStoredServerInstalls.value = false
+		syncPendingServerContentInstalls()
+	}
+}
+
+function pendingInstallToContentItem(item: PendingServerContentInstall): ContentItem {
+	return {
+		project: {
+			id: item.projectId,
+			slug: item.slug ?? item.projectId,
+			title: item.title,
+			icon_url: item.iconUrl ?? undefined,
+		},
+		version: {
+			id: item.versionId,
+			version_number:
+				item.versionName ?? item.versionNumber ?? formatMessage(commonMessages.installingLabel),
+			file_name: item.fileName ?? formatMessage(commonMessages.installingLabel),
+		},
+		owner: item.owner
+			? {
+					id: item.owner.id,
+					name: item.owner.name,
+					type: item.owner.type,
+					avatar_url: getContentOwnerAvatarUrl(item.owner),
+					link: item.owner.link,
+				}
+			: undefined,
+		id: `installing:${item.projectId}`,
+		enabled: true,
+		file_name: `installing:${item.projectId}`,
+		project_type: item.contentType,
+		has_update: false,
+		update_version_id: null,
+		installing: true,
+	}
+}
+
+const rawContentItems = computed<ContentItem[]>(() => {
+	const addons = contentQuery.data.value?.addons ?? []
+	const pendingProjectIds = new Set(
+		pendingServerContentInstalls.value.map((item) => item.projectId),
+	)
+	const pendingInstallByProjectId = new Map(
+		pendingServerContentInstalls.value.map((item) => [item.projectId, item]),
+	)
+	const installingContentKeys = new Set([...pendingProjectIds, ...contentInstallAddedKeys.value])
+	const installedProjectIds = new Set(
+		addons.map((addon) => addon.project_id).filter((id): id is string => !!id),
+	)
+	const pendingItems = pendingServerContentInstalls.value
+		.filter((item) => !installedProjectIds.has(item.projectId))
+		.map(pendingInstallToContentItem)
+	const addonItems = addons.map((addon) => {
+		const contentItem = addonToContentItem(addon)
+		const installing = installingContentKeys.has(getAddonInstallKey(addon))
+		const pendingItem = addon.project_id ? pendingInstallByProjectId.get(addon.project_id) : null
+
+		if (!installing || !pendingItem) {
+			return {
+				...contentItem,
+				installing,
+			}
+		}
+
+		const pendingContentItem = pendingInstallToContentItem(pendingItem)
+		return {
+			...contentItem,
+			project: {
+				...contentItem.project,
+				slug: pendingContentItem.project.slug,
+				title: pendingContentItem.project.title,
+				icon_url: contentItem.project.icon_url ?? pendingContentItem.project.icon_url,
+			},
+			version: {
+				id: pendingContentItem.version?.id ?? contentItem.version?.id ?? contentItem.file_name,
+				version_number:
+					pendingContentItem.version?.version_number ??
+					contentItem.version?.version_number ??
+					formatMessage(commonMessages.installingLabel),
+				file_name:
+					pendingContentItem.version?.file_name ??
+					contentItem.version?.file_name ??
+					contentItem.file_name,
+			},
+			owner: pendingContentItem.owner ?? contentItem.owner,
+			installing,
+		}
+	})
+
+	return [...addonItems, ...pendingItems]
+})
+
+const displayedContentItems = ref<ContentItem[]>([])
+const contentItems = computed<ContentItem[]>(() => displayedContentItems.value)
+const contentReadyPending = computed(
+	() =>
+		contentQuery.isLoading.value &&
+		contentQuery.data.value === undefined &&
+		pendingServerContentInstalls.value.length === 0 &&
+		displayedContentItems.value.length === 0,
+)
+
+function getContentItemDisplayKey(item: ContentItem) {
+	return item.project?.id ?? item.file_name ?? item.id
+}
+
+function mergeFragileContentItems(items: ContentItem[]) {
+	const nextItems = new Map(items.map((item) => [getContentItemDisplayKey(item), item]))
+	const mergedItems = displayedContentItems.value.map((item) => {
+		const key = getContentItemDisplayKey(item)
+		const nextItem = nextItems.get(key)
+		if (!nextItem) return item
+
+		nextItems.delete(key)
+		return nextItem
+	})
+
+	return [...mergedItems, ...nextItems.values()]
+}
+
+watch(
+	[
+		rawContentItems,
+		isSyncingContent,
+		() => contentQuery.isFetching.value,
+		() => contentQuery.isLoading.value,
+	],
+	([items, syncing, isFetching, isLoading]) => {
+		if (syncing) {
+			if (items.length > 0) {
+				displayedContentItems.value = mergeFragileContentItems(items)
+			}
+			return
+		}
+
+		if (items.length > 0 || (!isFetching && !isLoading)) {
+			displayedContentItems.value = items
+		}
+	},
+	{ deep: true, immediate: true },
+)
+
+watch(
+	[isSyncingContent, () => contentQuery.data.value?.addons],
+	([, addons]) => {
+		syncContentInstallKeys(addons ?? [])
+	},
+	{ deep: true, immediate: true },
+)
+
+watch(
+	worldId,
+	() => {
+		syncPendingServerContentInstalls()
+		syncContentInstallKeys()
+		void flushStoredServerInstalls()
+	},
+	{ immediate: true },
+)
+
+onMounted(() => {
+	syncPendingServerContentInstalls()
+	void flushStoredServerInstalls()
+	window.addEventListener(
+		pendingServerContentInstallsEvent,
+		handlePendingServerContentInstallsChanged,
+	)
+})
+
+onUnmounted(() => {
+	window.removeEventListener(
+		pendingServerContentInstallsEvent,
+		handlePendingServerContentInstallsChanged,
+	)
 })
 
 const deleteMutation = useMutation({
@@ -352,56 +635,9 @@ async function handleBulkDisable(items: ContentItem[]) {
 	}
 }
 
-const uploadState = ref<UploadState>({
-	isUploading: false,
-	currentFileName: null,
-	currentFileProgress: 0,
-	uploadedBytes: 0,
-	totalBytes: 0,
-	completedFiles: 0,
-	totalFiles: 0,
-})
-
-const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const modpackUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal>>()
-
-let activeUploadCancel: (() => void) | null = null
-
-const isUploading = computed(() => uploadState.value.isUploading)
-
-function handleBeforeUnload(e: BeforeUnloadEvent) {
-	if (isUploading.value) {
-		e.preventDefault()
-		return ''
-	}
-}
-
-if (typeof window !== 'undefined') {
-	watch(isUploading, (uploading) => {
-		if (uploading) {
-			window.addEventListener('beforeunload', handleBeforeUnload)
-		} else {
-			window.removeEventListener('beforeunload', handleBeforeUnload)
-		}
-	})
-
-	onBeforeUnmount(() => {
-		window.removeEventListener('beforeunload', handleBeforeUnload)
-	})
-
-	onBeforeRouteLeave(async () => {
-		if (isUploading.value) {
-			const shouldLeave = (await confirmLeaveModal.value?.prompt()) ?? false
-			if (shouldLeave) {
-				activeUploadCancel?.()
-			}
-			return shouldLeave
-		}
-		return true
-	})
-}
 
 const updatingProject = ref<ContentItem | null>(null)
 const updatingModpack = ref(false)
@@ -486,7 +722,7 @@ function handleUploadFiles() {
 				uploadState.value.totalBytes = p.total
 			},
 		})
-		activeUploadCancel = () => handle.cancel()
+		cancelUpload.value = () => handle.cancel()
 
 		try {
 			await handle.promise
@@ -500,7 +736,7 @@ function handleUploadFiles() {
 				text: err instanceof Error ? err.message : undefined,
 			})
 		} finally {
-			activeUploadCancel = null
+			cancelUpload.value = null
 			uploadState.value = {
 				isUploading: false,
 				currentFileName: null,
@@ -533,7 +769,7 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 					id: addon.owner.id,
 					name: addon.owner.name,
 					type: addon.owner.type,
-					avatar_url: addon.owner.icon_url ?? undefined,
+					avatar_url: getContentOwnerAvatarUrl(addon.owner),
 					link: `/${addon.owner.type}/${addon.owner.id}`,
 				}
 			: undefined,
@@ -847,7 +1083,14 @@ provideContentManager({
 	isPackLocked: ref(false),
 	isBusy: computed(() => busyReasons.value.length > 0),
 	busyMessage: computed(() => {
-		const bannerCoversInstalling = server.value?.status === 'installing' || isSyncingContent.value
+		const bannerCoversInstalling =
+			server.value?.status === 'installing' ||
+			isSyncingContent.value ||
+			busyReasons.value.some(
+				(r) =>
+					r.reason.id === 'servers.busy.installing' ||
+					r.reason.id === 'servers.busy.syncing-content',
+			)
 		const filteredReasons = busyReasons.value.filter((r) => {
 			if (
 				bannerCoversInstalling &&
@@ -875,7 +1118,6 @@ provideContentManager({
 	},
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
-	uploadState,
 	deletionContext: 'server',
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
@@ -889,18 +1131,19 @@ provideContentManager({
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
 		const addon = addonLookup.value.get(item.file_name)
-		const hasModrinthProject = !!addon?.project_id
+		const hasModrinthProject = !!addon?.project_id || (!!item.installing && !!item.project?.id)
+		const projectSlugOrId = item.project.slug ?? item.project.id
 		return {
 			id: item.id,
 			project: item.project,
-			projectLink: hasModrinthProject ? `/${projectType}/${item.project.id}` : undefined,
+			projectLink: hasModrinthProject ? `/${projectType}/${projectSlugOrId}` : undefined,
 			version: item.version,
 			versionLink:
 				hasModrinthProject && item.version?.id
-					? `/${projectType}/${item.project.id}/version/${item.version.id}`
+					? `/${projectType}/${projectSlugOrId}/version/${item.version.id}`
 					: undefined,
 			owner: item.owner
-				? { ...item.owner, link: `/${item.owner.type}/${item.owner.id}` }
+				? { ...item.owner, link: item.owner.link ?? `/${item.owner.type}/${item.owner.id}` }
 				: undefined,
 			enabled: item.enabled,
 		}
@@ -911,7 +1154,7 @@ provideContentManager({
 
 <template>
 	<ReadyTransition :pending="contentReadyPending">
-		<ContentPageLayout>
+		<ContentPageLayout :bottom-padding="false">
 			<template #modals>
 				<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
 				<ModpackContentModal
@@ -967,11 +1210,5 @@ provideContentManager({
 		server
 		@confirm="handleModpackUpdateConfirm"
 		@cancel="handleModpackUpdateCancel"
-	/>
-	<ConfirmLeaveModal
-		ref="confirmLeaveModal"
-		:header="formatMessage(leaveMessages.uploadInProgress)"
-		:body="formatMessage(leaveMessages.leavePageBody)"
-		admonition-type="critical"
 	/>
 </template>

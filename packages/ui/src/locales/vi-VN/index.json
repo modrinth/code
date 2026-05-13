@@ -92,6 +92,9 @@
   "billing.resubscribe-modal.storage": {
     "defaultMessage": "{storageGb} GB bộ nhớ"
   },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Đăng ký lại máy chủ"
+  },
   "button.accept": {
     "defaultMessage": "Chấp nhận"
   },
@@ -449,9 +452,6 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Tải tệp lên"
   },
-  "content.page-layout.uploading-files": {
-    "defaultMessage": "Đang tải tệp lên ({completed}/{total})"
-  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Tất cả nội dung đã chọn đều đã được tắt"
   },
@@ -557,11 +557,17 @@
   "files.editor.find-match-count": {
     "defaultMessage": "{current} trên {total}"
   },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Trận tiếp theo"
+  },
   "files.editor.find-no-results": {
     "defaultMessage": "Không có kết quả"
   },
   "files.editor.find-previous-match": {
     "defaultMessage": "Những kết quả trước"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Chuyển đổi thay thế"
   },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "URL tệp nhật kí của bạn đã được chép vào bảng tạm."
@@ -614,6 +620,12 @@
   "files.layout.busy-warning": {
     "defaultMessage": "Các thao tác với tệp sẽ bị vô hiệu hóa trong khi thao tác đang diễn ra."
   },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Lỗi khi chạy thử nghiệm không tải"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "Thử nghiệm không thành công"
+  },
   "files.layout.empty-folder-description": {
     "defaultMessage": "Không có tệp hoặc thư mục nào."
   },
@@ -625,6 +637,9 @@
   },
   "files.layout.error-title": {
     "defaultMessage": "Không thể tải tệp"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "Quá trình giải nén bắt đầu"
   },
   "files.layout.selected-count": {
     "defaultMessage": "đã chọn {count}"
@@ -641,11 +656,20 @@
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "v.d. /thu-muc-cua-toi"
   },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {Move folder} other {Move file}}"
+  },
   "files.navbar.back-to-home": {
     "defaultMessage": "Quay về trang chủ"
   },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Điều hướng bằng đường dẫn"
+  },
   "files.navbar.create-new": {
     "defaultMessage": "Tạo mới..."
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "Điều hướng tệp"
   },
   "files.navbar.home": {
     "defaultMessage": "Trang chủ"
@@ -679,9 +703,6 @@
   },
   "files.operations.extracting": {
     "defaultMessage": "Đang giải nén {source}"
-  },
-  "files.operations.failed": {
-    "defaultMessage": "Thất bại"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack từ URL"
@@ -1105,12 +1126,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Chế độ chơi không xác định"
-  },
-  "instances.confirm-leave-modal.body": {
-    "defaultMessage": "Các file đang trong quá trình upload. Rời khỏi trang này sẽ hủy upload và mất các thay đổi của bạn."
-  },
-  "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Đang trong quá trình upload"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "Tương thích {count} cái với {count, plural, other {instance}}"
@@ -1595,9 +1610,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Thất bại"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Công khai"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Kiểm duyệt viên"
   },
@@ -1633,9 +1645,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Không đạt"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Bị giữ lại"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Sao chép mã vào bảng nhớ tạm"
@@ -2561,20 +2570,11 @@
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Đã có lỗi xảy ra khi đang khôi phục từ bản sao lưu {backupName}. Vui lòng thử lại hoặc liên hệ bộ phận hỗ trợ nếu lỗi vẫn tiếp diễn."
   },
-  "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Khôi phục từ bản sao lưu thất bại"
-  },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Khôi phục từ bản sao lưu {backupName} đã được đưa vào hàng chờ và sẽ sớm bắt đầu."
   },
-  "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Khôi phục từ bản sao lưu đã được đưa vào hàng chờ"
-  },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Máy chủ của bạn đã được khôi phục từ bản sao lưu {backupName} và sẵn sàng để khởi động."
-  },
-  "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Khôi phục từ bản sao lưu thành công"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Đang khôi phục máy chủ của bạn từ bản sao lưu {backupName}. Điều này có thể mất vài phút."
@@ -2587,12 +2587,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Lịch sao lưu"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Tạo sao lưu thất bại"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Khôi phục từ sao lưu thất bại"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Sao lưu thủ công"

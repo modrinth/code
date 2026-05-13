@@ -10,7 +10,7 @@
 				:icon="SearchIcon"
 				type="text"
 				clearable
-				placeholder="Search collections..."
+				:placeholder="formatMessage(messages.searchCollectionsPlaceholder)"
 				wrapper-class="w-full"
 				input-class="!h-12"
 			/>
@@ -20,29 +20,22 @@
 					v-slot="{ selected }"
 					v-model="sortBy"
 					class="!w-auto flex-grow md:flex-grow-0"
-					name="Sort by"
+					:name="formatMessage(commonMessages.sortByLabel)"
 					:options="['updated', 'created', 'name']"
-					:display-name="
-						(option) =>
-							option === 'updated'
-								? 'Recently Updated'
-								: option === 'created'
-									? 'Recently Created'
-									: 'Name (A-Z)'
-					"
+					:display-name="formatCollectionSortOption"
 				>
-					<span class="font-semibold text-primary">Sort by: </span>
+					<span class="font-semibold text-primary">{{
+						formatMessage(commonMessages.sortByLabel)
+					}}</span>
 					<span class="font-semibold text-secondary">{{ selected }}</span>
 				</DropdownSelect>
 
-				<Button
-					color="primary"
-					class="ml-auto"
-					@click="(event) => $refs.modal_creation.show(event)"
-				>
-					<PlusIcon aria-hidden="true" />
-					{{ formatMessage(messages.createNewButton) }}
-				</Button>
+				<ButtonStyled color="brand">
+					<button class="ml-auto" @click="(event) => $refs.modal_creation.show(event)">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.createNewButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 		<div class="collections-grid">
@@ -151,7 +144,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	DropdownSelect,
@@ -187,6 +180,22 @@ const messages = defineMessages({
 	searchInputLabel: {
 		id: 'dashboard.collections.label.search-input',
 		defaultMessage: 'Search your collections',
+	},
+	searchCollectionsPlaceholder: {
+		id: 'dashboard.collections.placeholder.search',
+		defaultMessage: 'Search collections...',
+	},
+	sortRecentlyUpdated: {
+		id: 'dashboard.collections.sort.recently-updated',
+		defaultMessage: 'Recently Updated',
+	},
+	sortRecentlyCreated: {
+		id: 'dashboard.collections.sort.recently-created',
+		defaultMessage: 'Recently Created',
+	},
+	sortNameAscending: {
+		id: 'dashboard.collections.sort.name-ascending',
+		defaultMessage: 'Name (A-Z)',
 	},
 	emptyNoMatch: {
 		id: 'dashboard.collections.empty.no-match',
@@ -233,6 +242,18 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 const validSortOptions = ['updated', 'created', 'name']
 const sortBy = ref(validSortOptions.includes(route.query.s) ? route.query.s : 'updated')
+
+function formatCollectionSortOption(option) {
+	if (option === 'updated') {
+		return formatMessage(messages.sortRecentlyUpdated)
+	}
+
+	if (option === 'created') {
+		return formatMessage(messages.sortRecentlyCreated)
+	}
+
+	return formatMessage(messages.sortNameAscending)
+}
 
 const orderedCollections = computed(() => {
 	if (!collections.value) return []

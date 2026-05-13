@@ -1,3 +1,5 @@
+@import 'reset';
+
 // Use border box on everything to preserve everyone's sanity
 * {
 	box-sizing: border-box;
@@ -102,13 +104,6 @@ svg {
 	&:active:not(&:disabled) {
 		transform: scale(0.95);
 	}
-}
-
-button,
-input[type='button'] {
-	cursor: pointer;
-	border: none;
-	outline: 2px solid transparent;
 }
 
 input,

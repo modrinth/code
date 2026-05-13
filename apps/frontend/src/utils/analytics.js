@@ -2,6 +2,8 @@ import { injectI18n, useDebugLogger } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
+import { useTheme } from '~/composables/nuxt-accessors.ts'
+
 // note: build step can miss unix import for some reason, so
 // we have to import it like this
 

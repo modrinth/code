@@ -791,7 +791,7 @@ pub async fn remove_server_from_profile(
     index: usize,
 ) -> Result<()> {
     let mut servers = servers_data::read(profile_path).await?;
-    if servers.get(index).filter(|x| !x.hidden).is_none() {
+    if servers.get(index).as_ref().is_none_or(|x| x.hidden) {
         return Err(ErrorKind::InputError(format!(
             "No removable server at index {index}"
         ))

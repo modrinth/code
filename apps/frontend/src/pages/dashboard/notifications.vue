@@ -3,23 +3,36 @@
 		<section class="universal-card">
 			<Breadcrumbs
 				v-if="history"
-				current-title="History"
-				:link-stack="[{ href: `/dashboard/notifications`, label: 'Notifications' }]"
+				:current-title="formatMessage(messages.historyLabel)"
+				:link-stack="[
+					{
+						href: `/dashboard/notifications`,
+						label: formatMessage(commonMessages.notificationsLabel),
+					},
+				]"
 			/>
 			<div class="header__row">
 				<div class="header__title">
-					<h2 v-if="history" class="text-2xl">Notification history</h2>
-					<h2 v-else class="text-2xl">Notifications</h2>
+					<h2 v-if="history" class="text-2xl">
+						{{ formatMessage(messages.notificationHistoryTitle) }}
+					</h2>
+					<h2 v-else class="text-2xl">
+						{{ formatMessage(commonMessages.notificationsLabel) }}
+					</h2>
 				</div>
 				<template v-if="!history">
-					<Button v-if="data.hasRead" @click="updateRoute()">
-						<HistoryIcon />
-						View history
-					</Button>
-					<Button v-if="notifications.length > 0" color="danger" @click="readAll()">
-						<CheckCheckIcon />
-						Mark all as read
-					</Button>
+					<ButtonStyled v-if="data.hasRead">
+						<button @click="updateRoute()">
+							<HistoryIcon />
+							{{ formatMessage(messages.viewHistory) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="notifications.length > 0" color="red">
+						<button @click="readAll()">
+							<CheckCheckIcon />
+							{{ formatMessage(messages.markAllAsRead) }}
+						</button>
+					</ButtonStyled>
 				</template>
 			</div>
 			<Chips
@@ -29,9 +42,9 @@
 				:format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
 				:capitalize="false"
 			/>
-			<p v-if="isPending">Loading notifications...</p>
+			<p v-if="isPending">{{ formatMessage(messages.loadingNotifications) }}</p>
 			<template v-else-if="error">
-				<p>Error loading notifications:</p>
+				<p>{{ formatMessage(messages.errorLoadingNotifications) }}</p>
 				<pre>
           {{ error }}
         </pre>
@@ -48,7 +61,7 @@
 					@update:notifications="() => refetch()"
 				/>
 			</template>
-			<p v-else>You don't have any unread notifications.</p>
+			<p v-else>{{ formatMessage(messages.noUnreadNotifications) }}</p>
 			<div class="flex justify-end">
 				<Pagination :page="page" :count="pages" @switch-page="changePage" />
 			</div>
@@ -57,7 +70,15 @@
 </template>
 <script setup>
 import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
-import { Button, Chips, injectModrinthClient, Pagination } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Chips,
+	commonMessages,
+	defineMessages,
+	injectModrinthClient,
+	Pagination,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
@@ -69,8 +90,37 @@ import {
 	markAsRead,
 } from '~/helpers/platform-notifications.ts'
 
-useHead({
-	title: 'Notifications - Modrinth',
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	historyLabel: {
+		id: 'dashboard.overview.notifications.history.label',
+		defaultMessage: 'History',
+	},
+	notificationHistoryTitle: {
+		id: 'dashboard.overview.notifications.history.title',
+		defaultMessage: 'Notification history',
+	},
+	viewHistory: {
+		id: 'dashboard.overview.notifications.button.view-history',
+		defaultMessage: 'View history',
+	},
+	markAllAsRead: {
+		id: 'dashboard.overview.notifications.button.mark-all-as-read',
+		defaultMessage: 'Mark all as read',
+	},
+	loadingNotifications: {
+		id: 'dashboard.overview.notifications.loading',
+		defaultMessage: 'Loading notifications...',
+	},
+	errorLoadingNotifications: {
+		id: 'dashboard.overview.notifications.error.loading',
+		defaultMessage: 'Error loading notifications:',
+	},
+	noUnreadNotifications: {
+		id: 'dashboard.overview.notifications.empty.no-unread',
+		defaultMessage: "You don't have any unread notifications.",
+	},
 })
 
 const client = injectModrinthClient()
@@ -79,6 +129,12 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 
 const history = computed(() => route.name === 'dashboard-notifications-history')
+
+useHead({
+	title: () =>
+		`${formatMessage(history.value ? messages.notificationHistoryTitle : commonMessages.notificationsLabel)} - Modrinth`,
+})
+
 const selectedType = ref('all')
 const page = ref(1)
 const perPage = ref(50)

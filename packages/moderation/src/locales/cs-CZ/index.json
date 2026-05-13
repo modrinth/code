@@ -50,6 +50,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Navštivte stránku galerie"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": ""
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Poskytnutí zdrojového kódu"
   },

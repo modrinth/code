@@ -1,9 +1,11 @@
 import { DownloadIcon, LeftArrowIcon } from '@modrinth/assets'
 import { markRaw } from 'vue'
 
+import { commonMessages } from '#ui/utils/common-messages'
+
 import type { StageConfigInput } from '../../../base'
 import ImportInstanceStage from '../components/ImportInstanceStage.vue'
-import type { CreationFlowContextValue } from '../creation-flow-context'
+import { type CreationFlowContextValue, creationFlowMessages } from '../creation-flow-context'
 
 function getSelectedCount(ctx: CreationFlowContextValue): number {
 	let count = 0
@@ -15,11 +17,11 @@ function getSelectedCount(ctx: CreationFlowContextValue): number {
 
 export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	id: 'import-instance',
-	title: 'Import instance',
+	title: (ctx) => ctx.formatMessage(creationFlowMessages.importInstanceTitle),
 	stageContent: markRaw(ImportInstanceStage),
 	skip: (ctx) => !ctx.isImportMode.value,
 	leftButtonConfig: (ctx) => ({
-		label: 'Back',
+		label: ctx.formatMessage(commonMessages.backButton),
 		icon: LeftArrowIcon,
 		onClick: () => {
 			ctx.isImportMode.value = false
@@ -29,7 +31,10 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	rightButtonConfig: (ctx) => {
 		const count = getSelectedCount(ctx)
 		return {
-			label: count > 0 ? `Import ${count} instance${count !== 1 ? 's' : ''}` : 'Import',
+			label:
+				count > 0
+					? ctx.formatMessage(creationFlowMessages.importInstancesButton, { count })
+					: ctx.formatMessage(creationFlowMessages.importButton),
 			icon: DownloadIcon,
 			iconPosition: 'before' as const,
 			color: 'brand' as const,

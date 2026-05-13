@@ -88,14 +88,19 @@
 					formatMessage(messages.openingAutomatically)
 				}}</span>
 				<div v-else class="grid grid-cols-2 gap-2 w-full">
-					<ButtonStyled class="flex-1">
-						<button @click="hide">
+					<ButtonStyled>
+						<button class="flex-1" @click="hide">
 							<XIcon />
 							{{ formatMessage(commonMessages.closeButton) }}
 						</button>
 					</ButtonStyled>
-					<ButtonStyled color="green" class="flex-1">
-						<a href="https://modrinth.com/app" target="_blank" rel="noopener noreferrer">
+					<ButtonStyled color="brand">
+						<a
+							class="flex-1"
+							href="https://modrinth.com/app"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
 							<DownloadIcon />
 							{{ formatMessage(messages.getApp) }}
 						</a>

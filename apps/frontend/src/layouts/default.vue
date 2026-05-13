@@ -34,27 +34,41 @@
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
 	>
-		<RussiaBanner v-if="isRussia" />
-		<TaxIdMismatchBanner v-if="showTinMismatchBanner" />
-		<TaxComplianceBanner v-if="showTaxComplianceBanner" />
+		<RussiaBanner v-if="flags.showAllBanners || isRussia" />
+		<TaxIdMismatchBanner v-if="flags.showAllBanners || showTinMismatchBanner" />
+		<TaxComplianceBanner v-if="flags.showAllBanners || showTaxComplianceBanner" />
 		<VerifyEmailBanner
-			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
+			v-if="
+				flags.showAllBanners ||
+				(auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email')
+			"
 			:has-email="!!auth?.user?.email"
 		/>
 		<SubscriptionPaymentFailedBanner
 			v-if="
-				user.subscriptions.some((x) => x.status === 'payment-failed') &&
-				route.path !== '/settings/billing'
+				flags.showAllBanners ||
+				(user.subscriptions.some((x) => x.status === 'payment-failed') &&
+					route.path !== '/settings/billing')
 			"
 		/>
-		<PreviewBanner v-if="config.public.buildEnv === 'production' && config.public.preview" />
-		<StagingBanner v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')" />
+		<PreviewBanner
+			v-if="
+				flags.showAllBanners || (config.public.buildEnv === 'production' && config.public.preview)
+			"
+		/>
+		<StagingBanner
+			v-if="
+				flags.showAllBanners ||
+				config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')
+			"
+		/>
 		<GeneratedStateErrorsBanner
 			:errors="generatedStateErrors"
 			:api-url="config.public.apiBaseUrl"
 		/>
+		<ViewOnModrinthBanner />
 		<header
-			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
+			class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
 			<div>
 				<NuxtLink
@@ -311,7 +325,7 @@
 							{
 								id: 'review-projects',
 								color: 'orange',
-								link: '/moderation/',
+								link: '/moderation',
 							},
 							{
 								id: 'tech-review',
@@ -322,6 +336,11 @@
 								id: 'review-reports',
 								color: 'orange',
 								link: '/moderation/reports',
+							},
+							{
+								id: 'external-projects',
+								color: 'orange',
+								link: '/moderation/external-projects',
 							},
 							{
 								divider: true,
@@ -376,6 +395,9 @@
 						</template>
 						<template #review-reports>
 							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
+						</template>
+						<template #external-projects>
+							<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.externalProjects) }}
 						</template>
 						<template #user-lookup>
 							<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
@@ -705,6 +727,7 @@ import {
 	DropdownIcon,
 	FileIcon,
 	GlassesIcon,
+	GlobeIcon,
 	HamburgerIcon,
 	HomeIcon,
 	IssuesIcon,
@@ -758,6 +781,7 @@ import SubscriptionPaymentFailedBanner from '~/components/ui/banner/Subscription
 import TaxComplianceBanner from '~/components/ui/banner/TaxComplianceBanner.vue'
 import TaxIdMismatchBanner from '~/components/ui/banner/TaxIdMismatchBanner.vue'
 import VerifyEmailBanner from '~/components/ui/banner/VerifyEmailBanner.vue'
+import ViewOnModrinthBanner from '~/components/ui/banner/ViewOnModrinthBanner.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
@@ -879,6 +903,10 @@ const messages = defineMessages({
 	reports: {
 		id: 'layout.action.reports',
 		defaultMessage: 'Review reports',
+	},
+	externalProjects: {
+		id: 'layout.action.external-projects',
+		defaultMessage: 'External projects',
 	},
 	lookupByEmail: {
 		id: 'layout.action.lookup-by-email',
@@ -1298,7 +1326,8 @@ const { cycle: changeTheme } = useTheme()
 			justify-content: center;
 			padding: 1rem;
 
-			.iconified-button {
+			> button,
+			> a {
 				width: 100%;
 				max-width: 500px;
 				padding: 0.75rem;

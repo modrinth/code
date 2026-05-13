@@ -104,9 +104,10 @@ clearExpiredCache()
 
 const loadingIssues = reactive<Set<string>>(new Set())
 const decompiledSources = reactive<Map<string, string>>(new Map())
+const loadedIssues = reactive<Set<string>>(new Set())
 
 async function loadIssueSource(issueId: string): Promise<void> {
-	if (loadingIssues.has(issueId)) return
+	if (loadingIssues.has(issueId) || loadedIssues.has(issueId)) return
 
 	loadingIssues.add(issueId)
 
@@ -119,6 +120,7 @@ async function loadIssueSource(issueId: string): Promise<void> {
 				setCachedSource(detail.id, detail.decompiled_source)
 			}
 		}
+		loadedIssues.add(issueId)
 	} catch (error) {
 		console.error('Failed to load issue source:', error)
 	} finally {
@@ -126,38 +128,39 @@ async function loadIssueSource(issueId: string): Promise<void> {
 	}
 }
 
-function tryLoadCachedSourcesForFile(reportId: string): void {
+function findIssuesByIds(issueIds: Set<string>): Labrinth.TechReview.Internal.FileIssue[] {
+	const issues: Labrinth.TechReview.Internal.FileIssue[] = []
+
 	for (const review of reviewItems.value) {
-		const report = review.reports.find((r) => r.id === reportId)
-		if (report) {
+		for (const report of review.reports) {
 			for (const issue of report.issues) {
-				for (const detail of issue.details) {
-					if (!decompiledSources.has(detail.id)) {
-						const cached = getCachedSource(detail.id)
-						if (cached) {
-							decompiledSources.set(detail.id, cached)
-						}
-					}
+				if (issueIds.has(issue.id)) {
+					issues.push(issue)
 				}
 			}
-			return
 		}
 	}
+
+	return issues
 }
 
-function handleLoadFileSources(reportId: string): void {
-	tryLoadCachedSourcesForFile(reportId)
+function handleLoadIssueSources(issueIds: string[]): void {
+	const uniqueIssueIds = new Set(issueIds)
+	const issues = findIssuesByIds(uniqueIssueIds)
 
-	for (const review of reviewItems.value) {
-		const report = review.reports.find((r) => r.id === reportId)
-		if (report) {
-			for (const issue of report.issues) {
-				const hasUncached = issue.details.some((d) => !decompiledSources.has(d.id))
-				if (hasUncached) {
-					loadIssueSource(issue.id)
+	for (const issue of issues) {
+		for (const detail of issue.details) {
+			if (!decompiledSources.has(detail.id)) {
+				const cached = getCachedSource(detail.id)
+				if (cached) {
+					decompiledSources.set(detail.id, cached)
 				}
 			}
-			return
+		}
+
+		const hasUncached = issue.details.some((detail) => !decompiledSources.has(detail.id))
+		if (hasUncached) {
+			loadIssueSource(issue.id)
 		}
 	}
 }
@@ -225,7 +228,31 @@ const responseFilterTypes: ComboboxOption<string>[] = [
 	{ value: 'Read', label: 'Read' },
 ]
 
+const currentProjectTypeFilter = ref('All project types')
+const projectTypeFilterTypes: ComboboxOption<string>[] = [
+	{ value: 'All project types', label: 'All project types' },
+	{ value: 'Modpacks', label: 'Modpacks' },
+	{ value: 'Mods', label: 'Mods' },
+	{ value: 'Resource Packs', label: 'Resource Packs' },
+	{ value: 'Data Packs', label: 'Data Packs' },
+	{ value: 'Plugins', label: 'Plugins' },
+	{ value: 'Shaders', label: 'Shaders' },
+	{ value: 'Servers', label: 'Servers' },
+]
+
 const inOtherQueueFilter = ref(true)
+
+const techReviewQueryKey = computed(
+	() =>
+		[
+			'tech-reviews',
+			currentSortType.value,
+			currentResponseFilter.value,
+			inOtherQueueFilter.value,
+			currentFilterType.value,
+			currentProjectTypeFilter.value,
+		] as const,
+)
 
 const fuse = computed(() => {
 	if (!reviewItems.value || reviewItems.value.length === 0) return null
@@ -294,6 +321,27 @@ function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSo
 	}
 }
 
+function toApiProjectType(label: string): string | undefined {
+	switch (label) {
+		case 'Modpacks':
+			return 'modpack'
+		case 'Mods':
+			return 'mod'
+		case 'Resource Packs':
+			return 'resourcepack'
+		case 'Data Packs':
+			return 'datapack'
+		case 'Plugins':
+			return 'plugin'
+		case 'Shaders':
+			return 'shader'
+		case 'Servers':
+			return 'minecraft_java_server'
+		default:
+			return undefined
+	}
+}
+
 const {
 	data: infiniteData,
 	isLoading,
@@ -303,13 +351,7 @@ const {
 	refetch,
 } = useInfiniteQuery({
 	enabled: true,
-	queryKey: [
-		'tech-reviews',
-		currentSortType,
-		currentResponseFilter,
-		inOtherQueueFilter,
-		currentFilterType,
-	],
+	queryKey: techReviewQueryKey,
 	queryFn: async ({ pageParam = 0 }) => {
 		const filter: Labrinth.TechReview.Internal.SearchProjectsFilter = {
 			project_type: [],
@@ -330,6 +372,11 @@ const {
 
 		if (currentFilterType.value !== 'All flags') {
 			filter.issue_type = [currentFilterType.value]
+		}
+
+		const projectType = toApiProjectType(currentProjectTypeFilter.value)
+		if (projectType) {
+			filter.project_type = [projectType]
 		}
 
 		return await client.labrinth.tech_review_internal.searchProjects({
@@ -430,7 +477,7 @@ function handleMarkComplete(projectId: string) {
 	const threadId = projectData?.thread?.id
 
 	queryClient.setQueryData(
-		['tech-reviews', currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilterType],
+		techReviewQueryKey.value,
 		(
 			oldData:
 				| {
@@ -445,7 +492,8 @@ function handleMarkComplete(projectId: string) {
 				...oldData,
 				pages: oldData.pages.map((page) => ({
 					...page,
-					project_reports: page.project_reports.filter((pr) => pr.project_id !== projectId),
+					// Keep the raw page length stable; getNextPageParam uses it to know if more API pages exist.
+					project_reports: page.project_reports,
 					projects: Object.fromEntries(
 						Object.entries(page.projects).filter(([id]) => id !== projectId),
 					),
@@ -492,8 +540,28 @@ function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
 	maliciousSummaryModalRef.value?.show()
 }
 
-watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilterType], () => {
-	goToPage(1)
+watch(
+	[
+		currentSortType,
+		currentResponseFilter,
+		inOtherQueueFilter,
+		currentFilterType,
+		currentProjectTypeFilter,
+	],
+	() => {
+		goToPage(1)
+	},
+)
+
+watch(totalPages, (pages) => {
+	if (pages === 0) {
+		goToPage(1)
+		return
+	}
+
+	if (currentPage.value > pages) {
+		goToPage(pages)
+	}
 })
 
 // TODO: Reimpl when backend is available
@@ -597,6 +665,23 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 									</template>
 								</Combobox>
 							</div>
+							<div class="flex flex-col gap-2">
+								<span class="text-sm font-semibold text-secondary">Project type</span>
+								<Combobox
+									v-model="currentProjectTypeFilter"
+									class="!w-full"
+									:options="projectTypeFilterTypes"
+									:placeholder="formatMessage(commonMessages.filterByLabel)"
+									searchable
+								>
+									<template #selected>
+										<span class="flex flex-row gap-2 align-middle font-semibold">
+											<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
+											<span class="truncate text-contrast">{{ currentProjectTypeFilter }}</span>
+										</span>
+									</template>
+								</Combobox>
+							</div>
 						</div>
 					</template>
 				</FloatingPanel>
@@ -635,7 +720,7 @@ watch([currentSortType, currentResponseFilter, inOtherQueueFilter, currentFilter
 					:loading-issues="loadingIssues"
 					:decompiled-sources="decompiledSources"
 					@refetch="refetch"
-					@load-file-sources="handleLoadFileSources"
+					@load-issue-sources="handleLoadIssueSources"
 					@mark-complete="handleMarkComplete"
 					@show-malicious-summary="handleShowMaliciousSummary"
 				/>

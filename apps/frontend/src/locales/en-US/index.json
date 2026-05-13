@@ -407,6 +407,117 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Add private note"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Approve"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Approve with reply"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Close thread"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Close with reply"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Reject"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Reject with reply"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Reopen thread"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Reply"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Reply to thread"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Resubmit for review"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Resubmit for review with reply"
+  },
+  "conversation-thread.action.send": {
+    "message": "Send"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Send to review"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Send to review with reply"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Set to draft"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Set to draft with reply"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Withhold"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Withhold with reply"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "This thread is closed and new messages cannot be sent to it."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Error closing report"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Error reopening report"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Error sending message"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Reply to thread..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Send a message..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Confirm moderators do not actively monitor this"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "I acknowledge that the moderators do not actively monitor the thread."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Your project is already approved. As such, the moderation team does not actively monitor this thread. However, they may still see your message if there is a problem with your project."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Reply to thread"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "If you need to get in contact with the moderation team, please use the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble in the bottom right corner to contact support."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Confirm I have addressed the messages from the moderators"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "I confirm that I have properly addressed the moderators' comments."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "You're submitting <project-title>{projectTitle}</project-title> to be reviewed again by the moderators."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Resubmitting for review"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Submitting for review"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Make sure you have addressed all the comments from the moderation team."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Repeated submissions without addressing the moderators' comments may result in an account suspension."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Supplementary files are for supporting resources like source code, not for alternative versions or variants."
   },
@@ -554,6 +665,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Create affiliate link"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "No affiliate codes found."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Error loading affiliate links"
   },
@@ -571,6 +685,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Search affiliate links..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "from {count} {count, plural, one {project} other {projects}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Total downloads"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Total followers"
   },
   "dashboard.collections.button.create-new": {
     "message": "Create new"
@@ -595,6 +718,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Your collections"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Search collections..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Name (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Recently Created"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Recently Updated"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Download {formType}"
@@ -848,6 +983,171 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "You've used up your <b>{withdrawLimit}</b> withdrawal limit. You must complete a tax form to withdraw more."
   },
+  "dashboard.head-title": {
+    "message": "Dashboard"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "You have no unread notifications."
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "See all"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "View notification history"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "View {extraNotifs} more {extraNotifs, plural, one {notification} other {notifications}}"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Create organization"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Make an organization!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Failed to fetch organizations"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {member} other {members}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organizations"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Mark all as read"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "View history"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "You don't have any unread notifications."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Error loading notifications:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "History"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Notification history"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Loading notifications..."
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "You can edit multiple projects at once by selecting them below."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Server projects do not support bulk editing"
+  },
+  "dashboard.projects.empty": {
+    "message": "You don't have any projects yet. Click the green button above to begin."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projects"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "and {count} more..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Clear link"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Edit links"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Changes will be applied to <strong>{count}</strong> {count, plural, one {project} other {projects}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Any links you specify below will be overwritten on each of the selected projects. Any you leave blank will be ignored. You can clear a link from all selected projects using the trash can button."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "An invitation link to your Discord server."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord invite"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "A place for users to report bugs, issues, and concerns about your project."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Issue tracker"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Existing link will be cleared"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Enter a valid Discord invite URL"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Enter a valid URL"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Show all projects"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "A page/repository containing the source code for your project"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Source code"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "A page containing information, documentation, and help for the project."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Wiki page"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Bulk edited selected project's links."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icon for {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Project has a message from the moderators. View the project to see more."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Please review environment metadata"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Ascending"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Descending"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Name"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Type"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Icon"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Name"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Type"
+  },
+  "dashboard.report.title": {
+    "message": "Report {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Active reports"
+  },
+  "dashboard.reports.title": {
+    "message": "Reports"
+  },
   "dashboard.revenue.available-now": {
     "message": "Available now"
   },
@@ -884,6 +1184,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Download as CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Transaction history"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transactions"
   },
@@ -893,8 +1196,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Your payouts and withdrawals will appear here."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Last month"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "This month"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "See all"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "All years"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form."
@@ -907,6 +1219,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Withdraw"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Active reports"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analytics"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Creators"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Dashboard"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notifications"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organizations"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Overview"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projects"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Revenue"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Account"
@@ -1004,6 +1343,33 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Please complete tax form"
   },
+  "discover.install.back-to-server": {
+    "message": "Back to server"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Back to setup"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Cancel reset"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "No server world is available for install."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "This content type cannot be installed to a server from browse."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Selecting modpack to install after reset"
+  },
+  "discover.seo.description": {
+    "message": "Search and browse thousands of Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
+  },
+  "discover.seo.title": {
+    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
   },
@@ -1018,6 +1384,12 @@
   },
   "error.collection.404.title": {
     "message": "Collection not found"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "You're currently signed in as:"
+  },
+  "error.generic.401.title": {
+    "message": "You don't have access to this page"
   },
   "error.generic.404.subtitle": {
     "message": "The page you were looking for doesn't seem to exist."
@@ -1445,6 +1817,9 @@
   "layout.action.create-new": {
     "message": "Create new..."
   },
+  "layout.action.external-projects": {
+    "message": "External projects"
+  },
   "layout.action.file-lookup": {
     "message": "File lookup"
   },
@@ -1493,14 +1868,20 @@
   "layout.banner.add-email.description": {
     "message": "For security reasons, Modrinth needs you to register an email address to your account."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Always ignore"
+  },
   "layout.banner.build-fail.description": {
     "message": "This deploy of Modrinth's frontend failed to generate state from the API. This may be due to an outage or an error in configuration. Rebuild when the API is available. Error codes: {errors}; Current API URL is: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Ignore"
   },
   "layout.banner.build-fail.title": {
     "message": "Error generating state from API when building."
   },
   "layout.banner.preview.description": {
-    "message": "If you meant to access the official Modrinth website, visit <link>https://modrinth.com</link>. This preview deploy is used by Modrinth staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "If you meant to access the official Modrinth website, visit {url}. This preview deploy is used by Modrinth staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "This is a preview deploy of the Modrinth website."
@@ -1697,6 +2078,9 @@
   "moderation.moderate": {
     "message": "Moderate"
   },
+  "moderation.page.external-projects": {
+    "message": "External projects"
+  },
   "moderation.page.projects": {
     "message": "Projects"
   },
@@ -1704,7 +2088,7 @@
     "message": "Reports"
   },
   "moderation.page.technicalReview": {
-    "message": "Technical Review"
+    "message": "Tech review"
   },
   "muralpay.account-type.checking": {
     "message": "Checking"
@@ -2327,6 +2711,84 @@
   "project.license.title": {
     "message": "License"
   },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Your project is private, meaning it can only be accessed by you and people you invite."
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Your project is published and discoverable on Modrinth."
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "You can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Project approved"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "This is a draft project that cannot be seen by others until submitted for review and approved by Modrinth's moderation team."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Draft project"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Once you have completed all required steps and ensured your project complies with Modrinth's <rules-link>Content Rules</rules-link> you can submit your project for review."
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "Please address all moderation concerns, including any issues listed in messages below, before resubmitting this project."
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Changes requested"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "Repeatedly submitting your project without addressing all moderation concerns first may result in account suspension."
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Your project is in queue to be reviewed by Modrinth's moderation team."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Your project will be scanned and then reviewed by human moderators to ensure it meets Modrinth's <rules-link>Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "You can still modify your project, it won't affect your position in the queue."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "We aim to review submissions in 24-48 hours, but some projects may face delays. This does not reflect an issue with your submission."
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>We appreciate your patience while our moderators work hard to keep Modrinth safe, and look forward to helping you share your content! 💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Project under review"
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "Your project will not appear publicly and can only be accessed with a direct link.{requestedStatus, select, unlisted { Based on your selected <visibility-settings-link>visibility settings</visibility-settings-link>, most likely no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}"
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "Unlisted by staff"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Unauthorized"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "This thread is not actively monitored, but may be reviewed for information about your project if needed."
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "Content moderators cannot provide support for most issues and messages to this thread do not notify staff."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "If you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support."
+  },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "Show member UI"
+  },
+  "project.moderation.thread.private-description": {
+    "message": "This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project."
+  },
+  "project.moderation.thread.title": {
+    "message": "Moderation messages"
+  },
   "project.moderation.title": {
     "message": "Moderation"
   },
@@ -2390,6 +2852,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Please provide proof that you have permission to redistribute all of the following files and any withheld versions will be automatically published."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Please provide proof that you have permission to redistribute all of the following files before you can submit your project for review."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Unknown embedded content"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "All external content has attributions provided."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Attributions completed!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "None of your versions contain external content, so you don't need to worry about obtaining permissions."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "You're all set!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "You don't have permission to redistribute some of the external content you've added. In order to publish on Modrinth, remove the infringing content."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Some content can't be included"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our guide</link> to learn about how to do this properly!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Learn how attributions work"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Learn more"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Search {count} {count, plural, one {external project} other {external projects}}..."
+  },
   "project.settings.title": {
     "message": "Settings"
   },
@@ -2407,6 +2908,15 @@
   },
   "project.versions.title": {
     "message": "Versions"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {This version is} other {These versions are}} currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included in the modpack {count, plural, one {version} other {versions}}."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Resolve"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Version {version_name}} other {Versions}} withheld due to unknown embedded content"
   },
   "report.already-reported": {
     "message": "You've already reported {title}"
@@ -2776,6 +3286,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
+  },
+  "servers.manage.content.title": {
+    "message": "Content - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "Actions"

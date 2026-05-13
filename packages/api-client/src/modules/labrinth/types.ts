@@ -468,6 +468,10 @@ export namespace Labrinth {
 				monetization_status: MonetizationStatus
 			}
 
+			export type ProjectCheckResponse = {
+				id: string
+			}
+
 			export type SearchResultHit = {
 				project_id: string
 				project_type: ProjectType
@@ -876,6 +880,7 @@ export namespace Labrinth {
 				include_changelog?: boolean
 				limit?: number
 				offset?: number
+				apiVersion?: 2 | 3
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'
@@ -1301,6 +1306,38 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Moderation {
+		export namespace Internal {
+			export type LockedByUser = {
+				id: string
+				username: string
+				avatar_url?: string
+			}
+
+			export type LockStatusResponse = {
+				locked: boolean
+				is_own_lock: boolean
+				locked_by?: LockedByUser
+				locked_at?: string
+				expires_at?: string
+				expired?: boolean
+			}
+
+			export type LockAcquireResponse = {
+				success: boolean
+				is_own_lock: boolean
+				locked_by?: LockedByUser
+				locked_at?: string
+				expires_at?: string
+				expired?: boolean
+			}
+
+			export type ReleaseLockResponse = {
+				success: boolean
+			}
+		}
+	}
+
 	export namespace Notifications {
 		export namespace v2 {
 			export type NotificationAction = {
@@ -1430,6 +1467,52 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace ExternalProjects {
+		export namespace Internal {
+			export type ExternalLicenseStatus =
+				| 'yes'
+				| 'with-attribution-and-source'
+				| 'with-attribution'
+				| 'no'
+				| 'permanent-no'
+				| 'unidentified'
+
+			export type LinkedFile = {
+				name: string | null
+				sha1: string
+			}
+
+			export type ExternalProject = {
+				id: number
+				title: string | null
+				status: ExternalLicenseStatus
+				link: string | null
+				exceptions: string | null
+				proof: string | null
+				flame_project_id: number | null
+				inserted_at: string | null
+				inserted_by: number | null
+				updated_at: string | null
+				updated_by: number | null
+				linked_files: LinkedFile[]
+			}
+
+			export type SearchRequest = {
+				title?: string
+				flame_id?: number
+			}
+
+			export type UpdateLicenseRequest = {
+				title?: string
+				status: ExternalLicenseStatus
+				link?: string
+				exceptions?: string
+				proof?: string
+				flame_project_id?: number
+			}
+		}
+	}
+
 	export namespace TechReview {
 		export namespace Internal {
 			export type SearchProjectsRequest = {
@@ -1510,6 +1593,7 @@ export namespace Labrinth {
 				id: string
 				issue_id: string
 				key: string
+				jar: string | null
 				file_path: string
 				decompiled_source: string | null
 				data: Record<string, unknown>

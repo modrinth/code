@@ -108,7 +108,7 @@
     "message": "Pourcentage du processeur"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n'utilisant que 150 Mo de RAM !"
+    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n'utilisant que 150 Mo de mémoire vive !"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -369,7 +369,7 @@
     "message": "Cela va supprimer de manière permanente cette collection. Cette action est irréversible."
   },
   "collection.delete-modal.title": {
-    "message": "Êtes-vous sûr.e de vouloir supprimer cette collection ?"
+    "message": "Êtes-vous sûr·e de vouloir supprimer cette collection ?"
   },
   "collection.description": {
     "message": "{description} - Voir la collection {name} par {username} sur Modrinth"
@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Créer un lien affilié"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Aucun code d'affiliation trouvé."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Erreur lors du chargement des liens d'affiliation"
   },
@@ -567,10 +570,19 @@
     "message": "Révoquer"
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Êtes-vous sûr.e de vouloir révoquer votre lien d'affiliation « {title} » ?"
+    "message": "Êtes-vous sûr·e de vouloir révoquer votre lien d'affiliation « {title} » ?"
   },
   "dashboard.affiliate-links.search": {
     "message": "Rechercher des liens d'affiliation..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "de {count} {count, plural, one {projet} other {projets}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Total des téléchargements"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Total des adorateurs"
   },
   "dashboard.collections.button.create-new": {
     "message": "Créer un nouveau"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Vos collections"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Rechercher dans les collections..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Nom (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Créé récemment"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Mis à jour récemment"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Télécharger {formType}"
@@ -630,7 +654,7 @@
     "message": "Pratiques de sécurité"
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
-    "message": "Êtes-vous un.e citoyen(ne) des États-Unis d'Amérique ?"
+    "message": "Êtes-vous un·e citoyen(ne) des États-Unis d'Amérique ?"
   },
   "dashboard.creator-withdraw-modal.complete-tax-form": {
     "message": "Remplissez le formulaire fiscal"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Vous avez atteint votre limite de retrait de <b>{withdrawLimit}</b>. Vous devez remplir un formulaire fiscal pour effectuer un retrait supplémentaire."
   },
+  "dashboard.head-title": {
+    "message": "Tableau de bord"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Marquer tout comme lu"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Voir l'historique"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Vous n'avez pas de notifications non lues."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Échec lors du chargement des notifications :"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Historique"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Historique des notifications"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Voir tout"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Historique des notifications"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Voir {extraNotifs} {extraNotifs, plural, one {notification} other {notifications}} de plus"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Chargement des notifications..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Créer une organisation"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Faites une organisation !"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Impossible de chercher des organisations"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {membre} other {membres}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisations"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Vous pouvez modifier plusieurs projets en même temps en les sélectionnant ci-dessous."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Les projets du serveur ne prennent pas en charge l'édition en masse"
+  },
+  "dashboard.projects.empty": {
+    "message": "Vous n'avez aucun projet. Cliquez sur le bouton vert ci-dessus pour commencer."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projets"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "en ajouter {count} de plus..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Effacer le lien"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Modifier les liens"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Les changements seront appliqués à <strong>{count}</strong> {count, plural,one {projet}other {projets}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Tous les liens que vous spécifiez ci-dessous seront écrasés sur chacun des projets sélectionnés. Tout ce que vous laissez en blanc sera ignoré. Vous pouvez effacer un lien de tous les projets sélectionnés à l'aide du bouton de la poubelle."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Une invitation en lien avec votre serveur Discord."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Invitation Discord"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Un endroit pour que les utilisateurs signalent des bugs, problèmes et préoccupations à propos de votre projet."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Traceur de problèmes"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Un lien existant sera nettoyé"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Entrez un URL Discord valide"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Entrez un URL valide"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Montrer tous les projets"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Une page/dépôt contenant le code source pour votre projet"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Code source"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Une page contenant des informations, de la documentation et de l'aide pour le projet."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Page wiki"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Éditer en gros les liens sélectionnés."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icône pour {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Le projet a un message des modérateurs. Regardez le projet pour voir plus."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Merci de revoir les métadonnées environnementales"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Ascendant"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Descendant"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Nom"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Statut"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Type"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Icône"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nom"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Statut"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Type"
+  },
+  "dashboard.report.title": {
+    "message": "Signaler {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Signalements actifs"
+  },
+  "dashboard.reports.title": {
+    "message": "Signalements"
+  },
   "dashboard.revenue.available-now": {
     "message": "Disponible Maintenant"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Télécharger comme CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Historique des transactions"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transactions"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Vos paiements et retraits apparaîtront ici."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Dernier mois"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Ce mois-ci"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Voir tout"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Tous les ans"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Vos retraits sont temporairement bloqués car votre NIF ou votre NSS ne correspond pas aux données de l'IRS. Veuillez contacter l'assistance pour réinitialiser votre compte et soumettre à nouveau votre déclaration de revenus."
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Retirer"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Signalements actifs"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analytiques"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Créateurs"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Tableau de bord"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notifications"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organisations"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Aperçu"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projets"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Revenu"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Compte"
@@ -1004,6 +1229,33 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Veuillez remplir le formulaire fiscal"
   },
+  "discover.install.back-to-server": {
+    "message": "Retour au serveur"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Retour au setup"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Annuler la réinitialisation"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Aucun monde serveur n'est disponible pour l'installation."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Ce type de contenu ne peut pas être installé sur un serveur depuis la navigation."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Sélectionner un modpack à insaller après la réinitialisation"
+  },
+  "discover.seo.description": {
+    "message": "Recherchez et parcourez des milliers de {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}} Minecraft sur Modrinth avec des résultars fidèles et rapides. Nos filtres vous aident à trouver les meilleurs {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}}."
+  },
+  "discover.seo.title": {
+    "message": "Rechercher des {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "Vous avez peut-être mal tapé l'URL de la collection."
   },
@@ -1018,6 +1270,12 @@
   },
   "error.collection.404.title": {
     "message": "Collection introuvable"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Vous êtes actuellement connecté sous le nom de :"
+  },
+  "error.generic.401.title": {
+    "message": "Vous n'avez pas accès à cette page"
   },
   "error.generic.404.subtitle": {
     "message": "La page que vous recherchez ne semble pas exister."
@@ -1428,7 +1686,7 @@
     "message": "Partagez vos créations avec le monde"
   },
   "landing.section.for-players.description": {
-    "message": "Des biomes magiques aux donjons maudits, vous pouvez être sûr.e de trouver ce que vous cherchez pour amener votre gameplay au niveau supérieur."
+    "message": "Des biomes magiques aux donjons maudits, vous pouvez être sûr·e de trouver ce que vous cherchez pour amener votre gameplay au niveau supérieur."
   },
   "landing.section.for-players.label": {
     "message": "Pour les joueurs"
@@ -1444,6 +1702,9 @@
   },
   "layout.action.create-new": {
     "message": "Créer nouveau..."
+  },
+  "layout.action.external-projects": {
+    "message": "Projets externes"
   },
   "layout.action.file-lookup": {
     "message": "Recherche de fichier"
@@ -1696,6 +1957,9 @@
   },
   "moderation.moderate": {
     "message": "Modérer"
+  },
+  "moderation.page.external-projects": {
+    "message": "Projets externes"
   },
   "moderation.page.projects": {
     "message": "Projets"
@@ -2390,6 +2654,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Veuillez prouver que vous avez la permission de redistribuer tous les fichiers suivants et que toutes les versions retenues seront automatiquement publiées."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Veuillez fournir la preuve que vous avez l'autorisation de redistribuer tous les fichiers suivants avant de pouvoir soumettre votre projet pour évaluation."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Contenu intégré inconnu"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Tout le contenu externe est accompagné d'une attribution."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Attributions terminées !"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Aucune de vos versions ne contient de contenu externe, vous n'avez donc pas à vous soucier d'obtenir d'autorisations."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Vous êtes prêt !"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Vous n'êtes pas autorisé à rediffuser certains des contenus externes que vous avez ajoutés. Pour pouvoir publier sur Modrinth, veuillez supprimer les contenus litigieux."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Certains contenus ne peuvent pas être inclus"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Si vous incluez du contenu qui n’est pas sur Modrinth, vous devez nous faire savoir d’où il vient et vérifier que vous avez la permission de distribuer les fichiers. Jettez un coup d’œil à <link>notre guide</link> pour apprendre comment faire cela proprement !"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Découvrez comment fonctionnent les attributions"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "En savoir plus"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Rechercher {count} {count, plural, one {projet externe} other {projets externes}}..."
+  },
   "project.settings.title": {
     "message": "Paramètres"
   },
@@ -2407,6 +2710,15 @@
   },
   "project.versions.title": {
     "message": "Versions"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Cette version est actuellement indisponible et n'est pas répertoriée} other {Ces versions sont actuellement indisponibles et n'ont pas été répertoriées}} publiquement. Veuillez fournir la preuve que vous avez l'autorisation de redistribuer certains fichiers inclus dans {count, plural, one {la version} other {les versions}} du modpack."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Résoudre"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Version {version_name} non disponible} other {Versions non disponibles}} en raison de contenus intégrés inconnus"
   },
   "report.already-reported": {
     "message": "Vous avez déjà signalé {title}"
@@ -2777,6 +3089,9 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniser avec le serveur"
   },
+  "servers.manage.content.title": {
+    "message": "Contenu - {serverName} - Modrinth"
+  },
   "servers.notice.actions": {
     "message": "Actions"
   },
@@ -2838,7 +3153,7 @@
     "message": "Supprimer ce compte"
   },
   "settings.account.delete.confirm.title": {
-    "message": "Êtes-vous sûr.e de vouloir supprimer votre compte ?"
+    "message": "Êtes-vous sûr·e de vouloir supprimer votre compte ?"
   },
   "settings.account.delete.section.action": {
     "message": "Supprimer le compte"
@@ -3057,7 +3372,7 @@
     "message": "Vous êtes sur le point de supprimer cette application et retirer tous les jetons d'accès. (pour toujours !)"
   },
   "settings.applications.delete.confirm.title": {
-    "message": "Êtes-vous sûr.e de vouloir supprimer cette application ? "
+    "message": "Êtes-vous sûr·e de vouloir supprimer cette application ?"
   },
   "settings.applications.description.intro": {
     "message": "Les applications permettent d'authentifier les utilisateurs de Modrinth auprès de vos produits. Pour plus d'informations, consultez la <docs-link>documentation de l'API Modrinth</docs-link>."
@@ -3129,7 +3444,7 @@
     "message": "Cela révoquera l’accès de l’application à votre compte. Vous pourrez toujours la réautoriser plus tard."
   },
   "settings.authorizations.revoke.confirm.title": {
-    "message": "Êtes-vous sûr.e de vouloir révoquer cette application ?"
+    "message": "Êtes-vous sûr·e de vouloir révoquer cette application ?"
   },
   "settings.billing.charges.description": {
     "message": "Toutes vos transactions passées sur votre compte Modrinth seront affichées ici :"
@@ -3207,7 +3522,7 @@
     "message": "Cela annulera votre abonnement. Vous conserverez vos avantages jusqu’à la fin du cycle de facturation en cours."
   },
   "settings.billing.modal.cancel.title": {
-    "message": "Êtes-vous sûr.e de vouloir annuler votre abonnement ?"
+    "message": "Êtes-vous sûr·e de vouloir annuler votre abonnement ?"
   },
   "settings.billing.modal.delete.action": {
     "message": "Supprimer ce mode de paiement"
@@ -3216,7 +3531,7 @@
     "message": "Cela supprimera définitivement ce mode paiement. (vraiment toujours)."
   },
   "settings.billing.modal.delete.title": {
-    "message": "Êtes-vous sûr.e de vouloir supprimer ce mode de paiement ?"
+    "message": "Êtes-vous sûr·e de vouloir supprimer ce mode de paiement ?"
   },
   "settings.billing.next": {
     "message": "Suivant :"
@@ -3549,7 +3864,7 @@
     "message": "S'abonner"
   },
   "ui.newsletter-button.subscribed": {
-    "message": "Abonné ! "
+    "message": "Abonné !"
   },
   "ui.newsletter-button.tooltip": {
     "message": "S'abonner au journal Modrinth"

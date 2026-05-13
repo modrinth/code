@@ -41,10 +41,11 @@ pub enum Bucketing {
     BucketSize(u64),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum TextMatchType {
     MaxScore,
+    #[default]
     MaxWeight,
     SumScore,
 }
@@ -56,12 +57,6 @@ impl TextMatchType {
             Self::MaxWeight => "max_weight",
             Self::SumScore => "sum_score",
         }
-    }
-}
-
-impl Default for TextMatchType {
-    fn default() -> Self {
-        Self::MaxWeight
     }
 }
 
@@ -114,28 +109,25 @@ impl Default for RequestConfig {
 }
 
 fn default_query_by() -> Vec<String> {
-    // [
-    //     "name",
-    //     "indexed_name",
-    //     "slug",
-    //     "author",
-    //     "indexed_author",
-    //     "summary",
-    // ]
-    ["name", "indexed_name", "slug", "author", "indexed_author"]
-        .into_iter()
-        .map(str::to_string)
-        .collect()
+    [
+        "name",
+        "indexed_name",
+        "slug",
+        "author",
+        "indexed_author",
+        "summary",
+    ]
+    .into_iter()
+    .map(str::to_string)
+    .collect()
 }
 
 fn default_query_by_weights() -> Vec<u8> {
-    // vec![15, 15, 10, 3, 3, 1]
-    vec![15, 15, 10, 3, 3]
+    vec![15, 15, 10, 3, 3, 1]
 }
 
 fn default_prefix() -> Vec<bool> {
-    // vec![true, true, true, true, true, true]
-    vec![true, true, true, true, true]
+    vec![true, true, true, true, true, true]
 }
 
 const fn default_prioritize_exact_match() -> bool {
@@ -147,13 +139,13 @@ const fn default_prioritize_num_matching_fields() -> bool {
 }
 
 const fn default_prioritize_token_positions() -> bool {
-    // true
-    false
+    true
+    // false
 }
 
 const fn default_drop_tokens_threshold() -> usize {
-    // 0
-    1
+    0
+    // 1
 }
 
 const fn default_max_candidates() -> usize {

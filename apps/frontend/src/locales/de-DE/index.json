@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Partnerlink erstellen"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Keine Partnercodes gefunden."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Fehler beim Laden von Partnerlinks"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Partnerlinks durchsuchen..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "von {count} {count, plural, one {Projekt} other {Projekten}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Anzahl der Downloads"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Anzahl der Follower"
   },
   "dashboard.collections.button.create-new": {
     "message": "Erstellen"
@@ -595,6 +607,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Deine Kollektionen"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Kollektionen durchsuchen..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Name (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Kürzlich erstellt"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Kürzlich aktualisiert"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Lade {formType} herunter"
@@ -848,6 +872,168 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Du hast dein Auszahlungslimit von <b>{withdrawLimit}</b> aufgebraucht. Du musst ein Steuerformular ausfüllen, um merh abzuheben."
   },
+  "dashboard.head-title": {
+    "message": "Dashboard"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Alle als gelesen markieren"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Verlauf ansehen"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Du hast keine ungelesenen Benachrichtigungen."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Fehler beim Laden von Benachrichtigungen:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Verlauf"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Benachrichtigungsverlauf"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Alle ansehen"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Benachrichtigungsverlauf ansehen"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Siehe {extraNotifs} weitere {extraNotifs, plural, one {Benachrichtigung} other {Benachrichtigungen}} an"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Benachrichtigungen werden geladen..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Organisation erstellen"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Erstelle eine Organisation!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Fehler beim Laden der Organisationen"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {Mitglied} other {Mitglieder}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisationen"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Du kannst mehrere Projekte gleichzeitig bearbeiten, indem du sie unten auswählst."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Serverprojekte unterstützen Massenbearbeitung nicht"
+  },
+  "dashboard.projects.empty": {
+    "message": "Du hast noch keine Projekte. Klicke auf den grünen Knopf oben um loszulegen."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projekte"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "und {count} weitere..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Link entfernen"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Links bearbeiten"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Änderungen werden auf <strong>{count}</strong> {count, plural, one {Projekt} other {Projekte}} angewendet."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Alle Links, die du unten angibst, werden in jedem der ausgewählten Projekte überschrieben. Alle, die du leer lässt, werden ignoriert. Du kannst einen Link mithilfe der Papierkorb-Schaltfläche aus allen ausgewählten Projekten entfernen."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Ein Einladungslink zu deinem Discord-Server."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord-Einladung"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Ein Ort, an dem Nutzer Fehler, Probleme und Bedenken zu deinem Projekt melden können."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Issue-Tracker"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Der vorhandene Link wird gelöscht"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Gib eine gültige Discordeinladungs-URL ein"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Gib eine gültige URL ein"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Alle Projekte anzeigen"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Ein Seite/ein Repository mit dem Quellcode deines Projekts"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Quellcode"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Eine Seite mit Informationen, Dokumentation und Hilfe zum Projekt."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Wikiseite"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Links von Projekten wurden massenbearbeitet."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icon für {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Projekt hat eine Nachricht von den Moderatoren. Rufe das Projekt auf, um mehr zu erfahren."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Bitte überprüfe die Umgebungsmetadaten"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Aufsteigend"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Absteigend"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Name"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Typ"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Icon"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Name"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Typ"
+  },
+  "dashboard.report.title": {
+    "message": "Meldung {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Aktive Meldungen"
+  },
+  "dashboard.reports.title": {
+    "message": "Meldungen"
+  },
   "dashboard.revenue.available-now": {
     "message": "Jetzt verfügbar"
   },
@@ -884,6 +1070,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Als CSV herunterladen"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Zahlungsverlauf"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transaktionen"
   },
@@ -893,8 +1082,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Deine Auszahlungen und Abhebungen erscheinen hier."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Letzen Monat"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Diesen Monat"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Alle anzeigen"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Ganzes Jahr"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Deine Auszahlungen sind vorrübergehend gesperrt, da deine TIN oder SSN nicht mit den IRS-Aufzeichnungen übereinstimmt. Bitte kontaktiere den Support um dein Steuerformular zurückzusetzen und erneut einzureichen."
@@ -907,6 +1105,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Auszahlen"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Aktive Meldungen"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analysen"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Ersteller"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Dashboard"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Benachrichtigungen"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organisationen"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Übersicht"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projekte"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Einnahmen"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Konto"
@@ -1004,6 +1229,27 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Bitte Steuerformular ausfüllen"
   },
+  "discover.install.back-to-server": {
+    "message": "Zurück zum Server"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Zurück zur Einrichtung"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Zurücksetzung abbrechen"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Keine Serverwelt ist zur Installation verfügbar."
+  },
+  "discover.seo.description": {
+    "message": "Durchsuche und entdecke tausende Minecraft {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} other {Projekte}} auf Modrinth mit sofortigen und präzisen Suchergebnissen. Unsere Filter helfen dir dabei, schnell die besten Minecraft {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} other {Projekte}} zu finden."
+  },
+  "discover.seo.title": {
+    "message": "Durchsuche {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} other {Projekte}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Durchsuche {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} other {Projekte}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "Eventuell hast du die URL der Kollektion falsch eingegeben."
   },
@@ -1018,6 +1264,12 @@
   },
   "error.collection.404.title": {
     "message": "Kollektion nicht gefunden"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Du bist aktuell angemeldet als:"
+  },
+  "error.generic.401.title": {
+    "message": "Du hast keinen Zugriff auf diese Seite"
   },
   "error.generic.404.subtitle": {
     "message": "Die von dir gesuchte Seite scheint nicht zu existieren."
@@ -1445,6 +1697,9 @@
   "layout.action.create-new": {
     "message": "Erstellen..."
   },
+  "layout.action.external-projects": {
+    "message": "Externe Projekte"
+  },
   "layout.action.file-lookup": {
     "message": "Dateisuche"
   },
@@ -1696,6 +1951,9 @@
   },
   "moderation.moderate": {
     "message": "Moderieren"
+  },
+  "moderation.page.external-projects": {
+    "message": "Externe Projekte"
   },
   "moderation.page.projects": {
     "message": "Projekte"
@@ -2390,6 +2648,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Bitte lege Nachweise vor, dass du die Erlaubnis zur Weiterverbreitung folgender Dateien hast; alle zurückgehaltenen Versionen werden automatisch veröffentlicht."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Bitte lege Nachweise vor, dass du die Erlaubnis zur Weiterverbreitung aller folgenden Dateien hast, bevor du dein Projekt zur Überprüfung einreichen kannst."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Unbekannter eingebetteter Inhalt"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Alle externen Inhalte haben Quellenangaben."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Quellenangaben vollständig!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Keine deiner Versionen enthält externe Inhalte, du musst du dir keine Gedanken über die Einholung von Genehmigungen machen."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Du bist startklar!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Du hast keine Berechtigung, einige der von dir hinzugefügten externen Inhalte weiterzuverbreiten. Entferne die urheberrechtsverletzenden Inhalte, um auf Modrinth veröffentlichen zu können."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Bestimmte Inhalte können nicht enthalten sein"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Wenn du Inhalte einbindest, welche nicht auf Modrinth gehostet werden, musst du uns deren Quelle mitteilen und bestätigen, dass du die Berechtigung zur Verbreitung der Dateien hast. In <link>unserer Anleitung</link> lernst du, wie du dies am besten machst!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "So funktionieren Quellenangaben"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Mehr erfahren"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Durchsuche {count} {count, plural, one {externes Projekt} other {externe Projekte}}..."
+  },
   "project.settings.title": {
     "message": "Einstellungen"
   },
@@ -2407,6 +2704,15 @@
   },
   "project.versions.title": {
     "message": "Versionen"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Diese Version ist} other {Diese Versionen sind}} derzeit zurückgehalten und nicht öffentlich gelistet. Bitte stelle einen Nachweis bereit, dass du die Erlaubnis hast, bestimmte Dateien weiterzuverbreiten, die im Modpack in {count, plural, one {Version} other {Versionen}} enthalten sind."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Beheben"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Version {version_name} wurde} other {Versionen wurden}} aufgrund unbekannter eingebetteter Inhalte zurückgehalten"
   },
   "report.already-reported": {
     "message": "Du hast {title} bereits gemeldet"
@@ -2776,6 +3082,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Mit Server synchronisieren"
+  },
+  "servers.manage.content.title": {
+    "message": "Inhalt - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "Aktionen"

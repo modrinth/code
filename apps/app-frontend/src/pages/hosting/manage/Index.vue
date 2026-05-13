@@ -6,7 +6,6 @@
 			:resolve-viewer="resolveViewer"
 			:show-copy-id-action="themeStore.devMode"
 			:auth-user="authUser"
-			:fetch-intercom-token="fetchIntercomToken"
 			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
 			:browse-modpacks="
@@ -47,12 +46,10 @@
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { injectAuth, injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { config } from '@/config'
 import { get_user } from '@/helpers/cache'
 import { get as getCreds } from '@/helpers/mr_auth'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
@@ -122,26 +119,6 @@ const authUser = computed(() => {
 		created: user.created,
 	}
 })
-
-async function fetchIntercomToken(): Promise<{ token: string }> {
-	const credentials = await getCreds()
-	if (!credentials?.session) {
-		throw new Error('Not authenticated')
-	}
-	const response = await tauriFetch(
-		`${config.siteUrl}/api/intercom/messenger-jwt?server_id=${encodeURIComponent(serverId.value)}`,
-		{
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${credentials.session}`,
-			},
-		},
-	)
-	if (!response.ok) {
-		throw new Error(`Failed to fetch Intercom token: ${response.status}`)
-	}
-	return (await response.json()) as { token: string }
-}
 
 async function resolveViewer(): Promise<{ userId: string | null; userRole: string | null }> {
 	const credentials = await getCreds().catch(() => null)

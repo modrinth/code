@@ -1,15 +1,114 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Download"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Mostra meno istanze in esecuzione"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Rendi primaria"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Nessuna istanza in esecuzione"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Primaria"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Mostra più istanze in esecuzione"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Ferma l'istanza"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Mostra i download attivi"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Mostra l'istanza"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Mostra i log"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Abilita alcuni effetti come la sfocatura, ma può causare problemi di prestazioni senza accelerazione hardware."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Rendering avanzato"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Scegli il tema che Modrinth App userà su questo dispositivo."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Tema"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Imposta la pagina che si aprirà all'avvio del launcher."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Home"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Libreria"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Pagina di avvio"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Rimuove il nametag sopra la testa del giocatore nella pagina delle skin."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Nascondi il nome"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Elenca i mondi recenti nella sezione \"Avvio rapido\" della pagina Home."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Avvio rapido nei mondi"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Riduci il launcher a icona quando si avvia Minecraft."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Riduci a icona"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Usa la cornice di sistema (riavvio necessario)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Decorazioni native"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Scegli una pagina"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Scegli se mostrare o nascondere la barra laterale."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Abilita la barra laterale"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Visti i rischi nell'installare un file Modrinth Pack (.mrpack) non proveniente da Modrinth, mostriamo un avvertimento quando tenti di fare ciò."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Avvisami se installo pacchetti sconosciuti"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "I server di autenticazione di Minecraft stanno riscontrando problemi. Controlla la tua connessione a Internet e riprova più tardi."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Impossibile raggiungere i server di autenticazione"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Aggiungi server all'istanza"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "Aggiungi i server alla tua istanza"
+    "message": "Aggiungendo il server all'istanza"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Aggiungi a un'istanza"
   },
   "app.browse.add-to-instance": {
     "message": "Aggiungi all'istanza"
@@ -23,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Già aggiunto"
   },
+  "app.browse.back-to-instance": {
+    "message": "Torna all'istanza"
+  },
   "app.browse.discover-content": {
     "message": "Esplora i contenuti"
   },
@@ -30,13 +132,22 @@
     "message": "Esplora i server"
   },
   "app.browse.hide-added-servers": {
-    "message": "Nascondi server aggiunti"
+    "message": "Nascondi server già aggiunti"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Nascondi contenuti installati"
+  "app.browse.project-type.modpacks": {
+    "message": "Pacchetti di mod"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Installa contenuti nell'istanza"
+  "app.browse.server-instance-content-warning": {
+    "message": "Aggiungere dei contenuti potrebbe portare problemi entrando nel server. Qualsiasi contenuto aggiunto sarà anche perso aggiornando i contenuti dell'istanza del server."
+  },
+  "app.browse.server.installing": {
+    "message": "Installazione"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Installando il pacchetto..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Inserisci descrizione del pacchetto..."
@@ -47,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Esporta pacchetto"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Includere \"{file}\" nell'esportazione?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Nome del pacchetto"
   },
@@ -54,7 +168,7 @@
     "message": "Nome del pacchetto"
   },
   "app.export-modal.select-files-label": {
-    "message": "Seleziona i file e le cartelle da includere nel pacchetto"
+    "message": "Seleziona i file da includere in questa esportazione"
   },
   "app.export-modal.version-number-label": {
     "message": "Numero di versione"
@@ -184,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name} richiede degli aggiornamenti. Installa l'ultima versione per poter giocare."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Questo progetto è già stato installato"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Torna su esplora"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Installa il contenuto nell'istanza"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modalità sviluppatore attiva."
@@ -324,7 +447,7 @@
     "message": "Nessuna amicizia corrisponde a ''{query}''"
   },
   "friends.search-friends-placeholder": {
-    "message": "Cerca amicizie..."
+    "message": "Cerca tra le amicizie..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
@@ -363,7 +486,7 @@
     "message": "Mondo di Minecraft"
   },
   "instance.edit-world.reset-icon": {
-    "message": "Resetta icona"
+    "message": "Ripristina icona"
   },
   "instance.edit-world.title": {
     "message": "Modifica mondo"
@@ -423,7 +546,7 @@
     "message": "Cambia icona"
   },
   "instance.settings.tabs.general.edit-icon.select": {
-    "message": "Seleziona icona"
+    "message": "Scegli un'icona"
   },
   "instance.settings.tabs.general.library-groups": {
     "message": "Gruppi della libreria"
@@ -575,6 +698,24 @@
   "instance.worlds.world_in_use": {
     "message": "Mondo già in uso"
   },
+  "minecraft-account.add-account": {
+    "message": "Aggiungi account"
+  },
+  "minecraft-account.label": {
+    "message": "Account di Minecraft"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Accesso non effettuato"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Rimuovi account"
+  },
+  "minecraft-account.select-account": {
+    "message": "Seleziona un account"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Accedi a Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "Determinato dall'istanza"
   },
@@ -598,5 +739,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Il loader è determinato dal server"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "Solo i file caricati su Modrinth vengono esaminati, qualunque sia il loro formato (.mrpack inclusi)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Non mostrare più questo avviso"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Conferma l'installazione"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Installa comunque"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Spesso i malware vengono nascosti nei pacchetti di mod, poi distribuiti su piattaforme come Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "Non è stato possibile trovare questo file su Modrinth. Consigliamo di installare file solo da fonti attendibili."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Tipo di file sconosciuto"
   }
 }

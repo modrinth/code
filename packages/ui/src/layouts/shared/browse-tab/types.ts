@@ -12,6 +12,12 @@ export interface BrowseSearchResponse {
 	per_page: number
 }
 
+export interface BrowseSelectedProject {
+	id: string
+	name: string
+	iconUrl?: string | null
+}
+
 export interface BrowseInstallContext {
 	name: string
 	loader: string
@@ -24,14 +30,28 @@ export interface BrowseInstallContext {
 	backLabel: string
 	heading: string
 	warning?: string
+	queuedCount?: number
+	queuedLabel?: string
+	clearQueued?: () => void | Promise<void>
+	onBack?: () => boolean | void | Promise<boolean | void>
+	selectedProjects?: BrowseSelectedProject[]
+	isInstallingSelected?: boolean
+	installProgress?: {
+		completed: number
+		total: number
+	}
+	clearSelected?: () => void | Promise<void>
+	discardSelectedAndBack?: () => void | Promise<void>
+	installSelected?: () => boolean | void | Promise<boolean | void>
 }
 
 export interface CardAction {
 	key: string
 	label: string
 	icon: Component
+	iconClass?: string
 	disabled?: boolean
-	color?: 'brand' | 'red'
+	color?: 'brand' | 'red' | 'green'
 	type?: 'standard' | 'outlined' | 'transparent'
 	circular?: boolean
 	tooltip?: string

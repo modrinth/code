@@ -55,8 +55,6 @@ pub struct SearchRequest {
     #[serde(default)]
     pub show_metadata: bool,
     #[serde(default)]
-    pub elasticsearch_config: backend::elasticsearch::RequestConfig,
-    #[serde(default)]
     pub typesense_config: backend::typesense::RequestConfig,
 
     pub new_filters: Option<String>,
@@ -74,8 +72,6 @@ impl From<SearchQuery> for SearchRequest {
             index: query.index,
             limit: query.limit,
             show_metadata: false,
-            elasticsearch_config:
-                backend::elasticsearch::RequestConfig::default(),
             typesense_config: backend::typesense::RequestConfig::default(),
             new_filters: query.new_filters,
             facets: query.facets,
@@ -181,8 +177,6 @@ pub enum TasksCancelFilter {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SearchBackendKind {
-    Meilisearch,
-    Elasticsearch,
     Typesense,
 }
 
@@ -218,8 +212,6 @@ impl FromStr for SearchBackendKind {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
-            "meilisearch" => SearchBackendKind::Meilisearch,
-            "elasticsearch" => SearchBackendKind::Elasticsearch,
             "typesense" => SearchBackendKind::Typesense,
             _ => return Err(InvalidSearchBackendKind),
         })
@@ -447,13 +439,6 @@ impl From<UploadSearchProject> for ResultSearchProject {
 
 pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
     match ENV.SEARCH_BACKEND {
-        SearchBackendKind::Meilisearch => {
-            let config = backend::MeilisearchConfig::new(meta_namespace);
-            Box::new(backend::Meilisearch::new(config))
-        }
-        SearchBackendKind::Elasticsearch => {
-            Box::new(backend::Elasticsearch::new(meta_namespace).unwrap())
-        }
         SearchBackendKind::Typesense => {
             let config = backend::TypesenseConfig::new(meta_namespace);
             Box::new(backend::Typesense::new(config))

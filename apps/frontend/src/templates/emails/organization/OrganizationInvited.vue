@@ -27,7 +27,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			>You've been invited to an organization</Heading
 		>
 
-		<Text class="text-base">Hi {user.name},</Text>
+		<Text class="text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 
 		<Text class="text-base"
 			>Modrinth user

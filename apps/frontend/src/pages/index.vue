@@ -208,7 +208,7 @@
 						<p>
 							<IntlFormatted :message-id="messages.playWithLauncherDescription">
 								<template #link="{ children }">
-									<nuxt-link class="title-link" to="/app">
+									<nuxt-link class="underline hover:brightness-[--hover-brightness]" to="/app">
 										<component :is="() => children" />
 									</nuxt-link>
 								</template>
