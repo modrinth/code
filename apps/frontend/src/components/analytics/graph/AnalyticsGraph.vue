@@ -5,7 +5,7 @@
 		<AnalyticsLoadingBar :loading="isDataLoading" />
 		<div class="flex w-full flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
 			<div
-				class="flex w-full items-center justify-between border-0 border-b border-solid border-surface-5 bg-surface-3 p-4"
+				class="flex w-full items-center justify-between rounded-t-2xl border-0 border-b border-solid border-surface-5 bg-surface-3 p-4"
 			>
 				<div class="text-xl font-semibold text-contrast">
 					{{ graphTitle }}
