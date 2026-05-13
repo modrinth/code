@@ -173,6 +173,8 @@ export type CreateAnalyticsDashboardContextOptions = {
 export const [injectAnalyticsDashboardContext, provideAnalyticsDashboardContext] =
 	createContext<AnalyticsDashboardContextValue>('AnalyticsDashboard')
 
+type AnalyticsQueryBuilderRouteNavigationMode = 'push' | 'replace'
+
 function buildPreviousFetchRequest(
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
 ): Labrinth.Analytics.v3.FetchRequest | null {
@@ -801,6 +803,7 @@ export function createAnalyticsDashboardContext(
 	const queryRefreshTimestamp = ref(Date.now())
 	const queryResetToken = ref(0)
 	const fetchRequest = ref<Labrinth.Analytics.v3.FetchRequest | null>(null)
+	let nextAnalyticsRouteNavigationMode: AnalyticsQueryBuilderRouteNavigationMode = 'replace'
 
 	const hasProjectContext = computed(() => Boolean(options.projectPageContext))
 	const hasOrganizationContext = computed(
@@ -1181,6 +1184,62 @@ export function createAnalyticsDashboardContext(
 		return nextFilters
 	}
 
+	function replaceNextAnalyticsRouteNavigation() {
+		nextAnalyticsRouteNavigationMode = 'replace'
+	}
+
+	function consumeAnalyticsRouteNavigationMode(): AnalyticsQueryBuilderRouteNavigationMode {
+		const navigationMode = nextAnalyticsRouteNavigationMode
+		nextAnalyticsRouteNavigationMode = 'push'
+		return navigationMode
+	}
+
+	function getSelectedAnalyticsQueryBuilderState() {
+		return {
+			selectedProjectIds: selectedProjectIds.value,
+			selectedTimeframeMode: selectedTimeframeMode.value,
+			selectedTimeframe: selectedTimeframe.value,
+			selectedLastTimeframeAmount: selectedLastTimeframeAmount.value,
+			selectedLastTimeframeUnit: selectedLastTimeframeUnit.value,
+			selectedCustomTimeframeStartDate: selectedCustomTimeframeStartDate.value,
+			selectedCustomTimeframeEndDate: selectedCustomTimeframeEndDate.value,
+			selectedGroupBy: selectedGroupBy.value,
+			selectedBreakdown: selectedBreakdown.value,
+			selectedFilters: selectedFilters.value,
+		}
+	}
+
+	function syncAnalyticsRouteQuery(navigationMode: AnalyticsQueryBuilderRouteNavigationMode) {
+		if (import.meta.server) {
+			return
+		}
+
+		const nextRouteQuery = buildAnalyticsQueryBuilderRouteQuery(
+			route.query,
+			getSelectedAnalyticsQueryBuilderState(),
+			availableProjectIds.value,
+		)
+
+		const hasAnalyticsQueryChange = hasAnalyticsQueryBuilderRouteChange(
+			route.query,
+			nextRouteQuery,
+		)
+
+		if (!hasAnalyticsQueryChange) return
+
+		if (navigationMode === 'replace') {
+			router.replace({
+				path: route.path,
+				query: nextRouteQuery,
+			})
+		} else {
+			router.push({
+				path: route.path,
+				query: nextRouteQuery,
+			})
+		}
+	}
+
 	watch(
 		[selectedBreakdown, selectedFilters, activeStat],
 		([nextBreakdown, nextFilters, nextActiveStat]) => {
@@ -1204,6 +1263,7 @@ export function createAnalyticsDashboardContext(
 				nextFilters,
 			)
 			if (!areSelectedFiltersEqual(nextFilters, sanitizedFilters)) {
+				replaceNextAnalyticsRouteNavigation()
 				selectedFilters.value = sanitizedFilters
 			}
 		},
@@ -1215,6 +1275,7 @@ export function createAnalyticsDashboardContext(
 		([nextProjects, nextAreProjectsLoaded]) => {
 			if (nextProjects.length === 0) {
 				if (nextAreProjectsLoaded && selectedProjectIds.value.length > 0) {
+					replaceNextAnalyticsRouteNavigation()
 					selectedProjectIds.value = []
 				}
 				return
@@ -1222,14 +1283,22 @@ export function createAnalyticsDashboardContext(
 
 			const availableProjectIds = new Set(nextProjects.map((project) => project.id))
 			if (!hasExplicitProjectSelectionQuery.value) {
-				selectedProjectIds.value = nextProjects.map((project) => project.id)
+				const nextSelectedProjectIds = nextProjects.map((project) => project.id)
+				if (!areStringArraysEqual(selectedProjectIds.value, nextSelectedProjectIds)) {
+					replaceNextAnalyticsRouteNavigation()
+					selectedProjectIds.value = nextSelectedProjectIds
+				}
 				return
 			}
 
 			const retainedSelection = selectedProjectIds.value.filter((id) => availableProjectIds.has(id))
-
-			selectedProjectIds.value =
+			const nextSelectedProjectIds =
 				retainedSelection.length > 0 ? retainedSelection : nextProjects.map((project) => project.id)
+
+			if (!areStringArraysEqual(selectedProjectIds.value, nextSelectedProjectIds)) {
+				replaceNextAnalyticsRouteNavigation()
+				selectedProjectIds.value = nextSelectedProjectIds
+			}
 		},
 		{ immediate: true },
 	)
@@ -1246,38 +1315,79 @@ export function createAnalyticsDashboardContext(
 				nextQueryState.selectedBreakdown,
 				nextQueryState.selectedFilters,
 			)
+			const shouldUpdateSelectedProjectIds = !areStringArraysEqual(
+				selectedProjectIds.value,
+				nextSelectedProjectIds,
+			)
+			const shouldUpdateSelectedTimeframeMode =
+				selectedTimeframeMode.value !== nextQueryState.selectedTimeframeMode
+			const shouldUpdateSelectedTimeframe =
+				selectedTimeframe.value !== nextQueryState.selectedTimeframe
+			const shouldUpdateSelectedLastTimeframeAmount =
+				selectedLastTimeframeAmount.value !== nextQueryState.selectedLastTimeframeAmount
+			const shouldUpdateSelectedLastTimeframeUnit =
+				selectedLastTimeframeUnit.value !== nextQueryState.selectedLastTimeframeUnit
+			const shouldUpdateSelectedCustomTimeframeStartDate =
+				selectedCustomTimeframeStartDate.value !==
+				nextQueryState.selectedCustomTimeframeStartDate
+			const shouldUpdateSelectedCustomTimeframeEndDate =
+				selectedCustomTimeframeEndDate.value !== nextQueryState.selectedCustomTimeframeEndDate
+			const shouldUpdateSelectedGroupBy = selectedGroupBy.value !== nextQueryState.selectedGroupBy
+			const shouldUpdateSelectedBreakdown =
+				selectedBreakdown.value !== nextQueryState.selectedBreakdown
+			const shouldUpdateSelectedFilters = !areSelectedFiltersEqual(
+				selectedFilters.value,
+				nextSelectedFilters,
+			)
+			const hasRouteStateUpdate =
+				shouldUpdateSelectedProjectIds ||
+				shouldUpdateSelectedTimeframeMode ||
+				shouldUpdateSelectedTimeframe ||
+				shouldUpdateSelectedLastTimeframeAmount ||
+				shouldUpdateSelectedLastTimeframeUnit ||
+				shouldUpdateSelectedCustomTimeframeStartDate ||
+				shouldUpdateSelectedCustomTimeframeEndDate ||
+				shouldUpdateSelectedGroupBy ||
+				shouldUpdateSelectedBreakdown ||
+				shouldUpdateSelectedFilters
 
-			if (!areStringArraysEqual(selectedProjectIds.value, nextSelectedProjectIds)) {
+			if (hasRouteStateUpdate) {
+				replaceNextAnalyticsRouteNavigation()
+			}
+
+			if (shouldUpdateSelectedProjectIds) {
 				selectedProjectIds.value = nextSelectedProjectIds
 			}
-			if (selectedTimeframeMode.value !== nextQueryState.selectedTimeframeMode) {
+			if (shouldUpdateSelectedTimeframeMode) {
 				selectedTimeframeMode.value = nextQueryState.selectedTimeframeMode
 			}
-			if (selectedTimeframe.value !== nextQueryState.selectedTimeframe) {
+			if (shouldUpdateSelectedTimeframe) {
 				selectedTimeframe.value = nextQueryState.selectedTimeframe
 			}
-			if (selectedLastTimeframeAmount.value !== nextQueryState.selectedLastTimeframeAmount) {
+			if (shouldUpdateSelectedLastTimeframeAmount) {
 				selectedLastTimeframeAmount.value = nextQueryState.selectedLastTimeframeAmount
 			}
-			if (selectedLastTimeframeUnit.value !== nextQueryState.selectedLastTimeframeUnit) {
+			if (shouldUpdateSelectedLastTimeframeUnit) {
 				selectedLastTimeframeUnit.value = nextQueryState.selectedLastTimeframeUnit
 			}
-			if (
-				selectedCustomTimeframeStartDate.value !== nextQueryState.selectedCustomTimeframeStartDate
-			) {
+			if (shouldUpdateSelectedCustomTimeframeStartDate) {
 				selectedCustomTimeframeStartDate.value = nextQueryState.selectedCustomTimeframeStartDate
 			}
-			if (selectedCustomTimeframeEndDate.value !== nextQueryState.selectedCustomTimeframeEndDate) {
+			if (shouldUpdateSelectedCustomTimeframeEndDate) {
 				selectedCustomTimeframeEndDate.value = nextQueryState.selectedCustomTimeframeEndDate
 			}
-			if (selectedGroupBy.value !== nextQueryState.selectedGroupBy) {
+			if (shouldUpdateSelectedGroupBy) {
 				selectedGroupBy.value = nextQueryState.selectedGroupBy
 			}
-			if (selectedBreakdown.value !== nextQueryState.selectedBreakdown) {
+			if (shouldUpdateSelectedBreakdown) {
 				selectedBreakdown.value = nextQueryState.selectedBreakdown
 			}
-			if (!areSelectedFiltersEqual(selectedFilters.value, nextSelectedFilters)) {
+			if (shouldUpdateSelectedFilters) {
 				selectedFilters.value = nextSelectedFilters
+			}
+
+			if (!hasRouteStateUpdate) {
+				syncAnalyticsRouteQuery('replace')
 			}
 		},
 	)
@@ -1297,38 +1407,7 @@ export function createAnalyticsDashboardContext(
 			availableProjectIds,
 		],
 		() => {
-			if (import.meta.server) {
-				return
-			}
-
-			const nextRouteQuery = buildAnalyticsQueryBuilderRouteQuery(
-				route.query,
-				{
-					selectedProjectIds: selectedProjectIds.value,
-					selectedTimeframeMode: selectedTimeframeMode.value,
-					selectedTimeframe: selectedTimeframe.value,
-					selectedLastTimeframeAmount: selectedLastTimeframeAmount.value,
-					selectedLastTimeframeUnit: selectedLastTimeframeUnit.value,
-					selectedCustomTimeframeStartDate: selectedCustomTimeframeStartDate.value,
-					selectedCustomTimeframeEndDate: selectedCustomTimeframeEndDate.value,
-					selectedGroupBy: selectedGroupBy.value,
-					selectedBreakdown: selectedBreakdown.value,
-					selectedFilters: selectedFilters.value,
-				},
-				availableProjectIds.value,
-			)
-
-			const hasAnalyticsQueryChange = hasAnalyticsQueryBuilderRouteChange(
-				route.query,
-				nextRouteQuery,
-			)
-
-			if (!hasAnalyticsQueryChange) return
-
-			router.replace({
-				path: route.path,
-				query: nextRouteQuery,
-			})
+			syncAnalyticsRouteQuery(consumeAnalyticsRouteNavigationMode())
 		},
 		{ deep: true, immediate: true },
 	)
