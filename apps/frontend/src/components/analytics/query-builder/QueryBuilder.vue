@@ -22,6 +22,11 @@
 				>
 					<template #input-content="{ isOpen, openDirection }">
 						<div class="flex min-h-8 min-w-0 flex-1 items-center gap-2 pr-1">
+							<component
+								:is="selectedProjectIcon"
+								v-if="selectedProjectIcon"
+								class="size-7 shrink-0"
+							/>
 							<span class="min-w-0 flex-1 truncate px-1.5 py-1 font-semibold text-primary">
 								{{ selectedProjectLabel }}
 							</span>
@@ -165,12 +170,15 @@ import {
 	CheckIcon,
 	ChevronLeftIcon,
 	FolderOpenIcon,
+	PackageIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { Combobox, type ComboboxOption, MultiSelect, type MultiSelectOption } from '@modrinth/ui'
+import { defineAsyncComponent, h, markRaw } from 'vue'
 
 import {
 	type AnalyticsBreakdownPreset,
+	type AnalyticsDashboardProject,
 	type AnalyticsGroupByPreset,
 	type AnalyticsSelectedFilters,
 	getProjectIdsMatchingStatusFilter,
@@ -213,6 +221,7 @@ const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 	projects.value.map((project) => ({
 		value: project.id,
 		label: project.name,
+		icon: getProjectIcon(project),
 	})),
 )
 
@@ -252,10 +261,7 @@ watch(draftSelectedProjectIds, (nextSelectedProjectIds) => {
 	const normalizedProjectIds = normalizeProjectSelection(nextSelectedProjectIds)
 	if (
 		projectDownloadsThresholdProjectIds.value &&
-		isSameProjectSelection(
-			normalizedProjectIds,
-			projectDownloadsThresholdProjectIds.value,
-		)
+		isSameProjectSelection(normalizedProjectIds, projectDownloadsThresholdProjectIds.value)
 	) {
 		return
 	}
@@ -300,6 +306,40 @@ const selectedProjectLabel = computed(() => {
 
 	return `${draftSelectedProjectIds.value.length} projects`
 })
+
+const selectedProjectIcon = computed(() => {
+	if (
+		isAllProjectsOptionSelected.value ||
+		areAllProjectsSelected.value ||
+		draftSelectedProjectIds.value.length !== 1
+	) {
+		return undefined
+	}
+
+	return projectOptions.value.find((project) => project.value === draftSelectedProjectIds.value[0])
+		?.icon
+})
+
+function getProjectIcon(project: AnalyticsDashboardProject) {
+	const iconUrl = project.iconUrl
+	const projectName = project.name
+	if (!iconUrl) {
+		return markRaw(PackageIcon)
+	}
+
+	return markRaw(
+		defineAsyncComponent(() =>
+			Promise.resolve({
+				setup: () => () =>
+					h('img', {
+						src: iconUrl,
+						alt: `${projectName} Icon`,
+						class: 'h-6 w-6 rounded object-cover',
+					}),
+			}),
+		),
+	)
+}
 
 function handleProjectSelectOpen() {
 	isProjectSelectOpen.value = true

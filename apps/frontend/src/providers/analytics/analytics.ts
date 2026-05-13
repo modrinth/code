@@ -57,6 +57,7 @@ type AnalyticsProjectFetchRequest = Labrinth.Analytics.v3.FetchRequest & {
 export interface AnalyticsDashboardProject {
 	id: string
 	name: string
+	iconUrl?: string
 	downloads: number
 	status: ProjectStatusFilterValue
 }
@@ -771,6 +772,7 @@ export function createAnalyticsDashboardContext(
 						{
 							id: project.id,
 							name: project.title,
+							iconUrl: project.icon_url ?? undefined,
 							downloads: project.downloads ?? 0,
 							status: getProjectStatusFilterValue(project.status),
 						},
@@ -784,6 +786,7 @@ export function createAnalyticsDashboardContext(
 				.map((project) => ({
 					id: project.id,
 					name: project.name,
+					iconUrl: project.icon_url ?? undefined,
 					downloads: project.downloads ?? 0,
 					status: getProjectStatusFilterValue(project.status),
 				}))
@@ -794,6 +797,7 @@ export function createAnalyticsDashboardContext(
 			.map((project) => ({
 				id: project.id,
 				name: project.title,
+				iconUrl: project.icon_url ?? undefined,
 				downloads: project.downloads ?? 0,
 				status: getProjectStatusFilterValue(project.status),
 			}))
