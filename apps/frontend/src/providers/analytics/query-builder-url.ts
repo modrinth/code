@@ -22,11 +22,7 @@ export type AnalyticsTimeframePreset =
 	| 'year_to_date'
 	| 'all_time'
 
-export type AnalyticsTimeframeMode =
-	| 'preset'
-	| 'last'
-	| 'custom_range'
-	| 'custom_datetime_range'
+export type AnalyticsTimeframeMode = 'preset' | 'last' | 'custom_range' | 'custom_datetime_range'
 export type AnalyticsLastTimeframeUnit = 'hours' | 'days' | 'weeks' | 'months'
 
 export type AnalyticsGroupByPreset = '1h' | '6h' | 'day' | 'week' | 'month' | 'year'
@@ -553,10 +549,12 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 		state.selectedTimeframeMode === 'last' ? String(state.selectedLastTimeframeAmount) : undefined
 	nextRouteQuery[QUERY_KEY_TIMEFRAME_LAST_UNIT] =
 		state.selectedTimeframeMode === 'last' ? state.selectedLastTimeframeUnit : undefined
-	nextRouteQuery[QUERY_KEY_TIMEFRAME_START] =
-		isCustomTimeframeMode ? state.selectedCustomTimeframeStartDate : undefined
-	nextRouteQuery[QUERY_KEY_TIMEFRAME_END] =
-		isCustomTimeframeMode ? state.selectedCustomTimeframeEndDate : undefined
+	nextRouteQuery[QUERY_KEY_TIMEFRAME_START] = isCustomTimeframeMode
+		? state.selectedCustomTimeframeStartDate
+		: undefined
+	nextRouteQuery[QUERY_KEY_TIMEFRAME_END] = isCustomTimeframeMode
+		? state.selectedCustomTimeframeEndDate
+		: undefined
 	nextRouteQuery[QUERY_KEY_GROUP_BY] =
 		state.selectedGroupBy !== DEFAULT_GROUP_BY_PRESET ? state.selectedGroupBy : undefined
 	nextRouteQuery[QUERY_KEY_BREAKDOWN] =

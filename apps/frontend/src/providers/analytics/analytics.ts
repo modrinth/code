@@ -1235,10 +1235,7 @@ export function createAnalyticsDashboardContext(
 			availableProjectIds.value,
 		)
 
-		const hasAnalyticsQueryChange = hasAnalyticsQueryBuilderRouteChange(
-			route.query,
-			nextRouteQuery,
-		)
+		const hasAnalyticsQueryChange = hasAnalyticsQueryBuilderRouteChange(route.query, nextRouteQuery)
 
 		if (!hasAnalyticsQueryChange) return
 
@@ -1343,8 +1340,7 @@ export function createAnalyticsDashboardContext(
 			const shouldUpdateSelectedLastTimeframeUnit =
 				selectedLastTimeframeUnit.value !== nextQueryState.selectedLastTimeframeUnit
 			const shouldUpdateSelectedCustomTimeframeStartDate =
-				selectedCustomTimeframeStartDate.value !==
-				nextQueryState.selectedCustomTimeframeStartDate
+				selectedCustomTimeframeStartDate.value !== nextQueryState.selectedCustomTimeframeStartDate
 			const shouldUpdateSelectedCustomTimeframeEndDate =
 				selectedCustomTimeframeEndDate.value !== nextQueryState.selectedCustomTimeframeEndDate
 			const shouldUpdateSelectedGroupBy = selectedGroupBy.value !== nextQueryState.selectedGroupBy

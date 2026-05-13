@@ -1262,8 +1262,7 @@ defineExpose({
 	right: 0;
 }
 
-.modrinth-date-picker.can-select-range
-	:deep(.flatpickr-day:not(.flatpickr-disabled):not(.hidden)) {
+.modrinth-date-picker.can-select-range :deep(.flatpickr-day:not(.flatpickr-disabled):not(.hidden)) {
 	cursor: pointer;
 }
 
