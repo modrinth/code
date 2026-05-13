@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -14,8 +16,31 @@ pub struct AnalyticsEvent {
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct AnalyticsEventMeta {
+    #[serde(default)]
     pub title: String,
+    #[serde(default)]
     pub announcement_url: Option<String>,
+    #[serde(default)]
+    pub for_metric_kind: HashSet<MetricKind>,
+}
+
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum MetricKind {
+    Views,
+    Downloads,
+    Playtime,
+    Revenue,
 }
 
 impl From<crate::database::models::DBAnalyticsEvent> for AnalyticsEvent {

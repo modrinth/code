@@ -9,15 +9,16 @@
 
 mod old;
 
-use std::num::NonZeroU64;
+use std::{num::NonZeroU64, sync::LazyLock};
 
 use crate::database::PgPool;
 use actix_web::{HttpRequest, post, web};
 use chrono::{DateTime, TimeDelta, Utc};
 use eyre::eyre;
 use futures::StreamExt;
+use regex::Regex;
 use rust_decimal::Decimal;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 
 use crate::{
     auth::{AuthenticationError, get_user_from_headers},
@@ -167,8 +168,8 @@ pub enum ProjectDownloadsField {
     VersionId,
     /// Referrer domain which linked to this project.
     Domain,
-    /// Modrinth site path which was visited, e.g. `/mod/foo`.
-    SitePath,
+    /// Normalized user agent used to download this project.
+    UserAgent,
     /// Whether these downloads were monetized or not.
     Monetized,
     /// What country these downloads came from.
@@ -325,9 +326,9 @@ pub struct ProjectDownloads {
     /// [`ProjectDownloadsField::Domain`].
     #[serde(skip_serializing_if = "Option::is_none")]
     domain: Option<String>,
-    /// [`ProjectDownloadsField::SitePath`].
+    /// [`ProjectDownloadsField::UserAgent`].
     #[serde(skip_serializing_if = "Option::is_none")]
-    site_path: Option<String>,
+    user_agent: Option<DownloadSource>,
     /// [`ProjectDownloadsField::VersionId`].
     #[serde(skip_serializing_if = "Option::is_none")]
     version_id: Option<VersionId>,
@@ -348,6 +349,32 @@ pub struct ProjectDownloads {
     loader: Option<String>,
     /// Total number of downloads for this bucket.
     downloads: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, utoipa::ToSchema)]
+pub enum DownloadSource {
+    Website,
+    ModrinthApp,
+    ModrinthHosting,
+    Other,
+    Named(String),
+}
+
+impl Serialize for DownloadSource {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::Named(name) => serializer.serialize_str(name),
+            Self::Website => serializer.serialize_str("website"),
+            Self::ModrinthApp => serializer.serialize_str("modrinth_app"),
+            Self::ModrinthHosting => {
+                serializer.serialize_str("modrinth_hosting")
+            }
+            Self::Other => serializer.serialize_str("other"),
+        }
+    }
 }
 
 /// [`ReturnMetrics::project_playtime`].
@@ -476,7 +503,7 @@ mod query {
         pub bucket: u64,
         pub project_id: DBProjectId,
         pub domain: String,
-        pub site_path: String,
+        pub user_agent: String,
         pub version_id: DBVersionId,
         pub monetized: i8,
         pub country: String,
@@ -489,7 +516,7 @@ mod query {
     pub const DOWNLOADS: &str = {
         const USE_PROJECT_ID: &str = "{use_project_id: Bool}";
         const USE_DOMAIN: &str = "{use_domain: Bool}";
-        const USE_SITE_PATH: &str = "{use_site_path: Bool}";
+        const USE_USER_AGENT: &str = "{use_user_agent: Bool}";
         const USE_VERSION_ID: &str = "{use_version_id: Bool}";
         const USE_MONETIZED: &str = "{use_monetized: Bool}";
         const USE_COUNTRY: &str = "{use_country: Bool}";
@@ -502,7 +529,7 @@ mod query {
                 widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
                 if({USE_PROJECT_ID}, project_id, 0) AS project_id,
                 if({USE_DOMAIN}, domain, '') AS domain,
-                if({USE_SITE_PATH}, site_path, '') AS site_path,
+                if({USE_USER_AGENT}, user_agent, '') AS user_agent,
                 if({USE_VERSION_ID}, version_id, 0) AS version_id,
                 if({USE_MONETIZED}, CAST(user_id != 0 AS Int8), -1) AS monetized,
                 if({USE_COUNTRY}, country, '') AS country,
@@ -517,7 +544,7 @@ mod query {
                 -- not the possibly-zero one,
                 -- by using `downloads.project_id` instead of `project_id`
                 AND downloads.project_id IN {PROJECT_IDS}
-            GROUP BY bucket, project_id, domain, site_path, version_id, monetized, country, reason, game_version, loader"
+            GROUP BY bucket, project_id, domain, user_agent, version_id, monetized, country, reason, game_version, loader"
         )
     };
 
@@ -737,7 +764,7 @@ pub async fn fetch_analytics(
             &[
                 ("use_project_id", uses(F::ProjectId)),
                 ("use_domain", uses(F::Domain)),
-                ("use_site_path", uses(F::SitePath)),
+                ("use_user_agent", uses(F::UserAgent)),
                 ("use_version_id", uses(F::VersionId)),
                 ("use_monetized", uses(F::Monetized)),
                 ("use_country", uses(F::Country)),
@@ -756,7 +783,11 @@ pub async fn fetch_analytics(
                     source_project: row.project_id.into(),
                     metrics: ProjectMetrics::Downloads(ProjectDownloads {
                         domain: none_if_empty(row.domain),
-                        site_path: none_if_empty(row.site_path),
+                        user_agent: if uses(F::UserAgent) {
+                            normalize_download_source(&row.user_agent)
+                        } else {
+                            None
+                        },
                         version_id: none_if_zero_version_id(row.version_id),
                         monetized: match row.monetized {
                             0 => Some(false),
@@ -1016,6 +1047,70 @@ fn none_if_zero_version_id(v: DBVersionId) -> Option<VersionId> {
     if v.0 == 0 { None } else { Some(v.into()) }
 }
 
+#[derive(Debug, Clone, Copy)]
+enum DownloadSourcePattern {
+    Named(&'static str),
+    Website,
+    ModrinthApp,
+    ModrinthHosting,
+}
+
+impl DownloadSourcePattern {
+    fn into_source(self) -> DownloadSource {
+        match self {
+            Self::Named(name) => DownloadSource::Named(name.into()),
+            Self::Website => DownloadSource::Website,
+            Self::ModrinthApp => DownloadSource::ModrinthApp,
+            Self::ModrinthHosting => DownloadSource::ModrinthHosting,
+        }
+    }
+}
+
+static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
+    LazyLock::new(|| {
+        use DownloadSourcePattern as P;
+
+        [
+            (r"^modrinth/kyros/", P::ModrinthApp),
+            (r"^modrinth/theseus/", P::ModrinthApp),
+            (r"^MultiMC/", P::Named("MultiMC")),
+            (r"^PrismLauncher/", P::Named("Prism Launcher")),
+            (r"^PolyMC/", P::Named("PolyMC")),
+            (r"^FCL/", P::Named("FCL")),
+            (r"^PCL2/", P::Named("PCL2")),
+            (r"^HMCL/", P::Named("HMCL")),
+            (r"^Lunar Client Launcher", P::Named("Lunar Client")),
+            (r"^PojavLauncher", P::Named("PojavLauncher")),
+            (r"^ATLauncher/", P::Named("ATLauncher")),
+            (r"FeatherLauncher/", P::Named("Feather Client")),
+            (
+                r"^FeatherMC/Feather Client Rust Launcher/",
+                P::Named("Feather Client"),
+            ),
+            (r"Feather/[0-9A-Za-z]+", P::Named("Feather Client")),
+            (r"^PandoraLauncher/", P::Named("Pandora Launcher")),
+            (
+                r"^(Mozilla/|Chrome/|Chromium/|Firefox/|Safari/|AppleWebKit/|Edg/|OPR/)",
+                P::Website,
+            ),
+        ]
+        .into_iter()
+        .map(|(pattern, source)| {
+            (
+                Regex::new(pattern)
+                    .expect("download source regex should be valid"),
+                source,
+            )
+        })
+        .collect()
+    });
+
+fn normalize_download_source(user_agent: &str) -> Option<DownloadSource> {
+    DOWNLOAD_SOURCE_PATTERNS.iter().find_map(|(regex, source)| {
+        regex.is_match(user_agent).then(|| source.into_source())
+    })
+}
+
 fn condense_country(country: String, count: u64) -> String {
     // Every country under '50' (view or downloads) should be condensed into 'XX'
     if count < 50 {
@@ -1169,6 +1264,51 @@ mod tests {
     use serde_json::json;
 
     use super::*;
+
+    #[test]
+    fn normalizes_download_sources() {
+        let cases = [
+            ("MultiMC/5.0", Some(DownloadSource::Named("MultiMC".into()))),
+            (
+                "PrismLauncher/6.1",
+                Some(DownloadSource::Named("Prism Launcher".into())),
+            ),
+            (
+                "modrinth/theseus/0.8.6 (support@modrinth.com)",
+                Some(DownloadSource::ModrinthApp),
+            ),
+            (
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15",
+                Some(DownloadSource::Website),
+            ),
+            ("curl/8.7.1", None),
+        ];
+
+        for (user_agent, source) in cases {
+            assert_eq!(normalize_download_source(user_agent), source);
+        }
+    }
+
+    #[test]
+    fn download_source_serializes_as_raw_string() {
+        assert_eq!(
+            serde_json::to_value(DownloadSource::Named("MultiMC".into()))
+                .unwrap(),
+            json!("MultiMC")
+        );
+        assert_eq!(
+            serde_json::to_value(DownloadSource::Website).unwrap(),
+            json!("website")
+        );
+        assert_eq!(
+            serde_json::to_value(DownloadSource::ModrinthApp).unwrap(),
+            json!("modrinth_app")
+        );
+        assert_eq!(
+            serde_json::to_value(DownloadSource::Other).unwrap(),
+            json!("other")
+        );
+    }
 
     #[test]
     fn response_format() {
