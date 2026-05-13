@@ -1,6 +1,6 @@
 <template>
 	<section
-		class="relative flex flex-col overflow-hidden rounded-2xl border border-solid border-surface-5 bg-surface-3"
+		class="relative flex flex-col rounded-2xl border border-solid border-surface-5 bg-surface-3"
 	>
 		<AnalyticsLoadingBar :loading="isDataLoading" />
 		<div class="flex w-full flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
@@ -12,6 +12,10 @@
 				</div>
 
 				<div class="flex items-center gap-3">
+					<div v-if="hasChartEvents" class="inline-flex items-center gap-2">
+						<label for="events-toggle" class="cursor-pointer text-sm text-secondary">Events</label>
+						<Toggle id="events-toggle" v-model="showChartEvents" small />
+					</div>
 					<div v-if="canUseRatioMode" class="inline-flex items-center gap-2">
 						<label for="ratio-mode-toggle" class="cursor-pointer text-sm text-secondary"
 							>Ratio</label
@@ -100,10 +104,21 @@
 								:active-stat="activeStat"
 								:pinned-slice-index="pinnedSliceIndex"
 								@hover="onChartHover"
+								@geometry="onChartGeometry"
 								@pinned-drag="onPinnedDrag"
 								@range-select="onRangeSelect"
 							/>
 						</ClientOnly>
+						<AnalyticsChartEvents
+							v-if="showChartEvents"
+							:events="dummyAnalyticsChartEvents"
+							:active-stat="activeStat"
+							:chart-start="chartRangeBounds?.start ?? null"
+							:chart-end="chartRangeBounds?.end ?? null"
+							:geometry="chartGeometry"
+							:container-width="containerSize.width"
+							:container-height="containerSize.height"
+						/>
 						<div
 							v-if="showHoverGuide"
 							aria-hidden="true"
@@ -165,7 +180,11 @@ import {
 	ensureMinimumTimeRange,
 	getDefaultAnalyticsGroupByForDurationMinutes,
 } from '../query-builder/timeframe-picker/timeframe'
-import AnalyticsChart, { type AnalyticsChartRangeSelectPayload } from './AnalyticsChart.client.vue'
+import AnalyticsChart, {
+	type AnalyticsChartGeometryPayload,
+	type AnalyticsChartRangeSelectPayload,
+} from './AnalyticsChart.client.vue'
+import AnalyticsChartEvents, { type AnalyticsChartEvent } from './AnalyticsChartEvents.vue'
 import AnalyticsChartTooltip, { type AnalyticsChartTooltipEntry } from './AnalyticsChartTooltip.vue'
 import {
 	buildChartDatasets,
@@ -202,6 +221,7 @@ const isDataLoading = computed(() => isLoading.value)
 
 const activeViewMode = ref<ViewMode>('line')
 const isRatioMode = ref(false)
+const showChartEvents = ref(true)
 
 const viewModeTabs: TabsTab[] = [
 	{ value: 'line', label: 'Line', icon: ChartSplineIcon },
@@ -216,6 +236,33 @@ const titleByStat: Record<AnalyticsDashboardStat, string> = {
 	playtime: 'Playtime Over Time',
 }
 
+const dummyAnalyticsChartEvents: AnalyticsChartEvent[] = [
+	{
+		title: 'Analytics outage',
+		startDate: '2025-05-12T00:00:00.000Z',
+		endDate: '2025-05-13T00:00:00.000Z',
+	},
+	{
+		title: 'Ad revenue over reported, resulting in a potential spike.',
+		announcementUrl: 'https://modrinth.com/news',
+		startDate: '2025-05-04T00:00:00.000Z',
+		endDate: '2025-05-04T00:00:00.000Z',
+	},
+	{
+		title: 'China CDN ingest outage',
+		announcementUrl: 'https://modrinth.com/news',
+		startDate: '2025-04-02T00:00:00.000Z',
+		endDate: '2025-04-04T00:00:00.000Z',
+	},
+	{
+		title: 'Modrinth App release',
+		announcementUrl: 'https://modrinth.com/news',
+		startDate: '2023-08-07T00:00:00.000Z',
+		endDate: '2023-08-07T00:00:00.000Z',
+	},
+]
+
+const hasChartEvents = computed(() => dummyAnalyticsChartEvents.length > 0)
 const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 const hasAvailableProjects = computed(() => projects.value.length > 0)
 
@@ -337,6 +384,7 @@ const allChartDatasets = computed(() =>
 )
 
 const chartContainer = ref<HTMLElement | null>(null)
+const chartGeometry = ref<AnalyticsChartGeometryPayload | null>(null)
 const containerSize = reactive({ width: 0, height: 0 })
 let resizeObserver: ResizeObserver | null = null
 let clearIgnoredChartClickTimeout: ReturnType<typeof setTimeout> | null = null
@@ -427,6 +475,10 @@ function onPinnedDrag(payload: HoverState) {
 	if (isDataLoading.value || !isHoverPinned.value) return
 	ignoreUpcomingChartClick()
 	setHoverState(payload)
+}
+
+function onChartGeometry(payload: AnalyticsChartGeometryPayload) {
+	chartGeometry.value = payload
 }
 
 function getDefaultGroupByForRange(start: Date, end: Date) {

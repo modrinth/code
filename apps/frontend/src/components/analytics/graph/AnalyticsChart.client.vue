@@ -58,6 +58,16 @@ export type AnalyticsChartRangeSelectPayload = {
 	endSliceIndex: number
 }
 
+export type AnalyticsChartGeometryPayload = {
+	left: number
+	right: number
+	top: number
+	bottom: number
+	width: number
+	height: number
+	xPositions: number[]
+}
+
 const props = defineProps<{
 	type: 'line' | 'bar'
 	fill: boolean
@@ -73,6 +83,7 @@ const props = defineProps<{
 const emit = defineEmits<{
 	(event: 'hover' | 'pinned-drag', payload: AnalyticsChartHoverPayload): void
 	(event: 'range-select', payload: AnalyticsChartRangeSelectPayload): void
+	(event: 'geometry', payload: AnalyticsChartGeometryPayload): void
 }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -112,6 +123,13 @@ let rangeSelectStartSliceIndex: number | null = null
 let rangeSelectLastSliceIndex: number | null = null
 let isRangeSelecting = false
 
+const geometryPlugin = {
+	id: 'analytics-chart-geometry',
+	afterLayout(chart: Chart) {
+		emitChartGeometry(chart)
+	},
+}
+
 const rangeSelection = reactive({
 	visible: false,
 	startX: 0,
@@ -134,6 +152,35 @@ const rangeSelectionStyle = computed(() => {
 
 function getChartEvents(): ChartEvents {
 	return props.pinnedSliceIndex === null ? [...chartInteractionEvents] : []
+}
+
+function emitChartGeometry(chart: Chart | null = chartInstance) {
+	if (!chart || !canvasRef.value) return
+
+	const chartArea = chart.chartArea
+	const rect = canvasRef.value.getBoundingClientRect()
+	if (
+		!Number.isFinite(chartArea.left) ||
+		!Number.isFinite(chartArea.right) ||
+		!Number.isFinite(chartArea.top) ||
+		!Number.isFinite(chartArea.bottom) ||
+		chartArea.right <= chartArea.left ||
+		chartArea.bottom <= chartArea.top
+	) {
+		return
+	}
+
+	emit('geometry', {
+		left: chartArea.left,
+		right: chartArea.right,
+		top: chartArea.top,
+		bottom: chartArea.bottom,
+		width: rect.width,
+		height: rect.height,
+		xPositions: props.labels
+			.map((_, index) => chart.scales.x.getPixelForValue(index))
+			.filter((x) => Number.isFinite(x)),
+	})
 }
 
 function getPinnedActiveElements(sliceIndex: number) {
@@ -345,6 +392,7 @@ function buildConfig(): ChartConfiguration {
 
 	return {
 		type: props.type,
+		plugins: [geometryPlugin],
 		data: {
 			labels: props.labels,
 			datasets: buildDatasets() as ChartConfiguration['data']['datasets'],
@@ -439,6 +487,7 @@ function handleExternalTooltip(context: ExternalTooltipContext) {
 function createChart() {
 	if (!canvasRef.value) return
 	chartInstance = new Chart(canvasRef.value, buildConfig())
+	emitChartGeometry()
 }
 
 function refreshChart() {
@@ -448,6 +497,7 @@ function refreshChart() {
 	chartInstance.options = config.options ?? {}
 	chartInstance.update('none')
 	applyPinnedSliceState()
+	emitChartGeometry()
 }
 
 function applyPinnedSliceState() {
@@ -458,6 +508,7 @@ function applyPinnedSliceState() {
 		props.pinnedSliceIndex === null ? [] : getPinnedActiveElements(props.pinnedSliceIndex),
 	)
 	chartInstance.update('none')
+	emitChartGeometry()
 }
 
 function handleCanvasLeave() {
@@ -610,7 +661,7 @@ watch(
 )
 
 watch(
-	() => [props.datasets, props.labels, props.xAxisTickLimit, props.activeStat],
+	() => [props.datasets, props.labels, props.xAxisTickLimit, props.activeStat, props.ratioMode],
 	() => {
 		refreshChart()
 	},
