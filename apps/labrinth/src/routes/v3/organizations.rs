@@ -334,34 +334,40 @@ pub async fn organization_notes_edit(
             .ok_or(ApiError::NotFound)?;
 
     let mut transaction = pool.begin().await?;
-    let updated = if expected_version == 0 {
-        DBModerationNote::insert(
+    if let Some(expected) = expected_version {
+        let updated = DBModerationNote::update(
             None,
             Some(organization.id),
             user.id.into(),
+            expected,
             new_note.notes.as_deref(),
             new_note.user_rating,
             &mut transaction,
         )
-        .await?
-    } else {
-        DBModerationNote::update(
-            None,
-            Some(organization.id),
-            user.id.into(),
-            expected_version,
-            new_note.notes.as_deref(),
-            new_note.user_rating,
-            &mut transaction,
-        )
-        .await?
-    };
+        .await?;
 
-    if updated.is_none() {
-        return Err(ApiError::PreconditionFailed(
-            "moderation note version does not match".to_string(),
-        ));
-    }
+        if updated.is_none() {
+            return Err(ApiError::PreconditionFailed(
+                "moderation note version does not match".to_string(),
+            ));
+        }
+    } else {
+        let updated = DBModerationNote::insert(
+            None,
+            Some(organization.id),
+            user.id.into(),
+            new_note.notes.as_deref(),
+            new_note.user_rating,
+            &mut transaction,
+        )
+        .await?;
+
+        if updated.is_none() {
+            return Err(ApiError::PreconditionRequired(
+                "moderation note version does not match".to_string(),
+            ));
+        }
+    };
 
     transaction.commit().await?;
     DBModerationNote::clear_organization_cache(organization.id, &redis).await?;

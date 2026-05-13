@@ -46,12 +46,12 @@ impl PatchModerationNote {
     }
 }
 
-pub fn parse_if_match_header(req: &HttpRequest) -> Result<i32, ApiError> {
-    let value = req.headers().get(IF_MATCH).ok_or_else(|| {
-        ApiError::PreconditionRequired(
-            "`if-match` header is required".to_string(),
-        )
-    })?;
+pub fn parse_if_match_header(
+    req: &HttpRequest,
+) -> Result<Option<i32>, ApiError> {
+    let Some(value) = req.headers().get(IF_MATCH) else {
+        return Ok(None);
+    };
 
     let value = value.to_str().map_err(|_| {
         ApiError::InvalidInput(
@@ -59,9 +59,10 @@ pub fn parse_if_match_header(req: &HttpRequest) -> Result<i32, ApiError> {
         )
     })?;
 
-    value.parse::<i32>().map_err(|_| {
+    Some(value.parse::<i32>().map_err(|_| {
         ApiError::InvalidInput(
             "`if-match` header must be a valid integer".to_string(),
         )
-    })
+    }))
+    .transpose()
 }
