@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{Row, postgres::PgRow};
 
 use crate::database::redis::RedisPool;
 
@@ -25,21 +24,6 @@ pub struct DBModerationNote {
 }
 
 impl DBModerationNote {
-    fn from_row(row: PgRow) -> Result<Self, sqlx::Error> {
-        Ok(Self {
-            user_id: row.try_get::<Option<i64>, _>("user_id")?.map(DBUserId),
-            organization_id: row
-                .try_get::<Option<i64>, _>("organization_id")?
-                .map(DBOrganizationId),
-            last_modified: row.try_get("last_modified")?,
-            created_at: row.try_get("created_at")?,
-            last_author: DBUserId(row.try_get("last_author")?),
-            version: row.try_get("version")?,
-            notes: row.try_get("notes")?,
-            user_rating: row.try_get("user_rating")?,
-        })
-    }
-
     pub async fn get_many_users<'a, E>(
         user_ids: &[DBUserId],
         exec: E,
@@ -77,20 +61,29 @@ impl DBModerationNote {
             return Ok(notes);
         }
 
-        let rows = sqlx::query(
-			r#"
+        let rows = sqlx::query!(
+            r#"
 			SELECT user_id, organization_id, last_modified, created_at, last_author, version, notes, user_rating
 			FROM moderation_notes
 			WHERE user_id = ANY($1)
 			"#,
-		)
-		.bind(&missing_ids)
-		.fetch_all(exec)
-		.await?;
+            &missing_ids,
+        )
+        .fetch_all(exec)
+        .await?;
 
         let mut redis = redis.connect().await?;
         for row in rows {
-            let note = Self::from_row(row)?;
+            let note = Self {
+                user_id: row.user_id.map(DBUserId),
+                organization_id: row.organization_id.map(DBOrganizationId),
+                last_modified: row.last_modified,
+                created_at: row.created_at,
+                last_author: DBUserId(row.last_author),
+                version: row.version,
+                notes: row.notes,
+                user_rating: row.user_rating,
+            };
 
             if let Some(user_id) = note.user_id {
                 redis
@@ -158,20 +151,29 @@ impl DBModerationNote {
             return Ok(notes);
         }
 
-        let rows = sqlx::query(
-			r#"
+        let rows = sqlx::query!(
+            r#"
 			SELECT user_id, organization_id, last_modified, created_at, last_author, version, notes, user_rating
 			FROM moderation_notes
 			WHERE organization_id = ANY($1)
 			"#,
-		)
-		.bind(&missing_ids)
-		.fetch_all(exec)
-		.await?;
+            &missing_ids,
+        )
+        .fetch_all(exec)
+        .await?;
 
         let mut redis = redis.connect().await?;
         for row in rows {
-            let note = Self::from_row(row)?;
+            let note = Self {
+                user_id: row.user_id.map(DBUserId),
+                organization_id: row.organization_id.map(DBOrganizationId),
+                last_modified: row.last_modified,
+                created_at: row.created_at,
+                last_author: DBUserId(row.last_author),
+                version: row.version,
+                notes: row.notes,
+                user_rating: row.user_rating,
+            };
 
             if let Some(organization_id) = note.organization_id {
                 redis
@@ -215,8 +217,8 @@ impl DBModerationNote {
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let row = sqlx::query(
-			r#"
+        let row = sqlx::query!(
+            r#"
 			WITH updated AS (
 				UPDATE moderation_notes
 				SET
@@ -237,20 +239,47 @@ impl DBModerationNote {
 				ON CONFLICT DO NOTHING
 				RETURNING user_id, organization_id, last_modified, created_at, last_author, version, notes, user_rating
 			)
-			SELECT * FROM updated
+			SELECT
+				user_id,
+				organization_id,
+				last_modified AS "last_modified!",
+				created_at AS "created_at!",
+				last_author AS "last_author!",
+				version AS "version!",
+				notes AS "notes!",
+				user_rating AS "user_rating!"
+			FROM updated
 			UNION ALL
-			SELECT * FROM inserted
+			SELECT
+				user_id,
+				organization_id,
+				last_modified AS "last_modified!",
+				created_at AS "created_at!",
+				last_author AS "last_author!",
+				version AS "version!",
+				notes AS "notes!",
+				user_rating AS "user_rating!"
+			FROM inserted
 			"#,
-		)
-		.bind(user_id.0)
-		.bind(last_author.0)
-		.bind(expected_version)
-		.bind(notes)
-		.bind(user_rating)
-		.fetch_optional(exec)
-		.await?;
+            user_id as DBUserId,
+            last_author as DBUserId,
+            expected_version,
+            notes,
+            user_rating,
+        )
+        .fetch_optional(exec)
+        .await?;
 
-        Ok(row.map(Self::from_row).transpose()?)
+        Ok(row.map(|row| Self {
+            user_id: row.user_id.map(DBUserId),
+            organization_id: row.organization_id.map(DBOrganizationId),
+            last_modified: row.last_modified,
+            created_at: row.created_at,
+            last_author: DBUserId(row.last_author),
+            version: row.version,
+            notes: row.notes,
+            user_rating: row.user_rating,
+        }))
     }
 
     pub async fn patch_organization<'a, E>(
@@ -264,8 +293,8 @@ impl DBModerationNote {
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let row = sqlx::query(
-			r#"
+        let row = sqlx::query!(
+            r#"
 			WITH updated AS (
 				UPDATE moderation_notes
 				SET
@@ -286,20 +315,47 @@ impl DBModerationNote {
 				ON CONFLICT DO NOTHING
 				RETURNING user_id, organization_id, last_modified, created_at, last_author, version, notes, user_rating
 			)
-			SELECT * FROM updated
+			SELECT
+				user_id,
+				organization_id,
+				last_modified AS "last_modified!",
+				created_at AS "created_at!",
+				last_author AS "last_author!",
+				version AS "version!",
+				notes AS "notes!",
+				user_rating AS "user_rating!"
+			FROM updated
 			UNION ALL
-			SELECT * FROM inserted
+			SELECT
+				user_id,
+				organization_id,
+				last_modified AS "last_modified!",
+				created_at AS "created_at!",
+				last_author AS "last_author!",
+				version AS "version!",
+				notes AS "notes!",
+				user_rating AS "user_rating!"
+			FROM inserted
 			"#,
-		)
-		.bind(organization_id.0)
-		.bind(last_author.0)
-		.bind(expected_version)
-		.bind(notes)
-		.bind(user_rating)
-		.fetch_optional(exec)
-		.await?;
+            organization_id as DBOrganizationId,
+            last_author as DBUserId,
+            expected_version,
+            notes,
+            user_rating,
+        )
+        .fetch_optional(exec)
+        .await?;
 
-        Ok(row.map(Self::from_row).transpose()?)
+        Ok(row.map(|row| Self {
+            user_id: row.user_id.map(DBUserId),
+            organization_id: row.organization_id.map(DBOrganizationId),
+            last_modified: row.last_modified,
+            created_at: row.created_at,
+            last_author: DBUserId(row.last_author),
+            version: row.version,
+            notes: row.notes,
+            user_rating: row.user_rating,
+        }))
     }
 
     pub async fn clear_user_cache(
