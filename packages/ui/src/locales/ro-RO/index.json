@@ -710,9 +710,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Eșuat"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listat"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
@@ -748,9 +745,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Esuat"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Reținut"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copiați codul în clipboard"

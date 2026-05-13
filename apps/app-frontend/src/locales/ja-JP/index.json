@@ -104,12 +104,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "認証サーバーにアクセスできません"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "サーバーをインスタンスに追加"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "サーバーを自身のインスタンスに追加"
-  },
   "app.browse.add-to-instance": {
     "message": "インスタンスに追加"
   },
@@ -131,20 +125,8 @@
   "app.browse.hide-added-servers": {
     "message": "既に追加済みのサーバーを非表示にする"
   },
-  "app.browse.hide-installed-content": {
-    "message": "既にインストールされているコンテンツを非表示にする"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "コンテンツをインスタンスにインストールする"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modパック"
-  },
-  "app.browse.server.install": {
-    "message": "インストール"
-  },
-  "app.browse.server.installed": {
-    "message": "インストール済み"
   },
   "app.browse.server.installing": {
     "message": "インストール中"
@@ -169,9 +151,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modパック名"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "パックに含めるファイルとフォルダーを選択"
   },
   "app.export-modal.version-number-label": {
     "message": "バージョン番号"
@@ -691,6 +670,24 @@
   },
   "instance.worlds.world_in_use": {
     "message": "ワールドは使用中"
+  },
+  "minecraft-account.add-account": {
+    "message": "アカウントを追加"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraftアカウント"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "サインインしていません"
+  },
+  "minecraft-account.remove-account": {
+    "message": "アカウントを一覧から削除"
+  },
+  "minecraft-account.select-account": {
+    "message": "アカウントを選択"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Minecraftにサインイン"
   },
   "search.filter.locked.instance": {
     "message": "インスタンスによる条件"

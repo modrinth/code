@@ -1,1 +1,20 @@
-CLAUDE.md
+- Use `ApiError` as the error type for API routes
+- Prefer `ApiError::Internal` and `ApiError::Request` over `ApiError::InvalidInput`
+  - Use `eyre!` to construct a value for `Internal` and `Request` variants
+- Error messages (both for errors and exceptions) must be formatted as per the Rust API guidelines:
+  - lowercase message
+  - no trailing punctuation
+  - wrap code items e.g. type names in backticks
+- Prefer `wrap_internal_err`, `wrap_request_err` when attaching context to an existing error (like Anyhow `context` or Eyre `wrap_err`)
+- All operations should ideally have some context attached
+  - Database operations can have a message like `.wrap_internal_err("failed to fetch XYZ")`
+- You can perform real-time queries against the databases in the Docker Compose
+  - `docker exec labrinth-postgres psql -c "select 1"`
+  - `docker exec labrinth-redis redis-cli flushall`
+  - `docker exec labrinth-clickhouse clickhouse-client "select 1"`
+  - On some machines, you may have to use `podman` instead of `docker` - check which one is available first
+- Hardcoded credentials for admin:
+  - `Authorization: Bearer mra_admin` for default admin user
+  - `Authorization: Bearer mra_user` for a regular user
+  - `Modrinth-Admin: feedbeef` as admin key
+- If some steps require you to create a project/mod or version for testing, ask the user to go into the web frontend and manually create a project/version

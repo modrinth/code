@@ -47,7 +47,7 @@
 		"@modrinth/ui": "workspace:*",
 		"@modrinth/utils": "workspace:*",
 		"@sentry/nuxt": "^10.33.0",
-		"@tanstack/vue-query": "^5.90.7",
+		"@tanstack/vue-query": "5.90.7",
 		"@types/three": "^0.172.0",
 		"@vitejs/plugin-vue": "^6.0.3",
 		"@vue-email/components": "^0.0.21",

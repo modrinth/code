@@ -520,3 +520,6 @@ improvedigital.com, 1532, RESELLER
 opera.com, pub6871903319744, RESELLER, 55a0c5fd61378de3
 mintegral.com, 10003, RESELLER
 blis.com, 33, RESELLER, 61453ae19a4b73f4
+
+#Yahoo
+yahoo.com, 100033, DIRECT, e1a5b5b6e3255540

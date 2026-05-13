@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nie udało się połączyć się z serwerami uwierzytelniania"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Dodaj serwer do instancji"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "Dodaj serwery do swojej instancji"
+    "message": "Dodawanie serwera do instancji"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Dodaj do instancji"
   },
   "app.browse.add-to-instance": {
     "message": "Dodaj do instancji"
@@ -122,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Już dodano"
   },
+  "app.browse.back-to-instance": {
+    "message": "Powrót do instancji"
+  },
   "app.browse.discover-content": {
     "message": "Odkrywaj zawartość"
   },
@@ -131,20 +134,8 @@
   "app.browse.hide-added-servers": {
     "message": "Ukryj już dodane serwery"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Ukryj już dodane zasoby"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Zainstaluj zasoby do instancji"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Paczki modów"
-  },
-  "app.browse.server.install": {
-    "message": "Zainstaluj"
-  },
-  "app.browse.server.installed": {
-    "message": "Zainstalowano"
   },
   "app.browse.server.installing": {
     "message": "Instalowanie"
@@ -169,9 +160,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nazwa paczki modów"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Wybierz pliki i foldery, które mają znaleźć się w paczce"
   },
   "app.export-modal.version-number-label": {
     "message": "Numer wersji"
@@ -301,6 +289,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Aktualizacja jest wymagana, aby grać w {name}. Proszę zaktualizować do najnowszej wersji, aby uruchomić grę."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Ten projekt jest już zainstalowany"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Powrót do przeglądania"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Zainstaluj zasoby do instancji"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Tryb dewelopera włączony."
@@ -691,6 +688,21 @@
   },
   "instance.worlds.world_in_use": {
     "message": "Świat jest w użytku"
+  },
+  "minecraft-account.add-account": {
+    "message": "Dodaj konto"
+  },
+  "minecraft-account.label": {
+    "message": "Konto Minecraft"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Usuń konto"
+  },
+  "minecraft-account.select-account": {
+    "message": "Wybierz konto"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Zaloguj się do Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Podane przez instancję"

@@ -12,7 +12,7 @@
     "message": "设为主实例"
   },
   "app.action-bar.no-instances-running": {
-    "message": "没有实例正在运行"
+    "message": "没有运行中的实例"
   },
   "app.action-bar.offline": {
     "message": "离线"
@@ -60,10 +60,10 @@
     "message": "默认起始页"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "在皮肤页面中禁用你玩家头顶上的名称标签。"
+    "message": "在皮肤页面中禁用你玩家头顶上的名牌。"
   },
   "app.appearance-settings.hide-nametag.title": {
-    "message": "隐藏名称标签"
+    "message": "隐藏名牌"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
     "message": "在主页的“快速回到”部分包含最近的世界。"
@@ -104,14 +104,14 @@
   "app.auth-servers.unreachable.header": {
     "message": "无法连接到身份验证服务器"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "将服务器添加到实例实例"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "将服务器添加到你的实例"
+    "message": "将服务器添加到实例"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "添加到实例"
   },
   "app.browse.add-to-instance": {
-    "message": "添加到实例实例"
+    "message": "添加到实例"
   },
   "app.browse.add-to-instance-name": {
     "message": "添加到 {instanceName}"
@@ -120,7 +120,10 @@
     "message": "已添加"
   },
   "app.browse.already-added": {
-    "message": "已添加"
+    "message": "已添加过"
+  },
+  "app.browse.back-to-instance": {
+    "message": "返回实例"
   },
   "app.browse.discover-content": {
     "message": "发现内容"
@@ -131,20 +134,11 @@
   "app.browse.hide-added-servers": {
     "message": "隐藏已添加的服务器"
   },
-  "app.browse.hide-installed-content": {
-    "message": "隐藏已安装的内容"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "将内容安装到实例中"
-  },
   "app.browse.project-type.modpacks": {
     "message": "整合包"
   },
-  "app.browse.server.install": {
-    "message": "安装"
-  },
-  "app.browse.server.installed": {
-    "message": "已安装"
+  "app.browse.server-instance-content-warning": {
+    "message": "加入服务器时，添加内容可能会破坏兼容性。当更新服务器实例内容时任何添加的内容也将丢失。"
   },
   "app.browse.server.installing": {
     "message": "安装中"
@@ -164,6 +158,9 @@
   "app.export-modal.header": {
     "message": "导出整合包"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "包含 \"{file}\"？"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "整合包名称"
   },
@@ -171,7 +168,7 @@
     "message": "整合包名称"
   },
   "app.export-modal.select-files-label": {
-    "message": "选择要包含在包中的文件和文件夹"
+    "message": "配置此导出中包含哪些文件"
   },
   "app.export-modal.version-number-label": {
     "message": "版本号"
@@ -301,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "需要更新至最新版本才能运行 {name}。请更新后启动游戏。"
+  },
+  "app.project.install-button.already-installed": {
+    "message": "此项目已安装"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "返回浏览器"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "将内容安装到实例中"
   },
   "app.settings.developer-mode-enabled": {
     "message": "开发者模式已启用。"

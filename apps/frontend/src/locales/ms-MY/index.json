@@ -848,8 +848,17 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Anda telah menggunakan had pengeluaran anda sebanyak <b>{withdrawLimit}</b>. Anda mesti melengkapkan borang cukai untuk mengeluarkan lebih banyak wang."
   },
+  "dashboard.notifications.history.label": {
+    "message": "Sejarah"
+  },
+  "dashboard.projects.links.description": {
+    "message": "Sebarang pautan yang anda nyatakan di bawah akan ditulis ganti pada setiap projek yang dipilih. Sebarang pautan yang anda biarkan kosong akan diabaikan. Anda boleh memadamkan pautan daripada semua projek yang dipilih menggunakan butang tong sampah."
+  },
   "dashboard.projects.sort.option.name": {
     "message": "Nama"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Status"
   },
   "dashboard.projects.sort.option.type": {
     "message": "Jenis"
@@ -862,6 +871,9 @@
   },
   "dashboard.projects.table.name": {
     "message": "Nama"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
   },
   "dashboard.projects.table.type": {
     "message": "Jenis"
@@ -1021,6 +1033,15 @@
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Sila lengkapkan borang cukai"
+  },
+  "discover.seo.description": {
+    "message": "Cari dan layari beribu-ribu {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}} Minecraft di Modrinth dengan hasil carian yang segera dan tepat. Penapis kami akan membantu anda mencari {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}} yang terbaik."
+  },
+  "discover.seo.title": {
+    "message": "Cari {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Cari {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Anda mungkin tersalah taip URL koleksi."
@@ -1721,9 +1742,6 @@
   "moderation.page.reports": {
     "message": "Laporan"
   },
-  "moderation.page.technicalReview": {
-    "message": "Penilaian Teknikal"
-  },
   "muralpay.account-type.checking": {
     "message": "Cek"
   },
@@ -2408,6 +2426,9 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Jika anda memasukkan kandungan yang tidak dihoskan di Modrinth, anda perlu memberitahu kami dari mana ia berasal dan mengesahkan bahawa anda mempunyai kebenaran untuk mengedarkan fail tersebut. Lihat <link>panduan kami</link> untuk mengetahui cara untuk melakukannya dengan betul!"
+  },
   "project.settings.title": {
     "message": "Tetapan"
   },
@@ -2425,6 +2446,9 @@
   },
   "project.versions.title": {
     "message": "Versi"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, other {Versi ini}} kini ditahan dan tidak disenaraikan secara umum. Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula fail tertentu yang disertakan dalam {count, plural, other {versi}} pek mod ini."
   },
   "report.already-reported": {
     "message": "Anda telah melaporkan {title}"

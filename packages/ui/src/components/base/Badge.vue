@@ -15,16 +15,16 @@
 
 		<!-- Project statuses -->
 		<template v-else-if="type === 'approved'">
-			<ListIcon aria-hidden="true" /> {{ formatMessage(messages.listedLabel) }}
+			<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.listedLabel) }}
 		</template>
 		<template v-else-if="type === 'approved-general'">
 			<CheckIcon aria-hidden="true" /> {{ formatMessage(messages.approvedLabel) }}
 		</template>
 		<template v-else-if="type === 'unlisted'">
-			<EyeOffIcon aria-hidden="true" /> {{ formatMessage(messages.unlistedLabel) }}
+			<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.unlistedLabel) }}
 		</template>
 		<template v-else-if="type === 'withheld'">
-			<EyeOffIcon aria-hidden="true" /> {{ formatMessage(messages.withheldLabel) }}
+			<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.withheldLabel) }}
 		</template>
 		<template v-else-if="type === 'private'">
 			<LockIcon aria-hidden="true" /> {{ formatMessage(messages.privateLabel) }}
@@ -89,9 +89,9 @@ import {
 	BugIcon,
 	CalendarIcon,
 	CheckIcon,
-	EyeOffIcon,
 	FileTextIcon,
-	ListIcon,
+	GlobeIcon,
+	LinkIcon,
 	LockIcon,
 	ModrinthIcon,
 	ScaleIcon,
@@ -134,7 +134,7 @@ const messages = defineMessages({
 	},
 	listedLabel: {
 		id: 'omorphia.component.badge.label.listed',
-		defaultMessage: 'Listed',
+		defaultMessage: 'Public',
 	},
 	moderatorLabel: {
 		id: 'omorphia.component.badge.label.moderator',
@@ -186,7 +186,7 @@ const messages = defineMessages({
 	},
 	withheldLabel: {
 		id: 'omorphia.component.badge.label.withheld',
-		defaultMessage: 'Withheld',
+		defaultMessage: 'Unlisted by staff',
 	},
 })
 const { formatMessage } = useVIntl()

@@ -241,7 +241,10 @@ const fontSize = computed(() => {
 <template>
 	<div
 		class="btn-wrapper"
-		:class="[{ outline: type === 'outlined', chip: type === 'chip' }, fontSize]"
+		:class="[
+			{ outline: type === 'outlined', transparent: type === 'transparent', chip: type === 'chip' },
+			fontSize,
+		]"
 		:style="`${colorVariables}--_height:${height};--_width:${width};--_radius: ${radius};--_padding-x:${paddingX};--_padding-y:${paddingY};--_gap:${gap};--_font-weight:${fontWeight};--_icon-size:${iconSize};--_outline-color:${color === 'standard' && type === 'outlined' ? 'var(--surface-5)' : 'currentColor'}`"
 	>
 		<slot />
@@ -277,20 +280,20 @@ const fontSize = computed(() => {
 		flex-shrink: 0;
 	}
 
-	&[disabled],
+	&[disabled]:not([disabled='false']),
 	&[disabled='true'],
 	&.disabled,
 	&.looks-disabled {
 		@apply opacity-50;
 	}
 
-	&[disabled],
+	&[disabled]:not([disabled='false']),
 	&[disabled='true'],
 	&.disabled {
 		@apply cursor-not-allowed;
 	}
 
-	&:not([disabled]):not([disabled='true']):not(.disabled) {
+	&:not([disabled]:not([disabled='false'])):not([disabled='true']):not(.disabled) {
 		@apply hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness] hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text];
 
 		&:hover svg:first-child,
@@ -309,8 +312,27 @@ const fontSize = computed(() => {
 	> *:first-child
 	> *:first-child
 	> :is(button, a, .button-like):first-child {
-	&:not([disabled]):not([disabled='true']):not(.disabled) {
+	&:not([disabled]:not([disabled='false'])):not([disabled='true']):not(.disabled) {
 		@apply active:scale-95;
+	}
+}
+
+.disable-advanced-rendering {
+	.btn-wrapper:not(.outline):not(.transparent) :deep(:is(button, a, .button-like):first-child),
+	.btn-wrapper:not(.outline):not(.transparent) :slotted(:is(button, a, .button-like):first-child),
+	.btn-wrapper:not(.outline):not(.transparent)
+		:slotted(*)
+		> :is(button, a, .button-like):first-child,
+	.btn-wrapper:not(.outline):not(.transparent)
+		:slotted(*)
+		> *:first-child
+		> :is(button, a, .button-like):first-child,
+	.btn-wrapper
+		:slotted(*)
+		> *:first-child
+		> *:first-child
+		> :is(button, a, .button-like):first-child {
+		@apply border border-[rgba(0,0,0,0.2)];
 	}
 }
 

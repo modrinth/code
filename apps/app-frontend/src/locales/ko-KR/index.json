@@ -104,12 +104,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "인증 서버에 연결할 수 없습니다"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "인스턴스에 서버 추가"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "인스턴스에 서버 추가"
-  },
   "app.browse.add-to-instance": {
     "message": "인스턴스에 추가"
   },
@@ -131,20 +125,8 @@
   "app.browse.hide-added-servers": {
     "message": "이미 추가된 서버 숨기기"
   },
-  "app.browse.hide-installed-content": {
-    "message": "이미 설치된 콘텐츠 숨기기"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "인스턴스에 콘텐츠 설치"
-  },
   "app.browse.project-type.modpacks": {
     "message": "모드팩"
-  },
-  "app.browse.server.install": {
-    "message": "설치"
-  },
-  "app.browse.server.installed": {
-    "message": "설치됨"
   },
   "app.browse.server.installing": {
     "message": "설치 중"
@@ -164,6 +146,9 @@
   "app.export-modal.header": {
     "message": "모드팩 내보내기"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "\"{file}\"(을)를 포함할까요?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "모드팩 이름"
   },
@@ -171,7 +156,7 @@
     "message": "모드팩 이름"
   },
   "app.export-modal.select-files-label": {
-    "message": "팩에 포함할 파일과 폴더 선택"
+    "message": "내보내기에 어느 파일이 포함될지 구성"
   },
   "app.export-modal.version-number-label": {
     "message": "버전 구분"
@@ -691,6 +676,24 @@
   },
   "instance.worlds.world_in_use": {
     "message": "사용 중인 세계"
+  },
+  "minecraft-account.add-account": {
+    "message": "계정 추가"
+  },
+  "minecraft-account.label": {
+    "message": "마인크래프트 계정"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "로그인하지 않음"
+  },
+  "minecraft-account.remove-account": {
+    "message": "계정 제거"
+  },
+  "minecraft-account.select-account": {
+    "message": "계정 선택"
+  },
+  "minecraft-account.sign-in": {
+    "message": "마인크래프트 계정으로 로그인"
   },
   "search.filter.locked.instance": {
     "message": "인스턴스에서 관리"

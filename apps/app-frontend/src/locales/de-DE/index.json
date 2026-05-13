@@ -12,7 +12,7 @@
     "message": "Zur primären Instanz machen"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Keine Instanzen laufen"
+    "message": "Keine aktiven Instanzen"
   },
   "app.action-bar.offline": {
     "message": "Offline"
@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Authentifizierungsserver sind nicht erreichbar"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Server zur Instanz hinzufügen"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "Server zu deiner Instanz hinzufügen"
+    "message": "Server zu Instanz hinzufügen"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Zu Instanz hinzufügen"
   },
   "app.browse.add-to-instance": {
     "message": "Zur Instanz hinzufügen"
@@ -122,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Bereits hinzugefügt"
   },
+  "app.browse.back-to-instance": {
+    "message": "Zurück zur Instanz"
+  },
   "app.browse.discover-content": {
     "message": "Inhalte entdecken"
   },
@@ -131,20 +134,8 @@
   "app.browse.hide-added-servers": {
     "message": "Bereits hinzugefügte Server ausblenden"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Bereits installierte Inhalte ausblenden"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Inhalt in Instanz installieren"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
-  },
-  "app.browse.server.install": {
-    "message": "Installieren"
-  },
-  "app.browse.server.installed": {
-    "message": "Installiert"
   },
   "app.browse.server.installing": {
     "message": "Wird installiert"
@@ -164,6 +155,9 @@
   "app.export-modal.header": {
     "message": "Modpack exportieren"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "\"{file}\" einschließen?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpackname"
   },
@@ -171,7 +165,7 @@
     "message": "Modpackname"
   },
   "app.export-modal.select-files-label": {
-    "message": "Wähle Dateien und Ordner aus, die in das Paket sollen"
+    "message": "Konfiguriere, welche Dateien in diesen Export enthalten sind"
   },
   "app.export-modal.version-number-label": {
     "message": "Versionsnummer"
@@ -301,6 +295,12 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Zum Spielen von {name} ist eine Aktualisierung erforderlich. Bitte aktualisiere auf die neueste Version, um das Spiel zu starten."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Dieses Projekt ist bereits installiert"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Inhalt in Instanz installieren"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Entwicklermodus aktiviert."

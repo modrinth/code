@@ -25,6 +25,7 @@
 					aria-modal="true"
 					:aria-labelledby="headerId"
 					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
+					v-bind="$attrs"
 					@keydown="handleKeyDown"
 				>
 					<div
@@ -345,6 +346,10 @@ function handleKeyDown(event: KeyboardEvent) {
 		}
 	}
 }
+
+defineOptions({
+	inheritAttrs: false,
+})
 </script>
 
 <style lang="scss" scoped>

@@ -95,8 +95,47 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Se réabonner au serveur"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Filtrer les résultats..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Aucun résultat trouvé pour votre requête !"
+  },
+  "browse.offline": {
+    "defaultMessage": "Vous êtes actuellement hors ligne. Connectez-vous à Internet pour rechercher sur Modrinth !"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Rechercher des {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressource} shader {shaders} plugin {plugins} datapack {packs de données} server {servers} other {projets}}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Projets sélectionnés"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Installer {count, plural, one {# projet} other {# projects}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# projet sélectionné} other {# projets sélectionnés}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Vous avez sélectionné {count, plural, one {# projet} other {# projets}} à installer. Installez-les maintenant ou retournez à l'écran précédent sans installer."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Projets sélectionnés non installés"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Ignorer"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Projets sélectionnés non installés"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Vue :"
+  },
   "button.accept": {
     "defaultMessage": "Accepter"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Ajouter le serveur à l'instance"
   },
   "button.affiliate-links": {
     "defaultMessage": "Liens affiliés"
@@ -167,6 +206,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Masquer les snapshots"
   },
+  "button.install": {
+    "defaultMessage": "Installer"
+  },
   "button.max": {
     "defaultMessage": "Max"
   },
@@ -184,6 +226,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Ouvrir le dossier"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Ouvrir avec Modrinth"
   },
   "button.play": {
     "defaultMessage": "Jouer"
@@ -278,8 +323,11 @@
   "collections.label.private": {
     "defaultMessage": "Privé"
   },
+  "content.card.select-project": {
+    "defaultMessage": "Sélectionner {project}"
+  },
   "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "Êtes vous sûr.e de vouloir télécharger la dernière mise à jour compatible de {count, plural, one {# projet} other {# projets}} ? Il est recommandé de mettre à jour le contenu un par un."
+    "defaultMessage": "Êtes vous sûr·e de vouloir télécharger la dernière mise à jour compatible de {count, plural, one {# projet} other {# projets}} ? Il est recommandé de mettre à jour le contenu un par un."
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Avertissement mise à jour"
@@ -758,6 +806,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Mettre le serveur en place"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "Non"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Non permanent"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Non identifié"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "Avec attribution"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "Avec attribution et source"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Oui"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Extraire le sommaire"
   },
@@ -1199,6 +1265,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Saisir la région/le département"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, one {# octet} other {# octets}}"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} Kio"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} Mio"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} Gio"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} Tio"
+  },
   "header.category.category": {
     "defaultMessage": "Catégorie"
   },
@@ -1234,6 +1315,9 @@
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Impossible de mettre à jour le contenu"
+  },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "Impossible d'installer le contenu"
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Impossible de charger le contenu du modpack"
@@ -1296,7 +1380,7 @@
     "defaultMessage": "Réinitialiser à l'intégration"
   },
   "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Cela enverra le serveur à l'intégration afin que la configuration puisse être terminée à nouveau. Êtes-vous sûr.e de vouloir continuer ?"
+    "defaultMessage": "Cela enverra le serveur à l'intégration afin que la configuration puisse être terminée à nouveau. Êtes-vous sûr·e de vouloir continuer ?"
   },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Réinitialiser à l'intégration"
@@ -1688,20 +1772,35 @@
   "label.filter-by": {
     "defaultMessage": "Filtrer par"
   },
+  "label.filters": {
+    "defaultMessage": "Filtres"
+  },
   "label.followed-projects": {
     "defaultMessage": "Projets favoris"
   },
   "label.game-version": {
     "defaultMessage": "Version du jeu"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "Masquer le contenu déjà installé"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "Masquer le contenu sélectionné"
+  },
   "label.installation-info": {
     "defaultMessage": "Information d'installation"
+  },
+  "label.installed": {
+    "defaultMessage": "Installé"
   },
   "label.installed-modpack": {
     "defaultMessage": "Modpack installé"
   },
   "label.installing": {
     "defaultMessage": "Installation..."
+  },
+  "label.installing-content": {
+    "defaultMessage": "Contenu en cours d'installation"
   },
   "label.loading": {
     "defaultMessage": "Chargement..."
@@ -1778,6 +1877,9 @@
   "label.select-all": {
     "defaultMessage": "Tout sélectionner"
   },
+  "label.selected": {
+    "defaultMessage": "Sélectionner"
+  },
   "label.selection-actions": {
     "defaultMessage": "Actions de sélection"
   },
@@ -1820,8 +1922,14 @@
   "label.username": {
     "defaultMessage": "Pseudo"
   },
+  "label.validating": {
+    "defaultMessage": "En cours de validation"
+  },
   "label.version": {
     "defaultMessage": "Version"
+  },
+  "label.view": {
+    "defaultMessage": "Voir"
   },
   "label.visibility": {
     "defaultMessage": "Visibilité"
@@ -1980,7 +2088,7 @@
     "defaultMessage": "Échoué"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listé"
+    "defaultMessage": "Publique"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Modérateur"
@@ -2019,7 +2127,7 @@
     "defaultMessage": "Raté"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Bloqué"
+    "defaultMessage": "Non répertorié par le personnel"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copier le code dans le presse-papiers"
@@ -2789,6 +2897,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "Envoyer"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Permissions"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "Versions"
   },
@@ -3082,6 +3193,54 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "Synchronisation du contenu en cours"
+  },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "Impossible d'installer"
+  },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "Une erreur interne est survenue lors de l'installation de la platforme. Veuillez réessayer plus tard."
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "Le loader ou la version Minecraft spécifiée n'a pas pu être installée. Elle est peut-être invalide ou non prise en charge."
+  },
+  "servers.installing-banner.error.modpack-install-failed": {
+    "defaultMessage": "Le modpack n'a pas pu être installé. Il est peut-être corrompu ou incompatible."
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "Cette version de modpack ne contient pas de fichier téléchargeable. Il a peut-être été empaqueté incorrectement."
+  },
+  "servers.installing-banner.error.unknown": {
+    "defaultMessage": "Une erreur inattendue est survenue lors de l'installation."
+  },
+  "servers.installing-banner.error.unsupported-loader-version": {
+    "defaultMessage": "Cette version de Minecraft ou ce loader n'est peut-être pas encore bien pris en charge par Modrinth Hosting."
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "Installation des add-ons..."
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "Installation du modpack..."
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "Installation de la platforme..."
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "Nous préparons votre serveur"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "Ajout de Java..."
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "Configuration du serveur..."
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "Téléchargement de mods..."
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "Organisation des fichiers..."
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "Mise en place de l'environnement..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Vous avez déjà un serveur ?"

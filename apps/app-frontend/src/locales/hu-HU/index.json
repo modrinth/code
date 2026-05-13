@@ -6,31 +6,40 @@
     "message": "Letöltések"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "További futó példányok elrejtése"
+    "message": "További futó profilok elrejtése"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Elsődleges példány létrehozása"
+    "message": "Beállítás elsődleges profilként"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Nincsenek futó példányok"
+    "message": "Nincsenek futó profilok"
   },
   "app.action-bar.offline": {
     "message": "Offline"
   },
   "app.action-bar.primary-instance": {
-    "message": "Elsődleges példány"
+    "message": "Elsődleges profil"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Profil megállítása"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Naplók megtekintése"
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Téma"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Ha olyan Modrinth Csomagfájlt (.mrpack) próbálsz telepíteni, amely nem a Modrinth szerverén található, a telepítés előtt gondoskodunk arról, hogy tisztában legyél a kockázatokkal."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Figyelmeztess, mielőtt ismeretlen modcsomagokat telepítenék"
   },
   "app.auth-servers.unreachable.body": {
     "message": "A Minecraft hitelesítő szerverek lehet, hogy nem üzemelnek. Bizonyosodj meg róla, hogy van internetkapcsolatod és próbáld meg újra."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Nem lehet elérni a hitelesítési kiszolgálókat"
-  },
-  "app.browse.add-server-to-instance": {
-    "message": "Szerver hozzáadása a profilhoz"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Szerverek hozzáadása a profilodhoz"
   },
   "app.browse.add-to-instance": {
     "message": "Hozzáadás a profilhoz"
@@ -44,6 +53,9 @@
   "app.browse.already-added": {
     "message": "Már hozzá van adva"
   },
+  "app.browse.back-to-instance": {
+    "message": "Vissza a profilhoz"
+  },
   "app.browse.discover-content": {
     "message": "Tartalom böngészése"
   },
@@ -53,23 +65,17 @@
   "app.browse.hide-added-servers": {
     "message": "Már hozzáadott szerverek elrejtése"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Már telepített tartalom elrejtése"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Tartalom letöltése a profilhoz"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modcsomagok"
   },
-  "app.browse.server.install": {
-    "message": "Letöltés"
-  },
-  "app.browse.server.installed": {
-    "message": "Letöltve"
-  },
   "app.browse.server.installing": {
     "message": "Letöltés..."
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Modcsomag telepítése..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Írd be a modcsomag leírását..."
@@ -85,9 +91,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "A modcsomag neve"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Válaszd ki a csomagba felveendő fájlokat és mappákat"
   },
   "app.export-modal.version-number-label": {
     "message": "Verziószám"
@@ -218,6 +221,12 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "\nFrissítés szükséges ehhez: {name}. Kérjük, frissíts a legújabb verzióra a játék elindításához"
   },
+  "app.project.install-context.back-to-browse": {
+    "message": "Vissza a böngészéshez"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Tartalom telepítése a profilba"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Fejlesztői mód bekapcsolva."
   },
@@ -243,10 +252,10 @@
     "message": "Erőforráskezelés"
   },
   "app.update-popup.body": {
-    "message": "A Modrinth App v{version} telepítésre kész! Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás bezárásakor automatikusan frissül."
+    "message": "A Modrinth App v{version} telepítésre kész! Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás a bezárásakor automatikusan frissül."
   },
   "app.update-popup.body.download-complete": {
-    "message": "A Modrinth App v{version} letöltése befejeződött. Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás bezárásakor automatikusan frissül."
+    "message": "A Modrinth App v{version} letöltése befejeződött. Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás a bezárásakor automatikusan frissül."
   },
   "app.update-popup.body.linux": {
     "message": "A Modrinth App v{version} elérhető. Használd a csomagkezelőt a legújabb funkciók és javítások frissítéséhez!"
@@ -631,5 +640,14 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "A betöltőt a szerver biztosítja"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Telepítés megerősítése"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Letöltés mindenképpen"
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "Ezt a fájlt nem találtuk meg a Modrinthon. Határozottan javasoljuk, hogy kizárólag megbízható forrásokból származó fájlokat telepíts."
   }
 }

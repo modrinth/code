@@ -264,7 +264,7 @@
     "message": "Inserisci un codice 2FA"
   },
   "auth.sign-in.2fa.placeholder": {
-    "message": "Inserisci codice..."
+    "message": "Inserisci il codice..."
   },
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Password dimenticata?</forgot-password-link> • <create-account-link>Crea un account</create-account-link>"
@@ -360,7 +360,7 @@
     "message": "Cambia icona"
   },
   "collection.button.select-icon": {
-    "message": "Seleziona icona"
+    "message": "Scegli un'icona"
   },
   "collection.button.unfollow-project": {
     "message": "Smetti di seguire il progetto"
@@ -573,7 +573,7 @@
     "message": "Vuoi davvero revocare il tuo link affiliati \"{title}\"?"
   },
   "dashboard.affiliate-links.search": {
-    "message": "Cerca link affiliati..."
+    "message": "Cerca tra i link affiliati..."
   },
   "dashboard.analytics.from-projects": {
     "message": "da {count, plural, one {# progetto} other {# progetti}}"
@@ -591,7 +591,7 @@
     "message": "Inizia creando la tua prima raccolta!"
   },
   "dashboard.collections.empty.no-collections": {
-    "message": "Non hai ancora alcuna raccolta"
+    "message": "Ancora nessuna raccolta"
   },
   "dashboard.collections.empty.no-match": {
     "message": "Nessuna raccolta corrisponde alla tua ricerca"
@@ -603,7 +603,7 @@
     "message": "{count} {countPlural, plural, one {progetto} other {progetti}}"
   },
   "dashboard.collections.label.search-input": {
-    "message": "Cerca fra le tue raccolte"
+    "message": "Cerca tra le tue raccolte"
   },
   "dashboard.collections.long-title": {
     "message": "Le tue raccolte"
@@ -696,10 +696,10 @@
     "message": "Privato"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
-    "message": "Seleziona paese"
+    "message": "Seleziona il paese"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
-    "message": "Cerca paesi..."
+    "message": "Cerca tra i paesi..."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-text": {
     "message": "Impossibile ottenere i metodi di pagamento. Riprova più tardi."
@@ -714,7 +714,7 @@
     "message": "Alcuni metodi di prelievo non sono disponibili in certe regioni."
   },
   "dashboard.creator-withdraw-modal.method-selection.select-method": {
-    "message": "Seleziona metodo di prelievo"
+    "message": "Seleziona il metodo di prelievo"
   },
   "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
     "message": "La tua soglia di prelievo è <b>{amount}</b>, <tax-link>compila un modulo fiscale</tax-link> per prelevare di più."
@@ -837,19 +837,19 @@
     "message": "Premio"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
-    "message": "Seleziona premio"
+    "message": "Seleziona il premio"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Premi"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
-    "message": "Cerca valore"
+    "message": "Cerca un valore"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Seleziona un taglio:"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
-    "message": "Seleziona un taglio per continuare"
+    "message": "Seleziona un taglio per procedere"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Email non verificata"
@@ -909,7 +909,7 @@
     "message": "Crea organizzazione"
   },
   "dashboard.organizations.empty.cta": {
-    "message": "Crea un'organizzazione!"
+    "message": "Prova a creare un'organizzazione!"
   },
   "dashboard.organizations.error.fetch": {
     "message": "Impossibile ottenere le organizzazioni"
@@ -927,7 +927,7 @@
     "message": "Non puoi modificare più server contemporaneamente"
   },
   "dashboard.projects.empty": {
-    "message": "Non hai ancora alcun progetto. Clicca sul pulsante verde in alto per iniziare."
+    "message": "Ancora nessun progetto. Clicca sul pulsante verde in alto per iniziare."
   },
   "dashboard.projects.head-title": {
     "message": "Progetti"
@@ -1229,6 +1229,33 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Si prega di completare il modulo fiscale"
   },
+  "discover.install.back-to-server": {
+    "message": "Torna al server"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Torna alla configurazione"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Annulla ripristino"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Nessun mondo del server può essere installato."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Questo tipo di contenuto non può essere installato da esplora."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Selezione dei pacchetti da installare dopo il ripristino"
+  },
+  "discover.seo.description": {
+    "message": "Cerca e esplora tra migliaia di {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}} presenti su Modrinth attraverso ricerche rapide e accurate. I nostri filtri ti aiuteranno a trovarne i migliori."
+  },
+  "discover.seo.title": {
+    "message": "Ricerca di {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Ricerca di {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "Forse c'è un errore di battitura nell'URL della raccolta."
   },
@@ -1243,6 +1270,12 @@
   },
   "error.collection.404.title": {
     "message": "Raccolta non trovata"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Accesso effettuato come:"
+  },
+  "error.generic.401.title": {
+    "message": "Accesso non consentito"
   },
   "error.generic.404.subtitle": {
     "message": "La pagina che cercavi non sembra esistere."
@@ -1670,6 +1703,9 @@
   "layout.action.create-new": {
     "message": "Crea..."
   },
+  "layout.action.external-projects": {
+    "message": "Progetti esterni"
+  },
   "layout.action.file-lookup": {
     "message": "Trova file"
   },
@@ -1922,6 +1958,9 @@
   "moderation.moderate": {
     "message": "Modera"
   },
+  "moderation.page.external-projects": {
+    "message": "Progetti esterni"
+  },
   "moderation.page.projects": {
     "message": "Progetti"
   },
@@ -2100,10 +2139,10 @@
     "message": "Cellulare"
   },
   "muralpay.placeholder.account-number": {
-    "message": "Inserisci codice conto"
+    "message": "Inserisci il codice del conto"
   },
   "muralpay.placeholder.cbu-cvu": {
-    "message": "Inserisci CBU o CVU"
+    "message": "Inserisci il CBU o CVU"
   },
   "muralpay.placeholder.cbu-cvu-type": {
     "message": "CBU o CVU"
@@ -2112,34 +2151,34 @@
     "message": "Inserisci il CCI di 20 cifre"
   },
   "muralpay.placeholder.cuit-cuil": {
-    "message": "Inserisci CUIT o CUIL"
+    "message": "Inserisci il CUIT o CUIL"
   },
   "muralpay.placeholder.enter-account-number": {
-    "message": "Inserisci codice conto"
+    "message": "Inserisci il codice del conto"
   },
   "muralpay.placeholder.enter-clabe": {
     "message": "Inserisci il CLABE di 18 cifre"
   },
   "muralpay.placeholder.enter-cpf-cnpj": {
-    "message": "Inserisci CPF o CNPJ"
+    "message": "Inserisci il CPF o CNPJ"
   },
   "muralpay.placeholder.enter-iban": {
-    "message": "Inserisci IBAN"
+    "message": "Inserisci l'IBAN"
   },
   "muralpay.placeholder.enter-pix-email": {
-    "message": "Inserisci email PIX"
+    "message": "Inserisci l'email PIX"
   },
   "muralpay.placeholder.enter-random-key": {
-    "message": "Inserisci chiave casuale"
+    "message": "Inserisci la chiave casuale"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Inserisci il numero di routing di 9 cifre"
   },
   "muralpay.placeholder.enter-swift-bic": {
-    "message": "Inserisci codice SWIFT/BIC"
+    "message": "Inserisci il codice SWIFT/BIC"
   },
   "muralpay.placeholder.iban-crc": {
-    "message": "Inserisci IBAN costaricano"
+    "message": "Inserisci l'IBAN costaricano"
   },
   "muralpay.placeholder.phone-cop": {
     "message": "+57..."
@@ -2499,13 +2538,13 @@
     "message": "Cerca versioni del gioco..."
   },
   "project.download.search-game-versions-label": {
-    "message": "Cerca versioni del gioco..."
+    "message": "Cerca tra le versioni del gioco..."
   },
   "project.download.select-game-version": {
-    "message": "Seleziona versione del gioco"
+    "message": "Seleziona la versione del gioco"
   },
   "project.download.select-platform": {
-    "message": "Seleziona piattaforma"
+    "message": "Seleziona la piattaforma"
   },
   "project.download.show-all-versions": {
     "message": "Mostra tutte le versioni"
@@ -2615,6 +2654,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Dimostra di avere il permesso di ridistribuire tutti i seguenti file, e le versioni sospese verranno pubblicate automaticamente."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Dimostra di avere il permesso di ridistribuire tutti i seguenti file prima di presentare il tuo progetto alla revisione."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Contenuti di origine sconosciuta"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Sono state fornite attribuzioni per tutti i contenuti esterni."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Attribuzioni complete!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Nessuna versione include contenuti esterni, quindi non è necessario dimostrare alcun permesso."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Tutto a posto!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Non hai il permesso di ridistribuire alcuni dei contenuti esterni che hai incluso. Per pubblicare su Modrinth, rimuovi i contenuti illeciti."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Non puoi includere questi contenuti"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Se includi dei contenuti esterni a Modrinth, devi dichiarare la loro origine e dimostrare di avere il permesso di ridistribuirli. Controlla la <link>nostra guida</link> per farlo nel modo giusto!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Come funzionano le attribuzioni"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Scopri di più"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Cerca tra {count, plural, one {# progetto esterno} other {# progetti esterni}}..."
+  },
   "project.settings.title": {
     "message": "Impostazioni"
   },
@@ -2632,6 +2710,15 @@
   },
   "project.versions.title": {
     "message": "Versioni"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Questa versione è attualmente sospesa e non elencata} other {Queste versioni sono attualmente sospese e non elencate}} pubblicamente. Devi dimostrare di avere il permesso di ridistribuire alcuni dei file presenti in {count, plural, one {questa versione} other {queste versioni}} del pacchetto."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Risolvi"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {La versione {version_name} è stata sospesa} other {Alcune versioni sono state sospese}} per attribuzioni incomplete"
   },
   "report.already-reported": {
     "message": "Hai già segnalato {title}"
@@ -3002,6 +3089,9 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizza col server"
   },
+  "servers.manage.content.title": {
+    "message": "Contenuto - {serverName} - Modrinth"
+  },
   "servers.notice.actions": {
     "message": "Azioni"
   },
@@ -3219,7 +3309,7 @@
     "message": "Inserisci codice 2FA"
   },
   "settings.account.two-factor.field.code.placeholder": {
-    "message": "Inserisci codice..."
+    "message": "Inserisci il codice..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "L'autenticazione a due fattori (2FA) protegge il tuo account richiedendo un dispositivo secondario per effettuare l'accesso."
@@ -3228,7 +3318,7 @@
     "message": "Se il codice QR non funziona, inserisci manualmente questa chiave:"
   },
   "settings.account.two-factor.setup.scan": {
-    "message": "Inizia scansionando il codice QR con <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> o qualsiasi altra app per il 2FA."
+    "message": "Inizia scansionando il codice QR con <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> o qualsiasi altra app di autenticazione."
   },
   "settings.account.two-factor.verify.description": {
     "message": "Inserisci il codice generato dall'app di autenticazione per confermare l'accesso."

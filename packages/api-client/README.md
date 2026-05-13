@@ -28,7 +28,7 @@ import { AuthFeature, GenericModrinthClient, type Labrinth } from '@modrinth/api
 
 const client = new GenericModrinthClient({
 	userAgent: 'my-app/1.0.0',
-	features: [new AuthFeature({ token: 'mrp_...' })],
+	features: [new AuthFeature({ token: process.env.MODRINTH_TOKEN })],
 })
 
 const project: Labrinth.Projects.v2.Project = await client.labrinth.projects_v2.get('sodium')
@@ -51,14 +51,13 @@ import { AuthFeature, CircuitBreakerFeature, NuxtCircuitBreakerStorage, NuxtModr
 
 export const useModrinthClient = async () => {
 	const config = useRuntimeConfig()
-	const auth = await useAuth()
 
 	return new NuxtModrinthClient({
 		userAgent: 'my-nuxt-app/1.0.0',
 		rateLimitKey: import.meta.server ? config.rateLimitKey : undefined,
 		features: [
 			new AuthFeature({
-				token: async () => auth.value.token,
+				token: process.env.MODRINTH_TOKEN,
 			}),
 			new CircuitBreakerFeature({
 				storage: new NuxtCircuitBreakerStorage(),
@@ -74,10 +73,9 @@ export const useModrinthClient = async () => {
 import { getVersion } from '@tauri-apps/api/app'
 import { AuthFeature, TauriModrinthClient } from '@modrinth/api-client'
 
-const version = await getVersion()
 const client = new TauriModrinthClient({
-	userAgent: `modrinth/theseus/${version} (support@modrinth.com)`,
-	features: [new AuthFeature({ token: 'mrp_...' })],
+	userAgent: async () => `modrinth/theseus/${await getVersion()} (support@modrinth.com)`,
+	features: [new AuthFeature({ token: process.env.MODRINTH_TOKEN })],
 })
 
 const project = await client.labrinth.projects_v2.get('sodium')
@@ -138,7 +136,7 @@ Features wrap requests before they reach the platform implementation:
 import { AuthFeature, CircuitBreakerFeature, RetryFeature } from '@modrinth/api-client'
 
 const client = new GenericModrinthClient({
-	features: [new AuthFeature({ token: async () => getToken() }), new RetryFeature({ maxAttempts: 3, backoffStrategy: 'exponential' }), new CircuitBreakerFeature({ maxFailures: 3, resetTimeout: 30_000 })],
+	features: [new AuthFeature({ token: async () => process.env.MODRINTH_TOKEN }), new RetryFeature({ maxAttempts: 3, backoffStrategy: 'exponential' }), new CircuitBreakerFeature({ maxFailures: 3, resetTimeout: 30_000 })],
 })
 ```
 

@@ -546,7 +546,7 @@
     "defaultMessage": "Seleccionar versión del cargador"
   },
   "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
-    "defaultMessage": "Buscar la versión del Loader..."
+    "defaultMessage": "Buscar versión del loader..."
   },
   "creation-flow.modal.custom-setup.loader.label": {
     "defaultMessage": "Loader"
@@ -555,7 +555,7 @@
     "defaultMessage": "Nombre"
   },
   "creation-flow.modal.custom-setup.name.placeholder": {
-    "defaultMessage": "Introducir nombre de instancia"
+    "defaultMessage": "Ingrese nombre de la instancia"
   },
   "creation-flow.modal.custom-setup.options.no-versions-available": {
     "defaultMessage": "Ninguna versión disponible"
@@ -582,67 +582,67 @@
     "defaultMessage": "Pacífico"
   },
   "creation-flow.modal.final-config.game-version.placeholder": {
-    "defaultMessage": "Seleccionar versión del juego"
+    "defaultMessage": "Elige la versión del juego"
   },
   "creation-flow.modal.final-config.gamemode.creative": {
     "defaultMessage": "Creativo"
   },
   "creation-flow.modal.final-config.gamemode.hardcore": {
-    "defaultMessage": "Hardcore"
+    "defaultMessage": "Extremo"
   },
   "creation-flow.modal.final-config.gamemode.label": {
-    "defaultMessage": "Gamemode"
+    "defaultMessage": "Modo de juego"
   },
   "creation-flow.modal.final-config.gamemode.survival": {
     "defaultMessage": "Supervivencia"
   },
   "creation-flow.modal.final-config.generate-structures.description": {
-    "defaultMessage": "Controla si aldeas, strongholds, y otras estructuras se generan en chunks nuevos."
+    "defaultMessage": "Controla si las aldeas, strongholds, u otras estructuras se generan en chunks nuevos."
   },
   "creation-flow.modal.final-config.generate-structures.label": {
     "defaultMessage": "Generar estructuras"
   },
   "creation-flow.modal.final-config.generator-settings-json.placeholder": {
-    "defaultMessage": "Introduzca la configuración JSON del generador"
+    "defaultMessage": "Inserte el JSON con las configuraciones de generación"
   },
   "creation-flow.modal.final-config.generator-settings.custom": {
     "defaultMessage": "Personalizado"
   },
   "creation-flow.modal.final-config.generator-settings.default": {
-    "defaultMessage": "Predeterminado"
+    "defaultMessage": "Por defecto"
   },
   "creation-flow.modal.final-config.generator-settings.description": {
-    "defaultMessage": "Usado para customización avanzada de mundos, como Superflat layers."
+    "defaultMessage": "Usado para configuraciones de mundo avanzadas como las capas personalizadas del mundo plano."
   },
   "creation-flow.modal.final-config.generator-settings.flat": {
     "defaultMessage": "Plano"
   },
   "creation-flow.modal.final-config.generator-settings.label": {
-    "defaultMessage": "Configuración de generador"
+    "defaultMessage": "Configuraciones de generación"
   },
   "creation-flow.modal.final-config.generator-settings.placeholder": {
-    "defaultMessage": "Seleccionar configuración de generador"
+    "defaultMessage": "Elige las configuraciones de generación"
   },
   "creation-flow.modal.final-config.world-name.label": {
     "defaultMessage": "Nombre del mundo"
   },
   "creation-flow.modal.final-config.world-name.placeholder": {
-    "defaultMessage": "Introduzca el nombre del mundo"
+    "defaultMessage": "Inserte nombre del mundo"
   },
   "creation-flow.modal.final-config.world-seed.description": {
-    "defaultMessage": "Deje en blanco para que se genere una semilla aleatoria."
+    "defaultMessage": "Dejar en blanco para una semilla aleatoria."
   },
   "creation-flow.modal.final-config.world-seed.label-with-optional": {
-    "defaultMessage": "Semilla de mundo <optional>(Opcional)</optional>"
+    "defaultMessage": "Semilla del mundo <optional>(Opcional)</optional>"
   },
   "creation-flow.modal.final-config.world-seed.placeholder": {
-    "defaultMessage": "Introduzca la semilla del mundo"
+    "defaultMessage": "Inserte similla del mundo"
   },
   "creation-flow.modal.final-config.world-type.amplified": {
     "defaultMessage": "Amplificado"
   },
   "creation-flow.modal.final-config.world-type.default": {
-    "defaultMessage": "Predeterminado"
+    "defaultMessage": "Por defecto"
   },
   "creation-flow.modal.final-config.world-type.label": {
     "defaultMessage": "Tipo de mundo"
@@ -651,13 +651,13 @@
     "defaultMessage": "Biomas grandes"
   },
   "creation-flow.modal.final-config.world-type.placeholder": {
-    "defaultMessage": "Seleccione el tipo de mundo"
+    "defaultMessage": "Elige el tipo de mundo"
   },
   "creation-flow.modal.final-config.world-type.single-biome": {
-    "defaultMessage": "Un solo bioma"
+    "defaultMessage": "Bioma único"
   },
   "creation-flow.modal.final-config.world-type.superflat": {
-    "defaultMessage": "Superplano"
+    "defaultMessage": "Extraplano"
   },
   "creation-flow.modal.import-instance.action.add": {
     "defaultMessage": "Añadir"
@@ -666,82 +666,82 @@
     "defaultMessage": "Personalizado ({pathName})"
   },
   "creation-flow.modal.import-instance.detecting-launcher-instances": {
-    "defaultMessage": "Detectando instancias de launcher..."
+    "defaultMessage": "Detectando instancias del launcher..."
   },
   "creation-flow.modal.import-instance.launcher-instances.title": {
-    "defaultMessage": "Instancias de launcher"
+    "defaultMessage": "Instancias del launcher"
   },
   "creation-flow.modal.import-instance.launcher-path.add": {
-    "defaultMessage": "Añade el directorio del launcher"
+    "defaultMessage": "Añadir dirección del launcher"
   },
   "creation-flow.modal.import-instance.launcher-path.placeholder": {
-    "defaultMessage": "Directorio al launcher..."
+    "defaultMessage": "Dirección al launcher..."
   },
   "creation-flow.modal.import-instance.notification.no-instances-found.text": {
-    "defaultMessage": "Ninguna instancia importable fue encontrada en el directorio especificado."
+    "defaultMessage": "No se hayaron instancias importables en la dirección proporcionada."
   },
   "creation-flow.modal.import-instance.notification.no-instances-found.title": {
-    "defaultMessage": "Ninguna instancia encontrada"
+    "defaultMessage": "No se hayaron instancias"
   },
   "creation-flow.modal.import-instance.search.placeholder": {
-    "defaultMessage": "Buscar instancia por nombre"
+    "defaultMessage": "Buscar por nombre de instancia"
   },
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Borrar todo"
   },
   "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Descubrir modpacks"
+    "defaultMessage": "Explorar modpacks"
   },
   "creation-flow.modal.modpack.action.import": {
     "defaultMessage": "Importar modpack"
   },
   "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "¿Ya sabes cuál es el modpack que quieres instalar?"
+    "defaultMessage": "¿Ya sabes que modpack quieres instalar?"
   },
   "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Ningún resultado encontrado"
+    "defaultMessage": "No se hayaron resultados"
   },
   "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Buscar por modpack"
+    "defaultMessage": "Buscar modpack"
   },
   "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Una instancia es una configuración de Minecraft con un específico loader, versión, y mods."
+    "defaultMessage": "Una instancia es una configuración de Minecraft con un loader, versión y mods especificos."
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
-    "defaultMessage": "Empieza desde cero primero eligiendo un loader y una versión de juego."
+    "defaultMessage": "Empieza de cero eligiendo un loader y una versión del juego."
   },
   "creation-flow.modal.setup-type.option.custom-setup.title": {
     "defaultMessage": "Configuración personalizada"
   },
   "creation-flow.modal.setup-type.option.import-instance.description": {
-    "defaultMessage": "Importa una instancia de Prism, CurseForge, o similar."
+    "defaultMessage": "Importa una instancia desde Prism, CurseForge, o similar."
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Importar instancia"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Descubre modpacks en Modrinth o importe uno desde un archivo."
+    "defaultMessage": "Explora modpacks en Modrinth o importalo de un archivo."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
     "defaultMessage": "Instalar modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
-    "defaultMessage": "Minecraft clásico sin ningún mod o puglins."
+    "defaultMessage": "Minecraft clasico sin mods ni plugins."
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
     "defaultMessage": "Minecraft vanilla"
   },
   "creation-flow.modal.setup-type.title.installation": {
-    "defaultMessage": "Seleccione tipo de instalación"
+    "defaultMessage": "Selecciona el tipo de instalación"
   },
   "creation-flow.modal.setup-type.title.instance": {
-    "defaultMessage": "Elige tipo de instancia"
+    "defaultMessage": "Elije el tipo de instancia"
   },
   "creation-flow.modal.setup-type.title.world": {
-    "defaultMessage": "Seleccione tipo de mundo"
+    "defaultMessage": "Selecciona el tipo de mundo"
   },
   "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Elige modpack"
+    "defaultMessage": "Elije un modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Crear instancia"
@@ -757,6 +757,24 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Configurar servidor"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "No"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Permanentemente no"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "No identificado"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "Con atribución"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "Con atribución y fuente"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Sí"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Resumen de la extracción"
@@ -972,7 +990,7 @@
     "defaultMessage": "Cargar archivo .zip desde URL"
   },
   "files.operations.current-file": {
-    "defaultMessage": "Actual archivo: {file}"
+    "defaultMessage": "Archivo actual: {file}"
   },
   "files.operations.extracted": {
     "defaultMessage": "{size} extraído"
@@ -981,10 +999,10 @@
     "defaultMessage": "Extrayendo {source}"
   },
   "files.operations.extracting-completed": {
-    "defaultMessage": "Extracción de {source} terminada"
+    "defaultMessage": "Extracción de {source} finalizada"
   },
   "files.operations.extracting-failed": {
-    "defaultMessage": "Extracción de {source} fallada"
+    "defaultMessage": "Extracción de {source} fallida"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack desde URL"
@@ -1980,7 +1998,7 @@
     "defaultMessage": "Fallido"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listado"
+    "defaultMessage": "Público"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderador"
@@ -2017,9 +2035,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Fallido"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Retenido"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copiar código al portapapeles"
@@ -2789,6 +2804,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "Subir"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Permisos"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "Versiones"
   },
@@ -2835,7 +2853,7 @@
     "defaultMessage": "No listado por el Staff"
   },
   "s.bg": {
-    "defaultMessage": "Tarea en segundo plano ejecutándose"
+    "defaultMessage": "Tarea de segundo plano en ejecución"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filtro bloqueado"
@@ -2925,19 +2943,19 @@
     "defaultMessage": "Vanilla"
   },
   "servers.admonitions.background-task-running": {
-    "defaultMessage": "Tarea en segundo plano ejecutándose"
+    "defaultMessage": "Tarea de segundo plano en ejecución"
   },
   "servers.backups.admonition.backup-cancelled.description": {
-    "defaultMessage": "Respaldo {backupName} fue cancelado."
+    "defaultMessage": "La copia de seguridad {backupName} fue cancelada."
   },
   "servers.backups.admonition.backup-cancelled.title": {
-    "defaultMessage": "Respaldo cancelado"
+    "defaultMessage": "Copia de seguridad cancelada"
   },
   "servers.backups.admonition.backup-completed.description": {
-    "defaultMessage": "{backupName} termino exitosamente."
+    "defaultMessage": "{backupName} completada exitosamente."
   },
   "servers.backups.admonition.backup-completed.title": {
-    "defaultMessage": "Respaldo terminado"
+    "defaultMessage": "Copia de seguridad completada"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Algo salió mal al crear {backupName}. Por favor, inténtalo de nuevo o contacta con soporte si el problema continúa."
@@ -2952,10 +2970,10 @@
     "defaultMessage": "Respaldo programado"
   },
   "servers.backups.admonition.backup-timed-out.description": {
-    "defaultMessage": "El tiempo de espera para restaurar de {backupName} se agotó. Puedes intentar otra vez o contactar soporte si el problema persiste."
+    "defaultMessage": "La creación de {backupName} superó el tiempo de espera. Inténtalo de nuevo o contacta a soporte si el problema persiste."
   },
   "servers.backups.admonition.backup-timed-out.title": {
-    "defaultMessage": "Tiempo de espera de la copia de seguridad agotado"
+    "defaultMessage": "Copia de seguridad caducada"
   },
   "servers.backups.admonition.creating-backup.description": {
     "defaultMessage": "Guardando los datos del mundo y la configuración del servidor para {backupName}. Esto puede tardar un par de minutos."
@@ -2967,34 +2985,34 @@
     "defaultMessage": "Tu respaldo"
   },
   "servers.backups.admonition.restore-cancelled.description": {
-    "defaultMessage": "Recuperación de {backupName} fue cancelada."
+    "defaultMessage": "Se canceló la restauración de {backupName}."
   },
   "servers.backups.admonition.restore-cancelled.title": {
-    "defaultMessage": "Recuperación cancelada"
+    "defaultMessage": "Restauración cancelada"
   },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Algo salió mal durante la restauración desde {backupName}. Por favor, inténtalo de nuevo o contacta con soporte si el problema continúa."
   },
   "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Recuperación fallada"
+    "defaultMessage": "Restauración fallida"
   },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Restauración desde {backupName} en espera y comenzará en breve."
   },
   "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Recuperación en cola"
+    "defaultMessage": "Restauración en cola"
   },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Tu servidor se ha restaurado a {backupName} y está listo para iniciarse."
   },
   "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Recuperación terminada"
+    "defaultMessage": "Restauración finalizada"
   },
   "servers.backups.admonition.restore-timed-out.description": {
-    "defaultMessage": "El tiempo de espera para restaurar de {backupName} se agotó. Puedes intentar otra vez o contactar soporte si el problema persiste."
+    "defaultMessage": "La restauración de {backupName} superó el tiempo de espera. Inténtalo de nuevo o contacta a soporte si el problema persiste."
   },
   "servers.backups.admonition.restore-timed-out.title": {
-    "defaultMessage": "Tiempo de espera de la recuperación agotada"
+    "defaultMessage": "Restauración caducada"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Restaurando tu servidor desde {backupName}. Esto puede tardar un par de minutos."
@@ -3003,43 +3021,43 @@
     "defaultMessage": "Restaurando desde respaldo"
   },
   "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural,one {Acciones masivas seleccionado para un respaldo} other {Acciones masivas seleccionados para # respaldos}}"
+    "defaultMessage": "{count, plural, one {Acciones en masa para una copia de seguridad seleccionada} other {Acciones en masa para # copias de seguridad seleccionadas}}"
   },
   "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Borrando {total, plural, one {# respaldo} other {# respaldos}}..."
+    "defaultMessage": "Eliminando {total, plural, one {# copia de seguridad} other {# copias de seguridad}}..."
   },
   "servers.backups.bulk-bar.selected-count": {
-    "defaultMessage": "{count, plural, one {# respaldo seleccionado} other {# respaldos seleccionados}}"
+    "defaultMessage": "{count, plural, one {# copia de seguridad seleccionada} other {# copias de seguridad seleccionadas}}"
   },
   "servers.backups.delete-modal.admonition-body": {
-    "defaultMessage": "Una vez borrado, {count, plural, one {este respaldo no puede} other {estos respaldos no pueden}} ser recuperado. Se borra permanentemente."
+    "defaultMessage": "Una vez {count, plural, one {eliminada, esta copia de seguridad no podrá ser recuperada} other {eliminadas, estas copias de seguridad no prodrán ser recuperadas}}. La eliminación es permanente."
   },
   "servers.backups.delete-modal.admonition-header": {
     "defaultMessage": "Advertencia de eliminación"
   },
   "servers.backups.delete-modal.backups-label": {
-    "defaultMessage": "{count, plural, one {Respaldo} other {Respaldos ({count})}}"
+    "defaultMessage": "{count, plural, one {Copia de seguridad} other {Copias de seguridad ({count})}}"
   },
   "servers.backups.delete-modal.confirm": {
-    "defaultMessage": "Borrar {count, plural, one {respaldo} other {# respaldos}}"
+    "defaultMessage": "Eliminar {count, plural, one {copia de seguridad} other {# copias de seguridad}}"
   },
   "servers.backups.delete-modal.header": {
-    "defaultMessage": "Borrar {count, plural, one {respaldo} other {respaldos}}"
+    "defaultMessage": "Eliminar {count, plural, one {copia de seguridad} other {copias de seguridad}}"
   },
   "servers.backups.empty.description": {
-    "defaultMessage": "Crea tu primer respaldo"
+    "defaultMessage": "Crea tu primera copia de seguridad"
   },
   "servers.backups.empty.heading": {
-    "defaultMessage": "Ningún respaldo todavía"
+    "defaultMessage": "Sin copias de suguridad"
   },
   "servers.backups.filtered-empty.clear-filters": {
     "defaultMessage": "Borrar filtros"
   },
   "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Intenta un filtro diferente o borre los filtros para ver todos los respaldos."
+    "defaultMessage": "Prueba un filtro diferente o quitalos para ver todas las copias de seguridad."
   },
   "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Ningún respaldo coincide"
+    "defaultMessage": "Sin coincidencias"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
@@ -3057,13 +3075,13 @@
     "defaultMessage": "Restaurar"
   },
   "servers.backups.select-backup-aria": {
-    "defaultMessage": "Selecciona respaldo {name}"
+    "defaultMessage": "Selecciona {name}"
   },
   "servers.backups.toolbar.create-backup": {
-    "defaultMessage": "Crear respaldo"
+    "defaultMessage": "Crear copia de seguridad"
   },
   "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
+    "defaultMessage": "Automático"
   },
   "servers.backups.toolbar.filter-manual": {
     "defaultMessage": "Manual"
@@ -3096,16 +3114,16 @@
     "defaultMessage": "Nuevo servidor"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Instala mods, invita amigos, y jueguen todos juntos desde la Modrinth App."
+    "defaultMessage": "Instala mods, invita amigos, y jueguen juntos todo desde la Modrinth App."
   },
   "servers.list-empty.no-servers-title": {
-    "defaultMessage": "No se han encontrado servidores todavía"
+    "defaultMessage": "Sin servidores"
   },
   "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Elige tus mods favoritos y nosotros nos encargamos del resto."
+    "defaultMessage": "Elige tus mods favoritos y nosotros hacemos el resto."
   },
   "servers.list-empty.one-click-mod-installs-title": {
-    "defaultMessage": "Instala mod en un clic"
+    "defaultMessage": "Instalación de mods en un clic"
   },
   "servers.list-empty.play-with-friends-description": {
     "defaultMessage": "Invita a tus amigos y deja que se unan fácilmente desde la App de Modrinth."
@@ -3117,7 +3135,7 @@
     "defaultMessage": "Iniciar sesión"
   },
   "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Prepara tu servidor tal como si fuera un mundo de un solo jugador."
+    "defaultMessage": "Configura tu mundo justo como uno de un jugador."
   },
   "servers.list-empty.simple-setup-title": {
     "defaultMessage": "Configuración simple"
@@ -3141,22 +3159,22 @@
     "defaultMessage": "Nuevo"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Tus archivos se mantrendran por <days-remaining>{daysRemaining} {daysRemaining, plural, one {día} other {días} }más</days-remaining>. Contacta con el soporta para descargarlos antes de que sean eliminados. "
+    "defaultMessage": "Tus archivos serán conservados por <days-remaining>{daysRemaining} {daysRemaining, plural,one {día} other {días}} más</days-remaining>. Contacta a soporte para descargar los archivos antes de su eliminación. "
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
-    "defaultMessage": "Tus archivos se preservarán por 30 días tras la cancelación."
+    "defaultMessage": "Tus archivos se conservarán por 30 días después de la cancelación."
   },
   "servers.listing.notice.moderated": {
-    "defaultMessage": "Tu servidor ha sido suspendido por acciones de moderación."
+    "defaultMessage": "Tu servidor ha sido suspendido por moderación. "
   },
   "servers.listing.notice.pending-change": {
-    "defaultMessage": "Tu servidor va a {verb} al {planSize} Plan en <date>{formattedDate}</date>. "
+    "defaultMessage": "Tu servidor será {verb} a {planSize} Plan el <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.provisioning": {
-    "defaultMessage": "Por favor espere mientras preparamos tu servidor. Esto puede tomar hasta 10 minutos."
+    "defaultMessage": "Por favor espera mientras configuramos tu servidor. Esto puede tomar hasta 10 minutos."
   },
   "servers.listing.notice.subscription-cancelled": {
-    "defaultMessage": "Tu suscripción ha sido cancelada."
+    "defaultMessage": "Tu suscripción fue cancelada."
   },
   "servers.listing.notice.subscription-cancelled-on-date": {
     "defaultMessage": "Tu suscripción fue cancelada el <date>{formattedDate}</date>. "
@@ -3168,13 +3186,13 @@
     "defaultMessage": "Tu suscripción se canceló el <date>{formattedDate}</date> por un error en el pago. "
   },
   "servers.listing.notice.subscription-set-to-cancel": {
-    "defaultMessage": "Tu suscripción no será renovada."
+    "defaultMessage": "Tu suscripción está etiquetada para cancelación."
   },
   "servers.listing.notice.subscription-set-to-cancel-on-date": {
-    "defaultMessage": "Tu suscripción será cancelada el <date>{formattedDate}</date>. "
+    "defaultMessage": "Tu suscripción está etiquetada para cancelación el <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.suspended": {
-    "defaultMessage": "Tu servidor ha sido suspendido. Por favor contacta al Soporte de Modrinth para más información."
+    "defaultMessage": "Tu servidor ha sido suspendido. Por favor contacta al equipo de soporte de Modrinth para más información."
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "El hardware de tu servidor se está actualizando y volverá a estar en línea en breve."
@@ -3201,10 +3219,10 @@
     "defaultMessage": "Carga en progreso"
   },
   "servers.manage.contact-support-button": {
-    "defaultMessage": "Contactar al Soporte de Modrinth"
+    "defaultMessage": "Contacta al soporte de Modrinth"
   },
   "servers.manage.error.alert-notice": {
-    "defaultMessage": "Nuestros sistemas alertan automáticamente a nuestro equipo cuando hay un problema. Ya estamos trabajando para que vuelvan a estar en línea."
+    "defaultMessage": "Nuestros sistemas nos alertan cuando hay problemas. Ya estamos trabajando ponerlos de vuelta en línea."
   },
   "servers.manage.error.description": {
     "defaultMessage": "Podríamos estar teniendo problemas temporales con nuestros servidores."
@@ -3216,7 +3234,7 @@
     "defaultMessage": "Si compraste tu servidor de Modrinth Hosting recientemente, está en cola y aparecerá aquí en cuanto esté listo. <warning>No intentes comprar un servidor nuevo.</warning>"
   },
   "servers.manage.error.support-notice": {
-    "defaultMessage": "Si requieres soporte personalizado sobre el estatus de tu servidor, por favor contacta al Soporte de Modrinth."
+    "defaultMessage": "Si necesitas soporte personalizado acerca del estado de tu servidor, por favor contacta al soporte de Modrinth."
   },
   "servers.manage.error.title": {
     "defaultMessage": "No se pudo cargar los servidores"
@@ -3231,13 +3249,13 @@
     "defaultMessage": "No se encontraron servidores."
   },
   "servers.manage.purchase-unavailable.text": {
-    "defaultMessage": "La información está cargando. Se abrirá "
+    "defaultMessage": "La información de pago aún está cargando. Abriremos check-out tan pronto esté lista."
   },
   "servers.manage.purchase-unavailable.title": {
-    "defaultMessage": "Compra no disponible."
+    "defaultMessage": "Compra no disponible"
   },
   "servers.manage.reload-button": {
-    "defaultMessage": "Refrescar"
+    "defaultMessage": "Recargar"
   },
   "servers.manage.resubscribe-error.text": {
     "defaultMessage": "Ocurrió un error al renovar la suscripción de tu servidor de Modrinth."
@@ -3258,7 +3276,7 @@
     "defaultMessage": "Éxito"
   },
   "servers.manage.search-placeholder": {
-    "defaultMessage": "Buscar {count} {count, plural,one {servidor} other {servidores}}..."
+    "defaultMessage": "Buscar {count}{count, plural,one {servidor} other {servidores}}..."
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
@@ -3270,7 +3288,7 @@
     "defaultMessage": "No volver a mostrar"
   },
   "servers.manage.settings-hint.title": {
-    "defaultMessage": "La configuración de tu servidor se ha movido"
+    "defaultMessage": "Los ajustes de tu servidor se han movido"
   },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {día} other {días}} <hours-count>{hours}</hours-count> {hours, plural, one {hora} other {horas}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minuto} other {minutos}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {segundo} other {segundos}} restantes..."
@@ -3279,13 +3297,13 @@
     "defaultMessage": "Servidor nuevo"
   },
   "servers.medal-listing.notice.medal-trial-ended": {
-    "defaultMessage": "La prueba de tu servidor Medal ha finalizado y tu servidor ha sido suspendido. Por favor, mejora tu plan para seguir usándolo."
+    "defaultMessage": "Tu prueba gratis de Medal ha terminado y tu servidor ha sido suspendido. Por favor mejora tu plan para continuar usando tu servidor."
   },
   "servers.medal-listing.notice.suspended": {
-    "defaultMessage": "Tu servidor ha sido suspendido. Por favor actualiza tu información de facturación o contacta al Soporte de Modrinth para más información."
+    "defaultMessage": "Tu servidor ha sido suspendido. Por favor actualiza tu información de pago o contacta al soporte de Modrinth para más información."
   },
   "servers.medal-listing.notice.suspended-with-reason": {
-    "defaultMessage": "Tu servidor ha sido suspendido por: {reason}. Por favor actualiza tu información de facturación o contacta al Soporte de Modrinth para más información."
+    "defaultMessage": "Tu servidor ha sido suspendido: {reason}. Por favor actualiza tu información de pago o contacta al soporte de Modrinth para más información."
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "El hardware de tu servidor se está actualizando y volverá a estar en línea en breve."
@@ -3414,49 +3432,49 @@
     "defaultMessage": "Europa Occidental"
   },
   "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Se ha producido un error inesperado durante la instalación. Inténtalo de nuevo más tarde."
+    "defaultMessage": "Un error inesperado ocurrió durante la instalación. Por favor intentalo de nuevo más tarde."
   },
   "servers.setup.onboarding.installation-failed.title": {
     "defaultMessage": "Instalación fallida"
   },
   "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Se ha producido un error inesperado durante la carga. Inténtalo de nuevo más tarde."
+    "defaultMessage": "Un error inesperado ocurrió durante la carga. Por favor intentalo de nuevo más tarde."
   },
   "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Carga de modpack fallada"
+    "defaultMessage": "La carga del modpack falló"
   },
   "servers.setup.onboarding.setup-server.button": {
-    "defaultMessage": "Configurar servidor"
+    "defaultMessage": "Configura el servidor"
   },
   "servers.setup.onboarding.step.choose.description": {
-    "defaultMessage": "Selecciona tu modpack favorito de Modrinth, o elige un loader y añade los mods que quiera."
+    "defaultMessage": "Escoge tu modpack favorito de Modrinth, o elige un loader and añade los mods que quieras."
   },
   "servers.setup.onboarding.step.choose.title": {
-    "defaultMessage": "Elige que jugar"
+    "defaultMessage": "Elige con que jugar"
   },
   "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Configure tu mundo. Elige tu gamemode y semilla de mundo."
+    "defaultMessage": "Configura tu mundo al igual que en modo un jugador. Elige tu modo de juego y semilla."
   },
   "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Configure tu mundo"
+    "defaultMessage": "Configura tu mundo"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Comparte tu servidor con amigos copiando el link y dejándoles saber que mods necesitan para poder unirse."
+    "defaultMessage": "Comparte tu servidor con amigos copiando la dirección y dejándoles saber que mods necesitarán para conectarse."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Invita a tus amigos"
   },
   "servers.setup.onboarding.steps.heading": {
-    "defaultMessage": "Configura tu servidor (~2mins)"
+    "defaultMessage": "Configura tu servidor (~2min)"
   },
   "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "Cargando ({percent, number}%)"
+    "defaultMessage": "Subiendo ({percent, number}%)"
   },
   "servers.setup.onboarding.welcome.description": {
-    "defaultMessage": "Tu servidor está listo. ¡Esto es lo que necesitas hacer para empezar a jugar!"
+    "defaultMessage": "Tu servidor está listo. ¡Aquí está lo que debes hacer para empezar a jugar!"
   },
   "servers.setup.onboarding.welcome.title": {
-    "defaultMessage": "¡Bienvenido a Modrinth Hosting!"
+    "defaultMessage": "Bienvenido a Modrinth Hosting"
   },
   "servers.setup.rate-limit.text": {
     "defaultMessage": "Haz alcanzado el límite de solicitudes. Por favor, inténtalo de nuevo más tarde."
@@ -4005,7 +4023,7 @@
     "defaultMessage": "{count, plural, one {# alerta} other {# alertas}}"
   },
   "ui.stacked-admonitions.dismiss-all": {
-    "defaultMessage": "Descartar todas"
+    "defaultMessage": "Descartar todo"
   }
 }
 

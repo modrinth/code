@@ -16,7 +16,7 @@ import { XHRUploadClient } from './xhr-upload-client'
  * const client = new GenericModrinthClient({
  *   userAgent: 'my-app/1.0.0',
  *   features: [
- *     new AuthFeature({ token: 'mrp_...' }),
+ *     new AuthFeature({ token: async () => getOAuthToken() }),
  *     new RetryFeature({ maxAttempts: 3 })
  *   ]
  * })

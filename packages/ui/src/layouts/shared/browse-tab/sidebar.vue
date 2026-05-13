@@ -5,10 +5,13 @@ import { computed, toValue } from 'vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
+import { useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import { injectBrowseManager } from './providers/browse-manager'
 
 const ctx = injectBrowseManager()
+const { formatMessage } = useVIntl()
 
 const isApp = computed(() => ctx.variant === 'app')
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
@@ -80,7 +83,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 			v-if="ctx.filtersMenuOpen?.value"
 			class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
 		>
-			<h3 class="m-0 text-lg text-contrast">Filters</h3>
+			<h3 class="m-0 text-lg text-contrast">{{ formatMessage(commonMessages.filtersLabel) }}</h3>
 			<ButtonStyled circular>
 				<button @click="closeFiltersMenu">
 					<XIcon />
@@ -89,16 +92,29 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		</div>
 
 		<div
-			v-if="ctx.showHideInstalled?.value"
+			v-if="ctx.showHideInstalled?.value || ctx.showHideSelected?.value"
 			:class="
 				isApp
-					? 'border-0 border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid'
-					: 'card-shadow rounded-2xl bg-bg-raised p-4'
+					? 'flex flex-col gap-3 border-0 border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid'
+					: 'card-shadow flex flex-col gap-3 rounded-2xl bg-bg-raised p-4'
 			"
 		>
 			<Checkbox
+				v-if="ctx.showHideInstalled?.value"
 				v-model="ctx.hideInstalled!.value"
-				:label="ctx.hideInstalledLabel?.value ?? 'Hide already installed content'"
+				:label="
+					ctx.hideInstalledLabel?.value ?? formatMessage(commonMessages.hideInstalledContentLabel)
+				"
+				class="filter-checkbox"
+				@update:model-value="ctx.onFilterChange()"
+				@click.prevent.stop
+			/>
+			<Checkbox
+				v-if="ctx.showHideSelected?.value"
+				v-model="ctx.hideSelected!.value"
+				:label="
+					ctx.hideSelectedLabel?.value ?? formatMessage(commonMessages.hideSelectedContentLabel)
+				"
 				class="filter-checkbox"
 				@update:model-value="ctx.onFilterChange()"
 				@click.prevent.stop

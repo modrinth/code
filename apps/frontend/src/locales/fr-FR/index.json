@@ -369,7 +369,7 @@
     "message": "Cela va supprimer de manière permanente cette collection. Cette action est irréversible."
   },
   "collection.delete-modal.title": {
-    "message": "Êtes-vous sûr.e de vouloir supprimer cette collection ?"
+    "message": "Êtes-vous sûr·e de vouloir supprimer cette collection ?"
   },
   "collection.description": {
     "message": "{description} - Voir la collection {name} par {username} sur Modrinth"
@@ -570,7 +570,7 @@
     "message": "Révoquer"
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Êtes-vous sûr.e de vouloir révoquer votre lien d'affiliation « {title} » ?"
+    "message": "Êtes-vous sûr·e de vouloir révoquer votre lien d'affiliation « {title} » ?"
   },
   "dashboard.affiliate-links.search": {
     "message": "Rechercher des liens d'affiliation..."
@@ -654,7 +654,7 @@
     "message": "Pratiques de sécurité"
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
-    "message": "Êtes-vous un.e citoyen(ne) des États-Unis d'Amérique ?"
+    "message": "Êtes-vous un·e citoyen(ne) des États-Unis d'Amérique ?"
   },
   "dashboard.creator-withdraw-modal.complete-tax-form": {
     "message": "Remplissez le formulaire fiscal"
@@ -1229,6 +1229,33 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Veuillez remplir le formulaire fiscal"
   },
+  "discover.install.back-to-server": {
+    "message": "Retour au serveur"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Retour au setup"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Annuler la réinitialisation"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Aucun monde serveur n'est disponible pour l'installation."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Ce type de contenu ne peut pas être installé sur un serveur depuis la navigation."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Sélectionner un modpack à insaller après la réinitialisation"
+  },
+  "discover.seo.description": {
+    "message": "Recherchez et parcourez des milliers de {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}} Minecraft sur Modrinth avec des résultars fidèles et rapides. Nos filtres vous aident à trouver les meilleurs {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}}."
+  },
+  "discover.seo.title": {
+    "message": "Rechercher des {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "Vous avez peut-être mal tapé l'URL de la collection."
   },
@@ -1243,6 +1270,12 @@
   },
   "error.collection.404.title": {
     "message": "Collection introuvable"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Vous êtes actuellement connecté sous le nom de :"
+  },
+  "error.generic.401.title": {
+    "message": "Vous n'avez pas accès à cette page"
   },
   "error.generic.404.subtitle": {
     "message": "La page que vous recherchez ne semble pas exister."
@@ -1653,7 +1686,7 @@
     "message": "Partagez vos créations avec le monde"
   },
   "landing.section.for-players.description": {
-    "message": "Des biomes magiques aux donjons maudits, vous pouvez être sûr.e de trouver ce que vous cherchez pour amener votre gameplay au niveau supérieur."
+    "message": "Des biomes magiques aux donjons maudits, vous pouvez être sûr·e de trouver ce que vous cherchez pour amener votre gameplay au niveau supérieur."
   },
   "landing.section.for-players.label": {
     "message": "Pour les joueurs"
@@ -1669,6 +1702,9 @@
   },
   "layout.action.create-new": {
     "message": "Créer nouveau..."
+  },
+  "layout.action.external-projects": {
+    "message": "Projets externes"
   },
   "layout.action.file-lookup": {
     "message": "Recherche de fichier"
@@ -1921,6 +1957,9 @@
   },
   "moderation.moderate": {
     "message": "Modérer"
+  },
+  "moderation.page.external-projects": {
+    "message": "Projets externes"
   },
   "moderation.page.projects": {
     "message": "Projets"
@@ -2615,6 +2654,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Veuillez prouver que vous avez la permission de redistribuer tous les fichiers suivants et que toutes les versions retenues seront automatiquement publiées."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Veuillez fournir la preuve que vous avez l'autorisation de redistribuer tous les fichiers suivants avant de pouvoir soumettre votre projet pour évaluation."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Contenu intégré inconnu"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Tout le contenu externe est accompagné d'une attribution."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Attributions terminées !"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Aucune de vos versions ne contient de contenu externe, vous n'avez donc pas à vous soucier d'obtenir d'autorisations."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Vous êtes prêt !"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Vous n'êtes pas autorisé à rediffuser certains des contenus externes que vous avez ajoutés. Pour pouvoir publier sur Modrinth, veuillez supprimer les contenus litigieux."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Certains contenus ne peuvent pas être inclus"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Si vous incluez du contenu qui n’est pas sur Modrinth, vous devez nous faire savoir d’où il vient et vérifier que vous avez la permission de distribuer les fichiers. Jettez un coup d’œil à <link>notre guide</link> pour apprendre comment faire cela proprement !"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Découvrez comment fonctionnent les attributions"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "En savoir plus"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Rechercher {count} {count, plural, one {projet externe} other {projets externes}}..."
+  },
   "project.settings.title": {
     "message": "Paramètres"
   },
@@ -2632,6 +2710,15 @@
   },
   "project.versions.title": {
     "message": "Versions"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Cette version est actuellement indisponible et n'est pas répertoriée} other {Ces versions sont actuellement indisponibles et n'ont pas été répertoriées}} publiquement. Veuillez fournir la preuve que vous avez l'autorisation de redistribuer certains fichiers inclus dans {count, plural, one {la version} other {les versions}} du modpack."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Résoudre"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Version {version_name} non disponible} other {Versions non disponibles}} en raison de contenus intégrés inconnus"
   },
   "report.already-reported": {
     "message": "Vous avez déjà signalé {title}"
@@ -3002,6 +3089,9 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniser avec le serveur"
   },
+  "servers.manage.content.title": {
+    "message": "Contenu - {serverName} - Modrinth"
+  },
   "servers.notice.actions": {
     "message": "Actions"
   },
@@ -3063,7 +3153,7 @@
     "message": "Supprimer ce compte"
   },
   "settings.account.delete.confirm.title": {
-    "message": "Êtes-vous sûr.e de vouloir supprimer votre compte ?"
+    "message": "Êtes-vous sûr·e de vouloir supprimer votre compte ?"
   },
   "settings.account.delete.section.action": {
     "message": "Supprimer le compte"
@@ -3282,7 +3372,7 @@
     "message": "Vous êtes sur le point de supprimer cette application et retirer tous les jetons d'accès. (pour toujours !)"
   },
   "settings.applications.delete.confirm.title": {
-    "message": "Êtes-vous sûr.e de vouloir supprimer cette application ?"
+    "message": "Êtes-vous sûr·e de vouloir supprimer cette application ?"
   },
   "settings.applications.description.intro": {
     "message": "Les applications permettent d'authentifier les utilisateurs de Modrinth auprès de vos produits. Pour plus d'informations, consultez la <docs-link>documentation de l'API Modrinth</docs-link>."
@@ -3354,7 +3444,7 @@
     "message": "Cela révoquera l’accès de l’application à votre compte. Vous pourrez toujours la réautoriser plus tard."
   },
   "settings.authorizations.revoke.confirm.title": {
-    "message": "Êtes-vous sûr.e de vouloir révoquer cette application ?"
+    "message": "Êtes-vous sûr·e de vouloir révoquer cette application ?"
   },
   "settings.billing.charges.description": {
     "message": "Toutes vos transactions passées sur votre compte Modrinth seront affichées ici :"
@@ -3432,7 +3522,7 @@
     "message": "Cela annulera votre abonnement. Vous conserverez vos avantages jusqu’à la fin du cycle de facturation en cours."
   },
   "settings.billing.modal.cancel.title": {
-    "message": "Êtes-vous sûr.e de vouloir annuler votre abonnement ?"
+    "message": "Êtes-vous sûr·e de vouloir annuler votre abonnement ?"
   },
   "settings.billing.modal.delete.action": {
     "message": "Supprimer ce mode de paiement"
@@ -3441,7 +3531,7 @@
     "message": "Cela supprimera définitivement ce mode paiement. (vraiment toujours)."
   },
   "settings.billing.modal.delete.title": {
-    "message": "Êtes-vous sûr.e de vouloir supprimer ce mode de paiement ?"
+    "message": "Êtes-vous sûr·e de vouloir supprimer ce mode de paiement ?"
   },
   "settings.billing.next": {
     "message": "Suivant :"

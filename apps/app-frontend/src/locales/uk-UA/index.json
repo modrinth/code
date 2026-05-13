@@ -104,12 +104,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "Не вдається зв’язатися зі серверами автентифікації"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Додати сервер до профілю"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Додати сервера до вашого профілю"
-  },
   "app.browse.add-to-instance": {
     "message": "Додати до профілю"
   },
@@ -131,20 +125,8 @@
   "app.browse.hide-added-servers": {
     "message": "Скрити наявні сервери"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Скрити доданий контент"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Установити вміст в профіль"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Модпаки"
-  },
-  "app.browse.server.install": {
-    "message": "Установлено"
-  },
-  "app.browse.server.installed": {
-    "message": "Встановлено"
   },
   "app.browse.server.installing": {
     "message": "Встановлення"
@@ -169,9 +151,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Назва збірки"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Виберіть файли й теки, щоб додати їх до збірки"
   },
   "app.export-modal.version-number-label": {
     "message": "Номер версії"
@@ -691,6 +670,15 @@
   },
   "instance.worlds.world_in_use": {
     "message": "Світ наразі використовується"
+  },
+  "minecraft-account.add-account": {
+    "message": "Додати обліковий запис"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Видалити обліковий запис"
+  },
+  "minecraft-account.select-account": {
+    "message": "Обрати обліковий запис"
   },
   "search.filter.locked.instance": {
     "message": "Надано профілем"

@@ -603,3 +603,31 @@ export const WithOverflowMenu: StoryObj = {
 		`,
 	}),
 }
+
+export const EmptyState: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Name' },
+				{ key: 'email', label: 'Email' },
+				{ key: 'status', label: 'Status' },
+				{ key: 'role', label: 'Role' },
+			]
+			const data: User[] = []
+
+			return { columns, data }
+		},
+		template: /* html */ `
+			<Table :columns="columns" :data="data">
+				<template #empty-state>
+					<div class="flex h-64 flex-col items-center justify-center gap-2 text-center">
+						<div class="font-semibold text-contrast">No members found</div>
+						<div class="text-sm text-secondary">Invite a team member to get started.</div>
+					</div>
+				</template>
+			</Table>
+		`,
+	}),
+}

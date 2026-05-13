@@ -13,6 +13,7 @@ import {
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
 const config = useRuntimeConfig()
+const route = useRoute()
 
 const messages = defineMessages({
 	title: {
@@ -21,7 +22,7 @@ const messages = defineMessages({
 	},
 	description: {
 		id: 'layout.banner.preview.description',
-		defaultMessage: `If you meant to access the official Modrinth website, visit <link>https://modrinth.com</link>. This preview deploy is used by Modrinth staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}.`,
+		defaultMessage: `If you meant to access the official Modrinth website, visit {url}. This preview deploy is used by Modrinth staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}.`,
 	},
 })
 
@@ -29,10 +30,12 @@ function hidePreviewBanner() {
 	flags.value.hidePreviewBanner = true
 	saveFeatureFlags()
 }
+
+const url = computed(() => `https://modrinth.com${route.fullPath}`)
 </script>
 
 <template>
-	<PagewideBanner v-if="!flags.hidePreviewBanner" variant="info">
+	<PagewideBanner v-if="!flags.hidePreviewBanner || flags.showAllBanners" variant="info">
 		<template #title>
 			<span>{{ formatMessage(messages.title) }}</span>
 		</template>
@@ -45,9 +48,9 @@ function hidePreviewBanner() {
 						branch: config.public.branch,
 					}"
 				>
-					<template #link="{ children }">
-						<a href="https://modrinth.com" target="_blank" rel="noopener" class="text-link">
-							<component :is="() => normalizeChildren(children)" />
+					<template #url>
+						<a :href="url" target="_blank" rel="noopener" class="text-link">
+							{{ url }}
 						</a>
 					</template>
 					<template #branch-link="{ children }">
@@ -75,7 +78,7 @@ function hidePreviewBanner() {
 				</IntlFormatted>
 			</span>
 		</template>
-		<template #actions_right>
+		<template #actions_top_right>
 			<ButtonStyled type="transparent" circular>
 				<button :aria-label="formatMessage(commonMessages.closeButton)" @click="hidePreviewBanner">
 					<XIcon aria-hidden="true" />
