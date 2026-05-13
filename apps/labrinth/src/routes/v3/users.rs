@@ -174,7 +174,7 @@ pub async fn user_auth_get(
     if user.role.is_mod() {
         let note =
             DBModerationNote::get_user(user.id.into(), &**pool, &redis).await?;
-        user.notes = Some(note.map(Into::into));
+        user.notes = note.map(Into::into);
     }
 
     Ok(HttpResponse::Ok().json(user))
@@ -223,7 +223,7 @@ pub async fn users_get(
         .map(|data| {
             let mut user = crate::models::users::User::from(data.clone());
             if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
-                user.notes = Some(notes.remove(&data.id).map(Into::into));
+                user.notes = notes.remove(&data.id).map(Into::into);
             }
             user
         })
@@ -266,7 +266,7 @@ pub async fn user_get(
         if is_mod {
             let note =
                 DBModerationNote::get_user(user_id, &**pool, &redis).await?;
-            response.notes = Some(note.map(Into::into));
+            response.notes = note.map(Into::into);
         }
 
         Ok(HttpResponse::Ok().json(response))

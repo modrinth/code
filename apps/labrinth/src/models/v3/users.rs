@@ -66,7 +66,7 @@ pub struct User {
     pub stripe_customer_id: Option<String>,
     pub allow_friend_requests: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub notes: Option<Option<ModerationNote>>,
+    pub notes: Option<ModerationNote>,
 
     // DEPRECATED. Always returns None
     pub github_id: Option<u64>,
