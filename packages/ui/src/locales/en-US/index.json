@@ -2036,6 +2036,150 @@
   "locale.zh-TW": {
     "defaultMessage": "Chinese (Traditional)"
   },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "Replace this with a description"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "Error"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "Describe the image completely as you would to someone who could not see the image."
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "Describe the image..."
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "Description (alt text)"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "Insert image"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "Image source"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "Upload"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "Drag and drop to upload or click to select file"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "Enter the image URL..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "Insert"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "Insert link"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "Enter label..."
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Label"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "Enter the link's URL..."
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "This editor supports <markdown-link>Markdown formatting</markdown-link>."
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "Max length:"
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "Unlimited"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "Write something..."
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "Preview"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "Preview"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Bold"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "Bulleted list"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "Code"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "Heading 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "Heading 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "Heading 3"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "Image"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "Italic"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "Ordered list"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Quote"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "Spoiler"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "Strikethrough"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "Video"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "No file provided"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "No image upload handler provided"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "Invalid URL. This domain is not allowed."
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "Invalid URL. Make sure the URL is well-formed."
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "Unsupported protocol. Use http or https."
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "YouTube video player"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "Insert YouTube video"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "Enter a valid link to a YouTube video."
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "Enter YouTube video URL"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "YouTube video URL"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Add payment method"
   },

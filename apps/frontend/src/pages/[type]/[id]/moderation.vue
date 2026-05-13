@@ -7,12 +7,15 @@
 			:header="formatMessage(moderationAdmonition.header)"
 		>
 			<template
-				v-for="(message, index) in moderationAdmonition.body"
+				v-for="(section, index) in moderationAdmonition.body"
 				:key="`moderation-admonition.${project.status}+${project.requested_status ?? 'none'}.body.${index}`"
 			>
-				<p v-if="message" class="preserve-lines mb-0 mt-2 leading-tight first:mt-0">
+				<p
+					v-if="section.type === 'paragraph' && section.message"
+					class="preserve-lines mb-0 mt-2 leading-tight first:mt-0"
+				>
 					<IntlFormatted
-						:message-id="message"
+						:message-id="section.message"
 						:values="{
 							requestedStatus: project.requested_status ?? 'none',
 						}"
@@ -39,6 +42,28 @@
 						</template>
 					</IntlFormatted>
 				</p>
+				<ul
+					v-else-if="section.type === 'bullets'"
+					class="mb-0 mt-2 flex list-disc flex-col gap-1 pl-4 leading-normal first:mt-0"
+				>
+					<li
+						v-for="(message, listIndex) in section.items"
+						:key="`list-item-${index}-${listIndex}`"
+					>
+						<IntlFormatted :message-id="message">
+							<template #rules-link="{ children }">
+								<nuxt-link to="/legal/rules" class="text-link" target="_blank">
+									<component :is="() => normalizeChildren(children)" />
+								</nuxt-link>
+							</template>
+							<template #terms-link="{ children }">
+								<nuxt-link to="/legal/terms" class="text-link" target="_blank">
+									<component :is="() => normalizeChildren(children)" />
+								</nuxt-link>
+							</template>
+						</IntlFormatted>
+					</li>
+				</ul>
 			</template>
 		</Admonition>
 		<div class="card-shadow mb-6 rounded-2xl border border-solid border-surface-4 bg-surface-3">
@@ -80,7 +105,7 @@
 						v-if="isApproved(project)"
 						class="mb-0 mt-3 flex items-center gap-2 font-semibold text-orange"
 					>
-						<IssuesIcon />
+						<IssuesIcon class="shrink-0" />
 						{{ formatMessage(messages.threadApprovedWarning) }}
 					</p>
 				</template>
@@ -90,17 +115,28 @@
 				:thread="thread"
 				:project="project"
 				:set-status="setStatus"
-				:current-member="currentMember"
+				:current-member="currentMember ?? undefined"
 				:auth="auth"
 				class="overflow-clip rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2"
 				@update-thread="updateThread"
 			/>
+			<div
+				v-else
+				class="flex items-center justify-center gap-2 rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2 py-12"
+			>
+				<template v-if="pending">
+					<SpinnerIcon class="size-5 animate-spin" /> Loading messages
+				</template>
+				<template v-else>
+					<p class="m-0 text-sm text-red">Failed to load messages</p>
+				</template>
+			</div>
 		</div>
 	</template>
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { IssuesIcon } from '@modrinth/assets'
+import { IssuesIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	commonMessages,
@@ -116,23 +152,25 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, type Ref, ref, watch } from 'vue'
+import { computed, type Ref, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
 
 const { formatMessage } = useVIntl()
 
-const showDelayMessage = ref(true)
-
 type ProjectPageMember = Labrinth.Projects.v3.TeamMember & { staffOnly?: boolean }
+type ModerationAdmonitionSection =
+	| {
+			type: 'paragraph'
+			message: MessageDescriptor | null
+	  }
+	| {
+			type: 'bullets'
+			items: MessageDescriptor[]
+	  }
 
 const messages = defineMessages({
-	admonitionRejectedBody: {
-		id: 'project.moderation.admonition.rejected.body',
-		defaultMessage:
-			"Modrinth's moderation team found issues with this project that prevent it from being published on Modrinth, this may include violations of <rules-link>Modrinth's Content Rules</rules-link> or <terms-link>Terms of Use</terms-link>.",
-	},
 	admonitionRejectedSpamNotice: {
 		id: 'project.moderation.admonition.rejected.spam-notice',
 		defaultMessage:
@@ -206,7 +244,7 @@ const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
 			return defineMessage({
 				id: 'project.moderation.admonition.approved.body.private',
 				defaultMessage:
-					'Your project is private, meaning it can only be accessed by you and people you invite',
+					'Your project is private, meaning it can only be accessed by you and people you invite.',
 			})
 		default:
 			return null
@@ -216,7 +254,7 @@ const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
 const moderationAdmonition = computed<{
 	type: InstanceType<typeof Admonition>['type']
 	header: MessageDescriptor
-	body: (MessageDescriptor | null)[]
+	body: ModerationAdmonitionSection[]
 } | null>(() => {
 	const currentProject = project.value
 
@@ -228,15 +266,22 @@ const moderationAdmonition = computed<{
 				defaultMessage: 'Draft project',
 			}),
 			body: [
-				defineMessage({
-					id: 'project.moderation.admonition.draft.body',
-					defaultMessage:
-						"This is a draft project that cannot be seen by others until submitted for review and approved by Modrinth's moderation team.",
-				}),
-				defineMessage({
-					id: 'project.moderation.admonition.draft.submit-for-review',
-					defaultMessage: `Once you have completed all required steps and ensured your project complies with <rules-link>Modrinth's Content Rules</rules-link> you can submit your project for review.`,
-				}),
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.draft.body',
+						defaultMessage:
+							"This is a draft project that cannot be seen by others until submitted for review and approved by Modrinth's moderation team.",
+					}),
+				},
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.draft.submit-for-review',
+						defaultMessage:
+							"Once you have completed all required steps and ensured your project complies with Modrinth's <rules-link>Content Rules</rules-link> you can submit your project for review.",
+					}),
+				},
 			],
 		}
 	}
@@ -248,7 +293,16 @@ const moderationAdmonition = computed<{
 				id: 'project.moderation.admonition.approved.header',
 				defaultMessage: 'Project approved',
 			}),
-			body: [approvedAdmonitionMessage.value, messages.approvedProjectVisibilityMessage],
+			body: [
+				{
+					type: 'paragraph',
+					message: approvedAdmonitionMessage.value,
+				},
+				{
+					type: 'paragraph',
+					message: messages.approvedProjectVisibilityMessage,
+				},
+			],
 		}
 	}
 
@@ -260,34 +314,42 @@ const moderationAdmonition = computed<{
 				defaultMessage: 'Project under review',
 			}),
 			body: [
-				defineMessage({
-					id: 'project.moderation.admonition.under-review.body.1',
-					defaultMessage: `Your project is in queue to be reviewed by Modrinth's moderation team.`,
-				}),
-				defineMessage({
-					id: 'project.moderation.admonition.under-review.body.2',
-					defaultMessage: `While you wait, please ensure your project is compliant with <rules-link>Modrinth's Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>.`,
-				}),
-				defineMessage({
-					id: 'project.moderation.admonition.under-review.body.3',
-					defaultMessage: `You may freely modify or update your project while under review. It won't affect your position in the queue.`,
-				}),
-				defineMessage({
-					id: 'project.moderation.admonition.under-review.body.4',
-					defaultMessage: `We aim to review projects within 24-48 hours of submission.`,
-				}),
-				showDelayMessage.value
-					? defineMessage({
-							id: 'project.moderation.admonition.under-review.body.delay.1',
-							defaultMessage: `<emphasis>Due to delays, some reviews may take longer than expected, this does not reflect an issue with your submission and is not a cause for alarm.</emphasis>`,
-						})
-					: null,
-				showDelayMessage.value
-					? defineMessage({
-							id: 'project.moderation.admonition.under-review.body.delay.2',
-							defaultMessage: `<emphasis>We appreciate your patience while our content moderators work hard to keep Modrinth safe.</emphasis>`,
-						})
-					: null,
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.under-review.body.1',
+						defaultMessage:
+							"Your project is in queue to be reviewed by Modrinth's moderation team.",
+					}),
+				},
+				{
+					type: 'bullets',
+					items: [
+						defineMessage({
+							id: 'project.moderation.admonition.under-review.body.2',
+							defaultMessage:
+								"Your project will be scanned and then reviewed by human moderators to ensure it meets Modrinth's <rules-link>Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>.",
+						}),
+						defineMessage({
+							id: 'project.moderation.admonition.under-review.body.3',
+							defaultMessage:
+								"You can still modify your project, it won't affect your position in the queue.",
+						}),
+						defineMessage({
+							id: 'project.moderation.admonition.under-review.body.4',
+							defaultMessage:
+								'We aim to review submissions in 24-48 hours, but some projects may face delays. This does not reflect an issue with your submission.',
+						}),
+					],
+				},
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.under-review.body.5',
+						defaultMessage:
+							'<emphasis>We appreciate your patience while our moderators work hard to keep Modrinth safe, and look forward to helping you share your content! 💚</emphasis>',
+					}),
+				},
 			],
 		}
 	}
@@ -300,13 +362,18 @@ const moderationAdmonition = computed<{
 				defaultMessage: 'Unlisted by staff',
 			}),
 			body: [
-				messages.admonitionRejectedBody,
-				defineMessage({
-					id: 'project.moderation.admonition.withheld.still-accessible',
-					defaultMessage:
-						'Your project can still be accessed via a direct link, but will not appear publicly.{requestedStatus, select, unlisted { Based on your selected <visibility-settings-link>visibility settings</visibility-settings-link>, most likely no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}',
-				}),
-				messages.admonitionRejectedSpamNotice,
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.withheld.body',
+						defaultMessage:
+							'Your project will not appear publicly and can only be accessed with a direct link.{requestedStatus, select, unlisted { Based on your selected <visibility-settings-link>visibility settings</visibility-settings-link>, most likely no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}',
+					}),
+				},
+				{
+					type: 'paragraph',
+					message: messages.admonitionRejectedSpamNotice,
+				},
 			],
 		}
 	}
@@ -319,13 +386,18 @@ const moderationAdmonition = computed<{
 				defaultMessage: 'Changes requested',
 			}),
 			body: [
-				messages.admonitionRejectedBody,
-				defineMessage({
-					id: 'project.moderation.admonition.rejected.address-all-concerns',
-					defaultMessage:
-						'Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.',
-				}),
-				messages.admonitionRejectedSpamNotice,
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.rejected.address-all-concerns',
+						defaultMessage:
+							'Please address all moderation concerns, including any issues listed in messages below, before resubmitting this project.',
+					}),
+				},
+				{
+					type: 'paragraph',
+					message: messages.admonitionRejectedSpamNotice,
+				},
 			],
 		}
 	}
@@ -372,7 +444,7 @@ const auth = await useAuth()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
-const { data: thread } = useQuery({
+const { data: thread, isPending: pending } = useQuery({
 	queryKey: computed(() => ['thread', project.value?.thread_id]),
 	queryFn: () => client.labrinth.threads_v3.getThread(project.value.thread_id),
 	enabled: computed(() => !!project.value?.thread_id),

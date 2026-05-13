@@ -228,10 +228,9 @@ async function deleteMessage() {
 
 <style lang="scss" scoped>
 .message {
-	--gap-size: var(--spacing-card-xs);
 	display: flex;
 	flex-direction: row;
-	gap: var(--gap-size);
+	gap: var(--spacing-card-sm);
 	flex-wrap: wrap;
 	align-items: center;
 	word-break: break-word;
@@ -242,14 +241,12 @@ async function deleteMessage() {
 	}
 
 	&.has-body {
-		--gap-size: var(--spacing-card-sm);
 		display: grid;
 		grid-template:
 			'icon author actions'
 			'icon body actions'
 			'date date date';
 		grid-template-columns: min-content auto 1fr;
-		column-gap: var(--gap-size);
 		row-gap: var(--spacing-card-xs);
 
 		.message__icon {

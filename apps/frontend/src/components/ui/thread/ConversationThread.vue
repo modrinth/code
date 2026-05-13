@@ -1,28 +1,45 @@
 <template>
 	<div>
-		<Modal
+		<NewModal
 			ref="modalSubmit"
-			:header="isRejected(project) ? 'Resubmit for review' : 'Submit for review'"
+			:header="
+				formatMessage(
+					isRejected(project)
+						? messages.resubmitModalHeaderResubmitting
+						: messages.resubmitModalHeaderSubmitting,
+				)
+			"
 		>
-			<div class="modal-submit universal-body">
-				<span>
-					You're submitting <span class="project-title">{{ project.title }}</span> to be reviewed
-					again by the moderators.
-				</span>
-				<span>
-					Make sure you have addressed the comments from the moderation team.
-					<span class="known-errors">
-						Repeated submissions without addressing the moderators' comments may result in an
-						account suspension.
-					</span>
-				</span>
+			<div class="flex max-w-[35rem] flex-col gap-3">
+				<p class="m-0">
+					<IntlFormatted
+						:message-id="messages.resubmitModalDescription"
+						:message-values="{ projectTitle: project.title }"
+					>
+						<template #project-title="{ children }">
+							<span class="font-semibold text-contrast">
+								<component :is="() => children" />
+							</span>
+						</template>
+					</IntlFormatted>
+				</p>
+				<p class="m-0">{{ formatMessage(messages.resubmitModalReminder) }}</p>
+				<p class="m-0 font-semibold text-red">
+					{{ formatMessage(messages.resubmitModalWarning) }}
+				</p>
 				<Checkbox
 					v-model="submissionConfirmation"
-					description="Confirm I have addressed the messages from the moderators"
+					:description="formatMessage(messages.resubmitModalConfirmationDescription)"
 				>
-					I confirm that I have properly addressed the moderators' comments.
+					{{ formatMessage(messages.resubmitModalConfirmationLabel) }}
 				</Checkbox>
-				<div class="input-group push-right">
+				<div class="flex flex-wrap items-center justify-end gap-2">
+					<ButtonStyled type="outlined">
+						<button @click="modalSubmit.hide()">
+							<XIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
 					<ButtonStyled color="orange">
 						<button
 							:disabled="!submissionConfirmation || isLoading"
@@ -34,33 +51,37 @@
 								aria-hidden="true"
 							/>
 							<ScaleIcon v-else aria-hidden="true" />
-							Resubmit for review
+							{{ formatMessage(messages.actionResubmitForReview) }}
 						</button>
 					</ButtonStyled>
 				</div>
 			</div>
-		</Modal>
-		<Modal ref="modalReply" header="Reply to thread">
-			<div class="modal-submit universal-body">
-				<span>
-					Your project is already approved. As such, the moderation team does not actively monitor
-					this thread. However, they may still see your message if there is a problem with your
-					project.
-				</span>
-				<span>
-					If you need to get in contact with the moderation team, please use the
-					<a class="text-link" href="https://support.modrinth.com" target="_blank">
-						Modrinth Help Center
-					</a>
-					and click the green bubble to contact support.
-				</span>
+		</NewModal>
+		<NewModal ref="modalReply" :header="formatMessage(messages.replyModalHeader)">
+			<div class="flex max-w-[45rem] flex-col gap-3">
+				<p class="m-0">{{ formatMessage(messages.replyModalDescription) }}</p>
+				<p class="m-0">
+					<IntlFormatted :message-id="messages.replyModalHelpCenterNote">
+						<template #help-center-link="{ children }">
+							<a class="text-link" href="https://support.modrinth.com" target="_blank">
+								<component :is="() => children" />
+							</a>
+						</template>
+					</IntlFormatted>
+				</p>
 				<Checkbox
 					v-model="replyConfirmation"
-					description="Confirm moderators do not actively monitor this"
+					:description="formatMessage(messages.replyModalConfirmationDescription)"
 				>
-					I acknowledge that the moderators do not actively monitor the thread.
+					{{ formatMessage(messages.replyModalConfirmationLabel) }}
 				</Checkbox>
-				<div class="input-group push-right">
+				<div class="flex flex-wrap items-center justify-end gap-2">
+					<ButtonStyled type="outlined">
+						<button @click="modalReply.hide()">
+							<XIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
 					<ButtonStyled color="brand">
 						<button
 							:disabled="!replyConfirmation || isLoading"
@@ -72,13 +93,13 @@
 								aria-hidden="true"
 							/>
 							<ReplyIcon v-else aria-hidden="true" />
-							Reply to thread
+							{{ formatMessage(messages.actionReplyToThread) }}
 						</button>
 					</ButtonStyled>
 				</div>
 			</div>
-		</Modal>
-		<div v-if="flags.developerMode" class="thread-id mx-4">
+		</NewModal>
+		<div v-if="flags.developerMode" class="mx-4 mb-3 font-semibold">
 			Thread ID:
 			<CopyCode :text="thread.id" />
 		</div>
@@ -97,7 +118,7 @@
 				/>
 			</div>
 			<template v-if="report && report.closed">
-				<p>This thread is closed and new messages cannot be sent to it.</p>
+				<p>{{ formatMessage(messages.closedThreadDescription) }}</p>
 				<ButtonStyled v-if="isStaff(auth.user)">
 					<button :disabled="isLoading" @click="runBlockingAction('reopen', () => reopenReport())">
 						<SpinnerIcon
@@ -106,85 +127,92 @@
 							aria-hidden="true"
 						/>
 						<CheckCircleIcon v-else aria-hidden="true" />
-						Reopen thread
+						{{ formatMessage(messages.actionReopenThread) }}
 					</button>
 				</ButtonStyled>
 			</template>
 			<template v-else-if="!report || !report.closed">
-				<div class="markdown-editor-spacing mx-4 mt-2">
+				<div class="mx-4 mb-2 mt-2">
 					<MarkdownEditor
 						v-model="replyBody"
-						:placeholder="sortedMessages.length > 0 ? 'Reply to thread...' : 'Send a message...'"
+						:placeholder="
+							formatMessage(
+								sortedMessages.length > 0
+									? messages.replyEditorPlaceholderReply
+									: messages.replyEditorPlaceholderSend,
+							)
+						"
 						:on-image-upload="onUploadImage"
 					/>
 				</div>
-				<div class="input-group m-4 mt-3">
-					<ButtonStyled color="brand">
-						<button
-							v-if="sortedMessages.length > 0"
-							:disabled="!replyBody || isLoading"
-							@click="
-								isApproved(project) && !isStaff(auth.user)
-									? openReplyModal()
-									: runBlockingAction('reply', () => sendReply())
-							"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'reply'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<ReplyIcon v-else aria-hidden="true" />
-							Reply
-						</button>
-						<button
-							v-else
-							:disabled="!replyBody || isLoading"
-							@click="
-								isApproved(project) && !isStaff(auth.user)
-									? openReplyModal()
-									: runBlockingAction('send', () => sendReply())
-							"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'send'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<SendIcon v-else aria-hidden="true" />
-							Send
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="isStaff(auth.user)">
-						<button
-							:disabled="!replyBody || isLoading"
-							@click="runBlockingAction('private-note', () => sendReply(null, true))"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'private-note'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<ScaleIcon v-else aria-hidden="true" />
-							Add private note
-						</button>
-					</ButtonStyled>
-					<template v-if="currentMember && !currentMember.staffOnly">
-						<template v-if="isRejected(project)">
-							<ButtonStyled color="orange">
-								<button v-if="replyBody" :disabled="isLoading" @click="openResubmitModal(true)">
-									<ScaleIcon aria-hidden="true" />
-									Resubmit for review with reply
-								</button>
-								<button v-else :disabled="isLoading" @click="openResubmitModal(false)">
-									<ScaleIcon aria-hidden="true" />
-									Resubmit for review
-								</button>
-							</ButtonStyled>
+				<div class="m-4 mt-3 flex flex-wrap items-center justify-between gap-4">
+					<div class="flex flex-wrap items-center gap-2">
+						<ButtonStyled color="brand">
+							<button
+								v-if="sortedMessages.length > 0"
+								:disabled="!replyBody || isLoading"
+								@click="
+									isApproved(project)
+										? openReplyModal()
+										: runBlockingAction('reply', () => sendReply())
+								"
+							>
+								<SpinnerIcon
+									v-if="loadingAction === 'reply'"
+									class="animate-spin"
+									aria-hidden="true"
+								/>
+								<ReplyIcon v-else aria-hidden="true" />
+								{{ formatMessage(messages.actionReply) }}
+							</button>
+							<button
+								v-else
+								:disabled="!replyBody || isLoading"
+								@click="
+									isApproved(project)
+										? openReplyModal()
+										: runBlockingAction('send', () => sendReply())
+								"
+							>
+								<SpinnerIcon
+									v-if="loadingAction === 'send'"
+									class="animate-spin"
+									aria-hidden="true"
+								/>
+								<SendIcon v-else aria-hidden="true" />
+								{{ formatMessage(messages.actionSend) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-if="isStaff(auth.user)">
+							<button
+								:disabled="!replyBody || isLoading"
+								@click="runBlockingAction('private-note', () => sendReply(null, true))"
+							>
+								<SpinnerIcon
+									v-if="loadingAction === 'private-note'"
+									class="animate-spin"
+									aria-hidden="true"
+								/>
+								<ScaleIcon v-else aria-hidden="true" />
+								{{ formatMessage(messages.actionAddPrivateNote) }}
+							</button>
+						</ButtonStyled>
+						<template v-if="currentMember && !currentMember.staffOnly">
+							<template v-if="isRejected(project)">
+								<ButtonStyled color="orange">
+									<button v-if="replyBody" :disabled="isLoading" @click="openResubmitModal(true)">
+										<ScaleIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
+									</button>
+									<button v-else :disabled="isLoading" @click="openResubmitModal(false)">
+										<ScaleIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionResubmitForReview) }}
+									</button>
+								</ButtonStyled>
+							</template>
 						</template>
-					</template>
-					<div class="spacer"></div>
-					<div class="input-group extra-options">
+					</div>
+					<div class="flex flex-wrap items-center gap-2">
 						<template v-if="report">
 							<template v-if="isStaff(auth.user)">
 								<ButtonStyled color="red">
@@ -199,7 +227,7 @@
 											aria-hidden="true"
 										/>
 										<CheckCircleIcon v-else aria-hidden="true" />
-										Close with reply
+										{{ formatMessage(messages.actionCloseWithReply) }}
 									</button>
 									<button
 										v-else
@@ -212,7 +240,7 @@
 											aria-hidden="true"
 										/>
 										<CheckCircleIcon v-else aria-hidden="true" />
-										Close thread
+										{{ formatMessage(messages.actionCloseThread) }}
 									</button>
 								</ButtonStyled>
 							</template>
@@ -232,7 +260,7 @@
 											aria-hidden="true"
 										/>
 										<CheckIcon v-else aria-hidden="true" />
-										Approve with reply
+										{{ formatMessage(messages.actionApproveWithReply) }}
 									</button>
 								</ButtonStyled>
 								<ButtonStyled v-else color="green">
@@ -246,7 +274,7 @@
 											aria-hidden="true"
 										/>
 										<CheckIcon v-else aria-hidden="true" />
-										Approve
+										{{ formatMessage(messages.actionApprove) }}
 									</button>
 								</ButtonStyled>
 								<div class="joined-buttons">
@@ -261,7 +289,7 @@
 												aria-hidden="true"
 											/>
 											<XIcon v-else aria-hidden="true" />
-											Reject with reply
+											{{ formatMessage(messages.actionRejectWithReply) }}
 										</button>
 									</ButtonStyled>
 									<ButtonStyled v-else color="red">
@@ -275,7 +303,7 @@
 												aria-hidden="true"
 											/>
 											<XIcon v-else aria-hidden="true" />
-											Reject
+											{{ formatMessage(messages.actionReject) }}
 										</button>
 									</ButtonStyled>
 									<ButtonStyled color="red">
@@ -346,27 +374,27 @@
 											<DropdownIcon v-else aria-hidden="true" />
 											<template #withhold-reply>
 												<EyeOffIcon aria-hidden="true" />
-												Withhold with reply
+												{{ formatMessage(messages.actionWithholdWithReply) }}
 											</template>
 											<template #withhold>
 												<EyeOffIcon aria-hidden="true" />
-												Withhold
+												{{ formatMessage(messages.actionWithhold) }}
 											</template>
 											<template #set-to-draft-reply>
 												<FileTextIcon aria-hidden="true" />
-												Set to draft with reply
+												{{ formatMessage(messages.actionSetToDraftWithReply) }}
 											</template>
 											<template #set-to-draft>
 												<FileTextIcon aria-hidden="true" />
-												Set to draft
+												{{ formatMessage(messages.actionSetToDraft) }}
 											</template>
 											<template #send-to-review-reply>
 												<ScaleIcon aria-hidden="true" />
-												Send to review with reply
+												{{ formatMessage(messages.actionSendToReviewWithReply) }}
 											</template>
 											<template #send-to-review>
 												<ScaleIcon aria-hidden="true" />
-												Send to review
+												{{ formatMessage(messages.actionSendToReview) }}
 											</template>
 										</OverflowMenu>
 									</ButtonStyled>
@@ -396,19 +424,179 @@ import {
 import {
 	ButtonStyled,
 	Checkbox,
+	commonMessages,
 	CopyCode,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	MarkdownEditor,
+	NewModal,
 	OverflowMenu,
+	useVIntl,
 } from '@modrinth/ui'
 
-import Modal from '~/components/ui/Modal.vue'
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { isApproved, isRejected } from '~/helpers/projects.js'
 import { isStaff } from '~/helpers/users.js'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	resubmitModalHeaderResubmitting: {
+		id: 'conversation-thread.resubmit-modal.header.resubmitting',
+		defaultMessage: 'Resubmitting for review',
+	},
+	resubmitModalHeaderSubmitting: {
+		id: 'conversation-thread.resubmit-modal.header.submitting',
+		defaultMessage: 'Submitting for review',
+	},
+	resubmitModalDescription: {
+		id: 'conversation-thread.resubmit-modal.description',
+		defaultMessage:
+			"You're submitting <project-title>{projectTitle}</project-title> to be reviewed again by the moderators.",
+	},
+	resubmitModalReminder: {
+		id: 'conversation-thread.resubmit-modal.reminder',
+		defaultMessage: 'Make sure you have addressed all the comments from the moderation team.',
+	},
+	resubmitModalWarning: {
+		id: 'conversation-thread.resubmit-modal.warning',
+		defaultMessage:
+			"Repeated submissions without addressing the moderators' comments may result in an account suspension.",
+	},
+	resubmitModalConfirmationDescription: {
+		id: 'conversation-thread.resubmit-modal.confirmation.description',
+		defaultMessage: 'Confirm I have addressed the messages from the moderators',
+	},
+	resubmitModalConfirmationLabel: {
+		id: 'conversation-thread.resubmit-modal.confirmation.label',
+		defaultMessage: "I confirm that I have properly addressed the moderators' comments.",
+	},
+	replyModalHeader: {
+		id: 'conversation-thread.reply-modal.header',
+		defaultMessage: 'Reply to thread',
+	},
+	replyModalDescription: {
+		id: 'conversation-thread.reply-modal.description',
+		defaultMessage:
+			'Your project is already approved. As such, the moderation team does not actively monitor this thread. However, they may still see your message if there is a problem with your project.',
+	},
+	replyModalHelpCenterNote: {
+		id: 'conversation-thread.reply-modal.help-center-note',
+		defaultMessage:
+			'If you need to get in contact with the moderation team, please use the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble in the bottom right corner to contact support.',
+	},
+	replyModalConfirmationDescription: {
+		id: 'conversation-thread.reply-modal.confirmation.description',
+		defaultMessage: 'Confirm moderators do not actively monitor this',
+	},
+	replyModalConfirmationLabel: {
+		id: 'conversation-thread.reply-modal.confirmation.label',
+		defaultMessage: 'I acknowledge that the moderators do not actively monitor the thread.',
+	},
+	closedThreadDescription: {
+		id: 'conversation-thread.closed-thread.description',
+		defaultMessage: 'This thread is closed and new messages cannot be sent to it.',
+	},
+	replyEditorPlaceholderReply: {
+		id: 'conversation-thread.reply-editor.placeholder.reply',
+		defaultMessage: 'Reply to thread...',
+	},
+	replyEditorPlaceholderSend: {
+		id: 'conversation-thread.reply-editor.placeholder.send',
+		defaultMessage: 'Send a message...',
+	},
+	actionResubmitForReview: {
+		id: 'conversation-thread.action.resubmit-for-review',
+		defaultMessage: 'Resubmit for review',
+	},
+	actionReplyToThread: {
+		id: 'conversation-thread.action.reply-to-thread',
+		defaultMessage: 'Reply to thread',
+	},
+	actionReopenThread: {
+		id: 'conversation-thread.action.reopen-thread',
+		defaultMessage: 'Reopen thread',
+	},
+	actionReply: {
+		id: 'conversation-thread.action.reply',
+		defaultMessage: 'Reply',
+	},
+	actionSend: {
+		id: 'conversation-thread.action.send',
+		defaultMessage: 'Send',
+	},
+	actionAddPrivateNote: {
+		id: 'conversation-thread.action.add-private-note',
+		defaultMessage: 'Add private note',
+	},
+	actionResubmitForReviewWithReply: {
+		id: 'conversation-thread.action.resubmit-for-review-with-reply',
+		defaultMessage: 'Resubmit for review with reply',
+	},
+	actionCloseWithReply: {
+		id: 'conversation-thread.action.close-with-reply',
+		defaultMessage: 'Close with reply',
+	},
+	actionCloseThread: {
+		id: 'conversation-thread.action.close-thread',
+		defaultMessage: 'Close thread',
+	},
+	actionApproveWithReply: {
+		id: 'conversation-thread.action.approve-with-reply',
+		defaultMessage: 'Approve with reply',
+	},
+	actionApprove: {
+		id: 'conversation-thread.action.approve',
+		defaultMessage: 'Approve',
+	},
+	actionRejectWithReply: {
+		id: 'conversation-thread.action.reject-with-reply',
+		defaultMessage: 'Reject with reply',
+	},
+	actionReject: {
+		id: 'conversation-thread.action.reject',
+		defaultMessage: 'Reject',
+	},
+	actionWithholdWithReply: {
+		id: 'conversation-thread.action.withhold-with-reply',
+		defaultMessage: 'Withhold with reply',
+	},
+	actionWithhold: {
+		id: 'conversation-thread.action.withhold',
+		defaultMessage: 'Withhold',
+	},
+	actionSetToDraftWithReply: {
+		id: 'conversation-thread.action.set-to-draft-with-reply',
+		defaultMessage: 'Set to draft with reply',
+	},
+	actionSetToDraft: {
+		id: 'conversation-thread.action.set-to-draft',
+		defaultMessage: 'Set to draft',
+	},
+	actionSendToReviewWithReply: {
+		id: 'conversation-thread.action.send-to-review-with-reply',
+		defaultMessage: 'Send to review with reply',
+	},
+	actionSendToReview: {
+		id: 'conversation-thread.action.send-to-review',
+		defaultMessage: 'Send to review',
+	},
+	errorSendingMessage: {
+		id: 'conversation-thread.error.sending-message',
+		defaultMessage: 'Error sending message',
+	},
+	errorClosingReport: {
+		id: 'conversation-thread.error.closing-report',
+		defaultMessage: 'Error closing report',
+	},
+	errorReopeningReport: {
+		id: 'conversation-thread.error.reopening-report',
+		defaultMessage: 'Error reopening report',
+	},
+})
 
 const props = defineProps({
 	thread: {
@@ -554,7 +742,7 @@ async function sendReply(status = null, privateMessage = false) {
 		}
 	} catch (err) {
 		addNotification({
-			title: 'Error sending message',
+			title: formatMessage(messages.errorSendingMessage),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -576,7 +764,7 @@ async function closeReport(reply) {
 		await updateThreadLocal()
 	} catch (err) {
 		addNotification({
-			title: 'Error closing report',
+			title: formatMessage(messages.errorClosingReport),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -594,7 +782,7 @@ async function reopenReport() {
 		await updateThreadLocal()
 	} catch (err) {
 		addNotification({
-			title: 'Error reopening report',
+			title: formatMessage(messages.errorReopeningReport),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -631,37 +819,3 @@ defineOptions({
 	inheritAttrs: false,
 })
 </script>
-
-<style lang="scss" scoped>
-.markdown-editor-spacing {
-	margin-bottom: var(--gap-md);
-}
-
-.thread-id {
-	margin-bottom: var(--spacing-card-md);
-	font-weight: bold;
-	color: var(--color-heading);
-}
-
-.input-group {
-	.spacer {
-		flex-grow: 1;
-		flex-shrink: 1;
-	}
-
-	.extra-options {
-		flex-basis: fit-content;
-	}
-}
-
-.modal-submit {
-	padding: var(--spacing-card-bg);
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-card-lg);
-
-	.project-title {
-		font-weight: bold;
-	}
-}
-</style>
