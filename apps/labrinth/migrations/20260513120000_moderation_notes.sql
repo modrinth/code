@@ -6,11 +6,7 @@ CREATE TABLE moderation_notes (
 	last_author BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 	version INTEGER NOT NULL DEFAULT 0,
 	notes TEXT NOT NULL,
-	user_rating INTEGER NOT NULL DEFAULT 0,
-	CONSTRAINT moderation_notes_one_target CHECK (
-		(user_id IS NOT NULL AND organization_id IS NULL)
-		OR (user_id IS NULL AND organization_id IS NOT NULL)
-	)
+	user_rating INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE UNIQUE INDEX moderation_notes_user_id_unique
