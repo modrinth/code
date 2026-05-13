@@ -1053,6 +1053,7 @@ enum DownloadSourcePattern {
     Website,
     ModrinthApp,
     ModrinthHosting,
+    ModrinthMaven,
 }
 
 impl DownloadSourcePattern {
@@ -1062,6 +1063,7 @@ impl DownloadSourcePattern {
             Self::Website => DownloadSource::Website,
             Self::ModrinthApp => DownloadSource::ModrinthApp,
             Self::ModrinthHosting => DownloadSource::ModrinthHosting,
+            Self::ModrinthMaven => DownloadSource::ModrinthMaven,
         }
     }
 }
@@ -1073,6 +1075,7 @@ static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
         [
             (r"^modrinth/kyros/", P::ModrinthApp),
             (r"^modrinth/theseus/", P::ModrinthApp),
+            (r"^(Gradle/|Apache-Maven/)", P::ModrinthMaven),
             (r"^MultiMC/", P::Named("MultiMC")),
             (r"^PrismLauncher/", P::Named("Prism Launcher")),
             (r"^PolyMC/", P::Named("PolyMC")),
@@ -1089,6 +1092,9 @@ static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
             ),
             (r"Feather/[0-9A-Za-z]+", P::Named("Feather Client")),
             (r"^PandoraLauncher/", P::Named("Pandora Launcher")),
+            (r"^unsup", P::Named("unsup")),
+            (r"nothub/mrpack-install", P::Named("mrpack-install")),
+            (r"^(packwiz-installer|packwiz/)", P::Named("Packwiz")),
             (
                 r"^(Mozilla/|Chrome/|Chromium/|Firefox/|Safari/|AppleWebKit/|Edg/|OPR/)",
                 P::Website,
