@@ -469,6 +469,10 @@ export function readAnalyticsQueryBuilderState(
 	}
 }
 
+export function hasAnalyticsProjectSelectionQuery(query: LocationQuery): boolean {
+	return parseListQueryValue(query[QUERY_KEY_PROJECT_IDS]).length > 0
+}
+
 export function buildAnalyticsQueryBuilderRouteQuery(
 	currentRouteQuery: LocationQuery,
 	state: AnalyticsQueryBuilderState,

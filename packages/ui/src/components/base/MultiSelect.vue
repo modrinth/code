@@ -134,7 +134,7 @@
 						</div>
 
 						<div
-							v-if="filteredOptions.length > 0 || shouldShowSelectAll"
+							v-if="hasFilteredOptions || shouldShowSelectAll"
 							class="flex flex-col gap-2 bg-surface-4 border-0 border-solid border-b border-b-surface-5 py-1.5 empty:hidden"
 						>
 							<div v-if="shouldShowSelectAll" class="sticky top-0 z-10 bg-surface-4 px-3">
@@ -195,13 +195,32 @@
 					</div>
 
 					<div
-						v-if="filteredOptions.length > 0"
+						v-if="hasFilteredOptions"
 						ref="optionsContainerRef"
-						class="flex flex-col gap-2 overflow-y-auto px-3 py-1.5"
+						class="flex flex-col gap-2 overflow-y-auto px-3 py-1.5 select-none"
 						:style="{ maxHeight: `${maxHeight}px` }"
 					>
-						<template v-for="(item, index) in filteredOptions" :key="String(item.value)">
+						<template v-for="(item, index) in filteredOptions" :key="getItemKey(item, index)">
+							<div
+								v-if="isSectionHeader(item)"
+								class="flex items-center justify-between gap-3 px-3 pr-0 pb-1 pt-2 text-sm font-bold text-secondary"
+								:class="item.class"
+								role="presentation"
+							>
+								<span class="min-w-0 truncate">{{ item.label }}</span>
+								<button
+									v-if="hasSelectableSectionHeaderOptions(item)"
+									type="button"
+									class="shrink-0 border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+									@click.stop="toggleSectionHeaderOptions(item)"
+									@keydown.enter.stop
+									@keydown.space.stop
+								>
+									{{ areSectionHeaderOptionsSelected(item) ? 'Clear' : 'Select all' }}
+								</button>
+							</div>
 							<span
+								v-else
 								:ref="(el: any) => setOptionRef(el as HTMLElement, index)"
 								role="option"
 								:aria-selected="isSelected(item.value)"
@@ -291,14 +310,31 @@ export interface MultiSelectOption<T> {
 	searchTerms?: string[]
 }
 
+export interface MultiSelectSectionHeader {
+	type: 'section-header'
+	label: string
+	key?: string
+	class?: string
+}
+
+export type MultiSelectItem<T> = MultiSelectOption<T> | MultiSelectSectionHeader
+
 const DROPDOWN_VIEWPORT_MARGIN = 8
 const DROPDOWN_GAP = 12
 const DEFAULT_MAX_HEIGHT = 300
 
+function isSectionHeader<T>(item: MultiSelectItem<T>): item is MultiSelectSectionHeader {
+	return 'type' in item && item.type === 'section-header'
+}
+
+function isOption<T>(item: MultiSelectItem<T>): item is MultiSelectOption<T> {
+	return !isSectionHeader(item)
+}
+
 const props = withDefaults(
 	defineProps<{
 		modelValue: T[]
-		options: MultiSelectOption<T>[]
+		options: MultiSelectItem<T>[]
 		placeholder?: string
 		disabled?: boolean
 		searchable?: boolean
@@ -336,7 +372,7 @@ const props = withDefaults(
 		includeSelectAllOption: false,
 		selectAllLabel: 'Select all',
 		showSelectionActions: false,
-		selectionActionsClearLabel: 'Deselect all',
+		selectionActionsClearLabel: 'Clear',
 		maxTagRows: 1,
 	},
 )
@@ -371,12 +407,14 @@ const dropdownStyle = ref({
 const openDirection = ref<'down' | 'up'>('down')
 const hasCustomInputContent = computed(() => Boolean(slots['input-content']))
 
+const selectableOptions = computed(() => props.options.filter(isOption))
+
 const selectedOptions = computed(() => {
-	return props.options.filter((opt) => props.modelValue.includes(opt.value))
+	return selectableOptions.value.filter((opt) => props.modelValue.includes(opt.value))
 })
 
 const isAllSelected = computed(() => {
-	const selectableOptions = props.options.filter((opt) => !opt.disabled)
+	const selectableOptions = props.options.filter(isOption).filter((opt) => !opt.disabled)
 	return (
 		selectableOptions.length > 0 &&
 		selectableOptions.every((opt) => props.modelValue.includes(opt.value))
@@ -384,7 +422,10 @@ const isAllSelected = computed(() => {
 })
 
 const isIndeterminate = computed(() => {
-	return !isAllSelected.value && props.modelValue.length > 0
+	return (
+		!isAllSelected.value &&
+		selectableOptions.value.some((opt) => !opt.disabled && props.modelValue.includes(opt.value))
+	)
 })
 
 const visibleTagCount = ref(Infinity)
@@ -411,24 +452,114 @@ const filteredOptions = computed(() => {
 	}
 
 	const query = searchQuery.value.toLowerCase()
-	return props.options.filter((opt) => {
-		if (opt.label.toLowerCase().includes(query)) return true
-		if (opt.searchTerms?.some((term) => term.toLowerCase().includes(query))) return true
-		return false
-	})
+	const items: MultiSelectItem<T>[] = []
+	let pendingSectionHeader: MultiSelectSectionHeader | null = null
+
+	for (const opt of props.options) {
+		if (isSectionHeader(opt)) {
+			pendingSectionHeader = opt
+			continue
+		}
+
+		const matches =
+			opt.label.toLowerCase().includes(query) ||
+			opt.searchTerms?.some((term) => term.toLowerCase().includes(query))
+
+		if (!matches) {
+			continue
+		}
+
+		if (pendingSectionHeader) {
+			items.push(pendingSectionHeader)
+			pendingSectionHeader = null
+		}
+		items.push(opt)
+	}
+
+	return items
 })
 
-const isNoOptionsState = computed(() => props.options.length === 0 && !searchQuery.value)
-const shouldShowSelectAll = computed(() => props.includeSelectAllOption && props.options.length > 0)
+const hasFilteredOptions = computed(() => filteredOptions.value.some(isOption))
+const isNoOptionsState = computed(() => selectableOptions.value.length === 0 && !searchQuery.value)
+const shouldShowSelectAll = computed(
+	() => props.includeSelectAllOption && selectableOptions.value.length > 0,
+)
+const selectedOptionCount = computed(() => selectedOptions.value.length)
 const shouldShowSelectionActions = computed(
-	() => props.showSelectionActions && props.modelValue.length > 0,
+	() => props.showSelectionActions && selectedOptionCount.value > 0,
 )
 const selectionActionsLabel = computed(() => {
-	return props.modelValue.length === 1 ? '1 selected' : `${props.modelValue.length} selected`
+	return selectedOptionCount.value === 1 ? '1 selected' : `${selectedOptionCount.value} selected`
 })
 
 function isSelected(value: T) {
 	return props.modelValue.includes(value)
+}
+
+function getItemKey(item: MultiSelectItem<T>, index: number) {
+	if (isSectionHeader(item)) {
+		return item.key ?? `section-header-${item.label}-${index}`
+	}
+
+	return `option-${String(item.value)}`
+}
+
+function getSectionHeaderOptions(sectionHeader: MultiSelectSectionHeader) {
+	const sectionHeaderIndex = props.options.findIndex((item) => item === sectionHeader)
+	if (sectionHeaderIndex === -1) {
+		return []
+	}
+
+	const sectionHeaderOptions: MultiSelectOption<T>[] = []
+	for (let i = sectionHeaderIndex + 1; i < props.options.length; i++) {
+		const item = props.options[i]
+		if (!item || isSectionHeader(item)) {
+			break
+		}
+		if (!item.disabled) {
+			sectionHeaderOptions.push(item)
+		}
+	}
+
+	return sectionHeaderOptions
+}
+
+function hasSelectableSectionHeaderOptions(sectionHeader: MultiSelectSectionHeader) {
+	return getSectionHeaderOptions(sectionHeader).length > 0
+}
+
+function areSectionHeaderOptionsSelected(sectionHeader: MultiSelectSectionHeader) {
+	const sectionHeaderOptions = getSectionHeaderOptions(sectionHeader)
+	return (
+		sectionHeaderOptions.length > 0 &&
+		sectionHeaderOptions.every((option) => isSelected(option.value))
+	)
+}
+
+function toggleSectionHeaderOptions(sectionHeader: MultiSelectSectionHeader) {
+	const sectionHeaderOptions = getSectionHeaderOptions(sectionHeader)
+	if (sectionHeaderOptions.length === 0) {
+		return
+	}
+
+	let newValue: T[]
+	if (sectionHeaderOptions.every((option) => isSelected(option.value))) {
+		const sectionHeaderValues = new Set(sectionHeaderOptions.map((option) => option.value))
+		newValue = props.modelValue.filter((value) => !sectionHeaderValues.has(value))
+	} else {
+		newValue = [...props.modelValue]
+		for (const option of sectionHeaderOptions) {
+			if (!newValue.includes(option.value)) {
+				newValue.push(option.value)
+			}
+		}
+	}
+
+	emit('update:modelValue', newValue)
+	const lastSectionHeaderOption = sectionHeaderOptions[sectionHeaderOptions.length - 1]
+	if (lastSectionHeaderOption) {
+		lastClickedValue.value = { value: lastSectionHeaderOption.value }
+	}
 }
 
 function toggleOption(option: MultiSelectOption<T>, event?: MouseEvent | KeyboardEvent) {
@@ -436,8 +567,12 @@ function toggleOption(option: MultiSelectOption<T>, event?: MouseEvent | Keyboar
 
 	if (event?.shiftKey && lastClickedValue.value) {
 		const anchorValue = lastClickedValue.value.value
-		const anchorIndex = filteredOptions.value.findIndex((opt) => opt.value === anchorValue)
-		const currentIndex = filteredOptions.value.findIndex((opt) => opt.value === option.value)
+		const anchorIndex = filteredOptions.value.findIndex(
+			(opt) => isOption(opt) && opt.value === anchorValue,
+		)
+		const currentIndex = filteredOptions.value.findIndex(
+			(opt) => isOption(opt) && opt.value === option.value,
+		)
 
 		if (anchorIndex !== -1 && currentIndex !== -1 && anchorIndex !== currentIndex) {
 			const start = Math.min(anchorIndex, currentIndex)
@@ -447,7 +582,7 @@ function toggleOption(option: MultiSelectOption<T>, event?: MouseEvent | Keyboar
 
 			for (let i = start; i <= end; i++) {
 				const opt = filteredOptions.value[i]
-				if (opt.disabled) continue
+				if (!opt || isSectionHeader(opt) || opt.disabled) continue
 				const idx = newValue.indexOf(opt.value)
 				if (shouldSelect && idx === -1) {
 					newValue.push(opt.value)
@@ -493,7 +628,7 @@ function toggleSelectAll() {
 	if (isAllSelected.value) {
 		emit('update:modelValue', [])
 	} else {
-		const allValues = props.options.filter((opt) => !opt.disabled).map((opt) => opt.value)
+		const allValues = selectableOptions.value.filter((opt) => !opt.disabled).map((opt) => opt.value)
 		emit('update:modelValue', allValues)
 	}
 }
@@ -622,7 +757,7 @@ async function openDropdown() {
 		;(searchInputRef.value as unknown as { focus: () => void }).focus()
 	}
 
-	focusedIndex.value = shouldShowSelectAll.value ? -2 : filteredOptions.value.length > 0 ? 0 : -1
+	focusedIndex.value = shouldShowSelectAll.value ? -2 : getFirstFocusableOptionIndex()
 	startPositionTracking()
 }
 
@@ -666,16 +801,41 @@ function handleTriggerKeydown(event: KeyboardEvent) {
 	}
 }
 
+function isFocusableOptionIndex(index: number) {
+	const option = filteredOptions.value[index]
+	return option !== undefined && isOption(option) && !option.disabled
+}
+
+function getFirstFocusableOptionIndex() {
+	return filteredOptions.value.findIndex((_, index) => isFocusableOptionIndex(index))
+}
+
+function findNextFocusableOption(currentIndex: number, direction: 'next' | 'previous') {
+	const length = filteredOptions.value.length
+	if (length === 0) return -1
+
+	let index = currentIndex
+	for (let i = 0; i < length; i++) {
+		index = direction === 'next' ? (index + 1) % length : (index - 1 + length) % length
+		if (isFocusableOptionIndex(index)) {
+			return index
+		}
+	}
+
+	return -1
+}
+
 function focusNextOption() {
 	const length = filteredOptions.value.length
 	if (length === 0) return
 
-	if (focusedIndex.value === -2) {
-		focusedIndex.value = 0
-	} else {
-		focusedIndex.value = (focusedIndex.value + 1) % length
-	}
+	const nextIndex = findNextFocusableOption(
+		focusedIndex.value === -2 ? -1 : focusedIndex.value,
+		'next',
+	)
+	if (nextIndex === -1) return
 
+	focusedIndex.value = nextIndex
 	optionRefs.value[focusedIndex.value]?.scrollIntoView({ block: 'nearest' })
 }
 
@@ -683,17 +843,18 @@ function focusPreviousOption() {
 	const length = filteredOptions.value.length
 	if (length === 0) return
 
-	if (focusedIndex.value <= 0 && shouldShowSelectAll.value) {
+	if (focusedIndex.value === getFirstFocusableOptionIndex() && shouldShowSelectAll.value) {
 		focusedIndex.value = -2
 		return
 	}
 
-	if (focusedIndex.value <= 0) {
-		focusedIndex.value = length - 1
-	} else {
-		focusedIndex.value = focusedIndex.value - 1
-	}
+	const previousIndex = findNextFocusableOption(
+		focusedIndex.value === -1 ? 0 : focusedIndex.value,
+		'previous',
+	)
+	if (previousIndex === -1) return
 
+	focusedIndex.value = previousIndex
 	optionRefs.value[focusedIndex.value]?.scrollIntoView({ block: 'nearest' })
 }
 
@@ -718,7 +879,7 @@ function handleDropdownKeydown(event: KeyboardEvent) {
 				toggleSelectAll()
 			} else if (focusedIndex.value >= 0) {
 				const option = filteredOptions.value[focusedIndex.value]
-				if (option) toggleOption(option, event)
+				if (option && isOption(option)) toggleOption(option, event)
 			}
 			break
 		case 'Tab':
@@ -749,7 +910,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
 				toggleSelectAll()
 			} else if (focusedIndex.value >= 0) {
 				const option = filteredOptions.value[focusedIndex.value]
-				if (option) toggleOption(option, event)
+				if (option && isOption(option)) toggleOption(option, event)
 			}
 		}
 	} else if (event.key === 'Tab' && isOpen.value) {
@@ -767,7 +928,7 @@ function handleSearchInput() {
 	if (!isOpen.value) {
 		openDropdown()
 	}
-	focusedIndex.value = shouldShowSelectAll.value ? -2 : filteredOptions.value.length > 0 ? 0 : -1
+	focusedIndex.value = shouldShowSelectAll.value ? -2 : getFirstFocusableOptionIndex()
 }
 
 function handleWindowResize() {

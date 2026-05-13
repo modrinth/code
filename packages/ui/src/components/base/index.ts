@@ -50,7 +50,11 @@ export { default as LoadingBar } from './LoadingBar.vue'
 export { default as LoadingIndicator } from './LoadingIndicator.vue'
 export { default as ManySelect } from './ManySelect.vue'
 export { default as MarkdownEditor } from './MarkdownEditor.vue'
-export type { MultiSelectOption } from './MultiSelect.vue'
+export type {
+	MultiSelectItem,
+	MultiSelectOption,
+	MultiSelectSectionHeader,
+} from './MultiSelect.vue'
 export { default as MultiSelect } from './MultiSelect.vue'
 export type { MaybeCtxFn, StageButtonConfig, StageConfigInput } from './MultiStageModal.vue'
 export { default as MultiStageModal, resolveCtxFn } from './MultiStageModal.vue'

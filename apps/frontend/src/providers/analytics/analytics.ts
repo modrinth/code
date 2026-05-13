@@ -24,6 +24,7 @@ import {
 	areStringArraysEqual,
 	buildAnalyticsQueryBuilderRouteQuery,
 	buildDefaultAnalyticsQueryBuilderState,
+	hasAnalyticsProjectSelectionQuery,
 	hasAnalyticsQueryBuilderRouteChange,
 	isAnalyticsQueryBuilderStateDefault,
 	readAnalyticsQueryBuilderState,
@@ -54,12 +55,31 @@ type AnalyticsProjectFetchRequest = Labrinth.Analytics.v3.FetchRequest & {
 	project_ids: string[]
 }
 
+type AnalyticsDashboardProjectSource = ProjectTypeMetadata & {
+	id: string
+	name?: string | null
+	title?: string | null
+	icon_url?: string | null
+	downloads?: number | null
+	status?: string | null
+}
+
+type AnalyticsDashboardUserProjectSource = AnalyticsDashboardProjectSource & {
+	organization?: string | null
+}
+
 export interface AnalyticsDashboardProject {
 	id: string
 	name: string
 	iconUrl?: string
 	downloads: number
 	status: ProjectStatusFilterValue
+}
+
+export interface AnalyticsDashboardProjectGroup {
+	key?: string
+	title?: string
+	projects: AnalyticsDashboardProject[]
 }
 
 export interface AnalyticsDashboardTotals {
@@ -87,6 +107,7 @@ export interface AnalyticsDashboardFilterOptions {
 
 export interface AnalyticsDashboardContextValue {
 	hasProjectContext: ComputedRef<boolean>
+	projectGroups: ComputedRef<AnalyticsDashboardProjectGroup[]>
 	projects: ComputedRef<AnalyticsDashboardProject[]>
 	selectedProjectIds: Ref<string[]>
 	selectedTimeframeMode: Ref<AnalyticsTimeframeMode>
@@ -144,7 +165,7 @@ export interface AnalyticsDashboardContextValue {
 }
 
 export type CreateAnalyticsDashboardContextOptions = {
-	auth: Ref<{ user?: { id?: string } | null }>
+	auth: Ref<{ user?: { id?: string; username?: string; role?: string } | null }>
 	projectPageContext?: ProjectPageContext | null
 	organizationContext?: OrganizationContext | null
 }
@@ -283,6 +304,53 @@ function isAnalyticsEligibleProject(
 	project: ProjectTypeMetadata & { status?: string | null },
 ): boolean {
 	return !isServerProject(project) && getProjectStatusFilterValue(project.status) !== 'draft'
+}
+
+function getSingleQueryValue(value: unknown): string | undefined {
+	if (typeof value !== 'string') {
+		return undefined
+	}
+
+	const normalizedValue = value.trim()
+	return normalizedValue.length > 0 ? normalizedValue : undefined
+}
+
+function toAnalyticsDashboardProject(
+	project: AnalyticsDashboardProjectSource,
+): AnalyticsDashboardProject {
+	return {
+		id: project.id,
+		name: project.name ?? project.title ?? project.id,
+		iconUrl: project.icon_url ?? undefined,
+		downloads: project.downloads ?? 0,
+		status: getProjectStatusFilterValue(project.status),
+	}
+}
+
+function getUniqueAnalyticsDashboardProjects(
+	projects: AnalyticsDashboardProjectSource[],
+	seenProjectIds: Set<string>,
+): AnalyticsDashboardProject[] {
+	const analyticsProjects: AnalyticsDashboardProject[] = []
+
+	for (const project of projects) {
+		if (seenProjectIds.has(project.id) || !isAnalyticsEligibleProject(project)) {
+			continue
+		}
+
+		seenProjectIds.add(project.id)
+		analyticsProjects.push(toAnalyticsDashboardProject(project))
+	}
+
+	return analyticsProjects
+}
+
+function getProjectOrganizationId(
+	project: AnalyticsDashboardUserProjectSource,
+): string | undefined {
+	return typeof project.organization === 'string' && project.organization.trim().length > 0
+		? project.organization
+		: undefined
 }
 
 export function doesProjectStatusMatchFilters(
@@ -738,18 +806,197 @@ export function createAnalyticsDashboardContext(
 	const hasOrganizationContext = computed(
 		() => !hasProjectContext.value && Boolean(options.organizationContext),
 	)
+	const isDashboardAnalyticsRoute = computed(
+		() => route.path.replace(/\/$/, '') === '/dashboard/analytics',
+	)
+	const requestedDashboardUserId = computed(() => {
+		if (!isDashboardAnalyticsRoute.value || options.auth.value.user?.role !== 'admin') {
+			return undefined
+		}
+
+		return getSingleQueryValue(route.query.user)
+	})
+	const effectiveUserId = computed(
+		() => requestedDashboardUserId.value ?? options.auth.value.user?.id,
+	)
+	const isUsingDashboardUserOverride = computed(() => requestedDashboardUserId.value !== undefined)
+	const analyticsQueryUserId = computed(() => effectiveUserId.value ?? options.auth.value.user?.id)
+	const shouldFetchEffectiveUser = computed(
+		() =>
+			Boolean(effectiveUserId.value) &&
+			!hasProjectContext.value &&
+			!hasOrganizationContext.value &&
+			(effectiveUserId.value !== options.auth.value.user?.id || !options.auth.value.user?.username),
+	)
+
+	const { data: effectiveUser } = useQuery({
+		queryKey: computed(() => ['analytics', 'dashboard', effectiveUserId.value, 'user']),
+		queryFn: async () => {
+			try {
+				return await client.labrinth.users_v2.get(effectiveUserId.value ?? '')
+			} catch (error) {
+				if (isUsingDashboardUserOverride.value) {
+					return null
+				}
+
+				throw error
+			}
+		},
+		enabled: shouldFetchEffectiveUser,
+		placeholderData: null,
+	})
+	const effectiveUsername = computed(() => {
+		if (effectiveUserId.value === options.auth.value.user?.id) {
+			return (
+				options.auth.value.user?.username ??
+				effectiveUser.value?.username ??
+				effectiveUserId.value ??
+				'User'
+			)
+		}
+
+		return effectiveUser.value?.username ?? effectiveUserId.value ?? 'User'
+	})
 
 	const { data: userProjects, isFetched: hasFetchedUserProjects } = useQuery({
-		queryKey: computed(() => ['analytics', 'dashboard', options.auth.value?.user?.id, 'projects']),
-		queryFn: () => client.labrinth.users_v2.getProjects(options.auth.value.user?.id ?? ''),
+		queryKey: computed(() => ['analytics', 'dashboard', effectiveUserId.value, 'projects']),
+		queryFn: async () => {
+			try {
+				return await client.labrinth.users_v2.getProjects(effectiveUserId.value ?? '')
+			} catch (error) {
+				if (isUsingDashboardUserOverride.value) {
+					return []
+				}
+
+				throw error
+			}
+		},
 		enabled: computed(
 			() =>
-				Boolean(options.auth.value.user?.id) &&
+				Boolean(effectiveUserId.value) && !hasProjectContext.value && !hasOrganizationContext.value,
+		),
+		placeholderData: [],
+	})
+
+	const { data: userOrganizations, isFetched: hasFetchedUserOrganizations } = useQuery({
+		queryKey: computed(() => ['analytics', 'dashboard', effectiveUserId.value, 'organizations']),
+		queryFn: async () => {
+			try {
+				return await client.labrinth.users_v2.getOrganizations(effectiveUserId.value ?? '')
+			} catch (error) {
+				if (isUsingDashboardUserOverride.value) {
+					return []
+				}
+
+				throw error
+			}
+		},
+		enabled: computed(
+			() =>
+				Boolean(effectiveUserId.value) && !hasProjectContext.value && !hasOrganizationContext.value,
+		),
+		placeholderData: [],
+	})
+
+	const userOrganizationIds = computed(() =>
+		(userOrganizations.value ?? []).map((organization) => organization.id),
+	)
+	const userProjectOrganizationIds = computed(() => {
+		const organizationIds: string[] = []
+		const seenOrganizationIds = new Set<string>()
+
+		for (const project of userProjects.value ?? []) {
+			const organizationId = getProjectOrganizationId(project)
+			if (!organizationId || seenOrganizationIds.has(organizationId)) {
+				continue
+			}
+
+			seenOrganizationIds.add(organizationId)
+			organizationIds.push(organizationId)
+		}
+
+		return organizationIds
+	})
+	const extraUserProjectOrganizationIds = computed(() => {
+		const organizationIds = new Set(userOrganizationIds.value)
+		return userProjectOrganizationIds.value.filter(
+			(organizationId) => !organizationIds.has(organizationId),
+		)
+	})
+
+	const {
+		data: extraUserProjectOrganizations,
+		isFetched: hasFetchedExtraUserProjectOrganizations,
+	} = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			effectiveUserId.value,
+			'project-organizations',
+			extraUserProjectOrganizationIds.value,
+		]),
+		queryFn: async () => {
+			try {
+				return await client.labrinth.organizations_v3.getMultiple(
+					extraUserProjectOrganizationIds.value,
+				)
+			} catch (error) {
+				if (isUsingDashboardUserOverride.value) {
+					return []
+				}
+
+				throw error
+			}
+		},
+		enabled: computed(
+			() =>
+				Boolean(effectiveUserId.value) &&
+				hasFetchedUserProjects.value &&
+				extraUserProjectOrganizationIds.value.length > 0 &&
 				!hasProjectContext.value &&
 				!hasOrganizationContext.value,
 		),
 		placeholderData: [],
 	})
+
+	const { data: userOrganizationProjects, isFetched: hasFetchedUserOrganizationProjects } =
+		useQuery({
+			queryKey: computed(() => [
+				'analytics',
+				'dashboard',
+				effectiveUserId.value,
+				'organization-projects',
+				userOrganizationIds.value,
+			]),
+			queryFn: async () =>
+				Promise.all(
+					(userOrganizations.value ?? []).map(async (organization) => {
+						try {
+							return {
+								organization,
+								projects: await client.labrinth.organizations_v3.getProjects(organization.id),
+							}
+						} catch (error) {
+							if (isUsingDashboardUserOverride.value) {
+								return {
+									organization,
+									projects: [],
+								}
+							}
+
+							throw error
+						}
+					}),
+				),
+			enabled: computed(
+				() =>
+					Boolean(effectiveUserId.value) &&
+					hasFetchedUserOrganizations.value &&
+					!hasProjectContext.value &&
+					!hasOrganizationContext.value,
+			),
+			placeholderData: [],
+		})
 
 	const areProjectsLoaded = computed(() => {
 		if (hasProjectContext.value) {
@@ -760,47 +1007,119 @@ export function createAnalyticsDashboardContext(
 			return options.organizationContext?.projects.value !== null
 		}
 
-		return hasFetchedUserProjects.value
+		const areExtraUserProjectOrganizationsLoaded =
+			extraUserProjectOrganizationIds.value.length === 0 ||
+			hasFetchedExtraUserProjectOrganizations.value
+
+		return (
+			hasFetchedUserProjects.value &&
+			hasFetchedUserOrganizations.value &&
+			hasFetchedUserOrganizationProjects.value &&
+			areExtraUserProjectOrganizationsLoaded
+		)
 	})
 
-	const projects = computed<AnalyticsDashboardProject[]>(() => {
+	const projectGroups = computed<AnalyticsDashboardProjectGroup[]>(() => {
 		if (hasProjectContext.value && options.projectPageContext) {
 			const project = options.projectPageContext.projectV2.value
 			return project && isAnalyticsEligibleProject(project)
 				? [
 						{
-							id: project.id,
-							name: project.title,
-							iconUrl: project.icon_url ?? undefined,
-							downloads: project.downloads ?? 0,
-							status: getProjectStatusFilterValue(project.status),
+							projects: [toAnalyticsDashboardProject(project)],
 						},
 					]
 				: []
 		}
 
 		if (hasOrganizationContext.value && options.organizationContext?.projects.value) {
-			return options.organizationContext.projects.value
-				.filter((project) => isAnalyticsEligibleProject(project))
-				.map((project) => ({
-					id: project.id,
-					name: project.name,
-					iconUrl: project.icon_url ?? undefined,
-					downloads: project.downloads ?? 0,
-					status: getProjectStatusFilterValue(project.status),
-				}))
+			return [
+				{
+					projects: getUniqueAnalyticsDashboardProjects(
+						options.organizationContext.projects.value,
+						new Set(),
+					),
+				},
+			]
 		}
 
-		return (userProjects.value ?? [])
-			.filter((project) => isAnalyticsEligibleProject(project))
-			.map((project) => ({
-				id: project.id,
-				name: project.title,
-				iconUrl: project.icon_url ?? undefined,
-				downloads: project.downloads ?? 0,
-				status: getProjectStatusFilterValue(project.status),
-			}))
+		const seenProjectIds = new Set<string>()
+		const personalProjects = getUniqueAnalyticsDashboardProjects(
+			(userProjects.value ?? []).filter((project) => !getProjectOrganizationId(project)),
+			seenProjectIds,
+		)
+		const organizationGroups: AnalyticsDashboardProjectGroup[] = []
+
+		const userProjectsByOrganizationId = new Map<string, AnalyticsDashboardProjectSource[]>()
+		for (const project of userProjects.value ?? []) {
+			const organizationId = getProjectOrganizationId(project)
+			if (!organizationId) {
+				continue
+			}
+
+			const projects = userProjectsByOrganizationId.get(organizationId) ?? []
+			projects.push(project)
+			userProjectsByOrganizationId.set(organizationId, projects)
+		}
+
+		const organizationProjectsById = new Map<string, AnalyticsDashboardProjectSource[]>()
+		for (const group of userOrganizationProjects.value ?? []) {
+			organizationProjectsById.set(group.organization.id, group.projects)
+		}
+
+		const organizationNamesById = new Map<string, string>()
+		const orderedOrganizationIds: string[] = []
+		for (const organization of userOrganizations.value ?? []) {
+			organizationNamesById.set(organization.id, organization.name)
+			orderedOrganizationIds.push(organization.id)
+		}
+		for (const organization of extraUserProjectOrganizations.value ?? []) {
+			organizationNamesById.set(organization.id, organization.name)
+			if (!orderedOrganizationIds.includes(organization.id)) {
+				orderedOrganizationIds.push(organization.id)
+			}
+		}
+		for (const organizationId of userProjectOrganizationIds.value) {
+			if (!orderedOrganizationIds.includes(organizationId)) {
+				orderedOrganizationIds.push(organizationId)
+			}
+		}
+
+		for (const organizationId of orderedOrganizationIds) {
+			const projects = getUniqueAnalyticsDashboardProjects(
+				[
+					...(organizationProjectsById.get(organizationId) ?? []),
+					...(userProjectsByOrganizationId.get(organizationId) ?? []),
+				],
+				seenProjectIds,
+			)
+			if (projects.length === 0) {
+				continue
+			}
+
+			organizationGroups.push({
+				key: organizationId,
+				title: organizationNamesById.get(organizationId) ?? organizationId,
+				projects,
+			})
+		}
+
+		if (personalProjects.length === 0) {
+			return organizationGroups
+		}
+
+		return [
+			{
+				key: organizationGroups.length > 0 ? `user-${effectiveUserId.value}` : undefined,
+				title: organizationGroups.length > 0 ? effectiveUsername.value : undefined,
+				projects: personalProjects,
+			},
+			...organizationGroups,
+		]
 	})
+
+	const projects = computed<AnalyticsDashboardProject[]>(() =>
+		projectGroups.value.flatMap((group) => group.projects),
+	)
 
 	const availableProjectIds = computed(() => projects.value.map((project) => project.id))
 	const projectStatusById = computed(
@@ -811,6 +1130,9 @@ export function createAnalyticsDashboardContext(
 		return PROJECT_STATUS_FILTER_VALUES.filter((status) => presentStatuses.has(status))
 	})
 	const sortedSelectedProjectIds = computed(() => sortStringValues(selectedProjectIds.value))
+	const hasExplicitProjectSelectionQuery = computed(() =>
+		hasAnalyticsProjectSelectionQuery(route.query),
+	)
 	const isAnalyticsQueryBuilderDefault = computed(() =>
 		isAnalyticsQueryBuilderStateDefault(
 			{
@@ -899,6 +1221,11 @@ export function createAnalyticsDashboardContext(
 			}
 
 			const availableProjectIds = new Set(nextProjects.map((project) => project.id))
+			if (!hasExplicitProjectSelectionQuery.value) {
+				selectedProjectIds.value = nextProjects.map((project) => project.id)
+				return
+			}
+
 			const retainedSelection = selectedProjectIds.value.filter((id) => availableProjectIds.has(id))
 
 			selectedProjectIds.value =
@@ -1012,7 +1339,13 @@ export function createAnalyticsDashboardContext(
 		isFetching: currentFetching,
 		refetch: refetchCurrentTimeSlices,
 	} = useQuery({
-		queryKey: computed(() => ['analytics', 'dashboard', 'current', fetchRequest.value]),
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			analyticsQueryUserId.value,
+			'current',
+			fetchRequest.value,
+		]),
 		queryFn: async () => {
 			const response = await client.labrinth.analytics_v3.fetch(
 				fetchRequest.value as Labrinth.Analytics.v3.FetchRequest,
@@ -1058,6 +1391,7 @@ export function createAnalyticsDashboardContext(
 			queryKey: computed(() => [
 				'analytics',
 				'dashboard',
+				analyticsQueryUserId.value,
 				'filter-options',
 				'analytics-fields',
 				analyticsFilterOptionsRequest.value,
@@ -1076,6 +1410,7 @@ export function createAnalyticsDashboardContext(
 			queryKey: computed(() => [
 				'analytics',
 				'dashboard',
+				analyticsQueryUserId.value,
 				'filter-options',
 				'versions',
 				sortedSelectedProjectIds.value,
@@ -1157,7 +1492,13 @@ export function createAnalyticsDashboardContext(
 		isFetching: previousFetching,
 		refetch: refetchPreviousTimeSlices,
 	} = useQuery({
-		queryKey: computed(() => ['analytics', 'dashboard', 'previous', previousFetchRequest.value]),
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			analyticsQueryUserId.value,
+			'previous',
+			previousFetchRequest.value,
+		]),
 		queryFn: async () => {
 			const response = await client.labrinth.analytics_v3.fetch(
 				previousFetchRequest.value as Labrinth.Analytics.v3.FetchRequest,
@@ -1241,7 +1582,13 @@ export function createAnalyticsDashboardContext(
 	})
 
 	const { data: versions } = useQuery({
-		queryKey: computed(() => ['analytics', 'dashboard', 'versions', analyticsVersionIds.value]),
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			analyticsQueryUserId.value,
+			'versions',
+			analyticsVersionIds.value,
+		]),
 		queryFn: () =>
 			fetchSegmentedWith(analyticsVersionIds.value, (ids) =>
 				client.labrinth.versions_v3.getVersions(ids),
@@ -1422,6 +1769,7 @@ export function createAnalyticsDashboardContext(
 
 	return {
 		hasProjectContext,
+		projectGroups,
 		projects,
 		selectedProjectIds,
 		selectedTimeframeMode,

@@ -8,7 +8,7 @@
 			<div class="w-fit">
 				<MultiSelect
 					v-model="draftSelectedProjectIds"
-					:options="projectOptions"
+					:options="projectSelectOptions"
 					:disabled="!hasProjectOptions"
 					:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 					dropdown-min-width="330px"
@@ -22,14 +22,16 @@
 				>
 					<template #input-content="{ isOpen, openDirection }">
 						<div class="flex min-h-8 min-w-0 flex-1 items-center gap-2 pr-1">
-							<component
-								:is="selectedProjectIcon"
-								v-if="selectedProjectIcon"
-								class="size-7 shrink-0"
-							/>
-							<span class="min-w-0 flex-1 truncate px-1.5 py-1 font-semibold text-primary">
-								{{ selectedProjectLabel }}
-							</span>
+							<div class="flex items-center gap-0.5">
+								<component
+									:is="selectedProjectIcon"
+									v-if="selectedProjectIcon"
+									class="size-6 shrink-0 items-center text-primary"
+								/>
+								<span class="min-w-0 flex-1 truncate px-1.5 py-1 font-semibold text-primary">
+									{{ selectedProjectLabel }}
+								</span>
+							</div>
 							<div class="flex shrink-0 items-center gap-1.5">
 								<template v-if="canClearDraftSelectedProjects">
 									<button
@@ -166,14 +168,20 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BlocksIcon,
+	BoxIcon,
 	CalendarIcon,
 	CheckIcon,
 	ChevronLeftIcon,
 	FolderOpenIcon,
-	PackageIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Combobox, type ComboboxOption, MultiSelect, type MultiSelectOption } from '@modrinth/ui'
+import {
+	Combobox,
+	type ComboboxOption,
+	MultiSelect,
+	type MultiSelectItem,
+	type MultiSelectOption,
+} from '@modrinth/ui'
 import { defineAsyncComponent, h, markRaw } from 'vue'
 
 import {
@@ -203,6 +211,7 @@ const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
 
 const {
 	hasProjectContext,
+	projectGroups,
 	projects,
 	selectedProjectIds,
 	selectedTimeframeMode,
@@ -218,13 +227,43 @@ const {
 const route = useRoute()
 const { selectedTimeRange, selectedTimeframeDurationMinutes } = useSelectedAnalyticsTimeRange()
 
-const projectOptions = computed<MultiSelectOption<string>[]>(() =>
-	projects.value.map((project) => ({
+function getProjectOption(
+	project: AnalyticsDashboardProject,
+	groupTitle?: string,
+): MultiSelectOption<string> {
+	return {
 		value: project.id,
 		label: project.name,
 		icon: getProjectIcon(project),
-	})),
+		searchTerms: groupTitle ? [groupTitle] : undefined,
+	}
+}
+
+const projectOptions = computed<MultiSelectOption<string>[]>(() =>
+	projects.value.map((project) => getProjectOption(project)),
 )
+
+const projectSelectOptions = computed<MultiSelectItem<string>[]>(() => {
+	const options: MultiSelectItem<string>[] = []
+
+	for (const group of projectGroups.value) {
+		if (group.projects.length === 0) {
+			continue
+		}
+
+		if (group.title) {
+			options.push({
+				type: 'section-header',
+				label: group.title,
+				key: group.key ?? `organization-${group.title}`,
+			})
+		}
+
+		options.push(...group.projects.map((project) => getProjectOption(project, group.title)))
+	}
+
+	return options
+})
 
 const allProjectIds = computed(() => projectOptions.value.map((project) => project.value))
 const hasProjectOptions = computed(() => projectOptions.value.length > 0)
@@ -328,7 +367,11 @@ function getProjectIcon(project: AnalyticsDashboardProject) {
 	const iconUrl = project.iconUrl
 	const projectName = project.name
 	if (!iconUrl) {
-		return markRaw(PackageIcon)
+		return markRaw({
+			inheritAttrs: false,
+			setup: () => () =>
+				h('div', { class: 'h-6 w-6 text-primary' }, [h(BoxIcon, { class: 'h-full w-full' })]),
+		})
 	}
 
 	return markRaw(

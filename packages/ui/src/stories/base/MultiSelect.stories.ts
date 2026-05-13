@@ -71,6 +71,26 @@ export const WithSelectionActions: Story = {
 	},
 }
 
+export const WithSections: Story = {
+	args: {
+		options: [
+			{ value: 'iris', label: 'Iris' },
+			{ value: 'sodium', label: 'Sodium' },
+			{ type: 'section-header', label: 'LambdAurora' },
+			{ value: 'lambda-better-grass', label: 'LambdaBetterGrass', searchTerms: ['LambdAurora'] },
+			{ value: 'auroras-decorations', label: "Aurora's Decorations", searchTerms: ['LambdAurora'] },
+			{ type: 'section-header', label: 'Terraformers' },
+			{ value: 'modmenu', label: 'Mod Menu', searchTerms: ['Terraformers'] },
+			{ value: 'terraform-api', label: 'Terraform API', searchTerms: ['Terraformers'] },
+		],
+		modelValue: ['iris', 'modmenu'],
+		placeholder: 'Select projects',
+		searchable: true,
+		showSelectionActions: true,
+		searchPlaceholder: 'Search projects',
+	},
+}
+
 export const WithTopSlot: Story = {
 	args: {
 		...Default.args,

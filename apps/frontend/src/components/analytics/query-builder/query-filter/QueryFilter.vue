@@ -203,9 +203,9 @@ const gameVersionTypeOptions: Array<'release' | 'all'> = ['release', 'all']
 const filterValueCategoryKeys = new Set<string>(FILTER_VALUE_CATEGORIES)
 const downloadsThresholdFilterCategories = ['country', 'version_id', 'game_version'] as const
 type DownloadsThresholdFilterCategory = (typeof downloadsThresholdFilterCategories)[number]
-const downloadsThresholdSelections = ref<Partial<Record<DownloadsThresholdFilterCategory, string[]>>>(
-	{},
-)
+const downloadsThresholdSelections = ref<
+	Partial<Record<DownloadsThresholdFilterCategory, string[]>>
+>({})
 const projectStatusFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	availableProjectStatuses.value.map((status) => ({
 		value: status,
@@ -658,9 +658,7 @@ function setDownloadsThresholdSelectedValues(
 	setSelectedValues(selectedValues)
 }
 
-function clearDownloadsThreshold(
-	categoryKey: DownloadsThresholdFilterCategory,
-) {
+function clearDownloadsThreshold(categoryKey: DownloadsThresholdFilterCategory) {
 	switch (categoryKey) {
 		case 'country':
 			countryDownloadsThreshold.value = null
@@ -673,8 +671,7 @@ function clearDownloadsThreshold(
 			break
 	}
 
-	const nextSelections = { ...downloadsThresholdSelections.value }
-	delete nextSelections[categoryKey]
+	const { [categoryKey]: _removedSelection, ...nextSelections } = downloadsThresholdSelections.value
 	downloadsThresholdSelections.value = nextSelections
 }
 
