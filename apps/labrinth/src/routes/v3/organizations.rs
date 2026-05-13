@@ -334,15 +334,28 @@ pub async fn organization_notes_edit(
             .ok_or(ApiError::NotFound)?;
 
     let mut transaction = pool.begin().await?;
-    let updated = DBModerationNote::patch_organization(
-        organization.id,
-        user.id.into(),
-        expected_version,
-        new_note.notes.as_deref(),
-        new_note.user_rating,
-        &mut transaction,
-    )
-    .await?;
+    let updated = if expected_version == 0 {
+        DBModerationNote::insert(
+            None,
+            Some(organization.id),
+            user.id.into(),
+            new_note.notes.as_deref(),
+            new_note.user_rating,
+            &mut transaction,
+        )
+        .await?
+    } else {
+        DBModerationNote::update(
+            None,
+            Some(organization.id),
+            user.id.into(),
+            expected_version,
+            new_note.notes.as_deref(),
+            new_note.user_rating,
+            &mut transaction,
+        )
+        .await?
+    };
 
     if updated.is_none() {
         return Err(ApiError::PreconditionFailed(

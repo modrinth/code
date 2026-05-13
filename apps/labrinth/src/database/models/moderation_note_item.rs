@@ -206,156 +206,82 @@ impl DBModerationNote {
         )
     }
 
-    pub async fn patch_user<'a, E>(
-        user_id: DBUserId,
+    pub async fn insert<'a, E>(
+        user_id: Option<DBUserId>,
+        organization_id: Option<DBOrganizationId>,
         last_author: DBUserId,
-        expected_version: i32,
         notes: Option<&str>,
         user_rating: Option<i32>,
         exec: E,
-    ) -> Result<Option<Self>, DatabaseError>
+    ) -> Result<Option<i32>, DatabaseError>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let row = sqlx::query!(
+        let result = sqlx::query_scalar!(
             r#"
-			WITH updated AS (
-				UPDATE moderation_notes
-				SET
-					last_modified = NOW(),
-					last_author = $2,
-					version = version + 1,
-					notes = COALESCE($4::text, notes),
-					user_rating = COALESCE($5::integer, user_rating)
-				WHERE user_id = $1 AND version = $3::integer
-				RETURNING user_id, organization_id, last_modified, created_at, last_author, version, notes, user_rating
-			),
-			inserted AS (
-				INSERT INTO moderation_notes (user_id, organization_id, last_author, version, notes, user_rating)
-				SELECT $1, NULL::bigint, $2, 1, COALESCE($4::text, ''), COALESCE($5::integer, 0)
-				WHERE $3::integer = 0 AND NOT EXISTS (
-					SELECT 1 FROM moderation_notes WHERE user_id = $1
-				)
-				ON CONFLICT DO NOTHING
-				RETURNING user_id, organization_id, last_modified, created_at, last_author, version, notes, user_rating
-			)
-			SELECT
-				user_id,
-				organization_id,
-				last_modified AS "last_modified!",
-				created_at AS "created_at!",
-				last_author AS "last_author!",
-				version AS "version!",
-				notes AS "notes!",
-				user_rating AS "user_rating!"
-			FROM updated
-			UNION ALL
-			SELECT
-				user_id,
-				organization_id,
-				last_modified AS "last_modified!",
-				created_at AS "created_at!",
-				last_author AS "last_author!",
-				version AS "version!",
-				notes AS "notes!",
-				user_rating AS "user_rating!"
-			FROM inserted
-			"#,
-            user_id as DBUserId,
-            last_author as DBUserId,
-            expected_version,
+            INSERT INTO moderation_notes (user_id, organization_id, last_author, version, notes, user_rating)
+            SELECT
+              $1, $2, $3, 1, COALESCE($4::text, ''), COALESCE($5::integer, 0)
+            WHERE NOT EXISTS (
+              SELECT 1 FROM moderation_notes
+              WHERE
+                ($1::bigint IS NOT NULL AND user_id = $1)
+                OR ($2::bigint IS NOT NULL AND organization_id = $2)
+            )
+            ON CONFLICT DO NOTHING
+            RETURNING version
+            "#,
+            user_id.map(|x| x.0),
+            organization_id.map(|x| x.0),
+            last_author.0,
             notes,
             user_rating,
         )
         .fetch_optional(exec)
         .await?;
 
-        Ok(row.map(|row| Self {
-            user_id: row.user_id.map(DBUserId),
-            organization_id: row.organization_id.map(DBOrganizationId),
-            last_modified: row.last_modified,
-            created_at: row.created_at,
-            last_author: DBUserId(row.last_author),
-            version: row.version,
-            notes: row.notes,
-            user_rating: row.user_rating,
-        }))
+        Ok(result)
     }
 
-    pub async fn patch_organization<'a, E>(
-        organization_id: DBOrganizationId,
+    pub async fn update<'a, E>(
+        user_id: Option<DBUserId>,
+        organization_id: Option<DBOrganizationId>,
         last_author: DBUserId,
-        expected_version: i32,
+        expected_current_version: i32,
         notes: Option<&str>,
         user_rating: Option<i32>,
         exec: E,
-    ) -> Result<Option<Self>, DatabaseError>
+    ) -> Result<Option<i32>, DatabaseError>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let row = sqlx::query!(
+        let result = sqlx::query_scalar!(
             r#"
-			WITH updated AS (
-				UPDATE moderation_notes
-				SET
-					last_modified = NOW(),
-					last_author = $2,
-					version = version + 1,
-					notes = COALESCE($4::text, notes),
-					user_rating = COALESCE($5::integer, user_rating)
-				WHERE organization_id = $1 AND version = $3::integer
-				RETURNING user_id, organization_id, last_modified, created_at, last_author, version, notes, user_rating
-			),
-			inserted AS (
-				INSERT INTO moderation_notes (user_id, organization_id, last_author, version, notes, user_rating)
-				SELECT NULL::bigint, $1, $2, 1, COALESCE($4::text, ''), COALESCE($5::integer, 0)
-				WHERE $3::integer = 0 AND NOT EXISTS (
-					SELECT 1 FROM moderation_notes WHERE organization_id = $1
-				)
-				ON CONFLICT DO NOTHING
-				RETURNING user_id, organization_id, last_modified, created_at, last_author, version, notes, user_rating
-			)
-			SELECT
-				user_id,
-				organization_id,
-				last_modified AS "last_modified!",
-				created_at AS "created_at!",
-				last_author AS "last_author!",
-				version AS "version!",
-				notes AS "notes!",
-				user_rating AS "user_rating!"
-			FROM updated
-			UNION ALL
-			SELECT
-				user_id,
-				organization_id,
-				last_modified AS "last_modified!",
-				created_at AS "created_at!",
-				last_author AS "last_author!",
-				version AS "version!",
-				notes AS "notes!",
-				user_rating AS "user_rating!"
-			FROM inserted
-			"#,
-            organization_id as DBOrganizationId,
-            last_author as DBUserId,
-            expected_version,
+            UPDATE moderation_notes
+            SET
+              last_modified = NOW(),
+              last_author = $1,
+              version = version + 1,
+              notes = COALESCE($2::text, notes),
+              user_rating = COALESCE($3::integer, user_rating)
+            WHERE (
+                ($4::bigint IS NOT NULL AND user_id = $4) OR
+                ($5::bigint IS NOT NULL AND organization_id = $5)
+              )
+              AND version = $6
+            RETURNING version
+            "#,
+            last_author.0,
             notes,
             user_rating,
+            user_id.map(|x| x.0),
+            organization_id.map(|x| x.0),
+            expected_current_version
         )
         .fetch_optional(exec)
         .await?;
 
-        Ok(row.map(|row| Self {
-            user_id: row.user_id.map(DBUserId),
-            organization_id: row.organization_id.map(DBOrganizationId),
-            last_modified: row.last_modified,
-            created_at: row.created_at,
-            last_author: DBUserId(row.last_author),
-            version: row.version,
-            notes: row.notes,
-            user_rating: row.user_rating,
-        }))
+        Ok(result)
     }
 
     pub async fn clear_user_cache(
