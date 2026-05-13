@@ -27,60 +27,53 @@
 			</div>
 		</div>
 
-		<div class="flex flex-col gap-6 px-4 pb-6 pt-5">
+		<div
+			class="flex flex-col gap-6 px-4 pb-6 pt-5"
+			:class="['transition-opacity', isDataLoading ? 'pointer-events-none opacity-75' : '']"
+		>
 			<div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-3">
-				<template v-if="!isDataLoading">
-					<div
-						v-for="legendEntry in displayedLegendEntries"
-						:key="legendEntry.id"
-						class="inline-flex items-center"
+				<div
+					v-for="legendEntry in displayedLegendEntries"
+					:key="legendEntry.id"
+					class="inline-flex items-center"
+				>
+					<button
+						type="button"
+						class="inline-flex items-center gap-1.5 text-sm !outline-0 transition-all focus-within:!outline-0 focus:!outline-0 focus-visible:!outline-0"
+						:class="[
+							legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary',
+							isLegendEntryToggleDisabled(legendEntry)
+								? 'cursor-default'
+								: 'cursor-pointer hover:brightness-125',
+						]"
+						:aria-pressed="!legendEntry.hidden"
+						@click="onLegendEntryClick($event, legendEntry.id)"
 					>
-						<button
-							type="button"
-							class="inline-flex items-center gap-1.5 text-sm !outline-0 transition-all focus-within:!outline-0 focus:!outline-0 focus-visible:!outline-0"
-							:class="[
-								legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary',
-								isLegendEntryToggleDisabled(legendEntry)
-									? 'cursor-default'
-									: 'cursor-pointer hover:brightness-125',
-							]"
-							:aria-pressed="!legendEntry.hidden"
-							@click="onLegendEntryClick($event, legendEntry.id)"
-						>
-							<span class="size-2 rounded-full" :style="{ backgroundColor: legendEntry.color }" />
-							<span :class="{ 'line-through': legendEntry.hidden }">{{ legendEntry.name }}</span>
-						</button>
-					</div>
+						<span class="size-2 rounded-full" :style="{ backgroundColor: legendEntry.color }" />
+						<span :class="{ 'line-through': legendEntry.hidden }">{{ legendEntry.name }}</span>
+					</button>
+				</div>
 
-					<button
-						v-if="canShowMoreLegendEntries"
-						type="button"
-						class="text-sm font-normal text-primary underline transition-all hover:brightness-125"
-						@click="showMoreLegendEntries"
-					>
-						Show more
-					</button>
-					<button
-						v-else-if="canShowLessLegendEntries"
-						type="button"
-						class="text-sm font-normal text-primary underline transition-all hover:brightness-125"
-						@click="showLessLegendEntries"
-					>
-						Show less
-					</button>
-				</template>
-				<template v-else>
-					<div class="h-5 w-full"></div>
-				</template>
+				<button
+					v-if="canShowMoreLegendEntries"
+					type="button"
+					class="text-sm font-normal text-primary underline transition-all hover:brightness-125"
+					@click="showMoreLegendEntries"
+				>
+					Show more
+				</button>
+				<button
+					v-else-if="canShowLessLegendEntries"
+					type="button"
+					class="text-sm font-normal text-primary underline transition-all hover:brightness-125"
+					@click="showLessLegendEntries"
+				>
+					Show less
+				</button>
 			</div>
 
 			<div ref="chartContainer" class="relative h-[460px]" @click="onChartClick">
-				<div
-					:class="[
-						'h-full transition-opacity',
-						isDataLoading ? 'pointer-events-none opacity-75' : '',
-					]"
-				>
+				<div :class="['h-full']">
 					<div
 						v-if="selectedProjects.length === 0"
 						class="flex h-full items-center justify-center rounded-xl"
@@ -134,15 +127,15 @@
 						/>
 					</template>
 				</div>
-				<div v-if="isDataLoading" class="absolute inset-0 z-20 overflow-hidden rounded-xl">
-					<div class="absolute inset-0 bg-surface-3 opacity-50" />
-					<div class="absolute inset-0 backdrop-blur-[4px]" />
-					<div class="absolute inset-0 flex items-center justify-center">
-						<div
-							class="relative bottom-6 inline-flex items-center gap-2 text-lg font-semibold text-primary"
-						>
-							<span>Fetching results...</span>
-						</div>
+			</div>
+			<div v-if="isDataLoading" class="absolute inset-0 z-20 overflow-hidden rounded-xl">
+				<div class="absolute inset-0 bg-surface-3 opacity-50" />
+				<div class="absolute inset-0 backdrop-blur-[3px]" />
+				<div class="absolute inset-0 flex items-center justify-center">
+					<div
+						class="relative bottom-6 inline-flex items-center gap-2 text-lg font-semibold text-primary"
+					>
+						<span>Fetching results...</span>
 					</div>
 				</div>
 			</div>
