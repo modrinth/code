@@ -109,6 +109,7 @@ import {
 	getUpdateSize,
 	isDev,
 	isNetworkMetered,
+	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
 import i18n from '@/i18n.config'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
@@ -1025,6 +1026,13 @@ async function downloadUpdate(versionToDownload) {
 
 async function installUpdate() {
 	restarting.value = true
+	try {
+		await setRestartAfterPendingUpdate(true)
+	} catch (e) {
+		restarting.value = false
+		handleError(e)
+		return
+	}
 	setTimeout(async () => {
 		await handleClose()
 	}, 250)
@@ -1065,7 +1073,7 @@ function handleClick(e) {
 				!target.href.startsWith('http://tauri.localhost')
 			) {
 				const parsed = parseModrinthLink(target.href)
-				if (parsed) {
+				if (target.target !== '_blank' && parsed) {
 					void openModrinthProjectLinkInApp(parsed)
 				} else {
 					openUrl(target.href)

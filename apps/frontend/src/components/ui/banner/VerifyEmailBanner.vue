@@ -96,14 +96,12 @@ async function handleResendEmailVerification() {
 				}}
 			</span>
 		</template>
-		<template #actions>
-			<ButtonStyled v-if="hasEmail">
-				<button @click="handleResendEmailVerification">
+		<template #actions_right>
+			<ButtonStyled color="orange">
+				<button v-if="hasEmail" @click="handleResendEmailVerification">
 					{{ formatMessage(verifyEmailBannerMessages.action) }}
 				</button>
-			</ButtonStyled>
-			<ButtonStyled v-else>
-				<nuxt-link to="/settings/account">
+				<nuxt-link v-else to="/settings/account">
 					<SettingsIcon aria-hidden="true" />
 					{{ formatMessage(addEmailBannerMessages.action) }}
 				</nuxt-link>

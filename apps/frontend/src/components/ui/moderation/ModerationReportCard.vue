@@ -143,7 +143,7 @@
 			:expand-text="expandText"
 			collapse-text="Collapse thread"
 		>
-			<div class="bg-surface-2 p-4 pt-2">
+			<div class="bg-surface-2 pt-2">
 				<ThreadView
 					v-if="threadWithReportBody"
 					ref="reportThread"

@@ -2302,6 +2302,7 @@ const currentMember = computed(() => {
 			payouts_split: 0,
 			avatar_url: auth.value.user.avatar_url,
 			name: auth.value.user.username,
+			staffOnly: true,
 		}
 	}
 

@@ -6,6 +6,7 @@
 
 use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
+use std::sync::atomic::Ordering;
 use tauri::{Listener, Manager};
 use tauri_plugin_fs::FsExt;
 use theseus::prelude::*;
@@ -94,6 +95,17 @@ async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
 #[tauri::command]
 fn restart_app(app: tauri::AppHandle) {
     app.restart();
+}
+
+#[tauri::command]
+async fn set_restart_after_pending_update(
+    should_restart: bool,
+) -> api::Result<()> {
+    let state = State::get().await?;
+    state
+        .restart_after_pending_update
+        .store(should_restart, Ordering::Relaxed);
+    Ok(())
 }
 
 // if Tauri app is called with arguments, then those arguments will be treated as commands
@@ -245,6 +257,7 @@ fn main() {
             get_update_size,
             enqueue_update_for_installation,
             remove_enqueued_update,
+            set_restart_after_pending_update,
             toggle_decorations,
             show_window,
             restart_app,
@@ -262,7 +275,13 @@ fn main() {
                 #[cfg(feature = "updater")]
                 if matches!(event, tauri::RunEvent::Exit) {
                     let update_data = app.state::<PendingUpdateData>().inner();
-                    if let Some((update, data)) = &*update_data.0.lock().unwrap() {
+                    let should_restart = State::get_if_initialized()
+                        .map(|s| {
+                            s.restart_after_pending_update.load(Ordering::Relaxed)
+                        })
+                        .unwrap_or(false);
+                    if let Some((update, data)) = &*update_data.0.lock().unwrap()
+                    {
                         fn set_changelog_toast(version: Option<String>) {
                             let toast_result: theseus::Result<()> = tauri::async_runtime::block_on(async move {
                                 let mut settings = settings::get().await?;
@@ -271,27 +290,46 @@ fn main() {
                                 Ok(())
                             });
                             if let Err(e) = toast_result {
-                                tracing::warn!("Failed to set pending_update_toast: {e}")
+                                tracing::warn!(
+                                    "Failed to set pending_update_toast: {e}"
+                                )
                             }
                         }
 
                         set_changelog_toast(Some(update.version.clone()));
-                        if let Err(e) = update.install(data) {
-                            tracing::error!("Error while updating: {e}");
-                            set_changelog_toast(None);
+                        match update.install(data) {
+                            Ok(()) => {
+                                if should_restart {
+                                    tracing::info!(
+                                        "Pending update installed successfully (version {}); restarting because user requested reload",
+                                        update.version
+                                    );
+                                    app.restart();
+                                } else {
+                                    tracing::info!(
+                                        "Pending update installed successfully (version {}); exiting without relaunch (user did not request reload)",
+                                        update.version
+                                    );
+                                }
+                            }
+                            Err(e) => {
+                                tracing::error!(
+                                    "Pending update install failed (version {}): {e}",
+                                    update.version
+                                );
+                                set_changelog_toast(None);
 
-                            DialogBuilder::message()
-                                .set_level(MessageLevel::Error)
-                                .set_title("Update error")
-                                .set_text(format!("Failed to install update due to an error:\n{e}"))
-                                .alert()
-                                .show()
-                                .unwrap();
+                                DialogBuilder::message()
+                                    .set_level(MessageLevel::Error)
+                                    .set_title("Update error")
+                                    .set_text(format!("Failed to install update due to an error:\n{e}"))
+                                    .alert()
+                                    .show()
+                                    .unwrap();
+                            }
                         }
-                        app.restart();
                     }
                 }
-
                 #[cfg(target_os = "macos")]
                 if let tauri::RunEvent::Opened { urls } = event {
                     tracing::info!("Handling webview open {urls:?}");

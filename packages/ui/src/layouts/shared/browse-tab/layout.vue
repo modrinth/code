@@ -99,7 +99,11 @@ const messages = defineMessages({
 		<Combobox
 			:model-value="ctx.effectiveCurrentSortType.value"
 			:options="sortOptions"
-			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[16rem]'"
+			:class="
+				ctx.variant === 'web'
+					? '!w-[16rem] min-w-max max-w-full flex-grow md:flex-grow-0'
+					: '!w-[16rem] min-w-max max-w-full'
+			"
 			@update:model-value="(val: SortType) => (ctx.effectiveCurrentSortType.value = val)"
 		>
 			<template #prefix>
@@ -112,7 +116,11 @@ const messages = defineMessages({
 		<Combobox
 			:model-value="ctx.maxResults.value"
 			:options="maxResultsOptions"
-			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[9rem]'"
+			:class="
+				ctx.variant === 'web'
+					? '!w-[9rem] min-w-max max-w-full flex-grow md:flex-grow-0'
+					: '!w-[9rem] min-w-max max-w-full'
+			"
 			:placeholder="formatMessage(commonMessages.viewLabel)"
 			@update:model-value="(val: number) => (ctx.maxResults.value = val)"
 		>
@@ -296,7 +304,7 @@ const messages = defineMessages({
 			</template>
 		</ProjectCardList>
 
-		<div :class="ctx.variant === 'web' ? 'pagination-after my-3' : 'flex justify-end'">
+		<div :class="ctx.variant === 'web' ? 'pagination-after mt-3' : 'flex justify-end mt-3'">
 			<Pagination
 				:page="ctx.currentPage.value"
 				:count="ctx.pageCount.value"

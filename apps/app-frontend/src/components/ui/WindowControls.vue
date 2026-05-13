@@ -22,7 +22,7 @@
 			hover-color-fill="background"
 			circular
 		>
-			<button class="relative expanded-button" @click="handleClose">
+			<button class="relative expanded-button close-button" @click="handleClose">
 				<XIcon />
 			</button>
 		</ButtonStyled>
@@ -82,8 +82,12 @@ const handleClose = async () => {
 </script>
 <style scoped>
 .expanded-button::before {
-	inset: -6px;
+	inset: -9px -6px;
 	content: '';
 	position: absolute;
+}
+
+.expanded-button.close-button::before {
+	inset: -9px -9px -9px -6px;
 }
 </style>
