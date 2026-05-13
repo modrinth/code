@@ -87,7 +87,10 @@
 						v-if="selectedProjects.length === 0"
 						class="flex h-full items-center justify-center rounded-xl"
 					>
-						<div class="relative bottom-6 text-base font-normal text-secondary">
+						<div
+							v-if="!isDataLoading"
+							class="relative bottom-6 text-base font-normal text-secondary"
+						>
 							{{ emptyChartMessage }}
 						</div>
 					</div>

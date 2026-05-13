@@ -65,7 +65,7 @@
 			</template>
 			<template #empty-state>
 				<div class="flex h-64 items-center justify-center text-secondary">
-					{{ emptyTableMessage }}
+					{{ !isDataLoading ? emptyTableMessage : '' }}
 				</div>
 			</template>
 		</Table>
