@@ -261,7 +261,7 @@ async function deleteMessage() {
 
 	&:not(.no-actions):hover,
 	&:not(.no-actions):focus-within {
-		background-color: var(--surface-3);
+		background-color: var(--surface-2-5);
 
 		.message__actions {
 			opacity: 1;

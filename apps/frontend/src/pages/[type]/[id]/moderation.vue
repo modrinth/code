@@ -128,7 +128,7 @@
 					<SpinnerIcon class="size-5 animate-spin" /> Loading messages
 				</template>
 				<template v-else>
-					<p class="m-0 text-sm text-red">Failed to load messages</p>
+					<p class="m-0 text-red">Failed to load messages</p>
 				</template>
 			</div>
 		</div>
