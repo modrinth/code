@@ -286,6 +286,7 @@ export function getSliceBucketRange(
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
 const ONE_MINUTE_MS = 60 * 1000
+const YEAR_LABEL_TIME_RANGE_YEARS = 2
 const COMPACT_AXIS_THRESHOLD = 5
 const SHORT_HOURLY_TIME_LABEL_DURATION_MS = 6 * ONE_DAY_MS
 export const DEFAULT_X_AXIS_TICK_LIMIT = 12
@@ -396,10 +397,16 @@ function getTimeRangeDurationMs(timeRange: Labrinth.Analytics.v3.TimeRange): num
 }
 
 export function isYearRelevantForTimeRange(timeRange: Labrinth.Analytics.v3.TimeRange): boolean {
-	const startYear = new Date(timeRange.start).getFullYear()
-	const endYear = new Date(timeRange.end).getFullYear()
+	const start = new Date(timeRange.start)
+	const end = new Date(timeRange.end)
+	const yearLabelThreshold = new Date(start)
+	yearLabelThreshold.setFullYear(start.getFullYear() + YEAR_LABEL_TIME_RANGE_YEARS)
 
-	return startYear !== endYear
+	return (
+		Number.isFinite(start.getTime()) &&
+		Number.isFinite(end.getTime()) &&
+		end.getTime() > yearLabelThreshold.getTime()
+	)
 }
 
 export function formatBucketEndLabel(end: Date, includeTime: boolean, includeYear = false): string {

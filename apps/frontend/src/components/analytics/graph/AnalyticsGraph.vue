@@ -1,31 +1,35 @@
 <template>
 	<section
-		class="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
+		class="relative flex flex-col overflow-hidden rounded-2xl border border-solid border-surface-5 bg-surface-3"
 	>
 		<AnalyticsLoadingBar :loading="isDataLoading" />
-		<div class="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-			<div class="flex w-full flex-col gap-3">
-				<div class="flex items-center justify-between">
-					<div class="text-xl font-semibold text-contrast">
-						{{ graphTitle }}
-					</div>
-
-					<div class="flex items-center gap-3">
-						<div v-if="canUseRatioMode" class="inline-flex items-center gap-2">
-							<label for="ratio-mode-toggle" class="cursor-pointer text-sm text-secondary"
-								>Ratio</label
-							>
-							<Toggle id="ratio-mode-toggle" v-model="isRatioMode" small />
-						</div>
-						<Tabs
-							:value="activeViewMode"
-							:tabs="viewModeTabs"
-							@update:value="activeViewMode = $event as ViewMode"
-						/>
-					</div>
+		<div class="flex w-full flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+			<div
+				class="flex w-full items-center justify-between border-0 border-b border-solid border-surface-5 bg-surface-3 p-4"
+			>
+				<div class="text-xl font-semibold text-contrast">
+					{{ graphTitle }}
 				</div>
 
-				<div v-if="!isDataLoading" class="flex flex-wrap items-center gap-x-4 gap-y-2">
+				<div class="flex items-center gap-3">
+					<div v-if="canUseRatioMode" class="inline-flex items-center gap-2">
+						<label for="ratio-mode-toggle" class="cursor-pointer text-sm text-secondary"
+							>Ratio</label
+						>
+						<Toggle id="ratio-mode-toggle" v-model="isRatioMode" small />
+					</div>
+					<Tabs
+						:value="activeViewMode"
+						:tabs="viewModeTabs"
+						@update:value="activeViewMode = $event as ViewMode"
+					/>
+				</div>
+			</div>
+		</div>
+
+		<div class="flex flex-col gap-6 px-4 pb-6 pt-5">
+			<div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-3">
+				<template v-if="!isDataLoading">
 					<div
 						v-for="legendEntry in displayedLegendEntries"
 						:key="legendEntry.id"
@@ -64,78 +68,81 @@
 					>
 						Show less
 					</button>
-				</div>
-			</div>
-		</div>
-
-		<div ref="chartContainer" class="relative h-[420px]" @click="onChartClick">
-			<div
-				:class="[
-					'h-full transition-opacity',
-					isDataLoading ? 'pointer-events-none opacity-75' : '',
-				]"
-			>
-				<div
-					v-if="selectedProjects.length === 0"
-					class="flex h-full items-center justify-center rounded-xl"
-				>
-					<div class="relative bottom-6 text-base font-normal text-secondary">
-						{{ emptyChartMessage }}
-					</div>
-				</div>
+				</template>
 				<template v-else>
-					<ClientOnly>
-						<AnalyticsChart
-							:type="chartType"
-							:fill="isArea"
-							:stacked="isStacked"
-							:ratio-mode="isRatioMode"
-							:datasets="visibleChartDatasets"
-							:labels="chartLabels"
-							:x-axis-tick-limit="xAxisTickLimit"
-							:active-stat="activeStat"
-							:pinned-slice-index="pinnedSliceIndex"
-							@hover="onChartHover"
-							@pinned-drag="onPinnedDrag"
-						/>
-					</ClientOnly>
-					<div
-						v-if="showHoverGuide"
-						aria-hidden="true"
-						class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-8 mt-2 border-0 border-l border-solid border-contrast opacity-25"
-						:style="{ transform: `translate(${hoverState.x}px, 0)` }"
-					/>
-					<div
-						v-if="showPinnedGuide"
-						aria-hidden="true"
-						class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-8 mt-2 border-0 border-l-[2px] border-dashed border-green opacity-75"
-						:style="{ transform: `translate(${hoverState.x}px, 0)` }"
-					/>
-					<AnalyticsChartTooltip
-						:visible="hoverState.visible"
-						:x="hoverState.x"
-						:y="hoverState.y"
-						:start="hoverBucketRange?.start ?? null"
-						:end="hoverBucketRange?.end ?? null"
-						:chart-start="chartRangeBounds?.start ?? null"
-						:chart-end="chartRangeBounds?.end ?? null"
-						:formatted-total="hoverFormattedTotal"
-						:entries="hoverEntries"
-						:container-width="containerSize.width"
-						:container-height="containerSize.height"
-						:pinned="isHoverPinned"
-						:ratio-mode="isRatioMode"
-					/>
+					<div class="h-5 w-full"></div>
 				</template>
 			</div>
-			<div v-if="isDataLoading" class="absolute inset-0 z-20 overflow-hidden rounded-xl">
-				<div class="absolute inset-0 bg-surface-3 opacity-50" />
-				<div class="absolute inset-0 backdrop-blur-[4px]" />
-				<div class="absolute inset-0 flex items-center justify-center">
+
+			<div ref="chartContainer" class="relative h-[460px]" @click="onChartClick">
+				<div
+					:class="[
+						'h-full transition-opacity',
+						isDataLoading ? 'pointer-events-none opacity-75' : '',
+					]"
+				>
 					<div
-						class="relative bottom-6 inline-flex items-center gap-2 text-lg font-semibold text-primary"
+						v-if="selectedProjects.length === 0"
+						class="flex h-full items-center justify-center rounded-xl"
 					>
-						<span>Fetching results...</span>
+						<div class="relative bottom-6 text-base font-normal text-secondary">
+							{{ emptyChartMessage }}
+						</div>
+					</div>
+					<template v-else>
+						<ClientOnly>
+							<AnalyticsChart
+								:type="chartType"
+								:fill="isArea"
+								:stacked="isStacked"
+								:ratio-mode="isRatioMode"
+								:datasets="visibleChartDatasets"
+								:labels="chartLabels"
+								:x-axis-tick-limit="xAxisTickLimit"
+								:active-stat="activeStat"
+								:pinned-slice-index="pinnedSliceIndex"
+								@hover="onChartHover"
+								@pinned-drag="onPinnedDrag"
+							/>
+						</ClientOnly>
+						<div
+							v-if="showHoverGuide"
+							aria-hidden="true"
+							class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-8 mt-2 border-0 border-l border-solid border-contrast opacity-25"
+							:style="{ transform: `translate(${hoverState.x}px, 0)` }"
+						/>
+						<div
+							v-if="showPinnedGuide"
+							aria-hidden="true"
+							class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-8 mt-2 border-0 border-l-[2px] border-dashed border-green opacity-75"
+							:style="{ transform: `translate(${hoverState.x}px, 0)` }"
+						/>
+						<AnalyticsChartTooltip
+							:visible="hoverState.visible"
+							:x="hoverState.x"
+							:y="hoverState.y"
+							:start="hoverBucketRange?.start ?? null"
+							:end="hoverBucketRange?.end ?? null"
+							:chart-start="chartRangeBounds?.start ?? null"
+							:chart-end="chartRangeBounds?.end ?? null"
+							:formatted-total="hoverFormattedTotal"
+							:entries="hoverEntries"
+							:container-width="containerSize.width"
+							:container-height="containerSize.height"
+							:pinned="isHoverPinned"
+							:ratio-mode="isRatioMode"
+						/>
+					</template>
+				</div>
+				<div v-if="isDataLoading" class="absolute inset-0 z-20 overflow-hidden rounded-xl">
+					<div class="absolute inset-0 bg-surface-3 opacity-50" />
+					<div class="absolute inset-0 backdrop-blur-[4px]" />
+					<div class="absolute inset-0 flex items-center justify-center">
+						<div
+							class="relative bottom-6 inline-flex items-center gap-2 text-lg font-semibold text-primary"
+						>
+							<span>Fetching results...</span>
+						</div>
 					</div>
 				</div>
 			</div>

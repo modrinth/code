@@ -81,6 +81,7 @@ const chartInteractionEvents: ChartEvents = [
 const PINNED_DRAG_THRESHOLD_PX = 6
 const EMPTY_DATA_Y_AXIS_MAX = 10
 const EMPTY_DATA_Y_AXIS_STEP = 2
+const Y_AXIS_WIDTH = 40
 const SECONDS_PER_HOUR = 60 * 60
 const CSS_VARIABLE_COLOR_PATTERN = /^var\(\s*(--[a-z0-9-_]+)\s*\)$/i
 
@@ -285,6 +286,7 @@ function buildConfig(): ChartConfiguration {
 					offset: props.type === 'bar',
 					grid: { display: false },
 					ticks: {
+						align: 'inner',
 						maxTicksLimit: props.xAxisTickLimit ?? DEFAULT_X_AXIS_TICK_LIMIT,
 						autoSkip: !props.xAxisTickLimit,
 						color: 'rgba(148, 163, 184, 0.9)',
@@ -301,6 +303,9 @@ function buildConfig(): ChartConfiguration {
 				y: {
 					stacked: props.stacked,
 					beginAtZero: true,
+					afterFit: (scale) => {
+						scale.width = Y_AXIS_WIDTH
+					},
 					...(props.ratioMode
 						? { max: 100, min: 0 }
 						: hasData
