@@ -171,6 +171,7 @@ type ViewMode = 'line' | 'area' | 'bar'
 
 const {
 	activeStat,
+	hasProjectContext,
 	displayedSelectedProjectIds: selectedProjectIds,
 	projects,
 	displayedFetchRequest: fetchRequest,
@@ -211,9 +212,15 @@ const selectedProjects = computed(() =>
 	),
 )
 
-const emptyChartMessage = computed(() =>
-	hasAvailableProjects.value ? 'Select at least one project to view data' : 'No projects available',
-)
+const emptyChartMessage = computed(() => {
+	if (hasProjectContext.value) {
+		return 'No data available for analytics'
+	}
+
+	return hasAvailableProjects.value
+		? 'Select at least one project to view data'
+		: 'No projects available for analytics'
+})
 
 const lightLegendPalette = [
 	'#00AF5C',

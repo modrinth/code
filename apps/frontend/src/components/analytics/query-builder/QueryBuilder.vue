@@ -13,7 +13,7 @@
 					:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 					dropdown-min-width="330px"
 					placeholder="Select projects"
-					no-options-message="No projects available"
+					:no-options-message="noProjectsMessage"
 					:searchable="projectOptions.length > 6"
 					:max-tag-rows="1"
 					show-selection-actions
@@ -202,6 +202,7 @@ const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
 
 const {
+	hasProjectContext,
 	projects,
 	selectedProjectIds,
 	selectedTimeframeMode,
@@ -227,6 +228,9 @@ const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 
 const allProjectIds = computed(() => projectOptions.value.map((project) => project.value))
 const hasProjectOptions = computed(() => projectOptions.value.length > 0)
+const noProjectsMessage = computed(() =>
+	hasProjectContext.value ? 'No data available for analytics' : 'No projects available',
+)
 const isProjectSelectOpen = ref(false)
 const draftSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
 const projectDownloadsThreshold = ref<number | null>(null)
@@ -290,7 +294,7 @@ const canClearDraftSelectedProjects = computed(() => {
 
 const selectedProjectLabel = computed(() => {
 	if (!hasProjectOptions.value) {
-		return 'No projects available'
+		return noProjectsMessage.value
 	}
 
 	if (isAllProjectsOptionSelected.value || areAllProjectsSelected.value) {

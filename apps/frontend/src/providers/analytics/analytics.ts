@@ -282,8 +282,7 @@ function isServerProject(project: ProjectTypeMetadata): boolean {
 function isAnalyticsEligibleProject(
 	project: ProjectTypeMetadata & { status?: string | null },
 ): boolean {
-	return !isServerProject(project)
-	// && project.status !== 'draft'
+	return !isServerProject(project) && getProjectStatusFilterValue(project.status) !== 'draft'
 }
 
 export function doesProjectStatusMatchFilters(

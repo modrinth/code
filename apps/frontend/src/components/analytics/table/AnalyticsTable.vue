@@ -118,6 +118,7 @@ type AnalyticsTableRow = {
 }
 
 const {
+	hasProjectContext,
 	projects,
 	displayedSelectedProjectIds: selectedProjectIds,
 	displayedSelectedGroupBy: selectedGroupBy,
@@ -168,9 +169,13 @@ const projectNamesById = computed(
 	() => new Map(projects.value.map((project) => [project.id, project.name])),
 )
 const hasAvailableProjects = computed(() => projects.value.length > 0)
-const emptyTableMessage = computed(() =>
-	hasAvailableProjects.value ? 'No data available' : 'No projects available',
-)
+const emptyTableMessage = computed(() => {
+	if (hasProjectContext.value) {
+		return 'No data available for analytics'
+	}
+
+	return hasAvailableProjects.value ? 'No data available' : 'No projects available for analytics'
+})
 
 const breakdownColumnLabel = computed(() => {
 	switch (selectedBreakdown.value) {
