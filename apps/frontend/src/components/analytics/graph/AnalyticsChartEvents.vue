@@ -4,15 +4,23 @@
 			v-for="group in eventGroups"
 			:key="`${group.id}:guide`"
 			aria-hidden="true"
-			class="absolute z-0 border-0 border-l border-dashed border-secondary opacity-40"
+			class="absolute left-0 z-0 border-0 border-l border-dashed border-secondary opacity-40"
 			:style="getGuideStyle(group)"
 		/>
+		<Transition name="analytics-event-range-highlight-fade">
+			<div
+				v-if="rangeHighlight"
+				aria-hidden="true"
+				class="pointer-events-none absolute left-0 z-10 rounded-sm border border-dashed border-blue bg-highlight-blue opacity-30"
+				:style="rangeHighlight"
+			/>
+		</Transition>
 
 		<button
 			v-for="group in eventGroups"
 			:key="group.id"
 			type="button"
-			class="pointer-events-auto absolute -top-[34px] z-20 inline-flex h-8 min-w-8 items-center justify-center gap-1 rounded-full bg-surface-3 px-1 text-secondary shadow-lg transition-colors hover:text-contrast focus-visible:border-brand focus-visible:text-contrast"
+			class="pointer-events-auto absolute -top-[34px] left-0 z-20 inline-flex h-8 min-w-8 items-center justify-center gap-1 rounded-full bg-surface-3 px-1 text-secondary shadow-lg transition-colors hover:text-contrast focus-visible:border-brand focus-visible:text-contrast"
 			:class="activeGroup?.id === group.id ? 'border-brand text-contrast' : ''"
 			:style="getMarkerStyle(group)"
 			:aria-label="getGroupAriaLabel(group)"
@@ -33,7 +41,7 @@
 			<div
 				v-if="activeGroup"
 				ref="tooltipElement"
-				class="analytics-event-tooltip pointer-events-auto absolute -top-7 left-0 z-30 max-h-[360px] w-[min(20rem,calc(100%-1rem))] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-xl"
+				class="analytics-event-tooltip pointer-events-auto absolute -top-7 left-0 z-30 max-h-[360px] w-[min(12rem,calc(100%-1rem))] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-xl"
 				:style="tooltipStyle"
 				@mouseenter="onTooltipMouseEnter"
 				@mouseleave="onTooltipMouseLeave"
@@ -73,9 +81,13 @@
 <script setup lang="ts">
 import { ExternalIcon, InfoIcon } from '@modrinth/assets'
 
-import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
+import type {
+	AnalyticsDashboardStat,
+	AnalyticsGroupByPreset,
+} from '~/providers/analytics/analytics'
 
 import type { AnalyticsChartGeometryPayload } from './AnalyticsChart.client.vue'
+import { isTimeRelevantForGroupBy } from './utils'
 
 export type AnalyticsChartEvent = {
 	title: string
@@ -89,6 +101,7 @@ type PositionedEvent = AnalyticsChartEvent & {
 	startMs: number
 	endMs: number
 	x: number
+	endX: number
 }
 
 type EventGroup = {
@@ -100,6 +113,7 @@ type EventGroup = {
 const props = defineProps<{
 	events: AnalyticsChartEvent[]
 	activeStat: AnalyticsDashboardStat
+	groupBy: AnalyticsGroupByPreset
 	chartStart: Date | null
 	chartEnd: Date | null
 	geometry: AnalyticsChartGeometryPayload | null
@@ -160,15 +174,16 @@ const visibleEvents = computed<PositionedEvent[]>(() => {
 			if (eventEndMs < eventStartMs) return null
 			if (eventEndMs < startMs || eventStartMs > endMs) return null
 
-			const clampedStartMs = Math.max(startMs, Math.min(endMs, eventStartMs))
-			const x = getClosestBucketX(clampedStartMs, geometry, startMs, endMs)
-			if (x === null) return null
+			const x = getDateBucketX(event.startDate, eventStartMs, geometry, startMs, endMs)
+			const endX = getDateBucketX(event.endDate, eventEndMs, geometry, startMs, endMs)
+			if (x === null || endX === null) return null
 
 			return {
 				...event,
 				startMs: eventStartMs,
 				endMs: eventEndMs,
 				x,
+				endX,
 			}
 		})
 		.filter((event): event is PositionedEvent => Boolean(event))
@@ -197,7 +212,6 @@ const eventGroups = computed<EventGroup[]>(() => {
 
 	return groups.map((group) => ({
 		...group,
-		x: getClosestRenderedBucketX(group.x),
 		id: group.events.map(getEventKey).join('|'),
 	}))
 })
@@ -220,11 +234,8 @@ const activeRange = computed(() => {
 	const rangeEndMs = Math.min(endMs, Math.max(...rangedEvents.map((event) => event.endMs)))
 	if (rangeEndMs <= rangeStartMs) return null
 
-	const left =
-		geometry.left +
-		((rangeStartMs - startMs) / (endMs - startMs)) * (geometry.right - geometry.left)
-	const right =
-		geometry.left + ((rangeEndMs - startMs) / (endMs - startMs)) * (geometry.right - geometry.left)
+	const left = Math.min(...rangedEvents.map((event) => event.x))
+	const right = Math.max(...rangedEvents.map((event) => event.endX))
 
 	return {
 		left: Math.min(left, right),
@@ -232,7 +243,7 @@ const activeRange = computed(() => {
 	}
 })
 
-const highlightStyle = computed(() => {
+const rangeHighlight = computed(() => {
 	const range = activeRange.value
 	const geometry = props.geometry
 	if (!range || !geometry) return null
@@ -287,7 +298,39 @@ function getEventKey(event: AnalyticsChartEvent) {
 	}`
 }
 
-function getClosestBucketX(
+function getDateBucketX(
+	value: string,
+	fallbackMs: number,
+	geometry: AnalyticsChartGeometryPayload,
+	startMs: number,
+	endMs: number,
+) {
+	const dateInputValue = getEventDateInputValue(value)
+	const xPositions = geometry.xPositions
+	const bucketMs = xPositions.length > 0 ? (endMs - startMs) / xPositions.length : 0
+	if (!dateInputValue || bucketMs <= 0) {
+		const clampedMs = Math.max(startMs, Math.min(endMs, fallbackMs))
+		return getTimeAxisX(clampedMs, geometry, startMs, endMs)
+	}
+
+	for (let index = 0; index < xPositions.length; index++) {
+		const bucketDate = getBucketDateForEventSnap(index, bucketMs, startMs)
+		if (getDateInputValue(bucketDate) === dateInputValue) {
+			const x = xPositions[index]
+			return Number.isFinite(x) ? x : null
+		}
+	}
+
+	const clampedMs = Math.max(startMs, Math.min(endMs, fallbackMs))
+	return getTimeAxisX(clampedMs, geometry, startMs, endMs)
+}
+
+function getBucketDateForEventSnap(index: number, bucketMs: number, startMs: number): Date {
+	const bucketOffset = isTimeRelevantForGroupBy(props.groupBy) ? index : index + 1
+	return new Date(startMs + bucketOffset * bucketMs)
+}
+
+function getTimeAxisX(
 	targetMs: number,
 	geometry: AnalyticsChartGeometryPayload,
 	startMs: number,
@@ -295,21 +338,18 @@ function getClosestBucketX(
 ) {
 	const xPositions = geometry.xPositions
 	const bucketMs = xPositions.length > 0 ? (endMs - startMs) / xPositions.length : 0
-	if (bucketMs <= 0) return null
+	if (xPositions.length === 0 || bucketMs <= 0) return null
+	if (xPositions.length === 1) return xPositions[0]
 
-	const rawIndex = (targetMs - startMs) / bucketMs - 0.5
-	const bucketIndex = Math.min(xPositions.length - 1, Math.max(0, Math.round(rawIndex)))
-	const x = xPositions[bucketIndex]
-	return Number.isFinite(x) ? x : null
-}
+	const firstX = xPositions[0]
+	const lastX = xPositions[xPositions.length - 1]
+	if (!Number.isFinite(firstX) || !Number.isFinite(lastX)) return null
 
-function getClosestRenderedBucketX(x: number) {
-	const xPositions = props.geometry?.xPositions ?? []
-	if (xPositions.length === 0) return x
+	const firstBucketEndMs = startMs + bucketMs
+	const clampedTargetMs = Math.min(endMs, Math.max(firstBucketEndMs, targetMs))
+	const progress = (clampedTargetMs - firstBucketEndMs) / (endMs - firstBucketEndMs)
 
-	return xPositions.reduce((closestX, candidateX) =>
-		Math.abs(candidateX - x) < Math.abs(closestX - x) ? candidateX : closestX,
-	)
+	return firstX + progress * (lastX - firstX)
 }
 
 function getMarkerStyle(group: EventGroup) {
@@ -472,5 +512,15 @@ onBeforeUnmount(() => {
 	transition:
 		opacity 140ms ease-out,
 		transform 180ms ease-out;
+}
+
+.analytics-event-range-highlight-fade-enter-active,
+.analytics-event-range-highlight-fade-leave-active {
+	transition: opacity 140ms ease-out;
+}
+
+.analytics-event-range-highlight-fade-enter-from,
+.analytics-event-range-highlight-fade-leave-to {
+	opacity: 0;
 }
 </style>

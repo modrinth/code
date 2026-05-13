@@ -113,6 +113,7 @@
 							v-if="showChartEvents"
 							:events="dummyAnalyticsChartEvents"
 							:active-stat="activeStat"
+							:group-by="selectedGroupBy"
 							:chart-start="chartRangeBounds?.start ?? null"
 							:chart-end="chartRangeBounds?.end ?? null"
 							:geometry="chartGeometry"
@@ -239,20 +240,22 @@ const titleByStat: Record<AnalyticsDashboardStat, string> = {
 const dummyAnalyticsChartEvents: AnalyticsChartEvent[] = [
 	{
 		title: 'Analytics outage',
-		startDate: '2025-05-12T00:00:00.000Z',
-		endDate: '2025-05-13T00:00:00.000Z',
+		startDate: '2026-04-25T00:00:00.000Z',
+		endDate: '2026-04-27T00:00:00.000Z',
 	},
 	{
 		title: 'Ad revenue over reported, resulting in a potential spike.',
 		announcementUrl: 'https://modrinth.com/news',
-		startDate: '2025-05-04T00:00:00.000Z',
-		endDate: '2025-05-04T00:00:00.000Z',
+		startDate: '2026-05-04T00:00:00.000Z',
+		endDate: '2026-05-04T00:00:00.000Z',
+		forMetricType: 'revenue',
 	},
 	{
 		title: 'China CDN ingest outage',
 		announcementUrl: 'https://modrinth.com/news',
-		startDate: '2025-04-02T00:00:00.000Z',
-		endDate: '2025-04-04T00:00:00.000Z',
+		startDate: '2026-05-01T00:00:00.000Z',
+		endDate: '2026-05-07T00:00:00.000Z',
+		forMetricType: 'downloads',
 	},
 	{
 		title: 'Modrinth App release',
