@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
+use actix_web::{HttpRequest, delete, get, patch, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
@@ -41,20 +41,8 @@ pub struct AnalyticsEventUpsert {
 #[utoipa::path(responses((status = OK, body = Vec<AnalyticsEvent>)))]
 #[get("")]
 pub async fn analytics_events_get(
-    req: HttpRequest,
     pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<AnalyticsEvent>>, ApiError> {
-    get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::empty(),
-    )
-    .await?;
-
     let events = DBAnalyticsEvent::get_all(&**pool)
         .await
         .wrap_internal_err("failed to fetch analytics events")?
@@ -172,7 +160,7 @@ pub async fn analytics_event_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<(), ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -199,5 +187,5 @@ pub async fn analytics_event_delete(
         return Err(ApiError::NotFound);
     }
 
-    Ok(HttpResponse::NoContent().body(""))
+    Ok(())
 }
