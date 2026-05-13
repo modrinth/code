@@ -124,14 +124,14 @@ vars! {
     SENTRY_TRACES_SAMPLE_RATE: f32 = 0.1f32;
     SITE_URL: String = "http://localhost:3000";
     CDN_URL: String = "file:///tmp/modrinth";
-    LABRINTH_ADMIN_KEY: String = "feedbeef";
+    LABRINTH_ADMIN_KEY: String = "";
     LABRINTH_MEDAL_KEY: String = "";
-    LABRINTH_EXTERNAL_NOTIFICATION_KEY: String = "beeffeed";
-    RATE_LIMIT_IGNORE_KEY: String = "feedbeef";
+    LABRINTH_EXTERNAL_NOTIFICATION_KEY: String = "";
+    RATE_LIMIT_IGNORE_KEY: String = "";
     DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
     REDIS_URL: String = "redis://localhost";
-    BIND_ADDR: String = "0.0.0.0:8000";
-    SELF_ADDR: String = "http://127.0.0.1:8000";
+    BIND_ADDR: String = "";
+    SELF_ADDR: String = "";
 
     LOCAL_INDEX_INTERVAL: u64 = 3600u64;
     VERSION_INDEX_INTERVAL: u64 = 1800u64;
