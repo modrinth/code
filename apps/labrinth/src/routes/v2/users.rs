@@ -1,5 +1,4 @@
 use crate::database::PgPool;
-use crate::database::models::DBUser;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
@@ -79,19 +78,31 @@ pub struct UserIds {
 )]
 #[get("/users")]
 pub async fn users_get(
+    req: HttpRequest,
     web::Query(ids): web::Query<UserIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)?;
-    let users_data = DBUser::get_many(&user_ids, &**pool, &redis).await?;
+    let response = v3::users::users_get(
+        req,
+        web::Query(v3::users::UserIds { ids: ids.ids }),
+        pool,
+        redis,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
-    let legacy_users: Vec<LegacyUser> = users_data
-        .into_iter()
-        .map(crate::models::users::User::from)
-        .map(LegacyUser::from)
-        .collect();
-    Ok(HttpResponse::Ok().json(legacy_users))
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Vec<User>>(response).await {
+        Ok(users) => {
+            let legacy_users: Vec<LegacyUser> =
+                users.into_iter().map(LegacyUser::from).collect();
+            Ok(HttpResponse::Ok().json(legacy_users))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 /// Get a user by ID or username.
