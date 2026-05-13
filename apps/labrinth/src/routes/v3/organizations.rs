@@ -475,7 +475,7 @@ pub async fn organizations_get(
         let mut organization =
             models::organizations::Organization::from(data, team_members);
         if include_notes {
-            organization.notes = notes.remove(&data_id).map(Into::into);
+            organization.notes = notes.get(&data_id).clone().map(Into::into);
         }
         organizations.push(organization);
     }

@@ -223,7 +223,7 @@ pub async fn users_get(
         .map(|data| {
             let mut user = crate::models::users::User::from(data.clone());
             if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
-                user.notes = notes.remove(&data.id).map(Into::into);
+                user.notes = notes.get(&data.id).clone().map(Into::into);
             }
             user
         })
