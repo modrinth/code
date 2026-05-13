@@ -3,6 +3,7 @@ use crate::util::cors::default_cors;
 use actix_web::{HttpResponse, web};
 use serde_json::json;
 
+pub mod analytics_event;
 pub mod analytics_get;
 pub mod collections;
 pub mod friends;
@@ -57,7 +58,8 @@ pub fn utoipa_config(
     cfg.service(
         utoipa_actix_web::scope("/v3/analytics")
             .wrap(default_cors())
-            .configure(analytics_get::config),
+            .configure(analytics_get::config)
+            .configure(analytics_event::config),
     );
     cfg.service(
         utoipa_actix_web::scope("/v3/payout")

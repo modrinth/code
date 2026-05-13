@@ -1,0 +1,203 @@
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
+use chrono::{DateTime, Utc};
+use eyre::eyre;
+use serde::{Deserialize, Serialize};
+
+use crate::{
+    auth::get_user_from_headers,
+    database::{
+        PgPool,
+        models::{
+            DBAnalyticsEvent, DBAnalyticsEventId, generate_analytics_event_id,
+        },
+        redis::RedisPool,
+    },
+    models::{
+        ids::AnalyticsEventId,
+        pats::Scopes,
+        v3::analytics_event::{AnalyticsEvent, AnalyticsEventMeta},
+    },
+    queue::session::AuthQueue,
+    routes::ApiError,
+    util::error::Context,
+};
+
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+    cfg.service(analytics_events_get)
+        .service(analytics_event_create)
+        .service(analytics_event_edit)
+        .service(analytics_event_delete);
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AnalyticsEventUpsert {
+    #[serde(flatten)]
+    pub meta: AnalyticsEventMeta,
+    pub starts: DateTime<Utc>,
+    pub ends: DateTime<Utc>,
+}
+
+/// Fetches all analytics events.
+#[utoipa::path(responses((status = OK, body = Vec<AnalyticsEvent>)))]
+#[get("/events")]
+pub async fn analytics_events_get(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<AnalyticsEvent>>, ApiError> {
+    get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::empty(),
+    )
+    .await?;
+
+    let events = DBAnalyticsEvent::get_all(&**pool)
+        .await
+        .wrap_internal_err("failed to fetch analytics events")?
+        .into_iter()
+        .map(AnalyticsEvent::from)
+        .collect();
+
+    Ok(web::Json(events))
+}
+
+/// Creates an analytics event.
+#[utoipa::path(responses((status = OK, body = AnalyticsEvent)))]
+#[post("/event")]
+pub async fn analytics_event_create(
+    req: HttpRequest,
+    event: web::Json<AnalyticsEventUpsert>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<AnalyticsEvent>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::empty(),
+    )
+    .await?
+    .1;
+
+    if !user.role.is_admin() {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to manage analytics events"
+        )));
+    }
+
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin transaction")?;
+    let id = generate_analytics_event_id(&mut transaction)
+        .await
+        .wrap_internal_err("failed to generate analytics event ID")?;
+
+    let event = DBAnalyticsEvent {
+        id,
+        meta: event.meta.clone(),
+        starts: event.starts,
+        ends: event.ends,
+    };
+    event
+        .insert(&mut transaction)
+        .await
+        .wrap_internal_err("failed to insert analytics event")?;
+
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
+
+    Ok(web::Json(event.into()))
+}
+
+/// Edits an analytics event.
+#[utoipa::path(responses((status = OK, body = AnalyticsEvent)))]
+#[patch("/event/{id}")]
+pub async fn analytics_event_edit(
+    req: HttpRequest,
+    id: web::Path<(AnalyticsEventId,)>,
+    event: web::Json<AnalyticsEventUpsert>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<AnalyticsEvent>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::empty(),
+    )
+    .await?
+    .1;
+
+    if !user.role.is_admin() {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to manage analytics events"
+        )));
+    }
+
+    let event = DBAnalyticsEvent {
+        id: DBAnalyticsEventId::from(id.into_inner().0),
+        meta: event.meta.clone(),
+        starts: event.starts,
+        ends: event.ends,
+    };
+
+    let updated = event
+        .update(&**pool)
+        .await
+        .wrap_internal_err("failed to update analytics event")?;
+    if !updated {
+        return Err(ApiError::NotFound);
+    }
+
+    Ok(web::Json(event.into()))
+}
+
+/// Deletes an analytics event.
+#[utoipa::path(responses((status = NO_CONTENT)))]
+#[delete("/event/{id}")]
+pub async fn analytics_event_delete(
+    req: HttpRequest,
+    id: web::Path<(AnalyticsEventId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::empty(),
+    )
+    .await?
+    .1;
+
+    if !user.role.is_admin() {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to manage analytics events"
+        )));
+    }
+
+    let deleted = DBAnalyticsEvent::remove(
+        DBAnalyticsEventId::from(id.into_inner().0),
+        &**pool,
+    )
+    .await
+    .wrap_internal_err("failed to delete analytics event")?;
+    if !deleted {
+        return Err(ApiError::NotFound);
+    }
+
+    Ok(HttpResponse::NoContent().body(""))
+}

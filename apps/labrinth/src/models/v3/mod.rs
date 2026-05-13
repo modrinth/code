@@ -1,5 +1,6 @@
 pub mod affiliate_code;
 pub mod analytics;
+pub mod analytics_event;
 pub mod billing;
 pub mod collections;
 pub mod ids;
