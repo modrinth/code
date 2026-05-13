@@ -1,4 +1,4 @@
-import { CheckIcon } from '@modrinth/assets'
+import { BoxIcon, CheckIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, ref } from 'vue'
 
@@ -51,6 +51,48 @@ export const WithSearch: Story = {
 		searchable: true,
 		searchPlaceholder: 'Search versions',
 	},
+}
+
+export const WithOptionRightSlot: Story = {
+	args: {
+		options: [
+			{ value: 'sodium-1.21.5', label: '1.21.5', searchTerms: ['Sodium'] },
+			{ value: 'sodium-1.21.4', label: '1.21.4', searchTerms: ['Sodium'] },
+			{ value: 'iris-1.20.1', label: '1.20.1', searchTerms: ['Iris'] },
+			{ value: 'modmenu-1.19.2', label: '1.19.2', searchTerms: ['Mod Menu'] },
+		],
+		modelValue: ['sodium-1.21.5'],
+		placeholder: 'Select versions',
+		searchable: true,
+		searchPlaceholder: 'Search versions',
+	},
+	render: (args) => ({
+		components: { BoxIcon, MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			const projectNames: Record<string, string> = {
+				'sodium-1.21.5': 'Sodium',
+				'sodium-1.21.4': 'Sodium',
+				'iris-1.20.1': 'Iris',
+				'modmenu-1.19.2': 'Mod Menu',
+			}
+			return { args, projectNames, selected }
+		},
+		template: /*html*/ `
+			<div style="width: 400px;">
+				<MultiSelect v-bind="args" v-model="selected">
+					<template #option-right="{ item }">
+						<span
+							v-tooltip="projectNames[item.value]"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<BoxIcon class="size-6" />
+						</span>
+					</template>
+				</MultiSelect>
+			</div>
+		`,
+	}),
 }
 
 export const WithSelectAll: Story = {

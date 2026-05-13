@@ -1,3 +1,4 @@
+import { BoxIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
@@ -55,10 +56,10 @@ const searchableCategories = [
 		searchPlaceholder: 'Search versions...',
 		submenuClass: 'w-[360px]',
 		options: [
-			{ value: '1.21.5', label: '1.21.5' },
-			{ value: '1.21.4', label: '1.21.4' },
-			{ value: '1.20.1', label: '1.20.1' },
-			{ value: '1.19.2', label: '1.19.2' },
+			{ value: '1.21.5', label: '1.21.5', searchTerms: ['Sodium'] },
+			{ value: '1.21.4', label: '1.21.4', searchTerms: ['Sodium'] },
+			{ value: '1.20.1', label: '1.20.1', searchTerms: ['Iris'] },
+			{ value: '1.19.2', label: '1.19.2', searchTerms: ['Mod Menu'] },
 		],
 	},
 ]
@@ -174,14 +175,33 @@ export const WithFilterIcon: Story = {
 
 export const SearchableCategories: Story = {
 	render: () => ({
-		components: { DropdownFilterBar },
+		components: { BoxIcon, DropdownFilterBar },
 		setup() {
 			const selected = ref<Record<string, string[]>>({})
-			return { categories: searchableCategories, selected }
+			const versionProjects: Record<string, string> = {
+				'1.21.5': 'Sodium',
+				'1.21.4': 'Sodium',
+				'1.20.1': 'Iris',
+				'1.19.2': 'Mod Menu',
+			}
+			function getVersionProject(categoryKey: string, optionValue: string) {
+				return categoryKey === 'version' ? versionProjects[optionValue] : undefined
+			}
+			return { categories: searchableCategories, getVersionProject, selected }
 		},
 		template: /* html */ `
 			<div class="flex flex-wrap items-center gap-2">
-				<DropdownFilterBar v-model="selected" :categories="categories" />
+				<DropdownFilterBar v-model="selected" :categories="categories">
+					<template #option-right="{ category, option }">
+						<span
+							v-if="getVersionProject(category.key, option.value)"
+							v-tooltip="getVersionProject(category.key, option.value)"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<BoxIcon class="size-6" />
+						</span>
+					</template>
+				</DropdownFilterBar>
 			</div>
 		`,
 	}),

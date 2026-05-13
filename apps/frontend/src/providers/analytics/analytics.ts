@@ -132,6 +132,8 @@ export interface AnalyticsDashboardContextValue {
 	filterOptions: ComputedRef<AnalyticsDashboardFilterOptions>
 	versionNumbersById: ComputedRef<Map<string, string>>
 	versionPublishedDatesById: ComputedRef<Map<string, string>>
+	versionProjectNamesById: ComputedRef<Map<string, string>>
+	versionProjectIconUrlsById: ComputedRef<Map<string, string>>
 	projectStatusById: ComputedRef<Map<string, ProjectStatusFilterValue>>
 	availableProjectStatuses: ComputedRef<ProjectStatusFilterValue[]>
 	projectVersionDownloadsById: ComputedRef<Map<string, number>>
@@ -160,6 +162,8 @@ export interface AnalyticsDashboardContextValue {
 	resetAnalyticsQueryBuilder: () => void
 	getVersionDisplayName: (versionId: string) => string
 	getVersionPublishedDate: (versionId: string) => string | undefined
+	getVersionProjectName: (versionId: string) => string | undefined
+	getVersionProjectIconUrl: (versionId: string) => string | undefined
 	setFetchRequest: (fetchRequest: Labrinth.Analytics.v3.FetchRequest) => void
 	setActiveStat: (stat: AnalyticsDashboardStat) => void
 }
@@ -1125,6 +1129,17 @@ export function createAnalyticsDashboardContext(
 	)
 
 	const availableProjectIds = computed(() => projects.value.map((project) => project.id))
+	const projectNamesById = computed(
+		() => new Map(projects.value.map((project) => [project.id, project.name])),
+	)
+	const projectIconUrlsById = computed(
+		() =>
+			new Map(
+				projects.value
+					.filter((project) => project.iconUrl)
+					.map((project) => [project.id, project.iconUrl as string]),
+			),
+	)
 	const projectStatusById = computed(
 		() => new Map(projects.value.map((project) => [project.id, project.status])),
 	)
@@ -1693,6 +1708,28 @@ export function createAnalyticsDashboardContext(
 	const versionPublishedDatesById = computed(
 		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.date_published])),
 	)
+	const versionProjectNamesById = computed(() => {
+		const projectNames = projectNamesById.value
+		const versionProjectNames = new Map<string, string>()
+		for (const version of allVersionMetadata.value) {
+			const projectName = projectNames.get(version.project_id)
+			if (projectName) {
+				versionProjectNames.set(version.id, projectName)
+			}
+		}
+		return versionProjectNames
+	})
+	const versionProjectIconUrlsById = computed(() => {
+		const projectIconUrls = projectIconUrlsById.value
+		const versionProjectIconUrls = new Map<string, string>()
+		for (const version of allVersionMetadata.value) {
+			const projectIconUrl = projectIconUrls.get(version.project_id)
+			if (projectIconUrl) {
+				versionProjectIconUrls.set(version.id, projectIconUrl)
+			}
+		}
+		return versionProjectIconUrls
+	})
 	const projectVersionDownloadsById = computed(
 		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.downloads])),
 	)
@@ -1836,6 +1873,14 @@ export function createAnalyticsDashboardContext(
 		return versionPublishedDatesById.value.get(versionId)
 	}
 
+	function getVersionProjectName(versionId: string): string | undefined {
+		return versionProjectNamesById.value.get(versionId)
+	}
+
+	function getVersionProjectIconUrl(versionId: string): string | undefined {
+		return versionProjectIconUrlsById.value.get(versionId)
+	}
+
 	function setActiveStat(nextStat: AnalyticsDashboardStat) {
 		if (
 			!isAnalyticsDashboardStatRelevant(nextStat, selectedBreakdown.value, selectedFilters.value)
@@ -1873,6 +1918,8 @@ export function createAnalyticsDashboardContext(
 		filterOptions,
 		versionNumbersById,
 		versionPublishedDatesById,
+		versionProjectNamesById,
+		versionProjectIconUrlsById,
 		projectStatusById,
 		availableProjectStatuses,
 		projectVersionDownloadsById,
@@ -1894,6 +1941,8 @@ export function createAnalyticsDashboardContext(
 		resetAnalyticsQueryBuilder,
 		getVersionDisplayName,
 		getVersionPublishedDate,
+		getVersionProjectName,
+		getVersionProjectIconUrl,
 		setFetchRequest,
 		setActiveStat,
 	}

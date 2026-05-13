@@ -248,16 +248,31 @@
 								>
 									<CheckIcon v-if="isSelected(item.value)" aria-hidden="true" stroke-width="3" />
 								</span>
-								<slot :name="`option-${item.value}`" :item="item">
-									<div class="flex items-center gap-2">
-										<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
-										<span
-											class="font-semibold leading-tight"
-											:class="isSelected(item.value) ? 'text-contrast' : 'text-primary'"
-										>
-											{{ item.label }}
-										</span>
-									</div>
+								<slot name="option" :item="item" :selected="isSelected(item.value)" :index="index">
+									<slot
+										:name="`option-${item.value}`"
+										:item="item"
+										:selected="isSelected(item.value)"
+										:index="index"
+									>
+										<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
+											<div class="flex min-w-0 items-center gap-2">
+												<component :is="item.icon" v-if="item.icon" class="h-5 w-5 shrink-0" />
+												<span
+													class="min-w-0 truncate font-semibold leading-tight"
+													:class="isSelected(item.value) ? 'text-contrast' : 'text-primary'"
+												>
+													{{ item.label }}
+												</span>
+											</div>
+											<slot
+												name="option-right"
+												:item="item"
+												:selected="isSelected(item.value)"
+												:index="index"
+											></slot>
+										</div>
+									</slot>
 								</slot>
 							</span>
 						</template>

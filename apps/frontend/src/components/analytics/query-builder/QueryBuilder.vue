@@ -54,6 +54,18 @@
 							</div>
 						</div>
 					</template>
+					<template #option="{ item, selected }">
+						<div class="flex min-w-0 flex-1 items-center gap-2">
+							<component :is="item.icon" v-if="item.icon" class="h-5 w-5 shrink-0" />
+							<span
+								v-tooltip="item.label"
+								class="min-w-0 truncate font-semibold leading-tight"
+								:class="selected ? 'text-contrast' : 'text-primary'"
+							>
+								{{ item.label }}
+							</span>
+						</div>
+					</template>
 					<template v-if="hasProjectOptions" #top>
 						<div class="px-3">
 							<button

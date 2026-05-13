@@ -58,6 +58,15 @@
 				:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
 			></slot>
 		</template>
+		<template v-if="$slots['option-right']" #option-right="{ item, selected, index }">
+			<slot
+				name="option-right"
+				:category="preview.category"
+				:option="item"
+				:selected="selected"
+				:index="index"
+			></slot>
+		</template>
 	</MultiSelect>
 
 	<div class="flex h-10 items-center gap-2">
@@ -196,16 +205,24 @@
 								stroke-width="3"
 							/>
 						</span>
-						<span
-							class="font-semibold leading-tight"
-							:class="
-								isFilterValueSelected(activeCategory.key, option.value)
-									? 'text-contrast'
-									: 'text-primary'
-							"
-						>
-							{{ option.label }}
-						</span>
+						<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
+							<span
+								class="min-w-0 truncate font-semibold leading-tight"
+								:class="
+									isFilterValueSelected(activeCategory.key, option.value)
+										? 'text-contrast'
+										: 'text-primary'
+								"
+							>
+								{{ option.label }}
+							</span>
+							<slot
+								name="option-right"
+								:category="activeCategory"
+								:option="option"
+								:selected="isFilterValueSelected(activeCategory.key, option.value)"
+							></slot>
+						</div>
 					</button>
 				</template>
 			</div>

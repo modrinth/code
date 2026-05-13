@@ -48,6 +48,9 @@
 					>{{ formatBreakdownDisplayValue(String(value)) }}</span
 				>
 			</template>
+			<template #cell-project="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
 			<template #cell-views="{ row }">
 				<span>{{ formatInteger(row.views) }}</span>
 			</template>
@@ -104,12 +107,20 @@ import {
 
 type TableMode = 'date_breakdown' | 'breakdown_only'
 type SortDirection = 'asc' | 'desc'
-type TableColumnKey = 'date' | 'breakdown' | 'views' | 'downloads' | 'revenue' | 'playtime'
+type TableColumnKey =
+	| 'date'
+	| 'project'
+	| 'breakdown'
+	| 'views'
+	| 'downloads'
+	| 'revenue'
+	| 'playtime'
 
 type AnalyticsTableRow = {
 	id: string
 	date: string
 	dateMs: number
+	project: string
 	breakdown: string
 	views: number
 	downloads: number
@@ -129,6 +140,7 @@ const {
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
 	getVersionDisplayName,
+	getVersionProjectName,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 const isDataLoading = computed(() => isLoading.value)
@@ -159,6 +171,9 @@ const selectedProjectIdSet = computed(
 const isSingleProjectView = computed(() => selectedProjectIdSet.value.size === 1)
 const showBreakdownColumn = computed(
 	() => selectedBreakdown.value !== 'none' || !isSingleProjectView.value,
+)
+const showProjectVersionProjectColumn = computed(
+	() => selectedBreakdown.value === 'version_id' && selectedProjectIdSet.value.size > 1,
 )
 const showDateToggle = computed(() => showBreakdownColumn.value)
 const includeDateColumn = computed(
@@ -267,6 +282,7 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 					id: rowId,
 					date: dateLabel,
 					dateMs,
+					project: getProjectDisplayValue(breakdown, nextSelectedBreakdown),
 					breakdown,
 					views: 0,
 					downloads: 0,
@@ -281,6 +297,7 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 				id: breakdown,
 				date: '',
 				dateMs: 0,
+				project: getProjectDisplayValue(breakdown, nextSelectedBreakdown),
 				breakdown,
 				views: 0,
 				downloads: 0,
@@ -346,6 +363,14 @@ const columns = computed<TableColumn<TableColumnKey>[]>(() => {
 	}
 
 	if (showBreakdownColumn.value) {
+		if (showProjectVersionProjectColumn.value) {
+			nextColumns.push({
+				key: 'project',
+				label: 'Project',
+				enableSorting: true,
+			})
+		}
+
 		nextColumns.push({
 			key: 'breakdown',
 			label: breakdownColumnLabel.value,
@@ -517,7 +542,7 @@ function getDefaultSortColumn(
 }
 
 function getDefaultSortDirection(column: TableColumnKey | undefined): SortDirection {
-	return column === 'date' || column === 'breakdown' ? 'asc' : 'desc'
+	return column === 'date' || column === 'project' || column === 'breakdown' ? 'asc' : 'desc'
 }
 
 function getBreakdownValue(
@@ -535,6 +560,8 @@ function getSortComparison(
 	switch (column) {
 		case 'date':
 			return left.dateMs - right.dateMs
+		case 'project':
+			return left.project.localeCompare(right.project, undefined, { sensitivity: 'base' })
 		case 'breakdown':
 			return formatBreakdownDisplayValue(left.breakdown).localeCompare(
 				formatBreakdownDisplayValue(right.breakdown),
@@ -561,10 +588,23 @@ function formatBreakdownDisplayValue(value: string): string {
 	return formatBreakdownLabel(value, selectedBreakdown.value, getVersionDisplayName)
 }
 
+function getProjectDisplayValue(
+	breakdown: string,
+	selectedBreakdown: AnalyticsBreakdownPreset,
+): string {
+	if (selectedBreakdown !== 'version_id') {
+		return ''
+	}
+
+	return getVersionProjectName(breakdown) ?? ''
+}
+
 function getCsvCellValue(row: AnalyticsTableRow, key: TableColumnKey): string | number {
 	switch (key) {
 		case 'date':
 			return row.date
+		case 'project':
+			return row.project
 		case 'breakdown':
 			return formatBreakdownDisplayValue(row.breakdown)
 		case 'views':

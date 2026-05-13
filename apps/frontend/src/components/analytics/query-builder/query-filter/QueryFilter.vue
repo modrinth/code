@@ -19,6 +19,16 @@
 			</div>
 		</template>
 
+		<template #option-right="{ category, option }">
+			<span
+				v-if="category.key === 'version_id' && getProjectVersionOptionProjectMetadata(option.value)"
+				v-tooltip="getProjectVersionOptionProjectMetadata(option.value)?.name"
+				class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+			>
+				<component :is="getProjectVersionOptionProjectMetadata(option.value)?.icon" />
+			</span>
+		</template>
+
 		<template #category-footer="{ category, setSelectedValues, closeMenu }">
 			<DownloadsThresholdInput
 				v-if="category.key === 'country'"
@@ -148,18 +158,21 @@
 </template>
 
 <script setup lang="ts">
+import { BoxIcon } from '@modrinth/assets'
 import {
 	Chips,
 	DropdownFilterBar,
 	type DropdownFilterBarCategory,
 	type DropdownFilterBarOption,
 } from '@modrinth/ui'
+import { type Component, defineAsyncComponent, h, markRaw } from 'vue'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import { useGeneratedState } from '~/composables/generated'
 import {
 	type AnalyticsQueryFilterCategory,
 	type AnalyticsSelectedFilters,
+	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
@@ -176,9 +189,15 @@ type AnalyticsFilterValueCategory = Exclude<AnalyticsQueryFilterCategory, 'proje
 type SetDropdownFilterValues = (values: string[]) => void
 type ApplyDownloadsThreshold = (setSelectedValues: SetDropdownFilterValues) => void
 type CloseDownloadsThresholdMenu = (event?: Event) => void
+type ProjectVersionProjectOptionMetadata = {
+	name: string
+	icon: Component
+}
 
 const {
 	hasProjectContext,
+	projects,
+	selectedProjectIds,
 	availableProjectStatuses,
 	filterOptions,
 	projectVersionDownloadsById,
@@ -190,6 +209,8 @@ const {
 	refreshAnalyticsQuery,
 	getVersionDisplayName,
 	getVersionPublishedDate,
+	getVersionProjectName,
+	getVersionProjectIconUrl,
 } = injectAnalyticsDashboardContext()
 const formattedCountries = useFormattedCountries()
 const generatedState = useGeneratedState()
@@ -211,6 +232,40 @@ const projectStatusFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 		label: getProjectStatusFilterOptionLabel(status),
 	})),
 )
+const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
+const effectiveSelectedProjectCount = computed(
+	() =>
+		projects.value.filter(
+			(project) =>
+				selectedProjectIdSet.value.has(project.id) &&
+				doesProjectStatusMatchFilters(project.status, selectedFilters.value),
+		).length,
+)
+const showProjectVersionProjectIcons = computed(() => effectiveSelectedProjectCount.value > 1)
+const projectVersionProjectOptionVersionIds = computed(() =>
+	Array.from(new Set([...filterOptions.value.versionIds, ...selectedFilters.value.version_id])),
+)
+const projectVersionProjectMetadataByVersionId = computed(() => {
+	const metadata = new Map<string, ProjectVersionProjectOptionMetadata>()
+
+	if (!showProjectVersionProjectIcons.value) {
+		return metadata
+	}
+
+	for (const versionId of projectVersionProjectOptionVersionIds.value) {
+		const projectName = getVersionProjectName(versionId)
+		if (!projectName) {
+			continue
+		}
+
+		metadata.set(versionId, {
+			name: projectName,
+			icon: getProjectIcon(projectName, getVersionProjectIconUrl(versionId)),
+		})
+	}
+
+	return metadata
+})
 
 const selectedFilterValue = computed<Record<string, string[]>>({
 	get: () => selectedFilters.value,
@@ -375,11 +430,17 @@ const downloadReasonFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 
 const versionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.versionIds
-		.map((versionId) => ({
-			value: versionId,
-			label: getVersionDisplayName(versionId),
-			searchTerms: [versionId],
-		}))
+		.map((versionId) => {
+			const projectName = showProjectVersionProjectIcons.value
+				? getVersionProjectName(versionId)
+				: undefined
+
+			return {
+				value: versionId,
+				label: getVersionDisplayName(versionId),
+				searchTerms: projectName ? [versionId, projectName] : [versionId],
+			}
+		})
 		.sort((left, right) =>
 			compareOptionalDateStringsDescending(
 				getVersionPublishedDate(left.value),
@@ -495,6 +556,35 @@ function getDownloadReasonFilterOptionLabel(reason: string): string {
 		default:
 			return reason
 	}
+}
+
+function getProjectVersionOptionProjectMetadata(
+	versionId: string,
+): ProjectVersionProjectOptionMetadata | undefined {
+	return projectVersionProjectMetadataByVersionId.value.get(versionId)
+}
+
+function getProjectIcon(projectName: string, iconUrl: string | undefined) {
+	if (!iconUrl) {
+		return markRaw({
+			inheritAttrs: false,
+			setup: () => () =>
+				h('div', { class: 'h-6 w-6 text-primary' }, [h(BoxIcon, { class: 'h-full w-full' })]),
+		})
+	}
+
+	return markRaw(
+		defineAsyncComponent(() =>
+			Promise.resolve({
+				setup: () => () =>
+					h('img', {
+						src: iconUrl,
+						alt: `${projectName} Icon`,
+						class: 'h-6 w-6 rounded object-cover',
+					}),
+			}),
+		),
+	)
 }
 
 function getDateTimestamp(date: string | undefined): number | undefined {

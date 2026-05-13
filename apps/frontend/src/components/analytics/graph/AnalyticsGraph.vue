@@ -50,7 +50,12 @@
 						@click="onLegendEntryClick($event, legendEntry.id)"
 					>
 						<span class="size-2 rounded-full" :style="{ backgroundColor: legendEntry.color }" />
-						<span :class="{ 'line-through': legendEntry.hidden }">{{ legendEntry.name }}</span>
+						<span
+							v-tooltip="legendEntry.projectName ?? ''"
+							:class="{ 'line-through': legendEntry.hidden }"
+						>
+							{{ legendEntry.name }}
+						</span>
 					</button>
 				</div>
 
@@ -156,12 +161,12 @@ import {
 } from '~/providers/analytics/analytics'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
-import AnalyticsChart, { type AnalyticsChartRangeSelectPayload } from './AnalyticsChart.client.vue'
-import AnalyticsChartTooltip, { type AnalyticsChartTooltipEntry } from './AnalyticsChartTooltip.vue'
 import {
 	ensureMinimumTimeRange,
 	getDefaultAnalyticsGroupByForDurationMinutes,
 } from '../query-builder/timeframe-picker/timeframe'
+import AnalyticsChart, { type AnalyticsChartRangeSelectPayload } from './AnalyticsChart.client.vue'
+import AnalyticsChartTooltip, { type AnalyticsChartTooltipEntry } from './AnalyticsChartTooltip.vue'
 import {
 	buildChartDatasets,
 	buildTimeAxisLabels,
@@ -190,6 +195,7 @@ const {
 	displayedSelectedFilters: selectedFilters,
 	isLoading,
 	getVersionDisplayName,
+	getVersionProjectName,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 const isDataLoading = computed(() => isLoading.value)
@@ -219,6 +225,9 @@ const selectedProjects = computed(() =>
 			selectedProjectIdSet.value.has(project.id) &&
 			doesProjectStatusMatchFilters(project.status, selectedFilters.value),
 	),
+)
+const showProjectVersionNames = computed(
+	() => selectedBreakdown.value === 'version_id' && selectedProjects.value.length > 1,
 )
 
 const emptyChartMessage = computed(() => {
@@ -322,6 +331,7 @@ const allChartDatasets = computed(() =>
 		selectedBreakdown.value,
 		selectedFilters.value,
 		getVersionDisplayName,
+		showProjectVersionNames.value ? getVersionProjectName : undefined,
 		sliceCount.value,
 	),
 )
@@ -378,6 +388,7 @@ const OTHER_LEGEND_ENTRY_COLOR = '#9ca3af'
 type LegendEntry = {
 	id: string
 	name: string
+	projectName?: string
 	color: string
 	totalValue: number
 	hidden: boolean
@@ -519,6 +530,7 @@ const legendEntries = computed<LegendEntry[]>(() =>
 			return {
 				id: dataset.projectId,
 				name: dataset.label,
+				projectName: dataset.projectName,
 				color: dataset.borderColor,
 				totalValue,
 				hidden: hiddenDatasetIds.value.has(dataset.projectId),
@@ -591,6 +603,7 @@ const otherChartDataset = computed<ChartDataset | null>(() => {
 		...datasets[0],
 		projectId: OTHER_LEGEND_ENTRY_ID,
 		label: 'Other',
+		projectName: undefined,
 		data,
 		borderColor: OTHER_LEGEND_ENTRY_COLOR,
 		backgroundColor: OTHER_LEGEND_ENTRY_COLOR,
@@ -765,6 +778,7 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 			return {
 				projectId: legendEntry.id,
 				name: legendEntry.name,
+				projectName: legendEntry.projectName,
 				color: legendEntry.color,
 				formattedValue: isRatioMode.value
 					? `${value.toFixed(1)}%`

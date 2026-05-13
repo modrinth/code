@@ -14,6 +14,7 @@ import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'
 export type ChartDataset = {
 	projectId: string
 	label: string
+	projectName?: string
 	data: number[]
 	borderColor: string
 	backgroundColor: string
@@ -177,6 +178,7 @@ export function buildChartDatasets(
 	selectedBreakdown: AnalyticsBreakdownPreset,
 	selectedFilters: AnalyticsSelectedFilters,
 	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
+	getVersionProjectName?: (versionId: string) => string | undefined,
 	sliceCount: number = timeSlices.length,
 ): ChartDataset[] {
 	const selectedProjectIds = new Set(selectedProjects.map((project) => project.id))
@@ -215,6 +217,8 @@ export function buildChartDatasets(
 			return {
 				projectId: `breakdown:${breakdownValue}`,
 				label: formatBreakdownLabel(breakdownValue, selectedBreakdown, getVersionDisplayName),
+				projectName:
+					selectedBreakdown === 'version_id' ? getVersionProjectName?.(breakdownValue) : undefined,
 				data,
 				borderColor: color,
 				backgroundColor: color,

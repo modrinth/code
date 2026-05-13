@@ -32,7 +32,7 @@
 			>
 				<div class="inline-flex items-center gap-1.5 text-primary">
 					<span class="size-2 rounded-full" :style="{ backgroundColor: entry.color }" />
-					<span>{{ entry.name }}</span>
+					<span v-tooltip="entry.projectName ?? ''">{{ entry.name }}</span>
 				</div>
 				<span class="font-semibold text-contrast">{{ entry.formattedValue }}</span>
 			</div>
@@ -46,6 +46,7 @@ import { PinIcon } from '@modrinth/assets'
 export type AnalyticsChartTooltipEntry = {
 	projectId: string
 	name: string
+	projectName?: string
 	color: string
 	formattedValue: string
 }
