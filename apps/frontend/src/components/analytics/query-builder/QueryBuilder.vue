@@ -195,8 +195,6 @@ import {
 
 import DownloadsThresholdInput from './DownloadsThresholdInput.vue'
 import {
-	cloneSelectedFilters,
-	getAnalyticsFilterCategoryForBreakdown,
 	getAnalyticsStatsForBreakdown,
 	getAnalyticsStatsForFilterCategory,
 	getEnabledAnalyticsStatsForState,
@@ -437,15 +435,6 @@ const selectedBreakdownValue = computed<AnalyticsBreakdownPreset>({
 	get: () => selectedBreakdown.value,
 	set: (nextBreakdown) => {
 		selectedBreakdown.value = nextBreakdown
-
-		const filterCategory = getAnalyticsFilterCategoryForBreakdown(nextBreakdown)
-		if (!filterCategory || selectedFilters.value[filterCategory].length === 0) {
-			return
-		}
-
-		const nextFilters = cloneSelectedFilters(selectedFilters.value)
-		nextFilters[filterCategory] = []
-		selectedFilters.value = nextFilters
 	},
 })
 

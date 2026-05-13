@@ -167,7 +167,6 @@ import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
 import {
 	cloneSelectedFilters,
 	FILTER_VALUE_CATEGORIES,
-	getAnalyticsFilterCategoryForBreakdown,
 	getOptionsWithSelectedValues,
 	getVisibleAnalyticsFilterCategoriesForState,
 	normalizeSelectedValues as normalizeSelectedFilterValues,
@@ -224,11 +223,6 @@ const selectedFilterValue = computed<Record<string, string[]>>({
 			}
 
 			nextFilters[categoryKey] = normalizeSelectedFilterValues(categoryKey, values, [])
-		}
-
-		const breakdownFilterCategory = getAnalyticsFilterCategoryForBreakdown(selectedBreakdown.value)
-		if (breakdownFilterCategory && nextFilters[breakdownFilterCategory].length > 0) {
-			selectedBreakdown.value = 'none'
 		}
 
 		selectedFilters.value = nextFilters
