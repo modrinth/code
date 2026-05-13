@@ -5,6 +5,7 @@
 			'has-body': message.body.type === 'text' && !forceCompact,
 			'no-actions': noLinks,
 			private: isPrivateMessage,
+			'show-private-bg': flags.showModeratorPrivateMessageHighlight,
 		}"
 	>
 		<template v-if="members[message.author_id]">
@@ -22,11 +23,6 @@
 				/>
 			</AutoLink>
 			<span :class="`message__author role-${members[message.author_id].role}`">
-				<LockIcon
-					v-if="isPrivateMessage"
-					v-tooltip="'Only visible to moderators'"
-					class="private-icon"
-				/>
 				<AutoLink :to="noLinks ? '' : `/user/${members[message.author_id].username}`">
 					{{ members[message.author_id].username }}
 				</AutoLink>
@@ -34,6 +30,11 @@
 				<ModrinthIcon
 					v-else-if="members[message.author_id].role === 'admin'"
 					v-tooltip="'Modrinth Team'"
+				/>
+				<EyeOffIcon
+					v-if="isPrivateMessage"
+					v-tooltip="'Only visible to moderators'"
+					class="ml-1 text-orange"
 				/>
 				<MicrophoneIcon
 					v-if="report && message.author_id === report.reporter_user?.id"
@@ -132,7 +133,7 @@
 
 <script setup>
 import {
-	LockIcon,
+	EyeOffIcon,
 	MicrophoneIcon,
 	ModrinthIcon,
 	MoreHorizontalIcon,
@@ -184,6 +185,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update-thread'])
+const flags = useFeatureFlags()
 
 const formattedMessage = computed(() => {
 	const body = renderString(props.message.body.body)
@@ -234,6 +236,7 @@ async function deleteMessage() {
 	flex-wrap: wrap;
 	align-items: center;
 	word-break: break-word;
+	position: relative;
 
 	.avatar,
 	.backed-svg {
@@ -266,6 +269,15 @@ async function deleteMessage() {
 		.message__actions {
 			opacity: 1;
 		}
+	}
+
+	&.private.show-private-bg::before {
+		content: '';
+		inset: 0;
+		position: absolute;
+		background-color: var(--color-orange);
+		opacity: 0.05;
+		pointer-events: none;
 	}
 
 	&.no-actions {
@@ -345,10 +357,6 @@ a:active + .message__author a,
 
 .reporter-icon {
 	color: var(--color-purple);
-}
-
-.private-icon {
-	color: var(--color-gray);
 }
 
 @media screen and (min-width: 600px) {

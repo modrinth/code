@@ -52,6 +52,8 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showAllBanners: false,
 	alwaysIgnoreErrorBanner: false,
 	showViewProdRouteBanner: false,
+	showModeratorProjectMemberUi: false,
+	showModeratorPrivateMessageHighlight: true,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

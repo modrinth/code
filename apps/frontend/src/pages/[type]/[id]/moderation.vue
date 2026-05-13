@@ -158,6 +158,7 @@ import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
 
 const { formatMessage } = useVIntl()
+const flags = useFeatureFlags()
 
 type ProjectPageMember = Labrinth.Projects.v3.TeamMember & { staffOnly?: boolean }
 type ModerationAdmonitionSection =
@@ -405,19 +406,13 @@ const moderationAdmonition = computed<{
 	return null
 })
 
-const moderatorSeeUserUiCookie = useCookie('moderation-see-user-ui', {
-	default: () => false,
-	maxAge: 60 * 60 * 24 * 365,
-	sameSite: 'lax',
-	path: '/',
-})
-
 const moderatorSeeUserUi = computed<boolean>({
 	get() {
-		return moderatorSeeUserUiCookie.value ?? false
+		return flags.value.showModeratorProjectMemberUi
 	},
 	set(value: boolean) {
-		moderatorSeeUserUiCookie.value = value
+		flags.value.showModeratorProjectMemberUi = value
+		saveFeatureFlags()
 	},
 })
 
