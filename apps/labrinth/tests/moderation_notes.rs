@@ -43,11 +43,13 @@ pub async fn moderation_notes_users() {
                 test::TestRequest::patch()
                     .uri(&format!("/v3/user/{USER_USER_ID}/notes"))
                     .append_pat(MOD_USER_PAT)
-                    .set_json(json!({ "notes": "first note" }))
+                    .set_json(
+                        json!({ "notes": "first note", "user_rating": 1 }),
+                    )
                     .to_request(),
             )
             .await;
-        assert_status!(&resp, StatusCode::PRECONDITION_REQUIRED);
+        assert_status!(&resp, StatusCode::NO_CONTENT); // OK without If-Match for the first patch
 
         let resp = api
             .call(
@@ -78,7 +80,6 @@ pub async fn moderation_notes_users() {
                 test::TestRequest::patch()
                     .uri(&format!("/v3/user/{USER_USER_ID}/notes"))
                     .append_pat(MOD_USER_PAT)
-                    .append_header(("If-Match", "0"))
                     .set_json(json!({
                         "notes": "first note",
                         "user_rating": 2,
@@ -86,7 +87,7 @@ pub async fn moderation_notes_users() {
                     .to_request(),
             )
             .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::PRECONDITION_REQUIRED); // Needs If-Match moving forward
 
         let resp = api
             .call(
@@ -99,7 +100,7 @@ pub async fn moderation_notes_users() {
         assert_status!(&resp, StatusCode::OK);
         let body: Value = test::read_body_json(resp).await;
         assert_eq!(body["notes"]["notes"], "first note");
-        assert_eq!(body["notes"]["user_rating"], 2);
+        assert_eq!(body["notes"]["user_rating"], 1);
         assert_eq!(body["notes"]["version"], 1);
         assert_eq!(body["notes"]["last_author"], "2");
 
@@ -206,6 +207,20 @@ pub async fn moderation_notes_organizations() {
                     .to_request(),
             )
             .await;
+        assert_status!(&resp, StatusCode::PRECONDITION_FAILED); // Shouldn't have If-Match for the first patch
+
+        let resp = api
+            .call(
+                test::TestRequest::patch()
+                    .uri(&format!("/v3/organization/{organization_id}/notes"))
+                    .append_pat(MOD_USER_PAT)
+                    .set_json(json!({
+                        "notes": "org note",
+                        "user_rating": -1,
+                    }))
+                    .to_request(),
+            )
+            .await;
         assert_status!(&resp, StatusCode::NO_CONTENT);
 
         let resp = api
@@ -231,6 +246,19 @@ pub async fn moderation_notes_organizations() {
             )
             .await;
         assert_status!(&resp, StatusCode::NO_CONTENT);
+
+        let resp = api
+            .call(
+                test::TestRequest::patch()
+                    .uri(&format!("/v3/organization/{organization_id}/notes"))
+                    .append_pat(MOD_USER_PAT)
+                    .set_json(json!({
+                        "notes": "new note",
+                    }))
+                    .to_request(),
+            )
+            .await;
+        assert_status!(&resp, StatusCode::PRECONDITION_REQUIRED); // Needs If-Match moving forward
 
         let ids =
             serde_json::to_string(&vec![organization_id.as_str()]).unwrap();
