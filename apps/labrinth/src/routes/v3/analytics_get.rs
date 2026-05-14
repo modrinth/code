@@ -393,7 +393,9 @@ impl<'de> Deserialize<'de> for DownloadSource {
             "other" => Self::Other,
             _ if !source.is_empty() => Self::Named(source),
             _ => {
-                return Err(D::Error::custom("download source cannot be empty"));
+                return Err(D::Error::custom(
+                    "download source cannot be empty",
+                ));
             }
         })
     }
