@@ -66,7 +66,7 @@ pub struct User {
     pub stripe_customer_id: Option<String>,
     pub allow_friend_requests: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub notes: Option<ModerationNote>,
+    pub moderation_notes: Option<Option<ModerationNote>>,
 
     // DEPRECATED. Always returns None
     pub github_id: Option<u64>,
@@ -101,7 +101,7 @@ impl From<DBUser> for User {
             github_id: None,
             stripe_customer_id: None,
             allow_friend_requests: None,
-            notes: None,
+            moderation_notes: None,
         }
     }
 }
@@ -154,7 +154,7 @@ impl User {
             }),
             stripe_customer_id: db_user.stripe_customer_id,
             allow_friend_requests: Some(db_user.allow_friend_requests),
-            notes: None,
+            moderation_notes: None,
         }
     }
 }

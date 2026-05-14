@@ -25,7 +25,7 @@ pub struct Organization {
     /// A list of the members of the organization
     pub members: Vec<TeamMember>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub moderation_notes: Option<ModerationNote>,
+    pub moderation_notes: Option<Option<ModerationNote>>,
 }
 
 impl Organization {

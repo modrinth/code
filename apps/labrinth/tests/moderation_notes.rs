@@ -24,7 +24,7 @@ pub async fn moderation_notes_users() {
             .await;
         assert_status!(&resp, StatusCode::OK);
         let body: Value = test::read_body_json(resp).await;
-        assert!(body.get("notes").unwrap().is_null());
+        assert!(body.get("moderation_notes").unwrap().is_null());
 
         let resp = api
             .call(
@@ -36,7 +36,7 @@ pub async fn moderation_notes_users() {
             .await;
         assert_status!(&resp, StatusCode::OK);
         let body: Value = test::read_body_json(resp).await;
-        assert!(body.get("notes").is_none());
+        assert!(body.get("moderation_notes").is_none());
 
         let resp = api
             .call(
@@ -99,10 +99,10 @@ pub async fn moderation_notes_users() {
             .await;
         assert_status!(&resp, StatusCode::OK);
         let body: Value = test::read_body_json(resp).await;
-        assert_eq!(body["notes"]["notes"], "first note");
-        assert_eq!(body["notes"]["user_rating"], 1);
-        assert_eq!(body["notes"]["version"], 1);
-        assert_eq!(body["notes"]["last_author"], "2");
+        assert_eq!(body["moderation_notes"]["notes"], "first note");
+        assert_eq!(body["moderation_notes"]["user_rating"], 1);
+        assert_eq!(body["moderation_notes"]["version"], 1);
+        assert_eq!(body["moderation_notes"]["last_author"], "2");
 
         let resp = api
             .call(
@@ -138,9 +138,9 @@ pub async fn moderation_notes_users() {
             .await;
         assert_status!(&resp, StatusCode::OK);
         let body: Value = test::read_body_json(resp).await;
-        assert_eq!(body["notes"]["notes"], "first note");
-        assert_eq!(body["notes"]["user_rating"], 4);
-        assert_eq!(body["notes"]["version"], 2);
+        assert_eq!(body["moderation_notes"]["notes"], "first note");
+        assert_eq!(body["moderation_notes"]["user_rating"], 4);
+        assert_eq!(body["moderation_notes"]["version"], 2);
 
         let user_ids = serde_json::to_string(&vec![USER_USER_ID]).unwrap();
         let resp = api
@@ -156,7 +156,7 @@ pub async fn moderation_notes_users() {
             .await;
         assert_status!(&resp, StatusCode::OK);
         let body: Value = test::read_body_json(resp).await;
-        assert_eq!(body[0]["notes"]["version"], 2);
+        assert_eq!(body[0]["moderation_notes"]["version"], 2);
 
         let resp = api
             .call(
@@ -170,7 +170,7 @@ pub async fn moderation_notes_users() {
             .await;
         assert_status!(&resp, StatusCode::OK);
         let body: Value = test::read_body_json(resp).await;
-        assert!(body[0].get("notes").is_none());
+        assert!(body[0].get("moderation_notes").is_none());
     })
     .await;
 }

@@ -293,7 +293,7 @@ pub async fn organization_get(
                 &redis,
             )
             .await?;
-            organization.moderation_notes = note.map(Into::into);
+            organization.moderation_notes = Some(note.map(Into::into));
         }
         return Ok(HttpResponse::Ok().json(organization));
     }
@@ -476,7 +476,7 @@ pub async fn organizations_get(
             models::organizations::Organization::from(data, team_members);
         if include_notes {
             organization.moderation_notes =
-                notes.get(&data_id).cloned().map(Into::into);
+                Some(notes.get(&data_id).cloned().map(Into::into));
         }
         organizations.push(organization);
     }
