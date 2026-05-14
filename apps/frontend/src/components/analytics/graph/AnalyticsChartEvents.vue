@@ -124,7 +124,7 @@ const props = defineProps<{
 
 const GROUP_DISTANCE_PX = 32
 const MARKER_HEIGHT_PX = 28
-const TOOLTIP_OFFSET_PX = 10
+const TOOLTIP_OFFSET_PX = 8
 const EDGE_PADDING_PX = 8
 const CLOSE_DELAY_MS = 120
 const EVENT_RANGE_DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
@@ -276,18 +276,12 @@ const tooltipStyle = computed(() => {
 	const viewportWidth = typeof window === 'undefined' ? containerWidth.value : window.innerWidth
 	const viewportHeight = typeof window === 'undefined' ? containerHeight.value : window.innerHeight
 	const desiredLeft = chartRect.left + group.x - tooltipWidth.value / 2
-	const maxLeft = Math.max(
-		EDGE_PADDING_PX,
-		viewportWidth - tooltipWidth.value - EDGE_PADDING_PX,
-	)
+	const maxLeft = Math.max(EDGE_PADDING_PX, viewportWidth - tooltipWidth.value - EDGE_PADDING_PX)
 	const left = Math.min(maxLeft, Math.max(EDGE_PADDING_PX, desiredLeft))
 
 	const desiredTop =
 		chartRect.top + markerTop.value - tooltipHeight.value - TOOLTIP_OFFSET_PX - MARKER_HEIGHT_PX
-	const maxTop = Math.max(
-		EDGE_PADDING_PX,
-		viewportHeight - tooltipHeight.value - EDGE_PADDING_PX,
-	)
+	const maxTop = Math.max(EDGE_PADDING_PX, viewportHeight - tooltipHeight.value - EDGE_PADDING_PX)
 	const top = Math.min(maxTop, Math.max(EDGE_PADDING_PX, desiredTop))
 
 	return {
