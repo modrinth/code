@@ -12,15 +12,15 @@
 				</div>
 
 				<div class="flex items-center gap-3">
-					<div v-if="hasChartEvents" class="inline-flex items-center gap-2">
-						<label for="events-toggle" class="cursor-pointer text-sm text-secondary">Events</label>
-						<Toggle id="events-toggle" v-model="showChartEvents" small />
-					</div>
 					<div v-if="canUseRatioMode" class="inline-flex items-center gap-2">
 						<label for="ratio-mode-toggle" class="cursor-pointer text-sm text-secondary"
 							>Ratio</label
 						>
 						<Toggle id="ratio-mode-toggle" v-model="isRatioMode" small />
+					</div>
+					<div v-if="hasChartEvents" class="inline-flex items-center gap-2">
+						<label for="events-toggle" class="cursor-pointer text-sm text-secondary">Events</label>
+						<Toggle id="events-toggle" v-model="showChartEvents" small />
 					</div>
 					<Tabs
 						:value="activeViewMode"
@@ -81,7 +81,12 @@
 				</button>
 			</div>
 
-			<div ref="chartContainer" class="relative h-[460px]" @click="onChartClick">
+			<div
+				ref="chartContainer"
+				class="relative h-[460px]"
+				@click="onChartClick"
+				@wheel.capture="onChartWheel"
+			>
 				<div :class="['h-full']">
 					<div
 						v-if="selectedProjects.length === 0"
@@ -136,6 +141,7 @@
 							:style="{ transform: `translate(${hoverState.x}px, 0)` }"
 						/>
 						<AnalyticsChartTooltip
+							ref="chartTooltip"
 							:visible="hoverState.visible"
 							:x="hoverState.x"
 							:y="hoverState.y"
@@ -390,6 +396,7 @@ const allChartDatasets = computed(() =>
 )
 
 const chartContainer = ref<HTMLElement | null>(null)
+const chartTooltip = ref<InstanceType<typeof AnalyticsChartTooltip> | null>(null)
 const chartGeometry = ref<AnalyticsChartGeometryPayload | null>(null)
 const containerSize = reactive({ width: 0, height: 0 })
 let resizeObserver: ResizeObserver | null = null
@@ -435,6 +442,7 @@ const hiddenDatasetIds = ref<Set<string>>(new Set())
 const showAllLegendEntries = ref(false)
 
 const LEGEND_MAX_ITEMS = 8
+const LEGEND_VISIBLE_ITEM_COUNT = LEGEND_MAX_ITEMS - 1
 const LEGEND_EXPANDED_MAX_ITEMS = 24
 const OTHER_LEGEND_ENTRY_ID = '__analytics_other__'
 const OTHER_LEGEND_ENTRY_COLOR = '#9ca3af'
@@ -564,6 +572,11 @@ function onChartClick() {
 	isHoverPinned.value = true
 }
 
+function onChartWheel(event: WheelEvent) {
+	if (!hoverState.visible) return
+	chartTooltip.value?.consumeWheel(event)
+}
+
 const pinnedSliceIndex = computed(() => (isHoverPinned.value ? hoverState.sliceIndex : null))
 const showHoverGuide = computed(
 	() =>
@@ -605,7 +618,10 @@ const legendEntries = computed<LegendEntry[]>(() =>
 )
 
 const otherBundledLegendIds = computed<string[]>(() => {
-	if (!showAllLegendEntries.value) return []
+	if (!showAllLegendEntries.value) {
+		if (legendEntries.value.length <= LEGEND_MAX_ITEMS) return []
+		return legendEntries.value.slice(LEGEND_VISIBLE_ITEM_COUNT).map((entry) => entry.id)
+	}
 	if (legendEntries.value.length <= LEGEND_EXPANDED_MAX_ITEMS) return []
 	return legendEntries.value.slice(LEGEND_EXPANDED_MAX_ITEMS - 1).map((entry) => entry.id)
 })
@@ -627,10 +643,11 @@ const otherLegendEntry = computed<LegendEntry | null>(() => {
 })
 
 const displayedLegendEntries = computed<LegendEntry[]>(() => {
-	if (!showAllLegendEntries.value) {
-		return legendEntries.value.slice(0, LEGEND_MAX_ITEMS)
-	}
 	const other = otherLegendEntry.value
+	if (!showAllLegendEntries.value) {
+		if (!other) return legendEntries.value
+		return [...legendEntries.value.slice(0, LEGEND_VISIBLE_ITEM_COUNT), other]
+	}
 	if (!other) return legendEntries.value
 	return [...legendEntries.value.slice(0, LEGEND_EXPANDED_MAX_ITEMS - 1), other]
 })

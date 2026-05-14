@@ -149,6 +149,9 @@ const tooltipHeight = ref(0)
 
 const CURSOR_OFFSET = 12
 const EDGE_PADDING = 8
+const WHEEL_DELTA_LINE = 1
+const WHEEL_DELTA_PAGE = 2
+const WHEEL_LINE_HEIGHT = 16
 
 watch(
 	() => [props.visible, props.entries, rangeLabel.value, durationLabel.value, props.pinned],
@@ -161,6 +164,36 @@ watch(
 	},
 	{ deep: true, immediate: true },
 )
+
+function getNormalizedWheelDeltaY(event: WheelEvent, element: HTMLElement) {
+	if (event.deltaMode === WHEEL_DELTA_PAGE) return event.deltaY * element.clientHeight
+	if (event.deltaMode === WHEEL_DELTA_LINE) return event.deltaY * WHEEL_LINE_HEIGHT
+	return event.deltaY
+}
+
+function consumeWheel(event: WheelEvent): boolean {
+	const element = tooltipElement.value
+	if (!props.visible || !element) return false
+
+	const maxScrollTop = element.scrollHeight - element.clientHeight
+	if (maxScrollTop <= 0) return false
+
+	const deltaY = getNormalizedWheelDeltaY(event, element)
+	if (deltaY === 0) return false
+
+	const scrollTop = element.scrollTop
+	const canScrollDown = deltaY > 0 && scrollTop < maxScrollTop
+	const canScrollUp = deltaY < 0 && scrollTop > 0
+	if (!canScrollDown && !canScrollUp) return false
+
+	element.scrollTop = Math.min(maxScrollTop, Math.max(0, scrollTop + deltaY))
+	event.preventDefault()
+	return true
+}
+
+defineExpose({
+	consumeWheel,
+})
 
 const positionStyle = computed(() => {
 	const desiredLeft = props.x + CURSOR_OFFSET
