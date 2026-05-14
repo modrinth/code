@@ -192,7 +192,7 @@ pub async fn moderation_notes_organizations() {
             .await;
         assert_status!(&resp, StatusCode::OK);
         let body: Value = test::read_body_json(resp).await;
-        assert!(body.get("notes").unwrap().is_null());
+        assert!(body.get("moderation_notes").unwrap().is_null());
 
         let resp = api
             .call(
@@ -233,7 +233,7 @@ pub async fn moderation_notes_organizations() {
             .await;
         assert_status!(&resp, StatusCode::OK);
         let body: Value = test::read_body_json(resp).await;
-        assert!(body.get("notes").is_none());
+        assert!(body.get("moderation_notes").is_none());
 
         let resp = api
             .call(
@@ -275,9 +275,9 @@ pub async fn moderation_notes_organizations() {
             .await;
         assert_status!(&resp, StatusCode::OK);
         let body: Value = test::read_body_json(resp).await;
-        assert_eq!(body[0]["notes"]["notes"], "updated org note");
-        assert_eq!(body[0]["notes"]["user_rating"], -1);
-        assert_eq!(body[0]["notes"]["version"], 2);
+        assert_eq!(body[0]["moderation_notes"]["notes"], "updated org note");
+        assert_eq!(body[0]["moderation_notes"]["user_rating"], -1);
+        assert_eq!(body[0]["moderation_notes"]["version"], 2);
     })
     .await;
 }

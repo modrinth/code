@@ -5,8 +5,9 @@ use crate::database::PgPool;
 use crate::util::error::Context;
 use crate::{
     auth::{
-        checks::is_visible_organization, filter_visible_collections,
-        filter_visible_projects, get_user_from_headers,
+        check_is_moderator_from_headers, checks::is_visible_organization,
+        filter_visible_collections, filter_visible_projects,
+        get_user_from_headers,
     },
     database::{
         models::{DBModerationNote, DBUser},
@@ -283,21 +284,14 @@ pub async fn user_notes_edit(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let user = check_is_moderator_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
-    .1;
-
-    if !user.role.is_mod() {
-        return Err(ApiError::CustomAuthentication(
-            "you do not have permission to edit moderation notes".to_string(),
-        ));
-    }
+    .await?;
 
     new_note.validate_not_empty()?;
     let expected_version =
