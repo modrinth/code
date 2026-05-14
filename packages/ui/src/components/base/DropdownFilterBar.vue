@@ -172,59 +172,64 @@
 					Deselect all
 				</button>
 			</div>
-			<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
+			<div ref="activeCategoryOptionsContainer" class="min-h-0 flex-1 overflow-y-auto p-3">
 				<div
 					v-if="filteredActiveCategoryOptions.length === 0"
 					class="px-3 py-2 text-sm font-medium text-secondary"
 				>
 					{{ activeCategoryEmptyStateLabel }}
 				</div>
-				<template v-else>
-					<button
-						v-for="option in filteredActiveCategoryOptions"
+				<div
+					v-else
+					ref="activeCategoryOptionsListContainer"
+					:class="shouldVirtualizeActiveCategoryOptions ? 'relative' : 'flex flex-col gap-2'"
+					:style="activeCategoryOptionsListStyle"
+				>
+					<div
+						v-for="{ option, index } in renderedVisibleActiveCategoryOptions"
 						:key="`${activeCategory.key}-${option.value}`"
-						type="button"
-						class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5"
-						:class="{ 'pointer-events-none opacity-50': option.disabled }"
-						:aria-disabled="option.disabled || undefined"
-						:aria-checked="isFilterValueSelected(activeCategory.key, option.value)"
-						role="checkbox"
-						@click="toggleFilterOption(activeCategory.key, option)"
+						:class="shouldVirtualizeActiveCategoryOptions ? 'absolute left-0 right-0' : undefined"
+						:style="getActiveCategoryOptionWrapperStyle(index)"
 					>
-						<span
-							class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
-							:class="
-								isFilterValueSelected(activeCategory.key, option.value)
-									? 'border-button-border bg-brand text-brand-inverted'
-									: 'border-surface-5 bg-surface-2'
-							"
+						<button
+							type="button"
+							class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5"
+							:class="[
+								shouldVirtualizeActiveCategoryOptions ? 'h-12' : undefined,
+								{ 'pointer-events-none opacity-50': option.disabled },
+							]"
+							:aria-disabled="option.disabled || undefined"
+							:aria-checked="option.selected"
+							role="checkbox"
+							@click="toggleFilterOption(activeCategory.key, option)"
 						>
-							<CheckIcon
-								v-if="isFilterValueSelected(activeCategory.key, option.value)"
-								aria-hidden="true"
-								stroke-width="3"
-							/>
-						</span>
-						<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
 							<span
-								class="min-w-0 truncate font-semibold leading-tight"
+								class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
 								:class="
-									isFilterValueSelected(activeCategory.key, option.value)
-										? 'text-contrast'
-										: 'text-primary'
+									option.selected
+										? 'border-button-border bg-brand text-brand-inverted'
+										: 'border-surface-5 bg-surface-2'
 								"
 							>
-								{{ option.label }}
+								<CheckIcon v-if="option.selected" aria-hidden="true" stroke-width="3" />
 							</span>
-							<slot
-								name="option-right"
-								:category="activeCategory"
-								:option="option"
-								:selected="isFilterValueSelected(activeCategory.key, option.value)"
-							></slot>
-						</div>
-					</button>
-				</template>
+							<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
+								<span
+									class="min-w-0 truncate font-semibold leading-tight"
+									:class="option.selected ? 'text-contrast' : 'text-primary'"
+								>
+									{{ option.label }}
+								</span>
+								<slot
+									name="option-right"
+									:category="activeCategory"
+									:option="option"
+									:selected="option.selected"
+								></slot>
+							</div>
+						</button>
+					</div>
+				</div>
 			</div>
 			<slot
 				name="category-footer"
@@ -251,6 +256,7 @@ import { onClickOutside } from '@vueuse/core'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
+import { useVirtualScroll } from '../../composables/virtual-scroll'
 import ButtonStyled from './ButtonStyled.vue'
 import MultiSelect, { type MultiSelectOption } from './MultiSelect.vue'
 import StyledInput from './StyledInput.vue'
@@ -274,6 +280,15 @@ export type DropdownFilterBarCategory = {
 }
 
 type DropdownFilterBarValue = Record<string, string[]>
+
+type RenderedDropdownFilterBarOption = DropdownFilterBarOption & {
+	selected: boolean
+}
+
+type VisibleDropdownFilterBarOption = {
+	option: RenderedDropdownFilterBarOption
+	index: number
+}
 
 type Point = {
 	x: number
@@ -299,6 +314,8 @@ const ADD_MENU_WIDTH = 250
 const DROPDOWN_GAP = 12
 const DROPDOWN_VIEWPORT_MARGIN = 8
 const DEFAULT_PREVIEW_DROPDOWN_MIN_WIDTH = '18rem'
+const DROPDOWN_FILTER_OPTION_ROW_HEIGHT = 56
+const DROPDOWN_FILTER_VIRTUALIZATION_THRESHOLD = 80
 const TAILWIND_WIDTH_CLASS_SIZE: Record<string, string> = {
 	'w-72': '18rem',
 }
@@ -343,6 +360,7 @@ const hasSubmenuPosition = ref(false)
 const addMenuTrigger = ref<HTMLElement | null>(null)
 const menuContainer = ref<HTMLElement | null>(null)
 const submenu = ref<HTMLElement | null>(null)
+const activeCategoryOptionsContainer = ref<HTMLElement | null>(null)
 const addMenuStyle = ref<CSSProperties>({
 	left: '0px',
 	minWidth: '0px',
@@ -383,6 +401,7 @@ const activeCategorySelectionLabel = computed(() =>
 const activeCategorySelectedValues = computed(() =>
 	activeCategory.value ? getSelectedValues(activeCategory.value.key, 'draft') : [],
 )
+const activeCategorySelectedValueSet = computed(() => new Set(activeCategorySelectedValues.value))
 
 const filteredActiveCategoryOptions = computed(() => {
 	if (!activeCategory.value) {
@@ -408,6 +427,43 @@ const filteredActiveCategoryOptions = computed(() => {
 		return option.searchTerms?.some((term) => term.toLowerCase().includes(query)) ?? false
 	})
 })
+
+const renderedActiveCategoryOptions = computed<RenderedDropdownFilterBarOption[]>(() => {
+	const selectedValues = activeCategorySelectedValueSet.value
+	return filteredActiveCategoryOptions.value.map((option) => ({
+		...option,
+		selected: selectedValues.has(option.value),
+	}))
+})
+
+const shouldVirtualizeActiveCategoryOptions = computed(
+	() => renderedActiveCategoryOptions.value.length > DROPDOWN_FILTER_VIRTUALIZATION_THRESHOLD,
+)
+
+const {
+	listContainer: activeCategoryOptionsListContainer,
+	totalHeight: activeCategoryOptionsTotalHeight,
+	visibleRange: activeCategoryOptionsVisibleRange,
+	visibleItems: visibleActiveCategoryOptions,
+} = useVirtualScroll(renderedActiveCategoryOptions, {
+	itemHeight: DROPDOWN_FILTER_OPTION_ROW_HEIGHT,
+	bufferSize: 8,
+	initialItemCount: 12,
+	enabled: shouldVirtualizeActiveCategoryOptions,
+})
+
+const renderedVisibleActiveCategoryOptions = computed<VisibleDropdownFilterBarOption[]>(() =>
+	visibleActiveCategoryOptions.value.map((option, offset) => ({
+		option,
+		index: activeCategoryOptionsVisibleRange.value.start + offset,
+	})),
+)
+
+const activeCategoryOptionsListStyle = computed<CSSProperties | undefined>(() =>
+	shouldVirtualizeActiveCategoryOptions.value
+		? { height: `${activeCategoryOptionsTotalHeight.value}px` }
+		: undefined,
+)
 
 const activeCategoryEmptyStateLabel = computed(() =>
 	activeCategory.value?.searchable && categorySearchQuery.value.trim().length > 0
@@ -626,6 +682,10 @@ function setCategoryButtonRef(
 }
 
 function isFilterValueSelected(categoryKey: string, value: string): boolean {
+	if (categoryKey === activeCategory.value?.key) {
+		return activeCategorySelectedValueSet.value.has(value)
+	}
+
 	return getSelectedValues(categoryKey, 'draft').includes(value)
 }
 
@@ -651,6 +711,16 @@ function toggleFilterOption(categoryKey: string, option: DropdownFilterBarOption
 	}
 
 	toggleFilterValue(categoryKey, option.value, !isFilterValueSelected(categoryKey, option.value))
+}
+
+function getActiveCategoryOptionWrapperStyle(index: number): CSSProperties | undefined {
+	if (!shouldVirtualizeActiveCategoryOptions.value) {
+		return undefined
+	}
+
+	return {
+		transform: `translateY(${index * DROPDOWN_FILTER_OPTION_ROW_HEIGHT}px)`,
+	}
 }
 
 function getCategorySelectionCount(
@@ -1121,6 +1191,9 @@ watch(isAddMenuOpen, (isOpen) => {
 })
 
 watch(categorySearchQuery, () => {
+	if (activeCategoryOptionsContainer.value) {
+		activeCategoryOptionsContainer.value.scrollTop = 0
+	}
 	scheduleSubmenuPositionUpdate()
 })
 

@@ -311,6 +311,50 @@ export const WithBottomSlot: Story = {
 	}),
 }
 
+export const VirtualizedLargeList: Story = {
+	args: {
+		options: Array.from({ length: 250 }, (_, index) => {
+			const version = `1.${Math.floor(index / 10) + 1}.${index % 10}`
+			return {
+				value: `version-${index + 1}`,
+				label: version,
+				searchTerms: [`Project ${Math.floor(index / 25) + 1}`],
+			}
+		}),
+		modelValue: ['version-3', 'version-47', 'version-132'],
+		placeholder: 'Select versions',
+		searchable: true,
+		searchPlaceholder: 'Search versions',
+		showSelectionActions: true,
+		maxHeight: 320,
+	},
+	render: (args) => ({
+		components: { BoxIcon, MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			function getProjectName(value: string) {
+				const optionIndex = Number(value.replace('version-', '')) - 1
+				return `Project ${Math.floor(optionIndex / 25) + 1}`
+			}
+			return { args, getProjectName, selected }
+		},
+		template: /*html*/ `
+			<div style="width: 400px;">
+				<MultiSelect v-bind="args" v-model="selected">
+					<template #option-right="{ item }">
+						<span
+							v-tooltip="getProjectName(item.value)"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<BoxIcon class="size-6" />
+						</span>
+					</template>
+				</MultiSelect>
+			</div>
+		`,
+	}),
+}
+
 export const NoOptions: Story = {
 	args: {
 		...Default.args,

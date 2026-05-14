@@ -64,6 +64,16 @@ const searchableCategories = [
 	},
 ]
 
+const largeVersionOptions = Array.from({ length: 250 }, (_, index) => {
+	const version = `1.${Math.floor(index / 10) + 1}.${index % 10}`
+	const project = `Project ${Math.floor(index / 25) + 1}`
+	return {
+		value: `version-${index + 1}`,
+		label: version,
+		searchTerms: [project],
+	}
+})
+
 export const Default: Story = {
 	render: () => ({
 		components: { DropdownFilterBar },
@@ -208,6 +218,122 @@ export const SearchableCategories: Story = {
 	args: {
 		modelValue: {},
 		categories: searchableCategories,
+	},
+}
+
+export const VirtualizedPreview: Story = {
+	render: () => ({
+		components: { BoxIcon, DropdownFilterBar },
+		setup() {
+			const selected = ref<Record<string, string[]>>({
+				version: ['version-3', 'version-47', 'version-132'],
+			})
+			const categories = [
+				{
+					key: 'version',
+					label: 'Version',
+					searchable: true,
+					searchPlaceholder: 'Search versions...',
+					submenuClass: 'w-[360px]',
+					previewDropdownWidth: '360px',
+					options: largeVersionOptions,
+				},
+			]
+			function getVersionProject(categoryKey: string, optionValue: string) {
+				if (categoryKey !== 'version') {
+					return undefined
+				}
+				const optionIndex = Number(optionValue.replace('version-', '')) - 1
+				return `Project ${Math.floor(optionIndex / 25) + 1}`
+			}
+			return { categories, getVersionProject, selected }
+		},
+		template: /* html */ `
+			<div class="flex flex-wrap items-center gap-2">
+				<DropdownFilterBar v-model="selected" :categories="categories">
+					<template #option-right="{ category, option }">
+						<span
+							v-if="getVersionProject(category.key, option.value)"
+							v-tooltip="getVersionProject(category.key, option.value)"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<BoxIcon class="size-6" />
+						</span>
+					</template>
+				</DropdownFilterBar>
+			</div>
+		`,
+	}),
+	args: {
+		modelValue: {
+			version: ['version-3', 'version-47', 'version-132'],
+		},
+		categories: [
+			{
+				key: 'version',
+				label: 'Version',
+				searchable: true,
+				searchPlaceholder: 'Search versions...',
+				submenuClass: 'w-[360px]',
+				previewDropdownWidth: '360px',
+				options: largeVersionOptions,
+			},
+		],
+	},
+}
+
+export const VirtualizedSubmenu: Story = {
+	render: () => ({
+		components: { BoxIcon, DropdownFilterBar },
+		setup() {
+			const selected = ref<Record<string, string[]>>({})
+			const categories = [
+				{
+					key: 'version',
+					label: 'Version',
+					searchable: true,
+					searchPlaceholder: 'Search versions...',
+					submenuClass: 'w-[360px]',
+					options: largeVersionOptions,
+				},
+			]
+			function getVersionProject(categoryKey: string, optionValue: string) {
+				if (categoryKey !== 'version') {
+					return undefined
+				}
+				const optionIndex = Number(optionValue.replace('version-', '')) - 1
+				return `Project ${Math.floor(optionIndex / 25) + 1}`
+			}
+			return { categories, getVersionProject, selected }
+		},
+		template: /* html */ `
+			<div class="flex flex-wrap items-center gap-2">
+				<DropdownFilterBar v-model="selected" :categories="categories">
+					<template #option-right="{ category, option }">
+						<span
+							v-if="getVersionProject(category.key, option.value)"
+							v-tooltip="getVersionProject(category.key, option.value)"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<BoxIcon class="size-6" />
+						</span>
+					</template>
+				</DropdownFilterBar>
+			</div>
+		`,
+	}),
+	args: {
+		modelValue: {},
+		categories: [
+			{
+				key: 'version',
+				label: 'Version',
+				searchable: true,
+				searchPlaceholder: 'Search versions...',
+				submenuClass: 'w-[360px]',
+				options: largeVersionOptions,
+			},
+		],
 	},
 }
 

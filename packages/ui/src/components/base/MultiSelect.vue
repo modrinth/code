@@ -197,85 +197,103 @@
 					<div
 						v-if="hasFilteredOptions"
 						ref="optionsContainerRef"
-						class="flex flex-col gap-2 overflow-y-auto px-3 py-1.5 select-none"
+						class="overflow-y-auto px-3 py-1.5 select-none"
 						:style="{ maxHeight: `${maxHeight}px` }"
 					>
-						<template v-for="(item, index) in filteredOptions" :key="getItemKey(item, index)">
-							<div
-								v-if="isSectionHeader(item)"
-								class="flex items-center justify-between gap-3 px-3 pr-0 pb-1 pt-2 text-sm font-bold text-secondary"
-								:class="item.class"
-								role="presentation"
+						<div
+							ref="listContainer"
+							:class="shouldVirtualizeOptions ? 'relative' : 'flex flex-col gap-2'"
+							:style="optionsListStyle"
+						>
+							<template
+								v-for="{ item, index } in renderedVisibleOptions"
+								:key="getItemKey(item, index)"
 							>
-								<span class="min-w-0 truncate">{{ item.label }}</span>
-								<button
-									v-if="hasSelectableSectionHeaderOptions(item)"
-									type="button"
-									class="shrink-0 border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
-									@click.stop="toggleSectionHeaderOptions(item)"
-									@keydown.enter.stop
-									@keydown.space.stop
+								<div
+									:class="shouldVirtualizeOptions ? 'absolute left-0 right-0' : undefined"
+									:style="getOptionWrapperStyle(index)"
 								>
-									{{ areSectionHeaderOptionsSelected(item) ? 'Clear' : 'Select all' }}
-								</button>
-							</div>
-							<span
-								v-else
-								:ref="(el: any) => setOptionRef(el as HTMLElement, index)"
-								role="option"
-								:aria-selected="isSelected(item.value)"
-								:aria-disabled="item.disabled || undefined"
-								:data-focused="focusedIndex === index"
-								class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 rounded-xl"
-								:class="[
-									item.class,
-									{
-										'bg-surface-5': focusedIndex === index,
-										'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
-									},
-								]"
-								tabindex="-1"
-								@click="toggleOption(item, $event)"
-								@mouseenter="!item.disabled && (focusedIndex = index)"
-							>
-								<span
-									class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid shrink-0 checkbox-shadow"
-									:class="
-										isSelected(item.value)
-											? 'bg-brand border-button-border text-brand-inverted'
-											: 'bg-surface-2 border-surface-5'
-									"
-								>
-									<CheckIcon v-if="isSelected(item.value)" aria-hidden="true" stroke-width="3" />
-								</span>
-								<slot name="option" :item="item" :selected="isSelected(item.value)" :index="index">
-									<slot
-										:name="`option-${item.value}`"
-										:item="item"
-										:selected="isSelected(item.value)"
-										:index="index"
+									<div
+										v-if="isSectionHeader(item)"
+										class="flex items-center justify-between gap-3 text-sm font-bold text-secondary"
+										:class="[
+											item.class,
+											shouldVirtualizeOptions ? 'h-10 px-3 pr-0' : 'px-3 pr-0 pb-1 pt-2',
+										]"
+										role="presentation"
 									>
-										<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
-											<div class="flex min-w-0 items-center gap-2">
-												<component :is="item.icon" v-if="item.icon" class="h-5 w-5 shrink-0" />
-												<span
-													class="min-w-0 truncate font-semibold leading-tight"
-													:class="isSelected(item.value) ? 'text-contrast' : 'text-primary'"
-												>
-													{{ item.label }}
-												</span>
-											</div>
+										<span class="min-w-0 truncate">{{ item.label }}</span>
+										<button
+											v-if="hasSelectableSectionHeaderOptions(item)"
+											type="button"
+											class="shrink-0 border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+											@click.stop="toggleSectionHeaderOptions(item)"
+											@keydown.enter.stop
+											@keydown.space.stop
+										>
+											{{ areSectionHeaderOptionsSelected(item) ? 'Clear' : 'Select all' }}
+										</button>
+									</div>
+									<span
+										v-else
+										role="option"
+										:aria-selected="item.selected"
+										:aria-disabled="item.disabled || undefined"
+										:data-option-index="index"
+										:data-focused="focusedIndex === index"
+										class="flex cursor-pointer items-center gap-2.5 rounded-xl p-3 text-left text-contrast transition-colors duration-150 hover:bg-surface-5"
+										:class="[
+											item.class,
+											shouldVirtualizeOptions ? 'h-12' : undefined,
+											{
+												'bg-surface-5': focusedIndex === index,
+												'pointer-events-none cursor-not-allowed opacity-50': item.disabled,
+											},
+										]"
+										tabindex="-1"
+										@click="toggleOption(item, $event)"
+										@mouseenter="!item.disabled && (focusedIndex = index)"
+									>
+										<span
+											class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
+											:class="
+												item.selected
+													? 'border-button-border bg-brand text-brand-inverted'
+													: 'border-surface-5 bg-surface-2'
+											"
+										>
+											<CheckIcon v-if="item.selected" aria-hidden="true" stroke-width="3" />
+										</span>
+										<slot name="option" :item="item" :selected="item.selected" :index="index">
 											<slot
-												name="option-right"
+												:name="`option-${item.value}`"
 												:item="item"
-												:selected="isSelected(item.value)"
+												:selected="item.selected"
 												:index="index"
-											></slot>
-										</div>
-									</slot>
-								</slot>
-							</span>
-						</template>
+											>
+												<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
+													<div class="flex min-w-0 items-center gap-2">
+														<component :is="item.icon" v-if="item.icon" class="h-5 w-5 shrink-0" />
+														<span
+															class="min-w-0 truncate font-semibold leading-tight"
+															:class="item.selected ? 'text-contrast' : 'text-primary'"
+														>
+															{{ item.label }}
+														</span>
+													</div>
+													<slot
+														name="option-right"
+														:item="item"
+														:selected="item.selected"
+														:index="index"
+													></slot>
+												</div>
+											</slot>
+										</slot>
+									</span>
+								</div>
+							</template>
+						</div>
 					</div>
 					<div
 						v-else-if="isNoOptionsState && noOptionsMessage"
@@ -314,6 +332,7 @@ import {
 	watch,
 } from 'vue'
 
+import { useVirtualScroll } from '../../composables/virtual-scroll'
 import StyledInput from './StyledInput.vue'
 
 export interface MultiSelectOption<T> {
@@ -334,9 +353,22 @@ export interface MultiSelectSectionHeader {
 
 export type MultiSelectItem<T> = MultiSelectOption<T> | MultiSelectSectionHeader
 
+type RenderedMultiSelectOption<T> = MultiSelectOption<T> & {
+	selected: boolean
+}
+
+type RenderedMultiSelectItem<T> = RenderedMultiSelectOption<T> | MultiSelectSectionHeader
+
+type VisibleMultiSelectItem<T> = {
+	item: RenderedMultiSelectItem<T>
+	index: number
+}
+
 const DROPDOWN_VIEWPORT_MARGIN = 8
 const DROPDOWN_GAP = 12
 const DEFAULT_MAX_HEIGHT = 300
+const MULTI_SELECT_OPTION_ROW_HEIGHT = 56
+const MULTI_SELECT_VIRTUALIZATION_THRESHOLD = 80
 
 function isSectionHeader<T>(item: MultiSelectItem<T>): item is MultiSelectSectionHeader {
 	return 'type' in item && item.type === 'section-header'
@@ -408,7 +440,6 @@ const triggerRef = ref<HTMLElement>()
 const dropdownRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const searchInputRef = ref<InstanceType<typeof StyledInput>>()
-const optionRefs = ref<(HTMLElement | null)[]>([])
 const rafId = ref<number | null>(null)
 const tagsContainerRef = ref<HTMLElement>()
 
@@ -423,23 +454,26 @@ const openDirection = ref<'down' | 'up'>('down')
 const hasCustomInputContent = computed(() => Boolean(slots['input-content']))
 
 const selectableOptions = computed(() => props.options.filter(isOption))
+const selectedValueSet = computed(() => new Set(props.modelValue))
 
 const selectedOptions = computed(() => {
-	return selectableOptions.value.filter((opt) => props.modelValue.includes(opt.value))
+	const selectedValues = selectedValueSet.value
+	return selectableOptions.value.filter((opt) => selectedValues.has(opt.value))
 })
 
 const isAllSelected = computed(() => {
 	const selectableOptions = props.options.filter(isOption).filter((opt) => !opt.disabled)
+	const selectedValues = selectedValueSet.value
 	return (
-		selectableOptions.length > 0 &&
-		selectableOptions.every((opt) => props.modelValue.includes(opt.value))
+		selectableOptions.length > 0 && selectableOptions.every((opt) => selectedValues.has(opt.value))
 	)
 })
 
 const isIndeterminate = computed(() => {
+	const selectedValues = selectedValueSet.value
 	return (
 		!isAllSelected.value &&
-		selectableOptions.value.some((opt) => !opt.disabled && props.modelValue.includes(opt.value))
+		selectableOptions.value.some((opt) => !opt.disabled && selectedValues.has(opt.value))
 	)
 })
 
@@ -494,6 +528,44 @@ const filteredOptions = computed(() => {
 	return items
 })
 
+const renderedFilteredOptions = computed<RenderedMultiSelectItem<T>[]>(() => {
+	const selectedValues = selectedValueSet.value
+	return filteredOptions.value.map((item) => {
+		if (isSectionHeader(item)) {
+			return item
+		}
+
+		return {
+			...item,
+			selected: selectedValues.has(item.value),
+		}
+	})
+})
+
+const shouldVirtualizeOptions = computed(
+	() => renderedFilteredOptions.value.length > MULTI_SELECT_VIRTUALIZATION_THRESHOLD,
+)
+
+const { listContainer, totalHeight, visibleRange, visibleItems } = useVirtualScroll(
+	renderedFilteredOptions,
+	{
+		itemHeight: MULTI_SELECT_OPTION_ROW_HEIGHT,
+		bufferSize: 8,
+		initialItemCount: 12,
+		enabled: shouldVirtualizeOptions,
+	},
+)
+
+const renderedVisibleOptions = computed<VisibleMultiSelectItem<T>[]>(() =>
+	visibleItems.value.map((item, offset) => ({
+		item,
+		index: visibleRange.value.start + offset,
+	})),
+)
+const optionsListStyle = computed(() =>
+	shouldVirtualizeOptions.value ? { height: `${totalHeight.value}px` } : undefined,
+)
+
 const hasFilteredOptions = computed(() => filteredOptions.value.some(isOption))
 const isNoOptionsState = computed(() => selectableOptions.value.length === 0 && !searchQuery.value)
 const shouldShowSelectAll = computed(
@@ -508,7 +580,7 @@ const selectionActionsLabel = computed(() => {
 })
 
 function isSelected(value: T) {
-	return props.modelValue.includes(value)
+	return selectedValueSet.value.has(value)
 }
 
 function getItemKey(item: MultiSelectItem<T>, index: number) {
@@ -646,10 +718,6 @@ function toggleSelectAll() {
 		const allValues = selectableOptions.value.filter((opt) => !opt.disabled).map((opt) => opt.value)
 		emit('update:modelValue', allValues)
 	}
-}
-
-function setOptionRef(el: HTMLElement | null, index: number) {
-	optionRefs.value[index] = el
 }
 
 async function calculateVisibleTags() {
@@ -851,7 +919,7 @@ function focusNextOption() {
 	if (nextIndex === -1) return
 
 	focusedIndex.value = nextIndex
-	optionRefs.value[focusedIndex.value]?.scrollIntoView({ block: 'nearest' })
+	scrollOptionIndexIntoView(focusedIndex.value)
 }
 
 function focusPreviousOption() {
@@ -870,7 +938,38 @@ function focusPreviousOption() {
 	if (previousIndex === -1) return
 
 	focusedIndex.value = previousIndex
-	optionRefs.value[focusedIndex.value]?.scrollIntoView({ block: 'nearest' })
+	scrollOptionIndexIntoView(focusedIndex.value)
+}
+
+function scrollOptionIndexIntoView(index: number) {
+	const container = optionsContainerRef.value
+	if (!container) {
+		return
+	}
+
+	const optionElement = container.querySelector<HTMLElement>(`[data-option-index="${index}"]`)
+	if (optionElement) {
+		optionElement.scrollIntoView({ block: 'nearest' })
+		return
+	}
+
+	const optionTop = index * MULTI_SELECT_OPTION_ROW_HEIGHT
+	const optionBottom = optionTop + MULTI_SELECT_OPTION_ROW_HEIGHT
+	if (optionTop < container.scrollTop) {
+		container.scrollTop = optionTop
+	} else if (optionBottom > container.scrollTop + container.clientHeight) {
+		container.scrollTop = optionBottom - container.clientHeight
+	}
+}
+
+function getOptionWrapperStyle(index: number) {
+	if (!shouldVirtualizeOptions.value) {
+		return undefined
+	}
+
+	return {
+		transform: `translateY(${index * MULTI_SELECT_OPTION_ROW_HEIGHT}px)`,
+	}
 }
 
 function handleDropdownKeydown(event: KeyboardEvent) {
@@ -942,6 +1041,9 @@ function handleSearchInput() {
 	emit('searchInput', searchQuery.value)
 	if (!isOpen.value) {
 		openDropdown()
+	}
+	if (optionsContainerRef.value) {
+		optionsContainerRef.value.scrollTop = 0
 	}
 	focusedIndex.value = shouldShowSelectAll.value ? -2 : getFirstFocusableOptionIndex()
 }
