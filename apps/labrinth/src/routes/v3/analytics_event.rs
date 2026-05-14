@@ -42,8 +42,9 @@ pub struct AnalyticsEventUpsert {
 #[get("")]
 pub async fn analytics_events_get(
     pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<web::Json<Vec<AnalyticsEvent>>, ApiError> {
-    let events = DBAnalyticsEvent::get_all(&**pool)
+    let events = DBAnalyticsEvent::get_all(&**pool, &redis)
         .await
         .wrap_internal_err("failed to fetch analytics events")?
         .into_iter()
@@ -102,6 +103,9 @@ pub async fn analytics_event_create(
         .commit()
         .await
         .wrap_internal_err("failed to commit transaction")?;
+    DBAnalyticsEvent::clear_cache(&redis)
+        .await
+        .wrap_internal_err("failed to clear analytics event cache")?;
 
     Ok(web::Json(event.into()))
 }
@@ -147,6 +151,9 @@ pub async fn analytics_event_edit(
     if !updated {
         return Err(ApiError::NotFound);
     }
+    DBAnalyticsEvent::clear_cache(&redis)
+        .await
+        .wrap_internal_err("failed to clear analytics event cache")?;
 
     Ok(web::Json(event.into()))
 }
@@ -186,6 +193,9 @@ pub async fn analytics_event_delete(
     if !deleted {
         return Err(ApiError::NotFound);
     }
+    DBAnalyticsEvent::clear_cache(&redis)
+        .await
+        .wrap_internal_err("failed to clear analytics event cache")?;
 
     Ok(())
 }

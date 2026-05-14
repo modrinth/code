@@ -18,9 +18,7 @@ use eyre::eyre;
 use futures::StreamExt;
 use regex::Regex;
 use rust_decimal::Decimal;
-use serde::{
-    Deserialize, Deserializer, Serialize, Serializer, de::Error as _,
-};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as _};
 
 use crate::{
     auth::{AuthenticationError, get_user_from_headers},
@@ -394,7 +392,9 @@ impl<'de> Deserialize<'de> for DownloadSource {
             "modrinth_maven" => Self::ModrinthMaven,
             "other" => Self::Other,
             _ if !source.is_empty() => Self::Named(source),
-            _ => return Err(D::Error::custom("download source cannot be empty")),
+            _ => {
+                return Err(D::Error::custom("download source cannot be empty"));
+            }
         })
     }
 }
