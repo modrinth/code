@@ -141,6 +141,7 @@
 								<span
 									class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 rounded-xl"
 									:class="{ 'bg-surface-5': focusedIndex === -2 }"
+									data-option-index="-2"
 									:data-focused="focusedIndex === -2"
 									role="option"
 									:aria-selected="isAllSelected"
@@ -241,7 +242,7 @@
 										:aria-disabled="item.disabled || undefined"
 										:data-option-index="index"
 										:data-focused="focusedIndex === index"
-										class="flex cursor-pointer items-center gap-2.5 rounded-xl p-3 text-left text-contrast transition-colors duration-150 hover:bg-surface-5"
+										class="flex cursor-pointer items-center gap-2.5 rounded-xl p-3 focus-visible:outline-none text-left text-contrast transition-colors duration-150"
 										:class="[
 											item.class,
 											shouldVirtualizeOptions ? 'h-12' : undefined,
@@ -919,7 +920,7 @@ function focusNextOption() {
 	if (nextIndex === -1) return
 
 	focusedIndex.value = nextIndex
-	scrollOptionIndexIntoView(focusedIndex.value)
+	focusOptionIndex(focusedIndex.value)
 }
 
 function focusPreviousOption() {
@@ -928,6 +929,7 @@ function focusPreviousOption() {
 
 	if (focusedIndex.value === getFirstFocusableOptionIndex() && shouldShowSelectAll.value) {
 		focusedIndex.value = -2
+		focusOptionIndex(focusedIndex.value)
 		return
 	}
 
@@ -938,10 +940,14 @@ function focusPreviousOption() {
 	if (previousIndex === -1) return
 
 	focusedIndex.value = previousIndex
-	scrollOptionIndexIntoView(focusedIndex.value)
+	focusOptionIndex(focusedIndex.value)
 }
 
 function scrollOptionIndexIntoView(index: number) {
+	if (index < 0) {
+		return
+	}
+
 	const container = optionsContainerRef.value
 	if (!container) {
 		return
@@ -960,6 +966,13 @@ function scrollOptionIndexIntoView(index: number) {
 	} else if (optionBottom > container.scrollTop + container.clientHeight) {
 		container.scrollTop = optionBottom - container.clientHeight
 	}
+}
+
+function focusOptionIndex(index: number) {
+	scrollOptionIndexIntoView(index)
+	nextTick(() => {
+		dropdownRef.value?.querySelector<HTMLElement>(`[data-option-index="${index}"]`)?.focus()
+	})
 }
 
 function getOptionWrapperStyle(index: number) {
@@ -1008,15 +1021,17 @@ function handleDropdownKeydown(event: KeyboardEvent) {
 }
 
 function handleSearchKeydown(event: KeyboardEvent) {
+	event.stopPropagation()
+
 	if (event.key === 'Escape') {
 		event.preventDefault()
 		closeDropdown()
 	} else if (event.key === 'ArrowDown') {
 		event.preventDefault()
-		focusNextOption()
+		focusOptionFromSearch('next')
 	} else if (event.key === 'ArrowUp') {
 		event.preventDefault()
-		focusPreviousOption()
+		focusOptionFromSearch('previous')
 	} else if (event.key === 'Enter' || event.key === ' ') {
 		if (event.key === 'Enter') {
 			event.preventDefault()
@@ -1035,6 +1050,32 @@ function handleSearchKeydown(event: KeyboardEvent) {
 			focusNextOption()
 		}
 	}
+}
+
+function focusOptionFromSearch(direction: 'next' | 'previous') {
+	const activeElement = document.activeElement
+	if (activeElement instanceof HTMLElement) {
+		activeElement.blur()
+	}
+
+	if (direction === 'previous') {
+		focusPreviousOption()
+		return
+	}
+
+	const nextIndex =
+		focusedIndex.value === -1
+			? shouldShowSelectAll.value
+				? -2
+				: getFirstFocusableOptionIndex()
+			: focusedIndex.value
+
+	if (nextIndex === -1) {
+		return
+	}
+
+	focusedIndex.value = nextIndex
+	focusOptionIndex(nextIndex)
 }
 
 function handleSearchInput() {
