@@ -208,8 +208,9 @@ pub async fn filter_visible_versions(
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
 
     let version_ids: Vec<_> = versions.iter().map(|v| v.inner.id).collect();
-    let missing =
-        get_files_missing_attribution(pool, &version_ids).await.unwrap_or_default();
+    let missing = get_files_missing_attribution(pool, &version_ids)
+        .await
+        .unwrap_or_default();
 
     Ok(versions
         .into_iter()
@@ -217,9 +218,7 @@ pub async fn filter_visible_versions(
             let files_missing = missing
                 .get(&v.inner.id)
                 .map(|ids| {
-                    ids.iter()
-                        .map(|id| FileId(id.0 as u64))
-                        .collect::<Vec<_>>()
+                    ids.iter().map(|id| FileId(id.0 as u64)).collect::<Vec<_>>()
                 })
                 .unwrap_or_default();
             let mut version = crate::models::projects::Version::from(v);
@@ -280,13 +279,20 @@ pub async fn filter_visible_version_ids(
         filter_enlisted_version_ids(versions.clone(), user_option, pool, redis)
             .await?;
 
+    let version_ids: Vec<_> = versions.iter().map(|v| v.id).collect();
+    let withheld_versions = get_files_missing_attribution(pool, &version_ids)
+        .await
+        .unwrap_or_default();
+
     // Return versions that are not hidden, we are a mod of, or we are enlisted on the team of
     for version in versions {
+        let is_withheld = withheld_versions.contains_key(&version.id);
         // We can see the version if:
-        // - it's not hidden and we can see the project
+        // - it's not hidden and we can see the project and it's not withheld for attribution
         // - we are a mod
         // - we are enlisted on the team of the mod
         if (!version.status.is_hidden()
+            && !is_withheld
             && visible_project_ids.contains(&version.project_id))
             || user_option.as_ref().is_some_and(|x| x.role.is_mod())
             || enlisted_version_ids.contains(&version.id)

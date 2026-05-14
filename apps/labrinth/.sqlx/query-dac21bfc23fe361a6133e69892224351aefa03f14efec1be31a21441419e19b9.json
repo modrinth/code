@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n\t\t\tselect id, name, version_number\n\t\t\tfrom versions\n\t\t\twhere id = ANY($1)\n\t\t\t",
+  "query": "\n\t\t\tselect id, name, version_number, date_published\n\t\t\tfrom versions\n\t\t\twhere id = ANY($1)\n\t\t\torder by date_published desc\n\t\t\t",
   "describe": {
     "columns": [
       {
@@ -17,6 +17,11 @@
         "ordinal": 2,
         "name": "version_number",
         "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "date_published",
+        "type_info": "Timestamptz"
       }
     ],
     "parameters": {
@@ -27,8 +32,9 @@
     "nullable": [
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "29d499ba35e5f8909f2537fa3eef32eb36f53aef0f408e0e994791ba6fa4a3ce"
+  "hash": "dac21bfc23fe361a6133e69892224351aefa03f14efec1be31a21441419e19b9"
 }

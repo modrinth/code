@@ -10,7 +10,8 @@ use tracing::{Instrument, info, info_span, warn};
 use zip::ZipArchive;
 
 use crate::database::models::ids::{
-    DBAttributionGroupId, DBProjectId, DBVersionId, generate_attribution_group_id,
+    DBAttributionGroupId, DBProjectId, DBVersionId,
+    generate_attribution_group_id,
 };
 use crate::database::models::moderation_external_item::ExternalLicense;
 use crate::database::models::{DBFileId, DBUserId, DBVersion};
@@ -145,11 +146,13 @@ pub async fn scan_file_override_attributions(
                 eyre!("resolving overrides for file {file_id:?}")
             })?;
 
-        persist_attribution_results(project_id, file_id, &overrides, &resolved, txn)
-            .await
-            .wrap_err_with(|| {
-                eyre!("persisting attribution results for file {file_id:?}")
-            })?;
+        persist_attribution_results(
+            project_id, file_id, &overrides, &resolved, txn,
+        )
+        .await
+        .wrap_err_with(|| {
+            eyre!("persisting attribution results for file {file_id:?}")
+        })?;
     }
 
     sqlx::query!(
