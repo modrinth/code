@@ -417,7 +417,7 @@ pub async fn organizations_get(
     .ok();
     let user_id = current_user.as_ref().map(|x| x.id.into());
     let include_notes = current_user.as_ref().is_some_and(|x| x.role.is_mod());
-    let mut notes = if include_notes {
+    let notes = if include_notes {
         DBModerationNote::get_many_organizations(
             &organizations_data.iter().map(|x| x.id).collect::<Vec<_>>(),
             &**pool,
@@ -475,7 +475,7 @@ pub async fn organizations_get(
         let mut organization =
             models::organizations::Organization::from(data, team_members);
         if include_notes {
-            organization.notes = notes.get(&data_id).clone().map(Into::into);
+            organization.notes = notes.get(&data_id).cloned().map(Into::into);
         }
         organizations.push(organization);
     }

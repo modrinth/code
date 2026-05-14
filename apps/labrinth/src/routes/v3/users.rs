@@ -207,7 +207,7 @@ pub async fn users_get(
     .map(|x| x.1)
     .ok();
 
-    let mut notes = if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+    let notes = if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
         DBModerationNote::get_many_users(
             &users_data.iter().map(|x| x.id).collect::<Vec<_>>(),
             &**pool,
@@ -223,7 +223,7 @@ pub async fn users_get(
         .map(|data| {
             let mut user = crate::models::users::User::from(data.clone());
             if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
-                user.notes = notes.get(&data.id).clone().map(Into::into);
+                user.notes = notes.get(&data.id).cloned().map(Into::into);
             }
             user
         })
