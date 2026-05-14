@@ -72,7 +72,7 @@
 		<div v-if="isDataLoading" class="absolute inset-0 z-10 overflow-hidden rounded-xl">
 			<div class="absolute inset-0 bg-surface-3 opacity-50" />
 			<div class="absolute inset-0 backdrop-blur-[4px]" />
-			<div class="absolute inset-0 flex h-full items-start justify-center pt-52">
+			<div class="absolute inset-0 flex h-full max-h-[500px] items-center justify-center pt-10">
 				<div class="inline-flex items-center gap-2 text-lg font-semibold text-primary opacity-100">
 					<span>Fetching results...</span>
 				</div>
