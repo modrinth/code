@@ -78,11 +78,11 @@ impl DBAnalyticsEvent {
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBAnalyticsEvent>, DatabaseError> {
         sqlx::query!(
-            "
-			SELECT id, meta AS \"meta: Json<AnalyticsEventMeta>\", starts, ends
+            r#"
+			SELECT id, meta AS "meta: Json<AnalyticsEventMeta>", starts, ends
 			FROM analytics_events
 			ORDER BY starts DESC
-			"
+			"#
         )
         .fetch(exec)
         .map(|record| {

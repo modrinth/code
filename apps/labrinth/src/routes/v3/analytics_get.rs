@@ -18,7 +18,9 @@ use eyre::eyre;
 use futures::StreamExt;
 use regex::Regex;
 use rust_decimal::Decimal;
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{
+    Deserialize, Deserializer, Serialize, Serializer, de::Error as _,
+};
 
 use crate::{
     auth::{AuthenticationError, get_user_from_headers},
@@ -356,6 +358,7 @@ pub enum DownloadSource {
     Website,
     ModrinthApp,
     ModrinthHosting,
+    ModrinthMaven,
     Other,
     Named(String),
 }
@@ -372,8 +375,27 @@ impl Serialize for DownloadSource {
             Self::ModrinthHosting => {
                 serializer.serialize_str("modrinth_hosting")
             }
+            Self::ModrinthMaven => serializer.serialize_str("modrinth_maven"),
             Self::Other => serializer.serialize_str("other"),
         }
+    }
+}
+
+impl<'de> Deserialize<'de> for DownloadSource {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let source = String::deserialize(deserializer)?;
+        Ok(match source.as_str() {
+            "website" => Self::Website,
+            "modrinth_app" => Self::ModrinthApp,
+            "modrinth_hosting" => Self::ModrinthHosting,
+            "modrinth_maven" => Self::ModrinthMaven,
+            "other" => Self::Other,
+            _ if !source.is_empty() => Self::Named(source),
+            _ => return Err(D::Error::custom("download source cannot be empty")),
+        })
     }
 }
 
@@ -1073,7 +1095,7 @@ static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
         use DownloadSourcePattern as P;
 
         [
-            (r"^modrinth/kyros/", P::ModrinthApp),
+            (r"^modrinth/kyros/", P::ModrinthHosting),
             (r"^modrinth/theseus/", P::ModrinthApp),
             (r"^(Gradle/|Apache-Maven/)", P::ModrinthMaven),
             (r"^MultiMC/", P::Named("MultiMC")),
