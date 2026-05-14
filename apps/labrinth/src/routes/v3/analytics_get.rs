@@ -587,23 +587,48 @@ mod query {
         const USE_LOADER: &str = "{use_loader: Bool}";
         const USE_GAME_VERSION: &str = "{use_game_version: Bool}";
         const USE_COUNTRY: &str = "{use_country: Bool}";
+        const PARENT_VERSION_IDS: &str = "{parent_version_ids: Array(UInt64)}";
+        const PARENT_VERSION_PROJECT_IDS: &str =
+            "{parent_version_project_ids: Array(UInt64)}";
 
         formatcp!(
             "SELECT
-                widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
-                if({USE_PROJECT_ID}, project_id, 0) AS project_id,
-                if({USE_VERSION_ID}, version_id, 0) AS version_id,
-                if({USE_LOADER}, loader, '') AS loader,
-                if({USE_GAME_VERSION}, game_version, '') AS game_version,
-                if({USE_COUNTRY}, country, '') AS country,
+                bucket,
+                if({USE_PROJECT_ID}, source_project_id, 0) AS project_id,
+                version_id,
+                loader,
+                game_version,
+                country,
                 SUM(seconds) AS seconds
-            FROM playtime
-            WHERE
-                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
-                -- make sure that the REAL project id is included,
-                -- not the possibly-zero one,
-                -- by using `playtime.project_id` instead of `project_id`
-                AND playtime.project_id IN {PROJECT_IDS}
+            FROM (
+                SELECT
+                    widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
+                    project_id AS source_project_id,
+                    if({USE_VERSION_ID}, version_id, 0) AS version_id,
+                    if({USE_LOADER}, loader, '') AS loader,
+                    if({USE_GAME_VERSION}, game_version, '') AS game_version,
+                    if({USE_COUNTRY}, country, '') AS country,
+                    seconds
+                FROM playtime
+                WHERE
+                    recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                    AND playtime.project_id IN {PROJECT_IDS}
+
+                UNION ALL
+
+                SELECT
+                    widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
+                    transform(parent, {PARENT_VERSION_IDS}, {PARENT_VERSION_PROJECT_IDS}) AS source_project_id,
+                    if({USE_VERSION_ID}, version_id, 0) AS version_id,
+                    if({USE_LOADER}, loader, '') AS loader,
+                    if({USE_GAME_VERSION}, game_version, '') AS game_version,
+                    if({USE_COUNTRY}, country, '') AS country,
+                    seconds
+                FROM playtime
+                WHERE
+                    recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                    AND parent IN {PARENT_VERSION_IDS}
+            )
             GROUP BY bucket, project_id, version_id, loader, game_version, country"
         )
     };
@@ -721,6 +746,27 @@ pub async fn fetch_analytics(
     let project_ids =
         filter_allowed_project_ids(&project_ids, &user, &pool, &redis).await?;
 
+    let project_id_values =
+        project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
+    let parent_versions = sqlx::query!(
+        "
+        SELECT id, mod_id
+        FROM versions
+        WHERE mod_id = ANY($1)
+        ",
+        &project_id_values,
+    )
+    .fetch_all(&**pool)
+    .await?;
+    let parent_version_ids = parent_versions
+        .iter()
+        .map(|version| DBVersionId(version.id))
+        .collect::<Vec<_>>();
+    let parent_version_project_ids = parent_versions
+        .iter()
+        .map(|version| DBProjectId(version.mod_id))
+        .collect::<Vec<_>>();
+
     let affiliate_code_ids =
         DBAffiliateCode::get_by_affiliate(user.id.into(), &**pool)
             .await?
@@ -733,6 +779,8 @@ pub async fn fetch_analytics(
         req: &req,
         time_slices: &mut time_slices,
         project_ids: &project_ids,
+        parent_version_ids: &parent_version_ids,
+        parent_version_project_ids: &parent_version_project_ids,
         affiliate_code_ids: &affiliate_code_ids,
     };
 
@@ -892,9 +940,6 @@ pub async fn fetch_analytics(
         if !scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(AuthenticationError::InvalidCredentials.into());
         }
-
-        let project_id_values =
-            project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
 
         let mut rows = sqlx::query!(
             "SELECT
@@ -1153,6 +1198,8 @@ struct QueryClickhouseContext<'a> {
     req: &'a GetRequest,
     time_slices: &'a mut [TimeSlice],
     project_ids: &'a [DBProjectId],
+    parent_version_ids: &'a [DBVersionId],
+    parent_version_project_ids: &'a [DBProjectId],
     affiliate_code_ids: &'a [DBAffiliateCodeId],
 }
 
@@ -1174,6 +1221,8 @@ where
         .param("time_range_end", cx.req.time_range.end.timestamp())
         .param("time_slices", cx.time_slices.len())
         .param("project_ids", cx.project_ids)
+        .param("parent_version_ids", cx.parent_version_ids)
+        .param("parent_version_project_ids", cx.parent_version_project_ids)
         .param("affiliate_code_ids", cx.affiliate_code_ids);
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)
