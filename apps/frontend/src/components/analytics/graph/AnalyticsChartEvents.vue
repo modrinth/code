@@ -1,5 +1,5 @@
 <template>
-	<div v-if="canRender" class="pointer-events-none absolute inset-0">
+	<div v-if="canRender" ref="chartElement" class="pointer-events-none absolute inset-0">
 		<div
 			v-for="group in eventGroups"
 			:key="`${group.id}:guide`"
@@ -36,12 +36,13 @@
 				{{ group.events.length }}
 			</span>
 		</button>
-
+	</div>
+	<Teleport to="body">
 		<Transition name="analytics-event-tooltip-fade">
 			<div
 				v-if="activeGroup"
 				ref="tooltipElement"
-				class="analytics-event-tooltip pointer-events-auto absolute -top-7 left-0 z-30 max-h-[360px] w-[min(12rem,calc(100%-1rem))] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-xl"
+				class="analytics-event-tooltip pointer-events-auto fixed left-0 top-0 z-[100] max-h-[360px] w-[min(12rem,calc(100vw-1rem))] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-xl"
 				:style="tooltipStyle"
 				@mouseenter="onTooltipMouseEnter"
 				@mouseleave="onTooltipMouseLeave"
@@ -75,7 +76,7 @@
 				</div>
 			</div>
 		</Transition>
-	</div>
+	</Teleport>
 </template>
 
 <script setup lang="ts">
@@ -138,9 +139,14 @@ const EVENT_RANGE_MONTH_DAY_FORMATTER = new Intl.DateTimeFormat('en-US', {
 
 const hoveredGroupId = ref<string | null>(null)
 const isTooltipHovered = ref(false)
+const chartElement = ref<HTMLDivElement | null>(null)
 const tooltipElement = ref<HTMLDivElement | null>(null)
 const tooltipWidth = ref(0)
 const tooltipHeight = ref(0)
+const chartRect = reactive({
+	left: 0,
+	top: 0,
+})
 let closeTimeout: ReturnType<typeof setTimeout> | null = null
 
 const chartStartMs = computed(() => props.chartStart?.getTime() ?? null)
@@ -267,24 +273,34 @@ const tooltipStyle = computed(() => {
 	const group = activeGroup.value
 	if (!group) return {}
 
-	const desiredLeft = group.x - tooltipWidth.value / 2
+	const viewportWidth = typeof window === 'undefined' ? containerWidth.value : window.innerWidth
+	const viewportHeight = typeof window === 'undefined' ? containerHeight.value : window.innerHeight
+	const desiredLeft = chartRect.left + group.x - tooltipWidth.value / 2
 	const maxLeft = Math.max(
 		EDGE_PADDING_PX,
-		containerWidth.value - tooltipWidth.value - EDGE_PADDING_PX,
+		viewportWidth - tooltipWidth.value - EDGE_PADDING_PX,
 	)
 	const left = Math.min(maxLeft, Math.max(EDGE_PADDING_PX, desiredLeft))
 
-	const desiredTop = markerTop.value - tooltipHeight.value - TOOLTIP_OFFSET_PX
+	const desiredTop =
+		chartRect.top + markerTop.value - tooltipHeight.value - TOOLTIP_OFFSET_PX - MARKER_HEIGHT_PX
 	const maxTop = Math.max(
 		EDGE_PADDING_PX,
-		containerHeight.value - tooltipHeight.value - EDGE_PADDING_PX,
+		viewportHeight - tooltipHeight.value - EDGE_PADDING_PX,
 	)
-	const top = Math.min(maxTop, desiredTop)
+	const top = Math.min(maxTop, Math.max(EDGE_PADDING_PX, desiredTop))
 
 	return {
 		transform: `translate3d(${left}px, ${top}px, 0)`,
 	}
 })
+
+function updateChartRect() {
+	if (!chartElement.value) return
+	const rect = chartElement.value.getBoundingClientRect()
+	chartRect.left = rect.left
+	chartRect.top = rect.top
+}
 
 function doesEventMatchActiveStat(event: AnalyticsChartEvent) {
 	if (!event.forMetricType) return true
@@ -385,6 +401,7 @@ function clearCloseTimeout() {
 
 function showHoveredGroup(groupId: string) {
 	clearCloseTimeout()
+	updateChartRect()
 	hoveredGroupId.value = groupId
 }
 
@@ -473,6 +490,7 @@ watch(
 	() => [activeGroup.value, props.containerWidth, props.containerHeight],
 	() => {
 		nextTick(() => {
+			updateChartRect()
 			if (!tooltipElement.value) return
 			tooltipWidth.value = tooltipElement.value.offsetWidth
 			tooltipHeight.value = tooltipElement.value.offsetHeight
@@ -488,8 +506,16 @@ watch(eventGroups, (groups) => {
 	}
 })
 
+onMounted(() => {
+	updateChartRect()
+	window.addEventListener('resize', updateChartRect)
+	window.addEventListener('scroll', updateChartRect, true)
+})
+
 onBeforeUnmount(() => {
 	clearCloseTimeout()
+	window.removeEventListener('resize', updateChartRect)
+	window.removeEventListener('scroll', updateChartRect, true)
 })
 </script>
 

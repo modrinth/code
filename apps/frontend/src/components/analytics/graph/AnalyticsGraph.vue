@@ -1,6 +1,6 @@
 <template>
 	<section
-		class="relative flex flex-col rounded-2xl border border-solid border-surface-5 bg-surface-3"
+		class="relative flex flex-col !overflow-hidden rounded-2xl border border-solid border-surface-5 bg-surface-3"
 	>
 		<AnalyticsLoadingBar :loading="isDataLoading" />
 		<div class="flex w-full flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
@@ -153,15 +153,15 @@
 					</template>
 				</div>
 			</div>
-			<div v-if="isDataLoading" class="absolute inset-0 z-20 overflow-hidden rounded-xl">
-				<div class="absolute inset-0 bg-surface-3 opacity-50" />
-				<div class="absolute inset-0 backdrop-blur-[3px]" />
-				<div class="absolute inset-0 flex items-center justify-center">
-					<div
-						class="relative bottom-6 inline-flex items-center gap-2 text-lg font-semibold text-primary"
-					>
-						<span>Fetching results...</span>
-					</div>
+		</div>
+		<div v-if="isDataLoading" class="absolute inset-0 z-[19] overflow-hidden rounded-xl">
+			<div class="absolute inset-0 bg-surface-3 opacity-50" />
+			<div class="absolute inset-0 backdrop-blur-[3px]" />
+			<div class="absolute inset-0 flex items-center justify-center">
+				<div
+					class="relative bottom-6 inline-flex items-center gap-2 text-lg font-semibold text-primary"
+				>
+					<span>Fetching results...</span>
 				</div>
 			</div>
 		</div>
