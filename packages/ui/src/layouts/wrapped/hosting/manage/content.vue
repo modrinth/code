@@ -2,6 +2,7 @@
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useIntervalFn } from '@vueuse/core'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -276,6 +277,14 @@ const lastStableContentKeys = ref<Set<string>>(new Set())
 const contentInstallBaselineKeys = ref<Set<string> | null>(null)
 const contentInstallAddedKeys = ref<Set<string>>(new Set())
 const isFlushingStoredServerInstalls = ref(false)
+const { pause: pausePendingInstallPoll, resume: resumePendingInstallPoll } = useIntervalFn(
+	() => {
+		if (pendingServerContentInstalls.value.length === 0 || contentQuery.isFetching.value) return
+		void contentQuery.refetch()
+	},
+	5000,
+	{ immediate: false },
+)
 
 function syncPendingServerContentInstalls() {
 	pendingServerContentInstalls.value = readPendingServerContentInstalls(serverId, worldId.value)
@@ -299,6 +308,27 @@ function getAddonInstallKeys(addons: Archon.Content.v1.Addon[]) {
 		keys.add(getAddonInstallKey(addon))
 	}
 	return keys
+}
+
+function addonMatchesPendingInstall(
+	addon: Archon.Content.v1.Addon,
+	pendingInstall: PendingServerContentInstall,
+) {
+	return (
+		addon.project_id === pendingInstall.projectId ||
+		addon.version?.id === pendingInstall.versionId ||
+		(!!pendingInstall.fileName && addon.filename === pendingInstall.fileName)
+	)
+}
+
+function removeResolvedPendingServerContentInstalls(addons: Archon.Content.v1.Addon[]) {
+	if (addons.length === 0 || pendingServerContentInstalls.value.length === 0) return
+
+	for (const pendingInstall of pendingServerContentInstalls.value) {
+		if (addons.some((addon) => addonMatchesPendingInstall(addon, pendingInstall))) {
+			removePendingServerContentInstall(serverId, worldId.value, pendingInstall.projectId)
+		}
+	}
 }
 
 function syncContentInstallKeys(
@@ -412,17 +442,32 @@ const rawContentItems = computed<ContentItem[]>(() => {
 	const pendingInstallByProjectId = new Map(
 		pendingServerContentInstalls.value.map((item) => [item.projectId, item]),
 	)
+	const pendingInstallByVersionId = new Map(
+		pendingServerContentInstalls.value.map((item) => [item.versionId, item]),
+	)
+	const pendingInstallByFileName = new Map<string, PendingServerContentInstall>()
+	for (const item of pendingServerContentInstalls.value) {
+		if (item.fileName) {
+			pendingInstallByFileName.set(item.fileName, item)
+		}
+	}
 	const installingContentKeys = new Set([...pendingProjectIds, ...contentInstallAddedKeys.value])
-	const installedProjectIds = new Set(
-		addons.map((addon) => addon.project_id).filter((id): id is string => !!id),
+	const resolvedPendingProjectIds = new Set(
+		pendingServerContentInstalls.value
+			.filter((item) => addons.some((addon) => addonMatchesPendingInstall(addon, item)))
+			.map((item) => item.projectId),
 	)
 	const pendingItems = pendingServerContentInstalls.value
-		.filter((item) => !installedProjectIds.has(item.projectId))
+		.filter((item) => !resolvedPendingProjectIds.has(item.projectId))
 		.map(pendingInstallToContentItem)
 	const addonItems = addons.map((addon) => {
 		const contentItem = addonToContentItem(addon)
-		const installing = installingContentKeys.has(getAddonInstallKey(addon))
-		const pendingItem = addon.project_id ? pendingInstallByProjectId.get(addon.project_id) : null
+		const pendingItem =
+			(addon.project_id ? pendingInstallByProjectId.get(addon.project_id) : null) ??
+			(addon.version?.id ? pendingInstallByVersionId.get(addon.version.id) : null) ??
+			pendingInstallByFileName.get(addon.filename) ??
+			null
+		const installing = !!pendingItem || installingContentKeys.has(getAddonInstallKey(addon))
 
 		if (!installing || !pendingItem) {
 			return {
@@ -518,6 +563,26 @@ watch(
 )
 
 watch(
+	[() => contentQuery.data.value?.addons, pendingServerContentInstalls],
+	([addons]) => {
+		removeResolvedPendingServerContentInstalls(addons ?? [])
+	},
+	{ deep: true, immediate: true },
+)
+
+watch(
+	() => pendingServerContentInstalls.value.length > 0,
+	(hasPendingInstalls) => {
+		if (hasPendingInstalls) {
+			resumePendingInstallPoll()
+		} else {
+			pausePendingInstallPoll()
+		}
+	},
+	{ immediate: true },
+)
+
+watch(
 	worldId,
 	() => {
 		syncPendingServerContentInstalls()
@@ -537,6 +602,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+	pausePendingInstallPoll()
 	window.removeEventListener(
 		pendingServerContentInstallsEvent,
 		handlePendingServerContentInstallsChanged,
