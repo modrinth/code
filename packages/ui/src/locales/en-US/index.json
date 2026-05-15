@@ -761,6 +761,36 @@
   "external-files.permissions-card.add": {
     "defaultMessage": "Add attribution"
   },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, one {Add file} other {Add files}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "Select any files that should be moved into this group."
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "There are no files in other groups that can be moved here."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Could not load files"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "No files match your search."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Search files…"
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, one {# file selected} other {# files selected}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "Add files to this group"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Add files..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Could not add files"
+  },
   "external-files.permissions-card.badge.attributed": {
     "defaultMessage": "Attributed"
   },
@@ -859,6 +889,12 @@
   },
   "external-files.permissions-card.special-permission.description": {
     "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "Remove from group"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "Could not split file"
   },
   "external-files.permissions-card.type-label": {
     "defaultMessage": "Type"
