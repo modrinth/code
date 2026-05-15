@@ -178,6 +178,7 @@ import {
 
 import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
 import {
+	areSelectedFiltersEqual,
 	cloneSelectedFilters,
 	FILTER_VALUE_CATEGORIES,
 	getOptionsWithSelectedValues,
@@ -266,11 +267,13 @@ const projectVersionProjectMetadataByVersionId = computed(() => {
 
 	return metadata
 })
+const draftSelectedFilters = ref<AnalyticsSelectedFilters>(cloneSelectedFilters(selectedFilters.value))
+let selectedFiltersCommitRequestId = 0
 
 const selectedFilterValue = computed<Record<string, string[]>>({
-	get: () => selectedFilters.value,
+	get: () => draftSelectedFilters.value,
 	set: (nextValue) => {
-		const nextFilters = cloneSelectedFilters(selectedFilters.value)
+		const nextFilters = cloneSelectedFilters(draftSelectedFilters.value)
 
 		for (const [categoryKey, values] of Object.entries(nextValue)) {
 			if (!isAnalyticsFilterValueCategory(categoryKey)) {
@@ -280,7 +283,8 @@ const selectedFilterValue = computed<Record<string, string[]>>({
 			nextFilters[categoryKey] = normalizeSelectedFilterValues(categoryKey, values, [])
 		}
 
-		selectedFilters.value = nextFilters
+		draftSelectedFilters.value = nextFilters
+		void scheduleSelectedFiltersCommit()
 	},
 })
 
@@ -294,16 +298,49 @@ function clearFilterBar() {
 }
 
 watch(queryResetToken, () => {
+	selectedFiltersCommitRequestId++
+	draftSelectedFilters.value = cloneSelectedFilters(selectedFilters.value)
 	clearDownloadsThresholds()
 })
 
 watch(
 	selectedFilters,
 	(nextFilters, previousFilters) => {
+		selectedFiltersCommitRequestId++
+		draftSelectedFilters.value = cloneSelectedFilters(nextFilters)
 		clearDownloadsThresholdsForChangedFilters(previousFilters, nextFilters)
 	},
 	{ deep: true },
 )
+
+async function scheduleSelectedFiltersCommit() {
+	const requestId = ++selectedFiltersCommitRequestId
+	const nextFilters = cloneSelectedFilters(draftSelectedFilters.value)
+
+	await waitForDeferredQueryFilterCommit()
+
+	if (requestId !== selectedFiltersCommitRequestId) {
+		return
+	}
+
+	if (!areSelectedFiltersEqual(selectedFilters.value, nextFilters)) {
+		selectedFilters.value = nextFilters
+	}
+}
+
+function waitForDeferredQueryFilterCommit(): Promise<void> {
+	if (!import.meta.client) {
+		return nextTick()
+	}
+
+	return new Promise((resolve) => {
+		nextTick(() => {
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => resolve())
+			})
+		})
+	})
+}
 
 const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	const visibleCategoryKeys = new Set(
@@ -783,7 +820,7 @@ async function runDownloadsThresholdQuery(
 ) {
 	applyDownloadsThreshold(setSelectedValues)
 	closeMenu(event)
-	await nextTick()
+	await scheduleSelectedFiltersCommit()
 	await refreshAnalyticsQuery()
 }
 

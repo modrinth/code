@@ -345,6 +345,8 @@ watch(draftSelectedProjectIds, (nextSelectedProjectIds) => {
 
 watch(queryResetToken, () => {
 	isProjectSelectOpen.value = false
+	selectedBreakdownCommitRequestId++
+	draftSelectedBreakdown.value = selectedBreakdown.value
 	clearProjectDownloadsThreshold()
 	draftSelectedProjectIds.value = isSameProjectSelection(
 		selectedProjectIds.value,
@@ -460,15 +462,54 @@ function selectAllProjectsMode() {
 	draftSelectedProjectIds.value = []
 }
 
+const draftSelectedBreakdown = ref<AnalyticsBreakdownPreset>(selectedBreakdown.value)
+let selectedBreakdownCommitRequestId = 0
+
 const selectedBreakdownValue = computed<AnalyticsBreakdownPreset>({
-	get: () => selectedBreakdown.value,
+	get: () => draftSelectedBreakdown.value,
 	set: (nextBreakdown) => {
-		selectedBreakdown.value = nextBreakdown
+		draftSelectedBreakdown.value = nextBreakdown
+		void scheduleSelectedBreakdownCommit()
 	},
 })
 
 function clearSelectedBreakdown() {
-	selectedBreakdown.value = 'none'
+	draftSelectedBreakdown.value = 'none'
+	void scheduleSelectedBreakdownCommit()
+}
+
+watch(selectedBreakdown, (nextBreakdown) => {
+	selectedBreakdownCommitRequestId++
+	draftSelectedBreakdown.value = nextBreakdown
+})
+
+async function scheduleSelectedBreakdownCommit() {
+	const requestId = ++selectedBreakdownCommitRequestId
+	const nextBreakdown = draftSelectedBreakdown.value
+
+	await waitForDeferredQueryBuilderCommit()
+
+	if (requestId !== selectedBreakdownCommitRequestId) {
+		return
+	}
+
+	if (selectedBreakdown.value !== nextBreakdown) {
+		selectedBreakdown.value = nextBreakdown
+	}
+}
+
+function waitForDeferredQueryBuilderCommit(): Promise<void> {
+	if (!import.meta.client) {
+		return nextTick()
+	}
+
+	return new Promise((resolve) => {
+		nextTick(() => {
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => resolve())
+			})
+		})
+	})
 }
 
 const isDashboardAnalyticsRoute = computed(

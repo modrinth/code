@@ -35,7 +35,7 @@
 			class="flex flex-col gap-6 px-4 pb-6 pt-5"
 			:class="['transition-opacity', isDataLoading ? 'pointer-events-none opacity-75' : '']"
 		>
-			<div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-3">
+			<div class="flex flex-wrap items-center gap-y-1 px-3">
 				<div
 					v-for="legendEntry in displayedLegendEntries"
 					:key="legendEntry.id"
@@ -44,7 +44,7 @@
 					<button
 						type="button"
 						v-tooltip="getLegendEntryTooltip(legendEntry)"
-						class="inline-flex items-center gap-1.5 text-sm !outline-0 transition-all focus-within:!outline-0 focus:!outline-0 focus-visible:!outline-0"
+						class="inline-flex items-center gap-1.5 px-2 py-0.5 text-sm !outline-0 transition-all focus-within:!outline-0 focus:!outline-0 focus-visible:!outline-0"
 						:class="[
 							legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary',
 							isLegendEntryToggleDisabled(legendEntry)
@@ -73,7 +73,7 @@
 				<button
 					v-if="canShowMoreLegendEntries"
 					type="button"
-					class="text-sm font-normal text-primary underline transition-all hover:brightness-125"
+					class="mx-2 text-sm font-normal text-primary underline transition-all hover:brightness-125"
 					@click="showMoreLegendEntries"
 				>
 					Show more
@@ -81,7 +81,7 @@
 				<button
 					v-else-if="canShowLessLegendEntries"
 					type="button"
-					class="text-sm font-normal text-primary underline transition-all hover:brightness-125"
+					class="mx-2 text-sm font-normal text-primary underline transition-all hover:brightness-125"
 					@click="showLessLegendEntries"
 				>
 					Show less
@@ -378,12 +378,6 @@ const isStacked = computed(
 		activeGraphViewMode.value === 'bar',
 )
 
-watch(canUseRatioMode, (canUse) => {
-	if (!canUse) {
-		isRatioMode.value = false
-	}
-})
-
 const sliceCount = computed(() => {
 	const nextFetchRequest = fetchRequest.value
 	const fallback = timeSlices.value.length
@@ -465,10 +459,12 @@ const hoveredLegendEntryId = ref<string | null>(null)
 const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
 
 const LEGEND_MAX_ITEMS = 8
-const LEGEND_VISIBLE_ITEM_COUNT = LEGEND_MAX_ITEMS - 1
 const LEGEND_EXPANDED_MAX_ITEMS = 24
 const OTHER_LEGEND_ENTRY_ID = '__analytics_other__'
 const OTHER_LEGEND_ENTRY_COLOR = 'hsl(218, 11%, 65%)'
+const expandedLegendMaxItems = computed(() =>
+	selectedBreakdown.value === 'none' ? Number.POSITIVE_INFINITY : LEGEND_EXPANDED_MAX_ITEMS,
+)
 
 type LegendEntry = {
 	id: string
@@ -634,12 +630,11 @@ const legendEntries = computed<LegendEntry[]>(() =>
 )
 
 const otherBundledLegendIds = computed<string[]>(() => {
-	if (!showAllLegendEntries.value) {
-		if (legendEntries.value.length <= LEGEND_MAX_ITEMS) return []
-		return legendEntries.value.slice(LEGEND_VISIBLE_ITEM_COUNT).map((entry) => entry.id)
+	const maxItems = expandedLegendMaxItems.value
+	if (!showAllLegendEntries.value || legendEntries.value.length <= maxItems) {
+		return []
 	}
-	if (legendEntries.value.length <= LEGEND_EXPANDED_MAX_ITEMS) return []
-	return legendEntries.value.slice(LEGEND_EXPANDED_MAX_ITEMS - 1).map((entry) => entry.id)
+	return legendEntries.value.slice(maxItems - 1).map((entry) => entry.id)
 })
 
 const otherLegendEntry = computed<LegendEntry | null>(() => {
@@ -659,13 +654,13 @@ const otherLegendEntry = computed<LegendEntry | null>(() => {
 })
 
 const displayedLegendEntries = computed<LegendEntry[]>(() => {
-	const other = otherLegendEntry.value
 	if (!showAllLegendEntries.value) {
-		if (!other) return legendEntries.value
-		return [...legendEntries.value.slice(0, LEGEND_VISIBLE_ITEM_COUNT), other]
+		return legendEntries.value.slice(0, LEGEND_MAX_ITEMS)
 	}
-	if (!other) return legendEntries.value
-	return [...legendEntries.value.slice(0, LEGEND_EXPANDED_MAX_ITEMS - 1), other]
+	const maxItems = expandedLegendMaxItems.value
+	const other = otherLegendEntry.value
+	if (!other) return legendEntries.value.slice(0, maxItems)
+	return [...legendEntries.value.slice(0, maxItems - 1), other]
 })
 
 const canShowMoreLegendEntries = computed(
@@ -674,6 +669,12 @@ const canShowMoreLegendEntries = computed(
 const canShowLessLegendEntries = computed(
 	() => showAllLegendEntries.value && legendEntries.value.length > LEGEND_MAX_ITEMS,
 )
+
+watch(canUseRatioMode, (canUse) => {
+	if (!canUse) {
+		isRatioMode.value = false
+	}
+})
 
 const otherChartDataset = computed<ChartDataset | null>(() => {
 	const bundledIds = otherBundledLegendIds.value
@@ -780,6 +781,10 @@ function clearHoveredLegendEntryId(datasetId: string) {
 	}
 }
 
+function clearLegendHoverState() {
+	hoveredLegendEntryId.value = null
+}
+
 function toggleLegendEntryVisibility(datasetId: string) {
 	const nextHiddenDatasetIds = new Set(hiddenDatasetIds.value)
 	if (nextHiddenDatasetIds.has(datasetId)) {
@@ -804,9 +809,11 @@ function soloLegendEntry(datasetId: string) {
 function onLegendEntryClick(event: MouseEvent, datasetId: string) {
 	if (event.shiftKey) {
 		soloLegendEntry(datasetId)
+		clearLegendHoverState()
 		return
 	}
 	toggleLegendEntryVisibility(datasetId)
+	clearLegendHoverState()
 }
 
 function showMoreLegendEntries() {

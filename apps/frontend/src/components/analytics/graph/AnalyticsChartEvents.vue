@@ -20,7 +20,7 @@
 			v-for="group in eventGroups"
 			:key="group.id"
 			type="button"
-			class="pointer-events-auto absolute -top-[34px] left-0 z-20 inline-flex h-8 min-w-8 items-center justify-center gap-1 rounded-full bg-surface-3 px-1 text-secondary shadow-lg transition-colors hover:text-contrast focus-visible:border-brand focus-visible:text-contrast"
+			class="pointer-events-auto absolute -top-[26px] left-0 z-20 inline-flex h-5 min-w-5 items-center justify-center gap-1 rounded-full bg-surface-3 px-1 text-secondary shadow-lg transition-colors hover:text-contrast focus-visible:border-brand focus-visible:text-contrast"
 			:class="activeGroup?.id === group.id ? 'border-brand text-contrast' : ''"
 			:style="getMarkerStyle(group)"
 			:aria-label="getGroupAriaLabel(group)"

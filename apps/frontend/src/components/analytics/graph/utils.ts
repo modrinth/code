@@ -44,7 +44,7 @@ const LOADER_CHART_COLORS: Record<string, string> = {
 
 const REGION_CODE_PATTERN = /^[a-z]{2}$/i
 const OTHER_COUNTRY_CODE = 'XX'
-const OTHER_COUNTRY_LABEL = 'Other'
+const UNKNOWN_BREAKDOWN_LABEL = 'Unknown'
 const regionDisplayNamesByLocale = new Map<string, Intl.DisplayNames | null>()
 
 function getRegionDisplayNames(locale: string): Intl.DisplayNames | null {
@@ -65,7 +65,7 @@ function getRegionDisplayNames(locale: string): Intl.DisplayNames | null {
 function formatCountryCode(countryCode: string): string {
 	const normalized = countryCode.trim().toUpperCase()
 	if (normalized === OTHER_COUNTRY_CODE) {
-		return OTHER_COUNTRY_LABEL
+		return UNKNOWN_BREAKDOWN_LABEL
 	}
 
 	if (!REGION_CODE_PATTERN.test(normalized)) {
@@ -93,6 +93,9 @@ export function formatBreakdownLabel(
 	selectedBreakdown: AnalyticsBreakdownPreset,
 	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
 ): string {
+	if (breakdownValue.trim().toLowerCase() === 'other') {
+		return UNKNOWN_BREAKDOWN_LABEL
+	}
 	if (selectedBreakdown === 'country') {
 		return formatCountryCode(breakdownValue)
 	}

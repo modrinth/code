@@ -632,12 +632,6 @@ function cloneAnalyticsFetchRequest(
 	return fetchRequest ? JSON.parse(JSON.stringify(fetchRequest)) : null
 }
 
-function cloneAnalyticsTimeSlices(
-	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
-): Labrinth.Analytics.v3.TimeSlice[] {
-	return timeSlices.map((slice) => [...slice])
-}
-
 function getCountryFilterOptions(timeSlices: Labrinth.Analytics.v3.TimeSlice[]): string[] {
 	const countries = new Set<string>()
 
@@ -1904,8 +1898,8 @@ export function createAnalyticsDashboardContext(
 		enabled: computed(() => previousFetchRequest.value !== null),
 	})
 
-	const timeSlices = ref<Labrinth.Analytics.v3.TimeSlice[]>([])
-	const previousTimeSlices = ref<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const timeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const previousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const displayedSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
 	const displayedSelectedGroupBy = ref<AnalyticsGroupByPreset>(selectedGroupBy.value)
 	const displayedSelectedBreakdown = ref<AnalyticsBreakdownPreset>(selectedBreakdown.value)
@@ -1918,7 +1912,7 @@ export function createAnalyticsDashboardContext(
 	const displayedFilterOptions = ref<AnalyticsDashboardFilterOptions>(
 		cloneAnalyticsFilterOptions(filterOptions.value),
 	)
-	const displayedTimeSlices = ref<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const displayedTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 
 	function commitDisplayedAnalyticsState() {
 		displayedSelectedProjectIds.value = [...selectedProjectIds.value]
@@ -1927,7 +1921,7 @@ export function createAnalyticsDashboardContext(
 		displayedSelectedFilters.value = cloneAnalyticsSelectedFilters(selectedFilters.value)
 		displayedFetchRequest.value = cloneAnalyticsFetchRequest(fetchRequest.value)
 		displayedFilterOptions.value = cloneAnalyticsFilterOptions(filterOptions.value)
-		displayedTimeSlices.value = cloneAnalyticsTimeSlices(timeSlices.value)
+		displayedTimeSlices.value = timeSlices.value
 	}
 
 	watch(
@@ -1967,8 +1961,10 @@ export function createAnalyticsDashboardContext(
 			}
 		}
 
-		addVersionIdsFromTimeSlices(versionIds, timeSlices.value)
-		addVersionIdsFromTimeSlices(versionIds, previousTimeSlices.value)
+		if (selectedBreakdown.value === 'version_id' || selectedFilters.value.version_id.length > 0) {
+			addVersionIdsFromTimeSlices(versionIds, timeSlices.value)
+			addVersionIdsFromTimeSlices(versionIds, previousTimeSlices.value)
+		}
 
 		for (const versionId of filterOptionProjectVersionIds.value) {
 			versionIds.delete(versionId)
@@ -2113,7 +2109,7 @@ export function createAnalyticsDashboardContext(
 
 			commitDisplayedAnalyticsState()
 		},
-		{ deep: true, flush: 'post', immediate: true },
+		{ flush: 'post', immediate: true },
 	)
 
 	async function refreshAnalyticsQuery() {
