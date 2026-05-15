@@ -56,7 +56,14 @@
 						<span class="size-2 rounded-full" :style="{ backgroundColor: legendEntry.color }" />
 						<span
 							v-tooltip="legendEntry.projectName ?? ''"
-							:class="{ 'line-through': legendEntry.hidden }"
+							:class="{
+								'line-through': legendEntry.hidden,
+								capitalize:
+									selectedBreakdown === 'download_reason' ||
+									selectedBreakdown === 'monetization' ||
+									selectedBreakdown === 'loader' ||
+									selectedBreakdown === 'country',
+							}"
 						>
 							{{ legendEntry.name }}
 						</span>

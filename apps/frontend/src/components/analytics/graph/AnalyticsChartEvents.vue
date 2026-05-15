@@ -11,7 +11,7 @@
 			<div
 				v-if="rangeHighlight"
 				aria-hidden="true"
-				class="pointer-events-none absolute left-0 z-10 rounded-sm border border-dashed border-blue bg-highlight-blue opacity-30"
+				class="pointer-events-none absolute left-0 z-10 rounded-sm border border-l-0 border-dashed border-secondary bg-highlight-blue opacity-40"
 				:style="rangeHighlight"
 			/>
 		</Transition>

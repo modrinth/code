@@ -88,15 +88,6 @@ function formatCountryCode(countryCode: string): string {
 	return countryCode
 }
 
-function formatLoaderLabel(loader: string): string {
-	const normalized = loader.trim()
-	if (normalized.length === 0) {
-		return loader
-	}
-
-	return `${normalized[0].toUpperCase()}${normalized.slice(1)}`
-}
-
 export function formatBreakdownLabel(
 	breakdownValue: string,
 	selectedBreakdown: AnalyticsBreakdownPreset,
@@ -108,27 +99,8 @@ export function formatBreakdownLabel(
 	if (selectedBreakdown === 'version_id') {
 		return getVersionDisplayName(breakdownValue)
 	}
-	if (selectedBreakdown === 'loader') {
-		return formatLoaderLabel(breakdownValue)
-	}
-	if (selectedBreakdown === 'download_reason') {
-		return formatDownloadReasonLabel(breakdownValue)
-	}
 
 	return breakdownValue
-}
-
-function formatDownloadReasonLabel(reason: string): string {
-	switch (reason) {
-		case 'standalone':
-			return 'Standalone'
-		case 'dependency':
-			return 'Dependency'
-		case 'modpack':
-			return 'Modpack'
-		default:
-			return reason
-	}
 }
 
 function getBreakdownColor(
