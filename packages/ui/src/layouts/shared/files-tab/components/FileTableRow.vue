@@ -197,7 +197,11 @@ const isZip = computed(() => fileExtension.value === 'zip')
 
 function getFullPath() {
 	const basePath = ctx.basePath?.value
-	return basePath ? `${basePath}/${props.path}`.replace(/\/+/g, '/') : props.path
+	if (!basePath) return props.path
+	const fullPath = `${basePath}/${props.path}`
+	return navigator.userAgent.includes('Windows')
+		? fullPath.replace(/[\\/]+/g, '\\')
+		: fullPath.replace(/[\\/]+/g, '/')
 }
 
 const menuOptions = computed(() => {
