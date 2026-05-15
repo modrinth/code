@@ -95,8 +95,29 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "重新订阅服务器"
   },
+  "browse.filter-results": {
+    "defaultMessage": "筛选结果……"
+  },
+  "browse.no-results": {
+    "defaultMessage": "没有找到您的查询结果！"
+  },
+  "browse.offline": {
+    "defaultMessage": "你目前处于离线状态。连接互联网来浏览Modrinth！"
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "选定的项目"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "丢弃"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "查看："
+  },
   "button.accept": {
     "defaultMessage": "接受"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "将服务器添加到实例"
   },
   "button.affiliate-links": {
     "defaultMessage": "推广链接"
@@ -167,6 +188,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "隐藏快照版本"
   },
+  "button.install": {
+    "defaultMessage": "安装"
+  },
   "button.max": {
     "defaultMessage": "最大"
   },
@@ -184,6 +208,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "在文件夹中打开"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "在 Modrinth 中打开"
   },
   "button.play": {
     "defaultMessage": "开始游戏"
@@ -277,6 +304,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "私有"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "选择 {project}"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "是否确定要将 {count, plural,  other {# 个项目}}更新至最新的兼容版本？建议逐个更新内容。"
@@ -758,6 +788,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "初始化服务器"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "否"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "永久拒绝"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "未知"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "已署名"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "已署名及来源"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "是"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "解压概览"
   },
@@ -1199,6 +1247,21 @@
   "form.placeholder.state": {
     "defaultMessage": "输入州/省"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, other {# 字节}}"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
+  },
   "header.category.category": {
     "defaultMessage": "类别"
   },
@@ -1234,6 +1297,9 @@
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "更新内容失败"
+  },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "安装内容失败"
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "加载整合包内容失败"
@@ -1688,20 +1754,35 @@
   "label.filter-by": {
     "defaultMessage": "筛选"
   },
+  "label.filters": {
+    "defaultMessage": "过滤器"
+  },
   "label.followed-projects": {
     "defaultMessage": "已关注的项目"
   },
   "label.game-version": {
     "defaultMessage": "游戏版本"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "隐藏已安装内容"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "隐藏所选内容"
+  },
   "label.installation-info": {
     "defaultMessage": "安装信息"
+  },
+  "label.installed": {
+    "defaultMessage": "已安装"
   },
   "label.installed-modpack": {
     "defaultMessage": "已安装整合包"
   },
   "label.installing": {
     "defaultMessage": "安装中……"
+  },
+  "label.installing-content": {
+    "defaultMessage": "安装内容"
   },
   "label.loading": {
     "defaultMessage": "加载中……"
@@ -1778,6 +1859,9 @@
   "label.select-all": {
     "defaultMessage": "选择全部"
   },
+  "label.selected": {
+    "defaultMessage": "已选"
+  },
   "label.selection-actions": {
     "defaultMessage": "选择操作"
   },
@@ -1820,8 +1904,14 @@
   "label.username": {
     "defaultMessage": "用户名"
   },
+  "label.validating": {
+    "defaultMessage": "验证"
+  },
   "label.version": {
     "defaultMessage": "版本"
+  },
+  "label.view": {
+    "defaultMessage": "视图"
   },
   "label.visibility": {
     "defaultMessage": "可见性"
@@ -2019,7 +2109,7 @@
     "defaultMessage": "失败"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "暂扣"
+    "defaultMessage": "由管理员下架"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "将代码复制到剪贴板"
@@ -2789,6 +2879,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "上传"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "权限"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "版本"
   },
@@ -3082,6 +3175,39 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "正在同步內容"
+  },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "安装失败"
+  },
+  "servers.installing-banner.error.unknown": {
+    "defaultMessage": "安装过程中发生意外错误。"
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "正在安装组件……"
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "正在安装整合包……"
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "正在安装平台……"
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "我们正在准备你的服务器"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "正在添加 Java……"
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "正在配置服务器……"
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "正在下载模组……"
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "正在整理文件……"
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "正在设置运行环境……"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已经有服务器了吗？"

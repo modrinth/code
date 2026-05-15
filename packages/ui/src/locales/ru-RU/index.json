@@ -6,7 +6,7 @@
     "defaultMessage": "Создание партнёрского кода"
   },
   "affiliate.create.title.description": {
-    "defaultMessage": "Дайте название вашей партнерской ссылке, чтобы вы знали откуда приходят люди!"
+    "defaultMessage": "Укажите название для отслеживания источника переходов"
   },
   "affiliate.create.title.label": {
     "defaultMessage": "Название партнёрской ссылки"
@@ -15,7 +15,7 @@
     "defaultMessage": "Например: YouTube"
   },
   "affiliate.create.user.description": {
-    "defaultMessage": "Пользователь, для которого нужно создать партнёрский код"
+    "defaultMessage": "Пользователь, для которого будет создан партнёрский код"
   },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Введите имя..."
@@ -95,8 +95,47 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Возобновление подписки на сервер"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Фильтры..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Ничего не найдено по вашему запросу."
+  },
+  "browse.offline": {
+    "defaultMessage": "Вы не в сети. Подключитесь к интернету, чтобы искать на Modrinth."
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Поиск {projectType, select, mod {модов} modpack {сборок} resourcepack {наборов ресурсов} shader {шейдеров} plugin {плагинов} datapack {наборов данных} server {серверов} other {проектов}}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Выбранные проекты"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Установить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# проект выбран} few {# проекта выбрано} other {# проектов выбрано}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "{count, plural, one {Выбран # проект} few {Выбрано # проекта} other {Выбрано # проектов}} для установки. Установите {count, plural, =1 {его} other {их}} сейчас или вернитесь без изменений."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Выбранные проекты ещё не установлены"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Отказаться"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Проекты не установлены"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Вид:"
+  },
   "button.accept": {
     "defaultMessage": "Принять"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Добавить сервер в сборку"
   },
   "button.affiliate-links": {
     "defaultMessage": "Партнёрские ссылки"
@@ -167,6 +206,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Скрыть снапшоты"
   },
+  "button.install": {
+    "defaultMessage": "Установить"
+  },
   "button.max": {
     "defaultMessage": "Максимум"
   },
@@ -184,6 +226,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Открыть в папке"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Открыть в Modrinth"
   },
   "button.play": {
     "defaultMessage": "Играть"
@@ -216,7 +261,7 @@
     "defaultMessage": "Сбросить"
   },
   "button.reset-server": {
-    "defaultMessage": "Сбросить сервер"
+    "defaultMessage": "Переустановить сервер"
   },
   "button.retry": {
     "defaultMessage": "Повторить"
@@ -278,6 +323,9 @@
   "collections.label.private": {
     "defaultMessage": "Приватная"
   },
+  "content.card.select-project": {
+    "defaultMessage": "Выбрать {project}"
+  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Вы уверены, что хотите обновить {count, plural, one {# проект} few {# проекта} other {# проектов}} до их последней совместимой версии? Рекомендуется обновлять контент по отдельности."
   },
@@ -330,7 +378,7 @@
     "defaultMessage": "Отвязать"
   },
   "content.diff-modal.added-count": {
-    "defaultMessage": "{count} добавлено"
+    "defaultMessage": "{count, plural, one {# добавление} few {# добавления} other {# добавлений}}"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Добавлен (зависимость)"
@@ -342,13 +390,13 @@
     "defaultMessage": "Обновлён"
   },
   "content.diff-modal.removed-count": {
-    "defaultMessage": "{count, number} {count, plural, one {удаление} few {удаления} other {удалений}}"
+    "defaultMessage": "{count, plural, one {# удаление} few {# удаления} other {# удалений}}"
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Некоторый контент на вашем сервере не может быть анализирован и может быть затронут этим изменением."
   },
   "content.diff-modal.updated-count": {
-    "defaultMessage": "{count, number} {count, plural, one {обновление} few {обновления} other {обновлений}}"
+    "defaultMessage": "{count, plural, one {# обновление} few {# обновления} other {# обновлений}}"
   },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Создание резервной копии..."
@@ -393,7 +441,7 @@
     "defaultMessage": "Пожалуйста, дождитесь завершения операции перед редактированием."
   },
   "content.page-layout.empty.hint": {
-    "defaultMessage": "Найдите или загрузите {contentType}, чтобы начать"
+    "defaultMessage": "Найдите проекты или добавьте файлы"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Добавьте дополнительный контент поверх этой сборки"
@@ -414,10 +462,10 @@
     "defaultMessage": "Ничего не найдено."
   },
   "content.page-layout.please-wait": {
-    "defaultMessage": "Пожалуйста, подождите"
+    "defaultMessage": "Подождите"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Поиск по {count, number} {count, plural, one {проекту} other {проектам}}..."
+    "defaultMessage": "Поиск по {count, plural, one {# проекту} other {# проектам}}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Названия файлов"
@@ -453,37 +501,37 @@
     "defaultMessage": "Добавить файлы"
   },
   "content.selection-bar.all-already-disabled": {
-    "defaultMessage": "Весь выбранный контент уже отключён"
+    "defaultMessage": "Все выбранные проекты уже отключены"
   },
   "content.selection-bar.all-already-enabled": {
-    "defaultMessage": "Весь выбранный контент уже включён"
+    "defaultMessage": "Все выбранные проекты уже включены"
   },
   "content.selection-bar.bulk.deleting": {
-    "defaultMessage": "Удаление {progress}/{total} {contentType}..."
+    "defaultMessage": "Удаление проектов: {progress, number}/⁠{total, number}..."
   },
   "content.selection-bar.bulk.deleting-waiting": {
-    "defaultMessage": "Удаление {contentType}..."
+    "defaultMessage": "Удаление проектов..."
   },
   "content.selection-bar.bulk.disabling": {
-    "defaultMessage": "Отключение {progress}/{total} {contentType}..."
+    "defaultMessage": "Отключение проектов: {progress, number}/⁠{total, number}..."
   },
   "content.selection-bar.bulk.disabling-waiting": {
-    "defaultMessage": "Отключение {contentType}..."
+    "defaultMessage": "Отключение проектов..."
   },
   "content.selection-bar.bulk.enabling": {
-    "defaultMessage": "Включение {progress}/{total} {contentType}..."
+    "defaultMessage": "Включение проектов: {progress, number}/⁠{total, number}..."
   },
   "content.selection-bar.bulk.enabling-waiting": {
-    "defaultMessage": "Включение {contentType}..."
+    "defaultMessage": "Включение проектов..."
   },
   "content.selection-bar.bulk.updating": {
-    "defaultMessage": "Обновление {progress}/{total} {contentType}..."
+    "defaultMessage": "Обновление проектов: {progress, number}/⁠{total, number}..."
   },
   "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "Обновление проекта..."
+    "defaultMessage": "Обновление проектов..."
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} проектов выбрано"
+    "defaultMessage": "{count, plural, one {# проект выбран} few {# проекта выбрано} other {# проектов выбрано}}"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "Выбрано: {count, number}"
@@ -501,28 +549,28 @@
     "defaultMessage": "Импортировать"
   },
   "creation-flow.button.import-instances": {
-    "defaultMessage": "Импортировать {count, plural, one {# сборку} other {# сборки(ок)}}"
+    "defaultMessage": "Импортировать {count, plural, one {# сборку} few {# сборки} other {# сборок}}"
   },
   "creation-flow.button.setup-server": {
-    "defaultMessage": "Настроить сервер"
+    "defaultMessage": "Установить сервер"
   },
   "creation-flow.modal.custom-setup.build-number.label": {
-    "defaultMessage": "Номер сборки игры"
+    "defaultMessage": "Номер сборки"
   },
   "creation-flow.modal.custom-setup.build-number.placeholder": {
-    "defaultMessage": "Выбрать номер сборки игры"
+    "defaultMessage": "Выберите номер сборки"
   },
   "creation-flow.modal.custom-setup.build-number.search-placeholder": {
-    "defaultMessage": "Выбрать номер сборки игры..."
+    "defaultMessage": "Поиск номера сборки..."
   },
   "creation-flow.modal.custom-setup.content-loader.label": {
-    "defaultMessage": "Загрузчик контента"
+    "defaultMessage": "Загрузчик"
   },
   "creation-flow.modal.custom-setup.game-version.placeholder": {
     "defaultMessage": "Выберите версию игры"
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
-    "defaultMessage": "Выбрать версию игры..."
+    "defaultMessage": "Поиск версии игры..."
   },
   "creation-flow.modal.custom-setup.icon.remove": {
     "defaultMessage": "Удалить иконку"
@@ -543,10 +591,10 @@
     "defaultMessage": "Версия загрузчика"
   },
   "creation-flow.modal.custom-setup.loader-version.placeholder": {
-    "defaultMessage": "Выбрать версию загрузчика модов"
+    "defaultMessage": "Выберите версию загрузчика"
   },
   "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
-    "defaultMessage": "Выбрать версию загрузчика модов..."
+    "defaultMessage": "Поиск версии загрузчика..."
   },
   "creation-flow.modal.custom-setup.loader.label": {
     "defaultMessage": "Загрузчик"
@@ -564,7 +612,7 @@
     "defaultMessage": "Дополнительные настройки"
   },
   "creation-flow.modal.final-config.backup.before-reset-server.name": {
-    "defaultMessage": "До перезапуска сервера"
+    "defaultMessage": "До переустановки сервера"
   },
   "creation-flow.modal.final-config.difficulty.easy": {
     "defaultMessage": "Лëгкая"
@@ -606,7 +654,7 @@
     "defaultMessage": "Введите параметры генератора в формате JSON."
   },
   "creation-flow.modal.final-config.generator-settings.custom": {
-    "defaultMessage": "Пользовательский"
+    "defaultMessage": "Пользовательские"
   },
   "creation-flow.modal.final-config.generator-settings.default": {
     "defaultMessage": "По умолчанию"
@@ -615,13 +663,13 @@
     "defaultMessage": "Используется для продвинутой кастомизации мира, например пользовательских слоёв плоского мира."
   },
   "creation-flow.modal.final-config.generator-settings.flat": {
-    "defaultMessage": "Плоский"
+    "defaultMessage": "Плоскость"
   },
   "creation-flow.modal.final-config.generator-settings.label": {
     "defaultMessage": "Настройки генератора"
   },
   "creation-flow.modal.final-config.generator-settings.placeholder": {
-    "defaultMessage": "Выбрать настройки генератора"
+    "defaultMessage": "Выберите настройки генератора"
   },
   "creation-flow.modal.final-config.world-name.label": {
     "defaultMessage": "Название мира"
@@ -744,19 +792,37 @@
     "defaultMessage": "Выбрать сборку модов"
   },
   "creation-flow.title.create-instance": {
-    "defaultMessage": "Создать сборку"
+    "defaultMessage": "Создание сборки"
   },
   "creation-flow.title.create-world": {
-    "defaultMessage": "Создать мир"
+    "defaultMessage": "Создание мира"
   },
   "creation-flow.title.import-instance": {
-    "defaultMessage": "Импортировать сборку"
+    "defaultMessage": "Импорт сборок"
   },
   "creation-flow.title.reset-server": {
-    "defaultMessage": "Сбросить сервер"
+    "defaultMessage": "Переустановка сервера"
   },
   "creation-flow.title.set-up-server": {
-    "defaultMessage": "Настроить сервер"
+    "defaultMessage": "Установка сервера"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "Нет"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Всегда нет"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Неидентифицирован"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "С указанием источника"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "С указанием источника и авторства"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Да"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Итоги распаковки"
@@ -771,7 +837,7 @@
     "defaultMessage": "{count, plural, one {Следующий # файл} few {Следующие # файла} other {Следующие # файлов}} уже есть на сервере. При продолжении {count, plural, =1 {он будет перезаписан} other {они будут перезаписаны}}."
   },
   "files.conflict-modal.overwritten-count": {
-    "defaultMessage": "{count, number} перезаписей"
+    "defaultMessage": "{count, plural, one {# перезапись} few {# перезаписи} other {# перезаписей}}"
   },
   "files.conflict-modal.overwritten-label": {
     "defaultMessage": "Перезапись"
@@ -939,7 +1005,7 @@
     "defaultMessage": "Создать..."
   },
   "files.navbar.file-navigation": {
-    "defaultMessage": "Навигация файла"
+    "defaultMessage": "Файловая навигация"
   },
   "files.navbar.find-in-file": {
     "defaultMessage": "Найти в файле"
@@ -960,7 +1026,7 @@
     "defaultMessage": "Поиск файлов"
   },
   "files.navbar.share-to-mclogs": {
-    "defaultMessage": "Поделиться mclo.gs"
+    "defaultMessage": "Поделиться на mclo.gs"
   },
   "files.navbar.upload-file": {
     "defaultMessage": "Загрузить файл"
@@ -1014,7 +1080,7 @@
     "defaultMessage": "У вас есть несохраненные изменения, которые будут потеряны при выходе. Хотите ли вы сохранить изменения перед выходом?"
   },
   "files.unsaved-changes-modal.discard": {
-    "defaultMessage": "Отменить"
+    "defaultMessage": "Отказаться"
   },
   "files.unsaved-changes-modal.header": {
     "defaultMessage": "Несохранённые изменения"
@@ -1062,7 +1128,7 @@
     "defaultMessage": "Имя"
   },
   "files.validation.name-required": {
-    "defaultMessage": "Требуется название."
+    "defaultMessage": "Укажите имя."
   },
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Установка сборки модов CurseForge"
@@ -1086,13 +1152,13 @@
     "defaultMessage": "URL должен быть правильным."
   },
   "files.zip-url-modal.error-url-required": {
-    "defaultMessage": "Требуется URL."
+    "defaultMessage": "Укажите ссылку."
   },
   "files.zip-url-modal.install-button": {
     "defaultMessage": "Установить"
   },
   "files.zip-url-modal.install-failed-title": {
-    "defaultMessage": "Установка не удалась"
+    "defaultMessage": "Установка не удалась"
   },
   "files.zip-url-modal.step-copy-description": {
     "defaultMessage": "Скопируйте URL страницы версии и вставьте его ниже."
@@ -1199,6 +1265,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Введите край/область"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, one {# байт} few {# байта} many {# байт} other {# байта}}"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} КиБ"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} МиБ"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} ГиБ"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} ТиБ"
+  },
   "header.category.category": {
     "defaultMessage": "Категория"
   },
@@ -1235,14 +1316,17 @@
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Не удалось обновить контент"
   },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "Не удалось установить контент"
+  },
   "hosting.content.failed-to-load-modpack-content": {
-    "defaultMessage": "Не удалось обновить моды из набора"
+    "defaultMessage": "Не удалось загрузить содержимое сборки"
   },
   "hosting.content.failed-to-load-versions": {
     "defaultMessage": "Не удалось загрузить версии"
   },
   "hosting.content.failed-to-remove": {
-    "defaultMessage": "Не удалось удалить "
+    "defaultMessage": "Не удалось удалить контент"
   },
   "hosting.content.failed-to-toggle": {
     "defaultMessage": "Не удалось переключить {name}"
@@ -1266,10 +1350,10 @@
     "defaultMessage": "Не удалось переустановить набор модов"
   },
   "hosting.loader.failed-to-repair": {
-    "defaultMessage": "Не удалось восстановить сервер"
+    "defaultMessage": "Не удалось исправить сервер"
   },
   "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Не удалось сбросить сервер в исходное состояние"
+    "defaultMessage": "Не удалось сбросить сервер до первого запуска"
   },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Не удалось сохранить параметры установки"
@@ -1281,31 +1365,31 @@
     "defaultMessage": "Версия {loader, select, null {загрузчика} other {{loader}}}"
   },
   "hosting.loader.repair-started-text": {
-    "defaultMessage": "Установка вашего сервера была восстановлена."
+    "defaultMessage": "Установка сервера исправлена."
   },
   "hosting.loader.repair-started-title": {
-    "defaultMessage": "Восстановление завершено"
+    "defaultMessage": "Исправление завершено"
   },
   "hosting.loader.reset-server": {
-    "defaultMessage": "Сбросить сервер"
+    "defaultMessage": "Переустановка сервера"
   },
   "hosting.loader.reset-server-description": {
     "defaultMessage": "Удаляет все данные сервера, включая миры, моды и файлы настроек. Резервные копии останутся и их можно будет восстановить."
   },
   "hosting.loader.reset-to-onboarding-button": {
-    "defaultMessage": "Сбросить настройки сервера"
+    "defaultMessage": "Сбросить до первого запуска"
   },
   "hosting.loader.reset-to-onboarding-modal-description": {
     "defaultMessage": "Это действие вернет сервер на этап изначальной настройки для её повторного прохождения. Вы уверены, что хотите продолжить?"
   },
   "hosting.loader.reset-to-onboarding-modal-title": {
-    "defaultMessage": "Вернуть к изначальным настройкам"
+    "defaultMessage": "Сброс до первого запуска"
   },
   "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Сервер возвращён до исходного состояния."
+    "defaultMessage": "Сервер возвращён к процессу настройки до первого запуска."
   },
   "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Сервер переустановлен"
+    "defaultMessage": "Сервер сброшен до первого запуска"
   },
   "hosting.loader.support-options-title": {
     "defaultMessage": "Настройки поддержки"
@@ -1359,7 +1443,7 @@
     "defaultMessage": "Выберите версию игры"
   },
   "installation-settings.aria.select-loader-version": {
-    "defaultMessage": "Выбрать версию {loader}"
+    "defaultMessage": "Выберите версию {loader}"
   },
   "installation-settings.aria.select-platform": {
     "defaultMessage": "Выберите платформу"
@@ -1374,7 +1458,7 @@
     "defaultMessage": "Просмотреть изменения контента"
   },
   "installation-settings.edit-installation.title": {
-    "defaultMessage": "Редактировать установку"
+    "defaultMessage": "Настройка установки"
   },
   "installation-settings.edit.warning-instance": {
     "defaultMessage": "Мы не рекомендуем изменять настройки сборки после установки контента. Если вы всё же хотите их изменить, будьте осторожны, так как это может вызвать проблемы."
@@ -1428,13 +1512,13 @@
     "defaultMessage": "Удалён (несовместимо)"
   },
   "installation-settings.repair.instance-description": {
-    "defaultMessage": "Переустанавливает зависимости Minecraft, и ищет искажения. Это может исправить проблемы, если ваша игра не запускает из ошибок, связанных с лаунчером."
+    "defaultMessage": "Переустанавливает зависимости Minecraft и восстанавливает повреждённые файлы. Может устранить проблемы с запуском из‑за ошибок лаунчера."
   },
   "installation-settings.repair.instance-title": {
     "defaultMessage": "Исправление сборки"
   },
   "installation-settings.repair.server-description": {
-    "defaultMessage": "Переустанавливает загрузчик и зависимости Minecraft без удаления вашего контента. Это может исправить ошибки, если ваш сервер не запускается правильно."
+    "defaultMessage": "Переустанавливает загрузчик и зависимости Minecraft. Контент останется. Может устранить проблемы с запуском сервера."
   },
   "installation-settings.repair.server-title": {
     "defaultMessage": "Исправление сервера"
@@ -1467,7 +1551,7 @@
     "defaultMessage": "Переустановить сборку"
   },
   "instance.confirm-repair.body": {
-    "defaultMessage": "Восстановление заново устанавливает загрузчик и зависимости Minecraft без удаления вашего контента. Это может решить проблемы, если ваш {type, select, server {сервер запускается некорректно} other {запуск игры прерывается из-за ошибок лаунчера}}."
+    "defaultMessage": "Будут переустановлены загрузчик и зависимости Minecraft. Контент останется. Может устранить проблемы {type, select, server {с запуском сервера} other {с запуском из‑за ошибок лаунчера}}."
   },
   "instance.confirm-repair.header": {
     "defaultMessage": "Исправление {type, select, server {сервера} other {сборки}}"
@@ -1491,7 +1575,7 @@
     "defaultMessage": "Неизвестный режим игры"
   },
   "instances.content-install.compatible-count": {
-    "defaultMessage": "{count} совместимо со {count, plural, one {сборкой} other {сборками}}"
+    "defaultMessage": "{count, plural, one {# совместимая сборка} few {# совместимые сборки} other {# совместимых сборок}}"
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Существующая сборка"
@@ -1524,7 +1608,7 @@
     "defaultMessage": "Новая сборка"
   },
   "instances.content-install.no-instances": {
-    "defaultMessage": "Нет совместимых сборок"
+    "defaultMessage": "Совместимые сборки не найдены"
   },
   "instances.content-install.remove-icon": {
     "defaultMessage": "Удалить иконку"
@@ -1596,7 +1680,7 @@
     "defaultMessage": "Показать несовместимые"
   },
   "instances.updater-modal.switch-to": {
-    "defaultMessage": "Переключиться на {version}"
+    "defaultMessage": "Сменить на {version}"
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Обновить до {version}"
@@ -1638,13 +1722,13 @@
     "defaultMessage": "Контент"
   },
   "label.copied-filename": {
-    "defaultMessage": "Название файла скопировано"
+    "defaultMessage": "Имя файла скопировано"
   },
   "label.copied-path": {
-    "defaultMessage": "Скопирован путь"
+    "defaultMessage": "Путь скопирован"
   },
   "label.create-failed": {
-    "defaultMessage": "Создание не удалось"
+    "defaultMessage": "Создание не удалось"
   },
   "label.created-ago": {
     "defaultMessage": "Создан {ago}"
@@ -1656,10 +1740,10 @@
     "defaultMessage": "Удалить"
   },
   "label.delete-failed": {
-    "defaultMessage": "Удаление не удалось"
+    "defaultMessage": "Удаление не удалось"
   },
   "label.delete-immediately": {
-    "defaultMessage": "Удалить немедленно"
+    "defaultMessage": "Удалить сразу"
   },
   "label.description": {
     "defaultMessage": "Описание"
@@ -1668,10 +1752,10 @@
     "defaultMessage": "Сведения"
   },
   "label.done": {
-    "defaultMessage": "Завершено"
+    "defaultMessage": "Готово"
   },
   "label.download-failed": {
-    "defaultMessage": "Установка не удалась"
+    "defaultMessage": "Скачивание не удалось"
   },
   "label.email": {
     "defaultMessage": "Почта"
@@ -1683,10 +1767,13 @@
     "defaultMessage": "Ошибка"
   },
   "label.extract-failed": {
-    "defaultMessage": "Извлечение не удалось"
+    "defaultMessage": "Распаковка не удалась"
   },
   "label.filter-by": {
     "defaultMessage": "Фильтровать по"
+  },
+  "label.filters": {
+    "defaultMessage": "Фильтры"
   },
   "label.followed-projects": {
     "defaultMessage": "Отслеживаемые проекты"
@@ -1694,14 +1781,26 @@
   "label.game-version": {
     "defaultMessage": "Версия игры"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "Скрывать установленные"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "Скрывать выбранные"
+  },
   "label.installation-info": {
-    "defaultMessage": "Информация об установке"
+    "defaultMessage": "Сведения об установке"
+  },
+  "label.installed": {
+    "defaultMessage": "Установлено"
   },
   "label.installed-modpack": {
     "defaultMessage": "Установленная сборка"
   },
   "label.installing": {
     "defaultMessage": "Установка..."
+  },
+  "label.installing-content": {
+    "defaultMessage": "Установка контента"
   },
   "label.loading": {
     "defaultMessage": "Загрузка..."
@@ -1713,7 +1812,7 @@
     "defaultMessage": "Сборка"
   },
   "label.move-failed": {
-    "defaultMessage": "Перемещение не удалось"
+    "defaultMessage": "Перемещение не удалось"
   },
   "label.no": {
     "defaultMessage": "Нет"
@@ -1761,7 +1860,7 @@
     "defaultMessage": "Отклонена"
   },
   "label.rename-failed": {
-    "defaultMessage": "Переименование не удалось"
+    "defaultMessage": "Переименование не удалось"
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "Я принимаю <terms-link>условия программы вознаграждений</terms-link>"
@@ -1778,8 +1877,11 @@
   "label.select-all": {
     "defaultMessage": "Выбрать всё"
   },
+  "label.selected": {
+    "defaultMessage": "Выбрано"
+  },
   "label.selection-actions": {
-    "defaultMessage": "Действия выбора"
+    "defaultMessage": "Действия с выбранным"
   },
   "label.server": {
     "defaultMessage": "Сервер"
@@ -1797,7 +1899,7 @@
     "defaultMessage": "Сортировка: "
   },
   "label.success": {
-    "defaultMessage": "Успех"
+    "defaultMessage": "Готово"
   },
   "label.title": {
     "defaultMessage": "Название"
@@ -1820,8 +1922,14 @@
   "label.username": {
     "defaultMessage": "Имя пользователя"
   },
+  "label.validating": {
+    "defaultMessage": "Проверка"
+  },
   "label.version": {
     "defaultMessage": "Версия"
+  },
+  "label.view": {
+    "defaultMessage": "Вид"
   },
   "label.visibility": {
     "defaultMessage": "Видимость"
@@ -1980,7 +2088,7 @@
     "defaultMessage": "Ошибка"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Размещён"
+    "defaultMessage": "Публичный"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Модератор"
@@ -2019,7 +2127,7 @@
     "defaultMessage": "Отклонён"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "На удержании"
+    "defaultMessage": "Скрыт модератором"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Копировать код"
@@ -2079,7 +2187,7 @@
     "defaultMessage": "JCB"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
+    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -2127,7 +2235,7 @@
     "defaultMessage": "Всё"
   },
   "project-type.datapack.capital": {
-    "defaultMessage": "{count, plural, one {Наборов данных} few {Набора данных} many {Наборов данных} other {Наборов данных}}"
+    "defaultMessage": "{count, plural, one {набор данных} few {набора данных} other {наборов данных}}"
   },
   "project-type.datapack.category": {
     "defaultMessage": "Наборы данных"
@@ -2136,7 +2244,7 @@
     "defaultMessage": "{count, plural, one {набор данных} few {набора данных} other {наборов данных}}"
   },
   "project-type.mod.capital": {
-    "defaultMessage": "{count, plural, one {Мод} few {Мода} many {Модов} other {Модов}}"
+    "defaultMessage": "{count, plural, one {мод} few {мода} other {модов}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Моды"
@@ -2145,7 +2253,7 @@
     "defaultMessage": "{count, plural, one {мод} few {мода} other {модов}}"
   },
   "project-type.modpack.capital": {
-    "defaultMessage": "{count, plural, one {Сборка} few {Сборки} many {Сборок} other {Сборок}}"
+    "defaultMessage": "{count, plural, one {сборка} few {сборки} other {сборок}}"
   },
   "project-type.modpack.category": {
     "defaultMessage": "Сборки"
@@ -2154,7 +2262,7 @@
     "defaultMessage": "{count, plural, one {сборка} few {сборки} other {сборок}}"
   },
   "project-type.plugin.capital": {
-    "defaultMessage": "{count, plural, one {Плагин} few {Плагина} many {Плагинов} other {Плагинов}}"
+    "defaultMessage": "{count, plural, one {плагин} few {плагина} other {плагинов}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "Плагины"
@@ -2163,7 +2271,7 @@
     "defaultMessage": "{count, plural, one {плагин} few {плагина} other {плагинов}}"
   },
   "project-type.project.capital": {
-    "defaultMessage": "{count, plural, one {Проект} other {Проекта}}"
+    "defaultMessage": "{count, plural, one {проект} few {проекта} other {проектов}}"
   },
   "project-type.project.category": {
     "defaultMessage": "Проекты"
@@ -2172,7 +2280,7 @@
     "defaultMessage": "{count, plural, one {проект} few {проекта} other {проектов}}"
   },
   "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, one {Набор Ресурсов} few {Набора Ресурсов} many {Наборов Ресурсов} other {Наборов Ресурсов}}"
+    "defaultMessage": "{count, plural, one {набор ресурсов} few {набора ресурсов} other {наборов ресурсов}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Наборы ресурсов"
@@ -2181,7 +2289,7 @@
     "defaultMessage": "{count, plural, one {набор ресурсов} few {набора ресурсов} other {наборов ресурсов}}"
   },
   "project-type.server.capital": {
-    "defaultMessage": "{count, plural, one {Сервер} few {Сервера} many {Серверов} other {Сервера}}"
+    "defaultMessage": "{count, plural, one {сервер} few {сервера} other {серверов}}"
   },
   "project-type.server.category": {
     "defaultMessage": "Серверы"
@@ -2190,7 +2298,7 @@
     "defaultMessage": "{count, plural, one {сервер} few {сервера} other {серверов}}"
   },
   "project-type.shader.capital": {
-    "defaultMessage": "{count, plural, one {Шейдер} few {Шейдера} many {Шейдеров} other {Шейдеров}}"
+    "defaultMessage": "{count, plural, one {шейдер} few {шейдера} other {шейдеров}}"
   },
   "project-type.shader.category": {
     "defaultMessage": "Шейдеры"
@@ -2313,7 +2421,7 @@
     "defaultMessage": "Регион"
   },
   "project.about.server.requiredContent": {
-    "defaultMessage": "Необходимый контент"
+    "defaultMessage": "Необходимая сборка"
   },
   "project.about.server.title": {
     "defaultMessage": "О сервере"
@@ -2337,7 +2445,7 @@
     "defaultMessage": "Клиент и сервер, необязателен для сервера"
   },
   "project.environment.client-only.description": {
-    "defaultMessage": "Вся функциональность сделана для клиента и совместима с немодифицированными серверами."
+    "defaultMessage": "Вся функциональность сделана для клиента и совместима с ванильными серверами."
   },
   "project.environment.client-only.title": {
     "defaultMessage": "Только для клиента"
@@ -2355,7 +2463,7 @@
     "defaultMessage": "Клиент и сервер, необязателен для обоих"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Вся функциональность сделана для сервера и совместима с не модифицированными клиентами. Работает только на выделенных серверах."
+    "defaultMessage": "Вся функциональность сделана для сервера и совместима с ванильными клиентами. Работает только на выделенном сервере."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Только для сервера"
@@ -2367,7 +2475,7 @@
     "defaultMessage": "Клиент и сервер, необязателен для клиента"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "Вся функциональность сделана для сервера и совместима с немодифицированными клиентами. Работает в том числе на встроенном сервере одиночной игры."
+    "defaultMessage": "Вся функциональность сделана для сервера и совместима с ванильными клиентами. Работает в том числе на встроенном сервере одиночной игры."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Только для сервера, также работает в одиночной игре"
@@ -2697,7 +2805,7 @@
     "defaultMessage": "Клиент и сервер"
   },
   "project.settings.environment.client_only.description": {
-    "defaultMessage": "Вся функциональность сделана для клиента и совместима с немодифицированными серверами."
+    "defaultMessage": "Вся функциональность сделана для клиента и совместима с ванильными серверами."
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Только для клиента"
@@ -2730,7 +2838,7 @@
     "defaultMessage": "Только для выделенного сервера"
   },
   "project.settings.environment.server_only.description": {
-    "defaultMessage": "Вся функциональность сделана для сервера и совместима с немодифицированными клиентами."
+    "defaultMessage": "Вся функциональность сделана для сервера и совместима с ванильными клиентами."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
     "defaultMessage": "Также работает в одиночной игре"
@@ -2789,6 +2897,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "Добавление"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Атрибуции"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "Версии"
   },
@@ -2832,7 +2943,7 @@
     "defaultMessage": "Скрыт"
   },
   "project.visibility.unlisted-by-staff": {
-    "defaultMessage": "Скрыт модерацией"
+    "defaultMessage": "Скрыт модератором"
   },
   "s.bg": {
     "defaultMessage": "Выполняется фоновая задача"
@@ -3063,7 +3174,7 @@
     "defaultMessage": "Создать резервную копию"
   },
   "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Авто"
+    "defaultMessage": "Автоматические"
   },
   "servers.backups.toolbar.filter-manual": {
     "defaultMessage": "Ручные"
@@ -3082,6 +3193,54 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "Синхронизация контента в процессе"
+  },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "Установка не удалась"
+  },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "Во время установки платформы произошла внутренняя ошибка. Попробуйте ещё раз."
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "Не удалось установить указанную версию загрузчика или Minecraft. Возможно, она недействительна или не поддерживается."
+  },
+  "servers.installing-banner.error.modpack-install-failed": {
+    "defaultMessage": "Не удалось установить сборку модов. Возможно, она повреждена или несовместима."
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "Может Эта версия сборки не содержит загрузочного файла. Возможно, она была собрана неправильно."
+  },
+  "servers.installing-banner.error.unknown": {
+    "defaultMessage": "Во время установки произошла непредвиденная ошибка."
+  },
+  "servers.installing-banner.error.unsupported-loader-version": {
+    "defaultMessage": "Эта версия Minecraft или загрузчика пока не поддерживается Modrinth Hosting."
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "Установка дополнений..."
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "Установка сборки..."
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "Установка платформы..."
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "Подготовка сервера"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "Добавление Java..."
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "Настройка сервера..."
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "Скачивание модов..."
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "Упорядочивание файлов..."
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "Настройка среды..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Уже есть сервер?"
@@ -3240,7 +3399,7 @@
     "defaultMessage": "Перезагрузить"
   },
   "servers.manage.resubscribe-error.text": {
-    "defaultMessage": "Произошла ошибка при возобновлении подписки на вашем сервере Modrinth."
+    "defaultMessage": "Произошла ошибка при возобновлении подписки на сервер Modrinth."
   },
   "servers.manage.resubscribe-error.title": {
     "defaultMessage": "Не удалось возобновить подписку"
@@ -3255,7 +3414,7 @@
     "defaultMessage": "Подписка на сервер успешно возобновлена"
   },
   "servers.manage.resubscribe-success.title": {
-    "defaultMessage": "Успех"
+    "defaultMessage": "Готово"
   },
   "servers.manage.search-placeholder": {
     "defaultMessage": "Поиск по {count, plural, one {# серверу} other {# серверам}}..."
@@ -3417,7 +3576,7 @@
     "defaultMessage": "Произошла непредвиденная ошибка во время установки. Пожалуйста, попробуйте позже."
   },
   "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Установка не удалась"
+    "defaultMessage": "Установка не удалась"
   },
   "servers.setup.onboarding.modpack-upload-failed.text": {
     "defaultMessage": "Произошла непредвиденная ошибка во время загрузки. Пожалуйста, попробуйте снова позже."
@@ -3426,7 +3585,7 @@
     "defaultMessage": "Загрузка сборки не удалась"
   },
   "servers.setup.onboarding.setup-server.button": {
-    "defaultMessage": "Настроить сервер"
+    "defaultMessage": "Установить сервер"
   },
   "servers.setup.onboarding.step.choose.description": {
     "defaultMessage": "Выберите вашу любимую сборку из Modrinth, или выберите загрузчик и добавьте нужные моды."
@@ -3549,7 +3708,7 @@
     "defaultMessage": "Язык"
   },
   "settings.language.warning": {
-    "defaultMessage": "Изменение языка {platform} может привести к тому, что часть контента будет отображаться на английском, если перевод отсутствует. Платформа {platform} ещё не полностью переведена, поэтому в некоторых языках часть текста может оставаться на английском."
+    "defaultMessage": "При смене языка некоторые элементы {platform} могут отображаться на английском, если их перевод недоступен или пока невозможен."
   },
   "settings.pats.title": {
     "defaultMessage": "Личные токены доступа"
@@ -4005,7 +4164,7 @@
     "defaultMessage": "{count, plural, one {# уведомление} few {# уведомления} other {# уведомлений}}"
   },
   "ui.stacked-admonitions.dismiss-all": {
-    "defaultMessage": "Отклонить все"
+    "defaultMessage": "Закрыть всё"
   }
 }
 

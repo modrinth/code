@@ -657,6 +657,7 @@ watch(
 	[collection, creator],
 	([col, cre]) => {
 		if (col && cre) {
+			const canonicalUrl = col ? `https://modrinth.com/collection/${col.id}` : undefined
 			useSeoMeta({
 				title: formatMessage(messages.collectionTitle, { name: col.name }),
 				description: formatMessage(messages.collectionDescription, {
@@ -667,7 +668,16 @@ watch(
 				ogTitle: formatMessage(messages.collectionTitle, { name: col.name }),
 				ogDescription: col.description,
 				ogImage: col.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+				ogUrl: canonicalUrl,
 				robots: col.status === 'listed' ? 'all' : 'noindex',
+			})
+			useHead({
+				link: [
+					{
+						rel: 'canonical',
+						href: canonicalUrl,
+					},
+				],
 			})
 		}
 	},

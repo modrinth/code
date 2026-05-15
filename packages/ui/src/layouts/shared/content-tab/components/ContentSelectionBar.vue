@@ -2,6 +2,7 @@
 import { PowerIcon, PowerOffIcon, XIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
+import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -93,6 +94,13 @@ const emit = defineEmits<{
 }>()
 
 const shown = computed(() => props.selectedItems.length > 0 || props.isBulkOperating)
+const iconStackOffset = 24
+const visibleItems = computed(() => props.selectedItems.slice(0, 3))
+const overflowCount = computed(() => Math.max(0, props.selectedItems.length - 3))
+const iconStackWidth = computed(() => {
+	if (props.selectedItems.length === 0) return 0
+	return 32 + (visibleItems.value.length - 1 + (overflowCount.value > 0 ? 1 : 0)) * iconStackOffset
+})
 
 const allDisabled = computed(() => props.selectedItems.every((m) => !m.enabled))
 const allEnabled = computed(() => props.selectedItems.every((m) => m.enabled))
@@ -130,10 +138,41 @@ const bulkProgressMessage = computed(() => {
 <template>
 	<FloatingActionBar :shown="shown" :aria-label="ariaLabel">
 		<div class="flex items-center gap-0.5">
-			<span class="px-4 py-2.5 text-base font-semibold text-contrast tabular-nums">
+			<div
+				v-if="selectedItems.length > 0"
+				class="relative h-8 shrink-0"
+				:style="{ width: `${iconStackWidth}px` }"
+				aria-hidden="true"
+			>
+				<div
+					v-for="(item, index) in visibleItems"
+					:key="item.id"
+					v-tooltip="item.project?.title ?? item.file_name"
+					class="absolute top-0 flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4"
+					:style="{ left: `${index * iconStackOffset}px`, zIndex: visibleItems.length - index }"
+				>
+					<Avatar
+						:src="item.project?.icon_url"
+						:alt="item.project?.title ?? item.file_name"
+						:tint-by="item.id"
+						size="100%"
+						no-shadow
+						class="selected-content-avatar"
+					/>
+				</div>
+				<div
+					v-if="overflowCount > 0"
+					class="absolute top-0 flex h-8 w-8 items-center justify-center rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4 text-xs font-bold text-contrast"
+					:style="{ left: `${visibleItems.length * iconStackOffset}px`, zIndex: 0 }"
+				>
+					+{{ overflowCount }}
+				</div>
+			</div>
+
+			<span class="px-3 py-2 text-base font-semibold text-contrast tabular-nums">
 				{{ selectedCountText }}
 			</span>
-			<div class="mx-1 h-6 w-px bg-surface-5" />
+			<div class="mx-0.5 h-6 w-px bg-surface-5" />
 			<ButtonStyled type="transparent">
 				<button
 					v-tooltip="formatMessage(commonMessages.clearButton)"
@@ -222,5 +261,9 @@ const bulkProgressMessage = computed(() => {
 
 .animate-indeterminate {
 	animation: indeterminate 1.5s ease-in-out infinite;
+}
+
+:deep(.selected-content-avatar) {
+	background-color: var(--color-button-bg);
 }
 </style>

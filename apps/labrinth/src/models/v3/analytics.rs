@@ -54,6 +54,8 @@ pub enum DownloadReason {
     Dependency,
     /// Project was downloaded as part of a modpack.
     Modpack,
+    /// Project was re-downloaded due to an update.
+    Update,
 }
 
 impl std::str::FromStr for DownloadReason {

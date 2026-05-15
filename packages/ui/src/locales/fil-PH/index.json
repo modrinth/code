@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Tingnan ang analitika"
   },
+  "badge.alpha": {
+    "defaultMessage": "Alpha"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -284,6 +287,15 @@
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Nakabukas na ang lahat ng piniling kontento"
   },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "Karagdagang settings"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "Magdagdag"
+  },
+  "creation-flow.modal.import-instance.launcher-path.add": {
+    "defaultMessage": "Magdagdag ng launcher path"
+  },
   "files.editor.find-close": {
     "defaultMessage": "Isara"
   },
@@ -329,6 +341,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "Nakapatay ang mga operasyon sa talaksan habang ang operasyon ay isinasagawa."
   },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Error sa pagpatakbo ng dry run"
+  },
   "files.navbar.back-to-home": {
     "defaultMessage": "Bumalik sa tahanan"
   },
@@ -362,14 +377,26 @@
   "files.upload-dropdown.cancelled": {
     "defaultMessage": "Kinansela"
   },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Nabigo - {error}"
+  },
   "files.upload-dropdown.file": {
     "defaultMessage": "Talaksan"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Isang di-inaasahang error na naganap."
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} natitira"
   },
   "files.validation.name-label": {
     "defaultMessage": "Pangalan"
   },
   "files.zip-url-modal.install-button": {
     "defaultMessage": "I-install"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "Isang di-kilalang error na naganap"
   },
   "form.label.address-line": {
     "defaultMessage": "Address line"
@@ -550,6 +577,9 @@
   },
   "installation-settings.removed-incompatible": {
     "defaultMessage": "Tinanggal (di-magkatugma)"
+  },
+  "installation-settings.repair.instance-description": {
+    "defaultMessage": "Ire-reinstall ang mga dependency ng Minecraft at susuriin para sa pagkasira. Maaari nitong malutas ang mga isyu kung ang laro ay hindi lumulunsad dahil sa mga error na magkaugnay sa launcher."
   },
   "installation-settings.saving": {
     "defaultMessage": "Sine-save..."
@@ -936,7 +966,7 @@
     "defaultMessage": "Bakit Modrinth App ang gamitin"
   },
   "notification.error.title": {
-    "defaultMessage": "Isang kamaliang naganap"
+    "defaultMessage": "Isang error na naganap"
   },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Tinanggap"
@@ -958,9 +988,6 @@
   },
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Nabigo"
-  },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listed"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
@@ -997,9 +1024,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Bumigo"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Ipinagkait"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopyahin ang code sa clipboard"
@@ -1910,6 +1934,9 @@
   "servers.backups.item.restore": {
     "defaultMessage": "I-restore"
   },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "Mayroon ka nang server?"
+  },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Mag-sign-in"
   },
@@ -1922,11 +1949,29 @@
   "servers.listing.support-label": {
     "defaultMessage": "Suporta"
   },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "Nagsusuri para sa mga bagong server..."
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "Detalye ng error:"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "Isang error na naganap"
+  },
   "servers.manage.reload-button": {
     "defaultMessage": "Mag-reload"
   },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "Isang error ang naganap habang pagre-resubscribe sa iyong Modrinth server."
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "Error sa muling pag-subscribe"
+  },
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Tagumpay"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {araw} other {na araw}} <hours-count>{hours}</hours-count> {hours, plural, one {oras} other {na oras}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minuto} other {na minuto}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {segundo} other {na segundo}} ang natitira..."
   },
   "servers.medal-listing.upgrade-button": {
     "defaultMessage": "I-upgrade"
@@ -2030,8 +2075,14 @@
   "servers.region.western-europe": {
     "defaultMessage": "Kanlurang Yuropa"
   },
+  "servers.setup.onboarding.installation-failed.text": {
+    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-install. Mangyaring subukan muli mamaya."
+  },
+  "servers.setup.onboarding.modpack-upload-failed.text": {
+    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-upload. Mangyaring subukan muli mamaya."
+  },
   "servers.setup.reinstall-failed.text": {
-    "defaultMessage": "Isang di-inaasahang kamaliang nangyari habang nagre-reinstall. Mangyraing subukan muli makaya."
+    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-reinstall. Mangyaring subukan muli mamaya."
   },
   "settings.account.title": {
     "defaultMessage": "Account at seguridad"

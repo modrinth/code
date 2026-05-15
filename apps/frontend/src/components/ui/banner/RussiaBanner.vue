@@ -47,7 +47,7 @@ function hideRussiaCensorshipBanner() {
 						<span class="text-xs font-medium">(Перевод на русский)</span>
 					</nuxt-link>
 				</ButtonStyled>
-				<ButtonStyled>
+				<ButtonStyled type="transparent" hover-color-fill="background">
 					<nuxt-link to="/news/article/standing-by-our-values">
 						<BookTextIcon /> Read our full statement
 						<span class="text-xs font-medium">(English)</span>
@@ -55,7 +55,7 @@ function hideRussiaCensorshipBanner() {
 				</ButtonStyled>
 			</div>
 		</template>
-		<template #actions_right>
+		<template #actions_top_right>
 			<ButtonStyled circular type="transparent">
 				<button
 					v-tooltip="formatMessage(commonMessages.closeButton)"

@@ -49,6 +49,20 @@ export class ArchonContentV1Module extends AbstractModule {
 		})
 	}
 
+	/** POST /v1/:server_id/worlds/:world_id/addons/install-many */
+	public async addAddons(
+		serverId: string,
+		worldId: string,
+		addons: Archon.Content.v1.AddAddonRequest[],
+	): Promise<void> {
+		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/install-many`, {
+			api: 'archon',
+			version: 1,
+			method: 'POST',
+			body: addons satisfies Archon.Content.v1.AddAddonsRequest,
+		})
+	}
+
 	/** POST /v1/:server_id/worlds/:world_id/addons/delete */
 	public async deleteAddon(
 		serverId: string,

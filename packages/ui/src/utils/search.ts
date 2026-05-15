@@ -59,6 +59,14 @@ export type FilterValue = {
 	negative?: boolean
 }
 
+export const LOADER_FILTER_TYPES = [
+	'mod_loader',
+	'plugin_loader',
+	'modpack_loader',
+	'shader_loader',
+	'plugin_platform',
+] as const
+
 export interface GameVersion {
 	version: string
 	version_type: 'release' | 'snapshot' | 'alpha' | 'beta'

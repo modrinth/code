@@ -381,7 +381,7 @@
     "message": "Gyűjtemény szerkesztése"
   },
   "collection.error.not-found": {
-    "message": "Nncs ilyen gyűjtemény"
+    "message": "Nincs ilyen gyűjtemény"
   },
   "collection.label.created-at": {
     "message": "Létrehozva {ago}"
@@ -604,6 +604,9 @@
   },
   "dashboard.collections.long-title": {
     "message": "Gyűjteményeid"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Gyűjtemények keresése"
   },
   "dashboard.collections.sort.name-ascending": {
     "message": "Név (A-Z)"
@@ -1204,6 +1207,9 @@
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Töltsd ki az adóbevallási űrlapot"
+  },
+  "discover.install.back-to-server": {
+    "message": "Vissza a szerverhez"
   },
   "error.collection.404.list_item.1": {
     "message": "Elírhatad a gyűjtemémyed linkjét."
@@ -1848,7 +1854,7 @@
     "message": "Menü megnyitása"
   },
   "layout.nav.active-reports": {
-    "message": "Aktív Bejelentések"
+    "message": "Aktív jelentések"
   },
   "layout.nav.discover": {
     "message": "Felfedezés"
@@ -1903,9 +1909,6 @@
   },
   "moderation.page.reports": {
     "message": "Jelentések"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Műszaki áttekintés"
   },
   "muralpay.account-type.checking": {
     "message": "Ellenőrzés"

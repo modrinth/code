@@ -1229,6 +1229,33 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Por favor, complete seu formulário fiscal"
   },
+  "discover.install.back-to-server": {
+    "message": "Voltar ao servidor"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Voltar à configuração"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Cancelar redefinição"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Não há nenhum mundo de servidor disponível para instalação."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Este tipo de conteúdo não pode ser instalado em um servidor pelo explorar."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Selecionando o pacote de mods para instalar após a redefinição"
+  },
+  "discover.seo.description": {
+    "message": "Busque e explore milhares de {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {shaders} plugin {plugins} datapack {pacotes de dados} other {projetos}} de Minecraft no Modrinth com resultados de busca instantâneos e precisos. Nossos filtros ajudam você a encontrar rapidamente os melhores {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {shaders} plugin {plugins} datapack {pacotes de dados} other {projetos}} de Minecraft."
+  },
+  "discover.seo.title": {
+    "message": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {shaders} plugin {plugins} datapack {pacotes de dados} other {projetos}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {shaders} plugin {plugins} datapack {pacotes de dados} other {projetos}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "Você pode ter digitado incorretamente o URL da coleção."
   },
@@ -1243,6 +1270,12 @@
   },
   "error.collection.404.title": {
     "message": "Coleção não encontrada"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Você está acessando como:"
+  },
+  "error.generic.401.title": {
+    "message": "Você não possui acesso a essa página"
   },
   "error.generic.404.subtitle": {
     "message": "Parece que a página que você estava procurando não existe."
@@ -1670,6 +1703,9 @@
   "layout.action.create-new": {
     "message": "Criar novo..."
   },
+  "layout.action.external-projects": {
+    "message": "Projetos externos"
+  },
   "layout.action.file-lookup": {
     "message": "Procurar arquivo"
   },
@@ -1921,6 +1957,9 @@
   },
   "moderation.moderate": {
     "message": "Moderar"
+  },
+  "moderation.page.external-projects": {
+    "message": "Projetos externos"
   },
   "moderation.page.projects": {
     "message": "Projetos"
@@ -2615,6 +2654,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Forneça a prova que possui permissão para redistribuir todos os seguintes arquivos e a versão retida será publicada automaticamente."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Forneça a prova que possui permissão para redistribuir todos os seguintes arquivos antes de apresentar seu projeto para revisão."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Conteúdo incluso desconhecido"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Todos os conteúdos externos possuem atribuição inclusa."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Atribuições concluídas!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Nenhuma de suas versões contém conteúdo externo, não há o que se preocupar sobre adquirir permissões."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Tudo joia!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Você não possui permissão para redistribuir algum dos conteúdos externos que adicionou. Para poder publicar no Modrinth, remova os conteúdos que infringem."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Alguns conteúdos não puderam ser incluídos"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Se você incluir conteúdo que não é fornecido pelo Modrinth, você precisa nos contar de onde isso vem e verificar que você tem permissão para distribuir os arquivos. Veja <link>nosso guia</link> para saber mais como fazer do jeito certo!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Saiba como atribuições funcionam"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Saber mais"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Buscar {count} {count, plural,one {projeto externo} other {projetos externos}}..."
+  },
   "project.settings.title": {
     "message": "Configurações"
   },
@@ -2632,6 +2710,15 @@
   },
   "project.versions.title": {
     "message": "Versões"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Esta versão está atualmente retida e não listada} other {Estas versões estão atualmente retidas e não listadas}} publicamente. Por favor, forneça prova de que você tem permissão para redistribuir certos arquivos incluídos {count, plural, one {na versão} other {nas versões}} do pacote de mods."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Resolver"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural,one {Versão {version_name} retida} other {Versões retidas}} por conteúdo incluso desconhecido"
   },
   "report.already-reported": {
     "message": "Você já denunciou este {title}"
@@ -3001,6 +3088,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Sincronizar com o servidor"
+  },
+  "servers.manage.content.title": {
+    "message": "Conteúdo - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "Ações"

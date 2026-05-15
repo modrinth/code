@@ -990,7 +990,7 @@
     "message": "Иконка для {title}"
   },
   "dashboard.projects.project.moderator-message-aria": {
-    "message": "Проект получил сообщение от модерации. Посмотрите страницу проекта чтобы увидеть больше."
+    "message": "Проект получил сообщение от модерации. Посмотрите страницу проекта, чтобы увидеть больше."
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Пожалуйста, проверьте файл metadata"
@@ -1229,6 +1229,33 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Заполните налоговую форму"
   },
+  "discover.install.back-to-server": {
+    "message": "Вернуться к серверу"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Вернуться к установке"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Отменить сброс"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Нет доступного мира сервера для установки."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Этот тип контента не поддерживается для установки на сервер."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Выбор сборки модов для установки после сброса"
+  },
+  "discover.seo.description": {
+    "message": "Тысячи {projectType, select, mod {модов} modpack {сборок} resourcepack {наборов ресурсов} shader {шейдеров} plugin {плагинов} datapack {наборов данных} other {проектов}} для Minecraft на Modrinth. Мгновенный точный поиск и удобные фильтры помогут быстро найти лучшие {projectType, select, mod {моды} modpack {сборки} resourcepack {наборы ресурсов} shader {шейдеры} plugin {плагины} datapack {наборы данных} other {проекты}} для Minecraft."
+  },
+  "discover.seo.title": {
+    "message": "Поиск {projectType, select, mod {модов} modpack {сборок} resourcepack {наборов ресурсов} shader {шейдеров} plugin {плагинов} datapack {наборов данных} other {проектов}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Поиск {projectType, select, mod {модов} modpack {сборок} resourcepack {наборов ресурсов} shader {шейдеров} plugin {плагинов} datapack {наборов данных} other {проектов}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "В адресе коллекции может быть ошибка."
   },
@@ -1243,6 +1270,12 @@
   },
   "error.collection.404.title": {
     "message": "Коллекция не найдена"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Текущий аккаунт:"
+  },
+  "error.generic.401.title": {
+    "message": "У вас нет доступа к этой странице"
   },
   "error.generic.404.subtitle": {
     "message": "Похоже, такой страницы не существует."
@@ -1551,7 +1584,7 @@
     "message": "Данные и статистика"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Получайте внимание тысяч пользователей через поиск, главную страницу, сервер Discord и другие способы в будущем!"
+    "message": "Получайте внимание тысяч игроков через поиск, главную, Discord и другие способы в будущем!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Заметность"
@@ -1669,6 +1702,9 @@
   },
   "layout.action.create-new": {
     "message": "Создать..."
+  },
+  "layout.action.external-projects": {
+    "message": "Внешние проекты"
   },
   "layout.action.file-lookup": {
     "message": "Поиск файла"
@@ -1922,6 +1958,9 @@
   "moderation.moderate": {
     "message": "Модерировать"
   },
+  "moderation.page.external-projects": {
+    "message": "Внешние проекты"
+  },
   "moderation.page.projects": {
     "message": "Проекты"
   },
@@ -1929,7 +1968,7 @@
     "message": "Жалобы"
   },
   "moderation.page.technicalReview": {
-    "message": "Техническая проверка"
+    "message": "Техпроверка"
   },
   "muralpay.account-type.checking": {
     "message": "Расчётный"
@@ -2331,7 +2370,7 @@
     "message": "Проект {status, select, rejected {отклонён} withheld {на удержании} other {{status}}} командой Modrinth. Обычно после решения указанных модератором проблем можно снова запросить проверку."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
-    "message": "Необходимо выполнить обязательные действия в контрольном списке!"
+    "message": "Необходимо выполнить обязательные действия в контрольном списке"
   },
   "project-moderation-nags.submit-for-review": {
     "message": "Запросите проверку"
@@ -2615,6 +2654,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Пожалуйста, предоставьте доказательства, что у вас есть разрешение на распространение всех следующих файлов, а также любые скрытые версии будут опубликованы."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Прежде чем отправить проект на рассмотрение, пожалуйста, подтвердите наличие у вас разрешения на распространение всех перечисленных ниже файлов."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Неизвестное встроенный контент"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Весь внешний контент сопровождается указанием источников."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Указание авторства завершено!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Ни одна из ваших версий не содержит внешнего контента, поэтому вам не нужно беспокоиться о получении разрешений."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Всё подтверждено!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Вам запрещено распространять часть добавленного вами внешнего контента. Для публикации на Modrinth удалите контент, нарушающий авторские права."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Некоторый контент не может быть включён"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Если вы используете контент, который не размещен на Modrinth, вам необходимо сообщить нам, откуда он взят, и подтвердить наличие у вас разрешения на распространение файлов. Ознакомьтесь с <link>нашим руководством</link>, чтобы узнать, как это сделать правильно!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Узнайте, как работает атрибуция"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Подробнее"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Поиск {count} {count, plural, one {external project} other {external projects}}..."
+  },
   "project.settings.title": {
     "message": "Настройки"
   },
@@ -2632,6 +2710,15 @@
   },
   "project.versions.title": {
     "message": "Версии"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {This version is} other {These versions are}} в настоящее время скрыты и не опубликованы. Пожалуйста, предоставьте доказательства того, что у вас есть разрешение на распространение определенных файлов, включенных в модпак {count, plural, one {version} other {versions}}."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Решить"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Version {version_name}} other {Versions}} скрыто из-за неизвестного встроенного контента"
   },
   "report.already-reported": {
     "message": "Вы уже пожалова­лись на {title}"
@@ -3001,6 +3088,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Использовать с сервера"
+  },
+  "servers.manage.content.title": {
+    "message": "Контент — {serverName} — Modrinth"
   },
   "servers.notice.actions": {
     "message": "Действия"
@@ -3708,7 +3798,7 @@
     "message": "Истечёт {inTime}"
   },
   "settings.pats.token.last-used": {
-    "message": "Активность: {ago}"
+    "message": "Активность {ago}"
   },
   "settings.pats.token.never-used": {
     "message": "Не использовался"

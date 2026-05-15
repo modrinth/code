@@ -2,6 +2,7 @@
 import { Intercom, shutdown as shutdownIntercom } from '@intercom/messenger-js-sdk'
 import {
 	AuthFeature,
+	ModrinthApiError,
 	NodeAuthFeature,
 	nodeAuthState,
 	PanelVersionFeature,
@@ -51,9 +52,10 @@ import {
 	providePageContext,
 	providePopupNotificationManager,
 	useDebugLogger,
+	useFormatBytes,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatBytes, renderString } from '@modrinth/utils'
+import { renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
@@ -97,6 +99,7 @@ import { command_listener, warning_listener } from '@/helpers/events.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { create_profile_and_install_from_file } from '@/helpers/pack'
 import { list } from '@/helpers/profile.js'
+import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import {
@@ -106,6 +109,7 @@ import {
 	getUpdateSize,
 	isDev,
 	isNetworkMetered,
+	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
 import i18n from '@/i18n.config'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
@@ -146,8 +150,9 @@ const popupNotificationManager = new AppPopupNotificationManager()
 providePopupNotificationManager(popupNotificationManager)
 const { addPopupNotification } = popupNotificationManager
 
+const appVersion = getVersion()
 const tauriApiClient = new TauriModrinthClient({
-	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
+	userAgent: async () => `modrinth/theseus/${await appVersion} (support@modrinth.com)`,
 	labrinthBaseUrl: config.labrinthBaseUrl,
 	archonBaseUrl: config.archonBaseUrl,
 	features: [
@@ -261,6 +266,8 @@ onUnmounted(async () => {
 })
 
 const { formatMessage } = useVIntl()
+const formatBytes = useFormatBytes()
+
 const messages = defineMessages({
 	updateInstalledToastTitle: {
 		id: 'app.update.complete-toast.title',
@@ -1019,9 +1026,38 @@ async function downloadUpdate(versionToDownload) {
 
 async function installUpdate() {
 	restarting.value = true
+	try {
+		await setRestartAfterPendingUpdate(true)
+	} catch (e) {
+		restarting.value = false
+		handleError(e)
+		return
+	}
 	setTimeout(async () => {
 		await handleClose()
 	}, 250)
+}
+
+async function openModrinthProjectLinkInApp(parsed) {
+	const { slug, pathSuffix, url } = parsed
+	const loadToken = loading.begin()
+	try {
+		const { id } = await tauriApiClient.labrinth.projects_v2.check(slug)
+		const query = mergeUrlQuery(route.query, url)
+		await router.push({
+			path: `/project/${id}${pathSuffix}`,
+			query,
+			hash: url.hash || undefined,
+		})
+	} catch (err) {
+		if (err instanceof ModrinthApiError && err.statusCode === 404) {
+			openUrl(url.href)
+		} else {
+			handleError(err)
+		}
+	} finally {
+		loading.end(loadToken)
+	}
 }
 
 function handleClick(e) {
@@ -1036,7 +1072,12 @@ function handleClick(e) {
 				!target.href.startsWith('https://tauri.localhost') &&
 				!target.href.startsWith('http://tauri.localhost')
 			) {
-				openUrl(target.href)
+				const parsed = parseModrinthLink(target.href)
+				if (target.target !== '_blank' && parsed) {
+					void openModrinthProjectLinkInApp(parsed)
+				} else {
+					openUrl(target.href)
+				}
 			}
 			e.preventDefault()
 			break
@@ -1567,11 +1608,15 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 .app-grid-navbar {
 	grid-area: nav;
+	position: relative;
+	z-index: 2;
 }
 
 .app-grid-statusbar {
 	grid-area: status;
 	padding-right: var(--window-controls-width, 0px);
+	position: relative;
+	z-index: 2;
 }
 
 [data-tauri-drag-region-exclude] {
@@ -1639,6 +1684,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	&.app-contents::before {
 		box-shadow: none;
 	}
+
+	*,
+	:deep(*) {
+		box-shadow: none !important;
+		--tw-drop-shadow:;
+	}
 }
 
 .app-sidebar::before {
@@ -1657,10 +1708,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	height: 100%;
 	overflow: auto;
 	overflow-x: hidden;
+	scrollbar-gutter: stable;
 }
 
 .app-contents::before {
-	z-index: 1;
+	z-index: 30;
 	content: '';
 	position: fixed;
 	left: var(--left-bar-width);

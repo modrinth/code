@@ -169,6 +169,8 @@ pub enum ProjectDownloadsField {
     Domain,
     /// Modrinth site path which was visited, e.g. `/mod/foo`.
     SitePath,
+    /// Whether these downloads were monetized or not.
+    Monetized,
     /// What country these downloads came from.
     ///
     /// To anonymize the data, the country may be reported as `XX`.
@@ -329,6 +331,9 @@ pub struct ProjectDownloads {
     /// [`ProjectDownloadsField::VersionId`].
     #[serde(skip_serializing_if = "Option::is_none")]
     version_id: Option<VersionId>,
+    /// [`ProjectDownloadsField::Monetized`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    monetized: Option<bool>,
     /// [`ProjectDownloadsField::Country`].
     #[serde(skip_serializing_if = "Option::is_none")]
     country: Option<String>,
@@ -473,6 +478,7 @@ mod query {
         pub domain: String,
         pub site_path: String,
         pub version_id: DBVersionId,
+        pub monetized: i8,
         pub country: String,
         pub reason: String,
         pub game_version: String,
@@ -485,6 +491,7 @@ mod query {
         const USE_DOMAIN: &str = "{use_domain: Bool}";
         const USE_SITE_PATH: &str = "{use_site_path: Bool}";
         const USE_VERSION_ID: &str = "{use_version_id: Bool}";
+        const USE_MONETIZED: &str = "{use_monetized: Bool}";
         const USE_COUNTRY: &str = "{use_country: Bool}";
         const USE_REASON: &str = "{use_reason: Bool}";
         const USE_GAME_VERSION: &str = "{use_game_version: Bool}";
@@ -497,6 +504,7 @@ mod query {
                 if({USE_DOMAIN}, domain, '') AS domain,
                 if({USE_SITE_PATH}, site_path, '') AS site_path,
                 if({USE_VERSION_ID}, version_id, 0) AS version_id,
+                if({USE_MONETIZED}, CAST(user_id != 0 AS Int8), -1) AS monetized,
                 if({USE_COUNTRY}, country, '') AS country,
                 if({USE_REASON}, reason, '') AS reason,
                 if({USE_GAME_VERSION}, game_version, '') AS game_version,
@@ -509,7 +517,7 @@ mod query {
                 -- not the possibly-zero one,
                 -- by using `downloads.project_id` instead of `project_id`
                 AND downloads.project_id IN {PROJECT_IDS}
-            GROUP BY bucket, project_id, domain, site_path, version_id, country, reason, game_version, loader"
+            GROUP BY bucket, project_id, domain, site_path, version_id, monetized, country, reason, game_version, loader"
         )
     };
 
@@ -731,6 +739,7 @@ pub async fn fetch_analytics(
                 ("use_domain", uses(F::Domain)),
                 ("use_site_path", uses(F::SitePath)),
                 ("use_version_id", uses(F::VersionId)),
+                ("use_monetized", uses(F::Monetized)),
                 ("use_country", uses(F::Country)),
                 ("use_reason", uses(F::Reason)),
                 ("use_game_version", uses(F::GameVersion)),
@@ -749,6 +758,11 @@ pub async fn fetch_analytics(
                         domain: none_if_empty(row.domain),
                         site_path: none_if_empty(row.site_path),
                         version_id: none_if_zero_version_id(row.version_id),
+                        monetized: match row.monetized {
+                            0 => Some(false),
+                            1 => Some(true),
+                            _ => None,
+                        },
                         country,
                         reason: none_if_empty(row.reason)
                             .and_then(|s| s.parse().ok()),
@@ -821,10 +835,13 @@ pub async fn fetch_analytics(
         .await?;
     }
 
-    if let Some(metrics) = &req.return_metrics.project_revenue {
+    if req.return_metrics.project_revenue.is_some() {
         if !scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(AuthenticationError::InvalidCredentials.into());
         }
+
+        let project_id_values =
+            project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
 
         let mut rows = sqlx::query!(
             "SELECT
@@ -834,21 +851,20 @@ pub async fn fetch_analytics(
                     EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                     $3::integer
                 ) AS bucket,
-                CASE WHEN $5 THEN mod_id ELSE 0 END AS mod_id,
+                mod_id,
                 SUM(amount) amount_sum
             FROM payouts_values
             WHERE
-                user_id = $4
                 -- only project revenue is counted here
-                -- for affiliate code revenue, see `affiliate_code_revenue``
-                AND payouts_values.mod_id IS NOT NULL
+                -- for affiliate code revenue, see `affiliate_code_revenue`
+                payouts_values.mod_id IS NOT NULL
+                AND payouts_values.mod_id = ANY($4)
                 AND created BETWEEN $1 AND $2
             GROUP BY bucket, mod_id",
             req.time_range.start,
             req.time_range.end,
             num_time_slices as i64,
-            DBUserId::from(user.id) as DBUserId,
-            metrics.bucket_by.contains(&ProjectRevenueField::ProjectId),
+            &project_id_values,
         )
         .fetch(&**pool);
         while let Some(row) = rows.next().await.transpose()? {

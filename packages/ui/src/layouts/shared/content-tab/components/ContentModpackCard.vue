@@ -119,16 +119,18 @@ const collapsedOptions = computed(() => {
 
 const containerRef = ref<HTMLElement | null>(null)
 const isExpanded = ref(true)
-const observer = new ResizeObserver((entries) => {
-	for (const entry of entries) {
-		isExpanded.value = entry.contentRect.width >= 700
-	}
-})
+let observer: ResizeObserver | null = null
 onMounted(() => {
+	observer = new ResizeObserver((entries) => {
+		for (const entry of entries) {
+			isExpanded.value = entry.contentRect.width >= 700
+		}
+	})
 	if (containerRef.value) observer.observe(containerRef.value)
 })
 onUnmounted(() => {
-	observer.disconnect()
+	observer?.disconnect()
+	observer = null
 })
 </script>
 

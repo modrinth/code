@@ -468,6 +468,10 @@ export namespace Labrinth {
 				monetization_status: MonetizationStatus
 			}
 
+			export type ProjectCheckResponse = {
+				id: string
+			}
+
 			export type SearchResultHit = {
 				project_id: string
 				project_type: ProjectType
@@ -876,6 +880,7 @@ export namespace Labrinth {
 				include_changelog?: boolean
 				limit?: number
 				offset?: number
+				apiVersion?: 2 | 3
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'

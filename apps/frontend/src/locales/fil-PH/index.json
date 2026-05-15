@@ -393,7 +393,7 @@
     "message": "Wala pang proyekto sa koleksiyon"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Wala pang proyekto} one {<stat>{count}</stat> {type}} other {<stat>{count}</stat> na {type}}}"
+    "message": "{count, plural, =0 {Wala pang proyekto} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "In-update {ago}"
@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Lumikha ng affiliate link"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Walang mahanap na affiliate code."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Bigong ma-load ang mga affiliate link"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Maghanap ng affiliate link..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "galing sa {count} {count, plural, one {proyekto} other {na proyekto}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Kabuuang pag-download"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Kabuuang tagasunod"
   },
   "dashboard.collections.button.create-new": {
     "message": "Lumikha ng bago"
@@ -591,10 +603,22 @@
     "message": "{count} {countPlural, plural, one {proyekto} other {na proyekto}}"
   },
   "dashboard.collections.label.search-input": {
-    "message": "Hanapin ang iyong mga koleksiyon"
+    "message": "Maghanap sa iyong koleksiyon"
   },
   "dashboard.collections.long-title": {
     "message": "Mga koleksiyon mo"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Maghanap ng koleksiyon..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Pangalan (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Kamakailang Linikha"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Kamakailang In-update"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Download {formType}"
@@ -848,6 +872,66 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Naubos mo na ang iyong <b>{withdrawLimit}</b> hangganan sa pag-withdraw. Mangangailangan kang kumumpleto ng pormularyo sa buwis upang makapag-withdraw ngayon higit pa."
   },
+  "dashboard.head-title": {
+    "message": "Dashboard"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Tratuhing binasa na"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Tingnan ang kasaysayan"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Wala kang di-nababasang notipikasyon."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Error sa paglo-load ng mga notipikasyon:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Kasaysayan"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Kasaysayan ng notipikasyon"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Tingnan lahat"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Tingnan ang kasaysayan ng notipikasyon"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Tingnan ang {extraNotifs} pang {extraNotifs, plural, other {notipikasyon}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Naglo-load ang mga notipikasyon..."
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Lumikha ng organisasyon"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Gumawa ng organisasyon!"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {miyembro} other {na miyembro}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisasyon"
+  },
+  "dashboard.projects.head-title": {
+    "message": "Mga proyekto"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "at {count} pa..."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Pakisuri sa metadata sa environment"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Aktibong sumbong"
+  },
+  "dashboard.reports.title": {
+    "message": "Mga sumbong"
+  },
   "dashboard.revenue.available-now": {
     "message": "Magagamit ngayon"
   },
@@ -884,6 +968,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "I-download bilang CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Kasaysayan ng transaksiyon"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Mga transaksiyon"
   },
@@ -896,6 +983,9 @@
   "dashboard.revenue.transactions.see-all": {
     "message": "Tingnan lahat"
   },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Lahat ng taon"
+  },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Ang iyong pag-withdraw ay pansamantalang pinatigilan dahil hindi tumugma ang iyong TIN o SSN sa talaan ng IRS. Mangyaring abutin ang suporta upang ma-reset at muling sumitehin ang iyong pormularyo sa buwis."
   },
@@ -907,6 +997,9 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Mag-withdraw"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Aktibong sumbong"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Account"
@@ -957,7 +1050,7 @@
     "message": "Kailangang mapatunayan ang email"
   },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Hindi namin masumite ang iyong hiling na mag-withdraw, mangyaring suriin ang iyong mga detalye o abutin ang suporta. {error}"
+    "message": "Hindi namin maisumite ang iyong hiling na mag-withdraw, mangyaring suriin ang iyong mga detalye o abutin ang suporta. {error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Hindi makapag-withdraw"
@@ -990,7 +1083,7 @@
     "message": "Ang halaga ng pag-withdraw (matapos ang singil) hindi umabot sa pinakamaliit na pinapayagang kailangan. Mangyaring taasan ang iyong halagang ma-withdraw."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
-    "message": "Labis na mababa ang halaga"
+    "message": "Labis na mababa ang balyu"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "Mangyaring pillin ang wastong PayPal transfer option para sa iyong rehiyon (US o internasyunal)."
@@ -1497,7 +1590,7 @@
     "message": "Itong pinakalat na frontend ng Modrinth ay bigong makabuo ng estado galing sa API. Maaaring dahil ito sa isang kawalan o kamalian sa kumpigurasyon. Muling magpatayo kapag magagamit na muli ang API. Mga code ng kamalian: {errors}; Ang kasalukuyang URL ng API ay: {url}"
   },
   "layout.banner.build-fail.title": {
-    "message": "May error sa pagbuo ng estado galing sa API habang nagpapatayo."
+    "message": "Error sa pagbubuo ng estado galing sa API habang nagpapatayo."
   },
   "layout.banner.preview.description": {
     "message": "Kung ibig mong maakses ang opisyal na website ng Modrinth, bisitahin ang <link>https://modrinth.com</link>. Ito ay isang pinakalat na pasilip na ginagamit lamang ng kawani ng Modrinth sa pagsusubok nito. Ito ay pinatayo gamit ang <branch-link>{owner}/{branch}</branch-link> @ {commit}."
@@ -1704,7 +1797,7 @@
     "message": "Mga Sumbong"
   },
   "moderation.page.technicalReview": {
-    "message": "Teknikal na Pagsusuri"
+    "message": "Tech review"
   },
   "muralpay.account-type.checking": {
     "message": "Sinusuri"
@@ -2241,7 +2334,7 @@
     "message": "Bersiyon ng laro: {version}"
   },
   "project.download.game-version-error": {
-    "message": "Kamalian: walang mahanap na mga bersiyon ng laro"
+    "message": "Error: walang mahanap na mga bersiyon ng laro"
   },
   "project.download.game-version-tooltip": {
     "message": "Ang {title} ay magagamit lamang sa {version}"
@@ -2262,7 +2355,7 @@
     "message": "Plataporma: {platform}"
   },
   "project.download.platform-error": {
-    "message": "Kamalian: walang mahanap na platform"
+    "message": "Error: walang mahanap na platform"
   },
   "project.download.platform-tooltip": {
     "message": "Ang {title} ay magagamit lamang sa {platform}"
@@ -2307,7 +2400,7 @@
     "message": "Pakisuri sa metadata sa environment"
   },
   "project.error.loading": {
-    "message": "Nagkamali sa pag-load ng project data{message}"
+    "message": "Error sa paglo-load ng datos ng proyekto{message}"
   },
   "project.error.page-not-found": {
     "message": "Hindi mahanap na pahina"
@@ -2389,6 +2482,9 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Kung magsasama ka ng mga kontentong hindi naka-host sa Modrinth, kailangan niyong ipaalam sa amin sa pinanggalingan nito at matiyak na pinahintulutang mapakalat ang mga file. Tingnan ang <link>aming gabay</link> upang matuto kung papaano ito magawa nang maayos!"
   },
   "project.settings.title": {
     "message": "Mga Setting"
@@ -2816,6 +2912,9 @@
   "settings.account.email.modal.header.add": {
     "message": "Magdagdag ng email"
   },
+  "settings.account.password.modal.header.add": {
+    "message": "Magdagdag ng password"
+  },
   "settings.account.providers.action.add": {
     "message": "Idagdag"
   },
@@ -2830,6 +2929,9 @@
   },
   "settings.account.security.email.title": {
     "message": "Email"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Magdagdag ng password"
   },
   "settings.account.security.password.title": {
     "message": "Password"
@@ -2918,6 +3020,9 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.head-title": {
+    "message": "Mga aplikasyon"
+  },
   "settings.applications.modal.header": {
     "message": "Impormasyon ng aplikasyon"
   },
@@ -2940,7 +3045,7 @@
     "message": "Kasalukuyang hindi namin mapapakita ang mga pinahintulutang app, kinukumpuni pa namin ito. Mangyaring bisitahin ang pahinang ito sa ibang pagkataon!"
   },
   "settings.authorizations.head-title": {
-    "message": "Mga Pagpapahintulot"
+    "message": "Mga pagpapahintulot"
   },
   "settings.authorizations.revoke.action": {
     "message": "Bawiin"
@@ -3013,6 +3118,15 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Mga paraan ng pagbabayad"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Isang error ang naganap habang pagre-resubscribe sa iyong Modrinth server."
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Error sa muling pag-subscribe"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Pamahalaan ang iyong mga Modrinth Server subscription."
@@ -3125,6 +3239,9 @@
   "settings.display.theme.title": {
     "message": "Paksang kulay"
   },
+  "settings.head-title": {
+    "message": "Settings ng display"
+  },
   "settings.pats.action.create": {
     "message": "Lumikha ng PAT"
   },
@@ -3184,6 +3301,9 @@
   },
   "settings.profile.description": {
     "message": "Makikita ng publiko ang impormasyon ng iyong profile at sa <docs-link>API ng Modrinth</docs-link>."
+  },
+  "settings.profile.head-title": {
+    "message": "Settings ng profile"
   },
   "settings.profile.profile-info": {
     "message": "Impormasyon ng profile"

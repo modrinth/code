@@ -149,7 +149,7 @@ const handleOptionsClick = async (args) => {
 			break
 		case 'edit':
 			await router.push({
-				path: `/instance/${encodeURIComponent(args.item.path)}/`,
+				path: `/instance/${encodeURIComponent(args.item.path)}`,
 			})
 			break
 		case 'duplicate':

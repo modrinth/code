@@ -46,7 +46,8 @@
 					<ButtonStyled circular type="transparent">
 						<a
 							v-tooltip="`Download`"
-							:href="getPrimaryFile(version).url"
+							:href="createDownloadUrl(version)"
+							:download="getPrimaryFile(version).filename"
 							class="hover:!bg-button-bg [&>svg]:!text-green"
 							aria-label="Download"
 							@click="emit('onDownload')"
@@ -100,7 +101,8 @@
 									id: 'download',
 									color: 'primary',
 									hoverFilled: true,
-									link: getPrimaryFile(version).url,
+									link: createDownloadUrl(version),
+									download: getPrimaryFile(version).filename,
 									action: () => {
 										emit('onDownload')
 									},
@@ -266,13 +268,15 @@ import {
 	OverflowMenu,
 	ProjectPageVersions,
 } from '@modrinth/ui'
-import { onMounted, useTemplateRef } from 'vue'
+import { onMounted, useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const route = useRoute()
+
+const { createProjectDownloadUrl, updateVersionsFilterContext } = useCdnDownloadContext()
 
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
@@ -287,6 +291,7 @@ const {
 	versions,
 	versionsLoading,
 	loadVersions,
+	cdnDownloadReason,
 } = injectProjectPageContext()
 
 // Load versions on mount (client-side)
@@ -314,6 +319,23 @@ const baseDropdownId = useId()
 
 function getPrimaryFile(version) {
 	return version.files.find((x) => x.primary) || version.files[0]
+}
+
+watch(
+	() => [route.query.g, route.query.l],
+	() => {
+		updateVersionsFilterContext(
+			queryAsStringArray(route.query.g),
+			queryAsStringArray(route.query.l),
+		)
+	},
+	{ immediate: true },
+)
+
+function createDownloadUrl(version) {
+	return createProjectDownloadUrl(getPrimaryFile(version).url, {
+		reason: cdnDownloadReason.value,
+	})
 }
 
 async function copyToClipboard(text) {
