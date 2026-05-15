@@ -195,7 +195,6 @@ import { EditIcon, ExternalIcon, PlusIcon, SearchIcon, TrashIcon } from '@modrin
 import {
 	ButtonStyled,
 	DatePicker,
-	injectModrinthClient,
 	injectNotificationManager,
 	MultiSelect,
 	type MultiSelectOption,
@@ -205,8 +204,16 @@ import {
 	Table,
 	type TableColumn,
 } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
+
+import {
+	analyticsEventsQueryKey,
+	createAnalyticsEvent,
+	deleteAnalyticsEvent,
+	editAnalyticsEvent,
+	getAnalyticsEvents,
+} from '~/services/analytics-events'
 
 definePageMeta({
 	middleware: ['auth', 'staff'],
@@ -231,8 +238,8 @@ type EventForm = {
 
 type DatePickerValue = string | Date | null | undefined
 
-const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+const queryClient = useQueryClient()
 
 const columns: TableColumn<EventColumnKey>[] = [
 	{ key: 'date', label: 'Date', width: '18%', enableSorting: true },
@@ -266,10 +273,12 @@ const {
 	data: analyticsEvents,
 	error: eventsError,
 	isLoading: isLoadingEvents,
-	refetch: refetchEvents,
 } = useQuery({
-	queryKey: ['analytics-events'],
-	queryFn: () => client.labrinth.analytics_v3.getEvents(),
+	queryKey: analyticsEventsQueryKey,
+	queryFn: getAnalyticsEvents,
+	placeholderData: [],
+	refetchOnMount: 'always',
+	staleTime: 0,
 })
 
 watch(eventsError, (error) => {
@@ -383,12 +392,12 @@ async function saveEvent() {
 		const payload = buildEventPayload()
 
 		if (modalMode.value === 'edit' && editingEventId.value !== null) {
-			await client.labrinth.analytics_v3.editEvent(editingEventId.value, payload)
+			await editAnalyticsEvent(editingEventId.value, payload)
 		} else {
-			await client.labrinth.analytics_v3.createEvent(payload)
+			await createAnalyticsEvent(payload)
 		}
 
-		await refetchEvents()
+		await queryClient.invalidateQueries({ queryKey: analyticsEventsQueryKey })
 		eventModal.value?.hide()
 		addNotification({
 			title: modalMode.value === 'edit' ? 'Analytics event updated' : 'Analytics event created',
@@ -416,8 +425,8 @@ async function deleteEvent(eventId: Labrinth.Analytics.v3.AnalyticsEventId) {
 	setDeletingEvent(eventId, true)
 
 	try {
-		await client.labrinth.analytics_v3.deleteEvent(eventId)
-		await refetchEvents()
+		await deleteAnalyticsEvent(eventId)
+		await queryClient.invalidateQueries({ queryKey: analyticsEventsQueryKey })
 		addNotification({
 			title: 'Analytics event deleted',
 			type: 'success',

@@ -127,7 +127,7 @@
 						</ClientOnly>
 						<AnalyticsChartEvents
 							v-if="showChartEvents"
-							:events="dummyAnalyticsChartEvents"
+							:events="localAnalyticsChartEvents"
 							:active-stat="activeStat"
 							:group-by="selectedGroupBy"
 							:chart-start="chartRangeBounds?.start ?? null"
@@ -184,9 +184,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
 import { Tabs, type TabsTab, Toggle, useFormatNumber } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type {
@@ -198,6 +198,7 @@ import {
 	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
+import { analyticsEventsQueryKey, getAnalyticsEvents } from '~/services/analytics-events'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import {
@@ -245,6 +246,13 @@ const {
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 const isDataLoading = computed(() => isLoading.value)
+const { data: analyticsEvents } = useQuery({
+	queryKey: analyticsEventsQueryKey,
+	queryFn: getAnalyticsEvents,
+	placeholderData: [],
+	refetchOnMount: 'always',
+	staleTime: 0,
+})
 
 const viewModeTabs: TabsTab[] = [
 	{ value: 'line', label: 'Line', icon: ChartSplineIcon },
@@ -259,42 +267,8 @@ const titleByStat: Record<AnalyticsDashboardStat, string> = {
 	playtime: 'Playtime Over Time',
 }
 
-const dummyAnalyticsChartEvents: Labrinth.Analytics.v3.AnalyticsEvent[] = [
-	{
-		id: 1,
-		title: 'Analytics outage',
-		announcement_url: null,
-		for_metric_kind: null,
-		starts: '2026-04-25T00:00:00.000Z',
-		ends: '2026-04-27T00:00:00.000Z',
-	},
-	{
-		id: 2,
-		title: 'Ad revenue over reported, resulting in a potential spike.',
-		announcement_url: 'https://modrinth.com/news',
-		for_metric_kind: ['revenue'],
-		starts: '2026-05-04T00:00:00.000Z',
-		ends: '2026-05-04T00:00:00.000Z',
-	},
-	{
-		id: 3,
-		title: 'China CDN ingest outage',
-		announcement_url: 'https://modrinth.com/news',
-		for_metric_kind: ['downloads'],
-		starts: '2026-05-01T00:00:00.000Z',
-		ends: '2026-05-07T00:00:00.000Z',
-	},
-	{
-		id: 4,
-		title: 'Modrinth App release',
-		announcement_url: 'https://modrinth.com/news',
-		for_metric_kind: null,
-		starts: '2023-08-07T00:00:00.000Z',
-		ends: '2023-08-07T00:00:00.000Z',
-	},
-]
-
-const hasChartEvents = computed(() => dummyAnalyticsChartEvents.length > 0)
+const localAnalyticsChartEvents = computed(() => analyticsEvents.value ?? [])
+const hasChartEvents = computed(() => localAnalyticsChartEvents.value.length > 0)
 const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 const hasAvailableProjects = computed(() => projects.value.length > 0)
 
