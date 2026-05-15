@@ -131,6 +131,15 @@
 					/>
 				</div>
 			</div>
+			<ButtonStyled type="transparent" v-if="!isTimeframeAndGroupByDefault">
+				<button
+					type="button"
+					:disabled="isTimeframeAndGroupByDefault"
+					@click="resetTimeframeAndGroupBy"
+				>
+					Reset
+				</button>
+			</ButtonStyled>
 		</div>
 
 		<div class="flex flex-wrap items-start gap-2">
@@ -188,6 +197,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	MultiSelect,
@@ -204,6 +214,7 @@ import {
 	getProjectIdsMatchingStatusFilter,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
+import { buildDefaultAnalyticsQueryBuilderState } from '~/providers/analytics/query-builder-url'
 
 import DownloadsThresholdInput from './DownloadsThresholdInput.vue'
 import {
@@ -230,6 +241,10 @@ const {
 	selectedProjectIds,
 	selectedTimeframeMode,
 	selectedTimeframe,
+	selectedLastTimeframeAmount,
+	selectedLastTimeframeUnit,
+	selectedCustomTimeframeStartDate,
+	selectedCustomTimeframeEndDate,
 	selectedGroupBy,
 	selectedBreakdown,
 	selectedFilters,
@@ -240,6 +255,7 @@ const {
 } = injectAnalyticsDashboardContext()
 const route = useRoute()
 const { selectedTimeRange, selectedTimeframeDurationMinutes } = useSelectedAnalyticsTimeRange()
+const defaultQueryState = buildDefaultAnalyticsQueryBuilderState([])
 
 function getProjectOption(
 	project: AnalyticsDashboardProject,
@@ -458,6 +474,26 @@ const isDashboardAnalyticsRoute = computed(
 	() => route.path.replace(/\/$/, '') === '/dashboard/analytics',
 )
 const showProjectRow = computed(() => isDashboardAnalyticsRoute.value || projects.value.length > 1)
+const isTimeframeAndGroupByDefault = computed(
+	() =>
+		selectedTimeframeMode.value === defaultQueryState.selectedTimeframeMode &&
+		selectedTimeframe.value === defaultQueryState.selectedTimeframe &&
+		selectedGroupBy.value === defaultQueryState.selectedGroupBy,
+)
+
+function resetTimeframeAndGroupBy() {
+	if (isTimeframeAndGroupByDefault.value) {
+		return
+	}
+
+	selectedTimeframeMode.value = defaultQueryState.selectedTimeframeMode
+	selectedTimeframe.value = defaultQueryState.selectedTimeframe
+	selectedLastTimeframeAmount.value = defaultQueryState.selectedLastTimeframeAmount
+	selectedLastTimeframeUnit.value = defaultQueryState.selectedLastTimeframeUnit
+	selectedCustomTimeframeStartDate.value = defaultQueryState.selectedCustomTimeframeStartDate
+	selectedCustomTimeframeEndDate.value = defaultQueryState.selectedCustomTimeframeEndDate
+	selectedGroupBy.value = defaultQueryState.selectedGroupBy
+}
 
 function applyProjectDownloadsThreshold(threshold: number | null) {
 	if (threshold === null) {
