@@ -15,7 +15,7 @@
 		@close="handleTimeframeSelectClose"
 		@select="handleTimeframePresetSelect"
 	>
-		<template #bottom>
+		<template #dropdown-footer>
 			<template v-if="activeTimeframePanel === 'custom_range'">
 				<CustomRangeTimeframe
 					v-model:start-date="draftSelectedCustomTimeframeStartDate"
