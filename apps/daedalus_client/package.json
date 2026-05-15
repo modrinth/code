@@ -11,5 +11,6 @@
 	},
 	"dependencies": {
 		"@icarus/daedalus": "workspace:*"
-	}
+	},
+	"version": "0.2.1"
 }

@@ -1,7 +1,7 @@
 {
 	"name": "@icarus/docs",
 	"type": "module",
-	"version": "0.0.1",
+	"version": "0.2.1",
 	"scripts": {
 		"dev": "astro dev",
 		"start": "astro dev",

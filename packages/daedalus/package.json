@@ -7,5 +7,6 @@
 		"fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
 		"fix:ancillary": "prettier --write .",
 		"test": "cargo nextest run --all-targets --no-fail-fast"
-	}
+	},
+	"version": "0.2.1"
 }

@@ -17,5 +17,6 @@
     "@icarus/app-frontend": "workspace:*",
     "@icarus/app-lib": "workspace:*",
     "@icarus/daedalus": "workspace:*"
-  }
+  },
+  "version": "0.2.1"
 }

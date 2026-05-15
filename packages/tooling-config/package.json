@@ -1,6 +1,6 @@
 {
 	"name": "@icarus/tooling-config",
-	"version": "0.0.0",
+	"version": "0.2.1",
 	"type": "module",
 	"private": true,
 	"description": "Unified tooling configuration for Icarus monorepo",
@@ -47,9 +47,8 @@
 		"eslint-plugin-simple-import-sort": "^12.1.1",
 		"eslint-plugin-turbo": "^2.5.4",
 		"eslint-plugin-vue": "^10.4.0",
-		"vue-eslint-parser": "^10.1.3",
 		"globals": "^16.3.0",
-		"typescript-eslint": "^8.38.0"
+		"typescript-eslint": "^8.38.0",
+		"vue-eslint-parser": "^10.1.3"
 	}
 }
-

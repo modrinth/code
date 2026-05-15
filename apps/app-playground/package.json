@@ -8,5 +8,6 @@
 		"fix:ancillary": "prettier --check .",
 		"dev": "cargo run",
 		"test": "cargo nextest run --all-targets --no-fail-fast"
-	}
+	},
+	"version": "0.2.1"
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@icarus/api-client",
-	"version": "0.1.0",
+	"version": "0.2.1",
 	"description": "An API client for Icarus's API for use in nuxt, tauri and plain node/browser environments.",
 	"main": "./src/index.ts",
 	"scripts": {
@@ -23,4 +23,3 @@
 		}
 	}
 }
-
