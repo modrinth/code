@@ -52,7 +52,7 @@ const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
 const ANALYTICS_START_TIMESTAMP = '2023-01-01T00:00:00.000Z'
 const ANALYTICS_START_TIME = new Date(ANALYTICS_START_TIMESTAMP).getTime()
 const REVENUE_GROUP_BY_FALLBACK: AnalyticsGroupByPreset = 'day'
-const REVENUE_MIN_TIMEFRAME_MS = 2 * 24 * 60 * 60 * 1000 // need at least 2 days in timeframe range to show revenue
+const REVENUE_MIN_TIMEFRAME_MS = 1 * 24 * 60 * 60 * 1000 // need at least 1 day in timeframe range to show revenue
 const ANALYTICS_DAY_MS = 24 * 60 * 60 * 1000
 const ANALYTICS_MAX_TIME_SLICES = 256 // controls granularity allowed in "group by" for timeframe ranges
 
@@ -1341,7 +1341,7 @@ export function createAnalyticsDashboardContext(
 				customStartDate: selectedCustomTimeframeStartDate.value,
 				customEndDate: selectedCustomTimeframeEndDate.value,
 				nowTimestamp: queryRefreshTimestamp.value,
-			}) >= REVENUE_MIN_TIMEFRAME_MS,
+			}) > REVENUE_MIN_TIMEFRAME_MS,
 	)
 
 	function isAnalyticsDashboardStatAvailableForTimeframe(stat: AnalyticsDashboardStat): boolean {
