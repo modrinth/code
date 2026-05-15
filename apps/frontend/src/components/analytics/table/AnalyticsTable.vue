@@ -2,13 +2,14 @@
 	<div class="relative overflow-hidden rounded-2xl">
 		<AnalyticsLoadingBar :loading="isDataLoading" />
 		<Table
-			v-model:sort-column="sortColumn"
-			v-model:sort-direction="sortDirection"
+			:sort-column="displayedSortColumn"
+			:sort-direction="displayedSortDirection"
 			:columns="columns"
-			:data="sortedRows"
+			:data="paginatedRows"
 			row-key="id"
 			virtualized
 			:virtual-row-height="56"
+			@sort="applyRequestedSort"
 		>
 			<template #header>
 				<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -39,13 +40,13 @@
 			<template #cell-date="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
-			<template #cell-breakdown="{ value }">
+			<template #cell-breakdown="{ row }">
 				<span
 					class="text-primary"
 					:class="{
 						capitalize: selectedBreakdown === 'monetization',
 					}"
-					>{{ formatBreakdownDisplayValue(String(value)) }}</span
+					>{{ row.breakdownDisplay }}</span
 				>
 			</template>
 			<template #cell-project="{ value }">
@@ -69,6 +70,15 @@
 				</div>
 			</template>
 		</Table>
+		<div
+			v-if="sortedRows.length > PAGE_SIZE"
+			class="mt-3 flex flex-wrap items-center justify-between gap-3 px-1 text-sm text-secondary"
+		>
+			<span>
+				Showing {{ visibleRowStart }} to {{ visibleRowEnd }} of {{ sortedRows.length }}
+			</span>
+			<Pagination :page="currentPage" :count="pageCount" @switch-page="switchPage" />
+		</div>
 		<div v-if="isDataLoading" class="absolute inset-0 z-10 overflow-hidden rounded-xl">
 			<div class="absolute inset-0 bg-surface-3 opacity-50" />
 			<div class="absolute inset-0 backdrop-blur-[4px]" />
@@ -84,7 +94,14 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon } from '@modrinth/assets'
-import { ButtonStyled, Table, type TableColumn, Toggle, useFormatNumber } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Pagination,
+	Table,
+	type TableColumn,
+	Toggle,
+	useFormatNumber,
+} from '@modrinth/ui'
 
 import {
 	type AnalyticsBreakdownPreset,
@@ -122,10 +139,17 @@ type AnalyticsTableRow = {
 	dateMs: number
 	project: string
 	breakdown: string
+	breakdownDisplay: string
 	views: number
 	downloads: number
 	revenue: number
 	playtime: number
+}
+
+type SortedRowsCache = {
+	sortColumn: TableColumnKey | undefined
+	sortDirection: SortDirection
+	rows: AnalyticsTableRow[]
 }
 
 const {
@@ -148,6 +172,26 @@ const isDataLoading = computed(() => isLoading.value)
 const tableMode = ref<TableMode>('breakdown_only')
 const sortColumn = ref<TableColumnKey | undefined>('date')
 const sortDirection = ref<SortDirection>('asc')
+const displayedSortColumn = ref<TableColumnKey | undefined>('date')
+const displayedSortDirection = ref<SortDirection>('asc')
+const PAGE_SIZE = 500
+const currentPage = ref(1)
+const sortCollator = new Intl.Collator(undefined, { sensitivity: 'base' })
+const tableRowsByMode = shallowRef<Record<TableMode, AnalyticsTableRow[] | null>>({
+	date_breakdown: null,
+	breakdown_only: null,
+})
+const sortedRowsByMode = shallowRef<Record<TableMode, SortedRowsCache | null>>({
+	date_breakdown: null,
+	breakdown_only: null,
+})
+const modeBuildRequestIds: Record<TableMode, number> = {
+	date_breakdown: 0,
+	breakdown_only: 0,
+}
+let tableCacheGeneration = 0
+const displayedTableMode = ref<TableMode>('breakdown_only')
+const displayedSortedRows = shallowRef<AnalyticsTableRow[]>([])
 
 const includeDate = computed<boolean>({
 	get: () => tableMode.value === 'date_breakdown',
@@ -179,7 +223,14 @@ const showDateToggle = computed(() => showBreakdownColumn.value)
 const includeDateColumn = computed(
 	() => tableMode.value === 'date_breakdown' || !showBreakdownColumn.value,
 )
-
+const activeTableMode = computed<TableMode>(() =>
+	tableMode.value === 'date_breakdown' || !showBreakdownColumn.value
+		? 'date_breakdown'
+		: 'breakdown_only',
+)
+const displayedIncludeDateColumn = computed(
+	() => displayedTableMode.value === 'date_breakdown' || !showBreakdownColumn.value,
+)
 const projectNamesById = computed(
 	() => new Map(projects.value.map((project) => [project.id, project.name])),
 )
@@ -226,7 +277,7 @@ const showYearInBucketLabel = computed(() => {
 		: false
 })
 
-const tableRows = computed<AnalyticsTableRow[]>(() => {
+function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 	const nextFetchRequest = fetchRequest.value
 	const nextTimeSlices = timeSlices.value
 	const nextSelectedBreakdown = selectedBreakdown.value
@@ -236,7 +287,7 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 	}
 
 	const sliceCount = getSliceCount(nextFetchRequest.time_range, nextTimeSlices.length)
-	const includeDate = includeDateColumn.value
+	const includeDate = mode === 'date_breakdown' || !showBreakdownColumn.value
 
 	const breakdownValues = new Set<string>()
 	if (nextSelectedBreakdown === 'none') {
@@ -264,6 +315,14 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 		return []
 	}
 
+	const breakdownDisplayValues = new Map<string, string>()
+	const projectDisplayValues = new Map<string, string>()
+
+	for (const breakdown of breakdownValues) {
+		breakdownDisplayValues.set(breakdown, formatBreakdownDisplayValue(breakdown))
+		projectDisplayValues.set(breakdown, getProjectDisplayValue(breakdown, nextSelectedBreakdown))
+	}
+
 	const nextRows = new Map<string, AnalyticsTableRow>()
 
 	if (includeDate) {
@@ -282,8 +341,9 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 					id: rowId,
 					date: dateLabel,
 					dateMs,
-					project: getProjectDisplayValue(breakdown, nextSelectedBreakdown),
+					project: projectDisplayValues.get(breakdown) ?? '',
 					breakdown,
+					breakdownDisplay: breakdownDisplayValues.get(breakdown) ?? breakdown,
 					views: 0,
 					downloads: 0,
 					revenue: 0,
@@ -297,8 +357,9 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 				id: breakdown,
 				date: '',
 				dateMs: 0,
-				project: getProjectDisplayValue(breakdown, nextSelectedBreakdown),
+				project: projectDisplayValues.get(breakdown) ?? '',
 				breakdown,
+				breakdownDisplay: breakdownDisplayValues.get(breakdown) ?? breakdown,
 				views: 0,
 				downloads: 0,
 				revenue: 0,
@@ -346,14 +407,21 @@ const tableRows = computed<AnalyticsTableRow[]>(() => {
 	})
 
 	return Array.from(nextRows.values())
-})
+}
 
-const columns = computed<TableColumn<TableColumnKey>[]>(() => {
+const columns = computed<TableColumn<TableColumnKey>[]>(() =>
+	buildColumns(displayedIncludeDateColumn.value),
+)
+const activeColumns = computed<TableColumn<TableColumnKey>[]>(() =>
+	buildColumns(includeDateColumn.value),
+)
+
+function buildColumns(includeDate: boolean): TableColumn<TableColumnKey>[] {
 	const nextColumns: TableColumn<TableColumnKey>[] = []
 
 	const stats = getRelevantAnalyticsDashboardStats(selectedBreakdown.value, selectedFilters.value)
 
-	if (includeDateColumn.value) {
+	if (includeDate) {
 		nextColumns.push({
 			key: 'date',
 			label: 'Date',
@@ -386,10 +454,10 @@ const columns = computed<TableColumn<TableColumnKey>[]>(() => {
 	}
 
 	return nextColumns
-})
+}
 
 watch(
-	columns,
+	activeColumns,
 	(nextColumns) => {
 		const availableColumns = new Set(nextColumns.map((column) => column.key))
 		if (sortColumn.value && availableColumns.has(sortColumn.value)) {
@@ -402,38 +470,221 @@ watch(
 )
 
 watch(includeDateColumn, () => {
-	applyDefaultSort()
+	applyDefaultSort(activeColumns.value)
 })
 
 const sortedRows = computed<AnalyticsTableRow[]>(() => {
-	const rows = [...tableRows.value]
+	return displayedSortedRows.value
+})
+
+watch(
+	[
+		fetchRequest,
+		timeSlices,
+		selectedProjectIds,
+		selectedGroupBy,
+		selectedBreakdown,
+		selectedFilters,
+		projects,
+	],
+	() => {
+		invalidateTableCaches()
+		scheduleRowsForMode(activeTableMode.value)
+		scheduleInactiveModeWarmup()
+	},
+	{ immediate: true, flush: 'post' },
+)
+
+watch(activeTableMode, () => {
+	currentPage.value = 1
+	scheduleRowsForMode(activeTableMode.value)
+	scheduleInactiveModeWarmup()
+})
+
+watch([sortColumn, sortDirection], () => {
+	invalidateSortedCaches()
+	scheduleRowsForMode(activeTableMode.value)
+	scheduleInactiveModeWarmup()
+})
+
+const pageCount = computed(() => Math.max(Math.ceil(sortedRows.value.length / PAGE_SIZE), 1))
+const visibleRowStart = computed(() =>
+	sortedRows.value.length === 0 ? 0 : (currentPage.value - 1) * PAGE_SIZE + 1,
+)
+const visibleRowEnd = computed(() =>
+	Math.min(currentPage.value * PAGE_SIZE, sortedRows.value.length),
+)
+const paginatedRows = computed<AnalyticsTableRow[]>(() =>
+	sortedRows.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE),
+)
+
+watch(sortedRows, () => {
+	currentPage.value = 1
+})
+
+watch(pageCount, (nextPageCount) => {
+	if (currentPage.value > nextPageCount) {
+		currentPage.value = nextPageCount
+	}
+})
+
+function invalidateTableCaches() {
+	tableCacheGeneration++
+	tableRowsByMode.value = {
+		date_breakdown: null,
+		breakdown_only: null,
+	}
+	invalidateSortedCaches()
+}
+
+function invalidateSortedCaches() {
+	sortedRowsByMode.value = {
+		date_breakdown: null,
+		breakdown_only: null,
+	}
+}
+
+function hasSortedRowsForMode(mode: TableMode): boolean {
+	const cached = sortedRowsByMode.value[mode]
+	return (
+		cached !== null &&
+		cached.sortColumn === sortColumn.value &&
+		cached.sortDirection === sortDirection.value
+	)
+}
+
+function setCachedTableRows(mode: TableMode, rows: AnalyticsTableRow[]) {
+	tableRowsByMode.value = {
+		...tableRowsByMode.value,
+		[mode]: rows,
+	}
+}
+
+function setCachedSortedRows(mode: TableMode, rows: AnalyticsTableRow[]) {
+	sortedRowsByMode.value = {
+		...sortedRowsByMode.value,
+		[mode]: {
+			sortColumn: sortColumn.value,
+			sortDirection: sortDirection.value,
+			rows,
+		},
+	}
+
+	if (mode === activeTableMode.value) {
+		displayRowsForMode(mode)
+	}
+}
+
+function scheduleRowsForMode(mode: TableMode) {
+	if (hasSortedRowsForMode(mode)) {
+		if (mode === activeTableMode.value) {
+			displayRowsForMode(mode)
+		}
+		return
+	}
+
+	const requestId = ++modeBuildRequestIds[mode]
+	const generation = tableCacheGeneration
+
+	void buildRowsForMode(mode, generation, requestId)
+}
+
+function displayRowsForMode(mode: TableMode) {
+	const cached = sortedRowsByMode.value[mode]
+	if (!cached) {
+		return
+	}
+
+	displayedTableMode.value = mode
+	displayedSortColumn.value = cached.sortColumn
+	displayedSortDirection.value = cached.sortDirection
+	displayedSortedRows.value = cached.rows
+}
+
+async function buildRowsForMode(
+	mode: TableMode,
+	generation: number,
+	requestId: number,
+) {
+	await waitForDeferredTableWork()
+
+	if (isStaleBuild(mode, generation, requestId)) {
+		return
+	}
+
+	const cachedRows = tableRowsByMode.value[mode]
+	const rows = cachedRows ?? buildTableRows(mode)
+
+	if (isStaleBuild(mode, generation, requestId)) {
+		return
+	}
+
+	if (!cachedRows) {
+		setCachedTableRows(mode, rows)
+	}
+
+	setCachedSortedRows(mode, sortTableRows(rows))
+}
+
+function isStaleBuild(mode: TableMode, generation: number, requestId: number): boolean {
+	return tableCacheGeneration !== generation || modeBuildRequestIds[mode] !== requestId
+}
+
+function waitForDeferredTableWork(): Promise<void> {
+	if (!import.meta.client) {
+		return Promise.resolve()
+	}
+
+	return new Promise((resolve) => {
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => resolve())
+		})
+	})
+}
+
+function scheduleInactiveModeWarmup() {
+	if (!showBreakdownColumn.value) {
+		return
+	}
+
+	const inactiveMode: TableMode =
+		activeTableMode.value === 'date_breakdown' ? 'breakdown_only' : 'date_breakdown'
+
+	if (hasSortedRowsForMode(inactiveMode)) {
+		return
+	}
+
+	if (!import.meta.client) {
+		scheduleRowsForMode(inactiveMode)
+		return
+	}
+
+	const windowWithIdleCallback = window as Window & {
+		requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number
+	}
+
+	if (windowWithIdleCallback.requestIdleCallback) {
+		windowWithIdleCallback.requestIdleCallback(() => scheduleRowsForMode(inactiveMode), {
+			timeout: 2000,
+		})
+	} else {
+		window.setTimeout(() => scheduleRowsForMode(inactiveMode), 250)
+	}
+}
+
+function sortTableRows(rows: AnalyticsTableRow[]): AnalyticsTableRow[] {
+	const nextRows = [...rows]
 	const activeSortColumn = sortColumn.value
 
 	if (!activeSortColumn) {
-		return rows
+		return nextRows
 	}
 
 	const directionFactor = sortDirection.value === 'asc' ? 1 : -1
+	nextRows.sort(getRowComparator(activeSortColumn, directionFactor))
 
-	rows.sort((left, right) => {
-		const primaryResult = getSortComparison(left, right, activeSortColumn)
-		if (primaryResult !== 0) {
-			return primaryResult * directionFactor
-		}
-
-		const dateResult = left.dateMs - right.dateMs
-		if (dateResult !== 0) {
-			return dateResult * directionFactor
-		}
-
-		return (
-			left.breakdown.localeCompare(right.breakdown, undefined, { sensitivity: 'base' }) *
-			directionFactor
-		)
-	})
-
-	return rows
-})
+	return nextRows
+}
 
 const revenueFormatter = computed(
 	() =>
@@ -520,10 +771,19 @@ function getMetricColumnForStat(stat: AnalyticsDashboardStat): TableColumn<Table
 	}
 }
 
-function applyDefaultSort(nextColumns = columns.value) {
+function applyDefaultSort(nextColumns = activeColumns.value) {
 	const nextSortColumn = getDefaultSortColumn(nextColumns)
 	sortColumn.value = nextSortColumn
 	sortDirection.value = getDefaultSortDirection(nextSortColumn)
+}
+
+function applyRequestedSort(column: string, direction: SortDirection) {
+	sortColumn.value = column as TableColumnKey
+	sortDirection.value = direction
+}
+
+function switchPage(page: number) {
+	currentPage.value = page
 }
 
 function getDefaultSortColumn(
@@ -552,33 +812,56 @@ function getBreakdownValue(
 	return getAnalyticsBreakdownValue(point, selectedBreakdown)
 }
 
-function getSortComparison(
-	left: AnalyticsTableRow,
-	right: AnalyticsTableRow,
+function getRowComparator(
 	column: TableColumnKey,
-): number {
+	directionFactor: number,
+): (left: AnalyticsTableRow, right: AnalyticsTableRow) => number {
 	switch (column) {
 		case 'date':
-			return left.dateMs - right.dateMs
+			return (left, right) => compareRows(left, right, left.dateMs - right.dateMs, directionFactor)
 		case 'project':
-			return left.project.localeCompare(right.project, undefined, { sensitivity: 'base' })
+			return (left, right) =>
+				compareRows(left, right, sortCollator.compare(left.project, right.project), directionFactor)
 		case 'breakdown':
-			return formatBreakdownDisplayValue(left.breakdown).localeCompare(
-				formatBreakdownDisplayValue(right.breakdown),
-				undefined,
-				{ sensitivity: 'base' },
-			)
+			return (left, right) =>
+				compareRows(
+					left,
+					right,
+					sortCollator.compare(left.breakdownDisplay, right.breakdownDisplay),
+					directionFactor,
+				)
 		case 'views':
-			return left.views - right.views
+			return (left, right) => compareRows(left, right, left.views - right.views, directionFactor)
 		case 'downloads':
-			return left.downloads - right.downloads
+			return (left, right) =>
+				compareRows(left, right, left.downloads - right.downloads, directionFactor)
 		case 'revenue':
-			return left.revenue - right.revenue
+			return (left, right) =>
+				compareRows(left, right, left.revenue - right.revenue, directionFactor)
 		case 'playtime':
-			return left.playtime - right.playtime
+			return (left, right) =>
+				compareRows(left, right, left.playtime - right.playtime, directionFactor)
 		default:
-			return 0
+			return () => 0
 	}
+}
+
+function compareRows(
+	left: AnalyticsTableRow,
+	right: AnalyticsTableRow,
+	primaryResult: number,
+	directionFactor: number,
+): number {
+	if (primaryResult !== 0) {
+		return primaryResult * directionFactor
+	}
+
+	const dateResult = left.dateMs - right.dateMs
+	if (dateResult !== 0) {
+		return dateResult * directionFactor
+	}
+
+	return sortCollator.compare(left.breakdown, right.breakdown) * directionFactor
 }
 
 function formatBreakdownDisplayValue(value: string): string {
@@ -606,7 +889,7 @@ function getCsvCellValue(row: AnalyticsTableRow, key: TableColumnKey): string | 
 		case 'project':
 			return row.project
 		case 'breakdown':
-			return formatBreakdownDisplayValue(row.breakdown)
+			return row.breakdownDisplay
 		case 'views':
 			return row.views
 		case 'downloads':
@@ -655,7 +938,7 @@ function downloadCsv() {
 	downloadLink.setAttribute('href', url)
 	downloadLink.setAttribute(
 		'download',
-		`analytics-${includeDateColumn.value ? 'date-breakdown' : 'breakdown-only'}.csv`,
+		`analytics-${displayedIncludeDateColumn.value ? 'date-breakdown' : 'breakdown-only'}.csv`,
 	)
 	downloadLink.style.visibility = 'hidden'
 
