@@ -78,6 +78,7 @@ const props = defineProps<{
 	xAxisTickLimit?: number
 	activeStat: AnalyticsDashboardStat
 	pinnedSliceIndex: number | null
+	highlightedDatasetId: string | null
 }>()
 
 const emit = defineEmits<{
@@ -110,9 +111,12 @@ const EMPTY_DATA_Y_AXIS_MAX = 10
 const EMPTY_DATA_Y_AXIS_STEP = 2
 const Y_AXIS_WIDTH = 40
 const SECONDS_PER_HOUR = 60 * 60
+const DIMMED_SERIES_OPACITY = 0.5
+const BAR_BACKGROUND_OPACITY = 0.85
+const AREA_BACKGROUND_OPACITY = 0.3
+const SERIES_OPACITY_TRANSITION_MS = 150
 const CSS_VARIABLE_COLOR_PATTERN = /^var\(\s*(--[a-z0-9-_]+)\s*\)$/i
-const HSL_COLOR_PATTERN =
-	/^hsl\(\s*([0-9.]+)(?:deg)?\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%\s*\)$/i
+const HSL_COLOR_PATTERN = /^hsl\(\s*([0-9.]+)(?:deg)?\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%\s*\)$/i
 
 let pinnedDragPointerId: number | null = null
 let pinnedDragStartX = 0
@@ -124,6 +128,8 @@ let rangeSelectStartY = 0
 let rangeSelectStartSliceIndex: number | null = null
 let rangeSelectLastSliceIndex: number | null = null
 let isRangeSelecting = false
+let seriesOpacityAnimationFrame: number | null = null
+let currentDatasetOpacities: number[] = []
 
 const geometryPlugin = {
 	id: 'analytics-chart-geometry',
@@ -326,21 +332,40 @@ function resolveCssColor(color: string): string {
 	return resolvedColor || color
 }
 
+function getTargetDatasetOpacity(index: number) {
+	const dataset = props.datasets[index]
+	return props.highlightedDatasetId !== null && dataset?.projectId !== props.highlightedDatasetId
+		? DIMMED_SERIES_OPACITY
+		: 1
+}
+
+function getDatasetOpacity(index: number) {
+	return currentDatasetOpacities[index] ?? getTargetDatasetOpacity(index)
+}
+
+function getDatasetColors(dataset: ChartDataset, index: number) {
+	const opacity = getDatasetOpacity(index)
+	return {
+		borderColor: withAlpha(resolveCssColor(dataset.borderColor), opacity),
+		backgroundColor: resolveCssColor(dataset.backgroundColor),
+		opacity,
+	}
+}
+
 function buildDatasets() {
 	return props.datasets.map((dataset, index) => {
-		const borderColor = resolveCssColor(dataset.borderColor)
-		const backgroundColor = resolveCssColor(dataset.backgroundColor)
+		const colors = getDatasetColors(dataset, index)
 		const common = {
 			label: dataset.label,
 			data: dataset.data,
-			borderColor,
+			borderColor: colors.borderColor,
 			borderWidth: 2,
 		}
 
 		if (props.type === 'bar') {
 			return {
 				...common,
-				backgroundColor: withAlpha(backgroundColor, 0.85),
+				backgroundColor: withAlpha(colors.backgroundColor, BAR_BACKGROUND_OPACITY * colors.opacity),
 				borderWidth: 0,
 				stack: props.stacked ? 'analytics' : undefined,
 			}
@@ -350,19 +375,107 @@ function buildDatasets() {
 
 		return {
 			...common,
-			backgroundColor: props.fill ? withAlpha(backgroundColor, 0.3) : backgroundColor,
+			backgroundColor: props.fill
+				? withAlpha(colors.backgroundColor, AREA_BACKGROUND_OPACITY * colors.opacity)
+				: withAlpha(colors.backgroundColor, colors.opacity),
 			fill: lineFill,
 			tension: 0.35,
 			pointRadius: 0,
-			pointBackgroundColor: borderColor,
+			pointBackgroundColor: colors.borderColor,
 			pointBorderWidth: 0,
 			pointHoverRadius: 4,
-			pointHoverBackgroundColor: borderColor,
+			pointHoverBackgroundColor: colors.borderColor,
 			pointHoverBorderWidth: 0,
 			pointHitRadius: 16,
 			stack: props.stacked ? 'analytics' : undefined,
 		}
 	})
+}
+
+function cancelSeriesOpacityAnimation() {
+	if (seriesOpacityAnimationFrame === null) return
+
+	cancelAnimationFrame(seriesOpacityAnimationFrame)
+	seriesOpacityAnimationFrame = null
+}
+
+function getTargetDatasetOpacities() {
+	return props.datasets.map((_, index) => getTargetDatasetOpacity(index))
+}
+
+function syncDatasetOpacitiesToTargets() {
+	cancelSeriesOpacityAnimation()
+	currentDatasetOpacities = getTargetDatasetOpacities()
+}
+
+function applySeriesHoverState() {
+	if (!chartInstance) return
+
+	chartInstance.data.datasets.forEach((chartDataset, index) => {
+		const dataset = props.datasets[index]
+		if (!dataset) return
+
+		const colors = getDatasetColors(dataset, index)
+		chartDataset.borderColor = colors.borderColor
+		chartDataset.backgroundColor =
+			props.type === 'bar'
+				? withAlpha(colors.backgroundColor, BAR_BACKGROUND_OPACITY * colors.opacity)
+				: props.fill
+					? withAlpha(colors.backgroundColor, AREA_BACKGROUND_OPACITY * colors.opacity)
+					: withAlpha(colors.backgroundColor, colors.opacity)
+		Object.assign(chartDataset, {
+			pointBackgroundColor: colors.borderColor,
+			pointHoverBackgroundColor: colors.borderColor,
+		})
+	})
+
+	chartInstance.update('none')
+}
+
+function easeSeriesOpacityTransition(progress: number) {
+	return 1 - Math.pow(1 - progress, 3)
+}
+
+function animateSeriesHoverState() {
+	if (!chartInstance) return
+	if (typeof requestAnimationFrame === 'undefined') {
+		syncDatasetOpacitiesToTargets()
+		applySeriesHoverState()
+		return
+	}
+
+	cancelSeriesOpacityAnimation()
+
+	const from = props.datasets.map((_, index) => getDatasetOpacity(index))
+	const to = getTargetDatasetOpacities()
+	if (from.every((opacity, index) => Math.abs(opacity - (to[index] ?? 1)) < 0.001)) {
+		currentDatasetOpacities = to
+		applySeriesHoverState()
+		return
+	}
+
+	const start = performance.now()
+	const tick = (now: number) => {
+		const progress = Math.min(1, (now - start) / SERIES_OPACITY_TRANSITION_MS)
+		const easedProgress = easeSeriesOpacityTransition(progress)
+		currentDatasetOpacities = to.map(
+			(targetOpacity, index) =>
+				(from[index] ?? targetOpacity) +
+				(targetOpacity - (from[index] ?? targetOpacity)) * easedProgress,
+		)
+		applySeriesHoverState()
+
+		if (progress < 1) {
+			seriesOpacityAnimationFrame = requestAnimationFrame(tick)
+			return
+		}
+
+		seriesOpacityAnimationFrame = null
+		currentDatasetOpacities = to
+		applySeriesHoverState()
+	}
+
+	seriesOpacityAnimationFrame = requestAnimationFrame(tick)
 }
 
 function getVisibleXAxisLabelIndexes(labelCount: number, limit: number): Set<number> {
@@ -499,12 +612,14 @@ function handleExternalTooltip(context: ExternalTooltipContext) {
 
 function createChart() {
 	if (!canvasRef.value) return
+	syncDatasetOpacitiesToTargets()
 	chartInstance = new Chart(canvasRef.value, buildConfig())
 	emitChartGeometry()
 }
 
 function refreshChart() {
 	if (!chartInstance) return
+	syncDatasetOpacitiesToTargets()
 	const config = buildConfig()
 	chartInstance.data = config.data
 	chartInstance.options = config.options ?? {}
@@ -657,6 +772,7 @@ onBeforeUnmount(() => {
 	canvasRef.value?.removeEventListener('pointermove', handlePinnedPointerMove)
 	canvasRef.value?.removeEventListener('pointerup', handlePinnedPointerEnd)
 	canvasRef.value?.removeEventListener('pointercancel', handlePinnedPointerEnd)
+	cancelSeriesOpacityAnimation()
 	chartInstance?.destroy()
 	chartInstance = null
 })
@@ -685,6 +801,13 @@ watch(
 	() => props.pinnedSliceIndex,
 	() => {
 		applyPinnedSliceState()
+	},
+)
+
+watch(
+	() => props.highlightedDatasetId,
+	() => {
+		animateSeriesHoverState()
 	},
 )
 </script>

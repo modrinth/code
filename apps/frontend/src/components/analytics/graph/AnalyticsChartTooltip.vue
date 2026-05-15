@@ -2,9 +2,10 @@
 	<div
 		v-show="visible"
 		ref="tooltipElement"
-		class="analytics-chart-tooltip absolute left-0 top-0 z-10 max-h-[360px] min-w-[14rem] overflow-y-auto rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-2 text-sm shadow-lg"
+		class="analytics-chart-tooltip absolute left-0 top-0 z-10 max-h-[360px] min-w-[14rem] overflow-y-auto overscroll-contain rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-2 text-sm shadow-lg"
 		:class="pinned ? '' : 'pointer-events-none'"
 		:style="positionStyle"
+		@click.stop
 	>
 		<div class="mb-1 flex items-center justify-between gap-2 font-medium text-contrast">
 			<span>
@@ -16,7 +17,7 @@
 			<PinIcon
 				v-if="pinned"
 				v-tooltip="'Chart tooltip pinned'"
-				class="pointer-events-auto size-4 shrink-0 font-normal text-contrast"
+				class="pointer-events-none size-4 shrink-0 font-normal text-contrast"
 				aria-label="Pinned"
 			/>
 		</div>
@@ -228,10 +229,6 @@ function consumeWheel(event: WheelEvent): boolean {
 	if (deltaY === 0) return false
 
 	const scrollTop = element.scrollTop
-	const canScrollDown = deltaY > 0 && scrollTop < maxScrollTop
-	const canScrollUp = deltaY < 0 && scrollTop > 0
-	if (!canScrollDown && !canScrollUp) return false
-
 	element.scrollTop = Math.min(maxScrollTop, Math.max(0, scrollTop + deltaY))
 	event.preventDefault()
 	return true

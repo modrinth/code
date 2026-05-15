@@ -43,6 +43,7 @@
 				>
 					<button
 						type="button"
+						v-tooltip="getLegendEntryTooltip(legendEntry)"
 						class="inline-flex items-center gap-1.5 text-sm !outline-0 transition-all focus-within:!outline-0 focus:!outline-0 focus-visible:!outline-0"
 						:class="[
 							legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary',
@@ -51,11 +52,14 @@
 								: 'cursor-pointer hover:brightness-125',
 						]"
 						:aria-pressed="!legendEntry.hidden"
+						@mouseenter="setHoveredLegendEntryId(legendEntry.id)"
+						@mouseleave="clearHoveredLegendEntryId(legendEntry.id)"
+						@focus="setHoveredLegendEntryId(legendEntry.id)"
+						@blur="clearHoveredLegendEntryId(legendEntry.id)"
 						@click="onLegendEntryClick($event, legendEntry.id)"
 					>
 						<span class="size-2 rounded-full" :style="{ backgroundColor: legendEntry.color }" />
 						<span
-							v-tooltip="legendEntry.projectName ?? ''"
 							:class="{
 								'line-through': legendEntry.hidden,
 								capitalize: shouldCapitalizeDatasetLabels,
@@ -114,6 +118,7 @@
 								:x-axis-tick-limit="xAxisTickLimit"
 								:active-stat="activeStat"
 								:pinned-slice-index="pinnedSliceIndex"
+								:highlighted-dataset-id="highlightedChartDatasetId"
 								@hover="onChartHover"
 								@geometry="onChartGeometry"
 								@pinned-drag="onPinnedDrag"
@@ -140,7 +145,7 @@
 						<div
 							v-if="showPinnedGuide"
 							aria-hidden="true"
-							class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-8 mt-2 border-0 border-l-[2px] border-dashed border-green opacity-75"
+							class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-8 mt-2 border-0 border-l border-dashed border-green opacity-75"
 							:style="{ transform: `translate(${hoverState.x}px, 0)` }"
 						/>
 						<AnalyticsChartTooltip
@@ -456,6 +461,7 @@ const hoverState = reactive<HoverState>({
 
 const isHoverPinned = ref(false)
 const ignoreNextChartClick = ref(false)
+const hoveredLegendEntryId = ref<string | null>(null)
 const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
 
 const LEGEND_MAX_ITEMS = 8
@@ -748,10 +754,30 @@ const visibleChartDatasetById = computed(() => {
 	return datasets
 })
 
+const highlightedChartDatasetId = computed(() => {
+	const datasetId = hoveredLegendEntryId.value
+	if (!datasetId || !visibleChartDatasetById.value.has(datasetId)) return null
+	return datasetId
+})
+
 function isLegendEntryToggleDisabled(legendEntry: LegendEntry) {
 	if (legendEntry.hidden) return false
 	const visibleCount = displayedLegendEntries.value.filter((entry) => !entry.hidden).length
 	return visibleCount <= 1
+}
+
+function getLegendEntryTooltip(legendEntry: LegendEntry) {
+	return legendEntry.projectName ?? ''
+}
+
+function setHoveredLegendEntryId(datasetId: string) {
+	hoveredLegendEntryId.value = datasetId
+}
+
+function clearHoveredLegendEntryId(datasetId: string) {
+	if (hoveredLegendEntryId.value === datasetId) {
+		hoveredLegendEntryId.value = null
+	}
 }
 
 function toggleLegendEntryVisibility(datasetId: string) {
