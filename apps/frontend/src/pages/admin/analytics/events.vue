@@ -20,6 +20,7 @@
 				<span class="label__title font-semibold">Title</span>
 				<StyledInput
 					id="analytics-event-title"
+					ref="titleInput"
 					v-model="form.title"
 					type="text"
 					autocomplete="off"
@@ -214,8 +215,9 @@ import {
 	Table,
 	type TableColumn,
 } from '@modrinth/ui'
+import { isAdmin } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import {
 	analyticsEventsQueryKey,
@@ -226,7 +228,20 @@ import {
 } from '~/services/analytics-events'
 
 definePageMeta({
-	middleware: ['auth', 'staff'],
+	middleware: [
+		'auth',
+		async () => {
+			const auth = await useAuth()
+
+			if (!auth.value.user || !isAdmin(auth.value.user)) {
+				throw createError({
+					fatal: true,
+					statusCode: 401,
+					statusMessage: 'Unauthorized',
+				})
+			}
+		},
+	],
 })
 
 type EventColumnKey = 'title' | 'announcement' | 'date' | 'metrics' | 'actions'
@@ -269,6 +284,7 @@ const allMetricKinds = metricKindOptions.map((option) => option.value)
 
 const deleteEventModal = ref<InstanceType<typeof ConfirmModal> | null>(null)
 const eventModal = ref<InstanceType<typeof NewModal> | null>(null)
+const titleInput = ref<InstanceType<typeof StyledInput> | null>(null)
 const searchQuery = ref('')
 const sortColumn = ref<EventColumnKey | undefined>('date')
 const sortDirection = ref<SortDirection>('desc')
@@ -280,6 +296,7 @@ const isSaving = ref(false)
 const deletingEventIds = ref(new Set<Labrinth.Analytics.v3.AnalyticsEventId>())
 const notifiedEventsErrorMessage = ref<string | null>(null)
 const committedAnnouncementUrl = ref('')
+let resetFormTimeout: ReturnType<typeof setTimeout> | null = null
 
 const {
 	data: analyticsEvents,
@@ -310,6 +327,10 @@ watch(eventsError, (error) => {
 		text: message,
 		type: 'error',
 	})
+})
+
+onBeforeUnmount(() => {
+	clearResetFormTimeout()
 })
 
 const trimmedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
@@ -384,7 +405,9 @@ function openCreateModal() {
 		dateRange: getDefaultDateRange(),
 	}
 	committedAnnouncementUrl.value = ''
+	clearResetFormTimeout()
 	eventModal.value?.show()
+	void focusTitleInput()
 }
 
 function openEditModal(event: Labrinth.Analytics.v3.AnalyticsEvent) {
@@ -397,12 +420,21 @@ function openEditModal(event: Labrinth.Analytics.v3.AnalyticsEvent) {
 		metricKinds: event.for_metric_kind?.length ? [...event.for_metric_kind] : [...allMetricKinds],
 	}
 	committedAnnouncementUrl.value = event.announcement_url ?? ''
+	clearResetFormTimeout()
 	eventModal.value?.show()
+	void focusTitleInput()
 }
 
 function openDeleteEventModal(event: Labrinth.Analytics.v3.AnalyticsEvent) {
 	pendingDeleteEvent.value = event
 	deleteEventModal.value?.show()
+}
+
+async function focusTitleInput() {
+	await nextTick()
+	setTimeout(() => {
+		titleInput.value?.focus()
+	}, 75)
 }
 
 async function saveEvent() {
@@ -477,9 +509,22 @@ async function deleteEvent(eventId: Labrinth.Analytics.v3.AnalyticsEventId) {
 }
 
 function resetForm() {
-	form.value = getEmptyForm()
-	editingEventId.value = null
-	committedAnnouncementUrl.value = ''
+	clearResetFormTimeout()
+	resetFormTimeout = setTimeout(() => {
+		form.value = getEmptyForm()
+		editingEventId.value = null
+		committedAnnouncementUrl.value = ''
+		resetFormTimeout = null
+	}, 500)
+}
+
+function clearResetFormTimeout() {
+	if (!resetFormTimeout) {
+		return
+	}
+
+	clearTimeout(resetFormTimeout)
+	resetFormTimeout = null
 }
 
 function normalizeUrl(value: string): string | undefined {
