@@ -1,26 +1,42 @@
 <template>
 	<div
-		class="flex flex-col gap-2.5 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4 pt-1"
+		class="flex flex-col gap-0 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-0 pt-1"
 	>
 		<DatePicker
 			v-model="pickerRange"
 			mode="range"
 			:show-months="2"
 			:clearable="false"
-			:default-view-date="startDate"
+			:default-view-date="todayInputValue"
+			view-date-alignment="right"
+			:min-date="minDate"
 			:max-date="todayInputValue"
 			show-today
 			calendar-only
 			wrapper-class="w-full"
-			calendar-class="!border-none !p-0 !pt-3"
+			calendar-class="!border-none"
 		/>
-		<div class="flex items-center justify-between pl-1">
-			<div class="flex gap-1.5">
-				<span v-if="formattedRange" class="text-sm font-medium text-primary">Selected:</span>
-				<span v-if="formattedRange" class="text-sm font-normal text-primary">{{
-					formattedRange
-				}}</span>
+		<div class="flex items-center justify-between p-4 pt-1">
+			<div class="text-base">
+				<template v-if="formattedRange">
+					<div class="flex items-center gap-1.5">
+						<span class="font-normal text-primary">{{ rangeLabel }}:</span>
+						<span class="font-medium text-contrast">{{ formattedRange }}</span>
+						<button
+							v-if="selectedDraftDates.length !== 1"
+							type="button"
+							class="ml-1 border-0 bg-transparent p-0 font-normal text-primary underline hover:text-primary"
+							@click.stop="clearRange"
+						>
+							Clear
+						</button>
+					</div>
+				</template>
+				<template v-else>
+					<span class="font-normal text-primary">No date range selected.</span>
+				</template>
 			</div>
+
 			<div class="flex items-center gap-2">
 				<ButtonStyled type="outlined">
 					<button type="button" @click="$emit('cancel', $event)">Cancel</button>
@@ -43,6 +59,10 @@ defineEmits<{
 	apply: [event: MouseEvent]
 }>()
 
+defineProps<{
+	minDate: string
+}>()
+
 const startDate = defineModel<string>('startDate', { required: true })
 const endDate = defineModel<string>('endDate', { required: true })
 const pickerRange = ref<DatePickerValue[]>([startDate.value, endDate.value])
@@ -60,12 +80,6 @@ function formatDateString(value: string): string {
 	if (Number.isNaN(parsed.getTime())) return value
 	return rangeFormatter.format(parsed)
 }
-
-const formattedRange = computed(() => {
-	if (!startDate.value || !endDate.value) return ''
-	if (startDate.value === endDate.value) return formatDateString(startDate.value)
-	return `${formatDateString(startDate.value)} – ${formatDateString(endDate.value)}`
-})
 
 function getDateInputValue(date: Date): string {
 	const year = date.getFullYear()
@@ -109,6 +123,35 @@ function getOrderedRange(values: DatePickerValue[]): [string, string] | null {
 	}
 
 	return firstDate <= secondDate ? [firstDate, secondDate] : [secondDate, firstDate]
+}
+
+const selectedDraftDates = computed(() =>
+	pickerRange.value
+		.map(getDatePickerValueString)
+		.filter((value): value is string => Boolean(value)),
+)
+
+const rangeLabel = computed(() =>
+	selectedDraftDates.value.length === 1 ? 'Selecting' : 'Selected',
+)
+
+const formattedRange = computed(() => {
+	if (selectedDraftDates.value.length === 1)
+		return `${formatDateString(selectedDraftDates.value[0])} –`
+
+	const orderedRange =
+		getOrderedRange(pickerRange.value) ?? getOrderedRange([startDate.value, endDate.value])
+	if (!orderedRange) return ''
+
+	const [nextStartDate, nextEndDate] = orderedRange
+	if (nextStartDate === nextEndDate) return formatDateString(nextStartDate)
+	return `${formatDateString(nextStartDate)} – ${formatDateString(nextEndDate)}`
+})
+
+function clearRange() {
+	startDate.value = ''
+	endDate.value = ''
+	pickerRange.value = []
 }
 
 function syncPickerRangeFromModels() {

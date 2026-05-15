@@ -20,6 +20,7 @@
 				<CustomRangeTimeframe
 					v-model:start-date="draftSelectedCustomTimeframeStartDate"
 					v-model:end-date="draftSelectedCustomTimeframeEndDate"
+					:min-date="ANALYTICS_START_DATE_INPUT_VALUE"
 					@cancel="handleCustomRangeCancel"
 					@apply="handleCustomRangeApply"
 				/>
@@ -52,6 +53,7 @@
 import { Combobox, type ComboboxOption } from '@modrinth/ui'
 
 import {
+	ANALYTICS_START_DATE_INPUT_VALUE,
 	type AnalyticsGroupByPreset,
 	type AnalyticsLastTimeframeUnit,
 	type AnalyticsTimeframeMode,

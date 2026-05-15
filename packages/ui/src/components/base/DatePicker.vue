@@ -47,6 +47,8 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 type DatePickerValue = string | Date | null | undefined
 type RangeEdge = 'start' | 'end'
+type ViewDateAlignment = 'left' | 'right'
+type CalendarViewMonth = { month: number; year: number }
 type RangeDayElement = HTMLElement & { dateObj?: Date }
 type RangeDragState = {
 	edge: RangeEdge
@@ -84,6 +86,12 @@ const props = withDefaults(
 		 * first opens (and on subsequent opens while the value is empty).
 		 */
 		defaultViewDate?: string | Date
+		/**
+		 * Controls which visible calendar contains the opening view date when
+		 * multiple months are shown. In range mode, a complete range opens to
+		 * the end date.
+		 */
+		viewDateAlignment?: ViewDateAlignment
 		/**
 		 * The stored value format emitted by v-model. See https://flatpickr.js.org/formatting/
 		 *
@@ -129,6 +137,7 @@ const props = withDefaults(
 		showToday: false,
 		calendarOnly: false,
 		preserveDay: false,
+		viewDateAlignment: 'left',
 	},
 )
 
@@ -141,13 +150,15 @@ const emit = defineEmits<{
 const inputRef = ref<HTMLInputElement>()
 const picker = ref<Instance>()
 const isSyncingFromModel = ref(false)
-const intendedViewMonth = ref<{ month: number; year: number } | null>(null)
+const intendedViewMonth = ref<CalendarViewMonth | null>(null)
+const preserveViewOnNextModelSync = ref(false)
 const intendedDay = ref<number | null>(null)
 const isPreservingDay = ref(false)
 const rangeDragState = ref<RangeDragState | null>(null)
 const rangeEndpointMoveState = ref<RangeEndpointMoveState | null>(null)
 const suppressNextRangeClick = ref(false)
 let rangeClickSuppressionTimeout: number | null = null
+let monthSelectSyncFrame: number | null = null
 
 function getDayFromDateStr(dateStr: string): number | null {
 	const parts = dateStr.split('-')
@@ -225,6 +236,134 @@ function syncHeaderControlState(instance: Instance) {
 	}
 }
 
+function getDisplayedMonthDate(instance: Instance, index: number) {
+	return new Date(instance.currentYear, instance.currentMonth + index, 1)
+}
+
+function getMonthName(instance: Instance, month: number) {
+	const monthNames = instance.config.shorthandCurrentMonth
+		? instance.l10n.months.shorthand
+		: instance.l10n.months.longhand
+	return monthNames[month] ?? ''
+}
+
+function syncMultiMonthSelects(instance = picker.value) {
+	if (!instance) return
+
+	for (const select of instance.monthNav.querySelectorAll('.modrinth-monthDropdown-months')) {
+		select.remove()
+	}
+
+	for (const monthElement of instance.monthNav.querySelectorAll('.modrinth-hidden-cur-month')) {
+		monthElement.classList.remove('modrinth-hidden-cur-month')
+	}
+
+	const showMultiMonthSelects =
+		resolvedShowMonths.value >= 1 && !instance.isMobile && !instance.config.noCalendar
+	instance.calendarContainer.classList.toggle('has-multi-month-selects', showMultiMonthSelects)
+	if (!showMultiMonthSelects) return
+
+	instance.monthElements.forEach((monthElement, index) => {
+		const currentMonth = monthElement.closest('.flatpickr-current-month')
+		if (!currentMonth) return
+
+		const displayedMonthDate = getDisplayedMonthDate(instance, index)
+		const displayedYear = displayedMonthDate.getFullYear()
+		const displayedMonth = displayedMonthDate.getMonth()
+		const monthSelect = document.createElement('select')
+		monthSelect.className = 'flatpickr-monthDropdown-months modrinth-monthDropdown-months'
+		monthSelect.setAttribute('aria-label', instance.l10n.monthAriaLabel)
+		monthSelect.tabIndex = -1
+
+		for (let month = 0; month < 12; month++) {
+			const option = document.createElement('option')
+			option.className = 'flatpickr-monthDropdown-month'
+			option.value = String(month)
+			option.textContent = getMonthName(instance, month)
+			option.selected = month === displayedMonth
+			monthSelect.appendChild(option)
+		}
+
+		monthSelect.addEventListener('change', () => {
+			const selectedMonth = Number.parseInt(monthSelect.value, 10)
+			const selectedYear = Number.parseInt(
+				instance.yearElements[index]?.value ?? String(displayedYear),
+				10,
+			)
+			if (!Number.isFinite(selectedMonth) || !Number.isFinite(selectedYear)) return
+
+			instance.jumpToDate(new Date(selectedYear, selectedMonth - index, 1), true)
+			syncHeaderControlState(instance)
+			syncMissingRangeEndState()
+			syncRangeEndpointMoveState(instance)
+			syncMultiMonthSelects(instance)
+		})
+
+		monthElement.classList.add('modrinth-hidden-cur-month')
+		currentMonth.insertBefore(monthSelect, monthElement)
+	})
+}
+
+function changeYearInput(instance: Instance, input: HTMLInputElement, delta: number) {
+	const index = instance.yearElements.indexOf(input)
+	if (index < 0) return
+
+	const displayedMonthDate = getDisplayedMonthDate(instance, index)
+	const displayedYear = displayedMonthDate.getFullYear()
+	const selectedYear = Number.parseInt(input.value, 10)
+	const nextYear = (Number.isFinite(selectedYear) ? selectedYear : displayedYear) + delta
+
+	instance.jumpToDate(new Date(nextYear, displayedMonthDate.getMonth() - index, 1), true)
+	syncHeaderControlState(instance)
+	syncMissingRangeEndState()
+	syncRangeEndpointMoveState(instance)
+	syncMultiMonthSelects(instance)
+}
+
+function queueMultiMonthSelectSync(instance: Instance) {
+	if (monthSelectSyncFrame !== null) window.cancelAnimationFrame(monthSelectSyncFrame)
+
+	monthSelectSyncFrame = window.requestAnimationFrame(() => {
+		monthSelectSyncFrame = null
+		syncMultiMonthSelects(instance)
+	})
+}
+
+function parseViewDate(value: DatePickerValue, instance: Instance): Date | null {
+	if (!value) return null
+	if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value
+
+	const parsedDate = instance.parseDate(value, resolvedDateFormat.value) ?? instance.parseDate(value)
+	if (parsedDate && !Number.isNaN(parsedDate.getTime())) return parsedDate
+
+	const nativeDate = new Date(value)
+	return Number.isNaN(nativeDate.getTime()) ? null : nativeDate
+}
+
+function getAlignedViewDate(date: Date) {
+	if (props.viewDateAlignment !== 'right') return date
+
+	const calendarOffset = resolvedShowMonths.value - 1
+	if (calendarOffset <= 0) return date
+
+	return new Date(date.getFullYear(), date.getMonth() - calendarOffset, 1)
+}
+
+function getOpeningViewDate() {
+	if (props.mode === 'range' && selectedDates.value.length >= 2) {
+		return selectedDates.value[selectedDates.value.length - 1] ?? null
+	}
+
+	return selectedDates.value[0] ?? props.defaultViewDate ?? null
+}
+
+function syncCalendarView(instance: Instance) {
+	const viewDate = parseViewDate(getOpeningViewDate(), instance)
+	if (!viewDate) return
+
+	instance.jumpToDate(getAlignedViewDate(viewDate))
+}
+
 function getRangeDayElement(target: EventTarget | null): RangeDayElement | null {
 	if (!(target instanceof Element)) return null
 	return target.closest<RangeDayElement>('.flatpickr-day')
@@ -259,6 +398,12 @@ function dateOnlyTime(date: Date) {
 	return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
 }
 
+function jumpToViewMonth(instance: Instance, viewMonth: CalendarViewMonth) {
+	if (instance.currentMonth === viewMonth.month && instance.currentYear === viewMonth.year) return
+
+	instance.jumpToDate(new Date(viewMonth.year, viewMonth.month, 1))
+}
+
 function withEndpointTime(date: Date, endpoint: Date) {
 	return new Date(
 		date.getFullYear(),
@@ -272,37 +417,31 @@ function withEndpointTime(date: Date, endpoint: Date) {
 }
 
 function resolveRangeEndpointMove(
-	edge: RangeEdge,
 	targetDate: Date,
 	endpointDate: Date,
 	anchorDate: Date,
 ) {
 	const movedDate = withEndpointTime(targetDate, endpointDate)
-	let nextStartDate = edge === 'start' ? movedDate : anchorDate
-	let nextEndDate = edge === 'end' ? movedDate : anchorDate
-
-	if (edge === 'start' && dateOnlyTime(nextStartDate) > dateOnlyTime(anchorDate)) {
-		nextStartDate = anchorDate
-	} else if (edge === 'end' && dateOnlyTime(nextEndDate) < dateOnlyTime(anchorDate)) {
-		nextEndDate = anchorDate
-	}
+	const [nextStartDate, nextEndDate] =
+		dateOnlyTime(movedDate) <= dateOnlyTime(anchorDate)
+			? [movedDate, anchorDate]
+			: [anchorDate, movedDate]
 
 	return {
 		nextStartDate,
 		nextEndDate,
-		nextEndpointDate: edge === 'start' ? nextStartDate : nextEndDate,
+		nextEndpointDate: movedDate,
 	}
 }
 
 function withPreservedCalendarView(instance: Instance, callback: () => void) {
-	const currentMonth = instance.currentMonth
-	const currentYear = instance.currentYear
+	const currentViewMonth = {
+		month: instance.currentMonth,
+		year: instance.currentYear,
+	}
 
 	callback()
-
-	const monthDelta =
-		currentMonth - instance.currentMonth + (currentYear - instance.currentYear) * 12
-	if (monthDelta !== 0) instance.changeMonth(monthDelta)
+	jumpToViewMonth(instance, currentViewMonth)
 }
 
 function syncRangeEndpointMoveState(instance = picker.value) {
@@ -352,7 +491,6 @@ function previewSelectedRangeEndpoint(event: MouseEvent) {
 	if (!dayElem || !instance.calendarContainer.contains(dayElem) || !isSelectableDay(dayElem)) return
 
 	const { nextStartDate, nextEndDate, nextEndpointDate } = resolveRangeEndpointMove(
-		state.edge,
 		dayElem.dateObj!,
 		state.endpointDate,
 		state.anchorDate,
@@ -375,7 +513,6 @@ function moveSelectedRangeEndpoint(dayElem: RangeDayElement) {
 	if (!state || !instance || !dayElem.dateObj) return false
 
 	const { nextStartDate, nextEndDate, nextEndpointDate } = resolveRangeEndpointMove(
-		state.edge,
 		dayElem.dateObj,
 		state.endpointDate,
 		state.anchorDate,
@@ -455,7 +592,6 @@ function updateRangeDrag(event: PointerEvent) {
 	if (!dayElem || !instance.calendarContainer.contains(dayElem) || !isSelectableDay(dayElem)) return
 
 	const { nextStartDate, nextEndDate, nextEndpointDate } = resolveRangeEndpointMove(
-		state.edge,
 		dayElem.dateObj!,
 		state.draggedEndpointDate,
 		state.anchorDate,
@@ -569,12 +705,14 @@ function hasRangeEnd(instance: Instance) {
 
 function shouldSuppressMissingRangeEndBackground(instance?: Instance) {
 	if (props.mode !== 'range' || !instance) return false
+	if (instance.selectedDates.length !== 1) return false
 
 	const hasRangeStart = Boolean(
 		instance.calendarContainer.querySelector('.flatpickr-day.startRange:not(.endRange)'),
 	)
+	const hasRangePreview = Boolean(instance.calendarContainer.querySelector('.flatpickr-day.inRange'))
 
-	return hasRangeStart && !hasRangeEnd(instance)
+	return hasRangeStart && !hasRangeEnd(instance) && !hasRangePreview
 }
 
 function syncMissingRangeEndState() {
@@ -714,6 +852,8 @@ watch(
 		props.enableTime,
 		props.mode,
 		props.showMonths,
+		props.defaultViewDate,
+		props.viewDateAlignment,
 		props.dateFormat,
 		props.altFormat,
 		props.time24hr,
@@ -763,9 +903,7 @@ onMounted(async () => {
 	picker.value = flatpickr(inputRef.value, {
 		...flatpickrOptions(),
 		onReady: (_selectedDates, _dateStr, instance) => {
-			if (props.defaultViewDate && instance.selectedDates.length === 0) {
-				instance.jumpToDate(props.defaultViewDate)
-			}
+			syncCalendarView(instance)
 
 			instance.calendarContainer.addEventListener('pointerdown', startRangeDrag, true)
 			instance.calendarContainer.addEventListener('mousedown', stopRangeEndpointMouseEvent, true)
@@ -814,6 +952,16 @@ onMounted(async () => {
 				(event) => {
 					const target = event.target as HTMLElement | null
 					if (!target?.matches('input.cur-year')) return
+					if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+						event.preventDefault()
+						event.stopImmediatePropagation()
+						changeYearInput(
+							instance,
+							target as HTMLInputElement,
+							event.key === 'ArrowUp' ? 1 : -1,
+						)
+						return
+					}
 					if (
 						event.key === 'ArrowLeft' ||
 						event.key === 'ArrowRight' ||
@@ -825,11 +973,18 @@ onMounted(async () => {
 				},
 				true,
 			)
+			instance.calendarContainer.addEventListener('keyup', (event) => {
+				const target = event.target as HTMLElement | null
+				if (!target?.matches('input.cur-year') || event.key !== 'Enter') return
+
+				window.requestAnimationFrame(() => target.blur())
+			})
 
 			syncTimeInputTypes(instance)
 			syncHeaderControlState(instance)
 			syncCalendarClasses(instance)
 			syncRangeEndpointMoveState(instance)
+			syncMultiMonthSelects(instance)
 		},
 		onChange: (_selectedDates, dateStr, instance) => {
 			if (isSyncingFromModel.value) return
@@ -838,15 +993,14 @@ onMounted(async () => {
 				props.mode === 'single'
 					? dateStr || null
 					: _selectedDates.map((date) => instance.formatDate(date, resolvedDateFormat.value))
+			if (intendedViewMonth.value !== null) {
+				preserveViewOnNextModelSync.value = true
+			}
 			model.value = nextValue
 			emit('change', nextValue)
 
 			if (intendedViewMonth.value !== null) {
-				const monthDelta =
-					intendedViewMonth.value.month -
-					instance.currentMonth +
-					(intendedViewMonth.value.year - instance.currentYear) * 12
-				if (monthDelta !== 0) instance.changeMonth(monthDelta)
+				jumpToViewMonth(instance, intendedViewMonth.value)
 			}
 
 			syncHeaderControlState(instance)
@@ -868,21 +1022,22 @@ onMounted(async () => {
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
 			syncRangeEndpointMoveState(instance)
+			queueMultiMonthSelectSync(instance)
 		},
 		onYearChange: (_selectedDates, _dateStr, instance) => {
 			applyPreserveDay(instance)
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
 			syncRangeEndpointMoveState(instance)
+			queueMultiMonthSelectSync(instance)
 		},
 		onOpen: (_selectedDates, _dateStr, instance) => {
-			if (props.defaultViewDate && instance.selectedDates.length === 0) {
-				instance.jumpToDate(props.defaultViewDate)
-			}
+			syncCalendarView(instance)
 			syncTimeInputTypes(instance)
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
 			syncRangeEndpointMoveState(instance)
+			syncMultiMonthSelects(instance)
 		},
 	})
 
@@ -895,10 +1050,12 @@ onMounted(async () => {
 	syncPickerFromModel()
 	syncHeaderControlState(picker.value)
 	syncRangeEndpointMoveState(picker.value)
+	syncMultiMonthSelects(picker.value)
 })
 
 onBeforeUnmount(() => {
 	clearRangeClickSuppressionTimeout()
+	if (monthSelectSyncFrame !== null) window.cancelAnimationFrame(monthSelectSyncFrame)
 	document.removeEventListener('pointermove', updateRangeDrag, true)
 	document.removeEventListener('pointerup', stopRangeDrag, true)
 	document.removeEventListener('pointercancel', stopRangeDrag, true)
@@ -932,23 +1089,32 @@ function flatpickrOptions(): Options {
 function syncPickerFromModel() {
 	if (!picker.value) return
 
+	const preservedViewMonth =
+		intendedViewMonth.value ??
+		(preserveViewOnNextModelSync.value
+			? {
+					month: picker.value.currentMonth,
+					year: picker.value.currentYear,
+				}
+			: null)
+
 	isSyncingFromModel.value = true
 	picker.value.setDate(selectedDates.value, false, resolvedDateFormat.value)
 	syncTimeInputTypes(picker.value)
 
-	if (intendedViewMonth.value !== null) {
-		const monthDelta =
-			intendedViewMonth.value.month -
-			picker.value.currentMonth +
-			(intendedViewMonth.value.year - picker.value.currentYear) * 12
-		if (monthDelta !== 0) picker.value.changeMonth(monthDelta)
+	if (preservedViewMonth !== null) {
+		jumpToViewMonth(picker.value, preservedViewMonth)
 		intendedViewMonth.value = null
+		preserveViewOnNextModelSync.value = false
+	} else {
+		syncCalendarView(picker.value)
 	}
 
 	isSyncingFromModel.value = false
 	syncHeaderControlState(picker.value)
 	syncMissingRangeEndState()
 	syncRangeEndpointMoveState()
+	syncMultiMonthSelects()
 }
 
 function syncAltInputState() {
@@ -1047,6 +1213,9 @@ defineExpose({
 	background-position: calc(100% - 8px) calc(50%);
 	background-repeat: no-repeat;
 	background-size: 16px 16px;
+}
+.modrinth-date-picker :deep(.flatpickr-current-month .modrinth-hidden-cur-month) {
+	display: none;
 }
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months:disabled) {
 	@apply cursor-not-allowed opacity-40 hover:bg-surface-4;

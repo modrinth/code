@@ -50,6 +50,7 @@ export type {
 
 const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
 const ANALYTICS_START_TIMESTAMP = '2023-01-01T00:00:00.000Z'
+export const ANALYTICS_START_DATE_INPUT_VALUE = ANALYTICS_START_TIMESTAMP.slice(0, 10)
 const ANALYTICS_START_TIME = new Date(ANALYTICS_START_TIMESTAMP).getTime()
 const REVENUE_GROUP_BY_FALLBACK: AnalyticsGroupByPreset = 'day'
 const REVENUE_MIN_TIMEFRAME_MS = 1 * 24 * 60 * 60 * 1000 // need at least 1 day in timeframe range to show revenue
