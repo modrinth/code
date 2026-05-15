@@ -37,6 +37,9 @@ export type AnalyticsBreakdownPreset =
 	| 'loader'
 	| 'game_version'
 
+export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
+export type AnalyticsGraphViewMode = 'line' | 'area' | 'bar'
+
 export type AnalyticsSelectedFilters = Record<AnalyticsQueryFilterCategory, string[]>
 
 export type AnalyticsQueryBuilderState = {
@@ -52,6 +55,15 @@ export type AnalyticsQueryBuilderState = {
 	selectedFilters: AnalyticsSelectedFilters
 }
 
+export type AnalyticsGraphState = {
+	activeStat: AnalyticsDashboardStat
+	activeGraphViewMode: AnalyticsGraphViewMode
+	isRatioMode: boolean
+	showChartEvents: boolean
+	showAllLegendEntries: boolean
+	hiddenGraphDatasetIds: string[]
+}
+
 type MutableRouteQuery = Record<string, LocationQueryValueRaw | LocationQueryValueRaw[] | undefined>
 
 export const DEFAULT_TIMEFRAME_PRESET: AnalyticsTimeframePreset = 'last_30_days'
@@ -60,6 +72,11 @@ export const DEFAULT_LAST_TIMEFRAME_AMOUNT = 1
 export const DEFAULT_LAST_TIMEFRAME_UNIT: AnalyticsLastTimeframeUnit = 'days'
 export const DEFAULT_GROUP_BY_PRESET: AnalyticsGroupByPreset = 'day'
 export const DEFAULT_BREAKDOWN_PRESET: AnalyticsBreakdownPreset = 'none'
+export const DEFAULT_ANALYTICS_DASHBOARD_STAT: AnalyticsDashboardStat = 'views'
+export const DEFAULT_ANALYTICS_GRAPH_VIEW_MODE: AnalyticsGraphViewMode = 'line'
+export const DEFAULT_ANALYTICS_GRAPH_RATIO_MODE = false
+export const DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY = true
+export const DEFAULT_ANALYTICS_GRAPH_LEGEND_EXPANSION = false
 
 const TIMEFRAME_PRESET_VALUES: AnalyticsTimeframePreset[] = [
 	'today',
@@ -106,6 +123,15 @@ const BREAKDOWN_PRESET_VALUES: AnalyticsBreakdownPreset[] = [
 	'game_version',
 ]
 
+const ANALYTICS_DASHBOARD_STAT_VALUES: AnalyticsDashboardStat[] = [
+	'views',
+	'downloads',
+	'revenue',
+	'playtime',
+]
+
+const ANALYTICS_GRAPH_VIEW_MODE_VALUES: AnalyticsGraphViewMode[] = ['line', 'area', 'bar']
+
 const PROJECT_STATUS_FILTER_VALUES = [
 	'approved',
 	'archived',
@@ -134,6 +160,12 @@ const QUERY_KEY_FILTER_DOWNLOAD_REASON = 'a_download_reason'
 const QUERY_KEY_FILTER_VERSION_ID = 'a_version_id'
 const QUERY_KEY_FILTER_GAME_VERSION = 'a_game_version'
 const QUERY_KEY_FILTER_LOADER_TYPE = 'a_loader_type'
+const QUERY_KEY_STAT = 'a_stat'
+const QUERY_KEY_GRAPH_VIEW_MODE = 'a_chart'
+const QUERY_KEY_GRAPH_RATIO_MODE = 'a_ratio'
+const QUERY_KEY_GRAPH_EVENTS_VISIBILITY = 'a_events'
+const QUERY_KEY_GRAPH_LEGEND_EXPANSION = 'a_legend_expanded'
+const QUERY_KEY_GRAPH_HIDDEN_SERIES = 'a_hidden_series'
 
 const URL_FILTER_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'project'>[] = [
 	'project_status',
@@ -178,6 +210,12 @@ const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_FILTER_VERSION_ID,
 	QUERY_KEY_FILTER_GAME_VERSION,
 	QUERY_KEY_FILTER_LOADER_TYPE,
+	QUERY_KEY_STAT,
+	QUERY_KEY_GRAPH_VIEW_MODE,
+	QUERY_KEY_GRAPH_RATIO_MODE,
+	QUERY_KEY_GRAPH_EVENTS_VISIBILITY,
+	QUERY_KEY_GRAPH_LEGEND_EXPANSION,
+	QUERY_KEY_GRAPH_HIDDEN_SERIES,
 ]
 
 export function buildEmptySelectedFilters(): AnalyticsSelectedFilters {
@@ -257,6 +295,20 @@ function parsePositiveIntegerQueryValue(
 	return parsedValue
 }
 
+function parseEnabledQueryValue(
+	value: LocationQueryValue | LocationQueryValue[] | undefined,
+): boolean {
+	const rawValue = Array.isArray(value) ? value[0] : value
+	return rawValue === '1'
+}
+
+function parseVisibleQueryValue(
+	value: LocationQueryValue | LocationQueryValue[] | undefined,
+): boolean {
+	const rawValue = Array.isArray(value) ? value[0] : value
+	return rawValue !== '0'
+}
+
 function getLocalDateQueryValue(date: Date): string {
 	const year = date.getFullYear()
 	const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -317,6 +369,17 @@ function isTimeframeRangeEndBeforeStart(
 	return endValue < startValue
 }
 
+export function buildDefaultAnalyticsGraphState(): AnalyticsGraphState {
+	return {
+		activeStat: DEFAULT_ANALYTICS_DASHBOARD_STAT,
+		activeGraphViewMode: DEFAULT_ANALYTICS_GRAPH_VIEW_MODE,
+		isRatioMode: DEFAULT_ANALYTICS_GRAPH_RATIO_MODE,
+		showChartEvents: DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY,
+		showAllLegendEntries: DEFAULT_ANALYTICS_GRAPH_LEGEND_EXPANSION,
+		hiddenGraphDatasetIds: [],
+	}
+}
+
 export function buildDefaultAnalyticsQueryBuilderState(
 	availableProjectIds: string[],
 ): AnalyticsQueryBuilderState {
@@ -355,6 +418,19 @@ export function isAnalyticsQueryBuilderStateDefault(
 		state.selectedGroupBy === defaultState.selectedGroupBy &&
 		state.selectedBreakdown === defaultState.selectedBreakdown &&
 		areSelectedFiltersEqual(state.selectedFilters, defaultState.selectedFilters)
+	)
+}
+
+export function isAnalyticsGraphStateDefault(state: AnalyticsGraphState): boolean {
+	const defaultState = buildDefaultAnalyticsGraphState()
+
+	return (
+		state.activeStat === defaultState.activeStat &&
+		state.activeGraphViewMode === defaultState.activeGraphViewMode &&
+		state.isRatioMode === defaultState.isRatioMode &&
+		state.showChartEvents === defaultState.showChartEvents &&
+		state.showAllLegendEntries === defaultState.showAllLegendEntries &&
+		areStringArraysEqual(state.hiddenGraphDatasetIds, defaultState.hiddenGraphDatasetIds)
 	)
 }
 
@@ -432,6 +508,27 @@ function areAllProjectsSelected(selectedProjectIds: string[], allProjectIds: str
 	}
 	const allProjectIdSet = new Set(allProjectIds)
 	return selectedProjectIds.every((projectId) => allProjectIdSet.has(projectId))
+}
+
+export function readAnalyticsGraphState(query: LocationQuery): AnalyticsGraphState {
+	const defaultState = buildDefaultAnalyticsGraphState()
+
+	return {
+		activeStat: parsePresetQueryValue(
+			query[QUERY_KEY_STAT],
+			ANALYTICS_DASHBOARD_STAT_VALUES,
+			defaultState.activeStat,
+		),
+		activeGraphViewMode: parsePresetQueryValue(
+			query[QUERY_KEY_GRAPH_VIEW_MODE],
+			ANALYTICS_GRAPH_VIEW_MODE_VALUES,
+			defaultState.activeGraphViewMode,
+		),
+		isRatioMode: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_RATIO_MODE]),
+		showChartEvents: parseVisibleQueryValue(query[QUERY_KEY_GRAPH_EVENTS_VISIBILITY]),
+		showAllLegendEntries: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_LEGEND_EXPANSION]),
+		hiddenGraphDatasetIds: parseListQueryValue(query[QUERY_KEY_GRAPH_HIDDEN_SERIES]),
+	}
 }
 
 export function readAnalyticsQueryBuilderState(
@@ -526,6 +623,7 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 	currentRouteQuery: LocationQuery,
 	state: AnalyticsQueryBuilderState,
 	availableProjectIds: string[],
+	graphState?: AnalyticsGraphState,
 ): MutableRouteQuery {
 	const nextRouteQuery = {
 		...currentRouteQuery,
@@ -563,6 +661,23 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 	for (const category of URL_FILTER_CATEGORIES) {
 		const categoryQueryKey = FILTER_QUERY_KEY_BY_CATEGORY[category]
 		nextRouteQuery[categoryQueryKey] = serializeListQueryValue(state.selectedFilters[category])
+	}
+
+	if (graphState) {
+		nextRouteQuery[QUERY_KEY_STAT] =
+			graphState.activeStat !== DEFAULT_ANALYTICS_DASHBOARD_STAT ? graphState.activeStat : undefined
+		nextRouteQuery[QUERY_KEY_GRAPH_VIEW_MODE] =
+			graphState.activeGraphViewMode !== DEFAULT_ANALYTICS_GRAPH_VIEW_MODE
+				? graphState.activeGraphViewMode
+				: undefined
+		nextRouteQuery[QUERY_KEY_GRAPH_RATIO_MODE] = graphState.isRatioMode ? '1' : undefined
+		nextRouteQuery[QUERY_KEY_GRAPH_EVENTS_VISIBILITY] = graphState.showChartEvents ? undefined : '0'
+		nextRouteQuery[QUERY_KEY_GRAPH_LEGEND_EXPANSION] = graphState.showAllLegendEntries
+			? '1'
+			: undefined
+		nextRouteQuery[QUERY_KEY_GRAPH_HIDDEN_SERIES] = serializeListQueryValue(
+			[...graphState.hiddenGraphDatasetIds].sort((left, right) => left.localeCompare(right)),
+		)
 	}
 
 	return nextRouteQuery

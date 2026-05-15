@@ -15,6 +15,8 @@ import { fetchSegmentedWith } from '~/utils/fetch-helpers.ts'
 import type { OrganizationContext } from '../organization-context'
 import {
 	type AnalyticsBreakdownPreset,
+	type AnalyticsDashboardStat,
+	type AnalyticsGraphViewMode,
 	type AnalyticsGroupByPreset,
 	type AnalyticsLastTimeframeUnit,
 	type AnalyticsSelectedFilters,
@@ -23,15 +25,21 @@ import {
 	areSelectedFiltersEqual,
 	areStringArraysEqual,
 	buildAnalyticsQueryBuilderRouteQuery,
+	buildDefaultAnalyticsGraphState,
 	buildDefaultAnalyticsQueryBuilderState,
 	hasAnalyticsProjectSelectionQuery,
 	hasAnalyticsQueryBuilderRouteChange,
+	isAnalyticsGraphStateDefault,
 	isAnalyticsQueryBuilderStateDefault,
+	readAnalyticsGraphState,
 	readAnalyticsQueryBuilderState,
 } from './query-builder-url'
 
 export type {
 	AnalyticsBreakdownPreset,
+	AnalyticsDashboardStat,
+	AnalyticsGraphState,
+	AnalyticsGraphViewMode,
 	AnalyticsGroupByPreset,
 	AnalyticsLastTimeframeUnit,
 	AnalyticsQueryFilterCategory,
@@ -39,8 +47,6 @@ export type {
 	AnalyticsTimeframeMode,
 	AnalyticsTimeframePreset,
 } from './query-builder-url'
-
-export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
 
 const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
 const ANALYTICS_START_TIMESTAMP = '2023-01-01T00:00:00.000Z'
@@ -145,6 +151,11 @@ export interface AnalyticsDashboardContextValue {
 	isLoading: ComputedRef<boolean>
 	isRefetching: ComputedRef<boolean>
 	activeStat: Ref<AnalyticsDashboardStat>
+	activeGraphViewMode: Ref<AnalyticsGraphViewMode>
+	isRatioMode: Ref<boolean>
+	showChartEvents: Ref<boolean>
+	showAllLegendEntries: Ref<boolean>
+	hiddenGraphDatasetIds: Ref<string[]>
 	currentTotals: ComputedRef<AnalyticsDashboardTotals>
 	previousTotals: ComputedRef<AnalyticsDashboardTotals>
 	percentChanges: ComputedRef<AnalyticsDashboardPercentChanges>
@@ -786,8 +797,14 @@ export function createAnalyticsDashboardContext(
 	const route = useRoute()
 	const router = useRouter()
 	const initialQueryState = readAnalyticsQueryBuilderState(route.query, [])
+	const initialGraphState = readAnalyticsGraphState(route.query)
 
-	const activeStat = ref<AnalyticsDashboardStat>('views')
+	const activeStat = ref<AnalyticsDashboardStat>(initialGraphState.activeStat)
+	const activeGraphViewMode = ref<AnalyticsGraphViewMode>(initialGraphState.activeGraphViewMode)
+	const isRatioMode = ref(initialGraphState.isRatioMode)
+	const showChartEvents = ref(initialGraphState.showChartEvents)
+	const showAllLegendEntries = ref(initialGraphState.showAllLegendEntries)
+	const hiddenGraphDatasetIds = ref<string[]>(initialGraphState.hiddenGraphDatasetIds)
 	const selectedProjectIds = ref<string[]>(initialQueryState.selectedProjectIds)
 	const selectedTimeframeMode = ref<AnalyticsTimeframeMode>(initialQueryState.selectedTimeframeMode)
 	const selectedTimeframe = ref<AnalyticsTimeframePreset>(initialQueryState.selectedTimeframe)
@@ -1151,8 +1168,8 @@ export function createAnalyticsDashboardContext(
 	const hasExplicitProjectSelectionQuery = computed(() =>
 		hasAnalyticsProjectSelectionQuery(route.query),
 	)
-	const isAnalyticsQueryBuilderDefault = computed(() =>
-		isAnalyticsQueryBuilderStateDefault(
+	const isAnalyticsQueryBuilderDefault = computed(() => {
+		const isQueryBuilderDefault = isAnalyticsQueryBuilderStateDefault(
 			{
 				selectedProjectIds: selectedProjectIds.value,
 				selectedTimeframeMode: selectedTimeframeMode.value,
@@ -1166,8 +1183,18 @@ export function createAnalyticsDashboardContext(
 				selectedFilters: selectedFilters.value,
 			},
 			availableProjectIds.value,
-		),
-	)
+		)
+		const isGraphDefault = isAnalyticsGraphStateDefault({
+			activeStat: activeStat.value,
+			activeGraphViewMode: activeGraphViewMode.value,
+			isRatioMode: isRatioMode.value,
+			showChartEvents: showChartEvents.value,
+			showAllLegendEntries: showAllLegendEntries.value,
+			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
+		})
+
+		return isQueryBuilderDefault && isGraphDefault
+	})
 
 	function getRelevantAnalyticsDashboardStats(
 		breakdown: AnalyticsBreakdownPreset,
@@ -1224,6 +1251,17 @@ export function createAnalyticsDashboardContext(
 		}
 	}
 
+	function getSelectedAnalyticsGraphState() {
+		return {
+			activeStat: activeStat.value,
+			activeGraphViewMode: activeGraphViewMode.value,
+			isRatioMode: isRatioMode.value,
+			showChartEvents: showChartEvents.value,
+			showAllLegendEntries: showAllLegendEntries.value,
+			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
+		}
+	}
+
 	function syncAnalyticsRouteQuery(navigationMode: AnalyticsQueryBuilderRouteNavigationMode) {
 		if (import.meta.server) {
 			return
@@ -1233,6 +1271,7 @@ export function createAnalyticsDashboardContext(
 			route.query,
 			getSelectedAnalyticsQueryBuilderState(),
 			availableProjectIds.value,
+			getSelectedAnalyticsGraphState(),
 		)
 
 		const hasAnalyticsQueryChange = hasAnalyticsQueryBuilderRouteChange(route.query, nextRouteQuery)
@@ -1319,6 +1358,7 @@ export function createAnalyticsDashboardContext(
 		() => route.query,
 		(nextQuery) => {
 			const nextQueryState = readAnalyticsQueryBuilderState(nextQuery, availableProjectIds.value)
+			const nextGraphState = readAnalyticsGraphState(nextQuery)
 			const availableProjectIdSet = new Set(availableProjectIds.value)
 			const nextSelectedProjectIds = nextQueryState.selectedProjectIds.filter((projectId) =>
 				availableProjectIdSet.has(projectId),
@@ -1350,6 +1390,17 @@ export function createAnalyticsDashboardContext(
 				selectedFilters.value,
 				nextSelectedFilters,
 			)
+			const shouldUpdateActiveStat = activeStat.value !== nextGraphState.activeStat
+			const shouldUpdateActiveGraphViewMode =
+				activeGraphViewMode.value !== nextGraphState.activeGraphViewMode
+			const shouldUpdateIsRatioMode = isRatioMode.value !== nextGraphState.isRatioMode
+			const shouldUpdateShowChartEvents = showChartEvents.value !== nextGraphState.showChartEvents
+			const shouldUpdateShowAllLegendEntries =
+				showAllLegendEntries.value !== nextGraphState.showAllLegendEntries
+			const shouldUpdateHiddenGraphDatasetIds = !areStringArraysEqual(
+				hiddenGraphDatasetIds.value,
+				nextGraphState.hiddenGraphDatasetIds,
+			)
 			const hasRouteStateUpdate =
 				shouldUpdateSelectedProjectIds ||
 				shouldUpdateSelectedTimeframeMode ||
@@ -1360,7 +1411,13 @@ export function createAnalyticsDashboardContext(
 				shouldUpdateSelectedCustomTimeframeEndDate ||
 				shouldUpdateSelectedGroupBy ||
 				shouldUpdateSelectedBreakdown ||
-				shouldUpdateSelectedFilters
+				shouldUpdateSelectedFilters ||
+				shouldUpdateActiveStat ||
+				shouldUpdateActiveGraphViewMode ||
+				shouldUpdateIsRatioMode ||
+				shouldUpdateShowChartEvents ||
+				shouldUpdateShowAllLegendEntries ||
+				shouldUpdateHiddenGraphDatasetIds
 
 			if (hasRouteStateUpdate) {
 				replaceNextAnalyticsRouteNavigation()
@@ -1396,6 +1453,24 @@ export function createAnalyticsDashboardContext(
 			if (shouldUpdateSelectedFilters) {
 				selectedFilters.value = nextSelectedFilters
 			}
+			if (shouldUpdateActiveStat) {
+				activeStat.value = nextGraphState.activeStat
+			}
+			if (shouldUpdateActiveGraphViewMode) {
+				activeGraphViewMode.value = nextGraphState.activeGraphViewMode
+			}
+			if (shouldUpdateIsRatioMode) {
+				isRatioMode.value = nextGraphState.isRatioMode
+			}
+			if (shouldUpdateShowChartEvents) {
+				showChartEvents.value = nextGraphState.showChartEvents
+			}
+			if (shouldUpdateShowAllLegendEntries) {
+				showAllLegendEntries.value = nextGraphState.showAllLegendEntries
+			}
+			if (shouldUpdateHiddenGraphDatasetIds) {
+				hiddenGraphDatasetIds.value = nextGraphState.hiddenGraphDatasetIds
+			}
 
 			if (!hasRouteStateUpdate) {
 				syncAnalyticsRouteQuery('replace')
@@ -1421,6 +1496,21 @@ export function createAnalyticsDashboardContext(
 			syncAnalyticsRouteQuery(consumeAnalyticsRouteNavigationMode())
 		},
 		{ deep: true, immediate: true },
+	)
+
+	watch(
+		[
+			activeStat,
+			activeGraphViewMode,
+			isRatioMode,
+			showChartEvents,
+			showAllLegendEntries,
+			hiddenGraphDatasetIds,
+		],
+		() => {
+			syncAnalyticsRouteQuery('replace')
+		},
+		{ deep: true },
 	)
 
 	const {
@@ -1839,6 +1929,7 @@ export function createAnalyticsDashboardContext(
 		}
 
 		const defaultQueryState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds.value)
+		const defaultGraphState = buildDefaultAnalyticsGraphState()
 
 		selectedProjectIds.value = defaultQueryState.selectedProjectIds
 		selectedTimeframeMode.value = defaultQueryState.selectedTimeframeMode
@@ -1850,6 +1941,12 @@ export function createAnalyticsDashboardContext(
 		selectedGroupBy.value = defaultQueryState.selectedGroupBy
 		selectedBreakdown.value = defaultQueryState.selectedBreakdown
 		selectedFilters.value = defaultQueryState.selectedFilters
+		activeStat.value = defaultGraphState.activeStat
+		activeGraphViewMode.value = defaultGraphState.activeGraphViewMode
+		isRatioMode.value = defaultGraphState.isRatioMode
+		showChartEvents.value = defaultGraphState.showChartEvents
+		showAllLegendEntries.value = defaultGraphState.showAllLegendEntries
+		hiddenGraphDatasetIds.value = defaultGraphState.hiddenGraphDatasetIds
 		queryResetToken.value += 1
 	}
 
@@ -1927,6 +2024,11 @@ export function createAnalyticsDashboardContext(
 		isLoading,
 		isRefetching,
 		activeStat,
+		activeGraphViewMode,
+		isRatioMode,
+		showChartEvents,
+		showAllLegendEntries,
+		hiddenGraphDatasetIds,
 		currentTotals,
 		previousTotals,
 		percentChanges,

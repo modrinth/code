@@ -23,9 +23,9 @@
 						<Toggle id="events-toggle" v-model="showChartEvents" small />
 					</div>
 					<Tabs
-						:value="activeViewMode"
+						:value="activeGraphViewMode"
 						:tabs="viewModeTabs"
-						@update:value="activeViewMode = $event as ViewMode"
+						@update:value="activeGraphViewMode = $event as AnalyticsGraphViewMode"
 					/>
 				</div>
 			</div>
@@ -179,7 +179,10 @@ import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/as
 import { Tabs, type TabsTab, Toggle, useFormatNumber } from '@modrinth/ui'
 
 import { isDarkTheme } from '~/plugins/theme/index.ts'
-import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
+import type {
+	AnalyticsDashboardStat,
+	AnalyticsGraphViewMode,
+} from '~/providers/analytics/analytics'
 import {
 	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
@@ -206,10 +209,13 @@ import {
 	getSliceCount,
 } from './utils'
 
-type ViewMode = 'line' | 'area' | 'bar'
-
 const {
 	activeStat,
+	activeGraphViewMode,
+	isRatioMode,
+	showChartEvents,
+	showAllLegendEntries,
+	hiddenGraphDatasetIds,
 	hasProjectContext,
 	selectedTimeframeMode,
 	selectedCustomTimeframeStartDate,
@@ -228,10 +234,6 @@ const {
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 const isDataLoading = computed(() => isLoading.value)
-
-const activeViewMode = ref<ViewMode>('line')
-const isRatioMode = ref(false)
-const showChartEvents = ref(true)
 
 const viewModeTabs: TabsTab[] = [
 	{ value: 'line', label: 'Line', icon: ChartSplineIcon },
@@ -344,15 +346,20 @@ const legendPalette = computed(() =>
 
 const graphTitle = computed(() => titleByStat[activeStat.value])
 
-const chartType = computed<'line' | 'bar'>(() => (activeViewMode.value === 'bar' ? 'bar' : 'line'))
+const chartType = computed<'line' | 'bar'>(() =>
+	activeGraphViewMode.value === 'bar' ? 'bar' : 'line',
+)
 const canUseRatioMode = computed(
 	() =>
-		(activeViewMode.value === 'area' || activeViewMode.value === 'bar') &&
+		(activeGraphViewMode.value === 'area' || activeGraphViewMode.value === 'bar') &&
 		displayedLegendEntries.value.length > 1,
 )
-const isArea = computed(() => activeViewMode.value === 'area')
+const isArea = computed(() => activeGraphViewMode.value === 'area')
 const isStacked = computed(
-	() => isRatioMode.value || activeViewMode.value === 'area' || activeViewMode.value === 'bar',
+	() =>
+		isRatioMode.value ||
+		activeGraphViewMode.value === 'area' ||
+		activeGraphViewMode.value === 'bar',
 )
 
 watch(canUseRatioMode, (canUse) => {
@@ -438,8 +445,7 @@ const hoverState = reactive<HoverState>({
 
 const isHoverPinned = ref(false)
 const ignoreNextChartClick = ref(false)
-const hiddenDatasetIds = ref<Set<string>>(new Set())
-const showAllLegendEntries = ref(false)
+const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
 
 const LEGEND_MAX_ITEMS = 8
 const LEGEND_VISIBLE_ITEM_COUNT = LEGEND_MAX_ITEMS - 1
@@ -753,7 +759,7 @@ function toggleLegendEntryVisibility(datasetId: string) {
 		if (visibleCount <= 1) return
 		nextHiddenDatasetIds.add(datasetId)
 	}
-	hiddenDatasetIds.value = nextHiddenDatasetIds
+	hiddenGraphDatasetIds.value = Array.from(nextHiddenDatasetIds)
 }
 
 function soloLegendEntry(datasetId: string) {
@@ -762,7 +768,7 @@ function soloLegendEntry(datasetId: string) {
 		.filter((id) => id !== datasetId)
 	const isAlreadySolo =
 		!hiddenDatasetIds.value.has(datasetId) && otherIds.every((id) => hiddenDatasetIds.value.has(id))
-	hiddenDatasetIds.value = isAlreadySolo ? new Set() : new Set(otherIds)
+	hiddenGraphDatasetIds.value = isAlreadySolo ? [] : otherIds
 }
 
 function onLegendEntryClick(event: MouseEvent, datasetId: string) {
@@ -781,6 +787,14 @@ function showLessLegendEntries() {
 	showAllLegendEntries.value = false
 }
 
+function areStringArraysEqual(left: string[], right: string[]) {
+	if (left.length !== right.length) return false
+	for (let index = 0; index < left.length; index += 1) {
+		if (left[index] !== right[index]) return false
+	}
+	return true
+}
+
 watch([chartLabels, allChartDatasets], () => {
 	isHoverPinned.value = false
 	clearHoverState()
@@ -792,23 +806,42 @@ watch(isDataLoading, (loading) => {
 	clearHoverState()
 })
 
-watch(allChartDatasets, (datasets) => {
-	const availableDatasetIds = new Set(datasets.map((dataset) => dataset.projectId))
-	availableDatasetIds.add(OTHER_LEGEND_ENTRY_ID)
-	if (hiddenDatasetIds.value.size > 0) {
-		const nextHiddenDatasetIds = new Set(
-			Array.from(hiddenDatasetIds.value).filter((datasetId) => availableDatasetIds.has(datasetId)),
-		)
+watch(
+	[allChartDatasets, displayedLegendEntries],
+	([datasets, displayedEntries]) => {
+		if (datasets.length === 0) return
 
-		if (nextHiddenDatasetIds.size !== hiddenDatasetIds.value.size) {
-			hiddenDatasetIds.value = nextHiddenDatasetIds
+		const availableDatasetIds = new Set(datasets.map((dataset) => dataset.projectId))
+		if (otherLegendEntry.value) {
+			availableDatasetIds.add(OTHER_LEGEND_ENTRY_ID)
 		}
-	}
 
-	if (datasets.length <= LEGEND_MAX_ITEMS) {
-		showAllLegendEntries.value = false
-	}
-})
+		const nextHiddenDatasetIds = hiddenGraphDatasetIds.value.filter((datasetId) =>
+			availableDatasetIds.has(datasetId),
+		)
+		if (
+			displayedEntries.length > 0 &&
+			displayedEntries.every((entry) => nextHiddenDatasetIds.includes(entry.id))
+		) {
+			const firstDisplayedEntry = displayedEntries[0]
+			if (firstDisplayedEntry) {
+				const firstDisplayedEntryIndex = nextHiddenDatasetIds.indexOf(firstDisplayedEntry.id)
+				if (firstDisplayedEntryIndex !== -1) {
+					nextHiddenDatasetIds.splice(firstDisplayedEntryIndex, 1)
+				}
+			}
+		}
+
+		if (!areStringArraysEqual(hiddenGraphDatasetIds.value, nextHiddenDatasetIds)) {
+			hiddenGraphDatasetIds.value = nextHiddenDatasetIds
+		}
+
+		if (datasets.length <= LEGEND_MAX_ITEMS) {
+			showAllLegendEntries.value = false
+		}
+	},
+	{ immediate: true },
+)
 
 const hoverBucketRange = computed(() => {
 	const nextFetchRequest = fetchRequest.value
