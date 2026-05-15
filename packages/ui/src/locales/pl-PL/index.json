@@ -95,8 +95,26 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Wznów subskrypcję serwera"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Filtruj wyniki..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Wybrane projekty"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Zainstaluj {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "Wybrano {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Odrzuć"
+  },
   "button.accept": {
     "defaultMessage": "Akceptuj"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Dodaj serwer do instancji"
   },
   "button.affiliate-links": {
     "defaultMessage": "Linki afiliacyjne"
@@ -167,6 +185,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Ukryj snapshoty"
   },
+  "button.install": {
+    "defaultMessage": "Zainstaluj"
+  },
   "button.max": {
     "defaultMessage": "Maks"
   },
@@ -184,6 +205,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Otwórz w folderze"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Otwórz na Modrinth"
   },
   "button.play": {
     "defaultMessage": "Graj"
@@ -277,6 +301,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "Prywatna"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Wybierz {project}"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Czy na pewno chcesz zaktualizować {count, plural, one {# projekt} few {# projekty} other {# projektów}} do ich najnowszych wersji? Zalecane jest aktualizowanie modów jeden po drugim."
@@ -1199,6 +1226,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Wprowadź województwo"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, one {# bajt} few {# bajty} other {# bajtów}}"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
+  },
   "header.category.category": {
     "defaultMessage": "Kategoria"
   },
@@ -1688,6 +1730,9 @@
   "label.filter-by": {
     "defaultMessage": "Filtruj według"
   },
+  "label.filters": {
+    "defaultMessage": "Filtry"
+  },
   "label.followed-projects": {
     "defaultMessage": "Obserwowane projekty"
   },
@@ -1979,9 +2024,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Błąd"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Wymieniony"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
@@ -2017,9 +2059,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Odrzucony"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Wstrzymany"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Skopiuj kod do schowka"
@@ -2789,6 +2828,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "Prześlij"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Uprawnienia"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "Wersje"
   },
@@ -3082,6 +3124,54 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "Synchronizacja zawartości w toku"
+  },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "Instalacja nie powiodła się"
+  },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "Wystąpił wewnętrzny błąd podczas instalowania platformy. Spróbuj ponownie później."
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "Nie udało się zainstalować podanego loadera lub podanej wersji Minecraft. Mogą być niepoprawne lub niewspierane."
+  },
+  "servers.installing-banner.error.modpack-install-failed": {
+    "defaultMessage": "Nie udało się zainstalować paczki modów. Może być zepsuta lub niekompatybilna."
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "Ta wersja paczki modów nie zawiera pliku do pobrania. Możliwe, że została niepoprawnie zapakowana."
+  },
+  "servers.installing-banner.error.unknown": {
+    "defaultMessage": "Wystąpił nieoczekiwany błąd podczas instalacji."
+  },
+  "servers.installing-banner.error.unsupported-loader-version": {
+    "defaultMessage": "Ta wersja Minecraft lub loader nie są jeszcze wspierane przez Modrinth Hosting."
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "Instalowanie dodatków..."
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "Instalowanie paczki modów..."
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "Instalowanie platformy..."
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "Przygotowujemy Twój serwer"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "Dodawanie Java..."
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "Ustawianie serwera..."
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "Pobieranie modów..."
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "Organizowanie plików..."
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "Ustawianie środowiska..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Posiadasz serwer?"

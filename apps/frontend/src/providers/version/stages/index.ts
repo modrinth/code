@@ -2,10 +2,7 @@ import {
 	fromDetailsStageConfig as fromDetailsFilesStageConfig,
 	stageConfig as addFilesStageConfig,
 } from './add-files-stage'
-import {
-	fromDetailsStageConfig as fromDetailsDependenciesStageConfig,
-	stageConfig as dependenciesStageConfig,
-} from './dependencies-stage'
+import { fromDetailsStageConfig as fromDetailsDependenciesStageConfig } from './dependencies-stage'
 import { stageConfig as detailsStageConfig } from './details-stage'
 import {
 	fromDetailsStageConfig as fromDetailsEnvironmentStageConfig,
@@ -26,11 +23,10 @@ export const stageConfigs = [
 	loadersStageConfig,
 	mcVersionsStageConfig,
 	environmentStageConfig,
-	dependenciesStageConfig,
 	metadataStageConfig,
 	detailsStageConfig,
 
-	// Non-progress stages for editing from details page
+	// Non-progress stages for editing from metadata/details pages
 	fromDetailsLoadersStageConfig,
 	fromDetailsMcVersionsStageConfig,
 	fromDetailsEnvironmentStageConfig,

@@ -140,6 +140,7 @@
 					<a
 						v-tooltip="primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'"
 						:href="decoratedPrimaryFileUrl"
+						:download="primaryFile.filename"
 						@click="emit('onDownload')"
 					>
 						<DownloadIcon aria-hidden="true" />
@@ -307,6 +308,7 @@
 						:href="decorateDownloadUrl(file.url)"
 						class="raised-button"
 						:title="`Download ${file.filename}`"
+						:download="file.filename"
 						tabindex="0"
 					>
 						<DownloadIcon aria-hidden="true" />

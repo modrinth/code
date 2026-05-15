@@ -1,5 +1,5 @@
 <template>
-	<div class="shadow-card rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4">
+	<div class="shadow-card rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-4">
 				<NuxtLink
@@ -107,8 +107,8 @@
 							<LinkIcon />
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-tooltip="'Begin review'" circular color="orange">
-						<button @click="openProjectForReview">
+					<ButtonStyled circular color="orange">
+						<button v-tooltip="'Begin review'" @click="openProjectForReview">
 							<ScaleIcon />
 						</button>
 					</ButtonStyled>

@@ -617,9 +617,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "فشل"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "مدرج"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "مشرف"
   },
@@ -655,9 +652,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "يفشل"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "محجوز"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "نسخ الكود للحافظة"

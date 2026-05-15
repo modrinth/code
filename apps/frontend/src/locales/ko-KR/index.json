@@ -1244,6 +1244,12 @@
   "error.collection.404.title": {
     "message": "컬렉션을 찾을 수 없습니다"
   },
+  "error.generic.401.signed-in-as": {
+    "message": "현재 로그인된 계정:"
+  },
+  "error.generic.401.title": {
+    "message": "이 페이지에 접근할 권한이 없습니다"
+  },
   "error.generic.404.subtitle": {
     "message": "찾으시려는 페이지가 존재하지 않는 것 같습니다."
   },
@@ -1670,6 +1676,9 @@
   "layout.action.create-new": {
     "message": "새로 만들기..."
   },
+  "layout.action.external-projects": {
+    "message": "외부 프로젝트"
+  },
   "layout.action.file-lookup": {
     "message": "파일 찾기"
   },
@@ -1922,6 +1931,9 @@
   "moderation.moderate": {
     "message": "관리"
   },
+  "moderation.page.external-projects": {
+    "message": "외부 프로젝트"
+  },
   "moderation.page.projects": {
     "message": "프로젝트"
   },
@@ -1929,7 +1941,7 @@
     "message": "신고"
   },
   "moderation.page.technicalReview": {
-    "message": "기술 검토"
+    "message": "기술 리뷰"
   },
   "muralpay.account-type.checking": {
     "message": "입출금"
@@ -2615,6 +2627,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "다음 파일들을 재배포할 권한이 있음을 증명하는 자료를 제출 바랍니다. 제출 시 보류된 버전은 자동으로 공개됩니다."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "프로젝트 검토를 위해 제출하기 전에 다음 파일들을 재배포할 권한이 있음을 증명하는 자료를 제출해 주세요."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "알 수 없는 내장 콘텐츠"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "모든 외부 콘텐츠에는 출처가 명시되어 있습니다."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "출처 표기 완료됨!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "어떤 버전에도 외부 콘텐츠가 포함되어 있지 않으므로 권한을 얻는 걸 걱정하지 않아도 됩니다."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "준비됨!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "추가한 외부 콘텐츠 중 일부를 재배포할 권한이 없습니다. Modrinth에 게시하려면 저작권 침해 콘텐츠를 삭제해야 합니다."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "일부 콘텐츠는 포함될 수 없습니다"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Modrinth에 호스팅되지 않은 콘텐츠를 포함하는 경우, 해당 콘텐츠의 출처를 알리고 파일 배포 권한이 있는지 확인해야 합니다. <link>저희 지침</link>을 참고해 어떻게 처리하는지 알아보세요!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "출처 표기 방식 알아보기"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "더보기"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "{count}개의 {count, plural, other {외부 프로젝트}} 검색..."
+  },
   "project.settings.title": {
     "message": "설정"
   },
@@ -2632,6 +2683,15 @@
   },
   "project.versions.title": {
     "message": "버전"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, other {해당 버전은}} 현재 보류 상태이며 공개되지 않았습니다. 이 모드팩 {count, plural, other {버전에}} 포함된 특정 파일들을 재배포할 수 있는 권한이 있음을 증명하는 자료를 제출해주세요."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "해결"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "알 수 없는 내장 콘텐츠로 인해 일부 {count, plural, other {버전}}은 공개되지 않았습니다"
   },
   "report.already-reported": {
     "message": "이미 {title} 을(를) 신고했습니다"

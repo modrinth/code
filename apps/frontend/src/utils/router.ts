@@ -9,8 +9,8 @@ export function queryAsString(query: LocationQueryValue | LocationQueryValue[]):
 }
 
 export function queryAsStringArray(
-	query: LocationQueryValue | LocationQueryValue[],
-): string | null {
+	query: LocationQueryValue | LocationQueryValue[] | undefined,
+): string[] {
 	if (query === undefined || query === null) {
 		return []
 	}

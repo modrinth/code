@@ -5,46 +5,49 @@ import {
 	ClipboardCopyIcon,
 	ExternalIcon,
 	GlobeIcon,
-	PlayIcon,
 	PlusIcon,
 	SpinnerIcon,
-	StopCircleIcon,
 } from '@modrinth/assets'
-import type { CardAction, ProjectType, Tags } from '@modrinth/ui'
+import type { BrowseInstallContentType, CardAction, ProjectType, Tags } from '@modrinth/ui'
 import {
 	BrowsePageLayout,
 	BrowseSidebar,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
+	getLatestMatchingInstallVersion,
+	getSelectedInstallPreferences,
+	getTargetInstallPreferences,
 	injectNotificationManager,
+	preferencesDiffer,
 	provideBrowseManager,
+	requestInstall,
 	useBrowseSearch,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
-import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
-import { process_listener } from '@/helpers/events'
+import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
+import {
+	get_project,
+	get_project_v3,
+	get_search_results_v3,
+	get_version_many,
+} from '@/helpers/cache.js'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
-import { get_by_profile_path } from '@/helpers/process'
 import {
 	get as getInstance,
 	get_installed_project_ids as getInstalledProjectIds,
-	kill,
-	list as listInstances,
 } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import type { GameInstance } from '@/helpers/types'
-import { add_server_to_profile, get_profile_worlds, getServerLatency } from '@/helpers/worlds'
+import { get_profile_worlds } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import {
@@ -52,7 +55,6 @@ import {
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress } from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -76,15 +78,27 @@ const {
 	effectiveServerWorldId,
 	serverContextServerData,
 	serverContentProjectIds,
+	queuedServerInstallProjectIds,
+	queuedServerInstallCount,
+	selectedServerInstallProjects,
+	isInstallingQueuedServerInstalls,
+	queuedInstallProgress,
 	serverBackUrl,
 	serverBackLabel,
 	serverBrowseHeading,
+	clearQueuedServerInstalls,
+	removeQueuedServerInstall,
+	flushQueuedServerInstalls,
+	discardQueuedServerInstallsAndBack,
+	installQueuedServerInstallsAndBack,
 	initServerContext,
 	watchServerContextChanges,
 	searchServerModpacks,
 	getServerProjectVersions,
 	enforceSetupModpackRoute,
-	installProjectToServer,
+	getQueuedServerInstallPlans,
+	setQueuedServerInstallPlans,
+	openServerModpackInstallFlow,
 	onServerFlowBack,
 	handleServerModpackFlowCreate,
 	markServerProjectInstalled,
@@ -254,6 +268,7 @@ const instanceFilters = computed(() => {
 })
 
 const serverHideInstalled = ref(false)
+const hideSelectedServerInstalls = ref(false)
 if (route.query.shi) {
 	serverHideInstalled.value = route.query.shi === 'true'
 }
@@ -291,6 +306,12 @@ const serverContextFilters = computed(() => {
 			filters.push({ type: 'plugin_loader', option: platform })
 
 		if (pt === 'mod') filters.push({ type: 'environment', option: 'server' })
+
+		if (hideSelectedServerInstalls.value && queuedServerInstallProjectIds.value.size > 0) {
+			for (const id of queuedServerInstallProjectIds.value) {
+				filters.push({ type: 'project_id', option: `project_id:${id}`, negative: true })
+			}
+		}
 	}
 
 	if (pt === 'modpack') {
@@ -313,134 +334,24 @@ const combinedProvidedFilters = computed(() =>
 	isServerContext.value ? serverContextFilters.value : instanceFilters.value,
 )
 
-const serverPings = shallowRef<Record<string, number | undefined>>({})
-const serverPingCache = new Map<string, number | undefined>()
-const pendingServerPings = new Map<string, Promise<number | undefined>>()
-let serverPingCacheActive = true
-const runningServerProjects = ref<Record<string, string>>({})
-
-async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
-	debugLog('checkServerRunningStates', { hitCount: hits.length })
-	const packs = await listInstances()
-	const newRunning: Record<string, string> = {}
-	for (const hit of hits) {
-		const inst = packs.find((p: GameInstance) => p.linked_data?.project_id === hit.project_id)
-		if (inst) {
-			const processes = await get_by_profile_path(inst.path).catch(() => [])
-			if (Array.isArray(processes) && processes.length > 0) {
-				newRunning[hit.project_id] = inst.path
-			}
-		}
-	}
-	debugLog('runningServerProjects updated', newRunning)
-	runningServerProjects.value = newRunning
-}
-
-async function handleStopServerProject(projectId: string) {
-	debugLog('handleStopServerProject', projectId)
-	const instancePath = runningServerProjects.value[projectId]
-	if (!instancePath) return
-	await kill(instancePath).catch(() => {})
-	const { [projectId]: _, ...rest } = runningServerProjects.value
-	runningServerProjects.value = rest
-}
-
-async function handlePlayServerProject(projectId: string) {
-	debugLog('handlePlayServerProject', projectId)
-	await playServerProject(projectId)
-	checkServerRunningStates(lastServerHits.value)
-}
-
-const lastServerHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
-
-async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
-	debugLog('handleAddServerToInstance', { projectId: project.project_id, name: project.name })
-	const address = getServerAddress(project.minecraft_java_server)
-	if (!address) return
-
-	if (instance.value) {
-		try {
-			await add_server_to_profile(
-				instance.value.path,
-				project.name,
-				address,
-				'prompt',
-				project.project_id,
-				project.minecraft_java_server?.content?.kind,
-			)
-			newlyInstalled.value.push(project.project_id)
-		} catch (err) {
-			handleError(err as Error)
-		}
-	} else {
-		showAddServerToInstanceModal(project.name, address)
-	}
-}
-
-async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
-	debugLog('pingServerHits', { hitCount: hits.length })
-	const pingsToFetch = hits.flatMap((hit) => {
-		const address = hit.minecraft_java_server?.address
-		if (!address) return []
-		return [{ hit, address }]
-	})
-	const nextPings = { ...serverPings.value }
-	for (const { hit, address } of pingsToFetch) {
-		if (serverPingCache.has(address)) {
-			nextPings[hit.project_id] = serverPingCache.get(address)
-		}
-	}
-	serverPings.value = nextPings
-
-	await Promise.all(
-		pingsToFetch.map(async ({ hit, address }) => {
-			if (serverPingCache.has(address)) return
-
-			let pending = pendingServerPings.get(address)
-			if (!pending) {
-				pending = getServerLatency(address)
-					.then((latency) => {
-						if (serverPingCacheActive) serverPingCache.set(address, latency)
-						return latency
-					})
-					.catch((err) => {
-						console.error(`Failed to ping server ${address}:`, err)
-						if (serverPingCacheActive) serverPingCache.set(address, undefined)
-						return undefined
-					})
-					.finally(() => {
-						pendingServerPings.delete(address)
-					})
-				pendingServerPings.set(address, pending)
-			}
-
-			const latency = await pending
-			if (!serverPingCacheActive) return
-			serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
-		}),
-	)
-}
-
-const unlistenProcesses = await process_listener(
-	(e: { event: string; profile_path_id: string }) => {
-		debugLog('process event', e)
-		if (e.event === 'finished') {
-			const projectId = Object.entries(runningServerProjects.value).find(
-				([, path]) => path === e.profile_path_id,
-			)?.[0]
-			if (projectId) {
-				const { [projectId]: _, ...rest } = runningServerProjects.value
-				runningServerProjects.value = rest
-			}
-		}
-	},
-)
-
-onUnmounted(() => {
-	serverPingCacheActive = false
-	unlistenProcesses()
-	serverPingCache.clear()
-	pendingServerPings.clear()
+const {
+	serverPings,
+	contextMenuRef,
+	updateServerHits,
+	getServerModpackContent,
+	getServerCardActions,
+	handleRightClick,
+	handleOptionsClick,
+} = useAppServerBrowse({
+	instance,
+	isFromWorlds,
+	allInstalledIds,
+	newlyInstalled,
+	installingServerProjects,
+	playServerProject,
+	showAddServerToInstanceModal,
+	handleError,
+	router,
 })
 
 const offline = ref(!navigator.onLine)
@@ -454,29 +365,13 @@ window.addEventListener('online', () => {
 })
 
 const messages = defineMessages({
-	addServerToInstance: {
-		id: 'app.browse.add-server-to-instance',
-		defaultMessage: 'Add server to instance',
-	},
 	addServersToInstance: {
 		id: 'app.browse.add-servers-to-instance',
-		defaultMessage: 'Add servers to your instance',
+		defaultMessage: 'Adding server to instance',
 	},
-	addToInstance: {
-		id: 'app.browse.add-to-instance',
-		defaultMessage: 'Add to instance',
-	},
-	addToInstanceName: {
-		id: 'app.browse.add-to-instance-name',
-		defaultMessage: 'Add to {instanceName}',
-	},
-	added: {
-		id: 'app.browse.added',
-		defaultMessage: 'Added',
-	},
-	alreadyAdded: {
-		id: 'app.browse.already-added',
-		defaultMessage: 'Already added',
+	addToAnInstance: {
+		id: 'app.browse.add-to-an-instance',
+		defaultMessage: 'Add to an instance',
 	},
 	discoverContent: {
 		id: 'app.browse.discover-content',
@@ -502,25 +397,18 @@ const messages = defineMessages({
 		id: 'app.browse.hide-added-servers',
 		defaultMessage: 'Hide already added servers',
 	},
-	hideInstalledContent: {
-		id: 'app.browse.hide-installed-content',
-		defaultMessage: 'Hide already installed content',
-	},
-	installContentToInstance: {
-		id: 'app.browse.install-content-to-instance',
-		defaultMessage: 'Install content to instance',
-	},
-	installToServer: {
-		id: 'app.browse.server.install',
-		defaultMessage: 'Install',
-	},
-	installedToServer: {
-		id: 'app.browse.server.installed',
-		defaultMessage: 'Installed',
-	},
 	installingToServer: {
 		id: 'app.browse.server.installing',
 		defaultMessage: 'Installing',
+	},
+	backToInstance: {
+		id: 'app.browse.back-to-instance',
+		defaultMessage: 'Back to instance',
+	},
+	serverInstanceContentWarning: {
+		id: 'app.browse.server-instance-content-warning',
+		defaultMessage:
+			'Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content.',
 	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
@@ -654,46 +542,6 @@ const selectableProjectTypes = computed(() => {
 	]
 })
 
-const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject) => {
-	const content = project.minecraft_java_server?.content
-	if (content?.kind === 'modpack') {
-		const { project_name, project_icon, project_id } = content
-		if (!project_name) return undefined
-		return {
-			name: project_name,
-			icon: project_icon ?? undefined,
-			onclick:
-				project_id !== project.project_id
-					? () => {
-							router.push(`/project/${project_id}`)
-						}
-					: undefined,
-			showCustomModpackTooltip: project_id === project.project_id,
-		}
-	}
-	return undefined
-}
-
-const contextMenuRef = ref(null)
-// @ts-expect-error - no event types
-const handleRightClick = (event, result) => {
-	// @ts-ignore
-	contextMenuRef.value?.showMenu(event, result, [{ name: 'open_link' }, { name: 'copy_link' }])
-}
-// @ts-expect-error - no event types
-const handleOptionsClick = (args) => {
-	switch (args.option) {
-		case 'open_link':
-			openUrl(`https://modrinth.com/${args.item.project_types?.[0] ?? 'project'}/${args.item.slug}`)
-			break
-		case 'copy_link':
-			navigator.clipboard.writeText(
-				`https://modrinth.com/${args.item.project_types?.[0] ?? 'project'}/${args.item.slug}`,
-			)
-			break
-	}
-}
-
 const installContext = computed(() => {
 	if (isServerContext.value && serverContextServerData.value) {
 		return {
@@ -707,6 +555,15 @@ const installContext = computed(() => {
 			backUrl: serverBackUrl.value,
 			backLabel: serverBackLabel.value,
 			heading: serverBrowseHeading.value,
+			queuedCount: queuedServerInstallCount.value,
+			selectedProjects: selectedServerInstallProjects.value,
+			isInstallingSelected: isInstallingQueuedServerInstalls.value,
+			installProgress: queuedInstallProgress.value,
+			clearQueued: clearQueuedServerInstalls,
+			clearSelected: clearQueuedServerInstalls,
+			onBack: flushQueuedServerInstalls,
+			discardSelectedAndBack: discardQueuedServerInstallsAndBack,
+			installSelected: installQueuedServerInstallsAndBack,
 		}
 	}
 	if (instance.value) {
@@ -716,13 +573,13 @@ const installContext = computed(() => {
 			gameVersion: instance.value.game_version,
 			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 			backUrl: `/instance/${encodeURIComponent(instance.value.path)}${isFromWorlds.value ? '/worlds' : ''}`,
-			backLabel: 'Back to instance',
+			backLabel: formatMessage(messages.backToInstance),
 			heading: formatMessage(
-				isFromWorlds.value ? messages.addServersToInstance : messages.installContentToInstance,
+				isFromWorlds.value ? messages.addServersToInstance : commonMessages.installingContentLabel,
 			),
 			warning:
 				isServerInstance.value && !isFromWorlds.value
-					? 'Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content.'
+					? formatMessage(messages.serverInstanceContentWarning)
 					: undefined,
 		}
 	}
@@ -741,71 +598,82 @@ function setProjectInstalling(projectId: string, installing: boolean) {
 	installingProjectIds.value = next
 }
 
+const serverInstallQueue = {
+	get: getQueuedServerInstallPlans,
+	set: setQueuedServerInstallPlans,
+}
+
+function getCurrentSelectedInstallPreferences(projectTypeValue: string) {
+	return getSelectedInstallPreferences({
+		contentType: projectTypeValue,
+		selectedFilters: searchState.currentFilters.value,
+		providedFilters: combinedProvidedFilters.value,
+		overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+	})
+}
+
+function getServerInstallTargetPreferences(contentType: BrowseInstallContentType) {
+	return getTargetInstallPreferences(
+		{
+			gameVersion: serverContextServerData.value?.mc_version,
+			loader: serverContextServerData.value?.loader,
+		},
+		contentType,
+	)
+}
+
+function getInstanceInstallTargetPreferences(projectTypeValue: string) {
+	return getTargetInstallPreferences(
+		{
+			gameVersion: instance.value?.game_version,
+			loader: instance.value?.loader,
+		},
+		projectTypeValue,
+	)
+}
+
+async function getInstallProjectVersions(projectId: string) {
+	const project = await get_project(projectId, 'must_revalidate')
+	return (await get_version_many(
+		project.versions,
+		'must_revalidate',
+	)) as Labrinth.Versions.v2.Version[]
+}
+
+async function chooseInstanceInstallVersion(
+	project: Labrinth.Search.v2.ResultSearchProject & Labrinth.Search.v3.ResultSearchProject,
+	projectTypeValue: string,
+) {
+	const targetInstance = instance.value
+	if (!targetInstance) {
+		return { versionId: null as string | null }
+	}
+
+	const selectedPreferences = getCurrentSelectedInstallPreferences(projectTypeValue)
+	const targetPreferences = getInstanceInstallTargetPreferences(projectTypeValue)
+	if (!preferencesDiffer(selectedPreferences, targetPreferences)) {
+		return { versionId: null as string | null }
+	}
+
+	const selectedVersion = getLatestMatchingInstallVersion(
+		await getInstallProjectVersions(project.project_id),
+		selectedPreferences,
+		projectTypeValue,
+	)
+
+	if (!selectedVersion) {
+		return { versionId: null as string | null }
+	}
+
+	return { versionId: selectedVersion.id }
+}
+
 function getCardActions(
 	result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
 	currentProjectType: string,
 ): CardAction[] {
 	if (currentProjectType === 'server') {
-		const serverResult = result as Labrinth.Search.v3.ResultSearchProject
-		const isInstalled = allInstalledIds.value.has(serverResult.project_id)
-
-		if (isFromWorlds.value && instance.value) {
-			return [
-				{
-					key: 'add-to-instance',
-					label: formatMessage(isInstalled ? messages.added : messages.addToInstance),
-					icon: isInstalled ? CheckIcon : PlusIcon,
-					disabled: isInstalled,
-					color: 'brand',
-					type: 'outlined',
-					onClick: () => handleAddServerToInstance(serverResult),
-				},
-			]
-		}
-
-		const actions: CardAction[] = []
-
-		actions.push({
-			key: 'add',
-			label: '',
-			icon: isInstalled ? CheckIcon : PlusIcon,
-			disabled: isInstalled,
-			circular: true,
-			tooltip: isInstalled
-				? formatMessage(messages.alreadyAdded)
-				: instance.value
-					? formatMessage(messages.addToInstanceName, { instanceName: instance.value.name })
-					: formatMessage(messages.addServerToInstance),
-			onClick: () => handleAddServerToInstance(serverResult),
-		})
-
-		if (runningServerProjects.value[serverResult.project_id]) {
-			actions.push({
-				key: 'stop',
-				label: formatMessage(commonMessages.stopButton),
-				icon: StopCircleIcon,
-				color: 'red',
-				type: 'outlined',
-				onClick: () => handleStopServerProject(serverResult.project_id),
-			})
-		} else {
-			const isInstalling = (installingServerProjects.value as string[]).includes(
-				serverResult.project_id,
-			)
-			actions.push({
-				key: 'play',
-				label: formatMessage(
-					isInstalling ? commonMessages.installingLabel : commonMessages.playButton,
-				),
-				icon: PlayIcon,
-				disabled: isInstalling,
-				color: 'brand',
-				type: 'outlined',
-				onClick: () => handlePlayServerProject(serverResult.project_id),
-			})
-		}
-
-		return actions
+		return getServerCardActions(result as Labrinth.Search.v3.ResultSearchProject)
 	}
 
 	// Non-server project actions
@@ -817,39 +685,84 @@ function getCardActions(
 	const isInstalled =
 		projectResult.installed ||
 		allInstalledIds.value.has(projectResult.project_id || '') ||
-		serverContentProjectIds.value.has(projectResult.project_id || '')
+		serverContentProjectIds.value.has(projectResult.project_id || '') ||
+		serverContextServerData.value?.upstream?.project_id === projectResult.project_id
 	const isInstalling = installingProjectIds.value.has(projectResult.project_id)
 
 	if (
 		isServerContext.value &&
 		['modpack', 'mod', 'plugin', 'datapack'].includes(currentProjectType)
 	) {
+		const isQueued = queuedServerInstallProjectIds.value.has(projectResult.project_id)
+		const isInstallingSelection = isInstallingQueuedServerInstalls.value
+		const validatingInstall =
+			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
+		const installLabel = isInstalled
+			? commonMessages.installedLabel
+			: isQueued
+				? isInstalling || isInstallingSelection
+					? validatingInstall
+						? commonMessages.validatingLabel
+						: messages.installingToServer
+					: commonMessages.selectedLabel
+				: isInstalling || isInstallingSelection
+					? validatingInstall
+						? commonMessages.validatingLabel
+						: messages.installingToServer
+					: commonMessages.installButton
 		return [
 			{
 				key: 'install',
-				label: formatMessage(
-					isInstalling
-						? messages.installingToServer
-						: isInstalled
-							? messages.installedToServer
-							: messages.installToServer,
-				),
-				icon: isInstalled ? CheckIcon : PlusIcon,
-				iconClass: isInstalling ? 'animate-spin' : undefined,
-				disabled: isInstalled || isInstalling,
-				color: 'brand',
+				label: formatMessage(installLabel),
+				icon:
+					isInstalling || isInstallingSelection
+						? SpinnerIcon
+						: isQueued || isInstalled
+							? CheckIcon
+							: PlusIcon,
+				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
+				disabled: isInstalled || isInstalling || isInstallingSelection,
+				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: async () => {
-					setProjectInstalling(projectResult.project_id, true)
+					if (isQueued) {
+						removeQueuedServerInstall(projectResult.project_id)
+						return
+					}
+
+					const contentType = currentProjectType as BrowseInstallContentType
+					const isModpack = contentType === 'modpack'
+					const shouldShowInstalling = isModpack || !isQueued
+					if (shouldShowInstalling) {
+						setProjectInstalling(projectResult.project_id, true)
+					}
 					try {
-						const didInstall = await installProjectToServer(projectResult)
-						if (didInstall !== false) {
-							onSearchResultInstalled(projectResult.project_id)
-						}
+						await requestInstall({
+							project: projectResult,
+							contentType,
+							mode: isModpack ? 'immediate' : 'queue',
+							selectedFilters: isModpack ? [] : searchState.currentFilters.value,
+							providedFilters: isModpack ? [] : combinedProvidedFilters.value,
+							overriddenProvidedFilterTypes: isModpack
+								? []
+								: searchState.overriddenProvidedFilterTypes.value,
+							targetPreferences: getServerInstallTargetPreferences(contentType),
+							getProjectVersions: getInstallProjectVersions,
+							queue: serverInstallQueue,
+							install: (plan) =>
+								openServerModpackInstallFlow({
+									projectId: plan.projectId,
+									versionId: plan.versionId,
+									name: plan.project.name,
+									iconUrl: plan.project.icon_url ?? undefined,
+								}),
+						})
 					} catch (err) {
 						handleError(err as Error)
 					} finally {
-						setProjectInstalling(projectResult.project_id, false)
+						if (shouldShowInstalling) {
+							setProjectInstalling(projectResult.project_id, false)
+						}
 					}
 				},
 			},
@@ -862,13 +775,15 @@ function getCardActions(
 	return [
 		{
 			key: 'install',
-			label: isInstalling
-				? 'Installing'
-				: isInstalled
-					? 'Installed'
-					: shouldUseInstallIcon
-						? 'Install'
-						: 'Add to an instance',
+			label: formatMessage(
+				isInstalling
+					? messages.installingToServer
+					: isInstalled
+						? commonMessages.installedLabel
+						: shouldUseInstallIcon
+							? commonMessages.installButton
+							: messages.addToAnInstance,
+			),
 			icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : PlusIcon,
 			iconClass: isInstalling ? 'animate-spin' : undefined,
 			disabled: isInstalled || isInstalling,
@@ -876,28 +791,39 @@ function getCardActions(
 			type: 'outlined',
 			onClick: async () => {
 				setProjectInstalling(projectResult.project_id, true)
-				await installVersion(
-					projectResult.project_id,
-					null,
-					instance.value ? instance.value.path : null,
-					'SearchCard',
-					(versionId) => {
+				try {
+					const selectedInstall = instance.value
+						? await chooseInstanceInstallVersion(projectResult, currentProjectType)
+						: { versionId: null as string | null }
+					if (selectedInstall === null) {
 						setProjectInstalling(projectResult.project_id, false)
-						if (versionId) {
-							onSearchResultInstalled(projectResult.project_id)
-						}
-					},
-					(profile) => {
-						router.push(`/instance/${profile}`)
-					},
-					{
-						preferredLoader: instance.value?.loader ?? undefined,
-						preferredGameVersion: instance.value?.game_version ?? undefined,
-					},
-				).catch((err) => {
+						return
+					}
+					const selectedPreferences = getCurrentSelectedInstallPreferences(currentProjectType)
+					await installVersion(
+						projectResult.project_id,
+						selectedInstall.versionId,
+						instance.value ? instance.value.path : null,
+						'SearchCard',
+						(versionId) => {
+							setProjectInstalling(projectResult.project_id, false)
+							if (versionId) {
+								onSearchResultInstalled(projectResult.project_id)
+							}
+						},
+						(profile) => {
+							router.push(`/instance/${profile}`)
+						},
+						{
+							preferredLoader: instance.value?.loader ?? selectedPreferences.loaders?.[0],
+							preferredGameVersion:
+								instance.value?.game_version ?? selectedPreferences.gameVersions?.[0],
+						},
+					)
+				} catch (err) {
 					setProjectInstalling(projectResult.project_id, false)
 					handleError(err)
-				})
+				}
 			},
 		},
 	]
@@ -937,9 +863,7 @@ async function search(requestParams: string) {
 
 	if (isServer) {
 		const hits = rawResults.result.hits ?? []
-		lastServerHits.value = hits
-		pingServerHits(hits)
-		checkServerRunningStates(hits)
+		updateServerHits(hits)
 		return {
 			projectHits: [],
 			serverHits: hits,
@@ -1024,6 +948,12 @@ watch(
 	{ deep: true },
 )
 
+watch(queuedServerInstallCount, (count) => {
+	if (count === 0) {
+		hideSelectedServerInstalls.value = false
+	}
+})
+
 if (instance.value?.game_version) {
 	const gv = instance.value.game_version
 	const alreadyHasGv = searchState.serverCurrentFilters.value.some(
@@ -1036,16 +966,26 @@ if (instance.value?.game_version) {
 
 await searchState.refreshSearch()
 
+function getProjectBrowseQuery() {
+	if (!installContext.value) return undefined
+	return {
+		...route.query,
+		b: route.fullPath,
+	}
+}
+
 provideBrowseManager({
 	tags,
 	projectType,
 	...searchState,
 	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) => ({
 		path: `/project/${result.project_id ?? result.slug}`,
-		query: instance.value ? { i: instance.value.path } : undefined,
+		query: getProjectBrowseQuery(),
 	}),
-	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
-		`/project/${result.slug ?? result.project_id}`,
+	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
+		path: `/project/${result.slug ?? result.project_id}`,
+		query: getProjectBrowseQuery(),
+	}),
 	selectableProjectTypes,
 	showProjectTypeTabs: computed(() => !isServerContext.value),
 	variant: 'app',
@@ -1068,8 +1008,18 @@ provideBrowseManager({
 		() => (isServerContext.value && projectType.value !== 'modpack') || !!instance.value,
 	),
 	hideInstalledLabel: computed(() =>
-		formatMessage(isFromWorlds.value ? messages.hideAddedServers : messages.hideInstalledContent),
+		formatMessage(
+			isFromWorlds.value ? messages.hideAddedServers : commonMessages.hideInstalledContentLabel,
+		),
 	),
+	hideSelected: hideSelectedServerInstalls,
+	showHideSelected: computed(
+		() =>
+			isServerContext.value &&
+			projectType.value !== 'modpack' &&
+			queuedServerInstallCount.value > 0,
+	),
+	hideSelectedLabel: computed(() => formatMessage(commonMessages.hideSelectedContentLabel)),
 	onInstalled: onSearchResultInstalled,
 	serverPings,
 	getServerModpackContent,
@@ -1084,8 +1034,12 @@ provideBrowseManager({
 		<BrowsePageLayout>
 			<template #after>
 				<ContextMenu ref="contextMenuRef" @option-clicked="handleOptionsClick">
-					<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
-					<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+					<template #open_link>
+						<GlobeIcon /> {{ formatMessage(commonMessages.openInModrinthButton) }} <ExternalIcon />
+					</template>
+					<template #copy_link>
+						<ClipboardCopyIcon /> {{ formatMessage(commonMessages.copyLinkButton) }}
+					</template>
 				</ContextMenu>
 			</template>
 		</BrowsePageLayout>

@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Impossible de contacter les serveurs d'authentification"
   },
-  "app.browse.add-server-to-instance": {
+  "app.browse.add-servers-to-instance": {
     "message": "Ajouter le serveur à l'instance"
   },
-  "app.browse.add-servers-to-instance": {
-    "message": "Ajouter des serveurs à votre instance"
+  "app.browse.add-to-an-instance": {
+    "message": "Ajouter à une instance"
   },
   "app.browse.add-to-instance": {
     "message": "Ajouter à l'instance"
@@ -122,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Déjà ajouté"
   },
+  "app.browse.back-to-instance": {
+    "message": "Retour à l'instance"
+  },
   "app.browse.discover-content": {
     "message": "Découvrir du contenu"
   },
@@ -131,20 +134,11 @@
   "app.browse.hide-added-servers": {
     "message": "Masquer les serveurs déjà ajoutés"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Masquer le contenu déjà ajouté"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Installer du contenu à l'instance"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
   },
-  "app.browse.server.install": {
-    "message": "Installer"
-  },
-  "app.browse.server.installed": {
-    "message": "Installé"
+  "app.browse.server-instance-content-warning": {
+    "message": "Ajouter du contenu peut briser la comptabilité en rejoignant le serveur. Tout contenu en plus sera également perdu lorsque vous mettrez à jour le contenu de l'instance du serveur."
   },
   "app.browse.server.installing": {
     "message": "Installation en cours"
@@ -164,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Exporter le modpack"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Inclure « {file} » ?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Nom du modpack"
   },
@@ -171,7 +168,7 @@
     "message": "Nom du modpack"
   },
   "app.export-modal.select-files-label": {
-    "message": "Sélectionnez des fichiers et des dossiers à inclure dans le pack"
+    "message": "Configurez quels fichiers sont inclus dans cette exportation"
   },
   "app.export-modal.version-number-label": {
     "message": "Numéro de version"
@@ -192,7 +189,7 @@
     "message": "Supprimer l'instance"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Ce modpack est déjà installé sur l'instance <bold>{instanceName}</bold>. Êtes-vous sûr.e de vouloir le dupliquer ?"
+    "message": "Ce modpack est déjà installé sur l'instance <bold>{instanceName}</bold>. Êtes-vous sûr·e de vouloir le dupliquer ?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Créer"
@@ -231,7 +228,7 @@
     "message": "« {name} » sera supprimé **pour toujours**, et il sera impossible de le récupérer."
   },
   "app.instance.worlds.delete-world-title": {
-    "message": "Êtes-vous sûr.e de vouloir supprimer ce monde pour toujours ?"
+    "message": "Êtes-vous sûr·e de vouloir supprimer ce monde pour toujours ?"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Moddé"
@@ -258,7 +255,7 @@
     "message": "« {name} » ({address}) sera retiré de votre liste, y compris en jeu, et il sera impossible de le récupérer."
   },
   "app.instance.worlds.remove-server-title": {
-    "message": "Êtes-vous sûr.e de vouloir retirer {name} ?"
+    "message": "Êtes-vous sûr·e de vouloir retirer {name} ?"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Rechercher {count} mondes..."
@@ -301,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Une mise à jour est requise pour jouer à {name}. Veuillez mettre à jour à la dernière version pour lancer le jeu."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Ce projet a déjà été installé"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Retour à la navigation"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Installer du contenu à l'instance"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Mode développeur activé."

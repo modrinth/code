@@ -111,6 +111,7 @@
 								color: 'primary',
 								hoverFilled: true,
 								link: createDownloadUrl(version),
+								download: getPrimaryFile(version).filename,
 								action: () => {
 									emit('onDownload')
 								},

@@ -5,12 +5,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "לא ניתן לגשת לשרתי האימות"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "הוסף שרת להתקנה"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "הוסף שרתים להתקנה שלך"
-  },
   "app.browse.add-to-instance": {
     "message": "הוספה להתקנה"
   },
@@ -29,9 +23,6 @@
   "app.browse.discover-servers": {
     "message": "גלה שרתים"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "הוספת התוכן להתקנה"
-  },
   "app.export-modal.description-placeholder": {
     "message": "הזן את תיאור חבילת המודים..."
   },
@@ -46,9 +37,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "שם חבילת המודים"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "בחר קבצים ותיקיות להכללה בחבילה הזו"
   },
   "app.export-modal.version-number-label": {
     "message": "מספר גרסה"

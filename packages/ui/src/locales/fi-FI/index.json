@@ -404,9 +404,6 @@
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Piilotettu"
   },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Pidätetty"
-  },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopioi koodi leikepöydälle"
   },

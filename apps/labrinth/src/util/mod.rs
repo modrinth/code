@@ -17,5 +17,6 @@ pub mod ratelimit;
 pub mod redis;
 pub mod routes;
 pub mod sentry;
+pub mod tags;
 pub mod validate;
 pub mod webhook;

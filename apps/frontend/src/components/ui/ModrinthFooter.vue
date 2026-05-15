@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { BlueskyIcon, DiscordIcon, GithubIcon, MastodonIcon, TwitterIcon } from '@modrinth/assets'
+import {
+	BlueskyIcon,
+	DiscordIcon,
+	GithubIcon,
+	MastodonIcon,
+	ToggleRightIcon,
+	TwitterIcon,
+} from '@modrinth/assets'
 import {
 	AutoLink,
 	ButtonStyled,
@@ -10,6 +17,7 @@ import {
 	type MessageDescriptor,
 	useVIntl,
 } from '@modrinth/ui'
+import { commonSettingsMessages } from '@modrinth/ui/src/utils/common-messages.js'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
 
@@ -233,11 +241,21 @@ function developerModeIncrement() {
 					role="region"
 					:aria-label="formatMessage(messages.modrinthInformation)"
 				>
-					<TextLogo
-						aria-hidden="true"
-						class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
-						@click="developerModeIncrement()"
-					/>
+					<div class="flex items-center gap-2">
+						<TextLogo
+							aria-hidden="true"
+							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
+							@click="developerModeIncrement()"
+						/>
+						<ButtonStyled v-if="flags.developerMode" circular type="transparent" color="brand">
+							<nuxt-link
+								v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"
+								to="/settings/flags"
+							>
+								<ToggleRightIcon />
+							</nuxt-link>
+						</ButtonStyled>
+					</div>
 					<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
 						<ButtonStyled
 							v-for="(social, index) in socialLinks"

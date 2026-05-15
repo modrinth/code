@@ -11,6 +11,109 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-13T05:24:14+00:00`,
+		product: 'web',
+		body: `## Changed
+- Overhauled the 'Moderation' tab on project pages to make the moderation status of your project clearer.
+- Updated the report page to a more modern style.
+- Adjusted the colors of certain status banner buttons to make them more readable.
+- Updated the DMCA registered agent listed on the coypright policy page.
+
+## Fixed
+- Fixed status banners at the top of the page having really long buttons.
+- Fixed status banners at the top of the page having an unusual amount of padding on the bottom when they didn't have an action.`,
+	},
+	{
+		date: `2026-05-12T20:06:07+00:00`,
+		product: 'app',
+		version: '0.13.17',
+		body: `## Fixed
+- Fixed the app automatically re-opening after installing a pending update when the user closes the app.
+- Fixed "Open in browser" not working.
+- Fixed the lack of margin above the pagination links at the bottom of Discover pages.
+- Fixed longstanding issue "Unable to read category tags from any source" that occurs sometimes when the app has cached invalid tags.
+- Fixed Windows app control buttons not being clickable at the exact top right corner.
+- Fixed Modrinth project links opening inside a broken in-app web browser rather than going to the project's page in the app.
+- Fixed not being able to hover over project card tooltip items.`,
+	},
+	{
+		date: `2026-05-12T20:06:07+00:00`,
+		product: 'web',
+		body: `## Changed
+- Changed how dependencies are added and edited on versions to make it clearer when a dependency is added or not when saving.`,
+	},
+	{
+		date: `2026-05-11T20:16:06+00:00`,
+		product: 'app',
+		version: '0.13.15',
+		body: `## Changed
+- Updated translations.
+
+## Fixed
+- Fixed app launch speed being dramatically slowed by having lots of instances.`,
+	},
+	{
+		date: `2026-05-11T20:16:06+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations.
+
+## Fixed
+- Fixed NeoForge version inferring on Minecraft versions 26.1 and newer.
+- Improved how NeoForge Minecraft versions are inferred to support more cases.`,
+	},
+	{
+		date: `2026-05-11T20:16:06+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations.`,
+	},
+	{
+		date: `2026-05-09T21:42:48+00:00`,
+		product: 'app',
+		version: '0.13.14',
+		body: `## Fixed
+- Fixed hidden files showing up in the Content tab on instances.
+- Fixed 'Advanced rendering' option not being applied to most of the interface.`,
+	},
+	{
+		date: `2026-05-09T21:42:48+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Improved stability of content install flow.
+
+## Fixed
+- Fixed content install flow breaking if you refresh the page mid-install.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'app',
+		version: '0.13.13',
+		body: `## Changed
+- Improved the Browse page header so the back button no longer shifts the layout.
+
+## Fixed
+- Fixed instance redirects opening a broken page state.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved performance on search pages.`,
+	},
+	{
+		date: `2026-05-09T19:06:18+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated Modrinth Hosting content browsing so multiple projects can be selected before installation.
+- After installing selected content, the Modrinth Hosting content page now reopens immediately and shows pending projects as installing.
+- Project icons now appear in the action bar when selecting multiple projects in the Content tab.
+
+## Fixed
+- Fixed selected content and dependencies not staying marked as installing.
+- Fixed page shifts while dependencies resolve during installation.`,
+	},
+	{
 		date: `2026-05-08T09:58:39+00:00`,
 		product: 'web',
 		body: `## Fixed

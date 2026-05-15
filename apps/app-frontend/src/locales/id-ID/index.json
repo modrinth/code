@@ -3,25 +3,73 @@
     "message": "Mengunduh Java {version}"
   },
   "app.action-bar.downloads": {
-    "message": "Mengunduh"
+    "message": "Unduhan"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "Sembunyikan lebih banyak instance yang sedang berjalan"
+    "message": "Sembunyikan lebih banyak instans yang sedang berjalan"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Jadikan sebagai instance utama"
+    "message": "Jadikan sebagai instans utama"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Tidak ada instance yang sedang berjalan"
+    "message": "Tidak ada instans yang sedang berjalan"
   },
   "app.action-bar.offline": {
-    "message": "Offline"
+    "message": "Luring"
   },
   "app.action-bar.primary-instance": {
-    "message": "Instance utama"
+    "message": "Instans utama"
   },
   "app.action-bar.show-more-running-instances": {
-    "message": "Tampilkan lebih banyak instance yang sedang berjalan"
+    "message": "Tampilkan lebih banyak instans yang sedang berjalan"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Hentikan instans"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Lihat pengunduhan berlangsung"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Lihat instans"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Lihat catatan"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Menghidupkan renderasi tingkat lanjut seperti efek buram yang dapat menyebabkan masalah kinerja tanpa renderasi yang dipercepat perangkat keras."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Renderasi tingkat lanjut"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Pilih tema warna pilihan Anda untuk Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Tema warna"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Ubah halaman utama yang dibuka oleh peluncur."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Beranda"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Pustaka"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Mematikan label nama di atas wujud pemain Anda pada halaman rupa."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Sembunyikan label nama"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Kecilkan pluncur ketika proses Minecraft berjalan."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Kecilkan peluncur"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Pilih opsi"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Server autentikasi Minecraft mungkin sedang tidak tersedia saat ini. Periksa koneksi internet Anda dan coba lagi nanti."
@@ -29,11 +77,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat terhubung ke server autentikasi"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Tambah server ke instans"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "Tambah server ke instans Anda"
+    "message": "Menambah server ke instans"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Tambah ke instans"
   },
   "app.browse.add-to-instance": {
     "message": "Tambah ke instans"
@@ -47,14 +95,29 @@
   "app.browse.already-added": {
     "message": "Telah ditambahkan"
   },
+  "app.browse.back-to-instance": {
+    "message": "Kembali ke instans"
+  },
   "app.browse.discover-content": {
     "message": "Temukan konten"
   },
   "app.browse.discover-servers": {
     "message": "Temukan server"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Pasang konten ke instans"
+  "app.browse.hide-added-servers": {
+    "message": "Sembunyikan server yang sudah ditambah"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Paket Mod"
+  },
+  "app.browse.server.installing": {
+    "message": "Memasang"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Memasang paket mod..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Masukkan deskripsi paket mod..."
@@ -65,6 +128,9 @@
   "app.export-modal.header": {
     "message": "Ekspor paket mod"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Sertakan \"{file}\"?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Nama Paket Mod"
   },
@@ -72,7 +138,7 @@
     "message": "Nama paket mod"
   },
   "app.export-modal.select-files-label": {
-    "message": "Pilih berkas dan folder yang ingin dimasukkan ke paket"
+    "message": "Konfigurasikan berkas mana yang disertakan dalam pengeksporan ini"
   },
   "app.export-modal.version-number-label": {
     "message": "Nomor versi"

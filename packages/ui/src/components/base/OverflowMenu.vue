@@ -36,6 +36,7 @@
 							: undefined
 					"
 					:link="option.link ? option.link : undefined"
+					:download="option.download ? option.download : undefined"
 					:external="option.external ? option.external : false"
 					:disabled="option.disabled"
 					@click="
@@ -76,6 +77,7 @@ interface Item extends BaseOption {
 	icon?: Component
 	action?: (event?: MouseEvent) => void
 	link?: string
+	download?: string
 	external?: boolean
 	color?:
 		| 'primary'

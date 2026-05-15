@@ -1,15 +1,114 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Java {version} aan het downloaden"
+  },
+  "app.action-bar.downloads": {
+    "message": "Downloads"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Verberg meer actieve instanties"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Maak primaire instantie"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Geen actieve instanties"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Primaire instantie"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Toon meer actieve instanties"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Stop instantie"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Bekijk actieve downloads"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Bekijk instantie"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Bekijk logs"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Activeert geavanceerde weergaves zoals blur effecten die mogelijke prestatieproblemen opleveren zonder hardware-versnelde weergeving."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Geavanceerde weergave"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Selecteer je voorkeur kleurenthema voor de Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Kleurenthema"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Wijzig de pagina waarop de launcher opent."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Home"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Bibliotheek"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Standaard openingspagina"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Schakelt het nametag boven jouw speler op de skins pagina uit."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Verberg nametag"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Inclusief recente werelden in het gedeelte \"Ga terug\" op de startpagina."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Ga terug in werelden"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimaliseer de launcher als een Minecraft proces wordt gestart."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimaliseer launcher"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Gebruik systeem venster frame (app opnieuw starten vereist)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Oorspronkelijke versieringen"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Selecteer een optie"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Schakelt de mogelijkheid om de zijbalk in- of uit te schakelen in."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Schakel zijbalk"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Als je probeert een Modrinth Pack-bestand (.mrpack) te installeren dat niet op Modrinth zelf wordt gehost, zorgen we ervoor dat je de risico's begrijpt voordat je het installeert."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Waarschuw mij voordat ik onbekende modpacks installeer"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft authenticatie servers zijn mogelijk offline. Controleer je internetverbinding en probeer opnieuw later."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Authenticatieservers kunnen niet worden bereikt"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Voeg server aan instantie toe"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "Voeg servers aan instantie toe"
+    "message": "Server toevoegen aan instantie"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Voeg toe aan een instantie"
   },
   "app.browse.add-to-instance": {
     "message": "Voeg aan instantie toe"
@@ -23,14 +122,32 @@
   "app.browse.already-added": {
     "message": "Al toegevoegd"
   },
+  "app.browse.back-to-instance": {
+    "message": "Terug naar instantie"
+  },
   "app.browse.discover-content": {
     "message": "Ontdek content"
   },
   "app.browse.discover-servers": {
     "message": "Ontdek servers"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Installeer inhoud naar instantie"
+  "app.browse.hide-added-servers": {
+    "message": "Verberg al toegevoegde servers"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpacks"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Het toevoegen van content kan de compatibiliteit verbreken bij het verbinden met de server. Alle toegevoegde inhoud gaat ook verloren wanneer u de content van de serverinstantie bijwerkt."
+  },
+  "app.browse.server.installing": {
+    "message": "Installeren"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Modpack aan het installeren..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Voeg modpack beschrijving in..."
@@ -41,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Exporteer modpack"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Betrek \"{file}\"?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpack Naam"
   },
@@ -48,7 +168,7 @@
     "message": "Modpack naam"
   },
   "app.export-modal.select-files-label": {
-    "message": "Selecteer bestanden en mappen om toe te voegen aan pack"
+    "message": "Configureer welke bestanden bij deze export zijn betrokken"
   },
   "app.export-modal.version-number-label": {
     "message": "Versie nummer"
@@ -178,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Een update is vereist om {name} te spelen. Update naar de laatste versie om het spel te starten."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Dit project is al geïnstalleerd"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Terug naar browsen"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Installeer content naar instantie"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
@@ -569,6 +698,24 @@
   "instance.worlds.world_in_use": {
     "message": "Wereld wordt gebruikt"
   },
+  "minecraft-account.add-account": {
+    "message": "Voeg account toe"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft account"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Niet ingelogd"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Verwijder account"
+  },
+  "minecraft-account.select-account": {
+    "message": "Selecteer account"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Log in bij Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "Aangeboden door de instantie"
   },
@@ -592,5 +739,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is gegeven door de server"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "Een bestand wordt alleen beoordeeld als het naar Modrinth is geüpload, ongeacht het bestandsformaat (inclusief .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Toon deze waarschuwing niet opnieuw"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Bevestig installatie"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Installeer toch"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Malware wordt vaak verspreid via modpack-bestanden door ze te delen op platforms zoals Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "We konden dit bestand niet vinden op Modrinth. We raden ten zeerste aan om alleen bestanden te installeren van bronnen die u vertrouwt."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Waarschuwing voor onbekend bestand"
   }
 }

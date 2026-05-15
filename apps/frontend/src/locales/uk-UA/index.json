@@ -572,6 +572,12 @@
   "dashboard.affiliate-links.search": {
     "message": "Пошук партнерських посилань…"
   },
+  "dashboard.analytics.total-downloads": {
+    "message": "Всього завантажень"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Всього підписались"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Створити нову"
   },
@@ -595,6 +601,15 @@
   },
   "dashboard.collections.long-title": {
     "message": "Ваші добірки"
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Назва (А-Я)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Нещодавно зробленні"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Нещодавно оновлені"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Завантажити {formType}"
@@ -847,6 +862,24 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Ви використали свій ліміт зняття коштів <b>{withdrawLimit}</b>. Щоб зняти більше, вам потрібно заповнити податкову форму."
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "Подивитись історію"
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Помилка завантаження повідомлень"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "Історія"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Історія повідомлень"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Побачити всі"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Завантаження повідомлень"
   },
   "dashboard.revenue.available-now": {
     "message": "Наразі доступно"
@@ -1702,9 +1735,6 @@
   },
   "moderation.page.reports": {
     "message": "Скарги"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Технічний огляд"
   },
   "muralpay.account-type.checking": {
     "message": "Перевірка"
