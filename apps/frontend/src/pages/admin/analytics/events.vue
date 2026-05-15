@@ -1,4 +1,12 @@
 <template>
+	<ConfirmModal
+		ref="deleteEventModal"
+		title="Delete analytics event?"
+		:description="deleteEventDescription"
+		proceed-label="Delete event"
+		@proceed="confirmDeleteEvent"
+	/>
+
 	<NewModal
 		ref="eventModal"
 		:header="modalMode === 'create' ? 'New event' : 'Edit event'"
@@ -88,6 +96,7 @@
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button :disabled="!canSaveEvent || isSaving" @click="saveEvent">
+						<SaveIcon aria-hidden="true" />
 						{{ modalMode === 'create' ? 'Create event' : 'Save' }}
 					</button>
 				</ButtonStyled>
@@ -140,7 +149,7 @@
 						Open link
 						<ExternalIcon class="size-4" aria-hidden="true" />
 					</a>
-					<span v-else class="font-medium text-primary">N/A</span>
+					<span v-else class="text-sm font-medium text-primary">N/A</span>
 				</template>
 
 				<template #cell-date="{ row }">
@@ -152,7 +161,7 @@
 						<span
 							v-for="metric in getMetricKindOptions(row.for_metric_kind)"
 							:key="metric.value"
-							class="inline-flex items-center rounded-full border border-solid border-surface-5 bg-surface-3 px-2 py-0.5 text-xs font-semibold text-secondary"
+							class="inline-flex items-center rounded-full border border-solid border-surface-5 px-2 py-0.5 text-xs font-medium text-secondary"
 						>
 							{{ metric.label }}
 						</span>
@@ -165,7 +174,7 @@
 							<button
 								:aria-label="`Delete ${row.title}`"
 								:disabled="isDeletingEvent(row.id)"
-								@click="deleteEvent(row.id)"
+								@click="openDeleteEventModal(row)"
 							>
 								<TrashIcon aria-hidden="true" />
 							</button>
@@ -191,9 +200,10 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { EditIcon, ExternalIcon, PlusIcon, SearchIcon, TrashIcon } from '@modrinth/assets'
+import { EditIcon, ExternalIcon, PlusIcon, SaveIcon, SearchIcon, TrashIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	ConfirmModal,
 	DatePicker,
 	injectNotificationManager,
 	MultiSelect,
@@ -243,9 +253,9 @@ const queryClient = useQueryClient()
 
 const columns: TableColumn<EventColumnKey>[] = [
 	{ key: 'date', label: 'Date', width: '18%', enableSorting: true },
-	{ key: 'title', label: 'Title', width: '30%' },
-	{ key: 'announcement', label: 'Announcement link', width: '20%' },
-	{ key: 'metrics', label: 'Metric', width: '17%' },
+	{ key: 'title', label: 'Title' },
+	{ key: 'announcement', label: 'Announcement link', width: '18%' },
+	{ key: 'metrics', label: 'Metric', width: '18%' },
 	{ key: 'actions', label: 'Actions', width: '15%', align: 'right' },
 ]
 
@@ -257,12 +267,14 @@ const metricKindOptions: MultiSelectOption<AnalyticsEventMetricKind>[] = [
 ]
 const allMetricKinds = metricKindOptions.map((option) => option.value)
 
+const deleteEventModal = ref<InstanceType<typeof ConfirmModal> | null>(null)
 const eventModal = ref<InstanceType<typeof NewModal> | null>(null)
 const searchQuery = ref('')
 const sortColumn = ref<EventColumnKey | undefined>('date')
 const sortDirection = ref<SortDirection>('desc')
 const modalMode = ref<'create' | 'edit'>('create')
 const editingEventId = ref<Labrinth.Analytics.v3.AnalyticsEventId | null>(null)
+const pendingDeleteEvent = ref<Labrinth.Analytics.v3.AnalyticsEvent | null>(null)
 const form = ref<EventForm>(getEmptyForm())
 const isSaving = ref(false)
 const deletingEventIds = ref(new Set<Labrinth.Analytics.v3.AnalyticsEventId>())
@@ -311,6 +323,13 @@ const canSaveEvent = computed(
 		Boolean(getEventFormDateRange()) &&
 		form.value.metricKinds.length > 0,
 )
+const deleteEventDescription = computed(() => {
+	if (!pendingDeleteEvent.value) {
+		return 'This analytics event will be deleted. This cannot be undone.'
+	}
+
+	return `This will delete "${pendingDeleteEvent.value.title}" from analytics events. This cannot be undone.`
+})
 
 const eventRows = computed<AnalyticsEventRow[]>(() =>
 	(analyticsEvents.value ?? []).map((event) => ({
@@ -381,6 +400,11 @@ function openEditModal(event: Labrinth.Analytics.v3.AnalyticsEvent) {
 	eventModal.value?.show()
 }
 
+function openDeleteEventModal(event: Labrinth.Analytics.v3.AnalyticsEvent) {
+	pendingDeleteEvent.value = event
+	deleteEventModal.value?.show()
+}
+
 async function saveEvent() {
 	if (!canSaveEvent.value || isSaving.value) {
 		return
@@ -415,6 +439,16 @@ async function saveEvent() {
 	} finally {
 		isSaving.value = false
 	}
+}
+
+async function confirmDeleteEvent() {
+	if (!pendingDeleteEvent.value) {
+		return
+	}
+
+	const eventId = pendingDeleteEvent.value.id
+	pendingDeleteEvent.value = null
+	await deleteEvent(eventId)
 }
 
 async function deleteEvent(eventId: Labrinth.Analytics.v3.AnalyticsEventId) {
