@@ -15,8 +15,8 @@
 		:on-hide="resetForm"
 		:close-on-click-outside="false"
 	>
-		<form class="flex flex-col gap-5" @submit.prevent="saveEvent">
-			<label for="analytics-event-title" class="flex flex-col gap-2">
+		<div class="flex flex-col gap-5" @submit.prevent="saveEvent">
+			<div class="flex flex-col gap-2">
 				<span class="label__title font-semibold">Title</span>
 				<StyledInput
 					id="analytics-event-title"
@@ -27,9 +27,9 @@
 					placeholder="Event title..."
 					:maxlength="120"
 				/>
-			</label>
+			</div>
 
-			<label for="analytics-event-link" class="flex flex-col gap-2">
+			<div class="flex flex-col gap-2">
 				<div class="flex items-center justify-between">
 					<span class="label__title font-semibold">Announcement link</span>
 
@@ -58,9 +58,9 @@
 						@change="commitAnnouncementUrl"
 					/>
 				</div>
-			</label>
+			</div>
 
-			<label for="analytics-event-date" class="flex flex-col gap-2">
+			<div class="flex flex-col gap-2">
 				<span class="label__title font-semibold">Date range</span>
 				<DatePicker
 					id="analytics-event-date"
@@ -74,7 +74,7 @@
 					wrapper-class="w-full"
 					view-date-alignment="right"
 				/>
-			</label>
+			</div>
 
 			<div class="flex flex-col gap-2">
 				<span class="label__title font-semibold">Metric</span>
@@ -88,7 +88,7 @@
 					include-select-all-option
 				/>
 			</div>
-		</form>
+		</div>
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
