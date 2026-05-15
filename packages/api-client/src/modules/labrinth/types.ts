@@ -252,21 +252,26 @@ export namespace Labrinth {
 						license_id: string
 						link?: string
 						notes?: string
+						/** Hosted proof image URLs (e.g. permission screenshots) */
+						proof_image_urls?: string[]
 				  }
 				| {
 						type: 'my_project'
 						license_id: string
 						notes?: string
+						proof_image_urls?: string[]
 				  }
 				| {
 						type: 'special_permission'
 						link?: string
 						proof?: string
 						notes?: string
+						proof_image_urls?: string[]
 				  }
 				| {
 						type: 'no_permission'
 						notes?: string
+						proof_image_urls?: string[]
 				  }
 
 			export type AttributionFile = {
@@ -284,6 +289,8 @@ export namespace Labrinth {
 				id: string
 				flame_project_id: number | null
 				flame_project_title: string | null
+				flame_project_link: string | null
+				flame_project_icon: string | null
 				attribution: AttributionData | null
 				attributed_at: string | null
 				attributed_by: string | null
@@ -305,6 +312,44 @@ export namespace Labrinth {
 				sha1: string
 				project_id: string
 			}
+		}
+	}
+
+	export namespace Images {
+		export namespace v3 {
+			/** Extensions accepted by POST /v3/image (Labrinth image pipeline). */
+			export type ImageExtension = 'bmp' | 'gif' | 'jpeg' | 'jpg' | 'png' | 'webp'
+
+			/** `context` query values accepted by POST /v3/image. */
+			export type ImageUploadContext = 'project' | 'version' | 'thread_message' | 'report'
+
+			export type UploadedImage = {
+				id: string
+				url: string
+				size: number
+				created: string
+				owner_id: string
+			} & (
+				| { context: 'project'; project_id: string }
+				| { context: 'version'; version_id: string }
+				| { context: 'thread_message'; thread_message_id: string }
+				| { context: 'report'; report_id: string }
+			)
+
+			export type UploadedImageFor<C extends ImageUploadContext> = Extract<
+				UploadedImage,
+				{ context: C }
+			>
+
+			/**
+			 * Target for POST /v3/image (per-context id query params, plus `context`).
+			 * `ext` is passed as a separate argument on the client module.
+			 */
+			export type UploadImageParams =
+				| { context: 'project'; project_id: string }
+				| { context: 'version'; version_id: string }
+				| { context: 'thread_message'; thread_message_id: string }
+				| { context: 'report'; report_id: string }
 		}
 	}
 

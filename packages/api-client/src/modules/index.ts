@@ -13,13 +13,14 @@ import { KyrosFilesV0Module } from './kyros/files/v0'
 import { KyrosLogsV1Module } from './kyros/logs/v1'
 import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
 import { LabrinthAffiliateInternalModule } from './labrinth/affiliate/internal'
+import { LabrinthAttributionInternalModule } from './labrinth/attribution/internal'
 import { LabrinthAuthInternalModule } from './labrinth/auth/internal'
 import { LabrinthAuthV2Module } from './labrinth/auth/v2'
-import { LabrinthAttributionInternalModule } from './labrinth/attribution/internal'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthExternalProjectsInternalModule } from './labrinth/external-projects/internal'
 import { LabrinthGlobalsInternalModule } from './labrinth/globals/internal'
+import { LabrinthImagesV3Module } from './labrinth/images/v3'
 import { LabrinthLimitsV3Module } from './labrinth/limits/v3'
 import { LabrinthModerationInternalModule } from './labrinth/moderation/internal'
 import { LabrinthNotificationsV2Module } from './labrinth/notifications/v2'
@@ -80,6 +81,7 @@ export const MODULE_REGISTRY = {
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_external_projects_internal: LabrinthExternalProjectsInternalModule,
 	labrinth_globals_internal: LabrinthGlobalsInternalModule,
+	labrinth_images_v3: LabrinthImagesV3Module,
 	labrinth_moderation_internal: LabrinthModerationInternalModule,
 	labrinth_notifications_v2: LabrinthNotificationsV2Module,
 	labrinth_oauth_internal: LabrinthOAuthInternalModule,

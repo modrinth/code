@@ -219,6 +219,7 @@ import _SortAscIcon from './icons/sort-asc.svg?component'
 import _SortDescIcon from './icons/sort-desc.svg?component'
 import _SparklesIcon from './icons/sparkles.svg?component'
 import _SpinnerIcon from './icons/spinner.svg?component'
+import _SplitIcon from './icons/split.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
 import _StoreIcon from './icons/store.svg?component'
@@ -611,6 +612,7 @@ export const SortAscIcon = _SortAscIcon
 export const SortDescIcon = _SortDescIcon
 export const SparklesIcon = _SparklesIcon
 export const SpinnerIcon = _SpinnerIcon
+export const SplitIcon = _SplitIcon
 export const StarIcon = _StarIcon
 export const StopCircleIcon = _StopCircleIcon
 export const StoreIcon = _StoreIcon

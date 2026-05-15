@@ -82,7 +82,7 @@ async fn list(
     } else {
         sqlx::query(
             "
-			select paf.group_id, paf.name, encode(paf.sha1, 'escape') as sha1,
+			select paf.group_id, paf.name, encode(paf.sha1, 'hex') as sha1,
 				array_agg(distinct f.version_id) as version_ids
 			from project_attribution_files paf
 			left join override_file_sources ofs on ofs.sha1 = paf.sha1

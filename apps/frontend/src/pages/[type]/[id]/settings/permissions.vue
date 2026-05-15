@@ -205,7 +205,14 @@ function dismissInfoBanner() {
 			:body="formatMessage(messages.completedDescription)"
 		/>
 		<Admonition
-			v-if="stats.pending > 0"
+			v-else-if="stats.noPermission > 0"
+			type="critical"
+			class="mb-4"
+			:header="formatMessage(messages.failTitle)"
+			:body="formatMessage(messages.failDescription)"
+		/>
+		<Admonition
+			v-else-if="stats.pending > 0"
 			type="warning"
 			class="mb-4"
 			:header="formatMessage(messages.attentionNeededTitle)"
@@ -217,17 +224,12 @@ function dismissInfoBanner() {
 				)
 			"
 		/>
-		<Admonition
-			v-if="stats.noPermission > 0"
-			type="critical"
-			class="mb-4"
-			:header="formatMessage(messages.failTitle)"
-			:body="formatMessage(messages.failDescription)"
-		/>
 		<div class="grid grid-cols-[1fr_auto] gap-2">
 			<StyledInput
 				v-model="searchQuery"
-				type="search"
+				type="text"
+				autocomplete="off"
+				clearable
 				:placeholder="
 					formatMessage(messages.searchPlaceholder, {
 						count: totalGroups,
@@ -271,11 +273,12 @@ function dismissInfoBanner() {
 				/>
 			</TransitionGroup>
 		</div>
-
-		<p v-if="attributionError" class="mt-4 text-sm text-red">
-			{{ String(attributionError) }}
-		</p>
 	</template>
+	<div v-else-if="attributionError">
+		<p v-if="attributionError" class="my-12 text-center text-red">
+			{{ attributionError }}
+		</p>
+	</div>
 	<template v-else>
 		<EmptyState
 			:heading="formatMessage(messages.emptyStateHeading)"

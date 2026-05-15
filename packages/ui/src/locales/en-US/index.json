@@ -773,6 +773,9 @@
   "external-files.permissions-card.error.link-required": {
     "defaultMessage": "Please provide a link."
   },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "Please upload a PNG, JPEG, GIF, WebP, or BMP image."
+  },
   "external-files.permissions-card.error.proof-required": {
     "defaultMessage": "Please provide proof and explanation."
   },
@@ -782,8 +785,11 @@
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# file} other {# files}}"
   },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Included files:"
+  },
   "external-files.permissions-card.included-in-versions": {
-    "defaultMessage": "Included in versions"
+    "defaultMessage": "Included in {count, plural, one {# version} other {# versions}}:"
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Last updated on {date} by {user}"
@@ -823,6 +829,21 @@
   },
   "external-files.permissions-card.proof-description": {
     "defaultMessage": "Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack."
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "Proof screenshot {n}"
+  },
+  "external-files.permissions-card.proof-image-remove": {
+    "defaultMessage": "Remove image"
+  },
+  "external-files.permissions-card.proof-images-hint": {
+    "defaultMessage": "Optional: upload supporting screenshots (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each)."
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "Proof images"
+  },
+  "external-files.permissions-card.proof-images-upload-prompt": {
+    "defaultMessage": "Drag and drop to upload or click to select an image"
   },
   "external-files.permissions-card.proof-label": {
     "defaultMessage": "Proof and explanation"
