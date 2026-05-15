@@ -495,19 +495,9 @@ const uploadProofImageMutation = useMutation({
 		if (!ext) {
 			throw new Error(formatMessage(messages.proofImageInvalidType))
 		}
-		const result = await client.request<Labrinth.Images.v3.UploadedImage>('/image', {
-			api: 'labrinth',
-			version: 3,
-			method: 'POST',
-			params: {
-				context: 'project',
-				project_id: props.projectId,
-				ext,
-			},
-			body: file,
-			headers: {
-				'Content-Type': '',
-			},
+		const result = await client.labrinth.images_v3.uploadImage(file, ext, {
+			context: 'project',
+			project_id: props.projectId,
 		})
 		return result.url
 	},
