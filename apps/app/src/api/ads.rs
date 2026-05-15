@@ -227,21 +227,28 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 malicious_origins: HashSet::new(),
             }));
 
-            // We refresh the ads window every 5 minutes to mitigate memory leak issues.
-            // While this loop doesn't include explicit checks to see if the window is still
-            // visible when we refresh, the Aditude wrapper will not make any ad requests
-            // unless Chromium reports the page as visible. The refresh does not reset the
-            // visibility state.
+            // We refresh the ads window periodically to mitigate memory leak issues.
+            // Skip refreshes when app state has hidden the ads WebView. The refresh does
+            // not reset the visibility state.
             let refresh_app = app.clone();
             tauri::async_runtime::spawn(async move {
                 loop {
-                    if let Some(webview) =
-                        refresh_app.webviews().get_mut("ads-window")
+                    let should_refresh = refresh_app
+                        .state::<RwLock<AdsState>>()
+                        .try_read()
+                        .map(|state| {
+                            state.shown && !state.modal_shown && !state.occluded
+                        })
+                        .unwrap_or(false);
+
+                    if should_refresh
+                        && let Some(webview) =
+                            refresh_app.webviews().get_mut("ads-window")
                     {
                         let _ = webview.navigate(AD_LINK.parse().unwrap());
                     }
 
-                    tokio::time::sleep(std::time::Duration::from_secs(60 * 5))
+                    tokio::time::sleep(std::time::Duration::from_secs(10))
                         .await;
                 }
             });

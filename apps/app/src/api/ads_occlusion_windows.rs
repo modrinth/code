@@ -8,6 +8,8 @@ use windows::Win32::UI::WindowsAndMessaging::{
     GetWindowThreadProcessId, IsIconic, IsWindowVisible,
 };
 
+const OCCLUDED_AREA_THRESHOLD: f64 = 1.0;
+
 pub fn is_ads_webview_occluded(
     main_hwnd: HWND,
     x: i32,
@@ -24,6 +26,12 @@ pub fn is_ads_webview_occluded(
         return false;
     }
 
+    let ad_area = rect_area(&ad_rect);
+    if ad_area == 0 {
+        return false;
+    }
+
+    let mut occluded_area = 0u64;
     let app_root = unsafe { GetAncestor(main_hwnd, GA_ROOT) };
     let app_process_id = std::process::id();
     let mut hwnd = match unsafe { GetTopWindow(None) } {
@@ -47,10 +55,18 @@ pub fn is_ads_webview_occluded(
         }
 
         if window_counts_as_occluder(hwnd)
-            && let Some(window_rect) = window_rect(hwnd)
-            && rects_intersect(&ad_rect, &window_rect)
+            && let Some(occluder_rect) = window_rect(hwnd)
+            && let Some(intersection) =
+                intersect_rects(&ad_rect, &occluder_rect)
         {
-            return true;
+            occluded_area =
+                occluded_area.saturating_add(rect_area(&intersection));
+
+            if (occluded_area as f64 / ad_area as f64)
+                >= OCCLUDED_AREA_THRESHOLD
+            {
+                return true;
+            }
         }
 
         hwnd = match unsafe { GetWindow(hwnd, GW_HWNDNEXT) } {
@@ -157,6 +173,21 @@ fn is_empty_rect(rect: &RECT) -> bool {
     rect.right <= rect.left || rect.bottom <= rect.top
 }
 
-fn rects_intersect(a: &RECT, b: &RECT) -> bool {
-    a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
+fn rect_area(rect: &RECT) -> u64 {
+    if is_empty_rect(rect) {
+        return 0;
+    }
+
+    (rect.right - rect.left) as u64 * (rect.bottom - rect.top) as u64
+}
+
+fn intersect_rects(a: &RECT, b: &RECT) -> Option<RECT> {
+    let rect = RECT {
+        left: a.left.max(b.left),
+        top: a.top.max(b.top),
+        right: a.right.min(b.right),
+        bottom: a.bottom.min(b.bottom),
+    };
+
+    (!is_empty_rect(&rect)).then_some(rect)
 }
