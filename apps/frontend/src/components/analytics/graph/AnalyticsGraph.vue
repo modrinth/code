@@ -189,6 +189,7 @@ import { Tabs, type TabsTab, Toggle, useFormatNumber } from '@modrinth/ui'
 
 import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type {
+	AnalyticsBreakdownPreset,
 	AnalyticsDashboardStat,
 	AnalyticsGraphViewMode,
 } from '~/providers/analytics/analytics'
@@ -462,6 +463,16 @@ const LEGEND_MAX_ITEMS = 8
 const LEGEND_EXPANDED_MAX_ITEMS = 24
 const OTHER_LEGEND_ENTRY_ID = '__analytics_other__'
 const OTHER_LEGEND_ENTRY_COLOR = 'hsl(218, 11%, 65%)'
+const BREAKDOWN_TOOLTIP_NOUNS: Record<AnalyticsBreakdownPreset, string> = {
+	none: 'items',
+	country: 'countries',
+	monetization: 'monetization values',
+	download_source: 'download sources',
+	download_reason: 'download types',
+	version_id: 'project versions',
+	loader: 'loaders',
+	game_version: 'game versions',
+}
 const expandedLegendMaxItems = computed(() =>
 	selectedBreakdown.value === 'none' ? Number.POSITIVE_INFINITY : LEGEND_EXPANDED_MAX_ITEMS,
 )
@@ -473,6 +484,7 @@ type LegendEntry = {
 	color: string
 	totalValue: number
 	hidden: boolean
+	bundledEntryCount?: number
 }
 
 function setHoverState(payload: HoverState) {
@@ -650,6 +662,7 @@ const otherLegendEntry = computed<LegendEntry | null>(() => {
 		color: OTHER_LEGEND_ENTRY_COLOR,
 		totalValue,
 		hidden: hiddenDatasetIds.value.has(OTHER_LEGEND_ENTRY_ID),
+		bundledEntryCount: bundledIds.length,
 	}
 })
 
@@ -768,6 +781,12 @@ function isLegendEntryToggleDisabled(legendEntry: LegendEntry) {
 }
 
 function getLegendEntryTooltip(legendEntry: LegendEntry) {
+	if (legendEntry.id === OTHER_LEGEND_ENTRY_ID) {
+		const bundledEntryCount = legendEntry.bundledEntryCount ?? 0
+		const breakdownNoun = BREAKDOWN_TOOLTIP_NOUNS[selectedBreakdown.value]
+		return `All ${bundledEntryCount} other ${breakdownNoun} are in the breakdown table`
+	}
+
 	return legendEntry.projectName ?? ''
 }
 
