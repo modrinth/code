@@ -87,6 +87,7 @@ import {
 	ReadyTransition,
 	useDebugLogger,
 	useVIntl,
+	versionChangesGameVersion,
 } from '@modrinth/ui'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -384,7 +385,40 @@ async function handleUpdate(id: string) {
 
 	await nextTick()
 
-	contentUpdaterModal.value?.show(item.update_version_id ?? undefined)
+	const initialVersionId = item.update_version_id ?? undefined
+	console.log('[Mods.vue] Update clicked: opening content updater modal', {
+		type: 'content',
+		initialVersionId,
+		item: {
+			id: item.id,
+			fileName: item.file_name,
+			projectType: item.project_type,
+			projectId: item.project.id,
+			projectTitle: item.project.title,
+			currentVersionId: item.version.id,
+			currentVersionNumber: item.version.version_number,
+			updateVersionId: item.update_version_id,
+		},
+		instance: {
+			path: props.instance.path,
+			name: props.instance.name,
+			gameVersion: props.instance.game_version,
+			loader: props.instance.loader,
+			linkedData: props.instance.linked_data,
+		},
+		modalStateBeforeFetch: {
+			updatingModpack: updatingModpack.value,
+			updatingProjectId: updatingProject.value?.id,
+			updatingProjectVersions: updatingProjectVersions.value.map((version) => ({
+				id: version.id,
+				versionNumber: version.version_number,
+				gameVersions: version.game_versions,
+				loaders: version.loaders,
+				datePublished: version.date_published,
+			})),
+		},
+	})
+	contentUpdaterModal.value?.show(initialVersionId)
 
 	const versions = (await get_project_versions(item.project.id).catch((e) => {
 		return handleError(e)
@@ -414,6 +448,25 @@ async function handleUpdate(id: string) {
 	versions.sort(
 		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
 	)
+	const preselectedVersion =
+		versions.find((version) => version.id === initialVersionId) ?? versions[0] ?? null
+	console.log('[Mods.vue] Update clicked: resolved content updater preselection', {
+		type: 'content',
+		initialVersionId,
+		foundInitialVersion: versions.some((version) => version.id === initialVersionId),
+		preselectedVersion: preselectedVersion
+			? {
+					id: preselectedVersion.id,
+					versionNumber: preselectedVersion.version_number,
+					gameVersions: preselectedVersion.game_versions,
+					loaders: preselectedVersion.loaders,
+					datePublished: preselectedVersion.date_published,
+				}
+			: null,
+		versionCount: versions.length,
+		currentVersionId: item.version.id,
+		updateVersionId: item.update_version_id,
+	})
 
 	updatingProjectVersions.value = versions
 }
@@ -479,9 +532,35 @@ async function handleModpackUpdate() {
 
 	await nextTick()
 
-	contentUpdaterModal.value?.show(
-		linkedModpackUpdateVersionId.value ?? props.instance?.linked_data?.version_id ?? undefined,
-	)
+	const initialVersionId =
+		linkedModpackUpdateVersionId.value ?? props.instance?.linked_data?.version_id ?? undefined
+	console.log('[Mods.vue] Update clicked: opening modpack updater modal', {
+		type: 'modpack',
+		initialVersionId,
+		linkedModpackUpdateVersionId: linkedModpackUpdateVersionId.value,
+		linkedModpackProject: linkedModpackProject.value,
+		linkedModpackVersion: linkedModpackVersion.value,
+		linkedModpackHasUpdate: linkedModpackHasUpdate.value,
+		instance: {
+			path: props.instance.path,
+			name: props.instance.name,
+			gameVersion: props.instance.game_version,
+			loader: props.instance.loader,
+			linkedData: props.instance.linked_data,
+		},
+		modalStateBeforeFetch: {
+			updatingModpack: updatingModpack.value,
+			updatingProjectId: updatingProject.value?.id,
+			updatingProjectVersions: updatingProjectVersions.value.map((version) => ({
+				id: version.id,
+				versionNumber: version.version_number,
+				gameVersions: version.game_versions,
+				loaders: version.loaders,
+				datePublished: version.date_published,
+			})),
+		},
+	})
+	contentUpdaterModal.value?.show(initialVersionId)
 
 	const versions = (await get_project_versions(props.instance.linked_data.project_id).catch(
 		handleError,
@@ -494,6 +573,25 @@ async function handleModpackUpdate() {
 	versions.sort(
 		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
 	)
+	const preselectedVersion =
+		versions.find((version) => version.id === initialVersionId) ?? versions[0] ?? null
+	console.log('[Mods.vue] Update clicked: resolved modpack updater preselection', {
+		type: 'modpack',
+		initialVersionId,
+		foundInitialVersion: versions.some((version) => version.id === initialVersionId),
+		preselectedVersion: preselectedVersion
+			? {
+					id: preselectedVersion.id,
+					versionNumber: preselectedVersion.version_number,
+					gameVersions: preselectedVersion.game_versions,
+					loaders: preselectedVersion.loaders,
+					datePublished: preselectedVersion.date_published,
+				}
+			: null,
+		versionCount: versions.length,
+		linkedModpackUpdateVersionId: linkedModpackUpdateVersionId.value,
+		currentLinkedVersionId: props.instance.linked_data.version_id,
+	})
 
 	updatingProjectVersions.value = versions
 }
@@ -535,13 +633,23 @@ function resetUpdateState() {
 	loadingChangelog.value = false
 }
 
-function handleModpackUpdateRequest(selectedVersion: Labrinth.Versions.v2.Version) {
+async function handleModpackUpdateRequest(selectedVersion: Labrinth.Versions.v2.Version) {
 	pendingModpackUpdateVersion.value = selectedVersion
+
 	const currentVersionId = props.instance?.linked_data?.version_id
 	const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
 	isModpackUpdateDowngrade.value = currentVersion
 		? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
 		: false
+	const shouldShowWarning =
+		isModpackUpdateDowngrade.value ||
+		versionChangesGameVersion(selectedVersion, props.instance.game_version)
+
+	if (!shouldShowWarning) {
+		await handleModpackUpdateConfirm()
+		return
+	}
+
 	modpackUpdateConfirmModal.value?.show()
 }
 
@@ -551,6 +659,7 @@ async function handleModpackUpdateConfirm() {
 	const version = pendingModpackUpdateVersion.value
 	pendingModpackUpdateVersion.value = null
 
+	contentUpdaterModal.value?.hide()
 	isModpackUpdating.value = true
 	try {
 		await update_managed_modrinth_version(props.instance.path, version.id)
@@ -574,7 +683,7 @@ async function handleModalUpdate(
 			pendingModpackUpdateVersion.value = selectedVersion
 			await handleModpackUpdateConfirm()
 		} else {
-			handleModpackUpdateRequest(selectedVersion)
+			await handleModpackUpdateRequest(selectedVersion)
 		}
 	} else if (updatingProject.value) {
 		const mod = updatingProject.value

@@ -226,12 +226,8 @@ pub async fn get_linked_modpack_info(
     };
 
     // Check for updates
-    let (has_update, update_version_id, update_version) = check_modpack_update(
-        profile,
-        &linked_data.version_id,
-        &version,
-        all_versions,
-    );
+    let (has_update, update_version_id, update_version) =
+        check_modpack_update(&linked_data.version_id, &version, all_versions);
 
     Ok(Some(LinkedModpackInfo {
         project,
@@ -243,10 +239,9 @@ pub async fn get_linked_modpack_info(
     }))
 }
 
-/// Check if a newer compatible version exists for the linked modpack.
+/// Check if a newer version exists for the linked modpack.
 /// Returns (has_update, update_version_id, update_version).
 fn check_modpack_update(
-    profile: &Profile,
     installed_version_id: &str,
     installed_version: &Version,
     all_versions: Option<Vec<Version>>,
@@ -255,44 +250,19 @@ fn check_modpack_update(
         return (false, None, None);
     };
 
-    // Get the loader as a string for comparison
-    let loader_str = profile.loader.as_str().to_lowercase();
-    let game_version = &profile.game_version;
-
-    // Filter to compatible versions
-    let mut compatible_versions: Vec<&Version> = versions
+    let mut newer_versions: Vec<&Version> = versions
         .iter()
         .filter(|v| {
-            // Must support the profile's game version
-            let supports_game = v.game_versions.contains(game_version);
-
-            // Must support the profile's loader
-            // The v2 API replaces "mrpack" with actual loaders from mrpack_loaders,
-            // but if mrpack_loaders is missing, loaders may be just ["mrpack"].
-            // In that case we can't filter by loader, so accept the version.
-            let real_loaders: Vec<_> = v
-                .loaders
-                .iter()
-                .filter(|l| l.to_lowercase() != "mrpack")
-                .collect();
-            let supports_loader = real_loaders.is_empty()
-                || real_loaders.iter().any(|l| l.to_lowercase() == loader_str);
-
-            supports_game && supports_loader
+            v.id != installed_version_id
+                && v.date_published > installed_version.date_published
         })
         .collect();
 
     // Sort by date_published descending (newest first)
-    compatible_versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
+    newer_versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
 
-    // Find the newest compatible version
-    if let Some(newest) = compatible_versions.first() {
-        // Check if the newest version is different and newer than installed
-        if newest.id != installed_version_id
-            && newest.date_published > installed_version.date_published
-        {
-            return (true, Some(newest.id.clone()), Some((*newest).clone()));
-        }
+    if let Some(newest) = newer_versions.first() {
+        return (true, Some(newest.id.clone()), Some((*newest).clone()));
     }
 
     (false, None, None)

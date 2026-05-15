@@ -21,6 +21,7 @@ import {
 	readPendingServerContentInstalls,
 	removePendingServerContentInstall,
 } from '#ui/utils/server-content-installing'
+import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
 import {
 	flushStoredServerAddonInstallQueue,
@@ -160,6 +161,44 @@ const projectQuery = useQuery({
 	enabled: computed(() => !!modpackProjectId.value),
 })
 
+function getVersionTime(version: Labrinth.Versions.v2.Version) {
+	return new Date(version.date_published).getTime()
+}
+
+function sortVersionsByPublishedDate(versions: Labrinth.Versions.v2.Version[]) {
+	return [...versions].sort((a, b) => getVersionTime(b) - getVersionTime(a))
+}
+
+const currentModpackVersionId = computed(() => {
+	const spec = contentQuery.data.value?.modpack?.spec
+	return spec?.platform === 'modrinth' ? spec.version_id : null
+})
+
+const newestModpackUpdateVersion = computed(() => {
+	const currentVersionId = currentModpackVersionId.value
+	if (!currentVersionId) return null
+
+	const versions = sortVersionsByPublishedDate(modpackVersionsQuery.data.value ?? [])
+	const currentVersion = versions.find((version) => version.id === currentVersionId)
+	const installedPublishedAt = contentQuery.data.value?.modpack?.date_published
+	const storedCurrentTime = installedPublishedAt
+		? new Date(installedPublishedAt).getTime()
+		: Number.NaN
+	const currentVersionTime = Number.isNaN(storedCurrentTime)
+		? currentVersion
+			? getVersionTime(currentVersion)
+			: Number.NaN
+		: storedCurrentTime
+
+	return (
+		versions.find((version) => {
+			if (version.id === currentVersionId) return false
+			if (Number.isNaN(currentVersionTime)) return true
+			return getVersionTime(version) > currentVersionTime
+		}) ?? null
+	)
+})
+
 const modpack = computed<ContentModpackData | null>(() => {
 	const mp = contentQuery.data.value?.modpack
 	if (!mp) return null
@@ -207,7 +246,7 @@ const modpack = computed<ContentModpackData | null>(() => {
 			project_type: 'modpack',
 			header: 'categories',
 		})) as ContentModpackCardCategory[],
-		hasUpdate: !!mp.has_update,
+		hasUpdate: !!mp.has_update || !!newestModpackUpdateVersion.value,
 	}
 })
 
@@ -659,9 +698,7 @@ const updatingProjectVersions = computed(() => {
 		? modpackVersionsQuery.data.value
 		: projectVersionsQuery.data.value
 	if (!source) return []
-	return [...source].sort(
-		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-	)
+	return sortVersionsByPublishedDate(source)
 })
 
 const loadingVersions = computed(() =>
@@ -674,8 +711,10 @@ const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
 const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const isModpackUpdateDowngrade = ref(false)
 
-const currentGameVersion = computed(() => contentQuery.data.value?.game_version ?? '')
-const currentLoader = computed(() => contentQuery.data.value?.modloader ?? '')
+const currentGameVersion = computed(
+	() => contentQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
+)
+const currentLoader = computed(() => contentQuery.data.value?.modloader ?? server.value?.loader ?? '')
 
 function handleBrowseContent() {
 	const contentType = type.value
@@ -929,7 +968,7 @@ async function handleModpackUpdate() {
 
 	await nextTick()
 
-	contentUpdaterModal.value?.show(mp.has_update ?? undefined)
+	contentUpdaterModal.value?.show(newestModpackUpdateVersion.value?.id ?? mp.has_update ?? undefined)
 }
 
 function spliceVersionInCache(fullVersion: Labrinth.Versions.v2.Version) {
@@ -973,17 +1012,21 @@ function resetUpdateState() {
 
 function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	if (updatingModpack.value) {
-		if (event?.shiftKey) {
-			pendingModpackUpdateVersion.value = selectedVersion
+		pendingModpackUpdateVersion.value = selectedVersion
+
+		const mpSpec = contentQuery.data.value?.modpack?.spec
+		const currentVersionId = mpSpec?.platform === 'modrinth' ? mpSpec.version_id : undefined
+		const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
+		isModpackUpdateDowngrade.value = currentVersion
+			? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
+			: false
+		const shouldShowWarning =
+			isModpackUpdateDowngrade.value ||
+			versionChangesGameVersion(selectedVersion, currentGameVersion.value)
+
+		if (event?.shiftKey || !shouldShowWarning) {
 			handleModpackUpdateConfirm()
 		} else {
-			const mpSpec = contentQuery.data.value?.modpack?.spec
-			const currentVersionId = mpSpec?.platform === 'modrinth' ? mpSpec.version_id : undefined
-			const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
-			isModpackUpdateDowngrade.value = currentVersion
-				? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
-				: false
-			pendingModpackUpdateVersion.value = selectedVersion
 			modpackUpdateModal.value?.show()
 		}
 		return
@@ -1048,6 +1091,7 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 
 function handleModpackUpdateConfirm() {
 	if (pendingModpackUpdateVersion.value) {
+		contentUpdaterModal.value?.hide()
 		performUpdate(pendingModpackUpdateVersion.value)
 		pendingModpackUpdateVersion.value = null
 	}
