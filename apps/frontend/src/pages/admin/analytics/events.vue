@@ -5,7 +5,7 @@
 		width="480px"
 		max-width="calc(100vw - 2rem)"
 		:on-hide="resetForm"
-		:closeOnClickOutside="false"
+		:close-on-click-outside="false"
 	>
 		<form class="flex flex-col gap-5" @submit.prevent="saveEvent">
 			<label for="analytics-event-title" class="flex flex-col gap-2">
@@ -63,7 +63,7 @@
 					placeholder="Select date range"
 					input-class="w-full"
 					wrapper-class="w-full"
-					viewDateAlignment="right"
+					view-date-alignment="right"
 				/>
 			</label>
 
@@ -198,11 +198,11 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	MultiSelect,
+	type MultiSelectOption,
 	NewModal,
+	type SortDirection,
 	StyledInput,
 	Table,
-	type MultiSelectOption,
-	type SortDirection,
 	type TableColumn,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'

@@ -42,8 +42,8 @@
 					class="inline-flex items-center"
 				>
 					<button
-						type="button"
 						v-tooltip="getLegendEntryTooltip(legendEntry)"
+						type="button"
 						class="inline-flex items-center gap-1.5 px-2 py-0.5 text-sm !outline-0 transition-all focus-within:!outline-0 focus:!outline-0 focus-visible:!outline-0"
 						:class="[
 							legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary',

@@ -131,7 +131,7 @@
 					/>
 				</div>
 			</div>
-			<ButtonStyled type="transparent" v-if="!isTimeframeAndGroupByDefault">
+			<ButtonStyled v-if="!isTimeframeAndGroupByDefault" type="transparent">
 				<button
 					type="button"
 					:disabled="isTimeframeAndGroupByDefault"
@@ -635,8 +635,7 @@ const groupByOptions = computed<ComboboxOption<AnalyticsGroupByPreset>[]>(() => 
 			value: option.value,
 			label: option.label,
 			disabled:
-				isRevenueHourlyGroupByOption ||
-				(!isRevenueDailyFallback && (isTooCoarse || isTooFine)),
+				isRevenueHourlyGroupByOption || (!isRevenueDailyFallback && (isTooCoarse || isTooFine)),
 		}
 	})
 

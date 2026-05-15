@@ -267,7 +267,9 @@ const projectVersionProjectMetadataByVersionId = computed(() => {
 
 	return metadata
 })
-const draftSelectedFilters = ref<AnalyticsSelectedFilters>(cloneSelectedFilters(selectedFilters.value))
+const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
+	cloneSelectedFilters(selectedFilters.value),
+)
 let selectedFiltersCommitRequestId = 0
 
 const selectedFilterValue = computed<Record<string, string[]>>({
