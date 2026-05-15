@@ -89,12 +89,9 @@ import {
 	LeftArrowIcon,
 	RightArrowIcon,
 	XIcon,
-} from '@modrinth/assets'
-import { ButtonStyled, Card, useFormatDateTime } from '@modrinth/ui'
+} from '@icarus/assets'
+import { ButtonStyled, Card, useFormatDateTime } from '@icarus/ui'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-
-import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
-import { trackEvent } from '@/helpers/analytics'
 
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 
@@ -121,7 +118,6 @@ const zoomedIn = ref(false)
 
 const hideImage = () => {
 	expandedGalleryItem.value = null
-	show_ads_window()
 }
 
 const nextImage = () => {
@@ -130,10 +126,7 @@ const nextImage = () => {
 		expandedGalleryIndex.value = 0
 	}
 	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value]
-	trackEvent('GalleryImageNext', {
-		project_id: props.project.id,
-		url: expandedGalleryItem.value.url,
-	})
+
 }
 
 const previousImage = () => {
@@ -142,22 +135,15 @@ const previousImage = () => {
 		expandedGalleryIndex.value = filteredGallery.value.length - 1
 	}
 	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value]
-	trackEvent('GalleryImagePrevious', {
-		project_id: props.project.id,
-		url: expandedGalleryItem.value,
-	})
+
 }
 
 const expandImage = (item, index) => {
-	hide_ads_window()
 	expandedGalleryItem.value = item
 	expandedGalleryIndex.value = index
 	zoomedIn.value = false
 
-	trackEvent('GalleryImageExpand', {
-		project_id: props.project.id,
-		url: item.url,
-	})
+
 }
 
 function keyListener(e) {
@@ -353,3 +339,4 @@ onUnmounted(() => {
 	gap: 0.5rem;
 }
 </style>
+

@@ -1,13 +1,13 @@
 /**
- * @deprecated Use `@modrinth/api-client` via `injectModrinthClient()` instead.
+ * @deprecated Use `@icarus/api-client` via `injectIcarusClient()` instead.
  * The api-client's archon modules (`client.archon.servers_v0`, etc.) handle auth,
  * retry, and circuit breaking automatically. This composable is kept for legacy
  * code that hasn't been migrated yet.
  */
 
-import { PANEL_VERSION } from '@modrinth/api-client'
-import type { V1ErrorInfo } from '@modrinth/utils'
-import { ModrinthServerError, ModrinthServersFetchError } from '@modrinth/utils'
+import { PANEL_VERSION } from '@icarus/api-client'
+import type { V1ErrorInfo } from '@icarus/utils'
+import { ModrinthServerError, ModrinthServersFetchError } from '@icarus/utils'
 import { $fetch, FetchError } from 'ofetch'
 
 export interface ServersFetchOptions {

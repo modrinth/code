@@ -1,17 +1,16 @@
 <script setup>
-import { CheckIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
+import { CheckIcon, PlusIcon, SearchIcon } from '@icarus/assets'
 import {
 	Admonition,
 	Avatar,
 	ButtonStyled,
 	injectNotificationManager,
 	StyledInput,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { list } from '@/helpers/profile'
 import { add_server_to_profile, get_profile_worlds } from '@/helpers/worlds.ts'
 
@@ -56,7 +55,7 @@ defineExpose({
 		profiles.value = profilesVal
 		modal.value.show()
 
-		trackEvent('AddServerToInstanceStart', { source: 'AddServerToInstanceModal' })
+		
 	},
 })
 
@@ -66,11 +65,7 @@ async function addServer(profile) {
 		await add_server_to_profile(profile.path, serverName.value, serverAddress.value, 'prompt')
 		profile.added = true
 
-		trackEvent('AddServerToInstance', {
-			server_name: serverName.value,
-			instance_name: profile.name,
-			source: 'AddServerToInstanceModal',
-		})
+		
 	} catch (err) {
 		handleError(err)
 	}

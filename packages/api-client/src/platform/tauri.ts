@@ -27,17 +27,18 @@ interface HttpError extends Error {
  * ```typescript
  * import { getVersion } from '@tauri-apps/api/app'
  *
- * const client = new TauriModrinthClient({
- *   userAgent: async () => `modrinth/theseus/${await getVersion()} (support@modrinth.com)`,
+ * const version = await getVersion()
+ * const client = new TauriIcarusClient({
+ *   userAgent: `modrinth/theseus/${version} (support@modrinth.com)`,
  *   features: [
- *     new AuthFeature({ token: async () => getOAuthToken() })
+ *     new AuthFeature({ token: 'mrp_...' })
  *   ]
  * })
  *
  * const project = await client.request('/project/sodium', { api: 'labrinth', version: 2 })
  * ```
  */
-export class TauriModrinthClient extends XHRUploadClient {
+export class TauriIcarusClient extends XHRUploadClient {
 	declare protected config: TauriClientConfig
 
 	constructor(config: TauriClientConfig) {

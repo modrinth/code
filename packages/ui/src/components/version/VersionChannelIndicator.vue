@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { VersionChannel } from '@modrinth/utils'
+import type { VersionChannel } from '@icarus/utils'
 import { computed } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'

@@ -1,39 +1,92 @@
-# ![Modrinth Monorepo Cover](/.github/assets/monorepo_cover.png)
+# 💜 **Icarus Launcher**
 
-![Issues](https://img.shields.io/github/issues-raw/Modrinth/code?color=c78aff&label=issues&style=for-the-badge)
-![Pull Requests](https://img.shields.io/github/issues-pr-raw/Modrinth/code?color=c78aff&label=PRs&style=for-the-badge)
-![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=c78aff&label=contributors&style=for-the-badge)
-![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/code/badge?style=flat&logoColor=white&color=c78aff&style=for-the-badge)
-![Commit Activity](https://img.shields.io/github/commit-activity/m/Modrinth/code?color=c78aff&label=commits&style=for-the-badge)
-![Last Commit](https://img.shields.io/github/last-commit/Modrinth/code?color=c78aff&label=last%20commit&style=for-the-badge)
+[![Latest Release](https://img.shields.io/github/v/release/fraa2a/Icarus-Launcher?color=ea76cb&label=Latest%20Release&style=for-the-badge)](https://github.com/fraa2a/Icarus-Launcher/releases)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/fraa2a/Icarus-Launcher?color=ea76cb&label=commits&style=for-the-badge)
+![Last Commit](https://img.shields.io/github/last-commit/fraa2a/Icarus-Launcher?color=ea76cb&label=last%20commit&style=for-the-badge)
 
-## Modrinth Monorepo
+> **Icarus Launcher** is a fork of the Modrinth App, offering a **privacy-focused experience** by removing telemetry and ads, providing **offline/ craked account support**, integration with the **[Taxphobia discord community](https://ds.taxphobia.top)**.
+> This project is **not affiliated** with or **endorsed by Modrinth**.
 
-Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth web interface and app. It contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=black&label=) contributors!
+---
 
-If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com) and download the latest release of the app [here](https://modrinth.com/app).
+## 📚 Table of Contents
 
-## Development
+- [💜 **Icarus Launcher**](#icarus-launcher)
+	- [🚀 **Why Choose Icarus Launcher?**](#why-choose-icarus-launcher)
+	- [📥 **Download & Installation**](#download--installation)
+		- [**Installation Instructions**](#installation-instructions)
+	- [🌟 **What Makes Icarus Different?**](#what-makes-icarus-different)
+	- [📄 **License**](#license)
+	- [⚠️ **Disclaimer**](#disclaimer)
+	- [📧 **Contact**](#contact)
 
-This repository contains two primary packages. For detailed development information, please refer to their respective guides:
+---
 
-- [Website frontend](https://docs.modrinth.com/contributing/knossos/)
-- [Desktop app](https://docs.modrinth.com/contributing/theseus/)
+## 🚀 **Why Choose Icarus Launcher?**
 
-## Contributing
+- **Ad-Free Experience**: We removed all the ads from the original Modrinth app.
+- **Offline/Cracked Support**: We support offline/cracked Minecraft accounts.
+- **No Telemetry**: We removed all data tracking or analytics.
 
-We welcome contributions! Before submitting any contributions, please read our [contributing guidelines](https://docs.modrinth.com/contributing/getting-started/).
+---
 
-If you plan to fork this repository for your own purposes, please review our [copying guidelines](COPYING.md).
 
-## Security
+## 📥 **Download & Installation**
 
-If you discover a security vulnerability within our codebase, please follow our [responsible disclosure guidelines](https://modrinth.com/legal/security).
+You can download the latest version of Icarus Launcher from the [**Releases**](https://github.com/fraa2a/Icarus-Launcher/releases) page.
 
-## Support
+### **Installation Instructions**
 
-If you need help with the Modrinth web interface or app, please visit our [support page](https://support.modrinth.com). For general inquiries, you can also join our [Discord server](https://discord.modrinth.com).
+1. **Windows:**
 
-## License
+   - Click "INSTALL WINDOWS"
+   - Run the installer and follow the prompts.
 
-All packages in this repository are licensed under their respective licenses. Refer to the LICENSE file in each package for more information.
+2. **macOS:**
+
+   - Click "INSTALL MACOS"
+   - Open the `.dmg` and drag Icarus into the **Applications** folder.
+
+3. **Linux:**
+
+   - Download the appropriate `.AppImage`, `.deb`, or `.rpm` package.
+   - Follow your distribution’s standard installation procedure.
+   - For AppImage, make it executable with:
+
+     ```bash
+     chmod +x Icarus-Launcher.AppImage
+     ./Icarus-Launcher.AppImage
+     ```
+
+---
+
+## 🌟 **What Makes Icarus Different?**
+
+| Feature            | Original Modrinth | **Icarus**                  | Other Forks         |
+| ------------------ | ----------------- | ------------------------------ | ------------------- |
+| Telemetry          | Enabled           | **Disabled**                   | Sometimes enabled   |
+| Ads                | Supported         | **No Ads**                     | Often present       |
+| Offline/Cracked    | Unsupported       | **Full Support**               | Rarely supported    |
+| Instance Sync      | Unsupported       | **Full Support**               | Rarely supported    |
+| User Experience    | Standard          | **Cleaner (No Ads/Telemetry)** | Sometimes intrusive |
+
+Icarus Launcher was created to provide a **clean, privacy-friendly experience** with **full offline/cracked account support** without sacrificing usability or performance.
+
+---
+
+## 📄 **License**
+
+Icarus Launcher is based on the original Modrinth App, which is licensed under the [AGPL-3.0 License](https://github.com/modrinth/code/blob/main/apps/app/LICENSE).
+This fork makes changes focused on removing telemetry and ads for a better user experience.
+
+---
+
+## ⚠️ **Disclaimer**
+
+Icarus Launcher is an **independent fork** and is **not affiliated** with or **endorsed by Modrinth**.
+
+---
+
+## 📧 **Contact**
+
+Have questions or feedback? Contact me on [Discord](https://ds.taxphobia.top).

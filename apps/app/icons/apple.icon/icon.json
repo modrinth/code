@@ -31,8 +31,8 @@
 						}
 					],
 					"glass": true,
-					"image-name": "Modrinth logo.svg",
-					"name": "Modrinth logo",
+					"image-name": "Icarus logo.svg",
+					"name": "Icarus logo",
 					"opacity-specializations": [
 						{
 							"appearance": "tinted",
@@ -71,3 +71,4 @@
 		"squares": "shared"
 	}
 }
+

@@ -1,11 +1,11 @@
 ---
-title: 'This week in Modrinth development: Filters and Fixes'
-summary: 'Continuing to improve the user interface after a great first week since Modrinth launched out of beta.'
+title: 'This week in Icarus development: Filters and Fixes'
+summary: 'Continuing to improve the user interface after a great first week since Icarus launched out of beta.'
 date: 2022-03-09
 authors: ['Dc7EYhxG']
 ---
 
-It's officially been a bit over a week since Modrinth launched out of beta. We have continued to make improvements to the user experience on [the website](https://modrinth.com).
+It's officially been a bit over a week since Icarus launched out of beta. We have continued to make improvements to the user experience on [the website](https://Icarus.com).
 
 ## New features
 
@@ -44,15 +44,15 @@ While new features are great, we've also been working on a bunch of bugfixes. Be
 - Changed the green syntax highlighting in code blocks to match the brand color
 - Fixed the styling on various buttons and links that were missing hover or active states
 - Fixed the inconsistent rounding of the information card on the home page
-- [[GH-370]](https://github.com/modrinth/knossos/issues/370) Fixed download buttons in the changelog page
-- [[GH-384]](https://github.com/modrinth/knossos/issues/384) Fixed selecting too many Minecraft versions in the search page covering the license dropdown
-- [[GH-390]](https://github.com/modrinth/knossos/issues/390) Fixed the hover state of checkboxes not updating when clicking on the label
-- [[GH-393]](https://github.com/modrinth/knossos/issues/393) Fixed the padding of the donation link area when creating or editing a project
-- [[GH-394]](https://github.com/modrinth/knossos/issues/394) Fixed the rounding radius of dropdowns when opening upwards
+- [[GH-370]](https://github.com/Icarus/knossos/issues/370) Fixed download buttons in the changelog page
+- [[GH-384]](https://github.com/Icarus/knossos/issues/384) Fixed selecting too many Minecraft versions in the search page covering the license dropdown
+- [[GH-390]](https://github.com/Icarus/knossos/issues/390) Fixed the hover state of checkboxes not updating when clicking on the label
+- [[GH-393]](https://github.com/Icarus/knossos/issues/393) Fixed the padding of the donation link area when creating or editing a project
+- [[GH-394]](https://github.com/Icarus/knossos/issues/394) Fixed the rounding radius of dropdowns when opening upwards
 
 ## Minotaur fixes
 
-[Minotaur](https://github.com/modrinth/minotaur), our Gradle plugin, has also received a few fixes. This isn't going to be relevant to most people, but is relevant to some developers using this tool to deploy their mods.
+[Minotaur](https://github.com/Icarus/minotaur), our Gradle plugin, has also received a few fixes. This isn't going to be relevant to most people, but is relevant to some developers using this tool to deploy their mods.
 
 - Debug mode (enabled through `debugMode = true`) allows previewing the data to be uploaded before uploading
 - Fix edge case with ForgeGradle due to broken publishing metadata
@@ -62,3 +62,4 @@ While new features are great, we've also been working on a bunch of bugfixes. Be
 These fixes should have been automatically pulled in, assuming you're using Minotaur `2.+`. If not, you should be upgrading to `2.0.2`.
 
 Need a guide to migrate from Minotaur v1 to v2? Check the migration guide on the [redesign post](../redesign/#minotaur).
+

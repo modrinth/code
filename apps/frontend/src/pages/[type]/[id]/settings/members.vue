@@ -556,7 +556,7 @@ import {
 	UserPlusIcon,
 	UsersIcon,
 	UserXIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	Badge,
@@ -565,18 +565,18 @@ import {
 	Checkbox,
 	Combobox,
 	ConfirmModal,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
 	Toggle,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import ConfirmTransferProjectModal from '~/components/ui/ConfirmTransferProjectModal.vue'
 import { removeSelfFromTeam } from '~/helpers/teams.js'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,

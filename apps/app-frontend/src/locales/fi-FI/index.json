@@ -5,6 +5,12 @@
   "app.auth-servers.unreachable.header": {
     "message": "Todennuspalvelimiin ei saada yhteyttä"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Lisää palvelin instanssiin"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Lisää palvelimia instanssiisi"
+  },
   "app.browse.add-to-instance": {
     "message": "Lisää instanssiin"
   },
@@ -23,6 +29,15 @@
   "app.browse.discover-servers": {
     "message": "Löydä palvelimia"
   },
+  "app.browse.hide-added-servers": {
+    "message": "Piilota lisätyt palvelimet"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Piilota asennettu sisältö"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Lataa sisältöä instanssiin"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Lisää modipaketin kuvaus..."
   },
@@ -37,6 +52,9 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modipaketin nimi"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Valitse tiedostot ja kansiot pakettiin"
   },
   "app.export-modal.version-number-label": {
     "message": "Versio numero"
@@ -144,7 +162,7 @@
     "message": "Vaadittu modipaketti"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Tämä palvelin vaatii modeja toimiakseen. Klikkaa Asenna ladataksesi vaaditut tiedostot Modrinthista, ja käynnistä peli suoraan palvelimelle."
+    "message": "Tämä palvelin vaatii modeja toimiakseen. Klikkaa Asenna ladataksesi vaaditut tiedostot Icarusista, ja käynnistä peli suoraan palvelimelle."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Jaettu instanssi"
@@ -189,16 +207,16 @@
     "message": "Resurssien hallinta"
   },
   "app.update-popup.body": {
-    "message": "Modrinth App versio {version} on valmis asennettavaksi. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Modrinth Appin."
+    "message": "Icarus Launcher versio {version} on valmis asennettavaksi. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Icarus Launcher."
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App versio {version} on ladattu. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Modrinth Appin."
+    "message": "Icarus Launcher versio {version} on ladattu. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Icarus Launcher."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App versio {version} on saatavilla. Käytä paketinhallintasi ja päivitä käyttääksesi uusimpia ominaisuuksia ja korjauksia!"
+    "message": "Icarus Launcher versio {version} on saatavilla. Käytä paketinhallintasi ja päivitä käyttääksesi uusimpia ominaisuuksia ja korjauksia!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App versio {version} on nyt saatavilla! Koska käytät käytön mukaan laskutettavaa verkkoa, emme ladannut sitä automaattisesti."
+    "message": "Icarus Launcher versio {version} on nyt saatavilla! Koska käytät käytön mukaan laskutettavaa verkkoa, emme ladannut sitä automaattisesti."
   },
   "app.update-popup.changelog": {
     "message": "Muutosloki"
@@ -231,7 +249,7 @@
     "message": "Lataa uudelleen asentaaksesi päivityksen"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "example.Icarus.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Valitse vaihtoehto"
@@ -264,10 +282,10 @@
     "message": "Se ei voi olla eri kuin heidän Minecraft-käyttäjänimi!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Syötä Modrinth-käyttäjätunnus..."
+    "message": "Syötä Icarus-käyttäjätunnus..."
   },
   "friends.add-friend.username.title": {
-    "message": "Mikä on ystäväsi Modrinth-käyttäjänimi?"
+    "message": "Mikä on ystäväsi Icarus-käyttäjänimi?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Lisää kavereita</link> nähdäksesi mitä he pelaavat!"
@@ -309,7 +327,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Kirjaudu Modrinth-tilille</link> lisätäksesi ystäviä ja nähdäksesi mitä he pelaavat!"
+    "message": "<link>Kirjaudu Icarus-tilille</link> lisätäksesi ystäviä ja nähdäksesi mitä he pelaavat!"
   },
   "instance.add-server.add-and-play": {
     "message": "Lisää ja pelaa"
@@ -579,3 +597,4 @@
     "message": "Modialusta on palvelimen tarjoama"
   }
 }
+

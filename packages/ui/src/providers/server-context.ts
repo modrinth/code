@@ -1,5 +1,5 @@
-import type { Archon, UploadState } from '@modrinth/api-client'
-import type { Stats } from '@modrinth/utils'
+import type { Archon, UploadState } from '@icarus/api-client'
+import type { Stats } from '@icarus/utils'
 import type { ComputedRef, Ref } from 'vue'
 
 import type { MessageDescriptor } from '#ui/composables/i18n'
@@ -51,5 +51,5 @@ export interface ModrinthServerContext {
 	dismissOperation: (opId: string, action: 'dismiss' | 'cancel') => Promise<void>
 }
 
-export const [injectModrinthServerContext, provideModrinthServerContext] =
-	createContext<ModrinthServerContext>('[id].vue', 'modrinthServerContext')
+export const [injectIcarusServerContext, provideIcarusServerContext] =
+	createContext<ModrinthServerContext>('[id].vue', 'IcarusServerContext')

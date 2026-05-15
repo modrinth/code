@@ -164,36 +164,6 @@
   "collections.label.private": {
     "defaultMessage": "Privat"
   },
-  "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "Er du sikker på du vil opdatere {count, plural, one {# projekt} other {# projekter}} til den nyeste understøttede version? Det anbefales at opdatere indholdet et ad gangen."
-  },
-  "content.confirm-bulk-update.admonition-header": {
-    "defaultMessage": "Opdaterings Advarsel"
-  },
-  "content.confirm-bulk-update.header": {
-    "defaultMessage": "Opdater projekter"
-  },
-  "content.confirm-bulk-update.shift-click-hint": {
-    "defaultMessage": "Hold Shift imens du klikker \"Opdater alle\" for at springe denne bekræftelse over fremover."
-  },
-  "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "Opdater {count, plural, one {# projekt} other {# projekter}}"
-  },
-  "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Ved at slette et mod kan det have permanente konsekvenser for din verden og vil muligvis være skyld i manglende indhold eller uforudsigelige problemer når det bliver læst igen."
-  },
-  "content.confirm-deletion.admonition-header": {
-    "defaultMessage": "Advarsel ved sletning"
-  },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Slet {count} {itemType}{count, plural, one {} other {er}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Slet {itemType}{count, plural, one {} other {er}}"
-  },
-  "content.page-layout.please-wait": {
-    "defaultMessage": "Vent venligst"
-  },
   "form.label.address-line": {
     "defaultMessage": "Adresse"
   },
@@ -560,11 +530,14 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Mislykkedes"
   },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listet"
+  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Modrinth Team"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "Icarus Team"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "Afventer"
@@ -592,6 +565,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Fejl"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Tilbageholdt"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopiér kode til udklipsholder"
@@ -918,7 +894,7 @@
     "defaultMessage": "Dit projekt har flere miløjer"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Vi har ændret miljø systemet på Modrinth og nye muligheder er nu tilgængelige. Venligst sikre den korrekte mulighed er valgt nedenunder og så klik \"Bekræft\" og så du færdig!"
+    "defaultMessage": "Vi har ændret miljø systemet på Icarus og nye muligheder er nu tilgængelige. Venligst sikre den korrekte mulighed er valgt nedenunder og så klik \"Bekræft\" og så du færdig!"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Venligst gennemse mulighederne nedenunder"
@@ -1109,6 +1085,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Sikkerhedskopiering plan"
   },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Fejlede sikkerhedskopiering"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Fejlede at genoprette sikkerhedskopi"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuel sikkerhedskopiering"
   },
@@ -1179,7 +1161,7 @@
     "defaultMessage": "Mørk"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Vælg dit foretrukne farvetema til Modrinth på denne enhed."
+    "defaultMessage": "Vælg dit foretrukne farvetema til Icarus på denne enhed."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Lys"
@@ -1323,4 +1305,5 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
+
 

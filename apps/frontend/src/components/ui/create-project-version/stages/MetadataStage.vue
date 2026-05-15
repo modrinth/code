@@ -1,10 +1,11 @@
 <template>
-	<Tabs
+	<NavTabs
 		v-if="editingVersion"
-		value="metadata"
-		:tabs="editTabs"
-		class="mb-3 border border-solid border-surface-5 !shadow-none !drop-shadow-none"
-		@change="setEditTab"
+		mode="local"
+		:links="editTabLinks"
+		:active-index="0"
+		class="mb-2 border border-solid border-surface-5 shadow-none drop-shadow-none"
+		@tab-click="setEditTab"
 	/>
 	<div class="flex flex-col gap-6">
 		<div v-if="!editingVersion" class="flex flex-col gap-1">
@@ -160,32 +161,40 @@
 		</template>
 
 		<template v-if="!noDependenciesProject">
-			<div class="flex flex-col gap-2.5">
-				<div class="flex flex-col gap-1">
-					<div class="flex items-center justify-between">
-						<span class="font-semibold text-contrast"> Dependencies </span>
+			<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-1">
+				<div class="flex items-center justify-between">
+					<span class="font-semibold text-contrast"> Suggested dependencies </span>
 
-						<ButtonStyled type="transparent" size="standard">
-							<button @click="addDependency">
-								<PlusIcon />
-								Add dependency
-							</button>
-						</ButtonStyled>
-					</div>
+					<ButtonStyled type="transparent" size="standard">
+						<button @click="editDependencies">
+							<EditIcon />
+							Edit
+						</button>
+					</ButtonStyled>
+				</div>
+				<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
+			</div>
 
-					<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
-						<DependenciesList />
-					</div>
-					<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
-						<span class="text-sm font-medium">No dependencies added.</span>
-					</div>
+			<div
+				v-if="!visibleSuggestedDependencies.length || draftVersion.dependencies?.length"
+				class="flex flex-col gap-1"
+			>
+				<div class="flex items-center justify-between">
+					<span class="font-semibold text-contrast"> Dependencies </span>
+
+					<ButtonStyled type="transparent" size="standard">
+						<button @click="editDependencies">
+							<EditIcon />
+							Edit
+						</button>
+					</ButtonStyled>
 				</div>
 
-				<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-2.5">
-					<div class="flex items-center justify-between">
-						<span class="font-medium"> Suggested </span>
-					</div>
-					<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
+				<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
+					<DependenciesList disable-remove />
+				</div>
+				<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
+					<span class="text-sm font-medium">No dependencies added.</span>
 				</div>
 			</div>
 		</template>
@@ -193,19 +202,18 @@
 </template>
 
 <script lang="ts" setup>
-import type { Labrinth } from '@modrinth/api-client'
-import { EditIcon, getLoaderIcon, PlusIcon, UnknownIcon } from '@modrinth/assets'
+import type { Labrinth } from '@icarus/api-client'
+import { EditIcon, getLoaderIcon, UnknownIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	defineMessages,
 	ENVIRONMENTS_COPY,
 	FormattedTag,
 	injectProjectPageContext,
-	Tabs,
-	type TabsTab,
+	NavTabs,
 	TagItem,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 import { useGeneratedState } from '~/composables/generated'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
@@ -231,14 +239,18 @@ const { projectV2 } = injectProjectPageContext()
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
 
-const editTabs: TabsTab[] = [
-	{ label: 'Metadata', value: 'metadata' },
-	{ label: 'Details', value: 'add-details' },
-	{ label: 'Files', value: 'add-files' },
-]
+const editTabs = [
+	{ label: 'Metadata', href: 'metadata', stage: 'metadata' },
+	{ label: 'Details', href: 'details', stage: 'add-details' },
+	{ label: 'Files', href: 'files', stage: 'add-files' },
+] as const
 
-function setEditTab(tab: TabsTab) {
-	modal.value?.setStage(tab.value)
+const editTabLinks = editTabs.map(({ label, href }) => ({ label, href }))
+
+function setEditTab(index: number) {
+	const tab = editTabs[index]
+	if (!tab) return
+	modal.value?.setStage(tab.stage)
 }
 
 const isModpack = computed(() => projectType.value === 'modpack')
@@ -267,7 +279,7 @@ const editEnvironment = () => {
 const editFiles = () => {
 	modal.value?.setStage('from-details-files')
 }
-const addDependency = () => {
+const editDependencies = () => {
 	modal.value?.setStage('from-details-dependencies')
 }
 

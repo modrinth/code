@@ -1,9 +1,9 @@
 {
-	"name": "@modrinth/tooling-config",
+	"name": "@icarus/tooling-config",
 	"version": "0.0.0",
 	"type": "module",
 	"private": true,
-	"description": "Unified tooling configuration for Modrinth monorepo",
+	"description": "Unified tooling configuration for Icarus monorepo",
 	"main": "./index.js",
 	"scripts": {
 		"lint": "prettier --check .",
@@ -52,3 +52,4 @@
 		"typescript-eslint": "^8.38.0"
 	}
 }
+

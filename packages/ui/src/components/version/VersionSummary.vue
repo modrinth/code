@@ -31,21 +31,19 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, ExternalIcon } from '@modrinth/assets'
-import type { Version, VersionFile } from '@modrinth/utils'
+import { DownloadIcon, ExternalIcon } from '@icarus/assets'
+import type { Version, VersionFile } from '@icarus/utils'
 import { computed } from 'vue'
 
 import { ButtonStyled, VersionChannelIndicator } from '../index'
 
 const props = defineProps<{
 	version: Version
-	decorateDownloadUrl?: (url: string) => string
 }>()
 
 const downloadUrl = computed(() => {
 	const primary: VersionFile = props.version.files.find((x) => x.primary) || props.version.files[0]
-	const raw = primary.url
-	return props.decorateDownloadUrl ? props.decorateDownloadUrl(raw) : raw
+	return primary.url
 })
 
 const emit = defineEmits<{

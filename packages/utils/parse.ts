@@ -49,26 +49,22 @@ export const configuredXss = new FilterXSS({
 				},
 			]
 
-			try {
-				const url = new URL(value)
+			const url = new URL(value)
 
-				for (const source of allowedSources) {
-					if (!source.url.test(url.href)) {
-						continue
-					}
-
-					const newSearchParams = new URLSearchParams(url.searchParams)
-					url.searchParams.forEach((value, key) => {
-						if (!source.allowedParameters.some((param) => param.test(`${key}=${value}`))) {
-							newSearchParams.delete(key)
-						}
-					})
-
-					url.search = newSearchParams.toString()
-					return `${name}="${escapeAttrValue(url.toString())}"`
+			for (const source of allowedSources) {
+				if (!source.url.test(url.href)) {
+					continue
 				}
-			} catch {
-				// ..
+
+				const newSearchParams = new URLSearchParams(url.searchParams)
+				url.searchParams.forEach((value, key) => {
+					if (!source.allowedParameters.some((param) => param.test(`${key}=${value}`))) {
+						newSearchParams.delete(key)
+					}
+				})
+
+				url.search = newSearchParams.toString()
+				return `${name}="${escapeAttrValue(url.toString())}"`
 			}
 		}
 

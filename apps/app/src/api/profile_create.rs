@@ -1,5 +1,5 @@
 use crate::api::Result;
-use theseus::prelude::*;
+use pteron::prelude::*;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile-create")
@@ -21,6 +21,8 @@ pub async fn profile_create(
     icon: Option<String>,           // the icon for the profile
     skip_install: Option<bool>,
     linked_data: Option<LinkedData>,
+    sync_enabled: Option<bool>,
+    sync_overrides: Option<InstanceSyncOverrides>,
 ) -> Result<String> {
     let res = profile::create::profile_create(
         name,
@@ -30,6 +32,8 @@ pub async fn profile_create(
         icon,
         linked_data,
         skip_install,
+        sync_enabled,
+        sync_overrides,
     )
     .await?;
     Ok(res)

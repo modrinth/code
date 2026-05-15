@@ -1,45 +1,15 @@
 {
-  "app.action-bar.downloading-java": {
-    "message": "A Java {version} letöltése"
-  },
-  "app.action-bar.downloads": {
-    "message": "Letöltések"
-  },
-  "app.action-bar.hide-more-running-instances": {
-    "message": "További futó profilok elrejtése"
-  },
-  "app.action-bar.make-primary-instance": {
-    "message": "Beállítás elsődleges profilként"
-  },
-  "app.action-bar.no-instances-running": {
-    "message": "Nincsenek futó profilok"
-  },
-  "app.action-bar.offline": {
-    "message": "Offline"
-  },
-  "app.action-bar.primary-instance": {
-    "message": "Elsődleges profil"
-  },
-  "app.action-bar.stop-instance": {
-    "message": "Profil megállítása"
-  },
-  "app.action-bar.view-logs": {
-    "message": "Naplók megtekintése"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Téma"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Ha olyan Modrinth Csomagfájlt (.mrpack) próbálsz telepíteni, amely nem a Modrinth szerverén található, a telepítés előtt gondoskodunk arról, hogy tisztában legyél a kockázatokkal."
-  },
-  "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Figyelmeztess, mielőtt ismeretlen modcsomagokat telepítenék"
-  },
   "app.auth-servers.unreachable.body": {
     "message": "A Minecraft hitelesítő szerverek lehet, hogy nem üzemelnek. Bizonyosodj meg róla, hogy van internetkapcsolatod és próbáld meg újra."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Nem lehet elérni a hitelesítési kiszolgálókat"
+  },
+  "app.browse.add-server-to-instance": {
+    "message": "Szerver hozzáadása a profilhoz"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Szerverek hozzáadása a profilodhoz"
   },
   "app.browse.add-to-instance": {
     "message": "Hozzáadás a profilhoz"
@@ -53,9 +23,6 @@
   "app.browse.already-added": {
     "message": "Már hozzá van adva"
   },
-  "app.browse.back-to-instance": {
-    "message": "Vissza a profilhoz"
-  },
   "app.browse.discover-content": {
     "message": "Tartalom böngészése"
   },
@@ -63,19 +30,13 @@
     "message": "Szerverek böngészése"
   },
   "app.browse.hide-added-servers": {
-    "message": "Már hozzáadott szerverek elrejtése"
+    "message": "Hozzáadott szerverek elrejtése"
   },
-  "app.browse.project-type.modpacks": {
-    "message": "Modcsomagok"
+  "app.browse.hide-installed-content": {
+    "message": "A telepített tartalmak elrejtése"
   },
-  "app.browse.server.installing": {
-    "message": "Letöltés..."
-  },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Modcsomag telepítése..."
+  "app.browse.install-content-to-instance": {
+    "message": "Tartalom letöltése a profilhoz"
   },
   "app.export-modal.description-placeholder": {
     "message": "Írd be a modcsomag leírását..."
@@ -91,6 +52,9 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "A modcsomag neve"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Válaszd ki a csomagba felveendő fájlokat és mappákat"
   },
   "app.export-modal.version-number-label": {
     "message": "Verziószám"
@@ -201,7 +165,7 @@
     "message": "Szükséges modcsomag"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ehhez a szerverhez modok szükségesek a játékhoz. Kattints a Telepítés gombra, hogy telepítsd a szükséges fájlokat a Modrinth-ról, majd indítsd el közvetlenül a szervert."
+    "message": "Ehhez a szerverhez modok szükségesek a játékhoz. Kattints a Telepítés gombra, hogy telepítsd a szükséges fájlokat a Icarus-ról, majd indítsd el közvetlenül a szervert."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Megosztott profil"
@@ -220,12 +184,6 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "\nFrissítés szükséges ehhez: {name}. Kérjük, frissíts a legújabb verzióra a játék elindításához"
-  },
-  "app.project.install-context.back-to-browse": {
-    "message": "Vissza a böngészéshez"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Tartalom telepítése a profilba"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Fejlesztői mód bekapcsolva."
@@ -252,16 +210,16 @@
     "message": "Erőforráskezelés"
   },
   "app.update-popup.body": {
-    "message": "A Modrinth App v{version} telepítésre kész! Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás a bezárásakor automatikusan frissül."
+    "message": "A Icarus Launcher v{version} telepítésre kész! Frissítéshez Töltsd újra az oldalt, vagy a Icarus Launcher bezárásakor automatikusan frissül."
   },
   "app.update-popup.body.download-complete": {
-    "message": "A Modrinth App v{version} letöltése befejeződött. Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás a bezárásakor automatikusan frissül."
+    "message": "A Icarus Launcher v{version} letöltése befejeződött. Frissítéshez Töltsd újra az oldalt, vagy a Icarus Launcher bezárásakor automatikusan frissül."
   },
   "app.update-popup.body.linux": {
-    "message": "A Modrinth App v{version} elérhető. Használd a csomagkezelőt a legújabb funkciók és javítások frissítéséhez!"
+    "message": "A Icarus Launcher v{version} elérhető. Használd a csomagkezelőt a legújabb funkciók és javítások frissítéséhez!"
   },
   "app.update-popup.body.metered": {
-    "message": "A Modrinth App v{version} már elérhető! Mivel mérhető hálózaton vagy, nem töltöttük le automatikusan."
+    "message": "A Icarus Launcher v{version} már elérhető! Mivel mérhető hálózaton vagy, nem töltöttük le automatikusan."
   },
   "app.update-popup.changelog": {
     "message": "Változásnapló"
@@ -273,7 +231,7 @@
     "message": "Sikeres letöltés"
   },
   "app.update-popup.reload": {
-    "message": "Frissítés"
+    "message": "Újratöltés"
   },
   "app.update-popup.title": {
     "message": "Frissítés elérhető"
@@ -294,7 +252,7 @@
     "message": "A telepítéshez újraindítás szükséges"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "pelda.modrinth.gg"
+    "message": "pelda.Icarus.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Válassz egy lehetőséget"
@@ -327,10 +285,10 @@
     "message": "Más is lehet, mint a Minecraft felhasználóneve!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Barát Modrinth felhasználóneve..."
+    "message": "Barát Icarus felhasználóneve..."
   },
   "friends.add-friend.username.title": {
-    "message": "Mi a barátod Modrinth felhasználóneve?"
+    "message": "Mi a barátod Icarus felhasználóneve?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Vegyél fel barátokat</link>, hogy lásd mivel játszanak!"
@@ -372,7 +330,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Lépj be Modrinth fiókodba</link>, hogy felvehess barátokat és lásd mivel játszanak!"
+    "message": "<link>Lépj be Icarus fiókodba</link>, hogy felvehess barátokat és lásd mivel játszanak!"
   },
   "instance.add-server.add-and-play": {
     "message": "Hozzáadás és csatlakozás"
@@ -597,7 +555,7 @@
     "message": "A szerver nem kompatibilis"
   },
   "instance.worlds.linked_server": {
-    "message": "A szerver projektje által kezelt"
+    "message": "Szerverprojekt által kezelt"
   },
   "instance.worlds.no_contact": {
     "message": "A szerverrel nem lehet kapcsolatot létesíteni"
@@ -640,14 +598,7 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "A betöltőt a szerver biztosítja"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Telepítés megerősítése"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Letöltés mindenképpen"
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Ezt a fájlt nem találtuk meg a Modrinthon. Határozottan javasoljuk, hogy kizárólag megbízható forrásokból származó fájlokat telepíts."
   }
 }
+
+

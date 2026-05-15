@@ -260,7 +260,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	Combobox,
@@ -276,9 +276,9 @@ import {
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
-} from '@modrinth/ui'
-import { NOTICE_LEVELS } from '@modrinth/ui/src/utils/notices.ts'
-import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
+} from '@icarus/ui'
+import { NOTICE_LEVELS } from '@icarus/ui/src/utils/notices.ts'
+import type { ServerNotice as ServerNoticeType } from '@icarus/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 

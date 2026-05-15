@@ -2,7 +2,7 @@ import {
 	type ActionState,
 	deserializeActionStates,
 	serializeActionStates,
-} from '@modrinth/moderation'
+} from '@icarus/moderation'
 
 interface PersistedChecklistValue<T> {
 	version: 1

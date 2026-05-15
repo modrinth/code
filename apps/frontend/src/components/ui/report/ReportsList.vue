@@ -24,7 +24,7 @@
 	<p v-if="filteredReports.length === 0">You don't have any active reports.</p>
 </template>
 <script setup>
-import { Chips, injectModrinthClient } from '@modrinth/ui'
+import { Chips, injectIcarusClient } from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -43,7 +43,7 @@ const props = defineProps({
 	},
 })
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const viewMode = ref('open')
 const reasonFilter = ref('All')
 
@@ -155,3 +155,4 @@ const filteredReports = computed(() =>
 	),
 )
 </script>
+

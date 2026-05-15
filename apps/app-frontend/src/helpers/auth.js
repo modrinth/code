@@ -1,5 +1,5 @@
 /**
- * All theseus API calls return serialized values (both return values and errors);
+ * All pteron API calls return serialized values (both return values and errors);
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
@@ -31,6 +31,14 @@ export async function check_reachable() {
  */
 export async function login() {
 	return await invoke('plugin:auth|login')
+}
+
+/**
+ * Create and select an offline Minecraft account
+ * @param {string} username
+ */
+export async function create_offline_user(username) {
+	return await invoke('plugin:auth|create_offline_user', { username })
 }
 
 /**

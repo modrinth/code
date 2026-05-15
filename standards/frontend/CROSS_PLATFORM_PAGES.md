@@ -1,6 +1,6 @@
 # Cross-Platform Pages
 
-Pages that need to exist in both the Modrinth Website (`apps/frontend`) and the Modrinth App (`apps/app-frontend`) live in `packages/ui/src/layouts/`. There are two categories based on whether the page logic differs between platforms.
+Pages that need to exist in both the Icarus Website (`apps/frontend`) and Icarus Launcher (`apps/app-frontend`) live in `packages/ui/src/layouts/`. There are two categories based on whether the page logic differs between platforms.
 
 ## Shared Layouts (`layouts/shared/`)
 
@@ -53,7 +53,7 @@ export const [injectContentManager, provideContentManager] =
 ```vue
 <!-- apps/frontend/src/pages/instance/content.vue -->
 <script setup lang="ts">
-import { provideContentManager, ContentPageLayout } from '@modrinth/ui'
+import { provideContentManager, ContentPageLayout } from '@icarus/ui'
 
 const { data: items } = useQuery({
 	queryKey: ['content', instanceId],
@@ -79,7 +79,7 @@ provideContentManager({
 ```vue
 <!-- apps/app-frontend/src/pages/instance/Mods.vue -->
 <script setup lang="ts">
-import { provideContentManager, ContentPageLayout } from '@modrinth/ui'
+import { provideContentManager, ContentPageLayout } from '@icarus/ui'
 import { invoke } from '@tauri-apps/api/core'
 
 const items = ref<ContentItem[]>([])
@@ -137,7 +137,7 @@ Wrapped pages handle their own data fetching (typically via TanStack Query and `
 ```vue
 <!-- apps/frontend/src/pages/hosting/manage/[id]/content.vue -->
 <script setup lang="ts">
-import { ServersManageContentPage } from '@modrinth/ui'
+import { ServersManageContentPage } from '@icarus/ui'
 </script>
 
 <template>
@@ -173,11 +173,11 @@ When a wrapped layout uses that pattern, the **thin platform page** that imports
 **Rule:** For each primary `useQuery` in the wrapped layout that gates first paint (and thus `useReadyState` / `ReadyTransition`), the website and app route shells must call `queryClient.ensureQueryData` with the **same** `queryKey`, `queryFn`, and `staleTime` as that query. Wrap the call in `try/catch` and swallow errors so navigation does not fail during setup; the mounted layout’s `useQuery` still runs and surfaces errors to the user.
 
 ```ts
-import { injectModrinthClient, injectModrinthServerContext, ServersManageFilesPage } from '@modrinth/ui'
+import { injectIcarusClient, injectIcarusServerContext, ServersManageFilesPage } from '@icarus/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
-const client = injectModrinthClient()
-const { serverId } = injectModrinthServerContext()
+const client = injectIcarusClient()
+const { serverId } = injectIcarusServerContext()
 const queryClient = useQueryClient()
 
 try {
@@ -205,3 +205,4 @@ Reusable stateful logic lives in `packages/ui/src/layouts/shared/*/composables/`
 - **Filtering** — Dynamic filter pills
 - **Selection** — Multi-select with bulk operation support
 - **Bulk operations** — Sequential execution with progress tracking
+

@@ -1,108 +1,15 @@
 {
-  "app.action-bar.downloading-java": {
-    "message": "Завантаження Java {version}"
-  },
-  "app.action-bar.downloads": {
-    "message": "Завантаження"
-  },
-  "app.action-bar.hide-more-running-instances": {
-    "message": "Приховати більше запущених екземплярів"
-  },
-  "app.action-bar.make-primary-instance": {
-    "message": "Зробити основним екземпляром"
-  },
-  "app.action-bar.no-instances-running": {
-    "message": "Немає запущених екземплярів"
-  },
-  "app.action-bar.offline": {
-    "message": "Офлайн"
-  },
-  "app.action-bar.primary-instance": {
-    "message": "Основний екземпляр"
-  },
-  "app.action-bar.show-more-running-instances": {
-    "message": "Показати більше запущених екземплярів"
-  },
-  "app.action-bar.stop-instance": {
-    "message": "Зупинити екземпляр"
-  },
-  "app.action-bar.view-active-downloads": {
-    "message": "Переглянути активні завантаження"
-  },
-  "app.action-bar.view-instance": {
-    "message": "Переглянути екземпляр"
-  },
-  "app.action-bar.view-logs": {
-    "message": "Переглянути журнали"
-  },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Дозволяє розширений рендеринг, такий як ефекти розмиття, які можуть спричиняти проблеми з продуктивністю без апаратно-прискореного рендерингу."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Розширений рендеринг"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Виберіть бажану колірну тему для програми Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Колірна тема"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Змініть сторінку, на якій відкривається панель запуску."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Головна"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Бібліотека"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Цільова сторінка за замовчуванням"
-  },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Вимикає іменний бейдж над вашим гравцем на сторінці скінів."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Приховати бейдж з іменем"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Включає нещодавні світи в розділі «Повернення» на головній сторінці."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Стрибни назад у світи"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Згорнути лаунчер під час запуску процесу Minecraft."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Згорнути панель запуску"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Використовувати рамку системного вікна (потрібно перезапустити програму)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Рідні прикраси"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Виберіть опцію"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Вмикає можливість перемикання бічної панелі."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Перемикання бічної панелі"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Якщо ви спробуєте встановити файл пакета Modrinth (.mrpack), який не розміщено на Modrinth, ми переконаємося, що ви розумієте ризики, перш ніж встановлювати його."
-  },
-  "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Попереджати мене перед встановленням невідомих модпаків"
-  },
   "app.auth-servers.unreachable.body": {
     "message": "Сервери автентифікації Minecraft можуть зараз не працювати. Перевірте з’єднання з інтернетом та спробуйте пізніше."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Не вдається зв’язатися зі серверами автентифікації"
+  },
+  "app.browse.add-server-to-instance": {
+    "message": "Додати сервер до профілю"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Додати сервера до вашого профілю"
   },
   "app.browse.add-to-instance": {
     "message": "Додати до профілю"
@@ -123,22 +30,16 @@
     "message": "Дослідити сервера"
   },
   "app.browse.hide-added-servers": {
-    "message": "Скрити наявні сервери"
+    "message": "Сховати додані сервери"
   },
-  "app.browse.project-type.modpacks": {
-    "message": "Модпаки"
+  "app.browse.hide-installed-content": {
+    "message": "Сховати встановлений уміст"
   },
-  "app.browse.server.installing": {
-    "message": "Встановлення"
-  },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Встановлення модпаку..."
+  "app.browse.install-content-to-instance": {
+    "message": "Установити вміст в профіль"
   },
   "app.export-modal.description-placeholder": {
-    "message": "Уведіть опис збірки..."
+    "message": "Уведіть опис збірки…"
   },
   "app.export-modal.export-button": {
     "message": "Експортувати"
@@ -151,6 +52,9 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Назва збірки"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Виберіть файли й теки, щоб додати їх до збірки"
   },
   "app.export-modal.version-number-label": {
     "message": "Номер версії"
@@ -240,7 +144,7 @@
     "message": "Ви впевнені, що хочете видалити «{name}»?"
   },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Пошук {count} світів..."
+    "message": "Пошук {count} світів…"
   },
   "app.instance.worlds.this-server": {
     "message": "цей сервер"
@@ -261,7 +165,7 @@
     "message": "Потрібна збірка"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Для гри на цьому сервері потрібні моди. Натисніть «Установити», щоб налаштувати необхідні файли з Modrinth, а потім запустіть безпосередньо на сервері."
+    "message": "Для гри на цьому сервері потрібні моди. Натисніть «Установити», щоб налаштувати необхідні файли з Icarus, а потім запустіть безпосередньо на сервері."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Профіль"
@@ -306,16 +210,16 @@
     "message": "Керування ресурсами"
   },
   "app.update-popup.body": {
-    "message": "Modrinth App v{version} готовий до встановлення! Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте застосунок Modrinth."
+    "message": "Icarus Launcher v{version} готовий до встановлення! Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте застосунок Icarus."
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} завантажено. Перезапустіть зараз, щоб оновити його, або це відбудеться автоматично після закриття Modrinth App."
+    "message": "Icarus Launcher v{version} завантажено. Перезапустіть зараз, щоб оновити його, або це відбудеться автоматично після закриття Icarus Launcher."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} вже доступно. Скористайтеся вашим менеджером пакетів, щоб отримати найновіші функції та виправлення!"
+    "message": "Icarus Launcher v{version} вже доступно. Скористайтеся вашим менеджером пакетів, щоб отримати найновіші функції та виправлення!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} доступний для завантаження! Оскільки ви на лімітному з’єднанні, ми не завантажили його автоматично."
+    "message": "Icarus Launcher v{version} доступний для завантаження! Оскільки ви на лімітному з’єднанні, ми не завантажили його автоматично."
   },
   "app.update-popup.changelog": {
     "message": "Журнал змін"
@@ -348,7 +252,7 @@
     "message": "Перезавантажте, щоб установити оновлення"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "example.Icarus.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Виберіть опцію"
@@ -384,7 +288,7 @@
     "message": "Уведіть ім’я користувача…"
   },
   "friends.add-friend.username.title": {
-    "message": "Яке ім’я користувача Modrinth у вашого друга?"
+    "message": "Яке ім’я користувача Icarus у вашого друга?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Додайте друзів</link>, щоб бачити, у що вони грають!"
@@ -420,13 +324,13 @@
     "message": "Немає друзів, які збігаються з «{query}»"
   },
   "friends.search-friends-placeholder": {
-    "message": "Пошук друзів..."
+    "message": "Пошук друзів…"
   },
   "friends.section.heading": {
     "message": "{title} — {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Увійдіть в обліковий запис Modrinth</link>, щоб додати друзів і бачити, у що вони грають!"
+    "message": "<link>Увійдіть в обліковий запис Icarus</link>, щоб додати друзів і бачити, у що вони грають!"
   },
   "instance.add-server.add-and-play": {
     "message": "Додати та грати"
@@ -468,7 +372,7 @@
     "message": "Додавання файлів ({completed}/{total})"
   },
   "instance.files.save-as": {
-    "message": "Зберегти як..."
+    "message": "Зберегти як…"
   },
   "instance.server-modal.address": {
     "message": "Адреса"
@@ -671,15 +575,6 @@
   "instance.worlds.world_in_use": {
     "message": "Світ наразі використовується"
   },
-  "minecraft-account.add-account": {
-    "message": "Додати обліковий запис"
-  },
-  "minecraft-account.remove-account": {
-    "message": "Видалити обліковий запис"
-  },
-  "minecraft-account.select-account": {
-    "message": "Обрати обліковий запис"
-  },
   "search.filter.locked.instance": {
     "message": "Надано профілем"
   },
@@ -703,26 +598,7 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Завантажувач наданий сервером"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Файл перевірятиметься лише, якщо його завантажено на Modrinth, незалежно від його формату (включно з .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Не показувати більше це попередження"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Підтвердити інсталяцію"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Усе одно інсталювати"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Шкідливе програмне забезпечення часто поширюють через файли модпаків, які публікуються на таких платформах, як Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Ми не змогли знайти цей файл на Modrinth. Ми рекомендуємо встановлювати файли лише з тих джерел яким ви довіряєте."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Попередження про невідомий файл"
   }
 }
+
+

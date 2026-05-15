@@ -4,7 +4,7 @@
 
 		<!-- User roles -->
 		<template v-else-if="type === 'admin'">
-			<ModrinthIcon aria-hidden="true" /> {{ formatMessage(messages.modrinthTeamLabel) }}
+			<IcarusIcon aria-hidden="true" /> {{ formatMessage(messages.IcarusTeamLabel) }}
 		</template>
 		<template v-else-if="type === 'moderator'">
 			<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.moderatorLabel) }}
@@ -15,16 +15,16 @@
 
 		<!-- Project statuses -->
 		<template v-else-if="type === 'approved'">
-			<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.listedLabel) }}
+			<ListIcon aria-hidden="true" /> {{ formatMessage(messages.listedLabel) }}
 		</template>
 		<template v-else-if="type === 'approved-general'">
 			<CheckIcon aria-hidden="true" /> {{ formatMessage(messages.approvedLabel) }}
 		</template>
 		<template v-else-if="type === 'unlisted'">
-			<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.unlistedLabel) }}
+			<EyeOffIcon aria-hidden="true" /> {{ formatMessage(messages.unlistedLabel) }}
 		</template>
 		<template v-else-if="type === 'withheld'">
-			<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.withheldLabel) }}
+			<EyeOffIcon aria-hidden="true" /> {{ formatMessage(messages.withheldLabel) }}
 		</template>
 		<template v-else-if="type === 'private'">
 			<LockIcon aria-hidden="true" /> {{ formatMessage(messages.privateLabel) }}
@@ -89,17 +89,17 @@ import {
 	BugIcon,
 	CalendarIcon,
 	CheckIcon,
+	EyeOffIcon,
 	FileTextIcon,
-	GlobeIcon,
-	LinkIcon,
+	ListIcon,
 	LockIcon,
-	ModrinthIcon,
+	IcarusIcon,
 	ScaleIcon,
 	ShieldCheckIcon,
 	UpdatedIcon,
 	XIcon,
-} from '@modrinth/assets'
-import { capitalizeString } from '@modrinth/utils'
+} from '@icarus/assets'
+import { capitalizeString } from '@icarus/utils'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 
@@ -134,15 +134,15 @@ const messages = defineMessages({
 	},
 	listedLabel: {
 		id: 'omorphia.component.badge.label.listed',
-		defaultMessage: 'Public',
+		defaultMessage: 'Listed',
 	},
 	moderatorLabel: {
 		id: 'omorphia.component.badge.label.moderator',
 		defaultMessage: 'Moderator',
 	},
-	modrinthTeamLabel: {
-		id: 'omorphia.component.badge.label.modrinth-team',
-		defaultMessage: 'Modrinth Team',
+	IcarusTeamLabel: {
+		id: 'omorphia.component.badge.label.Icarus-team',
+		defaultMessage: 'Icarus Team',
 	},
 	pendingLabel: {
 		id: 'omorphia.component.badge.label.pending',
@@ -186,7 +186,7 @@ const messages = defineMessages({
 	},
 	withheldLabel: {
 		id: 'omorphia.component.badge.label.withheld',
-		defaultMessage: 'Unlisted by staff',
+		defaultMessage: 'Withheld',
 	},
 })
 const { formatMessage } = useVIntl()
@@ -266,3 +266,4 @@ defineProps<{
 	}
 }
 </style>
+

@@ -8,7 +8,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { getTagIcon } from '@modrinth/assets'
+import { getTagIcon } from '@icarus/assets'
 
 import { useVIntl } from '../../composables'
 import { formatTag } from '../../utils/tag-messages.ts'

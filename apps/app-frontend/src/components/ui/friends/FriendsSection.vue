@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MoreVerticalIcon, TrashIcon, UserIcon, XIcon } from '@modrinth/assets'
+import { MoreVerticalIcon, TrashIcon, UserIcon, XIcon } from '@icarus/assets'
 import {
 	Accordion,
 	Avatar,
@@ -7,7 +7,7 @@ import {
 	defineMessages,
 	OverflowMenu,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useTemplateRef } from 'vue'
 
@@ -189,3 +189,4 @@ const messages = defineMessages({
 		</template>
 	</Accordion>
 </template>
+

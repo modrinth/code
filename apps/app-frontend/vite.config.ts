@@ -67,7 +67,7 @@ export default defineConfig({
 	// tauri expects a fixed port, fail if that port is not available
 	server: {
 		port: 1420,
-		strictPort: true,
+		strictPort: false,
 		headers: {
 			'content-security-policy': Object.entries(tauriConf.app.security.csp)
 				.map(([directive, sources]) => {

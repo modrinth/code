@@ -1,4 +1,4 @@
-import { defineMessage } from '@modrinth/ui'
+import { defineMessage } from '@icarus/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
 

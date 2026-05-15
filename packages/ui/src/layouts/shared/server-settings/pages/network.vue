@@ -203,21 +203,21 @@ import {
 	SaveIcon,
 	TrashIcon,
 	UploadIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
 import { ButtonStyled, ConfirmModal, NewModal, StyledInput, Table, TagItem } from '#ui/components'
 import type { TableColumn } from '#ui/components/base'
 import {
-	injectModrinthClient,
-	injectModrinthServerContext,
+	injectIcarusClient,
+	injectIcarusServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
 
 const { addNotification } = injectNotificationManager()
-const { server, serverId } = injectModrinthServerContext()
-const client = injectModrinthClient()
+const { server, serverId } = injectIcarusServerContext()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
 
 const data = server
@@ -409,3 +409,4 @@ const copyText = (text: string) => {
 	})
 }
 </script>
+

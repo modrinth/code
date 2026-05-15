@@ -46,11 +46,10 @@
 </template>
 
 <script setup lang="ts">
-import { FolderUpIcon } from '@modrinth/assets'
-import { fileIsValid } from '@modrinth/utils'
+import { FolderUpIcon } from '@icarus/assets'
+import { fileIsValid } from '@icarus/utils'
 import { ref } from 'vue'
 
-import { useFormatBytes } from '../../composables'
 import { injectNotificationManager } from '../../providers'
 
 const { addNotification } = injectNotificationManager()
@@ -78,8 +77,6 @@ const props = withDefaults(
 		size: 'large',
 	},
 )
-
-const formatBytes = useFormatBytes()
 
 const files = ref<File[]>([])
 
@@ -132,7 +129,7 @@ function addFiles(incoming: FileList, shouldNotReset = false) {
 		alertOnInvalid: true,
 	}
 
-	files.value = files.value.filter((file) => fileIsValid(file, validationOptions, formatBytes))
+	files.value = files.value.filter((file) => fileIsValid(file, validationOptions))
 
 	if (files.value.length > 0) {
 		emit('change', files.value)

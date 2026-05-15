@@ -1,4 +1,4 @@
-import { CopyrightIcon } from '@modrinth/assets'
+import { CopyrightIcon } from '@icarus/assets'
 
 import type { ButtonAction, ToggleAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'

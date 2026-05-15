@@ -18,13 +18,13 @@
     "defaultMessage": "أضف عنوان جافا"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "أضف أي روابط ذات صلة خارج Modrinth، مثل موقع إلكتروني، متجر، أو دعوة Discord."
+    "defaultMessage": "أضف أي روابط ذات صلة خارج Icarus، مثل موقع إلكتروني، متجر، أو دعوة Discord."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "إضافة روابط خارجية"
   },
   "nags.add-links.description": {
-    "defaultMessage": "أضف أي روابط ذات صلة تستهدف خارج Modrinth، مثل كود المصدر، أو متعقب المشكلات، أو دعوة Discord."
+    "defaultMessage": "أضف أي روابط ذات صلة تستهدف خارج Icarus، مثل كود المصدر، أو متعقب المشكلات، أو دعوة Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "إضافة روابط خارجية"
@@ -249,4 +249,5 @@
     "defaultMessage": "زيارة إعدادات الروابط"
   }
 }
+
 

@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Modrinth App'in Linux sürümleri bazı sistemlerde <issues-link>sorunlu olabilir</issues-link>. Modrinth App sisteminizde stabil değilse, <prism-link>Prism Launcher</prism-link> gibi başka uygulamalarla Modrinth içeriklerini indirmenizi tavsiye ediyoruz."
+    "message": "Icarus Launcher'in Linux sürümleri bazı sistemlerde <issues-link>sorunlu olabilir</issues-link>. Icarus Launcher sisteminizde stabil değilse, <prism-link>Prism Launcher</prism-link> gibi başka uygulamalarla Icarus içeriklerini indirmenizi tavsiye ediyoruz."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -39,10 +39,10 @@
     "message": "İndirme seçenekleri"
   },
   "app-marketing.download.terms": {
-    "message": "Modrinth Uygulamasını indirerek <terms-link>Kullanım Şartları</terms-link> ve <privacy-link>Gizlilik Politikamızı</privacy-link> kabul etmiş olursunuz"
+    "message": "Icarus Uygulamasını indirerek <terms-link>Kullanım Şartları</terms-link> ve <privacy-link>Gizlilik Politikamızı</privacy-link> kabul etmiş olursunuz"
   },
   "app-marketing.download.title": {
-    "message": "Modrinth App'i İndir (Beta)"
+    "message": "Icarus Launcher'i İndir (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "Proje takibi"
   },
   "app-marketing.features.importing.description": {
-    "message": "Sevdiğin profilleri önceden kullandığın başlatıcıdan buraya aktar, saniyeler içinde Modrinth App'i kullanmaya başla!"
+    "message": "Sevdiğin profilleri önceden kullandığın başlatıcıdan buraya aktar, saniyeler içinde Icarus Launcher'i kullanmaya başla!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "{author} tarafından"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth tüm modlarınızı bir yerde toplayıp yönetmenizi kolaylaştırır. Tek tuşla mod kurabilir, silebilir ve güncelleyebilirsiniz."
+    "message": "Icarus tüm modlarınızı bir yerde toplayıp yönetmenizi kolaylaştırır. Tek tuşla mod kurabilir, silebilir ve güncelleyebilirsiniz."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Yüklü modlar"
@@ -96,7 +96,7 @@
     "message": "Çevrim dışı mod"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth'in başlatıcısı tamamen açık kaynak kodludur. <github-link>GitHub</github-link> sayfamızda kaynak kodunu inceleyebilirsin!"
+    "message": "Icarus'in başlatıcısı tamamen açık kaynak kodludur. <github-link>GitHub</github-link> sayfamızda kaynak kodunu inceleyebilirsin!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Açık kaynak"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth Uygulaması, yalnızca 150 MB RAM kullanarak birçok önde gelen mod yöneticisinden daha iyi performans gösterir!"
+    "message": "Icarus Uygulaması, yalnızca 150 MB RAM kullanarak birçok önde gelen mod yöneticisinden daha iyi performans gösterir!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -128,8 +128,8 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
-  "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth App"
+  "app-marketing.features.performance.Icarus-app": {
+    "message": "Icarus Launcher"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "% 1 milyar"
@@ -147,13 +147,13 @@
     "message": "Verimli"
   },
   "app-marketing.features.play.description": {
-    "message": "Modrinth App ile favori mod ve mod paketlerinizi indirin ve oynayın."
+    "message": "Icarus Launcher ile favori mod ve mod paketlerinizi indirin ve oynayın."
   },
   "app-marketing.features.play.title": {
     "message": "Favori modlarınız ile oynayın"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Modrinth'teki herhangi binlerce mod ile mod paketi oluşturun, paylaşın ve oynayın."
+    "message": "Icarus'teki herhangi binlerce mod ile mod paketi oluşturun, paylaşın ve oynayın."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Mod Paketi"
@@ -168,7 +168,7 @@
     "message": "Daha önce kullandığınız"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App, web sitesi ile tamamem bağlantılı, yani uygulamadan favori projelerinizin tamamına erişebilirsiniz!"
+    "message": "Icarus Launcher, web sitesi ile tamamem bağlantılı, yani uygulamadan favori projelerinizin tamamına erişebilirsiniz!"
   },
   "app-marketing.features.website.title": {
     "message": "Website entegrasyonu"
@@ -177,19 +177,19 @@
     "message": "hiç bir başlatıcıya benzemez"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Cobblemon kurulumunun ‘İçerik’ sayfasında olduğu Modrinth App ekran görüntüsü."
+    "message": "Cobblemon kurulumunun ‘İçerik’ sayfasında olduğu Icarus Launcher ekran görüntüsü."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App, favori modlarınızı güncel şekilde oynayabileceğiniz özgün ve açık kaynaklı bir başlatıcıdır."
+    "message": "Icarus Launcher, favori modlarınızı güncel şekilde oynayabileceğiniz özgün ve açık kaynaklı bir başlatıcıdır."
   },
   "app-marketing.hero.download-button": {
-    "message": "Modrinth App İndir"
+    "message": "Icarus Launcher İndir"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "Modrinth App İndir"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "Icarus Launcher İndir"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "{os} için Modrinth App İndir"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "{os} için Icarus Launcher İndir"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Cobblemon kurulumunun ana menü ekranının ekran görüntüsü."
@@ -282,7 +282,7 @@
     "message": "Hesap oluştur"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Bir hesap oluşturarak, Modrinth'in <terms-link>Kurallar</terms-link> ve <privacy-policy-link>Gizlilik İlkeleri </privacy-policy-link>'ni kabul etmiş bulunursunuz."
+    "message": "Bir hesap oluşturarak, Icarus'in <terms-link>Kurallar</terms-link> ve <privacy-policy-link>Gizlilik İlkeleri </privacy-policy-link>'ni kabul etmiş bulunursunuz."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Parolalar uyuşmuyor!"
@@ -291,7 +291,7 @@
     "message": "Zaten bir hesabınız var mı?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Modrinth hakkında güncellemelere abone ol"
+    "message": "Icarus hakkında güncellemelere abone ol"
   },
   "auth.sign-up.title": {
     "message": "Kaydol"
@@ -333,16 +333,16 @@
     "message": "E-postayı Doğrula"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Modrinth'le ilgili güncellemelere abone ol"
+    "message": "Icarus'le ilgili güncellemelere abone ol"
   },
   "auth.welcome.description": {
     "message": "Artık inanılmaz modlar yapan, indiren ve geride kalmayan yaratıcıların ve kaşiflerin havalı topluluğunun bir parçasısın."
   },
   "auth.welcome.label.tos": {
-    "message": "Bir hesap oluşturarak, Modrinth'in <terms-link>Şartlar</terms-link>'ını ve <privacy-policy-link>Gizlilik İlkeleri</privacy-policy-link>'ni kabul etmiş sayılırsınız."
+    "message": "Bir hesap oluşturarak, Icarus'in <terms-link>Şartlar</terms-link>'ını ve <privacy-policy-link>Gizlilik İlkeleri</privacy-policy-link>'ni kabul etmiş sayılırsınız."
   },
   "auth.welcome.long-title": {
-    "message": "Modrinth'e hoş geldiniz!"
+    "message": "Icarus'e hoş geldiniz!"
   },
   "auth.welcome.title": {
     "message": "Hoş geldiniz"
@@ -372,7 +372,7 @@
     "message": "Bu koleksiyonu silmek istediğinizden emin misiniz?"
   },
   "collection.description": {
-    "message": "{description} - Modrinth'te {username} tarafından oluşturulan {name} koleksiyonunu göster"
+    "message": "{description} - Icarus'te {username} tarafından oluşturulan {name} koleksiyonunu göster"
   },
   "collection.description.following": {
     "message": "Takip ettiğin projelerden oluşturulmuş otomatik koleksiyon."
@@ -384,7 +384,7 @@
     "message": "Koleksiyon bulunamadı"
   },
   "collection.label.created-at": {
-    "message": "{ago} tarihinde oluşturuldu"
+    "message": "{ago} tarihinde yaratıldı"
   },
   "collection.label.curated-by": {
     "message": "Hazırlayan"
@@ -554,9 +554,6 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Ortaklık bağlantısı oluştur"
   },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Yönlendirme kodu bulunamadı."
-  },
   "dashboard.affiliate-links.error.title": {
     "message": "Ortaklık bağlantıları yüklenemedi"
   },
@@ -574,15 +571,6 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Ortaklık bağlantılarını ara..."
-  },
-  "dashboard.analytics.from-projects": {
-    "message": "{count} {count, plural, one {project} other {projects}}'den"
-  },
-  "dashboard.analytics.total-downloads": {
-    "message": "Toplam indirmeler"
-  },
-  "dashboard.analytics.total-followers": {
-    "message": "Toplam takipçiler"
   },
   "dashboard.collections.button.create-new": {
     "message": "Yeni oluştur"
@@ -607,18 +595,6 @@
   },
   "dashboard.collections.long-title": {
     "message": "Koleksiyonların"
-  },
-  "dashboard.collections.placeholder.search": {
-    "message": "Koleksiyonlarda ara..."
-  },
-  "dashboard.collections.sort.name-ascending": {
-    "message": "İsim (A-Z)"
-  },
-  "dashboard.collections.sort.recently-created": {
-    "message": "Son oluşturulanlar"
-  },
-  "dashboard.collections.sort.recently-updated": {
-    "message": "Son Güncellenen"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} İndirin"
@@ -648,7 +624,7 @@
     "message": "Vergi formu"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth, vergi formlarınızı güvenli bir şekilde toplamak ve saklamak için üçüncü taraf sağlayıcı Track1099'u kullanır. <security-link>Buradan daha fazla bilgi edinebilirsiniz.</security-link>"
+    "message": "Icarus, vergi formlarınızı güvenli bir şekilde toplamak ve saklamak için üçüncü taraf sağlayıcı Track1099'u kullanır. <security-link>Buradan daha fazla bilgi edinebilirsiniz.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Güvenlik uygulamaları"
@@ -813,7 +789,7 @@
     "message": "Mevcut <b>{available}</b> bakiyenizin tamamını çekmek için aşağıdaki formu doldurun. Bu vergi raporlaması için gereklidir ve sadece bir kez yapılması yeterlidir."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "Vergi düzenlemelerine uygun kalmamız için Modrinth'in vergi kayıtları için W-9 veya W-8 formunu doldurmanız gerekir."
+    "message": "Vergi düzenlemelerine uygun kalmamız için Icarus'in vergi kayıtları için W-9 veya W-8 formunu doldurmanız gerekir."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Vergi formu gerekli"
@@ -855,7 +831,7 @@
     "message": "Doğrulanmamış E-posta"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "Girdiğiniz teslimat e-postası Modrinth hesabınızla ilişkili değil. Modrinth yanlış e-posta adresine gönderilen ödülleri kurtaramaz."
+    "message": "Girdiğiniz teslimat e-postası Icarus hesabınızla ilişkili değil. Icarus yanlış e-posta adresine gönderilen ödülleri kurtaramaz."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Daha düşük ücretler mevcut"
@@ -872,168 +848,6 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "<b>{withdrawLimit}</b> çekme limitinizi kadarını kullandınız. Daha fazla çekmek için vergi formunu gerekir."
   },
-  "dashboard.head-title": {
-    "message": "Kontrol Paneli"
-  },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Hepsini okundu işaretle"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Geçmişi görüntüle"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "Okunmamış bildiriminiz yok."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Bildirimler yüklenirken hata oluştu:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Geçmiş"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Bildirim geçmişi"
-  },
-  "dashboard.notifications.link.see-all": {
-    "message": "Hepsi"
-  },
-  "dashboard.notifications.link.view-history": {
-    "message": "Bildirim geçmişini gör"
-  },
-  "dashboard.notifications.link.view-more": {
-    "message": "{extraNotifs} daha fazla {extraNotifs, plural, one {notification} other {notifications}} görüntüle"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Bildirimler yükleniyor..."
-  },
-  "dashboard.organizations.button.create": {
-    "message": "Organizasyon oluştur"
-  },
-  "dashboard.organizations.empty.cta": {
-    "message": "Organizasyon oluştur!"
-  },
-  "dashboard.organizations.error.fetch": {
-    "message": "Kuruluşlar alınamadı"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count} {count, plural, one {üye} other {üyeler}}"
-  },
-  "dashboard.organizations.title": {
-    "message": "Organizasyonlar"
-  },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Aşağıdan seçerek birden fazla projeyi düzenleyebilirsiniz."
-  },
-  "dashboard.projects.bulk-edit.server-disabled": {
-    "message": "Sunucu projeleri toplu düzenlemeyi desteklemez"
-  },
-  "dashboard.projects.empty": {
-    "message": "Henüz projeniz yok. Aşağıdaki yeşil butona basarak başlayın."
-  },
-  "dashboard.projects.head-title": {
-    "message": "Projeler"
-  },
-  "dashboard.projects.links.and-more": {
-    "message": "ve {count} daha..."
-  },
-  "dashboard.projects.links.button.clear-link": {
-    "message": "Bağlantıyı temizle"
-  },
-  "dashboard.projects.links.button.edit": {
-    "message": "Bağlantıları düzenle"
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "Değişiklikler <strong>{count}</strong> {count, plural, one {proje} other {projeler}} için uygulanacaktır."
-  },
-  "dashboard.projects.links.description": {
-    "message": "Aşağıda belirttiğiniz tüm bağlantılar, seçilen her projede üzerine yazılacaktır. Boş bıraktıklarınız dikkate alınmayacaktır. Çöp kutusu düğmesini kullanarak tüm seçili projelerden bir bağlantıyı silebilirsiniz."
-  },
-  "dashboard.projects.links.discord-invite.description": {
-    "message": "Discord sunucunuzun davet bağlantısı."
-  },
-  "dashboard.projects.links.discord-invite.label": {
-    "message": "Discord daveti"
-  },
-  "dashboard.projects.links.issue-tracker.description": {
-    "message": "Kullanıcıların projenizle ilgili hataları, sorunları ve endişelerini bildirebilecekleri bir alan."
-  },
-  "dashboard.projects.links.issue-tracker.label": {
-    "message": "Hata izleme"
-  },
-  "dashboard.projects.links.placeholder.cleared": {
-    "message": "Mevcut bağlantı silinecek"
-  },
-  "dashboard.projects.links.placeholder.valid-discord-url": {
-    "message": "Geçerli bir Discord davet URL'si girin"
-  },
-  "dashboard.projects.links.placeholder.valid-url": {
-    "message": "Geçerli bir URL girin"
-  },
-  "dashboard.projects.links.show-all-projects": {
-    "message": "Tüm projeleri göster"
-  },
-  "dashboard.projects.links.source-code.description": {
-    "message": "Projenizin kaynak kodunu içeren bir sayfa/depo"
-  },
-  "dashboard.projects.links.source-code.label": {
-    "message": "Kaynak kodu"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Projeyle ilgili bilgiler, belgeler ve yardım içeren bir sayfa."
-  },
-  "dashboard.projects.links.wiki-page.label": {
-    "message": "Viki sayfası"
-  },
-  "dashboard.projects.notification.bulk-edit-success": {
-    "message": "Seçilen projelerin bağlantılarını toplu olarak düzenlendi."
-  },
-  "dashboard.projects.project.icon-alt": {
-    "message": "{title} için simge"
-  },
-  "dashboard.projects.project.moderator-message-aria": {
-    "message": "Projede moderatörlerden bir mesaj var. Daha fazla bilgi için projeyi inceleyin."
-  },
-  "dashboard.projects.project.review-environment-metadata": {
-    "message": "Lütfen ortam meta verilerini inceleyin"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Artan"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Azalan sırada sırala"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "İsim"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Durum"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tip"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Simge"
-  },
-  "dashboard.projects.table.id": {
-    "message": "Kimlik"
-  },
-  "dashboard.projects.table.name": {
-    "message": "İsim"
-  },
-  "dashboard.projects.table.status": {
-    "message": "Durum"
-  },
-  "dashboard.projects.table.type": {
-    "message": "Tip"
-  },
-  "dashboard.report.title": {
-    "message": "Rapor {id}"
-  },
-  "dashboard.reports.active-title": {
-    "message": "Aktif raporlar"
-  },
-  "dashboard.reports.title": {
-    "message": "Raporlar"
-  },
   "dashboard.revenue.available-now": {
     "message": "Şu anda mevcut"
   },
@@ -1044,7 +858,7 @@
     "message": "Tahmini gelir, kullanılabilir hale gelene kadar değişikliğe tabi olabilir."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Modrinth'in gelirinizi nasıl işlediği hakkında bilgi almak için tıklayın."
+    "message": "Icarus'in gelirinizi nasıl işlediği hakkında bilgi almak için tıklayın."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Tahminen {date}"
@@ -1065,13 +879,10 @@
     "message": "Çekilen"
   },
   "dashboard.revenue.tos": {
-    "message": "Modrinth'e proje yükleyerek ve hesabınızdan para çekerek <terms-link>Ödül Programı Şartlarımızı</terms-link> kabul etmiş olursunuz. <info-link>Ödül Programı</info-link> hakkında daha fazla bilgi edinin."
+    "message": "Icarus'e proje yükleyerek ve hesabınızdan para çekerek <terms-link>Ödül Programı Şartlarımızı</terms-link> kabul etmiş olursunuz. <info-link>Ödül Programı</info-link> hakkında daha fazla bilgi edinin."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "CSV olarak indir"
-  },
-  "dashboard.revenue.transactions.head-title": {
-    "message": "İşlem geçmişi"
   },
   "dashboard.revenue.transactions.header": {
     "message": "İşlemler"
@@ -1082,17 +893,8 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Ödeme ve para çekimleriniz burada görünür."
   },
-  "dashboard.revenue.transactions.period.last-month": {
-    "message": "Geçen ay"
-  },
-  "dashboard.revenue.transactions.period.this-month": {
-    "message": "Bu ay"
-  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Hepsini göster"
-  },
-  "dashboard.revenue.transactions.year.all": {
-    "message": "Tüm zamanlar"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "TIN veya SSN numaranız IRS kayıtlarıyla eşleşmediği için para çekme işlemleriniz geçici olarak engellendi. Vergi formunuzu sıfırlamak ve yeniden göndermek için destekle iletişime geçin."
@@ -1105,33 +907,6 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Para Çek"
-  },
-  "dashboard.sidebar.label.activeReports": {
-    "message": "Aktif raporlar"
-  },
-  "dashboard.sidebar.label.analytics": {
-    "message": "Analitik"
-  },
-  "dashboard.sidebar.label.creators": {
-    "message": "Yaratıcılar"
-  },
-  "dashboard.sidebar.label.dashboard": {
-    "message": "Gösterge paneli"
-  },
-  "dashboard.sidebar.label.notifications": {
-    "message": "Bildirimler"
-  },
-  "dashboard.sidebar.label.organizations": {
-    "message": "Organizasyonlar"
-  },
-  "dashboard.sidebar.label.overview": {
-    "message": "Genel Görünüm"
-  },
-  "dashboard.sidebar.label.projects": {
-    "message": "Projeler"
-  },
-  "dashboard.sidebar.label.revenue": {
-    "message": "Gelir"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Hesap"
@@ -1236,7 +1011,7 @@
     "message": "Koleksiyon gizli olabilir."
   },
   "error.collection.404.list_item.3": {
-    "message": "Koleksiyon Modrinth'in moderasyon ekibi tarafından <tou-link>Kullanım Koşullarımızı</tou-link> ihlal ettiği için kaldırılmış olabilir."
+    "message": "Koleksiyon Icarus'in moderasyon ekibi tarafından <tou-link>Kullanım Koşullarımızı</tou-link> ihlal ettiği için kaldırılmış olabilir."
   },
   "error.collection.404.list_title": {
     "message": "Neden?"
@@ -1257,10 +1032,10 @@
     "message": "Bu içerik, yasal nedenlerden dolayı erişilemez"
   },
   "error.generic.default.list_item.1": {
-    "message": "<status-link>Durum sayfamızdan</status-link> Modrinth'in çöküp çökmediğini kontrol edin."
+    "message": "<status-link>Durum sayfamızdan</status-link> Icarus'in çöküp çökmediğini kontrol edin."
   },
   "error.generic.default.list_item.2": {
-    "message": "Bu yaşanmaya devam ederse Modrinth Ekibini <discord-link>Discord sunucumuza</discord-link> katılarak bilgilendirmek isteyebilirsin."
+    "message": "Bu yaşanmaya devam ederse Icarus Ekibini <discord-link>Discord sunucumuza</discord-link> katılarak bilgilendirmek isteyebilirsin."
   },
   "error.generic.default.list_title": {
     "message": "Lütfen bir kaç dakika içinde tekrar dene."
@@ -1278,7 +1053,7 @@
     "message": "Organizasyonun sahibi URL'i değiştirmiş veya silmiş olabilir."
   },
   "error.organization.404.list_item.3": {
-    "message": "Organizasyon Modrinth'in moderasyon ekibi tarafından <tou-link>Kullanım Koşullarımızı</tou-link> ihlal ettiği için kaldırılmış olabilir."
+    "message": "Organizasyon Icarus'in moderasyon ekibi tarafından <tou-link>Kullanım Koşullarımızı</tou-link> ihlal ettiği için kaldırılmış olabilir."
   },
   "error.organization.404.list_title": {
     "message": "Neden?"
@@ -1293,7 +1068,7 @@
     "message": "Projenin sahibi URL'i değiştirmiş, projeyi gizlemiş veya silmiş olabilir."
   },
   "error.project.404.list_item.3": {
-    "message": "Proje Modrinth'in moderasyon ekibi tarafından <tou-link>Kullanım Koşullarımızı</tou-link> ihlal ettiği için kaldırılmış olabilir."
+    "message": "Proje Icarus'in moderasyon ekibi tarafından <tou-link>Kullanım Koşullarımızı</tou-link> ihlal ettiği için kaldırılmış olabilir."
   },
   "error.project.404.list_title": {
     "message": "Neden?"
@@ -1308,7 +1083,7 @@
     "message": "Kullanıcı, adını değiştirmiş veya hesabını silmiş olabilir."
   },
   "error.user.404.list_item.3": {
-    "message": "Kullanıcının hesabı Modrinth'in <tou-link>Kullanım Koşullarını</tou-link> ihlal ettiği için kaldırılmış olabilir."
+    "message": "Kullanıcının hesabı Icarus'in <tou-link>Kullanım Koşullarını</tou-link> ihlal ettiği için kaldırılmış olabilir."
   },
   "error.user.404.list_title": {
     "message": "Neden?"
@@ -1350,10 +1125,10 @@
     "message": "Sunucunuz yoğun yük altında olduğunda, gecikme artışlarını ve kararsızlığı azaltmak için geçici olarak ek işlemci iş parçacığı erişimi sağlıyoruz. Bu, TPS'nin 20'nin altına düşmesini önleyerek mümkün olan en sorunsuz deneyimi sağlar. Bu ek işlemci iş parçacıkları yalnızca yüksek yük dönemlerinde kısa süreliğine kullanılabilir olduğundan, Spark raporlarında veya diğer profil oluşturma araçlarında görünmeyebilir."
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Modrinth Hosting sunucuları ne tür işlemcilerle çalışır?"
+    "message": "Icarus Hosting sunucuları ne tür işlemcilerle çalışır?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting sunucuları, 5+ GHz hızında AMD Ryzen 7900 ve 7950X3D eşdeğer işlemciler ve DDR5 bellek ile çalışır."
+    "message": "Icarus Hosting sunucuları, 5+ GHz hızında AMD Ryzen 7900 ve 7950X3D eşdeğer işlemciler ve DDR5 bellek ile çalışır."
   },
   "hosting-marketing.faq.currency": {
     "message": "Fiyatlar hangi para birimindedir?"
@@ -1362,19 +1137,19 @@
     "message": "Tüm fiyatlar Dolar (USD) birimindedir."
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "Modrinth Hosting sunucularında DDoS koruması var mı?"
+    "message": "Icarus Hosting sunucularında DDoS koruması var mı?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Evet. Tüm Modrinth Hosting sunucuları DDoS korumasıyla gelir ve bazı konumlarda 17 Tbps’e kadar kapasiteye sahiptir."
+    "message": "Evet. Tüm Icarus Hosting sunucuları DDoS korumasıyla gelir ve bazı konumlarda 17 Tbps’e kadar kapasiteye sahiptir."
   },
   "hosting-marketing.faq.heading": {
     "message": "Sıkça Sorulan Sorular"
   },
   "hosting-marketing.faq.how-fast": {
-    "message": "Modrinth Hosting sunucuları ne kadar hızlı?"
+    "message": "Icarus Hosting sunucuları ne kadar hızlı?"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Modrinth Hosting sunucuları çok modern ve yüksek performanslı donanımlar kullanmaktadır. Ancak bunun sunucunuzun çalışma hızına tam olarak nasıl yansıyacağını söylemek zordur, çünkü bunu etkileyen birçok faktör vardır, örneğin sunucunuzda çalıştırdığınız modlar, veri paketleri, eklentiler veya kullanıcı davranışları gibi."
+    "message": "Icarus Hosting sunucuları çok modern ve yüksek performanslı donanımlar kullanmaktadır. Ancak bunun sunucunuzun çalışma hızına tam olarak nasıl yansıyacağını söylemek zordur, çünkü bunu etkileyen birçok faktör vardır, örneğin sunucunuzda çalıştırdığınız modlar, veri paketleri, eklentiler veya kullanıcı davranışları gibi."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "Ortaya çıkan performans sorunlarının çoğu, sunucunun gecikmesine neden olan optimize edilmemiş bir mod paketi, mod, veri paketi veya eklentinin hatasından kaynaklanmaktadır. Sunucularımız çok yüksek kaliteli olduğundan, sunucuda çalıştırdığınız içerik için uygun bir plan seçtiğiniz sürece çok fazla sorun yaşamazsınız."
@@ -1383,10 +1158,10 @@
     "message": "Sunucumun depolamasını arttırabilir miyim?"
   },
   "hosting-marketing.faq.increase-storage.answer": {
-    "message": "Evet, sunucunuzdaki depolama alanı ek ücret ödemeden artırılabilir. Daha fazla depolama alanına ihtiyacınız varsa Modrinth Destek ekibiyle iletişime geçin."
+    "message": "Evet, sunucunuzdaki depolama alanı ek ücret ödemeden artırılabilir. Daha fazla depolama alanına ihtiyacınız varsa Icarus Destek ekibiyle iletişime geçin."
   },
   "hosting-marketing.faq.location": {
-    "message": "Modrinth Hosting sunucuları nerede bulunuyor? Bölge seçebilir miyim?"
+    "message": "Icarus Hosting sunucuları nerede bulunuyor? Bölge seçebilir miyim?"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "Şu anda Kuzey Amerika, Avrupa ve Güneydoğu Asya'da satın alabileceğiniz sunucularımız bulunmaktadır. Gelecekte daha fazla bölge eklenecektir! Bölgenizi değiştirmek isterseniz, lütfen destek ekibiyle iletişime geçin."
@@ -1395,7 +1170,7 @@
     "message": "Hangi Minecraft sürümleri ve yükleyiciler kullanılabilir?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Modrinth Hosting sunucuları, snapshot sürümleri de dahil olmak üzere 1.2.5 sürümüne kadar geriye giden Minecraft: Java Edition'ın tüm sürümlerini çalıştırabilir."
+    "message": "Icarus Hosting sunucuları, snapshot sürümleri de dahil olmak üzere 1.2.5 sürümüne kadar geriye giden Minecraft: Java Edition'ın tüm sürümlerini çalıştırabilir."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "Ayrıca, modlar için Fabric, Quilt, Forge ve NeoForge, eklentiler için Paper ve Purpur dahil olmak üzere birçok mod ve eklenti yükleyicilerini destekliyoruz. Kullanılabilirlik, mod veya eklenti yükleyicisinin seçilen Minecraft sürümünü destekleyip desteklemediğine bağlıdır."
@@ -1412,11 +1187,11 @@
   "hosting-marketing.hero.button.start-your-server": {
     "message": "Sunucunuzu başlatın"
   },
-  "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Bir sonraki sunucunuzu Modrinth Hosting ile açın"
+  "hosting-marketing.hero.host-with-Icarus": {
+    "message": "Bir sonraki sunucunuzu Icarus Hosting ile açın"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting, kendi Minecraft: Java Edition sunucunuzu açmanın en kolay yoludur. Modrinth platformunda en sevdiğiniz modları ve mod paketlerini sorunsuz bir şekilde yükleyin ve oynayın."
+    "message": "Icarus Hosting, kendi Minecraft: Java Edition sunucunuzu açmanın en kolay yoludur. Icarus platformunda en sevdiğiniz modları ve mod paketlerini sorunsuz bir şekilde yükleyin ve oynayın."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Gelişmiş ağ yönetimi"
@@ -1434,10 +1209,10 @@
     "message": "Özel URL"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "Sunucunuzu özel bir <contrast>modrinth.gg</contrast> URL'si ile paylaşın."
+    "message": "Sunucunuzu özel bir <contrast>Icarus.gg</contrast> URL'si ile paylaşın."
   },
   "hosting-marketing.included.description": {
-    "message": "Her sunucuya, yalnızca Modrinth'in sunabileceği bir deneyim sağlamak için tasarlanmış bir sürü özellik dahildir."
+    "message": "Her sunucuya, yalnızca Icarus'in sunabileceği bir deneyim sağlamak için tasarlanmış bir sürü özellik dahildir."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Kullanımı kolay dosya yöneticisi"
@@ -1452,19 +1227,19 @@
     "message": "İhtiyacınız olduğunda yardım"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Sunucunuzla ilgili yardım için Modrinth ekibine istediğiniz zaman ulaşabilirsiniz."
+    "message": "Sunucunuzla ilgili yardım için Icarus ekibine istediğiniz zaman ulaşabilirsiniz."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "Güçlü bir konsol, sunucu özellikleri yöneticisi ve daha fazlası"
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "Modrinth Hosting, sunucunuzu yönetmek için güçlü araçlar sunar."
+    "message": "Icarus Hosting, sunucunuzu yönetmek için güçlü araçlar sunar."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "Güvenli Dosya Aktarım Protokolü erişimi"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "Modrinth Hosting'de yerleşik Güvenli Dosya Aktarım Protokolü ile sunucunuzun dosyalarına doğrudan erişin."
+    "message": "Icarus Hosting'de yerleşik Güvenli Dosya Aktarım Protokolü ile sunucunuzun dosyalarına doğrudan erişin."
   },
   "hosting-marketing.included.with-your-server": {
     "message": "Sunucunuza dahildir"
@@ -1487,20 +1262,20 @@
   "hosting-marketing.server-for-everyone": {
     "message": "Herkes için bir sunucu var"
   },
-  "hosting-marketing.why.all-on-modrinth": {
-    "message": "Modrinth ile her şeyi yönetin"
+  "hosting-marketing.why.all-on-Icarus": {
+    "message": "Icarus ile her şeyi yönetin"
   },
-  "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "Sunucunuz, modlarınız, oyuncular ve daha fazlası Modrinth'te. Platformlar arasında geçiş yapmanıza gerek yok."
+  "hosting-marketing.why.all-on-Icarus.description": {
+    "message": "Sunucunuz, modlarınız, oyuncular ve daha fazlası Icarus'te. Platformlar arasında geçiş yapmanıza gerek yok."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Tutarlı şekilde hızlı"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "Altyapımız asla aşırı yüklenmez, yani Modrinth ile açılan her sunucu her zaman tam performansıyla çalışır."
+    "message": "Altyapımız asla aşırı yüklenmez, yani Icarus ile açılan her sunucu her zaman tam performansıyla çalışır."
   },
   "hosting-marketing.why.description": {
-    "message": "Modrinth'teki binlerce mod paketinden seçin veya kendinizinkini kullanın. Oynamaya hazır olduğunuzda arkadaşlarınızı çağırın."
+    "message": "Icarus'teki binlerce mod paketinden seçin veya kendinizinkini kullanın. Oynamaya hazır olduğunuzda arkadaşlarınızı çağırın."
   },
   "hosting-marketing.why.heading": {
     "message": "Mod paketi bulun sunucu olsun."
@@ -1509,22 +1284,22 @@
     "message": "Modern ve güvenilir hosting deneyimleyin"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Modrinth Hosting sunucuları, <contrast>DDR5 RAM ile yüksek-performans AMD İşlemcilerde</contrast> ve sunucunuzun düzgünce çalışmasını sağlamak için özel yapılmış yazılımda çalışır."
+    "message": "Icarus Hosting sunucuları, <contrast>DDR5 RAM ile yüksek-performans AMD İşlemcilerde</contrast> ve sunucunuzun düzgünce çalışmasını sağlamak için özel yapılmış yazılımda çalışır."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Modlarınızın olduğu yerde oynayın"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting, mod ve mod paketi kurulum sürecini kesintisiz hale getirir."
+    "message": "Icarus Hosting, mod ve mod paketi kurulum sürecini kesintisiz hale getirir."
   },
-  "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "Niye Modrinth Hosting?"
+  "hosting-marketing.why.why-Icarus-hosting": {
+    "message": "Niye Icarus Hosting?"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "Tüm favori modlarınız"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "Vanilla, Fabric, Forge, Quilt ve NeoForge arasından seçin. Modrinth'de varsa sunucunuzda çalışır."
+    "message": "Vanilla, Fabric, Forge, Quilt ve NeoForge arasından seçin. Icarus'de varsa sunucunuzda çalışır."
   },
   "hosting.plan.out-of-stock": {
     "message": "Stokta yok"
@@ -1539,7 +1314,7 @@
     "message": "Panele git"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Modrinth ekibinden sürekli güncellemelerle mümkün olan en iyi modlama deneyimini edinin."
+    "message": "Icarus ekibinden sürekli güncellemelerle mümkün olan en iyi modlama deneyimini edinin."
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Sürekli Gelişen"
@@ -1584,13 +1359,13 @@
     "message": "Sevdiğiniz projeleri takip edin"
   },
   "landing.feature.launcher.description": {
-    "message": "Modrinth'in açık-kaynak API'ı başlatıcıların Modrinth ile tam bağlantı kurmasını sağlar. Modrinth; <link>kendi uygulamamız</link> veya ATLauncher, MultiMC ve Prism Launcher gibi öne çıkan başlatıcılar aracığılıyla kullanılabilir."
+    "message": "Icarus'in açık-kaynak API'ı başlatıcıların Icarus ile tam bağlantı kurmasını sağlar. Icarus; <link>kendi uygulamamız</link> veya ATLauncher, MultiMC ve Prism Launcher gibi öne çıkan başlatıcılar aracığılıyla kullanılabilir."
   },
   "landing.feature.launcher.heading": {
     "message": "Favori başlatıcınız ile oynayın"
   },
   "landing.feature.search.description": {
-    "message": "Modrinth'in ışık hızı araması ve güçlü filtreleriyle istediğinizi bulun."
+    "message": "Icarus'in ışık hızı araması ve güçlü filtreleriyle istediğinizi bulun."
   },
   "landing.feature.search.heading": {
     "message": "İstediğinizi kolay ve hızlıca bulun"
@@ -1623,10 +1398,10 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "Basitleştirilmiş bir Minecraft penceresinin temsili, Mojang Studios logosu Modrinth yeşilli."
+    "message": "Basitleştirilmiş bir Minecraft penceresinin temsili, Mojang Studios logosu Icarus yeşilli."
   },
-  "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+  "landing.launcher.Icarus-app-label": {
+    "message": "Icarus Launcher"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1716,25 +1491,25 @@
     "message": "Hesap ayarlarını ziyaret et"
   },
   "layout.banner.add-email.description": {
-    "message": "Güvenlik sebebiyle Modrinth hesabınıza bir e-posta adresi kaydetmeniz gerek."
+    "message": "Güvenlik sebebiyle Icarus hesabınıza bir e-posta adresi kaydetmeniz gerek."
   },
   "layout.banner.build-fail.description": {
-    "message": "Modrinth'in önucunun bu dağıtımı API'den durum oluşturamadı. Bu bir kesintiden veya yapılandırmadaki bir hatadan kaynaklı olabilir. API mevcutken tekrar derleyin. Hata kodları: {errors}; şu anki API adresi: {url}"
+    "message": "Icarus'in önucunun bu dağıtımı API'den durum oluşturamadı. Bu bir kesintiden veya yapılandırmadaki bir hatadan kaynaklı olabilir. API mevcutken tekrar derleyin. Hata kodları: {errors}; şu anki API adresi: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "Derleme esnasında API'den durum oluştururken hata."
   },
   "layout.banner.preview.description": {
-    "message": "Modrinth'in resmi web sitesine erişmek istediyseniz, <link>https://modrinth.com</link> adresini ziyaret edin. Bu önizleme dağıtımı, Modrinth yetkilileri tarafından test amaçlı kullanılmaktadır. <branch-link>{owner}/{branch}</branch-link> @ {commit} kullanılarak oluşturulmuştur."
+    "message": "Icarus'in resmi web sitesine erişmek istediyseniz, <link>https://Icarus.com</link> adresini ziyaret edin. Bu önizleme dağıtımı, Icarus yetkilileri tarafından test amaçlı kullanılmaktadır. <branch-link>{owner}/{branch}</branch-link> @ {commit} kullanılarak oluşturulmuştur."
   },
   "layout.banner.preview.title": {
-    "message": "Bu, Modrinth web sitesinin önizleme dağıtımıdır."
+    "message": "Bu, Icarus web sitesinin önizleme dağıtımıdır."
   },
   "layout.banner.staging.description": {
-    "message": "Hazırlama ortamı, Modrinth yapım veritabanından tamamen ayrıdır. Bu test ve hata ayıklama amaçları için kullanılır ve yapım profilinden daha yeni olan Modrinth'in arka ucunun veya ön ucunun geliştirmekte olan sürümlerini çalıştırıyor olabilir. "
+    "message": "Hazırlama ortamı, Icarus yapım veritabanından tamamen ayrıdır. Bu test ve hata ayıklama amaçları için kullanılır ve yapım profilinden daha yeni olan Icarus'in arka ucunun veya ön ucunun geliştirmekte olan sürümlerini çalıştırıyor olabilir. "
   },
   "layout.banner.staging.title": {
-    "message": "Modrinth'in hazırlama ortamını görüntülüyorsunuz"
+    "message": "Icarus'in hazırlama ortamını görüntülüyorsunuz"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Fatura bilgisini güncelle"
@@ -1749,7 +1524,7 @@
     "message": "Vergi formunu doldurun"
   },
   "layout.banner.tax.description": {
-    "message": "Bu yıl Modrinth'ten {threshold} üzerinde çekim yaptınız. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekmektedir. Bu form teslim edilene kadar para çekme işlemleriniz durdurulmuştur."
+    "message": "Bu yıl Icarus'ten {threshold} üzerinde çekim yaptınız. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekmektedir. Bu form teslim edilene kadar para çekme işlemleriniz durdurulmuştur."
   },
   "layout.banner.tax.title": {
     "message": "Vergi formu gereklidir"
@@ -1767,7 +1542,7 @@
     "message": "Doğrulama e-postasını yeniden gönder"
   },
   "layout.banner.verify-email.description": {
-    "message": "Güvenlik sebebiyle Modrinth hesabınızın e-posta adresini doğrulamanız gerek."
+    "message": "Güvenlik sebebiyle Icarus hesabınızın e-posta adresini doğrulamanız gerek."
   },
   "layout.footer.about": {
     "message": "Hakkında"
@@ -1808,23 +1583,23 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Kullanım Koşulları"
   },
-  "layout.footer.modrinth-information": {
-    "message": "Modrinth bilgileri"
+  "layout.footer.Icarus-information": {
+    "message": "Icarus bilgileri"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth <github-link>açık kaynaklıdır</github-link>."
+    "message": "Icarus <github-link>açık kaynaklıdır</github-link>."
   },
   "layout.footer.products": {
     "message": "Ürünler"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Icarus Launcher"
   },
   "layout.footer.products.plus": {
-    "message": "Modrinth+"
+    "message": "Icarus+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "layout.footer.resources": {
     "message": "Kaynaklar"
@@ -1860,7 +1635,7 @@
     "message": "Menü aç/kapa"
   },
   "layout.meta.description": {
-    "message": "Modrinth üzerinden Minecraft modları, pluginleri, veri paketleri, shaderları, kaynak paketleri ve mod paketleri indir. Modern ve kullanımı kolay bir arayüz ve API ile Modrinth üzerinden projeler keşfet ve yayınla."
+    "message": "Icarus üzerinden Minecraft modları, pluginleri, veri paketleri, shaderları, kaynak paketleri ve mod paketleri indir. Modern ve kullanımı kolay bir arayüz ve API ile Icarus üzerinden projeler keşfet ve yayınla."
   },
   "layout.meta.og-description": {
     "message": "Minecraft içeriği keşfet ve yayınla!"
@@ -1880,8 +1655,8 @@
   "layout.nav.discover-content": {
     "message": "İçerik keşfet"
   },
-  "layout.nav.get-modrinth-app": {
-    "message": "Modrinth App yükle"
+  "layout.nav.get-Icarus-app": {
+    "message": "Icarus Launcher yükle"
   },
   "layout.nav.home": {
     "message": "Anasayfa"
@@ -1889,11 +1664,11 @@
   "layout.nav.host-a-server": {
     "message": "Sunucu kur"
   },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+  "layout.nav.Icarus-app": {
+    "message": "Icarus Launcher"
   },
-  "layout.nav.modrinth-home-page": {
-    "message": "Modrinth ana sayfası"
+  "layout.nav.Icarus-home-page": {
+    "message": "Icarus ana sayfası"
   },
   "layout.nav.my-servers": {
     "message": "Sunucularım"
@@ -1916,8 +1691,8 @@
   "layout.nav.search": {
     "message": "Arama"
   },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Modrinth+ Kullan"
+  "layout.nav.upgrade-to-Icarus-plus": {
+    "message": "Icarus+ Kullan"
   },
   "moderation.moderate": {
     "message": "Yönet"
@@ -1927,6 +1702,9 @@
   },
   "moderation.page.reports": {
     "message": "Bildiriler"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Teknik İnceleme"
   },
   "muralpay.account-type.checking": {
     "message": "Vadesiz hesap"
@@ -2196,10 +1974,10 @@
     "message": "Cüzdan adresinizi iki kez kontrol edin. Yanlış adrese gönderilen fonlar kurtarılamaz."
   },
   "profile.bio.fallback.creator": {
-    "message": "Bir Modrinth içerik üreticisi."
+    "message": "Bir Icarus içerik üreticisi."
   },
   "profile.bio.fallback.user": {
-    "message": "Bir Modrinth kullanıcısı."
+    "message": "Bir Icarus kullanıcısı."
   },
   "profile.button.billing": {
     "message": "Kullanıcı faturasını yönet"
@@ -2283,10 +2061,10 @@
     "message": "Kaydediliyor..."
   },
   "profile.meta.description": {
-    "message": "{username} kullanıcısının Modrinth'teki projelerini indir"
+    "message": "{username} kullanıcısının Icarus'teki projelerini indir"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} - {username} kullanıcısının Modrinth'teki projelerini indir"
+    "message": "{bio} - {username} kullanıcısının Icarus'teki projelerini indir"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> proje takipçisi} other {<stat>{count}</stat> proje takipçisi}}"
@@ -2325,7 +2103,7 @@
     "message": "İncelemeye yeniden gönder"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Projeniz Modrinth personeli tarafından {status, select, rejected {reddedildi} withheld {alıkonuldu} other {{status}}}. Çoğu durumda, personelin mesajında belirtilen konuları ele aldıktan sonra inceleme için yeniden gönderebilirsiniz."
+    "message": "Projeniz Icarus personeli tarafından {status, select, rejected {reddedildi} withheld {alıkonuldu} other {{status}}}. Çoğu durumda, personelin mesajında belirtilen konuları ele aldıktan sonra inceleme için yeniden gönderebilirsiniz."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Yayımlama kontrol listesindeki gerekli adımları tamamlamalısınız!"
@@ -2439,7 +2217,7 @@
     "message": "Projeyi incele"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting arkadaşlarınla uğraşsız oynamanın en kolay yolu!"
+    "message": "Icarus Hosting arkadaşlarınla uğraşsız oynamanın en kolay yolu!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "{price}<small> / ay</small>'dan başlayan fiyatlarla"
@@ -2472,10 +2250,10 @@
     "message": "{title}, {platform} için {gameVersion} sürümünü desteklemiyor"
   },
   "project.download.install-with-app": {
-    "message": "Modrinth App ile yükle"
+    "message": "Icarus Launcher ile yükle"
   },
   "project.download.no-app": {
-    "message": "Modrinth App Yok Mu?"
+    "message": "Icarus Launcher Yok Mu?"
   },
   "project.download.no-versions-available": {
     "message": "{gameVersion} ve {platform} için sürüm mevcut değil."
@@ -2511,7 +2289,7 @@
     "message": "{title} Projesini Yükle"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Daha yeni Modrinth'in Çevre sistemini yeniledik ve yeni seçenekler mevcut. Bu ayarları değiştirmek için yetkiniz yok ama projenin başka bir üyesine çevre meta verisinin doğrulanması gerektiği haberini verebilirsiniz."
+    "message": "Daha yeni Icarus'in Çevre sistemini yeniledik ve yeni seçenekler mevcut. Bu ayarları değiştirmek için yetkiniz yok ama projenin başka bir üyesine çevre meta verisinin doğrulanması gerektiği haberini verebilirsiniz."
   },
   "project.environment.migration-no-permission.title": {
     "message": "Çevre meta verisi gözden geçirilmesi gerekiyor"
@@ -2520,7 +2298,7 @@
     "message": "Bu değişiklik hakkında daha fazla öğren"
   },
   "project.environment.migration.message": {
-    "message": "Modrinth’te Ortamlar sistemini baştan sona yeniledik ve artık yeni seçenekler mevcut. Lütfen meta verilerin doğru olduğunu doğrulayın."
+    "message": "Icarus’te Ortamlar sistemini baştan sona yeniledik ve artık yeni seçenekler mevcut. Lütfen meta verilerin doğru olduğunu doğrulayın."
   },
   "project.environment.migration.review-button": {
     "message": "Ortam ayarlarını incele"
@@ -2652,7 +2430,7 @@
     "message": "{item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} bulunamadı"
   },
   "report.for.violation": {
-    "message": "Modrinth <rules-link>Kuralları</rules-link> veya <terms-link>Kullanım Koşulları</terms-link> İhlali"
+    "message": "Icarus <rules-link>Kuralları</rules-link> veya <terms-link>Kullanım Koşulları</terms-link> İhlali"
   },
   "report.for.violation.description": {
     "message": "Örnekler kötü niyetli, spam, saldırgan, aldatıcı, yanıltıcı ve yasak içerikleri barındırır."
@@ -2697,7 +2475,7 @@
     "message": "Ne tür bir içerik bildiriyorsunuz?"
   },
   "report.question.report-reason": {
-    "message": "Bu {item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} Modrinth kurallarından hangisini ihlal ediyor?"
+    "message": "Bu {item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} Icarus kurallarından hangisini ihlal ediyor?"
   },
   "report.report-content": {
     "message": "Moderatörlere içerik bildir"
@@ -2901,7 +2679,7 @@
     "message": "Bildiri yaz"
   },
   "scopes.sessionAccess.description": {
-    "message": "Modrinth tarafından verilen oturumlara eriş"
+    "message": "Icarus tarafından verilen oturumlara eriş"
   },
   "scopes.sessionAccess.label": {
     "message": "Oturumlara eriş"
@@ -3048,13 +2826,13 @@
     "message": "Dışa aktarma oluşturuluyor..."
   },
   "settings.account.data-export.description": {
-    "message": "Modrinth'e yüklediğiniz tüm kişisel verilerinizin bir kopyasını talep edin. Bu işlemin tamamlanması birkaç dakika sürebilir."
+    "message": "Icarus'e yüklediğiniz tüm kişisel verilerinizin bir kopyasını talep edin. Bu işlemin tamamlanması birkaç dakika sürebilir."
   },
   "settings.account.data-export.title": {
     "message": "Veri dışa aktarma"
   },
   "settings.account.delete.confirm.description": {
-    "message": "Bu işlem, **tüm kullanıcı verilerinizi ve takip ettiğiniz hesapları anında siler**. Projeleriniz silinmez. Hesabınızı silme işlemi geri alınamaz.<br><br>Hesabınızla ilgili yardıma ihtiyacınız varsa, [Modrinth Discord](https://discord.modrinth.com) üzerinden destek alabilirsiniz."
+    "message": "Bu işlem, **tüm kullanıcı verilerinizi ve takip ettiğiniz hesapları anında siler**. Projeleriniz silinmez. Hesabınızı silme işlemi geri alınamaz.<br><br>Hesabınızla ilgili yardıma ihtiyacınız varsa, [Icarus Discord](https://discord.Icarus.com) üzerinden destek alabilirsiniz."
   },
   "settings.account.delete.confirm.proceed": {
     "message": "Hesabı sil"
@@ -3176,14 +2954,8 @@
   "settings.account.security.password.title": {
     "message": "Parola"
   },
-  "settings.account.security.providers.action.manage": {
-    "message": "Sağlayıcıları yönet"
-  },
   "settings.account.security.providers.description": {
     "message": "Hesabınıza giriş yöntemleri ekleyin veya kaldırın; GitHub, GitLab, Microsoft, Discord, Steam ve Google dahil."
-  },
-  "settings.account.security.providers.title": {
-    "message": "Kimlik doğrulama sağlayıcılarını yönet"
   },
   "settings.account.security.title": {
     "message": "Hesap güvenliği"
@@ -3200,35 +2972,14 @@
   "settings.account.security.two-factor.title": {
     "message": "İki aşamalı doğrulama"
   },
-  "settings.account.two-factor.backup.intro": {
-    "message": "Bu yedek kodları indirip güvenli bir yerde saklayın. Cihazınıza erişiminizi kaybederseniz, 2FA kodu yerine bu kodları kullanabilirsiniz. Bu kodları şifreniz gibi korumalısınız."
-  },
-  "settings.account.two-factor.backup.single-use": {
-    "message": "Yedek kodlar saece bir kere kullanılabilinir."
-  },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "Girilen kod yanlış!"
-  },
-  "settings.account.two-factor.field.code.description": {
-    "message": "Devam etmek için iki aşamalı doğrulama kodunuzu girin."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Çift aşamalı kodu girin"
   },
   "settings.account.two-factor.field.code.placeholder": {
     "message": "Kodu girin..."
-  },
-  "settings.account.two-factor.setup.intro": {
-    "message": "İki faktörlü kimlik doğrulama, oturum açmak için ikinci bir cihaza erişim gerektirerek hesabınızı güvenli tutar."
-  },
-  "settings.account.two-factor.setup.manual-secret": {
-    "message": "QR kod taranmazsa, gizli anahtarı manuel olarak girebilirsiniz:"
-  },
-  "settings.account.two-factor.setup.scan": {
-    "message": "QR kodunu <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> veya başka bir 2FA uygulamasıyla tarayarak başlayın."
-  },
-  "settings.account.two-factor.verify.description": {
-    "message": "Erişimi doğrulamak için kimlik doğrulayıcıdan tek kullanımlık kodu girin."
   },
   "settings.account.two-factor.verify.label": {
     "message": "Kodu onayla"
@@ -3282,7 +3033,7 @@
     "message": "Bu uygulamayı silmek istediğinizden emin misiniz?"
   },
   "settings.applications.description.intro": {
-    "message": "Uygulamalar, Modrinth kullanıcılarının ürünlerinizde kimlik doğrulaması yapması için kullanılabilir. Daha fazla bilgi için <docs-link>Modrinth'in API belgelerine</docs-link> göz atın."
+    "message": "Uygulamalar, Icarus kullanıcılarının ürünlerinizde kimlik doğrulaması yapması için kullanılabilir. Daha fazla bilgi için <docs-link>Icarus'in API belgelerine</docs-link> göz atın."
   },
   "settings.applications.field.description": {
     "message": "Açıklama"
@@ -3314,9 +3065,6 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://ornek.com"
   },
-  "settings.applications.head-title": {
-    "message": "Uygulamalar"
-  },
   "settings.applications.modal.header": {
     "message": "Proje bilgileri"
   },
@@ -3336,7 +3084,7 @@
     "message": "tarafından"
   },
   "settings.authorizations.description": {
-    "message": "Modrinth hesabınızla bir uygulamayı yetkilendirdiğinizde, ona hesabınıza erişim izni vermiş olursunuz. Hesabınıza verilen erişimi dilediğiniz zaman burada yönetebilir ve gözden geçirebilirsiniz."
+    "message": "Icarus hesabınızla bir uygulamayı yetkilendirdiğinizde, ona hesabınıza erişim izni vermiş olursunuz. Hesabınıza verilen erişimi dilediğiniz zaman burada yönetebilir ve gözden geçirebilirsiniz."
   },
   "settings.authorizations.empty-state": {
     "message": "Yetkilendirdiğiniz uygulamalar şu anda görüntülenemiyor, bunu düzeltmek için çalışıyoruz. Lütfen bu sayfayı daha sonra tekrar ziyaret edin."
@@ -3346,24 +3094,6 @@
   },
   "settings.authorizations.revoke.action": {
     "message": "Kaldır"
-  },
-  "settings.authorizations.revoke.confirm.description": {
-    "message": "Bu işlem, uygulamanın hesabınıza erişimini iptal edecektir. Daha sonra istediğiniz zaman yeniden yetkilendirebilirsiniz."
-  },
-  "settings.authorizations.revoke.confirm.title": {
-    "message": "Bu uygulamanın yetkisini kaldırmak istediğinizden emin misiniz?"
-  },
-  "settings.billing.charges.description": {
-    "message": "Modrinth hesabınıza geçmişte yapılan tüm ödemeleriniz burada listelenir:"
-  },
-  "settings.billing.charges.title": {
-    "message": "Past charges"
-  },
-  "settings.billing.expires": {
-    "message": "Son kullanma tarihi {date}"
-  },
-  "settings.billing.interval.monthly": {
-    "message": "ay"
   },
   "settings.billing.interval.quarter": {
     "message": "çeyrek"
@@ -3378,22 +3108,19 @@
     "message": "yıllık"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "Modrinth App ve modrinth.com'da reklamsız gezinme"
+    "message": "Icarus Launcher ve Icarus.com'da reklamsız gezinme"
   },
   "settings.billing.midas.benefits.badge": {
-    "message": "Profilinde Modrinth+ rozeti"
+    "message": "Profilinde Icarus+ rozeti"
   },
   "settings.billing.midas.benefits.support": {
-    "message": "Modrinth ve üreticilerini direkt olarak destekleyin"
+    "message": "Icarus ve üreticilerini direkt olarak destekleyin"
   },
   "settings.billing.midas.benefits.title": {
-    "message": "Ayrıcalıklar"
-  },
-  "settings.billing.midas.save-per-year": {
-    "message": "Yıllık faturalandırmaya geçerek yılda {amount} tasarruf edin!"
+    "message": "Yararlar"
   },
   "settings.billing.midas.upsell": {
-    "message": "Modrinth Plus’a abone olun!"
+    "message": "Icarus Plus’a abone olun!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Aboneliği iptal et"
@@ -3449,12 +3176,6 @@
   "settings.billing.price.slash-interval": {
     "message": "/{interval}"
   },
-  "settings.billing.pyro.cpu": {
-    "message": "{shared} Paylaşımlı CPU ( {bursts} CPU’ya kadar ani yükselme)"
-  },
-  "settings.billing.pyro.linked-server.not-found": {
-    "message": "Bu abonelik için bağlı bir sunucu bulunamadı. Bunun birkaç olası nedeni vardır. Sunucunuzu yeni satın aldıysanız bu normaldir. Sunucunuzun hazırlanması bir saate kadar sürebilir. Eğer sunucuyu bir süre önce satın aldıysanız, büyük ihtimalle askıya alınmıştır. Eğer bunu beklemiyorsanız, lütfen aşağıdaki bilgilerle birlikte Modrinth Destek ile iletişime geçin:"
-  },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "Sunucu Kimliği:{id}"
   },
@@ -3467,18 +3188,6 @@
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Yeniden abone olurken hata"
   },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Sunucu şu anda iptal durumundaysa, sunucunun kurulması 10-15 dakika sürebilir."
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.title": {
-    "message": "Yeniden abonelik talebi gönderildi"
-  },
-  "settings.billing.pyro.resubscribe.success.text": {
-    "message": "Sunucu aboneliği başarıyla yeniden aktifleştirildi"
-  },
-  "settings.billing.pyro.status.failed": {
-    "message": "Abonelik ödemen başarısız oldu. Lütfen ödeme yöntemini güncelle, ardından yeniden abonelik oluştur."
-  },
   "settings.billing.pyro.status.processing": {
     "message": "Ödemeniz işleniyor. Sunucunuz ödeme tamamlandığında aktifleşecektir."
   },
@@ -3489,34 +3198,19 @@
     "message": "{gb} GB Değişim"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Modrinth Sunucu aboneliklerini yönet."
+    "message": "Icarus Sunucu aboneliklerini yönet."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Modrinth Sunucu Abonelikleri"
-  },
-  "settings.billing.renews": {
-    "message": "{date} tarihinde yenilenir"
-  },
-  "settings.billing.resubscribe": {
-    "message": "Yeniden abone ol"
-  },
-  "settings.billing.since": {
-    "message": "{date} tarihinden beri"
+    "message": "Icarus Sunucu Abonelikleri"
   },
   "settings.billing.subscribe": {
     "message": "Abone ol"
   },
   "settings.billing.subscription.description": {
-    "message": "Modrinth aboneliklerinizi yönetin."
+    "message": "Icarus aboneliklerinizi yönetin."
   },
   "settings.billing.subscription.title": {
     "message": "Abonelikler"
-  },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "{interval} planına geçiliyor"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "{interval} planına geç"
   },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Aylık faturalandırma size yıllık ek olarak {amount} maliyet çıkaracaktır"
@@ -3534,7 +3228,7 @@
     "message": "Geliştirme modunu devre dışı bırak"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Geliştirme modu</strong> aktif. Modrinth'te bulunan çeşitli şeylerin dahilî kimliklerini gösterir, Modrinth API kullanan bir geliştiriciyseniz kullanışlı olabilir. Sayfanın en altındaki Modrinth logosuna 5 kere tıklayarak açılır ve kapanır."
+    "message": "<strong>Geliştirme modu</strong> aktif. Icarus'te bulunan çeşitli şeylerin dahilî kimliklerini gösterir, Icarus API kullanan bir geliştiriciyseniz kullanışlı olabilir. Sayfanın en altındaki Icarus logosuna 5 kere tıklayarak açılır ve kapanır."
   },
   "settings.display.flags.description": {
     "message": "Bu cihazdaki belli özellikleri etkinlestir veya devre dışı bırak."
@@ -3559,9 +3253,6 @@
   },
   "settings.display.project-list-layouts.mode.gallery": {
     "message": "Galeri"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Izgara"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Mod paketleri sayfası"
@@ -3594,16 +3285,16 @@
     "message": "Gelişmiş işleme"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Modrinth'in dışına giden bağlantıların yeni bir sekmede açılmasını sağla. Bu ayara bakılmaksızın, aynı alan adındaki ve Markdown açıklamalarındaki bağlantılar aynı sekmede açılacak ve reklamlardaki, düzenleme sayfalarındaki bağlantılar yeni bir sekmede açılacak."
+    "message": "Icarus'in dışına giden bağlantıların yeni bir sekmede açılmasını sağla. Bu ayara bakılmaksızın, aynı alan adındaki ve Markdown açıklamalarındaki bağlantılar aynı sekmede açılacak ve reklamlardaki, düzenleme sayfalarındaki bağlantılar yeni bir sekmede açılacak."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Dış bağlantıları yeni sekmede aç"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "\"Modrinth App Edin\" tuşlarını ana navigasyondan gizler. Modrinth App sayfası hala açılış sayfasında veya alt bilgide bulunabilir."
+    "message": "\"Icarus Launcher Edin\" tuşlarını ana navigasyondan gizler. Icarus Launcher sayfası hala açılış sayfasında veya alt bilgide bulunabilir."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Modrinth App tanıtımlarını gizle"
+    "message": "Icarus Launcher tanıtımlarını gizle"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "İçerik sayfalarında sola hizalı kenar çubuğu"
@@ -3618,7 +3309,7 @@
     "message": "Arama sayfalarında kenar çubuğunu sağa hizalar"
   },
   "settings.display.theme.description": {
-    "message": "Bu cihazda Modrinth için tercih ettiğiniz renk temasını seçin."
+    "message": "Bu cihazda Icarus için tercih ettiğiniz renk temasını seçin."
   },
   "settings.display.theme.title": {
     "message": "Renk teması"
@@ -3630,7 +3321,7 @@
     "message": "Bir PAT yarat"
   },
   "settings.pats.description": {
-    "message": "PAT'ler Modrinth API’sine erişmek için kullanılabilir. Bunlar istendiği zaman oluşturulabilir ve iptal edilebilir. Daha fazla bilgi için <doc-link>Modrinth API dokümantasyonuna</doc-link> bakın."
+    "message": "PAT'ler Icarus API’sine erişmek için kullanılabilir. Bunlar istendiği zaman oluşturulabilir ve iptal edilebilir. Daha fazla bilgi için <doc-link>Icarus API dokümantasyonuna</doc-link> bakın."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT oluştur"
@@ -3684,7 +3375,7 @@
     "message": "Hakkında"
   },
   "settings.profile.description": {
-    "message": "Profil bilgin Modrinth'te ve <docs-link>Modrinth API</docs-link> herkese açık görüntülenebilir."
+    "message": "Profil bilgin Icarus'te ve <docs-link>Icarus API</docs-link> herkese açık görüntülenebilir."
   },
   "settings.profile.head-title": {
     "message": "Profil Ayarları"
@@ -3708,7 +3399,7 @@
     "message": "Mevcut oturum"
   },
   "settings.sessions.description": {
-    "message": "Şu an Modrinth hesabınızla giriş yapılmış tüm cihazlar burada. Her birinden teker teker çıkış yapabilirsiniz.\n\nEğer tanımadığınız bir girdi varsa, o cihazdan çıkış yapın ve Modrinth hesabınızın parolasını derhal değiştirin."
+    "message": "Şu an Icarus hesabınızla giriş yapılmış tüm cihazlar burada. Her birinden teker teker çıkış yapabilirsiniz.\n\nEğer tanımadığınız bir girdi varsa, o cihazdan çıkış yapın ve Icarus hesabınızın parolasını derhal değiştirin."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "En son {ago} erişildi"
@@ -3726,7 +3417,7 @@
     "message": "Geliştirici"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Modrinth'ten haberler"
+    "message": "Icarus'ten haberler"
   },
   "ui.latest-news-row.view-all": {
     "message": "Bütün haberleri gör"
@@ -3738,7 +3429,7 @@
     "message": "Abone Olundu!"
   },
   "ui.newsletter-button.tooltip": {
-    "message": "Modrinth haber mektuplarına abone ol"
+    "message": "Icarus haber mektuplarına abone ol"
   },
   "version.environment.none.description": {
     "message": "Bu sürüm için ortam belirtilmemiş."
@@ -3753,3 +3444,4 @@
     "message": "Bilinmeyen ortam"
   }
 }
+

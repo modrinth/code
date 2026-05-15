@@ -18,7 +18,7 @@
     "defaultMessage": "Javaアドレスを追加する"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Modrinth以外の関連リンク (ウェブサイト、ストア、Discord招待など) を追加してください。"
+    "defaultMessage": "Icarus以外の関連リンク (ウェブサイト、ストア、Discord招待など) を追加してください。"
   },
   "nags.add-links-server.title": {
     "defaultMessage": "外部リンクを追加する"
@@ -249,4 +249,5 @@
     "defaultMessage": "リンク設定を表示"
   }
 }
+
 

@@ -1,4 +1,4 @@
-import { defineMessage, type MessageDescriptor } from '@modrinth/ui'
+import { defineMessage, type MessageDescriptor } from '@icarus/ui'
 
 export type FieldType = 'text' | 'select' | 'email' | 'tel' | 'date'
 

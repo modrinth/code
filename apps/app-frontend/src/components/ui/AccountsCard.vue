@@ -11,6 +11,12 @@
 				{{ formatMessage(messages.signInToMinecraft) }}
 			</button>
 		</ButtonStyled>
+		<ButtonStyled>
+			<button @click="addOfflineAccount()">
+				<PlusIcon />
+				{{ formatMessage(messages.addOfflineAccount) }}
+			</button>
+		</ButtonStyled>
 	</div>
 	<Accordion
 		v-else
@@ -32,7 +38,11 @@
 					<span class="truncate w-full text-left">{{
 						selectedAccount ? selectedAccount.profile.name : formatMessage(messages.selectAccount)
 					}}</span>
-					<span class="text-secondary text-xs">{{ formatMessage(messages.minecraftAccount) }}</span>
+					<span class="text-secondary text-xs">{{
+						selectedAccountIsOffline
+							? formatMessage(messages.offlineAccount)
+							: formatMessage(messages.minecraftAccount)
+					}}</span>
 				</div>
 			</div>
 		</template>
@@ -78,9 +88,54 @@
 						{{ formatMessage(messages.addAccount) }}
 					</button>
 				</ButtonStyled>
+				<ButtonStyled class="w-full">
+					<button @click="addOfflineAccount()">
+						<PlusIcon />
+						{{ formatMessage(messages.addOfflineAccount) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</Accordion>
+	<NewModal
+		ref="offlineAccountModal"
+		:header="formatMessage(messages.addOfflineAccount)"
+		width="500px"
+		max-width="500px"
+	>
+		<form class="space-y-4 w-full" @submit.prevent="submitOfflineAccount">
+			<label class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">
+					{{ formatMessage(messages.offlineUsernameLabel) }}
+				</span>
+				<StyledInput
+					v-model="offlineUsername"
+					:placeholder="formatMessage(messages.offlineUsernamePlaceholder)"
+					autocomplete="off"
+					wrapper-class="w-full"
+				/>
+			</label>
+			<p v-if="offlineUsernameError" class="m-0 text-sm text-red">
+				{{ offlineUsernameError }}
+			</p>
+		</form>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button @click="hideOfflineAccountModal()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="offlineAccountSaving" @click="submitOfflineAccount()">
+						<PlusIcon />
+						{{ formatMessage(messages.addOfflineAccount) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 </template>
 
 <script setup lang="ts">
@@ -91,20 +146,23 @@ import {
 	RadioButtonIcon,
 	SpinnerIcon,
 	TrashIcon,
-} from '@modrinth/assets'
+	XIcon,
+} from '@icarus/assets'
 import {
 	Accordion,
 	Avatar,
 	ButtonStyled,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	NewModal,
+	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import type { Ref } from 'vue'
 import { computed, onUnmounted, ref } from 'vue'
-
-import { trackEvent } from '@/helpers/analytics'
 import {
+	create_offline_user,
 	get_default_user,
 	login as login_flow,
 	remove_user,
@@ -129,13 +187,18 @@ type MinecraftCredential = {
 		id: string
 		name: string
 	}
+	access_token?: string
 }
 
 const accounts: Ref<MinecraftCredential[]> = ref([])
 const loginDisabled = ref(false)
+const offlineAccountSaving = ref(false)
 const defaultUser = ref<string | undefined>()
 const equippedSkin = ref<Skin | null>(null)
 const headUrlCache = ref(new Map<string, string>())
+const offlineAccountModal = ref<InstanceType<typeof NewModal>>()
+const offlineUsername = ref('')
+const offlineUsernameError = ref('')
 
 async function refreshValues() {
 	defaultUser.value = await get_default_user().catch(handleError)
@@ -175,6 +238,7 @@ await refreshValues()
 const selectedAccount = computed(() =>
 	accounts.value.find((account) => account.profile.id === defaultUser.value),
 )
+const selectedAccountIsOffline = computed(() => selectedAccount.value?.access_token === 'OFFLINE')
 
 const avatarUrl = computed(() => {
 	if (equippedSkin.value?.texture_key) {
@@ -218,7 +282,7 @@ async function login() {
 		await setAccount(loggedIn)
 	}
 
-	trackEvent('AccountLogIn')
+
 	loginDisabled.value = false
 }
 
@@ -230,7 +294,33 @@ async function logout(id: string) {
 	} else {
 		emit('change')
 	}
-	trackEvent('AccountLogOut')
+}
+
+async function addOfflineAccount() {
+	offlineUsername.value = ''
+	offlineUsernameError.value = ''
+	offlineAccountModal.value?.show()
+}
+
+function hideOfflineAccountModal() {
+	offlineAccountModal.value?.hide()
+}
+
+async function submitOfflineAccount() {
+	const trimmed = offlineUsername.value.trim()
+	if (!/^[A-Za-z0-9_]{3,16}$/.test(trimmed)) {
+		offlineUsernameError.value = formatMessage(messages.offlineUsernameInvalid)
+		return
+	}
+	offlineUsernameError.value = ''
+	offlineAccountSaving.value = true
+
+	const account = await create_offline_user(trimmed).catch(handleError)
+	if (account) {
+		await setAccount(account)
+		hideOfflineAccountModal()
+	}
+	offlineAccountSaving.value = false
 }
 
 const unlisten = await process_listener(async (e) => {
@@ -264,9 +354,30 @@ const messages = defineMessages({
 		id: 'minecraft-account.label',
 		defaultMessage: 'Minecraft account',
 	},
+	offlineAccount: {
+		id: 'minecraft-account.offline-label',
+		defaultMessage: 'Offline account',
+	},
 	signInToMinecraft: {
 		id: 'minecraft-account.sign-in',
 		defaultMessage: 'Sign in to Minecraft',
 	},
+	addOfflineAccount: {
+		id: 'minecraft-account.add-offline-account',
+		defaultMessage: 'Add offline account',
+	},
+	offlineUsernameLabel: {
+		id: 'minecraft-account.offline-username-label',
+		defaultMessage: 'Username',
+	},
+	offlineUsernamePlaceholder: {
+		id: 'minecraft-account.offline-username-placeholder',
+		defaultMessage: 'Player123',
+	},
+	offlineUsernameInvalid: {
+		id: 'minecraft-account.offline-username-invalid',
+		defaultMessage: "Invalid username. Use 3-16 characters: letters, numbers, '_'",
+	},
 })
 </script>
+

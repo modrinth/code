@@ -1,8 +1,8 @@
-import type { Archon } from '@modrinth/api-client'
+import type { Archon } from '@icarus/api-client'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, type ComputedRef, ref } from 'vue'
 
-import { injectModrinthClient } from '#ui/providers'
+import { injectIcarusClient } from '#ui/providers'
 
 type UpstreamRef = ComputedRef<Archon.Servers.v0.Server['upstream'] | null | undefined>
 
@@ -43,7 +43,7 @@ export function useServerImage(
 	upstream: UpstreamRef,
 	options: UseServerImageOptions = {},
 ) {
-	const client = injectModrinthClient()
+	const client = injectIcarusClient()
 	const localImage = ref<string | null | undefined>(undefined)
 	const iconSize = options.size ?? 512
 	const includeProjectFallback = options.includeProjectFallback ?? false

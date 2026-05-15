@@ -23,3 +23,4 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		</Text>
 	</StyledEmail>
 </template>
+

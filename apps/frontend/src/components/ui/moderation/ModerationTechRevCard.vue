@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	BugIcon,
 	CheckCircleIcon,
@@ -16,29 +16,28 @@ import {
 	ShieldCheckIcon,
 	TimerIcon,
 	TriangleAlertIcon,
-} from '@modrinth/assets'
-import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
+} from '@icarus/assets'
+import { type TechReviewContext, techReviewQuickReplies } from '@icarus/moderation'
 import {
 	Avatar,
 	ButtonStyled,
 	Collapsible,
 	CollapsibleRegion,
 	getProjectTypeIcon,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	OverflowMenu,
 	type OverflowMenuOption,
-	useFormatBytes,
 	useFormatDateTime,
-} from '@modrinth/ui'
-import { NavTabs } from '@modrinth/ui'
+} from '@icarus/ui'
+import { NavTabs } from '@icarus/ui'
 import {
 	capitalizeString,
 	formatProjectType,
 	highlightCodeLines,
 	type ThreadMessage,
 	type User,
-} from '@modrinth/utils'
+} from '@icarus/utils'
 import dayjs from 'dayjs'
 import { computed, reactive, ref, watch } from 'vue'
 
@@ -57,7 +56,6 @@ const formatDateTimeUtc = useFormatDateTime({
 	timeZoneName: 'short',
 	timeZone: 'UTC',
 })
-const formatBytes = useFormatBytes()
 
 type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
 	id: string
@@ -171,7 +169,7 @@ watch(selectedFile, (newFile) => {
 	}
 })
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 async function updateIssueDetails(data: { detail_id: string; verdict: 'safe' | 'unsafe' }[]) {
 	await client.request('/moderation/tech-review/issue-detail', {
@@ -363,6 +361,12 @@ const formattedDate = computed(() => {
 	if (diffDays === 1) return '1 day ago'
 	return `${diffDays} days ago`
 })
+
+function formatFileSize(bytes: number): string {
+	if (bytes < 1024) return `${bytes} B`
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KiB`
+	return `${(bytes / (1024 * 1024)).toFixed(2)} MiB`
+}
 
 function viewFileFlags(file: FlattenedFileReport) {
 	selectedFileId.value = file.id
@@ -847,7 +851,7 @@ const reviewSummaryPreview = computed(() => {
 		const fileVerdict = fileUnsafe > 0 ? 'Unsafe' : 'Safe'
 
 		markdown += `### ${fileData.fileName}\n`
-		markdown += `> ${formatBytes(fileData.fileSize)} • ${fileData.decisions.length} issues • Max severity: ${fileData.maxSeverity} • **Verdict:** ${fileVerdict}\n\n`
+		markdown += `> ${formatFileSize(fileData.fileSize)} • ${fileData.decisions.length} issues • Max severity: ${fileData.maxSeverity} • **Verdict:** ${fileVerdict}\n\n`
 		markdown += `<details>\n<summary>Issues (${fileSafe} safe, ${fileUnsafe} unsafe)</summary>\n\n`
 		markdown += `| Class | Issue Type | Severity | Decision |\n`
 		markdown += `|-------|------------|----------|----------|\n`
@@ -1075,7 +1079,6 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 				mode="local"
 				:links="navTabsLinks"
 				:active-index="activeTabIndex"
-				class="bg-surface-3! shadow-none!"
 				@tab-click="handleTabClick"
 			/>
 		</div>
@@ -1088,7 +1091,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					collapse-text="Collapse thread"
 					class="border-x border-b border-solid border-surface-3"
 				>
-					<div class="bg-surface-2 pt-0">
+					<div class="bg-surface-2 p-4 pt-0">
 						<!-- DEV-531 -->
 						<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
 						<ThreadView
@@ -1147,7 +1150,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 						</span>
 						<div class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1">
 							<span class="text-sm font-medium text-secondary">{{
-								formatBytes(file.file_size)
+								formatFileSize(file.file_size)
 							}}</span>
 						</div>
 						<div
@@ -1488,3 +1491,4 @@ pre {
 	opacity: 0;
 }
 </style>
+

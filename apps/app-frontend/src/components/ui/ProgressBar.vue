@@ -37,6 +37,6 @@ defineProps({
 
 .progress-bar__fill {
 	height: 100%;
-	transition: width 0.3s ease-out;
+	transition: width 0.3s;
 }
 </style>

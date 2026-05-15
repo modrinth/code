@@ -112,8 +112,8 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, DownloadIcon, XIcon } from '@modrinth/assets'
-import { commonMessages } from '@modrinth/ui'
+import { CheckIcon, DownloadIcon, XIcon } from '@icarus/assets'
+import { commonMessages } from '@icarus/ui'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -126,11 +126,11 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	openingApp: {
 		id: 'modal.open-in-app.title',
-		defaultMessage: 'Opening Modrinth App',
+		defaultMessage: 'Opening Icarus Launcher',
 	},
 	whyUseApp: {
 		id: 'modal.open-in-app.why-use',
-		defaultMessage: 'Why use the Modrinth App',
+		defaultMessage: 'Why use Icarus Launcher',
 	},
 	benefitLaunch: {
 		id: 'modal.open-in-app.benefit.launch',
@@ -146,11 +146,11 @@ const messages = defineMessages({
 	},
 	openingAutomatically: {
 		id: 'modal.open-in-app.opening-automatically',
-		defaultMessage: 'The Modrinth App will open automatically...',
+		defaultMessage: 'Icarus Launcher will open automatically...',
 	},
 	getApp: {
 		id: 'modal.open-in-app.get-app',
-		defaultMessage: 'Get Modrinth App',
+		defaultMessage: 'Get Icarus Launcher',
 	},
 })
 
@@ -184,7 +184,7 @@ const serverProject = ref<ServerProject>({
 	region: '',
 })
 const appLink = computed(() => {
-	return `modrinth://server/${serverProject.value.slug}`
+	return `Icarus://server/${serverProject.value.slug}`
 })
 
 function startCountdown() {
@@ -331,3 +331,4 @@ defineExpose({ show, hide, open })
 	z-index: 1;
 }
 </style>
+

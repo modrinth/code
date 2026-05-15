@@ -1,5 +1,5 @@
 <script setup>
-import { TrashIcon, UploadIcon } from '@modrinth/assets'
+import { TrashIcon, UploadIcon } from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -9,7 +9,7 @@ import {
 	StyledInput,
 	UnsavedChangesPopup,
 	useSavable,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 import { injectOrganizationContext } from '~/providers/organization-context.ts'
 

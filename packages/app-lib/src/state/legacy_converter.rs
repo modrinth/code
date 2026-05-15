@@ -57,7 +57,6 @@ where
         settings.collapsed_navigation = legacy_settings.collapsed_navigation;
         settings.advanced_rendering = legacy_settings.advanced_rendering;
         settings.native_decorations = legacy_settings.native_decorations;
-        settings.telemetry = !legacy_settings.opt_out_analytics;
         settings.discord_rpc = !legacy_settings.disable_discord_rpc;
         settings.developer_mode = legacy_settings.developer_mode;
         settings.onboarded = legacy_settings.fully_onboarded;
@@ -368,6 +367,8 @@ where
                             .and_then(|x| x.wrapper.clone()),
                         post_exit: profile.hooks.and_then(|x| x.post_exit),
                     },
+                    sync_enabled: true,
+                    sync_overrides: None,
                 }
                 .upsert(exec)
                 .await?;
@@ -419,8 +420,6 @@ struct LegacySettings {
     pub default_page: LegacyDefaultPage,
     #[serde(default)]
     pub developer_mode: bool,
-    #[serde(default)]
-    pub opt_out_analytics: bool,
     #[serde(default)]
     pub advanced_rendering: bool,
     #[serde(default)]

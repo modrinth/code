@@ -236,7 +236,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	CircleAlertIcon,
 	DownloadIcon,
@@ -247,8 +247,8 @@ import {
 	SpinnerIcon,
 	TriangleAlertIcon,
 	XIcon,
-} from '@modrinth/assets'
-import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
+} from '@icarus/assets'
+import { capitalizeString, renderHighlightedString } from '@icarus/utils'
 import { useTimeoutFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 

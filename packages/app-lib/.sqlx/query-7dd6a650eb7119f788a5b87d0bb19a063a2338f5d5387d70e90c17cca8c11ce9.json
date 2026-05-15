@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO minecraft_device_tokens (id, uuid, private_key, x, y, issue_instant, not_after, token, display_claims)\n            VALUES (0, $1, $2, $3, $4, $5, $6, $7, $8)\n            ON CONFLICT (id) DO UPDATE SET\n                uuid = $1,\n                private_key = $2,\n                x = $3,\n                y = $4,\n                issue_instant = $5,\n                not_after = $6,\n                token = $7,\n                display_claims = json($8)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "7dd6a650eb7119f788a5b87d0bb19a063a2338f5d5387d70e90c17cca8c11ce9"
+}

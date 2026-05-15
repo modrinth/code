@@ -1,31 +1,17 @@
 <template>
 	<div>
-		<section>
+		<section class="universal-card">
 			<Breadcrumbs
 				v-if="breadcrumbsStack"
 				:current-title="`Report ${reportId}`"
 				:link-stack="breadcrumbsStack"
 			/>
 			<h2>Report details</h2>
-			<ReportInfo
-				:report="report"
-				:show-thread="false"
-				:show-message="false"
-				:auth="auth"
-				class="card-shadow mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-2 p-4"
-			/>
+			<ReportInfo :report="report" :show-thread="false" :show-message="false" :auth="auth" />
 		</section>
-		<section
-			v-if="report && thread"
-			class="card-shadow rounded-2xl border border-solid border-surface-4 bg-surface-3"
-		>
-			<h2 class="m-4 mb-2 text-xl font-semibold text-contrast">Messages with the moderators</h2>
-			<p class="mx-4 mt-0">
-				Make sure to include evidence of all claims you make, or your report may be closed without
-				action.
-			</p>
+		<section v-if="report && thread" class="universal-card">
+			<h2>Messages</h2>
 			<ConversationThread
-				class="overflow-clip rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2"
 				:thread="thread"
 				:report="report"
 				:auth="auth"
@@ -35,7 +21,7 @@
 	</div>
 </template>
 <script setup>
-import { injectModrinthClient } from '@modrinth/ui'
+import { injectIcarusClient } from '@icarus/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
@@ -59,7 +45,7 @@ const props = defineProps({
 	},
 })
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
 
 // Fetch raw report
@@ -148,3 +134,4 @@ async function updateThread(newThread) {
 	flex-direction: column;
 }
 </style>
+

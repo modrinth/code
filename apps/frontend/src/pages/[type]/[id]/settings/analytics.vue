@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { injectProjectPageContext } from '@modrinth/ui'
+import { injectProjectPageContext } from '@icarus/ui'
 
 import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
 

@@ -42,7 +42,7 @@
     "message": "Advanced rendering"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Select your preferred color theme for Modrinth App."
+    "message": "Select your preferred color theme for Icarus Launcher."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Color theme"
@@ -93,7 +93,7 @@
     "message": "Toggle sidebar"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "If you attempt to install a Modrinth Pack file (.mrpack) that isn't hosted on Modrinth, we'll make sure you understand the risks before installing it."
+    "message": "If you attempt to install a Icarus Pack file (.mrpack) that isn't hosted on Icarus, we'll make sure you understand the risks before installing it."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Warn me before installing unknown modpacks"
@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Cannot reach authentication servers"
   },
-  "app.browse.add-servers-to-instance": {
-    "message": "Adding server to instance"
+  "app.browse.add-server-to-instance": {
+    "message": "Add server to instance"
   },
-  "app.browse.add-to-an-instance": {
-    "message": "Add to an instance"
+  "app.browse.add-servers-to-instance": {
+    "message": "Add servers to your instance"
   },
   "app.browse.add-to-instance": {
     "message": "Add to instance"
@@ -122,9 +122,6 @@
   "app.browse.already-added": {
     "message": "Already added"
   },
-  "app.browse.back-to-instance": {
-    "message": "Back to instance"
-  },
   "app.browse.discover-content": {
     "message": "Discover content"
   },
@@ -134,11 +131,20 @@
   "app.browse.hide-added-servers": {
     "message": "Hide already added servers"
   },
+  "app.browse.hide-installed-content": {
+    "message": "Hide already installed content"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Install content to instance"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
   },
-  "app.browse.server-instance-content-warning": {
-    "message": "Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content."
+  "app.browse.server.install": {
+    "message": "Install"
+  },
+  "app.browse.server.installed": {
+    "message": "Installed"
   },
   "app.browse.server.installing": {
     "message": "Installing"
@@ -158,9 +164,6 @@
   "app.export-modal.header": {
     "message": "Export modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Include \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpack Name"
   },
@@ -168,7 +171,7 @@
     "message": "Modpack name"
   },
   "app.export-modal.select-files-label": {
-    "message": "Configure which files are included in this export"
+    "message": "Select files and folders to include in pack"
   },
   "app.export-modal.version-number-label": {
     "message": "Version number"
@@ -279,7 +282,7 @@
     "message": "Required modpack"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "This server requires mods to play. Click Install to set up the required files from Modrinth, then launch directly into the server."
+    "message": "This server requires mods to play. Click Install to set up the required files from Icarus, then launch directly into the server."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Shared instance"
@@ -298,15 +301,6 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to the latest version to launch the game."
-  },
-  "app.project.install-button.already-installed": {
-    "message": "This project is already installed"
-  },
-  "app.project.install-context.back-to-browse": {
-    "message": "Back to discover"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Install content to instance"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
@@ -333,16 +327,16 @@
     "message": "Resource management"
   },
   "app.update-popup.body": {
-    "message": "Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App."
+    "message": "Icarus Launcher v{version} is ready to install! Reload to update now, or automatically when you close Icarus Launcher."
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
+    "message": "Icarus Launcher v{version} has finished downloading. Reload to update now, or automatically when you close Icarus Launcher."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} is available. Use your package manager to update for the latest features and fixes!"
+    "message": "Icarus Launcher v{version} is available. Use your package manager to update for the latest features and fixes!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} is available now! Since you're on a metered network, we didn't automatically download it."
+    "message": "Icarus Launcher v{version} is available now! Since you're on a metered network, we didn't automatically download it."
   },
   "app.update-popup.changelog": {
     "message": "Changelog"
@@ -375,7 +369,7 @@
     "message": "Reload to install update"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "example.Icarus.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Select an option"
@@ -408,10 +402,10 @@
     "message": "It may be different from their Minecraft username!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Enter Modrinth username..."
+    "message": "Enter Icarus username..."
   },
   "friends.add-friend.username.title": {
-    "message": "What's your friend's Modrinth username?"
+    "message": "What's your friend's Icarus username?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Add friends</link> to see what they're playing!"
@@ -453,7 +447,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!"
+    "message": "<link>Sign in to a Icarus account</link> to add friends and see what they're playing!"
   },
   "instance.add-server.add-and-play": {
     "message": "Add and play"
@@ -741,7 +735,7 @@
     "message": "Loader is provided by the server"
   },
   "unknown-pack-warning-modal.body": {
-    "message": "A file is only reviewed if it’s uploaded to Modrinth, regardless of its file format (including .mrpack)."
+    "message": "A file is only reviewed if it’s uploaded to Icarus, regardless of its file format (including .mrpack)."
   },
   "unknown-pack-warning-modal.dont-show-again": {
     "message": "Don't show this warning again"
@@ -756,9 +750,10 @@
     "message": "Malware is often distributed through modpack files by sharing them on platforms like Discord."
   },
   "unknown-pack-warning-modal.warning.body": {
-    "message": "We couldn't find this file on Modrinth. We strongly recommend only installing files from sources you trust."
+    "message": "We couldn't find this file on Icarus. We strongly recommend only installing files from sources you trust."
   },
   "unknown-pack-warning-modal.warning.title": {
     "message": "Unknown file warning"
   }
 }
+

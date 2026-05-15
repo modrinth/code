@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EditIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
+import { EditIcon, TrashIcon, UploadIcon } from '@icarus/assets'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { Avatar, OverflowMenu } from '../index'

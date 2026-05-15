@@ -1,5 +1,5 @@
-import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
-import { injectModrinthClient } from '@modrinth/ui'
+import type { AbstractModrinthClient, Labrinth } from '@icarus/api-client'
+import { injectIcarusClient } from '@icarus/ui'
 import { computed, proxyRefs, ref } from 'vue'
 
 import {
@@ -93,7 +93,7 @@ function persistedPayload(
 	}
 }
 
-function createModerationQueueState(client: AbstractModrinthClient = injectModrinthClient()) {
+function createModerationQueueState(client: AbstractModrinthClient = injectIcarusClient()) {
 	const currentQueue = ref(createEmptyQueue())
 	const currentLock = ref<{ projectId: string; lockedAt: Date } | null>(null)
 	const isQueueMode = ref(false)

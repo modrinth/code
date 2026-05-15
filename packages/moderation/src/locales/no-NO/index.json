@@ -12,7 +12,7 @@
     "defaultMessage": "Legg til et ikon"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Legg til alle relevante lenker målrettet utenfor Modrinth, som kildekode, en problemssporingssystem, eller en Discord-invitasjon."
+    "defaultMessage": "Legg til alle relevante lenker målrettet utenfor Icarus, som kildekode, en problemssporingssystem, eller en Discord-invitasjon."
   },
   "nags.add-links.title": {
     "defaultMessage": "Legg til eksterne lenker"
@@ -204,4 +204,5 @@
     "defaultMessage": "Gå til lisensinnstillinger"
   }
 }
+
 

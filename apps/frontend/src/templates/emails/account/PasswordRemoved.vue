@@ -15,7 +15,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		<Text class="text-muted text-base">
 			At your request, your password has been removed from your account. You must now use a linked
 			authentication provider (such as your {passremoved.provider} account) to log into your
-			Modrinth account.</Text
+			Icarus account.</Text
 		>
 		<Text class="text-muted text-base">
 			If you did not make this change, please contact us immediately through our
@@ -24,3 +24,4 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		</Text>
 	</StyledEmail>
 </template>
+

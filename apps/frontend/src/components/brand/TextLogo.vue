@@ -9,7 +9,7 @@
 		viewBox="0 0 3307 593"
 		:class="{ animate: loading }"
 	>
-		<!-- modrinth -->
+		<!-- Icarus -->
 		<path
 			v-if="api === 'prod'"
 			fill="currentColor"
@@ -98,3 +98,4 @@ const api = computed(() => {
 	}
 }
 </style>
+

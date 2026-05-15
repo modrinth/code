@@ -1,15 +1,15 @@
 use serde::{Deserialize, Serialize};
 use tauri::Runtime;
 use tauri_plugin_opener::OpenerExt;
-use theseus::{
+use pteron::{
     handler,
     prelude::{CommandPayload, DirectoryInfo},
 };
 
-use crate::api::{Result, TheseusSerializableError};
+use crate::api::{Result, PteronSerializableError};
 use dashmap::DashMap;
 use std::path::{Path, PathBuf};
-use theseus::prelude::canonicalize;
+use pteron::prelude::canonicalize;
 use url::Url;
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
@@ -49,7 +49,7 @@ pub fn get_os() -> OS {
 
 #[tauri::command]
 pub async fn is_network_metered() -> Result<bool> {
-    Ok(theseus::prelude::is_network_metered().await?)
+    Ok(pteron::prelude::is_network_metered().await?)
 }
 
 // Lists active progress bars
@@ -57,8 +57,8 @@ pub async fn is_network_metered() -> Result<bool> {
 // Values provided should not be used directly, as they are not guaranteed to be up-to-date
 #[tauri::command]
 pub async fn progress_bars_list()
--> Result<DashMap<uuid::Uuid, theseus::LoadingBar>> {
-    let res = theseus::EventState::list_progress_bars().await?;
+-> Result<DashMap<uuid::Uuid, pteron::LoadingBar>> {
+    let res = pteron::EventState::list_progress_bars().await?;
     Ok(res)
 }
 
@@ -159,7 +159,7 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 // We hijack the deep link library (which also contains functionality for instance-checking)
 pub async fn handle_command(command: String) -> Result<()> {
     tracing::info!("handle command: {command}");
-    Ok(theseus::handler::parse_and_emit_command(&command).await?)
+    Ok(pteron::handler::parse_and_emit_command(&command).await?)
 }
 
 // Remove when (and if) https://github.com/tauri-apps/tauri/issues/12022 is implemented
@@ -169,20 +169,20 @@ pub(crate) fn tauri_convert_file_src(path: &Path) -> Result<Url> {
     #[cfg(not(any(windows, target_os = "android")))]
     const BASE: &str = "asset://localhost/";
 
-    macro_rules! theseus_try {
+    macro_rules! pteron_try {
         ($test:expr) => {
             match $test {
                 Ok(val) => val,
                 Err(e) => {
-                    return Err(TheseusSerializableError::Theseus(e.into()))
+                    return Err(PteronSerializableError::Theseus(e.into()))
                 }
             }
         };
     }
 
-    let path = theseus_try!(canonicalize(path));
+    let path = pteron_try!(canonicalize(path));
     let path = path.to_string_lossy();
     let encoded = urlencoding::encode(&path);
 
-    Ok(theseus_try!(Url::parse(&format!("{BASE}{encoded}"))))
+    Ok(pteron_try!(Url::parse(&format!("{BASE}{encoded}"))))
 }

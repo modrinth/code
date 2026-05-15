@@ -259,8 +259,8 @@
 	</div>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { CalendarIcon, DownloadIcon, getLoaderIcon, PlusIcon, StarIcon } from '@modrinth/assets'
+import type { Labrinth } from '@icarus/api-client'
+import { CalendarIcon, DownloadIcon, getLoaderIcon, PlusIcon, StarIcon } from '@icarus/assets'
 import {
 	AutoLink,
 	ButtonStyled,
@@ -268,12 +268,16 @@ import {
 	Pagination,
 	TagItem,
 	useCompactNumber,
-	useFormatBytes,
 	useFormatDateTime,
 	VersionChannelIndicator,
 	VersionFilterControl,
-} from '@modrinth/ui'
-import { formatVersionsForDisplay, type GameVersionTag, type Version } from '@modrinth/utils'
+} from '@icarus/ui'
+import {
+	formatBytes,
+	formatVersionsForDisplay,
+	type GameVersionTag,
+	type Version,
+} from '@icarus/utils'
 import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -289,7 +293,6 @@ const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
 })
-const formatBytes = useFormatBytes()
 
 type VersionWithDisplayUrlEnding = Version & {
 	displayUrlEnding: string

@@ -33,8 +33,14 @@ export interface AuthConfig extends FeatureConfig {
  *
  * @example
  * ```typescript
+ * // Static token
  * const auth = new AuthFeature({
- *   token: async () => process.env.MODRINTH_TOKEN
+ *   token: 'mrp_...'
+ * })
+ *
+ * // Dynamic token (e.g., from auth state)
+ * const auth = new AuthFeature({
+ *   token: async () => await getAuthToken()
  * })
  * ```
  */

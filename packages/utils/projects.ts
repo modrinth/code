@@ -1,4 +1,4 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 // noinspection JSUnusedGlobalSymbols
 
 export const isApproved = (project) => {

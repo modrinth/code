@@ -72,9 +72,9 @@
 	</ContentPageHeader>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, HeartIcon } from '@modrinth/assets'
-import { capitalizeString, type Project } from '@modrinth/utils'
+import type { Labrinth } from '@icarus/api-client'
+import { DownloadIcon, HeartIcon } from '@icarus/assets'
+import { capitalizeString, type Project } from '@icarus/utils'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 

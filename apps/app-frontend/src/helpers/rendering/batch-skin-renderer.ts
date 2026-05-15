@@ -1,11 +1,11 @@
-import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
+import { ClassicPlayerModel, SlimPlayerModel } from '@icarus/assets'
 import {
 	applyCapeTexture,
 	createTransparentTexture,
 	disposeCaches,
 	loadTexture,
 	setupSkinModel,
-} from '@modrinth/utils'
+} from '@icarus/utils'
 import * as THREE from 'three'
 import { reactive } from 'vue'
 

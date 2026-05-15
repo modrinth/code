@@ -1,11 +1,10 @@
 <template>
 	<div
-		class="message px-4 py-3"
+		class="message"
 		:class="{
 			'has-body': message.body.type === 'text' && !forceCompact,
 			'no-actions': noLinks,
 			private: isPrivateMessage,
-			'show-private-bg': flags.showModeratorPrivateMessageHighlight,
 		}"
 	>
 		<template v-if="members[message.author_id]">
@@ -23,18 +22,18 @@
 				/>
 			</AutoLink>
 			<span :class="`message__author role-${members[message.author_id].role}`">
+				<LockIcon
+					v-if="isPrivateMessage"
+					v-tooltip="'Only visible to moderators'"
+					class="private-icon"
+				/>
 				<AutoLink :to="noLinks ? '' : `/user/${members[message.author_id].username}`">
 					{{ members[message.author_id].username }}
 				</AutoLink>
 				<ScaleIcon v-if="members[message.author_id].role === 'moderator'" v-tooltip="'Moderator'" />
-				<ModrinthIcon
+				<IcarusIcon
 					v-else-if="members[message.author_id].role === 'admin'"
-					v-tooltip="'Modrinth Team'"
-				/>
-				<EyeOffIcon
-					v-if="isPrivateMessage"
-					v-tooltip="'Only visible to moderators'"
-					class="ml-1 text-orange"
+					v-tooltip="'Icarus Team'"
 				/>
 				<MicrophoneIcon
 					v-if="report && message.author_id === report.reporter_user?.id"
@@ -79,12 +78,6 @@
 			<template v-else-if="message.body.type === 'status_change'">
 				<span v-if="message.body.new_status === 'processing'">
 					submitted the project for review.
-				</span>
-				<span v-else-if="message.body.old_status === 'processing'">
-					reviewed the project and set its status to <Badge :type="message.body.new_status" />.
-				</span>
-				<span v-else-if="message.body.new_status === 'draft'">
-					reverted this project back to a <Badge :type="message.body.new_status" />.
 				</span>
 				<span v-else>
 					changed the project's status from <Badge :type="message.body.old_status" /> to
@@ -133,13 +126,13 @@
 
 <script setup>
 import {
-	EyeOffIcon,
+	LockIcon,
 	MicrophoneIcon,
-	ModrinthIcon,
+	IcarusIcon,
 	MoreHorizontalIcon,
 	ScaleIcon,
 	TrashIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	AutoLink,
 	Avatar,
@@ -148,8 +141,8 @@ import {
 	OverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,
-} from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
+} from '@icarus/ui'
+import { renderString } from '@icarus/utils'
 
 import { isStaff } from '~/helpers/users.js'
 
@@ -185,7 +178,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update-thread'])
-const flags = useFeatureFlags()
 
 const formattedMessage = computed(() => {
 	const body = renderString(props.message.body.body)
@@ -230,13 +222,15 @@ async function deleteMessage() {
 
 <style lang="scss" scoped>
 .message {
+	--gap-size: var(--spacing-card-xs);
 	display: flex;
 	flex-direction: row;
-	gap: var(--spacing-card-sm);
+	gap: var(--gap-size);
 	flex-wrap: wrap;
 	align-items: center;
+	border-radius: var(--size-rounded-card);
+	padding: var(--spacing-card-md);
 	word-break: break-word;
-	position: relative;
 
 	.avatar,
 	.backed-svg {
@@ -244,12 +238,14 @@ async function deleteMessage() {
 	}
 
 	&.has-body {
+		--gap-size: var(--spacing-card-sm);
 		display: grid;
 		grid-template:
 			'icon author actions'
 			'icon body actions'
 			'date date date';
 		grid-template-columns: min-content auto 1fr;
+		column-gap: var(--gap-size);
 		row-gap: var(--spacing-card-xs);
 
 		.message__icon {
@@ -264,20 +260,11 @@ async function deleteMessage() {
 
 	&:not(.no-actions):hover,
 	&:not(.no-actions):focus-within {
-		background-color: var(--surface-2-5);
+		background-color: var(--color-table-alternate-row);
 
 		.message__actions {
 			opacity: 1;
 		}
-	}
-
-	&.private.show-private-bg::before {
-		content: '';
-		inset: 0;
-		position: absolute;
-		background-color: var(--color-orange);
-		opacity: 0.05;
-		pointer-events: none;
 	}
 
 	&.no-actions {
@@ -359,6 +346,10 @@ a:active + .message__author a,
 	color: var(--color-purple);
 }
 
+.private-icon {
+	color: var(--color-gray);
+}
+
 @media screen and (min-width: 600px) {
 	.message {
 		//grid-template:
@@ -372,7 +363,6 @@ a:active + .message__author a,
 				'icon body actions'
 				'date date date';
 			grid-template-columns: min-content auto 1fr;
-			grid-template-rows: min-content 1fr auto;
 		}
 	}
 }
@@ -387,7 +377,7 @@ a:active + .message__author a,
 				'icon author date actions'
 				'icon body body actions';
 			grid-template-columns: min-content auto 1fr;
-			grid-template-rows: min-content 1fr;
+			grid-template-rows: min-content 1fr auto;
 		}
 	}
 }
@@ -400,3 +390,4 @@ a:active + .message__author a,
 	--size: 2rem !important;
 }
 </style>
+

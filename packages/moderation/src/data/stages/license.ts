@@ -1,4 +1,4 @@
-import { BookTextIcon } from '@modrinth/assets'
+import { BookTextIcon } from '@icarus/assets'
 
 import type { Stage } from '../../types/stage'
 

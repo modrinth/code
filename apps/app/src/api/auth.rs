@@ -2,13 +2,14 @@ use crate::api::Result;
 use chrono::{Duration, Utc};
 use tauri::plugin::TauriPlugin;
 use tauri::{Manager, Runtime, UserAttentionType};
-use theseus::prelude::*;
+use pteron::prelude::*;
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::<R>::new("auth")
         .invoke_handler(tauri::generate_handler![
             check_reachable,
             login,
+            create_offline_user,
             remove_user,
             get_default_user,
             set_default_user,
@@ -43,7 +44,7 @@ pub async fn login<R: Runtime>(
         "signin",
         tauri::WebviewUrl::External(flow.auth_request_uri.parse().map_err(
             |_| {
-                theseus::ErrorKind::OtherError(
+                pteron::ErrorKind::OtherError(
                     "Error parsing auth redirect URL".to_string(),
                 )
                 .as_error()
@@ -81,6 +82,11 @@ pub async fn login<R: Runtime>(
 
     window.close()?;
     Ok(None)
+}
+
+#[tauri::command]
+pub async fn create_offline_user(username: String) -> Result<Credentials> {
+    Ok(minecraft_auth::create_offline_user(&username).await?)
 }
 
 #[tauri::command]

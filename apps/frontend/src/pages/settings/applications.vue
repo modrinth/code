@@ -241,7 +241,7 @@
 	</div>
 </template>
 <script setup>
-import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
+import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -252,14 +252,14 @@ import {
 	CopyCode,
 	defineMessages,
 	FileInput,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	IntlFormatted,
 	normalizeChildren,
 	StyledInput,
 	useFormatDateTime,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import Modal from '~/components/ui/Modal.vue'
@@ -272,7 +272,7 @@ import {
 	useScopes,
 } from '~/composables/auth/scopes.ts'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatDate = useFormatDateTime()
@@ -374,7 +374,7 @@ const messages = defineMessages({
 	descriptionIntro: {
 		id: 'settings.applications.description.intro',
 		defaultMessage:
-			"Applications can be used to authenticate Modrinth's users with your products. For more information, see <docs-link>Modrinth's API documentation</docs-link>.",
+			"Applications can be used to authenticate Icarus's users with your products. For more information, see <docs-link>Icarus's API documentation</docs-link>.",
 	},
 	aboutLabel: {
 		id: 'settings.applications.about',
@@ -415,7 +415,7 @@ const messages = defineMessages({
 })
 
 useHead({
-	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
+	title: () => `${formatMessage(messages.headTitle)} - Icarus`,
 })
 
 const { scopesToLabels } = useScopes()
@@ -760,3 +760,4 @@ async function removeApp() {
 	}
 }
 </style>
+

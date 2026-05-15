@@ -3,16 +3,16 @@ import {
 	clearNodeAuthState,
 	setNodeAuthState,
 	type UploadState,
-} from '@modrinth/api-client'
-import type { Stats } from '@modrinth/utils'
+} from '@icarus/api-client'
+import type { Stats } from '@icarus/utils'
 import type { ComputedRef, Ref } from 'vue'
 import { computed, ref } from 'vue'
 
 import type { FileOperation } from '../layouts/shared/files-tab/types'
-import { injectModrinthClient, provideModrinthServerContext } from '../providers'
+import { injectIcarusClient, provideIcarusServerContext } from '../providers'
 import type { BusyReason } from '../providers/server-context'
 import { defineMessage } from './i18n'
-import { useModrinthServersConsole } from './server-console'
+import { useIcarusServersConsole } from './server-console'
 
 type ReadableRef<T> = Ref<T> | ComputedRef<T>
 type SocketUnsubscriber = () => void
@@ -81,8 +81,8 @@ const mapPowerStateFromStateEvent = (
 }
 
 export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOptions) {
-	const client = injectModrinthClient()
-	const modrinthServersConsole = useModrinthServersConsole()
+	const client = injectIcarusClient()
+	const modrinthServersConsole = useIcarusServersConsole()
 
 	const shouldProcessEvent = () => (options.eventGuard ? options.eventGuard() : true)
 
@@ -385,7 +385,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		fsAuth.value = await client.archon.servers_v0.getFilesystemAuth(options.serverId.value)
 	}
 
-	provideModrinthServerContext({
+	provideIcarusServerContext({
 		get serverId() {
 			return options.serverId.value
 		},

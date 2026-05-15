@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Modrinth AppのLinux版は、特定のシステムや構成において<issues-link>問題が発生することが確認されています</issues-link>。お使いのシステムでModrinthアプリが不安定な場合は、Modrinthコンテンツを簡単にインストールできる<prism-link>Prism Launcher</prism-link>などの他のランチャーをお試しください。"
+    "message": "Icarus LauncherのLinux版は、特定のシステムや構成において<issues-link>問題が発生することが確認されています</issues-link>。お使いのシステムでIcarusアプリが不安定な場合は、Icarusコンテンツを簡単にインストールできる<prism-link>Prism Launcher</prism-link>などの他のランチャーをお試しください。"
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -39,10 +39,10 @@
     "message": "ダウンロードオプション"
   },
   "app-marketing.download.terms": {
-    "message": "Modrinth Appをダウンロードすることで、<terms-link>利用規約</terms-link>および <privacy-link>プライバシーポリシー</privacy-link> に同意したとみなします。"
+    "message": "Icarus Launcherをダウンロードすることで、<terms-link>利用規約</terms-link>および <privacy-link>プライバシーポリシー</privacy-link> に同意したとみなします。"
   },
   "app-marketing.download.title": {
-    "message": "Modrinth App (ベータ版) をダウンロードする"
+    "message": "Icarus Launcher (ベータ版) をダウンロードする"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "プロジェクトをフォローする"
   },
   "app-marketing.features.importing.description": {
-    "message": "以前使用していたランチャーからお気に入りのプロファイルをすべてインポートし、Modrinth Appをすぐに使い始めましょう！"
+    "message": "以前使用していたランチャーからお気に入りのプロファイルをすべてインポートし、Icarus Launcherをすぐに使い始めましょう！"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "{author} より"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinthを使えば、すべてのModを一箇所で簡単に管理できます。ワンクリックでModのインストール、アンインストール、アップデートが可能です。"
+    "message": "Icarusを使えば、すべてのModを一箇所で簡単に管理できます。ワンクリックでModのインストール、アンインストール、アップデートが可能です。"
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "インストールされたMod"
@@ -96,7 +96,7 @@
     "message": "オフラインモード"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinthのランチャーは完全にオープンソースです。ソースコードは<github-link>GitHub</github-link>にてご覧いただけます！"
+    "message": "Icarusのランチャーは完全にオープンソースです。ソースコードは<github-link>GitHub</github-link>にてご覧いただけます！"
   },
   "app-marketing.features.open-source.title": {
     "message": "オープンソース"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth AppのRAM使用量は、わずか150MB。多くの主要なModマネージャーよりも効率的です！"
+    "message": "Icarus LauncherのRAM使用量は、わずか150MB。多くの主要なModマネージャーよりも効率的です！"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -128,8 +128,8 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
-  "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth App"
+  "app-marketing.features.performance.Icarus-app": {
+    "message": "Icarus Launcher"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "10億%"
@@ -147,13 +147,13 @@
     "message": "効率的"
   },
   "app-marketing.features.play.description": {
-    "message": "Modrinth Appを使用して、お気に入りのModとModパックをダウンロードしてプレイしましょう。"
+    "message": "Icarus Launcherを使用して、お気に入りのModとModパックをダウンロードしてプレイしましょう。"
   },
   "app-marketing.features.play.title": {
     "message": "お気に入りのModで遊ぶ"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Modrinthでホストされている何千ものModやModパックのいずれかを使用して、Modパックを構築、共有、プレイできます。"
+    "message": "Icarusでホストされている何千ものModやModパックのいずれかを使用して、Modパックを構築、共有、プレイできます。"
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modパック"
@@ -168,7 +168,7 @@
     "message": "他のランチャーと異なる点"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth Appはウェブサイトと完全に統合されているため、あなたはすべてのお気に入りのプロジェクトにアプリからアクセスできます！"
+    "message": "Icarus Launcherはウェブサイトと完全に統合されているため、あなたはすべてのお気に入りのプロジェクトにアプリからアクセスできます！"
   },
   "app-marketing.features.website.title": {
     "message": "ウェブサイトとの統合"
@@ -177,19 +177,19 @@
     "message": "以前に使用したことある"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Modrinth Appのスクリーンショット。Cobblemonインスタンスで「コンテンツ」ページが開かれている。"
+    "message": "Icarus Launcherのスクリーンショット。Cobblemonインスタンスで「コンテンツ」ページが開かれている。"
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth Appは、お気に入りのModで遊んだり、アップデートを簡単に管理できる、独自のオープンソースランチャーです。"
+    "message": "Icarus Launcherは、お気に入りのModで遊んだり、アップデートを簡単に管理できる、独自のオープンソースランチャーです。"
   },
   "app-marketing.hero.download-button": {
-    "message": "Modrinth Appをダウンロードする"
+    "message": "Icarus Launcherをダウンロードする"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "Modrinth Appをダウンロードする"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "Icarus Launcherをダウンロードする"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "{os}向けのModrinth Appをダウンロード"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "{os}向けのIcarus Launcherをダウンロード"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Cobblemonインスタンスのメインメニューのスクリーンショット。"
@@ -282,7 +282,7 @@
     "message": "アカウントを作成"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
+    "message": "アカウントを作成すると、Icarusの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "パスワードが一致しません！"
@@ -291,7 +291,7 @@
     "message": "すでにアカウントをお持ちですか？"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Modrinthのアップデートを受け取る"
+    "message": "Icarusのアップデートを受け取る"
   },
   "auth.sign-up.title": {
     "message": "アカウント作成"
@@ -333,16 +333,16 @@
     "message": "メールアドレスを確認"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Modrinthのアップデートを受け取る"
+    "message": "Icarusのアップデートを受け取る"
   },
   "auth.welcome.description": {
     "message": "素晴らしいModの開発や導入、アップデートを日々行っている、クリエイターと冒険者たちの活気あるコミュニティへようこそ。"
   },
   "auth.welcome.label.tos": {
-    "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
+    "message": "アカウントを作成すると、Icarusの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
   },
   "auth.welcome.long-title": {
-    "message": "Modrinthへようこそ！"
+    "message": "Icarusへようこそ！"
   },
   "auth.welcome.title": {
     "message": "ようこそ"
@@ -372,7 +372,7 @@
     "message": "本当にこのコレクションを削除しますか？"
   },
   "collection.description": {
-    "message": "{description} - Modrinth の {username} によるコレクション {name} を表示します"
+    "message": "{description} - Icarus の {username} によるコレクション {name} を表示します"
   },
   "collection.description.following": {
     "message": "あなたがフォローしているプロジェクトがすべて含まれた自動生成のコレクションです。"
@@ -554,9 +554,6 @@
   "dashboard.affiliate-links.create.button": {
     "message": "アフィリエイトリンクを作成"
   },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "アフィリエイトコードが見つかりませんでした"
-  },
   "dashboard.affiliate-links.error.title": {
     "message": "アフィリエイトリンクの読み込みエラー"
   },
@@ -574,15 +571,6 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "アフィリエイトリンクを検索…"
-  },
-  "dashboard.analytics.from-projects": {
-    "message": "{count} 件のプロジェクトから"
-  },
-  "dashboard.analytics.total-downloads": {
-    "message": "総ダウンロード数"
-  },
-  "dashboard.analytics.total-followers": {
-    "message": "総フォロワー数"
   },
   "dashboard.collections.button.create-new": {
     "message": "新規作成"
@@ -607,18 +595,6 @@
   },
   "dashboard.collections.long-title": {
     "message": "コレクション"
-  },
-  "dashboard.collections.placeholder.search": {
-    "message": "コレクションを検索"
-  },
-  "dashboard.collections.sort.name-ascending": {
-    "message": "名前順(昇順)"
-  },
-  "dashboard.collections.sort.recently-created": {
-    "message": "作成順(新しい順)"
-  },
-  "dashboard.collections.sort.recently-updated": {
-    "message": "更新順(新しい順)"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} をダウンロード"
@@ -648,7 +624,7 @@
     "message": "納税申告書"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinthでは、納税申告書類を安全に収集・保管するため、サードパーティプロバイダーの「Track1099」を利用しています。詳細については<security-link>こちらをご覧ください。</security-link>"
+    "message": "Icarusでは、納税申告書類を安全に収集・保管するため、サードパーティプロバイダーの「Track1099」を利用しています。詳細については<security-link>こちらをご覧ください。</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "セキュリティ対策"
@@ -813,7 +789,7 @@
     "message": "利用可能な残高 <b>{available}</b> をすべて出金するには、以下の書類に記入してください。これは納税報告のために必要な手続きで、一度完了すれば再入力の必要はありません。"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "税法を遵守するため、Modrinthの税務記録用としてW-9フォーム（主に米国居住者）またはW-8フォーム（主に米国外居住者）への記入が必須となっています。"
+    "message": "税法を遵守するため、Icarusの税務記録用としてW-9フォーム（主に米国居住者）またはW-8フォーム（主に米国外居住者）への記入が必須となっています。"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "納税申告書が必要"
@@ -855,7 +831,7 @@
     "message": "未承認のメールアドレス"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "入力された配送先メールアドレスは、Modrinthアカウントに紐付けられていません。誤ったアドレスに送られた報酬を、Modrinth側で回収・復元することはできません。"
+    "message": "入力された配送先メールアドレスは、Icarusアカウントに紐付けられていません。誤ったアドレスに送られた報酬を、Icarus側で回収・復元することはできません。"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "より安い手数料が利用可能です"
@@ -872,168 +848,6 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "出金限度額の <b>{withdrawLimit}</b> に達しました。これ以上の額を出金するには、納税申告書類を記入する必要があります。"
   },
-  "dashboard.head-title": {
-    "message": "ダッシュボード"
-  },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "全て既読にする"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "履歴を表示"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "未読の通知はありません"
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "通知の読み込み中にエラーが発生しました:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "履歴"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "通知履歴"
-  },
-  "dashboard.notifications.link.see-all": {
-    "message": "すべて見る"
-  },
-  "dashboard.notifications.link.view-history": {
-    "message": "通知履歴を表示"
-  },
-  "dashboard.notifications.link.view-more": {
-    "message": "{extraNotifs} 件の通知をさらに表示"
-  },
-  "dashboard.notifications.loading": {
-    "message": "通知を読み込み中..."
-  },
-  "dashboard.organizations.button.create": {
-    "message": "組織を作成"
-  },
-  "dashboard.organizations.empty.cta": {
-    "message": "組織を作成しましょう！"
-  },
-  "dashboard.organizations.error.fetch": {
-    "message": "組織の取得に失敗しました"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count} 人のメンバー"
-  },
-  "dashboard.organizations.title": {
-    "message": "組織"
-  },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "以下で選択することで、複数のプロジェクトを一括で編集できます"
-  },
-  "dashboard.projects.bulk-edit.server-disabled": {
-    "message": "サーバープロジェクトでは一括編集を利用できません"
-  },
-  "dashboard.projects.empty": {
-    "message": "まだプロジェクトがありません。上にある緑のボタンを押して始めましょう"
-  },
-  "dashboard.projects.head-title": {
-    "message": "プロジェクト"
-  },
-  "dashboard.projects.links.and-more": {
-    "message": "さらに {count} 件..."
-  },
-  "dashboard.projects.links.button.clear-link": {
-    "message": "リンクを削除"
-  },
-  "dashboard.projects.links.button.edit": {
-    "message": "リンクを編集"
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "変更は <strong>{count}</strong> 件のプロジェクトに適用されます"
-  },
-  "dashboard.projects.links.description": {
-    "message": "下記に入力したリンクは、選択した各プロジェクトに上書きされます。空欄のままにしたリンクは無視されます。ゴミ箱ボタンを使用すると、選択したすべてのプロジェクトからリンクを削除できます。"
-  },
-  "dashboard.projects.links.discord-invite.description": {
-    "message": "Discordサーバーへの招待リンク"
-  },
-  "dashboard.projects.links.discord-invite.label": {
-    "message": "Discordの招待"
-  },
-  "dashboard.projects.links.issue-tracker.description": {
-    "message": "ユーザーがプロジェクトに関するバグ、問題、懸念事項を報告できる場所"
-  },
-  "dashboard.projects.links.issue-tracker.label": {
-    "message": "問題の報告と追跡"
-  },
-  "dashboard.projects.links.placeholder.cleared": {
-    "message": "現在のリンクは削除されます"
-  },
-  "dashboard.projects.links.placeholder.valid-discord-url": {
-    "message": "有効なDiscordの招待URLを入力してください"
-  },
-  "dashboard.projects.links.placeholder.valid-url": {
-    "message": "有効なURLを入力してください"
-  },
-  "dashboard.projects.links.show-all-projects": {
-    "message": "全てのプロジェクトを表示"
-  },
-  "dashboard.projects.links.source-code.description": {
-    "message": "プロジェクトのソースコードを含むページやリポジトリ"
-  },
-  "dashboard.projects.links.source-code.label": {
-    "message": "ソースコード"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "プロジェクトに関する情報、ドキュメント、ヘルプが掲載されているページ"
-  },
-  "dashboard.projects.links.wiki-page.label": {
-    "message": "ウィキページ"
-  },
-  "dashboard.projects.notification.bulk-edit-success": {
-    "message": "選択されたプロジェクトのリンクを一括編集しました"
-  },
-  "dashboard.projects.project.icon-alt": {
-    "message": "{title} のアイコン"
-  },
-  "dashboard.projects.project.moderator-message-aria": {
-    "message": "プロジェクトにモデレーターからのメッセージがあります。プロジェクトの詳細をご覧ください。"
-  },
-  "dashboard.projects.project.review-environment-metadata": {
-    "message": "環境メタデータを確認してください"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "昇順"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "降順"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "名前"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "ステータス"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "種類"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "アイコン"
-  },
-  "dashboard.projects.table.id": {
-    "message": "ID"
-  },
-  "dashboard.projects.table.name": {
-    "message": "名前"
-  },
-  "dashboard.projects.table.status": {
-    "message": "ステータス"
-  },
-  "dashboard.projects.table.type": {
-    "message": "種類"
-  },
-  "dashboard.report.title": {
-    "message": "通報 {id}"
-  },
-  "dashboard.reports.active-title": {
-    "message": "アクティブな通報"
-  },
-  "dashboard.reports.title": {
-    "message": "通報"
-  },
   "dashboard.revenue.available-now": {
     "message": "現在出金可能"
   },
@@ -1044,7 +858,7 @@
     "message": "推定収益額は、利用可能になるまで変更される場合があります。"
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Modrinthの収益取り扱いに関する詳細はこちらをご覧ください。"
+    "message": "Icarusの収益取り扱いに関する詳細はこちらをご覧ください。"
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "{date}（予定）"
@@ -1065,13 +879,10 @@
     "message": "出金済み"
   },
   "dashboard.revenue.tos": {
-    "message": "Modrinthへのプロジェクトのアップロード、およびアカウントからの出金を行うことで、当サイトの<terms-link>報酬プログラム利用規約</terms-link>に同意したものとみなされます。詳細は<info-link>報酬プログラム</info-link>についてをご覧ください。"
+    "message": "Icarusへのプロジェクトのアップロード、およびアカウントからの出金を行うことで、当サイトの<terms-link>報酬プログラム利用規約</terms-link>に同意したものとみなされます。詳細は<info-link>報酬プログラム</info-link>についてをご覧ください。"
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "CSVでダウンロード"
-  },
-  "dashboard.revenue.transactions.head-title": {
-    "message": "取引履歴"
   },
   "dashboard.revenue.transactions.header": {
     "message": "取引"
@@ -1082,17 +893,8 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "支払いおよび出金の履歴がここに表示されます。"
   },
-  "dashboard.revenue.transactions.period.last-month": {
-    "message": "先月"
-  },
-  "dashboard.revenue.transactions.period.this-month": {
-    "message": "今月"
-  },
   "dashboard.revenue.transactions.see-all": {
     "message": "すべて見る"
-  },
-  "dashboard.revenue.transactions.year.all": {
-    "message": "全ての年"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "入力された納税者番号または社会保障番号が米国内国歳入庁の記録と一致しなかったため、出金が一時的にロックされています。サポートに連絡して、納税申告書類のリセットと再提出を行ってください。"
@@ -1105,33 +907,6 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "出金"
-  },
-  "dashboard.sidebar.label.activeReports": {
-    "message": "アクティブな通報"
-  },
-  "dashboard.sidebar.label.analytics": {
-    "message": "アナリティクス"
-  },
-  "dashboard.sidebar.label.creators": {
-    "message": "クリエイター"
-  },
-  "dashboard.sidebar.label.dashboard": {
-    "message": "ダッシュボード"
-  },
-  "dashboard.sidebar.label.notifications": {
-    "message": "通知"
-  },
-  "dashboard.sidebar.label.organizations": {
-    "message": "組織"
-  },
-  "dashboard.sidebar.label.overview": {
-    "message": "概要"
-  },
-  "dashboard.sidebar.label.projects": {
-    "message": "プロジェクト"
-  },
-  "dashboard.sidebar.label.revenue": {
-    "message": "収益"
   },
   "dashboard.withdraw.completion.account": {
     "message": "アカウント"
@@ -1236,19 +1011,13 @@
     "message": "このコレクションは非公開に設定されている可能性があります。"
   },
   "error.collection.404.list_item.3": {
-    "message": "このコレクションは、<tou-link>利用規約</tou-link>に違反したため、Modrinthのモデレーションチームによって削除された可能性があります。"
+    "message": "このコレクションは、<tou-link>利用規約</tou-link>に違反したため、Icarusのモデレーションチームによって削除された可能性があります。"
   },
   "error.collection.404.list_title": {
     "message": "なぜ？"
   },
   "error.collection.404.title": {
     "message": "コレクションが見つかりません"
-  },
-  "error.generic.401.signed-in-as": {
-    "message": "現在サインイン中のアカウント:"
-  },
-  "error.generic.401.title": {
-    "message": "このページにアクセスする権限がありません"
   },
   "error.generic.404.subtitle": {
     "message": "お探しのページは存在しないようです。"
@@ -1263,10 +1032,10 @@
     "message": "法的な理由によりコンテンツを利用できません"
   },
   "error.generic.default.list_item.1": {
-    "message": "Modrinthがダウンしていないか、<status-link>ステータスページ</status-link>で確認してください。"
+    "message": "Icarusがダウンしていないか、<status-link>ステータスページ</status-link>で確認してください。"
   },
   "error.generic.default.list_item.2": {
-    "message": "この問題が繰り返し発生する場合は、<discord-link>Discordサーバー</discord-link>に参加して、Modrinthチームにお知らせください。"
+    "message": "この問題が繰り返し発生する場合は、<discord-link>Discordサーバー</discord-link>に参加して、Icarusチームにお知らせください。"
   },
   "error.generic.default.list_title": {
     "message": "数分後に再度試してください。"
@@ -1284,7 +1053,7 @@
     "message": "組織の所有者がURLを変更したか、削除した可能性があります。"
   },
   "error.organization.404.list_item.3": {
-    "message": "この組織は、<tou-link>利用規約</tou-link>に違反したため、Modrinthのモデレーションチームによって削除された可能性があります。"
+    "message": "この組織は、<tou-link>利用規約</tou-link>に違反したため、Icarusのモデレーションチームによって削除された可能性があります。"
   },
   "error.organization.404.list_title": {
     "message": "なぜ？"
@@ -1299,7 +1068,7 @@
     "message": "プロジェクトの所有者がURLを変更したか、非公開に設定したか、あるいは削除した可能性があります。"
   },
   "error.project.404.list_item.3": {
-    "message": "このプロジェクトは、<tou-link>利用規約</tou-link>に違反したため、Modrinthのモデレーションチームによって取り下げられた可能性があります。"
+    "message": "このプロジェクトは、<tou-link>利用規約</tou-link>に違反したため、Icarusのモデレーションチームによって取り下げられた可能性があります。"
   },
   "error.project.404.list_title": {
     "message": "なぜ？"
@@ -1314,7 +1083,7 @@
     "message": "ユーザー名が変更された、もしくはアカウントが削除された可能性があります。"
   },
   "error.user.404.list_item.3": {
-    "message": "このユーザーのアカウントは、Modrinthの<tou-link>利用規約</tou-link>に違反したため、停止された可能性があります。"
+    "message": "このユーザーのアカウントは、Icarusの<tou-link>利用規約</tou-link>に違反したため、停止された可能性があります。"
   },
   "error.user.404.list_title": {
     "message": "なぜ？"
@@ -1356,10 +1125,10 @@
     "message": "サーバーに高い負荷がかかっている場合、ラグの発生や不安定さを軽減するために、一時的に追加のCPUスレッドへのアクセスを許可します。これにより、TPSが20を下回るのを防ぎ、可能な限りスムーズな動作を実現します。これらの追加のCPUスレッドの負荷が高いときにのみ短時間利用可能となるため、Sparkレポートなどのプロファイリングツールには表示されない場合があります。"
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Modrinth Hostingのサーバーはどのような種類のCPUを使用していますか？"
+    "message": "Icarus Hostingのサーバーはどのような種類のCPUを使用していますか？"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hostingのサーバーは、5GHz以上のクロック速度を持つ、AMD Ryzen 7900および7950X3D相当のCPUとDDR5メモリを搭載しています。"
+    "message": "Icarus Hostingのサーバーは、5GHz以上のクロック速度を持つ、AMD Ryzen 7900および7950X3D相当のCPUとDDR5メモリを搭載しています。"
   },
   "hosting-marketing.faq.currency": {
     "message": "価格はどの通貨で表示されていますか？"
@@ -1368,19 +1137,19 @@
     "message": "価格はすべて米ドル（USD）で表示されています。"
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "Modrinth HostingのサーバーにはDDoS攻撃対策が施されていますか？"
+    "message": "Icarus HostingのサーバーにはDDoS攻撃対策が施されていますか？"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "はい。すべてのModrinth HostingサーバーにはDDoS攻撃対策が付属しており、さらに一部の地域では最大17Tbpsの容量を備えています。"
+    "message": "はい。すべてのIcarus HostingサーバーにはDDoS攻撃対策が付属しており、さらに一部の地域では最大17Tbpsの容量を備えています。"
   },
   "hosting-marketing.faq.heading": {
     "message": "よくある質問"
   },
   "hosting-marketing.faq.how-fast": {
-    "message": "Modrinthでホストするサーバーの速度はどのくらいですか？"
+    "message": "Icarusでホストするサーバーの速度はどのくらいですか？"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Modrinth Hostingのサーバーは非常に近代的で高性能なハードウェア上でホストされていますが、サーバーの実効速度がどの程度になるかは断言が難しいです。サーバー上で稼働しているMod、データパック、プラグイン、さらにはユーザーの行動など、速度に影響を与える要素が多岐にわたるためです。"
+    "message": "Icarus Hostingのサーバーは非常に近代的で高性能なハードウェア上でホストされていますが、サーバーの実効速度がどの程度になるかは断言が難しいです。サーバー上で稼働しているMod、データパック、プラグイン、さらにはユーザーの行動など、速度に影響を与える要素が多岐にわたるためです。"
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "多くのパフォーマンスの問題は、最適化されていないModパック、Mod、データパック、プラグインが原因で、サーバーに遅延が生じる傾向があります。当社のサーバーは非常に高性能であるため、サーバーで実行するコンテンツに適したプランを選択すれば、大きな問題に直面することはありません。"
@@ -1389,10 +1158,10 @@
     "message": "サーバーの容量を増やすことはできますか？"
   },
   "hosting-marketing.faq.increase-storage.answer": {
-    "message": "はい、サーバーの容量は追加料金無しで増やすことが出来ます。もし、容量の拡張が必要なら、Modrinthサポートへお問い合わせください。"
+    "message": "はい、サーバーの容量は追加料金無しで増やすことが出来ます。もし、容量の拡張が必要なら、Icarusサポートへお問い合わせください。"
   },
   "hosting-marketing.faq.location": {
-    "message": "Modrinthでホストするサーバーはどこにありますか？地域を選択できますか？"
+    "message": "Icarusでホストするサーバーはどこにありますか？地域を選択できますか？"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "現時点では、北アメリカ、ヨーロッパ、東南アジアのサーバーを購入時に選択できます。今後、より多くの地域に対応予定です！地域を変更したい場合はサポートまでお問い合わせください。"
@@ -1401,7 +1170,7 @@
     "message": "どのMinecraftのバージョンとローダーが使えますか？"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Modrinthホストサーバーは、スナップショットバージョンを含めて、バージョン1.2.5以降のMinecraft: Java Editonのバージョンを実行できます。"
+    "message": "Icarusホストサーバーは、スナップショットバージョンを含めて、バージョン1.2.5以降のMinecraft: Java Editonのバージョンを実行できます。"
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "また、Mod用のFabric、Quilt、Forge、NeoForge、プラグイン用のPaperやPurpurも含む、幅広い範囲のModやプラグインのローダーをサポートしています。利用可能かどうかは、選択したMinecraftバージョンをそのModまたはプラグインのローダーがサポートしているかどうかに依存します。"
@@ -1418,11 +1187,11 @@
   "hosting-marketing.hero.button.start-your-server": {
     "message": "あなたのサーバーを始める"
   },
-  "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Modrinth Hostingで次のサーバーをホストしよう"
+  "hosting-marketing.hero.host-with-Icarus": {
+    "message": "Icarus Hostingで次のサーバーをホストしよう"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hostingは、Minecraft: Java Editionサーバーを最も簡単にホストする方法です。お気に入りのModやModパックをすべてModrinthプラットフォーム内で、シームレスにインストールしてプレイできます。"
+    "message": "Icarus Hostingは、Minecraft: Java Editionサーバーを最も簡単にホストする方法です。お気に入りのModやModパックをすべてIcarusプラットフォーム内で、シームレスにインストールしてプレイできます。"
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "高度なネットワーク管理"
@@ -1440,10 +1209,10 @@
     "message": "カスタムURL"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "カスタム <contrast>modrinth.gg</contrast> URLでサーバーを共有できます。"
+    "message": "カスタム <contrast>Icarus.gg</contrast> URLでサーバーを共有できます。"
   },
   "hosting-marketing.included.description": {
-    "message": "全てのサーバーにはModrinthだけが提供できるホスティング体験を提供するために設計された一連の機能が含まれています。"
+    "message": "全てのサーバーにはIcarusだけが提供できるホスティング体験を提供するために設計された一連の機能が含まれています。"
   },
   "hosting-marketing.included.file-manager": {
     "message": "使いやすいファイルマネージャー"
@@ -1458,19 +1227,19 @@
     "message": "必要なときに助けを得る"
   },
   "hosting-marketing.included.help.description": {
-    "message": "サーバーのサポートが必要な場合は、いつでもModrinthチームに連絡してください。"
+    "message": "サーバーのサポートが必要な場合は、いつでもIcarusチームに連絡してください。"
   },
   "hosting-marketing.included.powerful-console": {
     "message": "強力なコンソール、サーバー設定管理ツールなど"
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "Modrinth Hostingには、サーバーを管理するための強力なツールが備わっています。"
+    "message": "Icarus Hostingには、サーバーを管理するための強力なツールが備わっています。"
   },
   "hosting-marketing.included.sftp-access": {
     "message": "SFTPアクセス"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "Modrinth Hosting に組み込まれた SFTP を使って、サーバーのファイルに直接アクセスできます。"
+    "message": "Icarus Hosting に組み込まれた SFTP を使って、サーバーのファイルに直接アクセスできます。"
   },
   "hosting-marketing.included.with-your-server": {
     "message": "サーバーに含まれています"
@@ -1493,20 +1262,20 @@
   "hosting-marketing.server-for-everyone": {
     "message": "誰にでも合うサーバーがあります"
   },
-  "hosting-marketing.why.all-on-modrinth": {
-    "message": "すべてをModrinthで管理"
+  "hosting-marketing.why.all-on-Icarus": {
+    "message": "すべてをIcarusで管理"
   },
-  "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "あなたのサーバー、Mod、プレイヤーなどはすべてModrinthにあります。プラットフォームを切り替える必要はありません。"
+  "hosting-marketing.why.all-on-Icarus.description": {
+    "message": "あなたのサーバー、Mod、プレイヤーなどはすべてIcarusにあります。プラットフォームを切り替える必要はありません。"
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "常に最速"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "当社のインフラは過負荷になることがありません。つまり、Modrinthでホストされている各サーバーは常に最高のパフォーマンスで稼働します。"
+    "message": "当社のインフラは過負荷になることがありません。つまり、Icarusでホストされている各サーバーは常に最高のパフォーマンスで稼働します。"
   },
   "hosting-marketing.why.description": {
-    "message": "Modrinthの数千ものModpackから選ぶか、自分だけのModパックを作成しよう。プレイの準備ができたら、友達を招待しよう。"
+    "message": "Icarusの数千ものModpackから選ぶか、自分だけのModパックを作成しよう。プレイの準備ができたら、友達を招待しよう。"
   },
   "hosting-marketing.why.heading": {
     "message": "Modパックを探しましょう。それでサーバーの誕生です。"
@@ -1515,22 +1284,22 @@
     "message": "モダンで信頼性の高いホスティングを体験"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Modrinth Hostingのサーバーは、<contrast>高性能AMD CPUおよびDDR5 RAM</contrast>を採用し、カスタムソフトウェアにより安定したパフォーマンスを提供します。"
+    "message": "Icarus Hostingのサーバーは、<contrast>高性能AMD CPUおよびDDR5 RAM</contrast>を採用し、カスタムソフトウェアにより安定したパフォーマンスを提供します。"
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "あなたのModがある場所でプレイする"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hostingは、サーバーへのModおよびModパックのインストールの過程をシームレスに統合します。"
+    "message": "Icarus Hostingは、サーバーへのModおよびModパックのインストールの過程をシームレスに統合します。"
   },
-  "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "なぜModrinth Hostingなのか？"
+  "hosting-marketing.why.why-Icarus-hosting": {
+    "message": "なぜIcarus Hostingなのか？"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "すべてのお気に入りのMod"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "Vanilla、Fabric、Forge、Quilt、NeoForgeから選択してください。Modrinth上で動作するものは、あなたのサーバーでも実行可能です。"
+    "message": "Vanilla、Fabric、Forge、Quilt、NeoForgeから選択してください。Icarus上で動作するものは、あなたのサーバーでも実行可能です。"
   },
   "hosting.plan.out-of-stock": {
     "message": "品切れ"
@@ -1545,7 +1314,7 @@
     "message": "ダッシュボードへ移動"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Modrinthチームの継続的なアップデートで、Mod開発を最高の体験に"
+    "message": "Icarusチームの継続的なアップデートで、Mod開発を最高の体験に"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "絶えず進化し続ける"
@@ -1590,13 +1359,13 @@
     "message": "気に入ったプロジェクトをフォロー"
   },
   "landing.feature.launcher.description": {
-    "message": "ModrinthのオープンソースAPIにより、各種ランチャーとの高度な連携が可能です。<link>公式アプリ</link>のほか、ATLauncher、MultiMC、Prism Launcherといった人気のランチャーからもModrinthを利用できます。"
+    "message": "IcarusのオープンソースAPIにより、各種ランチャーとの高度な連携が可能です。<link>公式アプリ</link>のほか、ATLauncher、MultiMC、Prism Launcherといった人気のランチャーからもIcarusを利用できます。"
   },
   "landing.feature.launcher.heading": {
     "message": "好きなランチャーで遊ぶ"
   },
   "landing.feature.search.description": {
-    "message": "Modrinthの高速な検索と強力なフィルターで目的のものをすぐ発見"
+    "message": "Icarusの高速な検索と強力なフィルターで目的のものをすぐ発見"
   },
   "landing.feature.search.heading": {
     "message": "探しているものを、素早く簡単に"
@@ -1629,10 +1398,10 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "Minecraftのウィンドウを簡略化したイラスト。Mojang StudiosのロゴがModrinthのブランドカラーである緑で描かれています。"
+    "message": "Minecraftのウィンドウを簡略化したイラスト。Mojang StudiosのロゴがIcarusのブランドカラーである緑で描かれています。"
   },
-  "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+  "landing.launcher.Icarus-app-label": {
+    "message": "Icarus Launcher"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1675,9 +1444,6 @@
   },
   "layout.action.create-new": {
     "message": "新規作成…"
-  },
-  "layout.action.external-projects": {
-    "message": "外部プロジェクト"
   },
   "layout.action.file-lookup": {
     "message": "ファイル検索"
@@ -1725,25 +1491,25 @@
     "message": "アカウント設定にアクセス"
   },
   "layout.banner.add-email.description": {
-    "message": "セキュリティ上の理由から、Modrinthではアカウントにメールアドレスを登録する必要があります。"
+    "message": "セキュリティ上の理由から、Icarusではアカウントにメールアドレスを登録する必要があります。"
   },
   "layout.banner.build-fail.description": {
-    "message": "Modrinthのフロントエンドのデプロイで、APIからのステート生成に失敗しました。APIの障害、または設定エラーの可能性があります。APIが利用可能になったら再ビルドしてください。エラーコード: {errors}; 現在のAPI URL: {url}"
+    "message": "Icarusのフロントエンドのデプロイで、APIからのステート生成に失敗しました。APIの障害、または設定エラーの可能性があります。APIが利用可能になったら再ビルドしてください。エラーコード: {errors}; 現在のAPI URL: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "ビルド時にAPIからステートを生成できませんでした。"
   },
   "layout.banner.preview.description": {
-    "message": "公式のModrinthウェブサイトにアクセスしたい場合は、<link>https://modrinth.com</link> をご覧ください。このプレビュー環境はModrinthスタッフによるテスト目的で使用されています。<branch-link>{owner}/{branch}</branch-link> @ {commit} を基に構築されています。"
+    "message": "公式のIcarusウェブサイトにアクセスしたい場合は、<link>https://Icarus.com</link> をご覧ください。このプレビュー環境はIcarusスタッフによるテスト目的で使用されています。<branch-link>{owner}/{branch}</branch-link> @ {commit} を基に構築されています。"
   },
   "layout.banner.preview.title": {
-    "message": "これはModrinthウェブサイトのプレビューデプロイです。"
+    "message": "これはIcarusウェブサイトのプレビューデプロイです。"
   },
   "layout.banner.staging.description": {
-    "message": "ステージング環境は、本番のModrinthデータベースとは完全に分離されています。これはテストやデバッグ目的で使用され、本番環境よりも新しい、開発中のModrinthバックエンドやフロントエンドのバージョンで動作している可能性があります。"
+    "message": "ステージング環境は、本番のIcarusデータベースとは完全に分離されています。これはテストやデバッグ目的で使用され、本番環境よりも新しい、開発中のIcarusバックエンドやフロントエンドのバージョンで動作している可能性があります。"
   },
   "layout.banner.staging.title": {
-    "message": "Modrinthのステージング環境を表示しています"
+    "message": "Icarusのステージング環境を表示しています"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "請求の情報を更新"
@@ -1758,7 +1524,7 @@
     "message": "納税申告書を記入"
   },
   "layout.banner.tax.description": {
-    "message": "Modrinthからの今年の引き出し額は、すでに{threshold}を超えています。税法を遵守するため、税務フォームを提出いただく必要があります。このフォームが提出されるまで、引き出しは一時停止されます。"
+    "message": "Icarusからの今年の引き出し額は、すでに{threshold}を超えています。税法を遵守するため、税務フォームを提出いただく必要があります。このフォームが提出されるまで、引き出しは一時停止されます。"
   },
   "layout.banner.tax.title": {
     "message": "納税申告書が必要"
@@ -1776,7 +1542,7 @@
     "message": "認証メールを再送信"
   },
   "layout.banner.verify-email.description": {
-    "message": "セキュリティ上の理由により、Modrinthではアカウントに関連付けられたメールアドレスの確認が必要です。"
+    "message": "セキュリティ上の理由により、Icarusではアカウントに関連付けられたメールアドレスの確認が必要です。"
   },
   "layout.footer.about": {
     "message": "このサービスについて"
@@ -1817,23 +1583,23 @@
   "layout.footer.legal.terms-of-use": {
     "message": "利用規約"
   },
-  "layout.footer.modrinth-information": {
-    "message": "Modrinthについて"
+  "layout.footer.Icarus-information": {
+    "message": "Icarusについて"
   },
   "layout.footer.open-source": {
-    "message": "Modrinthは<github-link>オープンソース</github-link>です。"
+    "message": "Icarusは<github-link>オープンソース</github-link>です。"
   },
   "layout.footer.products": {
     "message": "製品"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Icarus Launcher"
   },
   "layout.footer.products.plus": {
-    "message": "Modrinth+"
+    "message": "Icarus+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "layout.footer.resources": {
     "message": "リソース"
@@ -1869,7 +1635,7 @@
     "message": "メニューを切り替える"
   },
   "layout.meta.description": {
-    "message": "ModrinthでMinecraftのMod、プラグイン、データパック、シェーダー、リソースパック、そしてModパックをダウンロードしましょう。Modrinthでは、モダンで使いやすいインターフェースとAPIを使って、プロジェクトを探索したり公開したりできます。"
+    "message": "IcarusでMinecraftのMod、プラグイン、データパック、シェーダー、リソースパック、そしてModパックをダウンロードしましょう。Icarusでは、モダンで使いやすいインターフェースとAPIを使って、プロジェクトを探索したり公開したりできます。"
   },
   "layout.meta.og-description": {
     "message": "Minecraftのコンテンツを探索、公開してみよう！"
@@ -1889,8 +1655,8 @@
   "layout.nav.discover-content": {
     "message": "コンテンツを探索"
   },
-  "layout.nav.get-modrinth-app": {
-    "message": "Modrinth Appを入手"
+  "layout.nav.get-Icarus-app": {
+    "message": "Icarus Launcherを入手"
   },
   "layout.nav.home": {
     "message": "ホーム"
@@ -1898,11 +1664,11 @@
   "layout.nav.host-a-server": {
     "message": "サーバーをホスト"
   },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+  "layout.nav.Icarus-app": {
+    "message": "Icarus Launcher"
   },
-  "layout.nav.modrinth-home-page": {
-    "message": "Modrinthホームページ"
+  "layout.nav.Icarus-home-page": {
+    "message": "Icarusホームページ"
   },
   "layout.nav.my-servers": {
     "message": "自分のサーバー"
@@ -1925,14 +1691,11 @@
   "layout.nav.search": {
     "message": "検索"
   },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Modrinth+にアップグレード"
+  "layout.nav.upgrade-to-Icarus-plus": {
+    "message": "Icarus+にアップグレード"
   },
   "moderation.moderate": {
     "message": "適度"
-  },
-  "moderation.page.external-projects": {
-    "message": "外部プロジェクト"
   },
   "moderation.page.projects": {
     "message": "プロジェクト"
@@ -1941,7 +1704,7 @@
     "message": "レポート"
   },
   "moderation.page.technicalReview": {
-    "message": "技術評価"
+    "message": "技術的レビュー"
   },
   "muralpay.account-type.checking": {
     "message": "チェック中"
@@ -2211,10 +1974,10 @@
     "message": "もう一度ウォレットアドレスをご確認ください。 誤った口座に送られた資金は回収できません。"
   },
   "profile.bio.fallback.creator": {
-    "message": "Modrinthの作成者。"
+    "message": "Icarusの作成者。"
   },
   "profile.bio.fallback.user": {
-    "message": "Modrinthのユーザー。"
+    "message": "Icarusのユーザー。"
   },
   "profile.button.billing": {
     "message": "ユーザー課金管理"
@@ -2298,10 +2061,10 @@
     "message": "保存中…"
   },
   "profile.meta.description": {
-    "message": "Modrinthで{username}のプロジェクトをダウンロードする"
+    "message": "Icarusで{username}のプロジェクトをダウンロードする"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} - Modrinthで{username}のプロジェクトをダウンロードする"
+    "message": "{bio} - Icarusで{username}のプロジェクトをダウンロードする"
   },
   "profile.stats.projects-followers": {
     "message": "{count}件のプロジェクトフォロワー"
@@ -2340,7 +2103,7 @@
     "message": "レビューを再提出する"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "あなたのプロジェクトはModrinthのスタッフにより{status, select, rejected {却下} withheld {保留} other {{status}}}されました。ほとんどの場合、スタッフからのメッセージに対応した後、再審査を申請することができます。"
+    "message": "あなたのプロジェクトはIcarusのスタッフにより{status, select, rejected {却下} withheld {保留} other {{status}}}されました。ほとんどの場合、スタッフからのメッセージに対応した後、再審査を申請することができます。"
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "公開チェックリストに記載されている必須手順を踏んでいる必要があります！"
@@ -2454,7 +2217,7 @@
     "message": "プロジェクトを評価"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hostingは手間を掛けず、簡単に友達と遊べます！"
+    "message": "Icarus Hostingは手間を掛けず、簡単に友達と遊べます！"
   },
   "project.actions.servers-promo.pricing": {
     "message": "{price}<small> / 月</small>から"
@@ -2487,10 +2250,10 @@
     "message": "{title}は{platform}の{gameVersion}に対応していません"
   },
   "project.download.install-with-app": {
-    "message": "Modrinth Appでインストール"
+    "message": "Icarus Launcherでインストール"
   },
   "project.download.no-app": {
-    "message": "Modrinth Appをお持ちでないですか？"
+    "message": "Icarus Launcherをお持ちでないですか？"
   },
   "project.download.no-versions-available": {
     "message": "{gameVersion}および{platform}向けのバージョンは利用できません。"
@@ -2526,7 +2289,7 @@
     "message": "{title}をダウンロード"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Modrinthの環境システムを全面的に見直し、新たなオプションが利用可能になりました。これらの設定を変更する権限はありませんが、環境メタデータの検証が必要であることをプロジェクトの他のメンバーにお知らせください。"
+    "message": "Icarusの環境システムを全面的に見直し、新たなオプションが利用可能になりました。これらの設定を変更する権限はありませんが、環境メタデータの検証が必要であることをプロジェクトの他のメンバーにお知らせください。"
   },
   "project.environment.migration-no-permission.title": {
     "message": "環境メタデータの確認が必要です"
@@ -2535,7 +2298,7 @@
     "message": "この変更について詳しく見る"
   },
   "project.environment.migration.message": {
-    "message": "Modrinthの環境システムを全面的に見直し、新たなオプションが利用可能になりました。メタデータが正しいことをご確認ください。"
+    "message": "Icarusの環境システムを全面的に見直し、新たなオプションが利用可能になりました。メタデータが正しいことをご確認ください。"
   },
   "project.environment.migration.review-button": {
     "message": "環境設定を確認する"
@@ -2667,7 +2430,7 @@
     "message": "{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}が見つかりませんでした"
   },
   "report.for.violation": {
-    "message": "Modrinthの<rules-link>ルール</rules-link>または<terms-link>利用規約</terms-link>に違反している"
+    "message": "Icarusの<rules-link>ルール</rules-link>または<terms-link>利用規約</terms-link>に違反している"
   },
   "report.for.violation.description": {
     "message": "たとえば、悪意あるもの、スパム、詐欺的なもの、誤解を招くもの、違法なものなどが含まれます。"
@@ -2712,7 +2475,7 @@
     "message": "どの種類のコンテンツに関する報告ですか？"
   },
   "report.question.report-reason": {
-    "message": "この{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}は、Modrinthのどのルールに違反していますか？"
+    "message": "この{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}は、Icarusのどのルールに違反していますか？"
   },
   "report.report-content": {
     "message": "コンテンツをモデレーターに報告する"
@@ -2916,7 +2679,7 @@
     "message": "レポートの書き込み"
   },
   "scopes.sessionAccess.description": {
-    "message": "Modrinthが発行したセッションにアクセス"
+    "message": "Icarusが発行したセッションにアクセス"
   },
   "scopes.sessionAccess.label": {
     "message": "セッションにアクセス"
@@ -3063,13 +2826,13 @@
     "message": "エクスポートを生成中…"
   },
   "settings.account.data-export.description": {
-    "message": "Modrinthにアップロードされたあなたのすべての個人データのコピーをリクエストします。これには数分かかることがあります。"
+    "message": "Icarusにアップロードされたあなたのすべての個人データのコピーをリクエストします。これには数分かかることがあります。"
   },
   "settings.account.data-export.title": {
     "message": "データのエクスポート"
   },
   "settings.account.delete.confirm.description": {
-    "message": "これにより**即座にあなたのすべてのユーザーデータとフォローが削除されます**。プロジェクトは削除されません。アカウントの削除は取り消せません。<br><br>アカウントについてサポートが必要な場合は、[Modrinth Discord](https://discord.modrinth.com)にてご連絡ください。"
+    "message": "これにより**即座にあなたのすべてのユーザーデータとフォローが削除されます**。プロジェクトは削除されません。アカウントの削除は取り消せません。<br><br>アカウントについてサポートが必要な場合は、[Icarus Discord](https://discord.Icarus.com)にてご連絡ください。"
   },
   "settings.account.delete.confirm.proceed": {
     "message": "このアカウントを削除"
@@ -3081,7 +2844,7 @@
     "message": "アカウントを削除"
   },
   "settings.account.delete.section.description": {
-    "message": "一度アカウントを削除すると元に戻せません。アカウントを削除すると、プロジェクトを除くすべてのデータがModrinthのサーバーから削除されます。"
+    "message": "一度アカウントを削除すると元に戻せません。アカウントを削除すると、プロジェクトを除くすべてのデータがIcarusのサーバーから削除されます。"
   },
   "settings.account.delete.section.title": {
     "message": "アカウントを削除"
@@ -3297,7 +3060,7 @@
     "message": "本当にこのアプリケーションを削除してもよろしいですか？"
   },
   "settings.applications.description.intro": {
-    "message": "アプリケーションを使用することで、Modrinthのユーザーをご自身の製品で認証できます。\n詳細については<docs-link>ModrinthのAPIドキュメント</docs-link>をご覧ください。"
+    "message": "アプリケーションを使用することで、Icarusのユーザーをご自身の製品で認証できます。\n詳細については<docs-link>IcarusのAPIドキュメント</docs-link>をご覧ください。"
   },
   "settings.applications.field.description": {
     "message": "説明"
@@ -3351,7 +3114,7 @@
     "message": "作成者"
   },
   "settings.authorizations.description": {
-    "message": "Modrinthアカウントでアプリケーションを承認することにより、アプリケーションがあなたのアカウントにアクセスできるようになります。 アクセス権はいつでも確認でき、変更可能です。"
+    "message": "Icarusアカウントでアプリケーションを承認することにより、アプリケーションがあなたのアカウントにアクセスできるようになります。 アクセス権はいつでも確認でき、変更可能です。"
   },
   "settings.authorizations.empty-state": {
     "message": "現在承認済みアプリを表示することができません。現在修正中のため、また後ほど確認ください！"
@@ -3369,16 +3132,16 @@
     "message": "アプリケーションのアクセス権を取り消してもよろしいですか？"
   },
   "settings.billing.charges.description": {
-    "message": "Modrinthアカウントでの過去の支払い履歴は、こちらに表示されます："
+    "message": "Icarusアカウントでの過去の支払い履歴は、こちらに表示されます："
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "Medal Server トライアル"
   },
   "settings.billing.charges.product.midas": {
-    "message": "Modrinth Plus"
+    "message": "Icarus Plus"
   },
   "settings.billing.charges.product.pyro": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "settings.billing.charges.title": {
     "message": "過去の請求"
@@ -3392,12 +3155,6 @@
   "settings.billing.interval.monthly": {
     "message": "月間"
   },
-  "settings.billing.interval.quarter": {
-    "message": "四半期"
-  },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "3ヶ月ごと"
-  },
   "settings.billing.interval.year": {
     "message": "年"
   },
@@ -3405,13 +3162,13 @@
     "message": "年間"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "modrinth.comとModrinth Appを広告なしでブラウジング"
+    "message": "Icarus.comとIcarus Launcherを広告なしでブラウジング"
   },
   "settings.billing.midas.benefits.badge": {
-    "message": "Modrinth+バッジをプロフィールに表示"
+    "message": "Icarus+バッジをプロフィールに表示"
   },
   "settings.billing.midas.benefits.support": {
-    "message": "Modrinthとクリエイターを直接支援"
+    "message": "Icarusとクリエイターを直接支援"
   },
   "settings.billing.midas.benefits.title": {
     "message": "特典"
@@ -3435,7 +3192,7 @@
     "message": "決済を処理中です。 特典は決済の完了後に有効になります。"
   },
   "settings.billing.midas.upsell": {
-    "message": "Modrinth Plusに加入しよう！"
+    "message": "Icarus Plusに加入しよう！"
   },
   "settings.billing.modal.cancel.action": {
     "message": "サブスクリプションを解除する"
@@ -3495,7 +3252,7 @@
     "message": "{shared}個の共有されたCPU ({bursts}個のCPUに増加)"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "このサブスクリプションに対応するサーバーが見つかりませんでした。これにはいくつか説明があります。あなたがサーバーを購入してすぐの場合、これは通常であり、サーバーが提供されるまで長くて1時間かかります。しばらく前にサーバーを購入していた場合はおそらくそれ以来サーバーが停止されています。これが期待したものではない場合は、以下の情報と共にModrinth Supportにお問い合わせください。"
+    "message": "このサブスクリプションに対応するサーバーが見つかりませんでした。これにはいくつか説明があります。あなたがサーバーを購入してすぐの場合、これは通常であり、サーバーが提供されるまで長くて1時間かかります。しばらく前にサーバーを購入していた場合はおそらくそれ以来サーバーが停止されています。これが期待したものではない場合は、以下の情報と共にIcarus Supportにお問い合わせください。"
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "サーバーID: {id}"
@@ -3507,13 +3264,10 @@
     "message": "{gb}GB RAM"
   },
   "settings.billing.pyro.resubscribe.error.text": {
-    "message": "Modrinthサーバーの再登録中にエラーが発生しました。"
+    "message": "Icarusサーバーの再登録中にエラーが発生しました。"
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "再登録エラー"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "サーバーが現在キャンセルされている場合、サーバーの設定に10~15分かかる場合があります"
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "再加入申請を受け付けました"
@@ -3534,10 +3288,10 @@
     "message": "{gb} GB スワップ領域"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Modrinth Server のサブスクリプションを管理する。"
+    "message": "Icarus Server のサブスクリプションを管理する。"
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Modrinth Server のサブスクリプション"
+    "message": "Icarus Server のサブスクリプション"
   },
   "settings.billing.renews": {
     "message": "次の更新日: {date}"
@@ -3552,7 +3306,7 @@
     "message": "加入"
   },
   "settings.billing.subscription.description": {
-    "message": "Modrinth のサブスクリプションを管理する。"
+    "message": "Icarus のサブスクリプションを管理する。"
   },
   "settings.billing.subscription.title": {
     "message": "サブスクリプション"
@@ -3579,7 +3333,7 @@
     "message": "開発者モードを無効にする"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>開発者モード</strong> が有効です。これにより、Modrinth全体の様々な内部IDを表示することができ、Modrinth APIを使用する開発に役立ちます。ページの下部にあるModrinthロゴを5回クリックすると、開発者モードが切り替わります。"
+    "message": "<strong>開発者モード</strong> が有効です。これにより、Icarus全体の様々な内部IDを表示することができ、Icarus APIを使用する開発に役立ちます。ページの下部にあるIcarusロゴを5回クリックすると、開発者モードが切り替わります。"
   },
   "settings.display.flags.description": {
     "message": "このデバイスで特定の機能を有効または無効にします。"
@@ -3642,16 +3396,16 @@
     "message": "高度なレンダリング"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Modrinth外のリンクを新しいタブで開くように設定します。この設定にかかわらず、同一ドメイン上のリンクとMarkdownの概要欄のリンクは同じタブで開かれ、広告ページと編集ページ上のリンクは新しいタブで開かれます。"
+    "message": "Icarus外のリンクを新しいタブで開くように設定します。この設定にかかわらず、同一ドメイン上のリンクとMarkdownの概要欄のリンクは同じタブで開かれ、広告ページと編集ページ上のリンクは新しいタブで開かれます。"
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "外部リンクを新しいタブで開く"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "「Modrinth Appを入手」ボタンをプライマリナビゲーションから非表示にします。Modrinth Appのページは、ランディングページまたはフッターに表示されます。"
+    "message": "「Icarus Launcherを入手」ボタンをプライマリナビゲーションから非表示にします。Icarus Launcherのページは、ランディングページまたはフッターに表示されます。"
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Modrinth Appのプロモーションを非表示"
+    "message": "Icarus Launcherのプロモーションを非表示"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "コンテンツの左寄せサイドバー"
@@ -3678,7 +3432,7 @@
     "message": "PATを作成"
   },
   "settings.pats.description": {
-    "message": "PATはModrinthのAPIにアクセスするために使用できます。いつでも作成と取り消しができます。詳しくは<doc-link>Modrinth APIドキュメント</doc-link>を確認してください。"
+    "message": "PATはIcarusのAPIにアクセスするために使用できます。いつでも作成と取り消しができます。詳しくは<doc-link>Icarus APIドキュメント</doc-link>を確認してください。"
   },
   "settings.pats.modal.create.action": {
     "message": "PATを作成"
@@ -3732,7 +3486,7 @@
     "message": "自己紹介"
   },
   "settings.profile.description": {
-    "message": "あなたのプロフィール情報は、Modrinth上および<docs-link>Modrinth API</docs-link>を通じて一般公開されます。"
+    "message": "あなたのプロフィール情報は、Icarus上および<docs-link>Icarus API</docs-link>を通じて一般公開されます。"
   },
   "settings.profile.head-title": {
     "message": "プロフィール設定"
@@ -3756,7 +3510,7 @@
     "message": "現在のセッション"
   },
   "settings.sessions.description": {
-    "message": "現在、お使いのModrinthアカウントでログインしているデバイスは以下の通りです。各デバイスから個別にログアウトできます。\n\nもし覚えのないログイン履歴があった場合は、そのデバイスからログアウトし、すぐにModrinthアカウントのパスワードを変更してください。"
+    "message": "現在、お使いのIcarusアカウントでログインしているデバイスは以下の通りです。各デバイスから個別にログアウトできます。\n\nもし覚えのないログイン履歴があった場合は、そのデバイスからログアウトし、すぐにIcarusアカウントのパスワードを変更してください。"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "最終アクセス: {ago}"
@@ -3777,7 +3531,7 @@
     "message": "表示"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Modrinthの最新ニュース"
+    "message": "Icarusの最新ニュース"
   },
   "ui.latest-news-row.view-all": {
     "message": "すべてのニュースを見る"
@@ -3789,7 +3543,7 @@
     "message": "登録しました！"
   },
   "ui.newsletter-button.tooltip": {
-    "message": "Modrinthのニュースレターに登録する"
+    "message": "Icarusのニュースレターに登録する"
   },
   "version.environment.none.description": {
     "message": "このバージョンの環境設定は未指定です。"
@@ -3804,3 +3558,4 @@
     "message": "不明な環境"
   }
 }
+

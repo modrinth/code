@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon, XCircleIcon } from '@modrinth/assets'
+import { PlusIcon, XCircleIcon } from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -118,8 +118,8 @@ import {
 	TagItem,
 	useFormatDateTime,
 	useRelativeTime,
-} from '@modrinth/ui'
-import type { User } from '@modrinth/utils'
+} from '@icarus/ui'
+import type { User } from '@icarus/utils'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 

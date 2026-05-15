@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { CheckIcon, MailIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import { CheckIcon, MailIcon } from '@icarus/assets'
+import { ButtonStyled, defineMessages, injectIcarusClient, useVIntl } from '@icarus/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -9,7 +9,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	tooltipSubscribe: {
 		id: 'ui.newsletter-button.tooltip',
-		defaultMessage: 'Subscribe to the Modrinth newsletter',
+		defaultMessage: 'Subscribe to the Icarus newsletter',
 	},
 	subscribe: {
 		id: 'ui.newsletter-button.subscribe',
@@ -24,7 +24,7 @@ const messages = defineMessages({
 const auth = (await useAuth()) as unknown as {
 	value: { user: { id: string; username: string; email: string; created: string } }
 }
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
 const showSubscriptionConfirmation = ref(false)
 
@@ -70,3 +70,4 @@ async function subscribe() {
 		</button>
 	</ButtonStyled>
 </template>
+

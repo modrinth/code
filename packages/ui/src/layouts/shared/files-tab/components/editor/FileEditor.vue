@@ -21,10 +21,10 @@
 			v-if="!isEditingImage && !isLoading && props.editorComponent"
 			v-model:value="fileContent"
 			:lang="editorLanguage"
-			theme="modrinth"
+			theme="Icarus"
 			:print-margin="false"
 			:style="{ height: editorHeight, fontSize: '0.875rem' }"
-			class="ace-modrinth rounded-[20px]"
+			class="ace-Icarus rounded-[20px]"
 			@init="onEditorInit"
 		/>
 		<FileImageViewer v-else-if="isEditingImage && imagePreview" :image-blob="imagePreview" />
@@ -39,12 +39,12 @@
 </template>
 
 <script setup lang="ts">
-import { SpinnerIcon } from '@modrinth/assets'
+import { SpinnerIcon } from '@icarus/assets'
 import type { Ace } from 'ace-builds'
 import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { injectModrinthClient } from '#ui/providers'
+import { injectIcarusClient } from '#ui/providers'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
 
@@ -65,7 +65,7 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 const messages = defineMessages({
 	failedToOpenTitle: {
@@ -396,3 +396,4 @@ defineExpose({
 	toggleFind,
 })
 </script>
+

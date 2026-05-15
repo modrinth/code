@@ -45,7 +45,7 @@ import {
 	SpinnerIcon,
 	TrashIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 

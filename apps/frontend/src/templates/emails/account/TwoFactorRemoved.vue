@@ -15,7 +15,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 
 		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
-			At your request, we've removed two-factor authentication from your Modrinth account.
+			At your request, we've removed two-factor authentication from your Icarus account.
 		</Text>
 		<Text class="text-muted text-base">
 			If you did not make this change, please contact us immediately through our
@@ -24,3 +24,4 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		</Text>
 	</StyledEmail>
 </template>
+

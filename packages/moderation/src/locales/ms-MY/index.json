@@ -18,13 +18,13 @@
     "defaultMessage": "Tambah alamat Java"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Tambahkan sebarang pautan berkaitan yang disasarkan di luar Modrinth, seperti laman sesawang, kedai atau jemputan Discord."
+    "defaultMessage": "Tambahkan sebarang pautan berkaitan yang disasarkan di luar Icarus, seperti laman sesawang, kedai atau jemputan Discord."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Tambah pautan luaran"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Tambahkan sebarang pautan berkaitan yang disasarkan di luar Modrinth, seperti kod sumber, penjejak isu atau jemputan Discord."
+    "defaultMessage": "Tambahkan sebarang pautan berkaitan yang disasarkan di luar Icarus, seperti kod sumber, penjejak isu atau jemputan Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Tambah pautan luaran"
@@ -249,4 +249,5 @@
     "defaultMessage": "Kunjungi tetapan pautan"
   }
 }
+
 

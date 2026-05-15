@@ -57,8 +57,8 @@
 	</div>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
+import type { Labrinth } from '@icarus/api-client'
+import { PlusIcon, SearchIcon, XCircleIcon } from '@icarus/assets'
 import {
 	Admonition,
 	AffiliateLinkCard,
@@ -66,11 +66,11 @@ import {
 	ButtonStyled,
 	ConfirmModal,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 const createModal = useTemplateRef<typeof AffiliateLinkCreateModal>('createModal')
@@ -78,7 +78,7 @@ const revokeModal = useTemplateRef<typeof ConfirmModal>('revokeModal')
 
 const auth = await useAuth()
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { handleError } = injectNotificationManager()
 
 const { formatMessage } = useVIntl()
@@ -194,3 +194,4 @@ const messages = defineMessages({
 	max-width: 78.5rem;
 }
 </style>
+

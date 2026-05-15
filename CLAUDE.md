@@ -1,6 +1,6 @@
-# Modrinth Monorepo
+# Icarus Monorepo
 
-This is the Modrinth monorepo — it contains all Modrinth projects, both frontend and backend. When entering a project, either to edit or analyse, you should read it's CLAUDE.md.
+This is the Icarus monorepo — it contains all Icarus projects, both frontend and backend. When entering a project, either to edit or analyse, you should read it's CLAUDE.md.
 
 ## Architecture
 
@@ -13,7 +13,7 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 
 | App               | Description                    |
 | ----------------- | ------------------------------ |
-| `frontend`        | Main Modrinth website (Nuxt 3) |
+| `frontend`        | Main Icarus website (Nuxt 3) |
 | `app-frontend`    | Desktop/app frontend (Vue 3)   |
 | `app`             | Desktop/app shell (Tauri)      |
 | `app-playground`  | Testing playground for app     |
@@ -25,8 +25,8 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 
 | Package            | Description                                           |
 | ------------------ | ----------------------------------------------------- |
-| `ui`               | Shared Vue component library (`@modrinth/ui`)         |
-| `assets`           | Styling and auto-generated icons (`@modrinth/assets`) |
+| `ui`               | Shared Vue component library (`@icarus/ui`)         |
+| `assets`           | Styling and auto-generated icons (`@icarus/assets`) |
 | `api-client`       | API client for Nuxt, Tauri, and Node/browser          |
 | `app-lib`          | Shared app library                                    |
 | `blog`             | Blog system and changelog data                        |
@@ -35,9 +35,9 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 | `daedalus`         | Daedalus protocol                                     |
 | `tooling-config`   | ESLint, Prettier, TypeScript configs                  |
 | `ariadne`          | Analytics library                                     |
-| `modrinth-log`     | Logging utilities                                     |
-| `modrinth-maxmind` | MaxMind GeoIP                                         |
-| `modrinth-util`    | General utilities                                     |
+| `Icarus-log`     | Logging utilities                                     |
+| `Icarus-maxmind` | MaxMind GeoIP                                         |
+| `Icarus-util`    | General utilities                                     |
 | `muralpay`         | Payment processing                                    |
 | `path-util`        | Path utilities                                        |
 | `sqlx-tracing`     | SQLx query tracing                                    |
@@ -85,7 +85,7 @@ Each project may have its own `CLAUDE.md` with detailed instructions:
 ### General
 - Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to
 - For Frontend, when doing lint checks, only use the `prepr` commands, do not use `typecheck` or `tsc` etc.
-- Types in `@modrinth/utils` are considered highly outdated, if a component needs them, check if you can switch said component to use types from `packages/api-client`
+- Types in `@icarus/utils` are considered highly outdated, if a component needs them, check if you can switch said component to use types from `packages/api-client`
 - When provided problems, do not say "I didn't introduce these problems" (shifting the blame/effort) - just fix them.
 
 ## Edit Tool - Whitespace Handling (CLAUDE ONLY)
@@ -108,3 +108,4 @@ For Edit, use: `		private byte tag;` (copy everything after →, including the t
 ## Standards
 
 Standards available at the @standards/ folder.
+

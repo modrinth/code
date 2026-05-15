@@ -1,4 +1,4 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import type { Component } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -10,12 +10,6 @@ export interface BrowseSearchResponse {
 	serverHits: Labrinth.Search.v3.ResultSearchProject[]
 	total_hits: number
 	per_page: number
-}
-
-export interface BrowseSelectedProject {
-	id: string
-	name: string
-	iconUrl?: string | null
 }
 
 export interface BrowseInstallContext {
@@ -30,19 +24,6 @@ export interface BrowseInstallContext {
 	backLabel: string
 	heading: string
 	warning?: string
-	queuedCount?: number
-	queuedLabel?: string
-	clearQueued?: () => void | Promise<void>
-	onBack?: () => boolean | void | Promise<boolean | void>
-	selectedProjects?: BrowseSelectedProject[]
-	isInstallingSelected?: boolean
-	installProgress?: {
-		completed: number
-		total: number
-	}
-	clearSelected?: () => void | Promise<void>
-	discardSelectedAndBack?: () => void | Promise<void>
-	installSelected?: () => boolean | void | Promise<boolean | void>
 }
 
 export interface CardAction {
@@ -51,7 +32,7 @@ export interface CardAction {
 	icon: Component
 	iconClass?: string
 	disabled?: boolean
-	color?: 'brand' | 'red' | 'green'
+	color?: 'brand' | 'red'
 	type?: 'standard' | 'outlined' | 'transparent'
 	circular?: boolean
 	tooltip?: string

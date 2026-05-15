@@ -196,7 +196,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
+import type { Archon } from '@icarus/api-client'
 import {
 	CopyIcon,
 	ExternalIcon,
@@ -204,21 +204,21 @@ import {
 	EyeOffIcon,
 	SpinnerIcon,
 	UpdatedIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import { ButtonStyled, Combobox, StyledInput } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import {
-	injectModrinthClient,
-	injectModrinthServerContext,
+	injectIcarusClient,
+	injectIcarusServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
 
 const { addNotification } = injectNotificationManager()
-const { server, serverId, worldId } = injectModrinthServerContext()
-const client = injectModrinthClient()
+const { server, serverId, worldId } = injectIcarusServerContext()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
 
 // SFTP state
@@ -389,3 +389,4 @@ function resetToDefault() {
 	@apply [&:hover:not(:has(button:hover))]:brightness-125 [&:active:not(:has(button:active))]:scale-95;
 }
 </style>
+

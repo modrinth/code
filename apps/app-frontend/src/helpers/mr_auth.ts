@@ -1,5 +1,5 @@
 /**
- * All theseus API calls return serialized values (both return values and errors);
+ * All pteron API calls return serialized values (both return values and errors);
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */

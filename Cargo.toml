@@ -77,6 +77,7 @@ dotenv-build = "0.1.1"
 dotenvy = "0.15.7"
 dunce = "1.0.5"
 either = "1.15.0"
+elasticsearch = "9.1.0-alpha.1"
 encoding_rs = "0.8.35"
 enumset = "1.1.10"
 eyre = "0.6.12"
@@ -118,7 +119,6 @@ maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.30.0", default-features = false }
 modrinth-log = { path = "packages/modrinth-log" }
 modrinth-util = { path = "packages/modrinth-util" }
-muralpay = { path = "packages/muralpay" }
 murmur2 = "0.1.0"
 native-dialog = "0.9.2"
 notify = { version = "8.2.0", default-features = false }
@@ -194,7 +194,7 @@ tauri-plugin-updater = { version = "2.9.0", default-features = false, features =
 ] }
 tauri-plugin-window-state = "2.4.0"
 tempfile = "3.23.0"
-theseus = { path = "packages/app-lib" }
+pteron = { path = "packages/app-lib" }
 thiserror = "2.0.17"
 tikv-jemalloc-ctl = "0.6.0"
 tikv-jemallocator = "0.6.0"

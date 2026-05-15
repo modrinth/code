@@ -2,7 +2,7 @@ import {
 	AbstractWebNotificationManager,
 	type NotificationPanelLocation,
 	type WebNotification,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { type Ref, ref } from 'vue'
 
 export class AppNotificationManager extends AbstractWebNotificationManager {

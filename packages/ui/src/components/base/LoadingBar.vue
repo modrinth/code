@@ -109,7 +109,7 @@ onBeforeUnmount(clearTimers)
 
 <template>
 	<div
-		class="modrinth-loading-bar"
+		class="Icarus-loading-bar"
 		:style="{
 			position: props.position,
 			top: props.offsetTop,
@@ -128,7 +128,7 @@ onBeforeUnmount(clearTimers)
 </template>
 
 <style lang="scss" scoped>
-.modrinth-loading-bar {
+.Icarus-loading-bar {
 	z-index: 999999;
 
 	&::before {
@@ -146,3 +146,4 @@ onBeforeUnmount(clearTimers)
 	}
 }
 </style>
+

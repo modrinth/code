@@ -44,7 +44,7 @@
 	--color-green-800: #0a7141;
 	--color-green-900: #0a5d38;
 	--color-green-950: #00341d;
-	--color-green: var(--color-green-600);
+	--color-green: var(--color-purple-600);
 
 	--color-blue-50: #f2f7fd;
 	--color-blue-100: #e4ecfa;
@@ -109,20 +109,20 @@
 
 	--color-red-highlight: rgba(203, 34, 69, 0.25);
 	--color-orange-highlight: rgba(224, 131, 37, 0.25);
-	--color-green-highlight: rgba(0, 175, 92, 0.25);
+	--color-green-highlight: rgba(142, 50, 243, 0.25);
 	--color-blue-highlight: rgba(31, 104, 192, 0.25);
 	--color-purple-highlight: rgba(142, 50, 243, 0.25);
 	--color-gray-highlight: rgba(89, 91, 97, 0.25);
 
 	--color-red-bg: rgba(203, 34, 69, 0.1);
 	--color-orange-bg: rgba(224, 131, 37, 0.1);
-	--color-green-bg: rgba(0, 175, 92, 0.1);
+	--color-green-bg: rgba(142, 50, 243, 0.1);
 	--color-blue-bg: rgba(31, 104, 192, 0.1);
 	--color-purple-bg: rgba(142, 50, 243, 0.1);
 
-	--color-brand: var(--color-green);
-	--color-brand-highlight: var(--color-green-highlight);
-	--color-brand-shadow: rgba(0, 175, 92, 0.7);
+	--color-brand: var(--color-purple);
+	--color-brand-highlight: var(--color-purple-highlight);
+	--color-brand-shadow: rgba(142, 50, 243, 0.7);
 
 	--shadow-inset-lg: inset 0px -2px 2px hsla(221, 39%, 91%, 0.1);
 	--shadow-inset: inset 0px -2px 2px hsla(221, 39%, 91%, 0.05);
@@ -139,26 +139,18 @@
 
 	--shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
 
-	--brand-gradient-bg: linear-gradient(
-		0deg,
-		rgba(68, 182, 138, 0.175) 0%,
-		rgba(58, 250, 112, 0.125) 100%
-	);
-	--brand-gradient-strong-bg: linear-gradient(
-		270deg,
-		rgba(68, 182, 138, 0.175) 0%,
-		rgba(36, 225, 91, 0.12) 100%
-	);
+	--brand-gradient-bg: linear-gradient(0deg, rgba(112, 82, 197, 0.2) 0%, rgba(199, 138, 255, 0.15) 100%);
+	--brand-gradient-strong-bg: linear-gradient(270deg, rgba(96, 66, 178, 0.22) 0%, rgba(179, 95, 255, 0.14) 100%);
 	--brand-gradient-button: rgba(255, 255, 255, 0.5);
-	--brand-gradient-border: rgba(32, 64, 32, 0.15);
-	--brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(213, 235, 224, 0), #d0ece0 70%);
+	--brand-gradient-border: rgba(104, 70, 170, 0.22);
+	--brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(234, 224, 250, 0), #e8dcf8 70%);
 
 	--color-button-bg-selected: var(--color-brand);
 	--color-button-text-selected: var(--color-accent-contrast);
 
 	--color-gradient-button-bg: linear-gradient(180deg, #f8f9fa 0%, #dce0e6 100%);
 
-	--loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #00af5c 100%);
+	--loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #b45eff 100%);
 
 	--color-platform-fabric: #8a7b71;
 	--color-platform-quilt: #8b61b4;
@@ -269,7 +261,7 @@ html {
 	--color-green-800: #126937;
 	--color-green-900: #11562f;
 	--color-green-950: #033018;
-	--color-green: var(--color-green-500);
+	--color-green: var(--color-purple-500);
 
 	--color-blue-50: #eef6ff;
 	--color-blue-100: #daeaff;
@@ -334,20 +326,20 @@ html {
 
 	--color-red-highlight: rgba(255, 73, 110, 0.25);
 	--color-orange-highlight: rgba(255, 163, 71, 0.25);
-	--color-green-highlight: rgba(27, 217, 106, 0.25);
+	--color-green-highlight: rgba(199, 138, 255, 0.25);
 	--color-blue-highlight: rgba(79, 156, 255, 0.25);
 	--color-purple-highlight: rgba(199, 138, 255, 0.25);
 	--color-gray-highlight: rgba(159, 164, 179, 0.25);
 
 	--color-red-bg: rgba(255, 73, 110, 0.2);
 	--color-orange-bg: rgba(255, 163, 71, 0.2);
-	--color-green-bg: rgba(27, 217, 106, 0.2);
+	--color-green-bg: rgba(199, 138, 255, 0.2);
 	--color-blue-bg: rgba(79, 156, 255, 0.2);
 	--color-purple-bg: rgba(199, 138, 255, 0.2);
 
-	--color-brand: var(--color-green);
-	--color-brand-highlight: rgba(27, 217, 106, 0.25);
-	--color-brand-shadow: rgba(27, 217, 106, 0.7);
+	--color-brand: var(--color-purple);
+	--color-brand-highlight: rgba(199, 138, 255, 0.25);
+	--color-brand-shadow: rgba(199, 138, 255, 0.7);
 
 	--shadow-inset-lg: inset 0px -2px 2px hsla(221, 39%, 11%, 0.1);
 	--shadow-inset: inset 0px -2px 2px hsla(221, 39%, 11%, 0.05);
@@ -361,18 +353,18 @@ html {
 
 	--shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
 
-	--brand-gradient-bg: linear-gradient(0deg, rgba(14, 35, 19, 0.2) 0%, rgba(55, 137, 73, 0.1) 100%);
-	--brand-gradient-strong-bg: linear-gradient(270deg, #09110d 10%, #131f17 100%);
+	--brand-gradient-bg: linear-gradient(0deg, rgba(38, 24, 56, 0.28) 0%, rgba(96, 60, 152, 0.18) 100%);
+	--brand-gradient-strong-bg: linear-gradient(270deg, #130d1c 10%, #221634 100%);
 	--brand-gradient-button: rgba(255, 255, 255, 0.08);
-	--brand-gradient-border: rgba(155, 255, 160, 0.08);
-	--brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(24, 30, 31, 0), #171d1e 80%);
+	--brand-gradient-border: rgba(210, 170, 255, 0.12);
+	--brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(29, 23, 38, 0), #1e1729 80%);
 
 	--color-button-bg-selected: var(--color-brand-highlight);
 	--color-button-text-selected: var(--color-brand);
 
 	--color-gradient-button-bg: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
 
-	--loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #1ffa9a 100%);
+	--loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #d093ff 100%);
 
 	--color-platform-fabric: #dbb69b;
 	--color-platform-quilt: #c796f9;

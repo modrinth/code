@@ -15,7 +15,7 @@
 			<span>
 				{{
 					formatMessage(messages.extracted, {
-						size: formatBytes(op.bytes_processed ?? 0),
+						size: 'bytes_processed' in op ? formatBytes(op.bytes_processed ?? 0) : '0 B',
 					})
 				}}
 			</span>
@@ -34,15 +34,15 @@
 </template>
 
 <script setup lang="ts">
-import { PackageOpenIcon } from '@modrinth/assets'
+import { PackageOpenIcon } from '@icarus/assets'
+import { formatBytes } from '@icarus/utils'
 import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import { useFormatBytes } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
-import { injectModrinthServerContext } from '#ui/providers'
+import { injectIcarusServerContext } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
 defineEmits<{ dismiss: [] }>()
@@ -53,8 +53,7 @@ const props = defineProps<{
 }>()
 
 const { formatMessage } = useVIntl()
-const formatBytes = useFormatBytes()
-const ctx = injectModrinthServerContext()
+const ctx = injectIcarusServerContext()
 
 const messages = defineMessages({
 	extracting: {
@@ -98,3 +97,4 @@ const title = computed(() => {
 	return formatMessage(messages.extracting, { source: sourceName.value })
 })
 </script>
+

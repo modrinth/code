@@ -6,7 +6,7 @@ import {
 	PlayIcon,
 	SpinnerIcon,
 	StopCircleIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -17,14 +17,12 @@ import {
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
-} from '@modrinth/ui'
-import { capitalizeString } from '@modrinth/utils'
+} from '@icarus/ui'
+import { capitalizeString } from '@icarus/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Dayjs } from 'dayjs'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-
-import { trackEvent } from '@/helpers/analytics'
 import { get_project } from '@/helpers/cache'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
@@ -84,11 +82,7 @@ const play = async (event: MouseEvent) => {
 	await run(props.instance.path)
 		.catch((err) => handleSevereError(err, { profilePath: props.instance.path }))
 		.finally(() => {
-			trackEvent('InstanceStart', {
-				loader: props.instance.loader,
-				game_version: props.instance.game_version,
-				source: 'InstanceItem',
-			})
+			
 		})
 	emit('play')
 	loading.value = false
@@ -98,11 +92,7 @@ const stop = async (event: MouseEvent) => {
 	event?.stopPropagation()
 	loading.value = true
 	await kill(props.instance.path).catch(handleError)
-	trackEvent('InstanceStop', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		source: 'InstanceItem',
-	})
+	
 	emit('stop')
 	loading.value = false
 }

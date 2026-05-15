@@ -29,10 +29,6 @@ export const commonMessages = defineMessages({
 		id: 'project-type.all',
 		defaultMessage: 'All',
 	},
-	addServerToInstanceButton: {
-		id: 'button.add-server-to-instance',
-		defaultMessage: 'Add server to instance',
-	},
 	backButton: {
 		id: 'button.back',
 		defaultMessage: 'Back',
@@ -137,10 +133,6 @@ export const commonMessages = defineMessages({
 		id: 'label.filter-by',
 		defaultMessage: 'Filter by',
 	},
-	filtersLabel: {
-		id: 'label.filters',
-		defaultMessage: 'Filters',
-	},
 	followButton: {
 		id: 'button.follow',
 		defaultMessage: 'Follow',
@@ -196,10 +188,6 @@ export const commonMessages = defineMessages({
 	openFolderButton: {
 		id: 'button.open-folder',
 		defaultMessage: 'Open folder',
-	},
-	openInModrinthButton: {
-		id: 'button.open-in-modrinth',
-		defaultMessage: 'Open in Modrinth',
 	},
 	orLabel: {
 		id: 'label.or',
@@ -397,34 +385,6 @@ export const commonMessages = defineMessages({
 		id: 'label.installation-info',
 		defaultMessage: 'Installation info',
 	},
-	installButton: {
-		id: 'button.install',
-		defaultMessage: 'Install',
-	},
-	installedLabel: {
-		id: 'label.installed',
-		defaultMessage: 'Installed',
-	},
-	validatingLabel: {
-		id: 'label.validating',
-		defaultMessage: 'Validating',
-	},
-	selectedLabel: {
-		id: 'label.selected',
-		defaultMessage: 'Selected',
-	},
-	installingContentLabel: {
-		id: 'label.installing-content',
-		defaultMessage: 'Installing content',
-	},
-	hideInstalledContentLabel: {
-		id: 'label.hide-installed-content',
-		defaultMessage: 'Hide already installed content',
-	},
-	hideSelectedContentLabel: {
-		id: 'label.hide-selected-content',
-		defaultMessage: 'Hide selected content',
-	},
 	installedModpackTitle: {
 		id: 'label.installed-modpack',
 		defaultMessage: 'Installed modpack',
@@ -490,10 +450,6 @@ export const commonMessages = defineMessages({
 	versionLabel: {
 		id: 'label.version',
 		defaultMessage: 'Version',
-	},
-	viewLabel: {
-		id: 'label.view',
-		defaultMessage: 'View',
 	},
 	projectLabel: {
 		id: 'label.project',
@@ -996,10 +952,6 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.versions.title',
 		defaultMessage: 'Versions',
 	},
-	permissions: {
-		id: 'project.settings.versions.permissions',
-		defaultMessage: 'Permissions',
-	},
 	view: {
 		id: 'project.settings.view.title',
 		defaultMessage: 'View',
@@ -1136,32 +1088,5 @@ export const paymentMethodMessages = defineMessages({
 	charityPlural: {
 		id: 'payment-method.charity-plural',
 		defaultMessage: 'Charities',
-	},
-})
-
-export const externalProjectLicenseStatusMessages = defineMessages({
-	yes: {
-		id: 'external-project-license-status.yes',
-		defaultMessage: 'Yes',
-	},
-	'with-attribution-and-source': {
-		id: 'external-project-license-status.with-attribution-and-source',
-		defaultMessage: 'With attribution and source',
-	},
-	'with-attribution': {
-		id: 'external-project-license-status.with-attribution',
-		defaultMessage: 'With attribution',
-	},
-	no: {
-		id: 'external-project-license-status.no',
-		defaultMessage: 'No',
-	},
-	'permanent-no': {
-		id: 'external-project-license-status.permanent-no',
-		defaultMessage: 'Permanent no',
-	},
-	unidentified: {
-		id: 'external-project-license-status.unidentified',
-		defaultMessage: 'Unidentified',
 	},
 })

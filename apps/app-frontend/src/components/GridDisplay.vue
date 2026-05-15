@@ -8,7 +8,7 @@ import {
 	SearchIcon,
 	StopCircleIcon,
 	TrashIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Accordion,
 	DropdownSelect,
@@ -16,7 +16,7 @@ import {
 	injectNotificationManager,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'

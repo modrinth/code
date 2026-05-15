@@ -79,7 +79,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	BookTextIcon,
 	CalendarIcon,
@@ -87,8 +87,8 @@ import {
 	HeartIcon,
 	ScaleIcon,
 	VersionIcon,
-} from '@modrinth/assets'
-import { capitalizeString } from '@modrinth/utils'
+} from '@icarus/assets'
+import { capitalizeString } from '@icarus/utils'
 import { computed } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../composables'

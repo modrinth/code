@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
+import { injectIcarusClient, ServersManageRootLayout } from '@icarus/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
 import { reloadNuxtApp } from '#app'
@@ -49,7 +49,7 @@ const router = useRouter()
 const config = useRuntimeConfig()
 const serverId = route.params.id as string
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
 
 if (serverId) {
@@ -94,12 +94,5 @@ definePageMeta({
 	middleware: 'auth',
 })
 
-useHead({
-	script: [
-		{
-			src: 'https://tally.so/widgets/embed.js',
-			defer: true,
-		},
-	],
-})
+useHead({})
 </script>

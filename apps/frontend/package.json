@@ -1,5 +1,5 @@
 {
-	"name": "@modrinth/frontend",
+	"name": "@icarus/frontend",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -17,7 +17,7 @@
 	},
 	"devDependencies": {
 		"@formatjs/cli": "^6.2.12",
-		"@modrinth/tooling-config": "workspace:*",
+		"@icarus/tooling-config": "workspace:*",
 		"@types/dompurify": "^3.0.5",
 		"@types/iso-3166-2": "^1.0.4",
 		"@types/js-yaml": "^4.0.9",
@@ -40,14 +40,14 @@
 		"@formatjs/intl-localematcher": "^0.5.4",
 		"@intercom/messenger-js-sdk": "^0.0.14",
 		"@ltd/j-toml": "^1.38.0",
-		"@modrinth/api-client": "workspace:*",
-		"@modrinth/assets": "workspace:*",
-		"@modrinth/blog": "workspace:*",
-		"@modrinth/moderation": "workspace:*",
-		"@modrinth/ui": "workspace:*",
-		"@modrinth/utils": "workspace:*",
+		"@icarus/api-client": "workspace:*",
+		"@icarus/assets": "workspace:*",
+		"@icarus/blog": "workspace:*",
+		"@icarus/moderation": "workspace:*",
+		"@icarus/ui": "workspace:*",
+		"@icarus/utils": "workspace:*",
 		"@sentry/nuxt": "^10.33.0",
-		"@tanstack/vue-query": "5.90.7",
+		"@tanstack/vue-query": "^5.90.7",
 		"@types/three": "^0.172.0",
 		"@vitejs/plugin-vue": "^6.0.3",
 		"@vue-email/components": "^0.0.21",
@@ -80,5 +80,5 @@
 		"xss": "^1.0.14"
 	},
 	"web-types": "../../web-types.json",
-	"prettier": "@modrinth/tooling-config/frontend.prettier.config.cjs"
+	"prettier": "@icarus/tooling-config/frontend.prettier.config.cjs"
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RadioButtonCheckedIcon, RadioButtonIcon, SearchIcon } from '@modrinth/assets'
+import { RadioButtonCheckedIcon, RadioButtonIcon, SearchIcon } from '@icarus/assets'
 import Fuse from 'fuse.js/dist/fuse.basic'
 import { computed, ref, watchSyncEffect } from 'vue'
 

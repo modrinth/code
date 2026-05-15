@@ -1,11 +1,11 @@
 ---
 title: Content Management Overhaul
-summary: Overhauled content management for both Modrinth Hosting servers and Modrinth App instances.
+summary: Overhauled content management for both Icarus Hosting servers and Icarus Launcher instances.
 date: 2026-03-17T12:15:00-08:00
 authors: ['AJfd8YH6', 'bOHH0P9Z', 'LnK8MbX7']
 ---
 
-Today we’re shipping a big update to Modrinth Hosting. We’ve completely overhauled server onboarding and content management.
+Today we’re shipping a big update to Icarus Hosting. We’ve completely overhauled server onboarding and content management.
 
 All these improvements have also made their way to instances in the app so both experiences will stay the same moving forward.
 
@@ -20,21 +20,21 @@ All these improvements have also made their way to instances in the app so both 
 
 ## Design Goals
 
-Servers are very similar to a single instance in the app when it comes to installing and managing content. The content tab on Modrinth Hosting was much more primitive than instances which made it harder to keep features consistent.
+Servers are very similar to a single instance in the app when it comes to installing and managing content. The content tab on Icarus Hosting was much more primitive than instances which made it harder to keep features consistent.
 
 Our goal was to bring those two experiences together.
 
 We took everything we learned from working on instances, looked at what was missing, and rebuilt it from the ground up so the same implementation can power both.
 
-Because of that, many of the features in this post are new to Modrinth Hosting but already familiar to app users. Modrinth App instances also picked up a few upgrades along the way, so you will see some improvements there too.
+Because of that, many of the features in this post are new to Icarus Hosting but already familiar to app users. Icarus Launcher instances also picked up a few upgrades along the way, so you will see some improvements there too.
 
 ## Server Onboarding
 
-Simplifying server setup is one of the main goals for Modrinth Hosting. We want setting up a modded server for a group of friends to be simple and just work.
+Simplifying server setup is one of the main goals for Icarus Hosting. We want setting up a modded server for a group of friends to be simple and just work.
 
 Once your server is ready you’re greeted with a short onboarding screen that explains what comes next. Clicking setup server opens a guided setup flow that walks you through choosing your content and configuring your world.
 
-![A screenshot of the new server onboarding screen. It reads, "Welcome to Modrinth. Your server is ready. Here's what you need to do to start playing!" followed by an estimate that it will take about 2 minutes to set up. It lists three steps: 1) Choose what you want to play. 2) Configure your world. And 3) Invite your friends. At the bottom is a "Setup server" button for you to proceed to setup.](./server-onboarding.webp)
+![A screenshot of the new server onboarding screen. It reads, "Welcome to Icarus. Your server is ready. Here's what you need to do to start playing!" followed by an estimate that it will take about 2 minutes to set up. It lists three steps: 1) Choose what you want to play. 2) Configure your world. And 3) Invite your friends. At the bottom is a "Setup server" button for you to proceed to setup.](./server-onboarding.webp)
 
 You can set up your server in three ways:
 
@@ -56,7 +56,7 @@ Servers also have a much nicer reset flow in your options. You can reset the ser
 
 Along with the new onboarding flow comes a redesigned content tab.
 
-The entire page has been refreshed to better match Modrinth’s current design language. Alongside the visual update we also shipped several functional improvements for servers:
+The entire page has been refreshed to better match Icarus’s current design language. Alongside the visual update we also shipped several functional improvements for servers:
 
 - Installed projects are now listed in a table and support bulk actions
 - More filtering options on projects
@@ -110,8 +110,9 @@ Additionally, we brought the installation settings from instances over to server
 - Repair installation
   - Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly.
 
-![A screenshot of the updated "Platform" tab in the Modrinth Hosting panel options, allowing you to edit the modpack you have installed, unlink your server from the modpack, re-install, repair, or reset your server.](./installation-settings.webp)
+![A screenshot of the updated "Platform" tab in the Icarus Hosting panel options, allowing you to edit the modpack you have installed, unlink your server from the modpack, re-install, repair, or reset your server.](./installation-settings.webp)
 
 —
 
-That’s everything from us! Thank you for choosing Modrinth Hosting.
+That’s everything from us! Thank you for choosing Icarus Hosting.
+

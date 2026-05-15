@@ -11,7 +11,7 @@
 
 # Internationalization (i18n)
 
-All user-visible strings in Vue SFCs must use the localization system from `@modrinth/ui`. No hard-coded English strings should appear in templates or script — everything comes from `formatMessage` or `<IntlFormatted>`.
+All user-visible strings in Vue SFCs must use the localization system from `@Icarus/ui`. No hard-coded English strings should appear in templates or script — everything comes from `formatMessage` or `<IntlFormatted>`.
 
 ## Translatable Strings
 
@@ -21,7 +21,7 @@ Dynamic expressions (`{{ user.name }}`) and HTML tags are not translatable strin
 
 ## Message Definitions
 
-Messages are defined with `defineMessage` or `defineMessages` from `@modrinth/ui` in `<script setup>`. Each message has a unique `id` and a `defaultMessage` containing the English string:
+Messages are defined with `defineMessage` or `defineMessages` from `@Icarus/ui` in `<script setup>`. Each message has a unique `id` and a `defaultMessage` containing the English string:
 
 ```ts
 const messages = defineMessages({
@@ -34,7 +34,7 @@ Message `id`s should be descriptive and stable (e.g. `error.generic.default.titl
 
 ## Rendering Messages
 
-Use `useVIntl()` from `@modrinth/ui` for simple string formatting:
+Use `useVIntl()` from `@Icarus/ui` for simple string formatting:
 
 ```ts
 const { formatMessage } = useVIntl()
@@ -108,7 +108,7 @@ Render with the `<IntlFormatted>` component using named slots:
 </IntlFormatted>
 ```
 
-For simple emphasis (`'Welcome to <strong>Modrinth</strong>!'`):
+For simple emphasis (`'Welcome to <strong>Icarus</strong>!'`):
 
 ```vue
 <template #strong="{ children }">
@@ -116,7 +116,7 @@ For simple emphasis (`'Welcome to <strong>Modrinth</strong>!'`):
 </template>
 ```
 
-For complex child handling, use `normalizeChildren` from `@modrinth/ui`:
+For complex child handling, use `normalizeChildren` from `@Icarus/ui`:
 
 ```vue
 <template #bold="{ children }">
@@ -130,7 +130,7 @@ If an ICU placeholder ends right before `}}` in a Vue template, insert a space (
 
 ## Imports
 
-All i18n utilities come from `@modrinth/ui`:
+All i18n utilities come from `@Icarus/ui`:
 
 - `defineMessage` / `defineMessages` — message definitions
 - `useVIntl` — composable providing `formatMessage`
@@ -141,3 +141,4 @@ All i18n utilities come from `@modrinth/ui`:
 
 - Variables and plurals: `apps/frontend/src/pages/frog.vue`
 - Rich-text with link tags: `apps/frontend/src/pages/auth/welcome.vue` and `apps/frontend/src/error.vue`
+

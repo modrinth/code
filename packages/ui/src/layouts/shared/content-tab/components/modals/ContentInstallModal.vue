@@ -243,7 +243,7 @@ import {
 	SearchIcon,
 	UploadIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import { computed, ref } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { BookTextIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
+import { BookTextIcon, XIcon } from '@icarus/assets'
+import { ButtonStyled, commonMessages, PagewideBanner, useVIntl } from '@icarus/ui'
 
 const flags = useFeatureFlags()
 const { formatMessage } = useVIntl()
@@ -15,28 +15,28 @@ function hideRussiaCensorshipBanner() {
 	<PagewideBanner v-if="!flags.hideRussiaCensorshipBanner" variant="error">
 		<template #title>
 			<div class="flex flex-col gap-1 text-contrast">
-				<span lang="ru">К сожалению, Modrinth скоро станет недоступен в России</span>
+				<span lang="ru">К сожалению, Icarus скоро станет недоступен в России</span>
 				<span class="text-sm font-medium opacity-50" lang="en">
-					Modrinth will soon be unavailable in Russia
+					Icarus will soon be unavailable in Russia
 				</span>
 			</div>
 		</template>
 		<template #description>
 			<p class="m-0" lang="ru">
-				Российское правительство потребовало от нас заблокировать некоторые проекты на Modrinth, но
+				Российское правительство потребовало от нас заблокировать некоторые проекты на Icarus, но
 				мы решили отказать им в цензуре.
 			</p>
 			<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
-				The Russian government has asked us to censor certain topics on Modrinth and we have decided
+				The Russian government has asked us to censor certain topics on Icarus and we have decided
 				to refuse to comply with their requests.
 			</p>
 
 			<p class="m-0 font-semibold" lang="ru">
 				Пожалуйста, найдите какой-нибудь надёжный VPN или прокси, чтобы не потерять доступ к
-				Modrinth.
+				Icarus.
 			</p>
 			<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
-				Please seek a reputable VPN or proxy of some kind to continue to access Modrinth in Russia.
+				Please seek a reputable VPN or proxy of some kind to continue to access Icarus in Russia.
 			</p>
 		</template>
 		<template #actions>
@@ -47,7 +47,7 @@ function hideRussiaCensorshipBanner() {
 						<span class="text-xs font-medium">(Перевод на русский)</span>
 					</nuxt-link>
 				</ButtonStyled>
-				<ButtonStyled type="transparent" hover-color-fill="background">
+				<ButtonStyled>
 					<nuxt-link to="/news/article/standing-by-our-values">
 						<BookTextIcon /> Read our full statement
 						<span class="text-xs font-medium">(English)</span>
@@ -55,7 +55,7 @@ function hideRussiaCensorshipBanner() {
 				</ButtonStyled>
 			</div>
 		</template>
-		<template #actions_top_right>
+		<template #actions_right>
 			<ButtonStyled circular type="transparent">
 				<button
 					v-tooltip="formatMessage(commonMessages.closeButton)"
@@ -67,3 +67,4 @@ function hideRussiaCensorshipBanner() {
 		</template>
 	</PagewideBanner>
 </template>
+

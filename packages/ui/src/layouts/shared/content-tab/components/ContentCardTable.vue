@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
+import { ChevronDownIcon, ChevronUpIcon } from '@icarus/assets'
 import { computed, getCurrentInstance, onMounted, onUnmounted, ref, toRef } from 'vue'
 
 import Checkbox from '#ui/components/base/Checkbox.vue'
@@ -89,7 +89,6 @@ const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems } = u
 	{
 		itemHeight: 74,
 		bufferSize: 5,
-		initialItemCount: 20,
 		enabled: toRef(props, 'virtualized'),
 	},
 )

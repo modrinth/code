@@ -358,44 +358,26 @@
 
 							<div v-else-if="generatedMessage" class="flex items-center gap-2">
 								<ButtonStyled>
-									<button :disabled="loadingModerationDecision" @click="goBackToStages">
+									<button @click="goBackToStages">
 										<LeftArrowIcon aria-hidden="true" />
 										Edit
 									</button>
 								</ButtonStyled>
 								<ButtonStyled color="red">
-									<button :disabled="loadingModerationDecision" @click="sendMessage('rejected')">
-										<SpinnerIcon
-											v-if="moderationDecision === 'rejected'"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										<XIcon v-else aria-hidden="true" />
+									<button @click="sendMessage('rejected')">
+										<XIcon aria-hidden="true" />
 										Reject
 									</button>
 								</ButtonStyled>
 								<ButtonStyled color="orange">
-									<button :disabled="loadingModerationDecision" @click="sendMessage('withheld')">
-										<SpinnerIcon
-											v-if="moderationDecision === 'withheld'"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										<LinkIcon v-else aria-hidden="true" />
+									<button @click="sendMessage('withheld')">
+										<EyeOffIcon aria-hidden="true" />
 										Withhold
 									</button>
 								</ButtonStyled>
 								<ButtonStyled color="green">
-									<button
-										:disabled="loadingModerationDecision"
-										@click="sendMessage(approveSendStatus)"
-									>
-										<SpinnerIcon
-											v-if="moderationDecision === approveSendStatus"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										<CheckIcon v-else aria-hidden="true" />
+									<button @click="sendMessage(projectV2.requested_status ?? 'approved')">
+										<CheckIcon aria-hidden="true" />
 										Approve
 									</button>
 								</ButtonStyled>
@@ -446,19 +428,18 @@ import {
 	BrushCleaningIcon,
 	CheckIcon,
 	DropdownIcon,
+	EyeOffIcon,
 	FileTextIcon,
 	KeyboardIcon,
 	LeftArrowIcon,
-	LinkIcon,
 	ListBulletedIcon,
 	LockIcon,
 	RightArrowIcon,
 	ScaleIcon,
-	SpinnerIcon,
 	ToggleLeftIcon,
 	ToggleRightIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	type Action,
 	type ActionState,
@@ -483,7 +464,7 @@ import {
 	processMessage,
 	type Stage,
 	type ToggleAction,
-} from '@modrinth/moderation'
+} from '@icarus/moderation'
 import {
 	Avatar,
 	ButtonStyled,
@@ -498,13 +479,13 @@ import {
 	type OverflowMenuOption,
 	StyledInput,
 	useDebugLogger,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import {
 	type ModerationJudgements,
 	type ModerationModpackItem,
 	type ProjectStatus,
 	renderHighlightedString,
-} from '@modrinth/utils'
+} from '@icarus/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computedAsync, useDebounceFn } from '@vueuse/core'
 import type { Component } from 'vue'
@@ -779,12 +760,6 @@ const message = ref(
 )
 const generatedMessage = ref(persistedGeneratedMessage.generated === true)
 const loadingMessage = ref(false)
-const moderationDecision = ref<ProjectStatus | null>(null)
-const loadingModerationDecision = computed(() => moderationDecision.value !== null)
-const approveSendStatus = computed<ProjectStatus>(() => {
-	const requested = projectV2.value.requested_status
-	return requested ?? 'approved'
-})
 const done = ref(false)
 
 function persistGeneratedMessageState() {
@@ -1099,7 +1074,6 @@ function resetProgress() {
 	done.value = false
 	clearGeneratedMessageState()
 	loadingMessage.value = false
-	moderationDecision.value = null
 
 	localStorage.removeItem(`modpack-permissions-${projectV2.value.id}`)
 	localStorage.removeItem(`modpack-permissions-index-${projectV2.value.id}`)
@@ -1216,7 +1190,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				tryResetProgress: resetProgress,
 				tryExitModeration: handleExit,
 
-				tryApprove: () => sendMessage(approveSendStatus.value),
+				tryApprove: () => sendMessage(projectV2.value.requested_status ?? 'approved'),
 				tryReject: () => sendMessage('rejected'),
 				tryWithhold: () => sendMessage('withheld'),
 				tryEditMessage: goBackToStages,
@@ -2003,7 +1977,6 @@ async function sendMessage(status: ProjectStatus) {
 		return
 	}
 
-	moderationDecision.value = status
 	try {
 		await useBaseFetch(`project/${projectId}`, {
 			method: 'PATCH',
@@ -2053,8 +2026,6 @@ async function sendMessage(status: ProjectStatus) {
 			text: 'Failed to submit moderation decision. Please try again.',
 			type: 'error',
 		})
-	} finally {
-		moderationDecision.value = null
 	}
 }
 

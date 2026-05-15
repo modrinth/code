@@ -10,7 +10,7 @@
 	</NuxtLayout>
 </template>
 <script setup lang="ts">
-import { I18nDebugPanel, LoadingBar, NotificationPanel } from '@modrinth/ui'
+import { I18nDebugPanel, LoadingBar, NotificationPanel } from '@icarus/ui'
 
 import { setupProviders } from '~/providers/setup.ts'
 

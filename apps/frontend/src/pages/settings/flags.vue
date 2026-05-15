@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, StyledInput, Toggle } from '@modrinth/ui'
+import { SearchIcon } from '@icarus/assets'
+import { ButtonStyled, StyledInput, Toggle } from '@icarus/ui'
 import Fuse from 'fuse.js'
 import { computed, ref, shallowReactive } from 'vue'
 
@@ -50,7 +50,7 @@ useSeoMeta({
 			wrapper-class="w-full rounded-xl bg-bg-raised"
 		/>
 	</div>
-	<div class="mb-6 flex flex-col gap-2">
+	<div class="flex flex-col gap-2">
 		<div
 			v-for="flag in filteredFlags"
 			:key="`flag-${flag}`"

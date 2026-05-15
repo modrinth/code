@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Версии Modrinth App для Linux <issues-link>могут работать нестабильно</issues-link> на некоторых системах и конфигурациях. При возникновении проблем с приложением рекомендуется использовать альтернативы наподобие <prism-link>Prism Launcher</prism-link> для удобной установки контента с Modrinth."
+    "message": "Версии Icarus App для Linux <issues-link>могут работать нестабильно</issues-link> на некоторых системах и конфигурациях. При возникновении проблем с приложением рекомендуется использовать альтернативы наподобие <prism-link>Prism Launcher</prism-link> для удобной установки контента с Icarus."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -39,10 +39,10 @@
     "message": "Варианты установки"
   },
   "app-marketing.download.terms": {
-    "message": "Скачивая Modrinth App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденци­аль­ности</privacy-link>."
+    "message": "Скачивая Icarus App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденци­аль­ности</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "Скачать Modrinth App (бета-версия)"
+    "message": "Скачать Icarus App (бета-версия)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "Отслеживайте проекты"
   },
   "app-marketing.features.importing.description": {
-    "message": "Перенесите любимые профили из старого лаунчера и начните пользоваться Modrinth App за считанные секунды!"
+    "message": "Перенесите любимые профили из старого лаунчера и начните пользоваться Icarus App за считанные секунды!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "от {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth хранит все моды в одном месте. Скачивайте, удаляйте и обновляйте моды в один клик."
+    "message": "Icarus хранит все моды в одном месте. Скачивайте, удаляйте и обновляйте моды в один клик."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Установленные моды"
@@ -96,7 +96,7 @@
     "message": "Офлайн-режим"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth App имеет полностью открытый исходный код, доступный на <github-link>GitHub</github-link>!"
+    "message": "Icarus App имеет полностью открытый исходный код, доступный на <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Открытый код"
@@ -108,7 +108,7 @@
     "message": "% ЦП"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
+    "message": "Icarus App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -128,8 +128,8 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 МБ"
   },
-  "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth App"
+  "app-marketing.features.performance.Icarus-app": {
+    "message": "Icarus Launcher"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 млрд %"
@@ -147,13 +147,13 @@
     "message": "Быстродействие"
   },
   "app-marketing.features.play.description": {
-    "message": "Скачивайте и играйте в любимые сборки и моды, используя Modrinth App."
+    "message": "Скачивайте и играйте в любимые сборки и моды, используя Icarus App."
   },
   "app-marketing.features.play.title": {
     "message": "Играйте с любимыми модами"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Создавайте, делитесь и играйте в сборки, используя любые из тысяч модов и сборок, размещённых на Modrinth."
+    "message": "Создавайте, делитесь и играйте в сборки, используя любые из тысяч модов и сборок, размещённых на Icarus."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Сборка"
@@ -168,7 +168,7 @@
     "message": "Лаунчер, непохожий"
   },
   "app-marketing.features.website.description": {
-    "message": "Приложение полностью интегрировано с сайтом — открывайте любимые проекты прямо в Modrinth App!"
+    "message": "Приложение полностью интегрировано с сайтом — открывайте любимые проекты прямо в Icarus App!"
   },
   "app-marketing.features.website.title": {
     "message": "Интеграция с сайтом"
@@ -177,19 +177,19 @@
     "message": "на все остальные"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Скриншот Modrinth App со страницей содержимого сборки Cobblemon."
+    "message": "Скриншот Icarus Launcher со страницей содержимого сборки Cobblemon."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App — уникальный лаунчер с открытым кодом, возможностью играть в любимые моды и быстро обновлять их, — всё в одной аккуратной упаковке."
+    "message": "Icarus App — уникальный лаунчер с открытым кодом, возможностью играть в любимые моды и быстро обновлять их, — всё в одной аккуратной упаковке."
   },
   "app-marketing.hero.download-button": {
-    "message": "Скачать Modrinth App"
+    "message": "Скачать Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "Скачать Modrinth App"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "Скачать Icarus App"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Скачать Modrinth App для {os}"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "Скачать Icarus App для {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Скриншот главного меню сборки Cobblemon."
@@ -291,7 +291,7 @@
     "message": "Уже есть аккаунт?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Получать новости о Modrinth"
+    "message": "Получать новости о Icarus"
   },
   "auth.sign-up.title": {
     "message": "Регистрация"
@@ -333,7 +333,7 @@
     "message": "Подтверждение почты"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Получать новости о Modrinth"
+    "message": "Получать новости о Icarus"
   },
   "auth.welcome.description": {
     "message": "Теперь вы часть потрясающего сообщества авторов и игроков, которые вместе создают, находят и следят за любимыми модами."
@@ -372,7 +372,7 @@
     "message": "Вы действительно хотите удалить эту коллекцию?"
   },
   "collection.description": {
-    "message": "{description} — Посмотреть коллекцию {name} от {username} на Modrinth"
+    "message": "{description} — Посмотреть коллекцию {name} от {username} на Icarus"
   },
   "collection.description.following": {
     "message": "Создана автоматически на основе всех отслеживаемых проектов."
@@ -554,9 +554,6 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Создать ссылку"
   },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Партнёрские коды не найдены."
-  },
   "dashboard.affiliate-links.error.title": {
     "message": "Ошибка загрузки партнёрских ссылок"
   },
@@ -574,15 +571,6 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Поиск ссылок..."
-  },
-  "dashboard.analytics.from-projects": {
-    "message": "с {count, plural, one {# проекта} other {# проектов}}"
-  },
-  "dashboard.analytics.total-downloads": {
-    "message": "Всего скачиваний"
-  },
-  "dashboard.analytics.total-followers": {
-    "message": "Всего подписчиков"
   },
   "dashboard.collections.button.create-new": {
     "message": "Создать новую"
@@ -607,18 +595,6 @@
   },
   "dashboard.collections.long-title": {
     "message": "Ваши коллекции"
-  },
-  "dashboard.collections.placeholder.search": {
-    "message": "Поиск коллекций..."
-  },
-  "dashboard.collections.sort.name-ascending": {
-    "message": "Название (А–Я)"
-  },
-  "dashboard.collections.sort.recently-created": {
-    "message": "Дата создания"
-  },
-  "dashboard.collections.sort.recently-updated": {
-    "message": "Дата обновления"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Скачать {formType}"
@@ -648,7 +624,7 @@
     "message": "Налоговая форма"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth использует сторонний сервис Track1099 для безопасного сбора и хранения налоговых форм. <security-link>Подробнее...</security-link>"
+    "message": "Icarus использует сторонний сервис Track1099 для безопасного сбора и хранения налоговых форм. <security-link>Подробнее...</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Меры безопасности"
@@ -702,7 +678,7 @@
     "message": "Поиск стран..."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-text": {
-    "message": "Не удалось получить доступные способы вывода. Повторите попытку позже."
+    "message": "Не удалось получить список доступных способов вывода. Повторите попытку позже."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-title": {
     "message": "Ошибка загрузки способов вывода"
@@ -813,7 +789,7 @@
     "message": "Чтобы вывести все <b>{available}</b> средства, пожалуйста, заполните форму ниже. Это необходимо для налоговой отчётности и нужно сделать только один раз."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "Для отчётности Modrinth и соблюдения налогового законодательства нужно заполнить форму W‑9 или W‑8."
+    "message": "Для отчётности Icarus и соблюдения налогового законодательства нужно заполнить форму W‑9 или W‑8."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Требуется налоговая форма"
@@ -855,7 +831,7 @@
     "message": "Непроверенная почта"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "Указанная почта не привязана к аккаунту Modrinth. Вознаграждения, отправленные на неверный адрес, невозможно вернуть."
+    "message": "Указанная почта не привязана к аккаунту Icarus. Вознаграждения, отправленные на неверный адрес, невозможно вернуть."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Можно снизить сборы"
@@ -872,168 +848,6 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Достигнут лимит вывода в <b>{withdrawLimit}</b>. Для снятия лимита заполните налоговую форму."
   },
-  "dashboard.head-title": {
-    "message": "Панель управления"
-  },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Отметить всё как прочитанное"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Посмотреть историю"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "У вас нет непрочитанных уведомлений."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Ошибка загрузки уведомлений:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "История"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "История уведомлений"
-  },
-  "dashboard.notifications.link.see-all": {
-    "message": "Посмотреть все"
-  },
-  "dashboard.notifications.link.view-history": {
-    "message": "История уведомлений"
-  },
-  "dashboard.notifications.link.view-more": {
-    "message": "Ещё {extraNotifs, plural, one {# уведомление} few {# уведомления} other {# уведомлений}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Загрузка уведомлений..."
-  },
-  "dashboard.organizations.button.create": {
-    "message": "Создать организацию"
-  },
-  "dashboard.organizations.empty.cta": {
-    "message": "Создайте организацию!"
-  },
-  "dashboard.organizations.error.fetch": {
-    "message": "Не удалось получить организации"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count, plural, one {# участник} few {# участника} other {# участников}}"
-  },
-  "dashboard.organizations.title": {
-    "message": "Организации"
-  },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Выберите проекты ниже, чтобы настроить их вместе."
-  },
-  "dashboard.projects.bulk-edit.server-disabled": {
-    "message": "Серверные проекты не поддерживают массовые операции"
-  },
-  "dashboard.projects.empty": {
-    "message": "Вы не имеете никаких либо проектов. Нажмите зелёную кнопку сверху, чтобы начать."
-  },
-  "dashboard.projects.head-title": {
-    "message": "Проекты"
-  },
-  "dashboard.projects.links.and-more": {
-    "message": "и ещё {count}..."
-  },
-  "dashboard.projects.links.button.clear-link": {
-    "message": "Отчистить ссылку"
-  },
-  "dashboard.projects.links.button.edit": {
-    "message": "Изменить ссылки"
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "Изменения были приняты для <strong>{count}</strong> {count, plural, one {проекта} other {проектов}}."
-  },
-  "dashboard.projects.links.description": {
-    "message": "Любые ссылки, указанные вами ниже, будут перезаписаны во всех заполненных полях. Поля, оставленные пустыми, будут проигнорированы. Вы можете удалить ссылку из всех выбранных проектов с помощью кнопки в виде корзины."
-  },
-  "dashboard.projects.links.discord-invite.description": {
-    "message": "Ссылка приглашения на ваш Discord сервер."
-  },
-  "dashboard.projects.links.discord-invite.label": {
-    "message": "Discord"
-  },
-  "dashboard.projects.links.issue-tracker.description": {
-    "message": "Сайт на котором можно будет пожаловаться на баг, ошибку или написать отзыв об вашем проекте."
-  },
-  "dashboard.projects.links.issue-tracker.label": {
-    "message": "Трекер проблем"
-  },
-  "dashboard.projects.links.placeholder.cleared": {
-    "message": "Существующая ссылка будет отчищена"
-  },
-  "dashboard.projects.links.placeholder.valid-discord-url": {
-    "message": "Введите ссылку приглашение на Discord"
-  },
-  "dashboard.projects.links.placeholder.valid-url": {
-    "message": "Введите ссылку"
-  },
-  "dashboard.projects.links.show-all-projects": {
-    "message": "Показывать все проекты"
-  },
-  "dashboard.projects.links.source-code.description": {
-    "message": "Страница/репозиторий с открытым кодом проекта"
-  },
-  "dashboard.projects.links.source-code.label": {
-    "message": "Исходный код"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Страница содержит информацию, документацию и помощь для проекта."
-  },
-  "dashboard.projects.links.wiki-page.label": {
-    "message": "Вики"
-  },
-  "dashboard.projects.notification.bulk-edit-success": {
-    "message": "Ссылки обновлены в выбранных проектах."
-  },
-  "dashboard.projects.project.icon-alt": {
-    "message": "Иконка для {title}"
-  },
-  "dashboard.projects.project.moderator-message-aria": {
-    "message": "Проект получил сообщение от модерации. Посмотрите страницу проекта, чтобы увидеть больше."
-  },
-  "dashboard.projects.project.review-environment-metadata": {
-    "message": "Пожалуйста, проверьте файл metadata"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "По возрастанию"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "По убыванию"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Название"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Статус"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Тип"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Иконка"
-  },
-  "dashboard.projects.table.id": {
-    "message": "ID"
-  },
-  "dashboard.projects.table.name": {
-    "message": "Название"
-  },
-  "dashboard.projects.table.status": {
-    "message": "Статус"
-  },
-  "dashboard.projects.table.type": {
-    "message": "Тип"
-  },
-  "dashboard.report.title": {
-    "message": "Жалоба {id}"
-  },
-  "dashboard.reports.active-title": {
-    "message": "Активные жалобы"
-  },
-  "dashboard.reports.title": {
-    "message": "Жалобы"
-  },
   "dashboard.revenue.available-now": {
     "message": "Доступно"
   },
@@ -1044,7 +858,7 @@
     "message": "Сумма может измениться, прежде чем станет доступна."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Нажмите, чтобы узнать, как Modrinth рассчитывает доход."
+    "message": "Нажмите, чтобы узнать, как Icarus рассчитывает доход."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Ожидается {date}"
@@ -1065,13 +879,10 @@
     "message": "Выведено"
   },
   "dashboard.revenue.tos": {
-    "message": "Загружая проекты на Modrinth и выводя деньги со своего счёта, вы соглашаетесь с нашими <terms-link>Условиями программы вознаграждений</terms-link>. Узнайте больше о <info-link>программе вознаграждений</info-link>."
+    "message": "Загружая проекты на Icarus и выводя деньги со своего счёта, вы соглашаетесь с нашими <terms-link>Условиями программы вознаграждений</terms-link>. Узнайте больше о <info-link>программе вознаграждений</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Скачать в формате CSV"
-  },
-  "dashboard.revenue.transactions.head-title": {
-    "message": "История транзакций"
   },
   "dashboard.revenue.transactions.header": {
     "message": "Транзакции"
@@ -1105,33 +916,6 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Вывод средств"
-  },
-  "dashboard.sidebar.label.activeReports": {
-    "message": "Активные жалобы"
-  },
-  "dashboard.sidebar.label.analytics": {
-    "message": "Аналитика"
-  },
-  "dashboard.sidebar.label.creators": {
-    "message": "Авторам"
-  },
-  "dashboard.sidebar.label.dashboard": {
-    "message": "Панель управления"
-  },
-  "dashboard.sidebar.label.notifications": {
-    "message": "Уведомления"
-  },
-  "dashboard.sidebar.label.organizations": {
-    "message": "Организации"
-  },
-  "dashboard.sidebar.label.overview": {
-    "message": "Обзор"
-  },
-  "dashboard.sidebar.label.projects": {
-    "message": "Проекты"
-  },
-  "dashboard.sidebar.label.revenue": {
-    "message": "Доход"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Счёт"
@@ -1229,33 +1013,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Заполните налоговую форму"
   },
-  "discover.install.back-to-server": {
-    "message": "Вернуться к серверу"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Вернуться к установке"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Отменить сброс"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "Нет доступного мира сервера для установки."
-  },
-  "discover.install.error.unsupported-content-type": {
-    "message": "Этот тип контента не поддерживается для установки на сервер."
-  },
-  "discover.install.heading.reset-modpack": {
-    "message": "Выбор сборки модов для установки после сброса"
-  },
-  "discover.seo.description": {
-    "message": "Тысячи {projectType, select, mod {модов} modpack {сборок} resourcepack {наборов ресурсов} shader {шейдеров} plugin {плагинов} datapack {наборов данных} other {проектов}} для Minecraft на Modrinth. Мгновенный точный поиск и удобные фильтры помогут быстро найти лучшие {projectType, select, mod {моды} modpack {сборки} resourcepack {наборы ресурсов} shader {шейдеры} plugin {плагины} datapack {наборы данных} other {проекты}} для Minecraft."
-  },
-  "discover.seo.title": {
-    "message": "Поиск {projectType, select, mod {модов} modpack {сборок} resourcepack {наборов ресурсов} shader {шейдеров} plugin {плагинов} datapack {наборов данных} other {проектов}}"
-  },
-  "discover.seo.title-with-query": {
-    "message": "Поиск {projectType, select, mod {модов} modpack {сборок} resourcepack {наборов ресурсов} shader {шейдеров} plugin {плагинов} datapack {наборов данных} other {проектов}} | {query}"
-  },
   "error.collection.404.list_item.1": {
     "message": "В адресе коллекции может быть ошибка."
   },
@@ -1263,19 +1020,13 @@
     "message": "Коллекция может быть приватной."
   },
   "error.collection.404.list_item.3": {
-    "message": "Коллекция могла быть удалена модерацией Modrinth за нарушение <tou-link>условий использования</tou-link>."
+    "message": "Коллекция могла быть удалена модерацией Icarus за нарушение <tou-link>условий использования</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "Почему?"
   },
   "error.collection.404.title": {
     "message": "Коллекция не найдена"
-  },
-  "error.generic.401.signed-in-as": {
-    "message": "Текущий аккаунт:"
-  },
-  "error.generic.401.title": {
-    "message": "У вас нет доступа к этой странице"
   },
   "error.generic.404.subtitle": {
     "message": "Похоже, такой страницы не существует."
@@ -1290,10 +1041,10 @@
     "message": "Контент недоступен по юридичес­ким причинам"
   },
   "error.generic.default.list_item.1": {
-    "message": "Проверьте доступность Modrinth на <status-link>странице статуса</status-link>."
+    "message": "Проверьте доступность Icarus на <status-link>странице статуса</status-link>."
   },
   "error.generic.default.list_item.2": {
-    "message": "Если проблема не исчезает, сообщите о ней команде Modrinth в <discord-link>Discord</discord-link>."
+    "message": "Если проблема не исчезает, сообщите о ней команде Icarus в <discord-link>Discord</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Повторите попытку через несколько минут."
@@ -1311,7 +1062,7 @@
     "message": "Владелец организации мог изменить адрес или удалить её."
   },
   "error.organization.404.list_item.3": {
-    "message": "Организация могла быть удалена модерацией Modrinth за нарушение <tou-link>условий использования</tou-link>."
+    "message": "Организация могла быть удалена модерацией Icarus за нарушение <tou-link>условий использования</tou-link>."
   },
   "error.organization.404.list_title": {
     "message": "Почему?"
@@ -1326,7 +1077,7 @@
     "message": "Владелец проекта мог изменить адрес, сделать проект приватным или удалить его."
   },
   "error.project.404.list_item.3": {
-    "message": "Проект мог быть удалён модерацией Modrinth за нарушение <tou-link>условий использования</tou-link>."
+    "message": "Проект мог быть удалён модерацией Icarus за нарушение <tou-link>условий использования</tou-link>."
   },
   "error.project.404.list_title": {
     "message": "Почему?"
@@ -1383,10 +1134,10 @@
     "message": "Когда сервер испытывает высокую нагрузку, ему временно выделяются дополнительные потоки CPU. Это помогает показателю TPS не упасть ниже 20 и обеспечивает максимально плавный игровой процесс. Из‑за своей кратковременности такие потоки могут не отображаться в отчётах Spark и других инструментах профилирования."
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Какие процессоры используются на серверах Modrinth Hosting?"
+    "message": "Какие процессоры используются на серверах Icarus Hosting?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Серверы Modrinth Hosting оснащены процессорами уровня AMD Ryzen 7900 и 7950X3D с частотой более 5 ГГц и памятью DDR5."
+    "message": "Серверы Icarus Hosting оснащены процессорами уровня AMD Ryzen 7900 и 7950X3D с частотой более 5 ГГц и памятью DDR5."
   },
   "hosting-marketing.faq.currency": {
     "message": "В какой валюте указаны цены?"
@@ -1395,19 +1146,19 @@
     "message": "Все цены указаны в долларах США (USD)."
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "Защищены ли серверы Modrinth Hosting от DDoS‑атак?"
+    "message": "Защищены ли серверы Icarus Hosting от DDoS‑атак?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Да. Все серверы Modrinth Hosting защищены от DDoS‑атак и в некоторых регионах выдерживают атаки до 17 Тбит/⁠с."
+    "message": "Да. Все серверы Icarus Hosting защищены от DDoS‑атак и в некоторых регионах выдерживают атаки до 17 Тбит/⁠с."
   },
   "hosting-marketing.faq.heading": {
     "message": "Вопросы и ответы"
   },
   "hosting-marketing.faq.how-fast": {
-    "message": "Насколько быстро работают серверы Modrinth Hosting?"
+    "message": "Насколько быстро работают серверы Icarus Hosting?"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Серверы Modrinth Hosting используют современное и мощное оборудование, однако сложно точно сказать, насколько быстро будет работать конкретный сервер. На производи­тель­ность влияет множество факторов: используемые моды, плагины, наборы данных и даже поведение игроков."
+    "message": "Серверы Icarus Hosting используют современное и мощное оборудование, однако сложно точно сказать, насколько быстро будет работать конкретный сервер. На производи­тель­ность влияет множество факторов: используемые моды, плагины, наборы данных и даже поведение игроков."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "Чаще всего проблемы с производи­тель­ностью вызваны плохой оптимизацией сборок, модов, плагинов и наборов данных. Наши серверы рассчитаны на высокие нагрузки, поэтому при выборе подходящего плана серьёзных проблем возникнуть не должно."
@@ -1416,10 +1167,10 @@
     "message": "Можно ли увеличить объём диска на сервере?"
   },
   "hosting-marketing.faq.increase-storage.answer": {
-    "message": "Да. Объём диска на сервере можно бесплатно увеличить: достаточно обратиться в поддержку Modrinth."
+    "message": "Да. Объём диска на сервере можно бесплатно увеличить: достаточно обратиться в поддержку Icarus."
   },
   "hosting-marketing.faq.location": {
-    "message": "Где расположены серверы Modrinth Hosting? Можно ли выбрать регион?"
+    "message": "Где расположены серверы Icarus Hosting? Можно ли выбрать регион?"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "При покупке можно выбрать сервер в Северной Америке, Европе или Юго‑Восточной Азии. В будущем появятся и другие регионы! Чтобы сменить регион, обратитесь в поддержку."
@@ -1428,7 +1179,7 @@
     "message": "Какие загрузчики и версии Minecraft можно использовать?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Серверы Modrinth Hosting поддерживают все версии Minecraft: Java Edition, начиная с 1.2.5, в том числе снапшоты."
+    "message": "Серверы Icarus Hosting поддерживают все версии Minecraft: Java Edition, начиная с 1.2.5, в том числе снапшоты."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "Также доступен большой выбор загрузчиков модов и плагинов, в том числе Fabric, Quilt, Forge, NeoForge, Paper и Purpur. Поддержка каждого загрузчика зависит от выбранной версии Minecraft."
@@ -1445,11 +1196,11 @@
   "hosting-marketing.hero.button.start-your-server": {
     "message": "Создать свой сервер"
   },
-  "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Создайте свой сервер с Modrinth Hosting"
+  "hosting-marketing.hero.host-with-Icarus": {
+    "message": "Создайте свой сервер с Icarus Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting — самый простой способ создать свой сервер Minecraft: Java Edition. Устанавливайте и играйте в любимые моды и сборки без хлопот — всё это внутри платформы Modrinth."
+    "message": "Icarus Hosting — самый простой способ создать свой сервер Minecraft: Java Edition. Устанавливайте и играйте в любимые моды и сборки без хлопот — всё это внутри платформы Icarus."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Гибкое управление сетью"
@@ -1467,10 +1218,10 @@
     "message": "Настраиваемый адрес"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "Делитесь сервером, используя собственный адрес <contrast>modrinth.gg</contrast>."
+    "message": "Делитесь сервером, используя собственный адрес <contrast>Icarus.gg</contrast>."
   },
   "hosting-marketing.included.description": {
-    "message": "Каждый сервер предлагает возможности для хостинга, доступные только на Modrinth."
+    "message": "Каждый сервер предлагает возможности для хостинга, доступные только на Icarus."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Удобный файловый менеджер"
@@ -1485,19 +1236,19 @@
     "message": "Поддержка в нужный момент"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Команда Modrinth готова помочь с сервером в любое время."
+    "message": "Команда Icarus готова помочь с сервером в любое время."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "Мощная консоль, удобная настройка и многое другое"
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "С Modrinth Hosting управление сервером становится проще."
+    "message": "С Icarus Hosting управление сервером становится проще."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "Доступ по SFTP"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "Работайте с файлами сервера напрямую по SFTP внутри Modrinth Hosting."
+    "message": "Работайте с файлами сервера напрямую по SFTP внутри Icarus Hosting."
   },
   "hosting-marketing.included.with-your-server": {
     "message": "Возможности сервера"
@@ -1520,11 +1271,11 @@
   "hosting-marketing.server-for-everyone": {
     "message": "Сервер найдётся для каждого"
   },
-  "hosting-marketing.why.all-on-modrinth": {
-    "message": "Управляйте всем на Modrinth"
+  "hosting-marketing.why.all-on-Icarus": {
+    "message": "Управляйте всем на Icarus"
   },
-  "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "Сервер, моды, игроки — всё уже есть на Modrinth. Не нужно переключаться между платформами."
+  "hosting-marketing.why.all-on-Icarus.description": {
+    "message": "Сервер, моды, игроки — всё уже есть на Icarus. Не нужно переключаться между платформами."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Всегда высокая скорость"
@@ -1533,7 +1284,7 @@
     "message": "Из‑за отсутствия перегрузок в инфраструктуре каждый сервер работает на полной мощности."
   },
   "hosting-marketing.why.description": {
-    "message": "Выберите любую из тысяч сборок на Modrinth или создайте свою. Пригласите друзей и начинайте игру."
+    "message": "Выберите любую из тысяч сборок на Icarus или создайте свою. Пригласите друзей и начинайте игру."
   },
   "hosting-marketing.why.heading": {
     "message": "Найдите сборку. Сервер готов."
@@ -1542,22 +1293,22 @@
     "message": "Новейший и надёжный хостинг"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "<contrast>Современные процессоры AMD с памятью DDR5</contrast> и собственное ПО обеспечивают быструю и стабильную работу серверов Modrinth Hosting."
+    "message": "<contrast>Современные процессоры AMD с памятью DDR5</contrast> и собственное ПО обеспечивают быструю и стабильную работу серверов Icarus Hosting."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Играйте сразу с модами"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Установка серверных модов и сборок встроена в Modrinth Hosting."
+    "message": "Установка серверных модов и сборок встроена в Icarus Hosting."
   },
-  "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "Преимущества Modrinth Hosting"
+  "hosting-marketing.why.why-Icarus-hosting": {
+    "message": "Преимущества Icarus Hosting"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "Любые моды на ваш вкус"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "Выбирайте Fabric, Forge, Quilt, NeoForge или сервер без модов. Всё, что есть на Modrinth, работает на сервере."
+    "message": "Выбирайте Fabric, Forge, Quilt, NeoForge или сервер без модов. Всё, что есть на Icarus, работает на сервере."
   },
   "hosting.plan.out-of-stock": {
     "message": "Нет в наличии"
@@ -1572,7 +1323,7 @@
     "message": "Перейти в панель управления"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Получайте лучший опыт моддинга благодаря постоянным обновлениям от команды Modrinth"
+    "message": "Получайте лучший опыт моддинга благодаря постоянным обновлениям от команды Icarus"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Постоянное развитие"
@@ -1584,7 +1335,7 @@
     "message": "Данные и статистика"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Получайте внимание тысяч игроков через поиск, главную, Discord и другие способы в будущем!"
+    "message": "Получайте внимание тысяч пользователей через поиск, главную страницу, сервер Discord и другие способы в будущем!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Заметность"
@@ -1617,13 +1368,13 @@
     "message": "Следите за тем, что нравится"
   },
   "landing.feature.launcher.description": {
-    "message": "Наш открытый API позволяет глубже интегрироваться с Modrinth — используйте <link>наше приложение</link> или сторонние лаунчеры наподобие ATLauncher, MultiMC и Prism Launcher."
+    "message": "Наш открытый API позволяет глубже интегрироваться с Icarus — используйте <link>наше приложение</link> или сторонние лаунчеры наподобие ATLauncher, MultiMC и Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "Играйте через свой лаунчер"
   },
   "landing.feature.search.description": {
-    "message": "Мгновенный поиск и мощные фильтры Modrinth позволяют находить контент уже во время ввода."
+    "message": "Мгновенный поиск и мощные фильтры Icarus позволяют находить контент уже во время ввода."
   },
   "landing.feature.search.heading": {
     "message": "Ищите нужное быстро и легко"
@@ -1656,10 +1407,10 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "Упрощённое изображение окна Minecraft с логотипом Mojang Studios в зелёном цвете Modrinth."
+    "message": "Упрощённое изображение окна Minecraft с логотипом Mojang Studios в зелёном цвете Icarus."
   },
-  "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+  "landing.launcher.Icarus-app-label": {
+    "message": "Icarus Launcher"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1702,9 +1453,6 @@
   },
   "layout.action.create-new": {
     "message": "Создать..."
-  },
-  "layout.action.external-projects": {
-    "message": "Внешние проекты"
   },
   "layout.action.file-lookup": {
     "message": "Поиск файла"
@@ -1752,25 +1500,25 @@
     "message": "Открыть настройки аккаунта"
   },
   "layout.banner.add-email.description": {
-    "message": "В целях безопасности Modrinth просит привязать почту к аккаунту."
+    "message": "В целях безопасности Icarus просит привязать почту к аккаунту."
   },
   "layout.banner.build-fail.description": {
-    "message": "При развёртывании фронтенда Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Пересоберите проект, когда API станет доступен. Коды ошибок: {errors}. Текущий адрес API: {url}"
+    "message": "При развёртывании фронтенда Icarus не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Пересоберите проект, когда API станет доступен. Коды ошибок: {errors}. Текущий адрес API: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "Ошибка генерации состояния от API во время сборки."
   },
   "layout.banner.preview.description": {
-    "message": "Официальный сайт Modrinth доступен по адресу <link>https://modrinth.com</link>. Текущая предварительная версия предназначена для тестирования командой Modrinth и собрана из <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Официальный сайт Icarus доступен по адресу <link>https://Icarus.com</link>. Текущая предварительная версия предназначена для тестирования командой Icarus и собрана из <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
-    "message": "Это предварительная версия сайта Modrinth."
+    "message": "Это предварительная версия сайта Icarus."
   },
   "layout.banner.staging.description": {
-    "message": "Тестовая среда полностью отделена от основной базы данных Modrinth и нужна для тестирования и отладки. Фронтенд и бэкенд здесь могут содержать изменения, которые ещё не вышли на основном сайте."
+    "message": "Тестовая среда полностью отделена от основной базы данных Icarus и нужна для тестирования и отладки. Фронтенд и бэкенд здесь могут содержать изменения, которые ещё не вышли на основном сайте."
   },
   "layout.banner.staging.title": {
-    "message": "Вы находитесь в тестовой среде Modrinth"
+    "message": "Вы находитесь в тестовой среде Icarus"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Обновить платёжные данные"
@@ -1785,7 +1533,7 @@
     "message": "Заполнить налоговую форму"
   },
   "layout.banner.tax.description": {
-    "message": "В этом году вы вывели уже более {threshold} из Modrinth. Для соблюдения налогового законодательства нужно заполнить налоговую форму. Вывод средств приостановлен до подачи этой формы."
+    "message": "В этом году вы вывели уже более {threshold} из Icarus. Для соблюдения налогового законодательства нужно заполнить налоговую форму. Вывод средств приостановлен до подачи этой формы."
   },
   "layout.banner.tax.title": {
     "message": "Требуется налоговая форма"
@@ -1803,7 +1551,7 @@
     "message": "Отправить письмо ещё раз"
   },
   "layout.banner.verify-email.description": {
-    "message": "В целях безопасности Modrinth просит подтвердить почту, привязанную к аккаунту."
+    "message": "В целях безопасности Icarus просит подтвердить почту, привязанную к аккаунту."
   },
   "layout.footer.about": {
     "message": "О проекте"
@@ -1844,23 +1592,23 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Условия использования"
   },
-  "layout.footer.modrinth-information": {
-    "message": "Информация о Modrinth"
+  "layout.footer.Icarus-information": {
+    "message": "Информация о Icarus"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth — <github-link>открытый проект</github-link>."
+    "message": "Icarus — <github-link>открытый проект</github-link>."
   },
   "layout.footer.products": {
     "message": "Продукты"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Icarus Launcher"
   },
   "layout.footer.products.plus": {
-    "message": "Modrinth+"
+    "message": "Icarus+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "layout.footer.resources": {
     "message": "Ресурсы"
@@ -1896,7 +1644,7 @@
     "message": "Меню"
   },
   "layout.meta.description": {
-    "message": "Скачивайте моды, плагины, наборы данных, шейдеры, наборы ресурсов и сборки для Minecraft на Modrinth. Ищите и публикуйте проекты на Modrinth, используя удобный современный интерфейс и API."
+    "message": "Скачивайте моды, плагины, наборы данных, шейдеры, наборы ресурсов и сборки для Minecraft на Icarus. Ищите и публикуйте проекты на Icarus, используя удобный современный интерфейс и API."
   },
   "layout.meta.og-description": {
     "message": "Ищите и публикуйте проекты для Minecraft!"
@@ -1916,8 +1664,8 @@
   "layout.nav.discover-content": {
     "message": "Найти проекты"
   },
-  "layout.nav.get-modrinth-app": {
-    "message": "Скачать Modrinth App"
+  "layout.nav.get-Icarus-app": {
+    "message": "Скачать Icarus Launcher"
   },
   "layout.nav.home": {
     "message": "Главная"
@@ -1925,11 +1673,11 @@
   "layout.nav.host-a-server": {
     "message": "Создать сервер"
   },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+  "layout.nav.Icarus-app": {
+    "message": "Icarus Launcher"
   },
-  "layout.nav.modrinth-home-page": {
-    "message": "Главная страница Modrinth"
+  "layout.nav.Icarus-home-page": {
+    "message": "Главная страница Icarus"
   },
   "layout.nav.my-servers": {
     "message": "Мои серверы"
@@ -1952,14 +1700,11 @@
   "layout.nav.search": {
     "message": "Поиск"
   },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Перейти на Modrinth+"
+  "layout.nav.upgrade-to-Icarus-plus": {
+    "message": "Перейти на Icarus+"
   },
   "moderation.moderate": {
     "message": "Модерировать"
-  },
-  "moderation.page.external-projects": {
-    "message": "Внешние проекты"
   },
   "moderation.page.projects": {
     "message": "Проекты"
@@ -1968,7 +1713,7 @@
     "message": "Жалобы"
   },
   "moderation.page.technicalReview": {
-    "message": "Техпроверка"
+    "message": "Техническая проверка"
   },
   "muralpay.account-type.checking": {
     "message": "Расчётный"
@@ -2238,10 +1983,10 @@
     "message": "Перепроверьте адрес кошелька. Средства, отправленные на неверный адрес, невозможно вернуть."
   },
   "profile.bio.fallback.creator": {
-    "message": "Автор на Modrinth."
+    "message": "Автор на Icarus."
   },
   "profile.bio.fallback.user": {
-    "message": "Пользователь Modrinth."
+    "message": "Пользователь Icarus."
   },
   "profile.button.billing": {
     "message": "Управление платежами"
@@ -2325,10 +2070,10 @@
     "message": "Сохранение..."
   },
   "profile.meta.description": {
-    "message": "Скачать проекты {username} на Modrinth"
+    "message": "Скачать проекты {username} на Icarus"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} — Скачать проекты {username} на Modrinth"
+    "message": "{bio} — Скачать проекты {username} на Icarus"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> подписчик} few {<stat>{count}</stat> подписчика} other {<stat>{count}</stat> подписчиков}} у проектов"
@@ -2367,10 +2112,10 @@
     "message": "Запросите перепроверку"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Проект {status, select, rejected {отклонён} withheld {на удержании} other {{status}}} командой Modrinth. Обычно после решения указанных модератором проблем можно снова запросить проверку."
+    "message": "Проект {status, select, rejected {отклонён} withheld {на удержании} other {{status}}} командой Icarus. Обычно после решения указанных модератором проблем можно снова запросить проверку."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
-    "message": "Необходимо выполнить обязательные действия в контрольном списке"
+    "message": "Необходимо выполнить обязательные действия в контрольном списке!"
   },
   "project-moderation-nags.submit-for-review": {
     "message": "Запросите проверку"
@@ -2481,7 +2226,7 @@
     "message": "Проверить проект"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting — самый простой способ играть с друзьями без лишних хлопот!"
+    "message": "Icarus Hosting — самый простой способ играть с друзьями без лишних хлопот!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "От {price}<small> / месяц</small>"
@@ -2514,10 +2259,10 @@
     "message": "{title} не поддерживает {gameVersion} для {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Скачать в Modrinth App"
+    "message": "Скачать в Icarus App"
   },
   "project.download.no-app": {
-    "message": "У вас нет Modrinth App?"
+    "message": "У вас нет Icarus Launcher?"
   },
   "project.download.no-versions-available": {
     "message": "Нет версий, доступных для {gameVersion} и {platform}."
@@ -2553,7 +2298,7 @@
     "message": "Скачивание {title}"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Недавно мы переработали систему сред на Modrinth — теперь доступны новые варианты. У вас нет разрешения на изменение этих настроек — сообщите другому участнику проекта, что необходимо проверить метаданные среды."
+    "message": "Недавно мы переработали систему сред на Icarus — теперь доступны новые варианты. У вас нет разрешения на изменение этих настроек — сообщите другому участнику проекта, что необходимо проверить метаданные среды."
   },
   "project.environment.migration-no-permission.title": {
     "message": "Необходимо проверить метаданные среды"
@@ -2562,7 +2307,7 @@
     "message": "Подробнее об этом изменении..."
   },
   "project.environment.migration.message": {
-    "message": "Мы переработали систему сред на Modrinth, и теперь доступны новые варианты. Убедитесь, что метаданные указаны верно."
+    "message": "Мы переработали систему сред на Icarus, и теперь доступны новые варианты. Убедитесь, что метаданные указаны верно."
   },
   "project.environment.migration.review-button": {
     "message": "Проверить настройки среды"
@@ -2654,45 +2399,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Пожалуйста, предоставьте доказательства, что у вас есть разрешение на распространение всех следующих файлов, а также любые скрытые версии будут опубликованы."
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Прежде чем отправить проект на рассмотрение, пожалуйста, подтвердите наличие у вас разрешения на распространение всех перечисленных ниже файлов."
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "Неизвестное встроенный контент"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "Весь внешний контент сопровождается указанием источников."
-  },
-  "project.settings.permissions.completed.title": {
-    "message": "Указание авторства завершено!"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Ни одна из ваших версий не содержит внешнего контента, поэтому вам не нужно беспокоиться о получении разрешений."
-  },
-  "project.settings.permissions.empty-state.heading": {
-    "message": "Всё подтверждено!"
-  },
-  "project.settings.permissions.fail.description": {
-    "message": "Вам запрещено распространять часть добавленного вами внешнего контента. Для публикации на Modrinth удалите контент, нарушающий авторские права."
-  },
-  "project.settings.permissions.fail.title": {
-    "message": "Некоторый контент не может быть включён"
-  },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Если вы используете контент, который не размещен на Modrinth, вам необходимо сообщить нам, откуда он взят, и подтвердить наличие у вас разрешения на распространение файлов. Ознакомьтесь с <link>нашим руководством</link>, чтобы узнать, как это сделать правильно!"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "Узнайте, как работает атрибуция"
-  },
-  "project.settings.permissions.learn-more": {
-    "message": "Подробнее"
-  },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Поиск {count} {count, plural, one {external project} other {external projects}}..."
-  },
   "project.settings.title": {
     "message": "Настройки"
   },
@@ -2710,15 +2416,6 @@
   },
   "project.versions.title": {
     "message": "Версии"
-  },
-  "project.versions.withheld-versions-warning.description": {
-    "message": "{count, plural, one {This version is} other {These versions are}} в настоящее время скрыты и не опубликованы. Пожалуйста, предоставьте доказательства того, что у вас есть разрешение на распространение определенных файлов, включенных в модпак {count, plural, one {version} other {versions}}."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Решить"
-  },
-  "project.versions.withheld-versions-warning.title": {
-    "message": "{count, plural, one {Version {version_name}} other {Versions}} скрыто из-за неизвестного встроенного контента"
   },
   "report.already-reported": {
     "message": "Вы уже пожалова­лись на {title}"
@@ -2787,7 +2484,7 @@
     "message": "На какой тип контента вы жалуетесь?"
   },
   "report.question.report-reason": {
-    "message": "Какое правило Modrinth нарушено {item, select, project {этим проектом} version {этой версией} user {этим пользователем} other {этим контентом}}?"
+    "message": "Какое правило Icarus нарушено {item, select, project {этим проектом} version {этой версией} user {этим пользователем} other {этим контентом}}?"
   },
   "report.report-content": {
     "message": "Жалоба модерато­рам на контент"
@@ -2991,7 +2688,7 @@
     "message": "Изменение жалоб"
   },
   "scopes.sessionAccess.description": {
-    "message": "Пользоваться сеансами Modrinth"
+    "message": "Пользоваться сеансами Icarus"
   },
   "scopes.sessionAccess.label": {
     "message": "Использование сеансов"
@@ -3089,9 +2786,6 @@
   "search.filter.locked.server.sync": {
     "message": "Использовать с сервера"
   },
-  "servers.manage.content.title": {
-    "message": "Контент — {serverName} — Modrinth"
-  },
   "servers.notice.actions": {
     "message": "Действия"
   },
@@ -3141,13 +2835,13 @@
     "message": "Подготовка данных..."
   },
   "settings.account.data-export.description": {
-    "message": "Запросите копию своих личных данных, хранящихся на Modrinth. Подготовка может занять несколько минут."
+    "message": "Запросите копию своих личных данных, хранящихся на Icarus. Подготовка может занять несколько минут."
   },
   "settings.account.data-export.title": {
     "message": "Экспорт данных"
   },
   "settings.account.delete.confirm.description": {
-    "message": "**Все подписки и данные аккаунта будут немедленно удалены.** Проекты останутся. Удаление аккаунта необратимо.<br><br>Нужна помощь с аккаунтом? Напишите нам в [Discord](https://discord.modrinth.com)."
+    "message": "**Все подписки и данные аккаунта будут немедленно удалены.** Проекты останутся. Удаление аккаунта необратимо.<br><br>Нужна помощь с аккаунтом? Напишите нам в [Discord](https://discord.Icarus.com)."
   },
   "settings.account.delete.confirm.proceed": {
     "message": "Удалить этот аккаунт"
@@ -3159,7 +2853,7 @@
     "message": "Удалить аккаунт"
   },
   "settings.account.delete.section.description": {
-    "message": "Удаление аккаунта необратимо. Все связанные данные, кроме проектов, будут удалены с серверов Modrinth."
+    "message": "Удаление аккаунта необратимо. Все связанные данные, кроме проектов, будут удалены с серверов Icarus."
   },
   "settings.account.delete.section.title": {
     "message": "Удаление аккаунта"
@@ -3375,7 +3069,7 @@
     "message": "Вы действительно хотите удалить это приложение?"
   },
   "settings.applications.description.intro": {
-    "message": "Через приложения пользователи Modrinth могут входить в ваши сервисы. Подробнее — в <docs-link>документации</docs-link>."
+    "message": "Через приложения пользователи Icarus могут входить в ваши сервисы. Подробнее — в <docs-link>документации</docs-link>."
   },
   "settings.applications.field.description": {
     "message": "Описание"
@@ -3429,7 +3123,7 @@
     "message": "от"
   },
   "settings.authorizations.description": {
-    "message": "Авторизованные приложения получают доступ к аккаунту Modrinth. Здесь можно просматривать и отзывать этот доступ."
+    "message": "Авторизованные приложения получают доступ к аккаунту Icarus. Здесь можно просматривать и отзывать этот доступ."
   },
   "settings.authorizations.empty-state": {
     "message": "Список приложений временно недоступен. Мы работаем над исправлением — загляните сюда позже."
@@ -3447,16 +3141,16 @@
     "message": "Вы действительно хотите деавторизовать это приложение?"
   },
   "settings.billing.charges.description": {
-    "message": "Здесь перечислены все списания по аккаунту Modrinth:"
+    "message": "Здесь перечислены все списания по аккаунту Icarus:"
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "Пробный сервер от Medal"
   },
   "settings.billing.charges.product.midas": {
-    "message": "Modrinth Plus"
+    "message": "Icarus Plus"
   },
   "settings.billing.charges.product.pyro": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "settings.billing.charges.title": {
     "message": "История списаний"
@@ -3486,10 +3180,10 @@
     "message": "Отсутствие рекламы на сайте и в приложении"
   },
   "settings.billing.midas.benefits.badge": {
-    "message": "Значок Modrinth+ в профиле"
+    "message": "Значок Icarus+ в профиле"
   },
   "settings.billing.midas.benefits.support": {
-    "message": "Прямая поддержка Modrinth и авторов"
+    "message": "Прямая поддержка Icarus и авторов"
   },
   "settings.billing.midas.benefits.title": {
     "message": "Преимущества"
@@ -3513,7 +3207,7 @@
     "message": "Платёж в обработке. Подписка активируется автоматически."
   },
   "settings.billing.midas.upsell": {
-    "message": "Оформите подписку на Modrinth Plus!"
+    "message": "Оформите подписку на Icarus Plus!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Отменить подписку"
@@ -3573,7 +3267,7 @@
     "message": "{shared, plural, one {# разделяемый} other {# разделяемых}} CPU (рост до {bursts} CPU)"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "Привязанный сервер не найден. Возможных причин несколько: сервер куплен только что — подождите, подготовка занимает до часа; сервер куплен давно — вероятно, его уже приостановили. Если что‑то не так, свяжитесь с поддержкой Modrinth, указав следующие данные:"
+    "message": "Привязанный сервер не найден. Возможных причин несколько: сервер куплен только что — подождите, подготовка занимает до часа; сервер куплен давно — вероятно, его уже приостановили. Если что‑то не так, свяжитесь с поддержкой Icarus, указав следующие данные:"
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "ID сервера: {id}"
@@ -3585,7 +3279,7 @@
     "message": "{gb} ГБ ОЗУ"
   },
   "settings.billing.pyro.resubscribe.error.text": {
-    "message": "Произошла ошибка при возобновлении подписки на сервер Modrinth."
+    "message": "Произошла ошибка при возобновлении подписки на сервер Icarus."
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Не удалось возобновить подписку"
@@ -3612,10 +3306,10 @@
     "message": "{gb} ГБ подкачки"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Управляйте своими подписками на Modrinth Servers."
+    "message": "Управляйте своими подписками на Icarus Servers."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Подписки на Modrinth Servers"
+    "message": "Подписки на Icarus Servers"
   },
   "settings.billing.renews": {
     "message": "Продлится {date}"
@@ -3630,7 +3324,7 @@
     "message": "Подписаться"
   },
   "settings.billing.subscription.description": {
-    "message": "Управляйте своими подписками на Modrinth."
+    "message": "Управляйте своими подписками на Icarus."
   },
   "settings.billing.subscription.title": {
     "message": "Подписки"
@@ -3657,7 +3351,7 @@
     "message": "Отключить режим разработчика"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Режим разработчика</strong> включён. Отображаются внутренние идентификаторы различных элементов сайта, что удобно при работе с API. Чтобы отключить, снова нажмите на логотип Modrinth внизу страницы 5 раз."
+    "message": "<strong>Режим разработчика</strong> включён. Отображаются внутренние идентификаторы различных элементов сайта, что удобно при работе с API. Чтобы отключить, снова нажмите на логотип Icarus внизу страницы 5 раз."
   },
   "settings.display.flags.description": {
     "message": "Настройте отдельные функции на этом устройстве."
@@ -3714,22 +3408,22 @@
     "message": "Коллекция"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Включает продвинутые эффекты вроде размытия, но может снизить производительность на устройствах без аппаратного ускорения."
+    "message": "Включает продвинутые эффекты вроде размытия. Возможно снижение производительности на устройствах без аппаратного ускорения."
   },
   "settings.display.sidebar.advanced-rendering.title": {
     "message": "Расширенные эффекты"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Ссылки за пределы Modrinth будут открываться в новой вкладке. Исключения: ссылки внутри домена и в Markdown — всегда в той же вкладке; реклама и страницы редактирования — всегда в новой."
+    "message": "Ссылки за пределы Icarus будут открываться в новой вкладке. Исключения: ссылки внутри домена и в Markdown — всегда в той же вкладке; реклама и страницы редактирования — всегда в новой."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Внешние ссылки в новой вкладке"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Убирает кнопку «Скачать Modrinth App» с поисковых страниц. Ссылку на раздел с Modrinth App всё ещё можно найти на главной странице или в нижней части интерфейса."
+    "message": "Убирает кнопку «Скачать Icarus Launcher» с поисковых страниц. Ссылку на раздел с Icarus Launcher всё ещё можно найти на главной странице или в нижней части интерфейса."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Скрывать кнопку скачивания Modrinth App"
+    "message": "Скрывать кнопку скачивания Icarus Launcher"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Панель сведений слева"
@@ -3744,7 +3438,7 @@
     "message": "Панель фильтров справа"
   },
   "settings.display.theme.description": {
-    "message": "Выберите тему для Modrinth на этом устройстве."
+    "message": "Выберите тему для Icarus на этом устройстве."
   },
   "settings.display.theme.title": {
     "message": "Тема"
@@ -3756,7 +3450,7 @@
     "message": "Создать токен доступа"
   },
   "settings.pats.description": {
-    "message": "Токены доступа используются для обращения к API Modrinth. Их можно создавать и отзывать в любое время. Подробнее — в <doc-link>документации</doc-link>."
+    "message": "Токены доступа используются для обращения к API Icarus. Их можно создавать и отзывать в любое время. Подробнее — в <doc-link>документации</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Создать токен доступа"
@@ -3798,7 +3492,7 @@
     "message": "Истечёт {inTime}"
   },
   "settings.pats.token.last-used": {
-    "message": "Активность {ago}"
+    "message": "Активность: {ago}"
   },
   "settings.pats.token.never-used": {
     "message": "Не использовался"
@@ -3810,7 +3504,7 @@
     "message": "О себе"
   },
   "settings.profile.description": {
-    "message": "Информация в вашем профиле доступна публично на Modrinth и через <docs-link>API Modrinth</docs-link>."
+    "message": "Информация в вашем профиле доступна публично на Icarus и через <docs-link>API Icarus</docs-link>."
   },
   "settings.profile.head-title": {
     "message": "Настройки профиля"
@@ -3834,7 +3528,7 @@
     "message": "Текущий сеанс"
   },
   "settings.sessions.description": {
-    "message": "Ниже представлены все устройства, с которых осуществлён вход в вашу учётную запись Modrinth. Вы можете управлять сеансом каждого из них по отдельности.\n\nЕсли среди них присутствует незнакомое устройство, незамедлительно завершите его сеанс и смените пароль своей учётной записи."
+    "message": "Ниже представлены все устройства, с которых осуществлён вход в вашу учётную запись Icarus. Вы можете управлять сеансом каждого из них по отдельности.\n\nЕсли среди них присутствует незнакомое устройство, незамедлительно завершите его сеанс и смените пароль своей учётной записи."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Активность {ago}"
@@ -3849,13 +3543,13 @@
     "message": "Аккаунт"
   },
   "settings.sidebar.label.developer": {
-    "message": "Разработчикам"
+    "message": "Разработка"
   },
   "settings.sidebar.label.display": {
     "message": "Отображение"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Последние новости от Modrinth"
+    "message": "Последние новости от Icarus"
   },
   "ui.latest-news-row.view-all": {
     "message": "Посмотреть все новости"
@@ -3867,7 +3561,7 @@
     "message": "Вы подписаны!"
   },
   "ui.newsletter-button.tooltip": {
-    "message": "Подписаться на рассылку от Modrinth"
+    "message": "Подписаться на рассылку от Icarus"
   },
   "version.environment.none.description": {
     "message": "Среда для этой версии не указана."
@@ -3882,3 +3576,4 @@
     "message": "Неизвестная среда"
   }
 }
+

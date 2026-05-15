@@ -4,14 +4,14 @@
 )]
 
 use enumset::EnumSet;
-use theseus::prelude::*;
-use theseus::worlds::get_recent_worlds;
+use pteron::prelude::*;
+use pteron::worlds::get_recent_worlds;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
 // 2) open the URL in a browser
 // 3) call the authenticate_await_complete_flow() function to get the credentials (like you would in the frontend)
-pub async fn authenticate_run() -> theseus::Result<Credentials> {
+pub async fn authenticate_run() -> pteron::Result<Credentials> {
     println!("A browser window will now open, follow the login flow there.");
     let login = minecraft_auth::begin_login().await?;
 
@@ -35,10 +35,10 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
 }
 
 #[tokio::main]
-async fn main() -> theseus::Result<()> {
+async fn main() -> pteron::Result<()> {
     println!("Starting.");
 
-    let _log_guard = theseus::start_logger("ModrinthApp");
+    let _log_guard = pteron::start_logger("ModrinthApp");
 
     // Initialize state
     State::init("ModrinthApp".to_owned()).await?;

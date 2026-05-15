@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getCategoryIcon, getLoaderIcon, getTagIcon } from '@modrinth/assets'
+import { getCategoryIcon, getLoaderIcon, getTagIcon } from '@icarus/assets'
 import { computed } from 'vue'
 
 const props = defineProps<{

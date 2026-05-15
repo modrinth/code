@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import { computed, ref, watch } from 'vue'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../../../composables/i18n'

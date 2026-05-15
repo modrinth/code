@@ -5,13 +5,13 @@
 
 		<h2>Introduction</h2>
 		<p>
-			<a href="https://modrinth.com">Modrinth</a> is part of Rinth, Inc. ("Company", "us", "we",
+			<a href="https://modrinth.com">Icarus</a> is part of Rinth, Inc. ("Company", "us", "we",
 			"our"). This privacy policy explains how we collect data, process it, and your rights relative
 			to your data.
 		</p>
 		<p>
 			This policy describes the types of information we may collect from you or that you may provide
-			when you use www.modrinth.com, api.modrinth.com, or the Modrinth App ("Service" or "Website"),
+			when you use www.modrinth.com, api.modrinth.com, or the Icarus Launcher ("Service" or "Website"),
 			and our practices for collecting, using, maintaining, protecting, and disclosing that
 			information.
 		</p>
@@ -66,7 +66,7 @@
 			</li>
 		</ul>
 
-		<p>Rinth, Inc. is the data controller for data collected through Modrinth.</p>
+		<p>Rinth, Inc. is the data controller for data collected through Icarus.</p>
 
 		<h2>What data do we collect?</h2>
 
@@ -85,7 +85,7 @@
 		</p>
 
 		<h3>View data and download data</h3>
-		<p>When you view a project page or download a file from Modrinth, we collect:</p>
+		<p>When you view a project page or download a file from Icarus, we collect:</p>
 		<ul>
 			<li>Your IP address</li>
 			<li>Your user ID (if applicable)</li>
@@ -96,7 +96,7 @@
 		<p>This data is used to monitor automated access to our service and deliver statistics.</p>
 
 		<h3>Playtime data</h3>
-		<p>When you use the Modrinth App to play Modrinth projects, we collect:</p>
+		<p>When you use the Icarus Launcher to play Icarus projects, we collect:</p>
 		<ul>
 			<li>Your IP address</li>
 			<li>Your user ID</li>
@@ -109,7 +109,7 @@
 		<p>This data is used to deliver statistics.</p>
 
 		<h3>Usage data</h3>
-		<p>When you interact with the Modrinth App or the Website, we collect through PostHog:</p>
+		<p>When you interact with the Icarus Launcher or the Website, we collect through PostHog:</p>
 		<ul>
 			<li>Your IP address</li>
 			<li>Your anonymized user ID</li>
@@ -142,7 +142,7 @@
 
 		<h2>Third-party services</h2>
 		<p>
-			We use some third-party services to make Modrinth run. Please refer to each of their privacy
+			We use some third-party services to make Icarus run. Please refer to each of their privacy
 			policies for more information:
 		</p>
 		<ul>
@@ -231,7 +231,7 @@
 			online activity.
 		</p>
 		<p>
-			Modrinth does not knowingly collect any Personal Identifiable Information from children under
+			Icarus does not knowingly collect any Personal Identifiable Information from children under
 			the age of 13. If you think that your child provided this kind of information on our website,
 			we strongly encourage you to contact us immediately and we will do our best efforts to
 			promptly remove such information from our records.
@@ -240,7 +240,7 @@
 		<h2>Online Privacy Policy Only</h2>
 		<p>
 			This Privacy Policy applies only to our online activities and is valid for visitors to our
-			website with regards to the information that they shared and/or collect in Modrinth. This
+			website with regards to the information that they shared and/or collect in Icarus. This
 			policy is not applicable to any information collected offline or via channels other than this
 			website.
 		</p>
@@ -311,12 +311,13 @@
 
 <script setup>
 const description =
-	'The Privacy Policy of Modrinth, an open source modding platform focused on Minecraft.'
+	'The Privacy Policy of Icarus, an open source modding platform focused on Minecraft.'
 
 useSeoMeta({
-	title: 'Privacy Policy - Modrinth',
+	title: 'Privacy Policy - Icarus',
 	description,
 	ogTitle: 'Privacy Policy',
 	ogDescription: description,
 })
 </script>
+

@@ -415,4 +415,4 @@ export function createConsoleState() {
 	}
 }
 
-export const useModrinthServersConsole = createGlobalState(createConsoleState)
+export const useIcarusServersConsole = createGlobalState(createConsoleState)

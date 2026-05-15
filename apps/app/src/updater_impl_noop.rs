@@ -1,5 +1,5 @@
 use crate::api::Result;
-use theseus::ErrorKind;
+use pteron::ErrorKind;
 
 #[derive(Default)]
 pub struct PendingUpdateData(());
@@ -15,7 +15,7 @@ pub fn enqueue_update_for_installation() -> Result<()> {
 }
 
 fn updates_are_disabled() -> Result<()> {
-    let error: theseus::Error = ErrorKind::OtherError(
+    let error: pteron::Error = ErrorKind::OtherError(
         "Updates are disabled in this build.".to_string(),
     )
     .into();

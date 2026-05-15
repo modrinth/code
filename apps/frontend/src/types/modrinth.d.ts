@@ -1,1 +1,1 @@
-import '@modrinth/utils'
+import '@icarus/utils'

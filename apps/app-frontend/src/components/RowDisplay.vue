@@ -10,8 +10,8 @@ import {
 	PlusIcon,
 	StopCircleIcon,
 	TrashIcon,
-} from '@modrinth/assets'
-import { HeadingLink, injectNotificationManager } from '@modrinth/ui'
+} from '@icarus/assets'
+import { HeadingLink, injectNotificationManager } from '@icarus/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -20,7 +20,6 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/Instance.vue'
 import LegacyProjectCard from '@/components/ui/LegacyProjectCard.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { get_by_profile_path } from '@/helpers/process.js'
 import { duplicate, kill, remove, run } from '@/helpers/profile.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
@@ -129,17 +128,11 @@ const handleOptionsClick = async (args) => {
 			await run(args.item.path).catch((err) =>
 				handleSevereError(err, { profilePath: args.item.path }),
 			)
-			trackEvent('InstanceStart', {
-				loader: args.item.loader,
-				game_version: args.item.game_version,
-			})
+
 			break
 		case 'stop':
 			await kill(args.item.path).catch(handleError)
-			trackEvent('InstanceStop', {
-				loader: args.item.loader,
-				game_version: args.item.game_version,
-			})
+
 			break
 		case 'add_content':
 			await router.push({
@@ -149,7 +142,7 @@ const handleOptionsClick = async (args) => {
 			break
 		case 'edit':
 			await router.push({
-				path: `/instance/${encodeURIComponent(args.item.path)}`,
+				path: `/instance/${encodeURIComponent(args.item.path)}/`,
 			})
 			break
 		case 'duplicate':
@@ -285,7 +278,7 @@ onUnmounted(() => {
 		<template #duplicate> <ClipboardCopyIcon /> Duplicate instance</template>
 		<template #copy_path> <ClipboardCopyIcon /> Copy path </template>
 		<template #install> <DownloadIcon /> Install </template>
-		<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
+		<template #open_link> <GlobeIcon /> Open in Icarus <ExternalIcon /> </template>
 		<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
 	</ContextMenu>
 </template>
@@ -367,3 +360,4 @@ onUnmounted(() => {
 	}
 }
 </style>
+

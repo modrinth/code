@@ -1,4 +1,4 @@
-import type { GameVersion } from '@modrinth/ui'
+import type { GameVersion } from '@icarus/ui'
 import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'

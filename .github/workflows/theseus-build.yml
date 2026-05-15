@@ -1,4 +1,4 @@
-name: Modrinth App build
+name: Icarus build
 on:
   push:
     branches:
@@ -15,195 +15,125 @@ on:
       - 'packages/ui/**'
       - 'packages/utils/**'
   workflow_dispatch:
-    inputs:
-      sign-windows-binaries:
-        description: Sign Windows binaries
-        type: boolean
-        default: false
-        required: false
-      environment:
-        description: Environment
-        type: choice
-        options:
-          - prod
-          - staging
-          - prod-with-staging-archon
-        default: prod
-        required: false
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
+  workflow_call:
 
 jobs:
   build:
     name: Build
-    env:
-      VITE_STRIPE_PUBLISHABLE_KEY: pk_live_51JbFxJJygY5LJFfKLVVldb10HlLt24p421OWRsTOWc5sXYFOnFUXWieSc6HD3PHo25ktx8db1WcHr36XGFvZFVUz00V9ixrCs5
-      # SCCACHE_DIR: '/mnt/sccache'
-      # SCCACHE_CACHE_SIZE: '10G'
-      # SCCACHE_MULTILEVEL_CHAIN: 'disk,s3'
-      SCCACHE_S3_KEY_PREFIX: '${{ github.repository }}/'
-      SCCACHE_BUCKET: ${{ secrets.SCCACHE_BUCKET }}
-      SCCACHE_REGION: ${{ secrets.SCCACHE_REGION }}
-      SCCACHE_ENDPOINT: ${{ secrets.SCCACHE_ENDPOINT }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.SCCACHE_S3_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.SCCACHE_S3_SECRET_ACCESS_KEY }}
-      RUSTC_WRAPPER: 'sccache'
     strategy:
       fail-fast: false
       matrix:
-        platform: [
-            blacksmith-6vcpu-macos-26,
-            blacksmith-8vcpu-windows-2025, # At time of writing, Windows 4 vCPU VMs don't seem to actually exist
-            blacksmith-4vcpu-ubuntu-2404,
-          ]
+        platform: [macos-latest, windows-latest, ubuntu-latest]
         include:
-          - platform: blacksmith-6vcpu-macos-26
+          - platform: macos-latest
             artifact-target-name: universal-apple-darwin
-          - platform: blacksmith-8vcpu-windows-2025
+          - platform: windows-latest
             artifact-target-name: x86_64-pc-windows-msvc
-          - platform: blacksmith-4vcpu-ubuntu-2404
+          - platform: ubuntu-latest
             artifact-target-name: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: 📥 Check out code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@2b1f5e9b395427c92ee4e3331786ca3c37afe2d7 # v1.16.0
+      - name: 🧰 Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           rustflags: ''
-          target: ${{ contains(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
+          target: ${{ startsWith(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
+          cache-key: ${{ matrix.platform }}-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Setup sccache
-        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
+      - name: 🧰 Install pnpm
+        uses: pnpm/action-setup@v4
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Setup Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: 'pnpm'
+          cache: pnpm
 
-      - name: Generate tauri-dev.conf.json
-        shell: bash
+      - name: 🧰 Install Linux build dependencies
+        if: startsWith(matrix.platform, 'ubuntu')
         run: |
-          GIT_HASH=$(git rev-parse --short HEAD)
-          cat > apps/app/tauri-dev.conf.json <<EOF
-          {
-            "productName": "Modrinth App (dev-${GIT_HASH})",
-            "mainBinaryName": "Modrinth App (dev-${GIT_HASH})",
-            "identifier": "ModrinthApp-dev-${GIT_HASH}",
-            "bundle": {
-              "fileAssociations": []
-            }
-          }
-          EOF
+          sudo apt-get update
+          sudo apt-get install -yq libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
-      - name: Install Linux build dependencies
-        if: contains(matrix.platform, 'ubuntu')
-        uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
-        with:
-          packages: libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
-          version: v1 # cache key
-
-      - name: Setup Dasel
-        uses: jaxxstorm/action-install-gh-release@25e24d2d23ae098373794ef1d6faecb48ee52da8 # v3.0.0
+      - name: 🧰 Setup Dasel
+        uses: jaxxstorm/action-install-gh-release@v2.1.0
         with:
           repo: TomWright/dasel
           tag: v2.8.1
           extension-matching: disable
-          rename-to: ${{ contains(matrix.platform, 'windows') && 'dasel.exe' || 'dasel' }}
+          rename-to: ${{ startsWith(matrix.platform, 'windows') && 'dasel.exe' || 'dasel' }}
           chmod: 0755
 
-      - name: Set application version and environment
+      - name: 🏷️ Get version info
+        id: get-version-info
         shell: bash
         run: |
-          APP_VERSION="$(git describe --tags --always | sed -E 's/-([0-9]+)-(g[0-9a-fA-F]+)$/-canary+\1.\2/')"
-          BUILD_ENVIRONMENT="${{ inputs.environment || 'prod' }}"
+          git fetch --tags --force
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
+          COMMIT_COUNT=$(git rev-list --count ${LATEST_TAG}..HEAD 2>/dev/null || echo "0")
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "latest-tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "commit-count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+          echo "short-sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+
+      - name: ⚙️ Set application version
+        shell: bash
+        env:
+          APP_VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('{0}-canary+{1}.{2}', steps.get-version-info.outputs.latest-tag, steps.get-version-info.outputs.commit-count, steps.get-version-info.outputs.short-sha) }}
+        run: |
           echo "Setting application version to $APP_VERSION"
-          echo "Using environment $BUILD_ENVIRONMENT"
           dasel put -f apps/app/Cargo.toml -t string -v "${APP_VERSION#v}" 'package.version'
           dasel put -f packages/app-lib/Cargo.toml -t string -v "${APP_VERSION#v}" 'package.version'
           dasel put -f apps/app-frontend/package.json -t string -v "${APP_VERSION#v}" 'version'
 
-          cp "packages/app-lib/.env.${BUILD_ENVIRONMENT}" packages/app-lib/.env
+          cp packages/app-lib/.env.prod packages/app-lib/.env
 
-      - name: Setup Turbo cache
-        uses: rharkor/caching-for-turbo@56219402aacc0d06b650d898c222996dbc1191ec # v2.3.14
+      - name: 💨 Setup Turbo cache
+        uses: rharkor/caching-for-turbo@v1.8
 
-      - name: Install dependencies
+      - name: 🧰 Install dependencies
         run: pnpm install
 
-      - name: Set up Windows code signing
-        if: contains(matrix.platform, 'windows')
-        shell: bash
-        run: |
-          if [ '${{ startsWith(github.ref, 'refs/tags/v') || inputs.sign-windows-binaries }}' = 'true' ]; then
-            choco install jsign --ignore-dependencies # GitHub runners come with a global Java installation already
-          else
-            dasel delete -f apps/app/tauri-release.conf.json 'bundle.windows.signCommand'
-          fi
-
-      - name: Build macOS app
-        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
-        if: contains(matrix.platform, 'macos')
-        env:
-          TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
-          ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-
-      - name: Build Linux app
-        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json' }}
-        if: contains(matrix.platform, 'ubuntu')
+      - name: 🔨 Build macOS app
+        run: pnpm --filter=@icarus/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
+        if: startsWith(matrix.platform, 'macos')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
-      - name: Build Windows app
+      - name: 🔨 Build Linux app
+        run: pnpm --filter=@icarus/app run tauri build --config tauri-release.conf.json
+        if: startsWith(matrix.platform, 'ubuntu')
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: 🔨 Build Windows app
         run: |
-          [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
-          $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
           $env:JAVA_HOME = "$env:JAVA_HOME_17_X64"
-          ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles "nsis,updater"' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json --verbose --bundles "nsis,updater"' }}
-          Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
-        if: contains(matrix.platform, 'windows')
+          pnpm --filter=@icarus/app run tauri build --config tauri-release.conf.json --verbose --bundles 'nsis,updater'
+        if: startsWith(matrix.platform, 'windows')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          DIGICERT_ONE_SIGNER_API_KEY: ${{ secrets.DIGICERT_ONE_SIGNER_API_KEY }}
-          DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64 }}
-          DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD }}
 
-      - name: Upload app bundles
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - name: 📤 Upload app bundles
+        uses: actions/upload-artifact@v4
         with:
           name: App bundle (${{ matrix.artifact-target-name }})
           path: |
-            target/release/bundle/appimage/Modrinth App_*.AppImage*
-            target/release/bundle/deb/Modrinth App_*.deb*
-            target/release/bundle/rpm/Modrinth App-*.rpm*
-            target/release/bundle/appimage/Modrinth App (dev-*)_*.AppImage*
-            target/release/bundle/deb/Modrinth App (dev-*)_*.deb*
-            target/release/bundle/rpm/Modrinth App (dev-*)-*.rpm*
-            target/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz*
-            target/universal-apple-darwin/release/bundle/macos/Modrinth App (dev-*)*.app.tar.gz
-            target/universal-apple-darwin/release/bundle/dmg/Modrinth App (dev-*)*.dmg
-            target/universal-apple-darwin/release/bundle/dmg/Modrinth App_*.dmg*
-            target/release/bundle/nsis/Modrinth App_*-setup.exe*
-            target/release/bundle/nsis/Modrinth App (dev-*)_*-setup.exe*
-            target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*
+            target/release/bundle/appimage/Icarus-Launcher_*.AppImage*
+            target/release/bundle/deb/Icarus-Launcher_*.deb*
+            target/release/bundle/rpm/Icarus-Launcher_-*.rpm*
+            target/universal-apple-darwin/release/bundle/macos/Icarus-Launcher_.app.tar.gz*
+            target/universal-apple-darwin/release/bundle/dmg/Icarus-Launcher_*.dmg*
+            target/release/bundle/nsis/Icarus-Launcher_*-setup.exe*
+            target/release/bundle/nsis/Icarus-Launcher_*-setup.nsis.zip*
+            target/release/Icarus-Launcher.exe

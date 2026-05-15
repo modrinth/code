@@ -18,13 +18,13 @@
     "defaultMessage": "Voeg een Java adres toe"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Voeg relevante links buiten Modrinth toe, zoals een website, winkel of Discord invite."
+    "defaultMessage": "Voeg relevante links buiten Icarus toe, zoals een website, winkel of Discord invite."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Voeg externe links toe"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Voeg relevante links buiten Modrinth toe, zoals code, een probleemtracker of een Discord uitnodiging."
+    "defaultMessage": "Voeg relevante links buiten Icarus toe, zoals code, een probleemtracker of een Discord uitnodiging."
   },
   "nags.add-links.title": {
     "defaultMessage": "Voeg externe links toe"
@@ -249,4 +249,5 @@
     "defaultMessage": "Bezoek linkjes instellingen"
   }
 }
+
 

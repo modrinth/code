@@ -279,8 +279,8 @@ import {
 	SpinnerIcon,
 	VersionIcon,
 	XCircleIcon,
-} from '@modrinth/assets'
-import { defineMessage } from '@modrinth/ui'
+} from '@icarus/assets'
+import { defineMessage } from '@icarus/ui'
 import {
 	AutoLink,
 	Avatar,
@@ -294,8 +294,8 @@ import {
 	RadioButtons,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
-import type { Project, Report, User, Version } from '@modrinth/utils'
+} from '@icarus/ui'
+import type { Project, Report, User, Version } from '@icarus/utils'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 
@@ -581,7 +581,7 @@ const messages = defineMessages({
 	violation: {
 		id: 'report.for.violation',
 		defaultMessage:
-			'Violation of Modrinth <rules-link>Rules</rules-link> or <terms-link>Terms of Use</terms-link>',
+			'Violation of Icarus <rules-link>Rules</rules-link> or <terms-link>Terms of Use</terms-link>',
 	},
 	violationDescription: {
 		id: 'report.for.violation.description',
@@ -616,7 +616,7 @@ const messages = defineMessages({
 	whatReportReason: {
 		id: 'report.question.report-reason',
 		defaultMessage:
-			"Which of Modrinth's rules is this {item, select, project {project} version {version} user {user} other {content}} violating?",
+			"Which of Icarus's rules is this {item, select, project {project} version {version} user {user} other {content}} violating?",
 	},
 	checking: {
 		id: 'report.checking',
@@ -652,3 +652,4 @@ const messages = defineMessages({
 	max-width: 56rem;
 }
 </style>
+

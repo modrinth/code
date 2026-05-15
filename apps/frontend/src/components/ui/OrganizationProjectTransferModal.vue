@@ -114,9 +114,9 @@
 </template>
 
 <script setup>
-import { BoxIcon, SettingsIcon, TransferIcon, XIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, Checkbox, CopyCode, Modal } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+import { BoxIcon, SettingsIcon, TransferIcon, XIcon } from '@icarus/assets'
+import { Avatar, ButtonStyled, Checkbox, CopyCode, Modal } from '@icarus/ui'
+import { formatProjectType } from '@icarus/utils'
 
 const EDIT_DETAILS = 1 << 2
 const modalOpen = ref(null)

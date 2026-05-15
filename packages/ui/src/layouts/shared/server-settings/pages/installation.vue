@@ -67,8 +67,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
-import { RotateCounterClockwiseIcon } from '@modrinth/assets'
+import type { Archon } from '@icarus/api-client'
+import { RotateCounterClockwiseIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	commonMessages,
@@ -76,8 +76,8 @@ import {
 	defineMessages,
 	formatLoaderLabel,
 	type GameVersionOption,
-	injectModrinthClient,
-	injectModrinthServerContext,
+	injectIcarusClient,
+	injectIcarusServerContext,
 	injectNotificationManager,
 	injectServerSettings,
 	injectTags,
@@ -87,24 +87,24 @@ import {
 	ServerSetupModal,
 	UploadProgressModal,
 	useDebugLogger,
-	useModrinthServersConsole,
+	useIcarusServersConsole,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import { injectFilePicker } from '#ui/providers/file-picker'
 
 const debug = useDebugLogger('LoaderPage')
-const client = injectModrinthClient()
-const { server, serverId, worldId, isSyncingContent, busyReasons } = injectModrinthServerContext()
+const client = injectIcarusClient()
+const { server, serverId, worldId, isSyncingContent, busyReasons } = injectIcarusServerContext()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const tags = injectTags()
 const { formatMessage } = useVIntl()
 const serverSettings = injectServerSettings()
 const filePicker = injectFilePicker()
-const modrinthServersConsole = useModrinthServersConsole()
+const IcarusServersConsole = useIcarusServersConsole()
 
 const uploadProgressModal =
 	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
@@ -227,7 +227,7 @@ const modpack = computed(() => addonsQuery.data.value?.modpack ?? null)
 
 const modpackProjectId = computed(() => {
 	const spec = modpack.value?.spec
-	return spec?.platform === 'modrinth' ? spec.project_id : null
+	return spec?.platform === 'Icarus' ? spec.project_id : null
 })
 
 const modpackVersionsQuery = useQuery({
@@ -341,7 +341,7 @@ function getLoaderVersionsForGameVersion(
 	const manifest = manifestQuery.data.value?.gameVersions
 	if (!manifest) return []
 
-	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
+	const placeholder = manifest.find((x) => x.id === '${Icarus.gameVersion}')
 	if (placeholder) return placeholder.loaders
 
 	const entry = manifest.find((x) => x.id === gameVersion)
@@ -447,7 +447,7 @@ provideInstallationSettings({
 			} else {
 				const manifest = manifestQuery.data.value?.gameVersions
 				if (manifest) {
-					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
+					const hasPlaceholder = manifest.some((x) => x.id === '${Icarus.gameVersion}')
 					if (!hasPlaceholder) {
 						const supportedVersions = new Set(
 							manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
@@ -488,7 +488,7 @@ provideInstallationSettings({
 		}
 		const manifest = manifestQuery.data.value?.gameVersions
 		if (!manifest) return false
-		const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
+		const hasPlaceholder = manifest.some((x) => x.id === '${Icarus.gameVersion}')
 		if (hasPlaceholder) {
 			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
 		}
@@ -591,7 +591,7 @@ provideInstallationSettings({
 			}
 			return
 		}
-		if (modpack.value.spec.platform !== 'modrinth') return
+		if (modpack.value.spec.platform !== 'Icarus') return
 		debug(
 			'reinstallModpack: called, project:',
 			modpack.value.spec.project_id,
@@ -604,7 +604,7 @@ provideInstallationSettings({
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
 				content_variant: 'modpack',
 				spec: {
-					platform: 'modrinth',
+					platform: 'Icarus',
 					project_id: modpack.value.spec.project_id,
 					version_id: modpack.value.spec.version_id,
 				},
@@ -702,7 +702,7 @@ provideInstallationSettings({
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
 				content_variant: 'modpack',
 				spec: {
-					platform: 'modrinth',
+					platform: 'Icarus',
 					project_id: modpackProjectId.value,
 					version_id: version.id,
 				},
@@ -723,7 +723,7 @@ provideInstallationSettings({
 	updaterModalProps: computed(() => ({
 		isApp: serverSettings.isApp.value,
 		currentVersionId:
-			modpack.value?.spec.platform === 'modrinth' ? modpack.value.spec.version_id : '',
+			modpack.value?.spec.platform === 'Icarus' ? modpack.value.spec.version_id : '',
 		projectIconUrl: modpack.value?.icon_url ?? undefined,
 		projectName:
 			modpack.value?.title ?? modpackProjectId.value ?? formatMessage(commonMessages.modpackLabel),
@@ -733,7 +733,7 @@ provideInstallationSettings({
 
 	isServer: true,
 	isApp: serverSettings.isApp.value,
-	showModpackVersionActions: computed(() => modpack.value?.spec.platform === 'modrinth'),
+	showModpackVersionActions: computed(() => modpack.value?.spec.platform === 'Icarus'),
 	isLocalFile: computed(() => modpack.value?.spec.platform === 'local_file'),
 
 	lockPlatform: false,
@@ -757,19 +757,19 @@ provideInstallationSettings({
 		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
 		const activeAddons = (addons.addons ?? []).filter((a) => !a.disabled)
 
-		const modrinthAddons = activeAddons.filter((a) => a.version?.id)
+		const IcarusAddons = activeAddons.filter((a) => a.version?.id)
 		const customAddons = activeAddons.filter((a) => !a.version?.id)
 
 		const incompatibleItems: { kind: (typeof activeAddons)[number]['kind']; filename: string }[] =
 			customAddons.map((a) => ({ kind: a.kind, filename: a.filename }))
 
-		if (modrinthAddons.length > 0) {
-			const versionIds = modrinthAddons.map((a) => a.version!.id)
+		if (IcarusAddons.length > 0) {
+			const versionIds = IcarusAddons.map((a) => a.version!.id)
 			const versions = await client.labrinth.versions_v2.getVersions(versionIds)
 			const incompatibleVersionIds = new Set(
 				versions.filter((v) => !v.game_versions.includes(targetGameVersion)).map((v) => v.id),
 			)
-			for (const addon of modrinthAddons) {
+			for (const addon of IcarusAddons) {
 				if (incompatibleVersionIds.has(addon.version!.id)) {
 					incompatibleItems.push({ kind: addon.kind, filename: addon.filename })
 				}
@@ -855,7 +855,7 @@ watch(
 
 function onReinstall(event?: unknown) {
 	installationSettingsLayout.value?.cancelEditing()
-	modrinthServersConsole.clear()
+	IcarusServersConsole.clear()
 	queryClient.removeQueries({ queryKey: ['servers', 'ws-state', serverId] })
 	emit('reinstall', event)
 	serverSettings.closeModal?.()
@@ -876,7 +876,7 @@ async function confirmResetToOnboarding() {
 	try {
 		isResettingToOnboarding.value = true
 		await client.archon.servers_v1.resetToOnboarding(serverId, worldId.value)
-		modrinthServersConsole.clear()
+		IcarusServersConsole.clear()
 		try {
 			await client.kyros.logs_v1.clear()
 		} catch (error) {
@@ -903,3 +903,4 @@ async function confirmResetToOnboarding() {
 	}
 }
 </script>
+

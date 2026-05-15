@@ -1,6 +1,6 @@
 ---
 title: Daedalus (Metadata service)
-description: Guide for contributing to Modrinth's frontend
+description: Guide for contributing to Icarus's frontend
 sidebar:
   order: 5
 ---
@@ -13,3 +13,4 @@ and mod loaders for:
 - Reliability (Provides a versioning system which ensures no breakage with updates)
 
 Daedalus supports the original Minecraft data and reposting for the Forge, Fabric, Quilt, and NeoForge loaders.
+

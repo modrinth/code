@@ -1,4 +1,4 @@
-import { provideModalBehavior, providePageContext } from '@modrinth/ui'
+import { provideModalBehavior, providePageContext } from '@icarus/ui'
 import { computed, ref } from 'vue'
 
 import { useFeatureFlags } from '~/composables/featureFlags.ts'

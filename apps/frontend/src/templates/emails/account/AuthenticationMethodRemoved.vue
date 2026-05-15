@@ -14,7 +14,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
 			Your <b>{authprovider.name}</b> account has been disconnected and you can no longer use it to
-			sign in to your Modrinth account.
+			sign in to your Icarus account.
 		</Text>
 		<Text class="text-muted text-base">
 			If you did not make this change, please contact us immediately through our
@@ -23,3 +23,4 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		</Text>
 	</StyledEmail>
 </template>
+

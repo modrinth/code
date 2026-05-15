@@ -11,7 +11,7 @@ import {
 	usePageLeaveSafety,
 	useSavable,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 const { formatMessage } = useVIntl()
 

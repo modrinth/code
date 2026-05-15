@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, XIcon } from '@modrinth/assets'
+import { EditIcon, XIcon } from '@icarus/assets'
 import { computed, nextTick, ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'

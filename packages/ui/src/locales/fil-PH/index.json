@@ -32,9 +32,6 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Tingnan ang analitika"
   },
-  "badge.alpha": {
-    "defaultMessage": "Alpha"
-  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -287,15 +284,6 @@
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Nakabukas na ang lahat ng piniling kontento"
   },
-  "creation-flow.modal.final-config.additional-settings.title": {
-    "defaultMessage": "Karagdagang settings"
-  },
-  "creation-flow.modal.import-instance.action.add": {
-    "defaultMessage": "Magdagdag"
-  },
-  "creation-flow.modal.import-instance.launcher-path.add": {
-    "defaultMessage": "Magdagdag ng launcher path"
-  },
   "files.editor.find-close": {
     "defaultMessage": "Isara"
   },
@@ -341,9 +329,6 @@
   "files.layout.busy-warning": {
     "defaultMessage": "Nakapatay ang mga operasyon sa talaksan habang ang operasyon ay isinasagawa."
   },
-  "files.layout.dry-run-failed-text": {
-    "defaultMessage": "Error sa pagpatakbo ng dry run"
-  },
   "files.navbar.back-to-home": {
     "defaultMessage": "Bumalik sa tahanan"
   },
@@ -355,6 +340,9 @@
   },
   "files.navbar.new-file": {
     "defaultMessage": "Bagong talaksan"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Nabigo"
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Bagong pangalan"
@@ -377,26 +365,14 @@
   "files.upload-dropdown.cancelled": {
     "defaultMessage": "Kinansela"
   },
-  "files.upload-dropdown.failed-generic": {
-    "defaultMessage": "Nabigo - {error}"
-  },
   "files.upload-dropdown.file": {
     "defaultMessage": "Talaksan"
-  },
-  "files.upload-dropdown.unexpected-error": {
-    "defaultMessage": "Isang di-inaasahang error na naganap."
-  },
-  "files.upload-dropdown.uploads-left": {
-    "defaultMessage": " - {count} natitira"
   },
   "files.validation.name-label": {
     "defaultMessage": "Pangalan"
   },
   "files.zip-url-modal.install-button": {
     "defaultMessage": "I-install"
-  },
-  "files.zip-url-modal.unknown-error": {
-    "defaultMessage": "Isang di-kilalang error na naganap"
   },
   "form.label.address-line": {
     "defaultMessage": "Address line"
@@ -577,9 +553,6 @@
   },
   "installation-settings.removed-incompatible": {
     "defaultMessage": "Tinanggal (di-magkatugma)"
-  },
-  "installation-settings.repair.instance-description": {
-    "defaultMessage": "Ire-reinstall ang mga dependency ng Minecraft at susuriin para sa pagkasira. Maaari nitong malutas ang mga isyu kung ang laro ay hindi lumulunsad dahil sa mga error na magkaugnay sa launcher."
   },
   "installation-settings.saving": {
     "defaultMessage": "Sine-save..."
@@ -954,19 +927,19 @@
     "defaultMessage": "Panatilihing naisapanahon ang mga file kapag nagbago ang server"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Kunin ang Modrinth App"
+    "defaultMessage": "Kunin ang Icarus Launcher"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Kusang bubukas ang Modrinth App..."
+    "defaultMessage": "Kusang bubukas ang Icarus Launcher..."
   },
   "modal.open-in-app.title": {
     "defaultMessage": "Binubukas ang Modrnth App"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Bakit Modrinth App ang gamitin"
+    "defaultMessage": "Bakit Icarus Launcher ang gamitin"
   },
   "notification.error.title": {
-    "defaultMessage": "Isang error na naganap"
+    "defaultMessage": "Isang kamaliang naganap"
   },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Tinanggap"
@@ -989,11 +962,14 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Nabigo"
   },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listed"
+  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Koponan ng Modrinth"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "Koponan ng Icarus"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "Nakabinbin"
@@ -1024,6 +1000,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Bumigo"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Ipinagkait"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopyahin ang code sa clipboard"
@@ -1392,7 +1371,7 @@
     "defaultMessage": "{count} {countPlural, plural, one {kamakailang paglaro} other {na kamakailang paglaro}}"
   },
   "project.recent-plays.tooltip": {
-    "defaultMessage": "{count} {countPlural, plural, one {kamakailang paglaro} other {na kamakailang paglaro}} galing sa Modrinth sa nakalipas na 2 linggo"
+    "defaultMessage": "{count} {countPlural, plural, one {kamakailang paglaro} other {na kamakailang paglaro}} galing sa Icarus sa nakalipas na 2 linggo"
   },
   "project.server.language.af": {
     "defaultMessage": "Afrikaans"
@@ -1698,7 +1677,7 @@
     "defaultMessage": "Nasa magkakaibang environment ang proyekto mo"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Kakaunlad lang ng aming sistema sa Mga Environment sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring suriin na tama ang napili sa ibaba at pindutin ang 'Patunayan' kapag tapos ka na!"
+    "defaultMessage": "Kakaunlad lang ng aming sistema sa Mga Environment sa Icarus at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring suriin na tama ang napili sa ibaba at pindutin ang 'Patunayan' kapag tapos ka na!"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Mangyaring suriin ang iyong mga opsiyon sa ibaba"
@@ -1925,6 +1904,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Backup schedule"
   },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Bigong makalikha ng backup"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Bigong ma-restore galing sa backup"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"
   },
@@ -1933,9 +1918,6 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "I-restore"
-  },
-  "servers.list-empty.already-have-server-label": {
-    "defaultMessage": "Mayroon ka nang server?"
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Mag-sign-in"
@@ -1949,29 +1931,11 @@
   "servers.listing.support-label": {
     "defaultMessage": "Suporta"
   },
-  "servers.manage.checking-for-new-servers": {
-    "defaultMessage": "Nagsusuri para sa mga bagong server..."
-  },
-  "servers.manage.error.details": {
-    "defaultMessage": "Detalye ng error:"
-  },
-  "servers.manage.handle-error.title": {
-    "defaultMessage": "Isang error na naganap"
-  },
   "servers.manage.reload-button": {
     "defaultMessage": "Mag-reload"
   },
-  "servers.manage.resubscribe-error.text": {
-    "defaultMessage": "Isang error ang naganap habang pagre-resubscribe sa iyong Modrinth server."
-  },
-  "servers.manage.resubscribe-error.title": {
-    "defaultMessage": "Error sa muling pag-subscribe"
-  },
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Tagumpay"
-  },
-  "servers.medal-listing.countdown.remaining": {
-    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {araw} other {na araw}} <hours-count>{hours}</hours-count> {hours, plural, one {oras} other {na oras}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minuto} other {na minuto}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {segundo} other {na segundo}} ang natitira..."
   },
   "servers.medal-listing.upgrade-button": {
     "defaultMessage": "I-upgrade"
@@ -2067,7 +2031,7 @@
     "defaultMessage": "Saan mo nais malagay ang server mo?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Hindi nakalista na rehiyon? <link>Ipaalam sa amin kung saan mo pa nais sunod makita ang Modrinth Hosting!</link>"
+    "defaultMessage": "Hindi nakalista na rehiyon? <link>Ipaalam sa amin kung saan mo pa nais sunod makita ang Icarus Hosting!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Timog-silangang Asya"
@@ -2075,14 +2039,8 @@
   "servers.region.western-europe": {
     "defaultMessage": "Kanlurang Yuropa"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-install. Mangyaring subukan muli mamaya."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-upload. Mangyaring subukan muli mamaya."
-  },
   "servers.setup.reinstall-failed.text": {
-    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-reinstall. Mangyaring subukan muli mamaya."
+    "defaultMessage": "Isang di-inaasahang kamaliang nangyari habang nagre-reinstall. Mangyraing subukan muli makaya."
   },
   "settings.account.title": {
     "defaultMessage": "Account at seguridad"
@@ -2103,7 +2061,7 @@
     "defaultMessage": "madilim"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Pumili ng iyong gugustohing paksang kulay para sa Modrinth ng nitong device."
+    "defaultMessage": "Pumili ng iyong gugustohing paksang kulay para sa Icarus ng nitong device."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Liwanag"
@@ -2592,4 +2550,5 @@
     "defaultMessage": "Mayroon kang hindi na-save na pagbabago."
   }
 }
+
 

@@ -25,12 +25,12 @@
 </template>
 
 <script setup lang="ts">
-import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
+import { HistoryIcon, SaveIcon, SpinnerIcon } from '@icarus/assets'
 import { computed } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
-import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
+import { injectIcarusClient, injectIcarusServerContext } from '#ui/providers'
 
 const props = defineProps<{
 	isUpdating: boolean
@@ -41,9 +41,9 @@ const props = defineProps<{
 	serverId: string
 }>()
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
-const { powerState } = injectModrinthServerContext()
+const { powerState } = injectIcarusServerContext()
 
 const isStopped = computed(() => powerState.value === 'stopped' || powerState.value === 'crashed')
 
@@ -66,3 +66,4 @@ const saveAndPower = async () => {
 	await client.archon.servers_v0.power(props.serverId, isStopped.value ? 'Start' : 'Restart')
 }
 </script>
+

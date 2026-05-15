@@ -1,6 +1,6 @@
-<!-- @deprecated Use NewModal from @modrinth/ui directly. Ads/noblur now handled by injectModalBehavior. -->
+<!-- @deprecated Use NewModal from @icarus/ui directly. Ads/noblur now handled by injectModalBehavior. -->
 <script setup lang="ts">
-import { NewModal as Modal } from '@modrinth/ui'
+import { NewModal as Modal } from '@icarus/ui'
 import { useTemplateRef } from 'vue'
 
 const props = defineProps({

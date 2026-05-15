@@ -4,7 +4,7 @@ CREATE TABLE settings (
     max_concurrent_downloads INTEGER NOT NULL DEFAULT 10,
     max_concurrent_writes INTEGER NOT NULL DEFAULT 10,
 
-    theme TEXT NOT NULL DEFAULT 'dark',
+    theme TEXT NOT NULL DEFAULT 'oled',
     default_page TEXT NOT NULL DEFAULT 'home',
     collapsed_navigation INTEGER NOT NULL DEFAULT TRUE,
     advanced_rendering INTEGER NOT NULL DEFAULT TRUE,
@@ -25,7 +25,7 @@ CREATE TABLE settings (
     mc_game_resolution_x INTEGER NOT NULL DEFAULT 854,
     mc_game_resolution_y INTEGER NOT NULL DEFAULT 480,
 
-    hide_on_process_start INTEGER NOT NULL DEFAULT FALSE,
+    hide_on_process_start INTEGER NOT NULL DEFAULT TRUE,
 
     hook_pre_launch TEXT NULL,
     hook_wrapper TEXT NULL,

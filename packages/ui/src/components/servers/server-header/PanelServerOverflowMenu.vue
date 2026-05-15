@@ -17,13 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, MoreVerticalIcon, ServerIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, MoreVerticalIcon, ServerIcon } from '@icarus/assets'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { ButtonStyled } from '#ui/components'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
-import { injectModrinthServerContext } from '#ui/providers'
+import { injectIcarusServerContext } from '#ui/providers'
 
 const props = withDefaults(
 	defineProps<{
@@ -41,7 +41,7 @@ const props = withDefaults(
 )
 
 const router = useRouter()
-const { serverId } = injectModrinthServerContext()
+const { serverId } = injectIcarusServerContext()
 
 const menuOptions = computed(() => [
 	{
@@ -63,3 +63,4 @@ async function copyId() {
 	await navigator.clipboard.writeText(serverId)
 }
 </script>
+

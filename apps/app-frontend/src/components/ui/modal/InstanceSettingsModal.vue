@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	ChevronRightIcon,
 	CodeIcon,
 	CoffeeIcon,
 	InfoIcon,
 	MonitorIcon,
+	SettingsIcon,
 	WrenchIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	commonMessages,
@@ -15,13 +16,14 @@ import {
 	TabbedModal,
 	type TabbedModalTab,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.vue'
 import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
+import InstanceSyncOverrides from '@/components/ui/instance_settings/InstanceSyncOverrides.vue'
 import InstallationSettings from '@/components/ui/instance_settings/InstallationSettings.vue'
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
@@ -110,6 +112,14 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		}),
 		icon: CodeIcon,
 		content: HooksSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.sync',
+			defaultMessage: 'Instance sync',
+		}),
+		icon: SettingsIcon,
+		content: InstanceSyncOverrides,
 	},
 ])
 

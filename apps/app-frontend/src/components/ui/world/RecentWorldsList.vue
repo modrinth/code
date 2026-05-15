@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { LoaderCircleIcon } from '@modrinth/assets'
-import type { GameVersion } from '@modrinth/ui'
-import { GAME_MODES, HeadingLink, injectNotificationManager } from '@modrinth/ui'
+import { LoaderCircleIcon } from '@icarus/assets'
+import type { GameVersion } from '@icarus/ui'
+import { GAME_MODES, HeadingLink, injectNotificationManager } from '@icarus/ui'
 import { platform } from '@tauri-apps/plugin-os'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
@@ -9,7 +9,6 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_all } from '@/helpers/process'
 import { kill, run } from '@/helpers/profile'
@@ -180,11 +179,7 @@ async function joinWorld(world: WorldWithProfile, instance?: GameInstance) {
 	if (world.type === 'server') {
 		await start_join_server(world.profile, world.address).catch(handleError)
 		if (instance) {
-			trackEvent('InstanceStart', {
-				loader: instance.loader,
-				game_version: instance.game_version,
-				source: 'WorldItem',
-			})
+			
 		}
 	} else if (world.type === 'singleplayer') {
 		await start_join_singleplayer_world(world.profile, world.path).catch(handleError)
@@ -195,19 +190,13 @@ async function playInstance(instance: GameInstance) {
 	await run(instance.path)
 		.catch((err) => handleSevereError(err, { profilePath: instance.path }))
 		.finally(() => {
-			trackEvent('InstanceStart', {
-				loader: instance.loader,
-				game_version: instance.game_version,
-				source: 'WorldItem',
-			})
+			
 		})
 }
 
 async function stopInstance(path: string) {
 	await kill(path).catch(handleError)
-	trackEvent('InstanceStop', {
-		source: 'RecentWorldsList',
-	})
+	
 }
 
 const currentProfile = ref<string>()

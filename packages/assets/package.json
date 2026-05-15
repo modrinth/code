@@ -1,5 +1,5 @@
 {
-	"name": "@modrinth/assets",
+	"name": "@icarus/assets",
 	"version": "0.0.0",
 	"private": true,
 	"main": "./index.ts",
@@ -13,7 +13,7 @@
 		"icons:generate": "jiti build/generate-exports.ts"
 	},
 	"devDependencies": {
-		"@modrinth/tooling-config": "workspace:*",
+		"@icarus/tooling-config": "workspace:*",
 		"@types/node": "^24",
 		"jiti": "^2.4.2",
 		"lucide-static": "^0.562.0",

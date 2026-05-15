@@ -1,5 +1,5 @@
 {
-	"name": "@modrinth/blog",
+	"name": "@icarus/blog",
 	"version": "0.0.0",
 	"private": true,
 	"main": "./index.ts",
@@ -9,7 +9,7 @@
 		"fix": "jiti ./compile.ts && eslint . --fix && prettier --write ."
 	},
 	"devDependencies": {
-		"@modrinth/tooling-config": "workspace:*",
+		"@icarus/tooling-config": "workspace:*",
 		"@types/glob": "^9.0.0",
 		"@types/html-minifier-terser": "^7.0.2",
 		"@types/rss": "^0.0.32",
@@ -17,7 +17,7 @@
 		"jiti": "^2.4.2"
 	},
 	"dependencies": {
-		"@modrinth/utils": "workspace:*",
+		"@icarus/utils": "workspace:*",
 		"dayjs": "^1.11.10",
 		"glob": "^10.2.7",
 		"gray-matter": "^4.0.3",

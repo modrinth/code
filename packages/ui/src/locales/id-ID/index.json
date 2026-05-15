@@ -449,6 +449,9 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Unggah berkas"
   },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Mengunggah berkas ({completed}/{total})"
+  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Semua konten terpilih telah dimatikan"
   },
@@ -1074,16 +1077,16 @@
     "defaultMessage": "Berkas-berkas selalu diperbarui ketika server berubah"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Dapatkan Modrinth App"
+    "defaultMessage": "Dapatkan Icarus Launcher"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App akan buka secara otomatis..."
+    "defaultMessage": "Icarus Launcher akan buka secara otomatis..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Membuka Modrinth App"
+    "defaultMessage": "Membuka Icarus Launcher"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Mengapa harus Modrinth App?"
+    "defaultMessage": "Mengapa harus Icarus Launcher?"
   },
   "notification.error.title": {
     "defaultMessage": "Terjadi kesalahan"
@@ -1109,11 +1112,14 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Gagal"
   },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Terdaftar"
+  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Tim Modrinth"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "Tim Icarus"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "Menunggu"
@@ -1144,6 +1150,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Gagal"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Ditahan"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Salin kode ke papan klip"
@@ -1755,7 +1764,7 @@
     "defaultMessage": "Proyek Anda memiliki beberapa lingkungan"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Kamu baru saja memperbaiki sistem Lingkungan di Modrinth dan pilihan baru kini tersedia. Mohon pastikan untuk memilih pilihan yang benar dan klik 'Verifikasi' bila Anda selesai!"
+    "defaultMessage": "Kamu baru saja memperbaiki sistem Lingkungan di Icarus dan pilihan baru kini tersedia. Mohon pastikan untuk memilih pilihan yang benar dan klik 'Verifikasi' bila Anda selesai!"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Mohon tinjau pilihan di bawah"
@@ -1952,6 +1961,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Jadwal pencadangan"
   },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Gagal membuat cadangan"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Gagal memulihkan dari cadangan"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Pencadangan manual"
   },
@@ -2040,7 +2055,7 @@
     "defaultMessage": "Lokasi manakah yang Anda inginkan untuk server Anda?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Wilayah tidak terdaftar? <link>Beri tahu kami di mana Anda ingin melihat Modrinth Hosting untuk kedepannya!</link>"
+    "defaultMessage": "Wilayah tidak terdaftar? <link>Beri tahu kami di mana Anda ingin melihat Icarus Hosting untuk kedepannya!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Tenggara"
@@ -2067,7 +2082,7 @@
     "defaultMessage": "Gelap"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Pilih tema warna pilihan untuk Modrinth di perangkat ini."
+    "defaultMessage": "Pilih tema warna pilihan untuk Icarus di perangkat ini."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Terang"
@@ -2544,4 +2559,5 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
+
 

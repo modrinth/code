@@ -5,7 +5,7 @@
 			<!-- Heading -->
 			<div class="flex flex-col gap-2 items-start w-[300px]">
 				<p class="text-3xl leading-9 font-semibold text-contrast">
-					{{ formatMessage(messages.modrinthHostingLabel) }}
+					{{ formatMessage(messages.IcarusHostingLabel) }}
 				</p>
 				<p class="text-base font-normal text-primary">
 					{{ formatMessage(messages.noServersDescription) }}
@@ -150,8 +150,8 @@ import {
 	PlusIcon,
 	RightArrowIcon,
 	UsersIcon,
-} from '@modrinth/assets'
-import { AutoLink } from '@modrinth/ui'
+} from '@icarus/assets'
+import { AutoLink } from '@icarus/ui'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
@@ -194,9 +194,9 @@ const GRID_COLS = 5
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	modrinthHostingLabel: {
-		id: 'servers.list-empty.modrinth-hosting-label',
-		defaultMessage: 'Modrinth Hosting',
+	IcarusHostingLabel: {
+		id: 'servers.list-empty.Icarus-hosting-label',
+		defaultMessage: 'Icarus Hosting',
 	},
 	noServersTitle: {
 		id: 'servers.list-empty.no-servers-title',
@@ -204,7 +204,7 @@ const messages = defineMessages({
 	},
 	noServersDescription: {
 		id: 'servers.list-empty.no-servers-description',
-		defaultMessage: 'Install mods, invite friends, and play together all from the Modrinth App.',
+		defaultMessage: 'Install mods, invite friends, and play together all from Icarus Launcher.',
 	},
 	oneClickModInstallsTitle: {
 		id: 'servers.list-empty.one-click-mod-installs-title',
@@ -228,7 +228,7 @@ const messages = defineMessages({
 	},
 	playWithFriendsDescription: {
 		id: 'servers.list-empty.play-with-friends-description',
-		defaultMessage: 'Invite friends and get them set up right in the Modrinth App.',
+		defaultMessage: 'Invite friends and get them set up right in the Icarus Launcher.',
 	},
 	newServerButton: {
 		id: 'servers.list-empty.new-server-button',
@@ -236,7 +236,7 @@ const messages = defineMessages({
 	},
 	learnMoreLink: {
 		id: 'servers.list-empty.learn-more-link',
-		defaultMessage: 'Learn more about Modrinth Hosting',
+		defaultMessage: 'Learn more about Icarus Hosting',
 	},
 	alreadyHaveServerLabel: {
 		id: 'servers.list-empty.already-have-server-label',
@@ -311,3 +311,4 @@ p {
 	animation-duration: 400s;
 }
 </style>
+

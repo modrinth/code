@@ -18,13 +18,13 @@
     "defaultMessage": "Java 주소 추가"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "웹사이트, 스토어, Discord 초대 링크 등 Modrinth 외부로 연결되는 관련 링크를 추가하세요."
+    "defaultMessage": "웹사이트, 스토어, Discord 초대 링크 등 Icarus 외부로 연결되는 관련 링크를 추가하세요."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "외부 링크 추가"
   },
   "nags.add-links.description": {
-    "defaultMessage": "소스 코드, 이슈 트래커, Discord 초대 링크 등 Modrinth 외부로 연결되는 관련 링크를 추가하세요."
+    "defaultMessage": "소스 코드, 이슈 트래커, Discord 초대 링크 등 Icarus 외부로 연결되는 관련 링크를 추가하세요."
   },
   "nags.add-links.title": {
     "defaultMessage": "외부 링크 추가"
@@ -249,4 +249,5 @@
     "defaultMessage": "링크 설정 방문"
   }
 }
+
 

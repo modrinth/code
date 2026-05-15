@@ -42,7 +42,7 @@
 						:href="`https://modrinth.com/mod/${route.params.id}/version/${route.params.version}`"
 						rel="external"
 					>
-						Modrinth website
+						Icarus website
 						<ExternalIcon />
 					</a>
 				</ButtonStyled>
@@ -168,7 +168,7 @@
 </template>
 
 <script setup>
-import { CheckIcon, DownloadIcon, ExternalIcon, FileIcon, ReportIcon } from '@modrinth/assets'
+import { CheckIcon, DownloadIcon, ExternalIcon, FileIcon, ReportIcon } from '@icarus/assets'
 import {
 	Avatar,
 	Badge,
@@ -176,10 +176,9 @@ import {
 	ButtonStyled,
 	Card,
 	CopyCode,
-	useFormatBytes,
 	useFormatDateTime,
-} from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
+} from '@icarus/ui'
+import { formatBytes, renderString } from '@icarus/utils'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -192,7 +191,6 @@ const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
 })
-const formatBytes = useFormatBytes()
 
 const breadcrumbs = useBreadcrumbs()
 
@@ -468,3 +466,4 @@ await refreshDisplayDependencies()
 	}
 }
 </style>
+

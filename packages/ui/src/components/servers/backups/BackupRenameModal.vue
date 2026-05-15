@@ -46,14 +46,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
-import { IssuesIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import type { Archon } from '@icarus/api-client'
+import { IssuesIcon, SaveIcon, SpinnerIcon, XIcon } from '@icarus/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
 import {
-	injectModrinthClient,
-	injectModrinthServerContext,
+	injectIcarusClient,
+	injectIcarusServerContext,
 	injectNotificationManager,
 } from '../../../providers'
 import ButtonStyled from '../../base/ButtonStyled.vue'
@@ -61,9 +61,9 @@ import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 
 const { addNotification } = injectNotificationManager()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
-const ctx = injectModrinthServerContext()
+const ctx = injectIcarusServerContext()
 
 const props = defineProps<{
 	backups?: Archon.BackupsQueue.v1.BackupQueueBackup[]
@@ -163,3 +163,4 @@ defineExpose({
 	hide,
 })
 </script>
+

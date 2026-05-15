@@ -243,7 +243,7 @@
 			<template #copy_path> <ClipboardCopyIcon /> Copy path </template>
 			<template #open_folder> <FolderOpenIcon /> Open folder </template>
 			<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
-			<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
+			<template #open_link> <GlobeIcon /> Open in Icarus <ExternalIcon /> </template>
 			<template #copy_names><EditIcon />Copy names</template>
 			<template #copy_slugs><HashIcon />Copy slugs</template>
 			<template #copy_links><GlobeIcon />Copy links</template>
@@ -259,7 +259,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	BoxesIcon,
 	CheckCircleIcon,
@@ -283,7 +283,7 @@ import {
 	UpdatedIcon,
 	UserPlusIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -295,7 +295,7 @@ import {
 	ServerPing,
 	ServerRecentPlays,
 	ServerRegion,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
@@ -309,7 +309,6 @@ import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
-import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
@@ -504,11 +503,7 @@ const startInstance = async (context: string) => {
 	}
 	loading.value = false
 
-	trackEvent('InstanceStart', {
-		loader: instance.value.loader,
-		game_version: instance.value.game_version,
-		source: context,
-	})
+	
 }
 
 const stopInstance = async (context: string) => {
@@ -518,11 +513,7 @@ const stopInstance = async (context: string) => {
 	playing.value = false
 
 	if (!instance.value) return
-	trackEvent('InstanceStop', {
-		loader: instance.value.loader,
-		game_version: instance.value.game_version,
-		source: context,
-	})
+	
 }
 
 const handlePlayServer = async () => {
@@ -869,3 +860,4 @@ Button {
 	}
 }
 </style>
+

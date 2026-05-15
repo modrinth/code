@@ -30,7 +30,7 @@
     "message": "لينكس"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "الإصدارات الخاصة بـ Linux من Modrinth App <issues-link>معروفة بوجود مشاكل</issues-link> على بعض الأنظمة والتكوينات. إذا كان Modrinth App غير مستقر على نظامك، فننصحك بتجربة تطبيقات أخرى مثل <prism-link>Prism Launcher</prism-link> لتثبيت محتوى Modrinth بسهولة."
+    "message": "الإصدارات الخاصة بـ Linux من Icarus Launcher <issues-link>معروفة بوجود مشاكل</issues-link> على بعض الأنظمة والتكوينات. إذا كان Icarus Launcher غير مستقر على نظامك، فننصحك بتجربة تطبيقات أخرى مثل <prism-link>Prism Launcher</prism-link> لتثبيت محتوى Icarus بسهولة."
   },
   "app-marketing.download.mac": {
     "message": "ماك"
@@ -39,10 +39,10 @@
     "message": "خيارات التنزيل"
   },
   "app-marketing.download.terms": {
-    "message": "بتنزيلك Modrinth App فإنك توافق على <terms-link>الشروط</terms-link> و <privacy-link>سياسة الخصوصية</privacy-link>."
+    "message": "بتنزيلك Icarus Launcher فإنك توافق على <terms-link>الشروط</terms-link> و <privacy-link>سياسة الخصوصية</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "تنزيل Modrinth App (النسخة التجريبية)"
+    "message": "تنزيل Icarus Launcher (النسخة التجريبية)"
   },
   "app-marketing.download.windows": {
     "message": "ويندوز"
@@ -54,7 +54,7 @@
     "message": "تابع المشروعات"
   },
   "app-marketing.features.importing.description": {
-    "message": "استورد جميع ملفاتك الشخصية المفضلة من المشغل الذي كنت تستخدمه من قبل، وابدأ باستخدام Modrinth App في ثوانٍ!"
+    "message": "استورد جميع ملفاتك الشخصية المفضلة من المشغل الذي كنت تستخدمه من قبل، وابدأ باستخدام Icarus Launcher في ثوانٍ!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "يعمل Modrinth App بكفاءة أفضل من العديد من مديري المودات الرائدين، باستخدام 150 ميغابايت فقط من الذاكرة العشوائية!"
+    "message": "يعمل Icarus Launcher بكفاءة أفضل من العديد من مديري المودات الرائدين، باستخدام 150 ميغابايت فقط من الذاكرة العشوائية!"
   },
   "app-marketing.features.performance.discord": {
     "message": "ديسكورد"
@@ -128,7 +128,7 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 ميغابايت"
   },
-  "app-marketing.features.performance.modrinth-app": {
+  "app-marketing.features.performance.Icarus-app": {
     "message": "تطبيق مودرينث"
   },
   "app-marketing.features.performance.one-billion-percent": {
@@ -147,7 +147,7 @@
     "message": "أداء قوي"
   },
   "app-marketing.features.play.description": {
-    "message": "استخدم Modrinth App لتنزيل ولعب موداتك وحزم المودات المفضلة لديك."
+    "message": "استخدم Icarus Launcher لتنزيل ولعب موداتك وحزم المودات المفضلة لديك."
   },
   "app-marketing.features.play.title": {
     "message": "العب مع موداتك المفضلة"
@@ -168,7 +168,7 @@
     "message": "مختلف عن أي مشغل آخر"
   },
   "app-marketing.features.website.description": {
-    "message": "تم دمج Modrinth App بالكامل مع الموقع، بحيث يمكنك الوصول إلى جميع مشاريعك المفضلة بواسطة التطبيق!"
+    "message": "تم دمج Icarus Launcher بالكامل مع الموقع، بحيث يمكنك الوصول إلى جميع مشاريعك المفضلة بواسطة التطبيق!"
   },
   "app-marketing.features.website.title": {
     "message": "تكامل مع الموقع"
@@ -177,19 +177,19 @@
     "message": "الذي استخدمته من قبل"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "لقطة شاشة لـ Modrinth App مع نسخة Cobblemon مفتوحة في صفحة \"المحتوى\"."
+    "message": "لقطة شاشة لـ Icarus Launcher مع نسخة Cobblemon مفتوحة في صفحة \"المحتوى\"."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App هو مشغل فريد ومفتوح المصدر يتيح لك لعب موداتك المفضلة والحفاظ عليها محدثة، وكل ذلك في حزمة واحدة بسيطة ومنظمة."
+    "message": "Icarus Launcher هو مشغل فريد ومفتوح المصدر يتيح لك لعب موداتك المفضلة والحفاظ عليها محدثة، وكل ذلك في حزمة واحدة بسيطة ومنظمة."
   },
   "app-marketing.hero.download-button": {
-    "message": "تنزيل Modrinth App"
+    "message": "تنزيل Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "تنزيل Modrinth App"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "تنزيل Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "تنزيل Modrinth App لـ {os}"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "تنزيل Icarus Launcher لـ {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "لقطة شاشة لقائمة Cobblemon الرئيسية."
@@ -624,7 +624,7 @@
     "message": "نموذج ضريبي"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "تستخدم Modrinth المزود الخارجي Track1099 لجمع وتخزين نماذج الضرائب الخاصة بك بأمان. <security-link>تعرف على المزيد هنا.</security-link>"
+    "message": "تستخدم Icarus المزود الخارجي Track1099 لجمع وتخزين نماذج الضرائب الخاصة بك بأمان. <security-link>تعرف على المزيد هنا.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "ممارسات الأمن"
@@ -789,7 +789,7 @@
     "message": "لسحب رصيدك المتاح بالكامل <b>{available}</b> يرجى تعبئة النموذج أدناه. هذا النموذج مطلوب لأغراض الإبلاغ الضريبي، ولا يلزم تعبئته إلا مرة واحدة."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "يجب عليك إكمال نموذج W-9 أو W-8 لسجلات الضرائب الخاصة بشركة Modrinth حتى نبقى ملتزمين باللوائح الضريبية."
+    "message": "يجب عليك إكمال نموذج W-9 أو W-8 لسجلات الضرائب الخاصة بشركة Icarus حتى نبقى ملتزمين باللوائح الضريبية."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "نموذج ضريبي مطلوب"
@@ -831,7 +831,7 @@
     "message": "ايميل غير مؤكد"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "البريد الإلكتروني الذي أدخلته لا يرتبط بحسابك في Modrinth. لا يمكن Modrinth استرداد المكافآت المرسلة إلى عنوان بريد إلكتروني غير صحيح."
+    "message": "البريد الإلكتروني الذي أدخلته لا يرتبط بحسابك في Icarus. لا يمكن Icarus استرداد المكافآت المرسلة إلى عنوان بريد إلكتروني غير صحيح."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "تتوفر أقساط مخفضة"
@@ -848,30 +848,6 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "لقد استنفدت رصيدك <b>{withdrawLimit}</b> حد السحب. يجب عليك تعبئة نموذج ضريبي لسحب مبلغ أكبر."
   },
-  "dashboard.projects.notification.bulk-edit-success": {
-    "message": "قم بتحرير روابط المشاريع المحددة دفعة واحدة."
-  },
-  "dashboard.projects.project.icon-alt": {
-    "message": "أيقونة {title}"
-  },
-  "dashboard.projects.project.moderator-message-aria": {
-    "message": "يحتوي المشروع على رسالة من المشرفين. اطلع على المشروع للمزيد."
-  },
-  "dashboard.projects.project.review-environment-metadata": {
-    "message": "يرجى مراجعة بيانات تعريف البيئة"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "صعوداً"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "نزولا"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "الإسم"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "الحالة"
-  },
   "dashboard.revenue.available-now": {
     "message": "متاح الآن"
   },
@@ -882,7 +858,7 @@
     "message": "قد تخضع الإيرادات المقدرة للتغيير حتى يتم توفيرها. "
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "اضغط لكي تعرف كيف Modrinth يستحمل إيراداتك"
+    "message": "اضغط لكي تعرف كيف Icarus يستحمل إيراداتك"
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "مقدر {date}"
@@ -1158,10 +1134,10 @@
     "message": "الأسئلة شائعه"
   },
   "hosting-marketing.faq.how-fast": {
-    "message": "ما سرعه خوادم modrinth؟"
+    "message": "ما سرعه خوادم Icarus؟"
   },
   "hosting-marketing.faq.location": {
-    "message": "أين تقع استضافة خوادم Modrinth؟ هل يمكنني اختيار منطقة؟"
+    "message": "أين تقع استضافة خوادم Icarus؟ هل يمكنني اختيار منطقة؟"
   },
   "hosting-marketing.get-started": {
     "message": "ابدأ"
@@ -1175,8 +1151,8 @@
   "hosting-marketing.hero.button.start-your-server": {
     "message": "أنشئ خادمك"
   },
-  "hosting-marketing.hero.host-with-modrinth": {
-    "message": "أدر خادمك التالي مع Modrinth Hosting"
+  "hosting-marketing.hero.host-with-Icarus": {
+    "message": "أدر خادمك التالي مع Icarus Hosting"
   },
   "hosting-marketing.included.backups-included": {
     "message": "النسخ الاحتياطية مضمنة"
@@ -1202,20 +1178,20 @@
   "hosting-marketing.server-for-everyone": {
     "message": "يوجد خادم يناسب الجميع"
   },
-  "hosting-marketing.why.all-on-modrinth": {
+  "hosting-marketing.why.all-on-Icarus": {
     "message": "يمكنك إدارة كل شيء على مودرينث"
   },
-  "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "خادمك، وتعديلاتك، ولاعبوك، وغير ذلك الكثير موجود جميعها على Modrinth. لا حاجة للتبديل بين المنصات."
+  "hosting-marketing.why.all-on-Icarus.description": {
+    "message": "خادمك، وتعديلاتك، ولاعبوك، وغير ذلك الكثير موجود جميعها على Icarus. لا حاجة للتبديل بين المنصات."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "سريع باستمرار"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "لا يتم تحميل بنيتنا التحتية بشكل زائد أبدًا، مما يعني أن كل خادم مستضاف مع Modrinth يعمل دائمًا بكامل طاقته."
+    "message": "لا يتم تحميل بنيتنا التحتية بشكل زائد أبدًا، مما يعني أن كل خادم مستضاف مع Icarus يعمل دائمًا بكامل طاقته."
   },
   "hosting-marketing.why.description": {
-    "message": "اختر من بين آلاف حزم التعديلات المتوفرة على موقع Modrinth أو أنشئ حزمتك الخاصة. ادعُ أصدقاءك عندما تكون مستعدًا للعب."
+    "message": "اختر من بين آلاف حزم التعديلات المتوفرة على موقع Icarus أو أنشئ حزمتك الخاصة. ادعُ أصدقاءك عندما تكون مستعدًا للعب."
   },
   "hosting-marketing.why.heading": {
     "message": "ابحث عن حزمة تعديلات. الآن أصبح خادمًا."
@@ -1224,22 +1200,22 @@
     "message": "استمتع بتجربة استضافة عصرية وموثوقة"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "يتم استضافة خوادم Modrinth Hosting على <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>، وتعمل على برمجيات مخصّصة لضمان تشغيل خادمك بسلاسة."
+    "message": "يتم استضافة خوادم Icarus Hosting على <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>، وتعمل على برمجيات مخصّصة لضمان تشغيل خادمك بسلاسة."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "العب حيث توجد تعديلاتك"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "تدمج خدمة Modrinth Hosting عملية تثبيت التعديلات وحزم التعديلات بسلاسة في خادمك."
+    "message": "تدمج خدمة Icarus Hosting عملية تثبيت التعديلات وحزم التعديلات بسلاسة في خادمك."
   },
-  "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "لماذا استضافة Modrinth؟"
+  "hosting-marketing.why.why-Icarus-hosting": {
+    "message": "لماذا استضافة Icarus؟"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "جميع التعديلات المفضلة لديك"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "اختر بين Vanilla و Fabric و Forge و Quilt و NeoForge. إذا كان البرنامج موجودًا على Modrinth، فيمكن تشغيله على خادمك."
+    "message": "اختر بين Vanilla و Fabric و Forge و Quilt و NeoForge. إذا كان البرنامج موجودًا على Icarus، فيمكن تشغيله على خادمك."
   },
   "hosting.plan.out-of-stock": {
     "message": "إنتهى من المخزن"
@@ -1340,8 +1316,8 @@
   "landing.launcher.graphic-alt": {
     "message": "تمثيل مبسط لنافذة ماين كرافت، مع شعار Mojang Studios باللون الأخضر الخاص بمودرنث."
   },
-  "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+  "landing.launcher.Icarus-app-label": {
+    "message": "Icarus Launcher"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1442,23 +1418,23 @@
   "layout.footer.legal.terms-of-use": {
     "message": "شروط الاستخدام"
   },
-  "layout.footer.modrinth-information": {
-    "message": "معلومات Modrinth"
+  "layout.footer.Icarus-information": {
+    "message": "معلومات Icarus"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth <github-link>مفتوح المصدر</github-link>."
+    "message": "Icarus <github-link>مفتوح المصدر</github-link>."
   },
   "layout.footer.products": {
     "message": "منتجات"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Icarus Launcher"
   },
   "layout.footer.products.plus": {
-    "message": "Modrinth+"
+    "message": "Icarus+"
   },
   "layout.footer.products.servers": {
-    "message": "استضافة Modrinth"
+    "message": "استضافة Icarus"
   },
   "layout.footer.resources": {
     "message": "موارد"
@@ -1468,41 +1444,6 @@
   },
   "layout.footer.resources.help-center": {
     "message": "مركز المساعدة"
-  },
-  "layout.nav.modrinth-home-page": {
-    "message": "الصفحة الرئيسة لمودرينث"
-  },
-  "layout.nav.my-servers": {
-    "message": "خوادمي"
-  },
-  "layout.nav.saved-projects": {
-    "message": "المشاريع المحفوظة"
-  },
-  "muralpay.field.account-number-type": {
-    "message": "نوع رقم الحساب"
-  },
-  "muralpay.field.wallet-address": {
-    "message": "عنوان المحفظة"
-  },
-  "muralpay.placeholder.cuit-cuil": {
-    "message": "أدخل CUIT أو CUIL"
-  },
-  "profile.user-id": {
-    "message": "معرّف المستخدم: {id}"
-  },
-  "project-member-header.success-decline": {
-    "message": "لقد رفضت دعوة الفريق"
-  },
-  "project-type.resourcepack.plural": {
-    "message": "حزم ال"
-  },
-  "project.environment.migration.message": {
-    "message": "لقد قمنا بتحديث نظام البيئات في مودرينث، وأصبحت الخيارات الجديدة متاحة الآن. يرجى التأكد من صحة البيانات الوصفية."
-  },
-  "project.environment.migration.review-button": {
-    "message": "مراجعة إعدادات البيئة"
-  },
-  "project.environment.migration.title": {
-    "message": "يرجى مراجعة بيانات تعريف البيئة"
   }
 }
+

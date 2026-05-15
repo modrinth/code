@@ -1,28 +1,28 @@
 ---
-title: Modrinth Hosting in the App
-summary: Buy, setup, and manage your server all in the Modrinth App.
+title: Icarus Hosting in the App
+summary: Buy, setup, and manage your server all in the Icarus Launcher.
 date: 2026-04-12T13:30:00-08:00
 authors: ['AJfd8YH6', 'bOHH0P9Z', '6EjnV9Uf', 'LnK8MbX7']
 ---
 
-This update brings [Modrinth Hosting](/hosting) into [Modrinth App](/app) and is a big step towards our vision for both products. You can now purchase a server, set it up, play without bouncing between the website and the app!
+This update brings [Icarus Hosting](/hosting) into [Icarus Launcher](/app) and is a big step towards our vision for both products. You can now purchase a server, set it up, play without bouncing between the website and the app!
 
 This release also includes a redesigned server console which has been brought over to the logs page in instances.
 
 ### Tl;dr
 
-- Modrinth Hosting in the app
-- New Modrinth Hosting page and server card states
+- Icarus Hosting in the app
+- New Icarus Hosting page and server card states
 - New server purchase flow
 - New server resubscribe flow
 - Overhauled server settings
 - New server console and instance logs page
 
-## Modrinth Hosting Page
+## Icarus Hosting Page
 
-The Modrinth Hosting page has gotten a fresh coat of paint, with new server card states like server provisioning and upcoming cancellation.
+The Icarus Hosting page has gotten a fresh coat of paint, with new server card states like server provisioning and upcoming cancellation.
 
-![A screenshot of the Modrinth Hosting tab in the app, showing the user's servers](./server-list.webp)
+![A screenshot of the Icarus Hosting tab in the app, showing the user's servers](./server-list.webp)
 
 ## Server Purchase Flow
 
@@ -68,3 +68,4 @@ The properties page also got a big overhaul. We’ve split out many of the more 
 —
 
 That’s everything from us! Have a good week!
+

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckCircleIcon, XCircleIcon } from '@modrinth/assets'
+import { CheckCircleIcon, XCircleIcon } from '@icarus/assets'
 import {
 	Checkbox,
 	defineMessages,
@@ -7,7 +7,7 @@ import {
 	Slider,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { computed, readonly, ref, watch } from 'vue'
 
 import JavaSelector from '@/components/ui/JavaSelector.vue'

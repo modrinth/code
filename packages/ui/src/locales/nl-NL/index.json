@@ -95,29 +95,8 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Opnieuw abonneren op de server"
   },
-  "browse.no-results": {
-    "defaultMessage": "Er zijn geen resultaten gevonden voor uw zoekopdracht!"
-  },
-  "browse.offline": {
-    "defaultMessage": "U bent momenteel offline. Verbind met internet om verder te gaan op Modrinth!"
-  },
-  "browse.selected-projects-floating-bar.aria-label": {
-    "defaultMessage": "Geselecteerde projecten"
-  },
-  "browse.selected-projects-leave-modal.admonition-header": {
-    "defaultMessage": "Geselecteerde projecten zijn nog niet geïnstalleerd"
-  },
-  "browse.selected-projects-leave-modal.discard": {
-    "defaultMessage": "Weggooien"
-  },
-  "browse.view-prefix": {
-    "defaultMessage": "Bekijk:"
-  },
   "button.accept": {
     "defaultMessage": "Accepteer"
-  },
-  "button.add-server-to-instance": {
-    "defaultMessage": "Voeg server toevoegen aan instantie"
   },
   "button.affiliate-links": {
     "defaultMessage": "Affiliatelinks"
@@ -188,9 +167,6 @@
   "button.hide-snapshots": {
     "defaultMessage": "Verberg snapshots"
   },
-  "button.install": {
-    "defaultMessage": "Installeer"
-  },
   "button.max": {
     "defaultMessage": "Max"
   },
@@ -208,9 +184,6 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Open in map"
-  },
-  "button.open-in-modrinth": {
-    "defaultMessage": "Open in Modrinth"
   },
   "button.play": {
     "defaultMessage": "Speel"
@@ -304,9 +277,6 @@
   },
   "collections.label.private": {
     "defaultMessage": "Prive"
-  },
-  "content.card.select-project": {
-    "defaultMessage": "Selecteer {project}"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Weet u zeker dat u {count, plural, one {# project} other {# projects}} wilt updaten naar de nieuwste compatibele versie? Het wordt aanbevolen om de inhoud één voor één te updaten."
@@ -482,6 +452,9 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Upload bestanden"
   },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Bestanden aan het uploaden ({completed}/{total})"
+  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Alle geselecteerde content is al uitgeschakeld"
   },
@@ -517,39 +490,6 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} geselecteerd"
-  },
-  "creation-flow.button.create-instance": {
-    "defaultMessage": "Maak instantie"
-  },
-  "creation-flow.button.create-world": {
-    "defaultMessage": "Maak wereld"
-  },
-  "creation-flow.button.finish": {
-    "defaultMessage": "Klaar"
-  },
-  "creation-flow.button.import": {
-    "defaultMessage": "Importeren"
-  },
-  "creation-flow.button.setup-server": {
-    "defaultMessage": "Stel server in"
-  },
-  "creation-flow.modal.custom-setup.build-number.label": {
-    "defaultMessage": "Bouw nummer"
-  },
-  "creation-flow.modal.custom-setup.build-number.placeholder": {
-    "defaultMessage": "Selecteer bouw nummer"
-  },
-  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
-    "defaultMessage": "Zoek bouw nummer..."
-  },
-  "creation-flow.modal.custom-setup.game-version.placeholder": {
-    "defaultMessage": "Selecteer game versie"
-  },
-  "creation-flow.modal.final-config.gamemode.creative": {
-    "defaultMessage": "Creatief"
-  },
-  "creation-flow.modal.final-config.gamemode.hardcore": {
-    "defaultMessage": "Hardcore"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Samenvatting"
@@ -769,6 +709,9 @@
   },
   "files.operations.extracting": {
     "defaultMessage": "{bron} Uitpakken"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Mislukt"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "Modpack via URL"
@@ -1274,6 +1217,12 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Onbekende spelmodus"
   },
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "De bestanden worden nog geüpload. Als u deze pagina verlaat, wordt het uploaden afgebroken en gaan uw wijzigingen mogelijk verloren."
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Bezig met uploaden"
+  },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} compatibel met {count, plural, one {instance} other {instances}}"
   },
@@ -1728,16 +1677,16 @@
     "defaultMessage": "Houd de bestanden geupdate wanneer de server verandert"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Krijg de Modrinth App"
+    "defaultMessage": "Krijg de Icarus Launcher"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "De Modrinth App zal automatisch openen..."
+    "defaultMessage": "De Icarus Launcher zal automatisch openen..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Bezig met de Modrinth App openen"
+    "defaultMessage": "Bezig met de Icarus Launcher openen"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Waarom de Modrinth App gebruiken"
+    "defaultMessage": "Waarom de Icarus Launcher gebruiken"
   },
   "notification.error.title": {
     "defaultMessage": "Er is een fout opgetreden"
@@ -1763,11 +1712,14 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Mislukt"
   },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Publiek"
+  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Toezichthouder"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Modrinth team"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "Icarus team"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "In behandeling"
@@ -1798,6 +1750,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Gefaald"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Weerhouden"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopieer code naar klembord"
@@ -2181,7 +2136,7 @@
     "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}}"
   },
   "project.recent-plays.tooltip": {
-    "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}} van Modrinth in de afgelopen twee weken"
+    "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}} van Icarus in de afgelopen twee weken"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Dit project maakt gebruik van een op maat gemaakt modpack"
@@ -2493,7 +2448,7 @@
     "defaultMessage": "Uw project heeft meerdere omgevingen"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "We hebben zojuist het omgevingssysteem van Modrinth herzien en nieuwe opties zijn nu beschikbaar. Zorg dat de juiste onderstaande optie geselecteerd is en klik \"Verifieer\" wanneer je klaar bent!"
+    "defaultMessage": "We hebben zojuist het omgevingssysteem van Icarus herzien en nieuwe opties zijn nu beschikbaar. Zorg dat de juiste onderstaande optie geselecteerd is en klik \"Verifieer\" wanneer je klaar bent!"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Beoordeel onderstaande opties"
@@ -2723,11 +2678,20 @@
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Er is een fout opgetreden tijdens het terugzetten vanuit {backupName}. Probeer het nog eens of neem contact op met de helpdesk als het probleem zich blijft voordoen."
   },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Het herstellen vanuit de back-up is mislukt"
+  },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Het terugzetten vanuit {backupName} staat in de wachtrij en begint binnenkort."
   },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Herstel vanuit back-up staat in de wachtrij"
+  },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Uw server is teruggezet naar {backupName} en is klaar om te starten."
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Het terugzetten vanuit de back-up is gelukt"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Uw server wordt hersteld vanuit {backupName}. Dit kan enkele minuten duren."
@@ -2740,6 +2704,12 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Back-up planning"
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Het maken van een back-up is mislukt"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Herstellen vanuit back-up is mislukt"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Handmatige back-up"
@@ -2766,16 +2736,16 @@
     "defaultMessage": "Heb je al een server?"
   },
   "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Meer informatie over Modrinth Hosting"
+    "defaultMessage": "Meer informatie over Icarus Hosting"
   },
-  "servers.list-empty.modrinth-hosting-label": {
-    "defaultMessage": "Modrinth Hosting"
+  "servers.list-empty.Icarus-hosting-label": {
+    "defaultMessage": "Icarus Hosting"
   },
   "servers.list-empty.new-server-button": {
     "defaultMessage": "Nieuwe server"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Installeer mods, nodig vrienden uit en speel samen – allemaal via de Modrinth app."
+    "defaultMessage": "Installeer mods, nodig vrienden uit en speel samen – allemaal via de Icarus Launcher."
   },
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "Nog geen servers"
@@ -2787,7 +2757,7 @@
     "defaultMessage": "Mods installeren met één klik"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Nodig vrienden uit en help ze op weg in de Modrinth app."
+    "defaultMessage": "Nodig vrienden uit en help ze op weg in de Icarus Launcher."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Speel met vrienden"
@@ -2853,7 +2823,7 @@
     "defaultMessage": "Uw abonnement wordt op <date>{formattedDate}</date> opgezegd. "
   },
   "servers.listing.notice.suspended": {
-    "defaultMessage": "Uw server is geblokkeerd. Neem contact op met de klantenservice van Modrinth voor meer informatie."
+    "defaultMessage": "Uw server is geblokkeerd. Neem contact op met de klantenservice van Icarus voor meer informatie."
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "De hardware van uw server wordt momenteel geüpgraded en zal binnenkort weer online zijn."
@@ -2880,7 +2850,7 @@
     "defaultMessage": "Bezig met uploaden"
   },
   "servers.manage.contact-support-button": {
-    "defaultMessage": "Neem contact op met de klantenservice van Modrinth"
+    "defaultMessage": "Neem contact op met de klantenservice van Icarus"
   },
   "servers.manage.error.alert-notice": {
     "defaultMessage": "Onze systemen waarschuwen ons team automatisch wanneer er een probleem is. We zijn al bezig om ze weer online te krijgen."
@@ -2892,10 +2862,10 @@
     "defaultMessage": "Foutdetails:"
   },
   "servers.manage.error.queue-notice": {
-    "defaultMessage": "Als u onlangs een server bij Modrinth Hosting hebt aangeschaft, staat deze momenteel in de wachtrij en verschijnt hij hier zodra hij klaar is. <warning>Probeer geen nieuwe server aan te schaffen.</warning>"
+    "defaultMessage": "Als u onlangs een server bij Icarus Hosting hebt aangeschaft, staat deze momenteel in de wachtrij en verschijnt hij hier zodra hij klaar is. <warning>Probeer geen nieuwe server aan te schaffen.</warning>"
   },
   "servers.manage.error.support-notice": {
-    "defaultMessage": "Als je persoonlijke ondersteuning nodig hebt met betrekking tot de status van uw server, neem dan contact op met Modrinth Support."
+    "defaultMessage": "Als je persoonlijke ondersteuning nodig hebt met betrekking tot de status van uw server, neem dan contact op met Icarus Support."
   },
   "servers.manage.error.title": {
     "defaultMessage": "De servers konden niet worden geladen"
@@ -2919,7 +2889,7 @@
     "defaultMessage": "Opnieuw laden"
   },
   "servers.manage.resubscribe-error.text": {
-    "defaultMessage": "Er is een fout opgetreden bij het opnieuw abonneren op jouw Modrinth server."
+    "defaultMessage": "Er is een fout opgetreden bij het opnieuw abonneren op jouw Icarus server."
   },
   "servers.manage.resubscribe-error.title": {
     "defaultMessage": "Fout bij het opnieuw abonneren"
@@ -2940,7 +2910,7 @@
     "defaultMessage": "Zoek {count} {count, plural, one {server} other {servers}}..."
   },
   "servers.manage.servers-title": {
-    "defaultMessage": "Modrinth Hosting"
+    "defaultMessage": "Icarus Hosting"
   },
   "servers.manage.settings-hint.description": {
     "defaultMessage": "Je vindt ze nu hier!"
@@ -2961,10 +2931,10 @@
     "defaultMessage": "De proefperiode van uw Medal server is verstreken en uw server is opgeschort. Upgrade om uw server te kunnen blijven gebruiken."
   },
   "servers.medal-listing.notice.suspended": {
-    "defaultMessage": "Uw account is opgeschort. Werk uw factuurgegevens bij of neem contact op met de klantenservice van Modrinth voor meer informatie."
+    "defaultMessage": "Uw account is opgeschort. Werk uw factuurgegevens bij of neem contact op met de klantenservice van Icarus voor meer informatie."
   },
   "servers.medal-listing.notice.suspended-with-reason": {
-    "defaultMessage": "Uw account is opgeschort: {reason}. Werk uw factuurgegevens bij of neem contact op met de klantenservice van Modrinth voor meer informatie."
+    "defaultMessage": "Uw account is opgeschort: {reason}. Werk uw factuurgegevens bij of neem contact op met de klantenservice van Icarus voor meer informatie."
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "De hardware van uw server wordt momenteel geüpgraded en zal binnenkort weer online zijn."
@@ -3006,7 +2976,7 @@
     "defaultMessage": "Niet negeerbaar"
   },
   "servers.purchase.notification.success.text": {
-    "defaultMessage": "Uw aankoop bij Modrinth Hosting is succesvol afgerond."
+    "defaultMessage": "Uw aankoop bij Icarus Hosting is succesvol afgerond."
   },
   "servers.purchase.notification.success.title": {
     "defaultMessage": "Aankoop geslaagd"
@@ -3081,7 +3051,7 @@
     "defaultMessage": "Uit welk regio wil je een server?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Staat jouw regio er niet bij? <link>Laat ons weten waar je Modrinth Hosting graag als volgende zou willen zien!</link>"
+    "defaultMessage": "Staat jouw regio er niet bij? <link>Laat ons weten waar je Icarus Hosting graag als volgende zou willen zien!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Southeast Asia"
@@ -3126,7 +3096,7 @@
     "defaultMessage": "Donker"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Selecteer je gewenste kleurschema voor Modrinth op dit apparaat."
+    "defaultMessage": "Selecteer je gewenste kleurschema voor Icarus op dit apparaat."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Licht"
@@ -3633,4 +3603,5 @@
     "defaultMessage": "Wil je de pagina verlaten?"
   }
 }
+
 

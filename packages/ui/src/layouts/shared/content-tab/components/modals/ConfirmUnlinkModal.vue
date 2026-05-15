@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { UnlinkIcon, XIcon } from '@modrinth/assets'
+import { UnlinkIcon, XIcon } from '@icarus/assets'
 import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'

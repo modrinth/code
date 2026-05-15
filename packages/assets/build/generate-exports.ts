@@ -1,4 +1,4 @@
-import { compareImportSources } from '@modrinth/tooling-config/script-utils/import-sort'
+import { compareImportSources } from '@icarus/tooling-config/script-utils/import-sort'
 import fs from 'fs'
 import path from 'path'
 

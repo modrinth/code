@@ -8,13 +8,12 @@ import {
 	UpdatedIcon,
 	WrenchIcon,
 	XIcon,
-} from '@modrinth/assets'
-import { ButtonStyled, Collapsible, injectNotificationManager } from '@modrinth/ui'
+} from '@icarus/assets'
+import { ButtonStyled, Collapsible, injectNotificationManager } from '@icarus/ui'
 import { computed, ref } from 'vue'
 
 import { ChatIcon } from '@/assets/icons'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { install } from '@/helpers/profile.js'
 import { cancel_directory_change } from '@/helpers/settings.ts'
@@ -74,7 +73,7 @@ defineExpose({
 			supportLink.value = 'https://support.modrinth.com'
 			metadata.value.profilePath = context.profilePath
 		} else if (source === 'state_init') {
-			title.value = 'Error initializing Modrinth App'
+			title.value = 'Error initializing Icarus Launcher'
 			errorType.value = 'state_init'
 			supportLink.value = 'https://support.modrinth.com'
 		} else {
@@ -99,7 +98,7 @@ async function loginMinecraft() {
 			await set_default_user(loggedIn.profile.id).catch(handleError)
 		}
 
-		await trackEvent('AccountLogIn', { source: 'ErrorModal' })
+
 		loadingMinecraft.value = false
 		errorModal.value.hide()
 	} catch (err) {
@@ -162,7 +161,7 @@ async function copyToClipboard(text) {
 					<template v-if="metadata.network">
 						<h3>Network issues</h3>
 						<p>
-							It looks like there were issues with the Modrinth App connecting to Microsoft's
+							It looks like there were issues with Icarus Launcher connecting to Microsoft's
 							servers. This is often the result of a poor connection, so we recommend trying again
 							to see if it works. If issues continue to persist, follow the steps in
 							<a
@@ -176,7 +175,7 @@ async function copyToClipboard(text) {
 					<template v-else-if="metadata.hostsFile">
 						<h3>Network issues</h3>
 						<p>
-							The Modrinth App tried to connect to Microsoft / Xbox / Minecraft services, but the
+							Icarus Launcher tried to connect to Microsoft / Xbox / Minecraft services, but the
 							remote server rejected the connection. This may indicate that these services are
 							blocked by the hosts file. Please visit
 							<a
@@ -215,7 +214,7 @@ async function copyToClipboard(text) {
 					<template v-if="metadata.readOnly">
 						<h3>Change directory permissions</h3>
 						<p>
-							It looks like the Modrinth App is unable to write to the directory you selected.
+							It looks like Icarus Launcher is unable to write to the directory you selected.
 							Please adjust the permissions of the directory and try again or cancel the directory
 							change.
 						</p>
@@ -229,7 +228,7 @@ async function copyToClipboard(text) {
 					</template>
 					<template v-else>
 						<p>
-							The Modrinth App is unable to migrate to the new directory you selected. Please
+							Icarus Launcher is unable to migrate to the new directory you selected. Please
 							contact support for help or cancel the directory change.
 						</p>
 					</template>
@@ -259,7 +258,7 @@ async function copyToClipboard(text) {
 				</div>
 				<template v-else-if="errorType === 'state_init'">
 					<p>
-						Modrinth App failed to load correctly. This may be because of a corrupted file, or
+						Icarus Launcher failed to load correctly. This may be because of a corrupted file, or
 						because the app is missing crucial files.
 					</p>
 					<p>You may be able to fix it through one of the following ways:</p>
@@ -269,7 +268,7 @@ async function copyToClipboard(text) {
 					</ul>
 				</template>
 				<template v-else-if="errorType === 'no_loader_version'">
-					<p>The Modrinth App failed to find the loader version for this instance.</p>
+					<p>Icarus Launcher failed to find the loader version for this instance.</p>
 					<p>To resolve this, you need to repair the instance. Click the button below to do so.</p>
 					<div class="cta-button">
 						<button class="btn btn-primary" :disabled="loadingRepair" @click="repairInstance">
@@ -398,3 +397,4 @@ async function copyToClipboard(text) {
 	overflow: auto;
 }
 </style>
+

@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { FileTextIcon } from '@modrinth/assets'
+import { FileTextIcon } from '@icarus/assets'
 import {
 	Admonition,
 	ButtonStyled,
@@ -82,7 +82,7 @@ import {
 	normalizeChildren,
 	useFormatMoney,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { computed } from 'vue'
 
 import { getTaxThreshold, getTaxThresholdActual } from '@/providers/creator-withdraw.ts'
@@ -136,7 +136,7 @@ const messages = defineMessages({
 	taxFormRequiredBodyWithLimit: {
 		id: 'dashboard.creator-withdraw-modal.tax-form-required.body-with-limit',
 		defaultMessage:
-			"You must complete a W-9 or W-8 form for Modrinth's tax records so we remain compliant with tax regulations.",
+			"You must complete a W-9 or W-8 form for Icarus's tax records so we remain compliant with tax regulations.",
 	},
 	completeTaxForm: {
 		id: 'dashboard.creator-withdraw-modal.complete-tax-form',
@@ -169,3 +169,4 @@ const messages = defineMessages({
 	}
 }
 </style>
+

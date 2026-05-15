@@ -1,4 +1,4 @@
-import { LinkIcon } from '@modrinth/assets'
+import { LinkIcon } from '@icarus/assets'
 
 import type { ButtonAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'

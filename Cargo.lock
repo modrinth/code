@@ -3060,6 +3060,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "elasticsearch"
+version = "9.1.0-alpha.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12bb303aa6e1d28c0c86b6fbfe484fd0fd3f512629aeed1ac4f6b85f81d9834a"
+dependencies = [
+ "base64 0.22.1",
+ "bytes",
+ "dyn-clone",
+ "flate2",
+ "lazy_static",
+ "parking_lot",
+ "percent-encoding",
+ "reqwest 0.12.24",
+ "rustc_version",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "tokio",
+ "url",
+ "void",
+]
+
+[[package]]
 name = "elliptic-curve"
 version = "0.13.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5252,6 +5275,7 @@ dependencies = [
  "dotenv-build",
  "dotenvy",
  "either",
+ "elasticsearch",
  "eyre",
  "futures",
  "futures-util",
@@ -5269,7 +5293,6 @@ dependencies = [
  "lettre",
  "meilisearch-sdk",
  "modrinth-util",
- "muralpay",
  "murmur2",
  "paste",
  "path-util",
@@ -5914,26 +5937,6 @@ dependencies = [
  "serde",
  "thiserror 2.0.17",
  "windows-sys 0.60.2",
-]
-
-[[package]]
-name = "muralpay"
-version = "0.1.0"
-dependencies = [
- "arc-swap",
- "bytes",
- "chrono",
- "derive_more 2.1.1",
- "reqwest 0.12.24",
- "rust_decimal",
- "rust_iso3166",
- "secrecy",
- "serde",
- "serde_json",
- "serde_with",
- "strum",
- "utoipa",
- "uuid 1.18.1",
 ]
 
 [[package]]
@@ -7590,6 +7593,134 @@ dependencies = [
 ]
 
 [[package]]
+name = "pteron"
+version = "1.0.0-local"
+dependencies = [
+ "ariadne",
+ "async-compression",
+ "async-minecraft-ping",
+ "async-recursion",
+ "async-tungstenite",
+ "async-walkdir",
+ "async_zip",
+ "base64 0.22.1",
+ "bytemuck",
+ "bytes",
+ "chardetng",
+ "chrono",
+ "cidre",
+ "daedalus",
+ "dashmap",
+ "data-url",
+ "derive_more 2.1.1",
+ "dirs",
+ "discord-rich-presence",
+ "dotenvy",
+ "dunce",
+ "either",
+ "encoding_rs",
+ "enumset",
+ "eyre",
+ "flate2",
+ "fs4",
+ "futures",
+ "heck 0.5.0",
+ "hickory-resolver 0.25.2",
+ "indicatif",
+ "itertools 0.14.0",
+ "notify",
+ "notify-debouncer-mini",
+ "p256",
+ "parking_lot",
+ "paste",
+ "path-util",
+ "phf 0.13.1",
+ "png 0.18.0",
+ "quartz_nbt",
+ "quick-xml 0.38.3",
+ "rand 0.8.5",
+ "regex",
+ "reqwest 0.12.24",
+ "rgb",
+ "serde",
+ "serde_ini",
+ "serde_json",
+ "serde_with",
+ "sha1_smol",
+ "sha2",
+ "shlex",
+ "sqlx",
+ "sysinfo",
+ "tauri",
+ "tempfile",
+ "thiserror 2.0.17",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "tracing-error",
+ "tracing-subscriber",
+ "url",
+ "uuid 1.18.1",
+ "whoami",
+ "windows",
+ "windows-core 0.61.2",
+ "winreg 0.55.0",
+ "zbus",
+ "zip 6.0.0",
+]
+
+[[package]]
+name = "pteron_gui"
+version = "1.0.0-local"
+dependencies = [
+ "async_zip",
+ "chrono",
+ "daedalus",
+ "dashmap",
+ "either",
+ "enumset",
+ "hyper 1.7.0",
+ "hyper-util",
+ "native-dialog",
+ "paste",
+ "path-util",
+ "pteron",
+ "reqwest 0.12.24",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-deep-link",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-http",
+ "tauri-plugin-opener",
+ "tauri-plugin-os",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-updater",
+ "tauri-plugin-window-state",
+ "thiserror 2.0.17",
+ "tokio",
+ "tracing",
+ "tracing-error",
+ "url",
+ "urlencoding",
+ "uuid 1.18.1",
+ "webview2-com",
+ "windows-core 0.61.2",
+]
+
+[[package]]
+name = "pteron_playground"
+version = "0.0.0"
+dependencies = [
+ "enumset",
+ "pteron",
+ "tokio",
+]
+
+[[package]]
 name = "ptr_meta"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8715,15 +8846,6 @@ dependencies = [
  "generic-array",
  "pkcs8",
  "subtle",
- "zeroize",
-]
-
-[[package]]
-name = "secrecy"
-version = "0.10.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e891af845473308773346dc847b2c23ee78fe442e0472ac50e22a18a93d3ae5a"
-dependencies = [
  "zeroize",
 ]
 
@@ -10483,133 +10605,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "theseus"
-version = "1.0.0-local"
-dependencies = [
- "ariadne",
- "async-compression",
- "async-minecraft-ping",
- "async-recursion",
- "async-tungstenite",
- "async-walkdir",
- "async_zip",
- "base64 0.22.1",
- "bytemuck",
- "bytes",
- "chardetng",
- "chrono",
- "cidre",
- "daedalus",
- "dashmap",
- "data-url",
- "derive_more 2.1.1",
- "dirs",
- "discord-rich-presence",
- "dotenvy",
- "dunce",
- "either",
- "encoding_rs",
- "enumset",
- "eyre",
- "flate2",
- "fs4",
- "futures",
- "heck 0.5.0",
- "hickory-resolver 0.25.2",
- "indicatif",
- "itertools 0.14.0",
- "notify",
- "notify-debouncer-mini",
- "p256",
- "parking_lot",
- "paste",
- "path-util",
- "phf 0.13.1",
- "png 0.18.0",
- "quartz_nbt",
- "quick-xml 0.38.3",
- "rand 0.8.5",
- "regex",
- "reqwest 0.12.24",
- "rgb",
- "serde",
- "serde_ini",
- "serde_json",
- "serde_with",
- "sha1_smol",
- "sha2",
- "shlex",
- "sqlx",
- "sysinfo",
- "tauri",
- "tempfile",
- "thiserror 2.0.17",
- "tokio",
- "tokio-util",
- "tracing",
- "tracing-error",
- "tracing-subscriber",
- "url",
- "uuid 1.18.1",
- "whoami",
- "windows",
- "windows-core 0.61.2",
- "winreg 0.55.0",
- "zbus",
- "zip 6.0.0",
-]
-
-[[package]]
-name = "theseus_gui"
-version = "1.0.0-local"
-dependencies = [
- "async_zip",
- "chrono",
- "daedalus",
- "dashmap",
- "either",
- "enumset",
- "hyper 1.7.0",
- "hyper-util",
- "native-dialog",
- "paste",
- "path-util",
- "serde",
- "serde_json",
- "serde_with",
- "tauri",
- "tauri-build",
- "tauri-plugin-deep-link",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-http",
- "tauri-plugin-opener",
- "tauri-plugin-os",
- "tauri-plugin-single-instance",
- "tauri-plugin-updater",
- "tauri-plugin-window-state",
- "theseus",
- "thiserror 2.0.17",
- "tokio",
- "tracing",
- "tracing-error",
- "url",
- "urlencoding",
- "uuid 1.18.1",
- "webview2-com",
- "windows-core 0.61.2",
-]
-
-[[package]]
-name = "theseus_playground"
-version = "0.0.0"
-dependencies = [
- "enumset",
- "theseus",
- "tokio",
-]
-
-[[package]]
 name = "thiserror"
 version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -11517,7 +11512,6 @@ dependencies = [
  "regex",
  "syn 2.0.106",
  "url",
- "uuid 1.18.1",
 ]
 
 [[package]]

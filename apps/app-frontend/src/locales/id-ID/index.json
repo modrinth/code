@@ -1,87 +1,15 @@
 {
-  "app.action-bar.downloading-java": {
-    "message": "Mengunduh Java {version}"
-  },
-  "app.action-bar.downloads": {
-    "message": "Unduhan"
-  },
-  "app.action-bar.hide-more-running-instances": {
-    "message": "Sembunyikan lebih banyak instans yang sedang berjalan"
-  },
-  "app.action-bar.make-primary-instance": {
-    "message": "Jadikan sebagai instans utama"
-  },
-  "app.action-bar.no-instances-running": {
-    "message": "Tidak ada instans yang sedang berjalan"
-  },
-  "app.action-bar.offline": {
-    "message": "Luring"
-  },
-  "app.action-bar.primary-instance": {
-    "message": "Instans utama"
-  },
-  "app.action-bar.show-more-running-instances": {
-    "message": "Tampilkan lebih banyak instans yang sedang berjalan"
-  },
-  "app.action-bar.stop-instance": {
-    "message": "Hentikan instans"
-  },
-  "app.action-bar.view-active-downloads": {
-    "message": "Lihat pengunduhan berlangsung"
-  },
-  "app.action-bar.view-instance": {
-    "message": "Lihat instans"
-  },
-  "app.action-bar.view-logs": {
-    "message": "Lihat catatan"
-  },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Menghidupkan renderasi tingkat lanjut seperti efek buram yang dapat menyebabkan masalah kinerja tanpa renderasi yang dipercepat perangkat keras."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Renderasi tingkat lanjut"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Pilih tema warna pilihan Anda untuk Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Tema warna"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Ubah halaman utama yang dibuka oleh peluncur."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Beranda"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Pustaka"
-  },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Mematikan label nama di atas wujud pemain Anda pada halaman rupa."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Sembunyikan label nama"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Kecilkan pluncur ketika proses Minecraft berjalan."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Kecilkan peluncur"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Pilih opsi"
-  },
   "app.auth-servers.unreachable.body": {
     "message": "Server autentikasi Minecraft mungkin sedang tidak tersedia saat ini. Periksa koneksi internet Anda dan coba lagi nanti."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat terhubung ke server autentikasi"
   },
-  "app.browse.add-servers-to-instance": {
-    "message": "Menambah server ke instans"
+  "app.browse.add-server-to-instance": {
+    "message": "Tambah server ke instans"
   },
-  "app.browse.add-to-an-instance": {
-    "message": "Tambah ke instans"
+  "app.browse.add-servers-to-instance": {
+    "message": "Tambah server ke instans Anda"
   },
   "app.browse.add-to-instance": {
     "message": "Tambah ke instans"
@@ -95,9 +23,6 @@
   "app.browse.already-added": {
     "message": "Telah ditambahkan"
   },
-  "app.browse.back-to-instance": {
-    "message": "Kembali ke instans"
-  },
   "app.browse.discover-content": {
     "message": "Temukan konten"
   },
@@ -105,19 +30,13 @@
     "message": "Temukan server"
   },
   "app.browse.hide-added-servers": {
-    "message": "Sembunyikan server yang sudah ditambah"
+    "message": "Sembuyikan server tertambah"
   },
-  "app.browse.project-type.modpacks": {
-    "message": "Paket Mod"
+  "app.browse.hide-installed-content": {
+    "message": "Sembunyikan konten terpasang"
   },
-  "app.browse.server.installing": {
-    "message": "Memasang"
-  },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Memasang paket mod..."
+  "app.browse.install-content-to-instance": {
+    "message": "Pasang konten ke instans"
   },
   "app.export-modal.description-placeholder": {
     "message": "Masukkan deskripsi paket mod..."
@@ -128,9 +47,6 @@
   "app.export-modal.header": {
     "message": "Ekspor paket mod"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Sertakan \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Nama Paket Mod"
   },
@@ -138,7 +54,7 @@
     "message": "Nama paket mod"
   },
   "app.export-modal.select-files-label": {
-    "message": "Konfigurasikan berkas mana yang disertakan dalam pengeksporan ini"
+    "message": "Pilih berkas dan folder yang ingin dimasukkan ke paket"
   },
   "app.export-modal.version-number-label": {
     "message": "Nomor versi"
@@ -249,7 +165,7 @@
     "message": "Paket mod yang diperlukan"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Mod diperlukan untuk bermain di server ini. Klik pasang untuk menyiapkan berkas-berkas yang diperlukan dari Modrinth, kemudian luncurkan langsung sari server."
+    "message": "Mod diperlukan untuk bermain di server ini. Klik pasang untuk menyiapkan berkas-berkas yang diperlukan dari Icarus, kemudian luncurkan langsung sari server."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instans terbagi"
@@ -294,16 +210,16 @@
     "message": "Manajemen sumber"
   },
   "app.update-popup.body": {
-    "message": "Modrinth App v{version} siap dipasang! Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
+    "message": "Icarus Launcher v{version} siap dipasang! Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Icarus Launcher."
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
+    "message": "Icarus Launcher v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Icarus Launcher."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} tersedia. Gunakan pengelola paket Anda untuk memperbarui dan mendapatkan fitur-fitur dan perbaikan terbaru!"
+    "message": "Icarus Launcher v{version} tersedia. Gunakan pengelola paket Anda untuk memperbarui dan mendapatkan fitur-fitur dan perbaikan terbaru!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} sudah tersedia! Karena Anda saat ini sedang berada dalam jaringan terukur, kami tidak mengunduhnya secara otomatis."
+    "message": "Icarus Launcher v{version} sudah tersedia! Karena Anda saat ini sedang berada dalam jaringan terukur, kami tidak mengunduhnya secara otomatis."
   },
   "app.update-popup.changelog": {
     "message": "Catatan perubahan"
@@ -336,7 +252,7 @@
     "message": "Muat ulang untuk memasang pembaruan"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "example.Icarus.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Pilih opsi"
@@ -369,10 +285,10 @@
     "message": "Ia mungkin memiliki nama yang berbeda dari nama pengguna Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Masukkan nama pengguna Modrinth..."
+    "message": "Masukkan nama pengguna Icarus..."
   },
   "friends.add-friend.username.title": {
-    "message": "Apa nama pengguna Modrinth teman Anda?"
+    "message": "Apa nama pengguna Icarus teman Anda?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Tambah teman</link> untuk melihat apa yang mereka mainkan!"
@@ -414,7 +330,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Masuk ke akun Modrinth</link> untuk menambah teman dan melihat apa yang mereka mainkan!"
+    "message": "<link>Masuk ke akun Icarus</link> untuk menambah teman dan melihat apa yang mereka mainkan!"
   },
   "instance.add-server.add-and-play": {
     "message": "Tambah dan mainkan"
@@ -684,3 +600,5 @@
     "message": "Pemuat disediakan oleh server"
   }
 }
+
+

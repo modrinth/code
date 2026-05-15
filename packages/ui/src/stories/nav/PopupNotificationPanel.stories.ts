@@ -54,7 +54,7 @@ export const Default: StoryObj = {
 			const showWarning = () => {
 				popupManager.addPopupNotification({
 					title: 'Update available',
-					text: "Modrinth App v2.1.0 is available now! Since you're on a metered network, we didn't automatically download it.",
+					text: "Icarus Launcher v2.1.0 is available now! Since you're on a metered network, we didn't automatically download it.",
 					type: 'warning',
 					autoCloseMs: null,
 					buttons: [
@@ -74,7 +74,7 @@ export const Default: StoryObj = {
 			const showInfo = () => {
 				popupManager.addPopupNotification({
 					title: 'Download complete',
-					text: 'Modrinth App v2.1.0 has finished downloading. Reload to update now.',
+					text: 'Icarus Launcher v2.1.0 has finished downloading. Reload to update now.',
 					type: 'info',
 					buttons: [
 						{

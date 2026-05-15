@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { SettingsIcon } from '@modrinth/assets'
+import { SettingsIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	PagewideBanner,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { FetchError } from 'ofetch'
 
 const { addNotification } = injectNotificationManager()
@@ -25,7 +25,7 @@ const verifyEmailBannerMessages = defineMessages({
 	description: {
 		id: 'layout.banner.verify-email.description',
 		defaultMessage:
-			'For security reasons, Modrinth needs you to verify the email address associated with your account.',
+			'For security reasons, Icarus needs you to verify the email address associated with your account.',
 	},
 	action: {
 		id: 'layout.banner.verify-email.action',
@@ -41,7 +41,7 @@ const addEmailBannerMessages = defineMessages({
 	description: {
 		id: 'layout.banner.add-email.description',
 		defaultMessage:
-			'For security reasons, Modrinth needs you to register an email address to your account.',
+			'For security reasons, Icarus needs you to register an email address to your account.',
 	},
 	action: {
 		id: 'layout.banner.add-email.button',
@@ -96,12 +96,14 @@ async function handleResendEmailVerification() {
 				}}
 			</span>
 		</template>
-		<template #actions_right>
-			<ButtonStyled color="orange">
-				<button v-if="hasEmail" @click="handleResendEmailVerification">
+		<template #actions>
+			<ButtonStyled v-if="hasEmail">
+				<button @click="handleResendEmailVerification">
 					{{ formatMessage(verifyEmailBannerMessages.action) }}
 				</button>
-				<nuxt-link v-else to="/settings/account">
+			</ButtonStyled>
+			<ButtonStyled v-else>
+				<nuxt-link to="/settings/account">
 					<SettingsIcon aria-hidden="true" />
 					{{ formatMessage(addEmailBannerMessages.action) }}
 				</nuxt-link>
@@ -109,3 +111,4 @@ async function handleResendEmailVerification() {
 		</template>
 	</PagewideBanner>
 </template>
+

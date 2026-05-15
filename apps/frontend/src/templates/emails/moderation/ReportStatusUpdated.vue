@@ -37,7 +37,8 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		</Text>
 
 		<Text class="text-base"
-			>Thank you for helping keep Modrinth safe and welcoming for everyone.</Text
+			>Thank you for helping keep Icarus safe and welcoming for everyone.</Text
 		>
 	</StyledEmail>
 </template>
+

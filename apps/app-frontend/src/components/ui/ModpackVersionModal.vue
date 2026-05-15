@@ -1,6 +1,6 @@
 <script setup>
-import { CheckIcon } from '@modrinth/assets'
-import { Badge, ButtonStyled } from '@modrinth/ui'
+import { CheckIcon } from '@icarus/assets'
+import { Badge, ButtonStyled } from '@icarus/ui'
 import { computed, ref } from 'vue'
 
 import { SwapIcon } from '@/assets/icons/index.js'
@@ -197,3 +197,4 @@ const onHide = () => {
 	border: 1px solid var(--color-bg);
 }
 </style>
+

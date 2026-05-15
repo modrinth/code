@@ -1,5 +1,4 @@
 use crate::state::CacheBehaviour;
-use crate::util::fetch::DownloadReason;
 use crate::{
     LoadingBarType,
     event::{
@@ -13,7 +12,7 @@ use crate::{
 use futures::try_join;
 use std::collections::HashSet;
 
-/// Updates a managed modrinth pack to the version specified by new_version_id
+/// Updates a managed icarus pack to the version specified by new_version_id
 #[tracing::instrument]
 
 pub async fn update_managed_modrinth_version(
@@ -163,8 +162,7 @@ async fn replace_managed_modrinth(
                 profile.name.clone(),
                 None,
                 profile_path.to_string(),
-                Some(shared_loading_bar.clone()),
-                DownloadReason::Update,
+                Some(shared_loading_bar.clone())
             ),
             generate_pack_from_version_id(
                 project_id.clone(),
@@ -172,8 +170,7 @@ async fn replace_managed_modrinth(
                 profile.name.clone(),
                 None,
                 profile_path.to_string(),
-                Some(shared_loading_bar),
-                DownloadReason::Update,
+                Some(shared_loading_bar)
             )
         )?
     } else {
@@ -185,7 +182,6 @@ async fn replace_managed_modrinth(
             None,
             profile_path.to_string(),
             None,
-            DownloadReason::Update,
         )
         .await?;
         old_pack_creator.description.existing_loading_bar = None;
@@ -209,7 +205,6 @@ async fn replace_managed_modrinth(
     pack::install_mrpack::install_zipped_mrpack_files(
         new_pack_creator,
         ignore_lock,
-        DownloadReason::Update,
     )
     .await?;
 

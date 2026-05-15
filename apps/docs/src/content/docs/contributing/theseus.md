@@ -1,11 +1,11 @@
 ---
-title: Modrinth App
-description: Guide for contributing to Modrinth's desktop app
+title: Icarus Launcher
+description: Guide for contributing to Icarus's desktop app
 sidebar:
   order: 3
 ---
 
-The [Modrinth App], codename Theseus, is the Tauri-based launcher that lets users conveniently play any mod or modpack on Modrinth. It uses the Rust-based Tauri as the backend and Vue.js as the frontend.
+The [Icarus Launcher], codename Theseus, is the Tauri-based launcher that lets users conveniently play any mod or modpack on Icarus. It uses the Rust-based Tauri as the backend and Vue.js as the frontend.
 
 ## Setup
 
@@ -17,7 +17,7 @@ The [Modrinth App], codename Theseus, is the Tauri-based launcher that lets user
 
 ### 2. Install dependencies & set up .env
 
-- Clone [`https://github.com/modrinth/code`](https://github.com/modrinth/code) and run `pnpm install` in the workspace root folder.
+- Clone [`https://github.com/Icarus/code`](https://github.com/Icarus/code) and run `pnpm install` in the workspace root folder.
 - In `packages/app-lib` you should be able to see `.env.prod`, `.env.staging` — for basic app work, it's recommended to use `.env.prod`. Copy the relevant file into a new `.env` file within the `packages/app-lib` folder.
 
 ### 3. Run the app
@@ -49,6 +49,7 @@ If you're prepared to contribute by submitting a pull request, ensure you have m
 - Run `cargo clippy` to validate Rust-related code.
 - Run `cargo sqlx prepare --package theseus` if you've changed any SQL code to validate statements.
 
-[Modrinth App]: https://github.com/modrinth/code/tree/main/apps/app
+[Icarus Launcher]: https://github.com/Icarus/code/tree/main/apps/app
 [Rust]: https://www.rust-lang.org/tools/install
 [pnpm]: https://pnpm.io
+

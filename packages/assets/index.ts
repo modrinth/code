@@ -11,8 +11,8 @@ import './omorphia.scss'
 import _FourOhFourNotFound from './branding/404.svg?component'
 // Branding
 import _BrowserWindowSuccessIllustration from './branding/illustrations/browser-window-success.svg?component'
-import _ModrinthIcon from './branding/logo.svg?component'
-import _ModrinthPlusIcon from './branding/modrinth-plus.svg?component'
+import _IcarusIcon from './branding/logo.svg?component'
+import _IcarusPlusIcon from './branding/modrinth-plus.svg?component'
 import _AngryRinthbot from './branding/rinthbot/angry.webp'
 import _AnnoyedRinthbot from './branding/rinthbot/annoyed.webp'
 import _ConfusedRinthbot from './branding/rinthbot/confused.webp'
@@ -67,8 +67,8 @@ import _YouTubeShortsIcon from './external/youtubeshorts.svg?component'
 import type { IconComponent } from './generated-icons'
 import { categoryIconMap, loaderIconMap } from './generated-icons'
 import _DoneIllustration from './illustrations/done.svg?component'
-import _EmptyIllustration from './illustrations/empty.svg?component'
 import _EmptyInboxIllustration from './illustrations/empty-inbox.svg?component'
+import _EmptyIllustration from './illustrations/empty.svg?component'
 import _ErrorIllustration from './illustrations/error.svg?component'
 import _NoConnectionIllustration from './illustrations/no-connection.svg?component'
 import _NoCreditCardIllustration from './illustrations/no-credit-card.svg?component'
@@ -80,10 +80,10 @@ import _NoMessagesIllustration from './illustrations/no-messages.svg?component'
 import _NoSearchResultIllustration from './illustrations/no-search-result.svg?component'
 import _NoTasksIllustration from './illustrations/no-tasks.svg?component'
 
-export const ModrinthIcon = _ModrinthIcon
+export const IcarusIcon = _IcarusIcon
 export const BrowserWindowSuccessIllustration = _BrowserWindowSuccessIllustration
 export const FourOhFourNotFound = _FourOhFourNotFound
-export const ModrinthPlusIcon = _ModrinthPlusIcon
+export const IcarusPlusIcon = _IcarusPlusIcon
 export const AngryRinthbot = _AngryRinthbot
 export const AnnoyedRinthbot = _AnnoyedRinthbot
 export const ConfusedRinthbot = _ConfusedRinthbot

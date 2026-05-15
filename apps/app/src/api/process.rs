@@ -1,5 +1,5 @@
 use crate::api::Result;
-use theseus::prelude::*;
+use pteron::prelude::*;
 use uuid::Uuid;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {

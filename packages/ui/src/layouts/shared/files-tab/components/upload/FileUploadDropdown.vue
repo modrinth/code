@@ -111,20 +111,18 @@
 </template>
 
 <script setup lang="ts">
-import { CheckCircleIcon, FolderOpenIcon, SpinnerIcon, XCircleIcon } from '@modrinth/assets'
+import { CheckCircleIcon, FolderOpenIcon, SpinnerIcon, XCircleIcon } from '@icarus/assets'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import { useFormatBytes } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { injectModrinthClient } from '#ui/providers/api-client'
+import { injectIcarusClient } from '#ui/providers/api-client'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
 
 const { formatMessage } = useVIntl()
-const formatBytes = useFormatBytes()
 const { addNotification } = injectNotificationManager()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 const messages = defineMessages({
 	file: {
@@ -242,6 +240,13 @@ watch(
 	{ deep: true },
 )
 
+const formatFileSize = (bytes: number): string => {
+	if (bytes < 1024) return bytes + ' B'
+	if (bytes < 1024 ** 2) return (bytes / 1024).toFixed(1) + ' KB'
+	if (bytes < 1024 ** 3) return (bytes / 1024 ** 2).toFixed(1) + ' MB'
+	return (bytes / 1024 ** 3).toFixed(1) + ' GB'
+}
+
 const cancelUpload = (item: UploadItem) => {
 	if (item.uploader && item.status === 'uploading') {
 		item.uploader.cancel()
@@ -264,7 +269,7 @@ const uploadFile = async (file: File) => {
 		file,
 		progress: 0,
 		status: 'pending',
-		size: formatBytes(file.size, 1),
+		size: formatFileSize(file.size),
 	}
 
 	uploadQueue.value.push(uploadItem)
@@ -385,3 +390,4 @@ defineExpose({
 	opacity: 1;
 }
 </style>
+

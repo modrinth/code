@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { CircleArrowRightIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { CircleArrowRightIcon, SpinnerIcon, XIcon } from '@icarus/assets'
 import {
 	Admonition,
 	ButtonStyled,
@@ -47,7 +47,7 @@ import {
 	defineMessages,
 	NewModal,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { ref, useTemplateRef } from 'vue'
 
 import { get as getSettings, set as setSettings } from '@/helpers/settings'
@@ -75,11 +75,11 @@ const messages = defineMessages({
 	},
 	warningBody: {
 		id: 'unknown-pack-warning-modal.warning.body',
-		defaultMessage: `We couldn't find this file on Modrinth. We strongly recommend only installing files from sources you trust.`,
+		defaultMessage: `We couldn't find this file on Icarus. We strongly recommend only installing files from sources you trust.`,
 	},
 	body: {
 		id: 'unknown-pack-warning-modal.body',
-		defaultMessage: `A file is only reviewed if it’s uploaded to Modrinth, regardless of its file format (including .mrpack).`,
+		defaultMessage: `A file is only reviewed if it’s uploaded to Icarus, regardless of its file format (including .mrpack).`,
 	},
 	malwareStatement: {
 		id: 'unknown-pack-warning-modal.malware-statement',
@@ -138,3 +138,4 @@ async function proceed() {
 
 defineExpose({ show })
 </script>
+

@@ -1,7 +1,7 @@
 use crate::api::Result;
 
 use std::path::Path;
-use theseus::minecraft_skins::{
+use pteron::minecraft_skins::{
     self, Bytes, Cape, MinecraftSkinVariant, Skin, UrlOrBlob,
 };
 

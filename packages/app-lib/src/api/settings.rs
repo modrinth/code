@@ -1,4 +1,4 @@
-//! Theseus profile management interface
+//! Pteron profile management interface
 
 pub use crate::{
     State,

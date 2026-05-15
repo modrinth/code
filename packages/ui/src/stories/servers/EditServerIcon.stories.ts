@@ -1,10 +1,10 @@
-import type { Archon, UploadState } from '@modrinth/api-client'
-import type { Stats } from '@modrinth/utils'
+import type { Archon, UploadState } from '@icarus/api-client'
+import type { Stats } from '@icarus/utils'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, ref } from 'vue'
 
 import EditServerIcon from '../../components/servers/edit-server-icon/EditServerIcon.vue'
-import { provideModrinthServerContext } from '../../providers'
+import { provideIcarusServerContext } from '../../providers'
 import type { ModrinthServerContext } from '../../providers/server-context'
 
 const meta = {
@@ -78,7 +78,7 @@ const meta = {
 					dismissOperation: async () => {},
 				}
 
-				provideModrinthServerContext(serverContext)
+				provideIcarusServerContext(serverContext)
 			},
 			template: '<div style="max-width: 320px;"><story /></div>',
 		}),

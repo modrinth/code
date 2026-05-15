@@ -42,8 +42,8 @@
 </template>
 
 <script lang="ts" setup>
-import { getLoaderIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, FormattedTag, TagItem } from '@modrinth/ui'
+import { getLoaderIcon, XIcon } from '@icarus/assets'
+import { ButtonStyled, FormattedTag, TagItem } from '@icarus/ui'
 
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 

@@ -1,14 +1,14 @@
-import type { Archon } from '@modrinth/api-client'
+import type { Archon } from '@icarus/api-client'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, type ComputedRef } from 'vue'
 
-import { injectModrinthClient } from '#ui/providers'
+import { injectIcarusClient } from '#ui/providers'
 
 // TODO: Remove and use v1
 export function useServerProject(
 	upstream: ComputedRef<Archon.Servers.v0.Server['upstream'] | null>,
 ) {
-	const client = injectModrinthClient()
+	const client = injectIcarusClient()
 
 	return useQuery({
 		queryKey: computed(() => ['servers', 'project', upstream.value?.project_id ?? null]),

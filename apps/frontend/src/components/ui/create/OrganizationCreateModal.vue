@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon, XIcon } from '@modrinth/assets'
+import { PlusIcon, XIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	commonMessages,
@@ -86,7 +86,7 @@ import {
 	NewModal,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { ref } from 'vue'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
@@ -217,3 +217,4 @@ defineExpose({
 	}
 }
 </style>
+

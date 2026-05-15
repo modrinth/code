@@ -65,14 +65,14 @@
 	</div>
 </template>
 <script setup>
-import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
+import { RightArrowIcon, SettingsIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -132,7 +132,7 @@ const failedVerificationMessages = defineMessages({
 })
 
 useHead({
-	title: () => `${formatMessage(messages.title)} - Modrinth`,
+	title: () => `${formatMessage(messages.title)} - Icarus`,
 })
 
 const auth = await useAuth()
@@ -184,3 +184,4 @@ async function handleResendEmailVerification() {
 	}
 }
 </script>
+

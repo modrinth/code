@@ -6,14 +6,12 @@ import {
 	SpinnerIcon,
 	StopCircleIcon,
 	TimerIcon,
-} from '@modrinth/assets'
-import { Avatar, ButtonStyled, injectNotificationManager, useRelativeTime } from '@modrinth/ui'
+} from '@icarus/assets'
+import { Avatar, ButtonStyled, injectNotificationManager, useRelativeTime } from '@icarus/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-
-import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, kill, run } from '@/helpers/profile'
@@ -69,11 +67,7 @@ const play = async (e, context) => {
 	await run(props.instance.path)
 		.catch((err) => handleSevereError(err, { profilePath: props.instance.path }))
 		.finally(() => {
-			trackEvent('InstanceStart', {
-				loader: props.instance.loader,
-				game_version: props.instance.game_version,
-				source: context,
-			})
+			
 		})
 	loading.value = false
 }
@@ -84,11 +78,7 @@ const stop = async (e, context) => {
 
 	await kill(props.instance.path).catch(handleError)
 
-	trackEvent('InstanceStop', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		source: context,
-	})
+	
 }
 
 const repair = async (e) => {

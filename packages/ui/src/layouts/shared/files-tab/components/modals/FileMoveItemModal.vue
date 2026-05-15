@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon, XIcon } from '@modrinth/assets'
+import { RightArrowIcon, XIcon } from '@icarus/assets'
 import { nextTick, ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'

@@ -56,7 +56,7 @@
 								<ButtonStyled color="brand" type="transparent">
 									<a
 										class="ml-auto"
-										:href="createDownloadUrl(version)"
+										:href="version.primaryFile?.url"
 										:title="`Download ${version.name}`"
 									>
 										<DownloadIcon aria-hidden="true" />
@@ -87,20 +87,18 @@
 	</div>
 </template>
 <script setup>
-import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
+import { DownloadIcon, SpinnerIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectProjectPageContext,
 	Pagination,
 	useFormatDateTime,
-} from '@modrinth/ui'
-import VersionFilterControl from '@modrinth/ui/src/components/version/VersionFilterControl.vue'
-import { renderHighlightedString } from '@modrinth/utils'
+} from '@icarus/ui'
+import VersionFilterControl from '@icarus/ui/src/components/version/VersionFilterControl.vue'
+import { renderHighlightedString } from '@icarus/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { onMounted, watch } from 'vue'
-
-const { createProjectDownloadUrl, updateVersionsFilterContext } = useCdnDownloadContext()
+import { onMounted } from 'vue'
 
 const formatDate = useFormatDateTime({
 	month: 'short',
@@ -108,8 +106,7 @@ const formatDate = useFormatDateTime({
 	year: 'numeric',
 })
 
-const { projectV2, versions, versionsLoading, loadVersions, cdnDownloadReason } =
-	injectProjectPageContext()
+const { projectV2, versions, versionsLoading, loadVersions } = injectProjectPageContext()
 
 // Load versions on mount (client-side)
 onMounted(() => {
@@ -153,7 +150,7 @@ const filteredVersions = computed(() => {
 	)
 })
 
-const { labrinth } = injectModrinthClient()
+const { labrinth } = injectIcarusClient()
 
 const paginatedVersionIds = computed(() => {
 	const page = currentPage.value
@@ -217,27 +214,6 @@ function updateQuery(newQueries) {
 			...route.query,
 			...newQueries,
 		},
-	})
-}
-
-watch(
-	() => [route.query.g, route.query.l],
-	() => {
-		updateVersionsFilterContext(
-			queryAsStringArray(route.query.g),
-			queryAsStringArray(route.query.l),
-		)
-	},
-	{ immediate: true },
-)
-
-function getPrimaryFile(version) {
-	return version.files.find((x) => x.primary) || version.files[0]
-}
-
-function createDownloadUrl(version) {
-	return createProjectDownloadUrl(getPrimaryFile(version).url, {
-		reason: cdnDownloadReason.value,
 	})
 }
 </script>

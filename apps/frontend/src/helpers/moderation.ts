@@ -1,4 +1,4 @@
-import type { ExtendedReport, OwnershipTarget } from '@modrinth/moderation'
+import type { ExtendedReport, OwnershipTarget } from '@icarus/moderation'
 import type {
 	Organization,
 	Project,
@@ -7,7 +7,7 @@ import type {
 	Thread,
 	User,
 	Version,
-} from '@modrinth/utils'
+} from '@icarus/utils'
 
 export const useModerationCache = () => ({
 	threads: useState<Map<string, Thread>>('moderation-report-cache-threads', () => new Map()),
@@ -180,36 +180,57 @@ export async function enrichReportBatch(reports: Report[]): Promise<ExtendedRepo
 	})
 }
 
-// Doesn't need to be in @modrinth/moderation because it is specific to the frontend.
-export interface ModerationOwnershipUser {
-	kind: 'user'
-	id: string
-	name: string
-	icon_url: string | null
-}
-
-export interface ModerationOwnershipOrganization {
-	kind: 'organization'
-	id: string
-	name: string
-	icon_url: string | null
-}
-
-export type ModerationOwnership = ModerationOwnershipUser | ModerationOwnershipOrganization
-
-export interface ProjectWithOwnership {
-	ownership: ModerationOwnership
-	[key: string]: any
-}
-
+// Doesn't need to be in @icarus/moderation because it is specific to the frontend.
 export interface ModerationProject {
 	project: any
-	ownership: ModerationOwnership | null
+	owner: TeamMember | null
+	org: Organization | null
 }
 
-export function toModerationProjects(projects: ProjectWithOwnership[]): ModerationProject[] {
-	return projects.map(({ ownership, ...project }) => ({
-		project,
-		ownership: ownership ?? null,
-	}))
+export async function enrichProjectBatch(projects: any[]): Promise<ModerationProject[]> {
+	const teamIds = [...new Set(projects.map((p) => p.team_id).filter(Boolean))]
+	const orgIds = [...new Set(projects.map((p) => p.organization).filter(Boolean))]
+
+	const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
+		teamIds.length > 0
+			? fetchSegmented(teamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
+			: Promise.resolve([]),
+		orgIds.length > 0
+			? fetchSegmented(orgIds, (ids) => `organizations?ids=${asEncodedJsonArray(ids)}`, {
+					apiVersion: 3,
+				})
+			: Promise.resolve([]),
+	])
+
+	const cache = useModerationCache()
+
+	teamsData.forEach((team) => {
+		if (team.length > 0) cache.teams.value.set(team[0].team_id, team)
+	})
+
+	orgsData.forEach((org: Organization) => {
+		cache.orgs.value.set(org.id, org)
+	})
+
+	return projects.map((project) => {
+		let owner: TeamMember | null = null
+		let org: Organization | null = null
+
+		if (project.team_id) {
+			const teamMembers = cache.teams.value.get(project.team_id)
+			if (teamMembers) {
+				owner = teamMembers.find((member) => member.role === 'Owner') || null
+			}
+		}
+
+		if (project.organization) {
+			org = cache.orgs.value.get(project.organization) || null
+		}
+
+		return {
+			project,
+			owner,
+			org,
+		} as ModerationProject
+	})
 }

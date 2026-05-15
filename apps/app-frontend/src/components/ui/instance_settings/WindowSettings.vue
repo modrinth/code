@@ -6,7 +6,7 @@ import {
 	StyledInput,
 	Toggle,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { computed, type Ref, ref, watch } from 'vue'
 
 import { edit } from '@/helpers/profile'

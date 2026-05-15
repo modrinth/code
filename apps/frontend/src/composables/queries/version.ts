@@ -1,4 +1,4 @@
-import type { AbstractModrinthClient } from '@modrinth/api-client'
+import type { AbstractModrinthClient } from '@icarus/api-client'
 
 import { STALE_TIME } from './project'
 

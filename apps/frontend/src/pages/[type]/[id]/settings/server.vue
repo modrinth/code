@@ -158,12 +158,12 @@
 </template>
 
 <script setup>
-import { InfoIcon, RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
+import { InfoIcon, RefreshCwIcon, SpinnerIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	Combobox,
 	ConfirmLeaveModal,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	MultiSelect,
@@ -173,7 +173,7 @@ import {
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 
@@ -181,7 +181,7 @@ const PING_TIMEOUT_MS = 5000
 
 const { formatMessage, locale } = useVIntl()
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 const { projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 

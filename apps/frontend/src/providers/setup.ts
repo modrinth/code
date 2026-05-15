@@ -1,4 +1,4 @@
-import { provideNotificationManager } from '@modrinth/ui'
+import { provideNotificationManager } from '@icarus/ui'
 
 import { FrontendNotificationManager } from './frontend-notifications'
 import { setupAuthProvider } from './setup/auth'

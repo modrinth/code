@@ -760,19 +760,7 @@ pub async fn edit_team_member(
                     None
                 };
 
-            let edited_member_organization_team_member =
-                if let Some(organization) = &organization {
-                    DBTeamMember::get_from_user_id(
-                        organization.team_id,
-                        user_id,
-                        &**pool,
-                    )
-                    .await?
-                } else {
-                    None
-                };
-
-            if edited_member_organization_team_member
+            if organization_team_member
                 .as_ref()
                 .is_some_and(|x| x.is_owner)
                 && edit_member

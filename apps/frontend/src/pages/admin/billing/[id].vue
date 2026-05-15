@@ -321,14 +321,14 @@ import {
 	ServerIcon,
 	UserIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
 	CopyCode,
 	defineMessages,
 	DropdownSelect,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
@@ -337,16 +337,16 @@ import {
 	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
-} from '@modrinth/ui'
-import { capitalizeString } from '@modrinth/utils'
-import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
+} from '@icarus/ui'
+import { capitalizeString } from '@icarus/utils'
+import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@icarus/utils/utils.ts'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import ModrinthServersIcon from '~/components/brand/ModrinthServersIcon.vue'
 
 const { addNotification } = injectNotificationManager()
-const { labrinth } = injectModrinthClient()
+const { labrinth } = injectIcarusClient()
 const formatPrice = useFormatPrice()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',

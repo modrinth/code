@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-	BlueskyIcon,
-	DiscordIcon,
-	GithubIcon,
-	MastodonIcon,
-	ToggleRightIcon,
-	TwitterIcon,
-} from '@modrinth/assets'
+import { BlueskyIcon, DiscordIcon, GithubIcon, MastodonIcon, TwitterIcon } from '@icarus/assets'
 import {
 	AutoLink,
 	ButtonStyled,
@@ -16,8 +9,7 @@ import {
 	IntlFormatted,
 	type MessageDescriptor,
 	useVIntl,
-} from '@modrinth/ui'
-import { commonSettingsMessages } from '@modrinth/ui/src/utils/common-messages.js'
+} from '@icarus/ui'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
 
@@ -27,13 +19,13 @@ const { addNotification } = injectNotificationManager()
 const config = useRuntimeConfig()
 
 const messages = defineMessages({
-	modrinthInformation: {
-		id: 'layout.footer.modrinth-information',
-		defaultMessage: 'Modrinth information',
+	IcarusInformation: {
+		id: 'layout.footer.Icarus-information',
+		defaultMessage: 'Icarus information',
 	},
 	openSource: {
 		id: 'layout.footer.open-source',
-		defaultMessage: 'Modrinth is <github-link>open source</github-link>.',
+		defaultMessage: 'Icarus is <github-link>open source</github-link>.',
 	},
 	legalDisclaimer: {
 		id: 'layout.footer.legal-disclaimer',
@@ -60,18 +52,18 @@ const socialLinks: {
 	},
 	{
 		label: defineMessage({ id: 'layout.footer.social.mastodon', defaultMessage: 'Mastodon' }),
-		href: 'https://floss.social/@modrinth',
+		href: 'https://floss.social/@Icarus',
 		icon: MastodonIcon,
 		rel: 'me',
 	},
 	{
 		label: defineMessage({ id: 'layout.footer.social.x', defaultMessage: 'X' }),
-		href: 'https://x.com/modrinth',
+		href: 'https://x.com/Icarus',
 		icon: TwitterIcon,
 	},
 	{
 		label: defineMessage({ id: 'layout.footer.social.github', defaultMessage: 'GitHub' }),
-		href: 'https://github.com/modrinth',
+		href: 'https://github.com/Icarus',
 		icon: GithubIcon,
 	},
 ]
@@ -116,17 +108,17 @@ const footerLinks: {
 		links: [
 			{
 				href: '/plus',
-				label: defineMessage({ id: 'layout.footer.products.plus', defaultMessage: 'Modrinth+' }),
+				label: defineMessage({ id: 'layout.footer.products.plus', defaultMessage: 'Icarus+' }),
 			},
 			{
 				href: '/app',
-				label: defineMessage({ id: 'layout.footer.products.app', defaultMessage: 'Modrinth App' }),
+				label: defineMessage({ id: 'layout.footer.products.app', defaultMessage: 'Icarus Launcher' }),
 			},
 			{
 				href: '/hosting',
 				label: defineMessage({
 					id: 'layout.footer.products.servers',
-					defaultMessage: 'Modrinth Hosting',
+					defaultMessage: 'Icarus Hosting',
 				}),
 			},
 		],
@@ -149,7 +141,7 @@ const footerLinks: {
 				}),
 			},
 			{
-				href: 'https://github.com/modrinth/code/issues',
+				href: 'https://github.com/Icarus/code/issues',
 				label: defineMessage({
 					id: 'layout.footer.resources.report-issues',
 					defaultMessage: 'Report issues',
@@ -239,23 +231,13 @@ function developerModeIncrement() {
 				<div
 					class="flex flex-col items-center gap-3 md:items-start"
 					role="region"
-					:aria-label="formatMessage(messages.modrinthInformation)"
+					:aria-label="formatMessage(messages.IcarusInformation)"
 				>
-					<div class="flex items-center gap-2">
-						<TextLogo
-							aria-hidden="true"
-							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
-							@click="developerModeIncrement()"
-						/>
-						<ButtonStyled v-if="flags.developerMode" circular type="transparent" color="brand">
-							<nuxt-link
-								v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"
-								to="/settings/flags"
-							>
-								<ToggleRightIcon />
-							</nuxt-link>
-						</ButtonStyled>
-					</div>
+					<TextLogo
+						aria-hidden="true"
+						class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
+						@click="developerModeIncrement()"
+					/>
 					<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
 						<ButtonStyled
 							v-for="(social, index) in socialLinks"
@@ -278,7 +260,7 @@ function developerModeIncrement() {
 							<IntlFormatted :message-id="messages.openSource">
 								<template #github-link="{ children }">
 									<a
-										href="https://github.com/modrinth/code"
+										href="https://github.com/Icarus/code"
 										class="text-brand hover:underline"
 										target="_blank"
 										rel="noopener"
@@ -352,3 +334,4 @@ function developerModeIncrement() {
 	border-color: var(--brand-gradient-border);
 }
 </style>
+

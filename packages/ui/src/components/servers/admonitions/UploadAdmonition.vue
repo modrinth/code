@@ -24,17 +24,15 @@
 </template>
 
 <script setup lang="ts">
-import { UploadIcon } from '@modrinth/assets'
+import { UploadIcon } from '@icarus/assets'
+import { formatBytes } from '@icarus/utils'
 import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import { useFormatBytes } from '#ui/composables'
-import { injectModrinthServerContext } from '#ui/providers'
+import { injectIcarusServerContext } from '#ui/providers'
 
-const formatBytes = useFormatBytes()
-
-const ctx = injectModrinthServerContext()
+const ctx = injectIcarusServerContext()
 
 const state = computed(() => ctx.uploadState.value)
 const cancelUpload = computed(() => ctx.cancelUpload.value)
@@ -45,3 +43,4 @@ const overallProgress = computed(() => {
 	return Math.min((s.completedFiles + s.currentFileProgress) / s.totalFiles, 1)
 })
 </script>
+

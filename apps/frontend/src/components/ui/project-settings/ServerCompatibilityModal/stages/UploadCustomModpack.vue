@@ -64,8 +64,8 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeftRightIcon, FileIcon } from '@modrinth/assets'
-import { ButtonStyled, Checkbox, DropzoneFileInput } from '@modrinth/ui'
+import { ArrowLeftRightIcon, FileIcon } from '@icarus/assets'
+import { ButtonStyled, Checkbox, DropzoneFileInput } from '@icarus/ui'
 
 import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
 
@@ -90,3 +90,4 @@ function handleFileInputChange(e: Event) {
 	target.value = ''
 }
 </script>
+

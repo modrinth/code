@@ -1,9 +1,11 @@
 //! Authentication flow interface
 
 use reqwest::StatusCode;
+use regex::Regex;
+use chrono::{Duration, Utc};
 
 use crate::State;
-use crate::state::{Credentials, MinecraftLoginFlow};
+use crate::state::{Credentials, MinecraftLoginFlow, MinecraftProfile};
 use crate::util::fetch::INSECURE_REQWEST_CLIENT;
 
 #[tracing::instrument]
@@ -87,4 +89,36 @@ pub async fn users() -> crate::Result<Vec<Credentials>> {
     let state = State::get().await?;
     let users = Credentials::get_all(&state.pool).await?;
     Ok(users.into_iter().map(|x| x.1).collect())
+}
+
+#[tracing::instrument]
+pub async fn create_offline_user(username: &str) -> crate::Result<Credentials> {
+    let username = username.trim();
+    let username_regex = Regex::new(r"^[A-Za-z0-9_]{3,16}$")
+        .map_err(|e| crate::ErrorKind::OtherError(format!("Invalid username regex: {e}")).as_error())?;
+
+    if !username_regex.is_match(username) {
+        return Err(crate::ErrorKind::OtherError(
+            "Offline username must be 3-16 characters long and contain only letters, numbers, or '_'".to_string(),
+        )
+        .as_error());
+    }
+
+    let state = State::get().await?;
+    let credentials = Credentials {
+        offline_profile: MinecraftProfile {
+            id: uuid::Uuid::new_v4(),
+            name: username.to_string(),
+            skins: vec![],
+            capes: vec![],
+            fetch_time: None,
+        },
+        access_token: "OFFLINE".to_string(),
+        refresh_token: String::new(),
+        expires: Utc::now() + Duration::days(365 * 20),
+        active: true,
+    };
+
+    credentials.upsert(&state.pool).await?;
+    Ok(credentials)
 }

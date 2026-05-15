@@ -696,7 +696,7 @@ impl DeviceTokenPair {
                 issue_instant = $5,
                 not_after = $6,
                 token = $7,
-                display_claims = jsonb($8)
+                display_claims = json($8)
             ",
             uuid,
             key,
@@ -707,8 +707,8 @@ impl DeviceTokenPair {
             self.token.token,
             display_claims,
         )
-            .execute(exec)
-            .await?;
+        .execute(exec)
+        .await?;
 
         Ok(())
     }

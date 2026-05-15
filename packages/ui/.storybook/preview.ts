@@ -7,8 +7,8 @@ import '../../assets/styles/defaults.scss'
 // app-frontend css imports
 import '../../../apps/app-frontend/src/assets/stylesheets/global.scss'
 
-import type { Labrinth } from '@modrinth/api-client'
-import { GenericModrinthClient } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
+import { GenericModrinthClient } from '@icarus/api-client'
 import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
@@ -33,7 +33,7 @@ import {
 	type NotificationPanelLocation,
 	type PopupNotification,
 	provideFilePicker,
-	provideModrinthClient,
+	provideIcarusClient,
 	provideNotificationManager,
 	providePopupNotificationManager,
 	provideTags,
@@ -219,7 +219,7 @@ const StorybookProvider = defineComponent({
 		const modrinthClient = new GenericModrinthClient({
 			userAgent: 'modrinth-storybook/1.0.0',
 		})
-		provideModrinthClient(modrinthClient)
+		provideIcarusClient(modrinthClient)
 
 		const gameVersions = ref<Labrinth.Tags.v2.GameVersion[]>([])
 		const loaders = ref<Labrinth.Tags.v2.Loader[]>([])

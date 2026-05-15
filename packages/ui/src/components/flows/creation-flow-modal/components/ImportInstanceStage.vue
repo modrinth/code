@@ -104,8 +104,8 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon, FolderSearchIcon, SearchIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
+import { ChevronRightIcon, FolderSearchIcon, SearchIcon } from '@icarus/assets'
+import { defineMessages, useVIntl } from '@icarus/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { injectInstanceImport, injectNotificationManager } from '../../../../providers'

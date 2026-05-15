@@ -1,4 +1,4 @@
-import type { Archon } from '@modrinth/api-client'
+import type { Archon } from '@icarus/api-client'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import BackupItem from '../../components/servers/backups/BackupItem.vue'

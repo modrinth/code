@@ -309,20 +309,20 @@ import {
 	UserPlusIcon,
 	VersionIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
 	Categories,
 	CopyCode,
 	DoubleIcon,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	ProjectStatusBadge,
 	useFormatDateTime,
 	useRelativeTime,
-} from '@modrinth/ui'
-import { getUserLink, renderString } from '@modrinth/utils'
+} from '@icarus/ui'
+import { getUserLink, renderString } from '@icarus/utils'
 
 import { markAsRead } from '~/helpers/platform-notifications'
 import { getProjectLink, getVersionLink } from '~/helpers/projects'
@@ -330,7 +330,7 @@ import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 
 import ThreadSummary from './thread/ThreadSummary.vue'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 const emit = defineEmits(['update:notifications'])
 const formatRelativeTime = useRelativeTime()
@@ -607,3 +607,4 @@ function getLoaderCategories(ver) {
 	@apply underline hover:brightness-[--hover-brightness];
 }
 </style>
+

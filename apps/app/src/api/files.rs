@@ -4,7 +4,7 @@ use serde::Serialize;
 use std::io::Cursor;
 use tauri::Runtime;
 use tauri_plugin_dialog::DialogExt;
-use theseus::profile::get_full_path;
+use pteron::profile::get_full_path;
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("files")
@@ -33,7 +33,7 @@ pub async fn file_extract_zip(
     let canonical_zip = tokio::fs::canonicalize(&zip_path).await?;
     let canonical_base = tokio::fs::canonicalize(&base).await?;
     if !canonical_zip.starts_with(&canonical_base) {
-        return Err(theseus::Error::from(theseus::ErrorKind::OtherError(
+        return Err(pteron::Error::from(pteron::ErrorKind::OtherError(
             "file_path escapes the instance directory".to_string(),
         ))
         .into());
@@ -47,7 +47,7 @@ pub async fn file_extract_zip(
     let reader = Cursor::new(file_bytes);
 
     let zip_reader = ZipFileReader::with_tokio(reader).await.map_err(|e| {
-        theseus::Error::from(theseus::ErrorKind::OtherError(format!(
+        pteron::Error::from(pteron::ErrorKind::OtherError(format!(
             "Failed to read zip file: {e}"
         )))
     })?;
@@ -110,7 +110,7 @@ pub async fn file_extract_zip(
         let mut file_bytes = Vec::new();
         let mut entry_reader =
             zip_reader.reader_with_entry(*index).await.map_err(|e| {
-                theseus::Error::from(theseus::ErrorKind::OtherError(format!(
+                pteron::Error::from(pteron::ErrorKind::OtherError(format!(
                     "Failed to read zip entry: {e}"
                 )))
             })?;
@@ -118,7 +118,7 @@ pub async fn file_extract_zip(
             .read_to_end_checked(&mut file_bytes)
             .await
             .map_err(|e| {
-                theseus::Error::from(theseus::ErrorKind::OtherError(format!(
+                pteron::Error::from(pteron::ErrorKind::OtherError(format!(
                     "Failed to extract zip entry: {e}"
                 )))
             })?;
@@ -153,7 +153,7 @@ pub async fn file_save_as<R: Runtime>(
 
     if let Some(dest) = rx.await.unwrap_or(None) {
         let dest_path = std::path::PathBuf::try_from(dest).map_err(|e| {
-            theseus::Error::from(theseus::ErrorKind::OtherError(format!(
+            pteron::Error::from(pteron::ErrorKind::OtherError(format!(
                 "Invalid save path: {e}"
             )))
         })?;

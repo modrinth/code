@@ -21,7 +21,7 @@ const CLI_PROGRESS_BAR_TOTAL: u64 = 1000;
 
    To use events, we need to do the following:
     1) Make sure we are using the tauri feature flag
-    2) Initialize the EventState with EventState::init() *before* initializing the theseus State
+    2) Initialize the EventState with EventState::init() *before* initializing the pteron State
     3) Call emit_x functions to send events to the frontend
    For emit_loading() specifically, we need to initialize the loading bar with init_loading() first and pass the received loader in
 

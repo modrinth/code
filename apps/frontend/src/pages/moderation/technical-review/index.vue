@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	BlendIcon,
 	ListFilterIcon,
@@ -7,18 +7,18 @@ import {
 	SearchIcon,
 	SortAscIcon,
 	SortDescIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
 	FloatingPanel,
-	injectModrinthClient,
+	injectIcarusClient,
 	Pagination,
 	StyledInput,
 	Toggle,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
 import { nextTick, reactive } from 'vue'
@@ -28,9 +28,9 @@ import MaliciousSummaryModal, {
 } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
-useHead({ title: 'Tech review queue - Modrinth' })
+useHead({ title: 'Tech review queue - Icarus' })
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
 
 const currentPage = ref(1)
@@ -738,3 +738,4 @@ watch(totalPages, (pages) => {
 		<MaliciousSummaryModal ref="maliciousSummaryModalRef" :unsafe-files="currentUnsafeFiles" />
 	</div>
 </template>
+

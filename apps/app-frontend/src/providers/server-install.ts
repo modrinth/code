@@ -1,10 +1,8 @@
-import type { Labrinth } from '@modrinth/api-client'
-import type { AbstractPopupNotificationManager } from '@modrinth/ui'
-import { createContext } from '@modrinth/ui'
+import type { Labrinth } from '@icarus/api-client'
+import type { AbstractPopupNotificationManager } from '@icarus/ui'
+import { createContext } from '@icarus/ui'
 import { type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
-
-import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
 import { install_to_existing_profile } from '@/helpers/pack.js'
 import { create, edit, edit_icon, get, install as installProfile, list } from '@/helpers/profile.js'
@@ -153,11 +151,7 @@ export function createServerInstall(opts: {
 								action: async () => {
 									try {
 										await joinServer(project.path, serverAddress)
-										trackEvent('InstanceStart', {
-											loader: project.loader,
-											game_version: project.game_version,
-											source: 'ServerProject',
-										})
+										
 									} catch (err) {
 										handleSevereError(err, { profilePath: project.path })
 									}
@@ -188,11 +182,7 @@ export function createServerInstall(opts: {
 								action: async () => {
 									try {
 										if (serverAddress) await start_join_server(instance.path, serverAddress)
-										trackEvent('InstanceStart', {
-											loader: instance.loader,
-											game_version: instance.game_version,
-											source: 'ServerProject',
-										})
+										
 									} catch (err) {
 										handleSevereError(err, { profilePath: instance.path })
 									}
@@ -348,11 +338,7 @@ export function createServerInstall(opts: {
 		// Join server
 		try {
 			await joinServer(instance.path, serverAddress)
-			trackEvent('InstanceStart', {
-				loader: instance.loader,
-				game_version: instance.game_version,
-				source: 'ServerProject',
-			})
+			
 		} catch (err) {
 			handleSevereError(err, { profilePath: instance.path })
 		}

@@ -1,5 +1,5 @@
-import type { Labrinth } from '@modrinth/api-client'
-import { type AuthProvider, provideAuth } from '@modrinth/ui'
+import type { Labrinth } from '@icarus/api-client'
+import { type AuthProvider, provideAuth } from '@icarus/ui'
 import { computed, type Ref, ref, watchEffect } from 'vue'
 
 type AppCredentials = {

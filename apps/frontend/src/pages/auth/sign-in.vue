@@ -151,23 +151,23 @@ import {
 	MicrosoftColorIcon,
 	RightArrowIcon,
 	SteamColorIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	IntlFormatted,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -206,7 +206,7 @@ const messages = defineMessages({
 
 useHead({
 	title() {
-		return `${formatMessage(messages.signInTitle)} - Modrinth`
+		return `${formatMessage(messages.signInTitle)} - Icarus`
 	},
 })
 
@@ -332,3 +332,4 @@ async function finishSignIn(token) {
 	}
 }
 </script>
+

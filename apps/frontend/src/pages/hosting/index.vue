@@ -4,7 +4,7 @@
 		data-pyro
 		class="servers-hero relative isolate -mt-44 h-full min-h-screen pt-8"
 	>
-		<ModrinthServersPurchaseModal
+		<IcarusServersPurchaseModal
 			v-if="customer"
 			:key="`purchase-modal-${customer.id}`"
 			ref="purchaseModal"
@@ -39,7 +39,7 @@
 						{{ formatMessage(commonMessages.betaRelease) }}
 					</div>
 					<h1 class="relative m-0 max-w-3xl text-3xl font-bold !leading-[110%] md:text-6xl">
-						{{ formatMessage(messages.hostWithModrinth) }}
+						{{ formatMessage(messages.hostWithIcarus) }}
 					</h1>
 				</div>
 				<h2
@@ -111,7 +111,7 @@
 				<div
 					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
-					{{ formatMessage(messages.whyModrinthHosting) }}
+					{{ formatMessage(messages.whyIcarusHosting) }}
 				</div>
 				<h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
 					{{ formatMessage(messages.whyHeading) }}
@@ -186,9 +186,9 @@
 							<path d="M10 8h.01" />
 							<path d="M14 8h.01" />
 						</svg>
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.allOnModrinth) }}</h2>
+						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.allOnIcarus) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							{{ formatMessage(messages.allOnModrinthDescription) }}
+							{{ formatMessage(messages.allOnIcarusDescription) }}
 						</h3>
 					</div>
 
@@ -286,7 +286,7 @@
 								class="ooh-shiny absolute right-4 top-4 flex items-center justify-center rounded-full bg-bg-raised p-4"
 							>
 								<span class="font-bold text-contrast">{{ currentText }}</span
-								>.modrinth.gg
+								>.Icarus.gg
 							</div>
 						</div>
 						<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
@@ -633,20 +633,20 @@ import {
 	TerminalSquareIcon,
 	TransferIcon,
 	VersionIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	IntlFormatted,
 	LoaderIcon,
-	ModrinthServersPurchaseModal,
+	IcarusServersPurchaseModal,
 	useFormatPrice,
 	useVIntl,
-} from '@modrinth/ui'
-import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
+} from '@icarus/ui'
+import { monthsInInterval } from '@icarus/ui/src/utils/billing.ts'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
@@ -657,7 +657,7 @@ import { products } from '~/generated/state.json'
 
 const route = useRoute()
 const router = useRouter()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 const { setAffiliateCode, getAffiliateCode } = useAffiliates()
 
@@ -681,14 +681,14 @@ const formatPrice = useFormatPrice()
 const flags = useFeatureFlags()
 
 const messages = defineMessages({
-	hostWithModrinth: {
-		id: 'hosting-marketing.hero.host-with-modrinth',
-		defaultMessage: 'Host your next server with Modrinth Hosting',
+	hostWithIcarus: {
+		id: 'hosting-marketing.hero.host-with-Icarus',
+		defaultMessage: 'Host your next server with Icarus Hosting',
 	},
 	hostingDescription: {
 		id: 'hosting-marketing.hero.hosting-description',
 		defaultMessage:
-			'Modrinth Hosting is the easiest way to host your own Minecraft: Java Edition server. Seamlessly install and play your favorite mods and modpacks, all within the Modrinth platform.',
+			'Icarus Hosting is the easiest way to host your own Minecraft: Java Edition server. Seamlessly install and play your favorite mods and modpacks, all within the Icarus platform.',
 	},
 	startANewServer: {
 		id: 'hosting-marketing.hero.button.start-a-new-server',
@@ -702,9 +702,9 @@ const messages = defineMessages({
 		id: 'hosting-marketing.hero.button.manage-your-servers',
 		defaultMessage: 'Manage your servers',
 	},
-	whyModrinthHosting: {
-		id: 'hosting-marketing.why.why-modrinth-hosting',
-		defaultMessage: 'Why Modrinth Hosting?',
+	whyIcarusHosting: {
+		id: 'hosting-marketing.why.why-Icarus-hosting',
+		defaultMessage: 'Why Icarus Hosting?',
 	},
 	whyHeading: {
 		id: 'hosting-marketing.why.heading',
@@ -713,7 +713,7 @@ const messages = defineMessages({
 	whyDescription: {
 		id: 'hosting-marketing.why.description',
 		defaultMessage:
-			"Choose from the thousands of modpacks on Modrinth or create your own. Invite your friends when you're ready to play.",
+			"Choose from the thousands of modpacks on Icarus or create your own. Invite your friends when you're ready to play.",
 	},
 	whereModsAre: {
 		id: 'hosting-marketing.why.where-mods-are',
@@ -722,7 +722,7 @@ const messages = defineMessages({
 	whereModsAreDescription: {
 		id: 'hosting-marketing.why.where-mods-are.description',
 		defaultMessage:
-			'Modrinth Hosting seamlessly integrates the mod and modpack installation process into your server.',
+			'Icarus Hosting seamlessly integrates the mod and modpack installation process into your server.',
 	},
 	yourFavoriteMods: {
 		id: 'hosting-marketing.why.your-favorite-mods',
@@ -731,16 +731,16 @@ const messages = defineMessages({
 	yourFavoriteModsDescription: {
 		id: 'hosting-marketing.why.your-favorite-mods.description',
 		defaultMessage:
-			"Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can run on your server.",
+			"Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Icarus, it can run on your server.",
 	},
-	allOnModrinth: {
-		id: 'hosting-marketing.why.all-on-modrinth',
-		defaultMessage: 'Manage it all on Modrinth',
+	allOnIcarus: {
+		id: 'hosting-marketing.why.all-on-Icarus',
+		defaultMessage: 'Manage it all on Icarus',
 	},
-	allOnModrinthDescription: {
-		id: 'hosting-marketing.why.all-on-modrinth.description',
+	allOnIcarusDescription: {
+		id: 'hosting-marketing.why.all-on-Icarus.description',
 		defaultMessage:
-			'Your server, mods, players, and more are all on Modrinth. No need to switch between platforms.',
+			'Your server, mods, players, and more are all on Icarus. No need to switch between platforms.',
 	},
 	modernReliableHosting: {
 		id: 'hosting-marketing.why.modern-reliable-hosting',
@@ -749,7 +749,7 @@ const messages = defineMessages({
 	modernReliableHostingDescription: {
 		id: 'hosting-marketing.why.modern-reliable-hosting.description',
 		defaultMessage:
-			'Modrinth Hosting servers are hosted on <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>, running on custom-built software to ensure your server performs smoothly.',
+			'Icarus Hosting servers are hosted on <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>, running on custom-built software to ensure your server performs smoothly.',
 	},
 	consistentlyFast: {
 		id: 'hosting-marketing.why.consistently-fast',
@@ -758,7 +758,7 @@ const messages = defineMessages({
 	consistentlyFastDescription: {
 		id: 'hosting-marketing.why.consistently-fast.description',
 		defaultMessage:
-			'Our infrastructure is never overloaded, meaning each server hosted with Modrinth always runs at its full performance.',
+			'Our infrastructure is never overloaded, meaning each server hosted with Icarus always runs at its full performance.',
 	},
 	includedWithYourServer: {
 		id: 'hosting-marketing.included.with-your-server',
@@ -771,7 +771,7 @@ const messages = defineMessages({
 	includedDescription: {
 		id: 'hosting-marketing.included.description',
 		defaultMessage:
-			'Included with every server is a suite of features designed to provide a hosting experience that only Modrinth can offer.',
+			'Included with every server is a suite of features designed to provide a hosting experience that only Icarus can offer.',
 	},
 	customUrl: {
 		id: 'hosting-marketing.included.custom-url',
@@ -779,7 +779,7 @@ const messages = defineMessages({
 	},
 	customUrlDescription: {
 		id: 'hosting-marketing.included.custom-url.description',
-		defaultMessage: 'Share your server with a custom <contrast>modrinth.gg</contrast> URL.',
+		defaultMessage: 'Share your server with a custom <contrast>Icarus.gg</contrast> URL.',
 	},
 	backupsIncluded: {
 		id: 'hosting-marketing.included.backups-included',
@@ -803,7 +803,7 @@ const messages = defineMessages({
 	},
 	powerfulConsoleDescription: {
 		id: 'hosting-marketing.included.powerful-console.description',
-		defaultMessage: 'Modrinth Hosting comes with powerful tools to manage your server.',
+		defaultMessage: 'Icarus Hosting comes with powerful tools to manage your server.',
 	},
 	help: {
 		id: 'hosting-marketing.included.help',
@@ -811,7 +811,7 @@ const messages = defineMessages({
 	},
 	helpDescription: {
 		id: 'hosting-marketing.included.help.description',
-		defaultMessage: 'Reach out to the Modrinth team for help with your server at any time.',
+		defaultMessage: 'Reach out to the Icarus team for help with your server at any time.',
 	},
 	sftpAccess: {
 		id: 'hosting-marketing.included.sftp-access',
@@ -819,7 +819,7 @@ const messages = defineMessages({
 	},
 	sftpAccessDescription: {
 		id: 'hosting-marketing.included.sftp-access.description',
-		defaultMessage: "Access your server's files directly with SFTP built into Modrinth Hosting.",
+		defaultMessage: "Access your server's files directly with SFTP built into Icarus Hosting.",
 	},
 	advancedNetworking: {
 		id: 'hosting-marketing.included.advanced-networking',
@@ -836,12 +836,12 @@ const messages = defineMessages({
 	},
 	faqCpuKind: {
 		id: 'hosting-marketing.faq.cpu-kind',
-		defaultMessage: 'What kind of CPUs do Modrinth Hosting servers run on?',
+		defaultMessage: 'What kind of CPUs do Icarus Hosting servers run on?',
 	},
 	faqCpuKindAnswer: {
 		id: 'hosting-marketing.faq.cpu-kind.answer',
 		defaultMessage:
-			'Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+ GHz, paired with DDR5 memory.',
+			'Icarus Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+ GHz, paired with DDR5 memory.',
 	},
 	faqBurstThreads: {
 		id: 'hosting-marketing.faq.burst-threads',
@@ -854,16 +854,16 @@ const messages = defineMessages({
 	},
 	faqDDOSProtection: {
 		id: 'hosting-marketing.faq.ddos-protection',
-		defaultMessage: 'Do Modrinth Hosting servers have DDoS protection?',
+		defaultMessage: 'Do Icarus Hosting servers have DDoS protection?',
 	},
 	faqDDOSProtectionAnswer: {
 		id: 'hosting-marketing.faq.ddos-protection.answer',
 		defaultMessage:
-			'Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17 Tbps capacity in some locations.',
+			'Yes. All Icarus Hosting servers come with DDoS protection, with up to 17 Tbps capacity in some locations.',
 	},
 	faqLocation: {
 		id: 'hosting-marketing.faq.location',
-		defaultMessage: 'Where are Modrinth Hosting servers located? Can I choose a region?',
+		defaultMessage: 'Where are Icarus Hosting servers located? Can I choose a region?',
 	},
 	faqLocationAnswer: {
 		id: 'hosting-marketing.faq.location.answer',
@@ -877,16 +877,16 @@ const messages = defineMessages({
 	faqIncreaseStorageAnswer: {
 		id: 'hosting-marketing.faq.increase-storage.answer',
 		defaultMessage:
-			'Yes, storage can be increased on your server at no additional cost. If you need more storage, reach out to Modrinth Support.',
+			'Yes, storage can be increased on your server at no additional cost. If you need more storage, reach out to Icarus Support.',
 	},
 	faqHowFast: {
 		id: 'hosting-marketing.faq.how-fast',
-		defaultMessage: 'How fast are Modrinth Hosting servers?',
+		defaultMessage: 'How fast are Icarus Hosting servers?',
 	},
 	faqHowFastAnswer: {
 		id: 'hosting-marketing.faq.how-fast.answer.one',
 		defaultMessage:
-			"Modrinth Hosting servers are hosted on very modern high-performance hardware, but it's tough to say how exactly that will translate into how fast your server will run because there are so many factors that affect it, such as the mods, data packs, or plugins you're running on your server, and even user behavior.",
+			"Icarus Hosting servers are hosted on very modern high-performance hardware, but it's tough to say how exactly that will translate into how fast your server will run because there are so many factors that affect it, such as the mods, data packs, or plugins you're running on your server, and even user behavior.",
 	},
 	faqHowFastAnswerTwo: {
 		id: 'hosting-marketing.faq.how-fast.answer.two',
@@ -908,7 +908,7 @@ const messages = defineMessages({
 	faqVersionsLoadersAnswer: {
 		id: 'hosting-marketing.faq.versions-loaders.answer.one',
 		defaultMessage:
-			'Modrinth Hosting servers can run any version of Minecraft: Java Edition going all the way back to version 1.2.5, including snapshot versions.',
+			'Icarus Hosting servers can run any version of Minecraft: Java Edition going all the way back to version 1.2.5, including snapshot versions.',
 	},
 	faqVersionsLoadersAnswerTwo: {
 		id: 'hosting-marketing.faq.versions-loaders.answer.two',
@@ -974,9 +974,9 @@ const lowestPrice = computed(() => {
 	return amount ? amount / monthsInInterval[billingPeriod.value] : undefined
 })
 
-const title = 'Modrinth Hosting'
+const title = 'Icarus Hosting'
 const description =
-	'Start your own Minecraft server directly on Modrinth. Play your favorite mods, plugins, and datapacks — without the hassle of setup.'
+	'Start your own Minecraft server directly on Icarus. Play your favorite mods, plugins, and datapacks — without the hassle of setup.'
 
 useSeoMeta({
 	title,
@@ -1353,3 +1353,4 @@ onUnmounted(() => {
 	display: none;
 }
 </style>
+

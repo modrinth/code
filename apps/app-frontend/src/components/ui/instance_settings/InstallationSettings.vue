@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	commonMessages,
 	defineMessages,
@@ -9,12 +9,10 @@ import {
 	provideAppBackup,
 	provideInstallationSettings,
 	useVIntl,
-} from '@modrinth/ui'
-import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
+} from '@icarus/ui'
+import type { GameVersionTag, PlatformTag } from '@icarus/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, shallowRef } from 'vue'
-
-import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import { get_loader_versions } from '@/helpers/metadata'
 import {
@@ -24,7 +22,7 @@ import {
 	install,
 	list,
 	update_managed_modrinth_version,
-	update_repair_modrinth,
+	update_repair_Icarus,
 } from '@/helpers/profile'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import { injectInstanceSettings } from '@/providers/instance-settings'
@@ -202,30 +200,21 @@ provideInstallationSettings({
 
 	afterSave: async () => {
 		await install(instance.value.path, false).catch(handleError)
-		trackEvent('InstanceRepair', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-		})
+
 	},
 
 	async repair() {
 		repairing.value = true
 		await install(instance.value.path, true).catch(handleError)
 		repairing.value = false
-		trackEvent('InstanceRepair', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-		})
+
 	},
 
 	async reinstallModpack() {
 		reinstalling.value = true
 		await update_repair_modrinth(instance.value.path).catch(handleError)
 		reinstalling.value = false
-		trackEvent('InstanceRepair', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-		})
+
 	},
 
 	async unlinkModpack() {
@@ -280,3 +269,4 @@ provideInstallationSettings({
 <template>
 	<InstallationSettingsLayout />
 </template>
+

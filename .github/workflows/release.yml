@@ -1,0 +1,208 @@
+name: 'Icarus Launcher Release'
+
+on:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check_version:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.extract_version.outputs.version }}
+      app_version: ${{ steps.extract_version.outputs.app_version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version
+        id: extract_version
+        shell: bash
+        run: |
+          # This workflow must be run from a tag
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            APP_VERSION="${{ github.ref_name }}"
+          else
+            echo "::error::This workflow must be run from a tag! Please create and push a tag first:"
+            echo "::error::  git tag v1.10.3-110"
+            echo "::error::  git push origin v1.10.3-110"
+            echo "::error::Then trigger this workflow from the tag."
+            exit 1
+          fi
+
+          VERSION="${APP_VERSION#v}"  # Remove 'v' prefix
+          echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION (full: $APP_VERSION)"
+
+  build:
+    needs: check_version
+    uses: ./.github/workflows/theseus-build.yml
+    secrets: inherit
+
+  release:
+    needs: [check_version, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Set version environment variables
+        run: |
+          echo "VERSION=${{ needs.check_version.outputs.new_version }}" >> $GITHUB_ENV
+          echo "APP_VERSION=${{ needs.check_version.outputs.app_version }}" >> $GITHUB_ENV
+
+      - name: Debug artifacts
+        run: |
+          echo "Version: ${{ env.VERSION }}"
+          echo "App Version: ${{ env.APP_VERSION }}"
+          echo "Artifacts structure:"
+          find artifacts -type f -name "*" | sort
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.APP_VERSION }}
+          name: Release ${{ env.APP_VERSION }}
+          body: |
+            A new version of **Icarus** has been released! 🎉
+
+            🚀 **Download & Install:**
+            - [![Windows](https://img.shields.io/badge/Install-Windows-blue?style=for-the-badge&logo=windows)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus-Launcher_${{ env.VERSION }}_x64-setup.exe)
+            - [![Mac](https://img.shields.io/badge/Install-MacOS-black?style=for-the-badge&logo=apple)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus-Launcher_${{ env.VERSION }}_universal.dmg)
+            - [![Ubuntu](https://img.shields.io/badge/Install-Ubuntu-orange?style=for-the-badge&logo=ubuntu)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus-Launcher_${{ env.VERSION }}_amd64.deb)
+            - [![Linux](https://img.shields.io/badge/Install-AppImage-green?style=for-the-badge&logo=linux)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus-Launcher_${{ env.VERSION }}_amd64.AppImage)
+          files: |
+            artifacts/**/*.AppImage
+            artifacts/**/*.AppImage.sig
+            artifacts/**/*.deb
+            artifacts/**/*.deb.sig
+            artifacts/**/*.rpm
+            artifacts/**/*.rpm.sig
+            artifacts/**/*.tar.gz
+            artifacts/**/*.tar.gz.sig
+            artifacts/**/*.dmg
+            artifacts/**/*.dmg.sig
+            artifacts/**/*.msi
+            artifacts/**/*.msi.sig
+            artifacts/**/*.exe
+            artifacts/**/*.exe.sig
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  generate-update-file:
+    needs: [check_version, release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Set version environment variables
+        run: |
+          echo "VERSION=${{ needs.check_version.outputs.new_version }}" >> $GITHUB_ENV
+          echo "APP_VERSION=${{ needs.check_version.outputs.app_version }}" >> $GITHUB_ENV
+
+      - name: Generate updates.json
+        run: |
+          set -e
+          VERSION="${{ env.VERSION }}"
+          APP_VERSION="${{ env.APP_VERSION }}"
+          BASE_URL="https://github.com/${{ github.repository }}/releases/download/${APP_VERSION}"
+          UPDATES_JSON="updates.json"
+          PUB_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          echo "Generating updates.json for version $VERSION (tag: $APP_VERSION)"
+
+          # Find actual artifact files - they should be organized by platform
+          LINUX_APPIMAGE=$(find artifacts -name "*.AppImage" | head -1)
+          MACOS_TAR=$(find artifacts -name "*.app.tar.gz" | head -1)
+          WINDOWS_NSIS=$(find artifacts -name "*setup.exe" -o -name "*-setup.exe" | head -1)
+          WINDOWS_MSI=$(find artifacts -name "*.msi" | head -1)
+
+          cat > $UPDATES_JSON << EOF
+          {
+            "version": "$VERSION",
+            "notes": "A new version of Icarus has been released! Check the release page for details.",
+            "pub_date": "$PUB_DATE",
+            "platforms": {
+          EOF
+
+          FIRST=true
+
+          # Linux x86_64
+          if [[ -f "$LINUX_APPIMAGE" && -f "${LINUX_APPIMAGE}.sig" ]]; then
+            FILENAME=$(basename "$LINUX_APPIMAGE")
+            SIGNATURE=$(cat "${LINUX_APPIMAGE}.sig")
+            [[ "$FIRST" == "false" ]] && echo "," >> $UPDATES_JSON
+            cat >> $UPDATES_JSON << EOF
+              "linux-x86_64": {
+                "url": "${BASE_URL}/${FILENAME}",
+                "signature": "$SIGNATURE"
+              }
+          EOF
+            FIRST=false
+          fi
+
+          # macOS (both x86_64 and aarch64 use universal binary)
+          if [[ -f "$MACOS_TAR" && -f "${MACOS_TAR}.sig" ]]; then
+            FILENAME=$(basename "$MACOS_TAR")
+            SIGNATURE=$(cat "${MACOS_TAR}.sig")
+
+            for ARCH in "x86_64" "aarch64"; do
+              [[ "$FIRST" == "false" ]] && echo "," >> $UPDATES_JSON
+              cat >> $UPDATES_JSON << EOF
+              "darwin-${ARCH}": {
+                "url": "${BASE_URL}/${FILENAME}",
+                "signature": "$SIGNATURE"
+              }
+          EOF
+              FIRST=false
+            done
+          fi
+
+          # Windows x86_64
+          if [[ -f "$WINDOWS_NSIS" && -f "${WINDOWS_NSIS}.sig" ]]; then
+            FILENAME=$(basename "$WINDOWS_NSIS")
+            SIGNATURE=$(cat "${WINDOWS_NSIS}.sig")
+            [[ "$FIRST" == "false" ]] && echo "," >> $UPDATES_JSON
+            cat >> $UPDATES_JSON << EOF
+              "windows-x86_64": {
+                "url": "${BASE_URL}/${FILENAME}",
+                "signature": "$SIGNATURE"
+              }
+          EOF
+            FIRST=false
+          fi
+
+          echo "" >> $UPDATES_JSON
+          echo "    }" >> $UPDATES_JSON
+          echo "}" >> $UPDATES_JSON
+
+          echo "Generated updates.json:"
+          cat $UPDATES_JSON
+
+          # Validate JSON
+          if command -v jq >/dev/null 2>&1; then
+            jq empty $UPDATES_JSON || (echo "Invalid JSON generated" && exit 1)
+          fi
+
+      - name: Upload updates.json to release
+        run: |
+          gh release upload "${{ env.APP_VERSION }}" updates.json --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

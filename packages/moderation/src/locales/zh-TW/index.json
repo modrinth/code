@@ -18,13 +18,13 @@
     "defaultMessage": "新增 Java 位址"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "新增 Modrinth 以外的任何相關連結，例如網站、商店或 Discord 邀請連結。"
+    "defaultMessage": "新增 Icarus 以外的任何相關連結，例如網站、商店或 Discord 邀請連結。"
   },
   "nags.add-links-server.title": {
     "defaultMessage": "新增外部連結"
   },
   "nags.add-links.description": {
-    "defaultMessage": "新增任何與專案相關且指向 Modrinth 以外的連結，例如原始碼、問題追蹤器或 Discord 邀請連結。"
+    "defaultMessage": "新增任何與專案相關且指向 Icarus 以外的連結，例如原始碼、問題追蹤器或 Discord 邀請連結。"
   },
   "nags.add-links.title": {
     "defaultMessage": "新增外部連結"
@@ -249,4 +249,5 @@
     "defaultMessage": "前往連結設定"
   }
 }
+
 

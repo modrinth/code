@@ -1,6 +1,6 @@
 <template>
 	<div class="welcome-box has-bot">
-		<img :src="WavingRinthbot" alt="Waving Modrinth Bot" class="welcome-box__waving-bot" />
+		<img :src="WavingRinthbot" alt="Waving Icarus Bot" class="welcome-box__waving-bot" />
 		<div class="welcome-box__top-glow" />
 		<div class="welcome-box__body">
 			<h1 class="welcome-box__title">
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { RightArrowIcon, WavingRinthbot } from '@modrinth/assets'
+import { RightArrowIcon, WavingRinthbot } from '@icarus/assets'
 import {
 	ButtonStyled,
 	Checkbox,
@@ -59,7 +59,7 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
 const queryClient = useQueryClient()
@@ -70,12 +70,12 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	subscribeCheckbox: {
 		id: 'auth.welcome.checkbox.subscribe',
-		defaultMessage: 'Subscribe to updates about Modrinth',
+		defaultMessage: 'Subscribe to updates about Icarus',
 	},
 	tosLabel: {
 		id: 'auth.welcome.label.tos',
 		defaultMessage:
-			"By creating an account, you have agreed to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
+			"By creating an account, you have agreed to Icarus's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
 	},
 	welcomeDescription: {
 		id: 'auth.welcome.description',
@@ -84,7 +84,7 @@ const messages = defineMessages({
 	},
 	welcomeLongTitle: {
 		id: 'auth.welcome.long-title',
-		defaultMessage: 'Welcome to Modrinth!',
+		defaultMessage: 'Welcome to Icarus!',
 	},
 	welcomeTitle: {
 		id: 'auth.welcome.title',
@@ -93,7 +93,7 @@ const messages = defineMessages({
 })
 
 useHead({
-	title: () => `${formatMessage(messages.welcomeTitle)} - Modrinth`,
+	title: () => `${formatMessage(messages.welcomeTitle)} - Icarus`,
 })
 
 const subscribe = ref(true)
@@ -203,3 +203,4 @@ async function continueSignUp() {
 	}
 }
 </style>
+

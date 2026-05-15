@@ -1,4 +1,4 @@
-import { DownloadIcon, EyeIcon, FolderOpenIcon } from '@modrinth/assets'
+import { DownloadIcon, EyeIcon, FolderOpenIcon } from '@icarus/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { onMounted, onUnmounted, ref } from 'vue'

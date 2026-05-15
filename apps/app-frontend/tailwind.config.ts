@@ -1,4 +1,4 @@
-import preset from '@modrinth/tooling-config/tailwind/tailwind-preset.ts'
+import preset from '@icarus/tooling-config/tailwind/tailwind-preset.ts'
 import type { Config } from 'tailwindcss'
 
 const config: Config = {

@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import { NewspaperIcon } from '@modrinth/assets'
-import { articles as rawArticles } from '@modrinth/blog'
-import { ButtonStyled, defineMessages, NewsArticleCard, useVIntl } from '@modrinth/ui'
+import { NewspaperIcon } from '@icarus/assets'
+import { articles as rawArticles } from '@icarus/blog'
+import { ButtonStyled, defineMessages, NewsArticleCard, useVIntl } from '@icarus/ui'
 import { computed, ref } from 'vue'
 
 const { formatMessage } = useVIntl()
@@ -54,7 +54,7 @@ const articles = ref(
 const messages = defineMessages({
 	latestNews: {
 		id: 'ui.latest-news-row.latest-news',
-		defaultMessage: 'Latest news from Modrinth',
+		defaultMessage: 'Latest news from Icarus',
 	},
 	viewAll: {
 		id: 'ui.latest-news-row.view-all',
@@ -64,3 +64,4 @@ const messages = defineMessages({
 
 const latestArticles = computed(() => articles.value.slice(0, 3))
 </script>
+

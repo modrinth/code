@@ -1,6 +1,6 @@
 # Storybook Story Creation Guide
 
-This document provides instructions for AI assistants when creating Storybook stories for Vue components in the `@modrinth/ui` package.
+This document provides instructions for AI assistants when creating Storybook stories for Vue components in the `@Icarus/ui` package.
 
 ## File Location
 
@@ -127,10 +127,10 @@ const meta = {
 
 ### Components with Icons
 
-Import icons from `@modrinth/assets`:
+Import icons from `@Icarus/assets`:
 
 ```typescript
-import { SearchIcon, ChevronDownIcon } from '@modrinth/assets'
+import { SearchIcon, ChevronDownIcon } from '@Icarus/assets'
 
 export const WithIcon: Story = {
 	render: () => ({
@@ -193,13 +193,13 @@ export const Default: Story = {
 
 ## Things to Avoid
 
-### 1. Don't Import from `@modrinth/ui` in Components
+### 1. Don't Import from `@Icarus/ui` in Components
 
 Components should use relative imports, not the package alias:
 
 ```typescript
 // ❌ BAD - Causes circular dependency in Storybook
-import { ButtonStyled } from '@modrinth/ui'
+import { ButtonStyled } from '@Icarus/ui'
 
 // ✅ GOOD - Use relative imports
 import ButtonStyled from '../base/ButtonStyled.vue'
@@ -290,3 +290,4 @@ export const AllTypes: StoryObj = {
 	}),
 }
 ```
+

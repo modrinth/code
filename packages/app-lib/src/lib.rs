@@ -1,7 +1,7 @@
 /*!
-# Theseus
+# Pteron
 
-Theseus is a library which provides utilities for launching minecraft, creating Modrinth mod packs,
+Pteron is a library which provides utilities for launching minecraft, creating Modrinth mod packs,
 and launching Modrinth mod packs
 */
 #![warn(unused_import_braces)]
@@ -16,6 +16,7 @@ mod event;
 mod launcher;
 mod logger;
 mod state;
+pub mod sync;
 
 pub use api::*;
 pub use error::*;
@@ -29,7 +30,7 @@ pub use util::fetch::DownloadReason;
 
 pub fn launcher_user_agent() -> String {
     const LAUNCHER_BASE_USER_AGENT: &str =
-        concat!("modrinth/theseus/", env!("CARGO_PKG_VERSION"),);
+        concat!("icarus/pteron/", env!("CARGO_PKG_VERSION"),);
 
     format!(
         "{} ({}; support@modrinth.com)",

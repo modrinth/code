@@ -18,13 +18,13 @@
     "defaultMessage": "Adăugați o adresă Java"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Adăugați orice linkuri relevante vizate în afara Modrinth, cum ar fi un site web, un magazin sau o invitație Discord."
+    "defaultMessage": "Adăugați orice linkuri relevante vizate în afara Icarus, cum ar fi un site web, un magazin sau o invitație Discord."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Adăugați linkuri externe"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Adaugă orice link relevant către site-uri din afara Modrinth, cum ar fi codul sursă, un tracker de probleme sau o invitație de Discord."
+    "defaultMessage": "Adaugă orice link relevant către site-uri din afara Icarus, cum ar fi codul sursă, un tracker de probleme sau o invitație de Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Adaugă link-uri externe"
@@ -249,4 +249,5 @@
     "defaultMessage": "Vizitează setările link-urilor"
   }
 }
+
 

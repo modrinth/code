@@ -178,7 +178,7 @@
 </template>
 
 <script setup lang="ts">
-import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
+import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@icarus/assets'
 import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'

@@ -11,7 +11,7 @@
 # native and cross-compilation scenarios, this leads to existing
 # migrations that didn't change having potentially different checksums
 # according to the environment they were built in, which can break the
-# migration system when deploying the Modrinth App, rendering it
+# migration system when deploying Icarus Launcher, rendering it
 # unusable.
 #
 # The gitattribute above ensures that all text files are checked out

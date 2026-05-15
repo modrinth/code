@@ -1,5 +1,5 @@
 {
-	"name": "@modrinth/utils",
+	"name": "@icarus/utils",
 	"version": "0.0.0",
 	"private": true,
 	"main": "./index.ts",
@@ -9,8 +9,8 @@
 		"fix": "eslint . --fix && prettier --write ."
 	},
 	"devDependencies": {
-		"@modrinth/tooling-config": "workspace:*",
-		"@modrinth/api-client": "workspace:*"
+		"@icarus/tooling-config": "workspace:*",
+		"@icarus/api-client": "workspace:*"
 	},
 	"dependencies": {
 		"@codemirror/commands": "^6.3.2",
@@ -29,3 +29,4 @@
 		"xss": "^1.0.14"
 	}
 }
+

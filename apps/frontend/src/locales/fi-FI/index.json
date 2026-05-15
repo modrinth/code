@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Modrinth Appin Linux versioilla <issues-link>tunnetaan olevan ongelmia</issues-link> tietyillä järjestelmillä ja asetuksilla. Jos Modrinth App on epävakaa järjestelmälläsi, kannustamme sinua kokeilemaan toisia sovelluksia kuten <prism-link>Prism Launcher</prism-link> asentaaksesi helposti Modrinth sisältöä."
+    "message": "Icarus Launcherin Linux versioilla <issues-link>tunnetaan olevan ongelmia</issues-link> tietyillä järjestelmillä ja asetuksilla. Jos Icarus Launcher on epävakaa järjestelmälläsi, kannustamme sinua kokeilemaan toisia sovelluksia kuten <prism-link>Prism Launcher</prism-link> asentaaksesi helposti Icarus sisältöä."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -39,10 +39,10 @@
     "message": "Lataus vaihtoehdot"
   },
   "app-marketing.download.terms": {
-    "message": "Lataamalla Modrint sovelluksen, sinä hyväksyt meidän <terms-link>Ehdot</terms-link> Ja <privacy-link>Tietosuojakäytännöt</privacy-link>."
+    "message": "Lataamalla Icarus sovelluksen, sinä hyväksyt meidän <terms-link>Ehdot</terms-link> Ja <privacy-link>Tietosuojakäytännöt</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "Lataa Modrinth App (Beta)"
+    "message": "Lataa Icarus Launcher (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "Seuraa projekteja"
   },
   "app-marketing.features.importing.description": {
-    "message": "Tuo kaikki lempi profiilisi launcherista jota käytit ennen, ja aloita Modrinth Appin käyttö sekunneissa!"
+    "message": "Tuo kaikki lempi profiilisi launcherista jota käytit ennen, ja aloita Icarus Launcherin käyttö sekunneissa!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "käyttäjältä {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth tekee helpoksi hallita kaikkia modejasi yhdessä paikassa. Voit asentaa, poistaa ja päivittää modeja yhdellä klikkauksella."
+    "message": "Icarus tekee helpoksi hallita kaikkia modejasi yhdessä paikassa. Voit asentaa, poistaa ja päivittää modeja yhdellä klikkauksella."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Asennetut modit"
@@ -96,7 +96,7 @@
     "message": "Offline tila"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth launcherin lähdekoodi on täysin avointa. Voit lukea lähdekoodia meidän <github-link>Githubissa</github-link>!"
+    "message": "Icarus launcherin lähdekoodi on täysin avointa. Voit lukea lähdekoodia meidän <github-link>Githubissa</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Avoin lähdekoodi"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App toimii paremmin kuin monet johtavat modinhallintaohjelmat ja käyttää vain 150 MT RAM-muistia!"
+    "message": "Icarus Launcher toimii paremmin kuin monet johtavat modinhallintaohjelmat ja käyttää vain 150 MT RAM-muistia!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -128,8 +128,8 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MT"
   },
-  "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth App"
+  "app-marketing.features.performance.Icarus-app": {
+    "message": "Icarus Launcher"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 miljardi %"
@@ -147,13 +147,13 @@
     "message": "Suorituskykyinen"
   },
   "app-marketing.features.play.description": {
-    "message": "Käytä Modrinth sovellusta asentaaksesi ja pelataksesi sinun suosikki modeliila ja modpackeilla."
+    "message": "Käytä Icarus sovellusta asentaaksesi ja pelataksesi sinun suosikki modeliila ja modpackeilla."
   },
   "app-marketing.features.play.title": {
     "message": "Pelaa lempi modeillasi"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Rakenna, jaa, ja pelaa modipaketteja millä tahansa tuhansista modeista ja modipaketeista Modrinthissa."
+    "message": "Rakenna, jaa, ja pelaa modipaketteja millä tahansa tuhansista modeista ja modipaketeista Icarusissa."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modipaketti"
@@ -168,7 +168,7 @@
     "message": "Erilainen kuin mikään muu launcheri"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App on täysin integroitu sivuston kanssa, jotta saat pääsyn kaikkiin lempi projekteihisi appin kautta!"
+    "message": "Icarus Launcher on täysin integroitu sivuston kanssa, jotta saat pääsyn kaikkiin lempi projekteihisi appin kautta!"
   },
   "app-marketing.features.website.title": {
     "message": "Nettisivu integraatio"
@@ -177,19 +177,19 @@
     "message": "jota olet käyttänyt ennen"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Kuvakaappaus Modrinth Appista jossa on Cobblemon instanssi auki sisältö sivulle."
+    "message": "Kuvakaappaus Icarus Launcherista jossa on Cobblemon instanssi auki sisältö sivulle."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App on uniikki, avoimen lähdekoodin launcheri joka antaa sinun pelata lempi modeillasi, ja pitää ne ajantasalla, kaikki yhdessä siistissä pakkauksessa."
+    "message": "Icarus Launcher on uniikki, avoimen lähdekoodin launcheri joka antaa sinun pelata lempi modeillasi, ja pitää ne ajantasalla, kaikki yhdessä siistissä pakkauksessa."
   },
   "app-marketing.hero.download-button": {
-    "message": "Lataa Modrinth App"
+    "message": "Lataa Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "Lataa Modrinth App"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "Lataa Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Lataa Modrinth App alustalle {os}"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "Lataa Icarus Launcher alustalle {os}"
   },
   "app-marketing.hero.more-download-options": {
     "message": "Lisää lataus vaihtoehtoja"
@@ -270,7 +270,7 @@
     "message": "Luo tili"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Luomalla tilin, hyväksyt Modrinthin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
+    "message": "Luomalla tilin, hyväksyt Icarusin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Salasanat eivät täsmää!"
@@ -279,7 +279,7 @@
     "message": "Onko sinulla jo käyttäjätili?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Tilaa päivityksiä Modrinthista"
+    "message": "Tilaa päivityksiä Icarusista"
   },
   "auth.sign-up.title": {
     "message": "Rekisteröidy"
@@ -321,13 +321,13 @@
     "message": "Vahvista sähköposti"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Tilaa päivityksiä Modrinthista"
+    "message": "Tilaa päivityksiä Icarusista"
   },
   "auth.welcome.label.tos": {
-    "message": "Luomalla tilin, olet hyväksynyt Modrinthin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
+    "message": "Luomalla tilin, olet hyväksynyt Icarusin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
   },
   "auth.welcome.long-title": {
-    "message": "Tervetuloa Modrinthiin!"
+    "message": "Tervetuloa Icarusiin!"
   },
   "auth.welcome.title": {
     "message": "Tervetuloa"
@@ -393,7 +393,7 @@
     "message": "Tämä kokelma saattaa olla yksityinen."
   },
   "error.collection.404.list_item.3": {
-    "message": "Tämä kokoelma on saatettu poistaa Modrinthin moderaatio tiimin toimesta koska se on <tou-link>Käyttöehtojamme</tou-link> vastaan."
+    "message": "Tämä kokoelma on saatettu poistaa Icarusin moderaatio tiimin toimesta koska se on <tou-link>Käyttöehtojamme</tou-link> vastaan."
   },
   "error.collection.404.list_title": {
     "message": "Miksi?"
@@ -485,8 +485,8 @@
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
   },
-  "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+  "landing.launcher.Icarus-app-label": {
+    "message": "Icarus Launcher"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -543,10 +543,10 @@
     "message": "Tuotteet"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Icarus Launcher"
   },
   "layout.footer.products.plus": {
-    "message": "Modrinth+"
+    "message": "Icarus+"
   },
   "layout.footer.resources": {
     "message": "Resurssit"
@@ -584,8 +584,8 @@
   "layout.nav.host-a-server": {
     "message": "Hostaa palvelin"
   },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+  "layout.nav.Icarus-app": {
+    "message": "Icarus Launcher"
   },
   "layout.nav.organizations": {
     "message": "Organisaatiot"
@@ -783,3 +783,5 @@
     "message": "Tuntematon käyttöjärjestelmä"
   }
 }
+
+

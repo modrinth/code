@@ -7,7 +7,7 @@ import {
 	languageSelectorMessages,
 	LOCALES,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { computed, ref, watch } from 'vue'
 
 import { get, set } from '@/helpers/settings.ts'
@@ -69,3 +69,4 @@ async function onLocaleChange(newLocale: string) {
 		:is-changing="$isChanging"
 	/>
 </template>
+

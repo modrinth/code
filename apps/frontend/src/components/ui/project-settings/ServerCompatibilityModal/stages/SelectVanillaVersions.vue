@@ -23,7 +23,7 @@
 						:disabled="!recommendedOptions.length"
 					/>
 					<div class="mt-2 text-secondary">
-						Players joining the server from the Modrinth App will connect using this version.
+						Players joining the server from Icarus Launcher will connect using this version.
 					</div>
 				</label>
 			</div>
@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { Combobox } from '@modrinth/ui'
+import { Combobox } from '@icarus/ui'
 import { computed, watch } from 'vue'
 
 import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'

@@ -269,14 +269,14 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
+import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@icarus/assets'
 import {
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	useFormatDateTime,
 	useFormatMoney,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
@@ -291,7 +291,7 @@ const formatDate = useFormatDateTime({ dateStyle: 'medium' })
 
 await useAuth()
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 type RevenueBarSegment = {
 	key: string
@@ -328,7 +328,7 @@ const messages = defineMessages({
 	},
 	estimatedTooltip2: {
 		id: 'dashboard.revenue.estimated-tooltip.msg2',
-		defaultMessage: 'Click to read about how Modrinth handles your revenue.',
+		defaultMessage: 'Click to read about how Icarus handles your revenue.',
 	},
 	processing: {
 		id: 'dashboard.revenue.processing',
@@ -359,7 +359,7 @@ const messages = defineMessages({
 	tosLabel: {
 		id: 'dashboard.revenue.tos',
 		defaultMessage:
-			'By uploading projects to Modrinth and withdrawing money from your account, you agree to our <terms-link>Rewards Program Terms</terms-link>. Learn more about the <info-link>Reward Program</info-link>.',
+			'By uploading projects to Icarus and withdrawing money from your account, you agree to our <terms-link>Rewards Program Terms</terms-link>. Learn more about the <info-link>Reward Program</info-link>.',
 	},
 	transactionsHeader: {
 		id: 'dashboard.revenue.transactions.header',
@@ -684,3 +684,4 @@ $flash-colors: 'green', 'blue', 'purple', 'orange', 'red', 'gray';
 	border-color: transparent !important;
 }
 </style>
+

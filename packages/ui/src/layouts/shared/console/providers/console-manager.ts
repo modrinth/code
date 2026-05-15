@@ -1,4 +1,4 @@
-import type { Mclogs } from '@modrinth/api-client'
+import type { Mclogs } from '@icarus/api-client'
 import type { ComputedRef, Ref } from 'vue'
 
 import { createContext } from '#ui/providers/create-context'

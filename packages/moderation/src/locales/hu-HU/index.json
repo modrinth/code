@@ -18,13 +18,13 @@
     "defaultMessage": "Adj hozzá egy Java Címet"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Adj meg minden releváns, a Modrinthon kívüli linket, például egy weboldalt, boltot vagy Discord-meghívót."
+    "defaultMessage": "Adj meg minden releváns, a Icaruson kívüli linket, például egy weboldalt, boltot vagy Discord-meghívót."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Adj hozzá külső linkeket"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Adj hozzá bármilyen releváns linket, amely a Modrinthon kívülre visz, mint például a forráskód, hibajelentő oldal vagy Discord meghívó."
+    "defaultMessage": "Adj hozzá bármilyen releváns linket, amely a Icaruson kívülre visz, mint például a forráskód, hibajelentő oldal vagy Discord meghívó."
   },
   "nags.add-links.title": {
     "defaultMessage": "Adj hozzá külső linkeket"
@@ -249,4 +249,5 @@
     "defaultMessage": "Látogasd meg a linkbeállításokat"
   }
 }
+
 

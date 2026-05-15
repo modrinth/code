@@ -116,8 +116,8 @@
 </template>
 
 <script lang="ts">
-import { ChevronRightIcon, SpinnerIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { ChevronRightIcon, SpinnerIcon } from '@icarus/assets'
+import { ButtonStyled, NewModal } from '@icarus/ui'
 import type { Component } from 'vue'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 

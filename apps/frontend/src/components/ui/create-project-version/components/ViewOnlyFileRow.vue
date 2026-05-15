@@ -18,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { FileIcon, FilePlusIcon } from '@modrinth/assets'
-import { TagItem } from '@modrinth/ui'
+import type { Labrinth } from '@icarus/api-client'
+import { FileIcon, FilePlusIcon } from '@icarus/assets'
+import { TagItem } from '@icarus/ui'
 
 import { fileTypeLabels } from '~/providers/version/manage-version-modal'
 

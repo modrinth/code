@@ -1,108 +1,15 @@
 {
-  "app.action-bar.downloading-java": {
-    "message": "Dina-download ang Java {version}"
-  },
-  "app.action-bar.downloads": {
-    "message": "Mga downloads"
-  },
-  "app.action-bar.hide-more-running-instances": {
-    "message": "Itago ang mas marami pang tumatakbong instansiya"
-  },
-  "app.action-bar.make-primary-instance": {
-    "message": "Gumawa ng pangunahing instansiya"
-  },
-  "app.action-bar.no-instances-running": {
-    "message": "Walang instansiya ang tumatakbo"
-  },
-  "app.action-bar.offline": {
-    "message": "Offline"
-  },
-  "app.action-bar.primary-instance": {
-    "message": "Pangunahing instansiya"
-  },
-  "app.action-bar.show-more-running-instances": {
-    "message": "Ipakita ang mas marami pang tumatakbong instansiya"
-  },
-  "app.action-bar.stop-instance": {
-    "message": "Itigil ang instansiya"
-  },
-  "app.action-bar.view-active-downloads": {
-    "message": "Tignan ang mga active downloads"
-  },
-  "app.action-bar.view-instance": {
-    "message": "Tignan ang instansiya"
-  },
-  "app.action-bar.view-logs": {
-    "message": "Tignan ang logs"
-  },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Pagpapagana ng masalimuot na pagrerender katulad ng paglalabo na maaaring magdudulot ng mga isyu sa performance kapag walang hardware-acceleration."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Masalimuot na pagrerender"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Piliin ang iyong mas gustong kulay para sa Modrinth app."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Tema ng kulay"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Pagpapalit ng pahina na bubuksan ng launcher."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Tahanan"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Librarya"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Panimulang pahina ng paglapag"
-  },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Pagtatago ng nametag na nasa itaas ng iyong manlalaro sa loob ng pahina ng mga skin."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Itago ang nametag"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Pagsasali ng mga kamakailang mundo sa seksiyong \"Jump back in\" sa pahina ng Tahanan."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Bumalik sa mga mundo"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Liitan ang launcher kung nag-start ang isang proseso ng Minecraft."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Liitin ang launcher"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Gamitin ang system window frame (kailangan i-restart ang app)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Native decorations"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Pumili ng opsiyon"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Pagpapagana na mata-toggle ang sidebar."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "I-toggle ang sidebar"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Kung susubukan mong mag-install ng Modrinth Pack file (.mrpack) na hindi naka-host sa Modrinth, titiyakin namin na nakaaalam ka sa mga panganib bago ito ma-install."
-  },
-  "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Pakipaalala bago ko ma-install ang mga di-kilalang modpack"
-  },
   "app.auth-servers.unreachable.body": {
     "message": "Maaaring hindi maaabot ang mga authentication server ng Minecraft sa ngayon. Tingnan mo ang iyong internet connection at muling subukan mamaya."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Hindi maabot ang mga authentication server"
+  },
+  "app.browse.add-server-to-instance": {
+    "message": "Idagdag ang server sa instansiya"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Idagdag ang mga server sa iyong instansiya"
   },
   "app.browse.add-to-instance": {
     "message": "Idagdag sa instansiya"
@@ -123,19 +30,13 @@
     "message": "Tumuklas ng mga server"
   },
   "app.browse.hide-added-servers": {
-    "message": "Itago ang mga nailagay na mga servers"
+    "message": "Taguin ang mga nadagdag na server"
   },
-  "app.browse.project-type.modpacks": {
-    "message": "Modpacks"
+  "app.browse.hide-installed-content": {
+    "message": "Taguin ang mga na-install na kontento"
   },
-  "app.browse.server.installing": {
-    "message": "Ini-install"
-  },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Ini-install ang modpack..."
+  "app.browse.install-content-to-instance": {
+    "message": "I-install ang kontento sa instansiya"
   },
   "app.export-modal.description-placeholder": {
     "message": "Ilagay ang paglalarawan ng modpack..."
@@ -146,9 +47,6 @@
   "app.export-modal.header": {
     "message": "Iluwas ang modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Salihin ang \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Pangalan ng Modpack"
   },
@@ -156,7 +54,7 @@
     "message": "Pangalan ng modpack"
   },
   "app.export-modal.select-files-label": {
-    "message": "Isaayos kung anong mga file ang isasali sa pagluwas"
+    "message": "Pumili ng mga talaksan at folder na isasali sa pack"
   },
   "app.export-modal.version-number-label": {
     "message": "Numero ng bersiyon"
@@ -209,15 +107,6 @@
   "app.instance.worlds.add-server": {
     "message": "Magdagdag ng server"
   },
-  "app.instance.worlds.browse-servers": {
-    "message": "Mag-browse ng servers"
-  },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' ay **permanenteng mabubura**, at walang paraan upang maibalik muli."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Sigurado ka bang gusto mong permanenteng burahin ang world na ito?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Modded"
   },
@@ -229,18 +118,6 @@
   },
   "app.instance.worlds.filter-vanilla": {
     "message": "Vanilla"
-  },
-  "app.instance.worlds.no-worlds-description": {
-    "message": "Maglagay ng server o mag-browse upang mag-simula"
-  },
-  "app.instance.worlds.no-worlds-heading": {
-    "message": "Walang servers o worlds ang nalalagay"
-  },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' ay matatangal sa iyong listahan, pati sa loob ng laro, at walang paraan upang maibalik ito."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) ay matatangal sa iyong listahan, pati sa loob ng laro, at walang paraan upang maibalik ito."
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Sigurado ka bang gusto mong tanggalin ang {name}?"
@@ -267,7 +144,7 @@
     "message": "Kinailangan na modpack"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ang server rna ito ay nangangailangan ng mga mod upang makalaro. Pindutin ang install upang maihanda ang mga kinakailangang file galing sa Modrinth, matapos ay ilunsad nang diretso sa server."
+    "message": "Ang server rna ito ay nangangailangan ng mga mod upang makalaro. Pindutin ang install upang maihanda ang mga kinakailangang file galing sa Icarus, matapos ay ilunsad nang diretso sa server."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Binahaging instansiya"
@@ -312,16 +189,16 @@
     "message": "Pamamahala ng paglalaan"
   },
   "app.update-popup.body": {
-    "message": "Ang Modrinth App v{version} ay handa nang ma-install. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Modrinth App."
+    "message": "Ang Icarus Launcher v{version} ay handa nang ma-install. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Icarus Launcher."
   },
   "app.update-popup.body.download-complete": {
-    "message": "Tapos nang ma-download ang Modrinth App v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Modrinth App."
+    "message": "Tapos nang ma-download ang Icarus Launcher v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Icarus Launcher."
   },
   "app.update-popup.body.linux": {
-    "message": "Magagamit na ngayon ang Modrinth App v{version}. Gamitin ang iyong package manager upang i-update sa pinabagong tampok at pag-aayos!"
+    "message": "Magagamit na ngayon ang Icarus Launcher v{version}. Gamitin ang iyong package manager upang i-update sa pinabagong tampok at pag-aayos!"
   },
   "app.update-popup.body.metered": {
-    "message": "Magagamit na ngayon ang Modrinth App v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
+    "message": "Magagamit na ngayon ang Icarus Launcher v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
   },
   "app.update-popup.changelog": {
     "message": "Changelog"
@@ -354,7 +231,7 @@
     "message": "Handang ma-install ang update"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "example.Icarus.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Pumili ng opsiyon"
@@ -362,14 +239,8 @@
   "app.world.world-item.incompatible-version": {
     "message": "Di-magkatugmang bersiyong {version}"
   },
-  "app.world.world-item.not-played-yet": {
-    "message": "Hindi pa nalalaro"
-  },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Magdagdag ng kaibigan"
@@ -387,10 +258,10 @@
     "message": "Maaaraing hindi pareho sa kanilang pangalan sa Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Ilagay ang username sa Modrinth..."
+    "message": "Ilagay ang username sa Icarus..."
   },
   "friends.add-friend.username.title": {
-    "message": "Ano ang pangalan ng iyong kaibigan sa Modrinth?"
+    "message": "Ano ang pangalan ng iyong kaibigan sa Icarus?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Magdagdag ng mga kaibigan</link> upang makita ang kanilang nilalaro!"
@@ -432,7 +303,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Mag-sign in sa Modrinth account</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
+    "message": "<link>Mag-sign in sa Icarus account</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
   },
   "instance.add-server.add-and-play": {
     "message": "Idagdag at laruin"
@@ -469,12 +340,6 @@
   },
   "instance.edit-world.title": {
     "message": "Baguhin ang mundo"
-  },
-  "instance.files.adding-files": {
-    "message": "Idinadagdag ang mga file ({completed}/{total})"
-  },
-  "instance.files.save-as": {
-    "message": "I-save bilang..."
   },
   "instance.server-modal.address": {
     "message": "Adres"
@@ -677,24 +542,6 @@
   "instance.worlds.world_in_use": {
     "message": "Ginagamit ang mundo"
   },
-  "minecraft-account.add-account": {
-    "message": "Maglagay ng account"
-  },
-  "minecraft-account.label": {
-    "message": "Minecraft account"
-  },
-  "minecraft-account.not-signed-in": {
-    "message": "Hindi pa naka sign in"
-  },
-  "minecraft-account.remove-account": {
-    "message": "Itanggal ang account"
-  },
-  "minecraft-account.select-account": {
-    "message": "Pumili ng account"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Mag sign in kay Minecraft"
-  },
   "search.filter.locked.instance": {
     "message": "Sagot na ng instansiya"
   },
@@ -718,26 +565,7 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Ang loader ay handog na ng server"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Ang file ay nasusuri lamang kapag ito ay na-upload sa Modrinth, walang pili sa file format nito (kabilang na ang .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Huwag ipakita ang babalang ito ulit"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Kumpirmahin ang installation"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "I-install parin"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Ang malware ay madalas naidadala sa mga modpack files sa pamamagitan ng pag-bigay ng mga ito sa mga platforms kagaya ng Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Hindi namin mahanap ang file na ito sa Modrinth. Mahalagang mag-install ka lamang ng files galing sa mga mapagkakatiwalang sources."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Hindi kilalang file"
   }
 }
+
+

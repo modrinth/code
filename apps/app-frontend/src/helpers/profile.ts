@@ -1,10 +1,10 @@
 /**
- * All theseus API calls return serialized values (both return values and errors);
+ * All pteron API calls return serialized values (both return values and errors);
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
-import type { Labrinth } from '@modrinth/api-client'
-import type { ContentItem, ContentOwner } from '@modrinth/ui'
+import type { Labrinth } from '@icarus/api-client'
+import type { ContentItem, ContentOwner } from '@icarus/ui'
 import { invoke } from '@tauri-apps/api/core'
 
 import { install_to_existing_profile } from '@/helpers/pack'
@@ -15,6 +15,7 @@ import type {
 	ContentFileProjectType,
 	GameInstance,
 	InstanceLoader,
+	InstanceSyncOverrides,
 } from './types'
 
 // Add instance
@@ -184,7 +185,7 @@ export async function update_project(path: string, projectPath: string): Promise
 
 // Add a project to a profile from a version
 // Returns a path to the new project file
-export type DownloadReason = 'standalone' | 'dependency' | 'modpack' | 'update'
+export type DownloadReason = 'standalone' | 'dependency' | 'modpack'
 
 export async function add_project_from_version(
 	path: string,
@@ -289,6 +290,17 @@ export async function edit(path: string, editProfile: Partial<GameInstance>): Pr
 // Edits a profile's icon
 export async function edit_icon(path: string, iconPath: string | null): Promise<void> {
 	return await invoke('plugin:profile|profile_edit_icon', { path, iconPath })
+}
+
+export async function set_sync_enabled(path: string, enabled: boolean): Promise<void> {
+	return await invoke('plugin:profile-sync|profile_set_sync_enabled', { path, enabled })
+}
+
+export async function set_sync_overrides(
+	path: string,
+	overrides: InstanceSyncOverrides | null,
+): Promise<void> {
+	return await invoke('plugin:profile-sync|profile_set_sync_overrides', { path, overrides })
 }
 
 export async function finish_install(instance: GameInstance): Promise<void> {

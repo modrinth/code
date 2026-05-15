@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Modrinth App 的 Linux 版本在特定系統與設定上<issues-link>已知存在問題</issues-link>。若 Modrinth App 在你的系統上執行不穩定，我們建議你嘗試使用 <prism-link>Prism Launcher</prism-link> 等其他應用程式，以輕鬆安裝 Modrinth 的內容。"
+    "message": "Icarus Launcher 的 Linux 版本在特定系統與設定上<issues-link>已知存在問題</issues-link>。若 Icarus Launcher 在你的系統上執行不穩定，我們建議你嘗試使用 <prism-link>Prism Launcher</prism-link> 等其他應用程式，以輕鬆安裝 Icarus 的內容。"
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -39,10 +39,10 @@
     "message": "下載選項"
   },
   "app-marketing.download.terms": {
-    "message": "下載 Modrinth App，即表示您同意我們的《<terms-link>使用條款</terms-link>》及《<privacy-link>隱私權政策</privacy-link>》。"
+    "message": "下載 Icarus Launcher，即表示您同意我們的《<terms-link>使用條款</terms-link>》及《<privacy-link>隱私權政策</privacy-link>》。"
   },
   "app-marketing.download.title": {
-    "message": "下載 Modrinth App（Beta 版）"
+    "message": "下載 Icarus Launcher（Beta 版）"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "追蹤專案"
   },
   "app-marketing.features.importing.description": {
-    "message": "從你之前使用的啟動器匯入所有喜愛的設定檔，幾秒鐘內即可輕鬆上手 Modrinth App！"
+    "message": "從你之前使用的啟動器匯入所有喜愛的設定檔，幾秒鐘內即可輕鬆上手 Icarus Launcher！"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "作者：{author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth 讓你可以輕鬆集中管理所有模組。你可以一鍵安裝、移除及更新模組。"
+    "message": "Icarus 讓你可以輕鬆集中管理所有模組。你可以一鍵安裝、移除及更新模組。"
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "已安裝模組"
@@ -96,7 +96,7 @@
     "message": "離線模式"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth App 完全開源。你可以在我們的 <github-link>GitHub</github-link> 上查看原始碼！"
+    "message": "Icarus Launcher 完全開源。你可以在我們的 <github-link>GitHub</github-link> 上查看原始碼！"
   },
   "app-marketing.features.open-source.title": {
     "message": "開放原始碼"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App 的效能優於許多主流的模組管理員，且僅使用 150 MB 記憶體！"
+    "message": "Icarus Launcher 的效能優於許多主流的模組管理員，且僅使用 150 MB 記憶體！"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -128,8 +128,8 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
-  "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth App"
+  "app-marketing.features.performance.Icarus-app": {
+    "message": "Icarus Launcher"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "10 億 %"
@@ -147,13 +147,13 @@
     "message": "高效能"
   },
   "app-marketing.features.play.description": {
-    "message": "使用 Modrinth App 下載並遊玩你喜愛的模組和模組包。"
+    "message": "使用 Icarus Launcher 下載並遊玩你喜愛的模組和模組包。"
   },
   "app-marketing.features.play.title": {
     "message": "遊玩你喜愛的模組"
   },
   "app-marketing.features.sharing.description": {
-    "message": "透過 Modrinth 上託管的數千種模組與模組包，建立、分享並遊玩你的模組包。"
+    "message": "透過 Icarus 上託管的數千種模組與模組包，建立、分享並遊玩你的模組包。"
   },
   "app-marketing.features.sharing.modpack": {
     "message": "模組包"
@@ -168,7 +168,7 @@
     "message": "前所未有的"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App 已與網站完全整合，因此你可透過應用程式存取所有喜愛的專案！"
+    "message": "Icarus Launcher 已與網站完全整合，因此你可透過應用程式存取所有喜愛的專案！"
   },
   "app-marketing.features.website.title": {
     "message": "網站整合"
@@ -177,19 +177,19 @@
     "message": "啟動器體驗"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Modrinth App 的螢幕擷取畫面，顯示已開啟 Cobblemon 實例的「內容」頁面。"
+    "message": "Icarus Launcher 的螢幕擷取畫面，顯示已開啟 Cobblemon 實例的「內容」頁面。"
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App 是一款獨特的開源啟動器，它讓你可以輕鬆遊玩並保持你喜愛模組的最新狀態，所有功能都整合在一個簡潔小巧的應用程式中。"
+    "message": "Icarus Launcher 是一款獨特的開源啟動器，它讓你可以輕鬆遊玩並保持你喜愛模組的最新狀態，所有功能都整合在一個簡潔小巧的應用程式中。"
   },
   "app-marketing.hero.download-button": {
-    "message": "下載 Modrinth App"
+    "message": "下載 Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "下載 Modrinth App"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "下載 Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "下載適用於 {os} 的 Modrinth App"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "下載適用於 {os} 的 Icarus Launcher"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Cobblemon 實例主選單的螢幕擷取畫面。"
@@ -282,7 +282,7 @@
     "message": "建立帳號"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "建立帳號即表示您同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
+    "message": "建立帳號即表示您同意 Icarus 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "密碼不相符！"
@@ -291,7 +291,7 @@
     "message": "已經有帳號了？"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "訂閱 Modrinth 的最新消息"
+    "message": "訂閱 Icarus 的最新消息"
   },
   "auth.sign-up.title": {
     "message": "註冊"
@@ -333,16 +333,16 @@
     "message": "驗證電子郵件"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "訂閱 Modrinth 的最新消息"
+    "message": "訂閱 Icarus 的最新消息"
   },
   "auth.welcome.description": {
     "message": "你現在已加入由創作者與探索者組成的精彩社群，大家都在積極打造、下載並持續掌握優質模組的最新動態。"
   },
   "auth.welcome.label.tos": {
-    "message": "建立帳號即表示您已同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
+    "message": "建立帳號即表示您已同意 Icarus 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
   },
   "auth.welcome.long-title": {
-    "message": "歡迎使用 Modrinth！"
+    "message": "歡迎來到 Icarus！"
   },
   "auth.welcome.title": {
     "message": "歡迎"
@@ -369,10 +369,10 @@
     "message": "這將永久刪除這個收藏。此動作無法復原。"
   },
   "collection.delete-modal.title": {
-    "message": "確定要刪除這個收藏嗎？"
+    "message": "你確定要刪除這個收藏嗎？"
   },
   "collection.description": {
-    "message": "{description} — 前往 Modrinth 查看 {username} 的收藏「{name}」"
+    "message": "{description} — 前往 Icarus 查看 {username} 的收藏「{name}」"
   },
   "collection.description.following": {
     "message": "由系統自動產生的收藏，包含你正在追蹤的所有專案。"
@@ -555,7 +555,7 @@
     "message": "建立聯盟連結"
   },
   "dashboard.affiliate-links.empty.no-codes": {
-    "message": "找不到聯盟代碼。"
+    "message": "未找到推廣代碼。"
   },
   "dashboard.affiliate-links.error.title": {
     "message": "載入聯盟連結時發生錯誤"
@@ -570,19 +570,19 @@
     "message": "撤銷"
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "確定要撤銷「{title}」聯盟連結嗎？"
+    "message": "你確定要撤銷「{title}」聯盟連結嗎？"
   },
   "dashboard.affiliate-links.search": {
     "message": "搜尋聯盟連結..."
   },
   "dashboard.analytics.from-projects": {
-    "message": "來自 {count} 個專案"
+    "message": "來自 {count} {count, plural, one {project} other {projects}}"
   },
   "dashboard.analytics.total-downloads": {
     "message": "總下載量"
   },
   "dashboard.analytics.total-followers": {
-    "message": "總追蹤者人數"
+    "message": "總關注者"
   },
   "dashboard.collections.button.create-new": {
     "message": "新增"
@@ -609,13 +609,13 @@
     "message": "你的收藏"
   },
   "dashboard.collections.placeholder.search": {
-    "message": "搜尋收藏..."
+    "message": "搜尋收藏集…"
   },
   "dashboard.collections.sort.name-ascending": {
-    "message": "名稱（A-Z）"
+    "message": "姓名（A-Z）"
   },
   "dashboard.collections.sort.recently-created": {
-    "message": "最近建立"
+    "message": "最近創建"
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "最近更新"
@@ -648,7 +648,7 @@
     "message": "稅務表單"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth 透過第三方供應商 Track1099 安全地收集及儲存你的稅務表單。<security-link>在這裡了解更多。</security-link>"
+    "message": "Icarus 透過第三方供應商 Track1099 安全地收集及儲存你的稅務表單。<security-link>在這裡了解更多。</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "安全措施"
@@ -813,7 +813,7 @@
     "message": "如要提領全額可用餘額 <b>{available}</b>，請先完成下方表單。此為稅務申報所需，僅需設定一次即可。"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "你必須填寫 W-9 或 W-8 表單以供 Modrinth 的稅務紀錄使用，以便我們符合稅務法規。"
+    "message": "你必須填寫 W-9 或 W-8 表單以供 Icarus 的稅務紀錄使用，以便我們符合稅務法規。"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "需提交稅務表單"
@@ -855,7 +855,7 @@
     "message": "未驗證的電子郵件"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "你輸入的收件電子郵件地址與你的 Modrinth 帳號並無關聯。若獎勵已寄送至錯誤的電子郵件地址，Modrinth 將無法協助追回。"
+    "message": "你輸入的收件電子郵件地址與你的 Icarus 帳號並無關聯。若獎勵已寄送至錯誤的電子郵件地址，Icarus 將無法協助追回。"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "可享受較低的手續費"
@@ -879,7 +879,7 @@
     "message": "全部標記為已讀"
   },
   "dashboard.notifications.button.view-history": {
-    "message": "查看紀錄"
+    "message": "查看歷史記錄"
   },
   "dashboard.notifications.empty.no-unread": {
     "message": "您沒有任何未讀通知。"
@@ -888,151 +888,22 @@
     "message": "載入通知時發生錯誤："
   },
   "dashboard.notifications.history.label": {
-    "message": "紀錄"
+    "message": "歷史"
   },
   "dashboard.notifications.history.title": {
-    "message": "通知紀錄"
+    "message": "通知歷史記錄"
   },
   "dashboard.notifications.link.see-all": {
-    "message": "查看全部"
+    "message": "看全部"
   },
   "dashboard.notifications.link.view-history": {
-    "message": "查看通知紀錄"
+    "message": "查看通知記錄"
   },
   "dashboard.notifications.link.view-more": {
-    "message": "查看另外 {extraNotifs} 則通知"
+    "message": "看更多 {extraNotifs} 條 {extraNotifs, plural, one {通知} other {通知}}"
   },
   "dashboard.notifications.loading": {
-    "message": "正在載入通知..."
-  },
-  "dashboard.organizations.button.create": {
-    "message": "建立組織"
-  },
-  "dashboard.organizations.empty.cta": {
-    "message": "建立組織！"
-  },
-  "dashboard.organizations.error.fetch": {
-    "message": "無法取得組織資訊"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count} {count, plural,one {成員} other {成員}}"
-  },
-  "dashboard.organizations.title": {
-    "message": "組織"
-  },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "您可以透過在下方選擇項目來同時編輯多個項目。"
-  },
-  "dashboard.projects.bulk-edit.server-disabled": {
-    "message": "伺服器專案不支援大量編輯"
-  },
-  "dashboard.projects.empty": {
-    "message": "您目前還沒有任何項目。點擊上方綠色按鈕開始。"
-  },
-  "dashboard.projects.head-title": {
-    "message": "專案"
-  },
-  "dashboard.projects.links.and-more": {
-    "message": "{count}還有更多…"
-  },
-  "dashboard.projects.links.button.clear-link": {
-    "message": "清晰連結"
-  },
-  "dashboard.projects.links.button.edit": {
-    "message": "編輯連結"
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "更改將應用於<strong>{count}</strong>{count, plural,one {專案} other {專案}}。"
-  },
-  "dashboard.projects.links.description": {
-    "message": "您在下方指定的任何連結都將被覆蓋到每個選定的項目中。留空的連結將被忽略。您可以使用垃圾桶按鈕從所有選定的項目中清除連結。"
-  },
-  "dashboard.projects.links.discord-invite.description": {
-    "message": "您的 Discord 伺服器邀請連結。"
-  },
-  "dashboard.projects.links.discord-invite.label": {
-    "message": "Discord 邀請"
-  },
-  "dashboard.projects.links.issue-tracker.description": {
-    "message": "供使用者回報關於你專案的錯誤、問題與疑慮之處。"
-  },
-  "dashboard.projects.links.issue-tracker.label": {
-    "message": "問題追蹤器"
-  },
-  "dashboard.projects.links.placeholder.cleared": {
-    "message": "將清除現有的連結"
-  },
-  "dashboard.projects.links.placeholder.valid-discord-url": {
-    "message": "輸入有效的 Discord 邀請網址"
-  },
-  "dashboard.projects.links.placeholder.valid-url": {
-    "message": "輸入有效的網址"
-  },
-  "dashboard.projects.links.show-all-projects": {
-    "message": "顯示所有專案"
-  },
-  "dashboard.projects.links.source-code.description": {
-    "message": "包含你專案原始碼的頁面或儲存庫"
-  },
-  "dashboard.projects.links.source-code.label": {
-    "message": "原始碼"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "包含專案資訊、文件及說明的頁面。"
-  },
-  "dashboard.projects.links.wiki-page.label": {
-    "message": "Wiki 頁面"
-  },
-  "dashboard.projects.notification.bulk-edit-success": {
-    "message": "已批次編輯所選專案的連結。"
-  },
-  "dashboard.projects.project.icon-alt": {
-    "message": "{title} 的圖示"
-  },
-  "dashboard.projects.project.moderator-message-aria": {
-    "message": "專案有一則來自管理員的訊息。請查看專案以了解更多資訊。"
-  },
-  "dashboard.projects.project.review-environment-metadata": {
-    "message": "請審查環境詮釋資料"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "遞增"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "遞減"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "名稱"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "狀態"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "類型"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "圖示"
-  },
-  "dashboard.projects.table.id": {
-    "message": "ID"
-  },
-  "dashboard.projects.table.name": {
-    "message": "名稱"
-  },
-  "dashboard.projects.table.status": {
-    "message": "狀態"
-  },
-  "dashboard.projects.table.type": {
-    "message": "類型"
-  },
-  "dashboard.report.title": {
-    "message": "檢舉 {id}"
-  },
-  "dashboard.reports.active-title": {
-    "message": "處理中的檢舉"
-  },
-  "dashboard.reports.title": {
-    "message": "檢舉"
+    "message": "正在載入通知…"
   },
   "dashboard.revenue.available-now": {
     "message": "可提領"
@@ -1044,7 +915,7 @@
     "message": "預估收益在開放領取前可能有所變動。"
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "按這裡了解 Modrinth 如何處理你的收入。"
+    "message": "按這裡了解 Icarus 如何處理你的收入。"
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "預計時間：{date}"
@@ -1065,13 +936,10 @@
     "message": "提領"
   },
   "dashboard.revenue.tos": {
-    "message": "透過上傳專案至 Modrinth 並從您的帳號中提領款項，即表示您同意我們的《<terms-link>獎勵計畫條款</terms-link>》。請了解更多關於《<info-link>獎勵計畫</info-link>》的資訊。"
+    "message": "透過上傳專案至 Icarus 並從您的帳號中提領款項，即表示您同意我們的《<terms-link>獎勵計畫條款</terms-link>》。請了解更多關於《<info-link>獎勵計畫</info-link>》的資訊。"
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "下載為 CSV 檔案"
-  },
-  "dashboard.revenue.transactions.head-title": {
-    "message": "交易紀錄"
   },
   "dashboard.revenue.transactions.header": {
     "message": "交易"
@@ -1082,17 +950,8 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "你的付款和提領紀錄將顯示在這裡。"
   },
-  "dashboard.revenue.transactions.period.last-month": {
-    "message": "上個月"
-  },
-  "dashboard.revenue.transactions.period.this-month": {
-    "message": "這個月"
-  },
   "dashboard.revenue.transactions.see-all": {
     "message": "查看全部"
-  },
-  "dashboard.revenue.transactions.year.all": {
-    "message": "所有年份"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "由於你的稅務識別碼 (TIN) 或社會安全號碼 (SSN) 與美國國稅局 (IRS) 的紀錄不符，你的提領功能已暫時鎖定。請聯絡客服以重設並重新提交你的稅務表單。"
@@ -1105,33 +964,6 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "提領"
-  },
-  "dashboard.sidebar.label.activeReports": {
-    "message": "處理中的檢舉"
-  },
-  "dashboard.sidebar.label.analytics": {
-    "message": "數據分析"
-  },
-  "dashboard.sidebar.label.creators": {
-    "message": "創作者"
-  },
-  "dashboard.sidebar.label.dashboard": {
-    "message": "資訊主頁"
-  },
-  "dashboard.sidebar.label.notifications": {
-    "message": "通知"
-  },
-  "dashboard.sidebar.label.organizations": {
-    "message": "組織"
-  },
-  "dashboard.sidebar.label.overview": {
-    "message": "總覽"
-  },
-  "dashboard.sidebar.label.projects": {
-    "message": "專案"
-  },
-  "dashboard.sidebar.label.revenue": {
-    "message": "收益"
   },
   "dashboard.withdraw.completion.account": {
     "message": "帳戶"
@@ -1229,24 +1061,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "請填寫稅務表單"
   },
-  "discover.install.back-to-server": {
-    "message": "回到伺服器"
-  },
-  "discover.install.back-to-setup": {
-    "message": "回到設定"
-  },
-  "discover.install.cancel-reset": {
-    "message": "取消重設"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "沒有可安裝的伺服器世界。"
-  },
-  "discover.install.error.unsupported-content-type": {
-    "message": "無法從瀏覽頁面將這類內容類型安裝至伺服器。"
-  },
-  "discover.install.heading.reset-modpack": {
-    "message": "在重設後選擇要安裝的模組包"
-  },
   "error.collection.404.list_item.1": {
     "message": "你可能輸錯了該收藏的網址。"
   },
@@ -1254,19 +1068,13 @@
     "message": "該收藏可能已設為私人。"
   },
   "error.collection.404.list_item.3": {
-    "message": "該收藏可能因違反我們的《<tou-link>使用條款</tou-link>》，已被 Modrinth 的管理團隊下架。"
+    "message": "該收藏可能因違反我們的《<tou-link>使用條款</tou-link>》，已被 Icarus 的管理團隊下架。"
   },
   "error.collection.404.list_title": {
     "message": "原因："
   },
   "error.collection.404.title": {
     "message": "找不到收藏"
-  },
-  "error.generic.401.signed-in-as": {
-    "message": "你目前登入的帳號："
-  },
-  "error.generic.401.title": {
-    "message": "你沒有這個頁面的存取權"
   },
   "error.generic.404.subtitle": {
     "message": "你要找的頁面似乎不存在。"
@@ -1281,10 +1089,10 @@
     "message": "因法律原因無法提供內容"
   },
   "error.generic.default.list_item.1": {
-    "message": "前往我們的<status-link>狀態頁面</status-link>，查看 Modrinth 是否停機。"
+    "message": "前往我們的<status-link>狀態頁面</status-link>，查看 Icarus 是否停機。"
   },
   "error.generic.default.list_item.2": {
-    "message": "如果這個問題持續發生，你或許會想加入我們的 <discord-link>Discord 伺服器</discord-link>，通知 Modrinth 團隊。"
+    "message": "如果這個問題持續發生，你或許會想加入我們的 <discord-link>Discord 伺服器</discord-link>，通知 Icarus 團隊。"
   },
   "error.generic.default.list_title": {
     "message": "請在幾分鐘後再試一次。"
@@ -1302,7 +1110,7 @@
     "message": "該組織的擁有者可能已變更網址或已將其刪除。"
   },
   "error.organization.404.list_item.3": {
-    "message": "該組織可能因違反我們的《<tou-link>使用條款</tou-link>》，已被 Modrinth 的管理團隊下架。"
+    "message": "該組織可能因違反我們的《<tou-link>使用條款</tou-link>》，已被 Icarus 的管理團隊下架。"
   },
   "error.organization.404.list_title": {
     "message": "原因："
@@ -1317,7 +1125,7 @@
     "message": "該專案的擁有者可能已變更網址或已將其刪除。"
   },
   "error.project.404.list_item.3": {
-    "message": "該專案可能因違反我們的《<tou-link>使用條款</tou-link>》，已被 Modrinth 的管理團隊下架。"
+    "message": "該專案可能因違反我們的《<tou-link>使用條款</tou-link>》，已被 Icarus 的管理團隊下架。"
   },
   "error.project.404.list_title": {
     "message": "原因："
@@ -1332,7 +1140,7 @@
     "message": "該使用者可能已變更使用者名稱或已刪除帳號。"
   },
   "error.user.404.list_item.3": {
-    "message": "該使用者的帳號可能因違反 Modrinth 的《<tou-link>使用條款</tou-link>》，已被終止。"
+    "message": "該使用者的帳號可能因違反 Icarus 的《<tou-link>使用條款</tou-link>》，已被終止。"
   },
   "error.user.404.list_title": {
     "message": "原因："
@@ -1374,10 +1182,10 @@
     "message": "當你的伺服器負載較重時，我們會暫時讓它使用額外的 CPU 執行緒，幫你緩解延遲飆升與不穩定的情況。這能防止 TPS（每秒刻數）低於 20，確保遊戲體驗盡可能流暢。由於這些額外的 CPU 執行緒只會在高負載期間短暫提供，因此可能不會出現在 Spark 報告或其他效能分析工具中。"
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Modrinth Hosting 伺服器執行於哪種 CPU？"
+    "message": "Icarus Hosting 伺服器執行於哪種 CPU？"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting 伺服器搭載 AMD Ryzen 7900 與 7950X3D 同等級的高效能 CPU，時脈達 5 GHz 以上，並搭配 DDR5 記憶體。"
+    "message": "Icarus Hosting 伺服器搭載 AMD Ryzen 7900 與 7950X3D 同等級的高效能 CPU，時脈達 5 GHz 以上，並搭配 DDR5 記憶體。"
   },
   "hosting-marketing.faq.currency": {
     "message": "價格是以哪種貨幣計算？"
@@ -1386,19 +1194,19 @@
     "message": "所有價格均以美金 (USD) 標示。"
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "Modrinth Hosting 伺服器有 DDoS 防護嗎？"
+    "message": "Icarus Hosting 伺服器有 DDoS 防護嗎？"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "有的。所有 Modrinth Hosting 伺服器都具備 DDoS 防護，部分地區的防禦容量最高可達 17 Tbps。"
+    "message": "有的。所有 Icarus Hosting 伺服器都具備 DDoS 防護，部分地區的防禦容量最高可達 17 Tbps。"
   },
   "hosting-marketing.faq.heading": {
     "message": "常見問題"
   },
   "hosting-marketing.faq.how-fast": {
-    "message": "Modrinth Hosting 伺服器的速度有多快？"
+    "message": "Icarus Hosting 伺服器的速度有多快？"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Modrinth Hosting 伺服器託管於非常現代的高效能硬體上，但很難確切說明這會如何反映在你的伺服器速度上，因為影響因素很多，像是你在伺服器上執行的模組、資料包、插件，甚至是玩家的行為。"
+    "message": "Icarus Hosting 伺服器託管於非常現代的高效能硬體上，但很難確切說明這會如何反映在你的伺服器速度上，因為影響因素很多，像是你在伺服器上執行的模組、資料包、插件，甚至是玩家的行為。"
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "大部分的效能問題通常是出自未經最佳化的模組包、模組、資料包或插件，進而導致伺服器卡頓。由於我們的伺服器規格非常高階，只要你針對執行的內容選擇適合的方案，通常不會遇到什麼麻煩。"
@@ -1407,10 +1215,10 @@
     "message": "我可以增加伺服器的儲存空間嗎？"
   },
   "hosting-marketing.faq.increase-storage.answer": {
-    "message": "可以，你可以增加伺服器的儲存空間，而且完全不需要額外費用。如果你需要更多儲存空間，請聯絡 Modrinth 支援團隊。"
+    "message": "可以，你可以增加伺服器的儲存空間，而且完全不需要額外費用。如果你需要更多儲存空間，請聯絡 Icarus 支援團隊。"
   },
   "hosting-marketing.faq.location": {
-    "message": "Modrinth Hosting 伺服器位於哪裡？我可以選擇區域嗎？"
+    "message": "Icarus Hosting 伺服器位於哪裡？我可以選擇區域嗎？"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "我們目前在北美、歐洲與東南亞設有伺服器，你可以在購買時選擇。未來還會推出更多區域！如果你想切換區域，請聯絡支援團隊。"
@@ -1419,7 +1227,7 @@
     "message": "可以使用哪些 Minecraft 版本與載入器？"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Modrinth Hosting 伺服器支援自 1.2.5 起的任何 Minecraft Java 版版本，包含快照版本也能執行。"
+    "message": "Icarus Hosting 伺服器支援自 1.2.5 起的任何 Minecraft Java 版版本，包含快照版本也能執行。"
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "我們也支援多種模組與插件載入器，模組包含 Fabric、Quilt、Forge 與 NeoForge，插件則支援 Paper 與 Purpur。支援狀況取決於該載入器是否支援你選擇的 Minecraft 版本。"
@@ -1436,11 +1244,11 @@
   "hosting-marketing.hero.button.start-your-server": {
     "message": "立即啟動你的伺服器"
   },
-  "hosting-marketing.hero.host-with-modrinth": {
-    "message": "使用 Modrinth Hosting 託⁠管你的下一個伺服器"
+  "hosting-marketing.hero.host-with-Icarus": {
+    "message": "使用 Icarus Hosting 託⁠管你的下一個伺服器"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting 可讓你用最簡單的方式，託管個人的 Minecraft Java 版伺服器。你可以直接在 Modrinth 平臺內，無縫安裝並暢玩你喜愛的模組與模組包。"
+    "message": "Icarus Hosting 可讓你用最簡單的方式，託管個人的 Minecraft Java 版伺服器。你可以直接在 Icarus 平臺內，無縫安裝並暢玩你喜愛的模組與模組包。"
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "進階網路管理"
@@ -1458,10 +1266,10 @@
     "message": "自訂網址"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "使用自訂的 <contrast>modrinth.gg</contrast> 網址分享你的伺服器。"
+    "message": "使用自訂的 <contrast>Icarus.gg</contrast> 網址分享你的伺服器。"
   },
   "hosting-marketing.included.description": {
-    "message": "每個伺服器都隨附一系列功能，旨在提供唯有 Modrinth 才能帶給你的託管體驗。"
+    "message": "每個伺服器都隨附一系列功能，旨在提供唯有 Icarus 才能帶給你的託管體驗。"
   },
   "hosting-marketing.included.file-manager": {
     "message": "直覺好用的檔案管理員"
@@ -1476,19 +1284,19 @@
     "message": "隨時為你提供協助"
   },
   "hosting-marketing.included.help.description": {
-    "message": "隨時聯絡 Modrinth 團隊來取得伺服器相關協助。"
+    "message": "隨時聯絡 Icarus 團隊來取得伺服器相關協助。"
   },
   "hosting-marketing.included.powerful-console": {
     "message": "強大的主控臺、伺服器設定檔管理員，以及更多功能"
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "Modrinth Hosting 配備了多樣強大工具，讓你輕鬆管理你的伺服器。"
+    "message": "Icarus Hosting 配備了多樣強大工具，讓你輕鬆管理你的伺服器。"
   },
   "hosting-marketing.included.sftp-access": {
     "message": "SFTP 存取"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "透過 Modrinth Hosting 內建的 SFTP 功能，直接存取你的伺服器檔案。"
+    "message": "透過 Icarus Hosting 內建的 SFTP 功能，直接存取你的伺服器檔案。"
   },
   "hosting-marketing.included.with-your-server": {
     "message": "伺服器內含功能"
@@ -1511,20 +1319,20 @@
   "hosting-marketing.server-for-everyone": {
     "message": "適合每個人的方案"
   },
-  "hosting-marketing.why.all-on-modrinth": {
-    "message": "在 Modrinth 統籌管理一切"
+  "hosting-marketing.why.all-on-Icarus": {
+    "message": "在 Icarus 統籌管理一切"
   },
-  "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "你的伺服器、模組、玩家等所有資訊都在 Modrinth 上，不需要在多個平臺間切換。"
+  "hosting-marketing.why.all-on-Icarus.description": {
+    "message": "你的伺服器、模組、玩家等所有資訊都在 Icarus 上，不需要在多個平臺間切換。"
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "始終如一的高速體驗"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "我們的基礎設施絕不過載，這表示你在 Modrinth 託管的伺服器永遠都能發揮完整效能。"
+    "message": "我們的基礎設施絕不過載，這表示你在 Icarus 託管的伺服器永遠都能發揮完整效能。"
   },
   "hosting-marketing.why.description": {
-    "message": "從 Modrinth 上的數千個模組包中挑選，或是打造你專屬的組合。準備好遊玩時，直接邀請你的好友加入。"
+    "message": "從 Icarus 上的數千個模組包中挑選，或是打造你專屬的組合。準備好遊玩時，直接邀請你的好友加入。"
   },
   "hosting-marketing.why.heading": {
     "message": "找到模組包，秒變伺服器。"
@@ -1533,22 +1341,22 @@
     "message": "體驗現代且可靠的託管服務"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Modrinth Hosting 伺服器採用<contrast>高效能 AMD CPU 與 DDR5 記憶體</contrast>，並執行於自研軟體之上，確保你的伺服器執行流暢。"
+    "message": "Icarus Hosting 伺服器採用<contrast>高效能 AMD CPU 與 DDR5 記憶體</contrast>，並執行於自研軟體之上，確保你的伺服器執行流暢。"
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "在模組所在之處盡情暢玩"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting 將模組與模組包的安裝流程完美整合到你的伺服器中。"
+    "message": "Icarus Hosting 將模組與模組包的安裝流程完美整合到你的伺服器中。"
   },
-  "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "為什麼選擇 Modrinth Hosting？"
+  "hosting-marketing.why.why-Icarus-hosting": {
+    "message": "為什麼選擇 Icarus Hosting？"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "所有你喜愛的模組通通都有"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "自由選擇原版、Fabric、Forge、Quilt 或 NeoForge。只要在 Modrinth 上找得到的，都能在你的伺服器上執行。"
+    "message": "自由選擇原版、Fabric、Forge、Quilt 或 NeoForge。只要在 Icarus 上找得到的，都能在你的伺服器上執行。"
   },
   "hosting.plan.out-of-stock": {
     "message": "缺貨"
@@ -1563,7 +1371,7 @@
     "message": "前往資訊主頁"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "透過 Modrinth 團隊持續不斷的更新，享受最佳的模組體驗"
+    "message": "透過 Icarus 團隊持續不斷的更新，享受最佳的模組體驗"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "持續進化"
@@ -1608,13 +1416,13 @@
     "message": "追蹤你喜愛的專案"
   },
   "landing.feature.launcher.description": {
-    "message": "Modrinth 的開源 API 讓啟動器能夠深度整合 Modrinth。你可以透過<link>我們的應用程式</link>，以及 ATLauncher、MultiMC 和 Prism Launcher 等熱門啟動器使用 Modrinth。"
+    "message": "Icarus 的開源 API 讓啟動器能夠深度整合 Icarus。你可以透過<link>我們的應用程式</link>，以及 ATLauncher、MultiMC 和 Prism Launcher 等熱門啟動器使用 Icarus。"
   },
   "landing.feature.launcher.heading": {
     "message": "使用你偏好的啟動器遊玩"
   },
   "landing.feature.search.description": {
-    "message": "Modrinth 快如閃電的搜尋與強大的篩選功能，讓你能隨打即找。"
+    "message": "Icarus 快如閃電的搜尋與強大的篩選功能，讓你能隨打即找。"
   },
   "landing.feature.search.heading": {
     "message": "輕鬆快速找到你想要的內容"
@@ -1647,10 +1455,10 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "一個簡化的 Minecraft 視窗圖片，其中 Mojang Studios 標誌採用 Modrinth 綠色。"
+    "message": "一個簡化的 Minecraft 視窗圖片，其中 Mojang Studios 標誌採用 Icarus 綠色。"
   },
-  "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+  "landing.launcher.Icarus-app-label": {
+    "message": "Icarus Launcher"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1694,9 +1502,6 @@
   "layout.action.create-new": {
     "message": "新增..."
   },
-  "layout.action.external-projects": {
-    "message": "外部專案"
-  },
   "layout.action.file-lookup": {
     "message": "檔案查詢"
   },
@@ -1734,7 +1539,7 @@
     "message": "技術審查"
   },
   "layout.avatar.alt": {
-    "message": "你的顯示圖片"
+    "message": "你的頭貼"
   },
   "layout.banner.account-action": {
     "message": "帳號需採取行動"
@@ -1743,25 +1548,25 @@
     "message": "前往帳號設定"
   },
   "layout.banner.add-email.description": {
-    "message": "為了安全起見，Modrinth 需要你為帳號註冊電子郵件地址。"
+    "message": "為了安全起見，Icarus 需要你為帳號註冊電子郵件地址。"
   },
   "layout.banner.build-fail.description": {
-    "message": "Modrinth 的前端無法從 API 取得資料，導致本次部署失敗。這可能是服務中斷或設定錯誤所致。請在 API 恢復可用時，再重新嘗試。錯誤碼：{errors}；目前的 API 網址是：{url}"
+    "message": "Icarus 的前端無法從 API 取得資料，導致本次部署失敗。這可能是服務中斷或設定錯誤所致。請在 API 恢復可用時，再重新嘗試。錯誤碼：{errors}；目前的 API 網址是：{url}"
   },
   "layout.banner.build-fail.title": {
     "message": "建構時無法從 API 取得狀態資料。"
   },
   "layout.banner.preview.description": {
-    "message": "如果你是想前往 Modrinth 的官方網站，請前往 <link>https://modrinth.com</link>。這個預覽部署版本僅供 Modrinth 工作人員測試使用。它是基於 <branch-link>{owner}/{branch}</branch-link> @ {commit} 建構而成。"
+    "message": "如果你是想前往 Icarus 的官方網站，請前往 <link>https://Icarus.com</link>。這個預覽部署版本僅供 Icarus 工作人員測試使用。它是基於 <branch-link>{owner}/{branch}</branch-link> @ {commit} 建構而成。"
   },
   "layout.banner.preview.title": {
-    "message": "這是 Modrinth 網站的預覽部署版本。"
+    "message": "這是 Icarus 網站的預覽部署版本。"
   },
   "layout.banner.staging.description": {
-    "message": "預備環境與 Modrinth 的正式資料庫完全獨立。\n它被用於測試與除錯，因此你執行的 Modrinth 後端或前端，可能是比正式實例還要新的開發中版本。"
+    "message": "預備環境與 Icarus 的正式資料庫完全獨立。\n它被用於測試與除錯，因此你執行的 Icarus 後端或前端，可能是比正式實例還要新的開發中版本。"
   },
   "layout.banner.staging.title": {
-    "message": "你正在查看 Modrinth 的預備環境"
+    "message": "你正在查看 Icarus 的預備環境"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "更新帳務資訊"
@@ -1776,7 +1581,7 @@
     "message": "填寫稅務表單"
   },
   "layout.banner.tax.description": {
-    "message": "你今年已從 Modrinth 提領超過 {threshold}。為符合稅務法規，你需要填寫一份稅務表單。在提交這個表格之前，你的提領將暫停。"
+    "message": "你今年已從 Icarus 提領超過 {threshold}。為符合稅務法規，你需要填寫一份稅務表單。在提交這個表格之前，你的提領將暫停。"
   },
   "layout.banner.tax.title": {
     "message": "需填寫稅務表單"
@@ -1794,7 +1599,7 @@
     "message": "重新傳送驗證電子郵件"
   },
   "layout.banner.verify-email.description": {
-    "message": "為了安全起見，Modrinth 需要你驗證與你的帳號連結的電子郵件地址。"
+    "message": "為了安全起見，Icarus 需要你驗證與你的帳號連結的電子郵件地址。"
   },
   "layout.footer.about": {
     "message": "關於"
@@ -1835,23 +1640,23 @@
   "layout.footer.legal.terms-of-use": {
     "message": "使用條款"
   },
-  "layout.footer.modrinth-information": {
-    "message": "Modrinth 資訊"
+  "layout.footer.Icarus-information": {
+    "message": "Icarus 資訊"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth 是<github-link>開源專案</github-link>。"
+    "message": "Icarus 是<github-link>開源專案</github-link>。"
   },
   "layout.footer.products": {
     "message": "產品"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Icarus Launcher"
   },
   "layout.footer.products.plus": {
-    "message": "Modrinth+"
+    "message": "Icarus+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "layout.footer.resources": {
     "message": "資源"
@@ -1887,7 +1692,7 @@
     "message": "切換選單"
   },
   "layout.meta.description": {
-    "message": "前往 Modrinth 下載 Minecraft 模組、插件、資料包、光影包、資源包和模組包。使用現代、易於使用的介面和 API 在 Modrinth 上探索及發布專案。"
+    "message": "前往 Icarus 下載 Minecraft 模組、插件、資料包、光影包、資源包和模組包。使用現代、易於使用的介面和 API 在 Icarus 上探索及發布專案。"
   },
   "layout.meta.og-description": {
     "message": "探索及發布 Minecraft 內容！"
@@ -1907,8 +1712,8 @@
   "layout.nav.discover-content": {
     "message": "探索內容"
   },
-  "layout.nav.get-modrinth-app": {
-    "message": "取得 Modrinth App"
+  "layout.nav.get-Icarus-app": {
+    "message": "取得 Icarus Launcher"
   },
   "layout.nav.home": {
     "message": "首頁"
@@ -1916,11 +1721,11 @@
   "layout.nav.host-a-server": {
     "message": "託管伺服器"
   },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+  "layout.nav.Icarus-app": {
+    "message": "Icarus Launcher"
   },
-  "layout.nav.modrinth-home-page": {
-    "message": "Modrinth 首頁"
+  "layout.nav.Icarus-home-page": {
+    "message": "Icarus 首頁"
   },
   "layout.nav.my-servers": {
     "message": "我的伺服器"
@@ -1943,14 +1748,11 @@
   "layout.nav.search": {
     "message": "搜尋"
   },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "升級至 Modrinth+"
+  "layout.nav.upgrade-to-Icarus-plus": {
+    "message": "升級至 Icarus+"
   },
   "moderation.moderate": {
     "message": "管理"
-  },
-  "moderation.page.external-projects": {
-    "message": "外部專案"
   },
   "moderation.page.projects": {
     "message": "專案"
@@ -2229,10 +2031,10 @@
     "message": "請仔細檢查你的錢包帳戶。發送到錯誤帳戶的資金將無法追回。"
   },
   "profile.bio.fallback.creator": {
-    "message": "一位 Modrinth 創作者。"
+    "message": "一位 Icarus 創作者。"
   },
   "profile.bio.fallback.user": {
-    "message": "一位 Modrinth 使用者。"
+    "message": "一位 Icarus 使用者。"
   },
   "profile.button.billing": {
     "message": "管理使用者帳務"
@@ -2316,10 +2118,10 @@
     "message": "儲存中..."
   },
   "profile.meta.description": {
-    "message": "前往 Modrinth 下載 {username} 的專案"
+    "message": "前往 Icarus 下載 {username} 的專案"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} — 前往 Modrinth 下載 {username} 的專案"
+    "message": "{bio} — 前往 Icarus 下載 {username} 的專案"
   },
   "profile.stats.projects-followers": {
     "message": "<stat>{count}</stat> 位專案追蹤者"
@@ -2358,7 +2160,7 @@
     "message": "重新提交審查"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "你的專案已被 Modrinth 工作人員{status, select, rejected {拒絕} withheld {擱置} other {{status}}}。在大部分情況下，你可以在處理完工作人員的留言訊息後，重新提交審核。"
+    "message": "你的專案已被 Icarus 工作人員{status, select, rejected {拒絕} withheld {擱置} other {{status}}}。在大部分情況下，你可以在處理完工作人員的留言訊息後，重新提交審核。"
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "你必須完成發布檢查清單中的必要步驟！"
@@ -2472,7 +2274,7 @@
     "message": "審查專案"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting 是讓你與朋友輕鬆遊玩的最佳方式！"
+    "message": "Icarus Hosting 是讓你與朋友輕鬆遊玩的最佳方式！"
   },
   "project.actions.servers-promo.pricing": {
     "message": "{price} 起<small> / 月</small>"
@@ -2505,10 +2307,10 @@
     "message": "{title} 不支援 {platform} {gameVersion}"
   },
   "project.download.install-with-app": {
-    "message": "使用 Modrinth App 安裝"
+    "message": "使用 Icarus Launcher 安裝"
   },
   "project.download.no-app": {
-    "message": "還沒有 Modrinth App 嗎？"
+    "message": "還沒有 Icarus Launcher 嗎？"
   },
   "project.download.no-versions-available": {
     "message": "{platform} {gameVersion} 沒有可用的版本。"
@@ -2544,7 +2346,7 @@
     "message": "下載 {title}"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "我們剛剛對 Modrinth 的執行環境系統進行了全面更新，並提供了新的選項。你沒有權限修改這些設定，請通知專案中的其他成員以確定環境詮釋資料否正確。"
+    "message": "我們剛剛對 Icarus 的執行環境系統進行了全面更新，並提供了新的選項。你沒有權限修改這些設定，請通知專案中的其他成員以確定環境詮釋資料否正確。"
   },
   "project.environment.migration-no-permission.title": {
     "message": "環境詮釋資料需要審查"
@@ -2553,7 +2355,7 @@
     "message": "深入了解這項變更"
   },
   "project.environment.migration.message": {
-    "message": "我們剛剛對 Modrinth 的執行環境系統進行了全面更新，並提供了新的選項。請確定詮釋資料是否正確。"
+    "message": "我們剛剛對 Icarus 的執行環境系統進行了全面更新，並提供了新的選項。請確定詮釋資料是否正確。"
   },
   "project.environment.migration.review-button": {
     "message": "審查執行環境設定"
@@ -2645,45 +2447,6 @@
   "project.settings.general.url.title": {
     "message": "網址"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "請提供證明，以確認你擁有重新發布下列所有檔案的權限；此外，任何遭保留的版本都將自動發布。"
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "在提交專案進行審查之前，請先提供你擁有下列所有檔案重新發布權限的證明。"
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "未知的嵌入內容"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "所有外部內容均已標明出處。"
-  },
-  "project.settings.permissions.completed.title": {
-    "message": "出處標註已完成！"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "你的所有版本皆不含外部內容，因此無需擔心取得授權的問題。"
-  },
-  "project.settings.permissions.empty-state.heading": {
-    "message": "一切就緒！"
-  },
-  "project.settings.permissions.fail.description": {
-    "message": "你上傳的部分外部內容不具備重新發布權限。如要在 Modrinth 上發布，請移除侵權內容。"
-  },
-  "project.settings.permissions.fail.title": {
-    "message": "部分內容無法包含在內"
-  },
-  "project.settings.permissions.info-banner.description": {
-    "message": "如果你包含的內容並非託管於 Modrinth，你需要告知我們其來源，並確認你擁有重新發布這些檔案的權限。請參閱我們的<link>指南</link>以了解如何正確處理！"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "了解引用標註的處理方式"
-  },
-  "project.settings.permissions.learn-more": {
-    "message": "了解更多"
-  },
-  "project.settings.permissions.search-placeholder": {
-    "message": "搜尋 {count} 個外部專案..."
-  },
   "project.settings.title": {
     "message": "設定"
   },
@@ -2701,15 +2464,6 @@
   },
   "project.versions.title": {
     "message": "版本"
-  },
-  "project.versions.withheld-versions-warning.description": {
-    "message": "{count, plural, one {這個版本} other {這些版本}}目前被扣留且不公開。請提供你擁有轉載該模組包版本中特定檔案的許可證明。"
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "解決"
-  },
-  "project.versions.withheld-versions-warning.title": {
-    "message": "{count, plural, one {版本 {version_name}} other {版本}}因未知的嵌入內容而被扣留"
   },
   "report.already-reported": {
     "message": "你已檢舉 {title}"
@@ -2733,7 +2487,7 @@
     "message": "找不到{item, select, project {專案} version {版本} user {使用者} other {內容}}"
   },
   "report.for.violation": {
-    "message": "違反 Modrinth《<rules-link>內容規範</rules-link>》或《<terms-link>使用條款</terms-link>》"
+    "message": "違反 Icarus《<rules-link>內容規範</rules-link>》或《<terms-link>使用條款</terms-link>》"
   },
   "report.for.violation.description": {
     "message": "範例包括惡意內容、垃圾內容、冒犯性內容、欺騙性內容、誤導性及違法內容。"
@@ -2778,7 +2532,7 @@
     "message": "你要檢舉什麼類型的內容？"
   },
   "report.question.report-reason": {
-    "message": "這個{item, select, project {專案} version {版本} user {使用者} other {內容}}違反了 Modrinth 的哪項規範？"
+    "message": "這個{item, select, project {專案} version {版本} user {使用者} other {內容}}違反了 Icarus 的哪項規範？"
   },
   "report.report-content": {
     "message": "向管理員檢舉內容"
@@ -2982,7 +2736,7 @@
     "message": "寫入檢舉"
   },
   "scopes.sessionAccess.description": {
-    "message": "存取由 Modrinth 提供的工作階段"
+    "message": "存取由 Icarus 提供的工作階段"
   },
   "scopes.sessionAccess.label": {
     "message": "存取工作階段"
@@ -3129,19 +2883,19 @@
     "message": "正在生成匯出..."
   },
   "settings.account.data-export.description": {
-    "message": "申請你上傳至 Modrinth 的所有個人資料複本。此程序可能需要幾分鐘的時間才能完成。"
+    "message": "申請你上傳至 Icarus 的所有個人資料複本。此程序可能需要幾分鐘的時間才能完成。"
   },
   "settings.account.data-export.title": {
     "message": "資料匯出"
   },
   "settings.account.delete.confirm.description": {
-    "message": "這個動作將會**立即刪除您的所有使用者資料與追蹤清單**。這不會刪除你的專案。帳號刪除後將無法還原。<br><br>若你需要帳號相關協助，請至 [Modrinth Discord](https://discord.modrinth.com) 取得支援。"
+    "message": "這個動作將會**立即刪除您的所有使用者資料與追蹤清單**。這不會刪除你的專案。帳號刪除後將無法還原。<br><br>若你需要帳號相關協助，請至 [Icarus Discord](https://discord.Icarus.com) 取得支援。"
   },
   "settings.account.delete.confirm.proceed": {
     "message": "刪除這個帳號"
   },
   "settings.account.delete.confirm.title": {
-    "message": "確定要刪除你的帳號嗎？"
+    "message": "你確定要刪除你的帳號嗎？"
   },
   "settings.account.delete.section.action": {
     "message": "刪除帳號"
@@ -3360,10 +3114,10 @@
     "message": "這將永久刪除這個應用程式並撤銷所有存取權杖。（永遠！）"
   },
   "settings.applications.delete.confirm.title": {
-    "message": "確定要刪除這個應用程式？"
+    "message": "你確定要刪除這個應用程式？"
   },
   "settings.applications.description.intro": {
-    "message": "應用程式可用於在你的產品中驗證 Modrinth 使用者的身分。如需更多資訊，請參閱 <docs-link>Modrinth 的 API 文件</docs-link>。"
+    "message": "應用程式可用於在你的產品中驗證 Icarus 使用者的身分。如需更多資訊，請參閱 <docs-link>Icarus 的 API 文件</docs-link>。"
   },
   "settings.applications.field.description": {
     "message": "描述"
@@ -3417,7 +3171,7 @@
     "message": "作者"
   },
   "settings.authorizations.description": {
-    "message": "當你使用 Modrinth 帳號授權應用程式時，即代表你授予該應用程式存取你帳戶的權限。你可以隨時在這裡管理並審查帳號的存取權。"
+    "message": "當你使用 Icarus 帳號授權應用程式時，即代表你授予該應用程式存取你帳戶的權限。你可以隨時在這裡管理並審查帳號的存取權。"
   },
   "settings.authorizations.empty-state": {
     "message": "目前無法顯示你已授權的應用程式，我們正在努力修正這個問題。請稍後再回來查看！"
@@ -3432,19 +3186,19 @@
     "message": "這將撤銷該應用程式存取你帳號的權限。你隨時可以於稍後重新授權。"
   },
   "settings.authorizations.revoke.confirm.title": {
-    "message": "確定要撤銷這個應用程式的授權嗎？"
+    "message": "你確定要撤銷這個應用程式的授權嗎？"
   },
   "settings.billing.charges.description": {
-    "message": "你對 Modrinth 帳號的所有過往支付紀錄皆會列於這裡："
+    "message": "你對 Icarus 帳號的所有過往支付紀錄皆會列於這裡："
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "Medal 伺服器試用方案"
   },
   "settings.billing.charges.product.midas": {
-    "message": "Modrinth Plus"
+    "message": "Icarus Plus"
   },
   "settings.billing.charges.product.pyro": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "settings.billing.charges.title": {
     "message": "過往支付紀錄"
@@ -3471,13 +3225,13 @@
     "message": "每年"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "在 modrinth.com 與 Modrinth App 上享受無廣告的瀏覽體驗"
+    "message": "在 Icarus.com 與 Icarus Launcher 上享受無廣告的瀏覽體驗"
   },
   "settings.billing.midas.benefits.badge": {
-    "message": "在你的個人檔案顯示 Modrinth+ 徽章"
+    "message": "在你的個人檔案顯示 Icarus+ 徽章"
   },
   "settings.billing.midas.benefits.support": {
-    "message": "直接支持 Modrinth 與創作者"
+    "message": "直接支持 Icarus 與創作者"
   },
   "settings.billing.midas.benefits.title": {
     "message": "福利"
@@ -3501,16 +3255,16 @@
     "message": "我們正在處理你的付款。一旦付款完成，系統將立即啟用你的福利。"
   },
   "settings.billing.midas.upsell": {
-    "message": "立即訂閱 Modrinth Plus！"
+    "message": "立即訂閱 Icarus Plus！"
   },
   "settings.billing.modal.cancel.action": {
     "message": "取消訂閱"
   },
   "settings.billing.modal.cancel.description": {
-    "message": "這會取消你的訂閱。你的福利將保留到本期計費週期結束。"
+    "message": "這將取消你的訂閱。你將保留你的權益，直到本期計費週期結束。"
   },
   "settings.billing.modal.cancel.title": {
-    "message": "確定要取消訂閱嗎？"
+    "message": "你確定要取消訂閱嗎？"
   },
   "settings.billing.modal.delete.action": {
     "message": "移除這個付款方式"
@@ -3519,7 +3273,7 @@
     "message": "這將會永遠移除這個付款方式（真的，再也回不去了）。"
   },
   "settings.billing.modal.delete.title": {
-    "message": "確定要移除這個付款方式嗎？"
+    "message": "你確定要移除這個付款方式嗎？"
   },
   "settings.billing.next": {
     "message": "下期："
@@ -3561,7 +3315,7 @@
     "message": "{shared} 個共用 CPU（最高可爆發至 {bursts} 個 CPU）"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "找不到與這個訂閱相關聯的伺服器。這可能有幾種原因：如果你才剛購買伺服器，這屬於正常現象，伺服器的佈署過程最多可能需要一小時。若你已購買一段時間，則伺服器可能已被停用。如果這與你的預期不符，請將以下資訊提供給 Modrinth 客服團隊："
+    "message": "找不到與這個訂閱相關聯的伺服器。這可能有幾種原因：如果你才剛購買伺服器，這屬於正常現象，伺服器的佈署過程最多可能需要一小時。若你已購買一段時間，則伺服器可能已被停用。如果這與你的預期不符，請將以下資訊提供給 Icarus 客服團隊："
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "伺服器 ID：{id}"
@@ -3573,7 +3327,7 @@
     "message": "{gb} GB 記憶體"
   },
   "settings.billing.pyro.resubscribe.error.text": {
-    "message": "重新訂閱你的 Modrinth 伺服器時發生錯誤。"
+    "message": "重新訂閱你的 Icarus 伺服器時發生錯誤。"
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "重新訂閱時發生錯誤"
@@ -3600,10 +3354,10 @@
     "message": "{gb} GB 置換空間"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "管理你的 Modrinth 伺服器訂閱。"
+    "message": "管理你的 Icarus 伺服器訂閱。"
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Modrinth 伺服器訂閱"
+    "message": "Icarus 伺服器訂閱"
   },
   "settings.billing.renews": {
     "message": "將於{date}續訂"
@@ -3618,7 +3372,7 @@
     "message": "訂閱"
   },
   "settings.billing.subscription.description": {
-    "message": "管理你的 Modrinth 訂閱。"
+    "message": "管理你的 Icarus 訂閱。"
   },
   "settings.billing.subscription.title": {
     "message": "訂閱"
@@ -3645,7 +3399,7 @@
     "message": "停用開發人員模式"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "開發人員模式<strong>已啟用</strong>。這個模式可以讓你查看 Modrinth 各項內容的內部 ID，如果你是使用 Modrinth API 的開發人員，這項功能可能會對你有所幫助。按 5 次頁面底部的 Modrinth 標誌即可切換開發人員模式。"
+    "message": "開發人員模式<strong>已啟用</strong>。這個模式可以讓你查看 Icarus 各項內容的內部 ID，如果你是使用 Icarus API 的開發人員，這項功能可能會對你有所幫助。按 5 次頁面底部的 Icarus 標誌即可切換開發人員模式。"
   },
   "settings.display.flags.description": {
     "message": "針對這部裝置，設定要啟用或停用的特定功能。"
@@ -3708,16 +3462,16 @@
     "message": "進階繪製"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "在新分頁中開啟 Modrinth 的外部連結。這項設定僅適用於外部連結，內部連結和 Markdown 說明中的連結仍會在同一個分頁中開啟，而廣告和編輯頁面的連結會在新分頁中開啟。"
+    "message": "在新分頁中開啟 Icarus 的外部連結。這項設定僅適用於外部連結，內部連結和 Markdown 說明中的連結仍會在同一個分頁中開啟，而廣告和編輯頁面的連結會在新分頁中開啟。"
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "在新分頁中開啟外部連結"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "在主導覽列中隱藏「下載 Modrinth App」按鈕。你仍可在登入頁面或頁尾找到 Modrinth 應用程式頁面。"
+    "message": "在主導覽列中隱藏「下載 Icarus Launcher」按鈕。你仍可在登入頁面或頁尾找到 Icarus 應用程式頁面。"
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "隱藏 Modrinth App 廣告"
+    "message": "隱藏 Icarus Launcher 廣告"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "內容頁面左側邊欄"
@@ -3732,7 +3486,7 @@
     "message": "搜尋頁面右側篩選側邊欄"
   },
   "settings.display.theme.description": {
-    "message": "依照偏好，設定這部裝置的 Modrinth 主題顏色。"
+    "message": "依照偏好，設定這部裝置的 Icarus 主題顏色。"
   },
   "settings.display.theme.title": {
     "message": "色彩主題"
@@ -3744,7 +3498,7 @@
     "message": "建立個人存取權杖"
   },
   "settings.pats.description": {
-    "message": "可用於存取 Modrinth 的 API。你可以隨時建立或撤銷。欲了解更多資訊，請參閱 <doc-link>Modrinth API 文件</doc-link>。"
+    "message": "可用於存取 Icarus 的 API。你可以隨時建立或撤銷。欲了解更多資訊，請參閱 <doc-link>Icarus API 文件</doc-link>。"
   },
   "settings.pats.modal.create.action": {
     "message": "建立個人存取權杖"
@@ -3768,7 +3522,7 @@
     "message": "這將會永遠移除這個權杖（真的，再也回不去了）。"
   },
   "settings.pats.modal.delete.title": {
-    "message": "確定要刪除這個權杖嗎？"
+    "message": "你確定要刪除這個權杖嗎？"
   },
   "settings.pats.modal.edit.title": {
     "message": "編輯個人存取權杖"
@@ -3798,7 +3552,7 @@
     "message": "關於我"
   },
   "settings.profile.description": {
-    "message": "你的個人檔案資訊會公開顯示在 Modrinth 上，並可透過 <docs-link>Modrinth API</docs-link> 查詢。"
+    "message": "你的個人檔案資訊會公開顯示在 Icarus 上，並可透過 <docs-link>Icarus API</docs-link> 查詢。"
   },
   "settings.profile.head-title": {
     "message": "個人設定"
@@ -3822,7 +3576,7 @@
     "message": "目前的工作階段"
   },
   "settings.sessions.description": {
-    "message": "你目前已在下列裝置上登入 Modrinth 帳號。你可以分別登出每部裝置。\n\n如果你對某部裝置沒有印象，請立即登出該裝置，並變更你的 Modrinth 帳號密碼。"
+    "message": "你目前已在下列裝置上登入 Icarus 帳號。你可以分別登出每部裝置。\n\n如果你對某部裝置沒有印象，請立即登出該裝置，並變更你的 Icarus 帳號密碼。"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "上次存取時間：{ago}"
@@ -3843,7 +3597,7 @@
     "message": "顯示"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Modrinth 的最新消息"
+    "message": "Icarus 的最新消息"
   },
   "ui.latest-news-row.view-all": {
     "message": "查看所有新聞"
@@ -3855,7 +3609,7 @@
     "message": "已訂閱！"
   },
   "ui.newsletter-button.tooltip": {
-    "message": "訂閱 Modrinth 的最新消息"
+    "message": "訂閱 Icarus 的最新消息"
   },
   "version.environment.none.description": {
     "message": "此版本的執行環境尚未指定。"
@@ -3870,3 +3624,4 @@
     "message": "未知的執行環境"
   }
 }
+

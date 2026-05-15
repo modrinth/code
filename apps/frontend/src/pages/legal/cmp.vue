@@ -4,11 +4,11 @@
 		<p>
 			These REWARDS PROGRAM TERMS ("Terms") constitute a legally binding agreement between you (or
 			the entity you represent) ("you") and Rinth, Inc. ("Rinth") concerning your participation in
-			the Modrinth Rewards Program (the "Rewards Program").
+			the Icarus Rewards Program (the "Rewards Program").
 		</p>
 		<p>
 			The Rewards Program provides developers and content creators an opportunity to monetize the
-			projects ("Projects") that they upload to the Modrinth website.
+			projects ("Projects") that they upload to the Icarus website.
 		</p>
 		<p>
 			These Terms are in addition to and do not in any manner limit the applicability of the
@@ -21,7 +21,7 @@
 		<p>
 			Rinth shall pay to you the percentage set forth
 			<nuxt-link to="/legal/cmp-info">here</nuxt-link> of net revenue collected by Rinth
-			attributable to ad impressions displayed on modrinth.com and the Modrinth App excluding
+			attributable to ad impressions displayed on modrinth.com and the Icarus Launcher excluding
 			transaction fees ("Revenue Share"). Rinth shall make Revenue Share payments to you when you
 			withdraw funds from Rinth's dashboard. Rinth shall include with each such payment either
 			access to a dashboard or other reasonable reporting detailing the calculation thereof.
@@ -75,12 +75,13 @@
 
 <script setup>
 const description =
-	'The Rewards Program Terms of Modrinth, an open source modding platform focused on Minecraft.'
+	'The Rewards Program Terms of Icarus, an open source modding platform focused on Minecraft.'
 
 useSeoMeta({
-	title: 'Rewards Program Terms - Modrinth',
+	title: 'Rewards Program Terms - Icarus',
 	description,
 	ogTitle: 'Rewards Program Terms',
 	ogDescription: description,
 })
 </script>
+

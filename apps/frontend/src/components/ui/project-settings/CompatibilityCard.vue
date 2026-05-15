@@ -6,7 +6,7 @@
 					<div class="text-xl font-semibold text-contrast">Server compatibility</div>
 					<div v-if="!content" class="text-sm text-secondary">
 						Select whether your server is vanilla or modded and which versions it supports. The
-						Modrinth App uses this when a player joins.
+						Icarus Launcher uses this when a player joins.
 					</div>
 					<div v-else>
 						<div v-if="content.kind === 'vanilla'" class="flex items-center gap-1.5">
@@ -208,16 +208,16 @@ import {
 	PackageIcon,
 	PackagePlusIcon,
 	RefreshCwIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
 	FormattedTag,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectProjectPageContext,
 	TagItem,
-} from '@modrinth/ui'
-import { formatVersionsForDisplay } from '@modrinth/utils'
+} from '@icarus/ui'
+import { formatVersionsForDisplay } from '@icarus/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import { useGeneratedState } from '~/composables/generated'
@@ -229,7 +229,7 @@ const serverCompatibilityModal = useTemplateRef<InstanceType<typeof ServerCompat
 )
 
 const { projectV3, currentMember } = injectProjectPageContext()
-const { labrinth } = injectModrinthClient()
+const { labrinth } = injectIcarusClient()
 const tags = useGeneratedState()
 
 const hasPermission = computed(() => {
@@ -310,3 +310,4 @@ function handleUpdateContent() {
 	}
 }
 </script>
+

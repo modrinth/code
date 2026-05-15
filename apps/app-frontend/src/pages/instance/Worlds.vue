@@ -162,7 +162,7 @@
 	</ReadyTransition>
 </template>
 <script setup lang="ts">
-import { CompassIcon, FilterIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
+import { CompassIcon, FilterIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	commonMessages,
@@ -175,7 +175,7 @@ import {
 	StyledInput,
 	useReadyState,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { platform } from '@tauri-apps/plugin-os'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
@@ -187,7 +187,6 @@ import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events'
 import { get_game_versions } from '@/helpers/tags'
@@ -577,20 +576,12 @@ async function joinWorld(world: World) {
 		const managedProjectId = instance.value.linked_data?.project_id
 		if (managedProjectId && isManagedServerWorld(world)) {
 			await playServerProject(managedProjectId).catch(handleJoinError)
-			trackEvent('InstanceStart', {
-				loader: instance.value.loader,
-				game_version: instance.value.game_version,
-				source: 'WorldsPage',
-			})
+			
 			startingInstance.value = false
 			return
 		}
 		await start_join_server(instance.value.path, world.address).catch(handleJoinError)
-		trackEvent('InstanceStart', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-			source: 'WorldsPage',
-		})
+		
 	} else if (world.type === 'singleplayer') {
 		await start_join_singleplayer_world(instance.value.path, world.path).catch(handleJoinError)
 	}

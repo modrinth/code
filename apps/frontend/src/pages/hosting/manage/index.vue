@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ServersManagePageIndex } from '@modrinth/ui'
+import { ServersManagePageIndex } from '@icarus/ui'
 
 import { useGeneratedState } from '~/composables/generated'
 
@@ -8,7 +8,7 @@ definePageMeta({
 })
 
 useHead({
-	title: 'Hosting - Modrinth',
+	title: 'Hosting - Icarus',
 })
 
 const config = useRuntimeConfig()
@@ -23,3 +23,4 @@ const generatedState = useGeneratedState()
 		class="max-w-[1280px] py-0"
 	/>
 </template>
+

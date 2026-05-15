@@ -8,7 +8,7 @@ import {
 	languageSelectorMessages,
 	LOCALES,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 const { formatMessage } = useVIntl()
 const { locale, setLocale } = injectI18n()
@@ -78,3 +78,4 @@ async function onLocaleChange(newLocale: string) {
 	}
 }
 </style>
+

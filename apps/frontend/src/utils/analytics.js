@@ -1,4 +1,4 @@
-import { injectI18n, useDebugLogger } from '@modrinth/ui'
+import { injectI18n, useDebugLogger } from '@icarus/ui'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 

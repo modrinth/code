@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ButtonStyled, Toggle } from '@modrinth/ui'
+import { ButtonStyled, Toggle } from '@icarus/ui'
 import { ref, watch } from 'vue'
 
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'

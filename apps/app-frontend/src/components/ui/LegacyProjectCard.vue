@@ -1,6 +1,6 @@
 <script setup>
-import { DownloadIcon, HeartIcon, TagIcon } from '@modrinth/assets'
-import { Avatar, FormattedTag, TagItem, useCompactNumber } from '@modrinth/ui'
+import { DownloadIcon, HeartIcon, TagIcon } from '@icarus/assets'
+import { Avatar, FormattedTag, TagItem, useCompactNumber } from '@icarus/ui'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed } from 'vue'
@@ -22,11 +22,11 @@ const props = defineProps({
 })
 
 const featuredCategory = computed(() => {
-	if (props.project.display_categories.includes('optimization')) {
+	if (props.project.display_categories?.includes('optimization')) {
 		return 'optimization'
 	}
 
-	return props.project.display_categories[0] ?? props.project.categories[0]
+	return props.project.display_categories?.[0] ?? props.project.categories?.[0]
 })
 
 const toColor = computed(() => {
@@ -64,10 +64,10 @@ const toTransparent = computed(() => {
 		<div
 			class="w-full aspect-[2/1] bg-cover bg-center bg-no-repeat"
 			:style="{
-				'background-color': (project.featured_gallery ?? project.gallery[0]) ? null : toColor,
+				'background-color': (project.featured_gallery ?? (project.gallery && project.gallery[0])) ? null : toColor,
 				'background-image': `url(${
 					project.featured_gallery ??
-					project.gallery[0] ??
+					(project.gallery && project.gallery[0]) ??
 					'https://launcher-files.modrinth.com/assets/maze-bg.png'
 				})`,
 			}"
@@ -75,10 +75,10 @@ const toTransparent = computed(() => {
 			<div
 				class="badges-wrapper"
 				:class="{
-					'no-image': !project.featured_gallery && !project.gallery[0],
+					'no-image': !project.featured_gallery && (!project.gallery || !project.gallery[0]),
 				}"
 				:style="{
-					background: !project.featured_gallery && !project.gallery[0] ? toTransparent : null,
+					background: !project.featured_gallery && (!project.gallery || !project.gallery[0]) ? toTransparent : null,
 				}"
 			></div>
 		</div>
@@ -117,3 +117,4 @@ const toTransparent = computed(() => {
 </template>
 
 <style scoped lang="scss"></style>
+

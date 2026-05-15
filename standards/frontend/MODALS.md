@@ -32,7 +32,7 @@ Use the `NewModal` component (`packages/ui/src/components/modal/NewModal.vue`) f
 ```vue
 <script setup lang="ts">
 import { ref } from ‘vue’
-import { NewModal } from ‘@modrinth/ui’
+import { NewModal } from ‘@Icarus/ui’
 
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 </script>
@@ -175,8 +175,8 @@ Create a DI provider with all the state your wizard needs. Include the modal ref
 // providers/my-feature/my-modal.ts
 import type { ShallowRef } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
-import type { MultiStageModal, StageConfigInput } from '@modrinth/ui'
-import { createContext } from '@modrinth/ui'
+import type { MultiStageModal, StageConfigInput } from '@Icarus/ui'
+import { createContext } from '@Icarus/ui'
 
 export interface MyModalContext {
 	// State
@@ -221,10 +221,10 @@ Each stage is a `StageConfigInput<T>` where `T` is your context type. Most field
 ```ts
 // providers/my-feature/stages/details-stage.ts
 import { markRaw } from 'vue'
-import type { StageConfigInput } from '@modrinth/ui'
+import type { StageConfigInput } from '@Icarus/ui'
 import type { MyModalContext } from '../my-modal'
 import DetailsStage from './DetailsStage.vue'
-import { RightArrowIcon, SaveIcon } from '@modrinth/assets'
+import { RightArrowIcon, SaveIcon } from '@Icarus/assets'
 
 export const detailsStageConfig: StageConfigInput<MyModalContext> = {
 	id: 'details',
@@ -306,7 +306,7 @@ The wrapper provides context and renders `MultiStageModal`:
 <!-- components/MyModalWrapper.vue -->
 <script setup lang="ts">
 import { shallowRef } from 'vue'
-import { MultiStageModal } from '@modrinth/ui'
+import { MultiStageModal } from '@Icarus/ui'
 import { createMyModalContext, provideMyModalContext } from '../providers/my-feature/my-modal'
 
 const modal = shallowRef<InstanceType<typeof MultiStageModal> | null>(null)
@@ -368,3 +368,4 @@ The version creation/edit modal is the most complete example:
 | `apps/frontend/src/providers/version/stages/*-stage.ts`       | Individual stage configs          |
 
 The context includes computed properties for conditional UI, watchers for auto-fetching dependencies, loading states for granular button disabling, and both "create" and "edit" flows sharing the same stages with different button configs.
+

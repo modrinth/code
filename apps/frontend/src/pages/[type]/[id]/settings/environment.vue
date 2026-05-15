@@ -25,14 +25,14 @@
 </template>
 
 <script setup lang="ts">
-import { SettingsIcon } from '@modrinth/assets'
+import { SettingsIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	EnvironmentMigration,
 	injectProjectPageContext,
 	LoadingIndicator,
-} from '@modrinth/ui'
-import { isStaff } from '@modrinth/utils'
+} from '@icarus/ui'
+import { isStaff } from '@icarus/utils'
 
 const { currentMember, projectV2, projectV3 } = injectProjectPageContext()
 

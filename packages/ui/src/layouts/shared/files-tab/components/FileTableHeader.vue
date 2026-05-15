@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
+import { ChevronDownIcon, ChevronUpIcon } from '@icarus/assets'
 
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

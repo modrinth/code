@@ -3,8 +3,8 @@ import {
 	AuthFeature,
 	type FeatureConfig,
 	type NuxtClientConfig,
-	NuxtModrinthClient,
-} from '@modrinth/api-client'
+	NuxtIcarusClient,
+} from '@icarus/api-client'
 import type { H3Event } from 'h3'
 
 async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
@@ -22,7 +22,7 @@ export interface ServerModrinthClientOptions {
 	authToken?: string
 }
 
-export function useServerModrinthClient(options?: ServerModrinthClientOptions): NuxtModrinthClient {
+export function useServerModrinthClient(options?: ServerModrinthClientOptions): NuxtIcarusClient {
 	const config = useRuntimeConfig(options?.event)
 	const apiBaseUrl = (config.apiBaseUrl || config.public.apiBaseUrl).replace('/v2/', '/')
 
@@ -43,5 +43,5 @@ export function useServerModrinthClient(options?: ServerModrinthClientOptions): 
 		features,
 	}
 
-	return new NuxtModrinthClient(clientConfig)
+	return new NuxtIcarusClient(clientConfig)
 }

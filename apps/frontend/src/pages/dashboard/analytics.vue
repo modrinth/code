@@ -14,10 +14,10 @@
 <script setup>
 import {
 	commonProjectSettingsMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	useDebugLogger,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
 
@@ -30,11 +30,11 @@ definePageMeta({
 })
 
 useHead({
-	title: () => `${formatMessage(commonProjectSettingsMessages.analytics)} - Modrinth`,
+	title: () => `${formatMessage(commonProjectSettingsMessages.analytics)} - Icarus`,
 })
 
 const auth = await useAuth()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const id = auth.value?.user?.id
 
 debug('auth resolved', { id })
@@ -43,3 +43,4 @@ const projects = await client.labrinth.users_v2.getProjects(id)
 
 debug('projects resolved', { count: projects?.length })
 </script>
+

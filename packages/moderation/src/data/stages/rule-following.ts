@@ -1,4 +1,4 @@
-import { ListBulletedIcon } from '@modrinth/assets'
+import { ListBulletedIcon } from '@icarus/assets'
 
 import type { ButtonAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'

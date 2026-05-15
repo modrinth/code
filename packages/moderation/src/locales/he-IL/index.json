@@ -18,13 +18,13 @@
     "defaultMessage": "הוסף כתובת ג'אווה"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "הוסיפו קישורים רלוונטיים מחוץ ל-Modrinth, כגון אתר אינטרנט, חנות או הזמנה לדיסקורד."
+    "defaultMessage": "הוסיפו קישורים רלוונטיים מחוץ ל-Icarus, כגון אתר אינטרנט, חנות או הזמנה לדיסקורד."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "הוסף קישורים חיצוניים"
   },
   "nags.add-links.description": {
-    "defaultMessage": "הוסף קישורים רלוונטיים מחוץ ל-Modrinth, כגון קוד מקור, מעקב אחר בעיות או הזמנה לשרת דיסקורד."
+    "defaultMessage": "הוסף קישורים רלוונטיים מחוץ ל-Icarus, כגון קוד מקור, מעקב אחר בעיות או הזמנה לשרת דיסקורד."
   },
   "nags.add-links.title": {
     "defaultMessage": "הוסף קישורים חיצוניים"
@@ -231,4 +231,5 @@
     "defaultMessage": "בקר בהגדרות הקישורים"
   }
 }
+
 

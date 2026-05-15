@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Ang bersiyong Linux ng Modrinth App ay <issues-link>alam na may suliranin</issues-link> sa iilang mga sistema at kumpigurasyon. Kapag ang Modrinth App ay hindi matatag sa iyong sistema, hinihikayat ka namin na subukan ang ibang mga aplikasyon tulad ng <prism-link>Prism Launcher</prism-link> upang mapadali ang pag-install ng kontentong Modrinth."
+    "message": "Ang bersiyong Linux ng Icarus Launcher ay <issues-link>alam na may suliranin</issues-link> sa iilang mga sistema at kumpigurasyon. Kapag ang Icarus Launcher ay hindi matatag sa iyong sistema, hinihikayat ka namin na subukan ang ibang mga aplikasyon tulad ng <prism-link>Prism Launcher</prism-link> upang mapadali ang pag-install ng kontentong Icarus."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -39,10 +39,10 @@
     "message": "Mga pagpipilian sa pagdownload"
   },
   "app-marketing.download.terms": {
-    "message": "Sa pagdownload ng Modrinth App, sumasang-ayon ka sa aming <terms-link>Mga Tuntunin</terms-link> at <privacy-link>Patakaran sa Pribasiya</privacy-link>."
+    "message": "Sa pagdownload ng Icarus Launcher, sumasang-ayon ka sa aming <terms-link>Mga Tuntunin</terms-link> at <privacy-link>Patakaran sa Pribasiya</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "I-download ang Modrinth App (Beta)"
+    "message": "I-download ang Icarus Launcher (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "Sundan ang mga proyekto"
   },
   "app-marketing.features.importing.description": {
-    "message": "I-import ang lahat ng mga paboritong profile mo galing sa launcher na dating ginagamit mo, at magsimula na sa Modrinth App is iilang segundo!"
+    "message": "I-import ang lahat ng mga paboritong profile mo galing sa launcher na dating ginagamit mo, at magsimula na sa Icarus Launcher is iilang segundo!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "ni/ng {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Pinapadali ng Modrinth na ma-manage ang lahat ng iyong mod sa iisang lugar. Makaka-install, uninstall, at update ng mga mod sa iisang pindot lang."
+    "message": "Pinapadali ng Icarus na ma-manage ang lahat ng iyong mod sa iisang lugar. Makaka-install, uninstall, at update ng mga mod sa iisang pindot lang."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Mga na-install na mod"
@@ -96,7 +96,7 @@
     "message": "Offline mode"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Buong naka-open-source ang launcher ng Modrinth. Maaari mong matingnan ang source code sa aming <github-link>GitHub</github-link>!"
+    "message": "Buong naka-open-source ang launcher ng Icarus. Maaari mong matingnan ang source code sa aming <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Ang Modrinth App ay mas mahusay mag-perform kaysa sa maraming nangungunang mod manager, gumagamit lamang ng 150 MB ng RAM!"
+    "message": "Ang Icarus Launcher ay mas mahusay mag-perform kaysa sa maraming nangungunang mod manager, gumagamit lamang ng 150 MB ng RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -128,8 +128,8 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
-  "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth App"
+  "app-marketing.features.performance.Icarus-app": {
+    "message": "Icarus Launcher"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 bilyong %"
@@ -147,13 +147,13 @@
     "message": "Performant"
   },
   "app-marketing.features.play.description": {
-    "message": "Gamitin ang Modrinth App sa pagdownload at paglaro ng iyong mga paboritong mods at modpacks."
+    "message": "Gamitin ang Icarus Launcher sa pagdownload at paglaro ng iyong mga paboritong mods at modpacks."
   },
   "app-marketing.features.play.title": {
     "message": "Malaro ang mga paboritong mod mo"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Mag-build, magbahagi, at maglaro ng mga modpack kasama ang ilan sa libong-libong mod at modpack na naka-host dito sa Modrinth."
+    "message": "Mag-build, magbahagi, at maglaro ng mga modpack kasama ang ilan sa libong-libong mod at modpack na naka-host dito sa Icarus."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modpack"
@@ -168,7 +168,7 @@
     "message": "'Di katulad ng ibang launcher"
   },
   "app-marketing.features.website.description": {
-    "message": "Ang Modrinth App ay buong naka-integrate sa website, kaya maakses mo ang lahat ng itong paboritong proyekto galing sa app!"
+    "message": "Ang Icarus Launcher ay buong naka-integrate sa website, kaya maakses mo ang lahat ng itong paboritong proyekto galing sa app!"
   },
   "app-marketing.features.website.title": {
     "message": "Website integration"
@@ -177,19 +177,19 @@
     "message": "na iyong nagamit dati"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Screenshot ng Modrinth App na nakabukas ang pahinang 'Kontento' ng Cobblemon instance."
+    "message": "Screenshot ng Icarus Launcher na nakabukas ang pahinang 'Kontento' ng Cobblemon instance."
   },
   "app-marketing.hero.description": {
-    "message": "Kaisa-isahang open-source launcher ang Modrinth App na binibigyang-daan kang makapaglaro sa iyong mga paboritong mod, at mapanatili silang up to date, lahat sa iisang siksik na package."
+    "message": "Kaisa-isahang open-source launcher ang Icarus Launcher na binibigyang-daan kang makapaglaro sa iyong mga paboritong mod, at mapanatili silang up to date, lahat sa iisang siksik na package."
   },
   "app-marketing.hero.download-button": {
-    "message": "I-download ang Modrinth App"
+    "message": "I-download ang Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "I-download ang Modrinth App"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "I-download ang Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "I-download ang Modrinth App para sa {os}"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "I-download ang Icarus Launcher para sa {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Screenshot ng main menu screen ng Cobblemon instance."
@@ -282,7 +282,7 @@
     "message": "Lumikha ng account"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Sa paggawa ng account, sumasang-ayon ka sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
+    "message": "Sa paggawa ng account, sumasang-ayon ka sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Icarus."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Hindi magkatugma ang mga password!"
@@ -291,7 +291,7 @@
     "message": "Mayroon ka nang account?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Mag-subscribe ukol sa mga update sa Modrinth"
+    "message": "Mag-subscribe ukol sa mga update sa Icarus"
   },
   "auth.sign-up.title": {
     "message": "Mag-sign Up"
@@ -333,16 +333,16 @@
     "message": "Patunayan ang Email"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Mag-subscribe ukol sa mga update ng Modrinth"
+    "message": "Mag-subscribe ukol sa mga update ng Icarus"
   },
   "auth.welcome.description": {
     "message": "Ikaw ay parte na ngayon ng kahanga-hangang komunidad na ito ng mga tagagawa at manlalalakbay na nagtataguyod, nagda-download, at nananatiling napapanahon sa mga nakamamanghang na mga mod."
   },
   "auth.welcome.label.tos": {
-    "message": "Sa paggawa ng account, sumang-ayon ka na sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
+    "message": "Sa paggawa ng account, sumang-ayon ka na sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Icarus."
   },
   "auth.welcome.long-title": {
-    "message": "Maligayang pagdating sa Modrinth!"
+    "message": "Maligayang pagdating sa Icarus!"
   },
   "auth.welcome.title": {
     "message": "Maligayang Pagdating"
@@ -372,7 +372,7 @@
     "message": "Sigurado ka bang gusto mong tanggalin ang koleksiyong ito?"
   },
   "collection.description": {
-    "message": "{description} - Tingnan ang koleksiyon {name} ni {username} sa Modrinth"
+    "message": "{description} - Tingnan ang koleksiyon {name} ni {username} sa Icarus"
   },
   "collection.description.following": {
     "message": "Koleksiyong awtomatikong binuo ng lahat ng proyektong sinusundan mo."
@@ -393,7 +393,7 @@
     "message": "Wala pang proyekto sa koleksiyon"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Wala pang proyekto} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Wala pang proyekto} one {<stat>{count}</stat> {type}} other {<stat>{count}</stat> na {type}}}"
   },
   "collection.label.updated-at": {
     "message": "In-update {ago}"
@@ -554,9 +554,6 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Lumikha ng affiliate link"
   },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Walang mahanap na affiliate code."
-  },
   "dashboard.affiliate-links.error.title": {
     "message": "Bigong ma-load ang mga affiliate link"
   },
@@ -574,15 +571,6 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Maghanap ng affiliate link..."
-  },
-  "dashboard.analytics.from-projects": {
-    "message": "galing sa {count} {count, plural, one {proyekto} other {na proyekto}}"
-  },
-  "dashboard.analytics.total-downloads": {
-    "message": "Kabuuang pag-download"
-  },
-  "dashboard.analytics.total-followers": {
-    "message": "Kabuuang tagasunod"
   },
   "dashboard.collections.button.create-new": {
     "message": "Lumikha ng bago"
@@ -603,22 +591,10 @@
     "message": "{count} {countPlural, plural, one {proyekto} other {na proyekto}}"
   },
   "dashboard.collections.label.search-input": {
-    "message": "Maghanap sa iyong koleksiyon"
+    "message": "Hanapin ang iyong mga koleksiyon"
   },
   "dashboard.collections.long-title": {
     "message": "Mga koleksiyon mo"
-  },
-  "dashboard.collections.placeholder.search": {
-    "message": "Maghanap ng koleksiyon..."
-  },
-  "dashboard.collections.sort.name-ascending": {
-    "message": "Pangalan (A-Z)"
-  },
-  "dashboard.collections.sort.recently-created": {
-    "message": "Kamakailang Linikha"
-  },
-  "dashboard.collections.sort.recently-updated": {
-    "message": "Kamakailang In-update"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Download {formType}"
@@ -648,7 +624,7 @@
     "message": "Pormularyo sa buwis"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "And Modrinth ay gumagamit ng third-party provider Track1099 upang masiguro ang pagkolekta at pagsilid ng mga pormularyo ng buwis mo. <security-link>Dito matuto pa.</security-link>"
+    "message": "And Icarus ay gumagamit ng third-party provider Track1099 upang masiguro ang pagkolekta at pagsilid ng mga pormularyo ng buwis mo. <security-link>Dito matuto pa.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Security practices"
@@ -813,7 +789,7 @@
     "message": "Mangyaring kumpletuhin ang pormularyo sa ibaba upang ma-withdraw ang buong <b>{available}</b> balanseng magagamit. Ito ay kinakailangan sa pag-uulat ng buwis at kaiisang beses lamang gagawin."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "Nangangailangan kang kumumpleto ng W-9 o W-8 na pormularyo para sa pagtatala ng Modrinth sa buwis at upang manatili tayong masunirin sa mga regulasyon sa buwis."
+    "message": "Nangangailangan kang kumumpleto ng W-9 o W-8 na pormularyo para sa pagtatala ng Icarus sa buwis at upang manatili tayong masunirin sa mga regulasyon sa buwis."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Kailangan ng pormularyo sa buwis"
@@ -855,7 +831,7 @@
     "message": "Hindi napatunayang email"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "Ang delivery email na iyong inilagay ay hindi magkaugnay sa iyong Modrinth account. Hindi maaaring masauli ng Modrinth ang mga gantimpalang pinadala sa maling email address."
+    "message": "Ang delivery email na iyong inilagay ay hindi magkaugnay sa iyong Icarus account. Hindi maaaring masauli ng Icarus ang mga gantimpalang pinadala sa maling email address."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Lower fees available"
@@ -872,66 +848,6 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Naubos mo na ang iyong <b>{withdrawLimit}</b> hangganan sa pag-withdraw. Mangangailangan kang kumumpleto ng pormularyo sa buwis upang makapag-withdraw ngayon higit pa."
   },
-  "dashboard.head-title": {
-    "message": "Dashboard"
-  },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Tratuhing binasa na"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Tingnan ang kasaysayan"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "Wala kang di-nababasang notipikasyon."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Error sa paglo-load ng mga notipikasyon:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Kasaysayan"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Kasaysayan ng notipikasyon"
-  },
-  "dashboard.notifications.link.see-all": {
-    "message": "Tingnan lahat"
-  },
-  "dashboard.notifications.link.view-history": {
-    "message": "Tingnan ang kasaysayan ng notipikasyon"
-  },
-  "dashboard.notifications.link.view-more": {
-    "message": "Tingnan ang {extraNotifs} pang {extraNotifs, plural, other {notipikasyon}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Naglo-load ang mga notipikasyon..."
-  },
-  "dashboard.organizations.button.create": {
-    "message": "Lumikha ng organisasyon"
-  },
-  "dashboard.organizations.empty.cta": {
-    "message": "Gumawa ng organisasyon!"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count} {count, plural, one {miyembro} other {na miyembro}}"
-  },
-  "dashboard.organizations.title": {
-    "message": "Organisasyon"
-  },
-  "dashboard.projects.head-title": {
-    "message": "Mga proyekto"
-  },
-  "dashboard.projects.links.and-more": {
-    "message": "at {count} pa..."
-  },
-  "dashboard.projects.project.review-environment-metadata": {
-    "message": "Pakisuri sa metadata sa environment"
-  },
-  "dashboard.reports.active-title": {
-    "message": "Aktibong sumbong"
-  },
-  "dashboard.reports.title": {
-    "message": "Mga sumbong"
-  },
   "dashboard.revenue.available-now": {
     "message": "Magagamit ngayon"
   },
@@ -942,7 +858,7 @@
     "message": "Ang tinanatayang revenu ay maaari pang magbagi hanggang lamang na ito ay magiging available na."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Pindutin upang matuto kung paano pinamamahalaan ng Modrinth ang iyong revenue."
+    "message": "Pindutin upang matuto kung paano pinamamahalaan ng Icarus ang iyong revenue."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Tinantiyang {date}"
@@ -963,13 +879,10 @@
     "message": "Withdrawn"
   },
   "dashboard.revenue.tos": {
-    "message": "Sa pag-upload ng mga proyekto sa Modrinth at pag-withdraw ng pera galing sa iyong account, sumasang-ayon ka sa aming <terms-link>Mga Tuntunin sa Programa ng Gantimpala</terms-link>. Matuto pa ukol sa aming <info-link>Programa ng Gantimpala</info-link>."
+    "message": "Sa pag-upload ng mga proyekto sa Icarus at pag-withdraw ng pera galing sa iyong account, sumasang-ayon ka sa aming <terms-link>Mga Tuntunin sa Programa ng Gantimpala</terms-link>. Matuto pa ukol sa aming <info-link>Programa ng Gantimpala</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "I-download bilang CSV"
-  },
-  "dashboard.revenue.transactions.head-title": {
-    "message": "Kasaysayan ng transaksiyon"
   },
   "dashboard.revenue.transactions.header": {
     "message": "Mga transaksiyon"
@@ -983,9 +896,6 @@
   "dashboard.revenue.transactions.see-all": {
     "message": "Tingnan lahat"
   },
-  "dashboard.revenue.transactions.year.all": {
-    "message": "Lahat ng taon"
-  },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Ang iyong pag-withdraw ay pansamantalang pinatigilan dahil hindi tumugma ang iyong TIN o SSN sa talaan ng IRS. Mangyaring abutin ang suporta upang ma-reset at muling sumitehin ang iyong pormularyo sa buwis."
   },
@@ -997,9 +907,6 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Mag-withdraw"
-  },
-  "dashboard.sidebar.label.activeReports": {
-    "message": "Aktibong sumbong"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Account"
@@ -1050,7 +957,7 @@
     "message": "Kailangang mapatunayan ang email"
   },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Hindi namin maisumite ang iyong hiling na mag-withdraw, mangyaring suriin ang iyong mga detalye o abutin ang suporta. {error}"
+    "message": "Hindi namin masumite ang iyong hiling na mag-withdraw, mangyaring suriin ang iyong mga detalye o abutin ang suporta. {error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Hindi makapag-withdraw"
@@ -1083,7 +990,7 @@
     "message": "Ang halaga ng pag-withdraw (matapos ang singil) hindi umabot sa pinakamaliit na pinapayagang kailangan. Mangyaring taasan ang iyong halagang ma-withdraw."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
-    "message": "Labis na mababa ang balyu"
+    "message": "Labis na mababa ang halaga"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "Mangyaring pillin ang wastong PayPal transfer option para sa iyong rehiyon (US o internasyunal)."
@@ -1104,7 +1011,7 @@
     "message": "Ang koleksiyong ito ay maaaring prinibado."
   },
   "error.collection.404.list_item.3": {
-    "message": "Tinanggal ng moderation team ng Modrinth ang koleksiyong ito dahil sa paglabag nito sa aming <tou-link>Mga Tuntunun sa Paggamit</tou-link>."
+    "message": "Tinanggal ng moderation team ng Icarus ang koleksiyong ito dahil sa paglabag nito sa aming <tou-link>Mga Tuntunun sa Paggamit</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "Bakit?"
@@ -1125,10 +1032,10 @@
     "message": "Hindi maaabot na kontento dahil sa legal na rason"
   },
   "error.generic.default.list_item.1": {
-    "message": "Tingnan if wala ba ang Modrinth sa ngayon gamit ang aming <status-link>Status page</status-link>."
+    "message": "Tingnan if wala ba ang Icarus sa ngayon gamit ang aming <status-link>Status page</status-link>."
   },
   "error.generic.default.list_item.2": {
-    "message": "Kung mangyayari pa ito muli, mangyaring ipaalam sa Modrinth Team sa pagsali sa aming <discord-link>Discord server</discord-link>."
+    "message": "Kung mangyayari pa ito muli, mangyaring ipaalam sa Icarus Team sa pagsali sa aming <discord-link>Discord server</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Mangyaring subukan muli sa iilang minuto."
@@ -1146,7 +1053,7 @@
     "message": "Maaaring pinalitan ng may-ari ang URL ng organisasyon o kaya ay tinanggal na ito."
   },
   "error.organization.404.list_item.3": {
-    "message": "Tinanggal ng moderation team ng Modrinth ang organisasyong ito dahil sa paglabag nito sa aming <tou-link>Mga Tuntunin sa Paggamit</tou-link>."
+    "message": "Tinanggal ng moderation team ng Icarus ang organisasyong ito dahil sa paglabag nito sa aming <tou-link>Mga Tuntunin sa Paggamit</tou-link>."
   },
   "error.organization.404.list_title": {
     "message": "Bakit?"
@@ -1161,7 +1068,7 @@
     "message": "Maaaring pinalitan ng may-ari ang URL ng proyekto, prinibado, o kaya ay tinanggal na ito."
   },
   "error.project.404.list_item.3": {
-    "message": "Tinanggal ng moderation team ng Modrinth ang proyektong ito dahil sa paglabag nito sa aming <tou-link>Mga Tuntunin sa Paggamit</tou-link>."
+    "message": "Tinanggal ng moderation team ng Icarus ang proyektong ito dahil sa paglabag nito sa aming <tou-link>Mga Tuntunin sa Paggamit</tou-link>."
   },
   "error.project.404.list_title": {
     "message": "Bakit?"
@@ -1176,7 +1083,7 @@
     "message": "Maaaring nagpalit ng username ang tagagamit o kaya ay tinanggal niya ang kaniyang account."
   },
   "error.user.404.list_item.3": {
-    "message": "Maaaring tinapos ang kanyang account dahil sa paglabag sa <tou-link>Mga Tuntunin sa Paggamit</tou-link> ng Modrinth."
+    "message": "Maaaring tinapos ang kanyang account dahil sa paglabag sa <tou-link>Mga Tuntunin sa Paggamit</tou-link> ng Icarus."
   },
   "error.user.404.list_title": {
     "message": "Bakit?"
@@ -1218,10 +1125,10 @@
     "message": "Kapag nabibigatan ang iyong server, pansamantala naming dinaragdagan ng karagdagang CPU thread upang mabawasan nang bisa ang lag spike at instabilidad. Ito ay nakatutulong sa TPS na hindi ito bababa sa 20, sinisiguro ang maayos na karanasan. Dahil pansamantalaan lamang sa mabibigat na pagproseso ang dinagdag na CPU thread, maaaring hindi ito lilitaw sa ulat ng Spark o sa ibang kagamitang pagpo-profile."
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Anong uri ng CPU pinatatakbo ang mga server ng Modrinth Hosting?"
+    "message": "Anong uri ng CPU pinatatakbo ang mga server ng Icarus Hosting?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Ang mga server ng Modrinth Hosting ay pinapagana ng AMD Ryzen 7900 at 7950X3D katumbas na CPU sa 5+ GHz, pinares nang memoryang DDR5."
+    "message": "Ang mga server ng Icarus Hosting ay pinapagana ng AMD Ryzen 7900 at 7950X3D katumbas na CPU sa 5+ GHz, pinares nang memoryang DDR5."
   },
   "hosting-marketing.faq.currency": {
     "message": "Saang salapi pinipresyo ito?"
@@ -1230,19 +1137,19 @@
     "message": "Lahat ng presyo ay nasa United States Dollar (USD)."
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "Protekdado ba nang proteksiyong DDos ang Modrinth Hosting?"
+    "message": "Protekdado ba nang proteksiyong DDos ang Icarus Hosting?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Oo. Lahat ng server ng Modrinth Hosting ay may proteksiyong DDoS, umaabot ang kapasidad nang hanggang 17 Tbps sa iilang lokasyon."
+    "message": "Oo. Lahat ng server ng Icarus Hosting ay may proteksiyong DDoS, umaabot ang kapasidad nang hanggang 17 Tbps sa iilang lokasyon."
   },
   "hosting-marketing.faq.heading": {
     "message": "Kadalasang Tinatanong"
   },
   "hosting-marketing.faq.how-fast": {
-    "message": "Gaano ba kabilis ang mga server ng Modrinth Hosting?"
+    "message": "Gaano ba kabilis ang mga server ng Icarus Hosting?"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Ang mga server ng Modrinth Hosting ay naka-host sa napakamoderno at high-performance na hardware, ngunit mahirap matantiya kung papaano matumbasan sa bilis ng server dahil na rin sa iba pang mga salik, katulad ng mga mod, data pack, o plugin na pinatatakbo mo sa server, pati na ang kung pinapaano ito ng tagagamit."
+    "message": "Ang mga server ng Icarus Hosting ay naka-host sa napakamoderno at high-performance na hardware, ngunit mahirap matantiya kung papaano matumbasan sa bilis ng server dahil na rin sa iba pang mga salik, katulad ng mga mod, data pack, o plugin na pinatatakbo mo sa server, pati na ang kung pinapaano ito ng tagagamit."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "Lahat ng isyu sa performance ay kadalasang sanhi ng kakulangan sa optimisasyon ng modpack, mod, data pack, o plugin na nagdudulot ng pagbabagal ng server. Dahil ang aming server ay napaka-high-end, hindi ka na mag-aalala nito basta pinili mo ang nakaaangkop na plan para sa kontentong pinatatakbo sa iyong server."
@@ -1251,10 +1158,10 @@
     "message": "Maaari ko bang mapalaki ang storage ng aking server?"
   },
   "hosting-marketing.faq.increase-storage.answer": {
-    "message": "Oo, ang storage ay maaaring mapalaki para sa iyong server nang walang dagdag na bayarin. Kung kakailanganin mo ang higit pang storage, maaaring abutin ang Modrinth Support."
+    "message": "Oo, ang storage ay maaaring mapalaki para sa iyong server nang walang dagdag na bayarin. Kung kakailanganin mo ang higit pang storage, maaaring abutin ang Icarus Support."
   },
   "hosting-marketing.faq.location": {
-    "message": "Nasaan ang mga server ng Modrinth Hosting? Makapipili ba ako ng rehiyon?"
+    "message": "Nasaan ang mga server ng Icarus Hosting? Makapipili ba ako ng rehiyon?"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "Mayroon kaming mga server na magagamit sa Hilagang Amerika, Yuropa, at Timog-silangang Asya sa kasalukuyang sandali na maaari mong piliin pagkatapos bumili. Dadating ang higit pang rehiyon sa hinaharap! Kung nais mong magpalit ng rehiyon, mangyaring abutin ang suporta."
@@ -1263,7 +1170,7 @@
     "message": "Ano bang bersiyon ng Minecraft at loader ang magagamit?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Ang mga server ng Modrinth Hosting ay makatatakbo sa kahit na anong bersiyon ng Minecraft: Java Edition hanggang sa bersiyong 1.2.5, kasama ang mga snapshot version."
+    "message": "Ang mga server ng Icarus Hosting ay makatatakbo sa kahit na anong bersiyon ng Minecraft: Java Edition hanggang sa bersiyong 1.2.5, kasama ang mga snapshot version."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "Mayroon din kaming malawak na suporta sa mod at plugin loader, lakip nito ang Fabric, Quilt, Forge, at NeoForge para sa mod, kasali nito ang Paper at Purpur para sa plugin. Dumedepende ang pagkamagamit nito kung suporta ng mod o plugin loader ang piniling bersiyon ng Minecraft."
@@ -1280,11 +1187,11 @@
   "hosting-marketing.hero.button.start-your-server": {
     "message": "Simulan ang iyong server"
   },
-  "hosting-marketing.hero.host-with-modrinth": {
-    "message": "I-host ang susunod na server mo sa Modrinth Hosting"
+  "hosting-marketing.hero.host-with-Icarus": {
+    "message": "I-host ang susunod na server mo sa Icarus Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Ang Modrinth Hosting ang iyong pinakamadaling daan na makaho-host nang sarili mong Minecraft: Java Edition na server. Walang hadlangang pag-install at paglaro nang iyong mga paboritong mod at modpack, lahat sa loob ng plataporma ng Modrinth."
+    "message": "Ang Icarus Hosting ang iyong pinakamadaling daan na makaho-host nang sarili mong Minecraft: Java Edition na server. Walang hadlangang pag-install at paglaro nang iyong mga paboritong mod at modpack, lahat sa loob ng plataporma ng Icarus."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Dalubhasang pamamahala ng network"
@@ -1302,10 +1209,10 @@
     "message": "Pasadyang URL"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "Ibahagi ang iyong server gamit ang pasadyang <contrast>modrinth.gg</contrast> na URL."
+    "message": "Ibahagi ang iyong server gamit ang pasadyang <contrast>Icarus.gg</contrast> na URL."
   },
   "hosting-marketing.included.description": {
-    "message": "Nakapaloob sa bawat server ang malawak na tampok na dinisenyong bumigay ng karanasan sa hosting na sa Modrinth lang mabibigay."
+    "message": "Nakapaloob sa bawat server ang malawak na tampok na dinisenyong bumigay ng karanasan sa hosting na sa Icarus lang mabibigay."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Madaling gamitin na file manager"
@@ -1320,19 +1227,19 @@
     "message": "Tulong sa tuwing kakailanganin mo"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Abutin ang Modrinth team para sa tulong sa iyong server sa kahit na anong oras."
+    "message": "Abutin ang Icarus team para sa tulong sa iyong server sa kahit na anong oras."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "Isang makapangyarihang konsol, server properties manager, at higit pa"
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "Dala ng Modrinth Hosting ang makakapangyarihang kagamitan sa pamahala ng iyong server."
+    "message": "Dala ng Icarus Hosting ang makakapangyarihang kagamitan sa pamahala ng iyong server."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "SFTP access"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "Aksesihin ang mga file ng server mo nang deretso gamit ang SFTP na nakapaloob sa Modrinth Hosting."
+    "message": "Aksesihin ang mga file ng server mo nang deretso gamit ang SFTP na nakapaloob sa Icarus Hosting."
   },
   "hosting-marketing.included.with-your-server": {
     "message": "Sinama sa iyong server"
@@ -1355,20 +1262,20 @@
   "hosting-marketing.server-for-everyone": {
     "message": "May server para sa lahat"
   },
-  "hosting-marketing.why.all-on-modrinth": {
-    "message": "Pamahalaan ang lahat na ito sa Modrinth"
+  "hosting-marketing.why.all-on-Icarus": {
+    "message": "Pamahalaan ang lahat na ito sa Icarus"
   },
-  "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "Ang iyong server, mga mod, mga manlalaro, at higit pa ay lahat nasa Modrinth. Hindi na mangangailangang lumipat-lipat pa sa iba pang plataporma."
+  "hosting-marketing.why.all-on-Icarus.description": {
+    "message": "Ang iyong server, mga mod, mga manlalaro, at higit pa ay lahat nasa Icarus. Hindi na mangangailangang lumipat-lipat pa sa iba pang plataporma."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Laging mabilis"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "Ang aming impraestruktura ay hindi kailan man malalabisan ng karga, nangahuhulugan na ang bawat server na-host sa Modrinth ay laging tatakbo nang buong lakas."
+    "message": "Ang aming impraestruktura ay hindi kailan man malalabisan ng karga, nangahuhulugan na ang bawat server na-host sa Icarus ay laging tatakbo nang buong lakas."
   },
   "hosting-marketing.why.description": {
-    "message": "Pumili sa libo-libong modpack sa Modrinth o lumikha ng sa iyo. Anyayahin ang iyong mga kaibigan sa tuwing handa kayong maglaro."
+    "message": "Pumili sa libo-libong modpack sa Icarus o lumikha ng sa iyo. Anyayahin ang iyong mga kaibigan sa tuwing handa kayong maglaro."
   },
   "hosting-marketing.why.heading": {
     "message": "Maghanap ng modpack. Server na ito ngayon."
@@ -1377,22 +1284,22 @@
     "message": "Dumanas ng modernong, maaasahang hosting"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Ang mga server ng Modrinth Hosting ay naka-host sa <contrast>mga high-performance AMD CPU kasama ng DDR5 RAM</contrast>, pinatatakbo sa pasadyang gawa na software upang masiguro na tuloy-tuloy ang takbo ng server mo."
+    "message": "Ang mga server ng Icarus Hosting ay naka-host sa <contrast>mga high-performance AMD CPU kasama ng DDR5 RAM</contrast>, pinatatakbo sa pasadyang gawa na software upang masiguro na tuloy-tuloy ang takbo ng server mo."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Maglaro kung saan ang mod mo"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "And Modrinth Hosting ay magkaugnay na pinagsama sa proseso ng pag-install ng mod at modpack tungo sa iyong server."
+    "message": "And Icarus Hosting ay magkaugnay na pinagsama sa proseso ng pag-install ng mod at modpack tungo sa iyong server."
   },
-  "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "Bakit ba Modrinth Hosting?"
+  "hosting-marketing.why.why-Icarus-hosting": {
+    "message": "Bakit ba Icarus Hosting?"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "Lahat ng iyong paboritong mod"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "Mapa-Vanilla, mapa-Fabric, mapa-Forge, mapa-Quilt o mapa-NeoForge ba ang pili mo. Kung ito'y nasa Modrinth, gagana ito sa server mo."
+    "message": "Mapa-Vanilla, mapa-Fabric, mapa-Forge, mapa-Quilt o mapa-NeoForge ba ang pili mo. Kung ito'y nasa Icarus, gagana ito sa server mo."
   },
   "hosting.plan.out-of-stock": {
     "message": "Wala nang stock"
@@ -1407,7 +1314,7 @@
     "message": "Pumunta sa dashboard"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Ranasan ang pinakamagaling na karanasan sa modding kasali ang palaging mga update galing sa Modrinth team"
+    "message": "Ranasan ang pinakamagaling na karanasan sa modding kasali ang palaging mga update galing sa Icarus team"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Laging Umuunlad"
@@ -1452,13 +1359,13 @@
     "message": "Mag-follow sa mga mahal mong proyekto"
   },
   "landing.feature.launcher.description": {
-    "message": "Binibigyang-daan ng open-source API ng Modrinth ang mga launcher na makadagdag ng malalimang pagsasama sa Modrinth. Maaari mong gamitin ang Modrinth sa <link>aming app</link> at sa iilang pinakasikat na mga launcher gaya ng ATLauncher, MultiMC, at Prism Launcher."
+    "message": "Binibigyang-daan ng open-source API ng Icarus ang mga launcher na makadagdag ng malalimang pagsasama sa Icarus. Maaari mong gamitin ang Icarus sa <link>aming app</link> at sa iilang pinakasikat na mga launcher gaya ng ATLauncher, MultiMC, at Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "Maglaro sa iyong paboritong launcher"
   },
   "landing.feature.search.description": {
-    "message": "Ang malakitdlating-bilis na panghanap ng Modrinth at mahuhusay na pansala ay bibigyan ka ng daang mahanap ang lahat ng iyong gusto sa bawat mong pagtipa."
+    "message": "Ang malakitdlating-bilis na panghanap ng Icarus at mahuhusay na pansala ay bibigyan ka ng daang mahanap ang lahat ng iyong gusto sa bawat mong pagtipa."
   },
   "landing.feature.search.heading": {
     "message": "Hanapin ang gusto mo, mabilisan at madalian"
@@ -1491,10 +1398,10 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "Pinasimpleng representasyon ng isang Minecraft window, na may logo ng Mojang Studios sa Modrinth na berde."
+    "message": "Pinasimpleng representasyon ng isang Minecraft window, na may logo ng Mojang Studios sa Icarus na berde."
   },
-  "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+  "landing.launcher.Icarus-app-label": {
+    "message": "Icarus Launcher"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1584,25 +1491,25 @@
     "message": "Bisitahin ang mga setting sa account"
   },
   "layout.banner.add-email.description": {
-    "message": "Dahil sa mga kadahilang pangseguridad, kailangan ng Modrinth na makapag-register ka ng email address sa iyong account."
+    "message": "Dahil sa mga kadahilang pangseguridad, kailangan ng Icarus na makapag-register ka ng email address sa iyong account."
   },
   "layout.banner.build-fail.description": {
-    "message": "Itong pinakalat na frontend ng Modrinth ay bigong makabuo ng estado galing sa API. Maaaring dahil ito sa isang kawalan o kamalian sa kumpigurasyon. Muling magpatayo kapag magagamit na muli ang API. Mga code ng kamalian: {errors}; Ang kasalukuyang URL ng API ay: {url}"
+    "message": "Itong pinakalat na frontend ng Icarus ay bigong makabuo ng estado galing sa API. Maaaring dahil ito sa isang kawalan o kamalian sa kumpigurasyon. Muling magpatayo kapag magagamit na muli ang API. Mga code ng kamalian: {errors}; Ang kasalukuyang URL ng API ay: {url}"
   },
   "layout.banner.build-fail.title": {
-    "message": "Error sa pagbubuo ng estado galing sa API habang nagpapatayo."
+    "message": "May error sa pagbuo ng estado galing sa API habang nagpapatayo."
   },
   "layout.banner.preview.description": {
-    "message": "Kung ibig mong maakses ang opisyal na website ng Modrinth, bisitahin ang <link>https://modrinth.com</link>. Ito ay isang pinakalat na pasilip na ginagamit lamang ng kawani ng Modrinth sa pagsusubok nito. Ito ay pinatayo gamit ang <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Kung ibig mong maakses ang opisyal na website ng Icarus, bisitahin ang <link>https://Icarus.com</link>. Ito ay isang pinakalat na pasilip na ginagamit lamang ng kawani ng Icarus sa pagsusubok nito. Ito ay pinatayo gamit ang <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
-    "message": "Ito ay isang pinakalat na pasilip ng website ng Modrinth."
+    "message": "Ito ay isang pinakalat na pasilip ng website ng Icarus."
   },
   "layout.banner.staging.description": {
-    "message": "Buong magkahiwalay ang staging environment sa production Modrinth database. Ginagamit ito sa pagsusuri at pag-debug, at maaaring pinatatakbo sa mga bersiyong in-development ng backend o frontend sa bagong production instance ng Modrinth."
+    "message": "Buong magkahiwalay ang staging environment sa production Icarus database. Ginagamit ito sa pagsusuri at pag-debug, at maaaring pinatatakbo sa mga bersiyong in-development ng backend o frontend sa bagong production instance ng Icarus."
   },
   "layout.banner.staging.title": {
-    "message": "Tinitingnan mo ang staging environment ng Modrinth"
+    "message": "Tinitingnan mo ang staging environment ng Icarus"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "I-update ang billing info"
@@ -1617,7 +1524,7 @@
     "message": "Kinumpletong pormularyo sa buwis"
   },
   "layout.banner.tax.description": {
-    "message": "Ikaw ay naka-withdraw ng humigit {threshold} galing sa Modrinth ngayong taon. Upang makasunod sa regulasyon sa buwis, kinakailangang mong kumumpleto ng pormularyo sa buwis. Pinahinto muna ang iyong pag-withdraw hanggang ikaw ay nakapagsumite sa naturang pormularyo."
+    "message": "Ikaw ay naka-withdraw ng humigit {threshold} galing sa Icarus ngayong taon. Upang makasunod sa regulasyon sa buwis, kinakailangang mong kumumpleto ng pormularyo sa buwis. Pinahinto muna ang iyong pag-withdraw hanggang ikaw ay nakapagsumite sa naturang pormularyo."
   },
   "layout.banner.tax.title": {
     "message": "Nangangailangan ng pormularyo sa buwis"
@@ -1635,7 +1542,7 @@
     "message": "Muling ipadala ang email ng pagpapatunay"
   },
   "layout.banner.verify-email.description": {
-    "message": "Dahil sa mga kadahilang pangseguridad, kailangan ng Modrinth na mapatunayan ang email address sa iyong account."
+    "message": "Dahil sa mga kadahilang pangseguridad, kailangan ng Icarus na mapatunayan ang email address sa iyong account."
   },
   "layout.footer.about": {
     "message": "Tungkol"
@@ -1676,23 +1583,23 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Mga Tuntunin sa Paggamit"
   },
-  "layout.footer.modrinth-information": {
-    "message": "Impormasyon ng Modrinth"
+  "layout.footer.Icarus-information": {
+    "message": "Impormasyon ng Icarus"
   },
   "layout.footer.open-source": {
-    "message": "<github-link>Open source</github-link> ang Modrinth."
+    "message": "<github-link>Open source</github-link> ang Icarus."
   },
   "layout.footer.products": {
     "message": "Mga Produkto"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Icarus Launcher"
   },
   "layout.footer.products.plus": {
-    "message": "Modrinth+"
+    "message": "Icarus+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "layout.footer.resources": {
     "message": "Mga Mapagkukunan"
@@ -1728,7 +1635,7 @@
     "message": "I-toggle ang menu"
   },
   "layout.meta.description": {
-    "message": "Mag-download ng mga Minecraft mod, plugin, datapack, shader, resourcepack, at modpack sa Modrinth. Tumuklas at mag-publish ng mga proyekto sa Modrinth na may moderno at madaling gamitin na interface at API."
+    "message": "Mag-download ng mga Minecraft mod, plugin, datapack, shader, resourcepack, at modpack sa Icarus. Tumuklas at mag-publish ng mga proyekto sa Icarus na may moderno at madaling gamitin na interface at API."
   },
   "layout.meta.og-description": {
     "message": "Tumuklas at lumathala ng mga kontentong Minecraft!"
@@ -1748,8 +1655,8 @@
   "layout.nav.discover-content": {
     "message": "Tumuklas ng kontento"
   },
-  "layout.nav.get-modrinth-app": {
-    "message": "Kunin ang Modrinth App"
+  "layout.nav.get-Icarus-app": {
+    "message": "Kunin ang Icarus Launcher"
   },
   "layout.nav.home": {
     "message": "Tahanan"
@@ -1757,11 +1664,11 @@
   "layout.nav.host-a-server": {
     "message": "Mag-host ng server"
   },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+  "layout.nav.Icarus-app": {
+    "message": "Icarus Launcher"
   },
-  "layout.nav.modrinth-home-page": {
-    "message": "Pahina ng tahanan ng Modrinth"
+  "layout.nav.Icarus-home-page": {
+    "message": "Pahina ng tahanan ng Icarus"
   },
   "layout.nav.my-servers": {
     "message": "Aking mga server"
@@ -1784,8 +1691,8 @@
   "layout.nav.search": {
     "message": "Maghanap"
   },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Mag-upgrade sa Modrinth+"
+  "layout.nav.upgrade-to-Icarus-plus": {
+    "message": "Mag-upgrade sa Icarus+"
   },
   "moderation.moderate": {
     "message": "Moderate"
@@ -1797,7 +1704,7 @@
     "message": "Mga Sumbong"
   },
   "moderation.page.technicalReview": {
-    "message": "Tech review"
+    "message": "Teknikal na Pagsusuri"
   },
   "muralpay.account-type.checking": {
     "message": "Sinusuri"
@@ -2067,10 +1974,10 @@
     "message": "Pakisuri muli ng iyong wallet address. Ang mga pundong nahatid sa maling address ay hindi na mababawi."
   },
   "profile.bio.fallback.creator": {
-    "message": "Isang tagagawa sa Modrinth."
+    "message": "Isang tagagawa sa Icarus."
   },
   "profile.bio.fallback.user": {
-    "message": "Isang tagagamit sa Modrinth."
+    "message": "Isang tagagamit sa Icarus."
   },
   "profile.button.billing": {
     "message": "Pamahalaan ang billing ng tagagamit"
@@ -2154,10 +2061,10 @@
     "message": "Sine-save..."
   },
   "profile.meta.description": {
-    "message": "Magdownload ng mga proyekto ni {username} sa Modrinth"
+    "message": "Magdownload ng mga proyekto ni {username} sa Icarus"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} - Magdownload ng mga proyekto ni {username} sa Modrinth"
+    "message": "{bio} - Magdownload ng mga proyekto ni {username} sa Icarus"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> follower ng proyekto} other {<stat>{count}</stat> na follower ng proyekto}}"
@@ -2196,7 +2103,7 @@
     "message": "Sumitehin muli upang muling mapasuri"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Ang iyong proyekto ay {status, select, rejected {tinanggihan} withheld {na-withdhold} other {{status}}} ng staff ng Modrinth. Sa kadalasan, maaari mong sumitehin muli upang muling mapasuri matapos tugunan ang mensahe ng staff."
+    "message": "Ang iyong proyekto ay {status, select, rejected {tinanggihan} withheld {na-withdhold} other {{status}}} ng staff ng Icarus. Sa kadalasan, maaari mong sumitehin muli upang muling mapasuri matapos tugunan ang mensahe ng staff."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Nangangailangang makumpleto mo ang mga hakbang sa checklist ng paglalathala!"
@@ -2310,7 +2217,7 @@
     "message": "Suriin ang proyekto"
   },
   "project.actions.servers-promo.description": {
-    "message": "Ang Modrinth Hosting ang pinakamadaling paraang makapaglaro sa iyong mga kalaro ng walang kahadlangan!"
+    "message": "Ang Icarus Hosting ang pinakamadaling paraang makapaglaro sa iyong mga kalaro ng walang kahadlangan!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Nagsisinula sa {price}<small> / buwan</small>"
@@ -2334,7 +2241,7 @@
     "message": "Bersiyon ng laro: {version}"
   },
   "project.download.game-version-error": {
-    "message": "Error: walang mahanap na mga bersiyon ng laro"
+    "message": "Kamalian: walang mahanap na mga bersiyon ng laro"
   },
   "project.download.game-version-tooltip": {
     "message": "Ang {title} ay magagamit lamang sa {version}"
@@ -2343,10 +2250,10 @@
     "message": "Hindi masuporta ng {title} ang {gameVersion} para sa {platform}"
   },
   "project.download.install-with-app": {
-    "message": "I-install gamit ang Modrinth App"
+    "message": "I-install gamit ang Icarus Launcher"
   },
   "project.download.no-app": {
-    "message": "Wala kang Modrinth App?"
+    "message": "Wala kang Icarus Launcher?"
   },
   "project.download.no-versions-available": {
     "message": "Walang bersiyong magagamit para sa {gameVersion} at {platform}."
@@ -2355,7 +2262,7 @@
     "message": "Plataporma: {platform}"
   },
   "project.download.platform-error": {
-    "message": "Error: walang mahanap na platform"
+    "message": "Kamalian: walang mahanap na platform"
   },
   "project.download.platform-tooltip": {
     "message": "Ang {title} ay magagamit lamang sa {platform}"
@@ -2382,7 +2289,7 @@
     "message": "I-download ang {title}"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Kakaunlad lang ng aming sistema sa Mga Environment sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Wala kang pahintulot na magbago sa mga setting na ito, mangyaring ipaalam sa isa pang miyembro ng proyekto na kailangang mapatunayan ang metadata ng environment."
+    "message": "Kakaunlad lang ng aming sistema sa Mga Environment sa Icarus at magagamit na ngayon ang mga bagong pagpipilian. Wala kang pahintulot na magbago sa mga setting na ito, mangyaring ipaalam sa isa pang miyembro ng proyekto na kailangang mapatunayan ang metadata ng environment."
   },
   "project.environment.migration-no-permission.title": {
     "message": "Kailangang suriin ang metadata ng environment"
@@ -2391,7 +2298,7 @@
     "message": "Matuto pa ukol sa pagbabagong ito"
   },
   "project.environment.migration.message": {
-    "message": "Kakaunlad lang ng aming sistema sa Mga Environment sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring patunayan na wasto ang metadata."
+    "message": "Kakaunlad lang ng aming sistema sa Mga Environment sa Icarus at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring patunayan na wasto ang metadata."
   },
   "project.environment.migration.review-button": {
     "message": "Suriin ang mga setting sa environment"
@@ -2400,7 +2307,7 @@
     "message": "Pakisuri sa metadata sa environment"
   },
   "project.error.loading": {
-    "message": "Error sa paglo-load ng datos ng proyekto{message}"
+    "message": "Nagkamali sa pag-load ng project data{message}"
   },
   "project.error.page-not-found": {
     "message": "Hindi mahanap na pahina"
@@ -2483,9 +2390,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Kung magsasama ka ng mga kontentong hindi naka-host sa Modrinth, kailangan niyong ipaalam sa amin sa pinanggalingan nito at matiyak na pinahintulutang mapakalat ang mga file. Tingnan ang <link>aming gabay</link> upang matuto kung papaano ito magawa nang maayos!"
-  },
   "project.settings.title": {
     "message": "Mga Setting"
   },
@@ -2526,7 +2430,7 @@
     "message": "Hindi mahanap ang {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}"
   },
   "report.for.violation": {
-    "message": "Paglabag sa <rules-link>Mga Patakaran</rules-link> o <terms-link>Mga Tuntunin sa Paggamit</terms-link> ng Modrinth"
+    "message": "Paglabag sa <rules-link>Mga Patakaran</rules-link> o <terms-link>Mga Tuntunin sa Paggamit</terms-link> ng Icarus"
   },
   "report.for.violation.description": {
     "message": "Halimbawa ang malisyoso, spam, mapanakit, mapanlinlang, o ilegal na kontento."
@@ -2571,7 +2475,7 @@
     "message": "Anong uri ng kontento ang iyong isusumbong?"
   },
   "report.question.report-reason": {
-    "message": "Aling sa mga tuntunin ng Modrinth ang nilabag ng {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito?"
+    "message": "Aling sa mga tuntunin ng Icarus ang nilabag ng {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito?"
   },
   "report.report-content": {
     "message": "Isumbong ang kontento sa mga moderator"
@@ -2775,7 +2679,7 @@
     "message": "Pagsulat sa sumbong"
   },
   "scopes.sessionAccess.description": {
-    "message": "Pag-akses sa mga sesyong inisyu ng Modrinth"
+    "message": "Pag-akses sa mga sesyong inisyu ng Icarus"
   },
   "scopes.sessionAccess.label": {
     "message": "Pag-akses ng sesyon"
@@ -2912,9 +2816,6 @@
   "settings.account.email.modal.header.add": {
     "message": "Magdagdag ng email"
   },
-  "settings.account.password.modal.header.add": {
-    "message": "Magdagdag ng password"
-  },
   "settings.account.providers.action.add": {
     "message": "Idagdag"
   },
@@ -2929,9 +2830,6 @@
   },
   "settings.account.security.email.title": {
     "message": "Email"
-  },
-  "settings.account.security.password.action.add": {
-    "message": "Magdagdag ng password"
   },
   "settings.account.security.password.title": {
     "message": "Password"
@@ -2988,7 +2886,7 @@
     "message": "Sigurado ka bang gusto mong tanggalin ang aplikasyong ito?"
   },
   "settings.applications.description.intro": {
-    "message": "Ang mga aplikasyon ay maaaring gamitin sa pagpapatunay ng mga tagagamit ng Modrinth sa iyong mga produkto. Para sa karagdagang impormasyon, tingnan ang <docs-link>dokumentasyon ng API ng Modrinth</docs-link>."
+    "message": "Ang mga aplikasyon ay maaaring gamitin sa pagpapatunay ng mga tagagamit ng Icarus sa iyong mga produkto. Para sa karagdagang impormasyon, tingnan ang <docs-link>dokumentasyon ng API ng Icarus</docs-link>."
   },
   "settings.applications.field.description": {
     "message": "Paglalarawan"
@@ -3020,9 +2918,6 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
-  "settings.applications.head-title": {
-    "message": "Mga aplikasyon"
-  },
   "settings.applications.modal.header": {
     "message": "Impormasyon ng aplikasyon"
   },
@@ -3045,7 +2940,7 @@
     "message": "Kasalukuyang hindi namin mapapakita ang mga pinahintulutang app, kinukumpuni pa namin ito. Mangyaring bisitahin ang pahinang ito sa ibang pagkataon!"
   },
   "settings.authorizations.head-title": {
-    "message": "Mga pagpapahintulot"
+    "message": "Mga Pagpapahintulot"
   },
   "settings.authorizations.revoke.action": {
     "message": "Bawiin"
@@ -3119,26 +3014,17 @@
   "settings.billing.payment_method.title": {
     "message": "Mga paraan ng pagbabayad"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
-  "settings.billing.pyro.resubscribe.error.text": {
-    "message": "Isang error ang naganap habang pagre-resubscribe sa iyong Modrinth server."
-  },
-  "settings.billing.pyro.resubscribe.error.title": {
-    "message": "Error sa muling pag-subscribe"
-  },
   "settings.billing.pyro_subscription.description": {
-    "message": "Pamahalaan ang iyong mga Modrinth Server subscription."
+    "message": "Pamahalaan ang iyong mga Icarus Server subscription."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Mga Modrinth Server Subscription"
+    "message": "Mga Icarus Server Subscription"
   },
   "settings.billing.subscribe": {
     "message": "Mag-subscribe"
   },
   "settings.billing.subscription.description": {
-    "message": "Pamahalaan ang iyong mga subscription sa Modrinth."
+    "message": "Pamahalaan ang iyong mga subscription sa Icarus."
   },
   "settings.billing.subscription.title": {
     "message": "Mga subscription"
@@ -3150,7 +3036,7 @@
     "message": "Patayin ang developer mode"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "Ang <strong>developer mode</strong> ay aktibo. Binibigyang-daan ka nitong malaman ang internal ID ng samut-saring bagay sa Modrinth na nakakatulong sa mga developer sa paggamit ng Modrinth API. Pindutin ang logo ng Modrinth sa ibaba ng pahina ng 5 beses upang ma-toggle ang developer mode."
+    "message": "Ang <strong>developer mode</strong> ay aktibo. Binibigyang-daan ka nitong malaman ang internal ID ng samut-saring bagay sa Icarus na nakakatulong sa mga developer sa paggamit ng Icarus API. Pindutin ang logo ng Icarus sa ibaba ng pahina ng 5 beses upang ma-toggle ang developer mode."
   },
   "settings.display.flags.description": {
     "message": "Magpagana at magpatay ng mga piniling tampok sa iyong device."
@@ -3210,16 +3096,16 @@
     "message": "Masalimuot na pagrerender"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Gawin na magbukas ng bagong tab ang mga link na papunta sa labas ng Modrinth. Kahit na sa setting na ito, ang mga link sa magkatulad na domain at nasa paglalarawang Markdown ay bubukas sa iisang tab, at ang mga link sa ads at edit page ay magbubukas sa bagong tab."
+    "message": "Gawin na magbukas ng bagong tab ang mga link na papunta sa labas ng Icarus. Kahit na sa setting na ito, ang mga link sa magkatulad na domain at nasa paglalarawang Markdown ay bubukas sa iisang tab, at ang mga link sa ads at edit page ay magbubukas sa bagong tab."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Buksan ang link palabas sa bagong tab"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Itatago ang \"Kunin ang Modrinth App\" na mga pindutan sa pangunahing navigation. Ang pahina ng Modrinth App ay maaari pa ring mahanap sa landing page o kaya sa footer."
+    "message": "Itatago ang \"Kunin ang Icarus Launcher\" na mga pindutan sa pangunahing navigation. Ang pahina ng Icarus Launcher ay maaari pa ring mahanap sa landing page o kaya sa footer."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Itago ang mga promosyong Modrinth App"
+    "message": "Itago ang mga promosyong Icarus Launcher"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Pinakaliwang sidebar sa mga pahinang kontento"
@@ -3234,19 +3120,16 @@
     "message": "Pinakanang sidebar ng pansala sa pahina ng paghanap"
   },
   "settings.display.theme.description": {
-    "message": "Pumili ng iyong gugustohing paksang kulay para sa Modrinth ng nitong device."
+    "message": "Pumili ng iyong gugustohing paksang kulay para sa Icarus ng nitong device."
   },
   "settings.display.theme.title": {
     "message": "Paksang kulay"
-  },
-  "settings.head-title": {
-    "message": "Settings ng display"
   },
   "settings.pats.action.create": {
     "message": "Lumikha ng PAT"
   },
   "settings.pats.description": {
-    "message": "Maaaring ma-akses ang mga PAT gamit ang API ng Modrinth. Maaari silang malikha at mabawi sa kahit anong panahon, tingnan ang <doc-link>dokumentasyon ng API ng Modrinth</doc-link>."
+    "message": "Maaaring ma-akses ang mga PAT gamit ang API ng Icarus. Maaari silang malikha at mabawi sa kahit anong panahon, tingnan ang <doc-link>dokumentasyon ng API ng Icarus</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Lumikha ng PAT"
@@ -3300,10 +3183,7 @@
     "message": "Biyograpiya"
   },
   "settings.profile.description": {
-    "message": "Makikita ng publiko ang impormasyon ng iyong profile at sa <docs-link>API ng Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Settings ng profile"
+    "message": "Makikita ng publiko ang impormasyon ng iyong profile at sa <docs-link>API ng Icarus</docs-link>."
   },
   "settings.profile.profile-info": {
     "message": "Impormasyon ng profile"
@@ -3324,7 +3204,7 @@
     "message": "Kasalukuyang sesyon"
   },
   "settings.sessions.description": {
-    "message": "Narito ang lahat ng mga device na kasalukuyang nakalog-in sa iyong Modrinth account. Maaari mong maisaisang malog-out ang bawat isa.\n\nKung makakita ka ng isang hindi mo nakikilala, maglog-out sa device na iyon at agarang palitan ang password ng iyong Modrinth account."
+    "message": "Narito ang lahat ng mga device na kasalukuyang nakalog-in sa iyong Icarus account. Maaari mong maisaisang malog-out ang bawat isa.\n\nKung makakita ka ng isang hindi mo nakikilala, maglog-out sa device na iyon at agarang palitan ang password ng iyong Icarus account."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Huling inakses {ago}"
@@ -3342,7 +3222,7 @@
     "message": "Display"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Mga nagbabagang balita galing sa Modrinth"
+    "message": "Mga nagbabagang balita galing sa Icarus"
   },
   "ui.latest-news-row.view-all": {
     "message": "Tingnan ang lahat ng balita"
@@ -3354,7 +3234,7 @@
     "message": "Naka-subscribe!"
   },
   "ui.newsletter-button.tooltip": {
-    "message": "Mag-subscribe sa Modrinth newsletter"
+    "message": "Mag-subscribe sa Icarus newsletter"
   },
   "version.environment.none.description": {
     "message": "Wala pang itinakdang environment para sa bersiyong ito."
@@ -3369,3 +3249,4 @@
     "message": "Hindi kilalang environment"
   }
 }
+

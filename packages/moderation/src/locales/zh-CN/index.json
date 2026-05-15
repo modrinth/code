@@ -18,13 +18,13 @@
     "defaultMessage": "添加 Java 地址"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "添加一些 Modrinth 站外的相关链接，例如一个网站、商店或 Discord 频道邀请。"
+    "defaultMessage": "添加一些 Icarus 站外的相关链接，例如一个网站、商店或 Discord 频道邀请。"
   },
   "nags.add-links-server.title": {
     "defaultMessage": "添加外部链接"
   },
   "nags.add-links.description": {
-    "defaultMessage": "添加一些 Modrinth 站外的相关链接，例如源代码仓库、问题追踪器或 Discord 频道邀请。"
+    "defaultMessage": "添加一些 Icarus 站外的相关链接，例如源代码仓库、问题追踪器或 Discord 频道邀请。"
   },
   "nags.add-links.title": {
     "defaultMessage": "添加外部链接"
@@ -249,4 +249,5 @@
     "defaultMessage": "访问链接设置"
   }
 }
+
 

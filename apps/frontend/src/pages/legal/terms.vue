@@ -8,8 +8,8 @@
 			(<strong>"Company"</strong>, <strong>"we"</strong> or <strong>"us"</strong>). The following
 			terms and conditions, together with any documents they expressly incorporate by reference
 			(collectively, these "Terms of Use"), govern your access to and use of www.modrinth.com,
-			api.modrinth.com, or the Modrinth App, including any content, functionality and services
-			offered on or through www.modrinth.com, api.modrinth.com, or the Modrinth App (the "Service"),
+			api.modrinth.com, or the Icarus Launcher, including any content, functionality and services
+			offered on or through www.modrinth.com, api.modrinth.com, or the Icarus Launcher (the "Service"),
 			whether as a guest or a registered user.
 		</p>
 		<p>
@@ -106,28 +106,28 @@
 		<h2>API Usage</h2>
 		<p>
 			As part of our Services, we provide a tool known as Application Programming Interfaces
-			(Modrinth API). The Modrinth API enables users to perform actions on the Service via their own
+			(Icarus API). The Icarus API enables users to perform actions on the Service via their own
 			services, such as their websites and/or applications.
 		</p>
 		<p>
-			We grant the User of the Modrinth API a limited, non-exclusive, non-sublicensable and
+			We grant the User of the Icarus API a limited, non-exclusive, non-sublicensable and
 			revocable license to download, display, query, create, edit, and delete the User Generated
 			Content on the Service via their own services, such as their websites and/or applications (the
 			API License), provided the User complies with the following conditions:
 		</p>
 		<ul>
 			<li>
-				The User uses the Modrinth API in accordance with these Terms, the Community Standards and
+				The User uses the Icarus API in accordance with these Terms, the Community Standards and
 				all applicable laws and regulations that apply to such use.
 			</li>
 			<li>the User does not infringe any rights of third parties.</li>
 			<li>
-				the User provides Modrinth all assistance requested in complying with, and concluding all
+				the User provides Icarus all assistance requested in complying with, and concluding all
 				agreements required by the applicable laws and regulations.
 			</li>
 		</ul>
 		<p>
-			Each User using the Modrinth API shall indemnify Modrinth and keep Modrinth indemnified for
+			Each User using the Icarus API shall indemnify Icarus and keep Icarus indemnified for
 			all claims, proceedings or actions brought by another User or any other third party, including
 			governmental authorities.
 		</p>
@@ -167,7 +167,7 @@
 		</p>
 		<h2>Trademarks</h2>
 		<p>
-			The Company name, the terms Modrinth, the Company logo and all related names, logos, product
+			The Company name, the terms Icarus, the Company logo and all related names, logos, product
 			and service names, designs and slogans are trademarks of the Company or its affiliates or
 			licensors. You must not use such marks without the prior written permission of the Company.
 			All other names, logos, product and service names, designs and slogans contained in the
@@ -551,12 +551,13 @@
 
 <script setup>
 const description =
-	'The Terms of Use of Modrinth, an open source modding platform focused on Minecraft.'
+	'The Terms of Use of Icarus, an open source modding platform focused on Minecraft.'
 
 useSeoMeta({
-	title: 'Terms of Use - Modrinth',
+	title: 'Terms of Use - Icarus',
 	description,
 	ogTitle: 'Terms of Use',
 	ogDescription: description,
 })
 </script>
+

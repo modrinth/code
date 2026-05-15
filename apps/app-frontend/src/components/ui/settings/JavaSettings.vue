@@ -1,5 +1,5 @@
 <script setup>
-import { injectNotificationManager } from '@modrinth/ui'
+import { injectNotificationManager } from '@icarus/ui'
 import { ref } from 'vue'
 
 import JavaSelector from '@/components/ui/JavaSelector.vue'

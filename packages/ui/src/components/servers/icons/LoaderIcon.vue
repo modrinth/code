@@ -223,8 +223,8 @@
 </template>
 
 <script setup lang="ts">
-import { LoaderIcon } from '@modrinth/assets'
-import type { Loaders } from '@modrinth/utils'
+import { LoaderIcon } from '@icarus/assets'
+import type { Loaders } from '@icarus/utils'
 
 defineProps<{
 	loader: Loaders

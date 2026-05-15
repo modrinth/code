@@ -18,13 +18,13 @@
     "defaultMessage": "Lägg till Java-adress"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Lägg till andra relevanta länkar utanför Modrinth, som till exempel en webbsida, butik eller en Discord-inbjudning."
+    "defaultMessage": "Lägg till andra relevanta länkar utanför Icarus, som till exempel en webbsida, butik eller en Discord-inbjudning."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Lägg till externa länkar"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Lägg till andra relevanta länkar utanför Modrinth, som till exempel källkoden, en buggspårare eller en Discord-inbjudning."
+    "defaultMessage": "Lägg till andra relevanta länkar utanför Icarus, som till exempel källkoden, en buggspårare eller en Discord-inbjudning."
   },
   "nags.add-links.title": {
     "defaultMessage": "Lägg till externa länkar"
@@ -249,4 +249,5 @@
     "defaultMessage": "Besök länkinställningar"
   }
 }
+
 

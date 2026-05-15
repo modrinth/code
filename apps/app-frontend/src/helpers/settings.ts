@@ -1,5 +1,5 @@
 /**
- * All theseus API calls return serialized values (both return values and errors);
+ * All pteron API calls return serialized values (both return values and errors);
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
@@ -44,9 +44,7 @@ export type AppSettings = {
 	native_decorations: boolean
 	toggle_sidebar: boolean
 
-	telemetry: boolean
 	discord_rpc: boolean
-	personalized_ads: boolean
 
 	onboarded: boolean
 
@@ -68,6 +66,11 @@ export type AppSettings = {
 	skipped_update: string | null
 	pending_update_toast_for_version: string | null
 	auto_download_updates: boolean | null
+	sync: {
+		enabled: boolean
+		files: string[]
+		folders: string[]
+	}
 
 	version: number
 }

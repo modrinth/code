@@ -82,8 +82,8 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon, TransferIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Avatar, ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
+import { RightArrowIcon, TransferIcon, XIcon } from '@icarus/assets'
+import { Admonition, Avatar, ButtonStyled, NewModal, StyledInput } from '@icarus/ui'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{
@@ -123,3 +123,4 @@ function onConfirmClick() {
 
 defineExpose({ show, hide })
 </script>
+

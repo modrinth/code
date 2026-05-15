@@ -143,7 +143,7 @@
 			:expand-text="expandText"
 			collapse-text="Collapse thread"
 		>
-			<div class="bg-surface-2 pt-2">
+			<div class="bg-surface-2 p-4 pt-2">
 				<ThreadView
 					v-if="threadWithReportBody"
 					ref="reportThread"
@@ -188,9 +188,9 @@ import {
 	ClipboardCopyIcon,
 	EllipsisVerticalIcon,
 	LinkIcon,
-} from '@modrinth/assets'
-import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
-import { type OverflowMenuOption, useFormatDateTime } from '@modrinth/ui'
+} from '@icarus/assets'
+import { type ExtendedReport, reportQuickReplies } from '@icarus/moderation'
+import { type OverflowMenuOption, useFormatDateTime } from '@icarus/ui'
 import {
 	Avatar,
 	ButtonStyled,
@@ -199,8 +199,8 @@ import {
 	injectNotificationManager,
 	OverflowMenu,
 	useRelativeTime,
-} from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+} from '@icarus/ui'
+import { formatProjectType } from '@icarus/utils'
 import { computed } from 'vue'
 
 import { isStaff } from '~/helpers/users.js'

@@ -1,10 +1,10 @@
-import type { Archon } from '@modrinth/api-client'
+import type { Archon } from '@icarus/api-client'
 
-import { injectModrinthClient } from '../providers/api-client'
+import { injectIcarusClient } from '../providers/api-client'
 import { injectNotificationManager } from '../providers/web-notifications'
 
 export function useServerBackupDownload() {
-	const client = injectModrinthClient()
+	const client = injectIcarusClient()
 	const { addNotification } = injectNotificationManager()
 
 	function getLatestBackupDownload(

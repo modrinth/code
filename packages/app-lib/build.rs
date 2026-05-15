@@ -19,8 +19,8 @@ fn set_env() {
     for (var_name, var_value) in
         dotenvy::dotenv_iter().into_iter().flatten().flatten()
     {
-        if var_name == "DATABASE_URL" {
-            // The sqlx database URL is a build-time detail that should not be exposed to the crate
+        if var_name == "DATABASE_URL" || var_name == "SQLX_OFFLINE" {
+            // Build-time details that should not be exposed to the crate
             continue;
         }
 

@@ -2,14 +2,14 @@ use crate::api::Result;
 use either::Either;
 use enumset::EnumSet;
 use tauri::{AppHandle, Manager, Runtime};
-use theseus::prelude::ProcessMetadata;
-use theseus::profile::{QuickPlayType, get_full_path};
-use theseus::server_address::ServerAddress;
-use theseus::worlds::{
+use pteron::prelude::ProcessMetadata;
+use pteron::profile::{QuickPlayType, get_full_path};
+use pteron::server_address::ServerAddress;
+use pteron::worlds::{
     DisplayStatus, ProtocolVersion, ServerPackStatus, ServerStatus, World,
     WorldType, WorldWithProfile,
 };
-use theseus::{profile, worlds};
+use pteron::{profile, worlds};
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("worlds")

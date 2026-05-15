@@ -1,4 +1,4 @@
-import { provideTags } from '@modrinth/ui'
+import { provideTags } from '@icarus/ui'
 import { computed } from 'vue'
 
 export function setupTagsProvider() {

@@ -218,7 +218,7 @@ import {
 	formFieldPlaceholders,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 // TODO: Switch to using Muralpay's improved endpoint when it's available.
 import iso3166 from 'iso-3166-2'
 

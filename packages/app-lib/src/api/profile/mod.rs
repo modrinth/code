@@ -1,4 +1,4 @@
-//! Theseus profile management interface
+//! Pteron profile management interface
 
 use crate::event::LoadingBarType;
 use crate::event::emit::{
@@ -39,6 +39,7 @@ use tokio::io::AsyncReadExt;
 use tokio::{fs::File, process::Command, sync::RwLock};
 
 pub mod create;
+pub mod sync;
 pub mod update;
 
 #[derive(Debug, Clone)]
@@ -461,7 +462,7 @@ pub async fn update_project(
             let mut path = Profile::add_project_version(
                 profile_path,
                 update_version,
-                fetch::DownloadReason::Update,
+                fetch::DownloadReason::Standalone,
                 &state.pool,
                 &state.fetch_semaphore,
                 &state.io_semaphore,
@@ -784,6 +785,14 @@ async fn run_credentials(
             "Tried to run a nonexistent or unloaded profile at path {path}!"
         ))
     })?;
+
+    crate::sync::apply_sync_to_instance(
+        &settings.sync,
+        &crate::profile::get_full_path(&profile.path).await?,
+        &state.directories.synced_dir(),
+        profile.sync_enabled,
+        &profile.sync_overrides,
+    )?;
 
     let pre_launch_hooks = profile
         .hooks

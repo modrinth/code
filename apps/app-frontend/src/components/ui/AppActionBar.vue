@@ -123,7 +123,7 @@ import {
 	StopCircleIcon,
 	TerminalSquareIcon,
 	UnplugIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	ButtonStyled,
 	defineMessages,
@@ -132,12 +132,10 @@ import {
 	type PopupNotification,
 	type PopupNotificationProgressItem,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { Dropdown } from 'floating-vue'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-
-import { trackEvent } from '@/helpers/analytics'
 import { loading_listener, process_listener } from '@/helpers/events'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
 import { get_many as getInstances } from '@/helpers/profile.js'
@@ -264,11 +262,7 @@ const stop = async (process: RunningProcess) => {
 	try {
 		await killProcess(process.uuid).catch(handleError)
 
-		trackEvent('InstanceStop', {
-			loader: process.profile.loader,
-			game_version: process.profile.game_version,
-			source: 'AppBar',
-		})
+		
 	} catch (e) {
 		console.error(e)
 	}

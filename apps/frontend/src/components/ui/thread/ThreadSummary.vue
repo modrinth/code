@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { ChevronRightIcon } from '@modrinth/assets'
+import { ChevronRightIcon } from '@icarus/assets'
 
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 

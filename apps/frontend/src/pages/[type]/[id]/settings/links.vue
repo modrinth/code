@@ -284,16 +284,16 @@
 </template>
 
 <script setup>
-import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
-import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@modrinth/moderation'
+import { SaveIcon, TriangleAlertIcon } from '@icarus/assets'
+import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@icarus/moderation'
 import {
 	ButtonStyled,
 	DropdownSelect,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 const tags = useGeneratedState()
 
@@ -304,7 +304,7 @@ const {
 	patchProject,
 	invalidate,
 } = injectProjectPageContext()
-const { labrinth } = injectModrinthClient()
+const { labrinth } = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 
 const issuesUrl = ref(project.value.issues_url)

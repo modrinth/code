@@ -246,7 +246,7 @@ fn parse_jvm_argument(
                 .to_string_lossy(),
         )
         .replace("${classpath_separator}", classpath_separator(java_arch))
-        .replace("${launcher_name}", "theseus")
+        .replace("${launcher_name}", "icarus")
         .replace("${launcher_version}", env!("CARGO_PKG_VERSION"))
         .replace("${version_name}", version_name)
         .replace("${classpath}", class_paths))

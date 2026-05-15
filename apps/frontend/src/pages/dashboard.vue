@@ -63,9 +63,9 @@ import {
 	ListIcon,
 	OrganizationIcon,
 	ReportIcon,
-} from '@modrinth/assets'
-import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
-import { type User, UserBadge } from '@modrinth/utils'
+} from '@icarus/assets'
+import { commonMessages, defineMessages, useVIntl } from '@icarus/ui'
+import { type User, UserBadge } from '@icarus/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'
 

@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "A Linux verziója a Modrinth Appnak <issues-link>problémái vannak</issues-link> bizonyos rendszereken és a konfigurációkon. Ha a Modrinth App instabil a rendszereden akkor próbáld ki a <prism-link>Prism Launcher</prism-link>t, ahol nagyon könnyen lehet Modrinth tartalmat telepíteni."
+    "message": "A Linux verziója a Icarus Launchernak <issues-link>problémái vannak</issues-link> bizonyos rendszereken és a konfigurációkon. Ha a Icarus Launcher instabil a rendszereden akkor próbáld ki a <prism-link>Prism Launcher</prism-link>t, ahol nagyon könnyen lehet Icarus tartalmat telepíteni."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -39,10 +39,10 @@
     "message": "Letöltési opciók"
   },
   "app-marketing.download.terms": {
-    "message": "A Modrinth App letöltésével elfogadod a <terms-link>feltételeket</terms-link> és a <privacy-link>biztonsági szabályzatot</privacy-link>."
+    "message": "A Icarus Launcher letöltésével elfogadod a <terms-link>feltételeket</terms-link> és a <privacy-link>biztonsági szabályzatot</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "Modrinth App letöltése (béta)"
+    "message": "Icarus Launcher letöltése (béta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "Projektek követése"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importáld az összes kedvenc profilodat a korábban használt indítóból, és néhány másodperc alatt elindíthatod a Modrinth Appot!"
+    "message": "Importáld az összes kedvenc profilodat a korábban használt indítóból, és néhány másodperc alatt elindíthatod a Icarus Launcherot!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "{author} által"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "A Modrinth könnyűvé teszi az összes telepített modjaidnak a kezelését egy helyen. Telepíthetsz, eltávolíthatsz és frissíthetsz modokat egyetlen kattintással."
+    "message": "A Icarus könnyűvé teszi az összes telepített modjaidnak a kezelését egy helyen. Telepíthetsz, eltávolíthatsz és frissíthetsz modokat egyetlen kattintással."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Telepített modok"
@@ -96,7 +96,7 @@
     "message": "Offline mód"
   },
   "app-marketing.features.open-source.description": {
-    "message": "A Modrinth inditója teljesen nyílt forráskódú. Ellenőrizheted a forráskódot a <github-link>GitHub</github-link> oldalunkon!"
+    "message": "A Icarus inditója teljesen nyílt forráskódú. Ellenőrizheted a forráskódot a <github-link>GitHub</github-link> oldalunkon!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Nyílt forráskódú"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "A Modrinth App jobb teljesítményt nyújt, mint sok vezető modkezelő, és csak 150 MB RAM-ot használ!"
+    "message": "A Icarus Launcher jobb teljesítményt nyújt, mint sok vezető modkezelő, és csak 150 MB RAM-ot használ!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -128,8 +128,8 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
-  "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth App"
+  "app-marketing.features.performance.Icarus-app": {
+    "message": "Icarus Launcher"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 milliárd %"
@@ -147,13 +147,13 @@
     "message": "Teljesítmény"
   },
   "app-marketing.features.play.description": {
-    "message": "Használd a Modrinth Appot kedvenc modjaid és modcsomagjaid letöltéséhez és játszásához."
+    "message": "Használd a Icarus Launcherot kedvenc modjaid és modcsomagjaid letöltéséhez és játszásához."
   },
   "app-marketing.features.play.title": {
     "message": "Játssz a kedvenc modjaiddal"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Készíts, ossz meg és játssz a Modrinthon fentartott több ezer modok és modcsomagok közül bármelyikkel."
+    "message": "Készíts, ossz meg és játssz a Icaruson fentartott több ezer modok és modcsomagok közül bármelyikkel."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modcsomag"
@@ -168,7 +168,7 @@
     "message": "Más, mint bármely indító"
   },
   "app-marketing.features.website.description": {
-    "message": "A Modrinth App teljes mértékben integrálva van a weboldallal, így az alkalmazásból elérheted az összes kedvenc projektedet!"
+    "message": "A Icarus Launcher teljes mértékben integrálva van a weboldallal, így az alkalmazásból elérheted az összes kedvenc projektedet!"
   },
   "app-marketing.features.website.title": {
     "message": "Weboldal integráció"
@@ -177,19 +177,19 @@
     "message": "amit eddig használtál"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "A Modrinth App képernyőképe, amelyen a Cobblemon profil a „Tartalom” oldalon van megnyitva."
+    "message": "A Icarus alkalmazás képernyőképe, amelyen a Cobblemon profil a „Tartalom” oldalon van megnyitva."
   },
   "app-marketing.hero.description": {
-    "message": "A Modrinth App egy egyedülálló, nyílt forráskódú kliens, amely lehetővé teszi, hogy kedvenc modjaidat játssz, és naprakészen tartsd őket, mindezt egy kis, praktikus csomagban."
+    "message": "A Icarus Launcher egy egyedülálló, nyílt forráskódú kliens, amely lehetővé teszi, hogy kedvenc modjaidat játssz, és naprakészen tartsd őket, mindezt egy kis, praktikus csomagban."
   },
   "app-marketing.hero.download-button": {
-    "message": "Modrinth App letöltése"
+    "message": "Icarus Launcher letöltése"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "Modrinth App letöltése"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "Icarus Launcher letöltése"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Modrinth App letöltése {os} rendszerre"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "Icarus Launcher letöltése {os} rendszerre"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "A Cobblemon profil főmenüjének képernyőképe."
@@ -228,7 +228,7 @@
     "message": "Visszaállítási e-mail küldése"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Írd be az e-mail címedet az alábbi mezőbe, és küldünk neked egy hivatkozást, amivel vissza tudja állítani a fiókod."
+    "message": "Írja be az e-mail címét az alábbi mezőbe, és küldünk Önnek egy hivatkozást, amivel vissza tudja állítani a fiókját."
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Egy e-mail el lett küldve önnek az email-címére amennyiben az email-cím el volt mente a fiókjában."
@@ -267,7 +267,7 @@
     "message": "Kód beírása..."
   },
   "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Elfelejtetted a jelszavad?</forgot-password-link> • <create-account-link>Hozz létre egy fiókot</create-account-link>"
+    "message": "<forgot-password-link>Elfelejtted a jelszavad?</forgot-password-link> • <create-account-link>Hozz létre egy fiókót</create-account-link>"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Bejelentkezés ezzel"
@@ -282,7 +282,7 @@
     "message": "Fiók létrehozása"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
+    "message": "Fiók létrehozásával Ön elfogadja a Icarus <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "A jelszavak nem jegyeznek!"
@@ -291,7 +291,7 @@
     "message": "Már van fiókod?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Iratkozzon fel a Modrinth frissítéseiről szóló értesítésekre"
+    "message": "Iratkozzon fel a Icarus frissítéseiről szóló értesítésekre"
   },
   "auth.sign-up.title": {
     "message": "Regisztráció"
@@ -333,16 +333,16 @@
     "message": "Email-cím hitelesítése"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Iratkozzon fel a Modrinth frissítéseiről szóló értesítésekre"
+    "message": "Iratkozzon fel a Icarus frissítéseiről szóló értesítésekre"
   },
   "auth.welcome.description": {
     "message": "Most már része vagy annak a fantasztikus fejlesztők és felfedezők közösségének, akik már építenek, letöltenek és naprakészek maradnak a csodálatos modokkal kapcsolatban."
   },
   "auth.welcome.label.tos": {
-    "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
+    "message": "Fiók létrehozásával Ön elfogadja a Icarus <terms-link>felhasználási feltételeit</terms-link> és <privacy-policy-link>adatvédelmi irányelveit</privacy-policy-link>."
   },
   "auth.welcome.long-title": {
-    "message": "Üdvözlünk a Modrinth-onl!"
+    "message": "Üdvözlünk a Icarus-onl!"
   },
   "auth.welcome.title": {
     "message": "Üdvözlünk"
@@ -372,7 +372,7 @@
     "message": "Biztos vagy hogy törölni akarod ezt a gyűjteményt?"
   },
   "collection.description": {
-    "message": "{description}- Nézd meg a {name} nevű gyűjtemény {username} által Modrinth-on"
+    "message": "{description}- Nézd meg a {name} nevű gyűjtemény {username} által Icarus-on"
   },
   "collection.description.following": {
     "message": "Az összes követett projekt automatikusan generált gyűjteménye."
@@ -381,7 +381,7 @@
     "message": "Gyűjtemény szerkesztése"
   },
   "collection.error.not-found": {
-    "message": "Nincs ilyen gyűjtemény"
+    "message": "Nncs ilyen gyűjtemény"
   },
   "collection.label.created-at": {
     "message": "Létrehozva {ago}"
@@ -572,15 +572,6 @@
   "dashboard.affiliate-links.search": {
     "message": "Társulati linkek keresése..."
   },
-  "dashboard.analytics.from-projects": {
-    "message": "{count} projektből"
-  },
-  "dashboard.analytics.total-downloads": {
-    "message": "Összes letöltés"
-  },
-  "dashboard.analytics.total-followers": {
-    "message": "Összes követő"
-  },
   "dashboard.collections.button.create-new": {
     "message": "Új létrehozása"
   },
@@ -604,18 +595,6 @@
   },
   "dashboard.collections.long-title": {
     "message": "Gyűjteményeid"
-  },
-  "dashboard.collections.placeholder.search": {
-    "message": "Gyűjtemények keresése"
-  },
-  "dashboard.collections.sort.name-ascending": {
-    "message": "Név (A-Z)"
-  },
-  "dashboard.collections.sort.recently-created": {
-    "message": "Nemrég létrehozott"
-  },
-  "dashboard.collections.sort.recently-updated": {
-    "message": "Nemrég frissített"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Letöltés {formType}"
@@ -645,7 +624,7 @@
     "message": "Adóűrlap"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "A Modrinth a Track1099 nevű harmadik fél szolgáltatót használja az adóűrlapjaid biztonságos begyűjtésére és tárolására. <security-link>További információ.</security-link>"
+    "message": "A Icarus a Track1099 nevű harmadik fél szolgáltatót használja az adóűrlapjaid biztonságos begyűjtésére és tárolására. <security-link>További információ.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Biztonsági gyakorlatok"
@@ -684,7 +663,7 @@
     "message": "Üzleti szervezet"
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
-    "message": "Az „üzleti szervezet” egy olyan regisztrált szervezetre utal, mint egy vállalat, partnerség vagy Kft."
+    "message": "Az \"Üzleti szervezet\" egy olyan regisztrált szervezetre utal, mint egy vállalat, partnerség vagy LLC."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
     "message": "Szervezetként vagy személyként veszel fel?"
@@ -810,7 +789,7 @@
     "message": "Ahhoz, hogy kivedd a teljes <b>{available}</b> rendelkezésre álló összeget, kérlek töltsd ki az űrlapot. Szükséges az adóbevalláshoz és csak egyszer kell megcsinálni."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "Ki kell töltened egy W-9 vagy egy W-8 adóbevallási űrlapot Modrinth adóügyi nyilvántartásaihoz, hogy az adóügyi előírásoknak eleget tegyünk."
+    "message": "Ki kell töltened egy W-9 vagy egy W-8 adóbevallási űrlapot Icarus adóügyi nyilvántartásaihoz, hogy az adóügyi előírásoknak eleget tegyünk."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Adóbevallási űrlap szükséges"
@@ -852,7 +831,7 @@
     "message": "Hitelesítetlen e-mail"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "A kiszállítási e-mail cím, amit megadtál nincs hozzákapcsolva a Modrinth fiókodhoz. A Modrinth nem tudja visszaállítani a jutalmakat, amik rossz e-mail címre lettek küldve."
+    "message": "A kiszállítási e-mail cím, amit megadtál nincs hozzákapcsolva a Icarus fiókodhoz. A Icarus nem tudja visszaállítani a jutalmakat, amik rossz e-mail címre lettek küldve."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Alacsonyabb díjak elérhetőek"
@@ -869,150 +848,6 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Elérted a(z) <b>{withdrawLimit}</b> kifizetési limitet. További kifizetésekhez ki kell töltened egy adózási űrlapot."
   },
-  "dashboard.head-title": {
-    "message": "Irányítópult"
-  },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Összes megjelölése olvasottként"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Előzmények megtekintése"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "Nincsenek olvasatlan értesítéseid."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Hiba az értesítések betöltése során:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Előzmények"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Értesítési előzmények"
-  },
-  "dashboard.notifications.link.see-all": {
-    "message": "Összes megtekintése"
-  },
-  "dashboard.notifications.link.view-history": {
-    "message": "Értesítési előzmények megtekintése"
-  },
-  "dashboard.notifications.link.view-more": {
-    "message": "További {extraNotifs} értesítés megtekintése"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Értesítések betöltése"
-  },
-  "dashboard.organizations.button.create": {
-    "message": "Szervezet létrehozása"
-  },
-  "dashboard.organizations.empty.cta": {
-    "message": "Hozz létre egy szervezetet!"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count} tag"
-  },
-  "dashboard.organizations.title": {
-    "message": "Szervezetek"
-  },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Több projektet is szerkeszthetsz egyszerre, ha kiválasztod őket alább."
-  },
-  "dashboard.projects.empty": {
-    "message": "Még nincsenek projektjeid. Kattints a fenti zöld gombra a kezdéshez."
-  },
-  "dashboard.projects.head-title": {
-    "message": "Projektek"
-  },
-  "dashboard.projects.links.and-more": {
-    "message": "és még {count} további..."
-  },
-  "dashboard.projects.links.button.clear-link": {
-    "message": "Link törlése"
-  },
-  "dashboard.projects.links.button.edit": {
-    "message": "Linkek szerkesztése"
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "A változtatások <strong>{count}</strong> projektre vonatkoznak."
-  },
-  "dashboard.projects.links.discord-invite.description": {
-    "message": "Meghívólink a Discord szerveredre."
-  },
-  "dashboard.projects.links.discord-invite.label": {
-    "message": "Discord meghívó"
-  },
-  "dashboard.projects.links.issue-tracker.description": {
-    "message": "Egy hely, ahol a felhasználók hibákat, problémákat és aggályokat jelenthetnek a projekteddel kapcsolatban."
-  },
-  "dashboard.projects.links.issue-tracker.label": {
-    "message": "Hibakereső"
-  },
-  "dashboard.projects.links.placeholder.valid-discord-url": {
-    "message": "Adj meg egy érvényes Discord-meghívólinket"
-  },
-  "dashboard.projects.links.placeholder.valid-url": {
-    "message": "Adj meg egy érvényes linket"
-  },
-  "dashboard.projects.links.show-all-projects": {
-    "message": "Összes projekt megjelenítése"
-  },
-  "dashboard.projects.links.source-code.description": {
-    "message": "Egy oldal/kódtár, amely a projekt forráskódját tartalmazza"
-  },
-  "dashboard.projects.links.source-code.label": {
-    "message": "Forráskód"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Egy oldal, amely információkat, dokumentációt és segítséget tartalmaz a projekthez."
-  },
-  "dashboard.projects.links.wiki-page.label": {
-    "message": "Wiki oldal"
-  },
-  "dashboard.projects.project.icon-alt": {
-    "message": "{title} ikonja"
-  },
-  "dashboard.projects.project.moderator-message-aria": {
-    "message": "A projekt üzenetet kapott a moderátoroktól. További információkért nézd meg a projektet."
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Növekvő"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Csökkenő"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Név"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Állapot"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Típus"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
-  },
-  "dashboard.projects.table.id": {
-    "message": "Azonosító"
-  },
-  "dashboard.projects.table.name": {
-    "message": "Név"
-  },
-  "dashboard.projects.table.status": {
-    "message": "Állapot"
-  },
-  "dashboard.projects.table.type": {
-    "message": "Típus"
-  },
-  "dashboard.report.title": {
-    "message": "{id} jelentése"
-  },
-  "dashboard.reports.active-title": {
-    "message": "Aktív jelentések"
-  },
-  "dashboard.reports.title": {
-    "message": "Jelentések"
-  },
   "dashboard.revenue.available-now": {
     "message": "Elérhető most"
   },
@@ -1023,7 +858,7 @@
     "message": "A becsült bevételek a rendelkezésre bocsátásig változhatnak."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Kattints ide, hogy elolvasd, hogyan kezeli a Modrinth a bevételeidet."
+    "message": "Kattints ide, hogy elolvasd, hogyan kezeli a Icarus a bevételeidet."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Becsült {date}"
@@ -1044,13 +879,10 @@
     "message": "Felvéve"
   },
   "dashboard.revenue.tos": {
-    "message": "A projektek Modrinth-ra való feltöltésével és a számládról történő pénzfelvétellel elfogadod a <terms-link>jutalomprogram feltételeit</terms-link>. Tudj meg többet a <info-link>jutalomprogramról</info-link>."
+    "message": "A projektek Icarus-ra való feltöltésével és a számládról történő pénzfelvétellel elfogadod a <terms-link>jutalomprogram feltételeit</terms-link>. Tudj meg többet a <info-link>jutalomprogramról</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Letöltés CSV formátumban"
-  },
-  "dashboard.revenue.transactions.head-title": {
-    "message": "Tranzakcióelőzmények"
   },
   "dashboard.revenue.transactions.header": {
     "message": "Tranzakciók"
@@ -1061,17 +893,8 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "A kifizetések és a felvételek itt jelennek meg."
   },
-  "dashboard.revenue.transactions.period.last-month": {
-    "message": "Múlt hónapban"
-  },
-  "dashboard.revenue.transactions.period.this-month": {
-    "message": "Ebben a hónapban"
-  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Összes megtekintése"
-  },
-  "dashboard.revenue.transactions.year.all": {
-    "message": "Minden év"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "A kifizetéseid ideiglenesen zárolva vannak, mert az adóazonosító számod vagy a társadalombiztosítási számod nem egyezik az adóhatóság (IRS) nyilvántartásában szereplő adatokkal. Kérjük, vedd fel a kapcsolatot az ügyfélszolgálattal az adóbevallásod visszaállításához és újbóli benyújtásához."
@@ -1084,33 +907,6 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Pénzfelvétel"
-  },
-  "dashboard.sidebar.label.activeReports": {
-    "message": "Aktív jelentések"
-  },
-  "dashboard.sidebar.label.analytics": {
-    "message": "Statisztika"
-  },
-  "dashboard.sidebar.label.creators": {
-    "message": "Fejlesztők"
-  },
-  "dashboard.sidebar.label.dashboard": {
-    "message": "Irányítópult"
-  },
-  "dashboard.sidebar.label.notifications": {
-    "message": "Értesítések"
-  },
-  "dashboard.sidebar.label.organizations": {
-    "message": "Szervezetek"
-  },
-  "dashboard.sidebar.label.overview": {
-    "message": "Áttekintés"
-  },
-  "dashboard.sidebar.label.projects": {
-    "message": "Projektek"
-  },
-  "dashboard.sidebar.label.revenue": {
-    "message": "Bevétel"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Fiók"
@@ -1208,9 +1004,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Töltsd ki az adóbevallási űrlapot"
   },
-  "discover.install.back-to-server": {
-    "message": "Vissza a szerverhez"
-  },
   "error.collection.404.list_item.1": {
     "message": "Elírhatad a gyűjtemémyed linkjét."
   },
@@ -1218,7 +1011,7 @@
     "message": "Ez a gyűjtemény lehet hogy privát."
   },
   "error.collection.404.list_item.3": {
-    "message": "Gyűjteményt a Modrinth moderációs csapata eltávolíthatta, mert megsértette a <tou-link>Felhasználási feltételeinket</tou-link>."
+    "message": "Gyűjteményt a Icarus moderációs csapata eltávolíthatta, mert megsértette a <tou-link>Felhasználási feltételeinket</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "Miért?"
@@ -1239,10 +1032,10 @@
     "message": "Tartalom nem elérhető legális okok miatt"
   },
   "error.generic.default.list_item.1": {
-    "message": "Ellenőrizd, hogy a Modrinth elérhető-e az <status-link>állapotoldalon</status-link>."
+    "message": "Ellenőrizd, hogy a Icarus elérhető-e az <status-link>állapotoldalon</status-link>."
   },
   "error.generic.default.list_item.2": {
-    "message": "Ha ez továbbra is történik, valószínűleg tudatni szeretnéd a Modrinth csapatával. Ezt úgy tehetet meg, hogy csatlakozol a <discord-link>Discord szerverünkre</discord-link>."
+    "message": "Ha ez továbbra is történik, valószínűleg tudatni szeretnéd a Icarus csapatával. Ezt úgy tehetet meg, hogy csatlakozol a <discord-link>Discord szerverünkre</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Kerjük próbáld újra pár perc múlva."
@@ -1260,7 +1053,7 @@
     "message": "A szervezet készítője megváltoztathatta, vagy törölhette a linket."
   },
   "error.organization.404.list_item.3": {
-    "message": "A szervezet törölve lehetett a Modrinth moderációs csapata által, amiért megsértette a <tou-link>Terms of Use</tou-link>-t."
+    "message": "A szervezet törölve lehetett a Icarus moderációs csapata által, amiért megsértette a <tou-link>Terms of Use</tou-link>-t."
   },
   "error.organization.404.list_title": {
     "message": "Miért?"
@@ -1275,7 +1068,7 @@
     "message": "A projekt lészítője megváltoztathatta a linket, vagy a projektet privátta tette, esetleg ki is törölte."
   },
   "error.project.404.list_item.3": {
-    "message": "A projekt valószínűleg le lett törölve a Modrinth moderációs csapat által, amiért megsértette a <tou-link>Felhasználási feltételek</tou-link>et."
+    "message": "A projekt valószínűleg le lett törölve a Icarus moderációs csapat által, amiért megsértette a <tou-link>Felhasználási feltételek</tou-link>et."
   },
   "error.project.404.list_title": {
     "message": "Miért?"
@@ -1290,7 +1083,7 @@
     "message": "A felhasználó megváltoztathatta a nevét, vagy törölhette fiókját."
   },
   "error.user.404.list_item.3": {
-    "message": "A felhasználó fiókja fel lehet függesztve, amiért megsértette a Modrinth <tou-link>Terms of Use</tou-link>-t."
+    "message": "A felhasználó fiókja fel lehet függesztve, amiért megsértette a Icarus <tou-link>Terms of Use</tou-link>-t."
   },
   "error.user.404.list_title": {
     "message": "Miért?"
@@ -1332,10 +1125,10 @@
     "message": "Amikor a szervered nagy terhelés alatt áll, ideiglenesen további processzorszálakat biztosítunk számára, hogy csökkentsük a lagtüskéket és az instabilitást. Ez segít megakadályozni, hogy a TPS 20 alá essen, így a játékélmény a lehető legsimább marad.\nMivel ezek az extra processzorszálak csak rövid ideig, nagy terhelés esetén érhetők el, előfordulhat, hogy nem jelennek meg a Spark jelentésekben vagy más teljesítményelemző eszközökben."
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Milyen típusú CPU-k futnak a Modrinth Hosting szerverein?"
+    "message": "Milyen típusú CPU-k futnak a Icarus Hosting szerverein?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "A Modrinth Hosting szerverei AMD Ryzen 7900 és 7950X3D egyenértékű, 5+ GHz-s processzorokkal és DDR5 memóriával vannak felszerelve."
+    "message": "A Icarus Hosting szerverei AMD Ryzen 7900 és 7950X3D egyenértékű, 5+ GHz-s processzorokkal és DDR5 memóriával vannak felszerelve."
   },
   "hosting-marketing.faq.currency": {
     "message": "Milyen pénznemben vannak megadva az árak?"
@@ -1344,19 +1137,19 @@
     "message": "Minden ár amerikai dollárban (USD) van feltüntetve."
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "A Modrinth Hosting szerverei rendelkeznek DDoS védelemmel?"
+    "message": "A Icarus Hosting szerverei rendelkeznek DDoS védelemmel?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Igen. A Modrinth Hosting összes szerverén DDoS-védelem működik, egyes helyszíneken akár 17 Tbps kapacitással."
+    "message": "Igen. A Icarus Hosting összes szerverén DDoS-védelem működik, egyes helyszíneken akár 17 Tbps kapacitással."
   },
   "hosting-marketing.faq.heading": {
     "message": "Gyakori kérdések"
   },
   "hosting-marketing.faq.how-fast": {
-    "message": "Milyen gyorsak a Modrinth Hosting szerverek?"
+    "message": "Milyen gyorsak a Icarus Hosting szerverek?"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "A Modrinth Hosting szerverei nagyon modern, nagy teljesítményű hardvereken futnak, de nehéz megmondani, hogy ez pontosan hogyan fogja befolyásolni a szervered sebességét, mert sok tényező hat rá, például a szerveren futó modok, adatcsomagok vagy bővítmények, sőt még a felhasználói viselkedés is."
+    "message": "A Icarus Hosting szerverei nagyon modern, nagy teljesítményű hardvereken futnak, de nehéz megmondani, hogy ez pontosan hogyan fogja befolyásolni a szervered sebességét, mert sok tényező hat rá, például a szerveren futó modok, adatcsomagok vagy bővítmények, sőt még a felhasználói viselkedés is."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "A legtöbb teljesítményprobléma általában egy nem optimalizált modcsomag, mod, adatcsomag vagy bővítmény hibájából ered, ami a szerver lagolását okozza. Mivel szervereink nagyon csúcskategóriásak, nem kell sok problémával számolnod, ha a szerveren futtatott tartalomhoz megfelelő csomagot választasz."
@@ -1365,10 +1158,10 @@
     "message": "Növelhetem a szerverem tárhelyét?"
   },
   "hosting-marketing.faq.increase-storage.answer": {
-    "message": "Igen, a szervereden a tárhely további költségek nélkül növelhető. Ha több tárhelyre van szükséged, vedd fel a kapcsolatot a Modrinth ügyfélszolgálatával."
+    "message": "Igen, a szervereden a tárhely további költségek nélkül növelhető. Ha több tárhelyre van szükséged, vedd fel a kapcsolatot a Icarus ügyfélszolgálatával."
   },
   "hosting-marketing.faq.location": {
-    "message": "Hol találhatók a Modrinth Hosting szerverei? Kiválaszthatom a régiót?"
+    "message": "Hol találhatók a Icarus Hosting szerverei? Kiválaszthatom a régiót?"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "Jelenleg Észak-Amerikában, Európában és Délkelet-Ázsiában állnak rendelkezésre szerverek, amelyek közül vásárláskor választhatsz. A jövőben további régiók is elérhetővé válnak! Ha szeretnéd megváltoztatni a régiót, vedd fel a kapcsolatot az ügyfélszolgálattal."
@@ -1377,7 +1170,7 @@
     "message": "Melyik Minecraft verziók és betöltők használhatók?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "A Modrinth Hosting szerverei a Minecraft: Java Edition bármelyik verzióját futtathatják, egészen az 1.2.5-ös verziótól kezdve, beleértve a snapshot verziókat is."
+    "message": "A Icarus Hosting szerverei a Minecraft: Java Edition bármelyik verzióját futtathatják, egészen az 1.2.5-ös verziótól kezdve, beleértve a snapshot verziókat is."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "Számos mod- és bővítménybetöltőt is támogatunk, többek között a Fabric, Quilt, Forge és NeoForge modokat, valamint a Paper és Purpur bővítményeket. A rendelkezésre állás attól függ, hogy a mod- vagy pluginbetöltő támogatja-e a kiválasztott Minecraft verziót."
@@ -1394,11 +1187,11 @@
   "hosting-marketing.hero.button.start-your-server": {
     "message": "Szervered indítása"
   },
-  "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Hozd létre a következő szerveredet a Modrinth Hostingnál"
+  "hosting-marketing.hero.host-with-Icarus": {
+    "message": "Hozd létre a következő szerveredet a Icarus Hostingnál"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "A Modrinth Hosting a legegyszerűbb módja saját Minecraft: Java Edition szerver létrehozásához. Telepítsd és játssz kedvenc modjaiddal és modcsomagjaiddal zökkenőmentesen, mindezt a Modrinth platformon belül."
+    "message": "A Icarus Hosting a legegyszerűbb módja saját Minecraft: Java Edition szerver létrehozásához. Telepítsd és játssz kedvenc modjaiddal és modcsomagjaiddal zökkenőmentesen, mindezt a Icarus platformon belül."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Fejlett hálózatkezelés"
@@ -1407,7 +1200,7 @@
     "message": "Add hozzá saját domainedet a szerveredhez, foglalj le akár 15 portot azokhoz a modokhoz, amelyeknek szükségük van rá, és még sok más."
   },
   "hosting-marketing.included.backups-included": {
-    "message": "Tartalmaz biztonsági mentéseket"
+    "message": "Tartalmaz biztonsági másolatokat"
   },
   "hosting-marketing.included.backups-included.description": {
     "message": "Minden szerverhez 15 biztonságosan tárolt, külső helyszínen tárolt biztonsági másolat tartozik."
@@ -1416,10 +1209,10 @@
     "message": "Egyéni link"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "Oszd meg a szerveredet egy egyedi <contrast>modrinth.gg</contrast> linkkel."
+    "message": "Oszd meg a szerveredet egy egyedi <contrast>Icarus.gg</contrast> linkkel."
   },
   "hosting-marketing.included.description": {
-    "message": "Minden szerverhez tartozik egy sor olyan funkció, amelynek célja, hogy olyan tárhelyszolgáltatást nyújtson, amelyet csak a Modrinth tud nyújtani."
+    "message": "Minden szerverhez tartozik egy sor olyan funkció, amelynek célja, hogy olyan tárhelyszolgáltatást nyújtson, amelyet csak a Icarus tud nyújtani."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Könnyen használható fájlkezelő"
@@ -1434,19 +1227,19 @@
     "message": "Segítség, amikor szükséged van rá"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Bármikor fordulhatsz a Modrinth csapatához segítségért a szervereddel kapcsolatban."
+    "message": "Bármikor fordulhatsz a Icarus csapatához segítségért a szervereddel kapcsolatban."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "Erőteljes konzol, szervertulajdonság-kezelő és még sok más"
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "A Modrinth Hosting hatékony eszközökkel rendelkezik a szerver kezeléséhez."
+    "message": "A Icarus Hosting hatékony eszközökkel rendelkezik a szerver kezeléséhez."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "SFTP hozzáférés"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "A Modrinth Hosting szolgáltatásba beépített SFTP segítségével közvetlenül elérheti a szerver fájljait."
+    "message": "A Icarus Hosting szolgáltatásba beépített SFTP segítségével közvetlenül elérheti a szerver fájljait."
   },
   "hosting-marketing.included.with-your-server": {
     "message": "A szerverhez tartozik"
@@ -1455,7 +1248,7 @@
     "message": "Pontosan tudod, mire van szükséged?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Próbálj ki 5 napig ingyen egy <orange>3 GB-os szervert</orange>, amelyet a <orange>Medal</orange> biztosít"
+    "message": "Próbáld ki 5 napig ingyen egy <orange>3 GB-os szervert</orange>, amelyet a <orange>Medal</orange> biztosít"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "További információk"
@@ -1469,20 +1262,20 @@
   "hosting-marketing.server-for-everyone": {
     "message": "Ez egy szerver mindenkinek"
   },
-  "hosting-marketing.why.all-on-modrinth": {
-    "message": "Kezeld mindezt a Modrinthal"
+  "hosting-marketing.why.all-on-Icarus": {
+    "message": "Kezeld mindezt a Icarusal"
   },
-  "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "A szervered, a modjaid, a játékosaid és még sok más mind a Modrinthon van. Nincs szükség platformok közötti váltásra."
+  "hosting-marketing.why.all-on-Icarus.description": {
+    "message": "A szervered, a modjaid, a játékosaid és még sok más mind a Icaruson van. Nincs szükség platformok közötti váltásra."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Állandóan gyors"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "Infrastruktúránk soha nem terhelt túl, ami azt jelenti, hogy a Modrinth által üzemeltetett minden szerver mindig teljes teljesítményen működik."
+    "message": "Infrastruktúránk soha nem terhelt túl, ami azt jelenti, hogy a Icarus által üzemeltetett minden szerver mindig teljes teljesítményen működik."
   },
   "hosting-marketing.why.description": {
-    "message": "Válassz a Modrinth több ezer modcsomagja közül, vagy készítsd el a sajátodat. Ha készen állsz a játékra, hívd meg barátaidat."
+    "message": "Válassz a Icarus több ezer modcsomagja közül, vagy készítsd el a sajátodat. Ha készen állsz a játékra, hívd meg barátaidat."
   },
   "hosting-marketing.why.heading": {
     "message": "Keress egy modcsomagot. Most már ez egy szerver."
@@ -1491,22 +1284,22 @@
     "message": "Élvezd a modern, megbízható szerverüzemeltetést"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "A Modrinth Hosting <contrast>nagy teljesítményű AMD processzorokat és DDR5 memóriát</contrast> használ, valamint egyedi szoftverrel gondoskodik a stabil, zökkenőmentes működésről."
+    "message": "A Icarus Hosting <contrast>nagy teljesítményű AMD processzorokat és DDR5 memóriát</contrast> használ, valamint egyedi szoftverrel gondoskodik a stabil, zökkenőmentes működésről."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Játssz ott, ahol a modjaid vannak"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "A Modrinth Hosting zökkenőmentesen integrálja a mod és modcsomag telepítési folyamatot a szerveredbe."
+    "message": "A Icarus Hosting zökkenőmentesen integrálja a mod és modcsomag telepítési folyamatot a szerveredbe."
   },
-  "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "Miért a Modrinth Hosting?"
+  "hosting-marketing.why.why-Icarus-hosting": {
+    "message": "Miért a Icarus Hosting?"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "Az összes kedvenc modod"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "Válassz a Vanilla, Fabric, Forge, Quilt és NeoForge közül. Ha Modrinthon fut, akkor a szervereden is futtatható."
+    "message": "Válassz a Vanilla, Fabric, Forge, Quilt és NeoForge közül. Ha Icaruson fut, akkor a szervereden is futtatható."
   },
   "hosting.plan.out-of-stock": {
     "message": "Nincs raktáron"
@@ -1521,7 +1314,7 @@
     "message": "Ugrás az irányítópultra"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Kapd meg a legjobb modolási élményt folyamatos frissítésekkel a Modrinth csapattól"
+    "message": "Kapd meg a legjobb modolási élményt folyamatos frissítésekkel a Icarus csapattól"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Folyamatos változás"
@@ -1566,13 +1359,13 @@
     "message": "Kövesd a projekteket, amiket szeretsz"
   },
   "landing.feature.launcher.description": {
-    "message": "A Modrinth nyílt forráskódú API-ja lehetővé teszi az indítók számára a Modrinthal való mély integrációt. A Modrinthot használhatod a <link>saját alkalmazásunkon</link> és néhány népszerű indítón kersztül, mint például az ATLauncher, a MultiMC és a Prism Launcher."
+    "message": "A Icarus nyílt forráskódú API-ja lehetővé teszi az indítók számára a Icarusal való mély integrációt. A Icarusot használhatod a <link>saját alkalmazásunkon</link> és néhány népszerű indítón kersztül, mint például az ATLauncher, a MultiMC és a Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "Játssz kedvenc indítóddal"
   },
   "landing.feature.search.description": {
-    "message": "A Modrinth villámgyors keresője és hatékony szűrői lehetővé teszik, hogy már a beírás közben megtaláld, amit keresel."
+    "message": "A Icarus villámgyors keresője és hatékony szűrői lehetővé teszik, hogy már a beírás közben megtaláld, amit keresel."
   },
   "landing.feature.search.heading": {
     "message": "Találd meg gyorsan és egyszerűen, amit keresel"
@@ -1605,10 +1398,10 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "A Minecraft ablak egyszerűsített ábrázolása, a Mojang Studios logójával Modrinth-zöldben."
+    "message": "A Minecraft ablak egyszerűsített ábrázolása, a Mojang Studios logójával Icarus-zöldben."
   },
-  "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+  "landing.launcher.Icarus-app-label": {
+    "message": "Icarus Launcher"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1668,7 +1461,7 @@
     "message": "Új gyűjtemény"
   },
   "layout.action.new-organization": {
-    "message": "Új szervezet"
+    "message": "Új Szervezet"
   },
   "layout.action.new-project": {
     "message": "Új projekt"
@@ -1698,25 +1491,25 @@
     "message": "Nézd meg fiókbeállításaidat"
   },
   "layout.banner.add-email.description": {
-    "message": "Biztonsági okok miatt a Modrinthon kell egy e-mail cím a fiókodhoz."
+    "message": "Biztonsági okok miatt a Icaruson kell egy e-mail cím a fiókodhoz."
   },
   "layout.banner.build-fail.description": {
-    "message": "A Modrinth felhasználói felületének jelenlegi telepítése nem tudta az API-ból lekérni az állapotadatokat. Ennek oka lehet egy szolgáltatáskimaradás vagy konfigurációs hiba. Kérünk, próbáld meg újra, amikor az API újra elérhetővé válik. Hibakódok: {errors}; Az API jelenlegi linkje: {url}"
+    "message": "A Icarus felhasználói felületének jelenlegi telepítése nem tudta az API-ból lekérni az állapotadatokat. Ennek oka lehet egy szolgáltatáskimaradás vagy konfigurációs hiba. Kérünk, próbáld meg újra, amikor az API újra elérhetővé válik. Hibakódok: {errors}; Az API jelenlegi linkje: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "Hiba történt az API állapotának generálása közben a fordítás során."
   },
   "layout.banner.preview.description": {
-    "message": "Ha a hivatalos Modrinth weboldalt szeretnéd elérni, látogass el az <link>https://modrinth.com</link> oldalra. Ezt az előzetes telepítést a Modrinth munkatársai tesztelési célokra használják. A <branch-link>{owner}/{branch</branch-link> @ {commit} használatával készült."
+    "message": "Ha a hivatalos Icarus weboldalt szeretnéd elérni, látogass el az <link>https://Icarus.com</link> oldalra. Ezt az előzetes telepítést a Icarus munkatársai tesztelési célokra használják. A <branch-link>{owner}/{branch</branch-link> @ {commit} használatával készült."
   },
   "layout.banner.preview.title": {
-    "message": "Ez a Modrinth weboldal előzetes telepítése."
+    "message": "Ez a Icarus weboldal előzetes telepítése."
   },
   "layout.banner.staging.description": {
-    "message": "A tesztelési környezet teljesen elkülönül az éles Modrinth adatbázistól. Ezt tesztelési és hibakeresési célokra használják, és a Modrinth backend vagy frontend fejlesztés alatt álló, az éles példánynál újabb verzióit futtathatja."
+    "message": "A tesztelési környezet teljesen elkülönül az éles Icarus adatbázistól. Ezt tesztelési és hibakeresési célokra használják, és a Icarus backend vagy frontend fejlesztés alatt álló, az éles példánynál újabb verzióit futtathatja."
   },
   "layout.banner.staging.title": {
-    "message": "A Modrinth színreviteli környezetét nézed"
+    "message": "A Icarus színreviteli környezetét nézed"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Számlázási információ frissítése"
@@ -1731,7 +1524,7 @@
     "message": "Adózási űrlap kitöltése"
   },
   "layout.banner.tax.description": {
-    "message": "Idén már több mint {threshold} összeget vettél ki a Modrinth-ből. Az adózási szabályozásoknak való megfelelés érdekében ki kell töltened egy adóbevallási űrlapot. A kifizetések a nyomtatvány benyújtásáig szünetelnek."
+    "message": "Idén már több mint {threshold} összeget vettél ki a Icarus-ből. Az adózási szabályozásoknak való megfelelés érdekében ki kell töltened egy adóbevallási űrlapot. A kifizetések a nyomtatvány benyújtásáig szünetelnek."
   },
   "layout.banner.tax.title": {
     "message": "Adózási űrlap szükséges"
@@ -1749,7 +1542,7 @@
     "message": "Ellenőrző e-mail újraküldése"
   },
   "layout.banner.verify-email.description": {
-    "message": "Biztonsági okokból a Modrinth megköveteli, hogy igazold a fiókodhoz tartozó e-mail címet."
+    "message": "Biztonsági okokból a Icarus megköveteli, hogy igazold a fiókodhoz tartozó e-mail címet."
   },
   "layout.footer.about": {
     "message": "Rólunk"
@@ -1790,23 +1583,23 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Felhasználási feltételek"
   },
-  "layout.footer.modrinth-information": {
-    "message": "Modrinth infórmáció"
+  "layout.footer.Icarus-information": {
+    "message": "Icarus infórmáció"
   },
   "layout.footer.open-source": {
-    "message": "A Modrinth <github-link>nyílt forráskódú</github-link>"
+    "message": "A Icarus <github-link>nyílt forráskódú</github-link>"
   },
   "layout.footer.products": {
     "message": "Termékek"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Icarus Launcher"
   },
   "layout.footer.products.plus": {
-    "message": "Modrinth+"
+    "message": "Icarus+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "layout.footer.resources": {
     "message": "Források"
@@ -1842,7 +1635,7 @@
     "message": "Menü ki-be"
   },
   "layout.meta.description": {
-    "message": "Tölts le Minecraft modokat, bővítményeket, adatcsomagokat, shadereket, forráscsomagokat és modcsomagokat a Modrinthról. Fedezd fel és tedd közzé projektjeidet a Modrinthon egy modern, könnyen használható felületen és API-n keresztül."
+    "message": "Tölts le Minecraft modokat, bővítményeket, adatcsomagokat, shadereket, forráscsomagokat és modcsomagokat a Icarusról. Fedezd fel és tedd közzé projektjeidet a Icaruson egy modern, könnyen használható felületen és API-n keresztül."
   },
   "layout.meta.og-description": {
     "message": "Fedezd fel és tegyél közzé Minecraft tartalmakat!"
@@ -1854,7 +1647,7 @@
     "message": "Menü megnyitása"
   },
   "layout.nav.active-reports": {
-    "message": "Aktív jelentések"
+    "message": "Aktív Bejelentések"
   },
   "layout.nav.discover": {
     "message": "Felfedezés"
@@ -1862,8 +1655,8 @@
   "layout.nav.discover-content": {
     "message": "Tartalom felfedezése"
   },
-  "layout.nav.get-modrinth-app": {
-    "message": "Szerezd meg a Modrinth Appot"
+  "layout.nav.get-Icarus-app": {
+    "message": "Szerezd meg a Icarus Launcherot"
   },
   "layout.nav.home": {
     "message": "Kezdőlap"
@@ -1871,11 +1664,11 @@
   "layout.nav.host-a-server": {
     "message": "Hozz létre egy szervert"
   },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+  "layout.nav.Icarus-app": {
+    "message": "Icarus Launcher"
   },
-  "layout.nav.modrinth-home-page": {
-    "message": "Modrinth kezdőlap"
+  "layout.nav.Icarus-home-page": {
+    "message": "Icarus kezdőlap"
   },
   "layout.nav.my-servers": {
     "message": "Szervereim"
@@ -1898,8 +1691,8 @@
   "layout.nav.search": {
     "message": "Keresés"
   },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Frissíts a Modrinth+-ra"
+  "layout.nav.upgrade-to-Icarus-plus": {
+    "message": "Frissíts a Icarus+-ra"
   },
   "moderation.moderate": {
     "message": "Moderált"
@@ -1909,6 +1702,9 @@
   },
   "moderation.page.reports": {
     "message": "Jelentések"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Műszaki áttekintés"
   },
   "muralpay.account-type.checking": {
     "message": "Ellenőrzés"
@@ -2178,10 +1974,10 @@
     "message": "Nézd át jól a pénztárca címedet. Az egyenleg rossz címre lesz küldve az nem szerezhető vissza."
   },
   "profile.bio.fallback.creator": {
-    "message": "Egy Modrinth fejlesztő."
+    "message": "Egy Icarus fejlesztő."
   },
   "profile.bio.fallback.user": {
-    "message": "Egy Modrinth felhasználó."
+    "message": "Egy Icarus felhasználó."
   },
   "profile.button.billing": {
     "message": "Felhasználói számlázás kezelése"
@@ -2265,10 +2061,10 @@
     "message": "Mentés..."
   },
   "profile.meta.description": {
-    "message": "Töltsd le {username} projektjeit a Modrinthon"
+    "message": "Töltsd le {username} projektjeit a Icaruson"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} - Töltsd le {username} projektjeit a Modrinthon"
+    "message": "{bio} - Töltsd le {username} projektjeit a Icaruson"
   },
   "profile.stats.projects-followers": {
     "message": "<stat>{count}</stat> projektkövető"
@@ -2307,7 +2103,7 @@
     "message": "Felülvizsgálatra való benyújtás visszavonása"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "A projektedet {status, select, rejected {elutasították} withheld {visszatartották} other {{status}}} a Modrinth moderátor tagjai. A legtöbb esetben újra beküldheted felülvizsgálatra, miután reagáltál a moderátor üzenetére."
+    "message": "A projektedet {status, select, rejected {elutasították} withheld {visszatartották} other {{status}}} a Icarus moderátor tagjai. A legtöbb esetben újra beküldheted felülvizsgálatra, miután reagáltál a moderátor üzenetére."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "El kell végezned a közzétételi ellenőrzőlistán szereplő szükséges lépéseket!"
@@ -2421,7 +2217,7 @@
     "message": "Tekintsd át a projektet"
   },
   "project.actions.servers-promo.description": {
-    "message": "A Modrinth Hosting a legegyszerűbb módja annak, hogy gond nélkül játszhass a barátaiddal!"
+    "message": "A Icarus Hosting a legegyszerűbb módja annak, hogy gond nélkül játszhass a barátaiddal!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Kezdőár: {price}<small> / hó</small>"
@@ -2454,10 +2250,10 @@
     "message": "A(z) {title} nem támogatja ezt a verziót: {platform} {gameVersion}"
   },
   "project.download.install-with-app": {
-    "message": "Letöltés a Modrinth Appal"
+    "message": "Letöltés a Icarus Launcheral"
   },
   "project.download.no-app": {
-    "message": "Nincs meg a Modrinth App? "
+    "message": "Nincs meg a Icarus Launcher? "
   },
   "project.download.no-versions-available": {
     "message": "Nem érhető el verzió ehhez: {platform} {gameVersion}"
@@ -2493,7 +2289,7 @@
     "message": "{title} letöltése"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Átdolgoztuk a Modrinth Környezetek rendszerét, és új beállítások érhetők el. Nincs jogosultságod módosítani ezeket a beállításokat, de kérlek, jelezd a projekt egy másik tagjának, hogy a környezet metaadatait ellenőrizni kell."
+    "message": "Átdolgoztuk a Icarus Környezetek rendszerét, és új beállítások érhetők el. Nincs jogosultságod módosítani ezeket a beállításokat, de kérlek, jelezd a projekt egy másik tagjának, hogy a környezet metaadatait ellenőrizni kell."
   },
   "project.environment.migration-no-permission.title": {
     "message": "A környezeti metaadatokat felül kell vizsgálni"
@@ -2502,7 +2298,7 @@
     "message": "Tudj meg többet erről a változásról"
   },
   "project.environment.migration.message": {
-    "message": "Átdolgoztuk a Modrinth Környezetek rendszerét, és új lehetőségek érhetők el. Kérjük, ellenőrizd, hogy a metaadatok helyesek-e."
+    "message": "Átdolgoztuk a Icarus Környezetek rendszerét, és új lehetőségek érhetők el. Kérjük, ellenőrizd, hogy a metaadatok helyesek-e."
   },
   "project.environment.migration.review-button": {
     "message": "Környezet beállítások Átnézése"
@@ -2634,7 +2430,7 @@
     "message": "{item, select, project {Projekt} version {Verzió} user {Felhasználó} other {Tartalom}} nem található"
   },
   "report.for.violation": {
-    "message": "A Modrinth <rules-link>Szabályzat</rules-link> vagy <terms-link>Felhasználási feltételek</terms-link> megsértése"
+    "message": "A Icarus <rules-link>Szabályzat</rules-link> vagy <terms-link>Felhasználási feltételek</terms-link> megsértése"
   },
   "report.for.violation.description": {
     "message": "Példák: rosszindulatú, spam, sértő, megtévesztő, félrevezető és illegális tartalom."
@@ -2679,7 +2475,7 @@
     "message": "Milyen típusú tartalmat jelentesz?"
   },
   "report.question.report-reason": {
-    "message": "A Modrinth melyik szabályát szegi meg ez a {item, select, project {projekt} version {verzió} user {felhasználó} other {tartalom}}?"
+    "message": "A Icarus melyik szabályát szegi meg ez a {item, select, project {projekt} version {verzió} user {felhasználó} other {tartalom}}?"
   },
   "report.report-content": {
     "message": "Tartalom jelentése a moderátoroknak"
@@ -2883,7 +2679,7 @@
     "message": "Jelentések írása"
   },
   "scopes.sessionAccess.description": {
-    "message": "Modrinth által kiadott munkamenetek elérése"
+    "message": "Icarus által kiadott munkamenetek elérése"
   },
   "scopes.sessionAccess.label": {
     "message": "Munkamenetek hozzáférése"
@@ -3030,13 +2826,13 @@
     "message": "Exportálás..."
   },
   "settings.account.data-export.description": {
-    "message": "Másolatot kér az összes személyes adatról, amelyet a Modrinthra feltöltött. A feldolgozás néhány percig is eltarthat."
+    "message": "Másolatot kér az összes személyes adatról, amelyet a Icarusra feltöltött. A feldolgozás néhány percig is eltarthat."
   },
   "settings.account.data-export.title": {
     "message": "Adatok exportálása"
   },
   "settings.account.delete.confirm.description": {
-    "message": "Ez **azonnal törli az összes felhasználói adatodat és követőidet**. A projektjeid nem kerülnek törlésre. A fiók törlése visszafordíthatatlan.<br><br>Ha segítségre van szükséged a fiókoddal kapcsolatban, kérj támogatást a [Modrinth Discord](https://discord.modrinth.com)on."
+    "message": "Ez **azonnal törli az összes felhasználói adatodat és követőidet**. A projektjeid nem kerülnek törlésre. A fiók törlése visszafordíthatatlan.<br><br>Ha segítségre van szükséged a fiókoddal kapcsolatban, kérj támogatást a [Icarus Discord](https://discord.Icarus.com)on."
   },
   "settings.account.delete.confirm.proceed": {
     "message": "Fiók törlése"
@@ -3183,7 +2979,7 @@
     "message": "Kétlépcsős hitelesítés"
   },
   "settings.account.two-factor.backup.intro": {
-    "message": "Töltsd le ezeket a biztonsági kódokat, és őrizd meg őket biztonságos helyen. Ha valaha is elveszítenéd a hozzáférésedet az eszközödhöz, ezeket a kódokat használhatod a kétlépcsős hitelesítés kódja helyett! Ezeket a kódokat ugyanúgy óvnod kell, mint a jelszavadat."
+    "message": "Töltse le ezeket a biztonsági kódokat, és őrizze meg őket biztonságos helyen. Ha valaha is elveszítené a hozzáférését az eszközéhez, ezeket a kódokat használhatja a kétlépcsős hitelesítés kódja helyett! Ezeket a kódokat ugyanúgy óvnia kell, mint a jelszavát."
   },
   "settings.account.two-factor.backup.single-use": {
     "message": "A biztonsági kódok csak egyszer használhatók fel."
@@ -3264,7 +3060,7 @@
     "message": "Biztos törölni szeretnéd ezt az alkamazást?"
   },
   "settings.applications.description.intro": {
-    "message": "Az alkalmazások segítségével hitelesítheti a Modrinth felhasználóit a termékeivel. További információkért lásd a <docs-link>Modrinth API dokumentációját</docs-link>."
+    "message": "Az alkalmazások segítségével hitelesítheti a Icarus felhasználóit a termékeivel. További információkért lásd a <docs-link>Icarus API dokumentációját</docs-link>."
   },
   "settings.applications.field.description": {
     "message": "Leírás"
@@ -3318,7 +3114,7 @@
     "message": "által"
   },
   "settings.authorizations.description": {
-    "message": "Amikor engedélyezel egy alkalmazást a Modrinth-fiókjoddal, hozzáférést biztosítasz számára a fiókodhoz. A fiókodhoz való hozzáférést bármikor kezelheted és ellenőrizheted itt."
+    "message": "Amikor engedélyezel egy alkalmazást a Icarus-fiókjoddal, hozzáférést biztosítasz számára a fiókodhoz. A fiókodhoz való hozzáférést bármikor kezelheted és ellenőrizheted itt."
   },
   "settings.authorizations.empty-state": {
     "message": "Jelenleg nem tudjuk megjeleníteni a jogosult alkalmazásait, dolgozunk a probléma megoldásán. Kérjük, látogassa meg ezt az oldalt később!"
@@ -3336,16 +3132,16 @@
     "message": "Biztosan visszavonod ezt a kérelmet?"
   },
   "settings.billing.charges.description": {
-    "message": "A Modrinth-számládra korábban leadott összes fiókod itt lesz felsorolva:"
+    "message": "A Icarus-számládra korábban leadott összes fiókod itt lesz felsorolva:"
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "Medal Server próbaverzió"
   },
   "settings.billing.charges.product.midas": {
-    "message": "Modrinth Plus"
+    "message": "Icarus Plus"
   },
   "settings.billing.charges.product.pyro": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "settings.billing.charges.title": {
     "message": "Korábbi költségek"
@@ -3372,13 +3168,13 @@
     "message": "éves"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "Reklámmentes böngészés a modrinth.com-on és a Modrinth App-ban"
+    "message": "Reklámmentes böngészés a Icarus.com-on és a Icarus Launcher-ban"
   },
   "settings.billing.midas.benefits.badge": {
-    "message": "Modrinth+ jelvény a profilodon"
+    "message": "Icarus+ jelvény a profilodon"
   },
   "settings.billing.midas.benefits.support": {
-    "message": "Támogasd közvetlenül a Modrinth-et és a fejlesztőit"
+    "message": "Támogasd közvetlenül a Icarus-et és a fejlesztőit"
   },
   "settings.billing.midas.benefits.title": {
     "message": "Előnyök"
@@ -3402,7 +3198,7 @@
     "message": "A fizetésed feldolgozás alatt áll. A juttatások a fizetés befejezése után aktiválódnak."
   },
   "settings.billing.midas.upsell": {
-    "message": "Iratkozz fel a Modrinth Plusra!"
+    "message": "Iratkozz fel a Icarus Plusra!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Előfizetés lemondása"
@@ -3462,7 +3258,7 @@
     "message": "{shared} Megosztott CPU-k (maximum {bursts} CPU-ig terjedő löketek)"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "Nem található ehhez az előfizetéshez csatolt szerver. Ennek több lehetséges magyarázata is van. Ha nemrég vásároltad meg a szervert, ez normális. A szerver kiépítése akár egy órát is igénybe vehet. Ellenkező esetben, ha egy ideje vásároltad meg ezt a szervert, valószínűleg azóta felfüggesztették. Ha nem erre számítottál, kérjük, vedd fel a kapcsolatot a Modrinth ügyfélszolgálatával a következő információkkal:"
+    "message": "Nem található ehhez az előfizetéshez csatolt szerver. Ennek több lehetséges magyarázata is van. Ha nemrég vásároltad meg a szervert, ez normális. A szerver kiépítése akár egy órát is igénybe vehet. Ellenkező esetben, ha egy ideje vásároltad meg ezt a szervert, valószínűleg azóta felfüggesztették. Ha nem erre számítottál, kérjük, vedd fel a kapcsolatot a Icarus ügyfélszolgálatával a következő információkkal:"
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "Szerverazonosító: {id}"
@@ -3474,7 +3270,7 @@
     "message": "{gb} GB RAM"
   },
   "settings.billing.pyro.resubscribe.error.text": {
-    "message": "Hiba történt a Modrinth szerverre való újbóli feliratkozás során."
+    "message": "Hiba történt a Icarus szerverre való újbóli feliratkozás során."
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Hiba az újbóli feliratkozáskor"
@@ -3504,7 +3300,7 @@
     "message": "Modirinth szerver feliratkozások kezelése"
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Modrinth Szerver Előfizetések"
+    "message": "Icarus Szerver Előfizetések"
   },
   "settings.billing.renews": {
     "message": "Megújul: {date}"
@@ -3546,7 +3342,7 @@
     "message": "A fejlesztői mód letiltása"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "A <strong>fejlesztői mód</strong> aktív. Ez lehetővé teszi, hogy megtekintsd a Modrinth különböző elemeinek belső azonosítóit, ami hasznos lehet, ha a Modrinth API-t használó fejlesztő vagy. Kattints ötször a lap alján található Modrinth logóra a fejlesztői mód bekapcsolásához."
+    "message": "A <strong>fejlesztői mód</strong> aktív. Ez lehetővé teszi, hogy megtekintsd a Icarus különböző elemeinek belső azonosítóit, ami hasznos lehet, ha a Icarus API-t használó fejlesztő vagy. Kattints ötször a lap alján található Icarus logóra a fejlesztői mód bekapcsolásához."
   },
   "settings.display.flags.description": {
     "message": "Bizonyos funkciók engedélyezése vagy letiltása ezen az eszközön."
@@ -3609,16 +3405,16 @@
     "message": "Összetett renderelés"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "A Modrinthon kívüli linkeket új lapon nyílnak meg. Ettől a beállítástól függetlenül az azonos domainen található linkek és a Markdown leírásokban szereplő linkek ugyanazon a lapon nyílnak meg, míg a hirdetésekben és a szerkesztési oldalakon található linkek új lapon nyílnak meg."
+    "message": "A Icaruson kívüli linkeket új lapon nyílnak meg. Ettől a beállítástól függetlenül az azonos domainen található linkek és a Markdown leírásokban szereplő linkek ugyanazon a lapon nyílnak meg, míg a hirdetésekben és a szerkesztési oldalakon található linkek új lapon nyílnak meg."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Külső linkek megnyitása új lapon"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Elrejti a „Szerezd meg a Modrinth Appot” gombokat az elsődleges navigációból. A Modrinth App oldal továbbra is megtalálható a nyitóoldalon vagy a láblécben."
+    "message": "Elrejti a „Szerezd meg a Icarus Launcherot” gombokat az elsődleges navigációból. A Icarus Launcher oldal továbbra is megtalálható a nyitóoldalon vagy a láblécben."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Modrinth App promóciók elrejtése"
+    "message": "Icarus Launcher promóciók elrejtése"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Balra igazított oldalsáv oldalakon"
@@ -3633,7 +3429,7 @@
     "message": "Jobbra igazított szűrők oldalakon"
   },
   "settings.display.theme.description": {
-    "message": "Válaszd ki a Modrinth számára a kívánt színsémát ezen az eszközön."
+    "message": "Válaszd ki a Icarus számára a kívánt színsémát ezen az eszközön."
   },
   "settings.display.theme.title": {
     "message": "Téma"
@@ -3645,7 +3441,7 @@
     "message": "PAT létrehozása"
   },
   "settings.pats.description": {
-    "message": "A PAT-ek a Modrinth API-hoz való hozzáférést biztosítják. Bármikor létrehozhatók és visszavonhatók. További információkért látogasson el a <doc-link>Modrinth API dokumentációjára</doc-link>."
+    "message": "A PAT-ek a Icarus API-hoz való hozzáférést biztosítják. Bármikor létrehozhatók és visszavonhatók. További információkért látogasson el a <doc-link>Icarus API dokumentációjára</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT létrehozása"
@@ -3699,7 +3495,7 @@
     "message": "Bemutatkozás"
   },
   "settings.profile.description": {
-    "message": "A rofiladataid nyilvánosan megtekinthetők a Modrinth oldalon és a <docs-link>Modrinth API</docs-link>-n keresztül."
+    "message": "A rofiladataid nyilvánosan megtekinthetők a Icarus oldalon és a <docs-link>Icarus API</docs-link>-n keresztül."
   },
   "settings.profile.head-title": {
     "message": "Profilbeállítások"
@@ -3723,7 +3519,7 @@
     "message": "Jelenlegi munkamenet"
   },
   "settings.sessions.description": {
-    "message": "Itt találhatók azok az eszközök, amelyek jelenleg be vannak jelentkezve a Modrinth fiókodba. Mindegyikről külön-külön kijelentkezhetsz.\n\nHa nem ismerős bejegyzést látsz, jelentkezz ki az adott eszközről, és azonnal változtasd meg Modrinth fiókod jelszavát."
+    "message": "Itt találhatók azok az eszközök, amelyek jelenleg be vannak jelentkezve a Icarus fiókodba. Mindegyikről külön-külön kijelentkezhetsz.\n\nHa nem ismerős bejegyzést látsz, jelentkezz ki az adott eszközről, és azonnal változtasd meg Icarus fiókod jelszavát."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Legutoljára hozzáférve {ago}"
@@ -3744,7 +3540,7 @@
     "message": "Megjelenés"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "A legújabb hírek a Modrinthról"
+    "message": "A legújabb hírek a Icarusról"
   },
   "ui.latest-news-row.view-all": {
     "message": "Összes hír"
@@ -3756,7 +3552,7 @@
     "message": "Feliratkozva!"
   },
   "ui.newsletter-button.tooltip": {
-    "message": "Feliratkozás a Modrinth hírlevelére"
+    "message": "Feliratkozás a Icarus hírlevelére"
   },
   "version.environment.none.description": {
     "message": "A környezet erre a verzióra nem lett megadva."
@@ -3771,3 +3567,4 @@
     "message": "Ismeretlen környezet"
   }
 }
+

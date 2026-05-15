@@ -38,13 +38,13 @@
 		</ul>
 		<p>Our designated copyright agent to receive DMCA Notices is:</p>
 		<p>
-			&emsp;DMCA Designated Agent<br />
+			&emsp;Copyright Manager<br />
 			&emsp;Rinth, Inc.<br />
 			&emsp;800 N King St<br />
-			&emsp;Suite 304 #3133<br />
+			&emsp;Suite 304 -3133<br />
 			&emsp;Wilmington, DE 19801<br />
-			&emsp;Phone: +1 (201) 431-5015<br />
-			&emsp;<a href="mailto:dmca@modrinth.com">dmca@modrinth.com</a><br />
+			&emsp;Phone: +1 (302) 281-2193<br />
+			&emsp;<a href="mailto:support@modrinth.com">support@modrinth.com</a><br />
 		</p>
 		<p>
 			If you fail to comply with all of the requirements of Section 512(c)(3) of the DMCA, your DMCA
@@ -106,12 +106,13 @@
 
 <script setup>
 const description =
-	'The Copyright Policy of Modrinth, an open source modding platform focused on Minecraft.'
+	'The Copyright Policy of Icarus, an open source modding platform focused on Minecraft.'
 
 useSeoMeta({
-	title: 'Copyright Policy - Modrinth',
+	title: 'Copyright Policy - Icarus',
 	description,
 	ogTitle: 'Copyright Policy',
 	ogDescription: description,
 })
 </script>
+

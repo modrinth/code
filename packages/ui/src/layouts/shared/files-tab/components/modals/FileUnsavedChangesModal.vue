@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import { SaveIcon, TrashIcon, XIcon } from '@icarus/assets'
 import { ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'

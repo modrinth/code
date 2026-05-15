@@ -1,5 +1,5 @@
-import type { Labrinth } from '@modrinth/api-client'
-import { BookOpenIcon } from '@modrinth/assets'
+import type { Labrinth } from '@icarus/api-client'
+import { BookOpenIcon } from '@icarus/assets'
 
 import type { Stage } from '../../types/stage'
 

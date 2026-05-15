@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "เวอร์ชั่น Linux แอพ Modrinth <issues-link> อาจมีปัญหา</issues-link> ในบางเครื่องและการตั้งค่าบางอย่าง ถ้าแอพ Modrinth ไม่เสถียรในเครื่องของคุณ เราขอให้คุณลองใช้แอพอื่นๆเช่น <prism-link>Prism Launcher</prism-link> เพื่อติดตั้งเนื้อหาของ Modrinth"
+    "message": "เวอร์ชั่น Linux แอพ Icarus <issues-link> อาจมีปัญหา</issues-link> ในบางเครื่องและการตั้งค่าบางอย่าง ถ้าแอพ Icarus ไม่เสถียรในเครื่องของคุณ เราขอให้คุณลองใช้แอพอื่นๆเช่น <prism-link>Prism Launcher</prism-link> เพื่อติดตั้งเนื้อหาของ Icarus"
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -39,10 +39,10 @@
     "message": "ตัวเลือกการดาวน์โหลด"
   },
   "app-marketing.download.terms": {
-    "message": "การดาวน์โหลด Modrinth App ถือว่าคุณยอมรับ <terms-link>ข้อกำหนดการใช้งาน</terms-link> และ <privacy-link>นโยบายความเป็นส่วนตัว</privacy-link> ของเรา"
+    "message": "การดาวน์โหลด Icarus Launcher ถือว่าคุณยอมรับ <terms-link>ข้อกำหนดการใช้งาน</terms-link> และ <privacy-link>นโยบายความเป็นส่วนตัว</privacy-link> ของเรา"
   },
   "app-marketing.download.title": {
-    "message": "ดาวน์โหลดแอปพลิเคชัน Modrinth (Beta)"
+    "message": "ดาวน์โหลดแอปพลิเคชัน Icarus (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "ติดตามโปรเจค"
   },
   "app-marketing.features.importing.description": {
-    "message": "นำเข้าโปรไฟล์โปรดทั้งหมดของคุณจากลอนเชอร์ที่คุณเคยใช้ก่อนหน้านี้ และเริ่มต้นใช้งาน Modrinth App ได้ภายในไม่กี่วินาที!"
+    "message": "นำเข้าโปรไฟล์โปรดทั้งหมดของคุณจากลอนเชอร์ที่คุณเคยใช้ก่อนหน้านี้ และเริ่มต้นใช้งาน Icarus Launcher ได้ภายในไม่กี่วินาที!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "โดย {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth ช่วยให้การจัดการมอดทั้งหมดของคุณในที่เดียวเป็นเรื่องง่าย คุณสามารถติดตั้ง ถอนการติดตั้ง และอัปเดตมอดได้ด้วยการคลิกเพียงครั้งเดียว!"
+    "message": "Icarus ช่วยให้การจัดการมอดทั้งหมดของคุณในที่เดียวเป็นเรื่องง่าย คุณสามารถติดตั้ง ถอนการติดตั้ง และอัปเดตมอดได้ด้วยการคลิกเพียงครั้งเดียว!"
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "ม็อดที่ติดตั้งแล้ว"
@@ -96,7 +96,7 @@
     "message": "โหมดออฟไลน์"
   },
   "app-marketing.features.open-source.description": {
-    "message": "ลอนเชอร์ของ Modrinth เป็นโอเพนซอร์สแบบเต็มรูปแบบ คุณสามารถดูซอร์สโค้ดได้ที่ <github-link>GitHub</github-link>ของเรา!"
+    "message": "ลอนเชอร์ของ Icarus เป็นโอเพนซอร์สแบบเต็มรูปแบบ คุณสามารถดูซอร์สโค้ดได้ที่ <github-link>GitHub</github-link>ของเรา!"
   },
   "app-marketing.features.open-source.title": {
     "message": "โอเพนซอร์ส"
@@ -122,8 +122,8 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
-  "app-marketing.features.performance.modrinth-app": {
-    "message": "แอป Modrinth"
+  "app-marketing.features.performance.Icarus-app": {
+    "message": "แอป Icarus"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 พันล้าน %"
@@ -138,7 +138,7 @@
     "message": "มีประสิทธิภาพ"
   },
   "app-marketing.features.play.description": {
-    "message": "ดาวน์โหลดและเล่นม็อดกับม็อดแพ็กที่คุณชื่นชอบได้ง่าย ๆ ผ่านแอป Modrinth"
+    "message": "ดาวน์โหลดและเล่นม็อดกับม็อดแพ็กที่คุณชื่นชอบได้ง่าย ๆ ผ่านแอป Icarus"
   },
   "app-marketing.features.play.title": {
     "message": "เล่นกับม็อดที่คุณชอบ"
@@ -159,13 +159,13 @@
     "message": "คุณใช้มันมาก่อน"
   },
   "app-marketing.hero.download-button": {
-    "message": "ดาวน์โหลดแอป Modrinth"
+    "message": "ดาวน์โหลดแอป Icarus"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "ดาวน์โหลดแอป Modrinth"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "ดาวน์โหลดแอป Icarus"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "ดาวน์โหลดแอป Modrinth สำหรับ {os}"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "ดาวน์โหลดแอป Icarus สำหรับ {os}"
   },
   "app-marketing.hero.more-download-options": {
     "message": "ตัวเลือกการดาวน์โหลดเพิ่มเติม"
@@ -246,7 +246,7 @@
     "message": "สร้างบัญชี"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "ในการสร้างบัญชี คุณยอมรับ <terms-link> ข้อกำหนด </terms-link> และ <privacy-policy-link> นโยบายความเป็นส่วนตัว </privacy-policy-link> ของ Modrinth"
+    "message": "ในการสร้างบัญชี คุณยอมรับ <terms-link> ข้อกำหนด </terms-link> และ <privacy-policy-link> นโยบายความเป็นส่วนตัว </privacy-policy-link> ของ Icarus"
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "รหัสผ่านไม่ตรงกัน!"
@@ -255,7 +255,7 @@
     "message": "มีบัญชีอยู่แล้ว?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "สมัครรับข้อมูลการอัพเดทเกี่ยวกับ Modrinth"
+    "message": "สมัครรับข้อมูลการอัพเดทเกี่ยวกับ Icarus"
   },
   "auth.sign-up.title": {
     "message": "ลงทะเบียน"
@@ -297,16 +297,16 @@
     "message": "ยืนยันอีเมล"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "สมัครรับข้อมูลอัปเดตเกี่ยวกับ Modrinth"
+    "message": "สมัครรับข้อมูลอัปเดตเกี่ยวกับ Icarus"
   },
   "auth.welcome.description": {
     "message": "ตอนนี้คุณได้เป็นส่วนหนึ่งของคอมมูนิตี้สุดเจ๋งของเหล่าครีเอเตอร์และนักสำรวจ ที่กำลังสร้างสรรค์ ดาวน์โหลด และอัปเดตม็อดสุดยอดอยู่เสมอ"
   },
   "auth.welcome.label.tos": {
-    "message": "การสร้างบัญชี <tems-link> ข้อกำหนด </sems-link> และ <Privacy-Policy-Link> นโยบายความเป็นส่วนตัว </privacy-policy-link> ของ modrinth"
+    "message": "การสร้างบัญชี <tems-link> ข้อกำหนด </sems-link> และ <Privacy-Policy-Link> นโยบายความเป็นส่วนตัว </privacy-policy-link> ของ Icarus"
   },
   "auth.welcome.long-title": {
-    "message": "ยินดีต้อนรับเข้าสู่ modrinth!"
+    "message": "ยินดีต้อนรับเข้าสู่ Icarus!"
   },
   "auth.welcome.title": {
     "message": "ยินดีต้อนรับ"
@@ -333,7 +333,7 @@
     "message": "คุณแน่ใจหรือไม่ว่าต้องการที่จะลบคอลเล็กชันนี้"
   },
   "collection.description": {
-    "message": "{description} - ดูคอลเลกชัน {name} โดย {username} บน modrinth"
+    "message": "{description} - ดูคอลเลกชัน {name} โดย {username} บน Icarus"
   },
   "collection.description.following": {
     "message": "คอลเลกชันที่สร้างขึ้นโดยอัตโนมัติที่รวมโปรเจ็กต์ทั้งหมดที่คุณกำลังติดตาม"
@@ -485,10 +485,10 @@
   "hosting-marketing.server-for-everyone": {
     "message": ""
   },
-  "hosting-marketing.why.all-on-modrinth": {
+  "hosting-marketing.why.all-on-Icarus": {
     "message": ""
   },
-  "hosting-marketing.why.all-on-modrinth.description": {
+  "hosting-marketing.why.all-on-Icarus.description": {
     "message": ""
   },
   "landing.button.discover-mods": {
@@ -498,7 +498,7 @@
     "message": "ไปที่แดชบอร์ด"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "รับประสบการณ์การม็อดที่ดีที่สุด พร้อมการอัปเดตอย่างต่อเนื่องจากทีมงาน Modrinth"
+    "message": "รับประสบการณ์การม็อดที่ดีที่สุด พร้อมการอัปเดตอย่างต่อเนื่องจากทีมงาน Icarus"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "พัฒนาอย่างต่อเนื่อง"
@@ -540,13 +540,13 @@
     "message": "ติดตามโปรเจกต์ที่คุณชื่นชอบ"
   },
   "landing.feature.launcher.description": {
-    "message": "API แบบโอเพนซอร์สของ Modrinth ช่วยให้ Launcher ต่าง ๆ เชื่อมต่อกับ Modrinth ได้แบบเต็มระบบ ใช้งานได้ทั้งผ่าน <link>แอปของเรา</link> หรือ Launcher ยอดนิยมอย่าง ATLauncher, MultiMC และ Prism Launcher เลย"
+    "message": "API แบบโอเพนซอร์สของ Icarus ช่วยให้ Launcher ต่าง ๆ เชื่อมต่อกับ Icarus ได้แบบเต็มระบบ ใช้งานได้ทั้งผ่าน <link>แอปของเรา</link> หรือ Launcher ยอดนิยมอย่าง ATLauncher, MultiMC และ Prism Launcher เลย"
   },
   "landing.feature.launcher.heading": {
     "message": "เล่นกับ Launcher ที่คุณชอบได้เลย"
   },
   "landing.feature.search.description": {
-    "message": "ระบบค้นหาสุดรวดเร็วของ Modrinth พร้อมฟิลเตอร์ ช่วยให้คุณเจอสิ่งที่ต้องการได้ตั้งแต่ตอนพิมพ์เลย"
+    "message": "ระบบค้นหาสุดรวดเร็วของ Icarus พร้อมฟิลเตอร์ ช่วยให้คุณเจอสิ่งที่ต้องการได้ตั้งแต่ตอนพิมพ์เลย"
   },
   "landing.feature.search.heading": {
     "message": "ค้นหาสิ่งที่คุณต้องการได้อย่างรวดเร็วและง่ายดาย"
@@ -591,3 +591,4 @@
     "message": "ไอคอน"
   }
 }
+

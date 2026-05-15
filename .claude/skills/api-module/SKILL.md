@@ -15,4 +15,5 @@ Refer to the standard: @standards/frontend/ADDING_API_MODULES.md
 5. **Create the module class** — extend `BaseModule`, implement each endpoint as a method. Use the correct HTTP verb and request options pattern from the standard.
 6. **Register in `MODULE_REGISTRY`** — add the module entry so it's auto-instantiated on the client.
 7. **Export types** from the service's barrel `index.ts`.
-8. **Verify** — check that the module compiles and the types are accessible from `@modrinth/api-client`.
+8. **Verify** — check that the module compiles and the types are accessible from `@icarus/api-client`.
+

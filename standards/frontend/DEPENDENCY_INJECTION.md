@@ -16,14 +16,14 @@
 
 # Dependency Injection
 
-Modrinth uses a lightweight DI layer built on Vue's `provide`/`inject` for sharing platform-specific capabilities and page-level state across shared UI components.
+Icarus uses a lightweight DI layer built on Vue's `provide`/`inject` for sharing platform-specific capabilities and page-level state across shared UI components.
 
 ## The `createContext` Factory
 
 All providers are defined using `createContext` from `packages/ui/src/providers/index.ts` (adapted from Reka UI). It produces a typed `[inject, provide]` tuple:
 
 ```ts
-import { createContext } from '@modrinth/ui'
+import { createContext } from '@Icarus/ui'
 
 interface MyContext {
 	someValue: Ref<string>
@@ -107,7 +107,7 @@ Create a setup function in `apps/app-frontend/src/providers/setup/`:
 ```ts
 // apps/app-frontend/src/providers/setup/my-feature.ts
 import { ref } from 'vue'
-import { provideMyFeature } from '@modrinth/ui'
+import { provideMyFeature } from '@Icarus/ui'
 
 export function setupMyFeatureProvider() {
 	const items = ref<Item[]>([])
@@ -150,7 +150,7 @@ In any component across `packages/ui`, `apps/frontend`, or `apps/app-frontend`:
 
 ```vue
 <script setup lang="ts">
-import { injectMyFeature } from '@modrinth/ui'
+import { injectMyFeature } from '@Icarus/ui'
 
 const { items, addItem } = injectMyFeature()
 </script>
@@ -174,7 +174,7 @@ Default to props and emits. DI adds indirection — only use it with a concrete 
 
 | Provider                     | File                             | Purpose                        |
 | ---------------------------- | -------------------------------- | ------------------------------ |
-| `provideModrinthClient`      | `providers/api-client.ts`        | API client instance            |
+| `provideIcarusClient`      | `providers/api-client.ts`        | API client instance            |
 | `provideNotificationManager` | `providers/web-notifications.ts` | Notification management        |
 | `providePageContext`         | `providers/page-context.ts`      | Page config (sidebar, ads)     |
 | `provideProjectPageContext`  | `providers/project-page.ts`      | Project page state + mutations |
@@ -188,3 +188,4 @@ Default to props and emits. DI adds indirection — only use it with a concrete 
 - `apps/frontend/src/app.vue` — Nuxt root provider setup
 - `apps/app-frontend/src/App.vue` — Tauri root provider setup
 - `apps/app-frontend/src/providers/setup/` — App provider setup functions
+

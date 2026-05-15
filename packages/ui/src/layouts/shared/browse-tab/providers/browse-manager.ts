@@ -1,4 +1,4 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import type { Component, ComputedRef, MaybeRef, Ref, ShallowRef } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -66,9 +66,6 @@ export interface BrowseManagerContext {
 	hideInstalled?: Ref<boolean>
 	showHideInstalled?: ComputedRef<boolean>
 	hideInstalledLabel?: ComputedRef<string>
-	hideSelected?: Ref<boolean>
-	showHideSelected?: ComputedRef<boolean>
-	hideSelectedLabel?: ComputedRef<string>
 	onInstalled?: (projectId: string) => void
 
 	displayMode?: Ref<'list' | 'grid' | 'gallery'> | ComputedRef<'list' | 'grid' | 'gallery'>

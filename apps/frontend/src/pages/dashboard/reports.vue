@@ -7,7 +7,7 @@
 	</div>
 </template>
 <script setup>
-import { defineMessages, useVIntl } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@icarus/ui'
 
 import ReportsList from '~/components/ui/report/ReportsList.vue'
 
@@ -26,6 +26,7 @@ const messages = defineMessages({
 
 const auth = await useAuth()
 useHead({
-	title: () => `${formatMessage(messages.activeReportsTitle)} - Modrinth`,
+	title: () => `${formatMessage(messages.activeReportsTitle)} - Icarus`,
 })
 </script>
+

@@ -119,6 +119,9 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "อัปโหลดไฟล์"
   },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "กำลังอัปเดตไฟล์ ({completed}/{total})"
+  },
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "กำลังลบ {progress}/{total}{contentType}..."
   },
@@ -419,8 +422,8 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "ไม่สำเร็จ"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "ทีม Modrinth"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "ทีม Icarus"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "กําลังดำเนินการ"
@@ -448,6 +451,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "ไม่ผ่าน"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "ถูกระงับ"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "คัดลอกโค้ดไปยังคลิปบอร์ด"
@@ -636,7 +642,7 @@
     "defaultMessage": "มืด"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "เลือกธีมสีที่คุณต้องการสำหรับ Modrinth บนอุปกรณ์นี้"
+    "defaultMessage": "เลือกธีมสีที่คุณต้องการสำหรับ Icarus บนอุปกรณ์นี้"
   },
   "settings.display.theme.light": {
     "defaultMessage": "สว่าง"
@@ -654,4 +660,5 @@
     "defaultMessage": "โปรไฟล์สาธารณะ"
   }
 }
+
 

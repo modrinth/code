@@ -89,7 +89,7 @@ export class LabrinthThingsV3Module extends AbstractModule {
 | Field         | Values                                            | Purpose                            |
 | ------------- | ------------------------------------------------- | ---------------------------------- |
 | `api`         | `'labrinth'`, `'archon'`, or a full URL           | Which base URL to use              |
-| `version`     | `2`, `3`, `'internal'`, `'modrinth/v0'`, etc.     | URL version segment                |
+| `version`     | `2`, `3`, `'internal'`, `'Icarus/v0'`, etc.     | URL version segment                |
 | `method`      | `'GET'`, `'POST'`, `'PUT'`, `'PATCH'`, `'DELETE'` | HTTP method                        |
 | `body`        | object                                            | JSON request body                  |
 | `params`      | `Record<string, string>`                          | Query parameters                   |
@@ -165,3 +165,4 @@ export * from './<service>/types'
 - `src/modules/index.ts` — `MODULE_REGISTRY` and `buildModuleStructure()`
 - `src/modules/<api>/types.ts` — type definitions per API
 - `src/types/upload.ts` — `UploadHandle`, `UploadProgress`, `UploadRequestOptions`
+

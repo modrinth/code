@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownIcon } from '@modrinth/assets'
+import { DropdownIcon } from '@icarus/assets'
 import { ref } from 'vue'
 
 import type { FilterOption } from '../../utils/search'

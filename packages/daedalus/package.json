@@ -1,5 +1,5 @@
 {
-	"name": "@modrinth/daedalus",
+	"name": "@icarus/daedalus",
 	"scripts": {
 		"build": "cargo build --release",
 		"lint": "cargo fmt --check && cargo clippy --all-targets",

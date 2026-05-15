@@ -1,4 +1,4 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 
 import type { QuickReply } from '../types/quick-reply'
 

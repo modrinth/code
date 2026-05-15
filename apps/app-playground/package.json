@@ -1,5 +1,5 @@
 {
-	"name": "@modrinth/app-playground",
+	"name": "@icarus/app-playground",
 	"scripts": {
 		"build": "cargo build --release",
 		"lint": "cargo fmt --check && cargo clippy --all-targets",

@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { MinusIcon, PlusIcon, RefreshCwIcon, ReportIcon, XIcon } from '@modrinth/assets'
+import { MinusIcon, PlusIcon, RefreshCwIcon, ReportIcon, XIcon } from '@icarus/assets'
 import { type Component, computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'

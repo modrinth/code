@@ -1,1 +1,2 @@
-export { useModrinthServersConsole } from '@modrinth/ui'
+export { useIcarusServersConsole } from '@icarus/ui';
+

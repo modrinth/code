@@ -23,10 +23,11 @@ get_design_context(nodeId: "1:2", clientLanguages: "typescript,html,css", client
 
 ## Adapting Figma Output
 
-The Figma MCP returns generic reference code. It must be adapted to match the Modrinth codebase:
+The Figma MCP returns generic reference code. It must be adapted to match the Icarus codebase:
 
 1. **Read `packages/ui/CLAUDE.md`** for color usage rules, surface token mapping, and component patterns.
 2. **Map Figma color variables to `surface-*` tokens** — never use Figma's aliased names like `bg/default` or `bg/raised` directly. The CLAUDE.md has the full mapping table.
 3. **Check `packages/assets/styles/variables.scss`** for tokens not exposed in Figma (brand highlights, semantic backgrounds, shadows).
 4. **Check for existing components** in `packages/ui/src/components/` before building from scratch.
 5. **Match spacing exactly** — do not approximate values from the design.
+

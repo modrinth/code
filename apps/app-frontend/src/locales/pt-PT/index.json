@@ -5,6 +5,12 @@
   "app.auth-servers.unreachable.header": {
     "message": "Não foi possível alcançar os servidores de autenticação"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Adicionar servidor à instância"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Adicionar servidores à tua instância"
+  },
   "app.browse.add-to-instance": {
     "message": "Adicionar à instância"
   },
@@ -23,6 +29,15 @@
   "app.browse.discover-servers": {
     "message": "Descobrir servidores"
   },
+  "app.browse.hide-added-servers": {
+    "message": "Esconder servidores adicionados"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Esconder conteúdo instalado"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Instalar conteúdo à instância"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Insere a descrição do modpack..."
   },
@@ -37,6 +52,9 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nome do Modpack"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Seleciona as pastas e ficheiros a incluir no pack"
   },
   "app.export-modal.version-number-label": {
     "message": "Número da versão"
@@ -147,7 +165,7 @@
     "message": "Modpack requerido"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Este servidor requer mods para jogares. Clica Instalar para transferir os ficheiros necessários do Modrinth, e então entrar diretamente no servidor."
+    "message": "Este servidor requer mods para jogares. Clica Instalar para transferir os ficheiros necessários do Icarus, e então entrar diretamente no servidor."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instância partilhada"
@@ -192,16 +210,16 @@
     "message": "Gestão de recursos"
   },
   "app.update-popup.body": {
-    "message": "Modrinth App v{version} está pronta para ser instalada! Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
+    "message": "Icarus Launcher v{version} está pronta para ser instalada! Recarrega para atualizar agora, ou automaticamente quando fechares a Icarus Launcher."
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} acabou de ser transferida. Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
+    "message": "Icarus Launcher v{version} acabou de ser transferida. Recarrega para atualizar agora, ou automaticamente quando fechares a Icarus Launcher."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} está disponível. Usa o teu gestor de pacotes para atualizar e receber as correções e recursos mais recentes!"
+    "message": "Icarus Launcher v{version} está disponível. Usa o teu gestor de pacotes para atualizar e receber as correções e recursos mais recentes!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} está disponível! Como estás numa rede com tráfego limitado, não a transferimos automaticamente."
+    "message": "Icarus Launcher v{version} está disponível! Como estás numa rede com tráfego limitado, não a transferimos automaticamente."
   },
   "app.update-popup.changelog": {
     "message": "Lista de alterações"
@@ -234,7 +252,7 @@
     "message": "Recarrega para instalar a atualização"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "exemplo.modrinth.gg"
+    "message": "exemplo.Icarus.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Seleciona uma opção"
@@ -267,10 +285,10 @@
     "message": "Pode ser diferente do nome no Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Insere o nome do utilizador no Modrinth..."
+    "message": "Insere o nome do utilizador no Icarus..."
   },
   "friends.add-friend.username.title": {
-    "message": "Qual é o nome de utilizador do teu amigo no Modrinth?"
+    "message": "Qual é o nome de utilizador do teu amigo no Icarus?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Adiciona amigos</link> para ver o que estão a jogar!"
@@ -312,7 +330,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Inicia a sessão com uma conta Modrinth</link> para adicionar amigos e ver o que estão a jogar!"
+    "message": "<link>Inicia a sessão com uma conta Icarus</link> para adicionar amigos e ver o que estão a jogar!"
   },
   "instance.add-server.add-and-play": {
     "message": "Adicionar e jogar"
@@ -582,3 +600,5 @@
     "message": "Carregador é fornecido pelo servidor"
   }
 }
+
+

@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import type { UploadHandle } from '@modrinth/api-client'
+import type { UploadHandle } from '@icarus/api-client'
 import { ref } from 'vue'
 
 import { AppearingProgressBar } from '#ui/components/base'

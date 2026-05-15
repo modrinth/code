@@ -1,4 +1,4 @@
-//! Theseus error type
+//! Pteron error type
 use std::sync::Arc;
 
 use crate::{profile, util};

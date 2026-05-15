@@ -27,10 +27,11 @@ Refer to the standard: @standards/maintaining/CHANGELOG.md
    - Describes observable behavior, not implementation.
    - Specific enough to identify the surface (names the tab/page/modal).
    - One sentence, ends with a period, sentence case.
-   - Uses branded names (Modrinth App, Modrinth Hosting) correctly.
+   - Uses branded names (Icarus Launcher, Icarus Hosting) correctly.
    - No filler ("issue with", "issue where", "various", "some"), no vague intensifiers, no apologies, no PR/commit references (unless crediting a third-party contributor with a linked GitHub profile).
    - Not a duplicate sub-fix of a bigger change already listed.
 
 5. **Report findings** as a short list grouped by entry. For each problem bullet, show the original line and a suggested rewrite. If the entry is clean, say so explicitly. Do not edit the file unless the user asks - this skill is a review pass, not a rewrite pass.
 
 6. **If the user then asks to apply fixes**, edit `packages/blog/changelog.ts` directly using the suggested rewrites. Preserve tab indentation and template literal formatting.
+

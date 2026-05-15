@@ -1,4 +1,4 @@
-import type { User } from '@modrinth/utils'
+import type { User } from '@icarus/utils'
 import { invoke } from '@tauri-apps/api/core'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'

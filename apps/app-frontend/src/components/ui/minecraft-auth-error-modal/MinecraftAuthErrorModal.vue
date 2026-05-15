@@ -6,11 +6,10 @@ import {
 	LogInIcon,
 	MessagesSquareIcon,
 	WrenchIcon,
-} from '@modrinth/assets'
-import { Admonition, ButtonStyled, Collapsible, NewModal } from '@modrinth/ui'
+} from '@icarus/assets'
+import { Admonition, ButtonStyled, Collapsible, NewModal } from '@icarus/ui'
 import { computed, ref } from 'vue'
 
-import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { handleSevereError } from '@/store/error.js'
 
@@ -29,7 +28,6 @@ function show(errorVal: { message?: string }) {
 	matchedError.value = minecraftAuthErrors.find((e) => rawError.value.includes(e.errorCode)) ?? null
 
 	debugCollapsed.value = true
-	hide_ads_window()
 	modal.value?.show()
 }
 
@@ -39,7 +37,6 @@ function hide() {
 }
 
 function onModalHide() {
-	show_ads_window()
 }
 
 defineExpose({
@@ -193,3 +190,4 @@ async function copyToClipboard(text: string) {
 		</div>
 	</NewModal>
 </template>
+

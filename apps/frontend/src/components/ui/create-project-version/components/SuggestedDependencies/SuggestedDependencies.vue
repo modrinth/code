@@ -8,7 +8,7 @@
 				:name="dependency.name"
 				:icon="dependency.icon"
 				:dependency-type="dependency.dependency_type"
-				:version-number="dependency.versionNumber"
+				:version-name="dependency.versionName"
 				@on-add-suggestion="
 					() =>
 						handleAddSuggestion({
@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { SearchIcon } from '@modrinth/assets'
-import { computed, ref, toValue } from 'vue'
+import type { Labrinth } from '@icarus/api-client'
+import { SearchIcon } from '@icarus/assets'
+import { computed, toValue } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
@@ -12,23 +12,13 @@ import StyledInput from '#ui/components/base/StyledInput.vue'
 import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
 import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useStickyObserver } from '#ui/composables/sticky-observer'
-import { commonMessages } from '#ui/utils/common-messages'
 import type { SortType } from '#ui/utils/search'
 
-import SelectedProjectsFloatingBar from './components/SelectedProjectsFloatingBar.vue'
 import BrowseInstallHeader from './header.vue'
 import { injectBrowseManager } from './providers/browse-manager'
 
 const ctx = injectBrowseManager()
-const { formatMessage } = useVIntl()
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
-const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
-const { isStuck: isInstallHeaderStuck } = useStickyObserver(
-	stickyInstallHeaderRef,
-	'BrowseInstallHeader',
-)
 
 const sortOptions = computed<ComboboxOption<SortType>[]>(() =>
 	ctx.effectiveSortTypes.value.map((st) => ({
@@ -43,43 +33,12 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 		label: String(n),
 	})),
 )
-
-const messages = defineMessages({
-	searchPlaceholder: {
-		id: 'browse.search.placeholder',
-		defaultMessage:
-			'Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} server {servers} other {projects}}...',
-	},
-	viewPrefix: {
-		id: 'browse.view-prefix',
-		defaultMessage: 'View:',
-	},
-	filterResults: {
-		id: 'browse.filter-results',
-		defaultMessage: 'Filter results...',
-	},
-	offline: {
-		id: 'browse.offline',
-		defaultMessage: 'You are currently offline. Connect to the internet to browse Modrinth!',
-	},
-	noResults: {
-		id: 'browse.no-results',
-		defaultMessage: 'No results found for your query!',
-	},
-})
 </script>
 
 <template>
 	<template v-if="ctx.installContext?.value && ctx.variant !== 'web'">
-		<div
-			ref="stickyInstallHeaderRef"
-			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 p-3 border-surface-5"
-			:class="[isInstallHeaderStuck ? 'border-t' : '']"
-		>
-			<BrowseInstallHeader />
-		</div>
+		<BrowseInstallHeader />
 	</template>
-	<SelectedProjectsFloatingBar v-if="ctx.installContext?.value && ctx.variant !== 'web'" />
 
 	<NavTabs v-if="ctx.showProjectTypeTabs.value" :links="ctx.selectableProjectTypes.value" />
 
@@ -88,7 +47,7 @@ const messages = defineMessages({
 		:icon="SearchIcon"
 		type="text"
 		autocomplete="off"
-		:placeholder="formatMessage(messages.searchPlaceholder, { projectType: ctx.projectType.value })"
+		:placeholder="`Search ${ctx.projectType.value}s...`"
 		clearable
 		wrapper-class="w-full"
 		:input-class="ctx.variant === 'web' ? '!h-12' : 'h-12'"
@@ -99,41 +58,29 @@ const messages = defineMessages({
 		<Combobox
 			:model-value="ctx.effectiveCurrentSortType.value"
 			:options="sortOptions"
-			:class="
-				ctx.variant === 'web'
-					? '!w-[16rem] min-w-max max-w-full flex-grow md:flex-grow-0'
-					: '!w-[16rem] min-w-max max-w-full'
-			"
+			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[16rem]'"
 			@update:model-value="(val: SortType) => (ctx.effectiveCurrentSortType.value = val)"
 		>
 			<template #prefix>
-				<span class="font-semibold text-primary">{{
-					formatMessage(commonMessages.sortByLabel)
-				}}</span>
+				<span class="font-semibold text-primary">Sort by:</span>
 			</template>
 		</Combobox>
 
 		<Combobox
 			:model-value="ctx.maxResults.value"
 			:options="maxResultsOptions"
-			:class="
-				ctx.variant === 'web'
-					? '!w-[9rem] min-w-max max-w-full flex-grow md:flex-grow-0'
-					: '!w-[9rem] min-w-max max-w-full'
-			"
-			:placeholder="formatMessage(commonMessages.viewLabel)"
+			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[9rem]'"
+			placeholder="View"
 			@update:model-value="(val: number) => (ctx.maxResults.value = val)"
 		>
 			<template #prefix>
-				<span class="font-semibold text-primary">{{ formatMessage(messages.viewPrefix) }}</span>
+				<span class="font-semibold text-primary">View:</span>
 			</template>
 		</Combobox>
 
 		<div v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value" class="lg:hidden">
 			<ButtonStyled>
-				<button @click="ctx.filtersMenuOpen.value = true">
-					{{ formatMessage(messages.filterResults) }}
-				</button>
+				<button @click="ctx.filtersMenuOpen.value = true">Filter results...</button>
 			</ButtonStyled>
 		</div>
 
@@ -172,7 +119,7 @@ const messages = defineMessages({
 			<component :is="ctx.loadingComponent ?? LoadingIndicator" />
 		</section>
 		<section v-else-if="ctx.offline?.value && ctx.totalHits.value === 0" class="offline">
-			{{ formatMessage(messages.offline) }}
+			You are currently offline. Connect to the internet to browse Icarus!
 		</section>
 		<section
 			v-else-if="
@@ -182,7 +129,7 @@ const messages = defineMessages({
 			"
 			class="offline"
 		>
-			<p>{{ formatMessage(messages.noResults) }}</p>
+			<p>No results found for your query!</p>
 		</section>
 
 		<ProjectCardList v-else :layout="ctx.effectiveLayout.value">
@@ -304,7 +251,7 @@ const messages = defineMessages({
 			</template>
 		</ProjectCardList>
 
-		<div :class="ctx.variant === 'web' ? 'pagination-after mt-3' : 'flex justify-end mt-3'">
+		<div :class="ctx.variant === 'web' ? 'pagination-after my-3' : 'flex justify-end'">
 			<Pagination
 				:page="ctx.currentPage.value"
 				:count="ctx.pageCount.value"
@@ -316,3 +263,4 @@ const messages = defineMessages({
 
 	<slot name="after" />
 </template>
+

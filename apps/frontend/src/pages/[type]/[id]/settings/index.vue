@@ -146,11 +146,7 @@
 											const input = e.target
 											if (input.files?.length) {
 												if (
-													fileIsValid(
-														input.files[0],
-														{ maxSize: 524288000, alertOnInvalid: true },
-														formatBytes,
-													)
+													fileIsValid(input.files[0], { maxSize: 524288000, alertOnInvalid: true })
 												)
 													showBannerPreview(Array.from(input.files))
 											}
@@ -230,7 +226,7 @@
 						/>
 					</div>
 				</template>
-				<div id="visibility">
+				<div>
 					<label>
 						<span class="label__title">Visibility</span>
 					</label>
@@ -242,6 +238,36 @@
 							:disabled="!hasPermission"
 							:max-height="500"
 						/>
+						<div>If approved by the moderators:</div>
+						<ul class="visibility-info m-0">
+							<li>
+								<CheckIcon
+									v-if="visibility === 'approved' || visibility === 'archived'"
+									class="good"
+								/>
+								<XIcon v-else class="bad" />
+								{{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible in search
+							</li>
+							<li>
+								<XIcon v-if="visibility === 'unlisted' || visibility === 'private'" class="bad" />
+								<CheckIcon v-else class="good" />
+								{{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible on profile
+							</li>
+							<li>
+								<CheckIcon v-if="visibility !== 'private'" class="good" />
+								<IssuesIcon
+									v-else
+									v-tooltip="{
+										content:
+											visibility === 'private'
+												? 'Only members will be able to view the project.'
+												: '',
+									}"
+									class="warn"
+								/>
+								{{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible via URL
+							</li>
+						</ul>
 					</div>
 				</div>
 			</div>
@@ -330,24 +356,32 @@
 </template>
 
 <script setup>
-import { ImageIcon, ScaleIcon, TrashIcon, TriangleAlertIcon, UploadIcon } from '@modrinth/assets'
-import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
+import {
+	CheckIcon,
+	ImageIcon,
+	IssuesIcon,
+	ScaleIcon,
+	TrashIcon,
+	TriangleAlertIcon,
+	UploadIcon,
+	XIcon,
+} from '@icarus/assets'
+import { MIN_SUMMARY_CHARS } from '@icarus/moderation'
 import {
 	Avatar,
 	ButtonStyled,
 	Combobox,
 	ConfirmLeaveModal,
 	ConfirmModal,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
 	Toggle,
 	UnsavedChangesPopup,
-	useFormatBytes,
 	usePageLeaveSafety,
-} from '@modrinth/ui'
-import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
+} from '@icarus/ui'
+import { fileIsValid, formatProjectStatus, formatProjectType } from '@icarus/utils'
 
 import FileInput from '~/components/ui/FileInput.vue'
 import { useAuth } from '~/composables/auth.js'
@@ -364,14 +398,12 @@ const {
 	patchIcon,
 	invalidate,
 } = injectProjectPageContext()
-const { labrinth } = injectModrinthClient()
+const { labrinth } = injectIcarusClient()
 
 const flags = useFeatureFlags()
 
 const tags = useGeneratedState()
 const router = useNativeRouter()
-
-const formatBytes = useFormatBytes()
 
 const name = ref(project.value.title)
 const slug = ref(project.value.slug)
@@ -564,6 +596,14 @@ async function updateMonetizationStatus(status) {
 	} finally {
 		loadingModeratorMonetization.value = false
 	}
+}
+
+const hasModifiedVisibility = () => {
+	const originalVisibility = tags.value.approvedStatuses.includes(project.value.status)
+		? project.value.status
+		: project.value.requested_status
+
+	return originalVisibility !== visibility.value
 }
 
 async function handleSave() {

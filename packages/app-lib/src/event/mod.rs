@@ -1,4 +1,4 @@
-//! Theseus state management system
+//! Pteron state management system
 use ariadne::ids::UserId;
 use ariadne::users::UserStatus;
 use chrono::{DateTime, Utc};

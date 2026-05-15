@@ -1,7 +1,6 @@
 use crate::auth::checks::filter_visible_versions;
 use crate::database;
 use crate::database::PgPool;
-use crate::database::models::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
@@ -508,7 +507,6 @@ impl AutomatedModerationQueue {
                                         .fetch_all(&pool).await?;
 
                                     let mut insert_hashes = Vec::new();
-                                    let mut insert_filenames = Vec::new();
                                     let mut insert_ids = Vec::new();
 
                                     for row in rows {
@@ -520,7 +518,6 @@ impl AutomatedModerationQueue {
                                                 });
 
                                                 insert_hashes.push(hash.clone().as_bytes().to_vec());
-                                                insert_filenames.push(Some(file_name.clone()));
                                                 insert_ids.push(row.id);
 
                                                 hashes.remove(index);
@@ -529,13 +526,16 @@ impl AutomatedModerationQueue {
                                     }
 
                                     if !insert_ids.is_empty() && !insert_hashes.is_empty() {
-                                        crate::database::models::moderation_external_item::ExternalLicense::insert_files(
-                                            &pool,
-                                            &insert_hashes,
-                                            &insert_filenames,
-                                            &insert_ids,
-                                            DBUserId(0),
+                                        sqlx::query!(
+                                            "
+                                            INSERT INTO moderation_external_files (sha1, external_license_id)
+                                            SELECT * FROM UNNEST ($1::bytea[], $2::bigint[])
+                                            ON CONFLICT (sha1) DO NOTHING
+                                            ",
+                                            &insert_hashes[..],
+                                            &insert_ids[..]
                                         )
+                                            .execute(&pool)
                                             .await?;
                                     }
 

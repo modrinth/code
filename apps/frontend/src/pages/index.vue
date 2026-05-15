@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="landing-hero">
-			<ModrinthIcon class="modrinth-icon text-brand" />
+			<IcarusIcon class="Icarus-icon text-brand" />
 			<h1 class="main-header">
 				<IntlFormatted :message-id="messages.thePlaceForMinecraft">
 					<template #~content>
@@ -242,9 +242,9 @@
 								<nuxt-link
 									to="/app"
 									class="graphic gradient-border text-brand"
-									:aria-label="formatMessage(messages.modrinthAppLabel)"
+									:aria-label="formatMessage(messages.IcarusAppLabel)"
 								>
-									<ModrinthIcon aria-hidden="true" />
+									<IcarusIcon aria-hidden="true" />
 								</nuxt-link>
 								<a
 									rel="noopener"
@@ -439,9 +439,9 @@ import {
 	CompassIcon,
 	DashboardIcon,
 	LogInIcon,
-	ModrinthIcon,
+	IcarusIcon,
 	SearchIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -453,7 +453,7 @@ import {
 	StyledInput,
 	useRelativeTime,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { ref } from 'vue'
 
 import ATLauncherLogo from '~/assets/images/external/atlauncher.svg?component'
@@ -551,7 +551,7 @@ const messages = defineMessages({
 	findWhatYouWantDescription: {
 		id: 'landing.feature.search.description',
 		defaultMessage:
-			"Modrinth's lightning-fast search and powerful filters let you find what you want as you type.",
+			"Icarus's lightning-fast search and powerful filters let you find what you want as you type.",
 	},
 	followProjectsHeading: {
 		id: 'landing.feature.follow.heading',
@@ -568,7 +568,7 @@ const messages = defineMessages({
 	playWithLauncherDescription: {
 		id: 'landing.feature.launcher.description',
 		defaultMessage:
-			"Modrinth's open-source API lets launchers add deep integration with Modrinth. You can use Modrinth through <link>our own app</link> and some of the most popular launchers like ATLauncher, MultiMC, and Prism Launcher.",
+			"Icarus's open-source API lets launchers add deep integration with Icarus. You can use Icarus through <link>our own app</link> and some of the most popular launchers like ATLauncher, MultiMC, and Prism Launcher.",
 	},
 	notificationsHeading: {
 		id: 'landing.notifications.heading',
@@ -589,15 +589,15 @@ const messages = defineMessages({
 	launcherGraphicAlt: {
 		id: 'landing.launcher.graphic-alt',
 		defaultMessage:
-			'A simplified representation of a Minecraft window, with the Mojang Studios logo in Modrinth green.',
+			'A simplified representation of a Minecraft window, with the Mojang Studios logo in Icarus green.',
 	},
 	prismLauncherLabel: {
 		id: 'landing.launcher.prism-launcher-label',
 		defaultMessage: 'Prism Launcher',
 	},
-	modrinthAppLabel: {
-		id: 'landing.launcher.modrinth-app-label',
-		defaultMessage: 'Modrinth App',
+	IcarusAppLabel: {
+		id: 'landing.launcher.Icarus-app-label',
+		defaultMessage: 'Icarus Launcher',
 	},
 	atlauncherLabel: {
 		id: 'landing.launcher.atlauncher-label',
@@ -687,7 +687,7 @@ const creatorFeatureMessages = defineMessages({
 	constantlyEvolvingDescription: {
 		id: 'landing.creator.feature.constantly-evolving.description',
 		defaultMessage:
-			'Get the best modding experience possible with constant updates from the Modrinth team',
+			'Get the best modding experience possible with constant updates from the Icarus team',
 	},
 })
 </script>
@@ -705,7 +705,7 @@ const creatorFeatureMessages = defineMessages({
 	text-align: center;
 	flex-direction: column;
 
-	.modrinth-icon {
+	.Icarus-icon {
 		width: 13rem;
 		height: 13rem;
 		margin-bottom: 2.5rem;
@@ -1181,7 +1181,7 @@ const creatorFeatureMessages = defineMessages({
 	padding: 1rem 1rem 2rem 1rem;
 	overflow: hidden;
 
-	.modrinth-icon {
+	.Icarus-icon {
 		z-index: 2;
 		width: auto;
 		height: 32rem;
@@ -1488,3 +1488,4 @@ const creatorFeatureMessages = defineMessages({
 	}
 }
 </style>
+

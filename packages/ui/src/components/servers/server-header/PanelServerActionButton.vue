@@ -64,7 +64,7 @@ import {
 	SlashIcon,
 	StopCircleIcon,
 	UpdatedIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import { computed } from 'vue'
 
 import { ButtonStyled, type JoinedButtonAction, JoinedButtons } from '#ui/components'

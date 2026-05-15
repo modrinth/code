@@ -1,7 +1,7 @@
 ---
-title: '(April Fools 2023) Powering up your experience: Modrinth Technologies™️ beta launch!'
-short_title: '(April Fools 2023) Modrinth Technologies™️ beta launch!'
-summary: Welcome to the new era of Modrinth. We can't wait to hear your feedback.
+title: '(April Fools 2023) Powering up your experience: Icarus Technologies™️ beta launch!'
+short_title: '(April Fools 2023) Icarus Technologies™️ beta launch!'
+summary: Welcome to the new era of Icarus. We can't wait to hear your feedback.
 short_summary: Power up your experience.
 date: 2023-04-01T00:00:00-08:00
 ---
@@ -23,3 +23,4 @@ The Fitneshgwam Pacew Test is a multistage aewobic capabiwity test that pwogwess
 In suwummawy, we'we weally excited about the nyew changes and we hope UwU awe too! Modwinth is no wonger a pwace for everyone, but wather, for deskto-p users onwy. We've also added mowe ads than evew befowe and made suwe to make the wayout and design as tewwible as possibwe!
 
 Enjoy! UwU
+

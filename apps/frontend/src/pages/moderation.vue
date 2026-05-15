@@ -15,11 +15,11 @@
 </template>
 
 <script setup lang="ts">
-import { FolderIcon, GlobeIcon, ReportIcon, ShieldCheckIcon } from '@modrinth/assets'
-import { Chips, defineMessages, NavTabs, useVIntl } from '@modrinth/ui'
+import { FolderIcon, ReportIcon, ShieldCheckIcon } from '@icarus/assets'
+import { Chips, defineMessages, NavTabs, useVIntl } from '@icarus/ui'
 
 definePageMeta({
-	middleware: ['auth', 'staff'],
+	middleware: 'auth',
 })
 
 useSeoMeta({
@@ -37,15 +37,11 @@ const messages = defineMessages({
 	},
 	technicalReviewTitle: {
 		id: 'moderation.page.technicalReview',
-		defaultMessage: 'Tech review',
+		defaultMessage: 'Technical Review',
 	},
 	reportsTitle: {
 		id: 'moderation.page.reports',
 		defaultMessage: 'Reports',
-	},
-	externalFilesTitle: {
-		id: 'moderation.page.external-projects',
-		defaultMessage: 'External projects',
 	},
 })
 
@@ -57,18 +53,12 @@ const moderationLinks = [
 		icon: ShieldCheckIcon,
 	},
 	{ label: formatMessage(messages.reportsTitle), href: '/moderation/reports', icon: ReportIcon },
-	{
-		label: formatMessage(messages.externalFilesTitle),
-		href: '/moderation/external-projects',
-		icon: GlobeIcon,
-	},
 ]
 
 const mobileNavOptions = [
 	formatMessage(messages.projectsTitle),
 	formatMessage(messages.technicalReviewTitle),
 	formatMessage(messages.reportsTitle),
-	formatMessage(messages.externalFilesTitle),
 ]
 
 const selectedChip = computed({

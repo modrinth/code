@@ -42,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import type { VersionEntry } from '@modrinth/blog/changelog'
-import { renderHighlightedString } from '@modrinth/utils'
+import type { VersionEntry } from '@icarus/blog/changelog'
+import { renderHighlightedString } from '@icarus/utils'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 

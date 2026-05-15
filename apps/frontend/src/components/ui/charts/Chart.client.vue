@@ -1,5 +1,5 @@
 <script setup>
-import { useFormatDateTime, useFormatMoney, useFormatNumber } from '@modrinth/ui'
+import { useFormatDateTime, useFormatMoney, useFormatNumber } from '@icarus/ui'
 import VueApexCharts from 'vue3-apexcharts'
 
 const props = defineProps({

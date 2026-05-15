@@ -1,4 +1,4 @@
-import { SettingsIcon } from '@modrinth/assets'
+import { SettingsIcon } from '@icarus/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import Button from '../../components/base/Button.vue'

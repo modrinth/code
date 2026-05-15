@@ -5,7 +5,7 @@ import {
 	I18N_DEBUG_KEY,
 	type I18nDebugContext,
 	initI18nDebugRuntime,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 export default defineNuxtPlugin({
 	name: 'i18n-debug',

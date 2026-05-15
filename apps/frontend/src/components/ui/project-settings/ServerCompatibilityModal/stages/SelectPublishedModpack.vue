@@ -64,16 +64,16 @@
 </template>
 
 <script setup lang="ts">
-import { getLoaderIcon } from '@modrinth/assets'
+import { getLoaderIcon } from '@icarus/assets'
 import {
 	Combobox,
 	FormattedTag,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	ProjectCombobox,
 	TagItem,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
@@ -85,7 +85,7 @@ const { projectV3 } = injectProjectPageContext()
 
 const currentProjectId = computed(() => projectV3.value?.id)
 const { selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()
-const { labrinth } = injectModrinthClient()
+const { labrinth } = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 const auth = (await useAuth()) as { user?: { id: string } }
 
@@ -141,3 +141,4 @@ watch(
 	{ immediate: true },
 )
 </script>
+

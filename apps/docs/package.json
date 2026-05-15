@@ -1,5 +1,5 @@
 {
-	"name": "@modrinth/docs",
+	"name": "@icarus/docs",
 	"type": "module",
 	"version": "0.0.1",
 	"scripts": {
@@ -15,7 +15,7 @@
 	"dependencies": {
 		"@astrojs/check": "^0.9.4",
 		"@astrojs/starlight": "^0.32.2",
-		"@modrinth/assets": "workspace:*",
+		"@icarus/assets": "workspace:*",
 		"astro": "^5.4.1",
 		"sharp": "^0.33.5",
 		"starlight-openapi": "^0.14.0",

@@ -1,4 +1,4 @@
-import { provideModrinthClient } from '@modrinth/ui'
+import { provideIcarusClient } from '@icarus/ui'
 
 import { createModrinthClient } from '~/helpers/api.ts'
 
@@ -9,6 +9,6 @@ export function setupModrinthClientProvider(auth: Awaited<ReturnType<typeof useA
 		archonBaseUrl: config.public.pyroBaseUrl.replace('/v2/', '/'),
 		rateLimitKey: config.rateLimitKey,
 	})
-	provideModrinthClient(client)
+	provideIcarusClient(client)
 	return client
 }

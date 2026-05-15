@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PlusIcon, XIcon } from '@modrinth/assets'
+import { PlusIcon, XIcon } from '@icarus/assets'
 import {
 	Accordion,
 	ButtonStyled,
@@ -8,8 +8,8 @@ import {
 	ServerNotice,
 	StyledInput,
 	TagItem,
-} from '@modrinth/ui'
-import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
+} from '@icarus/ui'
+import type { ServerNotice as ServerNoticeType } from '@icarus/utils'
 import { ref } from 'vue'
 
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'

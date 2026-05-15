@@ -102,13 +102,13 @@
 </template>
 
 <script setup lang="ts">
-import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
+import { ClassicPlayerModel, SlimPlayerModel } from '@icarus/assets'
 import {
 	applyCapeTexture,
 	applyTexture,
 	createTransparentTexture,
 	loadTexture as loadSkinTexture,
-} from '@modrinth/utils'
+} from '@icarus/utils'
 import { useGLTF } from '@tresjs/cientos'
 import { TresCanvas, useRenderLoop, useTexture } from '@tresjs/core'
 import { EffectComposerPmndrs, FXAAPmndrs } from '@tresjs/post-processing'

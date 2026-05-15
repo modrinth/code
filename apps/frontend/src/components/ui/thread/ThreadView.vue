@@ -1,11 +1,11 @@
 <template>
 	<div>
-		<div v-if="flags.developerMode" class="m-4 font-bold text-heading">
+		<div v-if="flags.developerMode" class="mt-4 font-bold text-heading">
 			Thread ID:
 			<CopyCode :text="thread.id" />
 		</div>
 
-		<div v-if="sortedMessages.length > 0" class="flex flex-col rounded-xl">
+		<div v-if="sortedMessages.length > 0" class="flex flex-col space-y-4 rounded-xl p-3 sm:p-4">
 			<ThreadMessage
 				v-for="message in sortedMessages"
 				:key="'message-' + message.id"
@@ -28,7 +28,7 @@
 		</template>
 
 		<template v-else>
-			<div class="px-4 py-2">
+			<div>
 				<MarkdownEditor
 					v-model="replyBody"
 					:placeholder="sortedMessages.length > 0 ? 'Reply to thread...' : 'Send a message...'"
@@ -37,7 +37,7 @@
 			</div>
 
 			<div
-				class="mt-4 flex flex-col items-stretch justify-between gap-3 px-4 pb-4 sm:flex-row sm:items-center sm:gap-2"
+				class="mt-4 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center sm:gap-2"
 			>
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
 					<ButtonStyled v-if="sortedMessages.length > 0" color="brand">
@@ -74,8 +74,8 @@
 </template>
 
 <script setup lang="ts" generic="T">
-import { ChevronDownIcon, MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
-import type { QuickReply } from '@modrinth/moderation'
+import { ChevronDownIcon, MessageIcon, ReplyIcon, SendIcon } from '@icarus/assets'
+import type { QuickReply } from '@icarus/moderation'
 import {
 	ButtonStyled,
 	CopyCode,
@@ -83,8 +83,8 @@ import {
 	MarkdownEditor,
 	OverflowMenu,
 	type OverflowMenuOption,
-} from '@modrinth/ui'
-import type { Thread, User } from '@modrinth/utils'
+} from '@icarus/ui'
+import type { Thread, User } from '@icarus/utils'
 import dayjs from 'dayjs'
 
 import { useImageUpload } from '~/composables/image-upload.ts'

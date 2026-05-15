@@ -1,4 +1,4 @@
-import { PlayIcon, SlashIcon, StopCircleIcon, UpdatedIcon } from '@modrinth/assets'
+import { PlayIcon, SlashIcon, StopCircleIcon, UpdatedIcon } from '@icarus/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import JoinedButtons from '../../components/base/JoinedButtons.vue'

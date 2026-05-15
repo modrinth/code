@@ -9,56 +9,54 @@
 	>
 		<ModalCreation ref="modal_creation" :organization-id="organization.id" />
 		<template v-if="routeHasSettings">
-			<template v-if="canAccessSettings">
-				<div class="normal-page__sidebar">
-					<div
-						class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
-					>
-						<div class="flex items-center gap-4">
-							<Avatar size="sm" :src="organization.icon_url" />
-							<div class="flex flex-col justify-center gap-1">
-								<h2 class="m-0 text-base">
-									<nuxt-link :to="`/organization/${organization.slug}/settings`">
-										{{ organization.name }}
-									</nuxt-link>
-								</h2>
-								<span>
-									{{ formatCompactNumber(acceptedMembers?.length || 0) }}
-									member<template v-if="acceptedMembers?.length !== 1">s</template>
-								</span>
-							</div>
+			<div class="normal-page__sidebar">
+				<div
+					class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
+				>
+					<div class="flex items-center gap-4">
+						<Avatar size="sm" :src="organization.icon_url" />
+						<div class="flex flex-col justify-center gap-1">
+							<h2 class="m-0 text-base">
+								<nuxt-link :to="`/organization/${organization.slug}/settings`">
+									{{ organization.name }}
+								</nuxt-link>
+							</h2>
+							<span>
+								{{ formatCompactNumber(acceptedMembers?.length || 0) }}
+								member<template v-if="acceptedMembers?.length !== 1">s</template>
+							</span>
 						</div>
 					</div>
+				</div>
 
-					<NavStack
-						:items="[
-							{
-								link: `/organization/${organization.slug}/settings`,
-								label: 'Overview',
-								icon: SettingsIcon,
-							},
-							{
-								link: `/organization/${organization.slug}/settings/members`,
-								label: 'Members',
-								icon: UsersIcon,
-							},
-							{
-								link: `/organization/${organization.slug}/settings/projects`,
-								label: 'Projects',
-								icon: BoxIcon,
-							},
-							{
-								link: `/organization/${organization.slug}/settings/analytics`,
-								label: 'Analytics',
-								icon: ChartIcon,
-							},
-						]"
-					/>
-				</div>
-				<div class="normal-page__content">
-					<NuxtPage />
-				</div>
-			</template>
+				<NavStack
+					:items="[
+						{
+							link: `/organization/${organization.slug}/settings`,
+							label: 'Overview',
+							icon: SettingsIcon,
+						},
+						{
+							link: `/organization/${organization.slug}/settings/members`,
+							label: 'Members',
+							icon: UsersIcon,
+						},
+						{
+							link: `/organization/${organization.slug}/settings/projects`,
+							label: 'Projects',
+							icon: BoxIcon,
+						},
+						{
+							link: `/organization/${organization.slug}/settings/analytics`,
+							label: 'Analytics',
+							icon: ChartIcon,
+						},
+					]"
+				/>
+			</div>
+			<div class="normal-page__content">
+				<NuxtPage />
+			</div>
 		</template>
 		<template v-else>
 			<div class="normal-page__header py-4">
@@ -284,7 +282,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	BoxIcon,
 	ChartIcon,
@@ -298,23 +296,22 @@ import {
 	SpinnerIcon,
 	UsersIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
 	ContentPageHeader,
-	injectModrinthClient,
+	injectIcarusClient,
 	NavTabs,
 	OverflowMenu,
-	PROJECT_DEP_MARKER_QUERY,
 	ProjectCard,
 	ProjectCardList,
 	useCompactNumber,
 	useFormatNumber,
 	useVIntl,
-} from '@modrinth/ui'
-import type { Organization, ProjectStatus, ProjectType } from '@modrinth/utils'
+} from '@icarus/ui'
+import type { Organization, ProjectStatus, ProjectType } from '@icarus/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
@@ -359,7 +356,7 @@ if (route.path.includes('settings')) {
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes('settings'))
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 const {
 	data: organization,
@@ -490,10 +487,7 @@ function getServerModpackContent(project: ProjectV3) {
 			onclick:
 				project_id !== project.id
 					? () => {
-							navigateTo({
-								path: `/project/${project_id}`,
-								query: { ...PROJECT_DEP_MARKER_QUERY },
-							})
+							navigateTo(`/project/${project_id}`)
 						}
 					: undefined,
 			showCustomModpackTooltip: project_id === project.id,
@@ -533,29 +527,12 @@ const { currentMember } = organizationContext
 
 provideOrganizationContext(organizationContext)
 
-const canAccessSettings = computed(() => !!currentMember.value?.accepted)
-
-watch(
-	[routeHasSettings, acceptedMembers, currentMember],
-	() => {
-		if (routeHasSettings.value && acceptedMembers.value.length > 0 && !canAccessSettings.value) {
-			showError({
-				fatal: true,
-				statusCode: 401,
-				statusMessage: 'Unauthorized',
-			})
-		}
-	},
-	{ flush: 'sync', immediate: true },
-)
-
 watch(
 	organization,
 	(org) => {
 		if (org) {
 			const title = `${org.name} - Organization`
 			const description = `${org.description} - View the organization ${org.name} on Modrinth`
-			const canonicalUrl = org ? `https://modrinth.com/organization/${org.id}` : undefined
 
 			useSeoMeta({
 				title,
@@ -563,15 +540,6 @@ watch(
 				ogTitle: title,
 				ogDescription: org.description,
 				ogImage: org.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
-				ogUrl: canonicalUrl,
-			})
-			useHead({
-				link: [
-					{
-						rel: 'canonical',
-						href: canonicalUrl,
-					},
-				],
 			})
 		}
 	},

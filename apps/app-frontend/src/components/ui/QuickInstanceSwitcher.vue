@@ -1,6 +1,6 @@
 <script setup>
-import { SpinnerIcon } from '@modrinth/assets'
-import { Avatar, injectNotificationManager } from '@modrinth/ui'
+import { SpinnerIcon } from '@icarus/assets'
+import { Avatar, injectNotificationManager } from '@icarus/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { onUnmounted, ref } from 'vue'
@@ -66,7 +66,7 @@ onUnmounted(() => {
 		</NavButton>
 	</div>
 	<div
-		v-if="instances && recentInstances.length > 0"
+		v-if="recentInstances.length > 0"
 		class="h-px w-6 mx-auto my-2 bg-divider"
 	></div>
 </template>

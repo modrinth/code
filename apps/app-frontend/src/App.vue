@@ -1,14 +1,13 @@
 <script setup>
-import { Intercom, shutdown as shutdownIntercom } from '@intercom/messenger-js-sdk'
 import {
 	AuthFeature,
-	ModrinthApiError,
 	NodeAuthFeature,
 	nodeAuthState,
 	PanelVersionFeature,
-	TauriModrinthClient,
+	TauriIcarusClient,
 	VerboseLoggingFeature,
-} from '@modrinth/api-client'
+} from '@icarus/api-client'
+import icarusLogo from '@/assets/icarus_logo.png'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
@@ -25,12 +24,12 @@ import {
 	PlusIcon,
 	RefreshCwIcon,
 	RightArrowIcon,
-	ServerStackIcon,
+	StoreIcon,
 	SettingsIcon,
 	UserIcon,
 	WorldIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Admonition,
 	Avatar,
@@ -47,15 +46,14 @@ import {
 	PopupNotificationPanel,
 	ProgressSpinner,
 	provideModalBehavior,
-	provideModrinthClient,
+	provideIcarusClient,
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
 	useDebugLogger,
-	useFormatBytes,
 	useVIntl,
-} from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
+} from '@icarus/ui'
+import { formatBytes, renderString } from '@icarus/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
@@ -68,7 +66,7 @@ import { $fetch } from 'ofetch'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
-import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
+
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
@@ -84,22 +82,19 @@ import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
-import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
+
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
-import { useIntercomPositioning } from '@/composables/intercom-positioning'
+
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
-import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
-import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { create_profile_and_install_from_file } from '@/helpers/pack'
 import { list } from '@/helpers/profile.js'
-import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import {
@@ -109,7 +104,6 @@ import {
 	getUpdateSize,
 	isDev,
 	isNetworkMetered,
-	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
 import i18n from '@/i18n.config'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
@@ -132,15 +126,9 @@ import { AppPopupNotificationManager } from './providers/app-popup-notifications
 const themeStore = useTheming()
 const router = useRouter()
 const route = useRoute()
-const intercomBubblePositioning = useIntercomPositioning({ route, themeStore })
-const {
-	sidebarToggled,
-	forceSidebar,
-	sidebarVisible,
-	intercomBubblePosition,
-	updateIntercomBubbleStyles,
-	clearIntercomBubbleStyles,
-} = intercomBubblePositioning
+const sidebarToggled = ref(true)
+const forceSidebar = ref(false)
+const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 
 const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
@@ -150,9 +138,8 @@ const popupNotificationManager = new AppPopupNotificationManager()
 providePopupNotificationManager(popupNotificationManager)
 const { addPopupNotification } = popupNotificationManager
 
-const appVersion = getVersion()
-const tauriApiClient = new TauriModrinthClient({
-	userAgent: async () => `modrinth/theseus/${await appVersion} (support@modrinth.com)`,
+const tauriApiClient = new TauriIcarusClient({
+	userAgent: `@icarus/pteron/${getVersion()} (support)`,
 	labrinthBaseUrl: config.labrinthBaseUrl,
 	archonBaseUrl: config.archonBaseUrl,
 	features: [
@@ -171,11 +158,9 @@ const tauriApiClient = new TauriModrinthClient({
 		new VerboseLoggingFeature(),
 	],
 })
-provideModrinthClient(tauriApiClient)
+provideIcarusClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
-	showAds: ref(false),
-	...intercomBubblePositioning.pageContext,
 	featureFlags: {
 		serverRamAsBytesAlwaysOn: computed(() =>
 			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
@@ -185,8 +170,8 @@ providePageContext({
 })
 provideModalBehavior({
 	noblur: computed(() => !themeStore.advancedRendering),
-	onShow: () => hide_ads_window(),
-	onHide: () => show_ads_window(),
+	onShow: () => {},
+	onHide: () => {},
 })
 
 const {
@@ -204,7 +189,6 @@ const {
 } = setupProviders(notificationManager, popupNotificationManager)
 
 const news = ref([])
-const availableSurvey = ref(false)
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -259,15 +243,11 @@ onMounted(async () => {
 onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
-	shutdownHostingIntercom()
-	clearIntercomBubbleStyles()
 
 	await unlistenUpdateDownload?.()
 })
 
 const { formatMessage } = useVIntl()
-const formatBytes = useFormatBytes()
-
 const messages = defineMessages({
 	updateInstalledToastTitle: {
 		id: 'app.update.complete-toast.title',
@@ -348,11 +328,7 @@ async function setupApp() {
 		isMaximized.value = await getCurrentWindow().isMaximized()
 	})
 
-	if (telemetry) {
-		initAnalytics()
-		if (dev) debugAnalytics()
-		trackEvent('Launched', { version, dev, onboarded })
-	}
+
 
 	if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
@@ -371,7 +347,7 @@ async function setupApp() {
 		}),
 	)
 
-	fetch(`https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`)
+	fetch(`https://modrinth.com/appCriticalAnnouncement.json?version=${version}`)
 		.then((response) => response.json())
 		.then((res) => {
 			if (res && res.header && res.body) {
@@ -384,14 +360,19 @@ async function setupApp() {
 			)
 		})
 
-	fetch(`https://modrinth.com/news/feed/articles.json`)
+	fetch(`https://taxphobia.top/news/feed/articles.json`)
 		.then((response) => response.json())
 		.then((res) => {
 			if (res && res.articles) {
 				news.value = res.articles
 					.map((article) => ({
 						...article,
-						path: article.link,
+						path: article.url || `https://taxphobia.top/news/${article.id}`,
+						thumbnail: article.image,
+						title: article.title,
+						summary: article.excerpt || article.content?.substring(0, 150) || '',
+						date: article.date,
+						pinned: article.pinned,
 					}))
 					.slice(0, 4)
 			}
@@ -417,11 +398,6 @@ async function setupApp() {
 		await setSettings(settings)
 	}
 
-	if (osType === 'windows') {
-		await processPendingSurveys()
-	} else {
-		console.info('Skipping user surveys on non-Windows platforms')
-	}
 }
 
 const stateFailed = ref(false)
@@ -465,11 +441,6 @@ router.beforeEach(() => {
 	routerToken = loading.begin()
 })
 router.afterEach((to, from, failure) => {
-	trackEvent('PageView', {
-		path: to.path,
-		fromPath: from.path,
-		failed: failure,
-	})
 	setTimeout(() => {
 		if (!suspensePending && stateInitialized.value) {
 			if (initialLoadToken) {
@@ -513,39 +484,6 @@ watch(stateInitialized, (ready) => {
 			loading.end(routerToken)
 			routerToken = null
 		}
-
-		queryClient.prefetchQuery({
-			queryKey: ['servers'],
-			queryFn: async () => {
-				const response = await tauriApiClient.archon.servers_v0.list({ limit: 100 })
-				const hasMedalServers = response.servers.some((s) => s.is_medal)
-				if (hasMedalServers) {
-					const subscriptions = await tauriApiClient.labrinth.billing_internal.getSubscriptions()
-					for (const server of response.servers) {
-						if (server.is_medal) {
-							const sub = subscriptions.find((s) => s.metadata?.id === server.server_id)
-							if (sub) {
-								server.medal_expires = new Date(
-									new Date(sub.created).getTime() + 5 * 86400000,
-								).toISOString()
-							}
-						}
-					}
-				}
-				return response
-			},
-			staleTime: 30_000,
-		})
-		queryClient.prefetchQuery({
-			queryKey: ['billing', 'subscriptions'],
-			queryFn: () => tauriApiClient.labrinth.billing_internal.getSubscriptions(),
-			staleTime: 30_000,
-		})
-		queryClient.prefetchQuery({
-			queryKey: ['billing', 'payments'],
-			queryFn: () => tauriApiClient.labrinth.billing_internal.getPayments(),
-			staleTime: 30_000,
-		})
 	}
 })
 
@@ -595,7 +533,7 @@ const updateToPlayModal = ref()
 
 const credentials = ref()
 
-const modrinthLoginFlowWaitModal = ref()
+const IcarusLoginFlowWaitModal = ref()
 
 setupAuthProvider(credentials, async (_redirectPath) => {
 	await signIn()
@@ -628,7 +566,7 @@ async function fetchCredentials() {
 }
 
 async function signIn() {
-	modrinthLoginFlowWaitModal.value.show()
+	IcarusLoginFlowWaitModal.value.show()
 
 	try {
 		await login()
@@ -644,7 +582,7 @@ async function signIn() {
 			handleError(error)
 		}
 	} finally {
-		modrinthLoginFlowWaitModal.value.hide()
+		IcarusLoginFlowWaitModal.value.hide()
 	}
 }
 
@@ -653,116 +591,6 @@ async function logOut() {
 	await fetchCredentials()
 }
 
-const MIDAS_BITFLAG = 1 << 0
-const hasPlus = computed(
-	() =>
-		credentials.value &&
-		credentials.value.user &&
-		(credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
-)
-
-const showAd = computed(
-	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
-)
-const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
-
-let intercomBooting = false
-let intercomBooted = false
-
-async function fetchIntercomToken() {
-	const creds = await getCreds()
-	if (!creds?.session) {
-		throw new Error('Not authenticated')
-	}
-
-	const params = new URLSearchParams()
-	if (route.path.startsWith('/hosting/manage/') && typeof route.params.id === 'string') {
-		params.set('server_id', route.params.id)
-	}
-	const query = params.size > 0 ? `?${params.toString()}` : ''
-
-	const response = await tauriFetch(`${config.siteUrl}/api/intercom/messenger-jwt${query}`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${creds.session}`,
-		},
-	})
-	if (!response.ok) {
-		throw new Error(`Failed to fetch Intercom token: ${response.status}`)
-	}
-	return await response.json()
-}
-
-async function bootIntercom() {
-	if (
-		intercomBooting ||
-		intercomBooted ||
-		!hostingRouteActive.value ||
-		!credentials.value?.session
-	) {
-		return
-	}
-
-	intercomBooting = true
-	console.debug('[APP][INTERCOM] initializing secure support chat')
-	try {
-		const { token } = await fetchIntercomToken()
-		Intercom({
-			app_id: 'ykeritl9',
-			intercom_user_jwt: token,
-			session_duration: 1000 * 60 * 60 * 24,
-			alignment: 'right',
-			horizontal_padding: intercomBubblePosition.value.horizontalPadding,
-			vertical_padding: intercomBubblePosition.value.verticalPadding,
-		})
-		intercomBooted = true
-	} catch (error) {
-		console.warn('[APP][INTERCOM] failed to initialize secure support chat', error)
-	} finally {
-		intercomBooting = false
-	}
-}
-
-function shutdownHostingIntercom() {
-	if (!intercomBooted && !intercomBooting) return
-	shutdownIntercom()
-	intercomBooting = false
-	intercomBooted = false
-}
-
-watch(
-	intercomBubblePosition,
-	(position) => {
-		updateIntercomBubbleStyles(position)
-		if (intercomBooted) {
-			window.Intercom?.('update', {
-				horizontal_padding: position.horizontalPadding,
-				vertical_padding: position.verticalPadding,
-			})
-		}
-	},
-	{ immediate: true },
-)
-
-watch(
-	[hostingRouteActive, credentials],
-	([active]) => {
-		if (active) {
-			void bootIntercom()
-		} else {
-			shutdownHostingIntercom()
-		}
-	},
-	{ immediate: true },
-)
-
-watch(showAd, () => {
-	if (!showAd.value) {
-		hide_ads_window(true)
-	} else {
-		init_ads_window(true)
-	}
-})
 
 onMounted(() => {
 	invoke('show_window')
@@ -792,9 +620,6 @@ async function handleCommand(e) {
 			await create_profile_and_install_from_file(e.path, (createProfile, fileName) =>
 				unknownPackWarningModal.value?.show(createProfile, fileName),
 			).catch(handleError)
-			trackEvent('InstanceCreate', {
-				source: 'CreationModalFileDrop',
-			})
 		}
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
@@ -843,20 +668,20 @@ const updatePopupMessages = defineMessages({
 	body: {
 		id: 'app.update-popup.body',
 		defaultMessage:
-			'Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App.',
+			'Icarus Launcher v{version} is ready to install! Reload to update now, or automatically when you close Icarus Launcher.',
 	},
 	meteredBody: {
 		id: 'app.update-popup.body.metered',
-		defaultMessage: `Modrinth App v{version} is available now! Since you're on a metered network, we didn't automatically download it.`,
+		defaultMessage: `Icarus Launcher v{version} is available now! Since you're on a metered network, we didn't automatically download it.`,
 	},
 	downloadedBody: {
 		id: 'app.update-popup.body.download-complete',
-		defaultMessage: `Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App.`,
+		defaultMessage: `Icarus Launcher v{version} has finished downloading. Reload to update now, or automatically when you close Icarus Launcher.`,
 	},
 	linuxBody: {
 		id: 'app.update-popup.body.linux',
 		defaultMessage:
-			'Modrinth App v{version} is available. Use your package manager to update for the latest features and fixes!',
+			'Icarus Launcher v{version} is available. Use your package manager to update for the latest features and fixes!',
 	},
 	reload: {
 		id: 'app.update-popup.reload',
@@ -1026,38 +851,9 @@ async function downloadUpdate(versionToDownload) {
 
 async function installUpdate() {
 	restarting.value = true
-	try {
-		await setRestartAfterPendingUpdate(true)
-	} catch (e) {
-		restarting.value = false
-		handleError(e)
-		return
-	}
 	setTimeout(async () => {
 		await handleClose()
 	}, 250)
-}
-
-async function openModrinthProjectLinkInApp(parsed) {
-	const { slug, pathSuffix, url } = parsed
-	const loadToken = loading.begin()
-	try {
-		const { id } = await tauriApiClient.labrinth.projects_v2.check(slug)
-		const query = mergeUrlQuery(route.query, url)
-		await router.push({
-			path: `/project/${id}${pathSuffix}`,
-			query,
-			hash: url.hash || undefined,
-		})
-	} catch (err) {
-		if (err instanceof ModrinthApiError && err.statusCode === 404) {
-			openUrl(url.href)
-		} else {
-			handleError(err)
-		}
-	} finally {
-		loading.end(loadToken)
-	}
 }
 
 function handleClick(e) {
@@ -1072,12 +868,7 @@ function handleClick(e) {
 				!target.href.startsWith('https://tauri.localhost') &&
 				!target.href.startsWith('http://tauri.localhost')
 			) {
-				const parsed = parseModrinthLink(target.href)
-				if (target.target !== '_blank' && parsed) {
-					void openModrinthProjectLinkInApp(parsed)
-				} else {
-					openUrl(target.href)
-				}
+				openUrl(target.href)
 			}
 			e.preventDefault()
 			break
@@ -1097,116 +888,6 @@ function handleAuxClick(e) {
 			cancelable: true,
 		})
 		e.target.dispatchEvent(event)
-	}
-}
-
-function cleanupOldSurveyDisplayData() {
-	const threeWeeksAgo = new Date()
-	threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21)
-
-	for (let i = 0; i < localStorage.length; i++) {
-		const key = localStorage.key(i)
-
-		if (key.startsWith('survey-') && key.endsWith('-display')) {
-			const dateValue = new Date(localStorage.getItem(key))
-			if (dateValue < threeWeeksAgo) {
-				localStorage.removeItem(key)
-			}
-		}
-	}
-}
-
-async function openSurvey() {
-	if (!availableSurvey.value) {
-		console.error('No survey to open')
-		return
-	}
-
-	const creds = await getCreds().catch(handleError)
-	const userId = creds?.user_id
-
-	const formId = availableSurvey.value.tally_id
-
-	const popupOptions = {
-		layout: 'modal',
-		width: 700,
-		autoClose: 2000,
-		hideTitle: true,
-		hiddenFields: {
-			user_id: userId,
-		},
-		onOpen: () => console.info('Opened user survey'),
-		onClose: () => {
-			console.info('Closed user survey')
-			show_ads_window()
-		},
-		onSubmit: () => console.info('Active user survey submitted'),
-	}
-
-	try {
-		hide_ads_window()
-		if (window.Tally?.openPopup) {
-			console.info(`Opening Tally popup for user survey (form ID: ${formId})`)
-			dismissSurvey()
-			window.Tally.openPopup(formId, popupOptions)
-		} else {
-			console.warn('Tally script not yet loaded')
-			show_ads_window()
-		}
-	} catch (e) {
-		console.error('Error opening Tally popup:', e)
-		show_ads_window()
-	}
-
-	console.info(`Found user survey to show with tally_id: ${formId}`)
-	window.Tally.openPopup(formId, popupOptions)
-}
-
-function dismissSurvey() {
-	localStorage.setItem(`survey-${availableSurvey.value.id}-display`, new Date())
-	availableSurvey.value = undefined
-}
-
-async function processPendingSurveys() {
-	function isWithinLastTwoWeeks(date) {
-		const twoWeeksAgo = new Date()
-		twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
-		return date >= twoWeeksAgo
-	}
-
-	cleanupOldSurveyDisplayData()
-
-	const creds = await getCreds().catch(handleError)
-	const userId = creds?.user_id
-
-	const instances = await list().catch(handleError)
-	const isActivePlayer =
-		instances.findIndex(
-			(instance) =>
-				isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
-		) >= 0
-
-	let surveys = []
-	try {
-		surveys = await $fetch('https://api.modrinth.com/v2/surveys')
-	} catch (e) {
-		console.error('Error fetching surveys:', e)
-	}
-
-	const surveyToShow = surveys.find(
-		(survey) =>
-			!!(
-				localStorage.getItem(`survey-${survey.id}-display`) === null &&
-				survey.type === 'tally_app' &&
-				((survey.condition === 'active_player' && isActivePlayer) ||
-					(survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId)))
-			),
-	)
-
-	if (surveyToShow) {
-		availableSurvey.value = surveyToShow
-	} else {
-		console.info('No user survey to show')
 	}
 }
 
@@ -1240,7 +921,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<AppSettingsModal ref="settingsModal" />
 		</Suspense>
 		<Suspense>
-			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
+			<AuthGrantFlowWaitModal ref="IcarusLoginFlowWaitModal" @flow-cancel="cancelLogin" />
 		</Suspense>
 		<CreationFlowModal
 			ref="installationModal"
@@ -1288,12 +969,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<LibraryIcon />
 			</NavButton>
 			<NavButton
-				v-tooltip.right="'Modrinth Hosting'"
-				to="/hosting/manage"
-				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"
-				:is-subpage="(r) => r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/'"
+				v-tooltip.right="'Store Taxphobia'"
+				to="/taxphobia"
+				:is-primary="(r) => r.path === '/taxphobia' || r.path === '/taxphobia/'"
+				:is-subpage="(r) => r.path.startsWith('/taxphobia/') && r.path !== '/taxphobia/'"
 			>
-				<ServerStackIcon />
+				<StoreIcon />
 			</NavButton>
 			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<suspense>
@@ -1342,7 +1023,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 			<OverflowMenu
 				v-if="credentials?.user"
-				v-tooltip.right="`Modrinth account`"
+				v-tooltip.right="`Icarus account`"
 				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
 				:options="[
 					{
@@ -1371,13 +1052,18 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</template>
 				<template #sign-out> <LogOutIcon /> Sign out </template>
 			</OverflowMenu>
-			<NavButton v-else v-tooltip.right="'Sign in to a Modrinth account'" :to="() => signIn()">
+			<NavButton v-else v-tooltip.right="'Sign in to a Icarus account'" :to="() => signIn()">
 				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
 			<div data-tauri-drag-region class="flex min-w-0 flex-1 overflow-hidden p-3">
-				<ModrinthAppLogo class="h-full w-auto shrink-0 text-contrast pointer-events-none" />
+				<div class="h-full flex items-center shrink-0 text-contrast pointer-events-none select-none font-bold text-xl tracking-wide">
+					<div class="h-full flex items-center justify-center shrink-0 mr-3" style="width: calc(var(--left-bar-width) - 1.5rem);">
+						<img :src="icarusLogo" class="w-10 h-10 object-contain" />
+					</div>
+					<span>Icarus</span>
+				</div>
 				<div data-tauri-drag-region class="flex shrink-0 items-center gap-1 ml-3">
 					<button
 						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
@@ -1396,7 +1082,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</div>
 			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
 				<ButtonStyled
-					v-if="!forceSidebar && themeStore.toggleSidebar"
+					v-if="!forceSidebar"
 					:type="sidebarToggled ? 'standard' : 'transparent'"
 					circular
 				>
@@ -1426,28 +1112,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		}"
 	>
 		<div class="app-viewport flex-grow router-view">
-			<transition name="popup-survey">
-				<div
-					v-if="availableSurvey"
-					class="w-[400px] z-20 fixed -bottom-12 pb-16 right-[--right-bar-width] mr-4 rounded-t-2xl card-shadow bg-bg-raised border-surface-5 border-[1px] border-solid border-b-0 p-4"
-				>
-					<h2 class="text-lg font-extrabold mt-0 mb-2">Hey there Modrinth user!</h2>
-					<p class="m-0 leading-tight">
-						Would you mind answering a few questions about your experience with Modrinth App?
-					</p>
-					<p class="mt-3 mb-4 leading-tight">
-						This feedback will go directly to the Modrinth team and help guide future updates!
-					</p>
-					<div class="flex gap-2">
-						<ButtonStyled color="brand">
-							<button @click="openSurvey"><NotepadTextIcon /> Take survey</button>
-						</ButtonStyled>
-						<ButtonStyled>
-							<button @click="dismissSurvey"><XIcon /> No thanks</button>
-						</ButtonStyled>
-					</div>
-				</div>
-			</transition>
+
 			<div
 				class="loading-indicator-container h-8 fixed z-50 pointer-events-none"
 				:style="{
@@ -1500,12 +1165,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</div>
 		<div
 			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid"
-			:class="{ 'has-plus': hasPlus }"
+			:class="{ 'sidebar-hidden': !sidebarToggled }"
 		>
 			<div
 				v-overlay-scrollbars="sidebarOverlayScrollbarsOptions"
-				class="app-sidebar-scrollable flex-grow shrink relative"
-				:class="{ 'pb-12': !hasPlus }"
+				class="app-sidebar-scrollable flex-grow shrink relative pb-12"
 				data-overlayscrollbars-initialize
 			>
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
@@ -1538,16 +1202,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					</div>
 				</div>
 			</div>
-			<template v-if="showAd">
-				<a
-					href="https://modrinth.plus?app"
-					class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
-					target="_blank"
-				>
-					<ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+
-				</a>
-				<PromotionWrapper />
-			</template>
 		</div>
 	</div>
 	<I18nDebugPanel />
@@ -1608,15 +1262,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 .app-grid-navbar {
 	grid-area: nav;
-	position: relative;
-	z-index: 2;
 }
 
 .app-grid-statusbar {
 	grid-area: status;
 	padding-right: var(--window-controls-width, 0px);
-	position: relative;
-	z-index: 2;
 }
 
 [data-tauri-drag-region-exclude] {
@@ -1664,12 +1314,16 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 .app-sidebar::after {
 	content: '';
 	position: absolute;
-	bottom: 250px;
+	bottom: 0;
 	left: 0;
 	right: 0;
 	height: 5rem;
 	background: var(--brand-gradient-fade-out-color);
 	pointer-events: none;
+}
+
+.sidebar-hidden {
+	display: none;
 }
 
 .app-sidebar.has-plus::after {
@@ -1683,12 +1337,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 	&.app-contents::before {
 		box-shadow: none;
-	}
-
-	*,
-	:deep(*) {
-		box-shadow: none !important;
-		--tw-drop-shadow:;
 	}
 }
 
@@ -1708,11 +1356,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	height: 100%;
 	overflow: auto;
 	overflow-x: hidden;
-	scrollbar-gutter: stable;
 }
 
 .app-contents::before {
-	z-index: 30;
+	z-index: 1;
 	content: '';
 	position: fixed;
 	left: var(--left-bar-width);
@@ -1739,25 +1386,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	display: contents;
 }
 
-.popup-survey-enter-active {
-	transition:
-		opacity 0.25s ease,
-		transform 0.25s cubic-bezier(0.51, 1.08, 0.35, 1.15);
-	transform-origin: top center;
-}
 
-.popup-survey-leave-active {
-	transition:
-		opacity 0.25s ease,
-		transform 0.25s cubic-bezier(0.68, -0.17, 0.23, 0.11);
-	transform-origin: top center;
-}
-
-.popup-survey-enter-from,
-.popup-survey-leave-to {
-	opacity: 0;
-	transform: translateY(10rem) scale(0.8) scaleY(1.6);
-}
 
 @media (prefers-reduced-motion: no-preference) {
 	.nav-button-animated-enter-active {
@@ -1822,13 +1451,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--os-handle-bg-active: var(--color-scrollbar) !important;
 }
 
-.intercom-lightweight-app-launcher,
-.intercom-launcher-frame,
-iframe[name='intercom-launcher-frame'] {
-	right: var(--app-support-launcher-right, 20px) !important;
-	bottom: var(--app-support-launcher-bottom, 20px) !important;
-	z-index: 9 !important;
-}
 
 .mac {
 	.app-grid-statusbar {
@@ -1850,3 +1472,4 @@ iframe[name='intercom-launcher-frame'] {
 	}
 }
 </style>
+

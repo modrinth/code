@@ -1,4 +1,4 @@
-import { RotateCounterClockwiseIcon } from '@modrinth/assets'
+import { RotateCounterClockwiseIcon } from '@icarus/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import Admonition from '../../components/base/Admonition.vue'

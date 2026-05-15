@@ -288,7 +288,7 @@ import {
 	TrashIcon,
 	UploadIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	ButtonStyled,
 	ConfirmModal,
@@ -298,7 +298,7 @@ import {
 	NewModal as Modal,
 	StyledInput,
 	useFormatDateTime,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 import { isPermission } from '~/utils/permissions.ts'
 

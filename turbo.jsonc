@@ -8,9 +8,9 @@
 		"packages/app-lib/.env"
 	],
 	"globalEnv": [
-		"MODRINTH_URL",
-		"MODRINTH_API_BASE_URL",
-		"MODRINTH_ARCHON_BASE_URL",
+		"Icarus_URL",
+		"Icarus_API_BASE_URL",
+		"Icarus_ARCHON_BASE_URL",
 		"VITE_STRIPE_PUBLISHABLE_KEY"
 	],
 	"tasks": {
@@ -106,3 +106,4 @@
 		}
 	}
 }
+

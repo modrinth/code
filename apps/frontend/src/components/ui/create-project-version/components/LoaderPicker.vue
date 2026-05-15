@@ -39,9 +39,9 @@
 </template>
 
 <script lang="ts" setup>
-import type { Labrinth } from '@modrinth/api-client'
-import { getLoaderIcon } from '@modrinth/assets'
-import { Chips, FormattedTag, TagItem } from '@modrinth/ui'
+import type { Labrinth } from '@icarus/api-client'
+import { getLoaderIcon } from '@icarus/assets'
+import { Chips, FormattedTag, TagItem } from '@icarus/ui'
 
 const selectedLoaders = defineModel<string[]>({ default: [] })
 

@@ -40,7 +40,7 @@
 						@click="copyServerAddress"
 					>
 						<LinkIcon class="flex size-5 shrink-0" />
-						{{ props.server.net.domain }}.modrinth.gg
+						{{ props.server.net.domain }}.Icarus.gg
 					</div>
 
 					<div v-if="showUptime" class="h-1.5 w-1.5 rounded-full bg-surface-5" />
@@ -79,16 +79,16 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
-import { NuxtModrinthClient } from '@modrinth/api-client'
-import { LinkIcon, LoaderIcon, SettingsIcon, TimerIcon } from '@modrinth/assets'
+import type { Archon } from '@icarus/api-client'
+import { NuxtIcarusClient } from '@icarus/api-client'
+import { LinkIcon, LoaderIcon, SettingsIcon, TimerIcon } from '@icarus/assets'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 
 import { AutoLink, Avatar, ContentPageHeader, ServerIcon } from '#ui/components'
 import {
-	injectModrinthClient,
-	injectModrinthServerContext,
+	injectIcarusClient,
+	injectIcarusServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
 
@@ -123,10 +123,10 @@ const props = withDefaults(
 	},
 )
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
-const { serverId } = injectModrinthServerContext()
-const isNuxt = computed(() => client instanceof NuxtModrinthClient)
+const { serverId } = injectIcarusServerContext()
+const isNuxt = computed(() => client instanceof NuxtIcarusClient)
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 	hideSubdomainLabel: false,
@@ -169,7 +169,7 @@ const serverProjectLink = computed(() => {
 
 function copyServerAddress() {
 	if (!props.server?.net?.domain) return
-	navigator.clipboard.writeText(`${props.server.net.domain}.modrinth.gg`)
+	navigator.clipboard.writeText(`${props.server.net.domain}.Icarus.gg`)
 	addNotification({
 		title: 'Server address copied',
 		text: "Your server's address has been copied to your clipboard.",
@@ -177,3 +177,4 @@ function copyServerAddress() {
 	})
 }
 </script>
+

@@ -13,19 +13,20 @@ pub mod pack;
 pub mod process;
 pub mod profile;
 pub mod profile_create;
+pub mod profile_sync;
 pub mod settings;
 pub mod tags;
 pub mod utils;
 
-pub mod ads;
 pub mod cache;
 pub mod files;
 pub mod friends;
+pub mod taxphobia_news;
 pub mod worlds;
 
 mod oauth_utils;
 
-pub type Result<T> = std::result::Result<T, TheseusSerializableError>;
+pub type Result<T> = std::result::Result<T, PteronSerializableError>;
 
 // // Main returnable Theseus GUI error
 // // Needs to be Serializable to be returned to the JavaScript side
@@ -35,11 +36,11 @@ pub type Result<T> = std::result::Result<T, TheseusSerializableError>;
 //     Serializable(),
 // }
 
-// Serializable error intermediary, so TheseusGuiError can be Serializable (eg: so that we can return theseus::Errors in Tauri directly)
+// Serializable error intermediary, so TheseusGuiError can be Serializable (eg: so that we can return pteron::Errors in Tauri directly)
 #[derive(Error, Debug)]
-pub enum TheseusSerializableError {
+pub enum PteronSerializableError {
     #[error("{0}")]
-    Theseus(#[from] theseus::Error),
+    Theseus(#[from] pteron::Error),
 
     #[error("IO error: {0}")]
     IO(#[from] std::io::Error),
@@ -59,18 +60,18 @@ pub enum TheseusSerializableError {
 // Generic implementation of From<T> for ErrorTypeA
 // impl<T> From<T> for TheseusGuiError
 // where
-//     TheseusSerializableError: From<T>,
+//     PteronSerializableError: From<T>,
 // {
 //     fn from(error: T) -> Self {
-//         TheseusGuiError::Serializable(TheseusSerializableError::from(error))
+//         TheseusGuiError::Serializable(PteronSerializableError::from(error))
 //     }
 // }
 
-// This is a very simple macro that implements a very basic Serializable for each variant of TheseusSerializableError,
+// This is a very simple macro that implements a very basic Serializable for each variant of PteronSerializableError,
 // where the field is the string. (This allows easy extension to errors without many match arms)
 macro_rules! impl_serialize {
     ($($variant:ident),* $(,)?) => {
-        impl Serialize for TheseusSerializableError {
+        impl Serialize for PteronSerializableError {
             fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
             where
                 S: Serializer,
@@ -78,7 +79,7 @@ macro_rules! impl_serialize {
                 match self {
                     // For the Theseus variant, we add a special display for the error,
                     // to view the spans if subscribed to them (which is information that is lost when serializing)
-                    TheseusSerializableError::Theseus(theseus_error) => {
+                    PteronSerializableError::Theseus(theseus_error) => {
                         $crate::error::display_tracing_error(theseus_error);
 
                         let mut state = serializer.serialize_struct("Theseus", 2)?;
@@ -87,7 +88,7 @@ macro_rules! impl_serialize {
                         state.end()
                     }
                     $(
-                        TheseusSerializableError::$variant(message) => {
+                        PteronSerializableError::$variant(message) => {
                             let mut state = serializer.serialize_struct(stringify!($variant), 2)?;
                             state.serialize_field("field_name", stringify!($variant))?;
                             state.serialize_field("message", &message.to_string())?;
@@ -100,7 +101,7 @@ macro_rules! impl_serialize {
     };
 }
 
-// Use the macro to implement Serialize for TheseusSerializableError
+// Use the macro to implement Serialize for PteronSerializableError
 #[cfg(not(feature = "updater"))]
 impl_serialize! {
     IO,

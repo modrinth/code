@@ -5,6 +5,12 @@
   "app.auth-servers.unreachable.header": {
     "message": "Připojení k autorizačním serverům se nezdařilo"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Přidat server do instance"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Přidat servery do instance"
+  },
   "app.browse.add-to-instance": {
     "message": "Přidat do instalace"
   },
@@ -23,6 +29,15 @@
   "app.browse.discover-servers": {
     "message": "Prozkoumat servery"
   },
+  "app.browse.hide-added-servers": {
+    "message": "Skrýt přidané servery"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Skrýt nainstalovaný obsah"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Nainstalovat obsah do instnce"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Přidej popis modpacku..."
   },
@@ -37,6 +52,9 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Jméno modpacku"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Vybrat soubory a složky co zahrnout do modpacku"
   },
   "app.export-modal.version-number-label": {
     "message": "Číslo verze"
@@ -210,10 +228,10 @@
     "message": "Může být jiné než jejich Minecraft jméno!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Zadejte uživatelské jméno Modrinth..."
+    "message": "Zadejte uživatelské jméno Icarus..."
   },
   "friends.add-friend.username.title": {
-    "message": "Jak se váš kamarád jmenuje na Modrinthu?"
+    "message": "Jak se váš kamarád jmenuje na Icarusu?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Přidejte si přátelé</link> a podívejte se, co hrají!"
@@ -255,7 +273,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Přihlašte se ke svému Modrinth účtu</link>, abyste jsi přidali přátele a uviděli co hrají!"
+    "message": "<link>Přihlašte se ke svému Icarus účtu</link>, abyste jsi přidali přátele a uviděli co hrají!"
   },
   "instance.add-server.add-and-play": {
     "message": "Přidat a hrát"
@@ -513,3 +531,4 @@
     "message": "Loader zprostředkovává server"
   }
 }
+

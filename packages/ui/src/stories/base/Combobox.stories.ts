@@ -7,7 +7,7 @@ import {
 	ShareIcon,
 	TrashIcon,
 	UserIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import Combobox from '../../components/base/Combobox.vue'
@@ -43,24 +43,6 @@ export const Searchable: Story = {
 		],
 		searchable: true,
 		searchPlaceholder: 'Search loaders...',
-		selectSearchTextOnFocus: true,
-	},
-}
-
-export const SearchableEmpty: Story = {
-	args: {
-		options: [],
-		searchable: true,
-		searchPlaceholder: 'Search projects...',
-		noOptionsMessage: 'No projects found',
-	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					'Covers the idle empty searchable state: focusing the input should not open an empty dropdown until there is a query or footer content.',
-			},
-		},
 	},
 }
 

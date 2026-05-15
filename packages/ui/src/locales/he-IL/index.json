@@ -596,11 +596,14 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "נכשל"
   },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "רשום"
+  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "מפקח"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "צוות Modrinth"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "צוות Icarus"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "בהמתנה"
@@ -628,6 +631,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "נכשל"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "מוסתר"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "העתק קוד אל הלוח"
@@ -1110,7 +1116,7 @@
     "defaultMessage": "כהה"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "בחר את ערכת הצבעים המועדפת עליך עבור Modrinth במכשיר זה."
+    "defaultMessage": "בחר את ערכת הצבעים המועדפת עליך עבור Icarus במכשיר זה."
   },
   "settings.display.theme.light": {
     "defaultMessage": "בהיר"
@@ -1254,4 +1260,5 @@
     "defaultMessage": "יש לך שינויים שלא נשמרו."
   }
 }
+
 

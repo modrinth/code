@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Card, StyledInput } from '@modrinth/ui'
+import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@icarus/assets'
+import { ButtonStyled, Card, StyledInput } from '@icarus/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import docs from '~/templates/docs'

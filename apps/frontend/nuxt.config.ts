@@ -1,4 +1,4 @@
-import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
+import { GenericModrinthClient, type Labrinth } from '@icarus/api-client'
 import serverSidedVue from '@vitejs/plugin-vue'
 import fs from 'fs/promises'
 import { defineNuxtConfig } from 'nuxt/config'
@@ -114,8 +114,8 @@ export default defineNuxtConfig({
 			const docTemplates = Object.keys(
 				await import('./src/templates/docs/index.ts').then((m) => m.default),
 			)
-			const blogArticles = await import('@modrinth/blog').then((m) => m.articles)
-			const { getChangelog } = await import('@modrinth/blog')
+			const blogArticles = await import('@icarus/blog').then((m) => m.articles)
+			const { getChangelog } = await import('@icarus/blog')
 
 			nitroConfig.prerender = nitroConfig.prerender || {}
 			nitroConfig.prerender.routes = nitroConfig.prerender.routes || []

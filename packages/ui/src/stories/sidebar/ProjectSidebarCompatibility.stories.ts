@@ -1,4 +1,4 @@
-import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
+import type { GameVersionTag, PlatformTag } from '@icarus/utils'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import ProjectSidebarCompatibility from '../../components/project/ProjectSidebarCompatibility.vue'

@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	ArrowDownIcon,
 	ArrowUpIcon,
@@ -74,7 +74,7 @@ import {
 	PayPalColorIcon,
 	VenmoColorIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	BulletDivider,
 	ButtonStyled,
@@ -83,8 +83,8 @@ import {
 	useFormatDateTime,
 	useFormatMoney,
 	useVIntl,
-} from '@modrinth/ui'
-import { capitalizeString } from '@modrinth/utils'
+} from '@icarus/ui'
+import { capitalizeString } from '@icarus/utils'
 import { Tooltip } from 'floating-vue'
 
 import { useGeneratedState } from '~/composables/generated'

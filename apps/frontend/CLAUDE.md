@@ -1,10 +1,10 @@
-# apps/frontend — Modrinth Website
+# apps/frontend — Icarus Website
 
-Nuxt 3 application serving the main Modrinth website. Uses Vue 3, Tailwind CSS v3, and file-based routing.
+Nuxt 3 application serving the main Icarus website. Uses Vue 3, Tailwind CSS v3, and file-based routing.
 
 ## Architecture
 
-Nuxt 3 with SSR — pages are server-rendered and hydrated on the client. Uses `$fetch` for server-side data fetching and `@modrinth/api-client` (via `NuxtModrinthClient`) for client-side API calls.
+Nuxt 3 with SSR — pages are server-rendered and hydrated on the client. Uses `$fetch` for server-side data fetching and `@Icarus/api-client` (via `NuxtIcarusClient`) for client-side API calls.
 
 ## Key Directories
 
@@ -30,7 +30,7 @@ Rule of thumb: if it doesn't depend on Nuxt-specific APIs or website-only featur
 
 ## Data Fetching
 
-Use `@modrinth/api-client` via `injectModrinthClient()` for all API calls. See `packages/api-client/CLAUDE.md` for the full API client documentation.
+Use `@Icarus/api-client` via `injectIcarusClient()` for all API calls. See `packages/api-client/CLAUDE.md` for the full API client documentation.
 
 For caching and server state, use TanStack Query (`@tanstack/vue-query`). See the `tanstack-query` skill (`.claude/skills/tanstack-query/SKILL.md`) for patterns and conventions used in this codebase.
 
@@ -41,3 +41,4 @@ These composables are deprecated and should not be used in new code:
 - **`useAsyncData`** - we use tanstack, not nuxt's built in async data utility.
 - **`useBaseFetch`** (`src/composables/fetch.js`) — legacy Labrinth fetch wrapper. Use `client.labrinth.*` modules instead.
 - **`useServersFetch`** (`src/composables/servers/servers-fetch.ts`) — legacy Archon fetch wrapper with manual retry/circuit-breaker. Use `client.archon.*` modules instead — refer to the `packages/api-client/CLAUDE.md` for more information.
+

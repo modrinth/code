@@ -111,7 +111,7 @@ import {
 	SpinnerIcon,
 	UploadIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	ButtonStyled,
 	CapeButton,
@@ -119,7 +119,7 @@ import {
 	injectNotificationManager,
 	RadioButtons,
 	SkinPreviewRenderer,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'

@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "W wersjach Modrinth App dla systemu Linux <issues-link>mogą występywać problemy</issues-link> na niektórych systemach i konfiguracjach. Jeśli Modrinth App działa niestabilnie na Twoim komputerze, zachęcamy do wypróbowania innych aplikacji, takich jak <prism-link>Prism Launcher</prism-link>, które umożliwiają łatwą instalację treści z Modrinth."
+    "message": "W wersjach Icarus Launcher dla systemu Linux <issues-link>mogą występywać problemy</issues-link> na niektórych systemach i konfiguracjach. Jeśli Icarus Launcher działa niestabilnie na Twoim komputerze, zachęcamy do wypróbowania innych aplikacji, takich jak <prism-link>Prism Launcher</prism-link>, które umożliwiają łatwą instalację treści z Icarus."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -39,10 +39,10 @@
     "message": "Opcje pobierania"
   },
   "app-marketing.download.terms": {
-    "message": "Pobierając Modrinth App, wyrażasz zgodę na nasze <terms-link>Warunki</terms-link> oraz <privacy-link>Politykę prywatności</privacy-link>."
+    "message": "Pobierając Icarus Launcher, wyrażasz zgodę na nasze <terms-link>Warunki</terms-link> oraz <privacy-link>Politykę prywatności</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "Pobierz Modrinth App (Beta)"
+    "message": "Pobierz Icarus Launcher (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "Obserwuj projekty"
   },
   "app-marketing.features.importing.description": {
-    "message": "Zaimportuj wszystkie swoje ulubione profile z launchera, którego używałeś wcześniej, i zacznij korzystać z Modrinth App w kilka sekund!"
+    "message": "Zaimportuj wszystkie swoje ulubione profile z launchera, którego używałeś wcześniej, i zacznij korzystać z Icarus Launcher w kilka sekund!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "przez {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth ułatwia zarządzanie wszystkimi modami w jednym miejscu. Możesz instalować, odinstalowywać i aktualizować mody jednym kliknięciem."
+    "message": "Icarus ułatwia zarządzanie wszystkimi modami w jednym miejscu. Możesz instalować, odinstalowywać i aktualizować mody jednym kliknięciem."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Zainstalowane mody"
@@ -96,7 +96,7 @@
     "message": "Tryb offline"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth Launcher jest w pełni otwarto-źródłowy. Kod źródłowy możesz zobaczyć na naszym <github-link>GitHubie</github-link>!"
+    "message": "Icarus Launcher jest w pełni otwarto-źródłowy. Kod źródłowy możesz zobaczyć na naszym <github-link>GitHubie</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Otwarte oprogramowanie"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App działa wydajniej niż wiele popularnych menedżerów modów, zużywając zaledwie 150 MB pamięci RAM!"
+    "message": "Icarus Launcher działa wydajniej niż wiele popularnych menedżerów modów, zużywając zaledwie 150 MB pamięci RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -128,8 +128,8 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
-  "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth App"
+  "app-marketing.features.performance.Icarus-app": {
+    "message": "Icarus Launcher"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 miliard %"
@@ -147,13 +147,13 @@
     "message": "Wydajny"
   },
   "app-marketing.features.play.description": {
-    "message": "Użyj Modrinth App, aby pobierać i grać ze swoimi ulubionymi modami i paczkami modów."
+    "message": "Użyj Icarus Launcher, aby pobierać i grać ze swoimi ulubionymi modami i paczkami modów."
   },
   "app-marketing.features.play.title": {
     "message": "Graj ze swoimi ulubionymi modami"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Twórz, udostępniaj i graj w paczki modów, korzystając z tysięcy modów i paczek dostępnych na Modrinth."
+    "message": "Twórz, udostępniaj i graj w paczki modów, korzystając z tysięcy modów i paczek dostępnych na Icarus."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Paczka modów"
@@ -168,7 +168,7 @@
     "message": "Jak żaden inny launcher"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App jest w pełni zintegrowany ze stroną, dzięki czemu możesz uzyskać dostęp do wszystkich swoich ulubionych projektów bezpośrednio z aplikacji!"
+    "message": "Icarus Launcher jest w pełni zintegrowany ze stroną, dzięki czemu możesz uzyskać dostęp do wszystkich swoich ulubionych projektów bezpośrednio z aplikacji!"
   },
   "app-marketing.features.website.title": {
     "message": "Integracja ze stroną"
@@ -177,19 +177,19 @@
     "message": "które kiedykolwiek użyłeś(-aś)"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Zrzut ekranu z Modrinth App z otwartą instancją Cobblemon na stronie „Treść”."
+    "message": "Zrzut ekranu z Icarus Launcher z otwartą instancją Cobblemon na stronie „Treść”."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App to wyjątkowy, otwarto-źrodłowy launcher, który pozwala grać w Twoje ulubione mody i utrzymywać je na bieżąco, wszystko w jednym poręcznym pakiecie."
+    "message": "Icarus Launcher to wyjątkowy, otwarto-źrodłowy launcher, który pozwala grać w Twoje ulubione mody i utrzymywać je na bieżąco, wszystko w jednym poręcznym pakiecie."
   },
   "app-marketing.hero.download-button": {
-    "message": "Pobierz Modrinth App"
+    "message": "Pobierz Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "Pobierz Modrinth App"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "Pobierz Icarus Launcher"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Pobierz Modrinth App dla {os}"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "Pobierz Icarus Launcher dla {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Zrzut ekranu głównego menu instancji Cobblemon."
@@ -282,7 +282,7 @@
     "message": "Utwórz konto"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Tworząc konto, wyrażasz zgodę na <terms-link>Warunki</terms-link> i <privacy-policy-link>Politykę Prywatności</privacy-policy-link> Modrinth."
+    "message": "Tworząc konto, wyrażasz zgodę na <terms-link>Warunki</terms-link> i <privacy-policy-link>Politykę Prywatności</privacy-policy-link> Icarus."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Hasła się różnią!"
@@ -291,7 +291,7 @@
     "message": "Masz już konto?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Otrzymuj aktualności o Modrinth"
+    "message": "Otrzymuj aktualności o Icarus"
   },
   "auth.sign-up.title": {
     "message": "Zarejestruj się"
@@ -333,7 +333,7 @@
     "message": "Zweryfikuj e-mail"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Otrzymuj aktualności o Modrinth"
+    "message": "Otrzymuj aktualności o Icarus"
   },
   "auth.welcome.description": {
     "message": "Teraz jesteś częścią wspaniałej społeczności twórców i odkrywców, którzy już tworzą, pobierają i na bieżąco korzystają z niesamowitych modów."
@@ -342,7 +342,7 @@
     "message": "Przez stworzenie konta, zgadzasz się na nasze<terms-link>Warunki</terms-link> oraz <privacy-policy-link>Politykę prywatności</privacy-policy-link>."
   },
   "auth.welcome.long-title": {
-    "message": "Witaj w Modrinth!"
+    "message": "Witaj w Icarus!"
   },
   "auth.welcome.title": {
     "message": "Witaj"
@@ -372,7 +372,7 @@
     "message": "Czy na pewno chcesz usunąć tę kolekcję?"
   },
   "collection.description": {
-    "message": "{description} - Zobacz kolekcję {name} od {username} na Modrinth"
+    "message": "{description} - Zobacz kolekcję {name} od {username} na Icarus"
   },
   "collection.description.following": {
     "message": "Automatycznie wygenerowana kolekcja wszystkich projektów, które obserwujesz."
@@ -648,7 +648,7 @@
     "message": "Formularz podatkowy"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth używa dostawcy będącego stroną trzecią, Track1099, by bezpiecznie zbierać i przechowywać Twoje formularze podatkowe. <security-link>Dowiedz się więcej.</security-link>"
+    "message": "Icarus używa dostawcy będącego stroną trzecią, Track1099, by bezpiecznie zbierać i przechowywać Twoje formularze podatkowe. <security-link>Dowiedz się więcej.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Praktyki bezpieczeństwa"
@@ -813,7 +813,7 @@
     "message": "By wypłacić całe saldo konta (<b>{available}</b>) musisz wypełnić ten formularz. Jest on wymagany dla sprawozdawczości podatkowej i musi być wypełniony tylko raz."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "Musisz wypełnić formularz podatkowy W-9 lub W-8 dla zapisów podatkowych Modrinth, abyśmy mogli zachować zgodność z przepisami podatkowymi."
+    "message": "Musisz wypełnić formularz podatkowy W-9 lub W-8 dla zapisów podatkowych Icarus, abyśmy mogli zachować zgodność z przepisami podatkowymi."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Wymagany jest formularz podatkowy"
@@ -855,7 +855,7 @@
     "message": "Adres e-mail nie jest zweryfikowany"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "Podany adres e-mail nie jest powiązany z Twoim kontem Modrinth. Modrinth nie może odzyskać nagród wysłanych na niepoprawny adres e-mail."
+    "message": "Podany adres e-mail nie jest powiązany z Twoim kontem Icarus. Icarus nie może odzyskać nagród wysłanych na niepoprawny adres e-mail."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Dostępne niższe opłaty"
@@ -1044,7 +1044,7 @@
     "message": "Szacunkowe przychody mogą ulec zmianie do momentu ich udostępnienia."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Kliknij tutaj, by dowiedzieć się, jak Modrinth oblicza Twoje przychody."
+    "message": "Kliknij tutaj, by dowiedzieć się, jak Icarus oblicza Twoje przychody."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Oszacowane na {date}"
@@ -1065,7 +1065,7 @@
     "message": "Wypłacone"
   },
   "dashboard.revenue.tos": {
-    "message": "Udostępniając projekty na Modrinth i wypłacając pieniądze z konta, wyrażasz zgodę na <terms-link>Warunki programu wynagrodzenia</terms-link>. Dowiedz się więcej o <info-link>programie wynagrodzenia</info-link>."
+    "message": "Udostępniając projekty na Icarus i wypłacając pieniądze z konta, wyrażasz zgodę na <terms-link>Warunki programu wynagrodzenia</terms-link>. Dowiedz się więcej o <info-link>programie wynagrodzenia</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Pobierz jako CSV"
@@ -1229,9 +1229,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Wypełnij formularz podatkowy"
   },
-  "discover.install.cancel-reset": {
-    "message": "Anuluj resetowanie"
-  },
   "error.collection.404.list_item.1": {
     "message": "Mogłeś źle napisać URL kolekcji."
   },
@@ -1239,19 +1236,13 @@
     "message": "Ta kolekcja może być prywatna."
   },
   "error.collection.404.list_item.3": {
-    "message": "Ta kolekcja została usunięta przez zespół moderacji Modrinth za naruszanie naszych <tou-link>Warunków użytkowania</tou-link>."
+    "message": "Ta kolekcja została usunięta przez zespół moderacji Icarus za naruszanie naszych <tou-link>Warunków użytkowania</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "Dlaczego?"
   },
   "error.collection.404.title": {
     "message": "Nie znaleziono kolekcji"
-  },
-  "error.generic.401.signed-in-as": {
-    "message": "Jesteś obecnie zalogowany jako:"
-  },
-  "error.generic.401.title": {
-    "message": "Nie masz dostępu do tej strony"
   },
   "error.generic.404.subtitle": {
     "message": "Strona, której szukasz, prawdopodobnie nie istnieje."
@@ -1266,10 +1257,10 @@
     "message": "Treści niedostępne z przyczyn prawnych"
   },
   "error.generic.default.list_item.1": {
-    "message": "Sprawdź na naszej <status-link>stronie statusu</status-link>, czy Modrinth jest niedostępny."
+    "message": "Sprawdź na naszej <status-link>stronie statusu</status-link>, czy Icarus jest niedostępny."
   },
   "error.generic.default.list_item.2": {
-    "message": "Jeśli problem będzie się powtarzał, możesz powiadomić o tym zespół Modrinth, dołączając do naszego <discord-link>serwera Discord</discord-link>."
+    "message": "Jeśli problem będzie się powtarzał, możesz powiadomić o tym zespół Icarus, dołączając do naszego <discord-link>serwera Discord</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Spróbuj ponownie za kilka minut."
@@ -1287,7 +1278,7 @@
     "message": "Właściciel organizacji mógł zmienić adres URL lub go usunąć."
   },
   "error.organization.404.list_item.3": {
-    "message": "Organizacja mogła zostać usunięta przez zespół moderacyjny Modrinth za naruszenie naszych <tou-link>Warunków użytkowania</tou-link>."
+    "message": "Organizacja mogła zostać usunięta przez zespół moderacyjny Icarus za naruszenie naszych <tou-link>Warunków użytkowania</tou-link>."
   },
   "error.organization.404.list_title": {
     "message": "Dlaczego?"
@@ -1302,7 +1293,7 @@
     "message": "Właściciel projektu mógł zmienić adres URL, ustawić projekt jako prywatny lub go usunąć."
   },
   "error.project.404.list_item.3": {
-    "message": "Projekt mógł zostać usunięty przez zespół moderacyjny Modrinth za naruszenie naszych <tou-link>Warunków użytkowania</tou-link>."
+    "message": "Projekt mógł zostać usunięty przez zespół moderacyjny Icarus za naruszenie naszych <tou-link>Warunków użytkowania</tou-link>."
   },
   "error.project.404.list_title": {
     "message": "Dlaczego?"
@@ -1317,7 +1308,7 @@
     "message": "Użytkownik mógł zmienić nazwę użytkownika lub usunąć konto."
   },
   "error.user.404.list_item.3": {
-    "message": "Konto użytkownika mogło zostać zamknięte z powodu naruszenia <tou-link>Warunków używania</tou-link> serwisu Modrinth."
+    "message": "Konto użytkownika mogło zostać zamknięte z powodu naruszenia <tou-link>Warunków używania</tou-link> serwisu Icarus."
   },
   "error.user.404.list_title": {
     "message": "Dlaczego?"
@@ -1359,10 +1350,10 @@
     "message": "Gdy Twój serwer jest pod dużym obciążeniem, tymczasowo przyznajemy mu dostęp do dodatkowych wątków procesora, aby pomóc złagodzić skoki opóźnień i niestabilność. Pomaga to zapobiec spadkom TPS poniżej 20, zapewniając możliwie najpłynniejszą rozgrywkę. Ponieważ te dodatkowe wątki są dostępne tylko krótko podczas okresów wysokiego obciążenia, mogą nie pojawiać się w raportach Spark ani innych narzędziach do profilowania."
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Na jakich procesorach działają serwery Modrinth Hosting?"
+    "message": "Na jakich procesorach działają serwery Icarus Hosting?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Serwery Modrinth Hosting są zasilane przez procesory klasy AMD Ryzen 7900 i 7950X3D o taktowaniu 5+ GHz, sparowane z pamięcią DDR5."
+    "message": "Serwery Icarus Hosting są zasilane przez procesory klasy AMD Ryzen 7900 i 7950X3D o taktowaniu 5+ GHz, sparowane z pamięcią DDR5."
   },
   "hosting-marketing.faq.currency": {
     "message": "W jakiej walucie są podane ceny?"
@@ -1371,19 +1362,19 @@
     "message": "Wszystkie ceny są podane w dolarach amerykańskich (USD)."
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "Czy serwery Modrinth Hosting posiadają ochronę DDoS?"
+    "message": "Czy serwery Icarus Hosting posiadają ochronę DDoS?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Tak. Wszystkie serwery Modrinth Hosting są wyposażone w ochronę DDoS o przepustowości do 17 Tbps w wybranych lokalizacjach."
+    "message": "Tak. Wszystkie serwery Icarus Hosting są wyposażone w ochronę DDoS o przepustowości do 17 Tbps w wybranych lokalizacjach."
   },
   "hosting-marketing.faq.heading": {
     "message": "Często zadawane pytania"
   },
   "hosting-marketing.faq.how-fast": {
-    "message": "Jak szybkie są serwery Modrinth Hosting?"
+    "message": "Jak szybkie są serwery Icarus Hosting?"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Serwery Modrinth Hosting są hostowane na bardzo nowoczesnym, wydajnym sprzęcie, ale trudno powiedzieć dokładnie, jak szybko będzie działał Twój serwer. Wpływa na to wiele czynników, takich jak używane mody, paczki danych (data packi) czy pluginy, a nawet zachowanie samych graczy."
+    "message": "Serwery Icarus Hosting są hostowane na bardzo nowoczesnym, wydajnym sprzęcie, ale trudno powiedzieć dokładnie, jak szybko będzie działał Twój serwer. Wpływa na to wiele czynników, takich jak używane mody, paczki danych (data packi) czy pluginy, a nawet zachowanie samych graczy."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "Większość problemów z wydajnością jest spowodowane przez mało zoptymalizowane paczki modów, mody, paczki danych lub pluginy, które powodują lag na serwerze. Nasze serwery są z najwyższej półki, więc powinny wystarczać, jeśli wybierzesz odpowiedni plan do tego, co instalujesz na serwerze."
@@ -1395,7 +1386,7 @@
     "message": "Tak, pojemność dysku na Twoim serwerze można zwiększyć bez dodatkowych kosztów. Jeżeli potrzebujesz więcej miejsca na dysku, skontaktuj się z obsługą."
   },
   "hosting-marketing.faq.location": {
-    "message": "Gdzie znajdują się serwery Modrinth Hosting? Czy mogę wybrać region?"
+    "message": "Gdzie znajdują się serwery Icarus Hosting? Czy mogę wybrać region?"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "Aktualnie mamy dostępne serwery w Ameryce Północnej, Europie i Południowowschodniej Azji, które możesz wybrać podczas zakupu. Więcej regionów będzie dostępne w przyszłości! Jeżeli chcesz zmienić region, skontaktuj się z obsługą."
@@ -1404,7 +1395,7 @@
     "message": "Które loadery i wersje Minecraft mogę użyć?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Serwery Modrinth Hosting wspierają każdą wersję Minecraft: Java Edition wstecz do wersji 1.2.5, w tym wersje snapshotowe."
+    "message": "Serwery Icarus Hosting wspierają każdą wersję Minecraft: Java Edition wstecz do wersji 1.2.5, w tym wersje snapshotowe."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "Wspieramy także szeroki wybór loaderów modów i pluginów, w tym Fabric, Quilt, Forge i Neoforge dla modów; jak i Paper i Purpur dla pluginów. Dostępność zależy od tego, czy loader modów lub pluginów wspiera wybraną wersję Minecraft."
@@ -1421,11 +1412,11 @@
   "hosting-marketing.hero.button.start-your-server": {
     "message": "Uruchom swój serwer"
   },
-  "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Hostuj swój następny serwer z Modrinth Hosting"
+  "hosting-marketing.hero.host-with-Icarus": {
+    "message": "Hostuj swój następny serwer z Icarus Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting to najprostszy sposób na własny serwer Minecraft: Java Edition. Bezproblemowo instaluj i graj w swoje ulubione mody i paczki modów, a wszystko to w obrębie platformy Modrinth."
+    "message": "Icarus Hosting to najprostszy sposób na własny serwer Minecraft: Java Edition. Bezproblemowo instaluj i graj w swoje ulubione mody i paczki modów, a wszystko to w obrębie platformy Icarus."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Zaawansowane zarządzanie siecią"
@@ -1443,10 +1434,10 @@
     "message": "Własny adres URL"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "Udostępnij swój serwer za pomocą niestandardowego adresu URL <contrast>modrinth.gg</contrast>."
+    "message": "Udostępnij swój serwer za pomocą niestandardowego adresu URL <contrast>Icarus.gg</contrast>."
   },
   "hosting-marketing.included.description": {
-    "message": "Do każdego serwera dołączony jest pakiet funkcji zaprojektowanych tak, aby zapewnić jakość hostingu, którą może zaoferować tylko Modrinth."
+    "message": "Do każdego serwera dołączony jest pakiet funkcji zaprojektowanych tak, aby zapewnić jakość hostingu, którą może zaoferować tylko Icarus."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Łatwy w użyciu menedżer plików"
@@ -1461,19 +1452,19 @@
     "message": "Pomoc zawsze, gdy jej potrzebujesz"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Skontaktuj się z zespołem Modrinth, aby uzyskać pomoc dotyczącą serwera w dowolnym momencie."
+    "message": "Skontaktuj się z zespołem Icarus, aby uzyskać pomoc dotyczącą serwera w dowolnym momencie."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "Potężna konsola, menedżer właściwości serwera i nie tylko"
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "Modrinth Hosting oferuje zaawansowane narzędzia do zarządzania Twoim serwerem."
+    "message": "Icarus Hosting oferuje zaawansowane narzędzia do zarządzania Twoim serwerem."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "Dostęp przez SFTP"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "Uzyskaj bezpośredni dostęp do plików swojego serwera dzięki wbudowanemu SFTP w Modrinth Hosting."
+    "message": "Uzyskaj bezpośredni dostęp do plików swojego serwera dzięki wbudowanemu SFTP w Icarus Hosting."
   },
   "hosting-marketing.included.with-your-server": {
     "message": "W zestawie z Twoim serwerem"
@@ -1496,20 +1487,20 @@
   "hosting-marketing.server-for-everyone": {
     "message": "Dla każdego znajdzie się serwer "
   },
-  "hosting-marketing.why.all-on-modrinth": {
-    "message": "Zarządzaj wszystkim na Modrinth"
+  "hosting-marketing.why.all-on-Icarus": {
+    "message": "Zarządzaj wszystkim na Icarus"
   },
-  "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "Twój serwer, mody, gracze i inne elementy są dostępne w jednym miejscu na Modrinth. Nie musisz przełączać się między platformami."
+  "hosting-marketing.why.all-on-Icarus.description": {
+    "message": "Twój serwer, mody, gracze i inne elementy są dostępne w jednym miejscu na Icarus. Nie musisz przełączać się między platformami."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Stale wysoka wydajność"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "Nasza infrastruktura nigdy nie jest przeciążona, co oznacza, że każdy serwer hostowany na Modrinth zawsze działa z pełną wydajnością."
+    "message": "Nasza infrastruktura nigdy nie jest przeciążona, co oznacza, że każdy serwer hostowany na Icarus zawsze działa z pełną wydajnością."
   },
   "hosting-marketing.why.description": {
-    "message": "Wybieraj spośród tysięcy paczek modów na Modrinth lub stwórz własny. Zaproś znajomych, gdy będziesz gotowy do gry."
+    "message": "Wybieraj spośród tysięcy paczek modów na Icarus lub stwórz własny. Zaproś znajomych, gdy będziesz gotowy do gry."
   },
   "hosting-marketing.why.heading": {
     "message": "Znajdź paczkę modów. Teraz to serwer."
@@ -1518,22 +1509,22 @@
     "message": "Doświadcz nowoczesnego, niezawodnego hostingu"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Serwery Modrinth Hosting opierają się na <contrast>wydajnych procesorach AMD i pamięci RAM DDR5</contrast>, działając na autorskim oprogramowaniu, aby zapewnić płynną rozgrywkę."
+    "message": "Serwery Icarus Hosting opierają się na <contrast>wydajnych procesorach AMD i pamięci RAM DDR5</contrast>, działając na autorskim oprogramowaniu, aby zapewnić płynną rozgrywkę."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Graj tam, gdzie są Twoje mody"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting bezproblemowo integruje proces instalacji modów i paczek modów z Twoim serwerem."
+    "message": "Icarus Hosting bezproblemowo integruje proces instalacji modów i paczek modów z Twoim serwerem."
   },
-  "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "Dlaczego Modrinth Hosting?"
+  "hosting-marketing.why.why-Icarus-hosting": {
+    "message": "Dlaczego Icarus Hosting?"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "Wszystkie Twoje ulubione mody"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "Wybieraj między Vanilla, Fabric, Forge, Quilt i NeoForge. Jeśli coś jest na Modrinth, może działać na Twoim serwerze."
+    "message": "Wybieraj między Vanilla, Fabric, Forge, Quilt i NeoForge. Jeśli coś jest na Icarus, może działać na Twoim serwerze."
   },
   "hosting.plan.out-of-stock": {
     "message": "Wyprzedane"
@@ -1548,7 +1539,7 @@
     "message": "Przejdź do kokpitu"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Uzyskaj najlepsze możliwe doświadczenie w modowaniu dzięki stałym aktualizacjom od zespołu Modrinth"
+    "message": "Uzyskaj najlepsze możliwe doświadczenie w modowaniu dzięki stałym aktualizacjom od zespołu Icarus"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Nieustanny rozwój"
@@ -1593,7 +1584,7 @@
     "message": "Obserwuj projekty, które kochasz"
   },
   "landing.feature.launcher.description": {
-    "message": "Otwarto-źródłowe API Modrinth pozwala launcherom dodać głęboką integrację z Modrinth. Możesz używać Modrinth przez <link>naszą aplikację</link> i inne popularne launchery, takie jak ATLauncher, MultiMC i Prism Launcher."
+    "message": "Otwarto-źródłowe API Icarus pozwala launcherom dodać głęboką integrację z Icarus. Możesz używać Icarus przez <link>naszą aplikację</link> i inne popularne launchery, takie jak ATLauncher, MultiMC i Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "Graj na swoim ulubionym launcherze"
@@ -1632,10 +1623,10 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "Prostsza reprezentacja okna Minecraft, z logiem Mojang Studios w zielonym kolorze Modrinth."
+    "message": "Prostsza reprezentacja okna Minecraft, z logiem Mojang Studios w zielonym kolorze Icarus."
   },
-  "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+  "landing.launcher.Icarus-app-label": {
+    "message": "Icarus Launcher"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1678,9 +1669,6 @@
   },
   "layout.action.create-new": {
     "message": "Stwórz nowy..."
-  },
-  "layout.action.external-projects": {
-    "message": "Zewnętrzne projekty"
   },
   "layout.action.file-lookup": {
     "message": "Wyszukiwarka plików"
@@ -1728,25 +1716,25 @@
     "message": "Odwiedź ustawienia konta"
   },
   "layout.banner.add-email.description": {
-    "message": "Dla bezpieczeństwa, Modrinth musi zweryfikować e-maila powiązanego z twoim kontem."
+    "message": "Dla bezpieczeństwa, Icarus musi zweryfikować e-maila powiązanego z twoim kontem."
   },
   "layout.banner.build-fail.description": {
-    "message": "Wdrożenie interfejsu użytkownika Modrinth nie udało się wygenerować stanu z API. Może to wynikać z awarii lub błędu w konfiguracji. Odbuduj, gdy API będzie dostępne. Kody błędów: {errors}; Aktualny adres URL interfejsu API to: {url}"
+    "message": "Wdrożenie interfejsu użytkownika Icarus nie udało się wygenerować stanu z API. Może to wynikać z awarii lub błędu w konfiguracji. Odbuduj, gdy API będzie dostępne. Kody błędów: {errors}; Aktualny adres URL interfejsu API to: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "Błąd podczas generowania stanu z API przy kompilacji."
   },
   "layout.banner.preview.description": {
-    "message": "Jeśli chciałeś wejść na oficjalną stronę Modrinth, odwiedź <link>https://modrinth.com</link>. To wydanie poglądowe jest używane przez administrację Modrinth do testów. Zostało utworzone z <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Jeśli chciałeś wejść na oficjalną stronę Icarus, odwiedź <link>https://Icarus.com</link>. To wydanie poglądowe jest używane przez administrację Icarus do testów. Zostało utworzone z <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
-    "message": "To jest wydanie poglądowe strony Modrinth."
+    "message": "To jest wydanie poglądowe strony Icarus."
   },
   "layout.banner.staging.description": {
-    "message": "Środowisko testowe jest całkowicie oddzielone od produkcyjnej bazy danych Modrinth. Służy ono do testowania i debugowania i może działać w wersjach rozwojowych lub interfejsu użytkownika Modrinth, które są nowsze niż instancja produkcyjna."
+    "message": "Środowisko testowe jest całkowicie oddzielone od produkcyjnej bazy danych Icarus. Służy ono do testowania i debugowania i może działać w wersjach rozwojowych lub interfejsu użytkownika Icarus, które są nowsze niż instancja produkcyjna."
   },
   "layout.banner.staging.title": {
-    "message": "Przeglądasz środowisko testowe Modrinth"
+    "message": "Przeglądasz środowisko testowe Icarus"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Zaktualizuj informacje płatności"
@@ -1761,7 +1749,7 @@
     "message": "Wypełnij formularz podatkowy"
   },
   "layout.banner.tax.description": {
-    "message": "Wypłaciłeś/aś ponad {threshold} z Modrinth w tym roku. Aby spełnić wymogi podatkowe, musisz wypełnić formularz podatkowy. Twoje wypłaty są spauzowane, aż nie wypełnisz formularza podatkowego."
+    "message": "Wypłaciłeś/aś ponad {threshold} z Icarus w tym roku. Aby spełnić wymogi podatkowe, musisz wypełnić formularz podatkowy. Twoje wypłaty są spauzowane, aż nie wypełnisz formularza podatkowego."
   },
   "layout.banner.tax.title": {
     "message": "Wymagany jest formularz podatkowy"
@@ -1779,7 +1767,7 @@
     "message": "Wyślij ponownie e-mail weryfikacyjny"
   },
   "layout.banner.verify-email.description": {
-    "message": "Dla bezpieczeństwa, Modrinth musi zweryfikować e-maila powiązanego z twoim kontem."
+    "message": "Dla bezpieczeństwa, Icarus musi zweryfikować e-maila powiązanego z twoim kontem."
   },
   "layout.footer.about": {
     "message": "O nas"
@@ -1820,23 +1808,23 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Warunki użytkowania"
   },
-  "layout.footer.modrinth-information": {
-    "message": "Informacje o Modrinth"
+  "layout.footer.Icarus-information": {
+    "message": "Informacje o Icarus"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth to <github-link>otwarte oprogramowanie</github-link>."
+    "message": "Icarus to <github-link>otwarte oprogramowanie</github-link>."
   },
   "layout.footer.products": {
     "message": "Produkty"
   },
   "layout.footer.products.app": {
-    "message": "Aplikacja Modrinth"
+    "message": "Aplikacja Icarus"
   },
   "layout.footer.products.plus": {
-    "message": "Modrinth+"
+    "message": "Icarus+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "layout.footer.resources": {
     "message": "Zasoby"
@@ -1872,7 +1860,7 @@
     "message": "Przełącz menu"
   },
   "layout.meta.description": {
-    "message": "Pobieraj mody, pluginy, paczki danych, shadery, paczki zasobów i paczki modów do Minecrafta na Modrinth. Odkrywaj i publikuj projekty na Modrinth dzięki nowoczesnemu, łatwemu w użyciu interfejsowi i API."
+    "message": "Pobieraj mody, pluginy, paczki danych, shadery, paczki zasobów i paczki modów do Minecrafta na Icarus. Odkrywaj i publikuj projekty na Icarus dzięki nowoczesnemu, łatwemu w użyciu interfejsowi i API."
   },
   "layout.meta.og-description": {
     "message": "Odkrywaj i publikuj zawartość Minecraft!"
@@ -1892,8 +1880,8 @@
   "layout.nav.discover-content": {
     "message": "Odkrywaj zawartość"
   },
-  "layout.nav.get-modrinth-app": {
-    "message": "Pobierz Modrinth App"
+  "layout.nav.get-Icarus-app": {
+    "message": "Pobierz Icarus Launcher"
   },
   "layout.nav.home": {
     "message": "Strona główna"
@@ -1901,11 +1889,11 @@
   "layout.nav.host-a-server": {
     "message": "Hostuj serwer"
   },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+  "layout.nav.Icarus-app": {
+    "message": "Icarus Launcher"
   },
-  "layout.nav.modrinth-home-page": {
-    "message": "Strona główna Modrinth"
+  "layout.nav.Icarus-home-page": {
+    "message": "Strona główna Icarus"
   },
   "layout.nav.my-servers": {
     "message": "Moje serwery"
@@ -1928,14 +1916,11 @@
   "layout.nav.search": {
     "message": "Szukaj"
   },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Ulepsz do Modrinth+"
+  "layout.nav.upgrade-to-Icarus-plus": {
+    "message": "Ulepsz do Icarus+"
   },
   "moderation.moderate": {
     "message": "Moderuj"
-  },
-  "moderation.page.external-projects": {
-    "message": "Zewnętrzne projekty"
   },
   "moderation.page.projects": {
     "message": "Projekty"
@@ -2214,10 +2199,10 @@
     "message": "Sprawdź podwójnie adres portfela. Fundusze przesłane na nieprawidłowy portfel nie mogą być odzyskane."
   },
   "profile.bio.fallback.creator": {
-    "message": "Twórca na Modrinth."
+    "message": "Twórca na Icarus."
   },
   "profile.bio.fallback.user": {
-    "message": "Użytkownik Modrinth."
+    "message": "Użytkownik Icarus."
   },
   "profile.button.billing": {
     "message": "Zarządzaj rozliczaniem użytkownika"
@@ -2301,10 +2286,10 @@
     "message": "Zapisywanie..."
   },
   "profile.meta.description": {
-    "message": "Pobieraj projekty {username} na Modrinth"
+    "message": "Pobieraj projekty {username} na Icarus"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} - Pobieraj projekty {username} na Modrinth"
+    "message": "{bio} - Pobieraj projekty {username} na Icarus"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> obserwujący projekt} other {<stat>{count}</stat> obserwujących projekt}}"
@@ -2343,7 +2328,7 @@
     "message": "Wyślij ponownie do przeglądu"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Twój projekt został {status, select, rejected {odrzucony} witheld {wstrzymany} other {{status}}} przez zespół Modrinth. W większości przypadków możesz ponownie wysłać swój projekt do sprawdzenia po rozwiązaniu wspomnianego problemu."
+    "message": "Twój projekt został {status, select, rejected {odrzucony} witheld {wstrzymany} other {{status}}} przez zespół Icarus. W większości przypadków możesz ponownie wysłać swój projekt do sprawdzenia po rozwiązaniu wspomnianego problemu."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Należy wykonać wszystkie czynności wymienione w liście kontrolnej dotyczącej publikacji!"
@@ -2457,7 +2442,7 @@
     "message": "Przegląd projektu"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting to najprostszy sposób na zabawę z przyjaciółmi bez żadnych kłopotów!"
+    "message": "Icarus Hosting to najprostszy sposób na zabawę z przyjaciółmi bez żadnych kłopotów!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Od {price}<small> / miesięcznie</small>"
@@ -2490,10 +2475,10 @@
     "message": "{title} nie obsługuje {gameVersion} dla {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Zainstaluj za pomocą Modrinth App"
+    "message": "Zainstaluj za pomocą Icarus Launcher"
   },
   "project.download.no-app": {
-    "message": "Nie masz Modrinth App?"
+    "message": "Nie masz Icarus Launcher?"
   },
   "project.download.no-versions-available": {
     "message": "Brak dostępnych wersji dla {gameVersion} i {platform}."
@@ -2529,7 +2514,7 @@
     "message": "Pobierz {title}"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Właśnie odnowiliśmy system środowisk na Modrinth i nowe opcje są teraz dostępne. Nie masz uprawnień, aby modyfikować te ustawienia, ale daj znać innemu członkowi projektu, że metadane środowisk muszą zostać zweryfikowane."
+    "message": "Właśnie odnowiliśmy system środowisk na Icarus i nowe opcje są teraz dostępne. Nie masz uprawnień, aby modyfikować te ustawienia, ale daj znać innemu członkowi projektu, że metadane środowisk muszą zostać zweryfikowane."
   },
   "project.environment.migration-no-permission.title": {
     "message": "Metadane środowiska muszą być sprawdzone"
@@ -2538,7 +2523,7 @@
     "message": "Dowiedz się więcej o tej zmianie"
   },
   "project.environment.migration.message": {
-    "message": "Właśnie zmodernizowaliśmy system środowisk w Modrinth i nowe opcje są teraz dostępne. Prosimy o przejście do ustawień projektu i sprawdzenie poprawności metadanych."
+    "message": "Właśnie zmodernizowaliśmy system środowisk w Icarus i nowe opcje są teraz dostępne. Prosimy o przejście do ustawień projektu i sprawdzenie poprawności metadanych."
   },
   "project.environment.migration.review-button": {
     "message": "Sprawdź ustawienia środowiska"
@@ -2630,45 +2615,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Prosimy o dostarczenie dowodu, że posiadasz pozwolenie na rozpowszechnianie wszystkich poniższych plików, a wszelkie wstrzymane wersje zostaną automatycznie opublikowane."
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Przed przesłaniem projektu do oceny prosimy o pokazanie, że posiadasz pozwolenie na rozpowszechnianie wszystkich poniższych plików."
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "Nieznana osadzona treść"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "Wszystkie zewnętrzne treści mają podane źródła."
-  },
-  "project.settings.permissions.completed.title": {
-    "message": "Atrybuty przypisane!"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Żadna z Twoich wersji nie zawiera treści zewnętrznych, więc nie musisz martwić się o uzyskanie zezwoleń."
-  },
-  "project.settings.permissions.empty-state.heading": {
-    "message": "Wszystko gotowe!"
-  },
-  "project.settings.permissions.fail.description": {
-    "message": "Nie masz uprawnień do redystrybucji części dodanych przez siebie treści zewnętrznych. Aby publikować na Modrinth, usuń treści naruszające prawa autorskie."
-  },
-  "project.settings.permissions.fail.title": {
-    "message": "Niektórych treści nie można uwzględnić"
-  },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Jeśli zamieszczasz treści, które nie są hostowane na Modrinth, musisz poinformować nas, skąd pochodzą i potwierdzić, że masz pozwolenie na ich dystrybucję. Sprawdź <link>nasz poradnik</link>, aby dowiedzieć się, jak to zrobić poprawnie!"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "Dowiedz się, jak działają atrybuty"
-  },
-  "project.settings.permissions.learn-more": {
-    "message": "Dowiedz się więcej"
-  },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Szukaj w {count} {count, plural, one {projekcie zewnętrznym} other {projektach zewnętrznych}}..."
-  },
   "project.settings.title": {
     "message": "Ustawienia"
   },
@@ -2686,15 +2632,6 @@
   },
   "project.versions.title": {
     "message": "Wersje"
-  },
-  "project.versions.withheld-versions-warning.description": {
-    "message": "{count, plural, one {Ta wersja jest} other {Te wersje są}} obecnie wstrzymane i nie widnieją na publicznej liście. Proszę o przesłanie potwierdzenia posiadania zgody na redystrybucję określonych plików zawartych w {count, plural, one {tej wersji} other {tych wersjach}} modpacka."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Rozwiąż"
-  },
-  "project.versions.withheld-versions-warning.title": {
-    "message": "{count, plural, one {Wersja {version_name}} other {Wersje}} wstrzymane ze względu na nieznaną osadzoną zawartość"
   },
   "report.already-reported": {
     "message": "Zgłosiłeś już {title}"
@@ -2718,7 +2655,7 @@
     "message": "Nie znaleziono {item, select, project {projektu} version {wersji} user {użytkownika} other {treści}}"
   },
   "report.for.violation": {
-    "message": "Naruszenie <rules-link>zasad Modrinth</rules-link> lub <terms-link>Warunków użytkowania</terms-link>"
+    "message": "Naruszenie <rules-link>zasad Icarus</rules-link> lub <terms-link>Warunków użytkowania</terms-link>"
   },
   "report.for.violation.description": {
     "message": "Przykłady obejmują treści złośliwe, spam, obraźliwe, wprowadzające w błąd, nieprawdziwe i niezgodne z prawem."
@@ -2763,7 +2700,7 @@
     "message": "Jakiego rodzaju treści zgłaszasz?"
   },
   "report.question.report-reason": {
-    "message": "Które z zasad Modrinth {item, select, project {narusza ten projekt} version {narusza ta wersja} user {narusza ten użytkownik} other {naruszają te treści}}?"
+    "message": "Które z zasad Icarus {item, select, project {narusza ten projekt} version {narusza ta wersja} user {narusza ten użytkownik} other {naruszają te treści}}?"
   },
   "report.report-content": {
     "message": "Zgłoś treści do moderacji"
@@ -2967,7 +2904,7 @@
     "message": "Napisz raporty"
   },
   "scopes.sessionAccess.description": {
-    "message": "Dostęp do sesji wydanych przez Modrinth"
+    "message": "Dostęp do sesji wydanych przez Icarus"
   },
   "scopes.sessionAccess.label": {
     "message": "Dostęp do sesji"
@@ -3114,13 +3051,13 @@
     "message": "Tworzenie eksportu..."
   },
   "settings.account.data-export.description": {
-    "message": "Otrzymaj kopię wszystkich danych personalnych, które przesłałeś/aś na Modrinth. Może to potrwać kilka minut."
+    "message": "Otrzymaj kopię wszystkich danych personalnych, które przesłałeś/aś na Icarus. Może to potrwać kilka minut."
   },
   "settings.account.data-export.title": {
     "message": "Eksport danych"
   },
   "settings.account.delete.confirm.description": {
-    "message": "Spowoduje to **natychmiastowe usunięcie wszystkich Twoich projektów i obserwujących**. Usunięcie konta nie może być cofnięte.<br><br>Jeśli potrzebujesz pomocy ze swoim kontem, uzyskaj wsparcie na [Modrinth Discord](https://discord.modrinth.com)."
+    "message": "Spowoduje to **natychmiastowe usunięcie wszystkich Twoich projektów i obserwujących**. Usunięcie konta nie może być cofnięte.<br><br>Jeśli potrzebujesz pomocy ze swoim kontem, uzyskaj wsparcie na [Icarus Discord](https://discord.Icarus.com)."
   },
   "settings.account.delete.confirm.proceed": {
     "message": "Usuń to konto"
@@ -3348,7 +3285,7 @@
     "message": "Czy na pewno chcesz usunąć tę aplikację?"
   },
   "settings.applications.description.intro": {
-    "message": "Aplikacje pozwalają uwierzytelniać użytkowników Modrinth w Twoich produktach. Więcej informacji można znaleźć w <docs-link>dokumentacji API Modrinth</docs-link>."
+    "message": "Aplikacje pozwalają uwierzytelniać użytkowników Icarus w Twoich produktach. Więcej informacji można znaleźć w <docs-link>dokumentacji API Icarus</docs-link>."
   },
   "settings.applications.field.description": {
     "message": "Opis"
@@ -3402,7 +3339,7 @@
     "message": "od"
   },
   "settings.authorizations.description": {
-    "message": "Kiedy autoryzujesz aplikacje ze swoim kontem Modrinth, dajesz jej dostęp do swojego konta. Możesz tutaj zawsze zarządzać oraz przeglądać stan aplikacji z dostępem do Twojego konta."
+    "message": "Kiedy autoryzujesz aplikacje ze swoim kontem Icarus, dajesz jej dostęp do swojego konta. Możesz tutaj zawsze zarządzać oraz przeglądać stan aplikacji z dostępem do Twojego konta."
   },
   "settings.authorizations.empty-state": {
     "message": "Nie udało się nam wyświetlić twoich zautoryzowanych aplikacji, pracujemy nad tym, aby to naprawić. Odwiedź tę stronę później, w innym czasie!"
@@ -3420,16 +3357,16 @@
     "message": "Czy na pewno chcesz unieważnić dostęp tej aplikacji?"
   },
   "settings.billing.charges.description": {
-    "message": "Wszystkie pobrane opłaty z twojego konta Modrinth są wyświetlane poniżej:"
+    "message": "Wszystkie pobrane opłaty z twojego konta Icarus są wyświetlane poniżej:"
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "Okres próbny Medal"
   },
   "settings.billing.charges.product.midas": {
-    "message": "Modrinth Plus"
+    "message": "Icarus Plus"
   },
   "settings.billing.charges.product.pyro": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "settings.billing.charges.title": {
     "message": "Pobrane opłaty"
@@ -3456,13 +3393,13 @@
     "message": "rocznie"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "Brak reklam na modrinth.com i w Modrinth App"
+    "message": "Brak reklam na Icarus.com i w Icarus Launcher"
   },
   "settings.billing.midas.benefits.badge": {
-    "message": "Odznaka Modrinth+ na twoim profilu"
+    "message": "Odznaka Icarus+ na twoim profilu"
   },
   "settings.billing.midas.benefits.support": {
-    "message": "Wspieraj Modrinth oraz twórców bezpośrednio"
+    "message": "Wspieraj Icarus oraz twórców bezpośrednio"
   },
   "settings.billing.midas.benefits.title": {
     "message": "Korzyści"
@@ -3486,7 +3423,7 @@
     "message": "Trwa przetwarzanie Twojej płatności. Dodatkowe korzyści zostaną aktywowane, gdy transakcja zostanie zakończona."
   },
   "settings.billing.midas.upsell": {
-    "message": "Zasubskrybuj do Modrinth Plus!"
+    "message": "Zasubskrybuj do Icarus Plus!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Anuluj subskrypcję"
@@ -3546,7 +3483,7 @@
     "message": "{shared} współdzielonych CPU (może osiągać do {bursts} CPU)"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "Nie znaleziono serwera powiązanego z tą subskrypcją. Mogło się to stać z kilku przyczyn. Jeżeli dopiero kupiłeś/aś serwer, jest to normalne. Przydzielenie serwera może trwać około godziny. Jeżeli kupiłeś/aś serwer chwilę temu, mógł on być zawieszony. Jeżeli nie spodziewałeś/aś się tego, skontaktuj się z obsługą Modrinth i podaj następujące informacje:"
+    "message": "Nie znaleziono serwera powiązanego z tą subskrypcją. Mogło się to stać z kilku przyczyn. Jeżeli dopiero kupiłeś/aś serwer, jest to normalne. Przydzielenie serwera może trwać około godziny. Jeżeli kupiłeś/aś serwer chwilę temu, mógł on być zawieszony. Jeżeli nie spodziewałeś/aś się tego, skontaktuj się z obsługą Icarus i podaj następujące informacje:"
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "ID serwera: {id}"
@@ -3558,7 +3495,7 @@
     "message": "{gb} GB pamięci RAM"
   },
   "settings.billing.pyro.resubscribe.error.text": {
-    "message": "Wystąpił błąd podczas ponawiania subskrypcji do serwera Modrinth."
+    "message": "Wystąpił błąd podczas ponawiania subskrypcji do serwera Icarus."
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Błąd ponawiania subskrypcji"
@@ -3585,10 +3522,10 @@
     "message": "{gb} GB pamięci swap"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Zarządzaj subskrypcjami serwerów Modrinth."
+    "message": "Zarządzaj subskrypcjami serwerów Icarus."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Subskrypcje serwerów Modrinth"
+    "message": "Subskrypcje serwerów Icarus"
   },
   "settings.billing.renews": {
     "message": "Odnawia się {date}"
@@ -3603,7 +3540,7 @@
     "message": "Subskrybuj"
   },
   "settings.billing.subscription.description": {
-    "message": "Zarządzaj swoimi subskrypcjami Modrinth."
+    "message": "Zarządzaj swoimi subskrypcjami Icarus."
   },
   "settings.billing.subscription.title": {
     "message": "Subskrypcje"
@@ -3630,7 +3567,7 @@
     "message": "Wyłącz tryb dewelopera"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Tryb dewelopera</strong> jest aktywny. To umożliwia wyświetlać wewnętrzne identyfikatory różnych rzeczy w Modrinth, które mogą być pomocne, jeśli jesteś deweloperem korzystającym z API Modrinth'a. Kliknij logo Modrinth na dole strony 5 razy, aby przełączać tryb dewelopera."
+    "message": "<strong>Tryb dewelopera</strong> jest aktywny. To umożliwia wyświetlać wewnętrzne identyfikatory różnych rzeczy w Icarus, które mogą być pomocne, jeśli jesteś deweloperem korzystającym z API Icarus'a. Kliknij logo Icarus na dole strony 5 razy, aby przełączać tryb dewelopera."
   },
   "settings.display.flags.description": {
     "message": "Włącz lub wyłącz określone funkcje na tym urządzeniu."
@@ -3693,16 +3630,16 @@
     "message": "Zaawansowane renderowanie"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Spraw, aby linki prowadzące poza Modrinth otwierały się w nowej karcie. Niezależnie od tego ustawienia linki w tej samej domenie i w opisach Markdown będą otwierane w tej samej karcie, a linki w reklamach i edytowanych stronach będą otwierane w nowej karcie."
+    "message": "Spraw, aby linki prowadzące poza Icarus otwierały się w nowej karcie. Niezależnie od tego ustawienia linki w tej samej domenie i w opisach Markdown będą otwierane w tej samej karcie, a linki w reklamach i edytowanych stronach będą otwierane w nowej karcie."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Otwieraj linki zewnętrzne w nowej karcie"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Ukrywa przyciski \"Pobierz Modrinth App\" z głównych stron nawigacji. Strona aplikacji Modrinth nadal może być znaleziona na stronie lądowania lub w stopce."
+    "message": "Ukrywa przyciski \"Pobierz Icarus Launcher\" z głównych stron nawigacji. Strona aplikacji Icarus nadal może być znaleziona na stronie lądowania lub w stopce."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Ukryj reklamy Modrinth App"
+    "message": "Ukryj reklamy Icarus Launcher"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Pasek boczny wyrównany do lewej strony na stronach z treścią"
@@ -3717,7 +3654,7 @@
     "message": "Filtry po prawej na stronach wyszukiwania"
   },
   "settings.display.theme.description": {
-    "message": "Wybierz preferowany motyw dla Modrinth na tym urządzeniu."
+    "message": "Wybierz preferowany motyw dla Icarus na tym urządzeniu."
   },
   "settings.display.theme.title": {
     "message": "Motyw"
@@ -3729,7 +3666,7 @@
     "message": "Utwórz PAT"
   },
   "settings.pats.description": {
-    "message": "PATy zezwalają na dostęp do API Modrinth. Mogą być dowolnie tworzone bądź unieważniane. Więcej informacji zawarte jest w <doc-link>dokumentacji API Modrinth</doc-link>."
+    "message": "PATy zezwalają na dostęp do API Icarus. Mogą być dowolnie tworzone bądź unieważniane. Więcej informacji zawarte jest w <doc-link>dokumentacji API Icarus</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Utwórz PAT"
@@ -3783,7 +3720,7 @@
     "message": "O mnie"
   },
   "settings.profile.description": {
-    "message": "Twoje informacje profilowe są publicznie dostępnie na Modrinth i poprzez <docs-link>API Modrinth</docs-link>."
+    "message": "Twoje informacje profilowe są publicznie dostępnie na Icarus i poprzez <docs-link>API Icarus</docs-link>."
   },
   "settings.profile.head-title": {
     "message": "Ustawienia konta"
@@ -3807,7 +3744,7 @@
     "message": "Aktualna sesja"
   },
   "settings.sessions.description": {
-    "message": "Tu pokazane są wszystkie urządzenia zalogowane na Twoje konto Modrinth. Możesz wylogować się z każdego indywidualnie.\n\nJeżeli widzisz tu wpis, którego nie rozpoznajesz, natychmiast wyloguj to urządzenie i zmień hasło swojego konta Modrinth."
+    "message": "Tu pokazane są wszystkie urządzenia zalogowane na Twoje konto Icarus. Możesz wylogować się z każdego indywidualnie.\n\nJeżeli widzisz tu wpis, którego nie rozpoznajesz, natychmiast wyloguj to urządzenie i zmień hasło swojego konta Icarus."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Ostatnio użyte {ago}"
@@ -3828,7 +3765,7 @@
     "message": "Wyświetlanie"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Najnowsze aktualności z Modrinth"
+    "message": "Najnowsze aktualności z Icarus"
   },
   "ui.latest-news-row.view-all": {
     "message": "Zobacz wszystkie aktualności"
@@ -3840,7 +3777,7 @@
     "message": "Zasubskrybowano!"
   },
   "ui.newsletter-button.tooltip": {
-    "message": "Subskrybuj do newslettera Modrinth"
+    "message": "Subskrybuj do newslettera Icarus"
   },
   "version.environment.none.description": {
     "message": "Środowisko dla tej wersji nie zostało określone."
@@ -3855,3 +3792,4 @@
     "message": "Nieznane środowisko"
   }
 }
+

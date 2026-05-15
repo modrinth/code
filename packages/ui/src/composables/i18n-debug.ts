@@ -30,7 +30,7 @@ export function buildCrowdinUrl(key: string, locale: string): string {
 }
 
 export function initI18nDebugRuntime(context: I18nDebugContext): void {
-	import('@modrinth/assets/styles/i18n-debug.css')
+	import('@icarus/assets/styles/i18n-debug.css')
 	document.body.classList.add('i18n-debug')
 	startMutationObserver(context.registry, context.keyReveal)
 	setupKeyTooltip()

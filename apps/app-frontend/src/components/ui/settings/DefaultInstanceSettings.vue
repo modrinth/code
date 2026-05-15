@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { injectNotificationManager, Slider, StyledInput, Toggle } from '@modrinth/ui'
+import { injectNotificationManager, Slider, StyledInput, Toggle } from '@icarus/ui'
 import { ref, watch } from 'vue'
 
 import useMemorySlider from '@/composables/useMemorySlider'

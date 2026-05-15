@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ProjectStatus } from '@modrinth/utils'
+import type { ProjectStatus } from '@icarus/utils'
 import { computed } from 'vue'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'

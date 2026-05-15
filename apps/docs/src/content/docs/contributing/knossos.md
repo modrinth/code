@@ -1,11 +1,11 @@
 ---
-title: Modrinth Website
-description: Guide for contributing to Modrinth's frontend
+title: Icarus Website
+description: Guide for contributing to Icarus's frontend
 sidebar:
   order: 2
 ---
 
-The [Modrinth Website], codename Knossos, is a Nuxt.js frontend. You will need to install [pnpm] and run the standard commands:
+The [Icarus Website], codename Knossos, is a Nuxt.js frontend. You will need to install [pnpm] and run the standard commands:
 
 ## Setup
 
@@ -15,7 +15,7 @@ The [Modrinth Website], codename Knossos, is a Nuxt.js frontend. You will need t
 
 ### 2. Install dependencies & set up .env
 
-- Clone [`https://github.com/modrinth/code`](https://github.com/modrinth/code) and run `pnpm install` in the workspace root folder.
+- Clone [`https://github.com/Icarus/code`](https://github.com/Icarus/code) and run `pnpm install` in the workspace root folder.
 - In `apps/frontend` you should be able to see `.env.prod`, `.env.staging` — for basic work, it's recommended to use `.env.prod`. Copy the relevant file into a new `.env` file within the `apps/frontend` folder.
 
 ### 3. Run the frontend
@@ -28,5 +28,6 @@ If you're prepared to contribute by submitting a pull request, ensure you have m
 
 - `pnpm prepr:frontend` has been run.
 
-[Modrinth website]: https://github.com/modrinth/code/tree/main/apps/frontend
+[Icarus website]: https://github.com/Icarus/code/tree/main/apps/frontend
 [pnpm]: https://pnpm.io
+

@@ -1,4 +1,4 @@
-import { DownloadIcon, HeartIcon, SettingsIcon } from '@modrinth/assets'
+import { DownloadIcon, HeartIcon, SettingsIcon } from '@icarus/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'

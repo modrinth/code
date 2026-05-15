@@ -1,6 +1,6 @@
 <script setup>
-import { BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, Slider, StyledInput } from '@modrinth/ui'
+import { BoxIcon, FolderSearchIcon, TrashIcon } from '@icarus/assets'
+import { ButtonStyled, injectNotificationManager, Slider, StyledInput } from '@icarus/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref, watch } from 'vue'
 
@@ -102,7 +102,7 @@ async function findLauncherDir() {
 				Purge cache
 			</button>
 			<p class="m-0 leading-tight text-secondary">
-				The Modrinth app stores a cache of data to speed up loading. This can be purged to force the
+				Icarus Launcher stores a cache of data to speed up loading. This can be purged to force the
 				app to reload data. This may slow down the app temporarily.
 			</p>
 		</div>

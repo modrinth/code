@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Combobox, defineMessages, ThemeSelector, Toggle, useVIntl } from '@modrinth/ui'
+import { Combobox, defineMessages, ThemeSelector, Toggle, useVIntl } from '@icarus/ui'
 import { ref, watch } from 'vue'
 
 import { get, set } from '@/helpers/settings.ts'
@@ -20,7 +20,7 @@ const messages = defineMessages({
 	},
 	colorThemeDescription: {
 		id: 'app.appearance-settings.color-theme.description',
-		defaultMessage: 'Select your preferred color theme for Modrinth App.',
+		defaultMessage: 'Select your preferred color theme for Icarus Launcher.',
 	},
 	advancedRenderingTitle: {
 		id: 'app.appearance-settings.advanced-rendering.title',
@@ -98,7 +98,7 @@ const messages = defineMessages({
 	unknownPackWarningDescription: {
 		id: 'app.appearance-settings.unknown-pack-warning.description',
 		defaultMessage:
-			"If you attempt to install a Modrinth Pack file (.mrpack) that isn't hosted on Modrinth, we'll make sure you understand the risks before installing it.",
+			"If you attempt to install a Icarus Pack file (.mrpack) that isn't hosted on Icarus, we'll make sure you understand the risks before installing it.",
 	},
 })
 
@@ -267,3 +267,4 @@ watch(
 		/>
 	</div>
 </template>
+

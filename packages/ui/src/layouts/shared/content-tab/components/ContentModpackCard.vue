@@ -8,7 +8,7 @@ import {
 	Settings2Icon,
 	SpinnerIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import { Tooltip } from 'floating-vue'
 import { computed, getCurrentInstance, onMounted, onUnmounted, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
@@ -119,18 +119,16 @@ const collapsedOptions = computed(() => {
 
 const containerRef = ref<HTMLElement | null>(null)
 const isExpanded = ref(true)
-let observer: ResizeObserver | null = null
+const observer = new ResizeObserver((entries) => {
+	for (const entry of entries) {
+		isExpanded.value = entry.contentRect.width >= 700
+	}
+})
 onMounted(() => {
-	observer = new ResizeObserver((entries) => {
-		for (const entry of entries) {
-			isExpanded.value = entry.contentRect.width >= 700
-		}
-	})
 	if (containerRef.value) observer.observe(containerRef.value)
 })
 onUnmounted(() => {
-	observer?.disconnect()
-	observer = null
+	observer.disconnect()
 })
 </script>
 

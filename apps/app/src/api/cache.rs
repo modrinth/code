@@ -1,5 +1,5 @@
 use crate::api::Result;
-use theseus::prelude::*;
+use pteron::prelude::*;
 
 macro_rules! impl_cache_methods {
     ($(($variant:ident, $type:ty)),*) => {
@@ -8,7 +8,7 @@ macro_rules! impl_cache_methods {
                 #[tauri::command]
                 pub async fn [<get_ $variant:snake>](id: &str, cache_behaviour: Option<CacheBehaviour>) -> Result<Option<$type>>
                 {
-                    Ok(theseus::cache::[<get_ $variant:snake>](id, cache_behaviour).await?)
+                    Ok(pteron::cache::[<get_ $variant:snake>](id, cache_behaviour).await?)
                 }
 
                 #[tauri::command]
@@ -19,7 +19,7 @@ macro_rules! impl_cache_methods {
                 {
                     let ids = ids.iter().map(|x| &**x).collect::<Vec<&str>>();
                     let entries =
-                        theseus::cache::[<get_ $variant:snake _many>](&*ids, cache_behaviour).await?;
+                        pteron::cache::[<get_ $variant:snake _many>](&*ids, cache_behaviour).await?;
 
                     Ok(entries)
                 }
@@ -66,7 +66,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 
 #[tauri::command]
 pub async fn purge_cache_types(cache_types: Vec<CacheValueType>) -> Result<()> {
-    Ok(theseus::cache::purge_cache_types(&cache_types).await?)
+    Ok(pteron::cache::purge_cache_types(&cache_types).await?)
 }
 
 #[tauri::command]
@@ -75,7 +75,7 @@ pub async fn get_project_versions(
     cache_behaviour: Option<CacheBehaviour>,
 ) -> Result<Option<Vec<Version>>> {
     Ok(
-        theseus::cache::get_project_versions(project_id, cache_behaviour)
+        pteron::cache::get_project_versions(project_id, cache_behaviour)
             .await?,
     )
 }

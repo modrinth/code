@@ -84,25 +84,25 @@
 </template>
 
 <script setup>
-import { CheckIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, XIcon } from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	IntlFormatted,
 	normalizeChildren,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import { useAuth } from '@/composables/auth.js'
 import { useScopes } from '@/composables/auth/scopes.ts'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -374,3 +374,4 @@ definePageMeta({
 	}
 }
 </style>
+

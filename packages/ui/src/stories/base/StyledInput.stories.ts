@@ -1,4 +1,4 @@
-import { KeyIcon, LinkIcon, MailIcon, SearchIcon, UserIcon } from '@modrinth/assets'
+import { KeyIcon, LinkIcon, MailIcon, SearchIcon, UserIcon } from '@icarus/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 

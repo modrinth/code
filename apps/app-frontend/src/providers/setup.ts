@@ -1,4 +1,4 @@
-import type { AbstractPopupNotificationManager, AbstractWebNotificationManager } from '@modrinth/ui'
+import type { AbstractPopupNotificationManager, AbstractWebNotificationManager } from '@icarus/ui'
 
 import { setupCreationModal } from './setup/creation-modal'
 import { setupFilePickerProvider } from './setup/file-picker'

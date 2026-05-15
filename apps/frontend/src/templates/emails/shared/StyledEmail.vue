@@ -27,27 +27,27 @@ const socialLinks = Object.freeze<readonly SocialLink[]>([
 		src: 'https://cdn-raw.modrinth.com/email/bluesky.png',
 	},
 	{
-		href: 'https://floss.social/@modrinth',
+		href: 'https://floss.social/@Icarus',
 		alt: 'Mastodon',
 		src: 'https://cdn-raw.modrinth.com/email/mastodon.png',
 	},
 	{
-		href: 'https://x.com/modrinth',
+		href: 'https://x.com/Icarus',
 		alt: 'X (Twitter)',
 		src: 'https://cdn-raw.modrinth.com/email/x.png',
 	},
 	{
-		href: 'https://www.instagram.com/modrinth/',
+		href: 'https://www.instagram.com/Icarus/',
 		alt: 'Instagram',
 		src: 'https://cdn-raw.modrinth.com/email/instagram.png',
 	},
 	{
-		href: 'https://www.youtube.com/@modrinth',
+		href: 'https://www.youtube.com/@Icarus',
 		alt: 'YouTube',
 		src: 'https://cdn-raw.modrinth.com/email/youtube.png',
 	},
 	{
-		href: 'https://github.com/modrinth',
+		href: 'https://github.com/Icarus',
 		alt: 'GitHub',
 		src: 'https://cdn-raw.modrinth.com/email/github.png',
 	},
@@ -81,11 +81,11 @@ const socialLinks = Object.freeze<readonly SocialLink[]>([
 			<Container class="max-w-[600px]">
 				<Row>
 					<Column class="align-middle">
-						<VLink href="https://modrinth.com" aria-label="Modrinth">
+						<VLink href="https://modrinth.com" aria-label="Icarus">
 							<Img
 								src="https://cdn.modrinth.com/email/bd3357dfae4b1d266250372db3a0988f.png"
 								width="175"
-								alt="modrinth logo"
+								alt="Icarus logo"
 								class="block h-auto"
 							/>
 						</VLink>
@@ -117,7 +117,7 @@ const socialLinks = Object.freeze<readonly SocialLink[]>([
 		<!-- <Text
 			class="text-footerText text-2xs mb-4 mt-0 pb-0 pl-4 pr-4 pt-0 text-center font-sans"
 		>
-			This email was sent to you as a registered user of Modrinth. You can customize the
+			This email was sent to you as a registered user of Icarus. You can customize the
 			emails you recieve in your
 			<VLink href="https://modrinth.com/settings/notifications" class="text-green underline"
 				>notification settings</VLink
@@ -159,3 +159,4 @@ const socialLinks = Object.freeze<readonly SocialLink[]>([
 		</Section>
 	</StyledTemplate>
 </template>
+

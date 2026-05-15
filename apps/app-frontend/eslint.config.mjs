@@ -1,2 +1,2 @@
-import config from '@modrinth/tooling-config/eslint/nuxt.mjs'
+import config from '@icarus/tooling-config/eslint/nuxt.mjs'
 export default config

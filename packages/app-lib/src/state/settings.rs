@@ -1,11 +1,34 @@
-//! Theseus settings file
+//! Pteron settings file
 
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Sqlite};
 use std::collections::HashMap;
 
 // Types
-/// Global Theseus settings
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SyncSettings {
+    pub enabled: bool,
+    pub files: Vec<String>,
+    pub folders: Vec<String>,
+}
+
+impl Default for SyncSettings {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            files: vec!["options.txt".to_string(), "servers.dat".to_string()],
+            folders: vec![
+                "saves".to_string(),
+                "screenshots".to_string(),
+                "resourcepacks".to_string(),
+                "shaderpacks".to_string(),
+                "schematics".to_string(),
+            ],
+        }
+    }
+}
+
+/// Global Pteron settings
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Settings {
     pub max_concurrent_downloads: usize,
@@ -20,9 +43,7 @@ pub struct Settings {
     pub native_decorations: bool,
     pub toggle_sidebar: bool,
 
-    pub telemetry: bool,
     pub discord_rpc: bool,
-    pub personalized_ads: bool,
 
     pub onboarded: bool,
 
@@ -44,6 +65,7 @@ pub struct Settings {
     pub skipped_update: Option<String>,
     pub pending_update_toast_for_version: Option<String>,
     pub auto_download_updates: Option<bool>,
+    pub sync: SyncSettings,
 
     pub version: usize,
 }
@@ -74,13 +96,14 @@ impl Settings {
             SELECT
                 max_concurrent_writes, max_concurrent_downloads,
                 theme, locale, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,
-                discord_rpc, developer_mode, telemetry, personalized_ads,
+                discord_rpc, developer_mode,
                 onboarded,
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
                 hook_pre_launch, hook_wrapper, hook_post_exit,
                 custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,
                 skipped_update, pending_update_toast_for_version, auto_download_updates,
+                sync_enabled, json(sync_files) sync_files, json(sync_folders) sync_folders,
                 version
             FROM settings
             "
@@ -99,10 +122,8 @@ impl Settings {
             advanced_rendering: res.advanced_rendering == 1,
             native_decorations: res.native_decorations == 1,
             toggle_sidebar: res.toggle_sidebar == 1,
-            telemetry: res.telemetry == 1,
             discord_rpc: res.discord_rpc == 1,
             developer_mode: res.developer_mode == 1,
-            personalized_ads: res.personalized_ads == 1,
             onboarded: res.onboarded == 1,
             extra_launch_args: res
                 .extra_launch_args
@@ -140,6 +161,19 @@ impl Settings {
             pending_update_toast_for_version: res
                 .pending_update_toast_for_version,
             auto_download_updates: res.auto_download_updates.map(|x| x == 1),
+            sync: SyncSettings {
+                enabled: res.sync_enabled == 1,
+                files: res
+                    .sync_files
+                    .as_ref()
+                    .and_then(|x| serde_json::from_str(x).ok())
+                    .unwrap_or_else(|| SyncSettings::default().files),
+                folders: res
+                    .sync_folders
+                    .as_ref()
+                    .and_then(|x| serde_json::from_str(x).ok())
+                    .unwrap_or_else(|| SyncSettings::default().folders),
+            },
             version: res.version as usize,
         })
     }
@@ -155,6 +189,9 @@ impl Settings {
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
         let feature_flags = serde_json::to_string(&self.feature_flags)?;
+        let sync_files = serde_json::to_string(&self.sync.files)?;
+        let sync_folders = serde_json::to_string(&self.sync.folders)?;
+        let sync_enabled = self.sync.enabled as i32;
         let version = self.version as i64;
 
         sqlx::query!(
@@ -173,36 +210,37 @@ impl Settings {
 
                 discord_rpc = $9,
                 developer_mode = $10,
-                telemetry = $11,
-                personalized_ads = $12,
 
-                onboarded = $13,
+                onboarded = $11,
 
-                extra_launch_args = jsonb($14),
-                custom_env_vars = jsonb($15),
-                mc_memory_max = $16,
-                mc_force_fullscreen = $17,
-                mc_game_resolution_x = $18,
-                mc_game_resolution_y = $19,
-                hide_on_process_start = $20,
+                extra_launch_args = json($12),
+                custom_env_vars = json($13),
+                mc_memory_max = $14,
+                mc_force_fullscreen = $15,
+                mc_game_resolution_x = $16,
+                mc_game_resolution_y = $17,
+                hide_on_process_start = $18,
 
-                hook_pre_launch = $21,
-                hook_wrapper = $22,
-                hook_post_exit = $23,
+                hook_pre_launch = $19,
+                hook_wrapper = $20,
+                hook_post_exit = $21,
 
-                custom_dir = $24,
-                prev_custom_dir = $25,
-                migrated = $26,
+                custom_dir = $22,
+                prev_custom_dir = $23,
+                migrated = $24,
 
-                toggle_sidebar = $27,
-                feature_flags = $28,
-                hide_nametag_skins_page = $29,
+                toggle_sidebar = $25,
+                feature_flags = $26,
+                hide_nametag_skins_page = $27,
 
-                skipped_update = $30,
-                pending_update_toast_for_version = $31,
-                auto_download_updates = $32,
+                skipped_update = $28,
+                pending_update_toast_for_version = $29,
+                auto_download_updates = $30,
+                sync_enabled = $31,
+                sync_files = json($32),
+                sync_folders = json($33),
 
-                version = $33
+                version = $34
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -214,8 +252,6 @@ impl Settings {
             self.native_decorations,
             self.discord_rpc,
             self.developer_mode,
-            self.telemetry,
-            self.personalized_ads,
             self.onboarded,
             extra_launch_args,
             custom_env_vars,
@@ -236,6 +272,9 @@ impl Settings {
             self.skipped_update,
             self.pending_update_toast_for_version,
             self.auto_download_updates,
+            sync_enabled,
+            sync_files,
+            sync_folders,
             version,
         )
         .execute(exec)
@@ -307,7 +346,7 @@ impl Settings {
     }
 }
 
-/// Theseus theme
+/// Pteron theme
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Theme {
@@ -333,7 +372,7 @@ impl Theme {
             "light" => Theme::Light,
             "oled" => Theme::Oled,
             "system" => Theme::System,
-            _ => Theme::Dark,
+            _ => Theme::Oled,
         }
     }
 }

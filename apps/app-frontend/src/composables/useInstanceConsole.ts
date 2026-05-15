@@ -1,4 +1,4 @@
-import { createConsoleState } from '@modrinth/ui'
+import { createConsoleState } from '@icarus/ui'
 
 import { clear_log_buffer, get_live_log_buffer, get_logs } from '@/helpers/logs'
 

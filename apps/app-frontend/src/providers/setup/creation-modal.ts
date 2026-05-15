@@ -3,15 +3,14 @@ import type {
 	AbstractWebNotificationManager,
 	CreationFlowContextValue,
 	CreationFlowModal,
-} from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@modrinth/ui'
+} from '@icarus/ui'
+import { defineMessages, useVIntl } from '@icarus/ui'
 import { provide, ref, useTemplateRef } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 import { useRouter } from 'vue-router'
 
 import type UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import type ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
@@ -66,7 +65,7 @@ export function setupCreationModal(
 		iconUrl?: string,
 	) {
 		await create_profile_and_install(projectId, versionId, name, iconUrl).catch(handleError)
-		trackEvent('InstanceCreate', { source: 'CreationModalModpack' })
+		
 	}
 
 	async function handleCreate(config: CreationFlowContextValue) {
@@ -97,7 +96,7 @@ export function setupCreationModal(
 						await import_instance(launcher.name, launcher.path, name).catch(handleError)
 					}
 				}
-				trackEvent('InstanceCreate', { source: 'CreationModalImport' })
+				
 				return
 			}
 
@@ -126,7 +125,7 @@ export function setupCreationModal(
 					},
 				).catch(handleError)
 				popupNotificationManager.removeNotification(waitingNotification.id)
-				trackEvent('InstanceCreate', { source: 'CreationModalModpackFile' })
+				
 				return
 			}
 
@@ -149,9 +148,7 @@ export function setupCreationModal(
 				false,
 			).catch(handleError)
 
-			trackEvent('InstanceCreate', {
-				source: 'CreationModal',
-			})
+			
 		} catch (err) {
 			handleError(err as Error)
 		}

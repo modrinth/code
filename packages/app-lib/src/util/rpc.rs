@@ -210,7 +210,7 @@ impl RunningRpcServer {
                     },
                 },
                 None => RpcMessageBody::Error {
-                    error: format!("Unknown theseus RPC method {method}"),
+                    error: format!("Unknown pteron RPC method {method}"),
                 },
             };
             Ok(Some(RpcMessage {

@@ -1,6 +1,6 @@
-# Modrinth Documentation
+# Icarus Documentation
 
-Welcome to the Modrinth documentation!
+Welcome to the Icarus documentation!
 
 ## Development
 
@@ -21,3 +21,4 @@ pnpm docs:dev
 ```
 
 You should now have a development build of the documentation site running with hot-reloading enabled. Any changes you make to the code will automatically refresh the browser.
+

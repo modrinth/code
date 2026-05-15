@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { BoxIcon, PackageIcon, PackagePlusIcon } from '@modrinth/assets'
+import { BoxIcon, PackageIcon, PackagePlusIcon } from '@icarus/assets'
 
 import {
 	type CompatibilityType,

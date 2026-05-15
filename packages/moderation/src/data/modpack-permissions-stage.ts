@@ -1,6 +1,6 @@
-import type { Labrinth } from '@modrinth/api-client'
-import { PackageOpenIcon } from '@modrinth/assets'
-import type { ModerationModpackPermissionApprovalType } from '@modrinth/utils'
+import type { Labrinth } from '@icarus/api-client'
+import { PackageOpenIcon } from '@icarus/assets'
+import type { ModerationModpackPermissionApprovalType } from '@icarus/utils'
 
 import type { Stage } from '../types/stage'
 

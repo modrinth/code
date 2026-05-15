@@ -1,8 +1,8 @@
-import type { AbstractModrinthClient } from '@modrinth/api-client'
+import type { AbstractModrinthClient } from '@icarus/api-client'
 
 import { createContext } from './create-context'
 
-export const [injectModrinthClient, provideModrinthClient] = createContext<AbstractModrinthClient>(
+export const [injectIcarusClient, provideIcarusClient] = createContext<AbstractModrinthClient>(
 	'root',
 	'modrinthClient',
 )

@@ -160,7 +160,7 @@ import {
 	RightArrowIcon,
 	SpinnerIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Admonition,
 	ButtonStyled,
@@ -172,7 +172,7 @@ import {
 	NewModal,
 	normalizeChildren,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 import { type FormRequestResponse, useAvalara1099 } from '@/composables/avalara1099'
 
@@ -226,7 +226,7 @@ const messages = defineMessages({
 	securityDescription: {
 		id: 'dashboard.creator-tax-form-modal.security.description',
 		defaultMessage:
-			'Modrinth uses third-party provider Track1099 to securely collect and store your tax forms. <security-link>Learn more here.</security-link>',
+			'Icarus uses third-party provider Track1099 to securely collect and store your tax forms. <security-link>Learn more here.</security-link>',
 	},
 	usCitizenQuestion: {
 		id: 'dashboard.creator-tax-form-modal.us-citizen.question',
@@ -434,3 +434,4 @@ dialog[open] > iframe[src*='form_embed'] {
 	}
 }
 </style>
+

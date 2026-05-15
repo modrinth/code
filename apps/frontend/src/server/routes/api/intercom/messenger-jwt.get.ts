@@ -1,4 +1,4 @@
-import { type Labrinth, ModrinthApiError } from '@modrinth/api-client'
+import { type Labrinth, ModrinthApiError } from '@icarus/api-client'
 import { SignJWT } from 'jose'
 
 import { useServerModrinthClient } from '~/server/utils/api-client'

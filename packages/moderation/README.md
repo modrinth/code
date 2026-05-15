@@ -1,8 +1,8 @@
 <!-- TODO: After checklist v1.5, move everything into src directory. -->
 
-# @modrinth/moderation
+# @Icarus/moderation
 
-This package contains both the moderation checklist system used by moderators for reviewing projects on Modrinth, and the publishing checklist (nag system) that provides automated feedback to project authors during the submission process.
+This package contains both the moderation checklist system used by moderators for reviewing projects on Icarus, and the publishing checklist (nag system) that provides automated feedback to project authors during the submission process.
 
 ## Structure
 
@@ -240,3 +240,4 @@ newNagDescription: {
   id: 'nags.new-nag.description',
   defaultMessage: 'Description of the new nag issue.',
 ```
+

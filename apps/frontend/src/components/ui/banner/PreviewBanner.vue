@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { XIcon } from '@modrinth/assets'
+import { XIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	commonMessages,
@@ -8,21 +8,20 @@ import {
 	normalizeChildren,
 	PagewideBanner,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
 const config = useRuntimeConfig()
-const route = useRoute()
 
 const messages = defineMessages({
 	title: {
 		id: 'layout.banner.preview.title',
-		defaultMessage: `This is a preview deploy of the Modrinth website.`,
+		defaultMessage: `This is a preview deploy of the Icarus website.`,
 	},
 	description: {
 		id: 'layout.banner.preview.description',
-		defaultMessage: `If you meant to access the official Modrinth website, visit {url}. This preview deploy is used by Modrinth staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}.`,
+		defaultMessage: `If you meant to access the official Icarus website, visit <link>https://modrinth.com</link>. This preview deploy is used by Icarus staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}.`,
 	},
 })
 
@@ -30,12 +29,10 @@ function hidePreviewBanner() {
 	flags.value.hidePreviewBanner = true
 	saveFeatureFlags()
 }
-
-const url = computed(() => `https://modrinth.com${route.fullPath}`)
 </script>
 
 <template>
-	<PagewideBanner v-if="!flags.hidePreviewBanner || flags.showAllBanners" variant="info">
+	<PagewideBanner v-if="!flags.hidePreviewBanner" variant="info">
 		<template #title>
 			<span>{{ formatMessage(messages.title) }}</span>
 		</template>
@@ -48,9 +45,9 @@ const url = computed(() => `https://modrinth.com${route.fullPath}`)
 						branch: config.public.branch,
 					}"
 				>
-					<template #url>
-						<a :href="url" target="_blank" rel="noopener" class="text-link">
-							{{ url }}
+					<template #link="{ children }">
+						<a href="https://modrinth.com" target="_blank" rel="noopener" class="text-link">
+							<component :is="() => normalizeChildren(children)" />
 						</a>
 					</template>
 					<template #branch-link="{ children }">
@@ -78,7 +75,7 @@ const url = computed(() => `https://modrinth.com${route.fullPath}`)
 				</IntlFormatted>
 			</span>
 		</template>
-		<template #actions_top_right>
+		<template #actions_right>
 			<ButtonStyled type="transparent" circular>
 				<button :aria-label="formatMessage(commonMessages.closeButton)" @click="hidePreviewBanner">
 					<XIcon aria-hidden="true" />
@@ -87,3 +84,4 @@ const url = computed(() => `https://modrinth.com${route.fullPath}`)
 		</template>
 	</PagewideBanner>
 </template>
+

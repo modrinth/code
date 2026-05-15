@@ -1,10 +1,15 @@
-# ![Modrinth App](/.github/assets/app_cover.png)
+# Icarus Launcher
 
-## Modrinth App
+Icarus Launcher is a high-performance desktop application for managing your Minecraft mods and instances. A powerful fork of the Icarus Launcher, built with [Tauri](https://tauri.app/) and [Vue](https://vuejs.org/), designed for speed and enhanced privacy.
 
-The Modrinth App is a desktop application for managing your Minecraft mods. It is built with [Tauri](https://tauri.app/) and [Vue](https://vuejs.org/).
+## ✨ Unique Features
 
-If you're not a developer and you've stumbled upon this repository, you can download the latest release of the app from the [Modrinth website](https://modrinth.com/app).
+- **🔄 Cloud Sync**: Synchronize your instances, settings, and profiles across multiple devices seamlessly.
+- **🎮 Offline Support**: Play your favorite instances without an internet connection, perfect for on-the-go gaming.
+- **👑 Taxphobia Integration**: Native support for the Taxphobia ecosystem and branding.
+- **🚀 Performance Focused**: Built on Rust and Vue for the snappiest experience possible.
+
+If you're looking for the latest version, check out the [Releases](https://github.com/fraa2a/Icarus-Launcher/releases) page.
 
 ## Development
 
@@ -27,3 +32,11 @@ pnpm app:dev
 ```
 
 You should now have a development build of the app running with hot-reloading enabled. Any changes you make to the code will automatically refresh the app.
+
+### TaxPhobia news environment
+
+To keep the API key out of source code, configure:
+
+- `TAXPHOBIA_API_KEY` (required)
+- `TAXPHOBIA_API_URL` (optional, defaults to `https://taxphobia.top/api`)
+

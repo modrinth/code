@@ -1,7 +1,6 @@
 import { LRUCache } from 'lru-cache'
 
 import { injectI18n } from '../providers/i18n'
-import { LOCALES } from './i18n.ts'
 
 const formatterCache = new LRUCache<string, Intl.NumberFormat>({ max: 15 })
 
@@ -36,13 +35,16 @@ export function useCompactNumber() {
 		return twoDigitsCompactFormatter.format(value)
 	}
 
-	function formatCompactNumberPlural(value: number | bigint): number | bigint {
+	function formatCompactNumberPlural(value: number | bigint): string {
 		if (value < 10_000) {
-			return value
+			return value.toString()
 		}
-		const currentLocale = locale.value
-		const localeDefinition = LOCALES.find((l) => l.code === currentLocale)
-		return localeDefinition?.compactNumberPlural ?? NaN
+		if (value < 1_000_000) {
+			const oneDigitCompactFormatter = getCompactFormatter(locale.value, 1)
+			return oneDigitCompactFormatter.format(value)
+		}
+		const twoDigitsCompactFormatter = getCompactFormatter(locale.value, 2)
+		return twoDigitsCompactFormatter.format(value)
 	}
 
 	return { formatCompactNumber, formatCompactNumberPlural }

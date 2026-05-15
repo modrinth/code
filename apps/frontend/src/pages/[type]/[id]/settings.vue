@@ -8,18 +8,17 @@ import {
 	InfoIcon,
 	LinkIcon,
 	ServerIcon,
-	SignatureIcon,
 	TagsIcon,
 	UsersIcon,
 	VersionIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	commonMessages,
 	commonProjectSettingsMessages,
 	injectProjectPageContext,
 	useVIntl,
-} from '@modrinth/ui'
-import { isStaff } from '@modrinth/utils'
+} from '@icarus/ui'
+import { isStaff } from '@icarus/utils'
 import { useLocalStorage, useScroll } from '@vueuse/core'
 import { computed } from 'vue'
 
@@ -46,12 +45,6 @@ const navItems = computed(() => {
 	const showEnvironment =
 		projectV3.value?.project_types?.some((type) => ['mod', 'modpack'].includes(type)) &&
 		isStaff(currentMember.value?.user)
-
-	const hasPermissionsPage = computed(
-		() =>
-			flags.value.modpackPermissionsPage &&
-			projectV3.value?.project_types?.some((type) => ['modpack'].includes(type)),
-	)
 
 	const items = [
 		{
@@ -81,11 +74,6 @@ const navItems = computed(() => {
 			link: `/${base}/settings/description`,
 			label: formatMessage(commonProjectSettingsMessages.description),
 			icon: AlignLeftIcon,
-		},
-		hasPermissionsPage.value && {
-			link: `/${base}/settings/permissions`,
-			label: formatMessage(commonProjectSettingsMessages.permissions),
-			icon: SignatureIcon,
 		},
 		!isServerProject.value && {
 			link: `/${base}/settings/versions`,

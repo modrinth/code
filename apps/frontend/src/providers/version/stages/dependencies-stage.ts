@@ -1,32 +1,59 @@
-import { PlusIcon, XIcon } from '@modrinth/assets'
-import type { StageConfigInput } from '@modrinth/ui'
+import { LeftArrowIcon, RightArrowIcon, XIcon } from '@icarus/assets'
+import type { StageConfigInput } from '@icarus/ui'
 import { markRaw } from 'vue'
 
 import DependenciesStage from '~/components/ui/create-project-version/stages/DependenciesStage.vue'
 
 import type { ManageVersionContextValue } from '../manage-version-modal'
 
+export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
+	id: 'add-dependencies',
+	stageContent: markRaw(DependenciesStage),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit version' : 'Dependencies'),
+	skip: (ctx) => ctx.suggestedDependencies.value != null || ctx.projectType.value === 'modpack',
+	leftButtonConfig: (ctx) =>
+		ctx.editingVersion.value
+			? {
+					label: 'Cancel',
+					icon: XIcon,
+					onClick: () => ctx.modal.value?.hide(),
+				}
+			: {
+					label: 'Back',
+					icon: LeftArrowIcon,
+					onClick: () => ctx.modal.value?.prevStage(),
+				},
+	rightButtonConfig: (ctx) =>
+		ctx.editingVersion.value
+			? ctx.saveButtonConfig()
+			: {
+					label: ctx.getNextLabel(),
+					icon: RightArrowIcon,
+					iconPosition: 'after',
+					onClick: () => ctx.modal.value?.nextStage(),
+				},
+	nonProgressStage: (ctx) => ctx.editingVersion.value,
+}
+
 export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'from-details-dependencies',
 	stageContent: markRaw(DependenciesStage),
-	title: 'Add dependency',
+	title: 'Edit version',
 	nonProgressStage: true,
 	leftButtonConfig: (ctx) => ({
-		label: 'Cancel',
-		icon: XIcon,
-		onClick: () => {
-			ctx.resetNewDependency()
-			ctx.modal.value?.setStage('metadata')
-		},
+		label: 'Back',
+		icon: LeftArrowIcon,
+		onClick: () => ctx.modal.value?.setStage('metadata'),
 	}),
-	rightButtonConfig: (ctx) => ({
-		label: 'Add dependency',
-		icon: PlusIcon,
-		iconPosition: 'before',
-		color: 'green',
-		disabled: !ctx.newDependencyProjectId.value,
-		onClick: () => {
-			if (ctx.addNewDependency()) ctx.modal.value?.setStage('metadata')
-		},
-	}),
+	rightButtonConfig: (ctx) =>
+		ctx.editingVersion.value
+			? {
+					...ctx.saveButtonConfig(),
+				}
+			: {
+					label: 'Add details',
+					icon: RightArrowIcon,
+					iconPosition: 'after',
+					onClick: () => ctx.modal.value?.setStage('add-details'),
+				},
 }

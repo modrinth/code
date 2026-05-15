@@ -431,6 +431,9 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Ladda upp filer"
   },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Laddar upp filler ({completed}/{total})"
+  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Det valda innehållet är redan inaktiverat"
   },
@@ -956,6 +959,12 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Okänt spelläge"
   },
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "Filer laddas fortfarande upp. Om du lämnar sidan kommer uppladdningen avbrytas och dina ändringar kommer förloras."
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Uppladdning pågår"
+  },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} {count, plural, one {kompatibel} other {kompatibla}} {count, plural, one {instans} other {instanser}}"
   },
@@ -1368,16 +1377,16 @@
     "defaultMessage": "Håll filer uppdaterade när servern ändras"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Installera Modrinth App"
+    "defaultMessage": "Installera Icarus Launcher"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App kommer att öppnas automatiskt..."
+    "defaultMessage": "Icarus Launcher kommer att öppnas automatiskt..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Öppnar Modrinth App"
+    "defaultMessage": "Öppnar Icarus Launcher"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Varför använda Modrinth App"
+    "defaultMessage": "Varför använda Icarus Launcher"
   },
   "notification.error.title": {
     "defaultMessage": "Ett fel inträffade"
@@ -1403,11 +1412,14 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Misslyckad"
   },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listad"
+  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Modrinth-teamet"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "Icarus-teamet"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "Väntar"
@@ -1438,6 +1450,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Ej avklarad"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Tillhandahållen"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopiera kod till urklipp"
@@ -1821,7 +1836,7 @@
     "defaultMessage": "Spelades senast {count} {countPlural, plural, one {gång} other {gånger}}"
   },
   "project.recent-plays.tooltip": {
-    "defaultMessage": "Spelades på Modrinth {count} {countPlural, plural, one {gång} other {gånger}} i de 2 sista veckorna"
+    "defaultMessage": "Spelades på Icarus {count} {countPlural, plural, one {gång} other {gånger}} i de 2 sista veckorna"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Detta projektet använder ett modpaket"
@@ -2133,7 +2148,7 @@
     "defaultMessage": "Ditt projekt har flera miljöer"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Vi har just förbättrat Miljösystemet på Modrinth och nya val finns nu. Vänligen kontrollera att rätt val är vald nedanför och sen klicka på 'Verifiera' när du är klar!"
+    "defaultMessage": "Vi har just förbättrat Miljösystemet på Icarus och nya val finns nu. Vänligen kontrollera att rätt val är vald nedanför och sen klicka på 'Verifiera' när du är klar!"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Granska valen nedan"
@@ -2363,11 +2378,20 @@
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Något gick fel när vi försökte återställa från säkerhetskopian {backupName}. Vänligen försök igen eller kontakta support om felet återkommer."
   },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Äterställning från säkerhetskopia misslyckades"
+  },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Återställning från {backupName} är köad och kommer att börja strax."
   },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Återställning från säkerhetskopia köad"
+  },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Din server har återställts till {backupName} och är redo för att startas."
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Äterställning från säkerhetskopia lyckades"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Återställer din server från {backupName}. Detta kan ta några minuter."
@@ -2380,6 +2404,12 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Säkerhetskopieringschema"
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Misslyckades med att skapa säkerhetskopia"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Misslyckades med att återställa från säkerhetskopia"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuel säkerhetskopiering"
@@ -2475,7 +2505,7 @@
     "defaultMessage": "Vart vill du att din server ska vara placerad?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Är området inte med i listan? <link>Berätta vart du vill se Modrinth Hosting härnäst!</link>"
+    "defaultMessage": "Är området inte med i listan? <link>Berätta vart du vill se Icarus Hosting härnäst!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sydostasien"
@@ -2520,7 +2550,7 @@
     "defaultMessage": "Mörkt"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Välj färgtema för Modrinth på denna enhet."
+    "defaultMessage": "Välj färgtema för Icarus på denna enhet."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Ljust"
@@ -2979,4 +3009,5 @@
     "defaultMessage": "Du har osparade ändringar."
   }
 }
+
 

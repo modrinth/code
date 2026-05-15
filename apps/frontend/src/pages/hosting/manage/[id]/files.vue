@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {
-	injectModrinthClient,
-	injectModrinthServerContext,
+	injectIcarusClient,
+	injectIcarusServerContext,
 	ServersManageFilesPage,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
-const client = injectModrinthClient()
-const { server, serverId } = injectModrinthServerContext()
+const client = injectIcarusClient()
+const { server, serverId } = injectIcarusServerContext()
 const queryClient = useQueryClient()
 const flags = useFeatureFlags()
 

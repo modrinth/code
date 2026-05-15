@@ -1,6 +1,6 @@
 ---
 name: i18n-pass
-description: Perform an i18n localization pass on changed files or a pull request, converting hard-coded English strings to the @modrinth/ui i18n system. Use when internationalizing a set of changes, reviewing a PR for untranslated strings, or converting a specific component.
+description: Perform an i18n localization pass on changed files or a pull request, converting hard-coded English strings to the @icarus/ui i18n system. Use when internationalizing a set of changes, reviewing a PR for untranslated strings, or converting a specific component.
 argument-hint: [file-path-or-pr-number]
 ---
 
@@ -22,3 +22,4 @@ Refer to the standard: @standards/frontend/INTERNATIONALIZATION.md
 6. **Replace strings in templates** with `formatMessage()` calls, or `<IntlFormatted>` for strings containing links or markup.
 7. **Handle ICU edge cases** — add a space before `}}` if an ICU placeholder ends at a Vue template delimiter boundary.
 8. **Verify** no hard-coded English strings remain in the changed templates. Do not alter logic, layout, or reactivity.
+

@@ -62,15 +62,15 @@
 	</div>
 </template>
 <script setup>
-import { ChevronRightIcon, HistoryIcon } from '@modrinth/assets'
+import { ChevronRightIcon, HistoryIcon } from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import NotificationItem from '~/components/ui/NotificationItem.vue'
@@ -115,11 +115,11 @@ const messages = defineMessages({
 })
 
 useHead({
-	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
+	title: () => `${formatMessage(messages.headTitle)} - Icarus`,
 })
 
 const auth = await useAuth()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 const { data, refetch } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'notifications']),
@@ -177,3 +177,4 @@ const extraNotifs = computed(() => (data.value ? data.value.extraNotifs : 0))
 	}
 }
 </style>
+

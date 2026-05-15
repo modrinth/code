@@ -1,4 +1,4 @@
-import { TagsIcon } from '@modrinth/assets'
+import { TagsIcon } from '@icarus/assets'
 
 import type { ButtonAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'

@@ -1,6 +1,6 @@
 use crate::api::Result;
 use tauri::Runtime;
-use theseus::prelude::*;
+use pteron::prelude::*;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("settings")

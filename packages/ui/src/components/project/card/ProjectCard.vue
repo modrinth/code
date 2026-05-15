@@ -62,11 +62,7 @@
 								:hide-label="true"
 							/>
 							<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
-							<ServerRegion
-								v-if="serverRegion"
-								:region="serverRegion"
-								class="smart-clickable:allow-pointer-events"
-							/>
+							<ServerRegion v-if="serverRegion" :region="serverRegion" />
 						</template>
 						<ProjectCardEnvironment
 							v-if="environment"
@@ -162,11 +158,7 @@
 					<div class="flex items-center gap-1">
 						<template v-if="isServerProject">
 							<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
-							<ServerRegion
-								v-if="serverRegion"
-								:region="serverRegion"
-								class="smart-clickable:allow-pointer-events"
-							/>
+							<ServerRegion v-if="serverRegion" :region="serverRegion" />
 						</template>
 						<ProjectCardEnvironment
 							v-if="environment"
@@ -197,7 +189,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ProjectStatus } from '@modrinth/utils'
+import type { ProjectStatus } from '@icarus/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
@@ -430,3 +422,4 @@ const cssColor = computed(() => {
 	opacity: 0.7;
 }
 </style>
+

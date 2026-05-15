@@ -95,47 +95,8 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Resubscribe to Server"
   },
-  "browse.filter-results": {
-    "defaultMessage": "Filter results..."
-  },
-  "browse.no-results": {
-    "defaultMessage": "No results found for your query!"
-  },
-  "browse.offline": {
-    "defaultMessage": "You are currently offline. Connect to the internet to browse Modrinth!"
-  },
-  "browse.search.placeholder": {
-    "defaultMessage": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} server {servers} other {projects}}..."
-  },
-  "browse.selected-projects-floating-bar.aria-label": {
-    "defaultMessage": "Selected projects"
-  },
-  "browse.selected-projects-floating-bar.install": {
-    "defaultMessage": "Install {count, plural, one {# project} other {# projects}}"
-  },
-  "browse.selected-projects-floating-bar.selected-count": {
-    "defaultMessage": "{count, plural, one {# project selected} other {# projects selected}}"
-  },
-  "browse.selected-projects-leave-modal.admonition-body": {
-    "defaultMessage": "You have selected {count, plural, one {# project} other {# projects}} to install. Install them now or go back without installing them."
-  },
-  "browse.selected-projects-leave-modal.admonition-header": {
-    "defaultMessage": "Selected projects not installed yet"
-  },
-  "browse.selected-projects-leave-modal.discard": {
-    "defaultMessage": "Discard"
-  },
-  "browse.selected-projects-leave-modal.header": {
-    "defaultMessage": "Selected projects not installed yet"
-  },
-  "browse.view-prefix": {
-    "defaultMessage": "View:"
-  },
   "button.accept": {
     "defaultMessage": "Accept"
-  },
-  "button.add-server-to-instance": {
-    "defaultMessage": "Add server to instance"
   },
   "button.affiliate-links": {
     "defaultMessage": "Affiliate links"
@@ -206,9 +167,6 @@
   "button.hide-snapshots": {
     "defaultMessage": "Hide snapshots"
   },
-  "button.install": {
-    "defaultMessage": "Install"
-  },
   "button.max": {
     "defaultMessage": "Max"
   },
@@ -226,9 +184,6 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Open in folder"
-  },
-  "button.open-in-modrinth": {
-    "defaultMessage": "Open in Modrinth"
   },
   "button.play": {
     "defaultMessage": "Play"
@@ -322,9 +277,6 @@
   },
   "collections.label.private": {
     "defaultMessage": "Private"
-  },
-  "content.card.select-project": {
-    "defaultMessage": "Select {project}"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Are you sure you want to update {count, plural, one {# project} other {# projects}} to their latest compatible version? It's recommended to update content one-by-one."
@@ -768,7 +720,7 @@
     "defaultMessage": "Import instance"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Browse modpacks on Modrinth or import one from a file."
+    "defaultMessage": "Browse modpacks on Icarus or import one from a file."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
     "defaultMessage": "Install modpack"
@@ -805,24 +757,6 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Set up server"
-  },
-  "external-project-license-status.no": {
-    "defaultMessage": "No"
-  },
-  "external-project-license-status.permanent-no": {
-    "defaultMessage": "Permanent no"
-  },
-  "external-project-license-status.unidentified": {
-    "defaultMessage": "Unidentified"
-  },
-  "external-project-license-status.with-attribution": {
-    "defaultMessage": "With attribution"
-  },
-  "external-project-license-status.with-attribution-and-source": {
-    "defaultMessage": "With attribution and source"
-  },
-  "external-project-license-status.yes": {
-    "defaultMessage": "Yes"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Extract summary"
@@ -1265,21 +1199,6 @@
   "form.placeholder.state": {
     "defaultMessage": "Enter state/province"
   },
-  "format.bytes.0": {
-    "defaultMessage": "{count, plural, one {# byte} other {# bytes}}"
-  },
-  "format.bytes.1": {
-    "defaultMessage": "{count, number} KiB"
-  },
-  "format.bytes.2": {
-    "defaultMessage": "{count, number} MiB"
-  },
-  "format.bytes.3": {
-    "defaultMessage": "{count, number} GiB"
-  },
-  "format.bytes.4": {
-    "defaultMessage": "{count, number} TiB"
-  },
   "header.category.category": {
     "defaultMessage": "Category"
   },
@@ -1315,9 +1234,6 @@
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Failed to update content"
-  },
-  "hosting.content.failed-to-install": {
-    "defaultMessage": "Failed to install content"
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Failed to load modpack content"
@@ -1772,35 +1688,20 @@
   "label.filter-by": {
     "defaultMessage": "Filter by"
   },
-  "label.filters": {
-    "defaultMessage": "Filters"
-  },
   "label.followed-projects": {
     "defaultMessage": "Followed projects"
   },
   "label.game-version": {
     "defaultMessage": "Game version"
   },
-  "label.hide-installed-content": {
-    "defaultMessage": "Hide already installed content"
-  },
-  "label.hide-selected-content": {
-    "defaultMessage": "Hide selected content"
-  },
   "label.installation-info": {
     "defaultMessage": "Installation info"
-  },
-  "label.installed": {
-    "defaultMessage": "Installed"
   },
   "label.installed-modpack": {
     "defaultMessage": "Installed modpack"
   },
   "label.installing": {
     "defaultMessage": "Installing..."
-  },
-  "label.installing-content": {
-    "defaultMessage": "Installing content"
   },
   "label.loading": {
     "defaultMessage": "Loading..."
@@ -1877,9 +1778,6 @@
   "label.select-all": {
     "defaultMessage": "Select all"
   },
-  "label.selected": {
-    "defaultMessage": "Selected"
-  },
   "label.selection-actions": {
     "defaultMessage": "Selection actions"
   },
@@ -1922,14 +1820,8 @@
   "label.username": {
     "defaultMessage": "Username"
   },
-  "label.validating": {
-    "defaultMessage": "Validating"
-  },
   "label.version": {
     "defaultMessage": "Version"
-  },
-  "label.view": {
-    "defaultMessage": "View"
   },
   "label.visibility": {
     "defaultMessage": "Visibility"
@@ -2036,150 +1928,6 @@
   "locale.zh-TW": {
     "defaultMessage": "Chinese (Traditional)"
   },
-  "markdown-editor.default-image-alt-text": {
-    "defaultMessage": "Replace this with a description"
-  },
-  "markdown-editor.error-label": {
-    "defaultMessage": "Error"
-  },
-  "markdown-editor.image-modal.description-field.description": {
-    "defaultMessage": "Describe the image completely as you would to someone who could not see the image."
-  },
-  "markdown-editor.image-modal.description-field.placeholder": {
-    "defaultMessage": "Describe the image..."
-  },
-  "markdown-editor.image-modal.description-field.title": {
-    "defaultMessage": "Description (alt text)"
-  },
-  "markdown-editor.image-modal.header": {
-    "defaultMessage": "Insert image"
-  },
-  "markdown-editor.image-modal.upload-mode.label": {
-    "defaultMessage": "Image source"
-  },
-  "markdown-editor.image-modal.upload-mode.link": {
-    "defaultMessage": "Link"
-  },
-  "markdown-editor.image-modal.upload-mode.upload": {
-    "defaultMessage": "Upload"
-  },
-  "markdown-editor.image-modal.upload.prompt": {
-    "defaultMessage": "Drag and drop to upload or click to select file"
-  },
-  "markdown-editor.image-modal.url-field.placeholder": {
-    "defaultMessage": "Enter the image URL..."
-  },
-  "markdown-editor.insert-button": {
-    "defaultMessage": "Insert"
-  },
-  "markdown-editor.link-modal.header": {
-    "defaultMessage": "Insert link"
-  },
-  "markdown-editor.link-modal.label-field.placeholder": {
-    "defaultMessage": "Enter label..."
-  },
-  "markdown-editor.link-modal.label-field.title": {
-    "defaultMessage": "Label"
-  },
-  "markdown-editor.link-modal.url-field.placeholder": {
-    "defaultMessage": "Enter the link's URL..."
-  },
-  "markdown-editor.markdown-formatting-support": {
-    "defaultMessage": "This editor supports <markdown-link>Markdown formatting</markdown-link>."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Max length:"
-  },
-  "markdown-editor.max-length.unlimited": {
-    "defaultMessage": "Unlimited"
-  },
-  "markdown-editor.max-length.value": {
-    "defaultMessage": "{currentLength}/{maxLength}"
-  },
-  "markdown-editor.placeholder": {
-    "defaultMessage": "Write something..."
-  },
-  "markdown-editor.preview-label": {
-    "defaultMessage": "Preview"
-  },
-  "markdown-editor.preview-toggle.label": {
-    "defaultMessage": "Preview"
-  },
-  "markdown-editor.toolbar.bold": {
-    "defaultMessage": "Bold"
-  },
-  "markdown-editor.toolbar.bulleted-list": {
-    "defaultMessage": "Bulleted list"
-  },
-  "markdown-editor.toolbar.code": {
-    "defaultMessage": "Code"
-  },
-  "markdown-editor.toolbar.heading-1": {
-    "defaultMessage": "Heading 1"
-  },
-  "markdown-editor.toolbar.heading-2": {
-    "defaultMessage": "Heading 2"
-  },
-  "markdown-editor.toolbar.heading-3": {
-    "defaultMessage": "Heading 3"
-  },
-  "markdown-editor.toolbar.image": {
-    "defaultMessage": "Image"
-  },
-  "markdown-editor.toolbar.italic": {
-    "defaultMessage": "Italic"
-  },
-  "markdown-editor.toolbar.link": {
-    "defaultMessage": "Link"
-  },
-  "markdown-editor.toolbar.ordered-list": {
-    "defaultMessage": "Ordered list"
-  },
-  "markdown-editor.toolbar.quote": {
-    "defaultMessage": "Quote"
-  },
-  "markdown-editor.toolbar.spoiler": {
-    "defaultMessage": "Spoiler"
-  },
-  "markdown-editor.toolbar.strikethrough": {
-    "defaultMessage": "Strikethrough"
-  },
-  "markdown-editor.toolbar.video": {
-    "defaultMessage": "Video"
-  },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "No file provided"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "No image upload handler provided"
-  },
-  "markdown-editor.url-label": {
-    "defaultMessage": "URL"
-  },
-  "markdown-editor.url-validation-error.blocked-domain": {
-    "defaultMessage": "Invalid URL. This domain is not allowed."
-  },
-  "markdown-editor.url-validation-error.malformed": {
-    "defaultMessage": "Invalid URL. Make sure the URL is well-formed."
-  },
-  "markdown-editor.url-validation-error.unsupported-protocol": {
-    "defaultMessage": "Unsupported protocol. Use http or https."
-  },
-  "markdown-editor.video-embed.title": {
-    "defaultMessage": "YouTube video player"
-  },
-  "markdown-editor.video-modal.header": {
-    "defaultMessage": "Insert YouTube video"
-  },
-  "markdown-editor.video-modal.url-field.description": {
-    "defaultMessage": "Enter a valid link to a YouTube video."
-  },
-  "markdown-editor.video-modal.url-field.placeholder": {
-    "defaultMessage": "Enter YouTube video URL"
-  },
-  "markdown-editor.video-modal.url-field.title": {
-    "defaultMessage": "YouTube video URL"
-  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Add payment method"
   },
@@ -2196,16 +1944,16 @@
     "defaultMessage": "Keep files updated when the server changes"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Get Modrinth App"
+    "defaultMessage": "Get Icarus Launcher"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "The Modrinth App will open automatically..."
+    "defaultMessage": "The Icarus Launcher will open automatically..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Opening Modrinth App"
+    "defaultMessage": "Opening Icarus Launcher"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Why use the Modrinth App"
+    "defaultMessage": "Why use the Icarus Launcher"
   },
   "notification.error.title": {
     "defaultMessage": "An error occurred"
@@ -2232,13 +1980,13 @@
     "defaultMessage": "Failed"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Public"
+    "defaultMessage": "Listed"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Modrinth Team"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "Icarus Team"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "Pending"
@@ -2271,7 +2019,7 @@
     "defaultMessage": "Fail"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Unlisted by staff"
+    "defaultMessage": "Withheld"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copy code to clipboard"
@@ -2655,7 +2403,7 @@
     "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}}"
   },
   "project.recent-plays.tooltip": {
-    "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}} from Modrinth in the past 2 weeks"
+    "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}} from Icarus in the past 2 weeks"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "This project uses a custom modpack"
@@ -2967,7 +2715,7 @@
     "defaultMessage": "Your project has multiple environments"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "We've just overhauled the Environments system on Modrinth and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!"
+    "defaultMessage": "We've just overhauled the Environments system on Icarus and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Please review the options below"
@@ -3040,9 +2788,6 @@
   },
   "project.settings.upload.title": {
     "defaultMessage": "Upload"
-  },
-  "project.settings.versions.permissions": {
-    "defaultMessage": "Permissions"
   },
   "project.settings.versions.title": {
     "defaultMessage": "Versions"
@@ -3338,68 +3083,20 @@
   "servers.busy.syncing-content": {
     "defaultMessage": "Content sync in progress"
   },
-  "servers.installing-banner.error.header": {
-    "defaultMessage": "Installation failed"
-  },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "An internal error occurred while installing the platform. Please try again."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "The specified loader or Minecraft version could not be installed. It may be invalid or unsupported."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "The modpack could not be installed. It may be corrupted or incompatible."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "This modpack version does not include a downloadable file. It may have been packaged incorrectly."
-  },
-  "servers.installing-banner.error.unknown": {
-    "defaultMessage": "An unexpected error occurred during installation."
-  },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "This version of Minecraft or loader is not yet supported by Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Installing addons..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Installing modpack..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Installing platform..."
-  },
-  "servers.installing-banner.preparing.header": {
-    "defaultMessage": "We're preparing your server"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Adding Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Configuring server..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Downloading mods..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organizing files..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Setting up environment..."
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Already have a server?"
   },
   "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Learn more about Modrinth Hosting"
+    "defaultMessage": "Learn more about Icarus Hosting"
   },
-  "servers.list-empty.modrinth-hosting-label": {
-    "defaultMessage": "Modrinth Hosting"
+  "servers.list-empty.Icarus-hosting-label": {
+    "defaultMessage": "Icarus Hosting"
   },
   "servers.list-empty.new-server-button": {
     "defaultMessage": "New server"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Install mods, invite friends, and play together all from the Modrinth App."
+    "defaultMessage": "Install mods, invite friends, and play together all from the Icarus Launcher."
   },
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "No servers yet"
@@ -3411,7 +3108,7 @@
     "defaultMessage": "One-click mod installs"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Invite friends and get them set up right in the Modrinth App."
+    "defaultMessage": "Invite friends and get them set up right in the Icarus Launcher."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Play with friends"
@@ -3477,7 +3174,7 @@
     "defaultMessage": "Your subscription is set to cancel on <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.suspended": {
-    "defaultMessage": "Your server has been suspended. Please contact Modrinth Support for more information."
+    "defaultMessage": "Your server has been suspended. Please contact Icarus Support for more information."
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "Your server's hardware is currently being upgraded and will be back online shortly."
@@ -3504,7 +3201,7 @@
     "defaultMessage": "Upload in progress"
   },
   "servers.manage.contact-support-button": {
-    "defaultMessage": "Contact Modrinth Support"
+    "defaultMessage": "Contact Icarus Support"
   },
   "servers.manage.error.alert-notice": {
     "defaultMessage": "Our systems automatically alert our team when there's an issue. We are already working on getting them back online."
@@ -3516,10 +3213,10 @@
     "defaultMessage": "Error details:"
   },
   "servers.manage.error.queue-notice": {
-    "defaultMessage": "If you recently purchased your Modrinth Hosting server, it is currently in a queue and will appear here as soon as it's ready. <warning>Do not attempt to purchase a new server.</warning>"
+    "defaultMessage": "If you recently purchased your Icarus Hosting server, it is currently in a queue and will appear here as soon as it's ready. <warning>Do not attempt to purchase a new server.</warning>"
   },
   "servers.manage.error.support-notice": {
-    "defaultMessage": "If you require personalized support regarding the status of your server, please contact Modrinth Support."
+    "defaultMessage": "If you require personalized support regarding the status of your server, please contact Icarus Support."
   },
   "servers.manage.error.title": {
     "defaultMessage": "Servers could not be loaded"
@@ -3543,7 +3240,7 @@
     "defaultMessage": "Reload"
   },
   "servers.manage.resubscribe-error.text": {
-    "defaultMessage": "An error occurred while resubscribing to your Modrinth server."
+    "defaultMessage": "An error occurred while resubscribing to your Icarus server."
   },
   "servers.manage.resubscribe-error.title": {
     "defaultMessage": "Error resubscribing"
@@ -3564,7 +3261,7 @@
     "defaultMessage": "Search {count} {count, plural, one {server} other {servers}}..."
   },
   "servers.manage.servers-title": {
-    "defaultMessage": "Modrinth Hosting"
+    "defaultMessage": "Icarus Hosting"
   },
   "servers.manage.settings-hint.description": {
     "defaultMessage": "They can now be found here!"
@@ -3585,10 +3282,10 @@
     "defaultMessage": "Your Medal server trial has ended and your server has been suspended. Please upgrade to continue using your server."
   },
   "servers.medal-listing.notice.suspended": {
-    "defaultMessage": "Your server has been suspended. Please update your billing information or contact Modrinth Support for more information."
+    "defaultMessage": "Your server has been suspended. Please update your billing information or contact Icarus Support for more information."
   },
   "servers.medal-listing.notice.suspended-with-reason": {
-    "defaultMessage": "Your server has been suspended: {reason}. Please update your billing information or contact Modrinth Support for more information."
+    "defaultMessage": "Your server has been suspended: {reason}. Please update your billing information or contact Icarus Support for more information."
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "Your server's hardware is currently being upgraded and will be back online shortly."
@@ -3630,7 +3327,7 @@
     "defaultMessage": "Undismissable"
   },
   "servers.purchase.notification.success.text": {
-    "defaultMessage": "Your Modrinth Hosting purchase was completed successfully."
+    "defaultMessage": "Your Icarus Hosting purchase was completed successfully."
   },
   "servers.purchase.notification.success.title": {
     "defaultMessage": "Purchase success"
@@ -3708,7 +3405,7 @@
     "defaultMessage": "Where would you like your server to be located?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Hosting next!</link>"
+    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Icarus Hosting next!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Southeast Asia"
@@ -3732,7 +3429,7 @@
     "defaultMessage": "Setup server"
   },
   "servers.setup.onboarding.step.choose.description": {
-    "defaultMessage": "Pick your favorite modpack from Modrinth, or choose a loader and add the mods you want."
+    "defaultMessage": "Pick your favorite modpack from Icarus, or choose a loader and add the mods you want."
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Choose what to play"
@@ -3759,7 +3456,7 @@
     "defaultMessage": "Your server is ready. Here's what you need to do to start playing!"
   },
   "servers.setup.onboarding.welcome.title": {
-    "defaultMessage": "Welcome to Modrinth Hosting"
+    "defaultMessage": "Welcome to Icarus Hosting"
   },
   "servers.setup.rate-limit.text": {
     "defaultMessage": "You are being rate limited. Please try again later."
@@ -3798,7 +3495,7 @@
     "defaultMessage": "Dark"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Select your preferred color theme for Modrinth on this device."
+    "defaultMessage": "Select your preferred color theme for Icarus on this device."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Light"
@@ -4311,3 +4008,4 @@
     "defaultMessage": "Dismiss all"
   }
 }
+

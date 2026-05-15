@@ -1,6 +1,6 @@
-import type { Labrinth } from '@modrinth/api-client'
-import { ClientIcon, getCategoryIcon, getLoaderIcon, ServerIcon } from '@modrinth/assets'
-import { sortedCategories } from '@modrinth/utils'
+import type { Labrinth } from '@icarus/api-client'
+import { ClientIcon, getCategoryIcon, getLoaderIcon, ServerIcon } from '@icarus/assets'
+import { sortedCategories } from '@icarus/utils'
 import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
 
@@ -58,14 +58,6 @@ export type FilterValue = {
 	option: string
 	negative?: boolean
 }
-
-export const LOADER_FILTER_TYPES = [
-	'mod_loader',
-	'plugin_loader',
-	'modpack_loader',
-	'shader_loader',
-	'plugin_platform',
-] as const
 
 export interface GameVersion {
 	version: string

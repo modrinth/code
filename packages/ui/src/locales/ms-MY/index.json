@@ -35,9 +35,6 @@
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Gagal memuat tetapan pelayan"
   },
-  "badge.alpha": {
-    "defaultMessage": "Alfa"
-  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -94,12 +91,6 @@
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Langgan semula ke Pelayan"
-  },
-  "browse.search.placeholder": {
-    "defaultMessage": "Cari {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} server {pelayan} other {projek}}..."
-  },
-  "browse.view-prefix": {
-    "defaultMessage": "Lihat:"
   },
   "button.accept": {
     "defaultMessage": "Terima"
@@ -458,6 +449,9 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Muat naik fail"
   },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Sedang memuat naik fail ({completed}/{total})"
+  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Semua kandungan yang dipilih sudah pun dinyahdayakan"
   },
@@ -493,42 +487,6 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} dipilih"
-  },
-  "creation-flow.button.import": {
-    "defaultMessage": "Import"
-  },
-  "creation-flow.modal.custom-setup.loader-version-type.latest": {
-    "defaultMessage": "Terkini"
-  },
-  "creation-flow.modal.custom-setup.loader-version-type.other": {
-    "defaultMessage": "Lain-lain"
-  },
-  "creation-flow.modal.custom-setup.loader-version-type.stable": {
-    "defaultMessage": "Stabil"
-  },
-  "creation-flow.modal.custom-setup.loader.label": {
-    "defaultMessage": "Pemuat"
-  },
-  "creation-flow.modal.custom-setup.name.label": {
-    "defaultMessage": "Nama"
-  },
-  "creation-flow.modal.final-config.difficulty.hard": {
-    "defaultMessage": "Sukar"
-  },
-  "creation-flow.modal.final-config.generator-settings.custom": {
-    "defaultMessage": "Tersuai"
-  },
-  "creation-flow.modal.final-config.generator-settings.flat": {
-    "defaultMessage": "Datar"
-  },
-  "creation-flow.modal.import-instance.action.add": {
-    "defaultMessage": "Tambah"
-  },
-  "external-project-license-status.no": {
-    "defaultMessage": "Tidak"
-  },
-  "external-project-license-status.yes": {
-    "defaultMessage": "Ya"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Ringkasan pengekstrakan"
@@ -748,6 +706,9 @@
   },
   "files.operations.extracting": {
     "defaultMessage": "Mengekstrak {source}"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Gagal"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "pek mod daripada URL"
@@ -1253,6 +1214,12 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mod permainan yang tidak diketahui"
   },
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "Fail masih dimuat naik. Meninggalkan laman ini akan membatalkan muat naik dan perubahan anda mungkin hilang."
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Muat naik sedang berjalan"
+  },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} {count, plural, other {pemasangan}} serasi"
   },
@@ -1586,9 +1553,6 @@
   "label.version": {
     "defaultMessage": "Versi"
   },
-  "label.view": {
-    "defaultMessage": "Lihat"
-  },
   "label.visibility": {
     "defaultMessage": "Keterlihatan"
   },
@@ -1710,16 +1674,16 @@
     "defaultMessage": "Memastikan fail dikemas kini apabila pelayan berubah"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Dapatkan Modrinth App"
+    "defaultMessage": "Dapatkan Icarus Launcher"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App akan dibuka secara automatik..."
+    "defaultMessage": "Icarus Launcher akan dibuka secara automatik..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Membuka Modrinth App"
+    "defaultMessage": "Membuka Icarus Launcher"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Mengapa menggunakan Modrinth App"
+    "defaultMessage": "Mengapa menggunakan Icarus Launcher"
   },
   "notification.error.title": {
     "defaultMessage": "Sebuah ralat telah berlaku"
@@ -1746,13 +1710,13 @@
     "defaultMessage": "Gagal"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Awam"
+    "defaultMessage": "Disenaraikan"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Penyederhana"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Pasukan Modrinth"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "Pasukan Icarus"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "Menunggu"
@@ -1783,6 +1747,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Gagal"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Ditahan"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Salin kod ke papan keratan"
@@ -2166,7 +2133,7 @@
     "defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}}"
   },
   "project.recent-plays.tooltip": {
-    "defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}} daripada Modrinth dalam 2 minggu yang lalu"
+    "defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}} daripada Icarus dalam 2 minggu yang lalu"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Projek ini menggunakan pek mod tersuai"
@@ -2478,7 +2445,7 @@
     "defaultMessage": "Projek anda mempunyai berbilang persekitaran"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Kami baru sahaja merombak sistem Persekitaran pada Modrinth dan pilihan baharu kini tersedia. Sila pastikan pilihan yang betul dipilih di bawah dan kemudian klik 'Sahkan' apabila anda selesai!"
+    "defaultMessage": "Kami baru sahaja merombak sistem Persekitaran pada Icarus dan pilihan baharu kini tersedia. Sila pastikan pilihan yang betul dipilih di bawah dan kemudian klik 'Sahkan' apabila anda selesai!"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Sila semak pilihan di bawah"
@@ -2708,11 +2675,20 @@
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Sesuatu telah berlaku semasa memulihkan daripada {backupName}. Sila cuba lagi atau hubungi sokongan jika masalah berterusan."
   },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Pemulihan daripada sandaran gagal"
+  },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Pemulihan dari {backupName} telah dimasukkan ke barisan dan akan bermula sebentar lagi."
   },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Pemulihan sandaran dalam barisan"
+  },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Pelayan anda telah dipulihkan kepada {backupName} dan sedia untuk dimulakan."
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Pemulihan daripada sandaran berjaya"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Memulihkan pelayan anda daripada {backupName}. Ini mungkin mengambil masa beberapa minit."
@@ -2726,6 +2702,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Jadual penyandaran"
   },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Gagal mencipta sandaran"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Gagal memulihkan daripada sandaran"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Penyandaran manual"
   },
@@ -2734,12 +2716,6 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Pulihkan"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manual"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Penciptaan sandaran sedang dijalankan"
@@ -2757,16 +2733,16 @@
     "defaultMessage": "Sudah mempunyai pelayan?"
   },
   "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Ketahui lebih lanjut tentang Modrinth Hosting"
+    "defaultMessage": "Ketahui lebih lanjut tentang Icarus Hosting"
   },
-  "servers.list-empty.modrinth-hosting-label": {
-    "defaultMessage": "Modrinth Hosting"
+  "servers.list-empty.Icarus-hosting-label": {
+    "defaultMessage": "Icarus Hosting"
   },
   "servers.list-empty.new-server-button": {
     "defaultMessage": "Pelayan baharu"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Pasang mod, jemput rakan dan main bersama-sama, semuanya dari Modrinth App."
+    "defaultMessage": "Pasang mod, jemput rakan dan main bersama-sama, semuanya dari Icarus Launcher."
   },
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "Belum ada pelayan"
@@ -2778,7 +2754,7 @@
     "defaultMessage": "Pemasangan mod sekali klik"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Jemput rakan-rakan dan sediakan mereka terus dalam Modrinth App."
+    "defaultMessage": "Jemput rakan-rakan dan sediakan mereka terus dalam Icarus Launcher."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Main bersama rakan"
@@ -2844,7 +2820,7 @@
     "defaultMessage": "Langganan anda ditetapkan untuk dibatalkan pada <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.suspended": {
-    "defaultMessage": "Pelayan anda telah digantung. Sila hubungi Sokongan Modrinth untuk maklumat lanjut."
+    "defaultMessage": "Pelayan anda telah digantung. Sila hubungi Sokongan Icarus untuk maklumat lanjut."
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "Perkakasan pelayan anda sedang dinaik taraf dan akan kembali beroperasi tidak lama lagi."
@@ -2871,7 +2847,7 @@
     "defaultMessage": "Muat naik sedang berjalan"
   },
   "servers.manage.contact-support-button": {
-    "defaultMessage": "Hubungi Sokongan Modrinth"
+    "defaultMessage": "Hubungi Sokongan Icarus"
   },
   "servers.manage.error.alert-notice": {
     "defaultMessage": "Sistem kami akan memaklumkan pasukan kami secara automatik apabila terdapat masalah. Kami sedang berusaha untuk membawa mereka kembali dalam talian."
@@ -2883,10 +2859,10 @@
     "defaultMessage": "Butiran ralat:"
   },
   "servers.manage.error.queue-notice": {
-    "defaultMessage": "Jika anda baru-baru ini membeli pelayan Modrinth Hosting anda, ia sedang berada dalam barisan dan akan muncul di sini sebaik sahaja ia siap. <warning>Jangan cuba membeli pelayan baharu.</warning>"
+    "defaultMessage": "Jika anda baru-baru ini membeli pelayan Icarus Hosting anda, ia sedang berada dalam barisan dan akan muncul di sini sebaik sahaja ia siap. <warning>Jangan cuba membeli pelayan baharu.</warning>"
   },
   "servers.manage.error.support-notice": {
-    "defaultMessage": "Jika anda memerlukan sokongan peribadi mengenai status pelayan anda, sila hubungi Sokongan Modrinth."
+    "defaultMessage": "Jika anda memerlukan sokongan peribadi mengenai status pelayan anda, sila hubungi Sokongan Icarus."
   },
   "servers.manage.error.title": {
     "defaultMessage": "Pelayan tidak dapat dimuatkan"
@@ -2910,7 +2886,7 @@
     "defaultMessage": "Muat semula"
   },
   "servers.manage.resubscribe-error.text": {
-    "defaultMessage": "Sebuah ralat telah berlaku semasa melanggan semula pelayan Modrinth anda."
+    "defaultMessage": "Sebuah ralat telah berlaku semasa melanggan semula pelayan Icarus anda."
   },
   "servers.manage.resubscribe-error.title": {
     "defaultMessage": "Ralat semasa melanggan semula"
@@ -2931,7 +2907,7 @@
     "defaultMessage": "Cari {count} {count, plural, other {pelayan}}..."
   },
   "servers.manage.servers-title": {
-    "defaultMessage": "Modrinth Hosting"
+    "defaultMessage": "Icarus Hosting"
   },
   "servers.manage.settings-hint.description": {
     "defaultMessage": "Mereka kini boleh ditemui di sini!"
@@ -2952,10 +2928,10 @@
     "defaultMessage": "Percubaan pelayan Medal anda telah tamat dan pelayan anda telah digantung. Sila naik taraf untuk terus menggunakan pelayan anda."
   },
   "servers.medal-listing.notice.suspended": {
-    "defaultMessage": "Pelayan anda telah digantung. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan Modrinth untuk maklumat lanjut."
+    "defaultMessage": "Pelayan anda telah digantung. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan Icarus untuk maklumat lanjut."
   },
   "servers.medal-listing.notice.suspended-with-reason": {
-    "defaultMessage": "Pelayan anda telah digantung: {reason}. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan Modrinth untuk maklumat lanjut."
+    "defaultMessage": "Pelayan anda telah digantung: {reason}. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan Icarus untuk maklumat lanjut."
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "Perkakasan pelayan anda sedang dinaik taraf dan akan kembali beroperasi tidak lama lagi."
@@ -2997,7 +2973,7 @@
     "defaultMessage": "Tidak boleh diketepikan"
   },
   "servers.purchase.notification.success.text": {
-    "defaultMessage": "Pembelian Modrinth Hosting anda telah berjaya diselesaikan."
+    "defaultMessage": "Pembelian Icarus Hosting anda telah berjaya diselesaikan."
   },
   "servers.purchase.notification.success.title": {
     "defaultMessage": "Pembelian berjaya"
@@ -3065,9 +3041,6 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "Berapa banyak RAM yang anda mahu pelayan anda ada?"
   },
-  "servers.region.custom.prompt-ram-only": {
-    "defaultMessage": "RAM"
-  },
   "servers.region.north-america": {
     "defaultMessage": "Amerika Utara"
   },
@@ -3075,7 +3048,7 @@
     "defaultMessage": "Di manakah anda mahu pelayan anda ditempatkan?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Rantau tidak disenaraikan? <link>Beritahu kami di mana anda ingin melihat Modrinth Hosting tersedia!</link>"
+    "defaultMessage": "Rantau tidak disenaraikan? <link>Beritahu kami di mana anda ingin melihat Icarus Hosting tersedia!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Tenggara"
@@ -3120,7 +3093,7 @@
     "defaultMessage": "Gelap"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Pilih tema warna pilihan anda untuk Modrinth pada peranti ini."
+    "defaultMessage": "Pilih tema warna pilihan anda untuk Icarus pada peranti ini."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Cerah"
@@ -3627,4 +3600,5 @@
     "defaultMessage": "Tinggalkan laman?"
   }
 }
+
 

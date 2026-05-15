@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { GitGraphIcon, RssIcon } from '@modrinth/assets'
-import { articles as rawArticles } from '@modrinth/blog'
-import { Avatar, ButtonStyled, injectModrinthClient, useFormatDateTime } from '@modrinth/ui'
+import { GitGraphIcon, RssIcon } from '@icarus/assets'
+import { articles as rawArticles } from '@icarus/blog'
+import { Avatar, ButtonStyled, injectIcarusClient, useFormatDateTime } from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, onMounted } from 'vue'
@@ -9,7 +9,7 @@ import { computed, onMounted } from 'vue'
 import NewsletterButton from '~/components/ui/NewsletterButton.vue'
 import ShareArticleButtons from '~/components/ui/ShareArticleButtons.vue'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const config = useRuntimeConfig()
 const route = useRoute()
 

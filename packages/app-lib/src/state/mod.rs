@@ -1,7 +1,6 @@
-//! Theseus state management system
+//! Pteron state management system
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use std::sync::Arc;
-use std::sync::atomic::AtomicBool;
 use tokio::sync::{OnceCell, Semaphore};
 
 use crate::state::fs_watcher::FileWatcher;
@@ -84,8 +83,6 @@ pub struct State {
     /// Friends socket
     pub friends_socket: FriendsSocket,
 
-    pub restart_after_pending_update: AtomicBool,
-
     pub(crate) pool: SqlitePool,
 
     pub(crate) file_watcher: FileWatcher,
@@ -98,12 +95,6 @@ impl State {
             .await?;
 
         tokio::task::spawn(async move {
-            fs_watcher::watch_profiles_init(
-                &state.file_watcher,
-                &state.directories,
-            )
-            .await;
-
             let res = tokio::try_join!(
                 state.discord_rpc.clear_to_default(true),
                 Profile::refresh_all(),
@@ -149,10 +140,6 @@ impl State {
         LAUNCHER_STATE.initialized()
     }
 
-    pub fn get_if_initialized() -> Option<Arc<Self>> {
-        LAUNCHER_STATE.get().map(Arc::clone)
-    }
-
     #[tracing::instrument]
     async fn initialize_state(
         app_identifier: String,
@@ -188,6 +175,7 @@ impl State {
 
         tracing::info!("Initializing file watcher");
         let file_watcher = fs_watcher::init_watcher().await?;
+        fs_watcher::watch_profiles_init(&file_watcher, &directories).await;
 
         let process_manager = ProcessManager::new();
 
@@ -201,7 +189,6 @@ impl State {
             discord_rpc,
             process_manager,
             friends_socket,
-            restart_after_pending_update: AtomicBool::new(false),
             pool,
             file_watcher,
             // app_identifier,

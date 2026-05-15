@@ -1,4 +1,4 @@
-//! Theseus skin management interface
+//! Pteron skin management interface
 
 use std::sync::{
     Arc,

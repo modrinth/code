@@ -94,6 +94,18 @@ export const sortedCategories = (tags, formatCategoryName, locale) => {
 	})
 }
 
+export const formatBytes = (bytes, decimals = 2) => {
+	if (bytes === 0) return '0 Bytes'
+
+	const k = 1024
+	const dm = decimals < 0 ? 0 : decimals
+	const sizes = ['Bytes', 'KiB', 'MiB', 'GiB']
+
+	const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+	return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+}
+
 export const capitalizeString = (name) => {
 	return name ? name.charAt(0).toUpperCase() + name.slice(1) : name
 }
@@ -119,8 +131,6 @@ export const formatProjectType = (name, short = false) => {
 			return 'PLG'
 		} else if (name === 'datapack') {
 			return 'DPK'
-		} else if (name === 'minecraft_java_server') {
-			return 'SRV'
 		}
 	}
 
@@ -228,7 +238,7 @@ export function cycleValue<T extends string>(value: T, values: T[]): T {
 	return values[index % values.length]
 }
 
-export const fileIsValid = (file, validationOptions, formatBytes) => {
+export const fileIsValid = (file, validationOptions) => {
 	const { maxSize, alertOnInvalid } = validationOptions
 	if (maxSize !== null && maxSize !== undefined && file.size > maxSize) {
 		if (alertOnInvalid) {

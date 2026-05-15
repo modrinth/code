@@ -199,7 +199,7 @@
 	</div>
 </template>
 <script setup>
-import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	Checkbox,
@@ -208,7 +208,7 @@ import {
 	ConfirmModal,
 	CopyCode,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
@@ -216,7 +216,7 @@ import {
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import {
@@ -228,7 +228,7 @@ import {
 	useScopes,
 } from '~/composables/auth/scopes.ts'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -285,7 +285,7 @@ const messages = defineMessages({
 	description: {
 		id: 'settings.pats.description',
 		defaultMessage:
-			"PATs can be used to access Modrinth's API. They can be created and revoked at any time. For more information, see <doc-link>Modrinth's API documentation</doc-link>.",
+			"PATs can be used to access Icarus's API. They can be created and revoked at any time. For more information, see <doc-link>Icarus's API documentation</doc-link>.",
 	},
 	create: {
 		id: 'settings.pats.action.create',
@@ -325,7 +325,7 @@ definePageMeta({
 })
 
 useHead({
-	title: `${formatMessage(commonSettingsMessages.pats)} - Modrinth`,
+	title: `${formatMessage(commonSettingsMessages.pats)} - Icarus`,
 })
 
 const data = useNuxtApp()
@@ -483,3 +483,4 @@ async function removePat(id) {
 	}
 }
 </style>
+

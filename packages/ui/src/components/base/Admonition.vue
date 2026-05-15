@@ -24,7 +24,7 @@
 					{{ relativeTimeLabel }}
 				</span>
 			</div>
-			<div class="font-normal text-contrast/85 leading-tight">
+			<div class="font-normal text-contrast/85">
 				<slot>{{ body }}</slot>
 			</div>
 			<div v-if="showActionsUnderneath || $slots.actions" class="mt-2">
@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { ClockIcon, XIcon } from '@modrinth/assets'
+import { ClockIcon, XIcon } from '@icarus/assets'
 import { useNow } from '@vueuse/core'
 import { computed } from 'vue'
 
@@ -80,7 +80,7 @@ import ButtonStyled from './ButtonStyled.vue'
 
 const props = withDefaults(
 	defineProps<{
-		type?: 'info' | 'warning' | 'critical' | 'success' | 'moderation'
+		type?: 'info' | 'warning' | 'critical' | 'success'
 		header?: string
 		body?: string
 		showActionsUnderneath?: boolean
@@ -141,7 +141,6 @@ const typeClasses = {
 	warning: 'border-brand-orange bg-bg-orange',
 	critical: 'border-brand-red bg-bg-red',
 	success: 'border-brand-green bg-bg-green',
-	moderation: 'border-brand-orange bg-bg-orange',
 }
 
 const iconClasses = {
@@ -149,7 +148,6 @@ const iconClasses = {
 	warning: 'text-brand-orange',
 	critical: 'text-brand-red',
 	success: 'text-brand-green',
-	moderation: 'text-brand-orange',
 }
 
 const buttonColors = {
@@ -157,7 +155,6 @@ const buttonColors = {
 	warning: 'orange',
 	critical: 'red',
 	success: 'green',
-	moderation: 'orange',
 } as const
 
 const progressTrackClasses = {
@@ -165,7 +162,6 @@ const progressTrackClasses = {
 	warning: 'bg-brand-orange/20',
 	critical: 'bg-brand-red/20',
 	success: 'bg-brand-green/20',
-	moderation: 'bg-brand-orange/20',
 }
 
 const progressFillClasses = {

@@ -41,21 +41,21 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, SpinnerIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
+import { EditIcon, SpinnerIcon, TransferIcon, UploadIcon } from '@icarus/assets'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import { OverflowMenu, ServerIcon } from '#ui/components'
 import { useServerImage } from '#ui/composables'
 import {
-	injectModrinthClient,
-	injectModrinthServerContext,
+	injectIcarusClient,
+	injectIcarusServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
 
 const { addNotification } = injectNotificationManager()
-const client = injectModrinthClient()
-const { serverId, server } = injectModrinthServerContext()
+const client = injectIcarusClient()
+const { serverId, server } = injectIcarusServerContext()
 const queryClient = useQueryClient()
 const isUploadingIcon = ref(false)
 const isSyncingIcon = ref(false)
@@ -262,3 +262,4 @@ const triggerFileInput = () => {
 	input.click()
 }
 </script>
+

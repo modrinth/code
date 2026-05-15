@@ -468,10 +468,6 @@ export namespace Labrinth {
 				monetization_status: MonetizationStatus
 			}
 
-			export type ProjectCheckResponse = {
-				id: string
-			}
-
 			export type SearchResultHit = {
 				project_id: string
 				project_type: ProjectType
@@ -880,7 +876,6 @@ export namespace Labrinth {
 				include_changelog?: boolean
 				limit?: number
 				offset?: number
-				apiVersion?: 2 | 3
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'
@@ -1464,52 +1459,6 @@ export namespace Labrinth {
 			taxComplianceThresholds?: Record<string, number>
 
 			errors: unknown[]
-		}
-	}
-
-	export namespace ExternalProjects {
-		export namespace Internal {
-			export type ExternalLicenseStatus =
-				| 'yes'
-				| 'with-attribution-and-source'
-				| 'with-attribution'
-				| 'no'
-				| 'permanent-no'
-				| 'unidentified'
-
-			export type LinkedFile = {
-				name: string | null
-				sha1: string
-			}
-
-			export type ExternalProject = {
-				id: number
-				title: string | null
-				status: ExternalLicenseStatus
-				link: string | null
-				exceptions: string | null
-				proof: string | null
-				flame_project_id: number | null
-				inserted_at: string | null
-				inserted_by: number | null
-				updated_at: string | null
-				updated_by: number | null
-				linked_files: LinkedFile[]
-			}
-
-			export type SearchRequest = {
-				title?: string
-				flame_id?: number
-			}
-
-			export type UpdateLicenseRequest = {
-				title?: string
-				status: ExternalLicenseStatus
-				link?: string
-				exceptions?: string
-				proof?: string
-				flame_project_id?: number
-			}
 		}
 	}
 

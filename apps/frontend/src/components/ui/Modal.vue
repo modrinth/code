@@ -28,8 +28,8 @@
 </template>
 
 <script>
-import { XIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { XIcon } from '@icarus/assets'
+import { ButtonStyled } from '@icarus/ui'
 
 export default {
 	components: {

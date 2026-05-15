@@ -21,12 +21,12 @@
 		<div
 			class="absolute top-0 flex items-center justify-center overflow-hidden rounded-2xl bg-bg-raised"
 		>
-			<div id="modrinth-rail-1" />
+			<div id="Icarus-rail-1" />
 		</div>
 	</div>
 </template>
 <script setup>
-import { AutoLink } from '@modrinth/ui'
+import { AutoLink } from '@icarus/ui'
 
 const flags = useFeatureFlags()
 
@@ -38,7 +38,7 @@ useHead({
 		// },
 		{
 			// Aditude
-			src: 'https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js',
+			src: 'https://dn0qt3r0xannq.cloudfront.net/Icarus-7JfmkEIXEp/Icarus-longform/prebid-load.js',
 			async: true,
 		},
 		{
@@ -61,22 +61,12 @@ useHead({
 })
 
 const AD_PRESETS = {
-	medal: {
-		light: 'https://cdn-raw.modrinth.com/modrinth-hosting-medal-light.webp',
-		dark: 'https://cdn-raw.modrinth.com/modrinth-hosting-medal-dark.webp',
-		description: 'Host your next server with Modrinth Hosting',
-		link: '/hosting?plan&ref=medal',
-	},
-	'modrinth-hosting': {
-		light: 'https://cdn-raw.modrinth.com/modrinth-hosting-light.webp',
-		dark: 'https://cdn-raw.modrinth.com/modrinth-hosting-dark.webp',
-		description: 'Host your next server with Modrinth Hosting',
-		link: '/hosting',
-	},
+	medal: {},
+	'Icarus-hosting': {},
 }
 
 const currentAd = computed(() =>
-	flags.value.enableMedalPromotion ? AD_PRESETS.medal : AD_PRESETS['modrinth-hosting'],
+	flags.value.enableMedalPromotion ? AD_PRESETS.medal : AD_PRESETS['Icarus-hosting'],
 )
 
 onMounted(() => {
@@ -92,7 +82,7 @@ onMounted(() => {
 	tude.cmd.push(function () {
 		tude.refreshAdsViaDivMappings([
 			{
-				divId: 'modrinth-rail-1',
+				divId: 'Icarus-rail-1',
 				baseDivId: 'pb-slot-square-2',
 				targeting: {
 					location: 'web',
@@ -174,3 +164,4 @@ iframe[id^='google_ads_iframe'] {
 	}
 }
 </style>
+

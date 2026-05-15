@@ -1,4 +1,4 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 
 export function getProductDisplayName(product: Labrinth.Billing.Internal.Product): string {
 	const { metadata } = product

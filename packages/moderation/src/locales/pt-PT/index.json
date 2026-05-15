@@ -12,7 +12,7 @@
     "defaultMessage": "Adiciona um ícone"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Adiciona quaisquer links relevantes que direcionem para fora do Modrinth, como o código-fonte, um rastreador de problemas ou um convite para um servidor do Discord."
+    "defaultMessage": "Adiciona quaisquer links relevantes que direcionem para fora do Icarus, como o código-fonte, um rastreador de problemas ou um convite para um servidor do Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Adiciona links externos"
@@ -207,4 +207,5 @@
     "defaultMessage": "Vê as definições de links"
   }
 }
+
 

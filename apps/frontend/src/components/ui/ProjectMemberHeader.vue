@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, XIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	commonMessages,
@@ -31,8 +31,8 @@ import {
 	injectNotificationManager,
 	type MessageDescriptor,
 	useVIntl,
-} from '@modrinth/ui'
-import type { Project, User, Version } from '@modrinth/utils'
+} from '@icarus/ui'
+import type { Project, User, Version } from '@icarus/utils'
 import { computed } from 'vue'
 
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'

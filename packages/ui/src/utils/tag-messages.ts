@@ -1,4 +1,4 @@
-import { capitalizeString } from '@modrinth/utils'
+import { capitalizeString } from '@icarus/utils'
 
 import { defineMessages, type MessageDescriptor, type VIntlFormatters } from '../composables/i18n'
 

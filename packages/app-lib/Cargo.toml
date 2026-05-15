@@ -1,5 +1,5 @@
 [package]
-name = "theseus"
+name = "pteron"
 # The actual version is set by the theseus-build workflow on tagging
 version = "1.0.0-local"
 edition.workspace = true

@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "De linux-baserte versjonene av Modrinth App er <issues-link>kjent for å ha problemer</issues-link> på visse systemer og konfigurasjoner. Hvis Modrinth App er ustabil på ditt system, oppfordrer vi deg til å prøve andre apper som <prism-link>Prism Launcher</prism-link> for å enkelt installere Modrinth-innhold."
+    "message": "De linux-baserte versjonene av Icarus Launcher er <issues-link>kjent for å ha problemer</issues-link> på visse systemer og konfigurasjoner. Hvis Icarus Launcher er ustabil på ditt system, oppfordrer vi deg til å prøve andre apper som <prism-link>Prism Launcher</prism-link> for å enkelt installere Icarus-innhold."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -39,10 +39,10 @@
     "message": "Nedlastingsalternativer"
   },
   "app-marketing.download.terms": {
-    "message": "Ved å laste ned Modrinth-appen, så godtar du <terms-link>Brukervilkåra-</terms-link>-og-<privacy-link>Personvernerklæringene våre</privacy-link>."
+    "message": "Ved å laste ned Icarus-appen, så godtar du <terms-link>Brukervilkåra-</terms-link>-og-<privacy-link>Personvernerklæringene våre</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "Last ned Modrinth-appen (Beta)"
+    "message": "Last ned Icarus-appen (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -54,7 +54,7 @@
     "message": "Følg prosjekter"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importer alle dine favorittprofiler fra launcheren du brukte tidligere, og kom i gang med Modrinth-appen på noen sekunder!"
+    "message": "Importer alle dine favorittprofiler fra launcheren du brukte tidligere, og kom i gang med Icarus-appen på noen sekunder!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "av {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth gjør det enkelt å administrere alle moddene dine på ett sted. Du kan installere, avinstallere og oppdatere mods med ett enkelt klikk."
+    "message": "Icarus gjør det enkelt å administrere alle moddene dine på ett sted. Du kan installere, avinstallere og oppdatere mods med ett enkelt klikk."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Installerte mods"
@@ -96,7 +96,7 @@
     "message": "Offlinemodus"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinths launcher er helt åpen kildekode. Du kan se kildekoden på vår <github-link>GitHub</github-link>!"
+    "message": "Icaruss launcher er helt åpen kildekode. Du kan se kildekoden på vår <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Åpen kildekode"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth-appen yter bedre enn mange av de ledende mod-launcherne og bruker kun 150 MB med RAM!"
+    "message": "Icarus-appen yter bedre enn mange av de ledende mod-launcherne og bruker kun 150 MB med RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -128,8 +128,8 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
-  "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth App"
+  "app-marketing.features.performance.Icarus-app": {
+    "message": "Icarus Launcher"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 milliard %"
@@ -147,13 +147,13 @@
     "message": "Ytelsessterk"
   },
   "app-marketing.features.play.description": {
-    "message": "Bruk Modrinth-appen for å laste ned og spille med dine favoritt-mods og modpakker."
+    "message": "Bruk Icarus-appen for å laste ned og spille med dine favoritt-mods og modpakker."
   },
   "app-marketing.features.play.title": {
     "message": "Spill med dine favoritt-mods"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Bygg, del og spill med tusenvis av mods og modpakker som er tilgjengelige her på Modrinth."
+    "message": "Bygg, del og spill med tusenvis av mods og modpakker som er tilgjengelige her på Icarus."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modpakke"
@@ -168,7 +168,7 @@
     "message": "Ulik noen andre launchere"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth-appen er fullt integrert med nettsiden, så du kan få tilgang til alle dine favorittprosjekter direkte fra appen!"
+    "message": "Icarus-appen er fullt integrert med nettsiden, så du kan få tilgang til alle dine favorittprosjekter direkte fra appen!"
   },
   "app-marketing.features.website.title": {
     "message": "Nettsideintegrering"
@@ -177,19 +177,19 @@
     "message": "du har brukt før"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Skjermbilde av Modrinth-appen med en Cobblemon instans åpnet på 'Innhold' siden."
+    "message": "Skjermbilde av Icarus-appen med en Cobblemon instans åpnet på 'Innhold' siden."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth-appen er en unik, åpen kildekode-launcher som lar deg spille dine favoritt-mods og holde dem oppdatert – alt samlet i én ryddig pakke."
+    "message": "Icarus-appen er en unik, åpen kildekode-launcher som lar deg spille dine favoritt-mods og holde dem oppdatert – alt samlet i én ryddig pakke."
   },
   "app-marketing.hero.download-button": {
-    "message": "Last ned Modrinth Appen"
+    "message": "Last ned Icarus Launcheren"
   },
-  "app-marketing.hero.download-modrinth-app": {
-    "message": "Last ned Modrinth Appen"
+  "app-marketing.hero.download-Icarus-app": {
+    "message": "Last ned Icarus Launcheren"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Last ned Modrinth App for {os}"
+  "app-marketing.hero.download-Icarus-app-for-os": {
+    "message": "Last ned Icarus Launcher for {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Skjermbilde av hovedmenyen til en Cobblemon instans."
@@ -282,7 +282,7 @@
     "message": "Opprett konto"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Ved å opprette en konto godtar du Modrinths <terms-link>Vilkår</terms-link> og <privacy-policy-link>Personvernpolicy</privacy-policy-link>."
+    "message": "Ved å opprette en konto godtar du Icaruss <terms-link>Vilkår</terms-link> og <privacy-policy-link>Personvernpolicy</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Passordene stemmer ikke overens!"
@@ -291,7 +291,7 @@
     "message": "Har du allerede en konto?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Abonner på oppdateringer om Modrinth"
+    "message": "Abonner på oppdateringer om Icarus"
   },
   "auth.sign-up.title": {
     "message": "Registrer deg"
@@ -333,16 +333,16 @@
     "message": "Verifiser Email"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Abonner på oppdateringer om Modrinth"
+    "message": "Abonner på oppdateringer om Icarus"
   },
   "auth.welcome.description": {
     "message": "Nå er du med i det fantastiske fellesskapet av skapere og utforskere som bygger, laster ned og holder seg oppdatert på fantastiske mods."
   },
   "auth.welcome.label.tos": {
-    "message": "Ved å opprette en konto godtar du Modrinths <terms-link>Vilkår</terms-link> og <privacy-policy-link>Personvernpolicy</privacy-policy-link>."
+    "message": "Ved å opprette en konto godtar du Icaruss <terms-link>Vilkår</terms-link> og <privacy-policy-link>Personvernpolicy</privacy-policy-link>."
   },
   "auth.welcome.long-title": {
-    "message": "Velkommen til Modrinth!"
+    "message": "Velkommen til Icarus!"
   },
   "auth.welcome.title": {
     "message": "Velkommen"
@@ -372,7 +372,7 @@
     "message": "Er du sikker på at du vil slette denne samlingen?"
   },
   "collection.description": {
-    "message": "{description} - Se samlingen {name} av {username} på Modrinth"
+    "message": "{description} - Se samlingen {name} av {username} på Icarus"
   },
   "collection.description.following": {
     "message": "Auto-generated collection of all the projects you're following."
@@ -554,9 +554,6 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Opprett tilknytningslenke"
   },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Ingen tilknytte koder funnet."
-  },
   "dashboard.affiliate-links.error.title": {
     "message": "Feil ved lasting av tilknytningslenker"
   },
@@ -574,15 +571,6 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Søk i tilknytningslenker..."
-  },
-  "dashboard.analytics.from-projects": {
-    "message": "fra{count} {count, plural, one {projekt} other {projekt}}"
-  },
-  "dashboard.analytics.total-downloads": {
-    "message": "Totale nedlastinger"
-  },
-  "dashboard.analytics.total-followers": {
-    "message": "Totale følgere"
   },
   "dashboard.collections.button.create-new": {
     "message": "Lag ny"
@@ -607,18 +595,6 @@
   },
   "dashboard.collections.long-title": {
     "message": "Dine samlinger"
-  },
-  "dashboard.collections.placeholder.search": {
-    "message": "Søk etter samlinger..."
-  },
-  "dashboard.collections.sort.name-ascending": {
-    "message": "Navn (A-Z)"
-  },
-  "dashboard.collections.sort.recently-created": {
-    "message": "Nylig lagde"
-  },
-  "dashboard.collections.sort.recently-updated": {
-    "message": "Nylig lasta opp"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Last ned {formType}"
@@ -648,7 +624,7 @@
     "message": "Skatteskjema"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth bruker den uavhengige leverandøren Track1099 for å trygt innhente og lagre skatteskjemaene dine. <security-link>Les mer her.</security-link>"
+    "message": "Icarus bruker den uavhengige leverandøren Track1099 for å trygt innhente og lagre skatteskjemaene dine. <security-link>Les mer her.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Sikkerhetspraksis"
@@ -813,7 +789,7 @@
     "message": "For å ta ut den fulle, tilgjengelige belansen din, med <b>{available}</b>, vær så snill å fullfør skjemaet nedenfor. Det er påkrevd for skatterapportering og trengs bare å bli gjort én gang."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "Du må fullføre et E-9-eller-W-8-skjema for skatteoversiktene til Modrinth, sånn at vi kan forbli i samsvar med skattereguleringene."
+    "message": "Du må fullføre et E-9-eller-W-8-skjema for skatteoversiktene til Icarus, sånn at vi kan forbli i samsvar med skattereguleringene."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Skatteskjema påkrevd"
@@ -855,7 +831,7 @@
     "message": "Ubekreftet e-post"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "E-posten du har oppgitt for levering er ikke knyttet til din Modrinth-konto. Modrinth kan ikke gjenopprette belønninger sendt til feil e-postadresse."
+    "message": "E-posten du har oppgitt for levering er ikke knyttet til din Icarus-konto. Icarus kan ikke gjenopprette belønninger sendt til feil e-postadresse."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Lågere avgifter tilgjengelige"
@@ -872,78 +848,6 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Du har brukt opp uttakingsgrensa di <b>{withdrawLimit}</b>. Du må fullføre et skatteskjema for å ta flere uttak."
   },
-  "dashboard.head-title": {
-    "message": "Kontrollpanel"
-  },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Marker alt som lest"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Gå gjennom historie"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "Du har ingen uleste varslinger."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Error innen lasting av varsler:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Historie"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Varslingshistorie"
-  },
-  "dashboard.notifications.link.see-all": {
-    "message": "Se alle"
-  },
-  "dashboard.notifications.link.view-history": {
-    "message": "Vis varslingshistorie"
-  },
-  "dashboard.notifications.link.view-more": {
-    "message": "Vis {extraNotifs} flere {extraNotifs, plural, one {varsling} other {varslinger}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Laster inn varsler..."
-  },
-  "dashboard.organizations.button.create": {
-    "message": "Lag organisering"
-  },
-  "dashboard.organizations.empty.cta": {
-    "message": "Lag ei organisering!"
-  },
-  "dashboard.organizations.error.fetch": {
-    "message": "Kunne ikke få tak i organiseringer"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count} {count, plural, one {medlem} other {medlemmer}}"
-  },
-  "dashboard.organizations.title": {
-    "message": "Organiseringer"
-  },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Du kan redigere flere prosjekt samtidig ved å velge dem nedafor."
-  },
-  "dashboard.projects.bulk-edit.server-disabled": {
-    "message": "Serverprosjekt støtter ikke massredigering"
-  },
-  "dashboard.projects.empty": {
-    "message": "Du har ingen prosjekt ennå. Klikk på den grønne knappen oppi høgre hjørne for å begynne."
-  },
-  "dashboard.projects.head-title": {
-    "message": "Prosjekt"
-  },
-  "dashboard.projects.links.and-more": {
-    "message": "og {count} flere..."
-  },
-  "dashboard.projects.links.button.clear-link": {
-    "message": "Visk vekk lenka"
-  },
-  "dashboard.projects.links.button.edit": {
-    "message": "Rediger lenker"
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "Endringer blir utført på <strong>{count}</strong> {count, plural, one {prosjekt} other {prosjekt}}."
-  },
   "dashboard.revenue.available-now": {
     "message": "Tilgjengelig nå"
   },
@@ -954,7 +858,7 @@
     "message": "Estimerte inntekter kan endre seg etter at det har blitt gjort tilgjengelig."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Klikk her for å lese om hvordan Modrinth handterer inntektene dine."
+    "message": "Klikk her for å lese om hvordan Icarus handterer inntektene dine."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Estimert {date}"
@@ -975,7 +879,7 @@
     "message": "Ta ut"
   },
   "dashboard.revenue.tos": {
-    "message": "Når du laster opp prosjekt til Modrinth og tar ut penger fra kontoen din, så sier du deg enig med <terms-link>Belønningsprogramvilkåra våre</terms-link>. Lær mer om <info-link>-belønningsprogrammet</info-link>."
+    "message": "Når du laster opp prosjekt til Icarus og tar ut penger fra kontoen din, så sier du deg enig med <terms-link>Belønningsprogramvilkåra våre</terms-link>. Lær mer om <info-link>-belønningsprogrammet</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Last ned som en CSV"
@@ -1107,7 +1011,7 @@
     "message": "Samlinga kan være privat."
   },
   "error.collection.404.list_item.3": {
-    "message": "Det kan hende at samlinga har blitt tatt ned av Modrinth-modereringslaget for å ha brutt <tou-link>Bruksvilkåra våre</tou-link>."
+    "message": "Det kan hende at samlinga har blitt tatt ned av Icarus-modereringslaget for å ha brutt <tou-link>Bruksvilkåra våre</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "Hvorfor?"
@@ -1128,10 +1032,10 @@
     "message": "Innholdet er utilgjengelig av juridiske grunner"
   },
   "error.generic.default.list_item.1": {
-    "message": "Sjekk om Modrinth er nede på <status-link>Statussida vår</status-link>."
+    "message": "Sjekk om Icarus er nede på <status-link>Statussida vår</status-link>."
   },
   "error.generic.default.list_item.2": {
-    "message": "Viss dette forsetter å skje, så kan du bli med i <discord-link>Discord-serveren vår</discord-link> for å fortelle Modrinth-laget om det."
+    "message": "Viss dette forsetter å skje, så kan du bli med i <discord-link>Discord-serveren vår</discord-link> for å fortelle Icarus-laget om det."
   },
   "error.generic.default.list_title": {
     "message": "Vær så snill å prøv igjen etter noen minutt."
@@ -1149,7 +1053,7 @@
     "message": "Det kan hende at organiseringseieren har endra eller sletta URL-en."
   },
   "error.organization.404.list_item.3": {
-    "message": "Det kan hende at organiseringa har blitt fjerna av Modrinth-moderasjonslaget for å ha brutt <tou-link>Bruksvilkåra våre</tou-link>."
+    "message": "Det kan hende at organiseringa har blitt fjerna av Icarus-moderasjonslaget for å ha brutt <tou-link>Bruksvilkåra våre</tou-link>."
   },
   "error.organization.404.list_title": {
     "message": "Hvorfor?"
@@ -1164,7 +1068,7 @@
     "message": "Det kan hende at prosjekteieren har endra URL-en, gjort det privat eller sletta det."
   },
   "error.project.404.list_item.3": {
-    "message": "Det kan hende at prosjektet har blitt tatt ned av moderasjonslaget til Modrinth for å ha brutt <tou-link>tjenestevilkåra våre</tou-link>."
+    "message": "Det kan hende at prosjektet har blitt tatt ned av moderasjonslaget til Icarus for å ha brutt <tou-link>tjenestevilkåra våre</tou-link>."
   },
   "error.project.404.list_title": {
     "message": "Hvorfor?"
@@ -1179,7 +1083,7 @@
     "message": "Det kan hende at brukeren har endra brukernavnet sitt og sletta kontoen sin."
   },
   "error.user.404.list_item.3": {
-    "message": "Det kan hende at brukerkontoen har blitt bannlyst for å ha brutt <tou-link>Tjenestevilkåra til Modrinth</tou-link>."
+    "message": "Det kan hende at brukerkontoen har blitt bannlyst for å ha brutt <tou-link>Tjenestevilkåra til Icarus</tou-link>."
   },
   "error.user.404.list_title": {
     "message": "Hvorfor?"
@@ -1221,10 +1125,10 @@
     "message": "Når serveren har høg belastning, så gir vi midlertidig tilgang til yttligere CPU-tråder for å hjelpe med å mitigere lag-spikes og ustabilitet. Dette hjelper med å unngå at TPS-en går under 20, sånn at det blir en så god opplevelse som mulig. Sia de ekstra CPU-trådene bare er tilgjengelige i kort tid i periodene der det er høg belestning, så kan det hende at de ikke blir vist i Spart-rapporter eller andre profilleringsverktøy."
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Hvilke CPU-typer kjører Modrinth Hosting-serverne på?"
+    "message": "Hvilke CPU-typer kjører Icarus Hosting-serverne på?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting-serverne kjører på AMD Ryzen 7900 and 7950X3D-like CPU-er med 5+ GH<, kombinert med DDR5-minne."
+    "message": "Icarus Hosting-serverne kjører på AMD Ryzen 7900 and 7950X3D-like CPU-er med 5+ GH<, kombinert med DDR5-minne."
   },
   "hosting-marketing.faq.currency": {
     "message": "Hvilken valutta er prisene i?"
@@ -1233,19 +1137,19 @@
     "message": "Alle prisene er lista i United States Dollars (USD)."
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "Har Modrinth Hosting-serverne DDoS-beskyttelse?"
+    "message": "Har Icarus Hosting-serverne DDoS-beskyttelse?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Ja. Alle Modrinth Hosting-serverne kommer med DDoS-beskyttelse, med en kapasitet opp til 17 Tbps noen plasser."
+    "message": "Ja. Alle Icarus Hosting-serverne kommer med DDoS-beskyttelse, med en kapasitet opp til 17 Tbps noen plasser."
   },
   "hosting-marketing.faq.heading": {
     "message": "Ofte Stilte Spørsmål"
   },
   "hosting-marketing.faq.how-fast": {
-    "message": "Hvor raske er Modrint Hosting-serverne?"
+    "message": "Hvor raske er Icarus Hosting-serverne?"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Modrinth Hosting-serverne blir oppretta på en veldig moderne høgytelses-maskinvare, men det er vanskelig å si nøyaktig hvordan det oversetter til hvor rask serverer din faktisk vil kjøre, fordi det er veldig mange faktorer som går ut over det, sånn som hvilke mods, data packs, eller plugins du kjører på serveren din, og til og med brukeroppførselen."
+    "message": "Icarus Hosting-serverne blir oppretta på en veldig moderne høgytelses-maskinvare, men det er vanskelig å si nøyaktig hvordan det oversetter til hvor rask serverer din faktisk vil kjøre, fordi det er veldig mange faktorer som går ut over det, sånn som hvilke mods, data packs, eller plugins du kjører på serveren din, og til og med brukeroppførselen."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "De fleste ytelsesproblem som dukker opp pleier å være på grunn av en uoptimalisert modpack, mod, data pack, eller plugin som fører til at serveren går treigt. Sia serverne våre er veldig gode, så betyr det at du mest sannsynlig ikke kommer til å bli så mange problem, så lenge du velger en passende plan for innholdet du kjører på serveren din."
@@ -1254,10 +1158,10 @@
     "message": "Kan jeg auke lagringsplassen på serveren min?"
   },
   "hosting-marketing.faq.increase-storage.answer": {
-    "message": "Ja, du kan fritt auke lagringsplassen på serveren din uten noen ekstra kostnader. Viss du trenger mer lagringsplass, så kan du ta kontakt med Modrinth Support."
+    "message": "Ja, du kan fritt auke lagringsplassen på serveren din uten noen ekstra kostnader. Viss du trenger mer lagringsplass, så kan du ta kontakt med Icarus Support."
   },
   "hosting-marketing.faq.location": {
-    "message": "Hvor oppholder Modrinth Hosting-serverne seg? Kan jeg velge en region?"
+    "message": "Hvor oppholder Icarus Hosting-serverne seg? Kan jeg velge en region?"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "Akkurat nå, så har tilgjengelige servere i Nord-Amerika, Europa, og Sørøst-Asia som du kan velge etter kjøpet ditt. Det kommer flere regioner i framtida! Viss du vil bytte regionen din, vær så snill å ta kontakt med støtte."
@@ -1266,7 +1170,7 @@
     "message": "Hvilke Minecraft-versjoner-og-loadere kan brukes?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Modrinth Hosting-servere kan kjøre hvilken som helst versjon av Minecraft: Java Edition, heilt tilbake til versjon 1.2.5, inkludert snapshot-versjoner."
+    "message": "Icarus Hosting-servere kan kjøre hvilken som helst versjon av Minecraft: Java Edition, heilt tilbake til versjon 1.2.5, inkludert snapshot-versjoner."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "Vi støtter også en haug med mod-og-plugin-loadere, inkludert Fabric, Quilt, Forge og NeoForge for mods, i tillegg til Paper og Purpur for plugins. Tilgjengeligheta kommer an på om mod-en eller plugin-loader-en støtter den valgte Minecraft-versjonen."
@@ -1283,11 +1187,11 @@
   "hosting-marketing.hero.button.start-your-server": {
     "message": "Start serveren din"
   },
-  "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Opprett den neste serveren din med Modrinth Hosting"
+  "hosting-marketing.hero.host-with-Icarus": {
+    "message": "Opprett den neste serveren din med Icarus Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting er den letteste måten å opprette din eigen Minecraft: Java Edition-server. Det er problemfritt å installere og spille favoritt-modsa-og-modpacksa dine, alt innen Modrinth-plattformen."
+    "message": "Icarus Hosting er den letteste måten å opprette din eigen Minecraft: Java Edition-server. Det er problemfritt å installere og spille favoritt-modsa-og-modpacksa dine, alt innen Icarus-plattformen."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Avansert nettverksvedlikehold"
@@ -1305,10 +1209,10 @@
     "message": "Tilpassa URL"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "Del serveren din med en tilpassa <contrast>modrinth.gg</contrast>-URL."
+    "message": "Del serveren din med en tilpassa <contrast>Icarus.gg</contrast>-URL."
   },
   "hosting-marketing.included.description": {
-    "message": "Hver server inkluderer tilgjengeligheter designa for en opprettingsopplevelse som bare Modrinth kan tilby."
+    "message": "Hver server inkluderer tilgjengeligheter designa for en opprettingsopplevelse som bare Icarus kan tilby."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Lettbruksfilbehandler"
@@ -1323,19 +1227,19 @@
     "message": "Hjelp når du trenger det"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Ta kontakt med Modrinth-laget for å få hjelp med serveren din når som helst."
+    "message": "Ta kontakt med Icarus-laget for å få hjelp med serveren din når som helst."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "En kraftig konsoll, eiendomsforvaltningsserver og mer"
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "Modrinth Hosting kommer med kraftige verktøy for å holde styr på serveren din."
+    "message": "Icarus Hosting kommer med kraftige verktøy for å holde styr på serveren din."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "SFTP-tilgang"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "Gå inn i serverfilene dine direkte med SFTP, bygd inn i Modrinth Hosting."
+    "message": "Gå inn i serverfilene dine direkte med SFTP, bygd inn i Icarus Hosting."
   },
   "hosting-marketing.included.with-your-server": {
     "message": "Inkludert med serveren din"
@@ -1358,20 +1262,20 @@
   "hosting-marketing.server-for-everyone": {
     "message": "Det er en server for hvem som helst"
   },
-  "hosting-marketing.why.all-on-modrinth": {
-    "message": "Hold styr på alt på Modrinth"
+  "hosting-marketing.why.all-on-Icarus": {
+    "message": "Hold styr på alt på Icarus"
   },
-  "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "Din server, mods, spillere og mer er alt her på Modrinth. Trenger ikke å bygge mellom plattformer."
+  "hosting-marketing.why.all-on-Icarus.description": {
+    "message": "Din server, mods, spillere og mer er alt her på Icarus. Trenger ikke å bygge mellom plattformer."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Konstant raskt"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "Infrastrukturen vår er aldri overbelasta, som betyr at hver server av Modrinth alltid kjører det beste den kan kjøre."
+    "message": "Infrastrukturen vår er aldri overbelasta, som betyr at hver server av Icarus alltid kjører det beste den kan kjøre."
   },
   "hosting-marketing.why.description": {
-    "message": "Velg fra tusenvis av modpacks på Modrinth, eller lag din eigen. Inviter vennene dine når du er klar til å spille."
+    "message": "Velg fra tusenvis av modpacks på Icarus, eller lag din eigen. Inviter vennene dine når du er klar til å spille."
   },
   "hosting-marketing.why.heading": {
     "message": "Finn en modpack. Nå er det en server."
@@ -1380,22 +1284,22 @@
     "message": "Opplev moderne, kosistens serveroppstart"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Modrinth Hosting-servere er starta opp på <contrast>Høgtytende AMD-CPU-er med DDR5 RAM</contrast>, som kjører på tilpassa programvare for å sørge for at serveren din kjører som den skal."
+    "message": "Icarus Hosting-servere er starta opp på <contrast>Høgtytende AMD-CPU-er med DDR5 RAM</contrast>, som kjører på tilpassa programvare for å sørge for at serveren din kjører som den skal."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Spill hvor nå enn modsa dine er"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting integrerer installeringsprosessen til moden og modpacken lett inni serveren din."
+    "message": "Icarus Hosting integrerer installeringsprosessen til moden og modpacken lett inni serveren din."
   },
-  "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "Hvorfor Modrinth Hosting?"
+  "hosting-marketing.why.why-Icarus-hosting": {
+    "message": "Hvorfor Icarus Hosting?"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "Alle favoritmodsa dine"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
-    "message": "Velg mellom Vanilla, Fabric, Forge, Quilt og NeoForge. Hvis det er på Modrinth, så kan det kjøre på serveren din."
+    "message": "Velg mellom Vanilla, Fabric, Forge, Quilt og NeoForge. Hvis det er på Icarus, så kan det kjøre på serveren din."
   },
   "hosting.plan.out-of-stock": {
     "message": "Utsolgt"
@@ -1410,7 +1314,7 @@
     "message": "Gå til dashbord"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Få den beste mulige modding-opplevelsen med jamnlige oppdateringer fra Modrinth-laget"
+    "message": "Få den beste mulige modding-opplevelsen med jamnlige oppdateringer fra Icarus-laget"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Utvikler seg konstant"
@@ -1455,13 +1359,13 @@
     "message": "Følg prosjekt du liker"
   },
   "landing.feature.launcher.description": {
-    "message": "Modrinth sin åpen kildekode-API gjør sånn at launchere djupt integrerer seg med Modrinth. Du kan bruke Modrinth gjennom <link>vår eigen app</link> og noen av de mest populære launcherene som ATLauncher, MultiMC og Prism Launcher."
+    "message": "Icarus sin åpen kildekode-API gjør sånn at launchere djupt integrerer seg med Icarus. Du kan bruke Icarus gjennom <link>vår eigen app</link> og noen av de mest populære launcherene som ATLauncher, MultiMC og Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "Spill med favorittlauncheren din"
   },
   "landing.feature.search.description": {
-    "message": "Den lynraske Søkinga og filtra til Modrinth lar deg lett finne det du ser etter mens du skriver."
+    "message": "Den lynraske Søkinga og filtra til Icarus lar deg lett finne det du ser etter mens du skriver."
   },
   "landing.feature.search.heading": {
     "message": "Finn ut hva du vil ha, raskt og enkelt"
@@ -1494,10 +1398,10 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "Ei forenkla visning av et Minecraft-vindu, med Mojang Studios-logoen i Modrinth grønn."
+    "message": "Ei forenkla visning av et Minecraft-vindu, med Mojang Studios-logoen i Icarus grønn."
   },
-  "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+  "landing.launcher.Icarus-app-label": {
+    "message": "Icarus Launcher"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -1587,25 +1491,25 @@
     "message": "Gå til kontoinnstillinger"
   },
   "layout.banner.add-email.description": {
-    "message": "Grunna sikkerhet, så trenger Modrinth at du registrerer deg en email-adresse til kontoen din."
+    "message": "Grunna sikkerhet, så trenger Icarus at du registrerer deg en email-adresse til kontoen din."
   },
   "layout.banner.build-fail.description": {
-    "message": "Denne utplasseringa av brukergrensesnittet til Modrinth kunne ikke generere tilstanden fra API-en. Dette kan være på grunn av et strømbrott eller en error i konfigurasjonen. Ombygg når API-en er tilgjengelig. Errorkoder: {errors}; Nåværende API-URL er: {url}"
+    "message": "Denne utplasseringa av brukergrensesnittet til Icarus kunne ikke generere tilstanden fra API-en. Dette kan være på grunn av et strømbrott eller en error i konfigurasjonen. Ombygg når API-en er tilgjengelig. Errorkoder: {errors}; Nåværende API-URL er: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "Error når det kom til å generer tilstanden fra API-en når den blei bygd."
   },
   "layout.banner.preview.description": {
-    "message": "Viss du meinte å gå til den offisielle Modrinth-nettsida, gå til <link>https://modrinth.com</link>. Denne forhandsvisnigsutplasseringa blir brukt av Modrinth-personalet for testing. Den blei bygd ved å bruke <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Viss du meinte å gå til den offisielle Icarus-nettsida, gå til <link>https://Icarus.com</link>. Denne forhandsvisnigsutplasseringa blir brukt av Icarus-personalet for testing. Den blei bygd ved å bruke <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
-    "message": "Dette er ei forhandsvisning av distribusjonen til Modrinth-nettsida."
+    "message": "Dette er ei forhandsvisning av distribusjonen til Icarus-nettsida."
   },
   "layout.banner.staging.description": {
-    "message": "Oppsettingsmiljøet er heilt separat fra produksjonsdatabasen til Modrinth. Dette brukes for testing og feilsøking, og det kan også hende at det kjører nyere versjoner under utvikling av Modrinth-backend-en eller grensesnittet enn produktinstansen."
+    "message": "Oppsettingsmiljøet er heilt separat fra produksjonsdatabasen til Icarus. Dette brukes for testing og feilsøking, og det kan også hende at det kjører nyere versjoner under utvikling av Icarus-backend-en eller grensesnittet enn produktinstansen."
   },
   "layout.banner.staging.title": {
-    "message": "Du ser på oppsettingsmiljøet til Modrinth"
+    "message": "Du ser på oppsettingsmiljøet til Icarus"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Oppdater faktureringsinformasjon"
@@ -1620,7 +1524,7 @@
     "message": "Fullfør skatteskjemet"
   },
   "layout.banner.tax.description": {
-    "message": "Du har allerede tatt ut over {threshold} fra Modrinth i år. For å overholde skattereguleringer, så må du fullføre skatteskjemaet. Uttakingene dine er satt på pause til dette skjemaet er sendt inn."
+    "message": "Du har allerede tatt ut over {threshold} fra Icarus i år. For å overholde skattereguleringer, så må du fullføre skatteskjemaet. Uttakingene dine er satt på pause til dette skjemaet er sendt inn."
   },
   "layout.banner.tax.title": {
     "message": "Skatteskjema påkrevd"
@@ -1638,7 +1542,7 @@
     "message": "Send inn bekreftelsesemail-en igjen"
   },
   "layout.banner.verify-email.description": {
-    "message": "Gunna sikkerhet, så trenger Modrinth at du bekrefter email-adressa assisiert med kontoen din."
+    "message": "Gunna sikkerhet, så trenger Icarus at du bekrefter email-adressa assisiert med kontoen din."
   },
   "layout.footer.about": {
     "message": "Om"
@@ -1679,23 +1583,23 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Bruksvilkår"
   },
-  "layout.footer.modrinth-information": {
-    "message": "Modrinth-informasjon"
+  "layout.footer.Icarus-information": {
+    "message": "Icarus-informasjon"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth er <github-link>Åpen kjeldekode</github-link>."
+    "message": "Icarus er <github-link>Åpen kjeldekode</github-link>."
   },
   "layout.footer.products": {
     "message": "Produkt"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Icarus Launcher"
   },
   "layout.footer.products.plus": {
-    "message": "Modrinth+"
+    "message": "Icarus+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "layout.footer.resources": {
     "message": "Ressurser"
@@ -1731,7 +1635,7 @@
     "message": "Vekslingsmeny"
   },
   "layout.meta.description": {
-    "message": "Last ned Minecraft mods, plugins, datapacks, shaders, ressurspakker, og modpacks på Modrinth. Utforsk og last opp prosjekt på Modrinth med et moderne og lett å bruke grensesnitt og API."
+    "message": "Last ned Minecraft mods, plugins, datapacks, shaders, ressurspakker, og modpacks på Icarus. Utforsk og last opp prosjekt på Icarus med et moderne og lett å bruke grensesnitt og API."
   },
   "layout.meta.og-description": {
     "message": "Utforsk og publiser Minecraft-innhold!"
@@ -1751,8 +1655,8 @@
   "layout.nav.discover-content": {
     "message": "Utforsk innhold"
   },
-  "layout.nav.get-modrinth-app": {
-    "message": "Skaff deg Modrinth App-en"
+  "layout.nav.get-Icarus-app": {
+    "message": "Skaff deg Icarus Launcher-en"
   },
   "layout.nav.home": {
     "message": "Heim"
@@ -1760,11 +1664,11 @@
   "layout.nav.host-a-server": {
     "message": "Opprett en server"
   },
-  "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+  "layout.nav.Icarus-app": {
+    "message": "Icarus Launcher"
   },
-  "layout.nav.modrinth-home-page": {
-    "message": "Modrinth-heimeside"
+  "layout.nav.Icarus-home-page": {
+    "message": "Icarus-heimeside"
   },
   "layout.nav.my-servers": {
     "message": "Serverne mine"
@@ -1787,8 +1691,8 @@
   "layout.nav.search": {
     "message": "Søk"
   },
-  "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Oppgrader til Modrinth+"
+  "layout.nav.upgrade-to-Icarus-plus": {
+    "message": "Oppgrader til Icarus+"
   },
   "moderation.moderate": {
     "message": "Moderer"
@@ -1798,6 +1702,9 @@
   },
   "moderation.page.reports": {
     "message": "Rapporteringer"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Teknisk forhandsvisning"
   },
   "muralpay.account-type.checking": {
     "message": "Sjekking"
@@ -2067,10 +1974,10 @@
     "message": "Dobbeltsjekk lommeboksadressa di. Penger sendt til feil adresse kan ikke bli gjenoppretta."
   },
   "profile.bio.fallback.creator": {
-    "message": "En Modrinth-skaper."
+    "message": "En Icarus-skaper."
   },
   "profile.bio.fallback.user": {
-    "message": "En Modrinth-bruker."
+    "message": "En Icarus-bruker."
   },
   "profile.button.billing": {
     "message": "Hold styr på brukerfakturering"
@@ -2154,10 +2061,10 @@
     "message": "Lagrer..."
   },
   "profile.meta.description": {
-    "message": "Last ned prosjekta til {username} på Modrinth"
+    "message": "Last ned prosjekta til {username} på Icarus"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} - Last ned prosjekta til {username} på Modrinth"
+    "message": "{bio} - Last ned prosjekta til {username} på Icarus"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> prosjektfølger} other {<stat>{count}</stat> prosjektfølgere}}"
@@ -2196,7 +2103,7 @@
     "message": "Send inn på nytt att for anmeldelse"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Prosjektet ditt har blitt {status, select, rejected {avslått} withheld {tilbakeholdt} other {{status}}} av Modrinth-laget. I de fleste filfeller, så kan du sende det inn igjen sånn at det blir anmeldt igjen etter å ha sett på meldinga til laga."
+    "message": "Prosjektet ditt har blitt {status, select, rejected {avslått} withheld {tilbakeholdt} other {{status}}} av Icarus-laget. I de fleste filfeller, så kan du sende det inn igjen sånn at det blir anmeldt igjen etter å ha sett på meldinga til laga."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Du må fillføre de påkrevde trinna i publiseringsjekklista!"
@@ -2310,7 +2217,7 @@
     "message": "Anmeld prosjekt"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting er den letteste måten å spille med vennene dine uten problem!"
+    "message": "Icarus Hosting er den letteste måten å spille med vennene dine uten problem!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Startprisen: {price}<small> per måned</small>"
@@ -2343,10 +2250,10 @@
     "message": "{title} støtter ikke {gameVersion} for {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Installer med Modrinth App"
+    "message": "Installer med Icarus Launcher"
   },
   "project.download.no-app": {
-    "message": "Har du ikke en Modrinth App?"
+    "message": "Har du ikke en Icarus Launcher?"
   },
   "project.download.no-versions-available": {
     "message": "Ingen versjoner tilgjengelige for {gameVersion} og {platform}."
@@ -2382,7 +2289,7 @@
     "message": "Last ned {title}"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Vi har nettopp bygd opp igjen Miljø-systemet på Modrinth, som betyr at nye innstillinger er nå tilgjengelige. Du har ikke tillatelse til å endre på disse innstillingene, men vær så snill å fortell et anna medlem av dette prosjektet at miljø-matadata-en må bli bekrefta."
+    "message": "Vi har nettopp bygd opp igjen Miljø-systemet på Icarus, som betyr at nye innstillinger er nå tilgjengelige. Du har ikke tillatelse til å endre på disse innstillingene, men vær så snill å fortell et anna medlem av dette prosjektet at miljø-matadata-en må bli bekrefta."
   },
   "project.environment.migration-no-permission.title": {
     "message": "Miljø-metadata-en må bli gjennomgått"
@@ -2391,7 +2298,7 @@
     "message": "Lær mer om denne endringa"
   },
   "project.environment.migration.message": {
-    "message": "Vi har nettopp bygd opp igjen Miljø-systemet på Modrinth, som betyr at nye innstilinger er ny tilgjengelige. Vær så snill å bekreft at metadataen er korrekt."
+    "message": "Vi har nettopp bygd opp igjen Miljø-systemet på Icarus, som betyr at nye innstilinger er ny tilgjengelige. Vær så snill å bekreft at metadataen er korrekt."
   },
   "project.environment.migration.review-button": {
     "message": "Gå gjennom miljøinnstillinger"
@@ -2523,7 +2430,7 @@
     "message": "Kunne ikke finne {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}"
   },
   "report.for.violation": {
-    "message": "Brudd på <rules-link>Reglene</rules-link> til Modrinth eller <terms-link>Bruksvilkåra</terms-link> deres"
+    "message": "Brudd på <rules-link>Reglene</rules-link> til Icarus eller <terms-link>Bruksvilkåra</terms-link> deres"
   },
   "report.for.violation.description": {
     "message": "Eksempel inkluderer innhold som er ondsinna, spam, støtende, villendende, eller ulovlig."
@@ -2568,7 +2475,7 @@
     "message": "Hvilken type innhold rapporterer du?"
   },
   "report.question.report-reason": {
-    "message": "Hvilke av reglene til Modrinth bryter dette: {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}?"
+    "message": "Hvilke av reglene til Icarus bryter dette: {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}?"
   },
   "report.report-content": {
     "message": "Rapporter innhold til moderatorene"
@@ -2772,7 +2679,7 @@
     "message": "Skriv rapporter"
   },
   "scopes.sessionAccess.description": {
-    "message": "Få tilgang til Modrinth-utstedte sesjoner"
+    "message": "Få tilgang til Icarus-utstedte sesjoner"
   },
   "scopes.sessionAccess.label": {
     "message": "Gå inn i sesjoner"
@@ -2919,13 +2826,13 @@
     "message": "Genererer eksport..."
   },
   "settings.account.data-export.description": {
-    "message": "Spør om en kopi av de personlige dataene dine som du har lasta opp til Modrinth. Dette kan ta flere minutt å fullføre."
+    "message": "Spør om en kopi av de personlige dataene dine som du har lasta opp til Icarus. Dette kan ta flere minutt å fullføre."
   },
   "settings.account.data-export.title": {
     "message": "Dataeksport"
   },
   "settings.account.delete.confirm.description": {
-    "message": "Dette kommer til å **slette alle brukerdataene dine og følgerene dine med en gang**. Dette kommer ikke til å slette prosjekta dine. Du kan ikke angre sletting av kontoen din.<br><br>Viss du trenger hjelp med kontoen din, få støtte fra [Modrinth Discord]-en(https://discord.modrinth.com)."
+    "message": "Dette kommer til å **slette alle brukerdataene dine og følgerene dine med en gang**. Dette kommer ikke til å slette prosjekta dine. Du kan ikke angre sletting av kontoen din.<br><br>Viss du trenger hjelp med kontoen din, få støtte fra [Icarus Discord]-en(https://discord.Icarus.com)."
   },
   "settings.account.delete.confirm.proceed": {
     "message": "Slett denne kontoen"
@@ -3153,7 +3060,7 @@
     "message": "Er du sikker på at du vil slette denne applikasjonen?"
   },
   "settings.applications.description.intro": {
-    "message": "Applikasjonen kan bli brukt til autentikere Modrinth-brukere med produkta dine. For mer informasjon, så <docs-link>Dokumentasjonen til Modrinth</docs-link>."
+    "message": "Applikasjonen kan bli brukt til autentikere Icarus-brukere med produkta dine. For mer informasjon, så <docs-link>Dokumentasjonen til Icarus</docs-link>."
   },
   "settings.applications.field.description": {
     "message": "Beskrivelse"
@@ -3207,7 +3114,7 @@
     "message": "fra"
   },
   "settings.authorizations.description": {
-    "message": "Når du autoriserer en applikasjon med Modrinth-kontoen din, så gir du tilgang til kontoen din. Du kan handere og gå gjennom tilgang til kontoen din her når som helst."
+    "message": "Når du autoriserer en applikasjon med Icarus-kontoen din, så gir du tilgang til kontoen din. Du kan handere og gå gjennom tilgang til kontoen din her når som helst."
   },
   "settings.authorizations.empty-state": {
     "message": "Vi kan ikke vise de autoriserte appene dine akkurat nå, vi jobber med å fikse det. Vær så snill å besøk denne sida seinere!"
@@ -3225,16 +3132,16 @@
     "message": "Er du sikker på at du har lyst å slette denne applikasjonen?"
   },
   "settings.billing.charges.description": {
-    "message": "Alle de siste betalingene til Modrinth-kontoen din kommer til å bli lista opp her:"
+    "message": "Alle de siste betalingene til Icarus-kontoen din kommer til å bli lista opp her:"
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "Medal-Server-Prøveperiode"
   },
   "settings.billing.charges.product.midas": {
-    "message": "Modrinth Plus"
+    "message": "Icarus Plus"
   },
   "settings.billing.charges.product.pyro": {
-    "message": "Modrinth Hosting"
+    "message": "Icarus Hosting"
   },
   "settings.billing.expires": {
     "message": "Går ut {date}"
@@ -3252,13 +3159,13 @@
     "message": "årlig"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "Reklamefri surfing av modrinth.com og Modrinth App-en"
+    "message": "Reklamefri surfing av Icarus.com og Icarus Launcher-en"
   },
   "settings.billing.midas.benefits.badge": {
-    "message": "Modrinth+ merke på profilen din"
+    "message": "Icarus+ merke på profilen din"
   },
   "settings.billing.midas.benefits.support": {
-    "message": "Støtt Modrinth og skaperne direkte"
+    "message": "Støtt Icarus og skaperne direkte"
   },
   "settings.billing.midas.benefits.title": {
     "message": "Fordeler"
@@ -3282,7 +3189,7 @@
     "message": "Betalinga di blir bearbeida. Fordeler blir aktivert når betalinga er fullført."
   },
   "settings.billing.midas.upsell": {
-    "message": "Abonner på Modrinth Plus!"
+    "message": "Abonner på Icarus Plus!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Avslutt abonnement"
@@ -3342,7 +3249,7 @@
     "message": "{shared} Delte CPU-er (utbryter opp til {bursts} CPU-er)"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "Vi kunne ikke finne en tilkopla server for dette abonnementet. Noen av grunnene kan være. Viss du nettopp har kjøpt serveren din, så er dette normalt. Det kan ta opp til en time før serveren din blir bestemt. Men, viss du kjøpte denne serveren for ei stund sia, så kan det hende at den har blitt suspendert. Viss dette ikke er hva du hadde forventa, vennligst ta kontakt med Modrinth Support med følgende informasjon:"
+    "message": "Vi kunne ikke finne en tilkopla server for dette abonnementet. Noen av grunnene kan være. Viss du nettopp har kjøpt serveren din, så er dette normalt. Det kan ta opp til en time før serveren din blir bestemt. Men, viss du kjøpte denne serveren for ei stund sia, så kan det hende at den har blitt suspendert. Viss dette ikke er hva du hadde forventa, vennligst ta kontakt med Icarus Support med følgende informasjon:"
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "Server-ID: {id}"
@@ -3354,7 +3261,7 @@
     "message": "{gb} GB RAM"
   },
   "settings.billing.pyro.resubscribe.error.text": {
-    "message": "En error oppstod mens vi prøvde å abonnere på Modrinth-serveren din igjen."
+    "message": "En error oppstod mens vi prøvde å abonnere på Icarus-serveren din igjen."
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Error når vi prøvde å abonnere igjen"
@@ -3378,10 +3285,10 @@
     "message": "{gb} GB Swap"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Hold styr på Modrinth Server-abonnementa dine."
+    "message": "Hold styr på Icarus Server-abonnementa dine."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Modrinth Server-Abonnement"
+    "message": "Icarus Server-Abonnement"
   },
   "settings.billing.renews": {
     "message": "Fornyer {date}"
@@ -3396,7 +3303,7 @@
     "message": "Abonner"
   },
   "settings.billing.subscription.description": {
-    "message": "Hold styr Modrinth-abonnementa dine."
+    "message": "Hold styr Icarus-abonnementa dine."
   },
   "settings.billing.subscription.title": {
     "message": "Abonnement"
@@ -3423,7 +3330,7 @@
     "message": "Deaktiver utviklermodus"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Utviklermodus</strong> er aktivert. Dette gjør at du kan se på de internet ID-ene av forskjellige ting inni Modrinth som kan være hjelpsomme hvis du er en utvikler som bruker Modrinth-API-en. Klikk på Modrinth-logoen i botnen av sida 5 ganger for å skru på utviklermodus."
+    "message": "<strong>Utviklermodus</strong> er aktivert. Dette gjør at du kan se på de internet ID-ene av forskjellige ting inni Icarus som kan være hjelpsomme hvis du er en utvikler som bruker Icarus-API-en. Klikk på Icarus-logoen i botnen av sida 5 ganger for å skru på utviklermodus."
   },
   "settings.display.flags.description": {
     "message": "Skru av eller på visse funksjoner på denne enheta."
@@ -3486,16 +3393,16 @@
     "message": "Avansert gjengivelse"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Lag lenker som åpner seg utafor Modrinth gå i ei ny fane. Uansett hva innstillinga er satt på, så kommer lenker som er på samme domene og i samme nedmarkeringsbeskrivelsen til å åpne seg i samme fana, og lenker om reklame og redigeringssider kommer til å åpne seg i ei ny fane."
+    "message": "Lag lenker som åpner seg utafor Icarus gå i ei ny fane. Uansett hva innstillinga er satt på, så kommer lenker som er på samme domene og i samme nedmarkeringsbeskrivelsen til å åpne seg i samme fana, og lenker om reklame og redigeringssider kommer til å åpne seg i ei ny fane."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Åpne eksterne lenker i ei ny fane"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Gjømmer \"Skaff deg Modrinth App\"-knappene fra primærnavigatoren. Du kan fortsatt finne Modrinth App-sida i landingsside eller i footer-en."
+    "message": "Gjømmer \"Skaff deg Icarus Launcher\"-knappene fra primærnavigatoren. Du kan fortsatt finne Icarus Launcher-sida i landingsside eller i footer-en."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Gjøm Modrinth App-reklamekampanjer"
+    "message": "Gjøm Icarus Launcher-reklamekampanjer"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Venstre-stilt sidefelt på innholdssidene"
@@ -3510,7 +3417,7 @@
     "message": "Høgre-stilte sidebarfilter på søkesidene"
   },
   "settings.display.theme.description": {
-    "message": "Velg den spesifiserte fargetemaet ditt for Modrinth på denne enheta."
+    "message": "Velg den spesifiserte fargetemaet ditt for Icarus på denne enheta."
   },
   "settings.display.theme.title": {
     "message": "Fargetema"
@@ -3522,7 +3429,7 @@
     "message": "Lag en PAT"
   },
   "settings.pats.description": {
-    "message": "PAT-er kan bli brukt for å få tilgang til API-ene til Modrinth. De kan bli laga og sletta når som helst. For mer informasjon, se <doc-link>API-dokumentasjonen til Modrinth</doc-link>."
+    "message": "PAT-er kan bli brukt for å få tilgang til API-ene til Icarus. De kan bli laga og sletta når som helst. For mer informasjon, se <doc-link>API-dokumentasjonen til Icarus</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Lag PAT"
@@ -3576,7 +3483,7 @@
     "message": "Bio"
   },
   "settings.profile.description": {
-    "message": "Profilinformasjonen din er offentlig lesbar på Modrinth og gjennom <docs-link>Modrinth API</docs-link>-en."
+    "message": "Profilinformasjonen din er offentlig lesbar på Icarus og gjennom <docs-link>Icarus API</docs-link>-en."
   },
   "settings.profile.head-title": {
     "message": "Profilinnstillinger"
@@ -3600,7 +3507,7 @@
     "message": "Nåverende økt"
   },
   "settings.sessions.description": {
-    "message": "Her er alle enhetene som er logga inn med Modrinth-kontoen din akkurat nå. Du kan logge ut av hver av de for seg sjøl.\n\nViss du ser ei oppføring som du ikke kjenner igjen, logg ut av enheta og endre Modrinth-konto-passordet ditt med en gang."
+    "message": "Her er alle enhetene som er logga inn med Icarus-kontoen din akkurat nå. Du kan logge ut av hver av de for seg sjøl.\n\nViss du ser ei oppføring som du ikke kjenner igjen, logg ut av enheta og endre Icarus-konto-passordet ditt med en gang."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Sist tilgang {ago}"
@@ -3621,7 +3528,7 @@
     "message": "Visning"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Siste nyhetene fra Modrinth"
+    "message": "Siste nyhetene fra Icarus"
   },
   "ui.latest-news-row.view-all": {
     "message": "Vis alle nyhetene"
@@ -3633,7 +3540,7 @@
     "message": "Abonnert!"
   },
   "ui.newsletter-button.tooltip": {
-    "message": "Abonner til Modrinth-nyhetsbrevet"
+    "message": "Abonner til Icarus-nyhetsbrevet"
   },
   "version.environment.none.description": {
     "message": "Miljøet for denne versjonen har ikke blitt spesifisert."
@@ -3648,3 +3555,5 @@
     "message": "Ukjent miljø"
   }
 }
+
+

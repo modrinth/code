@@ -29,7 +29,7 @@ The primary file is explicitly listed at the top and separate from any supplemen
 
 <div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
-		<source src="https://cdn-raw.modrinth.com/blog/streamlined-version-creation/vid1.mp4" type="video/mp4" />
+		<source src="https://cdn-raw.Icarus.com/blog/streamlined-version-creation/vid1.mp4" type="video/mp4" />
 	</video>
 </div>
 
@@ -47,7 +47,7 @@ We’ve added a refreshed loader selection screen that groups loaders by project
 
 <div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
-		<source src="https://cdn-raw.modrinth.com/blog/streamlined-version-creation/vid2.mp4" type="video/mp4" />
+		<source src="https://cdn-raw.Icarus.com/blog/streamlined-version-creation/vid2.mp4" type="video/mp4" />
 	</video>
 </div>
 
@@ -57,7 +57,7 @@ Game versions now have their own dedicated step. This was a major pain point for
 
 <div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
-		<source src="https://cdn-raw.modrinth.com/blog/streamlined-version-creation/vid3.mp4" type="video/mp4" />
+		<source src="https://cdn-raw.Icarus.com/blog/streamlined-version-creation/vid3.mp4" type="video/mp4" />
 	</video>
 </div>
 
@@ -73,7 +73,7 @@ Dependencies were another pain point, so we’ve added the ability to search pro
 
 <div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
-		<source src="https://cdn-raw.modrinth.com/blog/streamlined-version-creation/vid4.mp4" type="video/mp4" />
+		<source src="https://cdn-raw.Icarus.com/blog/streamlined-version-creation/vid4.mp4" type="video/mp4" />
 	</video>
 </div>
 
@@ -85,3 +85,4 @@ Dependencies were another pain point, so we’ve added the ability to search pro
 <hr />
 
 Thank you all for your continued support. We hope you have a great holiday and get some well-earned time with your families! 🎅
+

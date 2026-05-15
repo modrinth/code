@@ -1,2 +1,3 @@
 [env]
-SQLX_OFFLINE = "true"
+# SQLX_OFFLINE removed for dev - re-enable after running cargo sqlx prepare
+SQLX_OFFLINE = "false"

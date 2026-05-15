@@ -1,4 +1,4 @@
-import type { ModrinthId } from '@modrinth/utils'
+import type { ModrinthId } from '@icarus/utils'
 
 export type GameInstance = {
 	path: string
@@ -30,6 +30,18 @@ export type GameInstance = {
 	force_fullscreen?: boolean
 	game_resolution?: [number, number]
 	hooks: Hooks
+	sync_enabled: boolean
+	sync_overrides?: InstanceSyncOverrides
+}
+
+export type InstanceSyncOverrides = {
+	saves?: boolean
+	screenshots?: boolean
+	resourcepacks?: boolean
+	shaderpacks?: boolean
+	schematics?: boolean
+	options_txt?: boolean
+	servers_dat?: boolean
 }
 
 type InstallStage =
@@ -109,10 +121,8 @@ type AppSettings = {
 	native_decorations: boolean
 	worlds_in_home: boolean
 
-	telemetry: boolean
 	discord_rpc: boolean
 	developer_mode: boolean
-	personalized_ads: boolean
 
 	onboarded: boolean
 
@@ -127,4 +137,9 @@ type AppSettings = {
 	custom_dir?: string
 	prev_custom_dir?: string
 	migrated: boolean
+	sync: {
+		enabled: boolean
+		files: string[]
+		folders: string[]
+	}
 }

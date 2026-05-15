@@ -14,6 +14,7 @@ fn main() {
                     .commands(&[
                         "check_reachable",
                         "login",
+                        "create_offline_user",
                         "remove_user",
                         "get_default_user",
                         "set_default_user",
@@ -207,6 +208,17 @@ fn main() {
                     ),
             )
             .plugin(
+                "profile-sync",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "profile_set_sync_enabled",
+                        "profile_set_sync_overrides",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
                 "settings",
                 InlinedPlugin::new()
                     .commands(&[
@@ -244,22 +256,6 @@ fn main() {
                         "show_launcher_logs_folder",
                         "progress_bars_list",
                         "get_opening_command",
-                    ])
-                    .default_permission(
-                        DefaultPermissionRule::AllowAllCommands,
-                    ),
-            )
-            .plugin(
-                "ads",
-                InlinedPlugin::new()
-                    .commands(&[
-                        "init_ads_window",
-                        "hide_ads_window",
-                        "scroll_ads_window",
-                        "show_ads_window",
-                        "record_ads_click",
-                        "open_link",
-                        "get_ads_personalization",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

@@ -92,17 +92,17 @@
 	</div>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	ClientIcon,
 	getLoaderIcon,
 	MonitorSmartphoneIcon,
 	ServerIcon,
 	UserIcon,
-} from '@modrinth/assets'
-import { FormattedTag, TagItem } from '@modrinth/ui'
-import type { EnvironmentV3, GameVersionTag, PlatformTag } from '@modrinth/utils'
-import { getVersionsToDisplay } from '@modrinth/utils'
+} from '@icarus/assets'
+import { FormattedTag, TagItem } from '@icarus/ui'
+import type { EnvironmentV3, GameVersionTag, PlatformTag } from '@icarus/utils'
+import { getVersionsToDisplay } from '@icarus/utils'
 import { type Component, computed } from 'vue'
 import { useRouter } from 'vue-router'
 

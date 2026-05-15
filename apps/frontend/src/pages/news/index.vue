@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ChevronRightIcon, GitGraphIcon, RssIcon } from '@modrinth/assets'
-import { articles as rawArticles } from '@modrinth/blog'
-import { ButtonStyled, NewsArticleCard, useFormatDateTime } from '@modrinth/ui'
+import { ChevronRightIcon, GitGraphIcon, RssIcon } from '@icarus/assets'
+import { articles as rawArticles } from '@icarus/blog'
+import { ButtonStyled, NewsArticleCard, useFormatDateTime } from '@icarus/ui'
 import { computed, ref } from 'vue'
 
 import NewsletterButton from '~/components/ui/NewsletterButton.vue'
@@ -29,10 +29,10 @@ const featuredArticle = computed(() => articles.value?.[0])
 const config = useRuntimeConfig()
 
 useSeoMeta({
-	title: 'Modrinth News',
-	ogTitle: 'Modrinth News',
-	description: 'Keep up-to-date on the latest news from Modrinth.',
-	ogDescription: 'Keep up-to-date on the latest news from Modrinth.',
+	title: 'Icarus News',
+	ogTitle: 'Icarus News',
+	description: 'Keep up-to-date on the latest news from Icarus.',
+	ogDescription: 'Keep up-to-date on the latest news from Icarus.',
 	ogType: 'website',
 	ogImage: () => `${config.public.siteUrl}/news/thumbnail.webp`,
 	twitterCard: 'summary_large_image',
@@ -163,3 +163,4 @@ useSeoMeta({
 	}
 }
 </style>
+

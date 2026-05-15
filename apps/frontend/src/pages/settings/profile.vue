@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { TrashIcon, UndoIcon, UploadIcon, UserIcon } from '@modrinth/assets'
+import { TrashIcon, UndoIcon, UploadIcon, UserIcon } from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -101,7 +101,7 @@ import {
 	UnsavedChangesPopup,
 	useSavable,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -122,7 +122,7 @@ const messages = defineMessages({
 	description: {
 		id: 'settings.profile.description',
 		defaultMessage:
-			'Your profile information is publicly viewable on Modrinth and through the <docs-link>Modrinth API</docs-link>.',
+			'Your profile information is publicly viewable on Icarus and through the <docs-link>Icarus API</docs-link>.',
 	},
 	profilePicture: {
 		id: 'settings.profile.profile-picture.title',
@@ -143,7 +143,7 @@ const messages = defineMessages({
 })
 
 useHead({
-	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
+	title: () => `${formatMessage(messages.headTitle)} - Icarus`,
 })
 
 const auth = await useAuth()
@@ -263,3 +263,4 @@ async function save() {
 	margin-top: var(--gap-md);
 }
 </style>
+

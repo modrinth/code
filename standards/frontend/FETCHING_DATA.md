@@ -23,7 +23,7 @@ TanStack Query is configured in `apps/frontend/src/plugins/tanstack.ts` as a Nux
 Use `useQuery` with the api-client for data fetching:
 
 ```ts
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 const { data, isPending, isError, error } = useQuery({
 	queryKey: ['project', 'v3', projectId],
@@ -50,13 +50,13 @@ export const STALE_TIME = 1000 * 60 * 5
 export const STALE_TIME_LONG = 1000 * 60 * 10
 
 export const projectQueryOptions = {
-	v3: (projectId: string, client: AbstractModrinthClient) => ({
+	v3: (projectId: string, client: AbstractIcarusClient) => ({
 		queryKey: ['project', 'v3', projectId] as const,
 		queryFn: () => client.labrinth.projects_v3.get(projectId),
 		staleTime: STALE_TIME,
 	}),
 
-	members: (projectId: string, client: AbstractModrinthClient) => ({
+	members: (projectId: string, client: AbstractIcarusClient) => ({
 		queryKey: ['project', projectId, 'members'] as const,
 		queryFn: () => client.labrinth.projects_v3.getMembers(projectId),
 		staleTime: STALE_TIME,
@@ -88,7 +88,7 @@ Use `useMutation` for create/update/delete operations. Invalidate related querie
 
 ```ts
 const queryClient = useQueryClient()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 const createMutation = useMutation({
 	mutationFn: (name: string) => client.archon.backups_v0.create(serverId, { name }),
@@ -162,3 +162,4 @@ queryClient.invalidateQueries({ queryKey: ['project', projectId] })
 - `apps/frontend/src/plugins/tanstack.ts` — QueryClient setup + SSR hydration
 - `apps/frontend/src/composables/query-client.ts` — `useAppQueryClient()` helper
 - `apps/frontend/src/composables/queries/` — reusable query option factories
+

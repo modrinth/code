@@ -1,4 +1,4 @@
-//! Theseus directory information
+//! Pteron directory information
 use crate::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::state::LAUNCHER_STATE;
@@ -13,6 +13,7 @@ pub const CACHES_FOLDER_NAME: &str = "caches";
 pub const LAUNCHER_LOGS_FOLDER_NAME: &str = "launcher_logs";
 pub const PROFILES_FOLDER_NAME: &str = "profiles";
 pub const METADATA_FOLDER_NAME: &str = "meta";
+pub const SYNCED_FOLDER_NAME: &str = "synced";
 
 #[derive(Debug)]
 pub struct DirectoryInfo {
@@ -33,11 +34,11 @@ impl DirectoryInfo {
     // Get the settings directory
     // init() is not needed for this function
     pub fn initial_settings_dir_path(app_identifier: &str) -> Option<PathBuf> {
-        Self::env_path("THESEUS_CONFIG_DIR")
+        Self::env_path("ICARUS_CONFIG_DIR")
             .or_else(|| Some(dirs::data_dir()?.join(app_identifier)))
     }
 
-    /// Get all paths needed for Theseus to operate properly
+    /// Get all paths needed for Pteron to operate properly
     #[tracing::instrument]
     pub async fn init(
         config_dir: Option<String>,
@@ -50,7 +51,7 @@ impl DirectoryInfo {
 
         fs::create_dir_all(&settings_dir).await.map_err(|err| {
             crate::ErrorKind::FSError(format!(
-                "Error creating Theseus config directory: {err}"
+                "Error creating Pteron config directory: {err}"
             ))
         })?;
 
@@ -178,10 +179,15 @@ impl DirectoryInfo {
             .map(|d| d.join(LAUNCHER_LOGS_FOLDER_NAME))
     }
 
-    /// Get the cache directory for Theseus
+    /// Get the cache directory for Pteron
     #[inline]
     pub fn caches_dir(&self) -> PathBuf {
         self.config_dir.join(CACHES_FOLDER_NAME)
+    }
+
+    #[inline]
+    pub fn synced_dir(&self) -> PathBuf {
+        self.config_dir.join(SYNCED_FOLDER_NAME)
     }
 
     /// Get path from environment variable

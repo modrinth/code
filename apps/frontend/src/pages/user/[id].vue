@@ -483,7 +483,7 @@ import {
 	SaveIcon,
 	SpinnerIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -491,7 +491,7 @@ import {
 	commonMessages,
 	ContentPageHeader,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	IntlFormatted,
 	NavTabs,
@@ -505,8 +505,8 @@ import {
 	useFormatNumber,
 	useRelativeTime,
 	useVIntl,
-} from '@modrinth/ui'
-import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+} from '@icarus/ui'
+import { isAdmin, isStaff, UserBadge } from '@icarus/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { onServerPrefetch } from 'vue'
 
@@ -683,7 +683,7 @@ const messages = defineMessages({
 	},
 })
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 const {
 	data: user,

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { FileTextIcon } from '@modrinth/assets'
+import { FileTextIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	defineMessages,
 	PagewideBanner,
 	useFormatMoney,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { computed } from 'vue'
 
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
@@ -29,7 +29,7 @@ const messages = defineMessages({
 	description: {
 		id: 'layout.banner.tax.description',
 		defaultMessage:
-			"You've already withdrawn over {threshold} from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.",
+			"You've already withdrawn over {threshold} from Icarus this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.",
 	},
 	action: {
 		id: 'layout.banner.tax.action',
@@ -55,10 +55,11 @@ function openTaxForm(e: MouseEvent) {
 				formatMessage(messages.description, { threshold: formatMoney(taxThreshold) })
 			}}</span>
 		</template>
-		<template #actions_right>
+		<template #actions>
 			<ButtonStyled color="orange">
 				<button @click="openTaxForm"><FileTextIcon /> {{ formatMessage(messages.action) }}</button>
 			</ButtonStyled>
 		</template>
 	</PagewideBanner>
 </template>
+

@@ -7,7 +7,7 @@ import {
 	PaintbrushIcon,
 	SearchIcon,
 	SpinnerIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import Fuse from 'fuse.js'
 import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
@@ -551,3 +551,4 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 		/>
 	</NewModal>
 </template>
+

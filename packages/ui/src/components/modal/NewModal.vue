@@ -25,7 +25,6 @@
 					aria-modal="true"
 					:aria-labelledby="headerId"
 					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
-					v-bind="$attrs"
 					@keydown="handleKeyDown"
 				>
 					<div
@@ -130,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { XIcon } from '@modrinth/assets'
+import { XIcon } from '@icarus/assets'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 
 import { useVIntl } from '../../composables/i18n'
@@ -346,10 +345,6 @@ function handleKeyDown(event: KeyboardEvent) {
 		}
 	}
 }
-
-defineOptions({
-	inheritAttrs: false,
-})
 </script>
 
 <style lang="scss" scoped>
@@ -414,7 +409,7 @@ defineOptions({
 	}
 }
 
-.modrinth-parent__no-modal-blurs {
+.Icarus-parent__no-modal-blurs {
 	.modal-overlay {
 		backdrop-filter: none;
 	}
@@ -471,3 +466,4 @@ defineOptions({
 	}
 }
 </style>
+

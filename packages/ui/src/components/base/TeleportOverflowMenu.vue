@@ -95,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { AutoLink, ButtonStyled } from '@modrinth/ui'
+import { AutoLink, ButtonStyled } from '@icarus/ui'
 import { onClickOutside, useElementHover } from '@vueuse/core'
 import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 

@@ -22,7 +22,7 @@
 			hover-color-fill="background"
 			circular
 		>
-			<button class="relative expanded-button close-button" @click="handleClose">
+			<button class="relative expanded-button" @click="handleClose">
 				<XIcon />
 			</button>
 		</ButtonStyled>
@@ -30,8 +30,8 @@
 </template>
 
 <script setup>
-import { MaximizeIcon, MinimizeIcon, RestoreIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { MaximizeIcon, MinimizeIcon, RestoreIcon, XIcon } from '@icarus/assets'
+import { ButtonStyled } from '@icarus/ui'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
@@ -82,12 +82,8 @@ const handleClose = async () => {
 </script>
 <style scoped>
 .expanded-button::before {
-	inset: -9px -6px;
+	inset: -6px;
 	content: '';
 	position: absolute;
-}
-
-.expanded-button.close-button::before {
-	inset: -9px -9px -9px -6px;
 }
 </style>

@@ -71,9 +71,6 @@
 				variant === 'outlined'
 					? 'bg-transparent border border-solid border-button-bg rounded-l-xl border-r-0'
 					: 'bg-surface-4 border-none rounded-xl',
-				{
-					'placeholder:text-sm': type === 'search',
-				},
 			]"
 			@input="onInput"
 			@focus="isFocused = true"
@@ -111,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { SearchIcon, XIcon } from '@modrinth/assets'
+import { SearchIcon, XIcon } from '@icarus/assets'
 import { type Component, computed, ref } from 'vue'
 
 const model = defineModel<string | number | undefined>()

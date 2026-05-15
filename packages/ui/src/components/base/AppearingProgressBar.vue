@@ -30,9 +30,8 @@
 </template>
 
 <script setup lang="ts">
+import { formatBytes } from '@icarus/utils'
 import { computed, onUnmounted, ref, watch } from 'vue'
-
-import { useFormatBytes } from '#ui/composables'
 
 interface Props {
 	maxValue: number
@@ -59,8 +58,6 @@ const props = withDefaults(defineProps<Props>(), {
 		'Convincing iron golems to smile...',
 	],
 })
-
-const formatBytes = useFormatBytes()
 
 const currentPhrase = ref('')
 const usedPhrases = ref(new Set<number>())

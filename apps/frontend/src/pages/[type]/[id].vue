@@ -3,49 +3,47 @@
 		<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
-		<template v-if="isSettings">
-			<div v-if="canAccessSettings" class="normal-page no-sidebar">
-				<div class="normal-page__header">
-					<div
-						class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
+		<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
+			<div class="normal-page__header">
+				<div
+					class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
+				>
+					<nuxt-link
+						:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
+						class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
 					>
-						<nuxt-link
-							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
-							class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
-						>
-							<Avatar :src="project.icon_url" size="32px" />
-							{{ project.title }}
-						</nuxt-link>
-						<ChevronRightIcon />
-						<span class="flex grow font-extrabold text-contrast">{{
-							formatMessage(messages.settingsTitle)
-						}}</span>
-						<div class="flex gap-2">
-							<ButtonStyled>
-								<nuxt-link to="/dashboard/projects"
-									><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
-								</nuxt-link>
-							</ButtonStyled>
-						</div>
+						<Avatar :src="project.icon_url" size="32px" />
+						{{ project.title }}
+					</nuxt-link>
+					<ChevronRightIcon />
+					<span class="flex grow font-extrabold text-contrast">{{
+						formatMessage(messages.settingsTitle)
+					}}</span>
+					<div class="flex gap-2">
+						<ButtonStyled>
+							<nuxt-link to="/dashboard/projects"
+								><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
+							</nuxt-link>
+						</ButtonStyled>
 					</div>
-					<ProjectMemberHeader
-						v-if="currentMember && false"
-						:project="project"
-						:versions="versions"
-						:current-member="currentMember"
-						:is-settings="isSettings"
-						:set-processing="setProcessing"
-						:all-members="allMembers"
-						:update-members="invalidateProject"
-						:auth="auth"
-						:tags="tags"
-					/>
 				</div>
-				<div class="normal-page__content">
-					<NuxtPage />
-				</div>
+				<ProjectMemberHeader
+					v-if="currentMember && false"
+					:project="project"
+					:versions="versions"
+					:current-member="currentMember"
+					:is-settings="route.name.startsWith('type-id-settings')"
+					:set-processing="setProcessing"
+					:all-members="allMembers"
+					:update-members="invalidateProject"
+					:auth="auth"
+					:tags="tags"
+				/>
 			</div>
-		</template>
+			<div class="normal-page__content">
+				<NuxtPage />
+			</div>
+		</div>
 
 		<div v-else>
 			<NewModal
@@ -125,7 +123,7 @@
 										:href="`modrinth://mod/${project.slug}`"
 										@click="() => installWithApp()"
 									>
-										<ModrinthIcon aria-hidden="true" />
+										<IcarusIcon aria-hidden="true" />
 										{{ formatMessage(messages.installWithModrinthApp) }}
 										<ExternalIcon aria-hidden="true" />
 									</a>
@@ -370,21 +368,18 @@
 							<VersionSummary
 								v-if="filteredRelease"
 								:version="filteredRelease"
-								:decorate-download-url="decorateModalDownloadUrl"
 								@on-download="onDownload"
 								@on-navigate="onVersionNavigate"
 							/>
 							<VersionSummary
 								v-if="filteredBeta"
 								:version="filteredBeta"
-								:decorate-download-url="decorateModalDownloadUrl"
 								@on-download="onDownload"
 								@on-navigate="onVersionNavigate"
 							/>
 							<VersionSummary
 								v-if="filteredAlpha"
 								:version="filteredAlpha"
-								:decorate-download-url="decorateModalDownloadUrl"
 								@on-download="onDownload"
 								@on-navigate="onVersionNavigate"
 							/>
@@ -816,7 +811,7 @@
 						:project="project"
 						:versions="versions"
 						:current-member="currentMember"
-						:is-settings="isSettings"
+						:is-settings="route.name.startsWith('type-id-settings')"
 						:route-name="route.name"
 						:set-processing="setProcessing"
 						:collapsed="collapsedChecklist"
@@ -1055,7 +1050,7 @@ import {
 	HeartIcon,
 	InfoIcon,
 	ListIcon,
-	ModrinthIcon,
+	IcarusIcon,
 	MoreVerticalIcon,
 	PlayIcon,
 	PlusIcon,
@@ -1068,7 +1063,7 @@ import {
 	VersionIcon,
 	WrenchIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Admonition,
 	Avatar,
@@ -1077,7 +1072,7 @@ import {
 	commonMessages,
 	defineMessages,
 	getTagMessage,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	IntlFormatted,
 	NavTabs,
@@ -1085,7 +1080,6 @@ import {
 	OpenInAppModal,
 	OverflowMenu,
 	PopoutMenu,
-	PROJECT_DEP_MARKER_QUERY,
 	ProjectBackgroundGradient,
 	ProjectEnvironmentModal,
 	ProjectHeader,
@@ -1105,14 +1099,14 @@ import {
 	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
-} from '@modrinth/ui'
-import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
+} from '@icarus/ui'
+import VersionSummary from '@icarus/ui/src/components/version/VersionSummary.vue'
+import { capitalizeString, formatProjectType, renderString } from '@icarus/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
-import { nextTick, readonly, ref, useTemplateRef, watch } from 'vue'
+import { nextTick, useTemplateRef, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
@@ -1141,7 +1135,6 @@ definePageMeta({
 
 const data = useNuxtApp()
 const route = useRoute()
-const router = useRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const config = useRuntimeConfig()
 const moderationQueue = useModerationQueue()
@@ -1150,23 +1143,6 @@ const { addNotification } = notifications
 
 const auth = await useAuth()
 const user = await useUser()
-
-const { createProjectDownloadUrl } = useCdnDownloadContext()
-
-const downloadReason = ref('standalone')
-
-function absorbDepQuery() {
-	if (route.query.dep === PROJECT_DEP_MARKER_QUERY.dep) {
-		downloadReason.value = 'dependency'
-		if (import.meta.client) {
-			const newQuery = { ...route.query }
-			delete newQuery.dep
-			void router.replace({ path: route.path, query: newQuery, hash: route.hash })
-		}
-	}
-}
-
-watch(() => route.query.dep, absorbDepQuery, { immediate: true })
 
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
@@ -1231,14 +1207,6 @@ const currentPlatformText = computed(() => {
 	if (!currentPlatform.value) return null
 	return formatMessage(getTagMessage(currentPlatform.value, 'loader'))
 })
-
-function decorateModalDownloadUrl(url) {
-	return createProjectDownloadUrl(url, {
-		reason: downloadReason.value,
-		gameVersion: currentGameVersion.value ?? undefined,
-		loader: currentPlatform.value ?? undefined,
-	})
-}
 
 const releaseVersions = computed(() => {
 	const set = new Set()
@@ -1356,7 +1324,7 @@ const messages = defineMessages({
 	},
 	dontHaveModrinthApp: {
 		id: 'project.download.no-app',
-		defaultMessage: "Don't have Modrinth App?",
+		defaultMessage: "Don't have Icarus Launcher?",
 	},
 	dontShowAgain: {
 		id: 'project.actions.dont-show-again',
@@ -1422,7 +1390,7 @@ const messages = defineMessages({
 	},
 	installWithModrinthApp: {
 		id: 'project.download.install-with-app',
-		defaultMessage: 'Install with Modrinth App',
+		defaultMessage: 'Install with Icarus Launcher',
 	},
 	licenseErrorMessage: {
 		id: 'project.license.error',
@@ -1654,7 +1622,7 @@ if (
 const routeProjectId = computed(() => route.params.id)
 
 // Use DI client for TanStack Query
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
 
 // V2 Project - hits middleware cache (uses route param for lookup)
@@ -1745,27 +1713,15 @@ const serverRequiredContent = computed(() => {
 		icon: content.project_icon,
 		onclickName:
 			content.project_id && content.project_id !== projectId.value
-				? () => {
-						navigateTo({
-							path: `/project/${content.project_id}`,
-							query: { ...PROJECT_DEP_MARKER_QUERY },
-						})
-					}
+				? () => navigateTo(`/project/${content.project_id}`)
 				: undefined,
 		onclickVersion:
 			content.project_id && content.project_id !== projectId.value
-				? () => {
-						navigateTo({
-							path: `/project/${content.project_id}/version/${serverModpackVersion.value?.id}`,
-							query: { ...PROJECT_DEP_MARKER_QUERY },
-						})
-					}
+				? () =>
+						navigateTo(`/project/${content.project_id}/version/${serverModpackVersion.value?.id}`)
 				: undefined,
 		onclickDownload: primaryFile?.url
-			? () =>
-					navigateTo(createProjectDownloadUrl(primaryFile.url, { reason: 'dependency' }), {
-						external: true,
-					})
+			? () => navigateTo(primaryFile.url, { external: true })
 			: undefined,
 		showCustomModpackTooltip: content.project_id === projectId.value,
 	}
@@ -1869,8 +1825,6 @@ const { data: organizationRaw } = useQuery({
 // When project is removed from org, enabled becomes false but TanStack keeps stale data.
 // Return null when the project no longer belongs to an organization.
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
-
-const isSettings = computed(() => route.name.startsWith('type-id-settings'))
 
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {
@@ -2302,33 +2256,16 @@ const currentMember = computed(() => {
 			payouts_split: 0,
 			avatar_url: auth.value.user.avatar_url,
 			name: auth.value.user.username,
-			staffOnly: true,
 		}
 	}
 
 	return val
 })
 
-const canAccessSettings = computed(() => !!currentMember.value?.accepted)
-
 const hasEditDetailsPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
 	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
 })
-
-watch(
-	[isSettings, allMembers, canAccessSettings],
-	() => {
-		if (isSettings.value && allMembers.value.length > 0 && !canAccessSettings.value) {
-			showError({
-				fatal: true,
-				statusCode: 401,
-				statusMessage: 'Unauthorized',
-			})
-		}
-	},
-	{ flush: 'sync', immediate: true },
-)
 
 const projectTypeDisplay = computed(() => {
 	if (!project.value) return ''
@@ -2360,18 +2297,6 @@ const canCreateServerFrom = computed(() => {
 	return project.value.project_type === 'modpack' && project.value.server_side !== 'unsupported'
 })
 
-const createCanonicalUrl = () =>
-	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
-
-useHead({
-	link: [
-		{
-			rel: 'canonical',
-			href: createCanonicalUrl,
-		},
-	],
-})
-
 if (!route.name.startsWith('type-id-settings')) {
 	useSeoMeta({
 		title: () => title.value,
@@ -2379,7 +2304,6 @@ if (!route.name.startsWith('type-id-settings')) {
 		ogTitle: () => title.value,
 		ogDescription: () => project.value?.description ?? '',
 		ogImage: () => project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
-		ogUrl: createCanonicalUrl,
 		robots: () =>
 			project.value?.status === 'approved' || project.value?.status === 'archived'
 				? 'all'
@@ -2388,7 +2312,6 @@ if (!route.name.startsWith('type-id-settings')) {
 } else {
 	useSeoMeta({
 		robots: 'noindex',
-		ogUrl: createCanonicalUrl,
 	})
 }
 
@@ -2746,7 +2669,6 @@ provideProjectPageContext({
 	// Lazy dependencies loading
 	dependencies,
 	dependenciesLoading: computed(() => dependenciesLoading.value),
-	cdnDownloadReason: readonly(downloadReason),
 
 	// Invalidate all project queries (auto-refetches active ones)
 	invalidate: invalidateProject,

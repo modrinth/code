@@ -1,21 +1,15 @@
 {
-  "app.action-bar.downloading-java": {
-    "message": "Laddar ner Java {version}"
-  },
-  "app.action-bar.downloads": {
-    "message": "Nedladdningar"
-  },
-  "app.action-bar.offline": {
-    "message": "Offline"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Färgtema"
-  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecrafts autentiseringsservrar kan vara nere just nu. Kontrollera din internetanslutning och försök igen senare."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ej nå autentiseringsservrarna"
+  },
+  "app.browse.add-server-to-instance": {
+    "message": "Lägg till server till instans"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Lägg till servrar till din instans"
   },
   "app.browse.add-to-instance": {
     "message": "Lägg till i instans"
@@ -35,11 +29,14 @@
   "app.browse.discover-servers": {
     "message": "Upptäck servrar"
   },
-  "app.browse.project-type.modpacks": {
-    "message": "Modpaket"
+  "app.browse.hide-added-servers": {
+    "message": "Dölj tillagda servrar"
   },
-  "app.browse.server.installing": {
-    "message": "Installerar"
+  "app.browse.hide-installed-content": {
+    "message": "Dölj installerat innehåll"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Installera innehåll till instans"
   },
   "app.export-modal.description-placeholder": {
     "message": "Ange modpaketets beskrivning..."
@@ -55,6 +52,9 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpaketets namn"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Välj filer och mappar att inkludera i paketet"
   },
   "app.export-modal.version-number-label": {
     "message": "Versionsnummer"
@@ -165,7 +165,7 @@
     "message": "Modpaket som krävs"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Servern kräver moddar för att du ska kunna spela. Klicka på Installera för att sätta upp dem nödvändiga filerna från Modrinth, och starta sedan på servern direkt."
+    "message": "Servern kräver moddar för att du ska kunna spela. Klicka på Installera för att sätta upp dem nödvändiga filerna från Icarus, och starta sedan på servern direkt."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Delad instans"
@@ -210,16 +210,16 @@
     "message": "Resurshantering"
   },
   "app.update-popup.body": {
-    "message": "Modrinth App v{version} är redo att laddas ner! Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
+    "message": "Icarus Launcher v{version} är redo att laddas ner! Ladda om för att uppdatera nu, eller automatiskt när du stänger Icarus Launcher."
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
+    "message": "Icarus Launcher v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Icarus Launcher."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} är tillgänglig. Använd din pakethanterare för att uppdatera och få tillgång till de senaste funktionerna och buggfixarna!"
+    "message": "Icarus Launcher v{version} är tillgänglig. Använd din pakethanterare för att uppdatera och få tillgång till de senaste funktionerna och buggfixarna!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} är nu tillgänglig! Eftersom du använder ett nätverk med datatrafikbegränsningar har vi inte laddat ner det automatiskt."
+    "message": "Icarus Launcher v{version} är nu tillgänglig! Eftersom du använder ett nätverk med datatrafikbegränsningar har vi inte laddat ner det automatiskt."
   },
   "app.update-popup.changelog": {
     "message": "Ändringslogg"
@@ -252,7 +252,7 @@
     "message": "Ladda om för att installera uppdatering"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "example.Icarus.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Välj ett alternativ"
@@ -285,10 +285,10 @@
     "message": "Det kan vara annorlunda från deras Minecraft-användarnamn!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Ange Modrinth-användarnamn..."
+    "message": "Ange Icarus-användarnamn..."
   },
   "friends.add-friend.username.title": {
-    "message": "Vad är din väns Modrinth-användarnamn?"
+    "message": "Vad är din väns Icarus-användarnamn?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Lägg till vänner</link> för att se vad de spelar!"
@@ -330,7 +330,7 @@
     "message": "{title}: {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Logga in på ett Modrinth-konto</link> för att lägga till vänner och se vad de spelar!"
+    "message": "<link>Logga in på ett Icarus-konto</link> för att lägga till vänner och se vad de spelar!"
   },
   "instance.add-server.add-and-play": {
     "message": "Lägg till och spela"
@@ -600,3 +600,5 @@
     "message": "Loader tillhandahålls av servern"
   }
 }
+
+

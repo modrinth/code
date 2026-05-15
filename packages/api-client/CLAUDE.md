@@ -1,6 +1,6 @@
-# @modrinth/api-client
+# @icarus/api-client
 
-Platform-agnostic API client for Modrinth's services. Works in Nuxt (SSR + CSR), Tauri (desktop app), and plain Node/browser environments.
+Platform-agnostic API client for Icarus's services. Works in Nuxt (SSR + CSR), Tauri (desktop app), and plain Node/browser environments.
 
 ## Architecture
 
@@ -11,7 +11,7 @@ Request Flow:
 
 ### Key Directories
 
-- **`src/core/`** — base classes (`AbstractModrinthClient`, `AbstractModule`, `AbstractFeature`, etc.)
+- **`src/core/`** — base classes (`AbstractIcarusClient`, `AbstractModule`, `AbstractFeature`, etc.)
 - **`src/platform/`** — platform implementations (generic, nuxt, tauri, xhr-upload, websocket)
 - **`src/features/`** — middleware plugins (auth, retry, circuit-breaker, etc.)
 - **`src/modules/`** — API endpoint modules organized by service (`labrinth/`, `archon/`, `kyros/`, `iso3166/`)
@@ -19,11 +19,11 @@ Request Flow:
 
 ### Client Hierarchy
 
-All platform clients extend `XHRUploadClient` → `AbstractModrinthClient`:
+All platform clients extend `XHRUploadClient` → `AbstractIcarusClient`:
 
-- **`GenericModrinthClient`** — uses `ofetch`, attaches WebSocket client to `archon.sockets`
-- **`NuxtModrinthClient`** — uses Nuxt's `$fetch`, SSR-aware, blocks `upload()` during SSR
-- **`TauriModrinthClient`** — uses `@tauri-apps/plugin-http`
+- **`GenericIcarusClient`** — uses `ofetch`, attaches WebSocket client to `archon.sockets`
+- **`NuxtIcarusClient`** — uses Nuxt's `$fetch`, SSR-aware, blocks `upload()` during SSR
+- **`TauriIcarusClient`** — uses `@tauri-apps/plugin-http`
 
 ### Module Access
 
@@ -51,7 +51,7 @@ This structure is derived at runtime from the flat `MODULE_REGISTRY` in `modules
 
 API modules **must** use `this.client.request()` (or `.upload`) for all HTTP calls — never `$fetch`, `fetch`, or any other HTTP library directly. The request method routes through the platform-specific implementation (Nuxt `$fetch`, Tauri HTTP plugin, etc.) and the feature middleware chain (auth, retry, circuit breaker). Using `$fetch` directly bypasses the platform layer and will fail in Tauri (CORS/sandboxing). The only exception is the `ISO3166Module` which is explicitly node-only.
 
-For external APIs (non-Modrinth), pass the full base URL as the `api` field and set `skipAuth: true`:
+For external APIs (non-Icarus), pass the full base URL as the `api` field and set `skipAuth: true`:
 
 ```ts
 this.client.request<MyType>('/endpoint', {
@@ -69,18 +69,18 @@ The client is provided to the component tree via DI (see the `dependency-injecti
 
 ```ts
 // apps/frontend/src/app.vue (Nuxt)
-const client = new NuxtModrinthClient({ ... })
-provideModrinthClient(client)
+const client = new NuxtIcarusClient({ ... })
+provideIcarusClient(client)
 
 // apps/app-frontend/src/App.vue (Tauri)
-const client = new TauriModrinthClient({ ... })
-provideModrinthClient(client)
+const client = new TauriIcarusClient({ ... })
+provideIcarusClient(client)
 ```
 
 Components anywhere in the tree then inject it:
 
 ```ts
-const { labrinth, archon, kyros } = injectModrinthClient()
+const { labrinth, archon, kyros } = injectIcarusClient()
 
 // Fetch data
 const project = await labrinth.projects_v3.get(projectId)
@@ -92,7 +92,7 @@ const { data } = useQuery({
 })
 ```
 
-`provideModrinthClient` and `injectModrinthClient` are exported from `@modrinth/ui` (defined in `packages/ui/src/providers/api-client.ts`). The provider is typed as `AbstractModrinthClient`, so shared components in `packages/ui` work with any platform client.
+`provideIcarusClient` and `injectIcarusClient` are exported from `@Icarus/ui` (defined in `packages/ui/src/providers/api-client.ts`). The provider is typed as `AbstractIcarusClient`, so shared components in `packages/ui` work with any platform client.
 
 ## Types
 
@@ -101,7 +101,7 @@ Types must match 1:1 with how they are returned from the backend API they are fe
 Types are organized in namespaces that mirror the backend services:
 
 ```ts
-import type { Labrinth, Archon, Kyros, ISO3166 } from '@modrinth/api-client'
+import type { Labrinth, Archon, Kyros, ISO3166 } from '@Icarus/api-client'
 
 const project: Labrinth.Projects.v3.Project = ...
 const server: Archon.Servers.v0.Server = ...
@@ -163,7 +163,7 @@ See `packages/ui/src/components/servers/files/upload/FileUploadDropdown.vue` and
 
 ## WebSocket
 
-WebSocket support is attached to `client.archon.sockets` (only on `GenericModrinthClient`). It provides event-based communication with Modrinth Hosting servers.
+WebSocket support is attached to `client.archon.sockets` (only on `GenericIcarusClient`). It provides event-based communication with Icarus Hosting servers.
 
 ### Connection Flow
 
@@ -206,3 +206,4 @@ See `apps/frontend/src/pages/hosting/manage/[id].vue` for the full server panel 
 ## Adding a New API Module
 
 See the `api-module` skill (`.claude/skills/api-module/SKILL.md`) for step-by-step instructions.
+

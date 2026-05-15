@@ -65,6 +65,8 @@ app-playground-data/*
 
 .astro
 .claude/*
+.openclaude/*
+.openclaude
 !.claude/skills/
 .letta
 
@@ -86,3 +88,7 @@ apps/frontend/src/public/robots.txt
 /test_result.md
 
 packages/tooling-config/script-utils/import-sort.js
+
+
+actions-runner
+actions-runner/*

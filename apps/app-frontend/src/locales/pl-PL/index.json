@@ -1,114 +1,15 @@
 {
-  "app.action-bar.downloading-java": {
-    "message": "Pobieranie Java {version}"
-  },
-  "app.action-bar.downloads": {
-    "message": "Pobrania"
-  },
-  "app.action-bar.hide-more-running-instances": {
-    "message": "Ukryj włączone instancje"
-  },
-  "app.action-bar.make-primary-instance": {
-    "message": "Ustaw jako główną instancję"
-  },
-  "app.action-bar.no-instances-running": {
-    "message": "Żadna instancja nie jest włączona"
-  },
-  "app.action-bar.offline": {
-    "message": "Offline"
-  },
-  "app.action-bar.primary-instance": {
-    "message": "Główna instancja"
-  },
-  "app.action-bar.show-more-running-instances": {
-    "message": "Pokaż więcej włączonych instancji"
-  },
-  "app.action-bar.stop-instance": {
-    "message": "Zatrzymaj instancję"
-  },
-  "app.action-bar.view-active-downloads": {
-    "message": "Pokaż aktualnie pobierane"
-  },
-  "app.action-bar.view-instance": {
-    "message": "Pokaż instancję"
-  },
-  "app.action-bar.view-logs": {
-    "message": "Pokaż logi"
-  },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Włącza zaawansowane renderowanie, takie jak efekty rozmycia, które może powodować problemy z wydajnością bez sprzętowej akceleracji renderowania."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Zaawansowane renderowanie"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Wybierz preferowany motyw w Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Motyw"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Ustaw stronę, która pojawia się po włączeniu launchera."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Strona główna"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Biblioteka"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Domyślna strona główna"
-  },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Wyłącza nazwę użytkownika na stronie skórek."
-  },
-  "app.appearance-settings.hide-nametag.title": {
-    "message": "Schowaj nazwę"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Pokazuje ostatnie światy w sekcji \"Wskocz z powrotem do światów\" na stronie głównej."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Wskocz z powrotem do światów"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimalizuj launcher po włączeniu procesu Minecraft."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimalizuj launcher"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Używaj systemowej ramki okna (wymaga ponownego uruchomienia)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Systemowe dekoracje"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Wybierz opcję"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Umożliwia przełączenie paska bocznego."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Przełącz pasek boczny"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Jeżeli spróbujesz zainstalować plik Modrinth Pack (.mrpack) którego nie można znaleźć na Modrinth, poinformujemy cię o możliwym ryzyku, zanim go zainstalujesz."
-  },
-  "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Ostrzegaj mnie przed instalowaniem nieznanych paczek modów"
-  },
   "app.auth-servers.unreachable.body": {
     "message": "Serwery uwierzytelniania Minecraft mogą aktualnie nie działać. Sprawdź swoje połączenie z internetem i spróbuj ponownie później."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Nie udało się połączyć się z serwerami uwierzytelniania"
   },
-  "app.browse.add-servers-to-instance": {
-    "message": "Dodawanie serwera do instancji"
+  "app.browse.add-server-to-instance": {
+    "message": "Dodaj serwer do instancji"
   },
-  "app.browse.add-to-an-instance": {
-    "message": "Dodaj do instancji"
+  "app.browse.add-servers-to-instance": {
+    "message": "Dodaj serwery do swojej instancji"
   },
   "app.browse.add-to-instance": {
     "message": "Dodaj do instancji"
@@ -122,9 +23,6 @@
   "app.browse.already-added": {
     "message": "Już dodano"
   },
-  "app.browse.back-to-instance": {
-    "message": "Powrót do instancji"
-  },
   "app.browse.discover-content": {
     "message": "Odkrywaj zawartość"
   },
@@ -132,19 +30,13 @@
     "message": "Odkryj serwery"
   },
   "app.browse.hide-added-servers": {
-    "message": "Ukryj już dodane serwery"
+    "message": "Ukryj dodane serwery"
   },
-  "app.browse.project-type.modpacks": {
-    "message": "Paczki modów"
+  "app.browse.hide-installed-content": {
+    "message": "Ukryj zainstalowane zasoby"
   },
-  "app.browse.server.installing": {
-    "message": "Instalowanie"
-  },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Instalowanie paczki modów..."
+  "app.browse.install-content-to-instance": {
+    "message": "Zainstaluj zasoby do instancji"
   },
   "app.export-modal.description-placeholder": {
     "message": "Wprowadź opis paczki modów..."
@@ -160,6 +52,9 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nazwa paczki modów"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Wybierz pliki i foldery, które mają znaleźć się w paczce"
   },
   "app.export-modal.version-number-label": {
     "message": "Numer wersji"
@@ -270,7 +165,7 @@
     "message": "Wymagana paczka modów"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ten serwer wymaga modów, aby na nim grać. Kliknij \"Zainstaluj\" aby otrzymać potrzebne pliki z Modrinth, a potem dołącz bezpośrednio do serwera."
+    "message": "Ten serwer wymaga modów, aby na nim grać. Kliknij \"Zainstaluj\" aby otrzymać potrzebne pliki z Icarus, a potem dołącz bezpośrednio do serwera."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Wspólna instancja"
@@ -289,15 +184,6 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Aktualizacja jest wymagana, aby grać w {name}. Proszę zaktualizować do najnowszej wersji, aby uruchomić grę."
-  },
-  "app.project.install-button.already-installed": {
-    "message": "Ten projekt jest już zainstalowany"
-  },
-  "app.project.install-context.back-to-browse": {
-    "message": "Powrót do przeglądania"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Zainstaluj zasoby do instancji"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Tryb dewelopera włączony."
@@ -324,16 +210,16 @@
     "message": "Zarządzanie zasobami"
   },
   "app.update-popup.body": {
-    "message": "Wersja Modrinth App v{version} jest gotowa do zainstalowania! Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
+    "message": "Wersja Icarus Launcher v{version} jest gotowa do zainstalowania! Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Icarus Launcher."
   },
   "app.update-popup.body.download-complete": {
-    "message": "Wersja Modrinth App v{version} została pobrana. Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
+    "message": "Wersja Icarus Launcher v{version} została pobrana. Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Icarus Launcher."
   },
   "app.update-popup.body.linux": {
-    "message": "Wersja Modrinth App v{version} jest dostępna. Pobierz aktualizację poprzez menedżer pakietów, by uzyskać najnowsze funkcje i poprawki!"
+    "message": "Wersja Icarus Launcher v{version} jest dostępna. Pobierz aktualizację poprzez menedżer pakietów, by uzyskać najnowsze funkcje i poprawki!"
   },
   "app.update-popup.body.metered": {
-    "message": "Wersja Modrinth App v{version} jest dostępna! Skoro korzystasz z sieci taryfowej, nie pobraliśmy jej automatycznie."
+    "message": "Wersja Icarus Launcher v{version} jest dostępna! Skoro korzystasz z sieci taryfowej, nie pobraliśmy jej automatycznie."
   },
   "app.update-popup.changelog": {
     "message": "Dziennik zmian"
@@ -366,7 +252,7 @@
     "message": "Załaduj ponownie, aby zainstalować aktualizację"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "example.Icarus.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Wybierz opcję"
@@ -399,7 +285,7 @@
     "message": "Może różnić się od nazwy użytkownika Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Wprowadź nazwę użytkownika Modrinth..."
+    "message": "Wprowadź nazwę użytkownika Icarus..."
   },
   "friends.add-friend.username.title": {
     "message": "Jaka jest nazwa użytkownika Twojego znajomego?"
@@ -444,7 +330,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Zaloguj się na konto Modrinth</link> by dodać znajomych i widzieć, w co grają!"
+    "message": "<link>Zaloguj się na konto Icarus</link> by dodać znajomych i widzieć, w co grają!"
   },
   "instance.add-server.add-and-play": {
     "message": "Dodaj i graj"
@@ -689,21 +575,6 @@
   "instance.worlds.world_in_use": {
     "message": "Świat jest w użytku"
   },
-  "minecraft-account.add-account": {
-    "message": "Dodaj konto"
-  },
-  "minecraft-account.label": {
-    "message": "Konto Minecraft"
-  },
-  "minecraft-account.remove-account": {
-    "message": "Usuń konto"
-  },
-  "minecraft-account.select-account": {
-    "message": "Wybierz konto"
-  },
-  "minecraft-account.sign-in": {
-    "message": "Zaloguj się do Minecraft"
-  },
   "search.filter.locked.instance": {
     "message": "Podane przez instancję"
   },
@@ -727,26 +598,7 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader jest dostarczony przez serwer"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Plik jest sprawdzony tylko, jeżeli został przesłany na Modrinth, niezależnie od formatu (w tym pliki .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Nie pokazuj ponownie"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Potwierdź instalację"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Instaluj mimo to"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Wirusy są często kryte w plikach paczek modów przesyłanych na platformach takich jak Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Nie mogliśmy znaleźć tego pliku na Modrinth. Stanowczo zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Ostrzeżenie o nieznanym pliku"
   }
 }
+
+

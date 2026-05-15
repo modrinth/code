@@ -548,6 +548,12 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ukjent spillmodus"
   },
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "Filer blir fortsatt oppdatert. Viss du går ut av denne sida, så avbryter du opplastinga og endringene dine kan forsvinne."
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Opplasting foregår"
+  },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} kompatable {count, plural, one {instanse} other {instanser}}"
   },
@@ -822,16 +828,16 @@
     "defaultMessage": "Hold filer oppdatert når serveren endres"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Skaff Modrinth App-en"
+    "defaultMessage": "Skaff Icarus Launcher-en"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth App-en kommer til å åpne seg automatisk..."
+    "defaultMessage": "Icarus Launcher-en kommer til å åpne seg automatisk..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Åpner Modrinth App-en"
+    "defaultMessage": "Åpner Icarus Launcher-en"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Hvorfor bruke modrinth App-en"
+    "defaultMessage": "Hvorfor bruke Icarus Launcher-en"
   },
   "notification.error.title": {
     "defaultMessage": "En feil oppstod"
@@ -857,11 +863,14 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Mislykket"
   },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Oppført"
+  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Modrinth Team"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "Icarus Team"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "Venter"
@@ -892,6 +901,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Ikke godkjent"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Tilbakeholdt"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopier kode til utklippstavle"
@@ -1437,7 +1449,7 @@
     "defaultMessage": "Prosjektet ditt har flere miljøer"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Vi har nettopp oppdatert miljøsystemet på Modrinth, og nye valg er nå tilgjengelige. Pass på at riktig alternativ er valgt nedenfor, og klikk deretter «Verifiser» når du er ferdig."
+    "defaultMessage": "Vi har nettopp oppdatert miljøsystemet på Icarus, og nye valg er nå tilgjengelige. Pass på at riktig alternativ er valgt nedenfor, og klikk deretter «Verifiser» når du er ferdig."
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Gå gjennom valgene nedenfor"
@@ -1637,6 +1649,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Sikkerhetskopiplan"
   },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Kunne ikke gjenopprette fra backup"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Kunne ikke gjenopprette fra backup"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuell sikkerhetskopiering"
   },
@@ -1725,7 +1743,7 @@
     "defaultMessage": "Hvor vil du at serveren din skal være plassert?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Region ikke oppført? <link>Gi oss beskjed om hvor du ønsker å se Modrinth Hosting neste gang!</link>"
+    "defaultMessage": "Region ikke oppført? <link>Gi oss beskjed om hvor du ønsker å se Icarus Hosting neste gang!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sørøst-Asia"
@@ -1752,7 +1770,7 @@
     "defaultMessage": "Mørk"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Velg ditt foretrukne fargetema for Modrinth på denne enheten."
+    "defaultMessage": "Velg ditt foretrukne fargetema for Icarus på denne enheten."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Lys"
@@ -2166,4 +2184,5 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
+
 

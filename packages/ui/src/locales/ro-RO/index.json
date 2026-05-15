@@ -675,16 +675,16 @@
     "defaultMessage": "Mențineți fișierele actualizate atunci când serverul se modifică"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Descărcați aplicația Modrinth"
+    "defaultMessage": "Descărcați aplicația Icarus"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Aplicația Modrinth se va deschide automat..."
+    "defaultMessage": "Aplicația Icarus se va deschide automat..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Deschiderea aplicației Modrinth"
+    "defaultMessage": "Deschiderea aplicației Icarus"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "De ce să folosiți aplicația Modrinth"
+    "defaultMessage": "De ce să folosiți aplicația Icarus"
   },
   "notification.error.title": {
     "defaultMessage": "A avut loc o eroare"
@@ -710,11 +710,14 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Eșuat"
   },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listat"
+  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Echipa Modrinth"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "Echipa Icarus"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "În așteptare"
@@ -745,6 +748,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Esuat"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Reținut"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copiați codul în clipboard"
@@ -1101,7 +1107,7 @@
     "defaultMessage": "{count} {countPlural, plural, one {recent jucat} other {recent jucate}}"
   },
   "project.recent-plays.tooltip": {
-    "defaultMessage": "{count} {countPlural, plural, one {recent jucat} other {recent jucate}} de la Modrinth în ultimele 2 săptămâni"
+    "defaultMessage": "{count} {countPlural, plural, one {recent jucat} other {recent jucate}} de la Icarus în ultimele 2 săptămâni"
   },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
@@ -1155,7 +1161,7 @@
     "defaultMessage": "Proiectul tău are mai multe environment-uri"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Tocmai am revizuit sistemul Environments pe Modrinth și acum sunt disponibile noi opțiuni. Asigurați-vă că ați selectat opțiunea corectă mai jos și apoi faceți clic pe „Verificați” când ați terminat!"
+    "defaultMessage": "Tocmai am revizuit sistemul Environments pe Icarus și acum sunt disponibile noi opțiuni. Asigurați-vă că ați selectat opțiunea corectă mai jos și apoi faceți clic pe „Verificați” când ați terminat!"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Vă rugăm să examinați opțiunile de mai jos"
@@ -1349,6 +1355,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Programul de backup"
   },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Nu s-a putut crea o copie de rezervă"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Restaurarea din backup nu a reușit"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Copiere de rezervă manuală"
   },
@@ -1437,7 +1449,7 @@
     "defaultMessage": "Unde ți-ar plăcea ca serverul să fie localizat?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Regiunea nu este listată? <link>Spuneți-ne unde doriți să vedeți în continuare Modrinth Hosting!</link>"
+    "defaultMessage": "Regiunea nu este listată? <link>Spuneți-ne unde doriți să vedeți în continuare Icarus Hosting!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Sud-Estică"
@@ -1464,7 +1476,7 @@
     "defaultMessage": "Întunecat"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Selectați tema de culoare preferată pentru Modrinth pe acest dispozitiv."
+    "defaultMessage": "Selectați tema de culoare preferată pentru Icarus pe acest dispozitiv."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Luminos"
@@ -1941,4 +1953,5 @@
     "defaultMessage": "Ai schimbări nesalvate."
   }
 }
+
 

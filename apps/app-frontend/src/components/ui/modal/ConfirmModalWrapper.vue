@@ -1,6 +1,6 @@
-<!-- @deprecated Use ConfirmModal from @modrinth/ui directly. Ads/noblur now handled by injectModalBehavior. -->
+<!-- @deprecated Use ConfirmModal from @icarus/ui directly. Ads/noblur now handled by injectModalBehavior. -->
 <script setup lang="ts">
-import { ConfirmModal } from '@modrinth/ui'
+import { ConfirmModal } from '@icarus/ui'
 import { useTemplateRef } from 'vue'
 
 defineProps({

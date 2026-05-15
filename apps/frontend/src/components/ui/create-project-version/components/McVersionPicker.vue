@@ -66,9 +66,9 @@
 </template>
 
 <script lang="ts" setup>
-import type { Labrinth } from '@modrinth/api-client'
-import { SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, StyledInput } from '@modrinth/ui'
+import type { Labrinth } from '@icarus/api-client'
+import { SearchIcon } from '@icarus/assets'
+import { ButtonStyled, Chips, StyledInput } from '@icarus/ui'
 import { useMagicKeys } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref } from 'vue'
 

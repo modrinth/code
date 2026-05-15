@@ -1,13 +1,13 @@
 ---
 title: Introducing Server Projects
-summary: A new project type made for seamless modded multiplayer on Modrinth.
+summary: A new project type made for seamless modded multiplayer on Icarus.
 date: 2026-03-03T17:30:00-08:00
 authors: ['AJfd8YH6', '6EjnV9Uf', 'xSQqYYIN']
 ---
 
 Big news: we’re shipping our first new project type in years!
 
-Server Projects are coming to Modrinth, and they’re not just a typical server list. They’re deeply integrated into the platform and app in ways that make playing seamless.
+Server Projects are coming to Icarus, and they’re not just a typical server list. They’re deeply integrated into the platform and app in ways that make playing seamless.
 
 We genuinely believe modded is the future of large-scale multiplayer Minecraft, so let's jump in!
 
@@ -35,7 +35,7 @@ Most of the fun in Minecraft happens with other people, but getting into a modde
 - The real constraint has been distribution and setup. Players have to find the server, install the right content, keep it updated, and hope everything matches.
 - Multiplayer discovery in Minecraft has never been great. It should be easier to join a server, and just as easy to join a modded one.
 
-Additionally, modpack discovery has become noisy on Modrinth. Servers fork popular packs with small tweaks and climb discovery, which crowds out original creators.
+Additionally, modpack discovery has become noisy on Icarus. Servers fork popular packs with small tweaks and climb discovery, which crowds out original creators.
 
 ## Project Creation
 
@@ -46,10 +46,10 @@ For the initial release, we support two compatibility models: vanilla and requir
 When setting up your server project, you define this in the Server Compatibility section. It comes in three types:
 
 - Vanilla server
-- Modded server (published Modrinth pack)
+- Modded server (published Icarus pack)
 - Modded server (uploaded custom pack)
 
-Each type defines different requirements to join. Vanilla servers specify supported and recommended Minecraft versions. Modded servers either link a Modrinth pack or upload a custom pack, which enforces the required version and mod loader.
+Each type defines different requirements to join. Vanilla servers specify supported and recommended Minecraft versions. Modded servers either link a Icarus pack or upload a custom pack, which enforces the required version and mod loader.
 
 <div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
@@ -73,7 +73,7 @@ Additionally, Server Projects are the only project type **not eligible for payou
 Server Projects use two new discovery metrics instead of downloads to help surface new servers over time. These are:
 
 - **Players online:** The live player count reported by the server.
-- **Verified plays:** Joins from the Modrinth App in the last two weeks.
+- **Verified plays:** Joins from the Icarus Launcher in the last two weeks.
 
 ![Server discovery](./project-discovery.webp)
 
@@ -122,3 +122,4 @@ When a server updates its compatibility, such as publishing a new modpack versio
 —
 
 That’s all from us! Thank you so much for your continued support and happy playing!
+

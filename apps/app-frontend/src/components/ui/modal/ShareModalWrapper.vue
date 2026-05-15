@@ -1,6 +1,6 @@
-<!-- @deprecated Use ShareModal from @modrinth/ui directly. Ads/noblur now handled by injectModalBehavior. -->
+<!-- @deprecated Use ShareModal from @icarus/ui directly. Ads/noblur now handled by injectModalBehavior. -->
 <script setup lang="ts">
-import { ShareModal } from '@modrinth/ui'
+import { ShareModal } from '@icarus/ui'
 import { ref } from 'vue'
 
 defineProps({
@@ -10,7 +10,7 @@ defineProps({
 	},
 	shareTitle: {
 		type: String,
-		default: 'Modrinth',
+		default: 'Icarus',
 	},
 	shareText: {
 		type: String,
@@ -48,3 +48,4 @@ defineExpose({
 		:open-in-new-tab="openInNewTab"
 	/>
 </template>
+

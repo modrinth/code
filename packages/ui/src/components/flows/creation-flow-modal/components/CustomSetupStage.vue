@@ -146,14 +146,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Paper } from '@modrinth/api-client'
-import { EyeIcon, EyeOffIcon, UploadIcon, XIcon } from '@modrinth/assets'
-import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
+import type { Paper } from '@icarus/api-client'
+import { EyeIcon, EyeOffIcon, UploadIcon, XIcon } from '@icarus/assets'
+import { commonMessages, defineMessages, useVIntl } from '@icarus/ui'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
-import { injectFilePicker, injectModrinthClient, injectTags } from '../../../../providers'
+import { injectFilePicker, injectIcarusClient, injectTags } from '../../../../providers'
 import Avatar from '../../../base/Avatar.vue'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Chips from '../../../base/Chips.vue'
@@ -166,7 +166,7 @@ import { injectCreationFlowContext } from '../creation-flow-context'
 import { formatLoaderLabel } from '../shared'
 
 const debug = useDebugLogger('CustomSetupStage')
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const ctx = injectCreationFlowContext()
 const { formatMessage } = useVIntl()
 const {
@@ -363,11 +363,11 @@ const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 		const manifest = ctx.loaderVersionsCache.value[apiLoader]
 		if (!manifest) return []
 
-		const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
+		const hasPlaceholder = manifest.some((x) => x.id === '${Icarus.gameVersion}')
 		const supportedVersions = new Set(
 			manifest
 				.filter(
-					(x) => x.id !== '${modrinth.gameVersion}' && (hasPlaceholder || x.loaders.length > 0),
+					(x) => x.id !== '${Icarus.gameVersion}' && (hasPlaceholder || x.loaders.length > 0),
 				)
 				.map((x) => x.id),
 		)
@@ -464,7 +464,7 @@ function getLoaderVersionsForGameVersion(
 	if (!manifest) return []
 
 	// Some loaders (e.g. Fabric) list all versions under a placeholder entry
-	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
+	const placeholder = manifest.find((x) => x.id === '${Icarus.gameVersion}')
 	if (placeholder) {
 		if (!manifest.some((x) => x.id === gameVersion)) return []
 		debug(
@@ -596,3 +596,4 @@ const loaderVersionOptions = computed<ComboboxOption<string>[]>(() => {
 	}))
 })
 </script>
+

@@ -1,10 +1,10 @@
 # ![Frontend Cover](/.github/assets/web_cover.png)
 
-# Modrinth Web Interface
+# Icarus Web Interface
 
-Welcome to the Modrinth Web Interface! This web-based platform is designed for discovering, downloading, and managing Minecraft mods.
+Welcome to the Icarus Web Interface! This web-based platform is designed for discovering, downloading, and managing Minecraft mods.
 
-If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com).
+If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Icarus website](https://modrinth.com).
 
 ## Development
 
@@ -25,3 +25,4 @@ pnpm web:dev
 ```
 
 You should now have a development build of the web interface running with hot-reloading enabled. Any changes you make to the code will automatically refresh the browser.
+

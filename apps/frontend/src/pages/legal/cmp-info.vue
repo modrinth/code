@@ -3,13 +3,13 @@
 		<h1>Rewards Program Information</h1>
 		<p><em>Last modified: Feb 20, 2025</em></p>
 		<p>
-			This page was created for transparency for how the rewards program works on Modrinth. Feel
+			This page was created for transparency for how the rewards program works on Icarus. Feel
 			free to join our Discord or email
 			<a href="mailto:support@modrinth.com">support@modrinth.com</a> if you have any questions!
 		</p>
 		<p>
 			This document is provided for informational purposes only and does not constitute a legal
-			agreement. Modrinth makes no representations or warranties as to the accuracy, completeness,
+			agreement. Icarus makes no representations or warranties as to the accuracy, completeness,
 			or reliability of the information contained herein.
 		</p>
 		<h2>Rewards Distribution</h2>
@@ -20,7 +20,7 @@
 		</p>
 		<p>
 			The advertising revenue of the entire website and app is split 75% to creators and 25% to
-			Modrinth.
+			Icarus.
 		</p>
 		<p>
 			The creator allotment to the pool is decided by how many page views and in-app downloads your
@@ -41,9 +41,9 @@
 			<li>Bloxcraft receives 50 page views and 20 in-app downloads (70 points)</li>
 			<li>Craftnite receives 10 page views and 0 in-app downloads (10 points)</li>
 		</ul>
-		<p>In this scenario, the earnings for each creator and Modrinth would be as follows:</p>
+		<p>In this scenario, the earnings for each creator and Icarus would be as follows:</p>
 		<ul>
-			<li>Modrinth: $25 (25% of $100, the site's earnings for the day)</li>
+			<li>Icarus: $25 (25% of $100, the site's earnings for the day)</li>
 			<li>User A: $48.91 ($75 * (10 + 30 + 100 + 10)/230)</li>
 			<li>User B: $10.43 (0.4 * $75 * (50 + 20 + 10 + 0)/230)</li>
 			<li>User C: $15.65 (0.6 * $75 * (50 + 20 + 10 + 0)/230)</li>
@@ -52,9 +52,9 @@
 		<p>
 			Page views are counted when a legitimate browser views a project page. In-app downloads when a
 			user logged into the launcher downloads a project. Project downloads alongside modpack
-			downloads are counted equally. In each category, Modrinth actively removes botted downloads
+			downloads are counted equally. In each category, Icarus actively removes botted downloads
 			and page views at our own discretion. If users are caught botting, they will be permanently
-			banned from using Modrinth's services.
+			banned from using Icarus's services.
 		</p>
 		<p>
 			You can view your page views and project downloads in your
@@ -67,20 +67,20 @@
 		</p>
 		<h3>Do you have to enroll in the monetization program to get money?</h3>
 		<p>
-			No. All creators who upload to Modrinth automatically will receive funds as according to the
+			No. All creators who upload to Icarus automatically will receive funds as according to the
 			above algorithm. However, if you would like to withdraw money from your account, you must
 			enroll by adding your payment information.
 		</p>
 		<h3>What methods can I use withdraw money from my account? Are there any fees?</h3>
 		<p>
-			Right now, you can use PayPal or Venmo to withdraw money from your Modrinth account. Gift card
+			Right now, you can use PayPal or Venmo to withdraw money from your Icarus account. Gift card
 			withdrawal is also available. We are working on more methods to withdraw money from your
-			account. There are fees to withdraw money from your Modrinth account—see the revenue page in
+			account. There are fees to withdraw money from your Icarus account—see the revenue page in
 			your dashboard for more information.
 		</p>
 		<h3 id="pending">What does "pending" revenue mean in my dashboard?</h3>
 		<p>
-			Modrinth receives ad revenue from our ad providers on a NET 60 day basis. Due to this, not all
+			Icarus receives ad revenue from our ad providers on a NET 60 day basis. Due to this, not all
 			revenue is immediately available to withdraw. We pay creators as soon as we receive the money
 			from our ad providers, which is 60 days after the last day of each month.
 		</p>
@@ -124,15 +124,15 @@
 			</tbody>
 		</table>
 
-		<h3>How do I know Modrinth is being transparent about revenue?</h3>
+		<h3>How do I know Icarus is being transparent about revenue?</h3>
 		<p>
 			We aim to be as transparent as possible with creator revenue. All of our code is open source,
 			including our
-			<a href="https://github.com/modrinth/code/blob/main/apps/labrinth/src/queue/payouts">
+			<a href="https://github.com/Icarus/code/blob/main/apps/labrinth/src/queue/payouts">
 				revenue distribution system</a
 			>. We also have an
 			<a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a>
-			to query the exact daily advertising revenue for the site - so far, creators on Modrinth have
+			to query the exact daily advertising revenue for the site - so far, creators on Icarus have
 			earned a total of <strong>{{ formatMoney(platformRevenue) }}</strong> in ad revenue.
 		</p>
 		<table>
@@ -141,7 +141,7 @@
 					<th>Date</th>
 					<th>Revenue</th>
 					<th>Creator Revenue (75%)</th>
-					<th>Modrinth's Cut (25%)</th>
+					<th>Icarus's Cut (25%)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -154,7 +154,7 @@
 			</tbody>
 		</table>
 		<small
-			>Modrinth's total ad revenue in the previous 5 days, for the entire dataset, use the
+			>Icarus's total ad revenue in the previous 5 days, for the entire dataset, use the
 			aforementioned
 			<a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a>.</small
 		>
@@ -162,12 +162,12 @@
 </template>
 
 <script lang="ts" setup>
-import { injectModrinthClient, StyledInput, useFormatDateTime, useFormatMoney } from '@modrinth/ui'
+import { injectIcarusClient, StyledInput, useFormatDateTime, useFormatMoney } from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const formatMoney = useFormatMoney()
 const formatDate = useFormatDateTime({
 	month: 'long',
@@ -176,10 +176,10 @@ const formatDate = useFormatDateTime({
 })
 
 const description =
-	'Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.'
+	'Information about the Rewards Program of Icarus, an open source modding platform focused on Minecraft.'
 
 useSeoMeta({
-	title: 'Rewards Program Information - Modrinth',
+	title: 'Rewards Program Information - Icarus',
 	description,
 	ogTitle: 'Rewards Program Information',
 	ogDescription: description,
@@ -200,3 +200,4 @@ const platformRevenueData = computed(
 	() => (transparencyInformation.value as any)?.data?.slice(0, 5) ?? [],
 )
 </script>
+

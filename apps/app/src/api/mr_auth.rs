@@ -1,11 +1,11 @@
 use crate::api::Result;
-use crate::api::TheseusSerializableError;
+use crate::api::PteronSerializableError;
 use crate::api::oauth_utils;
 use tauri::Manager;
 use tauri::Runtime;
 use tauri::plugin::TauriPlugin;
 use tauri_plugin_opener::OpenerExt;
-use theseus::prelude::*;
+use pteron::prelude::*;
 use tokio::sync::oneshot;
 
 pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
@@ -44,8 +44,8 @@ pub async fn modrinth_login<R: Runtime>(
     app.opener()
         .open_url(auth_request_uri, None::<&str>)
         .map_err(|e| {
-            TheseusSerializableError::Theseus(
-                theseus::ErrorKind::OtherError(format!(
+            PteronSerializableError::Theseus(
+                pteron::ErrorKind::OtherError(format!(
                     "Failed to open auth request URI: {e}"
                 ))
                 .into(),
@@ -53,8 +53,8 @@ pub async fn modrinth_login<R: Runtime>(
         })?;
 
     let Some(auth_code) = auth_code.await.unwrap()? else {
-        return Err(TheseusSerializableError::Theseus(
-            theseus::ErrorKind::OtherError("Login canceled".into()).into(),
+        return Err(PteronSerializableError::Theseus(
+            pteron::ErrorKind::OtherError("Login canceled".into()).into(),
         ));
     };
 
@@ -69,12 +69,12 @@ pub async fn modrinth_login<R: Runtime>(
 
 #[tauri::command]
 pub async fn logout() -> Result<()> {
-    Ok(theseus::mr_auth::logout().await?)
+    Ok(pteron::mr_auth::logout().await?)
 }
 
 #[tauri::command]
 pub async fn get() -> Result<Option<ModrinthCredentials>> {
-    Ok(theseus::mr_auth::get_credentials().await?)
+    Ok(pteron::mr_auth::get_credentials().await?)
 }
 
 #[tauri::command]

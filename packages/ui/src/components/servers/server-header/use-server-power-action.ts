@@ -2,8 +2,8 @@ import { computed, type Ref } from 'vue'
 
 import { useVIntl } from '#ui/composables/i18n'
 import {
-	injectModrinthClient,
-	injectModrinthServerContext,
+	injectIcarusClient,
+	injectIcarusServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
 
@@ -11,21 +11,11 @@ export type PowerAction = 'Start' | 'Stop' | 'Restart' | 'Kill'
 
 export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const { formatMessage } = useVIntl()
-	const client = injectModrinthClient()
-	const { serverId, server, powerState, isSyncingContent, busyReasons } =
-		injectModrinthServerContext()
+	const client = injectIcarusClient()
+	const { serverId, server, powerState, busyReasons } = injectIcarusServerContext()
 	const { addNotification } = injectNotificationManager()
 
-	const isInstalling = computed(
-		() =>
-			server.value.status === 'installing' ||
-			isSyncingContent.value ||
-			busyReasons.value.some(
-				(r) =>
-					r.reason.id === 'servers.busy.installing' ||
-					r.reason.id === 'servers.busy.syncing-content',
-			),
-	)
+	const isInstalling = computed(() => server.value.status === 'installing')
 	const isRunning = computed(() => powerState.value === 'running')
 	const isStopping = computed(() => powerState.value === 'stopping')
 	const isStarting = computed(() => powerState.value === 'starting')

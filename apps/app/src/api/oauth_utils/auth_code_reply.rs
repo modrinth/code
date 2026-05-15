@@ -18,8 +18,8 @@ use std::{
 
 use hyper::body::Incoming;
 use hyper_util::rt::{TokioIo, TokioTimer};
-use theseus::ErrorKind;
-use theseus::prelude::tcp_listen_any_loopback;
+use pteron::ErrorKind;
+use pteron::prelude::tcp_listen_any_loopback;
 use tokio::sync::{broadcast, oneshot};
 
 static SERVER_SHUTDOWN: LazyLock<broadcast::Sender<()>> =
@@ -31,8 +31,8 @@ static SERVER_SHUTDOWN: LazyLock<broadcast::Sender<()>> =
 ///
 /// If the server is stopped before receiving an authorization code, `Ok(None)` is returned.
 pub async fn listen(
-    listen_socket_tx: oneshot::Sender<Result<SocketAddr, theseus::Error>>,
-) -> Result<Option<String>, theseus::Error> {
+    listen_socket_tx: oneshot::Sender<Result<SocketAddr, pteron::Error>>,
+) -> Result<Option<String>, pteron::Error> {
     let listener = match tcp_listen_any_loopback().await {
         Ok(listener) => {
             listen_socket_tx

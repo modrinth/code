@@ -13,7 +13,6 @@ export interface PageContext {
 	intercomBubble?: {
 		width: Ref<number> | ComputedRef<number>
 		horizontalPadding: Ref<number> | ComputedRef<number>
-		requestHorizontalPadding?: (id: symbol, padding: number | null) => void
 		requestVerticalClearance: (id: symbol, clearance: number | null) => void
 	}
 	featureFlags?: {

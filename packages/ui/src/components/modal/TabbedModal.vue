@@ -1,7 +1,7 @@
 <script lang="ts"></script>
 
 <script setup lang="ts">
-import { RightArrowIcon } from '@modrinth/assets'
+import { RightArrowIcon } from '@icarus/assets'
 import { type Component, computed, nextTick, ref } from 'vue'
 
 import { type MessageDescriptor, useVIntl } from '../../composables/i18n'

@@ -233,8 +233,8 @@ function checkScriptForI18n(scriptContent: string): { hasI18n: boolean; i18nUsag
 	for (const node of ast.body) {
 		if (node.type === AST_NODE_TYPES.ImportDeclaration) {
 			const source = node.source.value as string
-			// Check for @modrinth/ui import
-			if (source === '@modrinth/ui') {
+			// Check for @icarus/ui import
+			if (source === '@icarus/ui') {
 				for (const specifier of node.specifiers) {
 					if (specifier.type === AST_NODE_TYPES.ImportSpecifier) {
 						const importedName =

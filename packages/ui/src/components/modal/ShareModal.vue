@@ -8,7 +8,7 @@ import {
 	RedditIcon,
 	ShareIcon,
 	TwitterIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import QrcodeVue from 'qrcode.vue'
 import { computed, nextTick, ref } from 'vue'
 
@@ -23,7 +23,7 @@ const props = defineProps({
 	},
 	shareTitle: {
 		type: String,
-		default: 'Modrinth',
+		default: 'Icarus',
 	},
 	shareText: {
 		type: String,
@@ -269,3 +269,4 @@ defineExpose({
 		</div>
 	</NewModal>
 </template>
+

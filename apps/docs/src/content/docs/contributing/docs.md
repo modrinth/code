@@ -1,12 +1,12 @@
 ---
 title: Docs
-description: Guide for contributing to Modrinth's developer documentation
+description: Guide for contributing to Icarus's developer documentation
 ---
 
-This project is part of our [monorepo](https://github.com/modrinth/code). You can find it in the `apps/docs` directory.
+This project is part of our [monorepo](https://github.com/Icarus/code). You can find it in the `apps/docs` directory.
 
 [Docs] are the very site you are looking at right now.
-They are here to help developers and contributors work with Modrinth's codebase and API.
+They are here to help developers and contributors work with Icarus's codebase and API.
 
 To set up a development environment, you will need to install [pnpm] and run the following commands:
 
@@ -21,5 +21,6 @@ When ready, you will have a hot-reloading environment of the docs site running o
 
 While there is no linting requirement on Docs, we do ask that you quickly check your writing before contributing.
 
-[docs]: https://github.com/modrinth/code/tree/main/apps/docs
+[docs]: https://github.com/Icarus/code/tree/main/apps/docs
 [pnpm]: https://pnpm.io
+

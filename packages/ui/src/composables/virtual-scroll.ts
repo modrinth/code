@@ -4,21 +4,13 @@ import { computed, ref, watch, watchEffect } from 'vue'
 export interface VirtualScrollOptions {
 	itemHeight: number
 	bufferSize?: number
-	initialItemCount?: number
 	enabled?: Ref<boolean>
 	onNearEnd?: () => void
 	nearEndThreshold?: number
 }
 
 export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptions) {
-	const {
-		itemHeight,
-		bufferSize = 5,
-		initialItemCount = 20,
-		enabled,
-		onNearEnd,
-		nearEndThreshold = 0.2,
-	} = options
+	const { itemHeight, bufferSize = 5, enabled, onNearEnd, nearEndThreshold = 0.2 } = options
 
 	const listContainer = ref<HTMLElement | null>(null)
 	const scrollContainer = ref<HTMLElement | Window | null>(null)
@@ -76,9 +68,7 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 			return { start: 0, end: items.value.length }
 		}
 
-		if (!listContainer.value || !scrollContainer.value) {
-			return { start: 0, end: Math.min(items.value.length, initialItemCount) }
-		}
+		if (!listContainer.value || !scrollContainer.value) return { start: 0, end: 0 }
 
 		const relativeScrollTop = Math.max(0, scrollTop.value - containerOffset.value)
 

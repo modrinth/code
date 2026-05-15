@@ -1,7 +1,9 @@
-//! Theseus profile management interface
+//! Pteron profile management interface
 use crate::launcher::get_loader_version_from_profile;
 use crate::settings::Hooks;
-use crate::state::{LauncherFeatureVersion, LinkedData, ProfileInstallStage};
+use crate::state::{
+    InstanceSyncOverrides, LauncherFeatureVersion, LinkedData, ProfileInstallStage, Settings,
+};
 use crate::util::io::{self, canonicalize};
 use crate::{ErrorKind, pack, profile};
 pub use crate::{State, state::Profile};
@@ -12,6 +14,21 @@ use crate::{
 use chrono::Utc;
 use std::path::PathBuf;
 use tracing::{info, trace};
+
+fn build_default_sync_overrides(sync: &crate::state::SyncSettings) -> InstanceSyncOverrides {
+    let has_folder = |name: &str| sync.folders.iter().any(|x| x == name);
+    let has_file = |name: &str| sync.files.iter().any(|x| x == name);
+
+    InstanceSyncOverrides {
+        saves: Some(has_folder("saves")),
+        screenshots: Some(has_folder("screenshots")),
+        resourcepacks: Some(has_folder("resourcepacks")),
+        shaderpacks: Some(has_folder("shaderpacks")),
+        schematics: Some(has_folder("schematics")),
+        options_txt: Some(has_file("options.txt")),
+        servers_dat: Some(has_file("servers.dat")),
+    }
+}
 
 // Creates a profile of a given name and adds it to the in-memory state
 // Returns relative filepath as ProfilePathId which can be used to access it in the State
@@ -25,6 +42,8 @@ pub async fn profile_create(
     icon_path: Option<String>,      // the icon for the profile
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
+    sync_enabled: Option<bool>,
+    sync_overrides: Option<InstanceSyncOverrides>,
 ) -> crate::Result<String> {
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
@@ -71,6 +90,11 @@ pub async fn profile_create(
         None
     };
 
+    let settings = Settings::get(&state.pool).await?;
+    let effective_sync_enabled = sync_enabled.unwrap_or(settings.sync.enabled);
+    let effective_sync_overrides = sync_overrides
+        .or_else(|| Some(build_default_sync_overrides(&settings.sync)));
+
     let mut profile = Profile {
         path: path.clone(),
         install_stage: ProfileInstallStage::NotInstalled,
@@ -99,6 +123,8 @@ pub async fn profile_create(
             wrapper: None,
             post_exit: None,
         },
+        sync_enabled: effective_sync_enabled,
+        sync_overrides: effective_sync_overrides,
     };
 
     let result = async {
@@ -141,6 +167,14 @@ pub async fn profile_create(
 
         profile.upsert(&state.pool).await?;
 
+        crate::sync::apply_sync_to_instance(
+            &settings.sync,
+            &full_path,
+            &state.directories.synced_dir(),
+            profile.sync_enabled,
+            &profile.sync_overrides,
+        )?;
+
         emit_profile(&profile.path, ProfilePayloadType::Created).await?;
 
         if !skip_install_profile.unwrap_or(false) {
@@ -177,6 +211,8 @@ pub async fn profile_create_from_duplicate(
         profile.icon_path.clone(),
         profile.linked_data.clone(),
         Some(true),
+        Some(profile.sync_enabled),
+        profile.sync_overrides.clone(),
     )
     .await?;
 

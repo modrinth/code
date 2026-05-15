@@ -31,49 +31,35 @@
 		class="layout"
 		:class="{
 			'expanded-mobile-nav': isBrowseMenuOpen,
-			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
+			'Icarus-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
 	>
-		<RussiaBanner v-if="flags.showAllBanners || isRussia" />
-		<TaxIdMismatchBanner v-if="flags.showAllBanners || showTinMismatchBanner" />
-		<TaxComplianceBanner v-if="flags.showAllBanners || showTaxComplianceBanner" />
+		<RussiaBanner v-if="isRussia" />
+		<TaxIdMismatchBanner v-if="showTinMismatchBanner" />
+		<TaxComplianceBanner v-if="showTaxComplianceBanner" />
 		<VerifyEmailBanner
-			v-if="
-				flags.showAllBanners ||
-				(auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email')
-			"
+			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
 			:has-email="!!auth?.user?.email"
 		/>
 		<SubscriptionPaymentFailedBanner
 			v-if="
-				flags.showAllBanners ||
-				(user.subscriptions.some((x) => x.status === 'payment-failed') &&
-					route.path !== '/settings/billing')
+				user.subscriptions.some((x) => x.status === 'payment-failed') &&
+				route.path !== '/settings/billing'
 			"
 		/>
-		<PreviewBanner
-			v-if="
-				flags.showAllBanners || (config.public.buildEnv === 'production' && config.public.preview)
-			"
-		/>
-		<StagingBanner
-			v-if="
-				flags.showAllBanners ||
-				config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')
-			"
-		/>
+		<PreviewBanner v-if="config.public.buildEnv === 'production' && config.public.preview" />
+		<StagingBanner v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')" />
 		<GeneratedStateErrorsBanner
 			:errors="generatedStateErrors"
 			:api-url="config.public.apiBaseUrl"
 		/>
-		<ViewOnModrinthBanner />
 		<header
 			class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
 			<div>
 				<NuxtLink
 					to="/"
-					:aria-label="formatMessage(messages.modrinthHomePage)"
+					:aria-label="formatMessage(messages.IcarusHomePage)"
 					class="group hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]"
 				>
 					<TextLogo
@@ -303,10 +289,10 @@
 						<nuxt-link to="/app">
 							<DownloadIcon aria-hidden="true" />
 							<span class="hidden md:contents">{{
-								formatMessage(navMenuMessages.getModrinthApp)
+								formatMessage(navMenuMessages.getIcarusApp)
 							}}</span>
 							<span class="contents md:hidden">{{
-								formatMessage(navMenuMessages.modrinthApp)
+								formatMessage(navMenuMessages.IcarusApp)
 							}}</span>
 						</nuxt-link>
 					</ButtonStyled>
@@ -325,7 +311,7 @@
 							{
 								id: 'review-projects',
 								color: 'orange',
-								link: '/moderation',
+								link: '/moderation/',
 							},
 							{
 								id: 'tech-review',
@@ -336,11 +322,6 @@
 								id: 'review-reports',
 								color: 'orange',
 								link: '/moderation/reports',
-							},
-							{
-								id: 'external-projects',
-								color: 'orange',
-								link: '/moderation/external-projects',
 							},
 							{
 								divider: true,
@@ -385,7 +366,7 @@
 							},
 						]"
 					>
-						<ModrinthIcon aria-hidden="true" />
+						<IcarusIcon aria-hidden="true" />
 						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
 						<template #review-projects>
 							<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProjects) }}
@@ -395,9 +376,6 @@
 						</template>
 						<template #review-reports>
 							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
-						</template>
-						<template #external-projects>
-							<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.externalProjects) }}
 						</template>
 						<template #user-lookup>
 							<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
@@ -489,7 +467,7 @@
 					</template>
 					<template #plus>
 						<ArrowBigUpDashIcon aria-hidden="true" />
-						{{ formatMessage(messages.upgradeToModrinthPlus) }}
+						{{ formatMessage(messages.upgradeToIcarusPlus) }}
 					</template>
 					<template #settings>
 						<SettingsIcon aria-hidden="true" /> {{ formatMessage(commonMessages.settingsLabel) }}
@@ -709,7 +687,7 @@
 			<BatchCreditModal v-if="auth.user && isAdmin(auth.user)" ref="modal_batch_credit" />
 			<slot id="main" />
 		</main>
-		<ModrinthFooter />
+		<IcarusFooter />
 	</div>
 </template>
 <script setup>
@@ -727,14 +705,13 @@ import {
 	DropdownIcon,
 	FileIcon,
 	GlassesIcon,
-	GlobeIcon,
 	HamburgerIcon,
 	HomeIcon,
 	IssuesIcon,
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
-	ModrinthIcon,
+	IcarusIcon,
 	MoonIcon,
 	OrganizationIcon,
 	PackageOpenIcon,
@@ -754,7 +731,7 @@ import {
 	UserIcon,
 	UserSearchIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -762,12 +739,12 @@ import {
 	commonProjectTypeCategoryMessages,
 	commonSettingsMessages,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	OverflowMenu,
 	useVIntl,
-} from '@modrinth/ui'
-import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
-import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+} from '@icarus/ui'
+import TeleportOverflowMenu from '@icarus/ui/src/components/base/TeleportOverflowMenu.vue'
+import { isAdmin, isStaff, UserBadge } from '@icarus/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
@@ -781,11 +758,10 @@ import SubscriptionPaymentFailedBanner from '~/components/ui/banner/Subscription
 import TaxComplianceBanner from '~/components/ui/banner/TaxComplianceBanner.vue'
 import TaxIdMismatchBanner from '~/components/ui/banner/TaxIdMismatchBanner.vue'
 import VerifyEmailBanner from '~/components/ui/banner/VerifyEmailBanner.vue'
-import ViewOnModrinthBanner from '~/components/ui/banner/ViewOnModrinthBanner.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
-import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
+import IcarusFooter from '~/components/ui/IcarusFooter.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
@@ -807,7 +783,7 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 const { data: payoutBalance } = useQuery({
 	queryKey: ['payout', 'balance'],
@@ -857,13 +833,13 @@ const navMenuMessages = defineMessages({
 		id: 'layout.nav.host-a-server',
 		defaultMessage: 'Host a server',
 	},
-	getModrinthApp: {
-		id: 'layout.nav.get-modrinth-app',
-		defaultMessage: 'Get Modrinth App',
+	getIcarusApp: {
+		id: 'layout.nav.get-Icarus-app',
+		defaultMessage: 'Get Icarus Launcher',
 	},
-	modrinthApp: {
-		id: 'layout.nav.modrinth-app',
-		defaultMessage: 'Modrinth App',
+	IcarusApp: {
+		id: 'layout.nav.Icarus-app',
+		defaultMessage: 'Icarus Launcher',
 	},
 })
 
@@ -880,9 +856,9 @@ const messages = defineMessages({
 		id: 'layout.action.change-theme',
 		defaultMessage: 'Change theme',
 	},
-	modrinthHomePage: {
-		id: 'layout.nav.modrinth-home-page',
-		defaultMessage: 'Modrinth home page',
+	IcarusHomePage: {
+		id: 'layout.nav.Icarus-home-page',
+		defaultMessage: 'Icarus home page',
 	},
 	createNew: {
 		id: 'layout.action.create-new',
@@ -903,10 +879,6 @@ const messages = defineMessages({
 	reports: {
 		id: 'layout.action.reports',
 		defaultMessage: 'Review reports',
-	},
-	externalProjects: {
-		id: 'layout.action.external-projects',
-		defaultMessage: 'External projects',
 	},
 	lookupByEmail: {
 		id: 'layout.action.lookup-by-email',
@@ -948,9 +920,9 @@ const messages = defineMessages({
 		id: 'layout.nav.saved-projects',
 		defaultMessage: 'Saved projects',
 	},
-	upgradeToModrinthPlus: {
-		id: 'layout.nav.upgrade-to-modrinth-plus',
-		defaultMessage: 'Upgrade to Modrinth+',
+	upgradeToIcarusPlus: {
+		id: 'layout.nav.upgrade-to-Icarus-plus',
+		defaultMessage: 'Upgrade to Icarus+',
 	},
 	projects: {
 		id: 'layout.nav.projects',
@@ -991,33 +963,33 @@ useHead({
 	],
 })
 useSeoMeta({
-	title: 'Modrinth',
+	title: 'Icarus',
 	description: () =>
 		formatMessage({
 			id: 'layout.meta.description',
 			defaultMessage:
-				'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. ' +
-				'Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
+				'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Icarus. ' +
+				'Discover and publish projects on Icarus with a modern, easy to use interface and API.',
 		}),
-	publisher: 'Modrinth',
+	publisher: 'Icarus',
 	themeColor: '#1bd96a',
 	colorScheme: 'dark light',
 
 	// OpenGraph
-	ogTitle: 'Modrinth',
-	ogSiteName: 'Modrinth',
+	ogTitle: 'Icarus',
+	ogSiteName: 'Icarus',
 	ogDescription: () =>
 		formatMessage({
 			id: 'layout.meta.og-description',
 			defaultMessage: 'Discover and publish Minecraft content!',
 		}),
 	ogType: 'website',
-	ogImage: 'https://cdn.modrinth.com/modrinth-new.png',
+	ogImage: 'https://cdn.modrinth.com/Icarus-new.png',
 	ogUrl: link,
 
 	// Twitter
 	twitterCard: 'summary',
-	twitterSite: '@modrinth',
+	twitterSite: '@Icarus',
 })
 
 const isMobileMenuOpen = ref(false)
@@ -1267,7 +1239,7 @@ const { cycle: changeTheme } = useTheme()
 
 <style lang="scss">
 @import '~/assets/styles/global.scss';
-// @import '@modrinth/assets';
+// @import '@icarus/assets';
 
 .layout {
 	min-height: 100vh;
@@ -1639,3 +1611,4 @@ const { cycle: changeTheme } = useTheme()
 	}
 }
 </style>
+

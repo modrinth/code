@@ -21,7 +21,7 @@
     "message": "Pachet de mod necesar"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Acest server necesită modificări pentru a juca. Faceți clic pe Instalare pentru a configura fișierele necesare din Modrinth, apoi lansați direct pe server."
+    "message": "Acest server necesită modificări pentru a juca. Faceți clic pe Instalare pentru a configura fișierele necesare din Icarus, apoi lansați direct pe server."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instanță comună"
@@ -66,16 +66,16 @@
     "message": "Administrare resurse"
   },
   "app.update-popup.body": {
-    "message": "Aplicația Modrinth v{version} este gata de instalat! Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Modrinth."
+    "message": "Aplicația Icarus v{version} este gata de instalat! Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Icarus."
   },
   "app.update-popup.body.download-complete": {
-    "message": "Aplicația Modrinth v{version} a terminat descărcarea. Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Modrinth."
+    "message": "Aplicația Icarus v{version} a terminat descărcarea. Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Icarus."
   },
   "app.update-popup.body.linux": {
-    "message": "Aplicația Modrinth v{version} este disponibil. Utilizați managerul de pachete pentru a actualiza pentru cele mai recente funcții și remedieri!"
+    "message": "Aplicația Icarus v{version} este disponibil. Utilizați managerul de pachete pentru a actualiza pentru cele mai recente funcții și remedieri!"
   },
   "app.update-popup.body.metered": {
-    "message": "Aplicația Modrinth v{version} este disponibil acum! Deoarece sunteți într-o rețea cu contorizare, nu am descărcat-o automat."
+    "message": "Aplicația Icarus v{version} este disponibil acum! Deoarece sunteți într-o rețea cu contorizare, nu am descărcat-o automat."
   },
   "app.update-popup.changelog": {
     "message": "Jurnalul modificărilor"
@@ -126,10 +126,10 @@
     "message": "Poate fi diferit de numele lor de utilizator Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Introduceți numele de utilizator Modrinth..."
+    "message": "Introduceți numele de utilizator Icarus..."
   },
   "friends.add-friend.username.title": {
-    "message": "Care este numele de utilizator Modrinth al prietenului tău?"
+    "message": "Care este numele de utilizator Icarus al prietenului tău?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Adaugă prieteni</link> pentru a vedea ce joacă!"
@@ -171,7 +171,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Conectează-te la un cont Modrinth</link> pentru a adăuga prieteni și a vedea ce joacă!"
+    "message": "<link>Conectează-te la un cont Icarus</link> pentru a adăuga prieteni și a vedea ce joacă!"
   },
   "instance.add-server.add-and-play": {
     "message": "Adaugă și joacă"
@@ -435,3 +435,4 @@
     "message": "Încărcătorul este furnizat de server"
   }
 }
+

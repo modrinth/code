@@ -128,8 +128,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { PlusIcon, XIcon } from '@modrinth/assets'
+import type { Labrinth } from '@icarus/api-client'
+import { PlusIcon, XIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	Chips,
@@ -137,12 +137,12 @@ import {
 	type ComboboxOption,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { computed, defineAsyncComponent, h } from 'vue'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
@@ -334,7 +334,7 @@ const userOption = computed(() => ({
 		: undefined,
 }))
 
-const { labrinth } = injectModrinthClient()
+const { labrinth } = injectIcarusClient()
 
 async function fetchOrganizations() {
 	if (!auth.value.user?.id) return
@@ -470,3 +470,4 @@ function updatedName() {
 	}
 }
 </script>
+

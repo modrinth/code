@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, LightBulbIcon, TriangleAlertIcon, XIcon } from '@modrinth/assets'
+import { ChevronDownIcon, LightBulbIcon, TriangleAlertIcon, XIcon } from '@icarus/assets'
 import { ref } from 'vue'
 
 import ButtonStyled from './ButtonStyled.vue'

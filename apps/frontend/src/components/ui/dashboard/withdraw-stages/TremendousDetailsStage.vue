@@ -335,7 +335,7 @@
 </template>
 
 <script setup lang="ts">
-import { SearchIcon } from '@modrinth/assets'
+import { SearchIcon } from '@icarus/assets'
 import {
 	Admonition,
 	Checkbox,
@@ -352,7 +352,7 @@ import {
 	useDebugLogger,
 	useFormatMoney,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -1069,7 +1069,7 @@ const messages = defineMessages({
 	unverifiedEmailMessage: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message',
 		defaultMessage:
-			'The delivery email you have entered is not associated with your Modrinth account. Modrinth cannot recover rewards sent to an incorrect email address.',
+			'The delivery email you have entered is not associated with your Icarus account. Icarus cannot recover rewards sent to an incorrect email address.',
 	},
 	paymentMethod: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.payment-method',
@@ -1126,3 +1126,4 @@ const messages = defineMessages({
 	},
 })
 </script>
+

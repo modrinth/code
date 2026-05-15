@@ -100,7 +100,7 @@
 						input-class="!bg-surface-3"
 					/>
 					<span>
-						To make up for it, we've added {{ days }} day{{ pluralize(days) }} to your Modrinth
+						To make up for it, we've added {{ days }} day{{ pluralize(days) }} to your Icarus
 						Servers subscription.
 					</span>
 					<span>
@@ -129,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, PlusIcon, XIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	Combobox,
@@ -138,8 +138,8 @@ import {
 	StyledInput,
 	TagItem,
 	Toggle,
-} from '@modrinth/ui'
-import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
+} from '@icarus/ui'
+import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@icarus/utils/utils.ts'
 import { computed, ref } from 'vue'
 
 import { useBaseFetch } from '#imports'
@@ -261,3 +261,4 @@ defineExpose({
 	hide,
 })
 </script>
+

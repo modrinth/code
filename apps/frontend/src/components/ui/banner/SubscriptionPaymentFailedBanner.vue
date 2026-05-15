@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { SettingsIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, PagewideBanner, useVIntl } from '@modrinth/ui'
+import { SettingsIcon } from '@icarus/assets'
+import { ButtonStyled, defineMessages, PagewideBanner, useVIntl } from '@icarus/ui'
 
 const { formatMessage } = useVIntl()
 
@@ -29,8 +29,8 @@ const messages = defineMessages({
 		<template #description>
 			<span>{{ formatMessage(messages.description) }}</span>
 		</template>
-		<template #actions_right>
-			<ButtonStyled color="red">
+		<template #actions>
+			<ButtonStyled>
 				<nuxt-link to="/settings/billing">
 					<SettingsIcon aria-hidden="true" />
 					{{ formatMessage(messages.action) }}

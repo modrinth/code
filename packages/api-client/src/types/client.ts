@@ -1,9 +1,6 @@
 import type { AbstractFeature } from '../core/abstract-feature'
 import type { RequestContext } from './request'
 
-export type MaybePromise<T> = T | Promise<T>
-export type UserAgentProvider = string | (() => MaybePromise<string | undefined>)
-
 /**
  * Request lifecycle hooks
  */
@@ -29,11 +26,11 @@ export type RequestHooks = {
  */
 export interface ClientConfig {
 	/**
-	 * User agent string or provider for requests
+	 * User agent string for requests
 	 * Should identify your application (e.g., 'my-app/1.0.0')
 	 * If not provided, the platform's default user agent will be used
 	 */
-	userAgent?: UserAgentProvider
+	userAgent?: string
 
 	/**
 	 * Base URL for Labrinth API (main Modrinth API)

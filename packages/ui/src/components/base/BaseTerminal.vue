@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, TerminalSquareIcon } from '@modrinth/assets'
+import { ChevronDownIcon, TerminalSquareIcon } from '@icarus/assets'
 import type { Terminal } from '@xterm/xterm'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
@@ -79,14 +79,14 @@ const FROG = [
 const EMPTY_STATE_BUBBLES: Record<string, string[]> = {
 	server: [
 		'   __________________________________________________',
-		' /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\',
+		' /  Welcome to your \x1B[32mIcarus Server\x1B[37m!                  \\',
 		'|   Press the green start button to start your server! |',
 		' \\____________________________________________________/',
 	],
 	instance: [
 		'   _____________________________________________________________',
 		' /  Start your instance in the top right to start               \\',
-		'|   receiving live logs!                                        |',
+		'|   recieving live logs!                                        |',
 		' \\_____________________________________________________________/',
 	],
 }
@@ -298,3 +298,4 @@ defineExpose({
 	opacity: 0;
 }
 </style>
+

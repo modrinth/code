@@ -3,7 +3,7 @@
 		<div class="flex flex-col gap-4 max-w-[500px]">
 			<Admonition type="info" header="Shared server instance">
 				This server requires modded content to play. Accept to install the needed files from
-				Modrinth.
+				Icarus.
 			</Admonition>
 
 			<div v-if="sharedBy?.name" class="flex items-center gap-2 text-sm text-secondary">
@@ -54,8 +54,8 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, XIcon } from '@modrinth/assets'
-import type { Project } from '@modrinth/utils'
+import { CheckIcon, XIcon } from '@icarus/assets'
+import type { Project } from '@icarus/utils'
 import { computed, ref } from 'vue'
 
 import { useVIntl } from '../../composables'
@@ -109,3 +109,4 @@ function hide() {
 
 defineExpose({ show, hide })
 </script>
+

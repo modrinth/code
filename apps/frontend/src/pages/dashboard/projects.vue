@@ -318,7 +318,7 @@ import {
 	TrashIcon,
 	TriangleAlertIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -333,8 +333,8 @@ import {
 	ProjectStatusBadge,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+} from '@icarus/ui'
+import { formatProjectType } from '@icarus/utils'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
@@ -496,7 +496,7 @@ const messages = defineMessages({
 	},
 })
 
-useHead({ title: () => `${formatMessage(messages.headTitle)} - Modrinth` })
+useHead({ title: () => `${formatMessage(messages.headTitle)} - Icarus` })
 
 const user = await useUser()
 const projects = ref([])
@@ -851,3 +851,4 @@ if (user.value?.projects) {
 	}
 }
 </style>
+

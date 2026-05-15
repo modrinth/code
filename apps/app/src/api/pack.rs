@@ -1,6 +1,6 @@
 use crate::api::Result;
 
-use theseus::{
+use pteron::{
     pack::{
         install_from::{CreatePackLocation, CreatePackProfile},
         install_mrpack::install_zipped_mrpack,

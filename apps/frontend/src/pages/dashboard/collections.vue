@@ -141,18 +141,18 @@ import {
 	PlusIcon,
 	SearchIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	DropdownSelect,
-	injectModrinthClient,
+	injectIcarusClient,
 	StyledInput,
 	useCompactNumber,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
@@ -220,12 +220,12 @@ definePageMeta({
 })
 
 useHead({
-	title: () => `${formatMessage(messages.collectionsLongTitle)} - Modrinth`,
+	title: () => `${formatMessage(messages.collectionsLongTitle)} - Icarus`,
 })
 
 const auth = await useAuth()
 const user = await useUser()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 if (import.meta.client) {
 	await initUserFollows()
@@ -333,3 +333,4 @@ watch(sortBy, (newVal) => {
 	}
 }
 </style>
+

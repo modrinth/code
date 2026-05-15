@@ -1,7 +1,7 @@
 <script lang="ts"></script>
 
 <script setup lang="ts" generic="ItemType extends StackedAdmonitionItem">
-import { ChevronDownIcon, XIcon } from '@modrinth/assets'
+import { ChevronDownIcon, XIcon } from '@icarus/assets'
 import { AnimatePresence, Motion } from 'motion-v'
 import { computed, onBeforeUnmount, onMounted, ref, useAttrs, useId, watch } from 'vue'
 

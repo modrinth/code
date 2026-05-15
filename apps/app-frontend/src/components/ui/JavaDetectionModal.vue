@@ -39,12 +39,11 @@
 	</ModalWrapper>
 </template>
 <script setup>
-import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import { CheckIcon, PlusIcon, XIcon } from '@icarus/assets'
+import { ButtonStyled, injectNotificationManager } from '@icarus/ui'
 import { ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { find_filtered_jres } from '@/helpers/jre.js'
 
 const { handleError } = injectNotificationManager()
@@ -71,10 +70,7 @@ const emit = defineEmits(['submit'])
 function setJavaInstall(javaInstall) {
 	emit('submit', javaInstall)
 	detectJavaModal.value.hide()
-	trackEvent('JavaAutoDetect', {
-		path: javaInstall.path,
-		version: javaInstall.version,
-	})
+	
 }
 </script>
 <style lang="scss" scoped>

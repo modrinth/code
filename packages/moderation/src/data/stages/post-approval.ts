@@ -1,4 +1,4 @@
-import { ScaleIcon } from '@modrinth/assets'
+import { ScaleIcon } from '@icarus/assets'
 
 import type { ButtonAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'

@@ -87,7 +87,7 @@
 	</div>
 </template>
 <script setup>
-import { CheckIcon, TrashIcon } from '@modrinth/assets'
+import { CheckIcon, TrashIcon } from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -95,15 +95,15 @@ import {
 	commonSettingsMessages,
 	ConfirmModal,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import { useScopes } from '~/composables/auth/scopes.ts'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -115,7 +115,7 @@ const messages = defineMessages({
 	description: {
 		id: 'settings.authorizations.description',
 		defaultMessage:
-			'When you authorize an application with your Modrinth account, you grant it access to your account. You can manage and review access to your account here at any time.',
+			'When you authorize an application with your Icarus account, you grant it access to your account. You can manage and review access to your account here at any time.',
 	},
 	emptyState: {
 		id: 'settings.authorizations.empty-state',
@@ -154,7 +154,7 @@ definePageMeta({
 })
 
 useHead({
-	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
+	title: () => `${formatMessage(messages.headTitle)} - Icarus`,
 })
 
 const { data: usersApps, refetch: refresh } = useQuery({
@@ -274,3 +274,4 @@ async function revokeApp(id) {
 	}
 }
 </style>
+

@@ -347,6 +347,9 @@
   "content.page-layout.upload-files": {
     "defaultMessage": "Nahrát soubory"
   },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Nahrávnání souborů ({completed}/{total})"
+  },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Aktualizování {contentType}..."
   },
@@ -689,11 +692,14 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Selhalo"
   },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Zařazeno"
+  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderátor"
   },
-  "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Modrinth tým"
+  "omorphia.component.badge.label.Icarus-team": {
+    "defaultMessage": "Icarus tým"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "Čekající"
@@ -724,6 +730,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Fail"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Odmítnuto"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Zkopírovat kód do schránky"
@@ -1232,6 +1241,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Plán zálohování"
   },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Nepodařilo se vytvořit zálohu"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Obnovení ze zálohy se nezdařilo"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Ruční zálohování"
   },
@@ -1320,7 +1335,7 @@
     "defaultMessage": "Kde byste chtěli umístit svůj server?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Region není uveden? <link>Dejte nám vědět, kde byste chtěli vidět další Modrinth servery!</link>"
+    "defaultMessage": "Region není uveden? <link>Dejte nám vědět, kde byste chtěli vidět další Icarus servery!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Jihovýchodní Asie"
@@ -1347,7 +1362,7 @@
     "defaultMessage": "Tmavý"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Vyberte si preferovaný barevný motiv pro Modrinth na tomto zařízení."
+    "defaultMessage": "Vyberte si preferovaný barevný motiv pro Icarus na tomto zařízení."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Světlý"
@@ -1542,4 +1557,5 @@
     "defaultMessage": "Máš neuložené změny."
   }
 }
+
 

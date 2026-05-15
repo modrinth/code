@@ -332,7 +332,7 @@ import {
 	SortDescIcon,
 	TrashIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -340,14 +340,14 @@ import {
 	commonMessages,
 	CopyCode,
 	DropdownSelect,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	NewModal,
 	ProjectStatusBadge,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+} from '@icarus/ui'
+import { formatProjectType } from '@icarus/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
@@ -355,7 +355,7 @@ import OrganizationProjectTransferModal from '~/components/ui/OrganizationProjec
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 import { injectOrganizationContext } from '~/providers/organization-context.ts'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 

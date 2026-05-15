@@ -1,5 +1,5 @@
 {
-	"name": "@modrinth/app-lib",
+	"name": "@icarus/app-lib",
 	"scripts": {
 		"build": "cargo build --release",
 		"lint": "cargo fmt --check && cargo clippy --all-targets",
@@ -8,5 +8,5 @@
 		"fix:ancillary": "prettier --write .",
 		"test": "cargo nextest run --all-targets --no-fail-fast"
 	},
-	"prettier": "@modrinth/tooling-config/app-lib.prettier.config.cjs"
+	"prettier": "@icarus/tooling-config/app-lib.prettier.config.cjs"
 }

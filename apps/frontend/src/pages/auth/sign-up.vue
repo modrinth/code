@@ -150,24 +150,24 @@ import {
 	RightArrowIcon,
 	SteamColorIcon,
 	UserIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	IntlFormatted,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl } from '@/composables/auth.js'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -186,12 +186,12 @@ const messages = defineMessages({
 	},
 	subscribeLabel: {
 		id: 'auth.sign-up.subscribe.label',
-		defaultMessage: 'Subscribe to updates about Modrinth',
+		defaultMessage: 'Subscribe to updates about Icarus',
 	},
 	legalDisclaimer: {
 		id: 'auth.sign-up.legal-dislaimer',
 		defaultMessage:
-			"By creating an account, you agree to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
+			"By creating an account, you agree to Icarus's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
 	},
 	createAccountButton: {
 		id: 'auth.sign-up.action.create-account',
@@ -204,7 +204,7 @@ const messages = defineMessages({
 })
 
 useHead({
-	title: () => `${formatMessage(messages.title)} - Modrinth`,
+	title: () => `${formatMessage(messages.title)} - Icarus`,
 })
 
 const auth = await useAuth()
@@ -284,3 +284,4 @@ async function createAccount() {
 	stopLoading()
 }
 </script>
+

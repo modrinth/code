@@ -69,21 +69,21 @@
 	</div>
 </template>
 <script setup>
-import { KeyIcon, MailIcon, SendIcon } from '@modrinth/assets'
+import { KeyIcon, MailIcon, SendIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -152,7 +152,7 @@ const messages = defineMessages({
 })
 
 useHead({
-	title: () => `${formatMessage(messages.title)} - Modrinth`,
+	title: () => `${formatMessage(messages.title)} - Icarus`,
 })
 
 const auth = await useAuth()
@@ -237,3 +237,4 @@ async function changePassword() {
 	stopLoading()
 }
 </script>
+

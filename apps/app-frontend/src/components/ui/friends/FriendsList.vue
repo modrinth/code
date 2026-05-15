@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MailIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
+import { MailIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -9,7 +9,7 @@ import {
 	StyledInput,
 	useRelativeTime,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
 import FriendsSection from '@/components/ui/friends/FriendsSection.vue'
@@ -22,7 +22,7 @@ import {
 	remove_friend,
 	transformFriends,
 } from '@/helpers/friends.ts'
-import type { ModrinthCredentials } from '@/helpers/mr_auth'
+import type { IcarusCredentials } from '@/helpers/mr_auth'
 
 const { formatMessage } = useVIntl()
 
@@ -30,7 +30,7 @@ const { handleError } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
 
 const props = defineProps<{
-	credentials: ModrinthCredentials | null
+	credentials: IcarusCredentials | null
 	signIn: () => void
 }>()
 
@@ -156,7 +156,7 @@ const messages = defineMessages({
 	},
 	usernameTitle: {
 		id: 'friends.add-friend.username.title',
-		defaultMessage: "What's your friend's Modrinth username?",
+		defaultMessage: "What's your friend's Icarus username?",
 	},
 	usernameDescription: {
 		id: 'friends.add-friend.username.description',
@@ -164,7 +164,7 @@ const messages = defineMessages({
 	},
 	usernamePlaceholder: {
 		id: 'friends.add-friend.username.placeholder',
-		defaultMessage: 'Enter Modrinth username...',
+		defaultMessage: 'Enter Icarus username...',
 	},
 	sendFriendRequest: {
 		id: 'friends.add-friend.submit',
@@ -205,7 +205,7 @@ const messages = defineMessages({
 	signInToAddFriends: {
 		id: 'friends.sign-in-to-add-friends',
 		defaultMessage:
-			"<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!",
+			"<link>Sign in to a Icarus account</link> to add friends and see what they're playing!",
 	},
 	addFriendsToShare: {
 		id: 'friends.add-friends-to-share',
@@ -404,3 +404,4 @@ const messages = defineMessages({
 		</template>
 	</div>
 </template>
+

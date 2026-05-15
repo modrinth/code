@@ -115,7 +115,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import {
 	BuyMeACoffeeIcon,
 	CodeIcon,
@@ -131,7 +131,7 @@ import {
 	PayPalIcon,
 	StoreIcon,
 	WikiIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 

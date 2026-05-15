@@ -6,7 +6,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="Verify your Modrinth email"
+		title="Verify your Icarus email"
 		:manual-links="[{ link: '{verifyemail.url}', label: 'Verification link' }]"
 	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold"> Verify your email </Heading>
@@ -30,3 +30,4 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		</VLink>
 	</StyledEmail>
 </template>
+

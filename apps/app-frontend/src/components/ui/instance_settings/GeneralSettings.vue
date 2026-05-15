@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CopyIcon, EditIcon, PlusIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
+import { CopyIcon, EditIcon, PlusIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -9,14 +9,13 @@ import {
 	OverflowMenu,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
 import { computed, type Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { duplicate, edit, edit_icon, list, remove } from '@/helpers/profile'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
@@ -40,10 +39,7 @@ const installing = computed(() => instance.value.install_stage !== 'installed')
 
 async function duplicateProfile() {
 	await duplicate(instance.value.path).catch(handleError)
-	trackEvent('InstanceDuplicate', {
-		loader: instance.value.loader,
-		game_version: instance.value.game_version,
-	})
+	
 }
 
 const allInstances = ref((await list()) as GameInstance[])
@@ -54,7 +50,7 @@ const availableGroups = computed(() => [
 async function resetIcon() {
 	icon.value = undefined
 	await edit_icon(instance.value.path, null).catch(handleError)
-	trackEvent('InstanceRemoveIcon')
+	
 }
 
 async function setIcon() {
@@ -73,7 +69,7 @@ async function setIcon() {
 	icon.value = value
 	await edit_icon(instance.value.path, icon.value).catch(handleError)
 
-	trackEvent('InstanceSetIcon')
+	
 }
 
 const editProfileObject = computed(() => ({
@@ -112,10 +108,7 @@ async function removeProfile() {
 	removing.value = true
 	const path = instance.value.path
 
-	trackEvent('InstanceRemove', {
-		loader: instance.value.loader,
-		game_version: instance.value.game_version,
-	})
+	
 
 	await router.push({ path: '/' })
 	await remove(path).catch(handleError)

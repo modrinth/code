@@ -7,13 +7,13 @@ authors: ['MpxzqsyW']
 
 Hey all,
 
-The last few months have been quite hectic for Modrinth. We've experienced all-time highs in both traffic and new creators and have outgrown a lot of our existing systems, which has led to a lot of issues plaguing creators, especially.
+The last few months have been quite hectic for Icarus. We've experienced all-time highs in both traffic and new creators and have outgrown a lot of our existing systems, which has led to a lot of issues plaguing creators, especially.
 
 The team has been super hard at work at this, and I'm really glad to announce that we've fixed most of these issues long term.
 
 1. **Upload issues (inputs not showing up, instability, etc)**
 
-   We've tracked these issues down to conflicting code between our ad provider and Modrinth's. For now, we've **disabled ads for all logged in users across the site** while we work on resolving these long term. Both web users and logged-in web users make a very small percentage of our ad revenue (7% for web and 0.05% for logged-in web users) so creators should see a very minimal revenue drop from this, and have a much better experience navigating and uploading to the site.
+   We've tracked these issues down to conflicting code between our ad provider and Icarus's. For now, we've **disabled ads for all logged in users across the site** while we work on resolving these long term. Both web users and logged-in web users make a very small percentage of our ad revenue (7% for web and 0.05% for logged-in web users) so creators should see a very minimal revenue drop from this, and have a much better experience navigating and uploading to the site.
 
 2. **Moderation and report response times**
 
@@ -29,10 +29,11 @@ The team has been super hard at work at this, and I'm really glad to announce th
 
 5. **Platform Revenue Route**
 
-   Due to some unannounced breaking changes in Aditude's API, the platform revenue API was broken. It is now [working](https://api.modrinth.com/v3/payout/platform_revenue). You can also use `start` and `end` fields to filter any date range!
+   Due to some unannounced breaking changes in Aditude's API, the platform revenue API was broken. It is now [working](https://api.Icarus.com/v3/payout/platform_revenue). You can also use `start` and `end` fields to filter any date range!
 
 6. **API and Uptime**
 
-   We've migrated our infrastructure for the website, app, and servers to OVH over our existing non-redundant AWS system. We've hit 99.96% uptime on our API and 99.98% on Modrinth Servers!
+   We've migrated our infrastructure for the website, app, and servers to OVH over our existing non-redundant AWS system. We've hit 99.96% uptime on our API and 99.98% on Icarus Servers!
 
-Thank you all for your patience! If you are having any more issues or have any questions about all of this, feel free to DM @geometrically on Discord or [start a support chat](https://support.modrinth.com) and we will be happy to help!
+Thank you all for your patience! If you are having any more issues or have any questions about all of this, feel free to DM @geometrically on Discord or [start a support chat](https://support.Icarus.com) and we will be happy to help!
+

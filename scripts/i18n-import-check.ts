@@ -5,7 +5,7 @@ import chalk from 'chalk'
 import * as fs from 'fs'
 import * as path from 'path'
 
-// i18n symbols that should be imported from @modrinth/ui
+// i18n symbols that should be imported from @icarus/ui
 const I18N_SYMBOLS = ['useVIntl', 'defineMessage', 'defineMessages', 'IntlFormatted'] as const
 type I18nSymbol = (typeof I18N_SYMBOLS)[number]
 
@@ -13,7 +13,7 @@ type I18nSymbol = (typeof I18N_SYMBOLS)[number]
 const FORMAT_MESSAGE = 'formatMessage'
 
 // Valid import sources for i18n symbols
-const VALID_IMPORT_SOURCES = ['@modrinth/ui']
+const VALID_IMPORT_SOURCES = ['@icarus/ui']
 
 // Directories to exclude from scanning
 const EXCLUDED_DIRS = new Set(['node_modules', '.output', '.nuxt', 'dist', '.git', '.turbo'])
@@ -227,7 +227,7 @@ function findUsages(ast: TSESTree.Program): Usage[] {
  * Check if import source is valid for i18n symbols
  */
 function isValidImportSource(source: string, filePath: string): boolean {
-	// Direct import from @modrinth/ui
+	// Direct import from @icarus/ui
 	if (VALID_IMPORT_SOURCES.includes(source)) {
 		return true
 	}
@@ -367,8 +367,8 @@ function main() {
 	console.log()
 
 	if (verbose) {
-		console.log(theme.muted('  Tip: Import these symbols from @modrinth/ui'))
-		console.log(theme.muted('  Example: import { useVIntl, defineMessages } from \'@modrinth/ui\''))
+		console.log(theme.muted('  Tip: Import these symbols from @icarus/ui'))
+		console.log(theme.muted('  Example: import { useVIntl, defineMessages } from \'@icarus/ui\''))
 		console.log()
 	}
 

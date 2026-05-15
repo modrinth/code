@@ -72,8 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import { ListFilterIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
-import type { ExtendedReport } from '@modrinth/moderation'
+import { ListFilterIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@icarus/assets'
+import type { ExtendedReport } from '@icarus/moderation'
 import {
 	Combobox,
 	type ComboboxOption,
@@ -81,14 +81,14 @@ import {
 	Pagination,
 	StyledInput,
 	useVIntl,
-} from '@modrinth/ui'
-import type { Report } from '@modrinth/utils'
+} from '@icarus/ui'
+import type { Report } from '@icarus/utils'
 import Fuse from 'fuse.js'
 
 import ReportCard from '~/components/ui/moderation/ModerationReportCard.vue'
 import { enrichReportBatch } from '~/helpers/moderation.ts'
 
-useHead({ title: 'Reports queue - Modrinth' })
+useHead({ title: 'Reports queue - Icarus' })
 
 const { formatMessage } = useVIntl()
 const route = useRoute()
@@ -293,3 +293,4 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 </script>
+

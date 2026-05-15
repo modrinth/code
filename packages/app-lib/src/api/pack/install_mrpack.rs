@@ -48,7 +48,6 @@ pub async fn install_zipped_mrpack(
                 icon_url,
                 profile_path.clone(),
                 None,
-                DownloadReason::Modpack,
             )
             .await?
         }
@@ -58,12 +57,7 @@ pub async fn install_zipped_mrpack(
     };
 
     // Install pack files, and if it fails, fail safely by removing the profile
-    let result = install_zipped_mrpack_files(
-        create_pack,
-        false,
-        DownloadReason::Modpack,
-    )
-    .await;
+    let result = install_zipped_mrpack_files(create_pack, false).await;
 
     match result {
         Ok(profile) => Ok(profile),
@@ -80,7 +74,6 @@ pub async fn install_zipped_mrpack(
 pub async fn install_zipped_mrpack_files(
     create_pack: CreatePack,
     ignore_lock: bool,
-    reason: DownloadReason,
 ) -> crate::Result<String> {
     let state = &State::get().await?;
 
@@ -228,7 +221,7 @@ pub async fn install_zipped_mrpack_files(
             })?;
 
     let download_meta = DownloadMeta {
-        reason,
+        reason: DownloadReason::Modpack,
         game_version: profile.game_version.clone(),
         loader: profile.loader.as_str().to_string(),
     };

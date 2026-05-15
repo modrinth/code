@@ -56,3 +56,4 @@
 	color: var(--medal-promotion-bg-orange);
 }
 </style>
+

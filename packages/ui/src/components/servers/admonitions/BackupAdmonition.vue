@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
+import type { Archon } from '@icarus/api-client'
 import {
 	CheckCircleIcon,
 	InfoIcon,
 	RotateCounterClockwiseIcon,
 	TriangleAlertIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'

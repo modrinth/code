@@ -218,8 +218,9 @@ pub async fn generate_pack_from_version_id(
     icon_url: Option<String>,
     profile_path: String,
 
+    // Existing loading bar. Unlike when existing_loading_bar is used, this one is pre-initialized with PackFileDownload
+    // For example, you might use this if multiple packs are being downloaded at once and you want to use the same loading bar
     initialized_loading_bar: Option<LoadingBarId>,
-    reason: DownloadReason,
 ) -> crate::Result<CreatePack> {
     let state = State::get().await?;
     let has_icon_url = icon_url.is_some();
@@ -300,7 +301,7 @@ pub async fn generate_pack_from_version_id(
             })?;
 
     let download_meta = DownloadMeta {
-        reason,
+        reason: DownloadReason::Modpack,
         game_version: profile.game_version.clone(),
         loader: profile.loader.as_str().to_string(),
     };

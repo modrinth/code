@@ -1,11 +1,11 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client'
 import type { ComputedRef, Ref, ShallowRef } from 'vue'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import type { FilterType, FilterValue, ProjectType, SortType } from '#ui/utils/search'
-import { LOADER_FILTER_TYPES, useSearch } from '#ui/utils/search'
+import { useSearch } from '#ui/utils/search'
 import { useServerSearch } from '#ui/utils/server-search'
 
 import type { BrowseSearchResponse } from '../types'
@@ -59,6 +59,14 @@ export interface BrowseSearchState {
 	clearSearch: () => void
 	onFilterChange: () => void
 }
+
+const LOADER_FILTER_TYPES = [
+	'mod_loader',
+	'plugin_loader',
+	'modpack_loader',
+	'shader_loader',
+	'plugin_platform',
+] as const
 
 export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchState {
 	const debug = useDebugLogger('BrowseSearch')

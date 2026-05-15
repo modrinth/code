@@ -65,13 +65,13 @@
 </template>
 
 <script setup>
-import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
+import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	injectNotificationManager,
 	OverflowMenu,
 	ProjectPageVersions,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { ref } from 'vue'
 
 import { SwapIcon } from '@/assets/icons/index.js'
@@ -196,3 +196,4 @@ const [loaders, gameVersions] = await Promise.all([
 	}
 }
 </style>
+

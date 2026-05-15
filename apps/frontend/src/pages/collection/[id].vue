@@ -379,7 +379,7 @@ import {
 	UpdatedIcon,
 	UploadIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -392,7 +392,7 @@ import {
 	EmptyState,
 	FileInput,
 	HorizontalRule,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	IntlFormatted,
 	NavTabs,
@@ -410,15 +410,15 @@ import {
 	useRelativeTime,
 	useSavable,
 	useVIntl,
-} from '@modrinth/ui'
-import { isAdmin } from '@modrinth/utils'
+} from '@icarus/ui'
+import { isAdmin } from '@icarus/utils'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 
 const { handleError } = injectNotificationManager()
-const api = injectModrinthClient()
+const api = injectIcarusClient()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
@@ -657,7 +657,6 @@ watch(
 	[collection, creator],
 	([col, cre]) => {
 		if (col && cre) {
-			const canonicalUrl = col ? `https://modrinth.com/collection/${col.id}` : undefined
 			useSeoMeta({
 				title: formatMessage(messages.collectionTitle, { name: col.name }),
 				description: formatMessage(messages.collectionDescription, {
@@ -668,16 +667,7 @@ watch(
 				ogTitle: formatMessage(messages.collectionTitle, { name: col.name }),
 				ogDescription: col.description,
 				ogImage: col.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
-				ogUrl: canonicalUrl,
 				robots: col.status === 'listed' ? 'all' : 'noindex',
-			})
-			useHead({
-				link: [
-					{
-						rel: 'canonical',
-						href: canonicalUrl,
-					},
-				],
 			})
 		}
 	},

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { injectModrinthClient } from '@modrinth/ui'
-import type { Report } from '@modrinth/utils'
+import { injectIcarusClient } from '@icarus/ui'
+import type { Report } from '@icarus/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import ModerationReportCard from '~/components/ui/moderation/ModerationReportCard.vue'
 import { enrichReportBatch } from '~/helpers/moderation.ts'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { params } = useRoute()
 const reportId = params.id as string
 

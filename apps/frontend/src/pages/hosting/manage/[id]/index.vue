@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { injectModrinthServerContext, ServersManageOverviewPage } from '@modrinth/ui'
+import { injectIcarusServerContext, ServersManageOverviewPage } from '@icarus/ui'
 
-const { server } = injectModrinthServerContext()
+const { server } = injectIcarusServerContext()
 const flags = useFeatureFlags()
 
 useHead({

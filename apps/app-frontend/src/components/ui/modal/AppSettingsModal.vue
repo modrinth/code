@@ -1,15 +1,15 @@
 <script setup lang="ts">
+import icarusLogo from '@/assets/icarus_logo.png'
 import {
 	CoffeeIcon,
 	GameIcon,
 	GaugeIcon,
 	LanguagesIcon,
-	ModrinthIcon,
 	PaintbrushIcon,
 	SettingsIcon,
 	ShieldIcon,
 	ToggleRightIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	commonMessages,
 	commonSettingsMessages,
@@ -18,7 +18,7 @@ import {
 	ProgressBar,
 	TabbedModal,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
 import { ref, watch } from 'vue'
@@ -30,6 +30,7 @@ import JavaSettings from '@/components/ui/settings/JavaSettings.vue'
 import LanguageSettings from '@/components/ui/settings/LanguageSettings.vue'
 import PrivacySettings from '@/components/ui/settings/PrivacySettings.vue'
 import ResourceManagementSettings from '@/components/ui/settings/ResourceManagementSettings.vue'
+import SyncSettings from '@/components/ui/settings/SyncSettings.vue'
 import { get, set } from '@/helpers/settings.ts'
 import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
 import { useTheming } from '@/store/state'
@@ -94,6 +95,14 @@ const tabs = [
 		}),
 		icon: GaugeIcon,
 		content: ResourceManagementSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.instance-sync',
+			defaultMessage: 'Instance sync',
+		}),
+		icon: SettingsIcon,
+		content: SyncSettings,
 	},
 	{
 		name: commonSettingsMessages.featureFlags,
@@ -175,10 +184,10 @@ const messages = defineMessages({
 						}"
 						@click="devModeCount"
 					>
-						<ModrinthIcon class="w-6 h-6" />
+						<img :src="icarusLogo" class="w-10 h-10 object-contain" />
 					</button>
 					<div class="max-w-[200px]">
-						<p class="m-0">Modrinth App {{ version }}</p>
+						<p class="m-0">Icarus Launcher {{ version }}</p>
 						<p class="m-0">
 							<span v-if="osPlatform === 'macos'">macOS</span>
 							<span v-else class="capitalize">{{ osPlatform }}</span>
@@ -190,3 +199,4 @@ const messages = defineMessages({
 		</template>
 	</TabbedModal>
 </template>
+

@@ -315,7 +315,7 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, PaletteIcon, UpdatedIcon } from '@modrinth/assets'
+import { DownloadIcon, PaletteIcon, UpdatedIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	Card,
@@ -324,8 +324,8 @@ import {
 	useDebugLogger,
 	useFormatMoney,
 	useFormatNumber,
-} from '@modrinth/ui'
-import { capitalizeString } from '@modrinth/utils'
+} from '@icarus/ui'
+import { capitalizeString } from '@icarus/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 

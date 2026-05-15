@@ -64,8 +64,8 @@ import {
 	MailIcon,
 	MastodonIcon,
 	TwitterIcon,
-} from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+} from '@icarus/assets'
+import { ButtonStyled } from '@icarus/ui'
 
 const props = defineProps<{
 	title?: string

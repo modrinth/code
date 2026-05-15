@@ -14,12 +14,12 @@
 </template>
 
 <script lang="ts" setup>
-import { PackageIcon } from '@modrinth/assets'
+import { PackageIcon } from '@icarus/assets'
 import { useDebounceFn } from '@vueuse/core'
 import Fuse from 'fuse.js'
 import { defineAsyncComponent, h, markRaw, ref, watch } from 'vue'
 
-import { injectModrinthClient, injectNotificationManager } from '../../providers'
+import { injectIcarusClient, injectNotificationManager } from '../../providers'
 import type { ComboboxOption } from '../base/Combobox.vue'
 import Combobox from '../base/Combobox.vue'
 
@@ -81,7 +81,7 @@ const options = ref<ComboboxOption<string>[]>([])
 const selectedProject = ref<SearchHit | null>(null)
 const searchResultsCache = ref<Map<string, SearchHit>>(new Map())
 
-const { labrinth } = injectModrinthClient()
+const { labrinth } = injectIcarusClient()
 
 const userProjectHits = ref<SearchHit[]>([])
 const userProjectsFuse = ref<Fuse<SearchHit> | null>(null)
@@ -250,3 +250,4 @@ defineExpose({
 	selectedProject,
 })
 </script>
+

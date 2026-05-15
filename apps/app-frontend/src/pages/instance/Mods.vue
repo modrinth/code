@@ -65,8 +65,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
+import type { Labrinth } from '@icarus/api-client'
+import { ClipboardCopyIcon, FolderOpenIcon } from '@icarus/assets'
 import {
 	commonMessages,
 	ConfirmModpackUpdateModal,
@@ -87,7 +87,7 @@ import {
 	ReadyTransition,
 	useDebugLogger,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -97,7 +97,6 @@ import { useRouter } from 'vue-router'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
@@ -269,14 +268,7 @@ async function toggleDisableMod(mod: ContentItem) {
 		mod.file_path = await toggle_disable_project(props.instance.path, mod.file_path!)
 		mod.enabled = !mod.enabled
 
-		trackEvent('InstanceProjectDisable', {
-			loader: props.instance.loader,
-			game_version: props.instance.game_version,
-			id: mod.project?.id,
-			name: mod.project?.title ?? mod.file_name,
-			project_type: mod.project_type,
-			disabled: !mod.enabled,
-		})
+
 	} catch (err) {
 		handleError(err as Error)
 	}
@@ -288,13 +280,7 @@ async function removeMod(mod: ContentItem) {
 	await remove_project(props.instance.path, mod.file_path!).catch(handleError)
 	projects.value = projects.value.filter((x) => mod.file_path !== x.file_path)
 
-	trackEvent('InstanceProjectRemove', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		id: mod.project?.id,
-		name: mod.project?.title ?? mod.file_name,
-		project_type: mod.project_type,
-	})
+
 }
 
 async function updateProject(mod: ContentItem) {
@@ -311,7 +297,7 @@ async function updateProject(mod: ContentItem) {
 				const profile = await get(props.instance.path).catch(handleError)
 
 				if (profile) {
-					await installVersionDependencies(profile, versionData, 'update').catch(handleError)
+					await installVersionDependencies(profile, versionData).catch(handleError)
 				}
 			}
 		}
@@ -322,13 +308,7 @@ async function updateProject(mod: ContentItem) {
 		}
 		mod.update_version_id = null
 
-		trackEvent('InstanceProjectUpdate', {
-			loader: props.instance.loader,
-			game_version: props.instance.game_version,
-			id: mod.project?.id,
-			name: mod.project?.title ?? mod.file_name,
-			project_type: mod.project_type,
-		})
+
 	} catch (err) {
 		handleError(err as Error)
 	}
@@ -347,7 +327,7 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 
 		const profile = await get(props.instance.path).catch(handleError)
 		if (profile) {
-			await installVersionDependencies(profile, version, 'update').catch(handleError)
+			await installVersionDependencies(profile, version).catch(handleError)
 		}
 
 		mod.file_path = newPath
@@ -910,3 +890,4 @@ onUnmounted(() => {
 	unlistenProfiles()
 })
 </script>
+

@@ -1,13 +1,14 @@
 {
-  "name": "@modrinth/monorepo",
+  "name": "@icarus/monorepo",
   "version": "0.0.0",
   "private": true,
+  "author": "fraa2a",
   "scripts": {
-    "web:dev": "turbo run dev --filter=@modrinth/frontend",
-    "web:build": "turbo run build --filter=@modrinth/frontend",
-    "app:dev": "turbo run dev --filter=@modrinth/app",
-    "app:build": "turbo run build --filter=@modrinth/app",
-    "docs:dev": "turbo run dev --filter=@modrinth/docs",
+    "web:dev": "turbo run dev --filter=@icarus/frontend",
+    "web:build": "turbo run build --filter=@icarus/frontend",
+    "app:dev": "turbo run dev --filter=@icarus/app",
+    "app:build": "turbo run build --filter=@icarus/app",
+    "docs:dev": "turbo run dev --filter=@icarus/docs",
     "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
     "build": "turbo run build --continue",
     "lint": "turbo run lint lint:ancillary --continue",
@@ -17,20 +18,20 @@
     "fix:ancillary": "prettier --write .github *.*",
     "ci": "turbo run lint test --continue",
     "prepr": "turbo run prepr --continue",
-    "prepr:frontend": "turbo run prepr --filter=@modrinth/frontend --filter=@modrinth/app-frontend",
-    "prepr:frontend:lib": "turbo run prepr --filter=@modrinth/ui --filter=@modrinth/moderation --filter=@modrinth/assets --filter=@modrinth/blog --filter=@modrinth/api-client --filter=@modrinth/utils --filter=@modrinth/tooling-config",
-    "prepr:frontend:web": "turbo run prepr --filter=@modrinth/frontend",
-    "prepr:frontend:app": "turbo run prepr --filter=@modrinth/app-frontend",
-    "storybook": "pnpm --filter @modrinth/ui storybook",
-    "build-storybook": "pnpm --filter @modrinth/ui build-storybook",
-    "icons:add": "pnpm --filter @modrinth/assets icons:add",
+    "prepr:frontend": "turbo run prepr --filter=@icarus/frontend --filter=@icarus/app-frontend",
+    "prepr:frontend:lib": "turbo run prepr --filter=@icarus/ui --filter=@icarus/moderation --filter=@icarus/assets --filter=@icarus/blog --filter=@icarus/api-client --filter=@icarus/utils --filter=@icarus/tooling-config",
+    "prepr:frontend:web": "turbo run prepr --filter=@icarus/frontend",
+    "prepr:frontend:app": "turbo run prepr --filter=@icarus/app-frontend",
+    "storybook": "pnpm --filter @icarus/ui storybook",
+    "build-storybook": "pnpm --filter @icarus/ui build-storybook",
+    "icons:add": "pnpm --filter @icarus/assets icons:add",
     "changelog:collect": "node scripts/run.mjs collect-changelog",
     "changelog:combine-for-app": "node scripts/run.mjs build-theseus-release-notes",
     "scripts": "node scripts/run.mjs"
   },
   "devDependencies": {
     "@clack/prompts": "^1.0.0",
-    "@modrinth/tooling-config": "workspace:*",
+    "@icarus/tooling-config": "workspace:*",
     "@tailwindcss/container-queries": "^0.1.1",
     "@types/node": "^24",
     "@vue/compiler-dom": "^3.5.26",
@@ -48,9 +49,6 @@
     "node": ">=24.15.0"
   },
   "pnpm": {
-    "patchedDependencies": {
-      "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
-    },
     "peerDependencyRules": {
       "allowedVersions": {
         "vite": "8",
@@ -69,5 +67,12 @@
       "workerd"
     ]
   },
-  "prettier": "@modrinth/tooling-config/prettier.config.cjs"
+  "prettier": "@icarus/tooling-config/prettier.config.cjs",
+  "patchedDependencies": {
+    "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }

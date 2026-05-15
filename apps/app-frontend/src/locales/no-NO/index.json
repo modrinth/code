@@ -84,10 +84,10 @@
     "message": "Det kan være annerledes enn Minecraft-brukernavnet deres!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Fyll ut Modrinth-brukernavn..."
+    "message": "Fyll ut Icarus-brukernavn..."
   },
   "friends.add-friend.username.title": {
-    "message": "Hva er Modrinth-brukernavnet til vennen din?"
+    "message": "Hva er Icarus-brukernavnet til vennen din?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Legg til venner</link> for å se hva de spiller!"
@@ -129,7 +129,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Logg inn til en Modrinth-bruker</link> for å legge til venner og se hva de spiller!"
+    "message": "<link>Logg inn til en Icarus-bruker</link> for å legge til venner og se hva de spiller!"
   },
   "instance.add-server.add-and-play": {
     "message": "Legg til og spill"
@@ -378,3 +378,4 @@
     "message": "Synkroniser med instans"
   }
 }
+

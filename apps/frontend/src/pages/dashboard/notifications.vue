@@ -69,17 +69,17 @@
 	</div>
 </template>
 <script setup>
-import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
+import { CheckCheckIcon, HistoryIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	Chips,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
+	injectIcarusClient,
 	Pagination,
 	useVIntl,
-} from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+} from '@icarus/ui'
+import { formatProjectType } from '@icarus/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
@@ -94,36 +94,36 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	historyLabel: {
-		id: 'dashboard.overview.notifications.history.label',
+		id: 'dashboard.notifications.history.label',
 		defaultMessage: 'History',
 	},
 	notificationHistoryTitle: {
-		id: 'dashboard.overview.notifications.history.title',
+		id: 'dashboard.notifications.history.title',
 		defaultMessage: 'Notification history',
 	},
 	viewHistory: {
-		id: 'dashboard.overview.notifications.button.view-history',
+		id: 'dashboard.notifications.button.view-history',
 		defaultMessage: 'View history',
 	},
 	markAllAsRead: {
-		id: 'dashboard.overview.notifications.button.mark-all-as-read',
+		id: 'dashboard.notifications.button.mark-all-as-read',
 		defaultMessage: 'Mark all as read',
 	},
 	loadingNotifications: {
-		id: 'dashboard.overview.notifications.loading',
+		id: 'dashboard.notifications.loading',
 		defaultMessage: 'Loading notifications...',
 	},
 	errorLoadingNotifications: {
-		id: 'dashboard.overview.notifications.error.loading',
+		id: 'dashboard.notifications.error.loading',
 		defaultMessage: 'Error loading notifications:',
 	},
 	noUnreadNotifications: {
-		id: 'dashboard.overview.notifications.empty.no-unread',
+		id: 'dashboard.notifications.empty.no-unread',
 		defaultMessage: "You don't have any unread notifications.",
 	},
 })
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const auth = await useAuth()
 const route = useNativeRoute()
 const router = useNativeRouter()
@@ -132,7 +132,7 @@ const history = computed(() => route.name === 'dashboard-notifications-history')
 
 useHead({
 	title: () =>
-		`${formatMessage(history.value ? messages.notificationHistoryTitle : commonMessages.notificationsLabel)} - Modrinth`,
+		`${formatMessage(history.value ? messages.notificationHistoryTitle : commonMessages.notificationsLabel)} - Icarus`,
 })
 
 const selectedType = ref('all')
@@ -225,3 +225,4 @@ function changePage(newPage) {
 	}
 }
 </style>
+

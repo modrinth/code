@@ -7,10 +7,10 @@ import {
 	nodeAuthState,
 	NuxtCircuitBreakerStorage,
 	type NuxtClientConfig,
-	NuxtModrinthClient,
+	NuxtIcarusClient,
 	PanelVersionFeature,
 	VerboseLoggingFeature,
-} from '@modrinth/api-client'
+} from '@icarus/api-client'
 import type { Ref } from 'vue'
 
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
@@ -29,7 +29,7 @@ async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
 export function createModrinthClient(
 	auth: Ref<{ token: string | undefined }>,
 	config: { apiBaseUrl: string; archonBaseUrl: string; rateLimitKey?: string },
-): NuxtModrinthClient {
+): NuxtIcarusClient {
 	const flags = useFeatureFlags()
 	const optionalFeatures = [
 		import.meta.dev ? (new VerboseLoggingFeature() as AbstractFeature) : undefined,
@@ -64,5 +64,5 @@ export function createModrinthClient(
 		],
 	}
 
-	return new NuxtModrinthClient(clientConfig)
+	return new NuxtIcarusClient(clientConfig)
 }

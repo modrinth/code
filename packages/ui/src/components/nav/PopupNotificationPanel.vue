@@ -24,7 +24,7 @@
 									:class="{
 										'text-red': item.type === 'error',
 										'text-orange': item.type === 'warning',
-										'text-green': item.type === 'download',
+										'text-brand': item.type === 'download',
 										'text-contrast': item.type === 'success',
 										'text-blue':
 											!item.type ||
@@ -107,7 +107,7 @@ import {
 	IssuesIcon,
 	XCircleIcon,
 	XIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import { computed } from 'vue'
 
 import {
@@ -141,13 +141,13 @@ function progressColorForType(type: PopupNotification['type']) {
 	} else if (type === 'warning') {
 		return 'orange'
 	} else if (type === 'download') {
-		return 'green'
+		return 'brand'
 	} else if (type === 'success') {
-		return 'green'
+		return 'brand'
 	} else if (type === 'info') {
 		return 'blue'
 	}
-	return 'green'
+	return 'brand'
 }
 
 withDefaults(

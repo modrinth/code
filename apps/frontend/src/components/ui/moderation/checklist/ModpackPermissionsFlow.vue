@@ -142,8 +142,8 @@
 </template>
 
 <script setup lang="ts">
-import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
-import { ButtonStyled, StyledInput } from '@modrinth/ui'
+import { LeftArrowIcon, RightArrowIcon } from '@icarus/assets'
+import { ButtonStyled, StyledInput } from '@icarus/ui'
 import type {
 	ModerationFlameModpackItem,
 	ModerationJudgements,
@@ -152,7 +152,7 @@ import type {
 	ModerationModpackResponse,
 	ModerationPermissionType,
 	ModerationUnknownModpackItem,
-} from '@modrinth/utils'
+} from '@icarus/utils'
 import { useLocalStorage, useSessionStorage } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 

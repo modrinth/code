@@ -1,4 +1,4 @@
-import { AlignLeftIcon } from '@modrinth/assets'
+import { AlignLeftIcon } from '@icarus/assets'
 
 import type { ButtonAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'

@@ -1,1 +1,0 @@
-ALTER TABLE settings ADD COLUMN personalized_ads INTEGER NOT NULL DEFAULT TRUE;

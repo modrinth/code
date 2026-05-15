@@ -18,13 +18,13 @@
     "defaultMessage": "Thêm địa chỉ Java"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Thêm bất kỳ liên kết nào có liên quan đến các trang web bên ngoài Modrinth, chẳng hạn như trang web, cửa hàng hoặc lời mời tham gia Discord."
+    "defaultMessage": "Thêm bất kỳ liên kết nào có liên quan đến các trang web bên ngoài Icarus, chẳng hạn như trang web, cửa hàng hoặc lời mời tham gia Discord."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Thêm liên kết ngoài"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Thêm bất kỳ liên kết nào có liên quan đến các trang web bên ngoài Modrinth, chẳng hạn như mã nguồn, trình theo dõi lỗi hoặc lời mời tham gia Discord."
+    "defaultMessage": "Thêm bất kỳ liên kết nào có liên quan đến các trang web bên ngoài Icarus, chẳng hạn như mã nguồn, trình theo dõi lỗi hoặc lời mời tham gia Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Thêm liên kết ngoài"
@@ -249,4 +249,5 @@
     "defaultMessage": "Truy cập cài đặt liên kết"
   }
 }
+
 

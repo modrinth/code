@@ -1,9 +1,9 @@
 [package]
-name = "theseus_gui"
-# The actual version is set by the theseus-build workflow on tagging
-version = "1.0.0-local"
+name = "pteron_gui"
+# The actual version is set by the pteron-build workflow on tagging
+version = "0.1.2"
 edition.workspace = true
-description = "The Modrinth App is a desktop application for managing your Minecraft mods"
+description = "Icarus Launcher - a desktop application for managing your Minecraft mods"
 repository = "https://github.com/modrinth/code/apps/app/"
 license = "GPL-3.0-only"
 
@@ -36,11 +36,12 @@ tauri-plugin-os = { workspace = true }
 tauri-plugin-single-instance = { workspace = true }
 tauri-plugin-updater = { workspace = true }
 tauri-plugin-window-state = { workspace = true }
-theseus = { workspace = true, features = ["tauri"] }
+pteron = { workspace = true, features = ["tauri"] }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["time"] }
 tracing = { workspace = true }
 tracing-error = { workspace = true }
+reqwest = { workspace = true, features = ["json"] }
 url = { workspace = true }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }

@@ -68,13 +68,12 @@ import {
 	PlayIcon,
 	SearchIcon,
 	XIcon,
-} from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, StyledInput } from '@modrinth/ui'
+} from '@icarus/assets'
+import { ButtonStyled, injectNotificationManager, StyledInput } from '@icarus/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref } from 'vue'
 
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { auto_install_java, find_filtered_jres, get_jre, test_jre } from '@/helpers/jre.js'
 
 const { handleError } = injectNotificationManager()
@@ -123,10 +122,7 @@ async function testJava() {
 	)
 	testingJava.value = false
 
-	trackEvent('JavaTest', {
-		path: props.modelValue ? props.modelValue.path : '',
-		success: testingJavaSuccess.value,
-	})
+	
 
 	setTimeout(() => {
 		testingJavaSuccess.value = null
@@ -146,9 +142,7 @@ async function handleJavaFileInput() {
 			}
 		}
 
-		trackEvent('JavaManualSelect', {
-			version: props.version,
-		})
+		
 
 		emit('update:modelValue', result)
 	}
@@ -179,10 +173,7 @@ async function reinstallJava() {
 		}
 	}
 
-	trackEvent('JavaReInstall', {
-		path: path,
-		version: props.version,
-	})
+	
 
 	emit('update:modelValue', result)
 	installingJava.value = false

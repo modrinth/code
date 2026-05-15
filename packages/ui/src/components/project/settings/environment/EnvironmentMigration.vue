@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { CheckIcon } from '@modrinth/assets'
+import { CheckIcon } from '@icarus/assets'
 import {
 	Admonition,
 	commonProjectSettingsMessages,
 	defineMessages,
 	EnvironmentSelector,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	UnsavedChangesPopup,
 	useSavable,
 	useVIntl,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { computed } from 'vue'
 
 const { formatMessage } = useVIntl()
 
 const { currentMember, projectV2, projectV3, invalidate } = injectProjectPageContext()
 const { handleError } = injectNotificationManager()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 
 const supportsEnvironment = computed(() =>
 	(projectV3.value?.project_types ?? []).some((type) => ['mod', 'modpack'].includes(type)),
@@ -108,7 +108,7 @@ const messages = defineMessages({
 	reviewOptionsDescription: {
 		id: 'project.settings.environment.notice.review-options.description',
 		defaultMessage:
-			"We've just overhauled the Environments system on Modrinth and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!",
+			"We've just overhauled the Environments system on Icarus and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!",
 	},
 })
 </script>
@@ -173,3 +173,4 @@ const messages = defineMessages({
 		/>
 	</div>
 </template>
+

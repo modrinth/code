@@ -45,8 +45,8 @@
 </template>
 
 <script setup lang="ts">
-import { CompassIcon, ImportIcon, RightArrowIcon } from '@modrinth/assets'
-import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
+import { CompassIcon, ImportIcon, RightArrowIcon } from '@icarus/assets'
+import { commonMessages, defineMessages, useVIntl } from '@icarus/ui'
 import { defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'

@@ -58,8 +58,8 @@
 </template>
 
 <script setup lang="ts">
-import { BoxesIcon, BoxIcon, BoxImportIcon, PackageIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
+import { BoxesIcon, BoxIcon, BoxImportIcon, PackageIcon } from '@icarus/assets'
+import { defineMessages, useVIntl } from '@icarus/ui'
 import { computed } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
@@ -99,7 +99,7 @@ const messages = defineMessages({
 	},
 	modpackBaseDescription: {
 		id: 'creation-flow.modal.setup-type.option.modpack-base.description',
-		defaultMessage: 'Browse modpacks on Modrinth or import one from a file.',
+		defaultMessage: 'Browse modpacks on Icarus or import one from a file.',
 	},
 	importInstanceTitle: {
 		id: 'creation-flow.modal.setup-type.option.import-instance.title',
@@ -138,3 +138,4 @@ function setSetupType(type: 'modpack' | 'custom' | 'vanilla') {
 	_setSetupType(type)
 }
 </script>
+

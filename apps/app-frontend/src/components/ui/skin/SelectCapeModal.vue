@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { CheckIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, XIcon } from '@icarus/assets'
 import {
 	ButtonStyled,
 	CapeButton,
 	CapeLikeTextButton,
 	ScrollablePanel,
 	SkinPreviewRenderer,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'

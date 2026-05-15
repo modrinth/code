@@ -1,9 +1,9 @@
 ---
 title: The hitchhiker's guide to OAuth
-description: Guide for using Modrinth OAuth to interact with the API on users' behalf.
+description: Guide for using Icarus OAuth to interact with the API on users' behalf.
 ---
 
-Modrinth allows developers to create applications which, once authorized by a Modrinth user, let the developer interact with the API on their behalf. The flow used to get an API token is based on the OAuth 2 protocol. It is recommended that most people use an existing OAuth library to handle the authentication. If you want to implement it from scratch, you will need to look into [RFC 6749]. If the only user of the application is yourself, a personal access token (PAT) may be a better fit.
+Icarus allows developers to create applications which, once authorized by a Icarus user, let the developer interact with the API on their behalf. The flow used to get an API token is based on the OAuth 2 protocol. It is recommended that most people use an existing OAuth library to handle the authentication. If you want to implement it from scratch, you will need to look into [RFC 6749]. If the only user of the application is yourself, a personal access token (PAT) may be a better fit.
 
 If you're familiar with OAuth 2, these are the URLs you will need:
 
@@ -14,13 +14,13 @@ If you're familiar with OAuth 2, these are the URLs you will need:
 
 The flow will generally look like this:
 
-1. User is redirected to Modrinth to authorize your application
+1. User is redirected to Icarus to authorize your application
 2. User is redirected back to your site after authorizing, with an authorization code
 3. Your backend exchanges this code for an access token
 
 ## Register your application
 
-To start off, you need to [register an application] in Modrinth's systems. The settings chosen here can always be changed later. You need to select what permissions you need, called scopes. For security reasons you will want to select only the scopes you need. See the [principle of least privilege].
+To start off, you need to [register an application] in Icarus's systems. The settings chosen here can always be changed later. You need to select what permissions you need, called scopes. For security reasons you will want to select only the scopes you need. See the [principle of least privilege].
 
 In addition to name and scopes, you will also need to add one or more redirect URIs. These are the URIs that the user can be redirected to after they authorize your application.
 
@@ -28,11 +28,11 @@ After you've registered your application, it is important that you take note of 
 
 ## Getting authorization
 
-Once the user is ready to authorize your application, you need to construct a URL to redirect them to. The authorization URL for Modrinth is `https://api.modrinth.com/_internal/oauth/token`. Supply the following query parameters:
+Once the user is ready to authorize your application, you need to construct a URL to redirect them to. The authorization URL for Icarus is `https://api.modrinth.com/_internal/oauth/token`. Supply the following query parameters:
 
 | Query parameter | Description                                                                               |
 | --------------- | ----------------------------------------------------------------------------------------- |
-| `response_type` | In Modrinth this always needs to be `code`, since only code grants are supported          |
+| `response_type` | In Icarus this always needs to be `code`, since only code grants are supported          |
 | `client_id`     | The application identifier found in the settings                                          |
 | `scope`         | The permissions you need access to                                                        |
 | `state`         | A mechanism to prevent certain attacks. Explained further below. Recommended but optional |
@@ -49,7 +49,7 @@ The redirect URI is the endpoint on your server that will receive the code which
 | `code`          | The code that can be exchanged for an access token |
 | `client_id`     | Your client id                                     |
 | `redirect_uri`  | The redirect URI which was used                    |
-| `grant_type`    | Always `authorization_code` in Modrinth            |
+| `grant_type`    | Always `authorization_code` in Icarus            |
 
 ## Exchanging tokens
 
@@ -62,7 +62,7 @@ In the body use these fields:
 | `code`         | The authorization code                                       |
 | `client_id`    | Your client id, the same as in the authorization request     |
 | `redirect_uri` | The redirect URI which was redirected to after authorization |
-| `grant_type`   | Always `authorization_code` in Modrinth                      |
+| `grant_type`   | Always `authorization_code` in Icarus                      |
 
 If the request succeeds, you should receive a JSON payload with these fields:
 
@@ -79,9 +79,10 @@ If you have any questions, you're welcome to ask in #api-development in the [Dis
 [RFC 6749]: https://datatracker.ietf.org/doc/html/rfc6749
 [register an application]: https://modrinth.com/settings/applications
 [principle of least privilege]: https://en.wikipedia.org/wiki/Principle_of_least_privilege
-[`apps/labrinth/src/models/v3/pats.rs`]: https://github.com/modrinth/code/blob/main/apps/labrinth/src/models/v3/pats.rs
+[`apps/labrinth/src/models/v3/pats.rs`]: https://github.com/Icarus/code/blob/main/apps/labrinth/src/models/v3/pats.rs
 [CSRF]: https://en.wikipedia.org/wiki/Cross-site_request_forgery
 [Clickjacking]: https://en.wikipedia.org/wiki/Clickjacking
 [`/user` endpoint]: https://docs.modrinth.com/api/operations/getuserfromauth/
 [Discord guild]: https://discord.modrinth.com
 [support portal]: https://support.modrinth.com/en/
+

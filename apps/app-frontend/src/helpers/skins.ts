@@ -1,4 +1,4 @@
-import { arrayBufferToBase64 } from '@modrinth/utils'
+import { arrayBufferToBase64 } from '@icarus/utils'
 import { invoke } from '@tauri-apps/api/core'
 
 export interface Cape {

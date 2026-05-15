@@ -82,8 +82,8 @@
 	</div>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
+import type { Labrinth } from '@icarus/api-client'
+import { PlusIcon, SearchIcon, XCircleIcon } from '@icarus/assets'
 import {
 	Accordion,
 	Admonition,
@@ -92,15 +92,15 @@ import {
 	Avatar,
 	ButtonStyled,
 	ConfirmModal,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	StyledInput,
-} from '@modrinth/ui'
-import type { User } from '@modrinth/utils'
+} from '@icarus/ui'
+import type { User } from '@icarus/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const { handleError } = injectNotificationManager()
 
 type UserGroup = {
@@ -271,3 +271,4 @@ async function confirmRevokeAffiliateCode() {
 	max-width: 78.5rem;
 }
 </style>
+

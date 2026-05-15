@@ -1,4 +1,4 @@
-//! Theseus tag management interface
+//! Pteron tag management interface
 use crate::state::CachedEntry;
 pub use crate::{
     State,

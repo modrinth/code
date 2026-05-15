@@ -32,7 +32,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		<Text class="text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 
 		<Text class="text-base">
-			Modrinth's moderation team has left a message on your project,
+			Icarus's moderation team has left a message on your project,
 			<VLink
 				href="https://modrinth.com/project/{project.id}/moderation"
 				class="text-green underline"
@@ -53,6 +53,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			</Text>
 		</Section>
 
-		<Text class="text-base">Thank you for publishing on Modrinth!</Text>
+		<Text class="text-base">Thank you for publishing on Icarus!</Text>
 	</StyledEmail>
 </template>
+

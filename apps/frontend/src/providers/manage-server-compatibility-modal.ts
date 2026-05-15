@@ -1,13 +1,13 @@
-import type { Labrinth, UploadProgress } from '@modrinth/api-client'
-import { ArrowLeftRightIcon, LeftArrowIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import type { Labrinth, UploadProgress } from '@icarus/api-client'
+import { ArrowLeftRightIcon, LeftArrowIcon, SaveIcon, SpinnerIcon, XIcon } from '@icarus/assets'
 import {
 	createContext,
-	injectModrinthClient,
+	injectIcarusClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	type MultiStageModal,
 	type StageConfigInput,
-} from '@modrinth/ui'
+} from '@icarus/ui'
 import JSZip from 'jszip'
 import type { Ref, ShallowRef } from 'vue'
 import { markRaw, toRaw } from 'vue'
@@ -51,7 +51,7 @@ export function createServerCompatibilityContext(
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>,
 ): ServerCompatibilityContextValue {
 	const { projectV3, patchProjectV3 } = injectProjectPageContext()
-	const { labrinth } = injectModrinthClient()
+	const { labrinth } = injectIcarusClient()
 	const { addNotification } = injectNotificationManager()
 
 	const isSubmitting = ref(false)

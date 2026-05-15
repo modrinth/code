@@ -12,7 +12,7 @@
     "defaultMessage": "Přidat ikonu"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Přidejte relevantní odkazy směřující mimo Modrinth, například zdrojový kód, issue tracker nebo pozvánku na Discord."
+    "defaultMessage": "Přidejte relevantní odkazy směřující mimo Icarus, například zdrojový kód, issue tracker nebo pozvánku na Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Přidat externí odkazy"
@@ -192,4 +192,5 @@
     "defaultMessage": "Navštívit nastavení odkazů"
   }
 }
+
 

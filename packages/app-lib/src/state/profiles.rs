@@ -21,6 +21,17 @@ use tokio::fs::DirEntry;
 use tokio::io::{AsyncBufReadExt, AsyncRead};
 use tokio::task::JoinSet;
 
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct InstanceSyncOverrides {
+    pub saves: Option<bool>,
+    pub screenshots: Option<bool>,
+    pub resourcepacks: Option<bool>,
+    pub shaderpacks: Option<bool>,
+    pub schematics: Option<bool>,
+    pub options_txt: Option<bool>,
+    pub servers_dat: Option<bool>,
+}
+
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
@@ -55,6 +66,8 @@ pub struct Profile {
     pub force_fullscreen: Option<bool>,
     pub game_resolution: Option<WindowSize>,
     pub hooks: Hooks,
+    pub sync_enabled: bool,
+    pub sync_overrides: Option<InstanceSyncOverrides>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
@@ -312,6 +325,8 @@ struct ProfileQueryResult {
     override_hook_post_exit: Option<String>,
     protocol_version: Option<i64>,
     launcher_feature_version: String,
+    sync_enabled: i64,
+    sync_overrides: Option<serde_json::Value>,
 }
 
 impl TryFrom<ProfileQueryResult> for Profile {
@@ -381,6 +396,10 @@ impl TryFrom<ProfileQueryResult> for Profile {
                 wrapper: x.override_hook_wrapper,
                 post_exit: x.override_hook_post_exit,
             },
+            sync_enabled: x.sync_enabled == 1,
+            sync_overrides: x
+                .sync_overrides
+                .and_then(|v| serde_json::from_value(v).ok()),
         })
     }
 }
@@ -400,7 +419,8 @@ macro_rules! select_profiles_with_predicate {
                 override_java_path,
                 json(override_extra_launch_args) as "override_extra_launch_args!: serde_json::Value", json(override_custom_env_vars) as "override_custom_env_vars!: serde_json::Value",
                 override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
-                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit
+                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit,
+                sync_enabled, json(sync_overrides) as "sync_overrides?: serde_json::Value"
             FROM profiles
             "#
                 + $predicate,
@@ -415,25 +435,6 @@ struct InitialScanFile {
     project_type: ProjectType,
     size: u64,
     cache_key: String,
-}
-
-fn is_scannable_project_file(
-    project_type: ProjectType,
-    file_name: &str,
-) -> bool {
-    let Some(extension) = Path::new(file_name.trim_end_matches(".disabled"))
-        .extension()
-        .and_then(|ext| ext.to_str())
-    else {
-        return false;
-    };
-
-    match project_type {
-        ProjectType::Mod => extension.eq_ignore_ascii_case("jar"),
-        ProjectType::DataPack
-        | ProjectType::ResourcePack
-        | ProjectType::ShaderPack => extension.eq_ignore_ascii_case("zip"),
-    }
 }
 
 impl Profile {
@@ -507,6 +508,8 @@ impl Profile {
 
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
+        let sync_enabled = self.sync_enabled as i32;
+        let sync_overrides_json = serde_json::to_string(&self.sync_overrides)?;
 
         sqlx::query!(
             "
@@ -520,19 +523,21 @@ impl Profile {
                 override_java_path, override_extra_launch_args, override_custom_env_vars,
                 override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
                 override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit,
-                protocol_version, launcher_feature_version
+                protocol_version, launcher_feature_version,
+                sync_enabled, sync_overrides
             )
             VALUES (
                 $1, $2, $3, $4,
                 $5, $6, $7,
-                jsonb($8),
+                json($8),
                 $9, $10, $11,
                 $12, $13, $14,
                 $15, $16,
-                $17, jsonb($18), jsonb($19),
+                $17, json($18), json($19),
                 $20, $21, $22, $23,
                 $24, $25, $26,
-                $27, $28
+                $27, $28,
+                $29, json($30)
             )
             ON CONFLICT (path) DO UPDATE SET
                 install_stage = $2,
@@ -543,7 +548,7 @@ impl Profile {
                 mod_loader = $6,
                 mod_loader_version = $7,
 
-                groups = jsonb($8),
+                groups = json($8),
 
                 linked_project_id = $9,
                 linked_version_id = $10,
@@ -557,8 +562,8 @@ impl Profile {
                 recent_time_played = $16,
 
                 override_java_path = $17,
-                override_extra_launch_args = jsonb($18),
-                override_custom_env_vars = jsonb($19),
+                override_extra_launch_args = json($18),
+                override_custom_env_vars = json($19),
                 override_mc_memory_max = $20,
                 override_mc_force_fullscreen = $21,
                 override_mc_game_resolution_x = $22,
@@ -569,7 +574,9 @@ impl Profile {
                 override_hook_post_exit = $26,
 
                 protocol_version = $27,
-                launcher_feature_version = $28
+                launcher_feature_version = $28,
+                sync_enabled = $29,
+                sync_overrides = json($30)
             ",
             self.path,
             install_stage,
@@ -598,10 +605,12 @@ impl Profile {
             self.hooks.wrapper,
             self.hooks.post_exit,
             self.protocol_version,
-            launcher_feature_version
+            launcher_feature_version,
+            sync_enabled,
+            sync_overrides_json
         )
-            .execute(exec)
-            .await?;
+        .execute(exec)
+        .await?;
 
         Ok(())
     }
@@ -667,10 +676,8 @@ impl Profile {
                             && let Some(file_name) = subdirectory
                                 .file_name()
                                 .and_then(|x| x.to_str())
-                            && is_scannable_project_file(
-                                project_type,
-                                file_name,
-                            )
+                            && !(project_type == ProjectType::ShaderPack
+                                && file_name.ends_with(".txt"))
                         {
                             let file_size = subdirectory
                                 .metadata()
@@ -972,13 +979,15 @@ impl Profile {
             InitialScanFile,
         > = keys.into_iter().map(|k| (k.path.clone(), k)).collect();
 
-        let file_info_by_hash: std::collections::HashMap<String, CachedFile> =
-            file_info.into_iter().map(|f| (f.hash.clone(), f)).collect();
+        let mut file_info_by_hash: std::collections::HashMap<
+            String,
+            CachedFile,
+        > = file_info.into_iter().map(|f| (f.hash.clone(), f)).collect();
 
         let files = DashMap::new();
 
         for hash in file_hashes {
-            let file = file_info_by_hash.get(&hash.hash).cloned();
+            let file = file_info_by_hash.remove(&hash.hash);
             let trimmed = hash.path.trim_end_matches(".disabled");
 
             if let Some(initial_file) = keys_by_path.remove(trimmed) {
@@ -1073,7 +1082,8 @@ impl Profile {
                     if subdirectory.is_file()
                         && let Some(file_name) =
                             subdirectory.file_name().and_then(|x| x.to_str())
-                        && is_scannable_project_file(project_type, file_name)
+                        && !(project_type == ProjectType::ShaderPack
+                            && file_name.ends_with(".txt"))
                     {
                         let file_size = subdirectory
                             .metadata()

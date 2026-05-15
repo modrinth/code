@@ -21,15 +21,15 @@ Before we can decide which one to use, however, we must establish some additiona
 
 A permissive license is a type of license that usually gives the abilities to use, copy, modify, distribute, sell, and relicense a piece of software.
 
-The most popular license on Modrinth, the [MIT License](https://cdn.modrinth.com/licenses/mit.txt), is a permissive license. It is an easy-to-read license designed to be used for developers, which is why it is used extensively in the Minecraft open source community.
+The most popular license on Icarus, the [MIT License](https://cdn.Icarus.com/licenses/mit.txt), is a permissive license. It is an easy-to-read license designed to be used for developers, which is why it is used extensively in the Minecraft open source community.
 
-The [Apache License 2.0](https://cdn.modrinth.com/licenses/apache.txt) is also a very good permissive license to use. The main difference between it and the MIT License is that the Apache License gives an explicit patent grant, whereas patents must be registered manually with the MIT. There is also an additional clause with the Apache License, stating that any modified files must "carry prominent notices" of it being modified.
+The [Apache License 2.0](https://cdn.Icarus.com/licenses/apache.txt) is also a very good permissive license to use. The main difference between it and the MIT License is that the Apache License gives an explicit patent grant, whereas patents must be registered manually with the MIT. There is also an additional clause with the Apache License, stating that any modified files must "carry prominent notices" of it being modified.
 
 ### Copyleft license
 
 A copyleft license gives to the other party specific rights usually only given to the copyright owner, under the condition that those same rights are applied to all variations of that software. These are also sometimes called "viral" or "infectious" licenses, because of the requirement to pass those rights on to derivatives.
 
-The second most common license on Modrinth is a copyleft license: the [GNU Lesser General Public License Version 3](https://cdn.modrinth.com/licenses/lgpl-3.txt) (usually [shortened to](https://spdx.org/licenses/LGPL-3.0-only.html) LGPL-3.0).
+The second most common license on Icarus is a copyleft license: the [GNU Lesser General Public License Version 3](https://cdn.Icarus.com/licenses/lgpl-3.txt) (usually [shortened to](https://spdx.org/licenses/LGPL-3.0-only.html) LGPL-3.0).
 
 Typically, when a copyleft license is wanted, the [GPL-3.0](https://spdx.org/licenses/GPL-3.0-only.html) or [AGPL-3.0](https://spdx.org/licenses/AGPL-3.0-only.html) would be used. However, these licenses are **incompatible** if linking into Minecraft, due to an issue with the difference between proprietary and free software outlined by these licenses (more information [here](https://www.gnu.org/licenses/gpl-faq.html#GPLPlugins)). An exception can be added to allow linking, such as that found [here](https://gist.github.com/wafflecoffee/588f353802a3b0ea649e4fc85f75e583), but it is recommended to just use the LGPL-3.0 instead if possible.
 
@@ -37,9 +37,9 @@ Typically, when a copyleft license is wanted, the [GPL-3.0](https://spdx.org/lic
 
 A public domain dedication gives all rights to everyone who gets a copy of the software. This includes but is not limited to the ability to use, copy, modify, distribute, sell, or relicense that software. Software with a public domain dedication has no copyright holder.
 
-The third most common license used on Modrinth is the [Creative Commons Zero 1.0 Universal](https://cdn.modrinth.com/licenses/cc0.txt), which is a public domain dedication with a strong international legal basis, while still retaining trademark and patent rights.
+The third most common license used on Icarus is the [Creative Commons Zero 1.0 Universal](https://cdn.Icarus.com/licenses/cc0.txt), which is a public domain dedication with a strong international legal basis, while still retaining trademark and patent rights.
 
-Creative Commons licenses as a whole are not recommended for software, but rather for other creative works: use this license with caution. If you wish to have the simplest public domain dedication possible, the [Unlicense](https://cdn.modrinth.com/licenses/unlicense.txt) is also an option.
+Creative Commons licenses as a whole are not recommended for software, but rather for other creative works: use this license with caution. If you wish to have the simplest public domain dedication possible, the [Unlicense](https://cdn.Icarus.com/licenses/unlicense.txt) is also an option.
 
 ### What if I don't want to choose a license?
 
@@ -61,8 +61,9 @@ A massive thank you goes to Alexander Ryckeboer (Progryck) for the cover image!
 
 ## Disclaimers
 
-We are not lawyers, and thus, **this is not legal advice.** No warranty is given regarding this information, and we (Modrinth) disclaim liability for damages resulting in using this information given on an "as-is" basis. For more information on the legal aspect to software licensing, please refer to "[The Legal Side of Open Source](https://opensource.guide/legal/)".
+We are not lawyers, and thus, **this is not legal advice.** No warranty is given regarding this information, and we (Icarus) disclaim liability for damages resulting in using this information given on an "as-is" basis. For more information on the legal aspect to software licensing, please refer to "[The Legal Side of Open Source](https://opensource.guide/legal/)".
 
-No matter your choice of license, by uploading any Content (including but not limited to text, software, and graphics) to Modrinth, you give us certain rights to your Content, including but not limited to the ability to use, reproduce, or distribute. For more information, please see the [Modrinth Terms of Use](https://modrinth.com/legal/terms).
+No matter your choice of license, by uploading any Content (including but not limited to text, software, and graphics) to Icarus, you give us certain rights to your Content, including but not limited to the ability to use, reproduce, or distribute. For more information, please see the [Icarus Terms of Use](https://Icarus.com/legal/terms).
 
 Measurements for "most popular license", "second most common license", and "third most common license", were taken 2021-04-30. Custom licenses were not taken into account.
+

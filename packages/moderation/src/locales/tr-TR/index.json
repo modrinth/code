@@ -18,13 +18,13 @@
     "defaultMessage": "Java adresleri ekle"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Modrinth'in dışında herhangi ilgili bağlantı ekleyin, website, mağaza veya Discord daveti gibi."
+    "defaultMessage": "Icarus'in dışında herhangi ilgili bağlantı ekleyin, website, mağaza veya Discord daveti gibi."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Dış bağlantı ekle"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Modrinth'in dışına gönderen herhangi ilgili bağlantı ekle. Mesela kaynak kodu, hata takipçisi veya Discord daveti."
+    "defaultMessage": "Icarus'in dışına gönderen herhangi ilgili bağlantı ekle. Mesela kaynak kodu, hata takipçisi veya Discord daveti."
   },
   "nags.add-links.title": {
     "defaultMessage": "Dış bağlantı ekle"
@@ -249,4 +249,5 @@
     "defaultMessage": "Bağlantı ayarlarına göz at"
   }
 }
+
 

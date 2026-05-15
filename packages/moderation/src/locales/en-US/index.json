@@ -18,13 +18,13 @@
     "defaultMessage": "Add a Java address"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Add any relevant links targeted outside of Modrinth, such as a website, store, or a Discord invite."
+    "defaultMessage": "Add any relevant links targeted outside of Icarus, such as a website, store, or a Discord invite."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Add external links"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Add any relevant links targeted outside of Modrinth, such as source code, an issue tracker, or a Discord invite."
+    "defaultMessage": "Add any relevant links targeted outside of Icarus, such as source code, an issue tracker, or a Discord invite."
   },
   "nags.add-links.title": {
     "defaultMessage": "Add external links"
@@ -249,3 +249,4 @@
     "defaultMessage": "Visit links settings"
   }
 }
+

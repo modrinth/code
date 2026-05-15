@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { UploadIcon } from '@modrinth/assets'
+import { UploadIcon } from '@icarus/assets'
 import { ref } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

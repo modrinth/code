@@ -52,8 +52,8 @@
 </template>
 
 <script setup>
-import { PlusIcon, UsersIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import { PlusIcon, UsersIcon } from '@icarus/assets'
+import { Avatar, ButtonStyled, defineMessages, injectIcarusClient, useVIntl } from '@icarus/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
@@ -87,7 +87,7 @@ const messages = defineMessages({
 const createOrgModal = ref(null)
 
 const auth = await useAuth()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const uid = computed(() => auth.value.user?.id || null)
 
 const { data: orgs, error } = useQuery({
@@ -235,3 +235,4 @@ const openCreateOrgModal = (event) => {
 	text-decoration: underline;
 }
 </style>
+

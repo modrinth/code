@@ -7,7 +7,7 @@ import {
 	SpinnerIcon,
 	TrashIcon,
 	UpdatedIcon,
-} from '@modrinth/assets'
+} from '@icarus/assets'
 import {
 	ButtonStyled,
 	ConfirmModal,
@@ -15,8 +15,8 @@ import {
 	SkinButton,
 	SkinLikeTextButton,
 	SkinPreviewRenderer,
-} from '@modrinth/ui'
-import { arrayBufferToBase64 } from '@modrinth/utils'
+} from '@icarus/ui'
+import { arrayBufferToBase64 } from '@icarus/utils'
 import { computedAsync } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
@@ -25,7 +25,6 @@ import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { get_default_user, login as login_flow, users } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
 import { generateSkinPreviews, skinBlobUrlMap } from '@/helpers/rendering/batch-skin-renderer.ts'
@@ -59,6 +58,8 @@ const currentUser = ref(undefined)
 const currentUserId = ref<string | undefined>(undefined)
 
 const username = computed(() => currentUser.value?.profile?.name ?? undefined)
+const currentUserIsOffline = computed(() => currentUser.value?.access_token === 'OFFLINE')
+const canUseSkins = computed(() => !!currentUser.value && !currentUserIsOffline.value)
 const selectedSkin = ref<Skin | null>(null)
 const defaultCape = ref<Cape>()
 
@@ -116,6 +117,13 @@ async function deleteSkin() {
 }
 
 async function loadCapes() {
+	if (currentUserIsOffline.value) {
+		capes.value = []
+		defaultCape.value = undefined
+		originalDefaultCape.value = undefined
+		return
+	}
+
 	try {
 		capes.value = (await get_available_capes()) ?? []
 		defaultCape.value = capes.value.find((c) => c.is_equipped)
@@ -128,6 +136,13 @@ async function loadCapes() {
 }
 
 async function loadSkins() {
+	if (currentUserIsOffline.value) {
+		skins.value = []
+		selectedSkin.value = null
+		originalSelectedSkin.value = null
+		return
+	}
+
 	try {
 		skins.value = (await get_available_skins()) ?? []
 		generateSkinPreviews(skins.value, capes.value)
@@ -234,7 +249,7 @@ async function login() {
 		await accountsCard.value.refreshValues()
 	}
 
-	trackEvent('AccountLogIn')
+
 	accountsCard.value.setLoginDisabled(false)
 }
 
@@ -318,7 +333,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 		@proceed="deleteSkin"
 	/>
 
-	<div v-if="currentUser" class="p-4 skin-layout">
+	<div v-if="canUseSkins" class="p-4 skin-layout">
 		<div class="preview-panel">
 			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">
 				Skins
@@ -430,7 +445,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 		>
 			<img
 				:src="ExcitedRinthbot"
-				alt="Excited Modrinth Bot"
+				alt="Excited Icarus Bot"
 				class="absolute -top-28 right-8 md:right-20 h-28 w-auto"
 			/>
 			<div
@@ -447,16 +462,21 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 			></div>
 
 			<div class="flex flex-col gap-5">
-				<h1 class="text-3xl font-extrabold m-0">Please sign-in</h1>
+				<h1 class="text-3xl font-extrabold m-0">
+					{{ currentUserIsOffline ? 'Premium account required' : 'Please sign-in' }}
+				</h1>
 				<p class="text-lg m-0">
-					Please sign into your Minecraft account to use the skin management features of the
-					Modrinth app.
+					{{
+						currentUserIsOffline
+							? 'Skins are available only with a premium Minecraft account. Switch to a premium account to continue.'
+							: 'Please sign into your Minecraft account to use the skin management features of Icarus Launcher.'
+					}}
 				</p>
 				<ButtonStyled v-show="accountsCard" color="brand" :disabled="accountsCard.loginDisabled">
 					<button :disabled="accountsCard.loginDisabled" @click="login">
 						<LogInIcon v-if="!accountsCard.loginDisabled" />
 						<SpinnerIcon v-else class="animate-spin" />
-						Sign In
+						{{ currentUserIsOffline ? 'Use premium account' : 'Sign In' }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -529,3 +549,4 @@ $skin-card-gap: 4px;
 	min-width: 0;
 }
 </style>
+

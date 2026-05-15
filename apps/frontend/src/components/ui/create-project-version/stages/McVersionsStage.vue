@@ -33,8 +33,8 @@
 </template>
 
 <script lang="ts" setup>
-import { XIcon } from '@modrinth/assets'
-import { ButtonStyled, TagItem } from '@modrinth/ui'
+import { XIcon } from '@icarus/assets'
+import { ButtonStyled, TagItem } from '@icarus/ui'
 
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 

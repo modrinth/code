@@ -24,7 +24,7 @@
     "defaultMessage": "Añade enlaces externos"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Añade cualquier enlace relevante fuera de Modrinth, como el código fuente, un gestor de incidencias o una invitación a Discord."
+    "defaultMessage": "Añade cualquier enlace relevante fuera de Icarus, como el código fuente, un gestor de incidencias o una invitación a Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Añadir enlaces externos"
@@ -249,4 +249,5 @@
     "defaultMessage": "Visitar la configuración de enlaces"
   }
 }
+
 

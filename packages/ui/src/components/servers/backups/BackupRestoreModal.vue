@@ -36,14 +36,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
-import { RotateCounterClockwiseIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import type { Archon } from '@icarus/api-client'
+import { RotateCounterClockwiseIcon, SpinnerIcon, XIcon } from '@icarus/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
 import {
-	injectModrinthClient,
-	injectModrinthServerContext,
+	injectIcarusClient,
+	injectIcarusServerContext,
 	injectNotificationManager,
 } from '../../../providers'
 import Admonition from '../../base/Admonition.vue'
@@ -52,9 +52,9 @@ import NewModal from '../../modal/NewModal.vue'
 import BackupItem from './BackupItem.vue'
 
 const { addNotification } = injectNotificationManager()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
-const ctx = injectModrinthServerContext()
+const ctx = injectIcarusServerContext()
 
 const backupsQueryKey = ['backups', 'queue', ctx.serverId]
 
@@ -115,3 +115,4 @@ defineExpose({
 	show,
 })
 </script>
+

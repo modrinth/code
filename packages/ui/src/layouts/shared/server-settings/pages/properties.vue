@@ -265,8 +265,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
-import { SearchIcon, SpinnerIcon } from '@modrinth/assets'
+import type { Archon } from '@icarus/api-client'
+import { SearchIcon, SpinnerIcon } from '@icarus/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
 import { computed, ref, watch } from 'vue'
@@ -275,14 +275,14 @@ import { Accordion, Admonition, AutoLink, Chips, StyledInput, Toggle } from '#ui
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings'
 import {
-	injectModrinthClient,
-	injectModrinthServerContext,
+	injectIcarusClient,
+	injectIcarusServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
 
 const { addNotification } = injectNotificationManager()
-const client = injectModrinthClient()
-const { serverId, worldId, powerState, busyReasons } = injectModrinthServerContext()
+const client = injectIcarusClient()
+const { serverId, worldId, powerState, busyReasons } = injectIcarusServerContext()
 const queryClient = useQueryClient()
 const filesTabLink = computed(
 	() => `/hosting/manage/${encodeURIComponent(serverId)}/files?path=/&editing=server.properties`,
@@ -557,3 +557,4 @@ function formatPropertyName(name: string): string {
 		.join(' ')
 }
 </script>
+

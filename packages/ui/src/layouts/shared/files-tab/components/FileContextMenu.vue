@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FolderOpenIcon } from '@icarus/assets'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'

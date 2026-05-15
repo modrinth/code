@@ -16,8 +16,8 @@ import {
 	UpdatedIcon,
 	UserIcon,
 	XIcon,
-} from '@modrinth/assets'
-import type { MessageDescriptor } from '@modrinth/ui'
+} from '@icarus/assets'
+import type { MessageDescriptor } from '@icarus/ui'
 import {
 	Avatar,
 	ButtonStyled,
@@ -30,8 +30,8 @@ import {
 	useFormatNumber,
 	useRelativeTime,
 	useVIntl,
-} from '@modrinth/ui'
-import { getPingLevel } from '@modrinth/utils'
+} from '@icarus/ui'
+import { getPingLevel } from '@icarus/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'

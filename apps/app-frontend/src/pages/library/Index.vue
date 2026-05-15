@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { PlusIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, NavTabs } from '@modrinth/ui'
+import { PlusIcon } from '@icarus/assets'
+import { ButtonStyled, injectNotificationManager, NavTabs } from '@icarus/ui'
 import { inject, onUnmounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -41,7 +41,6 @@ onUnmounted(() => {
 			:links="[
 				{ label: 'All instances', href: `/library` },
 				{ label: 'Modpacks', href: `/library/modpacks` },
-				{ label: 'Servers', href: `/library/servers` },
 				{ label: 'Custom', href: `/library/custom` },
 				{ label: 'Shared with me', href: `/library/shared`, shown: false },
 				{ label: 'Saved', href: `/library/saved`, shown: false },

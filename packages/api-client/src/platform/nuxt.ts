@@ -66,24 +66,20 @@ export interface NuxtClientConfig extends ClientConfig {
  * ```typescript
  * // In a Nuxt composable
  * const config = useRuntimeConfig()
+ * const auth = await useAuth()
  *
- * const client = new NuxtModrinthClient({
+ * const client = new NuxtIcarusClient({
  *   userAgent: 'my-nuxt-app/1.0.0',
  *   rateLimitKey: import.meta.server ? config.rateLimitKey : undefined,
  *   features: [
- *     new AuthFeature({
- *       token: async () => getOAuthToken()
- *     }),
- *     new CircuitBreakerFeature({
- *       storage: new NuxtCircuitBreakerStorage()
- *     })
+ *     new AuthFeature({ token: () => auth.value.token })
  *   ]
  * })
  *
  * const project = await client.request('/project/sodium', { api: 'labrinth', version: 2 })
  * ```
  */
-export class NuxtModrinthClient extends XHRUploadClient {
+export class NuxtIcarusClient extends XHRUploadClient {
 	declare protected config: NuxtClientConfig
 	private rateLimitKeyResolved: string | undefined
 	private rateLimitKeyPromise: Promise<string | undefined> | undefined
@@ -175,9 +171,9 @@ export class NuxtModrinthClient extends XHRUploadClient {
 		return super.normalizeError(error)
 	}
 
-	protected async buildDefaultHeaders(): Promise<Record<string, string>> {
+	protected buildDefaultHeaders(): Record<string, string> {
 		const headers: Record<string, string> = {
-			...(await super.buildDefaultHeaders()),
+			...super.buildDefaultHeaders(),
 		}
 
 		// Use the resolved key (populated by resolveRateLimitKey in request())

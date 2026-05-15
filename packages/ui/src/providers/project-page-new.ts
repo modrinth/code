@@ -1,4 +1,4 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth } from '@icarus/api-client/src/modules/types'
 import type { UseQueryReturnType } from '@tanstack/vue-query'
 import type { ComputedRef, Reactive, Ref } from 'vue'
 

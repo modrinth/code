@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { TriangleAlertIcon, ZoomInIcon, ZoomOutIcon } from '@modrinth/assets'
+import { TriangleAlertIcon, ZoomInIcon, ZoomOutIcon } from '@icarus/assets'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'

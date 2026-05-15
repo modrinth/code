@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { FileIcon, HomeIcon, RefreshCwIcon } from '@modrinth/assets'
+import { FileIcon, HomeIcon, RefreshCwIcon } from '@icarus/assets'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

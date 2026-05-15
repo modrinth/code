@@ -1,15 +1,15 @@
 {
-  "app.action-bar.downloading-java": {
-    "message": "جاز تنزيل إصدار جافا {version}"
-  },
-  "app.action-bar.downloads": {
-    "message": "التنزيلات"
-  },
   "app.auth-servers.unreachable.body": {
     "message": "قد تكون خوادم مصادقة ماينكرافت معطلة حاليًا. تحقق من اتصالك بالإنترنت وحاول مرة أخرى لاحقًا."
   },
   "app.auth-servers.unreachable.header": {
     "message": "تعذر الوصول إلى خوادم المصادقة"
+  },
+  "app.browse.add-server-to-instance": {
+    "message": "أضف الخادم للنموذج"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "أضف الخوادم لنموذجك"
   },
   "app.browse.add-to-instance": {
     "message": "أضف للنموذج"
@@ -29,8 +29,14 @@
   "app.browse.discover-servers": {
     "message": "استكشف خوادم"
   },
-  "app.browse.server.installing": {
-    "message": "جاري التثبيت"
+  "app.browse.hide-added-servers": {
+    "message": "إخفاء الخوادم المضافة"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "إخفاء المحتوى المضاف"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "تثبيت محتوى لنموذجك"
   },
   "app.export-modal.description-placeholder": {
     "message": "أدخل وصف التعديل..."
@@ -46,6 +52,9 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "إسم حزمة التعديل"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "حدد الملفات والمجلدات المراد تضمينها في الحزمة"
   },
   "app.export-modal.version-number-label": {
     "message": "رقم الإصدار"
@@ -156,7 +165,7 @@
     "message": "حزمة التعديل مطلوبة"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "يتطلب هذا الخادم تعديلات للعب. انقر فوق \"تثبيت\" لإعداد الملفات المطلوبة من Modrinth، ثم قم بتشغيله مباشرة إلى الخادم."
+    "message": "يتطلب هذا الخادم تعديلات للعب. انقر فوق \"تثبيت\" لإعداد الملفات المطلوبة من Icarus، ثم قم بتشغيله مباشرة إلى الخادم."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "النماذج المشتركة"
@@ -201,16 +210,16 @@
     "message": "إدارة الموارد"
   },
   "app.update-popup.body": {
-    "message": "تطبيق Modrinth v{version} جاهز للتثبيت! أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
+    "message": "تطبيق Icarus v{version} جاهز للتثبيت! أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Icarus."
   },
   "app.update-popup.body.download-complete": {
-    "message": "انتهى تنزيل تطبيق Modrinth v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
+    "message": "انتهى تنزيل تطبيق Icarus v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Icarus."
   },
   "app.update-popup.body.linux": {
-    "message": "تطبيق Modrinth v {version} متاح. استخدم مدير الحزم الخاص بك للتحديث للحصول على أحدث الميزات والإصلاحات!"
+    "message": "تطبيق Icarus v {version} متاح. استخدم مدير الحزم الخاص بك للتحديث للحصول على أحدث الميزات والإصلاحات!"
   },
   "app.update-popup.body.metered": {
-    "message": "تطبيق Modrinth v{version} متاح الآن! وبما أنك متصل بشبكة مقيّدة، لم نقم بتنزيله تلقائيًا."
+    "message": "تطبيق Icarus v{version} متاح الآن! وبما أنك متصل بشبكة مقيّدة، لم نقم بتنزيله تلقائيًا."
   },
   "app.update-popup.changelog": {
     "message": "سجل التغيير"
@@ -276,10 +285,10 @@
     "message": "قد يختلف عن اسم المستخدم الخاص بهم في ماينكرافت!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "أدخل اسم مستخدم Modrinth..."
+    "message": "أدخل اسم مستخدم Icarus..."
   },
   "friends.add-friend.username.title": {
-    "message": "ما اسم مستخدم صديقك في Modrinth؟"
+    "message": "ما اسم مستخدم صديقك في Icarus؟"
   },
   "friends.add-friends-to-share": {
     "message": "<link>أضف أصدقاء</link> لمعرفة ما الذي يلعبونه!"
@@ -321,7 +330,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>سجّل الدخول إلى حساب Modrinth</link> لإضافة الأصدقاء ومعرفة ما الذي يلعبونه!"
+    "message": "<link>سجّل الدخول إلى حساب Icarus</link> لإضافة الأصدقاء ومعرفة ما الذي يلعبونه!"
   },
   "instance.add-server.add-and-play": {
     "message": "إضافة واللعب"
@@ -591,3 +600,4 @@
     "message": "يتم توفير المحمّل من قبل الخادم"
   }
 }
+

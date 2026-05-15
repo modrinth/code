@@ -1,6 +1,6 @@
-# Modrinth Blog Articles
+# Icarus Blog Articles
 
-This package contains the articles for the Modrinth blog. The articles are written in Markdown and are rendered on the Modrinth website.
+This package contains the articles for the Icarus blog. The articles are written in Markdown and are rendered on the Icarus website.
 
 ## How to add a new article
 
@@ -18,6 +18,7 @@ date: 2024-09-13T12:00:00-08:00
 ---
 ```
 
-You **can** link other articles in the frontmatter, but it's recommended you're explicit about it, for example: `https://modrinth.com/news/article/...` instead of `/news/article/...`. It's not a requirement though, you just have to be careful about it.
+You **can** link other articles in the frontmatter, but it's recommended you're explicit about it, for example: `https://Icarus.com/news/article/...` instead of `/news/article/...`. It's not a requirement though, you just have to be careful about it.
 
 You can place images in the `public/{slug}/...` directory, the thumbnail must be a `.webp` file named `thumbnail.webp` in the same public directory.
+

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { ArrowLeftIcon, LoaderCircleIcon } from '@modrinth/assets'
-import { ButtonStyled, injectModrinthClient } from '@modrinth/ui'
+import type { Labrinth } from '@icarus/api-client'
+import { ArrowLeftIcon, LoaderCircleIcon } from '@icarus/assets'
+import { ButtonStyled, injectIcarusClient } from '@icarus/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import MaliciousSummaryModal, {
@@ -10,7 +10,7 @@ import MaliciousSummaryModal, {
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
 const route = useRoute()
-const client = injectModrinthClient()
+const client = injectIcarusClient()
 const queryClient = useQueryClient()
 
 const projectId = computed(() => route.params.id as string)

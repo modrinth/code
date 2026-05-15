@@ -9,14 +9,14 @@ import { XHRUploadClient } from './xhr-upload-client'
 /**
  * Generic platform client using ofetch
  *
- * This client works in any JavaScript environment (Node.js, browser, workers, etc).
+ * This client works in any JavaScript environment (Node.js, browser, workers).
  *
  * @example
  * ```typescript
  * const client = new GenericModrinthClient({
  *   userAgent: 'my-app/1.0.0',
  *   features: [
- *     new AuthFeature({ token: async () => getOAuthToken() }),
+ *     new AuthFeature({ token: 'mrp_...' }),
  *     new RetryFeature({ maxAttempts: 3 })
  *   ]
  * })

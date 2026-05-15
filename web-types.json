@@ -1,6 +1,6 @@
 {
 	"$schema": "https://raw.githubusercontent.com/JetBrains/web-types/master/v2-preview/web-types.json",
-	"name": "modrinth-monorepo-web-types",
+	"name": "Icarus-monorepo-web-types",
 	"framework": "vue",
 	"version": "1.0.0",
 	"contributions": {
@@ -16,3 +16,4 @@
 		}
 	}
 }
+

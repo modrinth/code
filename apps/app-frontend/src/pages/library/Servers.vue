@@ -1,47 +1,52 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
-
+import { ref, onMounted } from 'vue'
 import GridDisplay from '@/components/GridDisplay.vue'
-import { get_project_v3_many } from '@/helpers/cache.js'
+import { get_search_results_v3 } from '@/helpers/cache.js'
+import type { Instance } from '@/store/instance.js'
 
 const props = defineProps({
 	instances: {
-		type: Array,
+		type: Array as () => Instance[],
 		required: true,
 	},
 })
 
-const serverProjectIds = ref(new Set())
+const projects = ref<Labrinth.Search.v3.Project[]>([])
+const loading = ref(true)
 
-const linkedInstances = computed(() => props.instances.filter((i) => i.linked_data))
-
-watchEffect(async () => {
-	const projectIds = [
-		...new Set(linkedInstances.value.map((i) => i.linked_data?.project_id).filter(Boolean)),
-	]
-	if (projectIds.length === 0) {
-		serverProjectIds.value = new Set()
-		return
-	}
-
+onMounted(async () => {
 	try {
-		const projects = await get_project_v3_many(projectIds, 'must_revalidate')
-		serverProjectIds.value = new Set(
-			projects.filter((p) => p?.minecraft_server != null).map((p) => p.id),
+		const results = await get_search_results_v3(
+			'author=fraa2a&facets=[["project_type:modpack"],["project_type:resourcepack"]]&limit=20',
 		)
-	} catch {
-		serverProjectIds.value = new Set()
+		projects.value = results.hits || []
+	} catch (e) {
+		console.error('Failed to fetch fraa2a projects', e)
+	} finally {
+		loading.value = false
 	}
 })
-
-const filteredInstances = computed(() =>
-	linkedInstances.value.filter((i) => serverProjectIds.value.has(i.linked_data?.project_id)),
-)
 </script>
 <template>
-	<GridDisplay
-		v-if="filteredInstances && filteredInstances.length > 0"
-		label="Instances"
-		:instances="filteredInstances"
-	/>
+	<div class="p-4">
+		<h2 class="text-2xl font-bold mb-4">Shop</h2>
+		<p class="text-primary mb-6">
+			Modpack e texture pack creati da <strong>fraa2a</strong>
+		</p>
+
+		<div v-if="loading" class="text-center py-8 text-secondary">
+			Caricamento in corso...
+		</div>
+
+		<GridDisplay
+			v-else-if="projects && projects.length > 0"
+			label="Prodotti fraa2a"
+			:instances="instances"
+			:projects="projects"
+		/>
+
+		<div v-else class="text-center py-8 text-secondary">
+			Nessun progetto trovato.
+		</div>
+	</div>
 </template>

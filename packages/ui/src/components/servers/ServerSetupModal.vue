@@ -20,14 +20,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon, ModrinthApiError } from '@modrinth/api-client'
+import type { Archon, IcarusApiError } from '@icarus/api-client'
 import { computed, useTemplateRef } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import { injectModrinthClient } from '../../providers/api-client'
-import { injectModrinthServerContext } from '../../providers/server-context'
+import { injectIcarusClient } from '../../providers/api-client'
+import { injectIcarusServerContext } from '../../providers/server-context'
 import { injectNotificationManager } from '../../providers/web-notifications'
 import type { CreationFlowContextValue } from '../flows/creation-flow-modal/creation-flow-context'
 import CreationFlowModal from '../flows/creation-flow-modal/index.vue'
@@ -55,8 +55,8 @@ const messages = defineMessages({
 })
 
 const debug = useDebugLogger('ServerSetupModal')
-const client = injectModrinthClient()
-const serverContext = injectModrinthServerContext()
+const client = injectIcarusClient()
+const serverContext = injectIcarusServerContext()
 const { addNotification } = injectNotificationManager()
 
 const serverLoaders = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
@@ -125,7 +125,7 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 				{
 					content_variant: 'modpack',
 					spec: {
-						platform: 'modrinth',
+						platform: 'Icarus',
 						project_id: ctx.modpackSelection.value.projectId,
 						version_id: ctx.modpackSelection.value.versionId,
 					},
@@ -171,7 +171,7 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 		creationFlowRef.value?.hide()
 	} catch (error) {
 		debug('onFlowComplete: ERROR', error)
-		if ((error as ModrinthApiError).statusCode === 429) {
+		if ((error as IcarusApiError).statusCode === 429) {
 			addNotification({
 				title: formatMessage(messages.rateLimitTitle),
 				text: formatMessage(messages.rateLimitText),
@@ -218,3 +218,4 @@ function hide() {
 
 defineExpose({ show, hide, ctx: computed(() => creationFlowRef.value?.ctx) })
 </script>
+
