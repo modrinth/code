@@ -235,9 +235,9 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 
 const columns: TableColumn<EventColumnKey>[] = [
+	{ key: 'date', label: 'Date', width: '18%', enableSorting: true },
 	{ key: 'title', label: 'Title', width: '30%' },
 	{ key: 'announcement', label: 'Announcement link', width: '20%' },
-	{ key: 'date', label: 'Date', width: '18%', enableSorting: true },
 	{ key: 'metrics', label: 'Metric', width: '17%' },
 	{ key: 'actions', label: 'Actions', width: '15%', align: 'right' },
 ]
