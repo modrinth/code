@@ -327,6 +327,36 @@ export const ShowToday: Story = {
 	}),
 }
 
+export const InsideClippedContainer: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-04-27')
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="h-[220px] w-[360px] overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-4">
+				<div class="flex flex-col gap-2">
+					<DatePicker
+						ref="datePicker"
+						v-model="value"
+						wrapperClass="w-[300px]"
+						placeholder="Select a date..."
+					/>
+					<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+				</div>
+			</div>
+		`,
+	}),
+}
+
 export const Disabled: Story = {
 	args: {
 		modelValue: '2026-04-27',

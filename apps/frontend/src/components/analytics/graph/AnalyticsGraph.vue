@@ -184,6 +184,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
 import { Tabs, type TabsTab, Toggle, useFormatNumber } from '@modrinth/ui'
 
@@ -207,7 +208,7 @@ import AnalyticsChart, {
 	type AnalyticsChartGeometryPayload,
 	type AnalyticsChartRangeSelectPayload,
 } from './AnalyticsChart.client.vue'
-import AnalyticsChartEvents, { type AnalyticsChartEvent } from './AnalyticsChartEvents.vue'
+import AnalyticsChartEvents from './AnalyticsChartEvents.vue'
 import AnalyticsChartTooltip, { type AnalyticsChartTooltipEntry } from './AnalyticsChartTooltip.vue'
 import {
 	buildChartDatasets,
@@ -258,31 +259,38 @@ const titleByStat: Record<AnalyticsDashboardStat, string> = {
 	playtime: 'Playtime Over Time',
 }
 
-const dummyAnalyticsChartEvents: AnalyticsChartEvent[] = [
+const dummyAnalyticsChartEvents: Labrinth.Analytics.v3.AnalyticsEvent[] = [
 	{
+		id: 1,
 		title: 'Analytics outage',
-		startDate: '2026-04-25T00:00:00.000Z',
-		endDate: '2026-04-27T00:00:00.000Z',
+		announcement_url: null,
+		for_metric_kind: null,
+		starts: '2026-04-25T00:00:00.000Z',
+		ends: '2026-04-27T00:00:00.000Z',
 	},
 	{
+		id: 2,
 		title: 'Ad revenue over reported, resulting in a potential spike.',
-		announcementUrl: 'https://modrinth.com/news',
-		startDate: '2026-05-04T00:00:00.000Z',
-		endDate: '2026-05-04T00:00:00.000Z',
-		forMetricType: 'revenue',
+		announcement_url: 'https://modrinth.com/news',
+		for_metric_kind: ['revenue'],
+		starts: '2026-05-04T00:00:00.000Z',
+		ends: '2026-05-04T00:00:00.000Z',
 	},
 	{
+		id: 3,
 		title: 'China CDN ingest outage',
-		announcementUrl: 'https://modrinth.com/news',
-		startDate: '2026-05-01T00:00:00.000Z',
-		endDate: '2026-05-07T00:00:00.000Z',
-		forMetricType: 'downloads',
+		announcement_url: 'https://modrinth.com/news',
+		for_metric_kind: ['downloads'],
+		starts: '2026-05-01T00:00:00.000Z',
+		ends: '2026-05-07T00:00:00.000Z',
 	},
 	{
+		id: 4,
 		title: 'Modrinth App release',
-		announcementUrl: 'https://modrinth.com/news',
-		startDate: '2023-08-07T00:00:00.000Z',
-		endDate: '2023-08-07T00:00:00.000Z',
+		announcement_url: 'https://modrinth.com/news',
+		for_metric_kind: null,
+		starts: '2023-08-07T00:00:00.000Z',
+		ends: '2023-08-07T00:00:00.000Z',
 	},
 ]
 

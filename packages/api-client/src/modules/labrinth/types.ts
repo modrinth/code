@@ -240,6 +240,26 @@ export namespace Labrinth {
 
 	export namespace Analytics {
 		export namespace v3 {
+			export type AnalyticsEventId = number
+			export type AnalyticsEventMetricKind = 'view' | 'revenue' | 'downloads' | 'playtime'
+
+			export type AnalyticsEvent = {
+				announcement_url: string | null
+				for_metric_kind: AnalyticsEventMetricKind[] | null
+				title: string
+				ends: string
+				id: AnalyticsEventId
+				starts: string
+			}
+
+			export type AnalyticsEventUpsert = {
+				announcement_url: string | null
+				for_metric_kind: AnalyticsEventMetricKind[] | null
+				title: string
+				ends: string
+				starts: string
+			}
+
 			export type FetchRequest = {
 				time_range: TimeRange
 				return_metrics: ReturnMetrics

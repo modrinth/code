@@ -39,4 +39,59 @@ export class LabrinthAnalyticsV3Module extends AbstractModule {
 			body: data,
 		})
 	}
+
+	/**
+	 * Fetch all analytics events.
+	 * GET /v3/analytics-event
+	 */
+	public async getEvents(): Promise<Labrinth.Analytics.v3.AnalyticsEvent[]> {
+		return this.client.request<Labrinth.Analytics.v3.AnalyticsEvent[]>('/analytics-event', {
+			api: 'labrinth',
+			version: 3,
+			method: 'GET',
+		})
+	}
+
+	/**
+	 * Create an analytics event.
+	 * POST /v3/analytics-event
+	 */
+	public async createEvent(
+		data: Labrinth.Analytics.v3.AnalyticsEventUpsert,
+	): Promise<Labrinth.Analytics.v3.AnalyticsEvent> {
+		return this.client.request<Labrinth.Analytics.v3.AnalyticsEvent>('/analytics-event', {
+			api: 'labrinth',
+			version: 3,
+			method: 'POST',
+			body: data,
+		})
+	}
+
+	/**
+	 * Edit an analytics event.
+	 * PATCH /v3/analytics-event/{id}
+	 */
+	public async editEvent(
+		id: Labrinth.Analytics.v3.AnalyticsEventId,
+		data: Labrinth.Analytics.v3.AnalyticsEventUpsert,
+	): Promise<Labrinth.Analytics.v3.AnalyticsEvent> {
+		return this.client.request<Labrinth.Analytics.v3.AnalyticsEvent>(`/analytics-event/${id}`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'PATCH',
+			body: data,
+		})
+	}
+
+	/**
+	 * Delete an analytics event.
+	 * DELETE /v3/analytics-event/{id}
+	 */
+	public async deleteEvent(id: Labrinth.Analytics.v3.AnalyticsEventId): Promise<void> {
+		return this.client.request<void>(`/analytics-event/${id}`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'DELETE',
+		})
+	}
 }

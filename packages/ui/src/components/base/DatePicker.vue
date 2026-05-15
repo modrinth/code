@@ -1,5 +1,6 @@
 <template>
 	<div
+		ref="wrapperRef"
 		class="modrinth-date-picker relative inline-flex items-center"
 		:class="[
 			wrapperClass,
@@ -148,6 +149,7 @@ const emit = defineEmits<{
 }>()
 
 const inputRef = ref<HTMLInputElement>()
+const wrapperRef = ref<HTMLElement>()
 const picker = ref<Instance>()
 const isSyncingFromModel = ref(false)
 const intendedViewMonth = ref<CalendarViewMonth | null>(null)
@@ -159,6 +161,72 @@ const rangeEndpointMoveState = ref<RangeEndpointMoveState | null>(null)
 const suppressNextRangeClick = ref(false)
 let rangeClickSuppressionTimeout: number | null = null
 let monthSelectSyncFrame: number | null = null
+let calendarPortal: HTMLElement | null = null
+const calendarBaseClass = 'modrinth-date-picker-calendar'
+const calendarStateClasses = [
+	'calendar-only',
+	'show-today',
+	'can-select-range',
+	'is-selecting-range',
+	'can-drag-range',
+	'is-dragging-range',
+	'is-moving-range-end',
+]
+
+function getCalendarStateClasses() {
+	return [
+		props.calendarOnly ? 'calendar-only' : '',
+		props.showToday ? 'show-today' : '',
+		props.mode === 'range' && selectedDates.value.length < 2 ? 'can-select-range' : '',
+		props.mode === 'range' && selectedDates.value.length === 1 ? 'is-selecting-range' : '',
+		props.mode === 'range' && selectedDates.value.length === 2 ? 'can-drag-range' : '',
+		rangeDragState.value ? 'is-dragging-range' : '',
+		rangeEndpointMoveState.value ? 'is-moving-range-end' : '',
+	].filter(Boolean)
+}
+
+function syncCalendarStateClasses(instance?: Instance) {
+	const container = (instance ?? picker.value)?.calendarContainer
+	const targets = [container, calendarPortal].filter((target): target is HTMLElement =>
+		Boolean(target),
+	)
+	if (targets.length === 0) return
+
+	for (const target of targets) {
+		for (const cls of calendarStateClasses) {
+			target.classList.remove(cls)
+		}
+
+		for (const cls of getCalendarStateClasses()) {
+			target.classList.add(cls)
+		}
+	}
+}
+
+function ensureCalendarPortal() {
+	if (props.calendarOnly || typeof document === 'undefined') return undefined
+
+	if (!calendarPortal) {
+		calendarPortal = document.createElement('div')
+		calendarPortal.classList.add('modrinth-date-picker', 'modrinth-date-picker-portal')
+
+		for (const attr of wrapperRef.value?.getAttributeNames() ?? []) {
+			if (attr.startsWith('data-v-')) {
+				calendarPortal.setAttribute(attr, '')
+			}
+		}
+
+		document.body.appendChild(calendarPortal)
+	}
+
+	syncCalendarStateClasses()
+	return calendarPortal
+}
+
+function destroyCalendarPortal() {
+	calendarPortal?.remove()
+	calendarPortal = null
+}
 
 function getDayFromDateStr(dateStr: string): number | null {
 	const parts = dateStr.split('-')
@@ -210,6 +278,8 @@ function syncCalendarClasses(instance?: Instance) {
 	const container = (instance ?? picker.value)?.calendarContainer
 	if (!container) return
 
+	container.classList.add(calendarBaseClass)
+
 	for (const cls of appliedCalendarClasses) {
 		container.classList.remove(cls)
 	}
@@ -220,6 +290,7 @@ function syncCalendarClasses(instance?: Instance) {
 	}
 
 	appliedCalendarClasses = nextClasses
+	syncCalendarStateClasses(instance)
 }
 
 function syncHeaderControlState(instance: Instance) {
@@ -333,7 +404,8 @@ function parseViewDate(value: DatePickerValue, instance: Instance): Date | null 
 	if (!value) return null
 	if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value
 
-	const parsedDate = instance.parseDate(value, resolvedDateFormat.value) ?? instance.parseDate(value)
+	const parsedDate =
+		instance.parseDate(value, resolvedDateFormat.value) ?? instance.parseDate(value)
 	if (parsedDate && !Number.isNaN(parsedDate.getTime())) return parsedDate
 
 	const nativeDate = new Date(value)
@@ -416,11 +488,7 @@ function withEndpointTime(date: Date, endpoint: Date) {
 	)
 }
 
-function resolveRangeEndpointMove(
-	targetDate: Date,
-	endpointDate: Date,
-	anchorDate: Date,
-) {
+function resolveRangeEndpointMove(targetDate: Date, endpointDate: Date, anchorDate: Date) {
 	const movedDate = withEndpointTime(targetDate, endpointDate)
 	const [nextStartDate, nextEndDate] =
 		dateOnlyTime(movedDate) <= dateOnlyTime(anchorDate)
@@ -463,6 +531,7 @@ function syncRangeEndpointMoveState(instance = picker.value) {
 
 function setRangeEndpointMoveState(state: RangeEndpointMoveState | null) {
 	rangeEndpointMoveState.value = state
+	syncCalendarStateClasses()
 	syncRangeEndpointMoveState()
 }
 
@@ -571,6 +640,7 @@ function startRangeDrag(event: PointerEvent) {
 		lastDateTime: dateTime(draggedEndpointDate),
 		hasMoved: false,
 	}
+	syncCalendarStateClasses(instance)
 	clearRangeClickSuppressionTimeout()
 	suppressNextRangeClick.value = true
 
@@ -620,6 +690,7 @@ function stopRangeDrag(event: PointerEvent) {
 
 	const instance = picker.value
 	rangeDragState.value = null
+	syncCalendarStateClasses(instance)
 	document.removeEventListener('pointermove', updateRangeDrag, true)
 	document.removeEventListener('pointerup', stopRangeDrag, true)
 	document.removeEventListener('pointercancel', stopRangeDrag, true)
@@ -710,7 +781,9 @@ function shouldSuppressMissingRangeEndBackground(instance?: Instance) {
 	const hasRangeStart = Boolean(
 		instance.calendarContainer.querySelector('.flatpickr-day.startRange:not(.endRange)'),
 	)
-	const hasRangePreview = Boolean(instance.calendarContainer.querySelector('.flatpickr-day.inRange'))
+	const hasRangePreview = Boolean(
+		instance.calendarContainer.querySelector('.flatpickr-day.inRange'),
+	)
 
 	return hasRangeStart && !hasRangeEnd(instance) && !hasRangePreview
 }
@@ -896,6 +969,18 @@ watch(
 	() => syncCalendarClasses(),
 )
 
+watch(
+	() => [
+		props.showToday,
+		props.calendarOnly,
+		props.mode,
+		selectedDates.value.length,
+		Boolean(rangeDragState.value),
+		Boolean(rangeEndpointMoveState.value),
+	],
+	() => syncCalendarStateClasses(),
+)
+
 onMounted(async () => {
 	await nextTick()
 	if (!inputRef.value) return
@@ -955,11 +1040,7 @@ onMounted(async () => {
 					if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
 						event.preventDefault()
 						event.stopImmediatePropagation()
-						changeYearInput(
-							instance,
-							target as HTMLInputElement,
-							event.key === 'ArrowUp' ? 1 : -1,
-						)
+						changeYearInput(instance, target as HTMLInputElement, event.key === 'ArrowUp' ? 1 : -1)
 						return
 					}
 					if (
@@ -983,6 +1064,7 @@ onMounted(async () => {
 			syncTimeInputTypes(instance)
 			syncHeaderControlState(instance)
 			syncCalendarClasses(instance)
+			syncCalendarStateClasses(instance)
 			syncRangeEndpointMoveState(instance)
 			syncMultiMonthSelects(instance)
 		},
@@ -1005,6 +1087,7 @@ onMounted(async () => {
 
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
+			syncCalendarStateClasses(instance)
 			syncRangeEndpointMoveState(instance)
 		},
 		onClose: (_selectedDates, dateStr, instance) => {
@@ -1021,6 +1104,7 @@ onMounted(async () => {
 			applyPreserveDay(instance)
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
+			syncCalendarStateClasses(instance)
 			syncRangeEndpointMoveState(instance)
 			queueMultiMonthSelectSync(instance)
 		},
@@ -1028,6 +1112,7 @@ onMounted(async () => {
 			applyPreserveDay(instance)
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
+			syncCalendarStateClasses(instance)
 			syncRangeEndpointMoveState(instance)
 			queueMultiMonthSelectSync(instance)
 		},
@@ -1036,6 +1121,7 @@ onMounted(async () => {
 			syncTimeInputTypes(instance)
 			syncHeaderControlState(instance)
 			syncMissingRangeEndState()
+			syncCalendarStateClasses(instance)
 			syncRangeEndpointMoveState(instance)
 			syncMultiMonthSelects(instance)
 		},
@@ -1060,6 +1146,7 @@ onBeforeUnmount(() => {
 	document.removeEventListener('pointerup', stopRangeDrag, true)
 	document.removeEventListener('pointercancel', stopRangeDrag, true)
 	picker.value?.destroy()
+	destroyCalendarPortal()
 })
 
 function flatpickrOptions(): Options {
@@ -1068,7 +1155,7 @@ function flatpickrOptions(): Options {
 		altInput: !props.calendarOnly,
 		altInputClass: props.calendarOnly ? undefined : inputClasses.value.filter(Boolean).join(' '),
 		altFormat: resolvedAltFormat.value,
-		appendTo: props.calendarOnly ? undefined : (inputRef.value?.parentElement ?? undefined),
+		appendTo: ensureCalendarPortal(),
 		closeOnSelect: false,
 		dateFormat: resolvedDateFormat.value,
 		disableMobile: true,
@@ -1081,7 +1168,7 @@ function flatpickrOptions(): Options {
 		nextArrow: chevronRightIcon,
 		prevArrow: chevronLeftIcon,
 		showMonths: resolvedShowMonths.value,
-		static: !props.calendarOnly,
+		static: false,
 		time_24hr: props.time24hr,
 	}
 }
@@ -1113,6 +1200,7 @@ function syncPickerFromModel() {
 	isSyncingFromModel.value = false
 	syncHeaderControlState(picker.value)
 	syncMissingRangeEndState()
+	syncCalendarStateClasses()
 	syncRangeEndpointMoveState()
 	syncMultiMonthSelects()
 }

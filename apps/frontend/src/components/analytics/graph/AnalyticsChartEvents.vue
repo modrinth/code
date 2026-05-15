@@ -60,8 +60,8 @@
 							{{ event.title }}
 						</div>
 						<a
-							v-if="event.announcementUrl"
-							:href="event.announcementUrl"
+							v-if="event.announcement_url"
+							:href="event.announcement_url"
 							target="_blank"
 							rel="noopener noreferrer"
 							class="mt-1.5 inline-flex items-center gap-1 text-sm font-medium text-primary underline !transition-all hover:text-contrast"
@@ -80,6 +80,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { ExternalIcon, InfoIcon } from '@modrinth/assets'
 
 import type {
@@ -90,13 +91,7 @@ import type {
 import type { AnalyticsChartGeometryPayload } from './AnalyticsChart.client.vue'
 import { isTimeRelevantForGroupBy } from './utils'
 
-export type AnalyticsChartEvent = {
-	title: string
-	announcementUrl?: string
-	forMetricType?: 'view' | 'revenue' | 'downloads' | 'playtime'
-	startDate: string
-	endDate: string
-}
+export type AnalyticsChartEvent = Labrinth.Analytics.v3.AnalyticsEvent
 
 type PositionedEvent = AnalyticsChartEvent & {
 	startMs: number
@@ -174,14 +169,14 @@ const visibleEvents = computed<PositionedEvent[]>(() => {
 	return props.events
 		.filter((event) => doesEventMatchActiveStat(event))
 		.map((event) => {
-			const eventStartMs = new Date(event.startDate).getTime()
-			const eventEndMs = new Date(event.endDate).getTime()
+			const eventStartMs = new Date(event.starts).getTime()
+			const eventEndMs = new Date(event.ends).getTime()
 			if (!Number.isFinite(eventStartMs) || !Number.isFinite(eventEndMs)) return null
 			if (eventEndMs < eventStartMs) return null
 			if (eventEndMs < startMs || eventStartMs > endMs) return null
 
-			const x = getDateBucketX(event.startDate, eventStartMs, geometry, startMs, endMs)
-			const endX = getDateBucketX(event.endDate, eventEndMs, geometry, startMs, endMs)
+			const x = getDateBucketX(event.starts, eventStartMs, geometry, startMs, endMs)
+			const endX = getDateBucketX(event.ends, eventEndMs, geometry, startMs, endMs)
 			if (x === null || endX === null) return null
 
 			return {
@@ -297,14 +292,17 @@ function updateChartRect() {
 }
 
 function doesEventMatchActiveStat(event: AnalyticsChartEvent) {
-	if (!event.forMetricType) return true
-	if (event.forMetricType === 'view') return props.activeStat === 'views'
-	return event.forMetricType === props.activeStat
+	if (!event.for_metric_kind?.length) return true
+
+	return event.for_metric_kind.some((metricKind) => {
+		if (metricKind === 'view') return props.activeStat === 'views'
+		return metricKind === props.activeStat
+	})
 }
 
 function getEventKey(event: AnalyticsChartEvent) {
-	return `${event.title}:${event.startDate}:${event.endDate}:${event.announcementUrl ?? ''}:${
-		event.forMetricType ?? ''
+	return `${event.title}:${event.starts}:${event.ends}:${event.announcement_url ?? ''}:${
+		event.for_metric_kind?.join(',') ?? ''
 	}`
 }
 
@@ -451,10 +449,10 @@ function getDateFromInputValue(value: string): Date | undefined {
 }
 
 function formatEventRange(event: AnalyticsChartEvent) {
-	const startDateValue = getEventDateInputValue(event.startDate)
-	const endDateValue = getEventDateInputValue(event.endDate)
+	const startDateValue = getEventDateInputValue(event.starts)
+	const endDateValue = getEventDateInputValue(event.ends)
 	if (!startDateValue || !endDateValue) {
-		return `${event.startDate} - ${event.endDate}`
+		return `${event.starts} - ${event.ends}`
 	}
 
 	const startDate = getDateFromInputValue(startDateValue)
