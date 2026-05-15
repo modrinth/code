@@ -6,7 +6,8 @@ import {
 	type AnalyticsDashboardStat,
 	type AnalyticsGroupByPreset,
 	type AnalyticsSelectedFilters,
-	doesAnalyticsPointMatchFilters,
+	doesAnalyticsPointMatchNormalizedFilters,
+	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
 import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'
@@ -139,8 +140,7 @@ function buildPaletteColorsByDownloadRank(
 	if (palette.length === 0) return colorsByKey
 
 	const sortedEntries = [...entries].sort(
-		(a, b) =>
-			b.total - a.total || a.label.localeCompare(b.label) || a.key.localeCompare(b.key),
+		(a, b) => b.total - a.total || a.label.localeCompare(b.label) || a.key.localeCompare(b.key),
 	)
 	sortedEntries.forEach((entry, index) => {
 		colorsByKey.set(entry.key, getPaletteColorForIndex(index, palette))
@@ -192,6 +192,7 @@ export function buildChartDatasets(
 	}
 
 	const dataLength = Math.max(sliceCount, timeSlices.length)
+	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters)
 
 	if (selectedBreakdown !== 'none') {
 		const dataByBreakdown = new Map<string, number[]>()
@@ -201,7 +202,7 @@ export function buildChartDatasets(
 			for (const point of slice) {
 				if (!('source_project' in point)) continue
 				if (!selectedProjectIds.has(point.source_project)) continue
-				if (!doesAnalyticsPointMatchFilters(point, selectedFilters)) continue
+				if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) continue
 
 				const breakdownValue = getAnalyticsBreakdownValue(point, selectedBreakdown)
 				if (breakdownValue === ALL_BREAKDOWN_VALUE) continue
@@ -261,7 +262,7 @@ export function buildChartDatasets(
 		for (const point of slice) {
 			if (!('source_project' in point)) continue
 			if (!selectedProjectIds.has(point.source_project)) continue
-			if (!doesAnalyticsPointMatchFilters(point, selectedFilters)) continue
+			if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) continue
 
 			if (point.metric_kind === 'downloads') {
 				downloadTotalsByProjectId.set(
@@ -270,6 +271,8 @@ export function buildChartDatasets(
 						getMetricValue(point, 'downloads'),
 				)
 			}
+
+			if (!isMetricKindForStat(point, activeStat)) continue
 
 			const projectData = dataByProjectId.get(point.source_project)
 			if (!projectData) continue

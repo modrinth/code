@@ -74,9 +74,7 @@
 			v-if="sortedRows.length > PAGE_SIZE"
 			class="mt-3 flex flex-wrap items-center justify-between gap-3 px-1 text-sm text-secondary"
 		>
-			<span>
-				Showing {{ visibleRowStart }} to {{ visibleRowEnd }} of {{ sortedRows.length }}
-			</span>
+			<span> Showing {{ visibleRowStart }} to {{ visibleRowEnd }} of {{ sortedRows.length }} </span>
 			<Pagination :page="currentPage" :count="pageCount" @switch-page="switchPage" />
 		</div>
 		<div v-if="isDataLoading" class="absolute inset-0 z-10 overflow-hidden rounded-xl">
@@ -106,9 +104,10 @@ import {
 import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardStat,
-	doesAnalyticsPointMatchFilters,
+	doesAnalyticsPointMatchNormalizedFilters,
 	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
+	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
@@ -175,6 +174,7 @@ const sortDirection = ref<SortDirection>('asc')
 const displayedSortColumn = ref<TableColumnKey | undefined>('date')
 const displayedSortDirection = ref<SortDirection>('asc')
 const PAGE_SIZE = 500
+const INACTIVE_MODE_WARMUP_POINT_LIMIT = 12000
 const currentPage = ref(1)
 const sortCollator = new Intl.Collator(undefined, { sensitivity: 'base' })
 const tableRowsByMode = shallowRef<Record<TableMode, AnalyticsTableRow[] | null>>({
@@ -235,6 +235,9 @@ const projectNamesById = computed(
 	() => new Map(projects.value.map((project) => [project.id, project.name])),
 )
 const hasAvailableProjects = computed(() => projects.value.length > 0)
+const analyticsPointCount = computed(() =>
+	timeSlices.value.reduce((sum, slice) => sum + slice.length, 0),
+)
 const emptyTableMessage = computed(() => {
 	if (hasProjectContext.value) {
 		return 'No data available for analytics'
@@ -281,112 +284,101 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 	const nextFetchRequest = fetchRequest.value
 	const nextTimeSlices = timeSlices.value
 	const nextSelectedBreakdown = selectedBreakdown.value
+	const nextSelectedProjectIds = selectedProjectIdSet.value
+	const nextRelevantStats = relevantStats.value
+	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters.value)
 
-	if (!nextFetchRequest || selectedProjectIdSet.value.size === 0) {
+	if (!nextFetchRequest || nextSelectedProjectIds.size === 0) {
 		return []
 	}
 
 	const sliceCount = getSliceCount(nextFetchRequest.time_range, nextTimeSlices.length)
 	const includeDate = mode === 'date_breakdown' || !showBreakdownColumn.value
-
-	const breakdownValues = new Set<string>()
-	if (nextSelectedBreakdown === 'none') {
-		for (const projectId of selectedProjectIdSet.value) {
-			breakdownValues.add(projectId)
-		}
-	} else {
-		for (const slice of nextTimeSlices) {
-			for (const point of slice) {
-				if (!('source_project' in point)) continue
-				if (!selectedProjectIdSet.value.has(point.source_project)) continue
-				if (!doesAnalyticsPointMatchFilters(point, selectedFilters.value)) continue
-
-				const pointStat = getStatForMetric(point.metric_kind)
-				if (!pointStat || !relevantStats.value.has(pointStat)) continue
-
-				const breakdownValue = getBreakdownValue(point, nextSelectedBreakdown)
-				if (breakdownValue === ALL_BREAKDOWN_VALUE) continue
-				breakdownValues.add(breakdownValue)
-			}
-		}
-	}
-
-	if (breakdownValues.size === 0) {
-		return []
-	}
-
 	const breakdownDisplayValues = new Map<string, string>()
 	const projectDisplayValues = new Map<string, string>()
+	const nextRows = new Map<string, AnalyticsTableRow>()
+	const bucketLabelsBySliceIndex = new Map<number, { date: string; dateMs: number }>()
 
-	for (const breakdown of breakdownValues) {
-		breakdownDisplayValues.set(breakdown, formatBreakdownDisplayValue(breakdown))
-		projectDisplayValues.set(breakdown, getProjectDisplayValue(breakdown, nextSelectedBreakdown))
+	function getBreakdownDisplayValue(breakdown: string) {
+		let displayValue = breakdownDisplayValues.get(breakdown)
+		if (displayValue === undefined) {
+			displayValue = formatBreakdownDisplayValue(breakdown)
+			breakdownDisplayValues.set(breakdown, displayValue)
+		}
+		return displayValue
 	}
 
-	const nextRows = new Map<string, AnalyticsTableRow>()
-
-	if (includeDate) {
-		for (let sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++) {
-			const bucketRange = getSliceBucketRange(nextFetchRequest.time_range, sliceCount, sliceIndex)
-			const dateMs = bucketRange.end.getTime()
-			const dateLabel = formatBucketEndLabel(
-				bucketRange.end,
-				showTimeInBucketLabel.value,
-				showYearInBucketLabel.value,
-			)
-
-			for (const breakdown of breakdownValues) {
-				const rowId = `${dateMs}::${breakdown}`
-				nextRows.set(rowId, {
-					id: rowId,
-					date: dateLabel,
-					dateMs,
-					project: projectDisplayValues.get(breakdown) ?? '',
-					breakdown,
-					breakdownDisplay: breakdownDisplayValues.get(breakdown) ?? breakdown,
-					views: 0,
-					downloads: 0,
-					revenue: 0,
-					playtime: 0,
-				})
-			}
+	function getProjectDisplayValueForBreakdown(breakdown: string) {
+		let displayValue = projectDisplayValues.get(breakdown)
+		if (displayValue === undefined) {
+			displayValue = getProjectDisplayValue(breakdown, nextSelectedBreakdown)
+			projectDisplayValues.set(breakdown, displayValue)
 		}
-	} else {
-		for (const breakdown of breakdownValues) {
-			nextRows.set(breakdown, {
-				id: breakdown,
-				date: '',
-				dateMs: 0,
-				project: projectDisplayValues.get(breakdown) ?? '',
-				breakdown,
-				breakdownDisplay: breakdownDisplayValues.get(breakdown) ?? breakdown,
-				views: 0,
-				downloads: 0,
-				revenue: 0,
-				playtime: 0,
-			})
+		return displayValue
+	}
+
+	function getBucketLabel(sliceIndex: number) {
+		let bucketLabel = bucketLabelsBySliceIndex.get(sliceIndex)
+		if (!bucketLabel) {
+			const bucketRange = getSliceBucketRange(nextFetchRequest.time_range, sliceCount, sliceIndex)
+			bucketLabel = {
+				date: formatBucketEndLabel(
+					bucketRange.end,
+					showTimeInBucketLabel.value,
+					showYearInBucketLabel.value,
+				),
+				dateMs: bucketRange.end.getTime(),
+			}
+			bucketLabelsBySliceIndex.set(sliceIndex, bucketLabel)
+		}
+		return bucketLabel
+	}
+
+	function createRow(
+		rowId: string,
+		breakdown: string,
+		bucketLabel?: { date: string; dateMs: number },
+	) {
+		const row = {
+			id: rowId,
+			date: bucketLabel?.date ?? '',
+			dateMs: bucketLabel?.dateMs ?? 0,
+			project: getProjectDisplayValueForBreakdown(breakdown),
+			breakdown,
+			breakdownDisplay: getBreakdownDisplayValue(breakdown),
+			views: 0,
+			downloads: 0,
+			revenue: 0,
+			playtime: 0,
+		}
+		nextRows.set(rowId, row)
+		return row
+	}
+
+	if (!includeDate && nextSelectedBreakdown === 'none') {
+		for (const projectId of nextSelectedProjectIds) {
+			createRow(projectId, projectId)
 		}
 	}
 
 	nextTimeSlices.forEach((slice, sliceIndex) => {
-		const bucketRange = getSliceBucketRange(nextFetchRequest.time_range, sliceCount, sliceIndex)
-		const dateMs = bucketRange.end.getTime()
+		const bucketLabel = includeDate ? getBucketLabel(sliceIndex) : undefined
 
 		for (const point of slice) {
 			if (!('source_project' in point)) {
 				continue
 			}
 
-			if (!selectedProjectIdSet.value.has(point.source_project)) {
+			if (!nextSelectedProjectIds.has(point.source_project)) {
 				continue
 			}
 
-			if (!doesAnalyticsPointMatchFilters(point, selectedFilters.value)) {
+			if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) {
 				continue
 			}
 
 			const pointStat = getStatForMetric(point.metric_kind)
-			if (!pointStat || !relevantStats.value.has(pointStat)) {
+			if (!pointStat || !nextRelevantStats.has(pointStat)) {
 				continue
 			}
 
@@ -398,11 +390,10 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 				continue
 			}
 
-			const rowId = includeDate ? `${dateMs}::${breakdown}` : breakdown
-			const row = nextRows.get(rowId)
-			if (row) {
-				addMetricToRow(row, point)
-			}
+			const nextBucketLabel = includeDate ? (bucketLabel ?? getBucketLabel(sliceIndex)) : undefined
+			const rowId = includeDate ? `${nextBucketLabel?.dateMs ?? 0}::${breakdown}` : breakdown
+			const row = nextRows.get(rowId) ?? createRow(rowId, breakdown, nextBucketLabel)
+			addMetricToRow(row, point)
 		}
 	})
 
@@ -601,11 +592,7 @@ function displayRowsForMode(mode: TableMode) {
 	displayedSortedRows.value = cached.rows
 }
 
-async function buildRowsForMode(
-	mode: TableMode,
-	generation: number,
-	requestId: number,
-) {
+async function buildRowsForMode(mode: TableMode, generation: number, requestId: number) {
 	await waitForDeferredTableWork()
 
 	if (isStaleBuild(mode, generation, requestId)) {
@@ -644,6 +631,9 @@ function waitForDeferredTableWork(): Promise<void> {
 
 function scheduleInactiveModeWarmup() {
 	if (!showBreakdownColumn.value) {
+		return
+	}
+	if (analyticsPointCount.value > INACTIVE_MODE_WARMUP_POINT_LIMIT) {
 		return
 	}
 

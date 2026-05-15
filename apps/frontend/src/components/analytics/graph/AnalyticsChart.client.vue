@@ -130,10 +130,13 @@ let rangeSelectLastSliceIndex: number | null = null
 let isRangeSelecting = false
 let seriesOpacityAnimationFrame: number | null = null
 let currentDatasetOpacities: number[] = []
+let suppressGeometryEmit = false
+let lastGeometryPayload: AnalyticsChartGeometryPayload | null = null
 
 const geometryPlugin = {
 	id: 'analytics-chart-geometry',
 	afterLayout(chart: Chart) {
+		if (suppressGeometryEmit) return
 		emitChartGeometry(chart)
 	},
 }
@@ -178,7 +181,7 @@ function emitChartGeometry(chart: Chart | null = chartInstance) {
 		return
 	}
 
-	emit('geometry', {
+	const payload = {
 		left: chartArea.left,
 		right: chartArea.right,
 		top: chartArea.top,
@@ -188,7 +191,13 @@ function emitChartGeometry(chart: Chart | null = chartInstance) {
 		xPositions: props.labels
 			.map((_, index) => chart.scales.x.getPixelForValue(index))
 			.filter((x) => Number.isFinite(x)),
-	})
+	}
+	if (areChartGeometryPayloadsEqual(lastGeometryPayload, payload)) {
+		return
+	}
+
+	lastGeometryPayload = payload
+	emit('geometry', payload)
 }
 
 function getPinnedActiveElements(sliceIndex: number) {
@@ -251,6 +260,32 @@ function updateRangeSelection(sliceIndex: number) {
 
 function clearRangeSelection() {
 	rangeSelection.visible = false
+}
+
+function areChartGeometryPayloadsEqual(
+	left: AnalyticsChartGeometryPayload | null,
+	right: AnalyticsChartGeometryPayload,
+): boolean {
+	if (!left) return false
+	if (
+		left.left !== right.left ||
+		left.right !== right.right ||
+		left.top !== right.top ||
+		left.bottom !== right.bottom ||
+		left.width !== right.width ||
+		left.height !== right.height ||
+		left.xPositions.length !== right.xPositions.length
+	) {
+		return false
+	}
+
+	for (let index = 0; index < left.xPositions.length; index++) {
+		if (left.xPositions[index] !== right.xPositions[index]) {
+			return false
+		}
+	}
+
+	return true
 }
 
 function getPinnedTooltipPosition(sliceIndex: number) {
@@ -408,6 +443,17 @@ function syncDatasetOpacitiesToTargets() {
 	currentDatasetOpacities = getTargetDatasetOpacities()
 }
 
+function updateChartWithoutGeometry() {
+	if (!chartInstance) return
+
+	suppressGeometryEmit = true
+	try {
+		chartInstance.update('none')
+	} finally {
+		suppressGeometryEmit = false
+	}
+}
+
 function applySeriesHoverState() {
 	if (!chartInstance) return
 
@@ -429,7 +475,7 @@ function applySeriesHoverState() {
 		})
 	})
 
-	chartInstance.update('none')
+	updateChartWithoutGeometry()
 }
 
 function easeSeriesOpacityTransition(progress: number) {
@@ -527,6 +573,7 @@ function buildConfig(): ChartConfiguration {
 			responsive: true,
 			maintainAspectRatio: false,
 			animation: false,
+			normalized: true,
 			events: getChartEvents(),
 			interaction: {
 				mode: 'index',
@@ -635,8 +682,7 @@ function applyPinnedSliceState() {
 	chartInstance.setActiveElements(
 		props.pinnedSliceIndex === null ? [] : getPinnedActiveElements(props.pinnedSliceIndex),
 	)
-	chartInstance.update('none')
-	emitChartGeometry()
+	updateChartWithoutGeometry()
 }
 
 function handleCanvasLeave() {
@@ -794,7 +840,6 @@ watch(
 	() => {
 		refreshChart()
 	},
-	{ deep: true },
 )
 
 watch(
