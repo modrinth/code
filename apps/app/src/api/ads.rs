@@ -11,6 +11,7 @@ use tokio::sync::RwLock;
 pub struct AdsState {
     pub shown: bool,
     pub modal_shown: bool,
+    pub occluded: bool,
     pub last_click: Option<Instant>,
     pub malicious_origins: HashSet<String>,
 }
@@ -60,8 +61,8 @@ fn configure_ads_cookie_settings(
     core_webview2: &webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2,
 ) {
     use webview2_com::Microsoft::Web::WebView2::Win32::{
-        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE, ICoreWebView2,
-        ICoreWebView2_13, ICoreWebView2Profile3,
+        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE, ICoreWebView2_13,
+        ICoreWebView2Profile3,
     };
     use windows_core::Interface;
 
@@ -119,7 +120,55 @@ fn set_webview_visible_for_window<R: Runtime>(
         .and_then(|window| window.is_minimized().ok())
         .unwrap_or(false);
 
-    set_webview_visible(webview, visible && !is_minimized);
+    let is_occluded = app
+        .state::<RwLock<AdsState>>()
+        .try_read()
+        .map(|state| state.occluded)
+        .unwrap_or(false);
+
+    set_webview_visible(webview, visible && !is_minimized && !is_occluded);
+}
+
+#[cfg(windows)]
+fn compute_ads_webview_occlusion<R: Runtime>(
+    app: &tauri::AppHandle<R>,
+) -> Option<bool> {
+    let main_window = app.get_window("main")?;
+    let webviews = app.webviews();
+    let webview = webviews.get("ads-window")?;
+    let position = webview.position().ok()?;
+    let size = webview.size().ok()?;
+    let hwnd = main_window.hwnd().ok()?;
+
+    Some(crate::api::ads_occlusion_windows::is_ads_webview_occluded(
+        hwnd,
+        position.x,
+        position.y,
+        size.width,
+        size.height,
+    ))
+}
+
+#[cfg(windows)]
+async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
+    let Some(occluded) = compute_ads_webview_occlusion(app) else {
+        return;
+    };
+
+    let state = app.state::<RwLock<AdsState>>();
+    let mut state = state.write().await;
+
+    if state.occluded == occluded {
+        return;
+    }
+
+    state.occluded = occluded;
+    let visible = state.shown && !state.modal_shown;
+    drop(state);
+
+    if let Some(webview) = app.webviews().get("ads-window") {
+        set_webview_visible_for_window(app, webview, visible);
+    }
 }
 
 fn sync_webview_visibility_for_main_window<R: Runtime>(
@@ -140,7 +189,7 @@ fn sync_webview_visibility_for_main_window<R: Runtime>(
         false
     } else {
         match app.state::<RwLock<AdsState>>().try_read() {
-            Ok(state) => state.shown && !state.modal_shown,
+            Ok(state) => state.shown && !state.modal_shown && !state.occluded,
             Err(_) => false,
         }
     };
@@ -173,6 +222,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             app.manage(RwLock::new(AdsState {
                 shown: true,
                 modal_shown: false,
+                occluded: false,
                 last_click: None,
                 malicious_origins: HashSet::new(),
             }));
@@ -221,6 +271,19 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                             &delayed_was_minimized,
                         );
                     });
+                });
+            }
+
+            #[cfg(windows)]
+            {
+                let app_handle = app.clone();
+
+                tauri::async_runtime::spawn(async move {
+                    loop {
+                        sync_ads_occlusion(&app_handle).await;
+
+                        tokio::time::sleep(Duration::from_millis(200)).await;
+                    }
                 });
             }
 

@@ -53,6 +53,12 @@ tauri-plugin-updater = { workspace = true, optional = true }
 
 [target.'cfg(windows)'.dependencies]
 webview2-com.workspace = true
+windows = { workspace = true, features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Dwm",
+  "Win32_Graphics_Gdi",
+  "Win32_UI_WindowsAndMessaging",
+] }
 windows-core.workspace = true
 
 [features]
