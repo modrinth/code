@@ -33,7 +33,7 @@
     "defaultMessage": "Hai selezionato {totalAvailableTags, plural, one {l'unico tag disponibile} =8 {tutti gli # tag disponibili} =11 {tutti gli # tag disponibili} other {tutti i # tag disponibili}}. Questo rende i tag, che servono ad aiutare gli utenti a trovare progetti pertinenti, del tutto inutili. Si prega di selezionare solo i tag pertinenti al tuo progetto."
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "Seleziona tag accurati"
+    "defaultMessage": "Seleziona i tag pertinenti"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "La tua descrizione è lunga {length, plural, one {# carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia chiara e informativa."
@@ -138,37 +138,37 @@
     "defaultMessage": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero avere un solo tag di risoluzione che corrisponda alla loro risoluzione primaria."
   },
   "nags.multiple-resolution-tags.title": {
-    "defaultMessage": "Seleziona risoluzione corretta"
+    "defaultMessage": "Seleziona la risoluzione corretta"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Seleziona le versioni supportate dal tuo server, scegli un pacchetto di mod, o caricane il tuo."
   },
   "nags.select-compatibility.title": {
-    "defaultMessage": "Seleziona compatibilità"
+    "defaultMessage": "Seleziona la compatibilità"
   },
   "nags.select-country.description": {
     "defaultMessage": "Fai sapere ai giocatori in che regione si trova il tuo server."
   },
   "nags.select-country.title": {
-    "defaultMessage": "Seleziona una regione"
+    "defaultMessage": "Seleziona la regione"
   },
   "nags.select-language.description": {
     "defaultMessage": "Indica le lingue supportate dal tuo server."
   },
   "nags.select-language.title": {
-    "defaultMessage": "Seleziona lingue"
+    "defaultMessage": "Seleziona le lingue"
   },
   "nags.select-license.description": {
     "defaultMessage": "Seleziona la licenza sotto cui {type, select, shader {sono} other {è}} distribuit{type, select, mod {a la tua mod} modpack {o il tuo pacchetto di mod} resourcepack {o il tuo pacchetto di risorse} shader {e le tue shader} plugin {o il tuo plugin} datapack {o il tuo pacchetto di dati} other {o il tuo progetto}}."
   },
   "nags.select-license.title": {
-    "defaultMessage": "Scegli una licenza"
+    "defaultMessage": "Seleziona la licenza"
   },
   "nags.select-tags.description": {
     "defaultMessage": "Seleziona i tag che corrispondono al tuo progetto per aiutare gli utenti a trovarlo."
   },
   "nags.select-tags.title": {
-    "defaultMessage": "Seleziona tag"
+    "defaultMessage": "Seleziona i tag"
   },
   "nags.server.title": {
     "defaultMessage": "Vedi impostazioni del server"
@@ -216,16 +216,16 @@
     "defaultMessage": "Hai selezionato {tagCount} tag. Scegline al massimo {maxTagCount} cosicché il tuo server appaia in ricerche rilevanti."
   },
   "nags.too-many-tags-server.title": {
-    "defaultMessage": "Seleziona tag accurati"
+    "defaultMessage": "Seleziona i tag pertinenti"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Hai selezionato {tagCount} tag. Dovresti tenerne al massimo {maxTagCount} per assicurarti che il tuo progetto appaia solo nelle ricerche più rilevanti."
   },
   "nags.too-many-tags.title": {
-    "defaultMessage": "Seleziona tag accurati"
+    "defaultMessage": "Seleziona i tag pertinenti"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "È necessaria almeno un'immagine che mostri il contenuto {type, select, resourcepack {del tuo pacchetto di risorse, a meno che contenga solo audio o traduzioni. Se ciò descrive il tuo pacchetto, seleziona il tag appropriato} shader {delle tue shader} other {del tuo progetto}}."
+    "defaultMessage": "È necessaria almeno un'immagine che mostri il contenuto {type, select, resourcepack {del tuo pacchetto di risorse, a meno che contenga solo audio o traduzioni. In tal caso seleziona il tag appropriato} shader {delle tue shader} other {del tuo progetto}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Carica un'immagine"

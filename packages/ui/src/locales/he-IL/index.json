@@ -596,9 +596,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "נכשל"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "רשום"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "מפקח"
   },
@@ -631,9 +628,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "נכשל"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "מוסתר"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "העתק קוד אל הלוח"

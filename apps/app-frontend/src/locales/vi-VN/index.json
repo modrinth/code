@@ -5,12 +5,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "Không thể kết nối đến máy chủ xác thực"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Thêm máy chủ vào hồ sơ"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Thêm máy chủ vào hồ sơ của bạn"
-  },
   "app.browse.add-to-instance": {
     "message": "Thêm vào hồ sơ"
   },
@@ -29,9 +23,6 @@
   "app.browse.discover-servers": {
     "message": "Khám phá máy chủ"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Tải nội dung này vào hồ sơ"
-  },
   "app.export-modal.description-placeholder": {
     "message": "Thêm miêu tả cho gói modpack..."
   },
@@ -46,9 +37,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Tên modpack"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Chọn tệp và gói để thêm vào gói tài nguyên"
   },
   "app.export-modal.version-number-label": {
     "message": "Phiên bản"

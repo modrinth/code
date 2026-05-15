@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Нет связи с серверами аутентификации"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Добавить сервер в сборку"
-  },
   "app.browse.add-servers-to-instance": {
     "message": "Добавление серверов в сборку"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Добавить в сборку"
   },
   "app.browse.add-to-instance": {
     "message": "Добавить в сборку"
@@ -122,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Уже добавлено"
   },
+  "app.browse.back-to-instance": {
+    "message": "Вернуться к сборке"
+  },
   "app.browse.discover-content": {
     "message": "Поиск проектов"
   },
@@ -131,20 +134,11 @@
   "app.browse.hide-added-servers": {
     "message": "Скрывать добавленные"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Скрывать установленные"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Установка контента в сборку"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Сборки"
   },
-  "app.browse.server.install": {
-    "message": "Установить"
-  },
-  "app.browse.server.installed": {
-    "message": "Установлено"
+  "app.browse.server-instance-content-warning": {
+    "message": "Добавление контента может нарушить совместимость при подключении к серверу. Также весь добавленный контент будет удалён при обновлении содержимого серверной сборки."
   },
   "app.browse.server.installing": {
     "message": "Установка"
@@ -164,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Экспорт сборки"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Добавить «{file}» в экспорт?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Название сборки"
   },
@@ -171,7 +168,7 @@
     "message": "Название сборки"
   },
   "app.export-modal.select-files-label": {
-    "message": "Выберите файлы и папки для экспорта"
+    "message": "Выберите файлы для экспорта"
   },
   "app.export-modal.version-number-label": {
     "message": "Номер версии"
@@ -301,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Обновите {name} до последней версии, чтобы запустить игру."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Этот проект уже установлен"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Вернуться к поиску"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Установка контента в сборку"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Режим разработчика включён."
@@ -692,6 +698,24 @@
   "instance.worlds.world_in_use": {
     "message": "Мир используется"
   },
+  "minecraft-account.add-account": {
+    "message": "Добавить"
+  },
+  "minecraft-account.label": {
+    "message": "Учётная запись Minecraft"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Вход не выполнен"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Удалить"
+  },
+  "minecraft-account.select-account": {
+    "message": "Выберите профиль"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Войти в Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "Управляется сборкой"
   },
@@ -717,7 +741,7 @@
     "message": "Загрузчик управляется сервером"
   },
   "unknown-pack-warning-modal.body": {
-    "message": "Проверяются только файлы, загруженные на Modrinth, в том числе файлы .mrpack."
+    "message": "Файлы любого формата проверены на безопасность, если они загружены на Modrinth (в том числе файлы⠀.mrpack)."
   },
   "unknown-pack-warning-modal.dont-show-again": {
     "message": "Больше не предупреждать"

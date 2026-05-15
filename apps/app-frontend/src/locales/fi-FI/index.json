@@ -5,12 +5,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "Todennuspalvelimiin ei saada yhteyttä"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Lisää palvelin instanssiin"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Lisää palvelimia instanssiisi"
-  },
   "app.browse.add-to-instance": {
     "message": "Lisää instanssiin"
   },
@@ -29,9 +23,6 @@
   "app.browse.discover-servers": {
     "message": "Löydä palvelimia"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Lataa sisältöä instanssiin"
-  },
   "app.export-modal.description-placeholder": {
     "message": "Lisää modipaketin kuvaus..."
   },
@@ -46,9 +37,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modipaketin nimi"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Valitse tiedostot ja kansiot pakettiin"
   },
   "app.export-modal.version-number-label": {
     "message": "Versio numero"

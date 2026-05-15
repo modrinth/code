@@ -890,17 +890,6 @@ impl CachedEntry {
                     }
                 }
 
-                remaining_keys.retain(|x| {
-                    x != &&*row.id
-                        && !row.alias.as_ref().is_some_and(|y| {
-                            if type_.case_sensitive_alias().unwrap_or(true) {
-                                x == y
-                            } else {
-                                y.to_lowercase() == x.to_lowercase()
-                            }
-                        })
-                });
-
                 if let Some(data) = parsed_data {
                     if data.get_type() != type_ {
                         return Err(crate::ErrorKind::OtherError(format!(
@@ -911,6 +900,18 @@ impl CachedEntry {
                         ))
                         .as_error());
                     }
+
+                    remaining_keys.retain(|x| {
+                        x != &&*row.id
+                            && !row.alias.as_ref().is_some_and(|y| {
+                                if type_.case_sensitive_alias().unwrap_or(true)
+                                {
+                                    x == y
+                                } else {
+                                    y.to_lowercase() == x.to_lowercase()
+                                }
+                            })
+                    });
 
                     return_vals.push(Self {
                         id: row.id,

@@ -303,7 +303,7 @@
     "message": "This project is already installed"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "Back to browse"
+    "message": "Back to discover"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Install content to instance"

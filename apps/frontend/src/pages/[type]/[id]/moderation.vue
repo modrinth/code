@@ -1,137 +1,434 @@
 <template>
-	<div v-if="canAccess">
-		<section class="universal-card">
-			<h2>Project status</h2>
-			<Badge :type="project.status" />
-			<p v-if="isApproved(project)">
-				Your project has been approved by the moderators and you may freely change project
-				visibility in
-				<router-link :to="`${getProjectLink(project)}/settings`" class="text-link"
-					>your project's settings</router-link
-				>.
-			</p>
-			<div v-else-if="isUnderReview(project)">
-				<p>
-					Modrinth's team of content moderators work hard to review all submitted projects.
-					Typically, you can expect a new project to be reviewed within 24 to 48 hours. Please keep
-					in mind that larger projects, especially modpacks, may require more time to review.
-					Certain holidays or events may also lead to delays depending on moderator availability.
-					Modrinth's moderators will leave a message below if they have any questions or concerns
-					for you.
-				</p>
-				<p>
-					If your review has taken more than 48 hours, check our
-					<a
-						class="text-link"
-						href="https://support.modrinth.com/en/articles/8793355-modrinth-project-review-times"
-						target="_blank"
+	<template v-if="canAccess">
+		<Admonition
+			v-if="userFacingUiVisible && moderationAdmonition"
+			:type="moderationAdmonition.type"
+			class="mb-4"
+			:header="formatMessage(moderationAdmonition.header)"
+		>
+			<template
+				v-for="(section, index) in moderationAdmonition.body"
+				:key="`moderation-admonition.${project.status}+${project.requested_status ?? 'none'}.body.${index}`"
+			>
+				<p
+					v-if="section.type === 'paragraph' && section.message"
+					class="preserve-lines mb-0 mt-2 leading-tight first:mt-0"
+				>
+					<IntlFormatted
+						:message-id="section.message"
+						:values="{
+							requestedStatus: project.requested_status ?? 'none',
+						}"
 					>
-						support article on review times
-					</a>
-					for moderation delays.
+						<template #rules-link="{ children }">
+							<nuxt-link to="/legal/rules" class="text-link" target="_blank">
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+						<template #terms-link="{ children }">
+							<nuxt-link to="/legal/terms" class="text-link" target="_blank">
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+						<template #visibility-settings-link="{ children }">
+							<router-link :to="`${getProjectLink(project)}/settings#visibility`" class="text-link">
+								<component :is="() => normalizeChildren(children)" />
+							</router-link>
+						</template>
+						<template #emphasis="{ children }">
+							<span class="font-semibold">
+								<component :is="() => normalizeChildren(children)" />
+							</span>
+						</template>
+					</IntlFormatted>
 				</p>
-			</div>
-			<template v-else-if="isRejected(project)">
-				<p>
-					Your project does not currently meet Modrinth's
-					<nuxt-link to="/legal/rules" class="text-link" target="_blank">content rules</nuxt-link>
-					and the moderators have requested you make changes before it can be approved. Read the
-					messages from the moderators below and address their comments before resubmitting.
-				</p>
-				<p class="warning">
-					<IssuesIcon /> Repeated submissions without addressing the moderators' comments may result
-					in an account suspension.
-				</p>
+				<ul
+					v-else-if="section.type === 'bullets'"
+					class="mb-0 mt-2 flex list-disc flex-col gap-1 pl-4 leading-normal first:mt-0"
+				>
+					<li
+						v-for="(message, listIndex) in section.items"
+						:key="`list-item-${index}-${listIndex}`"
+					>
+						<IntlFormatted :message-id="message">
+							<template #rules-link="{ children }">
+								<nuxt-link to="/legal/rules" class="text-link" target="_blank">
+									<component :is="() => normalizeChildren(children)" />
+								</nuxt-link>
+							</template>
+							<template #terms-link="{ children }">
+								<nuxt-link to="/legal/terms" class="text-link" target="_blank">
+									<component :is="() => normalizeChildren(children)" />
+								</nuxt-link>
+							</template>
+						</IntlFormatted>
+					</li>
+				</ul>
 			</template>
-			<h3>Current visibility</h3>
-			<ul class="visibility-info">
-				<li v-if="isListed(project)">
-					<CheckIcon class="good" />
-					Listed in search results
-				</li>
-				<li v-else>
-					<XIcon class="bad" />
-					Not listed in search results
-				</li>
-				<li v-if="isListed(project)">
-					<CheckIcon class="good" />
-					Listed on the profiles of members
-				</li>
-				<li v-else>
-					<XIcon class="bad" />
-					Not listed on the profiles of members
-				</li>
-				<li v-if="isPrivate(project)">
-					<XIcon class="bad" />
-					Not accessible with a direct link
-				</li>
-				<li v-else>
-					<CheckIcon class="good" />
-					Accessible with a direct link
-				</li>
-			</ul>
-		</section>
-		<section id="messages" class="universal-card">
-			<h2>Messages</h2>
-			<p>
-				This is a private conversation thread with the Modrinth moderators. They may message you
-				with issues concerning this project. This thread is only checked when you submit your
-				project for review. For additional inquiries, please go to the
-				<a class="text-link" href="https://support.modrinth.com" target="_blank">
-					Modrinth Help Center
-				</a>
-				and click the green bubble to contact support.
-			</p>
-			<p v-if="isApproved(project)" class="warning">
-				<IssuesIcon /> The moderators do not actively monitor this chat. However, they may still see
-				messages here if there is a problem with your project.
-			</p>
+		</Admonition>
+		<div class="card-shadow mb-6 rounded-2xl border border-solid border-surface-4 bg-surface-3">
+			<div class="flex flex-col p-4">
+				<div class="flex items-center justify-between">
+					<h2 id="messages" class="m-0 text-xl font-semibold text-contrast">
+						{{ formatMessage(messages.threadSectionTitle) }}
+					</h2>
+					<div v-if="currentMember?.staffOnly" class="flex items-center gap-2">
+						<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
+						<label for="moderator-see-user-ui-toggle">
+							{{ formatMessage(messages.moderatorSeeUserUiToggle) }}
+						</label>
+					</div>
+				</div>
+				<template v-if="userFacingUiVisible">
+					<p class="m-0 mt-2 leading-tight">
+						{{ formatMessage(messages.threadPrivateDescription) }}
+					</p>
+					<p class="mb-0 mt-3 leading-tight">
+						<IntlFormatted :message-id="messages.threadHelpCenterNote1">
+							<template #help-center-link="{ children }">
+								<a class="text-link" href="https://support.modrinth.com" target="_blank">
+									<component :is="() => normalizeChildren(children)" />
+								</a>
+							</template>
+						</IntlFormatted>
+					</p>
+					<p class="mb-0 mt-2 leading-tight">
+						<IntlFormatted :message-id="messages.threadHelpCenterNote2">
+							<template #help-center-link="{ children }">
+								<a class="text-link" href="https://support.modrinth.com" target="_blank">
+									<component :is="() => normalizeChildren(children)" />
+								</a>
+							</template>
+						</IntlFormatted>
+					</p>
+					<p
+						v-if="isApproved(project)"
+						class="mb-0 mt-3 flex items-center gap-2 font-semibold text-orange"
+					>
+						<IssuesIcon class="shrink-0" />
+						{{ formatMessage(messages.threadApprovedWarning) }}
+					</p>
+				</template>
+			</div>
 			<ConversationThread
 				v-if="thread"
 				:thread="thread"
 				:project="project"
 				:set-status="setStatus"
-				:current-member="currentMember"
+				:current-member="currentMember ?? undefined"
 				:auth="auth"
+				class="overflow-clip rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2"
 				@update-thread="updateThread"
 			/>
-		</section>
-	</div>
+			<div
+				v-else
+				class="flex items-center justify-center gap-2 rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2 py-12"
+			>
+				<template v-if="pending">
+					<SpinnerIcon class="size-5 animate-spin" /> Loading messages
+				</template>
+				<template v-else>
+					<p class="m-0 text-red">Failed to load messages</p>
+				</template>
+			</div>
+		</div>
+	</template>
 </template>
-<script setup>
-import { CheckIcon, IssuesIcon, XIcon } from '@modrinth/assets'
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
+import { IssuesIcon, SpinnerIcon } from '@modrinth/assets'
 import {
-	Badge,
+	Admonition,
+	commonMessages,
+	defineMessage,
+	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	IntlFormatted,
+	type MessageDescriptor,
+	normalizeChildren,
+	Toggle,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, watch } from 'vue'
+import { computed, type Ref, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
-import {
-	getProjectLink,
-	isApproved,
-	isListed,
-	isPrivate,
-	isRejected,
-	isUnderReview,
-} from '~/helpers/projects.js'
+import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
+
+const { formatMessage } = useVIntl()
+const flags = useFeatureFlags()
+
+type ProjectPageMember = Labrinth.Projects.v3.TeamMember & { staffOnly?: boolean }
+type ModerationAdmonitionSection =
+	| {
+			type: 'paragraph'
+			message: MessageDescriptor | null
+	  }
+	| {
+			type: 'bullets'
+			items: MessageDescriptor[]
+	  }
+
+const messages = defineMessages({
+	admonitionRejectedSpamNotice: {
+		id: 'project.moderation.admonition.rejected.spam-notice',
+		defaultMessage:
+			'Repeatedly submitting your project without addressing all moderation concerns first may result in account suspension.',
+	},
+	threadSectionTitle: {
+		id: 'project.moderation.thread.title',
+		defaultMessage: 'Moderation messages',
+	},
+	moderatorSeeUserUiToggle: {
+		id: 'project.moderation.thread.moderator-see-user-ui-toggle',
+		defaultMessage: 'Show member UI',
+	},
+	threadPrivateDescription: {
+		id: 'project.moderation.thread.private-description',
+		defaultMessage:
+			'This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project.',
+	},
+	threadHelpCenterNote1: {
+		id: 'project.moderation.thread.help-center-note.1',
+		defaultMessage:
+			'Content moderators cannot provide support for most issues and messages to this thread do not notify staff.',
+	},
+	threadHelpCenterNote2: {
+		id: 'project.moderation.thread.help-center-note.2',
+		defaultMessage:
+			'If you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support.',
+	},
+	threadApprovedWarning: {
+		id: 'project.moderation.thread.approved-warning',
+		defaultMessage:
+			'This thread is not actively monitored, but may be reviewed for information about your project if needed.',
+	},
+	approvedProjectVisibilityMessage: {
+		id: 'project.moderation.admonition.approved.body.visibility-message',
+		defaultMessage:
+			"You can change the visibility of your project in your project's <visibility-settings-link>visibility settings</visibility-settings-link>.",
+	},
+})
 
 const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, invalidate } = injectProjectPageContext()
+const {
+	projectV2: project,
+	currentMember: currentMemberRaw,
+	invalidate,
+	allMembers,
+} = injectProjectPageContext()
+const currentMember = currentMemberRaw as Ref<ProjectPageMember | null>
 
 const canAccess = computed(() => !!currentMember.value)
+const userFacingUiVisible = computed(
+	() => !!currentMember.value && (!currentMember.value.staffOnly || moderatorSeeUserUi.value),
+)
+
+const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
+	switch (project.value?.status) {
+		case 'approved':
+		case 'archived':
+			return defineMessage({
+				id: 'project.moderation.admonition.approved.body.public',
+				defaultMessage: 'Your project is published and discoverable on Modrinth.',
+			})
+		case 'unlisted':
+			return defineMessage({
+				id: 'project.moderation.admonition.approved.body.unlisted',
+				defaultMessage:
+					'Your project is unlisted, meaning it can only be accessed with a direct link and is not discoverable on Modrinth.',
+			})
+
+		case 'private':
+			return defineMessage({
+				id: 'project.moderation.admonition.approved.body.private',
+				defaultMessage:
+					'Your project is private, meaning it can only be accessed by you and people you invite.',
+			})
+		default:
+			return null
+	}
+})
+
+const moderationAdmonition = computed<{
+	type: InstanceType<typeof Admonition>['type']
+	header: MessageDescriptor
+	body: ModerationAdmonitionSection[]
+} | null>(() => {
+	const currentProject = project.value
+
+	if (currentProject.status === 'draft') {
+		return {
+			type: 'info',
+			header: defineMessage({
+				id: 'project.moderation.admonition.draft.header',
+				defaultMessage: 'Draft project',
+			}),
+			body: [
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.draft.body',
+						defaultMessage:
+							"This is a draft project that cannot be seen by others until submitted for review and approved by Modrinth's moderation team.",
+					}),
+				},
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.draft.submit-for-review',
+						defaultMessage:
+							"Once you have completed all required steps and ensured your project complies with Modrinth's <rules-link>Content Rules</rules-link> you can submit your project for review.",
+					}),
+				},
+			],
+		}
+	}
+
+	if (isApproved(currentProject) && approvedAdmonitionMessage.value) {
+		return {
+			type: 'success',
+			header: defineMessage({
+				id: 'project.moderation.admonition.approved.header',
+				defaultMessage: 'Project approved',
+			}),
+			body: [
+				{
+					type: 'paragraph',
+					message: approvedAdmonitionMessage.value,
+				},
+				{
+					type: 'paragraph',
+					message: messages.approvedProjectVisibilityMessage,
+				},
+			],
+		}
+	}
+
+	if (isUnderReview(currentProject)) {
+		return {
+			type: 'moderation',
+			header: defineMessage({
+				id: 'project.moderation.admonition.under-review.header',
+				defaultMessage: 'Project under review',
+			}),
+			body: [
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.under-review.body.1',
+						defaultMessage:
+							"Your project is in queue to be reviewed by Modrinth's moderation team.",
+					}),
+				},
+				{
+					type: 'bullets',
+					items: [
+						defineMessage({
+							id: 'project.moderation.admonition.under-review.body.2',
+							defaultMessage:
+								"Your project will be scanned and then reviewed by human moderators to ensure it meets Modrinth's <rules-link>Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>.",
+						}),
+						defineMessage({
+							id: 'project.moderation.admonition.under-review.body.3',
+							defaultMessage:
+								"You can still modify your project, it won't affect your position in the queue.",
+						}),
+						defineMessage({
+							id: 'project.moderation.admonition.under-review.body.4',
+							defaultMessage:
+								'We aim to review submissions in 24-48 hours, but some projects may face delays. This does not reflect an issue with your submission.',
+						}),
+					],
+				},
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.under-review.body.5',
+						defaultMessage:
+							'<emphasis>We appreciate your patience while our moderators work hard to keep Modrinth safe, and look forward to helping you share your content! 💚</emphasis>',
+					}),
+				},
+			],
+		}
+	}
+
+	if (currentProject.status === 'withheld') {
+		return {
+			type: 'warning',
+			header: defineMessage({
+				id: 'project.moderation.admonition.withheld.header',
+				defaultMessage: 'Unlisted by staff',
+			}),
+			body: [
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.withheld.body',
+						defaultMessage:
+							'Your project will not appear publicly and can only be accessed with a direct link.{requestedStatus, select, unlisted { Based on your selected <visibility-settings-link>visibility settings</visibility-settings-link>, most likely no action is necessary.} other { Please address all moderation concerns, including any issues listed in messages below before resubmitting this project.}}',
+					}),
+				},
+				{
+					type: 'paragraph',
+					message: messages.admonitionRejectedSpamNotice,
+				},
+			],
+		}
+	}
+
+	if (isRejected(currentProject)) {
+		return {
+			type: 'critical',
+			header: defineMessage({
+				id: 'project.moderation.admonition.rejected.header',
+				defaultMessage: 'Changes requested',
+			}),
+			body: [
+				{
+					type: 'paragraph',
+					message: defineMessage({
+						id: 'project.moderation.admonition.rejected.address-all-concerns',
+						defaultMessage:
+							'Please address all moderation concerns, including any issues listed in messages below, before resubmitting this project.',
+					}),
+				},
+				{
+					type: 'paragraph',
+					message: messages.admonitionRejectedSpamNotice,
+				},
+			],
+		}
+	}
+
+	return null
+})
+
+const moderatorSeeUserUi = computed<boolean>({
+	get() {
+		return flags.value.showModeratorProjectMemberUi
+	},
+	set(value: boolean) {
+		flags.value.showModeratorProjectMemberUi = value
+		saveFeatureFlags()
+	},
+})
 
 watch(
-	[currentMember, project],
+	[currentMember, allMembers],
 	() => {
-		if (project.value && !canAccess.value) {
+		if (allMembers.value.length > 0 && !canAccess.value) {
 			showError({
 				fatal: true,
 				statusCode: 401,
-				statusMessage: 'Unauthorized',
+				statusMessage: formatMessage(
+					defineMessage({
+						id: 'project.moderation.error.unauthorized',
+						defaultMessage: 'Unauthorized',
+					}),
+				),
 			})
 		}
 	},
@@ -142,20 +439,23 @@ const auth = await useAuth()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
-const { data: thread } = useQuery({
+const { data: thread, isPending: pending } = useQuery({
 	queryKey: computed(() => ['thread', project.value?.thread_id]),
 	queryFn: () => client.labrinth.threads_v3.getThread(project.value.thread_id),
 	enabled: computed(() => !!project.value?.thread_id),
 })
 
-function updateThread(newThread) {
+function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) {
 	const threadId = newThread?.id ?? project.value?.thread_id
 	if (!threadId) return
 
-	queryClient.setQueryData(['thread', threadId], newThread)
+	queryClient.setQueryData<Labrinth.Threads.v3.Thread | null | undefined>(
+		['thread', threadId],
+		newThread,
+	)
 }
 
-async function setStatus(status) {
+async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 	startLoading()
 
 	try {
@@ -166,69 +466,21 @@ async function setStatus(status) {
 		await queryClient.invalidateQueries({ queryKey: ['thread', project.value?.thread_id] })
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: getErrorDescription(err),
 			type: 'error',
 		})
 	}
 
 	stopLoading()
 }
+
+function getErrorDescription(err: unknown): string {
+	if (typeof err === 'object' && err !== null && 'data' in err) {
+		const data = (err as { data?: { description?: string } }).data
+		if (data?.description) return data.description
+	}
+
+	return err instanceof Error ? err.message : String(err)
+}
 </script>
-<style lang="scss" scoped>
-.stacked {
-	display: flex;
-	flex-direction: column;
-}
-
-.status-message {
-	:deep(.badge) {
-		display: contents;
-
-		svg {
-			vertical-align: top;
-			margin: 0;
-		}
-	}
-
-	p:last-child {
-		margin-bottom: 0;
-	}
-}
-
-.unavailable-error {
-	.code {
-		margin-top: var(--spacing-card-sm);
-	}
-
-	svg {
-		vertical-align: top;
-	}
-}
-
-.visibility-info {
-	padding: 0;
-	list-style: none;
-
-	li {
-		display: flex;
-		align-items: center;
-		gap: var(--spacing-card-xs);
-	}
-}
-
-svg {
-	&.good {
-		color: var(--color-green);
-	}
-
-	&.bad {
-		color: var(--color-red);
-	}
-}
-
-.warning {
-	color: var(--color-orange);
-	font-weight: bold;
-}
-</style>

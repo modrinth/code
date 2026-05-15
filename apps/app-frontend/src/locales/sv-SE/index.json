@@ -1,15 +1,21 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Laddar ner Java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Nedladdningar"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Färgtema"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecrafts autentiseringsservrar kan vara nere just nu. Kontrollera din internetanslutning och försök igen senare."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ej nå autentiseringsservrarna"
-  },
-  "app.browse.add-server-to-instance": {
-    "message": "Lägg till server till instans"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Lägg till servrar till din instans"
   },
   "app.browse.add-to-instance": {
     "message": "Lägg till i instans"
@@ -29,17 +35,8 @@
   "app.browse.discover-servers": {
     "message": "Upptäck servrar"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Installera innehåll till instans"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modpaket"
-  },
-  "app.browse.server.install": {
-    "message": "Installera"
-  },
-  "app.browse.server.installed": {
-    "message": "Installerad"
   },
   "app.browse.server.installing": {
     "message": "Installerar"
@@ -58,9 +55,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpaketets namn"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Välj filer och mappar att inkludera i paketet"
   },
   "app.export-modal.version-number-label": {
     "message": "Versionsnummer"

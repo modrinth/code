@@ -5,12 +5,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "Připojení k autorizačním serverům se nezdařilo"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Přidat server do instance"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Přidat servery do instance"
-  },
   "app.browse.add-to-instance": {
     "message": "Přidat do instalace"
   },
@@ -29,9 +23,6 @@
   "app.browse.discover-servers": {
     "message": "Prozkoumat servery"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Nainstalovat obsah do instnce"
-  },
   "app.export-modal.description-placeholder": {
     "message": "Přidej popis modpacku..."
   },
@@ -46,9 +37,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Jméno modpacku"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Vybrat soubory a složky co zahrnout do modpacku"
   },
   "app.export-modal.version-number-label": {
     "message": "Číslo verze"

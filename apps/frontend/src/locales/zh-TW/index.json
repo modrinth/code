@@ -1229,6 +1229,24 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "請填寫稅務表單"
   },
+  "discover.install.back-to-server": {
+    "message": "回到伺服器"
+  },
+  "discover.install.back-to-setup": {
+    "message": "回到設定"
+  },
+  "discover.install.cancel-reset": {
+    "message": "取消重設"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "沒有可安裝的伺服器世界。"
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "無法從瀏覽頁面將這類內容類型安裝至伺服器。"
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "在重設後選擇要安裝的模組包"
+  },
   "error.collection.404.list_item.1": {
     "message": "你可能輸錯了該收藏的網址。"
   },
@@ -1243,6 +1261,12 @@
   },
   "error.collection.404.title": {
     "message": "找不到收藏"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "你目前登入的帳號："
+  },
+  "error.generic.401.title": {
+    "message": "你沒有這個頁面的存取權"
   },
   "error.generic.404.subtitle": {
     "message": "你要找的頁面似乎不存在。"
@@ -1670,6 +1694,9 @@
   "layout.action.create-new": {
     "message": "新增..."
   },
+  "layout.action.external-projects": {
+    "message": "外部專案"
+  },
   "layout.action.file-lookup": {
     "message": "檔案查詢"
   },
@@ -1921,6 +1948,9 @@
   },
   "moderation.moderate": {
     "message": "管理"
+  },
+  "moderation.page.external-projects": {
+    "message": "外部專案"
   },
   "moderation.page.projects": {
     "message": "專案"
@@ -2615,6 +2645,45 @@
   "project.settings.general.url.title": {
     "message": "網址"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "請提供證明，以確認你擁有重新發布下列所有檔案的權限；此外，任何遭保留的版本都將自動發布。"
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "在提交專案進行審查之前，請先提供你擁有下列所有檔案重新發布權限的證明。"
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "未知的嵌入內容"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "所有外部內容均已標明出處。"
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "出處標註已完成！"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "你的所有版本皆不含外部內容，因此無需擔心取得授權的問題。"
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "一切就緒！"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "你上傳的部分外部內容不具備重新發布權限。如要在 Modrinth 上發布，請移除侵權內容。"
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "部分內容無法包含在內"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "如果你包含的內容並非託管於 Modrinth，你需要告知我們其來源，並確認你擁有重新發布這些檔案的權限。請參閱我們的<link>指南</link>以了解如何正確處理！"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "了解引用標註的處理方式"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "了解更多"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "搜尋 {count} 個外部專案..."
+  },
   "project.settings.title": {
     "message": "設定"
   },
@@ -2632,6 +2701,15 @@
   },
   "project.versions.title": {
     "message": "版本"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {這個版本} other {這些版本}}目前被扣留且不公開。請提供你擁有轉載該模組包版本中特定檔案的許可證明。"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "解決"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {版本 {version_name}} other {版本}}因未知的嵌入內容而被扣留"
   },
   "report.already-reported": {
     "message": "你已檢舉 {title}"

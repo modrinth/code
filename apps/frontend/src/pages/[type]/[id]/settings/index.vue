@@ -230,7 +230,7 @@
 						/>
 					</div>
 				</template>
-				<div>
+				<div id="visibility">
 					<label>
 						<span class="label__title">Visibility</span>
 					</label>
@@ -242,36 +242,6 @@
 							:disabled="!hasPermission"
 							:max-height="500"
 						/>
-						<div>If approved by the moderators:</div>
-						<ul class="visibility-info m-0">
-							<li>
-								<CheckIcon
-									v-if="visibility === 'approved' || visibility === 'archived'"
-									class="good"
-								/>
-								<XIcon v-else class="bad" />
-								{{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible in search
-							</li>
-							<li>
-								<XIcon v-if="visibility === 'unlisted' || visibility === 'private'" class="bad" />
-								<CheckIcon v-else class="good" />
-								{{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible on profile
-							</li>
-							<li>
-								<CheckIcon v-if="visibility !== 'private'" class="good" />
-								<IssuesIcon
-									v-else
-									v-tooltip="{
-										content:
-											visibility === 'private'
-												? 'Only members will be able to view the project.'
-												: '',
-									}"
-									class="warn"
-								/>
-								{{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible via URL
-							</li>
-						</ul>
 					</div>
 				</div>
 			</div>
@@ -360,16 +330,7 @@
 </template>
 
 <script setup>
-import {
-	CheckIcon,
-	ImageIcon,
-	IssuesIcon,
-	ScaleIcon,
-	TrashIcon,
-	TriangleAlertIcon,
-	UploadIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { ImageIcon, ScaleIcon, TrashIcon, TriangleAlertIcon, UploadIcon } from '@modrinth/assets'
 import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
@@ -603,14 +564,6 @@ async function updateMonetizationStatus(status) {
 	} finally {
 		loadingModeratorMonetization.value = false
 	}
-}
-
-const hasModifiedVisibility = () => {
-	const originalVisibility = tags.value.approvedStatuses.includes(project.value.status)
-		? project.value.status
-		: project.value.requested_status
-
-	return originalVisibility !== visibility.value
 }
 
 async function handleSave() {

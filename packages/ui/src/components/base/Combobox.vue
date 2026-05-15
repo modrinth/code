@@ -28,7 +28,8 @@
 				class="relative z-[1]"
 				@input="handleSearchInput"
 				@keydown="handleSearchKeydown"
-				@focus="handleSearchFocus"
+				@focusin="handleSearchFocus"
+				@focusout="handleSearchFocusout"
 				@click="handleSearchClick"
 			>
 				<template v-if="showChevron" #right>
@@ -90,7 +91,7 @@
 				leave-to-class="opacity-0"
 			>
 				<div
-					v-if="isOpen"
+					v-if="shouldRenderDropdown"
 					ref="dropdownRef"
 					class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 border border-solid border-surface-5"
 					:class="[
@@ -122,6 +123,7 @@
 								class="group/option flex items-center gap-2.5 cursor-pointer rounded-xl p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
 								:class="getOptionClasses(item, index)"
 								tabindex="-1"
+								@mousedown.prevent
 								@click="handleOptionClick(item, index)"
 								@mouseenter="handleOptionMouseEnter(item, index)"
 							>
@@ -225,12 +227,15 @@ const props = withDefaults(
 		showIconInSelected?: boolean
 		maxHeight?: number
 		displayValue?: string
+		searchValue?: string
 		triggerClass?: string
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
 		/** Keep the selected option's label in the input after selection, and show all options on focus */
 		syncWithSelection?: boolean
+		/** Select the searchable input text when the field receives focus */
+		selectSearchTextOnFocus?: boolean
 		/** Show a search icon in the searchable input */
 		showSearchIcon?: boolean
 	}>(),
@@ -245,6 +250,7 @@ const props = withDefaults(
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		noOptionsMessage: 'No results found',
 		syncWithSelection: true,
+		selectSearchTextOnFocus: false,
 		showSearchIcon: false,
 	},
 )
@@ -256,6 +262,7 @@ const emit = defineEmits<{
 	open: []
 	close: []
 	searchInput: [query: string]
+	searchBlur: [query: string]
 }>()
 
 const slots = useSlots()
@@ -335,6 +342,14 @@ const filteredOptions = computed(() => {
 		if (opt.searchTerms?.some((term) => term.toLowerCase().includes(query))) return true
 		return false
 	})
+})
+
+const hasDropdownContent = computed(() => {
+	return filteredOptions.value.length > 0 || !!searchQuery.value || !!slots['dropdown-footer']
+})
+
+const shouldRenderDropdown = computed(() => {
+	return isOpen.value && hasDropdownContent.value
 })
 
 function getOptionClasses(item: ComboboxOption<T> & { key: string }, index: number) {
@@ -432,7 +447,7 @@ async function updateDropdownPosition() {
 }
 
 async function openDropdown() {
-	if (props.disabled || isOpen.value) return
+	if (props.disabled || isOpen.value || !hasDropdownContent.value) return
 
 	isOpen.value = true
 	emit('open')
@@ -503,15 +518,20 @@ function handleOptionMouseEnter(option: ComboboxOption<T>, index: number) {
 
 function findNextFocusableOption(currentIndex: number, direction: 'next' | 'previous'): number {
 	const length = filteredOptions.value.length
+	if (length === 0) return -1
+
 	let index = currentIndex
-	let option
 
-	do {
+	for (let i = 0; i < length; i++) {
 		index = direction === 'next' ? (index + 1) % length : (index - 1 + length) % length
-		option = filteredOptions.value[index]
-	} while (isDivider(option) || option.disabled)
+		const option = filteredOptions.value[index]
 
-	return index
+		if (!isDivider(option) && !option.disabled) {
+			return index
+		}
+	}
+
+	return -1
 }
 
 function focusOption(index: number) {
@@ -627,10 +647,31 @@ function handleSearchInput() {
 	}
 }
 
-function handleSearchFocus() {
+function handleSearchFocus(event: FocusEvent) {
+	const target = event.target
+	if (props.selectSearchTextOnFocus && target instanceof HTMLInputElement) {
+		window.setTimeout(() => {
+			if (document.activeElement === target) {
+				target.select()
+			}
+		})
+	}
+
 	if (!isOpen.value) {
 		openDropdown()
 	}
+}
+
+function handleSearchFocusout(event: FocusEvent) {
+	const nextTarget = event.relatedTarget
+	if (nextTarget instanceof Node && containerRef.value?.contains(nextTarget)) return
+	if (nextTarget instanceof Node && dropdownRef.value?.contains(nextTarget)) return
+
+	emit('searchBlur', searchQuery.value)
+	if (props.searchValue !== undefined) {
+		searchQuery.value = props.searchValue
+	}
+	closeDropdown()
 }
 
 function handleSearchClick() {
@@ -683,9 +724,21 @@ watch(isOpen, (value) => {
 	}
 })
 
+watch(shouldRenderDropdown, (value) => {
+	if (value) {
+		updateDropdownPosition()
+	}
+})
+
 watch(filteredOptions, () => {
 	if (isOpen.value) {
 		updateDropdownPosition()
+	}
+})
+
+watch(hasDropdownContent, (value) => {
+	if (!value && isOpen.value) {
+		closeDropdown()
 	}
 })
 

@@ -5,12 +5,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "Serveri za autentifikaciju su nedostupni"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Dodaj server na instancu"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Dodaj servere na tvoju instancu"
-  },
   "app.browse.add-to-instance": {
     "message": "Dodaj na instancu"
   },
@@ -29,9 +23,6 @@
   "app.browse.discover-servers": {
     "message": "Otkrij servere"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Instaliraj sadržaj na instancu"
-  },
   "app.export-modal.description-placeholder": {
     "message": "Ukucaj opis modpacka..."
   },
@@ -46,9 +37,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Ime modpacka"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Izaberi fajlove i foldere da uključiš u pack"
   },
   "app.export-modal.version-number-label": {
     "message": "Broj verzije"

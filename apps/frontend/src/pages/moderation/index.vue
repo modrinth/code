@@ -462,7 +462,7 @@ const emptyStateDescription = computed(() => {
 		return 'Check that your search query is correct!'
 	}
 	if (currentFilterType.value !== DEFAULT_FILTER_TYPE) {
-		return `There are no ${currentFilterType.value.toLowerCase()} in the queue`
+		return `There are no ${currentFilterType.value.toLowerCase()} in the queue.`
 	}
 	return 'you will probably never see this but if you do, congrats!!! :D'
 })

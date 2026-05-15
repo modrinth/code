@@ -95,8 +95,29 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Opnieuw abonneren op de server"
   },
+  "browse.no-results": {
+    "defaultMessage": "Er zijn geen resultaten gevonden voor uw zoekopdracht!"
+  },
+  "browse.offline": {
+    "defaultMessage": "U bent momenteel offline. Verbind met internet om verder te gaan op Modrinth!"
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Geselecteerde projecten"
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Geselecteerde projecten zijn nog niet geïnstalleerd"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Weggooien"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Bekijk:"
+  },
   "button.accept": {
     "defaultMessage": "Accepteer"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Voeg server toevoegen aan instantie"
   },
   "button.affiliate-links": {
     "defaultMessage": "Affiliatelinks"
@@ -167,6 +188,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Verberg snapshots"
   },
+  "button.install": {
+    "defaultMessage": "Installeer"
+  },
   "button.max": {
     "defaultMessage": "Max"
   },
@@ -184,6 +208,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Open in map"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Open in Modrinth"
   },
   "button.play": {
     "defaultMessage": "Speel"
@@ -277,6 +304,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "Prive"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Selecteer {project}"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Weet u zeker dat u {count, plural, one {# project} other {# projects}} wilt updaten naar de nieuwste compatibele versie? Het wordt aanbevolen om de inhoud één voor één te updaten."
@@ -487,6 +517,39 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} geselecteerd"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "Maak instantie"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "Maak wereld"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Klaar"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "Importeren"
+  },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "Stel server in"
+  },
+  "creation-flow.modal.custom-setup.build-number.label": {
+    "defaultMessage": "Bouw nummer"
+  },
+  "creation-flow.modal.custom-setup.build-number.placeholder": {
+    "defaultMessage": "Selecteer bouw nummer"
+  },
+  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
+    "defaultMessage": "Zoek bouw nummer..."
+  },
+  "creation-flow.modal.custom-setup.game-version.placeholder": {
+    "defaultMessage": "Selecteer game versie"
+  },
+  "creation-flow.modal.final-config.gamemode.creative": {
+    "defaultMessage": "Creatief"
+  },
+  "creation-flow.modal.final-config.gamemode.hardcore": {
+    "defaultMessage": "Hardcore"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Samenvatting"
@@ -1700,9 +1763,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Mislukt"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Publiek"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Toezichthouder"
   },
@@ -1738,9 +1798,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Gefaald"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Weerhouden"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopieer code naar klembord"

@@ -468,6 +468,10 @@ export namespace Labrinth {
 				monetization_status: MonetizationStatus
 			}
 
+			export type ProjectCheckResponse = {
+				id: string
+			}
+
 			export type SearchResultHit = {
 				project_id: string
 				project_type: ProjectType

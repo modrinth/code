@@ -95,7 +95,7 @@ function toggleItem(item: T) {
 		background-color: var(--color-brand-highlight);
 		box-shadow:
 			inset 0 0 0 transparent,
-			0 0 0 2px var(--color-brand);
+			0 0 0 1px var(--color-brand);
 	}
 }
 </style>

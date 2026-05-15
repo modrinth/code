@@ -1229,6 +1229,24 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "请完成税务表格"
   },
+  "discover.install.back-to-server": {
+    "message": "返回服务器"
+  },
+  "discover.install.back-to-setup": {
+    "message": "返回设置"
+  },
+  "discover.install.cancel-reset": {
+    "message": "取消重置"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "没有可供安装的服务器世界。"
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "无法通过浏览将此内容类型安装到服务器。"
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "重置后选择要安装的 modpack"
+  },
   "error.collection.404.list_item.1": {
     "message": "你可能输错了收藏夹的连接。"
   },
@@ -1243,6 +1261,12 @@
   },
   "error.collection.404.title": {
     "message": "未找到收藏夹"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "你目前登录的账号："
+  },
+  "error.generic.401.title": {
+    "message": "你没有该页面的访问权限"
   },
   "error.generic.404.subtitle": {
     "message": "你在找的页面似乎不存在。"
@@ -1670,6 +1694,9 @@
   "layout.action.create-new": {
     "message": "新建…"
   },
+  "layout.action.external-projects": {
+    "message": "外部项目"
+  },
   "layout.action.file-lookup": {
     "message": "文件查询"
   },
@@ -1921,6 +1948,9 @@
   },
   "moderation.moderate": {
     "message": "审核"
+  },
+  "moderation.page.external-projects": {
+    "message": "外部项目"
   },
   "moderation.page.projects": {
     "message": "项目"
@@ -2615,6 +2645,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "请提供证明你拥有重新分发以下所有文件的权限，任何未提供的版本将被自动发布。"
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "在提交项目以供审查之前，请提供证明你有权重新分发以下所有文件。"
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "未知的嵌入内容"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "所有外部内容均已注明出处。"
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "署名完成！"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "你的所有版本都不包含外部内容，因此无需担心存在权限问题。"
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "搞定啦！"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "你没有权限重新分发你添加的部分外部内容。为了在 Modrinth 上发布，请移除侵权内容。"
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "某些内容无法被包含"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "如果你使用了非 Modrinth 托管的内容，你需要告知我们这些内容的来源，并证明你有权分发这些文件。请查阅 <link>我们的指南</link> 了解如何正确操作！"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "了解署名机制的工作原理"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "了解详情"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "搜索 {count} 个外部项目……"
+  },
   "project.settings.title": {
     "message": "设置"
   },
@@ -2632,6 +2701,15 @@
   },
   "project.versions.title": {
     "message": "版本"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {此版本已保留且未公开列出。} other {这些版本已保留且未公开列出。}} 请提供证明，证明你有权重新分发该模组包{count, plural, one {版本} other {各版本}}中包含的某些文件。"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "完成"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {版本 {version_name}} other {这些版本}} 因未知嵌入内容被保留"
   },
   "report.already-reported": {
     "message": "你已举报过 {title}"
@@ -3001,6 +3079,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "跟随服务器"
+  },
+  "servers.manage.content.title": {
+    "message": "内容 - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "操作"
