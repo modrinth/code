@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { createContext, injectModrinthClient, type ProjectPageContext } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 
 import {
@@ -51,6 +51,10 @@ export type {
 const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
 const ANALYTICS_START_TIMESTAMP = '2023-01-01T00:00:00.000Z'
 const ANALYTICS_START_TIME = new Date(ANALYTICS_START_TIMESTAMP).getTime()
+const REVENUE_GROUP_BY_FALLBACK: AnalyticsGroupByPreset = 'day'
+const REVENUE_MIN_TIMEFRAME_MS = 2 * 24 * 60 * 60 * 1000 // need at least 2 days in timeframe range to show revenue
+const ANALYTICS_DAY_MS = 24 * 60 * 60 * 1000
+const ANALYTICS_MAX_TIME_SLICES = 256 // controls granularity allowed in "group by" for timeframe ranges
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -234,6 +238,136 @@ function areAnalyticsFetchRequestsEqual(
 	right: Labrinth.Analytics.v3.FetchRequest,
 ): boolean {
 	return JSON.stringify(left) === JSON.stringify(right)
+}
+
+function buildAnalyticsCurrentTimeSlicesQueryKey(
+	userId: string | undefined,
+	nextFetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+) {
+	return ['analytics', 'dashboard', userId, 'current', nextFetchRequest]
+}
+
+function isRevenueHourlyGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
+	return groupBy === '1h' || groupBy === '6h'
+}
+
+function buildDailyAnalyticsFetchRequest(
+	nextFetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+): Labrinth.Analytics.v3.FetchRequest | null {
+	if (!isAnalyticsFetchRequestReady(nextFetchRequest)) {
+		return null
+	}
+
+	const startTime = new Date(nextFetchRequest.time_range.start).getTime()
+	const endTime = new Date(nextFetchRequest.time_range.end).getTime()
+	const durationMs = endTime - startTime
+	if (!Number.isFinite(durationMs) || durationMs <= 0) {
+		return null
+	}
+
+	const desiredSlices = Math.max(1, Math.floor(durationMs / ANALYTICS_DAY_MS))
+
+	return {
+		...nextFetchRequest,
+		time_range: {
+			...nextFetchRequest.time_range,
+			resolution: {
+				slices: Math.min(ANALYTICS_MAX_TIME_SLICES, desiredSlices),
+			},
+		},
+	}
+}
+
+function addAnalyticsDays(date: Date, days: number): Date {
+	const nextDate = new Date(date)
+	nextDate.setDate(nextDate.getDate() + days)
+	return nextDate
+}
+
+function parseAnalyticsDateInputValue(value: string): Date | null {
+	const parsedDate = new Date(`${value}T00:00:00`)
+	return Number.isNaN(parsedDate.getTime()) ? null : parsedDate
+}
+
+function parseAnalyticsDateTimeInputValue(value: string): Date | null {
+	const parsedDate = new Date(value)
+	return Number.isNaN(parsedDate.getTime()) ? null : parsedDate
+}
+
+function getAnalyticsTimeframeDurationMs({
+	mode,
+	preset,
+	lastAmount,
+	lastUnit,
+	customStartDate,
+	customEndDate,
+	nowTimestamp,
+}: {
+	mode: AnalyticsTimeframeMode
+	preset: AnalyticsTimeframePreset
+	lastAmount: number
+	lastUnit: AnalyticsLastTimeframeUnit
+	customStartDate: string
+	customEndDate: string
+	nowTimestamp: number
+}): number {
+	if (mode === 'preset') {
+		switch (preset) {
+			case 'today':
+			case 'yesterday':
+				return 24 * 60 * 60 * 1000
+			case 'last_7_days':
+				return 7 * 24 * 60 * 60 * 1000
+			case 'last_14_days':
+				return 14 * 24 * 60 * 60 * 1000
+			case 'last_30_days':
+				return 30 * 24 * 60 * 60 * 1000
+			case 'last_90_days':
+				return 90 * 24 * 60 * 60 * 1000
+			case 'last_180_days':
+				return 180 * 24 * 60 * 60 * 1000
+			case 'year_to_date': {
+				const now = new Date(nowTimestamp)
+				const yearStart = new Date(now.getFullYear(), 0, 1)
+				yearStart.setHours(0, 0, 0, 0)
+				return now.getTime() - yearStart.getTime()
+			}
+			case 'all_time':
+				return REVENUE_MIN_TIMEFRAME_MS
+		}
+	}
+
+	if (mode === 'last') {
+		const amount = Math.max(1, Math.floor(lastAmount))
+		switch (lastUnit) {
+			case 'hours':
+				return amount * 60 * 60 * 1000
+			case 'days':
+				return amount * 24 * 60 * 60 * 1000
+			case 'weeks':
+				return amount * 7 * 24 * 60 * 60 * 1000
+			case 'months':
+				return REVENUE_MIN_TIMEFRAME_MS
+		}
+	}
+
+	if (mode === 'custom_range') {
+		const start = parseAnalyticsDateInputValue(customStartDate)
+		const inclusiveEnd = parseAnalyticsDateInputValue(customEndDate)
+		if (!start || !inclusiveEnd) {
+			return 0
+		}
+
+		return addAnalyticsDays(inclusiveEnd, 1).getTime() - start.getTime()
+	}
+
+	const start = parseAnalyticsDateTimeInputValue(customStartDate)
+	const end = parseAnalyticsDateTimeInputValue(customEndDate)
+	if (!start || !end) {
+		return 0
+	}
+
+	return end.getTime() - start.getTime()
 }
 
 function getPercentChange(currentValue: number, previousValue: number): number {
@@ -794,6 +928,7 @@ export function createAnalyticsDashboardContext(
 	options: CreateAnalyticsDashboardContextOptions,
 ): AnalyticsDashboardContextValue {
 	const client = injectModrinthClient()
+	const queryClient = useQueryClient()
 	const route = useRoute()
 	const router = useRouter()
 	const initialQueryState = readAnalyticsQueryBuilderState(route.query, [])
@@ -824,6 +959,7 @@ export function createAnalyticsDashboardContext(
 	const queryRefreshTimestamp = ref(Date.now())
 	const queryResetToken = ref(0)
 	const fetchRequest = ref<Labrinth.Analytics.v3.FetchRequest | null>(null)
+	let revenueHourlyGroupByBeforeOverride: AnalyticsGroupByPreset | null = null
 	let nextAnalyticsRouteNavigationMode: AnalyticsQueryBuilderRouteNavigationMode = 'replace'
 
 	const hasProjectContext = computed(() => Boolean(options.projectPageContext))
@@ -1195,12 +1331,30 @@ export function createAnalyticsDashboardContext(
 
 		return isQueryBuilderDefault && isGraphDefault
 	})
+	const isRevenueTimeframeAvailable = computed(
+		() =>
+			getAnalyticsTimeframeDurationMs({
+				mode: selectedTimeframeMode.value,
+				preset: selectedTimeframe.value,
+				lastAmount: selectedLastTimeframeAmount.value,
+				lastUnit: selectedLastTimeframeUnit.value,
+				customStartDate: selectedCustomTimeframeStartDate.value,
+				customEndDate: selectedCustomTimeframeEndDate.value,
+				nowTimestamp: queryRefreshTimestamp.value,
+			}) >= REVENUE_MIN_TIMEFRAME_MS,
+	)
+
+	function isAnalyticsDashboardStatAvailableForTimeframe(stat: AnalyticsDashboardStat): boolean {
+		return stat !== 'revenue' || isRevenueTimeframeAvailable.value
+	}
 
 	function getRelevantAnalyticsDashboardStats(
 		breakdown: AnalyticsBreakdownPreset,
 		filters: AnalyticsSelectedFilters = selectedFilters.value,
 	): readonly AnalyticsDashboardStat[] {
-		return getEnabledAnalyticsStatsForState(breakdown, filters)
+		return getEnabledAnalyticsStatsForState(breakdown, filters).filter((stat) =>
+			isAnalyticsDashboardStatAvailableForTimeframe(stat),
+		)
 	}
 
 	function isAnalyticsDashboardStatRelevant(
@@ -1291,8 +1445,31 @@ export function createAnalyticsDashboardContext(
 		}
 	}
 
+	function reconcileRevenueGroupBy(nextActiveStat: AnalyticsDashboardStat) {
+		if (nextActiveStat === 'revenue') {
+			if (!isRevenueHourlyGroupBy(selectedGroupBy.value)) {
+				if (selectedGroupBy.value !== REVENUE_GROUP_BY_FALLBACK) {
+					revenueHourlyGroupByBeforeOverride = null
+				}
+				return
+			}
+
+			revenueHourlyGroupByBeforeOverride = selectedGroupBy.value
+			replaceNextAnalyticsRouteNavigation()
+			selectedGroupBy.value = REVENUE_GROUP_BY_FALLBACK
+			return
+		}
+
+		const groupByBeforeRevenue = revenueHourlyGroupByBeforeOverride
+		revenueHourlyGroupByBeforeOverride = null
+		if (groupByBeforeRevenue && selectedGroupBy.value === REVENUE_GROUP_BY_FALLBACK) {
+			replaceNextAnalyticsRouteNavigation()
+			selectedGroupBy.value = groupByBeforeRevenue
+		}
+	}
+
 	watch(
-		[selectedBreakdown, selectedFilters, activeStat],
+		[selectedBreakdown, selectedFilters, activeStat, isRevenueTimeframeAvailable],
 		([nextBreakdown, nextFilters, nextActiveStat]) => {
 			if (isAnalyticsDashboardStatRelevant(nextActiveStat, nextBreakdown, nextFilters)) {
 				return
@@ -1479,6 +1656,14 @@ export function createAnalyticsDashboardContext(
 	)
 
 	watch(
+		[activeStat, selectedGroupBy],
+		([nextActiveStat]) => {
+			reconcileRevenueGroupBy(nextActiveStat)
+		},
+		{ flush: 'sync', immediate: true },
+	)
+
+	watch(
 		[
 			selectedProjectIds,
 			selectedTimeframeMode,
@@ -1519,13 +1704,9 @@ export function createAnalyticsDashboardContext(
 		isFetching: currentFetching,
 		refetch: refetchCurrentTimeSlices,
 	} = useQuery({
-		queryKey: computed(() => [
-			'analytics',
-			'dashboard',
-			analyticsQueryUserId.value,
-			'current',
-			fetchRequest.value,
-		]),
+		queryKey: computed(() =>
+			buildAnalyticsCurrentTimeSlicesQueryKey(analyticsQueryUserId.value, fetchRequest.value),
+		),
 		queryFn: async () => {
 			const response = await client.labrinth.analytics_v3.fetch(
 				fetchRequest.value as Labrinth.Analytics.v3.FetchRequest,
@@ -1536,6 +1717,41 @@ export function createAnalyticsDashboardContext(
 	})
 	const isCurrentTimeSliceLoading = computed(
 		() => isAnalyticsFetchRequestReady(fetchRequest.value) && currentTimeSlicePending.value,
+	)
+	const revenueDailyPrefetchRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
+		if (!isRevenueHourlyGroupBy(selectedGroupBy.value)) {
+			return null
+		}
+		if (
+			!isAnalyticsDashboardStatRelevant('revenue', selectedBreakdown.value, selectedFilters.value)
+		) {
+			return null
+		}
+
+		return buildDailyAnalyticsFetchRequest(fetchRequest.value)
+	})
+
+	watch(
+		[revenueDailyPrefetchRequest, analyticsQueryUserId],
+		([nextFetchRequest, nextAnalyticsQueryUserId]) => {
+			if (!isAnalyticsFetchRequestReady(nextFetchRequest)) {
+				return
+			}
+
+			void queryClient
+				.prefetchQuery({
+					queryKey: buildAnalyticsCurrentTimeSlicesQueryKey(
+						nextAnalyticsQueryUserId,
+						nextFetchRequest,
+					),
+					queryFn: async () => {
+						const response = await client.labrinth.analytics_v3.fetch(nextFetchRequest)
+						return response.metrics
+					},
+				})
+				.catch(() => {})
+		},
+		{ deep: true, immediate: true },
 	)
 
 	const analyticsFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {

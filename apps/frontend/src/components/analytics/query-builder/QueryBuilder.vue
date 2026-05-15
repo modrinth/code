@@ -248,6 +248,7 @@ const {
 	selectedGroupBy,
 	selectedBreakdown,
 	selectedFilters,
+	activeStat,
 	projectStatusById,
 	queryResetToken,
 	refreshAnalyticsQuery,
@@ -570,6 +571,10 @@ const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
 	{ value: 'game_version', label: 'Game version' },
 ]
 
+function isRevenueHourlyGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
+	return groupBy === '1h' || groupBy === '6h'
+}
+
 function getAllTimeYearGroupStart(end: Date): Date {
 	const start = new Date(end)
 	start.setFullYear(2021)
@@ -582,15 +587,25 @@ const groupByOptions = computed<ComboboxOption<AnalyticsGroupByPreset>[]>(() => 
 		const groupByMinutes = getAnalyticsGroupByPresetMinutes(option.value)
 		const isTooCoarse = groupByMinutes >= timeframeMinutes
 		const isTooFine = timeframeMinutes / groupByMinutes > MAX_ANALYTICS_TIME_SLICES
+		const isRevenueHourlyGroupByOption =
+			activeStat.value === 'revenue' && isRevenueHourlyGroupBy(option.value)
+		const isRevenueDailyFallback = activeStat.value === 'revenue' && option.value === 'day'
 		return {
 			value: option.value,
 			label: option.label,
-			disabled: isTooCoarse || isTooFine,
+			disabled:
+				isRevenueHourlyGroupByOption ||
+				(!isRevenueDailyFallback && (isTooCoarse || isTooFine)),
 		}
 	})
 
 	if (options.every((option) => option.disabled)) {
-		options[0].disabled = false
+		const fallbackOption =
+			options.find((option) => activeStat.value === 'revenue' && option.value === 'day') ??
+			options[0]
+		if (fallbackOption) {
+			fallbackOption.disabled = false
+		}
 	}
 
 	return options

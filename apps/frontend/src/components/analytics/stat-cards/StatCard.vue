@@ -1,6 +1,6 @@
 <template>
 	<button
-		v-tooltip="disabled ? 'Stat type not appicable to breakdown' : ''"
+		v-tooltip="disabled ? 'Stat unavailable for current qeury' : ''"
 		type="button"
 		class="flex h-full appearance-none flex-col gap-4 rounded-2xl border border-solid p-5 px-4 text-left transition-colors"
 		:class="{
