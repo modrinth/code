@@ -61,7 +61,6 @@ pub enum FeatureFlag {
     ServersInApp,
     ServerProjectQa,
     I18nDebug,
-    ContentFilterShowBothStatuses,
 }
 
 impl Settings {

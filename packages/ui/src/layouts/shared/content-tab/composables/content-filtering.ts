@@ -1,5 +1,5 @@
 import { useSessionStorage } from '@vueuse/core'
-import type { ComputedRef, Ref } from 'vue'
+import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -31,7 +31,6 @@ export interface ContentFilterConfig {
 	showWarningsFilter?: boolean
 	isPackLocked?: Ref<boolean>
 	persistKey?: string
-	showBothStatusFilters?: Ref<boolean> | ComputedRef<boolean>
 }
 
 const messages = defineMessages({
@@ -59,12 +58,6 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 	const selectedFilters = config?.persistKey
 		? useSessionStorage<string[]>(`content-filters:${config.persistKey}`, [])
 		: ref<string[]>([])
-	const statusFilter = config?.persistKey
-		? useSessionStorage<'enabled' | 'disabled'>(
-				`content-status-filter:${config.persistKey}`,
-				'disabled',
-			)
-		: ref<'enabled' | 'disabled'>('disabled')
 
 	const availableStatusFilters = computed<Array<'enabled' | 'disabled'>>(() => {
 		const filters: Array<'enabled' | 'disabled'> = []
@@ -75,12 +68,6 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			filters.push('disabled')
 		}
 		return filters
-	})
-
-	const visibleStatusFilters = computed<Array<'enabled' | 'disabled'>>(() => {
-		if (config?.showBothStatusFilters?.value) return availableStatusFilters.value
-		if (availableStatusFilters.value.includes(statusFilter.value)) return [statusFilter.value]
-		return availableStatusFilters.value.slice(0, 1)
 	})
 
 	const filterOptions = computed<ContentFilterOption[]>(() => {
@@ -109,7 +96,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
 		}
 
-		for (const status of visibleStatusFilters.value) {
+		for (const status of availableStatusFilters.value) {
 			options.push({
 				id: status,
 				label: formatMessage(status === 'enabled' ? messages.enabled : messages.disabled),
@@ -131,7 +118,6 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 
 	function toggleFilter(filterId: string) {
 		if (filterId === 'enabled' || filterId === 'disabled') {
-			statusFilter.value = filterId
 			const index = selectedFilters.value.indexOf(filterId)
 			const otherStatusFilter = filterId === 'enabled' ? 'disabled' : 'enabled'
 			if (index === -1) {
@@ -151,19 +137,6 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 		} else {
 			selectedFilters.value.splice(index, 1)
 		}
-	}
-
-	function cycleStatusFilter(filterId: string) {
-		if (config?.showBothStatusFilters?.value) return false
-		if (filterId !== 'enabled' && filterId !== 'disabled') return false
-		if (availableStatusFilters.value.length < 2) return false
-
-		const next = statusFilter.value === 'disabled' ? 'enabled' : 'disabled'
-		selectedFilters.value = selectedFilters.value.map((filter) =>
-			filter === statusFilter.value ? next : filter,
-		)
-		statusFilter.value = next
-		return true
 	}
 
 	function applyFilters(source: ContentItem[]): ContentItem[] {
@@ -192,5 +165,5 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 		})
 	}
 
-	return { selectedFilters, filterOptions, toggleFilter, cycleStatusFilter, applyFilters }
+	return { selectedFilters, filterOptions, toggleFilter, applyFilters }
 }
