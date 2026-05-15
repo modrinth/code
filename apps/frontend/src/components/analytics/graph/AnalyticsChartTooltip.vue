@@ -32,7 +32,14 @@
 			>
 				<div class="inline-flex items-center gap-1.5 text-primary">
 					<span class="size-2 rounded-full" :style="{ backgroundColor: entry.color }" />
-					<span v-tooltip="entry.projectName ?? ''">{{ entry.name }}</span>
+					<span
+						v-tooltip="entry.projectName ?? ''"
+						:class="{
+							capitalize: capitalizeLabels,
+						}"
+					>
+						{{ entry.name }}
+					</span>
 				</div>
 				<span class="font-semibold text-contrast">{{ entry.formattedValue }}</span>
 			</div>
@@ -65,6 +72,7 @@ const props = defineProps<{
 	containerHeight: number
 	pinned: boolean
 	ratioMode: boolean
+	capitalizeLabels: boolean
 }>()
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000

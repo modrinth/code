@@ -116,6 +116,36 @@ function getBreakdownColor(
 	return LOADER_CHART_COLORS[normalizedLoader] ?? fallbackColor
 }
 
+type PaletteRankEntry = {
+	key: string
+	label: string
+	total: number
+}
+
+function getPaletteColorForIndex(index: number, palette: string[]): string {
+	if (palette.length === 0) return ''
+
+	return palette[index % palette.length]
+}
+
+function buildPaletteColorsByDownloadRank(
+	entries: PaletteRankEntry[],
+	palette: string[],
+): Map<string, string> {
+	const colorsByKey = new Map<string, string>()
+	if (palette.length === 0) return colorsByKey
+
+	const sortedEntries = [...entries].sort(
+		(a, b) =>
+			b.total - a.total || a.label.localeCompare(b.label) || a.key.localeCompare(b.key),
+	)
+	sortedEntries.forEach((entry, index) => {
+		colorsByKey.set(entry.key, getPaletteColorForIndex(index, palette))
+	})
+
+	return colorsByKey
+}
+
 export function getMetricValue(
 	point: Labrinth.Analytics.v3.ProjectAnalytics,
 	activeStat: AnalyticsDashboardStat,
@@ -162,16 +192,26 @@ export function buildChartDatasets(
 
 	if (selectedBreakdown !== 'none') {
 		const dataByBreakdown = new Map<string, number[]>()
+		const downloadTotalsByBreakdown = new Map<string, number>()
 
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
 				if (!('source_project' in point)) continue
 				if (!selectedProjectIds.has(point.source_project)) continue
 				if (!doesAnalyticsPointMatchFilters(point, selectedFilters)) continue
-				if (!isMetricKindForStat(point, activeStat)) continue
 
 				const breakdownValue = getAnalyticsBreakdownValue(point, selectedBreakdown)
 				if (breakdownValue === ALL_BREAKDOWN_VALUE) continue
+
+				if (point.metric_kind === 'downloads') {
+					downloadTotalsByBreakdown.set(
+						breakdownValue,
+						(downloadTotalsByBreakdown.get(breakdownValue) ?? 0) +
+							getMetricValue(point, 'downloads'),
+					)
+				}
+
+				if (!isMetricKindForStat(point, activeStat)) continue
 
 				let breakdownData = dataByBreakdown.get(breakdownValue)
 				if (!breakdownData) {
@@ -183,8 +223,17 @@ export function buildChartDatasets(
 			}
 		})
 
-		return Array.from(dataByBreakdown.entries()).map(([breakdownValue, data], index) => {
-			const fallbackColor = palette[index % palette.length]
+		const colorsByBreakdown = buildPaletteColorsByDownloadRank(
+			Array.from(dataByBreakdown.keys()).map((breakdownValue) => ({
+				key: breakdownValue,
+				label: formatBreakdownLabel(breakdownValue, selectedBreakdown, getVersionDisplayName),
+				total: downloadTotalsByBreakdown.get(breakdownValue) ?? 0,
+			})),
+			palette,
+		)
+
+		return Array.from(dataByBreakdown.entries()).map(([breakdownValue, data]) => {
+			const fallbackColor = colorsByBreakdown.get(breakdownValue) ?? ''
 			const color = getBreakdownColor(breakdownValue, selectedBreakdown, fallbackColor)
 			return {
 				projectId: `breakdown:${breakdownValue}`,
@@ -199,8 +248,10 @@ export function buildChartDatasets(
 	}
 
 	const dataByProjectId = new Map<string, number[]>()
+	const downloadTotalsByProjectId = new Map<string, number>()
 	for (const project of selectedProjects) {
 		dataByProjectId.set(project.id, new Array(dataLength).fill(0))
+		downloadTotalsByProjectId.set(project.id, 0)
 	}
 
 	timeSlices.forEach((slice, sliceIndex) => {
@@ -209,6 +260,14 @@ export function buildChartDatasets(
 			if (!selectedProjectIds.has(point.source_project)) continue
 			if (!doesAnalyticsPointMatchFilters(point, selectedFilters)) continue
 
+			if (point.metric_kind === 'downloads') {
+				downloadTotalsByProjectId.set(
+					point.source_project,
+					(downloadTotalsByProjectId.get(point.source_project) ?? 0) +
+						getMetricValue(point, 'downloads'),
+				)
+			}
+
 			const projectData = dataByProjectId.get(point.source_project)
 			if (!projectData) continue
 
@@ -216,8 +275,17 @@ export function buildChartDatasets(
 		}
 	})
 
-	return selectedProjects.map((project, index) => {
-		const color = palette[index % palette.length]
+	const colorsByProjectId = buildPaletteColorsByDownloadRank(
+		selectedProjects.map((project) => ({
+			key: project.id,
+			label: project.name,
+			total: downloadTotalsByProjectId.get(project.id) ?? 0,
+		})),
+		palette,
+	)
+
+	return selectedProjects.map((project) => {
+		const color = colorsByProjectId.get(project.id) ?? ''
 		return {
 			projectId: project.id,
 			label: project.name,

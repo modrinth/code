@@ -58,11 +58,7 @@
 							v-tooltip="legendEntry.projectName ?? ''"
 							:class="{
 								'line-through': legendEntry.hidden,
-								capitalize:
-									selectedBreakdown === 'download_reason' ||
-									selectedBreakdown === 'monetization' ||
-									selectedBreakdown === 'loader' ||
-									selectedBreakdown === 'country',
+								capitalize: shouldCapitalizeDatasetLabels,
 							}"
 						>
 							{{ legendEntry.name }}
@@ -162,6 +158,7 @@
 							:container-height="containerSize.height"
 							:pinned="isHoverPinned"
 							:ratio-mode="isRatioMode"
+							:capitalize-labels="shouldCapitalizeDatasetLabels"
 						/>
 					</template>
 				</div>
@@ -309,41 +306,41 @@ const emptyChartMessage = computed(() => {
 })
 
 const lightLegendPalette = [
-	'#00AF5C',
-	'#D55E00',
-	'#0072B2',
-	'#CC79A7',
-	'#E69F00',
-	'#332288',
-	'#44AA99',
-	'#882255',
-	'#A04500',
-	'#007F3A',
-	'#8E4070',
-	'#004A74',
-	'#5C45D3',
-	'#A37100',
-	'#B83377',
-	'#2F756A',
+	'hsl(152, 100%, 34%)',
+	'hsl(26, 100%, 42%)',
+	'hsl(202, 100%, 35%)',
+	'hsl(327, 45%, 64%)',
+	'hsl(41, 100%, 45%)',
+	'hsl(250, 60%, 33%)',
+	'hsl(170, 43%, 47%)',
+	'hsl(330, 60%, 33%)',
+	'hsl(46, 100%, 36%)',
+	'hsl(167, 100%, 30%)',
+	'hsl(343, 38%, 45%)',
+	'hsl(222, 100%, 28%)',
+	'hsl(270, 62%, 60%)',
+	'hsl(32, 100%, 37%)',
+	'hsl(349, 57%, 51%)',
+	'hsl(191, 43%, 37%)',
 ]
 
 const darkLegendPalette = [
-	'#1BD96A',
-	'#FFB000',
-	'#56B4E9',
-	'#E78AC3',
-	'#F0E442',
-	'#A78BFA',
-	'#FF7A59',
-	'#4DD0C8',
-	'#B87C00',
-	'#119547',
-	'#B05690',
-	'#2D7AB5',
-	'#6F58CC',
-	'#B8AD30',
-	'#2A938B',
-	'#CC5239',
+	'hsl(145, 78%, 48%)',
+	'hsl(41, 100%, 50%)',
+	'hsl(202, 77%, 63%)',
+	'hsl(323, 66%, 72%)',
+	'hsl(56, 85%, 60%)',
+	'hsl(255, 92%, 80%)',
+	'hsl(12, 100%, 67%)',
+	'hsl(176, 58%, 56%)',
+	'hsl(60, 100%, 41%)',
+	'hsl(165, 80%, 38%)',
+	'hsl(341, 36%, 56%)',
+	'hsl(226, 60%, 49%)',
+	'hsl(252, 53%, 62%)',
+	'hsl(75, 59%, 50%)',
+	'hsl(195, 56%, 42%)',
+	'hsl(30, 59%, 56%)',
 ]
 
 const theme = useTheme()
@@ -352,6 +349,13 @@ const legendPalette = computed(() =>
 )
 
 const graphTitle = computed(() => titleByStat[activeStat.value])
+const shouldCapitalizeDatasetLabels = computed(
+	() =>
+		selectedBreakdown.value === 'download_reason' ||
+		selectedBreakdown.value === 'monetization' ||
+		selectedBreakdown.value === 'loader' ||
+		selectedBreakdown.value === 'country',
+)
 
 const chartType = computed<'line' | 'bar'>(() =>
 	activeGraphViewMode.value === 'bar' ? 'bar' : 'line',
@@ -458,7 +462,7 @@ const LEGEND_MAX_ITEMS = 8
 const LEGEND_VISIBLE_ITEM_COUNT = LEGEND_MAX_ITEMS - 1
 const LEGEND_EXPANDED_MAX_ITEMS = 24
 const OTHER_LEGEND_ENTRY_ID = '__analytics_other__'
-const OTHER_LEGEND_ENTRY_COLOR = '#9ca3af'
+const OTHER_LEGEND_ENTRY_COLOR = 'hsl(218, 11%, 65%)'
 
 type LegendEntry = {
 	id: string
@@ -620,14 +624,7 @@ const legendEntries = computed<LegendEntry[]>(() =>
 				hidden: hiddenDatasetIds.value.has(dataset.projectId),
 			}
 		})
-		.sort((a, b) => b.totalValue - a.totalValue || a.name.localeCompare(b.name))
-		.map((entry, index) => ({
-			...entry,
-			color:
-				selectedBreakdown.value === 'loader'
-					? entry.color
-					: legendPalette.value[index % legendPalette.value.length],
-		})),
+		.sort((a, b) => b.totalValue - a.totalValue || a.name.localeCompare(b.name)),
 )
 
 const otherBundledLegendIds = computed<string[]>(() => {

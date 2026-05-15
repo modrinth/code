@@ -111,6 +111,8 @@ const EMPTY_DATA_Y_AXIS_STEP = 2
 const Y_AXIS_WIDTH = 40
 const SECONDS_PER_HOUR = 60 * 60
 const CSS_VARIABLE_COLOR_PATTERN = /^var\(\s*(--[a-z0-9-_]+)\s*\)$/i
+const HSL_COLOR_PATTERN =
+	/^hsl\(\s*([0-9.]+)(?:deg)?\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%\s*\)$/i
 
 let pinnedDragPointerId: number | null = null
 let pinnedDragStartX = 0
@@ -295,12 +297,23 @@ function emitRangeDragHover(sliceIndex: number) {
 }
 
 function withAlpha(color: string, alpha: number): string {
-	const match = /^#([0-9a-f]{6})$/i.exec(color)
-	if (!match) return color
-	const r = Number.parseInt(match[1].slice(0, 2), 16)
-	const g = Number.parseInt(match[1].slice(2, 4), 16)
-	const b = Number.parseInt(match[1].slice(4, 6), 16)
-	return `rgba(${r}, ${g}, ${b}, ${alpha})`
+	const hexMatch = /^#([0-9a-f]{6})$/i.exec(color)
+	if (hexMatch) {
+		const r = Number.parseInt(hexMatch[1].slice(0, 2), 16)
+		const g = Number.parseInt(hexMatch[1].slice(2, 4), 16)
+		const b = Number.parseInt(hexMatch[1].slice(4, 6), 16)
+		return `rgba(${r}, ${g}, ${b}, ${alpha})`
+	}
+
+	const hslMatch = HSL_COLOR_PATTERN.exec(color)
+	if (!hslMatch) return color
+
+	const hue = Number.parseFloat(hslMatch[1])
+	const saturation = Number.parseFloat(hslMatch[2])
+	const lightness = Number.parseFloat(hslMatch[3])
+	if (![hue, saturation, lightness].every(Number.isFinite)) return color
+
+	return `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha})`
 }
 
 function resolveCssColor(color: string): string {
