@@ -101,6 +101,111 @@ export namespace Archon {
 		}
 	}
 
+	export namespace Actions {
+		export namespace v1 {
+			export type SortOrder = 'asc' | 'desc'
+
+			export type ActionName =
+				| 'server_created'
+				| 'changed_server_name'
+				| 'changed_server_subdomain'
+				| 'server_reallocated'
+				| 'server_plan_changed'
+				| 'user_invited'
+				| 'user_invite_revoked'
+				| 'user_permission_modified'
+				| 'user_removed'
+				| 'addon_added'
+				| 'addon_uploaded'
+				| 'addon_disabled'
+				| 'addon_enabled'
+				| 'addon_deleted'
+				| 'addon_updated'
+				| 'modpack_changed'
+				| 'modpack_unlinked'
+				| 'server_repaired'
+				| 'server_reset'
+				| 'server_started'
+				| 'server_stopped'
+				| 'server_restarted'
+				| 'server_killed'
+				| 'port_allocation_added'
+				| 'port_allocation_removed'
+				| 'loader_version_edited'
+				| 'game_version_edited'
+				| 'server_properties_modified'
+				| 'file_uploaded'
+				| 'file_deleted'
+				| 'file_renamed'
+				| 'file_edited'
+				| 'sftp_login'
+				| 'console_command_executed'
+				| 'console_cleared'
+				| 'backup_created'
+				| 'backup_renamed'
+				| 'backup_restored'
+				| 'backup_deleted'
+				| 'startup_command_modified'
+				| 'java_runtime_modified'
+				| 'java_version_modified'
+
+			export type Action = {
+				action: ActionName | string
+				metadata?: unknown
+			}
+
+			export type ActionUser =
+				| {
+						type: 'user'
+						user_id: string
+				  }
+				| {
+						type: 'support'
+						user_id?: string | null
+				  }
+
+			export type ActionEntry = {
+				actor: ActionUser
+				action: Action
+				server_id: string
+				world_id?: string | null
+				timestamp: string
+			}
+
+			export type UserResp = {
+				username: string
+				avatar_url: string
+			}
+
+			export type AddonResp = {
+				title: string
+				slug?: string | null
+				icon_url?: string | null
+				version?: string | null
+			}
+
+			export type ActionLogResponse = {
+				next_offset?: number | null
+				data: ActionEntry[]
+				users: Record<string, UserResp>
+				addons: Record<string, AddonResp>
+			}
+
+			export type ActionLogFilter = {
+				users?: string[]
+				worlds?: Array<string | null>
+				actions?: ActionName[]
+			}
+
+			export type ListActionLogOptions = {
+				filter?: ActionLogFilter
+				limit?: number
+				offset?: number
+				order?: SortOrder
+			}
+		}
+	}
+
 	export namespace Transfers {
 		export namespace Internal {
 			export type ProvisionOptions = {

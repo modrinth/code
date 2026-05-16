@@ -46,8 +46,6 @@
 				v-model:query="auditQuery"
 				v-model:filters="auditFilters"
 				:entries="auditEntries"
-				:users="members"
-				:worlds="worldOptions"
 			/>
 		</div>
 
@@ -88,13 +86,11 @@ import {
 	type ServerAccessMember,
 	type ServerAccessRole,
 	type ServerAccessRoleOption,
-	type ServerAccessUser,
 	type ServerAuditLogEntry,
 	type ServerAuditLogFilters,
 } from '#ui/components/servers/access'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
-	injectAuth,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -103,7 +99,6 @@ import {
 type RoleFilter = ServerAccessRole | 'all'
 
 const { formatMessage } = useVIntl()
-const auth = injectAuth()
 const client = injectModrinthClient()
 const { serverId } = injectModrinthServerContext()
 const { addNotification, removeNotification } = injectNotificationManager()
@@ -314,8 +309,20 @@ const worldOptions = computed(
 		serverFullQuery.data.value?.worlds.map((world) => ({ id: world.id, name: world.name })) ?? [],
 )
 
-const auditEntries = ref<ServerAuditLogEntry[]>([])
+const actionLogQueryKey = ['servers', 'action-log', 'v1', serverId]
+const actionLogQuery = useQuery({
+	queryKey: actionLogQueryKey,
+	queryFn: () => client.archon.actions_v1.list(serverId, { limit: 100, order: 'desc' }),
+})
+
+const auditEntries = computed<ServerAuditLogEntry[]>(() => {
+	const actionLog = actionLogQuery.data.value
+	if (!actionLog) return []
+
+	return actionLog.data.map((entry, index) => apiActionLogEntryToAuditEntry(entry, actionLog, index))
+})
 const hasShownLoadError = ref(false)
+const hasShownActionLogLoadError = ref(false)
 
 const memberSearch = ref('')
 const roleFilter = ref<RoleFilter>('all')
@@ -323,7 +330,6 @@ const auditQuery = ref('')
 const auditFilters = ref<ServerAuditLogFilters>({
 	userId: null,
 	worldId: null,
-	actionType: null,
 })
 
 const filteredMembers = computed(() => {
@@ -344,11 +350,6 @@ function formatRole(role: ServerAccessRole) {
 	return roleOptions.value.find((option) => option.value === role)?.label ?? role
 }
 
-const currentActor = computed<ServerAccessUser | null>(() => {
-	if (auth.user.value) return labrinthUserToAccessUser(auth.user.value)
-	return members.value.find((member) => member.isOwner)?.user ?? null
-})
-
 watch(
 	() => serverUsersQuery.error.value,
 	(serverUsersError) => {
@@ -363,13 +364,19 @@ watch(
 	},
 )
 
-function labrinthUserToAccessUser(user: Labrinth.Users.v2.User): ServerAccessUser {
-	return {
-		id: user.id,
-		username: user.username,
-		avatarUrl: user.avatar_url,
-	}
-}
+watch(
+	() => actionLogQuery.error.value,
+	(actionLogError) => {
+		if (hasShownActionLogLoadError.value || !actionLogError) return
+
+		hasShownActionLogLoadError.value = true
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.loadFailedTitle),
+			text: formatErrorMessage(actionLogError) ?? formatMessage(messages.loadFailedText),
+		})
+	},
+)
 
 function accessRoleToApiRole(
 	role: Exclude<ServerAccessRole, 'owner'>,
@@ -431,8 +438,46 @@ function formatErrorMessage(error: unknown): string | undefined {
 	return error instanceof Error ? error.message : undefined
 }
 
+function apiActionLogEntryToAuditEntry(
+	entry: Archon.Actions.v1.ActionEntry,
+	actionLog: Archon.Actions.v1.ActionLogResponse,
+	index: number,
+): ServerAuditLogEntry {
+	return {
+		id: `${entry.timestamp}-${entry.actor.type}-${entry.world_id ?? 'server'}-${index}`,
+		actor: apiActionActorToAccessUser(entry.actor, actionLog.users),
+		world: apiActionWorld(entry.world_id ?? null),
+		timestamp: entry.timestamp,
+	}
+}
+
+function apiActionActorToAccessUser(
+	actor: Archon.Actions.v1.ActionUser,
+	users: Record<string, Archon.Actions.v1.UserResp>,
+): ServerAuditLogEntry['actor'] {
+	if (actor.type === 'support') {
+		return { id: 'support', username: 'Support' }
+	}
+
+	const user = users[actor.user_id]
+	return {
+		id: actor.user_id,
+		username: user?.username ?? actor.user_id,
+		avatarUrl: user?.avatar_url || undefined,
+	}
+}
+
+function apiActionWorld(worldId: string | null): ServerAuditLogEntry['world'] {
+	if (!worldId) return null
+	return worldOptions.value.find((world) => world.id === worldId) ?? { id: worldId, name: worldId }
+}
+
 async function invalidateServerUsers() {
 	await queryClient.invalidateQueries({ queryKey: serverUsersQueryKey })
+}
+
+async function invalidateActionLog() {
+	await queryClient.invalidateQueries({ queryKey: actionLogQueryKey })
 }
 
 function setCachedMemberRole(member: ServerAccessMember, role: Exclude<ServerAccessRole, 'owner'>) {
@@ -474,27 +519,6 @@ async function resolveMemberUserId(member: ServerAccessMember): Promise<string> 
 	}
 }
 
-function pushAuditEntry(
-	entry: Omit<ServerAuditLogEntry, 'id' | 'timestamp' | 'actor'>,
-): ServerAuditLogEntry | null {
-	const actor = currentActor.value
-	if (!actor) return null
-
-	const auditEntry: ServerAuditLogEntry = {
-		...entry,
-		actor,
-		id: `audit-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-		timestamp: new Date().toISOString(),
-	}
-	auditEntries.value = [auditEntry, ...auditEntries.value]
-	return auditEntry
-}
-
-function removeAuditEntry(entry: ServerAuditLogEntry | null) {
-	if (!entry) return
-	auditEntries.value = auditEntries.value.filter((auditEntry) => auditEntry.id !== entry.id)
-}
-
 function revertNotification(notification: { id: string | number; count?: number }) {
 	if (notification.count && notification.count > 1) {
 		notification.count -= 1
@@ -510,10 +534,6 @@ async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRo
 
 	await queryClient.cancelQueries({ queryKey: serverUsersQueryKey })
 	setCachedMemberRole(member, role)
-	const optimisticAuditEntry = pushAuditEntry({
-		world: null,
-		action: { type: 'role_changed', target: member.user.username, role },
-	})
 	const optimisticNotification = addNotification({
 		type: 'success',
 		title: formatMessage(messages.roleUpdatedTitle),
@@ -528,7 +548,6 @@ async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRo
 		await client.archon.server_users_v1.update(serverId, userId, accessRoleToApiRole(role))
 	} catch (error) {
 		setCachedMemberRole(member, previousRole)
-		removeAuditEntry(optimisticAuditEntry)
 		revertNotification(optimisticNotification)
 		addNotification({
 			type: 'error',
@@ -539,6 +558,7 @@ async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRo
 	}
 
 	await invalidateServerUsers()
+	await invalidateActionLog()
 }
 
 function resendInvite(member: ServerAccessMember) {
@@ -589,10 +609,7 @@ async function removeMemberAccess(member: ServerAccessMember, shouldCancel: bool
 		const userId = await resolveMemberUserId(member)
 		await client.archon.server_users_v1.delete(serverId, userId)
 		await invalidateServerUsers()
-		pushAuditEntry({
-			world: null,
-			action: { type: 'member_removed', target: member.user.username },
-		})
+		await invalidateActionLog()
 		addNotification({
 			type: 'success',
 			title: formatMessage(
@@ -648,10 +665,7 @@ async function grantAccess(payload: GrantServerAccessPayload) {
 			role: accessRoleToApiRole(payload.role),
 		})
 		await invalidateServerUsers()
-		pushAuditEntry({
-			world: null,
-			action: { type: 'member_invited', target: user.username, role: payload.role },
-		})
+		await invalidateActionLog()
 		addNotification({
 			type: 'success',
 			title: formatMessage(messages.inviteSentTitle),

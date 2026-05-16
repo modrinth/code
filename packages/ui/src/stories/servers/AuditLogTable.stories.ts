@@ -34,61 +34,42 @@ const entries: ServerAuditLogEntry[] = [
 		id: 'support',
 		actor: { id: 'support', username: 'Support' },
 		world: null,
-		action: { type: 'file_edited', file: 'server.properties' },
 		timestamp: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
 	},
 	{
 		id: 'world',
 		actor: users[1].user,
 		world: null,
-		action: { type: 'world_started', worldName: 'Create SMP' },
 		timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
 	},
 	{
 		id: 'mod',
 		actor: users[1].user,
 		world: worlds[1],
-		action: {
-			type: 'content_installed',
-			contentType: 'mod',
-			name: 'Create Aeronautics',
-			href: '/mod/create-aeronautics',
-			version: '1.20.1-0.6.0',
-		},
 		timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
 	},
 	{
 		id: 'modpack',
 		actor: users[1].user,
 		world: worlds[1],
-		action: {
-			type: 'content_installed',
-			contentType: 'modpack',
-			name: 'Cobblemon x Create',
-			href: '/modpack/cobblemon-x-create',
-			version: '2.1.4',
-		},
 		timestamp: new Date(Date.now() - 6.5 * 60 * 60 * 1000).toISOString(),
 	},
 	{
 		id: 'member-invited',
 		actor: users[0].user,
 		world: null,
-		action: { type: 'member_invited', target: 'IMB', role: 'viewer' },
 		timestamp: new Date(Date.now() - 6.75 * 60 * 60 * 1000).toISOString(),
 	},
 	{
 		id: 'member-removed',
 		actor: users[0].user,
 		world: null,
-		action: { type: 'member_removed', target: 'Fetch' },
 		timestamp: new Date(Date.now() - 6.85 * 60 * 60 * 1000).toISOString(),
 	},
 	{
 		id: 'role-change',
 		actor: users[0].user,
 		world: null,
-		action: { type: 'role_changed', target: 'Geometrically', role: 'viewer' },
 		timestamp: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
 	},
 ]
@@ -123,17 +104,14 @@ export const Default: Story = {
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
 				worldId: null,
-				actionType: null,
 			})
-			return { entries, users, worlds, query, filters }
+			return { entries, query, filters }
 		},
 		template: /* html */ `
 			<AuditLogTable
 				v-model:query="query"
 				v-model:filters="filters"
 				:entries="entries"
-				:users="users"
-				:worlds="worlds"
 			/>
 		`,
 	}),
@@ -143,21 +121,18 @@ export const Filtered: Story = {
 	render: () => ({
 		components: { AuditLogTable },
 		setup() {
-			const query = ref('server.properties')
+			const query = ref('Geometrically')
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
-				worldId: null,
-				actionType: 'file_edited',
+				worldId: worlds[1].id,
 			})
-			return { entries, users, worlds, query, filters }
+			return { entries, query, filters }
 		},
 		template: /* html */ `
 			<AuditLogTable
 				v-model:query="query"
 				v-model:filters="filters"
 				:entries="entries"
-				:users="users"
-				:worlds="worlds"
 			/>
 		`,
 	}),
@@ -171,9 +146,8 @@ export const MobileCompact: Story = {
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
 				worldId: null,
-				actionType: null,
 			})
-			return { entries, users, worlds, query, filters }
+			return { entries, query, filters }
 		},
 		template: /* html */ `
 			<div style="max-width: 390px;">
@@ -181,8 +155,6 @@ export const MobileCompact: Story = {
 					v-model:query="query"
 					v-model:filters="filters"
 					:entries="entries"
-					:users="users"
-					:worlds="worlds"
 				/>
 			</div>
 		`,

@@ -59,78 +59,6 @@
 				</span>
 			</template>
 
-			<template #cell-action="{ row: entry }">
-				<div v-tooltip="actionTooltip(entry, 'desktop')" class="flex min-w-0 items-center gap-1.5">
-					<template v-if="entry.action.type === 'content_installed'">
-						<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
-						<span class="shrink-0 text-secondary">{{
-							contentTypeLabel(entry.action.contentType)
-						}}</span>
-						<AutoLink
-							:to="entry.action.href"
-							class="inline-flex min-w-0 items-center gap-1.5"
-							:class="actionLinkClass(entry.action.href)"
-						>
-							<Avatar
-								:src="entry.action.iconUrl ?? undefined"
-								:alt="formatMessage(messages.contentIconAlt, { name: entry.action.name })"
-								:tint-by="entry.action.name"
-								size="1.5rem"
-								no-shadow
-							/>
-							<span
-								:ref="
-									(element) => setActionLabelRef(actionLabelRefKey(entry.id, 'desktop'), element)
-								"
-								class="min-w-0 truncate font-medium"
-							>
-								{{ entry.action.name }}
-							</span>
-						</AutoLink>
-						<span v-if="entry.action.version" class="shrink-0 text-secondary">
-							{{ formatVersionSuffix(entry.action.version) }}
-						</span>
-					</template>
-					<template v-else-if="isMemberAuditAction(entry.action)">
-						<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
-						<AutoLink
-							:to="userProfilePath(entry.action.target)"
-							class="inline-flex min-w-0 items-center gap-1.5"
-							:class="actionLinkClass(userProfilePath(entry.action.target))"
-						>
-							<Avatar
-								:src="targetAvatarSrc(entry.action.target)"
-								:alt="formatMessage(messages.userAvatarAlt, { username: entry.action.target })"
-								:tint-by="entry.action.target"
-								size="1.5rem"
-								circle
-								no-shadow
-							/>
-							<span
-								:ref="
-									(element) => setActionLabelRef(actionLabelRefKey(entry.id, 'desktop'), element)
-								"
-								class="min-w-0 truncate font-medium"
-							>
-								{{ entry.action.target }}
-							</span>
-						</AutoLink>
-						<span v-if="memberActionSuffix(entry.action)" class="shrink-0 text-secondary">
-							{{ memberActionSuffix(entry.action) }}
-						</span>
-					</template>
-					<template v-else>
-						<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
-						<span
-							:ref="(element) => setActionLabelRef(actionLabelRefKey(entry.id, 'desktop'), element)"
-							class="min-w-0 truncate text-primary"
-						>
-							{{ actionMetadata(entry.action) }}
-						</span>
-					</template>
-				</div>
-			</template>
-
 			<template #cell-time="{ row: entry }">
 				<span v-tooltip="formatDate(entry.timestamp)">
 					{{ formatRelativeTime(entry.timestamp) }}
@@ -142,12 +70,12 @@
 			v-if="filteredEntries.length > 0"
 			class="overflow-hidden rounded-2xl border border-solid border-surface-5 sm:hidden"
 		>
-			<div class="grid min-h-14 grid-cols-[3.75rem_minmax(0,1fr)_5rem] bg-surface-3">
+			<div class="grid min-h-14 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_5rem] bg-surface-3">
 				<div class="flex items-center pl-4 font-semibold text-secondary">
 					{{ formatMessage(messages.userColumn) }}
 				</div>
 				<div class="flex items-center font-semibold text-secondary">
-					{{ formatMessage(messages.actionColumn) }}
+					{{ formatMessage(messages.worldColumn) }}
 				</div>
 				<div class="flex items-center justify-end pr-4 font-semibold text-secondary">
 					{{ formatMessage(messages.timeColumn) }}
@@ -156,14 +84,15 @@
 			<div
 				v-for="(entry, index) in filteredEntries"
 				:key="entry.id"
-				class="grid min-h-[4.5rem] grid-cols-[3.75rem_minmax(0,1fr)_5rem] items-center border-0 border-t border-solid border-surface-5"
+				class="grid min-h-[4.5rem] grid-cols-[minmax(0,1fr)_minmax(0,1fr)_5rem] items-center border-0 border-t border-solid border-surface-5"
 				:class="index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 			>
-				<div class="flex min-w-0 items-center pl-4">
+				<div class="flex min-w-0 items-center gap-2 pl-4 pr-2">
 					<AutoLink
 						v-tooltip="actorName(entry)"
 						:to="actorProfilePath(entry)"
-						class="inline-flex shrink-0"
+						class="inline-flex min-w-0 items-center gap-2"
+						:class="actorProfilePath(entry) ? 'text-primary hover:underline' : ''"
 					>
 						<Avatar
 							:src="actorAvatarSrc(entry)"
@@ -173,83 +102,18 @@
 							circle
 							no-shadow
 						/>
+						<span
+							class="min-w-0 truncate font-medium"
+							:class="entry.actor.id === 'support' ? 'text-blue' : ''"
+						>
+							{{ actorName(entry) }}
+						</span>
 					</AutoLink>
 				</div>
 				<div class="min-w-0 py-3 pr-2">
-					<div v-tooltip="actionTooltip(entry, 'mobile')" class="flex min-w-0 items-center gap-1.5">
-						<template v-if="entry.action.type === 'content_installed'">
-							<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
-							<span class="shrink-0 text-secondary">{{
-								contentTypeLabel(entry.action.contentType)
-							}}</span>
-							<AutoLink
-								:to="entry.action.href"
-								class="inline-flex min-w-0 items-center gap-1.5"
-								:class="actionLinkClass(entry.action.href)"
-							>
-								<Avatar
-									:src="entry.action.iconUrl ?? undefined"
-									:alt="formatMessage(messages.contentIconAlt, { name: entry.action.name })"
-									:tint-by="entry.action.name"
-									size="1.25rem"
-									no-shadow
-								/>
-								<span
-									:ref="
-										(element) => setActionLabelRef(actionLabelRefKey(entry.id, 'mobile'), element)
-									"
-									class="min-w-0 truncate font-medium"
-								>
-									{{ entry.action.name }}
-								</span>
-							</AutoLink>
-							<span v-if="entry.action.version" class="shrink-0 text-secondary">
-								{{ formatVersionSuffix(entry.action.version) }}
-							</span>
-						</template>
-						<template v-else-if="isMemberAuditAction(entry.action)">
-							<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
-							<AutoLink
-								:to="userProfilePath(entry.action.target)"
-								class="inline-flex min-w-0 items-center gap-1.5"
-								:class="actionLinkClass(userProfilePath(entry.action.target))"
-							>
-								<Avatar
-									:src="targetAvatarSrc(entry.action.target)"
-									:alt="formatMessage(messages.userAvatarAlt, { username: entry.action.target })"
-									:tint-by="entry.action.target"
-									size="1.25rem"
-									circle
-									no-shadow
-								/>
-								<span
-									:ref="
-										(element) => setActionLabelRef(actionLabelRefKey(entry.id, 'mobile'), element)
-									"
-									class="min-w-0 truncate font-medium"
-								>
-									{{ entry.action.target }}
-								</span>
-							</AutoLink>
-							<span v-if="memberActionSuffix(entry.action)" class="shrink-0 text-secondary">
-								{{ memberActionSuffix(entry.action) }}
-							</span>
-						</template>
-						<template v-else>
-							<span class="shrink-0 font-bold text-contrast">{{ actionVerb(entry.action) }}:</span>
-							<span
-								:ref="
-									(element) => setActionLabelRef(actionLabelRefKey(entry.id, 'mobile'), element)
-								"
-								class="min-w-0 truncate text-primary"
-							>
-								{{ actionMetadata(entry.action) }}
-							</span>
-						</template>
-					</div>
 					<span
 						v-tooltip="entry.world?.name"
-						class="mt-1 block truncate text-sm"
+						class="block truncate"
 						:class="entry.world ? 'text-primary' : 'text-secondary'"
 					>
 						{{ entry.world?.name ?? '—' }}
@@ -265,16 +129,13 @@
 
 		<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-5">
 			<div
-				class="grid min-h-14 grid-cols-[3.75rem_minmax(0,1fr)_5rem] bg-surface-3 sm:h-14 sm:grid-cols-[20%_18%_44%_18%]"
+				class="grid min-h-14 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_5rem] bg-surface-3 sm:h-14 sm:grid-cols-[40%_35%_25%]"
 			>
 				<div class="flex items-center pl-4 font-semibold text-secondary">
 					{{ formatMessage(messages.userColumn) }}
 				</div>
-				<div class="hidden items-center font-semibold text-secondary sm:flex">
-					{{ formatMessage(messages.worldColumn) }}
-				</div>
 				<div class="flex items-center font-semibold text-secondary">
-					{{ formatMessage(messages.actionColumn) }}
+					{{ formatMessage(messages.worldColumn) }}
 				</div>
 				<div class="flex items-center justify-end pr-4 font-semibold text-secondary">
 					{{ formatMessage(messages.timeColumn) }}
@@ -291,27 +152,18 @@
 
 <script setup lang="ts">
 import { IntercomBubbleIcon } from '@modrinth/assets'
-import { computed, ref, shallowReactive } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
-import { truncatedTooltip } from '../../../utils/truncate'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import Table, { type TableColumn } from '../../base/Table.vue'
-import type {
-	ServerAccessMember,
-	ServerAccessRole,
-	ServerAuditAction,
-	ServerAuditLogEntry,
-	ServerAuditLogFilters,
-} from './types'
+import type { ServerAuditLogEntry, ServerAuditLogFilters } from './types'
 
 const props = defineProps<{
 	entries: ServerAuditLogEntry[]
-	users: ServerAccessMember[]
-	worlds: { id: string; name: string }[]
 }>()
 
 const query = defineModel<string>('query', { default: '' })
@@ -319,7 +171,6 @@ const filters = defineModel<ServerAuditLogFilters>('filters', {
 	default: () => ({
 		userId: null,
 		worldId: null,
-		actionType: null,
 	}),
 })
 
@@ -439,10 +290,6 @@ const messages = defineMessages({
 		id: 'servers.audit-log.column.world',
 		defaultMessage: 'Instance',
 	},
-	actionColumn: {
-		id: 'servers.audit-log.column.action',
-		defaultMessage: 'Action',
-	},
 	timeColumn: {
 		id: 'servers.audit-log.column.time',
 		defaultMessage: 'Time',
@@ -458,90 +305,6 @@ const messages = defineMessages({
 	userAvatarAlt: {
 		id: 'servers.audit-log.user-avatar-alt',
 		defaultMessage: "{username}'s avatar",
-	},
-	contentIconAlt: {
-		id: 'servers.audit-log.content-icon-alt',
-		defaultMessage: "{name}'s icon",
-	},
-	editedVerb: {
-		id: 'servers.audit-log.action-verb.edited',
-		defaultMessage: 'Edited',
-	},
-	startedVerb: {
-		id: 'servers.audit-log.action-verb.started',
-		defaultMessage: 'Started',
-	},
-	installedVerb: {
-		id: 'servers.audit-log.action-verb.installed',
-		defaultMessage: 'Installed',
-	},
-	invitedVerb: {
-		id: 'servers.audit-log.action-verb.invited',
-		defaultMessage: 'Invited',
-	},
-	removedVerb: {
-		id: 'servers.audit-log.action-verb.removed',
-		defaultMessage: 'Removed',
-	},
-	changedVerb: {
-		id: 'servers.audit-log.action-verb.changed',
-		defaultMessage: 'Changed',
-	},
-	modContentType: {
-		id: 'servers.audit-log.content-type.mod',
-		defaultMessage: 'mod',
-	},
-	modpackContentType: {
-		id: 'servers.audit-log.content-type.modpack',
-		defaultMessage: 'modpack',
-	},
-	memberInvitedRoleSuffix: {
-		id: 'servers.audit-log.action-suffix.member-invited-role',
-		defaultMessage: 'as {role}',
-	},
-	roleChangedRoleSuffix: {
-		id: 'servers.audit-log.action-suffix.role-changed-role',
-		defaultMessage: 'to {role}',
-	},
-	fileEditedAction: {
-		id: 'servers.audit-log.action.file-edited',
-		defaultMessage: 'Edited: {file}',
-	},
-	worldStartedAction: {
-		id: 'servers.audit-log.action.world-started',
-		defaultMessage: 'Started: {worldName}',
-	},
-	modInstalledAction: {
-		id: 'servers.audit-log.action.mod-installed',
-		defaultMessage: 'Installed: mod {name}{version}',
-	},
-	modpackInstalledAction: {
-		id: 'servers.audit-log.action.modpack-installed',
-		defaultMessage: 'Installed: modpack {name}{version}',
-	},
-	memberInvitedAction: {
-		id: 'servers.audit-log.action.member-invited',
-		defaultMessage: 'Invited: {target}{role}',
-	},
-	memberRemovedAction: {
-		id: 'servers.audit-log.action.member-removed',
-		defaultMessage: 'Removed: {target}',
-	},
-	roleChangedAction: {
-		id: 'servers.audit-log.action.role-changed',
-		defaultMessage: 'Changed: {target}{role}',
-	},
-	ownerRole: {
-		id: 'servers.audit-log.role.owner',
-		defaultMessage: 'Owner',
-	},
-	editorRole: {
-		id: 'servers.audit-log.role.editor',
-		defaultMessage: 'Editor',
-	},
-	viewerRole: {
-		id: 'servers.audit-log.role.viewer',
-		defaultMessage: 'Limited',
 	},
 })
 
@@ -573,21 +336,13 @@ const selectedTimeRangeLabel = computed(
 		formatMessage(messages.last30Days),
 )
 
-type AuditLogTableColumn = 'user' | 'world' | 'action' | 'time'
+type AuditLogTableColumn = 'user' | 'world' | 'time'
 type AuditLogTableRow = ServerAuditLogEntry & Record<string, unknown>
-type MemberAuditAction = Extract<
-	ServerAuditAction,
-	{ type: 'member_invited' | 'member_removed' | 'role_changed' }
->
-type ActionLabelViewport = 'desktop' | 'mobile'
-
-const actionLabelRefs = shallowReactive<Record<string, HTMLElement | null>>({})
 
 const columns = computed<TableColumn<AuditLogTableColumn>[]>(() => [
-	{ key: 'user', label: formatMessage(messages.userColumn), width: '20%' },
-	{ key: 'world', label: formatMessage(messages.worldColumn), width: '18%' },
-	{ key: 'action', label: formatMessage(messages.actionColumn), width: '44%' },
-	{ key: 'time', label: formatMessage(messages.timeColumn), align: 'right', width: '18%' },
+	{ key: 'user', label: formatMessage(messages.userColumn), width: '40%' },
+	{ key: 'world', label: formatMessage(messages.worldColumn), width: '35%' },
+	{ key: 'time', label: formatMessage(messages.timeColumn), align: 'right', width: '25%' },
 ])
 
 const filteredEntries = computed(() => {
@@ -597,16 +352,10 @@ const filteredEntries = computed(() => {
 		.filter((entry) => {
 			if (filters.value.userId && entry.actor.id !== filters.value.userId) return false
 			if (filters.value.worldId && entry.world?.id !== filters.value.worldId) return false
-			if (filters.value.actionType && entry.action.type !== filters.value.actionType) return false
 
 			if (!normalizedQuery) return true
 
-			return [
-				entry.actor.username,
-				entry.world?.name,
-				formatAction(entry.action),
-				actionSearchValue(entry.action),
-			]
+			return [entry.actor.username, entry.world?.name]
 				.filter(Boolean)
 				.some((value) => value!.toLowerCase().includes(normalizedQuery))
 		})
@@ -620,8 +369,7 @@ const hasActiveFilters = computed(
 	() =>
 		query.value.trim().length > 0 ||
 		!!filters.value.userId ||
-		!!filters.value.worldId ||
-		!!filters.value.actionType,
+		!!filters.value.worldId,
 )
 
 const emptyStateMessage = computed(() =>
@@ -629,136 +377,6 @@ const emptyStateMessage = computed(() =>
 		? messages.noActivityEmptyState
 		: messages.emptyState,
 )
-
-function formatAction(action: ServerAuditAction): string {
-	switch (action.type) {
-		case 'file_edited':
-			return formatMessage(messages.fileEditedAction, { file: action.file })
-		case 'world_started':
-			return formatMessage(messages.worldStartedAction, { worldName: action.worldName })
-		case 'content_installed':
-			return action.contentType === 'mod'
-				? formatMessage(messages.modInstalledAction, {
-						name: action.name,
-						version: formatVersionSuffix(action.version),
-					})
-				: formatMessage(messages.modpackInstalledAction, {
-						name: action.name,
-						version: formatVersionSuffix(action.version),
-					})
-		case 'member_invited':
-			return formatMessage(messages.memberInvitedAction, {
-				target: action.target,
-				role: memberActionSuffix(action) ? ` ${memberActionSuffix(action)}` : '',
-			})
-		case 'member_removed':
-			return formatMessage(messages.memberRemovedAction, { target: action.target })
-		case 'role_changed':
-			return formatMessage(messages.roleChangedAction, {
-				target: action.target,
-				role: memberActionSuffix(action) ? ` ${memberActionSuffix(action)}` : '',
-			})
-	}
-}
-
-function actionSearchValue(action: ServerAuditAction): string {
-	switch (action.type) {
-		case 'file_edited':
-			return action.file
-		case 'world_started':
-			return action.worldName
-		case 'content_installed':
-			return `${action.contentType} ${action.name} ${action.version ?? ''}`
-		case 'member_invited':
-			return `${action.target} ${action.role ? formatRole(action.role) : ''}`
-		case 'member_removed':
-			return action.target
-		case 'role_changed':
-			return `${action.target} ${action.role ? formatRole(action.role) : ''}`
-	}
-}
-
-function actionVerb(action: ServerAuditAction): string {
-	switch (action.type) {
-		case 'file_edited':
-			return formatMessage(messages.editedVerb)
-		case 'world_started':
-			return formatMessage(messages.startedVerb)
-		case 'content_installed':
-			return formatMessage(messages.installedVerb)
-		case 'member_invited':
-			return formatMessage(messages.invitedVerb)
-		case 'member_removed':
-			return formatMessage(messages.removedVerb)
-		case 'role_changed':
-			return formatMessage(messages.changedVerb)
-	}
-}
-
-function actionMetadata(action: ServerAuditAction): string {
-	switch (action.type) {
-		case 'file_edited':
-			return action.file
-		case 'world_started':
-			return action.worldName
-		case 'content_installed':
-			return `${contentTypeLabel(action.contentType)} ${action.name}${formatVersionSuffix(action.version)}`
-		case 'member_invited':
-		case 'role_changed':
-			return `${action.target}${memberActionSuffix(action) ? ` ${memberActionSuffix(action)}` : ''}`
-		case 'member_removed':
-			return action.target
-	}
-}
-
-function contentTypeLabel(
-	contentType: Extract<ServerAuditAction, { type: 'content_installed' }>['contentType'],
-) {
-	return contentType === 'mod'
-		? formatMessage(messages.modContentType)
-		: formatMessage(messages.modpackContentType)
-}
-
-function isMemberAuditAction(action: ServerAuditAction): action is MemberAuditAction {
-	return (
-		action.type === 'member_invited' ||
-		action.type === 'member_removed' ||
-		action.type === 'role_changed'
-	)
-}
-
-function memberActionSuffix(action: MemberAuditAction): string {
-	switch (action.type) {
-		case 'member_invited':
-			return action.role
-				? formatMessage(messages.memberInvitedRoleSuffix, { role: formatRole(action.role) })
-				: ''
-		case 'role_changed':
-			return action.role
-				? formatMessage(messages.roleChangedRoleSuffix, { role: formatRole(action.role) })
-				: ''
-		default:
-			return ''
-	}
-}
-
-function actionLabelRefKey(entryId: string, viewport: ActionLabelViewport): string {
-	return `${viewport}-${entryId}`
-}
-
-function setActionLabelRef(key: string, element: unknown) {
-	actionLabelRefs[key] = element instanceof HTMLElement ? element : null
-}
-
-function actionTooltip(
-	entry: ServerAuditLogEntry,
-	viewport: ActionLabelViewport,
-): string | undefined {
-	return truncatedTooltip(
-		actionLabelRefs[actionLabelRefKey(entry.id, viewport)],
-		formatAction(entry.action),
-	)
-}
 
 function actorName(entry: ServerAuditLogEntry): string {
 	return entry.actor.id === 'support' ? formatMessage(messages.supportActor) : entry.actor.username
@@ -772,31 +390,8 @@ function actorProfilePath(entry: ServerAuditLogEntry): string | undefined {
 	return entry.actor.id === 'support' ? undefined : userProfilePath(entry.actor.username)
 }
 
-function targetAvatarSrc(username: string): string | undefined {
-	return props.users.find((member) => member.user.username === username)?.user.avatarUrl
-}
-
-function actionLinkClass(href: string | undefined): string {
-	return href ? 'text-secondary hover:text-primary hover:underline' : 'text-primary'
-}
-
 function userProfilePath(username: string): string | undefined {
 	if (!username || username.includes('@')) return undefined
 	return `/user/${encodeURIComponent(username)}`
-}
-
-function formatVersionSuffix(version: string | undefined): string {
-	return version ? ` (${version})` : ''
-}
-
-function formatRole(role: ServerAccessRole): string {
-	switch (role) {
-		case 'owner':
-			return formatMessage(messages.ownerRole)
-		case 'editor':
-			return formatMessage(messages.editorRole)
-		case 'viewer':
-			return formatMessage(messages.viewerRole)
-	}
 }
 </script>
