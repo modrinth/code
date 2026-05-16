@@ -295,7 +295,6 @@ function doesEventMatchActiveStat(event: AnalyticsChartEvent) {
 	if (!event.for_metric_kind?.length) return true
 
 	return event.for_metric_kind.some((metricKind) => {
-		if (metricKind === 'view') return props.activeStat === 'views'
 		return metricKind === props.activeStat
 	})
 }

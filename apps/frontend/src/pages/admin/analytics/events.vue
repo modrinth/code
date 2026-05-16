@@ -53,7 +53,7 @@
 						v-model="form.announcementUrl"
 						type="url"
 						autocomplete="off"
-						placeholder="Annoucement link..."
+						placeholder="Add an optional annoucement link..."
 						wrapper-class="w-full"
 						@change="commitAnnouncementUrl"
 					/>
@@ -206,6 +206,7 @@ import {
 	ButtonStyled,
 	ConfirmModal,
 	DatePicker,
+	injectModrinthClient,
 	injectNotificationManager,
 	MultiSelect,
 	type MultiSelectOption,
@@ -218,14 +219,6 @@ import {
 import { isAdmin } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-
-import {
-	analyticsEventsQueryKey,
-	createAnalyticsEvent,
-	deleteAnalyticsEvent,
-	editAnalyticsEvent,
-	getAnalyticsEvents,
-} from '~/services/analytics-events'
 
 definePageMeta({
 	middleware: [
@@ -264,7 +257,9 @@ type EventForm = {
 type DatePickerValue = string | Date | null | undefined
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const analyticsEventsQueryKey = ['analytics-events'] as const
 
 const columns: TableColumn<EventColumnKey>[] = [
 	{ key: 'date', label: 'Date', width: '18%', enableSorting: true },
@@ -275,7 +270,7 @@ const columns: TableColumn<EventColumnKey>[] = [
 ]
 
 const metricKindOptions: MultiSelectOption<AnalyticsEventMetricKind>[] = [
-	{ value: 'view', label: 'Views' },
+	{ value: 'views', label: 'Views' },
 	{ value: 'downloads', label: 'Downloads' },
 	{ value: 'revenue', label: 'Revenue' },
 	{ value: 'playtime', label: 'Playtime' },
@@ -304,9 +299,10 @@ const {
 	isLoading: isLoadingEvents,
 } = useQuery({
 	queryKey: analyticsEventsQueryKey,
-	queryFn: getAnalyticsEvents,
+	queryFn: () => client.labrinth.analytics_v3.getEvents(),
 	placeholderData: [],
 	refetchOnMount: 'always',
+	retry: false,
 	staleTime: 0,
 })
 
@@ -448,9 +444,9 @@ async function saveEvent() {
 		const payload = buildEventPayload()
 
 		if (modalMode.value === 'edit' && editingEventId.value !== null) {
-			await editAnalyticsEvent(editingEventId.value, payload)
+			await client.labrinth.analytics_v3.editEvent(editingEventId.value, payload)
 		} else {
-			await createAnalyticsEvent(payload)
+			await client.labrinth.analytics_v3.createEvent(payload)
 		}
 
 		await queryClient.invalidateQueries({ queryKey: analyticsEventsQueryKey })
@@ -491,7 +487,7 @@ async function deleteEvent(eventId: Labrinth.Analytics.v3.AnalyticsEventId) {
 	setDeletingEvent(eventId, true)
 
 	try {
-		await deleteAnalyticsEvent(eventId)
+		await client.labrinth.analytics_v3.deleteEvent(eventId)
 		await queryClient.invalidateQueries({ queryKey: analyticsEventsQueryKey })
 		addNotification({
 			title: 'Analytics event deleted',

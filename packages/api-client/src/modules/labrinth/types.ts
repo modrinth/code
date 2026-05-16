@@ -241,7 +241,7 @@ export namespace Labrinth {
 	export namespace Analytics {
 		export namespace v3 {
 			export type AnalyticsEventId = number
-			export type AnalyticsEventMetricKind = 'view' | 'revenue' | 'downloads' | 'playtime'
+			export type AnalyticsEventMetricKind = 'views' | 'revenue' | 'downloads' | 'playtime'
 
 			export type AnalyticsEvent = {
 				announcement_url: string | null

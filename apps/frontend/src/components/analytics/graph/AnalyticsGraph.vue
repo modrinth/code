@@ -185,7 +185,7 @@
 
 <script setup lang="ts">
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
-import { Tabs, type TabsTab, Toggle, useFormatNumber } from '@modrinth/ui'
+import { injectModrinthClient, Tabs, type TabsTab, Toggle, useFormatNumber } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import { isDarkTheme } from '~/plugins/theme/index.ts'
@@ -198,7 +198,6 @@ import {
 	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
-import { analyticsEventsQueryKey, getAnalyticsEvents } from '~/services/analytics-events'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import {
@@ -244,13 +243,16 @@ const {
 	getVersionDisplayName,
 	getVersionProjectName,
 } = injectAnalyticsDashboardContext()
+const client = injectModrinthClient()
+const analyticsEventsQueryKey = ['analytics-events'] as const
 const formatNumber = useFormatNumber()
 const isDataLoading = computed(() => isLoading.value)
 const { data: analyticsEvents } = useQuery({
 	queryKey: analyticsEventsQueryKey,
-	queryFn: getAnalyticsEvents,
+	queryFn: () => client.labrinth.analytics_v3.getEvents(),
 	placeholderData: [],
 	refetchOnMount: 'always',
+	retry: false,
 	staleTime: 0,
 })
 
