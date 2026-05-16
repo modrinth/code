@@ -93,6 +93,8 @@
 						v-if="!isPaperLike"
 						v-model="loaderVersionType"
 						:items="loaderVersionTypeItems"
+						:disabled-items="loaderVersionTypeDisabledItems"
+						:disabled-tooltip="'No such versions available'"
 						:format-label="formatLoaderVersionTypeLabel"
 					/>
 					<div v-if="isPaperLike || loaderVersionType === 'other'">
@@ -295,6 +297,11 @@ onMounted(() => {
 const tags = injectTags()
 
 const loaderVersionTypeItems: LoaderVersionType[] = ['stable', 'latest', 'other']
+
+const loaderVersionTypeDisabledItems = computed<LoaderVersionType[]>(() => {
+	const noStableVersions = !loaderVersionsData.value.some((v: LoaderVersionEntry) => v.stable)
+	return noStableVersions ? ['stable'] : []
+})
 
 const isPaperLike = computed(
 	() => selectedLoader.value === 'paper' || selectedLoader.value === 'purpur',
