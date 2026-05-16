@@ -733,6 +733,9 @@ function handleUploadFiles() {
 			uploadState.value.uploadedBytes = clampedUploadedBytes
 			uploadState.value.completedFiles = completedFiles
 			uploadState.value.currentFileName = files[currentFileIndex]?.name ?? null
+			if (clampedUploadedBytes >= totalBytes) {
+				cancelUpload.value = null
+			}
 		}
 
 		const handle = client.kyros.content_v1.uploadAddonFile(wid, files, {
@@ -742,6 +745,7 @@ function handleUploadFiles() {
 
 		try {
 			await handle.promise
+			cancelUpload.value = null
 			uploadState.value.uploadedBytes = totalBytes
 			uploadState.value.completedFiles = files.length
 			uploadState.value.currentFileName = files[files.length - 1]?.name ?? null
