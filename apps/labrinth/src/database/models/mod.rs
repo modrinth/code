@@ -13,6 +13,7 @@ pub mod legacy_loader_fields;
 pub mod loader_fields;
 pub mod moderation_external_item;
 pub mod moderation_lock_item;
+pub mod moderation_note_item;
 pub mod notification_item;
 pub mod notifications_deliveries_item;
 pub mod notifications_template_item;
@@ -56,6 +57,7 @@ pub use user_item::DBUser;
 pub use version_item::DBVersion;
 
 pub use moderation_lock_item::{DBModerationLock, ModerationLockWithUser};
+pub use moderation_note_item::DBModerationNote;
 
 #[derive(Error, Debug)]
 pub enum DatabaseError {
