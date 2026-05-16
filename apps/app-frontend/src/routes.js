@@ -181,6 +181,15 @@ export default new createRouter({
 						breadcrumb: [{ name: '?Project', link: '/project/{id}/' }, { name: 'Gallery' }],
 					},
 				},
+				{
+					path: 'reviews',
+					name: 'Reviews',
+					component: Project.Reviews,
+					meta: {
+						useContext: true,
+						breadcrumb: [{ name: '?Project', link: '/project/{id}/' }, { name: 'Reviews' }],
+					},
+				},
 			],
 		},
 		{

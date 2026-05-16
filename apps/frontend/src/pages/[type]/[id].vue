@@ -1444,6 +1444,10 @@ const messages = defineMessages({
 		id: 'project.moderation.title',
 		defaultMessage: 'Moderation',
 	},
+	reviewsTab: {
+		id: 'project.reviews.title',
+		defaultMessage: 'Reviews',
+	},
 	noCollectionsFound: {
 		id: 'project.collections.none-found',
 		defaultMessage: 'No collections found.',
@@ -2724,6 +2728,13 @@ const navLinks = computed(() => {
 				projectV3.value?.minecraft_server === undefined,
 			subpages: [`${projectUrl}/version/`],
 			onHover: loadVersions,
+		},
+		{
+			label: formatMessage(messages.reviewsTab),
+			href: `${projectUrl}/reviews`,
+			shown:
+				projectV3Loaded.value &&
+				projectV3.value?.minecraft_server === undefined,
 		},
 		{
 			label: formatMessage(messages.moderationTab),

@@ -28,6 +28,7 @@ pub mod product_item;
 pub mod products_tax_identifier_item;
 pub mod project_item;
 pub mod report_item;
+pub mod review_item;
 pub mod session_item;
 pub mod shared_instance_item;
 pub mod team_item;

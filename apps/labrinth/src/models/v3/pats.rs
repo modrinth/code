@@ -118,6 +118,15 @@ bitflags::bitflags! {
         // delete a shared instance version
         const SHARED_INSTANCE_VERSION_DELETE = 1 << 47;
 
+        // create a review
+        const REVIEW_CREATE = 1 << 48;
+        // read own reviews
+        const REVIEW_READ = 1 << 49;
+        // edit own review
+        const REVIEW_WRITE = 1 << 50;
+        // delete own review
+        const REVIEW_DELETE = 1 << 51;
+
         const NONE = 0b0;
     }
 }

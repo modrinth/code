@@ -4,7 +4,7 @@ use crate::models::ids::{
     AffiliateCodeId, ChargeId, CollectionId, FileId, ImageId, NotificationId,
     OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
     OAuthRedirectUriId, OrganizationId, PatId, PayoutId, ProductId,
-    ProductPriceId, ProjectId, ReportId, SessionId, SharedInstanceId,
+    ProductPriceId, ProjectId, ReportId, ReviewId, SessionId, SharedInstanceId,
     SharedInstanceVersionId, TeamId, TeamMemberId, ThreadId, ThreadMessageId,
     UserSubscriptionId, VersionId,
 };
@@ -268,6 +268,10 @@ db_id_interface!(
 db_id_interface!(
     AffiliateCodeId,
     generator: generate_affiliate_code_id @ "affiliate_codes",
+);
+db_id_interface!(
+    ReviewId,
+    generator: generate_review_id @ "project_reviews",
 );
 
 id_type!(CategoryId as i32);

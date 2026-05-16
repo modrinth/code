@@ -2807,6 +2807,9 @@
   "project.notification.updated.title": {
     "message": "Project updated"
   },
+  "project.reviews.title": {
+    "message": "Reviews"
+  },
   "project.settings.general.name.description": {
     "message": "Avoid prefixes, suffixes, parentheticals, or added descriptions—just the project's actual name."
   },
