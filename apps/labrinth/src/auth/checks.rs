@@ -6,6 +6,7 @@ use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
 use crate::models::ids::FileId;
+use crate::models::projects::{MissingAttributionFile, OverrideSource};
 use crate::models::users::User;
 use crate::queue::attribution_scan::get_files_missing_attribution;
 use crate::routes::ApiError;
@@ -217,8 +218,22 @@ pub async fn filter_visible_versions(
         .map(|v| {
             let files_missing = missing
                 .get(&v.inner.id)
-                .map(|ids| {
-                    ids.iter().map(|id| FileId(id.0 as u64)).collect::<Vec<_>>()
+                .map(|entries| {
+                    entries
+                        .iter()
+                        .map(|(id, fp)| MissingAttributionFile {
+                            id: FileId(id.0 as u64),
+                            override_source: fp
+                                .as_ref()
+                                .map(|p| OverrideSource::Flame {
+                                    id: p.id,
+                                    title: p.title.clone(),
+                                    url: p.url.clone(),
+                                    icon_url: p.icon_url.clone(),
+                                })
+                                .or(Some(OverrideSource::Unknown)),
+                        })
+                        .collect::<Vec<_>>()
                 })
                 .unwrap_or_default();
             let mut version = crate::models::projects::Version::from(v);

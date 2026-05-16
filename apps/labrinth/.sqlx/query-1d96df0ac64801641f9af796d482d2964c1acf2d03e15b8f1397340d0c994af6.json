@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n\t\tselect\n\t\t\tg.id as \"id: DBAttributionGroupId\",\n\t\t\tg.flame_project_id,\n\t\t\tg.flame_project_title,\n\t\t\tg.attribution,\n\t\t\tg.attributed_at,\n\t\t\tg.attributed_by as \"attributed_by: i64\"\n\t\tfrom project_attribution_groups g\n\t\twhere g.project_id = $1\n\t\t",
+  "query": "\n\t\tselect\n\t\t\tg.id as \"id: DBAttributionGroupId\",\n\t\t\tg.flame_project,\n\t\t\tg.attribution,\n\t\t\tg.attributed_at,\n\t\t\tg.attributed_by as \"attributed_by: i64\"\n\t\tfrom project_attribution_groups g\n\t\twhere g.project_id = $1\n\t\t",
   "describe": {
     "columns": [
       {
@@ -10,26 +10,21 @@
       },
       {
         "ordinal": 1,
-        "name": "flame_project_id",
-        "type_info": "Int8"
+        "name": "flame_project",
+        "type_info": "Jsonb"
       },
       {
         "ordinal": 2,
-        "name": "flame_project_title",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 3,
         "name": "attribution",
         "type_info": "Jsonb"
       },
       {
-        "ordinal": 4,
+        "ordinal": 3,
         "name": "attributed_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 5,
+        "ordinal": 4,
         "name": "attributed_by: i64",
         "type_info": "Int8"
       }
@@ -44,9 +39,8 @@
       true,
       true,
       true,
-      true,
       true
     ]
   },
-  "hash": "90fb557893ea8ea38dbec50efe77f78fb207844c423586330a2731f338cfbcc1"
+  "hash": "1d96df0ac64801641f9af796d482d2964c1acf2d03e15b8f1397340d0c994af6"
 }

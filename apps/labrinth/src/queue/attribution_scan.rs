@@ -208,6 +208,7 @@ pub enum OverrideResolution {
         project_id: u32,
         title: String,
         url: String,
+        icon_url: String,
     },
     Unknown,
 }
@@ -290,7 +291,7 @@ async fn persist_attribution_results(
     .await
     .wrap_err("checking existing attribution files")?;
 
-    let mut flame_groups: HashMap<u32, (Vec<&OverrideFile>, Option<String>)> =
+    let mut flame_groups: HashMap<u32, (Vec<&OverrideFile>, Option<&OverrideResolution>)> =
         HashMap::new();
     let mut unknown_files: Vec<&OverrideFile> = Vec::new();
 
@@ -310,15 +311,14 @@ async fn persist_attribution_results(
                 }
                 unknown_files.push(file);
             }
-            Some(OverrideResolution::Flame {
+            Some(res @ OverrideResolution::Flame {
                 project_id: fp_id,
-                title,
                 ..
             }) => {
                 let entry = flame_groups.entry(*fp_id).or_default();
                 entry.0.push(file);
                 if entry.1.is_none() {
-                    entry.1 = Some(title.clone());
+                    entry.1 = Some(res);
                 }
             }
             Some(OverrideResolution::Unknown) | None => {
@@ -329,9 +329,9 @@ async fn persist_attribution_results(
 
     let existing_flame_groups = sqlx::query!(
         r#"
-        select id as "id: DBAttributionGroupId", flame_project_id
+        select id as "id: DBAttributionGroupId", flame_project
         from project_attribution_groups
-        where project_id = $1 and flame_project_id is not null
+        where project_id = $1 and flame_project is not null
         "#,
         project_id as DBProjectId,
     )
@@ -339,24 +339,52 @@ async fn persist_attribution_results(
     .await
     .wrap_err("fetching existing flame attribution groups")?;
 
-    for (flame_project_id, (files, title)) in &flame_groups {
-        let existing = existing_flame_groups
-            .iter()
-            .find(|g| g.flame_project_id == Some(*flame_project_id as i64));
+    for (flame_project_id, (files, resolution)) in &flame_groups {
+        let existing = existing_flame_groups.iter().find(|g| {
+            g.flame_project
+                .as_ref()
+                .and_then(|fp| serde_json::from_value::<crate::routes::internal::attribution::FlameProject>(fp.clone()).ok())
+                .is_some_and(|fp| fp.id == *flame_project_id)
+        });
 
         let group_id = if let Some(group) = existing {
             group.id
         } else {
+            let fp = resolution
+                .and_then(|r| {
+                    if let OverrideResolution::Flame {
+                        project_id,
+                        title,
+                        url,
+                        icon_url,
+                    } = r
+                    {
+                        Some(
+                            serde_json::to_value(
+                                crate::routes::internal::attribution::FlameProject {
+                                    id: *project_id,
+                                    title: title.clone(),
+                                    url: url.clone(),
+                                    icon_url: icon_url.clone(),
+                                },
+                            )
+                            .ok(),
+                        )
+                    } else {
+                        None
+                    }
+                })
+                .flatten();
+
             let id = generate_attribution_group_id(&mut *txn).await?;
             sqlx::query!(
                 "
-                insert into project_attribution_groups (id, project_id, flame_project_id, flame_project_title)
-                values ($1, $2, $3, $4)
+                insert into project_attribution_groups (id, project_id, flame_project)
+                values ($1, $2, $3)
                 ",
                 id as DBAttributionGroupId,
                 project_id as DBProjectId,
-                *flame_project_id as i64,
-                title.as_deref().unwrap_or_default(),
+                fp,
             )
             .execute(&mut *txn)
             .await
@@ -661,6 +689,9 @@ async fn resolve_overrides(
                             url: project
                                 .map(|p| p.links.website_url.clone())
                                 .unwrap_or_default(),
+                            icon_url: project
+                                .map(|p| p.logo.thumbnail_url.clone())
+                                .unwrap_or_default(),
                         },
                     );
                 }
@@ -689,7 +720,7 @@ fn hash_flame_murmur32(input: Vec<u8>) -> u32 {
 pub async fn get_files_missing_attribution<'a, E>(
     exec: E,
     version_ids: &[DBVersionId],
-) -> Result<std::collections::HashMap<DBVersionId, Vec<DBFileId>>>
+) -> Result<std::collections::HashMap<DBVersionId, Vec<(DBFileId, Option<crate::routes::internal::attribution::FlameProject>)>>>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres>,
 {
@@ -699,7 +730,8 @@ where
 
     let rows = sqlx::query!(
         r#"
-        select distinct f.version_id as "version_id: DBVersionId", f.id as "file_id: DBFileId"
+        select distinct f.version_id as "version_id: DBVersionId", f.id as "file_id: DBFileId",
+            pag.flame_project
         from files f
         inner join override_file_sources ofs on ofs.file_id = f.id
         inner join project_attribution_files paf on paf.sha1 = ofs.sha1
@@ -714,10 +746,11 @@ where
 
     let mut result = std::collections::HashMap::new();
     for row in rows {
+        let flame_project = row.flame_project.and_then(|v| serde_json::from_value(v).ok());
         result
             .entry(row.version_id)
             .or_insert_with(Vec::new)
-            .push(row.file_id);
+            .push((row.file_id, flame_project));
     }
 
     Ok(result)

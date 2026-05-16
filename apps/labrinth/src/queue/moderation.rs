@@ -901,6 +901,13 @@ pub struct FlameProject {
     pub name: String,
     pub slug: String,
     pub links: FlameLinks,
+    pub logo: FlameLogo,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FlameLogo {
+    pub thumbnail_url: String,
 }
 
 #[derive(Deserialize, Serialize)]

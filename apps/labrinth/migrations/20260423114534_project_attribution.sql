@@ -13,8 +13,7 @@ create table file_attributions (
 create table project_attribution_groups (
 	id bigint primary key,
 	project_id bigint not null references mods(id),
-	flame_project_id bigint,
-	flame_project_title text,
+	flame_project jsonb,
 	attribution jsonb,
 	attributed_at timestamptz,
 	attributed_by bigint references users(id)

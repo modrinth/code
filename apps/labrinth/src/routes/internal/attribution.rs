@@ -23,12 +23,19 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     );
 }
 
+#[derive(Clone, Serialize, Deserialize)]
+pub struct FlameProject {
+    pub id: u32,
+    pub title: String,
+    pub url: String,
+    pub icon_url: String,
+}
+
 #[derive(Serialize)]
 struct AttributionGroupResponse {
     id: crate::models::ids::AttributionGroupId,
-    flame_project_id: Option<i64>,
-    flame_project_title: Option<String>,
-    attribution: Option<serde_json::Value>,
+    flame_project: Option<FlameProject>,
+    attribution: Option<crate::models::projects::AttributionResolution>,
     attributed_at: Option<chrono::DateTime<chrono::Utc>>,
     attributed_by: Option<ariadne::ids::UserId>,
     files: Vec<AttributionFileResponse>,
@@ -62,8 +69,7 @@ async fn list(
         r#"
 		select
 			g.id as "id: DBAttributionGroupId",
-			g.flame_project_id,
-			g.flame_project_title,
+			g.flame_project,
 			g.attribution,
 			g.attributed_at,
 			g.attributed_by as "attributed_by: i64"
@@ -158,9 +164,8 @@ async fn list(
 
         result.push(AttributionGroupResponse {
             id: group.id.into(),
-            flame_project_id: group.flame_project_id,
-            flame_project_title: group.flame_project_title,
-            attribution: group.attribution,
+            flame_project: group.flame_project.and_then(|v| serde_json::from_value(v).ok()),
+            attribution: group.attribution.and_then(|v| serde_json::from_value(v).ok()),
             attributed_at: group.attributed_at,
             attributed_by: group
                 .attributed_by
@@ -175,7 +180,7 @@ async fn list(
 
 #[derive(Deserialize, utoipa::ToSchema)]
 struct UpdateGroupBody {
-    attribution: serde_json::Value,
+    attribution: crate::models::projects::AttributionResolution,
 }
 
 #[utoipa::path]
@@ -205,7 +210,7 @@ async fn update_group(
 		set attribution = $1, attributed_at = now(), attributed_by = $3
 		where id = $2
 		",
-        &body.attribution,
+        &serde_json::to_value(&body.attribution).unwrap_or_default(),
         group_id,
         user.id.0 as i64,
     )

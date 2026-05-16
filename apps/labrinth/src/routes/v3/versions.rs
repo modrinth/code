@@ -119,14 +119,26 @@ pub async fn version_project_get_helper(
             let missing = get_files_missing_attribution(&**pool, &[version_id])
                 .await
                 .unwrap_or_default();
-            v.files_missing_attribution = missing
-                .get(&version_id)
-                .map(|ids| {
-                    ids.iter()
-                        .map(|id| models::ids::FileId(id.0 as u64))
-                        .collect()
-                })
-                .unwrap_or_default();
+             v.files_missing_attribution = missing
+                 .get(&version_id)
+                 .map(|entries| {
+                     entries
+                         .iter()
+                         .map(|(id, fp)| models::projects::MissingAttributionFile {
+                             id: models::ids::FileId(id.0 as u64),
+                             override_source: fp
+                                 .as_ref()
+                                 .map(|p| models::projects::OverrideSource::Flame {
+                                     id: p.id,
+                                     title: p.title.clone(),
+                                     url: p.url.clone(),
+                                     icon_url: p.icon_url.clone(),
+                                 })
+                                 .or(Some(models::projects::OverrideSource::Unknown)),
+                         })
+                         .collect()
+                 })
+                 .unwrap_or_default();
             return Ok(HttpResponse::Ok().json(v));
         }
     }
@@ -227,9 +239,21 @@ pub async fn version_get_helper(
             .unwrap_or_default();
         version.files_missing_attribution = missing
             .get(&version_id)
-            .map(|ids| {
-                ids.iter()
-                    .map(|id| models::ids::FileId(id.0 as u64))
+            .map(|entries| {
+                entries
+                    .iter()
+                    .map(|(id, fp)| models::projects::MissingAttributionFile {
+                        id: models::ids::FileId(id.0 as u64),
+                        override_source: fp
+                            .as_ref()
+                        .map(|p| models::projects::OverrideSource::Flame {
+                            id: p.id,
+                            title: p.title.clone(),
+                            url: p.url.clone(),
+                            icon_url: p.icon_url.clone(),
+                        })
+                            .or(Some(models::projects::OverrideSource::Unknown)),
+                    })
                     .collect()
             })
             .unwrap_or_default();
