@@ -8,6 +8,7 @@ import tauriConf from '../app/tauri.conf.json'
 
 const projectRootDir = resolve(__dirname)
 const appLibEnvDir = resolve(projectRootDir, '../../packages/app-lib')
+const apiClientSource = resolve(projectRootDir, '../../packages/api-client/src/index.ts')
 
 // Load .env from app-lib manually instead of using Vite's envDir, which would auto-load .env.local and override values
 const envFilePath = resolve(appLibEnvDir, '.env')
@@ -37,6 +38,10 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: [
+			{
+				find: '@modrinth/api-client',
+				replacement: apiClientSource,
+			},
 			{
 				find: '@',
 				replacement: resolve(projectRootDir, 'src'),

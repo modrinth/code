@@ -19,6 +19,7 @@
 		"types": ["vite/client"],
 
 		"paths": {
+			"@modrinth/api-client": ["../../packages/api-client/src/index.ts"],
 			"@/*": ["./src/*"]
 		}
 	},
