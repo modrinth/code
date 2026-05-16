@@ -25,7 +25,7 @@ use crate::queue::moderation::{
 use crate::util::error::Context;
 use crate::util::http::HTTP_CLIENT;
 
-pub async fn scan_all_file_override_attributions(
+pub async fn scan_all_files(
     db: &PgPool,
     redis: &RedisPool,
     file_host: &dyn FileHost,
@@ -38,10 +38,10 @@ pub async fn scan_all_file_override_attributions(
             fa.file_id as "file_id: DBFileId",
             f.url,
             v.mod_id as "project_id: DBProjectId"
-        from file_attributions fa
+        from file_scans fa
         inner join files f on f.id = fa.file_id
         inner join versions v on v.id = f.version_id
-        where fa.scanned_at is null
+        where fa.attributions_scanned_at is null
         "#
     )
     .fetch_all(&mut txn)
@@ -104,10 +104,10 @@ pub async fn scan_all_file_override_attributions(
         let now = Utc::now();
         sqlx::query!(
             "
-            update file_attributions
-            set scanned_at = now
+            update file_scans
+            set attributions_scanned_at = now
             from unnest($1::bigint[], $2::timestamptz[]) as u(id, now)
-            where file_attributions.file_id = u.id
+            where file_scans.file_id = u.id
             ",
             &scanned_ids,
             &vec![now; scanned_ids.len()],
@@ -124,7 +124,7 @@ pub async fn scan_all_file_override_attributions(
     Ok(())
 }
 
-pub async fn scan_file_override_attributions(
+pub async fn scan_file(
     txn: &mut PgTransaction<'_>,
     redis: &RedisPool,
     file_host: &dyn FileHost,
@@ -157,9 +157,9 @@ pub async fn scan_file_override_attributions(
 
     sqlx::query!(
         "
-        insert into file_attributions (file_id, scanned_at)
+        insert into file_scans (file_id, attributions_scanned_at)
         values ($1, now())
-        on conflict (file_id) do update set scanned_at = now()
+        on conflict (file_id) do update set attributions_scanned_at = now()
         ",
         file_id.0,
     )
@@ -168,6 +168,16 @@ pub async fn scan_file_override_attributions(
     .wrap_err("marking file as scanned")?;
 
     Ok(())
+}
+
+pub async fn scan_override_files(
+    file_host: &dyn FileHost,
+    file_id: DBFileId,
+    file_url: &str,
+) -> Result<Vec<OverrideFile>> {
+    extract_override_files_from_storage(file_host, file_id, file_url)
+        .await
+        .wrap_err_with(|| eyre!("extracting overrides for file {file_id:?}"))
 }
 
 async fn extract_override_files_from_storage(
@@ -736,7 +746,7 @@ where
         inner join override_file_sources ofs on ofs.file_id = f.id
         inner join project_attribution_files paf on paf.sha1 = ofs.sha1
         inner join project_attribution_groups pag on pag.id = paf.group_id
-        where f.version_id = ANY($1) and pag.attribution is null
+        where f.version_id = ANY($1) and (pag.attribution is null or pag.attribution->>'kind' = 'no_permission')
         "#,
         &version_ids.iter().map(|v| v.0).collect::<Vec<_>>(),
     )

@@ -24,7 +24,7 @@ use crate::models::projects::{
 };
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
-use crate::queue::attribution_scan::get_files_missing_attribution;
+use crate::queue::file_scan::get_files_missing_attribution;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
 use crate::search::SearchBackend;

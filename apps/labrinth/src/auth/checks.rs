@@ -8,7 +8,7 @@ use crate::database::{DBProject, DBVersion, models};
 use crate::models::ids::FileId;
 use crate::models::projects::{MissingAttributionFile, OverrideSource};
 use crate::models::users::User;
-use crate::queue::attribution_scan::get_files_missing_attribution;
+use crate::queue::file_scan::get_files_missing_attribution;
 use crate::routes::ApiError;
 use futures::TryStreamExt;
 use itertools::Itertools;

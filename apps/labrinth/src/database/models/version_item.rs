@@ -10,7 +10,7 @@ use crate::file_hosting::FileHost;
 use crate::models::exp;
 
 use crate::models::projects::{FileType, VersionStatus};
-use crate::queue::attribution_scan::scan_file_override_attributions;
+use crate::queue::file_scan::scan_file;
 use crate::routes::internal::delphi::DelphiRunParameters;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -178,7 +178,7 @@ impl VersionFileBuilder {
 
         sqlx::query!(
             "
-            INSERT INTO file_attributions (file_id)
+            INSERT INTO file_scans (file_id)
             VALUES ($1)
             ",
             file_id as DBFileId,
@@ -198,7 +198,7 @@ impl VersionFileBuilder {
             error!("Error submitting new file to Delphi: {err:?}");
         }
 
-        if let Err(err) = scan_file_override_attributions(
+        if let Err(err) = scan_file(
             &mut *transaction,
             redis,
             file_host,

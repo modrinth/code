@@ -3,7 +3,7 @@ use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::queue::analytics::cache::cache_analytics;
-use crate::queue::attribution_scan::scan_all_file_override_attributions;
+use crate::queue::file_scan::scan_all_files;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
@@ -39,7 +39,7 @@ pub enum BackgroundTask {
     /// Finds files of versions which have not been scanned for attributions
     /// yet, extracts them to find file overrides, and finds any overrides which
     /// require attribution from the creator.
-    ScanAttributions,
+    ScanFiles,
 }
 
 impl BackgroundTask {
@@ -97,8 +97,8 @@ impl BackgroundTask {
             PingMinecraftJavaServers => {
                 ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
             }
-            ScanAttributions => {
-                scan_all_file_override_attributions(
+            ScanFiles => {
+                scan_all_files(
                     &pool,
                     &redis_pool,
                     &**file_host,

@@ -1,13 +1,13 @@
-create table file_attributions (
+create table file_scans (
 	file_id bigint primary key references files(id),
 	-- if a file..
 	-- - does not have a row
 	--   -> was created before attributions system
-	-- - has a row, but `scanned_at = null`
+	-- - has a row, but `attributions_scanned_at = null`
 	--   -> still needs to be scanned
-	-- - has a row, and `scanned_at` is not null
+	-- - has a row, and `attributions_scanned_at` is not null
 	--   -> attributions have been scanned
-	scanned_at timestamptz
+	attributions_scanned_at timestamptz
 );
 
 create table project_attribution_groups (
