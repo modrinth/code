@@ -904,9 +904,7 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 											{{ licenseReadDisplay?.value }}
 										</span>
 									</template>
-									<template
-										v-if="readViewFields.includes('link') && 'link' in initialAttribution"
-									>
+									<template v-if="readViewFields.includes('link') && 'link' in initialAttribution">
 										<span class="text-secondary font-medium">
 											{{ formatMessage(messages.linkLabel) }}
 										</span>
@@ -1070,9 +1068,7 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 								<span class="text-contrast font-semibold">
 									{{ formatMessage(messages.proofImagesLabel) }}
 								</span>
-								<span
-									v-if="PERMISSION_REASONS[selectedType].proofImagesDescription"
-								>{{
+								<span v-if="PERMISSION_REASONS[selectedType].proofImagesDescription">{{
 									formatMessage(PERMISSION_REASONS[selectedType].proofImagesDescription!)
 								}}</span>
 							</div>

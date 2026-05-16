@@ -869,9 +869,6 @@
   "external-files.permissions-card.error.proof-image-invalid-type": {
     "defaultMessage": "Please upload a PNG, JPEG, GIF, WebP, or BMP image."
   },
-  "external-files.permissions-card.error.proof-required": {
-    "defaultMessage": "Please provide proof and explanation."
-  },
   "external-files.permissions-card.fallback-group-title": {
     "defaultMessage": "Attribution group {id}"
   },
@@ -935,17 +932,17 @@
   "external-files.permissions-card.proof-description": {
     "defaultMessage": "Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack."
   },
-  "external-files.permissions-card.proof-images-description.license": {
-    "defaultMessage": "Optional: upload supporting documentation related to this license (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each)."
-  },
-  "external-files.permissions-card.proof-images-description.my-project": {
-    "defaultMessage": "Optional: upload files that help verify you created this work (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each)."
-  },
   "external-files.permissions-card.proof-image-alt": {
     "defaultMessage": "Proof screenshot {n}"
   },
   "external-files.permissions-card.proof-image-remove": {
     "defaultMessage": "Remove image"
+  },
+  "external-files.permissions-card.proof-images-description.license": {
+    "defaultMessage": "Optional: upload supporting documentation related to this license (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each)."
+  },
+  "external-files.permissions-card.proof-images-description.my-project": {
+    "defaultMessage": "Optional: upload files that help verify you created this work (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each)."
   },
   "external-files.permissions-card.proof-images-label": {
     "defaultMessage": "Proof images"
