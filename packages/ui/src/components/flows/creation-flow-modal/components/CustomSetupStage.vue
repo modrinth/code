@@ -572,6 +572,13 @@ function autoSelectLoaderVersion() {
 		'first:',
 		loaderVersionsData.value[0]?.id,
 	)
+	if (
+		loaderVersionType.value === 'stable' &&
+		loaderVersionTypeDisabledItems.value.includes('stable')
+	) {
+		debug("'stable' loader version type is disabled, switching to 'latest'...")
+		loaderVersionType.value = 'latest'
+	}
 	if (loaderVersionType.value === 'stable') {
 		const stable = loaderVersionsData.value.find((v) => v.stable)
 		selectedLoaderVersion.value = stable?.id ?? loaderVersionsData.value[0]?.id ?? null
