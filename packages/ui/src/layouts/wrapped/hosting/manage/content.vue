@@ -780,7 +780,9 @@ const isModpackUpdateDowngrade = ref(false)
 const currentGameVersion = computed(
 	() => contentQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
 )
-const currentLoader = computed(() => contentQuery.data.value?.modloader ?? server.value?.loader ?? '')
+const currentLoader = computed(
+	() => contentQuery.data.value?.modloader ?? server.value?.loader ?? '',
+)
 
 function handleBrowseContent() {
 	const contentType = type.value
@@ -1034,7 +1036,9 @@ async function handleModpackUpdate() {
 
 	await nextTick()
 
-	contentUpdaterModal.value?.show(newestModpackUpdateVersion.value?.id ?? mp.has_update ?? undefined)
+	contentUpdaterModal.value?.show(
+		newestModpackUpdateVersion.value?.id ?? mp.has_update ?? undefined,
+	)
 }
 
 function spliceVersionInCache(fullVersion: Labrinth.Versions.v2.Version) {

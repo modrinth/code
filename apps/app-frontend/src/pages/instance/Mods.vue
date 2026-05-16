@@ -101,7 +101,7 @@ import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
-import { loadInstanceContentData, type InstanceContentData } from '@/helpers/instance-content'
+import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import {
 	add_project_from_path,
 	add_project_from_version,
@@ -231,13 +231,9 @@ function fileNameFromPath(path: string) {
 }
 
 function getContentOperationKeys(item: ContentItem) {
-	return [
-		item.id,
-		item.file_path,
-		item.file_name,
-		item.project?.id,
-		item.version?.id,
-	].filter((key): key is string => !!key)
+	return [item.id, item.file_path, item.file_name, item.project?.id, item.version?.id].filter(
+		(key): key is string => !!key,
+	)
 }
 
 function hasContentOperation(item: ContentItem) {
@@ -931,7 +927,11 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 async function initProjects(cacheBehaviour?: CacheBehaviour) {
 	if (!props.instance) return
 
-	const contentData = await loadInstanceContentData(props.instance.path, cacheBehaviour, handleError)
+	const contentData = await loadInstanceContentData(
+		props.instance.path,
+		cacheBehaviour,
+		handleError,
+	)
 	applyContentData(contentData)
 }
 

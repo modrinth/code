@@ -655,9 +655,7 @@ function confirmIncompatibleUpdate() {
 			props.currentGameVersion,
 		)
 		const shouldShowParentWarning =
-			isModpack.value &&
-			!pendingUpdate.event.shiftKey &&
-			(changesGameVersion || isPendingDowngrade)
+			isModpack.value && !pendingUpdate.event.shiftKey && (changesGameVersion || isPendingDowngrade)
 
 		emitUpdate(pendingUpdate.version, pendingUpdate.event, {
 			hide: !shouldShowParentWarning,
