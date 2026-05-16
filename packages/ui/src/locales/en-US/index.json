@@ -881,6 +881,9 @@
   "external-files.permissions-card.included-in-versions": {
     "defaultMessage": "Included in {count, plural, one {# version} other {# versions}}:"
   },
+  "external-files.permissions-card.input-optional": {
+    "defaultMessage": "(optional)"
+  },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Last updated on {date} by {user}"
   },
@@ -920,9 +923,6 @@
   "external-files.permissions-card.notes-none": {
     "defaultMessage": "None"
   },
-  "external-files.permissions-card.notes-optional": {
-    "defaultMessage": "(optional)"
-  },
   "external-files.permissions-card.notes-placeholder": {
     "defaultMessage": "Write something here..."
   },
@@ -939,10 +939,10 @@
     "defaultMessage": "Remove image"
   },
   "external-files.permissions-card.proof-images-description.license": {
-    "defaultMessage": "Optional: upload supporting documentation related to this license (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each)."
+    "defaultMessage": "Upload supporting documentation related to this license."
   },
   "external-files.permissions-card.proof-images-description.my-project": {
-    "defaultMessage": "Optional: upload files that help verify you created this work (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each)."
+    "defaultMessage": "Upload files that help verify you created this work."
   },
   "external-files.permissions-card.proof-images-label": {
     "defaultMessage": "Proof images"

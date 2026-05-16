@@ -140,8 +140,8 @@ const messages = defineMessages({
 		id: 'external-files.permissions-card.notes-label',
 		defaultMessage: 'Notes',
 	},
-	notesOptional: {
-		id: 'external-files.permissions-card.notes-optional',
+	optional: {
+		id: 'external-files.permissions-card.input-optional',
 		defaultMessage: '(optional)',
 	},
 	notesPlaceholder: {
@@ -397,9 +397,9 @@ const PERMISSION_REASONS = {
 		}),
 		proofImagesDescription: defineMessage({
 			id: 'external-files.permissions-card.proof-images-description.license',
-			defaultMessage:
-				'Optional: upload supporting documentation related to this license (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each).',
+			defaultMessage: 'Upload supporting documentation related to this license.',
 		}),
+		proofImagesOptional: true,
 		fields: ['license_id', 'custom_license', 'link', 'notes', 'proof_image_urls'] as const,
 	},
 	my_project: {
@@ -413,9 +413,9 @@ const PERMISSION_REASONS = {
 		}),
 		proofImagesDescription: defineMessage({
 			id: 'external-files.permissions-card.proof-images-description.my-project',
-			defaultMessage:
-				'Optional: upload files that help verify you created this work (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each).',
+			defaultMessage: 'Upload files that help verify you created this work.',
 		}),
+		proofImagesOptional: true,
 		fields: ['notes', 'proof_image_urls'] as const,
 	},
 	special_permission: {
@@ -433,6 +433,7 @@ const PERMISSION_REASONS = {
 			defaultMessage:
 				'Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack.',
 		}),
+		proofImagesOptional: false,
 		fields: ['link', 'notes', 'proof_image_urls'] as const,
 	},
 	no_permission: {
@@ -444,6 +445,8 @@ const PERMISSION_REASONS = {
 			id: 'external-files.permissions-card.no-permission.description',
 			defaultMessage: "You don't have permission to use this work.",
 		}),
+		proofImagesDescription: null,
+		proofImagesOptional: null,
 		fields: ['notes'] as const,
 	},
 } satisfies Record<
@@ -451,7 +454,8 @@ const PERMISSION_REASONS = {
 	{
 		label: MessageDescriptor
 		description: MessageDescriptor
-		proofImagesDescription?: MessageDescriptor
+		proofImagesDescription: MessageDescriptor | null
+		proofImagesOptional: boolean | null
 		fields: ProjectPermissionField[]
 	}
 >
@@ -1046,9 +1050,7 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 					<div v-if="permissionReasonFields.includes('notes')" class="flex flex-col gap-2">
 						<span class="text-contrast font-semibold mt-1">
 							{{ formatMessage(messages.notesLabel) }}
-							<span class="font-normal text-primary">{{
-								formatMessage(messages.notesOptional)
-							}}</span>
+							<span class="font-normal text-primary">{{ formatMessage(messages.optional) }}</span>
 						</span>
 						<StyledInput
 							v-model="notesInput"
@@ -1067,6 +1069,11 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 							<div class="flex flex-col gap-1 mt-1">
 								<span class="text-contrast font-semibold">
 									{{ formatMessage(messages.proofImagesLabel) }}
+									<span
+										v-if="!!PERMISSION_REASONS[selectedType].proofImagesOptional"
+										class="font-normal text-primary"
+										>{{ formatMessage(messages.optional) }}</span
+									>
 								</span>
 								<span v-if="PERMISSION_REASONS[selectedType].proofImagesDescription">{{
 									formatMessage(PERMISSION_REASONS[selectedType].proofImagesDescription!)

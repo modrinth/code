@@ -31,13 +31,6 @@ const flags = useFeatureFlags()
 const { projectV2: project } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
 
-if (!flags.value.modpackPermissionsPage) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-	})
-}
-
 type SortType = 'status' | 'most_files' | 'recently_edited'
 
 const searchQuery = ref('')
