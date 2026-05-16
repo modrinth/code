@@ -132,6 +132,18 @@ async fn version_updates() {
                 beta_version_id
             );
 
+            let versions = api
+                .update_files_deserialized_common(
+                    "sha1",
+                    vec![beta_version_hash.to_string()],
+                    None,
+                    None,
+                    None,
+                    None,
+                )
+                .await;
+            assert!(versions.is_empty());
+
             // When there is only the one version, there should be no updates
             let version = api
                 .get_update_from_hash_deserialized_common(
