@@ -250,14 +250,13 @@ export namespace Labrinth {
 				| {
 						type: 'license'
 						license_id: string
+						custom_license?: string
 						link?: string
 						notes?: string
-						/** Hosted proof image URLs (e.g. permission screenshots) */
 						proof_image_urls?: string[]
 				  }
 				| {
 						type: 'my_project'
-						license_id: string
 						notes?: string
 						proof_image_urls?: string[]
 				  }
@@ -281,8 +280,10 @@ export namespace Labrinth {
 			}
 
 			export type AttributionVersionInfo = {
+				id: string
 				name: string
 				version_number: string
+				date_created: string
 			}
 
 			export type AttributionGroup = {
@@ -295,7 +296,7 @@ export namespace Labrinth {
 				attributed_at: string | null
 				attributed_by: string | null
 				files: AttributionFile[]
-				versions: Record<string, AttributionVersionInfo>
+				versions: AttributionVersionInfo[]
 			}
 
 			export type UpdateGroupRequest = {

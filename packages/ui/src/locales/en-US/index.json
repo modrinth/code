@@ -842,11 +842,26 @@
   "external-files.permissions-card.badge.attributed": {
     "defaultMessage": "Attributed"
   },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "No permission"
+  },
   "external-files.permissions-card.badge.pending": {
     "defaultMessage": "Pending"
   },
+  "external-files.permissions-card.custom-license-label": {
+    "defaultMessage": "Link to license"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Other"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "Please describe the custom license."
+  },
   "external-files.permissions-card.error.license-required": {
     "defaultMessage": "Please select a license."
+  },
+  "external-files.permissions-card.error.link-invalid-url": {
+    "defaultMessage": "Link must be a valid URL."
   },
   "external-files.permissions-card.error.link-required": {
     "defaultMessage": "Please provide a link."
@@ -878,14 +893,20 @@
   "external-files.permissions-card.license.description": {
     "defaultMessage": "The license of this work permits you to redistribute it in your modpack."
   },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Unknown"
+  },
   "external-files.permissions-card.licensed-as": {
     "defaultMessage": "Licensed:"
   },
   "external-files.permissions-card.link-label": {
     "defaultMessage": "Link to work"
   },
-  "external-files.permissions-card.link-placeholder": {
-    "defaultMessage": "https://example.com/link-to-work"
+  "external-files.permissions-card.link-to-license-url-placeholder": {
+    "defaultMessage": "link-to-license"
+  },
+  "external-files.permissions-card.link-to-work-url-placeholder": {
+    "defaultMessage": "link-to-work"
   },
   "external-files.permissions-card.my-project.description": {
     "defaultMessage": "Original work created by you."
@@ -897,7 +918,10 @@
     "defaultMessage": "These files are not currently used by any version."
   },
   "external-files.permissions-card.notes-label": {
-    "defaultMessage": "Notes:"
+    "defaultMessage": "Notes"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "None"
   },
   "external-files.permissions-card.notes-optional": {
     "defaultMessage": "(optional)"
@@ -905,17 +929,23 @@
   "external-files.permissions-card.notes-placeholder": {
     "defaultMessage": "Write something here..."
   },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Original project"
+  },
   "external-files.permissions-card.proof-description": {
     "defaultMessage": "Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack."
+  },
+  "external-files.permissions-card.proof-images-description.license": {
+    "defaultMessage": "Optional: upload supporting documentation related to this license (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each)."
+  },
+  "external-files.permissions-card.proof-images-description.my-project": {
+    "defaultMessage": "Optional: upload files that help verify you created this work (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each)."
   },
   "external-files.permissions-card.proof-image-alt": {
     "defaultMessage": "Proof screenshot {n}"
   },
   "external-files.permissions-card.proof-image-remove": {
     "defaultMessage": "Remove image"
-  },
-  "external-files.permissions-card.proof-images-hint": {
-    "defaultMessage": "Optional: upload supporting screenshots (PNG, JPEG, GIF, WebP, or BMP, max 1 MB each)."
   },
   "external-files.permissions-card.proof-images-label": {
     "defaultMessage": "Proof images"
@@ -930,10 +960,25 @@
     "defaultMessage": "If you are found to have lied or manipulated the images uploaded, your project and account may be terminated."
   },
   "external-files.permissions-card.proof-warning.title": {
-    "defaultMessage": "Modrinth staff may attempt to verify submitted proof"
+    "defaultMessage": "Modrinth staff may verify submitted proof"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "License"
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "My project"
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "No permission"
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "Special permission"
   },
   "external-files.permissions-card.save": {
     "defaultMessage": "Save attribution"
+  },
+  "external-files.permissions-card.select-license-label": {
+    "defaultMessage": "Select a license..."
   },
   "external-files.permissions-card.special-permission.description": {
     "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
@@ -945,19 +990,7 @@
     "defaultMessage": "Could not split file"
   },
   "external-files.permissions-card.type-label": {
-    "defaultMessage": "Type"
-  },
-  "external-files.permissions-card.type.license": {
-    "defaultMessage": "License"
-  },
-  "external-files.permissions-card.type.my-project": {
-    "defaultMessage": "My project"
-  },
-  "external-files.permissions-card.type.no-permission": {
-    "defaultMessage": "No permission"
-  },
-  "external-files.permissions-card.type.special-permission": {
-    "defaultMessage": "Special permission"
+    "defaultMessage": "Permission reason"
   },
   "external-files.permissions-card.unnamed-multi-group-title": {
     "defaultMessage": "{filename} + {count} more"

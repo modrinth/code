@@ -24,7 +24,7 @@
 			</div>
 			<div class="input-group">
 				<ButtonStyled circular>
-					<button :class="!collapsed && '[&>svg]:rotate-180'" @click="$emit('toggleCollapsed')">
+					<button :class="{ '[&>svg]:rotate-180': !collapsed }" @click="$emit('toggleCollapsed')">
 						<DropdownIcon class="duration-250 transition-transform ease-in-out" />
 					</button>
 				</ButtonStyled>

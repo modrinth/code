@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { RightArrowIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
+import {
+	CircleDashedIcon,
+	FileIcon,
+	HistoryIcon,
+	RightArrowIcon,
+	SearchIcon,
+} from '@modrinth/assets'
 import {
 	Admonition,
 	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
+	defineMessage,
 	defineMessages,
 	EmptyState,
 	ExternalProjectPermissionsCard,
@@ -31,24 +38,53 @@ if (!flags.value.modpackPermissionsPage) {
 	})
 }
 
-type SortType = 'Oldest' | 'Newest'
+type SortType = 'status' | 'most_files' | 'recently_edited'
 
 const searchQuery = ref('')
-const currentSortType = ref<SortType>('Oldest')
+const currentSortType = ref<SortType>('status')
 
 const {
 	data: attributionData,
 	error: attributionError,
 	isPending: pending,
-} = useQuery({
+} = useQuery<Labrinth.Attribution.Internal.AttributionGroup[]>({
 	queryKey: ['project-attribution', project.value.id],
 	queryFn: () => labrinth.attribution_internal.listProjectAttribution(project.value.id),
 })
 
-const sortTypes: ComboboxOption<SortType>[] = [
-	{ value: 'Oldest', label: 'Oldest' },
-	{ value: 'Newest', label: 'Newest' },
-]
+const sortTypes = computed<ComboboxOption<SortType>[]>(() => [
+	{
+		value: 'status',
+		label: formatMessage(
+			defineMessage({
+				id: 'project.settings.permissions.sort.status',
+				defaultMessage: 'Status',
+			}),
+		),
+	},
+	{
+		value: 'most_files',
+		label: formatMessage(
+			defineMessage({
+				id: 'project.settings.permissions.sort.most-files',
+				defaultMessage: 'Most files',
+			}),
+		),
+	},
+	{
+		value: 'recently_edited',
+		label: formatMessage(
+			defineMessage({
+				id: 'project.settings.permissions.sort.recently-edited',
+				defaultMessage: 'Recently edited',
+			}),
+		),
+	},
+])
+
+const currentSortLabel = computed(() => {
+	return sortTypes.value.find((option) => option.value === currentSortType.value)?.label ?? ''
+})
 
 function isAttributed(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
 	return group.attribution !== null && group.attribution !== undefined
@@ -60,6 +96,34 @@ function isNoPermission(group: Labrinth.Attribution.Internal.AttributionGroup): 
 	return (a as { type?: string }).type === 'no_permission'
 }
 
+function isPendingGroup(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
+	return !isNoPermission(group) && !isAttributed(group)
+}
+
+function statusSortRank(group: Labrinth.Attribution.Internal.AttributionGroup): number {
+	if (isNoPermission(group)) return 0
+	if (isPendingGroup(group)) return 1
+	return 2
+}
+
+function alphabetSortKey(group: Labrinth.Attribution.Internal.AttributionGroup): string {
+	const title = group.flame_project_title?.trim()
+	return title && title.length > 0 ? title : group.id
+}
+
+function compareAlphabetical(
+	a: Labrinth.Attribution.Internal.AttributionGroup,
+	b: Labrinth.Attribution.Internal.AttributionGroup,
+): number {
+	return alphabetSortKey(a).localeCompare(alphabetSortKey(b), undefined, { sensitivity: 'base' })
+}
+
+function attributedTimestamp(group: Labrinth.Attribution.Internal.AttributionGroup): number {
+	if (!group.attributed_at) return Number.NEGATIVE_INFINITY
+	const t = Date.parse(group.attributed_at)
+	return Number.isNaN(t) ? Number.NEGATIVE_INFINITY : t
+}
+
 const filteredGroups = computed(() => {
 	const groups = attributionData.value ?? []
 	const query = searchQuery.value.trim().toLowerCase()
@@ -69,12 +133,20 @@ const filteredGroups = computed(() => {
 				return (group.files ?? []).some((file) => file.name.toLowerCase().includes(query))
 			})
 		: [...groups]
-	const direction = currentSortType.value === 'Newest' ? -1 : 1
+	const sortMode = currentSortType.value
+	filtered.sort(compareAlphabetical)
 	filtered.sort((a, b) => {
-		const aTime = a.attributed_at ? Date.parse(a.attributed_at) : 0
-		const bTime = b.attributed_at ? Date.parse(b.attributed_at) : 0
-		if (aTime !== bTime) return (aTime - bTime) * direction
-		return a.id.localeCompare(b.id) * direction
+		if (sortMode === 'status') {
+			return statusSortRank(a) - statusSortRank(b)
+		}
+		if (sortMode === 'most_files') {
+			const ac = a.files?.length ?? 0
+			const bc = b.files?.length ?? 0
+			return bc - ac
+		}
+		const at = attributedTimestamp(a)
+		const bt = attributedTimestamp(b)
+		return bt - at
 	})
 	return filtered
 })
@@ -241,18 +313,25 @@ function dismissInfoBanner() {
 			<div>
 				<Combobox
 					v-model="currentSortType"
-					class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
+					class="!w-full flex-grow sm:!w-[220px] sm:flex-grow-0"
 					:options="sortTypes"
 					:placeholder="formatMessage(commonMessages.sortByLabel)"
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
-							<SortAscIcon
-								v-if="currentSortType === 'Oldest'"
+							<CircleDashedIcon
+								v-if="currentSortType === 'status'"
 								class="size-5 flex-shrink-0 text-secondary"
 							/>
-							<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
-							<span class="truncate text-contrast">{{ currentSortType }}</span>
+							<FileIcon
+								v-else-if="currentSortType === 'most_files'"
+								class="size-5 flex-shrink-0 text-secondary"
+							/>
+							<HistoryIcon
+								v-else-if="currentSortType === 'recently_edited'"
+								class="size-5 flex-shrink-0 text-secondary"
+							/>
+							<span class="truncate text-contrast">{{ currentSortLabel }}</span>
 						</span>
 					</template>
 				</Combobox>
