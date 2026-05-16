@@ -667,21 +667,25 @@ pub enum AttributionLicense {
 
 #[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
-pub enum AttributionResolution {
-    License {
-        license: AttributionLicense,
-        link_to_work: url::Url,
-        notes: String,
-    },
-    MyProject {
-        license: AttributionLicense,
-        notes: String,
-    },
-    SpecialPermissions {
-        link_to_work: url::Url,
-        notes: String,
-    },
-    NoPermission,
+pub enum AttributionResolutionKind {
+	License {
+		license: AttributionLicense,
+		link_to_work: url::Url,
+	},
+	MyProject {
+		license: AttributionLicense,
+	},
+	SpecialPermissions {
+		link_to_work: url::Url,
+	},
+	NoPermission,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+pub struct AttributionResolution {
+	pub kind: AttributionResolutionKind,
+	pub notes: String,
+	pub image_urls: Vec<url::Url>,
 }
 
 /// A specific version of a project
