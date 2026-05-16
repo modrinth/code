@@ -19,8 +19,10 @@ export interface UseHostingIntercomOptions {
 }
 
 const DEFAULT_PADDING = 20
-const BUBBLE_WIDTH = 72
+const DEFAULT_LAUNCHER_WIDTH = 48
 const INTERCOM_STYLE_ID = 'modrinth-hosting-intercom-style'
+const LAUNCHER_SELECTOR =
+	".intercom-lightweight-app-launcher, .intercom-launcher-frame, iframe[name='intercom-launcher-frame']"
 const RIGHT_VAR = '--modrinth-hosting-intercom-right'
 const BOTTOM_VAR = '--modrinth-hosting-intercom-bottom'
 const POINTER_EVENTS_VAR = '--modrinth-hosting-intercom-pointer-events'
@@ -54,6 +56,17 @@ iframe[name='intercom-messenger-frame'] {
 iframe[name='intercom-launcher-frame'] {
 	right: var(${RIGHT_VAR}, ${DEFAULT_PADDING}px) !important;
 	bottom: var(${BOTTOM_VAR}, ${DEFAULT_PADDING}px) !important;
+	transition:
+		right 0.12s ease-out,
+		bottom 0.12s ease-out !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.intercom-lightweight-app-launcher,
+	.intercom-launcher-frame,
+	iframe[name='intercom-launcher-frame'] {
+		transition: none !important;
+	}
 }
 `
 	document.head.appendChild(style)
@@ -65,6 +78,7 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 	const verticalClearanceRequests = new Map<symbol, number>()
 	const requestedHorizontalPadding = ref<number | null>(null)
 	const requestedVerticalClearance = ref<number | null>(null)
+	const launcherWidth = ref(DEFAULT_LAUNCHER_WIDTH)
 	let booted = false
 	let booting = false
 	let bootedIdentity: string | null = null
@@ -73,6 +87,9 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 	let stopSync: (() => void) | null = null
 	let stopPositionSync: (() => void) | null = null
 	let stopModalSync: (() => void) | null = null
+	let launcherObserver: ResizeObserver | null = null
+	let documentObserver: MutationObserver | null = null
+	let observedLauncher: Element | null = null
 
 	const horizontalPadding = computed(
 		() =>
@@ -114,6 +131,26 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 				vertical_padding: verticalPadding.value,
 			})
 		}
+	}
+
+	function updateLauncherWidth() {
+		if (typeof document === 'undefined') return
+
+		const launcher = document.querySelector(LAUNCHER_SELECTOR)
+		if (launcher !== observedLauncher) {
+			launcherObserver?.disconnect()
+			observedLauncher = launcher
+			if (launcher) {
+				launcherObserver = new ResizeObserver(updateLauncherWidth)
+				launcherObserver.observe(launcher)
+			}
+		}
+
+		const width = launcher?.getBoundingClientRect().width
+		launcherWidth.value =
+			typeof width === 'number' && width > 0
+				? sanitizePixels(width, DEFAULT_LAUNCHER_WIDTH)
+				: DEFAULT_LAUNCHER_WIDTH
 	}
 
 	function clearPosition() {
@@ -192,6 +229,12 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 
 	onMounted(() => {
 		ensureIntercomStyle()
+		updateLauncherWidth()
+		documentObserver = new MutationObserver(updateLauncherWidth)
+		documentObserver.observe(document.body, {
+			childList: true,
+			subtree: true,
+		})
 		applyPosition()
 		stopSync = watch([enabled, identity], sync, {
 			immediate: true,
@@ -204,13 +247,15 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 		stopSync?.()
 		stopPositionSync?.()
 		stopModalSync?.()
+		launcherObserver?.disconnect()
+		documentObserver?.disconnect()
 		stop()
 		clearPosition()
 	})
 
 	return {
 		intercomBubble: {
-			width: computed(() => BUBBLE_WIDTH),
+			width: launcherWidth,
 			horizontalPadding,
 			requestHorizontalPadding: (id: symbol, value: number | null) =>
 				requestFromMap(horizontalPaddingRequests, requestedHorizontalPadding, id, value),
