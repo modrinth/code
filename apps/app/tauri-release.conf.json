@@ -1,22 +1,22 @@
 {
-	"bundle": {
-		"createUpdaterArtifacts": "v1Compatible",
-		"windows": {
-		}
-	},
-	"build": {
-		"features": ["updater"]
-	},
-	"app": {
-		"security": {
-			"capabilities": ["core", "plugins", "updater"]
-		}
-	},
-	"plugins": {
-		"updater": {
-			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdCOTgxOEE2MTc2QTdFMDgKUldRSWZtb1hwaGlZZTBVRm5vWGJMYnVxMWNORzVpSGY1TmFRc2syamNFT2Nna2g3blRWa1RncngK",
-			"endpoints": ["https://raw.githubusercontent.com/fraa2a/icarus-updater/main/updates.json"]
-		}
-	}
+  "bundle": {
+    "createUpdaterArtifacts": "v1Compatible",
+    "windows": {}
+  },
+  "build": {
+    "features": ["updater"]
+  },
+  "app": {
+    "security": {
+      "capabilities": ["core", "plugins", "updater"]
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdCOTgxOEE2MTc2QTdFMDgKUldRSWZtb1hwaGlZZTBVRm5vWGJMYnVxMWNORzVpSGY1TmFRc2syamNFT2Nna2g3blRWa1RncngK",
+      "endpoints": [
+        "https://raw.githubusercontent.com/fraa2a/icarus-updater/refs/heads/main/updater.json"
+      ]
+    }
+  }
 }
-
