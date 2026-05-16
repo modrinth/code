@@ -46,7 +46,7 @@ const filteredProjects = computed(() => {
 </script>
 
 <template>
-	<div class="flex flex-col gap-4 p-6 overflow-y-auto w-full h-full max-w-7xl mx-auto">
+	<div class="flex flex-col gap-4 p-6 overflow-y-auto w-full h-full">
 		<div class="flex items-center justify-between mb-4">
 			<div class="flex items-center gap-4">
 				<h1 class="m-0 text-3xl font-extrabold text-primary">Store Taxphobia</h1>

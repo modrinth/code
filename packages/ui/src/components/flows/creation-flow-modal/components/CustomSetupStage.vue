@@ -363,11 +363,11 @@ const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 		const manifest = ctx.loaderVersionsCache.value[apiLoader]
 		if (!manifest) return []
 
-		const hasPlaceholder = manifest.some((x) => x.id === '${Icarus.gameVersion}')
+		const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
 		const supportedVersions = new Set(
 			manifest
 				.filter(
-					(x) => x.id !== '${Icarus.gameVersion}' && (hasPlaceholder || x.loaders.length > 0),
+					(x) => x.id !== '${modrinth.gameVersion}' && (hasPlaceholder || x.loaders.length > 0),
 				)
 				.map((x) => x.id),
 		)
@@ -464,7 +464,7 @@ function getLoaderVersionsForGameVersion(
 	if (!manifest) return []
 
 	// Some loaders (e.g. Fabric) list all versions under a placeholder entry
-	const placeholder = manifest.find((x) => x.id === '${Icarus.gameVersion}')
+	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
 	if (placeholder) {
 		if (!manifest.some((x) => x.id === gameVersion)) return []
 		debug(

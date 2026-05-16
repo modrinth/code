@@ -35,6 +35,8 @@ const queryClient = useQueryClient()
 
 const { instance, offline, isMinecraftServer, onUnlinked } = injectInstanceSettings()
 
+const loaderErrors: Record<string, Error> = {}
+
 const [
 	fabric_versions,
 	forge_versions,
@@ -45,19 +47,38 @@ const [
 ] = await Promise.all([
 	get_loader_versions('fabric')
 		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
+		.catch((e) => {
+			loaderErrors['fabric'] = e
+			console.error('[InstallationSettings] Failed to load Fabric manifest:', e)
+			return undefined
+		}),
 	get_loader_versions('forge')
 		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
+		.catch((e) => {
+			loaderErrors['forge'] = e
+			console.error('[InstallationSettings] Failed to load Forge manifest:', e)
+			return undefined
+		}),
 	get_loader_versions('quilt')
 		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
+		.catch((e) => {
+			loaderErrors['quilt'] = e
+			console.error('[InstallationSettings] Failed to load Quilt manifest:', e)
+			return undefined
+		}),
 	get_loader_versions('neo')
 		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
+		.catch((e) => {
+			loaderErrors['neoforge'] = e
+			console.error('[InstallationSettings] Failed to load NeoForge manifest:', e)
+			return undefined
+		}),
 	get_game_versions()
 		.then((gameVersions: GameVersionTag[]) => shallowRef(gameVersions))
-		.catch(handleError),
+		.catch((e) => {
+			console.error('[InstallationSettings] Failed to load game versions:', e)
+			return undefined
+		}),
 	get_loaders()
 		.then((value: PlatformTag[]) =>
 			value
@@ -67,8 +88,26 @@ const [
 				.sort((a, b) => (a.name === 'vanilla' ? -1 : b.name === 'vanilla' ? 1 : 0)),
 		)
 		.then((loader: PlatformTag[]) => ref(loader))
-		.catch(handleError),
+		.catch((e) => {
+			console.error('[InstallationSettings] Failed to load loaders:', e)
+			return undefined
+		}),
 ])
+
+// Debug: log manifest load results
+const manifests = { fabric: fabric_versions, forge: forge_versions, quilt: quilt_versions, neoforge: neoforge_versions }
+for (const [name, m] of Object.entries(manifests)) {
+	if (m?.value) {
+		console.info(`[InstallationSettings] ${name}: loaded ${m.value.gameVersions?.length ?? 0} game versions, first ID: "${m.value.gameVersions?.[0]?.id}", loaders in first: ${m.value.gameVersions?.[0]?.loaders?.length ?? 0}`)
+	} else {
+		console.warn(`[InstallationSettings] ${name}: FAILED to load`, loaderErrors[name] ?? 'unknown error')
+	}
+}
+if (all_game_versions?.value) {
+	console.info(`[InstallationSettings] game_versions: loaded ${all_game_versions.value.length} versions`)
+} else {
+	console.warn('[InstallationSettings] game_versions: FAILED to load')
+}
 
 const { data: modpackInfo } = useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', instance.value.path]),
@@ -157,11 +196,28 @@ provideInstallationSettings({
 
 	resolveGameVersions(loader, showSnapshots) {
 		const versions = all_game_versions?.value ?? []
+		if (!all_game_versions?.value) {
+			console.error(`[InstallationSettings] resolveGameVersions(${loader}): game versions not loaded`)
+			return []
+		}
 		const filtered = versions.filter((item) => {
 			if (loader === 'vanilla') return true
 			const manifest = getManifest(loader)
-			return !!manifest?.value?.gameVersions?.some((x) => item.version === x.id)
+			if (!manifest?.value) {
+				return false
+			}
+			return !!manifest.value.gameVersions?.some((x) => item.version === x.id)
 		})
+		if (loader !== 'vanilla' && filtered.length === 0 && versions.length > 0) {
+			const manifest = getManifest(loader)
+			console.error(
+				`[InstallationSettings] resolveGameVersions(${loader}): 0 versions matched out of ${versions.length}.`,
+				`Manifest loaded: ${!!manifest?.value},`,
+				`gameVersions count: ${manifest?.value?.gameVersions?.length ?? 'N/A'},`,
+				`first gameVersion ID: "${manifest?.value?.gameVersions?.[0]?.id ?? 'N/A'}"`,
+				`Error: ${loaderErrors[loader] ?? 'none'}`,
+			)
+		}
 		return (showSnapshots ? filtered : filtered.filter((x) => x.version_type === 'release')).map(
 			(x) => ({ value: x.version, label: x.version }),
 		)
@@ -170,7 +226,13 @@ provideInstallationSettings({
 	resolveLoaderVersions(loader, gameVersion) {
 		if (loader === 'vanilla' || !gameVersion) return []
 		const manifest = getManifest(loader)
-		if (!manifest?.value) return []
+		if (!manifest?.value) {
+			console.error(
+				`[InstallationSettings] resolveLoaderVersions(${loader}, ${gameVersion}): manifest not loaded.`,
+				`Error: ${loaderErrors[loader] ?? 'none'}`,
+			)
+			return []
+		}
 		if (loader === 'fabric' || loader === 'quilt') {
 			return manifest.value.gameVersions[0]?.loaders ?? []
 		}
@@ -181,8 +243,9 @@ provideInstallationSettings({
 		const versions = all_game_versions?.value ?? []
 		if (loader === 'vanilla') return versions.some((x) => x.version_type !== 'release')
 		const manifest = getManifest(loader)
+		if (!manifest?.value) return false
 		const supported = versions.filter(
-			(item) => !!manifest?.value?.gameVersions?.some((x) => item.version === x.id),
+			(item) => !!manifest.value.gameVersions?.some((x) => item.version === x.id),
 		)
 		return supported.some((x) => x.version_type !== 'release')
 	},

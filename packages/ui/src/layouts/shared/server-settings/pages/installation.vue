@@ -341,7 +341,7 @@ function getLoaderVersionsForGameVersion(
 	const manifest = manifestQuery.data.value?.gameVersions
 	if (!manifest) return []
 
-	const placeholder = manifest.find((x) => x.id === '${Icarus.gameVersion}')
+	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
 	if (placeholder) return placeholder.loaders
 
 	const entry = manifest.find((x) => x.id === gameVersion)
@@ -447,7 +447,7 @@ provideInstallationSettings({
 			} else {
 				const manifest = manifestQuery.data.value?.gameVersions
 				if (manifest) {
-					const hasPlaceholder = manifest.some((x) => x.id === '${Icarus.gameVersion}')
+					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
 					if (!hasPlaceholder) {
 						const supportedVersions = new Set(
 							manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
@@ -488,7 +488,7 @@ provideInstallationSettings({
 		}
 		const manifest = manifestQuery.data.value?.gameVersions
 		if (!manifest) return false
-		const hasPlaceholder = manifest.some((x) => x.id === '${Icarus.gameVersion}')
+		const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
 		if (hasPlaceholder) {
 			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
 		}
