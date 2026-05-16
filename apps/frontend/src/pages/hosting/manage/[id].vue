@@ -72,7 +72,7 @@ const authUser = auth.value?.user
 			username: auth.value.user.username,
 			email: auth.value.user.email,
 			created: auth.value.user.created,
-	}
+		}
 	: undefined
 
 async function resolveViewer(): Promise<{ userId: string | null; userRole: string | null }> {

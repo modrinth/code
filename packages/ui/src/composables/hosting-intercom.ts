@@ -4,7 +4,15 @@ import {
 	shutdown as shutdownIntercom,
 	update as updateIntercom,
 } from '@intercom/messenger-js-sdk'
-import { computed, type MaybeRefOrGetter,onBeforeUnmount, onMounted, ref, toValue, watch } from 'vue'
+import {
+	computed,
+	type MaybeRefOrGetter,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	toValue,
+	watch,
+} from 'vue'
 
 import { useModalStack } from './modal-stack'
 
@@ -97,7 +105,9 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 			sanitizePixels(toValue(options.horizontalPadding), DEFAULT_PADDING),
 	)
 	const verticalPadding = computed(() => requestedVerticalClearance.value ?? DEFAULT_PADDING)
-	const enabled = computed(() => Boolean(toValue(options.enabled)) && Boolean(toValue(options.appId)))
+	const enabled = computed(
+		() => Boolean(toValue(options.enabled)) && Boolean(toValue(options.appId)),
+	)
 	const identity = computed(() => String(toValue(options.identityKey) ?? 'hosting'))
 
 	function requestFromMap(
@@ -202,11 +212,12 @@ export function useHostingIntercom(options: UseHostingIntercomOptions) {
 				console.warn('[HOSTING][INTERCOM] failed to initialize secure support chat', error)
 			}
 		} finally {
-			if (run !== bootRun) return
-			booting = false
-			if (syncAfterBoot) {
-				syncAfterBoot = false
-				sync()
+			if (run === bootRun) {
+				booting = false
+				if (syncAfterBoot) {
+					syncAfterBoot = false
+					sync()
+				}
 			}
 		}
 	}
