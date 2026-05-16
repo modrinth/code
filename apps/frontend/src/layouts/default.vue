@@ -819,7 +819,7 @@ const hostingIntercomServerId = computed(() => {
 })
 const hostingIntercom = useHostingIntercom({
 	enabled: hostingIntercomActive,
-	appId: computed(() => config.public.intercomAppId as string),
+	appId: computed(() => config.public.intercomAppId),
 	fetchToken: fetchIntercomToken,
 	identityKey: computed(
 		() => `${auth.value.user?.id ?? 'anonymous'}:${hostingIntercomServerId.value ?? 'hosting'}`,
@@ -858,7 +858,7 @@ const showTinMismatchBanner = computed(() => {
 
 const basePopoutId = useId()
 
-async function fetchIntercomToken(): Promise<{ token: string }> {
+async function fetchIntercomToken() {
 	return $fetch('/api/intercom/messenger-jwt', {
 		query: hostingIntercomServerId.value ? { server_id: hostingIntercomServerId.value } : {},
 	})
