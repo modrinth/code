@@ -2,7 +2,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { type AuthProvider, provideAuth } from '@modrinth/ui'
 import { ref, watchEffect } from 'vue'
 
-import { getSignInRedirectPath } from '~/composables/auth.js'
+import { getSignInRedirectPath } from '~/composables/auth.ts'
 
 export function setupAuthProvider(auth: Awaited<ReturnType<typeof useAuth>>) {
 	const router = useRouter()

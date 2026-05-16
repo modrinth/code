@@ -27,6 +27,7 @@ use crate::util::fetch::{
 use async_zip::base::read::seek::ZipFileReader;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
+use std::cmp::Reverse;
 use std::collections::HashSet;
 use std::io::Cursor;
 
@@ -283,7 +284,7 @@ fn check_modpack_update(
         .collect();
 
     // Sort by date_published descending (newest first)
-    compatible_versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
+    compatible_versions.sort_by_key(|b| Reverse(b.date_published));
 
     // Find the newest compatible version
     if let Some(newest) = compatible_versions.first() {

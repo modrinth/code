@@ -64,6 +64,7 @@ pub struct User {
     pub payout_data: Option<UserPayoutData>,
     pub stripe_customer_id: Option<String>,
     pub allow_friend_requests: Option<bool>,
+    pub eligibility_verified_at: Option<DateTime<Utc>>,
 
     // DEPRECATED. Always returns None
     pub github_id: Option<u64>,
@@ -98,6 +99,7 @@ impl From<DBUser> for User {
             github_id: None,
             stripe_customer_id: None,
             allow_friend_requests: None,
+            eligibility_verified_at: None,
         }
     }
 }
@@ -150,6 +152,7 @@ impl User {
             }),
             stripe_customer_id: db_user.stripe_customer_id,
             allow_friend_requests: Some(db_user.allow_friend_requests),
+            eligibility_verified_at: db_user.eligibility_verified_at,
         }
     }
 }
