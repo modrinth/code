@@ -218,7 +218,11 @@
 				:key="instance.path"
 			>
 				<template v-if="Component">
-					<Suspense :key="instance.path">
+					<Suspense
+						:key="instance.path"
+						@pending="subpagePending = true"
+						@resolve="subpagePending = false"
+					>
 						<component
 							:is="Component"
 							:instance="instance"
@@ -295,6 +299,7 @@ import {
 	ServerPing,
 	ServerRecentPlays,
 	ServerRegion,
+	useLoadingBarToken,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -343,9 +348,12 @@ window.addEventListener('online', () => {
 const instance = ref<GameInstance>()
 const playing = ref(false)
 const loading = ref(false)
+const subpagePending = ref(false)
 const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
+
+useLoadingBarToken(subpagePending)
 
 const isServerInstance = ref(false)
 const linkedProjectV3 = ref<Labrinth.Projects.v3.Project>()

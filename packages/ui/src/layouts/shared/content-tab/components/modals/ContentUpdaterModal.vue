@@ -507,7 +507,12 @@ const filteredVersions = computed(() => {
 
 	const beforeFilterCount = versions.length
 	if (!isModpack.value && hideIncompatibleState.value) {
-		versions = versions.filter(isVersionCompatible)
+		versions = versions.filter(
+			(version) =>
+				version.id === props.currentVersionId ||
+				version.id === selectedVersion.value?.id ||
+				isVersionCompatible(version),
+		)
 	}
 
 	debug('filteredVersions computed', {
@@ -641,7 +646,22 @@ function confirmIncompatibleUpdate() {
 	pendingIncompatibleUpdate.value = null
 
 	if (pendingUpdate) {
-		emitUpdate(pendingUpdate.version, pendingUpdate.event)
+		const current = currentVersion.value
+		const isPendingDowngrade = current
+			? new Date(pendingUpdate.version.date_published) < new Date(current.date_published)
+			: false
+		const changesGameVersion = versionChangesGameVersion(
+			pendingUpdate.version,
+			props.currentGameVersion,
+		)
+		const shouldShowParentWarning =
+			isModpack.value &&
+			!pendingUpdate.event.shiftKey &&
+			(changesGameVersion || isPendingDowngrade)
+
+		emitUpdate(pendingUpdate.version, pendingUpdate.event, {
+			hide: !shouldShowParentWarning,
+		})
 	}
 }
 

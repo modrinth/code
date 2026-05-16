@@ -3,13 +3,12 @@
 //! ## Data Flow
 //!
 //! 1. Frontend calls `get_content_items(profile_path)`
-//! 2. Backend fetches all installed files via `Profile::get_projects()`
-//! 3. If profile is linked to a modpack:
+//! 2. If profile is linked to a modpack:
 //!    - Fetch modpack file hashes from cache (populated during installation)
 //!    - Fallback: re-download .mrpack if cache miss (cleared/expired)
-//!    - Filter out files that belong to the modpack
-//! 4. For remaining files, fetch project/version/owner metadata in parallel
-//! 5. Return sorted `ContentItem` list
+//!    - Filter out files that belong to the modpack before update lookup
+//! 3. For remaining files, fetch project/version/owner metadata in parallel
+//! 4. Return sorted `ContentItem` list
 //!
 //! ## Caching
 //!
@@ -276,10 +275,6 @@ pub async fn get_content_items(
     pool: &SqlitePool,
     fetch_semaphore: &FetchSemaphore,
 ) -> crate::Result<Vec<ContentItem>> {
-    let all_files = profile
-        .get_projects(cache_behaviour, pool, fetch_semaphore)
-        .await?;
-
     let modpack_ids = if let Some(ref linked_data) = profile.linked_data {
         if linked_data.version_id.is_empty() {
             None
@@ -320,23 +315,35 @@ pub async fn get_content_items(
         None
     };
 
-    let user_files: Vec<(String, ProfileFile)> = all_files
-        .into_iter()
-        .filter(|(_, file)| {
-            modpack_ids
-                .as_ref()
-                .is_none_or(|ids| !ids.is_modpack_file(file))
-        })
-        .collect();
+    let user_files: Vec<(String, ProfileFile)> = if let Some(ids) = &modpack_ids
+    {
+        let filtered_files = profile
+            .get_projects_excluding_modpack_files(
+                &ids.hashes,
+                &ids.project_ids,
+                cache_behaviour,
+                pool,
+                fetch_semaphore,
+            )
+            .await?;
+        filtered_files.into_iter().collect()
+    } else {
+        let all_files = profile
+            .get_projects(cache_behaviour, pool, fetch_semaphore)
+            .await?;
+        all_files.into_iter().collect()
+    };
 
-    profile_files_to_content_items(
+    let content_items = profile_files_to_content_items(
         &profile.path,
         &user_files,
         cache_behaviour,
         pool,
         fetch_semaphore,
     )
-    .await
+    .await?;
+
+    Ok(content_items)
 }
 
 /// Pre-fetched metadata for projects, versions, teams, and organizations.

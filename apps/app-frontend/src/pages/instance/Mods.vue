@@ -13,6 +13,7 @@
 					:modpack-name="linkedModpackProject?.title"
 					:modpack-icon-url="linkedModpackProject?.icon_url ?? undefined"
 					:enable-toggle="!props.isServerInstance"
+					:busy="isBulkOperating"
 					:get-overflow-options="getOverflowOptions"
 					:switch-version="handleSwitchVersion"
 					@update:enabled="handleModpackContentToggle"
@@ -92,7 +93,6 @@ import {
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { useDebounceFn } from '@vueuse/core'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -220,6 +220,82 @@ const loadingChangelog = ref(false)
 const updatingModpack = ref(false)
 const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const isModpackUpdateDowngrade = ref(false)
+const activeContentOperationKeys = ref(new Set<string>())
+
+let activeContentOperationCount = 0
+let updateRequestId = 0
+const activeUpdateRequestId = ref(0)
+
+function fileNameFromPath(path: string) {
+	return path.split('/').pop() ?? path
+}
+
+function getContentOperationKeys(item: ContentItem) {
+	return [
+		item.id,
+		item.file_path,
+		item.file_name,
+		item.project?.id,
+		item.version?.id,
+	].filter((key): key is string => !!key)
+}
+
+function hasContentOperation(item: ContentItem) {
+	const keys = getContentOperationKeys(item)
+	return keys.some((key) => activeContentOperationKeys.value.has(key))
+}
+
+function setContentItemBusy(item: ContentItem, busy: boolean, originalFileName = item.file_name) {
+	item.installing = busy
+	modpackContentModal.value?.updateItem(originalFileName, {
+		installing: busy,
+		disabled: busy,
+	})
+	if (item.file_name !== originalFileName) {
+		modpackContentModal.value?.updateItem(item.file_name, {
+			installing: busy,
+			disabled: busy,
+		})
+	}
+}
+
+function beginContentOperation(item: ContentItem) {
+	if (hasContentOperation(item)) return null
+
+	const keys = getContentOperationKeys(item)
+	activeContentOperationKeys.value = new Set([...activeContentOperationKeys.value, ...keys])
+	activeContentOperationCount++
+	isBulkOperating.value = true
+	setContentItemBusy(item, true)
+
+	return { keys, originalFileName: item.file_name }
+}
+
+function finishContentOperation(
+	item: ContentItem,
+	operation: { keys: string[]; originalFileName: string },
+) {
+	const nextKeys = new Set(activeContentOperationKeys.value)
+	for (const key of operation.keys) {
+		nextKeys.delete(key)
+	}
+	activeContentOperationKeys.value = nextKeys
+	activeContentOperationCount = Math.max(0, activeContentOperationCount - 1)
+	setContentItemBusy(item, false, operation.originalFileName)
+	if (activeContentOperationCount === 0) {
+		isBulkOperating.value = false
+	}
+}
+
+function beginUpdateRequest() {
+	updateRequestId++
+	activeUpdateRequestId.value = updateRequestId
+	return updateRequestId
+}
+
+function isActiveUpdateRequest(requestId: number) {
+	return activeUpdateRequestId.value === requestId
+}
 
 async function handleBrowseContent() {
 	if (!props.instance) return
@@ -266,9 +342,21 @@ async function handleUploadFiles() {
 }
 
 async function toggleDisableMod(mod: ContentItem) {
+	if (!mod.file_path) return
+	const operation = beginContentOperation(mod)
+	if (!operation) return
+
 	try {
-		mod.file_path = await toggle_disable_project(props.instance.path, mod.file_path!)
+		const newPath = await toggle_disable_project(props.instance.path, mod.file_path)
+		const newFileName = fileNameFromPath(newPath)
+		mod.file_path = newPath
+		mod.file_name = newFileName
 		mod.enabled = !mod.enabled
+		modpackContentModal.value?.updateItem(operation.originalFileName, {
+			file_path: newPath,
+			file_name: newFileName,
+			enabled: mod.enabled,
+		})
 
 		trackEvent('InstanceProjectDisable', {
 			loader: props.instance.loader,
@@ -280,33 +368,48 @@ async function toggleDisableMod(mod: ContentItem) {
 		})
 	} catch (err) {
 		handleError(err as Error)
+	} finally {
+		finishContentOperation(mod, operation)
 	}
 }
 
-const toggleDisableDebounced = useDebounceFn(toggleDisableMod, 20)
+const toggleDisableDebounced = toggleDisableMod
 
 async function removeMod(mod: ContentItem) {
-	await remove_project(props.instance.path, mod.file_path!).catch(handleError)
-	projects.value = projects.value.filter((x) => mod.file_path !== x.file_path)
+	if (!mod.file_path) return
+	const operation = beginContentOperation(mod)
+	if (!operation) return
 
-	trackEvent('InstanceProjectRemove', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		id: mod.project?.id,
-		name: mod.project?.title ?? mod.file_name,
-		project_type: mod.project_type,
-	})
+	try {
+		const removedPath = mod.file_path
+		await remove_project(props.instance.path, removedPath)
+		projects.value = projects.value.filter((x) => removedPath !== x.file_path)
+
+		trackEvent('InstanceProjectRemove', {
+			loader: props.instance.loader,
+			game_version: props.instance.game_version,
+			id: mod.project?.id,
+			name: mod.project?.title ?? mod.file_name,
+			project_type: mod.project_type,
+		})
+	} catch (err) {
+		handleError(err as Error)
+	} finally {
+		finishContentOperation(mod, operation)
+	}
 }
 
 async function updateProject(mod: ContentItem) {
-	try {
-		const newPath = await update_project(props.instance.path, mod.file_path!)
-		mod.file_path = newPath
+	if (!mod.file_path) return
+	const operation = beginContentOperation(mod)
+	if (!operation) return
 
-		if (mod.update_version_id) {
-			const versionData = await get_version(mod.update_version_id, 'must_revalidate').catch(
-				handleError,
-			)
+	try {
+		const updateVersionId = mod.update_version_id
+		await update_project(props.instance.path, mod.file_path)
+
+		if (updateVersionId) {
+			const versionData = await get_version(updateVersionId, 'must_revalidate').catch(handleError)
 
 			if (versionData) {
 				const profile = await get(props.instance.path).catch(handleError)
@@ -317,12 +420,6 @@ async function updateProject(mod: ContentItem) {
 			}
 		}
 
-		mod.has_update = false
-		if (mod.version && mod.update_version_id) {
-			mod.version.id = mod.update_version_id
-		}
-		mod.update_version_id = null
-
 		trackEvent('InstanceProjectUpdate', {
 			loader: props.instance.loader,
 			game_version: props.instance.game_version,
@@ -332,38 +429,63 @@ async function updateProject(mod: ContentItem) {
 		})
 	} catch (err) {
 		handleError(err as Error)
+	} finally {
+		await refreshContentState('must_revalidate')
+		finishContentOperation(mod, operation)
 	}
 }
 
 async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions.v2.Version) {
-	isBulkOperating.value = true
-	mod.installing = true
-	if (mod.version) {
-		mod.version.id = version.id
-		mod.version.version_number = version.version_number
-	}
+	if (!mod.file_path) return
+	const operation = beginContentOperation(mod)
+	if (!operation) return
+
+	const oldPath = mod.file_path
+	const wasDisabled = mod.enabled === false || oldPath.endsWith('.disabled')
+	let newPath: string | null = null
+	let shouldRemoveNewOnError = false
+
 	try {
-		await remove_project(props.instance.path, mod.file_path!)
-		const newPath = await add_project_from_version(props.instance.path, version.id, 'standalone')
+		newPath = await add_project_from_version(props.instance.path, version.id, 'update')
+		shouldRemoveNewOnError = newPath !== oldPath
+
+		if (wasDisabled) {
+			newPath = await toggle_disable_project(props.instance.path, newPath)
+		}
 
 		const profile = await get(props.instance.path).catch(handleError)
 		if (profile) {
 			await installVersionDependencies(profile, version, 'update').catch(handleError)
 		}
 
-		mod.file_path = newPath
+		shouldRemoveNewOnError = false
+		if (newPath !== oldPath) {
+			await remove_project(props.instance.path, oldPath)
+		}
+
+		trackEvent('InstanceProjectUpdate', {
+			loader: props.instance.loader,
+			game_version: props.instance.game_version,
+			id: mod.project?.id,
+			name: mod.project?.title ?? mod.file_name,
+			project_type: mod.project_type,
+		})
 	} catch (err) {
+		if (shouldRemoveNewOnError && newPath && newPath !== oldPath) {
+			await remove_project(props.instance.path, newPath).catch(() => {})
+		}
 		handleError(err as Error)
 	} finally {
-		mod.installing = false
-		isBulkOperating.value = false
-		await initProjects()
+		await refreshContentState('must_revalidate')
+		finishContentOperation(mod, operation)
 	}
 }
 
 async function handleUpdate(id: string) {
 	const item = projects.value.find((p) => p.id === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
+
+	const requestId = beginUpdateRequest()
 
 	debug('handleUpdate triggered', {
 		fileName: item.file_name,
@@ -424,6 +546,8 @@ async function handleUpdate(id: string) {
 		return handleError(e)
 	})) as Labrinth.Versions.v2.Version[] | null
 
+	if (!isActiveUpdateRequest(requestId) || updatingProject.value?.id !== item.id) return
+
 	loadingVersions.value = false
 
 	if (!versions) {
@@ -474,6 +598,8 @@ async function handleUpdate(id: string) {
 async function handleSwitchVersion(item: ContentItem) {
 	if (!item.project?.id || !item.version?.id) return
 
+	const requestId = beginUpdateRequest()
+
 	updatingModpack.value = false
 	updatingProject.value = item
 	updatingProjectVersions.value = []
@@ -487,6 +613,8 @@ async function handleSwitchVersion(item: ContentItem) {
 	const versions = (await get_project_versions(item.project.id).catch((e) => {
 		return handleError(e)
 	})) as Labrinth.Versions.v2.Version[] | null
+
+	if (!isActiveUpdateRequest(requestId) || updatingProject.value?.id !== item.id) return
 
 	loadingVersions.value = false
 
@@ -521,8 +649,27 @@ async function handleModpackContent() {
 	}
 }
 
+async function refreshModpackContentItems(cacheBehaviour?: CacheBehaviour) {
+	if (!props.instance?.path) return
+
+	const contentItems = await get_linked_modpack_content(props.instance.path, cacheBehaviour).catch(
+		handleError,
+	)
+
+	if (contentItems) {
+		modpackContentModal.value?.setItems(contentItems)
+	}
+}
+
+async function refreshContentState(cacheBehaviour?: CacheBehaviour) {
+	await initProjects(cacheBehaviour)
+	await refreshModpackContentItems(cacheBehaviour)
+}
+
 async function handleModpackUpdate() {
 	if (!props.instance?.linked_data?.project_id) return
+
+	const requestId = beginUpdateRequest()
 
 	updatingModpack.value = true
 	updatingProject.value = null
@@ -566,6 +713,8 @@ async function handleModpackUpdate() {
 		handleError,
 	)) as Labrinth.Versions.v2.Version[] | null
 
+	if (!isActiveUpdateRequest(requestId) || !updatingModpack.value) return
+
 	loadingVersions.value = false
 
 	if (!versions) return
@@ -600,10 +749,12 @@ async function fetchAndSpliceVersion(
 	versionId: string,
 	cacheBehaviour?: Parameters<typeof get_version>[1],
 	onError?: (err: unknown) => void,
+	requestId = activeUpdateRequestId.value,
 ) {
 	const fullVersion = (await get_version(versionId, cacheBehaviour).catch(
 		onError ?? (() => null),
 	)) as Labrinth.Versions.v2.Version | null
+	if (!isActiveUpdateRequest(requestId)) return
 	if (!fullVersion) return
 	const index = updatingProjectVersions.value.findIndex((v) => v.id === versionId)
 	if (index !== -1) {
@@ -615,17 +766,26 @@ async function fetchAndSpliceVersion(
 
 async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	if (version.changelog != null) return
+	const requestId = activeUpdateRequestId.value
 	loadingChangelog.value = true
-	await fetchAndSpliceVersion(version.id, 'must_revalidate', handleError as (err: unknown) => void)
-	loadingChangelog.value = false
+	await fetchAndSpliceVersion(
+		version.id,
+		'must_revalidate',
+		handleError as (err: unknown) => void,
+		requestId,
+	)
+	if (isActiveUpdateRequest(requestId)) {
+		loadingChangelog.value = false
+	}
 }
 
 async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
 	if (version.changelog != null) return
-	await fetchAndSpliceVersion(version.id)
+	await fetchAndSpliceVersion(version.id, undefined, undefined, activeUpdateRequestId.value)
 }
 
 function resetUpdateState() {
+	activeUpdateRequestId.value = 0
 	updatingModpack.value = false
 	updatingProject.value = null
 	updatingProjectVersions.value = []
