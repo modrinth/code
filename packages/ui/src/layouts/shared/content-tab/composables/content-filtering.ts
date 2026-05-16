@@ -60,14 +60,10 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 		: ref<string[]>([])
 
 	const availableStatusFilters = computed<Array<'enabled' | 'disabled'>>(() => {
-		const filters: Array<'enabled' | 'disabled'> = []
-		if (items.value.some((m) => m.enabled)) {
-			filters.push('enabled')
-		}
-		if (items.value.some((m) => !m.enabled)) {
-			filters.push('disabled')
-		}
-		return filters
+		const hasEnabledContent = items.value.some((m) => m.enabled)
+		const hasDisabledContent = items.value.some((m) => !m.enabled)
+
+		return hasEnabledContent && hasDisabledContent ? ['enabled', 'disabled'] : []
 	})
 
 	const filterOptions = computed<ContentFilterOption[]>(() => {
