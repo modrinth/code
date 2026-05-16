@@ -259,7 +259,7 @@ pub async fn review_edit(
             rating,
             id as crate::database::models::ids::DBReviewId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -269,7 +269,7 @@ pub async fn review_edit(
             body,
             id as crate::database::models::ids::DBReviewId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 

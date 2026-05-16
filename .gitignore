@@ -71,6 +71,9 @@ app-playground-data/*
 # labrinth demo fixtures
 apps/labrinth/fixtures/demo
 
+# sqlx offline query cache (generated locally, not committed)
+.sqlx/
+
 *storybook.log
 storybook-static
 

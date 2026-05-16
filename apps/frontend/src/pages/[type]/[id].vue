@@ -2732,9 +2732,7 @@ const navLinks = computed(() => {
 		{
 			label: formatMessage(messages.reviewsTab),
 			href: `${projectUrl}/reviews`,
-			shown:
-				projectV3Loaded.value &&
-				projectV3.value?.minecraft_server === undefined,
+			shown: projectV3Loaded.value && projectV3.value?.minecraft_server === undefined,
 		},
 		{
 			label: formatMessage(messages.moderationTab),

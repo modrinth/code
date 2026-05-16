@@ -23,7 +23,10 @@
 				</ButtonStyled>
 			</div>
 
-			<div v-if="averageRating !== null && reviewsData && reviewsData.total > 0" class="flex items-center gap-3">
+			<div
+				v-if="averageRating !== null && reviewsData && reviewsData.total > 0"
+				class="flex items-center gap-3"
+			>
 				<div class="flex gap-0.5">
 					<StarIcon
 						v-for="i in 5"
@@ -45,19 +48,24 @@
 					</h3>
 
 					<div class="flex flex-col gap-2">
-						<label class="font-medium text-secondary text-sm">Rating</label>
-						<div class="flex gap-1">
+						<label class="text-sm font-medium text-secondary">Rating</label>
+						<div class="flex gap-1" @mouseleave="hoverRating = 0">
 							<button
 								v-for="i in 5"
 								:key="i"
 								type="button"
-								class="p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded"
+								class="rounded p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
 								:aria-label="`Rate ${i} out of 5`"
+								@mouseenter="hoverRating = i"
 								@click="formRating = i"
 							>
 								<StarIcon
 									class="h-7 w-7 transition-colors"
-									:class="i <= formRating ? 'text-yellow-400' : 'text-button-text hover:text-yellow-300'"
+									:class="
+										i <= (hoverRating || formRating)
+											? 'text-yellow-400'
+											: 'text-button-text'
+									"
 									aria-hidden="true"
 								/>
 							</button>
@@ -65,8 +73,8 @@
 					</div>
 
 					<div class="flex flex-col gap-1">
-						<label for="review-body" class="font-medium text-secondary text-sm"
-							>Review <span class="text-secondary font-normal">(optional)</span></label
+						<label for="review-body" class="text-sm font-medium text-secondary"
+							>Review <span class="font-normal text-secondary">(optional)</span></label
 						>
 						<textarea
 							id="review-body"
@@ -118,10 +126,10 @@
 						>
 							{{ review.user_id }}
 						</nuxt-link>
-						<span class="text-secondary text-sm">&middot;</span>
+						<span class="text-sm text-secondary">&middot;</span>
 						<time
 							:datetime="review.created"
-							class="text-secondary text-sm"
+							class="text-sm text-secondary"
 							:title="new Date(review.created).toLocaleString()"
 						>
 							{{ formatRelativeDate(review.created) }}
@@ -178,6 +186,7 @@ const auth = await useAuth()
 
 const showForm = ref(false)
 const formRating = ref(0)
+const hoverRating = ref(0)
 const formBody = ref('')
 const formError = ref('')
 const submitting = ref(false)
@@ -265,8 +274,9 @@ async function submitReview() {
 			text: 'Your review has been saved successfully.',
 			type: 'success',
 		})
-	} catch (err) {
-		formError.value = err?.data?.description ?? 'An error occurred. Please try again.'
+	} catch (err: unknown) {
+		const e = err as { data?: { description?: string }; message?: string }
+		formError.value = e?.data?.description ?? e?.message ?? 'An error occurred. Please try again.'
 	} finally {
 		submitting.value = false
 	}

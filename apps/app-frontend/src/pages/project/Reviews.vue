@@ -23,7 +23,10 @@
 				</ButtonStyled>
 			</div>
 
-			<div v-if="averageRating !== null && reviewsData && reviewsData.total > 0" class="flex items-center gap-3">
+			<div
+				v-if="averageRating !== null && reviewsData && reviewsData.total > 0"
+				class="flex items-center gap-3"
+			>
 				<div class="flex gap-0.5">
 					<StarIcon
 						v-for="i in 5"
@@ -57,7 +60,9 @@
 							>
 								<StarIcon
 									class="h-7 w-7 transition-colors"
-									:class="i <= formRating ? 'text-yellow-400' : 'text-button-text hover:text-yellow-300'"
+									:class="
+										i <= formRating ? 'text-yellow-400' : 'text-button-text hover:text-yellow-300'
+									"
 									aria-hidden="true"
 								/>
 							</button>
