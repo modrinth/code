@@ -93,7 +93,7 @@ import {
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
@@ -101,22 +101,20 @@ import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
+import { loadInstanceContentData, type InstanceContentData } from '@/helpers/instance-content'
 import {
 	add_project_from_path,
 	add_project_from_version,
 	duplicate,
 	edit,
 	get,
-	get_content_items,
 	get_linked_modpack_content,
-	get_linked_modpack_info,
 	list,
 	remove_project,
 	toggle_disable_project,
 	update_managed_modrinth_version,
 	update_project,
 } from '@/helpers/profile'
-import { get_categories } from '@/helpers/tags.js'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
@@ -161,6 +159,7 @@ const props = defineProps<{
 	instance: GameInstance
 	isServerInstance?: boolean
 	openSettings?: () => void
+	preloadedContent?: InstanceContentData | null
 }>()
 
 const loading = ref(true)
@@ -509,7 +508,7 @@ async function handleUpdate(id: string) {
 	await nextTick()
 
 	const initialVersionId = item.update_version_id ?? undefined
-	console.log('[Mods.vue] Update clicked: opening content updater modal', {
+	debug('handleUpdate: opening content updater modal', {
 		type: 'content',
 		initialVersionId,
 		item: {
@@ -575,7 +574,7 @@ async function handleUpdate(id: string) {
 	)
 	const preselectedVersion =
 		versions.find((version) => version.id === initialVersionId) ?? versions[0] ?? null
-	console.log('[Mods.vue] Update clicked: resolved content updater preselection', {
+	debug('handleUpdate: resolved content updater preselection', {
 		type: 'content',
 		initialVersionId,
 		foundInitialVersion: versions.some((version) => version.id === initialVersionId),
@@ -682,7 +681,7 @@ async function handleModpackUpdate() {
 
 	const initialVersionId =
 		linkedModpackUpdateVersionId.value ?? props.instance?.linked_data?.version_id ?? undefined
-	console.log('[Mods.vue] Update clicked: opening modpack updater modal', {
+	debug('handleModpackUpdate: opening modpack updater modal', {
 		type: 'modpack',
 		initialVersionId,
 		linkedModpackUpdateVersionId: linkedModpackUpdateVersionId.value,
@@ -725,7 +724,7 @@ async function handleModpackUpdate() {
 	)
 	const preselectedVersion =
 		versions.find((version) => version.id === initialVersionId) ?? versions[0] ?? null
-	console.log('[Mods.vue] Update clicked: resolved modpack updater preselection', {
+	debug('handleModpackUpdate: resolved modpack updater preselection', {
 		type: 'modpack',
 		initialVersionId,
 		foundInitialVersion: versions.some((version) => version.id === initialVersionId),
@@ -932,51 +931,27 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 async function initProjects(cacheBehaviour?: CacheBehaviour) {
 	if (!props.instance) return
 
-	const [contentItems, modpackInfo, allCategories] = await Promise.all([
-		get_content_items(props.instance.path, cacheBehaviour).catch(handleError),
-		get_linked_modpack_info(props.instance.path, cacheBehaviour).catch(handleError),
-		get_categories().catch(handleError),
-	])
+	const contentData = await loadInstanceContentData(props.instance.path, cacheBehaviour, handleError)
+	applyContentData(contentData)
+}
 
-	if (!contentItems) {
+function applyContentData(contentData: InstanceContentData) {
+	if (contentData.path !== props.instance.path) return false
+
+	if (!contentData.contentItems) {
 		loading.value = false
-		return
+		return true
 	}
 
-	projects.value = contentItems
+	projects.value = contentData.contentItems
 
-	if (modpackInfo) {
-		linkedModpackProject.value = {
-			...modpackInfo.project,
-			slug: modpackInfo.project.slug ?? modpackInfo.project.id,
-			icon_url: modpackInfo.project.icon_url ?? undefined,
-		}
-		linkedModpackVersion.value = {
-			...modpackInfo.version,
-			date_published: modpackInfo.version.date_published.toString(),
-		}
-		linkedModpackOwner.value = modpackInfo.owner
-			? {
-					...modpackInfo.owner,
-					avatar_url: modpackInfo.owner.avatar_url ?? undefined,
-				}
-			: null
-
-		linkedModpackHasUpdate.value = modpackInfo.has_update
-		linkedModpackUpdateVersionId.value = modpackInfo.update_version_id
-
-		if (allCategories && modpackInfo.project.categories) {
-			const seen = new Set<string>()
-			linkedModpackCategories.value = allCategories.filter((cat: { name: string }) => {
-				if (modpackInfo.project.categories.includes(cat.name) && !seen.has(cat.name)) {
-					seen.add(cat.name)
-					return true
-				}
-				return false
-			})
-		} else {
-			linkedModpackCategories.value = []
-		}
+	if (contentData.modpack) {
+		linkedModpackProject.value = contentData.modpack.project
+		linkedModpackVersion.value = contentData.modpack.version
+		linkedModpackOwner.value = contentData.modpack.owner
+		linkedModpackCategories.value = contentData.modpack.categories
+		linkedModpackHasUpdate.value = contentData.modpack.hasUpdate
+		linkedModpackUpdateVersionId.value = contentData.modpack.updateVersionId
 	} else {
 		linkedModpackProject.value = null
 		linkedModpackVersion.value = null
@@ -987,6 +962,7 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 	}
 
 	loading.value = false
+	return true
 }
 
 provideAppBackup({
@@ -1114,10 +1090,22 @@ provideContentManager({
 	filterPersistKey: props.instance.path,
 })
 
-await initProjects()
+type UnlistenFn = () => void
 
-// Restore modpack content modal state if returning via back navigation
-if (savedModalState) {
+const initialContentReady = loadInitialContent()
+void initialContentReady.then(restoreModpackContentModalState).catch(handleError)
+
+function loadInitialContent() {
+	if (props.preloadedContent && applyContentData(props.preloadedContent)) {
+		return Promise.resolve()
+	}
+
+	return initProjects()
+}
+
+async function restoreModpackContentModalState() {
+	if (!savedModalState) return
+
 	const stateToRestore = savedModalState
 	savedModalState = null
 	await nextTick()
@@ -1130,18 +1118,32 @@ const removeBeforeEach = router.beforeEach(() => {
 	savedModalState = state ?? null
 })
 
-const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
-	if (event.payload.type !== 'drop' || !props.instance) return
+let isUnmounted = false
+let unlistenDragDrop: UnlistenFn | null = null
+let unlistenProfiles: UnlistenFn | null = null
 
-	for (const file of event.payload.paths) {
-		if (file.endsWith('.mrpack')) continue
-		await add_project_from_path(props.instance.path, file).catch(handleError)
-	}
-	await initProjects()
-})
+onMounted(() => {
+	void getCurrentWebview()
+		.onDragDropEvent(async (event) => {
+			if (event.payload.type !== 'drop' || !props.instance) return
 
-const unlistenProfiles = await profile_listener(
-	async (event: { event: string; profile_path_id: string }) => {
+			for (const file of event.payload.paths) {
+				if (file.endsWith('.mrpack')) continue
+				await add_project_from_path(props.instance.path, file).catch(handleError)
+			}
+			await initProjects()
+		})
+		.then((unlisten) => {
+			if (isUnmounted) {
+				unlisten()
+				return
+			}
+
+			unlistenDragDrop = unlisten
+		})
+		.catch(handleError)
+
+	void profile_listener(async (event: { event: string; profile_path_id: string }) => {
 		if (
 			props.instance &&
 			event.profile_path_id === props.instance.path &&
@@ -1151,8 +1153,17 @@ const unlistenProfiles = await profile_listener(
 		) {
 			await initProjects()
 		}
-	},
-)
+	})
+		.then((unlisten) => {
+			if (isUnmounted) {
+				unlisten()
+				return
+			}
+
+			unlistenProfiles = unlisten
+		})
+		.catch(handleError)
+})
 
 watch(
 	() => props.instance?.install_stage,
@@ -1175,8 +1186,9 @@ watch(
 )
 
 onUnmounted(() => {
+	isUnmounted = true
 	removeBeforeEach()
-	unlisten()
-	unlistenProfiles()
+	unlistenDragDrop?.()
+	unlistenProfiles?.()
 })
 </script>
