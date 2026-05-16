@@ -52,7 +52,6 @@ const meta = {
 				const uploadState = ref<UploadState>({
 					isUploading: true,
 					currentFileName: 'resourcepack.zip',
-					currentFileProgress: 0.2,
 					uploadedBytes: 20_000,
 					totalBytes: 100_000,
 					completedFiles: 1,

@@ -229,7 +229,6 @@ async function handleDownloadFile(path: string, _fileName: string) {
 const uploadState = ref<UploadState>({
 	isUploading: false,
 	currentFileName: null,
-	currentFileProgress: 0,
 	uploadedBytes: 0,
 	totalBytes: 0,
 	completedFiles: 0,
@@ -241,8 +240,7 @@ async function handleUploadFiles(files: File[]) {
 
 	uploadState.value = {
 		isUploading: true,
-		currentFileName: '',
-		currentFileProgress: 0,
+		currentFileName: files[0]?.name ?? null,
 		uploadedBytes: 0,
 		totalBytes: files.reduce((sum, f) => sum + f.size, 0),
 		completedFiles: 0,
@@ -258,7 +256,6 @@ async function handleUploadFiles(files: File[]) {
 			await writeFileBytes(targetPath, new Uint8Array(buffer))
 			uploadState.value.completedFiles++
 			uploadState.value.uploadedBytes += file.size
-			uploadState.value.currentFileProgress = 1
 		}
 	} catch (e) {
 		addNotification({

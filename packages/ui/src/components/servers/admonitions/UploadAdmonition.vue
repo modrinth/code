@@ -1,18 +1,14 @@
 <template>
-	<Admonition type="info" :progress="overallProgress" progress-color="blue">
+	<Admonition type="info" :progress="displayProgress" progress-color="blue">
 		<template #icon>
 			<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
 		</template>
 		<template #header>
-			{{
-				state.currentFileName
-					? `Uploading ${state.currentFileName} (${state.completedFiles}/${state.totalFiles})`
-					: `Uploading files (${state.completedFiles}/${state.totalFiles})`
-			}}
+			{{ headerText }}
 		</template>
 		<span class="text-secondary">
-			{{ formatBytes(state.uploadedBytes) }} / {{ formatBytes(state.totalBytes) }} ({{
-				Math.round(overallProgress * 100)
+			{{ formatBytes(displayUploadedBytes) }} / {{ formatBytes(state.totalBytes) }} ({{
+				Math.round(displayProgress * 100)
 			}}%)
 		</span>
 		<template v-if="cancelUpload" #top-right-actions>
@@ -39,9 +35,32 @@ const ctx = injectModrinthServerContext()
 const state = computed(() => ctx.uploadState.value)
 const cancelUpload = computed(() => ctx.cancelUpload.value)
 
-const overallProgress = computed(() => {
+const headerText = computed(() => {
 	const s = state.value
-	if (!s.isUploading || s.totalFiles === 0) return 0
-	return Math.min((s.completedFiles + s.currentFileProgress) / s.totalFiles, 1)
+	if (s.currentFileName) {
+		return `Uploading ${s.currentFileName} (${currentFileNumber.value}/${s.totalFiles})`
+	}
+	return `Uploading files (${s.completedFiles}/${s.totalFiles})`
+})
+
+const currentFileNumber = computed(() => {
+	const s = state.value
+	if (s.totalFiles === 0) return 0
+	return Math.min(s.completedFiles + 1, s.totalFiles)
+})
+
+const displayUploadedBytes = computed(() => {
+	const s = state.value
+	if (s.totalBytes <= 0) return s.uploadedBytes
+	return Math.min(s.uploadedBytes, s.totalBytes)
+})
+
+const displayProgress = computed(() => {
+	const s = state.value
+	if (!s.isUploading) return 0
+	if (s.totalBytes > 0) {
+		return displayUploadedBytes.value / s.totalBytes
+	}
+	return 0
 })
 </script>

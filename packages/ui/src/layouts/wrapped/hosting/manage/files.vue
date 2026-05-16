@@ -374,7 +374,6 @@ async function uploadFiles(files: File[]) {
 	uploadState.value = {
 		isUploading: true,
 		currentFileName: files[0].name,
-		currentFileProgress: 0,
 		uploadedBytes: 0,
 		totalBytes,
 		completedFiles: 0,
@@ -389,13 +388,11 @@ async function uploadFiles(files: File[]) {
 		const filePath = `${currentPath.value}/${file.name}`.replace('//', '/')
 
 		uploadState.value.currentFileName = file.name
-		uploadState.value.currentFileProgress = 0
 
 		try {
 			const uploader = client.kyros.files_v0.uploadFile(filePath, file, {
-				onProgress: ({ progress }) => {
-					uploadState.value.currentFileProgress = progress
-					uploadState.value.uploadedBytes = completedBytes + Math.round(file.size * progress)
+				onProgress: ({ loaded }) => {
+					uploadState.value.uploadedBytes = completedBytes + Math.min(loaded, file.size)
 				},
 			})
 			activeUploadCancel = () => uploader.cancel()
@@ -420,7 +417,6 @@ async function uploadFiles(files: File[]) {
 	uploadState.value = {
 		isUploading: false,
 		currentFileName: null,
-		currentFileProgress: 0,
 		uploadedBytes: 0,
 		totalBytes: 0,
 		completedFiles: 0,

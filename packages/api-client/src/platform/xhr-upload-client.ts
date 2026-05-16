@@ -96,13 +96,16 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 		return new Promise<T>((resolve, reject) => {
 			const xhr = new XMLHttpRequest()
 			const metadata = context.metadata as UploadMetadata
+			const fallbackTotal = this.getUploadPayloadSize(metadata)
 
 			xhr.upload.addEventListener('progress', (e) => {
-				if (e.lengthComputable) {
+				const total = e.lengthComputable ? e.total : fallbackTotal
+				if (total > 0) {
+					const loaded = Math.min(e.loaded, total)
 					const progress: UploadProgress = {
-						loaded: e.loaded,
-						total: e.total,
-						progress: e.loaded / e.total,
+						loaded,
+						total,
+						progress: loaded / total,
 					}
 					progressCallbacks.forEach((cb) => cb(progress))
 				}
@@ -144,6 +147,18 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 			xhr.send(data)
 			abortController.signal.addEventListener('abort', () => xhr.abort())
 		})
+	}
+
+	private getUploadPayloadSize(metadata: UploadMetadata): number {
+		if ('file' in metadata) {
+			return metadata.file.size
+		}
+
+		let total = 0
+		metadata.formData.forEach((value) => {
+			total += value instanceof Blob ? value.size : new Blob([value]).size
+		})
+		return total
 	}
 
 	protected createUploadError(xhr: XMLHttpRequest): ModrinthApiError {
