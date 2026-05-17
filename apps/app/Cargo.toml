@@ -1,7 +1,7 @@
 [package]
 name = "pteron_gui"
 # The actual version is set by the pteron-build workflow on tagging
-version = "0.2.5"
+version = "0.2.4"
 edition.workspace = true
 description = "Icarus Launcher - a desktop application for managing your Minecraft mods"
 repository = "https://github.com/fraa2a/Icarus-Launcher"
