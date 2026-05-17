@@ -654,7 +654,12 @@ pub struct MissingAttributionFile {
 #[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum OverrideSource {
-    Flame { id: u32, title: String, url: String, icon_url: String },
+    Flame {
+        id: u32,
+        title: String,
+        url: String,
+        icon_url: String,
+    },
     Unknown,
 }
 
@@ -668,24 +673,24 @@ pub enum AttributionLicense {
 #[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum AttributionResolutionKind {
-	License {
-		license: AttributionLicense,
-		link_to_work: url::Url,
-	},
-	MyProject {
-		license: AttributionLicense,
-	},
-	SpecialPermissions {
-		link_to_work: url::Url,
-	},
-	NoPermission,
+    License {
+        license: AttributionLicense,
+        link_to_work: url::Url,
+    },
+    MyProject {
+        license: AttributionLicense,
+    },
+    SpecialPermissions {
+        link_to_work: url::Url,
+    },
+    NoPermission,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct AttributionResolution {
-	pub kind: AttributionResolutionKind,
-	pub notes: String,
-	pub image_urls: Vec<url::Url>,
+    pub kind: AttributionResolutionKind,
+    pub notes: String,
+    pub image_urls: Vec<url::Url>,
 }
 
 /// A specific version of a project

@@ -119,7 +119,7 @@ pub async fn version_project_get_helper(
             let missing = get_files_missing_attribution(&**pool, &[version_id])
                 .await
                 .unwrap_or_default();
-             v.files_missing_attribution = missing
+            v.files_missing_attribution = missing
                  .get(&version_id)
                  .map(|entries| {
                      entries
@@ -246,13 +246,15 @@ pub async fn version_get_helper(
                         id: models::ids::FileId(id.0 as u64),
                         override_source: fp
                             .as_ref()
-                        .map(|p| models::projects::OverrideSource::Flame {
-                            id: p.id,
-                            title: p.title.clone(),
-                            url: p.url.clone(),
-                            icon_url: p.icon_url.clone(),
-                        })
-                            .or(Some(models::projects::OverrideSource::Unknown)),
+                            .map(|p| models::projects::OverrideSource::Flame {
+                                id: p.id,
+                                title: p.title.clone(),
+                                url: p.url.clone(),
+                                icon_url: p.icon_url.clone(),
+                            })
+                            .or(Some(
+                                models::projects::OverrideSource::Unknown,
+                            )),
                     })
                     .collect()
             })

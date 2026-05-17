@@ -301,8 +301,10 @@ async fn persist_attribution_results(
     .await
     .wrap_err("checking existing attribution files")?;
 
-    let mut flame_groups: HashMap<u32, (Vec<&OverrideFile>, Option<&OverrideResolution>)> =
-        HashMap::new();
+    let mut flame_groups: HashMap<
+        u32,
+        (Vec<&OverrideFile>, Option<&OverrideResolution>),
+    > = HashMap::new();
     let mut unknown_files: Vec<&OverrideFile> = Vec::new();
 
     for file in overrides {
@@ -321,10 +323,11 @@ async fn persist_attribution_results(
                 }
                 unknown_files.push(file);
             }
-            Some(res @ OverrideResolution::Flame {
-                project_id: fp_id,
-                ..
-            }) => {
+            Some(
+                res @ OverrideResolution::Flame {
+                    project_id: fp_id, ..
+                },
+            ) => {
                 let entry = flame_groups.entry(*fp_id).or_default();
                 entry.0.push(file);
                 if entry.1.is_none() {
@@ -353,7 +356,12 @@ async fn persist_attribution_results(
         let existing = existing_flame_groups.iter().find(|g| {
             g.flame_project
                 .as_ref()
-                .and_then(|fp| serde_json::from_value::<crate::routes::internal::attribution::FlameProject>(fp.clone()).ok())
+                .and_then(|fp| {
+                    serde_json::from_value::<
+                        crate::routes::internal::attribution::FlameProject,
+                    >(fp.clone())
+                    .ok()
+                })
                 .is_some_and(|fp| fp.id == *flame_project_id)
         });
 
@@ -730,7 +738,15 @@ fn hash_flame_murmur32(input: Vec<u8>) -> u32 {
 pub async fn get_files_missing_attribution<'a, E>(
     exec: E,
     version_ids: &[DBVersionId],
-) -> Result<std::collections::HashMap<DBVersionId, Vec<(DBFileId, Option<crate::routes::internal::attribution::FlameProject>)>>>
+) -> Result<
+    std::collections::HashMap<
+        DBVersionId,
+        Vec<(
+            DBFileId,
+            Option<crate::routes::internal::attribution::FlameProject>,
+        )>,
+    >,
+>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres>,
 {
@@ -756,7 +772,9 @@ where
 
     let mut result = std::collections::HashMap::new();
     for row in rows {
-        let flame_project = row.flame_project.and_then(|v| serde_json::from_value(v).ok());
+        let flame_project = row
+            .flame_project
+            .and_then(|v| serde_json::from_value(v).ok());
         result
             .entry(row.version_id)
             .or_insert_with(Vec::new)

@@ -164,8 +164,12 @@ async fn list(
 
         result.push(AttributionGroupResponse {
             id: group.id.into(),
-            flame_project: group.flame_project.and_then(|v| serde_json::from_value(v).ok()),
-            attribution: group.attribution.and_then(|v| serde_json::from_value(v).ok()),
+            flame_project: group
+                .flame_project
+                .and_then(|v| serde_json::from_value(v).ok()),
+            attribution: group
+                .attribution
+                .and_then(|v| serde_json::from_value(v).ok()),
             attributed_at: group.attributed_at,
             attributed_by: group
                 .attributed_by

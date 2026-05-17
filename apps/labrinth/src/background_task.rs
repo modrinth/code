@@ -3,9 +3,9 @@ use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::queue::analytics::cache::cache_analytics;
-use crate::queue::file_scan::scan_all_files;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
+use crate::queue::file_scan::scan_all_files;
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
     insert_bank_balances_and_webhook, process_affiliate_payouts,
@@ -97,14 +97,7 @@ impl BackgroundTask {
             PingMinecraftJavaServers => {
                 ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
             }
-            ScanFiles => {
-                scan_all_files(
-                    &pool,
-                    &redis_pool,
-                    &**file_host,
-                )
-                .await
-            }
+            ScanFiles => scan_all_files(&pool, &redis_pool, &**file_host).await,
         }
     }
 }
