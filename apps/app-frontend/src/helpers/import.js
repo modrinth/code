@@ -37,7 +37,8 @@ export async function import_instance(launcherType, basePath, instanceFolder) {
 	// create a basic, empty instance (most properties will be filled in by the import process)
 	// We do NOT watch the fs for changes to avoid duplicate events during installation
 	// fs watching will be enabled once the instance is imported
-	const profilePath = await create(instanceFolder, '1.19.4', 'vanilla', 'latest', null, true)
+	const syncEnabled = launcherType === 'ModrinthApp' ? false : null;
+	const profilePath = await create(instanceFolder, '1.19.4', 'vanilla', 'latest', null, true, null, syncEnabled)
 
 	return await invoke('plugin:import|import_instance', {
 		profilePath,

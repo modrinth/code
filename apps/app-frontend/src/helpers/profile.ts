@@ -37,6 +37,7 @@ export async function create(
 	icon: string | null,
 	skipInstall: boolean,
 	linkedData?: { project_id: string; version_id: string; locked: boolean } | null,
+	syncEnabled?: boolean | null,
 ): Promise<string> {
 	// Trim string name to avoid "Unable to find directory"
 	name = name.trim()
@@ -48,6 +49,7 @@ export async function create(
 		icon,
 		skipInstall,
 		linkedData,
+		syncEnabled: syncEnabled ?? null,
 	})
 }
 

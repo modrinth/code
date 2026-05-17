@@ -7671,7 +7671,7 @@ dependencies = [
 
 [[package]]
 name = "pteron_gui"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "async_zip",
  "chrono",

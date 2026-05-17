@@ -9,5 +9,5 @@
 		"dev": "cargo run",
 		"test": "cargo nextest run --all-targets --no-fail-fast"
 	},
-	"version": "0.2.2"
+	"version": "0.2.3"
 }
