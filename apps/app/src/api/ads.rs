@@ -248,7 +248,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                         let _ = webview.navigate(AD_LINK.parse().unwrap());
                     }
 
-                    tokio::time::sleep(std::time::Duration::from_secs(10))
+                    tokio::time::sleep(std::time::Duration::from_secs(60 * 5))
                         .await;
                 }
             });
