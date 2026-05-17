@@ -48,7 +48,7 @@
 			}
 		]
 	},
-	"productName": "Icarus-Launcher",
+	"productName": "Icarus",
 	"version": "../app-frontend/package.json",
 	"mainBinaryName": "Icarus-Launcher",
 	"identifier": "IcarusLauncher",

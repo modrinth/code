@@ -1,6 +1,6 @@
 {
 	"name": "@icarus/utils",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"private": true,
 	"main": "./index.ts",
 	"types": "./index.d.ts",
