@@ -196,6 +196,11 @@
 							href: projectGalleryHref,
 							shown: data.gallery.length > 0,
 						},
+						{
+							label: 'Reviews',
+							href: projectReviewsHref,
+							shown: projectV3?.minecraft_server == null,
+						},
 					]"
 				/>
 				<RouterView
@@ -411,6 +416,7 @@ const versionsHref = computed(() =>
 	buildProjectHref(`/project/${route.params.id}/versions`, instanceFilters.value),
 )
 const projectGalleryHref = computed(() => buildProjectHref(`/project/${route.params.id}/gallery`))
+const projectReviewsHref = computed(() => buildProjectHref(`/project/${route.params.id}/reviews`))
 
 const projectBrowseBackUrl = computed(() => {
 	const browsePath = route.query.b

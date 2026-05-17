@@ -1306,6 +1306,41 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Reviews {
+		export namespace v3 {
+			export type Review = {
+				id: string
+				project_id: string
+				user_id: string
+				rating: number
+				body: string
+				created: string
+				updated: string
+			}
+
+			export type CreateReviewRequest = {
+				project_id: string
+				rating: number
+				body?: string
+			}
+
+			export type EditReviewRequest = {
+				rating?: number
+				body?: string
+			}
+
+			export type ListReviewsParams = {
+				count?: number
+				offset?: number
+			}
+
+			export type ReviewsResponse = {
+				reviews: Review[]
+				total: number
+			}
+		}
+	}
+
 	export namespace Moderation {
 		export namespace Internal {
 			export type LockedByUser = {

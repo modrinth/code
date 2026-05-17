@@ -30,6 +30,7 @@ import { LabrinthPayoutsV3Module } from './labrinth/payouts/v3'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
 import { LabrinthReportsV3Module } from './labrinth/reports/v3'
+import { LabrinthReviewsV3Module } from './labrinth/reviews/v3'
 import { LabrinthServerPingInternalModule } from './labrinth/server-ping/internal'
 import { LabrinthSessionsV2Module } from './labrinth/sessions/v2'
 import { LabrinthStateModule } from './labrinth/state'
@@ -89,6 +90,7 @@ export const MODULE_REGISTRY = {
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,
 	labrinth_reports_v3: LabrinthReportsV3Module,
+	labrinth_reviews_v3: LabrinthReviewsV3Module,
 	labrinth_server_ping_internal: LabrinthServerPingInternalModule,
 	labrinth_sessions_v2: LabrinthSessionsV2Module,
 	labrinth_state: LabrinthStateModule,

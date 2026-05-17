@@ -13,6 +13,7 @@ pub mod pats;
 pub mod payouts;
 pub mod projects;
 pub mod reports;
+pub mod reviews;
 pub mod sessions;
 pub mod shared_instances;
 pub mod teams;

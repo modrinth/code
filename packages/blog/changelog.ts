@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-17T00:00:00+00:00`,
+		product: 'web',
+		body: `## Added
+- Added project reviews! You can now rate and review projects on Modrinth.`,
+	},
+	{
 		date: `2026-05-13T05:24:14+00:00`,
 		product: 'web',
 		body: `## Changed
