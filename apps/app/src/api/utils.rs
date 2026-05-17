@@ -9,7 +9,10 @@ use theseus::{
 use crate::api::{Result, TheseusSerializableError};
 use dashmap::DashMap;
 use std::path::{Path, PathBuf};
+use theseus::emit_warning;
 use theseus::prelude::canonicalize;
+use theseus::profile::{self, QuickPlayType};
+use tracing;
 use url::Url;
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
@@ -160,6 +163,130 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 pub async fn handle_command(command: String) -> Result<()> {
     tracing::info!("handle command: {command}");
     Ok(theseus::handler::parse_and_emit_command(&command).await?)
+}
+
+/// Parse a Vec<OsString> (as provided by std::env::args_os()) or Vec<String> (as provided by tauri single-instance args)
+/// and return the value for the first `--launch-profile` occurrence, if any.
+pub fn parse_launch_profile_from_args<S: AsRef<std::ffi::OsStr>>(
+    args: Vec<S>,
+) -> Option<String> {
+    let mut iter = args.into_iter();
+    // Skip executable name
+    let _ = iter.next();
+
+    while let Some(arg) = iter.next() {
+        let s = arg.as_ref().to_string_lossy();
+        if let Some(rest) = s.strip_prefix("--launch-profile=") {
+            let val = rest.to_string();
+            if !val.trim().is_empty() {
+                return Some(val);
+            }
+        } else if s == "--launch-profile" {
+            if let Some(next) = iter.next() {
+                let val = next.as_ref().to_string_lossy().to_string();
+                if !val.trim().is_empty() {
+                    return Some(val);
+                }
+            } else {
+                // flag present but no value
+                return None;
+            }
+        }
+    }
+
+    None
+}
+
+/// Handle launching a profile by display name. Waits for state/profile readiness via underlying
+/// profile APIs and then re-uses the existing `profile::run` pipeline.
+pub async fn handle_launch_profile(profile_name: String) -> Result<()> {
+    tracing::info!(
+        "Requested auto-launch profile from CLI: '{}'",
+        profile_name
+    );
+
+    let name = profile_name.trim();
+    if name.is_empty() {
+        let _ = emit_warning("Empty profile name provided to --launch-profile")
+            .await;
+        tracing::warn!("Empty profile name provided to --launch-profile");
+        return Ok(());
+    }
+
+    // Retrieve profiles (this will await state readiness internally)
+    let profiles = match profile::list().await {
+        Ok(p) => p,
+        Err(e) => {
+            let msg = format!("Failed to read profiles for auto-launch: {e}");
+            let _ = emit_warning(&msg).await;
+            tracing::error!("{msg}");
+            return Ok(());
+        }
+    };
+
+    // Matching strategy: exact (case-sensitive), exact (case-insensitive), contains (case-insensitive)
+    let mut matches: Vec<_> =
+        profiles.iter().filter(|p| p.name == name).collect();
+
+    if matches.is_empty() {
+        let low = name.to_lowercase();
+        matches = profiles
+            .iter()
+            .filter(|p| p.name.to_lowercase() == low)
+            .collect();
+    }
+
+    if matches.is_empty() {
+        let low = name.to_lowercase();
+        matches = profiles
+            .iter()
+            .filter(|p| p.name.to_lowercase().contains(&low))
+            .collect();
+    }
+
+    if matches.is_empty() {
+        let msg = format!("Profile '{name}' not found");
+        let _ = emit_warning(&msg).await;
+        tracing::warn!("{msg}");
+        return Ok(());
+    }
+
+    if matches.len() > 1 {
+        // Ambiguous
+        let candidates = matches
+            .iter()
+            .map(|p| format!("{} ({})", p.name, p.path))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let msg = format!(
+            "Multiple profiles match '{name}'. Candidates: {candidates}"
+        );
+        let _ = emit_warning(&msg).await;
+        tracing::warn!("{msg}");
+        return Ok(());
+    }
+
+    let profile = matches.into_iter().next().unwrap();
+
+    tracing::info!(
+        "Auto-launch: launching profile '{}' (path='{}')",
+        profile.name,
+        profile.path
+    );
+
+    match profile::run(&profile.path, QuickPlayType::None).await {
+        Ok(_proc) => {
+            tracing::info!("Started launch for profile '{}'", profile.name)
+        }
+        Err(e) => {
+            let msg =
+                format!("Failed to launch profile '{}' : {e}", profile.name);
+            let _ = emit_warning(&msg).await;
+            tracing::error!("{msg}");
+        }
+    }
+
+    Ok(())
 }
 
 // Remove when (and if) https://github.com/tauri-apps/tauri/issues/12022 is implemented

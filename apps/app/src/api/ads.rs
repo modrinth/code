@@ -60,8 +60,8 @@ fn configure_ads_cookie_settings(
     core_webview2: &webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2,
 ) {
     use webview2_com::Microsoft::Web::WebView2::Win32::{
-        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE, ICoreWebView2,
-        ICoreWebView2_13, ICoreWebView2Profile3,
+        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE, ICoreWebView2_13,
+        ICoreWebView2Profile3,
     };
     use windows_core::Interface;
 
