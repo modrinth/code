@@ -81,5 +81,5 @@
 	},
 	"web-types": "../../web-types.json",
 	"prettier": "@icarus/tooling-config/frontend.prettier.config.cjs",
-	"version": "0.2.4"
+	"version": "0.2.5"
 }

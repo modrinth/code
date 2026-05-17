@@ -78,10 +78,10 @@ jobs:
             A new version of **Icarus** has been released! 🎉
 
             🚀 **Download & Install:**
-            - [![Windows](https://img.shields.io/badge/Install-Windows-blue?style=for-the-badge&logo=windows)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus-Launcher_${{ env.VERSION }}_x64-setup.exe)
-            - [![Mac](https://img.shields.io/badge/Install-MacOS-black?style=for-the-badge&logo=apple)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus-Launcher_${{ env.VERSION }}_universal.dmg)
-            - [![Ubuntu](https://img.shields.io/badge/Install-Ubuntu-orange?style=for-the-badge&logo=ubuntu)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus-Launcher_${{ env.VERSION }}_amd64.deb)
-            - [![Linux](https://img.shields.io/badge/Install-AppImage-green?style=for-the-badge&logo=linux)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus-Launcher_${{ env.VERSION }}_amd64.AppImage)
+            - [![Windows](https://img.shields.io/badge/Install-Windows-blue?style=for-the-badge&logo=windows)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus_${{ env.VERSION }}_x64-setup.exe)
+            - [![Mac](https://img.shields.io/badge/Install-MacOS-black?style=for-the-badge&logo=apple)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus_${{ env.VERSION }}_universal.dmg)
+            - [![Ubuntu](https://img.shields.io/badge/Install-Ubuntu-orange?style=for-the-badge&logo=ubuntu)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus_${{ env.VERSION }}_amd64.deb)
+            - [![Linux](https://img.shields.io/badge/Install-AppImage-green?style=for-the-badge&logo=linux)](https://github.com/${{ github.repository }}/releases/download/${{ env.APP_VERSION }}/Icarus_${{ env.VERSION }}_amd64.AppImage)
           files: |
             artifacts/**/*.AppImage
             artifacts/**/*.AppImage.sig
@@ -134,7 +134,7 @@ jobs:
           # Find actual artifact files - they should be organized by platform
           LINUX_APPIMAGE=$(find artifacts -name "*.AppImage" | head -1)
           MACOS_TAR=$(find artifacts -name "*.app.tar.gz" | head -1)
-          WINDOWS_NSIS=$(find artifacts -name "*setup.exe" -o -name "*-setup.exe" | head -1)
+          WINDOWS_NSIS=$(find artifacts -name "*-setup.exe" | head -1)
           WINDOWS_MSI=$(find artifacts -name "*.msi" | head -1)
 
           cat > $UPDATES_JSON << EOF

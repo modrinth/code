@@ -1,6 +1,6 @@
 {
 	"name": "@icarus/tooling-config",
-	"version": "0.2.4",
+	"version": "0.2.5",
 	"type": "module",
 	"private": true,
 	"description": "Unified tooling configuration for Icarus monorepo",

@@ -9,5 +9,5 @@
 		"test": "cargo nextest run --all-targets --no-fail-fast"
 	},
 	"prettier": "@icarus/tooling-config/app-lib.prettier.config.cjs",
-	"version": "0.2.4"
+	"version": "0.2.5"
 }

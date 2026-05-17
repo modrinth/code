@@ -50,7 +50,7 @@
 	},
 	"productName": "Icarus",
 	"version": "../app-frontend/package.json",
-	"mainBinaryName": "Icarus-Launcher",
+	"mainBinaryName": "Icarus",
 	"identifier": "IcarusLauncher",
 	"plugins": {
 		"deep-link": {
@@ -72,7 +72,7 @@
 				"fullscreen": false,
 				"height": 800,
 				"resizable": true,
-				"title": "Icarus Launcher",
+				"title": "Icarus",
 				"label": "main",
 				"width": 1280,
 				"minHeight": 700,

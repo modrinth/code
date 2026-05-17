@@ -129,11 +129,12 @@ jobs:
         with:
           name: App bundle (${{ matrix.artifact-target-name }})
           path: |
-            target/release/bundle/appimage/Icarus-Launcher_*.AppImage*
-            target/release/bundle/deb/Icarus-Launcher_*.deb*
-            target/release/bundle/rpm/Icarus-Launcher_-*.rpm*
-            target/universal-apple-darwin/release/bundle/macos/Icarus-Launcher_.app.tar.gz*
-            target/universal-apple-darwin/release/bundle/dmg/Icarus-Launcher_*.dmg*
-            target/release/bundle/nsis/Icarus-Launcher_*-setup.exe*
-            target/release/bundle/nsis/Icarus-Launcher_*-setup.nsis.zip*
-            target/release/Icarus-Launcher.exe
+            target/release/bundle/appimage/Icarus_*.AppImage*
+            target/release/bundle/deb/Icarus_*.deb*
+            target/release/bundle/rpm/Icarus_-*.rpm*
+            target/universal-apple-darwin/release/bundle/macos/Icarus_.app.tar.gz*
+            target/universal-apple-darwin/release/bundle/dmg/Icarus_*.dmg*
+            target/release/bundle/nsis/Icarus_*-setup.exe*
+            target/release/bundle/nsis/Icarus_*-setup.nsis.zip*
+            target/release/Icarus.exe
+
