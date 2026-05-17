@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                v.id AS \"version_id: DBVersionId\",\n                m.id AS \"project_id: DBProjectId\",\n                m.name AS \"project_name!\",\n                COALESCE(m.icon_url, '') AS \"project_icon!\"\n            FROM versions v\n            INNER JOIN mods m ON m.id = v.mod_id\n            WHERE v.id = ANY($1)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "project_id: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "project_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "project_icon!",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "fc99699ff89c3245c7288718ff15d16058b00bf5df286923c0c6b1db2dbbde4f"
+}

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE shared_instances\n                SET owner_id = $1\n                WHERE owner_id = $2\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "72ae0e8debd06067894a2f7bea279446dd964da4efa49c5464cebde57860f741"
+}

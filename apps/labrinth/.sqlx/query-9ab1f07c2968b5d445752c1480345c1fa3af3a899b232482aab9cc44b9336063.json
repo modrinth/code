@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM delphi_report_issue_details drid\n        WHERE issue_id IN (\n            SELECT dri.id\n            FROM mods m\n            INNER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN files f ON f.version_id = v.id\n            INNER JOIN delphi_reports dr ON dr.file_id = f.id\n            INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id\n            WHERE m.id = $1 AND dri.issue_type = '__dummy'\n        )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9ab1f07c2968b5d445752c1480345c1fa3af3a899b232482aab9cc44b9336063"
+}

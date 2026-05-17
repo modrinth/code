@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO pats (\n                id, name, access_token, scopes, user_id,\n                expires\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar",
+        "Varchar",
+        "Int8",
+        "Int8",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d3d1467a5dcfc3eb34d7e821b0de54a419d9a5391c13254478944f2f2cc78fe6"
+}

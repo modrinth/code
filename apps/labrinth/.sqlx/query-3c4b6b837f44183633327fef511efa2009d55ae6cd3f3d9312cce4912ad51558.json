@@ -1,0 +1,42 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH upsert AS (\n                INSERT INTO moderation_locks (project_id, moderator_id, locked_at)\n                VALUES ($1, $2, NOW())\n                ON CONFLICT (project_id) DO UPDATE SET\n                    moderator_id = CASE\n                        WHEN moderation_locks.moderator_id = EXCLUDED.moderator_id\n                          OR moderation_locks.locked_at < NOW() - ($3::bigint * INTERVAL '1 minute')\n                        THEN EXCLUDED.moderator_id\n                        ELSE moderation_locks.moderator_id\n                    END,\n                    locked_at = CASE\n                        WHEN moderation_locks.moderator_id = EXCLUDED.moderator_id\n                          OR moderation_locks.locked_at < NOW() - ($3::bigint * INTERVAL '1 minute')\n                        THEN EXCLUDED.locked_at\n                        ELSE moderation_locks.locked_at\n                    END\n                RETURNING moderator_id, locked_at\n            )\n            SELECT\n                upsert.moderator_id,\n                upsert.locked_at,\n                u.username   AS moderator_username,\n                u.avatar_url AS moderator_avatar_url\n            FROM upsert\n            INNER JOIN users u ON u.id = upsert.moderator_id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "moderator_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "locked_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 2,
+        "name": "moderator_username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "moderator_avatar_url",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "3c4b6b837f44183633327fef511efa2009d55ae6cd3f3d9312cce4912ad51558"
+}

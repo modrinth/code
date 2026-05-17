@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT\n\t\t\t\tml.project_id,\n\t\t\t\tml.moderator_id,\n\t\t\t\tu.username as moderator_username,\n\t\t\t\tu.avatar_url as moderator_avatar_url,\n\t\t\t\tml.locked_at\n\t\t\tFROM moderation_locks ml\n\t\t\tINNER JOIN users u ON u.id = ml.moderator_id\n\t\t\tWHERE ml.project_id = $1\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "moderator_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "moderator_username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "moderator_avatar_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "locked_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "15ce2cf3154ba3358461b375504ca2de7f5b8b742c0196e71ab2139174fcc12f"
+}

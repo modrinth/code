@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            id AS \"report_id!: DelphiReportId\",\n            file_id AS \"file_id!: DBFileId\",\n            created,\n            severity AS \"severity!: DelphiSeverity\"\n        FROM delphi_reports\n        WHERE file_id = ANY($1::bigint[])\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "report_id!: DelphiReportId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "file_id!: DBFileId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "severity!: DelphiSeverity",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_severity",
+            "kind": {
+              "Enum": [
+                "low",
+                "medium",
+                "high",
+                "severe"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "10e2a3b31ba94b93ed2d6c9753a5aabf13190a0b336089e6521022069813cf17"
+}

@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO delphi_report_issues (report_id, issue_type)\n                VALUES ($1, $2)\n                ON CONFLICT (report_id, issue_type) DO UPDATE SET\n                    issue_type = EXCLUDED.issue_type\n                RETURNING id\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "3bf93aa9204bc5c52441e0a3789aeaae55206a459299c2e63cc303d2a7615588"
+}

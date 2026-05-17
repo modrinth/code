@@ -1,0 +1,68 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            c.id as charge_id,\n            c.subscription_id as \"subscription_id!\",\n            c.net as charge_net,\n            c.tax_amount as charge_tax_amount,\n            c.last_attempt as charge_last_attempt,\n            c.currency_code,\n            usa.affiliate_code,\n            ac.affiliate as affiliate_user_id,\n            ac.revenue_split\n        -- get any charges...\n        FROM charges c\n        -- ...which have a subscription...\n        INNER JOIN users_subscriptions_affiliations usa\n            ON c.subscription_id = usa.subscription_id\n            AND c.subscription_id IS NOT NULL\n            AND (usa.deactivated_at IS NULL OR c.last_attempt < usa.deactivated_at)\n        -- ...which have an affiliate code...\n        INNER JOIN affiliate_codes ac\n            ON usa.affiliate_code = ac.id\n        -- ...and where no payout to an affiliate has been made for this charge yet\n        LEFT JOIN users_subscriptions_affiliations_payouts usap\n            ON c.id = usap.charge_id\n        WHERE\n            c.status = 'succeeded'\n            AND c.net > 0\n            AND usap.id IS NULL\n            -- exclude charges that have refund charges\n            AND NOT EXISTS (\n                SELECT 1\n                FROM charges refund_charges\n                WHERE refund_charges.parent_charge_id = c.id\n            )\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "charge_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "subscription_id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "charge_net",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "charge_tax_amount",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "charge_last_attempt",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "currency_code",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "affiliate_code",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "affiliate_user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "revenue_split",
+        "type_info": "Float8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "e8225fa8dae7e1ca57bc8f259cda40c3eb8b12943db05884386a456c5eb91117"
+}

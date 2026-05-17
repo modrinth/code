@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT\n                  users.username \"user_name!\",\n                  users.email \"user_email\",\n                  project.name \"project_name!\"\n                FROM users\n                INNER JOIN mods project ON project.id = $1\n                WHERE users.id = $2\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "project_name!",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "0e29dad2b228ca4922811bb45f05f39145489302a4e9bc25eeed49c97d3dc01e"
+}

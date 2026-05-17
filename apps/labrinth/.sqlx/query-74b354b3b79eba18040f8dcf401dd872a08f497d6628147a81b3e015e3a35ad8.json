@@ -1,0 +1,86 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, url, raw_url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id\n            FROM uploaded_images\n            WHERE context = $1\n            AND (mod_id = $2 OR ($2 IS NULL AND mod_id IS NULL))\n            AND (version_id = $3 OR ($3 IS NULL AND version_id IS NULL))\n            AND (thread_message_id = $4 OR ($4 IS NULL AND thread_message_id IS NULL))\n            AND (report_id = $5 OR ($5 IS NULL AND report_id IS NULL))\n            GROUP BY id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "raw_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "size",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "owner_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "context",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "thread_message_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "report_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "74b354b3b79eba18040f8dcf401dd872a08f497d6628147a81b3e015e3a35ad8"
+}

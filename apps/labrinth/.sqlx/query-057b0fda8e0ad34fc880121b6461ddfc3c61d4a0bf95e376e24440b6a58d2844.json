@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, created_at, created_by, affiliate, source_name\n            FROM affiliate_codes WHERE affiliate = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 2,
+        "name": "created_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "affiliate",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "source_name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "057b0fda8e0ad34fc880121b6461ddfc3c61d4a0bf95e376e24440b6a58d2844"
+}

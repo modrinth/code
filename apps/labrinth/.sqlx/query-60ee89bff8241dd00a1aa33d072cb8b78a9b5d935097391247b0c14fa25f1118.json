@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM moderation_locks",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "60ee89bff8241dd00a1aa33d072cb8b78a9b5d935097391247b0c14fa25f1118"
+}

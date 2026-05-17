@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net, tax_amount, tax_platform_id, tax_last_updated, tax_drift_loss, tax_transaction_version, tax_platform_accounting_time)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)\n            ON CONFLICT (id)\n            DO UPDATE\n                SET status = EXCLUDED.status,\n                    last_attempt = EXCLUDED.last_attempt,\n                    due = EXCLUDED.due,\n                    subscription_id = EXCLUDED.subscription_id,\n                    subscription_interval = EXCLUDED.subscription_interval,\n                    payment_platform = EXCLUDED.payment_platform,\n                    payment_platform_id = EXCLUDED.payment_platform_id,\n                    parent_charge_id = EXCLUDED.parent_charge_id,\n                    net = EXCLUDED.net,\n                    tax_amount = EXCLUDED.tax_amount,\n                    tax_platform_id = EXCLUDED.tax_platform_id,\n                    tax_last_updated = EXCLUDED.tax_last_updated,\n                    price_id = EXCLUDED.price_id,\n                    amount = EXCLUDED.amount,\n                    currency_code = EXCLUDED.currency_code,\n                    charge_type = EXCLUDED.charge_type,\n\t\t\t\t\ttax_drift_loss = EXCLUDED.tax_drift_loss,\n\t\t\t\t\ttax_transaction_version = EXCLUDED.tax_transaction_version,\n\t\t\t\t\ttax_platform_accounting_time = EXCLUDED.tax_platform_accounting_time\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Text",
+        "Text",
+        "Varchar",
+        "Timestamptz",
+        "Timestamptz",
+        "Int8",
+        "Text",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Text",
+        "Timestamptz",
+        "Int8",
+        "Int4",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5a972c49ccacf8735ec36d691f1c34b86c33703f984c869346b0c0be1c4a4883"
+}

@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO users_subscriptions_affiliations_payouts\n            (charge_id, subscription_id,\n            affiliate_code, payout_value_id)\n        SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::bigint[], $4::bigint[])\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int8Array",
+        "Int8Array",
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "57fd45648479590a01e8da51b2ecd59cbe76a1ae8acb4c2d7c96ba397739873a"
+}

@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            usap.id as usap_id,\n            usap.payout_value_id\n        FROM charges refund_charges\n        -- find original charges that have been refunded\n        INNER JOIN charges original_charges\n            ON original_charges.id = refund_charges.parent_charge_id\n        -- find affiliate payouts for those original charges\n        INNER JOIN users_subscriptions_affiliations_payouts usap\n            ON usap.charge_id = original_charges.id\n        -- only include payouts that haven't been issued yet (not available as of now)\n        INNER JOIN payouts_values pv\n            ON pv.id = usap.payout_value_id\n            AND pv.date_available > NOW()\n        WHERE\n            refund_charges.status = 'succeeded'\n            -- make sure it's actually a refund charge\n            AND refund_charges.charge_type = 'refund'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "usap_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "payout_value_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "0d9ae03c785ef21ecd9dc17d7c025431bf14c6e168a8350f1fe7602be4934ece"
+}

@@ -1,0 +1,71 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT f.id, f.version_id, v.mod_id, f.url, f.filename, f.is_primary, f.size, f.file_type,\n                    JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'))) filter (where h.hash is not null) hashes\n                    FROM files f\n                    INNER JOIN versions v on v.id = f.version_id\n                    INNER JOIN hashes h on h.file_id = f.id\n                    WHERE h.algorithm = $1 AND h.hash = ANY($2)\n                    GROUP BY f.id, v.mod_id, v.date_published\n                    ORDER BY v.date_published\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "filename",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "is_primary",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "size",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "file_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "hashes",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "ByteaArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      null
+    ]
+  },
+  "hash": "3689ca9f16fb80c55a0d2fd3c08ae4d0b70b92c8ab9a75afb96297748ec36bd4"
+}

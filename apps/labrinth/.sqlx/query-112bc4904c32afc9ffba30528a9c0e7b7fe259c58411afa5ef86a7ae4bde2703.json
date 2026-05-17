@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            to_jsonb(dri)\n            || jsonb_build_object(\n                -- TODO: replace with `json_array` in Postgres 16\n                'details', (\n                    SELECT coalesce(jsonb_agg(\n                        jsonb_build_object(\n                            'id', didws.id,\n                            'issue_id', didws.issue_id,\n                            'key', didws.key,\n                            'file_path', didws.file_path,\n                            'decompiled_source', didws.decompiled_source,\n                            'data', didws.data,\n                            'severity', didws.severity,\n                            'status', didws.status\n                        )\n                    ), '[]'::jsonb)\n                    FROM delphi_issue_details_with_statuses didws\n                    WHERE didws.issue_id = dri.id\n                )\n            ) AS \"data!: sqlx::types::Json<FileIssue>\"\n        FROM delphi_report_issues dri\n        WHERE dri.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "data!: sqlx::types::Json<FileIssue>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "112bc4904c32afc9ffba30528a9c0e7b7fe259c58411afa5ef86a7ae4bde2703"
+}

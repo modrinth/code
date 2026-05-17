@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tDELETE FROM oauth_client_authorizations\n\t\t\t\tWHERE user_id = $1\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "55feebc1bea8cee146860d5e2740d5291fa5507758f7f53a6e3db02c641048b1"
+}

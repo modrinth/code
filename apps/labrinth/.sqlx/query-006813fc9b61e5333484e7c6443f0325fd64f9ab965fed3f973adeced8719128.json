@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n              COALESCE(unp.id, dnp.id) \"id!\",\n              unp.user_id,\n              dnp.channel \"channel!\",\n              dnp.notification_type \"notification_type!\",\n              COALESCE(unp.enabled, dnp.enabled, false) \"enabled!\"\n            FROM users_notifications_preferences dnp\n            LEFT JOIN users_notifications_preferences unp\n              ON unp.channel = dnp.channel\n              AND unp.notification_type = dnp.notification_type\n              AND unp.user_id = ANY($1::bigint[])\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "channel!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "notification_type!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "enabled!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      null,
+      true,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "006813fc9b61e5333484e7c6443f0325fd64f9ab965fed3f973adeced8719128"
+}

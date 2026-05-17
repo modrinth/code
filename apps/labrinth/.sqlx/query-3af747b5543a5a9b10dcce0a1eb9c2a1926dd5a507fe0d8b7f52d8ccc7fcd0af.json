@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE mods_gallery\n            SET featured = $2\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3af747b5543a5a9b10dcce0a1eb9c2a1926dd5a507fe0d8b7f52d8ccc7fcd0af"
+}

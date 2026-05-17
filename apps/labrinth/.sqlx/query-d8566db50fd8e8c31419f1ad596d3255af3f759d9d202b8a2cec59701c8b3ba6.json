@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT DISTINCT dr.file_id\n        FROM delphi_reports dr\n        INNER JOIN files f ON f.id = dr.file_id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE v.mod_id = ANY($1::bigint[])\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "file_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "d8566db50fd8e8c31419f1ad596d3255af3f759d9d202b8a2cec59701c8b3ba6"
+}

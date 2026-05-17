@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO user_limits (user_id, projects, organizations, collections)\n            VALUES ($1, $2, $3, $4)\n            ON CONFLICT (user_id) DO UPDATE\n            SET projects = EXCLUDED.projects,\n                organizations = EXCLUDED.organizations,\n                collections = EXCLUDED.collections",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5184ad30a3a276892248037d43de23dbc90c968f4342ec108e65fe3c455466d3"
+}

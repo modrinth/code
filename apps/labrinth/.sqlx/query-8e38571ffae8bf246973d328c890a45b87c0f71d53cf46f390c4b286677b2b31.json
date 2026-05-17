@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            id AS \"file_id: DBFileId\",\n            version_id AS \"version_id: DBVersionId\",\n            url,\n            filename,\n            size\n        FROM files\n        WHERE version_id = ANY($1::bigint[])\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "file_id: DBFileId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "version_id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "filename",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "size",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "8e38571ffae8bf246973d328c890a45b87c0f71d53cf46f390c4b286677b2b31"
+}

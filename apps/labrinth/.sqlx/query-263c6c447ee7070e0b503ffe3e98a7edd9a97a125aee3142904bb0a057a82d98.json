@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM organizations o\n            JOIN teams t ON o.team_id = t.id\n            JOIN team_members tm ON t.id = tm.team_id\n            WHERE tm.user_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "263c6c447ee7070e0b503ffe3e98a7edd9a97a125aee3142904bb0a057a82d98"
+}

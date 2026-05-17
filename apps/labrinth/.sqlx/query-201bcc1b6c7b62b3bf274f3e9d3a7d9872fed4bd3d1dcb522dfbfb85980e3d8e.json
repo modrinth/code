@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE organizations\n                    SET slug = LOWER($1)\n                    WHERE (id = $2)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "201bcc1b6c7b62b3bf274f3e9d3a7d9872fed4bd3d1dcb522dfbfb85980e3d8e"
+}

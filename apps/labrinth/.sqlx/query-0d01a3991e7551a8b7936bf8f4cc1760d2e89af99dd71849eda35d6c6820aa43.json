@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "WITH random_id_point AS (\n            SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point\n        )\n        SELECT id FROM mods\n        WHERE status = ANY($1)\n        ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)\n        LIMIT $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "0d01a3991e7551a8b7936bf8f4cc1760d2e89af99dd71849eda35d6c6820aa43"
+}

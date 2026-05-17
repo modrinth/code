@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT projects, organizations, collections\n            FROM user_limits\n            WHERE user_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "projects",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "organizations",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "collections",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "2900514e9ff89519201700d3a96848690959f9ef946c8e7cf730e03cb92563b0"
+}

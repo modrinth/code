@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                DELETE FROM affiliate_codes\n                WHERE affiliate = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ca9b41de4618bcf8ff4f6086f658add5d93855f599a48eeb5f1811f14e7fe610"
+}

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT TRUE FROM mods WHERE organization_id = $1 AND status IN ('approved', 'archived') LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "?column?",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "829a4523233e957f8876d248a17ec04c245af41f43fa40aff9ee07e893dabf3a"
+}

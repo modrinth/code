@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                us.id, us.user_id, us.price_id, us.interval, us.created, us.status, us.metadata\n            FROM users_subscriptions us\n            \n            INNER JOIN products_prices pp ON us.price_id = pp.id\n            INNER JOIN products p ON p.metadata  @> '{\"type\": \"pyro\"}'\n            WHERE $1::text IS NULL OR us.status = $1::text\n            GROUP BY us.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "price_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "interval",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "0e722c03740252645acea786fae2e9a3e406cc58059d0c21dc95ed8b5d0634d9"
+}

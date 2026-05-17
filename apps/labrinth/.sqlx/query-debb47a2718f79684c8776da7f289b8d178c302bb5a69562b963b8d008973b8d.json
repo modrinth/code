@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE threads_messages\n                SET body = '{\"type\": \"deleted\"}', author_id = $2\n                WHERE author_id = $1\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "debb47a2718f79684c8776da7f289b8d178c302bb5a69562b963b8d008973b8d"
+}

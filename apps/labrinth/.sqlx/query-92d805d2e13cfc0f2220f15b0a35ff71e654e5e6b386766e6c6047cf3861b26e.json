@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE mods\n                SET approved = NOW()\n                WHERE id = $1 AND approved IS NULL\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "92d805d2e13cfc0f2220f15b0a35ff71e654e5e6b386766e6c6047cf3861b26e"
+}

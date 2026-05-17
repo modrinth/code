@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE users_redeemals\n            SET status = $1\n            WHERE\n              status = $2\n              AND NOW() - last_attempt > INTERVAL '5 minutes'\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1dea22589b0440cfeaf98b6869bdaad852d58c61cf2a1affb01acc4984d42341"
+}

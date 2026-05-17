@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                                        UPDATE files\n                                        SET metadata = $1\n                                        WHERE id = $2\n                                        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Jsonb",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c2924fff035e92f7bd2279517310ba391ced72b38be97d462cdfe60048e947db"
+}
