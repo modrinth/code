@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-17T20:46:06+00:00`,
+		product: 'app',
+		version: 'v0.13.18',
+		body: `## Fixed
+- Fixed how the app handles ad webview visibility`,
+	},
+	{
 		date: `2026-05-13T05:24:14+00:00`,
 		product: 'web',
 		body: `## Changed
