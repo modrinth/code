@@ -98,7 +98,7 @@ import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { create_profile_and_install_from_file } from '@/helpers/pack'
-import { list } from '@/helpers/profile.js'
+import { list, run } from '@/helpers/profile.js'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -862,6 +862,8 @@ async function handleCommand(e) {
 				source: 'CreationModalFileDrop',
 			})
 		}
+	} else if (e.event === 'LaunchProfile') {
+		await run(e.path).catch(handleError)
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)

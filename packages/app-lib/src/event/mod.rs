@@ -212,6 +212,9 @@ pub enum CommandPayload {
     InstallServer {
         id: String,
     },
+    LaunchProfile {
+        path: String,
+    },
     RunMRPack {
         // run or install .mrpack
         path: PathBuf,
