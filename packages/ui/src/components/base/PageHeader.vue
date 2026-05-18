@@ -155,56 +155,138 @@
 
 			<div v-if="props.actions.length" class="flex flex-wrap gap-2 items-center">
 				<template v-for="action in props.actions" :key="action.id">
-					<JoinedButtons
-						v-if="action.joinedActions?.length"
-						:actions="action.joinedActions"
-						:color="joinedActionColor(action.color)"
-						:size="action.size ?? 'large'"
-						:disabled="action.disabled"
-						:primary-disabled="action.primaryDisabled"
-						:dropdown-disabled="action.dropdownDisabled"
-						:primary-muted="action.primaryMuted"
-					/>
-					<ButtonStyled
-						v-else
-						:color="action.color ?? 'standard'"
-						:size="action.size ?? 'large'"
-						:type="action.type ?? 'standard'"
-						:circular="action.circular ?? action.labelHidden ?? false"
+					<Tooltip
+						v-if="action.prompt"
+						theme="dismissable-prompt"
+						:triggers="[]"
+						:shown="action.prompt.shown"
+						:auto-hide="false"
+						:placement="action.prompt.placement ?? 'bottom'"
 					>
-						<AutoLink
-							v-if="action.to"
-							v-tooltip="action.tooltip"
-							:to="action.to"
-							:aria-label="actionLabel(action)"
-						>
-							<component
-								:is="action.icon"
-								v-if="action.icon"
-								:class="action.iconClass"
-								aria-hidden="true"
-								v-bind="action.iconProps"
-							/>
-							<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
-						</AutoLink>
-						<button
-							v-else
-							v-tooltip="action.tooltip"
-							type="button"
+						<JoinedButtons
+							v-if="action.joinedActions?.length"
+							:actions="action.joinedActions"
+							:color="joinedActionColor(action.color)"
+							:size="action.size ?? 'large'"
 							:disabled="action.disabled"
-							:aria-label="actionLabel(action)"
-							@click="action.onClick"
+							:primary-disabled="action.primaryDisabled"
+							:dropdown-disabled="action.dropdownDisabled"
+							:primary-muted="action.primaryMuted"
+						/>
+						<ButtonStyled
+							v-else
+							:color="action.color ?? 'standard'"
+							:size="action.size ?? 'large'"
+							:type="action.type ?? 'standard'"
+							:circular="action.circular ?? action.labelHidden ?? false"
 						>
-							<component
-								:is="action.icon"
-								v-if="action.icon"
-								:class="action.iconClass"
-								aria-hidden="true"
-								v-bind="action.iconProps"
-							/>
-							<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
-						</button>
-					</ButtonStyled>
+							<AutoLink
+								v-if="action.to"
+								v-tooltip="action.tooltip"
+								:to="action.to"
+								:aria-label="actionLabel(action)"
+								@click="dismissActionPrompt(action)"
+							>
+								<component
+									:is="action.icon"
+									v-if="action.icon"
+									:class="action.iconClass"
+									aria-hidden="true"
+									v-bind="action.iconProps"
+								/>
+								<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
+							</AutoLink>
+							<button
+								v-else
+								v-tooltip="action.tooltip"
+								type="button"
+								:disabled="action.disabled"
+								:aria-label="actionLabel(action)"
+								@click="handleActionClick(action)"
+							>
+								<component
+									:is="action.icon"
+									v-if="action.icon"
+									:class="action.iconClass"
+									aria-hidden="true"
+									v-bind="action.iconProps"
+								/>
+								<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
+							</button>
+						</ButtonStyled>
+						<template #popper>
+							<div class="grid grid-cols-[min-content] gap-1">
+								<div class="flex min-w-48 items-center justify-between gap-8">
+									<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
+										{{ action.prompt.title }}
+									</h3>
+									<ButtonStyled size="small" circular>
+										<button
+											v-tooltip="action.prompt.dismissLabel"
+											@click="action.prompt.onDismiss?.()"
+										>
+											<XIcon aria-hidden="true" />
+										</button>
+									</ButtonStyled>
+								</div>
+								<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+									{{ action.prompt.description }}
+								</p>
+							</div>
+						</template>
+					</Tooltip>
+					<template v-else>
+						<JoinedButtons
+							v-if="action.joinedActions?.length"
+							:actions="action.joinedActions"
+							:color="joinedActionColor(action.color)"
+							:size="action.size ?? 'large'"
+							:disabled="action.disabled"
+							:primary-disabled="action.primaryDisabled"
+							:dropdown-disabled="action.dropdownDisabled"
+							:primary-muted="action.primaryMuted"
+						/>
+						<ButtonStyled
+							v-else
+							:color="action.color ?? 'standard'"
+							:size="action.size ?? 'large'"
+							:type="action.type ?? 'standard'"
+							:circular="action.circular ?? action.labelHidden ?? false"
+						>
+							<AutoLink
+								v-if="action.to"
+								v-tooltip="action.tooltip"
+								:to="action.to"
+								:aria-label="actionLabel(action)"
+							>
+								<component
+									:is="action.icon"
+									v-if="action.icon"
+									:class="action.iconClass"
+									aria-hidden="true"
+									v-bind="action.iconProps"
+								/>
+								<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
+							</AutoLink>
+							<button
+								v-else
+								v-tooltip="action.tooltip"
+								type="button"
+								:disabled="action.disabled"
+								:aria-label="actionLabel(action)"
+								@click="handleActionClick(action)"
+							>
+								<component
+									:is="action.icon"
+									v-if="action.icon"
+									:class="action.iconClass"
+									aria-hidden="true"
+									v-bind="action.iconProps"
+								/>
+								<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
+							</button>
+						</ButtonStyled>
+					</template>
 				</template>
 			</div>
 		</div>
@@ -270,6 +352,8 @@
 </template>
 
 <script setup lang="ts">
+import { XIcon } from '@modrinth/assets'
+import { Tooltip } from 'floating-vue'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
@@ -337,6 +421,15 @@ type PageHeaderMetadataItem = {
 	class?: string
 }
 
+type PageHeaderActionPrompt = {
+	title: string
+	description: string
+	dismissLabel?: string
+	shown?: boolean
+	placement?: string
+	onDismiss?: () => void
+}
+
 type PageHeaderAction = {
 	id: string
 	label: string
@@ -357,6 +450,7 @@ type PageHeaderAction = {
 	primaryDisabled?: boolean
 	dropdownDisabled?: boolean
 	primaryMuted?: boolean
+	prompt?: PageHeaderActionPrompt
 }
 
 const props = withDefaults(
@@ -414,6 +508,17 @@ function metadataClass(item: PageHeaderMetadataItem, interactive = false) {
 
 function actionLabel(action: PageHeaderAction) {
 	return action.ariaLabel ?? action.tooltip ?? action.label
+}
+
+function dismissActionPrompt(action: PageHeaderAction) {
+	if (action.prompt?.shown) {
+		action.prompt.onDismiss?.()
+	}
+}
+
+function handleActionClick(action: PageHeaderAction) {
+	dismissActionPrompt(action)
+	void action.onClick?.()
 }
 
 function joinedActionColor(color?: ButtonColor) {
