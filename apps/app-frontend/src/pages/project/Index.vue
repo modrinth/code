@@ -64,121 +64,9 @@
 					:project="data"
 					:project-v3="projectV3"
 					:ping="serverPing"
+					:actions="projectHeaderActions"
 					@contextmenu.prevent.stop="handleRightClick"
-				>
-					<template v-if="isServerProject" #actions>
-						<ButtonStyled v-if="serverPlaying" size="large" color="red">
-							<button @click="handleStopServer">
-								<StopCircleIcon />
-								{{ formatMessage(commonMessages.stopButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else size="large" color="brand">
-							<button
-								:disabled="data && installingServerProjects.includes(data.id)"
-								@click="handleClickPlay"
-							>
-								<PlayIcon />
-								{{
-									data && installingServerProjects.includes(data.id)
-										? formatMessage(commonMessages.installingLabel)
-										: formatMessage(commonMessages.playButton)
-								}}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular>
-							<button
-								v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
-								@click="handleAddServerToInstance"
-							>
-								<PlusIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:tooltip="`More options`"
-								:options="[
-									{
-										id: 'open-in-browser',
-										link: `https://modrinth.com/project/${data.slug}`,
-										external: true,
-									},
-									{
-										divider: true,
-									},
-									{
-										id: 'report',
-										color: 'red',
-										hoverFilled: true,
-										link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
-									},
-								]"
-								aria-label="More options"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
-								<template #report> <ReportIcon /> Report </template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</template>
-					<template v-else #actions>
-						<ButtonStyled size="large" color="brand">
-							<button
-								v-tooltip="installButtonTooltip"
-								:disabled="installButtonDisabled"
-								@click="install(null)"
-							>
-								<SpinnerIcon
-									v-if="installButtonLoading && !installButtonInstalled"
-									class="animate-spin"
-								/>
-								<DownloadIcon v-else-if="!installButtonInstalled && !serverProjectSelected" />
-								<CheckIcon v-else />
-								{{ installButtonLabel }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:tooltip="`More options`"
-								:options="[
-									{
-										id: 'follow',
-										disabled: true,
-										tooltip: 'Coming soon',
-										action: () => {},
-									},
-									{
-										id: 'save',
-										disabled: true,
-										tooltip: 'Coming soon',
-										action: () => {},
-									},
-									{
-										id: 'open-in-browser',
-										link: `https://modrinth.com/${data.project_type}/${data.slug}`,
-										external: true,
-									},
-									{
-										divider: true,
-									},
-									{
-										id: 'report',
-										color: 'red',
-										hoverFilled: true,
-										link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
-									},
-								]"
-								aria-label="More options"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
-								<template #follow> <HeartIcon /> Follow </template>
-								<template #save> <BookmarkIcon /> Save </template>
-								<template #report> <ReportIcon /> Report </template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</template>
-				</ProjectHeader>
+				/>
 				<NavTabs
 					:links="[
 						{
@@ -266,14 +154,12 @@ import {
 } from '@modrinth/assets'
 import {
 	BrowseInstallHeader,
-	ButtonStyled,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
 	getTargetInstallPreferences,
 	injectNotificationManager,
 	NavTabs,
-	OverflowMenu,
 	ProjectBackgroundGradient,
 	ProjectHeader,
 	ProjectSidebarCompatibility,
@@ -499,6 +385,131 @@ const installButtonLabel = computed(() => {
 const installButtonTooltip = computed(() => {
 	if (installButtonInstalled.value) return formatMessage(messages.alreadyInstalled)
 	return null
+})
+
+const projectHeaderActions = computed(() => {
+	if (!data.value) return []
+
+	if (isServerProject.value) {
+		return [
+			serverPlaying.value
+				? {
+						id: 'stop',
+						label: formatMessage(commonMessages.stopButton),
+						icon: StopCircleIcon,
+						color: 'red',
+						onClick: handleStopServer,
+					}
+				: {
+						id: 'play',
+						label:
+							data.value && installingServerProjects.value.includes(data.value.id)
+								? formatMessage(commonMessages.installingLabel)
+								: formatMessage(commonMessages.playButton),
+						icon: PlayIcon,
+						color: 'brand',
+						disabled: data.value && installingServerProjects.value.includes(data.value.id),
+						onClick: handleClickPlay,
+					},
+			{
+				id: 'add-server-to-instance',
+				label: formatMessage(commonMessages.addServerToInstanceButton),
+				icon: PlusIcon,
+				labelHidden: true,
+				tooltip: formatMessage(commonMessages.addServerToInstanceButton),
+				onClick: handleAddServerToInstance,
+			},
+			{
+				id: 'more',
+				label: 'More options',
+				icon: MoreVerticalIcon,
+				labelHidden: true,
+				type: 'transparent',
+				tooltip: 'More options',
+				menuActions: [
+					{
+						id: 'open-in-browser',
+						label: 'Open in browser',
+						icon: ExternalIcon,
+						action: () => openUrl(`https://modrinth.com/project/${data.value.slug}`),
+					},
+					{
+						divider: true,
+					},
+					{
+						id: 'report',
+						label: 'Report',
+						icon: ReportIcon,
+						color: 'red',
+						action: () =>
+							openUrl(`https://modrinth.com/report?item=project&itemID=${data.value.id}`),
+					},
+				],
+			},
+		]
+	}
+
+	return [
+		{
+			id: 'install',
+			label: installButtonLabel.value,
+			icon:
+				installButtonLoading.value && !installButtonInstalled.value
+					? SpinnerIcon
+					: !installButtonInstalled.value && !serverProjectSelected.value
+						? DownloadIcon
+						: CheckIcon,
+			iconClass:
+				installButtonLoading.value && !installButtonInstalled.value ? 'animate-spin' : undefined,
+			color: 'brand',
+			tooltip: installButtonTooltip.value,
+			disabled: installButtonDisabled.value,
+			onClick: () => install(null),
+		},
+		{
+			id: 'more',
+			label: 'More options',
+			icon: MoreVerticalIcon,
+			labelHidden: true,
+			type: 'transparent',
+			tooltip: 'More options',
+			menuActions: [
+				{
+					id: 'follow',
+					label: 'Follow',
+					icon: HeartIcon,
+					disabled: true,
+					tooltip: 'Coming soon',
+					action: () => {},
+				},
+				{
+					id: 'save',
+					label: 'Save',
+					icon: BookmarkIcon,
+					disabled: true,
+					tooltip: 'Coming soon',
+					action: () => {},
+				},
+				{
+					id: 'open-in-browser',
+					label: 'Open in browser',
+					icon: ExternalIcon,
+					action: () =>
+						openUrl(`https://modrinth.com/${data.value.project_type}/${data.value.slug}`),
+				},
+				{
+					divider: true,
+				},
+				{
+					id: 'report',
+					label: 'Report',
+					icon: ReportIcon,
+					color: 'red',
+					action: () => openUrl(`https://modrinth.com/report?item=project&itemID=${data.value.id}`),
+				},
+			],
+		},
+	]
 })
 
 const [allLoaders, allGameVersions] = await Promise.all([

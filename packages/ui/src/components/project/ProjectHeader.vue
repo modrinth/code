@@ -1,18 +1,14 @@
 <template>
-	<ContentPageHeader>
-		<template #icon>
-			<Avatar :src="project.icon_url" :alt="project.title" size="96px" />
-		</template>
-		<template #title>
-			{{ project.title }}
-		</template>
-		<template #title-suffix>
-			<ProjectStatusBadge v-if="member || project.status !== 'approved'" :status="project.status" />
-		</template>
-		<template #summary>
-			{{ project.description }}
-		</template>
-		<template #stats>
+	<PageHeader
+		:header="project.title"
+		:summary="project.description"
+		:leading="leadingItem"
+		:badges="headerBadges"
+		:metadata="headerMetadata"
+		:actions="actions"
+		:disable-line-clamp="disableLineClamp"
+	>
+		<template #metadata-project-stats>
 			<div class="flex items-center gap-3 flex-wrap gap-y-0">
 				<template v-if="isServerProject">
 					<ServerDetails
@@ -66,24 +62,24 @@
 				</div>
 			</div>
 		</template>
-		<template #actions>
-			<slot name="actions" />
-		</template>
-	</ContentPageHeader>
+	</PageHeader>
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, HeartIcon } from '@modrinth/assets'
 import { capitalizeString, type Project } from '@modrinth/utils'
+import type { Component } from 'vue'
 import { computed } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
 import { useRouter } from 'vue-router'
 
 import { useCompactNumber, useVIntl } from '../../composables'
 import { commonMessages } from '../../utils'
-import Avatar from '../base/Avatar.vue'
-import ContentPageHeader from '../base/ContentPageHeader.vue'
 import FormattedTag from '../base/FormattedTag.vue'
+import type { JoinedButtonAction } from '../base/JoinedButtons.vue'
+import PageHeader from '../base/PageHeader.vue'
 import TagItem from '../base/TagItem.vue'
+import type { Item as TeleportOverflowMenuItem } from '../base/TeleportOverflowMenu.vue'
 import ProjectStatusBadge from './ProjectStatusBadge.vue'
 import ServerDetails from './server/ServerDetails.vue'
 
@@ -91,17 +87,76 @@ const router = useRouter()
 const { formatMessage } = useVIntl()
 const { formatCompactNumber } = useCompactNumber()
 
+type HeaderAction = {
+	id: string
+	label: string
+	component?: Component
+	componentProps?: Record<string, unknown>
+	class?: string
+	icon?: Component
+	iconProps?: Record<string, unknown>
+	iconClass?: string
+	tooltip?: string
+	ariaLabel?: string
+	to?: string | RouteLocationRaw
+	onClick?: (event?: MouseEvent) => void | Promise<void>
+	disabled?: boolean
+	labelHidden?: boolean
+	circular?: boolean
+	color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple' | 'medal-promo'
+	size?: 'standard' | 'large' | 'small'
+	type?: 'standard' | 'outlined' | 'transparent' | 'highlight' | 'highlight-colored-text' | 'chip'
+	joinedActions?: JoinedButtonAction[]
+	menuActions?: TeleportOverflowMenuItem[]
+	primaryDisabled?: boolean
+	dropdownDisabled?: boolean
+	primaryMuted?: boolean
+}
+
 const props = withDefaults(
 	defineProps<{
 		project: Project
 		member?: boolean
 		projectV3?: Labrinth.Projects.v3.Project | null
 		ping?: number
+		actions?: HeaderAction[]
+		disableLineClamp?: boolean
 	}>(),
 	{
 		member: false,
+		actions: () => [],
+		disableLineClamp: false,
 	},
 )
+
+const leadingItem = computed(() => ({
+	type: 'avatar' as const,
+	src: props.project.icon_url,
+	alt: props.project.title,
+	avatarSize: '96px',
+}))
+
+const headerBadges = computed(() =>
+	props.member || props.project.status !== 'approved'
+		? [
+				{
+					id: 'status',
+					component: ProjectStatusBadge,
+					componentProps: {
+						status: props.project.status,
+					},
+				},
+			]
+		: [],
+)
+
+const headerMetadata = [
+	{
+		id: 'project-stats',
+		type: 'custom' as const,
+		class: 'contents',
+	},
+]
 
 const searchUrl = computed(
 	() => `/discover/${isServerProject.value ? 'servers' : `${props.project.project_type}s`}`,

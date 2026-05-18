@@ -143,6 +143,9 @@
   "app.browse.server.installing": {
     "message": "Installing"
   },
+  "app.browse.server.world-fallback-name": {
+    "message": "Instance"
+  },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
   },
