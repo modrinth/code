@@ -319,8 +319,8 @@ const advancedActionTooltip = computed(() =>
 )
 const filesTabLink = computed(() =>
 	worldId.value
-		? `/hosting/manage/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId.value)}/files?path=/&editing=server.properties`
-		: `/hosting/manage/${encodeURIComponent(serverId)}/worlds`,
+		? `/hosting/manage/${encodeURIComponent(serverId)}/instances/${encodeURIComponent(worldId.value)}/files?path=/&editing=server.properties`
+		: `/hosting/manage/${encodeURIComponent(serverId)}/instances`,
 )
 const serverSettings = injectServerSettings(null)
 

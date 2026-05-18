@@ -2,11 +2,11 @@
 	<div class="flex min-h-[36rem] flex-col gap-6 text-primary">
 		<div class="flex flex-col gap-2">
 			<RouterLink
-				:to="worldsPath"
+				:to="instancesPath"
 				class="flex w-fit items-center gap-1 text-base font-medium text-blue hover:underline"
 			>
 				<ChevronLeftIcon class="size-4" aria-hidden="true" />
-				{{ formatMessage(messages.allWorlds) }}
+				{{ formatMessage(messages.allInstances) }}
 			</RouterLink>
 
 			<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -23,10 +23,10 @@
 				</div>
 
 				<div class="flex shrink-0 items-center gap-2">
-					<PanelServerActionButton size="large" start-label="Start world" />
+					<PanelServerActionButton size="large" start-label="Start instance" />
 					<ButtonStyled size="large" circular>
 						<button
-							v-tooltip="formatMessage(messages.worldSettings)"
+							v-tooltip="formatMessage(messages.instanceSettings)"
 							@click="openServerSettings({ tabId: 'installation' })"
 						>
 							<SettingsIcon aria-hidden="true" />
@@ -78,9 +78,9 @@ interface Tab {
 }
 
 const messages = defineMessages({
-	allWorlds: {
-		id: 'servers.manage.world.all-worlds',
-		defaultMessage: 'All worlds',
+	allInstances: {
+		id: 'servers.manage.instance.all-instances',
+		defaultMessage: 'All instances',
 	},
 	contentNav: {
 		id: 'servers.manage.nav.content',
@@ -95,16 +95,16 @@ const messages = defineMessages({
 		defaultMessage: 'Backups',
 	},
 	worldFallbackName: {
-		id: 'servers.manage.world.fallback-name',
-		defaultMessage: 'World',
+		id: 'servers.manage.instance.fallback-name',
+		defaultMessage: 'Instance',
 	},
 	lastActive: {
-		id: 'servers.manage.world.last-active',
+		id: 'servers.manage.instance.last-active',
 		defaultMessage: 'Last active {time}',
 	},
-	worldSettings: {
-		id: 'servers.manage.world.settings',
-		defaultMessage: 'World settings',
+	instanceSettings: {
+		id: 'servers.manage.instance.settings',
+		defaultMessage: 'Instance settings',
 	},
 })
 
@@ -121,9 +121,11 @@ const { data: serverFull } = useQuery({
 	staleTime: 30_000,
 })
 
-const worldsPath = computed(() => `/hosting/manage/${encodeURIComponent(serverId)}/worlds`)
+const instancesPath = computed(() => `/hosting/manage/${encodeURIComponent(serverId)}/instances`)
 const worldPath = computed(() =>
-	worldId.value ? `${worldsPath.value}/${encodeURIComponent(worldId.value)}` : worldsPath.value,
+	worldId.value
+		? `${instancesPath.value}/${encodeURIComponent(worldId.value)}`
+		: instancesPath.value,
 )
 
 const currentWorld = computed(() => {
@@ -193,7 +195,7 @@ watch(
 	() => [serverFull.value, currentWorld.value, worldId.value] as const,
 	([full, world, id]) => {
 		if (full && id && !world) {
-			router.replace(worldsPath.value)
+			router.replace(instancesPath.value)
 		}
 	},
 	{ immediate: true },

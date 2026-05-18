@@ -1,5 +1,5 @@
 <template>
-	<ServersManageWorldRootLayout>
+	<ServersManageInstanceRootLayout>
 		<RouterView v-slot="{ Component }">
 			<template v-if="Component">
 				<Suspense>
@@ -7,10 +7,10 @@
 				</Suspense>
 			</template>
 		</RouterView>
-	</ServersManageWorldRootLayout>
+	</ServersManageInstanceRootLayout>
 </template>
 
 <script setup lang="ts">
-import { ServersManageWorldRootLayout } from '@modrinth/ui'
+import { ServersManageInstanceRootLayout } from '@modrinth/ui'
 import { RouterView } from 'vue-router'
 </script>

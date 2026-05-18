@@ -6,12 +6,12 @@
 		>
 			<div
 				v-for="slot in WORLD_SLOT_COUNT"
-				:key="`world-card-skeleton-${slot}`"
+				:key="`instance-card-skeleton-${slot}`"
 				class="min-h-[19.75rem] animate-pulse rounded-2xl border border-solid border-surface-5 bg-bg-raised shadow-xl"
 			/>
 		</div>
 		<div v-else class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,20.25rem),1fr))] gap-6">
-			<WorldCard
+			<InstanceCard
 				v-for="world in worldSlots"
 				:key="world.id"
 				:world="world"
@@ -29,7 +29,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import WorldCard from '#ui/components/servers/worlds/WorldCard.vue'
+import InstanceCard from '#ui/components/servers/instances/InstanceCard.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -39,9 +39,9 @@ import {
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 const messages = defineMessages({
-	worldSlotName: {
-		id: 'servers.manage.worlds.slot-name',
-		defaultMessage: 'World #{index}',
+	instanceSlotName: {
+		id: 'servers.manage.instances.slot-name',
+		defaultMessage: 'Instance #{index}',
 	},
 })
 
@@ -154,7 +154,7 @@ function padWorldSlots(slots: WorldSlot[]): WorldSlot[] {
 		padded.push({
 			type: 'empty',
 			id: `empty-world-slot-${i + 1}`,
-			name: formatMessage(messages.worldSlotName, { index: i + 1 }),
+			name: formatMessage(messages.instanceSlotName, { index: i + 1 }),
 		})
 	}
 	return padded
@@ -268,14 +268,14 @@ function createDummyWorldSlots(): WorldSlot[] {
 		{
 			type: 'empty',
 			id: 'empty-world-slot-3',
-			name: formatMessage(messages.worldSlotName, { index: 3 }),
+			name: formatMessage(messages.instanceSlotName, { index: 3 }),
 		},
 	]
 }
 
 function handleEditWorld(worldId: string) {
 	router.push(
-		`/hosting/manage/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}`,
+		`/hosting/manage/${encodeURIComponent(serverId)}/instances/${encodeURIComponent(worldId)}`,
 	)
 }
 

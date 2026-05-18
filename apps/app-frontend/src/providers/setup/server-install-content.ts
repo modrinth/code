@@ -252,7 +252,7 @@ export function createServerInstallContent(opts: {
 		if (serverFlowFrom.value === 'reset-server') {
 			return `/hosting/manage/${sid}?openSettings=installation`
 		}
-		return getServerWorldContentPath(sid, effectiveServerWorldId.value)
+		return getServerInstanceContentPath(sid, effectiveServerWorldId.value)
 	})
 	const serverBackLabel = computed(() => {
 		if (serverFlowFrom.value === 'onboarding') return 'Back to setup'
@@ -424,7 +424,7 @@ export function createServerInstallContent(opts: {
 		if (isInstallingQueuedServerInstalls.value) return false
 
 		if (!serverId || !worldId) {
-			handleError(new Error('No server world is available for install.'))
+			handleError(new Error('No server instance is available for install.'))
 			return false
 		}
 
@@ -556,7 +556,7 @@ export function createServerInstallContent(opts: {
 
 			if (serverFlowFrom.value === 'onboarding') {
 				await client.archon.servers_v1.endIntro(sid)
-				await router.push(getServerWorldContentPath(sid, wid))
+				await router.push(getServerInstanceContentPath(sid, wid))
 				return
 			}
 
@@ -571,8 +571,8 @@ export function createServerInstallContent(opts: {
 		serverContentProjectIds.value = new Set([...serverContentProjectIds.value, id])
 	}
 
-	function getServerWorldContentPath(serverId: string, worldId: string | null) {
-		const base = `/hosting/manage/${encodeURIComponent(serverId)}/worlds`
+	function getServerInstanceContentPath(serverId: string, worldId: string | null) {
+		const base = `/hosting/manage/${encodeURIComponent(serverId)}/instances`
 		return worldId ? `${base}/${encodeURIComponent(worldId)}` : base
 	}
 
