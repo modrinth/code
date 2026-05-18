@@ -1,5 +1,11 @@
 - Use `ApiError` as the error type for API routes
-- Prefer `ApiError::Internal` and `ApiError::Request` over `ApiError::InvalidInput`
+- The return type of an HTTP route should not be `HttpResponse` if possible; always prefer more specific types
+  - Use `web::Json<T>` for JSON-encoded response
+  - Use `()` for no content
+- Prefer `ApiError` variants:
+  - `ApiError::Request` instead of `ApiError::InvalidInput`
+  - `ApiError::Auth` instead of `ApiError::CustomAuthentication`
+  - `ApiError::Internal` for database errors, 3rd party service errors, anything else internal
   - Use `eyre!` to construct a value for `Internal` and `Request` variants
 - Error messages (both for errors and exceptions) must be formatted as per the Rust API guidelines:
   - lowercase message
