@@ -73,7 +73,8 @@ const messages = defineMessages({
 	},
 	instanceInfoFiles: {
 		id: 'servers.manage.instances.info.files',
-		defaultMessage: 'Each instance has its own server files, worlds, installed content, and settings.',
+		defaultMessage:
+			'Each instance has its own server files, worlds, installed content, and settings.',
 	},
 })
 

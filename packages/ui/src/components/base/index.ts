@@ -19,7 +19,6 @@ export { default as CollapsibleAdmonition } from './CollapsibleAdmonition.vue'
 export { default as CollapsibleRegion } from './CollapsibleRegion.vue'
 export type { ComboboxOption } from './Combobox.vue'
 export { default as Combobox } from './Combobox.vue'
-export { default as ContentPageHeader } from './ContentPageHeader.vue'
 export { default as CopyCode } from './CopyCode.vue'
 export { default as DatePicker } from './DatePicker.vue'
 export { default as DoubleIcon } from './DoubleIcon.vue'
@@ -96,6 +95,11 @@ export type {
 	TimeFramePreset,
 } from './TimeFramePicker.vue'
 export { default as TimeFramePicker } from './TimeFramePicker.vue'
+export type {
+	Item as TeleportOverflowMenuItem,
+	Option as TeleportOverflowMenuOption,
+} from './TeleportOverflowMenu.vue'
+export { default as TeleportOverflowMenu } from './TeleportOverflowMenu.vue'
 export { default as Timeline } from './Timeline.vue'
 export { default as Toggle } from './Toggle.vue'
 export { default as UnsavedChangesPopup } from './UnsavedChangesPopup.vue'

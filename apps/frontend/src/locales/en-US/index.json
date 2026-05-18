@@ -1964,6 +1964,9 @@
   "discover.install.heading.reset-modpack": {
     "message": "Selecting modpack to install after reset"
   },
+  "discover.install.world-fallback-name": {
+    "message": "Instance"
+  },
   "discover.seo.description": {
     "message": "Search and browse thousands of Minecraft {projectType} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType}."
   },
@@ -3940,6 +3943,9 @@
   },
   "servers.manage.instances.meta.title": {
     "message": "Instances - {server} - Modrinth"
+  },
+  "servers.manage.instances.slot-name": {
+    "message": "Instance #{index}"
   },
   "servers.notice.actions": {
     "message": "Actions"

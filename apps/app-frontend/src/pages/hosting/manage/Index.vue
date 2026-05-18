@@ -25,7 +25,7 @@
 			"
 		>
 			<template #default="{ onReinstall, onReinstallFailed }">
-				<RouterView v-slot="{ Component }">
+				<RouterView v-slot="{ Component }" :route="managedRoute">
 					<template v-if="Component">
 						<Suspense>
 							<component
@@ -46,7 +46,7 @@ import type { Archon, Labrinth } from '@modrinth/api-client'
 import { injectAuth, injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { computed, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { get_user } from '@/helpers/cache'
@@ -60,10 +60,23 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const breadcrumbs = useBreadcrumbs()
 
-const serverId = computed(() => {
-	const rawId = route.params.id
-	return Array.isArray(rawId) ? rawId[0] : (rawId ?? '')
-})
+const managedRoute = shallowRef(router.currentRoute.value)
+const serverId = ref(getRouteParam(managedRoute.value.params.id) ?? '')
+
+watch(
+	router.currentRoute,
+	(nextRoute) => {
+		if (!nextRoute.path.startsWith('/hosting/manage/')) return
+		managedRoute.value = nextRoute
+		serverId.value = getRouteParam(nextRoute.params.id) ?? ''
+	},
+	{ immediate: true },
+)
+
+function getRouteParam(param: string | string[] | undefined): string | null {
+	if (Array.isArray(param)) return param[0] ?? null
+	return param ?? null
+}
 
 if (serverId.value) {
 	try {
