@@ -27,8 +27,8 @@ import type { Component } from 'vue'
 import { computed } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
-import PageHeader from '#ui/components/base/PageHeader.vue'
 import type { JoinedButtonAction } from '#ui/components/base/JoinedButtons.vue'
+import PageHeader from '#ui/components/base/PageHeader.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import { injectModrinthClient, injectNotificationManager } from '#ui/providers'
 
