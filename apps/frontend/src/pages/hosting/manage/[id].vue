@@ -3,7 +3,6 @@
 		:server-id="serverId"
 		:reload-page="() => reloadNuxtApp({ path: route.path })"
 		:resolve-viewer="resolveViewer"
-		:show-copy-id-action="flags.developerMode"
 		:show-advanced-debug-info="flags.advancedDebugInfo"
 		:stripe-publishable-key="config.public.stripePublishableKey as string"
 		:site-url="config.public.siteUrl as string"
