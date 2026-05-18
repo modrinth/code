@@ -75,7 +75,7 @@
     "defaultMessage": "Some of your external links appear to be identical. Each link should be entered only once and with the appropriate link type."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Identical Links"
+    "defaultMessage": "Clean up identical links"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Your Description should contain sufficient plain text or image alt-text, keeping it accessible to those using screen readers or with slow internet connections."

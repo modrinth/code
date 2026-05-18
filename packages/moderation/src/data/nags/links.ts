@@ -133,7 +133,7 @@ export const linksNags: Nag[] = [
 		id: 'identical-links',
 		title: defineMessage({
 			id: 'nags.identical-links.title',
-			defaultMessage: 'Identical Links',
+			defaultMessage: 'Clean up identical links',
 		}),
 		description: defineMessage({
 			id: 'nags.identical-links.description',

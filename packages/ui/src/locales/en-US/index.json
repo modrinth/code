@@ -65,17 +65,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Failed to load subscription details."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 days"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/month"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/quarter"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/year"
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 days} monthly {/month} quarterly {/quarter} yearly {/year} other {{interval}}}"
   },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Your next charge will be on <charge-date>{date}</charge-date>."
@@ -2334,7 +2325,7 @@
     "defaultMessage": "JCB"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
+    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -3411,7 +3402,7 @@
     "defaultMessage": "No servers yet"
   },
   "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Pick your favourite mods and we handle the rest."
+    "defaultMessage": "Pick your favorite mods and we handle the rest."
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "One-click mod installs"
@@ -3450,16 +3441,16 @@
     "defaultMessage": "New"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining>. Contact support to download the files before they are deleted. "
+    "defaultMessage": "Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days}}</days-remaining>. Contact support to download the files before they are deleted."
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Your files will be preserved for 30 days after cancellation."
   },
   "servers.listing.notice.moderated": {
-    "defaultMessage": "Your server has been suspended by moderation action. "
+    "defaultMessage": "Your server has been suspended by moderation action."
   },
   "servers.listing.notice.pending-change": {
-    "defaultMessage": "Your server will {verb} to the {planSize} Plan on <date>{formattedDate}</date>. "
+    "defaultMessage": "Your server will {verb, select, downgrade {downgrade} other {upgrade}} to the {planSize} Plan on <date>{formattedDate}</date>."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Please wait while we set up your server. This can take up to 10 minutes."
@@ -3468,7 +3459,7 @@
     "defaultMessage": "Your subscription was cancelled."
   },
   "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Your subscription was cancelled on <date>{formattedDate}</date>. "
+    "defaultMessage": "Your subscription was cancelled on <date>{formattedDate}</date>."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Your subscription was cancelled due to payment failure."
@@ -3652,6 +3643,9 @@
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Payment method"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
   },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "Available in North America, Europe, and Southeast Asia."
