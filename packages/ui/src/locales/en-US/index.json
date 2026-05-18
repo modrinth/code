@@ -830,6 +830,9 @@
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Overwrite"
   },
+  "files.conflict-modal.overwrite-file-label": {
+    "defaultMessage": "Will overwrite <file-path>{path}</file-path>"
+  },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Over 100 files will be overwritten if you proceed with extraction; here are some of them."
   },
@@ -838,9 +841,6 @@
   },
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} overwritten"
-  },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Overwritten"
   },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Files will be overwritten"
