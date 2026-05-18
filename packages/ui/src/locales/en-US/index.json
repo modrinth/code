@@ -4658,6 +4658,51 @@
   "servers.manage.install.retry-error": {
     "defaultMessage": "Failed to retry installation"
   },
+  "servers.manage.instance.all-instances": {
+    "defaultMessage": "All instances"
+  },
+  "servers.manage.instance.fallback-name": {
+    "defaultMessage": "Instance"
+  },
+  "servers.manage.instance.last-active": {
+    "defaultMessage": "Last active {time}"
+  },
+  "servers.manage.instance.settings": {
+    "defaultMessage": "Instance settings"
+  },
+  "servers.manage.instances.card.active": {
+    "defaultMessage": "Active"
+  },
+  "servers.manage.instances.card.create": {
+    "defaultMessage": "Create instance"
+  },
+  "servers.manage.instances.card.created": {
+    "defaultMessage": "Created"
+  },
+  "servers.manage.instances.card.edit": {
+    "defaultMessage": "Edit instance"
+  },
+  "servers.manage.instances.card.empty-description": {
+    "defaultMessage": "New instance"
+  },
+  "servers.manage.instances.card.installed-content": {
+    "defaultMessage": "Installed content"
+  },
+  "servers.manage.instances.card.last-active": {
+    "defaultMessage": "Last active"
+  },
+  "servers.manage.instances.card.none": {
+    "defaultMessage": "None"
+  },
+  "servers.manage.instances.card.not-tracked-yet": {
+    "defaultMessage": "Not tracked yet"
+  },
+  "servers.manage.instances.card.settings": {
+    "defaultMessage": "Instance settings"
+  },
+  "servers.manage.instances.slot-name": {
+    "defaultMessage": "Instance #{index}"
+  },
   "servers.manage.nav.backups": {
     "defaultMessage": "Backups"
   },
@@ -4667,11 +4712,11 @@
   "servers.manage.nav.files": {
     "defaultMessage": "Files"
   },
-  "servers.manage.nav.overview": {
-    "defaultMessage": "Overview"
-  },
   "servers.manage.nav.instances": {
     "defaultMessage": "Instances"
+  },
+  "servers.manage.nav.overview": {
+    "defaultMessage": "Overview"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
@@ -4765,51 +4810,6 @@
   },
   "servers.manage.websocket.reconnecting": {
     "defaultMessage": "Hang on, we're reconnecting to your server."
-  },
-  "servers.manage.instance.all-instances": {
-    "defaultMessage": "All instances"
-  },
-  "servers.manage.instance.fallback-name": {
-    "defaultMessage": "Instance"
-  },
-  "servers.manage.instance.last-active": {
-    "defaultMessage": "Last active {time}"
-  },
-  "servers.manage.instance.settings": {
-    "defaultMessage": "Instance settings"
-  },
-  "servers.manage.instances.card.active": {
-    "defaultMessage": "Active"
-  },
-  "servers.manage.instances.card.create": {
-    "defaultMessage": "Create instance"
-  },
-  "servers.manage.instances.card.created": {
-    "defaultMessage": "Created"
-  },
-  "servers.manage.instances.card.edit": {
-    "defaultMessage": "Edit instance"
-  },
-  "servers.manage.instances.card.empty-description": {
-    "defaultMessage": "New instance"
-  },
-  "servers.manage.instances.card.installed-content": {
-    "defaultMessage": "Installed content"
-  },
-  "servers.manage.instances.card.last-active": {
-    "defaultMessage": "Last active"
-  },
-  "servers.manage.instances.card.none": {
-    "defaultMessage": "None"
-  },
-  "servers.manage.instances.card.not-tracked-yet": {
-    "defaultMessage": "Not tracked yet"
-  },
-  "servers.manage.instances.card.settings": {
-    "defaultMessage": "Instance settings"
-  },
-  "servers.manage.instances.slot-name": {
-    "defaultMessage": "Instance #{index}"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Your servers"
