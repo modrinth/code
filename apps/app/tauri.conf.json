@@ -10,7 +10,7 @@
 		"active": true,
 		"category": "Game",
 		"copyright": "",
-		"targets": "all",
+		"targets": ["nsis"],
 		"externalBin": [],
 		"icon": [
 			"icons/128x128.png",

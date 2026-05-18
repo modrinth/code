@@ -40,6 +40,23 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     app.fs_scope()
         .allow_directory(state.directories.profiles_dir(), true)?;
 
+    // Check for CLI --launch-profile when the app finishes initializing state.
+    // We spawn the handler so this command does not block the initialize_state caller.
+    if let Some(profile_name) =
+        crate::api::utils::parse_launch_profile_from_args(
+            std::env::args_os().collect(),
+        )
+    {
+        let name = profile_name;
+        tracing::info!("Detected --launch-profile on startup: {}", name);
+        tauri::async_runtime::spawn(async move {
+            if let Err(e) = crate::api::utils::handle_launch_profile(name).await
+            {
+                tracing::error!("Auto-launch profile failed: {:?}", e);
+            }
+        });
+    }
+
     Ok(())
 }
 
@@ -151,7 +168,17 @@ fn main() {
 
     builder = builder
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
-            if let Some(payload) = args.get(1) {
+            // First, check if a second-instance invoked with --launch-profile
+            let args_vec = args.clone();
+            if let Some(profile_name) = api::utils::parse_launch_profile_from_args(args_vec) {
+                tracing::info!("Received single-instance --launch-profile request: {}", profile_name);
+                let name = profile_name;
+                tauri::async_runtime::spawn(async move {
+                    if let Err(e) = api::utils::handle_launch_profile(name).await {
+                        tracing::error!("Auto-launch profile (single-instance) failed: {:?}", e);
+                    }
+                });
+            } else if let Some(payload) = args.get(1) {
                 tracing::info!("Handling deep link from arg {payload}");
                 let payload = payload.clone();
                 tauri::async_runtime::spawn(api::utils::handle_command(
