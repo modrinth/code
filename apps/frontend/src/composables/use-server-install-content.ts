@@ -628,7 +628,9 @@ export function useServerInstallContent({
 			if (fromContext.value === 'onboarding') {
 				await client.archon.servers_v1.endIntro(currentServerId.value)
 				queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
-				navigateTo(getServerInstanceContentPath(currentServerId.value, currentWorldId.value ?? null))
+				navigateTo(
+					getServerInstanceContentPath(currentServerId.value, currentWorldId.value ?? null),
+				)
 			} else {
 				navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
 			}
