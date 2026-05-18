@@ -570,7 +570,7 @@ impl AutomatedModerationQueue {
                                             Vec::new()
                                         } else {
                                             let res = client
-                                                .post(format!("{}v1/mods", ENV.FLAME_ANVIL_URL))
+                                                .post(format!("{}/v1/mods", ENV.FLAME_ANVIL_URL))
                                             .json(&serde_json::json!({
                                                 "modIds": flame_files.iter().map(|x| x.1).collect::<Vec<_>>()
                                             }))
@@ -823,7 +823,7 @@ pub enum ApprovalType {
 }
 
 impl ApprovalType {
-    fn approved(&self) -> bool {
+    pub fn approved(&self) -> bool {
         match self {
             ApprovalType::Yes => true,
             ApprovalType::WithAttributionAndSource => true,
@@ -901,6 +901,13 @@ pub struct FlameProject {
     pub name: String,
     pub slug: String,
     pub links: FlameLinks,
+    pub logo: FlameLogo,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FlameLogo {
+    pub thumbnail_url: String,
 }
 
 #[derive(Deserialize, Serialize)]

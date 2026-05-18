@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::collections::HashMap;
 
 use super::{ApiError, oauth_clients::get_user_clients};
 use crate::database::PgPool;
@@ -671,7 +671,7 @@ pub async fn user_icon_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -698,7 +698,7 @@ pub async fn user_icon_edit(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
             FileHostPublicity::Public,
-            &***file_host,
+            &**file_host,
         )
         .await?;
 
@@ -717,7 +717,7 @@ pub async fn user_icon_edit(
             &ext.ext,
             Some(96),
             Some(1.0),
-            &***file_host,
+            &**file_host,
         )
         .await?;
 
@@ -746,7 +746,7 @@ pub async fn user_icon_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -772,7 +772,7 @@ pub async fn user_icon_delete(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
             FileHostPublicity::Public,
-            &***file_host,
+            &**file_host,
         )
         .await?;
 

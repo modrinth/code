@@ -45,7 +45,7 @@ pub enum FileHostPublicity {
 }
 
 #[async_trait]
-pub trait FileHost {
+pub trait FileHost: Send + Sync {
     async fn upload_file(
         &self,
         content_type: &str,
@@ -65,6 +65,12 @@ pub trait FileHost {
         file_name: &str,
         file_publicity: FileHostPublicity,
     ) -> Result<DeleteFileData, FileHostingError>;
+
+    async fn read_file(
+        &self,
+        file_name: &str,
+        file_publicity: FileHostPublicity,
+    ) -> Result<Bytes, FileHostingError>;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

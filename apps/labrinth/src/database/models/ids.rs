@@ -1,12 +1,12 @@
 use super::DatabaseError;
 use crate::database::PgTransaction;
 use crate::models::ids::{
-    AffiliateCodeId, ChargeId, CollectionId, FileId, ImageId, NotificationId,
-    OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
-    OAuthRedirectUriId, OrganizationId, PatId, PayoutId, ProductId,
-    ProductPriceId, ProjectId, ReportId, SessionId, SharedInstanceId,
-    SharedInstanceVersionId, TeamId, TeamMemberId, ThreadId, ThreadMessageId,
-    UserSubscriptionId, VersionId,
+    AffiliateCodeId, AttributionGroupId, ChargeId, CollectionId, FileId,
+    ImageId, NotificationId, OAuthAccessTokenId, OAuthClientAuthorizationId,
+    OAuthClientId, OAuthRedirectUriId, OrganizationId, PatId, PayoutId,
+    ProductId, ProductPriceId, ProjectId, ReportId, SessionId,
+    SharedInstanceId, SharedInstanceVersionId, TeamId, TeamMemberId, ThreadId,
+    ThreadMessageId, UserSubscriptionId, VersionId,
 };
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
@@ -167,6 +167,10 @@ db_id_interface!(
 db_id_interface!(
     CollectionId,
     generator: generate_collection_id @ "collections",
+);
+db_id_interface!(
+    AttributionGroupId,
+    generator: generate_attribution_group_id @ "project_attribution_groups",
 );
 db_id_interface!(
     FileId,

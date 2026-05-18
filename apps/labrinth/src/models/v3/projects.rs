@@ -645,6 +645,54 @@ impl SideTypesMigrationReviewStatus {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+pub struct MissingAttributionFile {
+    pub id: FileId,
+    pub override_source: Option<OverrideSource>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum OverrideSource {
+    Flame {
+        id: u32,
+        title: String,
+        url: String,
+        icon_url: String,
+    },
+    Unknown,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+#[serde(untagged)]
+pub enum AttributionLicense {
+    Spdx(String),
+    Custom { name: String },
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum AttributionResolutionKind {
+    License {
+        license: AttributionLicense,
+        link_to_work: url::Url,
+    },
+    MyProject {
+        license: AttributionLicense,
+    },
+    SpecialPermissions {
+        link_to_work: url::Url,
+    },
+    NoPermission,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+pub struct AttributionResolution {
+    pub kind: AttributionResolutionKind,
+    pub notes: String,
+    pub image_urls: Vec<url::Url>,
+}
+
 /// A specific version of a project
 #[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct Version {
@@ -681,6 +729,9 @@ pub struct Version {
 
     /// A list of files available for download for this version.
     pub files: Vec<VersionFile>,
+    /// Files in this version that contain override files not yet attributed.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub files_missing_attribution: Vec<MissingAttributionFile>,
     /// A list of projects that this version depends on.
     pub dependencies: Vec<Dependency>,
 
@@ -768,6 +819,7 @@ impl From<VersionQueryResult> for Version {
                 .map(|vf| (vf.field_name, vf.value.serialize_internal()))
                 .collect(),
             components: data.components,
+            files_missing_attribution: Vec::new(),
         }
     }
 }

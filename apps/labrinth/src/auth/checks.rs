@@ -5,7 +5,10 @@ use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
+use crate::models::ids::FileId;
+use crate::models::projects::{MissingAttributionFile, OverrideSource};
 use crate::models::users::User;
+use crate::queue::file_scan::get_files_missing_attribution;
 use crate::routes::ApiError;
 use futures::TryStreamExt;
 use itertools::Itertools;
@@ -204,7 +207,40 @@ pub async fn filter_visible_versions(
     )
     .await?;
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
-    Ok(versions.into_iter().map(|x| x.into()).collect())
+
+    let version_ids: Vec<_> = versions.iter().map(|v| v.inner.id).collect();
+    let missing = get_files_missing_attribution(pool, &version_ids)
+        .await
+        .unwrap_or_default();
+
+    Ok(versions
+        .into_iter()
+        .map(|v| {
+            let files_missing = missing
+                .get(&v.inner.id)
+                .map(|entries| {
+                    entries
+                        .iter()
+                        .map(|(id, fp)| MissingAttributionFile {
+                            id: FileId(id.0 as u64),
+                            override_source: fp
+                                .as_ref()
+                                .map(|p| OverrideSource::Flame {
+                                    id: p.id,
+                                    title: p.title.clone(),
+                                    url: p.url.clone(),
+                                    icon_url: p.icon_url.clone(),
+                                })
+                                .or(Some(OverrideSource::Unknown)),
+                        })
+                        .collect::<Vec<_>>()
+                })
+                .unwrap_or_default();
+            let mut version = crate::models::projects::Version::from(v);
+            version.files_missing_attribution = files_missing;
+            version
+        })
+        .collect())
 }
 
 impl ValidateAuthorized for models::DBOAuthClient {
@@ -258,13 +294,20 @@ pub async fn filter_visible_version_ids(
         filter_enlisted_version_ids(versions.clone(), user_option, pool, redis)
             .await?;
 
+    let version_ids: Vec<_> = versions.iter().map(|v| v.id).collect();
+    let withheld_versions = get_files_missing_attribution(pool, &version_ids)
+        .await
+        .unwrap_or_default();
+
     // Return versions that are not hidden, we are a mod of, or we are enlisted on the team of
     for version in versions {
+        let is_withheld = withheld_versions.contains_key(&version.id);
         // We can see the version if:
-        // - it's not hidden and we can see the project
+        // - it's not hidden and we can see the project and it's not withheld for attribution
         // - we are a mod
         // - we are enlisted on the team of the mod
         if (!version.status.is_hidden()
+            && !is_withheld
             && visible_project_ids.contains(&version.project_id))
             || user_option.as_ref().is_some_and(|x| x.role.is_mod())
             || enlisted_version_ids.contains(&version.id)

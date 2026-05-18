@@ -6,8 +6,11 @@ use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
 use crate::database::redis::RedisPool;
+use crate::file_hosting::FileHost;
 use crate::models::exp;
+
 use crate::models::projects::{FileType, VersionStatus};
+use crate::queue::file_scan::scan_file;
 use crate::routes::internal::delphi::DelphiRunParameters;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -17,6 +20,7 @@ use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::iter;
+use tracing::error;
 
 pub const VERSIONS_NAMESPACE: &str = "versions";
 const VERSION_FILES_NAMESPACE: &str = "versions_files";
@@ -134,7 +138,10 @@ impl VersionFileBuilder {
     pub async fn insert(
         self,
         version_id: DBVersionId,
+        project_id: DBProjectId,
         transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+        file_host: &dyn FileHost,
         http: &reqwest::Client,
     ) -> Result<DBFileId, DatabaseError> {
         let file_id = generate_file_id(&mut *transaction).await?;
@@ -169,6 +176,16 @@ impl VersionFileBuilder {
             .await?;
         }
 
+        sqlx::query!(
+            "
+            INSERT INTO file_scans (file_id)
+            VALUES ($1)
+            ",
+            file_id as DBFileId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+
         if let Err(err) = crate::routes::internal::delphi::run(
             &mut *transaction,
             DelphiRunParameters {
@@ -178,7 +195,20 @@ impl VersionFileBuilder {
         )
         .await
         {
-            tracing::error!("Error submitting new file to Delphi: {err}");
+            error!("Error submitting new file to Delphi: {err:?}");
+        }
+
+        if let Err(err) = scan_file(
+            &mut *transaction,
+            redis,
+            file_host,
+            project_id,
+            file_id,
+            &self.url,
+        )
+        .await
+        {
+            error!("Error scanning new file {file_id:?}: {err:?}");
         }
 
         Ok(file_id)
@@ -195,6 +225,8 @@ impl VersionBuilder {
     pub async fn insert(
         self,
         transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+        file_host: &dyn FileHost,
         http: &reqwest::Client,
     ) -> Result<DBVersionId, DatabaseError> {
         let version = DBVersion {
@@ -236,7 +268,15 @@ impl VersionBuilder {
         } = self;
 
         for file in files {
-            file.insert(version_id, transaction, http).await?;
+            file.insert(
+                version_id,
+                self.project_id,
+                transaction,
+                redis,
+                file_host,
+                http,
+            )
+            .await?;
         }
 
         DependencyBuilder::insert_many(
@@ -862,14 +902,14 @@ impl DBVersion {
             })
     }
 
-    pub async fn get_files_from_hash<'a, 'b, E>(
+    pub async fn get_files_from_hash<'a, E>(
         algorithm: String,
         hashes: &[String],
         executor: E,
         redis: &RedisPool,
     ) -> Result<Vec<DBFile>, DatabaseError>
     where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis.get_cached_keys(
             VERSION_FILES_NAMESPACE,

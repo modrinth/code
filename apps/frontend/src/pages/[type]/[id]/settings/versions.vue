@@ -16,7 +16,7 @@
 		/>
 
 		<Admonition
-			v-if="flags.modpackPermissionsPage && withheldVersions.length > 0"
+			v-if="withheldVersions.length > 0"
 			type="warning"
 			class="mb-4"
 			:header="
@@ -454,7 +454,9 @@ async function deleteVersion() {
 	stopLoading()
 }
 
-const withheldVersions = computed(() => ['4.0.0'])
+const withheldVersions = computed(() =>
+	versions.value.filter((x) => x.files_missing_attribution?.length > 0),
+)
 
 const messages = defineMessages({
 	withheldVersionsWarningTitle: {

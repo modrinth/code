@@ -2888,8 +2888,20 @@
   "project.settings.permissions.learn-more": {
     "message": "Learn more"
   },
+  "project.settings.permissions.no-results": {
+    "message": "No external projects match your search."
+  },
   "project.settings.permissions.search-placeholder": {
     "message": "Search {count} {count, plural, one {external project} other {external projects}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "Most files"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Recently edited"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Status"
   },
   "project.settings.title": {
     "message": "Settings"
