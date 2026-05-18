@@ -3662,6 +3662,15 @@
   "servers.manage.instance.settings": {
     "defaultMessage": "Instance settings"
   },
+  "servers.manage.instances-hint.description": {
+    "defaultMessage": "Your server state has been converted into an instance."
+  },
+  "servers.manage.instances-hint.dismiss": {
+    "defaultMessage": "Don't show again"
+  },
+  "servers.manage.instances-hint.title": {
+    "defaultMessage": "New: Server Instances!"
+  },
   "servers.manage.instances.card.active": {
     "defaultMessage": "Active"
   },
@@ -3691,6 +3700,18 @@
   },
   "servers.manage.instances.card.settings": {
     "defaultMessage": "Instance settings"
+  },
+  "servers.manage.instances.info.definition": {
+    "defaultMessage": "An instance is a separate server setup."
+  },
+  "servers.manage.instances.info.files": {
+    "defaultMessage": "Each instance has its own server files, worlds, installed content, and settings."
+  },
+  "servers.manage.instances.info.header": {
+    "defaultMessage": "What is an instance?"
+  },
+  "servers.manage.instances.info.switching": {
+    "defaultMessage": "You can switch which instance your server runs."
   },
   "servers.manage.instances.slot-name": {
     "defaultMessage": "Instance #{index}"
