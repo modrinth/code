@@ -106,6 +106,7 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import ShareModal from '#ui/components/modal/ShareModal.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient } from '#ui/providers'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
 import { injectPageContext } from '#ui/providers/page-context'
@@ -130,11 +131,19 @@ const client = injectModrinthClient()
 const modalBehavior = injectModalBehavior()
 const pageContext = injectPageContext(null)
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	crashProblemsDetected: {
+		id: 'console.crash-analysis.problems-detected',
+		defaultMessage: '{count, plural, one {# problem detected} other {# problems detected}}',
+	},
+})
 
 const crashHeader = computed(() => {
 	const problems = ctx.crashAnalysis?.value?.analysis.problems ?? []
 	const count = problems.length
-	return `${count} problem${count !== 1 ? 's' : ''} detected`
+	return formatMessage(messages.crashProblemsDetected, { count })
 })
 
 const crashItems = computed<CollapsibleAdmonitionItem[]>(() => {

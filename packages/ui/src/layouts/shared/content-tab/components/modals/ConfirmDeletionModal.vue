@@ -56,7 +56,8 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	header: {
 		id: 'content.confirm-deletion.header',
-		defaultMessage: 'Delete {itemType}{count, plural, one {} other {s}}',
+		defaultMessage:
+			'{count, plural, one {Delete {itemType, select, datapack {data pack} mod {mod} modpack {modpack} plugin {plugin} project {project} resourcepack {resource pack} server {server} shader {shader} other {item}}} other {Delete {itemType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}}}',
 	},
 	admonitionHeader: {
 		id: 'content.confirm-deletion.admonition-header',
@@ -69,7 +70,8 @@ const messages = defineMessages({
 	},
 	deleteButton: {
 		id: 'content.confirm-deletion.delete-button',
-		defaultMessage: 'Delete {count} {itemType}{count, plural, one {} other {s}}',
+		defaultMessage:
+			'Delete {count, plural, one {# {itemType, select, datapack {data pack} mod {mod} modpack {modpack} plugin {plugin} project {project} resourcepack {resource pack} server {server} shader {shader} other {item}}} other {# {itemType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}}}',
 	},
 })
 

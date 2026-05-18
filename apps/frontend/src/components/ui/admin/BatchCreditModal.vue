@@ -100,8 +100,7 @@
 						input-class="!bg-surface-3"
 					/>
 					<span>
-						To make up for it, we've added {{ days }} day{{ pluralize(days) }} to your Modrinth
-						Servers subscription.
+						{{ formatMessage(messages.creditEmailSubscriptionDays, { days }) }}
 					</span>
 					<span>
 						Your next charge was scheduled for {credit.previous_due} and will now be on
@@ -133,11 +132,13 @@ import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,
+	defineMessages,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
 	TagItem,
 	Toggle,
+	useVIntl,
 } from '@modrinth/ui'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
 import { computed, ref } from 'vue'
@@ -146,6 +147,15 @@ import { useBaseFetch } from '#imports'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	creditEmailSubscriptionDays: {
+		id: 'admin.batch-credit.email-preview.subscription-days',
+		defaultMessage:
+			"To make up for it, we've added {days, plural, one {# day} other {# days}} to your Modrinth Servers subscription.",
+	},
+})
 
 const modal = ref<InstanceType<typeof NewModal>>()
 
@@ -250,10 +260,6 @@ async function apply() {
 			type: 'error',
 		})
 	}
-}
-
-function pluralize(n: number): string {
-	return n === 1 ? '' : 's'
 }
 
 defineExpose({

@@ -18,12 +18,34 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { defineMessages, useVIntl } from '../../../composables/i18n'
 import Separator from './Separator.vue'
 
 const props = defineProps<{
 	uptimeSeconds: number
 	noSeparator?: boolean
 }>()
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	verboseDays: {
+		id: 'servers.uptime.verbose.days',
+		defaultMessage: '{count, plural, one {# day} other {# days}}',
+	},
+	verboseHours: {
+		id: 'servers.uptime.verbose.hours',
+		defaultMessage: '{count, plural, one {# hour} other {# hours}}',
+	},
+	verboseMinutes: {
+		id: 'servers.uptime.verbose.minutes',
+		defaultMessage: '{count, plural, one {# minute} other {# minutes}}',
+	},
+	verboseSeconds: {
+		id: 'servers.uptime.verbose.seconds',
+		defaultMessage: '{count, plural, one {# second} other {# seconds}}',
+	},
+})
 
 const formattedUptime = computed(() => {
 	const days = Math.floor(props.uptimeSeconds / (24 * 3600))
@@ -51,15 +73,15 @@ const verboseUptime = computed(() => {
 
 	let verbose = ''
 	if (days > 0) {
-		verbose += `${days} day${days > 1 ? 's' : ''} `
+		verbose += `${formatMessage(messages.verboseDays, { count: days })} `
 	}
 	if (hours > 0) {
-		verbose += `${hours} hour${hours > 1 ? 's' : ''} `
+		verbose += `${formatMessage(messages.verboseHours, { count: hours })} `
 	}
 	if (minutes > 0) {
-		verbose += `${minutes} minute${minutes > 1 ? 's' : ''} `
+		verbose += `${formatMessage(messages.verboseMinutes, { count: minutes })} `
 	}
-	verbose += `${seconds} second${seconds > 1 ? 's' : ''}`
+	verbose += formatMessage(messages.verboseSeconds, { count: seconds })
 
 	return verbose.trim()
 })

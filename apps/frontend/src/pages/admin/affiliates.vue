@@ -61,8 +61,10 @@
 								{{ userGroup.user.username }}
 							</span>
 							<span class="text-sm text-secondary">
-								{{ userGroup.affiliates.length }} affiliate code{{
-									userGroup.affiliates.length === 1 ? '' : 's'
+								{{
+									formatMessage(messages.affiliateCodeCount, {
+										count: userGroup.affiliates.length,
+									})
 								}}
 							</span>
 						</div>
@@ -92,9 +94,11 @@ import {
 	Avatar,
 	ButtonStyled,
 	ConfirmModal,
+	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	StyledInput,
+	useVIntl,
 } from '@modrinth/ui'
 import type { User } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
@@ -102,6 +106,14 @@ import { computed, ref } from 'vue'
 
 const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	affiliateCodeCount: {
+		id: 'admin.affiliates.affiliate-code-count',
+		defaultMessage: '{count, plural, one {# affiliate code} other {# affiliate codes}}',
+	},
+})
 
 type UserGroup = {
 	user: User

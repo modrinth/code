@@ -324,6 +324,10 @@ const messages = defineMessages({
 		id: 'servers.backups.bulk-bar.deleting',
 		defaultMessage: 'Deleting {total, plural, one {# backup} other {# backups}}...',
 	},
+	failedBulkDelete: {
+		id: 'servers.backups.bulk-delete.failed',
+		defaultMessage: 'Failed to delete {count, plural, one {# backup} other {# backups}}',
+	},
 })
 
 const { addNotification } = injectNotificationManager()
@@ -529,7 +533,7 @@ async function bulkDelete(toRemove: Archon.BackupsQueue.v1.BackupQueueBackup[]) 
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			title: `Failed to delete ${toRemove.length} backup${toRemove.length === 1 ? '' : 's'}`,
+			title: formatMessage(messages.failedBulkDelete, { count: toRemove.length }),
 			text: err instanceof Error ? err.message : String(err),
 		})
 	} finally {

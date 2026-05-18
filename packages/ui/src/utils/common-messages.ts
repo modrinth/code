@@ -1083,7 +1083,7 @@ export const paymentMethodMessages = defineMessages({
 	},
 	mastercard: {
 		id: 'payment-method.mastercard',
-		defaultMessage: 'MasterCard',
+		defaultMessage: 'Mastercard',
 	},
 	paypal: {
 		id: 'payment-method.paypal',

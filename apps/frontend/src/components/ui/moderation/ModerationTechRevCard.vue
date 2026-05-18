@@ -23,6 +23,7 @@ import {
 	ButtonStyled,
 	Collapsible,
 	CollapsibleRegion,
+	defineMessages,
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -30,6 +31,7 @@ import {
 	type OverflowMenuOption,
 	useFormatBytes,
 	useFormatDateTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { NavTabs } from '@modrinth/ui'
 import {
@@ -58,6 +60,15 @@ const formatDateTimeUtc = useFormatDateTime({
 	timeZone: 'UTC',
 })
 const formatBytes = useFormatBytes()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	otherTracesAlsoMarked: {
+		id: 'moderation.tech-review.other-traces-also-marked',
+		defaultMessage:
+			'({count, plural, one {# other trace also marked} other {# other traces also marked}})',
+	},
+})
 
 type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
 	id: string
@@ -531,7 +542,7 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 
 		const otherText =
 			otherMatchedCount > 0
-				? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked)`
+				? ` ${formatMessage(messages.otherTracesAlsoMarked, { count: otherMatchedCount })}`
 				: ''
 
 		if (verdict === 'safe') {

@@ -145,6 +145,7 @@ import { computed, ref, watch } from 'vue'
 import { CopyCode, StyledInput, Toggle } from '#ui/components'
 import EditServerIcon from '#ui/components/servers/edit-server-icon/EditServerIcon.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -153,10 +154,19 @@ import {
 } from '#ui/providers'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const { server: data, serverId, busyReasons } = injectModrinthServerContext()
 const { featureFlags } = injectPageContext()
 const queryClient = useQueryClient()
+
+const messages = defineMessages({
+	sharedCpuSpec: {
+		id: 'servers.settings.general.specs.shared-cpu',
+		defaultMessage:
+			'{sharedCpus, plural, one {# Shared CPU} other {# Shared CPUs}} (Bursts up to {burstCpus, plural, one {# CPU} other {# CPUs}})',
+	},
+})
 
 const serverName = ref(data.value?.name)
 const serverSubdomain = ref(data.value?.net?.domain ?? '')
@@ -324,7 +334,10 @@ const infoProperties = computed<InfoProperty[]>(() => [
 		type: 'specs',
 		lines: serverSpecs.value
 			? [
-					`${serverSpecs.value.sharedCpus} Shared CPU${Number(serverSpecs.value.sharedCpus) > 1 ? 's' : ''} (Bursts up to ${serverSpecs.value.burstCpus} CPUs)`,
+					formatMessage(messages.sharedCpuSpec, {
+						sharedCpus: Number(serverSpecs.value.sharedCpus),
+						burstCpus: Number(serverSpecs.value.burstCpus),
+					}),
 					`${serverSpecs.value.ramGb} GB RAM`,
 					`${serverSpecs.value.swapGb} GB Swap`,
 					`${serverSpecs.value.storageGb} GB SSD`,

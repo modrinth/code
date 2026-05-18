@@ -146,7 +146,7 @@ const filterOptions = computed(() => {
 				commonProjectTypeCategoryMessages[type as keyof typeof commonProjectTypeCategoryMessages]
 			return {
 				id: type,
-				label: msg ? formatMessage(msg) : type.charAt(0).toUpperCase() + type.slice(1) + 's',
+				label: msg ? formatMessage(msg) : type.charAt(0).toUpperCase() + type.slice(1),
 			}
 		})
 

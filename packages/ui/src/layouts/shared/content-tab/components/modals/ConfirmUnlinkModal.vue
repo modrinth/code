@@ -28,7 +28,7 @@
 				<ButtonStyled color="orange">
 					<button :disabled="buttonsDisabled" @click="confirm">
 						<UnlinkIcon />
-						{{ formatMessage(server ? messages.header : messages.unlinkButton) }}
+						{{ formatMessage(messages.unlinkButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
