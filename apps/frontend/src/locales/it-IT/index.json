@@ -407,6 +407,117 @@
   "collection.title": {
     "message": "{name} - Raccolta"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Aggiungi nota privata"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Approva"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Approva con risposta"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Chiudi thread"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Chiudi con risposta"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Rifiuta"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Rifiuta con risposta"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Riapri thread"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Rispondi"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Rispondi al thread"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Ripresenta per la revisione"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Ripresenta per la revisione con risposta"
+  },
+  "conversation-thread.action.send": {
+    "message": "Invia"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Presenta per la revisione"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Presenta per la revisione con risposta"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Imposta come bozza"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Imposta come bozza con risposta"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Sospendi"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Sospendi con risposta"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Questo thread è stato chiuso. Non potranno essere inviati nuovi messaggi."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Impossibile chiudere la segnalazione"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Impossibile riaprire la segnalazione"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Impossibile inviare il messaggio"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Rispondi al thread..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Invia un messaggio..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Conferma che i moderatori non monitorano continuamente qui"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Comprendo che i moderatori non monitorano questo thread attivamente."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Il tuo progetto è già stato approvato. Perciò, il team di moderazione non monitora attivamente questo thread. Tuttavia, potrebbero comunque notare il tuo messaggio se c'è un problema col progetto."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Rispondi al thread"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Se hai bisogno di contattare il team di moderazione, usa il <help-center-link>centro assistenza di Modrinth</help-center-link> e clicca sulla bolla blu nell'angolo in basso a destra."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Confermo di aver risposto ai messaggi dei moderatori"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Confermo di aver risposto adeguatamente ai messaggi dei moderatori."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Stai ripresentando <project-title>{projectTitle}</project-title> per farlo revisionare nuovamente ai moderatori."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Ripresentazione"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Presentazione"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Assicurati di aver risposto a tutti i commenti del team di moderazione."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Ripresentare il progetto di continuo senza rispondere ai moderatori potrebbe portare alla sospensione dell'account."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "I file aggiuntivi sono per risorse di supporto come il codice sorgente, non per versioni alternative o varianti."
   },
@@ -875,23 +986,8 @@
   "dashboard.head-title": {
     "message": "Bacheca"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Segna tutte come lette"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Mostra cronologia"
-  },
   "dashboard.notifications.empty.no-unread": {
     "message": "Hai letto tutte le notifiche."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Impossibile caricare le notifiche:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Cronologia"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Cronologia delle notifiche"
   },
   "dashboard.notifications.link.see-all": {
     "message": "Mostra tutte"
@@ -901,9 +997,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "Mostra {extraNotifs, plural, one {un'altra notifica} other {altre # notifiche}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Caricando le notifiche..."
   },
   "dashboard.organizations.button.create": {
     "message": "Crea organizzazione"
@@ -919,6 +1012,27 @@
   },
   "dashboard.organizations.title": {
     "message": "Organizzazioni"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Segna tutte come lette"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Mostra cronologia"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Hai letto tutte le notifiche."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Impossibile caricare le notifiche:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Cronologia"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Cronologia delle notifiche"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Caricando le notifiche..."
   },
   "dashboard.projects.bulk-edit-hint": {
     "message": "Puoi modificare più progetti contemporaneamente selezionandoli qui sotto."
@@ -1239,22 +1353,22 @@
     "message": "Annulla ripristino"
   },
   "discover.install.error.no-server-world": {
-    "message": "Nessun mondo del server può essere installato."
+    "message": "Nessun mondo per server può essere installato."
   },
   "discover.install.error.unsupported-content-type": {
-    "message": "Questo tipo di contenuto non può essere installato da esplora."
+    "message": "Questo tipo di contenuto non può essere installato da Esplora."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "Selezione dei pacchetti da installare dopo il ripristino"
+    "message": "Pacchetti da installare dopo il ripristino"
   },
   "discover.seo.description": {
-    "message": "Cerca e esplora tra migliaia di {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}} presenti su Modrinth attraverso ricerche rapide e accurate. I nostri filtri ti aiuteranno a trovarne i migliori."
+    "message": "Cerca e esplora tra migliaia di {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}} presenti su Modrinth attraverso ricerche rapide e accurate. I nostri filtri ti aiuteranno a trovare quello che fa al caso tuo."
   },
   "discover.seo.title": {
-    "message": "Ricerca di {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}}"
+    "message": "Trova {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}}"
   },
   "discover.seo.title-with-query": {
-    "message": "Ricerca di {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}} | {query}"
+    "message": "Trova {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Forse c'è un errore di battitura nell'URL della raccolta."
@@ -1431,7 +1545,7 @@
     "message": "I server di Modrinth Hosting possono eseguire qualsiasi versione di Minecraft: Java Edition superiore alla 1.2.5, inclusi gli snapshot."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
-    "message": "Supportiamo anche un'ampia gamma di loader di mod e plugin, tra cui Fabric, Quilt, Forge e NeoForge per le mod, così come Paper e Purpur per i plugin. È necessario però che questi loader supportino la versione di Minecraft selezionata."
+    "message": "Supportiamo anche un'ampia gamma di loader di mod e plugin, tra cui Fabric, Quilt, Forge e NeoForge per le mod, così come Paper e Purpur per i plugin. È necessario però che questi loader supportino la versione di Minecraft scelta."
   },
   "hosting-marketing.get-started": {
     "message": "Inizia"
@@ -1754,14 +1868,20 @@
   "layout.banner.add-email.description": {
     "message": "Per motivi di sicurezza, Modrinth richiede l'associazione di un indirizzo email al tuo account."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Non mostrare più"
+  },
   "layout.banner.build-fail.description": {
     "message": "Questo deploy del frontend di Modrinth non è riuscito a generare uno stato dall'API. Questo potrebbe essere dovuto a un malfunzionamento o a un errore nella configurazione. Rieffettua il build quando l'API è disponibile. Codici di errore: {errors}; L'URL di API corrente è: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Ignora"
   },
   "layout.banner.build-fail.title": {
     "message": "Errore nella generazione dello stato da API durante il build."
   },
   "layout.banner.preview.description": {
-    "message": "Se volevi accedere al sito ufficiale, visita <link>https://modrinth.com</link>. Questa versione serve allo staff di Modrinth per condurre test; basata su <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Se volevi accedere al sito ufficiale, visita {url}. Questa versione serve allo staff di Modrinth per condurre test; basata su <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "Questa versione del sito di Modrinth è un'anteprima."
@@ -2591,6 +2711,84 @@
   "project.license.title": {
     "message": "Licenza"
   },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Il progetto è privato: solo tu e chiunque inviti potranno accederci."
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Il progetto è pubblico e accessibile su Modrinth."
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Il progetto è fuori elenco: sarà accessibile solo tramite link e non apparirà su Modrinth."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "Puoi modificare la visibilità del progetto nelle <visibility-settings-link>impostazioni di visibilità</visibility-settings-link>."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Progetto approvato"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "Questo progetto è in bozza e sarà pubblico solo quando verrà revisionato e approvato dal team di moderazione di Modrinth."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Progetto in bozza"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Appena avrai soddisfatto tutti i requisiti e ti sarai assicurato che il progetto rispetti le <rules-link>Regole sui contenuti</rules-link>, potrai presentarlo per la revisione."
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "Rispondi a tutti i dubbi dei moderatori, inclusi i problemi elencati nei messaggi sottostanti, prima di ripresentare il progetto."
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Modifiche richieste"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "Ripresentare il progetto di continuo senza rispondere ai moderatori potrebbe portare alla sospensione dell'account."
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Il progetto è in coda per essere revisionato dal team di moderazione di Modrinth."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Il progetto sarà scansionato, poi analizzato manualmente dai moderatori per assicurarsi che rispetti le <rules-link>Regole sui contenuti</rules-link> e i <terms-link>Termini d'uso</terms-link>."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "Puoi ancora modificare il progetto; non influirà sulla tua posizione in coda."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Puntiamo a revisionare i progetti entro le 24-48 ore, ma potrebbero esserci dei ritardi; ciò non vuol dire che abbiamo trovato un problema."
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>Apprezziamo la tua pazienza. Mentre i nostri moderatori si impegnano a tenere Modrinth un posto sicuro, non vediamo l'ora di aiutare a condividere i tuoi contenuti! 💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Progetto in revisione"
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "Il progetto non sarà visibile pubblicamente e potrà essere accesso solo tramite link. {requestedStatus, select, unlisted {Date le <visibility-settings-link>impostazioni di visibilità</visibility-settings-link> attuali, non dovrebbe essere necessaria alcuna azione.} other {Rispondi a tutti i dubbi dei moderatori, inclusi i problemi elencati nei messaggi sottostanti, prima di ripresentare il progetto.}}"
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "Nascosto dallo staff"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Accesso negato"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "Questo thread non è monitorato attivamente, ma potrebbe essere revisionato se necessario."
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "I moderatori non forniscono supporto per tutti i problemi e i messaggi inviati non raggiungono lo staff."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "Se hai bisogno di assistenza o hai altre richieste, visita il <help-center-link>centro assistenza di Modrinth</help-center-link> e clicca sulla bolla blu nell'angolo in basso a destra."
+  },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "Mostra interfaccia degli utenti"
+  },
+  "project.moderation.thread.private-description": {
+    "message": "Questa è una conversazione privata con i moderatori di Modrinth. Sarai contattato per eventuali problemi riguardanti questo progetto."
+  },
+  "project.moderation.thread.title": {
+    "message": "Messaggi di moderazione"
+  },
   "project.moderation.title": {
     "message": "Moderazione"
   },
@@ -2679,7 +2877,7 @@
     "message": "Non hai il permesso di ridistribuire alcuni dei contenuti esterni che hai incluso. Per pubblicare su Modrinth, rimuovi i contenuti illeciti."
   },
   "project.settings.permissions.fail.title": {
-    "message": "Non puoi includere questi contenuti"
+    "message": "Alcuni contenuti non possono essere pubblicati"
   },
   "project.settings.permissions.info-banner.description": {
     "message": "Se includi dei contenuti esterni a Modrinth, devi dichiarare la loro origine e dimostrare di avere il permesso di ridistribuirli. Controlla la <link>nostra guida</link> per farlo nel modo giusto!"
@@ -3501,7 +3699,7 @@
     "message": "Hai annullato l'abbonamento."
   },
   "settings.billing.midas.status.cancelled.line2": {
-    "message": "I vantaggi rimarranno attivi fino alla fine di questo ciclo di fatturazione."
+    "message": "Manterrai i tuoi vantaggi fino alla fine del ciclo di fatturazione in corso."
   },
   "settings.billing.midas.status.failed": {
     "message": "La transazione non è andata a buon fine. Aggiorna il tuo metodo di pagamento."

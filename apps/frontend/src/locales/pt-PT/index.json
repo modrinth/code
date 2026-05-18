@@ -854,26 +854,11 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Já utilizou o seu limite de levantamento de <b>{withdrawLimit}</b>. Deve preencher um formulário fiscal para levantar mais."
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Marcar tudo como lido"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Ver histórico"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Histórico"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Histórico de notificações"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "Ver tudo"
   },
   "dashboard.notifications.link.view-history": {
     "message": "Ver histórico de notificações"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Carregando notificações..."
   },
   "dashboard.projects.head-title": {
     "message": "Projetos"
@@ -1579,9 +1564,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Erro ao gerar estado da API durante a construção."
-  },
-  "layout.banner.preview.description": {
-    "message": "Se querias aceder ao website oficial do Modrinth, visita <link>https://modrinth.com</link>. Esta versão de pré-lançamento é utilizada pela equipa do Modrinth para fins de teste. Foi criada usando <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "Esta é uma pré-visualização da implementação do site da Modrinth."

@@ -78,14 +78,18 @@ pub struct UserIds {
 )]
 #[get("/users")]
 pub async fn users_get(
+    req: HttpRequest,
     web::Query(ids): web::Query<UserIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::users::users_get(
+        req,
         web::Query(v3::users::UserIds { ids: ids.ids }),
         pool,
         redis,
+        session_queue,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;

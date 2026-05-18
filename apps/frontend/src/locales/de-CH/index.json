@@ -407,6 +407,51 @@
   "collection.title": {
     "message": "{name} - Kollektion"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Private Notiz hinzufügen"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Genehmigen"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Mit Antwort genehmigen"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": ""
+  },
+  "conversation-thread.action.reject": {
+    "message": "Ablehnen"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Mit Antwort ablehnen"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Antworten"
+  },
+  "conversation-thread.action.send": {
+    "message": "Senden"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Zurückhalten"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Mit Antwort zurückhalten"
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Sende eine Nachricht..."
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Mir ist bewusst, dass dieser Thread nicht aktiv von den Moderatoren überwacht wird."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Du schickst <project-title>{projectTitle}</project-title> zur Wiederprüfung."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Erneut zur Überprüfung einreichen"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Erneut zur Überprüfung einreichen"
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ergänzende Dateien dienen zur unterstützung von Ressourcen wie Quellcode, nicht für alternative Versionen oder Varianten."
   },
@@ -875,23 +920,8 @@
   "dashboard.head-title": {
     "message": "Dashboard"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Alle als gelesen markieren"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Verlauf ansehen"
-  },
   "dashboard.notifications.empty.no-unread": {
-    "message": "Du hast keine ungelesenen Nachrichten."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Fehler beim laden von Benachrichtigungen:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Verlauf"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Benachrichtigungsverlauf"
+    "message": "Du hast keine ungelesenen Benachrichtigungen."
   },
   "dashboard.notifications.link.see-all": {
     "message": "Alle ansehen"
@@ -901,9 +931,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "Siehe {extraNotifs} weitere {extraNotifs, plural, one {Benachrichtigung} other {Benachrichtigungen}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Lade Benachrichtigungen..."
   },
   "dashboard.organizations.button.create": {
     "message": "Organisation erstellen"
@@ -919,6 +946,27 @@
   },
   "dashboard.organizations.title": {
     "message": "Organisationen"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Alle als gelesen markieren"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Verlauf ansehen"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Du hast keine ungelesenen Benachrichtigungen."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Fehler beim Laden von Benachrichtigungen:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Verlauf"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Benachrichtigungsverlauf"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Benachrichtigungen werden geladen..."
   },
   "dashboard.projects.bulk-edit-hint": {
     "message": "Du kannst mehrere Projekte gleichzeitig bearbeiten, indem du sie unden auswählst."
@@ -1754,14 +1802,20 @@
   "layout.banner.add-email.description": {
     "message": "Aus Sicherheitsgründen verlangt Modrinth, dass du eine E-Mail Adresse für dein Konto registrierst."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Immer ignorieren"
+  },
   "layout.banner.build-fail.description": {
     "message": "Diese Deployment von Modrinth's Frontend konnte keinen Status von der API generieren. Dies könnte aufgrund eines Ausfalls oder eines Konfigurationsfehlers sein. Erstelle neu wenn die API verfügbar ist. Fehlercodes: {errors}; Aktuelle API URL ist: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Ignorieren"
   },
   "layout.banner.build-fail.title": {
     "message": "Fehler beim generieren des Status von der API beim erstellen."
   },
   "layout.banner.preview.description": {
-    "message": "Falls du die offizielle Modrinth-Website aufrufen wolltest, besuch <link>https://modrinth.com</link>. Diese Vorschauversion wird von Modrinth-Mitarbeitern zu Testzwecken genutzt. Sie wurde unter Verwendung von <branch-link>{owner}/{branch}</branch-link> @ {commit} erstellt."
+    "message": "Falls du die offizielle Modrinth-Website aufrufen wolltest, besuche {url}. Diese Vorschauversion wird von Modrinth-Mitarbeitern zu Testzwecken genutzt. Sie wurde unter Verwendung von <branch-link>{owner}/{branch}</branch-link> @ {commit} erstellt."
   },
   "layout.banner.preview.title": {
     "message": "Dies ist eine Vorschauversion der Modrinth-Webseite."
@@ -2590,6 +2644,30 @@
   },
   "project.license.title": {
     "message": "Lizenz"
+  },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Dein Projekt ist privat, was bedeutet, dass nur du und von dir eingeladene Personen darauf zugreifen können."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Projekt genehmigt"
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Änderungen angefragt"
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Dein Projekt ist in der Warteschlange, um von Modrinths Moderationsteam überprüft zu werden."
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Projekt wird überprüft"
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "Von Mitarbeitern entlistet"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Nicht autorisiert"
+  },
+  "project.moderation.thread.title": {
+    "message": "Moderationsnachrichten"
   },
   "project.moderation.title": {
     "message": "Moderation"

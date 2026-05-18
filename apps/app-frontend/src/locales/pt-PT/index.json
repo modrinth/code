@@ -1,4 +1,61 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "A descarregar a versão do java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Downloads"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Esconder mais instâncias a correr"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Transformar na instância principal"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Nenhuma instância a correr"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Instância principal"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Mostrar mais instâncias a correr"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Para instância"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Ver instâncias ativas"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Ver instância"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Ver logs"
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Renderização avançada"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Seleciona a tua cor preferida para a Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Cor de tema"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Mudar a página em que o launcher abre."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Casa"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Livraria"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Página de carregamento principal"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Os servidores de autenticação do Minecraft poderão estar em baixo de momento. Verifica a tua ligação à internet e tenta novamente mais tarde."
   },
