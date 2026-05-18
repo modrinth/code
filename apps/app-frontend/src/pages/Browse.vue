@@ -11,7 +11,6 @@ import {
 import type { BrowseInstallContentType, CardAction, ProjectType, Tags } from '@modrinth/ui'
 import {
 	BrowsePageLayout,
-	BrowseSidebar,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
@@ -1119,8 +1118,5 @@ provideBrowseManager({
 			@browse-modpacks="() => {}"
 			@create="handleServerModpackFlowCreate"
 		/>
-		<Teleport to="#sidebar-teleport-target">
-			<BrowseSidebar />
-		</Teleport>
 	</div>
 </template>
