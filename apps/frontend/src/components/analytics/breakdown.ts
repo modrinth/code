@@ -21,7 +21,7 @@ export function getAnalyticsBreakdownValue(
 			return ALL_BREAKDOWN_VALUE
 		}
 		case 'download_source':
-			return normalizeBreakdownValue('domain' in point ? point.domain : undefined)
+			return normalizeBreakdownValue('user_agent' in point ? point.user_agent : undefined)
 		case 'download_reason':
 			return normalizeBreakdownValue(
 				'reason' in point ? point.reason : undefined,

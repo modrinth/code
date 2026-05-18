@@ -695,8 +695,8 @@ function getAnalyticsDataFilterOptionSummary(
 				}
 			}
 
-			if (dataPoint.metric_kind === 'downloads' && dataPoint.domain) {
-				const downloadSource = dataPoint.domain.trim()
+			if (dataPoint.metric_kind === 'downloads' && dataPoint.user_agent) {
+				const downloadSource = dataPoint.user_agent.trim()
 				if (downloadSource.length > 0) {
 					downloadSources.add(downloadSource)
 				}
@@ -932,7 +932,7 @@ function getDownloadSourceFilterValue(
 		return undefined
 	}
 
-	return dataPoint.domain ?? null
+	return dataPoint.user_agent ?? null
 }
 
 function getDownloadReasonFilterValue(
@@ -1824,7 +1824,7 @@ export function createAnalyticsDashboardContext(
 					bucket_by: ['country'],
 				},
 				project_downloads: {
-					bucket_by: ['country', 'domain', 'reason', 'game_version', 'loader'],
+					bucket_by: ['country', 'user_agent', 'reason', 'game_version', 'loader'],
 				},
 				project_playtime: {
 					bucket_by: ['country', 'game_version', 'loader'],
