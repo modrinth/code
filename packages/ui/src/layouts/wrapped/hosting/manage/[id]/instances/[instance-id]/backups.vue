@@ -386,7 +386,7 @@ const error = computed(() => {
 })
 const refetch = () => query.refetch()
 
-/** Until world exists we cannot fetch; `isLoading` is false while the query is disabled, which would flash empty state. */
+/** Until the instance exists we cannot fetch; `isLoading` is false while the query is disabled, which would flash empty state. */
 const backupsReadyPending = computed(
 	() => !worldId.value || (query.data.value === undefined && !query.error.value),
 )

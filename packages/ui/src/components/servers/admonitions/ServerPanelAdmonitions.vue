@@ -59,7 +59,7 @@ const isOnFilesTab = computed(() => route.path.includes('/files'))
 const isOnContentTab = computed(
 	() =>
 		route.path.includes('/content') ||
-		(!!route.params.world_id && !isOnFilesTab.value && !route.path.includes('/backups')),
+		(!!route.params.instance_id && !isOnFilesTab.value && !route.path.includes('/backups')),
 )
 
 const bannerCoversInstalling = computed(

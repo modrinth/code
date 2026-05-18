@@ -1839,7 +1839,7 @@
     "message": "Cancel reset"
   },
   "discover.install.error.no-server-world": {
-    "message": "No server world is available for install."
+    "message": "No server instance is available for install."
   },
   "discover.install.error.unsupported-content-type": {
     "message": "This content type cannot be installed to a server from Discover."
@@ -3791,8 +3791,8 @@
   "servers.manage.content.title": {
     "message": "Content - {serverName} - Modrinth"
   },
-  "servers.manage.worlds.meta.title": {
-    "message": "Worlds - {server} - Modrinth"
+  "servers.manage.instances.meta.title": {
+    "message": "Instances - {server} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "Actions"

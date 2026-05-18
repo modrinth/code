@@ -93,8 +93,8 @@
 		</ErrorInformationCard>
 	</div>
 	<div
-		v-else-if="serverData && isWorldDetailRoute"
-		data-pyro-world-manager-root
+		v-else-if="serverData && isInstanceDetailRoute"
+		data-pyro-instance-manager-root
 		class="experimental-styles-within relative mx-auto box-border flex w-full min-w-0 flex-col px-6 transition-all duration-300"
 		:class="[
 			'server-panel-' + revealState,
@@ -316,7 +316,7 @@
 		</template>
 	</div>
 	<div
-		v-if="showAdvancedDebugInfo && !isWorldDetailRoute"
+		v-if="showAdvancedDebugInfo && !isInstanceDetailRoute"
 		class="experimental-styles-within relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
 	>
 		<h2 class="m-0 text-lg font-extrabold text-contrast">
@@ -632,9 +632,9 @@ const messages = defineMessages({
 		id: 'servers.manage.nav.overview',
 		defaultMessage: 'Overview',
 	},
-	worldsNav: {
-		id: 'servers.manage.nav.worlds',
-		defaultMessage: 'Worlds',
+	instancesNav: {
+		id: 'servers.manage.nav.instances',
+		defaultMessage: 'Instances',
 	},
 	errorDismissingNotice: {
 		id: 'servers.manage.notice.dismiss-error',
@@ -769,14 +769,14 @@ const { data: serverFull } = useQuery({
 })
 
 const worldId = computed(() => {
-	const routeWorldId = getRouteParam(route.params.world_id)
-	if (routeWorldId) return routeWorldId
+	const routeInstanceId = getRouteParam(route.params.instance_id)
+	if (routeInstanceId) return routeInstanceId
 	if (!serverFull.value) return null
 	const activeWorld = serverFull.value.worlds.find((w) => w.is_active)
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
 
-const isWorldDetailRoute = computed(() => !!getRouteParam(route.params.world_id))
+const isInstanceDetailRoute = computed(() => !!getRouteParam(route.params.instance_id))
 const activeWorldName = computed(() => {
 	if (!serverFull.value) return null
 	const activeWorld = serverFull.value.worlds.find((world) => world.is_active)
@@ -789,7 +789,7 @@ function getRouteParam(param: string | string[] | undefined): string | null {
 }
 
 function getWorldPath(targetWorldId: string) {
-	return `/hosting/manage/${encodeURIComponent(props.serverId)}/worlds/${encodeURIComponent(targetWorldId)}`
+	return `/hosting/manage/${encodeURIComponent(props.serverId)}/instances/${encodeURIComponent(targetWorldId)}`
 }
 
 const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQueue(
@@ -1051,8 +1051,8 @@ const navLinks = computed<Tab[]>(() => [
 		subpages: [],
 	},
 	{
-		label: formatMessage(messages.worldsNav),
-		href: `/hosting/manage/${encodeURIComponent(props.serverId)}/worlds`,
+		label: formatMessage(messages.instancesNav),
+		href: `/hosting/manage/${encodeURIComponent(props.serverId)}/instances`,
 		icon: WorldIcon,
 		subpages: [],
 	},
@@ -1476,7 +1476,7 @@ const copyServerDebugInfo = () => {
 const openInstallLog = () => {
 	const filesPath = worldId.value
 		? `${getWorldPath(worldId.value)}/files`
-		: `/hosting/manage/${encodeURIComponent(props.serverId)}/worlds`
+		: `/hosting/manage/${encodeURIComponent(props.serverId)}/instances`
 	const url = `${filesPath}?editing=${encodeURIComponent(errorLogFile.value)}`
 	window.history.pushState({}, '', url)
 	window.dispatchEvent(new PopStateEvent('popstate'))
