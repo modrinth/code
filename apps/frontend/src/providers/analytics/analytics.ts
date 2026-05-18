@@ -1863,16 +1863,14 @@ export function createAnalyticsDashboardContext(
 				sortedSelectedProjectIds.value,
 			]),
 			queryFn: async () => {
-				const projectVersions = await Promise.all(
-					sortedSelectedProjectIds.value.map((projectId) =>
-						client.labrinth.versions_v3.getProjectVersions(projectId, {
-							include_changelog: false,
-							apiVersion: 3,
-						}),
-					),
+				const projects = await fetchSegmentedWith(sortedSelectedProjectIds.value, (ids) =>
+					client.labrinth.projects_v3.getMultiple(ids),
 				)
+				const versionIds = sortStringValues([
+					...new Set(projects.flatMap((project) => project.versions)),
+				])
 
-				return projectVersions.flat()
+				return fetchSegmentedWith(versionIds, (ids) => client.labrinth.versions_v3.getVersions(ids))
 			},
 			enabled: computed(() => sortedSelectedProjectIds.value.length > 0),
 			placeholderData: [],

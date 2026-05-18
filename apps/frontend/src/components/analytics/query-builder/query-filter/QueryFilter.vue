@@ -25,7 +25,13 @@
 				v-tooltip="getProjectVersionOptionProjectMetadata(option.value)?.name"
 				class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
 			>
-				<component :is="getProjectVersionOptionProjectMetadata(option.value)?.icon" />
+				<img
+					v-if="getProjectVersionOptionProjectMetadata(option.value)?.iconUrl"
+					:src="getProjectVersionOptionProjectMetadata(option.value)?.iconUrl"
+					:alt="`${getProjectVersionOptionProjectMetadata(option.value)?.name} Icon`"
+					class="h-6 w-6 rounded object-cover"
+				/>
+				<BoxIcon v-else class="h-full w-full" />
 			</span>
 		</template>
 
@@ -165,7 +171,6 @@ import {
 	type DropdownFilterBarCategory,
 	type DropdownFilterBarOption,
 } from '@modrinth/ui'
-import { type Component, defineAsyncComponent, h, markRaw } from 'vue'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import { useGeneratedState } from '~/composables/generated'
@@ -192,7 +197,7 @@ type ApplyDownloadsThreshold = (setSelectedValues: SetDropdownFilterValues) => v
 type CloseDownloadsThresholdMenu = (event?: Event) => void
 type ProjectVersionProjectOptionMetadata = {
 	name: string
-	icon: Component
+	iconUrl?: string
 }
 
 const {
@@ -243,30 +248,6 @@ const effectiveSelectedProjectCount = computed(
 		).length,
 )
 const showProjectVersionProjectIcons = computed(() => effectiveSelectedProjectCount.value > 1)
-const projectVersionProjectOptionVersionIds = computed(() =>
-	Array.from(new Set([...filterOptions.value.versionIds, ...selectedFilters.value.version_id])),
-)
-const projectVersionProjectMetadataByVersionId = computed(() => {
-	const metadata = new Map<string, ProjectVersionProjectOptionMetadata>()
-
-	if (!showProjectVersionProjectIcons.value) {
-		return metadata
-	}
-
-	for (const versionId of projectVersionProjectOptionVersionIds.value) {
-		const projectName = getVersionProjectName(versionId)
-		if (!projectName) {
-			continue
-		}
-
-		metadata.set(versionId, {
-			name: projectName,
-			icon: getProjectIcon(projectName, getVersionProjectIconUrl(versionId)),
-		})
-	}
-
-	return metadata
-})
 const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
 	cloneSelectedFilters(selectedFilters.value),
 )
@@ -592,6 +573,8 @@ function getDownloadReasonFilterOptionLabel(reason: string): string {
 			return 'Dependency'
 		case 'modpack':
 			return 'Modpack'
+		case 'update':
+			return 'Update'
 		default:
 			return reason
 	}
@@ -600,30 +583,17 @@ function getDownloadReasonFilterOptionLabel(reason: string): string {
 function getProjectVersionOptionProjectMetadata(
 	versionId: string,
 ): ProjectVersionProjectOptionMetadata | undefined {
-	return projectVersionProjectMetadataByVersionId.value.get(versionId)
-}
-
-function getProjectIcon(projectName: string, iconUrl: string | undefined) {
-	if (!iconUrl) {
-		return markRaw({
-			inheritAttrs: false,
-			setup: () => () =>
-				h('div', { class: 'h-6 w-6 text-primary' }, [h(BoxIcon, { class: 'h-full w-full' })]),
-		})
+	if (!showProjectVersionProjectIcons.value) {
+		return undefined
 	}
 
-	return markRaw(
-		defineAsyncComponent(() =>
-			Promise.resolve({
-				setup: () => () =>
-					h('img', {
-						src: iconUrl,
-						alt: `${projectName} Icon`,
-						class: 'h-6 w-6 rounded object-cover',
-					}),
-			}),
-		),
-	)
+	const projectName = getVersionProjectName(versionId)
+	return projectName
+		? {
+				name: projectName,
+				iconUrl: getVersionProjectIconUrl(versionId),
+			}
+		: undefined
 }
 
 function getDateTimestamp(date: string | undefined): number | undefined {

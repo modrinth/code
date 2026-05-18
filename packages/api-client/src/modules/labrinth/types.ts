@@ -315,7 +315,7 @@ export namespace Labrinth {
 
 			export type ProjectRevenueField = 'project_id'
 
-			export type DownloadReason = 'standalone' | 'dependency' | 'modpack'
+			export type DownloadReason = 'standalone' | 'dependency' | 'modpack' | 'update'
 
 			export type AffiliateCodeClicksField = 'affiliate_code_id'
 

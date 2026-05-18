@@ -65,10 +65,20 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 	}
 
 	function syncScrollState() {
-		if (!scrollContainer.value) return
-		scrollTop.value = getScrollTop(scrollContainer.value)
-		viewportHeight.value = getViewportHeight(scrollContainer.value)
+		const listEl = listContainer.value
+		if (!listEl) return
+
+		const container = findScrollableAncestor(listEl)
+		scrollContainer.value = container
+		scrollTop.value = getScrollTop(container)
+		viewportHeight.value = getViewportHeight(container)
 		updateContainerOffset()
+	}
+
+	function resetScrollState() {
+		scrollTop.value = 0
+		viewportHeight.value = 0
+		containerOffset.value = 0
 	}
 
 	const visibleRange = computed(() => {
@@ -165,5 +175,7 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 		visibleRange,
 		visibleTop,
 		visibleItems,
+		resetScrollState,
+		syncScrollState,
 	}
 }

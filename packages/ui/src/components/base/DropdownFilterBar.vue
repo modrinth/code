@@ -456,16 +456,8 @@ const filteredActiveCategoryOptions = computed(() => {
 	})
 })
 
-const renderedActiveCategoryOptions = computed<RenderedDropdownFilterBarOption[]>(() => {
-	const selectedValues = activeCategorySelectedValueSet.value
-	return filteredActiveCategoryOptions.value.map((option) => ({
-		...option,
-		selected: selectedValues.has(option.value),
-	}))
-})
-
 const shouldVirtualizeActiveCategoryOptions = computed(
-	() => renderedActiveCategoryOptions.value.length > DROPDOWN_FILTER_VIRTUALIZATION_THRESHOLD,
+	() => filteredActiveCategoryOptions.value.length > DROPDOWN_FILTER_VIRTUALIZATION_THRESHOLD,
 )
 
 const {
@@ -473,7 +465,9 @@ const {
 	totalHeight: activeCategoryOptionsTotalHeight,
 	visibleRange: activeCategoryOptionsVisibleRange,
 	visibleItems: visibleActiveCategoryOptions,
-} = useVirtualScroll(renderedActiveCategoryOptions, {
+	resetScrollState: resetActiveCategoryOptionsVirtualScrollState,
+	syncScrollState: syncActiveCategoryOptionsVirtualScrollState,
+} = useVirtualScroll(filteredActiveCategoryOptions, {
 	itemHeight: DROPDOWN_FILTER_OPTION_ROW_HEIGHT,
 	bufferSize: 8,
 	initialItemCount: 12,
@@ -482,7 +476,10 @@ const {
 
 const renderedVisibleActiveCategoryOptions = computed<VisibleDropdownFilterBarOption[]>(() =>
 	visibleActiveCategoryOptions.value.map((option, offset) => ({
-		option,
+		option: {
+			...option,
+			selected: activeCategorySelectedValueSet.value.has(option.value),
+		},
 		index: activeCategoryOptionsVisibleRange.value.start + offset,
 	})),
 )
@@ -753,8 +750,9 @@ function getActiveCategoryOptionWrapperStyle(index: number): CSSProperties | und
 
 async function initializeActiveCategoryOptionsOverlayScrollbars() {
 	await nextTick()
+	syncActiveCategoryOptionsVirtualScrollState()
 
-	if (!isAddMenuOpen.value || renderedActiveCategoryOptions.value.length === 0) {
+	if (!isAddMenuOpen.value || filteredActiveCategoryOptions.value.length === 0) {
 		destroyActiveCategoryOptionsOverlayScrollbars()
 		return
 	}
@@ -787,6 +785,13 @@ async function initializeActiveCategoryOptionsOverlayScrollbars() {
 function destroyActiveCategoryOptionsOverlayScrollbars() {
 	activeCategoryOptionsOverlayScrollbars.value?.destroy()
 	activeCategoryOptionsOverlayScrollbars.value = null
+}
+
+function resetActiveCategoryOptionsScrollState() {
+	if (activeCategoryOptionsContainer.value) {
+		activeCategoryOptionsContainer.value.scrollTop = 0
+	}
+	resetActiveCategoryOptionsVirtualScrollState()
 }
 
 function getCategorySelectionCount(
@@ -1252,20 +1257,20 @@ watch(isAddMenuOpen, (isOpen) => {
 		activeCategoryKey.value = null
 		hasSubmenuPosition.value = false
 		resetPendingCategory()
+		resetActiveCategoryOptionsScrollState()
 		stopAddMenuPositionTracking()
 		destroyActiveCategoryOptionsOverlayScrollbars()
 	}
 })
 
 watch(categorySearchQuery, () => {
-	if (activeCategoryOptionsContainer.value) {
-		activeCategoryOptionsContainer.value.scrollTop = 0
-	}
+	resetActiveCategoryOptionsScrollState()
 	initializeActiveCategoryOptionsOverlayScrollbars()
 	scheduleSubmenuPositionUpdate()
 })
 
 watch(activeCategoryKey, (categoryKey) => {
+	resetActiveCategoryOptionsScrollState()
 	if (categoryKey) {
 		initializeActiveCategoryOptionsOverlayScrollbars()
 	} else {
@@ -1273,12 +1278,12 @@ watch(activeCategoryKey, (categoryKey) => {
 	}
 })
 
-watch(renderedActiveCategoryOptions, () => {
+watch(filteredActiveCategoryOptions, () => {
 	if (!isAddMenuOpen.value) {
 		return
 	}
 
-	if (renderedActiveCategoryOptions.value.length > 0) {
+	if (filteredActiveCategoryOptions.value.length > 0) {
 		initializeActiveCategoryOptionsOverlayScrollbars()
 	} else {
 		destroyActiveCategoryOptionsOverlayScrollbars()
