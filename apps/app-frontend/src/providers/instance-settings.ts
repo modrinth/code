@@ -8,6 +8,7 @@ export interface InstanceSettingsContext {
 	offline?: boolean
 	isMinecraftServer: Ref<boolean>
 	onUnlinked: () => void
+	closeModal?: () => void
 }
 
 export const [injectInstanceSettings, provideInstanceSettings] =
