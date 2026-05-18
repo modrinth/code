@@ -403,6 +403,14 @@ interface Tab {
 	href: string
 	icon?: object
 	subpages?: string[]
+	prompt?: {
+		title: string
+		description: string
+		dismissLabel?: string
+		shown?: boolean
+		placement?: string
+		onDismiss?: () => void
+	}
 }
 
 const props = withDefaults(
@@ -473,6 +481,21 @@ const settingsHintMessages = defineMessages({
 	},
 	dismiss: {
 		id: 'servers.manage.settings-hint.dismiss',
+		defaultMessage: "Don't show again",
+	},
+})
+
+const instancesHintMessages = defineMessages({
+	title: {
+		id: 'servers.manage.instances-hint.title',
+		defaultMessage: 'New: Server Instances!',
+	},
+	description: {
+		id: 'servers.manage.instances-hint.description',
+		defaultMessage: 'Your server state has been converted into an instance.',
+	},
+	dismiss: {
+		id: 'servers.manage.instances-hint.dismiss',
 		defaultMessage: "Don't show again",
 	},
 })
@@ -720,6 +743,14 @@ const showSettingsHint = ref(!settingsHintDismissed.value)
 function dismissSettingsHint() {
 	showSettingsHint.value = false
 	settingsHintDismissed.value = true
+}
+
+const INSTANCES_HINT_KEY = 'server-panel-instances-hint-dismissed'
+const instancesHintDismissed = useStorage(INSTANCES_HINT_KEY, false)
+const showInstancesHint = ref(!instancesHintDismissed.value)
+function dismissInstancesHint() {
+	showInstancesHint.value = false
+	instancesHintDismissed.value = true
 }
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
@@ -1032,6 +1063,14 @@ const navLinks = computed<Tab[]>(() => [
 		href: `/hosting/manage/${encodeURIComponent(props.serverId)}/instances`,
 		icon: GlobeIcon,
 		subpages: [],
+		prompt: {
+			title: formatMessage(instancesHintMessages.title),
+			description: formatMessage(instancesHintMessages.description),
+			dismissLabel: formatMessage(instancesHintMessages.dismiss),
+			shown: showInstancesHint.value,
+			placement: 'bottom',
+			onDismiss: dismissInstancesHint,
+		},
 	},
 	...props.additionalTabs,
 ])
