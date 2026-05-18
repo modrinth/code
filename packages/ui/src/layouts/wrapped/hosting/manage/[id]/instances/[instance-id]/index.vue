@@ -1,42 +1,27 @@
 <template>
-	<div class="flex min-h-[36rem] flex-col gap-6 text-primary">
-		<div class="flex flex-col gap-2">
-			<RouterLink
-				:to="instancesPath"
-				class="flex w-fit items-center gap-1 text-base font-medium text-blue hover:underline"
-			>
-				<ChevronLeftIcon class="size-4" aria-hidden="true" />
-				{{ formatMessage(messages.allInstances) }}
-			</RouterLink>
-
-			<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-				<div class="flex min-w-0 flex-col gap-1">
-					<h1 class="m-0 truncate text-2xl font-semibold leading-8 text-contrast">
-						{{ worldName }}
-					</h1>
-					<div class="flex flex-wrap items-center gap-2 text-base font-medium text-secondary">
-						<template v-for="(item, index) in worldMetadata" :key="item">
-							<span>{{ item }}</span>
-							<BulletDivider v-if="index < worldMetadata.length - 1" />
-						</template>
-					</div>
-				</div>
-
-				<div class="flex shrink-0 items-center gap-2">
-					<PanelServerActionButton size="large" start-label="Start instance" />
-					<ButtonStyled size="large" circular>
-						<button
-							v-tooltip="formatMessage(messages.instanceSettings)"
-							@click="openServerSettings({ tabId: 'installation' })"
-						>
-							<SettingsIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-		</div>
-
-		<div class="h-px w-full bg-surface-5" />
+	<div class="flex min-h-[36rem] flex-col gap-4 text-primary">
+		<WorldManageHeader
+			:name="worldName"
+			:game-version="gameVersion"
+			:loader="loader"
+			:loader-version="loaderVersion"
+			:last-active="lastActiveLabel"
+			:back-href="instancesPath"
+			:back-label="formatMessage(messages.allInstances)"
+			:fallback-name="formatMessage(messages.worldFallbackName)"
+		>
+			<template #actions>
+				<PanelServerActionButton size="large" start-label="Start instance" />
+				<ButtonStyled size="large" circular>
+					<button
+						v-tooltip="formatMessage(messages.instanceSettings)"
+						@click="openServerSettings({ tabId: 'installation' })"
+					>
+						<SettingsIcon aria-hidden="true" />
+					</button>
+				</ButtonStyled>
+			</template>
+		</WorldManageHeader>
 
 		<NavTabs :links="worldTabLinks" replace />
 
@@ -46,21 +31,14 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import {
-	BoxesIcon,
-	ChevronLeftIcon,
-	DatabaseBackupIcon,
-	FolderOpenIcon,
-	SettingsIcon,
-} from '@modrinth/assets'
+import { BoxesIcon, DatabaseBackupIcon, FolderOpenIcon, SettingsIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
-import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
-import { PanelServerActionButton } from '#ui/components/servers/server-header'
+import { PanelServerActionButton, WorldManageHeader } from '#ui/components/servers/server-header'
 import { useRelativeTime } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
@@ -68,7 +46,6 @@ import {
 	injectModrinthServerContext,
 	injectServerSettingsModal,
 } from '#ui/providers'
-import { formatLoaderLabel } from '#ui/utils/loaders'
 
 interface Tab {
 	label: string
@@ -138,24 +115,18 @@ const worldName = computed(
 	() => currentWorld.value?.name ?? server.value?.name ?? formatMessage(messages.worldFallbackName),
 )
 
-const worldMetadata = computed(() =>
-	[gameVersionLabel.value, loaderLabel.value, lastActiveLabel.value].filter(
-		(item): item is string => !!item,
-	),
+const gameVersion = computed(() => {
+	const version = currentWorld.value?.content?.game_version ?? server.value?.mc_version
+	return version ?? null
+})
+
+const loader = computed(
+	() => currentWorld.value?.content?.modloader ?? server.value?.loader ?? null,
 )
 
-const gameVersionLabel = computed(() => {
-	const version = currentWorld.value?.content?.game_version ?? server.value?.mc_version
-	return version ? `MC ${version}` : null
-})
-
-const loaderLabel = computed(() => {
-	const loader = currentWorld.value?.content?.modloader ?? server.value?.loader?.toLowerCase()
-	if (!loader) return null
-	const loaderVersion =
-		currentWorld.value?.content?.modloader_version ?? server.value?.loader_version ?? null
-	return [formatLoaderLabel(loader), loaderVersion].filter(Boolean).join(' ')
-})
+const loaderVersion = computed(
+	() => currentWorld.value?.content?.modloader_version ?? server.value?.loader_version ?? null,
+)
 
 const lastActiveLabel = computed(() => {
 	const latestBackup = currentWorld.value ? latestDate(currentWorld.value.backups) : null
