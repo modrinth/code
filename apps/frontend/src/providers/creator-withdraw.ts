@@ -11,7 +11,7 @@ import type { MessageDescriptor } from '@modrinth/ui'
 import { createContext, getCurrencyIcon, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
-import { getRailConfig } from '@/utils/muralpay-rails'
+import { type FieldConfig, getRailConfig } from '@/utils/muralpay-rails'
 
 export function getTaxThreshold(thresholds: Record<string, number> | undefined): number {
 	if (!thresholds || Object.keys(thresholds).length === 0) return 600
@@ -263,6 +263,17 @@ function getRecipientDisplay(data: WithdrawData): string {
 	return ''
 }
 
+function isRailFieldVisible(field: FieldConfig, accountDetails: AccountDetails): boolean {
+	if (!field.dependsOn) return true
+
+	const { field: dependsOnField, value: dependsOnValue } = field.dependsOn
+	const currentValue = accountDetails[dependsOnField]
+
+	if (!currentValue) return false
+	if (Array.isArray(dependsOnValue)) return dependsOnValue.includes(currentValue)
+	return currentValue === dependsOnValue
+}
+
 interface PayoutPayload {
 	amount: number
 	method: 'tremendous' | 'muralpay' | 'paypal' | 'venmo'
@@ -329,6 +340,8 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 			}
 
 			for (const field of rail.fields) {
+				if (!isRailFieldVisible(field, data.providerData.accountDetails)) continue
+
 				const value = data.providerData.accountDetails[field.name]
 				if (value !== undefined && value !== null && value !== '') {
 					fiatAndRailDetails[field.name] = value
@@ -752,7 +765,9 @@ export function createWithdrawContext(
 					return false
 				}
 
-				const requiredFields = rail.fields.filter((f) => f.required)
+				const requiredFields = rail.fields.filter(
+					(f) => f.required && isRailFieldVisible(f, accountDetails),
+				)
 				const allRequiredPresent = requiredFields.every((f) => {
 					const value = accountDetails[f.name]
 					return value !== undefined && value !== null && value !== ''
