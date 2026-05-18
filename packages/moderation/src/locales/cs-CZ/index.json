@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "Přidat ikonu"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Zadejte IP adresu a port, přes které se mohou hráči s Java Edition připojit k vašemu serveru."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Přidat adresu Java"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Přidejte jakékoli relevantní odkazy směřující mimo Modrinth, například na webové stránky, do obchodu nebo na pozvánku na Discord."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Přidat externí odkazy"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Přidejte relevantní odkazy směřující mimo Modrinth, například zdrojový kód, issue tracker nebo pozvánku na Discord."
   },
@@ -22,6 +34,9 @@
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Vyberte vhodné tagy"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Váš popis má {length, plural, one {# čitelný znak} few {# čitelné znaky} other {# čitelných znaků}}. Pro vytvoření jasného a informativního popisu doporučujeme alespoň {minChars, plural, one {# znak} few {# znaky} other {# znaků}}."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Rozšířit popisek"
@@ -55,6 +70,12 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Poskytnutí zdrojového kódu"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Některé z vašich externích odkazů se zdají být duplicitní. Každý odkaz by měl být zadán pouze jednou a s příslušným typem odkazu."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Stejné odkazy"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Popis by měl obsahovat dostatečné množství prostého textu nebo popisků u obrázku, aby byl přístupný i těm, kteří používají čtečky obrazovky nebo mají pomalé připojení k internetu."
@@ -113,8 +134,32 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Zpětná vazba k recenzi"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Vybrali jste {count, plural, one {# tag rozlišení} other {# tagů rozlišení}} ({tags}). Resource packy by měly mít zpravidla pouze jedno, které odpovídá jejich primárnímu rozlišení."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Vyberte správné rozlišení"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Vyberte, které verze váš server podporuje, vyberte si modpack nebo nahrajte svůj vlastní."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Vyberte kompatibilitu"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Povolit hráčům vidět, v jakém regionu se váš server nachází."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Vyberte oblast"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Uveďte jazyk nebo jazyky, které váš server podporuje."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Vyberte jazyk"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Vyberte licenci, pod kterou je distribuován váš {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {doplněk} datapack {datapack} other {projekt}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Vybrat licenci"
@@ -124,6 +169,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Vybrat štítky"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Navštívit nastavení serveru"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Navštívit nastavení popisu"
@@ -152,6 +200,9 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Vyjasněte si shrnutí"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Váš popis má {length, plural, one {# čitelný znak} few {# čitelné znaky} other {# čitelných znaků}}. Pro vytvoření jasného a informativního popisu doporučujeme alespoň {minChars, plural, one {# znak} few {# znaky} other {# znaků}}."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Rozšířte shrnutí"
   },
@@ -160,6 +211,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Vyčistěte název"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Vybrali jste si {tagCount, plural, one {# tag} other {# tagů}}. Prosíme, snižte na {maxTagCount} či níže abyste zajistili, že se váš server zobrazí v relevantních výsledcích vyhledávání."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Vyberte odpovídající tagy"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Vybral jsi {tagCount, plural, one {# štítek} other {# štítků}}. Zvaž zúžení na {maxTagCount} nebo méně, aby se tvůj projekt zobrazoval ve relevantních výsledcích vyhledávání."

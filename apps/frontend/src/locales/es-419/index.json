@@ -407,6 +407,96 @@
   "collection.title": {
     "message": "{name} - Colección"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Añadir nota privada"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Aprovar"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Aprovar con respuesta"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Cerrar hilo"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Cerrar con respuesta"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Rechazar"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Rechazar con respuesta"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Reabrir hilo"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Responder"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Responder hilo"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Resubir para revisión"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Resubir para revisión con respuesta"
+  },
+  "conversation-thread.action.send": {
+    "message": "Enviar"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Enviar a revisión"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Enviar a revisión con respuesta"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Cambiar a borrador"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Cambiar a borrador con respuesta"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Retener"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Retener con respuesta"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Este hilo está cerrado y no se pueden enviar nuevos mensajes."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Error cerrando el reporte"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Error al reabrir el reporte"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Error al enviar el mensaje"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Respuesta al hilo..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Envía un mensaje..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Confirmación que moderadores no monitorean esto activamente"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Comprendo que los moderadores no monitorean este hilo activamente."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Tu proyecto ya ha sido aprovado. Por ello, el equipo de moderación no monitorea activamente este hilo. Sin embargo, puede que vean tu mensaje de todos modos de haber algún problema con tu proyecto."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Responder al hilo"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Si necesitas ponerte en contacto con el equipo de moderación, por favor utiliza el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz clic en la burbuja azúl en la esquina inferior derecha para contactar soporte."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Los archivos complementarios sirven para recursos de apoyo, como código fuente, no para versiones o variantes alternativas."
   },
@@ -875,24 +965,6 @@
   "dashboard.head-title": {
     "message": "Panel de control"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Marcar todas cómo leídas"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Ver historial"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "No tienes ningúna notificación sin leer."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Error al cargar las notificaciones:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Historial"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Historial de notificaciones"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "Ver todas"
   },
@@ -902,9 +974,6 @@
   "dashboard.notifications.link.view-more": {
     "message": "Ver {extraNotifs} {extraNotifs, plural,one {notificación} other {notificaciones}} más"
   },
-  "dashboard.notifications.loading": {
-    "message": "Cargando notificaciones..."
-  },
   "dashboard.organizations.button.create": {
     "message": "Crear organización"
   },
@@ -912,13 +981,31 @@
     "message": "¡Haz una organización!"
   },
   "dashboard.organizations.error.fetch": {
-    "message": "No se pudo obtener las organizaciones"
+    "message": "Fallo en obtener las organizaciones"
   },
   "dashboard.organizations.member-count": {
     "message": "{count} {count, plural,one {miembro} other {miembros}}"
   },
   "dashboard.organizations.title": {
     "message": "Organizaciones"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Marcar todo como leído"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Ver historial"
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Error cargando notificaciones:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Historial"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Historial de notificaciones"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Cargando notificaciones..."
   },
   "dashboard.projects.bulk-edit-hint": {
     "message": "Puedes editar varios proyectos a la vez seleccionándolos a continuación."
@@ -1228,6 +1315,33 @@
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Por favor, llena el formulario fiscal"
+  },
+  "discover.install.back-to-server": {
+    "message": "Volver al servidor"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Volver al setup"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Cancelar reinicio"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "No hay mundos de servidores disponibles para la instalación."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Este tipo de contenido no puede ser instalado a un servidor por búsqueda."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Seleccionando modpack para instalar antes del reinicio"
+  },
+  "discover.seo.description": {
+    "message": "Busca y navega miles de Minecraft {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} en Modrinth con resultados de busqueda instantáneos y precisos. Nuestros filtradores te ayudan a encontrar rápidamente lo mejor de Minecraft {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
+  },
+  "discover.seo.title": {
+    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Puede que hayas escrito mal la URL de la colección."
@@ -1727,14 +1841,17 @@
   "layout.banner.add-email.description": {
     "message": "Por motivos de seguridad, Modrinth necesita que registres una dirección de correo electrónico en tu cuenta."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Ignorar siempre"
+  },
   "layout.banner.build-fail.description": {
     "message": "Esta implementación del frontend de Modrinth no pudo generar el estado desde la API. Esto puede deberse a una interrupción del servicio o a un error de configuración. Vuelve a construir cuando la API esté disponible. Códigos de error: {errors}; La URL actual de la API es: {url}"
   },
+  "layout.banner.build-fail.ignore": {
+    "message": "Ignorar"
+  },
   "layout.banner.build-fail.title": {
     "message": "Error al generar el estado desde la API durante la compilación."
-  },
-  "layout.banner.preview.description": {
-    "message": "Si desea acceder al sitio web oficial de Modrinth, visite <link>https://modrinth.com</link>. El equipo de Modrinth utiliza esta versión preliminar para realizar pruebas. Se creó con <branch-link>{owner}/{branch}</branch-link> @ {commit}.."
   },
   "layout.banner.preview.title": {
     "message": "Esta es una vista previa de la implementación del sitio web de Modrinth."
@@ -2564,6 +2681,9 @@
   "project.license.title": {
     "message": "Licencia"
   },
+  "project.moderation.thread.title": {
+    "message": "Mensajes de moredación"
+  },
   "project.moderation.title": {
     "message": "Moderación"
   },
@@ -3061,6 +3181,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
+  },
+  "servers.manage.content.title": {
+    "message": "Contenido - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "Acciones"

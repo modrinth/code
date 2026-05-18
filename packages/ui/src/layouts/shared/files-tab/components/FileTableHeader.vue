@@ -38,7 +38,7 @@
 				:class="sortField === 'size' ? 'text-contrast' : 'text-secondary'"
 				@click="$emit('sort', 'size')"
 			>
-				<span class="ml-2">{{ formatMessage(messages.size) }}</span>
+				<span>{{ formatMessage(messages.size) }}</span>
 				<ChevronUpIcon
 					v-if="sortField === 'size' && !sortDesc"
 					class="h-4 w-4"
@@ -55,7 +55,7 @@
 				:class="sortField === 'created' ? 'text-contrast' : 'text-secondary'"
 				@click="$emit('sort', 'created')"
 			>
-				<span class="ml-2">{{ formatMessage(messages.created) }}</span>
+				<span>{{ formatMessage(messages.created) }}</span>
 				<ChevronUpIcon
 					v-if="sortField === 'created' && !sortDesc"
 					class="h-4 w-4"
@@ -72,7 +72,7 @@
 				:class="sortField === 'modified' ? 'text-contrast' : 'text-secondary'"
 				@click="$emit('sort', 'modified')"
 			>
-				<span class="ml-2">{{ formatMessage(messages.modified) }}</span>
+				<span>{{ formatMessage(messages.modified) }}</span>
 				<ChevronUpIcon
 					v-if="sortField === 'modified' && !sortDesc"
 					class="h-4 w-4"
@@ -84,7 +84,7 @@
 					aria-hidden="true"
 				/>
 			</button>
-			<span class="min-w-[51px] shrink-0 text-right font-semibold text-secondary">{{
+			<span class="min-w-[51px] shrink-0 text-nowrap text-right font-semibold text-secondary">{{
 				formatMessage(commonMessages.actionsLabel)
 			}}</span>
 		</div>
