@@ -46,7 +46,6 @@ const meta = {
 				const uploadState = ref<UploadState>({
 					isUploading: false,
 					currentFileName: null,
-					currentFileProgress: 0,
 					uploadedBytes: 0,
 					totalBytes: 0,
 					completedFiles: 0,

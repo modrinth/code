@@ -702,31 +702,53 @@ function handleUploadFiles() {
 	input.onchange = async () => {
 		if (!input.files) return
 		const files = Array.from(input.files)
+		if (files.length === 0) return
 		const wid = worldId.value
 		if (!wid) return
 
+		const totalBytes = files.reduce((sum, f) => sum + f.size, 0)
 		uploadState.value = {
 			isUploading: true,
-			currentFileName: null,
-			currentFileProgress: 0,
+			currentFileName: files[0]?.name ?? null,
 			uploadedBytes: 0,
-			totalBytes: files.reduce((sum, f) => sum + f.size, 0),
+			totalBytes,
 			completedFiles: 0,
 			totalFiles: files.length,
 		}
 
+		const cumulativeFileBytes = files.reduce<number[]>((out, file) => {
+			out.push((out[out.length - 1] ?? 0) + file.size)
+			return out
+		}, [])
+
+		function updateUploadProgress(loaded: number, total: number) {
+			const uploadedBytes =
+				total > 0 ? Math.round((Math.min(loaded, total) / total) * totalBytes) : loaded
+			const clampedUploadedBytes = Math.min(uploadedBytes, totalBytes)
+			const completedFiles = cumulativeFileBytes.filter(
+				(bytes) => bytes <= clampedUploadedBytes,
+			).length
+			const currentFileIndex = Math.min(completedFiles, files.length - 1)
+
+			uploadState.value.uploadedBytes = clampedUploadedBytes
+			uploadState.value.completedFiles = completedFiles
+			uploadState.value.currentFileName = files[currentFileIndex]?.name ?? null
+			if (clampedUploadedBytes >= totalBytes) {
+				cancelUpload.value = null
+			}
+		}
+
 		const handle = client.kyros.content_v1.uploadAddonFile(wid, files, {
-			onProgress: (p) => {
-				uploadState.value.currentFileProgress = p.progress
-				uploadState.value.uploadedBytes = p.loaded
-				uploadState.value.totalBytes = p.total
-			},
+			onProgress: ({ loaded, total }) => updateUploadProgress(loaded, total),
 		})
 		cancelUpload.value = () => handle.cancel()
 
 		try {
 			await handle.promise
+			cancelUpload.value = null
+			uploadState.value.uploadedBytes = totalBytes
 			uploadState.value.completedFiles = files.length
+			uploadState.value.currentFileName = files[files.length - 1]?.name ?? null
 			await contentQuery.refetch()
 		} catch (err) {
 			if (err instanceof Error && err.message === 'Upload cancelled') return
@@ -740,7 +762,6 @@ function handleUploadFiles() {
 			uploadState.value = {
 				isUploading: false,
 				currentFileName: null,
-				currentFileProgress: 0,
 				uploadedBytes: 0,
 				totalBytes: 0,
 				completedFiles: 0,

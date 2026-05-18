@@ -96,13 +96,17 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 		return new Promise<T>((resolve, reject) => {
 			const xhr = new XMLHttpRequest()
 			const metadata = context.metadata as UploadMetadata
+			const fallbackTotal = this.getUploadPayloadSize(metadata)
+			const abortUpload = () => xhr.abort()
 
 			xhr.upload.addEventListener('progress', (e) => {
-				if (e.lengthComputable) {
+				const total = e.lengthComputable ? e.total : fallbackTotal
+				if (total > 0) {
+					const loaded = Math.min(e.loaded, total)
 					const progress: UploadProgress = {
-						loaded: e.loaded,
-						total: e.total,
-						progress: e.loaded / e.total,
+						loaded,
+						total,
+						progress: loaded / total,
 					}
 					progressCallbacks.forEach((cb) => cb(progress))
 				}
@@ -122,6 +126,12 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 
 			xhr.addEventListener('error', () => reject(new ModrinthApiError('Upload failed')))
 			xhr.addEventListener('abort', () => reject(new ModrinthApiError('Upload cancelled')))
+			abortController.signal.addEventListener('abort', abortUpload, { once: true })
+
+			if (abortController.signal.aborted) {
+				reject(new ModrinthApiError('Upload cancelled'))
+				return
+			}
 
 			// build URL with params (unlike $fetch, XHR doesn't handle params automatically)
 			let url = context.url
@@ -140,10 +150,21 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 			}
 
 			// Send either FormData or file depending on what was provided
-			const data = 'formData' in metadata ? metadata.formData : metadata.file
+			const data = metadata.formData instanceof FormData ? metadata.formData : metadata.file
 			xhr.send(data)
-			abortController.signal.addEventListener('abort', () => xhr.abort())
 		})
+	}
+
+	private getUploadPayloadSize(metadata: UploadMetadata): number {
+		if (metadata.formData instanceof FormData) {
+			let total = 0
+			metadata.formData.forEach((value) => {
+				total += value instanceof Blob ? value.size : new Blob([value]).size
+			})
+			return total
+		}
+
+		return metadata.file instanceof Blob ? metadata.file.size : 0
 	}
 
 	protected createUploadError(xhr: XMLHttpRequest): ModrinthApiError {
