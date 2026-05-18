@@ -286,8 +286,8 @@ const { serverId, worldId, powerState, busyReasons } = injectModrinthServerConte
 const queryClient = useQueryClient()
 const filesTabLink = computed(() =>
 	worldId.value
-		? `/hosting/manage/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId.value)}/files?path=/&editing=server.properties`
-		: `/hosting/manage/${encodeURIComponent(serverId)}/worlds`,
+		? `/hosting/manage/${encodeURIComponent(serverId)}/instances/${encodeURIComponent(worldId.value)}/files?path=/&editing=server.properties`
+		: `/hosting/manage/${encodeURIComponent(serverId)}/instances`,
 )
 const serverSettings = injectServerSettings(null)
 

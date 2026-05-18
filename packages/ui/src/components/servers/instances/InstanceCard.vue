@@ -76,7 +76,7 @@
 				<div class="mt-6 flex flex-col gap-1">
 					<h2 class="m-0 text-2xl font-semibold leading-8 text-contrast">{{ world.name }}</h2>
 					<p class="m-0 text-base leading-6 text-secondary">
-						{{ formatMessage(messages.newWorldInstance) }}
+						{{ formatMessage(messages.newInstance) }}
 					</p>
 				</div>
 			</div>
@@ -85,7 +85,7 @@
 				<ButtonStyled color="brand">
 					<button class="w-full !h-10" @click="emit('create', world.id)">
 						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.createWorld) }}
+						{{ formatMessage(messages.createInstance) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -172,12 +172,12 @@
 				<ButtonStyled>
 					<button class="!shadow-none" @click="emit('edit', world.id)">
 						<PencilIcon aria-hidden="true" />
-						{{ formatMessage(messages.editWorld) }}
+						{{ formatMessage(messages.editInstance) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled circular>
 					<button
-						v-tooltip="formatMessage(messages.worldSettings)"
+						v-tooltip="formatMessage(messages.instanceSettings)"
 						class="!shadow-none"
 						@click="emit('settings', world.id)"
 					>
@@ -203,44 +203,44 @@ import { truncatedTooltip } from '#ui/utils'
 import { commonMessages } from '#ui/utils/common-messages'
 
 const messages = defineMessages({
-	newWorldInstance: {
-		id: 'servers.manage.worlds.card.empty-description',
-		defaultMessage: 'New world instance',
+	newInstance: {
+		id: 'servers.manage.instances.card.empty-description',
+		defaultMessage: 'New instance',
 	},
-	createWorld: {
-		id: 'servers.manage.worlds.card.create',
-		defaultMessage: 'Create world',
+	createInstance: {
+		id: 'servers.manage.instances.card.create',
+		defaultMessage: 'Create instance',
 	},
 	active: {
-		id: 'servers.manage.worlds.card.active',
+		id: 'servers.manage.instances.card.active',
 		defaultMessage: 'Active',
 	},
 	none: {
-		id: 'servers.manage.worlds.card.none',
+		id: 'servers.manage.instances.card.none',
 		defaultMessage: 'None',
 	},
 	installedContent: {
-		id: 'servers.manage.worlds.card.installed-content',
+		id: 'servers.manage.instances.card.installed-content',
 		defaultMessage: 'Installed content',
 	},
 	lastActive: {
-		id: 'servers.manage.worlds.card.last-active',
+		id: 'servers.manage.instances.card.last-active',
 		defaultMessage: 'Last active',
 	},
 	created: {
-		id: 'servers.manage.worlds.card.created',
+		id: 'servers.manage.instances.card.created',
 		defaultMessage: 'Created',
 	},
-	editWorld: {
-		id: 'servers.manage.worlds.card.edit',
-		defaultMessage: 'Edit world',
+	editInstance: {
+		id: 'servers.manage.instances.card.edit',
+		defaultMessage: 'Edit instance',
 	},
-	worldSettings: {
-		id: 'servers.manage.worlds.card.settings',
-		defaultMessage: 'World settings',
+	instanceSettings: {
+		id: 'servers.manage.instances.card.settings',
+		defaultMessage: 'Instance settings',
 	},
 	notTrackedYet: {
-		id: 'servers.manage.worlds.card.not-tracked-yet',
+		id: 'servers.manage.instances.card.not-tracked-yet',
 		defaultMessage: 'Not tracked yet',
 	},
 })
