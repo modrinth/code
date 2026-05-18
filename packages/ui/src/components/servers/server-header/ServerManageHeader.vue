@@ -1,77 +1,39 @@
 <template>
 	<div class="w-full flex flex-col gap-4" :class="{ 'mt-4': isNuxt }">
-		<ContentPageHeader :class="props.headerClass">
-			<template #icon>
-				<ServerIcon
-					:image="headerImage"
-					:class="isNuxt ? 'size-15 !rounded-2xl' : 'size-15 !rounded-xl'"
-				/>
-			</template>
-			<template #title>
-				{{ props.server?.name || 'Server' }}
-			</template>
-			<template #stats>
-				<div
-					v-if="props.server?.flows?.intro"
-					class="flex items-center gap-2 font-semibold text-secondary"
-				>
-					<SettingsIcon />
-					Configuring server...
-				</div>
-				<div v-else class="flex min-w-0 flex-wrap items-center gap-2">
-					<template v-for="(item, index) in headerStats" :key="item.id">
-						<div v-if="index > 0" class="h-1.5 w-1.5 rounded-full bg-surface-5" />
-						<button
-							v-if="item.copyable"
-							v-tooltip="'Copy server address'"
-							class="m-0 flex min-w-0 cursor-pointer items-center gap-2 border-0 bg-transparent p-0 font-medium text-secondary hover:underline text-nowrap"
-							type="button"
-							@click="copyServerAddress"
-						>
-							<component :is="item.icon" class="flex size-5 shrink-0" />
-							<span class="truncate">{{ item.label }}</span>
-						</button>
-						<div
-							v-else
-							class="flex min-w-0 items-center gap-2 font-medium text-secondary text-nowrap"
-						>
-							<component :is="item.icon" class="flex size-5 shrink-0" />
-							<span class="truncate">{{ item.label }}</span>
-						</div>
-					</template>
-					<div v-if="showProject && headerStats.length > 0" class="h-1.5 w-1.5 rounded-full bg-surface-5" />
-					<div
-						v-if="showProject"
-						class="flex min-w-0 items-center gap-1.5 font-medium text-primary text-nowrap"
-					>
-						Linked to
-						<Avatar
-							:src="props.serverProject?.icon_url ?? undefined"
-							:alt="props.serverProject?.title ?? ''"
-							size="24px"
-						/>
-						<AutoLink :to="serverProjectLink" class="truncate text-primary hover:underline">
-							{{ props.serverProject?.title }}
-						</AutoLink>
-					</div>
-				</div>
-			</template>
-			<template #actions>
-				<slot name="actions" />
-			</template>
-		</ContentPageHeader>
+		<PageHeader
+			:header="props.server?.name || 'Server'"
+			:leading="leadingItems"
+			:metadata="metadataItems"
+			:actions="headerActions"
+			:header-class="props.headerClass"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { NuxtModrinthClient } from '@modrinth/api-client'
-import { GlobeIcon, LinkIcon, SettingsIcon, TimerIcon } from '@modrinth/assets'
+import {
+	GlobeIcon,
+	LinkIcon,
+	LoaderCircleIcon,
+	PlayIcon,
+	SettingsIcon,
+	SlashIcon,
+	StopCircleIcon,
+	TimerIcon,
+	UpdatedIcon,
+} from '@modrinth/assets'
 import { useStorage } from '@vueuse/core'
 import type { Component } from 'vue'
 import { computed } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
 
-import { AutoLink, Avatar, ContentPageHeader, ServerIcon } from '#ui/components'
+import Avatar from '#ui/components/base/Avatar.vue'
+import PageHeader from '#ui/components/base/PageHeader.vue'
+import type { JoinedButtonAction } from '#ui/components/base/JoinedButtons.vue'
+import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
+import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -79,7 +41,7 @@ import {
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
-import LoaderIcon from '../icons/LoaderIcon.vue'
+import { useServerPowerAction } from './use-server-power-action'
 
 type ServerProjectSummary = {
 	id: string
@@ -88,11 +50,51 @@ type ServerProjectSummary = {
 	icon_url?: string | null
 }
 
-type HeaderStat = {
+type HeaderWorld = {
+	id: string
+	name: string
+}
+
+type HeaderMetadataItem = {
 	id: string
 	label: string
 	icon: Component
-	copyable?: boolean
+	iconProps?: Record<string, unknown>
+	tooltip?: string
+	ariaLabel?: string
+	to?: string | RouteLocationRaw
+	onClick?: () => void | Promise<void>
+	class?: string
+}
+
+type HeaderAction = {
+	id: string
+	label: string
+	icon?: Component
+	iconProps?: Record<string, unknown>
+	iconClass?: string
+	tooltip?: string
+	ariaLabel?: string
+	to?: string | RouteLocationRaw
+	onClick?: () => void | Promise<void>
+	disabled?: boolean
+	labelHidden?: boolean
+	circular?: boolean
+	color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
+	size?: 'standard' | 'large' | 'small'
+	type?: 'standard' | 'outlined' | 'transparent' | 'highlight' | 'highlight-colored-text' | 'chip'
+	joinedActions?: JoinedButtonAction[]
+	primaryDisabled?: boolean
+	dropdownDisabled?: boolean
+	primaryMuted?: boolean
+	prompt?: {
+		title: string
+		description: string
+		dismissLabel?: string
+		shown?: boolean
+		placement?: string
+		onDismiss?: () => void
+	}
 }
 
 const props = withDefaults(
@@ -107,6 +109,14 @@ const props = withDefaults(
 		backHref?: string
 		breadcrumbClass?: string
 		headerClass?: string
+		worlds?: HeaderWorld[]
+		powerDisabled?: boolean
+		settingsLabel?: string
+		showSettingsHint?: boolean
+		settingsHintTitle?: string
+		settingsHintDescription?: string
+		settingsHintDismissLabel?: string
+		actions?: HeaderAction[]
 	}>(),
 	{
 		serverImage: null,
@@ -118,13 +128,39 @@ const props = withDefaults(
 		backHref: '/hosting/manage',
 		breadcrumbClass: 'breadcrumb goto-link flex w-fit items-center',
 		headerClass: '',
+		worlds: () => [],
+		powerDisabled: false,
+		settingsLabel: 'Server settings',
+		showSettingsHint: false,
+		settingsHintTitle: '',
+		settingsHintDescription: '',
+		settingsHintDismissLabel: "Don't show again",
+		actions: () => [],
 	},
 )
+
+const emit = defineEmits<{
+	openSettings: []
+	dismissSettingsHint: []
+}>()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { serverId } = injectModrinthServerContext()
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
+const {
+	isInstalling,
+	isStopping,
+	showRestartButton,
+	busyTooltip,
+	canTakeAction,
+	canKill,
+	primaryActionText,
+	initiateAction,
+	handlePrimaryAction,
+} = useServerPowerAction({
+	disabled: computed(() => props.powerDisabled),
+})
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 	hideSubdomainLabel: false,
@@ -136,6 +172,18 @@ const headerImage = computed(() => {
 	}
 	return props.serverImage ?? undefined
 })
+
+const leadingItems = computed(() => [
+	{
+		id: 'server-icon',
+		type: 'component' as const,
+		component: ServerIcon,
+		componentProps: {
+			image: headerImage.value,
+		},
+		class: isNuxt.value ? 'size-15 !rounded-2xl' : 'size-15 !rounded-xl',
+	},
+])
 
 const showUptime = computed(() => props.showUptime && (props.uptimeSeconds ?? 0) > 0)
 
@@ -167,44 +215,70 @@ const showAddress = computed(
 	() => !!serverAddress.value && (!props.server?.net?.domain || !userPreferences.value.hideSubdomainLabel),
 )
 
-const headerStats = computed<HeaderStat[]>(() => {
-	const stats: HeaderStat[] = []
+const metadataItems = computed<HeaderMetadataItem[]>(() => {
+	if (props.server?.flows?.intro) {
+		return [
+			{
+				id: 'configuring',
+				label: 'Configuring server...',
+				icon: SettingsIcon,
+			},
+		]
+	}
+
+	const items: HeaderMetadataItem[] = []
 	const worldName = props.activeWorldName
 	if (worldName) {
-		stats.push({
+		items.push({
 			id: 'world',
 			label: worldName,
 			icon: GlobeIcon,
 		})
 	}
 	if (props.server?.loader) {
-		stats.push({
+		items.push({
 			id: 'loader',
 			label: props.server.mc_version
 				? `${formatLoaderLabel(props.server.loader)} ${props.server.mc_version}`
 				: formatLoaderLabel(props.server.loader),
 			icon: LoaderIcon,
+			iconProps: {
+				loader: props.server.loader,
+			},
 		})
 	}
 	if (showAddress.value && serverAddress.value) {
-		stats.push({
+		items.push({
 			id: 'address',
 			label: serverAddress.value,
 			icon: LinkIcon,
-			copyable: true,
+			tooltip: 'Copy server address',
+			onClick: copyServerAddress,
 		})
 	}
 	if (showUptime.value) {
-		stats.push({
+		items.push({
 			id: 'uptime',
 			label: formattedUptime.value,
 			icon: TimerIcon,
 		})
 	}
-	return stats
+	if (props.serverProject) {
+		items.push({
+			id: 'project',
+			label: `Linked to ${props.serverProject.title}`,
+			icon: Avatar,
+			iconProps: {
+				src: props.serverProject.icon_url ?? undefined,
+				alt: props.serverProject.title,
+				size: '24px',
+			},
+			to: serverProjectLink.value,
+			class: 'text-primary',
+		})
+	}
+	return items
 })
-
-const showProject = computed(() => !!props.serverProject)
 
 const serverProjectLink = computed(() => {
 	if (props.serverProjectLink) {
@@ -215,6 +289,134 @@ const serverProjectLink = computed(() => {
 	}
 	return `/project/${props.serverProject.slug ?? props.serverProject.id}`
 })
+
+const startActionText = computed(() =>
+	primaryActionText.value === 'Start' ? 'Start server' : primaryActionText.value,
+)
+
+const startableWorlds = computed(() => {
+	if (props.worlds.length > 0) return props.worlds
+
+	return [
+		{
+			id: 'current-world',
+			name: props.activeWorldName ?? 'current instance',
+		},
+	]
+})
+
+const startSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'start',
+		label: startActionText.value,
+		icon: PlayIcon,
+		action: handlePrimaryAction,
+	},
+	...startableWorlds.value.map((world) => ({
+		id: `start-${world.id}`,
+		label: `Start with ${world.name}`,
+		icon: GlobeIcon,
+		action: handlePrimaryAction,
+	})),
+])
+
+const stopSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'stop',
+		label: isStopping.value ? 'Stopping' : 'Stop',
+		icon: StopCircleIcon,
+		action: () => initiateAction('Stop'),
+	},
+	{
+		id: 'kill_server',
+		label: 'Kill server',
+		icon: SlashIcon,
+		action: () => initiateAction('Kill'),
+	},
+])
+
+const powerActions = computed<HeaderAction[]>(() => {
+	if (isInstalling.value) {
+		return [
+			{
+				id: 'installing',
+				label: 'Installing...',
+				icon: LoaderCircleIcon,
+				iconClass: 'animate-spin',
+				color: 'brand',
+				disabled: true,
+			},
+		]
+	}
+	if (showRestartButton.value) {
+		return [
+			{
+				id: 'restart',
+				label: primaryActionText.value,
+				icon: UpdatedIcon,
+				color: 'orange',
+				tooltip: busyTooltip.value,
+				disabled: !canTakeAction.value,
+				onClick: handlePrimaryAction,
+			},
+			{
+				id: 'stop',
+				label: 'Stop server',
+				color: 'red',
+				joinedActions: stopSplitActions.value,
+				primaryDisabled: !canTakeAction.value,
+				dropdownDisabled: !canKill.value,
+			},
+		]
+	}
+	if (isStopping.value) {
+		return [
+			{
+				id: 'stop',
+				label: 'Stop server',
+				color: 'red',
+				joinedActions: stopSplitActions.value,
+				primaryDisabled: true,
+				dropdownDisabled: !canKill.value,
+				primaryMuted: true,
+			},
+		]
+	}
+	return [
+		{
+			id: 'start',
+			label: startActionText.value,
+			color: 'brand',
+			tooltip: busyTooltip.value,
+			joinedActions: startSplitActions.value,
+			primaryDisabled: !canTakeAction.value,
+			dropdownDisabled: !canTakeAction.value,
+		},
+	]
+})
+
+const settingsAction = computed<HeaderAction>(() => ({
+	id: 'settings',
+	label: props.settingsLabel,
+	icon: SettingsIcon,
+	labelHidden: true,
+	tooltip: props.showSettingsHint ? undefined : props.settingsLabel,
+	onClick: () => emit('openSettings'),
+	prompt: {
+		title: props.settingsHintTitle,
+		description: props.settingsHintDescription,
+		dismissLabel: props.settingsHintDismissLabel,
+		shown: props.showSettingsHint,
+		placement: 'bottom-end',
+		onDismiss: () => emit('dismissSettingsHint'),
+	},
+}))
+
+const headerActions = computed<HeaderAction[]>(() => [
+	...powerActions.value,
+	settingsAction.value,
+	...props.actions,
+])
 
 function copyServerAddress() {
 	if (!serverAddress.value) return

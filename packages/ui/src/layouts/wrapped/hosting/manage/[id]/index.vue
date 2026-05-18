@@ -127,54 +127,16 @@
 				:server-project="serverProject"
 				:active-world-name="activeWorldName"
 				:uptime-seconds="showUptime ? uptimeSeconds : undefined"
-			>
-				<template #actions>
-					<div class="flex gap-2">
-						<PanelServerActionButton :disabled="!!installError" />
-						<Tooltip
-							theme="dismissable-prompt"
-							:triggers="[]"
-							:shown="showSettingsHint"
-							:auto-hide="false"
-							placement="bottom-end"
-						>
-							<ButtonStyled circular size="large">
-								<button
-									v-tooltip="showSettingsHint ? undefined : formatMessage(messages.serverSettings)"
-									@click="
-										() => {
-											openServerSettingsModal()
-											dismissSettingsHint()
-										}
-									"
-								>
-									<SettingsIcon />
-								</button>
-							</ButtonStyled>
-							<template #popper>
-								<div class="grid grid-cols-[min-content] gap-1">
-									<div class="flex min-w-48 items-center justify-between gap-8">
-										<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
-											{{ formatMessage(settingsHintMessages.title) }}
-										</h3>
-										<ButtonStyled size="small" circular>
-											<button
-												v-tooltip="formatMessage(settingsHintMessages.dismiss)"
-												@click="dismissSettingsHint"
-											>
-												<XIcon aria-hidden="true" />
-											</button>
-										</ButtonStyled>
-									</div>
-									<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-										{{ formatMessage(settingsHintMessages.description) }}
-									</p>
-								</div>
-							</template>
-						</Tooltip>
-					</div>
-				</template>
-			</ServerManageHeader>
+				:worlds="serverFull?.worlds ?? []"
+				:power-disabled="!!installError"
+				:settings-label="formatMessage(messages.serverSettings)"
+				:show-settings-hint="showSettingsHint"
+				:settings-hint-title="formatMessage(settingsHintMessages.title)"
+				:settings-hint-description="formatMessage(settingsHintMessages.description)"
+				:settings-hint-dismiss-label="formatMessage(settingsHintMessages.dismiss)"
+				@open-settings="openServerSettingsModal()"
+				@dismiss-settings-hint="dismissSettingsHint"
+			/>
 
 			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
 
@@ -348,16 +310,13 @@ import {
 	LoaderCircleIcon,
 	LockIcon,
 	RightArrowIcon,
-	SettingsIcon,
 	TransferIcon,
 	TriangleAlertIcon,
 	UsersIcon,
-	XIcon,
 } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage, useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
-import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
@@ -368,7 +327,7 @@ import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
-import { PanelServerActionButton, ServerManageHeader } from '#ui/components/servers/server-header'
+import { ServerManageHeader } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
 	hasServerPermission,
