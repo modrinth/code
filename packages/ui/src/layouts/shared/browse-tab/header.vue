@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { LeftArrowIcon } from '@modrinth/assets'
+import { LeftArrowIcon, TagCategoryGamepad2Icon as Gamepad2Icon } from '@modrinth/assets'
+import type { Component } from 'vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import PageHeader from '#ui/components/base/PageHeader.vue'
+import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
 import { useServerImage } from '#ui/composables/servers/use-server-image.ts'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
@@ -20,6 +21,13 @@ const props = defineProps<{
 	installContext?: BrowseInstallContext | null
 }>()
 type SelectedProjectsLeaveResult = 'cancel' | 'discard' | 'install'
+type BrowseHeaderMetadataItem = {
+	id: string
+	label: string
+	icon?: Component
+	iconProps?: Record<string, unknown>
+	class?: string
+}
 
 const ctx = injectBrowseManager(null)
 const installContext = computed(() => props.installContext ?? ctx?.installContext?.value ?? null)
@@ -37,14 +45,66 @@ const iconSrc = computed(() => {
 	return fetchedIcon.value ?? installContext.value?.iconSrc ?? null
 })
 
+const leadingItems = computed(() => {
+	const context = installContext.value
+	if (!context) return []
+
+	return [
+		{
+			id: 'back',
+			type: 'button' as const,
+			icon: LeftArrowIcon,
+			ariaLabel: context.backLabel,
+			tooltip: context.backLabel,
+			onClick: handleBack,
+			wrapperClass: 'flex size-12 shrink-0 items-center justify-center',
+		},
+		...(iconSrc.value
+			? [
+					{
+						id: 'icon',
+						type: 'avatar' as const,
+						src: iconSrc.value,
+						alt: context.name,
+						avatarSize: '48px',
+						class: 'shrink-0',
+					},
+				]
+			: []),
+	]
+})
+
 const metadataItems = computed(() => {
 	const context = installContext.value
 	if (!context) return []
-	return [
-		context.heading,
-		context.gameVersion ? `MC ${context.gameVersion}` : '',
-		context.loader ? formatLoaderLabel(context.loader) : '',
-	].filter(Boolean)
+
+	const items: BrowseHeaderMetadataItem[] = []
+	if (context.heading) {
+		items.push({
+			id: 'heading',
+			label: context.heading,
+			class: '!text-primary',
+		})
+	}
+	if (context.gameVersion) {
+		items.push({
+			id: 'game-version',
+			label: context.gameVersion,
+			icon: Gamepad2Icon,
+			class: '!text-primary',
+		})
+	}
+	if (context.loader) {
+		const loaderLabel = formatLoaderLabel(context.loader)
+		items.push({
+			id: 'loader',
+			label: loaderLabel,
+			icon: LoaderIcon,
+			iconProps: { loader: loaderLabel },
+			class: '!text-primary',
+		})
+	}
+	return items
 })
 
 const selectedCount = computed(() => installContext.value?.selectedProjects?.length ?? 0)
@@ -94,37 +154,16 @@ async function handleSelectedProjectsLeaveResult(
 			:count="selectedCount"
 			:installing="isInstallingSelected"
 		/>
-		<div class="flex flex-col gap-2">
-			<div class="flex flex-wrap items-center justify-between gap-4">
-				<div class="flex min-w-0 items-center gap-4">
-					<ButtonStyled circular size="large">
-						<button :aria-label="installContext.backLabel" @click="handleBack">
-							<LeftArrowIcon />
-						</button>
-					</ButtonStyled>
-
-					<Avatar v-if="iconSrc" :src="iconSrc" size="48px" class="shrink-0" />
-
-					<div class="flex min-w-0 flex-col justify-center gap-1">
-						<h1 class="m-0 truncate text-2xl font-semibold leading-8 text-contrast">
-							{{ installContext.name }}
-						</h1>
-						<div
-							v-if="metadataItems.length"
-							class="flex flex-wrap items-center gap-2 text-base font-medium leading-6 text-primary"
-						>
-							<template v-for="(item, index) in metadataItems" :key="item">
-								<span
-									v-if="index > 0"
-									class="h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-60"
-								/>
-								<span>{{ item }}</span>
-							</template>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		<PageHeader
+			:header="installContext.name"
+			:leading="leadingItems"
+			:metadata="metadataItems"
+			:divider="false"
+			:bottom-padding="false"
+			main-class="items-center"
+			title-class="leading-8"
+			truncate-title
+		/>
 		<Admonition v-if="installContext.warning" type="warning" class="mb-1">
 			{{ installContext.warning }}
 		</Admonition>
