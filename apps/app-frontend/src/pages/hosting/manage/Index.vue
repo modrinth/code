@@ -4,7 +4,6 @@
 			:server-id="serverId"
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
-			:show-copy-id-action="themeStore.devMode"
 			:auth-user="authUser"
 			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
@@ -53,14 +52,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { get_user } from '@/helpers/cache'
 import { get as getCreds } from '@/helpers/mr_auth'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { useTheming } from '@/store/theme'
 
 const route = useRoute()
 const router = useRouter()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const themeStore = useTheming()
 const breadcrumbs = useBreadcrumbs()
 
 const serverId = computed(() => {
