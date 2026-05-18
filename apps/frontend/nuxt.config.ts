@@ -1,10 +1,15 @@
-import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
 import serverSidedVue from '@vitejs/plugin-vue'
 import fs from 'fs/promises'
 import { defineNuxtConfig } from 'nuxt/config'
+import { fileURLToPath } from 'url'
 import svgLoader from 'vite-svg-loader'
 
+import { GenericModrinthClient, type Labrinth } from '../../packages/api-client/src/index.ts'
+
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
+const API_CLIENT_SOURCE = fileURLToPath(
+	new URL('../../packages/api-client/src/index.ts', import.meta.url),
+)
 
 const preloadedFonts = [
 	'inter/Inter-Regular.woff2',
@@ -24,6 +29,9 @@ const STAGING_MODRINTH_URL = 'https://staging.modrinth.com'
 
 export default defineNuxtConfig({
 	srcDir: 'src/',
+	alias: {
+		'@modrinth/api-client': API_CLIENT_SOURCE,
+	},
 	app: {
 		head: {
 			htmlAttrs: {
@@ -82,6 +90,9 @@ export default defineNuxtConfig({
 		},
 		cacheDir: '../../node_modules/.vite/apps/knossos',
 		resolve: {
+			alias: {
+				'@modrinth/api-client': API_CLIENT_SOURCE,
+			},
 			dedupe: ['vue'],
 		},
 		plugins: [
