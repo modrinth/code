@@ -28,17 +28,30 @@
 				<template #stats>
 					<div class="flex items-center flex-wrap gap-2">
 						<template v-if="!isServerInstance">
-							<div class="flex items-center gap-2 capitalize font-medium">
-								{{ instance.loader }} {{ instance.game_version }}
+							<div class="flex min-w-0 items-center gap-2 font-medium text-secondary text-nowrap">
+								<Gamepad2Icon class="flex size-5 shrink-0" aria-hidden="true" />
+								<span class="truncate">{{ instance.game_version }}</span>
 							</div>
 
-							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+							<BulletDivider />
 
-							<div class="flex items-center gap-2 font-medium">
-								<template v-if="timePlayed > 0">
-									{{ timePlayedHumanized }}
-								</template>
-								<template v-else> Never played </template>
+							<div class="flex min-w-0 items-center gap-2 font-medium text-secondary text-nowrap">
+								<ServerLoaderIcon
+									v-if="loaderDisplayName"
+									:loader="loaderDisplayName"
+									class="flex size-5 shrink-0"
+									aria-hidden="true"
+								/>
+								<span class="truncate">{{ loaderLabel }}</span>
+							</div>
+
+							<BulletDivider />
+
+							<div class="flex min-w-0 items-center gap-2 font-medium text-secondary text-nowrap">
+								<TimerIcon class="flex size-5 shrink-0" aria-hidden="true" />
+								<span class="truncate">
+									{{ playtimeLabel }}
+								</span>
 							</div>
 						</template>
 
@@ -279,16 +292,21 @@ import {
 	ServerIcon,
 	SettingsIcon,
 	StopCircleIcon,
+	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TerminalSquareIcon,
+	TimerIcon,
 	UpdatedIcon,
 	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
+	BulletDivider,
 	ButtonStyled,
 	ContentPageHeader,
+	formatLoaderLabel,
 	injectNotificationManager,
+	LoaderIcon as ServerLoaderIcon,
 	NavTabs,
 	OverflowMenu,
 	ServerOnlinePlayers,
@@ -296,6 +314,7 @@ import {
 	ServerRecentPlays,
 	ServerRegion,
 } from '@modrinth/ui'
+import type { Loaders } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
@@ -645,6 +664,16 @@ const timePlayed = computed(() => {
 		: 0
 })
 
+const loaderDisplayName = computed(() =>
+	instance.value ? (formatLoaderLabel(instance.value.loader) as Loaders) : null,
+)
+
+const loaderLabel = computed(() =>
+	instance.value && loaderDisplayName.value
+		? [loaderDisplayName.value, instance.value.loader_version].filter(Boolean).join(' ')
+		: '',
+)
+
 const timePlayedHumanized = computed(() => {
 	const duration = dayjs.duration(timePlayed.value, 'seconds')
 	const hours = Math.floor(duration.asHours())
@@ -660,6 +689,10 @@ const timePlayedHumanized = computed(() => {
 	const seconds = Math.floor(duration.asSeconds())
 	return seconds + ' second' + (seconds > 1 ? 's' : '')
 })
+
+const playtimeLabel = computed(() =>
+	timePlayed.value > 0 ? timePlayedHumanized.value : 'Never played',
+)
 
 onUnmounted(() => {
 	unlistenProcesses()
