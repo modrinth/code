@@ -3,7 +3,7 @@ import {
 	commonMessages,
 	defineMessages,
 	injectModrinthServerContext,
-	ServersManageWorldsPage,
+	ServersManageInstancesPage,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -12,8 +12,8 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	title: {
-		id: 'servers.manage.worlds.meta.title',
-		defaultMessage: 'Worlds - {server} - Modrinth',
+		id: 'servers.manage.instances.meta.title',
+		defaultMessage: 'Instances - {server} - Modrinth',
 	},
 })
 
@@ -26,5 +26,5 @@ useHead({
 </script>
 
 <template>
-	<ServersManageWorldsPage />
+	<ServersManageInstancesPage />
 </template>

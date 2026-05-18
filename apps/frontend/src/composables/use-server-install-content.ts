@@ -65,7 +65,7 @@ const messages = defineMessages({
 	},
 	noServerWorld: {
 		id: 'discover.install.error.no-server-world',
-		defaultMessage: 'No server world is available for install.',
+		defaultMessage: 'No server instance is available for install.',
 	},
 	backToSetup: {
 		id: 'discover.install.back-to-setup',
@@ -628,7 +628,7 @@ export function useServerInstallContent({
 			if (fromContext.value === 'onboarding') {
 				await client.archon.servers_v1.endIntro(currentServerId.value)
 				queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
-				navigateTo(getServerWorldContentPath(currentServerId.value, currentWorldId.value ?? null))
+				navigateTo(getServerInstanceContentPath(currentServerId.value, currentWorldId.value ?? null))
 			} else {
 				navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
 			}
@@ -644,11 +644,11 @@ export function useServerInstallContent({
 		if (fromContext.value === 'onboarding') return `/hosting/manage/${id}?resumeModal=setup-type`
 		if (fromContext.value === 'reset-server')
 			return `/hosting/manage/${id}?openSettings=installation`
-		return getServerWorldContentPath(id, currentWorldId.value)
+		return getServerInstanceContentPath(id, currentWorldId.value)
 	})
 
-	function getServerWorldContentPath(serverId: string, worldId: string | null) {
-		const base = `/hosting/manage/${encodeURIComponent(serverId)}/worlds`
+	function getServerInstanceContentPath(serverId: string, worldId: string | null) {
+		const base = `/hosting/manage/${encodeURIComponent(serverId)}/instances`
 		return worldId ? `${base}/${encodeURIComponent(worldId)}` : base
 	}
 

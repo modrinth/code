@@ -460,7 +460,7 @@ const sidebarOverlayScrollbarsOptions = Object.freeze({
 })
 
 router.beforeEach(async (to) => {
-	const redirect = await resolveLegacyServerWorldTabRedirect(to)
+	const redirect = await resolveLegacyServerInstanceTabRedirect(to)
 	if (redirect) return redirect
 })
 
@@ -495,7 +495,7 @@ function onSuspensePending() {
 	suspenseToken = loading.begin()
 }
 
-async function resolveLegacyServerWorldTabRedirect(to) {
+async function resolveLegacyServerInstanceTabRedirect(to) {
 	if (!['ServerManageContent', 'ServerManageFiles', 'ServerManageBackups'].includes(to.name)) {
 		return null
 	}
@@ -505,14 +505,14 @@ async function resolveLegacyServerWorldTabRedirect(to) {
 
 	const tabPath =
 		to.name === 'ServerManageFiles' ? '/files' : to.name === 'ServerManageBackups' ? '/backups' : ''
-	const worldsPath = `/hosting/manage/${encodeURIComponent(serverId)}/worlds`
+	const instancesPath = `/hosting/manage/${encodeURIComponent(serverId)}/instances`
 
 	try {
 		const serverFull = await tauriApiClient.archon.servers_v1.get(serverId)
 		const world = serverFull.worlds.find((item) => item.is_active) ?? serverFull.worlds[0]
 		if (world) {
 			return {
-				path: `${worldsPath}/${encodeURIComponent(world.id)}${tabPath}`,
+				path: `${instancesPath}/${encodeURIComponent(world.id)}${tabPath}`,
 				query: to.query,
 				hash: to.hash,
 				replace: true,
@@ -520,7 +520,7 @@ async function resolveLegacyServerWorldTabRedirect(to) {
 		}
 	} catch {
 		return {
-			path: worldsPath,
+			path: instancesPath,
 			query: to.query,
 			hash: to.hash,
 			replace: true,
@@ -528,7 +528,7 @@ async function resolveLegacyServerWorldTabRedirect(to) {
 	}
 
 	return {
-		path: worldsPath,
+		path: instancesPath,
 		query: to.query,
 		hash: to.hash,
 		replace: true,

@@ -3641,8 +3641,8 @@
   "servers.manage.nav.overview": {
     "defaultMessage": "Overview"
   },
-  "servers.manage.nav.worlds": {
-    "defaultMessage": "Worlds"
+  "servers.manage.nav.instances": {
+    "defaultMessage": "Instances"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
@@ -3728,50 +3728,50 @@
   "servers.manage.websocket.reconnecting": {
     "defaultMessage": "Hang on, we're reconnecting to your server."
   },
-  "servers.manage.world.all-worlds": {
-    "defaultMessage": "All worlds"
+  "servers.manage.instance.all-instances": {
+    "defaultMessage": "All instances"
   },
-  "servers.manage.world.fallback-name": {
-    "defaultMessage": "World"
+  "servers.manage.instance.fallback-name": {
+    "defaultMessage": "Instance"
   },
-  "servers.manage.world.last-active": {
+  "servers.manage.instance.last-active": {
     "defaultMessage": "Last active {time}"
   },
-  "servers.manage.world.settings": {
-    "defaultMessage": "World settings"
+  "servers.manage.instance.settings": {
+    "defaultMessage": "Instance settings"
   },
-  "servers.manage.worlds.card.active": {
+  "servers.manage.instances.card.active": {
     "defaultMessage": "Active"
   },
-  "servers.manage.worlds.card.create": {
-    "defaultMessage": "Create world"
+  "servers.manage.instances.card.create": {
+    "defaultMessage": "Create instance"
   },
-  "servers.manage.worlds.card.created": {
+  "servers.manage.instances.card.created": {
     "defaultMessage": "Created"
   },
-  "servers.manage.worlds.card.edit": {
-    "defaultMessage": "Edit world"
+  "servers.manage.instances.card.edit": {
+    "defaultMessage": "Edit instance"
   },
-  "servers.manage.worlds.card.empty-description": {
-    "defaultMessage": "New world instance"
+  "servers.manage.instances.card.empty-description": {
+    "defaultMessage": "New instance"
   },
-  "servers.manage.worlds.card.installed-content": {
+  "servers.manage.instances.card.installed-content": {
     "defaultMessage": "Installed content"
   },
-  "servers.manage.worlds.card.last-active": {
+  "servers.manage.instances.card.last-active": {
     "defaultMessage": "Last active"
   },
-  "servers.manage.worlds.card.none": {
+  "servers.manage.instances.card.none": {
     "defaultMessage": "None"
   },
-  "servers.manage.worlds.card.not-tracked-yet": {
+  "servers.manage.instances.card.not-tracked-yet": {
     "defaultMessage": "Not tracked yet"
   },
-  "servers.manage.worlds.card.settings": {
-    "defaultMessage": "World settings"
+  "servers.manage.instances.card.settings": {
+    "defaultMessage": "Instance settings"
   },
-  "servers.manage.worlds.slot-name": {
-    "defaultMessage": "World #{index}"
+  "servers.manage.instances.slot-name": {
+    "defaultMessage": "Instance #{index}"
   },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} remaining..."
@@ -3935,11 +3935,11 @@
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Choose what to play"
   },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Set up your world just like singleplayer. Choose your gamemode and world seed."
+  "servers.setup.onboarding.step.configure-instance.description": {
+    "defaultMessage": "Set up your instance just like singleplayer. Choose your gamemode and world seed."
   },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Configure your world"
+  "servers.setup.onboarding.step.configure-instance.title": {
+    "defaultMessage": "Configure your instance"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Share your server with friends by copying the address and letting them know which mods they'll need to join."

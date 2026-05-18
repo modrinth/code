@@ -58,24 +58,24 @@ export default new createRouter({
 					},
 				},
 				{
-					path: 'worlds',
-					name: 'ServerManageWorlds',
-					component: Hosting.Worlds,
+					path: 'instances',
+					name: 'ServerManageInstances',
+					component: Hosting.Instances,
 					meta: {
 						breadcrumb: [{ name: '?Server' }],
 					},
 				},
 				{
-					path: 'worlds/:world_id',
-					name: 'ServerManageWorld',
-					component: Hosting.World,
+					path: 'instances/:instance_id',
+					name: 'ServerManageInstance',
+					component: Hosting.Instance,
 					meta: {
 						breadcrumb: [{ name: '?Server' }],
 					},
 					children: [
 						{
 							path: '',
-							name: 'ServerManageWorldContent',
+							name: 'ServerManageInstanceContent',
 							component: Hosting.Content,
 							meta: {
 								breadcrumb: [{ name: '?Server' }],
@@ -83,7 +83,7 @@ export default new createRouter({
 						},
 						{
 							path: 'files',
-							name: 'ServerManageWorldFiles',
+							name: 'ServerManageInstanceFiles',
 							component: Hosting.Files,
 							meta: {
 								breadcrumb: [{ name: '?Server' }],
@@ -91,7 +91,7 @@ export default new createRouter({
 						},
 						{
 							path: 'backups',
-							name: 'ServerManageWorldBackups',
+							name: 'ServerManageInstanceBackups',
 							component: Hosting.Backups,
 							meta: {
 								breadcrumb: [{ name: '?Server' }],

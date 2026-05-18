@@ -191,8 +191,8 @@ const metrics = computed(() => {
 		chartOptions: null as ReturnType<typeof buildChartOptions> | null,
 		series: null as { name: string; data: number[] }[] | null,
 		link: worldId.value
-			? `/hosting/manage/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId.value)}/files`
-			: `/hosting/manage/${encodeURIComponent(serverId)}/worlds`,
+			? `/hosting/manage/${encodeURIComponent(serverId)}/instances/${encodeURIComponent(worldId.value)}/files`
+			: `/hosting/manage/${encodeURIComponent(serverId)}/instances`,
 	}
 
 	if (props.loading) {
