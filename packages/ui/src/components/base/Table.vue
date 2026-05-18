@@ -7,6 +7,14 @@
 			<slot name="header" />
 		</div>
 		<table class="w-full table-fixed border-separate border-spacing-0 border-surface-5">
+			<colgroup>
+				<col v-if="showSelection" class="w-10" />
+				<col
+					v-for="column in columns"
+					:key="column.key"
+					:style="column.width ? { width: column.width } : undefined"
+				/>
+			</colgroup>
 			<thead class="">
 				<tr class="bg-surface-3">
 					<th v-if="showSelection" class="w-10 pl-4">
@@ -25,24 +33,23 @@
 							`text-${column.align ?? 'left'}`,
 							column.enableSorting ? 'cursor-pointer select-none' : '',
 						]"
-						:style="column.width ? { width: column.width } : undefined"
 						@click="column.enableSorting ? handleSort(column.key) : undefined"
 					>
 						<slot :name="`header-${column.key}`" :column="column">
 							<span
 								v-if="column.label || column.enableSorting"
-								class="inline-flex items-center gap-1 font-semibold"
+								class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold"
 								:class="`${sortColumn === column.key ? 'text-contrast' : ''}`"
 							>
-								{{ column.label ?? '' }}
+								<span class="min-w-0 truncate">{{ column.label ?? '' }}</span>
 								<template v-if="column.enableSorting">
 									<ChevronUpIcon
 										v-if="sortColumn === column.key && sortDirection === 'asc'"
-										class="size-4"
+										class="size-4 shrink-0"
 									/>
 									<ChevronDownIcon
 										v-else-if="sortColumn === column.key && sortDirection === 'desc'"
-										class="size-4"
+										class="size-4 shrink-0"
 									/>
 								</template>
 							</span>
@@ -85,7 +92,6 @@
 							:key="column.key"
 							class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-5"
 							:class="`text-${column.align ?? 'left'}`"
-							:style="column.width ? { width: column.width } : undefined"
 						>
 							<slot
 								:name="`cell-${column.key}`"
