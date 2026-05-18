@@ -10,11 +10,13 @@ const client = injectModrinthClient()
 const { server, serverId } = injectModrinthServerContext()
 const queryClient = useQueryClient()
 const flags = useFeatureFlags()
+const route = useNativeRoute()
+const initialPath = typeof route.query.path === 'string' ? route.query.path : '/'
 
 try {
 	await queryClient.ensureQueryData({
-		queryKey: ['files', serverId, '/'],
-		queryFn: () => client.kyros.files_v0.listDirectory('/', 1, 2000),
+		queryKey: ['files', serverId, initialPath],
+		queryFn: () => client.kyros.files_v0.listDirectory(initialPath, 1, 2000),
 		staleTime: 30_000,
 	})
 } catch {
