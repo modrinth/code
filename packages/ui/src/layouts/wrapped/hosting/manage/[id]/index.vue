@@ -172,12 +172,6 @@
 								</div>
 							</template>
 						</Tooltip>
-						<PanelServerOverflowMenu
-							:disabled="!!installError"
-							:uptime-seconds="uptimeSeconds"
-							:show-copy-id-action="showCopyIdAction"
-							:show-debug-info="showAdvancedDebugInfo"
-						/>
 					</div>
 				</template>
 			</ServerManageHeader>
@@ -349,6 +343,7 @@ import {
 	CheckIcon,
 	CopyIcon,
 	FileIcon,
+	GlobeIcon,
 	IssuesIcon,
 	LayoutTemplateIcon,
 	LoaderCircleIcon,
@@ -357,7 +352,6 @@ import {
 	SettingsIcon,
 	TransferIcon,
 	TriangleAlertIcon,
-	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
@@ -375,11 +369,7 @@ import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
-import {
-	PanelServerActionButton,
-	PanelServerOverflowMenu,
-	ServerManageHeader,
-} from '#ui/components/servers/server-header'
+import { PanelServerActionButton, ServerManageHeader } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
 	useDebugLogger,
@@ -420,7 +410,6 @@ const props = withDefaults(
 		serverId: string
 		reloadPage: () => void
 		resolveViewer: () => Promise<{ userId: string | null; userRole: string | null }>
-		showCopyIdAction?: boolean
 		showAdvancedDebugInfo?: boolean
 		showUptime?: boolean
 		additionalTabs?: Tab[]
@@ -444,7 +433,6 @@ const props = withDefaults(
 		}) => void | Promise<void>
 	}>(),
 	{
-		showCopyIdAction: false,
 		showAdvancedDebugInfo: false,
 		showUptime: true,
 		additionalTabs: () => [],
@@ -1042,7 +1030,7 @@ const navLinks = computed<Tab[]>(() => [
 	{
 		label: formatMessage(messages.instancesNav),
 		href: `/hosting/manage/${encodeURIComponent(props.serverId)}/instances`,
-		icon: WorldIcon,
+		icon: GlobeIcon,
 		subpages: [],
 	},
 	...props.additionalTabs,
