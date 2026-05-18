@@ -4,7 +4,7 @@
 			<template #icon>
 				<ServerIcon
 					:image="headerImage"
-					:class="isNuxt ? 'size-20 !rounded-2xl' : 'size-16 !rounded-xl'"
+					:class="isNuxt ? 'size-15 !rounded-2xl' : 'size-15 !rounded-xl'"
 				/>
 			</template>
 			<template #title>
