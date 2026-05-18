@@ -64,6 +64,54 @@ export const SearchableEmpty: Story = {
 	},
 }
 
+export const DropdownMinWidth: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: [
+				{ value: 'fabric', label: 'Fabric', subLabel: 'Lightweight modding toolchain' },
+				{ value: 'forge', label: 'Forge', subLabel: 'The original Minecraft modding API' },
+				{ value: 'neoforge', label: 'NeoForge', subLabel: 'Community-driven Forge fork' },
+			],
+		}),
+		template: /*html*/ `
+			<div style="width: 11rem;">
+				<Combobox
+					v-model="selected"
+					:options="options"
+					:dropdown-min-width="320"
+					placeholder="Loader"
+				/>
+			</div>
+		`,
+	}),
+}
+
+export const DropdownClass: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: [
+				{ value: 'fabric', label: 'Fabric' },
+				{ value: 'forge', label: 'Forge' },
+				{ value: 'neoforge', label: 'NeoForge' },
+			],
+		}),
+		template: /*html*/ `
+			<div style="width: 14rem;">
+				<Combobox
+					v-model="selected"
+					:options="options"
+					dropdown-class="!border-brand"
+					placeholder="Loader"
+				/>
+			</div>
+		`,
+	}),
+}
+
 export const Disabled: Story = {
 	args: {
 		options: [{ value: '1', label: 'Option 1' }],
@@ -192,6 +240,51 @@ export const WithDropdownFooter: StoryObj = {
 			</Combobox>
 		`,
 	}),
+}
+
+export const DropdownFooterOnly: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: [],
+		}),
+		template: /*html*/ `
+			<div style="width: 240px;">
+				<Combobox
+					v-model="selected"
+					:options="options"
+					display-value="Custom range"
+					dropdown-min-width="320"
+				>
+					<template #dropdown-footer>
+						<div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; color: var(--color-text-primary);">
+							<div style="font-size: 0.875rem; font-weight: 700;">Dropdown footer content</div>
+							<div style="font-size: 0.8125rem; color: var(--color-text-secondary);">
+								This dropdown has no options and stays open because its footer slot is content.
+							</div>
+							<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+								<button type="button" style="height: 2rem; border: 1px solid var(--color-surface-5); border-radius: 0.5rem; background: var(--color-surface-3); color: var(--color-text-primary); font-weight: 600;">
+									Cancel
+								</button>
+								<button type="button" style="height: 2rem; border: 0; border-radius: 0.5rem; background: var(--color-brand); color: var(--color-brand-inverted); font-weight: 700;">
+									Apply
+								</button>
+							</div>
+						</div>
+					</template>
+				</Combobox>
+			</div>
+		`,
+	}),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers dropdowns whose only rendered content is the footer slot, such as the analytics custom date range picker.',
+			},
+		},
+	},
 }
 
 export const MixedSubLabels: Story = {

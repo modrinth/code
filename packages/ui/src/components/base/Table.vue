@@ -21,18 +21,18 @@
 						v-for="column in columns"
 						:key="column.key"
 						class="h-14 first:pl-4 last:pr-4"
-						:class="[
-							`text-${column.align ?? 'left'}`,
-							column.enableSorting ? 'cursor-pointer select-none' : '',
-						]"
+						:class="[`text-${column.align ?? 'left'}`]"
 						:style="column.width ? { width: column.width } : undefined"
-						@click="column.enableSorting ? handleSort(column.key) : undefined"
 					>
 						<slot :name="`header-${column.key}`" :column="column">
 							<span
 								v-if="column.label || column.enableSorting"
-								class="inline-flex items-center gap-1 font-semibold"
-								:class="`${sortColumn === column.key ? 'text-contrast' : ''}`"
+								class="inline-flex items-center gap-1 font-semibold w-fit py-2"
+								:class="[
+									column.enableSorting ? 'cursor-pointer select-none' : '',
+									sortColumn === column.key ? 'text-contrast' : '',
+								]"
+								@click="column.enableSorting ? handleSort(column.key) : undefined"
 							>
 								{{ column.label ?? '' }}
 								<template v-if="column.enableSorting">

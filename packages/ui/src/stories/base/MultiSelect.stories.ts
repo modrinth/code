@@ -1,4 +1,4 @@
-import { CheckIcon } from '@modrinth/assets'
+import { BoxIcon, CheckIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, ref } from 'vue'
 
@@ -53,6 +53,48 @@ export const WithSearch: Story = {
 	},
 }
 
+export const WithOptionRightSlot: Story = {
+	args: {
+		options: [
+			{ value: 'sodium-1.21.5', label: '1.21.5', searchTerms: ['Sodium'] },
+			{ value: 'sodium-1.21.4', label: '1.21.4', searchTerms: ['Sodium'] },
+			{ value: 'iris-1.20.1', label: '1.20.1', searchTerms: ['Iris'] },
+			{ value: 'modmenu-1.19.2', label: '1.19.2', searchTerms: ['Mod Menu'] },
+		],
+		modelValue: ['sodium-1.21.5'],
+		placeholder: 'Select versions',
+		searchable: true,
+		searchPlaceholder: 'Search versions',
+	},
+	render: (args) => ({
+		components: { BoxIcon, MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			const projectNames: Record<string, string> = {
+				'sodium-1.21.5': 'Sodium',
+				'sodium-1.21.4': 'Sodium',
+				'iris-1.20.1': 'Iris',
+				'modmenu-1.19.2': 'Mod Menu',
+			}
+			return { args, projectNames, selected }
+		},
+		template: /*html*/ `
+			<div style="width: 400px;">
+				<MultiSelect v-bind="args" v-model="selected">
+					<template #option-right="{ item }">
+						<span
+							v-tooltip="projectNames[item.value]"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<BoxIcon class="size-6" />
+						</span>
+					</template>
+				</MultiSelect>
+			</div>
+		`,
+	}),
+}
+
 export const WithSelectAll: Story = {
 	args: {
 		...Default.args,
@@ -68,6 +110,26 @@ export const WithSelectionActions: Story = {
 		searchable: true,
 		showSelectionActions: true,
 		searchPlaceholder: 'Search versions',
+	},
+}
+
+export const WithSections: Story = {
+	args: {
+		options: [
+			{ value: 'iris', label: 'Iris' },
+			{ value: 'sodium', label: 'Sodium' },
+			{ type: 'section-header', label: 'LambdAurora' },
+			{ value: 'lambda-better-grass', label: 'LambdaBetterGrass', searchTerms: ['LambdAurora'] },
+			{ value: 'auroras-decorations', label: "Aurora's Decorations", searchTerms: ['LambdAurora'] },
+			{ type: 'section-header', label: 'Terraformers' },
+			{ value: 'modmenu', label: 'Mod Menu', searchTerms: ['Terraformers'] },
+			{ value: 'terraform-api', label: 'Terraform API', searchTerms: ['Terraformers'] },
+		],
+		modelValue: ['iris', 'modmenu'],
+		placeholder: 'Select projects',
+		searchable: true,
+		showSelectionActions: true,
+		searchPlaceholder: 'Search projects',
 	},
 }
 
@@ -242,6 +304,50 @@ export const WithBottomSlot: Story = {
 							/>
 							<span style="font-size: 0.875rem; font-weight: 600; color: var(--color-text-primary);">downloads</span>
 						</div>
+					</template>
+				</MultiSelect>
+			</div>
+		`,
+	}),
+}
+
+export const VirtualizedLargeList: Story = {
+	args: {
+		options: Array.from({ length: 250 }, (_, index) => {
+			const version = `1.${Math.floor(index / 10) + 1}.${index % 10}`
+			return {
+				value: `version-${index + 1}`,
+				label: version,
+				searchTerms: [`Project ${Math.floor(index / 25) + 1}`],
+			}
+		}),
+		modelValue: ['version-3', 'version-47', 'version-132'],
+		placeholder: 'Select versions',
+		searchable: true,
+		searchPlaceholder: 'Search versions',
+		showSelectionActions: true,
+		maxHeight: 320,
+	},
+	render: (args) => ({
+		components: { BoxIcon, MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			function getProjectName(value: string) {
+				const optionIndex = Number(value.replace('version-', '')) - 1
+				return `Project ${Math.floor(optionIndex / 25) + 1}`
+			}
+			return { args, getProjectName, selected }
+		},
+		template: /*html*/ `
+			<div style="width: 400px;">
+				<MultiSelect v-bind="args" v-model="selected">
+					<template #option-right="{ item }">
+						<span
+							v-tooltip="getProjectName(item.value)"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<BoxIcon class="size-6" />
+						</span>
 					</template>
 				</MultiSelect>
 			</div>

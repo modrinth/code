@@ -467,7 +467,7 @@
 				<OverflowMenu
 					v-if="auth.user"
 					:dropdown-id="`${basePopoutId}-user`"
-					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1 pr-1"
 					:options="userMenuOptions"
 				>
 					<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
@@ -1227,6 +1227,10 @@ async function logoutUser() {
 }
 
 function runAnalytics() {
+	if (import.meta.dev) {
+		return
+	}
+
 	const config = useRuntimeConfig()
 	const replacedUrl = config.public.apiBaseUrl.replace('v2/', '')
 

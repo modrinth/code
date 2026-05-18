@@ -188,7 +188,7 @@ const colorVariables = computed(() => {
 		}
 		const hoverColors = JSON.parse(JSON.stringify(colors))
 		const boxShadow =
-			props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : defaultShadow
+			props.type === 'chip' && colorVar.value ? `0 0 0 1px ${colorVar.value}` : defaultShadow
 		return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon}; --_box-shadow: ${boxShadow};`
 	}
 
@@ -226,7 +226,7 @@ const colorVariables = computed(() => {
 	}
 
 	const boxShadow =
-		props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : defaultShadow
+		props.type === 'chip' && colorVar.value ? `0 0 0 1px ${colorVar.value}` : defaultShadow
 	return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_box-shadow: ${boxShadow};`
 })
 
@@ -266,7 +266,7 @@ const fontSize = computed(() => {
 	> *:first-child
 	> *:first-child
 	> :is(button, a, .button-like):first-child {
-	@apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
+	@apply flex cursor-pointer flex-row items-center justify-center border-solid border border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
 	box-shadow: var(--_box-shadow, inset 0 0 0 transparent);
 	transition:
 		scale 0.125s ease-in-out,

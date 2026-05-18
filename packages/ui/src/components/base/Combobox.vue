@@ -47,7 +47,7 @@
 			ref="triggerRef"
 			role="button"
 			tabindex="0"
-			class="relative flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 text-left transition-all duration-200 text-button-text"
+			class="relative flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 text-left transition-all duration-200 text-button-text gap-2.5"
 			:class="[
 				props.triggerClass,
 				{
@@ -95,6 +95,7 @@
 					ref="dropdownRef"
 					class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 border border-solid border-surface-5"
 					:class="[
+						props.dropdownClass,
 						openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',
 					]"
 					:style="dropdownStyle"
@@ -139,14 +140,14 @@
 											<div class="flex flex-col gap-1.5">
 												<span
 													class="font-semibold leading-tight"
-													:class="item.value === modelValue ? 'text-contrast' : 'text-primary'"
+													:class="item.value === modelValue ? 'text-green' : 'text-primary'"
 												>
 													{{ item.label }}
 												</span>
 												<span
 													v-if="item.subLabel"
 													class="text-sm"
-													:class="item.value === modelValue ? 'text-contrast' : 'text-secondary'"
+													:class="item.value === modelValue ? 'text-green' : 'text-secondary'"
 												>
 													{{ item.subLabel }}
 												</span>
@@ -229,6 +230,11 @@ const props = withDefaults(
 		displayValue?: string
 		searchValue?: string
 		triggerClass?: string
+		dropdownClass?: string
+		/** Width for the teleported dropdown; defaults to the trigger/input width */
+		dropdownWidth?: string | number
+		/** Minimum width for the teleported dropdown */
+		dropdownMinWidth?: string | number
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
@@ -290,6 +296,7 @@ const dropdownStyle = ref({
 	top: '0px',
 	left: '0px',
 	width: '0px',
+	minWidth: '0px',
 })
 
 const openDirection = ref<'down' | 'up'>('down')
@@ -353,12 +360,13 @@ const shouldRenderDropdown = computed(() => {
 })
 
 function getOptionClasses(item: ComboboxOption<T> & { key: string }, index: number) {
+	const isSelected = props.listbox && item.value === props.modelValue
+
 	return [
 		item.class,
 		{
-			'bg-surface-5':
-				(props.listbox && item.value === props.modelValue) ||
-				(focusedIndex.value === index && !(props.listbox && item.value === props.modelValue)),
+			'bg-highlight-green text-green hover:bg-highlight-green focus:bg-highlight-green': isSelected,
+			'bg-surface-5': focusedIndex.value === index && !isSelected,
 			'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
 		},
 	]
@@ -423,12 +431,35 @@ function calculateHorizontalPosition(
 	return left
 }
 
+function resolveDropdownWidth(triggerWidth: number): string {
+	if (props.dropdownWidth === undefined) return `${triggerWidth}px`
+	if (typeof props.dropdownWidth === 'number') return `${props.dropdownWidth}px`
+	return props.dropdownWidth
+}
+
+function resolveCssSize(size: string | number | undefined): string | undefined {
+	if (size === undefined) return undefined
+	if (typeof size === 'number') return `${size}px`
+	return size
+}
+
 async function updateDropdownPosition() {
 	if (!effectiveTriggerEl.value || !dropdownRef.value) return
 
 	await nextTick()
 
 	const triggerRect = effectiveTriggerEl.value.getBoundingClientRect()
+	const width = resolveDropdownWidth(triggerRect.width)
+	const minWidth = resolveCssSize(props.dropdownMinWidth) ?? '0px'
+
+	dropdownStyle.value = {
+		...dropdownStyle.value,
+		width,
+		minWidth,
+	}
+
+	await nextTick()
+
 	const dropdownRect = dropdownRef.value.getBoundingClientRect()
 	const viewportHeight = window.innerHeight
 	const viewportWidth = window.innerWidth
@@ -440,7 +471,8 @@ async function updateDropdownPosition() {
 	dropdownStyle.value = {
 		top: `${top}px`,
 		left: `${left}px`,
-		width: `${triggerRect.width}px`,
+		width,
+		minWidth,
 	}
 
 	openDirection.value = direction

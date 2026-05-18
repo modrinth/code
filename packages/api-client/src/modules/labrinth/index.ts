@@ -1,3 +1,4 @@
+export * from './analytics/v3'
 export * from './auth/internal'
 export * from './auth/v2'
 export * from './billing/internal'
