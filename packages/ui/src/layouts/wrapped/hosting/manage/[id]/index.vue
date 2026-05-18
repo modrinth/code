@@ -746,20 +746,37 @@ const { data: serverFull } = useQuery({
 	queryFn: () => client.archon.servers_v1.get(props.serverId),
 })
 
+const routeInstanceId = ref<string | null>(getRouteParam(route.params.instance_id))
+
+watch(
+	() => [route.path, route.params.id, route.params.instance_id, props.serverId] as const,
+	() => {
+		if (!isRouteForManagedServer()) return
+		routeInstanceId.value = getRouteParam(route.params.instance_id)
+	},
+	{ immediate: true },
+)
+
 const worldId = computed(() => {
-	const routeInstanceId = getRouteParam(route.params.instance_id)
-	if (routeInstanceId) return routeInstanceId
+	if (routeInstanceId.value) return routeInstanceId.value
 	if (!serverFull.value) return null
 	const activeWorld = serverFull.value.worlds.find((w) => w.is_active)
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
 
-const isInstanceDetailRoute = computed(() => !!getRouteParam(route.params.instance_id))
+const isInstanceDetailRoute = computed(() => !!routeInstanceId.value)
 const activeWorldName = computed(() => {
 	if (!serverFull.value) return null
 	const activeWorld = serverFull.value.worlds.find((world) => world.is_active)
 	return activeWorld?.name ?? serverFull.value.worlds[0]?.name ?? null
 })
+
+function isRouteForManagedServer() {
+	const routeServerId = getRouteParam(route.params.id)
+	if (!routeServerId || routeServerId !== props.serverId) return false
+	const basePath = `/hosting/manage/${encodeURIComponent(routeServerId)}`
+	return route.path === basePath || route.path.startsWith(`${basePath}/`)
+}
 
 function getRouteParam(param: string | string[] | undefined): string | null {
 	if (Array.isArray(param)) return param[0] ?? null

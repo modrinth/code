@@ -85,13 +85,69 @@
 							>
 								{{ props.header }}
 							</h1>
+							<template v-for="badge in props.badges" :key="badge.id">
+								<component
+									:is="badge.component"
+									v-if="badge.component"
+									:class="badge.class"
+									v-bind="badge.componentProps"
+								/>
+								<AutoLink
+									v-else-if="badge.to"
+									v-tooltip="badge.tooltip"
+									:to="badge.to"
+									:aria-label="badge.ariaLabel ?? badge.label"
+									:class="badgeClass(badge, true)"
+									:style="badge.style"
+								>
+									<component
+										:is="badge.icon"
+										v-if="badge.icon"
+										aria-hidden="true"
+										v-bind="badge.iconProps"
+									/>
+									<span>{{ badge.label }}</span>
+								</AutoLink>
+								<button
+									v-else-if="badge.onClick"
+									v-tooltip="badge.tooltip"
+									type="button"
+									:aria-label="badge.ariaLabel ?? badge.label"
+									:class="badgeClass(badge, true)"
+									:style="badge.style"
+									@click="badge.onClick"
+								>
+									<component
+										:is="badge.icon"
+										v-if="badge.icon"
+										aria-hidden="true"
+										v-bind="badge.iconProps"
+									/>
+									<span>{{ badge.label }}</span>
+								</button>
+								<div
+									v-else
+									v-tooltip="badge.tooltip"
+									:aria-label="badge.ariaLabel"
+									:class="badgeClass(badge)"
+									:style="badge.style"
+								>
+									<component
+										:is="badge.icon"
+										v-if="badge.icon"
+										aria-hidden="true"
+										v-bind="badge.iconProps"
+									/>
+									<span>{{ badge.label }}</span>
+								</div>
+							</template>
 						</div>
 						<p
-							v-if="props.summary"
+							v-if="props.summary || $slots.summary"
 							class="m-0 max-w-[44rem] empty:hidden"
 							:class="[props.disableLineClamp ? '' : 'line-clamp-2']"
 						>
-							{{ props.summary }}
+							<slot name="summary">{{ props.summary }}</slot>
 						</p>
 					</div>
 
@@ -99,11 +155,14 @@
 						<div class="flex min-w-0 flex-wrap items-center gap-2">
 							<template v-for="(item, index) in props.metadata" :key="item.id">
 								<BulletDivider v-if="index > 0" class="shrink-0" />
+								<div v-if="item.type === 'custom'" :class="item.class">
+									<slot :name="metadataSlotName(item)" :item="item" />
+								</div>
 								<AutoLink
-									v-if="item.to"
+									v-else-if="item.to"
 									v-tooltip="item.tooltip"
 									:to="item.to"
-									:aria-label="item.ariaLabel ?? item.label"
+									:aria-label="item.ariaLabel ?? item.label ?? ''"
 									:class="metadataClass(item, true)"
 								>
 									<component
@@ -119,7 +178,7 @@
 									v-else-if="item.onClick"
 									v-tooltip="item.tooltip"
 									type="button"
-									:aria-label="item.ariaLabel ?? item.label"
+									:aria-label="item.ariaLabel ?? item.label ?? ''"
 									:class="metadataClass(item, true)"
 									@click="item.onClick"
 								>
@@ -155,8 +214,14 @@
 
 			<div v-if="props.actions.length" class="flex flex-wrap gap-2 items-center">
 				<template v-for="action in props.actions" :key="action.id">
+					<component
+						:is="action.component"
+						v-if="action.component"
+						:class="action.class"
+						v-bind="action.componentProps"
+					/>
 					<Tooltip
-						v-if="action.prompt"
+						v-else-if="action.prompt"
 						theme="dismissable-prompt"
 						:triggers="[]"
 						:shown="action.prompt.shown"
@@ -180,12 +245,29 @@
 							:type="action.type ?? 'standard'"
 							:circular="action.circular ?? action.labelHidden ?? false"
 						>
+							<TeleportOverflowMenu
+								v-if="action.menuActions?.length"
+								:options="action.menuActions"
+								:tooltip="action.tooltip"
+								:aria-label="actionLabel(action)"
+								:disabled="action.disabled"
+								@open="dismissActionPrompt(action)"
+							>
+								<component
+									:is="action.icon"
+									v-if="action.icon"
+									:class="action.iconClass"
+									aria-hidden="true"
+									v-bind="action.iconProps"
+								/>
+								<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
+							</TeleportOverflowMenu>
 							<AutoLink
-								v-if="action.to"
+								v-else-if="action.to"
 								v-tooltip="action.tooltip"
 								:to="action.to"
 								:aria-label="actionLabel(action)"
-								@click="dismissActionPrompt(action)"
+								@click="(event) => handleActionClick(action, event)"
 							>
 								<component
 									:is="action.icon"
@@ -202,7 +284,7 @@
 								type="button"
 								:disabled="action.disabled"
 								:aria-label="actionLabel(action)"
-								@click="handleActionClick(action)"
+								@click="(event) => handleActionClick(action, event)"
 							>
 								<component
 									:is="action.icon"
@@ -217,8 +299,16 @@
 						<template #popper>
 							<div class="grid grid-cols-[min-content] gap-1">
 								<div class="flex min-w-48 items-center justify-between gap-8">
-									<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
+									<h3
+										class="m-0 flex items-center gap-2 whitespace-nowrap text-base font-bold text-contrast"
+									>
 										{{ action.prompt.title }}
+										<span
+											v-if="action.prompt.badge"
+											class="inline-flex items-center rounded-full border border-solid border-brand-highlight bg-brand-highlight px-2 py-1 text-sm font-semibold leading-none text-brand"
+										>
+											{{ action.prompt.badge }}
+										</span>
 									</h3>
 									<ButtonStyled size="small" circular>
 										<button
@@ -231,6 +321,9 @@
 								</div>
 								<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
 									{{ action.prompt.description }}
+								</p>
+								<p v-if="action.prompt.footer" class="m-0 text-wrap text-sm font-bold text-primary">
+									{{ action.prompt.footer }}
 								</p>
 							</div>
 						</template>
@@ -253,11 +346,28 @@
 							:type="action.type ?? 'standard'"
 							:circular="action.circular ?? action.labelHidden ?? false"
 						>
+							<TeleportOverflowMenu
+								v-if="action.menuActions?.length"
+								:options="action.menuActions"
+								:tooltip="action.tooltip"
+								:aria-label="actionLabel(action)"
+								:disabled="action.disabled"
+							>
+								<component
+									:is="action.icon"
+									v-if="action.icon"
+									:class="action.iconClass"
+									aria-hidden="true"
+									v-bind="action.iconProps"
+								/>
+								<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
+							</TeleportOverflowMenu>
 							<AutoLink
-								v-if="action.to"
+								v-else-if="action.to"
 								v-tooltip="action.tooltip"
 								:to="action.to"
 								:aria-label="actionLabel(action)"
+								@click="(event) => handleActionClick(action, event)"
 							>
 								<component
 									:is="action.icon"
@@ -274,7 +384,7 @@
 								type="button"
 								:disabled="action.disabled"
 								:aria-label="actionLabel(action)"
-								@click="handleActionClick(action)"
+								@click="(event) => handleActionClick(action, event)"
 							>
 								<component
 									:is="action.icon"
@@ -296,11 +406,14 @@
 				<div class="flex min-w-0 flex-wrap items-center gap-2">
 					<template v-for="(item, index) in props.metadata" :key="item.id">
 						<BulletDivider v-if="index > 0" class="shrink-0" />
+						<div v-if="item.type === 'custom'" :class="item.class">
+							<slot :name="metadataSlotName(item)" :item="item" />
+						</div>
 						<AutoLink
-							v-if="item.to"
+							v-else-if="item.to"
 							v-tooltip="item.tooltip"
 							:to="item.to"
-							:aria-label="item.ariaLabel ?? item.label"
+							:aria-label="item.ariaLabel ?? item.label ?? ''"
 							:class="metadataClass(item, true)"
 						>
 							<component
@@ -316,7 +429,7 @@
 							v-else-if="item.onClick"
 							v-tooltip="item.tooltip"
 							type="button"
-							:aria-label="item.ariaLabel ?? item.label"
+							:aria-label="item.ariaLabel ?? item.label ?? ''"
 							:class="metadataClass(item, true)"
 							@click="item.onClick"
 						>
@@ -363,6 +476,9 @@ import Avatar from './Avatar.vue'
 import BulletDivider from './BulletDivider.vue'
 import ButtonStyled from './ButtonStyled.vue'
 import JoinedButtons, { type JoinedButtonAction } from './JoinedButtons.vue'
+import TeleportOverflowMenu, {
+	type Item as TeleportOverflowMenuItem,
+} from './TeleportOverflowMenu.vue'
 
 type PageHeaderTarget = string | RouteLocationRaw
 type ButtonColor =
@@ -401,7 +517,7 @@ type PageHeaderLeading = {
 	class?: string
 	wrapperClass?: string
 	to?: PageHeaderTarget
-	onClick?: () => void | Promise<void>
+	onClick?: (event?: MouseEvent) => void | Promise<void>
 	tooltip?: string
 	ariaLabel?: string
 	color?: ButtonColor
@@ -409,9 +525,25 @@ type PageHeaderLeading = {
 	buttonType?: ButtonType
 }
 
+type PageHeaderBadge = {
+	id: string
+	label?: string
+	icon?: Component
+	iconProps?: Record<string, unknown>
+	component?: Component
+	componentProps?: Record<string, unknown>
+	tooltip?: string
+	ariaLabel?: string
+	to?: PageHeaderTarget
+	onClick?: () => void | Promise<void>
+	class?: string
+	style?: Record<string, string>
+}
+
 type PageHeaderMetadataItem = {
 	id: string
-	label: string
+	type?: 'text' | 'custom'
+	label?: string
 	icon?: Component
 	iconProps?: Record<string, unknown>
 	tooltip?: string
@@ -424,6 +556,8 @@ type PageHeaderMetadataItem = {
 type PageHeaderActionPrompt = {
 	title: string
 	description: string
+	badge?: string
+	footer?: string
 	dismissLabel?: string
 	shown?: boolean
 	placement?: string
@@ -433,6 +567,9 @@ type PageHeaderActionPrompt = {
 type PageHeaderAction = {
 	id: string
 	label: string
+	component?: Component
+	componentProps?: Record<string, unknown>
+	class?: string
 	icon?: Component
 	iconProps?: Record<string, unknown>
 	iconClass?: string
@@ -447,6 +584,7 @@ type PageHeaderAction = {
 	size?: ButtonSize
 	type?: ButtonType
 	joinedActions?: JoinedButtonAction[]
+	menuActions?: TeleportOverflowMenuItem[]
 	primaryDisabled?: boolean
 	dropdownDisabled?: boolean
 	primaryMuted?: boolean
@@ -458,6 +596,7 @@ const props = withDefaults(
 		header: string
 		summary?: string | null
 		leading?: PageHeaderLeading | PageHeaderLeading[] | null
+		badges?: PageHeaderBadge[]
 		metadata?: PageHeaderMetadataItem[]
 		actions?: PageHeaderAction[]
 		headerClass?: string
@@ -472,6 +611,7 @@ const props = withDefaults(
 	{
 		summary: null,
 		leading: null,
+		badges: () => [],
 		metadata: () => [],
 		actions: () => [],
 		headerClass: '',
@@ -506,6 +646,18 @@ function metadataClass(item: PageHeaderMetadataItem, interactive = false) {
 	]
 }
 
+function metadataSlotName(item: PageHeaderMetadataItem) {
+	return `metadata-${item.id}`
+}
+
+function badgeClass(badge: PageHeaderBadge, interactive = false) {
+	return [
+		'inline-flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-button-bg px-2 py-1 text-sm font-semibold leading-none text-secondary text-nowrap [&>svg]:size-4 [&>svg]:shrink-0',
+		interactive ? 'm-0 cursor-pointer hover:underline' : '',
+		badge.class,
+	]
+}
+
 function actionLabel(action: PageHeaderAction) {
 	return action.ariaLabel ?? action.tooltip ?? action.label
 }
@@ -516,9 +668,9 @@ function dismissActionPrompt(action: PageHeaderAction) {
 	}
 }
 
-function handleActionClick(action: PageHeaderAction) {
+function handleActionClick(action: PageHeaderAction, event?: MouseEvent) {
 	dismissActionPrompt(action)
-	void action.onClick?.()
+	void action.onClick?.(event)
 }
 
 function joinedActionColor(color?: ButtonColor) {

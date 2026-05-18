@@ -2,10 +2,13 @@
 	<div data-pyro-telepopover-wrapper class="relative">
 		<button
 			ref="triggerRef"
+			v-tooltip="tooltip"
 			class="teleport-overflow-menu-trigger"
 			:class="btnClass"
 			:aria-expanded="isOpen"
 			:aria-haspopup="true"
+			:aria-label="ariaLabel"
+			:disabled="disabled"
 			@mousedown="handleMouseDown"
 			@mouseenter="handleMouseEnter"
 			@mouseleave="handleMouseLeave"
@@ -38,9 +41,14 @@
 						:key="isDivider(option) ? `divider-${index}` : option.id"
 					>
 						<div v-if="isDivider(option)" class="h-px w-full bg-surface-5"></div>
-						<ButtonStyled v-else type="transparent" role="menuitem" :color="option.color">
+						<ButtonStyled
+							v-else
+							type="transparent"
+							role="menuitem"
+							:color="optionButtonColor(option)"
+						>
 							<button
-								v-if="typeof option.action === 'function'"
+								v-if="typeof option.action === 'function' || option.disabled"
 								:ref="
 									(el) => {
 										if (el) menuItemsRef[index] = el as HTMLElement
@@ -51,39 +59,41 @@
 								class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
 								:aria-selected="index === selectedIndex"
 								:style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
-								@click="handleItemClick(option, index)"
+								@click="(event) => handleItemClick(option, index, event)"
 								@focus="selectedIndex = index"
 								@mouseover="handleMouseOver(index)"
 							>
 								<slot :name="option.id">
 									<component :is="option.icon" v-if="option.icon" class="size-5" />
-									{{ option.id }}
+									{{ option.label ?? option.id }}
 								</slot>
 							</button>
 							<AutoLink
-								v-else-if="typeof option.action === 'string'"
+								v-else-if="optionLink(option)"
 								:ref="
 									(el) => {
 										if (el) menuItemsRef[index] = el as HTMLElement
 									}
 								"
-								:to="option.action"
+								:to="optionLink(option)"
+								:target="option.external ? '_blank' : undefined"
+								:rel="option.external ? 'noopener noreferrer' : undefined"
 								class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
 								:aria-selected="index === selectedIndex"
 								:style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
-								@click="handleItemClick(option, index)"
+								@click="(event) => handleItemClick(option, index, event)"
 								@focus="selectedIndex = index"
 								@mouseover="handleMouseOver(index)"
 							>
 								<slot :name="option.id">
 									<component :is="option.icon" v-if="option.icon" class="size-5" />
-									{{ option.id }}
+									{{ option.label ?? option.id }}
 								</slot>
 							</AutoLink>
 							<span v-else>
 								<slot :name="option.id">
 									<component :is="option.icon" v-if="option.icon" class="size-5" />
-									{{ option.id }}
+									{{ option.label ?? option.id }}
 								</slot>
 							</span>
 						</ButtonStyled>
@@ -95,29 +105,48 @@
 </template>
 
 <script setup lang="ts">
-import { AutoLink, ButtonStyled } from '@modrinth/ui'
 import { onClickOutside, useElementHover } from '@vueuse/core'
 import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
-interface Option {
+import AutoLink from './AutoLink.vue'
+import ButtonStyled from './ButtonStyled.vue'
+
+type OptionColor =
+	| 'standard'
+	| 'brand'
+	| 'primary'
+	| 'danger'
+	| 'secondary'
+	| 'highlight'
+	| 'red'
+	| 'orange'
+	| 'green'
+	| 'blue'
+	| 'purple'
+
+export interface Option {
 	id: string
+	label?: string
 	icon?: Component
-	action?: (() => void) | string
+	action?: ((event?: MouseEvent) => void) | string
+	link?: string
+	external?: boolean
 	shown?: boolean
-	color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
+	color?: OptionColor
 	disabled?: boolean
 	tooltip?: string
+	remainOnClick?: boolean
 }
 
-type Divider = {
+export type Divider = {
 	divider?: boolean
 	shown?: boolean
 }
 
-type Item = Option | Divider
+export type Item = Option | Divider
 
 function isDivider(item: Item): item is Divider {
-	return (item as Divider).divider
+	return !!(item as Divider).divider
 }
 
 const props = withDefaults(
@@ -125,10 +154,16 @@ const props = withDefaults(
 		options: Item[]
 		hoverable?: boolean
 		btnClass?: string | string[] | Record<string, boolean>
+		disabled?: boolean
+		tooltip?: string
+		ariaLabel?: string
 	}>(),
 	{
 		hoverable: false,
 		btnClass: undefined,
+		disabled: false,
+		tooltip: undefined,
+		ariaLabel: undefined,
 	},
 )
 
@@ -191,6 +226,7 @@ const calculateMenuPosition = () => {
 
 const toggleMenu = (event: MouseEvent) => {
 	event.stopPropagation()
+	if (props.disabled) return
 	if (!props.hoverable) {
 		if (isOpen.value) {
 			closeMenu()
@@ -201,6 +237,7 @@ const toggleMenu = (event: MouseEvent) => {
 }
 
 const openMenu = () => {
+	if (props.disabled) return
 	isOpen.value = true
 	emit('open')
 	disableBodyScroll()
@@ -218,15 +255,18 @@ const closeMenu = () => {
 	document.removeEventListener('mousemove', handleMouseMove)
 }
 
-const selectOption = (option: Option) => {
+const selectOption = (option: Option, event?: MouseEvent) => {
 	emit('select', option)
 	if (typeof option.action === 'function') {
-		option.action()
+		option.action(event)
 	}
-	closeMenu()
+	if (!option.remainOnClick) {
+		closeMenu()
+	}
 }
 
 const handleMouseDown = (event: MouseEvent) => {
+	if (props.disabled) return
 	event.preventDefault()
 	isMouseDown.value = true
 }
@@ -270,10 +310,10 @@ const handleMouseMove = (event: MouseEvent) => {
 	}
 }
 
-const handleItemClick = (option: Option, index: number) => {
+const handleItemClick = (option: Option, index: number, event?: MouseEvent) => {
 	if (option.disabled) return
 	selectedIndex.value = index
-	selectOption(option)
+	selectOption(option, event)
 }
 
 const handleMouseOver = (index: number) => {
@@ -432,4 +472,23 @@ onClickOutside(menuRef, (event) => {
 		closeMenu()
 	}
 })
+
+function optionLink(option: Option) {
+	if (typeof option.action === 'string') return option.action
+	return option.link
+}
+
+function optionButtonColor(option: Option) {
+	switch (option.color) {
+		case 'primary':
+			return 'brand'
+		case 'danger':
+			return 'red'
+		case 'secondary':
+		case 'highlight':
+			return 'standard'
+		default:
+			return option.color ?? 'standard'
+	}
+}
 </script>

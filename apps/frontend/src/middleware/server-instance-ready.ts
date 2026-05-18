@@ -50,8 +50,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
 		const content = await queryClient.ensureQueryData({
 			queryKey: ['content', 'list', 'v1', serverId, worldId],
-			queryFn: () =>
-				client.archon.content_v1.getAddons(serverId, worldId, { from_modpack: false }),
+			queryFn: () => client.archon.content_v1.getAddons(serverId, worldId, { from_modpack: false }),
 			staleTime: 30_000,
 		})
 

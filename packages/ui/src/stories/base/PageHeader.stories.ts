@@ -1,5 +1,9 @@
 import {
+	AffiliateIcon,
+	ClipboardCopyIcon,
+	DownloadIcon,
 	GlobeIcon,
+	HeartIcon,
 	LeftArrowIcon,
 	LinkIcon,
 	MoreVerticalIcon,
@@ -19,7 +23,7 @@ import ServerIcon from '../../components/servers/icons/ServerIcon.vue'
 const noop = () => undefined
 
 const meta = {
-	title: 'Base/PageHeader Prototype',
+	title: 'Base/PageHeader',
 	component: PageHeader,
 	parameters: {
 		layout: 'padded',
@@ -88,6 +92,67 @@ export const AppInstanceHeader: Story = {
 				labelHidden: true,
 				type: 'transparent',
 				tooltip: 'More actions',
+				menuActions: [
+					{
+						id: 'open-folder',
+						label: 'Open folder',
+						icon: GlobeIcon,
+						action: noop,
+					},
+					{
+						id: 'copy-id',
+						label: 'Copy ID',
+						icon: ClipboardCopyIcon,
+						action: noop,
+					},
+				],
+			},
+		],
+	},
+}
+
+export const CreatorHeader: Story = {
+	args: {
+		header: 'Prospector',
+		summary: 'A Modrinth creator with a handful of popular projects.',
+		leading: {
+			type: 'avatar',
+			src: null,
+			alt: 'Prospector',
+			avatarSize: '96px',
+			circle: true,
+		},
+		badges: [
+			{
+				id: 'affiliate',
+				label: 'Affiliate',
+				icon: AffiliateIcon,
+				class: 'border-brand-highlight bg-brand-highlight text-brand',
+			},
+		],
+		metadata: [
+			{
+				id: 'projects',
+				label: '12 projects',
+				icon: Gamepad2Icon,
+			},
+			{
+				id: 'downloads',
+				label: '4.2M downloads',
+				icon: DownloadIcon,
+			},
+			{
+				id: 'followers',
+				label: '82K followers',
+				icon: HeartIcon,
+			},
+		],
+		actions: [
+			{
+				id: 'follow',
+				label: 'Follow',
+				icon: HeartIcon,
+				color: 'brand',
 				onClick: noop,
 			},
 		],
@@ -258,4 +323,31 @@ export const ServerPanelInstanceHeader: Story = {
 			},
 		],
 	},
+}
+
+export const CustomMetadata: Story = {
+	render: () => ({
+		components: { PageHeader, DownloadIcon, HeartIcon },
+		template: `
+			<PageHeader
+				header="Custom Metadata Project"
+				summary="Custom metadata is reserved for rich stat rows that cannot be represented by icon and label data."
+				:leading="{ type: 'avatar', src: null, alt: 'Custom Metadata Project', avatarSize: '96px' }"
+				:metadata="[{ id: 'project-stats', type: 'custom', class: 'contents' }]"
+			>
+				<template #metadata-project-stats>
+					<div class="flex flex-wrap items-center gap-3">
+						<div class="flex items-center gap-2 font-semibold">
+							<DownloadIcon class="h-6 w-6 text-secondary" />
+							1.2M downloads
+						</div>
+						<div class="flex items-center gap-2 font-semibold">
+							<HeartIcon class="h-6 w-6 text-secondary" />
+							50K followers
+						</div>
+					</div>
+				</template>
+			</PageHeader>
+		`,
+	}),
 }

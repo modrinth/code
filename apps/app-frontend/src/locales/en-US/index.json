@@ -161,6 +161,9 @@
   "app.content-install.no-compatible-versions": {
     "message": "No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically."
   },
+  "app.browse.server.world-fallback-name": {
+    "message": "Instance"
+  },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
   },

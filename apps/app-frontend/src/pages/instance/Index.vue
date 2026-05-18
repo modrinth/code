@@ -13,215 +13,57 @@
 				@unlinked="fetchInstance"
 			/>
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
-			<ContentPageHeader>
-				<template #icon>
-					<Avatar
-						:src="icon ? icon : undefined"
-						:alt="instance.name"
-						size="64px"
-						:tint-by="instance.path"
-					/>
-				</template>
-				<template #title>
-					{{ instance.name }}
-				</template>
-				<template #stats>
+			<PageHeader
+				:header="instance.name"
+				:leading="instanceHeaderLeading"
+				:metadata="instanceHeaderMetadata"
+				:actions="instanceHeaderActions"
+			>
+				<template #metadata-server-details>
 					<div class="flex items-center flex-wrap gap-2">
-						<template v-if="!isServerInstance">
-							<div class="flex min-w-0 items-center gap-2 font-medium text-secondary text-nowrap">
-								<Gamepad2Icon class="flex size-5 shrink-0" aria-hidden="true" />
-								<span class="truncate">{{ instance.game_version }}</span>
-							</div>
-
-							<BulletDivider />
-
-							<div class="flex min-w-0 items-center gap-2 font-medium text-secondary text-nowrap">
-								<ServerLoaderIcon
-									v-if="loaderDisplayName"
-									:loader="loaderDisplayName"
-									class="flex size-5 shrink-0"
-									aria-hidden="true"
-								/>
-								<span class="truncate">{{ loaderLabel }}</span>
-							</div>
-
-							<template v-if="showInstancePlayTime">
-								<BulletDivider />
-
-								<div class="flex min-w-0 items-center gap-2 font-medium text-secondary text-nowrap">
-									<TimerIcon class="flex size-5 shrink-0" aria-hidden="true" />
-									<span class="truncate">
-										{{ playtimeLabel }}
-									</span>
-								</div>
-							</template>
-						</template>
-
-						<template v-else>
-							<template v-if="loadingServerPing">
-								<ServerOnlinePlayers
-									v-if="playersOnline !== undefined"
-									:online="playersOnline"
-									:status-online="statusOnline"
-									hide-label
-								/>
-								<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
-								<div
-									v-if="
-										(playersOnline !== undefined || recentPlays !== undefined) &&
-										(minecraftServer?.region || ping)
-									"
-									class="w-1.5 h-1.5 rounded-full bg-surface-5"
-								></div>
-								<ServerPing v-if="ping" :ping="ping" />
-							</template>
-
-							<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
-
+						<template v-if="loadingServerPing">
+							<ServerOnlinePlayers
+								v-if="playersOnline !== undefined"
+								:online="playersOnline"
+								:status-online="statusOnline"
+								hide-label
+							/>
+							<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
 							<div
-								v-if="minecraftServer?.region || ping"
+								v-if="
+									(playersOnline !== undefined || recentPlays !== undefined) &&
+									(minecraftServer?.region || ping)
+								"
 								class="w-1.5 h-1.5 rounded-full bg-surface-5"
 							></div>
-
-							<div
-								v-if="linkedProjectV3"
-								class="flex gap-1.5 items-center font-medium text-primary"
-							>
-								Linked to
-								<Avatar
-									:src="linkedProjectV3.icon_url"
-									:alt="linkedProjectV3.name"
-									:tint-by="instance.path"
-									size="24px"
-								/>
-								<router-link
-									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-									class="hover:underline text-primary truncate"
-								>
-									{{ linkedProjectV3.name }}
-								</router-link>
-							</div>
+							<ServerPing v-if="ping" :ping="ping" />
 						</template>
-					</div>
-				</template>
-				<template #actions>
-					<div class="flex gap-2">
-						<ButtonStyled
-							v-if="
-								[
-									'installing',
-									'pack_installing',
-									'pack_installed',
-									'not_installed',
-									'minecraft_installing',
-								].includes(instance.install_stage)
-							"
-							color="brand"
-							size="large"
-						>
-							<button disabled>Installing...</button>
-						</ButtonStyled>
-						<ButtonStyled
-							v-else-if="instance.install_stage !== 'installed'"
-							color="brand"
-							size="large"
-						>
-							<button @click="repairInstance()">
-								<DownloadIcon />
-								Repair
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else-if="playing === true" color="red" size="large">
-							<button :disabled="stopping" @click="stopInstance('InstancePage')">
-								<StopCircleIcon />
-								{{ stopping ? 'Stopping...' : 'Stop' }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled
-							v-else-if="playing === false && loading === false && !isServerInstance"
-							color="brand"
-							size="large"
-						>
-							<button @click="startInstance('InstancePage')">
-								<PlayIcon />
-								Play
-							</button>
-						</ButtonStyled>
-						<div
-							v-else-if="playing === false && loading === false && isServerInstance"
-							class="joined-buttons"
-						>
-							<ButtonStyled color="brand" size="large">
-								<button @click="handlePlayServer()">
-									<PlayIcon />
-									Play
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="brand" size="large">
-								<OverflowMenu
-									:options="[
-										{
-											id: 'join_server',
-											action: () => handlePlayServer(),
-										},
-										{
-											id: 'launch_instance',
-											action: () => startInstance('InstancePage'),
-										},
-									]"
-								>
-									<div class="w-0 text-xl relative top-0.5 right-2.5">
-										<DropdownIcon />
-									</div>
 
-									<template #join_server>
-										<PlayIcon />
-										Join server
-									</template>
-									<template #launch_instance>
-										<PlayIcon />
-										Launch instance
-									</template>
-								</OverflowMenu>
-							</ButtonStyled>
-						</div>
-						<ButtonStyled
-							v-else-if="loading === true && playing === false"
-							color="brand"
-							size="large"
-						>
-							<button disabled>Starting...</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large">
-							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
-								<SettingsIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled type="transparent" circular size="large">
-							<OverflowMenu
-								:options="[
-									{
-										id: 'open-folder',
-										action: () => {
-											if (instance) showProfileInFolder(instance.path)
-										},
-									},
-									{
-										id: 'export-mrpack',
-										action: () => exportModal?.show(),
-									},
-								]"
+						<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
+
+						<div
+							v-if="minecraftServer?.region || ping"
+							class="w-1.5 h-1.5 rounded-full bg-surface-5"
+						></div>
+
+						<div v-if="linkedProjectV3" class="flex gap-1.5 items-center font-medium text-primary">
+							Linked to
+							<Avatar
+								:src="linkedProjectV3.icon_url"
+								:alt="linkedProjectV3.name"
+								:tint-by="instance.path"
+								size="24px"
+							/>
+							<router-link
+								:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
+								class="hover:underline text-primary truncate"
 							>
-								<MoreVerticalIcon />
-								<template #share-instance> <UserPlusIcon /> Share instance </template>
-								<template #host-a-server> <ServerIcon /> Create a server </template>
-								<template #open-folder> <FolderOpenIcon /> Open folder </template>
-								<template #export-mrpack> <PackageIcon /> Export modpack </template>
-							</OverflowMenu>
-						</ButtonStyled>
+								{{ linkedProjectV3.name }}
+							</router-link>
+						</div>
 					</div>
 				</template>
-			</ContentPageHeader>
+			</PageHeader>
 		</div>
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
 			<NavTabs :links="tabs" />
@@ -285,7 +127,6 @@ import {
 	CheckCircleIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
-	DropdownIcon,
 	EditIcon,
 	ExternalIcon,
 	EyeIcon,
@@ -296,26 +137,21 @@ import {
 	PackageIcon,
 	PlayIcon,
 	PlusIcon,
-	ServerIcon,
 	SettingsIcon,
 	StopCircleIcon,
 	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TerminalSquareIcon,
 	TimerIcon,
 	UpdatedIcon,
-	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
-	BulletDivider,
-	ButtonStyled,
-	ContentPageHeader,
 	formatLoaderLabel,
 	injectNotificationManager,
 	LoaderIcon as ServerLoaderIcon,
 	NavTabs,
-	OverflowMenu,
+	PageHeader,
 	ServerOnlinePlayers,
 	ServerPing,
 	ServerRecentPlays,
@@ -731,6 +567,183 @@ const timePlayedHumanized = computed(() => {
 const playtimeLabel = computed(() =>
 	timePlayed.value > 0 ? timePlayedHumanized.value : 'Never played',
 )
+
+const instanceHeaderLeading = computed(() => ({
+	type: 'avatar' as const,
+	src: icon.value ? icon.value : undefined,
+	alt: instance.value?.name,
+	avatarSize: '64px',
+	tintBy: instance.value?.path,
+}))
+
+const instanceHeaderMetadata = computed(() => {
+	if (!instance.value) return []
+	if (isServerInstance.value) {
+		return [
+			{
+				id: 'server-details',
+				type: 'custom' as const,
+				class: 'contents',
+			},
+		]
+	}
+
+	return [
+		{
+			id: 'game-version',
+			label: instance.value.game_version,
+			icon: Gamepad2Icon,
+		},
+		{
+			id: 'loader',
+			label: loaderLabel.value,
+			icon: ServerLoaderIcon,
+			iconProps: {
+				loader: loaderDisplayName.value,
+			},
+		},
+		...(showInstancePlayTime.value
+			? [
+					{
+						id: 'playtime',
+						label: playtimeLabel.value,
+						icon: TimerIcon,
+					},
+				]
+			: []),
+	]
+})
+
+const installingStages = [
+	'installing',
+	'pack_installing',
+	'pack_installed',
+	'not_installed',
+	'minecraft_installing',
+]
+
+const primaryInstanceAction = computed(() => {
+	if (!instance.value) return null
+
+	if (installingStages.includes(instance.value.install_stage)) {
+		return {
+			id: 'installing',
+			label: 'Installing...',
+			color: 'brand' as const,
+			disabled: true,
+		}
+	}
+
+	if (instance.value.install_stage !== 'installed') {
+		return {
+			id: 'repair',
+			label: 'Repair',
+			icon: DownloadIcon,
+			color: 'brand' as const,
+			onClick: () => {
+				void repairInstance()
+			},
+		}
+	}
+
+	if (playing.value === true) {
+		return {
+			id: 'stop',
+			label: stopping.value ? 'Stopping...' : 'Stop',
+			icon: StopCircleIcon,
+			color: 'red' as const,
+			disabled: stopping.value,
+			onClick: () => {
+				void stopInstance('InstancePage')
+			},
+		}
+	}
+
+	if (playing.value === false && loading.value === false && !isServerInstance.value) {
+		return {
+			id: 'play',
+			label: 'Play',
+			icon: PlayIcon,
+			color: 'brand' as const,
+			onClick: () => {
+				void startInstance('InstancePage')
+			},
+		}
+	}
+
+	if (playing.value === false && loading.value === false && isServerInstance.value) {
+		return {
+			id: 'play',
+			label: 'Play',
+			color: 'brand' as const,
+			joinedActions: [
+				{
+					id: 'join_server',
+					label: 'Play',
+					icon: PlayIcon,
+					action: () => {
+						void handlePlayServer()
+					},
+				},
+				{
+					id: 'launch_instance',
+					label: 'Launch instance',
+					icon: PlayIcon,
+					action: () => {
+						void startInstance('InstancePage')
+					},
+				},
+			],
+		}
+	}
+
+	if (loading.value === true && playing.value === false) {
+		return {
+			id: 'starting',
+			label: 'Starting...',
+			color: 'brand' as const,
+			disabled: true,
+		}
+	}
+
+	return null
+})
+
+const instanceHeaderActions = computed(() => [
+	...(primaryInstanceAction.value ? [primaryInstanceAction.value] : []),
+	{
+		id: 'settings',
+		label: 'Instance settings',
+		icon: SettingsIcon,
+		labelHidden: true,
+		tooltip: 'Instance settings',
+		onClick: () => settingsModal.value?.show(),
+	},
+	{
+		id: 'more',
+		label: 'More actions',
+		icon: MoreVerticalIcon,
+		labelHidden: true,
+		type: 'transparent' as const,
+		tooltip: 'More actions',
+		menuActions: [
+			{
+				id: 'open-folder',
+				label: 'Open folder',
+				icon: FolderOpenIcon,
+				action: () => {
+					if (instance.value) void showProfileInFolder(instance.value.path)
+				},
+			},
+			{
+				id: 'export-mrpack',
+				label: 'Export modpack',
+				icon: PackageIcon,
+				action: () => exportModal.value?.show(),
+			},
+		],
+	},
+])
 
 onUnmounted(() => {
 	unlistenProcesses()
