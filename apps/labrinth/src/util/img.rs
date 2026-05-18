@@ -129,6 +129,9 @@ fn process_image(
     if content_type.to_lowercase() == "image/gif" {
         return Ok((image_bytes, "gif".to_string()));
     }
+     if content_type.to_lowercase() == "image/webp" {
+        return Ok((image_bytes, "webp".to_string()));
+    }
 
     let mut img = image::load_from_memory(&image_bytes)?;
 
