@@ -6,7 +6,7 @@
 		@clear="clearFilterBar"
 	>
 		<template #search-actions="{ category, setSelectedValues }">
-			<div v-if="category.key === 'game_version'" class="flex w-40 justify-end">
+			<div v-if="category.key === 'game_version'" class="flex w-[150px] justify-end">
 				<Chips
 					:model-value="gameVersionType"
 					:items="gameVersionTypeOptions"
@@ -32,7 +32,7 @@
 		<template #category-footer="{ category, setSelectedValues, closeMenu }">
 			<DownloadsThresholdInput
 				v-if="category.key === 'country'"
-				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
 				label="Countries above"
 				input-aria-label="Country downloads threshold"
 				:threshold="countryDownloadsThreshold"
@@ -52,7 +52,7 @@
 			/>
 			<DownloadsThresholdInput
 				v-else-if="category.key === 'version_id'"
-				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
 				label="Project versions above"
 				input-aria-label="Project version downloads threshold"
 				:threshold="projectVersionDownloadsThreshold"
@@ -72,7 +72,7 @@
 			/>
 			<DownloadsThresholdInput
 				v-else-if="category.key === 'game_version'"
-				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
 				label="Game Versions above"
 				input-aria-label="Game version downloads threshold"
 				:threshold="gameVersionDownloadsThreshold"
@@ -95,7 +95,7 @@
 		<template #preview-footer="{ category, setSelectedValues, closeMenu }">
 			<DownloadsThresholdInput
 				v-if="category.key === 'country'"
-				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
 				label="Countries above"
 				input-aria-label="Country downloads threshold"
 				:threshold="countryDownloadsThreshold"
@@ -115,7 +115,7 @@
 			/>
 			<DownloadsThresholdInput
 				v-else-if="category.key === 'version_id'"
-				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
 				label="Project versions above"
 				input-aria-label="Project version downloads threshold"
 				:threshold="projectVersionDownloadsThreshold"
@@ -135,7 +135,7 @@
 			/>
 			<DownloadsThresholdInput
 				v-else-if="category.key === 'game_version'"
-				class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
 				label="Game Versions above"
 				input-aria-label="Game version downloads threshold"
 				:threshold="gameVersionDownloadsThreshold"

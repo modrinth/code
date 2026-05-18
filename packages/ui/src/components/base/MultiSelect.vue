@@ -127,7 +127,7 @@
 								:icon="SearchIcon"
 								type="text"
 								:placeholder="searchPlaceholder"
-								wrapper-class="grow bg-surface-4 mx-0 "
+								wrapper-class="grow bg-surface-4 mx-0"
 								input-class="ps-9 mx-1.5"
 								@input="handleSearchInput"
 								@keydown="handleSearchKeydown"
@@ -140,7 +140,7 @@
 						>
 							<div v-if="shouldShowSelectAll" class="sticky top-0 z-10 bg-surface-4">
 								<span
-									class="flex w-full items-center gap-2.5 cursor-pointer p-3 text-left transition-all duration-150 text-contrast hover:brightness-110 focus:brightness-110"
+									class="flex w-full items-center gap-2.5 cursor-pointer p-3 text-left transition-all duration-150 text-contrast hover:brightness-110"
 									:class="{ 'brightness-110': focusedIndex === -2 }"
 									data-option-index="-2"
 									:data-focused="focusedIndex === -2"
@@ -169,7 +169,7 @@
 							</div>
 						</div>
 
-						<div v-if="$slots.top" class="border-0 border-b border-solid border-b-surface-5 py-1.5">
+						<div v-if="$slots.top" class="border-0 border-b border-solid border-b-surface-5">
 							<slot
 								name="top"
 								:model-value="modelValue"
@@ -181,7 +181,7 @@
 
 						<div
 							v-if="shouldShowSelectionActions"
-							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-6 py-2.5 text-sm"
+							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-3 py-2.5 text-sm"
 						>
 							<span class="font-semibold text-secondary">{{ selectionActionsLabel }}</span>
 							<button
@@ -218,15 +218,16 @@
 									:key="getItemKey(item, index)"
 								>
 									<div
+										class="group/option-container"
 										:class="shouldVirtualizeOptions ? 'absolute left-0 right-0' : undefined"
 										:style="getOptionWrapperStyle(index)"
 									>
 										<div
 											v-if="isSectionHeader(item)"
-											class="flex items-center justify-between gap-3 text-sm font-bold text-secondary"
+											class="flex items-center justify-between gap-3 text-sm font-bold text-secondary border-t border-surface-5 border-solid border-0 group-first/option-container:border-t-0"
 											:class="[
 												item.class,
-												shouldVirtualizeOptions ? 'h-10 px-3 pr-0' : 'px-3 pr-0 pb-1 pt-2',
+												shouldVirtualizeOptions ? 'h-10 px-3' : 'h-10 px-3  pb-1 pt-2',
 											]"
 											role="presentation"
 										>
@@ -249,12 +250,11 @@
 											:aria-disabled="item.disabled || undefined"
 											:data-option-index="index"
 											:data-focused="focusedIndex === index"
-											class="flex w-full cursor-pointer items-center gap-2.5 p-3 focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4"
+											class="flex w-full cursor-pointer items-center gap-2.5 p-3 py-3.5 focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4 hover:brightness-110"
 											:class="[
 												item.class,
 												shouldVirtualizeOptions ? 'h-12' : undefined,
 												{
-													'brightness-110': focusedIndex === index,
 													'pointer-events-none cursor-not-allowed opacity-50': item.disabled,
 												},
 											]"
@@ -382,7 +382,7 @@ type VisibleMultiSelectItem<T> = {
 type OverlayScrollbarsInstance = NonNullable<ReturnType<typeof OverlayScrollbars>>
 
 const DROPDOWN_VIEWPORT_MARGIN = 8
-const DROPDOWN_GAP = 12
+const DROPDOWN_GAP = 8
 const DEFAULT_MAX_HEIGHT = 300
 const MULTI_SELECT_OPTION_ROW_HEIGHT = 48
 const MULTI_SELECT_VIRTUALIZATION_THRESHOLD = 80

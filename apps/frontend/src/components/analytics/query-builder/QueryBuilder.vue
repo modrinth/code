@@ -67,10 +67,10 @@
 						</div>
 					</template>
 					<template v-if="hasProjectOptions" #top>
-						<div class="px-3">
+						<div>
 							<button
 								type="button"
-								class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
+								class="flex w-full cursor-pointer items-center gap-2.5 border-0 bg-surface-4 p-3 py-3.5 text-left text-contrast shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110"
 								:aria-selected="isAllProjectsOptionSelected"
 								role="option"
 								@click="selectAllProjectsMode"

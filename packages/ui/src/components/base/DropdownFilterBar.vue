@@ -99,7 +99,7 @@
 			<div
 				v-if="isAddMenuOpen"
 				ref="menuContainer"
-				class="fixed z-[9999] flex flex-col gap-2 overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 p-3 shadow-2xl"
+				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
 				:style="addMenuStyle"
 				role="menu"
 				@mousedown.stop
@@ -111,8 +111,8 @@
 					:key="category.key"
 					:ref="(element) => setCategoryButtonRef(category.key, element)"
 					type="button"
-					class="group/filter-menu-button flex h-11 w-full appearance-none items-center justify-between gap-1 rounded-xl border-0 px-3 text-left text-base font-medium text-primary shadow-none transition-colors duration-150 hover:bg-surface-5 focus:bg-surface-5"
-					:class="category.key === activeCategoryKey ? 'bg-surface-5' : ''"
+					class="group/filter-menu-button flex h-12 w-full appearance-none items-center justify-between gap-1 border-0 px-3 text-left text-base font-medium text-primary shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110 bg-surface-4"
+					:class="category.key === activeCategoryKey ? '!brightness-110' : ''"
 					role="menuitem"
 					@mouseenter="handleCategoryMouseEnter(category.key)"
 					@focus="activateCategory(category.key)"
@@ -130,7 +130,7 @@
 		<div
 			v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 			ref="submenu"
-			class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-4 shadow-xl"
+			class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
 			:class="activeCategory.submenuClass ?? 'w-72'"
 			:style="submenuStyle"
 			@mouseenter="handleSubmenuMouseEnter"
@@ -139,14 +139,15 @@
 		>
 			<div
 				v-if="activeCategory.searchable"
-				class="flex justify-between border-0 border-b border-solid border-b-surface-5 px-3 py-2.5"
+				class="flex justify-between border-0 border-b border-solid border-b-surface-5 py-1.5 pr-2"
 			>
 				<StyledInput
 					v-model="categorySearchQuery"
 					:icon="SearchIcon"
 					type="text"
 					:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
-					wrapper-class="grow bg-surface-4"
+					wrapper-class="grow bg-surface-4 mx-0"
+					input-class="ps-9 mx-1.5"
 				/>
 				<slot
 					name="search-actions"
@@ -159,7 +160,7 @@
 
 			<div
 				v-if="activeCategorySelectionCount > 0"
-				class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-6 py-2.5 text-sm"
+				class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-3 py-2.5 text-sm"
 			>
 				<span class="font-semibold text-secondary">{{ activeCategorySelectionLabel }}</span>
 				<button
@@ -172,62 +173,72 @@
 					Deselect all
 				</button>
 			</div>
-			<div ref="activeCategoryOptionsContainer" class="min-h-0 flex-1 overflow-y-auto p-3">
+			<div
+				ref="activeCategoryOptionsScrollbar"
+				class="dropdown-filter-bar-options-scrollbar min-h-0 flex-1 bg-surface-4"
+				data-overlayscrollbars-initialize
+			>
 				<div
-					v-if="filteredActiveCategoryOptions.length === 0"
-					class="px-3 py-2 text-sm font-medium text-secondary"
-				>
-					{{ activeCategoryEmptyStateLabel }}
-				</div>
-				<div
-					v-else
-					ref="activeCategoryOptionsListContainer"
-					:class="shouldVirtualizeActiveCategoryOptions ? 'relative' : 'flex flex-col gap-2'"
-					:style="activeCategoryOptionsListStyle"
+					ref="activeCategoryOptionsContainer"
+					class="h-full min-h-0 overflow-y-auto"
+					data-overlayscrollbars-viewport
 				>
 					<div
-						v-for="{ option, index } in renderedVisibleActiveCategoryOptions"
-						:key="`${activeCategory.key}-${option.value}`"
-						:class="shouldVirtualizeActiveCategoryOptions ? 'absolute left-0 right-0' : undefined"
-						:style="getActiveCategoryOptionWrapperStyle(index)"
+						v-if="filteredActiveCategoryOptions.length === 0"
+						class="px-3 py-2 text-sm font-medium text-secondary"
 					>
-						<button
-							type="button"
-							class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-transparent p-3 text-left text-contrast shadow-none transition-colors duration-150 hover:bg-surface-5"
-							:class="[
-								shouldVirtualizeActiveCategoryOptions ? 'h-12' : undefined,
-								{ 'pointer-events-none opacity-50': option.disabled },
-							]"
-							:aria-disabled="option.disabled || undefined"
-							:aria-checked="option.selected"
-							role="checkbox"
-							@click="toggleFilterOption(activeCategory.key, option)"
+						{{ activeCategoryEmptyStateLabel }}
+					</div>
+					<div
+						v-else
+						ref="activeCategoryOptionsListContainer"
+						:class="shouldVirtualizeActiveCategoryOptions ? 'relative' : 'flex flex-col'"
+						:style="activeCategoryOptionsListStyle"
+					>
+						<div
+							v-for="{ option, index } in renderedVisibleActiveCategoryOptions"
+							:key="`${activeCategory.key}-${option.value}`"
+							:class="shouldVirtualizeActiveCategoryOptions ? 'absolute left-0 right-0' : undefined"
+							:style="getActiveCategoryOptionWrapperStyle(index)"
 						>
-							<span
-								class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
-								:class="
-									option.selected
-										? 'border-button-border bg-brand text-brand-inverted'
-										: 'border-surface-5 bg-surface-2'
-								"
+							<button
+								type="button"
+								class="flex w-full cursor-pointer items-center gap-2.5 border-0 p-3 text-left text-contrast shadow-none transition-colors duration-150 bg-surface-4 hover:brightness-110 focus-visible:outline-none"
+								:class="[
+									shouldVirtualizeActiveCategoryOptions ? 'h-12' : undefined,
+									{ 'pointer-events-none opacity-50': option.disabled },
+								]"
+								:aria-disabled="option.disabled || undefined"
+								:aria-checked="option.selected"
+								role="checkbox"
+								@click="toggleFilterOption(activeCategory.key, option)"
 							>
-								<CheckIcon v-if="option.selected" aria-hidden="true" stroke-width="3" />
-							</span>
-							<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
 								<span
-									class="min-w-0 truncate font-semibold leading-tight"
-									:class="option.selected ? 'text-contrast' : 'text-primary'"
+									class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
+									:class="
+										option.selected
+											? 'border-button-border bg-brand text-brand-inverted'
+											: 'border-surface-5 bg-surface-2'
+									"
 								>
-									{{ option.label }}
+									<CheckIcon v-if="option.selected" aria-hidden="true" stroke-width="3" />
 								</span>
-								<slot
-									name="option-right"
-									:category="activeCategory"
-									:option="option"
-									:selected="option.selected"
-								></slot>
-							</div>
-						</button>
+								<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
+									<span
+										class="min-w-0 truncate font-semibold leading-tight"
+										:class="option.selected ? 'text-contrast' : 'text-primary'"
+									>
+										{{ option.label }}
+									</span>
+									<slot
+										name="option-right"
+										:category="activeCategory"
+										:option="option"
+										:selected="option.selected"
+									></slot>
+								</div>
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -253,6 +264,8 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
+import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
+import 'overlayscrollbars/overlayscrollbars.css'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
@@ -290,6 +303,8 @@ type VisibleDropdownFilterBarOption = {
 	index: number
 }
 
+type OverlayScrollbarsInstance = NonNullable<ReturnType<typeof OverlayScrollbars>>
+
 type Point = {
 	x: number
 	y: number
@@ -311,11 +326,22 @@ type SubmenuPositionOptions = {
 }
 
 const ADD_MENU_WIDTH = 250
-const DROPDOWN_GAP = 12
+const DROPDOWN_GAP = 8
 const DROPDOWN_VIEWPORT_MARGIN = 8
 const DEFAULT_PREVIEW_DROPDOWN_MIN_WIDTH = '18rem'
-const DROPDOWN_FILTER_OPTION_ROW_HEIGHT = 56
+const DROPDOWN_FILTER_OPTION_ROW_HEIGHT = 48
 const DROPDOWN_FILTER_VIRTUALIZATION_THRESHOLD = 80
+const OPTIONS_OVERLAY_SCROLLBARS_OPTIONS = Object.freeze<PartialOptions>({
+	overflow: {
+		x: 'hidden',
+		y: 'scroll',
+	},
+	scrollbars: {
+		theme: 'os-theme-modrinth',
+		autoHide: 'leave',
+		autoHideSuspend: true,
+	},
+})
 const TAILWIND_WIDTH_CLASS_SIZE: Record<string, string> = {
 	'w-72': '18rem',
 }
@@ -360,7 +386,9 @@ const hasSubmenuPosition = ref(false)
 const addMenuTrigger = ref<HTMLElement | null>(null)
 const menuContainer = ref<HTMLElement | null>(null)
 const submenu = ref<HTMLElement | null>(null)
+const activeCategoryOptionsScrollbar = ref<HTMLElement | null>(null)
 const activeCategoryOptionsContainer = ref<HTMLElement | null>(null)
+const activeCategoryOptionsOverlayScrollbars = ref<OverlayScrollbarsInstance | null>(null)
 const addMenuStyle = ref<CSSProperties>({
 	left: '0px',
 	minWidth: '0px',
@@ -497,7 +525,7 @@ const appliedFilterPreviews = computed(() =>
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
 const previewTriggerClass =
-	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 hover:bg-surface-5 hover:brightness-100 active:brightness-100'
+	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 transition-all bg-surface-4 hover:brightness-110 active:brightness-110'
 
 function cloneSelectedFilters(filters: DropdownFilterBarValue): DropdownFilterBarValue {
 	return Object.fromEntries(
@@ -721,6 +749,44 @@ function getActiveCategoryOptionWrapperStyle(index: number): CSSProperties | und
 	return {
 		transform: `translateY(${index * DROPDOWN_FILTER_OPTION_ROW_HEIGHT}px)`,
 	}
+}
+
+async function initializeActiveCategoryOptionsOverlayScrollbars() {
+	await nextTick()
+
+	if (!isAddMenuOpen.value || renderedActiveCategoryOptions.value.length === 0) {
+		destroyActiveCategoryOptionsOverlayScrollbars()
+		return
+	}
+
+	if (
+		!activeCategoryOptionsScrollbar.value ||
+		!activeCategoryOptionsContainer.value ||
+		!activeCategoryOptionsListContainer.value
+	) {
+		return
+	}
+
+	if (activeCategoryOptionsOverlayScrollbars.value) {
+		activeCategoryOptionsOverlayScrollbars.value.update(true)
+		return
+	}
+
+	activeCategoryOptionsOverlayScrollbars.value = OverlayScrollbars(
+		{
+			target: activeCategoryOptionsScrollbar.value,
+			elements: {
+				viewport: activeCategoryOptionsContainer.value,
+				content: activeCategoryOptionsListContainer.value,
+			},
+		},
+		OPTIONS_OVERLAY_SCROLLBARS_OPTIONS,
+	)
+}
+
+function destroyActiveCategoryOptionsOverlayScrollbars() {
+	activeCategoryOptionsOverlayScrollbars.value?.destroy()
+	activeCategoryOptionsOverlayScrollbars.value = null
 }
 
 function getCategorySelectionCount(
@@ -969,7 +1035,7 @@ function getSubmenuPosition({
 	viewportWidth,
 	viewportHeight,
 }: SubmenuPositionOptions): Point {
-	const gap = 20
+	const gap = 8
 	const viewportPadding = 8
 	const preferredLeft = buttonRect.right + gap
 	const left =
@@ -1187,12 +1253,35 @@ watch(isAddMenuOpen, (isOpen) => {
 		hasSubmenuPosition.value = false
 		resetPendingCategory()
 		stopAddMenuPositionTracking()
+		destroyActiveCategoryOptionsOverlayScrollbars()
 	}
 })
 
 watch(categorySearchQuery, () => {
 	if (activeCategoryOptionsContainer.value) {
 		activeCategoryOptionsContainer.value.scrollTop = 0
+	}
+	initializeActiveCategoryOptionsOverlayScrollbars()
+	scheduleSubmenuPositionUpdate()
+})
+
+watch(activeCategoryKey, (categoryKey) => {
+	if (categoryKey) {
+		initializeActiveCategoryOptionsOverlayScrollbars()
+	} else {
+		destroyActiveCategoryOptionsOverlayScrollbars()
+	}
+})
+
+watch(renderedActiveCategoryOptions, () => {
+	if (!isAddMenuOpen.value) {
+		return
+	}
+
+	if (renderedActiveCategoryOptions.value.length > 0) {
+		initializeActiveCategoryOptionsOverlayScrollbars()
+	} else {
+		destroyActiveCategoryOptionsOverlayScrollbars()
 	}
 	scheduleSubmenuPositionUpdate()
 })
@@ -1217,6 +1306,7 @@ watch(
 onBeforeUnmount(() => {
 	clearPendingCategoryTimeout()
 	stopAddMenuPositionTracking()
+	destroyActiveCategoryOptionsOverlayScrollbars()
 	if (isAddMenuOpen.value) {
 		commitAddMenuDraft()
 	}
@@ -1227,5 +1317,21 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .checkbox-shadow {
 	box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.dropdown-filter-bar-options-scrollbar :deep(.os-theme-modrinth) {
+	--os-size: 10px;
+	--os-padding-perpendicular: 2px;
+	--os-padding-axis: 2px;
+	--os-track-bg: transparent;
+	--os-track-bg-hover: transparent;
+	--os-track-bg-active: transparent;
+	--os-handle-border-radius: 9999px;
+	--os-handle-border: 2px solid var(--color-surface-4);
+	--os-handle-border-hover: 2px solid var(--color-surface-4);
+	--os-handle-border-active: 2px solid var(--color-surface-4);
+	--os-handle-bg: var(--color-scrollbar, var(--color-surface-5));
+	--os-handle-bg-hover: var(--color-scrollbar, var(--color-surface-5));
+	--os-handle-bg-active: var(--color-scrollbar, var(--color-surface-5));
 }
 </style>

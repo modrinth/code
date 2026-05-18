@@ -335,6 +335,14 @@ export const VirtualizedSubmenu: Story = {
 			},
 		],
 	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers the add-menu submenu with flush rows, square hover states, and OverlayScrollbars.',
+			},
+		},
+	},
 }
 
 export const CustomControls: Story = {

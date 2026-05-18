@@ -128,7 +128,7 @@
 										:aria-selected="listbox && item.value === modelValue"
 										:aria-disabled="item.disabled || undefined"
 										:data-focused="focusedIndex === index"
-										class="group/option flex items-center gap-2.5 cursor-pointer p-3 text-left transition-all duration-150 bg-surface-4 text-contrast hover:brightness-110 focus:brightness-110"
+										class="group/option flex items-center gap-2.5 cursor-pointer p-3 py-3.5 text-left transition-all duration-150"
 										:class="getOptionClasses(item, index)"
 										tabindex="-1"
 										@mousedown.prevent
@@ -220,7 +220,7 @@ export interface ComboboxOption<T> {
 type OverlayScrollbarsInstance = NonNullable<ReturnType<typeof OverlayScrollbars>>
 
 const DROPDOWN_VIEWPORT_MARGIN = 8
-const DROPDOWN_GAP = 12
+const DROPDOWN_GAP = 8
 const DEFAULT_MAX_HEIGHT = 300
 const OPTIONS_OVERLAY_SCROLLBARS_OPTIONS = Object.freeze<PartialOptions>({
 	overflow: {
@@ -397,8 +397,9 @@ function getOptionClasses(item: ComboboxOption<T> & { key: string }, index: numb
 	return [
 		item.class,
 		{
-			'bg-highlight-green text-green hover:bg-highlight-green focus:bg-highlight-green': isSelected,
-			'brightness-125': focusedIndex.value === index && !isSelected,
+			'bg-surface-4 text-contrast hover:brightness-110 focus:brightness-110': !isSelected,
+			'bg-highlight-green text-green !cursor-default hover:bg-highlight-green focus:bg-highlight-green':
+				isSelected,
 			'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
 		},
 	]
@@ -595,6 +596,8 @@ function handleTriggerClick(event: MouseEvent) {
 
 function handleOptionClick(option: ComboboxOption<T>, index: number) {
 	if (option.disabled || option.type === 'divider') return
+	const isSelected = props.listbox && option.value === props.modelValue
+	if (isSelected) return
 
 	focusedIndex.value = index
 
