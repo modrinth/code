@@ -92,7 +92,17 @@
 			</template>
 		</ErrorInformationCard>
 	</div>
-	<!-- SERVER START -->
+	<div
+		v-else-if="serverData && isInstanceDetailRoute"
+		data-pyro-instance-manager-root
+		class="experimental-styles-within relative mx-auto box-border flex w-full min-w-0 flex-col px-6 transition-all duration-300"
+		:class="[
+			'server-panel-' + revealState,
+			isNuxt ? 'min-h-[100svh] max-w-[1280px] pb-16' : 'min-h-[calc(100svh-100px)] pb-6',
+		]"
+	>
+		<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
+	</div>
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
@@ -115,61 +125,18 @@
 				:server="serverData"
 				:server-image="serverImage"
 				:server-project="serverProject"
+				:active-world-name="activeWorldName"
 				:uptime-seconds="showUptime ? uptimeSeconds : undefined"
-			>
-				<template #actions>
-					<div class="flex gap-2">
-						<PanelServerActionButton :disabled="!!installError" />
-						<Tooltip
-							theme="dismissable-prompt"
-							:triggers="[]"
-							:shown="showSettingsHint"
-							:auto-hide="false"
-							placement="bottom-end"
-						>
-							<ButtonStyled circular size="large">
-								<button
-									v-tooltip="showSettingsHint ? undefined : formatMessage(messages.serverSettings)"
-									@click="
-										() => {
-											openServerSettingsModal()
-											dismissSettingsHint()
-										}
-									"
-								>
-									<SettingsIcon />
-								</button>
-							</ButtonStyled>
-							<template #popper>
-								<div class="grid grid-cols-[min-content] gap-1">
-									<div class="flex min-w-48 items-center justify-between gap-8">
-										<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
-											{{ formatMessage(settingsHintMessages.title) }}
-										</h3>
-										<ButtonStyled size="small" circular>
-											<button
-												v-tooltip="formatMessage(settingsHintMessages.dismiss)"
-												@click="dismissSettingsHint"
-											>
-												<XIcon aria-hidden="true" />
-											</button>
-										</ButtonStyled>
-									</div>
-									<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-										{{ formatMessage(settingsHintMessages.description) }}
-									</p>
-								</div>
-							</template>
-						</Tooltip>
-						<PanelServerOverflowMenu
-							:disabled="!!installError"
-							:uptime-seconds="uptimeSeconds"
-							:show-copy-id-action="showCopyIdAction"
-							:show-debug-info="showAdvancedDebugInfo"
-						/>
-					</div>
-				</template>
-			</ServerManageHeader>
+				:worlds="serverFull?.worlds ?? []"
+				:power-disabled="!!installError"
+				:settings-label="formatMessage(messages.serverSettings)"
+				:show-settings-hint="showSettingsHint"
+				:settings-hint-title="formatMessage(settingsHintMessages.title)"
+				:settings-hint-description="formatMessage(settingsHintMessages.description)"
+				:settings-hint-dismiss-label="formatMessage(settingsHintMessages.dismiss)"
+				@open-settings="openServerSettingsModal()"
+				@dismiss-settings-hint="dismissSettingsHint"
+			/>
 
 			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
 
@@ -305,8 +272,8 @@
 		</template>
 	</div>
 	<div
-		v-if="showAdvancedDebugInfo"
-		class="relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
+		v-if="showAdvancedDebugInfo && !isInstanceDetailRoute"
+		class="experimental-styles-within relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
 	>
 		<h2 class="m-0 text-lg font-extrabold text-contrast">
 			{{ formatMessage(messages.serverDataTitle) }}
@@ -335,28 +302,22 @@ import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
-	BoxesIcon,
 	CheckIcon,
 	CopyIcon,
-	DatabaseBackupIcon,
 	FileIcon,
-	FolderOpenIcon,
+	GlobeIcon,
 	IssuesIcon,
 	LayoutTemplateIcon,
 	LoaderCircleIcon,
 	LockIcon,
 	RightArrowIcon,
-	SettingsIcon,
 	TransferIcon,
 	TriangleAlertIcon,
-	WorldIcon,
-	XIcon,
 } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage, useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
-import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
@@ -367,11 +328,7 @@ import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
-import {
-	PanelServerActionButton,
-	PanelServerOverflowMenu,
-	ServerManageHeader,
-} from '#ui/components/servers/server-header'
+import { ServerManageHeader } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
 	useDebugLogger,
@@ -382,8 +339,8 @@ import {
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
-import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
+import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
+import { useServerManageCoreRuntime } from '#ui/composables/servers/server-manage-core-runtime.ts'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
@@ -398,13 +355,21 @@ import {
 	writePendingServerContentInstalls,
 } from '#ui/utils/server-content-installing'
 
-import ServerOnboardingPanelPage from './[id]/onboarding.vue'
+import ServerOnboardingPanelPage from './onboarding.vue'
 
 interface Tab {
 	label: string
 	href: string
 	icon?: object
 	subpages?: string[]
+	prompt?: {
+		title: string
+		description: string
+		dismissLabel?: string
+		shown?: boolean
+		placement?: string
+		onDismiss?: () => void
+	}
 }
 
 const props = withDefaults(
@@ -412,7 +377,6 @@ const props = withDefaults(
 		serverId: string
 		reloadPage: () => void
 		resolveViewer: () => Promise<{ userId: string | null; userRole: string | null }>
-		showCopyIdAction?: boolean
 		showAdvancedDebugInfo?: boolean
 		showUptime?: boolean
 		additionalTabs?: Tab[]
@@ -436,7 +400,6 @@ const props = withDefaults(
 		}) => void | Promise<void>
 	}>(),
 	{
-		showCopyIdAction: false,
 		showAdvancedDebugInfo: false,
 		showUptime: true,
 		additionalTabs: () => [],
@@ -477,6 +440,21 @@ const settingsHintMessages = defineMessages({
 	},
 	dismiss: {
 		id: 'servers.manage.settings-hint.dismiss',
+		defaultMessage: "Don't show again",
+	},
+})
+
+const instancesHintMessages = defineMessages({
+	title: {
+		id: 'servers.manage.instances-hint.title',
+		defaultMessage: 'New: Server Instances!',
+	},
+	description: {
+		id: 'servers.manage.instances-hint.description',
+		defaultMessage: 'Your server state has been converted into an instance.',
+	},
+	dismiss: {
+		id: 'servers.manage.instances-hint.dismiss',
 		defaultMessage: "Don't show again",
 	},
 })
@@ -623,21 +601,9 @@ const messages = defineMessages({
 		id: 'servers.manage.nav.overview',
 		defaultMessage: 'Overview',
 	},
-	contentNav: {
-		id: 'servers.manage.nav.content',
-		defaultMessage: 'Content',
-	},
-	worldsNav: {
-		id: 'servers.manage.nav.worlds',
-		defaultMessage: 'Worlds',
-	},
-	filesNav: {
-		id: 'servers.manage.nav.files',
-		defaultMessage: 'Files',
-	},
-	backupsNav: {
-		id: 'servers.manage.nav.backups',
-		defaultMessage: 'Backups',
+	instancesNav: {
+		id: 'servers.manage.nav.instances',
+		defaultMessage: 'Instances',
 	},
 	errorDismissingNotice: {
 		id: 'servers.manage.notice.dismiss-error',
@@ -738,6 +704,14 @@ function dismissSettingsHint() {
 	settingsHintDismissed.value = true
 }
 
+const INSTANCES_HINT_KEY = 'server-panel-instances-hint-dismissed'
+const instancesHintDismissed = useStorage(INSTANCES_HINT_KEY, false)
+const showInstancesHint = ref(!instancesHintDismissed.value)
+function dismissInstancesHint() {
+	showInstancesHint.value = false
+	instancesHintDismissed.value = true
+}
+
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 
@@ -771,11 +745,46 @@ const { data: serverFull } = useQuery({
 	queryFn: () => client.archon.servers_v1.get(props.serverId),
 })
 
+const routeInstanceId = ref<string | null>(getRouteParam(route.params.instance_id))
+
+watch(
+	() => [route.path, route.params.id, route.params.instance_id, props.serverId] as const,
+	() => {
+		if (!isRouteForManagedServer()) return
+		routeInstanceId.value = getRouteParam(route.params.instance_id)
+	},
+	{ immediate: true },
+)
+
 const worldId = computed(() => {
+	if (routeInstanceId.value) return routeInstanceId.value
 	if (!serverFull.value) return null
 	const activeWorld = serverFull.value.worlds.find((w) => w.is_active)
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
+
+const isInstanceDetailRoute = computed(() => !!routeInstanceId.value)
+const activeWorldName = computed(() => {
+	if (!serverFull.value) return null
+	const activeWorld = serverFull.value.worlds.find((world) => world.is_active)
+	return activeWorld?.name ?? serverFull.value.worlds[0]?.name ?? null
+})
+
+function isRouteForManagedServer() {
+	const routeServerId = getRouteParam(route.params.id)
+	if (!routeServerId || routeServerId !== props.serverId) return false
+	const basePath = `/hosting/manage/${encodeURIComponent(routeServerId)}`
+	return route.path === basePath || route.path.startsWith(`${basePath}/`)
+}
+
+function getRouteParam(param: string | string[] | undefined): string | null {
+	if (Array.isArray(param)) return param[0] ?? null
+	return param ?? null
+}
+
+function getWorldPath(targetWorldId: string) {
+	return `/hosting/manage/${encodeURIComponent(props.serverId)}/instances/${encodeURIComponent(targetWorldId)}`
+}
 
 const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQueue(
 	computed(() => props.serverId),
@@ -1021,33 +1030,23 @@ watch(serverData, (data) => {
 const navLinks = computed<Tab[]>(() => [
 	{
 		label: formatMessage(messages.overviewNav),
-		href: `/hosting/manage/${props.serverId}`,
+		href: `/hosting/manage/${encodeURIComponent(props.serverId)}`,
 		icon: LayoutTemplateIcon,
 		subpages: [],
 	},
 	{
-		label: formatMessage(messages.contentNav),
-		href: `/hosting/manage/${props.serverId}/content`,
-		icon: BoxesIcon,
-		subpages: ['mods', 'datapacks'],
-	},
-	{
-		label: formatMessage(messages.worldsNav),
-		href: `/hosting/manage/${props.serverId}/worlds`,
-		icon: WorldIcon,
+		label: formatMessage(messages.instancesNav),
+		href: `/hosting/manage/${encodeURIComponent(props.serverId)}/instances`,
+		icon: GlobeIcon,
 		subpages: [],
-	},
-	{
-		label: formatMessage(messages.filesNav),
-		href: `/hosting/manage/${props.serverId}/files`,
-		icon: FolderOpenIcon,
-		subpages: [],
-	},
-	{
-		label: formatMessage(messages.backupsNav),
-		href: `/hosting/manage/${props.serverId}/backups`,
-		icon: DatabaseBackupIcon,
-		subpages: [],
+		prompt: {
+			title: formatMessage(instancesHintMessages.title),
+			description: formatMessage(instancesHintMessages.description),
+			dismissLabel: formatMessage(instancesHintMessages.dismiss),
+			shown: showInstancesHint.value,
+			placement: 'bottom',
+			onDismiss: dismissInstancesHint,
+		},
 	},
 	...props.additionalTabs,
 ])
@@ -1195,7 +1194,7 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 }
 
 const handleNewMod = () => {
-	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+	queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
 }
 
 const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
@@ -1281,7 +1280,7 @@ const onReinstall = async (
 
 	debug('[root.vue] onReinstall: triggering immediate invalidation')
 	queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
-	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+	queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
 }
 
 const onReinstallFailed = () => {
@@ -1330,7 +1329,7 @@ async function invalidateAfterInstall() {
 				queryClient.invalidateQueries({
 					queryKey: ['servers', 'startup', 'v1', props.serverId],
 				}),
-				queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
+				queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] }),
 			])
 		} catch (err: unknown) {
 			console.error('Error refreshing data after installation:', err)
@@ -1454,7 +1453,10 @@ const copyServerDebugInfo = () => {
 }
 
 const openInstallLog = () => {
-	const url = `/hosting/manage/${props.serverId}/files?editing=${encodeURIComponent(errorLogFile.value)}`
+	const filesPath = worldId.value
+		? `${getWorldPath(worldId.value)}/files`
+		: `/hosting/manage/${encodeURIComponent(props.serverId)}/instances`
+	const url = `${filesPath}?editing=${encodeURIComponent(errorLogFile.value)}`
 	window.history.pushState({}, '', url)
 	window.dispatchEvent(new PopStateEvent('popstate'))
 }

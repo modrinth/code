@@ -245,7 +245,6 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import type { Component } from 'vue'
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
@@ -259,7 +258,8 @@ import BackupItem from '#ui/components/servers/backups/BackupItem.vue'
 import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
+import { useBackupsSelection } from '#ui/composables/servers/backups-selection'
+import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
 import { useBulkOperation } from '#ui/layouts/shared/content-tab/composables/bulk-operations'
 import {
 	injectModrinthClient,
@@ -267,8 +267,6 @@ import {
 	injectNotificationManager,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
-
-import { useBackupsSelection } from './backups-selection'
 
 const messages = defineMessages({
 	selectAll: {
@@ -335,16 +333,13 @@ const filterPillOptions = computed<FilterPillOption[]>(() => [
 ])
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { server, worldId, busyReasons } = injectModrinthServerContext()
+const { server, serverId, worldId, busyReasons } = injectModrinthServerContext()
 
 const props = defineProps<{
 	isServerRunning: boolean
 	showCopyIdAction?: boolean
 	showDebugInfo?: boolean
 }>()
-
-const route = useRoute()
-const serverId = route.params.id as string
 
 defineEmits(['onDownload'])
 
@@ -359,7 +354,7 @@ const error = computed(() => {
 })
 const refetch = () => query.refetch()
 
-/** Until world exists we cannot fetch; `isLoading` is false while the query is disabled, which would flash empty state. */
+/** Until the instance exists we cannot fetch; `isLoading` is false while the query is disabled, which would flash empty state. */
 const backupsReadyPending = computed(
 	() => !worldId.value || (query.data.value === undefined && !query.error.value),
 )

@@ -11,7 +11,7 @@ import InstallingBanner, {
 	type SyncProgress,
 } from '#ui/components/servers/InstallingBanner.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
+import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
@@ -53,8 +53,12 @@ const messages = defineMessages({
 	},
 })
 
-const isOnContentTab = computed(() => route.path.includes('/content'))
 const isOnFilesTab = computed(() => route.path.includes('/files'))
+const isOnContentTab = computed(
+	() =>
+		route.path.includes('/content') ||
+		(!!route.params.instance_id && !isOnFilesTab.value && !route.path.includes('/backups')),
+)
 
 const bannerCoversInstalling = computed(
 	() =>

@@ -65,7 +65,7 @@ const messages = defineMessages({
 	},
 	noServerWorld: {
 		id: 'discover.install.error.no-server-world',
-		defaultMessage: 'No server world is available for install.',
+		defaultMessage: 'No server instance is available for install.',
 	},
 	backToSetup: {
 		id: 'discover.install.back-to-setup',
@@ -82,6 +82,10 @@ const messages = defineMessages({
 	resetModpackHeading: {
 		id: 'discover.install.heading.reset-modpack',
 		defaultMessage: 'Selecting modpack to install after reset',
+	},
+	worldFallbackName: {
+		id: 'discover.install.world-fallback-name',
+		defaultMessage: 'Instance',
 	},
 })
 
@@ -145,6 +149,11 @@ export function useServerInstallContent({
 			return enabled
 		}),
 	})
+	const { data: serverFullData } = useQuery({
+		queryKey: computed(() => ['servers', 'v1', 'detail', currentServerId.value ?? ''] as const),
+		queryFn: () => client.archon.servers_v1.get(currentServerId.value!),
+		enabled: computed(() => !!currentServerId.value),
+	})
 
 	watch(serverData, (val) =>
 		debug('serverData changed:', val?.server_id, val?.name, val?.loader, val?.mc_version),
@@ -187,7 +196,10 @@ export function useServerInstallContent({
 		},
 	}
 
-	const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
+	const contentQueryKey = computed(
+		() =>
+			['content', 'list', 'v1', currentServerId.value ?? '', currentWorldId.value ?? null] as const,
+	)
 	const { data: serverContentData, error: serverContentError } = useQuery({
 		queryKey: contentQueryKey,
 		queryFn: () =>
@@ -625,7 +637,9 @@ export function useServerInstallContent({
 			if (fromContext.value === 'onboarding') {
 				await client.archon.servers_v1.endIntro(currentServerId.value)
 				queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
-				navigateTo(`/hosting/manage/${currentServerId.value}/content`)
+				navigateTo(
+					getServerInstanceContentPath(currentServerId.value, currentWorldId.value ?? null),
+				)
 			} else {
 				navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
 			}
@@ -641,8 +655,13 @@ export function useServerInstallContent({
 		if (fromContext.value === 'onboarding') return `/hosting/manage/${id}?resumeModal=setup-type`
 		if (fromContext.value === 'reset-server')
 			return `/hosting/manage/${id}?openSettings=installation`
-		return `/hosting/manage/${id}/content`
+		return getServerInstanceContentPath(id, currentWorldId.value)
 	})
+
+	function getServerInstanceContentPath(serverId: string, worldId: string | null) {
+		const base = `/hosting/manage/${encodeURIComponent(serverId)}/instances`
+		return worldId ? `${base}/${encodeURIComponent(worldId)}` : base
+	}
 
 	const serverBackLabel = computed(() => {
 		if (fromContext.value === 'onboarding') return formatMessage(messages.backToSetup)
@@ -655,13 +674,26 @@ export function useServerInstallContent({
 			? formatMessage(messages.resetModpackHeading)
 			: formatMessage(commonMessages.installingContentLabel),
 	)
+	const currentWorld = computed(() => {
+		const full = serverFullData.value
+		if (!full) return null
+
+		const worldId = currentWorldId.value
+		if (worldId) {
+			return full.worlds.find((world) => world.id === worldId) ?? null
+		}
+
+		return full.worlds.find((world) => world.is_active) ?? full.worlds[0] ?? null
+	})
 
 	const installContext = computed(() => {
 		if (!serverData.value) return null
 		return {
-			name: serverData.value.name,
-			loader: serverData.value.loader ?? '',
-			gameVersion: serverData.value.mc_version ?? '',
+			name: currentWorld.value?.name ?? formatMessage(messages.worldFallbackName),
+			loader: currentWorld.value?.content?.modloader ?? serverData.value.loader ?? '',
+			loaderVersion:
+				currentWorld.value?.content?.modloader_version ?? serverData.value.loader_version ?? '',
+			gameVersion: currentWorld.value?.content?.game_version ?? serverData.value.mc_version ?? '',
 			serverId: currentServerId.value,
 			upstream: serverData.value.upstream,
 			iconSrc: serverIcon.value,

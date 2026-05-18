@@ -10,6 +10,7 @@ import {
 } from '@modrinth/assets'
 import type { BrowseInstallContentType, CardAction, ProjectType, Tags } from '@modrinth/ui'
 import {
+	BrowseInstallHeader,
 	BrowsePageLayout,
 	BrowseSidebar,
 	commonMessages,
@@ -22,8 +23,10 @@ import {
 	preferencesDiffer,
 	provideBrowseManager,
 	requestInstall,
+	SelectedProjectsFloatingBar,
 	useBrowseSearch,
 	useDebugLogger,
+	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -77,6 +80,7 @@ const {
 	isSetupServerContext,
 	effectiveServerWorldId,
 	serverContextServerData,
+	serverContextWorldName,
 	serverContentProjectIds,
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
@@ -405,6 +409,10 @@ const messages = defineMessages({
 		id: 'app.browse.back-to-instance',
 		defaultMessage: 'Back to instance',
 	},
+	worldFallbackName: {
+		id: 'app.browse.server.world-fallback-name',
+		defaultMessage: 'Instance',
+	},
 	serverInstanceContentWarning: {
 		id: 'app.browse.server-instance-content-warning',
 		defaultMessage:
@@ -545,8 +553,9 @@ const selectableProjectTypes = computed(() => {
 const installContext = computed(() => {
 	if (isServerContext.value && serverContextServerData.value) {
 		return {
-			name: serverContextServerData.value.name,
+			name: serverContextWorldName.value ?? formatMessage(messages.worldFallbackName),
 			loader: serverContextServerData.value.loader ?? '',
+			loaderVersion: serverContextServerData.value.loader_version ?? '',
 			gameVersion: serverContextServerData.value.mc_version ?? '',
 			serverId: serverIdQuery.value,
 			upstream: serverContextServerData.value.upstream,
@@ -585,6 +594,11 @@ const installContext = computed(() => {
 	}
 	return null
 })
+const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
+const { isStuck: isInstallHeaderStuck } = useStickyObserver(
+	stickyInstallHeaderRef,
+	'BrowseInstallHeader',
+)
 
 const installingProjectIds = ref<Set<string>>(new Set())
 
@@ -1031,6 +1045,17 @@ provideBrowseManager({
 
 <template>
 	<div class="flex flex-col gap-3 p-6">
+		<div
+			v-if="installContext"
+			ref="stickyInstallHeaderRef"
+			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 p-3 border-surface-5"
+			:class="[isInstallHeaderStuck ? 'border-t' : '']"
+		>
+			<BrowseInstallHeader />
+		</div>
+
+		<SelectedProjectsFloatingBar v-if="installContext" />
+
 		<BrowsePageLayout>
 			<template #after>
 				<ContextMenu ref="contextMenuRef" @option-clicked="handleOptionsClick">
@@ -1057,6 +1082,7 @@ provideBrowseManager({
 			@browse-modpacks="() => {}"
 			@create="handleServerModpackFlowCreate"
 		/>
+
 		<Teleport to="#sidebar-teleport-target">
 			<BrowseSidebar />
 		</Teleport>

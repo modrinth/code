@@ -1,23 +1,37 @@
 <template>
 	<div class="flex flex-col gap-4">
+		<Admonition
+			v-if="!instanceInfoAdmonitionDismissed"
+			type="info"
+			:header="formatMessage(messages.instanceInfoHeader)"
+			dismissible
+			@dismiss="dismissInstanceInfoAdmonition"
+		>
+			<ul class="m-0 pl-4">
+				<li>{{ formatMessage(messages.instanceInfoDefinition) }}</li>
+				<li>{{ formatMessage(messages.instanceInfoSwitching) }}</li>
+				<li>{{ formatMessage(messages.instanceInfoFiles) }}</li>
+			</ul>
+		</Admonition>
+
 		<div
 			v-if="worldsPending"
 			class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,20.25rem),1fr))] gap-6"
 		>
 			<div
 				v-for="slot in WORLD_SLOT_COUNT"
-				:key="`world-card-skeleton-${slot}`"
+				:key="`instance-card-skeleton-${slot}`"
 				class="min-h-[19.75rem] animate-pulse rounded-2xl border border-solid border-surface-5 bg-bg-raised shadow-xl"
 			/>
 		</div>
 		<div v-else class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,20.25rem),1fr))] gap-6">
-			<WorldCard
+			<InstanceCard
 				v-for="world in worldSlots"
 				:key="world.id"
 				:world="world"
 				@create="handleCreateWorld"
 				@edit="handleEditWorld"
-				@settings="handleEditWorld"
+				@settings="handleWorldSettings"
 			/>
 		</div>
 	</div>
@@ -26,8 +40,12 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { useQuery } from '@tanstack/vue-query'
+import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
+import Admonition from '#ui/components/base/Admonition.vue'
+import InstanceCard from '#ui/components/servers/instances/InstanceCard.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -36,12 +54,27 @@ import {
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
-import WorldCard from './components/WorldCard.vue'
-
 const messages = defineMessages({
-	worldSlotName: {
-		id: 'servers.manage.worlds.slot-name',
-		defaultMessage: 'World #{index}',
+	instanceSlotName: {
+		id: 'servers.manage.instances.slot-name',
+		defaultMessage: 'Instance #{index}',
+	},
+	instanceInfoHeader: {
+		id: 'servers.manage.instances.info.header',
+		defaultMessage: 'What is an instance?',
+	},
+	instanceInfoDefinition: {
+		id: 'servers.manage.instances.info.definition',
+		defaultMessage: 'An instance is a separate server setup.',
+	},
+	instanceInfoSwitching: {
+		id: 'servers.manage.instances.info.switching',
+		defaultMessage: 'You can switch which instance your server runs.',
+	},
+	instanceInfoFiles: {
+		id: 'servers.manage.instances.info.files',
+		defaultMessage:
+			'Each instance has its own server files, worlds, installed content, and settings.',
 	},
 })
 
@@ -79,11 +112,14 @@ type ContentSummary = {
 }
 
 const WORLD_SLOT_COUNT = 3
+const INSTANCE_INFO_ADMONITION_KEY = 'server-instances-info-admonition-dismissed'
 
 const client = injectModrinthClient()
 const { serverId, server, isServerRunning } = injectModrinthServerContext()
 const { openServerSettings } = injectServerSettingsModal()
 const { formatMessage } = useVIntl()
+const router = useRouter()
+const instanceInfoAdmonitionDismissed = useStorage(INSTANCE_INFO_ADMONITION_KEY, false)
 
 const worldsQuery = useQuery({
 	queryKey: computed(() => ['servers', 'worlds', 'summary', 'v1', serverId]),
@@ -153,7 +189,7 @@ function padWorldSlots(slots: WorldSlot[]): WorldSlot[] {
 		padded.push({
 			type: 'empty',
 			id: `empty-world-slot-${i + 1}`,
-			name: formatMessage(messages.worldSlotName, { index: i + 1 }),
+			name: formatMessage(messages.instanceSlotName, { index: i + 1 }),
 		})
 	}
 	return padded
@@ -267,16 +303,26 @@ function createDummyWorldSlots(): WorldSlot[] {
 		{
 			type: 'empty',
 			id: 'empty-world-slot-3',
-			name: formatMessage(messages.worldSlotName, { index: 3 }),
+			name: formatMessage(messages.instanceSlotName, { index: 3 }),
 		},
 	]
 }
 
-function handleEditWorld() {
+function handleEditWorld(worldId: string) {
+	router.push(
+		`/hosting/manage/${encodeURIComponent(serverId)}/instances/${encodeURIComponent(worldId)}`,
+	)
+}
+
+function handleWorldSettings() {
 	openServerSettings({ tabId: 'installation' })
 }
 
 function handleCreateWorld() {
 	openServerSettings({ tabId: 'installation' })
+}
+
+function dismissInstanceInfoAdmonition() {
+	instanceInfoAdmonitionDismissed.value = true
 }
 </script>

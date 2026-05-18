@@ -137,14 +137,14 @@ const messages = defineMessages({
 		defaultMessage:
 			'Pick your favorite modpack from Modrinth, or choose a loader and add the mods you want.',
 	},
-	configureWorldTitle: {
-		id: 'servers.setup.onboarding.step.configure-world.title',
-		defaultMessage: 'Configure your world',
+	configureInstanceTitle: {
+		id: 'servers.setup.onboarding.step.configure-instance.title',
+		defaultMessage: 'Configure your instance',
 	},
-	configureWorldDescription: {
-		id: 'servers.setup.onboarding.step.configure-world.description',
+	configureInstanceDescription: {
+		id: 'servers.setup.onboarding.step.configure-instance.description',
 		defaultMessage:
-			'Set up your world just like singleplayer. Choose your gamemode and world seed.',
+			'Set up your instance just like singleplayer. Choose your gamemode and world seed.',
 	},
 	inviteFriendsTitle: {
 		id: 'servers.setup.onboarding.step.invite-friends.title',
@@ -253,7 +253,11 @@ async function finalizeSetup() {
 	client.archon.servers_v1.endIntro(serverId).then(() => {
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	})
-	await router.push(`/hosting/manage/${serverId}/`)
+	await router.push(
+		worldId.value
+			? `/hosting/manage/${encodeURIComponent(serverId)}/instances/${encodeURIComponent(worldId.value)}`
+			: `/hosting/manage/${encodeURIComponent(serverId)}/instances`,
+	)
 }
 
 /** Map UI loader names to API Modloader values */
@@ -347,8 +351,8 @@ const steps = computed(() => [
 	},
 	{
 		icon: GlobeIcon,
-		title: formatMessage(messages.configureWorldTitle),
-		description: formatMessage(messages.configureWorldDescription),
+		title: formatMessage(messages.configureInstanceTitle),
+		description: formatMessage(messages.configureInstanceDescription),
 	},
 	{
 		icon: UsersIcon,

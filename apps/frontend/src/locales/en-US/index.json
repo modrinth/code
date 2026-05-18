@@ -1353,13 +1353,16 @@
     "message": "Cancel reset"
   },
   "discover.install.error.no-server-world": {
-    "message": "No server world is available for install."
+    "message": "No server instance is available for install."
   },
   "discover.install.error.unsupported-content-type": {
     "message": "This content type cannot be installed to a server from browse."
   },
   "discover.install.heading.reset-modpack": {
     "message": "Selecting modpack to install after reset"
+  },
+  "discover.install.world-fallback-name": {
+    "message": "Instance"
   },
   "discover.seo.description": {
     "message": "Search and browse thousands of Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
@@ -3290,8 +3293,11 @@
   "servers.manage.content.title": {
     "message": "Content - {serverName} - Modrinth"
   },
-  "servers.manage.worlds.meta.title": {
-    "message": "Worlds - {server} - Modrinth"
+  "servers.manage.instances.meta.title": {
+    "message": "Instances - {server} - Modrinth"
+  },
+  "servers.manage.instances.slot-name": {
+    "message": "Instance #{index}"
   },
   "servers.notice.actions": {
     "message": "Actions"

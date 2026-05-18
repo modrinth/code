@@ -58,12 +58,46 @@ export default new createRouter({
 					},
 				},
 				{
-					path: 'worlds',
-					name: 'ServerManageWorlds',
-					component: Hosting.Worlds,
+					path: 'instances',
+					name: 'ServerManageInstances',
+					component: Hosting.Instances,
 					meta: {
 						breadcrumb: [{ name: '?Server' }],
 					},
+				},
+				{
+					path: 'instances/:instance_id',
+					name: 'ServerManageInstance',
+					component: Hosting.Instance,
+					meta: {
+						breadcrumb: [{ name: '?Server' }],
+					},
+					children: [
+						{
+							path: '',
+							name: 'ServerManageInstanceContent',
+							component: Hosting.Content,
+							meta: {
+								breadcrumb: [{ name: '?Server' }],
+							},
+						},
+						{
+							path: 'files',
+							name: 'ServerManageInstanceFiles',
+							component: Hosting.Files,
+							meta: {
+								breadcrumb: [{ name: '?Server' }],
+							},
+						},
+						{
+							path: 'backups',
+							name: 'ServerManageInstanceBackups',
+							component: Hosting.Backups,
+							meta: {
+								breadcrumb: [{ name: '?Server' }],
+							},
+						},
+					],
 				},
 				{
 					path: 'files',
