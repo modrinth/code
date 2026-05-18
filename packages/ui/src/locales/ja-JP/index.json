@@ -95,6 +95,9 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "サーバーに再登録"
   },
+  "browse.offline": {
+    "defaultMessage": "現在オフラインです。インターネットに接続してModrinthを閲覧しましょう！"
+  },
   "button.accept": {
     "defaultMessage": "承認"
   },

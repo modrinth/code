@@ -302,9 +302,6 @@
   "app.project.install-button.already-installed": {
     "message": "Dit project is al geïnstalleerd"
   },
-  "app.project.install-context.back-to-browse": {
-    "message": "Terug naar browsen"
-  },
   "app.project.install-context.install-content-to-instance": {
     "message": "Installeer content naar instantie"
   },

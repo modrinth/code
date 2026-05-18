@@ -5,11 +5,56 @@
   "app.action-bar.downloads": {
     "message": "Nedladdningar"
   },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Göm fler pågående instanser"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Gör till primärinstans"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Ingen pågående instans"
+  },
   "app.action-bar.offline": {
     "message": "Offline"
   },
+  "app.action-bar.primary-instance": {
+    "message": "Primärinstans"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Visa fler pågående instanser"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Avsluta instans"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Visa aktiva nedladdningar"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Visa instans"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Visa loggar"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Aktiverar avancerad rendering som till exempel oskärpa vilket kan leda till prestandaproblem utan hårdvaruaccelererad rendering."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Avancerad rendering"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Välj färgtema för Modrinth-appen."
+  },
   "app.appearance-settings.color-theme.title": {
     "message": "Färgtema"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Hem"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Bibliotek"
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Dölj namnskylt"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Minecrafts autentiseringsservrar kan vara nere just nu. Kontrollera din internetanslutning och försök igen senare."
