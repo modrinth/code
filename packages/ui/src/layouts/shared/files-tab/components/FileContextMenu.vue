@@ -131,7 +131,11 @@ function getFullPath() {
 	if (!currentItem.value) return ''
 	const basePath = ctx.basePath?.value
 	const itemPath = currentItem.value.path
-	return basePath ? `${basePath}/${itemPath}`.replace(/\/+/g, '/') : itemPath
+	if (!basePath) return itemPath
+	const fullPath = `${basePath}/${itemPath}`
+	return navigator.userAgent.includes('Windows')
+		? fullPath.replace(/[\\/]+/g, '\\')
+		: fullPath.replace(/[\\/]+/g, '/')
 }
 
 function handleCopyPath() {
