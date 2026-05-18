@@ -83,6 +83,10 @@ const messages = defineMessages({
 		id: 'discover.install.heading.reset-modpack',
 		defaultMessage: 'Selecting modpack to install after reset',
 	},
+	worldFallbackName: {
+		id: 'discover.install.world-fallback-name',
+		defaultMessage: 'Instance',
+	},
 })
 
 function getQueuedInstallOwnerFallback(project: ServerInstallSearchResult) {
@@ -144,6 +148,11 @@ export function useServerInstallContent({
 			debug('serverData enabled:', enabled)
 			return enabled
 		}),
+	})
+	const { data: serverFullData } = useQuery({
+		queryKey: computed(() => ['servers', 'v1', 'detail', currentServerId.value ?? ''] as const),
+		queryFn: () => client.archon.servers_v1.get(currentServerId.value!),
+		enabled: computed(() => !!currentServerId.value),
 	})
 
 	watch(serverData, (val) =>
@@ -665,13 +674,26 @@ export function useServerInstallContent({
 			? formatMessage(messages.resetModpackHeading)
 			: formatMessage(commonMessages.installingContentLabel),
 	)
+	const currentWorld = computed(() => {
+		const full = serverFullData.value
+		if (!full) return null
+
+		const worldId = currentWorldId.value
+		if (worldId) {
+			return full.worlds.find((world) => world.id === worldId) ?? null
+		}
+
+		return full.worlds.find((world) => world.is_active) ?? full.worlds[0] ?? null
+	})
 
 	const installContext = computed(() => {
 		if (!serverData.value) return null
 		return {
-			name: serverData.value.name,
-			loader: serverData.value.loader ?? '',
-			gameVersion: serverData.value.mc_version ?? '',
+			name: currentWorld.value?.name ?? formatMessage(messages.worldFallbackName),
+			loader: currentWorld.value?.content?.modloader ?? serverData.value.loader ?? '',
+			loaderVersion:
+				currentWorld.value?.content?.modloader_version ?? serverData.value.loader_version ?? '',
+			gameVersion: currentWorld.value?.content?.game_version ?? serverData.value.mc_version ?? '',
 			serverId: currentServerId.value,
 			upstream: serverData.value.upstream,
 			iconSrc: serverIcon.value,
