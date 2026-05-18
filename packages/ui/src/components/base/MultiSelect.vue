@@ -39,7 +39,7 @@
 					<span
 						v-for="tag in visibleTags"
 						:key="String(tag.value)"
-						class="inline-flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary transition-colors hover:brightness-110"
+						class="inline-flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary transition-all hover:brightness-110"
 						@click.stop="removeTag(tag.value)"
 					>
 						{{ tag.label }}
@@ -80,7 +80,7 @@
 					<button
 						v-if="clearable && modelValue.length > 0"
 						type="button"
-						class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+						class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-all hover:text-contrast"
 						aria-label="Clear all"
 						@click.stop="clearAll"
 					>
@@ -116,10 +116,10 @@
 					@mousedown.stop
 					@keydown="handleDropdownKeydown"
 				>
-					<div class="empty:hidden pt-1.5">
+					<div class="empty:hidden">
 						<div
 							v-if="searchable"
-							class="px-3 py-1.5 pb-2.5 border-0 border-solid border-b border-b-surface-5"
+							class="px-0 py-1.5 border-0 border-solid border-b border-b-surface-5 flex"
 						>
 							<StyledInput
 								ref="searchInputRef"
@@ -127,7 +127,8 @@
 								:icon="SearchIcon"
 								type="text"
 								:placeholder="searchPlaceholder"
-								wrapper-class="w-full bg-surface-4"
+								wrapper-class="grow bg-surface-4 mx-0 "
+								input-class="ps-9 mx-1.5"
 								@input="handleSearchInput"
 								@keydown="handleSearchKeydown"
 							/>
@@ -135,12 +136,12 @@
 
 						<div
 							v-if="hasFilteredOptions || shouldShowSelectAll"
-							class="flex flex-col gap-2 bg-surface-4 border-0 border-solid border-b border-b-surface-5 py-1.5 empty:hidden"
+							class="flex flex-col bg-surface-4 border-0 border-solid border-b border-b-surface-5 empty:hidden"
 						>
-							<div v-if="shouldShowSelectAll" class="sticky top-0 z-10 bg-surface-4 px-3">
+							<div v-if="shouldShowSelectAll" class="sticky top-0 z-10 bg-surface-4">
 								<span
-									class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 rounded-xl"
-									:class="{ 'bg-surface-5': focusedIndex === -2 }"
+									class="flex w-full items-center gap-2.5 cursor-pointer p-3 text-left transition-all duration-150 text-contrast hover:brightness-110 focus:brightness-110"
+									:class="{ 'brightness-110': focusedIndex === -2 }"
 									data-option-index="-2"
 									:data-focused="focusedIndex === -2"
 									role="option"
@@ -185,7 +186,7 @@
 							<span class="font-semibold text-secondary">{{ selectionActionsLabel }}</span>
 							<button
 								type="button"
-								class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+								class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
 								@click="clearAll"
 								@keydown.enter.stop
 								@keydown.space.stop
@@ -197,103 +198,114 @@
 
 					<div
 						v-if="hasFilteredOptions"
-						ref="optionsContainerRef"
-						class="overflow-y-auto px-3 py-1.5 select-none"
-						:style="{ maxHeight: `${maxHeight}px` }"
+						ref="optionsScrollbarRef"
+						class="multi-select-options-scrollbar bg-surface-4"
+						data-overlayscrollbars-initialize
 					>
 						<div
-							ref="listContainer"
-							:class="shouldVirtualizeOptions ? 'relative' : 'flex flex-col gap-2'"
-							:style="optionsListStyle"
+							ref="optionsContainerRef"
+							class="overflow-y-auto select-none"
+							:style="{ maxHeight: `${maxHeight}px` }"
+							data-overlayscrollbars-viewport
 						>
-							<template
-								v-for="{ item, index } in renderedVisibleOptions"
-								:key="getItemKey(item, index)"
+							<div
+								ref="listContainer"
+								:class="shouldVirtualizeOptions ? 'relative' : 'flex flex-col'"
+								:style="optionsListStyle"
 							>
-								<div
-									:class="shouldVirtualizeOptions ? 'absolute left-0 right-0' : undefined"
-									:style="getOptionWrapperStyle(index)"
+								<template
+									v-for="{ item, index } in renderedVisibleOptions"
+									:key="getItemKey(item, index)"
 								>
 									<div
-										v-if="isSectionHeader(item)"
-										class="flex items-center justify-between gap-3 text-sm font-bold text-secondary"
-										:class="[
-											item.class,
-											shouldVirtualizeOptions ? 'h-10 px-3 pr-0' : 'px-3 pr-0 pb-1 pt-2',
-										]"
-										role="presentation"
+										:class="shouldVirtualizeOptions ? 'absolute left-0 right-0' : undefined"
+										:style="getOptionWrapperStyle(index)"
 									>
-										<span class="min-w-0 truncate">{{ item.label }}</span>
-										<button
-											v-if="hasSelectableSectionHeaderOptions(item)"
-											type="button"
-											class="shrink-0 border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
-											@click.stop="toggleSectionHeaderOptions(item)"
-											@keydown.enter.stop
-											@keydown.space.stop
+										<div
+											v-if="isSectionHeader(item)"
+											class="flex items-center justify-between gap-3 text-sm font-bold text-secondary"
+											:class="[
+												item.class,
+												shouldVirtualizeOptions ? 'h-10 px-3 pr-0' : 'px-3 pr-0 pb-1 pt-2',
+											]"
+											role="presentation"
 										>
-											{{ areSectionHeaderOptionsSelected(item) ? 'Clear' : 'Select all' }}
-										</button>
-									</div>
-									<span
-										v-else
-										role="option"
-										:aria-selected="item.selected"
-										:aria-disabled="item.disabled || undefined"
-										:data-option-index="index"
-										:data-focused="focusedIndex === index"
-										class="flex cursor-pointer items-center gap-2.5 rounded-xl p-3 focus-visible:outline-none text-left text-contrast transition-colors duration-150"
-										:class="[
-											item.class,
-											shouldVirtualizeOptions ? 'h-12' : undefined,
-											{
-												'bg-surface-5': focusedIndex === index,
-												'pointer-events-none cursor-not-allowed opacity-50': item.disabled,
-											},
-										]"
-										tabindex="-1"
-										@click="toggleOption(item, $event)"
-										@mouseenter="!item.disabled && (focusedIndex = index)"
-									>
-										<span
-											class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
-											:class="
-												item.selected
-													? 'border-button-border bg-brand text-brand-inverted'
-													: 'border-surface-5 bg-surface-2'
-											"
-										>
-											<CheckIcon v-if="item.selected" aria-hidden="true" stroke-width="3" />
-										</span>
-										<slot name="option" :item="item" :selected="item.selected" :index="index">
-											<slot
-												:name="`option-${item.value}`"
-												:item="item"
-												:selected="item.selected"
-												:index="index"
+											<span class="min-w-0 truncate">{{ item.label }}</span>
+											<button
+												v-if="hasSelectableSectionHeaderOptions(item)"
+												type="button"
+												class="shrink-0 border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
+												@click.stop="toggleSectionHeaderOptions(item)"
+												@keydown.enter.stop
+												@keydown.space.stop
 											>
-												<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
-													<div class="flex min-w-0 items-center gap-2">
-														<component :is="item.icon" v-if="item.icon" class="h-5 w-5 shrink-0" />
-														<span
-															class="min-w-0 truncate font-semibold leading-tight"
-															:class="item.selected ? 'text-contrast' : 'text-primary'"
-														>
-															{{ item.label }}
-														</span>
+												{{ areSectionHeaderOptionsSelected(item) ? 'Clear' : 'Select all' }}
+											</button>
+										</div>
+										<span
+											v-else
+											role="option"
+											:aria-selected="item.selected"
+											:aria-disabled="item.disabled || undefined"
+											:data-option-index="index"
+											:data-focused="focusedIndex === index"
+											class="flex w-full cursor-pointer items-center gap-2.5 p-3 focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4"
+											:class="[
+												item.class,
+												shouldVirtualizeOptions ? 'h-12' : undefined,
+												{
+													'brightness-110': focusedIndex === index,
+													'pointer-events-none cursor-not-allowed opacity-50': item.disabled,
+												},
+											]"
+											tabindex="-1"
+											@click="toggleOption(item, $event)"
+											@mouseenter="!item.disabled && (focusedIndex = index)"
+										>
+											<span
+												class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
+												:class="
+													item.selected
+														? 'border-button-border bg-brand text-brand-inverted'
+														: 'border-surface-5 bg-surface-2'
+												"
+											>
+												<CheckIcon v-if="item.selected" aria-hidden="true" stroke-width="3" />
+											</span>
+											<slot name="option" :item="item" :selected="item.selected" :index="index">
+												<slot
+													:name="`option-${item.value}`"
+													:item="item"
+													:selected="item.selected"
+													:index="index"
+												>
+													<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
+														<div class="flex min-w-0 items-center gap-2">
+															<component
+																:is="item.icon"
+																v-if="item.icon"
+																class="h-5 w-5 shrink-0"
+															/>
+															<span
+																class="min-w-0 truncate font-semibold leading-tight"
+																:class="item.selected ? 'text-contrast' : 'text-primary'"
+															>
+																{{ item.label }}
+															</span>
+														</div>
+														<slot
+															name="option-right"
+															:item="item"
+															:selected="item.selected"
+															:index="index"
+														></slot>
 													</div>
-													<slot
-														name="option-right"
-														:item="item"
-														:selected="item.selected"
-														:index="index"
-													></slot>
-												</div>
+												</slot>
 											</slot>
-										</slot>
-									</span>
-								</div>
-							</template>
+										</span>
+									</div>
+								</template>
+							</div>
 						</div>
 					</div>
 					<div
@@ -321,6 +333,8 @@
 import { CheckIcon, ChevronLeftIcon, MinusIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
 import { Menu } from 'floating-vue'
+import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
+import 'overlayscrollbars/overlayscrollbars.css'
 import {
 	type Component,
 	computed,
@@ -365,11 +379,24 @@ type VisibleMultiSelectItem<T> = {
 	index: number
 }
 
+type OverlayScrollbarsInstance = NonNullable<ReturnType<typeof OverlayScrollbars>>
+
 const DROPDOWN_VIEWPORT_MARGIN = 8
 const DROPDOWN_GAP = 12
 const DEFAULT_MAX_HEIGHT = 300
-const MULTI_SELECT_OPTION_ROW_HEIGHT = 56
+const MULTI_SELECT_OPTION_ROW_HEIGHT = 48
 const MULTI_SELECT_VIRTUALIZATION_THRESHOLD = 80
+const OPTIONS_OVERLAY_SCROLLBARS_OPTIONS = Object.freeze<PartialOptions>({
+	overflow: {
+		x: 'hidden',
+		y: 'scroll',
+	},
+	scrollbars: {
+		theme: 'os-theme-modrinth',
+		autoHide: 'leave',
+		autoHideSuspend: true,
+	},
+})
 
 function isSectionHeader<T>(item: MultiSelectItem<T>): item is MultiSelectSectionHeader {
 	return 'type' in item && item.type === 'section-header'
@@ -439,10 +466,12 @@ const focusedIndex = ref(-1)
 const containerRef = ref<HTMLElement>()
 const triggerRef = ref<HTMLElement>()
 const dropdownRef = ref<HTMLElement>()
+const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const searchInputRef = ref<InstanceType<typeof StyledInput>>()
 const rafId = ref<number | null>(null)
 const tagsContainerRef = ref<HTMLElement>()
+const optionsOverlayScrollbars = ref<OverlayScrollbarsInstance | null>(null)
 
 const dropdownStyle = ref({
 	top: '0px',
@@ -828,6 +857,46 @@ async function updateDropdownPosition() {
 	openDirection.value = direction
 }
 
+async function initializeOptionsOverlayScrollbars() {
+	await nextTick()
+
+	if (!isOpen.value || !hasFilteredOptions.value) {
+		destroyOptionsOverlayScrollbars()
+		return
+	}
+
+	if (!optionsScrollbarRef.value || !optionsContainerRef.value || !listContainer.value) {
+		return
+	}
+
+	if (optionsOverlayScrollbars.value) {
+		optionsOverlayScrollbars.value.update(true)
+		return
+	}
+
+	optionsOverlayScrollbars.value = OverlayScrollbars(
+		{
+			target: optionsScrollbarRef.value,
+			elements: {
+				viewport: optionsContainerRef.value,
+				content: listContainer.value,
+			},
+		},
+		OPTIONS_OVERLAY_SCROLLBARS_OPTIONS,
+	)
+}
+
+function updateOptionsOverlayScrollbars() {
+	nextTick(() => {
+		optionsOverlayScrollbars.value?.update(true)
+	})
+}
+
+function destroyOptionsOverlayScrollbars() {
+	optionsOverlayScrollbars.value?.destroy()
+	optionsOverlayScrollbars.value = null
+}
+
 async function openDropdown() {
 	if (props.disabled || isOpen.value) return
 
@@ -836,6 +905,7 @@ async function openDropdown() {
 
 	await nextTick()
 	await updateDropdownPosition()
+	await initializeOptionsOverlayScrollbars()
 
 	if (props.searchable && searchInputRef.value) {
 		;(searchInputRef.value as unknown as { focus: () => void }).focus()
@@ -849,6 +919,7 @@ function closeDropdown() {
 	if (!isOpen.value) return
 
 	stopPositionTracking()
+	destroyOptionsOverlayScrollbars()
 	isOpen.value = false
 	searchQuery.value = ''
 	focusedIndex.value = -1
@@ -1086,6 +1157,7 @@ function handleSearchInput() {
 	if (optionsContainerRef.value) {
 		optionsContainerRef.value.scrollTop = 0
 	}
+	updateOptionsOverlayScrollbars()
 	focusedIndex.value = shouldShowSelectAll.value ? -2 : getFirstFocusableOptionIndex()
 }
 
@@ -1126,6 +1198,7 @@ onMounted(() => {
 onUnmounted(() => {
 	window.removeEventListener('resize', handleWindowResize)
 	stopPositionTracking()
+	destroyOptionsOverlayScrollbars()
 })
 
 watch(isOpen, (value) => {
@@ -1137,6 +1210,11 @@ watch(isOpen, (value) => {
 watch(filteredOptions, () => {
 	if (isOpen.value) {
 		updateDropdownPosition()
+		if (hasFilteredOptions.value) {
+			initializeOptionsOverlayScrollbars()
+		} else {
+			destroyOptionsOverlayScrollbars()
+		}
 	}
 })
 
@@ -1146,14 +1224,37 @@ watch(
 		calculateVisibleTags()
 		if (isOpen.value) {
 			updateDropdownPosition()
+			updateOptionsOverlayScrollbars()
 		}
 	},
 	{ deep: true },
+)
+
+watch(
+	() => props.maxHeight,
+	() => {
+		if (isOpen.value) {
+			updateOptionsOverlayScrollbars()
+		}
+	},
 )
 </script>
 
 <style scoped>
 .checkbox-shadow {
 	box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.multi-select-options-scrollbar :deep(.os-theme-modrinth) {
+	--os-size: 10px;
+	--os-padding-perpendicular: 2px;
+	--os-padding-axis: 2px;
+	--os-track-bg: transparent;
+	--os-track-bg-hover: transparent;
+	--os-track-bg-active: transparent;
+	--os-handle-border-radius: 9999px;
+	--os-handle-bg: var(--color-scrollbar, var(--surface-5));
+	--os-handle-bg-hover: var(--color-scrollbar, var(--surface-5));
+	--os-handle-bg-active: var(--color-scrollbar, var(--surface-5));
 }
 </style>

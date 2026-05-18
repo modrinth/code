@@ -721,6 +721,9 @@ importers:
       motion-v:
         specifier: ^2.2.1
         version: 2.2.1(@vueuse/core@11.3.0(vue@3.5.27(typescript@5.9.3)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vue@3.5.27(typescript@5.9.3))
+      overlayscrollbars:
+        specifier: ^2.15.1
+        version: 2.15.1
       postprocessing:
         specifier: ^6.37.6
         version: 6.38.2(three@0.172.0)
