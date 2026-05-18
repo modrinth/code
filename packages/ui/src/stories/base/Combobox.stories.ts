@@ -32,6 +32,17 @@ export const Default: Story = {
 	},
 }
 
+export const WithSelectedOption: Story = {
+	args: {
+		modelValue: '2',
+		options: [
+			{ value: '1', label: 'Option 1' },
+			{ value: '2', label: 'Option 2' },
+			{ value: '3', label: 'Option 3' },
+		],
+	},
+}
+
 export const Searchable: Story = {
 	args: {
 		options: [
@@ -120,23 +131,6 @@ export const Disabled: Story = {
 	},
 }
 
-export const WithSubLabels: Story = {
-	args: {
-		options: [
-			{ value: 'download', label: 'Download', icon: DownloadIcon },
-			{ value: 'share', label: 'Share', icon: ShareIcon },
-			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
-			{ type: 'divider' },
-			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
-			{ value: 'profile', label: 'Profile', icon: UserIcon },
-			{ type: 'divider' },
-			{ value: 'delete', label: 'Delete', icon: TrashIcon, disabled: true },
-		],
-		placeholder: 'Select an action',
-		listbox: false,
-	},
-}
-
 export const SearchableWithIcons: Story = {
 	args: {
 		options: [
@@ -153,7 +147,24 @@ export const SearchableWithIcons: Story = {
 	},
 }
 
-export const WithSelectedOption: Story = {
+export const WithDividers: Story = {
+	args: {
+		options: [
+			{ value: 'download', label: 'Download', icon: DownloadIcon },
+			{ value: 'share', label: 'Share', icon: ShareIcon },
+			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
+			{ type: 'divider' },
+			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
+			{ value: 'profile', label: 'Profile', icon: UserIcon },
+			{ type: 'divider' },
+			{ value: 'delete', label: 'Delete', icon: TrashIcon, disabled: true },
+		],
+		placeholder: 'Select an action',
+		listbox: false,
+	},
+}
+
+export const WithSubLabel: Story = {
 	args: {
 		modelValue: '2',
 		options: [
@@ -161,6 +172,18 @@ export const WithSelectedOption: Story = {
 			{ value: '2', label: 'Forge', subLabel: 'The original Minecraft modding API' },
 			{ value: '3', label: 'NeoForge', subLabel: 'Community-driven Forge fork' },
 			{ value: '4', label: 'Quilt', subLabel: 'The mod-loader that cares' },
+		],
+	},
+}
+
+export const MixedSubLabels: Story = {
+	args: {
+		options: [
+			{ value: '1', label: 'Minecraft', subLabel: 'The base game' },
+			{ value: '2', label: 'Fabric' },
+			{ value: '3', label: 'Forge', subLabel: 'Supports most mods' },
+			{ value: '4', label: 'NeoForge' },
+			{ value: '5', label: 'Quilt', subLabel: 'Fabric-compatible' },
 		],
 	},
 }
@@ -177,20 +200,6 @@ export const SearchableNoFilter: Story = {
 		searchable: true,
 		searchPlaceholder: 'Search actions...',
 		disableSearchFilter: true,
-	},
-}
-
-export const SearchableModpacks: Story = {
-	args: {
-		options: [
-			{ value: 'download', label: 'Download', icon: DownloadIcon },
-			{ value: 'share', label: 'Share', icon: ShareIcon },
-			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
-			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
-		],
-		searchable: true,
-		searchPlaceholder: 'Search modpacks...',
-		noOptionsMessage: 'No modpacks found',
 	},
 }
 
@@ -267,7 +276,7 @@ export const DropdownFooterOnly: StoryObj = {
 								<button type="button" style="height: 2rem; border: 1px solid var(--color-surface-5); border-radius: 0.5rem; background: var(--color-surface-3); color: var(--color-text-primary); font-weight: 600;">
 									Cancel
 								</button>
-								<button type="button" style="height: 2rem; border: 0; border-radius: 0.5rem; background: var(--color-brand); color: var(--color-brand-inverted); font-weight: 700;">
+								<button type="button" style="height: 2rem; border: 0; border-radius: 0.5rem; background: var(--color-brand); color: var(--color-bg); font-weight: 700;">
 									Apply
 								</button>
 							</div>
@@ -284,18 +293,6 @@ export const DropdownFooterOnly: StoryObj = {
 					'Covers dropdowns whose only rendered content is the footer slot, such as the analytics custom date range picker.',
 			},
 		},
-	},
-}
-
-export const MixedSubLabels: Story = {
-	args: {
-		options: [
-			{ value: '1', label: 'Minecraft', subLabel: 'The base game' },
-			{ value: '2', label: 'Fabric' },
-			{ value: '3', label: 'Forge', subLabel: 'Supports most mods' },
-			{ value: '4', label: 'NeoForge' },
-			{ value: '5', label: 'Quilt', subLabel: 'Fabric-compatible' },
-		],
 	},
 }
 

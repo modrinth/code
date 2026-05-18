@@ -106,7 +106,7 @@
 					<div
 						v-if="filteredOptions.length > 0"
 						ref="optionsContainerRef"
-						class="flex flex-col gap-2 overflow-y-auto p-3"
+						class="flex flex-col overflow-y-auto"
 						:style="{ maxHeight: `${maxHeight}px` }"
 					>
 						<template v-for="(item, index) in filteredOptions" :key="item.key">
@@ -121,7 +121,7 @@
 								:aria-selected="listbox && item.value === modelValue"
 								:aria-disabled="item.disabled || undefined"
 								:data-focused="focusedIndex === index"
-								class="group/option flex items-center gap-2.5 cursor-pointer rounded-xl p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
+								class="group/option flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
 								:class="getOptionClasses(item, index)"
 								tabindex="-1"
 								@mousedown.prevent
@@ -136,7 +136,12 @@
 								>
 									<div class="flex w-full items-center justify-between gap-2">
 										<div class="flex items-center gap-2">
-											<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
+											<component
+												:is="item.icon"
+												v-if="item.icon"
+												class="h-5 w-5"
+												:class="item.value === modelValue ? 'text-green' : 'text-primary'"
+											/>
 											<div class="flex flex-col gap-1.5">
 												<span
 													class="font-semibold leading-tight"
