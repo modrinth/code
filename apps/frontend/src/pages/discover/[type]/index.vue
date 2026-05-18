@@ -13,9 +13,7 @@ import {
 } from '@modrinth/assets'
 import type { CardAction } from '@modrinth/ui'
 import {
-	BrowseInstallHeader,
 	BrowsePageLayout,
-	BrowseSidebar,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
@@ -23,10 +21,8 @@ import {
 	injectModrinthClient,
 	PROJECT_DEP_MARKER_QUERY,
 	provideBrowseManager,
-	SelectedProjectsFloatingBar,
 	useBrowseSearch,
 	useDebugLogger,
-	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
 import { cycleValue } from '@modrinth/utils'
@@ -55,9 +51,6 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 const filtersMenuOpen = ref(false)
-const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
-
-useStickyObserver(stickyInstallHeaderRef, 'DiscoverInstallHeader')
 
 const route = useRoute()
 
@@ -491,27 +484,16 @@ provideBrowseManager({
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
 		<div class="search-background"></div>
 	</Teleport>
-	<div
-		v-if="installContext"
-		ref="stickyInstallHeaderRef"
-		class="normal-page__header browse-install-header-bleed sticky top-0 z-20 mb-4 flex flex-col gap-2 border-0 bg-surface-1 py-3"
-	>
-		<BrowseInstallHeader />
-	</div>
-	<SelectedProjectsFloatingBar v-if="installContext" :install-context="installContext" />
-	<aside class="normal-page__sidebar" :aria-label="formatMessage(commonMessages.filtersLabel)">
-		<AdPlaceholder v-if="!auth.user && !serverData" />
-		<BrowseSidebar />
-	</aside>
-	<section class="normal-page__content">
-		<div class="flex flex-col gap-3">
-			<BrowsePageLayout>
-				<template #display-mode-icon>
-					<GridIcon v-if="resultsDisplayMode === 'grid'" />
-					<ImageIcon v-else-if="resultsDisplayMode === 'gallery'" />
-					<ListIcon v-else />
-				</template>
-			</BrowsePageLayout>
+	<BrowsePageLayout>
+		<template #sidebar-prepend>
+			<AdPlaceholder v-if="!auth.user && !serverData" />
+		</template>
+		<template #display-mode-icon>
+			<GridIcon v-if="resultsDisplayMode === 'grid'" />
+			<ImageIcon v-else-if="resultsDisplayMode === 'gallery'" />
+			<ListIcon v-else />
+		</template>
+		<template #content-after>
 			<CreationFlowModal
 				v-if="currentServerId && projectType?.id === 'modpack'"
 				ref="onboardingModalRef"
@@ -523,67 +505,10 @@ provideBrowseManager({
 				@browse-modpacks="() => {}"
 				@create="onModpackFlowCreate"
 			/>
-		</div>
-	</section>
+		</template>
+	</BrowsePageLayout>
 </template>
 <style lang="scss" scoped>
-.browse-install-header-bleed {
-	grid-column: 1 / -1;
-	margin-inline: -1.5rem;
-	padding-inline: 0.75rem !important;
-
-	&::after {
-		content: '';
-		position: absolute;
-		right: 50%;
-		bottom: 0;
-		width: 100vw;
-		border-bottom: 1px solid var(--surface-5);
-		transform: translateX(50%);
-	}
-}
-
-.normal-page__content {
-	display: contents;
-
-	@media screen and (min-width: 1024px) {
-		display: block;
-	}
-}
-
-.normal-page__sidebar {
-	grid-row: 3;
-
-	@media screen and (min-width: 1024px) {
-		display: block;
-	}
-}
-
-.filters-card {
-	padding: var(--spacing-card-md);
-
-	@media screen and (min-width: 1024px) {
-		padding: var(--spacing-card-lg);
-	}
-}
-
-.content-wrapper {
-	grid-row: 1;
-}
-
-.pagination-after {
-	grid-row: 6;
-}
-
-.no-results {
-	text-align: center;
-	display: flow-root;
-}
-
-.loading-logo {
-	margin: 2rem;
-}
-
 .search-background {
 	width: 100%;
 	height: 20rem;
