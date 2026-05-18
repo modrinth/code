@@ -13,7 +13,9 @@ import {
 } from '@modrinth/assets'
 import type { CardAction } from '@modrinth/ui'
 import {
+	BrowseInstallHeader,
 	BrowsePageLayout,
+	BrowseSidebar,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
@@ -21,8 +23,10 @@ import {
 	injectModrinthClient,
 	PROJECT_DEP_MARKER_QUERY,
 	provideBrowseManager,
+	SelectedProjectsFloatingBar,
 	useBrowseSearch,
 	useDebugLogger,
+	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
 import { cycleValue } from '@modrinth/utils'
@@ -169,6 +173,11 @@ const {
 	onboardingModalRef,
 	debug,
 })
+const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
+const { isStuck: isInstallHeaderStuck } = useStickyObserver(
+	stickyInstallHeaderRef,
+	'DiscoverInstallHeader',
+)
 
 function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
 	const content = project.minecraft_java_server?.content
@@ -192,47 +201,64 @@ function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject
 	return undefined
 }
 
-async function search(requestParams: string) {
+type DiscoverProjectSearchHit = Labrinth.Search.v2.ResultSearchProject & {
+	version_id?: string | null
+}
+
+function mapV3ProjectHit(hit: Labrinth.Search.v3.ResultSearchProject): DiscoverProjectSearchHit {
+	return {
+		...hit,
+		project_type: hit.project_types[0] ?? projectTypeId.value,
+		title: hit.name,
+		description: hit.summary,
+		versions: hit.version_id ? [hit.version_id] : [],
+		latest_version: hit.version_id,
+		icon_url: hit.icon_url ?? '',
+		client_side: 'unknown',
+		server_side: 'unknown',
+	}
+}
+
+async function fetchSearch(requestParams: string) {
 	debug('search() called', {
 		requestParams: requestParams.substring(0, 100),
 		isServer: isServerType.value,
 		projectTypeId: projectTypeId.value,
 	})
-	const config = useRuntimeConfig()
-	let base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
 
-	if (isServerType.value) {
-		base = base.replace(/\/v\d\//, '/v3/').replace(/\/v\d$/, '/v3')
-	}
-
-	const url = `${base}search${requestParams}`
-	debug('search() fetching:', url.substring(0, 120))
-
-	const raw = await $fetch<Labrinth.Search.v2.SearchResults | Labrinth.Search.v3.SearchResults>(
-		url,
-		{
-			headers: withLabrinthCanaryHeader(),
-		},
-	)
+	const raw = await client.request<Labrinth.Search.v3.SearchResults>('/search', {
+		api: 'labrinth',
+		version: 3,
+		method: 'GET',
+		params: Object.fromEntries(new URLSearchParams(requestParams.replace(/^\?/, ''))),
+		headers: withLabrinthCanaryHeader(),
+	})
 
 	debug('search() response', { total_hits: raw.total_hits, hitCount: raw.hits?.length })
 
-	if ('hits_per_page' in raw) {
-		// v3 response (servers)
+	if (isServerType.value) {
 		return {
 			projectHits: [],
-			serverHits: raw.hits as Labrinth.Search.v3.ResultSearchProject[],
+			serverHits: raw.hits,
 			total_hits: raw.total_hits,
 			per_page: raw.hits_per_page,
 		}
 	}
 
 	return {
-		projectHits: raw.hits as Labrinth.Search.v2.ResultSearchProject[],
+		projectHits: raw.hits.map(mapV3ProjectHit),
 		serverHits: [],
 		total_hits: raw.total_hits,
-		per_page: raw.limit,
+		per_page: raw.hits_per_page,
 	}
+}
+
+async function search(requestParams: string) {
+	return await queryClient.ensureQueryData({
+		queryKey: ['discover', 'search', 'v3', requestParams],
+		queryFn: () => fetchSearch(requestParams),
+		staleTime: 30_000,
+	})
 }
 
 function getCardActions(
@@ -404,7 +430,7 @@ watch(
 )
 
 debug('calling initial refreshSearch')
-searchState.refreshSearch()
+await searchState.refreshSearch()
 
 const ogTitle = computed(() =>
 	searchState.query.value
@@ -484,29 +510,63 @@ provideBrowseManager({
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
 		<div class="search-background"></div>
 	</Teleport>
-	<BrowsePageLayout>
-		<template #sidebar-prepend>
-			<AdPlaceholder v-if="!auth.user && !serverData" />
-		</template>
-		<template #display-mode-icon>
-			<GridIcon v-if="resultsDisplayMode === 'grid'" />
-			<ImageIcon v-else-if="resultsDisplayMode === 'gallery'" />
-			<ListIcon v-else />
-		</template>
-		<template #content-after>
-			<CreationFlowModal
-				v-if="currentServerId && projectType?.id === 'modpack'"
-				ref="onboardingModalRef"
-				:type="fromContext === 'reset-server' ? 'reset-server' : 'server-onboarding'"
-				:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
-				:show-snapshot-toggle="true"
-				:on-back="onOnboardingBack"
-				@hide="onOnboardingHide"
-				@browse-modpacks="() => {}"
-				@create="onModpackFlowCreate"
-			/>
-		</template>
-	</BrowsePageLayout>
+
+	<div
+		v-if="installContext"
+		ref="stickyInstallHeaderRef"
+		class="sticky top-0 z-20 -mx-6 border-0 border-solid border-divider bg-surface-1 px-6 pt-4"
+		:class="[isInstallHeaderStuck ? 'border-t' : '']"
+	>
+		<BrowseInstallHeader divider bottom-padding />
+	</div>
+
+	<SelectedProjectsFloatingBar v-if="installContext" :install-context="installContext" />
+
+	<div
+		class="grid min-w-0 gap-3"
+		:class="
+			cosmetics.rightSearchLayout
+				? 'lg:grid-cols-[minmax(0,1fr)_18.75rem]'
+				: 'lg:grid-cols-[18.75rem_minmax(0,1fr)]'
+		"
+	>
+		<section
+			class="flex min-w-0 flex-col gap-3"
+			:class="cosmetics.rightSearchLayout ? 'lg:order-1' : 'lg:order-2'"
+		>
+			<BrowsePageLayout>
+				<template #display-mode-icon>
+					<GridIcon v-if="resultsDisplayMode === 'grid'" />
+					<ImageIcon v-else-if="resultsDisplayMode === 'gallery'" />
+					<ListIcon v-else />
+				</template>
+			</BrowsePageLayout>
+		</section>
+
+		<aside
+			class="min-w-0"
+			:class="cosmetics.rightSearchLayout ? 'lg:order-2' : 'lg:order-1'"
+			:aria-label="formatMessage(commonMessages.filtersLabel)"
+		>
+			<BrowseSidebar>
+				<template #prepend>
+					<AdPlaceholder v-if="!auth.user && !serverData" />
+				</template>
+			</BrowseSidebar>
+		</aside>
+	</div>
+
+	<CreationFlowModal
+		v-if="currentServerId && projectType?.id === 'modpack'"
+		ref="onboardingModalRef"
+		:type="fromContext === 'reset-server' ? 'reset-server' : 'server-onboarding'"
+		:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
+		:show-snapshot-toggle="true"
+		:on-back="onOnboardingBack"
+		@hide="onOnboardingHide"
+		@browse-modpacks="() => {}"
+		@create="onModpackFlowCreate"
+	/>
 </template>
 <style lang="scss" scoped>
 .search-background {

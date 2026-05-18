@@ -1,42 +1,12 @@
 <template>
 	<div class="w-full flex flex-col gap-4" :class="{ 'mt-4': isNuxt }">
-		<ContentPageHeader :class="props.headerClass">
-			<template #icon>
-				<div class="flex size-16 shrink-0 items-center justify-center">
-					<ButtonStyled circular size="large">
-						<button
-							type="button"
-							:aria-label="props.backLabel"
-							@click="router.push(props.backHref)"
-						>
-							<LeftArrowIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
-				</div>
-			</template>
-			<template #title>
-				{{ props.name || props.fallbackName }}
-			</template>
-			<template #stats>
-				<div v-if="headerMetadata.length" class="flex min-w-0 flex-wrap items-center gap-2">
-					<template v-for="(item, index) in headerMetadata" :key="item.id">
-						<BulletDivider v-if="index > 0" />
-						<div class="flex min-w-0 items-center gap-2 font-medium text-secondary text-nowrap">
-							<component
-								:is="item.icon"
-								class="flex size-5 shrink-0"
-								aria-hidden="true"
-								v-bind="item.iconProps"
-							/>
-							<span class="truncate">{{ item.label }}</span>
-						</div>
-					</template>
-				</div>
-			</template>
-			<template #actions>
-				<slot name="actions" />
-			</template>
-		</ContentPageHeader>
+		<PageHeader
+			:header="props.name || props.fallbackName"
+			:leading="leadingItems"
+			:metadata="headerMetadata"
+			:actions="props.actions"
+			:header-class="props.headerClass"
+		/>
 	</div>
 </template>
 
@@ -46,9 +16,7 @@ import { LeftArrowIcon, TagCategoryGamepad2Icon as Gamepad2Icon, TimerIcon } fro
 import { type Component, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import ContentPageHeader from '#ui/components/base/ContentPageHeader.vue'
+import PageHeader from '#ui/components/base/PageHeader.vue'
 import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
 import { injectModrinthClient } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
@@ -58,6 +26,33 @@ type MetadataItem = {
 	label: string
 	icon: Component
 	iconProps?: Record<string, unknown>
+}
+type HeaderAction = {
+	id: string
+	label: string
+	icon?: Component
+	iconProps?: Record<string, unknown>
+	iconClass?: string
+	tooltip?: string
+	ariaLabel?: string
+	onClick?: () => void | Promise<void>
+	disabled?: boolean
+	labelHidden?: boolean
+	circular?: boolean
+	color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
+	size?: 'standard' | 'large' | 'small'
+	type?: 'standard' | 'outlined' | 'transparent' | 'highlight' | 'highlight-colored-text' | 'chip'
+	joinedActions?: {
+		id: string
+		label: string
+		icon?: Component
+		action: () => void
+		color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
+		hoverFilled?: boolean
+	}[]
+	primaryDisabled?: boolean
+	dropdownDisabled?: boolean
+	primaryMuted?: boolean
 }
 
 const props = withDefaults(
@@ -72,6 +67,7 @@ const props = withDefaults(
 		backLabel: string
 		fallbackName?: string
 		headerClass?: string
+		actions?: HeaderAction[]
 	}>(),
 	{
 		name: null,
@@ -82,12 +78,23 @@ const props = withDefaults(
 		lastActive: null,
 		fallbackName: 'World',
 		headerClass: '',
+		actions: () => [],
 	},
 )
 
 const client = injectModrinthClient()
 const router = useRouter()
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
+const leadingItems = computed(() => [
+	{
+		id: 'back',
+		type: 'button' as const,
+		icon: LeftArrowIcon,
+		ariaLabel: props.backLabel,
+		tooltip: props.backLabel,
+		onClick: () => router.push(props.backHref),
+	},
+])
 const loaderLabel = computed(() => {
 	if (!props.loader) return null
 	const label = formatLoaderLabel(props.loader.toLowerCase())

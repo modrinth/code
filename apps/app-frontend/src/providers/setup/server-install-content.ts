@@ -53,6 +53,7 @@ export interface ServerInstallContentContext {
 	isSetupServerContext: ComputedRef<boolean>
 	effectiveServerWorldId: ComputedRef<string | null>
 	serverContextServerData: Ref<Archon.Servers.v0.Server | null>
+	serverContextWorldName: ComputedRef<string | null>
 	serverContentProjectIds: Ref<Set<string>>
 	queuedServerInstallProjectIds: ComputedRef<Set<string>>
 	queuedServerInstallCount: ComputedRef<number>
@@ -226,6 +227,7 @@ export function createServerInstallContent(opts: {
 
 	const serverContextWorldId = ref<string | null>(worldIdQuery.value)
 	const serverContextServerData = ref<Archon.Servers.v0.Server | null>(null)
+	const serverContextServerFull = ref<Archon.Servers.v1.ServerFull | null>(null)
 	const serverContentProjectIds = ref<Set<string>>(new Set())
 	const serverContentInstallKeys = ref<Set<string>>(new Set())
 	const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(
@@ -243,6 +245,18 @@ export function createServerInstallContent(opts: {
 	const isInstallingQueuedServerInstalls = ref(false)
 	const queuedInstallProgress = ref({ completed: 0, total: 0 })
 	const effectiveServerWorldId = computed(() => worldIdQuery.value ?? serverContextWorldId.value)
+	const serverContextWorld = computed(() => {
+		const serverFull = serverContextServerFull.value
+		if (!serverFull) return null
+
+		const worldId = effectiveServerWorldId.value
+		if (worldId) {
+			return serverFull.worlds.find((world) => world.id === worldId) ?? null
+		}
+
+		return serverFull.worlds.find((world) => world.is_active) ?? serverFull.worlds[0] ?? null
+	})
+	const serverContextWorldName = computed(() => serverContextWorld.value?.name ?? null)
 	const serverBackUrl = computed(() => {
 		const sid = serverIdQuery.value
 		if (!sid) return '/hosting/manage'
@@ -266,9 +280,19 @@ export function createServerInstallContent(opts: {
 		return 'Installing content'
 	})
 
+	async function getServerContextServerFull(serverId: string) {
+		if (serverContextServerFull.value?.id === serverId) {
+			return serverContextServerFull.value
+		}
+
+		const server = await client.archon.servers_v1.get(serverId)
+		serverContextServerFull.value = server
+		return server
+	}
+
 	async function resolveServerContextWorldId(serverId: string) {
 		try {
-			const server = await client.archon.servers_v1.get(serverId)
+			const server = await getServerContextServerFull(serverId)
 			const activeWorld = server.worlds.find((world) => world.is_active)
 			return activeWorld?.id ?? server.worlds[0]?.id ?? null
 		} catch (err) {
@@ -304,6 +328,11 @@ export function createServerInstallContent(opts: {
 		} catch (err) {
 			handleError(err as Error)
 		}
+		try {
+			await getServerContextServerFull(sid)
+		} catch (err) {
+			handleError(err as Error)
+		}
 
 		let resolvedWorldId = effectiveServerWorldId.value
 		if (!resolvedWorldId) {
@@ -323,6 +352,7 @@ export function createServerInstallContent(opts: {
 		watch([serverIdQuery, effectiveServerWorldId], async ([sid, wid], [prevSid, prevWid]) => {
 			if (!sid) {
 				serverContextServerData.value = null
+				serverContextServerFull.value = null
 				serverContentProjectIds.value = new Set()
 				serverContentInstallKeys.value = new Set()
 				setQueuedServerInstallPlans(new Map())
@@ -330,11 +360,22 @@ export function createServerInstallContent(opts: {
 			}
 
 			if (sid !== prevSid) {
+				serverContextWorldId.value = worldIdQuery.value
+				serverContextServerFull.value = null
 				serverContentProjectIds.value = new Set()
 				serverContentInstallKeys.value = new Set()
 				queuedServerInstalls.value = readStoredServerInstallQueue(sid, wid)
 				try {
 					serverContextServerData.value = await client.archon.servers_v0.get(sid)
+				} catch (err) {
+					handleError(err as Error)
+				}
+				try {
+					const serverFull = await getServerContextServerFull(sid)
+					if (!worldIdQuery.value) {
+						const activeWorld = serverFull.worlds.find((world) => world.is_active)
+						serverContextWorldId.value = activeWorld?.id ?? serverFull.worlds[0]?.id ?? null
+					}
 				} catch (err) {
 					handleError(err as Error)
 				}
@@ -586,6 +627,7 @@ export function createServerInstallContent(opts: {
 		isSetupServerContext,
 		effectiveServerWorldId,
 		serverContextServerData,
+		serverContextWorldName,
 		serverContentProjectIds,
 		queuedServerInstallProjectIds,
 		queuedServerInstallCount,
