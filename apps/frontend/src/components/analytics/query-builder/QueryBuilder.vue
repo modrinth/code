@@ -717,7 +717,7 @@ function withBreakdownFields(
 			break
 		case 'download_source':
 			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-				downloads.push('user_agent')
+				downloads.push('domain')
 			}
 			break
 		case 'download_reason':
@@ -779,7 +779,7 @@ function withBreakdownFields(
 	if (filters.download_source.length > 0) {
 		const filterStats = getAnalyticsStatsForFilterCategory('download_source')
 		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-			downloads.push('user_agent')
+			downloads.push('domain')
 		}
 	}
 
