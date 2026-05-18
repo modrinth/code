@@ -869,24 +869,6 @@
   "dashboard.head-title": {
     "message": "Instrumentpanel"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Markera allt som läst"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Visa historik"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "Du har inga olästa notifikationer."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Misslyckades att ladda notifikationer:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Historik"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Notifikationshistorik"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "Visa alla"
   },
@@ -895,9 +877,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "Visa {extraNotifs} ytterligare {extraNotifs, plural, one {notifikation} other {notifikationer}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Laddar notifikationer..."
   },
   "dashboard.organizations.button.create": {
     "message": "Skapa organization"

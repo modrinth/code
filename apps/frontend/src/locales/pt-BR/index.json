@@ -407,6 +407,117 @@
   "collection.title": {
     "message": "{name} - Coleção"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Adicionar nota privada"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Aprovar"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Aprovar com resposta"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Fechar tópico"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Fechar com resposta"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Rejeitar"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Rejeitar com resposta"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Reabrir tópico"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Responder"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Responder ao tópico"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Reenviar para revisão"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Reenviar para revisão com resposta"
+  },
+  "conversation-thread.action.send": {
+    "message": "Enviar"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Enviar para revisão"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Enviar para revisão com resposta\t"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Definir como rascunho"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Definir como rascunho com resposta"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Reter"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Reter com resposta"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Este tópico está fechado e não é possível enviar novas mensagens para ele."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Erro ao fechar o relatório"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Erro ao reabrir o relatório"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Erro ao enviar mensagem"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Responder ao tópico..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Enviar uma mensagem..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Confirme que os moderadores não monitoram isso ativamente"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Estou ciente que os moderadores não monitoram o tópico ativamente."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Seu projeto já foi aprovado. Portanto, a equipe de moderação não monitora ativamente este tópico. No entanto, eles ainda podem ver sua mensagem caso haja algum problema com seu projeto."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Responder ao tópico"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Se precisar entrar em contato com a equipe de moderação, use a <help-center-link>Central de Ajuda do Modrinth</help-center-link> e clique no balão azul no canto inferior direito para contatar o suporte."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Confirmo que respondi às mensagens dos moderadores"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Confirmo que respondi adequadamente aos comentários dos moderadores."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Você está enviando <project-title>{projectTitle}</project-title> para ser revisado novamente pelos moderadores."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Reenviando para revisão"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Enviando para revisão"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Certifique-se de ter respondido a todos os comentários da equipe de moderação."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "O envio repetido de conteúdo sem considerar os comentários dos moderadores pode resultar na suspensão da conta."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Os arquivos suplementares servem para fornecer recursos de apoio, como código-fonte, e não versões ou variantes alternativas."
   },
@@ -875,23 +986,8 @@
   "dashboard.head-title": {
     "message": "Painel de controle"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Marcar tudo como lido"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Ver histórico"
-  },
   "dashboard.notifications.empty.no-unread": {
-    "message": "Você não tem nenhuma notificação não lida."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Erro ao carregar as notificações:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Histórico"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Histórico de notificações"
+    "message": "Você não tem notificações não lidas."
   },
   "dashboard.notifications.link.see-all": {
     "message": "Ver todas"
@@ -901,9 +997,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "Ver mais {extraNotifs} {extraNotifs, plural, one {notificação} other {notificações}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Carregando notificações..."
   },
   "dashboard.organizations.button.create": {
     "message": "Criar organização"
@@ -919,6 +1012,27 @@
   },
   "dashboard.organizations.title": {
     "message": "Organizações"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Marcar tudo como lido"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Ver histórico"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Você não tem nenhuma notificação não lida."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Erro ao carregar as notificações:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Histórico"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Histórico de notificações"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Carregando notificações..."
   },
   "dashboard.projects.bulk-edit-hint": {
     "message": "Você pode editar vários projetos em simultâneo, selecionando-os abaixo."
@@ -1754,14 +1868,20 @@
   "layout.banner.add-email.description": {
     "message": "Por motivos de segurança, o Modrinth precisa que você registre um endereço de e-mail na sua conta."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Sempre ignorar"
+  },
   "layout.banner.build-fail.description": {
     "message": "Esta implementação do frontend do Modrinth falhou ao gerar o estado da API. Isso pode ter ocorrido devido a uma interrupção ou a um erro de configuração. Recompile quando a API estiver disponível. Códigos de erro: {errors}; URL da API atual: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Ignorar"
   },
   "layout.banner.build-fail.title": {
     "message": "Erro ao gerar o estado da API durante a compilação."
   },
   "layout.banner.preview.description": {
-    "message": "Se você pretendia acessar o site oficial do Modrinth, visite <link>https://modrinth.com</link>. Essa versão de pré-lançamento é usada pela equipe da Modrinth para fins de teste. Ela foi construída com base em <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Se você pretendia acessar o site oficial do Modrinth, visite {url}. Essa versão de pré-lançamento é usada pela equipe da Modrinth para fins de teste. Ela foi construída com base em <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "Esta é uma versão de pré-lançamento do site Modrinth."
@@ -2590,6 +2710,84 @@
   },
   "project.license.title": {
     "message": "Licença"
+  },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Seu projeto é privado, o que significa que só você e as pessoas que você convidar podem acessá-lo."
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Seu projeto foi publicado e pode ser encontrado no Modrinth."
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Seu projeto não está listado, o que significa que só pode ser acessado por meio de um link direto e não pode ser encontrado no Modrinth."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "Você pode alterar a visibilidade do seu projeto nas <visibility-settings-link>configurações de visibilidade</visibility-settings-link> do seu projeto."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Projeto aprovado"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "Este é um projeto em rascunho e não poderá ser acessado por outras pessoas até que seja enviado para revisão e aprovado pela equipe de moderação do Modrinth."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Rascunho de projeto"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Após concluir todas as etapas necessárias e garantir que seu projeto esteja em conformidade com as <rules-link>Regras de Conteúdo</rules-link> da Modrinth, você poderá enviá-lo para revisão."
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "Por favor, resolva todas as questões relacionadas à moderação, incluindo quaisquer problemas listados nas mensagens abaixo, antes de reenviar este projeto."
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Alterações solicitadas"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "O envio repetido do seu projeto sem antes abordar todas as questões de moderação pode resultar na suspensão da conta."
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Seu projeto está na fila para ser revisado pela equipe de moderação da Modrinth."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Seu projeto será analisado e revisado por moderadores humanos para garantir que atenda às <rules-link>Regras de Conteúdo</rules-link> e aos <terms-link>Termos de Uso</terms-link> da Modrinth."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "Você ainda pode modificar seu projeto, isso não afetará sua posição na fila."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Nosso objetivo é analisar as submissões em 24 a 48 horas, mas alguns projetos podem sofrer atrasos. Isso não significa que haja algum problema com a sua submissão."
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>Agradecemos sua paciência enquanto nossos moderadores trabalham arduamente para manter o Modrinth seguro e estamos ansiosos para ajudá-lo(a) a compartilhar seu conteúdo! 💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Projeto em análise"
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "Seu projeto não será exibido publicamente e só poderá ser acessado por meio de um link direto.{requestedStatus, select, unlisted { Com base nas suas <visibility-settings-link>configurações de visibilidade</visibility-settings-link>, provavelmente nenhuma ação é necessária} other { Por favor, resolva todas as questões de moderação, incluindo quaisquer problemas listados nas mensagens abaixo, antes de reenviar este projeto}}."
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "Não listado pela equipe"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Não autorizado"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "Este tópico não está sendo monitorado ativamente, mas poderá ser consultado para obter informações sobre o seu projeto, se necessário."
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "Os moderadores de conteúdo não podem oferecer suporte para a maioria dos problemas e as mensagens neste tópico não notificam a equipe."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "Se precisar de ajuda ou tiver dúvidas adicionais, visite a <help-center-link>Central de Ajuda do Modrinth</help-center-link> e clique no balão azul para entrar em contato com o suporte."
+  },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "Exibir interface do membro"
+  },
+  "project.moderation.thread.private-description": {
+    "message": "Este é um tópico de conversa privada com os moderadores do Modrinth. Eles podem entrar em contato com você para tratar de assuntos relacionados a este projeto."
+  },
+  "project.moderation.thread.title": {
+    "message": "Mensagens da moderação"
   },
   "project.moderation.title": {
     "message": "Moderação"

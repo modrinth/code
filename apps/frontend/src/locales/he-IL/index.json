@@ -1499,9 +1499,6 @@
   "layout.banner.build-fail.title": {
     "message": "שגיאה ביצירת נתונים מהAPI במהלך הבנייה."
   },
-  "layout.banner.preview.description": {
-    "message": "אם התכוונת לגשת לאתר הרשמי של Modrinth, בקר בכתובת <link>https://modrinth.com</link>. פריסת תצוגה מקדימה זו משמשת את צוות Modrinth למטרות בדיקה בלבד. היא נבנתה באמצעות <branch-link>{owner}/{branch}</branch-link> @ {commit}."
-  },
   "layout.banner.preview.title": {
     "message": "זוהי פריסת תצוגה מקדימה של אתר Modrinth."
   },

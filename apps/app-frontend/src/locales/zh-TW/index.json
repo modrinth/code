@@ -302,9 +302,6 @@
   "app.project.install-button.already-installed": {
     "message": "這個專案已安裝"
   },
-  "app.project.install-context.back-to-browse": {
-    "message": "回到瀏覽頁面"
-  },
   "app.project.install-context.install-content-to-instance": {
     "message": "將內容安裝至實例"
   },

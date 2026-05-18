@@ -303,7 +303,7 @@
     "message": "此项目已安装"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "返回浏览器"
+    "message": "返回发现页"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "将内容安装到实例中"
@@ -567,7 +567,7 @@
     "message": "启动 Hooks"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "自定义启动Hooks"
+    "message": "自定义启动 Hooks"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooks允许高级用户在启动游戏前后运行特定的系统命令。"
