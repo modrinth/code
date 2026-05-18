@@ -1,7 +1,6 @@
-import { SettingsIcon } from '@modrinth/assets'
+import { PlayIcon, SettingsIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import WorldManageHeader from '../../components/servers/server-header/WorldManageHeader.vue'
 
 const meta = {
@@ -30,22 +29,22 @@ export const Default: Story = {
 		lastActive: 'Last active 2 weeks ago',
 		backHref: '/hosting/manage/demo-server/instances',
 		backLabel: 'All instances',
+		actions: [
+			{
+				id: 'start',
+				label: 'Start instance',
+				icon: PlayIcon,
+				color: 'brand',
+				onClick: () => undefined,
+			},
+			{
+				id: 'settings',
+				label: 'Instance settings',
+				icon: SettingsIcon,
+				labelHidden: true,
+				tooltip: 'Instance settings',
+				onClick: () => undefined,
+			},
+		],
 	},
-	render: (args) => ({
-		components: { ButtonStyled, SettingsIcon, WorldManageHeader },
-		setup() {
-			return { args }
-		},
-		template: `
-			<WorldManageHeader v-bind="args">
-				<template #actions>
-					<ButtonStyled size="large" circular>
-						<button type="button" aria-label="Instance settings">
-							<SettingsIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
-				</template>
-			</WorldManageHeader>
-		`,
-	}),
 }

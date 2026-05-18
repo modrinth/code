@@ -19,6 +19,8 @@ const MEDAL_ICON_URL = 'https://cdn-raw.modrinth.com/medal_icon.webp'
 const router = useRouter()
 const props = defineProps<{
 	installContext?: BrowseInstallContext | null
+	divider?: boolean
+	bottomPadding?: boolean
 }>()
 type SelectedProjectsLeaveResult = 'cancel' | 'discard' | 'install'
 type BrowseHeaderMetadataItem = {
@@ -57,7 +59,6 @@ const leadingItems = computed(() => {
 			ariaLabel: context.backLabel,
 			tooltip: context.backLabel,
 			onClick: handleBack,
-			wrapperClass: 'flex size-12 shrink-0 items-center justify-center',
 		},
 		...(iconSrc.value
 			? [
@@ -95,12 +96,13 @@ const metadataItems = computed(() => {
 		})
 	}
 	if (context.loader) {
-		const loaderLabel = formatLoaderLabel(context.loader)
+		const loaderName = formatLoaderLabel(context.loader)
+		const loaderLabel = [loaderName, context.loaderVersion].filter(Boolean).join(' ')
 		items.push({
 			id: 'loader',
 			label: loaderLabel,
 			icon: LoaderIcon,
-			iconProps: { loader: loaderLabel },
+			iconProps: { loader: loaderName },
 			class: '!text-primary',
 		})
 	}
@@ -158,8 +160,8 @@ async function handleSelectedProjectsLeaveResult(
 			:header="installContext.name"
 			:leading="leadingItems"
 			:metadata="metadataItems"
-			:divider="false"
-			:bottom-padding="false"
+			:divider="props.divider ?? false"
+			:bottom-padding="props.bottomPadding ?? false"
 			main-class="items-center"
 			title-class="leading-8"
 			truncate-title

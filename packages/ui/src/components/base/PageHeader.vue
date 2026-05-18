@@ -154,45 +154,58 @@
 			</div>
 
 			<div v-if="props.actions.length" class="flex flex-wrap gap-2 items-center">
-				<ButtonStyled
-					v-for="action in props.actions"
-					:key="action.id"
-					:color="action.color ?? 'standard'"
-					:size="action.size ?? 'large'"
-					:type="action.type ?? 'standard'"
-					:circular="action.circular ?? action.labelHidden ?? false"
-				>
-					<AutoLink
-						v-if="action.to"
-						v-tooltip="action.tooltip"
-						:to="action.to"
-						:aria-label="actionLabel(action)"
-					>
-						<component
-							:is="action.icon"
-							v-if="action.icon"
-							aria-hidden="true"
-							v-bind="action.iconProps"
-						/>
-						<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
-					</AutoLink>
-					<button
-						v-else
-						v-tooltip="action.tooltip"
-						type="button"
+				<template v-for="action in props.actions" :key="action.id">
+					<JoinedButtons
+						v-if="action.joinedActions?.length"
+						:actions="action.joinedActions"
+						:color="joinedActionColor(action.color)"
+						:size="action.size ?? 'large'"
 						:disabled="action.disabled"
-						:aria-label="actionLabel(action)"
-						@click="action.onClick"
+						:primary-disabled="action.primaryDisabled"
+						:dropdown-disabled="action.dropdownDisabled"
+						:primary-muted="action.primaryMuted"
+					/>
+					<ButtonStyled
+						v-else
+						:color="action.color ?? 'standard'"
+						:size="action.size ?? 'large'"
+						:type="action.type ?? 'standard'"
+						:circular="action.circular ?? action.labelHidden ?? false"
 					>
-						<component
-							:is="action.icon"
-							v-if="action.icon"
-							aria-hidden="true"
-							v-bind="action.iconProps"
-						/>
-						<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
-					</button>
-				</ButtonStyled>
+						<AutoLink
+							v-if="action.to"
+							v-tooltip="action.tooltip"
+							:to="action.to"
+							:aria-label="actionLabel(action)"
+						>
+							<component
+								:is="action.icon"
+								v-if="action.icon"
+								:class="action.iconClass"
+								aria-hidden="true"
+								v-bind="action.iconProps"
+							/>
+							<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
+						</AutoLink>
+						<button
+							v-else
+							v-tooltip="action.tooltip"
+							type="button"
+							:disabled="action.disabled"
+							:aria-label="actionLabel(action)"
+							@click="action.onClick"
+						>
+							<component
+								:is="action.icon"
+								v-if="action.icon"
+								:class="action.iconClass"
+								aria-hidden="true"
+								v-bind="action.iconProps"
+							/>
+							<span v-if="!action.labelHidden && !action.circular">{{ action.label }}</span>
+						</button>
+					</ButtonStyled>
+				</template>
 			</div>
 		</div>
 
@@ -265,6 +278,7 @@ import AutoLink from './AutoLink.vue'
 import Avatar from './Avatar.vue'
 import BulletDivider from './BulletDivider.vue'
 import ButtonStyled from './ButtonStyled.vue'
+import JoinedButtons, { type JoinedButtonAction } from './JoinedButtons.vue'
 
 type PageHeaderTarget = string | RouteLocationRaw
 type ButtonColor =
@@ -328,6 +342,7 @@ type PageHeaderAction = {
 	label: string
 	icon?: Component
 	iconProps?: Record<string, unknown>
+	iconClass?: string
 	tooltip?: string
 	ariaLabel?: string
 	to?: PageHeaderTarget
@@ -338,6 +353,10 @@ type PageHeaderAction = {
 	color?: ButtonColor
 	size?: ButtonSize
 	type?: ButtonType
+	joinedActions?: JoinedButtonAction[]
+	primaryDisabled?: boolean
+	dropdownDisabled?: boolean
+	primaryMuted?: boolean
 }
 
 const props = withDefaults(
@@ -395,5 +414,9 @@ function metadataClass(item: PageHeaderMetadataItem, interactive = false) {
 
 function actionLabel(action: PageHeaderAction) {
 	return action.ariaLabel ?? action.tooltip ?? action.label
+}
+
+function joinedActionColor(color?: ButtonColor) {
+	return color === 'medal-promo' ? 'standard' : color
 }
 </script>

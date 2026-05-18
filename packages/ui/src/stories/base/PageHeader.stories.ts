@@ -5,6 +5,8 @@ import {
 	MoreVerticalIcon,
 	PlayIcon,
 	SettingsIcon,
+	SlashIcon,
+	StopCircleIcon,
 	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TimerIcon,
 } from '@modrinth/assets'
@@ -226,6 +228,25 @@ export const ServerPanelInstanceHeader: Story = {
 				icon: PlayIcon,
 				color: 'brand',
 				onClick: noop,
+			},
+			{
+				id: 'stop',
+				label: 'Stop instance',
+				color: 'red',
+				joinedActions: [
+					{
+						id: 'stop',
+						label: 'Stop',
+						icon: StopCircleIcon,
+						action: noop,
+					},
+					{
+						id: 'kill_server',
+						label: 'Kill server',
+						icon: SlashIcon,
+						action: noop,
+					},
+				],
 			},
 			{
 				id: 'settings',
