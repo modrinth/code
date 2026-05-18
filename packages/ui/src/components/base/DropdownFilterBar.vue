@@ -111,7 +111,7 @@
 					:key="category.key"
 					:ref="(element) => setCategoryButtonRef(category.key, element)"
 					type="button"
-					class="group/filter-menu-button flex h-12 w-full appearance-none items-center justify-between gap-1 border-0 px-3 text-left text-base font-medium text-primary shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110 bg-surface-4"
+					class="group/filter-menu-button flex h-12 w-full appearance-none items-center justify-between gap-1 border-0 px-3 text-left text-base font-semibold text-primary shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110 bg-surface-4"
 					:class="category.key === activeCategoryKey ? '!brightness-110' : ''"
 					role="menuitem"
 					@mouseenter="handleCategoryMouseEnter(category.key)"
@@ -185,7 +185,7 @@
 				>
 					<div
 						v-if="filteredActiveCategoryOptions.length === 0"
-						class="px-3 py-2 text-sm font-medium text-secondary"
+						class="px-3 py-3.5 text-base font-medium text-secondary"
 					>
 						{{ activeCategoryEmptyStateLabel }}
 					</div>
@@ -203,7 +203,7 @@
 						>
 							<button
 								type="button"
-								class="flex w-full cursor-pointer items-center gap-2.5 border-0 p-3 text-left text-contrast shadow-none transition-colors duration-150 bg-surface-4 hover:brightness-110 focus-visible:outline-none"
+								class="flex w-full cursor-pointer items-center gap-2.5 border-0 p-3 py-3.5 text-left text-contrast shadow-none transition-colors duration-150 bg-surface-4 hover:brightness-110 focus-visible:outline-none"
 								:class="[
 									shouldVirtualizeActiveCategoryOptions ? 'h-12' : undefined,
 									{ 'pointer-events-none opacity-50': option.disabled },
@@ -225,7 +225,7 @@
 								</span>
 								<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
 									<span
-										class="min-w-0 truncate font-semibold leading-tight"
+										class="min-w-0 truncate font-medium leading-tight"
 										:class="option.selected ? 'text-contrast' : 'text-primary'"
 									>
 										{{ option.label }}

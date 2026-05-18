@@ -39,7 +39,7 @@
 				/>
 				<button
 					type="button"
-					class="flex cursor-pointer items-center border-0 border-t border-solid border-surface-5 bg-transparent px-4 py-3 text-left text-sm font-semibold text-primary transition-colors hover:bg-surface-5"
+					class="flex cursor-pointer items-center border-0 border-t border-solid border-surface-5 bg-transparent px-3 py-3 text-left text-sm font-semibold text-primary transition-colors hover:bg-surface-5"
 					@click.stop="switchDraftToCustomDateRange"
 				>
 					Custom fixed date range...
