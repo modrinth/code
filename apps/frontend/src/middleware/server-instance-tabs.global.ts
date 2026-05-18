@@ -6,7 +6,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
 	const serverId = decodeURIComponent(match[1])
 	const tab = match[2]
-	const worldsPath = `/hosting/manage/${encodeURIComponent(serverId)}/worlds`
+	const instancesPath = `/hosting/manage/${encodeURIComponent(serverId)}/instances`
 	const tabPath = tab === 'content' ? '' : `/${tab}`
 	const auth = await useAuth()
 
@@ -24,7 +24,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 			if (world) {
 				return navigateTo(
 					{
-						path: `${worldsPath}/${encodeURIComponent(world.id)}${tabPath}`,
+						path: `${instancesPath}/${encodeURIComponent(world.id)}${tabPath}`,
 						query: to.query,
 						hash: to.hash,
 					},
@@ -32,9 +32,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
 				)
 			}
 		} catch {
-			return navigateTo({ path: worldsPath, query: to.query, hash: to.hash }, { replace: true })
+			return navigateTo({ path: instancesPath, query: to.query, hash: to.hash }, { replace: true })
 		}
 	}
 
-	return navigateTo({ path: worldsPath, query: to.query, hash: to.hash }, { replace: true })
+	return navigateTo({ path: instancesPath, query: to.query, hash: to.hash }, { replace: true })
 })
