@@ -3,6 +3,7 @@
 
 use eyre::{Context, ContextCompat, Result, eyre};
 use std::{
+    fs::Metadata,
     io::{ErrorKind, Write},
     path::Path,
 };
@@ -55,6 +56,35 @@ pub fn canonicalize(
     })
 }
 
+pub async fn read_symlink_metadata(
+    path: impl AsRef<std::path::Path>,
+) -> Result<std::fs::Metadata, IOError> {
+    let path = path.as_ref();
+
+    tokio::fs::symlink_metadata(path)
+        .await
+        .map_err(|e| IOError::IOPathError {
+            source: e,
+            path: path.to_string_lossy().to_string(),
+        })
+}
+
+pub fn check_is_symlink(metadata: &Metadata) -> bool {
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::MetadataExt;
+
+        const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x0400;
+
+        metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0
+    }
+
+    #[cfg(not(windows))]
+    {
+        metadata.file_type().is_symlink()
+    }
+}
+
 pub async fn read_dir(
     path: impl AsRef<std::path::Path>,
 ) -> Result<tokio::fs::ReadDir, IOError> {
@@ -91,16 +121,63 @@ pub async fn create_dir_all(
         })
 }
 
+
 pub async fn remove_dir_all(
     path: impl AsRef<std::path::Path>,
 ) -> Result<(), IOError> {
-    let path = path.as_ref();
-    tokio::fs::remove_dir_all(path)
+    remove_dir_all_inner(path.as_ref()).await
+}
+
+async fn remove_link(
+    path: &std::path::Path,
+    _metadata: &std::fs::Metadata,
+) -> Result<(), IOError> {
+    remove_file(path).await
+}
+
+#[async_recursion::async_recursion]
+async fn remove_dir_all_inner(
+    path: &std::path::Path,
+) -> Result<(), IOError> {
+    let metadata = read_symlink_metadata(path)
         .await
-        .map_err(|e| IOError::IOPathError {
-            source: e,
-            path: path.to_string_lossy().to_string(),
-        })
+        .wrap_err_with(|| eyre!("reading metadata for {path:?}"))?;
+
+    if check_is_symlink(&metadata) {
+        return remove_link(path, &metadata).await;
+    }
+
+    let mut dir = read_dir(path)
+        .await
+        .wrap_err_with(|| eyre!("reading directory {path:?}"))?;
+
+    while let Some(entry) = dir
+        .next_entry()
+        .await
+        .wrap_err_with(|| eyre!("reading directory entry in {path:?}"))?
+    {
+        let entry_path = entry.path();
+
+        let entry_metadata = read_symlink_metadata(&entry_path)
+            .await
+            .wrap_err_with(|| eyre!("reading metadata for {entry_path:?}"))?;
+
+        if check_is_symlink(&entry_metadata) {
+            remove_link(&entry_path, &entry_metadata).await?;
+        } else if entry_metadata.is_dir() {
+            remove_dir_all_inner(&entry_path).await?;
+        } else {
+            remove_file(&entry_path)
+                .await
+                .wrap_err_with(|| eyre!("removing file {entry_path:?}"))?;
+        }
+    }
+
+    remove_dir(path)
+        .await
+        .wrap_err_with(|| eyre!("removing directory {path:?}"))?;
+
+    Ok(())
 }
 
 /// Reads a text file to a string, automatically detecting its encoding and
