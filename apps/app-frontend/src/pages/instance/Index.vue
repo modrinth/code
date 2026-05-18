@@ -288,6 +288,7 @@ import {
 	Avatar,
 	ButtonStyled,
 	ContentPageHeader,
+	defineMessages,
 	injectNotificationManager,
 	NavTabs,
 	OverflowMenu,
@@ -295,6 +296,7 @@ import {
 	ServerPing,
 	ServerRecentPlays,
 	ServerRegion,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -320,6 +322,23 @@ import { get_server_status, refreshWorlds } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs } from '@/store/state'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	timePlayedHours: {
+		id: 'app.instance.overview.time-played.hours',
+		defaultMessage: '{count, plural, one {# hour} other {# hours}}',
+	},
+	timePlayedMinutes: {
+		id: 'app.instance.overview.time-played.minutes',
+		defaultMessage: '{count, plural, one {# minute} other {# minutes}}',
+	},
+	timePlayedSeconds: {
+		id: 'app.instance.overview.time-played.seconds',
+		defaultMessage: '{count, plural, one {# second} other {# seconds}}',
+	},
+})
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -649,16 +668,16 @@ const timePlayedHumanized = computed(() => {
 	const duration = dayjs.duration(timePlayed.value, 'seconds')
 	const hours = Math.floor(duration.asHours())
 	if (hours >= 1) {
-		return hours + ' hour' + (hours > 1 ? 's' : '')
+		return formatMessage(messages.timePlayedHours, { count: hours })
 	}
 
 	const minutes = Math.floor(duration.asMinutes())
 	if (minutes >= 1) {
-		return minutes + ' minute' + (minutes > 1 ? 's' : '')
+		return formatMessage(messages.timePlayedMinutes, { count: minutes })
 	}
 
 	const seconds = Math.floor(duration.asSeconds())
-	return seconds + ' second' + (seconds > 1 ? 's' : '')
+	return formatMessage(messages.timePlayedSeconds, { count: seconds })
 })
 
 onUnmounted(() => {

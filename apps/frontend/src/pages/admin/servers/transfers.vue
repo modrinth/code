@@ -65,7 +65,7 @@
 									</TagItem>
 								</div>
 								<span class="text-sm text-secondary">
-									{{ batch.log_count }} transfer{{ batch.log_count === 1 ? '' : 's' }}
+									{{ formatMessage(messages.transferCount, { count: batch.log_count }) }}
 								</span>
 								<ButtonStyled v-if="canCancel(batch)" color="red" color-fill="text">
 									<button @click="showCancelModal(batch.id)">
@@ -113,11 +113,13 @@ import {
 	Avatar,
 	ButtonStyled,
 	ConfirmModal,
+	defineMessages,
 	injectNotificationManager,
 	Pagination,
 	TagItem,
 	useFormatDateTime,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import type { User } from '@modrinth/utils'
 import dayjs from 'dayjs'
@@ -127,10 +129,18 @@ import TransferModal from '~/components/ui/admin/TransferModal.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
+})
+
+const messages = defineMessages({
+	transferCount: {
+		id: 'admin.server-transfers.transfer-count',
+		defaultMessage: '{count, plural, one {# transfer} other {# transfers}}',
+	},
 })
 
 // Types

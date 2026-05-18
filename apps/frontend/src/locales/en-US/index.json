@@ -5,8 +5,23 @@
   "action.continue": {
     "message": "Continue"
   },
+  "admin.affiliates.affiliate-code-count": {
+    "message": "{count, plural, one {# affiliate code} other {# affiliate codes}}"
+  },
+  "admin.batch-credit.email-preview.subscription-days": {
+    "message": "To make up for it, we've added {days, plural, one {# day} other {# days}} to your Modrinth Servers subscription."
+  },
   "admin.billing.error.not-found": {
     "message": "User not found"
+  },
+  "admin.server-transfers.transfer-count": {
+    "message": "{count, plural, one {# transfer} other {# transfers}}"
+  },
+  "admin.transfer-modal.selected-servers": {
+    "message": "{count, plural, one {# server selected} other {# servers selected}}"
+  },
+  "admin.transfer-modal.unknown-nodes": {
+    "message": "{count, plural, one {Unknown node} other {Unknown nodes}}"
   },
   "app-marketing.download.description": {
     "message": "Our desktop app is available across all platforms, choose your desired version."
@@ -2090,6 +2105,9 @@
   "moderation.page.technicalReview": {
     "message": "Tech review"
   },
+  "moderation.tech-review.other-traces-also-marked": {
+    "message": "({count, plural, one {# other trace also marked} other {# other traces also marked}})"
+  },
   "muralpay.account-type.checking": {
     "message": "Checking"
   },
@@ -2357,6 +2375,9 @@
   "muralpay.warning.wallet-address": {
     "message": "Double-check your wallet address. Funds sent to an incorrect address cannot be recovered."
   },
+  "organization.settings.projects.edit-links.affected-projects": {
+    "message": "Changes will be applied to {count, plural, one {# project} other {# projects}}."
+  },
   "profile.bio.fallback.creator": {
     "message": "A Modrinth creator."
   },
@@ -2380,6 +2401,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Set as affiliate"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, one {# project} other {# projects}}"
   },
   "profile.details.label.auth-providers": {
     "message": "Auth providers"
@@ -2898,10 +2922,10 @@
     "message": "Visit projects dashboard"
   },
   "project.stats.downloads-label": {
-    "message": "download{count, plural, one {} other {s}}"
+    "message": "{count, plural, one {download} other {downloads}}"
   },
   "project.stats.followers-label": {
-    "message": "follower{count, plural, one {} other {s}}"
+    "message": "{count, plural, one {follower} other {followers}}"
   },
   "project.status.archived.message": {
     "message": "{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project."

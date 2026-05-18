@@ -200,9 +200,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
   },
-  "app.instance.mods.content-type-project": {
-    "message": "project"
-  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was added"
   },
@@ -217,6 +214,15 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
+  },
+  "app.instance.overview.time-played.hours": {
+    "message": "{count, plural, one {# hour} other {# hours}}"
+  },
+  "app.instance.overview.time-played.minutes": {
+    "message": "{count, plural, one {# minute} other {# minutes}}"
+  },
+  "app.instance.overview.time-played.seconds": {
+    "message": "{count, plural, one {# second} other {# seconds}}"
   },
   "app.instance.worlds.add-server": {
     "message": "Add server"

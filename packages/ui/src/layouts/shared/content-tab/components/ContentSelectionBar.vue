@@ -16,7 +16,8 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	selectedCount: {
 		id: 'content.selection-bar.selected-count',
-		defaultMessage: '{count} {contentType} selected',
+		defaultMessage:
+			'{count, plural, one {# {contentType, select, datapack {data pack} mod {mod} modpack {modpack} plugin {plugin} project {project} resourcepack {resource pack} server {server} shader {shader} other {item}} selected} other {# {contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}} selected}}',
 	},
 	selectedCountSimple: {
 		id: 'content.selection-bar.selected-count-simple',
@@ -24,35 +25,43 @@ const messages = defineMessages({
 	},
 	bulkEnabling: {
 		id: 'content.selection-bar.bulk.enabling',
-		defaultMessage: 'Enabling {progress}/{total} {contentType}...',
+		defaultMessage:
+			'Enabling {progress}/{total} {total, plural, one {{contentType, select, datapack {data pack} mod {mod} modpack {modpack} plugin {plugin} project {project} resourcepack {resource pack} server {server} shader {shader} other {item}}} other {{contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}}}...',
 	},
 	bulkEnablingWaiting: {
 		id: 'content.selection-bar.bulk.enabling-waiting',
-		defaultMessage: 'Enabling {contentType}...',
+		defaultMessage:
+			'Enabling {contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}...',
 	},
 	bulkDisabling: {
 		id: 'content.selection-bar.bulk.disabling',
-		defaultMessage: 'Disabling {progress}/{total} {contentType}...',
+		defaultMessage:
+			'Disabling {progress}/{total} {total, plural, one {{contentType, select, datapack {data pack} mod {mod} modpack {modpack} plugin {plugin} project {project} resourcepack {resource pack} server {server} shader {shader} other {item}}} other {{contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}}}...',
 	},
 	bulkDisablingWaiting: {
 		id: 'content.selection-bar.bulk.disabling-waiting',
-		defaultMessage: 'Disabling {contentType}...',
+		defaultMessage:
+			'Disabling {contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}...',
 	},
 	bulkUpdating: {
 		id: 'content.selection-bar.bulk.updating',
-		defaultMessage: 'Updating {progress}/{total} {contentType}...',
+		defaultMessage:
+			'Updating {progress}/{total} {total, plural, one {{contentType, select, datapack {data pack} mod {mod} modpack {modpack} plugin {plugin} project {project} resourcepack {resource pack} server {server} shader {shader} other {item}}} other {{contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}}}...',
 	},
 	bulkUpdatingWaiting: {
 		id: 'content.selection-bar.bulk.updating-waiting',
-		defaultMessage: 'Updating {contentType}...',
+		defaultMessage:
+			'Updating {contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}...',
 	},
 	bulkDeleting: {
 		id: 'content.selection-bar.bulk.deleting',
-		defaultMessage: 'Deleting {progress}/{total} {contentType}...',
+		defaultMessage:
+			'Deleting {progress}/{total} {total, plural, one {{contentType, select, datapack {data pack} mod {mod} modpack {modpack} plugin {plugin} project {project} resourcepack {resource pack} server {server} shader {shader} other {item}}} other {{contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}}}...',
 	},
 	bulkDeletingWaiting: {
 		id: 'content.selection-bar.bulk.deleting-waiting',
-		defaultMessage: 'Deleting {contentType}...',
+		defaultMessage:
+			'Deleting {contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}...',
 	},
 	allAlreadyEnabled: {
 		id: 'content.selection-bar.all-already-enabled',
@@ -110,7 +119,7 @@ const selectedCountText = computed(() => {
 	if (props.contentTypeLabel) {
 		return formatMessage(messages.selectedCount, {
 			count,
-			contentType: `${props.contentTypeLabel}${count === 1 ? '' : 's'}`,
+			contentType: props.contentTypeLabel,
 		})
 	}
 	return formatMessage(messages.selectedCountSimple, { count })
@@ -118,9 +127,6 @@ const selectedCountText = computed(() => {
 
 const bulkProgressMessage = computed(() => {
 	if (!props.bulkOperation) return ''
-	const contentType = props.contentTypeLabel
-		? `${props.contentTypeLabel}${props.bulkTotal === 1 ? '' : 's'}`
-		: 'items'
 	const messageMap = {
 		enable: props.bulkWaiting ? messages.bulkEnablingWaiting : messages.bulkEnabling,
 		disable: props.bulkWaiting ? messages.bulkDisablingWaiting : messages.bulkDisabling,
@@ -130,7 +136,7 @@ const bulkProgressMessage = computed(() => {
 	return formatMessage(messageMap[props.bulkOperation], {
 		progress: props.bulkProgress,
 		total: props.bulkTotal,
-		contentType,
+		contentType: props.contentTypeLabel ?? 'other',
 	})
 })
 </script>

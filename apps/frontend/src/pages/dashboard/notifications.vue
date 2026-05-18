@@ -39,7 +39,7 @@
 				v-if="notifTypes.length > 1"
 				v-model="selectedType"
 				:items="notifTypes"
-				:format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
+				:format-label="formatNotificationType"
 				:capitalize="false"
 			/>
 			<p v-if="isPending">{{ formatMessage(messages.loadingNotifications) }}</p>
@@ -74,12 +74,13 @@ import {
 	ButtonStyled,
 	Chips,
 	commonMessages,
+	commonProjectTypeCategoryMessages,
 	defineMessages,
 	injectModrinthClient,
+	normalizeProjectType,
 	Pagination,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
@@ -138,6 +139,16 @@ useHead({
 const selectedType = ref('all')
 const page = ref(1)
 const perPage = ref(50)
+
+function formatNotificationType(type: string) {
+	if (type === 'all') return formatMessage(commonMessages.allProjectType)
+	const normalized = normalizeProjectType(type)
+	const message =
+		commonProjectTypeCategoryMessages[
+			normalized as keyof typeof commonProjectTypeCategoryMessages
+		]
+	return message ? formatMessage(message) : type.replace('_', ' ')
+}
 
 const { data, isPending, error, refetch } = useQuery({
 	queryKey: computed(() => [

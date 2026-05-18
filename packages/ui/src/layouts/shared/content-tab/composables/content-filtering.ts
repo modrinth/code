@@ -53,7 +53,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			for (const type of types) {
 				const msg =
 					commonProjectTypeCategoryMessages[type as keyof typeof commonProjectTypeCategoryMessages]
-				const label = msg ? formatMessage(msg) : type.charAt(0).toUpperCase() + type.slice(1) + 's'
+				const label = msg ? formatMessage(msg) : type.charAt(0).toUpperCase() + type.slice(1)
 				options.push({ id: type, label })
 			}
 		}

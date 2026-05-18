@@ -189,7 +189,6 @@ import {
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
 
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import type { DisplayLocation } from '~/plugins/cosmetics'
@@ -415,8 +414,6 @@ const listTypes = computed(() => {
 	const types = tags.value.projectTypes.map((type) => {
 		return {
 			id: type.id as DisplayLocation,
-			name: formatProjectType(type.id) + 's',
-			display: 'the ' + formatProjectType(type.id).toLowerCase() + 's search page',
 		}
 	})
 

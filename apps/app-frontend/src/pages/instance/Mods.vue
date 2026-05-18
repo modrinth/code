@@ -142,10 +142,6 @@ const messages = defineMessages({
 		id: 'app.instance.mods.projects-were-added',
 		defaultMessage: '{count} projects were added',
 	},
-	contentTypeProject: {
-		id: 'app.instance.mods.content-type-project',
-		defaultMessage: 'project',
-	},
 })
 
 let savedModalState: ModpackContentModalState | null = null
@@ -781,7 +777,7 @@ provideContentManager({
 	isPackLocked,
 	isBusy: isInstanceBusy,
 	isBulkOperating,
-	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
+	contentTypeLabel: ref('project'),
 	toggleEnabled: toggleDisableDebounced,
 	bulkEnableItems: (items: ContentItem[]) =>
 		Promise.all(items.filter((item) => !item.enabled).map((item) => toggleDisableMod(item))).then(

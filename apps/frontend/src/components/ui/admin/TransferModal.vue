@@ -34,7 +34,7 @@
 					placeholder="123e4569-e89b-12d3-a456-426614174005&#10;123e9569-e89b-12d3-a456-413678919876"
 				/>
 				<span v-if="parsedServerIds.length" class="text-sm text-secondary">
-					{{ parsedServerIds.length }} server{{ parsedServerIds.length === 1 ? '' : 's' }} selected
+					{{ formatMessage(messages.selectedServers, { count: parsedServerIds.length }) }}
 				</span>
 			</div>
 
@@ -198,11 +198,13 @@ import {
 	ButtonStyled,
 	Chips,
 	Combobox,
+	defineMessages,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
 	TagItem,
 	Toggle,
+	useVIntl,
 } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
@@ -214,6 +216,18 @@ const emit = defineEmits<{
 }>()
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	selectedServers: {
+		id: 'admin.transfer-modal.selected-servers',
+		defaultMessage: '{count, plural, one {# server selected} other {# servers selected}}',
+	},
+	unknownNodes: {
+		id: 'admin.transfer-modal.unknown-nodes',
+		defaultMessage: '{count, plural, one {Unknown node} other {Unknown nodes}}',
+	},
+})
 
 const modal = ref<InstanceType<typeof NewModal>>()
 
@@ -303,7 +317,7 @@ function addNodes() {
 
 	if (unknownNodes.length > 0) {
 		addNotification({
-			title: `Unknown node${unknownNodes.length > 1 ? 's' : ''}`,
+			title: formatMessage(messages.unknownNodes, { count: unknownNodes.length }),
 			text: unknownNodes.join(', '),
 			type: 'error',
 		})

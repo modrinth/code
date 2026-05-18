@@ -16,7 +16,7 @@ import type Stripe from 'stripe'
 import { computed } from 'vue'
 
 import { useFormatPrice } from '../../composables'
-import { useVIntl } from '../../composables/i18n'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import { regionOverrides } from '../../utils/regions'
 import ButtonStyled from '../base/ButtonStyled.vue'
@@ -30,6 +30,14 @@ import ServersSpecs from './ServersSpecs.vue'
 
 const { formatMessage } = useVIntl()
 const formatPrice = useFormatPrice()
+
+const messages = defineMessages({
+	proratedHostingTitle: {
+		id: 'servers.purchase.review.invoice.prorated-hosting-title',
+		defaultMessage:
+			'Modrinth Hosting ({planName}) — prorated for {days, plural, one {# day} other {# days}}',
+	},
+})
 
 const emit = defineEmits<{
 	(e: 'changePaymentMethod' | 'reloadPaymentIntent'): void
@@ -287,9 +295,10 @@ function setInterval(newInterval: ServerBillingInterval) {
 								{
 									title:
 										isProratedCharge && prorationDays
-											? `Modrinth Hosting (${planName}) — prorated for ${prorationDays} day${
-													prorationDays === 1 ? '' : 's'
-												}`
+											? formatMessage(messages.proratedHostingTitle, {
+													planName,
+													days: prorationDays,
+												})
 											: `Modrinth Hosting (${planName})`,
 									amount: total - tax,
 								},

@@ -1368,7 +1368,7 @@ const messages = defineMessages({
 	},
 	downloadsStat: {
 		id: 'project.stats.downloads-label',
-		defaultMessage: 'download{count, plural, one {} other {s}}',
+		defaultMessage: '{count, plural, one {download} other {downloads}}',
 	},
 	errorLoadingProject: {
 		id: 'project.error.loading',
@@ -1398,7 +1398,7 @@ const messages = defineMessages({
 	},
 	followersStat: {
 		id: 'project.stats.followers-label',
-		defaultMessage: 'follower{count, plural, one {} other {s}}',
+		defaultMessage: '{count, plural, one {follower} other {followers}}',
 	},
 	galleryTab: {
 		id: 'project.gallery.title',

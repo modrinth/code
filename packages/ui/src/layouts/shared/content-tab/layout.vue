@@ -73,7 +73,8 @@ const messages = defineMessages({
 	},
 	searchPlaceholder: {
 		id: 'content.page-layout.search-placeholder',
-		defaultMessage: 'Search {count} {contentType}...',
+		defaultMessage:
+			'Search {count, plural, one {# {contentType, select, datapack {data pack} mod {mod} modpack {modpack} plugin {plugin} project {project} resourcepack {resource pack} server {server} shader {shader} other {item}}} other {# {contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {items}}}}...',
 	},
 	browseContent: {
 		id: 'content.page-layout.browse-content',
@@ -117,7 +118,8 @@ const messages = defineMessages({
 	},
 	emptyHint: {
 		id: 'content.page-layout.empty.hint',
-		defaultMessage: 'Browse or upload {contentType} to get started',
+		defaultMessage:
+			'Browse or upload {contentType, select, datapack {data packs} mod {mods} modpack {modpacks} plugin {plugins} project {projects} resourcepack {resource packs} server {servers} shader {shaders} other {content}} to get started',
 	},
 	shareProjectNames: {
 		id: 'content.page-layout.share.project-names',
@@ -555,7 +557,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								:placeholder="
 									formatMessage(messages.searchPlaceholder, {
 										count: tableItems.length,
-										contentType: `${ctx.contentTypeLabel.value}${tableItems.length === 1 ? '' : 's'}`,
+										contentType: ctx.contentTypeLabel.value,
 									})
 								"
 							/>
@@ -710,7 +712,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							ctx.modpack.value
 								? formatMessage(messages.emptyModpackHint)
 								: formatMessage(messages.emptyHint, {
-										contentType: `${ctx.contentTypeLabel.value}s`,
+										contentType: ctx.contentTypeLabel.value,
 									})
 						}}
 					</template>
