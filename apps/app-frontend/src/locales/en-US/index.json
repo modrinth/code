@@ -593,6 +593,27 @@
   "instance.settings.tabs.hooks.title": {
     "message": "Game launch hooks"
   },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "Hooks run in the working directory of the instance, with the following variables:"
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: The absolute path to the instance's folder"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: The name of the instance's folder"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: The JVM Arguments provided to the game"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: The absolute path to the java binary"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: An alias for $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: The name of the instance"
+  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
   },
