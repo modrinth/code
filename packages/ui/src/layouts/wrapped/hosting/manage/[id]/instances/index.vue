@@ -1,5 +1,19 @@
 <template>
 	<div class="flex flex-col gap-4">
+		<Admonition
+			v-if="!instanceInfoAdmonitionDismissed"
+			type="info"
+			:header="formatMessage(messages.instanceInfoHeader)"
+			dismissible
+			@dismiss="dismissInstanceInfoAdmonition"
+		>
+			<ul class="m-0 pl-4">
+				<li>{{ formatMessage(messages.instanceInfoDefinition) }}</li>
+				<li>{{ formatMessage(messages.instanceInfoSwitching) }}</li>
+				<li>{{ formatMessage(messages.instanceInfoFiles) }}</li>
+			</ul>
+		</Admonition>
+
 		<div
 			v-if="worldsPending"
 			class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,20.25rem),1fr))] gap-6"
@@ -26,9 +40,11 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { useQuery } from '@tanstack/vue-query'
+import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import InstanceCard from '#ui/components/servers/instances/InstanceCard.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
@@ -42,6 +58,22 @@ const messages = defineMessages({
 	instanceSlotName: {
 		id: 'servers.manage.instances.slot-name',
 		defaultMessage: 'Instance #{index}',
+	},
+	instanceInfoHeader: {
+		id: 'servers.manage.instances.info.header',
+		defaultMessage: 'What is an instance?',
+	},
+	instanceInfoDefinition: {
+		id: 'servers.manage.instances.info.definition',
+		defaultMessage: 'An instance is a separate server setup.',
+	},
+	instanceInfoSwitching: {
+		id: 'servers.manage.instances.info.switching',
+		defaultMessage: 'You can switch which instance your server runs.',
+	},
+	instanceInfoFiles: {
+		id: 'servers.manage.instances.info.files',
+		defaultMessage: 'Each instance has its own server files, worlds, installed content, and settings.',
 	},
 })
 
@@ -79,12 +111,14 @@ type ContentSummary = {
 }
 
 const WORLD_SLOT_COUNT = 3
+const INSTANCE_INFO_ADMONITION_KEY = 'server-instances-info-admonition-dismissed'
 
 const client = injectModrinthClient()
 const { serverId, server, isServerRunning } = injectModrinthServerContext()
 const { openServerSettings } = injectServerSettingsModal()
 const { formatMessage } = useVIntl()
 const router = useRouter()
+const instanceInfoAdmonitionDismissed = useStorage(INSTANCE_INFO_ADMONITION_KEY, false)
 
 const worldsQuery = useQuery({
 	queryKey: computed(() => ['servers', 'worlds', 'summary', 'v1', serverId]),
@@ -285,5 +319,9 @@ function handleWorldSettings() {
 
 function handleCreateWorld() {
 	openServerSettings({ tabId: 'installation' })
+}
+
+function dismissInstanceInfoAdmonition() {
+	instanceInfoAdmonitionDismissed.value = true
 }
 </script>
