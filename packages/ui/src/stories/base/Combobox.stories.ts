@@ -348,3 +348,22 @@ export const SearchableWithOptionAndSelectionAffix: StoryObj = {
 		`,
 	}),
 }
+
+export const ManyOptionsOverflow: Story = {
+	args: {
+		options: Array.from({ length: 40 }, (_, index) => ({
+			value: `${index + 1}`,
+			label: `Option ${index + 1}`,
+		})),
+		placeholder: 'Select an option',
+		maxHeight: 380,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers long option lists where the dropdown content should scroll within its max height.',
+			},
+		},
+	},
+}

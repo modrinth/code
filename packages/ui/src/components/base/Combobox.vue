@@ -105,64 +105,73 @@
 				>
 					<div
 						v-if="filteredOptions.length > 0"
-						ref="optionsContainerRef"
-						class="flex flex-col overflow-y-auto"
-						:style="{ maxHeight: `${maxHeight}px` }"
+						ref="optionsScrollbarRef"
+						class="combobox-options-scrollbar bg-surface-4"
+						data-overlayscrollbars-initialize
 					>
-						<template v-for="(item, index) in filteredOptions" :key="item.key">
-							<div v-if="item.type === 'divider'" class="h-px bg-surface-5"></div>
-							<component
-								:is="item.type === 'link' ? 'a' : 'span'"
-								v-else
-								:ref="(el: HTMLElement) => setOptionRef(el as HTMLElement, index)"
-								:href="item.type === 'link' && !item.disabled ? item.href : undefined"
-								:target="item.type === 'link' && !item.disabled ? item.target : undefined"
-								:role="listbox ? 'option' : 'menuitem'"
-								:aria-selected="listbox && item.value === modelValue"
-								:aria-disabled="item.disabled || undefined"
-								:data-focused="focusedIndex === index"
-								class="group/option flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
-								:class="getOptionClasses(item, index)"
-								tabindex="-1"
-								@mousedown.prevent
-								@click="handleOptionClick(item, index)"
-								@mouseenter="handleOptionMouseEnter(item, index)"
-							>
-								<slot
-									name="option"
-									:item="item"
-									:index="index"
-									:is-selected="!!(listbox && item.value === modelValue)"
-								>
-									<div class="flex w-full items-center justify-between gap-2">
-										<div class="flex items-center gap-2">
-											<component
-												:is="item.icon"
-												v-if="item.icon"
-												class="h-5 w-5"
-												:class="item.value === modelValue ? 'text-green' : 'text-primary'"
-											/>
-											<div class="flex flex-col gap-1.5">
-												<span
-													class="font-semibold leading-tight"
-													:class="item.value === modelValue ? 'text-green' : 'text-primary'"
-												>
-													{{ item.label }}
-												</span>
-												<span
-													v-if="item.subLabel"
-													class="text-sm"
-													:class="item.value === modelValue ? 'text-green' : 'text-secondary'"
-												>
-													{{ item.subLabel }}
-												</span>
+						<div
+							ref="optionsContainerRef"
+							class="overflow-y-auto"
+							:style="{ maxHeight: `${maxHeight}px` }"
+							data-overlayscrollbars-viewport
+						>
+							<div ref="optionsListRef" class="flex flex-col">
+								<template v-for="(item, index) in filteredOptions" :key="item.key">
+									<div v-if="item.type === 'divider'" class="h-px bg-surface-5"></div>
+									<component
+										:is="item.type === 'link' ? 'a' : 'span'"
+										v-else
+										:ref="(el: HTMLElement) => setOptionRef(el as HTMLElement, index)"
+										:href="item.type === 'link' && !item.disabled ? item.href : undefined"
+										:target="item.type === 'link' && !item.disabled ? item.target : undefined"
+										:role="listbox ? 'option' : 'menuitem'"
+										:aria-selected="listbox && item.value === modelValue"
+										:aria-disabled="item.disabled || undefined"
+										:data-focused="focusedIndex === index"
+										class="group/option flex items-center gap-2.5 cursor-pointer p-3 text-left transition-all duration-150 bg-surface-4 text-contrast hover:brightness-110 focus:brightness-110"
+										:class="getOptionClasses(item, index)"
+										tabindex="-1"
+										@mousedown.prevent
+										@click="handleOptionClick(item, index)"
+										@mouseenter="handleOptionMouseEnter(item, index)"
+									>
+										<slot
+											name="option"
+											:item="item"
+											:index="index"
+											:is-selected="!!(listbox && item.value === modelValue)"
+										>
+											<div class="flex w-full items-center justify-between gap-2">
+												<div class="flex items-center gap-2">
+													<component
+														:is="item.icon"
+														v-if="item.icon"
+														class="h-5 w-5"
+														:class="item.value === modelValue ? 'text-green' : 'text-primary'"
+													/>
+													<div class="flex flex-col gap-1.5">
+														<span
+															class="font-semibold leading-tight"
+															:class="item.value === modelValue ? 'text-green' : 'text-primary'"
+														>
+															{{ item.label }}
+														</span>
+														<span
+															v-if="item.subLabel"
+															class="text-sm"
+															:class="item.value === modelValue ? 'text-green' : 'text-secondary'"
+														>
+															{{ item.subLabel }}
+														</span>
+													</div>
+												</div>
+												<slot name="option-suffix" :item="item"></slot>
 											</div>
-										</div>
-										<slot name="option-suffix" :item="item"></slot>
-									</div>
-								</slot>
-							</component>
-						</template>
+										</slot>
+									</component>
+								</template>
+							</div>
+						</div>
 					</div>
 
 					<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
@@ -179,6 +188,8 @@
 <script setup lang="ts" generic="T">
 import { ChevronLeftIcon, SearchIcon } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
+import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
+import 'overlayscrollbars/overlayscrollbars.css'
 import {
 	type Component,
 	computed,
@@ -206,9 +217,22 @@ export interface ComboboxOption<T> {
 	searchTerms?: string[]
 }
 
+type OverlayScrollbarsInstance = NonNullable<ReturnType<typeof OverlayScrollbars>>
+
 const DROPDOWN_VIEWPORT_MARGIN = 8
 const DROPDOWN_GAP = 12
 const DEFAULT_MAX_HEIGHT = 300
+const OPTIONS_OVERLAY_SCROLLBARS_OPTIONS = Object.freeze<PartialOptions>({
+	overflow: {
+		x: 'hidden',
+		y: 'scroll',
+	},
+	scrollbars: {
+		theme: 'os-theme-modrinth',
+		autoHide: 'leave',
+		autoHideSuspend: true,
+	},
+})
 
 function isDropdownOption<T>(
 	opt: ComboboxOption<T> | { type: 'divider' },
@@ -286,9 +310,12 @@ const containerRef = ref<HTMLElement>()
 const triggerRef = ref<HTMLElement>()
 const searchTriggerRef = ref<InstanceType<typeof StyledInput>>()
 const dropdownRef = ref<HTMLElement>()
+const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
+const optionsListRef = ref<HTMLElement>()
 const optionRefs = ref<(HTMLElement | null)[]>([])
 const rafId = ref<number | null>(null)
+const optionsOverlayScrollbars = ref<OverlayScrollbarsInstance | null>(null)
 
 const effectiveTriggerEl = computed(() => {
 	if (props.searchable && searchTriggerRef.value) {
@@ -371,7 +398,7 @@ function getOptionClasses(item: ComboboxOption<T> & { key: string }, index: numb
 		item.class,
 		{
 			'bg-highlight-green text-green hover:bg-highlight-green focus:bg-highlight-green': isSelected,
-			'bg-surface-5': focusedIndex.value === index && !isSelected,
+			'brightness-125': focusedIndex.value === index && !isSelected,
 			'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
 		},
 	]
@@ -483,6 +510,46 @@ async function updateDropdownPosition() {
 	openDirection.value = direction
 }
 
+async function initializeOptionsOverlayScrollbars() {
+	await nextTick()
+
+	if (!isOpen.value || filteredOptions.value.length === 0) {
+		destroyOptionsOverlayScrollbars()
+		return
+	}
+
+	if (!optionsScrollbarRef.value || !optionsContainerRef.value || !optionsListRef.value) {
+		return
+	}
+
+	if (optionsOverlayScrollbars.value) {
+		optionsOverlayScrollbars.value.update(true)
+		return
+	}
+
+	optionsOverlayScrollbars.value = OverlayScrollbars(
+		{
+			target: optionsScrollbarRef.value,
+			elements: {
+				viewport: optionsContainerRef.value,
+				content: optionsListRef.value,
+			},
+		},
+		OPTIONS_OVERLAY_SCROLLBARS_OPTIONS,
+	)
+}
+
+function updateOptionsOverlayScrollbars() {
+	nextTick(() => {
+		optionsOverlayScrollbars.value?.update(true)
+	})
+}
+
+function destroyOptionsOverlayScrollbars() {
+	optionsOverlayScrollbars.value?.destroy()
+	optionsOverlayScrollbars.value = null
+}
+
 async function openDropdown() {
 	if (props.disabled || isOpen.value || !hasDropdownContent.value) return
 
@@ -491,6 +558,7 @@ async function openDropdown() {
 
 	await nextTick()
 	await updateDropdownPosition()
+	await initializeOptionsOverlayScrollbars()
 
 	setInitialFocus()
 	startPositionTracking()
@@ -500,6 +568,7 @@ function closeDropdown() {
 	if (!isOpen.value) return
 
 	stopPositionTracking()
+	destroyOptionsOverlayScrollbars()
 	isOpen.value = false
 	userHasTyped.value = false
 	focusedIndex.value = -1
@@ -753,6 +822,7 @@ onMounted(() => {
 onUnmounted(() => {
 	window.removeEventListener('resize', handleWindowResize)
 	stopPositionTracking()
+	destroyOptionsOverlayScrollbars()
 })
 
 watch(isOpen, (value) => {
@@ -764,12 +834,18 @@ watch(isOpen, (value) => {
 watch(shouldRenderDropdown, (value) => {
 	if (value) {
 		updateDropdownPosition()
+		initializeOptionsOverlayScrollbars()
 	}
 })
 
 watch(filteredOptions, () => {
 	if (isOpen.value) {
 		updateDropdownPosition()
+		if (filteredOptions.value.length > 0) {
+			initializeOptionsOverlayScrollbars()
+		} else {
+			destroyOptionsOverlayScrollbars()
+		}
 	}
 })
 
@@ -786,7 +862,37 @@ watch(
 			const opt = props.options.find((o) => isDropdownOption(o) && o.value === val)
 			searchQuery.value = opt && isDropdownOption(opt) ? opt.label : ''
 		}
+		if (isOpen.value) {
+			updateOptionsOverlayScrollbars()
+		}
 	},
 	{ immediate: true },
 )
+
+watch(
+	() => props.maxHeight,
+	() => {
+		if (isOpen.value) {
+			updateOptionsOverlayScrollbars()
+		}
+	},
+)
 </script>
+
+<style scoped>
+.combobox-options-scrollbar :deep(.os-theme-modrinth) {
+	--os-size: 10px;
+	--os-padding-perpendicular: 2px;
+	--os-padding-axis: 2px;
+	--os-track-bg: transparent;
+	--os-track-bg-hover: transparent;
+	--os-track-bg-active: transparent;
+	--os-handle-border-radius: 9999px;
+	--os-handle-border: 2px solid var(--color-surface-4);
+	--os-handle-border-hover: 2px solid var(--color-surface-4);
+	--os-handle-border-active: 2px solid var(--color-surface-4);
+	--os-handle-bg: var(--color-scrollbar, var(--color-surface-5));
+	--os-handle-bg-hover: var(--color-scrollbar, var(--color-surface-5));
+	--os-handle-bg-active: var(--color-scrollbar, var(--color-surface-5));
+}
+</style>
