@@ -9,19 +9,8 @@
 			:back-href="instancesPath"
 			:back-label="formatMessage(messages.allInstances)"
 			:fallback-name="formatMessage(messages.worldFallbackName)"
-		>
-			<template #actions>
-				<PanelServerActionButton size="large" start-label="Start instance" />
-				<ButtonStyled size="large" circular>
-					<button
-						v-tooltip="formatMessage(messages.instanceSettings)"
-						@click="openServerSettings({ tabId: 'installation' })"
-					>
-						<SettingsIcon aria-hidden="true" />
-					</button>
-				</ButtonStyled>
-			</template>
-		</WorldManageHeader>
+			:actions="headerActions"
+		/>
 
 		<NavTabs :links="worldTabLinks" replace />
 
@@ -31,14 +20,24 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { BoxesIcon, DatabaseBackupIcon, FolderOpenIcon, SettingsIcon } from '@modrinth/assets'
+import {
+	BoxesIcon,
+	DatabaseBackupIcon,
+	FolderOpenIcon,
+	LoaderCircleIcon,
+	PlayIcon,
+	SettingsIcon,
+	SlashIcon,
+	StopCircleIcon,
+	UpdatedIcon,
+} from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
-import { PanelServerActionButton, WorldManageHeader } from '#ui/components/servers/server-header'
+import { WorldManageHeader } from '#ui/components/servers/server-header'
+import { useServerPowerAction } from '#ui/components/servers/server-header/use-server-power-action'
 import { useRelativeTime } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
@@ -91,6 +90,17 @@ const { openServerSettings } = injectServerSettingsModal()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const router = useRouter()
+const {
+	isInstalling,
+	isStopping,
+	showRestartButton,
+	busyTooltip,
+	canTakeAction,
+	canKill,
+	primaryActionText,
+	initiateAction,
+	handlePrimaryAction,
+} = useServerPowerAction()
 
 const { data: serverFull } = useQuery({
 	queryKey: computed(() => ['servers', 'v1', 'detail', serverId]),
@@ -112,7 +122,7 @@ const currentWorld = computed(() => {
 })
 
 const worldName = computed(
-	() => currentWorld.value?.name ?? server.value?.name ?? formatMessage(messages.worldFallbackName),
+	() => currentWorld.value?.name ?? formatMessage(messages.worldFallbackName),
 )
 
 const gameVersion = computed(() => {
@@ -140,6 +150,93 @@ const lastActiveLabel = computed(() => {
 		? formatMessage(messages.lastActive, { time: formatRelativeTime(lastActiveAt) })
 		: null
 })
+const startActionText = computed(() =>
+	primaryActionText.value === 'Start' ? 'Start instance' : primaryActionText.value,
+)
+const stopSplitActions = computed(() => [
+	{
+		id: 'stop',
+		label: isStopping.value ? 'Stopping' : 'Stop',
+		icon: StopCircleIcon,
+		action: () => initiateAction('Stop'),
+	},
+	{
+		id: 'kill_server',
+		label: 'Kill server',
+		icon: SlashIcon,
+		action: () => initiateAction('Kill'),
+	},
+])
+const powerActions = computed(() => {
+	if (isInstalling.value) {
+		return [
+			{
+				id: 'installing',
+				label: 'Installing...',
+				icon: LoaderCircleIcon,
+				iconClass: 'animate-spin',
+				color: 'brand' as const,
+				disabled: true,
+			},
+		]
+	}
+	if (showRestartButton.value) {
+		return [
+			{
+				id: 'restart',
+				label: primaryActionText.value,
+				icon: UpdatedIcon,
+				color: 'orange' as const,
+				tooltip: busyTooltip.value,
+				disabled: !canTakeAction.value,
+				onClick: handlePrimaryAction,
+			},
+			{
+				id: 'stop',
+				label: 'Stop instance',
+				color: 'red' as const,
+				joinedActions: stopSplitActions.value,
+				primaryDisabled: !canTakeAction.value,
+				dropdownDisabled: !canKill.value,
+			},
+		]
+	}
+	if (isStopping.value) {
+		return [
+			{
+				id: 'stop',
+				label: 'Stop instance',
+				color: 'red' as const,
+				joinedActions: stopSplitActions.value,
+				primaryDisabled: true,
+				dropdownDisabled: !canKill.value,
+				primaryMuted: true,
+			},
+		]
+	}
+	return [
+		{
+			id: 'start',
+			label: startActionText.value,
+			icon: PlayIcon,
+			color: 'brand' as const,
+			tooltip: busyTooltip.value,
+			disabled: !canTakeAction.value,
+			onClick: handlePrimaryAction,
+		},
+	]
+})
+const headerActions = computed(() => [
+	...powerActions.value,
+	{
+		id: 'settings',
+		label: formatMessage(messages.instanceSettings),
+		icon: SettingsIcon,
+		labelHidden: true,
+		tooltip: formatMessage(messages.instanceSettings),
+		onClick: () => openServerSettings({ tabId: 'installation' }),
+	},
+])
 
 const worldTabLinks = computed<Tab[]>(() => [
 	{
