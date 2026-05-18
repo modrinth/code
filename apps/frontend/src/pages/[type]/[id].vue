@@ -58,13 +58,9 @@
 						{{ project.license.name ? project.license.name : formatMessage(messages.licenseTitle) }}
 					</span>
 				</template>
-				<div
-					class="markdown-body"
-					v-html="
-						renderString(licenseText).isEmpty
-							? formatMessage(messages.loadingLicenseText)
-							: renderString(licenseText)
-					"
+				<MarkdownBody
+					:markdown="licenseText"
+					:fallback="formatMessage(messages.loadingLicenseText)"
 				/>
 			</NewModal>
 			<OpenInAppModal ref="openInAppModal" />
@@ -1080,6 +1076,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	MarkdownBody,
 	NavTabs,
 	NewModal,
 	OpenInAppModal,
@@ -1107,7 +1104,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
+import { capitalizeString, formatProjectType } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'

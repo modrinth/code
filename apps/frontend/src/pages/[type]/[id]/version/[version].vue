@@ -193,11 +193,10 @@
 		</div>
 		<div class="version-page__changelog universal-card">
 			<h3>Changelog</h3>
-			<div
-				class="markdown-body"
-				v-html="
-					version.changelog ? renderHighlightedString(version.changelog) : 'No changelog specified.'
-				"
+			<MarkdownBody
+				:markdown="version.changelog ?? ''"
+				fallback="No changelog specified."
+				highlight
 			/>
 		</div>
 		<div
@@ -441,13 +440,13 @@ import {
 	ENVIRONMENTS_COPY,
 	injectNotificationManager,
 	injectProjectPageContext,
+	MarkdownBody,
 	MultiSelect,
 	PROJECT_DEP_MARKER_QUERY,
 	StyledInput,
 	useFormatBytes,
 	useFormatDateTime,
 } from '@modrinth/ui'
-import { renderHighlightedString } from '@modrinth/utils'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'

@@ -781,6 +781,29 @@ a:not(.no-click-animation),
 		line-height: 1.5;
 	}
 
+	ul,
+	ol {
+		padding-left: 2rem;
+	}
+
+	li {
+		margin: 0.25rem 0;
+	}
+
+	li > p {
+		margin: 0;
+	}
+
+	li > p + p {
+		margin-top: 0.75rem;
+	}
+
+	li > ul,
+	li > ol {
+		margin-top: 0.25rem;
+		margin-bottom: 0.25rem;
+	}
+
 	h1 {
 		display: block;
 	}
@@ -858,9 +881,15 @@ a:not(.no-click-animation),
 		overflow-x: auto;
 
 		code {
+			display: block;
+			background-color: transparent;
+			color: inherit;
 			font-size: 80%;
 			padding: 0;
 			border-radius: 0;
+			overflow-wrap: normal;
+			white-space: pre;
+			word-break: normal;
 		}
 	}
 

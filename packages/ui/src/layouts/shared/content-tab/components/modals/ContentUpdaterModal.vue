@@ -177,8 +177,9 @@
 						<div
 							v-else-if="selectedVersion.changelog"
 							class="markdown [&_img]:max-w-full [&_img]:h-auto"
-							v-html="renderHighlightedString(selectedVersion.changelog)"
-						/>
+						>
+							<MarkdownBody :markdown="selectedVersion.changelog" highlight />
+						</div>
 						<div v-else class="text-secondary italic">
 							{{ formatMessage(messages.noChangelog) }}
 						</div>
@@ -248,12 +249,13 @@ import {
 	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
+import { capitalizeString } from '@modrinth/utils'
 import { useTimeoutFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import MarkdownBody from '#ui/components/base/MarkdownBody.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import VersionChannelIndicator from '#ui/components/version/VersionChannelIndicator.vue'

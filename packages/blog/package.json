@@ -17,7 +17,7 @@
 		"jiti": "^2.4.2"
 	},
 	"dependencies": {
-		"@modrinth/utils": "workspace:*",
+		"@modrinth/ui": "workspace:*",
 		"dayjs": "^1.11.10",
 		"glob": "^10.2.7",
 		"gray-matter": "^4.0.3",

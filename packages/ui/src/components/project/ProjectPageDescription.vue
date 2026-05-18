@@ -1,8 +1,8 @@
 <template>
-	<div class="markdown-body" v-html="renderHighlightedString(description ?? '')" />
+	<MarkdownBody :markdown="description ?? ''" highlight />
 </template>
 <script setup lang="ts">
-import { renderHighlightedString } from '@modrinth/utils'
+import MarkdownBody from '../base/MarkdownBody.vue'
 
 withDefaults(
 	defineProps<{

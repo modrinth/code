@@ -41,6 +41,7 @@ import {
 	defineMessages,
 	I18nDebugPanel,
 	LoadingBar,
+	MarkdownBody,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
@@ -55,7 +56,6 @@ import {
 	useFormatBytes,
 	useVIntl,
 } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
@@ -1477,10 +1477,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:header="criticalErrorMessage.header"
 				class="m-6 mb-0"
 			>
-				<div
-					class="markdown-body text-primary"
-					v-html="renderString(criticalErrorMessage.body ?? '')"
-				></div>
+				<MarkdownBody body-class="text-primary" :markdown="criticalErrorMessage.body ?? ''" />
 			</Admonition>
 			<Admonition
 				v-if="authUnreachable"

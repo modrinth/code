@@ -7,10 +7,10 @@
 		</template>
 		<div class="flex flex-col gap-4">
 			<template v-if="description">
-				<div
+				<MarkdownBody
 					v-if="markdown"
-					class="markdown-body max-w-[35rem]"
-					v-html="renderString(description)"
+					body-class="max-w-[35rem]"
+					:markdown="description"
 				/>
 				<p v-else class="max-w-[35rem] m-0">
 					{{ description }}
@@ -50,10 +50,10 @@
 
 <script setup>
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import { renderString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import ButtonStyled from '../base/ButtonStyled.vue'
+import MarkdownBody from '../base/MarkdownBody.vue'
 import StyledInput from '../base/StyledInput.vue'
 import NewModal from './NewModal.vue'
 

@@ -31,6 +31,7 @@
 		"@tauri-apps/plugin-window-state": "^2.2.2",
 		"@types/three": "^0.172.0",
 		"@vueuse/core": "^11.1.0",
+		"comark": "^0.3.2",
 		"dayjs": "^1.11.10",
 		"floating-vue": "^5.2.2",
 		"fuse.js": "^6.6.2",

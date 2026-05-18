@@ -68,8 +68,9 @@
 							<div
 								v-if="version.changelog && !version.duplicate"
 								class="markdown-body"
-								v-html="renderHighlightedString(version.changelog)"
-							/>
+							>
+								<MarkdownBody :markdown="version.changelog" highlight />
+							</div>
 						</div>
 					</div>
 				</template>
@@ -93,11 +94,11 @@ import {
 	ButtonStyled,
 	injectModrinthClient,
 	injectProjectPageContext,
+	MarkdownBody,
 	Pagination,
 	useFormatDateTime,
 } from '@modrinth/ui'
 import VersionFilterControl from '@modrinth/ui/src/components/version/VersionFilterControl.vue'
-import { renderHighlightedString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { onMounted, watch } from 'vue'
 

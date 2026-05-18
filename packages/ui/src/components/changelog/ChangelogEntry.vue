@@ -36,20 +36,26 @@
 			</div>
 		</div>
 		<div class="ml-8 mt-3 rounded-2xl bg-bg-raised px-4 py-3">
-			<div class="changelog-body" v-html="renderHighlightedString(entry.body)" />
+			<MarkdownBody body-class="changelog-body" :markdown="entry.body" highlight />
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import type { VersionEntry } from '@modrinth/blog/changelog'
-import { renderHighlightedString } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import AutoLink from '../base/AutoLink.vue'
+import MarkdownBody from '../base/MarkdownBody.vue'
+
+type VersionEntry = {
+	date: dayjs.Dayjs
+	product: 'web' | 'hosting' | 'app'
+	version?: string
+	body: string
+}
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()

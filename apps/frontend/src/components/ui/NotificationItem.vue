@@ -140,7 +140,7 @@
 				.
 			</template>
 			<nuxt-link v-else :to="notification.link" class="title-link">
-				<span v-html="renderString(notification.title)" />
+				<MarkdownBody :markdown="notification.title" inline />
 			</nuxt-link>
 			<!--      <span v-else class="known-errors">Error reading notification.</span>-->
 		</div>
@@ -318,11 +318,12 @@ import {
 	DoubleIcon,
 	injectModrinthClient,
 	injectNotificationManager,
+	MarkdownBody,
 	ProjectStatusBadge,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { getUserLink, renderString } from '@modrinth/utils'
+import { getUserLink } from '@modrinth/utils'
 
 import { markAsRead } from '~/helpers/platform-notifications'
 import { getProjectLink, getVersionLink } from '~/helpers/projects'

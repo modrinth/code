@@ -73,7 +73,7 @@
 			<Badge v-if="report.closed" type="closed" />
 			<Badge :type="`Reported for ${report.report_type}`" color="orange" />
 		</div>
-		<div v-if="showMessage" class="markdown-body" v-html="renderHighlightedString(report.body)" />
+		<MarkdownBody v-if="showMessage" :markdown="report.body" highlight />
 		<ThreadSummary
 			v-if="thread"
 			:thread="thread"
@@ -107,8 +107,8 @@
 
 <script setup>
 import { ReportIcon, UnknownIcon, VersionIcon } from '@modrinth/assets'
-import { Avatar, Badge, CopyCode, useFormatDateTime, useRelativeTime } from '@modrinth/ui'
-import { formatProjectType, renderHighlightedString } from '@modrinth/utils'
+import { Avatar, Badge, CopyCode, MarkdownBody, useFormatDateTime, useRelativeTime } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
 
 import ThreadSummary from '~/components/ui/thread/ThreadSummary.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'

@@ -146,10 +146,14 @@ import {
 	Badge,
 	ButtonStyled,
 	OverflowMenu,
+	markdownHasImage,
+	markdownToPlainText,
+	renderMarkdown,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
+import { computedAsync } from '@vueuse/core'
+import { computed, ref } from 'vue'
 
 import { isStaff } from '~/helpers/users.js'
 
@@ -187,21 +191,21 @@ const props = defineProps({
 const emit = defineEmits(['update-thread'])
 const flags = useFeatureFlags()
 
-const formattedMessage = computed(() => {
-	const body = renderString(props.message.body.body)
+const formattedMessage = computedAsync(async () => {
+	const markdown = props.message.body.body
+	const body = await renderMarkdown(markdown)
 	if (props.forceCompact) {
-		const hasImage = body.includes('<img')
-		const noHtml = body.replace(/<\/?[^>]+(>|$)/g, '')
-		if (noHtml.trim()) {
-			return noHtml
-		} else if (hasImage) {
+		const plainText = markdownToPlainText(markdown)
+		if (plainText) {
+			return plainText
+		} else if (markdownHasImage(markdown)) {
 			return 'sent an image.'
 		} else {
 			return 'sent a message.'
 		}
 	}
 	return body
-})
+}, '')
 
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({

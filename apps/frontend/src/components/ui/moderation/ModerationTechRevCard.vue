@@ -26,6 +26,7 @@ import {
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
+	highlightCodeLines,
 	OverflowMenu,
 	type OverflowMenuOption,
 	useFormatBytes,
@@ -35,7 +36,6 @@ import { NavTabs } from '@modrinth/ui'
 import {
 	capitalizeString,
 	formatProjectType,
-	highlightCodeLines,
 	type ThreadMessage,
 	type User,
 } from '@modrinth/utils'
@@ -565,6 +565,7 @@ const expandedClasses = reactive<Set<string>>(new Set())
 const autoExpandedFileIds = reactive<Set<string>>(new Set())
 const showCopyFeedback = reactive<Map<string, boolean>>(new Map())
 const highlightedSourceCache = reactive<Map<string, { source: string; lines: string[] }>>(new Map())
+const highlightedSourceLoading = reactive<Set<string>>(new Set())
 const LAZY_LOAD_CLASS_SOURCE_MINIMUM = 10
 
 interface ClassGroup {
@@ -723,9 +724,18 @@ function getHighlightedClassSource(classItem: ClassGroup): string[] {
 	const cached = highlightedSourceCache.get(classItem.key)
 	if (cached?.source === source) return cached.lines
 
-	const lines = highlightCodeLines(source, 'java')
-	highlightedSourceCache.set(classItem.key, { source, lines })
-	return lines
+	if (!highlightedSourceLoading.has(classItem.key)) {
+		highlightedSourceLoading.add(classItem.key)
+		highlightCodeLines(source, 'java')
+			.then((lines) => {
+				highlightedSourceCache.set(classItem.key, { source, lines })
+			})
+			.finally(() => {
+				highlightedSourceLoading.delete(classItem.key)
+			})
+	}
+
+	return []
 }
 
 function isClassLoadingSource(classItem: ClassGroup): boolean {

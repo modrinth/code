@@ -186,7 +186,11 @@
 						</h2>
 
 						<div v-if="currentStageObj.text" class="mb-4">
-							<div v-if="stageTextExpanded" class="markdown-body" v-html="stageTextExpanded"></div>
+							<MarkdownBody
+								v-if="stageTextExpanded"
+								:markdown="stageTextExpanded"
+								highlight
+							/>
 							<div v-else class="markdown-body">Loading stage content...</div>
 						</div>
 
@@ -493,18 +497,14 @@ import {
 	DropdownSelect,
 	injectNotificationManager,
 	injectProjectPageContext,
+	MarkdownBody,
 	MarkdownEditor,
 	OverflowMenu,
 	type OverflowMenuOption,
 	StyledInput,
 	useDebugLogger,
 } from '@modrinth/ui'
-import {
-	type ModerationJudgements,
-	type ModerationModpackItem,
-	type ProjectStatus,
-	renderHighlightedString,
-} from '@modrinth/utils'
+import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computedAsync, useDebounceFn } from '@vueuse/core'
 import type { Component } from 'vue'
@@ -1135,13 +1135,11 @@ const stageTextExpanded = computedAsync(async () => {
 	const stageIndex = currentStage.value
 	const stage = checklist[stageIndex]
 	if (stage.text) {
-		return renderHighlightedString(
-			expandVariables(
-				await stage.text(projectV2.value, projectV3.value),
-				projectV2.value,
-				projectV3.value,
-				variables.value,
-			),
+		return expandVariables(
+			await stage.text(projectV2.value, projectV3.value),
+			projectV2.value,
+			projectV3.value,
+			variables.value,
 		)
 	}
 	return null

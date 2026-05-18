@@ -52,7 +52,7 @@
 			<div class="description-cards">
 				<Card>
 					<h3 class="card-title">Changelog</h3>
-					<div class="markdown-body" v-html="renderString(version.changelog ?? '')" />
+					<MarkdownBody :markdown="version.changelog ?? ''" />
 				</Card>
 				<Card>
 					<h3 class="card-title">Files</h3>
@@ -176,10 +176,10 @@ import {
 	ButtonStyled,
 	Card,
 	CopyCode,
+	MarkdownBody,
 	useFormatBytes,
 	useFormatDateTime,
 } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 

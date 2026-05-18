@@ -39,11 +39,7 @@
 				<span class="label__description"></span>
 			</span>
 			<div class="markdown-body-wrapper">
-				<div
-					style="width: 100%"
-					class="markdown-body"
-					v-html="renderHighlightedString(linkMarkdown)"
-				/>
+				<MarkdownBody style="width: 100%" :markdown="linkMarkdown" highlight />
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
 				<ButtonStyled type="outlined">
@@ -137,11 +133,7 @@
 				<span class="label__description"></span>
 			</span>
 			<div class="markdown-body-wrapper">
-				<div
-					style="width: 100%"
-					class="markdown-body"
-					v-html="renderHighlightedString(imageMarkdown)"
-				/>
+				<MarkdownBody style="width: 100%" :markdown="imageMarkdown" highlight />
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
 				<ButtonStyled type="outlined">
@@ -197,11 +189,7 @@
 			</span>
 
 			<div class="markdown-body-wrapper">
-				<div
-					style="width: 100%"
-					class="markdown-body"
-					v-html="renderHighlightedString(videoMarkdown)"
-				/>
+				<MarkdownBody style="width: 100%" :markdown="videoMarkdown" highlight />
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
 				<ButtonStyled type="outlined">
@@ -289,14 +277,14 @@
 		</div>
 		<div v-else>
 			<div class="markdown-body-wrapper">
-				<div
+				<MarkdownBody
 					style="width: 100%"
 					:style="{
 						maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
 						overflowY: 'auto',
 					}"
-					class="markdown-body"
-					v-html="renderHighlightedString(currentValue ?? '')"
+					:markdown="currentValue ?? ''"
+					highlight
 				/>
 			</div>
 		</div>
@@ -330,7 +318,6 @@ import {
 	YouTubeIcon,
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
-import { renderHighlightedString } from '@modrinth/utils/highlightjs'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
@@ -340,6 +327,7 @@ import ButtonStyled from './ButtonStyled.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
 import IntlFormatted from './IntlFormatted.vue'
+import MarkdownBody from './MarkdownBody.vue'
 import StyledInput from './StyledInput.vue'
 import Toggle from './Toggle.vue'
 

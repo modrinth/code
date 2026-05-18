@@ -27,19 +27,19 @@
 				</button>
 			</ButtonStyled>
 		</template>
-		<div v-if="message" class="markdown-body" v-html="renderString(message)" />
+		<MarkdownBody v-if="message" :markdown="message" />
 	</Admonition>
 </template>
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { renderString } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import Admonition from './Admonition.vue'
 import ButtonStyled from './ButtonStyled.vue'
 import CopyCode from './CopyCode.vue'
+import MarkdownBody from './MarkdownBody.vue'
 
 const { formatMessage } = useVIntl()
 const emit = defineEmits<{
