@@ -302,9 +302,6 @@
   "app.project.install-button.already-installed": {
     "message": "Projek ini sudah dipasang"
   },
-  "app.project.install-context.back-to-browse": {
-    "message": "Kembali melayar"
-  },
   "app.project.install-context.install-content-to-instance": {
     "message": "Pasang kandungan ke dalam pemasangan"
   },
