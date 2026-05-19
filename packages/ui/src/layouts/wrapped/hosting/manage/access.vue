@@ -21,7 +21,12 @@
 					</template>
 				</Combobox>
 				<ButtonStyled color="brand">
-					<button class="!h-10 w-full md:w-fit" @click="grantAccessModal?.show($event)">
+					<button
+						v-tooltip="manageUsersActionTooltip"
+						class="!h-10 w-full md:w-fit"
+						:disabled="!canManageUsers"
+						@click="grantAccessModal?.show($event)"
+					>
 						<UserPlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.inviteFriends) }}
 					</button>
@@ -32,6 +37,8 @@
 		<AccessTable
 			:members="filteredMembers"
 			:roles="roleOptions"
+			:can-manage-users="canManageUsers"
+			:permission-denied-message="permissionDeniedMessage"
 			@update-role="updateMemberRole"
 			@resend-invite="resendInvite"
 			@cancel-invite="requestCancelInvite"
@@ -67,6 +74,8 @@
 		<GrantAccessModal
 			ref="grantAccessModal"
 			:resolve-user="resolveInviteUser"
+			:can-grant="canManageUsers"
+			:permission-denied-message="permissionDeniedMessage"
 			@grant="grantAccess"
 		/>
 		<RemoveAccessModal
@@ -77,6 +86,8 @@
 			:joined-at="pendingRemovalMember?.joinedAt"
 			:pending="pendingRemovalMember?.pending"
 			:should-cancel="shouldCancelInvite"
+			:can-remove="canManageUsers"
+			:permission-denied-message="permissionDeniedMessage"
 			@remove="confirmAccessRemoval"
 		/>
 	</div>
@@ -109,6 +120,7 @@ import {
 } from '#ui/components/servers/access'
 import { parseAuditEvent } from '#ui/components/servers/access/events'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -140,6 +152,11 @@ const editorScopes = [
 	UserScope.ADVANCED,
 ]
 const viewerScopes = [UserScope.BASE_READ, UserScope.POWER_ACTIONS]
+
+const { canManageUsers, permissionDeniedMessage } = useServerPermissions()
+const manageUsersActionTooltip = computed(() =>
+	canManageUsers.value ? undefined : permissionDeniedMessage.value,
+)
 
 const messages = defineMessages({
 	searchUsersPlaceholder: {
@@ -1004,7 +1021,7 @@ function revertNotification(notification: { id: string | number; count?: number 
 }
 
 async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRole) {
-	if (member.isOwner || member.role === role || role === 'owner') return
+	if (!canManageUsers.value || member.isOwner || member.role === role || role === 'owner') return
 	const previousRole = member.role
 	if (previousRole === 'owner') return
 
@@ -1050,12 +1067,14 @@ async function cancelInvite(member: ServerAccessMember) {
 }
 
 function requestRemoveMember(member: ServerAccessMember) {
+	if (!canManageUsers.value) return
 	pendingRemovalMember.value = member
 	shouldCancelInvite.value = false
 	removeMemberConfirmModal.value?.show()
 }
 
 function requestCancelInvite(member: ServerAccessMember) {
+	if (!canManageUsers.value) return
 	pendingRemovalMember.value = member
 	shouldCancelInvite.value = true
 	removeMemberConfirmModal.value?.show()
@@ -1067,6 +1086,7 @@ async function confirmAccessRemoval() {
 	pendingRemovalMember.value = null
 	shouldCancelInvite.value = false
 	if (!member) return
+	if (!canManageUsers.value) return
 
 	if (shouldCancel) {
 		await cancelInvite(member)
@@ -1081,6 +1101,8 @@ async function removeMember(member: ServerAccessMember) {
 }
 
 async function removeMemberAccess(member: ServerAccessMember, shouldCancel: boolean) {
+	if (!canManageUsers.value) return
+
 	try {
 		const userId = await resolveMemberUserId(member)
 		await client.archon.server_users_v1.delete(serverId, userId)
@@ -1108,6 +1130,8 @@ async function removeMemberAccess(member: ServerAccessMember, shouldCancel: bool
 }
 
 async function grantAccess(payload: GrantServerAccessPayload) {
+	if (!canManageUsers.value) return
+
 	const target = payload.target.trim()
 	if (!target) return
 

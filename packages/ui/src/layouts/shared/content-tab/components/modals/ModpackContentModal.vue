@@ -36,7 +36,8 @@ interface Props {
 	modpackName?: string
 	modpackIconUrl?: string
 	enableToggle?: boolean
-	busy?: boolean
+	actionDisabled?: boolean
+	actionDisabledTooltip?: string | null
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
 	switchVersion?: (item: ContentItem) => void
 }
@@ -45,7 +46,8 @@ const props = withDefaults(defineProps<Props>(), {
 	modpackName: undefined,
 	modpackIconUrl: undefined,
 	enableToggle: false,
-	busy: false,
+	actionDisabled: false,
+	actionDisabledTooltip: undefined,
 	getOverflowOptions: undefined,
 	switchVersion: undefined,
 })
@@ -250,12 +252,15 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
 		installing: item.installing === true,
+		toggleDisabled: props.actionDisabled,
+		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		isClientOnly:
 			isClientOnlyEnvironment(item.environment) ||
 			!!item.pack_client_retained ||
 			!!item.pack_client_depends,
 		clientWarning: getClientWarningType(item),
-		disabled: props.busy || disabledIds.value.has(item.file_name) || item.installing === true,
+		disabled: props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
+		disabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		overflowOptions: [
 			...(props.switchVersion
 				? [
@@ -286,20 +291,20 @@ function getTypeIcon(type: string) {
 }
 
 function handleEnabledChange(fileName: string, value: boolean) {
-	if (props.busy) return
+	if (props.actionDisabled) return
 	const item = items.value.find((i) => i.file_name === fileName)
 	if (!item) return
 	emit('update:enabled', item, value)
 }
 
 function bulkEnable() {
-	if (props.busy) return
+	if (props.actionDisabled) return
 	emit('bulk:enable', [...selectedItems.value])
 	selectedIds.value = []
 }
 
 function bulkDisable() {
-	if (props.busy) return
+	if (props.actionDisabled) return
 	emit('bulk:disable', [...selectedItems.value])
 	selectedIds.value = []
 }
@@ -558,7 +563,8 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 		<ContentSelectionBar
 			v-if="props.enableToggle"
 			:selected-items="selectedItems"
-			:is-bulk-operating="props.busy"
+			:is-busy="props.actionDisabled"
+			:busy-tooltip="props.actionDisabledTooltip"
 			style="--left-bar-width: 0px; --right-bar-width: 0px"
 			@clear="selectedIds = []"
 			@enable="bulkEnable"

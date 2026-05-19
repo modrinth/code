@@ -68,6 +68,7 @@ interface Props {
 	selectedItems: ContentItem[]
 	contentTypeLabel?: string
 	isBusy?: boolean
+	busyTooltip?: string | null
 	isBulkOperating?: boolean
 	bulkOperation?: BulkOperationType | null
 	bulkProgress?: number
@@ -80,6 +81,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
 	contentTypeLabel: undefined,
 	isBusy: false,
+	busyTooltip: undefined,
 	isBulkOperating: false,
 	bulkOperation: null,
 	bulkProgress: 0,
@@ -199,7 +201,9 @@ const bulkProgressMessage = computed(() => {
 			<ButtonStyled type="transparent">
 				<button
 					v-tooltip="
-						allEnabled
+						isBusy && busyTooltip
+							? busyTooltip
+							: allEnabled
 							? formatMessage(messages.allAlreadyEnabled)
 							: formatMessage(commonMessages.enableButton)
 					"
@@ -213,7 +217,9 @@ const bulkProgressMessage = computed(() => {
 			<ButtonStyled type="transparent">
 				<button
 					v-tooltip="
-						allDisabled
+						isBusy && busyTooltip
+							? busyTooltip
+							: allDisabled
 							? formatMessage(messages.allAlreadyDisabled)
 							: formatMessage(commonMessages.disableButton)
 					"

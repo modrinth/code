@@ -1,21 +1,21 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.header, { count, itemType })"
-		:fade="variant === 'server' ? 'warning' : 'danger'"
+		:header="formatMessage(messages.header, { count: props.count, itemType: props.itemType })"
+		:fade="props.variant === 'server' ? 'warning' : 'danger'"
 		max-width="500px"
 		:on-hide="() => backupCreator?.cancelBackup()"
 	>
 		<div class="flex flex-col gap-6">
 			<Admonition
-				:type="variant === 'server' ? 'warning' : 'critical'"
+				:type="props.variant === 'server' ? 'warning' : 'critical'"
 				:header="formatMessage(messages.admonitionHeader)"
 			>
 				{{ formatMessage(messages.admonitionBody) }}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				:backup-name="backupTip ? `Before deletion (${backupTip})` : 'Before deletion'"
+				:backup-name="props.backupTip ? `Before deletion (${props.backupTip})` : 'Before deletion'"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -28,10 +28,19 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled :color="variant === 'server' ? 'orange' : 'red'">
-					<button :disabled="buttonsDisabled" @click="confirm">
+				<ButtonStyled :color="props.variant === 'server' ? 'orange' : 'red'">
+					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="buttonsDisabled || props.actionDisabled"
+						@click="confirm"
+					>
 						<TrashIcon />
-						{{ formatMessage(messages.deleteButton, { count, itemType }) }}
+						{{
+							formatMessage(messages.deleteButton, {
+								count: props.count,
+								itemType: props.itemType,
+							})
+						}}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -73,16 +82,20 @@ const messages = defineMessages({
 	},
 })
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		count: number
 		itemType: string
 		variant?: 'instance' | 'server'
 		backupTip?: string
+		actionDisabled?: boolean
+		actionDisabledTooltip?: string
 	}>(),
 	{
 		variant: 'instance',
 		backupTip: undefined,
+		actionDisabled: false,
+		actionDisabledTooltip: undefined,
 	},
 )
 
@@ -99,6 +112,7 @@ function show() {
 }
 
 function confirm() {
+	if (props.actionDisabled) return
 	modal.value?.hide()
 	emit('delete')
 }

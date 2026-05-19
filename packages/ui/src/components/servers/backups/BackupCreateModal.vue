@@ -53,7 +53,11 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
-					<button :disabled="createMutation.isPending.value || nameExists" @click="createBackup">
+					<button
+						v-tooltip="createDisabledTooltip"
+						:disabled="createDisabled"
+						@click="createBackup"
+					>
 						<PlusIcon />
 						Create backup
 					</button>
@@ -74,18 +78,30 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '../../../providers'
+import { useVIntl } from '../../../composables/i18n'
+import { commonMessages } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const ctx = injectModrinthServerContext()
 
-const props = defineProps<{
-	backups?: Archon.BackupsQueue.v1.BackupQueueBackup[]
-}>()
+const props = withDefaults(
+	defineProps<{
+		backups?: Archon.BackupsQueue.v1.BackupQueueBackup[]
+		canCreate?: boolean
+		permissionDeniedMessage?: string
+	}>(),
+	{
+		backups: undefined,
+		canCreate: true,
+		permissionDeniedMessage: undefined,
+	},
+)
 
 const backupsQueryKey = ['backups', 'queue', ctx.serverId]
 
@@ -109,6 +125,14 @@ const nameExists = computed(() => {
 		(backup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
 	)
 })
+const createDisabled = computed(
+	() => createMutation.isPending.value || nameExists.value || !props.canCreate,
+)
+const createDisabledTooltip = computed(() =>
+	props.canCreate
+		? undefined
+		: (props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction)),
+)
 
 const focusInput = () => {
 	nextTick(() => {
@@ -129,6 +153,7 @@ const hideModal = () => {
 }
 
 const createBackup = () => {
+	if (!props.canCreate) return
 	const name = trimmedName.value || `Backup #${newBackupAmount.value}`
 	isRateLimited.value = false
 

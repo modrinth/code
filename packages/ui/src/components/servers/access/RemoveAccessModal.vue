@@ -60,7 +60,11 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button @click="confirm">
+					<button
+						v-tooltip="removePermissionTooltip"
+						:disabled="!canRemove"
+						@click="confirm"
+					>
 						<XIcon v-if="shouldCancel" aria-hidden="true" />
 						<UserXIcon v-else aria-hidden="true" />
 						{{ formatMessage(shouldCancel ? messages.cancelButton : messages.removeButton) }}
@@ -92,6 +96,8 @@ const props = withDefaults(
 		joinedAt?: string | null
 		pending?: boolean
 		shouldCancel?: boolean
+		canRemove?: boolean
+		permissionDeniedMessage?: string
 	}>(),
 	{
 		avatarUrl: undefined,
@@ -99,6 +105,7 @@ const props = withDefaults(
 		joinedAt: null,
 		pending: false,
 		shouldCancel: false,
+		canRemove: true,
 	},
 )
 
@@ -220,6 +227,13 @@ const effectMessages = computed(() =>
 		? [messages.cancelEffectAccess, messages.cancelEffectInvite]
 		: [messages.removeEffectAccess, messages.removeEffectJoin],
 )
+const canRemove = computed(() => props.canRemove)
+const permissionDeniedMessage = computed(
+	() => props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction),
+)
+const removePermissionTooltip = computed(() =>
+	canRemove.value ? undefined : permissionDeniedMessage.value,
+)
 
 function formatRole(role: ServerAccessRole): string {
 	switch (role) {
@@ -252,6 +266,7 @@ function hide() {
 }
 
 function confirm() {
+	if (!canRemove.value) return
 	hide()
 	emit('remove')
 }

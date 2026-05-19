@@ -8,10 +8,13 @@
 						<span class="text-lg font-semibold text-contrast">SFTP</span>
 						<ButtonStyled>
 							<a
-								v-tooltip="'This button only works with compatible SFTP clients (e.g. WinSCP)'"
+								v-tooltip="sftpActionTooltip"
 								class="!w-full sm:!w-auto"
-								:href="sftpUrl"
+								:class="{ 'opacity-60': !canWriteFiles }"
+								:href="canWriteFiles ? sftpUrl : undefined"
+								:aria-disabled="!canWriteFiles"
 								target="_blank"
+								@click="handleSftpLaunchClick"
 							>
 								<ExternalIcon class="h-5 w-5" />
 								Launch SFTP
@@ -22,8 +25,9 @@
 					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
 						<span class="text-lg font-semibold text-contrast">Server Address</span>
 						<div
-							v-tooltip="'Copy SFTP server address'"
+							v-tooltip="sftpCopyTooltip('Copy SFTP server address')"
 							class="copy-field hover:bg-button-bg-hover"
+							:class="{ 'opacity-60': !canWriteFiles }"
 							@click="copyToClipboard('Server address', server?.sftp_host)"
 						>
 							<span class="cursor-pointer font-semibold text-primary">
@@ -37,8 +41,9 @@
 							<div class="flex w-full flex-col justify-center gap-2">
 								<span class="text-lg font-semibold text-contrast">Username</span>
 								<div
-									v-tooltip="'Copy SFTP username'"
+									v-tooltip="sftpCopyTooltip('Copy SFTP username')"
 									class="copy-field hover:bg-button-bg-hover"
+									:class="{ 'opacity-60': !canWriteFiles }"
 									@click="copyToClipboard('Username', server?.sftp_username)"
 								>
 									<div class="truncate font-semibold">
@@ -53,11 +58,12 @@
 								<span class="text-lg font-semibold text-contrast">Password</span>
 								<div
 									class="copy-field-has-button [&:hover:not(:has(button:hover))]:bg-button-bg-hover"
+									:class="{ 'opacity-60': !canWriteFiles }"
 									@click="copyToClipboard('Password', server?.sftp_password)"
 								>
 									<div class="flex items-center gap-1.5 h-full w-full">
 										<div
-											v-tooltip="'Copy SFTP Password'"
+											v-tooltip="sftpCopyTooltip('Copy SFTP Password')"
 											class="h-full flex justify-between grow items-center"
 										>
 											<div class="truncate font-semibold">
@@ -72,9 +78,16 @@
 
 										<ButtonStyled type="transparent" circular>
 											<button
-												v-tooltip="showPassword ? 'Hide password' : 'Show password'"
+												v-tooltip="
+													canWriteFiles
+														? showPassword
+															? 'Hide password'
+															: 'Show password'
+														: permissionDeniedMessage
+												"
 												class="hover:bg-button-bg-hover grid h-10 w-10 place-content-center rounded-lg"
-												@click.stop="showPassword = !showPassword"
+												:disabled="!canWriteFiles"
+												@click.stop="togglePasswordVisibility"
 											>
 												<!-- look into doing stop propagation here -->
 												<EyeIcon v-if="showPassword" class="h-5 w-5" />
@@ -96,7 +109,10 @@
 						</label>
 						<ButtonStyled v-if="startupCommand !== defaultStartupCommand" type="transparent">
 							<button
-								:disabled="isStartupLoading || startupCommand === defaultStartupCommand"
+								v-tooltip="advancedActionTooltip"
+								:disabled="
+									isStartupLoading || startupCommand === defaultStartupCommand || !canUseAdvancedSettings
+								"
 								class="relative !w-full sm:!w-auto"
 								@click="resetToDefault"
 							>
@@ -109,10 +125,11 @@
 						<StyledInput
 							id="startup-command-field"
 							v-model="startupCommand"
+							v-tooltip="advancedActionTooltip"
 							multiline
 							resize="vertical"
 							input-class="font-mono field-sizing-content"
-							:disabled="isStartupLoading"
+							:disabled="isStartupLoading || !canUseAdvancedSettings"
 						/>
 						<div
 							v-if="isStartupLoading"
@@ -133,10 +150,11 @@
 						<Combobox
 							:id="'java-version-field'"
 							v-model="javaVersion"
+							v-tooltip="advancedActionTooltip"
 							name="java-version"
 							:options="displayedJavaVersions"
 							:display-value="javaVersionLabel ?? 'Java Version'"
-							:disabled="isStartupLoading"
+							:disabled="isStartupLoading || !canUseAdvancedSettings"
 						>
 							<template #dropdown-footer>
 								<button
@@ -169,10 +187,11 @@
 						<Combobox
 							:id="'runtime-field'"
 							v-model="jreVendor"
+							v-tooltip="advancedActionTooltip"
 							name="runtime"
 							:options="JRE_VENDORS"
 							:display-value="jreVendorLabel ?? 'Runtime'"
-							:disabled="isStartupLoading"
+							:disabled="isStartupLoading || !canUseAdvancedSettings"
 						/>
 						<div
 							v-if="isStartupLoading"
@@ -189,7 +208,7 @@
 			:is-visible="!!hasUnsavedChanges || isPending"
 			:server-id="serverId"
 			:is-updating="isPending"
-			:save="() => saveStartup()"
+			:save="saveStartup"
 			:reset="resetStartup"
 		/>
 	</div>
@@ -210,6 +229,7 @@ import { computed, ref, watch } from 'vue'
 
 import { ButtonStyled, Combobox, StyledInput } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -220,12 +240,29 @@ const { addNotification } = injectNotificationManager()
 const { server, serverId, worldId } = injectModrinthServerContext()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const { canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } = useServerPermissions()
 
 // SFTP state
 const showPassword = ref(false)
 const sftpUrl = computed(() => `sftp://${server.value?.sftp_username}@${server.value?.sftp_host}`)
+const advancedActionTooltip = computed(() =>
+	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
+)
+const sftpActionTooltip = computed(() =>
+	canWriteFiles.value
+		? 'This button only works with compatible SFTP clients (e.g. WinSCP)'
+		: permissionDeniedMessage.value,
+)
+const sftpCopyTooltip = (label: string) =>
+	canWriteFiles.value ? label : permissionDeniedMessage.value
+
+function handleSftpLaunchClick(event: MouseEvent) {
+	if (canWriteFiles.value) return
+	event.preventDefault()
+}
 
 const copyToClipboard = (name: string, textToCopy?: string) => {
+	if (!canWriteFiles.value) return
 	navigator.clipboard.writeText(textToCopy || '')
 	addNotification({
 		type: 'success',
@@ -241,6 +278,11 @@ const { data: startupData, isLoading: isStartupLoading } = useQuery({
 	queryFn: () => client.archon.options_v1.getStartup(serverId, worldId.value!),
 	enabled: computed(() => worldId.value !== null),
 })
+
+function togglePasswordVisibility() {
+	if (!canWriteFiles.value) return
+	showPassword.value = !showPassword.value
+}
 
 const JAVA_VERSIONS = [
 	{ value: 8, label: 'Java 8' },
@@ -343,7 +385,7 @@ const hasUnsavedChanges = computed(
 		jreVendor.value !== savedJreVendor.value,
 )
 
-const { mutate: saveStartup, isPending } = useMutation({
+const { mutate: saveStartupMutation, isPending } = useMutation({
 	mutationFn: () =>
 		client.archon.options_v1.patchStartup(serverId, worldId.value!, {
 			startup_command: startupCommand.value || null,
@@ -369,11 +411,17 @@ const { mutate: saveStartup, isPending } = useMutation({
 	},
 })
 
+function saveStartup() {
+	if (!canUseAdvancedSettings.value) return
+	saveStartupMutation()
+}
+
 function resetStartup() {
 	syncFormFromData()
 }
 
 function resetToDefault() {
+	if (!canUseAdvancedSettings.value) return
 	startupCommand.value = defaultStartupCommand.value
 }
 </script>

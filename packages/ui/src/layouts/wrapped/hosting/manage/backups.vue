@@ -27,12 +27,28 @@
 		</div>
 
 		<div v-else key="content" class="contents">
-			<ReadyTransition :pending="backupsReadyPending">
-				<BackupCreateModal ref="createBackupModal" :backups="completedBackups" />
-				<BackupRenameModal ref="renameBackupModal" :backups="completedBackups" />
-				<BackupRestoreModal ref="restoreBackupModal" />
+				<ReadyTransition :pending="backupsReadyPending">
+				<BackupCreateModal
+					ref="createBackupModal"
+					:backups="completedBackups"
+					:can-create="canManageBackups"
+					:permission-denied-message="permissionDeniedMessage"
+				/>
+				<BackupRenameModal
+					ref="renameBackupModal"
+					:backups="completedBackups"
+					:can-rename="canManageBackups"
+					:permission-denied-message="permissionDeniedMessage"
+				/>
+				<BackupRestoreModal
+					ref="restoreBackupModal"
+					:can-restore="canManageBackups"
+					:permission-denied-message="permissionDeniedMessage"
+				/>
 				<BackupDeleteModal
 					ref="deleteBackupModal"
+					:can-delete="canManageBackups"
+					:permission-denied-message="permissionDeniedMessage"
 					@delete="deleteBackup"
 					@bulk-delete="bulkDelete"
 				/>
@@ -147,16 +163,18 @@
 										:backup="backup"
 										:selected="selectedIds.has(backup.id)"
 										:restore-disabled="backupRestoreDisabled"
+										:write-disabled="!canManageBackups"
+										:write-disabled-tooltip="permissionDeniedMessage"
 										:kyros-url="server.node?.instance"
 										:jwt="server.node?.token"
 										:show-copy-id-action="showCopyIdAction"
 										:show-debug-info="showDebugInfo"
 										@download="() => triggerDownloadAnimation()"
-										@rename="() => renameBackupModal?.show(backup)"
-										@restore="() => restoreBackupModal?.show(backup)"
+										@rename="() => showRenameBackupModal(backup)"
+										@restore="() => showRestoreBackupModal(backup)"
 										@delete="
 											(skipConfirmation?: boolean) =>
-												skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
+												skipConfirmation ? deleteBackup(backup) : showDeleteBackupModal(backup)
 										"
 									/>
 								</div>
@@ -197,7 +215,12 @@
 
 					<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
 						<ButtonStyled type="transparent" color="red" hover-color-fill="background">
-							<button type="button" @click="confirmBulkDelete">
+							<button
+								v-tooltip="!canManageBackups ? permissionDeniedMessage : undefined"
+								type="button"
+								:disabled="!canManageBackups"
+								@click="confirmBulkDelete"
+							>
 								<TrashIcon />
 								<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
 							</button>
@@ -267,6 +290,7 @@ import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModa
 import { useBackupsSelection } from '#ui/composables/hosting/backups-selection'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import { useBulkOperation } from '#ui/layouts/shared/content-tab/composables/bulk-operations'
 import {
 	injectModrinthClient,
@@ -333,6 +357,7 @@ const messages = defineMessages({
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const { canManageBackups, permissionDeniedMessage } = useServerPermissions()
 
 const filterPillOptions = computed<FilterPillOption[]>(() => [
 	{ id: 'manual', label: formatMessage(messages.filterManual) },
@@ -500,6 +525,9 @@ const restoreBackupModal = ref<InstanceType<typeof BackupRestoreModal>>()
 const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>()
 
 const backupRestoreDisabled = computed(() => {
+	if (!canManageBackups.value) {
+		return permissionDeniedMessage.value
+	}
 	if (props.isServerRunning) {
 		return 'Cannot restore backup while server is running'
 	}
@@ -513,6 +541,9 @@ const backupRestoreDisabled = computed(() => {
 })
 
 const backupCreationDisabled = computed(() => {
+	if (!canManageBackups.value) {
+		return permissionDeniedMessage.value
+	}
 	const quota = server.value.backup_quota
 	if (quota !== undefined) {
 		const usedCount = backups.value.length ?? server.value.used_backup_quota ?? 0
@@ -530,7 +561,23 @@ const backupCreationDisabled = computed(() => {
 })
 
 const showCreateModel = () => {
+	if (backupCreationDisabled.value) return
 	createBackupModal.value?.show()
+}
+
+function showRenameBackupModal(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
+	if (!canManageBackups.value) return
+	renameBackupModal.value?.show(backup)
+}
+
+function showRestoreBackupModal(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
+	if (backupRestoreDisabled.value) return
+	restoreBackupModal.value?.show(backup)
+}
+
+function showDeleteBackupModal(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
+	if (!canManageBackups.value) return
+	deleteBackupModal.value?.show(backup)
 }
 
 function clearBackupFilters() {
@@ -538,11 +585,13 @@ function clearBackupFilters() {
 }
 
 function confirmBulkDelete() {
+	if (!canManageBackups.value) return
 	if (!selectedBackups.value.length) return
 	deleteBackupModal.value?.showBulk(selectedBackups.value)
 }
 
 async function bulkDelete(toRemove: Archon.BackupsQueue.v1.BackupQueueBackup[]) {
+	if (!canManageBackups.value) return
 	if (!toRemove.length) return
 
 	isBulkOperating.value = true
@@ -573,6 +622,7 @@ function useQueueDeleteFor(backup: Archon.BackupsQueue.v1.BackupQueueBackup) {
 }
 
 function deleteBackup(backup?: Archon.BackupsQueue.v1.BackupQueueBackup) {
+	if (!canManageBackups.value) return
 	if (!backup) {
 		addNotification({
 			type: 'error',

@@ -36,11 +36,12 @@
 			>
 				{{ formatRole(member.role) }}
 			</span>
-			<div v-else class="w-fit">
+			<div v-else v-tooltip="accessManagementTooltip" class="w-fit">
 				<Combobox
 					:model-value="member.role"
 					:options="roleComboboxOptions"
 					:display-value="formatRole(member.role)"
+					:disabled="!canManageUsers"
 					:trigger-class="
 						roleTriggerClass(member.role) +
 						` !inline-flex !w-auto !h-7 !min-h-0 !rounded-full !border !border-solid !px-2.5 !py-1 gap-1 !text-sm !font-semibold !leading-5`
@@ -48,7 +49,7 @@
 					dropdown-class="!rounded-[24px] !bg-surface-3"
 					dropdown-min-width="18rem"
 					force-direction="down"
-					@update:model-value="(role) => emit('updateRole', member, role)"
+					@update:model-value="(role) => handleUpdateRole(member, role)"
 				>
 					<template #selected>
 						<span class="font-semibold leading-5" :class="roleTextClass(member.role)">
@@ -77,7 +78,7 @@
 				<ButtonStyled v-if="member.pending" circular type="transparent">
 					<button
 						v-tooltip="resendInviteTooltip(member)"
-						:aria-label="resendInviteTooltip(member)"
+						:aria-label="resendInviteLabel(member)"
 						:disabled="resendInviteDisabled(member)"
 						class="text-secondary hover:text-contrast disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
 						@click="handleResendInvite(member)"
@@ -87,18 +88,11 @@
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
 					<button
-						v-tooltip="
-							member.pending
-								? formatMessage(messages.cancelInvite)
-								: formatMessage(messages.removeUser)
-						"
-						:aria-label="
-							member.pending
-								? formatMessage(messages.cancelInvite)
-								: formatMessage(messages.removeUser)
-						"
-						class="text-secondary hover:text-red"
-						@click="member.pending ? emit('cancelInvite', member) : emit('removeMember', member)"
+						v-tooltip="memberAccessActionTooltip(member)"
+						:aria-label="memberAccessActionLabel(member)"
+						:disabled="!canManageUsers"
+						class="text-secondary hover:text-red disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
+						@click="member.pending ? handleCancelInvite(member) : handleRemoveMember(member)"
 					>
 						<XIcon v-if="member.pending" aria-hidden="true" />
 						<UserXIcon v-else aria-hidden="true" />
@@ -180,11 +174,12 @@
 				>
 					{{ formatRole(member.role) }}
 				</span>
-				<div v-else class="min-w-0">
+				<div v-else v-tooltip="accessManagementTooltip" class="min-w-0">
 					<Combobox
 						:model-value="member.role"
 						:options="roleComboboxOptions"
 						:display-value="formatRole(member.role)"
+						:disabled="!canManageUsers"
 						:trigger-class="
 							roleTriggerClass(member.role) +
 							` !inline-flex !w-auto !max-w-full !h-7 !min-h-0 !rounded-full !border !border-solid !px-2.5 !py-1 gap-1 !text-sm !font-semibold !leading-5`
@@ -192,7 +187,7 @@
 						dropdown-class="!rounded-[24px] !bg-surface-3"
 						dropdown-min-width="18rem"
 						force-direction="down"
-						@update:model-value="(role) => emit('updateRole', member, role)"
+						@update:model-value="(role) => handleUpdateRole(member, role)"
 					>
 						<template #selected>
 							<span
@@ -230,7 +225,7 @@
 						</span>
 						<template #resend-invite>
 							<SendIcon aria-hidden="true" />
-							{{ resendInviteTooltip(member) }}
+							{{ resendInviteLabel(member) }}
 						</template>
 						<template #cancel-invite>
 							<XIcon aria-hidden="true" />
@@ -284,6 +279,7 @@ import { type Component, computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
+import { commonMessages } from '../../../utils/common-messages'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
@@ -292,10 +288,17 @@ import Table, { type SortDirection, type TableColumn } from '../../base/Table.vu
 import TeleportOverflowMenu from '../../base/TeleportOverflowMenu.vue'
 import type { ServerAccessMember, ServerAccessRole, ServerAccessRoleOption } from './types'
 
-const props = defineProps<{
-	members: ServerAccessMember[]
-	roles: ServerAccessRoleOption[]
-}>()
+const props = withDefaults(
+	defineProps<{
+		members: ServerAccessMember[]
+		roles: ServerAccessRoleOption[]
+		canManageUsers?: boolean
+		permissionDeniedMessage?: string
+	}>(),
+	{
+		canManageUsers: true,
+	},
+)
 
 const emit = defineEmits<{
 	updateRole: [member: ServerAccessMember, role: ServerAccessRole]
@@ -399,6 +402,13 @@ const sortColumn = ref<string | undefined>('joined')
 const sortDirection = ref<SortDirection>('desc')
 const now = ref(Date.now())
 let nowInterval: ReturnType<typeof setInterval> | null = null
+const canManageUsers = computed(() => props.canManageUsers)
+const permissionDeniedMessage = computed(
+	() => props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction),
+)
+const accessManagementTooltip = computed(() =>
+	canManageUsers.value ? undefined : permissionDeniedMessage.value,
+)
 
 const roleSortOrder: Record<ServerAccessRole, number> = {
 	owner: 0,
@@ -528,20 +538,51 @@ function resendInviteCooldownSeconds(member: ServerAccessMember): number {
 	return Math.max(0, Math.ceil((availableAt - now.value) / 1000))
 }
 
-function resendInviteDisabled(member: ServerAccessMember): boolean {
+function resendInviteCooldownDisabled(member: ServerAccessMember): boolean {
 	return resendInviteCooldownSeconds(member) > 0
 }
 
-function resendInviteTooltip(member: ServerAccessMember): string {
+function resendInviteDisabled(member: ServerAccessMember): boolean {
+	return !canManageUsers.value || resendInviteCooldownDisabled(member)
+}
+
+function resendInviteLabel(member: ServerAccessMember): string {
 	const seconds = resendInviteCooldownSeconds(member)
 	return seconds > 0
 		? formatMessage(messages.resendInviteCooldown, { seconds })
 		: formatMessage(messages.resendInvite)
 }
 
+function resendInviteTooltip(member: ServerAccessMember): string {
+	return canManageUsers.value ? resendInviteLabel(member) : permissionDeniedMessage.value
+}
+
 function handleResendInvite(member: ServerAccessMember) {
 	if (resendInviteDisabled(member)) return
 	emit('resendInvite', member)
+}
+
+function memberAccessActionLabel(member: ServerAccessMember): string {
+	return member.pending ? formatMessage(messages.cancelInvite) : formatMessage(messages.removeUser)
+}
+
+function memberAccessActionTooltip(member: ServerAccessMember): string {
+	return canManageUsers.value ? memberAccessActionLabel(member) : permissionDeniedMessage.value
+}
+
+function handleUpdateRole(member: ServerAccessMember, role: ServerAccessRole) {
+	if (!canManageUsers.value) return
+	emit('updateRole', member, role)
+}
+
+function handleCancelInvite(member: ServerAccessMember) {
+	if (!canManageUsers.value) return
+	emit('cancelInvite', member)
+}
+
+function handleRemoveMember(member: ServerAccessMember) {
+	if (!canManageUsers.value) return
+	emit('removeMember', member)
 }
 
 function memberActionOptions(member: ServerAccessMember): OverflowMenuOption[] {
@@ -557,16 +598,20 @@ function memberActionOptions(member: ServerAccessMember): OverflowMenuOption[] {
 		{
 			id: 'cancel-invite',
 			icon: XIcon,
-			action: () => emit('cancelInvite', member),
+			action: () => handleCancelInvite(member),
 			color: 'red',
 			shown: member.pending,
+			disabled: !canManageUsers.value,
+			tooltip: memberAccessActionTooltip(member),
 		},
 		{
 			id: 'remove-user',
 			icon: UserXIcon,
-			action: () => emit('removeMember', member),
+			action: () => handleRemoveMember(member),
 			color: 'red',
 			shown: !member.pending,
+			disabled: !canManageUsers.value,
+			tooltip: memberAccessActionTooltip(member),
 		},
 	]
 }

@@ -32,6 +32,9 @@ export interface ContentCardTableItem {
 	owner?: ContentOwner
 	enabled?: boolean
 	disabled?: boolean
+	disabledTooltip?: string | null
+	toggleDisabled?: boolean
+	toggleDisabledTooltip?: string | null
 	installing?: boolean
 	hasUpdate?: boolean
 	isClientOnly?: boolean

@@ -38,6 +38,8 @@ const props = withDefaults(
 		showCopyIdAction?: boolean
 		showDebugInfo?: boolean
 		restoreDisabled?: string
+		writeDisabled?: boolean
+		writeDisabledTooltip?: string
 		selected?: boolean
 	}>(),
 	{
@@ -47,6 +49,8 @@ const props = withDefaults(
 		showCopyIdAction: false,
 		showDebugInfo: false,
 		restoreDisabled: undefined,
+		writeDisabled: false,
+		writeDisabledTooltip: undefined,
 		selected: false,
 	},
 )
@@ -81,13 +85,20 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 		disabled: !props.kyrosUrl || !props.jwt,
 	})
 
-	options.push({ id: 'rename', action: () => emit('rename') })
+	options.push({
+		id: 'rename',
+		action: () => emit('rename'),
+		disabled: props.writeDisabled,
+		tooltip: props.writeDisabled ? props.writeDisabledTooltip : undefined,
+	})
 
 	options.push({ divider: true })
 	options.push({
 		id: 'delete',
 		color: 'red',
 		action: () => emit('delete'),
+		disabled: props.writeDisabled,
+		tooltip: props.writeDisabled ? props.writeDisabledTooltip : undefined,
 	})
 
 	return options

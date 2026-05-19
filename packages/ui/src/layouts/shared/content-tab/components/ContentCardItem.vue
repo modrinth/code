@@ -55,6 +55,9 @@ interface Props {
 	hideSwitchVersion?: boolean
 	overflowOptions?: OverflowMenuOption[]
 	disabled?: boolean
+	disabledTooltip?: string | null
+	toggleDisabled?: boolean
+	toggleDisabledTooltip?: string | null
 	showCheckbox?: boolean
 	hideDelete?: boolean
 	hideActions?: boolean
@@ -73,6 +76,9 @@ const props = withDefaults(defineProps<Props>(), {
 	hideSwitchVersion: false,
 	overflowOptions: undefined,
 	disabled: false,
+	disabledTooltip: undefined,
+	toggleDisabled: false,
+	toggleDisabledTooltip: undefined,
 	showCheckbox: false,
 	hideDelete: false,
 	hideActions: false,
@@ -98,6 +104,7 @@ const versionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
 
 const isDisabled = computed(() => props.disabled || props.installing)
+const isToggleDisabled = computed(() => isDisabled.value || props.toggleDisabled)
 
 const clientWarningMessage = computed(() => {
 	switch (props.clientWarning) {
@@ -283,7 +290,11 @@ const deleteHovered = ref(false)
 					hover-color-fill="background"
 				>
 					<button
-						v-tooltip="formatMessage(commonMessages.updateAvailableLabel)"
+						v-tooltip="
+							isDisabled && disabledTooltip
+								? disabledTooltip
+								: formatMessage(commonMessages.updateAvailableLabel)
+						"
 						:disabled="isDisabled"
 						@click="emit('update')"
 					>
@@ -296,7 +307,11 @@ const deleteHovered = ref(false)
 					type="transparent"
 				>
 					<button
-						v-tooltip="formatMessage(commonMessages.switchVersionButton)"
+						v-tooltip="
+							isDisabled && disabledTooltip
+								? disabledTooltip
+								: formatMessage(commonMessages.switchVersionButton)
+						"
 						:disabled="isDisabled"
 						@click="emit('switchVersion')"
 					>
@@ -307,8 +322,13 @@ const deleteHovered = ref(false)
 
 			<Toggle
 				v-if="enabled !== undefined"
+				v-tooltip="
+					isToggleDisabled && (toggleDisabledTooltip || disabledTooltip)
+						? (toggleDisabledTooltip ?? disabledTooltip)
+						: undefined
+				"
 				:model-value="enabled"
-				:disabled="isDisabled"
+				:disabled="isToggleDisabled"
 				:aria-label="project.title"
 				class="my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
@@ -317,11 +337,13 @@ const deleteHovered = ref(false)
 			<ButtonStyled v-if="hasDeleteListener && !props.hideDelete" circular type="transparent">
 				<button
 					v-tooltip="
-						formatMessage(
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(
 							shiftHeld && deleteHovered
 								? commonMessages.deleteImmediatelyLabel
 								: commonMessages.deleteLabel,
-						)
+							)
 					"
 					:disabled="isDisabled"
 					@click="emit('delete', $event)"

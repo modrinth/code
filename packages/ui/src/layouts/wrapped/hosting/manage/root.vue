@@ -389,6 +389,7 @@ import {
 	useModrinthServersConsole,
 	useReadyState,
 	useServerImage,
+	hasServerPermission,
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -402,6 +403,7 @@ import {
 	provideServerSettingsModal,
 } from '#ui/providers'
 import type { ServerStats } from '#ui/providers/server-context'
+import { commonMessages } from '#ui/utils/common-messages'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 import {
 	pendingServerContentInstallsEvent,
@@ -686,6 +688,10 @@ const {
 })
 
 const isUploading = computed(() => uploadState.value.isUploading)
+const canSetup = computed(() =>
+	hasServerPermission(serverData.value?.current_user_permissions ?? 0, 'SETUP'),
+)
+const permissionDeniedMessage = computed(() => formatMessage(commonMessages.noPermissionAction))
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
 	if (isUploading.value) {
@@ -942,6 +948,13 @@ function loadTallyScript() {
 
 async function handleContentRetry() {
 	if (!worldId.value) return
+	if (!canSetup.value) {
+		addNotification({
+			type: 'error',
+			text: permissionDeniedMessage.value,
+		})
+		return
+	}
 	try {
 		await client.archon.content_v1.repair(props.serverId, worldId.value)
 	} catch (err) {

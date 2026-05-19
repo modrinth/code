@@ -109,7 +109,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
-					<button :disabled="!canInvite" @click="submit">
+					<button v-tooltip="grantPermissionTooltip" :disabled="!canSubmit" @click="submit">
 						<UserPlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.inviteButton) }}
 					</button>
@@ -125,6 +125,7 @@ import { useDebounceFn } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
+import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import Checkbox from '../../base/Checkbox.vue'
@@ -141,9 +142,12 @@ const props = withDefaults(
 	defineProps<{
 		suggestions?: ServerAccessInviteSuggestion[]
 		resolveUser?: (target: string) => Promise<ServerAccessInviteSuggestion | null>
+		canGrant?: boolean
+		permissionDeniedMessage?: string
 	}>(),
 	{
 		suggestions: () => [],
+		canGrant: true,
 	},
 )
 
@@ -252,6 +256,13 @@ const canInvite = computed(
 		(!usesRemoteLookup.value ||
 			(targetLookupStatus.value === 'loaded' && !!findSuggestion(normalizedTarget.value))),
 )
+const canSubmit = computed(() => props.canGrant && canInvite.value)
+const permissionDeniedMessage = computed(
+	() => props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction),
+)
+const grantPermissionTooltip = computed(() =>
+	props.canGrant ? undefined : permissionDeniedMessage.value,
+)
 const targetLookupMessage = computed(() =>
 	usesRemoteLookup.value && targetLookupStatus.value !== 'loaded'
 		? formatMessage(messages.searching)
@@ -347,7 +358,7 @@ function hide() {
 }
 
 function submit() {
-	if (!canInvite.value) return
+	if (!canSubmit.value) return
 
 	emit('grant', {
 		target: normalizedTarget.value,

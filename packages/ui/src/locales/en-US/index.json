@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "You do not have permission to do this action."
+  },
   "affiliate.create.button": {
     "defaultMessage": "Create affiliate link"
   },
