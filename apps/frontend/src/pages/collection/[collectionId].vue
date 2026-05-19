@@ -529,8 +529,8 @@ const returnLink = computed(() => {
 	return null
 })
 
-const collectionId = computed(() => route.params.id)
-const isFollowingCollection = computed(() => collectionId.value === 'following')
+const collectionId = useRouteId('collectionId')
+const isFollowingCollection = computed(() => collectionId === 'following')
 
 // Static collection for "following" page
 const followingCollection = computed(() =>
@@ -555,15 +555,15 @@ const {
 	error: collectionError,
 	isPending: collectionIsPending,
 } = useQuery({
-	queryKey: computed(() => ['collection', collectionId.value]),
-	queryFn: () => api.labrinth.collections.get(collectionId.value),
-	enabled: computed(() => !!collectionId.value && !isFollowingCollection.value),
+	queryKey: computed(() => ['collection', collectionId]),
+	queryFn: () => api.labrinth.collections.get(collectionId),
+	enabled: computed(() => !!collectionId && !isFollowingCollection.value),
 })
 
 watch(
 	collectionError,
 	(error) => {
-		if (error && collectionId.value && !isFollowingCollection.value) {
+		if (error && collectionId && !isFollowingCollection.value) {
 			const status = error.statusCode ?? error.status ?? 404
 			showError({
 				fatal: true,

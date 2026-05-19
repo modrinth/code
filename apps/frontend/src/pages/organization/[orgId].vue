@@ -348,7 +348,7 @@ const tags = useGeneratedState()
 const config = useRuntimeConfig()
 const modal_creation = useTemplateRef('modal_creation')
 
-const orgId = useRouteId()
+const orgId = useRouteId('orgId')
 
 if (route.path.includes('settings')) {
 	useSeoMeta({
