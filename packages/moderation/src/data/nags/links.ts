@@ -99,7 +99,7 @@ export const linksNags: Nag[] = [
 				id: 'nags.settings.links.title',
 				defaultMessage: 'Visit links settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-links',
 		},
 	},
 	{
@@ -126,7 +126,7 @@ export const linksNags: Nag[] = [
 				id: 'nags.settings.links.title',
 				defaultMessage: 'Visit links settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-links',
 		},
 	},
 	{
@@ -150,7 +150,7 @@ export const linksNags: Nag[] = [
 				id: 'nags.settings.links.title',
 				defaultMessage: 'Visit links settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-links',
 		},
 	},
 	{
@@ -178,7 +178,7 @@ export const linksNags: Nag[] = [
 				id: 'nags.visit-links-settings.title',
 				defaultMessage: 'Visit links settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-links',
 		},
 	},
 	{
@@ -205,7 +205,7 @@ export const linksNags: Nag[] = [
 				id: 'nags.visit-links-settings.title',
 				defaultMessage: 'Visit links settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-links',
 		},
 	},
 	{
@@ -299,7 +299,7 @@ export const linksNags: Nag[] = [
 				id: 'nags.edit-license.title',
 				defaultMessage: 'Edit license',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings',
 		},
 	},
 	{
@@ -373,7 +373,7 @@ export const linksNags: Nag[] = [
 				id: 'nags.visit-links-settings.title',
 				defaultMessage: 'Visit links settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-links',
 		},
 	},
 ]

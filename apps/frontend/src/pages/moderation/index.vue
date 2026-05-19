@@ -529,10 +529,10 @@ async function moderateAllInFilter() {
 	}
 
 	navigateTo({
-		name: 'type-id',
+		name: 'type-project',
 		params: {
 			type: 'project',
-			id: targetProject.project.slug,
+			project: targetProject.project.slug,
 		},
 		state: {
 			showChecklist: true,
@@ -566,10 +566,10 @@ async function startFromProject(projectId: string) {
 	}
 
 	navigateTo({
-		name: 'type-id',
+		name: 'type-project',
 		params: {
 			type: 'project',
-			id: targetProject.project.slug,
+			project: targetProject.project.slug,
 		},
 		state: {
 			showChecklist: true,
