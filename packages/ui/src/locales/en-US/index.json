@@ -3201,7 +3201,10 @@
     "defaultMessage": "Invite cancelled"
   },
   "servers.access-page.notification.invite-failed.title": {
-    "defaultMessage": "User could not be added"
+    "defaultMessage": "Invite could not be sent"
+  },
+  "servers.access-page.notification.friend-request-failed.title": {
+    "defaultMessage": "Friend request could not be sent"
   },
   "servers.access-page.notification.invite-resend-unavailable.text": {
     "defaultMessage": "Invites are accepted automatically for this server."
@@ -3629,14 +3632,17 @@
   "servers.busy.syncing-content": {
     "defaultMessage": "Content sync in progress"
   },
+  "servers.grant-access-modal.add-as-friend": {
+    "defaultMessage": "Also send a friend request"
+  },
   "servers.grant-access-modal.cancel": {
     "defaultMessage": "Cancel"
   },
   "servers.grant-access-modal.header": {
-    "defaultMessage": "Add a user"
+    "defaultMessage": "Add user"
   },
   "servers.grant-access-modal.invite": {
-    "defaultMessage": "Add user"
+    "defaultMessage": "Invite"
   },
   "servers.grant-access-modal.permissions-help": {
     "defaultMessage": "View the full list of permissions for each role <link>here</link>."

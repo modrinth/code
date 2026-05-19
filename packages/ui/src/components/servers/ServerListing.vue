@@ -35,7 +35,7 @@
 			</div>
 			<ServerIcon v-else :image="image ?? undefined" :disabled="isDisabled" />
 			<div class="ml-4 flex flex-col gap-1.5">
-				<div class="flex flex-row items-center gap-2">
+				<div class="flex flex-row items-center gap-2.5">
 					<h2 class="m-0 text-xl font-bold text-contrast" :class="{ 'opacity-50': isDisabled }">
 						{{ name }}
 					</h2>

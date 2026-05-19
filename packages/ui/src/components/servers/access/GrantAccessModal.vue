@@ -91,6 +91,12 @@
 						</template>
 					</IntlFormatted>
 				</p>
+				<Checkbox
+					v-model="addAsFriend"
+					:label="formatMessage(messages.addAsFriend)"
+					label-class="text-base font-semibold text-contrast"
+					class="mt-2"
+				/>
 			</div>
 		</div>
 
@@ -121,6 +127,7 @@ import { computed, ref } from 'vue'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
+import Checkbox from '../../base/Checkbox.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import IntlFormatted from '../../base/IntlFormatted.vue'
 import NewModal from '../../modal/NewModal.vue'
@@ -148,6 +155,7 @@ const { formatMessage } = useVIntl()
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const target = ref('')
 const selectedRole = ref<Exclude<ServerAccessRole, 'owner'>>('editor')
+const addAsFriend = ref(true)
 const suggestionMinimumLength = 2
 const resolvedSuggestion = ref<ServerAccessInviteSuggestion | null>(null)
 const targetLookupStatus = ref<'idle' | 'loading' | 'loaded'>('idle')
@@ -156,7 +164,7 @@ const targetLookupRequestId = ref(0)
 const messages = defineMessages({
 	header: {
 		id: 'servers.grant-access-modal.header',
-		defaultMessage: 'Add a user',
+		defaultMessage: 'Add user',
 	},
 	targetLabel: {
 		id: 'servers.grant-access-modal.target.label',
@@ -202,13 +210,17 @@ const messages = defineMessages({
 		id: 'servers.grant-access-modal.permissions-help',
 		defaultMessage: 'View the full list of permissions for each role <link>here</link>.',
 	},
+	addAsFriend: {
+		id: 'servers.grant-access-modal.add-as-friend',
+		defaultMessage: 'Also send a friend request',
+	},
 	cancelButton: {
 		id: 'servers.grant-access-modal.cancel',
 		defaultMessage: 'Cancel',
 	},
 	inviteButton: {
 		id: 'servers.grant-access-modal.invite',
-		defaultMessage: 'Add user',
+		defaultMessage: 'Invite',
 	},
 	suggestionAvatarAlt: {
 		id: 'servers.grant-access-modal.suggestion-avatar-alt',
@@ -319,6 +331,7 @@ function handleTargetSelect(option: ComboboxOption<string>) {
 function reset() {
 	target.value = ''
 	selectedRole.value = 'editor'
+	addAsFriend.value = true
 	resolvedSuggestion.value = null
 	targetLookupStatus.value = 'idle'
 	targetLookupRequestId.value += 1
@@ -339,6 +352,7 @@ function submit() {
 	emit('grant', {
 		target: normalizedTarget.value,
 		role: selectedRole.value,
+		addAsFriend: addAsFriend.value,
 	})
 	hide()
 }

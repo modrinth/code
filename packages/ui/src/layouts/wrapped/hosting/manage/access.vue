@@ -43,10 +43,25 @@
 				{{ formatMessage(messages.activityLogTitle) }}
 			</span>
 			<AuditLogTable
-				v-model:query="auditQuery"
-				v-model:filters="auditFilters"
 				:entries="auditEntries"
-			/>
+				:has-active-external-filters="hasActiveAuditLogFilters"
+				:has-more="hasMoreActionLogEntries"
+				:loading="isActionLogFiltering"
+				:loading-more="isLoadingMoreActionLogEntries"
+				@load-more="loadMoreActionLogEntries"
+			>
+				<template #filters>
+					<DropdownFilterBar
+						v-model="auditLogFilters"
+						:categories="auditLogFilterCategories"
+						:add-label="formatMessage(messages.addFilter)"
+						:clear-label="formatMessage(messages.clearFilters)"
+						:empty-options-label="formatMessage(messages.emptyFilterOptions)"
+						:empty-search-label="formatMessage(messages.emptyFilterSearch)"
+						use-filter-icon
+					/>
+				</template>
+			</AuditLogTable>
 		</div>
 
 		<GrantAccessModal
@@ -70,11 +85,15 @@
 <script setup lang="ts">
 import { Archon, type Labrinth } from '@modrinth/api-client'
 import { FilterIcon, SearchIcon, UserPlusIcon } from '@modrinth/assets'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
+import DropdownFilterBar, {
+	type DropdownFilterBarCategory,
+	type DropdownFilterBarOption,
+} from '#ui/components/base/DropdownFilterBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import {
 	AccessTable,
@@ -87,7 +106,6 @@ import {
 	type ServerAccessRole,
 	type ServerAccessRoleOption,
 	type ServerAuditLogEntry,
-	type ServerAuditLogFilters,
 } from '#ui/components/servers/access'
 import { parseAuditEvent } from '#ui/components/servers/access/events'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -98,6 +116,10 @@ import {
 } from '#ui/providers'
 
 type RoleFilter = ServerAccessRole | 'all'
+type AuditLogFilterKey = 'users' | 'worlds' | 'actions'
+
+const SERVER_WORLD_FILTER_VALUE = '__server__'
+const ACTION_LOG_PAGE_SIZE = 250
 
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
@@ -131,6 +153,218 @@ const messages = defineMessages({
 	activityLogTitle: {
 		id: 'servers.access-page.activity-log-title',
 		defaultMessage: 'Activity log',
+	},
+	addFilter: {
+		id: 'servers.access-page.activity-log-filter.add',
+		defaultMessage: 'Add filter',
+	},
+	clearFilters: {
+		id: 'servers.access-page.activity-log-filter.clear',
+		defaultMessage: 'Clear filters',
+	},
+	emptyFilterOptions: {
+		id: 'servers.access-page.activity-log-filter.empty-options',
+		defaultMessage: 'No options available.',
+	},
+	emptyFilterSearch: {
+		id: 'servers.access-page.activity-log-filter.empty-search',
+		defaultMessage: 'No options found.',
+	},
+	userFilter: {
+		id: 'servers.access-page.activity-log-filter.users',
+		defaultMessage: 'Users',
+	},
+	userFilterSearch: {
+		id: 'servers.access-page.activity-log-filter.users-search',
+		defaultMessage: 'Search users...',
+	},
+	instanceFilter: {
+		id: 'servers.access-page.activity-log-filter.instances',
+		defaultMessage: 'Instances',
+	},
+	instanceFilterSearch: {
+		id: 'servers.access-page.activity-log-filter.instances-search',
+		defaultMessage: 'Search instances...',
+	},
+	actionTypeFilter: {
+		id: 'servers.access-page.activity-log-filter.action-types',
+		defaultMessage: 'Action types',
+	},
+	actionTypeFilterSearch: {
+		id: 'servers.access-page.activity-log-filter.action-types-search',
+		defaultMessage: 'Search action types...',
+	},
+	serverScope: {
+		id: 'servers.access-page.activity-log-filter.server-scope',
+		defaultMessage: 'Server',
+	},
+	server_created: {
+		id: 'servers.access-page.activity-log-filter.action.server-created',
+		defaultMessage: 'Server created',
+	},
+	changed_server_name: {
+		id: 'servers.access-page.activity-log-filter.action.changed-server-name',
+		defaultMessage: 'Server name changed',
+	},
+	changed_server_subdomain: {
+		id: 'servers.access-page.activity-log-filter.action.changed-server-subdomain',
+		defaultMessage: 'Server subdomain changed',
+	},
+	server_reallocated: {
+		id: 'servers.access-page.activity-log-filter.action.server-reallocated',
+		defaultMessage: 'Server reallocated',
+	},
+	server_plan_changed: {
+		id: 'servers.access-page.activity-log-filter.action.server-plan-changed',
+		defaultMessage: 'Plan changed',
+	},
+	user_invited: {
+		id: 'servers.access-page.activity-log-filter.action.user-invited',
+		defaultMessage: 'User invited',
+	},
+	user_invite_revoked: {
+		id: 'servers.access-page.activity-log-filter.action.user-invite-revoked',
+		defaultMessage: 'User invite revoked',
+	},
+	user_permission_modified: {
+		id: 'servers.access-page.activity-log-filter.action.user-permission-modified',
+		defaultMessage: 'User permissions changed',
+	},
+	user_removed: {
+		id: 'servers.access-page.activity-log-filter.action.user-removed',
+		defaultMessage: 'User removed',
+	},
+	addon_added: {
+		id: 'servers.access-page.activity-log-filter.action.addon-added',
+		defaultMessage: 'Content added',
+	},
+	addon_uploaded: {
+		id: 'servers.access-page.activity-log-filter.action.addon-uploaded',
+		defaultMessage: 'Content uploaded',
+	},
+	addon_disabled: {
+		id: 'servers.access-page.activity-log-filter.action.addon-disabled',
+		defaultMessage: 'Content disabled',
+	},
+	addon_enabled: {
+		id: 'servers.access-page.activity-log-filter.action.addon-enabled',
+		defaultMessage: 'Content enabled',
+	},
+	addon_deleted: {
+		id: 'servers.access-page.activity-log-filter.action.addon-deleted',
+		defaultMessage: 'Content deleted',
+	},
+	addon_updated: {
+		id: 'servers.access-page.activity-log-filter.action.addon-updated',
+		defaultMessage: 'Content updated',
+	},
+	modpack_changed: {
+		id: 'servers.access-page.activity-log-filter.action.modpack-changed',
+		defaultMessage: 'Modpack changed',
+	},
+	modpack_unlinked: {
+		id: 'servers.access-page.activity-log-filter.action.modpack-unlinked',
+		defaultMessage: 'Modpack unlinked',
+	},
+	server_repaired: {
+		id: 'servers.access-page.activity-log-filter.action.server-repaired',
+		defaultMessage: 'Server repaired',
+	},
+	server_reset: {
+		id: 'servers.access-page.activity-log-filter.action.server-reset',
+		defaultMessage: 'Server reset',
+	},
+	server_started: {
+		id: 'servers.access-page.activity-log-filter.action.server-started',
+		defaultMessage: 'Server started',
+	},
+	server_stopped: {
+		id: 'servers.access-page.activity-log-filter.action.server-stopped',
+		defaultMessage: 'Server stopped',
+	},
+	server_restarted: {
+		id: 'servers.access-page.activity-log-filter.action.server-restarted',
+		defaultMessage: 'Server restarted',
+	},
+	server_killed: {
+		id: 'servers.access-page.activity-log-filter.action.server-killed',
+		defaultMessage: 'Server killed',
+	},
+	port_allocation_added: {
+		id: 'servers.access-page.activity-log-filter.action.port-allocation-added',
+		defaultMessage: 'Port allocation added',
+	},
+	port_allocation_removed: {
+		id: 'servers.access-page.activity-log-filter.action.port-allocation-removed',
+		defaultMessage: 'Port allocation removed',
+	},
+	loader_version_edited: {
+		id: 'servers.access-page.activity-log-filter.action.loader-version-edited',
+		defaultMessage: 'Loader version changed',
+	},
+	game_version_edited: {
+		id: 'servers.access-page.activity-log-filter.action.game-version-edited',
+		defaultMessage: 'Minecraft version changed',
+	},
+	server_properties_modified: {
+		id: 'servers.access-page.activity-log-filter.action.server-properties-modified',
+		defaultMessage: 'Server properties modified',
+	},
+	file_uploaded: {
+		id: 'servers.access-page.activity-log-filter.action.file-uploaded',
+		defaultMessage: 'File uploaded',
+	},
+	file_deleted: {
+		id: 'servers.access-page.activity-log-filter.action.file-deleted',
+		defaultMessage: 'File deleted',
+	},
+	file_renamed: {
+		id: 'servers.access-page.activity-log-filter.action.file-renamed',
+		defaultMessage: 'File renamed',
+	},
+	file_edited: {
+		id: 'servers.access-page.activity-log-filter.action.file-edited',
+		defaultMessage: 'File edited',
+	},
+	sftp_login: {
+		id: 'servers.access-page.activity-log-filter.action.sftp-login',
+		defaultMessage: 'SFTP login',
+	},
+	console_command_executed: {
+		id: 'servers.access-page.activity-log-filter.action.console-command-executed',
+		defaultMessage: 'Console command run',
+	},
+	console_cleared: {
+		id: 'servers.access-page.activity-log-filter.action.console-cleared',
+		defaultMessage: 'Console cleared',
+	},
+	backup_created: {
+		id: 'servers.access-page.activity-log-filter.action.backup-created',
+		defaultMessage: 'Backup created',
+	},
+	backup_renamed: {
+		id: 'servers.access-page.activity-log-filter.action.backup-renamed',
+		defaultMessage: 'Backup renamed',
+	},
+	backup_restored: {
+		id: 'servers.access-page.activity-log-filter.action.backup-restored',
+		defaultMessage: 'Backup restored',
+	},
+	backup_deleted: {
+		id: 'servers.access-page.activity-log-filter.action.backup-deleted',
+		defaultMessage: 'Backup deleted',
+	},
+	startup_command_modified: {
+		id: 'servers.access-page.activity-log-filter.action.startup-command-modified',
+		defaultMessage: 'Startup command changed',
+	},
+	java_runtime_modified: {
+		id: 'servers.access-page.activity-log-filter.action.java-runtime-modified',
+		defaultMessage: 'Java runtime changed',
+	},
+	java_version_modified: {
+		id: 'servers.access-page.activity-log-filter.action.java-version-modified',
+		defaultMessage: 'Java version changed',
 	},
 	allRoles: {
 		id: 'servers.access-page.role-filter.all',
@@ -166,11 +400,11 @@ const messages = defineMessages({
 	},
 	inviteSentTitle: {
 		id: 'servers.access-page.notification.invite-sent.title',
-		defaultMessage: 'Access added',
+		defaultMessage: 'Invite sent',
 	},
 	inviteSentText: {
 		id: 'servers.access-page.notification.invite-sent.text',
-		defaultMessage: 'Added {target} as {role}.',
+		defaultMessage: 'Invited {target} as {role}.',
 	},
 	inviteResentTitle: {
 		id: 'servers.access-page.notification.invite-resent.title',
@@ -222,7 +456,11 @@ const messages = defineMessages({
 	},
 	inviteFailedTitle: {
 		id: 'servers.access-page.notification.invite-failed.title',
-		defaultMessage: 'User could not be added',
+		defaultMessage: 'Invite could not be sent',
+	},
+	friendRequestFailedTitle: {
+		id: 'servers.access-page.notification.friend-request-failed.title',
+		defaultMessage: 'Friend request could not be sent',
 	},
 	inviteResendUnavailableTitle: {
 		id: 'servers.access-page.notification.invite-resend-unavailable.title',
@@ -241,6 +479,53 @@ const messages = defineMessages({
 		defaultMessage: 'Role could not be updated',
 	},
 })
+
+const actionLogActionNames = [
+	'server_created',
+	'changed_server_name',
+	'changed_server_subdomain',
+	'server_reallocated',
+	'server_plan_changed',
+	'user_invited',
+	'user_invite_revoked',
+	'user_permission_modified',
+	'user_removed',
+	'addon_added',
+	'addon_uploaded',
+	'addon_disabled',
+	'addon_enabled',
+	'addon_deleted',
+	'addon_updated',
+	'modpack_changed',
+	'modpack_unlinked',
+	'server_repaired',
+	'server_reset',
+	'server_started',
+	'server_stopped',
+	'server_restarted',
+	'server_killed',
+	'port_allocation_added',
+	'port_allocation_removed',
+	'loader_version_edited',
+	'game_version_edited',
+	'server_properties_modified',
+	'file_uploaded',
+	'file_deleted',
+	'file_renamed',
+	'file_edited',
+	'sftp_login',
+	'console_command_executed',
+	'console_cleared',
+	'backup_created',
+	'backup_renamed',
+	'backup_restored',
+	'backup_deleted',
+	'startup_command_modified',
+	'java_runtime_modified',
+	'java_version_modified',
+] as const satisfies readonly Archon.Actions.v1.ActionName[]
+type ActionLogFilterActionName = (typeof actionLogActionNames)[number]
+const actionLogActionNameSet = new Set<string>(actionLogActionNames)
 
 const roleOptions = computed<ServerAccessRoleOption[]>(() => [
 	{
@@ -308,8 +593,7 @@ const members = computed<ServerAccessMember[]>(() =>
 )
 
 const worldOptions = computed(
-	() =>
-		serverFull.value?.worlds.map((world) => ({ id: world.id, name: world.name })) ?? [],
+	() => serverFull.value?.worlds.map((world) => ({ id: world.id, name: world.name })) ?? [],
 )
 
 const worldById = computed(
@@ -326,28 +610,179 @@ const backupById = computed(() => {
 	return backups
 })
 
-const actionLogQueryKey = ['servers', 'action-log', 'v1', serverId]
-const actionLogQuery = useQuery({
-	queryKey: actionLogQueryKey,
-	queryFn: () => client.archon.actions_v1.list(serverId, { limit: 100, order: 'desc' }),
+const memberSearch = ref('')
+const roleFilter = ref<RoleFilter>('all')
+const auditLogFilters = ref<Record<string, string[]>>({
+	users: [],
+	worlds: [],
+	actions: [],
 })
 
-const auditEntries = computed<ServerAuditLogEntry[]>(() => {
-	const actionLog = actionLogQuery.data.value
-	if (!actionLog) return []
+const memberUsernames = computed(() =>
+	Array.from(new Set(members.value.map((member) => member.user.username))),
+)
+const memberUserDetailsQuery = useQuery({
+	queryKey: computed(() => [
+		'servers',
+		'access-user-filter-options',
+		'v2',
+		serverId,
+		memberUsernames.value,
+	]),
+	enabled: computed(() => memberUsernames.value.length > 0),
+	queryFn: async () => {
+		const results = await Promise.allSettled(
+			memberUsernames.value.map((username) => client.labrinth.users_v2.get(username)),
+		)
 
-	return actionLog.data.map((entry, index) => apiActionLogEntryToAuditEntry(entry, actionLog, index))
+		return results.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []))
+	},
+})
+
+const actionLogEndpointFilter = computed<Archon.Actions.v1.ActionLogFilter | undefined>(() => {
+	const users = selectedAuditLogFilterValues('users')
+	const worlds = selectedAuditLogFilterValues('worlds').map((world) =>
+		world === SERVER_WORLD_FILTER_VALUE ? null : world,
+	)
+	const actions = selectedAuditLogFilterValues('actions').filter(isActionLogActionName)
+	const filter: Archon.Actions.v1.ActionLogFilter = {}
+
+	if (users.length > 0) filter.users = users
+	if (worlds.length > 0) filter.worlds = worlds
+	if (actions.length > 0) filter.actions = actions
+
+	return Object.keys(filter).length > 0 ? filter : undefined
+})
+const actionLogBaseQueryKey = ['servers', 'action-log', 'v1', 'infinite', serverId] as const
+const actionLogQueryKey = computed(() => {
+	const filter = actionLogEndpointFilter.value
+	return filter ? [...actionLogBaseQueryKey, filter] : actionLogBaseQueryKey
+})
+const actionLogQuery = useInfiniteQuery({
+	queryKey: actionLogQueryKey,
+	queryFn: ({ pageParam = 0 }) => {
+		const offset = typeof pageParam === 'number' ? pageParam : 0
+		return client.archon.actions_v1.list(serverId, {
+			limit: ACTION_LOG_PAGE_SIZE,
+			offset,
+			order: 'desc',
+			filter: actionLogEndpointFilter.value,
+		})
+	},
+	getNextPageParam: (lastPage) =>
+		typeof lastPage.next_offset === 'number' && lastPage.data.length >= ACTION_LOG_PAGE_SIZE
+			? lastPage.next_offset
+			: undefined,
+	initialPageParam: 0,
+	staleTime: 30_000,
+})
+const hasCompletedInitialActionLogLoad = ref(false)
+watch(
+	() => actionLogQuery.isFetched.value,
+	(isFetched) => {
+		if (isFetched) hasCompletedInitialActionLogLoad.value = true
+	},
+	{ immediate: true },
+)
+
+const auditEntries = computed<ServerAuditLogEntry[]>(() => {
+	const pages = actionLogQuery.data.value?.pages ?? []
+
+	return pages.flatMap((actionLog, pageIndex) =>
+		actionLog.data.map((entry, index) =>
+			apiActionLogEntryToAuditEntry(
+				entry,
+				actionLog,
+				pageIndex * ACTION_LOG_PAGE_SIZE + index,
+			),
+		),
+	)
 })
 const hasShownLoadError = ref(false)
 const hasShownActionLogLoadError = ref(false)
+const hasMoreActionLogEntries = computed(() => actionLogQuery.hasNextPage.value)
+const isLoadingMoreActionLogEntries = computed(() => actionLogQuery.isFetchingNextPage.value)
+const isActionLogFiltering = computed(
+	() =>
+		hasCompletedInitialActionLogLoad.value &&
+		actionLogQuery.isFetching.value &&
+		!actionLogQuery.isFetchingNextPage.value,
+)
 
-const memberSearch = ref('')
-const roleFilter = ref<RoleFilter>('all')
-const auditQuery = ref('')
-const auditFilters = ref<ServerAuditLogFilters>({
-	userId: null,
-	worldId: null,
+const auditLogUserFilterOptions = computed<DropdownFilterBarOption[]>(() => {
+	const options = new Map<string, DropdownFilterBarOption>()
+
+	for (const user of memberUserDetailsQuery.data.value ?? []) {
+		options.set(user.id, userToFilterOption(user))
+	}
+
+	for (const page of actionLogQuery.data.value?.pages ?? []) {
+		for (const [id, user] of Object.entries(page.users)) {
+			if (!options.has(id)) {
+				options.set(id, {
+					value: id,
+					label: user.username,
+					searchTerms: [id, user.username],
+				})
+			}
+		}
+	}
+
+	return [...options.values()].sort(compareFilterOptions)
 })
+
+const auditLogWorldFilterOptions = computed<DropdownFilterBarOption[]>(() => [
+	{
+		value: SERVER_WORLD_FILTER_VALUE,
+		label: formatMessage(messages.serverScope),
+		searchTerms: [serverId],
+	},
+	...worldOptions.value.map((world) => ({
+		value: world.id,
+		label: world.name,
+		searchTerms: [world.id, world.name],
+	})),
+])
+
+const auditLogActionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
+	actionLogActionNames.map((action) => ({
+		value: action,
+		label: formatActionLogAction(action),
+		searchTerms: [action, action.replaceAll('_', ' ')],
+	})),
+)
+
+const auditLogFilterCategories = computed<DropdownFilterBarCategory[]>(() => [
+	{
+		key: 'users',
+		label: formatMessage(messages.userFilter),
+		options: auditLogUserFilterOptions.value,
+		searchable: true,
+		searchPlaceholder: formatMessage(messages.userFilterSearch),
+	},
+	{
+		key: 'worlds',
+		label: formatMessage(messages.instanceFilter),
+		options: auditLogWorldFilterOptions.value,
+		searchable: true,
+		searchPlaceholder: formatMessage(messages.instanceFilterSearch),
+	},
+	{
+		key: 'actions',
+		label: formatMessage(messages.actionTypeFilter),
+		options: auditLogActionFilterOptions.value,
+		searchable: true,
+		searchPlaceholder: formatMessage(messages.actionTypeFilterSearch),
+		submenuClass: 'w-[22rem]',
+		previewDropdownMinWidth: '20rem',
+	},
+])
+
+const hasActiveAuditLogFilters = computed(() =>
+	(['users', 'worlds', 'actions'] satisfies AuditLogFilterKey[]).some(
+		(key) => selectedAuditLogFilterValues(key).length > 0,
+	),
+)
 
 const filteredMembers = computed(() => {
 	const normalizedSearch = memberSearch.value.trim().toLowerCase()
@@ -365,6 +800,36 @@ const filteredMembers = computed(() => {
 
 function formatRole(role: ServerAccessRole) {
 	return roleOptions.value.find((option) => option.value === role)?.label ?? role
+}
+
+function selectedAuditLogFilterValues(key: AuditLogFilterKey): string[] {
+	const values = auditLogFilters.value[key]
+	return values ? [...values] : []
+}
+
+function isActionLogActionName(action: string): action is ActionLogFilterActionName {
+	return actionLogActionNameSet.has(action)
+}
+
+function userToFilterOption(user: Labrinth.Users.v2.User): DropdownFilterBarOption {
+	return {
+		value: user.id,
+		label: user.username,
+		searchTerms: [user.id, user.username],
+	}
+}
+
+function compareFilterOptions(left: DropdownFilterBarOption, right: DropdownFilterBarOption) {
+	return left.label.localeCompare(right.label)
+}
+
+function formatActionLogAction(action: ActionLogFilterActionName): string {
+	return formatMessage(messages[action])
+}
+
+function loadMoreActionLogEntries() {
+	if (!actionLogQuery.hasNextPage.value || actionLogQuery.isFetchingNextPage.value) return
+	void actionLogQuery.fetchNextPage()
 }
 
 watch(
@@ -488,7 +953,7 @@ async function invalidateServerUsers() {
 }
 
 async function invalidateActionLog() {
-	await queryClient.invalidateQueries({ queryKey: actionLogQueryKey })
+	await queryClient.invalidateQueries({ queryKey: actionLogBaseQueryKey })
 }
 
 function setCachedMemberRole(member: ServerAccessMember, role: Exclude<ServerAccessRole, 'owner'>) {
@@ -649,6 +1114,10 @@ async function grantAccess(payload: GrantServerAccessPayload) {
 	const existingMember = findMemberByTarget(target)
 	if (existingMember) {
 		await updateMemberRole(existingMember, payload.role)
+		if (payload.addAsFriend) {
+			const userId = await resolveMemberUserId(existingMember)
+			await sendFriendRequest(userId)
+		}
 		return
 	}
 
@@ -667,6 +1136,7 @@ async function grantAccess(payload: GrantServerAccessPayload) {
 	const resolvedMember = findMemberByTarget(user.id) ?? findMemberByTarget(user.username)
 	if (resolvedMember) {
 		await updateMemberRole(resolvedMember, payload.role)
+		if (payload.addAsFriend) await sendFriendRequest(user.id)
 		return
 	}
 
@@ -685,10 +1155,23 @@ async function grantAccess(payload: GrantServerAccessPayload) {
 				role: formatRole(payload.role),
 			}),
 		})
+		if (payload.addAsFriend) await sendFriendRequest(user.id)
 	} catch (error) {
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.inviteFailedTitle),
+			text: formatErrorMessage(error),
+		})
+	}
+}
+
+async function sendFriendRequest(userIdOrUsername: string) {
+	try {
+		await client.labrinth.friends_v3.add(userIdOrUsername)
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.friendRequestFailedTitle),
 			text: formatErrorMessage(error),
 		})
 	}

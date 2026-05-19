@@ -38,14 +38,16 @@ export const Default: Story = {
 				return users.find((user) => user.username.toLowerCase() === normalizedTarget) ?? null
 			}
 			function handleGrant(payload: GrantServerAccessPayload) {
-				lastAddedUser.value = `${payload.target} as ${payload.role}`
+				lastAddedUser.value = `${payload.target} as ${payload.role}${
+					payload.addAsFriend ? ' with friend request' : ''
+				}`
 			}
 			return { modalRef, resolveUser, lastAddedUser, handleGrant }
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
 				<ButtonStyled color="brand">
-					<button @click="modalRef?.show($event)">Add a user</button>
+					<button @click="modalRef?.show($event)">Add user</button>
 				</ButtonStyled>
 				<p v-if="lastAddedUser" class="m-0 text-sm text-secondary">Last added: {{ lastAddedUser }}</p>
 				<GrantAccessModal ref="modalRef" :resolve-user="resolveUser" @grant="handleGrant" />

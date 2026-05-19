@@ -47,6 +47,7 @@ export interface ServerAccessInviteSuggestion {
 export interface GrantServerAccessPayload {
 	target: string
 	role: Exclude<ServerAccessRole, 'owner'>
+	addAsFriend: boolean
 }
 
 export interface ServerListingOwner {

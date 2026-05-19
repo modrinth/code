@@ -4,6 +4,12 @@
 			<template #target-user>
 				<EventEntityLink :entity="targetUser" />
 			</template>
+			<template #permission-label="{ children }">
+				<span v-if="permissionRole" class="font-semibold text-contrast">
+					<component :is="() => children" />
+				</span>
+				<component :is="() => children" v-else />
+			</template>
 		</IntlFormatted>
 	</BaseEvent>
 </template>
@@ -20,6 +26,7 @@ import IntlFormatted from '../../../base/IntlFormatted.vue'
 import BaseEvent from './BaseEvent.vue'
 import EventEntityLink from './EventEntityLink.vue'
 import type { EventEntity } from './types'
+import type { ServerAccessRole } from '../types'
 
 const props = defineProps<{
 	kind: 'invited' | 'invite_revoked' | 'permission_modified' | 'removed'
@@ -36,7 +43,8 @@ const messages = defineMessages({
 	},
 	invitedWithPermissions: {
 		id: 'servers.audit-log.event.user-invited-with-permissions',
-		defaultMessage: 'Invited <target-user></target-user> with {permissions}',
+		defaultMessage:
+			'Invited <target-user></target-user> with <permission-label>{permissions}</permission-label>',
 	},
 	inviteRevoked: {
 		id: 'servers.audit-log.event.user-invite-revoked',
@@ -48,11 +56,24 @@ const messages = defineMessages({
 	},
 	permissionModifiedWithPermissions: {
 		id: 'servers.audit-log.event.user-permission-modified-with-permissions',
-		defaultMessage: 'Changed permissions for <target-user></target-user> to {permissions}',
+		defaultMessage:
+			'Changed permissions for <target-user></target-user> to <permission-label>{permissions}</permission-label>',
 	},
 	removed: {
 		id: 'servers.audit-log.event.user-removed',
 		defaultMessage: 'Removed <target-user></target-user>',
+	},
+	ownerRole: {
+		id: 'servers.access-role.owner',
+		defaultMessage: 'Owner',
+	},
+	editorRole: {
+		id: 'servers.access-role.editor',
+		defaultMessage: 'Editor',
+	},
+	viewerRole: {
+		id: 'servers.access-role.viewer',
+		defaultMessage: 'Limited',
 	},
 	serverAdmin: {
 		id: 'servers.audit-log.permission.server-admin',
@@ -124,6 +145,27 @@ const permissionMessages: Record<string, MessageDescriptor> = {
 	INFRA_SERVERS_XFER: messages.infraServersTransfer,
 }
 
+const roleMessages: Record<ServerAccessRole, MessageDescriptor> = {
+	owner: messages.ownerRole,
+	editor: messages.editorRole,
+	viewer: messages.viewerRole,
+}
+
+const ownerPermissionScopes = ['SERVER_ADMIN', 'MANAGE_USERS'] as const
+const editorPermissionScopes = [
+	'FILES_WRITE',
+	'SETUP',
+	'BACKUPS',
+	'ADVANCED',
+	'RESET_SERVER',
+] as const
+const viewerPermissionScopes = ['BASE_READ', 'POWER_ACTIONS'] as const
+const frontendPermissionScopes = new Set<string>([
+	...ownerPermissionScopes,
+	...editorPermissionScopes,
+	...viewerPermissionScopes,
+])
+
 const message = computed(() => {
 	if (props.kind === 'invited') {
 		return permissionLabel.value ? messages.invitedWithPermissions : messages.invited
@@ -141,12 +183,32 @@ const permissionLabel = computed(() => {
 	if (!props.permissions || props.permissions.length === 0) return ''
 	void locale.value
 
-	const labels = props.permissions.map(formatPermission).filter(Boolean)
+	const role = permissionRole.value
+	if (role) return formatMessage(roleMessages[role])
+
+	const labels = normalizedPermissions.value.map(formatPermission).filter(Boolean)
 	return new Intl.ListFormat(locale.value, {
 		style: 'long',
 		type: 'conjunction',
 	}).format(labels)
 })
+
+const normalizedPermissions = computed(
+	() => props.permissions?.map((permission) => permission.trim()).filter(Boolean) ?? [],
+)
+
+const permissionRole = computed(() => frontendRoleFromPermissions(normalizedPermissions.value))
+
+function frontendRoleFromPermissions(permissions: string[]): ServerAccessRole | null {
+	const permissionSet = new Set(permissions)
+	if (!permissions.every((permission) => frontendPermissionScopes.has(permission))) return null
+
+	if (ownerPermissionScopes.some((permission) => permissionSet.has(permission))) return 'owner'
+	if (editorPermissionScopes.some((permission) => permissionSet.has(permission))) return 'editor'
+	if (viewerPermissionScopes.every((permission) => permissionSet.has(permission))) return 'viewer'
+
+	return null
+}
 
 function formatPermission(permission: string): string {
 	const descriptor = permissionMessages[permission]

@@ -179,10 +179,6 @@ const messages = defineMessages({
 		id: 'servers.remove-access-modal.unknown-added-label',
 		defaultMessage: 'Added date unknown',
 	},
-	pendingLabel: {
-		id: 'servers.remove-access-modal.pending-label',
-		defaultMessage: 'Pending',
-	},
 	ownerRole: {
 		id: 'servers.access-role.owner',
 		defaultMessage: 'Owner',
@@ -198,15 +194,11 @@ const messages = defineMessages({
 })
 
 const memberStatusLabel = computed(() => {
-	if (props.shouldCancel || props.pending) return formatMessage(messages.pendingLabel)
 	if (!props.role) return null
 	return formatRole(props.role)
 })
 
 const memberStatusClasses = computed(() => {
-	if (props.shouldCancel || props.pending) {
-		return 'border-surface-5 bg-surface-4 text-secondary'
-	}
 	if (!props.role) return ''
 	return roleClasses(props.role)
 })

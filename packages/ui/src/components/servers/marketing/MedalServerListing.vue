@@ -36,7 +36,7 @@
 			</div>
 			<Avatar v-else src="https://cdn-raw.modrinth.com/medal_icon.webp" size="64px" class="z-10" />
 			<div class="z-10 ml-4 flex min-w-0 flex-col gap-1.5">
-				<div class="flex flex-row items-center gap-2">
+				<div class="flex flex-row items-center gap-2.5">
 					<h2
 						class="m-0 truncate text-xl font-bold text-contrast"
 						:class="{ 'opacity-50': isDisabled }"

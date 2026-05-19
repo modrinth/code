@@ -24,6 +24,7 @@ import { LabrinthAuthV2Module } from './labrinth/auth/v2'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthExternalProjectsInternalModule } from './labrinth/external-projects/internal'
+import { LabrinthFriendsV3Module } from './labrinth/friends/v3'
 import { LabrinthGlobalsInternalModule } from './labrinth/globals/internal'
 import { LabrinthLimitsV3Module } from './labrinth/limits/v3'
 import { LabrinthModerationInternalModule } from './labrinth/moderation/internal'
@@ -89,6 +90,7 @@ export const MODULE_REGISTRY = {
 	labrinth_billing_internal: LabrinthBillingInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_external_projects_internal: LabrinthExternalProjectsInternalModule,
+	labrinth_friends_v3: LabrinthFriendsV3Module,
 	labrinth_globals_internal: LabrinthGlobalsInternalModule,
 	labrinth_moderation_internal: LabrinthModerationInternalModule,
 	labrinth_notifications_v2: LabrinthNotificationsV2Module,

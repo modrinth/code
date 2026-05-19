@@ -2,6 +2,7 @@ import type { Archon } from '@modrinth/api-client'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
+import DropdownFilterBar from '../../components/base/DropdownFilterBar.vue'
 import AuditLogTable from '../../components/servers/access/AuditLogTable.vue'
 import {
 	parseAuditEvent,
@@ -22,6 +23,37 @@ const userIds = {
 	modmuss: 'JZA4dW8o',
 	prospector: 'Dc7EYhxG',
 }
+
+const filterBarCategories = [
+	{
+		key: 'users',
+		label: 'Users',
+		searchable: true,
+		searchPlaceholder: 'Search users...',
+		options: [
+			{ value: userIds.geometrically, label: 'Geometrically' },
+			{ value: userIds.modmuss, label: 'modmuss50' },
+			{ value: userIds.prospector, label: 'Prospector' },
+		],
+	},
+	{
+		key: 'worlds',
+		label: 'Instances',
+		options: [
+			{ value: createWorldId, label: 'Create SMP' },
+			{ value: activeWorldId, label: 'SMP Season 4' },
+		],
+	},
+	{
+		key: 'actions',
+		label: 'Action types',
+		options: [
+			{ value: 'server_started', label: 'Server started' },
+			{ value: 'console_command_executed', label: 'Console command run' },
+			{ value: 'backup_restored', label: 'Backup restored' },
+		],
+	},
+]
 
 const serverFullResponse: Archon.Servers.v1.ServerFull = {
 	id: serverId,
@@ -170,7 +202,10 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 		}),
 		rawEntry({
 			action: 'user_permission_modified',
-			metadata: { user_id: userIds.modmuss, permissions: 'BASE_READ | POWER_ACTIONS | BACKUPS' },
+			metadata: {
+				user_id: userIds.modmuss,
+				permissions: 'BASE_READ | POWER_ACTIONS | FILES_WRITE | SETUP | BACKUPS | ADVANCED',
+			},
 			worldId: null,
 			minutesAgo: 40,
 		}),
@@ -472,6 +507,71 @@ export const MissingLookupsAndFallbacks: Story = {
 
 export const Filtered: Story = {
 	render: renderStory(everyActionEntries, 'Create Aeronautics'),
+}
+
+export const WithExternalFilterControls: Story = {
+	render: () => ({
+		components: { AuditLogTable, DropdownFilterBar },
+		setup() {
+			const query = ref('')
+			const filters = ref<ServerAuditLogFilters>({
+				userId: null,
+				worldId: null,
+			})
+			const externalFilters = ref<Record<string, string[]>>({
+				users: [userIds.geometrically],
+				worlds: [],
+				actions: [],
+			})
+			return {
+				categories: filterBarCategories,
+				entries: everyActionEntries,
+				externalFilters,
+				filters,
+				query,
+			}
+		},
+		template: /* html */ `
+			<AuditLogTable
+				v-model:query="query"
+				v-model:filters="filters"
+				:entries="entries"
+				has-active-external-filters
+			>
+				<template #filters>
+					<DropdownFilterBar
+						v-model="externalFilters"
+						:categories="categories"
+						add-label="Add filter"
+						clear-label="Clear"
+						use-filter-icon
+					/>
+				</template>
+			</AuditLogTable>
+		`,
+	}),
+}
+
+export const EmptyExternalFilters: Story = {
+	render: () => ({
+		components: { AuditLogTable },
+		setup() {
+			const query = ref('')
+			const filters = ref<ServerAuditLogFilters>({
+				userId: null,
+				worldId: null,
+			})
+			return { entries: [], query, filters }
+		},
+		template: /* html */ `
+			<AuditLogTable
+				v-model:query="query"
+				v-model:filters="filters"
+				:entries="entries"
+				has-active-external-filters
+			/>
+		`,
+	}),
 }
 
 export const MobileCompact: Story = {
