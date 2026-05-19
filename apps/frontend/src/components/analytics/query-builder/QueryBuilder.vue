@@ -24,11 +24,15 @@
 					<template #input-content="{ isOpen, openDirection }">
 						<div class="flex min-h-8 min-w-0 flex-1 items-center gap-2 pr-1">
 							<div class="flex items-center gap-0.5">
-								<component
-									:is="selectedProjectIcon"
-									v-if="selectedProjectIcon"
-									class="size-6 shrink-0 items-center text-primary"
+								<img
+									v-if="selectedProjectIconUrl"
+									:src="selectedProjectIconUrl"
+									:alt="`${selectedProjectLabel} Icon`"
+									class="size-6 shrink-0 rounded object-cover"
+									loading="lazy"
+									decoding="async"
 								/>
+								<BoxIcon v-else class="size-6 shrink-0 text-primary" />
 								<span class="min-w-0 flex-1 truncate px-1.5 py-1 font-semibold text-primary">
 									{{ selectedProjectLabel }}
 								</span>
@@ -57,7 +61,15 @@
 					</template>
 					<template #option="{ item, selected }">
 						<div class="flex min-w-0 flex-1 items-center gap-2">
-							<component :is="item.icon" v-if="item.icon" class="h-5 w-5 shrink-0" />
+							<img
+								v-if="getProjectIconUrl(item.value)"
+								:src="getProjectIconUrl(item.value)"
+								:alt="`${item.label} Icon`"
+								class="h-5 w-5 shrink-0 rounded object-cover"
+								loading="lazy"
+								decoding="async"
+							/>
+							<BoxIcon v-else class="h-5 w-5 shrink-0 text-primary" />
 							<span
 								v-tooltip="item.label"
 								class="min-w-0 truncate font-semibold leading-tight"
@@ -196,7 +208,6 @@ import {
 	type MultiSelectItem,
 	type MultiSelectOption,
 } from '@modrinth/ui'
-import { defineAsyncComponent, h, markRaw } from 'vue'
 
 import {
 	type AnalyticsBreakdownPreset,
@@ -257,13 +268,20 @@ function getProjectOption(
 	return {
 		value: project.id,
 		label: project.name,
-		icon: getProjectIcon(project),
 		searchTerms: groupTitle ? [groupTitle] : undefined,
 	}
 }
 
 const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 	projects.value.map((project) => getProjectOption(project)),
+)
+const projectIconUrlsById = computed(
+	() =>
+		new Map(
+			projects.value
+				.filter((project) => project.iconUrl)
+				.map((project) => [project.id, project.iconUrl as string]),
+		),
 )
 
 const projectSelectOptions = computed<MultiSelectItem<string>[]>(() => {
@@ -375,7 +393,7 @@ const selectedProjectLabel = computed(() => {
 	return `${draftSelectedProjectIds.value.length} projects`
 })
 
-const selectedProjectIcon = computed(() => {
+const selectedProjectIconUrl = computed(() => {
 	if (
 		isAllProjectsOptionSelected.value ||
 		areAllProjectsSelected.value ||
@@ -384,33 +402,11 @@ const selectedProjectIcon = computed(() => {
 		return undefined
 	}
 
-	return projectOptions.value.find((project) => project.value === draftSelectedProjectIds.value[0])
-		?.icon
+	return getProjectIconUrl(draftSelectedProjectIds.value[0])
 })
 
-function getProjectIcon(project: AnalyticsDashboardProject) {
-	const iconUrl = project.iconUrl
-	const projectName = project.name
-	if (!iconUrl) {
-		return markRaw({
-			inheritAttrs: false,
-			setup: () => () =>
-				h('div', { class: 'h-6 w-6 text-primary' }, [h(BoxIcon, { class: 'h-full w-full' })]),
-		})
-	}
-
-	return markRaw(
-		defineAsyncComponent(() =>
-			Promise.resolve({
-				setup: () => () =>
-					h('img', {
-						src: iconUrl,
-						alt: `${projectName} Icon`,
-						class: 'h-6 w-6 rounded object-cover',
-					}),
-			}),
-		),
-	)
+function getProjectIconUrl(projectId: string): string | undefined {
+	return projectIconUrlsById.value.get(projectId)
 }
 
 function handleProjectSelectOpen() {

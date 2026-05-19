@@ -35,66 +35,6 @@
 			</span>
 		</template>
 
-		<template #category-top="{ category, selectedValues, setSelectedValues }">
-			<div v-if="shouldShowTopBreakdownFilterForCategory(category.key)">
-				<button
-					type="button"
-					class="flex w-full cursor-pointer items-center gap-2.5 border-0 bg-surface-4 p-3 py-3.5 text-left text-contrast shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110"
-					:aria-selected="isTopBreakdownFilterValueSelected(selectedValues)"
-					role="option"
-					@click="selectTopBreakdownFilter(setSelectedValues)"
-					@keydown.enter.stop
-					@keydown.space.stop
-				>
-					<span
-						class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
-						:class="
-							isTopBreakdownFilterValueSelected(selectedValues)
-								? 'border-button-border bg-brand text-brand-inverted'
-								: 'border-surface-5 bg-surface-2'
-						"
-					>
-						<CheckIcon
-							v-if="isTopBreakdownFilterValueSelected(selectedValues)"
-							aria-hidden="true"
-							stroke-width="3"
-						/>
-					</span>
-					<span class="min-w-0 flex-1 font-semibold leading-tight text-primary">Top 8</span>
-				</button>
-			</div>
-		</template>
-
-		<template #preview-top="{ category, selectedValues, setSelectedValues }">
-			<div v-if="shouldShowTopBreakdownFilterForCategory(category.key)">
-				<button
-					type="button"
-					class="flex w-full cursor-pointer items-center gap-2.5 border-0 bg-surface-4 p-3 py-3.5 text-left text-contrast shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110"
-					:aria-selected="isTopBreakdownFilterValueSelected(selectedValues)"
-					role="option"
-					@click="selectTopBreakdownFilter(setSelectedValues)"
-					@keydown.enter.stop
-					@keydown.space.stop
-				>
-					<span
-						class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
-						:class="
-							isTopBreakdownFilterValueSelected(selectedValues)
-								? 'border-button-border bg-brand text-brand-inverted'
-								: 'border-surface-5 bg-surface-2'
-						"
-					>
-						<CheckIcon
-							v-if="isTopBreakdownFilterValueSelected(selectedValues)"
-							aria-hidden="true"
-							stroke-width="3"
-						/>
-					</span>
-					<span class="min-w-0 flex-1 font-semibold leading-tight text-primary">Top 8</span>
-				</button>
-			</div>
-		</template>
-
 		<template #category-footer="{ category, setSelectedValues, closeMenu }">
 			<DownloadsThresholdInput
 				v-if="category.key === 'country'"
@@ -224,7 +164,7 @@
 </template>
 
 <script setup lang="ts">
-import { BoxIcon, CheckIcon } from '@modrinth/assets'
+import { BoxIcon } from '@modrinth/assets'
 import {
 	Chips,
 	DropdownFilterBar,
@@ -247,7 +187,6 @@ import {
 	areSelectedFiltersEqual,
 	cloneSelectedFilters,
 	FILTER_VALUE_CATEGORIES,
-	getAnalyticsFilterCategoryForBreakdown,
 	getOptionsWithSelectedValues,
 	getVisibleAnalyticsFilterCategoriesForState,
 	normalizeSelectedValues as normalizeSelectedFilterValues,
@@ -262,13 +201,6 @@ type ProjectVersionProjectOptionMetadata = {
 	iconUrl?: string
 }
 
-const TOP_BREAKDOWN_FILTER_VALUE = '__analytics_top_8__'
-const TOP_BREAKDOWN_FILTER_LIMIT = 8
-const TOP_BREAKDOWN_FILTER_OPTION: DropdownFilterBarOption = {
-	value: TOP_BREAKDOWN_FILTER_VALUE,
-	label: 'Top 8',
-}
-
 const {
 	hasProjectContext,
 	projects,
@@ -280,7 +212,6 @@ const {
 	countryDownloadsByCode,
 	selectedBreakdown,
 	selectedFilters,
-	isTopBreakdownFilterEnabled,
 	queryResetToken,
 	refreshAnalyticsQuery,
 	getVersionDisplayName,
@@ -327,69 +258,22 @@ const selectedFilterValue = computed<Record<string, string[]>>({
 	get: () => getSelectedFilterBarValue(),
 	set: (nextValue) => {
 		const nextFilters = cloneSelectedFilters(draftSelectedFilters.value)
-		const topBreakdownCategory = topBreakdownFilterCategory.value
-		let nextTopBreakdownFilterEnabled = isTopBreakdownFilterEnabled.value
 
 		for (const [categoryKey, values] of Object.entries(nextValue)) {
 			if (!isAnalyticsFilterValueCategory(categoryKey)) {
 				continue
 			}
 
-			const concreteValues = values.filter((value) => value !== TOP_BREAKDOWN_FILTER_VALUE)
-			nextFilters[categoryKey] = normalizeSelectedFilterValues(categoryKey, concreteValues, [])
-
-			if (
-				categoryKey === topBreakdownCategory &&
-				shouldShowTopBreakdownFilterForCategory(categoryKey)
-			) {
-				const hasTopBreakdownFilterValue = values.includes(TOP_BREAKDOWN_FILTER_VALUE)
-				const hasConcreteValues = concreteValues.length > 0
-
-				if (hasTopBreakdownFilterValue && !hasConcreteValues) {
-					nextTopBreakdownFilterEnabled = true
-				} else if (hasConcreteValues || isTopBreakdownFilterSelected.value) {
-					nextTopBreakdownFilterEnabled = false
-				}
-			}
+			nextFilters[categoryKey] = normalizeSelectedFilterValues(categoryKey, values, [])
 		}
 
 		draftSelectedFilters.value = nextFilters
-		if (isTopBreakdownFilterEnabled.value !== nextTopBreakdownFilterEnabled) {
-			isTopBreakdownFilterEnabled.value = nextTopBreakdownFilterEnabled
-		}
 		void scheduleSelectedFiltersCommit()
 	},
 })
 
-const topBreakdownFilterCategory = computed(() =>
-	getAnalyticsFilterCategoryForBreakdown(selectedBreakdown.value),
-)
-const isTopBreakdownFilterSelected = computed(() => {
-	const categoryKey = topBreakdownFilterCategory.value
-	if (!categoryKey || !shouldShowTopBreakdownFilterForCategory(categoryKey)) {
-		return false
-	}
-
-	return isTopBreakdownFilterEnabled.value && draftSelectedFilters.value[categoryKey].length === 0
-})
-
 function getSelectedFilterBarValue(): AnalyticsSelectedFilters {
-	const nextValue = cloneSelectedFilters(draftSelectedFilters.value)
-	const categoryKey = topBreakdownFilterCategory.value
-	if (!categoryKey || !isTopBreakdownFilterSelected.value) {
-		return nextValue
-	}
-
-	nextValue[categoryKey] = [TOP_BREAKDOWN_FILTER_VALUE]
-	return nextValue
-}
-
-function isTopBreakdownFilterValueSelected(selectedValues: string[]): boolean {
-	return selectedValues.includes(TOP_BREAKDOWN_FILTER_VALUE)
-}
-
-function selectTopBreakdownFilter(setSelectedValues: SetDropdownFilterValues) {
-	setSelectedValues([TOP_BREAKDOWN_FILTER_VALUE])
+	return cloneSelectedFilters(draftSelectedFilters.value)
 }
 
 function clearSelectedBreakdown() {
@@ -467,7 +351,6 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			searchable: countryFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search countries...',
 			options: withSelectedOptions('country', countryFilterOptions.value),
-			syntheticOptions: getTopBreakdownSyntheticOptions('country'),
 			submenuClass: 'w-[324px]',
 		},
 		{
@@ -477,7 +360,6 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 				{ value: 'monetized', label: 'Monetized' },
 				{ value: 'unmonetized', label: 'Unmonetized' },
 			]),
-			syntheticOptions: getTopBreakdownSyntheticOptions('monetization'),
 		},
 		{
 			key: 'user_agent',
@@ -485,13 +367,11 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			searchable: downloadSourceFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search download sources...',
 			options: withSelectedOptions('user_agent', downloadSourceFilterOptions.value),
-			syntheticOptions: getTopBreakdownSyntheticOptions('user_agent'),
 		},
 		{
 			key: 'download_reason',
 			label: 'Download Type',
 			options: withSelectedOptions('download_reason', downloadReasonFilterOptions.value),
-			syntheticOptions: getTopBreakdownSyntheticOptions('download_reason'),
 		},
 		{
 			key: 'version_id',
@@ -500,7 +380,6 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			searchPlaceholder: 'Search project versions...',
 			submenuClass: 'w-[368px]',
 			options: withSelectedOptions('version_id', versionFilterOptions.value),
-			syntheticOptions: getTopBreakdownSyntheticOptions('version_id'),
 		},
 		{
 			key: 'game_version',
@@ -509,13 +388,11 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			searchPlaceholder: 'Search versions...',
 			submenuClass: 'w-[360px]',
 			options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
-			syntheticOptions: getTopBreakdownSyntheticOptions('game_version'),
 		},
 		{
 			key: 'loader_type',
 			label: 'Loader Type',
 			options: withSelectedOptions('loader_type', loaderTypeFilterOptions.value),
-			syntheticOptions: getTopBreakdownSyntheticOptions('loader_type'),
 		},
 	)
 
@@ -646,43 +523,6 @@ function withSelectedOptions(
 		selectedFilters.value[categoryKey],
 		getMissingSelectedOptionLabel(categoryKey),
 	)
-}
-
-function getTopBreakdownSyntheticOptions(
-	categoryKey: AnalyticsFilterValueCategory,
-): DropdownFilterBarOption[] | undefined {
-	return shouldShowTopBreakdownFilterForCategory(categoryKey)
-		? [TOP_BREAKDOWN_FILTER_OPTION]
-		: undefined
-}
-
-function shouldShowTopBreakdownFilterForCategory(categoryKey: string): boolean {
-	return (
-		categoryKey === topBreakdownFilterCategory.value &&
-		isAnalyticsFilterValueCategory(categoryKey) &&
-		getFilterOptionCountForCategory(categoryKey) > TOP_BREAKDOWN_FILTER_LIMIT
-	)
-}
-
-function getFilterOptionCountForCategory(categoryKey: AnalyticsFilterValueCategory): number {
-	switch (categoryKey) {
-		case 'project_status':
-			return projectStatusFilterOptions.value.length
-		case 'country':
-			return countryFilterOptions.value.length
-		case 'monetization':
-			return 2
-		case 'user_agent':
-			return downloadSourceFilterOptions.value.length
-		case 'download_reason':
-			return downloadReasonFilterOptions.value.length
-		case 'version_id':
-			return versionFilterOptions.value.length
-		case 'game_version':
-			return gameVersionFilterOptions.value.length
-		case 'loader_type':
-			return loaderTypeFilterOptions.value.length
-	}
 }
 
 function getMissingSelectedOptionLabel(

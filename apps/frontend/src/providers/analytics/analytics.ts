@@ -4,7 +4,6 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 
 import {
-	getAnalyticsFilterCategoryForBreakdown,
 	getEnabledAnalyticsStatsForState,
 	getProjectStatusFilterValue,
 	PROJECT_STATUS_FILTER_VALUES,
@@ -138,6 +137,7 @@ interface AnalyticsDataFilterOptionSummary {
 	downloadReasons: string[]
 	gameVersions: string[]
 	loaderTypes: string[]
+	versionIds: string[]
 	countryDownloadsByCode: Map<string, number>
 }
 
@@ -145,6 +145,16 @@ interface ProjectVersionFilterOptionSummary {
 	gameVersions: string[]
 	loaderTypes: string[]
 	versionIds: string[]
+}
+
+interface AnalyticsVersionMetadata {
+	id: string
+	versionNumber: string
+	datePublished: string
+	projectId: string
+	downloads: number
+	gameVersions: string[]
+	loaders: string[]
 }
 
 function isProjectAnalyticsPoint(
@@ -196,7 +206,6 @@ export interface AnalyticsDashboardContextValue {
 	activeGraphViewMode: Ref<AnalyticsGraphViewMode>
 	isRatioMode: Ref<boolean>
 	showChartEvents: Ref<boolean>
-	isTopBreakdownFilterEnabled: Ref<boolean>
 	hiddenGraphDatasetIds: Ref<string[]>
 	isGraphDatasetSelectionActive: Ref<boolean>
 	selectedGraphDatasetIds: Ref<string[]>
@@ -316,6 +325,73 @@ function buildDailyAnalyticsFetchRequest(
 			},
 		},
 	}
+}
+
+function buildAnalyticsFilterOptionsRequests(
+	projectIds: string[],
+	endTimestamp: string,
+): Labrinth.Analytics.v3.FetchRequest[] {
+	const buildRequest = (
+		returnMetrics: Labrinth.Analytics.v3.ReturnMetrics,
+	): Labrinth.Analytics.v3.FetchRequest => ({
+		time_range: {
+			start: ANALYTICS_START_TIMESTAMP,
+			end: endTimestamp,
+			resolution: {
+				slices: 1,
+			},
+		},
+		project_ids: projectIds,
+		return_metrics: returnMetrics,
+	})
+
+	return [
+		buildRequest({
+			project_views: {
+				bucket_by: ['country'],
+			},
+			project_downloads: {
+				bucket_by: ['country'],
+			},
+			project_playtime: {
+				bucket_by: ['country'],
+			},
+		}),
+		buildRequest({
+			project_downloads: {
+				bucket_by: ['user_agent'],
+			},
+		}),
+		buildRequest({
+			project_downloads: {
+				bucket_by: ['reason'],
+			},
+		}),
+		buildRequest({
+			project_downloads: {
+				bucket_by: ['game_version'],
+			},
+			project_playtime: {
+				bucket_by: ['game_version'],
+			},
+		}),
+		buildRequest({
+			project_downloads: {
+				bucket_by: ['loader'],
+			},
+			project_playtime: {
+				bucket_by: ['loader'],
+			},
+		}),
+		buildRequest({
+			project_downloads: {
+				bucket_by: ['version_id'],
+			},
+			project_playtime: {
+				bucket_by: ['version_id'],
+			},
+		}),
+	]
 }
 
 function addAnalyticsDays(date: Date, days: number): Date {
@@ -574,8 +650,25 @@ function sortStringValues(values: string[]): string[] {
 	return [...values].sort((left, right) => left.localeCompare(right))
 }
 
+function toAnalyticsVersionMetadata(
+	version: Labrinth.Versions.v3.Version,
+): AnalyticsVersionMetadata {
+	return {
+		id: version.id,
+		versionNumber: version.version_number,
+		datePublished: version.date_published,
+		projectId: version.project_id,
+		downloads: version.downloads,
+		gameVersions: [...version.game_versions],
+		loaders:
+			version.mrpack_loaders && version.mrpack_loaders.length > 0
+				? [...version.mrpack_loaders]
+				: [...version.loaders],
+	}
+}
+
 function getProjectVersionFilterOptionSummary(
-	versions: Labrinth.Versions.v3.Version[],
+	versions: AnalyticsVersionMetadata[],
 ): ProjectVersionFilterOptionSummary {
 	const gameVersions = new Set<string>()
 	const loaders = new Set<string>()
@@ -584,19 +677,14 @@ function getProjectVersionFilterOptionSummary(
 	for (const version of versions) {
 		versionIds.add(version.id)
 
-		for (const gameVersion of version.game_versions) {
+		for (const gameVersion of version.gameVersions) {
 			const normalizedGameVersion = gameVersion.trim()
 			if (normalizedGameVersion.length > 0) {
 				gameVersions.add(normalizedGameVersion)
 			}
 		}
 
-		const versionLoaders =
-			version.mrpack_loaders && version.mrpack_loaders.length > 0
-				? version.mrpack_loaders
-				: version.loaders
-
-		for (const loader of versionLoaders) {
+		for (const loader of version.loaders) {
 			const normalizedLoader = loader.trim().toLowerCase()
 			if (normalizedLoader.length > 0 && normalizedLoader !== 'mrpack') {
 				loaders.add(normalizedLoader)
@@ -609,6 +697,31 @@ function getProjectVersionFilterOptionSummary(
 		loaderTypes: sortStringValues([...loaders]),
 		versionIds: sortStringValues([...versionIds]),
 	}
+}
+
+async function fetchAnalyticsVersionMetadata(
+	projectIds: string[],
+	getProjects: (ids: string[]) => Promise<Labrinth.Projects.v3.Project[]>,
+	getVersions: (ids: string[]) => Promise<Labrinth.Versions.v3.Version[]>,
+): Promise<AnalyticsVersionMetadata[]> {
+	const projects = await fetchSegmentedWith(projectIds, getProjects)
+	const versionIds = sortStringValues([...new Set(projects.flatMap((project) => project.versions))])
+	return fetchAnalyticsVersionMetadataByIds(versionIds, getVersions)
+}
+
+async function fetchAnalyticsVersionMetadataByIds(
+	versionIds: string[],
+	getVersions: (ids: string[]) => Promise<Labrinth.Versions.v3.Version[]>,
+): Promise<AnalyticsVersionMetadata[]> {
+	const metadata: AnalyticsVersionMetadata[] = []
+	const segmentSize = 800
+
+	for (let index = 0; index < versionIds.length; index += segmentSize) {
+		const versions = await getVersions(versionIds.slice(index, index + segmentSize))
+		metadata.push(...versions.map(toAnalyticsVersionMetadata))
+	}
+
+	return metadata
 }
 
 function retainAvailableSelectedFilterValues(
@@ -683,6 +796,7 @@ function getAnalyticsDataFilterOptionSummary(
 	const downloadReasons = new Set<string>()
 	const gameVersions = new Set<string>()
 	const loaderTypes = new Set<string>()
+	const versionIds = new Set<string>()
 	const countryDownloadsByCode = new Map<string, number>()
 
 	for (const timeSlice of timeSlices) {
@@ -742,6 +856,16 @@ function getAnalyticsDataFilterOptionSummary(
 					loaderTypes.add(loader)
 				}
 			}
+
+			if (
+				(dataPoint.metric_kind === 'downloads' || dataPoint.metric_kind === 'playtime') &&
+				dataPoint.version_id
+			) {
+				const versionId = dataPoint.version_id.trim()
+				if (versionId.length > 0) {
+					versionIds.add(versionId)
+				}
+			}
 		}
 	}
 
@@ -751,6 +875,7 @@ function getAnalyticsDataFilterOptionSummary(
 		downloadReasons: sortStringValues([...downloadReasons]),
 		gameVersions: sortStringValues([...gameVersions]),
 		loaderTypes: sortStringValues([...loaderTypes]),
+		versionIds: sortStringValues([...versionIds]),
 		countryDownloadsByCode,
 	}
 }
@@ -1003,7 +1128,6 @@ export function createAnalyticsDashboardContext(
 	const activeGraphViewMode = ref<AnalyticsGraphViewMode>(initialGraphState.activeGraphViewMode)
 	const isRatioMode = ref(initialGraphState.isRatioMode)
 	const showChartEvents = ref(initialGraphState.showChartEvents)
-	const isTopBreakdownFilterEnabled = ref(initialGraphState.isTopBreakdownFilterEnabled)
 	const hiddenGraphDatasetIds = ref<string[]>(initialGraphState.hiddenGraphDatasetIds)
 	const isGraphDatasetSelectionActive = ref(false)
 	const selectedGraphDatasetIds = ref<string[]>([])
@@ -1393,7 +1517,6 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode: activeGraphViewMode.value,
 			isRatioMode: isRatioMode.value,
 			showChartEvents: showChartEvents.value,
-			isTopBreakdownFilterEnabled: isTopBreakdownFilterEnabled.value,
 			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
 		})
 
@@ -1479,7 +1602,6 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode: activeGraphViewMode.value,
 			isRatioMode: isRatioMode.value,
 			showChartEvents: showChartEvents.value,
-			isTopBreakdownFilterEnabled: isTopBreakdownFilterEnabled.value,
 			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
 		}
 	}
@@ -1561,25 +1683,6 @@ export function createAnalyticsDashboardContext(
 			if (!areSelectedFiltersEqual(nextFilters, sanitizedFilters)) {
 				replaceNextAnalyticsRouteNavigation()
 				selectedFilters.value = sanitizedFilters
-			}
-
-			if (
-				(nextBreakdown === 'none' || nextBreakdown === 'project') &&
-				!isTopBreakdownFilterEnabled.value
-			) {
-				replaceNextAnalyticsRouteNavigation()
-				isTopBreakdownFilterEnabled.value = true
-				return
-			}
-
-			const breakdownFilterCategory = getAnalyticsFilterCategoryForBreakdown(nextBreakdown)
-			if (
-				breakdownFilterCategory &&
-				sanitizedFilters[breakdownFilterCategory].length > 0 &&
-				isTopBreakdownFilterEnabled.value
-			) {
-				replaceNextAnalyticsRouteNavigation()
-				isTopBreakdownFilterEnabled.value = false
 			}
 		},
 		{ deep: true, immediate: true },
@@ -1677,8 +1780,6 @@ export function createAnalyticsDashboardContext(
 				activeGraphViewMode.value !== nextGraphState.activeGraphViewMode
 			const shouldUpdateIsRatioMode = isRatioMode.value !== nextGraphState.isRatioMode
 			const shouldUpdateShowChartEvents = showChartEvents.value !== nextGraphState.showChartEvents
-			const shouldUpdateTopBreakdownFilter =
-				isTopBreakdownFilterEnabled.value !== nextGraphState.isTopBreakdownFilterEnabled
 			const shouldUpdateHiddenGraphDatasetIds = !areStringArraysEqual(
 				hiddenGraphDatasetIds.value,
 				nextGraphState.hiddenGraphDatasetIds,
@@ -1698,7 +1799,6 @@ export function createAnalyticsDashboardContext(
 				shouldUpdateActiveGraphViewMode ||
 				shouldUpdateIsRatioMode ||
 				shouldUpdateShowChartEvents ||
-				shouldUpdateTopBreakdownFilter ||
 				shouldUpdateHiddenGraphDatasetIds
 
 			if (hasRouteStateUpdate) {
@@ -1747,9 +1847,6 @@ export function createAnalyticsDashboardContext(
 			if (shouldUpdateShowChartEvents) {
 				showChartEvents.value = nextGraphState.showChartEvents
 			}
-			if (shouldUpdateTopBreakdownFilter) {
-				isTopBreakdownFilterEnabled.value = nextGraphState.isTopBreakdownFilterEnabled
-			}
 			if (shouldUpdateHiddenGraphDatasetIds) {
 				hiddenGraphDatasetIds.value = nextGraphState.hiddenGraphDatasetIds
 			}
@@ -1794,7 +1891,6 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode,
 			isRatioMode,
 			showChartEvents,
-			isTopBreakdownFilterEnabled,
 			hiddenGraphDatasetIds,
 		],
 		() => {
@@ -1861,32 +1957,15 @@ export function createAnalyticsDashboardContext(
 		{ deep: true, immediate: true },
 	)
 
-	const analyticsFilterOptionsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
+	const analyticsFilterOptionsRequests = computed<Labrinth.Analytics.v3.FetchRequest[] | null>(() => {
 		if (sortedSelectedProjectIds.value.length === 0) {
 			return null
 		}
 
-		return {
-			time_range: {
-				start: ANALYTICS_START_TIMESTAMP,
-				end: new Date(queryRefreshTimestamp.value).toISOString(),
-				resolution: {
-					slices: 1,
-				},
-			},
-			project_ids: sortedSelectedProjectIds.value,
-			return_metrics: {
-				project_views: {
-					bucket_by: ['country'],
-				},
-				project_downloads: {
-					bucket_by: ['country', 'user_agent', 'reason', 'game_version', 'loader'],
-				},
-				project_playtime: {
-					bucket_by: ['country', 'game_version', 'loader'],
-				},
-			},
-		}
+		return buildAnalyticsFilterOptionsRequests(
+			sortedSelectedProjectIds.value,
+			new Date(queryRefreshTimestamp.value).toISOString(),
+		)
 	})
 
 	const { data: analyticsFilterOptionsData, isFetched: hasFetchedAnalyticsFilterOptions } =
@@ -1897,15 +1976,18 @@ export function createAnalyticsDashboardContext(
 				analyticsQueryUserId.value,
 				'filter-options',
 				'analytics-fields',
-				analyticsFilterOptionsRequest.value,
+				sortedSelectedProjectIds.value,
+				queryRefreshTimestamp.value,
 			]),
 			queryFn: async () => {
-				const response = await client.labrinth.analytics_v3.fetch(
-					analyticsFilterOptionsRequest.value as Labrinth.Analytics.v3.FetchRequest,
-				)
-				return response.metrics
+				const timeSlices: Labrinth.Analytics.v3.TimeSlice[] = []
+				for (const request of analyticsFilterOptionsRequests.value ?? []) {
+					const response = await client.labrinth.analytics_v3.fetch(request)
+					timeSlices.push(...response.metrics)
+				}
+				return timeSlices
 			},
-			enabled: computed(() => analyticsFilterOptionsRequest.value !== null),
+			enabled: computed(() => analyticsFilterOptionsRequests.value !== null),
 			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 		})
 
@@ -1919,16 +2001,12 @@ export function createAnalyticsDashboardContext(
 				'versions',
 				sortedSelectedProjectIds.value,
 			]),
-			queryFn: async () => {
-				const projects = await fetchSegmentedWith(sortedSelectedProjectIds.value, (ids) =>
-					client.labrinth.projects_v3.getMultiple(ids),
-				)
-				const versionIds = sortStringValues([
-					...new Set(projects.flatMap((project) => project.versions)),
-				])
-
-				return fetchSegmentedWith(versionIds, (ids) => client.labrinth.versions_v3.getVersions(ids))
-			},
+			queryFn: () =>
+				fetchAnalyticsVersionMetadata(
+					sortedSelectedProjectIds.value,
+					(ids) => client.labrinth.projects_v3.getMultiple(ids),
+					(ids) => client.labrinth.versions_v3.getVersions(ids),
+				),
 			enabled: computed(() => sortedSelectedProjectIds.value.length > 0),
 			placeholderData: [],
 			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
@@ -1956,7 +2034,12 @@ export function createAnalyticsDashboardContext(
 				...analyticsDataFilterOptionSummary.value.loaderTypes,
 			]),
 		]),
-		versionIds: projectVersionFilterOptionSummary.value.versionIds,
+		versionIds: sortStringValues([
+			...new Set([
+				...projectVersionFilterOptionSummary.value.versionIds,
+				...analyticsDataFilterOptionSummary.value.versionIds,
+			]),
+		]),
 	}))
 
 	watch(
@@ -1985,10 +2068,6 @@ export function createAnalyticsDashboardContext(
 			}
 		},
 		{ deep: true },
-	)
-
-	const filterOptionProjectVersionIds = computed(
-		() => new Set(projectVersionFilterOptionSummary.value.versionIds),
 	)
 
 	const previousFetchRequest = computed(() => buildPreviousFetchRequest(fetchRequest.value))
@@ -2084,10 +2163,6 @@ export function createAnalyticsDashboardContext(
 			addVersionIdsFromTimeSlices(versionIds, previousTimeSlices.value)
 		}
 
-		for (const versionId of filterOptionProjectVersionIds.value) {
-			versionIds.delete(versionId)
-		}
-
 		return sortStringValues([...versionIds])
 	})
 
@@ -2100,7 +2175,7 @@ export function createAnalyticsDashboardContext(
 			analyticsVersionIds.value,
 		]),
 		queryFn: () =>
-			fetchSegmentedWith(analyticsVersionIds.value, (ids) =>
+			fetchAnalyticsVersionMetadataByIds(analyticsVersionIds.value, (ids) =>
 				client.labrinth.versions_v3.getVersions(ids),
 			),
 		enabled: computed(() => analyticsVersionIds.value.length > 0),
@@ -2109,7 +2184,7 @@ export function createAnalyticsDashboardContext(
 	})
 
 	const allVersionMetadata = computed(() => {
-		const versionsById = new Map<string, Labrinth.Versions.v3.Version>()
+		const versionsById = new Map<string, AnalyticsVersionMetadata>()
 		for (const version of filterOptionProjectVersions.value ?? []) {
 			versionsById.set(version.id, version)
 		}
@@ -2120,16 +2195,16 @@ export function createAnalyticsDashboardContext(
 	})
 
 	const versionNumbersById = computed(
-		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.version_number])),
+		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.versionNumber])),
 	)
 	const versionPublishedDatesById = computed(
-		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.date_published])),
+		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.datePublished])),
 	)
 	const versionProjectNamesById = computed(() => {
 		const projectNames = projectNamesById.value
 		const versionProjectNames = new Map<string, string>()
 		for (const version of allVersionMetadata.value) {
-			const projectName = projectNames.get(version.project_id)
+			const projectName = projectNames.get(version.projectId)
 			if (projectName) {
 				versionProjectNames.set(version.id, projectName)
 			}
@@ -2140,7 +2215,7 @@ export function createAnalyticsDashboardContext(
 		const projectIconUrls = projectIconUrlsById.value
 		const versionProjectIconUrls = new Map<string, string>()
 		for (const version of allVersionMetadata.value) {
-			const projectIconUrl = projectIconUrls.get(version.project_id)
+			const projectIconUrl = projectIconUrls.get(version.projectId)
 			if (projectIconUrl) {
 				versionProjectIconUrls.set(version.id, projectIconUrl)
 			}
@@ -2157,7 +2232,7 @@ export function createAnalyticsDashboardContext(
 		const downloadsByVersion = new Map<string, number>()
 
 		for (const version of allVersionMetadata.value) {
-			for (const gameVersion of version.game_versions) {
+			for (const gameVersion of version.gameVersions) {
 				const normalizedGameVersion = gameVersion.trim()
 				if (normalizedGameVersion.length === 0) {
 					continue
@@ -2276,7 +2351,6 @@ export function createAnalyticsDashboardContext(
 		activeGraphViewMode.value = defaultGraphState.activeGraphViewMode
 		isRatioMode.value = defaultGraphState.isRatioMode
 		showChartEvents.value = defaultGraphState.showChartEvents
-		isTopBreakdownFilterEnabled.value = defaultGraphState.isTopBreakdownFilterEnabled
 		hiddenGraphDatasetIds.value = defaultGraphState.hiddenGraphDatasetIds
 		isGraphDatasetSelectionActive.value = false
 		selectedGraphDatasetIds.value = []
@@ -2360,7 +2434,6 @@ export function createAnalyticsDashboardContext(
 		activeGraphViewMode,
 		isRatioMode,
 		showChartEvents,
-		isTopBreakdownFilterEnabled,
 		hiddenGraphDatasetIds,
 		isGraphDatasetSelectionActive,
 		selectedGraphDatasetIds,
