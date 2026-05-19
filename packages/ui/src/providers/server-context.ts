@@ -38,6 +38,7 @@ export interface ModrinthServerContext {
 	readonly serverId: string
 	readonly worldId: Ref<string | null>
 	readonly server: Ref<Archon.Servers.v0.Server>
+	readonly currentUserPermissions: ComputedRef<Archon.Servers.v0.UserScope>
 
 	// Websocket state
 	readonly isConnected: Ref<boolean>

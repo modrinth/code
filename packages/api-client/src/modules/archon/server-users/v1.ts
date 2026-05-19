@@ -53,7 +53,7 @@ export class ArchonServerUsersV1Module extends AbstractModule {
 	public async update(
 		serverId: string,
 		userId: string,
-		role: Archon.ServerUsers.v1.ServerUserRole,
+		role: Archon.ServerUsers.v1.AssignableServerUserRole,
 	): Promise<void> {
 		await this.client.request(`/servers/${serverId}/users/${userId}`, {
 			api: 'archon',

@@ -383,6 +383,9 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		}
 		fsAuth.value = await client.archon.servers_v0.getFilesystemAuth(options.serverId.value)
 	}
+	const currentUserPermissions = computed(
+		() => options.server.value?.current_user_permissions ?? 0,
+	)
 
 	provideModrinthServerContext({
 		get serverId() {
@@ -390,6 +393,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		},
 		worldId: options.worldId as Ref<string | null>,
 		server: options.server as Ref<Archon.Servers.v0.Server>,
+		currentUserPermissions,
 		isConnected,
 		isWsAuthIncorrect,
 		powerState: serverPowerState,

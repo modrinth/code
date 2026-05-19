@@ -62,6 +62,7 @@ const meta = {
 					},
 					worldId: ref(null),
 					server,
+					currentUserPermissions: computed(() => 0),
 					isConnected: ref(true),
 					isWsAuthIncorrect: ref(false),
 					powerState: ref('running'),

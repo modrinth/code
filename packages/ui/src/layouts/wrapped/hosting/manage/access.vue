@@ -108,8 +108,15 @@ const removeMemberConfirmModal = ref<InstanceType<typeof RemoveAccessModal> | nu
 const pendingRemovalMember = ref<ServerAccessMember | null>(null)
 const shouldCancelInvite = ref(false)
 const UserScope = Archon.ServerUsers.v1.UserScope
-const userScopeByte = 2 ** 56
-const userScopeSignedOffset = 2 ** 64
+const editorScopes = [
+	UserScope.BASE_READ,
+	UserScope.POWER_ACTIONS,
+	UserScope.FILES_WRITE,
+	UserScope.SETUP,
+	UserScope.BACKUPS,
+	UserScope.ADVANCED,
+]
+const viewerScopes = [UserScope.BASE_READ, UserScope.POWER_ACTIONS]
 
 const messages = defineMessages({
 	searchUsersPlaceholder: {
@@ -158,11 +165,11 @@ const messages = defineMessages({
 	},
 	inviteSentTitle: {
 		id: 'servers.access-page.notification.invite-sent.title',
-		defaultMessage: 'Invite sent',
+		defaultMessage: 'Access added',
 	},
 	inviteSentText: {
 		id: 'servers.access-page.notification.invite-sent.text',
-		defaultMessage: 'Invited {target} as {role}.',
+		defaultMessage: 'Added {target} as {role}.',
 	},
 	inviteResentTitle: {
 		id: 'servers.access-page.notification.invite-resent.title',
@@ -294,7 +301,7 @@ const members = computed<ServerAccessMember[]>(() =>
 				},
 				role,
 				joinedAt: serverUser.added_on ?? null,
-				pending: !serverUser.added_on && role !== 'owner',
+				pending: false,
 				isOwner: role === 'owner',
 			}
 		})
@@ -392,9 +399,9 @@ function accessRoleToApiRole(
 function accessRoleToApiPermissions(role: Exclude<ServerAccessRole, 'owner'>) {
 	switch (role) {
 		case 'editor':
-			return UserScope.EDITOR
+			return serializeUserScope(editorScopes)
 		case 'viewer':
-			return UserScope.VIEWER
+			return serializeUserScope(viewerScopes)
 	}
 }
 
@@ -423,15 +430,20 @@ function hasApiPermission(
 	permissions: Archon.ServerUsers.v1.UserScope,
 	scope: Archon.ServerUsers.v1.UserScope,
 ) {
-	const permissionByte = apiUserScopeToByte(permissions)
-	const scopeByte = apiUserScopeToByte(scope)
-	return (permissionByte & scopeByte) === scopeByte
+	return parseUserScope(permissions).has(scope)
 }
 
-function apiUserScopeToByte(scope: Archon.ServerUsers.v1.UserScope) {
-	const scopeNumber = Number(scope)
-	const unsignedScope = scopeNumber < 0 ? scopeNumber + userScopeSignedOffset : scopeNumber
-	return Math.trunc(unsignedScope / userScopeByte)
+function parseUserScope(scope: Archon.ServerUsers.v1.UserScope) {
+	return new Set(
+		String(scope)
+			.split('|')
+			.map((value) => value.trim())
+			.filter(Boolean),
+	)
+}
+
+function serializeUserScope(scopes: string[]): Archon.ServerUsers.v1.UserScope {
+	return scopes.join(' | ')
 }
 
 function formatErrorMessage(error: unknown): string | undefined {

@@ -496,28 +496,24 @@ export namespace Archon {
 
 			export type AssignableServerUserRole = Exclude<ServerUserRole, 'Owner' | 'Unknown'>
 
-			export enum UserScope {
-				NONE = 0,
+			export const UserScope = {
+				NONE: '',
+				SERVER_ADMIN: 'SERVER_ADMIN',
+				BASE_READ: 'BASE_READ',
+				POWER_ACTIONS: 'POWER_ACTIONS',
+				FILES_WRITE: 'FILES_WRITE',
+				SETUP: 'SETUP',
+				BACKUPS: 'BACKUPS',
+				ADVANCED: 'ADVANCED',
+				RESET_SERVER: 'RESET_SERVER',
+				MANAGE_USERS: 'MANAGE_USERS',
+				SUPPORT_AGENT: 'SUPPORT_AGENT',
+				INFRA_MANAGER: 'INFRA_MANAGER',
+				INFRA_MANAGER_READ: 'INFRA_MANAGER_READ',
+				INFRA_SERVERS_XFER: 'INFRA_SERVERS_XFER',
+			} as const
 
-				SERVER_ADMIN = -0x8000,
-				EDITOR = -0x400000000000000,
-				VIEWER = -0x4000000000000000,
-				RESERVED_BITS = 0x7fff,
-
-				BASE_READ = -0x8000000000000000,
-				POWER_ACTIONS = 0x4000000000000000,
-				FILES_WRITE = 0x2000000000000000,
-				SETUP = 0x1000000000000000,
-				BACKUPS = 0x800000000000000,
-				ADVANCED = 0x400000000000000,
-				RESET_SERVER = 0x200000000000000,
-				MANAGE_USERS = 0x100000000000000,
-
-				SUPPORT_AGENT = 0x1,
-				INFRA_MANAGER = 0x2,
-				INFRA_MANAGER_READ = 0x4,
-				INFRA_SERVERS_XFER = 0x8,
-			}
+			export type UserScope = string
 
 			export type UserResp = {
 				username: string
@@ -598,9 +594,12 @@ export namespace Archon {
 				node: NodeInfo | null
 				flows: Flows
 				is_medal: boolean
+				current_user_permissions: UserScope
 
 				medal_expires?: string
 			}
+
+			export type UserScope = number
 
 			export type Net = {
 				ip: string
