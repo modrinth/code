@@ -9,7 +9,7 @@
 			:data="paginatedRows"
 			row-key="id"
 			selection-key="graphDatasetId"
-			:selection-ids="selectableGraphDatasetIds"
+			:selection-ids="filteredSelectableGraphDatasetIds"
 			:show-selection="showGraphDatasetSelection"
 			virtualized
 			:virtual-row-height="56"
@@ -19,12 +19,20 @@
 				<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
 					<div class="text-xl font-semibold text-contrast">Breakdown</div>
 
-					<div class="flex flex-wrap items-center gap-3">
+					<div class="flex w-full flex-wrap items-center gap-3 md:w-auto">
+						<StyledInput
+							v-model="searchQuery"
+							:icon="SearchIcon"
+							placeholder="Search..."
+							clearable
+							wrapper-class="w-full sm:w-64"
+							@focusin="selectSearchInputText"
+						/>
 						<ButtonStyled>
 							<OverflowMenu
 								class="!shadow-none"
 								:options="csvExportOptions"
-								:disabled="isDataLoading || sortedRows.length === 0"
+								:disabled="isDataLoading || filteredRows.length === 0"
 							>
 								<DownloadIcon />
 								Export CSV
@@ -71,10 +79,12 @@
 			</template>
 		</Table>
 		<div
-			v-if="sortedRows.length > PAGE_SIZE"
+			v-if="filteredRows.length > PAGE_SIZE"
 			class="mt-3 flex flex-wrap items-center justify-between gap-3 px-1 text-sm text-secondary"
 		>
-			<span> Showing {{ visibleRowStart }} to {{ visibleRowEnd }} of {{ sortedRows.length }} </span>
+			<span>
+				Showing {{ visibleRowStart }} to {{ visibleRowEnd }} of {{ filteredRows.length }}
+			</span>
 			<Pagination :page="currentPage" :count="pageCount" @switch-page="switchPage" />
 		</div>
 		<div v-if="isDataLoading" class="absolute inset-0 z-10 overflow-hidden rounded-xl">
@@ -91,12 +101,13 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, DropdownIcon } from '@modrinth/assets'
+import { DownloadIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	OverflowMenu,
 	type OverflowMenuOption,
 	Pagination,
+	StyledInput,
 	Table,
 	type TableColumn,
 	useFormatNumber,
@@ -185,7 +196,9 @@ const GRAPH_DATASET_SELECTION_LIMIT = 8
 const INACTIVE_MODE_WARMUP_POINT_LIMIT = 12000
 const ALL_PROJECTS_DATASET_ID = 'all'
 const ALL_PROJECTS_BREAKDOWN_VALUE = 'all'
+const SEARCHABLE_COLUMN_KEYS = new Set<TableColumnKey>(['date', 'project', 'breakdown'])
 const currentPage = ref(1)
+const searchQuery = ref('')
 const sortCollator = new Intl.Collator(undefined, { sensitivity: 'base' })
 const modeBuildRequestIds: Record<TableMode, number> = {
 	date_breakdown: 0,
@@ -269,6 +282,10 @@ const analyticsPointCount = computed(() =>
 	timeSlices.value.reduce((sum, slice) => sum + slice.length, 0),
 )
 const emptyTableMessage = computed(() => {
+	if (trimmedSearchQuery.value && sortedRows.value.length > 0) {
+		return 'No matching analytics rows'
+	}
+
 	if (hasProjectContext.value) {
 		return 'No data available for analytics'
 	}
@@ -513,7 +530,21 @@ watch(includeDateColumn, () => {
 const sortedRows = computed<AnalyticsTableRow[]>(() => {
 	return displayedSortedRows.value
 })
+const trimmedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
+const searchableColumns = computed(() =>
+	columns.value.filter((column) => SEARCHABLE_COLUMN_KEYS.has(column.key)),
+)
+const filteredRows = computed<AnalyticsTableRow[]>(() => {
+	if (!trimmedSearchQuery.value) {
+		return sortedRows.value
+	}
+
+	return filterRowsBySearch(sortedRows.value, searchableColumns.value)
+})
 const selectableGraphDatasetIds = computed(() => getSelectableGraphDatasetIds(sortedRows.value))
+const filteredSelectableGraphDatasetIds = computed(() =>
+	getSelectableGraphDatasetIds(filteredRows.value),
+)
 
 watch(
 	showGraphDatasetSelection,
@@ -543,7 +574,9 @@ watch(
 			return
 		}
 
-		selectedGraphDatasetIds.value = getDefaultSelectedGraphDatasetIds(selectableGraphDatasetIds.value)
+		selectedGraphDatasetIds.value = getDefaultSelectedGraphDatasetIds(
+			selectableGraphDatasetIds.value,
+		)
 	},
 	{ immediate: true },
 )
@@ -583,18 +616,18 @@ watch([sortColumn, sortDirection], () => {
 	scheduleInactiveModeWarmup()
 })
 
-const pageCount = computed(() => Math.max(Math.ceil(sortedRows.value.length / PAGE_SIZE), 1))
+const pageCount = computed(() => Math.max(Math.ceil(filteredRows.value.length / PAGE_SIZE), 1))
 const visibleRowStart = computed(() =>
-	sortedRows.value.length === 0 ? 0 : (currentPage.value - 1) * PAGE_SIZE + 1,
+	filteredRows.value.length === 0 ? 0 : (currentPage.value - 1) * PAGE_SIZE + 1,
 )
 const visibleRowEnd = computed(() =>
-	Math.min(currentPage.value * PAGE_SIZE, sortedRows.value.length),
+	Math.min(currentPage.value * PAGE_SIZE, filteredRows.value.length),
 )
 const paginatedRows = computed<AnalyticsTableRow[]>(() =>
-	sortedRows.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE),
+	filteredRows.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE),
 )
 
-watch(sortedRows, () => {
+watch(filteredRows, () => {
 	currentPage.value = 1
 })
 
@@ -752,6 +785,35 @@ function sortTableRows(rows: AnalyticsTableRow[]): AnalyticsTableRow[] {
 	return nextRows
 }
 
+function filterRowsBySearch(
+	rows: AnalyticsTableRow[],
+	searchableColumns: TableColumn<TableColumnKey>[],
+): AnalyticsTableRow[] {
+	const query = trimmedSearchQuery.value
+	if (!query || searchableColumns.length === 0) {
+		return rows
+	}
+
+	return rows.filter((row) =>
+		searchableColumns.some((column) =>
+			String(getSearchableCellValue(row, column.key)).toLowerCase().includes(query),
+		),
+	)
+}
+
+function getSearchableCellValue(row: AnalyticsTableRow, key: TableColumnKey): string {
+	switch (key) {
+		case 'date':
+			return row.date
+		case 'project':
+			return row.project
+		case 'breakdown':
+			return row.breakdownDisplay
+		default:
+			return ''
+	}
+}
+
 function resortDisplayedRowsForCurrentSort(): boolean {
 	const mode = activeTableMode.value
 	if (displayedTableMode.value !== mode || displayedSortedRowsGeneration !== tableCacheGeneration) {
@@ -874,6 +936,13 @@ function applyRequestedSort(column: string, direction: SortDirection) {
 
 function switchPage(page: number) {
 	currentPage.value = page
+}
+
+function selectSearchInputText(event: FocusEvent) {
+	const target = event.target
+	if (target instanceof HTMLInputElement) {
+		target.select()
+	}
 }
 
 function getDefaultSortColumn(
@@ -1052,6 +1121,7 @@ function escapeCsvField(value: string | number): string {
 
 function getCsvRows(mode: TableMode): AnalyticsTableRow[] {
 	const displayedCache = displayedRowsCache.value
+	const visibleColumns = getCsvColumns(mode)
 	if (
 		displayedCache &&
 		displayedCache.generation === tableCacheGeneration &&
@@ -1059,10 +1129,10 @@ function getCsvRows(mode: TableMode): AnalyticsTableRow[] {
 		displayedCache.sortColumn === sortColumn.value &&
 		displayedCache.sortDirection === sortDirection.value
 	) {
-		return sortedRows.value
+		return filterRowsBySearch(displayedCache.rows, visibleColumns)
 	}
 
-	return sortTableRows(buildTableRows(mode))
+	return filterRowsBySearch(sortTableRows(buildTableRows(mode)), visibleColumns)
 }
 
 function getCsvColumns(mode: TableMode): TableColumn<TableColumnKey>[] {
