@@ -429,6 +429,37 @@ function getOpeningViewDate() {
 	return selectedDates.value[0] ?? props.defaultViewDate ?? null
 }
 
+function hasCompleteRange(instance: Instance) {
+	return props.mode === 'range' && instance.selectedDates.length === 2
+}
+
+function hasCompleteModelRange() {
+	return props.mode === 'range' && selectedDates.value.length === 2
+}
+
+function getCompleteRangeInputValue(instance: Instance, format: string) {
+	if (!hasCompleteRange(instance)) return null
+
+	const rangeValues = instance.selectedDates.map((date) => instance.formatDate(date, format))
+	if (rangeValues[0] === rangeValues[1]) return rangeValues[0] ?? null
+
+	return rangeValues.join(instance.l10n.rangeSeparator)
+}
+
+function syncInputDisplayValue(instance = picker.value) {
+	if (!instance) return
+
+	const inputValue = getCompleteRangeInputValue(instance, resolvedDateFormat.value)
+	if (inputValue) {
+		instance.input.value = inputValue
+	}
+
+	const altInputValue = getCompleteRangeInputValue(instance, resolvedAltFormat.value)
+	if (instance.altInput && altInputValue) {
+		instance.altInput.value = altInputValue
+	}
+}
+
 function syncCalendarView(instance: Instance) {
 	const viewDate = parseViewDate(getOpeningViewDate(), instance)
 	if (!viewDate) return
@@ -1089,10 +1120,17 @@ onMounted(async () => {
 			syncMissingRangeEndState()
 			syncCalendarStateClasses(instance)
 			syncRangeEndpointMoveState(instance)
+			syncInputDisplayValue(instance)
 		},
 		onClose: (_selectedDates, dateStr, instance) => {
 			cancelRangeEndpointMovePreview()
-			if (!props.clearable || dateStr) return
+			if (hasCompleteModelRange()) {
+				syncPickerFromModel()
+				return
+			}
+
+			syncInputDisplayValue(instance)
+			if (!props.clearable || dateStr || hasCompleteRange(instance)) return
 
 			const nextValue = props.mode === 'single' ? null : []
 			model.value = nextValue
@@ -1199,6 +1237,7 @@ function syncPickerFromModel() {
 
 	isSyncingFromModel.value = false
 	syncHeaderControlState(picker.value)
+	syncInputDisplayValue()
 	syncMissingRangeEndState()
 	syncCalendarStateClasses()
 	syncRangeEndpointMoveState()
