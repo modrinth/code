@@ -98,6 +98,15 @@
   "browse.filter-results": {
     "defaultMessage": "Filtruj wyniki..."
   },
+  "browse.no-results": {
+    "defaultMessage": "Nie znaleziono wyników dla twojego wyszukiwania!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Jesteś offline. Połącz się z internetem, aby przeglądać Modrinth!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Wyszukaj {projectType, select, mod {mody} modpack {paczki modów} resourcepack {paczki zasobów} shader {shadery} plugin {pluginy} datapack {paczki danych} server {serwery} other {projekty}}..."
+  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Wybrane projekty"
   },
@@ -107,8 +116,20 @@
   "browse.selected-projects-floating-bar.selected-count": {
     "defaultMessage": "Wybrano {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
   },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Wybrano {count, plural, one{# projekt} few {# projekty} other {# projektów}} do zainstalowania. Zainstaluj je teraz lub wróć bez instalowania ich."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Wybrane projekty jeszcze nie zainstalowane"
+  },
   "browse.selected-projects-leave-modal.discard": {
     "defaultMessage": "Odrzuć"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Wybrane projekty jeszcze nie zainstalowane"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Pokazuj:"
   },
   "button.accept": {
     "defaultMessage": "Akceptuj"
@@ -785,6 +806,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Ustaw serwer"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "Nie"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Zawsze nie"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Niezidentyfikowane"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "Z atrybucją"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "Z atrybucją i źródłem"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Tak"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Podsumowanie rozpakowywania"
   },
@@ -1277,6 +1316,9 @@
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Nie udało się zaktualizować zawartości"
   },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "Nie udało się zainstalować zawartości"
+  },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Nie udało się załadować zawartości paczki modów"
   },
@@ -1739,14 +1781,26 @@
   "label.game-version": {
     "defaultMessage": "Wersja gry"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "Ukryj zainstalowaną zawartość"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "Ukryj zaznaczoną zawartość"
+  },
   "label.installation-info": {
     "defaultMessage": "Informacje o instalacji"
+  },
+  "label.installed": {
+    "defaultMessage": "Zainstalowane"
   },
   "label.installed-modpack": {
     "defaultMessage": "Zainstalowana paczka modów"
   },
   "label.installing": {
     "defaultMessage": "Instalowanie..."
+  },
+  "label.installing-content": {
+    "defaultMessage": "Instalowanie zawartości"
   },
   "label.loading": {
     "defaultMessage": "Ładowanie..."
@@ -1823,6 +1877,9 @@
   "label.select-all": {
     "defaultMessage": "Zobacz wszystko"
   },
+  "label.selected": {
+    "defaultMessage": "Wybrano"
+  },
   "label.selection-actions": {
     "defaultMessage": "Akcje na wybranych"
   },
@@ -1865,8 +1922,14 @@
   "label.username": {
     "defaultMessage": "Nazwa użytkownika"
   },
+  "label.validating": {
+    "defaultMessage": "Weryfikowanie"
+  },
   "label.version": {
     "defaultMessage": "Wersja"
+  },
+  "label.view": {
+    "defaultMessage": "Pokazuj"
   },
   "label.visibility": {
     "defaultMessage": "Widoczność"
@@ -1973,6 +2036,150 @@
   "locale.zh-TW": {
     "defaultMessage": "Chiński (Tradycyjny)"
   },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "Zastąp to opisem"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "Błąd"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "Opisz cały obraz tak, jak opisano by go komuś, kto nie może go zobaczyć."
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "Opisz zdjęcie..."
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "Opis (tekst alternatywny)"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "Wstaw zdjęcie"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "Źródło zdjęcia"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "Prześlij"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "Przeciągnij i upuść, aby przesłać lub kliknij, aby wybrać plik"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "Wprowadź URL zdjęcia..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "Wstaw"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "Wstaw link"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "Wprowadź etykietę..."
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Etykieta"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "Wprowadź URL linku..."
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "Ten edytor wspiera <markdown-link>formatowanie Markdown</markdown-link>."
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "Maksymalna długość:"
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "Nieskończone"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "Napisz coś..."
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "Podgląd"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "Podgląd"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Pogrubione"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "Lista punktowa"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "Kod"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "Nagłówek 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "Nagłówek 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "Nagłówek 3"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "Zdjęcie"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "Przekrzywienie"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "Lista liczbowa"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Cytat"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "Spoiler"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "Przekreślenie"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "Film"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "Nie wybrano pliku"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "Nie dołączono usługi przesyłania zdjęć"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "Niepoprawny URL. Ta domena jest niedozwolona."
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "Niepoprawny URL. Upewnij się, że URL jest poprawny."
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "Niewspierany protokół. Użyj http lub https."
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "Odtwarzacz filmów na YouTube"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "Wstaw film z YouTube"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "Wprowadź poprawny link do filmu z YouTube."
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "Wprowadź URL do filmu z YouTube"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "URL do filmu z YouTube"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Dodaj metodę płatności"
   },
@@ -2024,6 +2231,9 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Błąd"
   },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Publiczne"
+  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
@@ -2059,6 +2269,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Odrzucony"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Ukryte przez moderację"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Skopiuj kod do schowka"

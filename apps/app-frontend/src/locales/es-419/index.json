@@ -104,6 +104,12 @@
   "app.auth-servers.unreachable.header": {
     "message": "No se puede acceder a los servidores de autenticación"
   },
+  "app.browse.add-servers-to-instance": {
+    "message": "Añadiendo servidor a instancia"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Añadir a una instancia"
+  },
   "app.browse.add-to-instance": {
     "message": "Añadir a instancia"
   },
@@ -116,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Ya se ha añadido"
   },
+  "app.browse.back-to-instance": {
+    "message": "Volver a instancia"
+  },
   "app.browse.discover-content": {
     "message": "Descubrir contenido"
   },
@@ -127,6 +136,9 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Añadir contenido puede romper la compatibilidad cuando te unes al servidor. Cualquier contenido añadido tambien se perderá cuando actualizes el contenido en la instancia del servidor."
   },
   "app.browse.server.installing": {
     "message": "Instalando"
@@ -286,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Se requiere una actualización para jugar {name}. Por favor, actualiza a la versión más reciente para iniciar el juego."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Este proyecto está actualmente instalado"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Volver al explorador"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Instalar contenido a la instancia"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."

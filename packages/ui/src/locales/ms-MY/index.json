@@ -95,14 +95,47 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Langgan semula ke Pelayan"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Tapis hasil..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Tiada hasil ditemui untuk carian anda!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Anda sedang berada di luar talian. Sambung ke internet untuk melayari Modrinth!"
+  },
   "browse.search.placeholder": {
     "defaultMessage": "Cari {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} server {pelayan} other {projek}}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Projek yang dipilih"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Pasang {count, plural, other {# projek}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, other {# projek dipilih}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Anda telah memilih {count, plural, other {# projek}} untuk dipasang. Pasangnya sekarang atau kembali tanpa memasangnya."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Projek yang dipilih belum dipasang lagi"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Buang"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Projek yang dipilih belum dipasang lagi"
   },
   "browse.view-prefix": {
     "defaultMessage": "Lihat:"
   },
   "button.accept": {
     "defaultMessage": "Terima"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Tambahkan pelayan ke dalam pemasangan"
   },
   "button.affiliate-links": {
     "defaultMessage": "Pautan afiliasi"
@@ -173,6 +206,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Sembunyikan petikan"
   },
+  "button.install": {
+    "defaultMessage": "Pasang"
+  },
   "button.max": {
     "defaultMessage": "Maks"
   },
@@ -190,6 +226,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Buka dalam folder"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Buka dalam Modrinth"
   },
   "button.play": {
     "defaultMessage": "Main"
@@ -283,6 +322,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "Peribadi"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Pilih {project}"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Adakah anda pasti mahu mengemas kini {count, plural, other {# projek}} ke versi terkini yang serasi? Disyorkan untuk mengemas kini kandungan satu per satu."
@@ -494,8 +536,29 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} dipilih"
   },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "Cipta pemasangan"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "Cipta dunia"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Selesai"
+  },
   "creation-flow.button.import": {
     "defaultMessage": "Import"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "Import {count, plural, other {# pemasangan}}"
+  },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "Sediakan pelayan"
+  },
+  "creation-flow.modal.custom-setup.build-number.label": {
+    "defaultMessage": "Nombor binaan"
+  },
+  "creation-flow.modal.custom-setup.build-number.placeholder": {
+    "defaultMessage": "Pilih nombor binaan"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Terkini"
@@ -515,14 +578,83 @@
   "creation-flow.modal.final-config.difficulty.hard": {
     "defaultMessage": "Sukar"
   },
+  "creation-flow.modal.final-config.game-version.placeholder": {
+    "defaultMessage": "Pilih versi permainan"
+  },
+  "creation-flow.modal.final-config.gamemode.creative": {
+    "defaultMessage": "Kreatif"
+  },
+  "creation-flow.modal.final-config.gamemode.hardcore": {
+    "defaultMessage": "Tegar"
+  },
+  "creation-flow.modal.final-config.gamemode.label": {
+    "defaultMessage": "Mod permainan"
+  },
+  "creation-flow.modal.final-config.gamemode.survival": {
+    "defaultMessage": "Kemandirian"
+  },
+  "creation-flow.modal.final-config.generate-structures.description": {
+    "defaultMessage": "Mengawal sama ada kampung, kubu kuat dan struktur lain menjana dalam cebisan baharu."
+  },
+  "creation-flow.modal.final-config.generate-structures.label": {
+    "defaultMessage": "Jana struktur"
+  },
+  "creation-flow.modal.final-config.generator-settings-json.placeholder": {
+    "defaultMessage": "Masukkan JSON tetapan penjana"
+  },
   "creation-flow.modal.final-config.generator-settings.custom": {
     "defaultMessage": "Tersuai"
+  },
+  "creation-flow.modal.final-config.generator-settings.default": {
+    "defaultMessage": "Lalai"
+  },
+  "creation-flow.modal.final-config.generator-settings.description": {
+    "defaultMessage": "Digunakan untuk penyesuaian dunia lanjutan seperti lapisan Lampau Rata tersuai."
   },
   "creation-flow.modal.final-config.generator-settings.flat": {
     "defaultMessage": "Datar"
   },
+  "creation-flow.modal.final-config.world-type.large-biomes": {
+    "defaultMessage": "Biom Besar"
+  },
+  "creation-flow.modal.final-config.world-type.placeholder": {
+    "defaultMessage": "Pilih jenis dunia"
+  },
+  "creation-flow.modal.final-config.world-type.single-biome": {
+    "defaultMessage": "Biom Tunggal"
+  },
+  "creation-flow.modal.final-config.world-type.superflat": {
+    "defaultMessage": "Lampau Rata"
+  },
   "creation-flow.modal.import-instance.action.add": {
     "defaultMessage": "Tambah"
+  },
+  "creation-flow.modal.import-instance.custom-launcher.name": {
+    "defaultMessage": "Tersuai ({pathName})"
+  },
+  "creation-flow.modal.import-instance.detecting-launcher-instances": {
+    "defaultMessage": "Sedang mengesan pemasangan dalam pelancar..."
+  },
+  "creation-flow.modal.import-instance.launcher-instances.title": {
+    "defaultMessage": "Pemasangan dalam pelancar"
+  },
+  "creation-flow.modal.import-instance.launcher-path.add": {
+    "defaultMessage": "Tambah laluan pelancar"
+  },
+  "creation-flow.modal.import-instance.launcher-path.placeholder": {
+    "defaultMessage": "Laluan ke pelancar..."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.text": {
+    "defaultMessage": "Tiada pemasangan yang boleh diimport ditemui pada laluan yang ditentukan."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.title": {
+    "defaultMessage": "Tiada pemasangan ditemui"
+  },
+  "creation-flow.modal.import-instance.search.placeholder": {
+    "defaultMessage": "Cari nama pemasangan"
+  },
+  "creation-flow.modal.import-instance.selection.clear-all": {
+    "defaultMessage": "Kosongkan semua"
   },
   "external-project-license-status.no": {
     "defaultMessage": "Tidak"
@@ -961,6 +1093,18 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Masukkan negeri/wilayah"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
   },
   "header.category.category": {
     "defaultMessage": "Kategori"
@@ -1694,6 +1838,36 @@
   "locale.zh-TW": {
     "defaultMessage": "Bahasa Cina (Tradisional)"
   },
+  "markdown-editor.error-label": {
+    "defaultMessage": "Ralat"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "Pautan"
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Label"
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "Pralihat"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "Pralihat"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "Kod"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "Gambar"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "Pautan"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "Pemain video YouTube"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Tambah kaedah pembayaran"
   },
@@ -1783,6 +1957,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Gagal"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Tidak disenaraikan oleh kakitangan"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Salin kod ke papan keratan"
@@ -2595,7 +2772,7 @@
     "defaultMessage": "Tidak disenaraikan"
   },
   "project.visibility.unlisted-by-staff": {
-    "defaultMessage": "Tidak disenaraikan oleh staf"
+    "defaultMessage": "Tidak disenaraikan oleh kakitangan"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Penapis dikunci"

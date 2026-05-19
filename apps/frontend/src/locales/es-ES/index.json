@@ -875,24 +875,6 @@
   "dashboard.head-title": {
     "message": "Panel de control"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Marcar todo como leido"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Ver historial"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "No tienes ninguna notificación sin leer."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Error al cargar las notificaciones:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Historial"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Historial de notificaciones"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "Ver todos"
   },
@@ -901,9 +883,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "Mostrar {extraNotifs} {extraNotifs, plural,one {notificación}other {otras notificaciones}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Cargando notificaciones..."
   },
   "dashboard.organizations.button.create": {
     "message": "Crear organización"
@@ -1723,9 +1702,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Error al generar el estado desde la API durante la compilación."
-  },
-  "layout.banner.preview.description": {
-    "message": "Si quieres acceder al sitio web oficial de Modrinth, visita <link>https://modrinth.com</link>. El personal de Modrinth utiliza esta implementación de vista previa para fines de prueba. Se creó con <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "Esta es una vista previa de la implementación del sitio web de Modrinth."

@@ -10597,6 +10597,7 @@ dependencies = [
  "urlencoding",
  "uuid 1.18.1",
  "webview2-com",
+ "windows",
  "windows-core 0.61.2",
 ]
 
