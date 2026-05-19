@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-19T19:51:55+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed 404 error when changing project URL.`,
+	},
+	{
 		date: `2026-05-19T18:50:27+00:00`,
 		product: 'web',
 		body: `## Changed
