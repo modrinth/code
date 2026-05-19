@@ -46,7 +46,8 @@ export const Default: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'Options render flush to the dropdown edges with full-width hover and selected states.',
+				story:
+					'Options render flush to the dropdown edges with full-width hover and selected states.',
 			},
 		},
 	},

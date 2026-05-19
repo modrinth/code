@@ -226,7 +226,7 @@
 									:key="getItemKey(item, index)"
 								>
 									<div
-										class="group/option-container"
+										class="group/option-container focus-visible:outline-none"
 										:class="shouldVirtualizeOptions ? 'absolute left-0 right-0' : undefined"
 										:style="getOptionWrapperStyle(index)"
 									>
@@ -258,7 +258,7 @@
 											:aria-disabled="item.disabled || undefined"
 											:data-option-index="index"
 											:data-focused="focusedIndex === index"
-											class="flex w-full cursor-pointer items-center gap-2.5 p-3 py-3.5 focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4 hover:brightness-110"
+											class="flex w-full cursor-pointer items-center gap-2.5 p-3 py-3.5 focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4 hover:brightness-110 focus:brightness-110"
 											:class="[
 												item.class,
 												shouldVirtualizeOptions ? 'h-12' : undefined,
@@ -346,11 +346,12 @@
 </template>
 
 <script setup lang="ts" generic="T">
+import 'overlayscrollbars/overlayscrollbars.css'
+
 import { CheckIcon, ChevronLeftIcon, MinusIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
 import { Menu } from 'floating-vue'
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
-import 'overlayscrollbars/overlayscrollbars.css'
 import {
 	type Component,
 	computed,
