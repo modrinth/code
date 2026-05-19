@@ -602,7 +602,7 @@ const groupByPresetOptions: Array<{
 ]
 
 const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
-	{ value: 'none', label: 'None' },
+	{ value: 'none', label: 'Project' },
 	{ value: 'country', label: 'Country' },
 	{ value: 'monetization', label: 'Monetization' },
 	{ value: 'download_source', label: 'Download source' },
