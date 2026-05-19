@@ -111,6 +111,16 @@ export const WithSelectAll: Story = {
 	},
 }
 
+export const WithRightCheckbox: Story = {
+	args: {
+		...Default.args,
+		searchable: true,
+		includeSelectAllOption: true,
+		checkboxPosition: 'right',
+		searchPlaceholder: 'Search languages',
+	},
+}
+
 export const WithSelectionActions: Story = {
 	args: {
 		...Default.args,

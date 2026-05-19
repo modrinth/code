@@ -11,11 +11,12 @@
 					:options="projectSelectOptions"
 					:disabled="!hasProjectOptions"
 					:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
-					dropdown-min-width="330px"
+					dropdown-min-width="360px"
 					placeholder="Select projects"
 					:no-options-message="noProjectsMessage"
 					:searchable="projectOptions.length > 6"
 					:max-tag-rows="1"
+					checkbox-position="right"
 					show-selection-actions
 					@open="handleProjectSelectOpen"
 					@close="handleProjectSelectClose"
@@ -77,21 +78,12 @@
 								@keydown.enter.stop
 								@keydown.space.stop
 							>
-								<span
-									class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
-									:class="
-										isAllProjectsOptionSelected
-											? 'border-button-border bg-brand text-brand-inverted'
-											: 'border-surface-5 bg-surface-2'
-									"
-								>
-									<CheckIcon
-										v-if="isAllProjectsOptionSelected"
-										aria-hidden="true"
-										stroke-width="3"
-									/>
+								<span class="min-w-0 flex-1 font-semibold leading-tight text-primary">
+									All projects
 								</span>
-								<span class="font-semibold leading-tight text-primary">All projects</span>
+								<span class="flex shrink-0 items-center justify-center text-brand">
+									<CheckIcon v-if="isAllProjectsOptionSelected" aria-hidden="true" class="size-5" />
+								</span>
 							</button>
 						</div>
 					</template>

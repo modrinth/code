@@ -151,6 +151,7 @@
 									@mouseenter="focusedIndex = -2"
 								>
 									<span
+										v-if="checkboxPosition === 'left'"
 										class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid shrink-0 checkbox-shadow"
 										:class="[
 											isAllSelected
@@ -162,8 +163,15 @@
 										<MinusIcon v-if="isIndeterminate" aria-hidden="true" stroke-width="3" />
 										<CheckIcon v-else-if="isAllSelected" aria-hidden="true" stroke-width="3" />
 									</span>
-									<span class="font-semibold leading-tight text-primary">
+									<span class="min-w-0 flex-1 font-semibold leading-tight text-primary">
 										{{ selectAllLabel }}
+									</span>
+									<span
+										v-if="checkboxPosition === 'right'"
+										class="flex items-center justify-center shrink-0 text-brand"
+									>
+										<MinusIcon v-if="isIndeterminate" aria-hidden="true" class="size-5" />
+										<CheckIcon v-else-if="isAllSelected" aria-hidden="true" class="size-5" />
 									</span>
 								</span>
 							</div>
@@ -224,7 +232,7 @@
 									>
 										<div
 											v-if="isSectionHeader(item)"
-											class="flex items-center justify-between gap-3 text-sm font-bold text-secondary border-t border-surface-5 border-solid border-0 group-first/option-container:border-t-0"
+											class="flex items-center justify-between gap-3 text-sm font-semibold text-secondary border-t border-surface-5 border-solid border-0 group-first/option-container:border-t-0"
 											:class="[
 												item.class,
 												shouldVirtualizeOptions ? 'h-10 px-3' : 'h-10 px-3  pb-1 pt-2',
@@ -235,7 +243,7 @@
 											<button
 												v-if="hasSelectableSectionHeaderOptions(item)"
 												type="button"
-												class="shrink-0 border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
+												class="shrink-0 border-0 bg-transparent p-0 text-sm font-medium text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
 												@click.stop="toggleSectionHeaderOptions(item)"
 												@keydown.enter.stop
 												@keydown.space.stop
@@ -255,6 +263,7 @@
 												item.class,
 												shouldVirtualizeOptions ? 'h-12' : undefined,
 												{
+													'brightness-110': item.selected,
 													'pointer-events-none cursor-not-allowed opacity-50': item.disabled,
 												},
 											]"
@@ -263,6 +272,7 @@
 											@mouseenter="!item.disabled && (focusedIndex = index)"
 										>
 											<span
+												v-if="checkboxPosition === 'left'"
 												class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
 												:class="
 													item.selected
@@ -302,6 +312,12 @@
 													</div>
 												</slot>
 											</slot>
+											<span
+												v-if="checkboxPosition === 'right'"
+												class="flex shrink-0 items-center justify-center text-brand"
+											>
+												<CheckIcon v-if="item.selected" aria-hidden="true" class="size-5" />
+											</span>
 										</span>
 									</div>
 								</template>
@@ -432,6 +448,7 @@ const props = withDefaults(
 		showSelectionActions?: boolean
 		selectionActionsClearLabel?: string
 		maxTagRows?: number
+		checkboxPosition?: 'left' | 'right'
 	}>(),
 	{
 		placeholder: 'Select options',
@@ -449,6 +466,7 @@ const props = withDefaults(
 		showSelectionActions: false,
 		selectionActionsClearLabel: 'Clear',
 		maxTagRows: 1,
+		checkboxPosition: 'left',
 	},
 )
 
