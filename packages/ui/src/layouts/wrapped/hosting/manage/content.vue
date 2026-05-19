@@ -116,7 +116,7 @@ const { openServerSettings, browseServerContent } = injectServerSettingsModal()
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
-const serverId = (route.params.id ?? route.params['serverId']) as string
+const serverId = route.params.id as string
 
 const type = computed(() => {
 	const loader = server.value?.loader?.toLowerCase()

@@ -344,7 +344,7 @@ const props = defineProps<{
 }>()
 
 const route = useRoute()
-const serverId = (route.params.id ?? route.params['serverId']) as string
+const serverId = route.params.id as string
 
 defineEmits(['onDownload'])
 

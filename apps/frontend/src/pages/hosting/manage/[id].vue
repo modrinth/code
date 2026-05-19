@@ -47,7 +47,7 @@ const flags = useFeatureFlags()
 const route = useNativeRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
-const serverId = String(useRouteId('serverId'))
+const serverId = route.params.id as string
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
