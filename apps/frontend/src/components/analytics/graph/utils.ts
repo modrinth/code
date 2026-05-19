@@ -215,6 +215,10 @@ export function buildChartDatasets(
 				const breakdownValue = getAnalyticsBreakdownValue(point, selectedBreakdown)
 				if (breakdownValue === ALL_BREAKDOWN_VALUE) continue
 
+				if (!dataByBreakdown.has(breakdownValue)) {
+					dataByBreakdown.set(breakdownValue, new Array(dataLength).fill(0))
+				}
+
 				if (point.metric_kind === 'downloads') {
 					downloadTotalsByBreakdown.set(
 						breakdownValue,
@@ -225,12 +229,8 @@ export function buildChartDatasets(
 
 				if (!isMetricKindForStat(point, activeStat)) continue
 
-				let breakdownData = dataByBreakdown.get(breakdownValue)
-				if (!breakdownData) {
-					breakdownData = new Array(dataLength).fill(0)
-					dataByBreakdown.set(breakdownValue, breakdownData)
-				}
-
+				const breakdownData = dataByBreakdown.get(breakdownValue)
+				if (!breakdownData) continue
 				breakdownData[sliceIndex] += getMetricValue(point, activeStat)
 			}
 		})
