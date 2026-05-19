@@ -148,6 +148,7 @@ type AnalyticsTableRow = {
 }
 
 type DisplayedRowsCache = {
+	generation: number
 	mode: TableMode
 	sortColumn: TableColumnKey | undefined
 	sortDirection: SortDirection
@@ -181,6 +182,7 @@ const displayedSortColumn = ref<TableColumnKey | undefined>('date')
 const displayedSortDirection = ref<SortDirection>('asc')
 const PAGE_SIZE = 500
 const GRAPH_DATASET_SELECTION_LIMIT = 8
+const INACTIVE_MODE_WARMUP_POINT_LIMIT = 12000
 const ALL_PROJECTS_DATASET_ID = 'all'
 const ALL_PROJECTS_BREAKDOWN_VALUE = 'all'
 const currentPage = ref(1)
@@ -190,6 +192,7 @@ const modeBuildRequestIds: Record<TableMode, number> = {
 	breakdown_only: 0,
 }
 let tableCacheGeneration = 0
+let displayedSortedRowsGeneration = 0
 const displayedTableMode = ref<TableMode>('breakdown_only')
 const displayedSortedRows = shallowRef<AnalyticsTableRow[]>([])
 const displayedRowsCache = shallowRef<DisplayedRowsCache | null>(null)
@@ -262,6 +265,9 @@ const projectNamesById = computed(
 	() => new Map(projects.value.map((project) => [project.id, project.name])),
 )
 const hasAvailableProjects = computed(() => projects.value.length > 0)
+const analyticsPointCount = computed(() =>
+	timeSlices.value.reduce((sum, slice) => sum + slice.length, 0),
+)
 const emptyTableMessage = computed(() => {
 	if (hasProjectContext.value) {
 		return 'No data available for analytics'
@@ -555,6 +561,7 @@ watch(
 	() => {
 		invalidateTableCaches()
 		scheduleRowsForMode(activeTableMode.value)
+		scheduleInactiveModeWarmup()
 	},
 	{ immediate: true, flush: 'post' },
 )
@@ -562,11 +569,18 @@ watch(
 watch(activeTableMode, () => {
 	currentPage.value = 1
 	scheduleRowsForMode(activeTableMode.value)
+	scheduleInactiveModeWarmup()
 })
 
 watch([sortColumn, sortDirection], () => {
+	if (resortDisplayedRowsForCurrentSort()) {
+		scheduleInactiveModeWarmup()
+		return
+	}
+
 	invalidateSortedCaches()
 	scheduleRowsForMode(activeTableMode.value)
+	scheduleInactiveModeWarmup()
 })
 
 const pageCount = computed(() => Math.max(Math.ceil(sortedRows.value.length / PAGE_SIZE), 1))
@@ -603,14 +617,20 @@ function hasSortedRowsForMode(mode: TableMode): boolean {
 	const cached = displayedRowsCache.value
 	return (
 		cached !== null &&
+		cached.generation === tableCacheGeneration &&
 		cached.mode === mode &&
 		cached.sortColumn === sortColumn.value &&
 		cached.sortDirection === sortDirection.value
 	)
 }
 
-function setDisplayedRowsForMode(mode: TableMode, rows: AnalyticsTableRow[]) {
+function setDisplayedRowsForMode(
+	mode: TableMode,
+	rows: AnalyticsTableRow[],
+	generation = tableCacheGeneration,
+) {
 	displayedRowsCache.value = {
+		generation,
 		mode,
 		sortColumn: sortColumn.value,
 		sortDirection: sortDirection.value,
@@ -618,6 +638,7 @@ function setDisplayedRowsForMode(mode: TableMode, rows: AnalyticsTableRow[]) {
 	}
 
 	if (mode === activeTableMode.value) {
+		displayedSortedRowsGeneration = generation
 		displayedTableMode.value = mode
 		displayedSortColumn.value = sortColumn.value
 		displayedSortDirection.value = sortDirection.value
@@ -641,10 +662,11 @@ function scheduleRowsForMode(mode: TableMode) {
 
 function displayRowsForMode(mode: TableMode) {
 	const cached = displayedRowsCache.value
-	if (!cached || cached.mode !== mode) {
+	if (!cached || cached.generation !== tableCacheGeneration || cached.mode !== mode) {
 		return
 	}
 
+	displayedSortedRowsGeneration = cached.generation
 	displayedTableMode.value = mode
 	displayedSortColumn.value = cached.sortColumn
 	displayedSortDirection.value = cached.sortDirection
@@ -664,7 +686,7 @@ async function buildRowsForMode(mode: TableMode, generation: number, requestId: 
 		return
 	}
 
-	setDisplayedRowsForMode(mode, rows)
+	setDisplayedRowsForMode(mode, rows, generation)
 }
 
 function isStaleBuild(mode: TableMode, generation: number, requestId: number): boolean {
@@ -683,6 +705,39 @@ function waitForDeferredTableWork(): Promise<void> {
 	})
 }
 
+function scheduleInactiveModeWarmup() {
+	if (!showBreakdownColumn.value) {
+		return
+	}
+	if (analyticsPointCount.value > INACTIVE_MODE_WARMUP_POINT_LIMIT) {
+		return
+	}
+
+	const inactiveMode: TableMode =
+		activeTableMode.value === 'date_breakdown' ? 'breakdown_only' : 'date_breakdown'
+
+	if (hasSortedRowsForMode(inactiveMode)) {
+		return
+	}
+
+	if (!import.meta.client) {
+		scheduleRowsForMode(inactiveMode)
+		return
+	}
+
+	const windowWithIdleCallback = window as Window & {
+		requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number
+	}
+
+	if (windowWithIdleCallback.requestIdleCallback) {
+		windowWithIdleCallback.requestIdleCallback(() => scheduleRowsForMode(inactiveMode), {
+			timeout: 2000,
+		})
+	} else {
+		window.setTimeout(() => scheduleRowsForMode(inactiveMode), 250)
+	}
+}
+
 function sortTableRows(rows: AnalyticsTableRow[]): AnalyticsTableRow[] {
 	const nextRows = [...rows]
 	const activeSortColumn = sortColumn.value
@@ -695,6 +750,16 @@ function sortTableRows(rows: AnalyticsTableRow[]): AnalyticsTableRow[] {
 	nextRows.sort(getRowComparator(activeSortColumn, directionFactor))
 
 	return nextRows
+}
+
+function resortDisplayedRowsForCurrentSort(): boolean {
+	const mode = activeTableMode.value
+	if (displayedTableMode.value !== mode || displayedSortedRowsGeneration !== tableCacheGeneration) {
+		return false
+	}
+
+	setDisplayedRowsForMode(mode, sortTableRows(displayedSortedRows.value))
+	return true
 }
 
 const revenueFormatter = computed(
@@ -989,6 +1054,7 @@ function getCsvRows(mode: TableMode): AnalyticsTableRow[] {
 	const displayedCache = displayedRowsCache.value
 	if (
 		displayedCache &&
+		displayedCache.generation === tableCacheGeneration &&
 		displayedCache.mode === mode &&
 		displayedCache.sortColumn === sortColumn.value &&
 		displayedCache.sortDirection === sortDirection.value

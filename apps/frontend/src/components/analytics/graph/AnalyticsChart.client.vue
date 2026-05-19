@@ -129,6 +129,7 @@ let rangeSelectStartSliceIndex: number | null = null
 let rangeSelectLastSliceIndex: number | null = null
 let isRangeSelecting = false
 let seriesOpacityAnimationFrame: number | null = null
+let chartRefreshAnimationFrame: number | null = null
 let currentDatasetOpacities: number[] = []
 let suppressGeometryEmit = false
 let lastGeometryPayload: AnalyticsChartGeometryPayload | null = null
@@ -434,6 +435,13 @@ function cancelSeriesOpacityAnimation() {
 	seriesOpacityAnimationFrame = null
 }
 
+function cancelScheduledChartRefresh() {
+	if (chartRefreshAnimationFrame === null) return
+
+	cancelAnimationFrame(chartRefreshAnimationFrame)
+	chartRefreshAnimationFrame = null
+}
+
 function getTargetDatasetOpacities() {
 	return props.datasets.map((_, index) => getTargetDatasetOpacity(index))
 }
@@ -670,18 +678,40 @@ function refreshChart() {
 	const config = buildConfig()
 	chartInstance.data = config.data
 	chartInstance.options = config.options ?? {}
+	syncPinnedSliceState()
 	chartInstance.update('none')
-	applyPinnedSliceState()
 	emitChartGeometry()
 }
 
-function applyPinnedSliceState() {
+function scheduleChartRefresh() {
+	if (typeof requestAnimationFrame === 'undefined') {
+		refreshChart()
+		return
+	}
+
+	if (chartRefreshAnimationFrame !== null) {
+		return
+	}
+
+	chartRefreshAnimationFrame = requestAnimationFrame(() => {
+		chartRefreshAnimationFrame = null
+		refreshChart()
+	})
+}
+
+function syncPinnedSliceState() {
 	if (!chartInstance) return
 
 	chartInstance.options.events = getChartEvents()
 	chartInstance.setActiveElements(
 		props.pinnedSliceIndex === null ? [] : getPinnedActiveElements(props.pinnedSliceIndex),
 	)
+}
+
+function applyPinnedSliceState() {
+	if (!chartInstance) return
+
+	syncPinnedSliceState()
 	updateChartWithoutGeometry()
 }
 
@@ -819,6 +849,7 @@ onBeforeUnmount(() => {
 	canvasRef.value?.removeEventListener('pointerup', handlePinnedPointerEnd)
 	canvasRef.value?.removeEventListener('pointercancel', handlePinnedPointerEnd)
 	cancelSeriesOpacityAnimation()
+	cancelScheduledChartRefresh()
 	chartInstance?.destroy()
 	chartInstance = null
 })
@@ -826,6 +857,7 @@ onBeforeUnmount(() => {
 watch(
 	() => [props.type, props.fill, props.stacked],
 	() => {
+		cancelScheduledChartRefresh()
 		chartInstance?.destroy()
 		chartInstance = null
 		nextTick(() => {
@@ -838,7 +870,7 @@ watch(
 watch(
 	() => [props.datasets, props.labels, props.xAxisTickLimit, props.activeStat, props.ratioMode],
 	() => {
-		refreshChart()
+		scheduleChartRefresh()
 	},
 )
 

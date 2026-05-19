@@ -305,6 +305,12 @@ const titleByStat: Record<AnalyticsDashboardStat, string> = {
 	revenue: 'Revenue Over Time',
 	playtime: 'Playtime Over Time',
 }
+const dashboardStats: readonly AnalyticsDashboardStat[] = [
+	'views',
+	'downloads',
+	'revenue',
+	'playtime',
+]
 
 const localAnalyticsChartEvents = computed(() => analyticsEvents.value ?? [])
 const hasChartEvents = computed(() => localAnalyticsChartEvents.value.length > 0)
@@ -420,19 +426,33 @@ const xAxisTickLimit = computed(() => {
 		: undefined
 })
 
-const allChartDatasets = computed(() =>
-	buildChartDatasets(
-		timeSlices.value,
-		selectedProjects.value,
-		activeStat.value,
-		legendPalette.value,
-		selectedBreakdown.value,
-		selectedFilters.value,
-		getVersionDisplayName,
-		showProjectVersionNames.value ? getVersionProjectName : undefined,
-		sliceCount.value,
-	),
-)
+const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset[]>>(() => {
+	const datasetsByStat = {} as Record<AnalyticsDashboardStat, ChartDataset[]>
+	const nextTimeSlices = timeSlices.value
+	const nextSelectedProjects = selectedProjects.value
+	const nextPalette = legendPalette.value
+	const nextSelectedBreakdown = selectedBreakdown.value
+	const nextSelectedFilters = selectedFilters.value
+	const nextGetVersionProjectName = showProjectVersionNames.value ? getVersionProjectName : undefined
+	const nextSliceCount = sliceCount.value
+
+	for (const stat of dashboardStats) {
+		datasetsByStat[stat] = buildChartDatasets(
+			nextTimeSlices,
+			nextSelectedProjects,
+			stat,
+			nextPalette,
+			nextSelectedBreakdown,
+			nextSelectedFilters,
+			getVersionDisplayName,
+			nextGetVersionProjectName,
+			nextSliceCount,
+		)
+	}
+
+	return datasetsByStat
+})
+const allChartDatasets = computed(() => chartDatasetsByStat.value[activeStat.value])
 const selectedGraphDatasetIdSet = computed(() => new Set(selectedGraphDatasetIds.value))
 const selectableChartDatasets = computed(() => {
 	if (!isGraphDatasetSelectionActive.value) {
