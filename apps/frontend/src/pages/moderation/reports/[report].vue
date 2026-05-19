@@ -7,8 +7,7 @@ import ModerationReportCard from '~/components/ui/moderation/ModerationReportCar
 import { enrichReportBatch } from '~/helpers/moderation.ts'
 
 const client = injectModrinthClient()
-const { params } = useRoute()
-const reportId = params.id as string
+const reportId = String(useRouteId('report'))
 
 const { data: report } = useQuery({
 	queryKey: computed(() => ['report', reportId]),

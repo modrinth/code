@@ -739,8 +739,8 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 	} else {
 		// Fallback: use project ID (will trigger middleware redirect)
 		navigateTo({
-			name: 'type-id',
-			params: { type: 'project', id: next.projectId },
+			name: 'type-project',
+			params: { type: 'project', project: next.projectId },
 			state: { showChecklist: true },
 		})
 	}
@@ -1067,8 +1067,8 @@ async function skipToNextProject() {
 				} else {
 					// Fallback: use project ID
 					navigateTo({
-						name: 'type-id',
-						params: { type: 'project', id },
+						name: 'type-project',
+						params: { type: 'project', project: id },
 						state: { showChecklist: true },
 					})
 				}
@@ -2127,8 +2127,8 @@ async function endChecklist(status?: string) {
 						} else {
 							// Fallback: use project ID
 							navigateTo({
-								name: 'type-id',
-								params: { type: 'project', id },
+								name: 'type-project',
+								params: { type: 'project', project: id },
 								state: { showChecklist: true },
 							})
 						}
