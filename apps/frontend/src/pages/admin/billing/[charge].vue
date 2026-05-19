@@ -360,7 +360,6 @@ const formatDateTimeShort = useFormatDateTime({
 	minute: 'numeric',
 })
 
-const route = useRoute()
 const vintl = useVIntl()
 
 const { formatMessage } = vintl
