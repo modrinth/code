@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 
 import {
+	getAnalyticsFilterCategoryForBreakdown,
 	getEnabledAnalyticsStatsForState,
 	getProjectStatusFilterValue,
 	PROJECT_STATUS_FILTER_VALUES,
@@ -184,7 +185,7 @@ export interface AnalyticsDashboardContextValue {
 	activeGraphViewMode: Ref<AnalyticsGraphViewMode>
 	isRatioMode: Ref<boolean>
 	showChartEvents: Ref<boolean>
-	showAllLegendEntries: Ref<boolean>
+	isTopBreakdownFilterEnabled: Ref<boolean>
 	hiddenGraphDatasetIds: Ref<string[]>
 	currentTotals: ComputedRef<AnalyticsDashboardTotals>
 	previousTotals: ComputedRef<AnalyticsDashboardTotals>
@@ -989,7 +990,7 @@ export function createAnalyticsDashboardContext(
 	const activeGraphViewMode = ref<AnalyticsGraphViewMode>(initialGraphState.activeGraphViewMode)
 	const isRatioMode = ref(initialGraphState.isRatioMode)
 	const showChartEvents = ref(initialGraphState.showChartEvents)
-	const showAllLegendEntries = ref(initialGraphState.showAllLegendEntries)
+	const isTopBreakdownFilterEnabled = ref(initialGraphState.isTopBreakdownFilterEnabled)
 	const hiddenGraphDatasetIds = ref<string[]>(initialGraphState.hiddenGraphDatasetIds)
 	const selectedProjectIds = ref<string[]>(initialQueryState.selectedProjectIds)
 	const selectedTimeframeMode = ref<AnalyticsTimeframeMode>(initialQueryState.selectedTimeframeMode)
@@ -1376,7 +1377,7 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode: activeGraphViewMode.value,
 			isRatioMode: isRatioMode.value,
 			showChartEvents: showChartEvents.value,
-			showAllLegendEntries: showAllLegendEntries.value,
+			isTopBreakdownFilterEnabled: isTopBreakdownFilterEnabled.value,
 			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
 		})
 
@@ -1462,7 +1463,7 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode: activeGraphViewMode.value,
 			isRatioMode: isRatioMode.value,
 			showChartEvents: showChartEvents.value,
-			showAllLegendEntries: showAllLegendEntries.value,
+			isTopBreakdownFilterEnabled: isTopBreakdownFilterEnabled.value,
 			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
 		}
 	}
@@ -1545,6 +1546,22 @@ export function createAnalyticsDashboardContext(
 				replaceNextAnalyticsRouteNavigation()
 				selectedFilters.value = sanitizedFilters
 			}
+
+			if (nextBreakdown === 'none' && !isTopBreakdownFilterEnabled.value) {
+				replaceNextAnalyticsRouteNavigation()
+				isTopBreakdownFilterEnabled.value = true
+				return
+			}
+
+			const breakdownFilterCategory = getAnalyticsFilterCategoryForBreakdown(nextBreakdown)
+			if (
+				breakdownFilterCategory &&
+				sanitizedFilters[breakdownFilterCategory].length > 0 &&
+				isTopBreakdownFilterEnabled.value
+			) {
+				replaceNextAnalyticsRouteNavigation()
+				isTopBreakdownFilterEnabled.value = false
+			}
 		},
 		{ deep: true, immediate: true },
 	)
@@ -1623,8 +1640,8 @@ export function createAnalyticsDashboardContext(
 				activeGraphViewMode.value !== nextGraphState.activeGraphViewMode
 			const shouldUpdateIsRatioMode = isRatioMode.value !== nextGraphState.isRatioMode
 			const shouldUpdateShowChartEvents = showChartEvents.value !== nextGraphState.showChartEvents
-			const shouldUpdateShowAllLegendEntries =
-				showAllLegendEntries.value !== nextGraphState.showAllLegendEntries
+			const shouldUpdateTopBreakdownFilter =
+				isTopBreakdownFilterEnabled.value !== nextGraphState.isTopBreakdownFilterEnabled
 			const shouldUpdateHiddenGraphDatasetIds = !areStringArraysEqual(
 				hiddenGraphDatasetIds.value,
 				nextGraphState.hiddenGraphDatasetIds,
@@ -1644,7 +1661,7 @@ export function createAnalyticsDashboardContext(
 				shouldUpdateActiveGraphViewMode ||
 				shouldUpdateIsRatioMode ||
 				shouldUpdateShowChartEvents ||
-				shouldUpdateShowAllLegendEntries ||
+				shouldUpdateTopBreakdownFilter ||
 				shouldUpdateHiddenGraphDatasetIds
 
 			if (hasRouteStateUpdate) {
@@ -1693,8 +1710,8 @@ export function createAnalyticsDashboardContext(
 			if (shouldUpdateShowChartEvents) {
 				showChartEvents.value = nextGraphState.showChartEvents
 			}
-			if (shouldUpdateShowAllLegendEntries) {
-				showAllLegendEntries.value = nextGraphState.showAllLegendEntries
+			if (shouldUpdateTopBreakdownFilter) {
+				isTopBreakdownFilterEnabled.value = nextGraphState.isTopBreakdownFilterEnabled
 			}
 			if (shouldUpdateHiddenGraphDatasetIds) {
 				hiddenGraphDatasetIds.value = nextGraphState.hiddenGraphDatasetIds
@@ -1740,7 +1757,7 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode,
 			isRatioMode,
 			showChartEvents,
-			showAllLegendEntries,
+			isTopBreakdownFilterEnabled,
 			hiddenGraphDatasetIds,
 		],
 		() => {
@@ -2216,7 +2233,7 @@ export function createAnalyticsDashboardContext(
 		activeGraphViewMode.value = defaultGraphState.activeGraphViewMode
 		isRatioMode.value = defaultGraphState.isRatioMode
 		showChartEvents.value = defaultGraphState.showChartEvents
-		showAllLegendEntries.value = defaultGraphState.showAllLegendEntries
+		isTopBreakdownFilterEnabled.value = defaultGraphState.isTopBreakdownFilterEnabled
 		hiddenGraphDatasetIds.value = defaultGraphState.hiddenGraphDatasetIds
 		queryResetToken.value += 1
 	}
@@ -2298,7 +2315,7 @@ export function createAnalyticsDashboardContext(
 		activeGraphViewMode,
 		isRatioMode,
 		showChartEvents,
-		showAllLegendEntries,
+		isTopBreakdownFilterEnabled,
 		hiddenGraphDatasetIds,
 		currentTotals,
 		previousTotals,

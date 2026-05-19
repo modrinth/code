@@ -35,57 +35,74 @@
 			class="flex flex-col gap-6 px-4 pb-6 pt-5"
 			:class="['transition-opacity', isDataLoading ? 'pointer-events-none opacity-75' : '']"
 		>
-			<div class="flex flex-wrap items-center gap-y-1 px-3">
-				<div
-					v-for="legendEntry in displayedLegendEntries"
-					:key="legendEntry.id"
-					class="inline-flex items-center"
+			<div class="relative">
+				<Transition
+					enter-active-class="transition-all duration-200 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-5"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-5"
+					leave-to-class="opacity-0 max-h-0"
 				>
-					<button
-						v-tooltip="getLegendEntryTooltip(legendEntry)"
-						type="button"
-						class="inline-flex items-center gap-1.5 px-2 py-0.5 text-sm !outline-0 transition-all focus-within:!outline-0 focus:!outline-0 focus-visible:!outline-0"
-						:class="[
-							legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary',
-							isLegendEntryToggleDisabled(legendEntry)
-								? 'cursor-default'
-								: 'cursor-pointer hover:brightness-125',
-						]"
-						:aria-pressed="!legendEntry.hidden"
-						@mouseenter="setHoveredLegendEntryId(legendEntry.id)"
-						@mouseleave="clearHoveredLegendEntryId(legendEntry.id)"
-						@focus="setHoveredLegendEntryId(legendEntry.id)"
-						@blur="clearHoveredLegendEntryId(legendEntry.id)"
-						@click="onLegendEntryClick($event, legendEntry.id)"
+					<div
+						v-if="showLegendTopFade"
+						class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-5 bg-gradient-to-b from-surface-3 to-transparent"
+					/>
+				</Transition>
+
+				<div
+					ref="legendContainer"
+					class="flex max-h-[160px] flex-wrap items-center gap-y-1 overflow-y-auto px-3"
+					@scroll="checkLegendScrollState"
+				>
+					<div
+						v-for="legendEntry in displayedLegendEntries"
+						:key="legendEntry.id"
+						class="inline-flex items-center"
 					>
-						<span class="size-2 rounded-full" :style="{ backgroundColor: legendEntry.color }" />
-						<span
-							:class="{
-								'line-through': legendEntry.hidden,
-								capitalize: shouldCapitalizeDatasetLabels,
-							}"
+						<button
+							v-tooltip="getLegendEntryTooltip(legendEntry)"
+							type="button"
+							class="inline-flex items-center gap-1.5 px-2 py-0.5 text-sm !outline-0 transition-all focus-within:!outline-0 focus:!outline-0 focus-visible:!outline-0"
+							:class="[
+								legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary',
+								isLegendEntryToggleDisabled(legendEntry)
+									? 'cursor-default'
+									: 'cursor-pointer hover:brightness-125',
+							]"
+							:aria-pressed="!legendEntry.hidden"
+							@mouseenter="setHoveredLegendEntryId(legendEntry.id)"
+							@mouseleave="clearHoveredLegendEntryId(legendEntry.id)"
+							@focus="setHoveredLegendEntryId(legendEntry.id)"
+							@blur="clearHoveredLegendEntryId(legendEntry.id)"
+							@click="onLegendEntryClick($event, legendEntry.id)"
 						>
-							{{ legendEntry.name }}
-						</span>
-					</button>
+							<span class="size-2 rounded-full" :style="{ backgroundColor: legendEntry.color }" />
+							<span
+								:class="{
+									'line-through': legendEntry.hidden,
+									capitalize: shouldCapitalizeDatasetLabels,
+								}"
+							>
+								{{ legendEntry.name }}
+							</span>
+						</button>
+					</div>
 				</div>
 
-				<button
-					v-if="canShowMoreLegendEntries"
-					type="button"
-					class="mx-2 text-sm font-normal text-primary underline transition-all hover:brightness-125"
-					@click="showMoreLegendEntries"
+				<Transition
+					enter-active-class="transition-all duration-200 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-5"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-5"
+					leave-to-class="opacity-0 max-h-0"
 				>
-					Show more
-				</button>
-				<button
-					v-else-if="canShowLessLegendEntries"
-					type="button"
-					class="mx-2 text-sm font-normal text-primary underline transition-all hover:brightness-125"
-					@click="showLessLegendEntries"
-				>
-					Show less
-				</button>
+					<div
+						v-if="showLegendBottomFade"
+						class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-5 bg-gradient-to-t from-surface-3 to-transparent"
+					/>
+				</Transition>
 			</div>
 
 			<div
@@ -185,12 +202,18 @@
 
 <script setup lang="ts">
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
-import { injectModrinthClient, Tabs, type TabsTab, Toggle, useFormatNumber } from '@modrinth/ui'
+import {
+	injectModrinthClient,
+	Tabs,
+	type TabsTab,
+	Toggle,
+	useFormatNumber,
+	useScrollIndicator,
+} from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type {
-	AnalyticsBreakdownPreset,
 	AnalyticsDashboardStat,
 	AnalyticsGraphViewMode,
 } from '~/providers/analytics/analytics'
@@ -225,7 +248,7 @@ const {
 	activeGraphViewMode,
 	isRatioMode,
 	showChartEvents,
-	showAllLegendEntries,
+	isTopBreakdownFilterEnabled,
 	hiddenGraphDatasetIds,
 	hasProjectContext,
 	selectedTimeframeMode,
@@ -398,9 +421,16 @@ const allChartDatasets = computed(() =>
 )
 
 const chartContainer = ref<HTMLElement | null>(null)
+const legendContainer = ref<HTMLElement | null>(null)
 const chartTooltip = ref<InstanceType<typeof AnalyticsChartTooltip> | null>(null)
 const chartGeometry = ref<AnalyticsChartGeometryPayload | null>(null)
 const containerSize = reactive({ width: 0, height: 0 })
+const {
+	showTopFade: showLegendTopFade,
+	showBottomFade: showLegendBottomFade,
+	checkScrollState: checkLegendScrollState,
+	forceCheck: forceCheckLegendScrollState,
+} = useScrollIndicator(legendContainer)
 let resizeObserver: ResizeObserver | null = null
 let clearIgnoredChartClickTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -444,22 +474,6 @@ const hoveredLegendEntryId = ref<string | null>(null)
 const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
 
 const LEGEND_MAX_ITEMS = 8
-const LEGEND_EXPANDED_MAX_ITEMS = 24
-const OTHER_LEGEND_ENTRY_ID = '__analytics_other__'
-const OTHER_LEGEND_ENTRY_COLOR = 'hsl(218, 11%, 65%)'
-const BREAKDOWN_TOOLTIP_NOUNS: Record<AnalyticsBreakdownPreset, string> = {
-	none: 'items',
-	country: 'countries',
-	monetization: 'monetization values',
-	download_source: 'download sources',
-	download_reason: 'download types',
-	version_id: 'project versions',
-	loader: 'loaders',
-	game_version: 'game versions',
-}
-const expandedLegendMaxItems = computed(() =>
-	selectedBreakdown.value === 'none' ? Number.POSITIVE_INFINITY : LEGEND_EXPANDED_MAX_ITEMS,
-)
 
 type LegendEntry = {
 	id: string
@@ -468,7 +482,6 @@ type LegendEntry = {
 	color: string
 	totalValue: number
 	hidden: boolean
-	bundledEntryCount?: number
 }
 
 function setHoverState(payload: HoverState) {
@@ -625,46 +638,21 @@ const legendEntries = computed<LegendEntry[]>(() =>
 		.sort((a, b) => b.totalValue - a.totalValue || a.name.localeCompare(b.name)),
 )
 
-const otherBundledLegendIds = computed<string[]>(() => {
-	const maxItems = expandedLegendMaxItems.value
-	if (!showAllLegendEntries.value || legendEntries.value.length <= maxItems) {
-		return []
-	}
-	return legendEntries.value.slice(maxItems - 1).map((entry) => entry.id)
-})
-
-const otherLegendEntry = computed<LegendEntry | null>(() => {
-	const bundledIds = otherBundledLegendIds.value
-	if (bundledIds.length === 0) return null
-	const idSet = new Set(bundledIds)
-	const totalValue = legendEntries.value
-		.filter((entry) => idSet.has(entry.id))
-		.reduce((sum, entry) => sum + entry.totalValue, 0)
-	return {
-		id: OTHER_LEGEND_ENTRY_ID,
-		name: 'Other',
-		color: OTHER_LEGEND_ENTRY_COLOR,
-		totalValue,
-		hidden: hiddenDatasetIds.value.has(OTHER_LEGEND_ENTRY_ID),
-		bundledEntryCount: bundledIds.length,
-	}
-})
-
 const displayedLegendEntries = computed<LegendEntry[]>(() => {
-	if (!showAllLegendEntries.value) {
+	if (selectedBreakdown.value !== 'none' && isTopBreakdownFilterEnabled.value) {
 		return legendEntries.value.slice(0, LEGEND_MAX_ITEMS)
 	}
-	const maxItems = expandedLegendMaxItems.value
-	const other = otherLegendEntry.value
-	if (!other) return legendEntries.value.slice(0, maxItems)
-	return [...legendEntries.value.slice(0, maxItems - 1), other]
+	return legendEntries.value
 })
 
-const canShowMoreLegendEntries = computed(
-	() => !showAllLegendEntries.value && legendEntries.value.length > LEGEND_MAX_ITEMS,
-)
-const canShowLessLegendEntries = computed(
-	() => showAllLegendEntries.value && legendEntries.value.length > LEGEND_MAX_ITEMS,
+watch(
+	displayedLegendEntries,
+	() => {
+		nextTick(() => {
+			forceCheckLegendScrollState()
+		})
+	},
+	{ immediate: true, flush: 'post' },
 )
 
 watch(canUseRatioMode, (canUse) => {
@@ -673,39 +661,10 @@ watch(canUseRatioMode, (canUse) => {
 	}
 })
 
-const otherChartDataset = computed<ChartDataset | null>(() => {
-	const bundledIds = otherBundledLegendIds.value
-	if (bundledIds.length === 0) return null
-	const idSet = new Set(bundledIds)
-	const datasets = allChartDatasets.value.filter((dataset) => idSet.has(dataset.projectId))
-	if (datasets.length === 0) return null
-
-	const sliceLength = datasets[0].data.length
-	const data = new Array<number>(sliceLength).fill(0)
-	for (const dataset of datasets) {
-		for (let i = 0; i < sliceLength; i++) {
-			data[i] += dataset.data[i] ?? 0
-		}
-	}
-
-	return {
-		...datasets[0],
-		projectId: OTHER_LEGEND_ENTRY_ID,
-		label: 'Other',
-		projectName: undefined,
-		data,
-		borderColor: OTHER_LEGEND_ENTRY_COLOR,
-		backgroundColor: OTHER_LEGEND_ENTRY_COLOR,
-	}
-})
-
 const chartDatasetById = computed(() => {
 	const datasets = new Map<string, ChartDataset>()
 	for (const dataset of allChartDatasets.value) {
 		datasets.set(dataset.projectId, dataset)
-	}
-	if (otherChartDataset.value) {
-		datasets.set(OTHER_LEGEND_ENTRY_ID, otherChartDataset.value)
 	}
 	return datasets
 })
@@ -765,12 +724,6 @@ function isLegendEntryToggleDisabled(legendEntry: LegendEntry) {
 }
 
 function getLegendEntryTooltip(legendEntry: LegendEntry) {
-	if (legendEntry.id === OTHER_LEGEND_ENTRY_ID) {
-		const bundledEntryCount = legendEntry.bundledEntryCount ?? 0
-		const breakdownNoun = BREAKDOWN_TOOLTIP_NOUNS[selectedBreakdown.value]
-		return `All ${bundledEntryCount} other ${breakdownNoun} are in the breakdown table`
-	}
-
 	return legendEntry.projectName ?? ''
 }
 
@@ -819,14 +772,6 @@ function onLegendEntryClick(event: MouseEvent, datasetId: string) {
 	clearLegendHoverState()
 }
 
-function showMoreLegendEntries() {
-	showAllLegendEntries.value = true
-}
-
-function showLessLegendEntries() {
-	showAllLegendEntries.value = false
-}
-
 function areStringArraysEqual(left: string[], right: string[]) {
 	if (left.length !== right.length) return false
 	for (let index = 0; index < left.length; index += 1) {
@@ -852,9 +797,6 @@ watch(
 		if (datasets.length === 0) return
 
 		const availableDatasetIds = new Set(datasets.map((dataset) => dataset.projectId))
-		if (otherLegendEntry.value) {
-			availableDatasetIds.add(OTHER_LEGEND_ENTRY_ID)
-		}
 
 		const nextHiddenDatasetIds = hiddenGraphDatasetIds.value.filter((datasetId) =>
 			availableDatasetIds.has(datasetId),
@@ -874,10 +816,6 @@ watch(
 
 		if (!areStringArraysEqual(hiddenGraphDatasetIds.value, nextHiddenDatasetIds)) {
 			hiddenGraphDatasetIds.value = nextHiddenDatasetIds
-		}
-
-		if (datasets.length <= LEGEND_MAX_ITEMS) {
-			showAllLegendEntries.value = false
 		}
 	},
 	{ immediate: true },

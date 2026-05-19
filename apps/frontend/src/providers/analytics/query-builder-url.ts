@@ -60,7 +60,7 @@ export type AnalyticsGraphState = {
 	activeGraphViewMode: AnalyticsGraphViewMode
 	isRatioMode: boolean
 	showChartEvents: boolean
-	showAllLegendEntries: boolean
+	isTopBreakdownFilterEnabled: boolean
 	hiddenGraphDatasetIds: string[]
 }
 
@@ -76,7 +76,7 @@ export const DEFAULT_ANALYTICS_DASHBOARD_STAT: AnalyticsDashboardStat = 'views'
 export const DEFAULT_ANALYTICS_GRAPH_VIEW_MODE: AnalyticsGraphViewMode = 'line'
 export const DEFAULT_ANALYTICS_GRAPH_RATIO_MODE = false
 export const DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY = true
-export const DEFAULT_ANALYTICS_GRAPH_LEGEND_EXPANSION = false
+export const DEFAULT_ANALYTICS_GRAPH_TOP_BREAKDOWN_FILTER = true
 
 const TIMEFRAME_PRESET_VALUES: AnalyticsTimeframePreset[] = [
 	'today',
@@ -164,8 +164,9 @@ const QUERY_KEY_STAT = 'a_stat'
 const QUERY_KEY_GRAPH_VIEW_MODE = 'a_chart'
 const QUERY_KEY_GRAPH_RATIO_MODE = 'a_ratio'
 const QUERY_KEY_GRAPH_EVENTS_VISIBILITY = 'a_events'
-const QUERY_KEY_GRAPH_LEGEND_EXPANSION = 'a_legend_expanded'
+const QUERY_KEY_GRAPH_TOP_BREAKDOWN_FILTER = 'a_top_breakdown'
 const QUERY_KEY_GRAPH_HIDDEN_SERIES = 'a_hidden_series'
+const QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION = 'a_legend_expanded'
 
 const URL_FILTER_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'project'>[] = [
 	'project_status',
@@ -214,8 +215,9 @@ const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_GRAPH_VIEW_MODE,
 	QUERY_KEY_GRAPH_RATIO_MODE,
 	QUERY_KEY_GRAPH_EVENTS_VISIBILITY,
-	QUERY_KEY_GRAPH_LEGEND_EXPANSION,
+	QUERY_KEY_GRAPH_TOP_BREAKDOWN_FILTER,
 	QUERY_KEY_GRAPH_HIDDEN_SERIES,
+	QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION,
 ]
 
 export function buildEmptySelectedFilters(): AnalyticsSelectedFilters {
@@ -309,6 +311,13 @@ function parseVisibleQueryValue(
 	return rawValue !== '0'
 }
 
+function parseTopBreakdownFilterQueryValue(
+	value: LocationQueryValue | LocationQueryValue[] | undefined,
+): boolean {
+	const rawValue = Array.isArray(value) ? value[0] : value
+	return rawValue !== 'all'
+}
+
 function getLocalDateQueryValue(date: Date): string {
 	const year = date.getFullYear()
 	const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -375,7 +384,7 @@ export function buildDefaultAnalyticsGraphState(): AnalyticsGraphState {
 		activeGraphViewMode: DEFAULT_ANALYTICS_GRAPH_VIEW_MODE,
 		isRatioMode: DEFAULT_ANALYTICS_GRAPH_RATIO_MODE,
 		showChartEvents: DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY,
-		showAllLegendEntries: DEFAULT_ANALYTICS_GRAPH_LEGEND_EXPANSION,
+		isTopBreakdownFilterEnabled: DEFAULT_ANALYTICS_GRAPH_TOP_BREAKDOWN_FILTER,
 		hiddenGraphDatasetIds: [],
 	}
 }
@@ -429,7 +438,7 @@ export function isAnalyticsGraphStateDefault(state: AnalyticsGraphState): boolea
 		state.activeGraphViewMode === defaultState.activeGraphViewMode &&
 		state.isRatioMode === defaultState.isRatioMode &&
 		state.showChartEvents === defaultState.showChartEvents &&
-		state.showAllLegendEntries === defaultState.showAllLegendEntries &&
+		state.isTopBreakdownFilterEnabled === defaultState.isTopBreakdownFilterEnabled &&
 		areStringArraysEqual(state.hiddenGraphDatasetIds, defaultState.hiddenGraphDatasetIds)
 	)
 }
@@ -526,7 +535,9 @@ export function readAnalyticsGraphState(query: LocationQuery): AnalyticsGraphSta
 		),
 		isRatioMode: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_RATIO_MODE]),
 		showChartEvents: parseVisibleQueryValue(query[QUERY_KEY_GRAPH_EVENTS_VISIBILITY]),
-		showAllLegendEntries: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_LEGEND_EXPANSION]),
+		isTopBreakdownFilterEnabled: parseTopBreakdownFilterQueryValue(
+			query[QUERY_KEY_GRAPH_TOP_BREAKDOWN_FILTER],
+		),
 		hiddenGraphDatasetIds: parseListQueryValue(query[QUERY_KEY_GRAPH_HIDDEN_SERIES]),
 	}
 }
@@ -672,9 +683,13 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 				: undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_RATIO_MODE] = graphState.isRatioMode ? '1' : undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_EVENTS_VISIBILITY] = graphState.showChartEvents ? undefined : '0'
-		nextRouteQuery[QUERY_KEY_GRAPH_LEGEND_EXPANSION] = graphState.showAllLegendEntries
-			? '1'
-			: undefined
+		nextRouteQuery[QUERY_KEY_GRAPH_TOP_BREAKDOWN_FILTER] =
+			state.selectedBreakdown === DEFAULT_BREAKDOWN_PRESET
+				? undefined
+				: graphState.isTopBreakdownFilterEnabled
+					? 'top8'
+					: 'all'
+		nextRouteQuery[QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION] = undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_HIDDEN_SERIES] = serializeListQueryValue(
 			[...graphState.hiddenGraphDatasetIds].sort((left, right) => left.localeCompare(right)),
 		)

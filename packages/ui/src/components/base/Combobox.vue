@@ -53,7 +53,7 @@
 				{
 					'z-[9999]': isOpen,
 					'cursor-not-allowed opacity-50': disabled,
-					'cursor-pointer hover:brightness-125 active:brightness-125': !disabled,
+					'cursor-pointer hover:brightness-110 active:brightness-110': !disabled,
 				},
 			]"
 			:aria-expanded="isOpen"
@@ -186,10 +186,11 @@
 </template>
 
 <script setup lang="ts" generic="T">
+import 'overlayscrollbars/overlayscrollbars.css'
+
 import { ChevronLeftIcon, SearchIcon } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
-import 'overlayscrollbars/overlayscrollbars.css'
 import {
 	type Component,
 	computed,
@@ -391,7 +392,7 @@ const shouldRenderDropdown = computed(() => {
 	return isOpen.value && hasDropdownContent.value
 })
 
-function getOptionClasses(item: ComboboxOption<T> & { key: string }, index: number) {
+function getOptionClasses(item: ComboboxOption<T> & { key: string }, _index: number) {
 	const isSelected = props.listbox && item.value === props.modelValue
 
 	return [

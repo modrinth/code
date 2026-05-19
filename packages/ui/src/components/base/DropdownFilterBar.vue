@@ -26,6 +26,15 @@
 		@open="openPreviewFilterDraft(preview.key)"
 		@close="commitPreviewFilterDraft(preview.key)"
 	>
+		<template v-if="$slots['preview-top'] && preview.category.syntheticOptions?.length" #top>
+			<slot
+				name="preview-top"
+				:category="preview.category"
+				:selected-values="getPreviewSelectedValues(preview.key)"
+				:set-selected-values="(values) => setPreviewSelectedValues(preview.key, values)"
+				:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
+			></slot>
+		</template>
 		<template #input-content="{ isOpen, openDirection }">
 			<div class="flex min-h-8 max-w-80 items-center gap-2">
 				<span class="min-w-0 flex-1 truncate">
@@ -158,6 +167,16 @@
 				></slot>
 			</div>
 
+			<div v-if="$slots['category-top']" class="border-0 border-b border-solid border-b-surface-5">
+				<slot
+					name="category-top"
+					:category="activeCategory"
+					:selected-values="activeCategorySelectedValues"
+					:set-selected-values="setActiveCategorySelectedValues"
+					:close-menu="closeAddMenu"
+				></slot>
+			</div>
+
 			<div
 				v-if="activeCategorySelectionCount > 0"
 				class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-3 py-2.5 text-sm"
@@ -254,6 +273,8 @@
 </template>
 
 <script setup lang="ts">
+import 'overlayscrollbars/overlayscrollbars.css'
+
 import {
 	CheckIcon,
 	ChevronLeftIcon,
@@ -265,7 +286,6 @@ import {
 } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
-import 'overlayscrollbars/overlayscrollbars.css'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
@@ -285,6 +305,7 @@ export type DropdownFilterBarCategory = {
 	key: string
 	label: string
 	options: DropdownFilterBarOption[]
+	syntheticOptions?: DropdownFilterBarOption[]
 	searchable?: boolean
 	searchPlaceholder?: string
 	submenuClass?: string
@@ -402,13 +423,17 @@ let previousMousePosition: Point | null = null
 
 const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	const source = isAddMenuOpen.value ? 'draft' : 'committed'
-	return props.categories.map((category) => ({
-		...category,
-		options: getOptionsWithSelectedValues(
-			category.options,
-			getSelectedValues(category.key, source),
-		),
-	}))
+	return props.categories.map((category) => {
+		const syntheticValues = getCategorySyntheticValueSet(category)
+		const selectedValues = getSelectedValues(category.key, source).filter(
+			(value) => !syntheticValues.has(value),
+		)
+
+		return {
+			...category,
+			options: getOptionsWithSelectedValues(category.options, selectedValues),
+		}
+	})
 })
 
 const filterCategoriesByKey = computed(
@@ -509,12 +534,7 @@ const appliedFilterPreviews = computed(() =>
 			summary: getCategorySelectionSummary(category),
 			count: getCategorySelectionCount(category.key),
 			category,
-			options: category.options.map((option) => ({
-				value: option.value,
-				label: option.label,
-				searchTerms: option.searchTerms,
-				disabled: option.disabled,
-			})) as MultiSelectOption<string>[],
+			options: getVisiblePreviewOptions(category),
 		}))
 		.filter((preview) => preview.count > 0),
 )
@@ -578,6 +598,35 @@ function getOptionsWithSelectedValues(
 		}))
 
 	return [...options, ...missingSelectedOptions]
+}
+
+function getCategorySyntheticValueSet(category: DropdownFilterBarCategory): Set<string> {
+	return new Set((category.syntheticOptions ?? []).map((option) => option.value))
+}
+
+function getCategorySyntheticValues(categoryKey: string): Set<string> {
+	const category = filterCategoriesByKey.value.get(categoryKey)
+	return category ? getCategorySyntheticValueSet(category) : new Set()
+}
+
+function getVisiblePreviewOptions(
+	category: DropdownFilterBarCategory,
+): MultiSelectOption<string>[] {
+	return category.options.map((option) => ({
+		value: option.value,
+		label: option.label,
+		searchTerms: option.searchTerms,
+		disabled: option.disabled,
+	})) as MultiSelectOption<string>[]
+}
+
+function getPreviewOptionLabel(
+	category: DropdownFilterBarCategory,
+	selectedValue: string,
+): string | undefined {
+	return [...(category.syntheticOptions ?? []), ...category.options].find(
+		(option) => option.value === selectedValue,
+	)?.label
 }
 
 function getSelectedValues(
@@ -718,8 +767,13 @@ function toggleFilterValue(categoryKey: string, value: string, nextValue: boolea
 	const currentValues = getSelectedValues(categoryKey, 'draft')
 
 	if (nextValue) {
-		if (!currentValues.includes(value)) {
-			setSelectedValues(categoryKey, [...currentValues, value], 'draft')
+		const syntheticValues = getCategorySyntheticValues(categoryKey)
+		const nextValues = syntheticValues.has(value)
+			? [value]
+			: currentValues.filter((item) => !syntheticValues.has(item))
+
+		if (!nextValues.includes(value)) {
+			setSelectedValues(categoryKey, [...nextValues, value], 'draft')
 		}
 	} else {
 		setSelectedValues(
@@ -809,7 +863,7 @@ function getCategorySelectionSummary(category: DropdownFilterBarCategory): strin
 
 	if (count === 1) {
 		const selectedValue = getSelectedValues(category.key)[0]
-		return category.options.find((option) => option.value === selectedValue)?.label ?? '1 selected'
+		return getPreviewOptionLabel(category, selectedValue) ?? '1 selected'
 	}
 
 	return `${count} selected`
