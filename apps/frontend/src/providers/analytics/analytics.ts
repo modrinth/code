@@ -59,6 +59,9 @@ const REVENUE_GROUP_BY_FALLBACK: AnalyticsGroupByPreset = 'day'
 const REVENUE_MIN_TIMEFRAME_MS = 1 * 24 * 60 * 60 * 1000 // need at least 1 day in timeframe range to show revenue
 const ANALYTICS_DAY_MS = 24 * 60 * 60 * 1000
 const ANALYTICS_MAX_TIME_SLICES = 256 // controls granularity allowed in "group by" for timeframe ranges
+const ANALYTICS_TIME_SLICES_GC_TIME_MS = 30 * 1000
+const ANALYTICS_PREFETCH_GC_TIME_MS = 15 * 1000
+const ANALYTICS_FILTER_OPTIONS_GC_TIME_MS = 60 * 1000
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -1816,6 +1819,7 @@ export function createAnalyticsDashboardContext(
 			return response.metrics
 		},
 		enabled: computed(() => isAnalyticsFetchRequestReady(fetchRequest.value)),
+		gcTime: ANALYTICS_TIME_SLICES_GC_TIME_MS,
 	})
 	const isCurrentTimeSliceLoading = computed(
 		() => isAnalyticsFetchRequestReady(fetchRequest.value) && currentTimeSlicePending.value,
@@ -1850,6 +1854,7 @@ export function createAnalyticsDashboardContext(
 						const response = await client.labrinth.analytics_v3.fetch(nextFetchRequest)
 						return response.metrics
 					},
+					gcTime: ANALYTICS_PREFETCH_GC_TIME_MS,
 				})
 				.catch(() => {})
 		},
@@ -1901,6 +1906,7 @@ export function createAnalyticsDashboardContext(
 				return response.metrics
 			},
 			enabled: computed(() => analyticsFilterOptionsRequest.value !== null),
+			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 		})
 
 	const { data: filterOptionProjectVersions, isFetched: hasFetchedFilterOptionProjectVersions } =
@@ -1925,6 +1931,7 @@ export function createAnalyticsDashboardContext(
 			},
 			enabled: computed(() => sortedSelectedProjectIds.value.length > 0),
 			placeholderData: [],
+			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 		})
 
 	const analyticsDataFilterOptionSummary = computed(() =>
@@ -2006,6 +2013,7 @@ export function createAnalyticsDashboardContext(
 			return response.metrics
 		},
 		enabled: computed(() => previousFetchRequest.value !== null),
+		gcTime: ANALYTICS_TIME_SLICES_GC_TIME_MS,
 	})
 
 	const timeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
@@ -2097,6 +2105,7 @@ export function createAnalyticsDashboardContext(
 			),
 		enabled: computed(() => analyticsVersionIds.value.length > 0),
 		placeholderData: [],
+		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 	})
 
 	const allVersionMetadata = computed(() => {

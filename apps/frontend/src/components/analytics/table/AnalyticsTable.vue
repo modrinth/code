@@ -9,7 +9,7 @@
 			:data="paginatedRows"
 			row-key="id"
 			selection-key="graphDatasetId"
-			:selection-data="sortedRows"
+			:selection-ids="selectableGraphDatasetIds"
 			:show-selection="showGraphDatasetSelection"
 			virtualized
 			:virtual-row-height="56"
@@ -147,7 +147,8 @@ type AnalyticsTableRow = {
 	playtime: number
 }
 
-type SortedRowsCache = {
+type DisplayedRowsCache = {
+	mode: TableMode
 	sortColumn: TableColumnKey | undefined
 	sortDirection: SortDirection
 	rows: AnalyticsTableRow[]
@@ -180,19 +181,10 @@ const displayedSortColumn = ref<TableColumnKey | undefined>('date')
 const displayedSortDirection = ref<SortDirection>('asc')
 const PAGE_SIZE = 500
 const GRAPH_DATASET_SELECTION_LIMIT = 8
-const INACTIVE_MODE_WARMUP_POINT_LIMIT = 12000
 const ALL_PROJECTS_DATASET_ID = 'all'
 const ALL_PROJECTS_BREAKDOWN_VALUE = 'all'
 const currentPage = ref(1)
 const sortCollator = new Intl.Collator(undefined, { sensitivity: 'base' })
-const tableRowsByMode = shallowRef<Record<TableMode, AnalyticsTableRow[] | null>>({
-	date_breakdown: null,
-	breakdown_only: null,
-})
-const sortedRowsByMode = shallowRef<Record<TableMode, SortedRowsCache | null>>({
-	date_breakdown: null,
-	breakdown_only: null,
-})
 const modeBuildRequestIds: Record<TableMode, number> = {
 	date_breakdown: 0,
 	breakdown_only: 0,
@@ -200,6 +192,7 @@ const modeBuildRequestIds: Record<TableMode, number> = {
 let tableCacheGeneration = 0
 const displayedTableMode = ref<TableMode>('breakdown_only')
 const displayedSortedRows = shallowRef<AnalyticsTableRow[]>([])
+const displayedRowsCache = shallowRef<DisplayedRowsCache | null>(null)
 
 const selectedProjectIdSet = computed(
 	() =>
@@ -269,9 +262,6 @@ const projectNamesById = computed(
 	() => new Map(projects.value.map((project) => [project.id, project.name])),
 )
 const hasAvailableProjects = computed(() => projects.value.length > 0)
-const analyticsPointCount = computed(() =>
-	timeSlices.value.reduce((sum, slice) => sum + slice.length, 0),
-)
 const emptyTableMessage = computed(() => {
 	if (hasProjectContext.value) {
 		return 'No data available for analytics'
@@ -517,6 +507,7 @@ watch(includeDateColumn, () => {
 const sortedRows = computed<AnalyticsTableRow[]>(() => {
 	return displayedSortedRows.value
 })
+const selectableGraphDatasetIds = computed(() => getSelectableGraphDatasetIds(sortedRows.value))
 
 watch(
 	showGraphDatasetSelection,
@@ -540,13 +531,13 @@ watch(activeStat, () => {
 })
 
 watch(
-	[sortedRows, showGraphDatasetSelection],
+	[selectableGraphDatasetIds, showGraphDatasetSelection],
 	() => {
 		if (!showGraphDatasetSelection.value) {
 			return
 		}
 
-		selectedGraphDatasetIds.value = getDefaultSelectedGraphDatasetIds(sortedRows.value)
+		selectedGraphDatasetIds.value = getDefaultSelectedGraphDatasetIds(selectableGraphDatasetIds.value)
 	},
 	{ immediate: true },
 )
@@ -564,7 +555,6 @@ watch(
 	() => {
 		invalidateTableCaches()
 		scheduleRowsForMode(activeTableMode.value)
-		scheduleInactiveModeWarmup()
 	},
 	{ immediate: true, flush: 'post' },
 )
@@ -572,13 +562,11 @@ watch(
 watch(activeTableMode, () => {
 	currentPage.value = 1
 	scheduleRowsForMode(activeTableMode.value)
-	scheduleInactiveModeWarmup()
 })
 
 watch([sortColumn, sortDirection], () => {
 	invalidateSortedCaches()
 	scheduleRowsForMode(activeTableMode.value)
-	scheduleInactiveModeWarmup()
 })
 
 const pageCount = computed(() => Math.max(Math.ceil(sortedRows.value.length / PAGE_SIZE), 1))
@@ -604,48 +592,36 @@ watch(pageCount, (nextPageCount) => {
 
 function invalidateTableCaches() {
 	tableCacheGeneration++
-	tableRowsByMode.value = {
-		date_breakdown: null,
-		breakdown_only: null,
-	}
 	invalidateSortedCaches()
 }
 
 function invalidateSortedCaches() {
-	sortedRowsByMode.value = {
-		date_breakdown: null,
-		breakdown_only: null,
-	}
+	displayedRowsCache.value = null
 }
 
 function hasSortedRowsForMode(mode: TableMode): boolean {
-	const cached = sortedRowsByMode.value[mode]
+	const cached = displayedRowsCache.value
 	return (
 		cached !== null &&
+		cached.mode === mode &&
 		cached.sortColumn === sortColumn.value &&
 		cached.sortDirection === sortDirection.value
 	)
 }
 
-function setCachedTableRows(mode: TableMode, rows: AnalyticsTableRow[]) {
-	tableRowsByMode.value = {
-		...tableRowsByMode.value,
-		[mode]: rows,
-	}
-}
-
-function setCachedSortedRows(mode: TableMode, rows: AnalyticsTableRow[]) {
-	sortedRowsByMode.value = {
-		...sortedRowsByMode.value,
-		[mode]: {
-			sortColumn: sortColumn.value,
-			sortDirection: sortDirection.value,
-			rows,
-		},
+function setDisplayedRowsForMode(mode: TableMode, rows: AnalyticsTableRow[]) {
+	displayedRowsCache.value = {
+		mode,
+		sortColumn: sortColumn.value,
+		sortDirection: sortDirection.value,
+		rows,
 	}
 
 	if (mode === activeTableMode.value) {
-		displayRowsForMode(mode)
+		displayedTableMode.value = mode
+		displayedSortColumn.value = sortColumn.value
+		displayedSortDirection.value = sortDirection.value
+		displayedSortedRows.value = rows
 	}
 }
 
@@ -664,8 +640,8 @@ function scheduleRowsForMode(mode: TableMode) {
 }
 
 function displayRowsForMode(mode: TableMode) {
-	const cached = sortedRowsByMode.value[mode]
-	if (!cached) {
+	const cached = displayedRowsCache.value
+	if (!cached || cached.mode !== mode) {
 		return
 	}
 
@@ -682,18 +658,13 @@ async function buildRowsForMode(mode: TableMode, generation: number, requestId: 
 		return
 	}
 
-	const cachedRows = tableRowsByMode.value[mode]
-	const rows = cachedRows ?? buildTableRows(mode)
+	const rows = sortTableRows(buildTableRows(mode))
 
 	if (isStaleBuild(mode, generation, requestId)) {
 		return
 	}
 
-	if (!cachedRows) {
-		setCachedTableRows(mode, rows)
-	}
-
-	setCachedSortedRows(mode, sortTableRows(rows))
+	setDisplayedRowsForMode(mode, rows)
 }
 
 function isStaleBuild(mode: TableMode, generation: number, requestId: number): boolean {
@@ -710,39 +681,6 @@ function waitForDeferredTableWork(): Promise<void> {
 			requestAnimationFrame(() => resolve())
 		})
 	})
-}
-
-function scheduleInactiveModeWarmup() {
-	if (!showBreakdownColumn.value) {
-		return
-	}
-	if (analyticsPointCount.value > INACTIVE_MODE_WARMUP_POINT_LIMIT) {
-		return
-	}
-
-	const inactiveMode: TableMode =
-		activeTableMode.value === 'date_breakdown' ? 'breakdown_only' : 'date_breakdown'
-
-	if (hasSortedRowsForMode(inactiveMode)) {
-		return
-	}
-
-	if (!import.meta.client) {
-		scheduleRowsForMode(inactiveMode)
-		return
-	}
-
-	const windowWithIdleCallback = window as Window & {
-		requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number
-	}
-
-	if (windowWithIdleCallback.requestIdleCallback) {
-		windowWithIdleCallback.requestIdleCallback(() => scheduleRowsForMode(inactiveMode), {
-			timeout: 2000,
-		})
-	} else {
-		window.setTimeout(() => scheduleRowsForMode(inactiveMode), 250)
-	}
 }
 
 function sortTableRows(rows: AnalyticsTableRow[]): AnalyticsTableRow[] {
@@ -914,11 +852,14 @@ function getGraphDatasetId(breakdown: string, selectedBreakdown: AnalyticsBreakd
 	return `breakdown:${breakdown}`
 }
 
-function getDefaultSelectedGraphDatasetIds(rows: AnalyticsTableRow[]): string[] {
-	const ids = rows.map((row) => row.graphDatasetId)
+function getDefaultSelectedGraphDatasetIds(ids: string[]): string[] {
 	return ids.length > GRAPH_DATASET_SELECTION_LIMIT
 		? ids.slice(0, GRAPH_DATASET_SELECTION_LIMIT)
 		: ids
+}
+
+function getSelectableGraphDatasetIds(rows: AnalyticsTableRow[]): string[] {
+	return Array.from(new Set(rows.map((row) => row.graphDatasetId)))
 }
 
 function getGroupByLabel(groupBy: string): string {
@@ -1045,12 +986,17 @@ function escapeCsvField(value: string | number): string {
 }
 
 function getCsvRows(mode: TableMode): AnalyticsTableRow[] {
-	if (mode === displayedTableMode.value) {
+	const displayedCache = displayedRowsCache.value
+	if (
+		displayedCache &&
+		displayedCache.mode === mode &&
+		displayedCache.sortColumn === sortColumn.value &&
+		displayedCache.sortDirection === sortDirection.value
+	) {
 		return sortedRows.value
 	}
 
-	const cachedRows = tableRowsByMode.value[mode]
-	return sortTableRows(cachedRows ?? buildTableRows(mode))
+	return sortTableRows(buildTableRows(mode))
 }
 
 function getCsvColumns(mode: TableMode): TableColumn<TableColumnKey>[] {

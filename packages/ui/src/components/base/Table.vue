@@ -157,6 +157,7 @@ const props = withDefaults(
 		rowKey?: keyof T /* The key used to uniquely identify each row */
 		selectionKey?: keyof T /* The key used to identify selectable rows */
 		selectionData?: T[] /* The complete selectable data set when data is paginated */
+		selectionIds?: unknown[] /* Complete selectable IDs when callers do not want to retain row objects */
 		virtualized?: boolean
 		virtualRowHeight?: number
 		virtualBufferSize?: number /* The number of extra rows rendered above and below the visible viewport */
@@ -206,19 +207,28 @@ const emit = defineEmits<{
 }>()
 
 const selectableRows = computed(() => props.selectionData ?? props.data)
-const selectableRowIds = computed(() => selectableRows.value.map((row) => getSelectionId(row)))
-const selectedSelectableIds = computed(() =>
-	selectableRowIds.value.filter((id) => selectedIds.value.includes(id)),
+const selectableRowIds = computed(
+	() => props.selectionIds ?? selectableRows.value.map((row) => getSelectionId(row)),
 )
+const selectedIdSet = computed(() => new Set(selectedIds.value))
+const selectedSelectableIdCount = computed(() => {
+	let count = 0
+	for (const id of selectableRowIds.value) {
+		if (selectedIdSet.value.has(id)) {
+			count++
+		}
+	}
+	return count
+})
 const allSelected = computed(
 	() =>
 		selectableRowIds.value.length > 0 &&
-		selectedSelectableIds.value.length === selectableRowIds.value.length,
+		selectedSelectableIdCount.value === selectableRowIds.value.length,
 )
 const someSelected = computed(
 	() =>
-		selectedSelectableIds.value.length > 0 &&
-		selectedSelectableIds.value.length < selectableRowIds.value.length,
+		selectedSelectableIdCount.value > 0 &&
+		selectedSelectableIdCount.value < selectableRowIds.value.length,
 )
 
 function getRowId(row: T): unknown {
@@ -247,7 +257,7 @@ function getRowRenderKey(row: T, rowIndex: number): PropertyKey {
 }
 
 function isSelected(row: T): boolean {
-	return selectedIds.value.includes(getSelectionId(row))
+	return selectedIdSet.value.has(getSelectionId(row))
 }
 
 function toggleSelection(row: T) {
@@ -261,7 +271,7 @@ function toggleSelection(row: T) {
 
 function toggleSelectAll(selectAll: boolean) {
 	if (selectAll) {
-		selectedIds.value = selectableRowIds.value
+		selectedIds.value = [...selectableRowIds.value]
 	} else {
 		selectedIds.value = []
 	}
