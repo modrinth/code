@@ -373,13 +373,15 @@ const messages = defineMessages({
 	},
 })
 
+const chargeId = useRouteId('chargeId')
+
 const {
 	data: user,
 	error: userError,
 	suspense: userSuspense,
 } = useQuery({
-	queryKey: ['user', route.params.id],
-	queryFn: () => labrinth.users_v2.get(route.params.id),
+	queryKey: ['user', chargeId],
+	queryFn: () => labrinth.users_v2.get(chargeId),
 })
 
 onServerPrefetch(userSuspense)

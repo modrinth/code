@@ -48,7 +48,7 @@ const copySubdomain = () => {
 }
 
 const route = useRoute()
-const serverId = props.serverId || (route.params.id as string)
+const serverId = props.serverId ?? route.params.id ?? route.params['serverId']
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 	hideSubdomainLabel: false,
