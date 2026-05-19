@@ -87,6 +87,38 @@ export const WithSelection: StoryObj = {
 	}),
 }
 
+export const WithSelectionData: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Name' },
+				{ key: 'email', label: 'Email' },
+				{ key: 'status', label: 'Status' },
+				{ key: 'role', label: 'Role' },
+			]
+			const data = sampleUsers.slice(0, 2)
+			const selectionData = sampleUsers
+			const selectedIds = ref<string[]>([])
+			return { columns, data, selectionData, selectedIds }
+		},
+		template: /* html */ `
+			<div class="space-y-4">
+				<Table
+					:columns="columns"
+					:data="data"
+					:selection-data="selectionData"
+					show-selection
+					row-key="id"
+					v-model:selected-ids="selectedIds"
+				/>
+				<p class="text-secondary">Selected IDs: {{ selectedIds.join(', ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const WithSorting: StoryObj = {
 	args: {},
 	render: () => ({

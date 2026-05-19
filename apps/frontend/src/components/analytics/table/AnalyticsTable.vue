@@ -6,7 +6,11 @@
 			:sort-direction="displayedSortDirection"
 			:columns="columns"
 			:data="paginatedRows"
+			v-model:selected-ids="selectedGraphDatasetIds"
 			row-key="id"
+			selection-key="graphDatasetId"
+			:selection-data="sortedRows"
+			:show-selection="showGraphDatasetSelection"
 			virtualized
 			:virtual-row-height="56"
 			@sort="applyRequestedSort"
@@ -23,11 +27,24 @@
 
 						<div v-if="showDateToggle" class="mx-1 h-6 w-px bg-surface-5"></div>
 
-						<ButtonStyled>
+						<ButtonStyled v-if="showCsvExportMenu">
+							<OverflowMenu
+								class="!shadow-none"
+								:options="csvExportOptions"
+								:disabled="isDataLoading || sortedRows.length === 0"
+							>
+								<DownloadIcon />
+								Export CSV
+								<DropdownIcon />
+								<template #cumulative-csv> Cumulative CSV </template>
+								<template #grouped-csv> Grouped by {{ groupByLabel }} CSV </template>
+							</OverflowMenu>
+						</ButtonStyled>
+						<ButtonStyled v-else>
 							<button
 								class="!shadow-none"
 								:disabled="isDataLoading || sortedRows.length === 0"
-								@click="downloadCsv"
+								@click="downloadCsv(displayedTableMode)"
 							>
 								<DownloadIcon />
 								Export CSV
@@ -91,9 +108,11 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon } from '@modrinth/assets'
+import { DownloadIcon, DropdownIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	OverflowMenu,
+	type OverflowMenuOption,
 	Pagination,
 	Table,
 	type TableColumn,
@@ -138,6 +157,7 @@ type AnalyticsTableRow = {
 	dateMs: number
 	project: string
 	breakdown: string
+	graphDatasetId: string
 	breakdownDisplay: string
 	views: number
 	downloads: number
@@ -160,6 +180,9 @@ const {
 	displayedSelectedFilters: selectedFilters,
 	displayedFetchRequest: fetchRequest,
 	displayedTimeSlices: timeSlices,
+	activeStat,
+	isGraphDatasetSelectionActive,
+	selectedGraphDatasetIds,
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
 	getVersionDisplayName,
@@ -174,6 +197,7 @@ const sortDirection = ref<SortDirection>('asc')
 const displayedSortColumn = ref<TableColumnKey | undefined>('date')
 const displayedSortDirection = ref<SortDirection>('asc')
 const PAGE_SIZE = 500
+const GRAPH_DATASET_SELECTION_LIMIT = 8
 const INACTIVE_MODE_WARMUP_POINT_LIMIT = 12000
 const currentPage = ref(1)
 const sortCollator = new Intl.Collator(undefined, { sensitivity: 'base' })
@@ -216,21 +240,42 @@ const isSingleProjectView = computed(() => selectedProjectIdSet.value.size === 1
 const showBreakdownColumn = computed(
 	() => selectedBreakdown.value !== 'none' || !isSingleProjectView.value,
 )
+const showGraphDatasetSelection = computed(
+	() => selectedBreakdown.value !== 'none' || selectedProjectIdSet.value.size > 1,
+)
 const showProjectVersionProjectColumn = computed(
 	() => selectedBreakdown.value === 'version_id' && selectedProjectIdSet.value.size > 1,
 )
-const showDateToggle = computed(() => showBreakdownColumn.value)
+const showDateToggle = computed(() => showBreakdownColumn.value && !showGraphDatasetSelection.value)
 const includeDateColumn = computed(
-	() => tableMode.value === 'date_breakdown' || !showBreakdownColumn.value,
+	() =>
+		!showGraphDatasetSelection.value &&
+		(tableMode.value === 'date_breakdown' || !showBreakdownColumn.value),
 )
 const activeTableMode = computed<TableMode>(() =>
-	tableMode.value === 'date_breakdown' || !showBreakdownColumn.value
-		? 'date_breakdown'
-		: 'breakdown_only',
+	showGraphDatasetSelection.value
+		? 'breakdown_only'
+		: tableMode.value === 'date_breakdown' || !showBreakdownColumn.value
+			? 'date_breakdown'
+			: 'breakdown_only',
 )
-const displayedIncludeDateColumn = computed(
-	() => displayedTableMode.value === 'date_breakdown' || !showBreakdownColumn.value,
+const displayedIncludeDateColumn = computed(() =>
+	showGraphDatasetSelection.value
+		? false
+		: displayedTableMode.value === 'date_breakdown' || !showBreakdownColumn.value,
 )
+const showCsvExportMenu = computed(() => showGraphDatasetSelection.value)
+const groupByLabel = computed(() => getGroupByLabel(selectedGroupBy.value))
+const csvExportOptions = computed<OverflowMenuOption[]>(() => [
+	{
+		id: 'cumulative-csv',
+		action: () => downloadCsv('breakdown_only'),
+	},
+	{
+		id: 'grouped-csv',
+		action: () => downloadCsv('date_breakdown'),
+	},
+])
 const projectNamesById = computed(
 	() => new Map(projects.value.map((project) => [project.id, project.name])),
 )
@@ -345,6 +390,7 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 			dateMs: bucketLabel?.dateMs ?? 0,
 			project: getProjectDisplayValueForBreakdown(breakdown),
 			breakdown,
+			graphDatasetId: getGraphDatasetId(breakdown, nextSelectedBreakdown),
 			breakdownDisplay: getBreakdownDisplayValue(breakdown),
 			views: 0,
 			downloads: 0,
@@ -467,6 +513,39 @@ watch(includeDateColumn, () => {
 const sortedRows = computed<AnalyticsTableRow[]>(() => {
 	return displayedSortedRows.value
 })
+
+watch(
+	showGraphDatasetSelection,
+	(nextShowSelection) => {
+		isGraphDatasetSelectionActive.value = nextShowSelection
+		if (nextShowSelection) {
+			applyActiveStatSort()
+		} else {
+			selectedGraphDatasetIds.value = []
+		}
+	},
+	{ immediate: true },
+)
+
+watch(activeStat, () => {
+	if (!showGraphDatasetSelection.value) {
+		return
+	}
+
+	applyActiveStatSort()
+})
+
+watch(
+	[sortedRows, showGraphDatasetSelection],
+	() => {
+		if (!showGraphDatasetSelection.value) {
+			return
+		}
+
+		selectedGraphDatasetIds.value = getDefaultSelectedGraphDatasetIds(sortedRows.value)
+	},
+	{ immediate: true },
+)
 
 watch(
 	[
@@ -733,6 +812,7 @@ function getMetricColumnForStat(stat: AnalyticsDashboardStat): TableColumn<Table
 				key: 'views',
 				label: 'Views',
 				enableSorting: true,
+				defaultSortDirection: 'desc',
 				align: 'right',
 			}
 		case 'downloads':
@@ -740,6 +820,7 @@ function getMetricColumnForStat(stat: AnalyticsDashboardStat): TableColumn<Table
 				key: 'downloads',
 				label: 'Downloads',
 				enableSorting: true,
+				defaultSortDirection: 'desc',
 				align: 'right',
 			}
 		case 'revenue':
@@ -747,6 +828,7 @@ function getMetricColumnForStat(stat: AnalyticsDashboardStat): TableColumn<Table
 				key: 'revenue',
 				label: 'Revenue',
 				enableSorting: true,
+				defaultSortDirection: 'desc',
 				align: 'right',
 			}
 		case 'playtime':
@@ -754,6 +836,7 @@ function getMetricColumnForStat(stat: AnalyticsDashboardStat): TableColumn<Table
 				key: 'playtime',
 				label: 'Playtime',
 				enableSorting: true,
+				defaultSortDirection: 'desc',
 				align: 'right',
 			}
 		default:
@@ -765,6 +848,16 @@ function applyDefaultSort(nextColumns = activeColumns.value) {
 	const nextSortColumn = getDefaultSortColumn(nextColumns)
 	sortColumn.value = nextSortColumn
 	sortDirection.value = getDefaultSortDirection(nextSortColumn)
+}
+
+function applyActiveStatSort() {
+	const availableColumns = new Set(activeColumns.value.map((column) => column.key))
+	if (!availableColumns.has(activeStat.value)) {
+		return
+	}
+
+	sortColumn.value = activeStat.value
+	sortDirection.value = 'desc'
 }
 
 function applyRequestedSort(column: string, direction: SortDirection) {
@@ -784,6 +877,10 @@ function getDefaultSortColumn(
 		return 'date'
 	}
 
+	if (showGraphDatasetSelection.value && availableColumns.has(activeStat.value)) {
+		return activeStat.value
+	}
+
 	if (availableColumns.has('downloads')) {
 		return 'downloads'
 	}
@@ -800,6 +897,36 @@ function getBreakdownValue(
 	selectedBreakdown: AnalyticsBreakdownPreset,
 ): string {
 	return getAnalyticsBreakdownValue(point, selectedBreakdown)
+}
+
+function getGraphDatasetId(breakdown: string, selectedBreakdown: AnalyticsBreakdownPreset): string {
+	return selectedBreakdown === 'none' ? breakdown : `breakdown:${breakdown}`
+}
+
+function getDefaultSelectedGraphDatasetIds(rows: AnalyticsTableRow[]): string[] {
+	const ids = rows.map((row) => row.graphDatasetId)
+	return ids.length > GRAPH_DATASET_SELECTION_LIMIT
+		? ids.slice(0, GRAPH_DATASET_SELECTION_LIMIT)
+		: ids
+}
+
+function getGroupByLabel(groupBy: string): string {
+	switch (groupBy) {
+		case '1h':
+			return '1h'
+		case '6h':
+			return '6h'
+		case 'day':
+			return 'Day'
+		case 'week':
+			return 'Week'
+		case 'month':
+			return 'Month'
+		case 'year':
+			return 'Year'
+		default:
+			return 'Date'
+	}
 }
 
 function getRowComparator(
@@ -906,17 +1033,35 @@ function escapeCsvField(value: string | number): string {
 	return stringValue
 }
 
-function downloadCsv() {
-	if (!import.meta.client || sortedRows.value.length === 0) {
+function getCsvRows(mode: TableMode): AnalyticsTableRow[] {
+	if (mode === displayedTableMode.value) {
+		return sortedRows.value
+	}
+
+	const cachedRows = tableRowsByMode.value[mode]
+	return sortTableRows(cachedRows ?? buildTableRows(mode))
+}
+
+function getCsvColumns(mode: TableMode): TableColumn<TableColumnKey>[] {
+	return buildColumns(mode === 'date_breakdown' || !showBreakdownColumn.value)
+}
+
+function downloadCsv(mode: TableMode) {
+	if (!import.meta.client) {
 		return
 	}
 
-	const visibleColumns = columns.value
+	const csvRows = getCsvRows(mode)
+	if (csvRows.length === 0) {
+		return
+	}
+
+	const visibleColumns = getCsvColumns(mode)
 	const header = visibleColumns
 		.map((column) => escapeCsvField(column.label ?? column.key))
 		.join(',')
 
-	const rows = sortedRows.value.map((row) =>
+	const rows = csvRows.map((row) =>
 		visibleColumns.map((column) => escapeCsvField(getCsvCellValue(row, column.key))).join(','),
 	)
 
@@ -928,7 +1073,7 @@ function downloadCsv() {
 	downloadLink.setAttribute('href', url)
 	downloadLink.setAttribute(
 		'download',
-		`analytics-${displayedIncludeDateColumn.value ? 'date-breakdown' : 'breakdown-only'}.csv`,
+		`analytics-${mode === 'date_breakdown' ? 'date-breakdown' : 'breakdown-only'}.csv`,
 	)
 	downloadLink.style.visibility = 'hidden'
 

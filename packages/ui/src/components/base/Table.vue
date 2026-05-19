@@ -8,7 +8,7 @@
 		</div>
 		<table class="w-full table-fixed border-separate border-spacing-0 border-surface-5">
 			<colgroup>
-				<col v-if="showSelection" class="w-10" />
+				<col v-if="showSelection" class="w-12" />
 				<col
 					v-for="column in columns"
 					:key="column.key"
@@ -17,7 +17,7 @@
 			</colgroup>
 			<thead class="">
 				<tr class="bg-surface-3">
-					<th v-if="showSelection" class="w-10 pl-4">
+					<th v-if="showSelection" class="w-12 pl-4">
 						<Checkbox
 							:model-value="allSelected"
 							:indeterminate="someSelected"
@@ -33,7 +33,7 @@
 							`text-${column.align ?? 'left'}`,
 							column.enableSorting ? 'cursor-pointer select-none' : '',
 						]"
-            :style="column.width ? { width: column.width } : undefined"
+						:style="column.width ? { width: column.width } : undefined"
 						@click="column.enableSorting ? handleSort(column.key) : undefined"
 					>
 						<slot :name="`header-${column.key}`" :column="column">
@@ -81,7 +81,7 @@
 						:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
 						:class="getAbsoluteRowIndex(rowIndex) % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 					>
-						<td v-if="showSelection" class="w-10 border-solid border-0 border-t border-surface-5">
+						<td v-if="showSelection" class="w-12 border-solid border-0 border-t border-surface-5">
 							<Checkbox
 								:model-value="isSelected(row)"
 								class="shrink-0 p-4"
@@ -141,6 +141,7 @@ export interface TableColumn<K extends string = string> {
 	label?: string
 	align?: TableColumnAlign
 	enableSorting?: boolean
+	defaultSortDirection?: SortDirection
 	/**
 	 * CSS width value for the column.
 	 * Accepts any valid CSS width (e.g., '200px', '20%', '10rem', 'auto', 'fit-content').
@@ -154,6 +155,8 @@ const props = withDefaults(
 		data: T[] /* Row data for table */
 		showSelection?: boolean
 		rowKey?: keyof T /* The key used to uniquely identify each row */
+		selectionKey?: keyof T /* The key used to identify selectable rows */
+		selectionData?: T[] /* The complete selectable data set when data is paginated */
 		virtualized?: boolean
 		virtualRowHeight?: number
 		virtualBufferSize?: number /* The number of extra rows rendered above and below the visible viewport */
@@ -202,15 +205,28 @@ const emit = defineEmits<{
 	sort: [column: string, direction: SortDirection]
 }>()
 
+const selectableRows = computed(() => props.selectionData ?? props.data)
+const selectableRowIds = computed(() => selectableRows.value.map((row) => getSelectionId(row)))
+const selectedSelectableIds = computed(() =>
+	selectableRowIds.value.filter((id) => selectedIds.value.includes(id)),
+)
 const allSelected = computed(
-	() => props.data.length > 0 && selectedIds.value.length === props.data.length,
+	() =>
+		selectableRowIds.value.length > 0 &&
+		selectedSelectableIds.value.length === selectableRowIds.value.length,
 )
 const someSelected = computed(
-	() => selectedIds.value.length > 0 && selectedIds.value.length < props.data.length,
+	() =>
+		selectedSelectableIds.value.length > 0 &&
+		selectedSelectableIds.value.length < selectableRowIds.value.length,
 )
 
 function getRowId(row: T): unknown {
 	return row[props.rowKey as keyof T]
+}
+
+function getSelectionId(row: T): unknown {
+	return row[(props.selectionKey ?? props.rowKey) as keyof T]
 }
 
 function setListContainer(element: unknown) {
@@ -231,11 +247,11 @@ function getRowRenderKey(row: T, rowIndex: number): PropertyKey {
 }
 
 function isSelected(row: T): boolean {
-	return selectedIds.value.includes(getRowId(row))
+	return selectedIds.value.includes(getSelectionId(row))
 }
 
 function toggleSelection(row: T) {
-	const id = getRowId(row)
+	const id = getSelectionId(row)
 	if (isSelected(row)) {
 		selectedIds.value = selectedIds.value.filter((selectedId) => selectedId !== id)
 	} else {
@@ -245,17 +261,25 @@ function toggleSelection(row: T) {
 
 function toggleSelectAll(selectAll: boolean) {
 	if (selectAll) {
-		selectedIds.value = props.data.map((row) => getRowId(row))
+		selectedIds.value = selectableRowIds.value
 	} else {
 		selectedIds.value = []
 	}
 }
 
 function handleSort(columnKey: string) {
+	const column = props.columns.find((column) => column.key === columnKey)
+	const defaultDirection = column?.defaultSortDirection ?? 'asc'
 	const newDirection: SortDirection =
-		sortColumn.value === columnKey && sortDirection.value === 'asc' ? 'desc' : 'asc'
+		sortColumn.value === columnKey && sortDirection.value === defaultDirection
+			? getOppositeSortDirection(defaultDirection)
+			: defaultDirection
 	sortColumn.value = columnKey
 	sortDirection.value = newDirection
 	emit('sort', columnKey, newDirection)
+}
+
+function getOppositeSortDirection(direction: SortDirection): SortDirection {
+	return direction === 'asc' ? 'desc' : 'asc'
 }
 </script>

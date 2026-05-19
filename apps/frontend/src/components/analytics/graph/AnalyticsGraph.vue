@@ -259,6 +259,8 @@ const {
 	isRatioMode,
 	showChartEvents,
 	hiddenGraphDatasetIds,
+	isGraphDatasetSelectionActive,
+	selectedGraphDatasetIds,
 	hasProjectContext,
 	selectedTimeframeMode,
 	selectedCustomTimeframeStartDate,
@@ -428,6 +430,16 @@ const allChartDatasets = computed(() =>
 		sliceCount.value,
 	),
 )
+const selectedGraphDatasetIdSet = computed(() => new Set(selectedGraphDatasetIds.value))
+const selectableChartDatasets = computed(() => {
+	if (!isGraphDatasetSelectionActive.value) {
+		return allChartDatasets.value
+	}
+
+	return allChartDatasets.value.filter((dataset) =>
+		selectedGraphDatasetIdSet.value.has(dataset.projectId),
+	)
+})
 
 const chartContainer = ref<HTMLElement | null>(null)
 const legendContainer = ref<HTMLElement | null>(null)
@@ -636,7 +648,7 @@ const showPinnedGuide = computed(
 )
 
 const legendEntries = computed<LegendEntry[]>(() =>
-	allChartDatasets.value
+	selectableChartDatasets.value
 		.map((dataset) => {
 			const totalValue = dataset.data.reduce((sum, value) => sum + value, 0)
 
@@ -646,7 +658,8 @@ const legendEntries = computed<LegendEntry[]>(() =>
 				projectName: dataset.projectName,
 				color: dataset.borderColor,
 				totalValue,
-				hidden: hiddenDatasetIds.value.has(dataset.projectId),
+				hidden:
+					!isGraphDatasetSelectionActive.value && hiddenDatasetIds.value.has(dataset.projectId),
 			}
 		})
 		.sort((a, b) => b.totalValue - a.totalValue || a.name.localeCompare(b.name)),
@@ -707,14 +720,18 @@ watch(canUseRatioMode, (canUse) => {
 
 const chartDatasetById = computed(() => {
 	const datasets = new Map<string, ChartDataset>()
-	for (const dataset of allChartDatasets.value) {
+	for (const dataset of selectableChartDatasets.value) {
 		datasets.set(dataset.projectId, dataset)
 	}
 	return datasets
 })
 
+const visibleLegendEntriesForChart = computed(() =>
+	isGraphDatasetSelectionActive.value ? legendEntries.value : displayedLegendEntries.value,
+)
+
 const baseVisibleChartDatasets = computed(() =>
-	displayedLegendEntries.value
+	visibleLegendEntriesForChart.value
 		.filter((legendEntry) => !legendEntry.hidden)
 		.map((legendEntry) => {
 			const dataset = chartDatasetById.value.get(legendEntry.id)
@@ -763,7 +780,10 @@ const highlightedChartDatasetId = computed(() => {
 
 function isLegendEntryToggleDisabled(legendEntry: LegendEntry) {
 	if (legendEntry.hidden) return false
-	const visibleCount = displayedLegendEntries.value.filter((entry) => !entry.hidden).length
+	const entries = isGraphDatasetSelectionActive.value
+		? legendEntries.value
+		: displayedLegendEntries.value
+	const visibleCount = entries.filter((entry) => !entry.hidden).length
 	return visibleCount <= 1
 }
 
@@ -785,7 +805,17 @@ function clearLegendHoverState() {
 	hoveredLegendEntryId.value = null
 }
 
+function removeSelectedGraphDataset(datasetId: string) {
+	if (legendEntries.value.length <= 1) return
+	selectedGraphDatasetIds.value = selectedGraphDatasetIds.value.filter((id) => id !== datasetId)
+}
+
 function toggleLegendEntryVisibility(datasetId: string) {
+	if (isGraphDatasetSelectionActive.value) {
+		removeSelectedGraphDataset(datasetId)
+		return
+	}
+
 	const nextHiddenDatasetIds = new Set(hiddenDatasetIds.value)
 	if (nextHiddenDatasetIds.has(datasetId)) {
 		nextHiddenDatasetIds.delete(datasetId)
@@ -798,6 +828,11 @@ function toggleLegendEntryVisibility(datasetId: string) {
 }
 
 function soloLegendEntry(datasetId: string) {
+	if (isGraphDatasetSelectionActive.value) {
+		removeSelectedGraphDataset(datasetId)
+		return
+	}
+
 	const otherIds = displayedLegendEntries.value
 		.map((entry) => entry.id)
 		.filter((id) => id !== datasetId)
@@ -818,6 +853,12 @@ function onLegendEntryClick(event: MouseEvent, datasetId: string) {
 
 function onTooltipEntryClick(datasetId: string) {
 	if (!chartDatasetById.value.has(datasetId)) return
+
+	if (isGraphDatasetSelectionActive.value) {
+		toggleLegendEntryVisibility(datasetId)
+		clearLegendHoverState()
+		return
+	}
 
 	if (collapsedLegendEntryIds.value.has(datasetId)) {
 		hiddenGraphDatasetIds.value = hiddenGraphDatasetIds.value.filter((id) => id !== datasetId)
@@ -931,7 +972,9 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 		const dataset = chartDatasetById.value.get(legendEntry.id)
 		const value = dataset?.data[sliceIndex] ?? 0
 		const ratioValue = totalValue === 0 ? 0 : (value / totalValue) * 100
-		const hidden = legendEntry.hidden || collapsedLegendEntryIds.value.has(legendEntry.id)
+		const hidden =
+			legendEntry.hidden ||
+			(!isGraphDatasetSelectionActive.value && collapsedLegendEntryIds.value.has(legendEntry.id))
 
 		return {
 			projectId: legendEntry.id,

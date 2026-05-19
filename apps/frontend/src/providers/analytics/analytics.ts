@@ -187,6 +187,8 @@ export interface AnalyticsDashboardContextValue {
 	showChartEvents: Ref<boolean>
 	isTopBreakdownFilterEnabled: Ref<boolean>
 	hiddenGraphDatasetIds: Ref<string[]>
+	isGraphDatasetSelectionActive: Ref<boolean>
+	selectedGraphDatasetIds: Ref<string[]>
 	currentTotals: ComputedRef<AnalyticsDashboardTotals>
 	previousTotals: ComputedRef<AnalyticsDashboardTotals>
 	percentChanges: ComputedRef<AnalyticsDashboardPercentChanges>
@@ -992,6 +994,8 @@ export function createAnalyticsDashboardContext(
 	const showChartEvents = ref(initialGraphState.showChartEvents)
 	const isTopBreakdownFilterEnabled = ref(initialGraphState.isTopBreakdownFilterEnabled)
 	const hiddenGraphDatasetIds = ref<string[]>(initialGraphState.hiddenGraphDatasetIds)
+	const isGraphDatasetSelectionActive = ref(false)
+	const selectedGraphDatasetIds = ref<string[]>([])
 	const selectedProjectIds = ref<string[]>(initialQueryState.selectedProjectIds)
 	const selectedTimeframeMode = ref<AnalyticsTimeframeMode>(initialQueryState.selectedTimeframeMode)
 	const selectedTimeframe = ref<AnalyticsTimeframePreset>(initialQueryState.selectedTimeframe)
@@ -2235,6 +2239,8 @@ export function createAnalyticsDashboardContext(
 		showChartEvents.value = defaultGraphState.showChartEvents
 		isTopBreakdownFilterEnabled.value = defaultGraphState.isTopBreakdownFilterEnabled
 		hiddenGraphDatasetIds.value = defaultGraphState.hiddenGraphDatasetIds
+		isGraphDatasetSelectionActive.value = false
+		selectedGraphDatasetIds.value = []
 		queryResetToken.value += 1
 	}
 
@@ -2317,6 +2323,8 @@ export function createAnalyticsDashboardContext(
 		showChartEvents,
 		isTopBreakdownFilterEnabled,
 		hiddenGraphDatasetIds,
+		isGraphDatasetSelectionActive,
+		selectedGraphDatasetIds,
 		currentTotals,
 		previousTotals,
 		percentChanges,
