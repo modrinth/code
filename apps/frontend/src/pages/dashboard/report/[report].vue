@@ -26,7 +26,7 @@ const messages = defineMessages({
 })
 
 const auth = await useAuth()
-const reportId = useRouteId('reportId')
+const reportId = useRouteId('report')
 
 useHead({
 	title: () => `${formatMessage(messages.reportTitle, { id: reportId })} - Modrinth`,

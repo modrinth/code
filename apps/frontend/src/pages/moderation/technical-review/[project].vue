@@ -12,7 +12,7 @@ import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevC
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
-const projectId = String(useRouteId('projectId'))
+const projectId = String(useRouteId('project'))
 
 useHead({ title: () => `Tech review - ${projectId} - Modrinth` })
 

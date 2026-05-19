@@ -529,7 +529,7 @@ const returnLink = computed(() => {
 	return null
 })
 
-const collectionId = useRouteId('collectionId')
+const collectionId = useRouteId('collection')
 const isFollowingCollection = computed(() => collectionId === 'following')
 
 // Static collection for "following" page

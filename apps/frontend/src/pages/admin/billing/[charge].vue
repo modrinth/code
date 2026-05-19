@@ -373,7 +373,7 @@ const messages = defineMessages({
 	},
 })
 
-const chargeId = useRouteId('chargeId')
+const chargeId = useRouteId('charge')
 
 const {
 	data: user,

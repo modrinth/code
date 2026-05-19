@@ -685,7 +685,7 @@ const messages = defineMessages({
 
 const client = injectModrinthClient()
 
-const userId = useRouteId('userId')
+const userId = useRouteId('user')
 
 const {
 	data: user,
