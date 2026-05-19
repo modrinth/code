@@ -4,7 +4,7 @@ use core_foundation::dictionary::CFDictionary;
 use core_foundation::number::CFNumber;
 use core_foundation::string::CFString;
 use core_graphics::display::CGDisplay;
-use core_graphics::geometry::CGRect;
+use core_graphics::geometry::{CGPoint, CGRect, CGSize};
 use core_graphics::window::{
     CGWindowID, kCGWindowAlpha, kCGWindowBounds, kCGWindowLayer,
     kCGWindowListExcludeDesktopElements,
@@ -24,8 +24,13 @@ pub fn main_window_id(ns_window: *mut std::ffi::c_void) -> Option<CGWindowID> {
     (window_number > 0).then_some(window_number as CGWindowID)
 }
 
-pub fn log_windows_above_main_overlaps<F>(
+pub fn is_ads_webview_occluded<F>(
     main_window_id: CGWindowID,
+    ad_x: i32,
+    ad_y: i32,
+    ad_width: u32,
+    ad_height: u32,
+    scale_factor: f64,
     mut log_to_js_console: F,
 ) -> bool
 where
@@ -69,6 +74,44 @@ where
 
         return false;
     };
+    let ad_rect = ad_rect_from_main_window(
+        &main_window_rect,
+        ad_x,
+        ad_y,
+        ad_width,
+        ad_height,
+        scale_factor,
+    );
+
+    if is_empty_rect(&ad_rect) {
+        tracing::debug!(
+            ad_x,
+            ad_y,
+            ad_width,
+            ad_height,
+            scale_factor,
+            "Computed macOS ad WebView rect is empty"
+        );
+        log_to_js_console(
+            "Computed macOS ad WebView rect is empty",
+            serde_json::json!({
+                "ad_x": ad_x,
+                "ad_y": ad_y,
+                "ad_width": ad_width,
+                "ad_height": ad_height,
+                "scale_factor": scale_factor,
+            }),
+        );
+
+        return false;
+    }
+
+    let ad_area = rect_area(&ad_rect);
+
+    if ad_area == 0.0 {
+        return false;
+    }
+
     let app_process_id = std::process::id() as i32;
     let Some(windows_above_main) = CGDisplay::window_list_info(
         kCGWindowListOptionOnScreenAboveWindow
@@ -99,6 +142,7 @@ where
     let mut skipped_non_normal_layer = 0u32;
     let mut skipped_transparent = 0u32;
     let mut overlapping_windows = 0u32;
+    let mut occluded_area = 0.0;
 
     tracing::debug!(
         main_window_id,
@@ -107,11 +151,16 @@ where
         main_y = main_window_rect.origin.y,
         main_width = main_window_rect.size.width,
         main_height = main_window_rect.size.height,
+        ad_x = ad_rect.origin.x,
+        ad_y = ad_rect.origin.y,
+        ad_width = ad_rect.size.width,
+        ad_height = ad_rect.size.height,
+        scale_factor,
         window_count = windows_above_main.len(),
-        "Checking macOS windows above main app window"
+        "Checking macOS normal windows above ad WebView"
     );
     log_to_js_console(
-        "Checking macOS windows above main app window",
+        "Checking macOS normal windows above ad WebView",
         serde_json::json!({
             "main_window_id": main_window_id,
             "app_process_id": app_process_id,
@@ -119,6 +168,11 @@ where
             "main_y": main_window_rect.origin.y,
             "main_width": main_window_rect.size.width,
             "main_height": main_window_rect.size.height,
+            "ad_x": ad_rect.origin.x,
+            "ad_y": ad_rect.origin.y,
+            "ad_width": ad_rect.size.width,
+            "ad_height": ad_rect.size.height,
+            "scale_factor": scale_factor,
             "window_count": windows_above_main.len(),
         }),
     );
@@ -181,13 +235,15 @@ where
             continue;
         };
 
-        if !intersects(&main_window_rect, &rect) {
+        let Some(intersection) = intersect_rects(&ad_rect, &rect) else {
             continue;
-        }
+        };
 
         overlapping_windows += 1;
+        occluded_area += rect_area(&intersection);
         let window_id = window_id(&window_info);
         let owner_pid = window_process_id(&window_info);
+        let occluded_ratio = occluded_area / ad_area;
 
         tracing::debug!(
             checked_windows,
@@ -200,10 +256,17 @@ where
             y = rect.origin.y,
             width = rect.size.width,
             height = rect.size.height,
-            "macOS window above main app window overlaps it"
+            intersection_x = intersection.origin.x,
+            intersection_y = intersection.origin.y,
+            intersection_width = intersection.size.width,
+            intersection_height = intersection.size.height,
+            occluded_area,
+            ad_area,
+            occluded_ratio,
+            "macOS normal window contents overlap ad WebView"
         );
         log_to_js_console(
-            "macOS window above main app window overlaps it",
+            "macOS normal window contents overlap ad WebView",
             serde_json::json!({
                 "checked_windows": checked_windows,
                 "window_id": window_id,
@@ -215,8 +278,46 @@ where
                 "y": rect.origin.y,
                 "width": rect.size.width,
                 "height": rect.size.height,
+                "intersection_x": intersection.origin.x,
+                "intersection_y": intersection.origin.y,
+                "intersection_width": intersection.size.width,
+                "intersection_height": intersection.size.height,
+                "occluded_area": occluded_area,
+                "ad_area": ad_area,
+                "occluded_ratio": occluded_ratio,
             }),
         );
+
+        if occluded_ratio >= super::ads::OCCLUDED_AREA_THRESHOLD {
+            tracing::debug!(
+                checked_windows,
+                skipped_own_process,
+                skipped_system_owner,
+                skipped_non_normal_layer,
+                skipped_transparent,
+                overlapping_windows,
+                occluded_area,
+                ad_area,
+                occluded_ratio,
+                "macOS ad WebView occlusion threshold reached"
+            );
+            log_to_js_console(
+                "macOS ad WebView occlusion threshold reached",
+                serde_json::json!({
+                    "checked_windows": checked_windows,
+                    "skipped_own_process": skipped_own_process,
+                    "skipped_system_owner": skipped_system_owner,
+                    "skipped_non_normal_layer": skipped_non_normal_layer,
+                    "skipped_transparent": skipped_transparent,
+                    "overlapping_windows": overlapping_windows,
+                    "occluded_area": occluded_area,
+                    "ad_area": ad_area,
+                    "occluded_ratio": occluded_ratio,
+                }),
+            );
+
+            return true;
+        }
     }
 
     tracing::debug!(
@@ -226,10 +327,13 @@ where
         skipped_non_normal_layer,
         skipped_transparent,
         overlapping_windows,
-        "Finished checking macOS windows above main app window"
+        occluded_area,
+        ad_area,
+        occluded_ratio = occluded_area / ad_area,
+        "Finished checking macOS normal windows above ad WebView"
     );
     log_to_js_console(
-        "Finished checking macOS windows above main app window",
+        "Finished checking macOS normal windows above ad WebView",
         serde_json::json!({
             "checked_windows": checked_windows,
             "skipped_own_process": skipped_own_process,
@@ -237,10 +341,36 @@ where
             "skipped_non_normal_layer": skipped_non_normal_layer,
             "skipped_transparent": skipped_transparent,
             "overlapping_windows": overlapping_windows,
+            "occluded_area": occluded_area,
+            "ad_area": ad_area,
+            "occluded_ratio": occluded_area / ad_area,
         }),
     );
 
-    overlapping_windows > 0
+    false
+}
+
+fn ad_rect_from_main_window(
+    main_window_rect: &CGRect,
+    x: i32,
+    y: i32,
+    width: u32,
+    height: u32,
+    scale_factor: f64,
+) -> CGRect {
+    let scale_factor = if scale_factor > 0.0 {
+        scale_factor
+    } else {
+        1.0
+    };
+
+    CGRect::new(
+        &CGPoint::new(
+            main_window_rect.origin.x + x as f64 / scale_factor,
+            main_window_rect.origin.y + y as f64 / scale_factor,
+        ),
+        &CGSize::new(width as f64 / scale_factor, height as f64 / scale_factor),
+    )
 }
 
 fn window_id(
@@ -301,9 +431,23 @@ fn is_empty_rect(rect: &CGRect) -> bool {
     rect.size.width <= 0.0 || rect.size.height <= 0.0
 }
 
-fn intersects(a: &CGRect, b: &CGRect) -> bool {
-    a.origin.x < b.origin.x + b.size.width
-        && a.origin.x + a.size.width > b.origin.x
-        && a.origin.y < b.origin.y + b.size.height
-        && a.origin.y + a.size.height > b.origin.y
+fn rect_area(rect: &CGRect) -> f64 {
+    if is_empty_rect(rect) {
+        return 0.0;
+    }
+
+    rect.size.width * rect.size.height
+}
+
+fn intersect_rects(a: &CGRect, b: &CGRect) -> Option<CGRect> {
+    let left = a.origin.x.max(b.origin.x);
+    let top = a.origin.y.max(b.origin.y);
+    let right = (a.origin.x + a.size.width).min(b.origin.x + b.size.width);
+    let bottom = (a.origin.y + a.size.height).min(b.origin.y + b.size.height);
+    let rect = CGRect::new(
+        &CGPoint::new(left, top),
+        &CGSize::new(right - left, bottom - top),
+    );
+
+    (!is_empty_rect(&rect)).then_some(rect)
 }

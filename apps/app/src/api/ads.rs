@@ -17,6 +17,7 @@ pub struct AdsState {
 }
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
+pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 1.0;
 #[cfg(not(target_os = "linux"))]
 const ADS_USER_AGENT: &str = concat!(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ",
@@ -162,34 +163,47 @@ fn compute_ads_webview_occlusion<R: Runtime>(
     let webview = webviews.get("ads-window")?;
 
     #[cfg(target_os = "macos")]
-    let _ = webview;
-
-    #[cfg(target_os = "macos")]
     {
+        let position = webview.position().ok()?;
+        let size = webview.size().ok()?;
+        let scale_factor = main_window.scale_factor().ok()?;
         let ns_window = main_window.ns_window().ok()?;
         let main_window_id =
             crate::api::ads_occlusion_macos::main_window_id(ns_window)?;
 
         tracing::debug!(
             main_window_id,
-            "Checking macOS windows above main app window"
+            x = position.x,
+            y = position.y,
+            width = size.width,
+            height = size.height,
+            scale_factor,
+            "Checking macOS normal windows above ad WebView"
         );
         log_ads_occlusion_to_js_console(
             app,
-            "Checking macOS windows above main app window",
+            "Checking macOS normal windows above ad WebView",
             serde_json::json!({
                 "main_window_id": main_window_id,
+                "x": position.x,
+                "y": position.y,
+                "width": size.width,
+                "height": size.height,
+                "scale_factor": scale_factor,
             }),
         );
 
-        return Some(
-            crate::api::ads_occlusion_macos::log_windows_above_main_overlaps(
-                main_window_id,
-                |message, fields| {
-                    log_ads_occlusion_to_js_console(app, message, fields)
-                },
-            ),
-        );
+        return Some(crate::api::ads_occlusion_macos::is_ads_webview_occluded(
+            main_window_id,
+            position.x,
+            position.y,
+            size.width,
+            size.height,
+            scale_factor,
+            |message, fields| {
+                log_ads_occlusion_to_js_console(app, message, fields)
+            },
+        ));
     }
 
     #[cfg(windows)]
