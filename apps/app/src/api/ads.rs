@@ -16,12 +16,6 @@ pub struct AdsState {
     pub malicious_origins: HashSet<String>,
 }
 
-#[cfg(any(windows, target_os = "macos"))]
-struct ComputedAdsOcclusion {
-    occluded: bool,
-    notification: Option<String>,
-}
-
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
 #[cfg(any(windows, target_os = "macos"))]
 pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 1.0;
@@ -142,23 +136,9 @@ fn set_webview_visible_for_window<R: Runtime>(
 }
 
 #[cfg(any(windows, target_os = "macos"))]
-fn notify_ads_occlusion<R: Runtime>(
-    app: &tauri::AppHandle<R>,
-    message: String,
-) {
-    let _ = tauri::Emitter::emit(
-        app,
-        "warning",
-        serde_json::json!({
-            "message": message,
-        }),
-    );
-}
-
-#[cfg(any(windows, target_os = "macos"))]
 fn compute_ads_webview_occlusion<R: Runtime>(
     app: &tauri::AppHandle<R>,
-) -> Option<ComputedAdsOcclusion> {
+) -> Option<bool> {
     let main_window = app.get_window("main")?;
     let webviews = app.webviews();
     let webview = webviews.get("ads-window")?;
@@ -172,20 +152,14 @@ fn compute_ads_webview_occlusion<R: Runtime>(
         let main_window_id =
             crate::api::ads_occlusion_macos::main_window_id(ns_window)?;
 
-        let (occluded, notification) =
-            crate::api::ads_occlusion_macos::is_ads_webview_occluded(
-                main_window_id,
-                position.x,
-                position.y,
-                size.width,
-                size.height,
-                scale_factor,
-            );
-
-        Some(ComputedAdsOcclusion {
-            occluded,
-            notification,
-        })
+        Some(crate::api::ads_occlusion_macos::is_ads_webview_occluded(
+            main_window_id,
+            position.x,
+            position.y,
+            size.width,
+            size.height,
+            scale_factor,
+        ))
     }
 
     #[cfg(windows)]
@@ -194,28 +168,21 @@ fn compute_ads_webview_occlusion<R: Runtime>(
         let size = webview.size().ok()?;
         let hwnd = main_window.hwnd().ok()?;
 
-        let occluded =
-            crate::api::ads_occlusion_windows::is_ads_webview_occluded(
-                hwnd,
-                position.x,
-                position.y,
-                size.width,
-                size.height,
-            );
-
-        Some(ComputedAdsOcclusion {
-            occluded,
-            notification: None,
-        })
+        Some(crate::api::ads_occlusion_windows::is_ads_webview_occluded(
+            hwnd,
+            position.x,
+            position.y,
+            size.width,
+            size.height,
+        ))
     }
 }
 
 #[cfg(any(windows, target_os = "macos"))]
 async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
-    let Some(computed) = compute_ads_webview_occlusion(app) else {
+    let Some(occluded) = compute_ads_webview_occlusion(app) else {
         return;
     };
-    let occluded = computed.occluded;
 
     let state = app.state::<RwLock<AdsState>>();
     let mut state = state.write().await;
@@ -225,13 +192,6 @@ async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
     }
 
     state.occluded = occluded;
-    let notification = computed.notification.unwrap_or_else(|| {
-        format!(
-            "Ads WebView occlusion state changed: {}",
-            if occluded { "occluded" } else { "visible" }
-        )
-    });
-    notify_ads_occlusion(app, notification);
     let visible = state.shown && !state.modal_shown;
     drop(state);
 

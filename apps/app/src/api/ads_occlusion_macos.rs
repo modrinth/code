@@ -31,12 +31,12 @@ pub fn is_ads_webview_occluded(
     ad_width: u32,
     ad_height: u32,
     scale_factor: f64,
-) -> (bool, Option<String>) {
+) -> bool {
     let Some(window_infos) = CGDisplay::window_list_info(
         kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements,
         None,
     ) else {
-        return (false, None);
+        return false;
     };
 
     let window_infos = unsafe {
@@ -49,7 +49,7 @@ pub fn is_ads_webview_occluded(
         .find(|window_info| window_id(window_info) == Some(main_window_id))
         .and_then(|window_info| window_rect(&window_info))
     else {
-        return (false, None);
+        return false;
     };
     let ad_rect = ad_rect_from_main_window(
         &main_window_rect,
@@ -61,13 +61,13 @@ pub fn is_ads_webview_occluded(
     );
 
     if is_empty_rect(&ad_rect) {
-        return (false, None);
+        return false;
     }
 
     let ad_area = rect_area(&ad_rect);
 
     if ad_area == 0.0 {
-        return (false, None);
+        return false;
     }
 
     let app_process_id = std::process::id() as i32;
@@ -76,55 +76,39 @@ pub fn is_ads_webview_occluded(
             | kCGWindowListExcludeDesktopElements,
         Some(main_window_id),
     ) else {
-        return (false, None);
+        return false;
     };
     let windows_above_main = unsafe {
         CFArray::<CFDictionary<CFString, CFType>>::wrap_under_get_rule(
             windows_above_main.as_concrete_TypeRef(),
         )
     };
-    let mut checked_windows = 0u32;
-    let mut skipped_own_process = 0u32;
-    let mut skipped_system_owner = 0u32;
-    let mut skipped_non_normal_layer = 0u32;
-    let mut skipped_transparent = 0u32;
-    let mut overlapping_windows = 0u32;
     let mut occluded_area = 0.0;
 
     for window_info in windows_above_main.iter() {
-        checked_windows += 1;
-
         if window_id(&window_info) == Some(main_window_id) {
             continue;
         }
 
         if window_process_id(&window_info) == Some(app_process_id) {
-            skipped_own_process += 1;
-
             continue;
         }
 
         let owner_name = window_owner_name(&window_info);
 
         if owner_name.as_deref().is_some_and(is_system_window_owner) {
-            skipped_system_owner += 1;
-
             continue;
         }
 
         let layer = window_layer(&window_info);
 
         if layer != Some(0) {
-            skipped_non_normal_layer += 1;
-
             continue;
         }
 
         let alpha = window_alpha(&window_info);
 
         if alpha.is_some_and(|alpha| alpha <= 0.0) {
-            skipped_transparent += 1;
-
             continue;
         }
 
@@ -136,36 +120,15 @@ pub fn is_ads_webview_occluded(
             continue;
         };
 
-        overlapping_windows += 1;
         occluded_area += rect_area(&intersection);
-        let window_id = window_id(&window_info);
-        let owner_pid = window_process_id(&window_info);
         let occluded_ratio = occluded_area / ad_area;
 
         if occluded_ratio >= super::ads::OCCLUDED_AREA_THRESHOLD {
-            return (
-                true,
-                Some(format!(
-                    "Ads WebView is occluded by {} (pid {:?}, window {:?}); {:.0}% of the ad area is covered.",
-                    owner_name.as_deref().unwrap_or("another app"),
-                    owner_pid,
-                    window_id,
-                    occluded_ratio * 100.0,
-                )),
-            );
+            return true;
         }
     }
 
-    let _ = (
-        checked_windows,
-        skipped_own_process,
-        skipped_system_owner,
-        skipped_non_normal_layer,
-        skipped_transparent,
-        overlapping_windows,
-    );
-
-    (false, None)
+    false
 }
 
 fn ad_rect_from_main_window(
