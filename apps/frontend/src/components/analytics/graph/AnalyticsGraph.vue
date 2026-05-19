@@ -88,6 +88,15 @@
 							</span>
 						</button>
 					</div>
+					<button
+						v-if="canToggleLegendExpansion"
+						type="button"
+						class="ml-1 text-sm font-medium underline"
+						:aria-expanded="isLegendExpanded"
+						@click="toggleLegendExpansion"
+					>
+						{{ isLegendExpanded ? 'Show less' : 'Show more' }}
+					</button>
 				</div>
 
 				<Transition
@@ -181,6 +190,7 @@
 							:pinned="isHoverPinned"
 							:ratio-mode="isRatioMode"
 							:capitalize-labels="shouldCapitalizeDatasetLabels"
+							@entry-click="onTooltipEntryClick"
 						/>
 					</template>
 				</div>
@@ -248,7 +258,6 @@ const {
 	activeGraphViewMode,
 	isRatioMode,
 	showChartEvents,
-	isTopBreakdownFilterEnabled,
 	hiddenGraphDatasetIds,
 	hasProjectContext,
 	selectedTimeframeMode,
@@ -471,7 +480,12 @@ const hoverState = reactive<HoverState>({
 const isHoverPinned = ref(false)
 const ignoreNextChartClick = ref(false)
 const hoveredLegendEntryId = ref<string | null>(null)
+const isLegendExpanded = ref(false)
+const promotedCollapsedLegendEntryIds = ref<string[]>([])
 const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
+const promotedCollapsedLegendEntryIdSet = computed(
+	() => new Set(promotedCollapsedLegendEntryIds.value),
+)
 
 const LEGEND_MAX_ITEMS = 8
 
@@ -638,12 +652,36 @@ const legendEntries = computed<LegendEntry[]>(() =>
 		.sort((a, b) => b.totalValue - a.totalValue || a.name.localeCompare(b.name)),
 )
 
+const canToggleLegendExpansion = computed(() => legendEntries.value.length > LEGEND_MAX_ITEMS)
+
 const displayedLegendEntries = computed<LegendEntry[]>(() => {
-	if (selectedBreakdown.value !== 'none' && isTopBreakdownFilterEnabled.value) {
-		return legendEntries.value.slice(0, LEGEND_MAX_ITEMS)
+	if (!isLegendExpanded.value && canToggleLegendExpansion.value) {
+		return legendEntries.value.filter(
+			(entry, index) =>
+				index < LEGEND_MAX_ITEMS || promotedCollapsedLegendEntryIdSet.value.has(entry.id),
+		)
 	}
 	return legendEntries.value
 })
+
+const collapsedLegendEntryIds = computed(() => {
+	if (isLegendExpanded.value || !canToggleLegendExpansion.value) return new Set<string>()
+	return new Set(
+		legendEntries.value
+			.slice(LEGEND_MAX_ITEMS)
+			.filter((entry) => !promotedCollapsedLegendEntryIdSet.value.has(entry.id))
+			.map((entry) => entry.id),
+	)
+})
+
+function toggleLegendExpansion() {
+	isLegendExpanded.value = !isLegendExpanded.value
+}
+
+function promoteCollapsedLegendEntry(datasetId: string) {
+	if (promotedCollapsedLegendEntryIdSet.value.has(datasetId)) return
+	promotedCollapsedLegendEntryIds.value = [...promotedCollapsedLegendEntryIds.value, datasetId]
+}
 
 watch(
 	displayedLegendEntries,
@@ -654,6 +692,12 @@ watch(
 	},
 	{ immediate: true, flush: 'post' },
 )
+
+watch(canToggleLegendExpansion, (canToggle) => {
+	if (!canToggle) {
+		isLegendExpanded.value = false
+	}
+})
 
 watch(canUseRatioMode, (canUse) => {
 	if (!canUse) {
@@ -772,6 +816,20 @@ function onLegendEntryClick(event: MouseEvent, datasetId: string) {
 	clearLegendHoverState()
 }
 
+function onTooltipEntryClick(datasetId: string) {
+	if (!chartDatasetById.value.has(datasetId)) return
+
+	if (collapsedLegendEntryIds.value.has(datasetId)) {
+		hiddenGraphDatasetIds.value = hiddenGraphDatasetIds.value.filter((id) => id !== datasetId)
+		promoteCollapsedLegendEntry(datasetId)
+		clearLegendHoverState()
+		return
+	}
+
+	toggleLegendEntryVisibility(datasetId)
+	clearLegendHoverState()
+}
+
 function areStringArraysEqual(left: string[], right: string[]) {
 	if (left.length !== right.length) return false
 	for (let index = 0; index < left.length; index += 1) {
@@ -817,6 +875,18 @@ watch(
 		if (!areStringArraysEqual(hiddenGraphDatasetIds.value, nextHiddenDatasetIds)) {
 			hiddenGraphDatasetIds.value = nextHiddenDatasetIds
 		}
+
+		const nextPromotedCollapsedLegendEntryIds = promotedCollapsedLegendEntryIds.value.filter(
+			(datasetId) => availableDatasetIds.has(datasetId),
+		)
+		if (
+			!areStringArraysEqual(
+				promotedCollapsedLegendEntryIds.value,
+				nextPromotedCollapsedLegendEntryIds,
+			)
+		) {
+			promotedCollapsedLegendEntryIds.value = nextPromotedCollapsedLegendEntryIds
+		}
 	},
 	{ immediate: true },
 )
@@ -839,7 +909,7 @@ const chartRangeBounds = computed(() => {
 const hoverTotalValue = computed(() => {
 	if (hoverState.sliceIndex === null) return 0
 	const sliceIndex = hoverState.sliceIndex
-	return displayedLegendEntries.value.reduce((sum, legendEntry) => {
+	return legendEntries.value.reduce((sum, legendEntry) => {
 		const dataset = chartDatasetById.value.get(legendEntry.id)
 		return sum + (dataset?.data[sliceIndex] ?? 0)
 	}, 0)
@@ -857,10 +927,11 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 	const sliceIndex = hoverState.sliceIndex
 	const totalValue = hoverTotalValue.value
 
-	return displayedLegendEntries.value.map((legendEntry) => {
+	return legendEntries.value.map((legendEntry) => {
 		const dataset = chartDatasetById.value.get(legendEntry.id)
 		const value = dataset?.data[sliceIndex] ?? 0
 		const ratioValue = totalValue === 0 ? 0 : (value / totalValue) * 100
+		const hidden = legendEntry.hidden || collapsedLegendEntryIds.value.has(legendEntry.id)
 
 		return {
 			projectId: legendEntry.id,
@@ -870,7 +941,8 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 			formattedValue: isRatioMode.value
 				? `${ratioValue.toFixed(1)}%`
 				: formatMetricValue(value, activeStat.value, formatNumber),
-			hidden: legendEntry.hidden,
+			hidden,
+			toggleDisabled: !hidden && isLegendEntryToggleDisabled(legendEntry),
 		}
 	})
 })

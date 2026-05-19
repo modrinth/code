@@ -26,10 +26,15 @@
 			<span class="font-semibold text-contrast">{{ formattedTotal }}</span>
 		</div>
 		<div class="flex flex-col gap-1">
-			<div
+			<button
 				v-for="entry in entries"
 				:key="entry.projectId"
-				class="flex items-center justify-between gap-4"
+				type="button"
+				class="flex w-full items-center justify-between gap-4 rounded border-0 bg-transparent px-0 py-0 text-left text-inherit transition-all disabled:opacity-100"
+				:class="entry.toggleDisabled ? 'cursor-default' : 'cursor-pointer hover:brightness-125'"
+				:disabled="entry.toggleDisabled"
+				:aria-label="`${entry.hidden ? 'Show' : 'Hide'} ${entry.name} in graph`"
+				@click="onEntryClick(entry)"
 			>
 				<div
 					class="inline-flex items-center gap-1.5"
@@ -52,7 +57,7 @@
 				>
 					{{ entry.formattedValue }}
 				</span>
-			</div>
+			</button>
 		</div>
 	</div>
 </template>
@@ -67,6 +72,7 @@ export type AnalyticsChartTooltipEntry = {
 	color: string
 	formattedValue: string
 	hidden: boolean
+	toggleDisabled: boolean
 }
 
 const props = defineProps<{
@@ -85,6 +91,15 @@ const props = defineProps<{
 	ratioMode: boolean
 	capitalizeLabels: boolean
 }>()
+
+const emit = defineEmits<{
+	'entry-click': [projectId: string]
+}>()
+
+function onEntryClick(entry: AnalyticsChartTooltipEntry) {
+	if (entry.toggleDisabled) return
+	emit('entry-click', entry.projectId)
+}
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
 const ONE_HOUR_MS = 60 * 60 * 1000
