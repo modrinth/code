@@ -593,8 +593,10 @@ const groupByPresetOptions: Array<{
 	{ value: 'year', label: 'Year' },
 ]
 
-const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
-	{ value: 'none', label: 'Project' },
+const selectedProjectCount = computed(() => selectedProjectIds.value.length)
+const breakdownOptions = computed<ComboboxOption<AnalyticsBreakdownPreset>[]>(() => [
+	{ value: 'none', label: 'None' },
+	...(selectedProjectCount.value > 1 ? [{ value: 'project' as const, label: 'Project' }] : []),
 	{ value: 'country', label: 'Country' },
 	{ value: 'monetization', label: 'Monetization' },
 	{ value: 'user_agent', label: 'Download source' },
@@ -602,7 +604,7 @@ const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
 	{ value: 'version_id', label: 'Project version' },
 	{ value: 'loader', label: 'Loader' },
 	{ value: 'game_version', label: 'Game version' },
-]
+])
 
 function isRevenueHourlyGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
 	return groupBy === '1h' || groupBy === '6h'
@@ -688,6 +690,8 @@ function withBreakdownFields(
 	const enabledStats = getEnabledAnalyticsStatsForState(breakdown, filters)
 
 	switch (breakdown) {
+		case 'project':
+			break
 		case 'country':
 			if (includesStat(breakdownStats, 'views') && includesStat(enabledStats, 'views')) {
 				views.push('country')

@@ -28,6 +28,8 @@ import {
 	buildAnalyticsQueryBuilderRouteQuery,
 	buildDefaultAnalyticsGraphState,
 	buildDefaultAnalyticsQueryBuilderState,
+	getDefaultAnalyticsBreakdownPreset,
+	hasAnalyticsBreakdownQuery,
 	hasAnalyticsProjectSelectionQuery,
 	hasAnalyticsQueryBuilderRouteChange,
 	isAnalyticsGraphStateDefault,
@@ -140,6 +142,12 @@ interface ProjectVersionFilterOptionSummary {
 	gameVersions: string[]
 	loaderTypes: string[]
 	versionIds: string[]
+}
+
+function isProjectAnalyticsPoint(
+	dataPoint: Labrinth.Analytics.v3.AnalyticsData,
+): dataPoint is Labrinth.Analytics.v3.ProjectAnalytics {
+	return 'source_project' in dataPoint
 }
 
 export interface AnalyticsDashboardContextValue {
@@ -439,7 +447,7 @@ function computeTotals(
 
 	for (const timeSlice of timeSlices) {
 		for (const dataPoint of timeSlice) {
-			if (!('source_project' in dataPoint)) {
+			if (!isProjectAnalyticsPoint(dataPoint)) {
 				continue
 			}
 
@@ -676,7 +684,7 @@ function getAnalyticsDataFilterOptionSummary(
 
 	for (const timeSlice of timeSlices) {
 		for (const dataPoint of timeSlice) {
-			if (!('source_project' in dataPoint)) {
+			if (!isProjectAnalyticsPoint(dataPoint)) {
 				continue
 			}
 
@@ -750,7 +758,7 @@ function addVersionIdsFromTimeSlices(
 ) {
 	for (const timeSlice of timeSlices) {
 		for (const dataPoint of timeSlice) {
-			if (!('source_project' in dataPoint)) {
+			if (!isProjectAnalyticsPoint(dataPoint)) {
 				continue
 			}
 
@@ -1360,6 +1368,7 @@ export function createAnalyticsDashboardContext(
 	const hasExplicitProjectSelectionQuery = computed(() =>
 		hasAnalyticsProjectSelectionQuery(route.query),
 	)
+	const hasExplicitBreakdownQuery = computed(() => hasAnalyticsBreakdownQuery(route.query))
 	const isAnalyticsQueryBuilderDefault = computed(() => {
 		const isQueryBuilderDefault = isAnalyticsQueryBuilderStateDefault(
 			{
@@ -1551,7 +1560,10 @@ export function createAnalyticsDashboardContext(
 				selectedFilters.value = sanitizedFilters
 			}
 
-			if (nextBreakdown === 'none' && !isTopBreakdownFilterEnabled.value) {
+			if (
+				(nextBreakdown === 'none' || nextBreakdown === 'project') &&
+				!isTopBreakdownFilterEnabled.value
+			) {
 				replaceNextAnalyticsRouteNavigation()
 				isTopBreakdownFilterEnabled.value = true
 				return
@@ -1601,6 +1613,24 @@ export function createAnalyticsDashboardContext(
 			}
 		},
 		{ immediate: true },
+	)
+
+	watch(
+		[selectedProjectIds, hasExplicitBreakdownQuery],
+		([nextSelectedProjectIds, nextHasExplicitBreakdownQuery]) => {
+			const defaultBreakdown = getDefaultAnalyticsBreakdownPreset(nextSelectedProjectIds)
+			if (selectedBreakdown.value === 'project' && defaultBreakdown === 'none') {
+				replaceNextAnalyticsRouteNavigation()
+				selectedBreakdown.value = 'none'
+				return
+			}
+
+			if (!nextHasExplicitBreakdownQuery && selectedBreakdown.value !== defaultBreakdown) {
+				replaceNextAnalyticsRouteNavigation()
+				selectedBreakdown.value = defaultBreakdown
+			}
+		},
+		{ deep: true, immediate: true },
 	)
 
 	watch(

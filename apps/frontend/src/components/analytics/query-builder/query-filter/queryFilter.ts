@@ -55,6 +55,7 @@ const ANALYTICS_DIMENSION_BY_BREAKDOWN: Record<
 	AnalyticsDashboardDimension
 > = {
 	none: 'project',
+	project: 'project',
 	country: 'country',
 	monetization: 'monetization',
 	user_agent: 'user_agent',
@@ -83,6 +84,7 @@ const ANALYTICS_FILTER_CATEGORY_BY_BREAKDOWN: Record<
 	Exclude<AnalyticsQueryFilterCategory, 'project'> | null
 > = {
 	none: null,
+	project: null,
 	country: 'country',
 	monetization: 'monetization',
 	user_agent: 'user_agent',

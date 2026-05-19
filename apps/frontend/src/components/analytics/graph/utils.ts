@@ -46,6 +46,8 @@ const LOADER_CHART_COLORS: Record<string, string> = {
 const REGION_CODE_PATTERN = /^[a-z]{2}$/i
 const OTHER_COUNTRY_CODE = 'XX'
 const UNKNOWN_BREAKDOWN_LABEL = 'Unknown'
+const ALL_PROJECTS_DATASET_ID = 'all'
+const ALL_PROJECTS_DATASET_LABEL = 'All projects'
 const regionDisplayNamesByLocale = new Map<string, Intl.DisplayNames | null>()
 
 function getRegionDisplayNames(locale: string): Intl.DisplayNames | null {
@@ -175,6 +177,13 @@ function isMetricKindForStat(
 	return point.metric_kind === activeStat
 }
 
+function isProjectAnalyticsPointInSelectedProjects(
+	point: Labrinth.Analytics.v3.AnalyticsData,
+	selectedProjectIds: Set<string>,
+): point is Labrinth.Analytics.v3.ProjectAnalytics {
+	return 'source_project' in point && selectedProjectIds.has(point.source_project)
+}
+
 export function buildChartDatasets(
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
 	selectedProjects: AnalyticsDashboardProject[],
@@ -194,14 +203,13 @@ export function buildChartDatasets(
 	const dataLength = Math.max(sliceCount, timeSlices.length)
 	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters)
 
-	if (selectedBreakdown !== 'none') {
+	if (selectedBreakdown !== 'none' && selectedBreakdown !== 'project') {
 		const dataByBreakdown = new Map<string, number[]>()
 		const downloadTotalsByBreakdown = new Map<string, number>()
 
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
-				if (!('source_project' in point)) continue
-				if (!selectedProjectIds.has(point.source_project)) continue
+				if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
 				if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) continue
 
 				const breakdownValue = getAnalyticsBreakdownValue(point, selectedBreakdown)
@@ -251,6 +259,49 @@ export function buildChartDatasets(
 		})
 	}
 
+	if (selectedBreakdown === 'none') {
+		const data = new Array(dataLength).fill(0)
+		let downloadTotal = 0
+
+		timeSlices.forEach((slice, sliceIndex) => {
+			for (const point of slice) {
+				if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
+				if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) continue
+
+				if (point.metric_kind === 'downloads') {
+					downloadTotal += getMetricValue(point, 'downloads')
+				}
+
+				if (!isMetricKindForStat(point, activeStat)) continue
+
+				data[sliceIndex] += getMetricValue(point, activeStat)
+			}
+		})
+
+		const color =
+			buildPaletteColorsByDownloadRank(
+				[
+					{
+						key: ALL_PROJECTS_DATASET_ID,
+						label: ALL_PROJECTS_DATASET_LABEL,
+						total: downloadTotal,
+					},
+				],
+				palette,
+			).get(ALL_PROJECTS_DATASET_ID) ?? ''
+		const selectedProject = selectedProjects.length === 1 ? selectedProjects[0] : undefined
+
+		return [
+			{
+				projectId: ALL_PROJECTS_DATASET_ID,
+				label: selectedProject?.name ?? ALL_PROJECTS_DATASET_LABEL,
+				data,
+				borderColor: color,
+				backgroundColor: color,
+			},
+		]
+	}
+
 	const dataByProjectId = new Map<string, number[]>()
 	const downloadTotalsByProjectId = new Map<string, number>()
 	for (const project of selectedProjects) {
@@ -260,8 +311,7 @@ export function buildChartDatasets(
 
 	timeSlices.forEach((slice, sliceIndex) => {
 		for (const point of slice) {
-			if (!('source_project' in point)) continue
-			if (!selectedProjectIds.has(point.source_project)) continue
+			if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
 			if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) continue
 
 			if (point.metric_kind === 'downloads') {

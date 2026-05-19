@@ -20,13 +20,6 @@
 					<div class="text-xl font-semibold text-contrast">Breakdown</div>
 
 					<div class="flex flex-wrap items-center gap-3">
-						<div v-if="showDateToggle" class="inline-flex items-center gap-2">
-							<label for="date-toggle" class="cursor-pointer text-sm text-secondary">Date</label>
-							<Toggle id="date-toggle" v-model="includeDate" small />
-						</div>
-
-						<div v-if="showDateToggle" class="mx-1 h-6 w-px bg-surface-5"></div>
-
 						<ButtonStyled>
 							<OverflowMenu
 								class="!shadow-none"
@@ -106,7 +99,6 @@ import {
 	Pagination,
 	Table,
 	type TableColumn,
-	Toggle,
 	useFormatNumber,
 } from '@modrinth/ui'
 
@@ -189,6 +181,8 @@ const displayedSortDirection = ref<SortDirection>('asc')
 const PAGE_SIZE = 500
 const GRAPH_DATASET_SELECTION_LIMIT = 8
 const INACTIVE_MODE_WARMUP_POINT_LIMIT = 12000
+const ALL_PROJECTS_DATASET_ID = 'all'
+const ALL_PROJECTS_BREAKDOWN_VALUE = 'all'
 const currentPage = ref(1)
 const sortCollator = new Intl.Collator(undefined, { sensitivity: 'base' })
 const tableRowsByMode = shallowRef<Record<TableMode, AnalyticsTableRow[] | null>>({
@@ -207,13 +201,6 @@ let tableCacheGeneration = 0
 const displayedTableMode = ref<TableMode>('breakdown_only')
 const displayedSortedRows = shallowRef<AnalyticsTableRow[]>([])
 
-const includeDate = computed<boolean>({
-	get: () => tableMode.value === 'date_breakdown',
-	set: (value) => {
-		tableMode.value = value ? 'date_breakdown' : 'breakdown_only'
-	},
-})
-
 const selectedProjectIdSet = computed(
 	() =>
 		new Set(
@@ -226,33 +213,33 @@ const selectedProjectIdSet = computed(
 				.map((project) => project.id),
 		),
 )
-const isSingleProjectView = computed(() => selectedProjectIdSet.value.size === 1)
-const showBreakdownColumn = computed(
-	() => selectedBreakdown.value !== 'none' || !isSingleProjectView.value,
-)
-const showGraphDatasetSelection = computed(
-	() => selectedBreakdown.value !== 'none' || selectedProjectIdSet.value.size > 1,
+const showBreakdownColumn = computed(() => selectedBreakdown.value !== 'none')
+const showGraphDatasetSelection = computed(() =>
+	selectedBreakdown.value === 'project'
+		? selectedProjectIdSet.value.size > 1
+		: selectedBreakdown.value !== 'none',
 )
 const showProjectVersionProjectColumn = computed(
 	() => selectedBreakdown.value === 'version_id' && selectedProjectIdSet.value.size > 1,
 )
-const showDateToggle = computed(() => showBreakdownColumn.value && !showGraphDatasetSelection.value)
 const includeDateColumn = computed(
 	() =>
-		!showGraphDatasetSelection.value &&
-		(tableMode.value === 'date_breakdown' || !showBreakdownColumn.value),
+		selectedBreakdown.value === 'none' ||
+		(!showGraphDatasetSelection.value && tableMode.value === 'date_breakdown'),
 )
 const activeTableMode = computed<TableMode>(() =>
-	showGraphDatasetSelection.value
-		? 'breakdown_only'
-		: tableMode.value === 'date_breakdown' || !showBreakdownColumn.value
-			? 'date_breakdown'
-			: 'breakdown_only',
+	selectedBreakdown.value === 'none'
+		? 'date_breakdown'
+		: showGraphDatasetSelection.value
+			? 'breakdown_only'
+			: tableMode.value,
 )
 const displayedIncludeDateColumn = computed(() =>
-	showGraphDatasetSelection.value
-		? false
-		: displayedTableMode.value === 'date_breakdown' || !showBreakdownColumn.value,
+	selectedBreakdown.value === 'none'
+		? true
+		: showGraphDatasetSelection.value
+			? false
+			: displayedTableMode.value === 'date_breakdown',
 )
 const groupByLabel = computed(() => getGroupByLabel(selectedGroupBy.value))
 const csvExportOptions = computed<OverflowMenuOption[]>(() => {
@@ -296,6 +283,8 @@ const emptyTableMessage = computed(() => {
 const breakdownColumnLabel = computed(() => {
 	switch (selectedBreakdown.value) {
 		case 'none':
+			return 'Project'
+		case 'project':
 			return 'Project'
 		case 'country':
 			return 'Country'
@@ -341,7 +330,7 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 
 	const timeRange = nextFetchRequest.time_range
 	const sliceCount = getSliceCount(timeRange, nextTimeSlices.length)
-	const includeDate = mode === 'date_breakdown' || !showBreakdownColumn.value
+	const includeDate = mode === 'date_breakdown'
 	const breakdownDisplayValues = new Map<string, string>()
 	const projectDisplayValues = new Map<string, string>()
 	const nextRows = new Map<string, AnalyticsTableRow>()
@@ -405,6 +394,10 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 	}
 
 	if (!includeDate && nextSelectedBreakdown === 'none') {
+		createRow(ALL_PROJECTS_BREAKDOWN_VALUE, ALL_PROJECTS_BREAKDOWN_VALUE)
+	}
+
+	if (!includeDate && nextSelectedBreakdown === 'project') {
 		for (const projectId of nextSelectedProjectIds) {
 			createRow(projectId, projectId)
 		}
@@ -414,7 +407,7 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 		const bucketLabel = includeDate ? getBucketLabel(sliceIndex) : undefined
 
 		for (const point of slice) {
-			if (!('source_project' in point)) {
+			if (!isProjectAnalyticsPoint(point)) {
 				continue
 			}
 
@@ -433,8 +426,10 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 
 			const breakdown =
 				nextSelectedBreakdown === 'none'
-					? point.source_project
-					: getBreakdownValue(point, nextSelectedBreakdown)
+					? ALL_PROJECTS_BREAKDOWN_VALUE
+					: nextSelectedBreakdown === 'project'
+						? point.source_project
+						: getBreakdownValue(point, nextSelectedBreakdown)
 			if (nextSelectedBreakdown !== 'none' && breakdown === ALL_BREAKDOWN_VALUE) {
 				continue
 			}
@@ -447,6 +442,12 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 	})
 
 	return Array.from(nextRows.values())
+}
+
+function isProjectAnalyticsPoint(
+	point: Labrinth.Analytics.v3.AnalyticsData,
+): point is Labrinth.Analytics.v3.ProjectAnalytics {
+	return 'source_project' in point
 }
 
 const columns = computed<TableColumn<TableColumnKey>[]>(() =>
@@ -470,15 +471,15 @@ function buildColumns(includeDate: boolean): TableColumn<TableColumnKey>[] {
 		})
 	}
 
-	if (showBreakdownColumn.value) {
-		if (showProjectVersionProjectColumn.value) {
-			nextColumns.push({
-				key: 'project',
-				label: 'Project',
-				enableSorting: true,
-			})
-		}
+	if (showProjectVersionProjectColumn.value) {
+		nextColumns.push({
+			key: 'project',
+			label: 'Project',
+			enableSorting: true,
+		})
+	}
 
+	if (showBreakdownColumn.value) {
 		nextColumns.push({
 			key: 'breakdown',
 			label: breakdownColumnLabel.value,
@@ -903,7 +904,14 @@ function getBreakdownValue(
 }
 
 function getGraphDatasetId(breakdown: string, selectedBreakdown: AnalyticsBreakdownPreset): string {
-	return selectedBreakdown === 'none' ? breakdown : `breakdown:${breakdown}`
+	if (selectedBreakdown === 'none') {
+		return ALL_PROJECTS_DATASET_ID
+	}
+	if (selectedBreakdown === 'project') {
+		return breakdown
+	}
+
+	return `breakdown:${breakdown}`
 }
 
 function getDefaultSelectedGraphDatasetIds(rows: AnalyticsTableRow[]): string[] {
@@ -985,7 +993,7 @@ function compareRows(
 }
 
 function formatBreakdownDisplayValue(value: string): string {
-	if (selectedBreakdown.value === 'none') {
+	if (selectedBreakdown.value === 'project') {
 		return projectNamesById.value.get(value) ?? value
 	}
 	return formatBreakdownLabel(value, selectedBreakdown.value, getVersionDisplayName)

@@ -29,6 +29,7 @@ export type AnalyticsGroupByPreset = '1h' | '6h' | 'day' | 'week' | 'month' | 'y
 
 export type AnalyticsBreakdownPreset =
 	| 'none'
+	| 'project'
 	| 'country'
 	| 'monetization'
 	| 'user_agent'
@@ -114,6 +115,7 @@ const GROUP_BY_PRESET_VALUES: AnalyticsGroupByPreset[] = [
 
 const BREAKDOWN_PRESET_VALUES: AnalyticsBreakdownPreset[] = [
 	'none',
+	'project',
 	'country',
 	'monetization',
 	'user_agent',
@@ -412,9 +414,15 @@ export function buildDefaultAnalyticsQueryBuilderState(
 		selectedCustomTimeframeStartDate: getDefaultCustomStartDate(),
 		selectedCustomTimeframeEndDate: getDefaultCustomEndDate(),
 		selectedGroupBy: DEFAULT_GROUP_BY_PRESET,
-		selectedBreakdown: DEFAULT_BREAKDOWN_PRESET,
+		selectedBreakdown: getDefaultAnalyticsBreakdownPreset(availableProjectIds),
 		selectedFilters: buildEmptySelectedFilters(),
 	}
+}
+
+export function getDefaultAnalyticsBreakdownPreset(
+	selectedProjectIds: readonly string[],
+): AnalyticsBreakdownPreset {
+	return selectedProjectIds.length > 1 ? 'project' : DEFAULT_BREAKDOWN_PRESET
 }
 
 export function isAnalyticsQueryBuilderStateDefault(
@@ -436,7 +444,7 @@ export function isAnalyticsQueryBuilderStateDefault(
 		state.selectedCustomTimeframeStartDate === defaultState.selectedCustomTimeframeStartDate &&
 		state.selectedCustomTimeframeEndDate === defaultState.selectedCustomTimeframeEndDate &&
 		state.selectedGroupBy === defaultState.selectedGroupBy &&
-		state.selectedBreakdown === defaultState.selectedBreakdown &&
+		state.selectedBreakdown === getDefaultAnalyticsBreakdownPreset(state.selectedProjectIds) &&
 		areSelectedFiltersEqual(state.selectedFilters, defaultState.selectedFilters)
 	)
 }
@@ -635,10 +643,14 @@ export function readAnalyticsQueryBuilderState(
 		),
 		selectedBreakdown: parseAnalyticsBreakdownQueryValue(
 			query[QUERY_KEY_BREAKDOWN],
-			defaultState.selectedBreakdown,
+			getDefaultAnalyticsBreakdownPreset(selectedProjectIds),
 		),
 		selectedFilters,
 	}
+}
+
+export function hasAnalyticsBreakdownQuery(query: LocationQuery): boolean {
+	return parseListQueryValue(query[QUERY_KEY_BREAKDOWN]).length > 0
 }
 
 export function hasAnalyticsProjectSelectionQuery(query: LocationQuery): boolean {
@@ -681,8 +693,9 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 		: undefined
 	nextRouteQuery[QUERY_KEY_GROUP_BY] =
 		state.selectedGroupBy !== DEFAULT_GROUP_BY_PRESET ? state.selectedGroupBy : undefined
+	const defaultBreakdown = getDefaultAnalyticsBreakdownPreset(state.selectedProjectIds)
 	nextRouteQuery[QUERY_KEY_BREAKDOWN] =
-		state.selectedBreakdown !== DEFAULT_BREAKDOWN_PRESET ? state.selectedBreakdown : undefined
+		state.selectedBreakdown !== defaultBreakdown ? state.selectedBreakdown : undefined
 
 	for (const category of URL_FILTER_CATEGORIES) {
 		const categoryQueryKey = FILTER_QUERY_KEY_BY_CATEGORY[category]
@@ -700,7 +713,7 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 		nextRouteQuery[QUERY_KEY_GRAPH_RATIO_MODE] = graphState.isRatioMode ? '1' : undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_EVENTS_VISIBILITY] = graphState.showChartEvents ? undefined : '0'
 		nextRouteQuery[QUERY_KEY_GRAPH_TOP_BREAKDOWN_FILTER] =
-			state.selectedBreakdown === DEFAULT_BREAKDOWN_PRESET
+			state.selectedBreakdown === 'none' || state.selectedBreakdown === 'project'
 				? undefined
 				: graphState.isTopBreakdownFilterEnabled
 					? 'top8'

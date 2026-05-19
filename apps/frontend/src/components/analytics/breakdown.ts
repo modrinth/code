@@ -12,6 +12,8 @@ export function getAnalyticsBreakdownValue(
 	switch (selectedBreakdown) {
 		case 'none':
 			return ALL_BREAKDOWN_VALUE
+		case 'project':
+			return normalizeBreakdownValue('source_project' in point ? point.source_project : undefined)
 		case 'country':
 			return normalizeBreakdownValue('country' in point ? point.country?.toUpperCase() : undefined)
 		case 'monetization': {
