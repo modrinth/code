@@ -17,11 +17,11 @@
 			</colgroup>
 			<thead class="">
 				<tr class="bg-surface-3">
-					<th v-if="showSelection" class="w-12 pl-4">
+					<th v-if="showSelection" class="w-12">
 						<Checkbox
 							:model-value="allSelected"
 							:indeterminate="someSelected"
-							class="shrink-0 py-4"
+							class="shrink-0 p-4 focus-visible:!outline-none"
 							@update:model-value="toggleSelectAll"
 						/>
 					</th>
@@ -81,11 +81,14 @@
 						:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
 						:class="getAbsoluteRowIndex(rowIndex) % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 					>
-						<td v-if="showSelection" class="w-12 border-solid border-0 border-t border-surface-5">
+						<td
+							v-if="showSelection"
+							class="w-12 border-solid border-0 border-t border-surface-5 focus:outline-none"
+						>
 							<Checkbox
 								:model-value="isSelected(row)"
-								class="shrink-0 p-4"
-								@update:model-value="toggleSelection(row)"
+								class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
+								@update:model-value="(selectRow, event) => toggleSelection(row, selectRow, event)"
 							/>
 						</td>
 						<td
@@ -124,7 +127,7 @@
 	generic="K extends string = string, T extends Record<string, unknown> = Record<K, unknown>"
 >
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed, toRef, useSlots } from 'vue'
+import { computed, ref, toRef, useSlots } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
 import Checkbox from './Checkbox.vue'
@@ -175,6 +178,7 @@ const selectedIds = defineModel<unknown[]>('selectedIds', { default: () => [] })
 const sortColumn = defineModel<string | undefined>('sortColumn')
 const sortDirection = defineModel<SortDirection>('sortDirection', { default: 'asc' })
 const slots = useSlots()
+const selectionAnchorId = ref<unknown>()
 const hasHeaderSlot = computed(() => Boolean(slots.header))
 const columnSpan = computed(() => Math.max(props.columns.length + (props.showSelection ? 1 : 0), 1))
 
@@ -260,16 +264,43 @@ function isSelected(row: T): boolean {
 	return selectedIdSet.value.has(getSelectionId(row))
 }
 
-function toggleSelection(row: T) {
+function toggleSelection(row: T, selectRow: boolean, event?: MouseEvent) {
 	const id = getSelectionId(row)
-	if (isSelected(row)) {
-		selectedIds.value = selectedIds.value.filter((selectedId) => selectedId !== id)
+	const rowIndex = selectableRowIds.value.findIndex((selectableId) => selectableId === id)
+	const anchorIndex = selectableRowIds.value.findIndex(
+		(selectableId) => selectableId === selectionAnchorId.value,
+	)
+
+	if (event?.shiftKey && rowIndex !== -1 && anchorIndex !== -1) {
+		const startIndex = Math.min(rowIndex, anchorIndex)
+		const endIndex = Math.max(rowIndex, anchorIndex)
+		const rangeIds = selectableRowIds.value.slice(startIndex, endIndex + 1)
+
+		if (selectRow) {
+			const nextSelectedIds = [...selectedIds.value]
+			const nextSelectedIdSet = new Set(nextSelectedIds)
+			for (const rangeId of rangeIds) {
+				if (!nextSelectedIdSet.has(rangeId)) {
+					nextSelectedIds.push(rangeId)
+					nextSelectedIdSet.add(rangeId)
+				}
+			}
+			selectedIds.value = nextSelectedIds
+		} else {
+			const rangeIdSet = new Set(rangeIds)
+			selectedIds.value = selectedIds.value.filter((selectedId) => !rangeIdSet.has(selectedId))
+		}
 	} else {
-		selectedIds.value = [...selectedIds.value, id]
+		selectedIds.value = selectRow
+			? [...selectedIds.value, id]
+			: selectedIds.value.filter((selectedId) => selectedId !== id)
 	}
+
+	selectionAnchorId.value = id
 }
 
 function toggleSelectAll(selectAll: boolean) {
+	selectionAnchorId.value = undefined
 	if (selectAll) {
 		selectedIds.value = [...selectableRowIds.value]
 	} else {
