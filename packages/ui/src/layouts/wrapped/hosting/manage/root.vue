@@ -675,6 +675,7 @@ const {
 	serverId: computed(() => props.serverId),
 	worldId,
 	server: serverData,
+	serverFull,
 	isSyncingContent,
 	extraBusyReasons: backupsBusy,
 	setDisconnectedOnAuthIncorrect: false,

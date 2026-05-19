@@ -89,6 +89,7 @@ import {
 	type ServerAuditLogEntry,
 	type ServerAuditLogFilters,
 } from '#ui/components/servers/access'
+import { parseAuditEvent } from '#ui/components/servers/access/events'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -100,7 +101,7 @@ type RoleFilter = ServerAccessRole | 'all'
 
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
-const { serverId } = injectModrinthServerContext()
+const { serverId, serverFull } = injectModrinthServerContext()
 const { addNotification, removeNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
@@ -281,11 +282,6 @@ const serverUsersQuery = useQuery({
 	queryFn: () => client.archon.server_users_v1.list(serverId),
 })
 
-const serverFullQuery = useQuery({
-	queryKey: ['servers', 'v1', 'detail', serverId],
-	queryFn: () => client.archon.servers_v1.get(serverId),
-})
-
 const members = computed<ServerAccessMember[]>(() =>
 	(serverUsersQuery.data.value ?? [])
 		.map((serverUser) => {
@@ -313,8 +309,22 @@ const members = computed<ServerAccessMember[]>(() =>
 
 const worldOptions = computed(
 	() =>
-		serverFullQuery.data.value?.worlds.map((world) => ({ id: world.id, name: world.name })) ?? [],
+		serverFull.value?.worlds.map((world) => ({ id: world.id, name: world.name })) ?? [],
 )
+
+const worldById = computed(
+	() => new Map(worldOptions.value.map((world) => [world.id, world] as const)),
+)
+
+const backupById = computed(() => {
+	const backups = new Map<string, Archon.Backups.v1.Backup>()
+	for (const world of serverFull.value?.worlds ?? []) {
+		for (const backup of world.backups ?? []) {
+			backups.set(backup.id, backup)
+		}
+	}
+	return backups
+})
 
 const actionLogQueryKey = ['servers', 'action-log', 'v1', serverId]
 const actionLogQuery = useQuery({
@@ -455,33 +465,22 @@ function apiActionLogEntryToAuditEntry(
 	actionLog: Archon.Actions.v1.ActionLogResponse,
 	index: number,
 ): ServerAuditLogEntry {
+	const event = parseAuditEvent(entry, {
+		serverId,
+		users: actionLog.users,
+		addons: actionLog.addons,
+		worldById: worldById.value,
+		backupById: backupById.value,
+		versions: undefined,
+	})
+
 	return {
 		id: `${entry.timestamp}-${entry.actor.type}-${entry.world_id ?? 'server'}-${index}`,
-		actor: apiActionActorToAccessUser(entry.actor, actionLog.users),
-		world: apiActionWorld(entry.world_id ?? null),
+		actor: event.props.actor,
+		world: event.props.world,
+		event,
 		timestamp: entry.timestamp,
 	}
-}
-
-function apiActionActorToAccessUser(
-	actor: Archon.Actions.v1.ActionUser,
-	users: Record<string, Archon.Actions.v1.UserResp>,
-): ServerAuditLogEntry['actor'] {
-	if (actor.type === 'support') {
-		return { id: 'support', username: 'Support' }
-	}
-
-	const user = users[actor.user_id]
-	return {
-		id: actor.user_id,
-		username: user?.username ?? actor.user_id,
-		avatarUrl: user?.avatar_url || undefined,
-	}
-}
-
-function apiActionWorld(worldId: string | null): ServerAuditLogEntry['world'] {
-	if (!worldId) return null
-	return worldOptions.value.find((world) => world.id === worldId) ?? { id: worldId, name: worldId }
 }
 
 async function invalidateServerUsers() {

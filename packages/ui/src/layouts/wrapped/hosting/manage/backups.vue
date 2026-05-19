@@ -122,6 +122,12 @@
 									v-for="(backup, backupIndex) in group.backups"
 									:key="`backup-${backup.id}`"
 									class="flex gap-2"
+									:data-backup-id="backup.id"
+									:class="
+										focusedBackupId === backup.id
+											? 'rounded-[22px] ring-2 ring-brand-green ring-offset-2'
+											: ''
+									"
 								>
 									<div class="flex w-5 flex-col items-center">
 										<div
@@ -244,7 +250,7 @@ import { CalendarIcon, DownloadIcon, IssuesIcon, PlusIcon, TrashIcon } from '@mo
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import type { Component } from 'vue'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -455,6 +461,25 @@ const groupedBackups = computed((): BackupGroup[] => {
 })
 
 const displayOrderedBackups = computed(() => groupedBackups.value.flatMap((g) => g.backups))
+const focusedBackupId = computed(() =>
+	typeof route.query.backup === 'string' ? route.query.backup : null,
+)
+
+watch(
+	[focusedBackupId, displayOrderedBackups],
+	async ([backupId]) => {
+		if (!backupId || !displayOrderedBackups.value.some((backup) => backup.id === backupId)) return
+		if (typeof document === 'undefined') return
+
+		await nextTick()
+		const escapedBackupId =
+			typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(backupId) : backupId.replaceAll('"', '\\"')
+		document
+			.querySelector(`[data-backup-id="${escapedBackupId}"]`)
+			?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+	},
+	{ immediate: true },
+)
 
 const {
 	selectedIds,

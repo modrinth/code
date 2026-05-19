@@ -49,6 +49,10 @@
 				</AutoLink>
 			</template>
 
+			<template #cell-event="{ row: entry }">
+				<component :is="entry.event.component" v-bind="entry.event.props" />
+			</template>
+
 			<template #cell-world="{ row: entry }">
 				<span
 					v-tooltip="entry.world?.name"
@@ -70,12 +74,9 @@
 			v-if="filteredEntries.length > 0"
 			class="overflow-hidden rounded-2xl border border-solid border-surface-5 sm:hidden"
 		>
-			<div class="grid min-h-14 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_5rem] bg-surface-3">
+			<div class="grid min-h-14 grid-cols-[minmax(0,1fr)_5rem] bg-surface-3">
 				<div class="flex items-center pl-4 font-semibold text-secondary">
-					{{ formatMessage(messages.userColumn) }}
-				</div>
-				<div class="flex items-center font-semibold text-secondary">
-					{{ formatMessage(messages.worldColumn) }}
+					{{ formatMessage(messages.eventColumn) }}
 				</div>
 				<div class="flex items-center justify-end pr-4 font-semibold text-secondary">
 					{{ formatMessage(messages.timeColumn) }}
@@ -84,40 +85,41 @@
 			<div
 				v-for="(entry, index) in filteredEntries"
 				:key="entry.id"
-				class="grid min-h-[4.5rem] grid-cols-[minmax(0,1fr)_minmax(0,1fr)_5rem] items-center border-0 border-t border-solid border-surface-5"
+				class="grid min-h-[5.5rem] grid-cols-[minmax(0,1fr)_5rem] items-start border-0 border-t border-solid border-surface-5"
 				:class="index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 			>
-				<div class="flex min-w-0 items-center gap-2 pl-4 pr-2">
-					<AutoLink
-						v-tooltip="actorName(entry)"
-						:to="actorProfilePath(entry)"
-						class="inline-flex min-w-0 items-center gap-2"
-						:class="actorProfilePath(entry) ? 'text-primary hover:underline' : ''"
-					>
-						<Avatar
-							:src="actorAvatarSrc(entry)"
-							:alt="formatMessage(messages.userAvatarAlt, { username: actorName(entry) })"
-							:tint-by="entry.actor.username"
-							size="24px"
-							circle
-							no-shadow
-						/>
-						<span
-							class="min-w-0 truncate font-medium"
-							:class="entry.actor.id === 'support' ? 'text-blue' : ''"
+				<div class="min-w-0 py-3 pl-4 pr-2">
+					<div class="mb-2 flex min-w-0 items-center gap-2 text-sm">
+						<AutoLink
+							v-tooltip="actorName(entry)"
+							:to="actorProfilePath(entry)"
+							class="inline-flex min-w-0 items-center gap-2"
+							:class="actorProfilePath(entry) ? 'text-primary hover:underline' : ''"
 						>
-							{{ actorName(entry) }}
+							<Avatar
+								:src="actorAvatarSrc(entry)"
+								:alt="formatMessage(messages.userAvatarAlt, { username: actorName(entry) })"
+								:tint-by="entry.actor.username"
+								size="20px"
+								circle
+								no-shadow
+							/>
+							<span
+								class="min-w-0 truncate font-medium"
+								:class="entry.actor.id === 'support' ? 'text-blue' : ''"
+							>
+								{{ actorName(entry) }}
+							</span>
+						</AutoLink>
+						<span class="text-secondary">·</span>
+						<span
+							v-tooltip="entry.world?.name"
+							class="min-w-0 truncate text-secondary"
+						>
+							{{ entry.world?.name ?? 'Server' }}
 						</span>
-					</AutoLink>
-				</div>
-				<div class="min-w-0 py-3 pr-2">
-					<span
-						v-tooltip="entry.world?.name"
-						class="block truncate"
-						:class="entry.world ? 'text-primary' : 'text-secondary'"
-					>
-						{{ entry.world?.name ?? '—' }}
-					</span>
+					</div>
+					<component :is="entry.event.component" v-bind="entry.event.props" />
 				</div>
 				<div class="min-w-0 py-3 pr-4 text-right text-secondary">
 					<span v-tooltip="formatDate(entry.timestamp)" class="inline-block max-w-full truncate">
@@ -129,12 +131,18 @@
 
 		<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-5">
 			<div
-				class="grid min-h-14 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_5rem] bg-surface-3 sm:h-14 sm:grid-cols-[40%_35%_25%]"
+				class="grid min-h-14 grid-cols-[minmax(0,1fr)_5rem] bg-surface-3 sm:h-14 sm:grid-cols-[22%_48%_18%_12%]"
 			>
-				<div class="flex items-center pl-4 font-semibold text-secondary">
+				<div class="flex items-center pl-4 font-semibold text-secondary sm:hidden">
+					{{ formatMessage(messages.eventColumn) }}
+				</div>
+				<div class="hidden items-center pl-4 font-semibold text-secondary sm:flex">
 					{{ formatMessage(messages.userColumn) }}
 				</div>
-				<div class="flex items-center font-semibold text-secondary">
+				<div class="hidden items-center font-semibold text-secondary sm:flex">
+					{{ formatMessage(messages.eventColumn) }}
+				</div>
+				<div class="hidden items-center font-semibold text-secondary sm:flex">
 					{{ formatMessage(messages.worldColumn) }}
 				</div>
 				<div class="flex items-center justify-end pr-4 font-semibold text-secondary">
@@ -290,6 +298,10 @@ const messages = defineMessages({
 		id: 'servers.audit-log.column.world',
 		defaultMessage: 'Instance',
 	},
+	eventColumn: {
+		id: 'servers.audit-log.column.event',
+		defaultMessage: 'Event',
+	},
 	timeColumn: {
 		id: 'servers.audit-log.column.time',
 		defaultMessage: 'Time',
@@ -336,13 +348,14 @@ const selectedTimeRangeLabel = computed(
 		formatMessage(messages.last30Days),
 )
 
-type AuditLogTableColumn = 'user' | 'world' | 'time'
+type AuditLogTableColumn = 'user' | 'event' | 'world' | 'time'
 type AuditLogTableRow = ServerAuditLogEntry & Record<string, unknown>
 
 const columns = computed<TableColumn<AuditLogTableColumn>[]>(() => [
-	{ key: 'user', label: formatMessage(messages.userColumn), width: '40%' },
-	{ key: 'world', label: formatMessage(messages.worldColumn), width: '35%' },
-	{ key: 'time', label: formatMessage(messages.timeColumn), align: 'right', width: '25%' },
+	{ key: 'user', label: formatMessage(messages.userColumn), width: '22%' },
+	{ key: 'event', label: formatMessage(messages.eventColumn), width: '48%' },
+	{ key: 'world', label: formatMessage(messages.worldColumn), width: '18%' },
+	{ key: 'time', label: formatMessage(messages.timeColumn), align: 'right', width: '12%' },
 ])
 
 const filteredEntries = computed(() => {
@@ -355,9 +368,9 @@ const filteredEntries = computed(() => {
 
 			if (!normalizedQuery) return true
 
-			return [entry.actor.username, entry.world?.name]
-				.filter(Boolean)
-				.some((value) => value!.toLowerCase().includes(normalizedQuery))
+			return [entry.actor.username, entry.world?.name, entry.event.searchText, entry.event.key]
+				.filter((value): value is string => typeof value === 'string' && value.length > 0)
+				.some((value) => value.toLowerCase().includes(normalizedQuery))
 		})
 		.slice()
 		.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
@@ -387,11 +400,6 @@ function actorAvatarSrc(entry: ServerAuditLogEntry): string | undefined {
 }
 
 function actorProfilePath(entry: ServerAuditLogEntry): string | undefined {
-	return entry.actor.id === 'support' ? undefined : userProfilePath(entry.actor.username)
-}
-
-function userProfilePath(username: string): string | undefined {
-	if (!username || username.includes('@')) return undefined
-	return `/user/${encodeURIComponent(username)}`
+	return entry.actor.profilePath
 }
 </script>

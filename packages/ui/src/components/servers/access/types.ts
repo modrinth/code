@@ -1,6 +1,8 @@
+import type { AuditActor, AuditWorld, ParsedAuditEvent } from './events/types'
+
 export type ServerAccessRole = 'owner' | 'editor' | 'viewer'
 
-export interface ServerAccessUser {
+export interface ServerAccessUser extends AuditActor {
 	id: string
 	username: string
 	avatarUrl?: string
@@ -18,8 +20,9 @@ export interface ServerAccessMember {
 
 export interface ServerAuditLogEntry {
 	id: string
-	actor: ServerAccessUser | { id: 'support'; username: 'Support' }
-	world: { id: string; name: string } | null
+	actor: AuditActor
+	world: AuditWorld | null
+	event: ParsedAuditEvent
 	timestamp: string
 }
 
