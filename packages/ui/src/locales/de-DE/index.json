@@ -1316,6 +1316,9 @@
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Inhalte konnten nicht aktualisiert werden"
   },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "Inhalte konnten nicht installiert werden"
+  },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Modpackinhalte konnten nicht geladen werden"
   },
@@ -2032,6 +2035,150 @@
   },
   "locale.zh-TW": {
     "defaultMessage": "Chinesisch (Traditionell)"
+  },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "Ersetze dies durch eine Beschreibung"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "Fehler"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "Beschreibe das Bild vollständig, so als würdest du es jemandem erklären, der es nicht sehen kann."
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "Beschreibe das Bild..."
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "Beschreibung (Alt-Text)"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "Bild einfügen"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "Bildquelle"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "Hochladen"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "Ziehe eine Datei in dieses Fenster oder drücke \"Hochladen\""
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "URL des Bilds eingeben..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "Einfügen"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "Link einfügen"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "Beschriftung eingeben..."
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Beschriftung"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "URL des Links eingeben..."
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "Dieser Editor unterstützt <markdown-link>Markdown-Formatierung</markdown-link>."
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "Maximale Länge:"
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "Unbegrenzt"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "Schreib etwas..."
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "Vorschau"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "Vorschau"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Fett"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "Aufzählung"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "Code"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "Überschrift 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "Überschrift 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "Überschrift 3"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "Bild"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "Kursiv"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "Geordnete Liste"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Zitat"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "Spoiler"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "Durchgestrichen"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "Video"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "Keine Datei vorhanden"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "Kein Bild-Upload-Handler vorhanden"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "Ungültige URL. Diese Domain ist nicht zulässig."
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "Ungültige URL. Stelle sicher, dass die URL korrekt formatiert ist."
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "Nicht unterstütztes Protokoll. Verwende http oder https."
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "YouTube-Videoplayer"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "YouTube-Video einfügen"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "Gib einen gültigen Link zu einem YouTube-Video ein."
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "Gib die URL des YouTube-Videos ein"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "URL des YouTube-Videos"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Zahlungsmethode hinzufügen"
@@ -3194,6 +3341,24 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installation fehlgeschlagen"
   },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "Während der Installation der Plattform ist ein interner Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "Die angegebene Loader- oder Minecraft-Version konnte nicht installiert werden. Sie ist möglicherweise ungültig oder wird nicht unterstützt."
+  },
+  "servers.installing-banner.error.modpack-install-failed": {
+    "defaultMessage": "Das Modpack konnte nicht installiert werden. Es ist eventuell beschädigt oder nicht kompatibel."
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "Diese Modpack-Version enthält keine herunterladbare Datei. Es wurde eventuell falsch gepackt."
+  },
+  "servers.installing-banner.error.unknown": {
+    "defaultMessage": "Während der Installation ist ein unerwarteter Fehler aufgetreten."
+  },
+  "servers.installing-banner.error.unsupported-loader-version": {
+    "defaultMessage": "Diese Version von Minecraft oder des Loaders wird aktuell noch nicht von Modrinth Hosting unterstützt."
+  },
   "servers.installing-banner.phase.installing-addons": {
     "defaultMessage": "Addons werden installiert..."
   },
@@ -3432,7 +3597,7 @@
     "defaultMessage": "Server-Icon"
   },
   "servers.medal-listing.upgrade-button": {
-    "defaultMessage": "Verbessern"
+    "defaultMessage": "Upgraden"
   },
   "servers.medal-listing.using-project-label": {
     "defaultMessage": "Nutzt {projectTitle}"

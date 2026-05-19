@@ -8,6 +8,7 @@ pub use v3::billing;
 pub use v3::collections;
 pub use v3::ids;
 pub use v3::images;
+pub use v3::moderation_notes;
 pub use v3::notifications;
 pub use v3::oauth_clients;
 pub use v3::organizations;

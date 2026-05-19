@@ -95,8 +95,47 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "서버 다시 구독"
   },
+  "browse.filter-results": {
+    "defaultMessage": "검색 결과..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "검색 결과가 없습니다!"
+  },
+  "browse.offline": {
+    "defaultMessage": "현재 오프라인 상태입니다. Modrinth를 이용하려면 인터넷에 연결하세요!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "{projectType, select, mod {모드} modpack {모드팩} resourcepack {리소스팩} shader {셰이더} plugin {플러그인} datapack {데이터팩} server {서버} other {프로젝트}} 검색..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "선택된 프로젝트"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "프로젝트 {count}개 설치"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "프로젝트 {count, plural, other {#}}개 선택됨"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "설치할 프로젝트로 {count, plural,  other {#}}개를 선택했습니다. 지금 설치하거나 설치하지 않고 돌아갈 수 있습니다."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "선택된 프로젝트가 아직 설치되지 않았습니다"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "버리기"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "선택된 프로젝트가 아직 설치되지 않았습니다"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "보기:"
+  },
   "button.accept": {
     "defaultMessage": "수락"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "인스턴스에 서버 추가"
   },
   "button.affiliate-links": {
     "defaultMessage": "제휴 링크"
@@ -167,6 +206,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "스냅샷 숨기기"
   },
+  "button.install": {
+    "defaultMessage": "설치"
+  },
   "button.max": {
     "defaultMessage": "최대"
   },
@@ -184,6 +226,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "폴더 열기"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Modrinth로 열기"
   },
   "button.play": {
     "defaultMessage": "플레이"
@@ -277,6 +322,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "비공개"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "{project} 선택"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "{count}개의 프로젝트를 최신 호환 버전으로 업데이트하시겠습니까? 콘텐츠는 하나씩 업데이트 하는 것을 권장합니다."
@@ -1268,6 +1316,9 @@
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "콘텐츠 업데이트 실패"
   },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "콘텐츠 설치 실패"
+  },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "모드팩 콘텐츠 불러오기 실패"
   },
@@ -1721,20 +1772,35 @@
   "label.filter-by": {
     "defaultMessage": "필터링 기준"
   },
+  "label.filters": {
+    "defaultMessage": "필터"
+  },
   "label.followed-projects": {
     "defaultMessage": "팔로우한 프로젝트"
   },
   "label.game-version": {
     "defaultMessage": "게임 버전"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "이미 설치된 콘텐츠 숨기기"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "선택된 콘텐츠 숨기기"
+  },
   "label.installation-info": {
     "defaultMessage": "설치 정보"
+  },
+  "label.installed": {
+    "defaultMessage": "설치됨"
   },
   "label.installed-modpack": {
     "defaultMessage": "설치된 모드팩"
   },
   "label.installing": {
     "defaultMessage": "설치 중..."
+  },
+  "label.installing-content": {
+    "defaultMessage": "콘텐츠 설치 중"
   },
   "label.loading": {
     "defaultMessage": "불러오는 중..."
@@ -1811,6 +1877,9 @@
   "label.select-all": {
     "defaultMessage": "모두 선택"
   },
+  "label.selected": {
+    "defaultMessage": "선택됨"
+  },
   "label.selection-actions": {
     "defaultMessage": "선택 행동"
   },
@@ -1853,8 +1922,14 @@
   "label.username": {
     "defaultMessage": "사용자명"
   },
+  "label.validating": {
+    "defaultMessage": "검증 중"
+  },
   "label.version": {
     "defaultMessage": "버전"
+  },
+  "label.view": {
+    "defaultMessage": "보기"
   },
   "label.visibility": {
     "defaultMessage": "공개 설정"
@@ -1960,6 +2035,150 @@
   },
   "locale.zh-TW": {
     "defaultMessage": "중국어 (번체)"
+  },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "여기에 설명을 입력하세요"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "오류"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "그림을 볼 수 없는 사람에게 설명하듯이, 그림을 자세히 묘사해 주세요."
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "이미지 설명..."
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "설명 (대체 텍스트)"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "이미지 삽입"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "이미지 출처"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "링크"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "업로드"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "파일을 끌어다 놓아 업로드하거나 클릭하여 파일 선택"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "이미지 URL 입력..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "삽입"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "링크 삽입"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "라벨 입력..."
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "라벨"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "링크 URL 입력..."
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "이 텍스트 에디터는 <markdown-link>마크다운 서식</markdown-link>을 지원합니다."
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "최대 길이:"
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "제한 없음"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "무언가 입력하세요..."
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "미리보기"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "미리보기"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "굵게"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "기호 목록"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "코드"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "제목 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "제목 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "제목 3"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "이미지"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "기울이기"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "링크"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "숫자 목록"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "인용구"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "스포일러"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "취소선"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "동영상"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "파일 없음"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "이미지 업로드 핸들러가 없음"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "잘못된 URL입니다. 이 도메인은 허용되지 않습니다."
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "잘못된 URL입니다. URL 형식이 올바른지 확인하세요."
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "지원되지 않는 프로토콜입니다. http 또는 https를 사용하세요."
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "YouTube 동영상 플레이어"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "YouTube 동영상 삽입"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "유효한 YouTube 동영상 링크를 입력하세요."
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "YouTube 동영상 URL 입력"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "YouTube 동영상 URL"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "결제 수단 추가"
@@ -3119,6 +3338,54 @@
   "servers.busy.syncing-content": {
     "defaultMessage": "콘텐츠 동기화 진행 중"
   },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "설치 실패"
+  },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "플랫폼 설치 중 내부 오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "지정한 로더 또는 마인크래프트 버전을 설치할 수 없습니다. 유효하지 않거나 지원되지 않는 것일 수 있습니다."
+  },
+  "servers.installing-banner.error.modpack-install-failed": {
+    "defaultMessage": "모드팩을 설치할 수 없습니다. 파일이 손상되었거나 호환되지 않을 수 있습니다."
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "이 모드팩 버전은 다운로드 가능한 파일을 포함되어 있지 않습니다. 패키징이 잘못되었을 수 있습니다."
+  },
+  "servers.installing-banner.error.unknown": {
+    "defaultMessage": "설치 중 알 수 없는 오류가 발생했습니다."
+  },
+  "servers.installing-banner.error.unsupported-loader-version": {
+    "defaultMessage": "이 미인크래프트 또는 로더 버전은 아직 Modrinth Hosting에서 지원되지 않습니다."
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "애드온 설치 중..."
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "모드팩 설치 중..."
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "플랫폼 설치 중..."
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "서버를 준비하고 있습니다"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "Java 추가 중..."
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "서버 구성 중..."
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "모드 다운로드 중..."
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "파일 준비 중..."
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "환경 설정 중..."
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "서버가 이미 있으신가요?"
   },
@@ -3870,7 +4137,7 @@
     "defaultMessage": "스크린샷"
   },
   "tag.category.semi-realistic": {
-    "defaultMessage": "반현실적"
+    "defaultMessage": "반사실적"
   },
   "tag.category.shadows": {
     "defaultMessage": "그림자"

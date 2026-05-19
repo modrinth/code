@@ -2036,6 +2036,150 @@
   "locale.zh-TW": {
     "defaultMessage": "Китайский (традиционный)"
   },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "Замените это описанием"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "Ошибка"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "Опишите изображение так, будто его не видно."
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "Опишите изображение..."
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "Описание (альтернативный текст)"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "Вставка изображения"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "Источник изображения"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "Ссылка"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "Загрузить"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "Перетащите файл или нажмите сюда, чтобы его выбрать"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "Введите адрес изображения..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "Вставить"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "Вставка ссылки"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "Введите текст ссылки..."
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Текст"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "Введите адрес ссылки..."
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "Этот редактор поддерживает <markdown-link>форматирование Markdown</markdown-link>."
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "Символов:"
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "без ограничений"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength, number}/⁠{maxLength, number}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "Введите что-нибудь..."
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "Предпросмотр"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "Предпросмотр"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Полужирный"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "Маркированный список"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "Код"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "Заголовок 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "Заголовок 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "Заголовок 3"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "Изображение"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "Курсив"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "Ссылка"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "Нумерованный список"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Цитата"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "Спойлер"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "Зачёркнутый"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "Видео"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "Файл не предоставлен"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "Обработчик загрузки изображений не предоставлен"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "Адрес"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "Некорректная ссылка. Этот домен не разрешён."
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "Некорректная ссылка. Перепроверьте формат ссылки."
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "Этот протокол не поддерживается. Используйте http или https."
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "Проигрыватель YouTube"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "Вставка видео с YouTube"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "Введите корректную ссылку на видео с YouTube."
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "Введите адрес видео с YouTube"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "Адрес видео с YouTube"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Добавить способ оплаты"
   },
@@ -3267,7 +3411,7 @@
     "defaultMessage": "Установка модов в один клик"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Приглашайте друзей и настаивайте всё прямо в Modrinth App."
+    "defaultMessage": "Зовите друзей и настраивайте им игру через Modrinth App."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Совместная игра"
@@ -3276,7 +3420,7 @@
     "defaultMessage": "Войти"
   },
   "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Настаивайте сервер подобно одиночному миру."
+    "defaultMessage": "Настраивайте сервер подобно одиночному миру."
   },
   "servers.list-empty.simple-setup-title": {
     "defaultMessage": "Простая настройка"
@@ -3687,7 +3831,7 @@
     "defaultMessage": "Результаты поиска"
   },
   "settings.language.description": {
-    "defaultMessage": "Выберите основной язык {platform}. Переводы выполнены сообществом <crowdin-link>на Crowdin</crowdin-link>."
+    "defaultMessage": "Выберите язык {platform}. Переводы выполнены сообществом <crowdin-link>на Crowdin</crowdin-link>."
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Поиск языка..."
@@ -3708,7 +3852,7 @@
     "defaultMessage": "Язык"
   },
   "settings.language.warning": {
-    "defaultMessage": "При смене языка некоторые элементы {platform} могут отображаться на английском, если их перевод недоступен или пока невозможен."
+    "defaultMessage": "При смене языка некоторые элементы {platform} могут остаться на английском, если их перевод недоступен или пока невозможен."
   },
   "settings.pats.title": {
     "defaultMessage": "Личные токены доступа"

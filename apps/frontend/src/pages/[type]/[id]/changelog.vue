@@ -57,6 +57,7 @@
 									<a
 										class="ml-auto"
 										:href="createDownloadUrl(version)"
+										:download="getPrimaryFile(version).filename"
 										:title="`Download ${version.name}`"
 									>
 										<DownloadIcon aria-hidden="true" />

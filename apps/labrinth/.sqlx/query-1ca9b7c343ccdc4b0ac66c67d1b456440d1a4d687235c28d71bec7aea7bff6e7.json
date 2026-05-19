@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO moderation_notes (user_id, organization_id, last_author, version, notes, user_rating)\n            SELECT\n              $1, $2, $3, 1, COALESCE($4::text, ''), COALESCE($5::integer, 0)\n            WHERE NOT EXISTS (\n              SELECT 1 FROM moderation_notes\n              WHERE\n                ($1::bigint IS NOT NULL AND user_id = $1)\n                OR ($2::bigint IS NOT NULL AND organization_id = $2)\n            )\n            ON CONFLICT DO NOTHING\n            RETURNING version\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8",
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "1ca9b7c343ccdc4b0ac66c67d1b456440d1a4d687235c28d71bec7aea7bff6e7"
+}
