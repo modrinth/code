@@ -258,7 +258,7 @@
 											:aria-disabled="item.disabled || undefined"
 											:data-option-index="index"
 											:data-focused="focusedIndex === index"
-											class="flex w-full cursor-pointer items-center gap-2.5 p-3 py-3.5 focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4 hover:brightness-110 focus:brightness-110"
+											class="flex w-full cursor-pointer items-center gap-2.5 p-3 py-3.5 outline-none focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4 hover:brightness-110 focus:brightness-110"
 											:class="[
 												item.class,
 												shouldVirtualizeOptions ? 'h-12' : undefined,
