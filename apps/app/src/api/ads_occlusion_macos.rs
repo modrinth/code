@@ -24,29 +24,19 @@ pub fn main_window_id(ns_window: *mut std::ffi::c_void) -> Option<CGWindowID> {
     (window_number > 0).then_some(window_number as CGWindowID)
 }
 
-pub fn is_ads_webview_occluded<F>(
+pub fn is_ads_webview_occluded(
     main_window_id: CGWindowID,
     ad_x: i32,
     ad_y: i32,
     ad_width: u32,
     ad_height: u32,
     scale_factor: f64,
-    mut log_to_js_console: F,
-) -> bool
-where
-    F: FnMut(&str, serde_json::Value),
-{
+) -> (bool, Option<String>) {
     let Some(window_infos) = CGDisplay::window_list_info(
         kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements,
         None,
     ) else {
-        tracing::debug!("macOS window list query returned no window info");
-        log_to_js_console(
-            "macOS window list query returned no window info",
-            serde_json::json!({}),
-        );
-
-        return false;
+        return (false, None);
     };
 
     let window_infos = unsafe {
@@ -59,20 +49,7 @@ where
         .find(|window_info| window_id(window_info) == Some(main_window_id))
         .and_then(|window_info| window_rect(&window_info))
     else {
-        tracing::debug!(
-            main_window_id,
-            window_count = window_infos.len(),
-            "Unable to find main app window in macOS window list"
-        );
-        log_to_js_console(
-            "Unable to find main app window in macOS window list",
-            serde_json::json!({
-                "main_window_id": main_window_id,
-                "window_count": window_infos.len(),
-            }),
-        );
-
-        return false;
+        return (false, None);
     };
     let ad_rect = ad_rect_from_main_window(
         &main_window_rect,
@@ -84,32 +61,13 @@ where
     );
 
     if is_empty_rect(&ad_rect) {
-        tracing::debug!(
-            ad_x,
-            ad_y,
-            ad_width,
-            ad_height,
-            scale_factor,
-            "Computed macOS ad WebView rect is empty"
-        );
-        log_to_js_console(
-            "Computed macOS ad WebView rect is empty",
-            serde_json::json!({
-                "ad_x": ad_x,
-                "ad_y": ad_y,
-                "ad_width": ad_width,
-                "ad_height": ad_height,
-                "scale_factor": scale_factor,
-            }),
-        );
-
-        return false;
+        return (false, None);
     }
 
     let ad_area = rect_area(&ad_rect);
 
     if ad_area == 0.0 {
-        return false;
+        return (false, None);
     }
 
     let app_process_id = std::process::id() as i32;
@@ -118,18 +76,7 @@ where
             | kCGWindowListExcludeDesktopElements,
         Some(main_window_id),
     ) else {
-        tracing::debug!(
-            main_window_id,
-            "macOS windows-above-main query returned no window info"
-        );
-        log_to_js_console(
-            "macOS windows-above-main query returned no window info",
-            serde_json::json!({
-                "main_window_id": main_window_id,
-            }),
-        );
-
-        return false;
+        return (false, None);
     };
     let windows_above_main = unsafe {
         CFArray::<CFDictionary<CFString, CFType>>::wrap_under_get_rule(
@@ -143,39 +90,6 @@ where
     let mut skipped_transparent = 0u32;
     let mut overlapping_windows = 0u32;
     let mut occluded_area = 0.0;
-
-    tracing::debug!(
-        main_window_id,
-        app_process_id,
-        main_x = main_window_rect.origin.x,
-        main_y = main_window_rect.origin.y,
-        main_width = main_window_rect.size.width,
-        main_height = main_window_rect.size.height,
-        ad_x = ad_rect.origin.x,
-        ad_y = ad_rect.origin.y,
-        ad_width = ad_rect.size.width,
-        ad_height = ad_rect.size.height,
-        scale_factor,
-        window_count = windows_above_main.len(),
-        "Checking macOS normal windows above ad WebView"
-    );
-    log_to_js_console(
-        "Checking macOS normal windows above ad WebView",
-        serde_json::json!({
-            "main_window_id": main_window_id,
-            "app_process_id": app_process_id,
-            "main_x": main_window_rect.origin.x,
-            "main_y": main_window_rect.origin.y,
-            "main_width": main_window_rect.size.width,
-            "main_height": main_window_rect.size.height,
-            "ad_x": ad_rect.origin.x,
-            "ad_y": ad_rect.origin.y,
-            "ad_width": ad_rect.size.width,
-            "ad_height": ad_rect.size.height,
-            "scale_factor": scale_factor,
-            "window_count": windows_above_main.len(),
-        }),
-    );
 
     for window_info in windows_above_main.iter() {
         checked_windows += 1;
@@ -195,14 +109,6 @@ where
         if owner_name.as_deref().is_some_and(is_system_window_owner) {
             skipped_system_owner += 1;
 
-            tracing::debug!(
-                checked_windows,
-                window_id = ?window_id(&window_info),
-                owner_pid = ?window_process_id(&window_info),
-                owner_name = ?owner_name,
-                "Skipping macOS system/window-manager surface"
-            );
-
             continue;
         }
 
@@ -210,15 +116,6 @@ where
 
         if layer != Some(0) {
             skipped_non_normal_layer += 1;
-
-            tracing::debug!(
-                checked_windows,
-                window_id = ?window_id(&window_info),
-                owner_pid = ?window_process_id(&window_info),
-                owner_name = ?owner_name,
-                layer = ?layer,
-                "Skipping macOS window because it is not a normal app window layer"
-            );
 
             continue;
         }
@@ -245,109 +142,30 @@ where
         let owner_pid = window_process_id(&window_info);
         let occluded_ratio = occluded_area / ad_area;
 
-        tracing::debug!(
-            checked_windows,
-            window_id = ?window_id,
-            owner_pid = ?owner_pid,
-            owner_name = ?owner_name,
-            layer = ?layer,
-            alpha = ?alpha,
-            x = rect.origin.x,
-            y = rect.origin.y,
-            width = rect.size.width,
-            height = rect.size.height,
-            intersection_x = intersection.origin.x,
-            intersection_y = intersection.origin.y,
-            intersection_width = intersection.size.width,
-            intersection_height = intersection.size.height,
-            occluded_area,
-            ad_area,
-            occluded_ratio,
-            "macOS normal window contents overlap ad WebView"
-        );
-        log_to_js_console(
-            "macOS normal window contents overlap ad WebView",
-            serde_json::json!({
-                "checked_windows": checked_windows,
-                "window_id": window_id,
-                "owner_pid": owner_pid,
-                "owner_name": owner_name,
-                "layer": layer,
-                "alpha": alpha,
-                "x": rect.origin.x,
-                "y": rect.origin.y,
-                "width": rect.size.width,
-                "height": rect.size.height,
-                "intersection_x": intersection.origin.x,
-                "intersection_y": intersection.origin.y,
-                "intersection_width": intersection.size.width,
-                "intersection_height": intersection.size.height,
-                "occluded_area": occluded_area,
-                "ad_area": ad_area,
-                "occluded_ratio": occluded_ratio,
-            }),
-        );
-
         if occluded_ratio >= super::ads::OCCLUDED_AREA_THRESHOLD {
-            tracing::debug!(
-                checked_windows,
-                skipped_own_process,
-                skipped_system_owner,
-                skipped_non_normal_layer,
-                skipped_transparent,
-                overlapping_windows,
-                occluded_area,
-                ad_area,
-                occluded_ratio,
-                "macOS ad WebView occlusion threshold reached"
+            return (
+                true,
+                Some(format!(
+                    "Ads WebView is occluded by {} (pid {:?}, window {:?}); {:.0}% of the ad area is covered.",
+                    owner_name.as_deref().unwrap_or("another app"),
+                    owner_pid,
+                    window_id,
+                    occluded_ratio * 100.0,
+                )),
             );
-            log_to_js_console(
-                "macOS ad WebView occlusion threshold reached",
-                serde_json::json!({
-                    "checked_windows": checked_windows,
-                    "skipped_own_process": skipped_own_process,
-                    "skipped_system_owner": skipped_system_owner,
-                    "skipped_non_normal_layer": skipped_non_normal_layer,
-                    "skipped_transparent": skipped_transparent,
-                    "overlapping_windows": overlapping_windows,
-                    "occluded_area": occluded_area,
-                    "ad_area": ad_area,
-                    "occluded_ratio": occluded_ratio,
-                }),
-            );
-
-            return true;
         }
     }
 
-    tracing::debug!(
+    let _ = (
         checked_windows,
         skipped_own_process,
         skipped_system_owner,
         skipped_non_normal_layer,
         skipped_transparent,
         overlapping_windows,
-        occluded_area,
-        ad_area,
-        occluded_ratio = occluded_area / ad_area,
-        "Finished checking macOS normal windows above ad WebView"
-    );
-    log_to_js_console(
-        "Finished checking macOS normal windows above ad WebView",
-        serde_json::json!({
-            "checked_windows": checked_windows,
-            "skipped_own_process": skipped_own_process,
-            "skipped_system_owner": skipped_system_owner,
-            "skipped_non_normal_layer": skipped_non_normal_layer,
-            "skipped_transparent": skipped_transparent,
-            "overlapping_windows": overlapping_windows,
-            "occluded_area": occluded_area,
-            "ad_area": ad_area,
-            "occluded_ratio": occluded_area / ad_area,
-        }),
     );
 
-    false
+    (false, None)
 }
 
 fn ad_rect_from_main_window(

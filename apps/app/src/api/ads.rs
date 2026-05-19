@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime};
+use tauri::{Emitter, Manager, PhysicalPosition, PhysicalSize, Runtime};
 use tauri_plugin_opener::OpenerExt;
 use theseus::settings;
 use tokio::sync::RwLock;
@@ -14,6 +14,12 @@ pub struct AdsState {
     pub occluded: bool,
     pub last_click: Option<Instant>,
     pub malicious_origins: HashSet<String>,
+}
+
+#[cfg(any(windows, target_os = "macos"))]
+struct ComputedAdsOcclusion {
+    occluded: bool,
+    notification: Option<String>,
 }
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
@@ -131,33 +137,22 @@ fn set_webview_visible_for_window<R: Runtime>(
 }
 
 #[cfg(any(windows, target_os = "macos"))]
-fn log_ads_occlusion_to_js_console<R: Runtime>(
+fn notify_ads_occlusion<R: Runtime>(
     app: &tauri::AppHandle<R>,
-    message: &str,
-    fields: serde_json::Value,
+    message: String,
 ) {
-    let Some(webview) = app.get_webview("main") else {
-        return;
-    };
-
-    let payload = serde_json::json!({
-        "message": message,
-        "fields": fields,
-    });
-    let script = format!("console.debug('[ads-occlusion]', {});", payload);
-
-    if let Err(error) = webview.eval(script) {
-        tracing::debug!(
-            ?error,
-            "Failed to write Ads WebView occlusion log to JS console"
-        );
-    }
+    let _ = app.emit(
+        "warning",
+        serde_json::json!({
+            "message": message,
+        }),
+    );
 }
 
 #[cfg(any(windows, target_os = "macos"))]
 fn compute_ads_webview_occlusion<R: Runtime>(
     app: &tauri::AppHandle<R>,
-) -> Option<bool> {
+) -> Option<ComputedAdsOcclusion> {
     let main_window = app.get_window("main")?;
     let webviews = app.webviews();
     let webview = webviews.get("ads-window")?;
@@ -171,39 +166,20 @@ fn compute_ads_webview_occlusion<R: Runtime>(
         let main_window_id =
             crate::api::ads_occlusion_macos::main_window_id(ns_window)?;
 
-        tracing::debug!(
-            main_window_id,
-            x = position.x,
-            y = position.y,
-            width = size.width,
-            height = size.height,
-            scale_factor,
-            "Checking macOS normal windows above ad WebView"
-        );
-        log_ads_occlusion_to_js_console(
-            app,
-            "Checking macOS normal windows above ad WebView",
-            serde_json::json!({
-                "main_window_id": main_window_id,
-                "x": position.x,
-                "y": position.y,
-                "width": size.width,
-                "height": size.height,
-                "scale_factor": scale_factor,
-            }),
-        );
+        let (occluded, notification) =
+            crate::api::ads_occlusion_macos::is_ads_webview_occluded(
+                main_window_id,
+                position.x,
+                position.y,
+                size.width,
+                size.height,
+                scale_factor,
+            );
 
-        return Some(crate::api::ads_occlusion_macos::is_ads_webview_occluded(
-            main_window_id,
-            position.x,
-            position.y,
-            size.width,
-            size.height,
-            scale_factor,
-            |message, fields| {
-                log_ads_occlusion_to_js_console(app, message, fields)
-            },
-        ));
+        return Some(ComputedAdsOcclusion {
+            occluded,
+            notification,
+        });
     }
 
     #[cfg(windows)]
@@ -212,88 +188,44 @@ fn compute_ads_webview_occlusion<R: Runtime>(
         let size = webview.size().ok()?;
         let hwnd = main_window.hwnd().ok()?;
 
-        tracing::debug!(
-            x = position.x,
-            y = position.y,
-            width = size.width,
-            height = size.height,
-            "Computing Windows Ads WebView occlusion"
-        );
-        log_ads_occlusion_to_js_console(
-            app,
-            "Computing Windows Ads WebView occlusion",
-            serde_json::json!({
-                "x": position.x,
-                "y": position.y,
-                "width": size.width,
-                "height": size.height,
-            }),
-        );
+        let occluded =
+            crate::api::ads_occlusion_windows::is_ads_webview_occluded(
+                hwnd,
+                position.x,
+                position.y,
+                size.width,
+                size.height,
+            );
 
-        Some(crate::api::ads_occlusion_windows::is_ads_webview_occluded(
-            hwnd,
-            position.x,
-            position.y,
-            size.width,
-            size.height,
-        ))
+        Some(ComputedAdsOcclusion {
+            occluded,
+            notification: None,
+        })
     }
 }
 
 #[cfg(any(windows, target_os = "macos"))]
 async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
-    tracing::debug!("Polling Ads WebView occlusion state");
-    log_ads_occlusion_to_js_console(
-        app,
-        "Polling Ads WebView occlusion state",
-        serde_json::json!({}),
-    );
-
-    let Some(occluded) = compute_ads_webview_occlusion(app) else {
-        tracing::debug!("Unable to compute Ads WebView occlusion state");
-        log_ads_occlusion_to_js_console(
-            app,
-            "Unable to compute Ads WebView occlusion state",
-            serde_json::json!({}),
-        );
-
+    let Some(computed) = compute_ads_webview_occlusion(app) else {
         return;
     };
-
-    tracing::debug!(occluded, "Computed Ads WebView occlusion state");
-    log_ads_occlusion_to_js_console(
-        app,
-        "Computed Ads WebView occlusion state",
-        serde_json::json!({
-            "occluded": occluded,
-        }),
-    );
+    let occluded = computed.occluded;
 
     let state = app.state::<RwLock<AdsState>>();
     let mut state = state.write().await;
 
     if state.occluded == occluded {
-        tracing::debug!(occluded, "Ads WebView occlusion state unchanged");
-        log_ads_occlusion_to_js_console(
-            app,
-            "Ads WebView occlusion state unchanged",
-            serde_json::json!({
-                "occluded": occluded,
-            }),
-        );
-
         return;
     }
 
     state.occluded = occluded;
-    tracing::debug!(occluded, "Ads WebView occlusion state changed");
-    log_ads_occlusion_to_js_console(
-        app,
-        "Ads WebView occlusion state changed",
-        serde_json::json!({
-            "occluded": occluded,
-        }),
-    );
+    let notification = computed.notification.unwrap_or_else(|| {
+        format!(
+            "Ads WebView occlusion state changed: {}",
+            if occluded { "occluded" } else { "visible" }
+        )
+    });
+    notify_ads_occlusion(app, notification);
     let visible = state.shown && !state.modal_shown;
     drop(state);
 
