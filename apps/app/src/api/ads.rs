@@ -100,10 +100,7 @@ fn configure_ads_cookie_settings(
     }
 }
 
-fn set_webview_visible<R: Runtime>(
-    webview: &tauri::Webview<R>,
-    _visible: bool,
-) {
+fn set_webview_visible<R: Runtime>(webview: &tauri::Webview<R>, visible: bool) {
     webview
         .with_webview(
             #[allow(unused_variables)]
@@ -111,11 +108,18 @@ fn set_webview_visible<R: Runtime>(
                 #[cfg(windows)]
                 {
                     let controller = wv.controller();
-                    unsafe { controller.SetIsVisible(_visible) }.ok();
+                    unsafe { controller.SetIsVisible(visible) }.ok();
                 }
             },
         )
         .ok();
+
+    #[cfg(target_os = "macos")]
+    if visible {
+        webview.show().ok();
+    } else {
+        webview.hide().ok();
+    }
 }
 
 fn set_webview_visible_for_window<R: Runtime>(
