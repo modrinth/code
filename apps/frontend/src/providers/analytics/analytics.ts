@@ -61,6 +61,8 @@ const ANALYTICS_MAX_TIME_SLICES = 256 // controls granularity allowed in "group 
 const ANALYTICS_TIME_SLICES_GC_TIME_MS = 30 * 1000
 const ANALYTICS_PREFETCH_GC_TIME_MS = 15 * 1000
 const ANALYTICS_FILTER_OPTIONS_GC_TIME_MS = 60 * 1000
+const ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE = 15
+const ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS = 150
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -280,6 +282,74 @@ function isAnalyticsFetchRequestReady(
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
 ): fetchRequest is AnalyticsProjectFetchRequest {
 	return Array.isArray(fetchRequest?.project_ids) && fetchRequest.project_ids.length > 0
+}
+
+function buildAnalyticsFetchRequestBatches(
+	fetchRequest: AnalyticsProjectFetchRequest,
+): AnalyticsProjectFetchRequest[] {
+	if (fetchRequest.project_ids.length <= ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE) {
+		return [fetchRequest]
+	}
+
+	const requests: AnalyticsProjectFetchRequest[] = []
+	for (
+		let index = 0;
+		index < fetchRequest.project_ids.length;
+		index += ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE
+	) {
+		requests.push({
+			...fetchRequest,
+			project_ids: fetchRequest.project_ids.slice(
+				index,
+				index + ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE,
+			),
+		})
+	}
+
+	return requests
+}
+
+function mergeAnalyticsTimeSlices(
+	timeSliceGroups: Labrinth.Analytics.v3.TimeSlice[][],
+): Labrinth.Analytics.v3.TimeSlice[] {
+	const mergedTimeSlices: Labrinth.Analytics.v3.TimeSlice[] = []
+
+	for (const timeSlices of timeSliceGroups) {
+		timeSlices.forEach((timeSlice, index) => {
+			if (!mergedTimeSlices[index]) {
+				mergedTimeSlices[index] = []
+			}
+
+			mergedTimeSlices[index].push(...timeSlice)
+		})
+	}
+
+	return mergedTimeSlices
+}
+
+function waitForAnalyticsFetchBatchDelay(): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS))
+}
+
+async function fetchAnalyticsTimeSlices(
+	fetchRequest: AnalyticsProjectFetchRequest,
+	fetchAnalytics: (
+		request: Labrinth.Analytics.v3.FetchRequest,
+	) => Promise<Labrinth.Analytics.v3.FetchResponse>,
+): Promise<Labrinth.Analytics.v3.TimeSlice[]> {
+	const fetchRequests = buildAnalyticsFetchRequestBatches(fetchRequest)
+	const timeSliceGroups: Labrinth.Analytics.v3.TimeSlice[][] = []
+
+	for (let index = 0; index < fetchRequests.length; index++) {
+		if (index > 0) {
+			await waitForAnalyticsFetchBatchDelay()
+		}
+
+		const response = await fetchAnalytics(fetchRequests[index])
+		timeSliceGroups.push(response.metrics)
+	}
+
+	return mergeAnalyticsTimeSlices(timeSliceGroups)
 }
 
 function areAnalyticsFetchRequestsEqual(
@@ -1886,13 +1956,7 @@ export function createAnalyticsDashboardContext(
 	)
 
 	watch(
-		[
-			activeStat,
-			activeGraphViewMode,
-			isRatioMode,
-			showChartEvents,
-			hiddenGraphDatasetIds,
-		],
+		[activeStat, activeGraphViewMode, isRatioMode, showChartEvents, hiddenGraphDatasetIds],
 		() => {
 			syncAnalyticsRouteQuery('replace')
 		},
@@ -1908,11 +1972,14 @@ export function createAnalyticsDashboardContext(
 		queryKey: computed(() =>
 			buildAnalyticsCurrentTimeSlicesQueryKey(analyticsQueryUserId.value, fetchRequest.value),
 		),
-		queryFn: async () => {
-			const response = await client.labrinth.analytics_v3.fetch(
-				fetchRequest.value as Labrinth.Analytics.v3.FetchRequest,
+		queryFn: () => {
+			if (!isAnalyticsFetchRequestReady(fetchRequest.value)) {
+				return []
+			}
+
+			return fetchAnalyticsTimeSlices(fetchRequest.value, (request) =>
+				client.labrinth.analytics_v3.fetch(request),
 			)
-			return response.metrics
 		},
 		enabled: computed(() => isAnalyticsFetchRequestReady(fetchRequest.value)),
 		gcTime: ANALYTICS_TIME_SLICES_GC_TIME_MS,
@@ -1946,10 +2013,10 @@ export function createAnalyticsDashboardContext(
 						nextAnalyticsQueryUserId,
 						nextFetchRequest,
 					),
-					queryFn: async () => {
-						const response = await client.labrinth.analytics_v3.fetch(nextFetchRequest)
-						return response.metrics
-					},
+					queryFn: () =>
+						fetchAnalyticsTimeSlices(nextFetchRequest, (request) =>
+							client.labrinth.analytics_v3.fetch(request),
+						),
 					gcTime: ANALYTICS_PREFETCH_GC_TIME_MS,
 				})
 				.catch(() => {})
@@ -1957,16 +2024,18 @@ export function createAnalyticsDashboardContext(
 		{ deep: true, immediate: true },
 	)
 
-	const analyticsFilterOptionsRequests = computed<Labrinth.Analytics.v3.FetchRequest[] | null>(() => {
-		if (sortedSelectedProjectIds.value.length === 0) {
-			return null
-		}
+	const analyticsFilterOptionsRequests = computed<Labrinth.Analytics.v3.FetchRequest[] | null>(
+		() => {
+			if (sortedSelectedProjectIds.value.length === 0) {
+				return null
+			}
 
-		return buildAnalyticsFilterOptionsRequests(
-			sortedSelectedProjectIds.value,
-			new Date(queryRefreshTimestamp.value).toISOString(),
-		)
-	})
+			return buildAnalyticsFilterOptionsRequests(
+				sortedSelectedProjectIds.value,
+				new Date(queryRefreshTimestamp.value).toISOString(),
+			)
+		},
+	)
 
 	const { data: analyticsFilterOptionsData, isFetched: hasFetchedAnalyticsFilterOptions } =
 		useQuery({
@@ -1982,8 +2051,15 @@ export function createAnalyticsDashboardContext(
 			queryFn: async () => {
 				const timeSlices: Labrinth.Analytics.v3.TimeSlice[] = []
 				for (const request of analyticsFilterOptionsRequests.value ?? []) {
-					const response = await client.labrinth.analytics_v3.fetch(request)
-					timeSlices.push(...response.metrics)
+					if (!isAnalyticsFetchRequestReady(request)) {
+						continue
+					}
+
+					timeSlices.push(
+						...(await fetchAnalyticsTimeSlices(request, (nextRequest) =>
+							client.labrinth.analytics_v3.fetch(nextRequest),
+						)),
+					)
 				}
 				return timeSlices
 			},
@@ -2085,13 +2161,16 @@ export function createAnalyticsDashboardContext(
 			'previous',
 			previousFetchRequest.value,
 		]),
-		queryFn: async () => {
-			const response = await client.labrinth.analytics_v3.fetch(
-				previousFetchRequest.value as Labrinth.Analytics.v3.FetchRequest,
+		queryFn: () => {
+			if (!isAnalyticsFetchRequestReady(previousFetchRequest.value)) {
+				return []
+			}
+
+			return fetchAnalyticsTimeSlices(previousFetchRequest.value, (request) =>
+				client.labrinth.analytics_v3.fetch(request),
 			)
-			return response.metrics
 		},
-		enabled: computed(() => previousFetchRequest.value !== null),
+		enabled: computed(() => isAnalyticsFetchRequestReady(previousFetchRequest.value)),
 		gcTime: ANALYTICS_TIME_SLICES_GC_TIME_MS,
 	})
 
