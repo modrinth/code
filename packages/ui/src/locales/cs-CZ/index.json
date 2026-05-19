@@ -32,6 +32,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Zobrazit analýzy"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Načtení nastavení serveru se nezdařilo"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -40,6 +46,63 @@
   },
   "badge.new": {
     "defaultMessage": "Nové"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Zrušit"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} Sdílené procesory"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Chystáte se znovu přihlásit k odběru <server-name>{serverName}</server-name>. Vaše předplatné bude znovu aktivováno a váš server bude pokračovat v provozu bez přerušení."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Nelze obnovit předplatné, načtení údajů o předplatném se nezdařilo."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Chyba"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Nepodařilo se načíst podrobnosti předplatného."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 dní"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/měsíc"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/čtvrtletně"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/rok"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Další platba bude provedena <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Plán"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB RAM"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Znovu se přihlásit k odběru"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB Úložiště"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Znovu se přihlásit k odběru serveru"
+  },
+  "browse.filter-results": {
+    "defaultMessage": "Filtrovat výsledky..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Pro váš dotaz nebyly nalezeny žádné výsledky!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Právě nejste připojeni k internetu. Připojte se k internetu a prohlížejte si Modrinth!"
   },
   "button.accept": {
     "defaultMessage": "Přijmout"

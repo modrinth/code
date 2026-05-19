@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tUPDATE analytics_events\n\t\t\tSET meta = $2, starts = $3, ends = $4\n\t\t\tWHERE id = $1\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Jsonb",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2e6ffe58fef1368fdd1377534b27ec367b211113464c6c79a3c9e226ae3fdb79"
+}

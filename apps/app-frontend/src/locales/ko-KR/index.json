@@ -104,6 +104,12 @@
   "app.auth-servers.unreachable.header": {
     "message": "인증 서버에 연결할 수 없습니다"
   },
+  "app.browse.add-servers-to-instance": {
+    "message": "인스턴스에 서버 추가"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "인스턴스에 추가"
+  },
   "app.browse.add-to-instance": {
     "message": "인스턴스에 추가"
   },
@@ -116,6 +122,9 @@
   "app.browse.already-added": {
     "message": "이미 추가됨"
   },
+  "app.browse.back-to-instance": {
+    "message": "인스턴스로 돌아가기"
+  },
   "app.browse.discover-content": {
     "message": "콘텐츠 탐색하기"
   },
@@ -127,6 +136,9 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "모드팩"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "콘텐츠를 추가하면 서버 접속 시 호환이 안 될 수 있습니다. 또한 서버 인스턴스 콘텐츠를 업데이트하면 임의로 추가된 콘텐츠는 모두 손실됩니다."
   },
   "app.browse.server.installing": {
     "message": "설치 중"
@@ -286,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name}을(를) 플레이하려면 업데이트가 필요합니다. 게임을 실행하려면 최신 버전으로 업데이트해 주세요."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "이미 설치되어 있음"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "탐색으로 돌아가기"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "인스턴스에 콘텐츠 설치"
   },
   "app.settings.developer-mode-enabled": {
     "message": "개발자 모드가 활성화되었습니다."

@@ -875,24 +875,6 @@
   "dashboard.head-title": {
     "message": "Bảng điều khiển"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Đánh dấu tất cả là đã đọc"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Xem lịch sử"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "Bạn không có thông báo nào chưa đọc."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Lỗi khi tải thông báo:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Lịch sử"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Lịch sử thông báo"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "Xem tất cả"
   },
@@ -901,9 +883,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "Xem thêm {extraNotifs} {extraNotifs, plural, one {thông báo} other {thông báo}} khác"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Đang tải thông báo..."
   },
   "dashboard.revenue.available-now": {
     "message": "Khả dụng ngay"
@@ -1555,9 +1534,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Lỗi tạo trạng thái từ API trong quá trình build."
-  },
-  "layout.banner.preview.description": {
-    "message": "Nếu bạn muốn truy cập trang web chính thức của Modrinth, hãy truy cập <link>https://modrinth.com</link>. Bản triển khai xem trước này được nhân viên Modrinth sử dụng cho mục đích thử nghiệm. Nó được xây dựng từ <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "Đây là bản mẫu của trang web Modrinth."

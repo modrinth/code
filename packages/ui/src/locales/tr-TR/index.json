@@ -86,6 +86,15 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Sunucuya Yeniden Abone Ol"
   },
+  "browse.offline": {
+    "defaultMessage": "Şu anda çevrimdışısınız. Modrinth'de gezinmek için internet'e bağlanın!"
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Seçili projeler"
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Seçili projeler hala indirilmemiş"
+  },
   "button.accept": {
     "defaultMessage": "Kabul Et"
   },
@@ -158,6 +167,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Snapshotları gizle"
   },
+  "button.install": {
+    "defaultMessage": "Yükle"
+  },
   "button.max": {
     "defaultMessage": "Maksimum"
   },
@@ -175,6 +187,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Klasörde aç"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Modrinth'de aç"
   },
   "button.play": {
     "defaultMessage": "Oyna"
@@ -268,6 +283,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "Gizli"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "{project} seçin"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "{count, plural, one {# projeyi} other {# projeyi}} en yeni uyumlu sürümüne güncellemek istediğinden emin misin? İçeriklerin tek tek güncellenmesi önerilir."
@@ -488,6 +506,21 @@
   "creation-flow.button.import": {
     "defaultMessage": "İçe aktar"
   },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "Sunucu kurun"
+  },
+  "creation-flow.modal.custom-setup.build-number.label": {
+    "defaultMessage": "İnşaa numarası"
+  },
+  "creation-flow.modal.custom-setup.build-number.placeholder": {
+    "defaultMessage": "İnşaa numarası seçin"
+  },
+  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
+    "defaultMessage": "İnşaa üyesi arayın..."
+  },
+  "creation-flow.modal.custom-setup.content-loader.label": {
+    "defaultMessage": "İçerik yükleyici"
+  },
   "creation-flow.modal.custom-setup.game-version.placeholder": {
     "defaultMessage": "Oyun sürümü seç"
   },
@@ -580,6 +613,33 @@
   },
   "creation-flow.modal.final-config.generator-settings.placeholder": {
     "defaultMessage": "Oluşturucu ayarları seçin"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "Dünya adı"
+  },
+  "creation-flow.modal.final-config.world-name.placeholder": {
+    "defaultMessage": "Dünya adı girin"
+  },
+  "creation-flow.modal.final-config.world-seed.description": {
+    "defaultMessage": "Rastgele bir tohum için boş bırakın."
+  },
+  "creation-flow.modal.final-config.world-seed.placeholder": {
+    "defaultMessage": "Dünya tohumu girin"
+  },
+  "creation-flow.modal.final-config.world-type.default": {
+    "defaultMessage": "Varsayılan"
+  },
+  "creation-flow.modal.final-config.world-type.label": {
+    "defaultMessage": "Dünya türü"
+  },
+  "creation-flow.modal.final-config.world-type.placeholder": {
+    "defaultMessage": "Dünya türü seçin"
+  },
+  "creation-flow.modal.final-config.world-type.superflat": {
+    "defaultMessage": "Dümdüz"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "Ekle"
   },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Yüklemek istediğiniz mod paketini zaten biliyor musunuz?"
