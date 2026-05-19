@@ -25,6 +25,26 @@ use tracing::error;
 pub const VERSIONS_NAMESPACE: &str = "versions";
 const VERSION_FILES_NAMESPACE: &str = "versions_files";
 
+pub async fn cleanup_empty_attribution_groups(
+    transaction: &mut PgTransaction<'_>,
+) -> Result<(), DatabaseError> {
+    sqlx::query!(
+        "
+        DELETE FROM project_attribution_groups g
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM project_attribution_files paf
+            INNER JOIN override_file_sources ofs ON ofs.sha1 = paf.sha1
+            WHERE paf.group_id = g.id
+        )
+        ",
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    Ok(())
+}
+
 #[derive(Clone)]
 pub struct VersionBuilder {
     pub version_id: DBVersionId,
@@ -465,6 +485,8 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await?;
+
+        cleanup_empty_attribution_groups(transaction).await?;
 
         // Sync dependencies
 

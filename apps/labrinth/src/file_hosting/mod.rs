@@ -46,6 +46,10 @@ pub enum FileHostPublicity {
 
 #[async_trait]
 pub trait FileHost: Send + Sync {
+    /// Uploads a file at the exact storage key provided.
+    ///
+    /// Callers must URL-decode keys derived from public URLs before passing
+    /// them here, and URL-encode this key before exposing it in a public URL.
     async fn upload_file(
         &self,
         content_type: &str,
@@ -54,18 +58,30 @@ pub trait FileHost: Send + Sync {
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError>;
 
+    /// Returns a private URL for the exact storage key provided.
+    ///
+    /// Callers must URL-decode keys derived from public URLs before passing
+    /// them here.
     async fn get_url_for_private_file(
         &self,
         file_name: &str,
         expiry_secs: u32,
     ) -> Result<String, FileHostingError>;
 
+    /// Deletes the file at the exact storage key provided.
+    ///
+    /// Callers must URL-decode keys derived from public URLs before passing
+    /// them here.
     async fn delete_file(
         &self,
         file_name: &str,
         file_publicity: FileHostPublicity,
     ) -> Result<DeleteFileData, FileHostingError>;
 
+    /// Reads the file at the exact storage key provided.
+    ///
+    /// Callers must URL-decode keys derived from public URLs before passing
+    /// them here.
     async fn read_file(
         &self,
         file_name: &str,

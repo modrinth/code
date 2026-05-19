@@ -189,9 +189,10 @@ async fn extract_override_files_from_storage(
         .strip_prefix(&ENV.CDN_URL)
         .unwrap_or(file_url)
         .trim_start_matches('/');
+    let key = urlencoding::decode(key).wrap_err("decoding file URL path")?;
 
     let file_data = file_host
-        .read_file(key, FileHostPublicity::Public)
+        .read_file(&key, FileHostPublicity::Public)
         .await
         .wrap_err_with(|| {
         eyre!("reading file {file_id:?} from storage at {key}")
