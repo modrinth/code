@@ -95,6 +95,11 @@ fn configure_ads_cookie_settings(
 }
 
 fn set_webview_visible<R: Runtime>(webview: &tauri::Webview<R>, visible: bool) {
+    #[cfg(not(any(windows, target_os = "macos")))]
+    {
+        _ = visible;
+    }
+
     webview
         .with_webview(
             #[allow(unused_variables)]
