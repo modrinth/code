@@ -433,7 +433,9 @@ const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset
 	const nextPalette = legendPalette.value
 	const nextSelectedBreakdown = selectedBreakdown.value
 	const nextSelectedFilters = selectedFilters.value
-	const nextGetVersionProjectName = showProjectVersionNames.value ? getVersionProjectName : undefined
+	const nextGetVersionProjectName = showProjectVersionNames.value
+		? getVersionProjectName
+		: undefined
 	const nextSliceCount = sliceCount.value
 
 	for (const stat of dashboardStats) {
