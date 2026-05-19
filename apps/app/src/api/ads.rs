@@ -176,10 +176,10 @@ fn compute_ads_webview_occlusion<R: Runtime>(
                 scale_factor,
             );
 
-        return Some(ComputedAdsOcclusion {
+        Some(ComputedAdsOcclusion {
             occluded,
             notification,
-        });
+        })
     }
 
     #[cfg(windows)]
