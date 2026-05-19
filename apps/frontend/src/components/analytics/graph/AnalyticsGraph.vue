@@ -901,10 +901,10 @@ const chartRangeBounds = computed(() => {
 const hoverTotalValue = computed(() => {
 	if (hoverState.sliceIndex === null) return 0
 	const sliceIndex = hoverState.sliceIndex
-	return visibleChartDatasets.value.reduce(
-		(sum, dataset) => sum + (dataset.data[sliceIndex] ?? 0),
-		0,
-	)
+	return displayedLegendEntries.value.reduce((sum, legendEntry) => {
+		const dataset = chartDatasetById.value.get(legendEntry.id)
+		return sum + (dataset?.data[sliceIndex] ?? 0)
+	}, 0)
 })
 
 const hoverFormattedTotal = computed(() => {
@@ -917,21 +917,23 @@ const hoverFormattedTotal = computed(() => {
 const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 	if (hoverState.sliceIndex === null) return []
 	const sliceIndex = hoverState.sliceIndex
-	return displayedLegendEntries.value
-		.filter((legendEntry) => !legendEntry.hidden)
-		.map((legendEntry) => {
-			const dataset = visibleChartDatasetById.value.get(legendEntry.id)
-			const value = dataset?.data[sliceIndex] ?? 0
+	const totalValue = hoverTotalValue.value
 
-			return {
-				projectId: legendEntry.id,
-				name: legendEntry.name,
-				projectName: legendEntry.projectName,
-				color: legendEntry.color,
-				formattedValue: isRatioMode.value
-					? `${value.toFixed(1)}%`
-					: formatMetricValue(value, activeStat.value, formatNumber),
-			}
-		})
+	return displayedLegendEntries.value.map((legendEntry) => {
+		const dataset = chartDatasetById.value.get(legendEntry.id)
+		const value = dataset?.data[sliceIndex] ?? 0
+		const ratioValue = totalValue === 0 ? 0 : (value / totalValue) * 100
+
+		return {
+			projectId: legendEntry.id,
+			name: legendEntry.name,
+			projectName: legendEntry.projectName,
+			color: legendEntry.color,
+			formattedValue: isRatioMode.value
+				? `${ratioValue.toFixed(1)}%`
+				: formatMetricValue(value, activeStat.value, formatNumber),
+			hidden: legendEntry.hidden,
+		}
+	})
 })
 </script>

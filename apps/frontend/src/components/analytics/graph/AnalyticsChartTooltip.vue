@@ -31,18 +31,27 @@
 				:key="entry.projectId"
 				class="flex items-center justify-between gap-4"
 			>
-				<div class="inline-flex items-center gap-1.5 text-primary">
+				<div
+					class="inline-flex items-center gap-1.5"
+					:class="entry.hidden ? 'text-secondary opacity-70' : 'text-primary'"
+				>
 					<span class="size-2 rounded-full" :style="{ backgroundColor: entry.color }" />
 					<span
 						v-tooltip="entry.projectName ?? ''"
 						:class="{
+							'line-through': entry.hidden,
 							capitalize: capitalizeLabels,
 						}"
 					>
 						{{ entry.name }}
 					</span>
 				</div>
-				<span class="font-semibold text-contrast">{{ entry.formattedValue }}</span>
+				<span
+					class="font-semibold"
+					:class="entry.hidden ? 'text-secondary line-through opacity-70' : 'text-contrast'"
+				>
+					{{ entry.formattedValue }}
+				</span>
 			</div>
 		</div>
 	</div>
@@ -57,6 +66,7 @@ export type AnalyticsChartTooltipEntry = {
 	projectName?: string
 	color: string
 	formattedValue: string
+	hidden: boolean
 }
 
 const props = defineProps<{
