@@ -27,7 +27,7 @@
 
 						<div v-if="showDateToggle" class="mx-1 h-6 w-px bg-surface-5"></div>
 
-						<ButtonStyled v-if="showCsvExportMenu">
+						<ButtonStyled>
 							<OverflowMenu
 								class="!shadow-none"
 								:options="csvExportOptions"
@@ -39,16 +39,6 @@
 								<template #cumulative-csv> Cumulative </template>
 								<template #grouped-csv> Grouped by {{ groupByLabel.toLowerCase() }} </template>
 							</OverflowMenu>
-						</ButtonStyled>
-						<ButtonStyled v-else>
-							<button
-								class="!shadow-none"
-								:disabled="isDataLoading || sortedRows.length === 0"
-								@click="downloadCsv(displayedTableMode)"
-							>
-								<DownloadIcon />
-								Export CSV
-							</button>
 						</ButtonStyled>
 					</div>
 				</div>
@@ -264,18 +254,30 @@ const displayedIncludeDateColumn = computed(() =>
 		? false
 		: displayedTableMode.value === 'date_breakdown' || !showBreakdownColumn.value,
 )
-const showCsvExportMenu = computed(() => showGraphDatasetSelection.value)
 const groupByLabel = computed(() => getGroupByLabel(selectedGroupBy.value))
-const csvExportOptions = computed<OverflowMenuOption[]>(() => [
-	{
-		id: 'cumulative-csv',
-		action: () => downloadCsv('breakdown_only'),
-	},
-	{
-		id: 'grouped-csv',
-		action: () => downloadCsv('date_breakdown'),
-	},
-])
+const csvExportOptions = computed<OverflowMenuOption[]>(() => {
+	if (showGraphDatasetSelection.value) {
+		return [
+			{
+				id: 'cumulative-csv',
+				action: () => downloadCsv('breakdown_only'),
+			},
+			{
+				id: 'grouped-csv',
+				action: () => downloadCsv('date_breakdown'),
+			},
+		]
+	}
+
+	const mode = displayedTableMode.value
+
+	return [
+		{
+			id: mode === 'date_breakdown' ? 'grouped-csv' : 'cumulative-csv',
+			action: () => downloadCsv(mode),
+		},
+	]
+})
 const projectNamesById = computed(
 	() => new Map(projects.value.map((project) => [project.id, project.name])),
 )
