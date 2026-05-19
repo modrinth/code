@@ -22,9 +22,9 @@ pub fn start_logger(_app_identifier: &str) -> Option<()> {
     use tracing_subscriber::prelude::*;
 
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| {
-            tracing_subscriber::EnvFilter::new("theseus=info,theseus_gui=info")
-        });
+        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(
+            "theseus=info,theseus_gui=info,theseus_gui::api::ads=debug,theseus_gui::api::ads_occlusion_macos=debug",
+        ));
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
         .with(filter)

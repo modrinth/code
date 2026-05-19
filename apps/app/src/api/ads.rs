@@ -129,40 +129,157 @@ fn set_webview_visible_for_window<R: Runtime>(
     set_webview_visible(webview, visible && !is_minimized && !is_occluded);
 }
 
-#[cfg(windows)]
+#[cfg(any(windows, target_os = "macos"))]
+fn log_ads_occlusion_to_js_console<R: Runtime>(
+    app: &tauri::AppHandle<R>,
+    message: &str,
+    fields: serde_json::Value,
+) {
+    let Some(webview) = app.get_webview("main") else {
+        return;
+    };
+
+    let payload = serde_json::json!({
+        "message": message,
+        "fields": fields,
+    });
+    let script = format!("console.debug('[ads-occlusion]', {});", payload);
+
+    if let Err(error) = webview.eval(script) {
+        tracing::debug!(
+            ?error,
+            "Failed to write Ads WebView occlusion log to JS console"
+        );
+    }
+}
+
+#[cfg(any(windows, target_os = "macos"))]
 fn compute_ads_webview_occlusion<R: Runtime>(
     app: &tauri::AppHandle<R>,
 ) -> Option<bool> {
     let main_window = app.get_window("main")?;
     let webviews = app.webviews();
     let webview = webviews.get("ads-window")?;
-    let position = webview.position().ok()?;
-    let size = webview.size().ok()?;
-    let hwnd = main_window.hwnd().ok()?;
 
-    Some(crate::api::ads_occlusion_windows::is_ads_webview_occluded(
-        hwnd,
-        position.x,
-        position.y,
-        size.width,
-        size.height,
-    ))
+    #[cfg(target_os = "macos")]
+    let _ = webview;
+
+    #[cfg(target_os = "macos")]
+    {
+        let ns_window = main_window.ns_window().ok()?;
+        let main_window_id =
+            crate::api::ads_occlusion_macos::main_window_id(ns_window)?;
+
+        tracing::debug!(
+            main_window_id,
+            "Checking macOS windows above main app window"
+        );
+        log_ads_occlusion_to_js_console(
+            app,
+            "Checking macOS windows above main app window",
+            serde_json::json!({
+                "main_window_id": main_window_id,
+            }),
+        );
+
+        return Some(
+            crate::api::ads_occlusion_macos::log_windows_above_main_overlaps(
+                main_window_id,
+                |message, fields| {
+                    log_ads_occlusion_to_js_console(app, message, fields)
+                },
+            ),
+        );
+    }
+
+    #[cfg(windows)]
+    {
+        let position = webview.position().ok()?;
+        let size = webview.size().ok()?;
+        let hwnd = main_window.hwnd().ok()?;
+
+        tracing::debug!(
+            x = position.x,
+            y = position.y,
+            width = size.width,
+            height = size.height,
+            "Computing Windows Ads WebView occlusion"
+        );
+        log_ads_occlusion_to_js_console(
+            app,
+            "Computing Windows Ads WebView occlusion",
+            serde_json::json!({
+                "x": position.x,
+                "y": position.y,
+                "width": size.width,
+                "height": size.height,
+            }),
+        );
+
+        Some(crate::api::ads_occlusion_windows::is_ads_webview_occluded(
+            hwnd,
+            position.x,
+            position.y,
+            size.width,
+            size.height,
+        ))
+    }
 }
 
-#[cfg(windows)]
+#[cfg(any(windows, target_os = "macos"))]
 async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
+    tracing::debug!("Polling Ads WebView occlusion state");
+    log_ads_occlusion_to_js_console(
+        app,
+        "Polling Ads WebView occlusion state",
+        serde_json::json!({}),
+    );
+
     let Some(occluded) = compute_ads_webview_occlusion(app) else {
+        tracing::debug!("Unable to compute Ads WebView occlusion state");
+        log_ads_occlusion_to_js_console(
+            app,
+            "Unable to compute Ads WebView occlusion state",
+            serde_json::json!({}),
+        );
+
         return;
     };
+
+    tracing::debug!(occluded, "Computed Ads WebView occlusion state");
+    log_ads_occlusion_to_js_console(
+        app,
+        "Computed Ads WebView occlusion state",
+        serde_json::json!({
+            "occluded": occluded,
+        }),
+    );
 
     let state = app.state::<RwLock<AdsState>>();
     let mut state = state.write().await;
 
     if state.occluded == occluded {
+        tracing::debug!(occluded, "Ads WebView occlusion state unchanged");
+        log_ads_occlusion_to_js_console(
+            app,
+            "Ads WebView occlusion state unchanged",
+            serde_json::json!({
+                "occluded": occluded,
+            }),
+        );
+
         return;
     }
 
     state.occluded = occluded;
+    tracing::debug!(occluded, "Ads WebView occlusion state changed");
+    log_ads_occlusion_to_js_console(
+        app,
+        "Ads WebView occlusion state changed",
+        serde_json::json!({
+            "occluded": occluded,
+        }),
+    );
     let visible = state.shown && !state.modal_shown;
     drop(state);
 
@@ -281,7 +398,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 });
             }
 
-            #[cfg(windows)]
+            #[cfg(any(windows, target_os = "macos"))]
             {
                 let app_handle = app.clone();
 
