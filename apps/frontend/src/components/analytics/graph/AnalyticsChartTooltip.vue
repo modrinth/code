@@ -42,6 +42,10 @@
 								: 'cursor-pointer text-primary transition-all hover:brightness-125'
 					"
 					:aria-label="`${entry.hidden ? 'Show' : 'Hide'} ${entry.name} in graph`"
+					@mouseenter="emit('entry-hover', entry.projectId)"
+					@mouseleave="emit('entry-hover-clear', entry.projectId)"
+					@focus="emit('entry-hover', entry.projectId)"
+					@blur="emit('entry-hover-clear', entry.projectId)"
 					@click="onEntryClick($event, entry)"
 				>
 					<span class="size-2 rounded-full" :style="{ backgroundColor: entry.color }" />
@@ -99,6 +103,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	'entry-click': [projectId: string, shiftKey: boolean]
+	'entry-hover': [projectId: string]
+	'entry-hover-clear': [projectId: string]
 }>()
 
 function onEntryClick(event: MouseEvent, entry: AnalyticsChartTooltipEntry) {

@@ -192,6 +192,8 @@
 							:capitalize-labels="shouldCapitalizeDatasetLabels"
 							:shift-key-pressed="isShiftKeyPressed"
 							@entry-click="onTooltipEntryClick"
+							@entry-hover="setHoveredLegendEntryId"
+							@entry-hover-clear="clearHoveredLegendEntryId"
 						/>
 					</template>
 				</div>
