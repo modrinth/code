@@ -1,19 +1,19 @@
 <template>
-	<div class="flex flex-col gap-4">
+	<div class="@container flex flex-col gap-4">
 		<div class="flex items-center">
 			<Combobox
 				v-model="selectedTimeRange"
-				class="!w-full sm:!w-[245px]"
+				class="!w-full @[640px]:!w-[245px]"
 				:options="timeRangeOptions"
 				:display-value="selectedTimeRangeLabel"
-				trigger-class="!h-10 !w-full sm:!w-[245px] !rounded-[14px] !bg-surface-4 !px-4 !py-2.5 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]"
+				trigger-class="!h-10 !w-full @[640px]:!w-[245px] !rounded-[14px] !bg-surface-4 !px-4 !py-2.5 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]"
 				dropdown-min-width="245px"
 			/>
 		</div>
 
 		<Table
 			v-if="filteredEntries.length > 0"
-			class="hidden sm:block"
+			class="hidden @[640px]:block"
 			:columns="columns"
 			:data="tableEntries"
 			row-key="id"
@@ -70,59 +70,42 @@
 			</template>
 		</Table>
 
-		<div
-			v-if="filteredEntries.length > 0"
-			class="overflow-hidden rounded-2xl border border-solid border-surface-5 sm:hidden"
-		>
-			<div class="grid min-h-14 grid-cols-[minmax(0,1fr)_5rem] bg-surface-3">
-				<div class="flex items-center pl-4 font-semibold text-secondary">
-					{{ formatMessage(messages.eventColumn) }}
-				</div>
-				<div class="flex items-center justify-end pr-4 font-semibold text-secondary">
-					{{ formatMessage(messages.timeColumn) }}
-				</div>
-			</div>
+		<div v-if="filteredEntries.length > 0" class="flex flex-col gap-3 @[640px]:hidden">
 			<div
-				v-for="(entry, index) in filteredEntries"
+				v-for="entry in filteredEntries"
 				:key="entry.id"
-				class="grid min-h-[5.5rem] grid-cols-[minmax(0,1fr)_5rem] items-start border-0 border-t border-solid border-surface-5"
-				:class="index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
+				class="flex min-w-0 flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
 			>
-				<div class="min-w-0 py-3 pl-4 pr-2">
-					<div class="mb-2 flex min-w-0 items-center gap-2 text-sm">
-						<AutoLink
-							v-tooltip="actorName(entry)"
-							:to="actorProfilePath(entry)"
-							class="inline-flex min-w-0 items-center gap-2"
-							:class="actorProfilePath(entry) ? 'text-primary hover:underline' : ''"
-						>
-							<Avatar
-								:src="actorAvatarSrc(entry)"
-								:alt="formatMessage(messages.userAvatarAlt, { username: actorName(entry) })"
-								:tint-by="entry.actor.username"
-								size="20px"
-								circle
-								no-shadow
-							/>
-							<span
-								class="min-w-0 truncate font-medium"
-								:class="entry.actor.id === 'support' ? 'text-blue' : ''"
-							>
-								{{ actorName(entry) }}
-							</span>
-						</AutoLink>
-						<span class="text-secondary">·</span>
-						<span
-							v-tooltip="entry.world?.name"
-							class="min-w-0 truncate text-secondary"
-						>
-							{{ entry.world?.name ?? 'Server' }}
-						</span>
-					</div>
+				<AutoLink
+					v-tooltip="actorName(entry)"
+					:to="actorProfilePath(entry)"
+					class="inline-flex min-w-0 items-center gap-2 self-start"
+					:class="actorProfilePath(entry) ? 'text-primary hover:underline' : 'text-primary'"
+				>
+					<Avatar
+						:src="actorAvatarSrc(entry)"
+						:alt="formatMessage(messages.userAvatarAlt, { username: actorName(entry) })"
+						:tint-by="entry.actor.username"
+						size="24px"
+						circle
+						no-shadow
+					/>
+					<span
+						class="min-w-0 truncate font-medium"
+						:class="entry.actor.id === 'support' ? 'text-blue' : ''"
+					>
+						{{ actorName(entry) }}
+					</span>
+				</AutoLink>
+				<div class="min-w-0">
 					<component :is="entry.event.component" v-bind="entry.event.props" />
 				</div>
-				<div class="min-w-0 py-3 pr-4 text-right text-secondary">
-					<span v-tooltip="formatDate(entry.timestamp)" class="inline-block max-w-full truncate">
+				<div class="flex min-w-0 items-center gap-1 text-sm text-secondary">
+					<span v-tooltip="entry.world?.name" class="min-w-0 truncate">
+						{{ entry.world?.name ?? 'Server' }}
+					</span>
+					<BulletDivider class="shrink-0" />
+					<span v-tooltip="formatDate(entry.timestamp)" class="shrink-0">
 						{{ formatRelativeTime(entry.timestamp) }}
 					</span>
 				</div>
@@ -131,26 +114,23 @@
 
 		<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-5">
 			<div
-				class="grid min-h-14 grid-cols-[minmax(0,1fr)_5rem] bg-surface-3 sm:h-14 sm:grid-cols-[22%_48%_18%_12%]"
+				class="hidden min-h-14 bg-surface-3 @[640px]:grid @[640px]:h-14 @[640px]:grid-cols-[22%_48%_18%_12%]"
 			>
-				<div class="flex items-center pl-4 font-semibold text-secondary sm:hidden">
-					{{ formatMessage(messages.eventColumn) }}
-				</div>
-				<div class="hidden items-center pl-4 font-semibold text-secondary sm:flex">
+				<div class="hidden items-center pl-4 font-semibold text-secondary @[640px]:flex">
 					{{ formatMessage(messages.userColumn) }}
 				</div>
-				<div class="hidden items-center font-semibold text-secondary sm:flex">
+				<div class="hidden items-center font-semibold text-secondary @[640px]:flex">
 					{{ formatMessage(messages.eventColumn) }}
 				</div>
-				<div class="hidden items-center font-semibold text-secondary sm:flex">
+				<div class="hidden items-center font-semibold text-secondary @[640px]:flex">
 					{{ formatMessage(messages.worldColumn) }}
 				</div>
-				<div class="flex items-center justify-end pr-4 font-semibold text-secondary">
+				<div class="hidden items-center justify-end pr-4 font-semibold text-secondary @[640px]:flex">
 					{{ formatMessage(messages.timeColumn) }}
 				</div>
 			</div>
 			<div
-				class="border-0 border-t border-solid border-surface-5 bg-surface-2 px-4 py-8 text-center text-secondary"
+				class="border-0 border-solid border-surface-5 bg-surface-2 px-4 py-8 text-center text-secondary @[640px]:border-t"
 			>
 				{{ formatMessage(emptyStateMessage) }}
 			</div>
@@ -166,6 +146,7 @@ import { useFormatDateTime, useRelativeTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
+import BulletDivider from '../../base/BulletDivider.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import Table, { type TableColumn } from '../../base/Table.vue'
 import type { ServerAuditLogEntry, ServerAuditLogFilters } from './types'
