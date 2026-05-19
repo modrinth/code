@@ -9,7 +9,7 @@
 			v-tooltip="hiddenTooltip"
 			class="inline-flex rounded-full border border-solid border-surface-5 bg-surface-4 px-1.5 text-xs font-semibold text-secondary"
 		>
-			+{{ hiddenCount }}
+			{{ formatMessage(messages.hiddenCount, { count: hiddenCount }) }}
 		</span>
 	</span>
 </template>
@@ -17,6 +17,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { defineMessages, useVIntl } from '../../../../composables/i18n'
 import EventEntityLink from './EventEntityLink.vue'
 import type { EventEntity } from './types'
 
@@ -30,8 +31,23 @@ const props = withDefaults(
 	},
 )
 
+const { formatMessage, locale } = useVIntl()
+
+const messages = defineMessages({
+	hiddenCount: {
+		id: 'servers.audit-log.event.entity-list.hidden-count',
+		defaultMessage: '+{count, number}',
+	},
+})
+
 const visibleEntities = computed(() => props.entities.slice(0, props.limit))
 const hiddenEntities = computed(() => props.entities.slice(props.limit))
 const hiddenCount = computed(() => hiddenEntities.value.length)
-const hiddenTooltip = computed(() => hiddenEntities.value.map((entity) => entity.label).join(', '))
+const hiddenTooltip = computed(() => {
+	void locale.value
+	return new Intl.ListFormat(locale.value, {
+		style: 'long',
+		type: 'conjunction',
+	}).format(hiddenEntities.value.map((entity) => entity.label))
+})
 </script>

@@ -24,19 +24,19 @@ import type {
 	ParsedAuditEvent,
 } from './types'
 
-const basicEvents: Record<string, string> = {
-	server_created: 'Server created',
-	server_reallocated: 'Server reallocated',
-	modpack_unlinked: 'Modpack unlinked',
-	server_repaired: 'Server repaired',
-	server_reset: 'Server reset',
-	server_started: 'Server started',
-	server_stopped: 'Server stopped',
-	server_restarted: 'Server restarted',
-	server_killed: 'Server killed',
-	sftp_login: 'SFTP login',
-	console_cleared: 'Console cleared',
-}
+const basicEvents = new Set([
+	'server_created',
+	'server_reallocated',
+	'modpack_unlinked',
+	'server_repaired',
+	'server_reset',
+	'server_started',
+	'server_stopped',
+	'server_restarted',
+	'server_killed',
+	'sftp_login',
+	'console_cleared',
+])
 
 export function parseAuditEvent(
 	entry: Archon.Actions.v1.ActionEntry,
@@ -47,9 +47,8 @@ export function parseAuditEvent(
 	const base = baseProps(entry, lookups, action)
 
 	try {
-		const basicEvent = basicEvents[action]
-		if (basicEvent) {
-			return parsed(BasicStringEvent, base, { label: basicEvent }, [basicEvent])
+		if (basicEvents.has(action)) {
+			return parsed(BasicStringEvent, base, {}, actionSearchParts(action))
 		}
 
 		switch (action) {
@@ -57,14 +56,19 @@ export function parseAuditEvent(
 				const record = metadataRecord(metadata)
 				const name = stringField(record, 'name')
 				if (!name) return unknown(base, action)
-				return parsed(ServerMetaEvent, base, { kind: 'name', name }, ['server name', name])
+				return parsed(
+					ServerMetaEvent,
+					base,
+					{ kind: 'name', name },
+					actionSearchParts(action, name),
+				)
 			}
 			case 'changed_server_subdomain': {
 				const record = metadataRecord(metadata)
 				const subdomain = stringField(record, 'subdomain')
 				if (!subdomain) return unknown(base, action)
 				return parsed(ServerMetaEvent, base, { kind: 'subdomain', subdomain }, [
-					'server subdomain',
+					...actionSearchParts(action),
 					subdomain,
 				])
 			}
@@ -73,7 +77,7 @@ export function parseAuditEvent(
 				const newSpecs = objectField(record, 'new_specs')
 				if (!newSpecs) return unknown(base, action)
 				return parsed(ServerMetaEvent, base, { kind: 'plan', newSpecs }, [
-					'server plan',
+					...actionSearchParts(action),
 					...Object.values(newSpecs).map(String),
 				])
 			}
@@ -82,12 +86,13 @@ export function parseAuditEvent(
 				const record = metadataRecord(metadata)
 				const userId = stringField(record, 'user_id')
 				if (!userId) return unknown(base, action)
-				const permissions = valueToString(record?.permissions)
+				const permissions = permissionScopes(record?.permissions)
 				const kind = action === 'user_invited' ? 'invited' : 'permission_modified'
 				const targetUser = userEntity(userId, lookups.users)
 				return parsed(UserAccessEvent, base, { kind, targetUser, permissions }, [
+					...actionSearchParts(action),
 					targetUser.label,
-					permissions,
+					...permissions,
 				])
 			}
 			case 'user_invite_revoked':
@@ -97,7 +102,10 @@ export function parseAuditEvent(
 				if (!userId) return unknown(base, action)
 				const kind = action === 'user_invite_revoked' ? 'invite_revoked' : 'removed'
 				const targetUser = userEntity(userId, lookups.users)
-				return parsed(UserAccessEvent, base, { kind, targetUser }, [targetUser.label])
+				return parsed(UserAccessEvent, base, { kind, targetUser }, [
+					...actionSearchParts(action),
+					targetUser.label,
+				])
 			}
 			case 'addon_added':
 			case 'addon_disabled':
@@ -108,7 +116,7 @@ export function parseAuditEvent(
 				if (!addons) return unknown(base, action)
 				const kind = action.replace('addon_', '')
 				return parsed(AddonEvent, base, { kind, addons }, [
-					kind,
+					...actionSearchParts(action),
 					...addons.flatMap((addon) => [
 						addon.project.label,
 						addon.addonId,
@@ -122,7 +130,7 @@ export function parseAuditEvent(
 				if (!fileNames) return unknown(base, action)
 				const files = fileNames.map((name) => fileEntity(name, lookups.serverId, false))
 				return parsed(AddonEvent, base, { kind: 'uploaded', fileNames: files }, [
-					'uploaded',
+					...actionSearchParts(action),
 					...fileNames,
 				])
 			}
@@ -130,7 +138,10 @@ export function parseAuditEvent(
 				const record = metadataRecord(metadata)
 				if (!record || !('new_version' in record)) return unknown(base, action)
 				const newVersionId = record.new_version == null ? null : valueToString(record.new_version)
-				return parsed(ModpackEvent, base, { newVersionId }, ['modpack', newVersionId])
+				return parsed(ModpackEvent, base, { newVersionId }, [
+					...actionSearchParts(action),
+					newVersionId,
+				])
 			}
 			case 'port_allocation_added':
 			case 'port_allocation_removed': {
@@ -140,7 +151,7 @@ export function parseAuditEvent(
 					NetworkEvent,
 					base,
 					{ kind: action === 'port_allocation_added' ? 'added' : 'removed', port },
-					['port', String(port)],
+					[...actionSearchParts(action), String(port)],
 				)
 			}
 			case 'loader_version_edited': {
@@ -148,7 +159,7 @@ export function parseAuditEvent(
 				if (!record || !('new_version' in record)) return unknown(base, action)
 				const newVersion = record.new_version == null ? null : valueToString(record.new_version)
 				return parsed(ConfigEvent, base, { kind: 'loader_version', newVersion }, [
-					'loader version',
+					...actionSearchParts(action),
 					newVersion,
 				])
 			}
@@ -156,7 +167,7 @@ export function parseAuditEvent(
 				const newVersion = stringField(metadataRecord(metadata), 'new_version')
 				if (!newVersion) return unknown(base, action)
 				return parsed(ConfigEvent, base, { kind: 'game_version', newVersion }, [
-					'game version',
+					...actionSearchParts(action),
 					newVersion,
 				])
 			}
@@ -171,7 +182,7 @@ export function parseAuditEvent(
 					}),
 				)
 				return parsed(ConfigEvent, base, { kind: 'properties', properties: items }, [
-					'server properties',
+					...actionSearchParts(action),
 					...items.map((item) => item.label),
 				])
 			}
@@ -179,7 +190,7 @@ export function parseAuditEvent(
 				const command = stringField(metadataRecord(metadata), 'command')
 				if (!command) return unknown(base, action)
 				return parsed(ConfigEvent, base, { kind: 'startup_command', command }, [
-					'startup command',
+					...actionSearchParts(action),
 					command,
 				])
 			}
@@ -187,7 +198,7 @@ export function parseAuditEvent(
 				const vendor = stringField(metadataRecord(metadata), 'vendor')
 				if (!vendor) return unknown(base, action)
 				return parsed(ConfigEvent, base, { kind: 'java_runtime', vendor }, [
-					'java runtime',
+					...actionSearchParts(action),
 					vendor,
 				])
 			}
@@ -195,7 +206,7 @@ export function parseAuditEvent(
 				const version = numberField(metadataRecord(metadata), 'version')
 				if (version == null) return unknown(base, action)
 				return parsed(ConfigEvent, base, { kind: 'java_version', version }, [
-					'java version',
+					...actionSearchParts(action),
 					String(version),
 				])
 			}
@@ -206,7 +217,7 @@ export function parseAuditEvent(
 				if (!path) return unknown(base, action)
 				const kind = action.replace('file_', '')
 				return parsed(FileEvent, base, { kind, file: fileEntity(path, lookups.serverId) }, [
-					kind,
+					...actionSearchParts(action),
 					path,
 				])
 			}
@@ -223,13 +234,13 @@ export function parseAuditEvent(
 						from: fileEntity(from, lookups.serverId),
 						to: fileEntity(to, lookups.serverId),
 					},
-					['renamed', from, to],
+					[...actionSearchParts(action), from, to],
 				)
 			}
 			case 'console_command_executed': {
 				const command = stringField(metadataRecord(metadata), 'command')
 				if (!command) return unknown(base, action)
-				return parsed(ConsoleEvent, base, { command }, ['console command', command])
+				return parsed(ConsoleEvent, base, { command }, [...actionSearchParts(action), command])
 			}
 			case 'backup_created':
 			case 'backup_restored':
@@ -239,7 +250,7 @@ export function parseAuditEvent(
 				const kind = action.replace('backup_', '')
 				const backup = backupEntity(id, lookups)
 				return parsed(BackupEvent, base, { kind, backup, backupId: id }, [
-					kind,
+					...actionSearchParts(action),
 					backup.label,
 					id,
 				])
@@ -251,12 +262,12 @@ export function parseAuditEvent(
 				const to = stringField(record, 'to')
 				if (!id || !from || !to) return unknown(base, action)
 				const backup = backupEntity(id, lookups)
-				return parsed(BackupEvent, base, { kind: 'renamed', backup, backupId: id, from, to }, [
-					'renamed',
-					from,
-					to,
-					id,
-				])
+				return parsed(
+					BackupEvent,
+					base,
+					{ kind: 'renamed', backup, backupId: id, from, to },
+					[...actionSearchParts(action), from, to, id],
+				)
 			}
 			default:
 				return unknown(base, action)
@@ -300,11 +311,15 @@ function unknown(base: BaseEventProps, rawAction: string): ParsedAuditEvent {
 	return parsed(UnknownEvent, base, { rawAction }, [rawAction])
 }
 
+function actionSearchParts(action: string, ...extra: unknown[]): unknown[] {
+	return [action, action.replaceAll('_', ' '), ...extra]
+}
+
 function actorFromEntry(
 	actor: Archon.Actions.v1.ActionUser,
 	users: Record<string, Archon.Actions.v1.UserResp>,
 ): AuditActor {
-	if (actor.type === 'support') return { id: 'support', username: 'Support' }
+	if (actor.type === 'support') return { id: 'support', username: 'support' }
 
 	const user = users[actor.user_id]
 	return {
@@ -313,6 +328,17 @@ function actorFromEntry(
 		avatarUrl: user?.avatar_url || undefined,
 		profilePath: user?.username ? `/user/${encodeURIComponent(user.username)}` : undefined,
 	}
+}
+
+function permissionScopes(value: unknown): string[] {
+	if (typeof value === 'string') {
+		return value
+			.split('|')
+			.map((permission) => permission.trim())
+			.filter(Boolean)
+	}
+	if (typeof value === 'number' || typeof value === 'boolean') return [String(value)]
+	return []
 }
 
 function worldFromId(worldId: string | null, worldById: Map<string, AuditWorld>): AuditWorld | null {

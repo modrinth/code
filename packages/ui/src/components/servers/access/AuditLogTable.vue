@@ -30,7 +30,7 @@
 								? IntercomBubbleIcon
 								: (entry.actor.avatarUrl ?? undefined)
 						"
-						:alt="formatMessage(messages.userAvatarAlt, { username: entry.actor.username })"
+						:alt="formatMessage(messages.userAvatarAlt, { username: actorName(entry) })"
 						:tint-by="entry.actor.username"
 						size="22px"
 						circle
@@ -102,7 +102,7 @@
 				</div>
 				<div class="flex min-w-0 items-center gap-1 text-sm text-secondary">
 					<span v-tooltip="entry.world?.name" class="min-w-0 truncate">
-						{{ entry.world?.name ?? 'Server' }}
+						{{ entry.world?.name ?? formatMessage(messages.serverScope) }}
 					</span>
 					<BulletDivider class="shrink-0" />
 					<span v-tooltip="formatDate(entry.timestamp)" class="shrink-0">
@@ -298,6 +298,10 @@ const messages = defineMessages({
 	userAvatarAlt: {
 		id: 'servers.audit-log.user-avatar-alt',
 		defaultMessage: "{username}'s avatar",
+	},
+	serverScope: {
+		id: 'servers.audit-log.scope.server',
+		defaultMessage: 'Server',
 	},
 })
 
