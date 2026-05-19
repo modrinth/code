@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{Emitter, Manager, PhysicalPosition, PhysicalSize, Runtime};
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime};
 use tauri_plugin_opener::OpenerExt;
 use theseus::settings;
 use tokio::sync::RwLock;
@@ -23,6 +23,7 @@ struct ComputedAdsOcclusion {
 }
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
+#[cfg(any(windows, target_os = "macos"))]
 pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 1.0;
 #[cfg(not(target_os = "linux"))]
 const ADS_USER_AGENT: &str = concat!(
@@ -141,7 +142,8 @@ fn notify_ads_occlusion<R: Runtime>(
     app: &tauri::AppHandle<R>,
     message: String,
 ) {
-    let _ = app.emit(
+    let _ = tauri::Emitter::emit(
+        app,
         "warning",
         serde_json::json!({
             "message": message,
