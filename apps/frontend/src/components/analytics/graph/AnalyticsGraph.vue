@@ -66,7 +66,7 @@
 							class="inline-flex items-center gap-1.5 px-2 py-0.5 text-sm !outline-0 transition-all focus-within:!outline-0 focus:!outline-0 focus-visible:!outline-0"
 							:class="[
 								legendEntry.hidden ? 'text-secondary opacity-70' : 'text-primary',
-								isLegendEntryToggleDisabled(legendEntry)
+								isLegendEntryToggleDisabled(legendEntry) && !isShiftKeyPressed
 									? 'cursor-default'
 									: 'cursor-pointer hover:brightness-125',
 							]"
@@ -190,6 +190,7 @@
 							:pinned="isHoverPinned"
 							:ratio-mode="isRatioMode"
 							:capitalize-labels="shouldCapitalizeDatasetLabels"
+							:shift-key-pressed="isShiftKeyPressed"
 							@entry-click="onTooltipEntryClick"
 						/>
 					</template>
@@ -387,7 +388,7 @@ const chartType = computed<'line' | 'bar'>(() =>
 const canUseRatioMode = computed(
 	() =>
 		(activeGraphViewMode.value === 'area' || activeGraphViewMode.value === 'bar') &&
-		displayedLegendEntries.value.length > 1,
+		legendEntries.value.filter((entry) => !entry.hidden).length > 1,
 )
 const isArea = computed(() => activeGraphViewMode.value === 'area')
 const isStacked = computed(
@@ -456,19 +457,27 @@ let resizeObserver: ResizeObserver | null = null
 let clearIgnoredChartClickTimeout: ReturnType<typeof setTimeout> | null = null
 
 onMounted(() => {
-	if (!chartContainer.value || typeof ResizeObserver === 'undefined') return
-	resizeObserver = new ResizeObserver((entries) => {
-		const entry = entries[0]
-		if (!entry) return
-		containerSize.width = entry.contentRect.width
-		containerSize.height = entry.contentRect.height
-	})
-	resizeObserver.observe(chartContainer.value)
+	if (chartContainer.value && typeof ResizeObserver !== 'undefined') {
+		resizeObserver = new ResizeObserver((entries) => {
+			const entry = entries[0]
+			if (!entry) return
+			containerSize.width = entry.contentRect.width
+			containerSize.height = entry.contentRect.height
+		})
+		resizeObserver.observe(chartContainer.value)
+	}
+
+	window.addEventListener('keydown', updateShiftKeyState)
+	window.addEventListener('keyup', updateShiftKeyState)
+	window.addEventListener('blur', clearShiftKeyState)
 })
 
 onBeforeUnmount(() => {
 	resizeObserver?.disconnect()
 	resizeObserver = null
+	window.removeEventListener('keydown', updateShiftKeyState)
+	window.removeEventListener('keyup', updateShiftKeyState)
+	window.removeEventListener('blur', clearShiftKeyState)
 	if (clearIgnoredChartClickTimeout) {
 		clearTimeout(clearIgnoredChartClickTimeout)
 		clearIgnoredChartClickTimeout = null
@@ -493,6 +502,7 @@ const isHoverPinned = ref(false)
 const ignoreNextChartClick = ref(false)
 const hoveredLegendEntryId = ref<string | null>(null)
 const isLegendExpanded = ref(false)
+const isShiftKeyPressed = ref(false)
 const promotedCollapsedLegendEntryIds = ref<string[]>([])
 const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
 const promotedCollapsedLegendEntryIdSet = computed(
@@ -520,6 +530,14 @@ function setHoverState(payload: HoverState) {
 function clearHoverState() {
 	hoverState.visible = false
 	hoverState.sliceIndex = null
+}
+
+function updateShiftKeyState(event: KeyboardEvent) {
+	isShiftKeyPressed.value = event.shiftKey
+}
+
+function clearShiftKeyState() {
+	isShiftKeyPressed.value = false
 }
 
 function onChartHover(payload: HoverState) {
@@ -658,8 +676,7 @@ const legendEntries = computed<LegendEntry[]>(() =>
 				projectName: dataset.projectName,
 				color: dataset.borderColor,
 				totalValue,
-				hidden:
-					!isGraphDatasetSelectionActive.value && hiddenDatasetIds.value.has(dataset.projectId),
+				hidden: hiddenDatasetIds.value.has(dataset.projectId),
 			}
 		})
 		.sort((a, b) => b.totalValue - a.totalValue || a.name.localeCompare(b.name)),
@@ -726,12 +743,8 @@ const chartDatasetById = computed(() => {
 	return datasets
 })
 
-const visibleLegendEntriesForChart = computed(() =>
-	isGraphDatasetSelectionActive.value ? legendEntries.value : displayedLegendEntries.value,
-)
-
 const baseVisibleChartDatasets = computed(() =>
-	visibleLegendEntriesForChart.value
+	legendEntries.value
 		.filter((legendEntry) => !legendEntry.hidden)
 		.map((legendEntry) => {
 			const dataset = chartDatasetById.value.get(legendEntry.id)
@@ -780,10 +793,7 @@ const highlightedChartDatasetId = computed(() => {
 
 function isLegendEntryToggleDisabled(legendEntry: LegendEntry) {
 	if (legendEntry.hidden) return false
-	const entries = isGraphDatasetSelectionActive.value
-		? legendEntries.value
-		: displayedLegendEntries.value
-	const visibleCount = entries.filter((entry) => !entry.hidden).length
+	const visibleCount = legendEntries.value.filter((entry) => !entry.hidden).length
 	return visibleCount <= 1
 }
 
@@ -805,22 +815,12 @@ function clearLegendHoverState() {
 	hoveredLegendEntryId.value = null
 }
 
-function removeSelectedGraphDataset(datasetId: string) {
-	if (legendEntries.value.length <= 1) return
-	selectedGraphDatasetIds.value = selectedGraphDatasetIds.value.filter((id) => id !== datasetId)
-}
-
 function toggleLegendEntryVisibility(datasetId: string) {
-	if (isGraphDatasetSelectionActive.value) {
-		removeSelectedGraphDataset(datasetId)
-		return
-	}
-
 	const nextHiddenDatasetIds = new Set(hiddenDatasetIds.value)
 	if (nextHiddenDatasetIds.has(datasetId)) {
 		nextHiddenDatasetIds.delete(datasetId)
 	} else {
-		const visibleCount = displayedLegendEntries.value.filter((entry) => !entry.hidden).length
+		const visibleCount = legendEntries.value.filter((entry) => !entry.hidden).length
 		if (visibleCount <= 1) return
 		nextHiddenDatasetIds.add(datasetId)
 	}
@@ -828,17 +828,27 @@ function toggleLegendEntryVisibility(datasetId: string) {
 }
 
 function soloLegendEntry(datasetId: string) {
-	if (isGraphDatasetSelectionActive.value) {
-		removeSelectedGraphDataset(datasetId)
+	const currentLegendEntryIds = new Set(legendEntries.value.map((entry) => entry.id))
+	const otherIds = legendEntries.value.map((entry) => entry.id).filter((id) => id !== datasetId)
+	const isAlreadySolo =
+		!hiddenDatasetIds.value.has(datasetId) && otherIds.every((id) => hiddenDatasetIds.value.has(id))
+
+	if (isAlreadySolo) {
+		hiddenGraphDatasetIds.value = hiddenGraphDatasetIds.value.filter(
+			(hiddenDatasetId) => !currentLegendEntryIds.has(hiddenDatasetId),
+		)
 		return
 	}
 
-	const otherIds = displayedLegendEntries.value
-		.map((entry) => entry.id)
-		.filter((id) => id !== datasetId)
-	const isAlreadySolo =
-		!hiddenDatasetIds.value.has(datasetId) && otherIds.every((id) => hiddenDatasetIds.value.has(id))
-	hiddenGraphDatasetIds.value = isAlreadySolo ? [] : otherIds
+	const nextHiddenDatasetIds = new Set(hiddenDatasetIds.value)
+	for (const legendEntry of legendEntries.value) {
+		if (legendEntry.id === datasetId) {
+			nextHiddenDatasetIds.delete(legendEntry.id)
+		} else {
+			nextHiddenDatasetIds.add(legendEntry.id)
+		}
+	}
+	hiddenGraphDatasetIds.value = Array.from(nextHiddenDatasetIds)
 }
 
 function onLegendEntryClick(event: MouseEvent, datasetId: string) {
@@ -851,22 +861,18 @@ function onLegendEntryClick(event: MouseEvent, datasetId: string) {
 	clearLegendHoverState()
 }
 
-function onTooltipEntryClick(datasetId: string) {
+function onTooltipEntryClick(datasetId: string, shiftKey: boolean) {
 	if (!chartDatasetById.value.has(datasetId)) return
 
-	if (isGraphDatasetSelectionActive.value) {
-		toggleLegendEntryVisibility(datasetId)
-		clearLegendHoverState()
-		return
-	}
-
 	if (collapsedLegendEntryIds.value.has(datasetId)) {
-		hiddenGraphDatasetIds.value = hiddenGraphDatasetIds.value.filter((id) => id !== datasetId)
 		promoteCollapsedLegendEntry(datasetId)
+	}
+
+	if (shiftKey) {
+		soloLegendEntry(datasetId)
 		clearLegendHoverState()
 		return
 	}
-
 	toggleLegendEntryVisibility(datasetId)
 	clearLegendHoverState()
 }
@@ -891,8 +897,8 @@ watch(isDataLoading, (loading) => {
 })
 
 watch(
-	[allChartDatasets, displayedLegendEntries],
-	([datasets, displayedEntries]) => {
+	[allChartDatasets, legendEntries],
+	([datasets]) => {
 		if (datasets.length === 0) return
 
 		const availableDatasetIds = new Set(datasets.map((dataset) => dataset.projectId))
@@ -901,14 +907,14 @@ watch(
 			availableDatasetIds.has(datasetId),
 		)
 		if (
-			displayedEntries.length > 0 &&
-			displayedEntries.every((entry) => nextHiddenDatasetIds.includes(entry.id))
+			legendEntries.value.length > 0 &&
+			legendEntries.value.every((entry) => nextHiddenDatasetIds.includes(entry.id))
 		) {
-			const firstDisplayedEntry = displayedEntries[0]
-			if (firstDisplayedEntry) {
-				const firstDisplayedEntryIndex = nextHiddenDatasetIds.indexOf(firstDisplayedEntry.id)
-				if (firstDisplayedEntryIndex !== -1) {
-					nextHiddenDatasetIds.splice(firstDisplayedEntryIndex, 1)
+			const firstLegendEntry = legendEntries.value[0]
+			if (firstLegendEntry) {
+				const firstLegendEntryIndex = nextHiddenDatasetIds.indexOf(firstLegendEntry.id)
+				if (firstLegendEntryIndex !== -1) {
+					nextHiddenDatasetIds.splice(firstLegendEntryIndex, 1)
 				}
 			}
 		}
@@ -951,6 +957,7 @@ const hoverTotalValue = computed(() => {
 	if (hoverState.sliceIndex === null) return 0
 	const sliceIndex = hoverState.sliceIndex
 	return legendEntries.value.reduce((sum, legendEntry) => {
+		if (legendEntry.hidden) return sum
 		const dataset = chartDatasetById.value.get(legendEntry.id)
 		return sum + (dataset?.data[sliceIndex] ?? 0)
 	}, 0)
@@ -972,10 +979,6 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 		const dataset = chartDatasetById.value.get(legendEntry.id)
 		const value = dataset?.data[sliceIndex] ?? 0
 		const ratioValue = totalValue === 0 ? 0 : (value / totalValue) * 100
-		const hidden =
-			legendEntry.hidden ||
-			(!isGraphDatasetSelectionActive.value && collapsedLegendEntryIds.value.has(legendEntry.id))
-
 		return {
 			projectId: legendEntry.id,
 			name: legendEntry.name,
@@ -984,8 +987,8 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 			formattedValue: isRatioMode.value
 				? `${ratioValue.toFixed(1)}%`
 				: formatMetricValue(value, activeStat.value, formatNumber),
-			hidden,
-			toggleDisabled: !hidden && isLegendEntryToggleDisabled(legendEntry),
+			hidden: legendEntry.hidden,
+			toggleDisabled: !legendEntry.hidden && isLegendEntryToggleDisabled(legendEntry),
 		}
 	})
 })

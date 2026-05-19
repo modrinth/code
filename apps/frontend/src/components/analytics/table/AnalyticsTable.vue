@@ -36,8 +36,8 @@
 								<DownloadIcon />
 								Export CSV
 								<DropdownIcon />
-								<template #cumulative-csv> Cumulative CSV </template>
-								<template #grouped-csv> Grouped by {{ groupByLabel }} CSV </template>
+								<template #cumulative-csv> Cumulative </template>
+								<template #grouped-csv> Grouped by {{ groupByLabel.toLowerCase() }} </template>
 							</OverflowMenu>
 						</ButtonStyled>
 						<ButtonStyled v-else>

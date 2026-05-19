@@ -26,19 +26,23 @@
 			<span class="font-semibold text-contrast">{{ formattedTotal }}</span>
 		</div>
 		<div class="flex flex-col gap-1">
-			<button
+			<div
 				v-for="entry in entries"
 				:key="entry.projectId"
-				type="button"
-				class="flex w-full items-center justify-between gap-4 rounded border-0 bg-transparent px-0 py-0 text-left text-inherit transition-all disabled:opacity-100"
-				:class="entry.toggleDisabled ? 'cursor-default' : 'cursor-pointer hover:brightness-125'"
-				:disabled="entry.toggleDisabled"
-				:aria-label="`${entry.hidden ? 'Show' : 'Hide'} ${entry.name} in graph`"
-				@click="onEntryClick(entry)"
+				class="flex w-full items-center justify-between gap-4 text-primary"
 			>
-				<div
-					class="inline-flex items-center gap-1.5"
-					:class="entry.hidden ? 'text-secondary opacity-70' : 'text-primary'"
+				<button
+					type="button"
+					class="inline-flex items-center gap-1.5 border-0 bg-transparent p-0 text-left focus-visible:!outline-none"
+					:class="
+						entry.toggleDisabled && !shiftKeyPressed
+							? 'cursor-default'
+							: entry.hidden
+								? 'cursor-pointer text-secondary opacity-70'
+								: 'cursor-pointer text-primary transition-all hover:brightness-125'
+					"
+					:aria-label="`${entry.hidden ? 'Show' : 'Hide'} ${entry.name} in graph`"
+					@click="onEntryClick($event, entry)"
 				>
 					<span class="size-2 rounded-full" :style="{ backgroundColor: entry.color }" />
 					<span
@@ -50,14 +54,14 @@
 					>
 						{{ entry.name }}
 					</span>
-				</div>
+				</button>
 				<span
 					class="font-semibold"
 					:class="entry.hidden ? 'text-secondary line-through opacity-70' : 'text-contrast'"
 				>
 					{{ entry.formattedValue }}
 				</span>
-			</button>
+			</div>
 		</div>
 	</div>
 </template>
@@ -90,15 +94,16 @@ const props = defineProps<{
 	pinned: boolean
 	ratioMode: boolean
 	capitalizeLabels: boolean
+	shiftKeyPressed: boolean
 }>()
 
 const emit = defineEmits<{
-	'entry-click': [projectId: string]
+	'entry-click': [projectId: string, shiftKey: boolean]
 }>()
 
-function onEntryClick(entry: AnalyticsChartTooltipEntry) {
-	if (entry.toggleDisabled) return
-	emit('entry-click', entry.projectId)
+function onEntryClick(event: MouseEvent, entry: AnalyticsChartTooltipEntry) {
+	if (entry.toggleDisabled && !event.shiftKey) return
+	emit('entry-click', entry.projectId, event.shiftKey)
 }
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
