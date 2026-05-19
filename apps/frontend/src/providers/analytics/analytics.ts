@@ -120,7 +120,7 @@ export interface AnalyticsDashboardFilterOptions {
 export interface NormalizedAnalyticsSelectedFilters {
 	country: ReadonlySet<string>
 	monetization: ReadonlySet<string>
-	downloadSource: ReadonlySet<string>
+	userAgent: ReadonlySet<string>
 	downloadReason: ReadonlySet<string>
 	versionId: ReadonlySet<string>
 	gameVersion: ReadonlySet<string>
@@ -637,7 +637,7 @@ function cloneAnalyticsSelectedFilters(
 		project_status: [...filters.project_status],
 		country: [...filters.country],
 		monetization: [...filters.monetization],
-		download_source: [...filters.download_source],
+		user_agent: [...filters.user_agent],
 		download_reason: [...filters.download_reason],
 		version_id: [...filters.version_id],
 		game_version: [...filters.game_version],
@@ -698,8 +698,8 @@ function getAnalyticsDataFilterOptionSummary(
 				}
 			}
 
-			if (dataPoint.metric_kind === 'downloads' && dataPoint.domain) {
-				const downloadSource = dataPoint.domain.trim()
+			if (dataPoint.metric_kind === 'downloads' && dataPoint.user_agent) {
+				const downloadSource = dataPoint.user_agent.trim()
 				if (downloadSource.length > 0) {
 					downloadSources.add(downloadSource)
 				}
@@ -783,7 +783,7 @@ export function normalizeAnalyticsSelectedFilters(
 	return {
 		country: normalizeAnalyticsFilterValues(filters.country),
 		monetization: normalizeAnalyticsFilterValues(filters.monetization),
-		downloadSource: normalizeAnalyticsFilterValues(filters.download_source),
+		userAgent: normalizeAnalyticsFilterValues(filters.user_agent),
 		downloadReason: normalizeAnalyticsFilterValues(filters.download_reason),
 		versionId: normalizeAnalyticsFilterValues(filters.version_id),
 		gameVersion: normalizeAnalyticsFilterValues(filters.game_version),
@@ -834,7 +834,7 @@ export function doesAnalyticsPointMatchNormalizedFilters(
 				) &&
 				doesAnalyticsPointMatchNormalizedFilter(
 					dataPoint,
-					filters.downloadSource,
+					filters.userAgent,
 					getDownloadSourceFilterValue,
 				) &&
 				doesAnalyticsPointMatchNormalizedFilter(
@@ -935,7 +935,7 @@ function getDownloadSourceFilterValue(
 		return undefined
 	}
 
-	return dataPoint.domain ?? null
+	return dataPoint.user_agent ?? null
 }
 
 function getDownloadReasonFilterValue(
@@ -1845,7 +1845,7 @@ export function createAnalyticsDashboardContext(
 					bucket_by: ['country'],
 				},
 				project_downloads: {
-					bucket_by: ['country', 'domain', 'reason', 'game_version', 'loader'],
+					bucket_by: ['country', 'user_agent', 'reason', 'game_version', 'loader'],
 				},
 				project_playtime: {
 					bucket_by: ['country', 'game_version', 'loader'],

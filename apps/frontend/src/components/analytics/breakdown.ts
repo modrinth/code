@@ -20,8 +20,10 @@ export function getAnalyticsBreakdownValue(
 			}
 			return ALL_BREAKDOWN_VALUE
 		}
-		case 'download_source':
-			return normalizeBreakdownValue('domain' in point ? point.domain : undefined)
+		case 'user_agent':
+			return getDownloadSourceLabel(
+				normalizeBreakdownValue('user_agent' in point ? point.user_agent : undefined),
+			)
 		case 'download_reason':
 			return normalizeBreakdownValue(
 				'reason' in point ? point.reason : undefined,
@@ -42,6 +44,26 @@ export function getAnalyticsBreakdownValue(
 		default:
 			return ALL_BREAKDOWN_VALUE
 	}
+}
+
+export function getDownloadSourceLabel(value: string): string {
+	const normalized = value.trim()
+	const normalizedLowercase = normalized.toLowerCase()
+	if (normalizedLowercase === 'website') {
+		return 'Modrinth Website'
+	}
+	if (normalizedLowercase === 'modrinth_app') {
+		return 'Modrinth App'
+	}
+	if (!normalized.includes('_')) {
+		return normalized
+	}
+
+	return normalizedLowercase
+		.split('_')
+		.filter((part) => part.length > 0)
+		.map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+		.join(' ')
 }
 
 function normalizeBreakdownValue(

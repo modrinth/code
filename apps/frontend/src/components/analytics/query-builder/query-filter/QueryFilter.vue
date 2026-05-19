@@ -241,6 +241,7 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
+import { getDownloadSourceLabel } from '../../breakdown'
 import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
 import {
 	areSelectedFiltersEqual,
@@ -479,12 +480,12 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			syntheticOptions: getTopBreakdownSyntheticOptions('monetization'),
 		},
 		{
-			key: 'download_source',
+			key: 'user_agent',
 			label: 'Download Source',
 			searchable: downloadSourceFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search download sources...',
-			options: withSelectedOptions('download_source', downloadSourceFilterOptions.value),
-			syntheticOptions: getTopBreakdownSyntheticOptions('download_source'),
+			options: withSelectedOptions('user_agent', downloadSourceFilterOptions.value),
+			syntheticOptions: getTopBreakdownSyntheticOptions('user_agent'),
 		},
 		{
 			key: 'download_reason',
@@ -563,7 +564,7 @@ const downloadSourceFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.downloadSources
 		.map((downloadSource) => ({
 			value: downloadSource,
-			label: downloadSource,
+			label: getDownloadSourceLabel(downloadSource),
 		}))
 		.sort((left, right) => left.label.localeCompare(right.label)),
 )
@@ -671,7 +672,7 @@ function getFilterOptionCountForCategory(categoryKey: AnalyticsFilterValueCatego
 			return countryFilterOptions.value.length
 		case 'monetization':
 			return 2
-		case 'download_source':
+		case 'user_agent':
 			return downloadSourceFilterOptions.value.length
 		case 'download_reason':
 			return downloadReasonFilterOptions.value.length
@@ -695,6 +696,9 @@ function getMissingSelectedOptionLabel(
 	}
 	if (categoryKey === 'download_reason') {
 		return getDownloadReasonFilterOptionLabel
+	}
+	if (categoryKey === 'user_agent') {
+		return getDownloadSourceLabel
 	}
 	if (categoryKey === 'loader_type') {
 		return getLoaderTypeFilterOptionLabel

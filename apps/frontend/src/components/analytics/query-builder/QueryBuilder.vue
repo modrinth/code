@@ -597,7 +597,7 @@ const breakdownOptions: ComboboxOption<AnalyticsBreakdownPreset>[] = [
 	{ value: 'none', label: 'Project' },
 	{ value: 'country', label: 'Country' },
 	{ value: 'monetization', label: 'Monetization' },
-	{ value: 'download_source', label: 'Download source' },
+	{ value: 'user_agent', label: 'Download source' },
 	{ value: 'download_reason', label: 'Download type' },
 	{ value: 'version_id', label: 'Project version' },
 	{ value: 'loader', label: 'Loader' },
@@ -707,9 +707,9 @@ function withBreakdownFields(
 				downloads.push('monetized')
 			}
 			break
-		case 'download_source':
+		case 'user_agent':
 			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-				downloads.push('domain')
+				downloads.push('user_agent')
 			}
 			break
 		case 'download_reason':
@@ -768,10 +768,10 @@ function withBreakdownFields(
 		}
 	}
 
-	if (filters.download_source.length > 0) {
-		const filterStats = getAnalyticsStatsForFilterCategory('download_source')
+	if (filters.user_agent.length > 0) {
+		const filterStats = getAnalyticsStatsForFilterCategory('user_agent')
 		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-			downloads.push('domain')
+			downloads.push('user_agent')
 		}
 	}
 

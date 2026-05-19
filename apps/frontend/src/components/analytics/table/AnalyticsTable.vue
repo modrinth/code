@@ -2,11 +2,11 @@
 	<div class="relative overflow-hidden rounded-2xl">
 		<AnalyticsLoadingBar :loading="isDataLoading" />
 		<Table
+			v-model:selected-ids="selectedGraphDatasetIds"
 			:sort-column="displayedSortColumn"
 			:sort-direction="displayedSortDirection"
 			:columns="columns"
 			:data="paginatedRows"
-			v-model:selected-ids="selectedGraphDatasetIds"
 			row-key="id"
 			selection-key="graphDatasetId"
 			:selection-data="sortedRows"
@@ -299,7 +299,7 @@ const breakdownColumnLabel = computed(() => {
 			return 'Country'
 		case 'monetization':
 			return 'Monetization'
-		case 'download_source':
+		case 'user_agent':
 			return 'Download source'
 		case 'download_reason':
 			return 'Download type'
@@ -337,7 +337,8 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 		return []
 	}
 
-	const sliceCount = getSliceCount(nextFetchRequest.time_range, nextTimeSlices.length)
+	const timeRange = nextFetchRequest.time_range
+	const sliceCount = getSliceCount(timeRange, nextTimeSlices.length)
 	const includeDate = mode === 'date_breakdown' || !showBreakdownColumn.value
 	const breakdownDisplayValues = new Map<string, string>()
 	const projectDisplayValues = new Map<string, string>()
@@ -365,7 +366,7 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 	function getBucketLabel(sliceIndex: number) {
 		let bucketLabel = bucketLabelsBySliceIndex.get(sliceIndex)
 		if (!bucketLabel) {
-			const bucketRange = getSliceBucketRange(nextFetchRequest.time_range, sliceCount, sliceIndex)
+			const bucketRange = getSliceBucketRange(timeRange, sliceCount, sliceIndex)
 			bucketLabel = {
 				date: formatBucketEndLabel(
 					bucketRange.end,

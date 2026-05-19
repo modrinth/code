@@ -5,7 +5,7 @@ export type AnalyticsQueryFilterCategory =
 	| 'project_status'
 	| 'country'
 	| 'monetization'
-	| 'download_source'
+	| 'user_agent'
 	| 'download_reason'
 	| 'version_id'
 	| 'game_version'
@@ -31,7 +31,7 @@ export type AnalyticsBreakdownPreset =
 	| 'none'
 	| 'country'
 	| 'monetization'
-	| 'download_source'
+	| 'user_agent'
 	| 'download_reason'
 	| 'version_id'
 	| 'loader'
@@ -116,7 +116,7 @@ const BREAKDOWN_PRESET_VALUES: AnalyticsBreakdownPreset[] = [
 	'none',
 	'country',
 	'monetization',
-	'download_source',
+	'user_agent',
 	'download_reason',
 	'version_id',
 	'loader',
@@ -155,7 +155,8 @@ const QUERY_KEY_BREAKDOWN = 'a_breakdown'
 const QUERY_KEY_FILTER_PROJECT_STATUS = 'a_project_status'
 const QUERY_KEY_FILTER_COUNTRY = 'a_country'
 const QUERY_KEY_FILTER_MONETIZATION = 'a_monetization'
-const QUERY_KEY_FILTER_DOWNLOAD_SOURCE = 'a_download_source'
+const QUERY_KEY_FILTER_USER_AGENT = 'a_user_agent'
+const QUERY_KEY_FILTER_LEGACY_DOWNLOAD_SOURCE = 'a_download_source'
 const QUERY_KEY_FILTER_DOWNLOAD_REASON = 'a_download_reason'
 const QUERY_KEY_FILTER_VERSION_ID = 'a_version_id'
 const QUERY_KEY_FILTER_GAME_VERSION = 'a_game_version'
@@ -172,7 +173,7 @@ const URL_FILTER_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'project'>[] 
 	'project_status',
 	'country',
 	'monetization',
-	'download_source',
+	'user_agent',
 	'download_reason',
 	'version_id',
 	'game_version',
@@ -186,7 +187,7 @@ const FILTER_QUERY_KEY_BY_CATEGORY: Record<
 	project_status: QUERY_KEY_FILTER_PROJECT_STATUS,
 	country: QUERY_KEY_FILTER_COUNTRY,
 	monetization: QUERY_KEY_FILTER_MONETIZATION,
-	download_source: QUERY_KEY_FILTER_DOWNLOAD_SOURCE,
+	user_agent: QUERY_KEY_FILTER_USER_AGENT,
 	download_reason: QUERY_KEY_FILTER_DOWNLOAD_REASON,
 	version_id: QUERY_KEY_FILTER_VERSION_ID,
 	game_version: QUERY_KEY_FILTER_GAME_VERSION,
@@ -206,7 +207,8 @@ const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_FILTER_PROJECT_STATUS,
 	QUERY_KEY_FILTER_COUNTRY,
 	QUERY_KEY_FILTER_MONETIZATION,
-	QUERY_KEY_FILTER_DOWNLOAD_SOURCE,
+	QUERY_KEY_FILTER_USER_AGENT,
+	QUERY_KEY_FILTER_LEGACY_DOWNLOAD_SOURCE,
 	QUERY_KEY_FILTER_DOWNLOAD_REASON,
 	QUERY_KEY_FILTER_VERSION_ID,
 	QUERY_KEY_FILTER_GAME_VERSION,
@@ -226,7 +228,7 @@ export function buildEmptySelectedFilters(): AnalyticsSelectedFilters {
 		project_status: [],
 		country: [],
 		monetization: [],
-		download_source: [],
+		user_agent: [],
 		download_reason: [],
 		version_id: [],
 		game_version: [],
@@ -283,6 +285,15 @@ function parsePresetQueryValue<T extends string>(
 	if (!rawValue) return fallbackValue
 	if (!allowedValues.includes(rawValue as T)) return fallbackValue
 	return rawValue as T
+}
+
+function parseAnalyticsBreakdownQueryValue(
+	value: LocationQueryValue | LocationQueryValue[] | undefined,
+	fallbackValue: AnalyticsBreakdownPreset,
+): AnalyticsBreakdownPreset {
+	const rawValue = Array.isArray(value) ? value[0] : value
+	if (rawValue === 'download_source') return 'user_agent'
+	return parsePresetQueryValue(value, BREAKDOWN_PRESET_VALUES, fallbackValue)
 }
 
 function parsePositiveIntegerQueryValue(
@@ -555,9 +566,14 @@ export function readAnalyticsQueryBuilderState(
 
 	const selectedFilters = buildEmptySelectedFilters()
 	for (const category of URL_FILTER_CATEGORIES) {
+		const categoryQueryKey = FILTER_QUERY_KEY_BY_CATEGORY[category]
+		const rawQueryValue =
+			category === 'user_agent' && query[categoryQueryKey] === undefined
+				? query[QUERY_KEY_FILTER_LEGACY_DOWNLOAD_SOURCE]
+				: query[categoryQueryKey]
 		selectedFilters[category] = normalizeFilterQueryValues(
 			category,
-			parseListQueryValue(query[FILTER_QUERY_KEY_BY_CATEGORY[category]]),
+			parseListQueryValue(rawQueryValue),
 		)
 	}
 
@@ -617,9 +633,8 @@ export function readAnalyticsQueryBuilderState(
 			GROUP_BY_PRESET_VALUES,
 			defaultState.selectedGroupBy,
 		),
-		selectedBreakdown: parsePresetQueryValue(
+		selectedBreakdown: parseAnalyticsBreakdownQueryValue(
 			query[QUERY_KEY_BREAKDOWN],
-			BREAKDOWN_PRESET_VALUES,
 			defaultState.selectedBreakdown,
 		),
 		selectedFilters,
@@ -673,6 +688,7 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 		const categoryQueryKey = FILTER_QUERY_KEY_BY_CATEGORY[category]
 		nextRouteQuery[categoryQueryKey] = serializeListQueryValue(state.selectedFilters[category])
 	}
+	nextRouteQuery[QUERY_KEY_FILTER_LEGACY_DOWNLOAD_SOURCE] = undefined
 
 	if (graphState) {
 		nextRouteQuery[QUERY_KEY_STAT] =

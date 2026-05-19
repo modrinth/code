@@ -298,7 +298,7 @@ export namespace Labrinth {
 			export type ProjectDownloadsField =
 				| 'project_id'
 				| 'version_id'
-				| 'domain'
+				| 'user_agent'
 				| 'site_path'
 				| 'country'
 				| 'monetized'
@@ -350,7 +350,7 @@ export namespace Labrinth {
 			}
 
 			export type ProjectDownloads = {
-				domain?: string
+				user_agent?: string
 				site_path?: string
 				version_id?: string
 				country?: string

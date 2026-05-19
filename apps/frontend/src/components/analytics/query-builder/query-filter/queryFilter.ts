@@ -11,7 +11,7 @@ export type AnalyticsDashboardDimension =
 	| 'version_id'
 	| 'country'
 	| 'monetization'
-	| 'download_source'
+	| 'user_agent'
 	| 'download_reason'
 	| 'game_version'
 	| 'loader_type'
@@ -21,7 +21,7 @@ export const FILTER_VALUE_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'pro
 	'project_status',
 	'country',
 	'monetization',
-	'download_source',
+	'user_agent',
 	'download_reason',
 	'version_id',
 	'game_version',
@@ -43,7 +43,7 @@ const ANALYTICS_STATS_BY_DIMENSION: Record<
 	version_id: ['downloads', 'playtime'],
 	country: ['views', 'downloads', 'playtime'],
 	monetization: ['views', 'downloads'],
-	download_source: ['downloads'],
+	user_agent: ['downloads'],
 	download_reason: ['downloads'],
 	game_version: ['downloads', 'playtime'],
 	loader_type: ['downloads', 'playtime'],
@@ -57,7 +57,7 @@ const ANALYTICS_DIMENSION_BY_BREAKDOWN: Record<
 	none: 'project',
 	country: 'country',
 	monetization: 'monetization',
-	download_source: 'download_source',
+	user_agent: 'user_agent',
 	download_reason: 'download_reason',
 	version_id: 'version_id',
 	loader: 'loader_type',
@@ -71,7 +71,7 @@ const ANALYTICS_DIMENSION_BY_FILTER_CATEGORY: Record<
 	project_status: 'project_status',
 	country: 'country',
 	monetization: 'monetization',
-	download_source: 'download_source',
+	user_agent: 'user_agent',
 	download_reason: 'download_reason',
 	version_id: 'version_id',
 	game_version: 'game_version',
@@ -85,7 +85,7 @@ const ANALYTICS_FILTER_CATEGORY_BY_BREAKDOWN: Record<
 	none: null,
 	country: 'country',
 	monetization: 'monetization',
-	download_source: 'download_source',
+	user_agent: 'user_agent',
 	download_reason: 'download_reason',
 	version_id: 'version_id',
 	loader: 'loader_type',
@@ -208,7 +208,7 @@ export function cloneSelectedFilters(filters: AnalyticsSelectedFilters): Analyti
 		project_status: [...filters.project_status],
 		country: [...filters.country],
 		monetization: [...filters.monetization],
-		download_source: [...filters.download_source],
+		user_agent: [...filters.user_agent],
 		download_reason: [...filters.download_reason],
 		version_id: [...filters.version_id],
 		game_version: [...filters.game_version],
