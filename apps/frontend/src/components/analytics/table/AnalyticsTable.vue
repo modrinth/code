@@ -180,6 +180,8 @@ const {
 	selectedGraphDatasetIds,
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
+	versionNumbersById,
+	versionProjectNamesById,
 	getVersionDisplayName,
 	getVersionProjectName,
 } = injectAnalyticsDashboardContext()
@@ -591,6 +593,8 @@ watch(
 		selectedBreakdown,
 		selectedFilters,
 		projects,
+		versionNumbersById,
+		versionProjectNamesById,
 	],
 	() => {
 		invalidateTableCaches()

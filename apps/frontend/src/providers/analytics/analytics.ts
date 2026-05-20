@@ -956,6 +956,31 @@ function addVersionIdsFromTimeSlices(
 	}
 }
 
+function addVersionProjectNamesFromTimeSlices(
+	versionProjectNames: Map<string, string>,
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+	projectNamesById: Map<string, string>,
+) {
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!isProjectAnalyticsPoint(dataPoint)) {
+				continue
+			}
+
+			if (
+				(dataPoint.metric_kind === 'downloads' || dataPoint.metric_kind === 'playtime') &&
+				dataPoint.version_id
+			) {
+				const versionId = dataPoint.version_id.trim()
+				const projectName = projectNamesById.get(dataPoint.source_project)
+				if (versionId.length > 0 && projectName && !versionProjectNames.has(versionId)) {
+					versionProjectNames.set(versionId, projectName)
+				}
+			}
+		}
+	}
+}
+
 export function doesAnalyticsPointMatchFilters(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
 	filters: AnalyticsSelectedFilters,
@@ -2284,6 +2309,8 @@ export function createAnalyticsDashboardContext(
 				versionProjectNames.set(version.id, projectName)
 			}
 		}
+		addVersionProjectNamesFromTimeSlices(versionProjectNames, timeSlices.value, projectNames)
+		addVersionProjectNamesFromTimeSlices(versionProjectNames, previousTimeSlices.value, projectNames)
 		return versionProjectNames
 	})
 	const versionProjectIconUrlsById = computed(() => {
