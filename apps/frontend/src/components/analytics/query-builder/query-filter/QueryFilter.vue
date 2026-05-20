@@ -6,7 +6,7 @@
 		@clear="clearFilterBar"
 	>
 		<template #search-actions="{ category, setSelectedValues }">
-			<div v-if="category.key === 'game_version'" class="flex w-[150px] justify-end">
+			<div v-if="category.key === 'game_version'" class="mr-2 flex w-[150px] justify-end">
 				<Chips
 					:model-value="gameVersionType"
 					:items="gameVersionTypeOptions"
@@ -395,7 +395,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
 			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
 			options: withSelectedOptions('country', countryFilterOptions.value),
-			submenuClass: 'w-[324px]',
+			submenuClass: 'w-fit',
 		},
 		{
 			key: 'monetization',
@@ -426,7 +426,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			label: 'Project version',
 			searchable: versionFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search project versions...',
-			submenuClass: 'w-[368px]',
+			submenuClass: 'w-fit',
 			options: withSelectedOptions('version_id', versionFilterOptions.value),
 		},
 		{
@@ -434,7 +434,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			label: 'Game Version',
 			searchable: true,
 			searchPlaceholder: 'Search versions...',
-			submenuClass: 'w-[360px]',
+			submenuClass: 'w-fit',
 			options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
 		},
 		{
@@ -504,8 +504,7 @@ const downloadReasonFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 const versionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.versionIds
 		.map((versionId) => {
-			const projectName =
-				projectVersionOptionProjectMetadataById.value.get(versionId)?.[0]?.name
+			const projectName = projectVersionOptionProjectMetadataById.value.get(versionId)?.[0]?.name
 
 			return {
 				value: versionId,

@@ -74,6 +74,43 @@ const largeVersionOptions = Array.from({ length: 250 }, (_, index) => {
 	}
 })
 
+const mixedWidthCategories = [
+	{
+		key: 'status',
+		label: 'Status',
+		options: [
+			{ value: 'active', label: 'Active' },
+			{ value: 'archived', label: 'Archived' },
+			{ value: 'draft', label: 'Draft' },
+		],
+	},
+	{
+		key: 'country',
+		label: 'Country',
+		searchable: true,
+		searchPlaceholder: 'Search countries...',
+		submenuClass: 'w-[324px]',
+		options: [
+			{ value: 'US', label: 'United States' },
+			{ value: 'CA', label: 'Canada' },
+			{ value: 'DE', label: 'Germany' },
+			{ value: 'JP', label: 'Japan' },
+		],
+	},
+	{
+		key: 'version',
+		label: 'Project version',
+		searchable: true,
+		searchPlaceholder: 'Search project versions...',
+		submenuClass: 'w-[368px]',
+		options: [
+			{ value: 'sodium-1.21.5', label: 'Sodium 1.21.5' },
+			{ value: 'iris-1.21.4', label: 'Iris 1.21.4' },
+			{ value: 'mod-menu-1.20.1', label: 'Mod Menu 1.20.1' },
+		],
+	},
+]
+
 export const Default: Story = {
 	render: () => ({
 		components: { DropdownFilterBar },
@@ -218,6 +255,33 @@ export const SearchableCategories: Story = {
 	args: {
 		modelValue: {},
 		categories: searchableCategories,
+	},
+}
+
+export const MixedSubmenuWidthsNearEdge: Story = {
+	render: () => ({
+		components: { DropdownFilterBar },
+		setup() {
+			const selected = ref<Record<string, string[]>>({})
+			return { categories: mixedWidthCategories, selected }
+		},
+		template: /* html */ `
+			<div class="flex min-h-96 justify-end px-4 py-8">
+				<DropdownFilterBar v-model="selected" :categories="categories" />
+			</div>
+		`,
+	}),
+	args: {
+		modelValue: {},
+		categories: mixedWidthCategories,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers mixed submenu widths near the viewport edge so all add-menu submenus open on the same side.',
+			},
+		},
 	},
 }
 

@@ -140,7 +140,7 @@
 			v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
 			ref="submenu"
 			class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
-			:class="activeCategory.submenuClass ?? 'w-72'"
+			:class="activeCategory.submenuClass ?? DEFAULT_SUBMENU_CLASS"
 			:style="submenuStyle"
 			@mouseenter="handleSubmenuMouseEnter"
 			@mouseleave="handleSubmenuMouseLeave"
@@ -148,7 +148,7 @@
 		>
 			<div
 				v-if="activeCategory.searchable"
-				class="flex justify-between border-0 border-b border-solid border-b-surface-5 py-1.5 pr-2"
+				class="flex justify-between border-0 border-b border-solid border-b-surface-5 py-1.5 w-full"
 			>
 				<StyledInput
 					v-model="categorySearchQuery"
@@ -342,15 +342,27 @@ type MenuPositionOptions = {
 
 type SubmenuPositionOptions = {
 	buttonRect: DOMRect
+	openDirection: SubmenuOpenDirection
 	submenuWidth: number
 	submenuHeight: number
 	viewportWidth: number
 	viewportHeight: number
 }
 
+type SubmenuOpenDirection = 'left' | 'right'
+
+type SubmenuOpenDirectionOptions = {
+	menuRect: DOMRect
+	widestSubmenuWidth: number
+	viewportWidth: number
+}
+
 const ADD_MENU_WIDTH = 250
 const DROPDOWN_GAP = 8
 const DROPDOWN_VIEWPORT_MARGIN = 8
+const DEFAULT_ROOT_FONT_SIZE = 16
+const DEFAULT_SUBMENU_CLASS = 'w-72'
+const DEFAULT_SUBMENU_WIDTH = '18rem'
 const DEFAULT_PREVIEW_DROPDOWN_MIN_WIDTH = '18rem'
 const DROPDOWN_FILTER_OPTION_ROW_HEIGHT = 48
 const DROPDOWN_FILTER_VIRTUALIZATION_THRESHOLD = 80
@@ -366,7 +378,7 @@ const OPTIONS_OVERLAY_SCROLLBARS_OPTIONS = Object.freeze<PartialOptions>({
 	},
 })
 const TAILWIND_WIDTH_CLASS_SIZE: Record<string, string> = {
-	'w-72': '18rem',
+	[DEFAULT_SUBMENU_CLASS]: DEFAULT_SUBMENU_WIDTH,
 }
 
 const props = withDefaults(
@@ -406,6 +418,7 @@ const categorySearchQuery = ref('')
 const lastMousePosition = ref<Point | null>(null)
 const isCursorInsideSubmenu = ref(false)
 const hasSubmenuPosition = ref(false)
+const submenuOpenDirection = ref<SubmenuOpenDirection>('right')
 const addMenuTrigger = ref<HTMLElement | null>(null)
 const menuContainer = ref<HTMLElement | null>(null)
 const submenu = ref<HTMLElement | null>(null)
@@ -990,6 +1003,45 @@ function getWidthFromClass(className: string | undefined): string | undefined {
 		.find((width) => width !== undefined)
 }
 
+function getRootFontSizeInPixels(): number {
+	if (typeof window === 'undefined') {
+		return DEFAULT_ROOT_FONT_SIZE
+	}
+
+	const rootFontSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize)
+	return Number.isFinite(rootFontSize) ? rootFontSize : DEFAULT_ROOT_FONT_SIZE
+}
+
+function getCssLengthInPixels(length: string): number | undefined {
+	const trimmedLength = length.trim()
+	const parsedLength = Number.parseFloat(trimmedLength)
+	if (!Number.isFinite(parsedLength)) {
+		return undefined
+	}
+
+	if (trimmedLength.endsWith('rem')) {
+		return parsedLength * getRootFontSizeInPixels()
+	}
+
+	if (trimmedLength.endsWith('px') || /^[\d.]+$/.test(trimmedLength)) {
+		return parsedLength
+	}
+
+	return undefined
+}
+
+function getSubmenuWidthInPixels(category: DropdownFilterBarCategory): number {
+	return (
+		getCssLengthInPixels(getWidthFromClass(category.submenuClass) ?? DEFAULT_SUBMENU_WIDTH) ??
+		getCssLengthInPixels(DEFAULT_SUBMENU_WIDTH) ??
+		288
+	)
+}
+
+function getWidestSubmenuWidthInPixels(categories: DropdownFilterBarCategory[]): number {
+	return Math.max(...categories.map((category) => getSubmenuWidthInPixels(category)), 0)
+}
+
 function activateCategory(categoryKey: string) {
 	clearPendingCategoryTimeout()
 	pendingCategoryKey.value = null
@@ -1096,27 +1148,49 @@ function getAddMenuPosition({
 
 function getSubmenuPosition({
 	buttonRect,
+	openDirection,
 	submenuWidth,
 	submenuHeight,
 	viewportWidth,
 	viewportHeight,
 }: SubmenuPositionOptions): Point {
-	const gap = 8
-	const viewportPadding = 8
-	const preferredLeft = buttonRect.right + gap
-	const left =
-		preferredLeft + submenuWidth + viewportPadding <= viewportWidth
-			? preferredLeft
-			: Math.max(viewportPadding, buttonRect.left - submenuWidth - gap)
+	const preferredLeft =
+		openDirection === 'right'
+			? buttonRect.right + DROPDOWN_GAP
+			: buttonRect.left - submenuWidth - DROPDOWN_GAP
+	const maxLeft = Math.max(
+		DROPDOWN_VIEWPORT_MARGIN,
+		viewportWidth - submenuWidth - DROPDOWN_VIEWPORT_MARGIN,
+	)
+	const left = Math.min(Math.max(DROPDOWN_VIEWPORT_MARGIN, preferredLeft), maxLeft)
 	const top = Math.min(
-		Math.max(viewportPadding, buttonRect.top),
-		Math.max(viewportPadding, viewportHeight - submenuHeight - viewportPadding),
+		Math.max(DROPDOWN_VIEWPORT_MARGIN, buttonRect.top),
+		Math.max(DROPDOWN_VIEWPORT_MARGIN, viewportHeight - submenuHeight - DROPDOWN_VIEWPORT_MARGIN),
 	)
 
 	return {
 		x: left,
 		y: top,
 	}
+}
+
+function getSubmenuOpenDirection({
+	menuRect,
+	widestSubmenuWidth,
+	viewportWidth,
+}: SubmenuOpenDirectionOptions): SubmenuOpenDirection {
+	const rightSpace = viewportWidth - menuRect.right - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN
+	const leftSpace = menuRect.left - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN
+
+	if (rightSpace >= widestSubmenuWidth) {
+		return 'right'
+	}
+
+	if (leftSpace >= widestSubmenuWidth) {
+		return 'left'
+	}
+
+	return rightSpace >= leftSpace ? 'right' : 'left'
 }
 
 function getIsCursorAimingAtSubmenu(
@@ -1185,13 +1259,35 @@ function updateAddMenuPosition(): boolean {
 	return true
 }
 
+function updateSubmenuOpenDirection(): boolean {
+	if (typeof window === 'undefined' || !menuContainer.value) {
+		return false
+	}
+
+	submenuOpenDirection.value = getSubmenuOpenDirection({
+		menuRect: menuContainer.value.getBoundingClientRect(),
+		widestSubmenuWidth: getWidestSubmenuWidthInPixels(filterCategories.value),
+		viewportWidth: window.innerWidth,
+	})
+	return true
+}
+
 function scheduleAddMenuPositionUpdate(retries = 8) {
 	if (typeof window === 'undefined') {
 		return
 	}
 
 	nextTick(() => {
-		if (!isAddMenuOpen.value || updateAddMenuPosition() || retries <= 0) {
+		if (!isAddMenuOpen.value) {
+			return
+		}
+
+		if (updateAddMenuPosition()) {
+			updateSubmenuOpenDirection()
+			return
+		}
+
+		if (retries <= 0) {
 			return
 		}
 
@@ -1215,11 +1311,15 @@ function updateSubmenuPosition(): boolean {
 
 	const buttonRect = activeButton.getBoundingClientRect()
 	const submenuRect = submenu.value?.getBoundingClientRect()
-	const submenuWidth = submenuRect?.width ?? 256
+	const submenuWidth =
+		submenuRect?.width ??
+		(activeCategory.value ? getSubmenuWidthInPixels(activeCategory.value) : 256)
 	const submenuHeight = submenuRect?.height ?? 320
 
+	updateSubmenuOpenDirection()
 	submenuPosition.value = getSubmenuPosition({
 		buttonRect,
+		openDirection: submenuOpenDirection.value,
 		submenuWidth,
 		submenuHeight,
 		viewportWidth: window.innerWidth,
@@ -1279,6 +1379,7 @@ function updateMenuPositions() {
 	}
 
 	updateAddMenuPosition()
+	updateSubmenuOpenDirection()
 	updateSubmenuPosition()
 }
 
@@ -1356,6 +1457,11 @@ watch(filterCategoriesByKey, (nextCategories) => {
 	if (activeCategoryKey.value && !nextCategories.has(activeCategoryKey.value)) {
 		activeCategoryKey.value = null
 		hasSubmenuPosition.value = false
+	}
+
+	if (isAddMenuOpen.value) {
+		updateSubmenuOpenDirection()
+		scheduleSubmenuPositionUpdate()
 	}
 })
 
