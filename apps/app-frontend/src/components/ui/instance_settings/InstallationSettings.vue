@@ -35,7 +35,7 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 
-const { instance, offline, isMinecraftServer, onUnlinked } = injectInstanceSettings()
+const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
 
 const [
 	fabric_versions,
@@ -113,6 +113,7 @@ provideAppBackup({
 })
 
 provideInstallationSettings({
+	closeSettings: closeModal,
 	loading: ref(false),
 	installationInfo: computed(() => {
 		const rows = [

@@ -64,6 +64,7 @@ export interface InstallationSettingsContext {
 	reinstalling?: Ref<boolean>
 
 	afterSave?: () => Promise<void>
+	closeSettings?: () => void
 
 	lockPlatform?: boolean
 	hideLoaderVersion?: boolean
