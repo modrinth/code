@@ -17,7 +17,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		worldId: string,
 	): Promise<Kyros.UploadSessions.v1.UploadSessionResponse> {
 		return this.client.request<Kyros.UploadSessions.v1.UploadSessionResponse>(
-			`/worlds/${worldId}/${scope}/upload-session`,
+			`/worlds/${worldId}/files/upload-session`,
 			{
 				api: '',
 				version: 'v1',
@@ -32,7 +32,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		worldId: string,
 	): Promise<Kyros.UploadSessions.v1.GetUploadSessionResponse> {
 		return this.client.request<Kyros.UploadSessions.v1.GetUploadSessionResponse>(
-			`/worlds/${worldId}/${scope}/upload-session`,
+			`/worlds/${worldId}/files/upload-session`,
 			{
 				api: '',
 				version: 'v1',
@@ -58,7 +58,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		}
 
 		return this.client.upload<Kyros.UploadSessions.v1.UploadSessionResponse>(
-			`/worlds/${worldId}/${scope}/upload-session/${uploadId}/files`,
+			`/worlds/${worldId}/files/upload-session/${uploadId}/files`,
 			{
 				api: '',
 				version: 'v1',
@@ -76,7 +76,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		uploadId: string,
 	): Promise<Kyros.UploadSessions.v1.UploadSessionResponse> {
 		return this.client.request<Kyros.UploadSessions.v1.UploadSessionResponse>(
-			`/worlds/${worldId}/${scope}/upload-session/${uploadId}/finalize`,
+			`/worlds/${worldId}/files/upload-session/${uploadId}/finalize`,
 			{
 				api: '',
 				version: 'v1',
@@ -92,7 +92,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		uploadId: string,
 	): Promise<Kyros.UploadSessions.v1.UploadSessionResponse> {
 		return this.client.request<Kyros.UploadSessions.v1.UploadSessionResponse>(
-			`/worlds/${worldId}/${scope}/upload-session/${uploadId}`,
+			`/worlds/${worldId}/files/upload-session/${uploadId}`,
 			{
 				api: '',
 				version: 'v1',
