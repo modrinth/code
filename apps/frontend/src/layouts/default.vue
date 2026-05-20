@@ -761,6 +761,7 @@ import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	commonSettingsMessages,
+	createHostingIntercomIdentityKey,
 	defineMessages,
 	injectModrinthClient,
 	injectPageContext,
@@ -821,8 +822,8 @@ const hostingIntercom = useHostingIntercom({
 	enabled: hostingIntercomActive,
 	appId: computed(() => config.public.intercomAppId),
 	fetchToken: fetchIntercomToken,
-	identityKey: computed(
-		() => `${auth.value.user?.id ?? 'anonymous'}:${hostingIntercomServerId.value ?? 'hosting'}`,
+	identityKey: computed(() =>
+		createHostingIntercomIdentityKey(auth.value.user, hostingIntercomServerId.value),
 	),
 })
 

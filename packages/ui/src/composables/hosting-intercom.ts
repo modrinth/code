@@ -18,12 +18,23 @@ import { useModalStack } from './modal-stack'
 
 type FetchIntercomToken = () => Promise<{ token: string }>
 
+export interface HostingIntercomIdentityUser {
+	id?: string | null
+}
+
 export interface UseHostingIntercomOptions {
 	enabled: MaybeRefOrGetter<boolean>
 	appId: MaybeRefOrGetter<string | undefined>
 	fetchToken: FetchIntercomToken
 	identityKey: MaybeRefOrGetter<string | null | undefined>
 	horizontalPadding?: MaybeRefOrGetter<number | undefined>
+}
+
+export function createHostingIntercomIdentityKey(
+	user: HostingIntercomIdentityUser | null | undefined,
+	serverId: string | null | undefined,
+): string {
+	return `${user?.id ?? 'anonymous'}:${serverId ?? 'hosting'}`
 }
 
 const DEFAULT_PADDING = 20
