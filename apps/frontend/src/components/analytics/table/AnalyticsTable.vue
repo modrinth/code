@@ -188,9 +188,9 @@ const isDataLoading = computed(() => isLoading.value)
 
 const tableMode = ref<TableMode>('breakdown_only')
 const sortColumn = ref<TableColumnKey | undefined>('date')
-const sortDirection = ref<SortDirection>('asc')
+const sortDirection = ref<SortDirection>('desc')
 const displayedSortColumn = ref<TableColumnKey | undefined>('date')
-const displayedSortDirection = ref<SortDirection>('asc')
+const displayedSortDirection = ref<SortDirection>('desc')
 const PAGE_SIZE = 500
 const GRAPH_DATASET_SELECTION_LIMIT = 8
 const INACTIVE_MODE_WARMUP_POINT_LIMIT = 12000
@@ -480,15 +480,8 @@ function buildColumns(includeDate: boolean): TableColumn<TableColumnKey>[] {
 			key: 'date',
 			label: 'Date',
 			enableSorting: true,
+			defaultSortDirection: 'desc',
 			width: stats.length > 2 ? '20%' : '',
-		})
-	}
-
-	if (showProjectVersionProjectColumn.value) {
-		nextColumns.push({
-			key: 'project',
-			label: 'Project',
-			enableSorting: true,
 		})
 	}
 
@@ -496,6 +489,14 @@ function buildColumns(includeDate: boolean): TableColumn<TableColumnKey>[] {
 		nextColumns.push({
 			key: 'breakdown',
 			label: breakdownColumnLabel.value,
+			enableSorting: true,
+		})
+	}
+
+	if (showProjectVersionProjectColumn.value) {
+		nextColumns.push({
+			key: 'project',
+			label: 'Project',
 			enableSorting: true,
 		})
 	}
@@ -916,7 +917,7 @@ function getMetricColumnForStat(stat: AnalyticsDashboardStat): TableColumn<Table
 function applyDefaultSort(nextColumns = activeColumns.value) {
 	const nextSortColumn = getDefaultSortColumn(nextColumns)
 	sortColumn.value = nextSortColumn
-	sortDirection.value = getDefaultSortDirection(nextSortColumn)
+	sortDirection.value = getDefaultSortDirection(nextSortColumn, nextColumns)
 }
 
 function applyActiveStatSort() {
@@ -964,8 +965,11 @@ function getDefaultSortColumn(
 	return nextColumns[0]?.key
 }
 
-function getDefaultSortDirection(column: TableColumnKey | undefined): SortDirection {
-	return column === 'date' || column === 'project' || column === 'breakdown' ? 'asc' : 'desc'
+function getDefaultSortDirection(
+	column: TableColumnKey | undefined,
+	nextColumns: TableColumn<TableColumnKey>[],
+): SortDirection {
+	return nextColumns.find((nextColumn) => nextColumn.key === column)?.defaultSortDirection ?? 'asc'
 }
 
 function getBreakdownValue(
