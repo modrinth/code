@@ -289,7 +289,9 @@ function isCustomAttributionLicense(
 	return typeof license === 'object' && license !== null && 'name' in license
 }
 
-function parseAttributionLicense(license: Labrinth.Attribution.Internal.AttributionLicense | undefined): {
+function parseAttributionLicense(
+	license: Labrinth.Attribution.Internal.AttributionLicense | undefined,
+): {
 	spdx: string
 	custom: string
 } {
@@ -314,18 +316,20 @@ function attributionLinkToWork(
 	return undefined
 }
 
-const initialAttribution = computed<Labrinth.Attribution.Internal.AttributionResolution | null>(() => {
-	const raw = props.group.attribution
-	if (!raw || typeof raw !== 'object') {
-		return null
-	}
-	const obj = raw as Record<string, unknown>
-	const kind = obj.kind
-	if (typeof kind !== 'string' || !(permissionKinds as string[]).includes(kind)) {
-		return null
-	}
-	return obj as Labrinth.Attribution.Internal.AttributionResolution
-})
+const initialAttribution = computed<Labrinth.Attribution.Internal.AttributionResolution | null>(
+	() => {
+		const raw = props.group.attribution
+		if (!raw || typeof raw !== 'object') {
+			return null
+		}
+		const obj = raw as Record<string, unknown>
+		const kind = obj.kind
+		if (typeof kind !== 'string' || !(permissionKinds as string[]).includes(kind)) {
+			return null
+		}
+		return obj as Labrinth.Attribution.Internal.AttributionResolution
+	},
+)
 
 const editing = ref(!isAttributed.value)
 const selectedKind = ref<Labrinth.Attribution.Internal.AttributionResolutionKind>(
@@ -1107,10 +1111,7 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 							:placeholder="formatMessage(messages.notesPlaceholder)"
 						/>
 					</div>
-					<div
-						v-if="permissionReasonFields.includes('image_urls')"
-						class="flex flex-col gap-2"
-					>
+					<div v-if="permissionReasonFields.includes('image_urls')" class="flex flex-col gap-2">
 						<div class="flex flex-col gap-2 mt-1">
 							<div class="flex flex-col gap-1 mt-1">
 								<span class="text-contrast font-semibold">
