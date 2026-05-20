@@ -415,6 +415,21 @@ export function getDefaultAnalyticsBreakdownPreset(
 	return selectedProjectIds.length > 1 ? 'project' : DEFAULT_BREAKDOWN_PRESET
 }
 
+export function getAnalyticsBreakdownPresetForProjectSelection(
+	breakdown: AnalyticsBreakdownPreset,
+	selectedProjectIds: readonly string[],
+): AnalyticsBreakdownPreset {
+	const defaultBreakdown = getDefaultAnalyticsBreakdownPreset(selectedProjectIds)
+	if (
+		(breakdown === 'none' && defaultBreakdown === 'project') ||
+		(breakdown === 'project' && defaultBreakdown === 'none')
+	) {
+		return defaultBreakdown
+	}
+
+	return breakdown
+}
+
 export function isAnalyticsQueryBuilderStateDefault(
 	state: AnalyticsQueryBuilderState,
 	availableProjectIds: string[],
@@ -603,6 +618,14 @@ export function readAnalyticsQueryBuilderState(
 		? selectedCustomTimeframeStartDate
 		: rawCustomTimeframeEndDate
 
+	const selectedBreakdown = getAnalyticsBreakdownPresetForProjectSelection(
+		parseAnalyticsBreakdownQueryValue(
+			query[QUERY_KEY_BREAKDOWN],
+			getDefaultAnalyticsBreakdownPreset(selectedProjectIds),
+		),
+		selectedProjectIds,
+	)
+
 	return {
 		selectedProjectIds,
 		selectedTimeframeMode,
@@ -627,10 +650,7 @@ export function readAnalyticsQueryBuilderState(
 			GROUP_BY_PRESET_VALUES,
 			defaultState.selectedGroupBy,
 		),
-		selectedBreakdown: parseAnalyticsBreakdownQueryValue(
-			query[QUERY_KEY_BREAKDOWN],
-			getDefaultAnalyticsBreakdownPreset(selectedProjectIds),
-		),
+		selectedBreakdown,
 		selectedFilters,
 	}
 }
@@ -680,8 +700,12 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 	nextRouteQuery[QUERY_KEY_GROUP_BY] =
 		state.selectedGroupBy !== DEFAULT_GROUP_BY_PRESET ? state.selectedGroupBy : undefined
 	const defaultBreakdown = getDefaultAnalyticsBreakdownPreset(state.selectedProjectIds)
+	const selectedBreakdown = getAnalyticsBreakdownPresetForProjectSelection(
+		state.selectedBreakdown,
+		state.selectedProjectIds,
+	)
 	nextRouteQuery[QUERY_KEY_BREAKDOWN] =
-		state.selectedBreakdown !== defaultBreakdown ? state.selectedBreakdown : undefined
+		selectedBreakdown !== defaultBreakdown ? selectedBreakdown : undefined
 
 	for (const category of URL_FILTER_CATEGORIES) {
 		const categoryQueryKey = FILTER_QUERY_KEY_BY_CATEGORY[category]

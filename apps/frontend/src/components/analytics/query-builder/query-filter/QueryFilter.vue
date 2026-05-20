@@ -2,7 +2,7 @@
 	<DropdownFilterBar
 		v-model="selectedFilterValue"
 		:categories="filterCategories"
-		:show-clear="selectedBreakdown !== 'none'"
+		:show-clear="canClearSelectedBreakdown"
 		@clear="clearFilterBar"
 	>
 		<template #search-actions="{ category, setSelectedValues }">
@@ -180,6 +180,7 @@ import {
 	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
+import { getDefaultAnalyticsBreakdownPreset } from '~/providers/analytics/query-builder-url'
 
 import { getDownloadSourceLabel } from '../../breakdown'
 import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
@@ -249,6 +250,12 @@ const effectiveSelectedProjectCount = computed(
 		).length,
 )
 const showProjectVersionProjectIcons = computed(() => effectiveSelectedProjectCount.value > 1)
+const defaultSelectedBreakdown = computed(() =>
+	getDefaultAnalyticsBreakdownPreset(selectedProjectIds.value),
+)
+const canClearSelectedBreakdown = computed(
+	() => selectedBreakdown.value !== defaultSelectedBreakdown.value,
+)
 const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
 	cloneSelectedFilters(selectedFilters.value),
 )
@@ -277,7 +284,7 @@ function getSelectedFilterBarValue(): AnalyticsSelectedFilters {
 }
 
 function clearSelectedBreakdown() {
-	selectedBreakdown.value = 'none'
+	selectedBreakdown.value = defaultSelectedBreakdown.value
 }
 
 function clearFilterBar() {

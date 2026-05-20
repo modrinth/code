@@ -164,7 +164,7 @@
 								<template #suffix>
 									<div class="mr-0.5 flex gap-1.5">
 										<button
-											v-if="selectedBreakdownValue !== 'none'"
+											v-if="canClearSelectedBreakdown"
 											type="button"
 											class="inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent shadow-none transition-colors hover:bg-transparent hover:text-contrast"
 											aria-label="Clear breakdown"
@@ -174,7 +174,7 @@
 											<XIcon class="size-4 text-primary" />
 										</button>
 										<div
-											v-if="selectedBreakdownValue !== 'none'"
+											v-if="canClearSelectedBreakdown"
 											class="h-5 w-[1px] shrink-0 bg-surface-5"
 										></div>
 									</div>
@@ -217,7 +217,11 @@ import {
 	getProjectIdsMatchingStatusFilter,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
-import { buildDefaultAnalyticsQueryBuilderState } from '~/providers/analytics/query-builder-url'
+import {
+	buildDefaultAnalyticsQueryBuilderState,
+	getAnalyticsBreakdownPresetForProjectSelection,
+	getDefaultAnalyticsBreakdownPreset,
+} from '~/providers/analytics/query-builder-url'
 
 import DownloadsThresholdInput from './DownloadsThresholdInput.vue'
 import {
@@ -456,13 +460,16 @@ let selectedBreakdownCommitRequestId = 0
 const selectedBreakdownValue = computed<AnalyticsBreakdownPreset>({
 	get: () => draftSelectedBreakdown.value,
 	set: (nextBreakdown) => {
-		draftSelectedBreakdown.value = nextBreakdown
+		draftSelectedBreakdown.value = getAnalyticsBreakdownPresetForProjectSelection(
+			nextBreakdown,
+			selectedProjectIds.value,
+		)
 		void scheduleSelectedBreakdownCommit()
 	},
 })
 
 function clearSelectedBreakdown() {
-	draftSelectedBreakdown.value = 'none'
+	draftSelectedBreakdown.value = defaultSelectedBreakdown.value
 	void scheduleSelectedBreakdownCommit()
 }
 
@@ -590,8 +597,14 @@ const groupByPresetOptions: Array<{
 ]
 
 const selectedProjectCount = computed(() => selectedProjectIds.value.length)
+const defaultSelectedBreakdown = computed(() =>
+	getDefaultAnalyticsBreakdownPreset(selectedProjectIds.value),
+)
+const canClearSelectedBreakdown = computed(
+	() => selectedBreakdownValue.value !== defaultSelectedBreakdown.value,
+)
 const breakdownOptions = computed<ComboboxOption<AnalyticsBreakdownPreset>[]>(() => [
-	{ value: 'none', label: 'None' },
+	...(selectedProjectCount.value <= 1 ? [{ value: 'none' as const, label: 'None' }] : []),
 	...(selectedProjectCount.value > 1 ? [{ value: 'project' as const, label: 'Project' }] : []),
 	{ value: 'country', label: 'Country' },
 	{ value: 'monetization', label: 'Monetization' },

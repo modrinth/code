@@ -27,6 +27,7 @@ import {
 	buildAnalyticsQueryBuilderRouteQuery,
 	buildDefaultAnalyticsGraphState,
 	buildDefaultAnalyticsQueryBuilderState,
+	getAnalyticsBreakdownPresetForProjectSelection,
 	getDefaultAnalyticsBreakdownPreset,
 	hasAnalyticsBreakdownQuery,
 	hasAnalyticsProjectSelectionQuery,
@@ -1776,13 +1777,17 @@ export function createAnalyticsDashboardContext(
 	watch(
 		[selectedProjectIds, hasExplicitBreakdownQuery],
 		([nextSelectedProjectIds, nextHasExplicitBreakdownQuery]) => {
-			const defaultBreakdown = getDefaultAnalyticsBreakdownPreset(nextSelectedProjectIds)
-			if (selectedBreakdown.value === 'project' && defaultBreakdown === 'none') {
+			const validBreakdown = getAnalyticsBreakdownPresetForProjectSelection(
+				selectedBreakdown.value,
+				nextSelectedProjectIds,
+			)
+			if (selectedBreakdown.value !== validBreakdown) {
 				replaceNextAnalyticsRouteNavigation()
-				selectedBreakdown.value = 'none'
+				selectedBreakdown.value = validBreakdown
 				return
 			}
 
+			const defaultBreakdown = getDefaultAnalyticsBreakdownPreset(nextSelectedProjectIds)
 			if (!nextHasExplicitBreakdownQuery && selectedBreakdown.value !== defaultBreakdown) {
 				replaceNextAnalyticsRouteNavigation()
 				selectedBreakdown.value = defaultBreakdown
@@ -1800,8 +1805,12 @@ export function createAnalyticsDashboardContext(
 			const nextSelectedProjectIds = nextQueryState.selectedProjectIds.filter((projectId) =>
 				availableProjectIdSet.has(projectId),
 			)
-			const nextSelectedFilters = sanitizeAnalyticsSelectedFiltersForContext(
+			const nextSelectedBreakdown = getAnalyticsBreakdownPresetForProjectSelection(
 				nextQueryState.selectedBreakdown,
+				nextSelectedProjectIds,
+			)
+			const nextSelectedFilters = sanitizeAnalyticsSelectedFiltersForContext(
+				nextSelectedBreakdown,
 				nextQueryState.selectedFilters,
 			)
 			const shouldUpdateSelectedProjectIds = !areStringArraysEqual(
@@ -1821,8 +1830,7 @@ export function createAnalyticsDashboardContext(
 			const shouldUpdateSelectedCustomTimeframeEndDate =
 				selectedCustomTimeframeEndDate.value !== nextQueryState.selectedCustomTimeframeEndDate
 			const shouldUpdateSelectedGroupBy = selectedGroupBy.value !== nextQueryState.selectedGroupBy
-			const shouldUpdateSelectedBreakdown =
-				selectedBreakdown.value !== nextQueryState.selectedBreakdown
+			const shouldUpdateSelectedBreakdown = selectedBreakdown.value !== nextSelectedBreakdown
 			const shouldUpdateSelectedFilters = !areSelectedFiltersEqual(
 				selectedFilters.value,
 				nextSelectedFilters,
@@ -1882,7 +1890,7 @@ export function createAnalyticsDashboardContext(
 				selectedGroupBy.value = nextQueryState.selectedGroupBy
 			}
 			if (shouldUpdateSelectedBreakdown) {
-				selectedBreakdown.value = nextQueryState.selectedBreakdown
+				selectedBreakdown.value = nextSelectedBreakdown
 			}
 			if (shouldUpdateSelectedFilters) {
 				selectedFilters.value = nextSelectedFilters
