@@ -2326,8 +2326,9 @@ watch(
 
 const projectTypeDisplay = computed(() => {
 	if (!project.value) return ''
+	const projectType = isServerProject.value ? 'minecraft_java_server' : project.value.project_type
 	return formatProjectType(
-		data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
+		data.$getProjectTypeForDisplay(projectType, project.value.loaders),
 	)
 })
 
