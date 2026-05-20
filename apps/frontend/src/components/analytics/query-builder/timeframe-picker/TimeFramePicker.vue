@@ -368,6 +368,10 @@ function handleCustomRangeCancel() {
 }
 
 async function handleCustomRangeApply(event: MouseEvent) {
+	if (!hasCompleteDraftCustomDateRange()) {
+		return
+	}
+
 	draftSelectedTimeframeMode.value = 'custom_range'
 	commitTimeframeDraft()
 	closeTimeframeSelectDropdown(event)
@@ -415,6 +419,13 @@ function handleTimeframePresetSelect(option: ComboboxOption<AnalyticsTimeframePr
 	}
 }
 
+function hasCompleteDraftCustomDateRange() {
+	return Boolean(
+		getDateFromInputValue(draftSelectedCustomTimeframeStartDate.value) &&
+			getDateFromInputValue(draftSelectedCustomTimeframeEndDate.value),
+	)
+}
+
 watch(
 	[
 		draftSelectedTimeframeMode,
@@ -433,6 +444,12 @@ watch(
 		) {
 			return
 		}
+		if (
+			draftSelectedTimeframeMode.value === 'custom_range' &&
+			!hasCompleteDraftCustomDateRange()
+		) {
+			return
+		}
 
 		const range = getDraftTimeRange()
 		const { start, end } = ensureMinimumTimeRange(range.start, range.end)
@@ -443,9 +460,15 @@ watch(
 )
 
 function switchDraftToCustomDateRange() {
-	const rawRange = getDraftTimeRange()
-	draftSelectedCustomTimeframeStartDate.value = getDateInputValue(rawRange.start)
-	draftSelectedCustomTimeframeEndDate.value = getInclusiveEndDateInputValue(rawRange.end)
+	if (draftSelectedTimeframeMode.value === 'preset') {
+		draftSelectedCustomTimeframeStartDate.value = ''
+		draftSelectedCustomTimeframeEndDate.value = ''
+	} else {
+		const rawRange = getDraftTimeRange()
+		draftSelectedCustomTimeframeStartDate.value = getDateInputValue(rawRange.start)
+		draftSelectedCustomTimeframeEndDate.value = getInclusiveEndDateInputValue(rawRange.end)
+	}
+
 	draftSelectedTimeframeMode.value = 'custom_range'
 	activeTimeframePanel.value = 'custom_range'
 }

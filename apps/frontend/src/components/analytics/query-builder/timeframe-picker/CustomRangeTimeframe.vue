@@ -42,7 +42,9 @@
 					<button type="button" @click="$emit('cancel', $event)">Cancel</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
-					<button type="button" @click="$emit('apply', $event)">Apply</button>
+					<button type="button" :disabled="!hasCompleteRange" @click="$emit('apply', $event)">
+						Apply
+					</button>
 				</ButtonStyled>
 			</div>
 		</div>
@@ -134,6 +136,7 @@ const selectedDraftDates = computed(() =>
 const rangeLabel = computed(() =>
 	selectedDraftDates.value.length === 1 ? 'Selecting' : 'Selected',
 )
+const hasCompleteRange = computed(() => Boolean(getOrderedRange(pickerRange.value)))
 
 const formattedRange = computed(() => {
 	if (selectedDraftDates.value.length === 1)
