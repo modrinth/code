@@ -131,10 +131,9 @@
 				class="h-10"
 			/>
 
-			<StyledInput
+			<DatePicker
 				v-else-if="field.type === 'date'"
 				v-model="formData[field.name]"
-				type="date"
 				wrapper-class="w-full"
 			/>
 
@@ -230,6 +229,7 @@ import {
 	Admonition,
 	Checkbox,
 	Combobox,
+	DatePicker,
 	defineMessages,
 	financialMessages,
 	formFieldLabels,

@@ -102,7 +102,7 @@
 				<tr>
 					<td>Revenue earned on</td>
 					<td>
-						<StyledInput id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
+						<DatePicker id="revenue-date-picker" v-model="rawSelectedDate" />
 						<noscript
 							>(JavaScript must be enabled for the date picker to function, example date:
 							2024-07-15)
@@ -162,7 +162,7 @@
 </template>
 
 <script lang="ts" setup>
-import { injectModrinthClient, StyledInput, useFormatDateTime, useFormatMoney } from '@modrinth/ui'
+import { DatePicker, injectModrinthClient, useFormatDateTime, useFormatMoney } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'

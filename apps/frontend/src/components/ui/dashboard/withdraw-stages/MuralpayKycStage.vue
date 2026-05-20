@@ -95,10 +95,9 @@
 							<span class="text-red">*</span>
 						</span>
 					</label>
-					<StyledInput
+					<DatePicker
 						v-model="formData.dateOfBirth"
-						type="date"
-						:max="maxDate"
+						:max-date="maxDate"
 						autocomplete="bday"
 						wrapper-class="w-full"
 					/>
@@ -213,6 +212,7 @@
 import {
 	Chips,
 	Combobox,
+	DatePicker,
 	defineMessages,
 	formFieldLabels,
 	formFieldPlaceholders,

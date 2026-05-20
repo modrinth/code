@@ -62,7 +62,7 @@
 					<label for="pat-expires">
 						<span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
 					</label>
-					<StyledInput id="pat-expires" v-model="expires" type="date" />
+					<DatePicker id="pat-expires" v-model="expires" wrapper-class="w-full" />
 					<p></p>
 				</div>
 
@@ -207,6 +207,7 @@ import {
 	commonSettingsMessages,
 	ConfirmModal,
 	CopyCode,
+	DatePicker,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
