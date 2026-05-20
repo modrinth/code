@@ -61,7 +61,7 @@ const ANALYTICS_MAX_TIME_SLICES = 256 // controls granularity allowed in "group 
 const ANALYTICS_TIME_SLICES_GC_TIME_MS = 30 * 1000
 const ANALYTICS_PREFETCH_GC_TIME_MS = 15 * 1000
 const ANALYTICS_FILTER_OPTIONS_GC_TIME_MS = 60 * 1000
-const ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE = 15
+const ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE = 20
 const ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS = 150
 
 type ProjectTypeMetadata = {
@@ -320,7 +320,9 @@ function mergeAnalyticsTimeSlices(
 				mergedTimeSlices[index] = []
 			}
 
-			mergedTimeSlices[index].push(...timeSlice)
+			for (const dataPoint of timeSlice) {
+				mergedTimeSlices[index].push(dataPoint)
+			}
 		})
 	}
 
@@ -420,9 +422,13 @@ function buildAnalyticsFilterOptionsRequests(
 			project_views: {
 				bucket_by: ['country'],
 			},
+		}),
+		buildRequest({
 			project_downloads: {
 				bucket_by: ['country'],
 			},
+		}),
+		buildRequest({
 			project_playtime: {
 				bucket_by: ['country'],
 			},
@@ -435,30 +441,6 @@ function buildAnalyticsFilterOptionsRequests(
 		buildRequest({
 			project_downloads: {
 				bucket_by: ['reason'],
-			},
-		}),
-		buildRequest({
-			project_downloads: {
-				bucket_by: ['game_version'],
-			},
-			project_playtime: {
-				bucket_by: ['game_version'],
-			},
-		}),
-		buildRequest({
-			project_downloads: {
-				bucket_by: ['loader'],
-			},
-			project_playtime: {
-				bucket_by: ['loader'],
-			},
-		}),
-		buildRequest({
-			project_downloads: {
-				bucket_by: ['version_id'],
-			},
-			project_playtime: {
-				bucket_by: ['version_id'],
 			},
 		}),
 	]
@@ -2050,7 +2032,13 @@ export function createAnalyticsDashboardContext(
 			]),
 			queryFn: async () => {
 				const timeSlices: Labrinth.Analytics.v3.TimeSlice[] = []
-				for (const request of analyticsFilterOptionsRequests.value ?? []) {
+				const requests = analyticsFilterOptionsRequests.value ?? []
+				for (let index = 0; index < requests.length; index++) {
+					if (index > 0) {
+						await waitForAnalyticsFetchBatchDelay()
+					}
+
+					const request = requests[index]
 					if (!isAnalyticsFetchRequestReady(request)) {
 						continue
 					}
