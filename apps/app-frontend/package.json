@@ -13,7 +13,6 @@
 		"test": "vue-tsc --noEmit"
 	},
 	"dependencies": {
-		"@intercom/messenger-js-sdk": "^0.0.14",
 		"@modrinth/api-client": "workspace:^",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/ui": "workspace:*",

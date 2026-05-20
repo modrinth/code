@@ -761,9 +761,13 @@ import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	commonSettingsMessages,
+	createHostingIntercomIdentityKey,
 	defineMessages,
 	injectModrinthClient,
+	injectPageContext,
 	OverflowMenu,
+	providePageContext,
+	useHostingIntercom,
 	useVIntl,
 } from '@modrinth/ui'
 import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
@@ -808,6 +812,25 @@ const router = useNativeRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const client = injectModrinthClient()
+const pageContext = injectPageContext()
+const hostingIntercomActive = computed(() => route.path.startsWith('/hosting') && !!auth.value.user)
+const hostingIntercomServerId = computed(() => {
+	const rawId = route.params.id
+	return Array.isArray(rawId) ? rawId[0] : rawId
+})
+const hostingIntercom = useHostingIntercom({
+	enabled: hostingIntercomActive,
+	appId: computed(() => config.public.intercomAppId),
+	fetchToken: fetchIntercomToken,
+	identityKey: computed(() =>
+		createHostingIntercomIdentityKey(auth.value.user, hostingIntercomServerId.value),
+	),
+})
+
+providePageContext({
+	...pageContext,
+	intercomBubble: hostingIntercom.intercomBubble,
+})
 
 const { data: payoutBalance } = useQuery({
 	queryKey: ['payout', 'balance'],
@@ -835,6 +858,12 @@ const showTinMismatchBanner = computed(() => {
 })
 
 const basePopoutId = useId()
+
+async function fetchIntercomToken() {
+	return $fetch('/api/intercom/messenger-jwt', {
+		query: hostingIntercomServerId.value ? { server_id: hostingIntercomServerId.value } : {},
+	})
+}
 
 const navMenuMessages = defineMessages({
 	home: {

@@ -1658,6 +1658,15 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hide incompatible"
   },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} is not marked as compatible with this installation. It may fail to launch or behave unexpectedly."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Update to incompatible version?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Update anyway"
+  },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Loading changelog..."
   },

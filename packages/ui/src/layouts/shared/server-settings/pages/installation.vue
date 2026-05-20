@@ -354,6 +354,7 @@ function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 }
 
 provideInstallationSettings({
+	closeSettings: serverSettings.closeModal,
 	onGameVersionHover: handleGameVersionHover,
 	loading: computed(() => !server.value || addonsQuery.isLoading.value),
 	installationInfo: computed(() => {
