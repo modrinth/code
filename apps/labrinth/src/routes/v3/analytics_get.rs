@@ -22,8 +22,8 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as _};
 
 use crate::{
     auth::{
-        AuthenticationError, get_user_from_headers,
-        checks::filter_visible_version_ids,
+        AuthenticationError, checks::filter_visible_version_ids,
+        get_user_from_headers,
     },
     database::{
         self, DBProject,
@@ -805,7 +805,10 @@ pub async fn fetch_analytics(
     let parent_version_data =
         DBVersion::get_many(&parent_version_ids, &**pool, &redis).await?;
     let visible_version_ids = filter_visible_version_ids(
-        parent_version_data.iter().map(|version| &version.inner).collect(),
+        parent_version_data
+            .iter()
+            .map(|version| &version.inner)
+            .collect(),
         &Some(user.clone()),
         &pool,
         &redis,
