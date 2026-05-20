@@ -10,25 +10,30 @@
 		class="universal-card mx-auto flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
 	>
 		<template v-if="flow && !subtleLauncherRedirectUri">
-			<label for="two-factor-code">
-				<span class="label__title">{{ formatMessage(messages.twoFactorCodeLabel) }}</span>
-				<span class="label__description">
-					{{ formatMessage(messages.twoFactorCodeLabelDescription) }}
-				</span>
-			</label>
-			<StyledInput
-				id="two-factor-code"
-				v-model="twoFactorCodeModel"
-				:maxlength="11"
-				inputmode="numeric"
-				:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
-				autocomplete="one-time-code"
-				@keyup.enter="onTwoFactorSignIn()"
-			/>
-
-			<button class="btn btn-primary min-h-10 font-bold no-underline" @click="onTwoFactorSignIn()">
-				{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon class="ml-2" />
-			</button>
+			<div class="flex flex-col items-end gap-4">
+				<div class="flex flex-col gap-1.5">
+					<label for="two-factor-code">
+						<span class="label__title">{{ formatMessage(messages.twoFactorCodeLabel) }}</span>
+						<span class="label__description">
+							{{ formatMessage(messages.twoFactorCodeLabelDescription) }}
+						</span>
+					</label>
+					<StyledInput
+						id="two-factor-code"
+						v-model="twoFactorCodeModel"
+						:maxlength="11"
+						inputmode="numeric"
+						:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
+						autocomplete="one-time-code"
+						@keyup.enter="onTwoFactorSignIn()"
+					/>
+				</div>
+				<ButtonStyled color="brand">
+					<button @click="onTwoFactorSignIn()">
+						{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
+					</button>
+				</ButtonStyled>
+			</div>
 		</template>
 		<template v-else>
 			<div class="flex flex-col gap-6">
@@ -319,11 +324,12 @@ const messages = defineMessages({
 	},
 	twoFactorCodeLabel: {
 		id: 'auth.sign-in.2fa.label',
-		defaultMessage: 'Enter two-factor code',
+		defaultMessage: 'Two-factor authentication',
 	},
 	twoFactorCodeLabelDescription: {
 		id: 'auth.sign-in.2fa.description',
-		defaultMessage: 'Please enter a two-factor code to proceed.',
+		defaultMessage:
+			'Enter the 6-digit code from your authenticator app, or one of your backup codes.',
 	},
 	continueWithProvider: {
 		id: 'auth.continue-with-provider',

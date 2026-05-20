@@ -321,10 +321,10 @@
     "message": "Reset your password"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Please enter a two-factor code to proceed."
+    "message": "Enter the 6-digit code from your authenticator app, or one of your backup codes."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Enter two-factor code"
+    "message": "Two-factor authentication"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Enter code..."
