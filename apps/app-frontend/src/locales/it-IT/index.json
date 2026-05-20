@@ -93,7 +93,7 @@
     "message": "Abilita la barra laterale"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Visti i rischi nell'installare un file Modrinth Pack (.mrpack) non proveniente da Modrinth, mostriamo un avvertimento quando tenti di fare ciò."
+    "message": "Visti i rischi, apparirà un avviso prima di installare un file Modrinth Pack (.mrpack) non proveniente da Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Avvisami se installo pacchetti sconosciuti"
@@ -303,7 +303,7 @@
     "message": "Questo progetto è già stato installato"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "Torna su esplora"
+    "message": "Torna a Esplora"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Installa il contenuto nell'istanza"

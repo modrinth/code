@@ -9,13 +9,12 @@ import MaliciousSummaryModal, {
 } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
-const route = useRoute()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
-const projectId = computed(() => route.params.id as string)
+const projectId = String(useRouteId('project'))
 
-useHead({ title: () => `Tech review - ${projectId.value} - Modrinth` })
+useHead({ title: () => `Tech review - ${projectId} - Modrinth` })
 
 const CACHE_TTL = 24 * 60 * 60 * 1000
 const CACHE_KEY_PREFIX = 'tech_review_source_'
@@ -151,7 +150,7 @@ const {
 } = useQuery({
 	queryKey: ['tech-review-project-report', projectId],
 	queryFn: async () => {
-		return await client.labrinth.tech_review_internal.getProjectReport(projectId.value)
+		return await client.labrinth.tech_review_internal.getProjectReport(projectId)
 	},
 	retry: false,
 })
@@ -163,7 +162,7 @@ const {
 } = useQuery({
 	queryKey: ['project', projectId],
 	queryFn: async () => {
-		return await client.labrinth.projects_v3.get(projectId.value)
+		return await client.labrinth.projects_v3.get(projectId)
 	},
 	retry: false,
 })
@@ -171,14 +170,14 @@ const {
 const { data: organizationData, isLoading: isLoadingOrg } = useQuery({
 	queryKey: ['project-organization', projectId],
 	queryFn: async () => {
-		return await client.labrinth.projects_v3.getOrganization(projectId.value)
+		return await client.labrinth.projects_v3.getOrganization(projectId)
 	},
 })
 
 const { data: membersData, isLoading: isLoadingMembers } = useQuery({
 	queryKey: ['project-members', projectId],
 	queryFn: async () => {
-		return await client.labrinth.projects_v3.getMembers(projectId.value)
+		return await client.labrinth.projects_v3.getMembers(projectId)
 	},
 	enabled: computed(() => !organizationData.value && !isLoadingOrg.value),
 })
@@ -265,7 +264,7 @@ function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
 }
 
 function refetch() {
-	queryClient.invalidateQueries({ queryKey: ['tech-review-project-report', projectId.value] })
+	queryClient.invalidateQueries({ queryKey: ['tech-review-project-report', projectId] })
 }
 </script>
 
