@@ -8,8 +8,6 @@ use windows::Win32::UI::WindowsAndMessaging::{
     GetWindowThreadProcessId, IsIconic, IsWindowVisible,
 };
 
-const OCCLUDED_AREA_THRESHOLD: f64 = 1.0;
-
 pub fn is_ads_webview_occluded(
     main_hwnd: HWND,
     x: i32,
@@ -63,7 +61,7 @@ pub fn is_ads_webview_occluded(
                 occluded_area.saturating_add(rect_area(&intersection));
 
             if (occluded_area as f64 / ad_area as f64)
-                >= OCCLUDED_AREA_THRESHOLD
+                >= super::ads::OCCLUDED_AREA_THRESHOLD
             {
                 return true;
             }
