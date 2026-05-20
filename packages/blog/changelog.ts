@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-20T16:01:04.111Z`,
+		product: 'web',
+		body: `## Fixed
+- Fixed "Permissions" page showing in Modpack settings.`,
+	},
+	{
 		date: `2026-05-19T19:51:55+00:00`,
 		product: 'web',
 		body: `## Fixed
