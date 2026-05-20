@@ -6,6 +6,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
+import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -111,6 +112,13 @@ const messages = defineMessages({
 const client = injectModrinthClient()
 const { server, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
 	injectModrinthServerContext()
+const contentUploadSession = useUploadSessionUpload({
+	client,
+	scope: 'content',
+	worldId,
+	uploadState,
+	cancelUpload,
+})
 const { addNotification } = injectNotificationManager()
 const { openServerSettings, browseServerContent } = injectServerSettingsModal()
 const route = useRoute()
@@ -705,47 +713,17 @@ function handleUploadFiles() {
 		const wid = worldId.value
 		if (!wid) return
 
-		uploadState.value = {
-			isUploading: true,
-			currentFileName: null,
-			currentFileProgress: 0,
-			uploadedBytes: 0,
-			totalBytes: files.reduce((sum, f) => sum + f.size, 0),
-			completedFiles: 0,
-			totalFiles: files.length,
-		}
-
-		const handle = client.kyros.content_v1.uploadAddonFile(wid, files, {
-			onProgress: (p) => {
-				uploadState.value.currentFileProgress = p.progress
-				uploadState.value.uploadedBytes = p.loaded
-				uploadState.value.totalBytes = p.total
-			},
-		})
-		cancelUpload.value = () => handle.cancel()
-
 		try {
-			await handle.promise
-			uploadState.value.completedFiles = files.length
-			await contentQuery.refetch()
+			const result = await contentUploadSession.uploadFiles(
+				files.map((file) => ({ file, filename: file.name })),
+			)
+			if (result === 'completed') await contentQuery.refetch()
 		} catch (err) {
-			if (err instanceof Error && err.message === 'Upload cancelled') return
 			addNotification({
 				type: 'error',
 				title: formatMessage(messages.failedToUpload),
 				text: err instanceof Error ? err.message : undefined,
 			})
-		} finally {
-			cancelUpload.value = null
-			uploadState.value = {
-				isUploading: false,
-				currentFileName: null,
-				currentFileProgress: 0,
-				uploadedBytes: 0,
-				totalBytes: 0,
-				completedFiles: 0,
-				totalFiles: 0,
-			}
 		}
 	}
 	input.click()

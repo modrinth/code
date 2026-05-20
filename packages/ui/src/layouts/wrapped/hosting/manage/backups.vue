@@ -268,7 +268,7 @@ import {
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import { useBackupsSelection } from './backups-selection'
+import { useBackupsSelection } from '#ui/composables/hosting/backups-selection'
 
 const messages = defineMessages({
 	selectAll: {
