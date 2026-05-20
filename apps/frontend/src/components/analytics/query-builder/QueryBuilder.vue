@@ -240,6 +240,7 @@ import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
+const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 
 const {
 	hasProjectContext,
@@ -276,6 +277,13 @@ function getProjectOption(
 	}
 }
 
+function compareProjectOptions(
+	left: MultiSelectOption<string>,
+	right: MultiSelectOption<string>,
+): number {
+	return projectOptionCollator.compare(left.label, right.label)
+}
+
 const projectOptions = computed<MultiSelectOption<string>[]>(() =>
 	projects.value.map((project) => getProjectOption(project)),
 )
@@ -304,7 +312,11 @@ const projectSelectOptions = computed<MultiSelectItem<string>[]>(() => {
 			})
 		}
 
-		options.push(...group.projects.map((project) => getProjectOption(project, group.title)))
+		options.push(
+			...group.projects
+				.map((project) => getProjectOption(project, group.title))
+				.sort(compareProjectOptions),
+		)
 	}
 
 	return options
