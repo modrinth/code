@@ -84,9 +84,7 @@ function isAttributed(group: Labrinth.Attribution.Internal.AttributionGroup): bo
 }
 
 function isNoPermission(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
-	const a = group.attribution
-	if (!a || typeof a !== 'object') return false
-	return (a as { type?: string }).type === 'no_permission'
+	return group.attribution?.kind === 'no_permission'
 }
 
 function isPendingGroup(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
@@ -100,7 +98,7 @@ function statusSortRank(group: Labrinth.Attribution.Internal.AttributionGroup): 
 }
 
 function alphabetSortKey(group: Labrinth.Attribution.Internal.AttributionGroup): string {
-	const title = group.flame_project_title?.trim()
+	const title = group.flame_project?.title?.trim()
 	return title && title.length > 0 ? title : group.id
 }
 
@@ -122,7 +120,7 @@ const filteredGroups = computed(() => {
 	const query = searchQuery.value.trim().toLowerCase()
 	const filtered = query
 		? groups.filter((group) => {
-				if (group.flame_project_title?.toLowerCase().includes(query)) return true
+				if (group.flame_project?.title?.toLowerCase().includes(query)) return true
 				return (group.files ?? []).some((file) => file.name.toLowerCase().includes(query))
 			})
 		: [...groups]

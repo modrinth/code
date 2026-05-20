@@ -240,8 +240,8 @@ function isValidUrl(raw: string): boolean {
 }
 
 const effectiveTitle = computed(() => {
-	if (props.group.flame_project_title) {
-		return props.group.flame_project_title
+	if (props.group.flame_project?.title) {
+		return props.group.flame_project.title
 	}
 	const firstFileName = props.group.files[0]?.name ?? props.group.files[0]?.sha1 ?? ''
 	if (firstFileName) {
@@ -276,38 +276,68 @@ const containingVersions = computed(() => {
 	return props.group.versions?.filter((v) => versionIds.has(v.id))
 })
 
-const permissionTypes: Labrinth.Attribution.Internal.AttributionPermissionType[] = [
+const permissionKinds: Labrinth.Attribution.Internal.AttributionResolutionKind[] = [
 	'license',
 	'my_project',
-	'special_permission',
+	'special_permissions',
 	'no_permission',
 ]
 
-const initialAttribution = computed<Labrinth.Attribution.Internal.AttributionData | null>(() => {
+function isCustomAttributionLicense(
+	license: Labrinth.Attribution.Internal.AttributionLicense,
+): license is { name: string } {
+	return typeof license === 'object' && license !== null && 'name' in license
+}
+
+function parseAttributionLicense(license: Labrinth.Attribution.Internal.AttributionLicense | undefined): {
+	spdx: string
+	custom: string
+} {
+	if (!license) {
+		return { spdx: '', custom: '' }
+	}
+	if (isCustomAttributionLicense(license)) {
+		return { spdx: CUSTOM_LICENSE_VALUE, custom: license.name }
+	}
+	return { spdx: license, custom: '' }
+}
+
+function attributionLinkToWork(
+	attribution: Labrinth.Attribution.Internal.AttributionResolution | null | undefined,
+): string | undefined {
+	if (!attribution) {
+		return undefined
+	}
+	if (attribution.kind === 'license' || attribution.kind === 'special_permissions') {
+		return attribution.link_to_work
+	}
+	return undefined
+}
+
+const initialAttribution = computed<Labrinth.Attribution.Internal.AttributionResolution | null>(() => {
 	const raw = props.group.attribution
 	if (!raw || typeof raw !== 'object') {
 		return null
 	}
 	const obj = raw as Record<string, unknown>
-	const type = obj.type
-	if (typeof type !== 'string' || !(permissionTypes as string[]).includes(type)) {
+	const kind = obj.kind
+	if (typeof kind !== 'string' || !(permissionKinds as string[]).includes(kind)) {
 		return null
 	}
-	return obj as Labrinth.Attribution.Internal.AttributionData
+	return obj as Labrinth.Attribution.Internal.AttributionResolution
 })
 
 const editing = ref(!isAttributed.value)
-const selectedType = ref<Labrinth.Attribution.Internal.AttributionPermissionType>(
-	initialAttribution.value?.type ?? 'license',
+const selectedKind = ref<Labrinth.Attribution.Internal.AttributionResolutionKind>(
+	initialAttribution.value?.kind ?? 'license',
 )
 
-/** Combobox value when the user picks a non-SPDX custom license (stored in `custom_license`). */
+/** Combobox value when the user picks a non-SPDX custom license (stored as `{ name }`). */
 const CUSTOM_LICENSE_VALUE = '__custom__'
 
 const licenseIdInput = ref('')
 const customLicenseInput = ref('')
 const linkInput = ref('')
-const proofInput = ref('')
 const notesInput = ref('')
 const inputError = ref<string | null>(null)
 const proofImageUrls = ref<string[]>([])
@@ -336,29 +366,17 @@ function extFromImageFile(file: File): Labrinth.Images.v3.ImageExtension | null 
 
 function resetInputs() {
 	const payload = initialAttribution.value
-	selectedType.value = payload?.type ?? 'license'
-	if (payload?.type === 'license') {
-		if (payload.custom_license) {
-			licenseIdInput.value = CUSTOM_LICENSE_VALUE
-			customLicenseInput.value = payload.custom_license
-		} else {
-			licenseIdInput.value = payload.license_id
-			customLicenseInput.value = ''
-		}
-	} else {
-		licenseIdInput.value = ''
-		customLicenseInput.value = ''
-	}
-	const linkFallback = props.group.flame_project_link ?? ''
-	linkInput.value = !payload
-		? linkFallback
-		: 'link' in payload
-			? (payload.link ?? '')
-			: linkFallback
-	proofInput.value = payload?.type === 'special_permission' ? (payload.proof ?? '') : ''
+	selectedKind.value = payload?.kind ?? 'license'
+	const license =
+		payload && (payload.kind === 'license' || payload.kind === 'my_project')
+			? parseAttributionLicense(payload.license)
+			: { spdx: '', custom: '' }
+	licenseIdInput.value = license.spdx
+	customLicenseInput.value = license.custom
+	const linkFallback = props.group.flame_project?.url ?? ''
+	linkInput.value = attributionLinkToWork(payload) ?? linkFallback
 	notesInput.value = payload?.notes ?? ''
-	proofImageUrls.value =
-		payload && 'proof_image_urls' in payload ? (payload.proof_image_urls ?? []) : []
+	proofImageUrls.value = payload?.image_urls ?? []
 	inputError.value = null
 }
 
@@ -381,9 +399,9 @@ watch(
 type ProjectPermissionField =
 	| 'license_id'
 	| 'custom_license'
-	| 'link'
+	| 'link_to_work'
 	| 'notes'
-	| 'proof_image_urls'
+	| 'image_urls'
 
 const PERMISSION_REASONS = {
 	license: {
@@ -400,7 +418,7 @@ const PERMISSION_REASONS = {
 			defaultMessage: 'Upload supporting documentation related to this license.',
 		}),
 		proofImagesOptional: true,
-		fields: ['license_id', 'custom_license', 'link', 'notes', 'proof_image_urls'] as const,
+		fields: ['license_id', 'custom_license', 'link_to_work', 'notes', 'image_urls'] as const,
 	},
 	my_project: {
 		label: defineMessage({
@@ -416,9 +434,9 @@ const PERMISSION_REASONS = {
 			defaultMessage: 'Upload files that help verify you created this work.',
 		}),
 		proofImagesOptional: true,
-		fields: ['notes', 'proof_image_urls'] as const,
+		fields: ['license_id', 'custom_license', 'notes', 'image_urls'] as const,
 	},
-	special_permission: {
+	special_permissions: {
 		label: defineMessage({
 			id: 'external-files.permissions-card.reason.special-permission',
 			defaultMessage: 'Special permission',
@@ -434,7 +452,7 @@ const PERMISSION_REASONS = {
 				'Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack.',
 		}),
 		proofImagesOptional: false,
-		fields: ['link', 'notes', 'proof_image_urls'] as const,
+		fields: ['link_to_work', 'notes', 'image_urls'] as const,
 	},
 	no_permission: {
 		label: defineMessage({
@@ -450,7 +468,7 @@ const PERMISSION_REASONS = {
 		fields: ['notes'] as const,
 	},
 } satisfies Record<
-	Labrinth.Attribution.Internal.AttributionPermissionType,
+	Labrinth.Attribution.Internal.AttributionResolutionKind,
 	{
 		label: MessageDescriptor
 		description: MessageDescriptor
@@ -461,13 +479,13 @@ const PERMISSION_REASONS = {
 >
 
 const permissionReasonFields = computed<ProjectPermissionField[]>(() => {
-	return PERMISSION_REASONS[selectedType.value]?.fields ?? []
+	return PERMISSION_REASONS[selectedKind.value]?.fields ?? []
 })
 
 const readViewFields = computed<ProjectPermissionField[]>(() => {
-	const type = initialAttribution.value?.type
-	if (!type) return []
-	return PERMISSION_REASONS[type]?.fields ?? []
+	const kind = initialAttribution.value?.kind
+	if (!kind) return []
+	return PERMISSION_REASONS[kind]?.fields ?? []
 })
 
 const unknownLicenseMessage = defineMessage({
@@ -502,11 +520,13 @@ const licenseOptions = computed<ComboboxOption<string>[]>(() => [
 
 const licenseReadDisplay = computed(() => {
 	const attr = initialAttribution.value
-	if (!attr || attr.type !== 'license') return null
-	if (attr.custom_license) {
-		return { kind: 'custom' as const, value: attr.custom_license }
+	if (!attr || (attr.kind !== 'license' && attr.kind !== 'my_project')) {
+		return null
 	}
-	const licenseId = attr.license_id
+	if (isCustomAttributionLicense(attr.license)) {
+		return { kind: 'custom' as const, value: attr.license.name }
+	}
+	const licenseId = attr.license
 	if (licenseId) {
 		const friendly =
 			builtinLicenses.find((license) => license.short === licenseId)?.friendly ?? licenseId
@@ -515,52 +535,35 @@ const licenseReadDisplay = computed(() => {
 	return { kind: 'unknown' as const, value: formatMessage(unknownLicenseMessage) }
 })
 
-function buildEditedData(): Labrinth.Attribution.Internal.AttributionData | null {
+function buildAttributionLicense(): Labrinth.Attribution.Internal.AttributionLicense | null {
+	const custom = isCustomLicense.value
+	if (!licenseIdInput.value) {
+		inputError.value = formatMessage(messages.licenseRequired)
+		return null
+	}
+	const customLicense = customLicenseInput.value.trim()
+	if (custom && !customLicense) {
+		inputError.value = formatMessage(
+			defineMessage({
+				id: 'external-files.permissions-card.error.custom-license-required',
+				defaultMessage: 'Please describe the custom license.',
+			}),
+		)
+		return null
+	}
+	return custom ? { name: customLicense } : licenseIdInput.value
+}
+
+function buildEditedData(): Labrinth.Attribution.Internal.AttributionResolution | null {
 	inputError.value = null
-	const notes = notesInput.value.trim() || undefined
-	switch (selectedType.value) {
+	const notes = notesInput.value.trim()
+	const image_urls = [...proofImageUrls.value]
+	switch (selectedKind.value) {
 		case 'license': {
-			const custom = isCustomLicense.value
-			if (!licenseIdInput.value) {
-				inputError.value = formatMessage(messages.licenseRequired)
+			const license = buildAttributionLicense()
+			if (!license) {
 				return null
 			}
-			const customLicense = customLicenseInput.value.trim()
-			if (custom && !customLicense) {
-				inputError.value = formatMessage(
-					defineMessage({
-						id: 'external-files.permissions-card.error.custom-license-required',
-						defaultMessage: 'Please describe the custom license.',
-					}),
-				)
-				return null
-			}
-			const linkRaw = linkInput.value.trim()
-			let link: string | undefined
-			if (linkRaw) {
-				if (!isValidUrl(linkRaw)) {
-					inputError.value = formatMessage(messages.linkInvalidUrl)
-					return null
-				}
-				link = linkRaw.trim()
-			}
-			return {
-				type: 'license',
-				license_id: custom ? '' : licenseIdInput.value,
-				...(custom ? { custom_license: customLicense } : {}),
-				link,
-				notes,
-				...(proofImageUrls.value.length > 0 ? { proof_image_urls: [...proofImageUrls.value] } : {}),
-			}
-		}
-		case 'my_project': {
-			return {
-				type: 'my_project',
-				notes,
-				...(proofImageUrls.value.length > 0 ? { proof_image_urls: [...proofImageUrls.value] } : {}),
-			}
-		}
-		case 'special_permission': {
 			const linkRaw = linkInput.value.trim()
 			if (!linkRaw) {
 				inputError.value = formatMessage(
@@ -576,17 +579,52 @@ function buildEditedData(): Labrinth.Attribution.Internal.AttributionData | null
 				return null
 			}
 			return {
-				type: 'special_permission',
-				link: linkRaw.trim(),
-				proof: proofInput.value.trim(),
+				kind: 'license',
+				license,
+				link_to_work: linkRaw,
 				notes,
-				...(proofImageUrls.value.length > 0 ? { proof_image_urls: [...proofImageUrls.value] } : {}),
+				image_urls,
+			}
+		}
+		case 'my_project': {
+			const license = buildAttributionLicense()
+			if (!license) {
+				return null
+			}
+			return {
+				kind: 'my_project',
+				license,
+				notes,
+				image_urls,
+			}
+		}
+		case 'special_permissions': {
+			const linkRaw = linkInput.value.trim()
+			if (!linkRaw) {
+				inputError.value = formatMessage(
+					defineMessage({
+						id: 'external-files.permissions-card.error.link-required',
+						defaultMessage: 'Please provide a link.',
+					}),
+				)
+				return null
+			}
+			if (!isValidUrl(linkRaw)) {
+				inputError.value = formatMessage(messages.linkInvalidUrl)
+				return null
+			}
+			return {
+				kind: 'special_permissions',
+				link_to_work: linkRaw,
+				notes,
+				image_urls,
 			}
 		}
 		case 'no_permission':
 			return {
-				type: 'no_permission',
+				kind: 'no_permission',
 				notes,
+				image_urls,
 			}
 	}
 }
@@ -690,7 +728,7 @@ const splitFileMutation = useMutation({
 })
 
 const saveMutation = useMutation({
-	mutationFn: (payload: Labrinth.Attribution.Internal.AttributionData) =>
+	mutationFn: (payload: Labrinth.Attribution.Internal.AttributionResolution) =>
 		client.labrinth.attribution_internal.updateGroup(props.group.id, {
 			attribution: payload,
 		}),
@@ -759,7 +797,7 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 		<div class="flex items-center bg-surface-3 gap-3">
 			<button
 				class="flex grow items-center m-0 appearance-none p-4 bg-transparent group transition-all gap-3 text-left min-w-0 outline-offset-[-3px] rounded-2xl"
-				:class="{ 'rounded-b-none': !collapsed, 'rounded-r-none': group.flame_project_link }"
+				:class="{ 'rounded-b-none': !collapsed, 'rounded-r-none': group.flame_project?.url }"
 				@click="collapsed = !collapsed"
 			>
 				<ChevronDownIcon
@@ -770,7 +808,7 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 					<span class="flex items-center gap-2 text-contrast font-semibold min-w-0">
 						<span class="truncate">{{ effectiveTitle }}</span>
 						<TagItem
-							v-if="isAttributed && group.attribution?.type === 'no_permission'"
+							v-if="isAttributed && group.attribution?.kind === 'no_permission'"
 							:style="{ '--_bg-color': 'var(--color-red-bg)', '--_color': 'var(--color-red)' }"
 						>
 							{{ formatMessage(messages.noPermissionBadge) }}
@@ -797,8 +835,8 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 				</span>
 			</button>
 			<a
-				v-if="!!group.flame_project_link || !!initialAttribution?.link"
-				:href="initialAttribution?.link ?? group.flame_project_link"
+				v-if="!!group.flame_project?.url || !!attributionLinkToWork(initialAttribution)"
+				:href="attributionLinkToWork(initialAttribution) ?? group.flame_project?.url"
 				target="_blank"
 				rel="noopener"
 				class="text-link flex items-center mr-4 outline-offset-[4px] rounded-sm"
@@ -883,12 +921,17 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 						<div class="flex flex-col gap-3 w-full">
 							<div class="flex items-start justify-between gap-3">
 								<span class="text-contrast font-semibold">
-									{{ formatMessage(PERMISSION_REASONS[initialAttribution.type].label) }}
+									{{ formatMessage(PERMISSION_REASONS[initialAttribution.kind].label) }}
 								</span>
 							</div>
 							<div class="flex flex-col gap-3">
 								<div class="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 items-baseline">
-									<template v-if="initialAttribution.type === 'license'">
+									<template
+										v-if="
+											initialAttribution.kind === 'license' ||
+											initialAttribution.kind === 'my_project'
+										"
+									>
 										<span class="text-secondary font-medium">
 											{{ formatMessage(messages.licensedAs) }}
 										</span>
@@ -908,20 +951,23 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 											{{ licenseReadDisplay?.value }}
 										</span>
 									</template>
-									<template v-if="readViewFields.includes('link') && 'link' in initialAttribution">
+									<template
+										v-if="
+											readViewFields.includes('link_to_work') &&
+											attributionLinkToWork(initialAttribution)
+										"
+									>
 										<span class="text-secondary font-medium">
 											{{ formatMessage(messages.linkLabel) }}
 										</span>
 										<a
-											v-if="initialAttribution.link"
-											:href="initialAttribution.link"
+											:href="attributionLinkToWork(initialAttribution)"
 											target="_blank"
 											rel="noopener"
 											class="text-link truncate"
 										>
-											{{ initialAttribution.link }}
+											{{ attributionLinkToWork(initialAttribution) }}
 										</a>
-										<span v-else class="text-primary">{{ formatMessage(notesNoneMessage) }}</span>
 									</template>
 									<template v-if="readViewFields.includes('notes')">
 										<span class="text-secondary font-medium">
@@ -936,13 +982,13 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 										</span>
 									</template>
 								</div>
-								<div v-if="initialAttribution.proof_image_urls?.length" class="flex flex-col gap-2">
+								<div v-if="initialAttribution.image_urls?.length" class="flex flex-col gap-2">
 									<span class="text-secondary font-medium">
 										{{ formatMessage(messages.proofImagesLabel) }}
 									</span>
 									<div class="flex flex-wrap gap-2">
 										<a
-											v-for="(src, idx) in initialAttribution.proof_image_urls"
+											v-for="(src, idx) in initialAttribution.image_urls"
 											:key="`${src}-${idx}`"
 											:href="src"
 											target="_blank"
@@ -1004,13 +1050,13 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 						{{ formatMessage(messages.typeLabel) }}
 					</span>
 					<Chips
-						v-model="selectedType"
-						:items="permissionTypes"
-						:format-label="(type) => formatMessage(PERMISSION_REASONS[type].label)"
+						v-model="selectedKind"
+						:items="permissionKinds"
+						:format-label="(kind) => formatMessage(PERMISSION_REASONS[kind].label)"
 						:capitalize="false"
 					/>
-					<span>{{ formatMessage(PERMISSION_REASONS[selectedType].description) }}</span>
-					<div v-if="permissionReasonFields.includes('link')" class="flex flex-col gap-2">
+					<span>{{ formatMessage(PERMISSION_REASONS[selectedKind].description) }}</span>
+					<div v-if="permissionReasonFields.includes('link_to_work')" class="flex flex-col gap-2">
 						<span class="text-contrast font-semibold mt-1">
 							{{ formatMessage(messages.linkLabel) }}
 						</span>
@@ -1062,7 +1108,7 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 						/>
 					</div>
 					<div
-						v-if="permissionReasonFields.includes('proof_image_urls')"
+						v-if="permissionReasonFields.includes('image_urls')"
 						class="flex flex-col gap-2"
 					>
 						<div class="flex flex-col gap-2 mt-1">
@@ -1070,13 +1116,13 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 								<span class="text-contrast font-semibold">
 									{{ formatMessage(messages.proofImagesLabel) }}
 									<span
-										v-if="!!PERMISSION_REASONS[selectedType].proofImagesOptional"
+										v-if="!!PERMISSION_REASONS[selectedKind].proofImagesOptional"
 										class="font-normal text-primary"
 										>{{ formatMessage(messages.optional) }}</span
 									>
 								</span>
-								<span v-if="PERMISSION_REASONS[selectedType].proofImagesDescription">{{
-									formatMessage(PERMISSION_REASONS[selectedType].proofImagesDescription!)
+								<span v-if="PERMISSION_REASONS[selectedKind].proofImagesDescription">{{
+									formatMessage(PERMISSION_REASONS[selectedKind].proofImagesDescription!)
 								}}</span>
 							</div>
 							<div v-if="proofImageUrls.length > 0" class="grid grid-cols-2 gap-4">
@@ -1125,7 +1171,7 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 						</div>
 					</div>
 					<Admonition
-						v-if="selectedType === 'special_permission'"
+						v-if="selectedKind === 'special_permissions'"
 						type="warning"
 						:header="formatMessage(messages.proofWarningTitle)"
 						:body="formatMessage(messages.proofWarningBody)"

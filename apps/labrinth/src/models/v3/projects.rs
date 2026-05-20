@@ -688,6 +688,7 @@ pub enum AttributionResolutionKind {
 
 #[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct AttributionResolution {
+    #[serde(flatten)]
     pub kind: AttributionResolutionKind,
     pub notes: String,
     pub image_urls: Vec<url::Url>,

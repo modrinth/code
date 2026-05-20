@@ -117,7 +117,7 @@ function buildAssignableEntries(
 		}
 		const firstName = g.files?.[0]?.name
 		const sourceLabel =
-			g.flame_project_title ??
+			g.flame_project?.title ??
 			(firstName ? (firstName.split('/').pop() ?? firstName) : null) ??
 			formatMessage(messages.defaultGroupTitle, { id: g.id })
 		for (const f of g.files ?? []) {

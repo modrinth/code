@@ -240,38 +240,43 @@ export namespace Labrinth {
 
 	export namespace Attribution {
 		export namespace Internal {
-			export type AttributionPermissionType =
+			export type AttributionLicense = string | { name: string }
+
+			export type AttributionResolutionKind =
 				| 'license'
 				| 'my_project'
-				| 'special_permission'
+				| 'special_permissions'
 				| 'no_permission'
 
-			export type AttributionData =
-				| {
-						type: 'license'
-						license_id: string
-						custom_license?: string
-						link?: string
-						notes?: string
-						proof_image_urls?: string[]
-				  }
-				| {
-						type: 'my_project'
-						notes?: string
-						proof_image_urls?: string[]
-				  }
-				| {
-						type: 'special_permission'
-						link?: string
-						proof?: string
-						notes?: string
-						proof_image_urls?: string[]
-				  }
-				| {
-						type: 'no_permission'
-						notes?: string
-						proof_image_urls?: string[]
-				  }
+			type AttributionResolutionBase = {
+				notes: string
+				image_urls: string[]
+			}
+
+			export type AttributionResolution =
+				| (AttributionResolutionBase & {
+						kind: 'license'
+						license: AttributionLicense
+						link_to_work: string
+				  })
+				| (AttributionResolutionBase & {
+						kind: 'my_project'
+						license: AttributionLicense
+				  })
+				| (AttributionResolutionBase & {
+						kind: 'special_permissions'
+						link_to_work: string
+				  })
+				| (AttributionResolutionBase & {
+						kind: 'no_permission'
+				  })
+
+			export type FlameProject = {
+				id: number
+				title: string
+				url: string
+				icon_url: string
+			}
 
 			export type AttributionFile = {
 				name: string
@@ -288,11 +293,8 @@ export namespace Labrinth {
 
 			export type AttributionGroup = {
 				id: string
-				flame_project_id: number | null
-				flame_project_title: string | null
-				flame_project_link: string | null
-				flame_project_icon: string | null
-				attribution: AttributionData | null
+				flame_project: FlameProject | null
+				attribution: AttributionResolution | null
 				attributed_at: string | null
 				attributed_by: string | null
 				files: AttributionFile[]
@@ -300,7 +302,7 @@ export namespace Labrinth {
 			}
 
 			export type UpdateGroupRequest = {
-				attribution: AttributionData
+				attribution: AttributionResolution
 			}
 
 			export type AssignRequest = {
