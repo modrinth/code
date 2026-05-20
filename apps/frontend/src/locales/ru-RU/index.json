@@ -407,6 +407,117 @@
   "collection.title": {
     "message": "{name} — Коллекция"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Добавить примечание для себя"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Одобрить"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Одобрить с ответом"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Закрыть ветку"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Закрыть с ответом"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Отклонить"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Отклонить с ответом"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Возобновить ветку"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Ответить"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Ответить на ветку"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Запросить перепроверку"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Запросить перепроверку с ответом"
+  },
+  "conversation-thread.action.send": {
+    "message": "Отправить"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Отправить на проверку"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Отправить на проверку с ответом"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Установить в черновик"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Установить в черновик с ответом"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Удержать"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Удержать с ответом"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Эта ветка закрыта, новые сообщения в неё нельзя отправить."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Ошибка закрытия жалобы"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Ошибка возобновления жалобы"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Ошибка отправки сообщения"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Ответить в ветку..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Отправить сообщение..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Подтвердить, что модераторы не проводят активный просмотр"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Я признаю, что модерация не проводит активный просмотр ветки."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Ваш проект уже одобрен. Из-за этого модерация не проводит активный просмотр этой ветки. Однако, если возникнет проблема с вашим проектом, она сможет увидеть ваше сообщение."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Ответить на ветку"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Если вам нужно выйти на контакт с командой модерации, используйте <help-center-link>справочный центр Modrinth</help-center-link> и нажмите на синий значок в правом нижнем углу для связи с поддержкой."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Подтвердить, что я ответил на сообщения модерации"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Я подтверждаю, что я надлежащим образом ответил на комментарии модерации."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Вы отправляете <project-title>{projectTitle}</project-title> на перепроверку модерацией."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Запрос на перепроверку"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Запрос на проверку"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Убедитесь, что вы ответили на все комментарии модерации."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Повторные запросы без ответа на комментарии модерации могут привести к блокировке учётной записи."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Дополнительные файлы предназначены для вспомогательных ресурсов, например исходного кода, но не для альтернативных версий или вариантов."
   },
@@ -875,23 +986,8 @@
   "dashboard.head-title": {
     "message": "Панель управления"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Отметить всё как прочитанное"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Посмотреть историю"
-  },
   "dashboard.notifications.empty.no-unread": {
     "message": "У вас нет непрочитанных уведомлений."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Ошибка загрузки уведомлений:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "История"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "История уведомлений"
   },
   "dashboard.notifications.link.see-all": {
     "message": "Посмотреть все"
@@ -900,10 +996,7 @@
     "message": "История уведомлений"
   },
   "dashboard.notifications.link.view-more": {
-    "message": "Ещё {extraNotifs, plural, one {# уведомление} few {# уведомления} other {# уведомлений}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Загрузка уведомлений..."
+    "message": "Посмотреть ещё {extraNotifs, number}"
   },
   "dashboard.organizations.button.create": {
     "message": "Создать организацию"
@@ -919,6 +1012,27 @@
   },
   "dashboard.organizations.title": {
     "message": "Организации"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Отметить всё как прочитанное"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Посмотреть историю"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "У вас нет непрочитанных уведомлений."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Ошибка загрузки уведомлений:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "История"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "История уведомлений"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Загрузка уведомлений..."
   },
   "dashboard.projects.bulk-edit-hint": {
     "message": "Выберите проекты ниже, чтобы настроить их вместе."
@@ -1754,14 +1868,20 @@
   "layout.banner.add-email.description": {
     "message": "В целях безопасности Modrinth просит привязать почту к аккаунту."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Всегда игнорировать"
+  },
   "layout.banner.build-fail.description": {
     "message": "При развёртывании фронтенда Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Пересоберите проект, когда API станет доступен. Коды ошибок: {errors}. Текущий адрес API: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Игнорировать"
   },
   "layout.banner.build-fail.title": {
     "message": "Ошибка генерации состояния от API во время сборки."
   },
   "layout.banner.preview.description": {
-    "message": "Официальный сайт Modrinth доступен по адресу <link>https://modrinth.com</link>. Текущая предварительная версия предназначена для тестирования командой Modrinth и собрана из <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Официальный сайт Modrinth доступен по адресу {url}. Текущая предварительная версия предназначена для тестирования командой Modrinth и собрана из <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "Это предварительная версия сайта Modrinth."
@@ -2590,6 +2710,84 @@
   },
   "project.license.title": {
     "message": "Лицензия"
+  },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Ваш проект приватный, доступ к нему есть только у вас и приглашённых вами людей."
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Ваш проект выложен и доступен для поиска на Modrinth."
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Ваш проект скрыт, доступ к нему можно получить только по ссылке."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "Изменить видимость проекта можно в его <visibility-settings-link>настройках видимости</visibility-settings-link>."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Проект одобрен"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "Это черновик проекта, который никому не виден до запроса на проверку и одобрения модерацией Modrinth."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Черновик"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Когда вы выполните все обязательные шаги и убедитесь в отсутствии нарушений <rules-link>правил контента Modrinth</rules-link>, то тогда можно будет запросить проверку проекта."
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "Ответьте на все замечания модерации, включая перечисленные в сообщении ниже, перед тем, как запрашивать перепроверку."
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Нужны изменения"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "Повторные запросы на перепроверку без ответа на замечания модерации могут привести к блокировке учётной записи."
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Ваш проект находится в очереди на проверку модерацией Modrinth."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Ваш проект проверит человек для того, чтобы убедиться в соблюдении <rules-link>правил контента Modrinth</rules-link> и <terms-link>условий использования</terms-link>."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "Проект всё ещё можно менять, на положение в очереди это не повлияет."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Мы стараемся проверять проекты за 24-48 часов, но иногда бывают задержки. Это не означает, что с вашей заявкой что-то не так."
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>Мы ценим ваше терпение, пока наша модерация трудится, чтобы Modrinth оставался безопасным, а также продолжать помогать вам делиться контентом! 💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Проект на проверке"
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "Ваш проект не будет виден всем и будет доступен лишь по прямой ссылке.{requestedStatus, select, unlisted { Судя по вашим выбранным <visibility-settings-link>настройкам видимости</visibility-settings-link>, больше действий не требуется.} other { Пожалуйста, прежде чем повторно отправлять этот проект на проверку, решите все связанные с модерацией вопросы, в том числе те, что перечислены в сообщениях ниже.}}"
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "Скрыто командой Modrinth"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Нет доступа"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "Эта ветка не просматривается активно, но может быть проверена, если нужна будет информация о вашем проекте."
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "Модераторы контента не могут помочь с большинством проблем и сообщения в эту ветку не оповещают команду Modrinth."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "Если вам нужна помощь или уточнения, перейдите в <help-center-link>справочный центр Modrinth</help-center-link> и нажмите на синий значок для связи с поддержкой."
+  },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "Показать интерфейс участника"
+  },
+  "project.moderation.thread.private-description": {
+    "message": "Это личная ветка обсуждения с модерацией Modrinth. Вам могут написать по вопросам, касающихся этого проекта."
+  },
+  "project.moderation.thread.title": {
+    "message": "Сообщения модерации"
   },
   "project.moderation.title": {
     "message": "Модерация"

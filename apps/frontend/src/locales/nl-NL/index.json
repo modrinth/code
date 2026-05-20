@@ -1499,9 +1499,6 @@
   "layout.banner.build-fail.title": {
     "message": "Fout bij het genereren van de status vanuit de API tijdens het bouwen."
   },
-  "layout.banner.preview.description": {
-    "message": "Als je de officiële Modrinth website wilde bezoeken, ga dan naar <link>https://modrinth.com</link>. Deze preview implementatie wordt door Modrinth medewerkers gebruikt voor testdoeleinden. Deze is gebouwd met <branch-link>{owner}/{branch}</branch-link> @ {commit}."
-  },
   "layout.banner.preview.title": {
     "message": "Dit is een preview-versie van de Modrinth website."
   },

@@ -42,41 +42,49 @@
 			<span class="hidden w-[160px] text-nowrap text-sm text-secondary @[800px]:block">
 				{{ formattedModifiedDate }}
 			</span>
-			<div class="flex min-w-[51px] shrink-0 items-center justify-end">
-				<ButtonStyled circular type="transparent">
-					<TeleportOverflowMenu :options="menuOptions">
-						<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-						<template #copy-filename
-							><ClipboardCopyIcon />
-							{{ formatMessage(commonMessages.copyFilenameButton) }}</template
-						>
-						<template #copy-full-path
-							><ClipboardCopyIcon />
-							{{ formatMessage(commonMessages.copyFullPathButton) }}</template
-						>
-						<template #open-in-folder
-							><FolderOpenIcon /> {{ formatMessage(commonMessages.openInFolderButton) }}</template
-						>
-						<template #extract
-							><PackageOpenIcon /> {{ formatMessage(commonMessages.extractButton) }}</template
-						>
-						<template #rename
-							><EditIcon /> {{ formatMessage(commonMessages.renameButton) }}</template
-						>
-						<template #move
-							><RightArrowIcon /> {{ formatMessage(commonMessages.moveButton) }}</template
-						>
-						<template #download
-							><DownloadIcon />
-							{{
-								ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton)
-							}}</template
-						>
-						<template #delete
-							><TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}</template
-						>
-					</TeleportOverflowMenu>
-				</ButtonStyled>
+			<div class="grid min-w-[51px] shrink-0 items-center justify-items-end">
+				<span
+					aria-hidden="true"
+					class="invisible col-start-1 row-start-1 text-nowrap font-semibold"
+				>
+					{{ formatMessage(commonMessages.actionsLabel) }}
+				</span>
+				<div class="col-start-1 row-start-1 flex justify-end">
+					<ButtonStyled circular type="transparent">
+						<TeleportOverflowMenu :options="menuOptions">
+							<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+							<template #copy-filename
+								><ClipboardCopyIcon />
+								{{ formatMessage(commonMessages.copyFilenameButton) }}</template
+							>
+							<template #copy-full-path
+								><ClipboardCopyIcon />
+								{{ formatMessage(commonMessages.copyFullPathButton) }}</template
+							>
+							<template #open-in-folder
+								><FolderOpenIcon /> {{ formatMessage(commonMessages.openInFolderButton) }}</template
+							>
+							<template #extract
+								><PackageOpenIcon /> {{ formatMessage(commonMessages.extractButton) }}</template
+							>
+							<template #rename
+								><EditIcon /> {{ formatMessage(commonMessages.renameButton) }}</template
+							>
+							<template #move
+								><RightArrowIcon /> {{ formatMessage(commonMessages.moveButton) }}</template
+							>
+							<template #download
+								><DownloadIcon />
+								{{
+									ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton)
+								}}</template
+							>
+							<template #delete
+								><TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}</template
+							>
+						</TeleportOverflowMenu>
+					</ButtonStyled>
+				</div>
 			</div>
 		</div>
 	</li>

@@ -875,24 +875,6 @@
   "dashboard.head-title": {
     "message": "儀表板"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "全部標記為已讀"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "查看紀錄"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "您沒有任何未讀通知。"
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "載入通知時發生錯誤："
-  },
-  "dashboard.notifications.history.label": {
-    "message": "紀錄"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "通知紀錄"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "查看全部"
   },
@@ -901,9 +883,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "查看另外 {extraNotifs} 則通知"
-  },
-  "dashboard.notifications.loading": {
-    "message": "正在載入通知..."
   },
   "dashboard.organizations.button.create": {
     "message": "建立組織"
@@ -1750,9 +1729,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "建構時無法從 API 取得狀態資料。"
-  },
-  "layout.banner.preview.description": {
-    "message": "如果你是想前往 Modrinth 的官方網站，請前往 <link>https://modrinth.com</link>。這個預覽部署版本僅供 Modrinth 工作人員測試使用。它是基於 <branch-link>{owner}/{branch}</branch-link> @ {commit} 建構而成。"
   },
   "layout.banner.preview.title": {
     "message": "這是 Modrinth 網站的預覽部署版本。"

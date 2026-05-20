@@ -875,24 +875,6 @@
   "dashboard.head-title": {
     "message": "ダッシュボード"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "全て既読にする"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "履歴を表示"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "未読の通知はありません"
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "通知の読み込み中にエラーが発生しました:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "履歴"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "通知履歴"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "すべて見る"
   },
@@ -901,9 +883,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "{extraNotifs} 件の通知をさらに表示"
-  },
-  "dashboard.notifications.loading": {
-    "message": "通知を読み込み中..."
   },
   "dashboard.organizations.button.create": {
     "message": "組織を作成"
@@ -1732,9 +1711,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "ビルド時にAPIからステートを生成できませんでした。"
-  },
-  "layout.banner.preview.description": {
-    "message": "公式のModrinthウェブサイトにアクセスしたい場合は、<link>https://modrinth.com</link> をご覧ください。このプレビュー環境はModrinthスタッフによるテスト目的で使用されています。<branch-link>{owner}/{branch}</branch-link> @ {commit} を基に構築されています。"
   },
   "layout.banner.preview.title": {
     "message": "これはModrinthウェブサイトのプレビューデプロイです。"

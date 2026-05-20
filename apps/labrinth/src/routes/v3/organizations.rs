@@ -7,7 +7,7 @@ use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
-    DBOrganization, generate_organization_id, team_item,
+    DBModerationNote, DBOrganization, generate_organization_id, team_item,
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
@@ -34,6 +34,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("organization")
             .route("", web::post().to(organization_create))
             .route("{id}/projects", web::get().to(organization_projects_get))
+            .route("{id}/notes", web::patch().to(organization_notes_edit))
             .route("{id}", web::get().to(organization_get))
             .route("{id}", web::patch().to(organizations_edit))
             .route("{id}", web::delete().to(organization_delete))
@@ -283,11 +284,95 @@ pub async fn organization_get(
             })
             .collect();
 
-        let organization =
+        let mut organization =
             models::organizations::Organization::from(data, team_members);
+        if current_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+            let note = DBModerationNote::get_organization(
+                organization.id.into(),
+                &**pool,
+                &redis,
+            )
+            .await?;
+            organization.moderation_notes = Some(note.map(Into::into));
+        }
         return Ok(HttpResponse::Ok().json(organization));
     }
     Err(ApiError::NotFound)
+}
+
+pub async fn organization_notes_edit(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    new_note: web::Json<crate::models::moderation_notes::PatchModerationNote>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await?
+    .1;
+
+    if !user.role.is_mod() {
+        return Err(ApiError::CustomAuthentication(
+            "you do not have permission to edit moderation notes".to_string(),
+        ));
+    }
+
+    new_note.validate_not_empty()?;
+    let expected_version =
+        crate::models::moderation_notes::parse_if_match_header(&req)?;
+
+    let organization =
+        DBOrganization::get(&info.into_inner().0, &**pool, &redis)
+            .await?
+            .ok_or(ApiError::NotFound)?;
+
+    let mut transaction = pool.begin().await?;
+    if let Some(expected) = expected_version {
+        let updated = DBModerationNote::update(
+            None,
+            Some(organization.id),
+            user.id.into(),
+            expected,
+            new_note.notes.as_deref(),
+            new_note.user_rating,
+            &mut transaction,
+        )
+        .await?;
+
+        if updated.is_none() {
+            return Err(ApiError::PreconditionFailed(
+                "moderation note version does not match".to_string(),
+            ));
+        }
+    } else {
+        let updated = DBModerationNote::insert(
+            None,
+            Some(organization.id),
+            user.id.into(),
+            new_note.notes.as_deref(),
+            new_note.user_rating,
+            &mut transaction,
+        )
+        .await?;
+
+        if updated.is_none() {
+            return Err(ApiError::PreconditionRequired(
+                "moderation note version does not match".to_string(),
+            ));
+        }
+    };
+
+    transaction.commit().await?;
+    DBModerationNote::clear_organization_cache(organization.id, &redis).await?;
+
+    Ok(HttpResponse::NoContent().finish())
 }
 
 #[derive(Deserialize)]
@@ -331,6 +416,17 @@ pub async fn organizations_get(
     .map(|x| x.1)
     .ok();
     let user_id = current_user.as_ref().map(|x| x.id.into());
+    let include_notes = current_user.as_ref().is_some_and(|x| x.role.is_mod());
+    let notes = if include_notes {
+        DBModerationNote::get_many_organizations(
+            &organizations_data.iter().map(|x| x.id).collect::<Vec<_>>(),
+            &**pool,
+            &redis,
+        )
+        .await?
+    } else {
+        HashMap::new()
+    };
 
     let mut organizations = vec![];
 
@@ -375,8 +471,13 @@ pub async fn organizations_get(
             })
             .collect();
 
-        let organization =
+        let data_id = data.id;
+        let mut organization =
             models::organizations::Organization::from(data, team_members);
+        if include_notes {
+            organization.moderation_notes =
+                Some(notes.get(&data_id).cloned().map(Into::into));
+        }
         organizations.push(organization);
     }
 

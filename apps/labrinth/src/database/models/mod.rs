@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 pub mod affiliate_code_item;
+pub mod analytics_event_item;
 pub mod categories;
 pub mod charge_item;
 pub mod collection_item;
@@ -13,6 +14,7 @@ pub mod legacy_loader_fields;
 pub mod loader_fields;
 pub mod moderation_external_item;
 pub mod moderation_lock_item;
+pub mod moderation_note_item;
 pub mod notification_item;
 pub mod notifications_deliveries_item;
 pub mod notifications_template_item;
@@ -43,6 +45,7 @@ pub mod users_subscriptions_credits;
 pub mod version_item;
 
 pub use affiliate_code_item::DBAffiliateCode;
+pub use analytics_event_item::DBAnalyticsEvent;
 pub use collection_item::DBCollection;
 pub use ids::*;
 pub use image_item::DBImage;
@@ -56,6 +59,7 @@ pub use user_item::DBUser;
 pub use version_item::DBVersion;
 
 pub use moderation_lock_item::{DBModerationLock, ModerationLockWithUser};
+pub use moderation_note_item::DBModerationNote;
 
 #[derive(Error, Debug)]
 pub enum DatabaseError {

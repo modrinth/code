@@ -1,9 +1,11 @@
 pub mod affiliate_code;
 pub mod analytics;
+pub mod analytics_event;
 pub mod billing;
 pub mod collections;
 pub mod ids;
 pub mod images;
+pub mod moderation_notes;
 pub mod notifications;
 pub mod oauth_clients;
 pub mod organizations;

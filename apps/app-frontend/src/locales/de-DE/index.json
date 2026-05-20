@@ -48,7 +48,7 @@
     "message": "Farbschema"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Ändere die Seite, die beim Öffnen des Launchers angezeigt wird."
+    "message": "Ändere die Kategorie, die beim Öffnen des Launchers angezeigt wird."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
@@ -136,6 +136,9 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Das Hinzufügen von Inhalten kann die Kompatibilität beim Beitreten zum Server beeinträchtigen. Außerdem gehen alle hinzugefügten Inhalte verloren, wenn du die Inhalte der Serverinstanz aktualisierst."
   },
   "app.browse.server.installing": {
     "message": "Wird installiert"
@@ -298,6 +301,9 @@
   },
   "app.project.install-button.already-installed": {
     "message": "Dieses Projekt ist bereits installiert"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Zurück zum Entdecken"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Inhalt in Instanz installieren"
@@ -519,7 +525,7 @@
     "message": "Wird gelöscht..."
   },
   "instance.settings.tabs.general.duplicate-button": {
-    "message": "Kopieren"
+    "message": "Duplizieren"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
     "message": "Kann während der Installation nicht dupliziert werden."

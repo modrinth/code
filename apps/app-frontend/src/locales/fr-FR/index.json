@@ -1,6 +1,6 @@
 {
   "app.action-bar.downloading-java": {
-    "message": "Java version {version} en cours de téléchargement"
+    "message": "Téléchargement de Java {version} en cours"
   },
   "app.action-bar.downloads": {
     "message": "Téléchargements"
@@ -303,7 +303,7 @@
     "message": "Ce projet a déjà été installé"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "Retour à la navigation"
+    "message": "Retour vers la page découvrir"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Installer du contenu à l'instance"

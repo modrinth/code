@@ -95,8 +95,47 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Renovar suscripción del servidor"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Filtrar resultados..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "¡No hay resultados que coincidan con tu búsqueda!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Estás actualmente desconectado. ¡Conéctate a internet para buscar en Modrinth!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Buscar {projectType, select, mod {mods} modpack {modpacks} packs de recursos  {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} servidores {servers} otros {projects}}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Proyectos seleccionados"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Instalar {count, plural, one {# project} other {# projects}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# proyecto seleccionado} other {# proyectos seleccionados}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Tienes seleccionado {count, plural, one {# proyecto} other {# proyectos}} para instalar. Instalalos ahora o cancela sin instalarlos."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Proyectos seleccionados aún no instalados"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Descartar"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Proyectos seleccionados aún no instalados"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Ver:"
+  },
   "button.accept": {
     "defaultMessage": "Aceptar"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Añadir servidor a la instancia"
   },
   "button.affiliate-links": {
     "defaultMessage": "Enlaces de afiliado"
@@ -167,6 +206,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Ocultar snapshots"
   },
+  "button.install": {
+    "defaultMessage": "Instalar"
+  },
   "button.max": {
     "defaultMessage": "Máx"
   },
@@ -184,6 +226,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Abrir en la carpeta"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Abrir en Modrinth"
   },
   "button.play": {
     "defaultMessage": "Jugar"
@@ -277,6 +322,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "Privado"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Seleccionar {project}"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Estás seguro de querer actualizar {count, plural,one {# proyecto} other {# proyectos}} a su última versión compatible? Se recomienda actualizar el contenido de uno-en-uno."
@@ -1217,6 +1265,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Introduce el estado"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural,one {# byte} other {# bytes}}"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
+  },
   "header.category.category": {
     "defaultMessage": "Categoría"
   },
@@ -1252,6 +1315,9 @@
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Error al actualizar el contenido"
+  },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "Error al instalar el contenido"
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Error al cargar el contenido del modpack"
@@ -1706,20 +1772,35 @@
   "label.filter-by": {
     "defaultMessage": "Filtrar por"
   },
+  "label.filters": {
+    "defaultMessage": "Filtradores"
+  },
   "label.followed-projects": {
     "defaultMessage": "Proyectos seguidos"
   },
   "label.game-version": {
     "defaultMessage": "Versión del juego"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "Ocultar contenido ya instalado"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "Ocultar contenido seleccionado"
+  },
   "label.installation-info": {
     "defaultMessage": "Información de la instalación"
+  },
+  "label.installed": {
+    "defaultMessage": "Instalado"
   },
   "label.installed-modpack": {
     "defaultMessage": "Modpack instalado"
   },
   "label.installing": {
     "defaultMessage": "Instalando..."
+  },
+  "label.installing-content": {
+    "defaultMessage": "Instalando contenido"
   },
   "label.loading": {
     "defaultMessage": "Cargando..."
@@ -1796,6 +1877,9 @@
   "label.select-all": {
     "defaultMessage": "Seleccionar todo"
   },
+  "label.selected": {
+    "defaultMessage": "Seleccionado"
+  },
   "label.selection-actions": {
     "defaultMessage": "Acciones de selección"
   },
@@ -1838,8 +1922,14 @@
   "label.username": {
     "defaultMessage": "Usuario"
   },
+  "label.validating": {
+    "defaultMessage": "Validando"
+  },
   "label.version": {
     "defaultMessage": "Versión"
+  },
+  "label.view": {
+    "defaultMessage": "Ver"
   },
   "label.visibility": {
     "defaultMessage": "Visibilidad"
@@ -1946,6 +2036,147 @@
   "locale.zh-TW": {
     "defaultMessage": "Chino (Tradicional)"
   },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "Reemplaza esto con una descripción"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "Error"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "Describe la imagen es su totalidad, como si lo hicieras a una persona que no puede verla."
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "Describe la imagen..."
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "Descripción (texto alternativo)"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "Inserta la imagen"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "Fuente de la imgan"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "Enlace"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "Subir"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "Arrastra y suelta para subir o selecciona el archivo"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "Ingresa URL de la imagen..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "Insertar"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "Insertar enlace"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "Ingresa una etiqueta..."
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Etiqueta"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "Inserta el enlace URL..."
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "Este editor acepta <markdown-link>formato Markdown</markdown-link>."
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "Largo máximo:"
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "Ilimitado"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "Escribe algo..."
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "Vista previa"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "Vista previa"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Negrita"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "Lista punteada"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "Código"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "Encabezado 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "Encabezado 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "Encabezado 3"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "Imagen"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "Cursiva"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "Enlace"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "Lista numérica"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Citación"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "Spoiler"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "Tachado"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "Video"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "Falta el archivo"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "URL inválida. Este dominio no está permitido."
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "URL inválida. Asegurate que la sintaxis sea la adecuada."
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "Protocolo no permitido. Usa http o https."
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "Reproductor de videos de YouTube"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "Inserta video de YouTube"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "Ingresa un enlace válido para un video de YouTube."
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "Ingresa URL"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "YouTube URL"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Agregar método de pago"
   },
@@ -2035,6 +2266,9 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Fallido"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "No listado por el Staff"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copiar código al portapapeles"
@@ -3100,6 +3334,54 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "Sincronización de contenido en curso"
+  },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "Fallo en la instalación"
+  },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "Un error interno ocurrió cuando se estuvo instalando la plataforma. Por favor, inténtalo de nuevo."
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "El cargador o versión de Minecraft específico no pudo instalarse, puede estar inválido o insoportado."
+  },
+  "servers.installing-banner.error.modpack-install-failed": {
+    "defaultMessage": "El modpack no pudo instalarse. Puede estar corrupto o incompatible."
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "La versión del modpack no tiene un archivo descargable. Puede estar incorrectamente empacado."
+  },
+  "servers.installing-banner.error.unknown": {
+    "defaultMessage": "Un error inesperado ocurrió durante la instalación."
+  },
+  "servers.installing-banner.error.unsupported-loader-version": {
+    "defaultMessage": "Esta versión de minecraft o el cargador no está soportado actualmente por Modrinth Hosting."
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "Instalando addons..."
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "Instalando modpack..."
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "Instalando plataforma..."
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "Estamos preparando tu servidor"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "Añadiendo java..."
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "Configurando servidor..."
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "Descargando mods..."
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "Organizando archivos..."
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "Preparando environment..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "¿Ya tienes un servidor?"

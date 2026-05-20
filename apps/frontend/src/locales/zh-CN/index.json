@@ -407,6 +407,117 @@
   "collection.title": {
     "message": "{name} - 收藏夹"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "添加个人笔记"
+  },
+  "conversation-thread.action.approve": {
+    "message": "批准"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "批准并回复"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "关闭对话消息"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "关闭并回复"
+  },
+  "conversation-thread.action.reject": {
+    "message": "驳回"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "驳回并回复"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "重开对话消息"
+  },
+  "conversation-thread.action.reply": {
+    "message": "回复"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "回复对话消息"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "重新提交审核"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "重新提交审核并回复"
+  },
+  "conversation-thread.action.send": {
+    "message": "发送"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "送审"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "送审并回复"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "设为草稿"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "设为草稿并回复"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "扣留"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "扣留并回复"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "此对话消息已关闭，无法发送新消息。"
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "关闭举报出错"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "重开举报出错"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "发送消息出错"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "回复对话消息…"
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "发送消息…"
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "确认管理员不会主动审核此内容"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "我已知晓管理员不会主动审核此贴。"
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "你的项目已经获得批准。因此，管理团队不会主动监控此讨论消息。不过，如果您的项目出现问题，他们仍然可能看到你的信息。"
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "回复对话消息"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "如果你需要联系管理团队，请使用 <help-center-link>Modrinth Help Center</help-center-link>，然后点击右下角的蓝色气泡以联系支持。"
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "我已确认处理来自管理员的消息"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "我确认我已妥善处理了管理员的评论。"
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "这将会把 <project-title>{projectTitle}</project-title> 提交给管理员重新审核。"
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "重新提交审核"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "提交审核"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "请确保你已处理来自管理团队的所有评论。"
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "如果反复提交而不处理管理员的评论，可能会导致账户被暂停。"
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "补充文件仅用来保存源代码等支持性资料，不能用来存放替代版本或者变体文件。"
   },
@@ -875,23 +986,8 @@
   "dashboard.head-title": {
     "message": "仪表盘"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "标记全部已读"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "查看历史"
-  },
   "dashboard.notifications.empty.no-unread": {
     "message": "你没有未读通知。"
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "加载通知时出错："
-  },
-  "dashboard.notifications.history.label": {
-    "message": "历史"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "历史通知"
   },
   "dashboard.notifications.link.see-all": {
     "message": "查看所有"
@@ -901,9 +997,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "查看更多 {extraNotifs} 个通知"
-  },
-  "dashboard.notifications.loading": {
-    "message": "加载通知……"
   },
   "dashboard.organizations.button.create": {
     "message": "创建组织"
@@ -919,6 +1012,27 @@
   },
   "dashboard.organizations.title": {
     "message": "组织"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "标记全部已读"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "查看历史"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "你没有未读通知。"
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "加载通知出错："
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "历史"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "历史通知"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "加载通知…"
   },
   "dashboard.projects.bulk-edit-hint": {
     "message": "你可以通过下方复选框选择多个项目来一次性编辑。"
@@ -990,7 +1104,7 @@
     "message": "{title} 的图标"
   },
   "dashboard.projects.project.moderator-message-aria": {
-    "message": "项目有一则来自版主的消息。查看项目以了解更多。"
+    "message": "项目有一则来自管理的消息。查看项目以了解更多。"
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "请复核运行环境元数据"
@@ -1246,6 +1360,15 @@
   },
   "discover.install.heading.reset-modpack": {
     "message": "重置后选择要安装的 modpack"
+  },
+  "discover.seo.description": {
+    "message": "通过快速、精确地搜索结果在Modrinth上搜索并浏览数千个Minecraft{projectType, select, mod {模组} modpack {整合包} resourcepack {资源包} shader {光影包} plugin {插件} datapack {数据包} other {项目}}。我们的筛选器会帮助你快速寻找最合适的Minecraft{projectType, select, mod {模组} modpack {整合包} resourcepack {资源包} shader {光影包} plugin {插件} datapack {数据包} other {项目}}。"
+  },
+  "discover.seo.title": {
+    "message": "搜索{projectType, select, mod {模组} modpack {整合包} resourcepack {资源包} shader {光影包} plugin {插件} datapack {数据包} other {项目}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "搜索{projectType, select, mod {模组} modpack {整合包} resourcepack {资源包} shader {光影包} plugin {插件} datapack {数据包} other {项目}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "你可能输错了收藏夹的连接。"
@@ -1745,14 +1868,20 @@
   "layout.banner.add-email.description": {
     "message": "为确保账户安全，Modrinth 需要你为账户关联一个电子邮箱地址。"
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "总是忽略"
+  },
   "layout.banner.build-fail.description": {
     "message": "当前 Modrinth 前端部署实例不能从 API 生成状态。这可能是由于 API 不可用或配置错误。请在 API 可用时重新构建。\n错误码：{errors}；当前 API URL 为 {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "忽略"
   },
   "layout.banner.build-fail.title": {
     "message": "构建期间从 API 生成状态时发生错误。"
   },
   "layout.banner.preview.description": {
-    "message": "如果你是想前往 Modrinth 的官方网站，请前往 <link>https://modrinth.com</link>。这个预览部署版本仅供 Modrinth 工作人员测试使用。它是基于 <branch-link>{owner}/{branch}</branch-link> @ {commit} 构建而成。"
+    "message": "如果你是想前往 Modrinth 的官方网站，请前往 {url}。这个预览部署版本仅供 Modrinth 工作人员测试使用。它是基于 <branch-link>{owner}/{branch}</branch-link> @ {commit} 构建而成。"
   },
   "layout.banner.preview.title": {
     "message": "这是 Modrinth 网站的预览部署版本。"
@@ -2582,6 +2711,84 @@
   "project.license.title": {
     "message": "许可证"
   },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "你的项目是私人的，这意味着它只能由你本人或受你邀请的人访问。"
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "您的项目已发布，并且可以在 Modrinth 上被发现。"
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "你的项目状态为“未列出”，即只能通过直链访问，无法在 Modrinth 被搜索到。"
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "您可以在项目的<visibility-settings-link>可见性设置</visibility-settings-link>中更改项目的可见性。"
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "已批准项目"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "这是一个草稿项目，在提交审核并获得 Modrinth 管理团队批准之前，其他人无法查看。"
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "草稿项目"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "一旦你完成了所有必需步骤，并确保你的项目符合 Modrinth 的<rules-link>内容规则</rules-link>，你就可以提交你的项目以供审核。"
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "在重新提交项目前，请解决所有审核关切和下方列出的问题。"
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "更改请求"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "如果反复提交你的项目而不预先处理管理问题，可能会导致账户被暂停。"
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "你的项目已在排队等待 Modrinth 管理团队的审核。"
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "你的项目将先被扫描，然后由人工管理员来审核，以确保其符合 Modrinth 的<rules-link>内容规则</rules-link>和<terms-link>使用条款</terms-link>。"
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "你仍然可以修改项目，这并不会影响你在队列中的位置。"
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "我们计划在24-48小时内审查提交内容，但某些项目可能会有延迟。这并不意味着你的提交有问题。"
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>我们感谢您的耐心等待，同时我们的管理员正在努力保持 Modrinth 的安全，并期待帮助您分享内容！💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "在审项目"
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "你的项目不会公开显示，只能通过直链访问。{requestedStatus, select, unlisted {由于你在<visibility-settings-link>可见性设置</visibility-settings-link>作出了设置，无需处理。} other {在重新提交项目前，请解决所有审核关切和下方列出的问题。}}"
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "由管理员下架"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "未经许可"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "这则聊天消息审核并不活跃，但如有需要，可能会审查其中关于你项目的信息。"
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "内容管理员无法为大多数问题提供支持，并且发送到此对话的消息不会通知工作人员。"
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "如果你需要帮助或有其他疑问，请访问 <help-center-link>Modrinth Help Center</help-center-link>，然后点击蓝色气泡以联系支持。"
+  },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "显示成员图形界面"
+  },
+  "project.moderation.thread.private-description": {
+    "message": "这是与 Modrinth 管理员的私人对话消息。他们可能会就此项目的问题向你发送消息。"
+  },
+  "project.moderation.thread.title": {
+    "message": "审核信息"
+  },
   "project.moderation.title": {
     "message": "审核"
   },
@@ -2781,10 +2988,10 @@
     "message": "此{item, select, project {项目} version {版本} user {用户} other {内容}}违反了 Modrinth 的哪条规则？"
   },
   "report.report-content": {
-    "message": "向管理人员举报内容"
+    "message": "向管理员举报内容"
   },
   "report.report-item": {
-    "message": "向管理人员举报 {title}"
+    "message": "向管理员举报 {title}"
   },
   "report.submit": {
     "message": "提交举报"

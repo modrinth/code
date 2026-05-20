@@ -137,6 +137,9 @@
   "app.browse.project-type.modpacks": {
     "message": "Paczki modów"
   },
+  "app.browse.server-instance-content-warning": {
+    "message": "Dodawanie zawartości może zepsuć kompatybilność podczas dołączania na serwer. Jakakolwiek dodana zawartość zostanie stracona, gdy zaktualizujesz zawartość instancji serwera."
+  },
   "app.browse.server.installing": {
     "message": "Instalowanie"
   },
@@ -155,11 +158,17 @@
   "app.export-modal.header": {
     "message": "Eksportuj paczkę modów"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Dołączyć \"{file}\"?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Nazwa paczki modów"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nazwa paczki modów"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Skonfiguruje jakie pliki zostaną załączone w tym eksporcie"
   },
   "app.export-modal.version-number-label": {
     "message": "Numer wersji"
@@ -168,7 +177,7 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i wszystkie zainstalowane treści."
+    "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i jakakolwiek dodana zawartość."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Tej akcji nie można odwrócić"
@@ -294,7 +303,7 @@
     "message": "Ten projekt jest już zainstalowany"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "Powrót do przeglądania"
+    "message": "Powróć do odkrywania"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Zainstaluj zasoby do instancji"
@@ -694,6 +703,9 @@
   },
   "minecraft-account.label": {
     "message": "Konto Minecraft"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Nie zalogowano"
   },
   "minecraft-account.remove-account": {
     "message": "Usuń konto"
