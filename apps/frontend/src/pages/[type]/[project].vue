@@ -485,7 +485,7 @@
 									v-if="!isServerProject"
 									size="large"
 									:color="
-										(auth.user && currentMember) || route.name === 'type-id-version-version'
+										(auth.user && currentMember) || route.name === 'type-project-version-version'
 											? `standard`
 											: `brand`
 									"
@@ -507,7 +507,7 @@
 									v-else
 									size="large"
 									:color="
-										(auth.user && currentMember) || route.name === 'type-id-version-version'
+										(auth.user && currentMember) || route.name === 'type-project-version-version'
 											? `standard`
 											: `brand`
 									"
@@ -529,7 +529,7 @@
 									size="large"
 									circular
 									:color="
-										route.name === 'type-id-version-version' || (auth.user && currentMember)
+										route.name === 'type-project-version-version' || (auth.user && currentMember)
 											? `standard`
 											: `brand`
 									"
@@ -547,7 +547,7 @@
 									size="large"
 									circular
 									:color="
-										route.name === 'type-id-version-version' || (auth.user && currentMember)
+										route.name === 'type-project-version-version' || (auth.user && currentMember)
 											? `standard`
 											: `brand`
 									"
@@ -1136,7 +1136,7 @@ import { useModerationQueue } from '~/services/moderation-queue.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
-	key: (route) => `${route.params.id}`,
+	key: (route) => `${route.params.project}`,
 })
 
 const data = useNuxtApp()
@@ -1150,6 +1150,9 @@ const { addNotification } = notifications
 
 const auth = await useAuth()
 const user = await useUser()
+
+// Route param for initial lookup (middleware caches by both slug and ID)
+const routeProjectId = ref(useRouteId('project'))
 
 const { createProjectDownloadUrl } = useCdnDownloadContext()
 
@@ -1637,7 +1640,7 @@ const collections = computed(() =>
 )
 
 if (
-	!route.params.id ||
+	!routeProjectId.value ||
 	!(
 		tags.value.projectTypes.find((x) => x.id === route.params.type) ||
 		route.params.type === 'project'
@@ -1649,9 +1652,6 @@ if (
 		message: formatMessage(messages.pageNotFound),
 	})
 }
-
-// Route param for initial lookup (middleware caches by both slug and ID)
-const routeProjectId = computed(() => route.params.id)
 
 // Use DI client for TanStack Query
 const client = injectModrinthClient()
@@ -1870,7 +1870,7 @@ const { data: organizationRaw } = useQuery({
 // Return null when the project no longer belongs to an organization.
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
-const isSettings = computed(() => route.name.startsWith('type-id-settings'))
+const isSettings = computed(() => route.name.startsWith('type-project-settings'))
 
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {
@@ -1911,27 +1911,6 @@ function loadDependencies() {
 // This allows showing/hiding UI elements without loading full version data
 const hasVersions = computed(() => (project.value?.versions?.length ?? 0) > 0)
 
-async function updateProjectRoute() {
-	if (
-		project.value &&
-		route.params.id !== project.value.slug &&
-		!flags.value.disablePrettyProjectUrlRedirects
-	) {
-		await navigateTo(
-			{
-				name: route.name,
-				params: {
-					...route.params,
-					id: project.value.slug,
-				},
-				query: route.query,
-				hash: route.hash,
-			},
-			{ replace: true },
-		)
-	}
-}
-
 async function invalidateProject() {
 	await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
 	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', routeProjectId.value] })
@@ -1947,12 +1926,27 @@ async function invalidateProject() {
 const patchProjectMutation = useMutation({
 	mutationFn: async ({ projectId, data }) => {
 		await client.labrinth.projects_v2.edit(projectId, data)
+		if (data.slug !== undefined && data.slug !== route.params.project) {
+			routeProjectId.value = data.slug
+			await navigateTo(
+				{
+					name: route.name,
+					params: {
+						type: route.params.type,
+						project: data.slug,
+					},
+					query: route.query,
+					hash: route.hash,
+				},
+				{ replace: true },
+			)
+		}
 		return data
 	},
 
 	onMutate: async ({ projectId, data }) => {
 		// Cancel outgoing refetches for both slug-based and ID-based cache keys
-		// The query may be keyed by slug (routeProjectId) but we also have the actual UUID (projectId)
+		// The query may be keyed by slug (routeProjectId.value) but we also have the actual UUID (projectId)
 		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
 		if (routeProjectId.value !== projectId) {
 			await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
@@ -2372,7 +2366,7 @@ useHead({
 	],
 })
 
-if (!route.name.startsWith('type-id-settings')) {
+if (!route.name.startsWith('type-project-settings')) {
 	useSeoMeta({
 		title: () => title.value,
 		description: () => description.value,
@@ -2460,7 +2454,6 @@ async function patchProject(resData, quiet = false) {
 			{ projectId: project.value.id, data: resData },
 			{
 				onSuccess: async () => {
-					await updateProjectRoute()
 					if (!quiet) {
 						addNotification({
 							title: formatMessage(messages.projectUpdated),

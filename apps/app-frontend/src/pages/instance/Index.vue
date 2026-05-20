@@ -218,7 +218,11 @@
 				:key="instance.path"
 			>
 				<template v-if="Component">
-					<Suspense :key="instance.path">
+					<Suspense
+						:key="instance.path"
+						@pending="subpagePending = true"
+						@resolve="subpagePending = false"
+					>
 						<component
 							:is="Component"
 							:instance="instance"
@@ -228,6 +232,7 @@
 							:installed="instance.install_stage !== 'installed'"
 							:is-server-instance="isServerInstance"
 							:open-settings="() => settingsModal?.show(1)"
+							v-bind="contentSubpageProps"
 							@play="updatePlayState"
 							@stop="() => stopInstance('InstanceSubpage')"
 						></component>
@@ -295,6 +300,7 @@ import {
 	ServerPing,
 	ServerRecentPlays,
 	ServerRegion,
+	useLoadingBarToken,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -312,6 +318,7 @@ import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
+import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
@@ -331,6 +338,7 @@ const route = useRoute()
 
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
+const contentSubpageRouteNames = new Set(['Mods', 'ModsFilter'])
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -341,11 +349,15 @@ window.addEventListener('online', () => {
 })
 
 const instance = ref<GameInstance>()
+const preloadedContent = ref<InstanceContentData | null>(null)
 const playing = ref(false)
 const loading = ref(false)
+const subpagePending = ref(false)
 const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
+
+useLoadingBarToken(subpagePending)
 
 const isServerInstance = ref(false)
 const linkedProjectV3 = ref<Labrinth.Projects.v3.Project>()
@@ -361,36 +373,55 @@ const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
 
+function isContentSubpageRoute(routeName = route.name) {
+	return typeof routeName === 'string' && contentSubpageRouteNames.has(routeName)
+}
+
 async function fetchInstance() {
 	isServerInstance.value = false
 	linkedProjectV3.value = undefined
+	preloadedContent.value = null
 	ping.value = undefined
 	playersOnline.value = undefined
 	loadingServerPing.value = false
 
-	instance.value = await get(route.params.id as string).catch(handleError)
+	const nextInstance = await get(route.params.id as string).catch(handleError)
+	let nextLinkedProjectV3: Labrinth.Projects.v3.Project | undefined
+	let nextIsServerInstance = false
 
-	if (!offline.value && instance.value?.linked_data && instance.value.linked_data.project_id) {
+	const contentPreloadPromise =
+		nextInstance && isContentSubpageRoute()
+			? loadInstanceContentData(nextInstance.path, undefined, handleError)
+			: Promise.resolve(null)
+
+	if (!offline.value && nextInstance?.linked_data && nextInstance.linked_data.project_id) {
 		try {
-			linkedProjectV3.value = await get_project_v3(
-				instance.value.linked_data.project_id,
+			nextLinkedProjectV3 = await get_project_v3(
+				nextInstance.linked_data.project_id,
 				'must_revalidate',
 			)
 
-			if (linkedProjectV3.value?.minecraft_server != null) {
-				isServerInstance.value = true
+			if (nextLinkedProjectV3?.minecraft_server != null) {
+				nextIsServerInstance = true
 			}
 		} catch (error) {
 			handleError(error as Error)
 		}
 	}
 
+	const nextPreloadedContent = await contentPreloadPromise
+
+	instance.value = nextInstance ?? undefined
+	linkedProjectV3.value = nextLinkedProjectV3
+	isServerInstance.value = nextIsServerInstance
+	preloadedContent.value = nextPreloadedContent
+
 	fetchDeferredData()
 
-	if (instance.value) {
+	if (nextInstance) {
 		queryClient.prefetchQuery({
-			queryKey: ['worlds', instance.value.path],
-			queryFn: () => refreshWorlds(instance.value!.path),
+			queryKey: ['worlds', nextInstance.path],
+			queryFn: () => refreshWorlds(nextInstance.path),
 			staleTime: 30_000,
 		})
 	}
@@ -448,6 +479,9 @@ const renderMode = computed<'scroll' | 'fixed'>(() =>
 	route.meta.renderMode === 'fixed' ? 'fixed' : 'scroll',
 )
 const isFixedRender = computed(() => renderMode.value === 'fixed')
+const contentSubpageProps = computed(() =>
+	isContentSubpageRoute() ? { preloadedContent: preloadedContent.value } : {},
+)
 
 const tabs = computed(() => [
 	{

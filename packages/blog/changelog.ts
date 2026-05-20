@@ -11,6 +11,45 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-20T16:01:04.111Z`,
+		product: 'web',
+		body: `## Fixed
+- Fixed "Permissions" page showing in Modpack settings.`,
+	},
+	{
+		date: `2026-05-19T19:51:55+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed 404 error when changing project URL.`,
+	},
+	{
+		date: `2026-05-19T18:50:27+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations.
+
+## Fixed
+- Fixed pages randomly erroring with 404 when coming from another page such as a user, org, or collection.
+- Fixed bug with table headers being misaligned if using the website in a non-english language.
+- Fixed a problem with Brazil PIX withdrawals being unable to click the withdraw button.`,
+	},
+	{
+		date: `2026-05-19T18:50:27+00:00`,
+		product: 'app',
+		version: '0.13.19',
+		body: `## Changed
+- Updated translations.
+
+## Fixed
+- Fixed bug with table headers being misaligned if using the app in a non-english language.`,
+	},
+	{
+		date: `2026-05-19T18:50:27+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations.`,
+	},
+	{
 		date: `2026-05-17T20:46:06+00:00`,
 		product: 'app',
 		version: '0.13.18',

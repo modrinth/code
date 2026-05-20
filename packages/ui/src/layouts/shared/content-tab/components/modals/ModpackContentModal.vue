@@ -36,6 +36,7 @@ interface Props {
 	modpackName?: string
 	modpackIconUrl?: string
 	enableToggle?: boolean
+	busy?: boolean
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
 	switchVersion?: (item: ContentItem) => void
 }
@@ -44,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 	modpackName: undefined,
 	modpackIconUrl: undefined,
 	enableToggle: false,
+	busy: false,
 	getOverflowOptions: undefined,
 	switchVersion: undefined,
 })
@@ -247,12 +249,13 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
+		installing: item.installing === true,
 		isClientOnly:
 			isClientOnlyEnvironment(item.environment) ||
 			!!item.pack_client_retained ||
 			!!item.pack_client_depends,
 		clientWarning: getClientWarningType(item),
-		disabled: disabledIds.value.has(item.file_name),
+		disabled: props.busy || disabledIds.value.has(item.file_name) || item.installing === true,
 		overflowOptions: [
 			...(props.switchVersion
 				? [
@@ -283,17 +286,20 @@ function getTypeIcon(type: string) {
 }
 
 function handleEnabledChange(fileName: string, value: boolean) {
+	if (props.busy) return
 	const item = items.value.find((i) => i.file_name === fileName)
 	if (!item) return
 	emit('update:enabled', item, value)
 }
 
 function bulkEnable() {
+	if (props.busy) return
 	emit('bulk:enable', [...selectedItems.value])
 	selectedIds.value = []
 }
 
 function bulkDisable() {
+	if (props.busy) return
 	emit('bulk:disable', [...selectedItems.value])
 	selectedIds.value = []
 }
@@ -361,7 +367,15 @@ function updateItem(fileName: string, updates: Partial<ContentItem> & { disabled
 	}
 }
 
-defineExpose({ show, showLoading, hide, getState, restore, updateItem })
+function setItems(contentItems: ContentItem[]) {
+	const contentFileNames = new Set(contentItems.map((item) => item.file_name))
+	items.value = contentItems
+	selectedIds.value = selectedIds.value.filter((id) => contentFileNames.has(id))
+	disabledIds.value = new Set([...disabledIds.value].filter((id) => contentFileNames.has(id)))
+	loading.value = false
+}
+
+defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems })
 </script>
 
 <template>
@@ -544,6 +558,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 		<ContentSelectionBar
 			v-if="props.enableToggle"
 			:selected-items="selectedItems"
+			:is-bulk-operating="props.busy"
 			style="--left-bar-width: 0px; --right-bar-width: 0px"
 			@clear="selectedIds = []"
 			@enable="bulkEnable"

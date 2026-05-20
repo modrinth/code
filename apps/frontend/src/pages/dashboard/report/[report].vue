@@ -1,7 +1,7 @@
 <template>
 	<ReportView
 		:auth="auth"
-		:report-id="route.params.id"
+		:report-id="reportId"
 		:breadcrumbs-stack="[
 			{ href: '/dashboard/reports', label: formatMessage(messages.activeReportsTitle) },
 		]"
@@ -25,10 +25,10 @@ const messages = defineMessages({
 	},
 })
 
-const route = useNativeRoute()
 const auth = await useAuth()
+const reportId = useRouteId('report')
 
 useHead({
-	title: () => `${formatMessage(messages.reportTitle, { id: route.params.id })} - Modrinth`,
+	title: () => `${formatMessage(messages.reportTitle, { id: reportId })} - Modrinth`,
 })
 </script>

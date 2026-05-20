@@ -1844,6 +1844,15 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hide incompatible"
   },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} is not marked as compatible with this installation. It may fail to launch or behave unexpectedly."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Update to incompatible version?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Update anyway"
+  },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Loading changelog..."
   },
@@ -3887,8 +3896,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "North America"
+  "servers.region.north-america-central": {
+    "defaultMessage": "Central North America"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Eastern North America"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Western North America"
   },
   "servers.region.prompt": {
     "defaultMessage": "Where would you like your server to be located?"

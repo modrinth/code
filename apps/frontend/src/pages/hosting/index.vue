@@ -868,7 +868,7 @@ const messages = defineMessages({
 	faqLocationAnswer: {
 		id: 'hosting-marketing.faq.location.answer',
 		defaultMessage:
-			"We have servers available in North America, Europe, and Southeast Asia at the moment that you can choose upon purchase. More regions to come in the future! If you'd like to switch your region, please contact support.",
+			"We have servers available across North America, Europe, and Southeast Asia at the moment that you can choose upon purchase. More regions to come in the future! If you'd like to switch your region, please contact support.",
 	},
 	faqIncreaseStorage: {
 		id: 'hosting-marketing.faq.increase-storage',

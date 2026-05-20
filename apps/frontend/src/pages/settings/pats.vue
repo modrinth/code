@@ -16,10 +16,10 @@
 			"
 			:width="'550px'"
 		>
-			<div class="flex flex-col gap-4">
-				<div class="flex w-full flex-col">
+			<div class="flex flex-col gap-6">
+				<div class="flex w-full flex-col gap-2.5">
 					<label for="pat-name">
-						<span class="label__title">{{ formatMessage(createModalMessages.nameLabel) }}</span>
+						<span class="font-semibold">{{ formatMessage(createModalMessages.nameLabel) }}</span>
 					</label>
 					<StyledInput
 						id="pat-name"
@@ -29,20 +29,20 @@
 					/>
 				</div>
 
-				<div class="flex w-full flex-col">
+				<div class="flex w-full flex-col gap-2.5">
 					<label for="pat-scopes">
-						<span class="label__title">{{ formatMessage(commonMessages.scopesLabel) }}</span>
+						<span class="font-semibold">{{ formatMessage(commonMessages.scopesLabel) }}</span>
 					</label>
 					<div
 						id="pat-scopes"
-						class="scope-items mt-2 grid grid-cols-1 gap-x-6 gap-y-4 min-[600px]:grid-cols-2"
+						class="scope-items grid grid-cols-1 gap-x-6 gap-y-4 min-[600px]:grid-cols-2"
 					>
 						<div
 							v-for="category in scopeCategories"
 							:key="category.name"
-							class="flex flex-col gap-2"
+							class="flex flex-col gap-1.5"
 						>
-							<h4 class="m-0 border-b border-divider pb-1 text-base font-bold text-contrast">
+							<h4 class="m-0 border-b border-divider text-base font-medium text-primary">
 								{{ category.name }}
 							</h4>
 							<div class="flex flex-col gap-2">
@@ -58,15 +58,14 @@
 					</div>
 				</div>
 
-				<div class="flex w-full flex-col">
+				<div class="flex w-full flex-col gap-2.5">
 					<label for="pat-expires">
-						<span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
+						<span class="font-semibold">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
 					</label>
-					<StyledInput id="pat-expires" v-model="expires" type="date" />
-					<p></p>
+					<DatePicker id="pat-expires" show-today v-model="expires" wrapper-class="w-full" />
 				</div>
 
-				<div class="ml-auto flex gap-2">
+				<div class="ml-auto mt-4 flex gap-2">
 					<ButtonStyled type="outlined">
 						<button @click="$refs.patModal.hide()">
 							<XIcon />
@@ -207,6 +206,7 @@ import {
 	commonSettingsMessages,
 	ConfirmModal,
 	CopyCode,
+	DatePicker,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
