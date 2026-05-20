@@ -49,6 +49,19 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 type DatePickerValue = string | Date | null | undefined
 type RangeEdge = 'start' | 'end'
 type ViewDateAlignment = 'left' | 'right'
+type DatePickerPosition =
+	| 'auto'
+	| 'above'
+	| 'below'
+	| 'auto left'
+	| 'auto center'
+	| 'auto right'
+	| 'above left'
+	| 'above center'
+	| 'above right'
+	| 'below left'
+	| 'below center'
+	| 'below right'
 type CalendarViewMonth = { month: number; year: number }
 type RangeDayElement = HTMLElement & { dateObj?: Date }
 type RangeDragState = {
@@ -115,6 +128,11 @@ const props = withDefaults(
 		showToday?: boolean
 		calendarOnly?: boolean
 		/**
+		 * Controls where the calendar opens relative to the input. Use `above`
+		 * to force the calendar to open above the input.
+		 */
+		position?: DatePickerPosition
+		/**
 		 * When true (single mode only), navigating between months/years preserves the
 		 * originally selected day number. If the target month has fewer days, the day
 		 * is clamped to the last valid day, and a `clamp` event is emitted with the
@@ -134,9 +152,11 @@ const props = withDefaults(
 		showMonths: 1,
 		time24hr: false,
 		clearable: true,
+		placeholder: 'Enter date',
 		showIcon: true,
 		showToday: false,
 		calendarOnly: false,
+		position: 'auto',
 		preserveDay: false,
 		viewDateAlignment: 'left',
 	},
@@ -962,6 +982,7 @@ watch(
 		props.altFormat,
 		props.time24hr,
 		props.calendarOnly,
+		props.position,
 	],
 	() => {
 		if (!picker.value) return
@@ -1204,6 +1225,7 @@ function flatpickrOptions(): Options {
 		mode: props.mode,
 		noCalendar: false,
 		nextArrow: chevronRightIcon,
+		position: props.position,
 		prevArrow: chevronLeftIcon,
 		showMonths: resolvedShowMonths.value,
 		static: false,
@@ -1275,6 +1297,10 @@ defineExpose({
 .modrinth-date-picker :deep(.flatpickr-calendar) {
 	@apply mt-2 rounded-2xl border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary select-none;
 	box-sizing: content-box;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.arrowBottom) {
+	margin-top: -2.5rem;
 }
 
 .modrinth-date-picker.calendar-only {

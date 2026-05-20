@@ -11,6 +11,44 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-20T19:48:04+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved date selection across the website.
+
+## Fixed
+- Fixed server project types sometimes appearing as modpacks in page titles and embeds.`,
+	},
+	{
+		date: `2026-05-20T19:48:04+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed the support portal bubble appearing in the wrong position in the bottom-right corner of the server panel.
+- Fixed modpack updates in the Content tab not appearing when a newer Modrinth version was available.`,
+	},
+	{
+		date: `2026-05-20T19:48:04+00:00`,
+		product: 'app',
+		version: '0.13.20',
+		body: `## Changed
+- Updated linked modpack version switching to show every available version and ask for confirmation before risky changes:
+	- Versions for a different game version.
+	- Downgrades.
+
+## Fixed
+- Fixed instance pages sometimes opening with an empty Content tab.
+- Fixed Content tab performance problems.
+- Fixed linked modpack content appearing as user-added after switching a bundled project to another version.
+- Fixed linked modpack content staying stale after updating, removing, enabling, disabling, or switching bundled content.
+- Fixed content installation problems from the Browse content page.`,
+	},
+	{
+		date: `2026-05-20T16:01:04.111Z`,
+		product: 'web',
+		body: `## Fixed
+- Fixed "Permissions" page showing in Modpack settings.`,
+	},
+	{
 		date: `2026-05-19T19:51:55+00:00`,
 		product: 'web',
 		body: `## Fixed

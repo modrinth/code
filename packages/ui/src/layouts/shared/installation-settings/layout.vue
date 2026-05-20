@@ -26,6 +26,7 @@ import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 import { formatLoaderLabel } from '#ui/utils/loaders'
+import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
 import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
@@ -120,22 +121,31 @@ const isLocalFile = computed(() => {
 
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	pendingUpdateVersion.value = version
+
 	const currentVersionId = ctx.updaterModalProps.value.currentVersionId
 	const currentVersion = form.updatingProjectVersions.value.find((v) => v.id === currentVersionId)
 	isUpdateDowngrade.value = currentVersion
 		? new Date(version.date_published) < new Date(currentVersion.date_published)
 		: false
-	if (event?.shiftKey) {
+	const shouldShowWarning =
+		isUpdateDowngrade.value ||
+		versionChangesGameVersion(version, ctx.updaterModalProps.value.currentGameVersion)
+
+	if (event?.shiftKey || !shouldShowWarning) {
 		handleModpackUpdateConfirm()
-	} else {
-		modpackUpdateModal.value?.show()
+		return
 	}
+
+	modpackUpdateModal.value?.show()
 }
 
 function handleModpackUpdateConfirm() {
-	if (pendingUpdateVersion.value) {
+	const version = pendingUpdateVersion.value
+	if (version) {
+		contentUpdaterModal.value?.hide()
 		form.cancelEditing()
-		form.handleUpdaterConfirm(pendingUpdateVersion.value)
+		ctx.closeSettings?.()
+		form.handleUpdaterConfirm(version)
 		pendingUpdateVersion.value = null
 	}
 }

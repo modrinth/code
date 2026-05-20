@@ -47,8 +47,10 @@ const navItems = computed(() => {
 		projectV3.value?.project_types?.some((type) => ['mod', 'modpack'].includes(type)) &&
 		isStaff(currentMember.value?.user)
 
-	const hasPermissionsPage = computed(() =>
-		projectV3.value?.project_types?.some((type) => ['modpack'].includes(type)),
+	const hasPermissionsPage = computed(
+		() =>
+			flags.value.modpackPermissionsPage &&
+			projectV3.value?.project_types?.some((type) => ['modpack'].includes(type)),
 	)
 
 	const items = [
