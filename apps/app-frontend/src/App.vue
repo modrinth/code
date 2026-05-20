@@ -1,5 +1,4 @@
 <script setup>
-import { Intercom, shutdown as shutdownIntercom } from '@intercom/messenger-js-sdk'
 import {
 	AuthFeature,
 	ModrinthApiError,
@@ -53,6 +52,7 @@ import {
 	providePopupNotificationManager,
 	useDebugLogger,
 	useFormatBytes,
+	useHostingIntercom,
 	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
@@ -88,7 +88,6 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
-import { useIntercomPositioning } from '@/composables/intercom-positioning'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -132,15 +131,36 @@ import { AppPopupNotificationManager } from './providers/app-popup-notifications
 const themeStore = useTheming()
 const router = useRouter()
 const route = useRoute()
-const intercomBubblePositioning = useIntercomPositioning({ route, themeStore })
-const {
-	sidebarToggled,
-	forceSidebar,
-	sidebarVisible,
-	intercomBubblePosition,
-	updateIntercomBubbleStyles,
-	clearIntercomBubbleStyles,
-} = intercomBubblePositioning
+const APP_LEFT_NAV_WIDTH = '4rem'
+const APP_SIDEBAR_WIDTH = 300
+const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
+const credentials = ref()
+const sidebarToggled = ref(true)
+const unsubscribeSidebarToggle = themeStore.$subscribe(() => {
+	sidebarToggled.value = !themeStore.toggleSidebar
+})
+const forceSidebar = computed(
+	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
+)
+const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
+const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
+const hostingIntercomIdentityKey = computed(() => {
+	const rawServerId = route.params.id
+	const serverId = Array.isArray(rawServerId) ? rawServerId[0] : rawServerId
+	const userId = credentials.value?.user_id ?? credentials.value?.user?.id ?? 'anonymous'
+	return `${userId}:${serverId ?? 'hosting'}`
+})
+const hostingIntercom = useHostingIntercom({
+	enabled: computed(() => hostingRouteActive.value && !!credentials.value?.session),
+	appId: 'ykeritl9',
+	fetchToken: fetchIntercomToken,
+	identityKey: hostingIntercomIdentityKey,
+	horizontalPadding: computed(() =>
+		sidebarVisible.value
+			? APP_SIDEBAR_WIDTH + INTERCOM_BUBBLE_DEFAULT_PADDING
+			: INTERCOM_BUBBLE_DEFAULT_PADDING,
+	),
+})
 
 const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
@@ -175,7 +195,11 @@ provideModrinthClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
-	...intercomBubblePositioning.pageContext,
+	floatingActionBarOffsets: {
+		left: ref(APP_LEFT_NAV_WIDTH),
+		right: computed(() => (sidebarVisible.value ? `${APP_SIDEBAR_WIDTH}px` : '0px')),
+	},
+	intercomBubble: hostingIntercom.intercomBubble,
 	featureFlags: {
 		serverRamAsBytesAlwaysOn: computed(() =>
 			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
@@ -259,8 +283,7 @@ onMounted(async () => {
 onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
-	shutdownHostingIntercom()
-	clearIntercomBubbleStyles()
+	unsubscribeSidebarToggle()
 
 	await unlistenUpdateDownload?.()
 })
@@ -593,8 +616,6 @@ const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
 const updateToPlayModal = ref()
 
-const credentials = ref()
-
 const modrinthLoginFlowWaitModal = ref()
 
 setupAuthProvider(credentials, async (_redirectPath) => {
@@ -664,10 +685,6 @@ const hasPlus = computed(
 const showAd = computed(
 	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
 )
-const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
-
-let intercomBooting = false
-let intercomBooted = false
 
 async function fetchIntercomToken() {
 	const creds = await getCreds()
@@ -676,8 +693,10 @@ async function fetchIntercomToken() {
 	}
 
 	const params = new URLSearchParams()
-	if (route.path.startsWith('/hosting/manage/') && typeof route.params.id === 'string') {
-		params.set('server_id', route.params.id)
+	const rawServerId = route.params.id
+	const serverId = Array.isArray(rawServerId) ? rawServerId[0] : rawServerId
+	if (route.path.startsWith('/hosting/manage/') && typeof serverId === 'string') {
+		params.set('server_id', serverId)
 	}
 	const query = params.size > 0 ? `?${params.toString()}` : ''
 
@@ -692,69 +711,6 @@ async function fetchIntercomToken() {
 	}
 	return await response.json()
 }
-
-async function bootIntercom() {
-	if (
-		intercomBooting ||
-		intercomBooted ||
-		!hostingRouteActive.value ||
-		!credentials.value?.session
-	) {
-		return
-	}
-
-	intercomBooting = true
-	console.debug('[APP][INTERCOM] initializing secure support chat')
-	try {
-		const { token } = await fetchIntercomToken()
-		Intercom({
-			app_id: 'ykeritl9',
-			intercom_user_jwt: token,
-			session_duration: 1000 * 60 * 60 * 24,
-			alignment: 'right',
-			horizontal_padding: intercomBubblePosition.value.horizontalPadding,
-			vertical_padding: intercomBubblePosition.value.verticalPadding,
-		})
-		intercomBooted = true
-	} catch (error) {
-		console.warn('[APP][INTERCOM] failed to initialize secure support chat', error)
-	} finally {
-		intercomBooting = false
-	}
-}
-
-function shutdownHostingIntercom() {
-	if (!intercomBooted && !intercomBooting) return
-	shutdownIntercom()
-	intercomBooting = false
-	intercomBooted = false
-}
-
-watch(
-	intercomBubblePosition,
-	(position) => {
-		updateIntercomBubbleStyles(position)
-		if (intercomBooted) {
-			window.Intercom?.('update', {
-				horizontal_padding: position.horizontalPadding,
-				vertical_padding: position.verticalPadding,
-			})
-		}
-	},
-	{ immediate: true },
-)
-
-watch(
-	[hostingRouteActive, credentials],
-	([active]) => {
-		if (active) {
-			void bootIntercom()
-		} else {
-			shutdownHostingIntercom()
-		}
-	},
-	{ immediate: true },
-)
 
 watch(showAd, () => {
 	if (!showAd.value) {
@@ -1820,14 +1776,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--os-handle-bg: var(--color-scrollbar) !important;
 	--os-handle-bg-hover: var(--color-scrollbar) !important;
 	--os-handle-bg-active: var(--color-scrollbar) !important;
-}
-
-.intercom-lightweight-app-launcher,
-.intercom-launcher-frame,
-iframe[name='intercom-launcher-frame'] {
-	right: var(--app-support-launcher-right, 20px) !important;
-	bottom: var(--app-support-launcher-bottom, 20px) !important;
-	z-index: 9 !important;
 }
 
 .mac {

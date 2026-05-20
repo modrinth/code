@@ -343,7 +343,6 @@
 </template>
 
 <script setup lang="ts">
-import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
@@ -431,8 +430,6 @@ const props = withDefaults(
 		siteUrl?: string
 		products?: Labrinth.Billing.Internal.Product[]
 		authUser?: { id: string; username: string; email: string; created: string }
-		fetchIntercomToken?: () => Promise<{ token: string }>
-		intercomAppId?: string
 		navigateToBilling?: () => void
 		navigateToServers?: () => void
 		browseModpacks?: (args: {
@@ -455,8 +452,6 @@ const props = withDefaults(
 		siteUrl: undefined,
 		products: () => [],
 		authUser: undefined,
-		fetchIntercomToken: undefined,
-		intercomAppId: 'ykeritl9',
 		navigateToBilling: undefined,
 		navigateToServers: undefined,
 		browseModpacks: undefined,
@@ -1360,17 +1355,10 @@ function initializeServer() {
 	}
 }
 
-let intercomInitialized = false
-
 const cleanup = () => {
 	isMounted.value = false
 
 	saveWsStateToCache()
-
-	if (intercomInitialized) {
-		shutdown()
-		intercomInitialized = false
-	}
 
 	cleanupCoreRuntime(props.serverId)
 
@@ -1398,53 +1386,6 @@ onMounted(() => {
 			}
 		})
 	}
-
-	const tryInitIntercom = () => {
-		if (intercomInitialized) return
-		if (!props.authUser || !props.fetchIntercomToken) {
-			console.debug('[PYROSERVERS][INTERCOM] waiting for auth user and token fetcher', {
-				hasAuthUser: !!props.authUser,
-				hasFetchIntercomToken: !!props.fetchIntercomToken,
-			})
-			return
-		}
-		intercomInitialized = true
-		console.debug('[PYROSERVERS][INTERCOM] initializing secure support chat')
-		props
-			.fetchIntercomToken()
-			.then(({ token }) => {
-				console.debug('[PYROSERVERS][INTERCOM] fetched messenger JWT, booting widget')
-				Intercom({
-					app_id: props.intercomAppId!,
-					intercom_user_jwt: token,
-					session_duration: 1000 * 60 * 60 * 24,
-				})
-				window.setTimeout(() => {
-					const hasWidget = !!document.querySelector(
-						'.intercom-lightweight-app, #intercom-container, #intercom-frame',
-					)
-					if (!hasWidget) {
-						console.warn(
-							'[PYROSERVERS][INTERCOM] boot completed but no Intercom widget was detected',
-						)
-					}
-				}, 2500)
-			})
-			.catch((error) => {
-				intercomInitialized = false
-				console.warn('[PYROSERVERS][INTERCOM] failed to initialize secure support chat', error)
-			})
-	}
-	tryInitIntercom()
-	const stopIntercomWatch = watch(
-		() => props.authUser,
-		(user) => {
-			if (user) {
-				tryInitIntercom()
-				stopIntercomWatch()
-			}
-		},
-	)
 
 	DOMPurify.addHook(
 		'afterSanitizeAttributes',
