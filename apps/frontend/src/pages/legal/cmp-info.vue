@@ -102,7 +102,12 @@
 				<tr>
 					<td>Revenue earned on</td>
 					<td>
-						<DatePicker id="revenue-date-picker" v-model="rawSelectedDate" />
+						<DatePicker
+							id="revenue-date-picker"
+							v-model="rawSelectedDate"
+							show-today
+							position="above"
+						/>
 						<noscript
 							>(JavaScript must be enabled for the date picker to function, example date:
 							2024-07-15)

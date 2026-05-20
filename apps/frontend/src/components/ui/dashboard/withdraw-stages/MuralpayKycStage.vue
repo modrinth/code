@@ -99,6 +99,7 @@
 						v-model="formData.dateOfBirth"
 						:max-date="maxDate"
 						autocomplete="bday"
+						placeholder="Select date of birth"
 						wrapper-class="w-full"
 					/>
 				</div>

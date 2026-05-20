@@ -292,6 +292,35 @@ export const OpenCalendar: Story = {
 	}),
 }
 
+export const ForceAbove: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-06-15')
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[420px] max-w-sm flex-col justify-end gap-2 pb-6">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[300px]"
+					default-view-date="2026-06-01"
+					position="above"
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const PreserveDay: Story = {
 	render: () => ({
 		components: { DatePicker },
