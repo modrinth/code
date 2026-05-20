@@ -6,6 +6,8 @@ import type {
 } from '@modrinth/api-client'
 import type { Ref } from 'vue'
 
+import type { CancelUploadHandler } from '#ui/providers/server-context'
+
 export type UploadSessionUploadFile = {
 	file: File
 	filename: string
@@ -18,9 +20,9 @@ export function useUploadSessionUpload(options: {
 	scope: Kyros.UploadSessions.v1.Scope
 	worldId: Ref<string | null>
 	uploadState: Ref<UploadState>
-	cancelUpload: Ref<(() => void) | null>
+	cancelUpload: Ref<CancelUploadHandler | null>
 }) {
-	let activeUploadCancel: (() => void) | null = null
+	let activeUploadCancel: CancelUploadHandler | null = null
 
 	function getUploadByteCount(files: File[]) {
 		return files.reduce((sum, file) => sum + file.size, 0)
@@ -96,8 +98,8 @@ export function useUploadSessionUpload(options: {
 		}
 	}
 
-	function cancelUpload() {
-		activeUploadCancel?.()
+	async function cancelUpload() {
+		await activeUploadCancel?.()
 	}
 
 	async function uploadFiles(
@@ -115,12 +117,37 @@ export function useUploadSessionUpload(options: {
 		let finalized = false
 		let uploadId: string | null = null
 		let uploadHandle: { cancel: () => void } | null = null
-		const cancelCurrentUpload = () => {
+		let cancelRequest: Promise<void> | null = null
+		let cancelCompletion: Promise<void> | null = null
+		let resolveCancelCompletion: (() => void) | null = null
+		const waitForCancelCompletion = () => {
+			cancelCompletion ??= new Promise<void>((resolve) => {
+				resolveCancelCompletion = resolve
+			})
+			return cancelCompletion
+		}
+		const completeCancel = () => {
+			resolveCancelCompletion?.()
+			resolveCancelCompletion = null
+			cancelCompletion = null
+		}
+		const cancelSessionOnce = async () => {
+			if (!uploadId) return
+			cancelRequest ??= cancelUploadSession(worldId, uploadId)
+			await cancelRequest
+		}
+		const finishCancellation = async () => {
+			await cancelSessionOnce()
+			completeCancel()
+		}
+		const cancelCurrentUpload = async () => {
 			cancelled = true
 			uploadHandle?.cancel()
-			if (uploadId) {
-				void cancelUploadSession(worldId, uploadId)
+			if (!uploadId) {
+				await waitForCancelCompletion()
+				return
 			}
+			await finishCancellation()
 		}
 
 		activeUploadCancel = cancelCurrentUpload
@@ -131,7 +158,7 @@ export function useUploadSessionUpload(options: {
 			uploadId = session.upload_id
 
 			if (cancelled) {
-				await cancelUploadSession(worldId, uploadId)
+				await finishCancellation()
 				return 'cancelled'
 			}
 
@@ -147,7 +174,7 @@ export function useUploadSessionUpload(options: {
 
 			await uploadHandle.promise
 			if (cancelled) {
-				await cancelUploadSession(worldId, uploadId)
+				await finishCancellation()
 				return 'cancelled'
 			}
 
@@ -157,7 +184,9 @@ export function useUploadSessionUpload(options: {
 			return 'completed'
 		} catch (error) {
 			if (uploadId && !finalized) {
-				await cancelUploadSession(worldId, uploadId)
+				await finishCancellation()
+			} else if (cancelled) {
+				completeCancel()
 			}
 			if (cancelled || (error instanceof Error && error.message === 'Upload cancelled')) {
 				return 'cancelled'
@@ -169,6 +198,9 @@ export function useUploadSessionUpload(options: {
 			}
 			if (options.cancelUpload.value === cancelCurrentUpload) {
 				options.cancelUpload.value = null
+			}
+			if (cancelled) {
+				completeCancel()
 			}
 			resetUploadState()
 		}

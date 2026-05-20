@@ -128,7 +128,11 @@ const {
 	staleTime: 30_000,
 })
 
-const items = computed<FileItem[]>(() => directoryData.value?.items ?? [])
+function isVisibleFileItem(item: Kyros.Files.v0.DirectoryItem) {
+	return !item.path.split('/').includes('.modrinth-staged')
+}
+
+const items = computed<FileItem[]>(() => (directoryData.value?.items ?? []).filter(isVisibleFileItem))
 
 const filesReadyPending = useReadyState({ isLoading, data: directoryData })
 
