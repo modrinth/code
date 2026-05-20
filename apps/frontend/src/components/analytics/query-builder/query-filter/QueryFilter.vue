@@ -20,19 +20,22 @@
 		</template>
 
 		<template #option-right="{ category, option }">
-			<span
-				v-if="category.key === 'version_id' && getProjectVersionOptionProjectMetadata(option.value)"
-				v-tooltip="getProjectVersionOptionProjectMetadata(option.value)?.name"
-				class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
-			>
-				<img
-					v-if="getProjectVersionOptionProjectMetadata(option.value)?.iconUrl"
-					:src="getProjectVersionOptionProjectMetadata(option.value)?.iconUrl"
-					:alt="`${getProjectVersionOptionProjectMetadata(option.value)?.name} Icon`"
-					class="h-6 w-6 rounded object-cover"
-				/>
-				<BoxIcon v-else class="h-full w-full" />
-			</span>
+			<template v-if="category.key === 'version_id'">
+				<span
+					v-for="metadata in projectVersionOptionProjectMetadataById.get(option.value) ?? []"
+					:key="`${option.value}-${metadata.name}`"
+					v-tooltip="metadata.name"
+					class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+				>
+					<img
+						v-if="metadata.iconUrl"
+						:src="metadata.iconUrl"
+						:alt="`${metadata.name} Icon`"
+						class="h-6 w-6 rounded object-cover"
+					/>
+					<BoxIcon v-else class="h-full w-full" />
+				</span>
+			</template>
 		</template>
 
 		<template #category-footer="{ category, setSelectedValues, closeMenu }">
@@ -251,6 +254,34 @@ const effectiveSelectedProjectCount = computed(
 		).length,
 )
 const showProjectVersionProjectIcons = computed(() => effectiveSelectedProjectCount.value > 1)
+const projectVersionOptionProjectMetadataById = computed(() => {
+	const metadataById = new Map<string, ProjectVersionProjectOptionMetadata[]>()
+
+	if (!showProjectVersionProjectIcons.value) {
+		return metadataById
+	}
+
+	const versionIds = new Set([
+		...filterOptions.value.versionIds,
+		...selectedFilters.value.version_id,
+	])
+	for (const versionId of versionIds) {
+		const projectName = getVersionProjectName(versionId)
+		if (!projectName) {
+			continue
+		}
+
+		const metadata: ProjectVersionProjectOptionMetadata = { name: projectName }
+		const iconUrl = getVersionProjectIconUrl(versionId)
+		if (iconUrl) {
+			metadata.iconUrl = iconUrl
+		}
+
+		metadataById.set(versionId, [metadata])
+	}
+
+	return metadataById
+})
 const defaultSelectedBreakdown = computed(() =>
 	getDefaultAnalyticsBreakdownPreset(selectedProjectIds.value),
 )
@@ -473,9 +504,8 @@ const downloadReasonFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 const versionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.versionIds
 		.map((versionId) => {
-			const projectName = showProjectVersionProjectIcons.value
-				? getVersionProjectName(versionId)
-				: undefined
+			const projectName =
+				projectVersionOptionProjectMetadataById.value.get(versionId)?.[0]?.name
 
 			return {
 				value: versionId,
@@ -603,22 +633,6 @@ function getDownloadReasonFilterOptionLabel(reason: string): string {
 		default:
 			return reason
 	}
-}
-
-function getProjectVersionOptionProjectMetadata(
-	versionId: string,
-): ProjectVersionProjectOptionMetadata | undefined {
-	if (!showProjectVersionProjectIcons.value) {
-		return undefined
-	}
-
-	const projectName = getVersionProjectName(versionId)
-	return projectName
-		? {
-				name: projectName,
-				iconUrl: getVersionProjectIconUrl(versionId),
-			}
-		: undefined
 }
 
 function getDateTimestamp(date: string | undefined): number | undefined {
