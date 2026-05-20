@@ -63,7 +63,6 @@ const ANALYTICS_TIME_SLICES_GC_TIME_MS = 30 * 1000
 const ANALYTICS_PREFETCH_GC_TIME_MS = 15 * 1000
 const ANALYTICS_FILTER_OPTIONS_GC_TIME_MS = 60 * 1000
 const ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE = 20
-const ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS = 150
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -2058,31 +2057,31 @@ export function createAnalyticsDashboardContext(
 		isFetched: hasFetchedAnalyticsFilterOptions,
 		isFetching: isAnalyticsFilterOptionsFetching,
 	} = useQuery({
-			queryKey: computed(() => [
-				'analytics',
-				'dashboard',
-				analyticsQueryUserId.value,
-				'filter-options',
-				'analytics-fields',
-				sortedSelectedProjectIds.value,
-				queryRefreshTimestamp.value,
-			]),
-			queryFn: async () => {
-				const requests = (analyticsFilterOptionsRequests.value ?? []).filter(
-					isAnalyticsFetchRequestReady,
-				)
-				const timeSliceGroups = await Promise.all(
-					requests.map((request) =>
-						fetchAnalyticsTimeSlices(request, (nextRequest) =>
-							client.labrinth.analytics_v3.fetch(nextRequest),
-						),
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			analyticsQueryUserId.value,
+			'filter-options',
+			'analytics-fields',
+			sortedSelectedProjectIds.value,
+			queryRefreshTimestamp.value,
+		]),
+		queryFn: async () => {
+			const requests = (analyticsFilterOptionsRequests.value ?? []).filter(
+				isAnalyticsFetchRequestReady,
+			)
+			const timeSliceGroups = await Promise.all(
+				requests.map((request) =>
+					fetchAnalyticsTimeSlices(request, (nextRequest) =>
+						client.labrinth.analytics_v3.fetch(nextRequest),
 					),
-				)
-				return timeSliceGroups.flat()
-			},
-			enabled: computed(() => analyticsFilterOptionsRequests.value !== null),
-			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
-		})
+				),
+			)
+			return timeSliceGroups.flat()
+		},
+		enabled: computed(() => analyticsFilterOptionsRequests.value !== null),
+		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+	})
 
 	const { data: filterOptionProjectVersions, isFetched: hasFetchedFilterOptionProjectVersions } =
 		useQuery({

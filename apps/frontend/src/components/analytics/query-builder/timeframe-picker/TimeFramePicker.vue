@@ -422,7 +422,7 @@ function handleTimeframePresetSelect(option: ComboboxOption<AnalyticsTimeframePr
 function hasCompleteDraftCustomDateRange() {
 	return Boolean(
 		getDateFromInputValue(draftSelectedCustomTimeframeStartDate.value) &&
-			getDateFromInputValue(draftSelectedCustomTimeframeEndDate.value),
+		getDateFromInputValue(draftSelectedCustomTimeframeEndDate.value),
 	)
 }
 
@@ -444,10 +444,7 @@ watch(
 		) {
 			return
 		}
-		if (
-			draftSelectedTimeframeMode.value === 'custom_range' &&
-			!hasCompleteDraftCustomDateRange()
-		) {
+		if (draftSelectedTimeframeMode.value === 'custom_range' && !hasCompleteDraftCustomDateRange()) {
 			return
 		}
 
