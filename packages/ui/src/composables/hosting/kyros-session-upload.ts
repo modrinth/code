@@ -95,6 +95,7 @@ export function useUploadSessionUpload(options: {
 		try {
 			await options.client.kyros.upload_sessions_v1.cancel(options.scope, worldId, uploadId)
 		} catch {
+			// ...
 		}
 	}
 
@@ -102,9 +103,7 @@ export function useUploadSessionUpload(options: {
 		await activeUploadCancel?.()
 	}
 
-	async function uploadFiles(
-		files: UploadSessionUploadFile[],
-	): Promise<UploadSessionUploadResult> {
+	async function uploadFiles(files: UploadSessionUploadFile[]): Promise<UploadSessionUploadResult> {
 		if (files.length === 0) return 'cancelled'
 		if (options.uploadState.value.isUploading) return 'cancelled'
 		const worldId = options.worldId.value
