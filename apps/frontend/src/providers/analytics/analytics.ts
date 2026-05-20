@@ -63,6 +63,7 @@ const ANALYTICS_TIME_SLICES_GC_TIME_MS = 30 * 1000
 const ANALYTICS_PREFETCH_GC_TIME_MS = 15 * 1000
 const ANALYTICS_FILTER_OPTIONS_GC_TIME_MS = 60 * 1000
 const ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE = 20
+const ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS = 300
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -331,7 +332,7 @@ function mergeAnalyticsTimeSlices(
 }
 
 function waitForAnalyticsFetchBatchDelay(): Promise<void> {
-	return new Promise((resolve) => setTimeout(resolve, 50))
+	return new Promise((resolve) => setTimeout(resolve, ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS))
 }
 
 async function fetchAnalyticsTimeSlices(
