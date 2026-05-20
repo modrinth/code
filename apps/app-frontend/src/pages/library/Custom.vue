@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import GridDisplay from '@/components/GridDisplay.vue'
 
 defineProps({
@@ -10,7 +10,7 @@ defineProps({
 </script>
 <template>
 	<GridDisplay
-		v-if="instances.length > 0"
+		v-if="instances && instances.length > 0"
 		label="Instances"
 		:instances="instances.filter((i) => !i.linked_data)"
 	/>

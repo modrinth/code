@@ -2,7 +2,7 @@
 	<label
 		:class="[
 			'flex flex-col items-center justify-center  cursor-pointer border-2 border-dashed bg-surface-4 text-contrast transition-colors',
-			size === 'small' ? 'p-5' : 'p-12',
+			size === 'small' ? 'p-5' : size === 'medium' ? 'p-10' : 'p-12',
 			size === 'small' ? 'gap-2' : 'gap-4',
 			size === 'small' ? 'rounded-2xl' : 'rounded-3xl',
 			isDragOver ? 'border-purple' : 'border-surface-5',
@@ -50,6 +50,7 @@ import { FolderUpIcon } from '@modrinth/assets'
 import { fileIsValid } from '@modrinth/utils'
 import { ref } from 'vue'
 
+import { useFormatBytes } from '../../composables'
 import { injectNotificationManager } from '../../providers'
 
 const { addNotification } = injectNotificationManager()
@@ -69,14 +70,16 @@ const props = withDefaults(
 		maxSize?: number | null
 		shouldAlwaysReset?: boolean
 		disabled?: boolean
-		size?: 'small' | 'standard'
+		size?: 'small' | 'medium' | 'large'
 	}>(),
 	{
 		primaryPrompt: 'Drop files here or click to upload',
 		secondaryPrompt: 'Only supported file types will be accepted',
-		size: 'standard',
+		size: 'large',
 	},
 )
+
+const formatBytes = useFormatBytes()
 
 const files = ref<File[]>([])
 
@@ -129,7 +132,7 @@ function addFiles(incoming: FileList, shouldNotReset = false) {
 		alertOnInvalid: true,
 	}
 
-	files.value = files.value.filter((file) => fileIsValid(file, validationOptions))
+	files.value = files.value.filter((file) => fileIsValid(file, validationOptions, formatBytes))
 
 	if (files.value.length > 0) {
 		emit('change', files.value)

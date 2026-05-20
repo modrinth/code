@@ -1,8 +1,8 @@
+use crate::database::PgPool;
 use actix_web::{HttpResponse, post, web};
 use ariadne::ids::UserId;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use tracing::warn;
 
 use crate::database::models::users_redeemals::{
@@ -14,7 +14,7 @@ use crate::routes::ApiError;
 use crate::util::guards::medal_key_guard;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("medal").service(verify).service(redeem));
+    cfg.service(web::scope("/medal").service(verify).service(redeem));
 }
 
 #[derive(Deserialize)]
@@ -63,7 +63,7 @@ pub async fn redeem(
 
     let maybe_fields =
         RedeemalLookupFields::redeemal_status_by_username_and_offer(
-            &mut *txn,
+            &mut txn,
             &username,
             Offer::Medal,
         )
@@ -93,7 +93,7 @@ pub async fn redeem(
         n_attempts: 0,
     };
 
-    redeemal.insert(&mut *txn).await?;
+    redeemal.insert(&mut txn).await?;
 
     txn.commit().await?;
 

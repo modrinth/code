@@ -1,5 +1,8 @@
 import MarkdownIt from 'markdown-it'
-import { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } from 'xss'
+import xss from 'xss'
+
+// @ts-expect-error xss types don't reflect CJS default export shape
+const { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } = xss
 
 export const configuredXss = new FilterXSS({
 	whiteList: {
@@ -46,22 +49,26 @@ export const configuredXss = new FilterXSS({
 				},
 			]
 
-			const url = new URL(value)
+			try {
+				const url = new URL(value)
 
-			for (const source of allowedSources) {
-				if (!source.url.test(url.href)) {
-					continue
-				}
-
-				const newSearchParams = new URLSearchParams()
-				url.searchParams.forEach((value, key) => {
-					if (!source.allowedParameters.some((param) => param.test(`${key}=${value}`))) {
-						newSearchParams.delete(key)
+				for (const source of allowedSources) {
+					if (!source.url.test(url.href)) {
+						continue
 					}
-				})
 
-				url.search = newSearchParams.toString()
-				return `${name}="${escapeAttrValue(url.toString())}"`
+					const newSearchParams = new URLSearchParams(url.searchParams)
+					url.searchParams.forEach((value, key) => {
+						if (!source.allowedParameters.some((param) => param.test(`${key}=${value}`))) {
+							newSearchParams.delete(key)
+						}
+					})
+
+					url.search = newSearchParams.toString()
+					return `${name}="${escapeAttrValue(url.toString())}"`
+				}
+			} catch {
+				// ..
 			}
 		}
 
@@ -79,7 +86,7 @@ export const configuredXss = new FilterXSS({
 	safeAttrValue(tag, name, value, cssFilter) {
 		if (
 			(tag === 'img' || tag === 'video' || tag === 'audio' || tag === 'source') &&
-			(name === 'src' || name === 'srcset') &&
+			(name === 'src' || name === 'srcset' || name === 'poster') &&
 			!value.startsWith('data:')
 		) {
 			try {
@@ -106,7 +113,12 @@ export const configuredXss = new FilterXSS({
 					'bstats.org',
 				]
 
-				if (!allowedHostnames.includes(url.hostname)) {
+				const allowedHostnameSuffixes = ['.github.io']
+
+				if (
+					!allowedHostnames.includes(url.hostname) &&
+					!allowedHostnameSuffixes.some((suffix) => url.hostname.endsWith(suffix))
+				) {
 					return safeAttrValue(
 						tag,
 						name,

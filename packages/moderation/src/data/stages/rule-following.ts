@@ -8,7 +8,7 @@ const ruleFollowing: Stage = {
 	id: 'rule-following',
 	icon: ListBulletedIcon,
 	guidance_url:
-		'https://www.notion.so/Creator-Communication-Guide-1b65ee711bf080ec9337e3ccdded146c',
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080709084f6269835607f',
 	navigate: '/moderation',
 	actions: [
 		{
@@ -28,6 +28,35 @@ const ruleFollowing: Stage = {
 				},
 			],
 		} as ButtonAction,
+		{
+			id: 'paid_access_server',
+			type: 'button',
+			label: 'Paid access server',
+			weight: 0,
+			suggestedStatus: 'rejected',
+			severity: 'critical',
+			shouldShow(project, projectV3) {
+				return !!projectV3?.minecraft_server
+			},
+			message: async () => (await import('../messages/paid-access-server.md?raw')).default,
+		},
+		{
+			id: 'excessive_languages',
+			type: 'button',
+			label: 'Excessive languages',
+			weight: 0,
+			suggestedStatus: 'flagged',
+			severity: 'low',
+			shouldShow(project, projectV3) {
+				return (
+					!!projectV3?.minecraft_server &&
+					!!projectV3?.minecraft_server?.languages?.length &&
+					projectV3?.minecraft_server?.languages?.length > 4
+				)
+			},
+			message: async () =>
+				(await import('../messages/misc-metadata/excessive_languages-server.md?raw')).default,
+		},
 	],
 }
 

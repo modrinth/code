@@ -1,5 +1,5 @@
+use crate::database::PgPool;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 use crate::database::models::DBUserId;
 

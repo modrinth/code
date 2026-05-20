@@ -25,15 +25,14 @@
 					</span>
 					<span>Server IDs (one per line or comma-separated.)</span>
 				</label>
-				<div class="textarea-wrapper">
-					<textarea
-						id="server-ids"
-						v-model="serverIdsInput"
-						rows="4"
-						class="w-full bg-surface-3"
-						placeholder="123e4569-e89b-12d3-a456-426614174005&#10;123e9569-e89b-12d3-a456-413678919876"
-					/>
-				</div>
+				<StyledInput
+					id="server-ids"
+					v-model="serverIdsInput"
+					multiline
+					:rows="4"
+					input-class="bg-surface-3"
+					placeholder="123e4569-e89b-12d3-a456-426614174005&#10;123e9569-e89b-12d3-a456-413678919876"
+				/>
 				<span v-if="parsedServerIds.length" class="text-sm text-secondary">
 					{{ parsedServerIds.length }} server{{ parsedServerIds.length === 1 ? '' : 's' }} selected
 				</span>
@@ -46,20 +45,19 @@
 							Node hostnames
 							<span class="text-brand-red">*</span>
 						</span>
-						<span>Add nodes to transfer.</span>
+						<span>Add nodes to transfer (comma or space-separated).</span>
 					</label>
 					<div class="flex items-center gap-2">
-						<input
+						<StyledInput
 							id="node-input"
 							v-model="nodeInput"
-							class="w-40"
-							type="text"
+							wrapper-class="w-64"
 							autocomplete="off"
-							placeholder="us-vin200"
-							@keydown.enter.prevent="addNode"
+							placeholder="us-vin200, us-vin201"
+							@keydown.enter.prevent="addNodes"
 						/>
 						<ButtonStyled color="blue" color-fill="text">
-							<button class="shrink-0" @click="addNode">
+							<button class="shrink-0" @click="addNodes">
 								<PlusIcon />
 								Add
 							</button>
@@ -88,11 +86,10 @@
 						<span class="text-lg font-semibold text-contrast">Tag transferred nodes</span>
 						<span>Optional tag to add to the transferred nodes.</span>
 					</label>
-					<input
+					<StyledInput
 						id="tag-nodes"
 						v-model="tagNodes"
-						class="max-w-[12rem]"
-						type="text"
+						wrapper-class="max-w-[12rem]"
 						autocomplete="off"
 					/>
 				</div>
@@ -117,11 +114,10 @@
 					<span>Optional preferred node tags for node selection.</span>
 				</label>
 				<div class="flex items-center gap-2">
-					<input
+					<StyledInput
 						id="tag-input"
 						v-model="tagInput"
-						class="w-40"
-						type="text"
+						wrapper-class="w-40"
 						autocomplete="off"
 						placeholder="ovh-gen4"
 						@keydown.enter.prevent="addTag"
@@ -151,11 +147,11 @@
 					:format-label="(item) => scheduleOptionLabels[item]"
 					:capitalize="false"
 				/>
-				<input
+				<StyledInput
 					v-if="scheduleOption === 'later'"
 					v-model="scheduledDate"
 					type="datetime-local"
-					class="mt-2 max-w-[16rem]"
+					wrapper-class="mt-2 max-w-[16rem]"
 					autocomplete="off"
 				/>
 			</div>
@@ -168,15 +164,14 @@
 					</span>
 					<span>Provide a reason for this transfer batch.</span>
 				</label>
-				<div class="textarea-wrapper">
-					<textarea
-						id="reason"
-						v-model="reason"
-						rows="2"
-						class="w-full bg-surface-3"
-						placeholder="Node maintenance scheduled"
-					/>
-				</div>
+				<StyledInput
+					id="reason"
+					v-model="reason"
+					multiline
+					:rows="2"
+					input-class="bg-surface-3"
+					placeholder="Node maintenance scheduled"
+				/>
 			</div>
 
 			<div class="flex gap-2">
@@ -205,6 +200,7 @@ import {
 	Combobox,
 	injectNotificationManager,
 	NewModal,
+	StyledInput,
 	TagItem,
 	Toggle,
 } from '@modrinth/ui'
@@ -282,18 +278,37 @@ function hide() {
 	modal.value?.hide()
 }
 
-function addNode() {
-	const v = nodeInput.value.trim()
-	if (!v) return
-	if (!nodeHostnames.value.includes(v)) {
+function addNodes() {
+	const input = nodeInput.value.trim()
+	if (!input) return
+
+	const nodes = input
+		.split(/[,\s]+/)
+		.map((s) => s.trim())
+		.filter((s) => s.length > 0)
+
+	const unknownNodes: string[] = []
+	const addedNodes: string[] = []
+
+	for (const v of nodes) {
+		if (!nodeHostnames.value.includes(v)) {
+			unknownNodes.push(v)
+			continue
+		}
+		if (!selectedNodes.value.includes(v)) {
+			selectedNodes.value.push(v)
+			addedNodes.push(v)
+		}
+	}
+
+	if (unknownNodes.length > 0) {
 		addNotification({
-			title: 'Unknown node',
-			text: "This hostname doesn't exist",
+			title: `Unknown node${unknownNodes.length > 1 ? 's' : ''}`,
+			text: unknownNodes.join(', '),
 			type: 'error',
 		})
-		return
 	}
-	if (!selectedNodes.value.includes(v)) selectedNodes.value.push(v)
+
 	nodeInput.value = ''
 }
 

@@ -56,21 +56,19 @@
 			</span>
 			<div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
 				<div class="flex flex-1 flex-col gap-2.5">
-					<input
+					<StyledInput
 						v-model="formData.bankAccountOwnerFirstName"
-						type="text"
 						:placeholder="formatMessage(formFieldPlaceholders.firstNamePlaceholder)"
 						autocomplete="given-name"
-						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+						wrapper-class="w-full"
 					/>
 				</div>
 				<div class="flex flex-1 flex-col gap-2.5">
-					<input
+					<StyledInput
 						v-model="formData.bankAccountOwnerLastName"
-						type="text"
 						:placeholder="formatMessage(formFieldPlaceholders.lastNamePlaceholder)"
 						autocomplete="family-name"
-						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+						wrapper-class="w-full"
 					/>
 				</div>
 			</div>
@@ -93,17 +91,16 @@
 				class="h-10"
 			/>
 
-			<input
+			<StyledInput
 				v-else
 				v-model="formData.bankName"
-				type="text"
 				:placeholder="formatMessage(formFieldPlaceholders.bankNamePlaceholder)"
 				autocomplete="off"
-				class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+				wrapper-class="w-full"
 			/>
 		</div>
 
-		<div v-for="field in selectedRail?.fields" :key="field.name" class="flex flex-col gap-2.5">
+		<div v-for="field in visibleFields" :key="field.name" class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(field.label) }}
@@ -111,14 +108,14 @@
 				</span>
 			</label>
 
-			<input
+			<StyledInput
 				v-if="['text', 'email', 'tel'].includes(field.type)"
 				v-model="formData[field.name]"
-				:type="field.type"
+				:type="field.type === 'tel' ? undefined : field.type === 'text' ? undefined : field.type"
+				:inputmode="field.type === 'tel' ? 'tel' : undefined"
 				:placeholder="field.placeholder ? formatMessage(field.placeholder) : undefined"
-				:pattern="field.pattern"
 				:autocomplete="field.autocomplete || 'off'"
-				class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+				wrapper-class="w-full"
 			/>
 
 			<Combobox
@@ -134,11 +131,11 @@
 				class="h-10"
 			/>
 
-			<input
+			<StyledInput
 				v-else-if="field.type === 'date'"
 				v-model="formData[field.name]"
 				type="date"
-				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+				wrapper-class="w-full"
 			/>
 
 			<span v-if="field.helpText" class="text-sm text-secondary">
@@ -162,12 +159,11 @@
 							<span v-if="dynamicDocumentNumberField.required" class="text-red">*</span>
 						</span>
 					</label>
-					<input
+					<StyledInput
 						v-model="formData.documentNumber"
-						:type="dynamicDocumentNumberField.type"
 						:placeholder="dynamicDocumentNumberField.placeholder"
 						autocomplete="off"
-						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+						wrapper-class="w-full"
 					/>
 				</div>
 			</div>
@@ -244,6 +240,7 @@ import {
 	getCurrencyIcon,
 	IntlFormatted,
 	normalizeChildren,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'
@@ -401,6 +398,26 @@ const isBusinessEntity = computed(() => {
 	return providerDataValue.kycData?.type === 'business'
 })
 
+const visibleFields = computed(() => {
+	const rail = selectedRail.value
+	if (!rail) return []
+
+	return rail.fields.filter((field) => {
+		if (!field.dependsOn) return true
+
+		const { field: dependsOnField, value: dependsOnValue } = field.dependsOn
+		const currentValue = formData.value[dependsOnField]
+
+		if (!currentValue) return false
+
+		if (Array.isArray(dependsOnValue)) {
+			return dependsOnValue.includes(currentValue)
+		} else {
+			return currentValue === dependsOnValue
+		}
+	})
+})
+
 const allRequiredFieldsFilled = computed(() => {
 	const rail = selectedRail.value
 	if (!rail) return false
@@ -410,7 +427,7 @@ const allRequiredFieldsFilled = computed(() => {
 
 	if (rail.requiresBankName && !formData.value.bankName) return false
 
-	const requiredFields = rail.fields.filter((f) => f.required)
+	const requiredFields = visibleFields.value.filter((f) => f.required)
 	const allRequiredPresent = requiredFields.every((f) => {
 		const value = formData.value[f.name]
 		return value !== undefined && value !== null && value !== ''

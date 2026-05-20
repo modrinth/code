@@ -25,7 +25,8 @@ const titleSlug: Stage = {
 		return text
 	},
 	icon: BookOpenIcon,
-	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
+	guidance_url:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705',
 	actions: [
 		{
 			id: 'title_useless_info',
@@ -69,6 +70,7 @@ const titleSlug: Stage = {
 						{
 							label: 'Forked project',
 							weight: 112,
+							shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 							message: async () =>
 								(await import('../messages/title/similarities-fork.md?raw')).default,
 						},

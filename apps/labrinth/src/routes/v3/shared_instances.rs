@@ -1,5 +1,6 @@
 use crate::auth::get_user_from_headers;
 use crate::auth::validate::get_maybe_user_from_headers;
+use crate::database::PgPool;
 use crate::database::models::shared_instance_item::{
     DBSharedInstance, DBSharedInstanceUser, DBSharedInstanceVersion,
 };
@@ -21,7 +22,6 @@ use actix_web::web::{Data, Redirect};
 use actix_web::{HttpRequest, HttpResponse, web};
 use futures_util::future::try_join_all;
 use serde::Deserialize;
-use sqlx::PgPool;
 use std::sync::Arc;
 use validator::Validate;
 
@@ -277,7 +277,7 @@ pub async fn shared_instance_edit(
             title,
             id as DBSharedInstanceId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -291,7 +291,7 @@ pub async fn shared_instance_edit(
             public,
             id as DBSharedInstanceId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
     }
 
@@ -538,7 +538,7 @@ async fn delete_instance_version(
         ",
         version_id as DBSharedInstanceVersionId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     sqlx::query!(
@@ -554,7 +554,7 @@ async fn delete_instance_version(
         ",
         instance_id as DBSharedInstanceId,
     )
-    .execute(&mut *transaction)
+    .execute(&mut transaction)
     .await?;
 
     transaction.commit().await?;

@@ -1,4 +1,5 @@
 import 'floating-vue/dist/style.css'
+import 'overlayscrollbars/overlayscrollbars.css'
 
 import * as Sentry from '@sentry/vue'
 import { VueScanPlugin } from '@taijased/vue-render-tracker'
@@ -8,7 +9,9 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import App from '@/App.vue'
+import { overlayScrollbarsDirective } from '@/directives/overlayScrollbars'
 import i18nPlugin from '@/plugins/i18n'
+import i18nDebugPlugin from '@/plugins/i18n-debug'
 import router from '@/routes'
 
 const vueScan = new VueScanPlugin({
@@ -41,8 +44,14 @@ app.use(FloatingVue, {
 			instantMove: true,
 			distance: 8,
 		},
+		'dismissable-prompt': {
+			$extend: 'dropdown',
+			placement: 'bottom-start',
+		},
 	},
 })
 app.use(i18nPlugin)
+app.use(i18nDebugPlugin)
+app.directive('overlay-scrollbars', overlayScrollbarsDirective)
 
 app.mount('#app')

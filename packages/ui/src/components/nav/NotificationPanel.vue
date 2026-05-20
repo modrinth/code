@@ -1,11 +1,11 @@
 <template>
 	<div
-		class="vue-notification-group experimental-styles-within"
+		class="vue-notification-group"
 		:class="{
 			'intercom-present': isIntercomPresent,
 			'location-left': notificationLocation === 'left',
 			'location-right': notificationLocation === 'right',
-			'has-sidebar': hasSidebar,
+			'has-sidebar': hasSidebar && !hasModalActive,
 		}"
 	>
 		<transition-group name="notifs">
@@ -43,7 +43,7 @@
 							<XCircleIcon v-else-if="item.type === 'error'" class="h-6 w-6" />
 							<InfoIcon v-else class="h-6 w-6" />
 						</div>
-						<div class="m-0 text-wrap font-bold text-contrast" v-html="item.title"></div>
+						<div class="m-0 text-wrap font-bold text-contrast">{{ item.title }}</div>
 						<div class="flex items-center gap-1">
 							<div v-if="item.count && item.count > 1" class="text-xs font-bold text-contrast">
 								x{{ item.count }}
@@ -66,13 +66,12 @@
 							</ButtonStyled>
 						</div>
 						<div></div>
-						<div class="col-span-2 text-sm text-primary" v-html="item.text"></div>
+						<div class="col-span-2 text-sm text-primary">{{ item.text }}</div>
 						<template v-if="item.errorCode">
 							<div></div>
-							<div
-								class="m-0 text-wrap text-xs font-medium text-secondary"
-								v-html="item.errorCode"
-							></div>
+							<div class="m-0 text-wrap text-xs font-medium text-secondary">
+								{{ item.errorCode }}
+							</div>
 						</template>
 					</div>
 				</div>
@@ -92,6 +91,8 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+
+import { useModalStack } from '#ui/composables/modal-stack.ts'
 
 import { injectNotificationManager, type WebNotification } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
@@ -152,6 +153,8 @@ onMounted(() => {
 	})
 })
 
+const { hasModal: hasModalActive } = useModalStack()
+
 withDefaults(
 	defineProps<{
 		hasSidebar?: boolean
@@ -168,9 +171,11 @@ withDefaults(
 	bottom: 1.5rem;
 	z-index: 200;
 	width: 450px;
+	transition: bottom 0.25s ease-in-out;
 
 	&.location-right {
 		right: 1.5rem;
+		transition: right 0.25s ease-in-out;
 
 		&.has-sidebar {
 			right: 325px;
@@ -242,5 +247,9 @@ withDefaults(
 	.location-left & {
 		transform: translateX(-100%) scale(0.8);
 	}
+}
+
+body.floating-action-bar-shown .vue-notification-group {
+	bottom: calc(90px);
 }
 </style>

@@ -1,6 +1,4 @@
-use crate::{
-    models::v2::projects::LegacySideType, util::env::parse_strings_from_var,
-};
+use crate::{env::ENV, models::v2::projects::LegacySideType};
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -44,9 +42,7 @@ fn validate_download_url(
             return Err(validator::ValidationError::new("invalid URL"));
         }
 
-        let domains = parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS")
-            .unwrap_or_default();
-        if !domains.contains(
+        if !ENV.WHITELISTED_MODPACK_DOMAINS.contains(
             &url.domain()
                 .ok_or_else(|| validator::ValidationError::new("invalid URL"))?
                 .to_string(),

@@ -1,3 +1,8 @@
 {
-	"extends": "@modrinth/tooling-config/typescript/vue.json"
+	"extends": "@modrinth/tooling-config/typescript/vue.json",
+	"compilerOptions": {
+		"paths": {
+			"#ui/*": ["./src/*"]
+		}
+	}
 }

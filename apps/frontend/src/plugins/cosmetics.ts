@@ -48,6 +48,7 @@ export default defineNuxtPlugin({
 					modpack: 'list',
 					shader: 'gallery',
 					datapack: 'list',
+					server: 'list',
 					user: 'list',
 					collection: 'list',
 				},

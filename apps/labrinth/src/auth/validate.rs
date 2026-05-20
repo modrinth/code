@@ -2,6 +2,7 @@ use super::AuthProvider;
 use crate::auth::AuthenticationError;
 use crate::database::models::{DBUser, user_item};
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::pats::Scopes;
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
@@ -18,7 +19,7 @@ pub async fn get_maybe_user_from_headers<'a, E>(
     required_scopes: Scopes,
 ) -> Result<Option<(Scopes, User)>, AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     if !req.headers().contains_key(AUTHORIZATION) {
         return Ok(None);
@@ -31,6 +32,7 @@ where
         executor,
         redis,
         session_queue,
+        false,
     )
     .await?
     else {
@@ -52,7 +54,7 @@ pub async fn get_full_user_from_headers<'a, E>(
     required_scopes: Scopes,
 ) -> Result<(Scopes, DBUser), AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     let (scopes, db_user) = get_user_record_from_bearer_token(
         req,
@@ -60,6 +62,7 @@ where
         executor,
         redis,
         session_queue,
+        false,
     )
     .await?
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -80,7 +83,7 @@ pub async fn get_user_from_headers<'a, E>(
     required_scopes: Scopes,
 ) -> Result<(Scopes, User), AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     let (scopes, db_user) = get_full_user_from_headers(
         req,
@@ -94,15 +97,41 @@ where
     Ok((scopes, User::from_full(db_user)))
 }
 
+pub async fn get_user_from_bearer_token<'a, E>(
+    req: &HttpRequest,
+    token: Option<&str>,
+    executor: E,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    allow_expired: bool,
+) -> Result<(Scopes, User), AuthenticationError>
+where
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
+{
+    let (scopes, db_user) = get_user_record_from_bearer_token(
+        req,
+        token,
+        executor,
+        redis,
+        session_queue,
+        allow_expired,
+    )
+    .await?
+    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+    Ok((scopes, User::from_full(db_user)))
+}
+
 pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
     req: &HttpRequest,
     token: Option<&str>,
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
+    allow_expired: bool,
 ) -> Result<Option<(Scopes, user_item::DBUser)>, AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     let token = if let Some(token) = token {
         token
@@ -119,7 +148,7 @@ where
                 .await?
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-            if pat.expires < Utc::now() {
+            if !allow_expired && pat.expires < Utc::now() {
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
@@ -138,7 +167,7 @@ where
                 .await?
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-            if session.expires < Utc::now() {
+            if !allow_expired && session.expires < Utc::now() {
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
@@ -146,7 +175,7 @@ where
                 user_item::DBUser::get_id(session.user_id, executor, redis)
                     .await?;
 
-            let rate_limit_ignore = dotenvy::var("RATE_LIMIT_IGNORE_KEY")?;
+            let rate_limit_ignore = &ENV.RATE_LIMIT_IGNORE_KEY;
             if req
                 .headers()
                 .get("x-ratelimit-key")
@@ -168,7 +197,7 @@ where
                     .await?
                     .ok_or(AuthenticationError::InvalidCredentials)?;
 
-            if access_token.expires < Utc::now() {
+            if !allow_expired && access_token.expires < Utc::now() {
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
@@ -227,7 +256,7 @@ pub async fn check_is_moderator_from_headers<'a, 'b, E>(
     required_scopes: Scopes,
 ) -> Result<User, AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     let user = get_user_from_headers(
         req,

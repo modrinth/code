@@ -21,10 +21,10 @@
 				</span>
 			</div>
 		</div>
-		<ButtonStyled color="medal-promo" type="outlined" size="large" class="z-10 my-auto mt-2">
+		<ButtonStyled color="medal-promo" type="outlined" size="large">
 			<nuxt-link
 				to="https://medal.tv/modrinth"
-				class="z-10 flex w-full items-center justify-center gap-1 md:mt-0 md:w-auto"
+				class="z-10 my-auto mt-2 flex w-full items-center justify-center gap-1 md:mt-0 md:w-auto"
 				>{{ formatMessage(messages.learnMoreButton) }} <ExternalIcon
 			/></nuxt-link>
 		</ButtonStyled>
@@ -49,7 +49,7 @@ const messages = defineMessages({
 	info: {
 		id: 'hosting-marketing.medal.info',
 		defaultMessage:
-			'Try a free <orange>3GB server</orange> for 5 days powered by <orange>Medal</orange>',
+			'Try a free <orange>3 GB server</orange> for 5 days powered by <orange>Medal</orange>',
 	},
 	textSecondary: {
 		id: 'hosting-marketing.medal.text-secondary',

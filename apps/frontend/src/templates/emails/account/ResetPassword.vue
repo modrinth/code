@@ -11,7 +11,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold"> Reset your password </Heading>
 
-		<Text class="text-muted text-base">Hi {user.name},</Text>
+		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
 			Please visit the link below to reset your password. If you did not request for your password
 			to be reset, you can safely ignore this email.

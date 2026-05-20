@@ -13,91 +13,101 @@
 					{{ formatMessage(messages.twoFactorCodeLabelDescription) }}
 				</span>
 			</label>
-			<input
+			<StyledInput
 				id="two-factor-code"
 				v-model="twoFactorCode"
-				maxlength="11"
-				type="text"
+				:maxlength="11"
 				inputmode="numeric"
 				:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
 				autocomplete="one-time-code"
-				autofocus
 				@keyup.enter="begin2FASignIn"
 			/>
 
-			<button class="btn btn-primary continue-btn" @click="begin2FASignIn">
-				{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
-			</button>
+			<ButtonStyled color="brand">
+				<button class="continue-btn" @click="begin2FASignIn">
+					{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
+				</button>
+			</ButtonStyled>
 		</template>
 		<template v-else>
 			<h1>{{ formatMessage(messages.signInWithLabel) }}</h1>
 
 			<section class="third-party">
-				<a class="btn" :href="getAuthUrl('discord', redirectTarget)">
-					<DiscordColorIcon />
-					<span>Discord</span>
-				</a>
-				<a class="btn" :href="getAuthUrl('github', redirectTarget)">
-					<GitHubColorIcon />
-					<span>GitHub</span>
-				</a>
-				<a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-					<MicrosoftColorIcon />
-					<span>Microsoft</span>
-				</a>
-				<a class="btn" :href="getAuthUrl('google', redirectTarget)">
-					<GoogleColorIcon />
-					<span>Google</span>
-				</a>
-				<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-					<SteamColorIcon />
-					<span>Steam</span>
-				</a>
-				<a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-					<GitLabColorIcon />
-					<span>GitLab</span>
-				</a>
+				<ButtonStyled>
+					<a :href="getAuthUrl('discord', redirectTarget)">
+						<DiscordColorIcon />
+						<span>Discord</span>
+					</a>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a :href="getAuthUrl('github', redirectTarget)">
+						<GitHubColorIcon />
+						<span>GitHub</span>
+					</a>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a :href="getAuthUrl('microsoft', redirectTarget)">
+						<MicrosoftColorIcon />
+						<span>Microsoft</span>
+					</a>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a :href="getAuthUrl('google', redirectTarget)">
+						<GoogleColorIcon />
+						<span>Google</span>
+					</a>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a :href="getAuthUrl('steam', redirectTarget)">
+						<SteamColorIcon />
+						<span>Steam</span>
+					</a>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a :href="getAuthUrl('gitlab', redirectTarget)">
+						<GitLabColorIcon />
+						<span>GitLab</span>
+					</a>
+				</ButtonStyled>
 			</section>
 
 			<h1>{{ formatMessage(messages.usePasswordLabel) }}</h1>
 
 			<section class="auth-form">
-				<div class="iconified-input">
-					<label for="email" hidden>{{ formatMessage(messages.emailUsernameLabel) }}</label>
-					<MailIcon />
-					<input
-						id="email"
-						v-model="email"
-						type="text"
-						inputmode="email"
-						autocomplete="username"
-						class="auth-form__input"
-						:placeholder="formatMessage(messages.emailUsernameLabel)"
-					/>
-				</div>
+				<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
+				<StyledInput
+					id="email"
+					v-model="email"
+					:icon="MailIcon"
+					type="text"
+					inputmode="email"
+					autocomplete="username"
+					:placeholder="formatMessage(commonMessages.emailUsernameLabel)"
+					wrapper-class="w-full"
+				/>
 
-				<div class="iconified-input">
-					<label for="password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
-					<KeyIcon />
-					<input
-						id="password"
-						v-model="password"
-						type="password"
-						autocomplete="current-password"
-						class="auth-form__input"
-						:placeholder="formatMessage(messages.passwordLabel)"
-					/>
-				</div>
+				<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
+				<StyledInput
+					id="password"
+					v-model="password"
+					:icon="KeyIcon"
+					type="password"
+					autocomplete="current-password"
+					:placeholder="formatMessage(commonMessages.passwordLabel)"
+					wrapper-class="w-full"
+				/>
 
-				<HCaptcha ref="captcha" v-model="token" />
+				<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
 
-				<button
-					class="btn btn-primary continue-btn centered-btn"
-					:disabled="!token"
-					@click="beginPasswordSignIn()"
-				>
-					{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
-				</button>
+				<ButtonStyled color="brand">
+					<button
+						class="continue-btn centered-btn"
+						:disabled="globals?.captcha_enabled ? !token : false"
+						@click="beginPasswordSignIn()"
+					>
+						{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
+					</button>
+				</ButtonStyled>
 
 				<div class="auth-form__additional-options">
 					<IntlFormatted :message-id="messages.additionalOptionsLabel">
@@ -143,16 +153,22 @@ import {
 	SteamColorIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'
 
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -161,14 +177,6 @@ const messages = defineMessages({
 		id: 'auth.sign-in.additional-options',
 		defaultMessage:
 			'<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>',
-	},
-	emailUsernameLabel: {
-		id: 'auth.sign-in.email-username.label',
-		defaultMessage: 'Email or username',
-	},
-	passwordLabel: {
-		id: 'auth.sign-in.password.label',
-		defaultMessage: 'Password',
 	},
 	signInWithLabel: {
 		id: 'auth.sign-in.sign-in-with',
@@ -218,6 +226,18 @@ if (auth.value.user) {
 
 const captcha = ref()
 
+const { data: globals } = useQuery({
+	queryKey: ['auth-globals'],
+	queryFn: async () => {
+		try {
+			return await client.labrinth.globals_internal.get()
+		} catch (err) {
+			console.error('Error fetching globals:', err)
+			return { captcha_enabled: true, tax_compliance_thresholds: {} }
+		}
+	},
+})
+
 const email = ref('')
 const password = ref('')
 const token = ref('')
@@ -227,13 +247,10 @@ const flow = ref(route.query.flow)
 async function beginPasswordSignIn() {
 	startLoading()
 	try {
-		const res = await useBaseFetch('auth/login', {
-			method: 'POST',
-			body: {
-				username: email.value,
-				password: password.value,
-				challenge: token.value,
-			},
+		const res = await client.labrinth.auth_v2.login({
+			username: email.value,
+			password: password.value,
+			challenge: token.value,
 		})
 
 		if (res.flow) {
@@ -256,12 +273,9 @@ const twoFactorCode = ref(null)
 async function begin2FASignIn() {
 	startLoading()
 	try {
-		const res = await useBaseFetch('auth/login/2fa', {
-			method: 'POST',
-			body: {
-				flow: flow.value,
-				code: twoFactorCode.value ? twoFactorCode.value.toString() : twoFactorCode.value,
-			},
+		const res = await client.labrinth.auth_v2.login2FA({
+			flow: flow.value,
+			code: twoFactorCode.value ? twoFactorCode.value.toString() : twoFactorCode.value,
 		})
 
 		await finishSignIn(res.session)
@@ -305,6 +319,7 @@ async function finishSignIn(token) {
 	if (token) {
 		await useAuth(token)
 		await useUser()
+		queryClient.clear()
 	}
 
 	if (route.query.redirect) {

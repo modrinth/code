@@ -13,7 +13,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			A new personal access token has been created
 		</Heading>
 
-		<Text class="text-muted text-base">Hi {user.name},</Text>
+		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
 			A new personal access token, <b>{newpat.token_name}</b>, has been added to your account.
 		</Text>

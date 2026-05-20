@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
+use crate::database::PgPool;
+use crate::env::ENV;
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::get_user_from_headers;
@@ -85,7 +86,7 @@ pub async fn forge_updates(
     )
     .await?;
 
-    versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+    versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
 
     #[derive(Serialize)]
     struct ForgeUpdates {
@@ -94,11 +95,7 @@ pub async fn forge_updates(
     }
 
     let mut response = ForgeUpdates {
-        homepage: format!(
-            "{}/mod/{}",
-            dotenvy::var("SITE_URL").unwrap_or_default(),
-            id
-        ),
+        homepage: format!("{}/mod/{}", ENV.SITE_URL, id),
         promos: HashMap::new(),
     };
 

@@ -1,45 +1,14 @@
+// TODO: migrate to content-install.ts DI
+
 import dayjs from 'dayjs'
-import { defineStore } from 'pinia'
 
-import { trackEvent } from '@/helpers/analytics.js'
-import { get_project, get_version_many } from '@/helpers/cache.js'
-import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
+import { get_project, get_version, get_version_many } from '@/helpers/cache.js'
+import { add_project_from_version, check_installed } from '@/helpers/profile.js'
 import {
-	add_project_from_version,
-	check_installed,
-	get,
-	get_projects,
-	list,
-	remove_project,
-} from '@/helpers/profile.js'
-
-export const useInstall = defineStore('installStore', {
-	state: () => ({
-		installConfirmModal: null,
-		modInstallModal: null,
-		incompatibilityWarningModal: null,
-	}),
-	actions: {
-		setInstallConfirmModal(ref) {
-			this.installConfirmModal = ref
-		},
-		showInstallConfirmModal(project, version_id, onInstall, createInstanceCallback) {
-			this.installConfirmModal.show(project, version_id, onInstall, createInstanceCallback)
-		},
-		setIncompatibilityWarningModal(ref) {
-			this.incompatibilityWarningModal = ref
-		},
-		showIncompatibilityWarningModal(instance, project, versions, selected, onInstall) {
-			this.incompatibilityWarningModal.show(instance, project, versions, selected, onInstall)
-		},
-		setModInstallModal(ref) {
-			this.modInstallModal = ref
-		},
-		showModInstallModal(project, versions, onInstall) {
-			this.modInstallModal.show(project, versions, onInstall)
-		},
-	},
-})
+	add_server_to_profile,
+	get_profile_worlds,
+	resolveManagedServerWorld,
+} from '@/helpers/worlds.ts'
 
 export const findPreferredVersion = (versions, project, instance) => {
 	// When `project` is passed in from this stack trace:
@@ -79,144 +48,156 @@ export const isVersionCompatible = (version, project, instance) => {
 	)
 }
 
-export const install = async (
-	projectId,
-	versionId,
-	instancePath,
-	source,
-	callback = () => {},
-	createInstanceCallback = () => {},
-) => {
-	const project = await get_project(projectId, 'must_revalidate')
+export const installVersionDependencies = async (profile, version, reason, onDepInstalling) => {
+	const projectNames = new Map()
+	const storeProjectName = (p) => {
+		if (p?.id && p.title) projectNames.set(p.id, p.title)
+	}
 
-	if (project.project_type === 'modpack') {
-		const version = versionId ?? project.versions[project.versions.length - 1]
-		const packs = await list()
+	const visitedVersions = new Set()
+	const announcedProjects = new Set()
+	const queuedVersionIds = new Set()
+	const queuedProjectVersions = new Map()
+	const queuedInstalls = []
+	const installedProjectCache = new Map()
 
-		if (packs.length === 0 || !packs.find((pack) => pack.linked_data?.project_id === project.id)) {
-			await packInstall(
-				project.id,
-				version,
-				project.title,
-				project.icon_url,
-				createInstanceCallback,
-			)
-
-			trackEvent('PackInstall', {
-				id: project.id,
-				version_id: version,
-				title: project.title,
-				source,
-			})
-
-			callback(version)
-		} else {
-			const install = useInstall()
-			install.showInstallConfirmModal(project, version, callback, createInstanceCallback)
+	const isProjectInstalled = async (projectId) => {
+		if (!projectId) return false
+		if (installedProjectCache.has(projectId)) {
+			return installedProjectCache.get(projectId)
 		}
-	} else {
-		if (instancePath) {
-			const [instance, instanceProjects, versions] = await Promise.all([
-				await get(instancePath),
-				await get_projects(instancePath),
-				await get_version_many(project.versions, 'must_revalidate'),
-			])
+		const installed = await check_installed(profile.path, projectId)
+		installedProjectCache.set(projectId, installed)
+		return installed
+	}
 
-			const projectVersions = versions.sort(
-				(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
+	const queueInstall = async (projectId, resolvedVersion) => {
+		if (!resolvedVersion?.id) return false
+
+		const versionId = resolvedVersion.id
+		const resolvedProjectId = projectId ?? resolvedVersion.project_id ?? null
+
+		if (resolvedProjectId) {
+			if (await isProjectInstalled(resolvedProjectId)) return false
+
+			const existingVersionId = queuedProjectVersions.get(resolvedProjectId)
+			if (existingVersionId && existingVersionId !== versionId) return false
+			if (existingVersionId === versionId) return false
+		}
+
+		if (queuedVersionIds.has(versionId)) return false
+
+		queuedVersionIds.add(versionId)
+		if (resolvedProjectId) {
+			queuedProjectVersions.set(resolvedProjectId, versionId)
+		}
+		queuedInstalls.push({ versionId, projectId: resolvedProjectId })
+		return true
+	}
+
+	const announceDependency = async (projectId, resolvedVersion) => {
+		if (!onDepInstalling || !projectId) return
+		if (announcedProjects.has(projectId)) return
+
+		const depProject = await get_project(projectId, 'bypass').catch(() => null)
+		if (!depProject) return
+
+		storeProjectName(depProject)
+		onDepInstalling(depProject, resolvedVersion ?? undefined)
+		announcedProjects.add(projectId)
+	}
+
+	const resolveDependency = async (dep) => {
+		let depVersion = null
+		let depProjectId = dep.project_id ?? null
+
+		if (dep.version_id) {
+			depVersion = await get_version(dep.version_id, 'bypass').catch(() => null)
+			if (!depVersion) return null
+
+			depProjectId = depProjectId ?? depVersion.project_id ?? null
+			if (depProjectId && !projectNames.has(depProjectId)) {
+				const p = await get_project(depProjectId, 'bypass').catch(() => null)
+				storeProjectName(p)
+			}
+		} else if (dep.project_id) {
+			const depProject = await get_project(dep.project_id, 'bypass').catch(() => null)
+			if (!depProject) return null
+
+			storeProjectName(depProject)
+
+			const depVersions = await get_version_many(depProject.versions, 'bypass').catch(() => [])
+			depVersion = findPreferredVersion(
+				depVersions.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published)),
+				dep,
+				profile,
 			)
+			if (!depVersion) return null
 
-			let version
-			if (versionId) {
-				version = projectVersions.find((v) => v.id === versionId)
-			} else {
-				version = findPreferredVersion(projectVersions, project, instance)
-			}
-
-			if (!version) {
-				version = projectVersions[0]
-			}
-
-			if (isVersionCompatible(version, project, instance, true)) {
-				for (const [path, file] of Object.entries(instanceProjects)) {
-					if (file.metadata && file.metadata.project_id === project.id) {
-						await remove_project(instance.path, path)
-					}
-				}
-
-				await add_project_from_version(instance.path, version.id)
-				await installVersionDependencies(instance, version)
-
-				trackEvent('ProjectInstall', {
-					loader: instance.loader,
-					game_version: instance.game_version,
-					id: project.id,
-					project_type: project.project_type,
-					version_id: version.id,
-					title: project.title,
-					source,
-				})
-
-				callback(version.id)
-			} else {
-				const install = useInstall()
-				install.showIncompatibilityWarningModal(
-					instance,
-					project,
-					projectVersions,
-					version,
-					callback,
-				)
-			}
+			depProjectId = dep.project_id
 		} else {
-			let versions = (await get_version_many(project.versions)).sort(
-				(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
-			)
+			return null
+		}
 
-			if (versionId) {
-				versions = versions.filter((v) => v.id === versionId)
+		return { depVersion, depProjectId }
+	}
+
+	const collectDependenciesForVersion = async (inputVersion) => {
+		if (!inputVersion?.id || visitedVersions.has(inputVersion.id)) return
+		visitedVersions.add(inputVersion.id)
+
+		if (inputVersion.project_id && !projectNames.has(inputVersion.project_id)) {
+			const p = await get_project(inputVersion.project_id, 'bypass').catch(() => null)
+			storeProjectName(p)
+		}
+
+		for (const dep of inputVersion.dependencies ?? []) {
+			if (dep.dependency_type !== 'required') continue
+			if (dep.project_id === 'P7dR8mSH' && profile.loader === 'quilt') continue
+
+			const resolved = await resolveDependency(dep, inputVersion)
+			if (!resolved) continue
+
+			const { depVersion, depProjectId } = resolved
+			const queued = await queueInstall(depProjectId, depVersion)
+			if (queued && depProjectId) {
+				await announceDependency(depProjectId, depVersion)
 			}
 
-			const install = useInstall()
-			install.showModInstallModal(project, versions, callback)
+			await collectDependenciesForVersion(depVersion)
 		}
 	}
 
-	// If project is modpack:
-	//   - We check all available instances if modpack is already installed
-	//     If true: show confirmation modal
-	//     If false: install it (latest version if passed version is null)
-	// If project is mod:
-	//   - If instance is selected:
-	//        - If project is already installed
-	//          We first uninstall the project
-	//        - If no version is selected, we look check the instance for versions to select based on the versions
-	//            - If there are no versions, we show the incompat modal
-	//        - If a version is selected, and the version is incompatible, we show the incompat modal
-	//   - Version is installed, as well as version dependencies
+	await collectDependenciesForVersion(version)
+
+	if (queuedInstalls.length === 0) return
+
+	const batchSize = 8
+	for (let i = 0; i < queuedInstalls.length; i += batchSize) {
+		const batch = queuedInstalls.slice(i, i + batchSize)
+		await Promise.all(
+			batch.map(async ({ versionId }) => {
+				await add_project_from_version(profile.path, versionId, reason)
+			}),
+		)
+	}
 }
 
-export const installVersionDependencies = async (profile, version) => {
-	for (const dep of version.dependencies) {
-		if (dep.dependency_type !== 'required') continue
-		// disallow fabric api install on quilt
-		if (dep.project_id === 'P7dR8mSH' && profile.loader === 'quilt') continue
-		if (dep.version_id) {
-			if (dep.project_id && (await check_installed(profile.path, dep.project_id))) continue
-			await add_project_from_version(profile.path, dep.version_id)
-		} else {
-			if (dep.project_id && (await check_installed(profile.path, dep.project_id))) continue
+export const getServerAddress = (javaServer) => {
+	if (!javaServer) return null
+	const { address } = javaServer
+	return address
+}
 
-			const depProject = await get_project(dep.project_id, 'must_revalidate')
-
-			const depVersions = (await get_version_many(depProject.versions, 'must_revalidate')).sort(
-				(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
-			)
-
-			const latest = findPreferredVersion(depVersions, dep, profile)
-			if (latest) {
-				await add_project_from_version(profile.path, latest.id)
-			}
+export const ensureManagedServerWorldExists = async (profilePath, serverName, serverAddress) => {
+	if (!profilePath || !serverAddress) return
+	try {
+		const worlds = await get_profile_worlds(profilePath)
+		const managedWorld = resolveManagedServerWorld(worlds, serverName, serverAddress)
+		if (!managedWorld) {
+			await add_server_to_profile(profilePath, serverName, serverAddress, 'prompt')
 		}
+	} catch (err) {
+		console.error('Failed to ensure managed server world exists:', err)
 	}
 }

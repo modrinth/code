@@ -8,7 +8,7 @@
 				:name="dependency.name"
 				:icon="dependency.icon"
 				:dependency-type="dependency.dependencyType"
-				:version-name="dependency.versionName"
+				:version-number="dependency.versionNumber"
 				:hide-remove="disableRemove"
 				@remove="() => removeDependency(index)"
 			/>
@@ -35,7 +35,7 @@ const addedDependencies = computed(() =>
 			if (!dep.project_id) return null
 
 			const dependencyProject = dependencyProjects.value[dep.project_id]
-			const versionName = dependencyVersions.value[dep.version_id || '']?.name ?? ''
+			const versionNumber = dependencyVersions.value[dep.version_id || '']?.version_number ?? ''
 
 			if (!dependencyProject && projectsFetchLoading.value) return null
 
@@ -44,7 +44,7 @@ const addedDependencies = computed(() =>
 				name: dependencyProject?.name,
 				icon: dependencyProject?.icon_url,
 				dependencyType: dep.dependency_type,
-				versionName,
+				versionNumber,
 			}
 		})
 		.filter(Boolean),

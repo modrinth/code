@@ -1,5 +1,5 @@
 <template>
-	<div v-if="project.versions.length > 0" class="flex flex-col gap-3">
+	<div v-if="project.versions?.length > 0" class="flex flex-col gap-3">
 		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
 		<section class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.minecraftJava) }}</h3>
@@ -15,15 +15,22 @@
 		<section v-if="project.project_type !== 'resourcepack'" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.platforms) }}</h3>
 			<div class="flex flex-wrap gap-1">
-				<TagItem
-					v-for="platform in project.loaders"
-					:key="`platform-tag-${platform}`"
-					:action="() => router.push(`/${project.project_type}s?g=categories:${platform}`)"
-					:style="`--_color: var(--color-platform-${platform})`"
-				>
-					<svg v-html="tags.loaders.find((x) => x.name === platform)?.icon"></svg>
-					{{ formatCategory(platform) }}
-				</TagItem>
+				<template v-if="noModpackLoader">
+					<TagItem class="border !border-solid border-surface-5 hover:no-underline">
+						No mod loader
+					</TagItem>
+				</template>
+				<template v-else>
+					<TagItem
+						v-for="platform in project.loaders"
+						:key="`platform-tag-${platform}`"
+						:action="() => router.push(`/${project.project_type}s?g=categories:${platform}`)"
+						:style="`--_color: var(--color-platform-${platform})`"
+					>
+						<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
+						<FormattedTag :tag="platform" enforce-type="loader" />
+					</TagItem>
+				</template>
 			</div>
 		</section>
 		<section v-if="showEnvironments" class="flex flex-col gap-2">
@@ -85,9 +92,17 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
-import type { EnvironmentV3, GameVersionTag, PlatformTag, ProjectV3Partial } from '@modrinth/utils'
-import { formatCategory, getVersionsToDisplay } from '@modrinth/utils'
+import type { Labrinth } from '@modrinth/api-client'
+import {
+	ClientIcon,
+	getLoaderIcon,
+	MonitorSmartphoneIcon,
+	ServerIcon,
+	UserIcon,
+} from '@modrinth/assets'
+import { FormattedTag, TagItem } from '@modrinth/ui'
+import type { EnvironmentV3, GameVersionTag, PlatformTag } from '@modrinth/utils'
+import { getVersionsToDisplay } from '@modrinth/utils'
 import { type Component, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -97,9 +112,10 @@ import {
 	type MessageDescriptor,
 	useVIntl,
 } from '../../composables/i18n'
-import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()
+// TODO: anything in this component that uses the router will not work in the app. and this component is used in the app.
+// fix is to replace any router stuff with click handlers and pass in the handlers as props from the parent component
 const router = useRouter()
 
 type EnvironmentValue = 'optional' | 'required' | 'unsupported' | 'unknown'
@@ -120,17 +136,25 @@ const props = defineProps<{
 		gameVersions: GameVersionTag[]
 		loaders: PlatformTag[]
 	}
-	v3Metadata?: ProjectV3Partial
+	projectV3?: Labrinth.Projects.v3.Project
 }>()
+
+const noModpackLoader = computed(
+	() =>
+		(props.projectV3?.project_types.includes('modpack') &&
+			props.projectV3?.mrpack_loaders?.length === 1 &&
+			props.projectV3?.mrpack_loaders?.[0] === 'minecraft') ||
+		props.projectV3?.mrpack_loaders?.length === 0,
+)
 
 const showEnvironments = computed(
 	() =>
-		TYPES_WITH_ENVS.some((x) => props.v3Metadata?.project_types.includes(x)) &&
+		TYPES_WITH_ENVS.some((x) => props.projectV3?.project_types.includes(x)) &&
 		primaryEnvironment.value,
 )
 
 const primaryEnvironment = computed<EnvironmentV3 | undefined>(() =>
-	props.v3Metadata?.environment?.find((x) => x !== 'unknown'),
+	props.projectV3?.environment?.find((x) => x !== 'unknown'),
 )
 
 type EnvironmentTag = {

@@ -1,8 +1,7 @@
 use crate::database::models::DelphiReportIssueDetailsId;
+use crate::env::ENV;
 use crate::file_hosting::FileHostingError;
-use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
-use crate::util::env::parse_strings_from_var;
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
@@ -10,16 +9,13 @@ use actix_web::{HttpResponse, web};
 use futures::FutureExt;
 use serde_json::json;
 
+pub mod debug;
 pub mod internal;
 pub mod v2;
+pub mod v2_reroute;
 pub mod v3;
 
-#[cfg(target_os = "linux")]
-pub mod debug;
-
-pub mod v2_reroute;
-
-mod analytics;
+pub mod analytics;
 mod index;
 mod maven;
 mod not_found;
@@ -29,24 +25,21 @@ pub use self::not_found::not_found;
 
 pub fn root_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("maven")
+        web::scope("/maven")
             .wrap(default_cors())
             .configure(maven::config),
     );
     cfg.service(
-        web::scope("updates")
+        web::scope("/updates")
             .wrap(default_cors())
             .configure(updates::config),
     );
     cfg.service(
-        web::scope("analytics")
+        web::scope("/analytics")
             .wrap(
                 Cors::default()
                     .allowed_origin_fn(|origin, _req_head| {
-                        let allowed_origins =
-                            parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS")
-                                .unwrap_or_default();
-
+                        let allowed_origins = &ENV.ANALYTICS_ALLOWED_ORIGINS;
                         allowed_origins.contains(&"*".to_string())
                             || allowed_origins.contains(
                                 &origin
@@ -63,11 +56,10 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
                     ])
                     .max_age(3600),
             )
-            .service(page_view_ingest)
-            .service(playtime_ingest),
+            .configure(analytics::config),
     );
     cfg.service(
-        web::scope("api/v1")
+        web::scope("/api/v1")
             .wrap(default_cors())
             .wrap_fn(|req, _srv| {
             async {
@@ -101,15 +93,13 @@ pub enum ApiError {
     Auth(eyre::Report),
     #[error("Invalid input: {0}")]
     InvalidInput(String),
-    #[error("Environment error")]
-    Env(#[from] dotenvy::Error),
     #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
-    #[error("Database error: {0}")]
+    #[error("database error")]
     Database(#[from] crate::database::models::DatabaseError),
-    #[error("SQLx database error: {0}")]
+    #[error("Postgres database error")]
     SqlxDatabase(#[from] sqlx::Error),
-    #[error("Redis database error: {0}")]
+    #[error("redis database error")]
     RedisDatabase(#[from] redis::RedisError),
     #[error("Clickhouse error: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
@@ -125,8 +115,6 @@ pub enum ApiError {
     Validation(String),
     #[error("Search error: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
-    #[error("Indexing error: {0}")]
-    Indexing(#[from] crate::search::indexing::IndexingError),
     #[error("Payments error: {0}")]
     Payments(String),
     #[error("Discord error: {0}")]
@@ -153,6 +141,10 @@ pub enum ApiError {
     NotFound,
     #[error("Conflict: {0}")]
     Conflict(String),
+    #[error("precondition required: {0}")]
+    PreconditionRequired(String),
+    #[error("precondition failed: {0}")]
+    PreconditionFailed(String),
     #[error("External tax compliance API error")]
     TaxComplianceApi,
     #[error(transparent)]
@@ -184,7 +176,6 @@ impl ApiError {
                 Self::Internal(..) => "internal_error",
                 Self::Request(..) => "request_error",
                 Self::Auth(..) => "auth_error",
-                Self::Env(..) => "environment_error",
                 Self::Database(..) => "database_error",
                 Self::SqlxDatabase(..) => "database_error",
                 Self::RedisDatabase(..) => "database_error",
@@ -193,7 +184,6 @@ impl ApiError {
                 Self::Xml(..) => "xml_error",
                 Self::Json(..) => "json_error",
                 Self::Search(..) => "search_error",
-                Self::Indexing(..) => "indexing_error",
                 Self::FileHosting(..) => "file_hosting_error",
                 Self::InvalidInput(..) => "invalid_input",
                 Self::Validation(..) => "invalid_input",
@@ -208,6 +198,8 @@ impl ApiError {
                 Self::Reroute(..) => "reroute_error",
                 Self::NotFound => "not_found",
                 Self::Conflict(..) => "conflict",
+                Self::PreconditionRequired(..) => "precondition_required",
+                Self::PreconditionFailed(..) => "precondition_failed",
                 Self::TaxComplianceApi => "tax_compliance_api_error",
                 Self::Zip(..) => "zip_error",
                 Self::Io(..) => "io_error",
@@ -222,9 +214,9 @@ impl ApiError {
                 }
             },
             description: match self {
-                Self::Internal(e) => format!("{e:#?}"),
-                Self::Request(e) => format!("{e:#?}"),
-                Self::Auth(e) => format!("{e:#?}"),
+                Self::Internal(e) => format!("{e:#}"),
+                Self::Request(e) => format!("{e:#}"),
+                Self::Auth(e) => format!("{e:#}"),
                 _ => self.to_string(),
             },
             details: match self {
@@ -249,7 +241,6 @@ impl actix_web::ResponseError for ApiError {
             Self::Request(..) => StatusCode::BAD_REQUEST,
             Self::Auth(..) => StatusCode::UNAUTHORIZED,
             Self::InvalidInput(..) => StatusCode::BAD_REQUEST,
-            Self::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::SqlxDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::RedisDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -259,7 +250,6 @@ impl actix_web::ResponseError for ApiError {
             Self::Xml(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Json(..) => StatusCode::BAD_REQUEST,
             Self::Search(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::Indexing(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::FileHosting(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Validation(..) => StatusCode::BAD_REQUEST,
             Self::Payments(..) => StatusCode::FAILED_DEPENDENCY,
@@ -272,6 +262,8 @@ impl actix_web::ResponseError for ApiError {
             Self::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::NotFound => StatusCode::NOT_FOUND,
             Self::Conflict(..) => StatusCode::CONFLICT,
+            Self::PreconditionRequired(..) => StatusCode::PRECONDITION_REQUIRED,
+            Self::PreconditionFailed(..) => StatusCode::PRECONDITION_FAILED,
             Self::TaxComplianceApi => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Zip(..) => StatusCode::BAD_REQUEST,
             Self::Io(..) => StatusCode::BAD_REQUEST,

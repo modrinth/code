@@ -1,26 +1,27 @@
+use crate::auth::validate::get_user_from_bearer_token;
 use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUserId;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::session_item::SessionBuilder;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::pats::Scopes;
 use crate::models::sessions::Session;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use crate::util::env::parse_var;
 use actix_web::http::header::AUTHORIZATION;
-use actix_web::web::{Data, ServiceConfig, scope};
+use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use sqlx::PgPool;
 use woothee::parser::Parser;
 
-pub fn config(cfg: &mut ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
-        scope("session")
+        utoipa_actix_web::scope("/session")
             .service(list)
             .service(delete)
             .service(refresh),
@@ -41,7 +42,7 @@ pub async fn get_session_metadata(
     req: &HttpRequest,
 ) -> Result<SessionMetadata, AuthenticationError> {
     let conn_info = req.connection_info().clone();
-    let ip_addr = if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
+    let ip_addr = if ENV.CLOUDFLARE_INTEGRATION {
         if let Some(header) = req.headers().get("CF-Connecting-IP") {
             header.to_str().ok()
         } else {
@@ -86,8 +87,9 @@ pub async fn get_session_metadata(
 pub async fn issue_session(
     req: HttpRequest,
     user_id: DBUserId,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
+    session_expires: Option<DateTime<Utc>>,
 ) -> Result<DBSession, AuthenticationError> {
     let metadata = get_session_metadata(&req).await?;
 
@@ -108,11 +110,13 @@ pub async fn issue_session(
         country: metadata.country,
         ip: metadata.ip,
         user_agent: metadata.user_agent,
+        expires: None,
+        session_expires,
     }
     .insert(transaction)
     .await?;
 
-    let session = DBSession::get_id(id, &mut **transaction, redis)
+    let session = DBSession::get_id(id, &mut *transaction, redis)
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
@@ -129,7 +133,16 @@ pub async fn issue_session(
     Ok(session)
 }
 
-#[get("list")]
+#[utoipa::path(
+    get,
+    operation_id = "listSessions",
+    responses(
+        (status = 200, description = "List of active sessions"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = ["SESSION_READ"]))
+)]
+#[get("/list")]
 pub async fn list(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -165,7 +178,17 @@ pub async fn list(
     Ok(HttpResponse::Ok().json(sessions))
 }
 
-#[delete("{id}")]
+#[utoipa::path(
+    delete,
+    operation_id = "deleteSession",
+    params(("id" = String, Path, description = "The session ID")),
+    responses(
+        (status = 204, description = "Session deleted"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = ["SESSION_DELETE"]))
+)]
+#[delete("/{id}")]
 pub async fn delete(
     info: web::Path<(String,)>,
     req: HttpRequest,
@@ -205,22 +228,21 @@ pub async fn delete(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[post("refresh")]
+#[utoipa::path(
+    post,
+    operation_id = "refreshSession",
+    responses(
+        (status = 200, description = "Session refreshed"),
+        (status = 401, description = "Unauthorized")
+    )
+)]
+#[post("/refresh")]
 pub async fn refresh(
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let current_user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::empty(),
-    )
-    .await?
-    .1;
     let session = req
         .headers()
         .get(AUTHORIZATION)
@@ -228,6 +250,25 @@ pub async fn refresh(
         .ok_or_else(|| {
             ApiError::Authentication(AuthenticationError::InvalidCredentials)
         })?;
+
+    // We should ensure that the authorization given is a session token, and not some other type of token (like a PAT), since this endpoint is only for refreshing sessions.
+    // This is done by checking the prefix of the token, which should be "mra_" for session tokens.
+    if !session.starts_with("mra_") {
+        return Err(ApiError::Authentication(
+            AuthenticationError::InvalidCredentials,
+        ));
+    }
+
+    let current_user = get_user_from_bearer_token(
+        &req,
+        Some(session),
+        &**pool,
+        &redis,
+        &session_queue,
+        true, // Allow expired sessions, since we want to allow refreshing expired sessions
+    )
+    .await?
+    .1;
 
     let session = DBSession::get(session, &**pool, &redis).await?;
 
@@ -243,9 +284,14 @@ pub async fn refresh(
         let mut transaction = pool.begin().await?;
 
         DBSession::remove(session.id, &mut transaction).await?;
-        let new_session =
-            issue_session(req, session.user_id, &mut transaction, &redis)
-                .await?;
+        let new_session = issue_session(
+            req,
+            session.user_id,
+            &mut transaction,
+            &redis,
+            Some(session.refresh_expires),
+        )
+        .await?;
         transaction.commit().await?;
         DBSession::clear_cache(
             vec![(

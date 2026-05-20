@@ -8,8 +8,11 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { useQueryClient } from '@tanstack/vue-query'
 import type Stripe from 'stripe'
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, toRef, useTemplateRef, watch } from 'vue'
+
+import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useStripe } from '../../composables/stripe'
@@ -23,6 +26,8 @@ import PaymentMethodSelector from './ServersPurchase2PaymentMethod.vue'
 import ConfirmPurchase from './ServersPurchase3Review.vue'
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
+const queryClient = useQueryClient()
 
 export type RegionPing = {
 	region: string
@@ -34,7 +39,7 @@ export type ServerBillingInterval = 'monthly' | 'quarterly' | 'yearly'
 
 const props = defineProps<{
 	publishableKey: string
-	returnUrl: string
+	returnUrl?: string
 	paymentMethods: Stripe.PaymentMethod[]
 	customer: Stripe.Customer
 	currency: string
@@ -89,8 +94,8 @@ const {
 	noPaymentRequired,
 } = useStripe(
 	props.publishableKey,
-	props.customer,
-	props.paymentMethods,
+	toRef(props, 'customer'),
+	toRef(props, 'paymentMethods'),
 	props.currency,
 	selectedPlan,
 	selectedInterval,
@@ -111,6 +116,10 @@ const steps: Step[] = props.planStage
 	? (['plan', 'region', 'payment', 'review'] as Step[])
 	: (['region', 'payment', 'review'] as Step[])
 
+const isUpgrade = computed(() => !!props.existingSubscription)
+const skipRegionStep = computed(() => isUpgrade.value && !customServer.value)
+const visibleSteps = computed(() => steps.filter((s) => !(s === 'region' && skipRegionStep.value)))
+
 const titles: Record<Step, MessageDescriptor> = {
 	plan: defineMessage({ id: 'servers.purchase.step.plan.title', defaultMessage: 'Plan' }),
 	region: defineMessage({ id: 'servers.purchase.step.region.title', defaultMessage: 'Region' }),
@@ -120,6 +129,16 @@ const titles: Record<Step, MessageDescriptor> = {
 	}),
 	review: defineMessage({ id: 'servers.purchase.step.review.title', defaultMessage: 'Review' }),
 }
+
+const purchaseSuccessTitle = defineMessage({
+	id: 'servers.purchase.notification.success.title',
+	defaultMessage: 'Purchase success',
+})
+
+const purchaseSuccessText = defineMessage({
+	id: 'servers.purchase.notification.success.text',
+	defaultMessage: 'Your Modrinth Hosting purchase was completed successfully.',
+})
 
 const currentRegion = computed(() => {
 	return props.regions.find((region) => region.shortcode === selectedRegion.value)
@@ -131,17 +150,24 @@ const currentPing = computed(() => {
 
 const currentStep = ref<Step>()
 
-const currentStepIndex = computed(() => (currentStep.value ? steps.indexOf(currentStep.value) : -1))
+const currentStepIndex = computed(() =>
+	currentStep.value ? visibleSteps.value.indexOf(currentStep.value) : -1,
+)
 const previousStep = computed(() => {
-	const step = currentStep.value ? steps[steps.indexOf(currentStep.value) - 1] : undefined
+	if (!currentStep.value) return undefined
+	const idx = visibleSteps.value.indexOf(currentStep.value)
+	let step = idx > 0 ? visibleSteps.value[idx - 1] : undefined
 	if (step === 'payment' && skipPaymentMethods.value && primaryPaymentMethodId.value) {
-		return 'region'
+		const paymentIdx = visibleSteps.value.indexOf('payment')
+		step = paymentIdx > 0 ? visibleSteps.value[paymentIdx - 1] : undefined
 	}
 	return step
 })
-const nextStep = computed(() =>
-	currentStep.value ? steps[steps.indexOf(currentStep.value) + 1] : undefined,
-)
+const nextStep = computed(() => {
+	if (!currentStep.value) return undefined
+	const idx = visibleSteps.value.indexOf(currentStep.value)
+	return idx >= 0 ? visibleSteps.value[idx + 1] : undefined
+})
 
 const canProceed = computed(() => {
 	switch (currentStep.value) {
@@ -180,12 +206,14 @@ async function beforeProceed(step: string) {
 			await initializeStripe()
 
 			if (primaryPaymentMethodId.value && skipPaymentMethods.value) {
-				const paymentMethod = await props.paymentMethods.find(
+				const paymentMethod = props.paymentMethods.find(
 					(x) => x.id === primaryPaymentMethodId.value,
 				)
-				await selectPaymentMethod(paymentMethod)
-				await setStep('review', true)
-				return false
+				if (paymentMethod) {
+					await selectPaymentMethod(paymentMethod)
+					await setStep('review', true)
+					return false
+				}
 			}
 			return true
 		case 'review':
@@ -215,7 +243,22 @@ async function afterProceed(step: string) {
 
 async function setStep(step: Step | undefined, skipValidation = false) {
 	if (!step) {
-		await submitPayment(props.returnUrl)
+		const success = await submitPayment(props.returnUrl)
+
+		if (success) {
+			modal.value?.hide()
+			addNotification({
+				title: formatMessage(purchaseSuccessTitle),
+				text: formatMessage(purchaseSuccessText),
+				type: 'success',
+			})
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ['servers'] }),
+				queryClient.invalidateQueries({ queryKey: ['servers', 'v1'] }),
+			])
+			emit('purchase-success')
+		}
+
 		return
 	}
 
@@ -231,11 +274,25 @@ async function setStep(step: Step | undefined, skipValidation = false) {
 	}
 }
 
-watch(selectedPlan, () => {
-	if (currentStep.value === 'plan') {
-		customServer.value = !selectedPlan.value
-	}
-})
+watch(
+	selectedPlan,
+	() => {
+		if (currentStep.value === 'plan') {
+			customServer.value = !selectedPlan.value
+		}
+	},
+	{ flush: 'sync' },
+)
+
+watch(
+	() => props.existingSubscription,
+	(sub) => {
+		if (sub?.metadata?.type === 'pyro' && sub.metadata.region) {
+			selectedRegion.value = sub.metadata.region
+		}
+	},
+	{ immediate: true },
+)
 
 const defaultPlan = computed<Labrinth.Billing.Internal.Product | undefined>(() => {
 	return (
@@ -264,7 +321,10 @@ function begin(
 	selectedInterval.value = interval
 	customServer.value = !selectedPlan.value
 	selectedPaymentMethod.value = undefined
-	currentStep.value = steps[0]
+	const skipPlanStep = props.planStage && plan !== undefined
+	currentStep.value = skipPlanStep
+		? (visibleSteps.value[1] ?? visibleSteps.value[0])
+		: visibleSteps.value[0]
 	skipPaymentMethods.value = true
 	projectId.value = project
 	modal.value?.show()
@@ -274,13 +334,17 @@ defineExpose({
 	show: begin,
 })
 
-defineEmits<{
-	(e: 'hide'): void
+const emit = defineEmits<{
+	(e: 'hide' | 'purchase-success'): void
 }>()
 
 function handleChooseCustom() {
 	customServer.value = true
 	selectedPlan.value = undefined
+}
+
+function handleProceed() {
+	setStep(nextStep.value)
 }
 
 // When the user explicitly wants to change or add a payment method from Review
@@ -304,7 +368,7 @@ function goToBreadcrumbStep(id: string) {
 	<NewModal ref="modal" @hide="$emit('hide')">
 		<template #title>
 			<div class="flex items-center gap-1 font-bold text-secondary">
-				<template v-for="(step, index) in steps" :key="step">
+				<template v-for="(step, index) in visibleSteps" :key="step">
 					<button
 						v-if="index < currentStepIndex"
 						class="bg-transparent active:scale-95 font-bold text-secondary p-0"
@@ -321,14 +385,14 @@ function goToBreadcrumbStep(id: string) {
 						{{ formatMessage(titles[step]) }}
 					</span>
 					<ChevronRightIcon
-						v-if="index < steps.length - 1"
+						v-if="index < visibleSteps.length - 1"
 						class="h-5 w-5 text-secondary"
 						stroke-width="3"
 					/>
 				</template>
 			</div>
 		</template>
-		<div class="w-[40rem] max-w-full">
+		<div :class="currentStep === 'plan' ? 'w-[56rem] max-w-full' : 'w-[40rem] max-w-full'">
 			<PlanSelector
 				v-if="currentStep === 'plan'"
 				v-model:plan="selectedPlan"
@@ -337,6 +401,7 @@ function goToBreadcrumbStep(id: string) {
 				:available-products="availableProducts"
 				:currency="currency"
 				@choose-custom="handleChooseCustom"
+				@proceed="handleProceed"
 			/>
 			<RegionSelector
 				v-else-if="currentStep === 'region'"
@@ -345,6 +410,7 @@ function goToBreadcrumbStep(id: string) {
 				:regions="regions"
 				:pings="pings"
 				:custom="customServer"
+				:hide-region-selection="isUpgrade"
 				:available-products="availableProducts"
 				:currency="currency"
 				:interval="selectedInterval"
@@ -374,7 +440,7 @@ function goToBreadcrumbStep(id: string) {
 				:ping="currentPing"
 				:loading="paymentMethodLoading"
 				:selected-payment-method="selectedPaymentMethod || inputtedPaymentMethod"
-				:has-payment-method="hasPaymentMethod"
+				:has-payment-method="!!hasPaymentMethod"
 				:tax="tax"
 				:total="total"
 				:no-payment-required="noPaymentRequired"
@@ -410,12 +476,12 @@ function goToBreadcrumbStep(id: string) {
 				<button v-if="previousStep" @click="previousStep && setStep(previousStep, true)">
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
 				</button>
-				<button v-else @click="modal?.hide()">
+				<button v-else-if="currentStep !== 'plan'" @click="modal?.hide()">
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
-			<ButtonStyled color="brand">
+			<ButtonStyled v-if="currentStep !== 'plan'" color="brand">
 				<button
 					v-tooltip="
 						currentStep === 'review' && !acceptedEula && !noPaymentRequired

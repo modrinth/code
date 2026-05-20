@@ -1,22 +1,27 @@
 use super::ApiError;
 use crate::auth::get_user_from_headers;
 use crate::database;
+use crate::database::PgPool;
 use crate::database::models::DBModerationLock;
+use crate::database::models::moderation_external_item;
 use crate::database::redis::RedisPool;
 use crate::models::ids::OrganizationId;
 use crate::models::projects::{Project, ProjectStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
 use crate::util::error::Context;
-use crate::{auth::check_is_moderator_from_headers, models::pats::Scopes};
+use crate::{
+    auth::{check_is_moderator_from_headers, get_user_from_bearer_token},
+    models::pats::Scopes,
+};
 use actix_web::{HttpRequest, delete, get, post, web};
 use ariadne::ids::{UserId, random_base62};
 use chrono::{DateTime, Utc};
 use ownership::get_projects_ownership;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use std::collections::HashMap;
 
+mod external_license;
 mod ownership;
 mod tech_review;
 
@@ -25,12 +30,18 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(get_project_meta)
         .service(set_project_meta)
         .service(acquire_lock)
+        .service(override_lock)
         .service(get_lock_status)
         .service(release_lock)
+        .service(release_lock_beacon)
         .service(delete_all_locks)
         .service(
             utoipa_actix_web::scope("/tech-review")
                 .configure(tech_review::config),
+        )
+        .service(
+            utoipa_actix_web::scope("/external-license")
+                .configure(external_license::config),
         );
 }
 
@@ -88,13 +99,18 @@ pub enum Ownership {
 pub struct LockStatusResponse {
     /// Whether the project is currently locked
     pub locked: bool,
+    /// Whether the requesting user holds the lock
+    pub is_own_lock: bool,
     /// Information about who holds the lock (if locked)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locked_by: Option<LockedByUser>,
     /// When the lock was acquired
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locked_at: Option<DateTime<Utc>>,
-    /// Whether the lock has expired (>15 minutes old)
+    /// When the lock expires
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<DateTime<Utc>>,
+    /// Whether the lock has expired
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expired: Option<bool>,
 }
@@ -115,11 +131,16 @@ pub struct LockedByUser {
 pub struct LockAcquireResponse {
     /// Whether lock was successfully acquired
     pub success: bool,
+    /// Whether the requesting user holds the lock (true when success is true)
+    pub is_own_lock: bool,
     /// If blocked, info about who holds the lock
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locked_by: Option<LockedByUser>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locked_at: Option<DateTime<Utc>>,
+    /// When the lock expires (present whether acquired or blocked)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expired: Option<bool>,
 }
@@ -397,7 +418,7 @@ async fn set_project_meta(
     session_queue: web::Data<AuthQueue>,
     judgements: web::Json<HashMap<String, Judgement>>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    let user = check_is_moderator_from_headers(
         &req,
         &**pool,
         &redis,
@@ -408,14 +429,10 @@ async fn set_project_meta(
 
     let mut transaction = pool.begin().await?;
 
-    let mut ids = Vec::new();
-    let mut titles = Vec::new();
-    let mut statuses = Vec::new();
-    let mut links = Vec::new();
-    let mut proofs = Vec::new();
-    let mut flame_ids = Vec::new();
-
+    let mut licenses = Vec::new();
     let mut file_hashes = Vec::new();
+    let mut file_filenames = Vec::new();
+    let mut file_license_ids = Vec::new();
 
     for (hash, judgement) in judgements.0 {
         let id = random_base62(8);
@@ -441,41 +458,38 @@ async fn set_project_meta(
             } => (title, status, link, proof, None),
         };
 
-        ids.push(id as i64);
-        titles.push(title);
-        statuses.push(status.as_str());
-        links.push(link);
-        proofs.push(proof);
-        flame_ids.push(flame_id);
+        licenses.push(moderation_external_item::ExternalLicense {
+            id: id as i64,
+            title,
+            status: status.as_str().to_string(),
+            link,
+            proof,
+            flame_project_id: flame_id,
+        });
         file_hashes.push(hash);
+        file_filenames.push(None);
+        file_license_ids.push(id as i64);
     }
 
-    sqlx::query(
-    "
-        INSERT INTO moderation_external_licenses (id, title, status, link, proof, flame_project_id)
-        SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::varchar[], $4::varchar[], $5::varchar[], $6::integer[])
-        "
-    )
-        .bind(&ids[..])
-        .bind(&titles[..])
-        .bind(&statuses[..])
-        .bind(&links[..])
-        .bind(&proofs[..])
-        .bind(&flame_ids[..])
-        .execute(&mut *transaction)
-        .await?;
+    let user_id = database::models::ids::DBUserId::from(user.id);
 
-    sqlx::query(
-        "
-        INSERT INTO moderation_external_files (sha1, external_license_id)
-        SELECT * FROM UNNEST ($1::bytea[], $2::bigint[])
-        ON CONFLICT (sha1)
-        DO NOTHING
-        ",
+    moderation_external_item::ExternalLicense::insert_many(
+        &mut transaction,
+        &licenses,
+        user_id,
     )
-    .bind(&file_hashes[..])
-    .bind(&ids[..])
-    .execute(&mut *transaction)
+    .await?;
+
+    moderation_external_item::ExternalLicense::insert_files(
+        &mut transaction,
+        &file_hashes
+            .iter()
+            .map(|x| x.as_bytes().to_vec())
+            .collect::<Vec<_>>(),
+        &file_filenames,
+        &file_license_ids,
+        user_id,
+    )
     .await?;
 
     transaction.commit().await?;
@@ -520,21 +534,70 @@ async fn acquire_lock(
     match DBModerationLock::acquire(db_project_id, db_user_id, &pool).await? {
         Ok(()) => Ok(web::Json(LockAcquireResponse {
             success: true,
+            is_own_lock: true,
             locked_by: None,
             locked_at: None,
+            expires_at: None,
             expired: None,
         })),
         Err(lock) => Ok(web::Json(LockAcquireResponse {
             success: false,
+            is_own_lock: false,
             locked_by: Some(LockedByUser {
                 id: UserId::from(lock.moderator_id).to_string(),
                 username: lock.moderator_username,
                 avatar_url: lock.moderator_avatar_url,
             }),
             locked_at: Some(lock.locked_at),
+            expires_at: Some(lock.expires_at),
             expired: Some(lock.expired),
         })),
     }
+}
+
+/// Force-acquire a moderation lock on a project (moderator override).
+#[utoipa::path(
+    responses(
+        (status = OK, body = LockAcquireResponse),
+        (status = NOT_FOUND, description = "Project not found")
+    )
+)]
+#[post("/lock/{project_id}/override")]
+async fn override_lock(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(String,)>,
+) -> Result<web::Json<LockAcquireResponse>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await?;
+
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await?
+            .ok_or(ApiError::NotFound)?;
+
+    let db_project_id = project.inner.id;
+    let db_user_id = database::models::DBUserId::from(user.id);
+
+    DBModerationLock::force_acquire(db_project_id, db_user_id, &pool).await?;
+
+    Ok(web::Json(LockAcquireResponse {
+        success: true,
+        is_own_lock: true,
+        locked_by: None,
+        locked_at: None,
+        expires_at: None,
+        expired: None,
+    }))
 }
 
 /// Check the lock status for a project
@@ -552,7 +615,7 @@ async fn get_lock_status(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(String,)>,
 ) -> Result<web::Json<LockStatusResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    let user = check_is_moderator_from_headers(
         &req,
         &**pool,
         &redis,
@@ -568,22 +631,30 @@ async fn get_lock_status(
             .ok_or(ApiError::NotFound)?;
 
     let db_project_id = project.inner.id;
+    let db_user_id = database::models::DBUserId::from(user.id);
 
     match DBModerationLock::get_with_user(db_project_id, &pool).await? {
-        Some(lock) => Ok(web::Json(LockStatusResponse {
-            locked: true,
-            locked_by: Some(LockedByUser {
-                id: UserId::from(lock.moderator_id).to_string(),
-                username: lock.moderator_username,
-                avatar_url: lock.moderator_avatar_url,
-            }),
-            locked_at: Some(lock.locked_at),
-            expired: Some(lock.expired),
-        })),
+        Some(lock) => {
+            let is_own_lock = lock.moderator_id == db_user_id;
+            Ok(web::Json(LockStatusResponse {
+                locked: true,
+                is_own_lock,
+                locked_by: Some(LockedByUser {
+                    id: UserId::from(lock.moderator_id).to_string(),
+                    username: lock.moderator_username,
+                    avatar_url: lock.moderator_avatar_url,
+                }),
+                locked_at: Some(lock.locked_at),
+                expires_at: Some(lock.expires_at),
+                expired: Some(lock.expired),
+            }))
+        }
         None => Ok(web::Json(LockStatusResponse {
             locked: false,
+            is_own_lock: false,
             locked_by: None,
             locked_at: None,
+            expires_at: None,
             expired: None,
         })),
     }
@@ -612,6 +683,77 @@ async fn release_lock(
         Scopes::PROJECT_WRITE,
     )
     .await?;
+
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await?
+            .ok_or(ApiError::NotFound)?;
+
+    let db_project_id = project.inner.id;
+    let db_user_id = database::models::DBUserId::from(user.id);
+
+    let released =
+        DBModerationLock::release(db_project_id, db_user_id, &pool).await?;
+
+    let _ = DBModerationLock::cleanup_expired(&pool).await;
+
+    Ok(web::Json(LockReleaseResponse { success: released }))
+}
+
+/// Release a moderation lock using credentials in the request body.
+///
+/// For use with `navigator.sendBeacon`, which cannot set `Authorization` or send `DELETE`.
+/// The body must be `text/plain` containing the same token value as the `Authorization` header
+/// (optional `Bearer ` prefix). This avoids a CORS preflight compared to `application/json`.
+#[utoipa::path(
+    request_body(
+        content = String,
+        description = "Token value (same as Authorization header)",
+        content_type = "text/plain"
+    ),
+    responses(
+        (status = OK, body = LockReleaseResponse),
+        (status = NOT_FOUND, description = "Project not found")
+    )
+)]
+#[post("/lock/{project_id}/release")]
+async fn release_lock_beacon(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(String,)>,
+    body: String,
+) -> Result<web::Json<LockReleaseResponse>, ApiError> {
+    let token = body.trim();
+    if token.is_empty() {
+        return Err(ApiError::InvalidInput(
+            "missing token in request body".to_string(),
+        ));
+    }
+    let token = token.strip_prefix("Bearer ").unwrap_or(token).trim();
+
+    let (scopes, user) = get_user_from_bearer_token(
+        &req,
+        Some(token),
+        &**pool,
+        &redis,
+        &session_queue,
+        false,
+    )
+    .await?;
+
+    if !scopes.contains(Scopes::PROJECT_WRITE) {
+        return Err(ApiError::CustomAuthentication(
+            "token is missing required scopes".to_string(),
+        ));
+    }
+    if !user.role.is_mod() {
+        return Err(ApiError::CustomAuthentication(
+            "only moderators may release moderation locks".to_string(),
+        ));
+    }
 
     let project_id_str = path.into_inner().0;
     let project =

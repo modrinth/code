@@ -1,11 +1,12 @@
-const startReport = (type: string, id: string) => {
+export const getReportPath = (type: string, id: string) => {
 	const prefill = new URLSearchParams()
-
-	// type
 	prefill.set('item', type)
 	prefill.set('itemID', id)
+	return '/report?' + prefill.toString()
+}
 
-	navigateTo('/report?' + prefill.toString())
+const startReport = (type: string, id: string) => {
+	navigateTo(getReportPath(type, id))
 }
 
 export const reportProject = (id: string) => {

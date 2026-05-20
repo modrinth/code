@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
@@ -29,7 +30,7 @@ pub struct DBPersonalAccessToken {
 impl DBPersonalAccessToken {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -49,7 +50,7 @@ impl DBPersonalAccessToken {
             self.user_id as DBUserId,
             self.expires
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -65,7 +66,7 @@ impl DBPersonalAccessToken {
         redis: &RedisPool,
     ) -> Result<Option<DBPersonalAccessToken>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec, redis)
             .await
@@ -78,7 +79,7 @@ impl DBPersonalAccessToken {
         redis: &RedisPool,
     ) -> Result<Vec<DBPersonalAccessToken>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = pat_ids
             .iter()
@@ -97,7 +98,7 @@ impl DBPersonalAccessToken {
         redis: &RedisPool,
     ) -> Result<Vec<DBPersonalAccessToken>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis
             .get_cached_keys_with_slug(
@@ -154,7 +155,7 @@ impl DBPersonalAccessToken {
         redis: &RedisPool,
     ) -> Result<Vec<DBPatId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
@@ -228,7 +229,7 @@ impl DBPersonalAccessToken {
 
     pub async fn remove(
         id: DBPatId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "
@@ -236,7 +237,7 @@ impl DBPersonalAccessToken {
             ",
             id as DBPatId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))

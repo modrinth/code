@@ -3,7 +3,7 @@
 		"target": "ES2020",
 		"useDefineForClassFields": true,
 		"module": "ESNext",
-		"lib": ["ES2020", "DOM", "DOM.Iterable"],
+		"lib": ["ES2021", "DOM", "DOM.Iterable"],
 		"skipLibCheck": true,
 
 		"moduleResolution": "bundler",
@@ -15,6 +15,8 @@
 		"jsx": "preserve",
 
 		"strict": true,
+
+		"types": ["vite/client"],
 
 		"paths": {
 			"@/*": ["./src/*"]

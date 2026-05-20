@@ -3,10 +3,10 @@ import { MailIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/ass
 import {
 	Avatar,
 	ButtonStyled,
-	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
+	StyledInput,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -271,15 +271,14 @@ const messages = defineMessages({
 				{{ formatMessage(messages.usernameDescription) }}
 			</p>
 			<div class="flex items-center gap-2 mt-4">
-				<div class="iconified-input flex-1">
-					<UserIcon aria-hidden="true" />
-					<input
-						v-model="username"
-						type="text"
-						:placeholder="formatMessage(messages.usernamePlaceholder)"
-						@keyup.enter="addFriendFromModal"
-					/>
-				</div>
+				<StyledInput
+					v-model="username"
+					:icon="UserIcon"
+					type="text"
+					:placeholder="formatMessage(messages.usernamePlaceholder)"
+					wrapper-class="flex-1"
+					@keyup.enter="addFriendFromModal"
+				/>
 				<ButtonStyled color="brand">
 					<button :disabled="username.length === 0" @click="addFriendFromModal">
 						<SendIcon />
@@ -289,7 +288,7 @@ const messages = defineMessages({
 			</div>
 		</div>
 	</ModalWrapper>
-	<div v-if="userCredentials && !loading" class="flex gap-1 items-center mb-3 ml-2 mr-1">
+	<div v-if="userCredentials && !loading" class="flex gap-1 items-center mb-3 -ml-1">
 		<template v-if="sortedFriends.length > 0">
 			<ButtonStyled circular type="transparent">
 				<button
@@ -300,25 +299,17 @@ const messages = defineMessages({
 					<UserPlusIcon />
 				</button>
 			</ButtonStyled>
-			<div class="iconified-input flex-1">
-				<input
-					v-model="search"
-					type="text"
-					class="friends-search-bar flex w-full"
-					:placeholder="formatMessage(messages.searchFriends)"
-					@keyup.esc="search = ''"
-				/>
-				<button
-					v-if="search"
-					v-tooltip="formatMessage(commonMessages.clearButton)"
-					class="r-btn flex items-center justify-center bg-transparent button-animation p-2 cursor-pointer appearance-none border-none"
-					@click="search = ''"
-				>
-					<XIcon />
-				</button>
-			</div>
+			<StyledInput
+				v-model="search"
+				type="text"
+				:placeholder="formatMessage(messages.searchFriends)"
+				clearable
+				variant="outlined"
+				wrapper-class="flex-1"
+				@keyup.esc="search = ''"
+			/>
 		</template>
-		<h3 v-else class="ml-2 w-full text-base text-primary font-medium m-0">
+		<h3 v-else class="w-full text-base text-primary font-medium m-0">
 			{{ formatMessage(messages.friends) }}
 		</h3>
 		<ButtonStyled v-if="incomingRequests.length > 0" circular type="transparent">
@@ -340,11 +331,11 @@ const messages = defineMessages({
 		</ButtonStyled>
 	</div>
 	<div class="flex flex-col gap-3">
-		<h3 v-if="loading" class="ml-4 mr-1 text-base text-primary font-medium m-0">
+		<h3 v-if="loading" class="text-base text-primary font-medium m-0">
 			{{ formatMessage(messages.friends) }}
 		</h3>
 		<template v-if="loading">
-			<div v-for="n in 5" :key="n" class="flex gap-2 items-center animate-pulse ml-4 mr-1">
+			<div v-for="n in 5" :key="n" class="flex gap-2 items-center animate-pulse">
 				<div class="min-w-9 min-h-9 bg-button-bg rounded-full"></div>
 				<div class="flex flex-col w-full">
 					<div class="h-3 bg-button-bg rounded-full w-1/2 mb-1"></div>
@@ -353,7 +344,7 @@ const messages = defineMessages({
 			</div>
 		</template>
 		<template v-else-if="sortedFriends.length === 0">
-			<div class="text-sm ml-4 mr-1">
+			<div class="text-sm">
 				<div v-if="!userCredentials">
 					<IntlFormatted :message-id="messages.signInToAddFriends">
 						<template #link="{ children }">
@@ -413,16 +404,3 @@ const messages = defineMessages({
 		</template>
 	</div>
 </template>
-<style scoped>
-.friends-search-bar {
-	background: none;
-	border: 2px solid var(--color-button-bg) !important;
-	padding: 8px;
-	border-radius: 12px;
-	height: 36px;
-}
-
-.friends-search-bar::placeholder {
-	@apply text-sm font-normal;
-}
-</style>

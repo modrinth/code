@@ -1,5 +1,9 @@
 <template>
-	<button class="code" :class="{ copied }" :title="formatMessage(copiedMessage)" @click="copyText">
+	<button
+		class="!m-0 inline-flex w-fit select-text items-center gap-2 rounded-[10px] bg-[var(--color-button-bg)] px-2 py-1 font-mono text-sm text-primary transition-[opacity,filter,transform,outline] duration-200 ease-in-out hover:brightness-[1.25] active:scale-95 active:brightness-[0.8] motion-reduce:transition-none [&>svg]:h-[1em] [&>svg]:w-[1em]"
+		:title="formatMessage(copiedMessage)"
+		@click="copyText"
+	>
 		<span>{{ text }}</span>
 		<CheckIcon v-if="copied" />
 		<ClipboardCopyIcon v-else />
@@ -27,42 +31,3 @@ async function copyText() {
 	copied.value = true
 }
 </script>
-
-<style lang="scss" scoped>
-.code {
-	color: var(--color-text);
-	display: inline-flex;
-	grid-gap: 0.5rem;
-	font-family: var(--mono-font);
-	font-size: var(--font-size-sm);
-	margin: 0;
-	padding: 0.25rem 0.5rem;
-	background-color: var(--color-button-bg);
-	width: fit-content;
-	border-radius: 10px;
-	user-select: text;
-	transition:
-		opacity 0.5s ease-in-out,
-		filter 0.2s ease-in-out,
-		transform 0.05s ease-in-out,
-		outline 0.2s ease-in-out;
-
-	@media (prefers-reduced-motion) {
-		transition: none !important;
-	}
-
-	svg {
-		width: 1em;
-		height: 1em;
-	}
-
-	&:hover {
-		filter: brightness(0.85);
-	}
-
-	&:active {
-		transform: scale(0.95);
-		filter: brightness(0.8);
-	}
-}
-</style>

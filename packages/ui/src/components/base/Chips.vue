@@ -1,8 +1,12 @@
 <template>
-	<div class="chips">
+	<div class="chips" role="radiogroup" :aria-label="ariaLabel">
 		<Button
 			v-for="item in items"
 			:key="formatLabel(item)"
+			v-tooltip="isDisabled(item) ? disabledTooltip : undefined"
+			role="radio"
+			:aria-checked="selected === item"
+			:disabled="isDisabled(item)"
 			class="btn !brightness-100 hover:!brightness-125"
 			:class="{
 				selected: selected === item,
@@ -11,7 +15,7 @@
 			}"
 			@click="toggleItem(item)"
 		>
-			<CheckIcon v-if="selected === item" />
+			<CheckIcon v-if="selected === item && !hideCheckmarkIcon" />
 			<span>{{ formatLabel(item) }}</span>
 		</Button>
 	</div>
@@ -29,6 +33,10 @@ const props = withDefaults(
 		neverEmpty?: boolean
 		capitalize?: boolean
 		size?: 'standard' | 'small'
+		ariaLabel?: string
+		disabledItems?: T[]
+		disabledTooltip?: string
+		hideCheckmarkIcon?: boolean
 	}>(),
 	{
 		neverEmpty: true,
@@ -46,7 +54,12 @@ if (props.items.length > 0 && props.neverEmpty && !selected.value) {
 	selected.value = props.items[0]
 }
 
+function isDisabled(item: T): boolean {
+	return props.disabledItems?.includes(item) ?? false
+}
+
 function toggleItem(item: T) {
+	if (isDisabled(item)) return
 	if (selected.value === item && !props.neverEmpty) {
 		selected.value = null
 	} else {
@@ -72,7 +85,7 @@ function toggleItem(item: T) {
 		}
 
 		&:focus-visible {
-			outline: 0.25rem solid #ea80ff;
+			outline: 0.25rem solid var(--color-focus-ring);
 			border-radius: 0.25rem;
 		}
 	}
@@ -82,7 +95,7 @@ function toggleItem(item: T) {
 		background-color: var(--color-brand-highlight);
 		box-shadow:
 			inset 0 0 0 transparent,
-			0 0 0 2px var(--color-brand);
+			0 0 0 1px var(--color-brand);
 	}
 }
 </style>

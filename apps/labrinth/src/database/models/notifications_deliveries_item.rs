@@ -60,7 +60,7 @@ impl From<NotificationDeliveryQueryResult> for DBNotificationDelivery {
 impl DBNotificationDelivery {
     pub async fn get_all_user(
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBNotificationDelivery>, DatabaseError> {
         let user_id = user_id.0;
         let results = select_notification_deliveries_with_predicate!(
@@ -78,7 +78,7 @@ impl DBNotificationDelivery {
     pub async fn lock_channel_processable(
         channel: NotificationChannel,
         limit: i64,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBNotificationDelivery>, DatabaseError> {
         // This follows the `idx_notifications_deliveries_composite_queue` index.
         Ok(select_notification_deliveries_with_predicate!(
@@ -107,7 +107,7 @@ impl DBNotificationDelivery {
     /// Inserts the row into the table and updates its ID.
     pub async fn insert(
         &mut self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         let id = sqlx::query_scalar!(
             "
@@ -136,7 +136,7 @@ impl DBNotificationDelivery {
     /// Updates semantically mutable columns of the row.
     pub async fn update(
         &self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "

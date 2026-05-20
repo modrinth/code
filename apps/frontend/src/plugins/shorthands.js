@@ -104,22 +104,6 @@ export default defineNuxtPlugin((nuxtApp) => {
 		getProjectTypeForUrlShorthand(type, loaders, tags),
 	)
 	nuxtApp.provide('cycleValue', cycleValue)
-	nuxtApp.provide('sortedCategories', () => {
-		return tagStore.value.categories.slice().sort((a, b) => {
-			const headerCompare = a.header.localeCompare(b.header)
-			if (headerCompare !== 0) {
-				return headerCompare
-			}
-			if (a.header === 'resolutions' && b.header === 'resolutions') {
-				return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
-			} else if (a.header === 'performance impact' && b.header === 'performance impact') {
-				const x = ['potato', 'low', 'medium', 'high', 'screenshot']
-
-				return x.indexOf(a.name) - x.indexOf(b.name)
-			}
-			return 0
-		})
-	})
 })
 export const formatNumber = (number, abbreviate = true) => {
 	const x = +number

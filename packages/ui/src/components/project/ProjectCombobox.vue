@@ -1,0 +1,252 @@
+<template>
+	<Combobox
+		v-model="projectId"
+		:placeholder="placeholder"
+		:options="options"
+		:searchable="true"
+		:search-placeholder="searchPlaceholder"
+		:no-options-message="searchLoading ? loadingMessage : noResultsMessage"
+		:disable-search-filter="true"
+		:disabled="disabled"
+		show-icon-in-selected
+		@search-input="(query) => handleSearch(query)"
+	/>
+</template>
+
+<script lang="ts" setup>
+import { PackageIcon } from '@modrinth/assets'
+import { useDebounceFn } from '@vueuse/core'
+import Fuse from 'fuse.js'
+import { defineAsyncComponent, h, markRaw, ref, watch } from 'vue'
+
+import { injectModrinthClient, injectNotificationManager } from '../../providers'
+import type { ComboboxOption } from '../base/Combobox.vue'
+import Combobox from '../base/Combobox.vue'
+
+export type ProjectType =
+	| 'mod'
+	| 'modpack'
+	| 'resourcepack'
+	| 'shader'
+	| 'datapack'
+	| 'plugin'
+	| 'server'
+
+interface SearchHit {
+	project_id: string
+	title: string
+	icon_url?: string
+	project_type: string
+	slug: string
+}
+
+const props = withDefaults(
+	defineProps<{
+		/** Filter by project types */
+		projectTypes?: ProjectType[]
+		/** Placeholder text for the combobox */
+		placeholder?: string
+		/** Placeholder text for the search input */
+		searchPlaceholder?: string
+		/** Message shown when loading */
+		loadingMessage?: string
+		/** Message shown when no results found */
+		noResultsMessage?: string
+		/** Whether the combobox is disabled */
+		disabled?: boolean
+		/** Maximum number of results to show */
+		limit?: number
+		/** Project IDs to exclude from results */
+		excludeProjectIds?: string[]
+		/** Include the user's own projects (including unlisted) in results via Fuse search */
+		includeUserUnlistedProjects?: boolean
+		/** User ID or username required when includeUserUnlistedProjects is true */
+		userId?: string
+	}>(),
+	{
+		placeholder: 'Select project',
+		searchPlaceholder: 'Search by name or paste ID...',
+		loadingMessage: 'Loading...',
+		noResultsMessage: 'No results found',
+		disabled: false,
+		limit: 20,
+	},
+)
+
+const { addNotification } = injectNotificationManager()
+const projectId = defineModel<string>()
+
+const searchLoading = ref(false)
+const options = ref<ComboboxOption<string>[]>([])
+const selectedProject = ref<SearchHit | null>(null)
+const searchResultsCache = ref<Map<string, SearchHit>>(new Map())
+
+const { labrinth } = injectModrinthClient()
+
+const userProjectHits = ref<SearchHit[]>([])
+const userProjectsFuse = ref<Fuse<SearchHit> | null>(null)
+
+watch(
+	() => props.includeUserUnlistedProjects && props.userId,
+	async (shouldFetch) => {
+		if (!shouldFetch || !props.userId) {
+			userProjectHits.value = []
+			userProjectsFuse.value = null
+			return
+		}
+
+		try {
+			const projects = await labrinth.users_v2.getProjects(props.userId)
+			const projectTypeSet = props.projectTypes ? new Set(props.projectTypes) : null
+
+			userProjectHits.value = projects
+				.filter((p) => !projectTypeSet || projectTypeSet.has(p.project_type as ProjectType))
+				.filter((p) => p.status === 'unlisted')
+				.map((p) => ({
+					project_id: p.id,
+					title: p.title,
+					icon_url: p.icon_url ?? undefined,
+					project_type: p.project_type,
+					slug: p.slug,
+				}))
+
+			for (const hit of userProjectHits.value) {
+				searchResultsCache.value.set(hit.project_id, hit)
+			}
+
+			userProjectsFuse.value = new Fuse(userProjectHits.value, {
+				keys: ['title', 'slug'],
+				threshold: 0.4,
+			})
+		} catch {
+			userProjectHits.value = []
+			userProjectsFuse.value = null
+		}
+	},
+	{ immediate: true },
+)
+
+function hitToOption(hit: SearchHit): ComboboxOption<string> {
+	return {
+		label: hit.title,
+		value: hit.project_id,
+		icon: hit.icon_url
+			? markRaw(
+					defineAsyncComponent(() =>
+						Promise.resolve({
+							setup: () => () =>
+								h('img', {
+									src: hit.icon_url,
+									alt: hit.title,
+									class: 'h-5 w-5 rounded',
+								}),
+						}),
+					),
+				)
+			: markRaw(PackageIcon),
+	}
+}
+
+// Watch for external changes to projectId to update selectedProject
+watch(
+	projectId,
+	async (newId) => {
+		if (!newId) {
+			selectedProject.value = null
+			return
+		}
+
+		let hit: SearchHit | null = null
+
+		if (searchResultsCache.value.has(newId)) {
+			hit = searchResultsCache.value.get(newId) || null
+		} else {
+			try {
+				const project = await labrinth.projects_v2.get(newId)
+				if (project) {
+					hit = {
+						project_id: project.id,
+						title: project.title,
+						icon_url: project.icon_url ?? undefined,
+						project_type: project.project_type,
+						slug: project.slug,
+					}
+					searchResultsCache.value.set(project.id, hit)
+				}
+			} catch {
+				selectedProject.value = null
+				return
+			}
+		}
+
+		selectedProject.value = hit
+		if (hit && !options.value.some((o) => o.value === hit!.project_id)) {
+			options.value = [hitToOption(hit), ...options.value]
+		}
+	},
+	{ immediate: true },
+)
+
+const search = async (query: string) => {
+	query = query.trim()
+	if (!query) {
+		searchLoading.value = false
+		options.value = []
+		return
+	}
+
+	try {
+		const projectTypeFacets = props.projectTypes?.map((type) => `project_type:${type}`)
+
+		const results = await labrinth.projects_v2.search({
+			query: query,
+			limit: props.limit,
+			facets: projectTypeFacets ? [projectTypeFacets] : undefined,
+		})
+
+		const resultsByProjectId = await labrinth.projects_v2.search({
+			query: '',
+			limit: props.limit,
+			facets: [[`project_id:${query.replace(/[^a-zA-Z0-9]/g, '')}`]],
+		})
+
+		const userFuseHits: SearchHit[] = userProjectsFuse.value
+			? userProjectsFuse.value.search(query).map((r) => r.item)
+			: []
+
+		const allHits = [...userFuseHits, ...resultsByProjectId.hits, ...results.hits]
+		const seenIds = new Set<string>()
+		const excludeSet = new Set(props.excludeProjectIds ?? [])
+		const uniqueHits: SearchHit[] = []
+
+		for (const hit of allHits) {
+			if (!seenIds.has(hit.project_id) && !excludeSet.has(hit.project_id)) {
+				seenIds.add(hit.project_id)
+				uniqueHits.push(hit)
+				searchResultsCache.value.set(hit.project_id, hit)
+			}
+		}
+
+		options.value = uniqueHits.map(hitToOption)
+	} catch (error: unknown) {
+		const err = error as { data?: { description?: string } }
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : String(error),
+			type: 'error',
+		})
+	}
+	searchLoading.value = false
+}
+
+const throttledSearch = useDebounceFn(search, 250)
+
+const handleSearch = async (query: string) => {
+	searchLoading.value = true
+	await throttledSearch(query)
+}
+
+defineExpose({
+	selectedProject,
+})
+</script>

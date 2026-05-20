@@ -21,99 +21,100 @@
 					circle
 					:alt="auth.user.username"
 				/>
-				<div class="input-stack">
-					<FileInput
-						:max-size="262144"
-						:show-icon="true"
-						class="btn"
-						:prompt="formatMessage(commonMessages.uploadImageButton)"
-						accept="image/png,image/jpeg,image/gif,image/webp"
-						@change="showPreviewImage"
-					>
-						<UploadIcon />
-					</FileInput>
-					<Button v-if="avatarUrl !== null" :action="removePreviewImage">
-						<TrashIcon />
-						{{ formatMessage(commonMessages.removeImageButton) }}
-					</Button>
-					<Button
-						v-if="previewImage"
-						:action="
-							() => {
-								icon = null
-								previewImage = null
-							}
-						"
-					>
-						<UndoIcon />
-						{{ formatMessage(messages.profilePictureReset) }}
-					</Button>
+				<div class="flex flex-col gap-2">
+					<ButtonStyled>
+						<FileInput
+							:max-size="262144"
+							:show-icon="true"
+							class="button-like"
+							:prompt="formatMessage(commonMessages.uploadImageButton)"
+							accept="image/png,image/jpeg,image/gif,image/webp"
+							@change="showPreviewImage"
+						>
+							<UploadIcon />
+						</FileInput>
+					</ButtonStyled>
+					<ButtonStyled v-if="avatarUrl !== null">
+						<button @click="removePreviewImage">
+							<TrashIcon />
+							{{ formatMessage(commonMessages.removeImageButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="previewImage">
+						<button
+							@click="
+								() => {
+									icon = null
+									previewImage = null
+								}
+							"
+						>
+							<UndoIcon />
+							{{ formatMessage(commonMessages.resetButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 			<label for="username-field">
-				<span class="label__title">{{ formatMessage(messages.usernameTitle) }}</span>
+				<span class="label__title">{{ formatMessage(commonMessages.usernameLabel) }}</span>
 				<span class="label__description">
 					{{ formatMessage(messages.usernameDescription) }}
 				</span>
 			</label>
-			<input id="username-field" v-model="username" type="text" />
+			<StyledInput id="username-field" v-model="current.username" />
 			<label for="bio-field">
 				<span class="label__title">{{ formatMessage(messages.bioTitle) }}</span>
 				<span class="label__description">
 					{{ formatMessage(messages.bioDescription) }}
 				</span>
 			</label>
-			<textarea id="bio-field" v-model="bio" type="text" />
-			<div v-if="hasUnsavedChanges" class="input-group">
-				<Button color="primary" :action="() => saveChanges()">
-					<SaveIcon /> {{ formatMessage(commonMessages.saveChangesButton) }}
-				</Button>
-				<Button :action="() => cancel()">
-					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-			</div>
-			<div v-else class="input-group">
-				<Button disabled color="primary" :action="() => saveChanges()">
-					<SaveIcon />
-					{{
-						saved
-							? formatMessage(commonMessages.changesSavedLabel)
-							: formatMessage(commonMessages.saveChangesButton)
-					}}
-				</Button>
-				<Button :link="`/user/${auth.user.username}`">
-					<UserIcon /> {{ formatMessage(commonMessages.visitYourProfile) }}
-				</Button>
+			<StyledInput id="bio-field" v-model="current.bio" multiline />
+			<div class="input-group mt-4">
+				<ButtonStyled>
+					<NuxtLink :to="`/user/${auth.user.username}`">
+						<UserIcon /> {{ formatMessage(commonMessages.visitYourProfile) }}
+					</NuxtLink>
+				</ButtonStyled>
 			</div>
 		</section>
+		<UnsavedChangesPopup
+			:original="originalState"
+			:modified="modifiedState"
+			:saving="saving"
+			@reset="reset"
+			@save="save"
+		/>
 	</div>
 </template>
 
 <script setup>
-import { SaveIcon, TrashIcon, UndoIcon, UploadIcon, UserIcon, XIcon } from '@modrinth/assets'
+import { TrashIcon, UndoIcon, UploadIcon, UserIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	FileInput,
 	injectNotificationManager,
 	IntlFormatted,
+	StyledInput,
+	UnsavedChangesPopup,
+	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
-useHead({
-	title: 'Profile settings - Modrinth',
-})
-
 definePageMeta({
 	middleware: 'auth',
 })
 
 const messages = defineMessages({
+	headTitle: {
+		id: 'settings.profile.head-title',
+		defaultMessage: 'Profile settings',
+	},
 	title: {
 		id: 'settings.profile.profile-info',
 		defaultMessage: 'Profile information',
@@ -126,14 +127,6 @@ const messages = defineMessages({
 	profilePicture: {
 		id: 'settings.profile.profile-picture.title',
 		defaultMessage: 'Profile picture',
-	},
-	profilePictureReset: {
-		id: 'settings.profile.profile-picture.reset',
-		defaultMessage: 'Reset',
-	},
-	usernameTitle: {
-		id: 'settings.profile.username.title',
-		defaultMessage: 'Username',
 	},
 	usernameDescription: {
 		id: 'settings.profile.username.description',
@@ -149,22 +142,48 @@ const messages = defineMessages({
 	},
 })
 
+useHead({
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
+})
+
 const auth = await useAuth()
 
-const username = ref(auth.value.user.username)
-const bio = ref(auth.value.user.bio)
+// Avatar state (separate from useSavable)
 const avatarUrl = ref(auth.value.user.avatar_url)
 const icon = shallowRef(null)
 const previewImage = shallowRef(null)
 const pendingAvatarDeletion = ref(false)
-const saved = ref(false)
+const saving = ref(false)
 
-const hasUnsavedChanges = computed(
-	() =>
-		username.value !== auth.value.user.username ||
-		bio.value !== auth.value.user.bio ||
-		previewImage.value,
+const {
+	saved,
+	current,
+	reset: resetFields,
+} = useSavable(
+	() => ({
+		username: auth.value.user.username,
+		bio: auth.value.user.bio ?? '',
+	}),
+	async () => {}, // Save is handled manually due to complex icon logic
 )
+
+// Combined state for UnsavedChangesPopup
+const originalState = computed(() => ({
+	...saved.value,
+	avatarChanged: false,
+}))
+
+const modifiedState = computed(() => ({
+	...current.value,
+	avatarChanged: !!(previewImage.value || pendingAvatarDeletion.value),
+}))
+
+const reset = () => {
+	resetFields()
+	icon.value = null
+	previewImage.value = null
+	pendingAvatarDeletion.value = false
+}
 
 function showPreviewImage(files) {
 	const reader = new FileReader()
@@ -180,16 +199,8 @@ function removePreviewImage() {
 	previewImage.value = 'https://cdn.modrinth.com/placeholder.png'
 }
 
-function cancel() {
-	icon.value = null
-	previewImage.value = null
-	pendingAvatarDeletion.value = false
-	username.value = auth.value.user.username
-	bio.value = auth.value.user.bio
-}
-
-async function saveChanges() {
-	startLoading()
+async function save() {
+	saving.value = true
 	try {
 		if (pendingAvatarDeletion.value) {
 			await useBaseFetch(`user/${auth.value.user.id}/icon`, {
@@ -215,12 +226,12 @@ async function saveChanges() {
 
 		const body = {}
 
-		if (auth.value.user.username !== username.value) {
-			body.username = username.value
+		if (auth.value.user.username !== current.value.username) {
+			body.username = current.value.username
 		}
 
-		if (auth.value.user.bio !== bio.value) {
-			body.bio = bio.value
+		if (auth.value.user.bio !== current.value.bio) {
+			body.bio = current.value.bio
 		}
 
 		await useBaseFetch(`user/${auth.value.user.id}`, {
@@ -229,10 +240,9 @@ async function saveChanges() {
 		})
 		await useAuth(auth.value.token)
 		avatarUrl.value = auth.value.user.avatar_url
-		saved.value = true
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err
 				? err.data
 					? err.data.description
@@ -243,7 +253,7 @@ async function saveChanges() {
 			type: 'error',
 		})
 	}
-	stopLoading()
+	saving.value = false
 }
 </script>
 <style lang="scss" scoped>
@@ -251,11 +261,5 @@ async function saveChanges() {
 	display: flex;
 	gap: var(--gap-lg);
 	margin-top: var(--gap-md);
-}
-
-textarea {
-	height: 6rem;
-	width: 40rem;
-	margin-bottom: var(--gap-lg);
 }
 </style>

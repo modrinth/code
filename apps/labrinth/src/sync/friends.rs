@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::queue::socket::ActiveSockets;
 use crate::routes::internal::statuses::{
     broadcast_to_local_friends, send_message_to_user,
@@ -9,7 +10,6 @@ use ariadne::users::UserStatus;
 use redis::aio::PubSub;
 use redis::{RedisWrite, ToRedisArgs};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use tokio_stream::StreamExt;
 
 pub const FRIENDS_CHANNEL_NAME: &str = "friends";

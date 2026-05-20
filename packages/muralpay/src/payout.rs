@@ -10,7 +10,7 @@ use {
     crate::{
         AccountId, Blockchain, CounterpartyId, CurrencyCode, FiatAccountType,
         FiatAmount, FiatAndRailCode, PayoutMethodId, TokenAmount,
-        TransactionId, WalletDetails,
+        WalletDetails,
     },
     chrono::{DateTime, Utc},
     derive_more::{Deref, Display, Error, From},
@@ -297,7 +297,7 @@ pub struct Payout {
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum PayoutDetails {
-    Fiat(FiatPayoutDetails),
+    Fiat(Box<FiatPayoutDetails>),
     Blockchain(BlockchainPayoutDetails),
 }
 
@@ -357,14 +357,14 @@ pub enum FiatPayoutStatus {
         failure_reason: String,
         refund_completed_at: DateTime<Utc>,
         refund_initiated_at: DateTime<Utc>,
-        refund_transaction_id: TransactionId,
+        refund_transaction_id: String,
     },
 }
 
 // since 1.31
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum RefundErrorCode {
     Unknown,
     AccountNumberIncorrect,
@@ -376,7 +376,7 @@ pub enum RefundErrorCode {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde(tag = "type", rename_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum FiatPayoutStatusKind {
     Created,
     Pending,
@@ -554,9 +554,12 @@ pub enum FiatAndRailDetails {
     Brl {
         symbol: BrlSymbol,
         pix_account_type: PixAccountType,
-        pix_email: String,
-        pix_phone: String,
-        branch_code: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pix_email: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pix_phone: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        branch_code: Option<String>,
         document_number: String,
     },
     #[serde(rename_all = "camelCase")]

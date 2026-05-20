@@ -1,3 +1,4 @@
+import containerQueries from '@tailwindcss/container-queries'
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -6,7 +7,9 @@ const config: Config = {
 			colors: {
 				surface: {
 					1: 'var(--surface-1)',
+					1.5: 'var(--surface-1-5)',
 					2: 'var(--surface-2)',
+					2.5: 'var(--surface-2-5)',
 					3: 'var(--surface-3)',
 					4: 'var(--surface-4)',
 					5: 'var(--surface-5)',
@@ -224,7 +227,7 @@ const config: Config = {
 				hr: 'var(--color-hr)',
 				table: {
 					border: 'var(--color-table-border)',
-					alternateRow: ' var(--color-table-alternate-row)',
+					alternateRow: 'var(--color-table-alternate-row)',
 				},
 			},
 			backgroundImage: {
@@ -252,7 +255,7 @@ const config: Config = {
 			},
 		},
 	},
-	plugins: [],
+	plugins: [containerQueries],
 	corePlugins: {
 		preflight: false,
 	},

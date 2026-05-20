@@ -1,7 +1,8 @@
+use crate::database::PgPool;
+use crate::env::ENV;
 use chrono::{Datelike, Duration, TimeZone, Utc};
 use eyre::{Context, Result, eyre};
 use rust_decimal::{Decimal, dec};
-use sqlx::PgPool;
 use tracing::warn;
 
 use crate::database::models::{DBAffiliateCodeId, DBUserId};
@@ -58,15 +59,11 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             )
         "#
     )
-    .fetch_all(&mut *txn)
+    .fetch_all(&mut txn)
     .await
     .wrap_err("failed to fetch charges awaiting affiliate payout")?;
 
-    let default_affiliate_revenue_split =
-        dotenvy::var("DEFAULT_AFFILIATE_REVENUE_SPLIT")
-            .wrap_err("no env var `DEFAULT_AFFILIATE_REVENUE_SPLIT`")?
-            .parse::<Decimal>()
-            .wrap_err("`DEFAULT_AFFILIATE_REVENUE_SPLIT` is not a decimal")?;
+    let default_affiliate_revenue_split = ENV.DEFAULT_AFFILIATE_REVENUE_SPLIT;
 
     let (
         mut insert_usap_charges,
@@ -147,7 +144,7 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             available,
             affiliate_code_id as _,
         )
-        .fetch_one(&mut *txn)
+        .fetch_one(&mut txn)
         .await
         .wrap_err_with(|| eyre!("failed to insert payout value for ({affiliate_user_id:?}, {affiliate_code_id:?})"))?
         .id;
@@ -170,7 +167,7 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
         &insert_usap_affiliate_codes[..],
         &insert_usap_payout_values[..],
     )
-    .execute(&mut *txn)
+    .execute(&mut txn)
     .await
     .wrap_err("failed to associate charges with affiliate payouts")?;
 
@@ -221,7 +218,7 @@ pub async fn remove_payouts_for_refunded_charges(
             AND refund_charges.charge_type = 'refund'
         "#
     )
-    .fetch_all(&mut *txn)
+    .fetch_all(&mut txn)
     .await
     .wrap_err("failed to fetch refundable affiliate payouts")?;
 
@@ -248,7 +245,7 @@ pub async fn remove_payouts_for_refunded_charges(
         ",
         &usap_ids[..]
     )
-    .execute(&mut *txn)
+    .execute(&mut txn)
     .await
     .wrap_err("failed to delete affiliate payout associations")?;
 
@@ -260,7 +257,7 @@ pub async fn remove_payouts_for_refunded_charges(
         ",
         &payout_value_ids[..]
     )
-    .execute(&mut *txn)
+    .execute(&mut txn)
     .await
     .wrap_err("failed to delete payout values")?;
 

@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use crate::models::pats::Scopes;
+use crate::{database::PgTransaction, models::pats::Scopes};
 
 use super::{
     DBOAuthClientAuthorizationId, DBOAuthClientId, DBUserId, DatabaseError,
@@ -41,7 +41,7 @@ impl DBOAuthClientAuthorization {
     pub async fn get(
         client_id: DBOAuthClientId,
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBOAuthClientAuthorization>, DatabaseError> {
         let value = sqlx::query_as!(
             DBAuthClientAuthorizationQueryResult,
@@ -61,7 +61,7 @@ impl DBOAuthClientAuthorization {
 
     pub async fn get_all_for_user(
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBOAuthClientAuthorization>, DatabaseError> {
         let results = sqlx::query_as!(
             DBAuthClientAuthorizationQueryResult,
@@ -83,7 +83,7 @@ impl DBOAuthClientAuthorization {
         client_id: DBOAuthClientId,
         user_id: DBUserId,
         scopes: Scopes,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -101,7 +101,7 @@ impl DBOAuthClientAuthorization {
             user_id.0,
             scopes.bits() as i64,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -110,7 +110,7 @@ impl DBOAuthClientAuthorization {
     pub async fn remove(
         client_id: DBOAuthClientId,
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "

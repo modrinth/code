@@ -7,9 +7,12 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 
-use crate::database::models::{
-    DBFileId, DBProjectId, DatabaseError, DelphiReportId,
-    DelphiReportIssueDetailsId, DelphiReportIssueId,
+use crate::database::{
+    PgTransaction,
+    models::{
+        DBFileId, DBProjectId, DatabaseError, DelphiReportId,
+        DelphiReportIssueDetailsId, DelphiReportIssueId,
+    },
 };
 
 /// A Delphi malware analysis report for a project version file.
@@ -32,7 +35,7 @@ pub struct DBDelphiReport {
 impl DBDelphiReport {
     pub async fn upsert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DelphiReportId, DatabaseError> {
         Ok(DelphiReportId(sqlx::query_scalar!(
             "
@@ -47,7 +50,7 @@ impl DBDelphiReport {
             self.artifact_url,
             self.severity as DelphiSeverity,
         )
-        .fetch_one(&mut **transaction)
+        .fetch_one(&mut *transaction)
         .await?))
     }
 }
@@ -179,9 +182,30 @@ pub struct DelphiReportIssueResult {
 }
 
 impl DBDelphiReportIssue {
+    pub async fn upsert(
+        &self,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<DelphiReportIssueId, DatabaseError> {
+        Ok(DelphiReportIssueId(
+            sqlx::query_scalar!(
+                "
+                INSERT INTO delphi_report_issues (report_id, issue_type)
+                VALUES ($1, $2)
+                ON CONFLICT (report_id, issue_type) DO UPDATE SET
+                    issue_type = EXCLUDED.issue_type
+                RETURNING id
+                ",
+                self.report_id as DelphiReportId,
+                self.issue_type,
+            )
+            .fetch_one(&mut *transaction)
+            .await?,
+        ))
+    }
+
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DelphiReportIssueId, DatabaseError> {
         Ok(DelphiReportIssueId(
             sqlx::query_scalar!(
@@ -193,7 +217,7 @@ impl DBDelphiReportIssue {
                 self.report_id as DelphiReportId,
                 self.issue_type,
             )
-            .fetch_one(&mut **transaction)
+            .fetch_one(&mut *transaction)
             .await?,
         ))
     }
@@ -218,6 +242,9 @@ pub struct ReportIssueDetail {
     /// This acts as a stable identifier for an issue detail, even across
     /// different versions of the same file.
     pub key: String,
+    /// If this detail was found inside a JAR embedded inside the scanned JAR,
+    /// this will point to the path of that JAR inside the outer JAR.
+    pub jar: Option<String>,
     /// Name of the Java class path in which this issue was found.
     pub file_path: String,
     /// Decompiled, pretty-printed source of the Java class.
@@ -234,34 +261,35 @@ pub struct ReportIssueDetail {
 impl ReportIssueDetail {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DelphiReportIssueDetailsId, DatabaseError> {
         Ok(DelphiReportIssueDetailsId(sqlx::query_scalar!(
             "
-            INSERT INTO delphi_report_issue_details (issue_id, key, file_path, decompiled_source, data, severity)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO delphi_report_issue_details (issue_id, key, jar, file_path, decompiled_source, data, severity)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING id
             ",
             self.issue_id as DelphiReportIssueId,
             self.key,
+            self.jar,
             self.file_path,
             self.decompiled_source,
             sqlx::types::Json(&self.data) as Json<&HashMap<String, serde_json::Value>>,
             self.severity as DelphiSeverity,
         )
-        .fetch_one(&mut **transaction)
+        .fetch_one(&mut *transaction)
         .await?))
     }
 
     pub async fn remove_all_by_issue_id(
         issue_id: DelphiReportIssueId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<u64, DatabaseError> {
         Ok(sqlx::query!(
             "DELETE FROM delphi_report_issue_details WHERE issue_id = $1",
             issue_id as DelphiReportIssueId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?
         .rows_affected())
     }

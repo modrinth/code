@@ -8,7 +8,9 @@
 				<Combobox
 					v-model="selectedYear"
 					:options="yearOptions"
-					:display-value="selectedYear === 'all' ? 'All years' : String(selectedYear)"
+					:display-value="
+						selectedYear === 'all' ? formatMessage(messages.allYears) : String(selectedYear)
+					"
 					listbox
 				/>
 				<ButtonStyled circular>
@@ -67,19 +69,16 @@
 						v-for="transaction in transactions"
 						:key="transaction.id || transaction.created"
 						:transaction="transaction"
-						@cancelled="refresh"
+						@cancelled="refetch"
 					/>
 				</div>
 			</div>
 		</div>
-		<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
-			<span class="text-lg text-contrast md:text-xl">{{
-				formatMessage(messages.noTransactions)
-			}}</span>
-			<span class="max-w-[256px] text-base text-secondary md:text-lg">{{
-				formatMessage(messages.noTransactionsDesc)
-			}}</span>
-		</div>
+		<EmptyState
+			v-else
+			:heading="formatMessage(messages.noTransactions)"
+			:description="formatMessage(messages.noTransactionsDesc)"
+		/>
 	</div>
 </template>
 <script setup>
@@ -90,8 +89,18 @@ import {
 	GenericListIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Combobox, defineMessages, useVIntl } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
+import {
+	ButtonStyled,
+	Combobox,
+	defineMessages,
+	EmptyState,
+	injectModrinthClient,
+	useFormatDateTime,
+	useFormatMoney,
+	useVIntl,
+} from '@modrinth/ui'
+import { capitalizeString } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
@@ -99,17 +108,70 @@ import { useGeneratedState } from '~/composables/generated'
 import { findRail } from '~/utils/muralpay-rails'
 
 const { formatMessage } = useVIntl()
-const generatedState = useGeneratedState()
-
-useHead({
-	title: 'Transaction history - Modrinth',
+const formatMoney = useFormatMoney()
+const formatMonth = useFormatDateTime({
+	year: 'numeric',
+	month: 'long',
 })
 
-const { data: transactions, refresh } = await useAsyncData(`payout-history`, () =>
-	useBaseFetch(`payout/history`, {
-		apiVersion: 3,
-	}),
-)
+const client = injectModrinthClient()
+const generatedState = useGeneratedState()
+
+const messages = defineMessages({
+	transactionsHeader: {
+		id: 'dashboard.revenue.transactions.header',
+		defaultMessage: 'Transactions',
+	},
+	headTitle: {
+		id: 'dashboard.revenue.transactions.head-title',
+		defaultMessage: 'Transaction history',
+	},
+	received: {
+		id: 'dashboard.revenue.stats.received',
+		defaultMessage: 'Received',
+	},
+	withdrawn: {
+		id: 'dashboard.revenue.stats.withdrawn',
+		defaultMessage: 'Withdrawn',
+	},
+	transactions: {
+		id: 'dashboard.revenue.stats.transactions',
+		defaultMessage: 'Transactions',
+	},
+	noTransactions: {
+		id: 'dashboard.revenue.transactions.none',
+		defaultMessage: 'No transactions',
+	},
+	noTransactionsDesc: {
+		id: 'dashboard.revenue.transactions.none.desc',
+		defaultMessage: 'Your payouts and withdrawals will appear here.',
+	},
+	downloadCsv: {
+		id: 'dashboard.revenue.transactions.btn.download-csv',
+		defaultMessage: 'Download as CSV',
+	},
+	allYears: {
+		id: 'dashboard.revenue.transactions.year.all',
+		defaultMessage: 'All years',
+	},
+	thisMonth: {
+		id: 'dashboard.revenue.transactions.period.this-month',
+		defaultMessage: 'This month',
+	},
+	lastMonth: {
+		id: 'dashboard.revenue.transactions.period.last-month',
+		defaultMessage: 'Last month',
+	},
+})
+
+useHead({
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
+})
+
+const { data: transactions, refetch } = useQuery({
+	queryKey: ['payout', 'history'],
+	queryFn: () => client.labrinth.payout_v3.getHistory(),
+})
 
 const allTransactions = computed(() => {
 	if (!transactions.value) return []
@@ -130,7 +192,7 @@ const yearOptions = computed(() => {
 
 	return yearValues.map((year) => ({
 		value: year,
-		label: year === 'all' ? 'All years' : String(year),
+		label: year === 'all' ? formatMessage(messages.allYears) : String(year),
 	}))
 })
 
@@ -148,11 +210,11 @@ function getPeriodLabel(date) {
 	const now = dayjs()
 
 	if (txnDate.isSame(now, 'month')) {
-		return 'This month'
+		return formatMessage(messages.thisMonth)
 	} else if (txnDate.isSame(now.subtract(1, 'month'), 'month')) {
-		return 'Last month'
+		return formatMessage(messages.lastMonth)
 	} else {
-		return txnDate.format('MMMM YYYY')
+		return capitalizeString(formatMonth(txnDate.toDate()))
 	}
 }
 
@@ -303,35 +365,4 @@ const downloadTransactionsCSV = () => {
 }
 
 const onDownloadCSV = useClientTry(async () => await downloadTransactionsCSV())
-
-const messages = defineMessages({
-	transactionsHeader: {
-		id: 'dashboard.revenue.transactions.header',
-		defaultMessage: 'Transactions',
-	},
-	received: {
-		id: 'dashboard.revenue.stats.received',
-		defaultMessage: 'Received',
-	},
-	withdrawn: {
-		id: 'dashboard.revenue.stats.withdrawn',
-		defaultMessage: 'Withdrawn',
-	},
-	transactions: {
-		id: 'dashboard.revenue.stats.transactions',
-		defaultMessage: 'Transactions',
-	},
-	noTransactions: {
-		id: 'dashboard.revenue.transactions.none',
-		defaultMessage: 'No transactions',
-	},
-	noTransactionsDesc: {
-		id: 'dashboard.revenue.transactions.none.desc',
-		defaultMessage: 'Your payouts and withdrawals will appear here.',
-	},
-	downloadCsv: {
-		id: 'dashboard.revenue.transactions.btn.download-csv',
-		defaultMessage: 'Download as CSV',
-	},
-})
 </script>

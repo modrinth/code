@@ -11,7 +11,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold"> New sign-in method added </Heading>
 
-		<Text class="text-muted text-base">Hi {user.name},</Text>
+		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
 			Your {authprovider.name} account has been connected and you can now use it to sign in to your
 			Modrinth account.

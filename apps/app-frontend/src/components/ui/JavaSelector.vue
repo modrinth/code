@@ -1,52 +1,61 @@
 <template>
 	<JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
 	<div class="toggle-setting" :class="{ compact }">
-		<input
+		<StyledInput
 			autocomplete="off"
 			:disabled="props.disabled"
-			:value="props.modelValue ? props.modelValue.path : ''"
-			type="text"
-			class="installation-input"
+			:model-value="props.modelValue ? props.modelValue.path : ''"
 			:placeholder="placeholder ?? '/path/to/java'"
-			@input="
+			wrapper-class="installation-input"
+			@update:model-value="
 				(val) => {
 					emit('update:modelValue', {
 						...props.modelValue,
-						path: val.target.value,
+						path: val,
 					})
 				}
 			"
 		/>
 		<span class="installation-buttons">
-			<Button
-				v-if="props.version"
-				:disabled="props.disabled || installingJava"
-				@click="reinstallJava"
-			>
-				<DownloadIcon />
-				{{ installingJava ? 'Installing...' : 'Install recommended' }}
-			</Button>
-			<Button :disabled="props.disabled" @click="autoDetect">
-				<SearchIcon />
-				Detect
-			</Button>
-			<Button :disabled="props.disabled" @click="handleJavaFileInput()">
-				<FolderSearchIcon />
-				Browse
-			</Button>
-			<Button v-if="testingJava" disabled> Testing... </Button>
-			<Button v-else-if="testingJavaSuccess === true">
-				<CheckIcon class="test-success" />
-				Success
-			</Button>
-			<Button v-else-if="testingJavaSuccess === false">
-				<XIcon class="test-fail" />
-				Failed
-			</Button>
-			<Button v-else :disabled="props.disabled" @click="testJava">
-				<PlayIcon />
-				Test
-			</Button>
+			<ButtonStyled v-if="props.version">
+				<button :disabled="props.disabled || installingJava" @click="reinstallJava">
+					<DownloadIcon />
+					{{ installingJava ? 'Installing...' : 'Install recommended' }}
+				</button>
+			</ButtonStyled>
+			<ButtonStyled>
+				<button :disabled="props.disabled" @click="autoDetect">
+					<SearchIcon />
+					Detect
+				</button>
+			</ButtonStyled>
+			<ButtonStyled>
+				<button :disabled="props.disabled" @click="handleJavaFileInput()">
+					<FolderSearchIcon />
+					Browse
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-if="testingJava">
+				<button disabled>Testing...</button>
+			</ButtonStyled>
+			<ButtonStyled v-else-if="testingJavaSuccess === true">
+				<button disabled>
+					<CheckIcon />
+					Success
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-else-if="testingJavaSuccess === false">
+				<button disabled>
+					<XIcon />
+					Failed
+				</button>
+			</ButtonStyled>
+			<ButtonStyled v-else>
+				<button :disabled="props.disabled" @click="testJava">
+					<PlayIcon />
+					Test
+				</button>
+			</ButtonStyled>
 		</span>
 	</div>
 </template>
@@ -60,7 +69,7 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, injectNotificationManager } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref } from 'vue'
 
@@ -205,10 +214,6 @@ async function reinstallJava() {
 	align-items: center;
 	gap: 0.5rem;
 	margin: 0;
-
-	.btn {
-		width: max-content;
-	}
 }
 
 .test-success {

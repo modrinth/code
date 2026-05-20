@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :noblur="noblur" :danger="danger" :on-hide="onHide">
+	<NewModal ref="modal" :noblur="noblur" :danger="danger" :on-hide="onHide" max-width="550px">
 		<template #title>
 			<slot name="title">
 				<span class="font-extrabold text-contrast text-lg">{{ title }}</span>
@@ -23,25 +23,24 @@
 					<span class="italic font-bold">{{ confirmationText }}</span> below:
 				</span>
 			</label>
-			<input
+			<StyledInput
 				v-if="hasToType"
 				id="confirmation"
 				v-model="confirmation_typed"
-				type="text"
 				placeholder="Type here..."
-				class="max-w-[20rem]"
+				wrapper-class="max-w-[20rem]"
 			/>
-			<div class="flex gap-2">
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled>
+					<button class="!shadow-none" @click="hide()">
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
 				<ButtonStyled :color="danger ? 'red' : 'brand'">
 					<button :disabled="action_disabled" @click="proceed">
 						<component :is="proceedIcon" />
 						{{ proceedLabel }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="modal.hide()">
-						<XIcon />
-						Cancel
 					</button>
 				</ButtonStyled>
 			</div>
@@ -55,6 +54,7 @@ import { renderString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import ButtonStyled from '../base/ButtonStyled.vue'
+import StyledInput from '../base/StyledInput.vue'
 import NewModal from './NewModal.vue'
 
 const props = defineProps({
@@ -78,7 +78,7 @@ const props = defineProps({
 	},
 	proceedIcon: {
 		type: Object,
-		default: TrashIcon,
+		default: () => TrashIcon,
 	},
 	proceedLabel: {
 		type: String,
@@ -124,6 +124,9 @@ function proceed() {
 function show() {
 	modal.value.show()
 }
+function hide() {
+	modal.value.hide()
+}
 
-defineExpose({ show })
+defineExpose({ show, hide })
 </script>

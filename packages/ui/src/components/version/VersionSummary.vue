@@ -12,7 +12,12 @@
 			</p>
 		</div>
 		<ButtonStyled color="brand">
-			<a :href="downloadUrl" class="min-w-0" @click="emit('onDownload')">
+			<a
+				:href="downloadUrl"
+				:download="primaryFilename"
+				class="min-w-0"
+				@click="emit('onDownload')"
+			>
 				<DownloadIcon aria-hidden="true" /> Download
 			</a>
 		</ButtonStyled>
@@ -39,12 +44,19 @@ import { ButtonStyled, VersionChannelIndicator } from '../index'
 
 const props = defineProps<{
 	version: Version
+	decorateDownloadUrl?: (url: string) => string
 }>()
 
+const primaryFile = computed<VersionFile>(
+	() => props.version.files.find((x) => x.primary) || props.version.files[0],
+)
+
 const downloadUrl = computed(() => {
-	const primary: VersionFile = props.version.files.find((x) => x.primary) || props.version.files[0]
-	return primary.url
+	const raw = primaryFile.value.url
+	return props.decorateDownloadUrl ? props.decorateDownloadUrl(raw) : raw
 })
+
+const primaryFilename = computed(() => primaryFile.value.filename)
 
 const emit = defineEmits<{
 	onDownload: []

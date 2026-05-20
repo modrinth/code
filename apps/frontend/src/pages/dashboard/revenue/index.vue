@@ -67,10 +67,15 @@
 						></span>
 						{{
 							formatMessage(messages.estimatedWithDate, {
-								date: date.date ? dayjs(date.date).format('MMM D, YYYY') : '',
+								date: date.date ? formatDate(date.date) : '',
 							})
 						}}
-						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
+						<Tooltip
+							theme="dismissable-prompt"
+							:triggers="['hover', 'focus']"
+							no-auto-focus
+							:aria-id="`${baseId}-date-segment-tooltip-${i}`"
+						>
 							<nuxt-link
 								class="inline-flex items-center justify-center text-link"
 								to="/legal/cmp-info#pending"
@@ -99,7 +104,12 @@
 							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg opacity-90 md:size-5"
 						></span>
 						{{ formatMessage(messages.processing) }}
-						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
+						<Tooltip
+							theme="dismissable-prompt"
+							:triggers="['hover', 'focus']"
+							no-auto-focus
+							:aria-id="`${baseId}-processing-tooltip`"
+						>
 							<InProgressIcon class="inline-block size-4 align-middle md:size-5" />
 							<template #popper>
 								<div class="w-[250px] font-semibold text-contrast">
@@ -188,7 +198,7 @@
 			<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-3 md:gap-4">
 				<RevenueTransaction
 					v-for="transaction in sortedPayouts.slice(0, 3)"
-					:key="transaction.id || transaction.created"
+					:key="('id' in transaction && transaction.id) || transaction.created"
 					:transaction="transaction"
 					@cancelled="refreshPayouts"
 				/>
@@ -260,34 +270,28 @@
 
 <script setup lang="ts">
 import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
+import {
+	defineMessages,
+	injectModrinthClient,
+	useFormatDateTime,
+	useFormatMoney,
+	useVIntl,
+} from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 
 import { useUserCountry } from '@/composables/country.ts'
-import type { PayoutMethod } from '@/providers/creator-withdraw.ts'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
+const formatDate = useFormatDateTime({ dateStyle: 'medium' })
 
 await useAuth()
 
-// TODO: Deduplicate these types & interfaces in @modrinth/api-client PR.
-type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'
-
-type UserBalanceResponse = {
-	available: number
-	withdrawn_lifetime: number
-	withdrawn_ytd: number
-	pending: number
-	// ISO 8601 date string -> amount
-	dates: Record<string, number>
-	// backend returns null when not applicable
-	requested_form_type: string | null
-	form_completion_status: FormCompletionStatus | null
-}
+const client = injectModrinthClient()
 
 type RevenueBarSegment = {
 	key: string
@@ -298,14 +302,22 @@ type RevenueBarSegment = {
 
 const hoveredSeg = ref<string | null>(null)
 
+const baseId = useId()
+
 const withdrawModal = ref<InstanceType<typeof CreatorWithdrawModal>>()
 async function openWithdrawModal() {
 	withdrawModal.value?.show?.()
 }
 
 const messages = defineMessages({
-	balanceLabel: { id: 'dashboard.revenue.balance', defaultMessage: 'Balance' },
-	availableNow: { id: 'dashboard.revenue.available-now', defaultMessage: 'Available now' },
+	balanceLabel: {
+		id: 'dashboard.revenue.balance',
+		defaultMessage: 'Balance',
+	},
+	availableNow: {
+		id: 'dashboard.revenue.available-now',
+		defaultMessage: 'Available now',
+	},
 	estimatedWithDate: {
 		id: 'dashboard.revenue.estimated-with-date',
 		defaultMessage: 'Estimated {date}',
@@ -318,14 +330,23 @@ const messages = defineMessages({
 		id: 'dashboard.revenue.estimated-tooltip.msg2',
 		defaultMessage: 'Click to read about how Modrinth handles your revenue.',
 	},
-	processing: { id: 'dashboard.revenue.processing', defaultMessage: 'Processing' },
+	processing: {
+		id: 'dashboard.revenue.processing',
+		defaultMessage: 'Processing',
+	},
 	processingTooltip: {
 		id: 'dashboard.revenue.processing.tooltip',
 		defaultMessage:
 			'Revenue stays in processing until the end of the month, then becomes available 60 days later.',
 	},
-	withdrawHeader: { id: 'dashboard.revenue.withdraw.header', defaultMessage: 'Withdraw' },
-	withdrawCardTitle: { id: 'dashboard.revenue.withdraw.card.title', defaultMessage: 'Withdraw' },
+	withdrawHeader: {
+		id: 'dashboard.revenue.withdraw.header',
+		defaultMessage: 'Withdraw',
+	},
+	withdrawCardTitle: {
+		id: 'dashboard.revenue.withdraw.card.title',
+		defaultMessage: 'Withdraw',
+	},
 	withdrawCardDescription: {
 		id: 'dashboard.revenue.withdraw.card.description',
 		defaultMessage: 'Withdraw from your available balance to any payout method.',
@@ -344,7 +365,10 @@ const messages = defineMessages({
 		id: 'dashboard.revenue.transactions.header',
 		defaultMessage: 'Transactions',
 	},
-	seeAll: { id: 'dashboard.revenue.transactions.see-all', defaultMessage: 'See all' },
+	seeAll: {
+		id: 'dashboard.revenue.transactions.see-all',
+		defaultMessage: 'See all',
+	},
 	noTransactions: {
 		id: 'dashboard.revenue.transactions.none',
 		defaultMessage: 'No transactions',
@@ -355,42 +379,30 @@ const messages = defineMessages({
 	},
 })
 
-const { data: userBalance, refresh: refreshUserBalance } = await useAsyncData(
-	`payout/balance`,
-	async () => {
-		const response = (await useBaseFetch(`payout/balance`, {
-			apiVersion: 3,
-		})) as UserBalanceResponse
-		return {
-			...response,
-			available: Number(response.available),
-			withdrawn_lifetime: Number(response.withdrawn_lifetime),
-			withdrawn_ytd: Number(response.withdrawn_ytd),
-			pending: Number(response.pending),
-		}
-	},
-)
+const { data: userBalance, refetch: refreshUserBalance } = useQuery({
+	queryKey: ['payout', 'balance'],
+	queryFn: () => client.labrinth.payout_v3.getBalance(),
+})
 
-const { data: payouts, refresh: refreshPayouts } = await useAsyncData(`payout/history`, () =>
-	useBaseFetch(`payout/history`, {
-		apiVersion: 3,
-	}),
-)
+const { data: payouts, refetch: refreshPayouts } = useQuery({
+	queryKey: ['payout', 'history'],
+	queryFn: () => client.labrinth.payout_v3.getHistory(),
+})
 
 const userCountry = useUserCountry()
-const { data: preloadedPaymentMethods } = await useAsyncData(`payout/methods-preload`, async () => {
-	const defaultCountry = userCountry.value || 'US'
-	try {
-		return {
-			country: defaultCountry,
-			methods: (await useBaseFetch('payout/methods', {
-				apiVersion: 3,
-				query: { country: defaultCountry },
-			})) as PayoutMethod[],
+const { data: preloadedPaymentMethods } = useQuery({
+	queryKey: computed(() => ['payout', 'methods-preload', userCountry.value]),
+	queryFn: async () => {
+		const defaultCountry = userCountry.value || 'US'
+		try {
+			return {
+				country: defaultCountry,
+				methods: await client.labrinth.payout_v3.getMethods(defaultCountry),
+			}
+		} catch {
+			return null
 		}
-	} catch {
-		return null
-	}
+	},
 })
 
 const sortedPayouts = computed(() => {

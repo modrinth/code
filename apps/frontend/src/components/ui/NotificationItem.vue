@@ -178,12 +178,7 @@
 							class="categories"
 						/>
 						{{ $formatVersion(notif.extra_data.version.game_versions) }}
-						<span
-							v-tooltip="
-								$dayjs(notif.extra_data.version.date_published).format('MMMM D, YYYY [at] h:mm A')
-							"
-							class="date"
-						>
+						<span v-tooltip="formatDateTime(notif.extra_data.version.date_published)" class="date">
 							{{ formatRelativeTime(notif.extra_data.version.date_published) }}
 						</span>
 					</span>
@@ -197,57 +192,16 @@
 			<span v-if="notification.read" class="read-badge inline-flex">
 				<CheckCircleIcon /> Read
 			</span>
-			<span
-				v-tooltip="$dayjs(notification.created).format('MMMM D, YYYY [at] h:mm A')"
-				class="inline-flex"
-			>
+			<span v-tooltip="formatDateTime(notification.created)" class="inline-flex">
 				<CalendarIcon class="mr-1" /> Received
 				{{ formatRelativeTime(notification.created) }}
 			</span>
 		</span>
 		<div v-if="compact" class="notification__actions">
 			<template v-if="type === 'team_invite' || type === 'organization_invite'">
-				<button
-					v-tooltip="`Accept`"
-					class="iconified-button square-button brand-button button-transparent"
-					@click="
-						() => {
-							acceptTeamInvite(notification.body.team_id)
-							read()
-						}
-					"
-				>
-					<CheckIcon />
-				</button>
-				<button
-					v-tooltip="`Decline`"
-					class="iconified-button square-button danger-button button-transparent"
-					@click="
-						() => {
-							removeSelfFromTeam(notification.body.team_id)
-							read()
-						}
-					"
-				>
-					<XIcon />
-				</button>
-			</template>
-			<button
-				v-else-if="!notification.read"
-				v-tooltip="`Mark as read`"
-				class="iconified-button square-button button-transparent"
-				@click="read()"
-			>
-				<XIcon />
-			</button>
-		</div>
-		<div v-else class="notification__actions">
-			<div v-if="type !== null" class="input-group">
-				<template
-					v-if="(type === 'team_invite' || type === 'organization_invite') && !notification.read"
-				>
+				<ButtonStyled circular color="brand" type="transparent">
 					<button
-						class="iconified-button brand-button"
+						v-tooltip="`Accept`"
 						@click="
 							() => {
 								acceptTeamInvite(notification.body.team_id)
@@ -256,10 +210,11 @@
 						"
 					>
 						<CheckIcon />
-						Accept
 					</button>
+				</ButtonStyled>
+				<ButtonStyled circular color="red" type="transparent">
 					<button
-						class="iconified-button danger-button"
+						v-tooltip="`Decline`"
 						@click="
 							() => {
 								removeSelfFromTeam(notification.body.team_id)
@@ -268,51 +223,75 @@
 						"
 					>
 						<XIcon />
-						Decline
 					</button>
-				</template>
-				<button
-					v-else-if="!notification.read"
-					class="iconified-button"
-					:class="{ 'raised-button': raised }"
-					@click="read()"
-				>
-					<CheckIcon />
-					Mark as read
+				</ButtonStyled>
+			</template>
+			<ButtonStyled v-else-if="!notification.read" circular type="transparent">
+				<button v-tooltip="`Mark as read`" @click="read()">
+					<XIcon />
 				</button>
+			</ButtonStyled>
+		</div>
+		<div v-else class="notification__actions">
+			<div v-if="type !== null" class="input-group">
+				<template
+					v-if="(type === 'team_invite' || type === 'organization_invite') && !notification.read"
+				>
+					<ButtonStyled color="brand">
+						<button
+							@click="
+								() => {
+									acceptTeamInvite(notification.body.team_id)
+									read()
+								}
+							"
+						>
+							<CheckIcon />
+							Accept
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="red">
+						<button
+							@click="
+								() => {
+									removeSelfFromTeam(notification.body.team_id)
+									read()
+								}
+							"
+						>
+							<XIcon />
+							Decline
+						</button>
+					</ButtonStyled>
+				</template>
+				<ButtonStyled v-else-if="!notification.read">
+					<button @click="read()">
+						<CheckIcon />
+						Mark as read
+					</button>
+				</ButtonStyled>
 				<CopyCode v-if="flags.developerMode" :text="notification.id" />
 			</div>
 			<div v-else class="input-group">
-				<nuxt-link
-					v-if="notification.link && notification.link !== '#'"
-					class="iconified-button"
-					:class="{ 'raised-button': raised }"
-					:to="notification.link"
-					target="_blank"
-				>
-					<ExternalIcon />
-					Open link
-				</nuxt-link>
-				<button
-					v-for="(action, actionIndex) in notification.actions"
-					:key="actionIndex"
-					class="iconified-button"
-					:class="{ 'raised-button': raised }"
-					@click="performAction(notification, actionIndex)"
-				>
-					<CheckIcon v-if="action.title === 'Accept'" />
-					<XIcon v-else-if="action.title === 'Deny'" />
-					{{ action.title }}
-				</button>
-				<button
-					v-if="notification.actions.length === 0 && !notification.read"
-					class="iconified-button"
-					:class="{ 'raised-button': raised }"
-					@click="performAction(notification, null)"
-				>
-					<CheckIcon />
-					Mark as read
-				</button>
+				<ButtonStyled v-if="notification.link && notification.link !== '#'">
+					<nuxt-link :to="notification.link" target="_blank">
+						<ExternalIcon />
+						Open link
+					</nuxt-link>
+				</ButtonStyled>
+				<ButtonStyled v-for="(action, actionIndex) in notification.actions" :key="actionIndex">
+					<button @click="performAction(notification, actionIndex)">
+						<CheckIcon v-if="action.title === 'Accept'" />
+						<XIcon v-else-if="action.title === 'Deny'" />
+						{{ action.title }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-if="notification.actions.length === 0 && !notification.read">
+					<button @click="performAction(notification, null)">
+						<CheckIcon />
+						Mark as read
+					</button>
+				</ButtonStyled>
 				<CopyCode v-if="flags.developerMode" :text="notification.id" />
 			</div>
 		</div>
@@ -333,11 +312,14 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonStyled,
 	Categories,
 	CopyCode,
 	DoubleIcon,
+	injectModrinthClient,
 	injectNotificationManager,
 	ProjectStatusBadge,
+	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { getUserLink, renderString } from '@modrinth/utils'
@@ -348,9 +330,14 @@ import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 
 import ThreadSummary from './thread/ThreadSummary.vue'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const emit = defineEmits(['update:notifications'])
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const props = defineProps({
 	notification: {
@@ -410,7 +397,7 @@ async function read() {
 				? props.notification.grouped_notifs.map((notif) => notif.id)
 				: []),
 		]
-		const updateNotifs = await markAsRead(ids)
+		const updateNotifs = await markAsRead(client, ids)
 		const newNotifs = updateNotifs(props.notifications)
 		emit('update:notifications', newNotifs)
 	} catch (err) {
@@ -458,9 +445,11 @@ function getMessages() {
 }
 
 function getLoaderCategories(ver) {
-	return tags.value.loaders.filter((loader) => {
-		return ver?.loaders?.includes(loader.name)
-	})
+	return tags.value.loaders
+		.filter((loader) => {
+			return ver?.loaders?.includes(loader.name)
+		})
+		.map((loader) => loader.name)
 }
 </script>
 
@@ -593,10 +582,6 @@ function getLoaderCategories(ver) {
 		gap: var(--spacing-card-sm);
 	}
 
-	.notification__actions .iconified-button.square-button svg {
-		margin-right: 0;
-	}
-
 	.unknown-type {
 		color: var(--color-red);
 	}
@@ -616,5 +601,9 @@ function getLoaderCategories(ver) {
 	.creator-color {
 		color: var(--color-blue);
 	}
+}
+
+.title-link {
+	@apply underline hover:brightness-[--hover-brightness];
 }
 </style>

@@ -60,7 +60,7 @@
 			<div v-if="!existingSubscription">
 				<p class="my-2 text-lg font-bold">Configure your server</p>
 				<div class="flex flex-col gap-4">
-					<input v-model="serverName" placeholder="Server name" class="input" maxlength="48" />
+					<StyledInput v-model="serverName" placeholder="Server name" :maxlength="48" />
 					<!-- <DropdownSelect
             v-model="serverLoader"
             v-tooltip="'Select the mod loader for your server'"
@@ -136,7 +136,7 @@
 					>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Shared CPUs</div>
-							<input :value="sharedCpus" disabled class="input w-full" />
+							<StyledInput :model-value="sharedCpus" disabled wrapper-class="w-full" />
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold flex items-center gap-1">
@@ -148,14 +148,18 @@
 									class="h-4 w-4text-secondary opacity-60"
 								/>
 							</div>
-							<input :value="mutatedProduct.metadata.cpu" disabled class="input w-full" />
+							<StyledInput
+								:model-value="mutatedProduct.metadata.cpu"
+								disabled
+								wrapper-class="w-full"
+							/>
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Storage</div>
-							<input
+							<StyledInput
 								v-model="customServerConfig.storageGbFormatted"
 								disabled
-								class="input w-full"
+								wrapper-class="w-full"
 							/>
 						</div>
 					</div>
@@ -228,7 +232,7 @@
 							}}%
 						</span>
 						<span class="ml-auto text-lg" :class="{ 'text-secondary': selectedPlan !== interval }">
-							{{ formatPrice(locale, rawPrice, price.currency_code) }}
+							{{ formatPrice(rawPrice, price.currency_code) }}
 						</span>
 					</div>
 				</div>
@@ -236,7 +240,7 @@
 					<span class="text-xl text-secondary">Total</span>
 					<div class="flex items-baseline gap-2">
 						<span class="text-2xl font-extrabold text-primary">
-							{{ formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code) }}
+							{{ formatPrice(price.prices.intervals[selectedPlan], price.currency_code) }}
 						</span>
 						<span class="text-lg text-secondary">/ {{ selectedPlan }}</span>
 					</div>
@@ -300,121 +304,42 @@
 							}}
 						</span>
 						<span v-if="existingPlan" class="text-secondary text-end">
-							{{ formatPrice(locale, total - tax, price.currency_code) }}
+							{{ formatPrice(total - tax, price.currency_code) }}
 						</span>
 						<span v-else class="text-secondary text-end">
-							{{ formatPrice(locale, total - tax, price.currency_code) }} /
+							{{ formatPrice(total - tax, price.currency_code) }} /
 							{{ selectedPlan }}
 						</span>
 					</div>
 					<div class="flex justify-between">
 						<span class="text-secondary">Tax</span>
-						<span class="text-secondary text-end">{{
-							formatPrice(locale, tax, price.currency_code)
-						}}</span>
+						<span class="text-secondary text-end">{{ formatPrice(tax, price.currency_code) }}</span>
 					</div>
 					<div class="mt-4 flex justify-between border-0 border-t border-solid border-code-bg pt-4">
 						<span class="text-lg font-bold">Today's total</span>
 						<span class="text-lg font-extrabold text-primary text-end">
-							{{ formatPrice(locale, total, price.currency_code) }}
+							{{ formatPrice(total, price.currency_code) }}
 						</span>
 					</div>
 				</div>
 				<p class="my-2 text-lg font-bold">Pay for it with</p>
-				<multiselect
-					v-model="selectedPaymentMethod"
+				<Combobox
+					v-model="selectedPaymentMethodId"
 					placeholder="Payment method"
-					label="id"
-					track-by="id"
-					:options="selectablePaymentMethods"
-					:option-height="104"
-					:show-labels="false"
+					:options="selectablePaymentMethodOptions"
 					:searchable="false"
-					:close-on-select="true"
-					:allow-empty="false"
-					open-direction="top"
+					:show-icon-in-selected="true"
+					force-direction="up"
 					class="max-w-[20rem]"
-					@select="selectPaymentMethod"
-				>
-					<!-- eslint-disable-next-line vue/no-template-shadow -->
-					<template #singleLabel="props">
-						<div class="flex items-center gap-2">
-							<CardIcon v-if="props.option.type === 'card'" class="h-8 w-8" />
-							<CurrencyIcon v-else-if="props.option.type === 'cashapp'" class="h-8 w-8" />
-							<PayPalIcon v-else-if="props.option.type === 'paypal'" class="h-8 w-8" />
-
-							<span v-if="props.option.type === 'card'">
-								{{
-									formatMessage(messages.paymentMethodCardDisplay, {
-										card_brand:
-											formatMessage(paymentMethodTypes[props.option.card.brand]) ??
-											formatMessage(paymentMethodTypes.unknown),
-										last_four: props.option.card.last4,
-									})
-								}}
-							</span>
-							<template v-else>
-								{{
-									formatMessage(paymentMethodTypes[props.option.type]) ??
-									formatMessage(paymentMethodTypes.unknown)
-								}}
-							</template>
-
-							<span v-if="props.option.type === 'cashapp' && props.option.cashapp.cashtag">
-								({{ props.option.cashapp.cashtag }})
-							</span>
-							<span v-else-if="props.option.type === 'paypal' && props.option.paypal.payer_email">
-								({{ props.option.paypal.payer_email }})
-							</span>
-						</div>
-					</template>
-					<!-- eslint-disable-next-line vue/no-template-shadow -->
-					<template #option="props">
-						<div class="flex items-center gap-2">
-							<template v-if="props.option.id === 'new'">
-								<PlusIcon class="h-8 w-8" />
-								<span class="text-secondary">Add payment method</span>
-							</template>
-							<template v-else>
-								<CardIcon v-if="props.option.type === 'card'" class="h-8 w-8" />
-								<CurrencyIcon v-else-if="props.option.type === 'cashapp'" class="h-8 w-8" />
-								<PayPalIcon v-else-if="props.option.type === 'paypal'" class="h-8 w-8" />
-
-								<span v-if="props.option.type === 'card'">
-									{{
-										formatMessage(messages.paymentMethodCardDisplay, {
-											card_brand:
-												formatMessage(paymentMethodTypes[props.option.card.brand]) ??
-												formatMessage(paymentMethodTypes.unknown),
-											last_four: props.option.card.last4,
-										})
-									}}
-								</span>
-								<template v-else>
-									{{
-										formatMessage(paymentMethodTypes[props.option.type]) ??
-										formatMessage(paymentMethodTypes.unknown)
-									}}
-								</template>
-
-								<span v-if="props.option.type === 'cashapp'">
-									({{ props.option.cashapp.cashtag }})
-								</span>
-								<span v-else-if="props.option.type === 'paypal'">
-									({{ props.option.paypal.payer_email }})
-								</span>
-							</template>
-						</div>
-					</template>
-				</multiselect>
+				/>
 			</div>
 			<p class="m-0 mt-9 text-sm text-secondary">
 				<strong>By clicking "Subscribe", you are purchasing a recurring subscription.</strong>
 				<br />
 				You'll be charged
-				{{ formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code) }}
+				{{ formatPrice(price.prices.intervals[selectedPlan], price.currency_code) }}
 				/ {{ selectedPlan }} plus applicable taxes starting
-				{{ existingPlan ? dayjs(renewalDate).format('MMMM D, YYYY') : 'today' }}, until you cancel.
+				{{ existingPlan ? formatDate(renewalDate) : 'today' }}, until you cancel.
 				<br />
 				You can cancel anytime from your settings page.
 			</p>
@@ -541,20 +466,25 @@ import {
 	UnknownIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { calculateSavings, createStripeElements, formatPrice, getCurrency } from '@modrinth/utils'
+import { calculateSavings, createStripeElements, getCurrency } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
-import { Multiselect } from 'vue-multiselect'
 
-import { defineMessages, useVIntl } from '../../composables/i18n'
+import { useVIntl } from '../../composables/i18n'
+import { useFormatDateTime, useFormatPrice } from '../../composables/index.ts'
+import { paymentMethodMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
+import Combobox from '../base/Combobox.vue'
 import Slider from '../base/Slider.vue'
+import StyledInput from '../base/StyledInput.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import NewModal from '../modal/NewModal.vue'
 import LoaderIcon from '../servers/icons/LoaderIcon.vue'
 
-const { locale, formatMessage } = useVIntl()
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 
 const props = defineProps({
 	product: {
@@ -645,61 +575,6 @@ const props = defineProps({
 })
 
 const productType = computed(() => (props.customServer ? 'pyro' : props.product.metadata.type))
-
-const messages = defineMessages({
-	paymentMethodCardDisplay: {
-		id: 'omorphia.component.purchase_modal.payment_method_card_display',
-		defaultMessage: '{card_brand} ending in {last_four}',
-	},
-})
-
-const paymentMethodTypes = defineMessages({
-	visa: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.visa',
-		defaultMessage: 'Visa',
-	},
-	amex: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amex',
-		defaultMessage: 'American Express',
-	},
-	diners: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.diners',
-		defaultMessage: 'Diners Club',
-	},
-	discover: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.discover',
-		defaultMessage: 'Discover',
-	},
-	eftpos: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.eftpos',
-		defaultMessage: 'EFTPOS',
-	},
-	jcb: { id: 'omorphia.component.purchase_modal.payment_method_type.jcb', defaultMessage: 'JCB' },
-	mastercard: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.mastercard',
-		defaultMessage: 'MasterCard',
-	},
-	unionpay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
-		defaultMessage: 'UnionPay',
-	},
-	paypal: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
-		defaultMessage: 'PayPal',
-	},
-	cashapp: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.cashapp',
-		defaultMessage: 'Cash App',
-	},
-	amazon_pay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amazon_pay',
-		defaultMessage: 'Amazon Pay',
-	},
-	unknown: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unknown',
-		defaultMessage: 'Unknown payment method',
-	},
-})
 
 let stripe = null
 let elements = null
@@ -830,6 +705,67 @@ const selectablePaymentMethods = computed(() => {
 	}
 
 	return values
+})
+
+function formatPaymentMethodLabel(paymentMethod) {
+	if (!paymentMethod) {
+		return formatMessage(paymentMethodMessages.unknown)
+	}
+
+	if (paymentMethod.id === 'new') {
+		return 'Add payment method'
+	}
+
+	if (paymentMethod.type === 'card') {
+		return formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
+			card_brand:
+				formatMessage(paymentMethodMessages[paymentMethod.card?.brand]) ??
+				formatMessage(paymentMethodMessages.unknown),
+			last_four: paymentMethod.card?.last4 ?? '****',
+		})
+	}
+
+	const typeLabel =
+		formatMessage(paymentMethodMessages[paymentMethod.type]) ??
+		formatMessage(paymentMethodMessages.unknown)
+	let suffix = ''
+
+	if (paymentMethod.type === 'cashapp' && paymentMethod.cashapp?.cashtag) {
+		suffix = ` (${paymentMethod.cashapp.cashtag})`
+	} else if (paymentMethod.type === 'paypal' && paymentMethod.paypal?.payer_email) {
+		suffix = ` (${paymentMethod.paypal.payer_email})`
+	}
+
+	return `${typeLabel}${suffix}`
+}
+
+function getPaymentMethodIcon(paymentMethod) {
+	if (paymentMethod.id === 'new') return PlusIcon
+	if (paymentMethod.type === 'card') return CardIcon
+	if (paymentMethod.type === 'cashapp') return CurrencyIcon
+	if (paymentMethod.type === 'paypal') return PayPalIcon
+	return undefined
+}
+
+const selectablePaymentMethodOptions = computed(() =>
+	selectablePaymentMethods.value.map((paymentMethod) => ({
+		value: paymentMethod.id,
+		label: formatPaymentMethodLabel(paymentMethod),
+		icon: getPaymentMethodIcon(paymentMethod),
+	})),
+)
+
+const selectedPaymentMethodId = computed({
+	get: () => selectedPaymentMethod.value?.id ?? null,
+	set: (value) => {
+		if (!value) return
+
+		const paymentMethod = selectablePaymentMethods.value.find((method) => method.id === value)
+		if (paymentMethod) {
+			selectedPaymentMethod.value = paymentMethod
+			void selectPaymentMethod(paymentMethod)
+		}
+	},
 })
 
 const primaryPaymentMethodId = computed(() => {

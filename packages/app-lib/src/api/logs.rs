@@ -300,6 +300,26 @@ pub async fn delete_logs_by_filename(
 }
 
 #[tracing::instrument]
+pub async fn get_live_log_buffer(
+    profile_path: &str,
+) -> crate::Result<CensoredString> {
+    let state = State::get().await?;
+    let lines = crate::state::get_log_buffer(profile_path);
+    let joined = lines.join("\n");
+
+    let credentials = Credentials::get_all(&state.pool)
+        .await?
+        .into_iter()
+        .map(|x| x.1)
+        .collect::<Vec<_>>();
+    Ok(CensoredString::censor(joined, &credentials))
+}
+
+pub fn clear_live_log_buffer(profile_path: &str) {
+    crate::state::remove_log_buffer(profile_path);
+}
+
+#[tracing::instrument]
 pub async fn get_latest_log_cursor(
     profile_path: &str,
     cursor: u64, // 0 to start at beginning of file

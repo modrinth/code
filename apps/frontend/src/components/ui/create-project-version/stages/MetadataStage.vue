@@ -1,4 +1,11 @@
 <template>
+	<Tabs
+		v-if="editingVersion"
+		value="metadata"
+		:tabs="editTabs"
+		class="mb-3 border border-solid border-surface-5 !shadow-none !drop-shadow-none"
+		@change="setEditTab"
+	/>
 	<div class="flex flex-col gap-6">
 		<div v-if="!editingVersion" class="flex flex-col gap-1">
 			<div class="flex items-center justify-between">
@@ -72,12 +79,18 @@
 							class="border !border-solid border-surface-5 hover:no-underline"
 							:style="`--_color: var(--color-platform-${loader.name})`"
 						>
-							<div v-html="loader.icon"></div>
-							{{ formatCategory(loader.name) }}
+							<component :is="getLoaderIcon(loader.name)" v-if="getLoaderIcon(loader.name)" />
+							<FormattedTag :tag="loader.name" enforce-type="loader" />
 						</TagItem>
 					</template>
 
-					<span v-if="!draftVersion.loaders.length">No loaders selected.</span>
+					<TagItem
+						v-if="!draftVersionLoaders.length && projectType === 'modpack'"
+						class="border !border-solid border-surface-5 hover:no-underline"
+					>
+						No mod loader
+					</TagItem>
+					<span v-else-if="!draftVersionLoaders.length">No loaders selected.</span>
 				</div>
 			</div>
 		</div>
@@ -147,40 +160,32 @@
 		</template>
 
 		<template v-if="!noDependenciesProject">
-			<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-1">
-				<div class="flex items-center justify-between">
-					<span class="font-semibold text-contrast"> Suggested dependencies </span>
+			<div class="flex flex-col gap-2.5">
+				<div class="flex flex-col gap-1">
+					<div class="flex items-center justify-between">
+						<span class="font-semibold text-contrast"> Dependencies </span>
 
-					<ButtonStyled type="transparent" size="standard">
-						<button @click="editDependencies">
-							<EditIcon />
-							Edit
-						</button>
-					</ButtonStyled>
-				</div>
-				<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
-			</div>
+						<ButtonStyled type="transparent" size="standard">
+							<button @click="addDependency">
+								<PlusIcon />
+								Add dependency
+							</button>
+						</ButtonStyled>
+					</div>
 
-			<div
-				v-if="!visibleSuggestedDependencies.length || draftVersion.dependencies?.length"
-				class="flex flex-col gap-1"
-			>
-				<div class="flex items-center justify-between">
-					<span class="font-semibold text-contrast"> Dependencies </span>
-
-					<ButtonStyled type="transparent" size="standard">
-						<button @click="editDependencies">
-							<EditIcon />
-							Edit
-						</button>
-					</ButtonStyled>
+					<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
+						<DependenciesList />
+					</div>
+					<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
+						<span class="text-sm font-medium">No dependencies added.</span>
+					</div>
 				</div>
 
-				<div v-if="draftVersion.dependencies?.length" class="flex flex-col gap-4">
-					<DependenciesList disable-remove />
-				</div>
-				<div v-else class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
-					<span class="text-sm font-medium">No dependencies added.</span>
+				<div v-if="visibleSuggestedDependencies.length" class="flex flex-col gap-2.5">
+					<div class="flex items-center justify-between">
+						<span class="font-medium"> Suggested </span>
+					</div>
+					<SuggestedDependencies @on-add-suggestion="handleAddSuggestedDependency" />
 				</div>
 			</div>
 		</template>
@@ -189,16 +194,18 @@
 
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
-import { EditIcon, UnknownIcon } from '@modrinth/assets'
+import { EditIcon, getLoaderIcon, PlusIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	defineMessages,
 	ENVIRONMENTS_COPY,
+	FormattedTag,
 	injectProjectPageContext,
+	Tabs,
+	type TabsTab,
 	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatCategory } from '@modrinth/utils'
 
 import { useGeneratedState } from '~/composables/generated'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
@@ -223,6 +230,17 @@ const { projectV2 } = injectProjectPageContext()
 
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
+
+const editTabs: TabsTab[] = [
+	{ label: 'Metadata', value: 'metadata' },
+	{ label: 'Details', value: 'add-details' },
+	{ label: 'Files', value: 'add-files' },
+]
+
+function setEditTab(tab: TabsTab) {
+	modal.value?.setStage(tab.value)
+}
+
 const isModpack = computed(() => projectType.value === 'modpack')
 const isResourcePack = computed(
 	() =>
@@ -249,7 +267,7 @@ const editEnvironment = () => {
 const editFiles = () => {
 	modal.value?.setStage('from-details-files')
 }
-const editDependencies = () => {
+const addDependency = () => {
 	modal.value?.setStage('from-details-dependencies')
 }
 

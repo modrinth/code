@@ -9,7 +9,7 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-mc-versions',
 	stageContent: markRaw(McVersionsStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit game versions' : 'Game versions'),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit version' : 'Game versions'),
 	skip: (ctx) =>
 		(ctx.inferredVersionData.value?.game_versions?.length ?? 0) > 0 || !ctx.primaryFile.value,
 	hideStageInBreadcrumb: (ctx) => !ctx.primaryFile.value || ctx.handlingNewFiles.value,
@@ -32,7 +32,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'from-details-mc-versions',
 	stageContent: markRaw(McVersionsStage),
-	title: 'Edit game versions',
+	title: 'Edit version',
 	nonProgressStage: true,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',

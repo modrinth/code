@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::loader_fields::VersionField;
 use crate::database::models::{project_item, version_item};
 use crate::database::redis::RedisPool;
@@ -12,13 +13,13 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::routes::v3::version_creation;
 use crate::routes::{v2_reroute, v3};
+use crate::util::http::HttpClient;
 use actix_multipart::Multipart;
 use actix_web::http::header::ContentDisposition;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post, web};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
 use validator::Validate;
@@ -74,7 +75,25 @@ pub struct InitialVersionData {
 }
 
 // under `/api/v1/version`
-#[post("version")]
+/// Create a version on an existing project.
+#[utoipa::path(
+    post,
+    operation_id = "createVersion",
+    request_body(
+        content(("multipart/form-data")),
+        description = "Multipart payload containing `data` and uploaded files"
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["VERSION_CREATE"]))
+)]
+#[post("/version")]
 pub async fn version_create(
     req: HttpRequest,
     payload: Multipart,
@@ -83,6 +102,7 @@ pub async fn version_create(
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
     moderation_queue: Data<AutomatedModerationQueue>,
+    http: Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {
     let payload = v2_reroute::alter_actix_multipart(
         payload,
@@ -237,6 +257,7 @@ pub async fn version_create(
         file_host,
         session_queue,
         moderation_queue,
+        http,
     )
     .await?;
 
@@ -277,7 +298,29 @@ async fn get_example_version_fields(
 }
 
 // under /api/v1/version/{version_id}
-#[post("{version_id}/file")]
+/// Add files to an existing version.
+#[utoipa::path(
+    post,
+    operation_id = "addFilesToVersion",
+    params(("version_id" = VersionId, Path, description = "The ID of the version")),
+    request_body(
+        content(("multipart/form-data")),
+        description = "Multipart payload containing files to upload"
+    ),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["VERSION_WRITE"]))
+)]
+#[post("/{version_id}/file")]
 pub async fn upload_file_to_version(
     req: HttpRequest,
     url_data: web::Path<(VersionId,)>,
@@ -286,6 +329,7 @@ pub async fn upload_file_to_version(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
+    http: web::Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {
     // Returns NoContent, so no need to convert to V2
     let response = v3::version_creation::upload_file_to_version(
@@ -296,6 +340,7 @@ pub async fn upload_file_to_version(
         redis.clone(),
         file_host,
         session_queue,
+        http,
     )
     .await?;
     Ok(response)

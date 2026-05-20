@@ -14,7 +14,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			Price change for {taxnotification.service}
 		</Heading>
 
-		<Text class="text-muted text-base">Hi {user.name},</Text>
+		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
 			We're writing to let you know about an update to your {taxnotification.service} subscription.
 		</Text>

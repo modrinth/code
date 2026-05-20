@@ -12,7 +12,7 @@ export class PanelVersionFeature extends AbstractFeature {
 		return next()
 	}
 
-	shouldApply(_: RequestContext): boolean {
-		return true
+	shouldApply(context: RequestContext): boolean {
+		return context.options.api === 'labrinth' || context.options.api === 'archon'
 	}
 }

@@ -11,7 +11,7 @@ pub struct DBProductsTaxIdentifier {
 impl DBProductsTaxIdentifier {
     pub async fn get_product(
         product_id: DBProductId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<Self>, ApiError> {
         let maybe_row = sqlx::query!(
             "SELECT * FROM products_tax_identifiers WHERE product_id = $1",
@@ -29,7 +29,7 @@ impl DBProductsTaxIdentifier {
 
     pub async fn get_price(
         price_id: DBProductPriceId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<Self>, ApiError> {
         let maybe_row = sqlx::query!(
             "
@@ -58,7 +58,7 @@ pub struct ProductInfo {
 
 pub async fn product_info_by_product_price_id(
     product_price_id: DBProductPriceId,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
 ) -> Result<Option<ProductInfo>, ApiError> {
     let maybe_row = sqlx::query!(
         r#"

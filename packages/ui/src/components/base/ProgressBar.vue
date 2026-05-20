@@ -66,11 +66,19 @@ const percent = computed(() => props.progress / props.max)
 			<div v-if="showProgress" class="flex items-center gap-1 text-sm text-secondary">
 				<span>{{ Math.round(percent * 100) }}%</span>
 				<slot name="progress-icon">
-					<SpinnerIcon class="size-5 animate-spin" />
+					<SpinnerIcon class="size-5 animate-spin" aria-hidden="true" />
 				</slot>
 			</div>
 		</div>
-		<div class="flex h-2 w-full overflow-hidden rounded-full" :class="[colors[props.color].bg]">
+		<div
+			role="progressbar"
+			:aria-valuenow="waiting ? undefined : Math.round(percent * 100)"
+			aria-valuemin="0"
+			aria-valuemax="100"
+			:aria-label="label || undefined"
+			class="flex h-2 w-full overflow-hidden rounded-full"
+			:class="[colors[props.color].bg]"
+		>
 			<div
 				class="rounded-full progress-bar"
 				:class="[

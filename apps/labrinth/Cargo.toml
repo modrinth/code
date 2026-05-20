@@ -21,14 +21,15 @@ actix-ws = { workspace = true }
 arc-swap = { workspace = true }
 argon2 = { workspace = true }
 ariadne = { workspace = true }
+async-minecraft-ping = { workspace = true, features = ["srv"] }
 async-stripe = { workspace = true, features = [
   "billing",
   "checkout",
   "connect",
-  "webhook-events",
+  "webhook-events"
 ] }
-derive_more = { workspace = true, features = ["deref", "deref_mut"]}
 async-trait = { workspace = true }
+aws-sdk-s3 = { workspace = true }
 base64 = { workspace = true }
 bitflags = { workspace = true }
 bytes = { workspace = true }
@@ -41,11 +42,13 @@ color-thief = { workspace = true }
 const_format = { workspace = true }
 dashmap = { workspace = true }
 deadpool-redis.workspace = true
+derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 dotenvy = { workspace = true }
 either = { workspace = true }
 eyre = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
+heck = { workspace = true }
 hex = { workspace = true }
 hmac = { workspace = true }
 hyper-rustls = { workspace = true }
@@ -77,6 +80,7 @@ murmur2 = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
 prometheus = { workspace = true }
+quick-xml = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
 redis = { workspace = true, features = ["ahash", "r2d2", "tokio-comp"] }
@@ -85,14 +89,13 @@ reqwest = { workspace = true, features = [
   "http2",
   "json",
   "multipart",
-  "rustls-tls-webpki-roots",
+  "rustls-tls-webpki-roots"
 ] }
 rust_decimal = { workspace = true, features = [
   "serde-with-float",
-  "serde-with-str",
+  "serde-with-str"
 ] }
 rust_iso3166 = { workspace = true }
-rust-s3 = { workspace = true }
 rustls.workspace = true
 rusty-money = { workspace = true }
 sentry = { workspace = true }
@@ -112,7 +115,8 @@ sqlx = { workspace = true, features = [
   "rust_decimal",
   "tls-rustls-aws-lc-rs",
 ] }
-strum = { workspace = true }
+sqlx-tracing = { workspace = true, features = ["postgres"] }
+strum = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tokio-stream = { workspace = true }
@@ -123,7 +127,7 @@ url = { workspace = true }
 urlencoding = { workspace = true }
 utoipa = { workspace = true, features = ["url"] }
 utoipa-actix-web = { workspace = true }
-utoipa-swagger-ui = { workspace = true }
+utoipa-scalar = { workspace = true, features = ["actix-web"] }
 uuid = { workspace = true, features = ["fast-rng", "serde", "v4"] }
 validator = { workspace = true, features = ["derive"] }
 webp = { workspace = true }

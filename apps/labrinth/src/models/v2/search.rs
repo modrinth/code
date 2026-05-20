@@ -17,6 +17,12 @@ pub struct LegacyResultSearchProject {
     pub project_type: String,
     pub slug: Option<String>,
     pub author: String,
+    #[serde(default)]
+    pub author_id: Option<String>,
+    #[serde(default)]
+    pub organization: Option<String>,
+    #[serde(default)]
+    pub organization_id: Option<String>,
     pub title: String,
     pub description: String,
     pub categories: Vec<String>,
@@ -139,6 +145,9 @@ impl LegacyResultSearchProject {
             project_id: result_search_project.project_id,
             slug: result_search_project.slug,
             author: result_search_project.author,
+            author_id: result_search_project.author_id,
+            organization: result_search_project.organization,
+            organization_id: result_search_project.organization_id,
             title: result_search_project.name,
             description: result_search_project.summary,
             display_categories,
@@ -159,15 +168,20 @@ impl LegacySearchResults {
     pub fn from(search_results: crate::search::SearchResults) -> Self {
         let limit = search_results.hits_per_page;
         let offset = (search_results.page - 1) * limit;
+        let crate::search::SearchResults {
+            hits,
+            page: _,
+            hits_per_page: _,
+            total_hits,
+        } = search_results;
         Self {
-            hits: search_results
-                .hits
+            hits: hits
                 .into_iter()
                 .map(LegacyResultSearchProject::from)
                 .collect(),
             offset,
             limit,
-            total_hits: search_results.total_hits,
+            total_hits,
         }
     }
 }

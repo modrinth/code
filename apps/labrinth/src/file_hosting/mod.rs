@@ -1,3 +1,6 @@
+use std::error::Error;
+use std::str::FromStr;
+
 use async_trait::async_trait;
 use thiserror::Error;
 
@@ -11,7 +14,7 @@ pub use s3_host::{S3BucketConfig, S3Host};
 #[derive(Error, Debug)]
 pub enum FileHostingError {
     #[error("S3 error when {0}: {1}")]
-    S3Error(&'static str, s3::error::S3Error),
+    S3Error(&'static str, #[source] Box<dyn Error + Send + Sync>),
     #[error("File system error in file hosting: {0}")]
     FileSystemError(#[from] std::io::Error),
     #[error("Invalid Filename")]
@@ -62,4 +65,26 @@ pub trait FileHost {
         file_name: &str,
         file_publicity: FileHostPublicity,
     ) -> Result<DeleteFileData, FileHostingError>;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum FileHostKind {
+    S3,
+    Local,
+}
+
+#[derive(Debug, Error)]
+#[error("invalid file host kind")]
+pub struct InvalidFileHostKind;
+
+impl FromStr for FileHostKind {
+    type Err = InvalidFileHostKind;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "s3" => Self::S3,
+            "local" => Self::Local,
+            _ => return Err(InvalidFileHostKind),
+        })
+    }
 }

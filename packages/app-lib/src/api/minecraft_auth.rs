@@ -4,11 +4,11 @@ use reqwest::StatusCode;
 
 use crate::State;
 use crate::state::{Credentials, MinecraftLoginFlow};
-use crate::util::fetch::REQWEST_CLIENT;
+use crate::util::fetch::INSECURE_REQWEST_CLIENT;
 
 #[tracing::instrument]
 pub async fn check_reachable() -> crate::Result<()> {
-    let resp = REQWEST_CLIENT
+    let resp = INSECURE_REQWEST_CLIENT
         .get("https://sessionserver.mojang.com/session/minecraft/hasJoined")
         .send()
         .await?;

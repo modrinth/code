@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT m.id mod_id, u.username, u.id uid\n        FROM mods m\n        INNER JOIN team_members tm ON tm.is_owner = TRUE and tm.team_id = m.team_id\n        INNER JOIN users u ON u.id = tm.user_id\n        WHERE m.id = ANY($1)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "uid",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "654ca85d28573de9b532d0768e5250baa3a5f200fcf9ae990575073d0a1043e0"
+}

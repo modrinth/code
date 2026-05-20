@@ -11,6 +11,8 @@ use crate::database::models::{
     user_subscription_item,
 };
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::billing::{
     Charge, ChargeStatus, ChargeType, PaymentPlatform, Price, PriceDuration,
     Product, ProductMetadata, ProductPrice, SubscriptionMetadata,
@@ -29,7 +31,6 @@ use chrono::{Duration, Utc};
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
 use serde::{Deserialize, Serialize};
-use sqlx::{PgPool, Postgres, Transaction};
 use std::collections::HashMap;
 use std::str::FromStr;
 use stripe::{
@@ -43,7 +44,7 @@ use tracing::warn;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("billing")
+        web::scope("/billing")
             .service(products)
             .service(subscriptions)
             .service(user_customer)
@@ -449,7 +450,7 @@ pub async fn reprocess_charge_tax(
 
     let mut txn = pool.begin().await?;
 
-    let charge_refund = charge_item::DBCharge::get(id.into(), &mut *txn)
+    let charge_refund = charge_item::DBCharge::get(id.into(), &mut txn)
         .await?
         .ok_or_else(|| ApiError::NotFound)?;
 
@@ -466,10 +467,9 @@ pub async fn reprocess_charge_tax(
             ));
         }
         None => {
-            let charge =
-                charge_item::DBCharge::get(parent_charge_id, &mut *txn)
-                    .await?
-                    .ok_or_else(|| ApiError::NotFound)?;
+            let charge = charge_item::DBCharge::get(parent_charge_id, &mut txn)
+                .await?
+                .ok_or_else(|| ApiError::NotFound)?;
 
             let payment_platform_id = charge
                 .payment_platform_id
@@ -503,7 +503,7 @@ pub async fn reprocess_charge_tax(
             };
 
             let tax_id =
-                product_info_by_product_price_id(charge.price_id, &mut *txn)
+                product_info_by_product_price_id(charge.price_id, &mut txn)
                     .await?
                     .ok_or_else(|| {
                         ApiError::InvalidInput(
@@ -634,13 +634,13 @@ pub async fn edit_subscription(
     /// if this operation will require immediate payment or if the user can be
     /// charged only after the promotion interval ends.
     async fn promotion_payment_requirement(
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         current_product_price: &product_item::DBProductPrice,
         new_product_price: &product_item::DBProductPrice,
     ) -> Result<PaymentRequirement, ApiError> {
         let new_product = product_item::DBProduct::get(
             new_product_price.product_id,
-            &mut **txn,
+            &mut *txn,
         )
         .await?
         .ok_or_else(|| {
@@ -650,7 +650,7 @@ pub async fn edit_subscription(
         })?;
         let current_product = product_item::DBProduct::get(
             current_product_price.product_id,
-            &mut **txn,
+            &mut *txn,
         )
         .await?
         .ok_or_else(|| {
@@ -769,7 +769,7 @@ pub async fn edit_subscription(
 
     let mut open_charge = charge_item::DBCharge::get_open_subscription(
         subscription.id,
-        &mut *transaction,
+        &mut transaction,
     )
     .await?
     .ok_or_else(|| {
@@ -780,7 +780,7 @@ pub async fn edit_subscription(
 
     let current_price = product_item::DBProductPrice::get(
         subscription.price_id,
-        &mut *transaction,
+        &mut transaction,
     )
     .await?
     .ok_or_else(|| {
@@ -798,7 +798,7 @@ pub async fn edit_subscription(
             if cancelled {
                 DBUsersSubscriptionsAffiliations::deactivate(
                     subscription.id,
-                    &mut *transaction,
+                    &mut transaction,
                 )
                 .await?;
                 open_charge.status = ChargeStatus::Cancelled;
@@ -822,7 +822,7 @@ pub async fn edit_subscription(
             open_charge.status = if cancelled {
                 DBUsersSubscriptionsAffiliations::deactivate(
                     subscription.id,
-                    &mut *transaction,
+                    &mut transaction,
                 )
                 .await?;
                 ChargeStatus::Cancelled
@@ -845,7 +845,7 @@ pub async fn edit_subscription(
             let new_product_price =
                 product_item::DBProductPrice::get_all_product_prices(
                     product_id.into(),
-                    &mut *transaction,
+                    &mut transaction,
                 )
                 .await?
                 .into_iter()
@@ -1438,7 +1438,7 @@ pub async fn active_servers(
     pool: web::Data<PgPool>,
     query: web::Query<ActiveServersQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    let master_key = dotenvy::var("PYRO_API_KEY")?;
+    let master_key = &ENV.PYRO_API_KEY;
 
     if req
         .head()
@@ -1627,7 +1627,7 @@ pub async fn stripe_webhook(
     if let Ok(event) = Webhook::construct_event(
         &payload,
         stripe_signature,
-        &dotenvy::var("STRIPE_WEBHOOK_SECRET")?,
+        &ENV.STRIPE_WEBHOOK_SECRET,
     ) {
         struct PaymentIntentMetadata {
             pub user_item: crate::database::models::user_item::DBUser,
@@ -1650,7 +1650,7 @@ pub async fn stripe_webhook(
             pool: &PgPool,
             redis: &RedisPool,
             charge_status: ChargeStatus,
-            transaction: &mut Transaction<'_, Postgres>,
+            transaction: &mut PgTransaction<'_>,
         ) -> Result<PaymentIntentMetadata, ApiError> {
             'metadata: {
                 let Some(user_id) = metadata
@@ -1977,7 +1977,7 @@ pub async fn stripe_webhook(
                                 metadata.user_item.id
                                     as crate::database::models::ids::DBUserId,
                             )
-                            .execute(&mut *transaction)
+                            .execute(&mut transaction)
                             .await?;
                         }
                         ProductMetadata::Pyro {
@@ -2037,23 +2037,23 @@ pub async fn stripe_webhook(
                                     client
                                         .post(format!(
                                             "{}/modrinth/v0/servers/{}/unsuspend",
-                                            dotenvy::var("ARCHON_URL")?,
+                                            ENV.ARCHON_URL,
                                             id
                                         ))
-                                        .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                                        .header("X-Master-Key", &ENV.PYRO_API_KEY)
                                         .send()
                                         .await?
                                         .error_for_status()?;
 
                                     client
                                         .post(format!(
-                                        "{}/modrinth/v0/servers/{}/reallocate",
-                                        dotenvy::var("ARCHON_URL")?,
-                                        id
-                                    ))
+                                            "{}/modrinth/v0/servers/{}/reallocate",
+                                            ENV.ARCHON_URL,
+                                            id
+                                        ))
                                         .header(
                                             "X-Master-Key",
-                                            dotenvy::var("PYRO_API_KEY")?,
+                                            &ENV.PYRO_API_KEY,
                                         )
                                         .json(&body)
                                         .send()
@@ -2115,9 +2115,9 @@ pub async fn stripe_webhook(
                                     let res = client
                                         .post(format!(
                                             "{}/modrinth/v0/servers/create",
-                                            dotenvy::var("ARCHON_URL")?,
+                                            ENV.ARCHON_URL,
                                         ))
-                                        .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                                        .header("X-Master-Key", &ENV.PYRO_API_KEY)
                                         .json(&serde_json::json!({
                                             "user_id": to_base62(metadata.user_item.id.0 as u64),
                                             "name": server_name,
@@ -2161,7 +2161,7 @@ pub async fn stripe_webhook(
                     {
                         let open_charge = DBCharge::get_open_subscription(
                             subscription.id,
-                            &mut *transaction,
+                            &mut transaction,
                         )
                         .await?;
 
@@ -2269,7 +2269,7 @@ pub async fn stripe_webhook(
                                     ),
                                     deactivated_at: None,
                                 }
-                                .insert(&mut *transaction)
+                                .insert(&mut transaction)
                                 .await?;
                             }
                         };
@@ -2409,7 +2409,7 @@ pub async fn stripe_webhook(
 
 #[allow(clippy::too_many_arguments)]
 async fn apply_credit_many(
-    transaction: &mut Transaction<'_, Postgres>,
+    transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
     current_user_id: crate::database::models::ids::DBUserId,
     subscription_ids: Vec<crate::models::ids::UserSubscriptionId>,
@@ -2423,7 +2423,7 @@ async fn apply_credit_many(
         .collect();
     let subs = user_subscription_item::DBUserSubscription::get_many(
         &subs_ids,
-        &mut **transaction,
+        &mut *transaction,
     )
     .await?;
 
@@ -2451,7 +2451,7 @@ async fn apply_credit_many(
 
         let mut open_charge = charge_item::DBCharge::get_open_subscription(
             subscription.id,
-            &mut **transaction,
+            &mut *transaction,
         )
         .await?
         .ok_or_else(|| {
@@ -2598,7 +2598,7 @@ pub async fn credit(
             server_ids.dedup();
             let subs = user_subscription_item::DBUserSubscription::get_many_by_server_ids(
                 &server_ids,
-                &mut *transaction,
+                &mut transaction,
             )
             .await?;
             if subs.is_empty() {
@@ -2622,7 +2622,7 @@ pub async fn credit(
                 archon_client.get_active_servers_by_region(&region).await?;
             let subs = user_subscription_item::DBUserSubscription::get_many_by_server_ids(
                 &servers.into_iter().map(|id| id.to_string()).collect::<Vec<String>>(),
-                &mut *transaction,
+                &mut transaction,
             )
             .await?;
             if subs.is_empty() {

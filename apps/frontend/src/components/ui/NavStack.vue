@@ -19,7 +19,7 @@
 					<NuxtLink
 						v-else-if="item.link ?? item.to"
 						:to="(item.link ?? item.to) as string"
-						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 text-nowrap rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
+						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
 						:class="{ 'is-active': isActive(item as NavStackLinkItem) }"
 					>
 						<component

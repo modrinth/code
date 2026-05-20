@@ -1,6 +1,7 @@
 // IO error
 // A wrapper around the tokio IO functions that adds the path to the error message, instead of the uninformative std::io::Error.
 
+use eyre::{Context, ContextCompat, Result, eyre};
 use std::{
     io::{ErrorKind, Write},
     path::Path,
@@ -181,17 +182,34 @@ fn sync_write(
     std::io::Result::Ok(())
 }
 
-pub fn is_same_disk(old_dir: &Path, new_dir: &Path) -> Result<bool, IOError> {
+pub fn is_same_disk(old_dir: &Path, new_dir: &Path) -> Result<bool> {
     #[cfg(unix)]
     {
         use std::os::unix::fs::MetadataExt;
-        Ok(old_dir.metadata()?.dev() == new_dir.metadata()?.dev())
+
+        use eyre::eyre;
+
+        // we need to use `symlink_metadata` instead of `metadata`, because
+        // if this file is a symlink, we need to query the symlink file itself,
+        // rather than the target.
+        // downloaded JREs use symlinks to point to certain stuff like LICENSE
+        // files.
+        // this fixes moving JRE dirs.
+
+        let old_meta = std::fs::symlink_metadata(old_dir)
+            .wrap_err_with(|| eyre!("getting meta of old dir {old_dir:?}"))?;
+        let new_meta = std::fs::symlink_metadata(new_dir)
+            .wrap_err_with(|| eyre!("getting meta of new dir {new_dir:?}"))?;
+
+        Ok(old_meta.dev() == new_meta.dev())
     }
 
     #[cfg(windows)]
     {
-        let old_dir = canonicalize(old_dir)?;
-        let new_dir = canonicalize(new_dir)?;
+        let old_dir = canonicalize(old_dir)
+            .wrap_err_with(|| eyre!("canonicalizing {old_dir:?}"))?;
+        let new_dir = canonicalize(new_dir)
+            .wrap_err_with(|| eyre!("canonicalizing {new_dir:?}"))?;
 
         let old_component = old_dir.components().next();
         let new_component = new_dir.components().next();
@@ -209,39 +227,62 @@ pub fn is_same_disk(old_dir: &Path, new_dir: &Path) -> Result<bool, IOError> {
 pub async fn rename_or_move(
     from: impl AsRef<std::path::Path>,
     to: impl AsRef<std::path::Path>,
-) -> Result<(), IOError> {
+) -> Result<()> {
     let from = from.as_ref();
     let to = to.as_ref();
 
-    if to
+    let to_parent = to
         .parent()
-        .map_or(Ok(false), |to_dir| is_same_disk(from, to_dir))?
-    {
+        .wrap_err_with(|| eyre!("getting parent of `to` dir {to:?}"))?;
+    let same_disk = is_same_disk(from, to_parent).wrap_err_with(|| {
+        eyre!("checking if `to_parent` ({to_parent:?}) and `from` ({from:?}) are on the same disk")
+    })?;
+
+    if same_disk {
         tokio::fs::rename(from, to)
             .await
             .map_err(|e| IOError::IOPathError {
                 source: e,
                 path: from.to_string_lossy().to_string(),
             })
+            .wrap_err_with(|| eyre!("moving {from:?} to {to:?} on same disk"))
     } else {
-        move_recursive(from, to).await
+        move_recursive(from, to).await.with_context(|| {
+            eyre!("moving {from:?} to {to:?} on different disks")
+        })
     }
 }
 
 #[async_recursion::async_recursion]
-async fn move_recursive(from: &Path, to: &Path) -> Result<(), IOError> {
+async fn move_recursive(from: &Path, to: &Path) -> Result<()> {
     if from.is_file() {
-        copy(from, to).await?;
-        remove_file(from).await?;
+        copy(from, to)
+            .await
+            .wrap_err_with(|| eyre!("copying {from:?} to {to:?}"))?;
+        remove_file(from).await.wrap_err_with(|| {
+            eyre!("removing {from:?} after copying to {to:?}")
+        })?;
         return Ok(());
     }
 
-    create_dir(to).await?;
+    create_dir(to)
+        .await
+        .wrap_err_with(|| eyre!("creating dir for {to:?}"))?;
 
-    let mut dir = read_dir(from).await?;
-    while let Some(entry) = dir.next_entry().await? {
+    let mut dir = read_dir(from)
+        .await
+        .wrap_err_with(|| eyre!("reading dir {from:?}"))?;
+    while let Some(entry) = dir
+        .next_entry()
+        .await
+        .wrap_err_with(|| eyre!("reading dir entry in {from:?}"))?
+    {
         let new_path = to.join(entry.file_name());
-        move_recursive(&entry.path(), &new_path).await?;
+        move_recursive(&entry.path(), &new_path)
+            .await
+            .with_context(|| {
+                eyre!("moving {:?} to {new_path:?}", entry.path())
+            })?;
     }
 
     Ok(())

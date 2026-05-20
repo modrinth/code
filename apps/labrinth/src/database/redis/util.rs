@@ -2,7 +2,6 @@ use std::fmt::Debug;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use deadpool_redis::PoolError;
 use derive_more::{Deref, DerefMut};
 use redis::{FromRedisValue, RedisResult, ToRedisArgs};
 use tokio::sync::Notify;
@@ -10,24 +9,6 @@ use tokio::time::{Duration, timeout};
 use tracing::{Instrument, info_span};
 
 use crate::database::models::DatabaseError;
-
-#[derive(Debug, Clone, Deref, DerefMut)]
-pub struct InstrumentedPool {
-    inner: deadpool_redis::Pool,
-}
-
-impl InstrumentedPool {
-    pub fn new(inner: deadpool_redis::Pool) -> Self {
-        Self { inner }
-    }
-
-    pub async fn get(&self) -> Result<deadpool_redis::Connection, PoolError> {
-        self.inner
-            .get()
-            .instrument(info_span!("get redis connection"))
-            .await
-    }
-}
 
 pub fn redis_pipe() -> InstrumentedPipeline {
     InstrumentedPipeline {
@@ -55,7 +36,7 @@ impl InstrumentedPipeline {
     ) -> RedisResult<T> {
         self.inner
             .query_async(con)
-            .instrument(info_span!("execute redis pipeline"))
+            .instrument(info_span!("pipeline.query_async"))
             .await
     }
 }
@@ -88,7 +69,7 @@ impl InstrumentedCmd {
         con: &mut impl redis::aio::ConnectionLike,
     ) -> RedisResult<T> {
         let span = info_span!(
-            "query_async",
+            "cmd.query_async",
             // <https://opentelemetry.io/docs/specs/semconv/db/redis/>
             db.system.name = "redis",
             db.operation.name = self.name,

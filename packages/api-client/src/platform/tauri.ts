@@ -27,11 +27,10 @@ interface HttpError extends Error {
  * ```typescript
  * import { getVersion } from '@tauri-apps/api/app'
  *
- * const version = await getVersion()
  * const client = new TauriModrinthClient({
- *   userAgent: `modrinth/theseus/${version} (support@modrinth.com)`,
+ *   userAgent: async () => `modrinth/theseus/${await getVersion()} (support@modrinth.com)`,
  *   features: [
- *     new AuthFeature({ token: 'mrp_...' })
+ *     new AuthFeature({ token: async () => getOAuthToken() })
  *   ]
  * })
  *
@@ -60,17 +59,33 @@ export class TauriModrinthClient extends XHRUploadClient {
 
 			let body: BodyInit | null | undefined = undefined
 			if (options.body) {
-				if (typeof options.body === 'object' && !(options.body instanceof FormData)) {
-					body = JSON.stringify(options.body)
+				const raw = options.body
+				if (
+					typeof raw === 'object' &&
+					!(raw instanceof FormData) &&
+					!(raw instanceof URLSearchParams) &&
+					!(raw instanceof Blob) &&
+					!(raw instanceof ArrayBuffer) &&
+					!ArrayBuffer.isView(raw as ArrayBufferView)
+				) {
+					body = JSON.stringify(raw)
 				} else {
-					body = options.body as BodyInit
+					body = raw as BodyInit
 				}
 			}
 
 			let fullUrl = url
 			if (options.params) {
-				const queryParams = new URLSearchParams(options.params as Record<string, string>).toString()
-				fullUrl = `${url}?${queryParams}`
+				const filteredParams: Record<string, string> = {}
+				for (const [key, value] of Object.entries(options.params)) {
+					if (value !== undefined && value !== null) {
+						filteredParams[key] = String(value)
+					}
+				}
+				const queryString = new URLSearchParams(filteredParams).toString()
+				if (queryString) {
+					fullUrl = `${url}?${queryString}`
+				}
 			}
 
 			const response = await tauriFetch(fullUrl, {
@@ -95,8 +110,38 @@ export class TauriModrinthClient extends XHRUploadClient {
 				throw error
 			}
 
-			const data = await response.json()
-			return data as T
+			// Handle binary downloads (e.g. kyros fs files) before JSON parsing.
+			const contentType = response.headers.get('content-type')?.toLowerCase() ?? ''
+			if (fullUrl.includes('/fs/download')) {
+				return (await response.blob()) as T
+			}
+			if (
+				contentType.startsWith('image/') ||
+				contentType.startsWith('audio/') ||
+				contentType.startsWith('video/') ||
+				contentType.includes('application/octet-stream')
+			) {
+				return (await response.blob()) as T
+			}
+
+			if (response.status === 204 || response.status === 205) {
+				return undefined as T
+			}
+
+			if (contentType.includes('application/json') || contentType.includes('+json')) {
+				return (await response.json()) as T
+			}
+
+			const text = await response.text()
+			if (!text) {
+				return undefined as T
+			}
+
+			try {
+				return JSON.parse(text) as T
+			} catch {
+				return text as T
+			}
 		} catch (error) {
 			throw this.normalizeError(error)
 		}

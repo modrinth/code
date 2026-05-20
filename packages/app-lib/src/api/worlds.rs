@@ -12,7 +12,8 @@ pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
 use crate::util::{io, server_ping};
-use crate::{ErrorKind, Result, State, launcher};
+use crate::{Error, ErrorKind, Result, State, launcher};
+use async_minecraft_ping::ServerDescription;
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Local, TimeZone, Utc};
@@ -23,10 +24,12 @@ use futures::StreamExt;
 use quartz_nbt::{NbtCompound, NbtTag};
 use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
+use serde_json::value::RawValue;
 use std::cmp::Reverse;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
+use std::time::Instant;
 use tokio::io::AsyncWriteExt;
 use tokio::task::JoinSet;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
@@ -139,6 +142,10 @@ pub enum WorldDetails {
         index: usize,
         address: String,
         pack_status: ServerPackStatus,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        project_id: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        content_kind: Option<String>,
     },
 }
 
@@ -278,15 +285,24 @@ async fn get_singleplayer_worlds_in_profile(
     if !saves_dir.exists() {
         return Ok(());
     }
-    let mut saves_dir = io::read_dir(saves_dir).await?;
-    while let Some(world_dir) = saves_dir.next_entry().await? {
+    let mut entries = io::read_dir(&saves_dir).await?;
+    let mut tasks = JoinSet::new();
+    while let Some(world_dir) = entries.next_entry().await? {
         let world_path = world_dir.path();
-        let level_dat_path = world_path.join("level.dat");
-        if !level_dat_path.exists() {
+        if !world_path.join("level.dat").exists() {
             continue;
         }
-        if let Ok(world) = read_singleplayer_world(world_path).await {
-            worlds.push(world);
+        tasks.spawn(read_singleplayer_world(world_path));
+    }
+    while let Some(result) = tasks.join_next().await {
+        match result {
+            Ok(Ok(world)) => worlds.push(world),
+            Ok(Err(e)) => {
+                tracing::warn!("Skipping unreadable world: {e}");
+            }
+            Err(e) => {
+                tracing::warn!("World read task panicked: {e}");
+            }
         }
     }
 
@@ -327,36 +343,36 @@ async fn read_singleplayer_world_maybe_locked(
     world_path: PathBuf,
     locked: bool,
 ) -> Result<World> {
-    #[derive(Deserialize, Debug)]
-    #[serde(rename_all = "PascalCase")]
-    struct LevelDataRoot {
-        data: LevelData,
-    }
-
-    #[derive(Deserialize, Debug)]
-    #[serde(rename_all = "PascalCase")]
-    struct LevelData {
-        #[serde(default)]
-        level_name: String,
-        #[serde(default)]
-        last_played: i64,
-        #[serde(default)]
-        game_type: i32,
-        #[serde(default, rename = "hardcore")]
-        hardcore: bool,
-    }
-
-    let level_data = io::read(world_path.join("level.dat")).await?;
-    let level_data: LevelDataRoot = quartz_nbt::serde::deserialize(
-        &level_data,
+    let raw = io::read(world_path.join("level.dat")).await?;
+    let (root, _) = quartz_nbt::io::read_nbt(
+        &mut Cursor::new(raw),
         quartz_nbt::io::Flavor::GzCompressed,
-    )?
-    .0;
-    let level_data = level_data.data;
+    )?;
 
-    let icon = Some(world_path.join("icon.png")).filter(|i| i.exists());
+    let data = root.get::<_, &NbtCompound>("Data").map_err(|_| {
+        Error::from(ErrorKind::InputError(
+            "Missing Data tag in level.dat".into(),
+        ))
+    })?;
 
-    let game_mode = match level_data.game_type {
+    let level_name = data
+        .get::<_, &str>("LevelName")
+        .unwrap_or_default()
+        .to_string();
+    let last_played = data.get::<_, i64>("LastPlayed").unwrap_or(0);
+    let game_type = data.get::<_, i32>("GameType").unwrap_or(0);
+    let hardcore = data.get::<_, i8>("hardcore").unwrap_or(0) != 0;
+
+    let icon = if tokio::fs::try_exists(world_path.join("icon.png"))
+        .await
+        .unwrap_or(false)
+    {
+        Some(Either::Left(world_path.join("icon.png")))
+    } else {
+        None
+    };
+
+    let game_mode = match game_type {
         0 => SingleplayerGameMode::Survival,
         1 => SingleplayerGameMode::Creative,
         2 => SingleplayerGameMode::Adventure,
@@ -365,9 +381,9 @@ async fn read_singleplayer_world_maybe_locked(
     };
 
     Ok(World {
-        name: level_data.level_name,
-        last_played: Utc.timestamp_millis_opt(level_data.last_played).single(),
-        icon: icon.map(Either::Left),
+        name: level_name,
+        last_played: Utc.timestamp_millis_opt(last_played).single(),
+        icon,
         display_status: DisplayStatus::Normal,
         details: WorldDetails::Singleplayer {
             path: world_path
@@ -376,7 +392,7 @@ async fn read_singleplayer_world_maybe_locked(
                 .to_string_lossy()
                 .to_string(),
             game_mode,
-            hardcore: level_data.hardcore,
+            hardcore,
             locked,
         },
     })
@@ -397,7 +413,6 @@ async fn get_server_worlds_in_profile(
         .await
         .ok();
 
-    let first_server_index = worlds.len();
     for (index, server) in servers.into_iter().enumerate() {
         if server.hidden {
             // TODO: Figure out whether we want to hide or show direct connect servers
@@ -423,40 +438,26 @@ async fn get_server_worlds_in_profile(
                 index,
                 address: server.ip,
                 pack_status: server.accept_textures.into(),
+                project_id: None,
+                content_kind: None,
             },
         };
         worlds.push(world);
     }
-
-    if let Some(join_log) = join_log {
-        let mut futures = JoinSet::new();
-        for (index, world) in worlds.iter().enumerate().skip(first_server_index)
-        {
-            // We can't check for the profile already having a last_played, in case the user joined
-            // the target address directly more recently. This is often the case when using
-            // quick-play before 1.20.
-            if let WorldDetails::Server { address, .. } = &world.details
-                && let Ok((host, port)) = parse_server_address(address)
-            {
-                let host = host.to_owned();
-                futures.spawn(async move {
-                    resolve_server_address(&host, port)
-                        .await
-                        .ok()
-                        .map(|x| (index, x))
-                });
-            }
-        }
-        for (index, address) in futures.join_all().await.into_iter().flatten() {
-            worlds[index].last_played = join_log.get(&address).copied();
-        }
-    }
-
     Ok(())
 }
 
 fn attach_world_data_to_world(world: &mut World, data: &AttachedWorldData) {
     world.display_status = data.display_status;
+    if let WorldDetails::Server {
+        project_id,
+        content_kind,
+        ..
+    } = &mut world.details
+    {
+        *project_id = data.project_id.clone();
+        *content_kind = data.content_kind.clone();
+    }
 }
 
 pub async fn set_world_display_status(
@@ -709,9 +710,12 @@ async fn try_get_world_session_lock(
 
 pub async fn add_server_to_profile(
     profile_path: &Path,
+    profile_path_id: &str,
     name: String,
     address: String,
     pack_status: ServerPackStatus,
+    project_id: Option<String>,
+    content_kind: Option<String>,
 ) -> Result<usize> {
     let mut servers = servers_data::read(profile_path).await?;
     let insert_index = servers
@@ -722,13 +726,38 @@ pub async fn add_server_to_profile(
         insert_index,
         servers_data::ServerData {
             name,
-            ip: address,
+            ip: address.clone(),
             accept_textures: pack_status.into(),
             hidden: false,
             icon: None,
         },
     );
     servers_data::write(profile_path, &servers).await?;
+
+    if project_id.is_some() || content_kind.is_some() {
+        let state = State::get().await?;
+        if let Some(project_id) = &project_id {
+            attached_world_data::set_project_id(
+                profile_path_id,
+                WorldType::Server,
+                &address,
+                project_id,
+                &state.pool,
+            )
+            .await?;
+        }
+        if let Some(content_kind) = &content_kind {
+            attached_world_data::set_content_kind(
+                profile_path_id,
+                WorldType::Server,
+                &address,
+                content_kind,
+                &state.pool,
+            )
+            .await?;
+        }
+    }
+
     Ok(insert_index)
 }
 
@@ -762,7 +791,7 @@ pub async fn remove_server_from_profile(
     index: usize,
 ) -> Result<()> {
     let mut servers = servers_data::read(profile_path).await?;
-    if servers.get(index).filter(|x| !x.hidden).is_none() {
+    if servers.get(index).as_ref().is_none_or(|x| x.hidden) {
         return Err(ErrorKind::InputError(format!(
             "No removable server at index {index}"
         ))
@@ -855,15 +884,13 @@ pub async fn get_profile_protocol_version(
         return Ok(Some(*protocol_version));
     }
 
-    let minecraft = crate::api::metadata::get_minecraft_versions().await?;
-    let version_index = minecraft
-        .versions
-        .iter()
-        .position(|it| it.id == profile.game_version)
-        .ok_or(ErrorKind::LauncherError(format!(
-            "Invalid game version: {}",
-            profile.game_version
-        )))?;
+    let state = State::get().await?;
+    let (minecraft, version_index) =
+        crate::launcher::resolve_minecraft_manifest(
+            &profile.game_version,
+            &state,
+        )
+        .await?;
     let version = &minecraft.versions[version_index];
 
     let loader_version = get_loader_version_from_profile(
@@ -903,6 +930,18 @@ pub async fn get_server_status(
     address: &str,
     protocol_version: Option<ProtocolVersion>,
 ) -> Result<ServerStatus> {
+    tracing::debug!(
+        "Pinging {address} with protocol version {protocol_version:?}"
+    );
+
+    get_server_status_old(address, protocol_version).await
+    // get_server_status_new(address, protocol_version).await
+}
+
+async fn get_server_status_old(
+    address: &str,
+    protocol_version: Option<ProtocolVersion>,
+) -> Result<ServerStatus> {
     let (original_host, original_port) = parse_server_address(address)?;
     let (host, port) =
         resolve_server_address(original_host, original_port).await?;
@@ -915,4 +954,88 @@ pub async fn get_server_status(
         protocol_version,
     )
     .await
+}
+
+async fn _get_server_status_new(
+    address: &str,
+    protocol_version: Option<ProtocolVersion>,
+) -> Result<ServerStatus> {
+    let (address, port) = match address.rsplit_once(':') {
+        Some((addr, port)) => {
+            let port = port.parse::<u16>().map_err(|_err| {
+                Error::from(ErrorKind::InputError("invalid port number".into()))
+            })?;
+            (addr, port)
+        }
+        None => (address, 25565),
+    };
+
+    let mut builder = async_minecraft_ping::ConnectionConfig::build(address)
+        .with_port(port)
+        .with_srv_lookup();
+
+    if let Some(version) = protocol_version {
+        builder = builder.with_protocol_version(version.version as usize)
+    }
+
+    let conn = builder.connect().await.map_err(|_err| {
+        Error::from(ErrorKind::InputError("failed to connect to server".into()))
+    })?;
+
+    let ping_conn = conn.status().await.map_err(|_err| {
+        Error::from(ErrorKind::InputError("failed to get server status".into()))
+    })?;
+    let status = &ping_conn.status;
+    let description = match &status.description {
+        ServerDescription::Plain(text) => {
+            serde_json::value::to_raw_value(&text).ok()
+        }
+        ServerDescription::Object { text } => {
+            // TODO: `text` always seems to be empty?
+            RawValue::from_string(text.clone()).ok()
+        }
+    };
+
+    let players = ServerPlayers {
+        max: status.players.max,
+        online: status.players.online,
+        sample: status
+            .players
+            .sample
+            .as_ref()
+            .map(|sample| {
+                sample
+                    .iter()
+                    .map(|player| ServerGameProfile {
+                        id: player.id.clone(),
+                        name: player.name.clone(),
+                    })
+                    .collect()
+            })
+            .unwrap_or_default(),
+    };
+    let version = ServerVersion {
+        name: status.version.name.clone(),
+        protocol: status.version.protocol,
+        legacy: false,
+    };
+    let favicon = status.favicon.as_ref().and_then(|url| url.parse().ok());
+
+    let latency = {
+        let start = Instant::now();
+        let ping_magic = Utc::now().timestamp_millis().cast_unsigned();
+        ping_conn.ping(ping_magic).await.map_err(|_err| {
+            Error::from(ErrorKind::InputError("failed to do ping".into()))
+        })?;
+        start.elapsed().as_millis() as i64
+    };
+
+    Ok(ServerStatus {
+        description,
+        players: Some(players),
+        version: Some(version),
+        favicon,
+        enforces_secure_chat: false,
+        ping: Some(latency),
+    })
 }

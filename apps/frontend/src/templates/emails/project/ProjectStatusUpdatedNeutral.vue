@@ -29,7 +29,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			>Your project, {project.name}, status has been updated</Heading
 		>
 
-		<Text class="text-base">Hi {user.name},</Text>
+		<Text class="text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 
 		<Text class="text-base">
 			Your project's status has been changed from <b>{project.oldstatus}</b> to

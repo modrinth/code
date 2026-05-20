@@ -31,31 +31,31 @@
 				anytime.
 			</p>
 			<p class="m-0 text-[2rem] font-bold text-purple">
-				{{ formatPrice(vintl.locale, price.prices.intervals.monthly, price.currency_code) }}/mo
+				{{ formatPrice(price.prices.intervals.monthly, price.currency_code) }}/mo
 			</p>
 			<p class="m-0 mb-4 text-secondary">
 				or save
 				{{ calculateSavings(price.prices.intervals.monthly, price.prices.intervals.yearly) }}% with
 				annual billing!
 			</p>
-			<nuxt-link
+			<ButtonStyled
 				v-if="auth.user && isPermission(auth.user.badges, 1 << 0)"
-				to="/settings/billing"
-				class="btn btn-purple btn-large"
+				color="purple"
+				size="large"
 			>
-				<SettingsIcon aria-hidden="true" />
-				Manage subscription
-			</nuxt-link>
-			<button v-else-if="auth.user" class="btn btn-purple btn-large" @click="purchaseModal.show()">
-				Subscribe
-			</button>
-			<nuxt-link
-				v-else
-				:to="`/auth/sign-in?redirect=${encodeURIComponent('/plus?showModal=true')}`"
-				class="btn btn-purple btn-large"
-			>
-				Subscribe
-			</nuxt-link>
+				<nuxt-link to="/settings/billing">
+					<SettingsIcon aria-hidden="true" />
+					Manage subscription
+				</nuxt-link>
+			</ButtonStyled>
+			<ButtonStyled v-else-if="auth.user" color="purple" size="large">
+				<button @click="purchaseModal.show()">Subscribe</button>
+			</ButtonStyled>
+			<ButtonStyled v-else color="purple" size="large">
+				<nuxt-link :to="`/auth/sign-in?redirect=${encodeURIComponent('/plus?showModal=true')}`">
+					Subscribe
+				</nuxt-link>
+			</ButtonStyled>
 		</div>
 	</div>
 	<div class="perks-hero">
@@ -86,14 +86,20 @@
 </template>
 <script setup>
 import { HeartIcon, ModrinthPlusIcon, SettingsIcon, SparklesIcon, StarIcon } from '@modrinth/assets'
-import { injectNotificationManager, PurchaseModal, useVIntl } from '@modrinth/ui'
-import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
+import {
+	ButtonStyled,
+	injectNotificationManager,
+	PurchaseModal,
+	useFormatPrice,
+} from '@modrinth/ui'
+import { calculateSavings, getCurrency } from '@modrinth/utils'
 
 import { useBaseFetch } from '@/composables/fetch.js'
 import { isPermission } from '@/utils/permissions.ts'
 import { products } from '~/generated/state.json'
 
 const { addNotification } = injectNotificationManager()
+const formatPrice = useFormatPrice()
 
 const title = 'Subscribe to Modrinth Plus!'
 const description =
@@ -115,8 +121,6 @@ useHead({
 		},
 	],
 })
-
-const vintl = useVIntl()
 
 const config = useRuntimeConfig()
 

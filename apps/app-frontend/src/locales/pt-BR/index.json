@@ -1,9 +1,312 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Baixando java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Downloads"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Ocultar mais instâncias em execução"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Criar instância primária"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Nenhuma instância em execução"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Instância primária"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Mostrar mais instâncias em execução"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Parar instância"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Ver downloads ativos"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Ver instância"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Ver logs"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Ativa a renderização avançada, como efeitos de desfoque que podem causar problemas de desempenho sem a renderização acelerada de hardware."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Renderização avançada"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Selecione seu tema de cores preferido para o Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Tema de Cores"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Alterar a página em que o launcher é aberto."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Início"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Biblioteca"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Página inicial padrão"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Desativa o nome acima do seu jogador na página de skins."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Ocultar nome"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Inclui mundos recentes na seção \"Voltar à ação\" na página inicial."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Volte aos mundos"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimize o launcher quando um processo do Minecraft for iniciado."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimizar launcher"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Usar molduras de janela do sistema (requer reiniciar o aplicativo)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Decorações nativas"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Selecione uma opção"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Ativa a capacidade de alternar a visibilidade da barra lateral."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Alternar barra lateral"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Se você tentar instalar um arquivo Modrinth Pack (.mrpack) que não esteja hospedado no Modrinth, garantiremos que você entenda os riscos antes de instalá-lo."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Avise-me antes de instalar pacotes de mods desconhecidos"
+  },
   "app.auth-servers.unreachable.body": {
-    "message": "Os servidores de autenticação do Minecraft podem estar indisponíveis no momento. Verifique sua conexão com a internet e tente novamente mais tarde."
+    "message": "Os servidores de autenticação do Minecraft podem estar indisponíveis no momento. Verifique sua conexão com a rede e tente novamente mais tarde."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Não foi possível acessar os servidores de autenticação"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Adicionando servidor à instância"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Adicionar a uma instância"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Adicionar à instância"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Adicionar a {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Adicionado"
+  },
+  "app.browse.already-added": {
+    "message": "Já adicionado"
+  },
+  "app.browse.back-to-instance": {
+    "message": "Voltar a instância"
+  },
+  "app.browse.discover-content": {
+    "message": "Descubra conteúdo"
+  },
+  "app.browse.discover-servers": {
+    "message": "Descubra servidores"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Ocultar servidores já adicionados"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Pacotes de mods"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Adicionar conteúdo pode quebrar a compatibilidade ao entrar no servidor. Qualquer conteúdo adicionado também será perdido ao atualizar o conteúdo da instância do servidor."
+  },
+  "app.browse.server.installing": {
+    "message": "Instalando"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Instalando pacote de mods..."
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Insira uma descrição para o pacote de mods..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exportar"
+  },
+  "app.export-modal.header": {
+    "message": "Exportar pacote de mods"
+  },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Incluir \"{file}\"?"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Nome do pacote de mods"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Nome do pacote de mods"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Configure quais arquivos serão incluídos nessa exportação"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Número da versão"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Todos os dados da sua instância serão permanentemente excluídos, incluindo seus mundos, configurações e todo o conteúdo instalado."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Esta ação não pode ser desfeita"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Excluir instância"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Excluir instância"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Este pacote de mods já está instalado na instância <bold>{instanceName}</bold>. Tem certeza de que deseja duplicá-lo?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Criar"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "O pacote de mods já está instalado"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instância"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projeto"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" foi adicionado"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projetos foram adicionados"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Confira os projetos que estou usando no meu pacote de mods!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Compartilhando conteúdo do pacote de mods\n\n\n    \t\t\t\t\t\t\n    \t\t\t\t\t\t\t\n    \t\t\t\t\t\t\n    \t\t\t\t\t\t"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Adicionado com sucesso"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Adicionar servidor"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Explorar servidores"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' será excluído permanentemente, e não haverá como recuperá-lo."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Tem certeza de que deseja excluir este mundo permanentemente?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modificado"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Jogo padrão"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Adicione um servidor ou explore para começar"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Nenhum servidor ou mundo adicionado"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' será removido da sua lista, inclusive no jogo, e não haverá como recuperá-lo."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) será removido da sua lista, inclusive no jogo, e não haverá como recuperá-lo."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Tem certeza de que deseja remover {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Buscar {count} mundos..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "este servidor"
+  },
+  "app.modal.install-to-play.content-required": {
+    "message": "Conteúdo necessário"
+  },
+  "app.modal.install-to-play.header": {
+    "message": "Instale para jogar"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Instalar"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, =0 {Nenhum mod} one {# mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Pacote de mods necessário"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Este servidor requer mods para jogar. Clique em Instalar para configurar os arquivos necessários a partir do Modrinth, e iniciar diretamente no servidor."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Instância compartilhada"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Instância de servidor compartilhada"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Ver conteúdos"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Atualize para jogar"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Atualização necessária"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "É necessária uma atualização para jogar {name}. Atualize para a versão mais recente para iniciar o jogo."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Este projeto já foi instalado"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Voltar ao descobrir"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Instalar conteúdo para a instância"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modo de desenvolvedor ativado."
@@ -17,9 +320,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "Opções da instância"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "Sinalização de recursos"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Instalações do Java"
   },
@@ -32,32 +332,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Gerenciamento de recursos"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "O Modrinth App v{version} está pronto para ser instalado! Você pode recarregar para atualizar agora ou a atualização será feita automaticamente ao fechar o Modrinth App."
   },
-  "app.update-toast.body.download-complete": {
-    "message": "O Modrinth App v{version} baixado. Recarregue para atualizar agora ou a atualização será aplicada automaticamente ao fechar o Modrinth App."
+  "app.update-popup.body.download-complete": {
+    "message": "O Modrinth App v{version} foi baixado. Recarregue para atualizar agora ou a atualização será aplicada automaticamente ao fechar o Modrinth App."
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.linux": {
+    "message": "O Modrinth App v{version} está disponível. Use seu gerenciador de pacotes para atualizar e obter os recursos e correções mais recentes!"
+  },
+  "app.update-popup.body.metered": {
     "message": "O Modrinth App v{version} já está disponível! Como você está em uma rede limitada, não o baixamos automaticamente."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Mudanças"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Baixar ({size})"
   },
-  "app.update-toast.downloading": {
-    "message": "Baixando..."
-  },
-  "app.update-toast.reload": {
-    "message": "Atualizar"
-  },
-  "app.update-toast.title": {
-    "message": "Atualização disponível"
-  },
-  "app.update-toast.title.download-complete": {
+  "app.update-popup.download-complete": {
     "message": "Download concluído"
+  },
+  "app.update-popup.reload": {
+    "message": "Recarregar"
+  },
+  "app.update-popup.title": {
+    "message": "Atualização disponível"
   },
   "app.update.complete-toast.text": {
     "message": "Clique aqui para ver as mudanças."
@@ -74,11 +374,29 @@
   "app.update.reload-to-update": {
     "message": "Recarregue para instalar a atualização"
   },
+  "app.world.server-modal.placeholder-address": {
+    "message": "exemplo.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Selecione uma opção"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Versão incompatível {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Ainda não jogado"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
+  },
   "friends.action.add-friend": {
     "message": "Adicionar um amigo"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count, plural, =0 {{count} solicitações de amizade} one {{count} solicitação de amizade} other {{count} solicitações de amizade}}"
+    "message": "{count, plural, =0 {Nenhuma solicitação de amizade} one {{count} solicitação de amizade} other {{count} solicitações de amizade}}"
   },
   "friends.add-friend.submit": {
     "message": "Enviar amizade"
@@ -173,11 +491,11 @@
   "instance.edit-world.title": {
     "message": "Editar mundo"
   },
-  "instance.filter.disabled": {
-    "message": "Projetos desativados"
+  "instance.files.adding-files": {
+    "message": "Adicionando arquivos ({completed}/{total})"
   },
-  "instance.filter.updates-available": {
-    "message": "Atualizações disponíveis"
+  "instance.files.save-as": {
+    "message": "Salvar como..."
   },
   "instance.server-modal.address": {
     "message": "Endereço"
@@ -231,7 +549,7 @@
     "message": "Selecionar ícone"
   },
   "instance.settings.tabs.general.library-groups": {
-    "message": "Coleções"
+    "message": "Grupos"
   },
   "instance.settings.tabs.general.library-groups.create": {
     "message": "Criar novo grupo"
@@ -287,140 +605,8 @@
   "instance.settings.tabs.installation": {
     "message": "Instalação"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} para o Minecraft {game_version} já está instalada"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "A versão padrão {game_version} já está instalada"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Alterar versão"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "Instalar"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Instalando"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Buscando versões do pacote de mods"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Instalando nova versão"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "Versão instalada"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Informação de depuração:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Buscando detalhes do pacote de mods"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "Versão do jogo"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "Instalar"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Instalação em progresso"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versão do {loader}"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Não foi possível carregar detalhes do pacote de mods. Verifique sua conexão com a internet."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} não está disponível para o Minecraft {version}. Tente outro carregador de mods."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Esta instância está vinculada a um pacote de mods, mas o pacote não foi encontrado no Modrinth."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "Plataforma"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Reinstalar pacote de mods"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Reinstalando pacote de mods"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "A reinstalação redefinirá todo o conteúdo instalado ou modificado para o fornecido pelo pacote de mods, removendo quaisquer mods ou conteúdo que você tenha adicionado sobre a instalação original. Isso pode corrigir comportamentos inesperados se alterações tiverem sido feitas na instância, mas se seus mundos agora dependem do conteúdo adicional instalado, isso pode danificar mundos existentes."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Tem certeza de que deseja reinstalar esta instância?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Volta ao estado original da instância, removendo quaisquer mods ou conteúdo que você tenha adicionado além do que já havia no pacote de mods original."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Reinstalar pacote de mods"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "Reparar"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "Reparando"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "O reparo reinstala as dependências do Minecraft e verifica se há corrupção. Isso pode resolver problemas se o seu jogo não estiver iniciando devido a erros relacionados ao launcher, mas não resolverá problemas ou travamentos relacionados a mods instalados."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Reparar instância?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Reparação em progresso"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "Retornar ao padrão"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Exibir todas as versões"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "mudar a versão"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "instalar"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "reinstalar"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "reparar"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Não é possível {action} durante a instalação"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Não é possível {action} enquanto estiver offline"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Não é possível {action} enquanto repara"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(versão desconhecida)"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "Desvincular instância"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Ao prosseguir, não será possível vincular novamente sem criar uma instância totalmente nova. Você não receberá mais atualizações do pacote de mods e ela se tornará uma instância normal."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Tem certeza de que deseja desvincular esta instância?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "Esta instância está vinculada a um pacote de mods, o que significa que mods não podem ser atualizados e você não pode alterar o carregador de mods ou a versão do Minecraft. Desvincular desconectará permanentemente esta instância do pacote de mods."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "Desvincular do pacote de mods"
   },
   "instance.settings.tabs.java": {
     "message": "Java e memória"
@@ -470,9 +656,6 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Insira a largura..."
   },
-  "instance.settings.title": {
-    "message": "Configurações"
-  },
   "instance.worlds.a_minecraft_server": {
     "message": "Servidor de Minecraft"
   },
@@ -485,9 +668,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Não mostrar na tela inicial"
   },
-  "instance.worlds.filter.available": {
-    "message": "Disponível"
-  },
   "instance.worlds.game_already_open": {
     "message": "A instância já está aberta"
   },
@@ -497,6 +677,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Servidor incompatível"
   },
+  "instance.worlds.linked_server": {
+    "message": "Gerenciado pelo projeto de servidor"
+  },
   "instance.worlds.no_contact": {
     "message": "Não foi possível conectar-se ao servidor"
   },
@@ -504,22 +687,34 @@
     "message": "Você só pode entrar diretamente em servidores a partir do Minecraft 1.0.5"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Você só pode entrar diretamente em mundos de um jogador a partir do Minecraft 1.20"
+    "message": "Você só pode entrar diretamente em mundos de um jogador a partir do Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
     "message": "Jogar na instância"
-  },
-  "instance.worlds.type.server": {
-    "message": "Servidor"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Um jogador"
   },
   "instance.worlds.view_instance": {
     "message": "Ver instância"
   },
   "instance.worlds.world_in_use": {
     "message": "Mundo em uso"
+  },
+  "minecraft-account.add-account": {
+    "message": "Adicionar conta"
+  },
+  "minecraft-account.label": {
+    "message": "Conta do minecraft"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Não conectado"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Remover conta"
+  },
+  "minecraft-account.select-account": {
+    "message": "Selecionar conta"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Faça login no Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Fornecido pela instância"
@@ -532,5 +727,38 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar com a instância"
+  },
+  "search.filter.locked.server": {
+    "message": "Fornecido pelo servidor"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Apenas mods do lado do cliente podem ser adicionados à instância do servidor"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "A versão do jogo é fornecida pelo servidor"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "O carregador é fornecido pelo servidor"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "Um arquivo só é revisado se for enviado para o Modrinth, não importa o seu formato de arquivo (incluindo .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Não mostrar este aviso novamente"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Confirmar instalação"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Instalar mesmo assim"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Malware é frequentemente distribuído através de arquivos de pacotes de mods compartilhados em plataformas como o Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "Não foi possível encontrar este arquivo no Modrinth. Recomendamos fortemente que você instale apenas arquivos de fontes confiáveis."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Aviso de arquivo desconhecido"
   }
 }

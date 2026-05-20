@@ -1,6 +1,6 @@
 use crate::util::fetch_json;
 use crate::{
-    Error, MirrorArtifact, UploadFile, util::download_file, util::format_url,
+    Error, FetchResult, UploadFile, util::download_file, util::format_url,
     util::sha1_async,
 };
 use daedalus::minecraft::{
@@ -12,12 +12,9 @@ use serde::Deserialize;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 
-#[tracing::instrument(skip(semaphore, upload_files, _mirror_artifacts))]
-pub async fn fetch(
-    semaphore: Arc<Semaphore>,
-    upload_files: &DashMap<String, UploadFile>,
-    _mirror_artifacts: &DashMap<String, MirrorArtifact>,
-) -> Result<(), Error> {
+#[tracing::instrument(skip(semaphore))]
+pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
+    let upload_files = DashMap::new();
     let modrinth_manifest = fetch_json::<VersionManifest>(
         &format_url(&format!(
             "minecraft/v{}/manifest.json",
@@ -147,7 +144,7 @@ pub async fn fetch(
             .chain(existing_versions.into_iter())
             .collect::<Vec<_>>();
 
-        new_versions.sort_by(|a, b| b.release_time.cmp(&a.release_time));
+        new_versions.sort_by_key(|b| std::cmp::Reverse(b.release_time));
 
         // create and upload the new manifest
         let version_manifest_path = format!(
@@ -169,7 +166,10 @@ pub async fn fetch(
         );
     }
 
-    Ok(())
+    Ok(FetchResult {
+        upload_files,
+        mirror_artifacts: DashMap::new(),
+    })
 }
 
 #[derive(Deserialize, Debug)]

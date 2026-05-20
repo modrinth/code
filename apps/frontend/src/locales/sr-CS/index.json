@@ -1,6 +1,66 @@
 {
+  "action.cancel": {
+    "message": "Otkaži"
+  },
+  "action.continue": {
+    "message": "Nastavi"
+  },
   "admin.billing.error.not-found": {
     "message": "Korisnik nije pronađen"
+  },
+  "app-marketing.download.description": {
+    "message": "Naša desktop aplikacija je dostupna na svim platformama, izaberite željenu verziju."
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Preuzmite beta verziju"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Opcije preuzimanja"
+  },
+  "app-marketing.download.title": {
+    "message": "Preuzmite aplikaciju Modrint (Beta verzija)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Pratite projekte"
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Instalirani modovi"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Ime"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Pretraži modove"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Upravljanje modovima"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Verzija"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Igrajte svoje modove, bez obzira da li ste povezani na internet ili ne."
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Deli"
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Preuzmite aplikaciju Modrint"
   },
   "auth.authorize.action.authorize": {
     "message": "Odobri"
@@ -25,12 +85,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "Unesite vaš email ispod i poslaćemo vam link za oporavak kako biste povratili svoj nalog."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Email ili korisničko ime"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Email"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Poslat vam je email sa uputstvima ako je email već povezan sa vašim nalogom."
@@ -71,12 +125,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Zaboravili ste lozinku?</forgot-password-link> • <create-account-link>Kreirajte nalog</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Email ili korisničko ime"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Lozinka"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Prijavi se sa"
   },
@@ -89,23 +137,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Kreirajte nalog"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Potvrdite lozinku"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Email"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Korisničko ime"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Kreiranjem naloga prihvatate <terms-link>Uslove</terms-link> i <privacy-policy-link>Pravila privatnosti</privacy-policy-link> Modrintha."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Lozinke se ne poklapaju!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Lozinka"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Već imate nalog?"
@@ -124,9 +160,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Podešavanja naloga"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Prijavite se"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Vaš email je već verifikovan!"
@@ -202,9 +235,6 @@
   },
   "dashboard.collections.button.create-new": {
     "message": "Kreiraj novo"
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projekat} other {{count} projekata}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Pretražite svoje kolekcije"
@@ -298,12 +328,6 @@
   },
   "frog.altText": {
     "message": "Fotorealistična slika sa žabama"
-  },
-  "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} osoba je takođe pretvorena u žabu} few {{count} osobe su takođe pretvorene u žabe} other {{count} ljudi su takođe pretvoreni u žabe}}!"
-  },
-  "frog.sinceOpened": {
-    "message": "Ova stranica je otvorena pre {ago}"
   },
   "frog.title": {
     "message": "Žaba"
@@ -446,9 +470,6 @@
   "layout.nav.search": {
     "message": "Pretraga"
   },
-  "moderation.filter.by": {
-    "message": "Filtriraj po"
-  },
   "moderation.moderate": {
     "message": "Moderiraj"
   },
@@ -457,15 +478,6 @@
   },
   "moderation.page.reports": {
     "message": "Izvještaji"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Tehnička recenzija"
-  },
-  "moderation.search.placeholder": {
-    "message": "Pretraži..."
-  },
-  "moderation.sort.by": {
-    "message": "Sortiraj po"
   },
   "profile.button.billing": {
     "message": "Upravljaj naplatom korisnika"
@@ -481,9 +493,6 @@
   },
   "profile.label.badges": {
     "message": "Bedževi"
-  },
-  "profile.label.details": {
-    "message": "Detalji"
   },
   "profile.label.no-collections": {
     "message": "Ovaj korisnik nema kolekcija!"
@@ -512,15 +521,6 @@
   "profile.user-id": {
     "message": "ID korisnika: {id}"
   },
-  "project-member-header.accept": {
-    "message": "Prihvati"
-  },
-  "project-member-header.decline": {
-    "message": "Odbij"
-  },
-  "project-member-header.error": {
-    "message": "Greška"
-  },
   "project-member-header.error-decline": {
     "message": "Neuspešno odbijanje poziva tima"
   },
@@ -532,9 +532,6 @@
   },
   "project-member-header.invitation-title": {
     "message": "Poziv za pridruživanje projektu"
-  },
-  "project-member-header.success": {
-    "message": "Uspešno"
   },
   "project-member-header.success-decline": {
     "message": "Odbili ste poziv tima"
@@ -629,23 +626,11 @@
   "report.already-reported": {
     "message": "Već ste prijavili {title}"
   },
-  "report.already-reported-description": {
-    "message": "Već imate otvorenu prijavu za ovaj {item}. Ako imate dodatne informacije, možete dodati detalje toj prijavi."
-  },
-  "report.back-to-item": {
-    "message": "Nazad na {item}"
-  },
   "report.body.description": {
     "message": "Uključite linkove i slike kad je moguće i relevantno. Prazne ili nedovoljne prijave biće zatvorene i ignorisane."
   },
   "report.body.title": {
     "message": "Molimo navedite dodatni kontekst za vašu prijavu"
-  },
-  "report.checking": {
-    "message": "Proveravam {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Nije moguće pronaći {item}"
   },
   "report.for.violation": {
     "message": "Kršenje Modrinth-ovih <rules-link>Pravila</rules-link> ili <terms-link>Uslova korišćenja</terms-link>"
@@ -686,14 +671,8 @@
   "report.please-report": {
     "message": "Molimo prijavite:"
   },
-  "report.question.content-id": {
-    "message": "Koji je ID {item}?"
-  },
   "report.question.content-type": {
     "message": "Koju vrstu sadržaja prijavljujete?"
-  },
-  "report.question.report-reason": {
-    "message": "Koje pravilo Modrintha krši ovaj {item}?"
   },
   "report.report-content": {
     "message": "Prijavi sadržaj moderatorima"
@@ -860,9 +839,6 @@
   "scopes.reportWrite.label": {
     "message": "Uređivanje prijava"
   },
-  "scopes.sessionAccess.description": {
-    "message": "Omogućava pristup Modrinth-izdatim sesijama"
-  },
   "scopes.sessionAccess.label": {
     "message": "Pristup sesijama"
   },
@@ -956,9 +932,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sinhronizuj sa serverom"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Vraćanje iz backupa u toku"
-  },
   "servers.notice.actions": {
     "message": "Radnje"
   },
@@ -989,20 +962,11 @@
   "servers.plan.large.description": {
     "message": "Idealno za 15–25 igrača, modpackove ili intenzivno modovanje."
   },
-  "servers.plan.large.name": {
-    "message": "Veliki"
-  },
   "servers.plan.medium.description": {
     "message": "Odlično za 6–15 igrača i više modova."
   },
-  "servers.plan.medium.name": {
-    "message": "Srednje"
-  },
   "servers.plan.small.description": {
     "message": "Savršeno za 1–5 prijatelja sa nekoliko lakih modova."
-  },
-  "servers.plan.small.name": {
-    "message": "Mali"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Otkaži pretplatu"
@@ -1031,9 +995,6 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Postavi kao primarni"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} koja se završava na {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Ističe {month}/{year}"
   },
@@ -1045,42 +1006,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Načini plaćanja"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Nepoznati način plaćanja"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Upravljajte svojim Modrinth Server pretplatama."
@@ -1175,9 +1100,6 @@
   "settings.pats.action.create": {
     "message": "Kreirajte PAT"
   },
-  "settings.pats.description": {
-    "message": "PAT-ovi se mogu koristiti za pristup Modrinth API-ju. Za više informacija, pogledajte <doc-link>dokumentaciju Modrinth API-ja</doc-link>. Mogu se kreirati i opozvati u bilo kom trenutku."
-  },
   "settings.pats.modal.create.action": {
     "message": "Kreirajte PAT"
   },
@@ -1235,17 +1157,11 @@
   "settings.profile.profile-info": {
     "message": "Informacije o profilu"
   },
-  "settings.profile.profile-picture.reset": {
-    "message": "Resetuj"
-  },
   "settings.profile.profile-picture.title": {
     "message": "Profilna slika"
   },
   "settings.profile.username.description": {
     "message": "Jedinstveno ime, bez razlikovanja velikih i malih slova, koje identifikuje vaš profil."
-  },
-  "settings.profile.username.title": {
-    "message": "Korisničko ime"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Opozovi sesiju"

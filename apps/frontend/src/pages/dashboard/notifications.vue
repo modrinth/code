@@ -3,23 +3,36 @@
 		<section class="universal-card">
 			<Breadcrumbs
 				v-if="history"
-				current-title="History"
-				:link-stack="[{ href: `/dashboard/notifications`, label: 'Notifications' }]"
+				:current-title="formatMessage(messages.historyLabel)"
+				:link-stack="[
+					{
+						href: `/dashboard/notifications`,
+						label: formatMessage(commonMessages.notificationsLabel),
+					},
+				]"
 			/>
 			<div class="header__row">
 				<div class="header__title">
-					<h2 v-if="history" class="text-2xl">Notification history</h2>
-					<h2 v-else class="text-2xl">Notifications</h2>
+					<h2 v-if="history" class="text-2xl">
+						{{ formatMessage(messages.notificationHistoryTitle) }}
+					</h2>
+					<h2 v-else class="text-2xl">
+						{{ formatMessage(commonMessages.notificationsLabel) }}
+					</h2>
 				</div>
 				<template v-if="!history">
-					<Button v-if="data.hasRead" @click="updateRoute()">
-						<HistoryIcon />
-						View history
-					</Button>
-					<Button v-if="notifications.length > 0" color="danger" @click="readAll()">
-						<CheckCheckIcon />
-						Mark all as read
-					</Button>
+					<ButtonStyled v-if="data.hasRead">
+						<button @click="updateRoute()">
+							<HistoryIcon />
+							{{ formatMessage(messages.viewHistory) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="notifications.length > 0" color="red">
+						<button @click="readAll()">
+							<CheckCheckIcon />
+							{{ formatMessage(messages.markAllAsRead) }}
+						</button>
+					</ButtonStyled>
 				</template>
 			</div>
 			<Chips
@@ -29,9 +42,9 @@
 				:format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
 				:capitalize="false"
 			/>
-			<p v-if="pending">Loading notifications...</p>
+			<p v-if="isPending">{{ formatMessage(messages.loadingNotifications) }}</p>
 			<template v-else-if="error">
-				<p>Error loading notifications:</p>
+				<p>{{ formatMessage(messages.errorLoadingNotifications) }}</p>
 				<pre>
           {{ error }}
         </pre>
@@ -45,10 +58,10 @@
 					:notification="notification"
 					:auth="auth"
 					raised
-					@update:notifications="() => refresh()"
+					@update:notifications="() => refetch()"
 				/>
 			</template>
-			<p v-else>You don't have any unread notifications.</p>
+			<p v-else>{{ formatMessage(messages.noUnreadNotifications) }}</p>
 			<div class="flex justify-end">
 				<Pagination :page="page" :count="pages" @switch-page="changePage" />
 			</div>
@@ -57,8 +70,17 @@
 </template>
 <script setup>
 import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
-import { Button, Chips, Pagination } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Chips,
+	commonMessages,
+	defineMessages,
+	injectModrinthClient,
+	Pagination,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import NotificationItem from '~/components/ui/NotificationItem.vue'
@@ -68,24 +90,70 @@ import {
 	markAsRead,
 } from '~/helpers/platform-notifications.ts'
 
-useHead({
-	title: 'Notifications - Modrinth',
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	historyLabel: {
+		id: 'dashboard.overview.notifications.history.label',
+		defaultMessage: 'History',
+	},
+	notificationHistoryTitle: {
+		id: 'dashboard.overview.notifications.history.title',
+		defaultMessage: 'Notification history',
+	},
+	viewHistory: {
+		id: 'dashboard.overview.notifications.button.view-history',
+		defaultMessage: 'View history',
+	},
+	markAllAsRead: {
+		id: 'dashboard.overview.notifications.button.mark-all-as-read',
+		defaultMessage: 'Mark all as read',
+	},
+	loadingNotifications: {
+		id: 'dashboard.overview.notifications.loading',
+		defaultMessage: 'Loading notifications...',
+	},
+	errorLoadingNotifications: {
+		id: 'dashboard.overview.notifications.error.loading',
+		defaultMessage: 'Error loading notifications:',
+	},
+	noUnreadNotifications: {
+		id: 'dashboard.overview.notifications.empty.no-unread',
+		defaultMessage: "You don't have any unread notifications.",
+	},
 })
 
+const client = injectModrinthClient()
 const auth = await useAuth()
 const route = useNativeRoute()
 const router = useNativeRouter()
 
 const history = computed(() => route.name === 'dashboard-notifications-history')
+
+useHead({
+	title: () =>
+		`${formatMessage(history.value ? messages.notificationHistoryTitle : commonMessages.notificationsLabel)} - Modrinth`,
+})
+
 const selectedType = ref('all')
 const page = ref(1)
 const perPage = ref(50)
 
-const { data, pending, error, refresh } = await useAsyncData(
-	async () => {
+const { data, isPending, error, refetch } = useQuery({
+	queryKey: computed(() => [
+		'user',
+		auth.value?.user?.id,
+		'notifications',
+		page.value,
+		history.value,
+		selectedType.value,
+	]),
+	queryFn: async () => {
 		const pageNum = page.value - 1
 		const showRead = history.value
-		const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`)
+		const notifications = await client.labrinth.notifications_v2.getUserNotifications(
+			auth.value?.user?.id,
+		)
 
 		const typesInFeed = [
 			...new Set(notifications.filter((n) => showRead || !n.read).map((n) => n.type)),
@@ -99,6 +167,7 @@ const { data, pending, error, refresh } = await useAsyncData(
 		const pages = Math.max(1, Math.ceil(filtered.length / perPage.value))
 
 		return fetchExtraNotificationData(
+			client,
 			filtered.slice(pageNum * perPage.value, pageNum * perPage.value + perPage.value),
 		).then((notifs) => ({
 			notifications: notifs,
@@ -107,11 +176,12 @@ const { data, pending, error, refresh } = await useAsyncData(
 			hasRead: notifications.some((n) => n.read),
 		}))
 	},
-	{ watch: [page, history, selectedType] },
-)
+	enabled: computed(() => !!auth.value?.user?.id),
+	placeholderData: { notifications: [], notifTypes: [], pages: 1, hasRead: false },
+})
 
 const notifications = computed(() =>
-	data.value ? groupNotifications(data.value.notifications, history.value) : [],
+	data.value ? groupNotifications(data.value.notifications) : [],
 )
 
 const notifTypes = computed(() => data.value?.notifTypes || [])
@@ -129,8 +199,8 @@ async function readAll() {
 		...(n.grouped_notifs ? n.grouped_notifs.map((g) => g.id) : []),
 	])
 
-	await markAsRead(ids)
-	await refresh()
+	await markAsRead(client, ids)
+	await refetch()
 }
 
 function changePage(newPage) {

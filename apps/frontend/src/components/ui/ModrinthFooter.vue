@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { BlueskyIcon, DiscordIcon, GithubIcon, MastodonIcon, TwitterIcon } from '@modrinth/assets'
+import {
+	BlueskyIcon,
+	DiscordIcon,
+	GithubIcon,
+	MastodonIcon,
+	ToggleRightIcon,
+	TwitterIcon,
+} from '@modrinth/assets'
 import {
 	AutoLink,
 	ButtonStyled,
@@ -10,6 +17,7 @@ import {
 	type MessageDescriptor,
 	useVIntl,
 } from '@modrinth/ui'
+import { commonSettingsMessages } from '@modrinth/ui/src/utils/common-messages.js'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
 
@@ -200,6 +208,7 @@ const developerModeCounter = ref(0)
 const state = useGeneratedState()
 
 function developerModeIncrement() {
+	developerModeCounter.value++
 	if (developerModeCounter.value >= 5) {
 		flags.value.developerMode = !flags.value.developerMode
 		developerModeCounter.value = 0
@@ -217,16 +226,12 @@ function developerModeIncrement() {
 				type: 'success',
 			})
 		}
-	} else {
-		developerModeCounter.value++
 	}
 }
 </script>
 
 <template>
-	<footer
-		class="footer-brand-background experimental-styles-within border-0 border-t-[1px] border-solid"
-	>
+	<footer class="footer-brand-background border-0 border-t-[1px] border-solid">
 		<div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
 			<div
 				class="grid grid-cols-1 gap-4 text-primary md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]"
@@ -236,11 +241,21 @@ function developerModeIncrement() {
 					role="region"
 					:aria-label="formatMessage(messages.modrinthInformation)"
 				>
-					<TextLogo
-						aria-hidden="true"
-						class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
-						@click="developerModeIncrement()"
-					/>
+					<div class="flex items-center gap-2">
+						<TextLogo
+							aria-hidden="true"
+							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
+							@click="developerModeIncrement()"
+						/>
+						<ButtonStyled v-if="flags.developerMode" circular type="transparent" color="brand">
+							<nuxt-link
+								v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"
+								to="/settings/flags"
+							>
+								<ToggleRightIcon />
+							</nuxt-link>
+						</ButtonStyled>
+					</div>
 					<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
 						<ButtonStyled
 							v-for="(social, index) in socialLinks"

@@ -1,6 +1,7 @@
 use std::{collections::HashSet, fmt::Display, sync::Arc};
 
 use super::ApiError;
+use crate::database::{PgPool, PgTransaction};
 use crate::file_hosting::FileHostPublicity;
 use crate::models::ids::OAuthClientId;
 use crate::util::img::{delete_old_images, upload_image_optimized};
@@ -38,7 +39,6 @@ use itertools::Itertools;
 use rand::{Rng, SeedableRng, distributions::Alphanumeric};
 use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -325,7 +325,7 @@ pub async fn oauth_client_edit(
 
         let mut transaction = pool.begin().await?;
         updated_client
-            .update_editable_fields(&mut *transaction)
+            .update_editable_fields(&mut transaction)
             .await?;
 
         if let Some(redirects) = redirect_uris {
@@ -410,7 +410,7 @@ pub async fn oauth_client_icon_edit(
     editable_client.raw_icon_url = Some(upload_result.raw_url);
 
     editable_client
-        .update_editable_fields(&mut *transaction)
+        .update_editable_fields(&mut transaction)
         .await?;
 
     transaction.commit().await?;
@@ -461,7 +461,7 @@ pub async fn oauth_client_icon_delete(
     editable_client.raw_icon_url = None;
 
     editable_client
-        .update_editable_fields(&mut *transaction)
+        .update_editable_fields(&mut transaction)
         .await?;
     transaction.commit().await?;
 
@@ -536,7 +536,7 @@ fn generate_oauth_client_secret() -> String {
 async fn create_redirect_uris(
     uri_strings: impl IntoIterator<Item = impl Display>,
     client_id: DBOAuthClientId,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<Vec<DBOAuthRedirectUri>, DatabaseError> {
     let mut redirect_uris = vec![];
     for uri in uri_strings.into_iter() {
@@ -554,7 +554,7 @@ async fn create_redirect_uris(
 async fn edit_redirects(
     redirects: Vec<String>,
     existing_client: &DBOAuthClient,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<(), DatabaseError> {
     let updated_redirects: HashSet<String> = redirects.into_iter().collect();
     let original_redirects: HashSet<String> = existing_client
@@ -569,14 +569,14 @@ async fn edit_redirects(
         &mut *transaction,
     )
     .await?;
-    DBOAuthClient::insert_redirect_uris(&redirects_to_add, &mut **transaction)
+    DBOAuthClient::insert_redirect_uris(&redirects_to_add, &mut *transaction)
         .await?;
 
     let mut redirects_to_remove = existing_client.redirect_uris.clone();
     redirects_to_remove.retain(|r| !updated_redirects.contains(&r.uri));
     DBOAuthClient::remove_redirect_uris(
         redirects_to_remove.iter().map(|r| r.id),
-        &mut **transaction,
+        &mut *transaction,
     )
     .await?;
 

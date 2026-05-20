@@ -6,9 +6,12 @@ use crate::pack::install_from::{
     EnvType, PackFile, PackFileHash, set_profile_information,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, ProfileInstallStage, SideType, cache_file_hash,
+    CacheBehaviour, CachedEntry, Profile, ProfileInstallStage, SideType,
+    cache_file_hash,
 };
-use crate::util::fetch::{fetch_mirrors, write};
+use crate::util::fetch::{
+    DownloadMeta, DownloadReason, fetch_mirrors, sha1_async, write,
+};
 use crate::util::io;
 use crate::{State, profile};
 use async_zip::base::read::seek::ZipFileReader;
@@ -45,6 +48,7 @@ pub async fn install_zipped_mrpack(
                 icon_url,
                 profile_path.clone(),
                 None,
+                DownloadReason::Modpack,
             )
             .await?
         }
@@ -54,7 +58,12 @@ pub async fn install_zipped_mrpack(
     };
 
     // Install pack files, and if it fails, fail safely by removing the profile
-    let result = install_zipped_mrpack_files(create_pack, false).await;
+    let result = install_zipped_mrpack_files(
+        create_pack,
+        false,
+        DownloadReason::Modpack,
+    )
+    .await;
 
     match result {
         Ok(profile) => Ok(profile),
@@ -71,6 +80,7 @@ pub async fn install_zipped_mrpack(
 pub async fn install_zipped_mrpack_files(
     create_pack: CreatePack,
     ignore_lock: bool,
+    reason: DownloadReason,
 ) -> crate::Result<String> {
     let state = &State::get().await?;
 
@@ -115,6 +125,73 @@ pub async fn install_zipped_mrpack_files(
         .into());
     }
 
+    // Cache the modpack file hashes for later filtering of user-added content
+    // Includes both manifest file hashes and computed hashes for override files
+    if let Some(ref version_id) = version_id {
+        let mut file_hashes: Vec<String> = pack
+            .files
+            .iter()
+            .filter_map(|f| f.hashes.get(&PackFileHash::Sha1).cloned())
+            .collect();
+
+        // Also hash files from overrides folders (these aren't in modrinth.index.json)
+        let override_entries: Vec<usize> = zip_reader
+            .file()
+            .entries()
+            .iter()
+            .enumerate()
+            .filter_map(|(index, entry)| {
+                let filename = entry.filename().as_str().ok()?;
+                let is_override = (filename.starts_with("overrides/")
+                    || filename.starts_with("client-overrides/")
+                    || filename.starts_with("server-overrides/"))
+                    && !filename.ends_with('/');
+                is_override.then_some(index)
+            })
+            .collect();
+
+        for index in override_entries {
+            let mut file_bytes = Vec::new();
+            let mut entry_reader = zip_reader.reader_with_entry(index).await?;
+            entry_reader.read_to_end_checked(&mut file_bytes).await?;
+
+            let hash = sha1_async(bytes::Bytes::from(file_bytes)).await?;
+            file_hashes.push(hash);
+        }
+
+        let project_ids: Vec<String> = pack
+            .files
+            .iter()
+            .filter_map(|f| {
+                f.downloads.iter().find_map(|url| {
+                    let parts: Vec<&str> = url.split('/').collect();
+                    let data_idx = parts.iter().position(|&p| p == "data")?;
+                    parts.get(data_idx + 1).map(|s| s.to_string())
+                })
+            })
+            .collect::<std::collections::HashSet<_>>()
+            .into_iter()
+            .collect();
+
+        tracing::info!(
+            "Caching {} modpack file hashes and {} project IDs for version {}",
+            file_hashes.len(),
+            project_ids.len(),
+            version_id
+        );
+        CachedEntry::cache_modpack_files(
+            version_id,
+            file_hashes,
+            project_ids,
+            &state.pool,
+        )
+        .await?;
+    } else {
+        tracing::warn!(
+            "No version_id available, skipping modpack file hash caching"
+        );
+    }
+
     // Sets generated profile attributes to the pack ones (using profile::edit)
     set_profile_information(
         profile_path.clone(),
@@ -140,10 +217,25 @@ pub async fn install_zipped_mrpack_files(
     )
     .await?;
 
+    let profile =
+        Profile::get(&profile_path, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::UnmanagedProfileError(
+                    profile_path.to_string(),
+                )
+                .as_error()
+            })?;
+
+    let download_meta = DownloadMeta {
+        reason,
+        game_version: profile.game_version.clone(),
+        loader: profile.loader.as_str().to_string(),
+    };
+
     let num_files = pack.files.len();
     loading_try_for_each_concurrent(
-        futures::stream::iter(pack.files.into_iter())
-            .map(Ok::<PackFile, crate::Error>),
+        futures::stream::iter(pack.files).map(Ok::<PackFile, crate::Error>),
         None,
         Some(&loading_bar),
         70.0,
@@ -151,6 +243,7 @@ pub async fn install_zipped_mrpack_files(
         None,
         |project| {
             let profile_path = profile_path.clone();
+            let download_meta = download_meta.clone();
             async move {
                 //TODO: Future update: prompt user for optional files in a modpack
                 if let Some(env) = project.env
@@ -168,6 +261,7 @@ pub async fn install_zipped_mrpack_files(
                         .map(|x| &**x)
                         .collect::<Vec<&str>>(),
                     project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
+                    Some(&download_meta),
                     &state.fetch_semaphore,
                     &state.pool,
                 )

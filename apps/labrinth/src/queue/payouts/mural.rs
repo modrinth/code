@@ -1,10 +1,10 @@
+use crate::database::PgPool;
 use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
 use modrinth_util::decimal::Decimal2dp;
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use tracing::{info, trace, warn};
 
 use crate::{
@@ -177,7 +177,7 @@ pub async fn sync_pending_payouts_from_mural(
         .collect::<Vec<String>>(),
         i64::from(limit),
     )
-    .fetch_all(&mut *txn)
+    .fetch_all(&mut txn)
     .await
     .wrap_internal_err("failed to fetch incomplete Mural payouts")?;
 
@@ -235,7 +235,7 @@ pub async fn sync_pending_payouts_from_mural(
         &payout_ids,
         &payout_statuses,
     )
-    .execute(&mut *txn)
+    .execute(&mut txn)
     .await
     .wrap_internal_err("failed to update payout statuses")?;
 
@@ -352,13 +352,16 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
 }
 
 fn payout_should_be_failed(payout: &muralpay::Payout) -> bool {
+    let muralpay::PayoutDetails::Fiat(b) = &payout.details else {
+        return false;
+    };
     matches!(
-        payout.details,
-        muralpay::PayoutDetails::Fiat(muralpay::FiatPayoutDetails {
+        **b,
+        muralpay::FiatPayoutDetails {
             fiat_payout_status: muralpay::FiatPayoutStatus::Failed { .. }
                 | muralpay::FiatPayoutStatus::Refunded { .. },
             ..
-        })
+        }
     )
 }
 
@@ -394,7 +397,7 @@ mod tests {
                     token_amount: dec!(10.00),
                     token_symbol: "USDC".into(),
                 },
-                details: PayoutDetails::Fiat(FiatPayoutDetails {
+                details: PayoutDetails::Fiat(Box::new(FiatPayoutDetails {
                     fiat_and_rail_code: FiatAndRailCode::Usd,
                     fiat_payout_status: FiatPayoutStatus::Pending {
                         initiated_at: chrono::Utc::now(),
@@ -414,7 +417,7 @@ mod tests {
                         token_symbol: "USDC".into(),
                     },
                     developer_fee: None,
-                }),
+                })),
                 recipient_info: PayoutRecipientInfo::Inline {
                     name: "John Smith".into(),
                     details: InlineRecipientDetails::Fiat {
@@ -452,7 +455,7 @@ mod tests {
     }
 
     async fn setup_test_db_with_payouts(
-        db: &sqlx::PgPool,
+        db: &PgPool,
         payouts: Vec<(i64, String, PayoutStatus)>,
     ) -> Result<(), eyre::Error> {
         for (id, platform_id, status) in payouts {

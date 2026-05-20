@@ -1,12 +1,18 @@
 use std::{collections::HashMap, sync::Arc};
 
 use super::{ApiError, oauth_clients::get_user_clients};
+use crate::database::PgPool;
+use crate::util::error::Context;
 use crate::{
     auth::{
-        checks::is_visible_organization, filter_visible_collections,
-        filter_visible_projects, get_user_from_headers,
+        check_is_moderator_from_headers, checks::is_visible_organization,
+        filter_visible_collections, filter_visible_projects,
+        get_user_from_headers,
     },
-    database::{models::DBUser, redis::RedisPool},
+    database::{
+        models::{DBModerationNote, DBUser},
+        redis::RedisPool,
+    },
     file_hosting::{FileHost, FileHostPublicity},
     models::{
         notifications::Notification,
@@ -23,7 +29,6 @@ use crate::{
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -34,6 +39,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("user")
             .route("{user_id}/projects", web::get().to(projects_list))
+            .route("{id}/notes", web::patch().to(user_notes_edit))
             .route("{id}", web::get().to(user_get))
             .route("{user_id}/collections", web::get().to(collections_list))
             .route("{user_id}/organizations", web::get().to(orgs_list))
@@ -166,6 +172,12 @@ pub async fn user_auth_get(
         user.payout_data = None;
     }
 
+    if user.role.is_mod() {
+        let note =
+            DBModerationNote::get_user(user.id.into(), &**pool, &redis).await?;
+        user.moderation_notes = Some(note.map(Into::into));
+    }
+
     Ok(HttpResponse::Ok().json(user))
 }
 
@@ -175,16 +187,49 @@ pub struct UserIds {
 }
 
 pub async fn users_get(
+    req: HttpRequest,
     web::Query(ids): web::Query<UserIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)?;
 
     let users_data = DBUser::get_many(&user_ids, &**pool, &redis).await?;
 
-    let users: Vec<crate::models::users::User> =
-        users_data.into_iter().map(From::from).collect();
+    let auth_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
+
+    let notes = if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+        DBModerationNote::get_many_users(
+            &users_data.iter().map(|x| x.id).collect::<Vec<_>>(),
+            &**pool,
+            &redis,
+        )
+        .await?
+    } else {
+        HashMap::new()
+    };
+
+    let users: Vec<crate::models::users::User> = users_data
+        .into_iter()
+        .map(|data| {
+            let mut user = crate::models::users::User::from(data.clone());
+            if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+                user.moderation_notes =
+                    Some(notes.get(&data.id).cloned().map(Into::into));
+            }
+            user
+        })
+        .collect();
 
     Ok(HttpResponse::Ok().json(users))
 }
@@ -210,17 +255,93 @@ pub async fn user_get(
         .map(|x| x.1)
         .ok();
 
-        let response: crate::models::users::User =
-            if auth_user.is_some_and(|x| x.role.is_admin()) {
-                crate::models::users::User::from_full(data)
-            } else {
-                data.into()
-            };
+        let is_admin = auth_user.as_ref().is_some_and(|x| x.role.is_admin());
+        let is_mod = auth_user.as_ref().is_some_and(|x| x.role.is_mod());
+        let user_id = data.id;
+
+        let mut response: crate::models::users::User = if is_admin {
+            crate::models::users::User::from_full(data)
+        } else {
+            data.into()
+        };
+
+        if is_mod {
+            let note =
+                DBModerationNote::get_user(user_id, &**pool, &redis).await?;
+            response.moderation_notes = Some(note.map(Into::into));
+        }
 
         Ok(HttpResponse::Ok().json(response))
     } else {
         Err(ApiError::NotFound)
     }
+}
+
+pub async fn user_notes_edit(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    new_note: web::Json<crate::models::moderation_notes::PatchModerationNote>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await?;
+
+    new_note.validate_not_empty()?;
+    let expected_version =
+        crate::models::moderation_notes::parse_if_match_header(&req)?;
+
+    let user_data = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await?
+        .ok_or(ApiError::NotFound)?;
+
+    let mut transaction = pool.begin().await?;
+    if let Some(expected) = expected_version {
+        let updated = DBModerationNote::update(
+            Some(user_data.id),
+            None,
+            user.id.into(),
+            expected,
+            new_note.notes.as_deref(),
+            new_note.user_rating,
+            &mut transaction,
+        )
+        .await?;
+
+        if updated.is_none() {
+            return Err(ApiError::PreconditionFailed(
+                "moderation note version does not match".to_string(),
+            ));
+        }
+    } else {
+        let updated = DBModerationNote::insert(
+            Some(user_data.id),
+            None,
+            user.id.into(),
+            new_note.notes.as_deref(),
+            new_note.user_rating,
+            &mut transaction,
+        )
+        .await?;
+
+        if updated.is_none() {
+            return Err(ApiError::PreconditionRequired(
+                "moderation note version does not match".to_string(),
+            ));
+        }
+    };
+
+    transaction.commit().await?;
+    DBModerationNote::clear_user_cache(user_data.id, &redis).await?;
+
+    Ok(HttpResponse::NoContent().finish())
 }
 
 pub async fn collections_list(
@@ -422,7 +543,7 @@ pub async fn user_edit(
                         username,
                         id as crate::database::models::ids::DBUserId,
                     )
-                    .execute(&mut *transaction)
+                    .execute(&mut transaction)
                     .await?;
                 } else {
                     return Err(ApiError::InvalidInput(format!(
@@ -441,7 +562,7 @@ pub async fn user_edit(
                     bio.as_deref(),
                     id as crate::database::models::ids::DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -464,7 +585,7 @@ pub async fn user_edit(
                     role,
                     id as crate::database::models::ids::DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -485,7 +606,7 @@ pub async fn user_edit(
                     badges.bits() as i64,
                     id as crate::database::models::ids::DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -506,7 +627,7 @@ pub async fn user_edit(
                     venmo_handle,
                     id as crate::database::models::ids::DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -520,7 +641,7 @@ pub async fn user_edit(
                     allow_friend_requests,
                     id as crate::database::models::ids::DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
             }
 
@@ -680,7 +801,7 @@ pub async fn user_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<(), ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -690,26 +811,33 @@ pub async fn user_delete(
     )
     .await?
     .1;
-    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to get user")?;
 
-    if let Some(id) = id_option.map(|x| x.id) {
-        if !user.role.is_admin() && user.id != id.into() {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to delete this user!".to_string(),
-            ));
-        }
+    let id = id_option.map(|x| x.id).ok_or(ApiError::NotFound)?;
+    if !user.role.is_admin() && user.id != id.into() {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to delete this user!".to_string(),
+        ));
+    }
 
-        let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin transaction")?;
 
-        let result = DBUser::remove(id, &mut transaction, &redis).await?;
+    let result = DBUser::remove(id, &mut transaction, &redis)
+        .await
+        .wrap_internal_err("failed to remove user")?;
 
-        transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
 
-        if result.is_some() {
-            Ok(HttpResponse::NoContent().body(""))
-        } else {
-            Err(ApiError::NotFound)
-        }
+    if result.is_some() {
+        Ok(())
     } else {
         Err(ApiError::NotFound)
     }
@@ -791,7 +919,7 @@ pub async fn user_notifications(
             .map(Into::into)
             .collect();
 
-        notifications.sort_by(|a, b| b.created.cmp(&a.created));
+        notifications.sort_by_key(|b| std::cmp::Reverse(b.created));
         Ok(HttpResponse::Ok().json(notifications))
     } else {
         Err(ApiError::NotFound)

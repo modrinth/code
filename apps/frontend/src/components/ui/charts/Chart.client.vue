@@ -1,6 +1,5 @@
 <script setup>
-import { formatMoney, formatNumber } from '@modrinth/utils'
-import dayjs from 'dayjs'
+import { useFormatDateTime, useFormatMoney, useFormatNumber } from '@modrinth/ui'
 import VueApexCharts from 'vue3-apexcharts'
 
 const props = defineProps({
@@ -18,7 +17,6 @@ const props = defineProps({
 	},
 	formatLabels: {
 		type: Function,
-		default: (label) => dayjs(label).format('MMM D'),
 	},
 	colors: {
 		type: Array,
@@ -78,8 +76,15 @@ const props = defineProps({
 	},
 })
 
+const formatNumber = useFormatNumber()
+const formatMoney = useFormatMoney()
+const formatDate = useFormatDateTime({
+	month: 'short',
+	day: 'numeric',
+})
+
 function formatTooltipValue(value, props) {
-	return props.isMoney ? formatMoney(value, false) : formatNumber(value, false)
+	return props.isMoney ? formatMoney(value) : formatNumber(value)
 }
 
 function generateListEntry(value, index, _, w, props) {
@@ -99,7 +104,7 @@ function generateListEntry(value, index, _, w, props) {
 function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
 	const label = w.globals.lastXAxis.categories?.[dataPointIndex]
 
-	const formattedLabel = props.formatLabels(label)
+	const formattedLabel = props.formatLabels ? props.formatLabels(label) : formatDate(label)
 
 	let tooltip = `<div class="bar-tooltip">
     <div class="seperated-entry title">

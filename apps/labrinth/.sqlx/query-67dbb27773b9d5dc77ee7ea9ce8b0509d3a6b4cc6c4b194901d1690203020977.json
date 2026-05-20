@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tINSERT INTO analytics_events (id, meta, starts, ends)\n\t\t\tVALUES ($1, $2, $3, $4)\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Jsonb",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "67dbb27773b9d5dc77ee7ea9ce8b0509d3a6b4cc6c4b194901d1690203020977"
+}

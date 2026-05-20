@@ -13,7 +13,7 @@ import {
 const { formatMessage } = useVIntl()
 const { locale, setLocale } = injectI18n()
 
-const platform = formatMessage(languageSelectorMessages.platformSite)
+const platform = computed(() => formatMessage(languageSelectorMessages.platformSite))
 
 const $isChanging = ref(false)
 

@@ -1,0 +1,565 @@
+<template>
+	<div>
+		<!-- Server Project Links -->
+		<section v-if="isServerProject" class="universal-card">
+			<h2>External links</h2>
+			<div class="adjacent-input">
+				<label id="server-website" title="Your server's website.">
+					<span class="label__title">Website</span>
+					<span class="label__description">Your server's official website.</span>
+				</label>
+				<TriangleAlertIcon
+					v-if="isServerSiteLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="isServerSiteDiscordUrl"
+					v-tooltip="`Discord invites are not appropriate for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<input
+					id="server-website"
+					v-model="siteUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label id="server-store" title="Your server's store page.">
+					<span class="label__title">Store</span>
+					<span class="label__description">A link to your server's store or shop.</span>
+				</label>
+				<TriangleAlertIcon
+					v-if="isServerStoreLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="isServerStoreDiscordUrl"
+					v-tooltip="`Discord invites are not appropriate for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<input
+					id="server-store"
+					v-model="storeUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label
+					id="server-wiki"
+					title="A page containing information, documentation, and help for the server."
+				>
+					<span class="label__title">Wiki page</span>
+					<span class="label__description"
+						>A page containing information, documentation, and help for the server.</span
+					>
+				</label>
+				<TriangleAlertIcon
+					v-if="isServerWikiLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="isServerWikiDiscordUrl"
+					v-tooltip="`Discord invites are not appropriate for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<input
+					id="server-wiki"
+					v-model="serverWikiUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label id="server-discord" title="An invitation link to your Discord server.">
+					<span class="label__title">Discord</span>
+					<span class="label__description">An invitation link to your Discord server.</span>
+				</label>
+				<TriangleAlertIcon
+					v-if="isServerDiscordLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="!isServerDiscordUrlCommon"
+					v-tooltip="`You're using a link which isn't common for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<input
+					id="server-discord"
+					v-model="serverDiscordUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="button-group">
+				<ButtonStyled color="brand">
+					<button :disabled="!hasServerChanges" @click="saveServerChanges()">
+						<SaveIcon />
+						Save changes
+					</button>
+				</ButtonStyled>
+			</div>
+		</section>
+
+		<!-- Standard Project Links -->
+		<section v-if="!isServerProject" class="universal-card">
+			<h2>External links</h2>
+			<div class="adjacent-input">
+				<label
+					id="project-issue-tracker"
+					title="A place for users to report bugs, issues, and concerns about your project."
+				>
+					<span class="label__title">Issue tracker </span>
+					<span class="label__description">
+						A place for users to report bugs, issues, and concerns about your project.
+					</span>
+				</label>
+				<TriangleAlertIcon
+					v-if="isIssuesLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="isIssuesDiscordUrl"
+					v-tooltip="`Discord invites are not appropriate for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="!isIssuesUrlCommon"
+					v-tooltip="`Link includes a domain which isn't common for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<StyledInput
+					id="project-issue-tracker"
+					v-model="issuesUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					:maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label
+					id="project-source-code"
+					title="A page/repository containing the source code for your project"
+				>
+					<span class="label__title">Source code </span>
+					<span class="label__description">
+						A page/repository containing the source code for your project
+					</span>
+				</label>
+				<TriangleAlertIcon
+					v-if="isSourceLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="isSourceDiscordUrl"
+					v-tooltip="`Discord invites are not appropriate for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="!isSourceUrlCommon"
+					v-tooltip="`Link includes a domain which isn't common for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<StyledInput
+					id="project-source-code"
+					v-model="sourceUrl"
+					type="url"
+					:maxlength="2048"
+					placeholder="Enter a valid URL"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label
+					id="project-wiki-page"
+					title="A page containing information, documentation, and help for the project."
+				>
+					<span class="label__title">Wiki page</span>
+					<span class="label__description">
+						A page containing information, documentation, and help for the project.
+					</span>
+				</label>
+				<TriangleAlertIcon
+					v-if="isWikiLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="isWikiDiscordUrl"
+					v-tooltip="`Discord invites are not appropriate for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<StyledInput
+					id="project-wiki-page"
+					v-model="wikiUrl"
+					type="url"
+					:maxlength="2048"
+					placeholder="Enter a valid URL"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label id="project-discord-invite" title="An invitation link to your Discord server.">
+					<span class="label__title">Discord invite </span>
+					<span class="label__description"> An invitation link to your Discord server. </span>
+				</label>
+				<TriangleAlertIcon
+					v-if="isDiscordLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="!isDiscordUrlCommon"
+					v-tooltip="`You're using a link which isn't common for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<StyledInput
+					id="project-discord-invite"
+					v-model="discordUrl"
+					type="url"
+					:maxlength="2048"
+					placeholder="Enter a valid URL"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<span class="label">
+				<span class="label__title">Donation links</span>
+				<span class="label__description">
+					Add donation links for users to support you directly.
+				</span>
+			</span>
+
+			<div
+				v-for="(donationLink, index) in donationLinks"
+				:key="`donation-link-${index}`"
+				class="input-group donation-link-group"
+			>
+				<StyledInput
+					v-model="donationLink.url"
+					type="url"
+					:maxlength="2048"
+					placeholder="Enter a valid URL"
+					:disabled="!hasPermission"
+					@update:model-value="updateDonationLinks"
+				/>
+				<DropdownSelect
+					v-model="donationLink.id"
+					name="Donation platform selector"
+					:options="tags.donationPlatforms.map((x) => x.short)"
+					:display-name="
+						(option) => tags.donationPlatforms.find((platform) => platform.short === option)?.name
+					"
+					placeholder="Select platform"
+					render-up
+					class="platform-selector"
+					@update:model-value="updateDonationLinks"
+				/>
+			</div>
+			<div class="button-group">
+				<ButtonStyled color="brand">
+					<button :disabled="!hasChanges" @click="saveChanges()">
+						<SaveIcon />
+						Save changes
+					</button>
+				</ButtonStyled>
+			</div>
+		</section>
+	</div>
+</template>
+
+<script setup>
+import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
+import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@modrinth/moderation'
+import {
+	ButtonStyled,
+	DropdownSelect,
+	injectModrinthClient,
+	injectNotificationManager,
+	injectProjectPageContext,
+	StyledInput,
+} from '@modrinth/ui'
+
+const tags = useGeneratedState()
+
+const {
+	projectV2: project,
+	projectV3,
+	currentMember,
+	patchProject,
+	invalidate,
+} = injectProjectPageContext()
+const { labrinth } = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
+
+const issuesUrl = ref(project.value.issues_url)
+const sourceUrl = ref(project.value.source_url)
+const wikiUrl = ref(project.value.wiki_url)
+const discordUrl = ref(project.value.discord_url)
+
+// Server project links
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+const siteUrl = ref(projectV3.value?.link_urls?.site?.url ?? '')
+const storeUrl = ref(projectV3.value?.link_urls?.store?.url ?? '')
+const serverWikiUrl = ref(projectV3.value?.link_urls?.wiki?.url ?? '')
+const serverDiscordUrl = ref(projectV3.value?.link_urls?.discord?.url ?? '')
+
+watch(
+	projectV3,
+	(newVal) => {
+		if (newVal) {
+			siteUrl.value = newVal.link_urls?.site?.url ?? ''
+			storeUrl.value = newVal.link_urls?.store?.url ?? ''
+			serverWikiUrl.value = newVal.link_urls?.wiki?.url ?? ''
+			serverDiscordUrl.value = newVal.link_urls?.discord?.url ?? ''
+		}
+	},
+	{ immediate: true },
+)
+
+const isIssuesUrlCommon = computed(() => {
+	if (!issuesUrl.value || issuesUrl.value.trim().length === 0) return true
+	return isCommonUrl(issuesUrl.value, commonLinkDomains.issues)
+})
+
+const isSourceUrlCommon = computed(() => {
+	if (!sourceUrl.value || sourceUrl.value.trim().length === 0) return true
+	return isCommonUrl(sourceUrl.value, commonLinkDomains.source)
+})
+
+const isDiscordUrlCommon = computed(() => {
+	if (!discordUrl.value || discordUrl.value.trim().length === 0) return true
+	return isCommonUrl(discordUrl.value, commonLinkDomains.discord)
+})
+
+const isIssuesDiscordUrl = computed(() => {
+	return isDiscordUrl(issuesUrl.value)
+})
+
+const isSourceDiscordUrl = computed(() => {
+	return isDiscordUrl(sourceUrl.value)
+})
+
+const isWikiDiscordUrl = computed(() => {
+	return isDiscordUrl(wikiUrl.value)
+})
+
+const isIssuesLinkShortener = computed(() => {
+	return isLinkShortener(issuesUrl.value)
+})
+const isSourceLinkShortener = computed(() => {
+	return isLinkShortener(sourceUrl.value)
+})
+const isWikiLinkShortener = computed(() => {
+	return isLinkShortener(wikiUrl.value)
+})
+const isDiscordLinkShortener = computed(() => {
+	return isLinkShortener(discordUrl.value)
+})
+
+const isServerSiteDiscordUrl = computed(() => {
+	return isDiscordUrl(siteUrl.value)
+})
+const isServerStoreDiscordUrl = computed(() => {
+	return isDiscordUrl(storeUrl.value)
+})
+const isServerWikiDiscordUrl = computed(() => {
+	return isDiscordUrl(serverWikiUrl.value)
+})
+const isServerSiteLinkShortener = computed(() => {
+	return isLinkShortener(siteUrl.value)
+})
+const isServerStoreLinkShortener = computed(() => {
+	return isLinkShortener(storeUrl.value)
+})
+const isServerWikiLinkShortener = computed(() => {
+	return isLinkShortener(serverWikiUrl.value)
+})
+const isServerDiscordLinkShortener = computed(() => {
+	return isLinkShortener(serverDiscordUrl.value)
+})
+const isServerDiscordUrlCommon = computed(() => {
+	if (!serverDiscordUrl.value || serverDiscordUrl.value.trim().length === 0) return true
+	return isCommonUrl(serverDiscordUrl.value, commonLinkDomains.discord)
+})
+
+const rawDonationLinks = JSON.parse(JSON.stringify(project.value.donation_urls))
+rawDonationLinks.push({
+	id: null,
+	platform: null,
+	url: null,
+})
+const donationLinks = ref(rawDonationLinks)
+
+const hasPermission = computed(() => {
+	const EDIT_DETAILS = 1 << 2
+	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
+})
+
+const patchData = computed(() => {
+	const data = {}
+
+	if (checkDifference(issuesUrl.value, project.value.issues_url)) {
+		data.issues_url = issuesUrl.value === '' ? null : issuesUrl.value.trim()
+	}
+	if (checkDifference(sourceUrl.value, project.value.source_url)) {
+		data.source_url = sourceUrl.value === '' ? null : sourceUrl.value.trim()
+	}
+	if (checkDifference(wikiUrl.value, project.value.wiki_url)) {
+		data.wiki_url = wikiUrl.value === '' ? null : wikiUrl.value.trim()
+	}
+	if (checkDifference(discordUrl.value, project.value.discord_url)) {
+		data.discord_url = discordUrl.value === '' ? null : discordUrl.value.trim()
+	}
+
+	const validDonationLinks = donationLinks.value.filter((link) => link.url && link.id)
+
+	if (
+		validDonationLinks !== project.value.donation_urls &&
+		!(
+			project.value.donation_urls &&
+			project.value.donation_urls.length === 0 &&
+			validDonationLinks.length === 0
+		)
+	) {
+		data.donation_urls = validDonationLinks
+	}
+
+	if (data.donation_urls) {
+		data.donation_urls.forEach((link) => {
+			const platform = tags.value.donationPlatforms.find((platform) => platform.short === link.id)
+			link.platform = platform.name
+		})
+	}
+
+	return data
+})
+
+const hasChanges = computed(() => {
+	return Object.keys(patchData.value).length > 0
+})
+
+// Server project links
+const serverPatchData = computed(() => {
+	const data = {}
+	const originalSite = projectV3.value?.link_urls?.site?.url ?? ''
+	const originalStore = projectV3.value?.link_urls?.store?.url ?? ''
+	const originalWiki = projectV3.value?.link_urls?.wiki?.url ?? ''
+	const originalDiscord = projectV3.value?.link_urls?.discord?.url ?? ''
+
+	if (checkDifference(siteUrl.value, originalSite)) {
+		data.site = siteUrl.value === '' ? null : siteUrl.value?.trim()
+	}
+	if (checkDifference(storeUrl.value, originalStore)) {
+		data.store = storeUrl.value === '' ? null : storeUrl.value?.trim()
+	}
+	if (checkDifference(serverWikiUrl.value, originalWiki)) {
+		data.wiki = serverWikiUrl.value === '' ? null : serverWikiUrl.value?.trim()
+	}
+	if (checkDifference(serverDiscordUrl.value, originalDiscord)) {
+		data.discord = serverDiscordUrl.value === '' ? null : serverDiscordUrl.value?.trim()
+	}
+	return data
+})
+
+const hasServerChanges = computed(() => {
+	return Object.keys(serverPatchData.value).length > 0
+})
+
+async function saveServerChanges() {
+	const linkUpdates = serverPatchData.value
+	if (Object.keys(linkUpdates).length === 0) return
+
+	try {
+		await labrinth.projects_v3.edit(project.value.id, {
+			link_urls: linkUpdates,
+		})
+		await invalidate()
+		addNotification({
+			title: 'Links updated',
+			text: 'Your server links have been updated.',
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: 'Failed to update links',
+			text: err.data?.description ?? String(err),
+			type: 'error',
+		})
+	}
+}
+
+async function saveChanges() {
+	if (patchData.value && (await patchProject(patchData.value))) {
+		donationLinks.value = JSON.parse(JSON.stringify(project.value.donation_urls))
+		donationLinks.value.push({
+			id: null,
+			platform: null,
+			url: null,
+		})
+	}
+}
+
+function updateDonationLinks() {
+	const links = donationLinks.value
+	links.forEach((link) => {
+		if (link.url) {
+			const url = link.url.toLowerCase()
+			if (url.includes('patreon.com')) {
+				link.id = 'patreon'
+			} else if (url.includes('ko-fi.com')) {
+				link.id = 'ko-fi'
+			} else if (url.includes('paypal.com') || url.includes('paypal.me')) {
+				link.id = 'paypal'
+			} else if (url.includes('buymeacoffee.com') || url.includes('buymeacoff.ee')) {
+				link.id = 'bmac'
+			} else if (url.includes('github.com/sponsors')) {
+				link.id = 'github'
+			}
+		}
+	})
+	if (!links.find((link) => !(link.url && link.id))) {
+		links.push({
+			id: null,
+			platform: null,
+			url: null,
+		})
+	}
+	donationLinks.value = links
+}
+
+function checkDifference(newLink, existingLink) {
+	return newLink != existingLink
+}
+</script>
+<style lang="scss" scoped>
+.donation-link-group {
+	input {
+		flex-grow: 2;
+		max-width: 26rem;
+	}
+
+	:deep(.animated-dropdown .selected) {
+		height: 40px;
+	}
+}
+
+.button-group {
+	justify-content: flex-start;
+}
+</style>

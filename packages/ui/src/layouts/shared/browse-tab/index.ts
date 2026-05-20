@@ -1,0 +1,7 @@
+export { default as SelectedProjectsFloatingBar } from './components/SelectedProjectsFloatingBar.vue'
+export * from './composables'
+export { default as BrowseInstallHeader } from './header.vue'
+export { default as BrowsePageLayout } from './layout.vue'
+export * from './providers'
+export { default as BrowseSidebar } from './sidebar.vue'
+export * from './types'

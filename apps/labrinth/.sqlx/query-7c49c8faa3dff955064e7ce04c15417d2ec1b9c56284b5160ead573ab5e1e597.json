@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tDELETE FROM users_notifications_preferences\n\t\t\t\tWHERE user_id = $1\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7c49c8faa3dff955064e7ce04c15417d2ec1b9c56284b5160ead573ab5e1e597"
+}

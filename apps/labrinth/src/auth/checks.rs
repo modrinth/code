@@ -1,4 +1,5 @@
 use crate::database;
+use crate::database::PgPool;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
@@ -8,7 +9,6 @@ use crate::models::users::User;
 use crate::routes::ApiError;
 use futures::TryStreamExt;
 use itertools::Itertools;
-use sqlx::PgPool;
 
 pub trait ValidateAuthorized {
     fn validate_authorized(

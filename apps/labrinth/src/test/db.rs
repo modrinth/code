@@ -1,5 +1,7 @@
+use crate::database::Executor;
 use eyre::{Context, Result};
-use sqlx::{Executor, PgPool};
+
+use crate::database::PgPool;
 
 /// Static personal access token for use in [`AppendPat`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

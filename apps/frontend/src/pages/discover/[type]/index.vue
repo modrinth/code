@@ -1,63 +1,126 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BookmarkIcon,
 	CheckIcon,
 	DownloadIcon,
-	FilterIcon,
-	GameIcon,
 	GridIcon,
+	HeartIcon,
 	ImageIcon,
-	LeftArrowIcon,
 	ListIcon,
-	SearchIcon,
-	XIcon,
+	MoreVerticalIcon,
+	SpinnerIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
+import type { CardAction } from '@modrinth/ui'
 import {
-	Avatar,
-	Button,
-	ButtonStyled,
-	Checkbox,
-	DropdownSelect,
-	injectNotificationManager,
-	NewProjectCard,
-	Pagination,
-	SearchFilterControl,
-	SearchSidebarFilter,
-	type SortType,
-	useSearch,
+	BrowseInstallHeader,
+	BrowsePageLayout,
+	BrowseSidebar,
+	commonMessages,
+	CreationFlowModal,
+	defineMessages,
+	injectModrinthClient,
+	PROJECT_DEP_MARKER_QUERY,
+	provideBrowseManager,
+	SelectedProjectsFloatingBar,
+	useBrowseSearch,
+	useDebugLogger,
+	useStickyObserver,
+	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
-import { useThrottleFn } from '@vueuse/core'
-import { computed, type Reactive, watch } from 'vue'
+import { cycleValue } from '@modrinth/utils'
+import { useQueryClient } from '@tanstack/vue-query'
+import { useTimeoutFn } from '@vueuse/core'
+import { computed, ref, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
-import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
+import { projectQueryOptions } from '~/composables/queries/project'
+import { versionQueryOptions } from '~/composables/queries/version'
+import type {
+	ServerInstallModalHandle,
+	ServerInstallSearchResult,
+} from '~/composables/use-server-install-content'
+import { useServerInstallContent } from '~/composables/use-server-install-content'
+import { withLabrinthCanaryHeader } from '~/helpers/canary.ts'
 import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
 
 const { formatMessage } = useVIntl()
+const debug = useDebugLogger('Discover')
+
+const { updateDiscoverFilterContext } = useCdnDownloadContext()
+
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 
 const filtersMenuOpen = ref(false)
+const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
 
-const route = useNativeRoute()
-const router = useNativeRouter()
+useStickyObserver(stickyInstallHeaderRef, 'DiscoverInstallHeader')
+
+const route = useRoute()
 
 const cosmetics = useCosmetics()
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
-const { handleError } = injectNotificationManager()
+let prefetchTimeout: ReturnType<typeof useTimeoutFn> | null = null
+const HOVER_DURATION_TO_PREFETCH_MS = 500
+
+const handleProjectMouseEnter = (result: Labrinth.Search.v2.ResultSearchProject) => {
+	const slug = result.slug || result.project_id
+	prefetchTimeout = useTimeoutFn(
+		() => {
+			queryClient.prefetchQuery(projectQueryOptions.v2(slug, client))
+			queryClient.prefetchQuery(projectQueryOptions.v3(result.project_id, client))
+			queryClient.prefetchQuery(projectQueryOptions.members(result.project_id, client))
+			queryClient.prefetchQuery(projectQueryOptions.dependencies(result.project_id, client))
+			queryClient.prefetchQuery(projectQueryOptions.versionsV3(result.project_id, client))
+		},
+		HOVER_DURATION_TO_PREFETCH_MS,
+		{ immediate: false },
+	)
+	prefetchTimeout.start()
+}
+
+const handleServerProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject) => {
+	const slug = result.slug || result.project_id
+
+	prefetchTimeout = useTimeoutFn(
+		async () => {
+			queryClient.prefetchQuery(projectQueryOptions.v2(slug, client))
+			queryClient.prefetchQuery(projectQueryOptions.v3(slug, client))
+
+			const content = result.minecraft_java_server?.content
+			if (content?.kind === 'modpack' && content.version_id) {
+				queryClient.prefetchQuery(versionQueryOptions.v3(content.version_id, client))
+			}
+		},
+		HOVER_DURATION_TO_PREFETCH_MS,
+		{ immediate: false },
+	)
+	prefetchTimeout.start()
+}
+
+const handleProjectHoverEnd = () => {
+	if (prefetchTimeout) prefetchTimeout.stop()
+}
 
 const currentType = computed(() =>
 	queryAsStringOrEmpty(route.params.type).replaceAll(/^\/|s\/?$/g, ''),
 )
 
+debug('initial route.params.type:', route.params.type, '→ currentType:', currentType.value)
+
+const isServerType = computed(() => currentType.value === 'server')
+
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
-const projectTypes = computed(() => (projectType.value ? [projectType.value.id] : []))
+
+watch(
+	() => projectType.value?.id,
+	(val) => debug('projectType.id changed:', val),
+)
 
 const resultsDisplayLocation = computed<DisplayLocation | undefined>(
 	() => projectType.value?.id as DisplayLocation,
@@ -67,103 +130,6 @@ const resultsDisplayMode = computed<DisplayMode>(() =>
 		? cosmetics.value.searchDisplayMode[resultsDisplayLocation.value]
 		: 'list',
 )
-
-const server = ref<Reactive<ModrinthServer>>()
-const serverHideInstalled = ref(false)
-const eraseDataOnInstall = ref(false)
-
-const PERSISTENT_QUERY_PARAMS = ['sid', 'shi']
-
-async function updateServerContext() {
-	const serverId = queryAsString(route.query.sid)
-
-	if (!serverId) {
-		server.value = undefined
-		return
-	}
-
-	try {
-		if (!auth.value.user) {
-			router.push('/auth/sign-in?redirect=' + encodeURIComponent(route.fullPath))
-			return
-		}
-
-		if (!server.value || server.value.serverId !== serverId) {
-			server.value = await useModrinthServers(serverId, ['general', 'content'])
-		}
-
-		if (route.query.shi && projectType.value?.id !== 'modpack' && server.value) {
-			serverHideInstalled.value = route.query.shi === 'true'
-		}
-	} catch (error) {
-		console.error('Failed to load server context:', error)
-		server.value = undefined
-	}
-}
-
-if (import.meta.client && route.query.sid) {
-	updateServerContext().catch((error) => {
-		console.error('Failed to initialize server context:', error)
-	})
-}
-
-watch(
-	() => route.query.sid,
-	() => {
-		updateServerContext().catch((error) => {
-			console.error('Failed to update server context:', error)
-		})
-	},
-)
-
-const serverFilters = computed(() => {
-	const filters = []
-	if (server.value && projectType.value?.id !== 'modpack') {
-		const gameVersion = server.value.general?.mc_version
-		if (gameVersion) {
-			filters.push({
-				type: 'game_version',
-				option: gameVersion,
-			})
-		}
-
-		const platform = server.value.general?.loader?.toLowerCase()
-
-		const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
-
-		if (platform && modLoaders.includes(platform)) {
-			filters.push({
-				type: 'mod_loader',
-				option: platform,
-			})
-		}
-
-		const pluginLoaders = ['paper', 'purpur']
-
-		if (platform && pluginLoaders.includes(platform)) {
-			filters.push({
-				type: 'plugin_loader',
-				option: platform,
-			})
-		}
-
-		if (serverHideInstalled.value) {
-			const installedMods = server.value.content?.data
-				.filter((x: InstallableMod) => x.project_id)
-				.map((x: InstallableMod) => x.project_id)
-				.filter((id): id is string => id !== undefined)
-
-			installedMods
-				.map((x: string) => ({
-					type: 'project_id',
-					option: `project_id:${x}`,
-					negative: true,
-				}))
-				.forEach((x) => filters.push(x))
-		}
-	}
-	return filters
-})
 
 const maxResultsForView = ref<Record<DisplayMode, number[]>>({
 	list: [5, 10, 15, 20, 50, 100],
@@ -175,26 +141,195 @@ const currentMaxResultsOptions = computed(
 	() => maxResultsForView.value[resultsDisplayMode.value] ?? [20],
 )
 
+function cycleSearchDisplayMode() {
+	if (!resultsDisplayLocation.value) return
+	cosmetics.value.searchDisplayMode[resultsDisplayLocation.value] = cycleValue(
+		cosmetics.value.searchDisplayMode[resultsDisplayLocation.value],
+		tags.value.projectViewModes.filter((x) => x !== 'grid'),
+	)
+}
+
+const onboardingModalRef = ref<ServerInstallModalHandle | null>(null)
 const {
-	// Selections
-	query,
-	currentSortType,
-	currentFilters,
-	toggledGroups,
-	maxResults,
-	currentPage,
-	overriddenProvidedFilterTypes,
+	currentServerId,
+	fromContext,
+	serverData,
+	serverContentData,
+	serverFilters,
+	serverHideInstalled,
+	hideSelectedServerInstalls,
+	installingProjectIds,
+	optimisticallyInstalledProjectIds,
+	queuedServerInstallProjectIds,
+	queuedServerInstallCount,
+	isInstallingQueuedServerInstalls,
+	installContext,
+	setBrowseSearchState,
+	syncHiddenInstalledProjectIds,
+	serverInstall,
+	onOnboardingHide,
+	onOnboardingBack,
+	onModpackFlowCreate,
+} = useServerInstallContent({
+	projectType,
+	onboardingModalRef,
+	debug,
+})
 
-	// Lists
-	filters,
-	sortTypes,
+function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
+	const content = project.minecraft_java_server?.content
+	if (content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = content
+		if (!project_name) return undefined
+		return {
+			name: project_name,
+			icon: project_icon ?? undefined,
+			onclick:
+				project_id !== project.project_id
+					? () =>
+							navigateTo({
+								path: `/project/${project_id}`,
+								query: { ...PROJECT_DEP_MARKER_QUERY },
+							})
+					: undefined,
+			showCustomModpackTooltip: project_id === project.project_id,
+		}
+	}
+	return undefined
+}
 
-	// Computed
-	requestParams,
+async function search(requestParams: string) {
+	debug('search() called', {
+		requestParams: requestParams.substring(0, 100),
+		isServer: isServerType.value,
+		projectTypeId: projectTypeId.value,
+	})
+	const config = useRuntimeConfig()
+	let base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
 
-	// Functions
-	createPageParams,
-} = useSearch(projectTypes, tags, serverFilters)
+	if (isServerType.value) {
+		base = base.replace(/\/v\d\//, '/v3/').replace(/\/v\d$/, '/v3')
+	}
+
+	const url = `${base}search${requestParams}`
+	debug('search() fetching:', url.substring(0, 120))
+
+	const raw = await $fetch<Labrinth.Search.v2.SearchResults | Labrinth.Search.v3.SearchResults>(
+		url,
+		{
+			headers: withLabrinthCanaryHeader(),
+		},
+	)
+
+	debug('search() response', { total_hits: raw.total_hits, hitCount: raw.hits?.length })
+
+	if ('hits_per_page' in raw) {
+		// v3 response (servers)
+		return {
+			projectHits: [],
+			serverHits: raw.hits as Labrinth.Search.v3.ResultSearchProject[],
+			total_hits: raw.total_hits,
+			per_page: raw.hits_per_page,
+		}
+	}
+
+	return {
+		projectHits: raw.hits as Labrinth.Search.v2.ResultSearchProject[],
+		serverHits: [],
+		total_hits: raw.total_hits,
+		per_page: raw.limit,
+	}
+}
+
+function getCardActions(
+	result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
+	currentProjectType: string,
+): CardAction[] {
+	if (currentProjectType === 'server') return []
+
+	const projectResult = result as ServerInstallSearchResult
+
+	if (flags.value.showDiscoverProjectButtons) {
+		return [
+			{
+				key: 'download',
+				label: 'Download',
+				icon: DownloadIcon,
+				color: 'brand',
+				onClick: () => {},
+			},
+			{
+				key: 'heart',
+				label: '',
+				icon: HeartIcon,
+				circular: true,
+				onClick: () => {},
+			},
+			{
+				key: 'bookmark',
+				label: '',
+				icon: BookmarkIcon,
+				circular: true,
+				onClick: () => {},
+			},
+			{
+				key: 'more',
+				label: '',
+				icon: MoreVerticalIcon,
+				circular: true,
+				type: 'transparent',
+				onClick: () => {},
+			},
+		]
+	}
+
+	if (serverData.value) {
+		const isQueued = queuedServerInstallProjectIds.value.has(result.project_id)
+		const isInstalled =
+			projectResult.installed ||
+			optimisticallyInstalledProjectIds.value.has(result.project_id) ||
+			(serverContentData.value &&
+				(serverContentData.value.addons ?? []).find((x) => x.project_id === result.project_id)) ||
+			serverData.value.upstream?.project_id === result.project_id
+		const isInstalling = installingProjectIds.value.has(result.project_id)
+		const isInstallingSelection = isInstallingQueuedServerInstalls.value
+		const validatingInstall =
+			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
+		const installLabel = isInstalled
+			? formatMessage(commonMessages.installedLabel)
+			: isQueued
+				? isInstalling || isInstallingSelection
+					? validatingInstall
+						? formatMessage(commonMessages.validatingLabel)
+						: formatMessage(commonMessages.installingLabel)
+					: formatMessage(commonMessages.selectedLabel)
+				: isInstalling || isInstallingSelection
+					? validatingInstall
+						? formatMessage(commonMessages.validatingLabel)
+						: formatMessage(commonMessages.installingLabel)
+					: formatMessage(commonMessages.installButton)
+
+		return [
+			{
+				key: 'install',
+				label: installLabel,
+				icon:
+					isInstalling || isInstallingSelection
+						? SpinnerIcon
+						: isQueued || isInstalled
+							? CheckIcon
+							: DownloadIcon,
+				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
+				disabled: !!isInstalled || isInstalling || isInstallingSelection,
+				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
+				type: 'outlined',
+				onClick: () => serverInstall(projectResult),
+			},
+		]
+	}
+
+	return []
+}
 
 const messages = defineMessages({
 	gameVersionProvidedByServer: {
@@ -213,161 +348,82 @@ const messages = defineMessages({
 		id: 'search.filter.locked.server.sync',
 		defaultMessage: 'Sync with server',
 	},
+	seoTitle: {
+		id: 'discover.seo.title',
+		defaultMessage:
+			'Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}',
+	},
+	seoTitleWithQuery: {
+		id: 'discover.seo.title-with-query',
+		defaultMessage:
+			'Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}',
+	},
+	seoDescription: {
+		id: 'discover.seo.description',
+		defaultMessage:
+			'Search and browse thousands of Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}.',
+	},
+	gameVersionShaderMessage: {
+		id: 'search.filter.game-version-shader-message',
+		defaultMessage:
+			'Shader packs for older versions most likely work on newer versions with only minor issues.',
+	},
 })
 
-interface InstallableSearchResult extends Labrinth.Search.v2.ResultSearchProject {
-	installing?: boolean
-	installed?: boolean
-}
+const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
-async function serverInstall(project: InstallableSearchResult) {
-	if (!server.value) {
-		handleError(new Error('No server to install to.'))
-		return
-	}
-	project.installing = true
-	try {
-		const versions = (await useBaseFetch(
-			`project/${project.project_id}/version`,
-			{},
-			true,
-		)) as Labrinth.Versions.v2.Version[]
+debug('projectTypeId:', projectTypeId.value)
+watch(projectTypeId, (val) => debug('projectTypeId changed:', val))
 
-		const version =
-			versions.find(
-				(x) =>
-					x.game_versions.includes(server.value!.general.mc_version) &&
-					x.loaders.includes(server.value!.general.loader.toLowerCase()),
-			) ?? versions[0]
+const searchState = useBrowseSearch({
+	projectType: projectTypeId,
+	tags,
+	providedFilters: serverFilters,
+	search,
+	persistentQueryParams: ['sid', 'wid', 'shi', 'from'],
+	getExtraQueryParams: () => ({
+		shi: serverHideInstalled.value ? 'true' : undefined,
+	}),
+	maxResultsOptions: currentMaxResultsOptions,
+	displayMode: resultsDisplayMode,
+})
+setBrowseSearchState(searchState)
 
-		if (projectType.value?.id === 'modpack') {
-			await server.value.general.reinstall(
-				false,
-				project.project_id,
-				version.id,
-				undefined,
-				eraseDataOnInstall.value,
-			)
-			project.installed = true
-			navigateTo(`/hosting/manage/${server.value.serverId}/options/loader`)
-		} else if (projectType.value?.id === 'mod') {
-			await server.value.content.install('mod', version.project_id, version.id)
-			await server.value.refresh(['content'])
-			project.installed = true
-		} else if (projectType.value?.id === 'plugin') {
-			await server.value.content.install('plugin', version.project_id, version.id)
-			await server.value.refresh(['content'])
-			project.installed = true
-		}
-	} catch (e) {
-		console.error(e)
-		handleError(new Error(`Error installing content ${e}`))
-	}
-	project.installing = false
-}
+watch(
+	() =>
+		searchState.isServerType.value
+			? searchState.serverCurrentFilters.value
+			: searchState.currentFilters.value,
+	(filters) => updateDiscoverFilterContext(filters),
+	{ deep: true, immediate: true },
+)
 
-const noLoad = ref(false)
-const {
-	data: rawResults,
-	refresh: refreshSearch,
-	pending: searchLoading,
-} = useLazyFetch(
+watch(
+	[
+		() => searchState.query.value,
+		() => searchState.currentFilters.value,
+		() => searchState.serverCurrentFilters.value,
+		() => projectTypeId.value,
+	],
 	() => {
-		const config = useRuntimeConfig()
-		const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
-
-		return `${base}search${requestParams.value}`
+		syncHiddenInstalledProjectIds()
 	},
-	{
-		watch: false,
-		transform: (hits) => {
-			noLoad.value = false
-			return hits as Labrinth.Search.v2.SearchResults
-		},
-	},
+	{ deep: true },
 )
 
-const results = shallowRef(toRaw(rawResults))
-const pageCount = computed(() =>
-	results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
+debug('calling initial refreshSearch')
+searchState.refreshSearch()
+
+const ogTitle = computed(() =>
+	searchState.query.value
+		? formatMessage(messages.seoTitleWithQuery, {
+				projectType: projectType.value?.id ?? 'project',
+				query: searchState.query.value,
+			})
+		: formatMessage(messages.seoTitle, { projectType: projectType.value?.id ?? 'project' }),
 )
-
-function scrollToTop(behavior: ScrollBehavior = 'smooth') {
-	window.scrollTo({ top: 0, behavior })
-}
-
-function updateSearchResults(pageNumber: number = 1, resetScroll = true) {
-	currentPage.value = pageNumber
-	if (resetScroll) {
-		scrollToTop()
-	}
-	noLoad.value = true
-
-	if (query.value === null) {
-		return
-	}
-
-	refreshSearch()
-
-	if (import.meta.client) {
-		const persistentParams: Record<string, any> = {}
-
-		for (const [key, value] of Object.entries(route.query)) {
-			if (PERSISTENT_QUERY_PARAMS.includes(key)) {
-				persistentParams[key] = value
-			}
-		}
-
-		if (serverHideInstalled.value) {
-			persistentParams.shi = 'true'
-		} else {
-			delete persistentParams.shi
-		}
-
-		const params = {
-			...persistentParams,
-			...createPageParams(),
-		}
-
-		router.replace({ path: route.path, query: params })
-	}
-}
-
-watch([currentFilters], () => {
-	updateSearchResults(1, false)
-})
-
-const throttledSearch = useThrottleFn(() => updateSearchResults(), 500, true)
-
-function cycleSearchDisplayMode() {
-	if (!resultsDisplayLocation.value) {
-		// if no display location, abort
-		return
-	}
-	cosmetics.value.searchDisplayMode[resultsDisplayLocation.value] = cycleValue(
-		cosmetics.value.searchDisplayMode[resultsDisplayLocation.value],
-		tags.value.projectViewModes,
-	)
-	setClosestMaxResults()
-}
-
-function setClosestMaxResults() {
-	const maxResultsOptions = maxResultsForView.value[resultsDisplayMode.value] ?? [20]
-	const currentMax = maxResults.value
-	if (!maxResultsOptions.includes(currentMax)) {
-		maxResults.value = maxResultsOptions.reduce((prev: number, curr: number) => {
-			return Math.abs(curr - currentMax) <= Math.abs(prev - currentMax) ? curr : prev
-		})
-	}
-}
-
-const ogTitle = computed(
-	() =>
-		`Search ${projectType.value?.display ?? 'project'}s${query.value ? ' | ' + query.value : ''}`,
-)
-const description = computed(
-	() =>
-		`Search and browse thousands of Minecraft ${projectType.value?.display ?? 'project'}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value?.display ?? 'project'}s.`,
+const description = computed(() =>
+	formatMessage(messages.seoDescription, { projectType: projectType.value?.id ?? 'project' }),
 )
 
 useSeoMeta({
@@ -375,328 +431,108 @@ useSeoMeta({
 	ogTitle,
 	ogDescription: description,
 })
+
+debug('calling provideBrowseManager')
+provideBrowseManager({
+	tags,
+	projectType: projectTypeId,
+	...searchState,
+	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) =>
+		`/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
+	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
+		`/server/${result.slug ?? result.project_id}`,
+	selectableProjectTypes: computed(() => []),
+	showProjectTypeTabs: computed(() => false),
+	variant: 'web',
+	getCardActions,
+	installContext,
+	providedFilters: serverFilters,
+	hideInstalled: serverHideInstalled,
+	showHideInstalled: computed(() => !!serverData.value && projectType.value?.id !== 'modpack'),
+	hideInstalledLabel: computed(() => formatMessage(commonMessages.hideInstalledContentLabel)),
+	hideSelected: hideSelectedServerInstalls,
+	showHideSelected: computed(
+		() =>
+			!!serverData.value &&
+			projectType.value?.id !== 'modpack' &&
+			queuedServerInstallCount.value > 0,
+	),
+	hideSelectedLabel: computed(() => formatMessage(commonMessages.hideSelectedContentLabel)),
+	displayMode: resultsDisplayMode,
+	cycleDisplayMode: cycleSearchDisplayMode,
+	maxResultsOptions: currentMaxResultsOptions,
+	getServerModpackContent,
+	onProjectHover: handleProjectMouseEnter,
+	onServerProjectHover: handleServerProjectMouseEnter,
+	onProjectHoverEnd: handleProjectHoverEnd,
+	filtersMenuOpen,
+	lockedFilterMessages: {
+		gameVersion: formatMessage(messages.gameVersionProvidedByServer),
+		modLoader: formatMessage(messages.modLoaderProvidedByServer),
+		syncButton: formatMessage(messages.syncFilterButton),
+		providedBy: formatMessage(messages.providedByServer),
+		gameVersionShaderMessage: formatMessage(messages.gameVersionShaderMessage),
+	},
+	loadingComponent: LogoAnimated,
+})
 </script>
 <template>
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
 		<div class="search-background"></div>
 	</Teleport>
-	<Teleport v-if="server" to="#discover-header-prefix">
-		<div
-			class="mb-4 flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-divider pb-4"
-		>
-			<nuxt-link
-				:to="`/servers/manage/${server.serverId}/content`"
-				tabindex="-1"
-				class="flex flex-col gap-4 text-primary"
-			>
-				<span class="flex items-center gap-2">
-					<Avatar
-						:src="
-							server.general.is_medal
-								? 'https://cdn-raw.modrinth.com/medal_icon.webp'
-								: server.general.image
-						"
-						size="48px"
-					/>
-					<span class="flex flex-col gap-2">
-						<span class="bold font-extrabold text-contrast">
-							{{ server.general.name }}
-						</span>
-						<span class="flex items-center gap-2 font-semibold text-secondary">
-							<GameIcon class="h-5 w-5 text-secondary" />
-							{{ server.general.loader }} {{ server.general.mc_version }}
-						</span>
-					</span>
-				</span>
-			</nuxt-link>
-			<ButtonStyled>
-				<nuxt-link :to="`/hosting/manage/${server.serverId}/content`">
-					<LeftArrowIcon />
-					Back to server
-				</nuxt-link>
-			</ButtonStyled>
-		</div>
-		<h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Install content to server</h1>
-	</Teleport>
-
-	<aside
-		:class="{
-			'normal-page__sidebar': true,
-		}"
-		aria-label="Filters"
+	<div
+		v-if="installContext"
+		ref="stickyInstallHeaderRef"
+		class="normal-page__header browse-install-header-bleed sticky top-0 z-20 mb-4 flex flex-col gap-2 border-0 bg-surface-1 py-3"
 	>
-		<AdPlaceholder v-if="!auth.user && !server" />
-		<div v-if="filtersMenuOpen" class="fixed inset-0 z-40 bg-bg"></div>
-		<div
-			class="flex flex-col gap-3"
-			:class="{
-				'fixed inset-0 z-50 m-4 mb-0 overflow-auto rounded-t-3xl bg-bg-raised': filtersMenuOpen,
-			}"
-		>
-			<div
-				v-if="filtersMenuOpen"
-				class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
-			>
-				<h3 class="m-0 text-lg text-contrast">Filters</h3>
-				<ButtonStyled circular>
-					<button
-						@click="
-							() => {
-								filtersMenuOpen = false
-								scrollToTop('instant')
-							}
-						"
-					>
-						<XIcon />
-					</button>
-				</ButtonStyled>
-			</div>
-			<div
-				v-if="server && projectType?.id === 'modpack'"
-				class="card-shadow rounded-2xl bg-bg-raised"
-			>
-				<div class="flex flex-row items-center gap-2 px-6 py-4 text-contrast">
-					<h3 class="m-0 text-lg">Options</h3>
-				</div>
-				<div class="flex flex-row items-center justify-between gap-2 px-6">
-					<label for="erase-data-on-install"> Erase all data on install </label>
-					<input
-						id="erase-data-on-install"
-						v-model="eraseDataOnInstall"
-						label="Erase all data on install"
-						class="switch stylized-toggle flex-none"
-						type="checkbox"
-					/>
-				</div>
-				<div class="px-6 py-4 text-sm">
-					If enabled, existing mods, worlds, and configurations, will be deleted before installing
-					the selected modpack.
-				</div>
-			</div>
-			<div
-				v-if="server && projectType?.id !== 'modpack'"
-				class="card-shadow rounded-2xl bg-bg-raised p-4"
-			>
-				<Checkbox
-					v-model="serverHideInstalled"
-					label="Hide installed content"
-					class="filter-checkbox"
-					@update:model-value="updateSearchResults()"
-				/>
-			</div>
-			<SearchSidebarFilter
-				v-for="filter in filters.filter((f) => f.display !== 'none')"
-				:key="`filter-${filter.id}`"
-				v-model:selected-filters="currentFilters"
-				v-model:toggled-groups="toggledGroups"
-				v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-				:provided-filters="serverFilters"
-				:filter-type="filter"
-				:class="
-					filtersMenuOpen
-						? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
-						: 'card-shadow rounded-2xl bg-bg-raised'
-				"
-				button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
-				content-class="mb-4 mx-3"
-				inner-panel-class="p-1"
-				:open-by-default="true"
-			>
-				<template #header>
-					<h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
-				</template>
-				<template #locked-game_version>
-					{{ formatMessage(messages.gameVersionProvidedByServer) }}
-				</template>
-				<template #locked-mod_loader>
-					{{ formatMessage(messages.modLoaderProvidedByServer) }}
-				</template>
-				<template #sync-button> {{ formatMessage(messages.syncFilterButton) }}</template>
-			</SearchSidebarFilter>
-		</div>
+		<BrowseInstallHeader />
+	</div>
+	<SelectedProjectsFloatingBar v-if="installContext" :install-context="installContext" />
+	<aside class="normal-page__sidebar" :aria-label="formatMessage(commonMessages.filtersLabel)">
+		<AdPlaceholder v-if="!auth.user && !serverData" />
+		<BrowseSidebar />
 	</aside>
 	<section class="normal-page__content">
 		<div class="flex flex-col gap-3">
-			<div class="iconified-input w-full">
-				<SearchIcon aria-hidden="true" class="text-lg" />
-				<input
-					v-model="query"
-					class="h-12"
-					autocomplete="off"
-					spellcheck="false"
-					type="text"
-					:placeholder="`Search ${projectType?.display ?? 'project'}s...`"
-					@input="throttledSearch()"
-				/>
-				<Button
-					v-if="query"
-					class="r-btn"
-					@click="
-						() => {
-							query = ''
-							updateSearchResults()
-						}
-					"
-				>
-					<XIcon />
-				</Button>
-			</div>
-			<div class="flex flex-wrap items-center gap-2">
-				<DropdownSelect
-					v-slot="{ selected }"
-					v-model="currentSortType"
-					class="!w-auto flex-grow md:flex-grow-0"
-					name="Sort by"
-					:options="[...sortTypes]"
-					:display-name="(option?: SortType) => option?.display"
-					@change="updateSearchResults()"
-				>
-					<span class="font-semibold text-primary">Sort by: </span>
-					<span class="font-semibold text-secondary">{{ selected }}</span>
-				</DropdownSelect>
-				<DropdownSelect
-					v-slot="{ selected }"
-					v-model="maxResults"
-					name="Max results"
-					:options="currentMaxResultsOptions"
-					:default-value="maxResults"
-					class="!w-auto flex-grow md:flex-grow-0"
-					@change="updateSearchResults()"
-				>
-					<span class="font-semibold text-primary">View: </span>
-					<span class="font-semibold text-secondary">{{ selected }}</span>
-				</DropdownSelect>
-				<div class="lg:hidden">
-					<ButtonStyled>
-						<button @click="filtersMenuOpen = true">
-							<FilterIcon />
-							Filter results...
-						</button>
-					</ButtonStyled>
-				</div>
-				<ButtonStyled circular>
-					<button
-						:v-tooltip="capitalizeString(resultsDisplayMode + ' view')"
-						:aria-label="capitalizeString(resultsDisplayMode + ' view')"
-						@click="cycleSearchDisplayMode()"
-					>
-						<GridIcon v-if="resultsDisplayMode === 'grid'" />
-						<ImageIcon v-else-if="resultsDisplayMode === 'gallery'" />
-						<ListIcon v-else />
-					</button>
-				</ButtonStyled>
-				<Pagination
-					:page="currentPage"
-					:count="pageCount"
-					class="mx-auto sm:ml-auto sm:mr-0"
-					@switch-page="updateSearchResults"
-				/>
-			</div>
-			<SearchFilterControl
-				v-model:selected-filters="currentFilters"
-				:filters="filters.filter((f) => f.display !== 'none')"
-				:provided-filters="serverFilters"
-				:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-				:provided-message="messages.providedByServer"
+			<BrowsePageLayout>
+				<template #display-mode-icon>
+					<GridIcon v-if="resultsDisplayMode === 'grid'" />
+					<ImageIcon v-else-if="resultsDisplayMode === 'gallery'" />
+					<ListIcon v-else />
+				</template>
+			</BrowsePageLayout>
+			<CreationFlowModal
+				v-if="currentServerId && projectType?.id === 'modpack'"
+				ref="onboardingModalRef"
+				:type="fromContext === 'reset-server' ? 'reset-server' : 'server-onboarding'"
+				:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
+				:show-snapshot-toggle="true"
+				:on-back="onOnboardingBack"
+				@hide="onOnboardingHide"
+				@browse-modpacks="() => {}"
+				@create="onModpackFlowCreate"
 			/>
-			<LogoAnimated v-if="searchLoading && !noLoad" />
-			<div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
-				<p>No results found for your query!</p>
-			</div>
-			<div v-else class="search-results-container">
-				<div
-					id="search-results"
-					class="project-list"
-					:class="'display-mode--' + resultsDisplayMode"
-					role="list"
-					aria-label="Search results"
-				>
-					<template v-for="result in results?.hits" :key="result.project_id">
-						<ProjectCard
-							v-if="flags.oldProjectCards"
-							:id="result.slug ? result.slug : result.project_id"
-							:display="resultsDisplayMode"
-							:featured-image="
-								result.featured_gallery ? result.featured_gallery : result.gallery[0]
-							"
-							:type="result.project_type"
-							:author="result.author"
-							:name="result.title"
-							:description="result.description"
-							:created-at="result.date_created"
-							:updated-at="result.date_modified"
-							:downloads="result.downloads.toString()"
-							:follows="result.follows.toString()"
-							:icon-url="result.icon_url"
-							:client-side="result.client_side"
-							:server-side="result.server_side"
-							:categories="result.display_categories"
-							:search="true"
-							:show-updated-date="!server && currentSortType.name !== 'newest'"
-							:show-created-date="!server"
-							:hide-loaders="
-								projectType ? ['resourcepack', 'datapack'].includes(projectType.id) : false
-							"
-							:color="result.color ?? undefined"
-						>
-							<template v-if="server">
-								<button
-									v-if="
-										(result as InstallableSearchResult).installed ||
-										(server?.content?.data &&
-											server.content.data.find(
-												(x: InstallableMod) => x.project_id === result.project_id,
-											)) ||
-										server.general?.project?.id === result.project_id
-									"
-									disabled
-									class="btn btn-outline btn-primary"
-								>
-									<CheckIcon />
-									Installed
-								</button>
-								<button
-									v-else-if="(result as InstallableSearchResult).installing"
-									disabled
-									class="btn btn-outline btn-primary"
-								>
-									Installing...
-								</button>
-								<button
-									v-else
-									class="btn btn-outline btn-primary"
-									@click="serverInstall(result as InstallableSearchResult)"
-								>
-									<DownloadIcon />
-									Install
-								</button>
-							</template>
-						</ProjectCard>
-						<NuxtLink
-							v-if="flags.newProjectCards"
-							:to="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
-						>
-							<NewProjectCard :project="result" :categories="result.display_categories">
-								<template v-if="false" #actions></template>
-							</NewProjectCard>
-						</NuxtLink>
-					</template>
-				</div>
-			</div>
-			<div class="pagination-after">
-				<pagination
-					:page="currentPage"
-					:count="pageCount"
-					class="justify-end"
-					@switch-page="updateSearchResults"
-				/>
-			</div>
 		</div>
 	</section>
 </template>
 <style lang="scss" scoped>
+.browse-install-header-bleed {
+	grid-column: 1 / -1;
+	margin-inline: -1.5rem;
+	padding-inline: 0.75rem !important;
+
+	&::after {
+		content: '';
+		position: absolute;
+		right: 50%;
+		bottom: 0;
+		width: 100vw;
+		border-bottom: 1px solid var(--surface-5);
+		transform: translateX(50%);
+	}
+}
+
 .normal-page__content {
-	// Passthrough children as grid items on mobile
 	display: contents;
 
 	@media screen and (min-width: 1024px) {
@@ -704,11 +540,9 @@ useSeoMeta({
 	}
 }
 
-// Move the filters "sidebar" on mobile underneath the search card
 .normal-page__sidebar {
 	grid-row: 3;
 
-	// Always show on desktop
 	@media screen and (min-width: 1024px) {
 		display: block;
 	}
@@ -722,107 +556,8 @@ useSeoMeta({
 	}
 }
 
-.sidebar-menu {
-	display: none;
-}
-
-.sidebar-menu_open {
-	display: block;
-}
-
-.sidebar-menu-heading {
-	margin: 1.5rem 0 0.5rem 0;
-}
-
-// EthicalAds
 .content-wrapper {
 	grid-row: 1;
-}
-
-.search-controls {
-	display: flex;
-	flex-direction: row;
-	gap: var(--spacing-card-md);
-	flex-wrap: wrap;
-	padding: var(--spacing-card-md);
-	grid-row: 2;
-
-	.search-filter-container {
-		display: flex;
-		width: 100%;
-		align-items: center;
-
-		.sidebar-menu-close-button {
-			max-height: none;
-			// match height of the search field
-			height: 40px;
-			transition: box-shadow 0.1s ease-in-out;
-			margin-right: var(--spacing-card-md);
-
-			&.open {
-				color: var(--color-button-text-active);
-				background-color: var(--color-brand-highlight);
-				box-shadow:
-					inset 0 0 0 transparent,
-					0 0 0 2px var(--color-brand);
-			}
-		}
-
-		.iconified-input {
-			flex: 1;
-
-			input {
-				width: 100%;
-				margin: 0;
-			}
-		}
-	}
-
-	.sort-controls {
-		width: 100%;
-		display: flex;
-		flex-direction: row;
-		gap: var(--spacing-card-md);
-		flex-wrap: wrap;
-		align-items: center;
-
-		.labeled-control {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			flex-wrap: wrap;
-			gap: 0.5rem;
-
-			.labeled-control__label {
-				white-space: nowrap;
-			}
-		}
-
-		.square-button {
-			margin-top: auto;
-			// match height of search dropdowns
-			height: 40px;
-			width: 40px; // make it square!
-		}
-	}
-}
-
-.search-controls__sorting {
-	min-width: 14rem;
-}
-
-.labeled-control__label,
-.labeled-control__control {
-	display: block;
-}
-
-.pagination-before {
-	grid-row: 4;
-}
-
-.search-results-container {
-	grid-row: 5;
 }
 
 .pagination-after {
@@ -838,79 +573,14 @@ useSeoMeta({
 	margin: 2rem;
 }
 
-#search-results {
-	min-height: 20vh;
-}
-
-@media screen and (min-width: 750px) {
-	.search-controls {
-		flex-wrap: nowrap;
-		flex-direction: row;
-	}
-
-	.sort-controls {
-		min-width: fit-content;
-		max-width: fit-content;
-		flex-wrap: nowrap;
-	}
-
-	.labeled-control {
-		align-items: center;
-		display: flex;
-		flex-direction: column !important;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		max-width: fit-content;
-	}
-
-	.labeled-control__label {
-		flex-shrink: 0;
-		margin-bottom: 0 !important;
-	}
-}
-
-@media screen and (min-width: 860px) {
-	.labeled-control {
-		flex-wrap: nowrap !important;
-		flex-direction: row !important;
-	}
-}
-
-@media screen and (min-width: 1024px) {
-	.sidebar-menu {
-		display: block;
-		margin-top: 0;
-	}
-
-	.sidebar-menu-close-button {
-		display: none;
-	}
-
-	.labeled-control {
-		flex-wrap: wrap !important;
-		flex-direction: column !important;
-	}
-}
-
-@media screen and (min-width: 1100px) {
-	.labeled-control {
-		flex-wrap: nowrap !important;
-		flex-direction: row !important;
-	}
-}
-
 .search-background {
 	width: 100%;
 	height: 20rem;
-	background-image: url('https://minecraft.wiki/images/The_Garden_Awakens_Key_Art_No_Creaking.jpg?9968c');
+	background-image: url('https://minecraft.wiki/images/Tiny_Takeover_Key_Art.png?025dc');
 	background-size: cover;
-	background-position: center;
+	background-position: 50% 25%;
 	pointer-events: none;
 	mask-image: linear-gradient(to bottom, black, transparent);
 	opacity: 0.25;
-}
-
-.stylized-toggle:checked::after {
-	background: var(--color-accent-contrast) !important;
 }
 </style>

@@ -1,7 +1,11 @@
-import type { Labrinth } from '@modrinth/api-client/src/modules/types'
-import type { Ref } from 'vue'
+import type { Labrinth } from '@modrinth/api-client'
+import type { DeepReadonly, Ref } from 'vue'
 
 import { createContext } from '.'
+
+export const PROJECT_DEP_MARKER_QUERY = { dep: '1' } as const
+
+export type CdnDownloadReason = 'standalone' | 'dependency'
 
 export interface ProjectPageContext {
 	// Data refs
@@ -17,20 +21,35 @@ export interface ProjectPageContext {
 	dependencies: Ref<Labrinth.Projects.v2.DependencyInfo | null>
 	dependenciesLoading: Ref<boolean>
 
-	// Refresh functions (invalidate + refetch)
-	refreshProject: () => Promise<void>
-	refreshVersions: () => Promise<void>
-	refreshMembers: () => Promise<void>
-	refreshOrganization: () => Promise<void>
+	cdnDownloadReason: DeepReadonly<Ref<CdnDownloadReason>>
+
+	// Invalidate all project queries (auto-refetches active ones)
+	invalidate: () => Promise<void>
 
 	// Lazy loading
-	loadVersions: () => Promise<void>
-	loadDependencies: () => Promise<void>
+	loadVersions: () => void
+	loadDependencies: () => void
 
 	// Mutation functions
 	patchProject: (data: Record<string, unknown>, quiet?: boolean) => Promise<boolean>
+	patchProjectV3: (data: Record<string, unknown>, quiet?: boolean) => Promise<boolean>
 	patchIcon: (icon: File) => Promise<boolean>
 	setProcessing: () => Promise<void>
+	createGalleryItem: (
+		file: File,
+		title?: string,
+		description?: string,
+		featured?: boolean,
+		ordering?: number,
+	) => Promise<boolean>
+	editGalleryItem: (
+		imageUrl: string,
+		title?: string,
+		description?: string,
+		featured?: boolean,
+		ordering?: number,
+	) => Promise<boolean>
+	deleteGalleryItem: (imageUrl: string) => Promise<boolean>
 }
 
 export const [injectProjectPageContext, provideProjectPageContext] =

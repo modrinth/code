@@ -1,10 +1,17 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { ClientIcon, ServerIcon } from '@modrinth/assets'
-import { formatCategory, formatCategoryHeader, sortByNameOrNumber } from '@modrinth/utils'
+import { ClientIcon, getCategoryIcon, getLoaderIcon, ServerIcon } from '@modrinth/assets'
+import { sortedCategories } from '@modrinth/utils'
 import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
 
 import { defineMessage, useVIntl } from '../composables/i18n'
+import {
+	DEFAULT_MOD_LOADERS,
+	DEFAULT_SHADER_LOADERS,
+	formatCategory,
+	formatCategoryHeader,
+	formatLoader,
+} from './tag-messages.ts'
 
 type BaseOption = {
 	id: string
@@ -12,6 +19,7 @@ type BaseOption = {
 	toggle_group?: string
 	icon?: string | Component
 	query_value?: string
+	group?: string
 }
 
 export type FilterOption = BaseOption &
@@ -51,6 +59,14 @@ export type FilterValue = {
 	negative?: boolean
 }
 
+export const LOADER_FILTER_TYPES = [
+	'mod_loader',
+	'plugin_loader',
+	'modpack_loader',
+	'shader_loader',
+	'plugin_platform',
+] as const
+
 export interface GameVersion {
 	version: string
 	version_type: 'release' | 'snapshot' | 'alpha' | 'beta'
@@ -58,7 +74,15 @@ export interface GameVersion {
 	major: boolean
 }
 
-export type ProjectType = 'mod' | 'modpack' | 'resourcepack' | 'shader' | 'datapack' | 'plugin'
+export type ProjectType =
+	| 'mod'
+	| 'modpack'
+	| 'resourcepack'
+	| 'shader'
+	| 'datapack'
+	| 'plugin'
+	| 'server'
+	| 'project'
 
 const ALL_PROJECT_TYPES: ProjectType[] = [
 	'mod',
@@ -67,6 +91,7 @@ const ALL_PROJECT_TYPES: ProjectType[] = [
 	'shader',
 	'datapack',
 	'plugin',
+	'server',
 ]
 
 export interface Tags {
@@ -98,7 +123,7 @@ export function useSearch(
 		{ display: 'Date updated', name: 'updated' },
 	])
 
-	const currentSortType: Ref<SortType> = ref({ name: 'relevance', display: 'Relevance' })
+	const currentSortType: Ref<SortType> = ref(sortTypes[0])
 
 	const route = useRoute()
 	const currentPage = ref(1)
@@ -107,20 +132,23 @@ export function useSearch(
 	const toggledGroups = ref<string[]>([])
 	const overriddenProvidedFilterTypes = ref<string[]>([])
 
-	const { formatMessage } = useVIntl()
+	const { formatMessage, locale } = useVIntl()
+	const formatCategoryName = (categoryName: string) => {
+		return formatCategory(formatMessage, categoryName)
+	}
 
 	const filters = computed(() => {
 		const categoryFilters: Record<string, FilterType> = {}
-		for (const category of sortByNameOrNumber(tags.value.categories.slice(), ['header', 'name'])) {
+		for (const category of sortedCategories(tags.value, formatCategoryName, locale.value)) {
 			const filterTypeId = `category_${category.project_type}_${category.header}`
 			if (!categoryFilters[filterTypeId]) {
 				categoryFilters[filterTypeId] = {
 					id: filterTypeId,
-					formatted_name: formatCategoryHeader(category.header),
+					formatted_name: formatCategoryHeader(formatMessage, category.header),
 					supported_project_types:
 						category.project_type === 'mod'
 							? ['mod', 'plugin', 'datapack']
-							: [category.project_type],
+							: ([category.project_type] as ProjectType[]),
 					display: 'all',
 					query_param: category.header === 'resolutions' ? 'g' : 'f',
 					supports_negative_filter: true,
@@ -130,8 +158,8 @@ export function useSearch(
 			}
 			categoryFilters[filterTypeId].options.push({
 				id: category.name,
-				formatted_name: formatCategory(category.name),
-				icon: category.icon,
+				formatted_name: formatCategory(formatMessage, category.name),
+				icon: getCategoryIcon(category.name),
 				value: `categories:${category.name}`,
 				method: category.header === 'resolutions' ? 'or' : 'and',
 			})
@@ -207,11 +235,15 @@ export function useSearch(
 				options: tags.value.gameVersions.map((gameVersion) => ({
 					id: gameVersion.version,
 					toggle_group: gameVersion.version_type !== 'release' ? 'all_versions' : undefined,
-					value: `versions:${gameVersion.version}`,
+					value: `game_versions:${gameVersion.version}`,
 					query_value: gameVersion.version,
 					method: 'or',
 				})),
-				ordering: projectTypes.value.includes('mod') ? 2 : undefined,
+				ordering: projectTypes.value.includes('mod')
+					? 2
+					: projectTypes.value.includes('shader')
+						? -1
+						: undefined,
 			},
 			{
 				id: 'mod_loader',
@@ -225,7 +257,7 @@ export function useSearch(
 				display: 'expandable',
 				query_param: 'g',
 				supports_negative_filter: true,
-				default_values: ['fabric', 'forge', 'neoforge', 'quilt'],
+				default_values: DEFAULT_MOD_LOADERS,
 				searchable: false,
 				options: tags.value.loaders
 					.filter(
@@ -237,8 +269,8 @@ export function useSearch(
 					.map((loader) => {
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: formatLoader(formatMessage, loader.name),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -263,8 +295,8 @@ export function useSearch(
 					.map((loader) => {
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: formatLoader(formatMessage, loader.name),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -292,8 +324,8 @@ export function useSearch(
 					.map((loader) => {
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: formatLoader(formatMessage, loader.name),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -317,8 +349,8 @@ export function useSearch(
 					.map((loader) => {
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: formatLoader(formatMessage, loader.name),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -333,17 +365,18 @@ export function useSearch(
 					}),
 				),
 				supported_project_types: ['shader'],
-				display: 'all',
 				query_param: 'g',
 				supports_negative_filter: true,
 				searchable: false,
+				display: 'expandable',
+				default_values: DEFAULT_SHADER_LOADERS,
 				options: tags.value.loaders
 					.filter((loader) => loader.supported_project_types.includes('shader'))
 					.map((loader) => {
 						return {
 							id: loader.name,
-							formatted_name: formatCategory(loader.name),
-							icon: loader.icon,
+							formatted_name: formatLoader(formatMessage, loader.name),
+							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
 						}
@@ -400,7 +433,7 @@ export function useSearch(
 			.sort((a, b) => (b.ordering ?? 0) - (a.ordering ?? 0))
 	})
 
-	const facets = computed(() => {
+	const newFilters = computed(() => {
 		const validProvidedFilters = providedFilters.value.filter(
 			(providedFilter) => !overriddenProvidedFilterTypes.value.includes(providedFilter.type),
 		)
@@ -410,8 +443,10 @@ export function useSearch(
 		)
 		const filterValues = [...filteredFilters, ...validProvidedFilters]
 
-		const andFacets: string[][] = []
-		const orFacets: Record<string, string[]> = {}
+		const parts: string[] = []
+		const orGroups: Record<string, string[]> = {}
+		const negativeByType: Record<string, string[]> = {}
+
 		for (const filterValue of filterValues) {
 			const type = filters.value.find((type) => type.id === filterValue.type)
 			if (!type) {
@@ -433,41 +468,70 @@ export function useSearch(
 			}
 
 			if (option.method === 'or' || option.method === 'and') {
+				const [field, val] = option.value.split(':')
+				if (!field || !val) continue
+
 				if (filterValue.negative) {
-					andFacets.push([option.value.replace(':', '!=')])
-				} else {
-					if (option.method === 'or') {
-						if (!orFacets[type.id]) {
-							orFacets[type.id] = []
-						}
-						orFacets[type.id].push(option.value)
-					} else if (option.method === 'and') {
-						andFacets.push([option.value])
+					if (!negativeByType[field]) {
+						negativeByType[field] = []
 					}
+					negativeByType[field].push(val)
+				} else if (option.method === 'or') {
+					if (!orGroups[field]) {
+						orGroups[field] = []
+					}
+					orGroups[field].push(val)
+				} else {
+					parts.push(`${field} = ${enquoteNonBools(val)}`)
 				}
 			}
 		}
 
-		Object.values(orFacets).forEach((facets) => andFacets.push(facets))
+		for (const [field, values] of Object.entries(orGroups)) {
+			if (values.length === 1) {
+				const val = values[0]
+				parts.push(`${field} = ${enquoteNonBools(val)}`)
+			} else {
+				const quoted = values.map(enquoteNonBools).join(', ')
+				parts.push(`${field} IN [${quoted}]`)
+			}
+		}
 
-		/*
-       Add environment facets, separate from the rest because it oddly depends on the combination
-       of filters selected to determine which facets to add.
-     */
-		const client = currentFilters.value.some(
+		for (const [field, values] of Object.entries(negativeByType)) {
+			const quoted = values.map(enquoteNonBools).join(', ')
+			parts.push(`${field} NOT IN [${quoted}]`)
+		}
+
+		// Environment facets
+		const client = filterValues.some(
 			(filter) => filter.type === 'environment' && filter.option === 'client',
 		)
-		const server = currentFilters.value.some(
+		const server = filterValues.some(
 			(filter) => filter.type === 'environment' && filter.option === 'server',
 		)
-		andFacets.push(...createEnvironmentFacets(client, server))
-
-		const projectType = projectTypes.value.map((projectType) => `project_type:${projectType}`)
-		if (andFacets.length > 0) {
-			return [projectType, ...andFacets]
-		} else {
-			return [projectType]
+		for (const envGroup of getEnvironmentFilterGroups(client, server)) {
+			if (envGroup.length === 1) {
+				const [field, val] = envGroup[0].split(':')
+				parts.push(`${field} = ${enquoteNonBools(val)}`)
+			} else if (envGroup.length > 1) {
+				const conditions = envGroup.map((f) => {
+					const [field, val] = f.split(':')
+					return `${field} = ${enquoteNonBools(val)}`
+				})
+				parts.push(`(${conditions.join(' OR ')})`)
+			}
 		}
+
+		// Project types
+		const mappedProjectTypes = projectTypes.value.map(mapProjectTypeToSearch)
+		if (mappedProjectTypes.length === 1) {
+			parts.push(`project_types = ${enquoteNonBools(mappedProjectTypes[0])}`)
+		} else if (mappedProjectTypes.length > 1) {
+			const quoted = mappedProjectTypes.map(enquoteNonBools).join(', ')
+			parts.push(`project_types IN [${quoted}]`)
+		}
+
+		return parts.join(' AND ')
 	})
 
 	const requestParams: Ref<string> = computed(() => {
@@ -477,7 +541,9 @@ export function useSearch(
 			params.push(`query=${encodeURIComponent(query.value)}`)
 		}
 
-		params.push(`facets=${encodeURIComponent(JSON.stringify(facets.value))}`)
+		if (newFilters.value) {
+			params.push(`new_filters=${encodeURIComponent(newFilters.value)}`)
+		}
 
 		const offset = (currentPage.value - 1) * maxResults.value
 		if (currentPage.value !== 1) {
@@ -689,7 +755,7 @@ export function useSearch(
 		filters,
 
 		// Computed
-		facets,
+		newFilters,
 		requestParams,
 
 		// Functions
@@ -698,22 +764,37 @@ export function useSearch(
 	}
 }
 
-export function createEnvironmentFacets(client: boolean, server: boolean): string[][] {
-	const facets: string[][] = []
+const PROJECT_TYPE_SEARCH_MAP: Partial<Record<ProjectType, string>> = {
+	server: 'minecraft_java_server',
+}
+
+function mapProjectTypeToSearch(projectType: ProjectType): string {
+	return PROJECT_TYPE_SEARCH_MAP[projectType] ?? projectType
+}
+
+function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][] {
+	const groups: string[][] = []
 	if (client && server) {
-		facets.push(['client_side:required'], ['server_side:required'])
+		groups.push(
+			['client_side:required', 'client_side:optional', 'client_side:unsupported'],
+			['server_side:required', 'server_side:optional'],
+		)
 	} else if (client) {
-		facets.push(
+		groups.push(
 			['client_side:optional', 'client_side:required'],
 			['server_side:optional', 'server_side:unsupported'],
 		)
 	} else if (server) {
-		facets.push(
-			['client_side:optional', 'client_side:unsupported'],
-			['server_side:optional', 'server_side:required'],
-		)
+		groups.push(['server_side:optional', 'server_side:required'])
 	}
-	return facets
+	return groups
+}
+
+function enquoteNonBools(value: string): string {
+	if (value === 'true' || value === 'false') {
+		return value
+	}
+	return `"${value}"`
 }
 
 function getOptionValue(option: FilterOption, negative?: boolean): string {

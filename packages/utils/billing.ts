@@ -60,29 +60,6 @@ export const getCurrency = (userCountry) => {
 	return countryCurrency[userCountry] ?? 'USD'
 }
 
-export const formatPrice = (locale, price, currency, trimZeros = false) => {
-	let formatter = new Intl.NumberFormat(locale, {
-		style: 'currency',
-		currency,
-	})
-
-	const maxDigits = formatter.resolvedOptions().maximumFractionDigits
-	const convertedPrice = price / Math.pow(10, maxDigits)
-
-	let minimumFractionDigits = maxDigits
-
-	if (trimZeros && Number.isInteger(convertedPrice)) {
-		minimumFractionDigits = 0
-	}
-
-	formatter = new Intl.NumberFormat(locale, {
-		style: 'currency',
-		currency,
-		minimumFractionDigits,
-	})
-	return formatter.format(convertedPrice)
-}
-
 export const calculateSavings = (monthlyPlan, plan, months = 12) => {
 	const monthlyAnnualized = monthlyPlan * months
 

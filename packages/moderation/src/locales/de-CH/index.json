@@ -6,13 +6,25 @@
     "defaultMessage": "Beschreibung hinzufügen"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Das hinzufügen eines einzigartigen, relevanten und ansprechenden Icon macht dein Project unverwechselbar und hilt es, sich von anderen abzuheben."
+    "defaultMessage": "Das Hinzufügen eines einzigartigen, relevanten und ansprechenden Icons macht dein Projekt unverwechselbar und hilft ihm, sich von anderen abzuheben."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Icon hinzufügen"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Füge die IP-Adresse und den Port deines Servers hinzu, welchen Java Edition Spieler nutzen können, um deinem Server beizutreten."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Java Adresse Hinzufügen"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Füge relevante Links hinzu, welche außerhalb von Modrinth liegen, wie z. B. eine Webseite, einen Shop, oder eine Discord Einladung."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Externe Links hinzufügen"
+  },
   "nags.add-links.description": {
-    "defaultMessage": "Füge relevante links, welche ausserhalb von Modrinth liegen, hinzu, wie z. B. Quellcode, einen Issue-Tracker oder eine Discord Einladung."
+    "defaultMessage": "Füge relevante Links hinzu, welche außerhalb von Modrinth liegen, wie z. B. Quellcode, einen Issue-Tracker oder eine Discord Einladung."
   },
   "nags.add-links.title": {
     "defaultMessage": "Externe Links hinzufügen"
@@ -24,7 +36,7 @@
     "defaultMessage": "Wähle akkurate Tags aus"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Deine Beschreibung ist {length, plural, one {# lesbares Zeichen} other {# lesbare Zeichen}} lang. Mindestens {minChars, plural, one {1 Zeichen} other {# Zeichen}} sind empfohlen, um eine klare uns informative Beschreibung zu erstellen."
+    "defaultMessage": "Deine Beschreibung ist {length, plural, one {# lesbares Zeichen} other {# lesbare Zeichen}} lang. Mindestens {minChars, plural, one {1 Zeichen ist} other {# Zeichen sind}} empfohlen, um eine klare und informative Beschreibung zu erstellen."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Beschreibung erweitern"
@@ -33,7 +45,7 @@
     "defaultMessage": "Beschreibung bearbeiten"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "Lizens bearbeiten"
+    "defaultMessage": "Lizenz bearbeiten"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "Zusammenfassung bearbeiten"
@@ -45,10 +57,10 @@
     "defaultMessage": "Titel bearbeiten"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "Das vorgestellte Galleriebild ist oftmals wie dein Projekt einen ersten Eindruck machen."
+    "defaultMessage": "Das hervorgehobene Galeriebild ist oftmals der erste Eindruck, den andere von deinem Projekt haben."
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "Ein Galleriebild vorstellen"
+    "defaultMessage": "Ein Galeriebild hervorheben"
   },
   "nags.gallery.title": {
     "defaultMessage": "Gallerie-Seite besuchen"
@@ -59,8 +71,14 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Quellcode bereitstellen"
   },
+  "nags.identical-links.description": {
+    "defaultMessage": "Einige deiner externen Links scheinen identisch zu sein. Jeder Link sollte nur einmal und mit dem richtigen Linktyp eingegeben werden."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Identische Links"
+  },
   "nags.image-heavy-description.description": {
-    "defaultMessage": "Deine Beschreibung sollte genügend normalen Text und Alt-Text für Bilder enthalten, damit es für Benutzer mit Bildschirmleseprogrammen oder langsamen Internet verfügbar ist."
+    "defaultMessage": "Deine Beschreibung sollte genügend normalen Text und Alt-Text für Bilder enthalten, damit es für Benutzer mit Bildschirmleseprogrammen oder langsamem Internet verfügbar ist."
   },
   "nags.image-heavy-description.title": {
     "defaultMessage": "Barrierefreiheit sicherstellen"
@@ -69,7 +87,7 @@
     "defaultMessage": "Lizenz-URL ist ungültig."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Deine Lizenz-URL verweist auf {domain}, welche für Lizenzinformationen nicht geeignet ist. Lizenz-URLs sollten direkt auf deine Lizenzdatei verlinken, und nicht auf Socialmedia, Gaming-Platformen o. ä."
+    "defaultMessage": "Deine Lizenz-URL verweist auf {domain}, welche für Lizenzinformationen nicht geeignet ist. Lizenz-URLs sollten direkt auf deine Lizenzdatei verlinken, und nicht auf Social Media, Gaming-Plattformen, o. ä."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Deine Lizenz-URL scheint fehlerhaft zu sein. Bitte gib eine gültige URL zu deinem Lizenztext an."
@@ -78,7 +96,7 @@
     "defaultMessage": "Gültigen Lizenzlink hinzufügen"
   },
   "nags.link-shortener-usage.description": {
-    "defaultMessage": "Das verwenden von Linkverkürzern oder anderen Methoden, welche das Ziel eines Links verschleiern, ist nicht erlaubt. Bitte verwende nur geeignete Links in voller länge."
+    "defaultMessage": "Das Verwenden von Linkverkürzern oder anderen Methoden, welche das Ziel eines Links verschleiern, ist nicht erlaubt. Bitte verwende nur geeignete Links in voller Länge."
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Verwende keine Linkverkürzer"
@@ -90,16 +108,16 @@
     "defaultMessage": "Überschriften kürzen"
   },
   "nags.minecraft-title-clause.description": {
-    "defaultMessage": "Projekte dürfen weder Markenzeichen von Minecraft verwenden noch \"Minecraft\" als einen signifikanten Teil des Namens verwenden."
+    "defaultMessage": "Projekte dürfen weder Markenzeichen von Minecraft, noch \"Minecraft\" als einen signifikanten Teil des Namens verwenden."
   },
   "nags.minecraft-title-clause.title": {
     "defaultMessage": "Vermeide Markenrechtsverletzungen"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "Einige deiner Bilder haben keinen Alt-Text, welcher wichtig für die Barrierefreiheit ist, insbesondere für sehbehinderte Benutzer."
+    "defaultMessage": "Einige deiner Bilder haben keinen Alternativtext, welcher wichtig für die Barrierefreiheit ist, insbesondere für sehbehinderte Benutzer."
   },
   "nags.missing-alt-text.title": {
-    "defaultMessage": "Bild-Alt-text hinzufügen"
+    "defaultMessage": "Bild-Alternativtext hinzufügen"
   },
   "nags.misused-discord-link-description": {
     "defaultMessage": "Einladungslinks für Discord können nicht für andere Link-Typen verwendet werden. Bitte füge deinen Einladungslink nur in das Discord-Einladungslink\" Feld ein."
@@ -108,31 +126,52 @@
     "defaultMessage": "Verschiebe Discord-Einladungslink"
   },
   "nags.moderation.title": {
-    "defaultMessage": "Moderations-Seite ansehen"
+    "defaultMessage": "Moderationsseite ansehen"
   },
   "nags.moderator-feedback.description": {
-    "defaultMessage": "Überprüfe und behandle alle Bedenken des Moderationsteams, befor du das Projekt erneut einreichst."
+    "defaultMessage": "Überprüfe und behebe alle Bedenken des Moderationsteams, bevor du das Projekt erneut einreichst."
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Feedback überprüfen"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Du hast {count, plural, one {einen Auflösungs-Tag} other {# Auflösungs-Tags}} ausgewählt ({tags}). Resourcenpakete haben in der Regel nur einen Auflösungs-Tag welches Ihrer primären Auflösung entspricht."
+    "defaultMessage": "Du hast {count, plural, one {einen Auflösungs-Tag} other {# Auflösungs-Tags}} ausgewählt ({tags}). Resourcenpakete haben in der Regel nur einen Auflösungs-Tag, der Ihrer primären Auflösung entspricht."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Richtige Auflösung auswählen"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Wähle, welche Versionen dein Server unterstützt, wähle ein Modpack, oder lade dein eigenes hoch."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Kompatibilität auswählen"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Lasse Spieler wissen, in welcher Region dein Server liegt."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Wähle eine Region aus"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Gib die Sprache oder Sprachen, welche auf deinem Server unterstützt werden, an."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Wähle eine Sprache aus"
   },
   "nags.select-license.description": {
     "defaultMessage": "Wähle die Lizenz, unter welcher dein{type, select, mod {e Mod} modpack { Modpaket} resourcepack { Resourcenpaket} shader { Shader} plugin { Plugin} other { Projekt}} vertrieben wird."
   },
   "nags.select-license.title": {
-    "defaultMessage": "Lizenz auswählen"
+    "defaultMessage": "Wähle eine Lizenz aus"
   },
   "nags.select-tags.description": {
     "defaultMessage": "Wähle Tags aus, welche auf dein Projekt zutreffen, damit es die richtigen Nutzer finden können."
   },
   "nags.select-tags.title": {
-    "defaultMessage": "Tags auswählen"
+    "defaultMessage": "Wähle Tags aus"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Servereinstellungen ansehen"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Beschreibungseinstellungen ansehen"
@@ -141,49 +180,55 @@
     "defaultMessage": "Lizenzeinstellungen ansehen"
   },
   "nags.settings.links.title": {
-    "defaultMessage": "Linkeinstellungen ansehen"
+    "defaultMessage": "Link-Einstellungen ansehen"
   },
   "nags.settings.tags.title": {
-    "defaultMessage": "Tageinstellungen ansehen"
+    "defaultMessage": "Tag-Einstellungen ansehen"
   },
   "nags.settings.title": {
     "defaultMessage": "Allgemeine Einstellungen ansehen"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Deine Zusammenfassung kann nicht die selbe sein wie dein Projektname. Es ist wichtig eine informative und passende Zusammenfassung zu erstellen."
+    "defaultMessage": "Deine Zusammenfassung kann nicht identisch mit deinem Projektnamen sein. Es ist wichtig, eine informative und spannende Zusammenfassung zu erstellen."
   },
   "nags.summary-same-as-title.title": {
-    "defaultMessage": "Mach die Zusammenfassung einzigartig"
+    "defaultMessage": "Mache die Zusammenfassung einzigartig"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Deine Zusammenfassung sollte keine Formatierungen, Zeilenumbrüche, spezielle Zeichen oder links enthalten, da sie nur als Klartext anzeigt wird."
+    "defaultMessage": "Deine Zusammenfassung sollte keine Formatierungen, Zeilenumbrüche, spezielle Zeichen oder Links enthalten, da sie nur als Klartext anzeigt wird."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Zusammenfassung bereinigen"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Deine Zusammenfassung ist {length, plural, one {1 Zeichen} other {# Zeichen}} lang. Mindestens {minChars, plural, one {1 Zeichen} other {# Zeichen}} sind empfohlen, um eine anregende und informative Zusammenfassung zu erstellen."
+    "defaultMessage": "Deine Zusammenfassung ist {length, plural, one {1 Zeichen} other {# Zeichen}} lang. Mindestens {minChars, plural, one {1 Zeichen ist} other {# Zeichen sind}} empfohlen, um eine informative und spannende Zusammenfassung zu erstellen."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Zusammenfassung erweitern"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Halte den Namen deines Projekts übersichtlich und einprägsam, damit es leichter zu merken und finden ist. Versionen- und Loader-Informationen werden automatisch neben deinem Projekt angezeigt."
+    "defaultMessage": "Ein klarer, übersichtlicher Name macht dein Projekt einprägsamer und leichter auffindbar. Versions- und Loader-Informationen werden automatisch neben deinem Projekt angezeigt."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Namen bereinigen"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Server in relevanten Suchen erscheint."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Wähle passende Tags"
+  },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Du hast {tagCount, plural, one {1 Tag} other {# Tags}} ausgewählt. Erwäge die Anzahl auf {maxTagCount} oder weniger zu reduzieren, damit dein Projekt in relevanten Suchen erscheint."
+    "defaultMessage": "Du hast {tagCount, plural, one {1 Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekt in relevanten Suchen erscheint."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wähle akkurate Tags aus"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Mindestens ein Galleriebild ist nötig um den Inhalt {type, select, resourcepack {deines Resourcenpakets - mit ausnahme von Lokalisierungspaketen. Bitte wähle die passenden Tags sollte dies zutreffen. -} shader {deiner Shader} other {deines Projekts}} zu zeigen."
+    "defaultMessage": "Mindestens ein Galeriebild ist erforderlich, um den Inhalt deines {type, select,\nresourcepack {Ressourcenpakets zu präsentieren, außer bei Audio- oder Sprachpaketen. Wenn dies auf dein Paket zutrifft, wähle bitte das entsprechende Tag aus} shader {Shaders zu zeigen} other {Projekts zu zeigen}}."
   },
   "nags.upload-gallery-image.title": {
-    "defaultMessage": "Lade ein Galleriebild hoch"
+    "defaultMessage": "Lade ein Galeriebild hoch"
   },
   "nags.upload-version.description": {
     "defaultMessage": "Mindestens eine Version wird für das Projekt benötigt, um es zur Überprüfung einzureichen."
@@ -192,16 +237,16 @@
     "defaultMessage": "Version hochladen"
   },
   "nags.verify-external-links.description": {
-    "defaultMessage": "Einige deiner externen Links verwenden eventual Domains, welche für diese Art von Link ungeeignet sind."
+    "defaultMessage": "Einige deiner externen Links verwenden möglicherweise Domains, welche für diese Art von Link ungeeignet sind."
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Externe Links überprüfen"
   },
   "nags.versions.title": {
-    "defaultMessage": "Versions-Seite ansehen"
+    "defaultMessage": "Versionen-Seite ansehen"
   },
   "nags.visit-links-settings.title": {
-    "defaultMessage": "Linkeinstellungen ansehen"
+    "defaultMessage": "Link-Einstellungen ansehen"
   }
 }
 

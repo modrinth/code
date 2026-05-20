@@ -9,7 +9,6 @@ import {
 	UpdatedIcon,
 } from '@modrinth/assets'
 import {
-	Button,
 	ButtonStyled,
 	ConfirmModal,
 	injectNotificationManager,
@@ -383,25 +382,25 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 						@select="changeSkin(skin)"
 					>
 						<template #overlay-buttons>
-							<Button
-								color="green"
-								aria-label="Edit skin"
-								class="pointer-events-auto"
-								@click.stop="(e: MouseEvent) => editSkinModal?.show(e, skin)"
-							>
-								<EditIcon /> Edit
-							</Button>
-							<Button
-								v-show="!skin.is_equipped"
-								v-tooltip="'Delete skin'"
-								aria-label="Delete skin"
-								color="red"
-								class="!rounded-[100%] pointer-events-auto"
-								icon-only
-								@click.stop="() => confirmDeleteSkin(skin)"
-							>
-								<TrashIcon />
-							</Button>
+							<ButtonStyled color="brand">
+								<button
+									aria-label="Edit skin"
+									class="pointer-events-auto"
+									@click.stop="(e: MouseEvent) => editSkinModal?.show(e, skin)"
+								>
+									<EditIcon /> Edit
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-show="!skin.is_equipped" circular color="red">
+								<button
+									v-tooltip="'Delete skin'"
+									aria-label="Delete skin"
+									class="!rounded-[100%] pointer-events-auto"
+									@click.stop="() => confirmDeleteSkin(skin)"
+								>
+									<TrashIcon />
+								</button>
+							</ButtonStyled>
 						</template>
 					</SkinButton>
 				</div>

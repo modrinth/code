@@ -3,6 +3,8 @@ export const getProjectTypeForUrl = (type, categories) => {
 }
 
 export const getProjectTypeForUrlShorthand = (type, categories, overrideTags) => {
+	if (type === 'minecraft_java_server') return 'server'
+
 	const tags = overrideTags ?? useGeneratedState().value
 
 	if (type === 'mod') {
@@ -163,7 +165,7 @@ export function formatVersionsForDisplay(gameVersions, overrideTags) {
 		output = [...releaseVersionsAsRanges, ...output]
 	}
 
-	if (latestSnapshot && !output.includes(latestSnapshot)) {
+	if (releaseVersionsAsRanges.length > 0 && latestSnapshot) {
 		output = [latestSnapshot, ...output]
 	}
 	return output

@@ -10,9 +10,9 @@ use crate::database::models::loader_fields::{
 use crate::database::redis::RedisPool;
 use actix_web::{HttpResponse, web};
 
+use crate::database::PgPool;
 use itertools::Itertools;
 use serde_json::Value;
-use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -119,7 +119,7 @@ pub async fn loader_list(
         })
         .collect::<Vec<_>>();
 
-    results.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    results.sort_by_key(|a| a.name.to_lowercase());
 
     Ok(HttpResponse::Ok().json(results))
 }

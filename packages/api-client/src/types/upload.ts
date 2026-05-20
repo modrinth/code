@@ -86,3 +86,16 @@ export interface UploadHandle<T> {
 	/** Cancel the upload */
 	cancel: () => void
 }
+
+/**
+ * State of a batch file upload operation
+ */
+export interface UploadState {
+	isUploading: boolean
+	currentFileName: string | null
+	currentFileProgress: number
+	uploadedBytes: number
+	totalBytes: number
+	completedFiles: number
+	totalFiles: number
+}

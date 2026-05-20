@@ -18,8 +18,8 @@ import { getPriceForInterval } from '../utils/product-utils'
 
 export const useStripe = (
 	publishableKey: string,
-	customer: Stripe.Customer,
-	paymentMethods: Stripe.PaymentMethod[],
+	customer: Ref<Stripe.Customer | null | undefined>,
+	paymentMethods: Ref<Stripe.PaymentMethod[]>,
 	currency: string,
 	product: Ref<Labrinth.Billing.Internal.Product | undefined>,
 	interval: Ref<ServerBillingInterval>,
@@ -96,7 +96,7 @@ export const useStripe = (
 
 		const contacts: ContactOption[] = []
 
-		paymentMethods.forEach((method) => {
+		paymentMethods.value.forEach((method) => {
 			const addr = method.billing_details?.address
 			if (
 				addr &&
@@ -131,15 +131,22 @@ export const useStripe = (
 	}
 
 	const primaryPaymentMethodId = computed<string | null>(() => {
-		if (customer && customer.invoice_settings && customer.invoice_settings.default_payment_method) {
-			const method = customer.invoice_settings.default_payment_method
+		const customerValue = customer.value
+		const paymentMethodsValue = paymentMethods.value
+
+		if (
+			customerValue &&
+			customerValue.invoice_settings &&
+			customerValue.invoice_settings.default_payment_method
+		) {
+			const method = customerValue.invoice_settings.default_payment_method
 			if (typeof method === 'string') {
 				return method
 			} else {
 				return method.id
 			}
-		} else if (paymentMethods && paymentMethods[0] && paymentMethods[0].id) {
-			return paymentMethods[0].id
+		} else if (paymentMethodsValue[0] && paymentMethodsValue[0].id) {
+			return paymentMethodsValue[0].id
 		} else {
 			return null
 		}
@@ -148,7 +155,7 @@ export const useStripe = (
 	const loadStripeElements = async () => {
 		loadingFailed.value = undefined
 		try {
-			if (!customer && primaryPaymentMethodId.value) {
+			if (!customer.value && primaryPaymentMethodId.value) {
 				paymentMethodLoading.value = true
 				await refreshPaymentIntent(primaryPaymentMethodId.value, false)
 				paymentMethodLoading.value = false
@@ -189,7 +196,7 @@ export const useStripe = (
 		try {
 			paymentMethodLoading.value = true
 			if (!confirmation) {
-				selectedPaymentMethod.value = paymentMethods.find((x) => x.id === id)
+				selectedPaymentMethod.value = paymentMethods.value.find((x) => x.id === id)
 			}
 
 			if (!product.value) {
@@ -242,10 +249,18 @@ export const useStripe = (
 			if (confirmation) {
 				confirmationToken.value = id
 				if (result && 'payment_method' in result && result.payment_method) {
-					// payment_method is a string ID from the API, need to find the full object
-					const method = paymentMethods.find((x) => x.id === result.payment_method)
-					if (method) {
-						inputtedPaymentMethod.value = method
+					const paymentMethod = (
+						result as {
+							payment_method?: string | Stripe.PaymentMethod
+						}
+					).payment_method
+					if (typeof paymentMethod === 'string') {
+						const method = paymentMethods.value.find((x) => x.id === paymentMethod)
+						if (method) {
+							inputtedPaymentMethod.value = method
+						}
+					} else if (paymentMethod) {
+						inputtedPaymentMethod.value = paymentMethod
 					}
 				}
 			}
@@ -330,31 +345,42 @@ export const useStripe = (
 
 	const loadingElements = computed(() => elementsLoaded.value < 2)
 
-	async function submitPayment(returnUrl: string) {
+	async function submitPayment(returnUrl?: string): Promise<boolean> {
 		if (noPaymentRequired.value) {
 			completingPurchase.value = false
 			return true
 		}
 		completingPurchase.value = true
-		const secert = clientSecret.value
+		const secret = clientSecret.value
 
-		if (!secert) {
-			return handlePaymentError('No client secret')
+		if (!secret) {
+			handlePaymentError('No client secret')
+			return false
 		}
 
 		if (!stripe.value) {
-			return handlePaymentError('No stripe')
+			handlePaymentError('No stripe')
+			return false
 		}
 
 		submittingPayment.value = true
 		const productPrice = product.value?.prices.find((x) => x.currency_code === currency)
-		const { error } = await stripe.value.confirmPayment({
-			clientSecret: secert,
-			confirmParams: {
-				confirmation_token: confirmationToken.value,
-				return_url: `${returnUrl}?priceId=${productPrice?.id}&plan=${interval.value}`,
-			},
-		})
+
+		const { error } = returnUrl
+			? await stripe.value.confirmPayment({
+					clientSecret: secret,
+					confirmParams: {
+						confirmation_token: confirmationToken.value,
+						return_url: `${returnUrl}?priceId=${productPrice?.id}&plan=${interval.value}`,
+					},
+				})
+			: await stripe.value.confirmPayment({
+					clientSecret: secret,
+					redirect: 'if_required',
+					confirmParams: {
+						confirmation_token: confirmationToken.value,
+					},
+				})
 
 		if (error) {
 			handlePaymentError(error.message ?? 'Unknown error submitting payment')

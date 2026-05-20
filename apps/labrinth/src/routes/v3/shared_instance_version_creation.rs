@@ -7,6 +7,7 @@ use crate::database::models::{
     generate_shared_instance_version_id,
 };
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
 use crate::models::pats::Scopes;
@@ -24,7 +25,6 @@ use bytes::BytesMut;
 use chrono::Utc;
 use futures_util::StreamExt;
 use hex::FromHex;
-use sqlx::{PgPool, Postgres, Transaction};
 use std::sync::Arc;
 
 const MAX_FILE_SIZE: usize = 500 * 1024 * 1024;
@@ -100,7 +100,7 @@ async fn shared_instance_version_create_inner(
     file_host: &dyn FileHost,
     instance_id: DBSharedInstanceId,
     session_queue: &AuthQueue,
-    transaction: &mut Transaction<'_, Postgres>,
+    transaction: &mut PgTransaction<'_>,
     uploaded_files: &mut Vec<UploadedFile>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -192,7 +192,7 @@ async fn shared_instance_version_create_inner(
         new_version.id as DBSharedInstanceVersionId,
         instance_id as DBSharedInstanceId,
     )
-    .execute(&mut **transaction)
+    .execute(&mut *transaction)
     .await?;
 
     let version: SharedInstanceVersion = new_version.into();

@@ -34,27 +34,41 @@
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
 	>
-		<RussiaBanner v-if="isRussia" />
-		<TaxIdMismatchBanner v-if="showTinMismatchBanner" />
-		<TaxComplianceBanner v-if="showTaxComplianceBanner" />
+		<RussiaBanner v-if="flags.showAllBanners || isRussia" />
+		<TaxIdMismatchBanner v-if="flags.showAllBanners || showTinMismatchBanner" />
+		<TaxComplianceBanner v-if="flags.showAllBanners || showTaxComplianceBanner" />
 		<VerifyEmailBanner
-			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
-			:has-email="auth?.user?.email"
+			v-if="
+				flags.showAllBanners ||
+				(auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email')
+			"
+			:has-email="!!auth?.user?.email"
 		/>
 		<SubscriptionPaymentFailedBanner
 			v-if="
-				user.subscriptions.some((x) => x.status === 'payment-failed') &&
-				route.path !== '/settings/billing'
+				flags.showAllBanners ||
+				(user.subscriptions.some((x) => x.status === 'payment-failed') &&
+					route.path !== '/settings/billing')
 			"
 		/>
-		<PreviewBanner v-if="config.public.buildEnv === 'production' && config.public.preview" />
-		<StagingBanner v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')" />
+		<PreviewBanner
+			v-if="
+				flags.showAllBanners || (config.public.buildEnv === 'production' && config.public.preview)
+			"
+		/>
+		<StagingBanner
+			v-if="
+				flags.showAllBanners ||
+				config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')
+			"
+		/>
 		<GeneratedStateErrorsBanner
 			:errors="generatedStateErrors"
 			:api-url="config.public.apiBaseUrl"
 		/>
+		<ViewOnModrinthBanner />
 		<header
-			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
+			class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
 			<div>
 				<NuxtLink
@@ -69,7 +83,8 @@
 				</NuxtLink>
 			</div>
 			<div
-				:class="`col-span-2 row-start-2 flex flex-wrap justify-center ${flags.projectTypesPrimaryNav ? 'gap-2' : 'gap-4'} lg:col-span-1 lg:row-start-auto`"
+				class="col-span-2 row-start-2 flex justify-center lg:col-span-1 lg:row-start-auto"
+				:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
 			>
 				<template v-if="flags.projectTypesPrimaryNav">
 					<ButtonStyled
@@ -148,6 +163,18 @@
 							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
 						</nuxt-link>
 					</ButtonStyled>
+					<ButtonStyled
+						type="transparent"
+						:highlighted="route.name === 'discover-servers' || route.path.startsWith('/server/')"
+						:highlighted-style="
+							route.name === 'discover-servers' ? 'main-nav-primary' : 'main-nav-secondary'
+						"
+					>
+						<nuxt-link to="/discover/servers">
+							<ServerIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
+						</nuxt-link>
+					</ButtonStyled>
 				</template>
 				<template v-else>
 					<ButtonStyled
@@ -184,7 +211,6 @@
 								{
 									id: 'servers',
 									action: '/discover/servers',
-									shown: flags.serverDiscovery,
 								},
 							]"
 							hoverable
@@ -269,7 +295,7 @@
 						"
 					>
 						<nuxt-link to="/hosting">
-							<ServerIcon aria-hidden="true" />
+							<ServerStackIcon aria-hidden="true" />
 							{{ formatMessage(navMenuMessages.hostAServer) }}
 						</nuxt-link>
 					</ButtonStyled>
@@ -299,7 +325,7 @@
 							{
 								id: 'review-projects',
 								color: 'orange',
-								link: '/moderation/',
+								link: '/moderation',
 							},
 							{
 								id: 'tech-review',
@@ -310,6 +336,11 @@
 								id: 'review-reports',
 								color: 'orange',
 								link: '/moderation/reports',
+							},
+							{
+								id: 'external-projects',
+								color: 'orange',
+								link: '/moderation/external-projects',
 							},
 							{
 								divider: true,
@@ -365,6 +396,9 @@
 						<template #review-reports>
 							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
 						</template>
+						<template #external-projects>
+							<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.externalProjects) }}
+						</template>
 						<template #user-lookup>
 							<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
 						</template>
@@ -399,6 +433,10 @@
 								action: (event) => $refs.modal_creation.show(event),
 							},
 							{
+								id: 'new-server-project',
+								action: (event) => $refs.modal_creation.show(event, { type: 'server' }),
+							},
+							{
 								id: 'new-collection',
 								action: (event) => $refs.modal_collection_creation.show(event),
 							},
@@ -410,9 +448,12 @@
 						]"
 					>
 						<PlusIcon aria-hidden="true" />
-						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+						{{ formatMessage(messages.publish) }}
 						<template #new-project>
 							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
+						</template>
+						<template #new-server-project>
+							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newServerProject) }}
 						</template>
 						<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
 						<template #new-collection>
@@ -444,7 +485,7 @@
 						<LibraryIcon aria-hidden="true" /> {{ formatMessage(commonMessages.collectionsLabel) }}
 					</template>
 					<template #servers>
-						<ServerIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
+						<ServerStackIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
 					</template>
 					<template #plus>
 						<ArrowBigUpDashIcon aria-hidden="true" />
@@ -454,7 +495,8 @@
 						<SettingsIcon aria-hidden="true" /> {{ formatMessage(commonMessages.settingsLabel) }}
 					</template>
 					<template #flags>
-						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.featureFlags) }}
+						<ToggleRightIcon aria-hidden="true" />
+						{{ formatMessage(commonSettingsMessages.featureFlags) }}
 					</template>
 					<template #projects>
 						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.projects) }}
@@ -470,7 +512,7 @@
 						<CurrencyIcon aria-hidden="true" /> {{ formatMessage(messages.revenue) }}
 					</template>
 					<template #analytics>
-						<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analytics) }}
+						<ChartIcon aria-hidden="true" /> {{ formatMessage(commonMessages.analyticsButton) }}
 					</template>
 					<template #moderation>
 						<ScaleIcon aria-hidden="true" /> {{ formatMessage(commonMessages.moderationLabel) }}
@@ -481,7 +523,7 @@
 				</OverflowMenu>
 				<template v-else>
 					<ButtonStyled color="brand">
-						<nuxt-link to="/auth/sign-in">
+						<nuxt-link :to="signInRouteObj">
 							<LogInIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.signInButton) }}
 						</nuxt-link>
@@ -536,7 +578,7 @@
 							<div>{{ formatMessage(commonMessages.visitYourProfile) }}</div>
 						</div>
 					</NuxtLink>
-					<nuxt-link v-else class="iconified-button brand-button" to="/auth/sign-in">
+					<nuxt-link v-else class="iconified-button brand-button" :to="signInRouteObj">
 						<LogInIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signInButton) }}
 					</nuxt-link>
 				</div>
@@ -566,9 +608,9 @@
 							<ScaleIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.moderationLabel) }}
 						</NuxtLink>
-						<NuxtLink v-if="flags.developerMode" class="iconified-button" to="/flags">
-							<ReportIcon aria-hidden="true" />
-							{{ formatMessage(messages.featureFlags) }}
+						<NuxtLink v-if="flags.developerMode" class="iconified-button" to="/settings/flags">
+							<ToggleRightIcon aria-hidden="true" />
+							{{ formatMessage(commonSettingsMessages.featureFlags) }}
 						</NuxtLink>
 					</template>
 					<NuxtLink class="iconified-button" to="/settings">
@@ -685,6 +727,7 @@ import {
 	DropdownIcon,
 	FileIcon,
 	GlassesIcon,
+	GlobeIcon,
 	HamburgerIcon,
 	HomeIcon,
 	IssuesIcon,
@@ -702,9 +745,11 @@ import {
 	ScaleIcon,
 	SearchIcon,
 	ServerIcon,
+	ServerStackIcon,
 	SettingsIcon,
 	ShieldAlertIcon,
 	SunIcon,
+	ToggleRightIcon,
 	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
@@ -715,12 +760,17 @@ import {
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
+	commonSettingsMessages,
 	defineMessages,
+	injectModrinthClient,
 	OverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
+import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
+import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
 import TextLogo from '~/components/brand/TextLogo.vue'
 import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
 import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
@@ -731,13 +781,16 @@ import SubscriptionPaymentFailedBanner from '~/components/ui/banner/Subscription
 import TaxComplianceBanner from '~/components/ui/banner/TaxComplianceBanner.vue'
 import TaxIdMismatchBanner from '~/components/ui/banner/TaxIdMismatchBanner.vue'
 import VerifyEmailBanner from '~/components/ui/banner/VerifyEmailBanner.vue'
+import ViewOnModrinthBanner from '~/components/ui/banner/ViewOnModrinthBanner.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
-import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
+import { getSignInRouteObj } from '~/composables/auth.js'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
+
+const generatedState = useGeneratedState()
 
 const country = useUserCountry()
 
@@ -752,18 +805,22 @@ const flags = useFeatureFlags()
 const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
+const signInRouteObj = computed(() => getSignInRouteObj(route))
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
+const client = injectModrinthClient()
 
-const { data: payoutBalance } = await useAsyncData('payout/balance', () => {
-	if (!auth.value.user) return null
-	return useBaseFetch('payout/balance', { apiVersion: 3 })
+const { data: payoutBalance } = useQuery({
+	queryKey: ['payout', 'balance'],
+	queryFn: () => client.labrinth.payout_v3.getBalance(),
+	enabled: computed(() => !!auth.value.user),
 })
 
 const showTaxComplianceBanner = computed(() => {
 	if (flags.value.testTaxForm && auth.value.user) return true
 	const bal = payoutBalance.value
 	if (!bal) return false
-	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
+	const threshold = getTaxThreshold(generatedState.value?.taxComplianceThresholds)
+	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= threshold
 	const status = bal.form_completion_status ?? 'unknown'
 	const isComplete = status === 'complete'
 	const isTinMismatch = status === 'tin-mismatch'
@@ -831,6 +888,10 @@ const messages = defineMessages({
 		id: 'layout.action.create-new',
 		defaultMessage: 'Create new...',
 	},
+	publish: {
+		id: 'layout.action.publish',
+		defaultMessage: 'Publish',
+	},
 	reviewProjects: {
 		id: 'layout.action.review-projects',
 		defaultMessage: 'Project review',
@@ -842,6 +903,10 @@ const messages = defineMessages({
 	reports: {
 		id: 'layout.action.reports',
 		defaultMessage: 'Review reports',
+	},
+	externalProjects: {
+		id: 'layout.action.external-projects',
+		defaultMessage: 'External projects',
 	},
 	lookupByEmail: {
 		id: 'layout.action.lookup-by-email',
@@ -863,6 +928,10 @@ const messages = defineMessages({
 		id: 'layout.action.new-project',
 		defaultMessage: 'New project',
 	},
+	newServerProject: {
+		id: 'layout.action.new-server-project',
+		defaultMessage: 'New server',
+	},
 	newCollection: {
 		id: 'layout.action.new-collection',
 		defaultMessage: 'New collection',
@@ -883,10 +952,6 @@ const messages = defineMessages({
 		id: 'layout.nav.upgrade-to-modrinth-plus',
 		defaultMessage: 'Upgrade to Modrinth+',
 	},
-	featureFlags: {
-		id: 'layout.nav.feature-flags',
-		defaultMessage: 'Feature flags',
-	},
 	projects: {
 		id: 'layout.nav.projects',
 		defaultMessage: 'Projects',
@@ -898,10 +963,6 @@ const messages = defineMessages({
 	revenue: {
 		id: 'layout.nav.revenue',
 		defaultMessage: 'Revenue',
-	},
-	analytics: {
-		id: 'layout.nav.analytics',
-		defaultMessage: 'Analytics',
 	},
 	activeReports: {
 		id: 'layout.nav.active-reports',
@@ -987,6 +1048,10 @@ const navRoutes = computed(() => [
 		label: formatMessage(getProjectTypeMessage('modpack', true)),
 		href: '/discover/modpacks',
 	},
+	{
+		label: formatMessage(getProjectTypeMessage('server', true)),
+		href: '/discover/servers',
+	},
 ])
 
 const userMenuOptions = computed(() => {
@@ -1010,7 +1075,7 @@ const userMenuOptions = computed(() => {
 		},
 		{
 			id: 'flags',
-			link: '/flags',
+			link: '/settings/flags',
 			shown: flags.value.developerMode,
 		},
 		{
@@ -1083,7 +1148,7 @@ const isDiscovering = computed(
 )
 
 const isDiscoveringSubpage = computed(
-	() => route.name && route.name.startsWith('type-id') && !route.query.sid,
+	() => route.name && route.name.startsWith('type-project') && !route.query.sid,
 )
 
 const isRussia = computed(() => country.value === 'ru')
@@ -1109,7 +1174,7 @@ async function onKeyDown(event) {
 		rCount.value++
 
 		if (randomProjects.value.length < 3) {
-			randomProjects.value = await useBaseFetch('projects_random?count=50').catch((err) => {
+			randomProjects.value = await client.labrinth.projects_v2.getRandom(50).catch((err) => {
 				console.error(err)
 				return []
 			})
@@ -1248,7 +1313,7 @@ const { cycle: changeTheme } = useTheme()
 		left: 0;
 		background-color: var(--color-raised-bg);
 		z-index: 11; // 20 = modals, 10 = svg icons
-		transform: translateY(100%);
+		transform: translateY(calc(100% + env(safe-area-inset-bottom)));
 		transition: transform 0.4s cubic-bezier(0.54, 0.84, 0.42, 1);
 		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
 		box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0);
@@ -1261,7 +1326,8 @@ const { cycle: changeTheme } = useTheme()
 			justify-content: center;
 			padding: 1rem;
 
-			.iconified-button {
+			> button,
+			> a {
 				width: 100%;
 				max-width: 500px;
 				padding: 0.75rem;
@@ -1335,6 +1401,17 @@ const { cycle: changeTheme } = useTheme()
 		transition: border-radius 0.3s ease-out;
 		border-top: 2px solid rgba(0, 0, 0, 0);
 		box-sizing: border-box;
+
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: 2px;
+			left: 0;
+			width: 100%;
+			height: 300px;
+			background-color: var(--color-raised-bg);
+			transform: translateY(100%);
+		}
 
 		&.expanded {
 			box-shadow: none;
@@ -1426,13 +1503,13 @@ const { cycle: changeTheme } = useTheme()
 	}
 }
 
-@media (any-hover: none) and (max-width: 640px) {
+@media (pointer: coarse) and (max-width: 640px) {
 	.desktop-only {
 		display: none;
 	}
 }
 
-@media (any-hover: none) and (max-width: 640px) {
+@media (pointer: coarse) and (max-width: 640px) {
 	.mobile-navigation {
 		display: flex;
 	}
@@ -1562,4 +1639,3 @@ const { cycle: changeTheme } = useTheme()
 	}
 }
 </style>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>

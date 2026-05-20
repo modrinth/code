@@ -14,7 +14,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			Payment failed for {paymentfailed.service}
 		</Heading>
 
-		<Text class="text-muted text-base">Hi {user.name},</Text>
+		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
 			Our attempt to collect payment for {paymentfailed.amount} from the payment card on file was
 			unsuccessful. Please update your billing settings to avoid suspension of your service.

@@ -7,7 +7,8 @@ const categories: Stage = {
 	title: "Are the project's tags accurate?",
 	id: 'tags',
 	icon: TagsIcon,
-	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
+	guidance_url:
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0802f96aafc0397a9f6d3',
 	navigate: '/settings/tags',
 	shouldShow: (project) =>
 		project.categories.length > 0 || project.additional_categories.length > 0,

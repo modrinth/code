@@ -10,11 +10,12 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { formatPrice, getPingLevel } from '@modrinth/utils'
+import { getPingLevel } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'
 
+import { useFormatPrice } from '../../composables'
 import { useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import { regionOverrides } from '../../utils/regions'
@@ -27,8 +28,8 @@ import FormattedPaymentMethod from './FormattedPaymentMethod.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import ServersSpecs from './ServersSpecs.vue'
 
-const vintl = useVIntl()
-const { locale, formatMessage } = vintl
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
 
 const emit = defineEmits<{
 	(e: 'changePaymentMethod' | 'reloadPaymentIntent'): void
@@ -178,7 +179,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 
 <template>
 	<div class="grid sm:grid-cols-[3fr_2fr] gap-4">
-		<div class="bg-table-alternateRow p-4 rounded-2xl">
+		<div class="bg-surface-2 p-4 rounded-2xl">
 			<div class="flex items-center gap-2 mb-3">
 				<ModrinthServersIcon class="flex h-5 w-fit" />
 				<TagItem>{{ planName }}</TagItem>
@@ -193,9 +194,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 				/>
 			</div>
 		</div>
-		<div
-			class="bg-table-alternateRow p-4 rounded-2xl flex flex-col gap-2 items-center justify-center"
-		>
+		<div class="bg-surface-2 p-4 rounded-2xl flex flex-col gap-2 items-center justify-center">
 			<img
 				v-if="flag"
 				class="aspect-[16/10] max-w-12 w-full object-cover rounded-md border-1 border-button-border border-solid"
@@ -246,7 +245,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 					>Pay monthly</span
 				>
 				<span class="text-sm text-secondary flex items-center gap-1"
-					>{{ formatPrice(locale, monthlyPrice, currency, true) }} / month</span
+					>{{ formatPrice(monthlyPrice, currency, true) }} / month</span
 				>
 			</div>
 		</button>
@@ -268,17 +267,10 @@ function setInterval(newInterval: ServerBillingInterval) {
 						>{{ interval === 'quarterly' ? 'Saving' : 'Save' }} 16%</span
 					></span
 				>
-				<span class="text-sm text-secondary flex items-center gap-1"
-					>{{
-						formatPrice(
-							locale,
-							(quarterlyPrice ?? 0) / monthsInInterval['quarterly'],
-							currency,
-							true,
-						)
-					}}
-					/ month</span
-				>
+				<span class="text-sm text-secondary flex items-center gap-1">
+					{{ formatPrice((quarterlyPrice ?? 0) / monthsInInterval['quarterly'], currency, true) }} /
+					month
+				</span>
 			</div>
 		</button>
 	</div>
@@ -310,10 +302,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 				"
 			/>
 		</template>
-		<div
-			v-else
-			class="p-4 rounded-2xl bg-table-alternateRow text-sm text-secondary leading-relaxed"
-		>
+		<div v-else class="p-4 rounded-2xl bg-surface-2 text-sm text-secondary leading-relaxed">
 			No payment required. Your downgrade will apply at the end of the current billing period.
 		</div>
 	</div>
@@ -346,14 +335,14 @@ function setInterval(newInterval: ServerBillingInterval) {
 			Today, you will be charged a prorated amount for the remainder of your current billing cycle.
 			<br />
 			Your subscription will renew at
-			{{ formatPrice(locale, selectedPlanPriceForInterval, currency) }} / {{ period }} plus
-			applicable taxes at the end of your current billing interval, until you cancel. You can cancel
-			anytime from your settings page.
+			{{ formatPrice(selectedPlanPriceForInterval, currency) }} / {{ period }} plus applicable taxes
+			at the end of your current billing interval, until you cancel. You can cancel anytime from
+			your settings page.
 		</template>
 		<template v-else>
 			You'll be charged
 			<SpinnerIcon v-if="loading" class="animate-spin relative top-0.5 mx-2" /><template v-else>{{
-				formatPrice(locale, total, currency)
+				formatPrice(total, currency)
 			}}</template>
 			every {{ period }} plus applicable taxes starting today, until you cancel. You can cancel
 			anytime from your settings page.

@@ -23,11 +23,14 @@
   "app-marketing.download.download-rpm": {
     "message": "Завантажити RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Отримати на Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "На версії Modrinth App для Linux є <issues-link>відомі проблеми</issues-link> на деяких системах та налаштуваннях. Якщо Modrinth App нестабільно працює на вашій системі, ми радимо вам спробувати інші програми, як наприклад <prism-link>Prism Launcher</prism-link> щоб легко встановлювати вміст від Modrinth."
+    "message": "Відомо, що Modrinth App для Linux <issues-link>має проблеми</issues-link> на певних системах і налаштуваннях. Якщо Modrinth App працює нестабільно на вашій системі, радимо спробувати інші застосунки, наприклад, <prism-link>Prism Launcher</prism-link>, щоб легко встановлювати вміст з Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -36,10 +39,7 @@
     "message": "Варіанти завантаження"
   },
   "app-marketing.download.terms": {
-    "message": "Завантажуючи Modrinth App, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-link>Політикою конфіденційности</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Сторонні пакети"
+    "message": "Завантажуючи Modrinth App, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-link>Політикою конфіденційності</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Завантажити Modrinth App (бета)"
@@ -96,13 +96,13 @@
     "message": "Працює без мережі"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Запускач Modrinth має повний відкритий код. Ви можете подивитись його на нашому <github-link>GitHub</github-link>!"
+    "message": "Modrinth є повністю відкритим. Ви можете переглянути відкритий код на нашому <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Відкритий код"
   },
   "app-marketing.features.performance.activity-monitor": {
-    "message": "Процеси"
+    "message": "Диспетчер завдань"
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% ЦП"
@@ -114,7 +114,7 @@
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Хороша продуктивність"
+    "message": "Висока продуктивність"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -144,7 +144,7 @@
     "message": "Малий"
   },
   "app-marketing.features.performance.title": {
-    "message": "Продуктивність"
+    "message": "Швидкодія"
   },
   "app-marketing.features.play.description": {
     "message": "Використовуйте Modrinth App, щоб завантажувати та грати з вашими улюбленими модами та збірками."
@@ -197,6 +197,15 @@
   "app-marketing.hero.more-download-options": {
     "message": "Більше варіантів завантаження"
   },
+  "app-marketing.hide-other-packages": {
+    "message": "Сховати інші пакети"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Не рекомендуємо використовувати їх, якщо не знаєте, що робите."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Показати інші пакети"
+  },
   "auth.authorize.action.authorize": {
     "message": "Авторизувати"
   },
@@ -220,12 +229,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "Укажіть вашу електронну пошту нижче, щоб ми надіслали вам посилання для відновлення вашого облікового запису."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Ел. пошта або ім’я користувача"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Електронна пошта"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Лист з інструкціями було надіслано на вашу електронну пошту, якщо вона була збережена у вашому обліковому записі."
@@ -258,7 +261,7 @@
     "message": "Будь ласка, укажіть код двофакторної автентифікації, щоб продовжити."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Вкажіть код двофакторної автентифікації"
+    "message": "Укажіть код двофакторної автентифікації"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Уведіть код…"
@@ -266,17 +269,11 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Забули пароль?</forgot-password-link> • <create-account-link>Створити обліковий запис</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Ел. пошта або ім’я користувача"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Пароль"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Увійдіть за допомогою"
   },
   "auth.sign-in.title": {
-    "message": "Увійти"
+    "message": "Вхід"
   },
   "auth.sign-in.use-password": {
     "message": "Або ж з паролем"
@@ -284,23 +281,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Створити обліковий запис"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Підтвердити пароль"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Електронна пошта"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Ім’я користувача"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Створивши обліковий запис, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-policy-link>Політикою конфіденційности</privacy-policy-link> Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Паролі не збігаються!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Пароль"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Уже маєте обліковий запис?"
@@ -319,9 +304,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Налаштування облікового запису"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Увійти"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Ваша електронна пошта вже підтверджена!"
@@ -393,7 +375,7 @@
     "message": "{description} — Дивіться добірку «{name}» від {username} на Modrinth"
   },
   "collection.description.following": {
-    "message": "Автоматична добірка з усіх проєктів, на які ви підписані."
+    "message": "Автоматична добірка з усіх проєктів, які ви відстежуєте."
   },
   "collection.editing": {
     "message": "Редагування добірки"
@@ -407,17 +389,11 @@
   "collection.label.curated-by": {
     "message": "Куратори"
   },
-  "collection.label.description": {
-    "message": "Опис"
-  },
-  "collection.label.details": {
-    "message": "Деталі"
-  },
   "collection.label.no-projects": {
     "message": "У добірці поки немає проєктів"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Ще немає проєктів} one {<stat>{count}</stat> проєкт} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Проєктів ще немає} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Оновлено {ago}"
@@ -431,26 +407,125 @@
   "collection.title": {
     "message": "{name} — добірка"
   },
-  "common.no": {
-    "message": "Ні"
+  "conversation-thread.action.add-private-note": {
+    "message": "Додати приватну нотатку"
   },
-  "common.yes": {
-    "message": "Так"
+  "conversation-thread.action.approve": {
+    "message": "Підтвердити"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Підтвердити з відповіддю"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Закрити тему"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Закрити з відповіддю"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Відхилити"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Відхилити з відповіддю"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Знову відкрити потік"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Відповісти"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Відповісти до теми"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Подати на розгляд знову"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Подати на розгляд знову з відповіддю"
+  },
+  "conversation-thread.action.send": {
+    "message": "Надіслати"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Надіслати на розгляд"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Надіслати на розгляд з відповіддю"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Зробити чернеткою"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Зробити чернеткою з відповіддю"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Утримуватися"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Утримуватися з відповіддю"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Цю тему зачинено, і в нього не можна надсилати нові повідомлення."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Помилка закриття звіту"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Помилка повторного відкриття звіту"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Помилка надсилання повідомлення"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Відповісти до потоку…"
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Надіслати повідомлення…"
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Підтверджую, що модератори активно не відстежують це"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Я визнаю, що модератори не стежать активно за темою."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Ваш проєкт уже затверджено. Таким чином, команда модераторів активно не стежить за цією темою. Однак вони можуть побачити ваше повідомлення, якщо з вашим проєктом виникне проблема."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Відповісти до теми"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Якщо вам потрібно зв’язатися з командою модераторів, скористайтеся <help-center-link>довідковим центром Modrinth</help-center-link> і натисніть синю підказку в нижньому правому куті, щоб зв’язатися зі службою підтримки."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Підтверджую, що я розглянув повідомлення від модераторів"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Я підтверджую, що я правильно розглянув коментарі модераторів."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Ви надсилаєте <project-title>{projectTitle}</project-title> на повторний розгляд модераторам."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Повторне подання на розгляд"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Подання на розгляд"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Переконайтеся, що ви врахували всі коментарі команди модераторів."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Повторне надсилання без розгляду коментарів модераторів може призвести до призупинення дії облікового запису."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
-    "message": "Додаткові файли призначені для допоміжних ресурсів, таких як вихідний код, а не для альтернативних версій чи варіантів."
-  },
-  "create.collection.cancel": {
-    "message": "Скасувати"
+    "message": "Додаткові файли призначені для допоміжних ресурсів, таких як початковий код, а не для альтернативних версій чи варіантів."
   },
   "create.collection.collection-info": {
     "message": "Ваша нова добірка після створення буде публічною {count, plural,=0 {без проєктів} one {і міститиме # проєкт} few {і міститиме # проєкти} other {і міститиме # проєктів}}."
   },
   "create.collection.create-collection": {
     "message": "Створити добірку"
-  },
-  "create.collection.error-title": {
-    "message": "Виникла помилка"
   },
   "create.collection.name-label": {
     "message": "Назва"
@@ -503,14 +578,8 @@
   "create.limit-alert.type-project": {
     "message": "проєкту"
   },
-  "create.organization.cancel": {
-    "message": "Скасувати"
-  },
   "create.organization.create-organization": {
     "message": "Створити організацію"
-  },
-  "create.organization.error-title": {
-    "message": "Виникла помилка"
   },
   "create.organization.name-label": {
     "message": "Назва"
@@ -536,20 +605,26 @@
   "create.organization.url-label": {
     "message": "Посилання"
   },
-  "create.project.cancel": {
-    "message": "Скасувати"
-  },
   "create.project.create-project": {
     "message": "Створити проєкт"
   },
-  "create.project.error-title": {
-    "message": "Виникла помилка"
+  "create.project.missing-fields-tooltip": {
+    "message": "Відсутні поля: {fields}"
   },
   "create.project.name-label": {
     "message": "Назва"
   },
   "create.project.name-placeholder": {
     "message": "Уведіть назву проєкту…"
+  },
+  "create.project.owner-description": {
+    "message": "Установіть власника проєкту як себе чи організацію, членом якої ви є."
+  },
+  "create.project.owner-label": {
+    "message": "Власник"
+  },
+  "create.project.server-project-title": {
+    "message": "Створення проєкту сервера"
   },
   "create.project.summary-description": {
     "message": "Кілька речень, які описують ваш проєкт."
@@ -563,14 +638,20 @@
   "create.project.title": {
     "message": "Створення проєкту"
   },
+  "create.project.type-label": {
+    "message": "Тип"
+  },
+  "create.project.type-project": {
+    "message": "Проєкт"
+  },
+  "create.project.type-server": {
+    "message": "Сервер"
+  },
   "create.project.url-label": {
     "message": "Посилання"
   },
   "create.project.visibility-description": {
     "message": "Видимість вашого проєкту після його затвердження."
-  },
-  "create.project.visibility-label": {
-    "message": "Видимість"
   },
   "create.project.visibility-private": {
     "message": "Приватно"
@@ -583,6 +664,9 @@
   },
   "dashboard.affiliate-links.create.button": {
     "message": "Створити партнерське посилання"
+  },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Партнерські коди не знайдено."
   },
   "dashboard.affiliate-links.error.title": {
     "message": "Помилка під час завантаження партнерських посилань"
@@ -602,17 +686,50 @@
   "dashboard.affiliate-links.search": {
     "message": "Пошук партнерських посилань…"
   },
+  "dashboard.analytics.from-projects": {
+    "message": "з {count} {count, plural, one {проєкту} few {проєктів} many {проєктів} other {проєктів}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Всього завантажень"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Всього підписались"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Створити нову"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Щоби почати, створіть свою першу добірку!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "У вас ще немає добірок"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Жодна добірка не відповідає вашому пошуку"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Спробуйте налаштувати фільтри або пошукові терміни."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} проєкт} few {{count} проєкти} other {{count} проєктів}}"
+    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Пошук у ваших добірках"
   },
   "dashboard.collections.long-title": {
     "message": "Ваші добірки"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Пошук добірок…"
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Назва (А-Я)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Нещодавно зробленні"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Нещодавно оновлені"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Завантажити {formType}"
@@ -779,14 +896,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
     "message": "З’єднайте свій рахунок PayPal, щоб отримувати платежі напряму."
   },
-  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
-    "message": "Зберегти"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Ім’я користувача Venmo збережено!"
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
-    "message": "Збережено"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Увійдіть за допомогою PayPal"
@@ -804,19 +915,10 @@
     "message": "Готово"
   },
   "dashboard.creator-withdraw-modal.stage.method-selection": {
-    "message": "Метод"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Деталі рахунка"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Підтвердження"
+    "message": "Спосіб"
   },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "Податкова форма"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Деталі"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
     "message": "Щоб зняти весь <b>{available}</b> доступний баланс, будь ласка, заповніть форму нижче. Це необхідно для податкової звітности та потрібно зробити лише один раз."
@@ -881,8 +983,173 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Ви використали свій ліміт зняття коштів <b>{withdrawLimit}</b>. Щоб зняти більше, вам потрібно заповнити податкову форму."
   },
+  "dashboard.head-title": {
+    "message": "Панель керування"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Ви не маєте непрочитаних сповіщень."
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Побачити всі"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Побачити історію сповіщень"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Побачити {extraNotifs} ще {extraNotifs, plural, one {повідомлення} few {повідомлень} many {повідомлень} other {повідомлень}}"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Створити організацію"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Зробіть організацію!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Не вдалося отримати організації"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {учасник} few {учасники} many {учасників} other {учасників}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Організації"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Позначити все як прочитано"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Побачити історію"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Ви не маєте будь-яких непрочитаних сповіщень."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Помилка завантаження сповіщень:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Історія"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Історія сповіщень"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Завантаження сповіщень…"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Ви можете редагувати кілька проєктів одночасно, вибравши їх нижче."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Проєкти сервера не підтримують масове редагування"
+  },
+  "dashboard.projects.empty": {
+    "message": "У вас ще немає проєктів. Натисніть зелену кнопку вище, щоб почати."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Проєкти"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "та ще {count}…"
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Очистити посилання"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Редагувати посилання"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Зміни буде застосовано до <strong>{count}</strong> {count, plural, one {проєкту} other {проєктів}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Будь-які посилання, які ви вкажете нижче, будуть перезаписані в кожному з вибраних проєктів. Усі поля, які ви залишите порожніми, будуть проігноровані. Ви можете видалити посилання з усіх вибраних проєктів за допомогою кнопки кошика."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Посилання для запрошення на ваш сервер Discord."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Запрошення до Discord"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Місце, де користувачі можуть повідомляти про помилки, проблеми та сумніви щодо вашого проєкту."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Система відстеження помилок"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Наявне посилання буде видалено"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Уведіть дійсне посилання запрошення до Discord"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Уведіть дійсне посилання"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Показати всі проєкти"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Сторінка/репозиторій, що містить вихідний код вашого проєкту"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Вихідний код"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Сторінка, що містить інформацію, документацію та допомогу для проєкту."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Сторінка вікі"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Масове редагування посилань вибраного проєкту."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Значок для {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Проєкт має повідомлення від модераторів. Перегляньте проєкт, щоб побачити більше."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Перегляньте метадані середовища"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Зростання"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Спадання"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Назва"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Статус"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Тип"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Значок"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Назва"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Статус"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Тип"
+  },
+  "dashboard.report.title": {
+    "message": "Скарга на {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Активні скарги"
+  },
+  "dashboard.reports.title": {
+    "message": "Звіти"
+  },
   "dashboard.revenue.available-now": {
-    "message": "Доступний зараз"
+    "message": "Наразі доступно"
   },
   "dashboard.revenue.balance": {
     "message": "Баланс"
@@ -897,7 +1164,7 @@
     "message": "Приблизно {date}"
   },
   "dashboard.revenue.processing": {
-    "message": "Обробка"
+    "message": "В обробці"
   },
   "dashboard.revenue.processing.tooltip": {
     "message": "Дохід залишається в обробці до кінця місяця, а потім стає доступним через 60 днів."
@@ -917,6 +1184,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Завантажити як CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Історія транзакцій"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Транзакції"
   },
@@ -926,8 +1196,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Ваші виплати та зняття коштів буде видно тут."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "За останній місяць"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "За цей місяць"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Переглянути всі"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Усі роки"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Ваші зняття тимчасово заблоковано, оскільки ваш TIN або SSN не збігаються із записами IRS. Зв’яжіться зі службою підтримки, щоб скинути та повторно надіслати податкову форму."
@@ -941,14 +1220,38 @@
   "dashboard.revenue.withdraw.header": {
     "message": "Зняти"
   },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Активні звіти"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Аналітика"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Творці"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Панель керування"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Сповіщення"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Організації"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Огляд"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Проєкти"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Дохід"
+  },
   "dashboard.withdraw.completion.account": {
     "message": "Рахунок"
   },
   "dashboard.withdraw.completion.amount": {
     "message": "Кількість"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Закрити"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Дата"
@@ -963,7 +1266,7 @@
     "message": "Комісія"
   },
   "dashboard.withdraw.completion.method": {
-    "message": "Метод"
+    "message": "Спосіб"
   },
   "dashboard.withdraw.completion.net-amount": {
     "message": "Фінальна сума"
@@ -1014,13 +1317,13 @@
     "message": "Надані вами банківські реквізити недійсні. Будь ласка, перевірте свою інформацію."
   },
   "dashboard.withdraw.error.invalid-bank.title": {
-    "message": "Недійсні банківські реквізити"
+    "message": "Хибні банківські реквізити"
   },
   "dashboard.withdraw.error.invalid-wallet.text": {
-    "message": "Вказана вами адреса криптогаманця недійсна. Будь ласка, перевірте ще раз і спробуйте ще раз."
+    "message": "Указана вами адреса криптогаманця недійсна. Будь ласка, перевірте ще раз і спробуйте ще раз."
   },
   "dashboard.withdraw.error.invalid-wallet.title": {
-    "message": "Недійсна адреса гаманця"
+    "message": "Хибна адреса гаманця"
   },
   "dashboard.withdraw.error.minimum-not-met.text": {
     "message": "Сума виведення (після комісій) не відповідає мінімальній вимозі. Будь ласка, збільште суму виведення."
@@ -1040,6 +1343,33 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Будь ласка, заповніть податкову форму"
   },
+  "discover.install.back-to-server": {
+    "message": "Повернутися до сервера"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Повернутися до налаштування"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Скасувати скидання"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Жоден світ сервера недоступний для встановлення."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Цей тип умісту не можна встановити на сервер із перегляду."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Вибір збірки для встановлення після скидання"
+  },
+  "discover.seo.description": {
+    "message": "Знаходьте та переглядайте тисячі {projectType, select, mod {модів} modpack {збірок} resourcepack {пакетів ресурсів} shader {шейдерів} plugin {плаґінів} datapack {пакетів даних} other {проєтів}} для Minecraft на Modrinth з миттєвим, точним результатом пошуку. Наші фільтри допоможуть швидко знайти найкращі {projectType, select, mod {моди} modpack {збірки} resourcepack {пакети ресурсів} shader {шейдери} plugin {плаґіни} datapack {пакети даних} other {проєкти}} для Minecraft."
+  },
+  "discover.seo.title": {
+    "message": "Знайти {projectType, select, mod {моди} modpack {збірки} resourcepack {пакети ресурсів} shader {шейдери} plugin {плаґіни} datapack {пакети даних} other {проєкти}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Знайти {projectType, select, mod {моди} modpack {збірки} resourcepack {пакети ресурсів} shader {шейдери} plugin {плаґіни} datapack {пакети даних} other {проєкти}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "Можливо, ви помилилися в посиланні на добірку."
   },
@@ -1054,6 +1384,12 @@
   },
   "error.collection.404.title": {
     "message": "Добірку не знайдено"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Зараз ви ввійшли як:"
+  },
+  "error.generic.401.title": {
+    "message": "Ви не маєте доступу до цієї сторінки"
   },
   "error.generic.404.subtitle": {
     "message": "Схоже, сторінки, яку ви шукаєте, не існує."
@@ -1133,20 +1469,221 @@
   "frog.altText": {
     "message": "Фотореалістична картина лабіринту для жаб"
   },
-  "frog.froggedPeople": {
-    "message": "Окрім вас, жабнули ще {count, plural, one {{count} людину} other {{count} людей}}!"
-  },
-  "frog.sinceOpened": {
-    "message": "Цю сторінку було відкрито {ago}"
-  },
   "frog.title": {
     "message": "Жаба"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Доступні в Північній Америці, Європі та Південно-Східній Азії для ширшого покриття."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Щомісячна плата"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Щоквартальна плата"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Заощаджуйте 16% завдяки щоквартальній платі!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Від {price} / місяць"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Щорічна плата"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Як працює короткочасне посилення потоків ЦП?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Коли ваш сервер перебуває під великим навантаженням, ми тимчасово надаємо йому доступ до додаткових потоків ЦП, щоб допомогти зменшити затримки й нестабільність. Це допомагає запобігти зниженню TPS нижче 20, утримуючи найплавніший досвід. Оскільки ці додаткові потоки ЦП доступні лише протягом короткого часу в періоди високого навантаження, вони можуть не відображатися у звітах Spark або інших інструментах профілювання."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "На яких ЦП працюють сервери Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Сервери Modrinth Hosting працюють на базі процесорів AMD Ryzen 7900 і 7950X3D з тактовою частотою понад 5 ГГц у поєднанні з пам’яттю DDR5."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "У якій валюті вказані ціни?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Усі ціни вказані в доларах США (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Чи мають сервери Modrinth Hosting захист від DDoS-атак?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Так. Усі сервери Modrinth Hosting оснащені захистом від DDoS-атак, а в деяких локаціях пропускна здатність досягає 17 Тбіт/с."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Часті питання"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Наскільки швидкими є сервери Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Сервери Modrinth Hosting працюють на дуже сучасному високопродуктивному обладнанні, але важко сказати, як саме це вплине на швидкість роботи вашого сервера, оскільки на неї впливає безліч факторів, таких як моди, пакети даних або плаґіни, які ви використовуєте на своєму сервері, і навіть поводження гравців."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "Більшість проблем з продуктивністю, як правило, є наслідком неоптимізованої збірки, мода, пакета даних або плаґіна, що спричиняє затримку роботи сервера. Оскільки наші сервери є дуже потужними, ви не повинні мати особливих проблем, якщо виберете відповідний тарифний план для вмісту, який ви запускаєте на сервері."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Чи можна збільшити обсяг пам’яті на сервері?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Так, обсяг пам’яті на вашому сервері можна збільшити без додаткових витрат. Якщо вам потрібно більше пам’яті — зверніться до підтримки Modrinth."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Де розташовані сервери Modrinth Hosting? Чи зможу я вибрати регіон?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Наразі ми маємо сервери в Північній Америці, Європі та Південно-Східній Азії — ви зможете вибрати одну з цих локацій під час покупки. У майбутньому з’являться й інші регіони! Якщо ви хочете змінити регіон — зверніться до підтримки."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Які версії Minecraft і завантажувачі модів можна використовувати?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Сервери Modrinth Hosting можуть працювати з будь-якою версією Minecraft: Java Edition, починаючи з версії 1.2.5, зокрема зі знімками версій."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Ми також підтримуємо широкий спектр завантажувачів модів і плаґінів, таких як Fabric, Quilt, Forge і NeoForge для модів, а також Paper і Purpur для плаґінів. Доступність залежить від того, чи підтримує завантажувач модів або плаґінів вибрану вами версію Minecraft."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Розпочати"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Керувати своїми серверами"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Запустити новий сервер"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Запустити свій сервер"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Оберіть Modrinth Hosting для свого наступного сервера"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting — це найпростіший спосіб запустити власний сервер Minecraft: Java Edition. Без проблем установлюйте та грайте у свої улюблені моди та збірки, і все це на платформі Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Просунуте керування мережею"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Додайте власний домен до свого сервера, зарезервуйте до 15 портів для модів, які їх потребують та багато іншого."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Резервні копії включено"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Кожен сервер має 15 резервних копій, які надійно зберігаються окремо від нього."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Користувацьке посилання"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Діліться своїм сервером за допомогою власного посилання <contrast>modrinth.gg</contrast>."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Кожен сервер оснащений набором функцій, розроблених для такого досвіду утримування сервера, який може запропонувати лише Modrinth."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Простий у використанні файловий менеджер"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Легко знаходьте, керуйте, редагуйте та вивантажуйте файли безпосередньо на свій сервер."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Має всі необхідні вам функції."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Допомога, коли вона потрібна"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Зверніться до команди Modrinth за допомогою з вашим сервером у будь-який час."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Потужна консоль, менеджер властивостей сервера й багато іншого"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting пропонує потужні інструменти для керування вашим сервером."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "Доступ з SFTP"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Отримуйте прямий доступ до файлів вашого сервера з SFTP, вбудованого в Modrinth Hosting."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Включено до вашого сервера"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Знаєте, що саме вам потрібно?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Отримайте безплатний <orange>сервер із 3 ГБ</orange> на 5 днів через <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Дізнатися більше"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Тимчасова пропозиція. Банківська картка не потрібна. Доступно для серверів у США."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Виберіть індивідуальний план із необхідними вам характеристиками."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Ми маємо сервери для всіх"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Керуйте всім на Modrinth"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Ваш сервер, моди, гравці тощо — все це знаходиться на Modrinth. Нема потреби переходити між платформами."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Постійно швидкий"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Наша інфраструктура ніколи не перевантажується, тобто кожен сервер, запущений на Modrinth, завжди працює на повну потужність."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Вибирайте із тисяч збірок на Modrinth або створіть свою. Запросіть друзів, коли будете готові грати."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Знайдіть збірку. Тепер це сервер."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Відчуйте сучасний, надійний хостинг"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Сервери Modrinth Hosting працюють на <contrast>високопродуктивних процесорах AMD з оперативною пам’яттю DDR5</contrast> і працюють на власному програмному забезпеченні, що забезпечує безперебійну роботу вашого сервера."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Грайте там, де всі ваші моди"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting органічно інтегрує процес установлення модів та збірок на ваш сервер."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Чому Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Усі ваші улюблені моди"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Вибирайте між ванільною грою, Fabric, Forge, Quilt і NeoForge. Якщо воно є Modrinth — значить воно працюватиме на вашому сервері."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Немає в наявності"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Вибрати план"
   },
   "landing.button.discover-mods": {
     "message": "Дослідити моди"
   },
   "landing.button.go-to-dashboard": {
-    "message": "До панелі керування"
+    "message": "Перейти до Панелі керування"
   },
   "landing.creator.feature.constantly-evolving.description": {
     "message": "Отримуйте найкращий можливий досвід створення модів завдяки постійним оновленням від команди Modrinth"
@@ -1253,15 +1790,6 @@
   "landing.notifications.version-released": {
     "message": "Версію {version} було випущено для {gameVersion}"
   },
-  "landing.search.label": {
-    "message": "Пошук"
-  },
-  "landing.search.placeholder": {
-    "message": "Пошук…"
-  },
-  "landing.search.sort-by.label": {
-    "message": "Сортувати за"
-  },
   "landing.section.for-creators.description": {
     "message": "Створіть свою домівку для своїх творінь та охоплюйте величезну авдиторію відданих гравців."
   },
@@ -1278,7 +1806,7 @@
     "message": "Для гравців"
   },
   "landing.section.for-players.tagline": {
-    "message": "Відкрийте для себе понад {count} творінь"
+    "message": "Відкрийте для себе понад {count, number} творінь"
   },
   "landing.subheading": {
     "message": "Досліджуйте, грайте, та діліться вмістом Minecraft через нашу платформу з відкритим кодом, розроблену для спільноти."
@@ -1288,6 +1816,9 @@
   },
   "layout.action.create-new": {
     "message": "Створити новий…"
+  },
+  "layout.action.external-projects": {
+    "message": "Зовнішні проєкти"
   },
   "layout.action.file-lookup": {
     "message": "Пошук файлів"
@@ -1310,6 +1841,12 @@
   "layout.action.new-project": {
     "message": "Новий проєкт"
   },
+  "layout.action.new-server-project": {
+    "message": "Новий сервер"
+  },
+  "layout.action.publish": {
+    "message": "Опублікувати"
+  },
   "layout.action.reports": {
     "message": "Перегляд звітів"
   },
@@ -1331,14 +1868,20 @@
   "layout.banner.add-email.description": {
     "message": "З міркувань безпеки, Modrinth вимагає, щоб ви зареєстрували адресу електронної пошти у своєму обліковому записі."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Завжди ігнорувати"
+  },
   "layout.banner.build-fail.description": {
     "message": "Ця установка frontend Modrinth не змогла згенерувати стан з API. Це може бути пов’язано з перебоєм у роботі або помилкою в налаштуваннях. Перебудуйте, коли API буде доступний. Коди помилок: {errors}; Поточна URL-адреса API: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Ігнорувати"
   },
   "layout.banner.build-fail.title": {
     "message": "Помилка під час створення стану з API під час побудови."
   },
   "layout.banner.preview.description": {
-    "message": "Якщо ви хотіли перейти на офіційний вебсайт Modrinth, відвідайте <link>https://modrinth.com</link>. Цей попередній перегляд розгортки використовується співробітниками Modrinth для тестування. Він був створений з <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Якщо ви хочете отримати доступ до офіційного сайту Modrinth, відвідайте {url}. Це розгортання попереднього перегляду використовується персоналом Modrinth для тестування. Він був створений за допомогою <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "Це попередній перегляд розгортки вебсайту Modrinth."
@@ -1362,7 +1905,7 @@
     "message": "Заповніть податкову форму"
   },
   "layout.banner.tax.description": {
-    "message": "Ви вже вивели більше ніж $600 з Modrinth цього року. Щоб дотримуватися податкових зобов’язань, ви маєте заповнити податкову форму. Ваші виведення затримані, доки ця форма не буде заповнена."
+    "message": "Ви вже вивели більше ніж {threshold} з Modrinth цього року. Щоб дотримуватися податкових зобов’язань, ви маєте заповнити податкову форму. Ваші виведення затримані, доки ця форма не буде заповнена."
   },
   "layout.banner.tax.title": {
     "message": "Вимагано податкову форму"
@@ -1487,17 +2030,11 @@
   "layout.nav.active-reports": {
     "message": "Активні скарги"
   },
-  "layout.nav.analytics": {
-    "message": "Аналітика"
-  },
   "layout.nav.discover": {
     "message": "Дослідити"
   },
   "layout.nav.discover-content": {
-    "message": "Шукати вміст"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Спеціальні функції"
+    "message": "Дослідити вміст"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Установити Modrinth App"
@@ -1538,11 +2075,11 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Оновитись до Modrinth+"
   },
-  "moderation.filter.by": {
-    "message": "Фільтрувати за"
-  },
   "moderation.moderate": {
     "message": "Проглядати"
+  },
+  "moderation.page.external-projects": {
+    "message": "Зовнішні проєкти"
   },
   "moderation.page.projects": {
     "message": "Проєкти"
@@ -1552,12 +2089,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Технічний огляд"
-  },
-  "moderation.search.placeholder": {
-    "message": "Пошук…"
-  },
-  "moderation.sort.by": {
-    "message": "Сортувати за"
   },
   "muralpay.account-type.checking": {
     "message": "Перевірка"
@@ -1652,9 +2183,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Номер рахунку"
   },
-  "muralpay.field.branch-code": {
-    "message": "Код відділення"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1684,6 +2212,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Телефон PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Випадковий ключ"
   },
   "muralpay.field.routing-number": {
     "message": "Номер маршруту"
@@ -1745,9 +2276,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Уведіть номер рахунку"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Уведіть код відділення"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Уведіть 18-значний CLABE"
   },
@@ -1759,6 +2287,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Уведіть електронну адресу PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Уведіть випадковий ключ"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Введіть 9-значний маршрутний номер"
@@ -1886,17 +2417,11 @@
   "profile.label.collection": {
     "message": "Добірка"
   },
-  "profile.label.details": {
-    "message": "Деталі"
-  },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, many {завантажень} other {завантаження}}"
+    "message": "{count} {countPlural, plural, one {завантаження} few {завантаження} many {завантажень} other {завантажень}}"
   },
   "profile.label.joined": {
     "message": "Приєднався"
-  },
-  "profile.label.no": {
-    "message": "Ні"
   },
   "profile.label.no-collections": {
     "message": "У цього користувача немає добірок!"
@@ -1914,13 +2439,10 @@
     "message": "Організації"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
+    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
   },
   "profile.label.saving": {
     "message": "Збереження…"
-  },
-  "profile.label.yes": {
-    "message": "Так"
   },
   "profile.meta.description": {
     "message": "Завантажте проєкти {username} на Modrinth"
@@ -1929,19 +2451,10 @@
     "message": "{bio} — Завантажуйте проєкти {username} на Modrinth"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> підписник} few {<stat>{count}</stat> підписника} other {<stat>{count}</stat> підписників}}"
+    "message": "{count, plural, one {<stat>{count}</stat> відстежує} few {<stat>{count}</stat> відстежує} other {<stat>{count}</stat> відстежують}}"
   },
   "profile.user-id": {
     "message": "ID користувача: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Прийняти"
-  },
-  "project-member-header.decline": {
-    "message": "Відхилити"
-  },
-  "project-member-header.error": {
-    "message": "Помилка"
   },
   "project-member-header.error-decline": {
     "message": "Не вдалося відхилити запрошення до команди"
@@ -1957,9 +2470,6 @@
   },
   "project-member-header.invitation-with-role": {
     "message": "Ви були запрошені стати учасником цього проєкту з роллю «{role}»."
-  },
-  "project-member-header.success": {
-    "message": "Успіх"
   },
   "project-member-header.success-decline": {
     "message": "Ви відхилили запрошення в команду"
@@ -2012,6 +2522,12 @@
   "project-type.datapack.singular": {
     "message": "Пакет даних"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Сервери"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Сервер"
+  },
   "project-type.mod.plural": {
     "message": "Моди"
   },
@@ -2042,6 +2558,12 @@
   "project-type.resourcepack.singular": {
     "message": "Пакет ресурсів"
   },
+  "project-type.server.plural": {
+    "message": "Сервери"
+  },
+  "project-type.server.singular": {
+    "message": "Сервер"
+  },
   "project-type.shader.plural": {
     "message": "Шейдери"
   },
@@ -2058,7 +2580,7 @@
     "message": "Опубліковано {date}"
   },
   "project.about.details.submitted": {
-    "message": "Підтверджено {date}"
+    "message": "Подано на розгляд {date}"
   },
   "project.about.details.title": {
     "message": "Деталі"
@@ -2189,6 +2711,84 @@
   "project.license.title": {
     "message": "Ліцензія"
   },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Ваш проєкт є приватним, тобто доступ до нього маєте лише ви та запрошені вами люди."
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Ваш проєкт опубліковано та доступний для виявлення на Modrinth."
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Ваш проєкт є приватним, тобто доступ до нього можливий лише за прямим посиланням і його неможливо знайти на Modrinth."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "Ви можете змінити видимість свого проєкту в <visibility-settings-link>параметрах видимости</visibility-settings-link> проєкту."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Проєкт затверджено"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "Це чернетка проєкту, яку інші не можуть побачити, доки не буде передано на перевірку та схвалено командою модераторів Modrinth."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Чернетка проєкту"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Після того, як ви виконали всі необхідні кроки та переконалися, що ваш проєкт відповідає <rules-link>правилам умісту</rules-link> Modrinth, ви можете подати свій проєкт на перевірку."
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "Будь ласка, розв'яжіть усі проблеми модерації, включно з будь-якими проблемами, переліченими в повідомленнях нижче, перш ніж повторно подавати цей проєкт."
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Запитані зміни"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "Повторне надсилання проєкту без попереднього розв'язання всіх питань модерації може призвести до призупинення облікового запису."
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Ваш проєкт знаходиться в черзі на розгляд командою модераторів Modrinth."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Ваш проєкт буде просканувати, а потім переглянуто модераторами, щоб переконатися, що він відповідає <rules-link>Правилам умісту</rules-link> та <terms-link>Умовам використання</terms-link>."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "Ви все ще можете змінити свій проєкт, це не вплине на вашу позицію в черзі."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Ми прагнемо розглядати подання протягом 24–48 годин, але деякі проєкти можуть затримуватися. Це не свідчить про проблему з вашим поданням."
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>Ми цінуємо ваше терпіння, поки наші модератори наполегливо працюють над безпекою Modrinth, і сподіваємося допомогти вам поділитися своїм умістом! 💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Проєкт на розгляді"
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "Ваш проєкт не буде відкритим для всіх, доступ до нього можна отримати лише за прямим посиланням.{requestedStatus, select, unlisted { На основі ваних вибраних <visibility-settings-link>налаштування видимости</visibility-settings-link>, швидше за все, ніяких дій робити не потрібно.} other { Будь ласка, розв'яжіть усі проблеми модерації, включно з будь-якими проблемами, переліченими в повідомленнях нижче, перш ніж повторно надсилати цей проєкт.}}"
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "Команда зробила поза списком"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Не авторизовано"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "Ця тема активно не відстежується, але за потреби її можна переглянути для отримання інформації про ваш проєкт."
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "Модератори вмісту не можуть надати підтримку з більшости проблем, а повідомлення в цій темі не сповіщають персонал."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "Якщо вам потрібна допомога або у вас є додаткові запитання, відвідайте <help-center-link>довідковий центр Modrinth</help-center-link> і натисніть синю підказку, щоб зв’язатися зі службою підтримки."
+  },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "Показати інтерфейс учасника"
+  },
+  "project.moderation.thread.private-description": {
+    "message": "Це тема приватної розмови з модераторами Modrinth. Вони можуть надіслати вам повідомлення про проблеми щодо цього проєкту."
+  },
+  "project.moderation.thread.title": {
+    "message": "Повідомлення модерації"
+  },
   "project.moderation.title": {
     "message": "Модерація"
   },
@@ -2252,6 +2852,45 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Будь ласка, надайте підтвердження того, що ви маєте дозвіл на повторне розповсюдження всіх наведених нижче файлів, і будь-які приховані версії буде автоматично опубліковано."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Будь ласка, надайте підтвердження того, що у вас є дозвіл на повторне розповсюдження всіх наведених нижче файлів, перш ніж ви зможете подати свій проєкт на розгляд."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Невідомий убудований уміст"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Весь зовнішній вміст має посилання на авторство."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Авторство завершено!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Жодна з ваших версій не містить зовнішнього вмісту, тому вам не потрібно турбуватися про отримання дозволів."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Усе готово!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Ви не маєте дозволу на повторне розповсюдження зовнішнього вмісту, який ви додали. Щоб опублікувати на Modrinth, видаліть правопорушний вміст."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Деякий уміст не можна включити"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Якщо ви додаєте вміст, який не розміщено на Modrinth, вам потрібно повідомити нам, звідки він походить, і підтвердити, що у вас є дозвіл на розповсюдження файлів. Перегляньте <link>наш посібник</link>, щоб дізнатися, як це зробити правильно!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Дізнайтеся, як працює авторство"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Дізнатися більше"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Пошук {count} {count, plural, one {зовнішнього проєкту} few {зовнішніх проєктів} many {зовнішніх проєктів} other {зовнішніх проєктів}}…"
+  },
   "project.settings.title": {
     "message": "Налаштування"
   },
@@ -2262,7 +2901,7 @@
     "message": "завантажен{count, plural, one {ня} few {ня} other {ь}}"
   },
   "project.stats.followers-label": {
-    "message": "підписник{count, plural, one {} few {и} other {ів}}"
+    "message": "відстежу{count, plural, one {є} few {є} other {ють}}"
   },
   "project.status.archived.message": {
     "message": "«{title}» було архівовано. «{title}» не отримуватиме подальших оновлень допоки автор не вирішить розархівувати проєкт."
@@ -2270,14 +2909,23 @@
   "project.versions.title": {
     "message": "Версії"
   },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Ця версія} few {Ці версії} many {Ці версії} other {Ці версії}} наразі наразі утримано та поза списком. Будь ласка, надайте підтвердження того, що ви маєте дозвіл на повторне розповсюдження певних файлів, які входять до {count, plural, one {версії} few {версій} many {версій} other {версій}} збірки."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Розв'язати"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Версія{version_name}} other {Версії}} утримано через невідомий убудований уміст"
+  },
   "report.already-reported": {
     "message": "Ви вже повідомляли про «{title}»"
   },
   "report.already-reported-description": {
-    "message": "Ви вже відкрили скаргу на {item}. Ви можете додати більше деталей до вашої скарги, якщо ви маєте більше інформації щоб додати."
+    "message": "У вас уже є відкрита скарга на {item, select, project {цей проєкт} version {цю версію} user {цього користувача} other {цей вміст}}. Ви можете додати більше деталей до своєї скарги, якщо у вас є подробиці."
   },
   "report.back-to-item": {
-    "message": "Повернутися до {item}"
+    "message": "Повернутися до {item, select, project {проєкта} version {версії} user {користувача} other {вмісту}}"
   },
   "report.body.description": {
     "message": "За можливости додавайте посилання і зображення, якщо це доречно. Порожні або недостатні скарги буде закрито й проігноровано."
@@ -2286,10 +2934,10 @@
     "message": "Будь ласка, надайте більше деталей про вашу скаргу"
   },
   "report.checking": {
-    "message": "Перевірка {item}…"
+    "message": "Перевірка {item, select, project {проєкта} version {версії} user {користувача} other {вмісту}}…"
   },
   "report.could-not-find": {
-    "message": "Не вдалося знайти {item}"
+    "message": "Не вдалося знайти {item, select, project {проєкт} version {версію} user {користувача} other {вміст}}"
   },
   "report.for.violation": {
     "message": "Порушення <rules-link>Правил</rules-link> або <terms-link>Умов використання</terms-link> Modrinth"
@@ -2331,13 +2979,13 @@
     "message": "Можна скаржитись на:"
   },
   "report.question.content-id": {
-    "message": "Який ID у {item}?"
+    "message": "Який ID у {item, select, project {проєкта} version {версії} user {користувача} other {вмісту}}?"
   },
   "report.question.content-type": {
     "message": "Який тип умісту ви оскаржуєте?"
   },
   "report.question.report-reason": {
-    "message": "Яке саме правило Modrinth порушує {item}?"
+    "message": "Яке з правил Modrinth порушує {item, select, project {цей проєкт} version {ця версія} user {цей користувач} other {цей вміст}}?"
   },
   "report.report-content": {
     "message": "Повідомити модераторів про вміст"
@@ -2352,157 +3000,193 @@
     "message": "Доступ до ваших аналітичних даних"
   },
   "scopes.analytics.label": {
-    "message": "Див. аналітику"
+    "message": "Переглядати аналітику"
+  },
+  "scopes.category.analytics": {
+    "message": "Аналітика"
+  },
+  "scopes.category.collections": {
+    "message": "Добірки"
+  },
+  "scopes.category.notifications": {
+    "message": "Сповіщення"
+  },
+  "scopes.category.organizations": {
+    "message": "Організації"
+  },
+  "scopes.category.pats": {
+    "message": "Особисті токени доступу"
+  },
+  "scopes.category.payouts": {
+    "message": "Виплати"
+  },
+  "scopes.category.projects": {
+    "message": "Проєкти"
+  },
+  "scopes.category.reports": {
+    "message": "Скарги"
+  },
+  "scopes.category.sessions": {
+    "message": "Сеанси"
+  },
+  "scopes.category.threads": {
+    "message": "Гілки модерації"
+  },
+  "scopes.category.user-account": {
+    "message": "Облікові записи"
+  },
+  "scopes.category.versions": {
+    "message": "Версії"
   },
   "scopes.collectionCreate.description": {
     "message": "Створювати добірки"
   },
   "scopes.collectionCreate.label": {
-    "message": "Створ. добірки"
+    "message": "Створювати добірки"
   },
   "scopes.collectionDelete.description": {
     "message": "Видаляти добірки"
   },
   "scopes.collectionDelete.label": {
-    "message": "Вид. добірки"
+    "message": "Видаляти добірки"
   },
   "scopes.collectionRead.description": {
     "message": "Переглядати добірки"
   },
   "scopes.collectionRead.label": {
-    "message": "Див. добірки"
+    "message": "Переглядати добірки"
   },
   "scopes.collectionWrite.description": {
     "message": "Редагувати добірки"
   },
   "scopes.collectionWrite.label": {
-    "message": "Ред. добірки"
+    "message": "Редагувати добірки"
   },
   "scopes.notificationRead.description": {
     "message": "Переглядати ваші сповіщення"
   },
   "scopes.notificationRead.label": {
-    "message": "Див. сповіщення"
+    "message": "Переглядати сповіщення"
   },
   "scopes.notificationWrite.description": {
     "message": "Видаляти/переглядати ваші сповіщення"
   },
   "scopes.notificationWrite.label": {
-    "message": "Ред. сповіщення"
+    "message": "Редагувати сповіщення"
   },
   "scopes.organizationCreate.description": {
     "message": "Створювати організації"
   },
   "scopes.organizationCreate.label": {
-    "message": "Створ. організації"
+    "message": "Створювати організації"
   },
   "scopes.organizationDelete.description": {
     "message": "Видаляти організації"
   },
   "scopes.organizationDelete.label": {
-    "message": "Вид. організації"
+    "message": "Видаляти організації"
   },
   "scopes.organizationRead.description": {
     "message": "Переглядати організації"
   },
   "scopes.organizationRead.label": {
-    "message": "Див. організації"
+    "message": "Переглядати організації"
   },
   "scopes.organizationWrite.description": {
     "message": "Редагувати організації"
   },
   "scopes.organizationWrite.label": {
-    "message": "Ред. організації"
+    "message": "Редагувати організації"
   },
   "scopes.patCreate.description": {
-    "message": "Створювати персональні API-токени"
+    "message": "Створювати особисті API-токени"
   },
   "scopes.patCreate.label": {
-    "message": "Створ. PAT’и"
+    "message": "Створювати токени доступу"
   },
   "scopes.patDelete.description": {
-    "message": "Видаляти ваші персональні API-токени"
+    "message": "Видаляти ваші особисті API-токени"
   },
   "scopes.patDelete.label": {
-    "message": "Вид. PAT’и"
+    "message": "Видаляти токени доступу"
   },
   "scopes.patRead.description": {
     "message": "Переглядати створені API-токени"
   },
   "scopes.patRead.label": {
-    "message": "Див. PAT’и"
+    "message": "Дивитися токени доступу"
   },
   "scopes.patWrite.description": {
-    "message": "Змінювати персональні API-токени"
+    "message": "Змінювати особисті API-токени"
   },
   "scopes.patWrite.label": {
-    "message": "Ред. PAT’и"
+    "message": "Редагувати токени доступу"
   },
   "scopes.payoutsRead.description": {
     "message": "Переглядати ваші дані про виплати"
   },
   "scopes.payoutsRead.label": {
-    "message": "Див. виплати"
+    "message": "Переглядати виплати"
   },
   "scopes.payoutsWrite.description": {
     "message": "Виводити кошти"
   },
   "scopes.payoutsWrite.label": {
-    "message": "Ред. виплати"
+    "message": "Редагувати виплати"
   },
   "scopes.performAnalytics.description": {
     "message": "Виконувати дії з аналітикою"
   },
   "scopes.performAnalytics.label": {
-    "message": "Управ. аналітикою"
+    "message": "Управляти аналітикою"
   },
   "scopes.projectCreate.description": {
     "message": "Створювати нові проєкти"
   },
   "scopes.projectCreate.label": {
-    "message": "Створ. проєкти"
+    "message": "Створювати проєкти"
   },
   "scopes.projectDelete.description": {
     "message": "Видалення ваших проєктів"
   },
   "scopes.projectDelete.label": {
-    "message": "Вид. проєкти"
+    "message": "Видаляти проєкти"
   },
   "scopes.projectRead.description": {
     "message": "Переглядати всі ваші проєкти"
   },
   "scopes.projectRead.label": {
-    "message": "Див. проєкти"
+    "message": "Переглядати проєкти"
   },
   "scopes.projectWrite.description": {
     "message": "Редагувати дані проєкту"
   },
   "scopes.projectWrite.label": {
-    "message": "Ред. проєкти"
+    "message": "Редагувати проєкти"
   },
   "scopes.reportCreate.description": {
     "message": "Створювати скарги"
   },
   "scopes.reportCreate.label": {
-    "message": "Створ. скарги"
+    "message": "Створювати скарги"
   },
   "scopes.reportDelete.description": {
     "message": "Видаляти скарги"
   },
   "scopes.reportDelete.label": {
-    "message": "Вид. скарги"
+    "message": "Видаляти скарги"
   },
   "scopes.reportRead.description": {
     "message": "Переглядати скарги"
   },
   "scopes.reportRead.label": {
-    "message": "Див. скарги"
+    "message": "Переглядати скарги"
   },
   "scopes.reportWrite.description": {
     "message": "Редагувати скарги"
   },
   "scopes.reportWrite.label": {
-    "message": "Ред. скарги"
+    "message": "Редагувати скарги"
   },
   "scopes.sessionAccess.description": {
     "message": "Доступ до сесій, створених Modrinth"
@@ -2514,79 +3198,82 @@
     "message": "Видаляти сесії"
   },
   "scopes.sessionDelete.label": {
-    "message": "Вид. сесії"
+    "message": "Видаляти сесії"
   },
   "scopes.sessionRead.description": {
     "message": "Переглядати активні сесії"
   },
   "scopes.sessionRead.label": {
-    "message": "Див. сесії"
+    "message": "Переглядати сесії"
   },
   "scopes.threadRead.description": {
     "message": "Переглядати гілки"
   },
   "scopes.threadRead.label": {
-    "message": "Див. гілки"
+    "message": "Переглядати гілки"
   },
   "scopes.threadWrite.description": {
     "message": "Редагувати гілки"
   },
   "scopes.threadWrite.label": {
-    "message": "Ред. гілки"
+    "message": "Редагувати гілки"
   },
   "scopes.userAuthWrite.description": {
     "message": "Змінювати ваші автентифікаційні дані"
   },
   "scopes.userAuthWrite.label": {
-    "message": "Ред. дані входу"
+    "message": "Редагувати дані входу"
   },
   "scopes.userDelete.description": {
     "message": "Видаляти ваш обліковий запис"
   },
   "scopes.userDelete.label": {
-    "message": "Вид. обліковий запис"
+    "message": "Видаляти обліковий запис"
   },
   "scopes.userRead.description": {
     "message": "Доступ до публічної інформації вашого профілю"
   },
   "scopes.userRead.label": {
-    "message": "Див. дані користувача"
+    "message": "Переглядати дані користувача"
   },
   "scopes.userReadEmail.description": {
     "message": "Переглядати адресу вашої ел. пошти"
   },
   "scopes.userReadEmail.label": {
-    "message": "Дав. адресу ел. пошти"
+    "message": "Переглядати адресу ел. пошти"
   },
   "scopes.userWrite.description": {
     "message": "Редагувати ваш профіль"
   },
   "scopes.userWrite.label": {
-    "message": "Ред. дані користувача"
+    "message": "Редагувати дані користувача"
   },
   "scopes.versionCreate.description": {
     "message": "Створювати нові версії"
   },
   "scopes.versionCreate.label": {
-    "message": "Створ. версії"
+    "message": "Створити версії"
   },
   "scopes.versionDelete.description": {
     "message": "Видаляти версію"
   },
   "scopes.versionDelete.label": {
-    "message": "Вид. версії"
+    "message": "Видаляти версії"
   },
   "scopes.versionRead.description": {
     "message": "Переглядати всі версії"
   },
   "scopes.versionRead.label": {
-    "message": "Див. версії"
+    "message": "Переглядати версії"
   },
   "scopes.versionWrite.description": {
     "message": "Редагувати дані версії"
   },
   "scopes.versionWrite.label": {
-    "message": "Ред. версії"
+    "message": "Редагувати версії"
+  },
+  "search.filter.game-version-shader-message": {
+    "message": "Пакети шейдерів для старіших версій, швидше за все, працюватимуть на нових версіях з незначними проблемами."
   },
   "search.filter.locked.server": {
     "message": "Надано сервером"
@@ -2600,8 +3287,8 @@
   "search.filter.locked.server.sync": {
     "message": "Синхронізувати з сервером"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Відновлення резервної копії триває"
+  "servers.manage.content.title": {
+    "message": "Уміст — {serverName} — Modrinth"
   },
   "servers.notice.actions": {
     "message": "Дії"
@@ -2631,22 +3318,400 @@
     "message": "Немає приміток"
   },
   "servers.plan.large.description": {
-    "message": "Ідеально підходить для 15–25 гравців, збірок або великої кількости модів."
-  },
-  "servers.plan.large.name": {
-    "message": "Великий"
+    "message": "Ідеально підходить для 15–25 гравців, збірок або важких модів."
   },
   "servers.plan.medium.description": {
     "message": "Чудово підходить для 6–15 гравців та кількох модів."
   },
-  "servers.plan.medium.name": {
-    "message": "Середній"
-  },
   "servers.plan.small.description": {
     "message": "Прекрасно підходить для 1–5 друзів із кількома легкими модами."
   },
-  "servers.plan.small.name": {
-    "message": "Малий"
+  "settings.account.button.complete-setup": {
+    "message": "Завершити налаштування"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "Завантажити дані облікового запису"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "Створити файл експорту"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "Створення файлу експорту…"
+  },
+  "settings.account.data-export.description": {
+    "message": "Запросіть копіювання всіх ваших персональних даних, які ви завантажили на Modrinth. Це може зайняти деякий час."
+  },
+  "settings.account.data-export.title": {
+    "message": "Експорт даних"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "Це **негайно видалить усі ваші дані й відстежування**, але не видалить ваші проєкти. Видалення облікового запису не можна скасувати.<br><br>Якщо вам потрібна допомога з обліковим записом, зверніться до підтримки на [сервері Modrinth у Discord](https://discord.modrinth.com)."
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "Видалити обліковий запис"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Ви впевнені що хочете видалити обліковий запис?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Видалити обліковий запис"
+  },
+  "settings.account.delete.section.description": {
+    "message": "Після видалення облікового запису шлях назад буде закритий. Видалення облікового запису призведе до вилучення з наших серверів усіх пов’язаних із ним даних, за винятком проєктів."
+  },
+  "settings.account.delete.section.title": {
+    "message": "Видалення облікового запису"
+  },
+  "settings.account.email.action.save": {
+    "message": "Зберегти електронну пошту"
+  },
+  "settings.account.email.field.label": {
+    "message": "Електронна пошта"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Уведіть електронну пошту…"
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Додати електронну пошту"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Змінити електронну пошту"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "Інформація про ваш обліковий запис не є публічною."
+  },
+  "settings.account.password.action.remove": {
+    "message": "Прибрати пароль"
+  },
+  "settings.account.password.action.save": {
+    "message": "Зберегти пароль"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "Паролі не збігаються!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Будь ласка, введіть ваш пароль, щоб продовжити."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Підтвердження паролю"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Підтвердьте пароль"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Підтвердження нового паролю"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Підтвердьте новий пароль"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Новий пароль"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Новий пароль"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Старий пароль"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Старий пароль"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Додати пароль"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Змінити пароль"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Прибрати пароль"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Додати"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "Сервіси входу"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Дії"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Сервіс"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Додати електронну пошту"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Змінити електронну пошту"
+  },
+  "settings.account.security.email.description": {
+    "message": "Змініть електронну пошту, пов’язану з вашим обліковим записом."
+  },
+  "settings.account.security.email.title": {
+    "message": "Електронна пошта"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Додати пароль"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Змінити пароль"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "Змініть пароль для входу в ваш обліковий запис."
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "Змініть або приберіть пароль для входу в ваш обліковий запис."
+  },
+  "settings.account.security.password.description.set": {
+    "message": "Установіть постійний пароль для входу в ваш обліковий запис."
+  },
+  "settings.account.security.password.title": {
+    "message": "Пароль"
+  },
+  "settings.account.security.providers.action.manage": {
+    "message": "Керувати сервісами"
+  },
+  "settings.account.security.providers.description": {
+    "message": "Додайте або приберіть способи входу для вашого облікового запису, зокрема GitHub, GitLab, Microsoft, Discord, Steam і Google."
+  },
+  "settings.account.security.providers.title": {
+    "message": "Керування сервісами входу"
+  },
+  "settings.account.security.title": {
+    "message": "Безпека облікового запису"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "Прибрати двофакторну автентифікацію"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "Установити двофакторну автентифікацію"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "Додайте додатковий рівень захисту для свого облікового запису під час входу."
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "Двофакторна автентифікація"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "Завантажте ці резервні коди й збережіть їх у безпечному місці. Ви зможете використовувати їх замість коду двофакторної автентифікації, якщо раптом втратите доступ до свого пристрою! Ці коди слід зберігати так само ретельно, як і свій пароль."
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "Кожен резервний код можна використати лише раз."
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "Указаний код неправильний!"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Будь ласка, укажіть код двофакторної автентифікації, щоб продовжити."
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "Укажіть код двофакторної автентифікації"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "Укажіть код…"
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "Двофакторна автентифікація забезпечує безпеку вашого облікового запису, вимагаючи для входу доступ до другого пристрою."
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "Якщо QR-код не сканується, ви можете ввести код вручну:"
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "Для початку, проскануйте QR-код за допомогою <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> або будь-якого іншого застосунку для двофакторної автентифікації."
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "Укажіть одноразовий код із застосунку, щоб підтвердити доступ."
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Код підтвердження"
+  },
+  "settings.applications.about": {
+    "message": "Про застосунок"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Додати більше"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Додати переадресацію URI"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Скасувати"
+  },
+  "settings.applications.button.create": {
+    "message": "Створити застосунок"
+  },
+  "settings.applications.button.delete": {
+    "message": "Видалити"
+  },
+  "settings.applications.button.edit": {
+    "message": "Редагувати"
+  },
+  "settings.applications.button.new": {
+    "message": "Новий застосунок"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Зберегти зміни"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Завантажити значок"
+  },
+  "settings.applications.client-id": {
+    "message": "Клієнтський ідентифікатор"
+  },
+  "settings.applications.client-secret": {
+    "message": "Клієнтський секрет"
+  },
+  "settings.applications.created-on": {
+    "message": "Створено {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Видалити цей застосунок"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Це призведе до остаточного видалення цього застосунку і відкликання всіх токенів доступу. (Назавжди!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Ви впевнені, що хочете видалити цей застосунок?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Застосунки можна використовувати для автентифікації користувачів Modrinth у ваших продуктах. Для додаткової інформації перегляньте <docs-link>документацію API Modrinth</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Опис"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Уведіть опис застосунку…"
+  },
+  "settings.applications.field.icon": {
+    "message": "Значок"
+  },
+  "settings.applications.field.name": {
+    "message": "Назва"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Уведіть назву застосунку…"
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Переадресація URI"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Цілі"
+  },
+  "settings.applications.field.url": {
+    "message": "Посилання"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.head-title": {
+    "message": "Застосунки"
+  },
+  "settings.applications.modal.header": {
+    "message": "Інформація про застосунок"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Значок вашого застосунку оновлено."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Значок оновлено"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Збережіть ваш секрет зараз — його буде приховано після того, як ви залишите цю сторінку!"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "Про застосунок"
+  },
+  "settings.authorizations.by": {
+    "message": "від"
+  },
+  "settings.authorizations.description": {
+    "message": "Коли ви авторизуєтеся у застосунку за допомогою Modrinth, ви надаєте йому доступ до вашого облікового запису. Ви завжди можете переглядати й керувати доступом до свого облікового запису тут."
+  },
+  "settings.authorizations.empty-state": {
+    "message": "Наразі ми не можемо показати ваші авторизовані застосунки, але ми працюємо, щоб виправити це. Будь ласка, завітайте на цю сторінку пізніше!"
+  },
+  "settings.authorizations.head-title": {
+    "message": "Авторизації"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "Відкликати"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Це відкличе доступ застосунку до вашого облікового запису. Ви завжди зможете повторно надати йому доступ."
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "Ви впевнені, що хочете відкликати цей застосунок?"
+  },
+  "settings.billing.charges.description": {
+    "message": "Тут буде наведено перелік усіх попередніх оплат на вашому обліковому записі Modrinth:"
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Пробний сервер Medal"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.charges.title": {
+    "message": "Останні списання"
+  },
+  "settings.billing.expires": {
+    "message": "Сплине {date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "місяць"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "щомісячно"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "квартал"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "щоквартально"
+  },
+  "settings.billing.interval.year": {
+    "message": "рік"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "щорічно"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "Перегляд сторінок modrinth.com і Modrinth App без реклами"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Значок Modrinth+ у вашому профілі"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Пряма підтримка Modrinth і творців"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "Переваги"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "Перейдіть на річну оплату та заощаджуйте {amount}/рік!"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "Ви скасували підписку."
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "Ви зможете користуватися своїми перевагами до кінця поточного розрахункового періоду."
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "Не вдалося оплатити підписку. Будь ласка, оновіть ваш спосіб оплати."
+  },
+  "settings.billing.midas.status.open": {
+    "message": "Наразі ви підписані на:"
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "Ваш платіж обробляється. Переваги будуть активовані після успішної оплати."
+  },
+  "settings.billing.midas.upsell": {
+    "message": "Станьте підписником Modrinth Plus!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Скасувати підписку"
@@ -2666,6 +3731,12 @@
   "settings.billing.modal.delete.title": {
     "message": "Ви впевнені що хочете видалити цей спосіб оплати?"
   },
+  "settings.billing.next": {
+    "message": "Далі:"
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "Або {price} / рік (заощадьте {percent}%)!"
+  },
   "settings.billing.payment_method.action.add": {
     "message": "Додати спосіб оплати"
   },
@@ -2675,14 +3746,11 @@
   "settings.billing.payment_method.action.primary": {
     "message": "Зробити основним"
   },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand}, що закінчується на {last_four}"
-  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Спливає {month}/{year}"
   },
   "settings.billing.payment_method.none": {
-    "message": "Ви не додали жодних методів оплати."
+    "message": "Ви не додали жодних способів оплати."
   },
   "settings.billing.payment_method.primary": {
     "message": "Основний"
@@ -2690,41 +3758,56 @@
   "settings.billing.payment_method.title": {
     "message": "Способи оплати"
   },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
+  "settings.billing.plan.title": {
+    "message": "{size} план"
   },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
   },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
   },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Dinners Club"
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} спільних ЦП (з можливістю посилення до {bursts} ЦП)"
   },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "Не вдалося знайти підключений до цієї підписки сервер. Це може бути пов’язано з кількома причинами. Якщо ви щойно придбали сервер — це нормально, налаштування сервера може зайняти до години. Якщо ж ви придбали цей сервер деякий час тому, ймовірно, його було призупинено. Якщо це не те, чого ви очікували, зверніться до служби підтримки Modrinth, надавши таку інформацію:"
   },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "ID сервера: {id}"
   },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "ID Stripe: {id}"
   },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
+  "settings.billing.pyro.ram": {
+    "message": "{gb} ГБ ОЗП"
   },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Під час поновлення підписки на сервер Modrinth сталася помилка."
   },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Помилка поновлення підписки"
   },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Невідомий спосіб оплати"
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Якщо сервер наразі скасовано, налаштування сервера може зайняти 10-15 хвилин."
   },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "Запит на поновлення підписки надіслано"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "Підписка на сервер успішно поновлена"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "Не вдалося оплатити підписку. Будь ласка, оновіть ваш спосіб оплати й спробуйте підписатися повторно."
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "Ваш платіж обробляється. Сервер буде активовано після успішної оплати."
+  },
+  "settings.billing.pyro.storage": {
+    "message": "SSD на {gb} ГБ"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} ГБ підкачування"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Керування вашими підписками на Modrinth Servers."
@@ -2732,11 +3815,41 @@
   "settings.billing.pyro_subscription.title": {
     "message": "Підписка на Сервери Modrinth"
   },
+  "settings.billing.renews": {
+    "message": "Поновлення {date}"
+  },
+  "settings.billing.resubscribe": {
+    "message": "Підписатися повторно"
+  },
+  "settings.billing.since": {
+    "message": "З {date}"
+  },
+  "settings.billing.subscribe": {
+    "message": "Підписатися"
+  },
   "settings.billing.subscription.description": {
     "message": "Керування вашими підписками Modrinth."
   },
   "settings.billing.subscription.title": {
     "message": "Підписки"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Перехід на оплату {interval}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Перейти на оплату {interval}"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "Щомісячна оплата обійдеться вам у додаткові {amount} на рік"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Перехід на оплату {interval} {date}"
+  },
+  "settings.billing.update-method": {
+    "message": "Оновити спосіб"
+  },
+  "settings.billing.upgrade": {
+    "message": "Покращити"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Вимкнути режим розробника"
@@ -2750,6 +3863,12 @@
   "settings.display.flags.title": {
     "message": "Перемикання функцій"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "Режим розробника було вимкнено"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "Режим розробника вимкнено"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Сторінка пакетів даних"
   },
@@ -2759,6 +3878,15 @@
   "settings.display.project-list-layouts.mod": {
     "message": "Сторінка модів"
   },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Галерея"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "Сітка"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "Рядки"
+  },
   "settings.display.project-list-layouts.modpack": {
     "message": "Сторінка збірок"
   },
@@ -2767,6 +3895,9 @@
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Сторінка пакетів ресурсів"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Сторінка серверів"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Сторінка шейдерів"
@@ -2787,7 +3918,7 @@
     "message": "Розширене промальовування"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Зробити так, щоб посилання за межі Modrinth, відкривалися в новій вкладці. Незалежно від цього налаштування, посилання в одному домені та в описах з Markdown відкриватимуться в тій же вкладці, а посилання в рекламах і на сторінках редагування — в новій вкладці."
+    "message": "Робить так, аби посилання за межі Modrinth, відкривалися в новій вкладці. Незалежно від цього налаштування, посилання в одному домені та в описах з Markdown відкриватимуться в тій же вкладці, а посилання в рекламах і на сторінках редагування — в новій вкладці."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Відкривати зовнішні посилання в новій вкладці"
@@ -2816,14 +3947,17 @@
   "settings.display.theme.title": {
     "message": "Колірна тема"
   },
+  "settings.head-title": {
+    "message": "Налаштування вигляду"
+  },
   "settings.pats.action.create": {
-    "message": "Створити PAT"
+    "message": "Створити токен"
   },
   "settings.pats.description": {
-    "message": "РАТ’и можуть знадобитися для доступу до Modrinth API. Для детальної інформації перегляньте <doc-link>документацію Modrinth API</doc-link>. Вони можуть бути створені та відкликані у будь-який час."
+    "message": "Особисті токени доступу можуть знадобитися для доступу до Modrinth API. Вони можуть бути створені та відкликані у будь-який час. Для детальної інформації перегляньте <doc-link>документацію Modrinth API</doc-link>."
   },
   "settings.pats.modal.create.action": {
-    "message": "Створити PAT"
+    "message": "Створити токен"
   },
   "settings.pats.modal.create.expires.label": {
     "message": "Сплине"
@@ -2832,10 +3966,10 @@
     "message": "Назва"
   },
   "settings.pats.modal.create.name.placeholder": {
-    "message": "Уведіть назву PAT…"
+    "message": "Уведіть назву токена…"
   },
   "settings.pats.modal.create.title": {
-    "message": "Створити персональний токен доступу (PAT)"
+    "message": "Створити особистий токен доступу"
   },
   "settings.pats.modal.delete.action": {
     "message": "Видалити цей токен"
@@ -2847,7 +3981,7 @@
     "message": "Ви дійсно впевнені що хочете видалити цей токен?"
   },
   "settings.pats.modal.edit.title": {
-    "message": "Редагувати персональний токен доступу (PAT)"
+    "message": "Редагувати особистий токен доступу"
   },
   "settings.pats.token.action.edit": {
     "message": "Редагувати токен"
@@ -2865,7 +3999,7 @@
     "message": "Використовувався {ago}"
   },
   "settings.pats.token.never-used": {
-    "message": "Ніколи не використовувався"
+    "message": "Не використовувався"
   },
   "settings.profile.bio.description": {
     "message": "Короткий опис, щоб розповісти всім трохи про себе."
@@ -2876,20 +4010,17 @@
   "settings.profile.description": {
     "message": "Інформація з вашого профілю є загальнодоступною на Modrinth та через <docs-link>Modrinth API</docs-link>."
   },
+  "settings.profile.head-title": {
+    "message": "Налаштування профілю"
+  },
   "settings.profile.profile-info": {
     "message": "Інформація про профіль"
-  },
-  "settings.profile.profile-picture.reset": {
-    "message": "Скинути"
   },
   "settings.profile.profile-picture.title": {
     "message": "Зображення профілю"
   },
   "settings.profile.username.description": {
     "message": "Унікальне ім’я без урахування регістру, для ідентифікації вашого профілю."
-  },
-  "settings.profile.username.title": {
-    "message": "Ім’я користувача"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Завершити сеанс"
@@ -2904,7 +4035,7 @@
     "message": "Тут перераховані всі пристрої, на яких здійснено вхід у ваш обліковий запис Modrinth. Ви можете керувати сеансом на кожному з них.\n\nЯкщо ви бачите тут пристрій, якого у вас немає, негайно завершіть сеанс і змініть пароль до вашого облікового запису."
   },
   "settings.sessions.last-accessed-ago": {
-    "message": "Востаннє активний {ago}"
+    "message": "Остання активність {ago}"
   },
   "settings.sessions.unknown-os": {
     "message": "Невідома ОС"
@@ -2912,11 +4043,29 @@
   "settings.sessions.unknown-platform": {
     "message": "Невідома платформа"
   },
+  "settings.sidebar.label.account": {
+    "message": "Обліковий запис"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Розробка"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Перегляд"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Останні новини від Modrinth"
   },
   "ui.latest-news-row.view-all": {
     "message": "Переглянути всі новини"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Підписатися"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Підписано!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Підписатися на розсилку новин Modrinth"
   },
   "version.environment.none.description": {
     "message": "Середовище для цієї версії не було вказано."

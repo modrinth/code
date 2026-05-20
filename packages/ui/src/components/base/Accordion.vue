@@ -1,23 +1,50 @@
 <template>
 	<div v-bind="$attrs">
+		<div v-if="divider && !!slots.title" class="flex items-center gap-4 mb-4">
+			<button
+				:class="
+					buttonClass ??
+					'group flex items-center gap-1 bg-transparent m-0 p-0 border-none cursor-pointer'
+				"
+				@click="() => (forceOpen ? undefined : toggledOpen ? close() : open())"
+			>
+				<slot name="button" :open="isOpen">
+					<div
+						class="flex items-center gap-1 whitespace-nowrap transition-colors text-primary group-hover:text-contrast"
+					>
+						<slot name="title" :open="isOpen" />
+						<DropdownIcon
+							v-if="!forceOpen"
+							class="size-5 transition-transform duration-300 shrink-0 text-secondary group-hover:text-primary"
+							:class="{ 'rotate-180': isOpen }"
+						/>
+					</div>
+				</slot>
+			</button>
+			<hr class="h-px w-full border-none bg-divider" aria-hidden="true" />
+		</div>
 		<button
-			v-if="!!slots.title"
+			v-else-if="!!slots.title"
 			:class="buttonClass ?? 'flex flex-col gap-2 bg-transparent m-0 p-0 border-none'"
 			@click="() => (forceOpen ? undefined : toggledOpen ? close() : open())"
 		>
 			<slot name="button" :open="isOpen">
-				<div class="flex items-center gap-1 w-full">
+				<div class="flex items-center gap-1 w-full text-contrast">
 					<slot name="title" :open="isOpen" />
 					<DropdownIcon
 						v-if="!forceOpen"
-						class="ml-auto size-5 transition-transform duration-300 shrink-0"
+						class="ml-auto size-5 transition-transform duration-300 shrink-0 text-contrast"
 						:class="{ 'rotate-180': isOpen }"
 					/>
 				</div>
 			</slot>
 			<slot name="summary" />
 		</button>
-		<div class="accordion-content" :class="{ open: isOpen }">
+		<div
+			class="accordion-content"
+			:class="{ open: isOpen, 'overflow-visible': overflowVisible && showOverflow }"
+			@transitionend="onTransitionEnd"
+		>
 			<div>
 				<div :class="contentClass ? contentClass : ''" :inert="!isOpen">
 					<slot />
@@ -39,6 +66,8 @@ const props = withDefaults(
 		contentClass?: string
 		titleWrapperClass?: string
 		forceOpen?: boolean
+		overflowVisible?: boolean
+		divider?: boolean
 	}>(),
 	{
 		type: 'standard',
@@ -47,11 +76,14 @@ const props = withDefaults(
 		contentClass: null,
 		titleWrapperClass: null,
 		forceOpen: false,
+		overflowVisible: false,
+		divider: false,
 	},
 )
 
 const toggledOpen = ref(props.openByDefault)
 const isOpen = computed(() => toggledOpen.value || props.forceOpen)
+const showOverflow = ref(props.openByDefault)
 const emit = defineEmits(['onOpen', 'onClose'])
 
 const slots = useSlots()
@@ -71,8 +103,14 @@ function open() {
 	emit('onOpen')
 }
 function close() {
+	showOverflow.value = false
 	toggledOpen.value = false
 	emit('onClose')
+}
+function onTransitionEnd() {
+	if (isOpen.value) {
+		showOverflow.value = true
+	}
 }
 
 defineExpose({
@@ -104,5 +142,9 @@ defineOptions({
 
 .accordion-content > div {
 	overflow: hidden;
+}
+
+.accordion-content.overflow-visible > div {
+	overflow: visible;
 }
 </style>

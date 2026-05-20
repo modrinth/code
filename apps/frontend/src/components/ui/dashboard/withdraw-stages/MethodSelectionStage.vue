@@ -88,14 +88,20 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	useDebugLogger,
+	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
 import { useGeolocation } from '@vueuse/core'
 
 import { useCountries, useFormattedCountries, useUserCountry } from '@/composables/country.ts'
-import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import {
+	getTaxThreshold,
+	type PayoutMethod,
+	useWithdrawContext,
+} from '@/providers/creator-withdraw.ts'
+import { useGeneratedState } from '~/composables/generated'
 
+const generatedState = useGeneratedState()
 const debug = useDebugLogger('MethodSelectionStage')
 const {
 	withdrawData,
@@ -109,6 +115,7 @@ const userCountry = useUserCountry()
 const allCountries = useCountries()
 const { coords } = useGeolocation()
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
 const { addNotification } = injectNotificationManager()
 const auth = await useAuth()
 
@@ -165,7 +172,9 @@ const shouldShowTaxLimitWarning = computed(() => {
 	if (!balanceValue) return false
 
 	const formIncomplete = balanceValue.form_completion_status !== 'complete'
-	const wouldHitLimit = (balanceValue.withdrawn_ytd ?? 0) + (balanceValue.available ?? 0) >= 600
+	const wouldHitLimit =
+		(balanceValue.withdrawn_ytd ?? 0) + (balanceValue.available ?? 0) >=
+		getTaxThreshold(generatedState.value.taxComplianceThresholds)
 
 	return formIncomplete && wouldHitLimit
 })

@@ -1,3 +1,5 @@
+@import '@modrinth/assets/styles/reset.scss';
+
 html {
 	--dark-color-text: #b0bac5;
 	--dark-color-text-dark: #ecf9fb;
@@ -59,8 +61,6 @@ html {
 	--color-button-text-hover: #1b1e24;
 	--color-button-bg-active: #c3c6cb;
 	--color-button-text-active: var(--color-button-text-hover);
-
-	--color-toggle-handle: var(--color-icon);
 
 	--color-dropdown-bg: var(--color-button-bg);
 	--color-dropdown-text: var(--color-button-text);
@@ -176,8 +176,6 @@ html {
 	--color-button-text-hover: #ffffff;
 	--color-button-bg-active: #616570;
 	--color-button-text-active: var(--color-button-text-hover);
-
-	--color-toggle-handle: var(--color-button-text);
 
 	--color-dropdown-bg: var(--color-button-bg);
 	--color-dropdown-text: var(--color-button-text);
@@ -384,18 +382,18 @@ a {
 }
 
 h1 {
-	color: var(--color-text-dark);
+	color: var(--color-text-primary);
 }
 
 h2 {
 	margin-top: 0;
 	margin-bottom: 1rem;
-	color: var(--color-text-dark);
+	color: var(--color-text-primary);
 }
 
 h3 {
 	margin-block: var(--spacing-card-md) var(--spacing-card-sm);
-	color: var(--color-text-dark);
+	color: var(--color-text-primary);
 }
 
 input {
@@ -450,13 +448,6 @@ textarea {
 	}
 }
 
-button,
-input[type='button'] {
-	cursor: pointer;
-	border: none;
-	outline: 2px solid transparent;
-}
-
 kbd {
 	background-color: var(--color-code-bg);
 	color: var(--color-code-text);
@@ -467,17 +458,9 @@ kbd {
 	font-size: 0.85em !important;
 }
 
-@import '~/assets/styles/layout.scss';
-@import '~/assets/styles/utils.scss';
-@import '~/assets/styles/components.scss';
-
-button:focus-visible,
-a:focus-visible,
-[tabindex='0']:focus-visible,
-[type='button']:focus-visible {
-	outline: 0.25rem solid #ea80ff;
-	border-radius: 0.25rem;
-}
+@import './layout.scss';
+@import './utils.scss';
+@import './components.scss';
 
 // OMORPHIA FIXES
 .card {

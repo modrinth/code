@@ -21,6 +21,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             logs_delete_logs,
             logs_delete_logs_by_filename,
             logs_get_latest_log_cursor,
+            logs_get_live_log_buffer,
+            logs_clear_live_log_buffer,
         ])
         .build()
 }
@@ -82,4 +84,19 @@ pub async fn logs_get_latest_log_cursor(
     cursor: u64, // 0 to start at beginning of file
 ) -> Result<LatestLogCursor> {
     Ok(logs::get_latest_log_cursor(profile_path, cursor).await?)
+}
+
+/// Get all buffered live log lines for a profile
+#[tauri::command]
+pub async fn logs_get_live_log_buffer(
+    profile_path: &str,
+) -> Result<CensoredString> {
+    Ok(logs::get_live_log_buffer(profile_path).await?)
+}
+
+/// Clear the live log buffer for a profile
+#[tauri::command]
+pub async fn logs_clear_live_log_buffer(profile_path: &str) -> Result<()> {
+    logs::clear_live_log_buffer(profile_path);
+    Ok(())
 }

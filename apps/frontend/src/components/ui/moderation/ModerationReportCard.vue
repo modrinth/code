@@ -32,7 +32,7 @@
 
 				<div class="flex flex-row items-center gap-2 self-end sm:self-auto">
 					<span
-						v-tooltip="formatExactDate(report.created)"
+						v-tooltip="formatDateTime(report.created)"
 						class="cursor-help whitespace-nowrap text-sm text-secondary"
 					>
 						{{ formatRelativeTime(report.created) }}
@@ -80,7 +80,7 @@
 
 						<span
 							v-if="report.user?.created"
-							v-tooltip="formatExactDate(report.user.created)"
+							v-tooltip="formatDateTime(report.user.created)"
 							class="cursor-help text-sm text-secondary"
 						>
 							Joined {{ formatRelativeTime(report.user.created) }}
@@ -143,7 +143,7 @@
 			:expand-text="expandText"
 			collapse-text="Collapse thread"
 		>
-			<div class="bg-surface-2 p-4 pt-2">
+			<div class="bg-surface-2 pt-2">
 				<ThreadView
 					v-if="threadWithReportBody"
 					ref="reportThread"
@@ -154,8 +154,8 @@
 					@update-thread="updateThread"
 				>
 					<template #closedActions>
-						<ButtonStyled v-if="isStaff(auth.user)" color="green" class="mt-2">
-							<button class="w-full gap-2 sm:w-auto" @click="reopenReport()">
+						<ButtonStyled v-if="isStaff(auth.user)" color="green">
+							<button class="mt-2 w-full gap-2 sm:w-auto" @click="reopenReport()">
 								<CheckCircleIcon class="size-4" />
 								Reopen Thread
 							</button>
@@ -190,7 +190,7 @@ import {
 	LinkIcon,
 } from '@modrinth/assets'
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
-import type { OverflowMenuOption } from '@modrinth/ui'
+import { type OverflowMenuOption, useFormatDateTime } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
@@ -201,7 +201,6 @@ import {
 	useRelativeTime,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import { isStaff } from '~/helpers/users.js'
@@ -274,7 +273,7 @@ async function closeReport(reply = false) {
 				closed: true,
 			},
 		})
-		updateThread(props.report.thread)
+		await refreshReportCaches()
 		didCloseReport.value = true
 	} catch (err: any) {
 		addNotification({
@@ -293,7 +292,7 @@ async function reopenReport() {
 				closed: false,
 			},
 		})
-		updateThread(props.report.thread)
+		await refreshReportCaches()
 		didCloseReport.value = false
 	} catch (err: any) {
 		addNotification({
@@ -305,9 +304,21 @@ async function reopenReport() {
 }
 
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
-function formatExactDate(date: string): string {
-	return dayjs(date).format('MMMM D, YYYY [at] h:mm A')
+async function refreshReportCaches() {
+	await Promise.allSettled([refreshThread(), refreshNuxtData('new-moderation-reports')])
+}
+
+async function refreshThread() {
+	const threadId = props.report.thread?.id ?? props.report.thread_id
+	if (!threadId) return
+
+	const thread = await useBaseFetch(`thread/${threadId}`)
+	updateThread(thread)
 }
 
 function updateThread(newThread: any) {

@@ -3,7 +3,7 @@ import type { Archon, Labrinth } from '@modrinth/api-client'
 import { InfoIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
-import { formatPrice } from '../../../../utils'
+import { useFormatPrice } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils.ts'
 import { regionOverrides } from '../../utils/regions.ts'
@@ -14,7 +14,8 @@ import type { RegionPing, ServerBillingInterval } from './ModrinthServersPurchas
 import ServersRegionButton from './ServersRegionButton.vue'
 import ServersSpecs from './ServersSpecs.vue'
 
-const { formatMessage, locale } = useVIntl()
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
 
 const props = defineProps<{
 	regions: Archon.Servers.v1.Region[]
@@ -24,12 +25,13 @@ const props = defineProps<{
 		request: Archon.Servers.v0.StockRequest,
 	) => Promise<number>
 	custom: boolean
+	hideRegionSelection?: boolean
 	currency: string
 	interval: ServerBillingInterval
 	availableProducts: Labrinth.Billing.Internal.Product[]
 }>()
 
-const loading = ref(true)
+const loading = ref(false)
 const checkingCustomStock = ref(false)
 const selectedPlan = defineModel<Labrinth.Billing.Internal.Product>('plan')
 const selectedRegion = defineModel<string>('region')
@@ -176,6 +178,10 @@ const messages = defineMessages({
 		id: 'servers.region.custom.prompt',
 		defaultMessage: `How much RAM do you want your server to have?`,
 	},
+	customPromptRamOnly: {
+		id: 'servers.region.custom.prompt-ram-only',
+		defaultMessage: `RAM`,
+	},
 })
 
 async function updateStock() {
@@ -213,14 +219,15 @@ async function updateStock() {
 onMounted(() => {
 	// auto select region with lowest ping
 	loading.value = true
-	bestPing.value =
-		props.pings.length > 0
-			? props.pings.reduce((acc, cur) => {
-					return acc.ping < cur.ping ? acc : cur
-				})?.region
-			: undefined
-	selectedRegion.value = undefined
+	bestPing.value = [...props.pings].sort((a, b) => {
+		if (a.ping <= 0) return 1
+		if (b.ping <= 0) return -1
+		return a.ping - b.ping
+	})[0]?.region
 	selectedRam.value = minRam.value
+	if (!props.hideRegionSelection) {
+		selectedRegion.value = undefined
+	}
 	checkingCustomStock.value = true
 	updateStock().then(() => {
 		const firstWithStock = sortedRegions.value.find(
@@ -228,8 +235,9 @@ onMounted(() => {
 		)
 		let stockedRegion = selectedRegion.value
 		if (!stockedRegion) {
-			stockedRegion =
-				bestPing.value && currentStock.value[bestPing.value] > 0
+			stockedRegion = props.hideRegionSelection
+				? firstWithStock?.shortcode
+				: bestPing.value && currentStock.value[bestPing.value] > 0
 					? bestPing.value
 					: firstWithStock?.shortcode
 		}
@@ -247,43 +255,50 @@ onMounted(() => {
 		Checking availability...
 	</ModalLoadingIndicator>
 	<template v-else>
-		<h2 class="mt-0 mb-4 text-xl font-bold text-contrast">
-			{{ formatMessage(messages.prompt) }}
-		</h2>
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-			<ServersRegionButton
-				v-for="region in visibleRegions"
-				:key="region.shortcode"
-				v-model="selectedRegion"
-				:region="region"
-				:out-of-stock="currentStock[region.shortcode] === 0"
-				:ping="pings.find((p) => p.region === region.shortcode)?.ping"
-				:best-ping="bestPing === region.shortcode"
-			/>
-		</div>
-		<div class="mt-3 text-sm">
-			<IntlFormatted :message-id="messages.regionUnsupported">
-				<template #link="{ children }">
-					<a
-						class="text-link"
-						target="_blank"
-						rel="noopener noreferrer"
-						href="https://surveys.modrinth.com/servers-region-waitlist"
-					>
-						<component :is="() => children" />
-					</a>
-				</template>
-			</IntlFormatted>
-		</div>
+		<template v-if="!hideRegionSelection">
+			<h2 class="mt-0 mb-4 text-xl font-bold text-contrast">
+				{{ formatMessage(messages.prompt) }}
+			</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<ServersRegionButton
+					v-for="region in visibleRegions"
+					:key="region.shortcode"
+					v-model="selectedRegion"
+					:region="region"
+					:out-of-stock="currentStock[region.shortcode] === 0"
+					:ping="pings.find((p) => p.region === region.shortcode)?.ping"
+					:best-ping="bestPing === region.shortcode"
+				/>
+			</div>
+			<div class="mt-3 text-sm">
+				<IntlFormatted :message-id="messages.regionUnsupported">
+					<template #link="{ children }">
+						<a
+							class="text-link"
+							target="_blank"
+							rel="noopener noreferrer"
+							href="https://surveys.modrinth.com/servers-region-waitlist"
+						>
+							<component :is="() => children" />
+						</a>
+					</template>
+				</IntlFormatted>
+			</div>
+		</template>
 		<template v-if="custom">
-			<h2 class="mt-4 mb-2 text-xl font-bold text-contrast">
-				{{ formatMessage(messages.customPrompt) }}
+			<h2
+				class="mb-2 text-xl font-bold text-contrast"
+				:class="hideRegionSelection ? 'mt-0' : 'mt-4'"
+			>
+				{{
+					formatMessage(hideRegionSelection ? messages.customPromptRamOnly : messages.customPrompt)
+				}}
 			</h2>
 			<div>
 				<Slider v-model="selectedRam" :min="minRam" :max="maxRam" :step="2" unit="GB" />
 				<p v-if="selectedPrice" class="mt-2 mb-0">
 					<span class="text-contrast text-lg font-bold"
-						>{{ formatPrice(locale, selectedPrice, currency, true) }} / month</span
+						>{{ formatPrice(selectedPrice, currency, true) }} / month</span
 					><span v-if="interval !== 'monthly'">, billed {{ interval }}</span>
 				</p>
 				<div class="bg-bg rounded-xl p-4 mt-2 text-secondary h-14">

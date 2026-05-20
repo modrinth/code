@@ -8,6 +8,7 @@ use serde_json::json;
 
 use crate::{
     database::models::payout_item::DBPayout,
+    env::ENV,
     models::payouts::{
         PayoutMethod, PayoutMethodFee, PayoutMethodType, PayoutStatus,
         TremendousCurrency, TremendousDetails, TremendousForexResponse,
@@ -90,6 +91,11 @@ pub(super) async fn create(
             );
             let net_usd = gross_usd - total_fee_usd;
 
+            let net_local = net_usd.mul_round(
+                usd_to_currency,
+                RoundingStrategy::MidpointTowardZero,
+            );
+
             Ok(PayoutFlow {
                 net_usd,
                 total_fee_usd,
@@ -105,8 +111,8 @@ pub(super) async fn create(
                     // To offset this, we (the platform) take the fees off before
                     // we send the request to Tremendous. Afterwards, the method
                     // (Tremendous) will take 0% off the top of our $10.
-                    value_denomination: net_usd.get(),
-                    value_currency_code: TremendousCurrency::Usd.to_string(),
+                    value_denomination: net_local.get(),
+                    value_currency_code: currency_code,
                     net_usd,
                     total_fee_usd,
                     delivery_email,
@@ -205,7 +211,7 @@ pub(super) async fn execute(
             "products": [
                 method_id,
             ],
-            "campaign_id": dotenvy::var("TREMENDOUS_CAMPAIGN_ID")?,
+            "campaign_id": ENV.TREMENDOUS_CAMPAIGN_ID.as_str(),
         }]
     });
 

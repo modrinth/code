@@ -4,7 +4,14 @@
 	"globalDependencies": [
 		"packages/tooling-config/**",
 		"!packages/tooling-config/.turbo/**",
-		"!packages/tooling-config/node_modules/**"
+		"!packages/tooling-config/node_modules/**",
+		"packages/app-lib/.env"
+	],
+	"globalEnv": [
+		"MODRINTH_URL",
+		"MODRINTH_API_BASE_URL",
+		"MODRINTH_ARCHON_BASE_URL",
+		"VITE_STRIPE_PUBLISHABLE_KEY"
 	],
 	"tasks": {
 		"build": {
@@ -24,6 +31,8 @@
 				"CF_PAGES_*",
 				"HEROKU_APP_NAME",
 				"STRIPE_PUBLISHABLE_KEY",
+				"INTERCOM_APP_ID",
+				"INTERCOM_IDENTITY_SECRET",
 				"PYRO_BASE_URL",
 				"PROD_OVERRIDE",
 				"PYRO_MASTER_KEY",
@@ -37,6 +46,12 @@
 				"NEXTEST_*",
 				"BUILD_ENV",
 				"PREVIEW"
+			],
+			"passThroughEnv": [
+				"SCCACHE_*",
+				"RUSTC_WRAPPER",
+				"AWS_ACCESS_KEY_ID",
+				"AWS_SECRET_ACCESS_KEY"
 			]
 		},
 		"lint": {
@@ -48,6 +63,12 @@
 				"RUSTFLAGS",
 				"FORCE_COLOR",
 				"NEXTEST_*"
+			],
+			"passThroughEnv": [
+				"SCCACHE_*",
+				"RUSTC_WRAPPER",
+				"AWS_ACCESS_KEY_ID",
+				"AWS_SECRET_ACCESS_KEY"
 			]
 		},
 		"lint:ancillary": {},
@@ -56,7 +77,7 @@
 			"persistent": true,
 			"inputs": ["$TURBO_DEFAULT$", ".env*"],
 			"env": ["CARGO_*", "RUST_*", "RUSTFLAGS", "FORCE_COLOR", "NEXTEST_*"],
-			"passThroughEnv": ["DISPLAY", "WEBKIT_DISABLE_DMABUF_RENDERER"]
+			"passThroughEnv": ["DISPLAY", "WEBKIT_DISABLE_DMABUF_RENDERER", "JAVA_HOME"]
 		},
 		"test": {
 			"env": [
@@ -67,6 +88,12 @@
 				"RUSTFLAGS",
 				"FORCE_COLOR",
 				"NEXTEST_*"
+			],
+			"passThroughEnv": [
+				"SCCACHE_*",
+				"RUSTC_WRAPPER",
+				"AWS_ACCESS_KEY_ID",
+				"AWS_SECRET_ACCESS_KEY"
 			]
 		},
 		"fix": {},

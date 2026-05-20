@@ -4,6 +4,8 @@ use crate::database::models::notifications_deliveries_item::DBNotificationDelive
 use crate::database::models::notifications_template_item::NotificationTemplate;
 use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::notifications::{NotificationBody, NotificationType};
 use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
@@ -16,7 +18,6 @@ use lettre::transport::smtp::authentication::Credentials;
 use lettre::transport::smtp::client::{Tls, TlsParameters};
 use lettre::{AsyncSmtpTransport, AsyncTransport, Tokio1Executor};
 use reqwest::Client;
-use sqlx::PgPool;
 use std::sync::Arc;
 use thiserror::Error;
 use tokio::sync::Mutex as TokioMutex;
@@ -36,16 +37,16 @@ impl Mailer {
     ) -> Result<Arc<AsyncSmtpTransport<Tokio1Executor>>, MailError> {
         let maybe_transport = match self {
             Mailer::Uninitialized => {
-                let username = dotenvy::var("SMTP_USERNAME")?;
-                let password = dotenvy::var("SMTP_PASSWORD")?;
-                let host = dotenvy::var("SMTP_HOST")?;
-                let port =
-                    dotenvy::var("SMTP_PORT")?.parse::<u16>().unwrap_or(465);
+                let username = &ENV.SMTP_USERNAME;
+                let password = &ENV.SMTP_PASSWORD;
+                let host = &ENV.SMTP_HOST;
+                let port = ENV.SMTP_PORT;
 
-                let creds = (!username.is_empty())
-                    .then(|| Credentials::new(username, password));
+                let creds = (!username.is_empty()).then(|| {
+                    Credentials::new(username.clone(), password.clone())
+                });
 
-                let tls_setting = match dotenvy::var("SMTP_TLS")?.as_str() {
+                let tls_setting = match ENV.SMTP_TLS.as_str() {
                     "none" => Tls::None,
                     "opportunistic_start_tls" => Tls::Opportunistic(
                         TlsParameters::new(host.to_string())?,
@@ -65,7 +66,7 @@ impl Mailer {
                 };
 
                 let mut mailer =
-                    AsyncSmtpTransport::<Tokio1Executor>::relay(&host)?
+                    AsyncSmtpTransport::<Tokio1Executor>::relay(host)?
                         .port(port)
                         .tls(tls_setting);
 
@@ -101,8 +102,6 @@ impl Mailer {
 
 #[derive(Error, Debug)]
 pub enum MailError {
-    #[error("Environment Error")]
-    Env(#[from] dotenvy::Error),
     #[error("Mail Error: {0}")]
     Mail(#[from] lettre::error::Error),
     #[error("Address Parse Error: {0}")]
@@ -135,7 +134,7 @@ impl EmailQueue {
             pg,
             redis,
             mailer: Arc::new(TokioMutex::new(Mailer::Uninitialized)),
-            identity: templates::MailingIdentity::from_env()?,
+            identity: templates::MailingIdentity::from_env(),
             client: Client::builder()
                 .user_agent("Modrinth")
                 .build()
@@ -204,12 +203,9 @@ impl EmailQueue {
             futures.push(async move {
                 let mut txn = this.pg.begin().await?;
 
-                let maybe_user = DBUser::get_id(
-                    notification.user_id,
-                    &mut *txn,
-                    &this.redis,
-                )
-                .await?;
+                let maybe_user =
+                    DBUser::get_id(notification.user_id, &mut txn, &this.redis)
+                        .await?;
 
                 let Some(mailbox) = maybe_user
                     .and_then(|user| user.email)
@@ -301,7 +297,7 @@ impl EmailQueue {
 
     pub async fn send_one(
         &self,
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         notification: NotificationBody,
         user_id: DBUserId,
         address: Mailbox,
@@ -319,7 +315,7 @@ impl EmailQueue {
 
     async fn send_one_with_transport(
         &self,
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         transport: Arc<AsyncSmtpTransport<Tokio1Executor>>,
         notification: NotificationBody,
         user_id: DBUserId,
@@ -330,7 +326,7 @@ impl EmailQueue {
 
         let Some(template) = NotificationTemplate::list_channel(
             NotificationChannel::Email,
-            &mut **txn,
+            &mut *txn,
             &self.redis,
         )
         .await?

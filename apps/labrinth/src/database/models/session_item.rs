@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
@@ -24,12 +25,17 @@ pub struct SessionBuilder {
 
     pub ip: String,
     pub user_agent: String,
+
+    // When None, database default of 14 days will be used
+    pub expires: Option<DateTime<Utc>>,
+    // When None, database default of 60 days will be used
+    pub session_expires: Option<DateTime<Utc>>,
 }
 
 impl SessionBuilder {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<DBSessionId, DatabaseError> {
         let id = generate_session_id(transaction).await?;
 
@@ -37,11 +43,13 @@ impl SessionBuilder {
             "
             INSERT INTO sessions (
                 id, session, user_id, os, platform,
-                city, country, ip, user_agent
+                city, country, ip, user_agent,
+                expires, refresh_expires
             )
             VALUES (
                 $1, $2, $3, $4, $5,
-                $6, $7, $8, $9
+                $6, $7, $8, $9,
+                $10, $11
             )
             ",
             id as DBSessionId,
@@ -53,8 +61,12 @@ impl SessionBuilder {
             self.country,
             self.ip,
             self.user_agent,
+            self.expires
+                .unwrap_or_else(|| Utc::now() + chrono::Duration::days(14)),
+            self.session_expires
+                .unwrap_or_else(|| Utc::now() + chrono::Duration::days(60)),
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(id)
@@ -92,7 +104,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Option<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec, redis)
             .await
@@ -105,7 +117,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Option<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         DBSession::get_many(
             &[crate::models::ids::SessionId::from(id)],
@@ -122,7 +134,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Vec<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let ids = session_ids
             .iter()
@@ -141,7 +153,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Vec<DBSession>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 
@@ -207,7 +219,7 @@ impl DBSession {
         redis: &RedisPool,
     ) -> Result<Vec<DBSessionId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
             let mut redis = redis.connect().await?;
@@ -286,7 +298,7 @@ impl DBSession {
 
     pub async fn remove(
         id: DBSessionId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "
@@ -294,7 +306,7 @@ impl DBSession {
             ",
             id as DBSessionId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))

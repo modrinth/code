@@ -1,6 +1,10 @@
 import { defineMessages } from '../composables/i18n'
 
 export const commonMessages = defineMessages({
+	acceptButton: {
+		id: 'button.accept',
+		defaultMessage: 'Accept',
+	},
 	affiliateLinksButton: {
 		id: 'button.affiliate-links',
 		defaultMessage: 'Affiliate links',
@@ -8,6 +12,10 @@ export const commonMessages = defineMessages({
 	analyticsButton: {
 		id: 'button.analytics',
 		defaultMessage: 'Analytics',
+	},
+	alpha: {
+		id: 'badge.alpha',
+		defaultMessage: 'Alpha',
 	},
 	betaRelease: {
 		id: 'badge.beta-release',
@@ -20,6 +28,10 @@ export const commonMessages = defineMessages({
 	allProjectType: {
 		id: 'project-type.all',
 		defaultMessage: 'All',
+	},
+	addServerToInstanceButton: {
+		id: 'button.add-server-to-instance',
+		defaultMessage: 'Add server to instance',
 	},
 	backButton: {
 		id: 'button.back',
@@ -45,6 +57,10 @@ export const commonMessages = defineMessages({
 		id: 'label.collections',
 		defaultMessage: 'Collections',
 	},
+	confirmPasswordLabel: {
+		id: 'label.confirm-password',
+		defaultMessage: 'Confirm password',
+	},
 	continueButton: {
 		id: 'button.continue',
 		defaultMessage: 'Continue',
@@ -69,17 +85,25 @@ export const commonMessages = defineMessages({
 		id: 'label.dashboard',
 		defaultMessage: 'Dashboard',
 	},
-	dateAtTimeTooltip: {
-		id: 'tooltip.date-at-time',
-		defaultMessage: '{date, date, long} at {time, time, short}',
+	declineButton: {
+		id: 'button.decline',
+		defaultMessage: 'Decline',
 	},
 	deleteLabel: {
 		id: 'label.delete',
 		defaultMessage: 'Delete',
 	},
+	deleteImmediatelyLabel: {
+		id: 'label.delete-immediately',
+		defaultMessage: 'Delete immediately',
+	},
 	descriptionLabel: {
 		id: 'label.description',
 		defaultMessage: 'Description',
+	},
+	detailsLabel: {
+		id: 'label.details',
+		defaultMessage: 'Details',
 	},
 	downloadButton: {
 		id: 'button.download',
@@ -93,6 +117,14 @@ export const commonMessages = defineMessages({
 		id: 'button.edit',
 		defaultMessage: 'Edit',
 	},
+	emailLabel: {
+		id: 'label.email',
+		defaultMessage: 'Email',
+	},
+	emailUsernameLabel: {
+		id: 'label.email-username',
+		defaultMessage: 'Email or username',
+	},
 	errorLabel: {
 		id: 'label.error',
 		defaultMessage: 'Error',
@@ -100,6 +132,14 @@ export const commonMessages = defineMessages({
 	errorNotificationTitle: {
 		id: 'notification.error.title',
 		defaultMessage: 'An error occurred',
+	},
+	filterByLabel: {
+		id: 'label.filter-by',
+		defaultMessage: 'Filter by',
+	},
+	filtersLabel: {
+		id: 'label.filters',
+		defaultMessage: 'Filters',
 	},
 	followButton: {
 		id: 'button.follow',
@@ -125,6 +165,10 @@ export const commonMessages = defineMessages({
 		id: 'label.loading',
 		defaultMessage: 'Loading...',
 	},
+	maxButton: {
+		id: 'button.max',
+		defaultMessage: 'Max',
+	},
 	moderationLabel: {
 		id: 'label.moderation',
 		defaultMessage: 'Moderation',
@@ -141,6 +185,10 @@ export const commonMessages = defineMessages({
 		id: 'button.next',
 		defaultMessage: 'Next',
 	},
+	noLabel: {
+		id: 'label.no',
+		defaultMessage: 'No',
+	},
 	notificationsLabel: {
 		id: 'label.notifications',
 		defaultMessage: 'Notifications',
@@ -148,6 +196,10 @@ export const commonMessages = defineMessages({
 	openFolderButton: {
 		id: 'button.open-folder',
 		defaultMessage: 'Open folder',
+	},
+	openInModrinthButton: {
+		id: 'button.open-in-modrinth',
+		defaultMessage: 'Open in Modrinth',
 	},
 	orLabel: {
 		id: 'label.or',
@@ -157,20 +209,16 @@ export const commonMessages = defineMessages({
 		id: 'label.password',
 		defaultMessage: 'Password',
 	},
-	paymentMethodCardDisplay: {
-		id: 'omorphia.component.purchase_modal.payment_method_card_display',
-		defaultMessage: '{card_brand} ending in {last_four}',
-	},
 	playButton: {
 		id: 'button.play',
 		defaultMessage: 'Play',
 	},
 	playedLabel: {
 		id: 'label.played',
-		defaultMessage: 'Played {time}',
+		defaultMessage: 'Played {ago}',
 	},
 	privateLabel: {
-		id: 'collection.label.private',
+		id: 'collections.label.private',
 		defaultMessage: 'Private',
 	},
 	publicLabel: {
@@ -201,6 +249,10 @@ export const commonMessages = defineMessages({
 		id: 'button.reset',
 		defaultMessage: 'Reset',
 	},
+	retryButton: {
+		id: 'button.retry',
+		defaultMessage: 'Retry',
+	},
 	saveButton: {
 		id: 'button.save',
 		defaultMessage: 'Save',
@@ -220,6 +272,10 @@ export const commonMessages = defineMessages({
 	scopesLabel: {
 		id: 'label.scopes',
 		defaultMessage: 'Scopes',
+	},
+	searchLabel: {
+		id: 'label.search',
+		defaultMessage: 'Search',
 	},
 	searchPlaceholder: {
 		id: 'input.search.placeholder',
@@ -253,9 +309,17 @@ export const commonMessages = defineMessages({
 		id: 'label.singleplayer',
 		defaultMessage: 'Singleplayer',
 	},
+	sortByLabel: {
+		id: 'label.sort-by',
+		defaultMessage: 'Sort by: ',
+	},
 	stopButton: {
 		id: 'button.stop',
 		defaultMessage: 'Stop',
+	},
+	successLabel: {
+		id: 'label.success',
+		defaultMessage: 'Success',
 	},
 	titleLabel: {
 		id: 'label.title',
@@ -273,6 +337,10 @@ export const commonMessages = defineMessages({
 		id: 'button.upload-image',
 		defaultMessage: 'Upload image',
 	},
+	usernameLabel: {
+		id: 'label.username',
+		defaultMessage: 'Username',
+	},
 	visibilityLabel: {
 		id: 'label.visibility',
 		defaultMessage: 'Visibility',
@@ -281,9 +349,312 @@ export const commonMessages = defineMessages({
 		id: 'label.visit-your-profile',
 		defaultMessage: 'Visit your profile',
 	},
-	maxButton: {
-		id: 'button.max',
-		defaultMessage: 'Max',
+	yesLabel: {
+		id: 'label.yes',
+		defaultMessage: 'Yes',
+	},
+	platformLabel: {
+		id: 'label.platform',
+		defaultMessage: 'Platform',
+	},
+	gameVersionLabel: {
+		id: 'label.game-version',
+		defaultMessage: 'Game version',
+	},
+	selectVersionPlaceholder: {
+		id: 'input.select-version.placeholder',
+		defaultMessage: 'Select version',
+	},
+	searchVersionPlaceholder: {
+		id: 'input.search-version.placeholder',
+		defaultMessage: 'Search version...',
+	},
+	unknownLabel: {
+		id: 'label.unknown',
+		defaultMessage: 'Unknown',
+	},
+	modpackLabel: {
+		id: 'label.modpack',
+		defaultMessage: 'Modpack',
+	},
+	repairButton: {
+		id: 'button.repair',
+		defaultMessage: 'Repair',
+	},
+	repairingButton: {
+		id: 'button.repairing',
+		defaultMessage: 'Repairing...',
+	},
+	showAllVersionsButton: {
+		id: 'button.show-all-versions',
+		defaultMessage: 'Show all versions',
+	},
+	hideSnapshotsButton: {
+		id: 'button.hide-snapshots',
+		defaultMessage: 'Hide snapshots',
+	},
+	installationInfoTitle: {
+		id: 'label.installation-info',
+		defaultMessage: 'Installation info',
+	},
+	installButton: {
+		id: 'button.install',
+		defaultMessage: 'Install',
+	},
+	installedLabel: {
+		id: 'label.installed',
+		defaultMessage: 'Installed',
+	},
+	validatingLabel: {
+		id: 'label.validating',
+		defaultMessage: 'Validating',
+	},
+	selectedLabel: {
+		id: 'label.selected',
+		defaultMessage: 'Selected',
+	},
+	installingContentLabel: {
+		id: 'label.installing-content',
+		defaultMessage: 'Installing content',
+	},
+	hideInstalledContentLabel: {
+		id: 'label.hide-installed-content',
+		defaultMessage: 'Hide already installed content',
+	},
+	hideSelectedContentLabel: {
+		id: 'label.hide-selected-content',
+		defaultMessage: 'Hide selected content',
+	},
+	installedModpackTitle: {
+		id: 'label.installed-modpack',
+		defaultMessage: 'Installed modpack',
+	},
+	changeVersionButton: {
+		id: 'button.change-version',
+		defaultMessage: 'Change version',
+	},
+	unlinkModpackButton: {
+		id: 'button.unlink-modpack',
+		defaultMessage: 'Unlink modpack',
+	},
+	reinstallModpackButton: {
+		id: 'button.reinstall-modpack',
+		defaultMessage: 'Re-install modpack',
+	},
+	resetServerButton: {
+		id: 'button.reset-server',
+		defaultMessage: 'Reset server',
+	},
+	clientOnlyWarning: {
+		id: 'label.client-only-warning',
+		defaultMessage: 'This is a client-side mod and may cause issues when starting your server',
+	},
+	clientRetainedWarning: {
+		id: 'label.client-retained-warning',
+		defaultMessage:
+			'This is a client-side mod that was installed as a dependency and may cause issues when starting your server',
+	},
+	clientDependsWarning: {
+		id: 'label.client-depends-warning',
+		defaultMessage:
+			'This mod depends on a client-side mod and may cause issues when starting your server',
+	},
+	selectAllLabel: {
+		id: 'label.select-all',
+		defaultMessage: 'Select all',
+	},
+	selectionActionsLabel: {
+		id: 'label.selection-actions',
+		defaultMessage: 'Selection actions',
+	},
+	updateAvailableLabel: {
+		id: 'label.update-available',
+		defaultMessage: 'Update available',
+	},
+	installingLabel: {
+		id: 'label.installing',
+		defaultMessage: 'Installing...',
+	},
+	changelogLabel: {
+		id: 'label.changelog',
+		defaultMessage: 'Changelog',
+	},
+	updateButton: {
+		id: 'button.update',
+		defaultMessage: 'Update',
+	},
+	contentLabel: {
+		id: 'label.content',
+		defaultMessage: 'Content',
+	},
+	versionLabel: {
+		id: 'label.version',
+		defaultMessage: 'Version',
+	},
+	viewLabel: {
+		id: 'label.view',
+		defaultMessage: 'View',
+	},
+	projectLabel: {
+		id: 'label.project',
+		defaultMessage: 'Project',
+	},
+	actionsLabel: {
+		id: 'label.actions',
+		defaultMessage: 'Actions',
+	},
+	noItemsLabel: {
+		id: 'label.no-items',
+		defaultMessage: 'No items',
+	},
+	planUnknownLabel: {
+		id: 'label.plan-unknown',
+		defaultMessage: 'Unknown',
+	},
+	planSmallLabel: {
+		id: 'label.plan-small',
+		defaultMessage: 'Small',
+	},
+	planMediumLabel: {
+		id: 'label.plan-medium',
+		defaultMessage: 'Medium',
+	},
+	planLargeLabel: {
+		id: 'label.plan-large',
+		defaultMessage: 'Large',
+	},
+	planCustomLabel: {
+		id: 'label.plan-custom',
+		defaultMessage: 'Custom',
+	},
+	copyLinkButton: {
+		id: 'button.copy-link',
+		defaultMessage: 'Copy link',
+	},
+	switchVersionButton: {
+		id: 'button.switch-version',
+		defaultMessage: 'Switch version',
+	},
+	updatingLabel: {
+		id: 'label.updating',
+		defaultMessage: 'Updating...',
+	},
+	deleteFailedLabel: {
+		id: 'label.delete-failed',
+		defaultMessage: 'Delete failed',
+	},
+	uploadFailedLabel: {
+		id: 'label.upload-failed',
+		defaultMessage: 'Upload failed',
+	},
+	renameFailedLabel: {
+		id: 'label.rename-failed',
+		defaultMessage: 'Rename failed',
+	},
+	moveFailedLabel: {
+		id: 'label.move-failed',
+		defaultMessage: 'Move failed',
+	},
+	createFailedLabel: {
+		id: 'label.create-failed',
+		defaultMessage: 'Create failed',
+	},
+	extractFailedLabel: {
+		id: 'label.extract-failed',
+		defaultMessage: 'Extract failed',
+	},
+	showFileButton: {
+		id: 'button.show-file',
+		defaultMessage: 'Show file',
+	},
+	enableButton: {
+		id: 'button.enable',
+		defaultMessage: 'Enable',
+	},
+	disableButton: {
+		id: 'button.disable',
+		defaultMessage: 'Disable',
+	},
+	renameButton: {
+		id: 'button.rename',
+		defaultMessage: 'Rename',
+	},
+	moveButton: {
+		id: 'button.move',
+		defaultMessage: 'Move',
+	},
+	extractButton: {
+		id: 'button.extract',
+		defaultMessage: 'Extract',
+	},
+	doneLabel: {
+		id: 'label.done',
+		defaultMessage: 'Done',
+	},
+	copyFilenameButton: {
+		id: 'button.copy-filename',
+		defaultMessage: 'Copy filename',
+	},
+	copyFullPathButton: {
+		id: 'button.copy-full-path',
+		defaultMessage: 'Copy full path',
+	},
+	copiedFilenameLabel: {
+		id: 'label.copied-filename',
+		defaultMessage: 'Copied filename',
+	},
+	copiedPathLabel: {
+		id: 'label.copied-path',
+		defaultMessage: 'Copied path',
+	},
+	openInFolderButton: {
+		id: 'button.open-in-folder',
+		defaultMessage: 'Open in folder',
+	},
+	downloadFailedLabel: {
+		id: 'label.download-failed',
+		defaultMessage: 'Download failed',
+	},
+	projectCreated: {
+		id: 'project.about.details.created',
+		defaultMessage: 'Created {date}',
+	},
+	projectSubmitted: {
+		id: 'project.about.details.submitted',
+		defaultMessage: 'Submitted {date}',
+	},
+	projectPublished: {
+		id: 'project.about.details.published',
+		defaultMessage: 'Published {date}',
+	},
+	projectUpdated: {
+		id: 'project.about.details.updated',
+		defaultMessage: 'Updated {date}',
+	},
+	projectDownloads: {
+		id: 'project.download-count-tooltip',
+		defaultMessage: '{count, number} {count, plural, one {download} other {downloads}}',
+	},
+	projectFollowers: {
+		id: 'project.follower-count-tooltip',
+		defaultMessage: '{count, number} {count, plural, one {follower} other {followers}}',
+	},
+	projectOnlinePlayerCount: {
+		id: 'project.online-player-count',
+		defaultMessage: '{count, number} online',
+	},
+	projectOnlinePlayerCountTooltip: {
+		id: 'project.online-player-count.tooltip',
+		defaultMessage: '{count} {countPlural, plural, one {player} other {players}} online',
+	},
+	projectRecentPlays: {
+		id: 'project.recent-plays',
+		defaultMessage: '{count} {countPlural, plural, one {recent play} other {recent plays}}',
+	},
+	projectRecentPlaysTooltip: {
+		id: 'project.recent-plays.tooltip',
+		defaultMessage:
+			'{count} {countPlural, plural, one {recent play} other {recent plays}} from Modrinth in the past 2 weeks',
 	},
 })
 
@@ -408,6 +779,14 @@ export const financialMessages = defineMessages({
 	},
 })
 
+const PROJECT_TYPE_ALIASES: Record<string, string> = {
+	shaderpack: 'shader',
+}
+
+export function normalizeProjectType(type: string): string {
+	return PROJECT_TYPE_ALIASES[type] ?? type
+}
+
 export const commonProjectTypeCategoryMessages = defineMessages({
 	datapack: {
 		id: 'project-type.datapack.category',
@@ -473,7 +852,7 @@ export const commonProjectTypeTitleMessages = defineMessages({
 		defaultMessage: '{count, plural, one {Server} other {Servers}}',
 	},
 	project: {
-		id: 'project-type.project.lowercase',
+		id: 'project-type.project.capital',
 		defaultMessage: '{count, plural, one {Project} other {Projects}}',
 	},
 })
@@ -534,6 +913,10 @@ export const commonSettingsMessages = defineMessages({
 		id: 'settings.billing.title',
 		defaultMessage: 'Billing and subscriptions',
 	},
+	featureFlags: {
+		id: 'settings.feature-flags.title',
+		defaultMessage: 'Feature flags',
+	},
 	language: {
 		id: 'settings.language.title',
 		defaultMessage: 'Language',
@@ -556,6 +939,10 @@ export const commonProjectSettingsMessages = defineMessages({
 	analytics: {
 		id: 'project.settings.analytics.title',
 		defaultMessage: 'Analytics',
+	},
+	content: {
+		id: 'project.settings.content.title',
+		defaultMessage: 'Content',
 	},
 	description: {
 		id: 'project.settings.description.title',
@@ -601,9 +988,17 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.upload.title',
 		defaultMessage: 'Upload',
 	},
+	server: {
+		id: 'project.settings.server.title',
+		defaultMessage: 'Server',
+	},
 	versions: {
 		id: 'project.settings.versions.title',
 		defaultMessage: 'Versions',
+	},
+	permissions: {
+		id: 'project.settings.versions.permissions',
+		defaultMessage: 'Permissions',
 	},
 	view: {
 		id: 'project.settings.view.title',
@@ -654,60 +1049,64 @@ export const languageSelectorMessages = defineMessages({
 })
 
 export const paymentMethodMessages = defineMessages({
+	paymentMethodCardDisplay: {
+		id: 'payment-method.card_display',
+		defaultMessage: '{card_brand} ending in {last_four}',
+	},
 	amazon_pay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amazon_pay',
+		id: 'payment-method.amazon_pay',
 		defaultMessage: 'Amazon Pay',
 	},
 	amex: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.amex',
+		id: 'payment-method.amex',
 		defaultMessage: 'American Express',
 	},
 	cashapp: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.cashapp',
+		id: 'payment-method.cashapp',
 		defaultMessage: 'Cash App',
 	},
 	diners: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.diners',
+		id: 'payment-method.diners',
 		defaultMessage: 'Diners Club',
 	},
 	discover: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.discover',
+		id: 'payment-method.discover',
 		defaultMessage: 'Discover',
 	},
 	eftpos: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.eftpos',
+		id: 'payment-method.eftpos',
 		defaultMessage: 'EFTPOS',
 	},
 	jcb: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.jcb',
+		id: 'payment-method.jcb',
 		defaultMessage: 'JCB',
 	},
 	mastercard: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.mastercard',
+		id: 'payment-method.mastercard',
 		defaultMessage: 'MasterCard',
 	},
 	paypal: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
+		id: 'payment-method.paypal',
 		defaultMessage: 'PayPal',
 	},
 	paypalInternational: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal_international',
+		id: 'payment-method.paypal_international',
 		defaultMessage: 'PayPal International',
 	},
 	paypalUS: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
+		id: 'payment-method.paypal',
 		defaultMessage: 'PayPal',
 	},
 	unionpay: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
+		id: 'payment-method.unionpay',
 		defaultMessage: 'UnionPay',
 	},
 	unknown: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.unknown',
+		id: 'payment-method.unknown',
 		defaultMessage: 'Unknown payment method',
 	},
 	visa: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.visa',
+		id: 'payment-method.visa',
 		defaultMessage: 'Visa',
 	},
 	venmo: {
@@ -737,5 +1136,32 @@ export const paymentMethodMessages = defineMessages({
 	charityPlural: {
 		id: 'payment-method.charity-plural',
 		defaultMessage: 'Charities',
+	},
+})
+
+export const externalProjectLicenseStatusMessages = defineMessages({
+	yes: {
+		id: 'external-project-license-status.yes',
+		defaultMessage: 'Yes',
+	},
+	'with-attribution-and-source': {
+		id: 'external-project-license-status.with-attribution-and-source',
+		defaultMessage: 'With attribution and source',
+	},
+	'with-attribution': {
+		id: 'external-project-license-status.with-attribution',
+		defaultMessage: 'With attribution',
+	},
+	no: {
+		id: 'external-project-license-status.no',
+		defaultMessage: 'No',
+	},
+	'permanent-no': {
+		id: 'external-project-license-status.permanent-no',
+		defaultMessage: 'Permanent no',
+	},
+	unidentified: {
+		id: 'external-project-license-status.unidentified',
+		defaultMessage: 'Unidentified',
 	},
 })

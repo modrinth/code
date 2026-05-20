@@ -9,7 +9,7 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-details',
 	stageContent: markRaw(DetailsStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit details' : 'Details'),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit version' : 'Details'),
 	maxWidth: '744px',
 	disableClose: (ctx) => ctx.isUploading.value,
 	leftButtonConfig: (ctx) =>

@@ -1,41 +1,105 @@
 <template>
-	<div>
+	<div v-if="instance" :class="{ 'flex h-full flex-col': isFixedRender }">
 		<div
-			class="p-6 pr-2 pb-4"
-			@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
+			:class="['p-6 pr-2 pb-4', { 'shrink-0': isFixedRender }]"
+			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
 		>
 			<ExportModal ref="exportModal" :instance="instance" />
-			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
+			<InstanceSettingsModal
+				:key="instance.path"
+				ref="settingsModal"
+				:instance="instance"
+				:offline="offline"
+				@unlinked="fetchInstance"
+			/>
+			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
 			<ContentPageHeader>
 				<template #icon>
-					<Avatar :src="icon" :alt="instance.name" size="96px" :tint-by="instance.path" />
+					<Avatar
+						:src="icon ? icon : undefined"
+						:alt="instance.name"
+						size="64px"
+						:tint-by="instance.path"
+					/>
 				</template>
 				<template #title>
 					{{ instance.name }}
 				</template>
-				<template #summary> </template>
 				<template #stats>
-					<div
-						class="flex items-center gap-2 font-semibold transform capitalize border-0 border-solid border-divider pr-4 md:border-r"
-					>
-						<GameIcon class="h-6 w-6 text-secondary" />
-						{{ instance.loader }} {{ instance.game_version }}
-					</div>
-					<div class="flex items-center gap-2 font-semibold">
-						<TimerIcon class="h-6 w-6 text-secondary" />
-						<template v-if="timePlayed > 0">
-							{{ timePlayedHumanized }}
+					<div class="flex items-center flex-wrap gap-2">
+						<template v-if="!isServerInstance">
+							<div class="flex items-center gap-2 capitalize font-medium">
+								{{ instance.loader }} {{ instance.game_version }}
+							</div>
+
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div class="flex items-center gap-2 font-medium">
+								<template v-if="timePlayed > 0">
+									{{ timePlayedHumanized }}
+								</template>
+								<template v-else> Never played </template>
+							</div>
 						</template>
-						<template v-else> Never played </template>
+
+						<template v-else>
+							<template v-if="loadingServerPing">
+								<ServerOnlinePlayers
+									v-if="playersOnline !== undefined"
+									:online="playersOnline"
+									:status-online="statusOnline"
+									hide-label
+								/>
+								<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
+								<div
+									v-if="
+										(playersOnline !== undefined || recentPlays !== undefined) &&
+										(minecraftServer?.region || ping)
+									"
+									class="w-1.5 h-1.5 rounded-full bg-surface-5"
+								></div>
+								<ServerPing v-if="ping" :ping="ping" />
+							</template>
+
+							<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
+
+							<div
+								v-if="minecraftServer?.region || ping"
+								class="w-1.5 h-1.5 rounded-full bg-surface-5"
+							></div>
+
+							<div
+								v-if="linkedProjectV3"
+								class="flex gap-1.5 items-center font-medium text-primary"
+							>
+								Linked to
+								<Avatar
+									:src="linkedProjectV3.icon_url"
+									:alt="linkedProjectV3.name"
+									:tint-by="instance.path"
+									size="24px"
+								/>
+								<router-link
+									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
+									class="hover:underline text-primary truncate"
+								>
+									{{ linkedProjectV3.name }}
+								</router-link>
+							</div>
+						</template>
 					</div>
 				</template>
 				<template #actions>
 					<div class="flex gap-2">
 						<ButtonStyled
 							v-if="
-								['installing', 'pack_installing', 'minecraft_installing'].includes(
-									instance.install_stage,
-								)
+								[
+									'installing',
+									'pack_installing',
+									'pack_installed',
+									'not_installed',
+									'minecraft_installing',
+								].includes(instance.install_stage)
 							"
 							color="brand"
 							size="large"
@@ -53,13 +117,13 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled v-else-if="playing === true" color="red" size="large">
-							<button @click="stopInstance('InstancePage')">
+							<button :disabled="stopping" @click="stopInstance('InstancePage')">
 								<StopCircleIcon />
-								Stop
+								{{ stopping ? 'Stopping...' : 'Stop' }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled
-							v-else-if="playing === false && loading === false"
+							v-else-if="playing === false && loading === false && !isServerInstance"
 							color="brand"
 							size="large"
 						>
@@ -68,28 +132,68 @@
 								Play
 							</button>
 						</ButtonStyled>
+						<div
+							v-else-if="playing === false && loading === false && isServerInstance"
+							class="joined-buttons"
+						>
+							<ButtonStyled color="brand" size="large">
+								<button @click="handlePlayServer()">
+									<PlayIcon />
+									Play
+								</button>
+							</ButtonStyled>
+							<ButtonStyled color="brand" size="large">
+								<OverflowMenu
+									:options="[
+										{
+											id: 'join_server',
+											action: () => handlePlayServer(),
+										},
+										{
+											id: 'launch_instance',
+											action: () => startInstance('InstancePage'),
+										},
+									]"
+								>
+									<div class="w-0 text-xl relative top-0.5 right-2.5">
+										<DropdownIcon />
+									</div>
+
+									<template #join_server>
+										<PlayIcon />
+										Join server
+									</template>
+									<template #launch_instance>
+										<PlayIcon />
+										Launch instance
+									</template>
+								</OverflowMenu>
+							</ButtonStyled>
+						</div>
 						<ButtonStyled
 							v-else-if="loading === true && playing === false"
 							color="brand"
 							size="large"
 						>
-							<button disabled>Loading...</button>
+							<button disabled>Starting...</button>
 						</ButtonStyled>
-						<ButtonStyled size="large" circular>
-							<button v-tooltip="'Instance settings'" @click="settingsModal.show()">
+						<ButtonStyled circular size="large">
+							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
 								<SettingsIcon />
 							</button>
 						</ButtonStyled>
-						<ButtonStyled size="large" type="transparent" circular>
+						<ButtonStyled type="transparent" circular size="large">
 							<OverflowMenu
 								:options="[
 									{
 										id: 'open-folder',
-										action: () => showProfileInFolder(instance.path),
+										action: () => {
+											if (instance) showProfileInFolder(instance.path)
+										},
 									},
 									{
 										id: 'export-mrpack',
-										action: () => $refs.exportModal.show(),
+										action: () => exportModal?.show(),
 									},
 								]"
 							>
@@ -104,31 +208,29 @@
 				</template>
 			</ContentPageHeader>
 		</div>
-		<div class="px-6">
+		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
 			<NavTabs :links="tabs" />
 		</div>
-		<div v-if="!!instance" class="p-6 pt-4">
-			<RouterView v-slot="{ Component }" :key="instance.path">
+		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
+			<RouterView
+				v-if="route.path.startsWith('/instance')"
+				v-slot="{ Component }"
+				:key="instance.path"
+			>
 				<template v-if="Component">
-					<Suspense
-						:key="instance.path"
-						@pending="loadingBar.startLoading()"
-						@resolve="loadingBar.stopLoading()"
-					>
+					<Suspense :key="instance.path">
 						<component
 							:is="Component"
 							:instance="instance"
 							:options="options"
 							:offline="offline"
 							:playing="playing"
-							:versions="modrinthVersions"
 							:installed="instance.install_stage !== 'installed'"
+							:is-server-instance="isServerInstance"
+							:open-settings="() => settingsModal?.show(1)"
 							@play="updatePlayState"
 							@stop="() => stopInstance('InstanceSubpage')"
 						></component>
-						<template #fallback>
-							<LoadingIndicator />
-						</template>
 					</Suspense>
 				</template>
 			</RouterView>
@@ -156,16 +258,18 @@
 		</ContextMenu>
 	</div>
 </template>
-<script setup>
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
+	BoxesIcon,
 	CheckCircleIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
+	DropdownIcon,
 	EditIcon,
 	ExternalIcon,
 	EyeIcon,
 	FolderOpenIcon,
-	GameIcon,
 	GlobeIcon,
 	HashIcon,
 	MoreVerticalIcon,
@@ -175,7 +279,7 @@ import {
 	ServerIcon,
 	SettingsIcon,
 	StopCircleIcon,
-	TimerIcon,
+	TerminalSquareIcon,
 	UpdatedIcon,
 	UserPlusIcon,
 	XIcon,
@@ -185,9 +289,14 @@ import {
 	ButtonStyled,
 	ContentPageHeader,
 	injectNotificationManager,
-	LoadingIndicator,
+	NavTabs,
 	OverflowMenu,
+	ServerOnlinePlayers,
+	ServerPing,
+	ServerRecentPlays,
+	ServerRegion,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
@@ -198,20 +307,26 @@ import { useRoute, useRouter } from 'vue-router'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
-import NavTabs from '@/components/ui/NavTabs.vue'
+import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
+import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_version_many } from '@/helpers/cache.js'
+import { get_project_v3 } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
+import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
+import { get_server_status, refreshWorlds } from '@/helpers/worlds'
+import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { useBreadcrumbs, useLoading } from '@/store/state'
+import { useBreadcrumbs } from '@/store/state'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
+const { playServerProject } = injectServerInstall()
+const queryClient = useQueryClient()
 const route = useRoute()
 
 const router = useRouter()
@@ -225,37 +340,88 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const instance = ref()
-const modrinthVersions = ref([])
+const instance = ref<GameInstance>()
 const playing = ref(false)
 const loading = ref(false)
+const stopping = ref(false)
+const exportModal = ref<InstanceType<typeof ExportModal>>()
+const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
+
+const isServerInstance = ref(false)
+const linkedProjectV3 = ref<Labrinth.Projects.v3.Project>()
+const selected = ref<unknown[]>([])
+
+const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
+const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
+const statusOnline = computed(() => !!javaServerPingData.value)
+const recentPlays = computed(
+	() => linkedProjectV3.value?.minecraft_java_server?.verified_plays_2w ?? undefined,
+)
+const playersOnline = ref<number | undefined>(undefined)
+const ping = ref<number | undefined>(undefined)
+const loadingServerPing = ref(false)
 
 async function fetchInstance() {
-	instance.value = await get(route.params.id).catch(handleError)
+	isServerInstance.value = false
+	linkedProjectV3.value = undefined
+	ping.value = undefined
+	playersOnline.value = undefined
+	loadingServerPing.value = false
 
-	if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
-		get_project(instance.value.linked_data.project_id, 'must_revalidate')
-			.catch(handleError)
-			.then((project) => {
-				if (project && project.versions) {
-					get_version_many(project.versions, 'must_revalidate')
-						.catch(handleError)
-						.then((versions) => {
-							modrinthVersions.value = versions.sort(
-								(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
-							)
-						})
-				}
-			})
+	instance.value = await get(route.params.id as string).catch(handleError)
+
+	if (!offline.value && instance.value?.linked_data && instance.value.linked_data.project_id) {
+		try {
+			linkedProjectV3.value = await get_project_v3(
+				instance.value.linked_data.project_id,
+				'must_revalidate',
+			)
+
+			if (linkedProjectV3.value?.minecraft_server != null) {
+				isServerInstance.value = true
+			}
+		} catch (error) {
+			handleError(error as Error)
+		}
 	}
 
-	await updatePlayState()
+	fetchDeferredData()
+
+	if (instance.value) {
+		queryClient.prefetchQuery({
+			queryKey: ['worlds', instance.value.path],
+			queryFn: () => refreshWorlds(instance.value!.path),
+			staleTime: 30_000,
+		})
+	}
+}
+
+function fetchDeferredData() {
+	const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
+	if (isServerInstance.value && serverAddress) {
+		get_server_status(serverAddress)
+			.then((status) => {
+				playersOnline.value = status.players?.online
+				ping.value = status.ping
+			})
+			.catch((error) => {
+				console.error(`Failed to fetch server status for ${serverAddress}:`, error)
+			})
+			.finally(() => {
+				loadingServerPing.value = true
+			})
+	} else {
+		loadingServerPing.value = true
+	}
+
+	updatePlayState()
 }
 
 async function updatePlayState() {
-	const runningProcesses = await get_by_profile_path(route.params.id).catch(handleError)
+	if (!route.params.id) return
+	const runningProcesses = await get_by_profile_path(route.params.id as string).catch(handleError)
 
-	playing.value = runningProcesses.length > 0
+	playing.value = Array.isArray(runningProcesses) && runningProcesses.length > 0
 }
 
 await fetchInstance()
@@ -268,47 +434,73 @@ watch(
 	},
 )
 
-const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id)}`)
+const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id as string)}`)
+
+/**
+ * Per-route layout mode.
+ * - `'scroll'` (default): the whole instance page scrolls inside `.app-viewport`. This lets
+ *   `position: sticky` children (and the viewport-rooted `IntersectionObserver` used by
+ *   `useStickyObserver`) work correctly.
+ * - `'fixed'`: the header + tabs are pinned and only the tab body scrolls in its own container.
+ *   Used by tabs whose content (e.g. the log console) needs a bounded height to resolve `h-full`.
+ */
+const renderMode = computed<'scroll' | 'fixed'>(() =>
+	route.meta.renderMode === 'fixed' ? 'fixed' : 'scroll',
+)
+const isFixedRender = computed(() => renderMode.value === 'fixed')
 
 const tabs = computed(() => [
 	{
 		label: 'Content',
 		href: `${basePath.value}`,
+		icon: BoxesIcon,
+	},
+	{
+		label: 'Files',
+		href: `${basePath.value}/files`,
+		icon: FolderOpenIcon,
 	},
 	{
 		label: 'Worlds',
 		href: `${basePath.value}/worlds`,
+		icon: GlobeIcon,
 	},
 	{
 		label: 'Logs',
 		href: `${basePath.value}/logs`,
+		icon: TerminalSquareIcon,
 	},
 ])
 
-breadcrumbs.setName(
-	'Instance',
-	instance.value.name.length > 40
-		? instance.value.name.substring(0, 40) + '...'
-		: instance.value.name,
-)
+if (instance.value) {
+	breadcrumbs.setName(
+		'Instance',
+		instance.value.name.length > 40
+			? instance.value.name.substring(0, 40) + '...'
+			: instance.value.name,
+	)
+	breadcrumbs.setContext({
+		name: instance.value.name,
+		link: route.path,
+		query: route.query,
+	})
+}
 
-breadcrumbs.setContext({
-	name: instance.value.name,
-	link: route.path,
-	query: route.query,
-})
+const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
-const loadingBar = useLoading()
+const startInstance = async (context: string) => {
+	if (!instance.value) return
+	if (updateToPlayModal.value?.hasUpdate) {
+		updateToPlayModal.value.show(instance.value)
+		return
+	}
 
-const options = ref(null)
-
-const startInstance = async (context) => {
 	loading.value = true
 	try {
-		await run(route.params.id)
+		await run(route.params.id as string)
 		playing.value = true
 	} catch (err) {
-		handleSevereError(err, { profilePath: route.params.id })
+		handleSevereError(err, { profilePath: route.params.id as string })
 	}
 	loading.value = false
 
@@ -319,10 +511,13 @@ const startInstance = async (context) => {
 	})
 }
 
-const stopInstance = async (context) => {
+const stopInstance = async (context: string) => {
+	stopping.value = true
+	await kill(route.params.id as string).catch(handleError)
+	stopping.value = false
 	playing.value = false
-	await kill(route.params.id).catch(handleError)
 
+	if (!instance.value) return
 	trackEvent('InstanceStop', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
@@ -330,11 +525,22 @@ const stopInstance = async (context) => {
 	})
 }
 
+const handlePlayServer = async () => {
+	if (!instance.value?.linked_data?.project_id) return
+	loading.value = true
+	try {
+		await playServerProject(instance.value.linked_data.project_id)
+	} finally {
+		await updatePlayState()
+		loading.value = false
+	}
+}
+
 const repairInstance = async () => {
 	await finish_install(instance.value).catch(handleError)
 }
 
-const handleRightClick = (event) => {
+const handleRightClick = (event: MouseEvent) => {
 	const baseOptions = [
 		{ name: 'add_content' },
 		{ type: 'divider' },
@@ -343,7 +549,7 @@ const handleRightClick = (event) => {
 		{ name: 'copy_path' },
 	]
 
-	options.value.showMenu(
+	options.value?.showMenu(
 		event,
 		instance.value,
 		playing.value
@@ -364,7 +570,7 @@ const handleRightClick = (event) => {
 	)
 }
 
-const handleOptionsClick = async (args) => {
+const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 	switch (args.option) {
 		case 'play':
 			await startInstance('InstancePageContextMenu')
@@ -374,52 +580,69 @@ const handleOptionsClick = async (args) => {
 			break
 		case 'add_content':
 			await router.push({
-				path: `/browse/${instance.value.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+				path: `/browse/${instance.value?.loader === 'vanilla' ? 'datapack' : 'mod'}`,
 				query: { i: route.params.id },
 			})
 			break
 		case 'edit':
 			await router.push({
-				path: `/instance/${encodeURIComponent(route.params.id)}/options`,
+				path: `/instance/${encodeURIComponent(route.params.id as string)}/options`,
 			})
 			break
 		case 'open_folder':
-			await showProfileInFolder(instance.value.path)
+			if (instance.value) await showProfileInFolder(instance.value.path)
 			break
 		case 'copy_path': {
-			const fullPath = await get_full_path(instance.value.path)
-			await navigator.clipboard.writeText(fullPath)
+			if (instance.value) {
+				const fullPath = await get_full_path(instance.value?.path)
+				await navigator.clipboard.writeText(fullPath)
+			}
 			break
 		}
 	}
 }
 
-const unlistenProfiles = await profile_listener(async (event) => {
-	if (event.profile_path_id === route.params.id) {
-		if (event.event === 'removed') {
-			await router.push({
-				path: '/',
-			})
+const unlistenProfiles = await profile_listener(
+	async (event: { profile_path_id: string; event: string }) => {
+		if (event.profile_path_id !== route.params.id) return
+		if (event.event === 'removed' || route.path === '/') {
+			if (route.path !== '/') {
+				await router.push({ path: '/' })
+			}
 			return
 		}
-		instance.value = await get(route.params.id).catch(handleError)
-	}
-})
-
-const unlistenProcesses = await process_listener((e) => {
-	if (e.event === 'finished' && e.profile_path_id === route.params.id) {
-		playing.value = false
-	}
-})
-
-const icon = computed(() =>
-	instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+		instance.value = await get(route.params.id as string).catch((err) => {
+			if (String(err).includes('not managed')) {
+				router.push({ path: '/' })
+				return undefined
+			}
+			return handleError(err)
+		})
+		if (!instance.value?.linked_data?.project_id) {
+			linkedProjectV3.value = undefined
+			isServerInstance.value = false
+		}
+	},
 )
 
-const settingsModal = ref()
+const unlistenProcesses = await process_listener(
+	(e: { event: string; profile_path_id: string }) => {
+		if (e.event === 'finished' && e.profile_path_id === route.params.id) {
+			playing.value = false
+		}
+	},
+)
+
+const icon = computed(() =>
+	instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+)
+
+const settingsModal = ref<InstanceType<typeof InstanceSettingsModal>>()
 
 const timePlayed = computed(() => {
-	return instance.value.recent_time_played + instance.value.submitted_time_played
+	return instance.value
+		? instance.value.recent_time_played + instance.value.submitted_time_played
+		: 0
 })
 
 const timePlayedHumanized = computed(() => {
@@ -441,6 +664,11 @@ const timePlayedHumanized = computed(() => {
 onUnmounted(() => {
 	unlistenProcesses()
 	unlistenProfiles()
+	const profilePath = route.params.id
+	if (profilePath) {
+		const { destroy } = useInstanceConsole(profilePath)
+		destroy()
+	}
 })
 </script>
 

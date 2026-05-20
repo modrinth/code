@@ -11,6 +11,8 @@ use crate::database::models::{
     product_item, user_subscription_item, users_redeemals,
 };
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::billing::{
     ChargeStatus, ChargeType, PaymentPlatform, Price, PriceDuration,
     ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
@@ -28,7 +30,6 @@ use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use futures::FutureExt;
 use futures::stream::{FuturesUnordered, StreamExt};
-use sqlx::PgPool;
 use std::collections::HashSet;
 use std::str::FromStr;
 use std::time::Instant;
@@ -49,7 +50,7 @@ async fn update_tax_amounts(
     loop {
         let mut txn = pg.begin().await?;
 
-        let charges = DBCharge::get_updateable_lock(&mut *txn, 5).await?;
+        let charges = DBCharge::get_updateable_lock(&mut txn, 5).await?;
 
         if charges.is_empty() {
             info!("No more charges to process");
@@ -273,7 +274,7 @@ async fn update_anrok_transactions(
 ) -> Result<(), ApiError> {
     async fn process_charge(
         stripe_client: &stripe::Client,
-        txn: &mut sqlx::PgTransaction<'_>,
+        txn: &mut PgTransaction<'_>,
         redis: &RedisPool,
         anrok_client: &anrok::Client,
         mut c: DBCharge,
@@ -341,7 +342,7 @@ async fn update_anrok_transactions(
                 .and_then(|x| x.billing_details.address);
 
             let stripe_customer_id =
-                DBUser::get_id(c.user_id, &mut **txn, redis)
+                DBUser::get_id(c.user_id, &mut *txn, redis)
                     .await?
                     .ok_or_else(|| {
                         ApiError::from(DatabaseError::Database(
@@ -395,7 +396,7 @@ async fn update_anrok_transactions(
             (address, tax_platform_id, customer_id)
         };
 
-        let tax_id = DBProductsTaxIdentifier::get_price(c.price_id, &mut **txn)
+        let tax_id = DBProductsTaxIdentifier::get_price(c.price_id, &mut *txn)
             .await?
             .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
 
@@ -466,7 +467,7 @@ async fn update_anrok_transactions(
         let mut txn = pg.begin().await?;
 
         let mut charges =
-            DBCharge::get_missing_tax_identifier_lock(&mut *txn, offset, 1)
+            DBCharge::get_missing_tax_identifier_lock(&mut txn, offset, 1)
                 .await?;
 
         let Some(c) = charges.pop() else {
@@ -654,7 +655,7 @@ pub async fn try_process_user_redeemal(
 
     // Update `users_redeemal`, mark subscription as redeemed.
     user_redeemal.status = users_redeemals::Status::Processed;
-    user_redeemal.update(&mut *txn).await?;
+    user_redeemal.update(&mut txn).await?;
 
     txn.commit().await?;
 
@@ -896,7 +897,7 @@ async fn unprovision_subscriptions(
                     badges.bits() as i64,
                     user.id as DBUserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut transaction)
                 .await?;
 
                 true
@@ -913,10 +914,10 @@ async fn unprovision_subscriptions(
                 let res = reqwest::Client::new()
                     .post(format!(
                         "{}/modrinth/v0/servers/{}/suspend",
-                        dotenvy::var("ARCHON_URL")?,
+                        ENV.ARCHON_URL,
                         server_id
                     ))
-                    .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                    .header("X-Master-Key", &ENV.PYRO_API_KEY)
                     .json(&serde_json::json!({
                         "reason": if charge.status == ChargeStatus::Cancelled || charge.status == ChargeStatus::Expiring {
                             "cancelled"
@@ -942,7 +943,7 @@ async fn unprovision_subscriptions(
 
             DBUsersSubscriptionsAffiliations::deactivate(
                 subscription.id,
-                &mut *transaction,
+                &mut transaction,
             )
             .await
             .wrap_internal_err(

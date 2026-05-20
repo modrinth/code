@@ -21,15 +21,21 @@ async function updateJavaVersion(version) {
 }
 </script>
 <template>
-	<div v-for="(javaVersion, index) in [25, 21, 17, 8]" :key="`java-${javaVersion}`">
-		<h2 class="m-0 text-lg font-extrabold text-contrast" :class="{ 'mt-4': index !== 0 }">
-			Java {{ javaVersion }} location
-		</h2>
-		<JavaSelector
-			:id="'java-selector-' + javaVersion"
-			v-model="javaVersions[javaVersion]"
-			:version="javaVersion"
-			@update:model-value="updateJavaVersion"
-		/>
+	<div class="flex flex-col gap-6">
+		<div
+			v-for="(javaVersion, index) in [25, 21, 17, 8]"
+			:key="`java-${javaVersion}`"
+			class="flex flex-col gap-2.5"
+		>
+			<h2 class="m-0 text-lg font-semibold text-contrast" :class="{ 'mt-4': index !== 0 }">
+				Java {{ javaVersion }} location
+			</h2>
+			<JavaSelector
+				:id="'java-selector-' + javaVersion"
+				v-model="javaVersions[javaVersion]"
+				:version="javaVersion"
+				@update:model-value="updateJavaVersion"
+			/>
+		</div>
 	</div>
 </template>

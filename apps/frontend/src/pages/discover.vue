@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { commonProjectTypeCategoryMessages, useVIntl } from '@modrinth/ui'
-
-import NavTabs from '~/components/ui/NavTabs.vue'
+import { commonProjectTypeCategoryMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
 
@@ -46,17 +44,16 @@ const selectableProjectTypes = [
 		label: formatMessage(commonProjectTypeCategoryMessages.server),
 		href: `/discover/servers`,
 		type: 'servers',
-		shown: flags.value.serverDiscovery,
 	},
 ]
 </script>
 <template>
 	<div class="new-page sidebar" :class="{ 'alt-layout': !cosmetics.rightSearchLayout }">
 		<section class="normal-page__header mb-4 flex flex-col gap-4">
-			<div id="discover-header-prefix" class="empty:hidden"></div>
 			<NavTabs
 				v-if="!flags.projectTypesPrimaryNav && allowTabChanging"
 				:links="selectableProjectTypes"
+				replace
 				class="hidden md:flex"
 			/>
 		</section>

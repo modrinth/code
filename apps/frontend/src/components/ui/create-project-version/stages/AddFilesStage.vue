@@ -1,4 +1,11 @@
 <template>
+	<Tabs
+		v-if="editingVersion"
+		value="add-files"
+		:tabs="editTabs"
+		class="mb-5 border border-solid border-surface-5 !shadow-none !drop-shadow-none"
+		@change="setEditTab"
+	/>
 	<div class="flex w-full flex-col gap-4">
 		<template
 			v-if="handlingNewFiles || !(filesToAdd.length || draftVersion.existing_files?.length)"
@@ -91,6 +98,8 @@ import {
 	defineMessages,
 	DropzoneFileInput,
 	injectProjectPageContext,
+	Tabs,
+	type TabsTab,
 	useVIntl,
 } from '@modrinth/ui'
 import { acceptFileFromProjectType } from '@modrinth/utils'
@@ -110,9 +119,20 @@ const {
 	swapPrimaryFile,
 	replacePrimaryFile,
 	editingVersion,
+	modal,
 	primaryFile,
 	handleNewFiles,
 } = injectManageVersionContext()
+
+const editTabs: TabsTab[] = [
+	{ label: 'Metadata', value: 'metadata' },
+	{ label: 'Details', value: 'add-details' },
+	{ label: 'Files', value: 'add-files' },
+]
+
+function setEditTab(tab: TabsTab) {
+	modal.value?.setStage(tab.value)
+}
 
 function handleRemoveFile(index: number) {
 	filesToAdd.value.splice(index, 1)

@@ -1,3 +1,5 @@
+use crate::database::PgTransaction;
+
 use super::ids::*;
 use chrono::{DateTime, Utc};
 
@@ -29,7 +31,7 @@ pub struct ReportQueryResult {
 impl DBReport {
     pub async fn insert(
         &self,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
             "
@@ -50,7 +52,7 @@ impl DBReport {
             self.body,
             self.reporter as DBUserId
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(())
@@ -61,7 +63,7 @@ impl DBReport {
         exec: E,
     ) -> Result<Option<ReportQueryResult>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec)
             .await
@@ -73,7 +75,7 @@ impl DBReport {
         exec: E,
     ) -> Result<Vec<ReportQueryResult>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -111,7 +113,7 @@ impl DBReport {
 
     pub async fn remove_full(
         id: DBReportId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         let result = sqlx::query!(
             "
@@ -119,7 +121,7 @@ impl DBReport {
             ",
             id as DBReportId
         )
-        .fetch_one(&mut **transaction)
+        .fetch_one(&mut *transaction)
         .await?;
 
         if !result.exists.unwrap_or(false) {
@@ -133,7 +135,7 @@ impl DBReport {
             ",
             id as DBReportId
         )
-        .fetch_optional(&mut **transaction)
+        .fetch_optional(&mut *transaction)
         .await?;
 
         if let Some(thread_id) = thread_id {
@@ -150,7 +152,7 @@ impl DBReport {
             ",
             id as DBReportId,
         )
-        .execute(&mut **transaction)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))

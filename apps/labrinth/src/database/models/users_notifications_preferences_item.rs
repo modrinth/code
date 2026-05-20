@@ -39,14 +39,14 @@ impl From<UserNotificationPreferenceQueryResult>
 impl UserNotificationPreference {
     pub async fn get_user_or_default(
         user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<UserNotificationPreference>, DatabaseError> {
         Self::get_many_users_or_default(&[user_id], exec).await
     }
 
     pub async fn get_many_users_or_default(
         user_ids: &[DBUserId],
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<UserNotificationPreference>, DatabaseError> {
         let results = sqlx::query!(
             r#"
@@ -86,7 +86,7 @@ impl UserNotificationPreference {
     /// Inserts the row into the table and updates its ID.
     pub async fn insert(
         &mut self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         let id = sqlx::query_scalar!(
             "

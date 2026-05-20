@@ -316,7 +316,7 @@ async fn search_projects() {
                 async move {
                     let projects = api
                         .search_deserialized(
-                            Some(&format!("\"&{test_name}\"")),
+                            Some(&format!("&{test_name}")),
                             Some(facets.clone()),
                             USER_USER_PAT,
                         )
@@ -337,7 +337,7 @@ async fn search_projects() {
         // A couple additional tests for the search type returned, making sure it is properly translated back
         let client_side_required = api
             .search_deserialized(
-                Some(&format!("\"&{test_name}\"")),
+                Some(&format!("&{test_name}")),
                 Some(json!([["client_side:required"]])),
                 USER_USER_PAT,
             )
@@ -348,7 +348,7 @@ async fn search_projects() {
 
         let server_side_required = api
             .search_deserialized(
-                Some(&format!("\"&{test_name}\"")),
+                Some(&format!("&{test_name}")),
                 Some(json!([["server_side:required"]])),
                 USER_USER_PAT,
             )
@@ -359,7 +359,7 @@ async fn search_projects() {
 
         let client_side_unsupported = api
             .search_deserialized(
-                Some(&format!("\"&{test_name}\"")),
+                Some(&format!("&{test_name}")),
                 Some(json!([["client_side:unsupported"]])),
                 USER_USER_PAT,
             )
@@ -370,7 +370,7 @@ async fn search_projects() {
 
         let client_side_optional_server_side_optional = api
             .search_deserialized(
-                Some(&format!("\"&{test_name}\"")),
+                Some(&format!("&{test_name}")),
                 Some(json!([["client_side:optional"], ["server_side:optional"]])),
                 USER_USER_PAT,
             )
@@ -384,7 +384,7 @@ async fn search_projects() {
         // over all versions of a project
         let game_versions = api
             .search_deserialized(
-                Some(&format!("\"&{test_name}\"")),
+                Some(&format!("&{test_name}")),
                 Some(json!([["categories:forge"], ["versions:1.20.2"]])),
                 USER_USER_PAT,
             )

@@ -1,0 +1,31 @@
+import type { Ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+
+import type { ContentItem } from '../types'
+
+export function useContentSelection(items: Ref<ContentItem[]>) {
+	const selectedIds = ref<string[]>([])
+
+	const selectedItems = computed(() =>
+		items.value.filter((item) => selectedIds.value.includes(item.id)),
+	)
+
+	watch(items, (newItems) => {
+		if (selectedIds.value.length === 0) return
+		const validIds = new Set(newItems.map((item) => item.id))
+		const pruned = selectedIds.value.filter((id) => validIds.has(id))
+		if (pruned.length !== selectedIds.value.length) {
+			selectedIds.value = pruned
+		}
+	})
+
+	function clearSelection() {
+		selectedIds.value = []
+	}
+
+	function removeFromSelection(id: string) {
+		selectedIds.value = selectedIds.value.filter((i) => i !== id)
+	}
+
+	return { selectedIds, selectedItems, clearSelection, removeFromSelection }
+}

@@ -2,6 +2,7 @@
 
 use super::ApiError;
 use crate::database;
+use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::models::teams::ProjectPermissions;
 use crate::{
@@ -15,7 +16,6 @@ use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Duration, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use sqlx::postgres::types::PgInterval;
 use std::collections::HashMap;
 use std::convert::TryInto;

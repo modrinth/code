@@ -98,7 +98,7 @@ function getPreviewClass(option: T): string {
 <style scoped lang="scss">
 .theme-options {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 	gap: var(--gap-lg);
 
 	.preview {

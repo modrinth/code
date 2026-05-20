@@ -15,7 +15,7 @@ pub struct DBAffiliateCode {
 impl DBAffiliateCode {
     pub async fn get_by_id(
         id: DBAffiliateCodeId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBAffiliateCode>, DatabaseError> {
         let record = sqlx::query!(
             "SELECT id, created_at, created_by, affiliate, source_name
@@ -36,7 +36,7 @@ impl DBAffiliateCode {
 
     pub async fn get_by_affiliate(
         affiliate: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBAffiliateCode>, DatabaseError> {
         let records = sqlx::query!(
             "SELECT id, created_at, created_by, affiliate, source_name
@@ -62,7 +62,7 @@ impl DBAffiliateCode {
 
     pub async fn insert(
         &self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "INSERT INTO affiliate_codes (id, created_at, created_by, affiliate, source_name)
@@ -80,7 +80,7 @@ impl DBAffiliateCode {
 
     pub async fn remove(
         id: DBAffiliateCodeId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<()>, DatabaseError> {
         let result = sqlx::query!(
             "DELETE FROM affiliate_codes WHERE id = $1",
@@ -99,7 +99,7 @@ impl DBAffiliateCode {
     pub async fn update_source_name(
         id: DBAffiliateCodeId,
         source_name: &str,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<bool, DatabaseError> {
         let result = sqlx::query!(
             "UPDATE affiliate_codes SET source_name = $1 WHERE id = $2",
@@ -113,7 +113,7 @@ impl DBAffiliateCode {
     }
 
     pub async fn get_all(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBAffiliateCode>, DatabaseError> {
         let records = sqlx::query!(
             "SELECT id, created_at, created_by, affiliate, source_name

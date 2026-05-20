@@ -13,6 +13,8 @@ import {
 } from '@modrinth/api-client'
 import type { Ref } from 'vue'
 
+import { useFeatureFlags } from '~/composables/featureFlags.ts'
+
 async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
 	try {
 		const mod = 'cloudflare:workers'
@@ -28,6 +30,7 @@ export function createModrinthClient(
 	auth: Ref<{ token: string | undefined }>,
 	config: { apiBaseUrl: string; archonBaseUrl: string; rateLimitKey?: string },
 ): NuxtModrinthClient {
+	const flags = useFeatureFlags()
 	const optionalFeatures = [
 		import.meta.dev ? (new VerboseLoggingFeature() as AbstractFeature) : undefined,
 	].filter(Boolean) as AbstractFeature[]
@@ -35,6 +38,7 @@ export function createModrinthClient(
 	const clientConfig: NuxtClientConfig = {
 		labrinthBaseUrl: config.apiBaseUrl,
 		archonBaseUrl: config.archonBaseUrl,
+		archonSentryCapture: () => flags.value.archonSentryCapture,
 		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
 		features: [
 			// for modrinth hosting

@@ -1,20 +1,21 @@
 use super::ApiError;
 use crate::auth::checks::{filter_visible_versions, is_visible_version};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::database::PgPool;
 use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
 use crate::models::ids::VersionId;
 use crate::models::pats::Scopes;
-use crate::models::projects::VersionType;
+use crate::models::projects::{ProjectStatus, VersionStatus, VersionType};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
+use crate::routes::internal::delphi;
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, web};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use std::collections::HashMap;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -405,18 +406,26 @@ async fn update_files_internal(
         "
         SELECT v.id version_id, v.mod_id mod_id
         FROM mods m
-        INNER JOIN versions v ON m.id = v.mod_id AND (cardinality($4::varchar[]) = 0 OR v.version_type = ANY($4))
+        INNER JOIN versions v ON m.id = v.mod_id AND (cardinality($4::varchar[]) = 0 OR v.version_type = ANY($4)) AND v.status = ANY($5)
         INNER JOIN version_fields vf ON vf.field_id = 3 AND v.id = vf.version_id
         INNER JOIN loader_field_enum_values lfev ON vf.enum_value = lfev.id AND (cardinality($2::varchar[]) = 0 OR lfev.value = ANY($2::varchar[]))
         INNER JOIN loaders_versions lv ON lv.version_id = v.id
         INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
-        WHERE m.id = ANY($1)
+        WHERE m.id = ANY($1) AND m.status = ANY($6)
         ORDER BY v.date_published ASC
         ",
         &files.iter().map(|x| x.project_id.0).collect::<Vec<_>>(),
         &update_data.game_versions.clone().unwrap_or_default(),
         &update_data.loaders.clone().unwrap_or_default(),
         &update_data.version_types.clone().unwrap_or_default().iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+        &*VersionStatus::iterator()
+            .filter(|x| !x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
+        &*ProjectStatus::iterator()
+            .filter(|x| !x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     )
         .fetch(&***pool)
         .try_fold(DashMap::new(), |acc : DashMap<_,Vec<database::models::ids::DBVersionId>>, m| {
@@ -688,6 +697,9 @@ pub async fn delete_file(
         }
 
         let mut transaction = pool.begin().await?;
+        let was_in_tech_review =
+            delphi::is_project_in_tech_review(row.project_id, &mut transaction)
+                .await?;
 
         sqlx::query!(
             "
@@ -696,7 +708,7 @@ pub async fn delete_file(
             ",
             row.id.0
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
         .await?;
 
         sqlx::query!(
@@ -706,7 +718,14 @@ pub async fn delete_file(
             ",
             row.id.0,
         )
-        .execute(&mut *transaction)
+        .execute(&mut transaction)
+        .await?;
+
+        delphi::send_tech_review_exit_file_deleted_message_if_exited(
+            row.project_id,
+            was_in_tech_review,
+            &mut transaction,
+        )
         .await?;
 
         transaction.commit().await?;

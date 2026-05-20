@@ -4,6 +4,7 @@ import { article as accelerating_development } from "./accelerating_development"
 import { article as becoming_sustainable } from "./becoming_sustainable";
 import { article as capital_return } from "./capital_return";
 import { article as carbon_ads } from "./carbon_ads";
+import { article as content_management_overhaul } from "./content_management_overhaul";
 import { article as creator_monetization } from "./creator_monetization";
 import { article as creator_update } from "./creator_update";
 import { article as creator_updates_july_2025 } from "./creator_updates_july_2025";
@@ -11,12 +12,14 @@ import { article as creator_withdrawals_overhaul } from "./creator_withdrawals_o
 import { article as design_refresh } from "./design_refresh";
 import { article as download_adjustment } from "./download_adjustment";
 import { article as free_server_medal } from "./free_server_medal";
+import { article as introducing_server_projects } from "./introducing_server_projects";
 import { article as knossos_v2_1_0 } from "./knossos_v2_1_0";
 import { article as licensing_guide } from "./licensing_guide";
 import { article as modpack_changes } from "./modpack_changes";
 import { article as modpacks_alpha } from "./modpacks_alpha";
 import { article as modrinth_app_beta } from "./modrinth_app_beta";
 import { article as modrinth_beta } from "./modrinth_beta";
+import { article as modrinth_hosting_in_app } from "./modrinth_hosting_in_app";
 import { article as modrinth_servers_asia } from "./modrinth_servers_asia";
 import { article as modrinth_servers_beta } from "./modrinth_servers_beta";
 import { article as new_environments } from "./new_environments";
@@ -40,6 +43,7 @@ export const articles = [
   becoming_sustainable,
   capital_return,
   carbon_ads,
+  content_management_overhaul,
   creator_monetization,
   creator_update,
   creator_updates_july_2025,
@@ -47,12 +51,14 @@ export const articles = [
   design_refresh,
   download_adjustment,
   free_server_medal,
+  introducing_server_projects,
   knossos_v2_1_0,
   licensing_guide,
   modpack_changes,
   modpacks_alpha,
   modrinth_app_beta,
   modrinth_beta,
+  modrinth_hosting_in_app,
   modrinth_servers_asia,
   modrinth_servers_beta,
   new_environments,

@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::{DBOrganization, DBTeamId, DBTeamMember, DBUser};
 use crate::database::redis::RedisPool;
 use crate::models::ids::OrganizationId;
@@ -5,7 +6,6 @@ use crate::routes::internal::moderation::Ownership;
 use crate::util::error::Context;
 use ariadne::ids::UserId;
 use eyre::eyre;
-use sqlx::PgPool;
 
 /// Fetches ownership information for multiple projects efficiently
 pub async fn get_projects_ownership(

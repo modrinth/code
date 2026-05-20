@@ -2,7 +2,7 @@
 import type Stripe from 'stripe'
 
 import { useVIntl } from '../../composables/i18n'
-import { commonMessages, getPaymentMethodIcon, paymentMethodMessages } from '../../utils'
+import { getPaymentMethodIcon, paymentMethodMessages } from '../../utils'
 
 const { formatMessage } = useVIntl()
 defineProps<{
@@ -15,7 +15,7 @@ defineProps<{
 		<component :is="getPaymentMethodIcon(method.type)" class="size-[1.5em]" />
 		<span v-if="method.type === 'card' && 'card' in method && method.card">
 			{{
-				formatMessage(commonMessages.paymentMethodCardDisplay, {
+				formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
 					card_brand:
 						formatMessage(paymentMethodMessages[method.card.brand]) ??
 						formatMessage(paymentMethodMessages.unknown),

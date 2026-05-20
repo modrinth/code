@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Lataa RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Lataa: Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -36,10 +39,7 @@
     "message": "Lataus vaihtoehdot"
   },
   "app-marketing.download.terms": {
-    "message": "Lataamalla Modrinth Appin hyväksyt meidän <terms-link>Ehdot</terms-link> ja <privacy-link>Tietosuojaselosteen</privacy-link>."
-  },
-  "app-marketing.download.third-party-packages": {
-    "message": "Kolmannen osapuolen paketit"
+    "message": "Lataamalla Modrint sovelluksen, sinä hyväksyt meidän <terms-link>Ehdot</terms-link> Ja <privacy-link>Tietosuojakäytännöt</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Lataa Modrinth App (Beta)"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App on tehokkaampi kuin moni johtavista modin hallitsijoista, käyttäen vain 150mt muistia!"
+    "message": "Modrinth App toimii paremmin kuin monet johtavat modinhallintaohjelmat ja käyttää vain 150 MT RAM-muistia!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -146,8 +146,14 @@
   "app-marketing.features.performance.title": {
     "message": "Suorituskykyinen"
   },
+  "app-marketing.features.play.description": {
+    "message": "Käytä Modrinth sovellusta asentaaksesi ja pelataksesi sinun suosikki modeliila ja modpackeilla."
+  },
   "app-marketing.features.play.title": {
     "message": "Pelaa lempi modeillasi"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Rakenna, jaa, ja pelaa modipaketteja millä tahansa tuhansista modeista ja modipaketeista Modrinthissa."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modipaketti"
@@ -161,11 +167,20 @@
   "app-marketing.features.unlike-any-launcher": {
     "message": "Erilainen kuin mikään muu launcheri"
   },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App on täysin integroitu sivuston kanssa, jotta saat pääsyn kaikkiin lempi projekteihisi appin kautta!"
+  },
   "app-marketing.features.website.title": {
     "message": "Nettisivu integraatio"
   },
   "app-marketing.features.youve-used-before": {
     "message": "jota olet käyttänyt ennen"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Kuvakaappaus Modrinth Appista jossa on Cobblemon instanssi auki sisältö sivulle."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App on uniikki, avoimen lähdekoodin launcheri joka antaa sinun pelata lempi modeillasi, ja pitää ne ajantasalla, kaikki yhdessä siistissä pakkauksessa."
   },
   "app-marketing.hero.download-button": {
     "message": "Lataa Modrinth App"
@@ -185,6 +200,9 @@
   "auth.authorize.action.decline": {
     "message": "Kieltäydy"
   },
+  "auth.authorize.app-info": {
+    "message": "<creator-link>{creator}</creator-link>:n <strong>{appName}</strong> pystyy:"
+  },
   "auth.authorize.authorize-app-name": {
     "message": "Valtuuta {appName}"
   },
@@ -199,12 +217,6 @@
   },
   "auth.reset-password.method-choice.description": {
     "message": "Kirjoita sähköpostiosoitteesi ja lähetämme palautuslinkin, jonka avulla voit palauttaa tilisi."
-  },
-  "auth.reset-password.method-choice.email-username.label": {
-    "message": "Sähköposti tai käyttäjänimi"
-  },
-  "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Sähköposti"
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Sinulle on lähetetty sähköposti, jossa on ohjeita, jos sähköposti on aiemmin tallennettu tilillesi."
@@ -245,12 +257,6 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-Link> Unohditko salasanasi? </forgot-password-Link> • <create-account-link>Luo tili</create-account-link>"
   },
-  "auth.sign-in.email-username.label": {
-    "message": "Sähköposti tai käyttäjänimi"
-  },
-  "auth.sign-in.password.label": {
-    "message": "Salasana"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Kirjaudu sisään käyttäen"
   },
@@ -263,23 +269,11 @@
   "auth.sign-up.action.create-account": {
     "message": "Luo tili"
   },
-  "auth.sign-up.confirm-password.label": {
-    "message": "Vahvista salasana"
-  },
-  "auth.sign-up.email.label": {
-    "message": "Sähköposti"
-  },
-  "auth.sign-up.label.username": {
-    "message": "Käyttäjänimi"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Luomalla tilin, hyväksyt Modrinthin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Salasanat eivät täsmää!"
-  },
-  "auth.sign-up.password.label": {
-    "message": "Salasana"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Onko sinulla jo käyttäjätili?"
@@ -298,9 +292,6 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "Tilin asetukset"
-  },
-  "auth.verify-email.action.sign-in": {
-    "message": "Kirjaudu sisään"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Sähköpostisi on jo vahvistettu!"
@@ -359,17 +350,20 @@
   "collection.label.created-at": {
     "message": "Luotu {ago}"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {No projects yet} other {<stat>{count}</stat> {type}}}"
+  },
   "collection.label.updated-at": {
     "message": "Päivitetty {ago}"
+  },
+  "collection.return-link.user": {
+    "message": "{user}:n profiili"
   },
   "collection.title": {
     "message": "{name} - kokoelma"
   },
-  "common.no": {
-    "message": "Ei"
-  },
-  "common.yes": {
-    "message": "Kyllä"
+  "create.collection.collection-info": {
+    "message": "Sinun uusi kokoelma luodaan julkiseksi kokoelmaksi {count, plural, =0 {no projects} one {# project} other {# projects}}:lla. "
   },
   "dashboard.collections.button.create-new": {
     "message": "Luo uusi"
@@ -382,6 +376,15 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Vero lomake"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Vahvista lompakkosi osoite"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Matalammat maksut saatavilla"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Prosessoidaan"
   },
   "error.collection.404.list_item.1": {
     "message": "Saatoit kirjoittaa kokoelman URL osoitteen väärin."
@@ -491,15 +494,6 @@
   "landing.notifications.heading": {
     "message": "Ilmoitukset"
   },
-  "landing.search.label": {
-    "message": "Hae"
-  },
-  "landing.search.placeholder": {
-    "message": "Hae..."
-  },
-  "landing.search.sort-by.label": {
-    "message": "Järjestä"
-  },
   "landing.section.for-creators.label": {
     "message": "Luojille"
   },
@@ -581,9 +575,6 @@
   "layout.footer.social.x": {
     "message": "X"
   },
-  "layout.nav.analytics": {
-    "message": "Analytiikat"
-  },
   "layout.nav.discover": {
     "message": "Löydä"
   },
@@ -620,35 +611,14 @@
   "moderation.page.reports": {
     "message": "Raportit"
   },
-  "moderation.search.placeholder": {
-    "message": "Hae..."
-  },
-  "moderation.sort.by": {
-    "message": "Järjestä"
-  },
   "profile.label.badges": {
     "message": "Arvomerkit"
-  },
-  "profile.label.details": {
-    "message": "Yksityiskohdat"
   },
   "profile.label.organizations": {
     "message": "Organisaatiot"
   },
   "profile.user-id": {
     "message": "Käyttäjätunnus: {id}"
-  },
-  "project-member-header.accept": {
-    "message": "Hyväksy"
-  },
-  "project-member-header.decline": {
-    "message": "Hylkää"
-  },
-  "project-member-header.error": {
-    "message": "Virhe"
-  },
-  "project-member-header.success": {
-    "message": "Onnistui"
   },
   "project-moderation-nags.required": {
     "message": "Vaadittu"
@@ -776,50 +746,11 @@
   "servers.notices.no-notices": {
     "message": "Ei ilmoituksia"
   },
-  "servers.plan.large.name": {
-    "message": "Suuri"
-  },
-  "servers.plan.medium.name": {
-    "message": "Keskikokoinen"
-  },
-  "servers.plan.small.name": {
-    "message": "Pieni"
-  },
   "settings.billing.payment_method.action.primary": {
     "message": "Tee ensisijaiseksi"
   },
   "settings.billing.payment_method.primary": {
     "message": "Ensisijainen"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Mods -sivu"
@@ -847,12 +778,6 @@
   },
   "settings.profile.bio.title": {
     "message": "Kuvaus"
-  },
-  "settings.profile.profile-picture.reset": {
-    "message": "Nollaa"
-  },
-  "settings.profile.username.title": {
-    "message": "Käyttäjänimi"
   },
   "settings.sessions.unknown-os": {
     "message": "Tuntematon käyttöjärjestelmä"

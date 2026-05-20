@@ -10,6 +10,7 @@ import {
 
 const { formatMessage } = useVIntl()
 const cosmetics = useCosmetics()
+const flags = useFeatureFlags()
 
 const messages = defineMessages({
 	title: {
@@ -29,14 +30,14 @@ function hideStagingBanner() {
 </script>
 
 <template>
-	<PagewideBanner v-if="!cosmetics.hideStagingBanner" variant="warning">
+	<PagewideBanner v-if="flags.showAllBanners || !cosmetics.hideStagingBanner" variant="warning">
 		<template #title>
 			<span>{{ formatMessage(messages.title) }}</span>
 		</template>
 		<template #description>
 			{{ formatMessage(messages.description) }}
 		</template>
-		<template #actions_right>
+		<template #actions_top_right>
 			<ButtonStyled type="transparent" circular>
 				<button :aria-label="formatMessage(commonMessages.closeButton)" @click="hideStagingBanner">
 					<XIcon aria-hidden="true" />

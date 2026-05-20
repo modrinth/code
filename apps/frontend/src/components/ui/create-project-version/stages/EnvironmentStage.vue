@@ -1,7 +1,5 @@
 <template>
-	<div class="sm:w-[512px]">
-		<EnvironmentSelector v-model="draftVersion.environment" />
-	</div>
+	<EnvironmentSelector v-model="draftVersion.environment" />
 </template>
 
 <script lang="ts" setup>

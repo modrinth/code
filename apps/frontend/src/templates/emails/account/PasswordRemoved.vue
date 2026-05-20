@@ -11,7 +11,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold"> Your password has been removed </Heading>
 
-		<Text class="text-muted text-base">Hi {user.name},</Text>
+		<Text class="text-muted text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
 		<Text class="text-muted text-base">
 			At your request, your password has been removed from your account. You must now use a linked
 			authentication provider (such as your {passremoved.provider} account) to log into your

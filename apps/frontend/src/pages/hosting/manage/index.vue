@@ -8,7 +8,7 @@ definePageMeta({
 })
 
 useHead({
-	title: 'Servers - Modrinth',
+	title: 'Hosting - Modrinth',
 })
 
 const config = useRuntimeConfig()
@@ -20,5 +20,6 @@ const generatedState = useGeneratedState()
 		:stripe-publishable-key="config.public.stripePublishableKey"
 		:site-url="config.public.siteUrl"
 		:products="generatedState.products || []"
+		class="max-w-[1280px] py-0"
 	/>
 </template>

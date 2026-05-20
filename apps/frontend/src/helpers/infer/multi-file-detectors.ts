@@ -14,6 +14,8 @@ export function createMultiFileDetectors(
 	return {
 		// Legacy texture pack (pre-1.6.1)
 		legacyTexturePack: async (zip: JSZip): Promise<InferredVersionInfo | null> => {
+			if (!rawFile.name.endsWith('.zip')) return null
+
 			const packTxt = zip.file('pack.txt')
 			if (!packTxt) return null
 

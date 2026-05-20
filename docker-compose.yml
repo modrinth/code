@@ -18,6 +18,20 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
+  typesense0:
+    image: typesense/typesense:30.1
+    container_name: labrinth-typesense0
+    restart: on-failure
+    ports:
+      - '127.0.0.1:8108:8108'
+    volumes:
+      - typesense-data:/data
+    command: --data-dir=/data --api-key=modrinth --enable-cors
+    healthcheck:
+      test: ['CMD-SHELL', "bash -lc '</dev/tcp/127.0.0.1/8108'"]
+      interval: 3s
+      timeout: 5s
+      retries: 3
   meilisearch0:
     image: getmeili/meilisearch:v1.12.0
     container_name: labrinth-meilisearch0
@@ -109,6 +123,12 @@ services:
         condition: service_healthy
       meilisearch:
         condition: service_healthy
+      elasticsearch0:
+        condition: service_healthy
+      elasticsearch1:
+        condition: service_healthy
+      elasticsearch2:
+        condition: service_healthy
       redis:
         condition: service_healthy
       clickhouse:
@@ -122,7 +142,7 @@ services:
   delphi:
     profiles:
       - with-delphi
-    image: ghcr.io/modrinth/delphi:feature-schema-rework
+    image: ghcr.io/modrinth/delphi:main
     container_name: labrinth-delphi
     ports:
       - '127.0.0.1:59999:59999'
@@ -143,7 +163,6 @@ services:
       # Delphi must send a message on a webhook to our backend,
       # so it must have access to our local network
       - 'host.docker.internal:host-gateway'
-
   # Sharded Meilisearch
   meilisearch1:
     profiles:
@@ -166,7 +185,6 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
-
   nginx-meilisearch-lb:
     profiles:
       - sharded-meilisearch
@@ -186,9 +204,16 @@ services:
 networks:
   meilisearch-mesh:
     driver: bridge
+  elasticsearch-mesh:
+    driver: bridge
 volumes:
+  typesense-data:
   meilisearch-data:
   meilisearch1-data:
+  elasticsearch0-data:
+  elasticsearch1-data:
+  elasticsearch2-data:
+  elasticsearch-certs:
   db-data:
   redis-data:
   labrinth-cdn-data:

@@ -1,0 +1,23 @@
+body.i18n-debug [data-i18n-key] {
+	outline: 1px dashed var(--color-brand);
+	outline-offset: 2px;
+}
+
+body.i18n-debug [data-i18n-key]:hover {
+	outline: 2px solid var(--color-orange);
+	background: color-mix(in srgb, var(--color-orange) 5%, transparent);
+}
+
+.i18n-key-tooltip {
+	position: fixed;
+	z-index: 99999;
+	background: var(--surface-1);
+	color: var(--color-base);
+	font: 10px/1.4 monospace;
+	padding: 2px 6px;
+	border-radius: var(--radius-xs);
+	border: 1px solid var(--color-divider);
+	white-space: nowrap;
+	pointer-events: none;
+	box-shadow: var(--shadow-floating);
+}

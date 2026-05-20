@@ -1,3 +1,4 @@
+use crate::database::PgPool;
 use crate::database::models::version_item;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
@@ -11,12 +12,12 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::default_project_type;
 use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
 use crate::routes::{v2_reroute, v3};
+use crate::util::http::HttpClient;
 use actix_multipart::Multipart;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::postgres::PgPool;
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -24,7 +25,7 @@ use validator::Validate;
 
 use super::version_creation::InitialVersionData;
 
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(project_create);
 }
 
@@ -133,6 +134,24 @@ struct ProjectCreateData {
     pub organization_id: Option<models::ids::OrganizationId>,
 }
 
+/// Create a new project with initial versions.
+#[utoipa::path(
+    post,
+    operation_id = "createProject",
+    request_body(
+        content(("multipart/form-data")),
+        description = "Multipart payload containing `data` and uploaded files"
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_CREATE"]))
+)]
 #[post("/project")]
 pub async fn project_create(
     req: HttpRequest,
@@ -141,6 +160,7 @@ pub async fn project_create(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
+    http: Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {
     // Convert V2 multipart payload to V3 multipart payload
     let payload = v2_reroute::alter_actix_multipart(
@@ -252,6 +272,7 @@ pub async fn project_create(
         redis.clone(),
         file_host,
         session_queue,
+        http,
     )
     .await?;
 
