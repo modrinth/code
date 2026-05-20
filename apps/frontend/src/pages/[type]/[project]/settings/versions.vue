@@ -14,7 +14,6 @@
 			proceed-label="Delete"
 			@proceed="deleteVersion()"
 		/>
-
 		<Admonition
 			v-if="withheldVersions.length > 0"
 			type="warning"
@@ -22,13 +21,15 @@
 			:header="
 				formatMessage(messages.withheldVersionsWarningTitle, {
 					count: withheldVersions.length,
-					version_name: withheldVersions.length === 1 ? withheldVersions[0] : undefined,
+					version_name:
+						withheldVersions.length === 1 ? withheldVersions[0].version_number : undefined,
 				})
 			"
 			:body="
 				formatMessage(messages.withheldVersionsWarningDescription, {
 					count: withheldVersions.length,
-					version_name: withheldVersions.length === 1 ? withheldVersions[0] : undefined,
+					version_name:
+						withheldVersions.length === 1 ? withheldVersions[0].version_number : undefined,
 				})
 			"
 		>
