@@ -308,6 +308,8 @@ export type DropdownFilterBarCategory = {
 	syntheticOptions?: DropdownFilterBarOption[]
 	searchable?: boolean
 	searchPlaceholder?: string
+	emptyOptionsLabel?: string
+	emptySearchLabel?: string
 	submenuClass?: string
 	previewDropdownWidth?: string | number
 	previewDropdownMinWidth?: string | number
@@ -515,11 +517,16 @@ const activeCategoryOptionsListStyle = computed<CSSProperties | undefined>(() =>
 		: undefined,
 )
 
-const activeCategoryEmptyStateLabel = computed(() =>
-	activeCategory.value?.searchable && categorySearchQuery.value.trim().length > 0
-		? props.emptySearchLabel
-		: props.emptyOptionsLabel,
-)
+const activeCategoryEmptyStateLabel = computed(() => {
+	const category = activeCategory.value
+	if (!category) {
+		return props.emptyOptionsLabel
+	}
+
+	return category.searchable && categorySearchQuery.value.trim().length > 0
+		? (category.emptySearchLabel ?? props.emptySearchLabel)
+		: (category.emptyOptionsLabel ?? props.emptyOptionsLabel)
+})
 
 const submenuStyle = computed<CSSProperties>(() => ({
 	left: `${submenuPosition.value.x}px`,

@@ -211,6 +211,7 @@ const {
 	projectVersionDownloadsById,
 	gameVersionDownloadsByVersion,
 	countryDownloadsByCode,
+	isAnalyticsFilterOptionsLoading,
 	selectedBreakdown,
 	selectedFilters,
 	queryResetToken,
@@ -255,6 +256,9 @@ const defaultSelectedBreakdown = computed(() =>
 )
 const canClearSelectedBreakdown = computed(
 	() => selectedBreakdown.value !== defaultSelectedBreakdown.value,
+)
+const analyticsFilterOptionsEmptyLabel = computed(() =>
+	isAnalyticsFilterOptionsLoading.value ? 'Loading...' : undefined,
 )
 const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
 	cloneSelectedFilters(selectedFilters.value),
@@ -357,6 +361,8 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			label: 'Country',
 			searchable: countryFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search countries...',
+			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
+			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
 			options: withSelectedOptions('country', countryFilterOptions.value),
 			submenuClass: 'w-[324px]',
 		},
@@ -373,11 +379,15 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			label: 'Download Source',
 			searchable: downloadSourceFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search download sources...',
+			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
+			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
 			options: withSelectedOptions('user_agent', downloadSourceFilterOptions.value),
 		},
 		{
 			key: 'download_reason',
 			label: 'Download Type',
+			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
+			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
 			options: withSelectedOptions('download_reason', downloadReasonFilterOptions.value),
 		},
 		{

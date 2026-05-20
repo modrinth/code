@@ -191,6 +191,7 @@ export interface AnalyticsDashboardContextValue {
 	displayedFetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
 	displayedFilterOptions: Ref<AnalyticsDashboardFilterOptions>
 	filterOptions: ComputedRef<AnalyticsDashboardFilterOptions>
+	isAnalyticsFilterOptionsLoading: ComputedRef<boolean>
 	versionNumbersById: ComputedRef<Map<string, string>>
 	versionPublishedDatesById: ComputedRef<Map<string, string>>
 	versionProjectNamesById: ComputedRef<Map<string, string>>
@@ -331,7 +332,7 @@ function mergeAnalyticsTimeSlices(
 }
 
 function waitForAnalyticsFetchBatchDelay(): Promise<void> {
-	return new Promise((resolve) => setTimeout(resolve, ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS))
+	return new Promise((resolve) => setTimeout(resolve, 50))
 }
 
 async function fetchAnalyticsTimeSlices(
@@ -2052,8 +2053,11 @@ export function createAnalyticsDashboardContext(
 		},
 	)
 
-	const { data: analyticsFilterOptionsData, isFetched: hasFetchedAnalyticsFilterOptions } =
-		useQuery({
+	const {
+		data: analyticsFilterOptionsData,
+		isFetched: hasFetchedAnalyticsFilterOptions,
+		isFetching: isAnalyticsFilterOptionsFetching,
+	} = useQuery({
 			queryKey: computed(() => [
 				'analytics',
 				'dashboard',
@@ -2064,25 +2068,17 @@ export function createAnalyticsDashboardContext(
 				queryRefreshTimestamp.value,
 			]),
 			queryFn: async () => {
-				const timeSlices: Labrinth.Analytics.v3.TimeSlice[] = []
-				const requests = analyticsFilterOptionsRequests.value ?? []
-				for (let index = 0; index < requests.length; index++) {
-					if (index > 0) {
-						await waitForAnalyticsFetchBatchDelay()
-					}
-
-					const request = requests[index]
-					if (!isAnalyticsFetchRequestReady(request)) {
-						continue
-					}
-
-					timeSlices.push(
-						...(await fetchAnalyticsTimeSlices(request, (nextRequest) =>
+				const requests = (analyticsFilterOptionsRequests.value ?? []).filter(
+					isAnalyticsFetchRequestReady,
+				)
+				const timeSliceGroups = await Promise.all(
+					requests.map((request) =>
+						fetchAnalyticsTimeSlices(request, (nextRequest) =>
 							client.labrinth.analytics_v3.fetch(nextRequest),
-						)),
-					)
-				}
-				return timeSlices
+						),
+					),
+				)
+				return timeSliceGroups.flat()
 			},
 			enabled: computed(() => analyticsFilterOptionsRequests.value !== null),
 			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
@@ -2138,6 +2134,7 @@ export function createAnalyticsDashboardContext(
 			]),
 		]),
 	}))
+	const isAnalyticsFilterOptionsLoading = computed(() => isAnalyticsFilterOptionsFetching.value)
 
 	watch(
 		[
@@ -2310,7 +2307,11 @@ export function createAnalyticsDashboardContext(
 			}
 		}
 		addVersionProjectNamesFromTimeSlices(versionProjectNames, timeSlices.value, projectNames)
-		addVersionProjectNamesFromTimeSlices(versionProjectNames, previousTimeSlices.value, projectNames)
+		addVersionProjectNamesFromTimeSlices(
+			versionProjectNames,
+			previousTimeSlices.value,
+			projectNames,
+		)
 		return versionProjectNames
 	})
 	const versionProjectIconUrlsById = computed(() => {
@@ -2518,6 +2519,7 @@ export function createAnalyticsDashboardContext(
 		displayedFetchRequest,
 		displayedFilterOptions,
 		filterOptions,
+		isAnalyticsFilterOptionsLoading,
 		versionNumbersById,
 		versionPublishedDatesById,
 		versionProjectNamesById,
