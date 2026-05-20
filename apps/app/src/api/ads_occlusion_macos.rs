@@ -1,3 +1,5 @@
+use std::ptr::NonNull;
+
 use core_foundation::array::CFArray;
 use core_foundation::base::{CFType, TCFType};
 use core_foundation::dictionary::CFDictionary;
@@ -13,44 +15,38 @@ use core_graphics::window::{
 };
 use objc2_app_kit::NSWindow;
 
-pub fn main_window_id(ns_window: *mut std::ffi::c_void) -> Option<CGWindowID> {
-    if ns_window.is_null() {
-        return None;
-    }
-
-    let window_number =
-        unsafe { (ns_window as *mut NSWindow).as_ref()?.windowNumber() };
-
-    (window_number > 0).then_some(window_number as CGWindowID)
-}
-
-pub fn is_ads_webview_occluded(
-    main_window_id: CGWindowID,
+pub fn is_ads_webview_occluded<R: tauri::Runtime>(
+    main_window: &tauri::Window<R>,
     ad_x: i32,
     ad_y: i32,
     ad_width: u32,
     ad_height: u32,
-    scale_factor: f64,
-) -> bool {
-    let Some(window_infos) = CGDisplay::window_list_info(
+) -> Option<bool> {
+    let scale_factor = main_window.scale_factor().ok()?;
+    let maybe_ns_window = main_window.ns_window().ok()?;
+    let ns_window = NonNull::new(maybe_ns_window)?.cast::<NSWindow>();
+    let ns_window = unsafe { ns_window.as_ref() };
+    let window_number = ns_window.windowNumber();
+    let main_window_id = if window_number > 0 {
+        window_number as CGWindowID
+    } else {
+        return None;
+    };
+
+    let window_infos = CGDisplay::window_list_info(
         kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements,
         None,
-    ) else {
-        return false;
-    };
+    )?;
 
     let window_infos = unsafe {
         CFArray::<CFDictionary<CFString, CFType>>::wrap_under_get_rule(
             window_infos.as_concrete_TypeRef(),
         )
     };
-    let Some(main_window_rect) = window_infos
+    let main_window_rect = window_infos
         .iter()
         .find(|window_info| window_id(window_info) == Some(main_window_id))
-        .and_then(|window_info| window_rect(&window_info))
-    else {
-        return false;
-    };
+        .and_then(|window_info| window_rect(&window_info))?;
     let ad_rect = ad_rect_from_main_window(
         &main_window_rect,
         ad_x,
@@ -61,23 +57,21 @@ pub fn is_ads_webview_occluded(
     );
 
     if is_empty_rect(&ad_rect) {
-        return false;
+        return None;
     }
 
     let ad_area = rect_area(&ad_rect);
 
     if ad_area == 0.0 {
-        return false;
+        return None;
     }
 
     let app_process_id = std::process::id() as i32;
-    let Some(windows_above_main) = CGDisplay::window_list_info(
+    let windows_above_main = CGDisplay::window_list_info(
         kCGWindowListOptionOnScreenAboveWindow
             | kCGWindowListExcludeDesktopElements,
         Some(main_window_id),
-    ) else {
-        return false;
-    };
+    )?;
     let windows_above_main = unsafe {
         CFArray::<CFDictionary<CFString, CFType>>::wrap_under_get_rule(
             windows_above_main.as_concrete_TypeRef(),
@@ -124,11 +118,11 @@ pub fn is_ads_webview_occluded(
         let occluded_ratio = occluded_area / ad_area;
 
         if occluded_ratio >= super::ads::OCCLUDED_AREA_THRESHOLD {
-            return true;
+            return Some(true);
         }
     }
 
-    false
+    Some(false)
 }
 
 fn ad_rect_from_main_window(
@@ -205,7 +199,11 @@ fn window_rect(window_info: &CFDictionary<CFString, CFType>) -> Option<CGRect> {
     let bounds = window_info.find(&key)?.downcast::<CFDictionary>()?;
     let rect = CGRect::from_dict_representation(&bounds)?;
 
-    (!is_empty_rect(&rect)).then_some(rect)
+    if is_empty_rect(&rect) {
+        None
+    } else {
+        Some(rect)
+    }
 }
 
 fn is_empty_rect(rect: &CGRect) -> bool {
@@ -230,5 +228,9 @@ fn intersect_rects(a: &CGRect, b: &CGRect) -> Option<CGRect> {
         &CGSize::new(right - left, bottom - top),
     );
 
-    (!is_empty_rect(&rect)).then_some(rect)
+    if is_empty_rect(&rect) {
+        None
+    } else {
+        Some(rect)
+    }
 }

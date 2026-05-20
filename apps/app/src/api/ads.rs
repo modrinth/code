@@ -152,19 +152,17 @@ fn compute_ads_webview_occlusion<R: Runtime>(
     {
         let position = webview.position().ok()?;
         let size = webview.size().ok()?;
-        let scale_factor = main_window.scale_factor().ok()?;
-        let ns_window = main_window.ns_window().ok()?;
-        let main_window_id =
-            crate::api::ads_occlusion_macos::main_window_id(ns_window)?;
 
-        Some(crate::api::ads_occlusion_macos::is_ads_webview_occluded(
-            main_window_id,
-            position.x,
-            position.y,
-            size.width,
-            size.height,
-            scale_factor,
-        ))
+        Some(
+            crate::api::ads_occlusion_macos::is_ads_webview_occluded(
+                &main_window,
+                position.x,
+                position.y,
+                size.width,
+                size.height,
+            )
+            .unwrap_or(false),
+        )
     }
 
     #[cfg(windows)]
