@@ -62,7 +62,7 @@
 					<label for="pat-expires">
 						<span class="font-semibold">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
 					</label>
-					<DatePicker id="pat-expires" show-today v-model="expires" wrapper-class="w-full" />
+					<DatePicker id="pat-expires" v-model="expires" show-today wrapper-class="w-full" />
 				</div>
 
 				<div class="ml-auto mt-4 flex gap-2">
