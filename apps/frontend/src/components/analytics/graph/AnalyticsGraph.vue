@@ -164,13 +164,13 @@
 						<div
 							v-if="showHoverGuide"
 							aria-hidden="true"
-							class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-8 mt-2 border-0 border-l border-solid border-contrast opacity-25"
+							class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-[1.8rem] mt-2.5 border-0 border-l border-solid border-contrast opacity-25"
 							:style="{ transform: `translate(${hoverState.x}px, 0)` }"
 						/>
 						<div
 							v-if="showPinnedGuide"
 							aria-hidden="true"
-							class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-8 mt-2 border-0 border-l border-dashed border-green opacity-75"
+							class="pointer-events-none absolute bottom-0 left-0 top-0 z-10 mb-[1.8rem] mt-2.5 border-0 border-l border-dashed border-green opacity-75"
 							:style="{ transform: `translate(${hoverState.x}px, 0)` }"
 						/>
 						<AnalyticsChartTooltip
@@ -199,7 +199,7 @@
 			</div>
 		</div>
 		<div v-if="isDataLoading" class="absolute inset-0 z-[19] overflow-hidden rounded-xl">
-			<AnalyticsLoadingBar :loading="isDataLoading" class="mt-px" />
+			<AnalyticsLoadingBar :loading="isDataLoading" />
 			<div class="absolute inset-0 bg-surface-3 opacity-50" />
 			<div class="absolute inset-0 backdrop-blur-[3px]" />
 			<div class="absolute inset-0 flex items-center justify-center">
