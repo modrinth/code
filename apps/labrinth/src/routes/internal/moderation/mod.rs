@@ -53,9 +53,9 @@ pub struct ProjectsRequestOptions {
     /// How many projects to skip.
     #[serde(default)]
     pub offset: u32,
-    /// Only fetch modpacks that have external dependencies.
+    /// Whether to filter by modpacks that have external dependencies.
     #[serde(default)]
-    pub has_external_dependencies: bool,
+    pub has_external_dependencies: Option<bool>,
 }
 
 fn default_count() -> u16 {
@@ -227,7 +227,7 @@ pub async fn get_projects_internal(
             GROUP BY m.id
         ) t
         WHERE
-            (NOT $4 OR has_external_dependencies)
+            ($4::boolean IS NULL OR has_external_dependencies = $4)
         ORDER BY queued ASC
         OFFSET $3
         LIMIT $2
