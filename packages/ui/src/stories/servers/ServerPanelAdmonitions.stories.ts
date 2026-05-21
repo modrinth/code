@@ -8,7 +8,7 @@ import ServerPanelAdmonitions from '../../components/servers/admonitions/ServerP
 import { defineMessage } from '../../composables/i18n'
 import type { FileOperation } from '../../layouts/shared/files-tab/types'
 import { provideModrinthServerContext } from '../../providers'
-import type { ModrinthServerContext } from '../../providers/server-context'
+import type { CancelUploadHandler, ModrinthServerContext } from '../../providers/server-context'
 
 const meta = {
 	title: 'Servers/ServerPanelAdmonitions',
@@ -92,7 +92,8 @@ const meta = {
 					fsQueuedOps: ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([]),
 					refreshFsAuth: async () => {},
 					uploadState,
-					cancelUpload: ref(() => {
+					cancelUpload: ref<CancelUploadHandler | null>(async () => {
+						await new Promise((resolve) => setTimeout(resolve, 1200))
 						uploadState.value = { ...uploadState.value, isUploading: false }
 					}),
 					activeOperations: computed(() => fileOp.value),

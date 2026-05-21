@@ -10,7 +10,7 @@ import { computed, ref } from 'vue'
 
 import type { FileOperation } from '../layouts/shared/files-tab/types'
 import { injectModrinthClient, provideModrinthServerContext } from '../providers'
-import type { BusyReason } from '../providers/server-context'
+import type { BusyReason, CancelUploadHandler } from '../providers/server-context'
 import { defineMessage } from './i18n'
 import { useModrinthServersConsole } from './server-console'
 
@@ -355,7 +355,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		completedFiles: 0,
 		totalFiles: 0,
 	})
-	const cancelUpload = ref<(() => void) | null>(null)
+	const cancelUpload = ref<CancelUploadHandler | null>(null)
 
 	type QueuedOpWithState = Archon.Websocket.v0.QueuedFilesystemOp & { state: 'queued' }
 	const dismissedOpIds = ref<Set<string>>(new Set())
