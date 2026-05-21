@@ -72,7 +72,10 @@
 							</div>
 						</template>
 					</Menu>
-					<span v-if="selectedOptions.length === 0" class="px-1.5 py-1 text-secondary">
+					<span
+						v-if="selectedOptions.length === 0"
+						class="text-primary opacity-50 text-base font-medium"
+					>
 						{{ placeholder }}
 					</span>
 				</div>
@@ -86,7 +89,10 @@
 					>
 						<XIcon class="size-5" />
 					</button>
-					<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+					<div
+						v-if="clearable && modelValue.length > 0"
+						class="h-5 w-[1px] shrink-0 bg-surface-5"
+					></div>
 					<ChevronLeftIcon
 						v-if="showChevron"
 						class="size-5 shrink-0 text-secondary transition-transform duration-150"

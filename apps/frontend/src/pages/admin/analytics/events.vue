@@ -31,7 +31,7 @@
 
 			<div class="flex flex-col gap-2">
 				<div class="flex items-center justify-between">
-					<span class="label__title font-semibold">Announcement link</span>
+					<span class="label__title font-semibold">Announcement link (optional)</span>
 
 					<ButtonStyled v-if="committedNormalizedAnnouncementUrl" type="transparent" size="small">
 						<a
@@ -53,7 +53,7 @@
 						v-model="form.announcementUrl"
 						type="url"
 						autocomplete="off"
-						placeholder="Add an optional annoucement link..."
+						placeholder="Announcement link..."
 						wrapper-class="w-full"
 						@change="commitAnnouncementUrl"
 					/>
@@ -73,6 +73,7 @@
 					input-class="w-full"
 					wrapper-class="w-full"
 					view-date-alignment="right"
+					show-today
 				/>
 			</div>
 
@@ -83,8 +84,7 @@
 					:options="metricKindOptions"
 					:clearable="false"
 					:max-tag-rows="2"
-					placeholder="Select metrics"
-					trigger-class="border border-solid border-surface-5 bg-surface-1"
+					placeholder="Select metrics this applies to"
 					include-select-all-option
 				/>
 			</div>
@@ -106,7 +106,7 @@
 	</NewModal>
 
 	<div class="normal-page no-sidebar">
-		<div class="normal-page__content flex flex-col gap-6">
+		<div class="normal-page__content flex flex-col gap-4">
 			<div class="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 				<h1 class="m-0 text-2xl font-extrabold text-contrast">Analytics Events</h1>
 
@@ -150,7 +150,7 @@
 						Open link
 						<ExternalIcon class="size-4" aria-hidden="true" />
 					</a>
-					<span v-else class="text-sm font-medium text-primary">N/A</span>
+					<span v-else class="text-sm font-medium text-primary">-</span>
 				</template>
 
 				<template #cell-date="{ row }">
@@ -389,7 +389,7 @@ function getEmptyForm(): EventForm {
 		title: '',
 		announcementUrl: '',
 		dateRange: [],
-		metricKinds: [...allMetricKinds],
+		metricKinds: [],
 	}
 }
 
@@ -398,7 +398,6 @@ function openCreateModal() {
 	editingEventId.value = null
 	form.value = {
 		...getEmptyForm(),
-		dateRange: getDefaultDateRange(),
 	}
 	committedAnnouncementUrl.value = ''
 	clearResetFormTimeout()
