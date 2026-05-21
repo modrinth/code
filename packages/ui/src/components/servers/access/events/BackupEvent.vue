@@ -2,10 +2,10 @@
 	<BaseEvent>
 		<IntlFormatted :message-id="message">
 			<template #backup>
-				<EventEntityLink :entity="backup" />
+				<EventEntityLink v-if="backup" :entity="backup" />
 			</template>
 			<template #renamed-backup>
-				<EventEntityLink :entity="renamedBackup" />
+				<EventEntityLink v-if="renamedBackup" :entity="renamedBackup" />
 			</template>
 			<template #from>
 				<span class="font-semibold text-contrast">{{ from }}</span>
@@ -25,7 +25,7 @@ import type { AuditBackupEventItem } from './types'
 
 const props = defineProps<{
 	kind: string
-	backup: AuditBackupEventItem
+	backup?: AuditBackupEventItem
 	backupId?: string
 	from?: string
 	to?: string
@@ -52,6 +52,26 @@ const messages = defineMessages({
 		id: 'servers.audit-log.event.backup-changed',
 		defaultMessage: 'Changed backup <backup></backup>',
 	},
+	createdFallback: {
+		id: 'servers.audit-log.event.backup-created-fallback',
+		defaultMessage: 'Created backup',
+	},
+	restoredFallback: {
+		id: 'servers.audit-log.event.backup-restored-fallback',
+		defaultMessage: 'Restored backup',
+	},
+	renamedFallback: {
+		id: 'servers.audit-log.event.backup-renamed-fallback',
+		defaultMessage: 'Renamed backup',
+	},
+	deletedFallback: {
+		id: 'servers.audit-log.event.backup-deleted-fallback',
+		defaultMessage: 'Deleted backup',
+	},
+	changedFallback: {
+		id: 'servers.audit-log.event.backup-changed-fallback',
+		defaultMessage: 'Changed backup',
+	},
 })
 
 const kindMessages: Record<string, MessageDescriptor> = {
@@ -61,9 +81,24 @@ const kindMessages: Record<string, MessageDescriptor> = {
 	deleted: messages.deleted,
 }
 
-const message = computed(() => kindMessages[props.kind] ?? messages.changed)
-const renamedBackup = computed(() => ({
-	...props.backup,
-	label: props.to ?? props.backup.label,
-}))
+const fallbackMessages: Record<string, MessageDescriptor> = {
+	created: messages.createdFallback,
+	restored: messages.restoredFallback,
+	renamed: messages.renamedFallback,
+	deleted: messages.deletedFallback,
+}
+
+const message = computed(() =>
+	props.backup
+		? (kindMessages[props.kind] ?? messages.changed)
+		: (fallbackMessages[props.kind] ?? messages.changedFallback),
+)
+const renamedBackup = computed(() =>
+	props.backup
+		? {
+				...props.backup,
+				label: props.to ?? props.backup.label,
+			}
+		: undefined,
+)
 </script>

@@ -9,7 +9,7 @@
 					? 'text-secondary'
 					: 'text-contrast',
 			entity.mono ? 'font-mono text-[0.925em]' : '',
-			hasIcon ? 'align-[-0.45rem]' : 'align-baseline',
+			'align-middle',
 		]"
 	>
 		<Avatar
@@ -43,11 +43,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import { truncatedTooltip } from '#ui/utils'
+import { truncatedTooltip } from '#ui/utils/truncate'
 
 import type { EventEntity } from './types'
 
@@ -56,5 +56,4 @@ const props = defineProps<{
 }>()
 
 const labelRef = ref<HTMLElement | null>(null)
-const hasIcon = computed(() => Boolean(props.entity.iconUrl || props.entity.icon))
 </script>

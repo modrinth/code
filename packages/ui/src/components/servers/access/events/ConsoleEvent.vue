@@ -4,7 +4,7 @@
 			<template #command>
 				<span
 					v-tooltip="command"
-					class="inline-block max-w-full truncate align-bottom font-mono text-contrast"
+					class="inline-block max-w-full truncate align-middle font-mono text-contrast"
 				>
 					{{ command }}
 				</span>

@@ -1,5 +1,5 @@
 import type { Archon } from '@modrinth/api-client'
-import { PackageIcon, TrashIcon } from '@modrinth/assets'
+import { PackageIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
 
 import AddonEvent from './AddonEvent.vue'
@@ -135,9 +135,7 @@ export function parseAuditEvent(
 				])
 			}
 			case 'modpack_changed': {
-				const record = metadataRecord(metadata)
-				if (!record || !('new_version' in record)) return unknown(base, action)
-				const newVersionId = record.new_version == null ? null : valueToString(record.new_version)
+				const newVersionId = modpackVersionFromMetadata(metadataRecord(metadata))
 				return parsed(ModpackEvent, base, { newVersionId }, [
 					...actionSearchParts(action),
 					newVersionId,
@@ -249,9 +247,9 @@ export function parseAuditEvent(
 				if (!id) return unknown(base, action)
 				const kind = action.replace('backup_', '')
 				const backup = backupEntity(id, lookups)
-				return parsed(BackupEvent, base, { kind, backup, backupId: id }, [
+				return parsed(BackupEvent, base, { kind, backup: backup ?? undefined, backupId: id }, [
 					...actionSearchParts(action),
-					backup.label,
+					backup?.label,
 					id,
 				])
 			}
@@ -262,12 +260,12 @@ export function parseAuditEvent(
 				const to = stringField(record, 'to')
 				if (!id || !from || !to) return unknown(base, action)
 				const backup = backupEntity(id, lookups)
-				return parsed(BackupEvent, base, { kind: 'renamed', backup, backupId: id, from, to }, [
-					...actionSearchParts(action),
-					from,
-					to,
-					id,
-				])
+				return parsed(
+					BackupEvent,
+					base,
+					{ kind: 'renamed', backup: backup ?? undefined, backupId: id, from, to },
+					[...actionSearchParts(action), backup?.label, from, to, id],
+				)
 			}
 			default:
 				return unknown(base, action)
@@ -340,6 +338,12 @@ function permissionScopes(value: unknown): string[] {
 	if (typeof value === 'string') {
 		return value
 			.split('|')
+			.map((permission) => permission.trim())
+			.filter(Boolean)
+	}
+	if (Array.isArray(value)) {
+		return value
+			.filter((permission): permission is string => typeof permission === 'string')
 			.map((permission) => permission.trim())
 			.filter(Boolean)
 	}
@@ -421,21 +425,19 @@ function resolveVersionLabel(
 	return version?.version_number || version?.name || shortId(versionId)
 }
 
-function backupEntity(id: string, lookups: AuditEventLookups): AuditBackupEventItem {
+function backupEntity(id: string, lookups: AuditEventLookups): AuditBackupEventItem | null {
 	const backup = lookups.backupById.get(id)
+	if (!backup) return null
+
 	return {
 		id,
 		backupId: id,
-		found: !!backup,
-		label: backup?.name ?? shortId(id),
-		icon: backup ? undefined : TrashIcon,
-		muted: !backup,
-		to: backup
-			? {
-					path: `/hosting/manage/${lookups.serverId}/backups`,
-					query: { backup: id },
-				}
-			: undefined,
+		found: true,
+		label: backup.name,
+		to: {
+			path: `/hosting/manage/${lookups.serverId}/backups`,
+			query: { backup: id },
+		},
 	}
 }
 
@@ -484,6 +486,19 @@ function stringArrayField(record: Record<string, unknown> | null, key: string): 
 	const array = arrayField(record, key)
 	if (!array || !array.every((item) => typeof item === 'string')) return null
 	return array
+}
+
+function modpackVersionFromMetadata(record: Record<string, unknown> | null): string | null {
+	const direct = valueToString(record?.new_version)
+	if (direct != null) return direct
+
+	const spec = metadataRecord(record?.spec)
+	if (!spec) return null
+
+	const versionId = valueToString(spec.version_id)
+	if (versionId != null) return versionId
+
+	return spec.platform === 'local_file' ? stringField(spec, 'filename') : null
 }
 
 function stringField(record: Record<string, unknown> | null, key: string): string | null {

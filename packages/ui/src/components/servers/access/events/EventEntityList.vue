@@ -1,7 +1,7 @@
 <template>
 	<span
-		class="inline-flex max-w-full items-center gap-x-1 align-baseline"
-		:class="singleLine ? 'min-w-0 flex-nowrap whitespace-nowrap' : 'flex-wrap gap-y-0.5'"
+		class="inline-flex max-w-full min-w-0 items-center gap-x-1 align-middle"
+		:class="singleLine ? 'flex-nowrap whitespace-nowrap' : 'flex-wrap gap-y-0.5'"
 	>
 		<template v-for="(entity, index) in visibleEntities" :key="entity.id">
 			<EventEntityLink :entity="entity" :class="singleLine ? 'min-w-0' : ''" />
@@ -10,7 +10,7 @@
 		<Tooltip
 			v-if="hiddenCount > 0"
 			theme="dismissable-prompt"
-			class="inline-flex shrink-0"
+			class="inline-flex shrink-0 items-center"
 			:triggers="['hover', 'focus']"
 			:popper-triggers="['hover', 'focus']"
 			popper-class="v-popper--interactive"
@@ -20,7 +20,7 @@
 		>
 			<button
 				type="button"
-				class="inline-flex cursor-help rounded-full border border-solid border-surface-5 bg-surface-4 px-1.5 py-0 text-xs font-semibold text-secondary"
+				class="inline-flex min-w-0 cursor-help items-center rounded-full border border-solid border-surface-5 bg-surface-4 px-1.5 py-1 leading-none text-xs font-semibold text-secondary"
 				:aria-label="hiddenTooltip"
 			>
 				{{ formatMessage(messages.hiddenCount, { count: hiddenCount }) }}
@@ -55,7 +55,7 @@ const props = withDefaults(
 	}>(),
 	{
 		limit: 3,
-		singleLine: false,
+		singleLine: true,
 	},
 )
 

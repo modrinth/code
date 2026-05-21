@@ -2,7 +2,11 @@
 	<BaseEvent>
 		<IntlFormatted :message-id="message">
 			<template #version>
-				<span class="font-mono text-secondary">{{ shortVersionId }}</span>
+				<span
+					class="inline-block max-w-full min-w-0 truncate align-middle font-mono text-secondary"
+				>
+					{{ shortVersionId }}
+				</span>
 			</template>
 		</IntlFormatted>
 	</BaseEvent>

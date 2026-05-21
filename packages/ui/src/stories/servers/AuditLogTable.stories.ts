@@ -256,7 +256,13 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 		}),
 		rawEntry({
 			action: 'modpack_changed',
-			metadata: { new_version: 'version-modpack-001' },
+			metadata: {
+				spec: {
+					platform: 'modrinth',
+					project_id: 'project-modpack-001',
+					version_id: 'version-modpack-001',
+				},
+			},
 			minutesAgo: 80,
 		}),
 		rawEntry({ action: 'modpack_unlinked', minutesAgo: 85 }),
@@ -369,7 +375,12 @@ const missingLookupActionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 		}),
 		rawEntry({
 			action: 'modpack_changed',
-			metadata: { new_version: null },
+			metadata: {
+				spec: {
+					platform: 'local_file',
+					filename: 'example-modpack-v1.20.mrpack',
+				},
+			},
 			minutesAgo: 15,
 		}),
 		rawEntry({

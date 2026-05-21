@@ -189,12 +189,6 @@ const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidC
 const isUpdating = ref(false)
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
 
-watch(serverName, (newValue, oldValue) => {
-	if (!(newValue?.length ?? 0)) {
-		serverName.value = oldValue
-	}
-})
-
 // Preferences
 const preferences = {
 	hideSubdomainLabel: {

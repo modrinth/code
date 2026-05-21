@@ -1,37 +1,60 @@
 <template>
 	<BaseEvent>
-		<IntlFormatted :message-id="message">
+		<span
+			v-if="props.kind === 'properties'"
+			class="inline-flex max-w-full min-w-0 items-center gap-1 align-middle whitespace-nowrap"
+		>
+			<span class="shrink-0">{{ formatMessage(messages.propertiesModifiedLabel) }}</span>
+			<span
+				ref="propertiesRef"
+				v-tooltip="truncatedTooltip(propertiesRef, propertiesLabel)"
+				class="min-w-0 truncate align-middle font-mono text-[0.925em] font-semibold text-contrast"
+			>
+				{{ propertiesLabel }}
+			</span>
+		</span>
+		<IntlFormatted v-else :message-id="message">
 			<template #version>
-				<span class="font-semibold text-contrast">{{ newVersion }}</span>
-			</template>
-			<template #properties>
-				<EventEntityList :entities="properties ?? []" />
+				<span
+					class="inline-block max-w-full min-w-0 truncate align-middle font-semibold text-contrast"
+				>
+					{{ newVersion }}
+				</span>
 			</template>
 			<template #command>
 				<span
 					v-tooltip="command"
-					class="inline-block max-w-full truncate align-bottom font-mono text-contrast"
+					class="inline-block max-w-full truncate align-middle font-mono text-contrast"
 				>
 					{{ command }}
 				</span>
 			</template>
 			<template #vendor>
-				<span class="font-semibold text-contrast">{{ vendor }}</span>
+				<span
+					class="inline-block max-w-full min-w-0 truncate align-middle font-semibold text-contrast"
+				>
+					{{ vendor }}
+				</span>
 			</template>
 			<template #java-version>
-				<span class="font-semibold text-contrast">{{ version }}</span>
+				<span
+					class="inline-block max-w-full min-w-0 truncate align-middle font-semibold text-contrast"
+				>
+					{{ version }}
+				</span>
 			</template>
 		</IntlFormatted>
 	</BaseEvent>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
-import { defineMessages, type MessageDescriptor } from '../../../../composables/i18n'
+import { truncatedTooltip } from '#ui/utils/truncate'
+
+import { defineMessages, type MessageDescriptor, useVIntl } from '../../../../composables/i18n'
 import IntlFormatted from '../../../base/IntlFormatted.vue'
 import BaseEvent from './BaseEvent.vue'
-import EventEntityList from './EventEntityList.vue'
 import type { EventEntity } from './types'
 
 const props = defineProps<{
@@ -66,6 +89,10 @@ const messages = defineMessages({
 		id: 'servers.audit-log.event.server-properties-modified',
 		defaultMessage: 'Modified server properties <properties></properties>',
 	},
+	propertiesModifiedLabel: {
+		id: 'servers.audit-log.event.server-properties-modified-label',
+		defaultMessage: 'Modified server properties',
+	},
 	startupCommandModified: {
 		id: 'servers.audit-log.event.startup-command-modified',
 		defaultMessage: 'Changed startup command to <command></command>',
@@ -83,6 +110,12 @@ const messages = defineMessages({
 		defaultMessage: 'Changed server configuration',
 	},
 })
+
+const { formatMessage } = useVIntl()
+const propertiesRef = ref<HTMLElement | null>(null)
+const propertiesLabel = computed(
+	() => props.properties?.map((property) => property.label).join(', ') ?? '',
+)
 
 const kindMessages: Record<string, MessageDescriptor> = {
 	game_version: messages.gameVersionChanged,
