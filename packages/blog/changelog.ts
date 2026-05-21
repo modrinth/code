@@ -11,6 +11,26 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-21T22:13:35+00:00`,
+		product: 'website',
+		body: `## Fixed
+- Fixed project embeds not loading in correctly.`,
+	},
+	{
+		date: `2026-05-21T22:13:35+00:00`,
+		product: 'app',
+		version: '0.13.21',
+		body: `## Fixed
+- Fixed issue with content items visually duplicating over other content items in the Content tab table.`,
+	},
+	{
+		date: `2026-05-21T22:13:35+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed issue with content items visually duplicating over other content items in the Content tab table.
+- Fixed issue when cancelling a multi-file upload to the Files tab or Content tab, any files fully uploaded before cancelling are not removed on cancel.`,
+	},
+	{
 		date: `2026-05-20T19:48:04+00:00`,
 		product: 'web',
 		body: `## Changed
