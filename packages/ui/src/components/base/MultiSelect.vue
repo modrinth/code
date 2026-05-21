@@ -140,7 +140,7 @@
 						>
 							<div v-if="shouldShowSelectAll" class="sticky top-0 z-10 bg-surface-4">
 								<span
-									class="flex w-full items-center gap-2.5 cursor-pointer p-3 text-left transition-all duration-150 text-contrast hover:brightness-[115%]"
+									class="flex w-full items-center gap-2.5 cursor-pointer px-4 py-3 text-left transition-all duration-150 text-contrast hover:brightness-[115%]"
 									:class="{ 'brightness-[115%]': focusedIndex === -2 }"
 									data-option-index="-2"
 									:data-focused="focusedIndex === -2"
@@ -235,7 +235,7 @@
 											class="flex items-center justify-between gap-3 text-sm font-semibold text-secondary border-t border-surface-5 border-solid border-0 group-first/option-container:border-t-0"
 											:class="[
 												item.class,
-												shouldVirtualizeOptions ? 'h-10 px-3' : 'h-10 px-3  pb-1 pt-2',
+												shouldVirtualizeOptions ? 'h-10 px-4' : 'h-10 px-4 pb-1 pt-2',
 											]"
 											role="presentation"
 										>
@@ -258,7 +258,7 @@
 											:aria-disabled="item.disabled || undefined"
 											:data-option-index="index"
 											:data-focused="focusedIndex === index"
-											class="flex w-full cursor-pointer items-center gap-2.5 p-3 py-3.5 outline-none focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4 hover:brightness-[115%] focus:brightness-[115%]"
+											class="flex w-full cursor-pointer items-center gap-2.5 px-4 py-3 outline-none focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4 hover:brightness-[115%] focus-visible:brightness-[115%]"
 											:class="[
 												item.class,
 												shouldVirtualizeOptions ? 'h-12' : undefined,

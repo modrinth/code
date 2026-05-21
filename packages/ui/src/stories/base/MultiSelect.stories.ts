@@ -53,6 +53,20 @@ export const Default: Story = {
 	},
 }
 
+export const DeselectFocusState: Story = {
+	args: {
+		...Default.args,
+		modelValue: ['en'],
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: 'Mouse focus after deselecting an option should not keep the selected brightness state applied.',
+			},
+		},
+	},
+}
+
 export const WithSearch: Story = {
 	args: {
 		...Default.args,

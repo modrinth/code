@@ -87,7 +87,7 @@
 						<div>
 							<button
 								type="button"
-								class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-4 p-3 py-3.5 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
+								class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-4 px-4 py-3 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
 								:aria-selected="isAllProjectsOptionSelected"
 								:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 								role="option"

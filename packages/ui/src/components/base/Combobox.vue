@@ -128,7 +128,7 @@
 										:aria-selected="listbox && item.value === modelValue"
 										:aria-disabled="item.disabled || undefined"
 										:data-focused="focusedIndex === index"
-										class="group/option flex items-center gap-2.5 cursor-pointer p-3 py-3.5 text-left transition-all duration-150"
+										class="group/option flex items-center gap-2.5 cursor-pointer px-4 py-3 text-left transition-all duration-150"
 										:class="getOptionClasses(item, index)"
 										tabindex="-1"
 										@mousedown.prevent
