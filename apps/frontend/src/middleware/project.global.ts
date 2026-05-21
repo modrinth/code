@@ -21,7 +21,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	// Only run this middleware on the server - it relies on server-only runtime config
 	if (import.meta.client) return
 
-	const routeProjectParam = to.params.project ?? to.params.id
+	const routeProjectParam = to.params.project
 	const projectId = Array.isArray(routeProjectParam) ? routeProjectParam[0] : routeProjectParam
 	const routeType = Array.isArray(to.params.type) ? to.params.type[0] : to.params.type
 
