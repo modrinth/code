@@ -746,9 +746,9 @@ export namespace Archon {
 				modloader: string
 				modloader_version: string
 				game_version: string
-				java_version: number
-				invocation: string
-				original_invocation: string
+				java_version: number | null
+				invocation: string | null
+				original_invocation: string | null
 			}
 
 			export type Region = {
@@ -876,6 +876,106 @@ export namespace Archon {
 				active_operations: ActiveOperation[]
 				backups: BackupQueueBackup[]
 			}
+		}
+	}
+
+	export namespace Sync {
+		export namespace v1 {
+			export type SyncCategory = 'backup' | 'users' | 'server' | 'protocol' | 'world'
+			export type SyncIntent = 'all' | SyncCategory | SyncCategory[]
+			export type BackupOperationStatus = 'completed' | 'cancelled' | 'failed' | 'timed-out'
+			export type ServerNetworkPort = { port: number; name: string }
+
+			export type ProtocolResetEvent = { type: 'protocol.reset' }
+			export type ProtocolInvalidEvent = { type: 'protocol.invalid' }
+			export type ProtocolErrorEvent = { type: 'protocol.error'; error: string }
+
+			export type BackupNewEvent = { type: 'backup.new'; id: string }
+			export type BackupPatchEvent = {
+				type: 'backup.patch'
+				world_id: string
+				backup_id: string
+				name: string
+			}
+			export type BackupDeleteEvent = {
+				type: 'backup.delete'
+				world_id: string
+				backup_id: string
+			}
+			export type BackupOperationStartEvent = {
+				type:
+					| 'backup.operation.create.init'
+					| 'backup.operation.create.start'
+					| 'backup.operation.restore.init'
+					| 'backup.operation.restore.start'
+				world_id: string
+				backup_id: string
+				operation_id: number
+			}
+			export type BackupOperationDoneEvent = {
+				type: 'backup.operation.create.done' | 'backup.operation.restore.done'
+				world_id: string
+				backup_id: string
+				operation_id: number
+				status: BackupOperationStatus
+			}
+
+			export type ServerPatchEvent = {
+				type: 'server.patch'
+				name: string
+				subdomain: string
+			}
+			export type ServerNetworkPatchEvent = {
+				type: 'server.network.patch'
+				ports: ServerNetworkPort[]
+			}
+			export type ServerTransferEvent = {
+				type: 'server.transfer.start' | 'server.transfer.done'
+				target_node: string
+			}
+
+			export type UsersPatchEvent = { type: 'users.patch' }
+
+			export type WorldPatchEvent = {
+				type: 'world.patch'
+				world_id: string
+				name: string
+			}
+			export type WorldStartupPatchEvent = {
+				type: 'world.startup.patch'
+				world_id: string
+				java_version: number | null
+				invocation: string | null
+				original_invocation: string | null
+			}
+			export type WorldContentAddonPatchEvent = {
+				type: 'world.content.addon.patch'
+				world_id: string
+				specs: Archon.Content.v1.Addon[]
+			}
+			export type WorldContentBaseUpdateEvent = {
+				type: 'world.content.base.update'
+				world_id: string
+				spec: Archon.Content.v1.Addons
+			}
+
+			export type SyncEvent =
+				| ProtocolResetEvent
+				| ProtocolInvalidEvent
+				| ProtocolErrorEvent
+				| BackupNewEvent
+				| BackupPatchEvent
+				| BackupDeleteEvent
+				| BackupOperationStartEvent
+				| BackupOperationDoneEvent
+				| ServerPatchEvent
+				| ServerNetworkPatchEvent
+				| ServerTransferEvent
+				| UsersPatchEvent
+				| WorldPatchEvent
+				| WorldStartupPatchEvent
+				| WorldContentAddonPatchEvent
+				| WorldContentBaseUpdateEvent
 		}
 	}
 
