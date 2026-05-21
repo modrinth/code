@@ -104,7 +104,7 @@ const iconStackWidth = computed(() => {
 	return 32 + (visibleItems.value.length - 1 + (overflowCount.value > 0 ? 1 : 0)) * iconStackOffset
 })
 
-function getItemId(item: ContentItem) {
+function resolveItemId(item: ContentItem) {
 	return props.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
 }
 
@@ -152,7 +152,7 @@ const bulkProgressMessage = computed(() => {
 			>
 				<div
 					v-for="(item, index) in visibleItems"
-					:key="getItemId(item)"
+					:key="resolveItemId(item)"
 					v-tooltip="item.project?.title ?? item.file_name"
 					class="absolute top-0 flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4"
 					:style="{ left: `${index * iconStackOffset}px`, zIndex: visibleItems.length - index }"
@@ -160,7 +160,7 @@ const bulkProgressMessage = computed(() => {
 					<Avatar
 						:src="item.project?.icon_url"
 						:alt="item.project?.title ?? item.file_name"
-						:tint-by="getItemId(item)"
+						:tint-by="resolveItemId(item)"
 						size="100%"
 						no-shadow
 						class="selected-content-avatar"

@@ -271,10 +271,7 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 			...base,
 			id,
 			disabled:
-				isChanging(id) ||
-				ctx.isBusy.value ||
-				isBulkOperating.value ||
-				item.installing === true,
+				isChanging(id) || ctx.isBusy.value || isBulkOperating.value || item.installing === true,
 			installing: item.installing === true,
 			hasUpdate: item.has_update,
 			isClientOnly:
