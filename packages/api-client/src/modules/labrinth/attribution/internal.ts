@@ -30,13 +30,13 @@ export class LabrinthAttributionInternalModule extends AbstractModule {
 
 	/**
 	 * List attribution groups for a project
-	 * GET /_internal/attribution/attribution/{project_id}
+	 * GET /_internal/attribution/{project_id}
 	 */
 	public async listProjectAttribution(
 		projectId: string,
 	): Promise<Labrinth.Attribution.Internal.AttributionGroup[]> {
 		return this.client.request<Labrinth.Attribution.Internal.AttributionGroup[]>(
-			`/attribution/attribution/${projectId}`,
+			`/attribution/${projectId}`,
 			{
 				api: 'labrinth',
 				version: 'internal',
@@ -47,7 +47,7 @@ export class LabrinthAttributionInternalModule extends AbstractModule {
 
 	/**
 	 * Update an attribution group's attribution payload.
-	 * PATCH /_internal/attribution/attribution/group/{group_id}
+	 * PATCH /_internal/attribution/group/{group_id}
 	 *
 	 * @param groupId - The base62 attribution group id (as returned from listProjectAttribution).
 	 */
@@ -56,7 +56,7 @@ export class LabrinthAttributionInternalModule extends AbstractModule {
 		body: Labrinth.Attribution.Internal.UpdateGroupRequest,
 	): Promise<void> {
 		const numericId = decodeBase62Id(groupId)
-		return this.client.request<void>(`/attribution/attribution/group/${numericId}`, {
+		return this.client.request<void>(`/attribution/group/${numericId}`, {
 			api: 'labrinth',
 			version: 'internal',
 			method: 'PATCH',
@@ -66,7 +66,7 @@ export class LabrinthAttributionInternalModule extends AbstractModule {
 
 	/**
 	 * Reassign a file (by sha1) to another attribution group within the same project.
-	 * POST /_internal/attribution/attribution/assign
+	 * POST /_internal/attribution/assign
 	 *
 	 * @param body.target_group_id - The base62 id of the attribution group to assign the file to.
 	 */
@@ -80,7 +80,7 @@ export class LabrinthAttributionInternalModule extends AbstractModule {
 			target_group_id: decodeBase62Id(body.target_group_id),
 			project_id: body.project_id,
 		}
-		return this.client.request<void>('/attribution/attribution/assign', {
+		return this.client.request<void>('/attribution/assign', {
 			api: 'labrinth',
 			version: 'internal',
 			method: 'POST',
@@ -90,10 +90,10 @@ export class LabrinthAttributionInternalModule extends AbstractModule {
 
 	/**
 	 * Split a file (by sha1) out of its current attribution group into a new group.
-	 * POST /_internal/attribution/attribution/split
+	 * POST /_internal/attribution/split
 	 */
 	public async splitFile(body: Labrinth.Attribution.Internal.SplitRequest): Promise<void> {
-		return this.client.request<void>('/attribution/attribution/split', {
+		return this.client.request<void>('/attribution/split', {
 			api: 'labrinth',
 			version: 'internal',
 			method: 'POST',
