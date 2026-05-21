@@ -231,6 +231,8 @@ const durationLabel = computed(() =>
 const tooltipElement = ref<HTMLDivElement | null>(null)
 const tooltipWidth = ref(0)
 const tooltipHeight = ref(0)
+const tooltipOffsetParentLeft = ref(0)
+const viewportWidth = ref(0)
 
 const CURSOR_OFFSET = 12
 const EDGE_PADDING = 8
@@ -238,17 +240,44 @@ const WHEEL_DELTA_LINE = 1
 const WHEEL_DELTA_PAGE = 2
 const WHEEL_LINE_HEIGHT = 16
 
+function updateTooltipMeasurements() {
+	nextTick(() => {
+		const element = tooltipElement.value
+		if (!element) return
+
+		tooltipWidth.value = element.offsetWidth
+		tooltipHeight.value = element.offsetHeight
+
+		const offsetParent =
+			element.offsetParent instanceof HTMLElement ? element.offsetParent : element.parentElement
+		tooltipOffsetParentLeft.value = offsetParent?.getBoundingClientRect().left ?? 0
+		viewportWidth.value =
+			document.documentElement.clientWidth || window.innerWidth || props.containerWidth
+	})
+}
+
 watch(
-	() => [props.visible, props.entries, rangeLabel.value, durationLabel.value, props.pinned],
-	() => {
-		nextTick(() => {
-			if (!tooltipElement.value) return
-			tooltipWidth.value = tooltipElement.value.offsetWidth
-			tooltipHeight.value = tooltipElement.value.offsetHeight
-		})
-	},
+	() => [
+		props.visible,
+		props.entries,
+		rangeLabel.value,
+		durationLabel.value,
+		props.pinned,
+		props.containerWidth,
+		props.containerHeight,
+	],
+	updateTooltipMeasurements,
 	{ deep: true, immediate: true },
 )
+
+onMounted(() => {
+	updateTooltipMeasurements()
+	window.addEventListener('resize', updateTooltipMeasurements)
+})
+
+onBeforeUnmount(() => {
+	window.removeEventListener('resize', updateTooltipMeasurements)
+})
 
 function getNormalizedWheelDeltaY(event: WheelEvent, element: HTMLElement) {
 	if (event.deltaMode === WHEEL_DELTA_PAGE) return event.deltaY * element.clientHeight
@@ -278,11 +307,18 @@ defineExpose({
 
 const positionStyle = computed(() => {
 	const desiredLeft = props.x + CURSOR_OFFSET
-	const maxLeft = Math.max(EDGE_PADDING, props.containerWidth - tooltipWidth.value - EDGE_PADDING)
-	const clampedLeft =
-		desiredLeft + tooltipWidth.value > props.containerWidth - EDGE_PADDING
-			? Math.max(EDGE_PADDING, props.x - tooltipWidth.value - CURSOR_OFFSET)
-			: Math.min(maxLeft, desiredLeft)
+	const viewportRight = viewportWidth.value || tooltipOffsetParentLeft.value + props.containerWidth
+	const desiredViewportRight = tooltipOffsetParentLeft.value + desiredLeft + tooltipWidth.value
+	const shouldPlaceLeft =
+		props.x <= props.containerWidth / 4 || desiredViewportRight > viewportRight - EDGE_PADDING
+	const candidateLeft =
+		shouldPlaceLeft ? props.x - tooltipWidth.value - CURSOR_OFFSET : desiredLeft
+	const minLeft = EDGE_PADDING - tooltipOffsetParentLeft.value
+	const maxLeft = Math.max(
+		minLeft,
+		viewportRight - tooltipOffsetParentLeft.value - tooltipWidth.value - EDGE_PADDING,
+	)
+	const clampedLeft = Math.min(maxLeft, Math.max(minLeft, candidateLeft))
 
 	const desiredTop = props.y - tooltipHeight.value / 2
 	const maxTop = Math.max(EDGE_PADDING, props.containerHeight - tooltipHeight.value - EDGE_PADDING)

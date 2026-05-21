@@ -678,8 +678,12 @@ function refreshChart() {
 	const config = buildConfig()
 	chartInstance.data = config.data
 	chartInstance.options = config.options ?? {}
-	syncPinnedSliceState()
+	clearChartActiveState()
 	chartInstance.update('none')
+	syncPinnedSliceState()
+	if (props.pinnedSliceIndex !== null) {
+		updateChartWithoutGeometry()
+	}
 	emitChartGeometry()
 }
 
@@ -702,10 +706,23 @@ function scheduleChartRefresh() {
 function syncPinnedSliceState() {
 	if (!chartInstance) return
 
+	const activeElements =
+		props.pinnedSliceIndex === null ? [] : getPinnedActiveElements(props.pinnedSliceIndex)
+	const tooltipPosition =
+		props.pinnedSliceIndex === null
+			? { x: 0, y: 0 }
+			: (getPinnedTooltipPosition(props.pinnedSliceIndex) ?? { x: 0, y: 0 })
+
 	chartInstance.options.events = getChartEvents()
-	chartInstance.setActiveElements(
-		props.pinnedSliceIndex === null ? [] : getPinnedActiveElements(props.pinnedSliceIndex),
-	)
+	chartInstance.setActiveElements(activeElements)
+	chartInstance.tooltip?.setActiveElements(activeElements, tooltipPosition)
+}
+
+function clearChartActiveState() {
+	if (!chartInstance) return
+
+	chartInstance.setActiveElements([])
+	chartInstance.tooltip?.setActiveElements([], { x: 0, y: 0 })
 }
 
 function applyPinnedSliceState() {

@@ -1,8 +1,7 @@
 <template>
 	<section
-		class="relative flex flex-col !overflow-hidden rounded-2xl border border-solid border-surface-5 bg-surface-3"
+		class="relative flex flex-col rounded-2xl border border-solid border-surface-5 bg-surface-3"
 	>
-		<AnalyticsLoadingBar :loading="isDataLoading" />
 		<div class="flex w-full flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
 			<div
 				class="flex w-full items-center justify-between rounded-t-2xl border-0 border-b border-solid border-surface-5 bg-surface-3 p-4"
@@ -200,6 +199,7 @@
 			</div>
 		</div>
 		<div v-if="isDataLoading" class="absolute inset-0 z-[19] overflow-hidden rounded-xl">
+			<AnalyticsLoadingBar :loading="isDataLoading" class="mt-px" />
 			<div class="absolute inset-0 bg-surface-3 opacity-50" />
 			<div class="absolute inset-0 backdrop-blur-[3px]" />
 			<div class="absolute inset-0 flex items-center justify-center">
@@ -235,7 +235,6 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
-import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import {
 	ensureMinimumTimeRange,
 	getDefaultAnalyticsGroupByForDurationMinutes,
@@ -396,7 +395,7 @@ const chartType = computed<'line' | 'bar'>(() =>
 const canUseRatioMode = computed(
 	() =>
 		(activeGraphViewMode.value === 'area' || activeGraphViewMode.value === 'bar') &&
-		legendEntries.value.filter((entry) => !entry.hidden).length > 1,
+		legendEntries.value.length > 1,
 )
 const isArea = computed(() => activeGraphViewMode.value === 'area')
 const isStacked = computed(
@@ -767,6 +766,25 @@ const chartDatasetById = computed(() => {
 	return datasets
 })
 
+const hoverRatioSliceTotals = computed(() => {
+	const sliceLength = selectableChartDatasets.value.reduce(
+		(maxLength, dataset) => Math.max(maxLength, dataset.data.length),
+		0,
+	)
+	const totals = new Array<number>(sliceLength).fill(0)
+
+	for (const legendEntry of legendEntries.value) {
+		const dataset = chartDatasetById.value.get(legendEntry.id)
+		if (!dataset) continue
+
+		for (let i = 0; i < sliceLength; i++) {
+			totals[i] += dataset.data[i] ?? 0
+		}
+	}
+
+	return totals
+})
+
 const baseVisibleChartDatasets = computed(() =>
 	legendEntries.value
 		.filter((legendEntry) => !legendEntry.hidden)
@@ -787,7 +805,10 @@ const visibleChartDatasets = computed<ChartDataset[]>(() => {
 	const datasets = baseVisibleChartDatasets.value
 	if (!isRatioMode.value || datasets.length === 0) return datasets
 
-	const sliceLength = datasets[0]?.data.length ?? 0
+	const sliceLength = datasets.reduce(
+		(maxLength, dataset) => Math.max(maxLength, dataset.data.length),
+		0,
+	)
 	const totals = new Array<number>(sliceLength).fill(0)
 	for (const dataset of datasets) {
 		for (let i = 0; i < sliceLength; i++) {
@@ -980,6 +1001,8 @@ const chartRangeBounds = computed(() => {
 const hoverTotalValue = computed(() => {
 	if (hoverState.sliceIndex === null) return 0
 	const sliceIndex = hoverState.sliceIndex
+	if (isRatioMode.value) return hoverRatioSliceTotals.value[sliceIndex] ?? 0
+
 	return legendEntries.value.reduce((sum, legendEntry) => {
 		if (legendEntry.hidden) return sum
 		const dataset = chartDatasetById.value.get(legendEntry.id)
