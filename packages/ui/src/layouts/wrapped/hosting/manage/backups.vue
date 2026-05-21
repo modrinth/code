@@ -258,6 +258,7 @@ import BackupDeleteModal from '#ui/components/servers/backups/BackupDeleteModal.
 import BackupItem from '#ui/components/servers/backups/BackupItem.vue'
 import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
+import { useBackupsSelection } from '#ui/composables/hosting/backups-selection'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useBulkOperation } from '#ui/layouts/shared/content-tab/composables/bulk-operations'
@@ -267,8 +268,6 @@ import {
 	injectNotificationManager,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
-
-import { useBackupsSelection } from './backups-selection'
 
 const messages = defineMessages({
 	selectAll: {

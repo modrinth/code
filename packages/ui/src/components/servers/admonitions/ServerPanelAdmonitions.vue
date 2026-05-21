@@ -92,6 +92,7 @@ const filesBusyHeader = computed(() =>
 
 const dismissedIds = reactive(new Set<string>())
 const cancellingIds = reactive(new Set<string>())
+const uploadCancelling = ref(false)
 const dismissedContentErrorKey = ref<string | null>(null)
 
 const contentErrorKey = computed(() =>
@@ -327,6 +328,21 @@ async function onBackupRetry(item: BackupAdmonitionEntry) {
 	await invalidate()
 }
 
+async function onUploadCancel() {
+	if (uploadCancelling.value) return
+	const cancel = ctx.cancelUpload.value
+	if (!cancel) return
+
+	uploadCancelling.value = true
+	try {
+		await cancel()
+	} catch (err) {
+		console.error('Failed to cancel upload', err)
+	} finally {
+		uploadCancelling.value = false
+	}
+}
+
 async function onDismissAll() {
 	const tasks: Promise<unknown>[] = []
 	for (const it of stackItems.value) {
@@ -375,7 +391,12 @@ function onContentErrorDismiss() {
 				@dismiss="onContentErrorDismiss"
 				@retry="emit('content-retry')"
 			/>
-			<UploadAdmonition v-else-if="item.kind === 'upload'" />
+			<UploadAdmonition
+				v-else-if="item.kind === 'upload'"
+				:cancelable="!!ctx.cancelUpload.value"
+				:cancelling="uploadCancelling"
+				@cancel="onUploadCancel"
+			/>
 			<FileOperationAdmonition
 				v-else-if="item.kind === 'fs-op'"
 				:op="item.op"

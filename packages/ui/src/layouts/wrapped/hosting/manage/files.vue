@@ -6,6 +6,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { useReadyState } from '#ui/composables'
+import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -25,7 +26,21 @@ const props = defineProps<{
 
 const client = injectModrinthClient()
 const serverContext = injectModrinthServerContext()
-const { serverId, fsOps, busyReasons, uploadState, cancelUpload: cancelUploadRef } = serverContext
+const {
+	serverId,
+	worldId,
+	fsOps,
+	busyReasons,
+	uploadState,
+	cancelUpload: cancelUploadRef,
+} = serverContext
+const fileUploadSession = useUploadSessionUpload({
+	client,
+	scope: 'files',
+	worldId,
+	uploadState,
+	cancelUpload: cancelUploadRef,
+})
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -113,7 +128,13 @@ const {
 	staleTime: 30_000,
 })
 
-const items = computed<FileItem[]>(() => directoryData.value?.items ?? [])
+function isVisibleFileItem(item: Kyros.Files.v0.DirectoryItem) {
+	return !item.path.split('/').includes('.modrinth-staged')
+}
+
+const items = computed<FileItem[]>(() =>
+	(directoryData.value?.items ?? []).filter(isVisibleFileItem),
+)
 
 const filesReadyPending = useReadyState({ isLoading, data: directoryData })
 
@@ -365,71 +386,33 @@ async function restartServer() {
 	await client.archon.servers_v0.power(serverId, 'Restart')
 }
 
-let activeUploadCancel: (() => void) | null = null
+function getSessionUploadFilename(fileName: string) {
+	const basePath = currentPath.value.split('/').filter(Boolean).join('/')
+	return basePath ? `${basePath}/${fileName}` : fileName
+}
 
 async function uploadFiles(files: File[]) {
 	if (files.length === 0) return
 
-	const totalBytes = files.reduce((sum, f) => sum + f.size, 0)
-	uploadState.value = {
-		isUploading: true,
-		currentFileName: files[0].name,
-		currentFileProgress: 0,
-		uploadedBytes: 0,
-		totalBytes,
-		completedFiles: 0,
-		totalFiles: files.length,
-	}
-	cancelUploadRef.value = () => activeUploadCancel?.()
-
-	let completedBytes = 0
-
-	for (let i = 0; i < files.length; i++) {
-		const file = files[i]
-		const filePath = `${currentPath.value}/${file.name}`.replace('//', '/')
-
-		uploadState.value.currentFileName = file.name
-		uploadState.value.currentFileProgress = 0
-
-		try {
-			const uploader = client.kyros.files_v0.uploadFile(filePath, file, {
-				onProgress: ({ progress }) => {
-					uploadState.value.currentFileProgress = progress
-					uploadState.value.uploadedBytes = completedBytes + Math.round(file.size * progress)
-				},
-			})
-			activeUploadCancel = () => uploader.cancel()
-
-			await uploader.promise
-			completedBytes += file.size
-			uploadState.value.completedFiles = i + 1
-			uploadState.value.uploadedBytes = completedBytes
-		} catch (err) {
-			if (err instanceof Error && err.message === 'Upload cancelled') break
-			addNotification({
-				title: formatMessage(commonMessages.uploadFailedLabel),
-				text: `Failed to upload ${file.name}`,
-				type: 'error',
-			})
-		}
-	}
-
-	activeUploadCancel = null
-	cancelUploadRef.value = null
-	refreshList()
-	uploadState.value = {
-		isUploading: false,
-		currentFileName: null,
-		currentFileProgress: 0,
-		uploadedBytes: 0,
-		totalBytes: 0,
-		completedFiles: 0,
-		totalFiles: 0,
+	try {
+		const result = await fileUploadSession.uploadFiles(
+			files.map((file) => ({
+				file,
+				filename: getSessionUploadFilename(file.name),
+			})),
+		)
+		if (result === 'completed') refreshList()
+	} catch (err) {
+		addNotification({
+			title: formatMessage(commonMessages.uploadFailedLabel),
+			text: err instanceof Error ? err.message : undefined,
+			type: 'error',
+		})
 	}
 }
 
 function cancelUpload() {
-	activeUploadCancel?.()
+	fileUploadSession.cancelUpload()
 }
 
 // Provide the file manager context

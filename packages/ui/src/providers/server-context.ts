@@ -16,6 +16,8 @@ export interface FilesystemAuth {
 	token: string
 }
 
+export type CancelUploadHandler = () => void | Promise<void>
+
 export interface ModrinthServerContext {
 	readonly serverId: string
 	readonly worldId: Ref<string | null>
@@ -44,7 +46,7 @@ export interface ModrinthServerContext {
 
 	// File upload state
 	readonly uploadState: Ref<UploadState>
-	readonly cancelUpload: Ref<(() => void) | null>
+	readonly cancelUpload: Ref<CancelUploadHandler | null>
 
 	// File operations (extract, move, etc.)
 	readonly activeOperations: ComputedRef<FileOperation[]>
