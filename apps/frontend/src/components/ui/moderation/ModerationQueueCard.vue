@@ -129,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, LinkIcon, FileIcon, ScaleIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FileIcon, LinkIcon, ScaleIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Badge,
