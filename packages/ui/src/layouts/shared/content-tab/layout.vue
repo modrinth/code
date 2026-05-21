@@ -365,9 +365,12 @@ async function confirmDelete() {
 		const item = itemsToDelete[0]
 		const id = getItemId(item)
 		markChanging(id)
-		await ctx.deleteItem(item)
-		removeFromSelection(id)
-		unmarkChanging(id)
+		try {
+			await ctx.deleteItem(item)
+			removeFromSelection(id)
+		} finally {
+			unmarkChanging(id)
+		}
 		return
 	}
 

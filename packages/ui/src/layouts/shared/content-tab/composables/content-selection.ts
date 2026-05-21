@@ -13,14 +13,17 @@ export function useContentSelection(
 		items.value.filter((item) => selectedIds.value.includes(getItemId(item))),
 	)
 
-	watch(items, (newItems) => {
-		if (selectedIds.value.length === 0) return
-		const validIds = new Set(newItems.map(getItemId))
-		const pruned = selectedIds.value.filter((id) => validIds.has(id))
-		if (pruned.length !== selectedIds.value.length) {
-			selectedIds.value = pruned
-		}
-	})
+	watch(
+		() => items.value.map(getItemId),
+		(newIds) => {
+			if (selectedIds.value.length === 0) return
+			const validIds = new Set(newIds)
+			const pruned = selectedIds.value.filter((id) => validIds.has(id))
+			if (pruned.length !== selectedIds.value.length) {
+				selectedIds.value = pruned
+			}
+		},
+	)
 
 	function clearSelection() {
 		selectedIds.value = []
