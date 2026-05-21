@@ -21,13 +21,10 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(
-        utoipa_actix_web::scope("/attribution")
-            .service(list)
-            .service(update_group)
-            .service(assign)
-            .service(split),
-    );
+    cfg.service(list)
+        .service(update_group)
+        .service(assign)
+        .service(split);
 }
 
 #[derive(Clone, Serialize, Deserialize)]
