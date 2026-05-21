@@ -526,6 +526,10 @@ function getContentItemDisplayKey(item: ContentItem) {
 	return item.project?.id ?? item.file_name ?? item.id
 }
 
+function getContentItemId(item: ContentItem) {
+	return item.file_name ?? item.id
+}
+
 function mergeFragileContentItems(items: ContentItem[]) {
 	const nextItems = new Map(items.map((item) => [getContentItemDisplayKey(item), item]))
 	const mergedItems = displayedContentItems.value.map((item) => {
@@ -980,7 +984,7 @@ async function handleBulkUpdate(items: ContentItem[]) {
 }
 
 async function handleUpdateItem(id: string) {
-	const item = contentItems.value.find((i) => i.id === id)
+	const item = contentItems.value.find((i) => getContentItemId(i) === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
 	updatingModpack.value = false
@@ -1220,13 +1224,14 @@ provideContentManager({
 	openSettings: () => openServerSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
+	getItemId: getContentItemId,
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
 		const addon = addonLookup.value.get(item.file_name)
 		const hasModrinthProject = !!addon?.project_id || (!!item.installing && !!item.project?.id)
 		const projectSlugOrId = item.project.slug ?? item.project.id
 		return {
-			id: item.id,
+			id: getContentItemId(item),
 			project: item.project,
 			projectLink: hasModrinthProject ? `/${projectType}/${projectSlugOrId}` : undefined,
 			version: item.version,
