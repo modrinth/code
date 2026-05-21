@@ -12,11 +12,16 @@ export type VersionEntry = {
 const VERSIONS: VersionEntry[] = [
 	{
 		date: `2026-05-21T22:13:35+00:00`,
+		product: 'website',
+		body: `## Fixed
+- Fixed project embeds not loading in correctly.`,
+	},
+	{
+		date: `2026-05-21T22:13:35+00:00`,
 		product: 'app',
 		version: '0.13.21',
 		body: `## Fixed
-- Fixed issue with content items visually duplicating over other content items in the Content tab table.
-- Fixed project embeds not loading in correctly.`,
+- Fixed issue with content items visually duplicating over other content items in the Content tab table.`,
 	},
 	{
 		date: `2026-05-21T22:13:35+00:00`,
