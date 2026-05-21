@@ -112,6 +112,24 @@ export const WithSelectAll: Story = {
 	},
 }
 
+export const SingleOptionWithSelectAll: Story = {
+	args: {
+		options: [{ value: 'sodium', label: 'Sodium' }],
+		modelValue: [],
+		placeholder: 'Select projects',
+		searchable: true,
+		includeSelectAllOption: true,
+		searchPlaceholder: 'Search projects',
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: 'Select all is hidden when there is only one enabled option.',
+			},
+		},
+	},
+}
+
 export const WithRightCheckbox: Story = {
 	args: {
 		...Default.args,
@@ -136,6 +154,8 @@ export const WithSections: Story = {
 		options: [
 			{ value: 'iris', label: 'Iris' },
 			{ value: 'sodium', label: 'Sodium' },
+			{ type: 'section-header', label: 'Single project group' },
+			{ value: 'lithium', label: 'Lithium', searchTerms: ['Single project group'] },
 			{ type: 'section-header', label: 'LambdAurora' },
 			{ value: 'lambda-better-grass', label: 'LambdaBetterGrass', searchTerms: ['LambdAurora'] },
 			{ value: 'auroras-decorations', label: "Aurora's Decorations", searchTerms: ['LambdAurora'] },

@@ -503,6 +503,9 @@ const openDirection = ref<'down' | 'up'>('down')
 const hasCustomInputContent = computed(() => Boolean(slots['input-content']))
 
 const selectableOptions = computed(() => props.options.filter(isOption))
+const enabledSelectableOptions = computed(() =>
+	selectableOptions.value.filter((opt) => !opt.disabled),
+)
 const selectedValueSet = computed(() => new Set(props.modelValue))
 
 const selectedOptions = computed(() => {
@@ -511,7 +514,7 @@ const selectedOptions = computed(() => {
 })
 
 const isAllSelected = computed(() => {
-	const selectableOptions = props.options.filter(isOption).filter((opt) => !opt.disabled)
+	const selectableOptions = enabledSelectableOptions.value
 	const selectedValues = selectedValueSet.value
 	return (
 		selectableOptions.length > 0 && selectableOptions.every((opt) => selectedValues.has(opt.value))
@@ -618,7 +621,7 @@ const optionsListStyle = computed(() =>
 const hasFilteredOptions = computed(() => filteredOptions.value.some(isOption))
 const isNoOptionsState = computed(() => selectableOptions.value.length === 0 && !searchQuery.value)
 const shouldShowSelectAll = computed(
-	() => props.includeSelectAllOption && selectableOptions.value.length > 0,
+	() => props.includeSelectAllOption && enabledSelectableOptions.value.length > 1,
 )
 const selectedOptionCount = computed(() => selectedOptions.value.length)
 const shouldShowSelectionActions = computed(
@@ -661,7 +664,7 @@ function getSectionHeaderOptions(sectionHeader: MultiSelectSectionHeader) {
 }
 
 function hasSelectableSectionHeaderOptions(sectionHeader: MultiSelectSectionHeader) {
-	return getSectionHeaderOptions(sectionHeader).length > 0
+	return getSectionHeaderOptions(sectionHeader).length > 1
 }
 
 function areSectionHeaderOptionsSelected(sectionHeader: MultiSelectSectionHeader) {
@@ -764,7 +767,7 @@ function toggleSelectAll() {
 	if (isAllSelected.value) {
 		emit('update:modelValue', [])
 	} else {
-		const allValues = selectableOptions.value.filter((opt) => !opt.disabled).map((opt) => opt.value)
+		const allValues = enabledSelectableOptions.value.map((opt) => opt.value)
 		emit('update:modelValue', allValues)
 	}
 }
