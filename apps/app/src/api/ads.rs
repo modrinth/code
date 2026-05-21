@@ -18,7 +18,7 @@ pub struct AdsState {
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
 #[cfg(any(windows, target_os = "macos"))]
-pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 1.0;
+pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 0.5;
 #[cfg(not(target_os = "linux"))]
 const ADS_USER_AGENT: &str = concat!(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ",
