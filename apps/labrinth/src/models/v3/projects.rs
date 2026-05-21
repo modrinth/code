@@ -663,7 +663,9 @@ pub enum OverrideSource {
     Unknown,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema)]
+#[derive(
+    Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema,
+)]
 #[serde(untagged)]
 pub enum AttributionLicense {
     Spdx(String),
@@ -677,6 +679,9 @@ pub enum AttributionResolutionKind {
         license: AttributionLicense,
         link_to_work: url::Url,
     },
+    GloballyAllowed {
+        link_to_work: url::Url,
+    },
     MyProject {
         license: AttributionLicense,
     },
@@ -687,9 +692,27 @@ pub enum AttributionResolutionKind {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum AttributionModerationStatusKind {
+    NotAllowed,
+    Approved,
+    BadProof,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+pub struct AttributionModerationStatus {
+    #[serde(flatten)]
+    pub kind: AttributionModerationStatusKind,
+    #[serde(default)]
+    pub reason: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct AttributionResolution {
     #[serde(flatten)]
     pub kind: AttributionResolutionKind,
+    #[serde(default)]
+    pub moderation_status: Option<AttributionModerationStatus>,
     pub notes: String,
     pub image_urls: Vec<url::Url>,
 }
@@ -957,7 +980,9 @@ pub struct Dependency {
     pub attribution: Option<DependencyAttribution>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, utoipa::ToSchema)]
+#[derive(
+    Serialize, Deserialize, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+)]
 pub struct DependencyAttribution {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link: Option<url::Url>,

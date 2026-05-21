@@ -243,53 +243,26 @@ export namespace Labrinth {
 			export type AttributionPermissionKind =
 				| 'license'
 				| 'my_project'
-				| 'special_permission'
+				| 'special_permissions'
+				| 'globally_allowed'
 				| 'no_permission'
+			export type AttributionResolutionKind = AttributionPermissionKind
 
 			export type AttributionLicense =
 				| string
 				| { name: string }
 
-			export type AttributionResolution = {
-				kind: AttributionPermissionKind
+			export type AttributionModerationStatusKind = 'not_allowed' | 'approved' | 'bad_proof'
+
+			export type AttributionModerationStatus = {
+				kind: AttributionModerationStatusKind
+				reason: string
+			}
+
+			export type AttributionResolutionBase = {
 				notes: string
 				image_urls: string[]
-				license?: AttributionLicense
-				link_to_work?: string
-			}
-
-			export type AttributionFile = {
-				name: string
-				sha1: string
-				versions: string[]
-			}
-
-			export type AttributionVersionInfo = {
-				id: string
-				name: string
-				version_number: string
-				date_created: string
-			}
-
-			export type FlameProject = {
-				id: number
-				title: string
-				url: string
-				icon_url: string
-			}
-
-			export type AttributionGroup = {
-				id: string
-				flame_project: FlameProject | null
-				attribution: AttributionResolution | null
-				attributed_at: string | null
-				attributed_by: string | null
-				files: AttributionFile[]
-				versions: AttributionVersionInfo[]
-			}
-
-			export type UpdateGroupRequest = {
-				attribution: AttributionResolution
+				moderation_status: AttributionModerationStatus | null
 			}
 
 			export type AttributionResolution =
@@ -307,6 +280,10 @@ export namespace Labrinth {
 						link_to_work: string
 				  })
 				| (AttributionResolutionBase & {
+						kind: 'globally_allowed'
+						link_to_work: string
+				  })
+				| (AttributionResolutionBase & {
 						kind: 'no_permission'
 				  })
 
@@ -321,6 +298,8 @@ export namespace Labrinth {
 				name: string
 				sha1: string
 				versions: string[]
+				moderation_external_license_id?: number
+				moderation_external_license?: ExternalProjects.Internal.ExternalProject
 			}
 
 			export type AttributionVersionInfo = {

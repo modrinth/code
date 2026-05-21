@@ -1,0 +1,2 @@
+alter table project_attribution_files
+	add column moderation_external_license_id bigint references moderation_external_licenses(id);

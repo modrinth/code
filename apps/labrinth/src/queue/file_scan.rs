@@ -19,7 +19,9 @@ use crate::database::{PgPool, PgTransaction, redis::RedisPool};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::FileId;
-use crate::models::projects::{AttributionResolution, AttributionResolutionKind};
+use crate::models::projects::{
+    AttributionResolution, AttributionResolutionKind,
+};
 use crate::queue::moderation::{
     ApprovalType, FingerprintResponse, FlameProject, FlameResponse,
 };
@@ -197,8 +199,8 @@ async fn extract_override_files_from_storage(
         .read_file(&key, FileHostPublicity::Public)
         .await
         .wrap_err_with(|| {
-        eyre!("reading file {file_id:?} from storage at {key}")
-    })?;
+            eyre!("reading file {file_id:?} from storage at {key}")
+        })?;
 
     spawn_blocking(move || extract_override_files(&file_data))
         .await
@@ -216,7 +218,11 @@ pub struct OverrideFile {
 #[derive(Debug)]
 pub enum OverrideResolution {
     OnModrinth,
-    ExternalLicense(ApprovalType),
+    ExternalLicense {
+        id: i64,
+        status: ApprovalType,
+        link: Option<String>,
+    },
     Flame {
         project_id: u32,
         title: String,
@@ -248,6 +254,10 @@ fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
             .by_index(i)
             .wrap_err_with(|| eyre!("reading file {i}"))?;
         let name = file.name().to_string();
+
+        if file.is_dir() {
+            continue;
+        }
 
         if !OVERRIDE_PREFIXES
             .iter()
@@ -308,6 +318,12 @@ async fn persist_attribution_results(
         u32,
         (Vec<&OverrideFile>, Option<&OverrideResolution>),
     > = HashMap::new();
+    let mut external_license_files: Vec<(
+        &OverrideFile,
+        i64,
+        ApprovalType,
+        Option<String>,
+    )> = Vec::new();
     let mut unknown_files: Vec<&OverrideFile> = Vec::new();
 
     for file in overrides {
@@ -320,11 +336,8 @@ async fn persist_attribution_results(
 
         match resolved.get(&file.sha1) {
             Some(OverrideResolution::OnModrinth) => continue,
-            Some(OverrideResolution::ExternalLicense(approval)) => {
-                if approval.approved() {
-                    continue;
-                }
-                unknown_files.push(file);
+            Some(OverrideResolution::ExternalLicense { id, status, link }) => {
+                external_license_files.push((file, *id, *status, link.clone()));
             }
             Some(
                 res @ OverrideResolution::Flame {
@@ -341,6 +354,37 @@ async fn persist_attribution_results(
                 unknown_files.push(file);
             }
         }
+    }
+
+    for (file, external_license_id, status, link) in external_license_files {
+        let attribution = default_external_license_attribution(status, link);
+        let group_id = generate_attribution_group_id(&mut *txn).await?;
+        sqlx::query!(
+            "
+            insert into project_attribution_groups (id, project_id, attribution)
+            values ($1, $2, $3)
+            ",
+            group_id as DBAttributionGroupId,
+            project_id as DBProjectId,
+            attribution,
+        )
+        .execute(&mut *txn)
+        .await
+        .wrap_err("inserting external license attribution group")?;
+
+        sqlx::query!(
+            "
+            insert into project_attribution_files (group_id, name, sha1, moderation_external_license_id)
+            values ($1, $2, $3, $4)
+            ",
+            group_id as DBAttributionGroupId,
+            &file.path,
+            &file.sha1.as_bytes().to_vec() as &[u8],
+            external_license_id,
+        )
+        .execute(&mut *txn)
+        .await
+        .wrap_err("inserting external license attribution file")?;
     }
 
     let existing_flame_groups = sqlx::query!(
@@ -360,7 +404,9 @@ async fn persist_attribution_results(
             g.flame_project
                 .as_ref()
                 .and_then(|fp| {
-                    serde_json::from_value::<AttributionFlameProject>(fp.clone())
+                    serde_json::from_value::<AttributionFlameProject>(
+                        fp.clone(),
+                    )
                     .ok()
                 })
                 .is_some_and(|fp| fp.id == *flame_project_id)
@@ -380,12 +426,11 @@ async fn persist_attribution_results(
                     {
                         Some(
                             serde_json::to_value(AttributionFlameProject {
-                                    id: *project_id,
-                                    title: title.clone(),
-                                    url: url.clone(),
-                                    icon_url: icon_url.clone(),
-                                },
-                            )
+                                id: *project_id,
+                                title: title.clone(),
+                                url: url.clone(),
+                                icon_url: icon_url.clone(),
+                            })
                             .ok(),
                         )
                     } else {
@@ -474,6 +519,37 @@ async fn persist_attribution_results(
     Ok(())
 }
 
+fn default_external_license_attribution(
+    status: ApprovalType,
+    link: Option<String>,
+) -> Option<serde_json::Value> {
+    match status {
+        ApprovalType::Yes
+        | ApprovalType::WithAttributionAndSource
+        | ApprovalType::WithAttribution => link
+            .and_then(|link| url::Url::parse(&link).ok())
+            .and_then(|link_to_work| {
+                serde_json::to_value(AttributionResolution {
+                    kind: AttributionResolutionKind::GloballyAllowed {
+                        link_to_work,
+                    },
+                    moderation_status: None,
+                    notes: String::new(),
+                    image_urls: Vec::new(),
+                })
+                .ok()
+            }),
+        ApprovalType::No => serde_json::to_value(AttributionResolution {
+            kind: AttributionResolutionKind::NoPermission,
+            moderation_status: None,
+            notes: String::new(),
+            image_urls: Vec::new(),
+        })
+        .ok(),
+        ApprovalType::PermanentNo | ApprovalType::Unidentified => None,
+    }
+}
+
 async fn resolve_overrides(
     overrides: &[OverrideFile],
     redis: &RedisPool,
@@ -525,7 +601,7 @@ async fn resolve_overrides(
 
     let rows = sqlx::query!(
         "
-        SELECT encode(mef.sha1, 'escape') sha1, mel.status status
+        SELECT encode(mef.sha1, 'escape') sha1, mel.id, mel.status status, mel.link
         FROM moderation_external_files mef
         INNER JOIN moderation_external_licenses mel ON mef.external_license_id = mel.id
         WHERE mef.sha1 = ANY($1)
@@ -547,10 +623,12 @@ async fn resolve_overrides(
             let idx = remaining.remove(pos);
             results.insert(
                 overrides[idx].sha1.clone(),
-                OverrideResolution::ExternalLicense(
-                    ApprovalType::from_string(&row.status)
+                OverrideResolution::ExternalLicense {
+                    id: row.id,
+                    status: ApprovalType::from_string(&row.status)
                         .unwrap_or(ApprovalType::Unidentified),
-                ),
+                    link: row.link,
+                },
             );
         }
     }
@@ -605,7 +683,7 @@ async fn resolve_overrides(
 
         let rows = sqlx::query!(
             "
-            SELECT mel.id, mel.flame_project_id, mel.status status
+            SELECT mel.id, mel.flame_project_id, mel.status status, mel.link
             FROM moderation_external_licenses mel
             WHERE mel.flame_project_id = ANY($1)
             ",
@@ -631,10 +709,12 @@ async fn resolve_overrides(
 
                 results.insert(
                     overrides[idx].sha1.clone(),
-                    OverrideResolution::ExternalLicense(
-                        ApprovalType::from_string(&row.status)
+                    OverrideResolution::ExternalLicense {
+                        id: row.id,
+                        status: ApprovalType::from_string(&row.status)
                             .unwrap_or(ApprovalType::Unidentified),
-                    ),
+                        link: row.link.clone(),
+                    },
                 );
 
                 insert_hashes.push(overrides[idx].sha1.as_bytes().to_vec());
@@ -741,10 +821,7 @@ pub async fn get_files_missing_attribution<'a, E>(
 ) -> Result<
     std::collections::HashMap<
         DBVersionId,
-        Vec<(
-            DBFileId,
-            Option<AttributionFlameProject>,
-        )>,
+        Vec<(DBFileId, Option<AttributionFlameProject>)>,
     >,
 >
 where
@@ -835,16 +912,19 @@ where
         let attribution: Option<AttributionResolution> =
             row.attribution.and_then(|v| serde_json::from_value(v).ok());
 
-        let flame_project: Option<AttributionFlameProject> =
-            row.flame_project.and_then(|v| serde_json::from_value(v).ok());
+        let flame_project: Option<AttributionFlameProject> = row
+            .flame_project
+            .and_then(|v| serde_json::from_value(v).ok());
 
         let link = attribution
             .as_ref()
             .and_then(|a| match &a.kind {
-                AttributionResolutionKind::License {
-                    link_to_work,
-                    ..
-                } => Some(link_to_work.to_string()),
+                AttributionResolutionKind::License { link_to_work, .. } => {
+                    Some(link_to_work.to_string())
+                }
+                AttributionResolutionKind::GloballyAllowed { link_to_work } => {
+                    Some(link_to_work.to_string())
+                }
                 AttributionResolutionKind::SpecialPermissions {
                     link_to_work,
                 } => Some(link_to_work.to_string()),
