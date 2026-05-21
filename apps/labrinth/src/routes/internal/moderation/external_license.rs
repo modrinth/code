@@ -5,6 +5,8 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::database::PgPool;
+use crate::database::models::ids::DBUserId;
+use crate::database::models::moderation_external_item::ExternalLicense;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::queue::moderation::ApprovalType;
@@ -14,7 +16,9 @@ use crate::{auth::check_is_moderator_from_headers, queue::session::AuthQueue};
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(search)
         .service(get_by_sha1)
-        .service(update_license);
+        .service(update_license)
+        .service(add_file)
+        .service(reassign_file);
 }
 
 #[derive(Serialize, Deserialize, utoipa::ToSchema)]
@@ -53,6 +57,32 @@ pub struct UpdateLicenseRequest {
     pub exceptions: Option<String>,
     pub proof: Option<String>,
     pub flame_project_id: Option<i32>,
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
+pub struct FileLicenseRequest {
+    pub hash: String,
+    pub license_id: LicenseId,
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
+#[serde(untagged)]
+pub enum LicenseId {
+    Number(i64),
+    String(String),
+}
+
+impl LicenseId {
+    fn parse(self) -> Result<i64, ApiError> {
+        match self {
+            LicenseId::Number(id) => Ok(id),
+            LicenseId::String(id) => id.parse().map_err(|_| {
+                ApiError::InvalidInput(
+                    "license_id must be a valid integer".to_string(),
+                )
+            }),
+        }
+    }
 }
 
 struct LicenseRow {
@@ -120,7 +150,8 @@ async fn fetch_linked_files(
             .or_default()
             .push(LinkedFile {
                 name: row.filename,
-                sha1: hex::encode(&row.sha1),
+                sha1: String::from_utf8(row.sha1)
+                    .unwrap_or_else(|err| hex::encode(err.into_bytes())),
             });
     }
     Ok(map)
@@ -257,6 +288,112 @@ async fn get_by_sha1(
             inserted_by: row.inserted_by,
             updated_at: row.updated_at,
             updated_by: row.updated_by,
+        }
+        .into_external_project(linked_files),
+    ))
+}
+
+#[utoipa::path]
+#[post("/file")]
+async fn add_file(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    body: web::Json<FileLicenseRequest>,
+) -> Result<web::Json<ExternalProject>, ApiError> {
+    upsert_file_license(req, pool, redis, session_queue, body).await
+}
+
+#[utoipa::path]
+#[post("/file/reassign")]
+async fn reassign_file(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    body: web::Json<FileLicenseRequest>,
+) -> Result<web::Json<ExternalProject>, ApiError> {
+    upsert_file_license(req, pool, redis, session_queue, body).await
+}
+
+async fn upsert_file_license(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    body: web::Json<FileLicenseRequest>,
+) -> Result<web::Json<ExternalProject>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let body = body.into_inner();
+    let license_id = body.license_id.parse()?;
+    let hash = body.hash.trim();
+    if hash.len() != 40 || !hash.chars().all(|c| c.is_ascii_hexdigit()) {
+        return Err(ApiError::InvalidInput(
+            "hash must be a valid SHA1 hex string".to_string(),
+        ));
+    }
+
+    let mut transaction = pool.begin().await?;
+
+    let license = sqlx::query!(
+        r#"
+        SELECT
+            id,
+            title,
+            status,
+            link,
+            exceptions,
+            proof,
+            flame_project_id,
+            inserted_at,
+            inserted_by,
+            updated_at,
+            updated_by
+        FROM moderation_external_licenses
+        WHERE id = $1
+        "#,
+        license_id,
+    )
+    .fetch_optional(&mut transaction)
+    .await?
+    .ok_or(ApiError::NotFound)?;
+
+    ExternalLicense::insert_files(
+        &mut transaction,
+        &[hash.as_bytes().to_vec()],
+        &[None],
+        &[license_id],
+        DBUserId(user.id.0 as i64),
+    )
+    .await?;
+
+    transaction.commit().await?;
+
+    let files_map = fetch_linked_files(&pool, &[license_id]).await?;
+    let linked_files = files_map.get(&license_id).cloned().unwrap_or_default();
+
+    Ok(web::Json(
+        LicenseRow {
+            id: license.id,
+            title: license.title,
+            status: license.status,
+            link: license.link,
+            exceptions: license.exceptions,
+            proof: license.proof,
+            flame_project_id: license.flame_project_id,
+            inserted_at: license.inserted_at,
+            inserted_by: license.inserted_by,
+            updated_at: license.updated_at,
+            updated_by: license.updated_by,
         }
         .into_external_project(linked_files),
     ))

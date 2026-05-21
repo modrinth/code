@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use super::ApiError;
 use crate::auth::checks::{
-    enrich_dependency_attributions, filter_visible_versions, is_visible_project, is_visible_version,
+    enrich_dependency_attributions, filter_visible_versions,
+    is_visible_project, is_visible_version,
 };
 use crate::auth::get_user_from_headers;
 use crate::database;
@@ -24,7 +25,9 @@ use crate::models::projects::{
 };
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
-use crate::queue::file_scan::{get_files_missing_attribution, get_dependency_attributions};
+use crate::queue::file_scan::{
+    get_dependency_attributions, get_files_missing_attribution,
+};
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
 use crate::search::SearchBackend;

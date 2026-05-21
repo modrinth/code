@@ -3,11 +3,10 @@ use crate::database::PgTransaction;
 use crate::models::ids::{
     AffiliateCodeId, AnalyticsEventId, AttributionGroupId, ChargeId,
     CollectionId, FileId, ImageId, NotificationId, OAuthAccessTokenId,
-    OAuthClientAuthorizationId,
-    OAuthClientId, OAuthRedirectUriId, OrganizationId, PatId, PayoutId,
-    ProductId, ProductPriceId, ProjectId, ReportId, SessionId,
-    SharedInstanceId, SharedInstanceVersionId, TeamId, TeamMemberId, ThreadId,
-    ThreadMessageId, UserSubscriptionId, VersionId,
+    OAuthClientAuthorizationId, OAuthClientId, OAuthRedirectUriId,
+    OrganizationId, PatId, PayoutId, ProductId, ProductPriceId, ProjectId,
+    ReportId, SessionId, SharedInstanceId, SharedInstanceVersionId, TeamId,
+    TeamMemberId, ThreadId, ThreadMessageId, UserSubscriptionId, VersionId,
 };
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};

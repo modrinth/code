@@ -6,16 +6,24 @@ use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
 use crate::models::ids::FileId;
-use crate::models::projects::{DependencyAttribution, MissingAttributionFile, OverrideSource, Version};
+use crate::models::projects::{
+    DependencyAttribution, MissingAttributionFile, OverrideSource, Version,
+};
 use crate::models::users::User;
-use crate::queue::file_scan::{DependencyAttributionData, get_dependency_attributions, get_files_missing_attribution};
+use crate::queue::file_scan::{
+    DependencyAttributionData, get_dependency_attributions,
+    get_files_missing_attribution,
+};
 use crate::routes::ApiError;
 use futures::TryStreamExt;
 use itertools::Itertools;
 
 pub fn enrich_dependency_attributions(
     version: &mut Version,
-    dep_attr: &std::collections::HashMap<(database::models::ids::DBVersionId, String), DependencyAttributionData>,
+    dep_attr: &std::collections::HashMap<
+        (database::models::ids::DBVersionId, String),
+        DependencyAttributionData,
+    >,
 ) {
     let version_id = database::models::ids::DBVersionId(version.id.0 as i64);
     for dep in &mut version.dependencies {
@@ -25,9 +33,15 @@ pub fn enrich_dependency_attributions(
             let attribution = DependencyAttribution {
                 link: attr.link.clone().and_then(|u| u.parse().ok()),
                 icon_url: attr.icon_url.clone().and_then(|u| u.parse().ok()),
-                license: attr.license.clone().and_then(|v| serde_json::from_value(v).ok()),
+                license: attr
+                    .license
+                    .clone()
+                    .and_then(|v| serde_json::from_value(v).ok()),
             };
-            if attribution.link.is_some() || attribution.icon_url.is_some() || attribution.license.is_some() {
+            if attribution.link.is_some()
+                || attribution.icon_url.is_some()
+                || attribution.license.is_some()
+            {
                 dep.attribution = Some(attribution);
             }
         }
