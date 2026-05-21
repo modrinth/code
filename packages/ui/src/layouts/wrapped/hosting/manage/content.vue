@@ -2,6 +2,7 @@
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useIntervalFn } from '@vueuse/core'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -22,6 +23,7 @@ import {
 	readPendingServerContentInstalls,
 	removePendingServerContentInstall,
 } from '#ui/utils/server-content-installing'
+import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
 import {
 	flushStoredServerAddonInstallQueue,
@@ -168,6 +170,44 @@ const projectQuery = useQuery({
 	enabled: computed(() => !!modpackProjectId.value),
 })
 
+function getVersionTime(version: Labrinth.Versions.v2.Version) {
+	return new Date(version.date_published).getTime()
+}
+
+function sortVersionsByPublishedDate(versions: Labrinth.Versions.v2.Version[]) {
+	return [...versions].sort((a, b) => getVersionTime(b) - getVersionTime(a))
+}
+
+const currentModpackVersionId = computed(() => {
+	const spec = contentQuery.data.value?.modpack?.spec
+	return spec?.platform === 'modrinth' ? spec.version_id : null
+})
+
+const newestModpackUpdateVersion = computed(() => {
+	const currentVersionId = currentModpackVersionId.value
+	if (!currentVersionId) return null
+
+	const versions = sortVersionsByPublishedDate(modpackVersionsQuery.data.value ?? [])
+	const currentVersion = versions.find((version) => version.id === currentVersionId)
+	const installedPublishedAt = contentQuery.data.value?.modpack?.date_published
+	const storedCurrentTime = installedPublishedAt
+		? new Date(installedPublishedAt).getTime()
+		: Number.NaN
+	const currentVersionTime = Number.isNaN(storedCurrentTime)
+		? currentVersion
+			? getVersionTime(currentVersion)
+			: Number.NaN
+		: storedCurrentTime
+
+	return (
+		versions.find((version) => {
+			if (version.id === currentVersionId) return false
+			if (Number.isNaN(currentVersionTime)) return true
+			return getVersionTime(version) > currentVersionTime
+		}) ?? null
+	)
+})
+
 const modpack = computed<ContentModpackData | null>(() => {
 	const mp = contentQuery.data.value?.modpack
 	if (!mp) return null
@@ -215,7 +255,7 @@ const modpack = computed<ContentModpackData | null>(() => {
 			project_type: 'modpack',
 			header: 'categories',
 		})) as ContentModpackCardCategory[],
-		hasUpdate: !!mp.has_update,
+		hasUpdate: !!mp.has_update || !!newestModpackUpdateVersion.value,
 	}
 })
 
@@ -245,6 +285,14 @@ const lastStableContentKeys = ref<Set<string>>(new Set())
 const contentInstallBaselineKeys = ref<Set<string> | null>(null)
 const contentInstallAddedKeys = ref<Set<string>>(new Set())
 const isFlushingStoredServerInstalls = ref(false)
+const { pause: pausePendingInstallPoll, resume: resumePendingInstallPoll } = useIntervalFn(
+	() => {
+		if (pendingServerContentInstalls.value.length === 0 || contentQuery.isFetching.value) return
+		void contentQuery.refetch()
+	},
+	5000,
+	{ immediate: false },
+)
 
 function syncPendingServerContentInstalls() {
 	pendingServerContentInstalls.value = readPendingServerContentInstalls(serverId, worldId.value)
@@ -268,6 +316,27 @@ function getAddonInstallKeys(addons: Archon.Content.v1.Addon[]) {
 		keys.add(getAddonInstallKey(addon))
 	}
 	return keys
+}
+
+function addonMatchesPendingInstall(
+	addon: Archon.Content.v1.Addon,
+	pendingInstall: PendingServerContentInstall,
+) {
+	return (
+		addon.project_id === pendingInstall.projectId ||
+		addon.version?.id === pendingInstall.versionId ||
+		(!!pendingInstall.fileName && addon.filename === pendingInstall.fileName)
+	)
+}
+
+function removeResolvedPendingServerContentInstalls(addons: Archon.Content.v1.Addon[]) {
+	if (addons.length === 0 || pendingServerContentInstalls.value.length === 0) return
+
+	for (const pendingInstall of pendingServerContentInstalls.value) {
+		if (addons.some((addon) => addonMatchesPendingInstall(addon, pendingInstall))) {
+			removePendingServerContentInstall(serverId, worldId.value, pendingInstall.projectId)
+		}
+	}
 }
 
 function syncContentInstallKeys(
@@ -381,17 +450,32 @@ const rawContentItems = computed<ContentItem[]>(() => {
 	const pendingInstallByProjectId = new Map(
 		pendingServerContentInstalls.value.map((item) => [item.projectId, item]),
 	)
+	const pendingInstallByVersionId = new Map(
+		pendingServerContentInstalls.value.map((item) => [item.versionId, item]),
+	)
+	const pendingInstallByFileName = new Map<string, PendingServerContentInstall>()
+	for (const item of pendingServerContentInstalls.value) {
+		if (item.fileName) {
+			pendingInstallByFileName.set(item.fileName, item)
+		}
+	}
 	const installingContentKeys = new Set([...pendingProjectIds, ...contentInstallAddedKeys.value])
-	const installedProjectIds = new Set(
-		addons.map((addon) => addon.project_id).filter((id): id is string => !!id),
+	const resolvedPendingProjectIds = new Set(
+		pendingServerContentInstalls.value
+			.filter((item) => addons.some((addon) => addonMatchesPendingInstall(addon, item)))
+			.map((item) => item.projectId),
 	)
 	const pendingItems = pendingServerContentInstalls.value
-		.filter((item) => !installedProjectIds.has(item.projectId))
+		.filter((item) => !resolvedPendingProjectIds.has(item.projectId))
 		.map(pendingInstallToContentItem)
 	const addonItems = addons.map((addon) => {
 		const contentItem = addonToContentItem(addon)
-		const installing = installingContentKeys.has(getAddonInstallKey(addon))
-		const pendingItem = addon.project_id ? pendingInstallByProjectId.get(addon.project_id) : null
+		const pendingItem =
+			(addon.project_id ? pendingInstallByProjectId.get(addon.project_id) : null) ??
+			(addon.version?.id ? pendingInstallByVersionId.get(addon.version.id) : null) ??
+			pendingInstallByFileName.get(addon.filename) ??
+			null
+		const installing = !!pendingItem || installingContentKeys.has(getAddonInstallKey(addon))
 
 		if (!installing || !pendingItem) {
 			return {
@@ -487,6 +571,26 @@ watch(
 )
 
 watch(
+	[() => contentQuery.data.value?.addons, pendingServerContentInstalls],
+	([addons]) => {
+		removeResolvedPendingServerContentInstalls(addons ?? [])
+	},
+	{ deep: true, immediate: true },
+)
+
+watch(
+	() => pendingServerContentInstalls.value.length > 0,
+	(hasPendingInstalls) => {
+		if (hasPendingInstalls) {
+			resumePendingInstallPoll()
+		} else {
+			pausePendingInstallPoll()
+		}
+	},
+	{ immediate: true },
+)
+
+watch(
 	worldId,
 	() => {
 		syncPendingServerContentInstalls()
@@ -506,6 +610,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+	pausePendingInstallPoll()
 	window.removeEventListener(
 		pendingServerContentInstallsEvent,
 		handlePendingServerContentInstallsChanged,
@@ -667,9 +772,7 @@ const updatingProjectVersions = computed(() => {
 		? modpackVersionsQuery.data.value
 		: projectVersionsQuery.data.value
 	if (!source) return []
-	return [...source].sort(
-		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-	)
+	return sortVersionsByPublishedDate(source)
 })
 
 const loadingVersions = computed(() =>
@@ -682,8 +785,12 @@ const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
 const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const isModpackUpdateDowngrade = ref(false)
 
-const currentGameVersion = computed(() => contentQuery.data.value?.game_version ?? '')
-const currentLoader = computed(() => contentQuery.data.value?.modloader ?? '')
+const currentGameVersion = computed(
+	() => contentQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
+)
+const currentLoader = computed(
+	() => contentQuery.data.value?.modloader ?? server.value?.loader ?? '',
+)
 
 function handleBrowseContent() {
 	const contentType = type.value
@@ -907,7 +1014,9 @@ async function handleModpackUpdate() {
 
 	await nextTick()
 
-	contentUpdaterModal.value?.show(mp.has_update ?? undefined)
+	contentUpdaterModal.value?.show(
+		newestModpackUpdateVersion.value?.id ?? mp.has_update ?? undefined,
+	)
 }
 
 function spliceVersionInCache(fullVersion: Labrinth.Versions.v2.Version) {
@@ -951,17 +1060,21 @@ function resetUpdateState() {
 
 function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	if (updatingModpack.value) {
-		if (event?.shiftKey) {
-			pendingModpackUpdateVersion.value = selectedVersion
+		pendingModpackUpdateVersion.value = selectedVersion
+
+		const mpSpec = contentQuery.data.value?.modpack?.spec
+		const currentVersionId = mpSpec?.platform === 'modrinth' ? mpSpec.version_id : undefined
+		const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
+		isModpackUpdateDowngrade.value = currentVersion
+			? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
+			: false
+		const shouldShowWarning =
+			isModpackUpdateDowngrade.value ||
+			versionChangesGameVersion(selectedVersion, currentGameVersion.value)
+
+		if (event?.shiftKey || !shouldShowWarning) {
 			handleModpackUpdateConfirm()
 		} else {
-			const mpSpec = contentQuery.data.value?.modpack?.spec
-			const currentVersionId = mpSpec?.platform === 'modrinth' ? mpSpec.version_id : undefined
-			const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
-			isModpackUpdateDowngrade.value = currentVersion
-				? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
-				: false
-			pendingModpackUpdateVersion.value = selectedVersion
 			modpackUpdateModal.value?.show()
 		}
 		return
@@ -1026,6 +1139,7 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 
 function handleModpackUpdateConfirm() {
 	if (pendingModpackUpdateVersion.value) {
+		contentUpdaterModal.value?.hide()
 		performUpdate(pendingModpackUpdateVersion.value)
 		pendingModpackUpdateVersion.value = null
 	}

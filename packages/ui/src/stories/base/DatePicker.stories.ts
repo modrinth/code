@@ -94,6 +94,28 @@ export const Range: Story = {
 	}),
 }
 
+export const SameDayRange: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref(['2026-04-27', '2026-04-27'])
+			return { value }
+		},
+		template: /* html */ `
+			<div class="flex max-w-sm flex-col gap-2">
+				<DatePicker
+					v-model="value"
+					wrapperClass="w-[350px]"
+					mode="range"
+					default-view-date="2026-04-01"
+					placeholder="Select a date range..."
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const TwoMonthRange: Story = {
 	render: () => ({
 		components: { DatePicker },
@@ -125,7 +147,61 @@ export const TwoMonthRange: Story = {
 	}),
 }
 
-export const DraggableRange: Story = {
+export const TwoMonthRangeAlignedRight: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref(['2033-11-16', '2033-12-21'])
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[460px] max-w-[700px] flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[350px]"
+					mode="range"
+					:show-months="2"
+					view-date-alignment="right"
+					placeholder="Select a date range..."
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const TwoMonthCalendarOnlyRange: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref(['2033-11-16', '2033-12-21'])
+			return { value }
+		},
+		template: /* html */ `
+			<div class="flex max-w-[700px] flex-col gap-2">
+				<DatePicker
+					v-model="value"
+					wrapperClass="w-full"
+					mode="range"
+					:show-months="2"
+					calendar-only
+					default-view-date="2033-11-01"
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const AdjustableRange: Story = {
 	render: () => ({
 		components: { DatePicker },
 		setup() {
@@ -150,6 +226,9 @@ export const DraggableRange: Story = {
 					placeholder="Select a date range..."
 				/>
 				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+				<p class="text-xs text-secondary">
+					Drag either endpoint, or click an endpoint, hover to preview, and click another day to move it.
+				</p>
 			</div>
 		`,
 	}),
@@ -206,6 +285,35 @@ export const OpenCalendar: Story = {
 					v-model="value"
 					wrapperClass="w-[300px]"
 					default-view-date="2026-06-01"
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const ForceAbove: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-06-15')
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[420px] max-w-sm flex-col justify-end gap-2 pb-6">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[300px]"
+					default-view-date="2026-06-01"
+					position="above"
 				/>
 				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
 			</div>
@@ -270,9 +378,67 @@ export const ShowToday: Story = {
 	}),
 }
 
+export const InsideClippedContainer: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-04-27')
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="h-[220px] w-[360px] overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-4">
+				<div class="flex flex-col gap-2">
+					<DatePicker
+						ref="datePicker"
+						v-model="value"
+						wrapperClass="w-[300px]"
+						placeholder="Select a date..."
+					/>
+					<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+				</div>
+			</div>
+		`,
+	}),
+}
+
 export const Disabled: Story = {
 	args: {
 		modelValue: '2026-04-27',
 		disabled: true,
 	},
+}
+
+export const CalendarClass: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-04-27')
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[420px] max-w-sm flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[300px]"
+					calendar-class="ring-2 ring-brand"
+				/>
+				<p class="text-sm text-secondary">Calendar has a brand-colored ring applied via calendarClass.</p>
+			</div>
+		`,
+	}),
 }
