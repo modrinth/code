@@ -125,10 +125,11 @@ async fn list(
         sqlx::query(
             "
 			select paf.group_id, paf.name, convert_from(paf.sha1, 'UTF8') as sha1, paf.moderation_external_license_id,
-				coalesce(array_agg(distinct f.version_id) filter (where f.version_id is not null), '{}') as version_ids
+				coalesce(array_agg(distinct aev.id) filter (where aev.id is not null), '{}') as version_ids
 			from project_attribution_files paf
 			left join override_file_sources ofs on ofs.sha1 = paf.sha1
 			left join files f on f.id = ofs.file_id
+			left join attribution_enforced_versions aev on aev.id = f.version_id
 			where paf.group_id = ANY($1)
 			group by paf.group_id, paf.name, paf.sha1, paf.moderation_external_license_id
 			",
