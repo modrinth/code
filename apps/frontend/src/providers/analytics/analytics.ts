@@ -366,8 +366,9 @@ function areAnalyticsFetchRequestsEqual(
 function buildAnalyticsCurrentTimeSlicesQueryKey(
 	userId: string | undefined,
 	nextFetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+	refreshTimestamp: number,
 ) {
-	return ['analytics', 'dashboard', userId, 'current', nextFetchRequest]
+	return ['analytics', 'dashboard', userId, 'current', nextFetchRequest, refreshTimestamp]
 }
 
 function isRevenueHourlyGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
@@ -1986,7 +1987,11 @@ export function createAnalyticsDashboardContext(
 		refetch: refetchCurrentTimeSlices,
 	} = useQuery({
 		queryKey: computed(() =>
-			buildAnalyticsCurrentTimeSlicesQueryKey(analyticsQueryUserId.value, fetchRequest.value),
+			buildAnalyticsCurrentTimeSlicesQueryKey(
+				analyticsQueryUserId.value,
+				fetchRequest.value,
+				queryRefreshTimestamp.value,
+			),
 		),
 		queryFn: () => {
 			if (!isAnalyticsFetchRequestReady(fetchRequest.value)) {
@@ -2003,6 +2008,13 @@ export function createAnalyticsDashboardContext(
 	const isCurrentTimeSliceLoading = computed(
 		() => isAnalyticsFetchRequestReady(fetchRequest.value) && currentTimeSlicePending.value,
 	)
+	const hasCompletedCurrentTimeSliceFetch = computed(
+		() =>
+			isAnalyticsFetchRequestReady(fetchRequest.value) &&
+			currentTimeSliceData.value !== undefined &&
+			!currentTimeSlicePending.value &&
+			!currentFetching.value,
+	)
 	const revenueDailyPrefetchRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
 		if (!isRevenueHourlyGroupBy(selectedGroupBy.value)) {
 			return null
@@ -2017,9 +2029,19 @@ export function createAnalyticsDashboardContext(
 	})
 
 	watch(
-		[revenueDailyPrefetchRequest, analyticsQueryUserId],
-		([nextFetchRequest, nextAnalyticsQueryUserId]) => {
-			if (!isAnalyticsFetchRequestReady(nextFetchRequest)) {
+		[
+			revenueDailyPrefetchRequest,
+			analyticsQueryUserId,
+			queryRefreshTimestamp,
+			hasCompletedCurrentTimeSliceFetch,
+		],
+		([
+			nextFetchRequest,
+			nextAnalyticsQueryUserId,
+			nextQueryRefreshTimestamp,
+			hasCompletedCurrentFetch,
+		]) => {
+			if (!isAnalyticsFetchRequestReady(nextFetchRequest) || !hasCompletedCurrentFetch) {
 				return
 			}
 
@@ -2028,6 +2050,7 @@ export function createAnalyticsDashboardContext(
 					queryKey: buildAnalyticsCurrentTimeSlicesQueryKey(
 						nextAnalyticsQueryUserId,
 						nextFetchRequest,
+						nextQueryRefreshTimestamp,
 					),
 					queryFn: () =>
 						fetchAnalyticsTimeSlices(nextFetchRequest, (request) =>
@@ -2080,7 +2103,9 @@ export function createAnalyticsDashboardContext(
 			)
 			return timeSliceGroups.flat()
 		},
-		enabled: computed(() => analyticsFilterOptionsRequests.value !== null),
+		enabled: computed(
+			() => analyticsFilterOptionsRequests.value !== null && hasCompletedCurrentTimeSliceFetch.value,
+		),
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 	})
 
@@ -2100,7 +2125,9 @@ export function createAnalyticsDashboardContext(
 					(ids) => client.labrinth.projects_v3.getMultiple(ids),
 					(ids) => client.labrinth.versions_v3.getVersions(ids),
 				),
-			enabled: computed(() => sortedSelectedProjectIds.value.length > 0),
+			enabled: computed(
+				() => sortedSelectedProjectIds.value.length > 0 && hasCompletedCurrentTimeSliceFetch.value,
+			),
 			placeholderData: [],
 			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 		})
@@ -2178,6 +2205,7 @@ export function createAnalyticsDashboardContext(
 			analyticsQueryUserId.value,
 			'previous',
 			previousFetchRequest.value,
+			queryRefreshTimestamp.value,
 		]),
 		queryFn: () => {
 			if (!isAnalyticsFetchRequestReady(previousFetchRequest.value)) {
@@ -2188,7 +2216,11 @@ export function createAnalyticsDashboardContext(
 				client.labrinth.analytics_v3.fetch(request),
 			)
 		},
-		enabled: computed(() => isAnalyticsFetchRequestReady(previousFetchRequest.value)),
+		enabled: computed(
+			() =>
+				isAnalyticsFetchRequestReady(previousFetchRequest.value) &&
+				hasCompletedCurrentTimeSliceFetch.value,
+		),
 		gcTime: ANALYTICS_TIME_SLICES_GC_TIME_MS,
 	})
 
@@ -2424,12 +2456,14 @@ export function createAnalyticsDashboardContext(
 			return
 		}
 
-		const refetches = [refetchCurrentTimeSlices()]
-		if (previousFetchRequest.value !== null) {
-			refetches.push(refetchPreviousTimeSlices())
-		}
+		await refetchCurrentTimeSlices()
 
-		await Promise.all(refetches)
+		if (fetchRequest.value === null || JSON.stringify(fetchRequest.value) !== fetchRequestKey) {
+			return
+		}
+		if (previousFetchRequest.value !== null) {
+			await refetchPreviousTimeSlices()
+		}
 	}
 
 	function resetAnalyticsQueryBuilder() {
