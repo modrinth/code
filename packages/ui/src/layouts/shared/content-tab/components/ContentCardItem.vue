@@ -180,7 +180,13 @@ const deleteHovered = ref(false)
 						>
 							{{ project.title }}
 						</AutoLink>
-						<Tooltip v-if="isClientOnly">
+						<Tooltip
+							v-if="isClientOnly"
+							theme="dismissable-prompt"
+							class="inline-flex shrink-0"
+							:triggers="['hover', 'focus']"
+							no-auto-focus
+						>
 							<TriangleAlertIcon class="size-4 shrink-0 text-orange" />
 							<template #popper>
 								<div class="max-w-[18rem] text-sm">

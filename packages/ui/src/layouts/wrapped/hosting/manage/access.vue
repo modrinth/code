@@ -98,7 +98,7 @@
 import { Archon, type Labrinth } from '@modrinth/api-client'
 import { FilterIcon, SearchIcon, UserPlusIcon } from '@modrinth/assets'
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
@@ -133,11 +133,12 @@ type AuditLogFilterKey = 'users' | 'worlds' | 'actions'
 
 const SERVER_WORLD_FILTER_VALUE = '__server__'
 const ACTION_LOG_PAGE_SIZE = 200
+const ACTION_LOG_FILTER_OVERLAY_MS = 750
 
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const { serverId, serverFull } = injectModrinthServerContext()
-const { addNotification, removeNotification } = injectNotificationManager()
+const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 const removeMemberConfirmModal = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
@@ -448,14 +449,6 @@ const messages = defineMessages({
 		id: 'servers.access-page.notification.member-removed.text',
 		defaultMessage: 'Removed {target} from this server.',
 	},
-	roleUpdatedTitle: {
-		id: 'servers.access-page.notification.role-updated.title',
-		defaultMessage: 'Role updated',
-	},
-	roleUpdatedText: {
-		id: 'servers.access-page.notification.role-updated.text',
-		defaultMessage: 'Changed {target} to {role}.',
-	},
 	loadFailedTitle: {
 		id: 'servers.access-page.notification.load-failed.title',
 		defaultMessage: 'Access could not be loaded',
@@ -693,36 +686,55 @@ const actionLogQuery = useInfiniteQuery({
 	getNextPageParam: (lastPage) =>
 		typeof lastPage.next_offset === 'number' ? lastPage.next_offset : undefined,
 	initialPageParam: 0,
+	placeholderData: (previousData) => previousData,
 	staleTime: 30_000,
 })
-const hasCompletedInitialActionLogLoad = ref(false)
-watch(
-	() => actionLogQuery.isFetched.value,
-	(isFetched) => {
-		if (isFetched) hasCompletedInitialActionLogLoad.value = true
-	},
-	{ immediate: true },
+const actionLogFilterSignature = computed(() =>
+	JSON.stringify([
+		actionLogEndpointFilter.value ?? null,
+		actionLogDateFilter.value.min_datetime ?? null,
+		actionLogDateFilter.value.max_datetime ?? null,
+	]),
 )
+const isActionLogFilterTransitioning = ref(false)
+let actionLogFilterTransitionTimeout: ReturnType<typeof setTimeout> | null = null
+
+watch(actionLogFilterSignature, (_signature, previousSignature) => {
+	if (previousSignature === undefined) return
+	startActionLogFilterTransition()
+})
+
+onBeforeUnmount(() => {
+	if (actionLogFilterTransitionTimeout) {
+		clearTimeout(actionLogFilterTransitionTimeout)
+	}
+})
 
 const auditEntries = computed<ServerAuditLogEntry[]>(() => {
 	const pages = actionLogQuery.data.value?.pages ?? []
+	const entryIdCounts = new Map<string, number>()
 
-	return pages.flatMap((actionLog, pageIndex) =>
-		actionLog.data.map((entry, index) =>
-			apiActionLogEntryToAuditEntry(entry, actionLog, pageIndex * ACTION_LOG_PAGE_SIZE + index),
-		),
+	return pages.flatMap((actionLog) =>
+		actionLog.data.map((entry) => {
+			const entryId = getActionLogEntryId(entry)
+			const entryIdCount = entryIdCounts.get(entryId) ?? 0
+			entryIdCounts.set(entryId, entryIdCount + 1)
+
+			return apiActionLogEntryToAuditEntry(
+				entry,
+				actionLog,
+				entryIdCount === 0 ? entryId : `${entryId}-${entryIdCount}`,
+			)
+		}),
 	)
 })
 const hasShownLoadError = ref(false)
 const hasShownActionLogLoadError = ref(false)
-const hasMoreActionLogEntries = computed(() => actionLogQuery.hasNextPage.value)
-const isLoadingMoreActionLogEntries = computed(() => actionLogQuery.isFetchingNextPage.value)
-const isActionLogFiltering = computed(
-	() =>
-		hasCompletedInitialActionLogLoad.value &&
-		actionLogQuery.isFetching.value &&
-		!actionLogQuery.isFetchingNextPage.value,
+const hasMoreActionLogEntries = computed(
+	() => !actionLogQuery.isPlaceholderData.value && actionLogQuery.hasNextPage.value,
 )
+const isLoadingMoreActionLogEntries = computed(() => actionLogQuery.isFetchingNextPage.value)
+const isActionLogFiltering = computed(() => isActionLogFilterTransitioning.value)
 
 const auditLogUserFilterOptions = computed<DropdownFilterBarOption[]>(() => {
 	const options = new Map<string, DropdownFilterBarOption>()
@@ -876,8 +888,28 @@ function formatActionLogAction(action: ActionLogFilterActionName): string {
 }
 
 function loadMoreActionLogEntries() {
-	if (!actionLogQuery.hasNextPage.value || actionLogQuery.isFetchingNextPage.value) return
+	if (
+		isActionLogFilterTransitioning.value ||
+		actionLogQuery.isPlaceholderData.value ||
+		!actionLogQuery.hasNextPage.value ||
+		actionLogQuery.isFetchingNextPage.value
+	) {
+		return
+	}
 	void actionLogQuery.fetchNextPage()
+}
+
+function startActionLogFilterTransition() {
+	isActionLogFilterTransitioning.value = true
+
+	if (actionLogFilterTransitionTimeout) {
+		clearTimeout(actionLogFilterTransitionTimeout)
+	}
+
+	actionLogFilterTransitionTimeout = setTimeout(() => {
+		isActionLogFilterTransitioning.value = false
+		actionLogFilterTransitionTimeout = null
+	}, ACTION_LOG_FILTER_OVERLAY_MS)
 }
 
 watch(
@@ -960,7 +992,7 @@ function formatErrorMessage(error: unknown): string | undefined {
 function apiActionLogEntryToAuditEntry(
 	entry: Archon.Actions.v1.ActionEntry,
 	actionLog: Archon.Actions.v1.ActionLogResponse,
-	index: number,
+	id: string,
 ): ServerAuditLogEntry {
 	const event = parseAuditEvent(entry, {
 		serverId,
@@ -972,12 +1004,43 @@ function apiActionLogEntryToAuditEntry(
 	})
 
 	return {
-		id: `${entry.timestamp}-${entry.actor.type}-${entry.world_id ?? 'server'}-${index}`,
+		id,
 		actor: event.props.actor,
 		world: event.props.world,
 		event,
 		timestamp: entry.timestamp,
 	}
+}
+
+function getActionLogEntryId(entry: Archon.Actions.v1.ActionEntry) {
+	return JSON.stringify([
+		entry.timestamp,
+		entry.actor.type,
+		entry.actor.type === 'user' ? entry.actor.user_id : (entry.actor.user_id ?? 'support'),
+		entry.server_id,
+		entry.world_id ?? null,
+		entry.action.action,
+		stableStringify(entry.action.metadata),
+	])
+}
+
+function stableStringify(value: unknown): string {
+	if (value === undefined) {
+		return 'undefined'
+	}
+
+	if (value === null || typeof value !== 'object') {
+		return JSON.stringify(value) ?? String(value)
+	}
+
+	if (Array.isArray(value)) {
+		return `[${value.map((item) => stableStringify(item)).join(',')}]`
+	}
+
+	return `{${Object.entries(value as Record<string, unknown>)
+		.sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
+		.map(([key, item]) => `${JSON.stringify(key)}:${stableStringify(item)}`)
+		.join(',')}}`
 }
 
 async function invalidateServerUsers() {
@@ -1027,14 +1090,6 @@ async function resolveMemberUserId(member: ServerAccessMember): Promise<string> 
 	}
 }
 
-function revertNotification(notification: { id: string | number; count?: number }) {
-	if (notification.count && notification.count > 1) {
-		notification.count -= 1
-		return
-	}
-	removeNotification(notification.id)
-}
-
 async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRole) {
 	if (!canManageUsers.value || member.isOwner || member.role === role || role === 'owner') return
 	const previousRole = member.role
@@ -1042,21 +1097,12 @@ async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRo
 
 	await queryClient.cancelQueries({ queryKey: serverUsersQueryKey })
 	setCachedMemberRole(member, role)
-	const optimisticNotification = addNotification({
-		type: 'success',
-		title: formatMessage(messages.roleUpdatedTitle),
-		text: formatMessage(messages.roleUpdatedText, {
-			target: member.user.username,
-			role: formatRole(role),
-		}),
-	})
 
 	try {
 		const userId = await resolveMemberUserId(member)
 		await client.archon.server_users_v1.update(serverId, userId, accessRoleToApiRole(role))
 	} catch (error) {
 		setCachedMemberRole(member, previousRole)
-		revertNotification(optimisticNotification)
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.roleUpdateFailedTitle),

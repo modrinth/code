@@ -1,6 +1,13 @@
 <template>
 	<BaseEvent>
-		<IntlFormatted :message-id="message">
+		<span
+			v-if="isDeleted"
+			class="inline-flex min-w-0 max-w-full items-center gap-1 whitespace-nowrap align-baseline"
+		>
+			<span class="shrink-0">{{ formatMessage(messages.deletedLabel) }}</span>
+			<EventEntityList class="min-w-0" :entities="addonEntities" :limit="1" single-line />
+		</span>
+		<IntlFormatted v-else :message-id="message">
 			<template #content>
 				<EventEntityList :entities="addonEntities" />
 			</template>
@@ -14,7 +21,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { defineMessages, type MessageDescriptor } from '../../../../composables/i18n'
+import { defineMessages, type MessageDescriptor, useVIntl } from '../../../../composables/i18n'
 import IntlFormatted from '../../../base/IntlFormatted.vue'
 import BaseEvent from './BaseEvent.vue'
 import EventEntityList from './EventEntityList.vue'
@@ -25,6 +32,8 @@ const props = defineProps<{
 	addons?: AuditAddonEventItem[]
 	fileNames?: EventEntity[]
 }>()
+
+const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	added: {
@@ -47,6 +56,10 @@ const messages = defineMessages({
 		id: 'servers.audit-log.event.addon-deleted',
 		defaultMessage: 'Deleted content <content></content>',
 	},
+	deletedLabel: {
+		id: 'servers.audit-log.event.addon-deleted-label',
+		defaultMessage: 'Deleted content',
+	},
 	updated: {
 		id: 'servers.audit-log.event.addon-updated',
 		defaultMessage: 'Updated content <content></content>',
@@ -68,4 +81,5 @@ const kindMessages: Record<string, MessageDescriptor> = {
 
 const message = computed(() => kindMessages[props.kind] ?? messages.changed)
 const addonEntities = computed(() => props.addons?.map((addon) => addon.project) ?? [])
+const isDeleted = computed(() => props.kind === 'deleted')
 </script>

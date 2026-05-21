@@ -139,11 +139,6 @@
 									:key="`backup-${backup.id}`"
 									class="flex gap-2"
 									:data-backup-id="backup.id"
-									:class="
-										focusedBackupId === backup.id
-											? 'rounded-[22px] ring-2 ring-brand-green ring-offset-2'
-											: ''
-									"
 								>
 									<div class="flex w-5 flex-col items-center">
 										<div
@@ -162,6 +157,7 @@
 										class="my-1.5 min-w-0 flex-1"
 										:backup="backup"
 										:selected="selectedIds.has(backup.id)"
+										:highlighted="highlightedBackupId === backup.id"
 										:restore-disabled="backupRestoreDisabled"
 										:write-disabled="!canManageBackups"
 										:write-disabled-tooltip="permissionDeniedMessage"
@@ -273,7 +269,7 @@ import { CalendarIcon, DownloadIcon, IssuesIcon, PlusIcon, TrashIcon } from '@mo
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import type { Component } from 'vue'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -375,6 +371,7 @@ const props = defineProps<{
 
 const route = useRoute()
 const serverId = route.params.id as string
+const BACKUP_HIGHLIGHT_DURATION_MS = 5_000
 
 defineEmits(['onDownload'])
 
@@ -489,13 +486,30 @@ const displayOrderedBackups = computed(() => groupedBackups.value.flatMap((g) =>
 const focusedBackupId = computed(() =>
 	typeof route.query.backup === 'string' ? route.query.backup : null,
 )
+const highlightedBackupId = ref<string | null>(null)
+let highlightedBackupTimeout: ReturnType<typeof setTimeout> | null = null
+let lastHighlightedFocusedBackupId: string | null = null
+let lastScrolledFocusedBackupId: string | null = null
 
 watch(
 	[focusedBackupId, displayOrderedBackups],
 	async ([backupId]) => {
-		if (!backupId || !displayOrderedBackups.value.some((backup) => backup.id === backupId)) return
+		if (!backupId) {
+			lastHighlightedFocusedBackupId = null
+			lastScrolledFocusedBackupId = null
+			clearHighlightedBackup()
+			return
+		}
+		if (!displayOrderedBackups.value.some((backup) => backup.id === backupId)) return
+
+		if (lastHighlightedFocusedBackupId !== backupId) {
+			lastHighlightedFocusedBackupId = backupId
+			highlightBackup(backupId)
+		}
+		if (lastScrolledFocusedBackupId === backupId) return
 		if (typeof document === 'undefined') return
 
+		lastScrolledFocusedBackupId = backupId
 		await nextTick()
 		const escapedBackupId =
 			typeof CSS !== 'undefined' && CSS.escape
@@ -507,6 +521,34 @@ watch(
 	},
 	{ immediate: true },
 )
+
+onBeforeUnmount(() => {
+	if (highlightedBackupTimeout) {
+		clearTimeout(highlightedBackupTimeout)
+	}
+})
+
+function highlightBackup(backupId: string) {
+	highlightedBackupId.value = backupId
+
+	if (highlightedBackupTimeout) {
+		clearTimeout(highlightedBackupTimeout)
+	}
+
+	highlightedBackupTimeout = setTimeout(() => {
+		highlightedBackupId.value = null
+		highlightedBackupTimeout = null
+	}, BACKUP_HIGHLIGHT_DURATION_MS)
+}
+
+function clearHighlightedBackup() {
+	highlightedBackupId.value = null
+
+	if (highlightedBackupTimeout) {
+		clearTimeout(highlightedBackupTimeout)
+		highlightedBackupTimeout = null
+	}
+}
 
 const {
 	selectedIds,

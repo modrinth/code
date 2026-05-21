@@ -1,7 +1,7 @@
 <template>
 	<AutoLink
 		:to="entity.to"
-		class="inline-flex max-w-full items-center gap-1 font-semibold"
+		class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold"
 		:class="[
 			entity.to
 				? 'text-contrast hover:underline'
@@ -29,7 +29,11 @@
 		>
 			<component :is="entity.icon" class="size-4" />
 		</span>
-		<span v-tooltip="entity.title ?? entity.label" class="min-w-0 truncate leading-7">
+		<span
+			ref="labelRef"
+			v-tooltip="truncatedTooltip(labelRef, entity.title ?? entity.label)"
+			class="min-w-0 truncate leading-7"
+		>
 			{{ entity.label }}
 		</span>
 		<span v-if="entity.secondaryLabel" class="shrink-0 text-secondary">
@@ -39,10 +43,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
+import { truncatedTooltip } from '#ui/utils'
 
 import type { EventEntity } from './types'
 
@@ -50,5 +55,6 @@ const props = defineProps<{
 	entity: EventEntity
 }>()
 
+const labelRef = ref<HTMLElement | null>(null)
 const hasIcon = computed(() => Boolean(props.entity.iconUrl || props.entity.icon))
 </script>

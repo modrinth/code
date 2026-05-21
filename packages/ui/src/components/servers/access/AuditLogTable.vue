@@ -19,127 +19,135 @@
 			</template>
 		</div>
 
-		<div class="relative">
-			<Table
-				v-if="filteredEntries.length > 0"
-				class="hidden @[640px]:block"
-				:columns="columns"
-				:data="tableEntries"
-				row-key="id"
-			>
-				<template #cell-user="{ row: entry }">
-					<AutoLink
-						:to="actorProfilePath(entry)"
-						class="flex min-w-0 items-center gap-2"
-						:class="actorProfilePath(entry) ? 'text-primary hover:underline' : ''"
-					>
-						<Avatar
-							:src="
-								entry.actor.id === 'support'
-									? IntercomBubbleIcon
-									: (entry.actor.avatarUrl ?? undefined)
-							"
-							:alt="formatMessage(messages.userAvatarAlt, { username: actorName(entry) })"
-							:tint-by="entry.actor.username"
-							size="22px"
-							circle
-							no-shadow
-						/>
-						<span
-							class="min-w-0 truncate font-medium"
-							:class="entry.actor.id === 'support' ? 'text-blue' : ''"
-						>
-							{{ actorName(entry) }}
-						</span>
-					</AutoLink>
-				</template>
-
-				<template #cell-event="{ row: entry }">
-					<component :is="entry.event.component" v-bind="entry.event.props" />
-				</template>
-
-				<template #cell-world="{ row: entry }">
-					<span
-						v-tooltip="entry.world?.name"
-						class="truncate"
-						:class="entry.world ? 'text-primary' : 'text-secondary'"
-					>
-						{{ entry.world?.name ?? '—' }}
-					</span>
-				</template>
-
-				<template #cell-time="{ row: entry }">
-					<span v-tooltip="formatDate(entry.timestamp)">
-						{{ formatRelativeTime(entry.timestamp) }}
-					</span>
-				</template>
-			</Table>
-
-			<div v-if="filteredEntries.length > 0" class="flex flex-col gap-3 @[640px]:hidden">
-				<div
-					v-for="entry in filteredEntries"
-					:key="entry.id"
-					class="flex min-w-0 flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+		<div class="audit-log-content-frame relative overflow-hidden" :style="contentFrameStyle">
+			<div ref="contentBody" class="min-w-0">
+				<Table
+					v-if="filteredEntries.length > 0"
+					class="hidden @[640px]:block"
+					:columns="columns"
+					:data="tableEntries"
+					row-key="id"
+					row-transition-name="audit-log-row"
 				>
-					<AutoLink
-						v-tooltip="actorName(entry)"
-						:to="actorProfilePath(entry)"
-						class="inline-flex min-w-0 items-center gap-2 self-start"
-						:class="actorProfilePath(entry) ? 'text-primary hover:underline' : 'text-primary'"
-					>
-						<Avatar
-							:src="actorAvatarSrc(entry)"
-							:alt="formatMessage(messages.userAvatarAlt, { username: actorName(entry) })"
-							:tint-by="entry.actor.username"
-							size="24px"
-							circle
-							no-shadow
-						/>
-						<span
-							class="min-w-0 truncate font-medium"
-							:class="entry.actor.id === 'support' ? 'text-blue' : ''"
+					<template #cell-user="{ row: entry }">
+						<AutoLink
+							:to="actorProfilePath(entry)"
+							class="flex min-w-0 items-center gap-2"
+							:class="actorProfilePath(entry) ? 'text-primary hover:underline' : ''"
 						>
-							{{ actorName(entry) }}
-						</span>
-					</AutoLink>
-					<div class="min-w-0">
+							<Avatar
+								:src="
+									entry.actor.id === 'support'
+										? IntercomBubbleIcon
+										: (entry.actor.avatarUrl ?? undefined)
+								"
+								:alt="formatMessage(messages.userAvatarAlt, { username: actorName(entry) })"
+								:tint-by="entry.actor.username"
+								size="22px"
+								circle
+								no-shadow
+							/>
+							<span
+								class="min-w-0 truncate font-medium"
+								:class="entry.actor.id === 'support' ? 'text-blue' : ''"
+							>
+								{{ actorName(entry) }}
+							</span>
+						</AutoLink>
+					</template>
+
+					<template #cell-event="{ row: entry }">
 						<component :is="entry.event.component" v-bind="entry.event.props" />
-					</div>
-					<div class="flex min-w-0 items-center gap-1 text-sm text-secondary">
-						<span v-tooltip="entry.world?.name" class="min-w-0 truncate">
-							{{ entry.world?.name ?? formatMessage(messages.serverScope) }}
+					</template>
+
+					<template #cell-world="{ row: entry }">
+						<span
+							v-tooltip="entry.world?.name"
+							class="truncate"
+							:class="entry.world ? 'text-primary' : 'text-secondary'"
+						>
+							{{ entry.world?.name ?? '—' }}
 						</span>
-						<BulletDivider class="shrink-0" />
-						<span v-tooltip="formatDate(entry.timestamp)" class="shrink-0">
+					</template>
+
+					<template #cell-time="{ row: entry }">
+						<span v-tooltip="formatDate(entry.timestamp)">
 							{{ formatRelativeTime(entry.timestamp) }}
 						</span>
-					</div>
-				</div>
-			</div>
+					</template>
+				</Table>
 
-			<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-5">
-				<div
-					class="hidden min-h-14 bg-surface-3 @[640px]:grid @[640px]:h-14 @[640px]:grid-cols-[22%_48%_18%_12%]"
+				<TransitionGroup
+					v-if="filteredEntries.length > 0"
+					name="audit-log-card"
+					tag="div"
+					class="flex flex-col gap-3 @[640px]:hidden"
 				>
-					<div class="hidden items-center pl-4 font-semibold text-secondary @[640px]:flex">
-						{{ formatMessage(messages.userColumn) }}
+					<div
+						v-for="entry in filteredEntries"
+						:key="entry.id"
+						class="flex min-w-0 flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+					>
+						<AutoLink
+							v-tooltip="actorName(entry)"
+							:to="actorProfilePath(entry)"
+							class="inline-flex min-w-0 items-center gap-2 self-start"
+							:class="actorProfilePath(entry) ? 'text-primary hover:underline' : 'text-primary'"
+						>
+							<Avatar
+								:src="actorAvatarSrc(entry)"
+								:alt="formatMessage(messages.userAvatarAlt, { username: actorName(entry) })"
+								:tint-by="entry.actor.username"
+								size="24px"
+								circle
+								no-shadow
+							/>
+							<span
+								class="min-w-0 truncate font-medium"
+								:class="entry.actor.id === 'support' ? 'text-blue' : ''"
+							>
+								{{ actorName(entry) }}
+							</span>
+						</AutoLink>
+						<div class="min-w-0">
+							<component :is="entry.event.component" v-bind="entry.event.props" />
+						</div>
+						<div class="flex min-w-0 items-center gap-1 text-sm text-secondary">
+							<span v-tooltip="entry.world?.name" class="min-w-0 truncate">
+								{{ entry.world?.name ?? formatMessage(messages.serverScope) }}
+							</span>
+							<BulletDivider class="shrink-0" />
+							<span v-tooltip="formatDate(entry.timestamp)" class="shrink-0">
+								{{ formatRelativeTime(entry.timestamp) }}
+							</span>
+						</div>
 					</div>
-					<div class="hidden items-center font-semibold text-secondary @[640px]:flex">
-						{{ formatMessage(messages.eventColumn) }}
-					</div>
-					<div class="hidden items-center font-semibold text-secondary @[640px]:flex">
-						{{ formatMessage(messages.worldColumn) }}
+				</TransitionGroup>
+
+				<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-5">
+					<div
+						class="hidden min-h-14 bg-surface-3 @[640px]:grid @[640px]:h-14 @[640px]:grid-cols-[22%_48%_18%_12%]"
+					>
+						<div class="hidden items-center pl-4 font-semibold text-secondary @[640px]:flex">
+							{{ formatMessage(messages.userColumn) }}
+						</div>
+						<div class="hidden items-center font-semibold text-secondary @[640px]:flex">
+							{{ formatMessage(messages.eventColumn) }}
+						</div>
+						<div class="hidden items-center font-semibold text-secondary @[640px]:flex">
+							{{ formatMessage(messages.worldColumn) }}
+						</div>
+						<div
+							class="hidden items-center justify-end pr-4 font-semibold text-secondary @[640px]:flex"
+						>
+							{{ formatMessage(messages.timeColumn) }}
+						</div>
 					</div>
 					<div
-						class="hidden items-center justify-end pr-4 font-semibold text-secondary @[640px]:flex"
+						class="border-0 border-solid border-surface-5 bg-surface-2 px-4 py-8 text-center text-secondary @[640px]:border-t"
 					>
-						{{ formatMessage(messages.timeColumn) }}
+						{{ formatMessage(emptyStateMessage) }}
 					</div>
-				</div>
-				<div
-					class="border-0 border-solid border-surface-5 bg-surface-2 px-4 py-8 text-center text-secondary @[640px]:border-t"
-				>
-					{{ formatMessage(emptyStateMessage) }}
 				</div>
 			</div>
 
@@ -200,7 +208,10 @@ const formatRelativeTime = useRelativeTime()
 const formatDate = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
 const slots = useSlots()
 const loadMoreSentinel = ref<HTMLElement | null>(null)
+const contentBody = ref<HTMLElement | null>(null)
+const contentHeight = ref<number | null>(null)
 let loadMoreObserver: IntersectionObserver | null = null
+let contentResizeObserver: ResizeObserver | null = null
 
 const messages = defineMessages({
 	dateRangePlaceholder: {
@@ -255,10 +266,12 @@ const dateRangePickerInputClass = computed(
 
 onMounted(() => {
 	updateLoadMoreObserver()
+	updateContentHeightObserver()
 })
 
 onBeforeUnmount(() => {
 	loadMoreObserver?.disconnect()
+	contentResizeObserver?.disconnect()
 })
 
 watch(
@@ -296,6 +309,15 @@ const filteredEntries = computed(() => {
 })
 
 const tableEntries = computed<AuditLogTableRow[]>(() => filteredEntries.value as AuditLogTableRow[])
+const contentFrameStyle = computed(() =>
+	contentHeight.value === null ? undefined : { height: `${contentHeight.value}px` },
+)
+
+watch(
+	() => [filteredEntries.value.length, props.loading] as const,
+	() => updateContentHeight(),
+	{ flush: 'post' },
+)
 
 const hasActiveFilters = computed(
 	() =>
@@ -352,9 +374,46 @@ function updateLoadMoreObserver() {
 		loadMoreObserver.observe(loadMoreSentinel.value)
 	})
 }
+
+function updateContentHeightObserver() {
+	contentResizeObserver?.disconnect()
+	contentResizeObserver = null
+
+	nextTick(() => {
+		updateContentHeight()
+
+		if (!contentBody.value || typeof ResizeObserver === 'undefined') {
+			return
+		}
+
+		contentResizeObserver = new ResizeObserver((entries) => {
+			const height =
+				entries[0]?.contentRect.height ?? contentBody.value?.getBoundingClientRect().height ?? 0
+			setContentHeight(height)
+		})
+		contentResizeObserver.observe(contentBody.value)
+	})
+}
+
+function updateContentHeight() {
+	nextTick(() => {
+		if (!contentBody.value) return
+		setContentHeight(contentBody.value.getBoundingClientRect().height)
+	})
+}
+
+function setContentHeight(height: number) {
+	contentHeight.value = Math.ceil(height)
+}
 </script>
 
 <style>
+@media (prefers-reduced-motion: no-preference) {
+	.audit-log-content-frame {
+		transition: height 220ms ease-in-out;
+	}
+}
+
 @keyframes audit-log-bpulse {
 	50% {
 		filter: brightness(75%);
@@ -373,5 +432,28 @@ function updateLoadMoreObserver() {
 .audit-log-loading-fade-enter-from,
 .audit-log-loading-fade-leave-to {
 	opacity: 0;
+}
+
+.audit-log-row-enter-active,
+.audit-log-row-leave-active,
+.audit-log-row-move,
+.audit-log-card-enter-active,
+.audit-log-card-leave-active,
+.audit-log-card-move {
+	transition:
+		opacity 180ms ease-in-out,
+		transform 180ms ease-in-out;
+}
+
+.audit-log-row-enter-from,
+.audit-log-card-enter-from {
+	opacity: 0;
+	transform: translateY(-8px);
+}
+
+.audit-log-row-leave-to,
+.audit-log-card-leave-to {
+	opacity: 0;
+	transform: translateY(8px);
 }
 </style>

@@ -41,6 +41,7 @@ const props = withDefaults(
 		writeDisabled?: boolean
 		writeDisabledTooltip?: string
 		selected?: boolean
+		highlighted?: boolean
 	}>(),
 	{
 		preview: false,
@@ -52,6 +53,7 @@ const props = withDefaults(
 		writeDisabled: false,
 		writeDisabledTooltip: undefined,
 		selected: false,
+		highlighted: false,
 	},
 )
 
@@ -62,6 +64,12 @@ const backupIcon = computed(() => {
 		return ShieldIcon
 	}
 	return UserRoundIcon
+})
+
+const itemBorderClass = computed(() => {
+	if (props.selected) return 'border-brand-green'
+	if (props.highlighted) return 'border-purple backup-item-highlighted'
+	return 'border-transparent'
 })
 
 const overflowMenuOptions = computed<OverflowOption[]>(() => {
@@ -134,7 +142,7 @@ const messages = defineMessages({
 <template>
 	<div
 		class="flex items-center gap-4 rounded-[20px] border border-solid bg-surface-3 p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.3),0px_1px_3px_0px_rgba(0,0,0,0.15)]"
-		:class="props.selected ? 'border-brand-green' : 'border-transparent'"
+		:class="itemBorderClass"
 	>
 		<div class="flex min-w-0 flex-1 items-center gap-4">
 			<!-- Icon tile -->
@@ -226,3 +234,25 @@ const messages = defineMessages({
 		}}</pre>
 	</div>
 </template>
+
+<style scoped>
+@keyframes backup-item-highlight-pulse {
+	0%,
+	100% {
+		box-shadow:
+			0 0 0 0 var(--color-purple-highlight),
+			0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+			0px 1px 3px 0px rgba(0, 0, 0, 0.15);
+	}
+	50% {
+		box-shadow:
+			0 0 0 3px var(--color-purple-highlight),
+			0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+			0px 1px 3px 0px rgba(0, 0, 0, 0.15);
+	}
+}
+
+.backup-item-highlighted {
+	animation: backup-item-highlight-pulse 1.25s ease-in-out infinite;
+}
+</style>
