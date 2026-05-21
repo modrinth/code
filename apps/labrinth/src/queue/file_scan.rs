@@ -19,9 +19,11 @@ use crate::database::{PgPool, PgTransaction, redis::RedisPool};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::FileId;
+use crate::models::projects::{AttributionResolution, AttributionResolutionKind};
 use crate::queue::moderation::{
     ApprovalType, FingerprintResponse, FlameProject, FlameResponse,
 };
+use crate::routes::internal::attribution::FlameProject as AttributionFlameProject;
 use crate::util::error::Context;
 use crate::util::http::HTTP_CLIENT;
 
@@ -358,9 +360,7 @@ async fn persist_attribution_results(
             g.flame_project
                 .as_ref()
                 .and_then(|fp| {
-                    serde_json::from_value::<
-                        crate::routes::internal::attribution::FlameProject,
-                    >(fp.clone())
+                    serde_json::from_value::<AttributionFlameProject>(fp.clone())
                     .ok()
                 })
                 .is_some_and(|fp| fp.id == *flame_project_id)
@@ -379,8 +379,7 @@ async fn persist_attribution_results(
                     } = r
                     {
                         Some(
-                            serde_json::to_value(
-                                crate::routes::internal::attribution::FlameProject {
+                            serde_json::to_value(AttributionFlameProject {
                                     id: *project_id,
                                     title: title.clone(),
                                     url: url.clone(),
@@ -744,7 +743,7 @@ pub async fn get_files_missing_attribution<'a, E>(
         DBVersionId,
         Vec<(
             DBFileId,
-            Option<crate::routes::internal::attribution::FlameProject>,
+            Option<AttributionFlameProject>,
         )>,
     >,
 >
@@ -780,6 +779,99 @@ where
             .entry(row.version_id)
             .or_insert_with(Vec::new)
             .push((row.file_id, flame_project));
+    }
+
+    Ok(result)
+}
+
+pub struct DependencyAttributionData {
+    pub link: Option<String>,
+    pub icon_url: Option<String>,
+    pub license: Option<serde_json::Value>,
+}
+
+pub async fn get_dependency_attributions<'a, E>(
+    exec: E,
+    version_ids: &[DBVersionId],
+) -> Result<HashMap<(DBVersionId, String), DependencyAttributionData>>
+where
+    E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+{
+    if version_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+
+    let version_ids_vec: Vec<_> = version_ids.iter().map(|v| v.0).collect();
+
+    let rows = sqlx::query!(
+        r#"
+        select
+            d.dependent_id as "version_id: DBVersionId",
+            d.dependency_file_name as "file_name!",
+            pag.attribution,
+            pag.flame_project,
+            pag.project_id as "project_id: DBProjectId"
+        from dependencies d
+        inner join files f on f.version_id = d.dependent_id
+        inner join override_file_sources ofs on ofs.file_id = f.id
+        inner join project_attribution_files paf on paf.sha1 = ofs.sha1
+        inner join project_attribution_groups pag on pag.id = paf.group_id
+        where d.dependent_id = ANY($1)
+          and d.dependency_file_name is not null
+          and pag.attribution is not null
+          and pag.attribution->>'kind' not in ('no_permission')
+          and split_part(paf.name, '/', -1) = d.dependency_file_name
+        "#,
+        &version_ids_vec,
+    )
+    .fetch_all(exec)
+    .await
+    .wrap_err("fetching dependency attributions")?;
+
+    let mut result = HashMap::new();
+    for row in rows {
+        let file_name = row.file_name;
+
+        let attribution: Option<AttributionResolution> =
+            row.attribution.and_then(|v| serde_json::from_value(v).ok());
+
+        let flame_project: Option<AttributionFlameProject> =
+            row.flame_project.and_then(|v| serde_json::from_value(v).ok());
+
+        let link = attribution
+            .as_ref()
+            .and_then(|a| match &a.kind {
+                AttributionResolutionKind::License {
+                    link_to_work,
+                    ..
+                } => Some(link_to_work.to_string()),
+                AttributionResolutionKind::SpecialPermissions {
+                    link_to_work,
+                } => Some(link_to_work.to_string()),
+                _ => None,
+            })
+            .or(flame_project.as_ref().map(|fp| fp.url.clone()));
+
+        let icon_url = flame_project.as_ref().map(|fp| fp.icon_url.clone());
+
+        let license = attribution
+            .as_ref()
+            .and_then(|a| match &a.kind {
+                AttributionResolutionKind::License { license, .. } => {
+                    Some(serde_json::to_value(license).ok())
+                }
+                _ => None,
+            })
+            .flatten();
+
+        result.insert(
+            (row.version_id, file_name),
+            DependencyAttributionData {
+                link,
+                icon_url,
+                license,
+            },
+        );
     }
 
     Ok(result)

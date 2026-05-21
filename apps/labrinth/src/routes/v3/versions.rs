@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use super::ApiError;
 use crate::auth::checks::{
-    filter_visible_versions, is_visible_project, is_visible_version,
+    enrich_dependency_attributions, filter_visible_versions, is_visible_project, is_visible_version,
 };
 use crate::auth::get_user_from_headers;
 use crate::database;
@@ -24,7 +24,7 @@ use crate::models::projects::{
 };
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
-use crate::queue::file_scan::get_files_missing_attribution;
+use crate::queue::file_scan::{get_files_missing_attribution, get_dependency_attributions};
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
 use crate::search::SearchBackend;
@@ -139,6 +139,12 @@ pub async fn version_project_get_helper(
                          .collect()
                  })
                  .unwrap_or_default();
+
+            let dep_attr = get_dependency_attributions(&**pool, &[version_id])
+                .await
+                .unwrap_or_default();
+            enrich_dependency_attributions(&mut v, &dep_attr);
+
             return Ok(HttpResponse::Ok().json(v));
         }
     }
@@ -259,6 +265,12 @@ pub async fn version_get_helper(
                     .collect()
             })
             .unwrap_or_default();
+
+        let dep_attr = get_dependency_attributions(&**pool, &[version_id])
+            .await
+            .unwrap_or_default();
+        enrich_dependency_attributions(&mut version, &dep_attr);
+
         return Ok(web::Json(version));
     }
 

@@ -663,7 +663,7 @@ pub enum OverrideSource {
     Unknown,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema)]
 #[serde(untagged)]
 pub enum AttributionLicense {
     Spdx(String),
@@ -809,6 +809,7 @@ impl From<VersionQueryResult> for Version {
                     dependency_type: DependencyType::from_string(
                         d.dependency_type.as_str(),
                     ),
+                    attribution: None,
                 })
                 .collect(),
             loaders: data.loaders.into_iter().map(Loader).collect(),
@@ -952,6 +953,18 @@ pub struct Dependency {
     pub file_name: Option<String>,
     /// The type of the dependency
     pub dependency_type: DependencyType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<DependencyAttribution>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, utoipa::ToSchema)]
+pub struct DependencyAttribution {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link: Option<url::Url>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub icon_url: Option<url::Url>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub license: Option<AttributionLicense>,
 }
 
 #[derive(

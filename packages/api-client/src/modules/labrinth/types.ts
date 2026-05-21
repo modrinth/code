@@ -240,17 +240,56 @@ export namespace Labrinth {
 
 	export namespace Attribution {
 		export namespace Internal {
-			export type AttributionLicense = string | { name: string }
-
-			export type AttributionResolutionKind =
+			export type AttributionPermissionKind =
 				| 'license'
 				| 'my_project'
-				| 'special_permissions'
+				| 'special_permission'
 				| 'no_permission'
 
-			type AttributionResolutionBase = {
+			export type AttributionLicense =
+				| string
+				| { name: string }
+
+			export type AttributionResolution = {
+				kind: AttributionPermissionKind
 				notes: string
 				image_urls: string[]
+				license?: AttributionLicense
+				link_to_work?: string
+			}
+
+			export type AttributionFile = {
+				name: string
+				sha1: string
+				versions: string[]
+			}
+
+			export type AttributionVersionInfo = {
+				id: string
+				name: string
+				version_number: string
+				date_created: string
+			}
+
+			export type FlameProject = {
+				id: number
+				title: string
+				url: string
+				icon_url: string
+			}
+
+			export type AttributionGroup = {
+				id: string
+				flame_project: FlameProject | null
+				attribution: AttributionResolution | null
+				attributed_at: string | null
+				attributed_by: string | null
+				files: AttributionFile[]
+				versions: AttributionVersionInfo[]
+			}
+
+			export type UpdateGroupRequest = {
+				attribution: AttributionResolution
 			}
 
 			export type AttributionResolution =

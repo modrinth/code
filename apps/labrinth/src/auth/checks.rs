@@ -6,12 +6,33 @@ use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
 use crate::models::ids::FileId;
-use crate::models::projects::{MissingAttributionFile, OverrideSource};
+use crate::models::projects::{DependencyAttribution, MissingAttributionFile, OverrideSource, Version};
 use crate::models::users::User;
-use crate::queue::file_scan::get_files_missing_attribution;
+use crate::queue::file_scan::{DependencyAttributionData, get_dependency_attributions, get_files_missing_attribution};
 use crate::routes::ApiError;
 use futures::TryStreamExt;
 use itertools::Itertools;
+
+pub fn enrich_dependency_attributions(
+    version: &mut Version,
+    dep_attr: &std::collections::HashMap<(database::models::ids::DBVersionId, String), DependencyAttributionData>,
+) {
+    let version_id = database::models::ids::DBVersionId(version.id.0 as i64);
+    for dep in &mut version.dependencies {
+        if let Some(file_name) = &dep.file_name
+            && let Some(attr) = dep_attr.get(&(version_id, file_name.clone()))
+        {
+            let attribution = DependencyAttribution {
+                link: attr.link.clone().and_then(|u| u.parse().ok()),
+                icon_url: attr.icon_url.clone().and_then(|u| u.parse().ok()),
+                license: attr.license.clone().and_then(|v| serde_json::from_value(v).ok()),
+            };
+            if attribution.link.is_some() || attribution.icon_url.is_some() || attribution.license.is_some() {
+                dep.attribution = Some(attribution);
+            }
+        }
+    }
+}
 
 pub trait ValidateAuthorized {
     fn validate_authorized(
@@ -213,6 +234,10 @@ pub async fn filter_visible_versions(
         .await
         .unwrap_or_default();
 
+    let dep_attr = get_dependency_attributions(pool, &version_ids)
+        .await
+        .unwrap_or_default();
+
     Ok(versions
         .into_iter()
         .map(|v| {
@@ -236,8 +261,9 @@ pub async fn filter_visible_versions(
                         .collect::<Vec<_>>()
                 })
                 .unwrap_or_default();
-            let mut version = crate::models::projects::Version::from(v);
+            let mut version = Version::from(v);
             version.files_missing_attribution = files_missing;
+            enrich_dependency_attributions(&mut version, &dep_attr);
             version
         })
         .collect())

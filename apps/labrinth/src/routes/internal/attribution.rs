@@ -89,7 +89,7 @@ async fn list(
         sqlx::query(
             "
 			select paf.group_id, paf.name, encode(paf.sha1, 'hex') as sha1,
-				array_agg(distinct f.version_id) as version_ids
+				coalesce(array_agg(distinct f.version_id) filter (where f.version_id is not null), '{}') as version_ids
 			from project_attribution_files paf
 			left join override_file_sources ofs on ofs.sha1 = paf.sha1
 			left join files f on f.id = ofs.file_id
@@ -102,11 +102,10 @@ async fn list(
         .await?
     };
 
-    let mut all_version_ids: Vec<i64> = files
-        .iter()
-        .filter_map(|f| f.get::<Option<Vec<i64>>, _>("version_ids"))
-        .flatten()
-        .collect();
+	let mut all_version_ids: Vec<i64> = files
+		.iter()
+		.flat_map(|f| f.get::<Vec<i64>, _>("version_ids"))
+		.collect();
     all_version_ids.sort_unstable();
     all_version_ids.dedup();
 
@@ -148,12 +147,11 @@ async fn list(
                 name: f.get("name"),
                 sha1: f.get("sha1"),
                 versions: {
-                    let mut versions: Vec<_> = f
-                        .get::<Option<Vec<i64>>, _>("version_ids")
-                        .unwrap_or_default()
-                        .into_iter()
-                        .map(|id| VersionId(id as u64))
-                        .collect();
+					let mut versions: Vec<_> = f
+						.get::<Vec<i64>, _>("version_ids")
+						.into_iter()
+						.map(|id| VersionId(id as u64))
+						.collect();
                     versions.sort_by_key(|id| {
                         version_order.get(id).copied().unwrap_or(usize::MAX)
                     });
