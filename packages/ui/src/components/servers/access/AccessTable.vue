@@ -106,15 +106,17 @@
 		v-if="members.length > 0"
 		class="overflow-hidden rounded-2xl border border-solid border-surface-5 sm:hidden"
 	>
-		<div class="grid min-h-14 grid-cols-[3.75rem_7.25rem_minmax(0,1fr)_2.75rem] bg-surface-3">
+		<div
+			class="grid min-h-14 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_2.75rem] bg-surface-3"
+		>
 			<div class="flex items-center pl-4 font-semibold text-secondary">
 				<button
 					type="button"
-					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold transition-colors hover:text-contrast"
+					class="flex min-w-0 cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold transition-colors hover:text-contrast"
 					:class="sortColumn === 'user' ? 'text-contrast' : 'text-secondary'"
 					@click="toggleSort('user')"
 				>
-					{{ formatMessage(messages.userColumn) }}
+					<span class="min-w-0 truncate">{{ formatMessage(messages.userColumn) }}</span>
 					<component :is="sortIcon('user')" v-if="sortIcon('user')" class="size-4" />
 				</button>
 			</div>
@@ -147,14 +149,15 @@
 		<div
 			v-for="(member, index) in sortedMembers"
 			:key="member.id"
-			class="grid min-h-16 grid-cols-[3.75rem_7.25rem_minmax(0,1fr)_2.75rem] items-center border-0 border-t border-solid border-surface-5"
+			class="grid min-h-16 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_2.75rem] items-center border-0 border-t border-solid border-surface-5"
 			:class="index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 		>
 			<div class="flex min-w-0 items-center pl-4">
 				<AutoLink
 					v-tooltip="member.user.username"
 					:to="userProfilePath(member.user.username)"
-					class="inline-flex shrink-0"
+					class="inline-flex min-w-0 items-center gap-2"
+					:class="userProfilePath(member.user.username) ? 'text-primary hover:underline' : ''"
 				>
 					<Avatar
 						:src="member.user.avatarUrl"
@@ -164,6 +167,9 @@
 						circle
 						no-shadow
 					/>
+					<span class="min-w-0 truncate font-medium">
+						{{ member.user.username }}
+					</span>
 				</AutoLink>
 			</div>
 			<div class="min-w-0 py-3 pr-2">
@@ -398,8 +404,8 @@ const columns = computed<TableColumn<AccessTableColumn>[]>(() => [
 	{ key: 'actions', label: formatMessage(messages.actionsColumn), align: 'right', width: '12%' },
 ])
 
-const sortColumn = ref<string | undefined>('joined')
-const sortDirection = ref<SortDirection>('desc')
+const sortColumn = ref<string | undefined>('role')
+const sortDirection = ref<SortDirection>('asc')
 const now = ref(Date.now())
 let nowInterval: ReturnType<typeof setInterval> | null = null
 const canManageUsers = computed(() => props.canManageUsers)

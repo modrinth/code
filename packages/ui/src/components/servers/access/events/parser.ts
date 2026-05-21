@@ -11,8 +11,6 @@ import FileEvent from './FileEvent.vue'
 import ModpackEvent from './ModpackEvent.vue'
 import NetworkEvent from './NetworkEvent.vue'
 import ServerMetaEvent from './ServerMetaEvent.vue'
-import UnknownEvent from './UnknownEvent.vue'
-import UserAccessEvent from './UserAccessEvent.vue'
 import type {
 	AuditActor,
 	AuditAddonEventItem,
@@ -23,6 +21,8 @@ import type {
 	EventEntity,
 	ParsedAuditEvent,
 } from './types'
+import UnknownEvent from './UnknownEvent.vue'
+import UserAccessEvent from './UserAccessEvent.vue'
 
 const basicEvents = new Set([
 	'server_created',
@@ -262,12 +262,12 @@ export function parseAuditEvent(
 				const to = stringField(record, 'to')
 				if (!id || !from || !to) return unknown(base, action)
 				const backup = backupEntity(id, lookups)
-				return parsed(
-					BackupEvent,
-					base,
-					{ kind: 'renamed', backup, backupId: id, from, to },
-					[...actionSearchParts(action), from, to, id],
-				)
+				return parsed(BackupEvent, base, { kind: 'renamed', backup, backupId: id, from, to }, [
+					...actionSearchParts(action),
+					from,
+					to,
+					id,
+				])
 			}
 			default:
 				return unknown(base, action)
@@ -319,7 +319,13 @@ function actorFromEntry(
 	actor: Archon.Actions.v1.ActionUser,
 	users: Record<string, Archon.Actions.v1.UserResp>,
 ): AuditActor {
-	if (actor.type === 'support') return { id: 'support', username: 'support' }
+	if (actor.type === 'support') {
+		const user = actor.user_id ? users[actor.user_id] : undefined
+		return {
+			id: 'support',
+			username: user?.username ? `Support (${user.username})` : 'support',
+		}
+	}
 
 	const user = users[actor.user_id]
 	return {
@@ -341,7 +347,10 @@ function permissionScopes(value: unknown): string[] {
 	return []
 }
 
-function worldFromId(worldId: string | null, worldById: Map<string, AuditWorld>): AuditWorld | null {
+function worldFromId(
+	worldId: string | null,
+	worldById: Map<string, AuditWorld>,
+): AuditWorld | null {
 	if (!worldId) return null
 	return worldById.get(worldId) ?? { id: worldId, name: worldId }
 }
@@ -374,7 +383,7 @@ function addonList(
 		const addonId = stringField(addonRecord, 'addon_id')
 		const versionId = stringField(addonRecord, 'version_id')
 		if (!addonId || !versionId) return null
-		addons.push(addonEntity(addonId, versionId, lookups.addons))
+		addons.push(addonEntity(addonId, versionId, lookups.addons, lookups.versions))
 	}
 	return addons
 }
@@ -383,9 +392,10 @@ function addonEntity(
 	addonId: string,
 	versionId: string,
 	addons: Record<string, Archon.Actions.v1.AddonResp>,
+	versions: Record<string, Archon.Actions.v1.VersionResp>,
 ): AuditAddonEventItem {
 	const addon = addons[addonId]
-	const versionLabel = resolveVersionLabel(versionId)
+	const versionLabel = resolveVersionLabel(versionId, versions)
 	const projectIdOrSlug = addon?.slug || addonId
 	return {
 		addonId,
@@ -403,9 +413,12 @@ function addonEntity(
 	}
 }
 
-function resolveVersionLabel(versionId: string): string {
-	// TODO: Replace this fallback with lookups.versions[version_id] once the backend exposes a versions map in ActionLogResponse.
-	return shortId(versionId)
+function resolveVersionLabel(
+	versionId: string,
+	versions: Record<string, Archon.Actions.v1.VersionResp>,
+): string {
+	const version = versions[versionId]
+	return version?.version_number || version?.name || shortId(versionId)
 }
 
 function backupEntity(id: string, lookups: AuditEventLookups): AuditBackupEventItem {

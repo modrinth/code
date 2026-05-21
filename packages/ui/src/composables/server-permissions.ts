@@ -1,44 +1,78 @@
-import { Archon } from '@modrinth/api-client'
+import type { Archon } from '@modrinth/api-client'
 import { computed } from 'vue'
 
 import { useVIntl } from '#ui/composables/i18n'
 import { injectModrinthServerContext } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
-const UserScope = Archon.ServerUsers.v1.UserScope
+export type ServerPermissionName = keyof typeof Archon.ServerUsers.v1.UserScope
 
-export type ServerPermissionName = keyof typeof UserScope
+type ServerPermissionValue = Archon.Servers.v0.UserScope | Archon.ServerUsers.v1.UserScope
+
+const U64_SIZE = 64n
+const U64_MODULUS = 1n << U64_SIZE
 
 export const serverPermissionBits = {
-	NONE: 0,
-	SERVER_ADMIN: 1 << 0,
-	BASE_READ: 1 << 1,
-	POWER_ACTIONS: 1 << 2,
-	FILES_WRITE: 1 << 3,
-	SETUP: 1 << 4,
-	BACKUPS: 1 << 5,
-	ADVANCED: 1 << 6,
-	RESET_SERVER: 1 << 7,
-	MANAGE_USERS: 1 << 8,
-	SUPPORT_AGENT: 1 << 9,
-	INFRA_MANAGER: 1 << 10,
-	INFRA_MANAGER_READ: 1 << 11,
-	INFRA_SERVERS_XFER: 1 << 12,
-} as const satisfies Record<ServerPermissionName, Archon.Servers.v0.UserScope>
+	NONE: 0n,
+	BASE_READ: 1n << 63n,
+	POWER_ACTIONS: 1n << 62n,
+	FILES_WRITE: 1n << 61n,
+	SETUP: 1n << 60n,
+	BACKUPS: 1n << 59n,
+	ADVANCED: 1n << 58n,
+	RESET_SERVER: 1n << 57n,
+	MANAGE_USERS: 1n << 56n,
+	SUPPORT_AGENT: 1n,
+	INFRA_MANAGER: 1n << 1n,
+	INFRA_MANAGER_READ: 1n << 2n,
+	INFRA_SERVERS_XFER: 1n << 3n,
+	SERVER_ADMIN: ((1n << 64n) - 1n) ^ ((1n << 15n) - 1n),
+} as const satisfies Record<ServerPermissionName, bigint>
 
-function hasPermissionBit(
-	permissions: Archon.Servers.v0.UserScope,
-	scope: ServerPermissionName,
-) {
+function parsePermissionNumber(value: number) {
+	const bigintValue = BigInt(value)
+	return bigintValue < 0n ? bigintValue + U64_MODULUS : bigintValue
+}
+
+function parsePermissionString(value: string) {
+	const numericValue = Number(value)
+	if (value.trim() !== '' && Number.isFinite(numericValue)) {
+		return parsePermissionNumber(numericValue)
+	}
+
+	const permissions = value
+		.split('|')
+		.map((permission) => permission.trim())
+		.filter((permission): permission is ServerPermissionName => permission in serverPermissionBits)
+
+	if (permissions.length === 0) return 0n
+
+	return permissions.reduce((mask, permission) => mask | serverPermissionBits[permission], 0n)
+}
+
+function parsePermissions(permissions: ServerPermissionValue) {
+	return typeof permissions === 'number'
+		? parsePermissionNumber(permissions)
+		: parsePermissionString(permissions)
+}
+
+function hasPermissionBit(permissions: ServerPermissionValue, scope: ServerPermissionName) {
 	const permission = serverPermissionBits[scope]
-	return permission === 0 || (permissions & permission) === permission
+	if (permission === 0n) return true
+
+	const permissionsMask = parsePermissions(permissions)
+	return (permissionsMask & permission) === permission
 }
 
 export function hasServerPermission(
-	permissions: Archon.Servers.v0.UserScope,
+	permissions: ServerPermissionValue,
 	scope: ServerPermissionName,
 ) {
-	if (scope !== 'NONE' && scope !== 'SERVER_ADMIN' && hasPermissionBit(permissions, 'SERVER_ADMIN')) {
+	if (
+		scope !== 'NONE' &&
+		scope !== 'SERVER_ADMIN' &&
+		hasPermissionBit(permissions, 'SERVER_ADMIN')
+	) {
 		return true
 	}
 	return hasPermissionBit(permissions, scope)

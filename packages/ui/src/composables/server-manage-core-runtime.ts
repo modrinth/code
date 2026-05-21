@@ -384,9 +384,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		}
 		fsAuth.value = await client.archon.servers_v0.getFilesystemAuth(options.serverId.value)
 	}
-	const currentUserPermissions = computed(
-		() => options.server.value?.current_user_permissions ?? 0,
-	)
+	const currentUserPermissions = computed(() => options.server.value?.current_user_permissions ?? 0)
 	const serverFull = computed(() => options.serverFull?.value ?? null)
 
 	provideModrinthServerContext({

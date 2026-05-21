@@ -384,12 +384,12 @@ import {
 } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
+	hasServerPermission,
 	useDebugLogger,
 	useLoadingBarToken,
 	useModrinthServersConsole,
 	useReadyState,
 	useServerImage,
-	hasServerPermission,
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'

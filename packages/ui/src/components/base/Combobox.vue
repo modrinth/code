@@ -458,8 +458,8 @@ async function updateDropdownPosition() {
 }
 
 async function openDropdown() {
-	if (props.disabled || isOpen.value || !hasDropdownContent.value) return
-	if (!hasMinimumSearchLength.value) return
+	if (props.disabled || isOpen.value || !hasMinimumSearchLength.value || !hasDropdownContent.value)
+		return
 
 	isOpen.value = true
 	emit('open')

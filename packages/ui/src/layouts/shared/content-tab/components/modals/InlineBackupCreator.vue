@@ -12,8 +12,8 @@
 						!canManageBackups
 							? permissionDeniedMessage
 							: backup.externalBackupInProgress.value
-							? formatMessage(messages.backupInProgress)
-							: undefined
+								? formatMessage(messages.backupInProgress)
+								: undefined
 					"
 					class="!shadow-none"
 					:disabled="
@@ -79,7 +79,11 @@ const { canManageBackups, permissionDeniedMessage } = useServerPermissions()
 const backup = useInlineBackup(() => props.backupName)
 
 function startBackup() {
-	if (!canManageBackups.value || backup.externalBackupInProgress.value || backup.isBackingUp.value) {
+	if (
+		!canManageBackups.value ||
+		backup.externalBackupInProgress.value ||
+		backup.isBackingUp.value
+	) {
 		return
 	}
 	backup.startBackup()

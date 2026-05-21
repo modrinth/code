@@ -191,7 +191,7 @@ export const commonMessages = defineMessages({
 	},
 	noPermissionAction: {
 		id: 'action.no-permission',
-		defaultMessage: 'You do not have permission to do this action.',
+		defaultMessage: 'You do not have permission.',
 	},
 	notificationsLabel: {
 		id: 'label.notifications',

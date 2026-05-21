@@ -204,8 +204,8 @@ const bulkProgressMessage = computed(() => {
 						isBusy && busyTooltip
 							? busyTooltip
 							: allEnabled
-							? formatMessage(messages.allAlreadyEnabled)
-							: formatMessage(commonMessages.enableButton)
+								? formatMessage(messages.allAlreadyEnabled)
+								: formatMessage(commonMessages.enableButton)
 					"
 					:disabled="isBusy || allEnabled"
 					@click="emit('enable')"
@@ -220,8 +220,8 @@ const bulkProgressMessage = computed(() => {
 						isBusy && busyTooltip
 							? busyTooltip
 							: allDisabled
-							? formatMessage(messages.allAlreadyDisabled)
-							: formatMessage(commonMessages.disableButton)
+								? formatMessage(messages.allAlreadyDisabled)
+								: formatMessage(commonMessages.disableButton)
 					"
 					:disabled="isBusy || allDisabled"
 					@click="emit('disable')"

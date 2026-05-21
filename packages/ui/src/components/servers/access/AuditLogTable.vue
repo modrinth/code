@@ -1,13 +1,15 @@
 <template>
 	<div class="@container flex flex-col gap-4">
 		<div class="flex min-w-0 flex-col items-start gap-3 @[640px]:flex-row @[640px]:items-center">
-			<Combobox
-				v-model="selectedTimeRange"
-				:class="timeRangeComboboxClass"
-				:options="timeRangeOptions"
-				:display-value="selectedTimeRangeLabel"
-				:trigger-class="timeRangeTriggerClass"
-				dropdown-min-width="245px"
+			<DatePicker
+				v-model="dateRange"
+				mode="range"
+				:placeholder="formatMessage(messages.dateRangePlaceholder)"
+				:wrapper-class="dateRangePickerWrapperClass"
+				:input-class="dateRangePickerInputClass"
+				date-format="Y-m-d"
+				alt-format="M j, Y"
+				position="below left"
 			/>
 			<template v-if="slots.filters">
 				<div class="hidden h-8 w-[1px] shrink-0 bg-surface-5 @[640px]:ml-4 @[640px]:block"></div>
@@ -47,11 +49,7 @@
 							class="min-w-0 truncate font-medium"
 							:class="entry.actor.id === 'support' ? 'text-blue' : ''"
 						>
-							{{
-								entry.actor.id === 'support'
-									? formatMessage(messages.supportActor)
-									: entry.actor.username
-							}}
+							{{ actorName(entry) }}
 						</span>
 					</AutoLink>
 				</template>
@@ -132,7 +130,9 @@
 					<div class="hidden items-center font-semibold text-secondary @[640px]:flex">
 						{{ formatMessage(messages.worldColumn) }}
 					</div>
-					<div class="hidden items-center justify-end pr-4 font-semibold text-secondary @[640px]:flex">
+					<div
+						class="hidden items-center justify-end pr-4 font-semibold text-secondary @[640px]:flex"
+					>
 						{{ formatMessage(messages.timeColumn) }}
 					</div>
 				</div>
@@ -170,7 +170,7 @@ import { defineMessages, useVIntl } from '../../../composables/i18n'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
 import BulletDivider from '../../base/BulletDivider.vue'
-import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
+import DatePicker from '../../base/DatePicker.vue'
 import Table, { type TableColumn } from '../../base/Table.vue'
 import type { ServerAuditLogEntry, ServerAuditLogFilters } from './types'
 
@@ -187,6 +187,7 @@ const emit = defineEmits<{
 }>()
 
 const query = defineModel<string>('query', { default: '' })
+const dateRange = defineModel<string[]>('dateRange', { default: () => [] })
 const filters = defineModel<ServerAuditLogFilters>('filters', {
 	default: () => ({
 		userId: null,
@@ -201,105 +202,10 @@ const slots = useSlots()
 const loadMoreSentinel = ref<HTMLElement | null>(null)
 let loadMoreObserver: IntersectionObserver | null = null
 
-type AuditTimeRange =
-	| 'previous_30_minutes'
-	| 'previous_hour'
-	| 'previous_12_hours'
-	| 'previous_24_hours'
-	| 'today'
-	| 'yesterday'
-	| 'this_week'
-	| 'last_week'
-	| 'previous_7_days'
-	| 'this_month'
-	| 'last_month'
-	| 'last_30_days'
-	| 'this_quarter'
-	| 'last_quarter'
-	| 'this_year'
-	| 'last_year'
-	| 'previous_year'
-	| 'previous_two_years'
-	| 'all_time'
-
-const selectedTimeRange = ref<AuditTimeRange>('last_30_days')
-
 const messages = defineMessages({
-	previous30Minutes: {
-		id: 'servers.audit-log.time-range.previous-30-minutes',
-		defaultMessage: 'Previous 30 minutes',
-	},
-	previousHour: {
-		id: 'servers.audit-log.time-range.previous-hour',
-		defaultMessage: 'Previous hour',
-	},
-	previous12Hours: {
-		id: 'servers.audit-log.time-range.previous-12-hours',
-		defaultMessage: 'Previous 12 hours',
-	},
-	previous24Hours: {
-		id: 'servers.audit-log.time-range.previous-24-hours',
-		defaultMessage: 'Previous 24 hours',
-	},
-	today: {
-		id: 'servers.audit-log.time-range.today',
-		defaultMessage: 'Today',
-	},
-	yesterday: {
-		id: 'servers.audit-log.time-range.yesterday',
-		defaultMessage: 'Yesterday',
-	},
-	thisWeek: {
-		id: 'servers.audit-log.time-range.this-week',
-		defaultMessage: 'This week',
-	},
-	lastWeek: {
-		id: 'servers.audit-log.time-range.last-week',
-		defaultMessage: 'Last week',
-	},
-	previous7Days: {
-		id: 'servers.audit-log.time-range.previous-7-days',
-		defaultMessage: 'Previous 7 days',
-	},
-	thisMonth: {
-		id: 'servers.audit-log.time-range.this-month',
-		defaultMessage: 'This month',
-	},
-	lastMonth: {
-		id: 'servers.audit-log.time-range.last-month',
-		defaultMessage: 'Last month',
-	},
-	last30Days: {
-		id: 'servers.audit-log.time-range.last-30-days',
-		defaultMessage: 'Last 30 days',
-	},
-	thisQuarter: {
-		id: 'servers.audit-log.time-range.this-quarter',
-		defaultMessage: 'This quarter',
-	},
-	lastQuarter: {
-		id: 'servers.audit-log.time-range.last-quarter',
-		defaultMessage: 'Last quarter',
-	},
-	thisYear: {
-		id: 'servers.audit-log.time-range.this-year',
-		defaultMessage: 'This year',
-	},
-	lastYear: {
-		id: 'servers.audit-log.time-range.last-year',
-		defaultMessage: 'Last year',
-	},
-	previousYear: {
-		id: 'servers.audit-log.time-range.previous-year',
-		defaultMessage: 'Previous year',
-	},
-	previousTwoYears: {
-		id: 'servers.audit-log.time-range.previous-two-years',
-		defaultMessage: 'Previous two years',
-	},
-	allTime: {
-		id: 'servers.audit-log.time-range.all-time',
-		defaultMessage: 'All Time',
+	dateRangePlaceholder: {
+		id: 'servers.audit-log.date-range.placeholder',
+		defaultMessage: 'Select date range...',
 	},
 	supportActor: {
 		id: 'servers.audit-log.actor.support',
@@ -339,39 +245,12 @@ const messages = defineMessages({
 	},
 })
 
-const timeRangeOptions = computed<ComboboxOption<AuditTimeRange>[]>(() => [
-	{ value: 'previous_30_minutes', label: formatMessage(messages.previous30Minutes) },
-	{ value: 'previous_hour', label: formatMessage(messages.previousHour) },
-	{ value: 'previous_12_hours', label: formatMessage(messages.previous12Hours) },
-	{ value: 'previous_24_hours', label: formatMessage(messages.previous24Hours) },
-	{ value: 'today', label: formatMessage(messages.today) },
-	{ value: 'yesterday', label: formatMessage(messages.yesterday) },
-	{ value: 'this_week', label: formatMessage(messages.thisWeek) },
-	{ value: 'last_week', label: formatMessage(messages.lastWeek) },
-	{ value: 'previous_7_days', label: formatMessage(messages.previous7Days) },
-	{ value: 'this_month', label: formatMessage(messages.thisMonth) },
-	{ value: 'last_month', label: formatMessage(messages.lastMonth) },
-	{ value: 'last_30_days', label: formatMessage(messages.last30Days) },
-	{ value: 'this_quarter', label: formatMessage(messages.thisQuarter) },
-	{ value: 'last_quarter', label: formatMessage(messages.lastQuarter) },
-	{ value: 'this_year', label: formatMessage(messages.thisYear) },
-	{ value: 'last_year', label: formatMessage(messages.lastYear) },
-	{ value: 'previous_year', label: formatMessage(messages.previousYear) },
-	{ value: 'previous_two_years', label: formatMessage(messages.previousTwoYears) },
-	{ value: 'all_time', label: formatMessage(messages.allTime) },
-])
-
-const selectedTimeRangeLabel = computed(
-	() =>
-		timeRangeOptions.value.find((option) => option.value === selectedTimeRange.value)?.label ??
-		formatMessage(messages.last30Days),
+const dateRangePickerWrapperClass = computed(() =>
+	slots.filters ? '!w-full @[640px]:!w-[285px] shrink-0' : '!w-full @[640px]:!w-[285px]',
 )
-const timeRangeComboboxClass = computed(() =>
-	slots.filters ? '!w-full @[640px]:!w-[245px] shrink-0' : '!w-full @[640px]:!w-[245px]',
-)
-const timeRangeTriggerClass = computed(
+const dateRangePickerInputClass = computed(
 	() =>
-		'!h-10 !w-full @[640px]:!w-[245px] !rounded-[14px] !bg-surface-4 !px-4 !py-2.5 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]',
+		'!h-10 !w-full !rounded-[14px] !bg-surface-4 !py-2.5 !pl-10 !pr-4 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]',
 )
 
 onMounted(() => {
@@ -422,6 +301,7 @@ const hasActiveFilters = computed(
 	() =>
 		props.hasActiveExternalFilters ||
 		query.value.trim().length > 0 ||
+		dateRange.value.length > 0 ||
 		!!filters.value.userId ||
 		!!filters.value.worldId,
 )
@@ -433,7 +313,10 @@ const emptyStateMessage = computed(() =>
 )
 
 function actorName(entry: ServerAuditLogEntry): string {
-	return entry.actor.id === 'support' ? formatMessage(messages.supportActor) : entry.actor.username
+	if (entry.actor.id !== 'support') return entry.actor.username
+	return entry.actor.username === 'support'
+		? formatMessage(messages.supportActor)
+		: entry.actor.username
 }
 
 function actorAvatarSrc(entry: ServerAuditLogEntry): string | undefined {

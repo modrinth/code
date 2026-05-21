@@ -27,7 +27,7 @@
 		</div>
 
 		<div v-else key="content" class="contents">
-				<ReadyTransition :pending="backupsReadyPending">
+			<ReadyTransition :pending="backupsReadyPending">
 				<BackupCreateModal
 					ref="createBackupModal"
 					:backups="completedBackups"
@@ -498,7 +498,9 @@ watch(
 
 		await nextTick()
 		const escapedBackupId =
-			typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(backupId) : backupId.replaceAll('"', '\\"')
+			typeof CSS !== 'undefined' && CSS.escape
+				? CSS.escape(backupId)
+				: backupId.replaceAll('"', '\\"')
 		document
 			.querySelector(`[data-backup-id="${escapedBackupId}"]`)
 			?.scrollIntoView({ block: 'center', behavior: 'smooth' })

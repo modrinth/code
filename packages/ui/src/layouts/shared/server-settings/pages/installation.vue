@@ -12,7 +12,10 @@
 			</div>
 		</Teleport>
 
-		<InstallationSettingsLayout ref="installationSettingsLayout" @reset-server="showResetServerModal">
+		<InstallationSettingsLayout
+			ref="installationSettingsLayout"
+			@reset-server="showResetServerModal"
+		>
 			<template #extra>
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">{{

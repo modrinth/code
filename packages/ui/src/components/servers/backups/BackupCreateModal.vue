@@ -73,12 +73,12 @@ import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
+import { useVIntl } from '../../../composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '../../../providers'
-import { useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import StyledInput from '../../base/StyledInput.vue'

@@ -110,7 +110,9 @@ const platformDisabledItems = computed(() =>
 	ctx.isBusy.value ? ctx.availablePlatforms : disabledPlatforms.value,
 )
 const platformDisabledTooltip = computed(() =>
-	ctx.isBusy.value ? (ctx.busyMessage?.value ?? undefined) : formatMessage(messages.platformLockTooltip),
+	ctx.isBusy.value
+		? (ctx.busyMessage?.value ?? undefined)
+		: formatMessage(messages.platformLockTooltip),
 )
 
 const showModpackVersionActions = computed(() => {
@@ -553,6 +555,7 @@ const messages = defineMessages({
 							</span>
 							<Combobox
 								v-model="form.selectedGameVersion.value"
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								:options="form.gameVersionOptions.value"
 								searchable
 								sync-with-selection
@@ -564,15 +567,14 @@ const messages = defineMessages({
 								"
 								:aria-label="formatMessage(messages.selectGameVersionAriaLabel)"
 								:disabled="ctx.isBusy.value"
-								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								@option-hover="ctx.onGameVersionHover?.($event)"
 							>
 								<template v-if="form.hasSnapshots.value" #dropdown-footer>
 									<button
-										class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
-										@mousedown.prevent
-										:disabled="ctx.isBusy.value"
 										v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
+										class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+										:disabled="ctx.isBusy.value"
+										@mousedown.prevent
 										@click="form.showSnapshots.value = !form.showSnapshots.value"
 									>
 										<EyeOffIcon v-if="form.showSnapshots.value" class="size-4" />
@@ -600,6 +602,7 @@ const messages = defineMessages({
 							</span>
 							<Combobox
 								v-model="form.selectedLoaderVersion.value"
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								searchable
 								sync-with-selection
 								:placeholder="
@@ -618,7 +621,6 @@ const messages = defineMessages({
 									})
 								"
 								:disabled="ctx.isBusy.value"
-								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 							>
 								<template
 									v-if="form.selectedPlatform.value === 'paper'"
@@ -654,7 +656,10 @@ const messages = defineMessages({
 									v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 									class="!shadow-none"
 									:disabled="
-										!form.isValid.value || !form.hasChanges.value || form.isSaving.value || ctx.isBusy.value
+										!form.isValid.value ||
+										!form.hasChanges.value ||
+										form.isSaving.value ||
+										ctx.isBusy.value
 									"
 									@click="form.save()"
 								>

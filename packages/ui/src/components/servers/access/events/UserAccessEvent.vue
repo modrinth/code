@@ -17,16 +17,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import {
-	defineMessages,
-	type MessageDescriptor,
-	useVIntl,
-} from '../../../../composables/i18n'
+import { defineMessages, type MessageDescriptor, useVIntl } from '../../../../composables/i18n'
 import IntlFormatted from '../../../base/IntlFormatted.vue'
+import type { ServerAccessRole } from '../types'
 import BaseEvent from './BaseEvent.vue'
 import EventEntityLink from './EventEntityLink.vue'
 import type { EventEntity } from './types'
-import type { ServerAccessRole } from '../types'
 
 const props = defineProps<{
 	kind: 'invited' | 'invite_revoked' | 'permission_modified' | 'removed'

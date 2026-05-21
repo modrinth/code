@@ -19,6 +19,8 @@ export class ArchonActionsV1Module extends AbstractModule {
 		if (options.limit !== undefined) params.limit = options.limit
 		if (options.offset !== undefined) params.offset = options.offset
 		if (options.order !== undefined) params.order = options.order
+		if (options.min_datetime !== undefined) params.min_datetime = options.min_datetime
+		if (options.max_datetime !== undefined) params.max_datetime = options.max_datetime
 
 		return this.client.request<Archon.Actions.v1.ActionLogResponse>(
 			`/servers/${serverId}/action-log`,

@@ -94,6 +94,37 @@ export const Range: Story = {
 	}),
 }
 
+export const RangeWithTime: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref(['2026-04-13 09:00', '2026-04-29 17:30'])
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[500px] max-w-sm flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[350px]"
+					mode="range"
+					enable-time
+					default-view-date="2026-04-01"
+					placeholder="Select a date and time range..."
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const SameDayRange: Story = {
 	render: () => ({
 		components: { DatePicker },

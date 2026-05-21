@@ -36,8 +36,8 @@
 					{{ formatMessage(messages.zipDescription) }}
 				</div>
 				<StyledInput
-					v-tooltip="props.disabled ? props.disabledTooltip : undefined"
 					v-model="url"
+					v-tooltip="props.disabled ? props.disabledTooltip : undefined"
 					:icon="LinkIcon"
 					type="url"
 					:placeholder="

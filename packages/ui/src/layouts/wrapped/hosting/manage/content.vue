@@ -153,17 +153,21 @@ const contentQuery = useQuery({
 	staleTime: 0,
 })
 
-const contentReadyPending = useReadyState(contentQuery)
 const setupActionDisabled = computed(() => !canSetup.value || busyReasons.value.length > 0)
 const setupActionBusyMessage = computed(() => {
 	if (!canSetup.value) return permissionDeniedMessage.value
 
-	const bannerCoversInstalling = server.value?.status === 'installing' || isSyncingContent.value
+	const bannerCoversInstalling =
+		server.value?.status === 'installing' ||
+		isSyncingContent.value ||
+		busyReasons.value.some(
+			(r) =>
+				r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content',
+		)
 	const filteredReasons = busyReasons.value.filter((r) => {
 		if (
 			bannerCoversInstalling &&
-			(r.reason.id === 'servers.busy.installing' ||
-				r.reason.id === 'servers.busy.syncing-content')
+			(r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content')
 		)
 			return false
 		if (

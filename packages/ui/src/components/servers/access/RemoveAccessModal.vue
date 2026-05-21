@@ -60,11 +60,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button
-						v-tooltip="removePermissionTooltip"
-						:disabled="!canRemove"
-						@click="confirm"
-					>
+					<button v-tooltip="removePermissionTooltip" :disabled="!canRemove" @click="confirm">
 						<XIcon v-if="shouldCancel" aria-hidden="true" />
 						<UserXIcon v-else aria-hidden="true" />
 						{{ formatMessage(shouldCancel ? messages.cancelButton : messages.removeButton) }}

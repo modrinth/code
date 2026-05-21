@@ -4,10 +4,7 @@ import { ref } from 'vue'
 
 import DropdownFilterBar from '../../components/base/DropdownFilterBar.vue'
 import AuditLogTable from '../../components/servers/access/AuditLogTable.vue'
-import {
-	parseAuditEvent,
-	type AuditEventLookups,
-} from '../../components/servers/access/events'
+import { type AuditEventLookups, parseAuditEvent } from '../../components/servers/access/events'
 import type {
 	ServerAuditLogEntry,
 	ServerAuditLogFilters,
@@ -151,13 +148,15 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 		oWaK0Q19: {
 			title: 'Create Aeronautics',
 			slug: 'create-aeronautics',
-			icon_url: 'https://cdn.modrinth.com/data/oWaK0Q19/f66b5589924884ffd81acb27f3ccb775867a962e_96.webp',
+			icon_url:
+				'https://cdn.modrinth.com/data/oWaK0Q19/f66b5589924884ffd81acb27f3ccb775867a962e_96.webp',
 			version: null,
 		},
 		AANobbMI: {
 			title: 'Sodium',
 			slug: 'sodium',
-			icon_url: 'https://cdn.modrinth.com/data/AANobbMI/295862f4724dc3f78df3447ad6072b2dcd3ef0c9_96.webp',
+			icon_url:
+				'https://cdn.modrinth.com/data/AANobbMI/295862f4724dc3f78df3447ad6072b2dcd3ef0c9_96.webp',
 			version: null,
 		},
 		P7dR8mSH: {
@@ -166,6 +165,11 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 			icon_url: 'https://cdn.modrinth.com/data/P7dR8mSH/icon.png',
 			version: null,
 		},
+	},
+	versions: {
+		HY8u0JqC: { name: 'Create Aeronautics 1.0.0', version_number: '1.0.0' },
+		yaoBL9D9: { name: 'Sodium 0.6.0', version_number: '0.6.0' },
+		KZS9tylY: { name: 'Fabric API 0.116.0', version_number: '0.116.0' },
 	},
 	data: [
 		rawEntry({ action: 'server_created', worldId: null, minutesAgo: 5 }),
@@ -350,6 +354,7 @@ const missingLookupActionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 	next_offset: null,
 	users: {},
 	addons: {},
+	versions: {},
 	data: [
 		rawEntry({
 			action: 'user_permission_modified',
@@ -427,7 +432,7 @@ function lookupsFromResponse(
 			serverFull.worlds.map((world) => [world.id, { id: world.id, name: world.name }]),
 		),
 		backupById: backups,
-		versions: undefined,
+		versions: response.versions,
 	}
 }
 
@@ -481,15 +486,17 @@ function renderStory(entries: ServerAuditLogEntry[], initialQuery = '') {
 		components: { AuditLogTable },
 		setup() {
 			const query = ref(initialQuery)
+			const dateRange = ref<string[]>([])
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
 				worldId: null,
 			})
-			return { entries, query, filters }
+			return { dateRange, entries, query, filters }
 		},
 		template: /* html */ `
 			<AuditLogTable
 				v-model:query="query"
+				v-model:date-range="dateRange"
 				v-model:filters="filters"
 				:entries="entries"
 			/>
@@ -514,6 +521,7 @@ export const WithExternalFilterControls: Story = {
 		components: { AuditLogTable, DropdownFilterBar },
 		setup() {
 			const query = ref('')
+			const dateRange = ref<string[]>([])
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
 				worldId: null,
@@ -525,6 +533,7 @@ export const WithExternalFilterControls: Story = {
 			})
 			return {
 				categories: filterBarCategories,
+				dateRange,
 				entries: everyActionEntries,
 				externalFilters,
 				filters,
@@ -534,6 +543,7 @@ export const WithExternalFilterControls: Story = {
 		template: /* html */ `
 			<AuditLogTable
 				v-model:query="query"
+				v-model:date-range="dateRange"
 				v-model:filters="filters"
 				:entries="entries"
 				has-active-external-filters
@@ -557,15 +567,17 @@ export const EmptyExternalFilters: Story = {
 		components: { AuditLogTable },
 		setup() {
 			const query = ref('')
+			const dateRange = ref<string[]>([])
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
 				worldId: null,
 			})
-			return { entries: [], query, filters }
+			return { dateRange, entries: [], query, filters }
 		},
 		template: /* html */ `
 			<AuditLogTable
 				v-model:query="query"
+				v-model:date-range="dateRange"
 				v-model:filters="filters"
 				:entries="entries"
 				has-active-external-filters
@@ -579,16 +591,18 @@ export const MobileCompact: Story = {
 		components: { AuditLogTable },
 		setup() {
 			const query = ref('')
+			const dateRange = ref<string[]>([])
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
 				worldId: null,
 			})
-			return { entries: everyActionEntries.slice(0, 8), query, filters }
+			return { dateRange, entries: everyActionEntries.slice(0, 8), query, filters }
 		},
 		template: /* html */ `
 			<div style="max-width: 390px;">
 				<AuditLogTable
 					v-model:query="query"
+					v-model:date-range="dateRange"
 					v-model:filters="filters"
 					:entries="entries"
 				/>

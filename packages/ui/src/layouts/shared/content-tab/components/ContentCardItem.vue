@@ -340,10 +340,10 @@ const deleteHovered = ref(false)
 						isDisabled && disabledTooltip
 							? disabledTooltip
 							: formatMessage(
-							shiftHeld && deleteHovered
-								? commonMessages.deleteImmediatelyLabel
-								: commonMessages.deleteLabel,
-							)
+									shiftHeld && deleteHovered
+										? commonMessages.deleteImmediatelyLabel
+										: commonMessages.deleteLabel,
+								)
 					"
 					:disabled="isDisabled"
 					@click="emit('delete', $event)"

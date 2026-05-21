@@ -30,9 +30,7 @@ const messages = defineMessages({
 	},
 })
 
-const message = computed(() =>
-	props.newVersionId ? messages.changedToVersion : messages.changed,
-)
+const message = computed(() => (props.newVersionId ? messages.changedToVersion : messages.changed))
 
 const shortVersionId = computed(() =>
 	props.newVersionId && props.newVersionId.length > 12

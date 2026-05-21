@@ -3,7 +3,11 @@
 		:to="entity.to"
 		class="inline-flex max-w-full items-center gap-1 font-semibold"
 		:class="[
-			entity.to ? 'text-contrast hover:underline' : entity.muted ? 'text-secondary' : 'text-contrast',
+			entity.to
+				? 'text-contrast hover:underline'
+				: entity.muted
+					? 'text-secondary'
+					: 'text-contrast',
 			entity.mono ? 'font-mono text-[0.925em]' : '',
 			hasIcon ? 'align-[-0.45rem]' : 'align-baseline',
 		]"

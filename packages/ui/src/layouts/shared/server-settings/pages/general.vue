@@ -355,7 +355,9 @@ const hasServerSettingsChanges = computed(
 const hasPreferenceChanges = computed(
 	() => JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value),
 )
-const hasUnsavedChanges = computed(() => hasServerSettingsChanges.value || hasPreferenceChanges.value)
+const hasUnsavedChanges = computed(
+	() => hasServerSettingsChanges.value || hasPreferenceChanges.value,
+)
 
 const saveGeneral = async () => {
 	if (!isValidServerName.value || !isValidSubdomain.value) return

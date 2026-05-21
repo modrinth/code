@@ -50,6 +50,7 @@
 				{{ formatMessage(messages.activityLogTitle) }}
 			</span>
 			<AuditLogTable
+				v-model:date-range="auditLogDateRange"
 				:entries="auditEntries"
 				:has-active-external-filters="hasActiveAuditLogFilters"
 				:has-more="hasMoreActionLogEntries"
@@ -120,7 +121,7 @@ import {
 } from '#ui/components/servers/access'
 import { parseAuditEvent } from '#ui/components/servers/access/events'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerPermissions } from '#ui/composables/server-permissions'
+import { hasServerPermission, useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -131,7 +132,7 @@ type RoleFilter = ServerAccessRole | 'all'
 type AuditLogFilterKey = 'users' | 'worlds' | 'actions'
 
 const SERVER_WORLD_FILTER_VALUE = '__server__'
-const ACTION_LOG_PAGE_SIZE = 250
+const ACTION_LOG_PAGE_SIZE = 200
 
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
@@ -634,26 +635,21 @@ const auditLogFilters = ref<Record<string, string[]>>({
 	worlds: [],
 	actions: [],
 })
+const auditLogDateRange = ref(defaultAuditLogDateRange())
 
-const memberUsernames = computed(() =>
-	Array.from(new Set(members.value.map((member) => member.user.username))),
-)
-const memberUserDetailsQuery = useQuery({
-	queryKey: computed(() => [
-		'servers',
-		'access-user-filter-options',
-		'v2',
-		serverId,
-		memberUsernames.value,
-	]),
-	enabled: computed(() => memberUsernames.value.length > 0),
-	queryFn: async () => {
-		const results = await Promise.allSettled(
-			memberUsernames.value.map((username) => client.labrinth.users_v2.get(username)),
-		)
+const actionLogDateFilter = computed(() => {
+	const [startValue, endValue] = auditLogDateRange.value
+	const startDate = startValue ? parseDatePickerValue(startValue) : null
+	const endDate = endValue ? parseDatePickerValue(endValue) : null
+	const [minDate, maxDate] =
+		startDate && endDate && startDate.getTime() > endDate.getTime()
+			? [endDate, startDate]
+			: [startDate, endDate]
 
-		return results.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []))
-	},
+	return {
+		min_datetime: minDate ? startOfDay(minDate).toISOString() : undefined,
+		max_datetime: maxDate ? endOfDay(maxDate).toISOString() : undefined,
+	}
 })
 
 const actionLogEndpointFilter = computed<Archon.Actions.v1.ActionLogFilter | undefined>(() => {
@@ -673,7 +669,14 @@ const actionLogEndpointFilter = computed<Archon.Actions.v1.ActionLogFilter | und
 const actionLogBaseQueryKey = ['servers', 'action-log', 'v1', 'infinite', serverId] as const
 const actionLogQueryKey = computed(() => {
 	const filter = actionLogEndpointFilter.value
-	return filter ? [...actionLogBaseQueryKey, filter] : actionLogBaseQueryKey
+	const dateFilter = actionLogDateFilter.value
+
+	return [
+		...actionLogBaseQueryKey,
+		filter ?? null,
+		dateFilter.min_datetime ?? null,
+		dateFilter.max_datetime ?? null,
+	]
 })
 const actionLogQuery = useInfiniteQuery({
 	queryKey: actionLogQueryKey,
@@ -684,12 +687,11 @@ const actionLogQuery = useInfiniteQuery({
 			offset,
 			order: 'desc',
 			filter: actionLogEndpointFilter.value,
+			...actionLogDateFilter.value,
 		})
 	},
 	getNextPageParam: (lastPage) =>
-		typeof lastPage.next_offset === 'number' && lastPage.data.length >= ACTION_LOG_PAGE_SIZE
-			? lastPage.next_offset
-			: undefined,
+		typeof lastPage.next_offset === 'number' ? lastPage.next_offset : undefined,
 	initialPageParam: 0,
 	staleTime: 30_000,
 })
@@ -707,11 +709,7 @@ const auditEntries = computed<ServerAuditLogEntry[]>(() => {
 
 	return pages.flatMap((actionLog, pageIndex) =>
 		actionLog.data.map((entry, index) =>
-			apiActionLogEntryToAuditEntry(
-				entry,
-				actionLog,
-				pageIndex * ACTION_LOG_PAGE_SIZE + index,
-			),
+			apiActionLogEntryToAuditEntry(entry, actionLog, pageIndex * ACTION_LOG_PAGE_SIZE + index),
 		),
 	)
 })
@@ -728,10 +726,6 @@ const isActionLogFiltering = computed(
 
 const auditLogUserFilterOptions = computed<DropdownFilterBarOption[]>(() => {
 	const options = new Map<string, DropdownFilterBarOption>()
-
-	for (const user of memberUserDetailsQuery.data.value ?? []) {
-		options.set(user.id, userToFilterOption(user))
-	}
 
 	for (const page of actionLogQuery.data.value?.pages ?? []) {
 		for (const [id, user] of Object.entries(page.users)) {
@@ -795,10 +789,16 @@ const auditLogFilterCategories = computed<DropdownFilterBarCategory[]>(() => [
 	},
 ])
 
-const hasActiveAuditLogFilters = computed(() =>
-	(['users', 'worlds', 'actions'] satisfies AuditLogFilterKey[]).some(
-		(key) => selectedAuditLogFilterValues(key).length > 0,
-	),
+const hasActiveAuditLogDateFilter = computed(
+	() => !!actionLogDateFilter.value.min_datetime || !!actionLogDateFilter.value.max_datetime,
+)
+
+const hasActiveAuditLogFilters = computed(
+	() =>
+		hasActiveAuditLogDateFilter.value ||
+		(['users', 'worlds', 'actions'] satisfies AuditLogFilterKey[]).some(
+			(key) => selectedAuditLogFilterValues(key).length > 0,
+		),
 )
 
 const filteredMembers = computed(() => {
@@ -824,16 +824,47 @@ function selectedAuditLogFilterValues(key: AuditLogFilterKey): string[] {
 	return values ? [...values] : []
 }
 
-function isActionLogActionName(action: string): action is ActionLogFilterActionName {
-	return actionLogActionNameSet.has(action)
+function defaultAuditLogDateRange() {
+	const endDate = new Date()
+	const startDate = new Date(endDate)
+	startDate.setDate(startDate.getDate() - 29)
+
+	return [formatDatePickerValue(startDate), formatDatePickerValue(endDate)]
 }
 
-function userToFilterOption(user: Labrinth.Users.v2.User): DropdownFilterBarOption {
-	return {
-		value: user.id,
-		label: user.username,
-		searchTerms: [user.id, user.username],
+function formatDatePickerValue(date: Date) {
+	const year = date.getFullYear()
+	const month = String(date.getMonth() + 1).padStart(2, '0')
+	const day = String(date.getDate()).padStart(2, '0')
+	return `${year}-${month}-${day}`
+}
+
+function parseDatePickerValue(value: string) {
+	const [yearValue, monthValue, dayValue] = value.split('-').map(Number)
+	if (!yearValue || !monthValue || !dayValue) return null
+
+	const date = new Date(yearValue, monthValue - 1, dayValue)
+	if (
+		date.getFullYear() !== yearValue ||
+		date.getMonth() !== monthValue - 1 ||
+		date.getDate() !== dayValue
+	) {
+		return null
 	}
+
+	return date
+}
+
+function startOfDay(date: Date) {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+}
+
+function endOfDay(date: Date) {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999)
+}
+
+function isActionLogActionName(action: string): action is ActionLogFilterActionName {
+	return actionLogActionNameSet.has(action)
 }
 
 function compareFilterOptions(left: DropdownFilterBarOption, right: DropdownFilterBarOption) {
@@ -901,37 +932,21 @@ function apiPermissionsToAccessRole(
 	permissions: Archon.ServerUsers.v1.UserScope,
 ): ServerAccessRole {
 	if (
-		hasApiPermission(permissions, UserScope.SERVER_ADMIN) ||
-		hasApiPermission(permissions, UserScope.MANAGE_USERS)
+		hasServerPermission(permissions, 'SERVER_ADMIN') ||
+		hasServerPermission(permissions, 'MANAGE_USERS')
 	) {
 		return 'owner'
 	}
 	if (
-		hasApiPermission(permissions, UserScope.FILES_WRITE) ||
-		hasApiPermission(permissions, UserScope.SETUP) ||
-		hasApiPermission(permissions, UserScope.BACKUPS) ||
-		hasApiPermission(permissions, UserScope.ADVANCED) ||
-		hasApiPermission(permissions, UserScope.RESET_SERVER)
+		hasServerPermission(permissions, 'FILES_WRITE') ||
+		hasServerPermission(permissions, 'SETUP') ||
+		hasServerPermission(permissions, 'BACKUPS') ||
+		hasServerPermission(permissions, 'ADVANCED') ||
+		hasServerPermission(permissions, 'RESET_SERVER')
 	) {
 		return 'editor'
 	}
 	return 'viewer'
-}
-
-function hasApiPermission(
-	permissions: Archon.ServerUsers.v1.UserScope,
-	scope: Archon.ServerUsers.v1.UserScope,
-) {
-	return parseUserScope(permissions).has(scope)
-}
-
-function parseUserScope(scope: Archon.ServerUsers.v1.UserScope) {
-	return new Set(
-		String(scope)
-			.split('|')
-			.map((value) => value.trim())
-			.filter(Boolean),
-	)
 }
 
 function serializeUserScope(scopes: string[]): Archon.ServerUsers.v1.UserScope {
@@ -953,7 +968,7 @@ function apiActionLogEntryToAuditEntry(
 		addons: actionLog.addons,
 		worldById: worldById.value,
 		backupById: backupById.value,
-		versions: undefined,
+		versions: actionLog.versions ?? {},
 	})
 
 	return {

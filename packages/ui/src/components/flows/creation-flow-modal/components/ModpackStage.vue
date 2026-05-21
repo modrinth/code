@@ -4,8 +4,8 @@
 			formatMessage(messages.knownModpackPrompt)
 		}}</span>
 		<Combobox
-			v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
 			v-model="ctx.modpackSearchProjectId.value"
+			v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
 			:options="ctx.modpackSearchOptions.value"
 			searchable
 			:disabled="ctx.finishDisabled.value"

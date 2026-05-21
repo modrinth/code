@@ -111,7 +111,9 @@
 							<button
 								v-tooltip="advancedActionTooltip"
 								:disabled="
-									isStartupLoading || startupCommand === defaultStartupCommand || !canUseAdvancedSettings
+									isStartupLoading ||
+									startupCommand === defaultStartupCommand ||
+									!canUseAdvancedSettings
 								"
 								class="relative !w-full sm:!w-auto"
 								@click="resetToDefault"

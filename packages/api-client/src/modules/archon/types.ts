@@ -184,11 +184,17 @@ export namespace Archon {
 				version?: string | null
 			}
 
+			export type VersionResp = {
+				name: string
+				version_number?: string | null
+			}
+
 			export type ActionLogResponse = {
 				next_offset?: number | null
 				data: ActionEntry[]
 				users: Record<string, UserResp>
 				addons: Record<string, AddonResp>
+				versions: Record<string, VersionResp>
 			}
 
 			export type ActionLogFilter = {
@@ -202,6 +208,8 @@ export namespace Archon {
 				limit?: number
 				offset?: number
 				order?: SortOrder
+				min_datetime?: string
+				max_datetime?: string
 			}
 		}
 	}
@@ -513,7 +521,7 @@ export namespace Archon {
 				INFRA_SERVERS_XFER: 'INFRA_SERVERS_XFER',
 			} as const
 
-			export type UserScope = string
+			export type UserScope = string | number
 
 			export type UserResp = {
 				username: string

@@ -38,7 +38,9 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 
 	const isBlockedByPropsBusyOrPermission = computed(
 		() =>
-			!canUsePowerActions.value || Boolean(options?.disabled?.value) || busyReasons.value.length > 0,
+			!canUsePowerActions.value ||
+			Boolean(options?.disabled?.value) ||
+			busyReasons.value.length > 0,
 	)
 
 	const busyTooltip = computed(() => {
@@ -47,7 +49,9 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 		return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined
 	})
 
-	const canTakeAction = computed(() => !isTransitioning.value && !isBlockedByPropsBusyOrPermission.value)
+	const canTakeAction = computed(
+		() => !isTransitioning.value && !isBlockedByPropsBusyOrPermission.value,
+	)
 
 	const canKill = computed(
 		() =>

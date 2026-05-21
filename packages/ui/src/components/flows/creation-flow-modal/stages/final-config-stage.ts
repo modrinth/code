@@ -51,7 +51,8 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 			icon: isFinish ? PlusIcon : RightArrowIcon,
 			iconPosition: isFinish ? ('before' as const) : ('after' as const),
 			color: isReset ? ('red' as const) : isFinish ? ('brand' as const) : undefined,
-			disabled: isForwardBlocked(ctx) || ctx.isBackingUp.value || (isFinish && ctx.finishDisabled.value),
+			disabled:
+				isForwardBlocked(ctx) || ctx.isBackingUp.value || (isFinish && ctx.finishDisabled.value),
 			loading: isFinish && ctx.loading.value,
 			tooltip: isFinish && ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined,
 			onClick: () => {
