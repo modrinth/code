@@ -547,7 +547,8 @@ async function handleUpdate(id: string) {
 		return handleError(e)
 	})) as Labrinth.Versions.v2.Version[] | null
 
-	if (!isActiveUpdateRequest(requestId) || getContentItemId(updatingProject.value) !== itemId) return
+	if (!isActiveUpdateRequest(requestId) || getContentItemId(updatingProject.value) !== itemId)
+		return
 
 	loadingVersions.value = false
 
@@ -616,7 +617,8 @@ async function handleSwitchVersion(item: ContentItem) {
 		return handleError(e)
 	})) as Labrinth.Versions.v2.Version[] | null
 
-	if (!isActiveUpdateRequest(requestId) || getContentItemId(updatingProject.value) !== itemId) return
+	if (!isActiveUpdateRequest(requestId) || getContentItemId(updatingProject.value) !== itemId)
+		return
 
 	loadingVersions.value = false
 
