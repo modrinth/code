@@ -26,6 +26,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 
 	const legacyServerDetailKey = (serverId: string) => ['servers', 'detail', serverId] as const
 	const serverV1DetailKey = (serverId: string) => ['servers', 'v1', 'detail', serverId] as const
+	const contentListKey = (serverId: string) => ['content', 'list', 'v1', serverId] as const
 	const actionLogBaseKey = (serverId: string) =>
 		['servers', 'action-log', 'v1', 'infinite', serverId] as const
 
@@ -191,15 +192,16 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		}
 
 		queryClient.setQueryData<Archon.Content.v1.Addons>(
-			['content', 'list', 'v1', serverId],
+			contentListKey(serverId),
 			(current) =>
 				current
 					? {
 							...current,
-							addons: event.specs,
+							addons: mergeAddonSpecs(current.addons ?? [], event.specs),
 						}
 					: current,
 		)
+		void queryClient.invalidateQueries({ queryKey: contentListKey(serverId) })
 	}
 
 	function handleWorldContentBaseUpdate(
@@ -208,11 +210,11 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 	) {
 		if (event.world_id === options.worldId.value) {
 			queryClient.setQueryData<Archon.Content.v1.Addons>(
-				['content', 'list', 'v1', serverId],
+				contentListKey(serverId),
 				(current) => (current ? { ...current, ...event.spec } : event.spec),
 			)
 		} else {
-			void queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] })
+			void queryClient.invalidateQueries({ queryKey: contentListKey(serverId) })
 		}
 
 		void queryClient.invalidateQueries({ queryKey: serverV1DetailKey(serverId) })
@@ -256,7 +258,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 
 	async function invalidateContentAndServerDetails(serverId: string) {
 		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+			queryClient.invalidateQueries({ queryKey: contentListKey(serverId) }),
 			invalidateServerDetails(serverId),
 		])
 	}
@@ -265,13 +267,55 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		await Promise.all([
 			queryClient.invalidateQueries({ queryKey: legacyServerDetailKey(serverId) }),
 			queryClient.invalidateQueries({ queryKey: serverV1DetailKey(serverId) }),
-			queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+			queryClient.invalidateQueries({ queryKey: contentListKey(serverId) }),
 			queryClient.invalidateQueries({ queryKey: ['backups', 'queue', serverId] }),
 			queryClient.invalidateQueries({ queryKey: ['servers', 'users', 'v1', serverId] }),
 			queryClient.invalidateQueries({ queryKey: actionLogBaseKey(serverId) }),
 			queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', serverId] }),
 			queryClient.invalidateQueries({ queryKey: ['servers', 'allocations', serverId] }),
 		])
+	}
+
+	function mergeAddonSpecs(
+		currentAddons: Archon.Content.v1.Addon[],
+		incomingAddons: Archon.Content.v1.Addon[],
+	): Archon.Content.v1.Addon[] {
+		const currentByFilename = new Map(
+			currentAddons.map((addon) => [normalizeAddonFilename(addon.filename), addon] as const),
+		)
+
+		return incomingAddons.map((incoming) =>
+			mergeAddonSpec(currentByFilename.get(normalizeAddonFilename(incoming.filename)), incoming),
+		)
+	}
+
+	function mergeAddonSpec(
+		current: Archon.Content.v1.Addon | undefined,
+		incoming: Archon.Content.v1.Addon,
+	): Archon.Content.v1.Addon {
+		if (!current) return incoming
+
+		return {
+			...current,
+			...incoming,
+			filesize: incoming.filesize || current.filesize,
+			name: incoming.name ?? current.name,
+			owner: incoming.owner ?? current.owner,
+			icon_url: incoming.icon_url ?? current.icon_url,
+			has_update: incoming.has_update ?? current.has_update,
+			project_id: incoming.project_id ?? current.project_id,
+			version: incoming.version
+				? {
+						...incoming.version,
+						name: incoming.version.name ?? current.version?.name ?? null,
+						environment: incoming.version.environment ?? current.version?.environment ?? null,
+					}
+				: current.version,
+		}
+	}
+
+	function normalizeAddonFilename(filename: string): string {
+		return filename.endsWith('.disabled') ? filename.slice(0, -'.disabled'.length) : filename
 	}
 
 	onMounted(() => {

@@ -139,6 +139,7 @@ const type = computed(() => {
 })
 
 const queryKey = computed(() => ['content', 'list', 'v1', serverId])
+const modpackContentQueryKey = computed(() => ['content', 'list', 'v1', serverId, 'modpack'])
 
 function getContentOwnerAvatarUrl(owner: ContentOwnerAvatarSource) {
 	const ownerId = owner.type === 'user' ? owner.name || owner.id : owner.id
@@ -150,6 +151,17 @@ const contentQuery = useQuery({
 	queryFn: () =>
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
+	staleTime: 0,
+})
+
+const isModpackContentModalOpen = ref(false)
+const modpackContentQuery = useQuery({
+	queryKey: modpackContentQueryKey,
+	queryFn: () =>
+		client.archon.content_v1.getAddons(serverId, worldId.value!, {
+			from_modpack: true,
+		}),
+	enabled: computed(() => isModpackContentModalOpen.value && worldId.value !== null),
 	staleTime: 0,
 })
 
@@ -795,6 +807,15 @@ const updatingProject = ref<ContentItem | null>(null)
 const updatingModpack = ref(false)
 const loadingChangelog = ref(false)
 
+watch(
+	() => modpackContentQuery.data.value?.addons,
+	(addons) => {
+		if (!isModpackContentModalOpen.value || !addons) return
+		modpackAddons.value = addons
+		modpackContentModal.value?.setItems(addons.map(addonToContentItem))
+	},
+)
+
 const updatingProjectId = computed(() => updatingProject.value?.project?.id ?? null)
 
 const projectVersionsQuery = useQuery({
@@ -913,15 +934,16 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 }
 
 async function handleViewModpackContent() {
+	isModpackContentModalOpen.value = true
 	modpackContentModal.value?.showLoading()
 	try {
-		const data = await client.archon.content_v1.getAddons(serverId, worldId.value!, {
-			from_modpack: true,
-		})
+		const { data } = await modpackContentQuery.refetch()
+		if (!data) throw new Error('Failed to load modpack content')
 		modpackAddons.value = data.addons ?? []
 		const items = (data.addons ?? []).map(addonToContentItem)
 		modpackContentModal.value?.show(items)
 	} catch (err) {
+		isModpackContentModalOpen.value = false
 		modpackContentModal.value?.hide()
 		addNotification({
 			type: 'error',
@@ -940,6 +962,18 @@ async function handleModpackContentToggle(item: ContentItem) {
 		await toggleMutation.mutateAsync({ addon })
 		modpackAddons.value = modpackAddons.value.map((a) =>
 			a.filename === addon.filename ? { ...a, disabled: !addon.disabled } : a,
+		)
+		queryClient.setQueryData(
+			modpackContentQueryKey.value,
+			(oldData: Archon.Content.v1.Addons | undefined) =>
+				oldData
+					? {
+							...oldData,
+							addons: (oldData.addons ?? []).map((a) =>
+								a.filename === addon.filename ? { ...a, disabled: !addon.disabled } : a,
+							),
+						}
+					: oldData,
 		)
 		modpackContentModal.value?.updateItem(item.file_name, {
 			enabled: !item.enabled,
@@ -969,6 +1003,20 @@ async function handleModpackBulkToggle(items: ContentItem[], enable: boolean) {
 		} else {
 			await client.archon.content_v1.disableAddons(serverId, worldId.value!, requests)
 		}
+		queryClient.setQueryData(
+			modpackContentQueryKey.value,
+			(oldData: Archon.Content.v1.Addons | undefined) =>
+				oldData
+					? {
+							...oldData,
+							addons: (oldData.addons ?? []).map((addon) =>
+								items.some((item) => item.file_name === addon.filename)
+									? { ...addon, disabled: !enable }
+									: addon,
+							),
+						}
+					: oldData,
+		)
 		await queryClient.invalidateQueries({ queryKey: queryKey.value })
 	} catch (err) {
 		for (const item of items) {
@@ -1292,6 +1340,7 @@ provideContentManager({
 					@update:enabled="handleModpackContentToggle"
 					@bulk:enable="handleModpackBulkToggle($event, true)"
 					@bulk:disable="handleModpackBulkToggle($event, false)"
+					@hide="isModpackContentModalOpen = false"
 				/>
 				<ContentUpdaterModal
 					v-if="updatingProject || updatingModpack"

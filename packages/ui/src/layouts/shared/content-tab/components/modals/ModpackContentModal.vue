@@ -56,6 +56,7 @@ const emit = defineEmits<{
 	'update:enabled': [item: ContentItem, value: boolean]
 	'bulk:enable': [items: ContentItem[]]
 	'bulk:disable': [items: ContentItem[]]
+	hide: []
 }>()
 
 const messages = defineMessages({
@@ -331,6 +332,10 @@ function hide() {
 	modal.value?.hide()
 }
 
+function handleHide() {
+	emit('hide')
+}
+
 function getState(): ModpackContentModalState | null {
 	if (!items.value.length) return null
 	return {
@@ -388,6 +393,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 		ref="modal"
 		:max-width="'min(928px, calc(95vw - 10rem))'"
 		:width="'min(928px, calc(95vw - 10rem))'"
+		:on-hide="handleHide"
 		no-padding
 	>
 		<template #title>
