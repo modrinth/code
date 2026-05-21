@@ -5,14 +5,10 @@ import type { RequestOptions } from '../types/request'
 
 export type SyncEventType = Archon.Sync.v1.SyncEvent['type']
 
-export type SyncEventOfType<E extends SyncEventType> =
-	Archon.Sync.v1.SyncEvent extends infer Event
-		? Event extends { type: infer Type }
-			? E extends Type
-				? Event & { type: E }
-				: never
-			: never
-		: never
+export type SyncEventOfType<E extends SyncEventType> = Extract<
+	Archon.Sync.v1.SyncEvent,
+	{ type: E }
+>
 
 export type SyncEventHandler<E extends Archon.Sync.v1.SyncEvent = Archon.Sync.v1.SyncEvent> = (
 	event: E,

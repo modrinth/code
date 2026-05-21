@@ -40,7 +40,7 @@ export class SseParser {
 		const items: ParsedSseItem[] = []
 
 		if (this.buffer.length > 0) {
-			this.processLine(this.buffer, items)
+			this.processLine(this.buffer.endsWith('\r') ? this.buffer.slice(0, -1) : this.buffer, items)
 			this.buffer = ''
 		}
 

@@ -395,6 +395,7 @@ import {
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
+import { useServerPanelSync } from '#ui/composables/server-panel-sync'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
@@ -565,6 +566,11 @@ const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQue
 	computed(() => props.serverId),
 	worldId,
 )
+
+const { disconnect: disconnectPanelSync } = useServerPanelSync({
+	serverId: computed(() => props.serverId),
+	worldId,
+})
 
 const { image: serverImage } = useServerImage(
 	props.serverId,
@@ -1384,6 +1390,7 @@ const cleanup = () => {
 	saveWsStateToCache()
 
 	cleanupCoreRuntime(props.serverId)
+	disconnectPanelSync()
 
 	isReconnecting.value = false
 	isLoading.value = true
