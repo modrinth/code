@@ -71,8 +71,8 @@ pub struct FetchedProject {
     pub project: Project,
     /// Who owns the project.
     pub ownership: Ownership,
-    /// Whether any version has external file dependencies.
-    pub has_external_dependencies: bool,
+    /// How many external file dependencies the project has.
+    pub external_dependencies_count: i64,
 }
 
 /// Fetched information on who owns a project.
@@ -199,18 +199,18 @@ pub async fn get_projects_internal(
         r#"
         SELECT
             id,
-            has_external_dependencies as "has_external_dependencies!"
+            external_dependencies_count as "external_dependencies_count!"
         FROM (
             SELECT DISTINCT ON (m.id)
                 m.id,
                 m.queued,
-                EXISTS(
-                    SELECT 1
+                (
+                    SELECT COUNT(*)
                     FROM versions v
                     INNER JOIN dependencies d ON d.dependent_id = v.id
                     WHERE v.mod_id = m.id
                         AND d.dependency_file_name IS NOT NULL
-                ) has_external_dependencies
+                ) external_dependencies_count
             FROM mods m
 
             /* -- Temporarily, don't exclude projects in tech rev q
@@ -227,7 +227,7 @@ pub async fn get_projects_internal(
             GROUP BY m.id
         ) t
         WHERE
-            ($4::boolean IS NULL OR has_external_dependencies = $4)
+            ($4::boolean IS NULL OR (external_dependencies_count > 0) = $4)
         ORDER BY queued ASC
         OFFSET $3
         LIMIT $2
@@ -251,7 +251,7 @@ pub async fn get_projects_internal(
         .map(|m| {
             (
                 database::models::DBProjectId(m.id),
-                m.has_external_dependencies,
+                m.external_dependencies_count,
             )
         })
         .collect::<HashMap<_, _>>();
@@ -270,7 +270,7 @@ pub async fn get_projects_internal(
 
     let map_project =
         |(project, ownership): (Project, Ownership)| -> FetchedProject {
-            let has_external_dependencies = project_metadata
+            let external_dependencies_count = project_metadata
                 .get(&database::models::DBProjectId(project.id.0 as i64))
                 .copied()
                 .unwrap_or_default();
@@ -278,7 +278,7 @@ pub async fn get_projects_internal(
             FetchedProject {
                 ownership,
                 project,
-                has_external_dependencies,
+                external_dependencies_count,
             }
         };
 
