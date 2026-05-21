@@ -20,8 +20,13 @@ const PROJECT_TYPES = [
 export default defineNuxtRouteMiddleware(async (to) => {
 	// Only run this middleware on the server - it relies on server-only runtime config
 	if (import.meta.client) return
+
+	const routeProjectParam = to.params.project ?? to.params.id
+	const projectId = Array.isArray(routeProjectParam) ? routeProjectParam[0] : routeProjectParam
+	const routeType = Array.isArray(to.params.type) ? to.params.type[0] : to.params.type
+
 	// Only handle project routes
-	if (!to.params.id || !PROJECT_TYPES.includes(to.params.type as string)) {
+	if (!projectId || !routeType || !PROJECT_TYPES.includes(routeType)) {
 		return
 	}
 
@@ -29,7 +34,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const authToken = useCookie('auth-token')
 	const client = useServerModrinthClient({ authToken: authToken.value || undefined })
 	const tags = useGeneratedState()
-	const projectId = to.params.id as string
 
 	try {
 		// Fetch v2 and v3 in parallel — cache both for the page's useQuery calls
