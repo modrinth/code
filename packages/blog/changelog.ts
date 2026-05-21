@@ -12,7 +12,7 @@ export type VersionEntry = {
 const VERSIONS: VersionEntry[] = [
 	{
 		date: `2026-05-21T22:13:35+00:00`,
-		product: 'website',
+		product: 'web',
 		body: `## Fixed
 - Fixed project embeds not loading in correctly.`,
 	},
