@@ -84,9 +84,13 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 
 		const start = Math.floor(relativeScrollTop / itemHeight)
 		const visibleCount = Math.ceil(viewportHeight.value / itemHeight)
+		const rangeSize = visibleCount + bufferSize * 2
 
-		const rangeStart = Math.max(0, start - bufferSize)
-		const rangeEnd = Math.min(items.value.length, start + visibleCount + bufferSize * 2)
+		const rangeStart = Math.min(
+			Math.max(0, start - bufferSize),
+			Math.max(0, items.value.length - rangeSize),
+		)
+		const rangeEnd = Math.min(items.value.length, rangeStart + rangeSize)
 
 		return {
 			start: rangeStart,
