@@ -3,6 +3,7 @@
 		v-model="selectedFilterValue"
 		:categories="filterCategories"
 		:show-clear="canClearSelectedBreakdown"
+		clear-label="Reset"
 		@clear="clearFilterBar"
 	>
 		<template #search-actions="{ category, setSelectedValues }">

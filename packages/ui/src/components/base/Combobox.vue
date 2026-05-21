@@ -53,7 +53,7 @@
 				{
 					'z-[9999]': isOpen,
 					'cursor-not-allowed opacity-50': disabled,
-					'cursor-pointer hover:brightness-110 active:brightness-110': !disabled,
+					'cursor-pointer hover:brightness-[115%] active:brightness-[115%]': !disabled,
 				},
 			]"
 			:aria-expanded="isOpen"
@@ -398,7 +398,7 @@ function getOptionClasses(item: ComboboxOption<T> & { key: string }, _index: num
 	return [
 		item.class,
 		{
-			'bg-surface-4 text-contrast hover:brightness-110 focus:brightness-110': !isSelected,
+			'bg-surface-4 text-contrast hover:brightness-[115%] focus:brightness-[115%]': !isSelected,
 			'bg-highlight-green text-green !cursor-default hover:bg-highlight-green focus:bg-highlight-green':
 				isSelected,
 			'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,

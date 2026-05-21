@@ -2,12 +2,14 @@
 	<div
 		v-show="visible"
 		ref="tooltipElement"
-		class="analytics-chart-tooltip absolute left-0 top-0 z-10 max-h-[360px] min-w-[14rem] overflow-y-auto overscroll-contain rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-2 text-sm shadow-lg"
+		class="analytics-chart-tooltip absolute left-0 top-0 z-10 max-h-[360px] min-w-[14rem] overflow-y-auto overscroll-contain rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-lg"
 		:class="pinned ? '' : 'pointer-events-none'"
 		:style="positionStyle"
 		@click.stop
 	>
-		<div class="mb-1 flex items-center justify-between gap-2 font-medium text-contrast">
+		<div
+			class="mb-1.5 flex items-center justify-between gap-2 border-0 border-b border-solid border-surface-5 px-3 pb-1.5 font-medium text-contrast"
+		>
 			<span>
 				{{ rangeLabel }}
 				<span v-if="durationLabel" class="text-xs font-normal text-secondary">
@@ -21,11 +23,11 @@
 				aria-label="Pinned"
 			/>
 		</div>
-		<div v-if="!ratioMode" class="mb-1.5 flex items-center justify-between gap-4">
+		<div v-if="!ratioMode" class="mb-1.5 flex items-center justify-between gap-4 px-3">
 			<span class="font-medium text-primary">Total</span>
 			<span class="font-semibold text-contrast">{{ formattedTotal }}</span>
 		</div>
-		<div class="flex flex-col gap-1">
+		<div class="flex flex-col gap-1 px-3">
 			<div
 				v-for="entry in entries"
 				:key="entry.projectId"

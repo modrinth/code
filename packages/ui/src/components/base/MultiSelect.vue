@@ -39,7 +39,7 @@
 					<span
 						v-for="tag in visibleTags"
 						:key="String(tag.value)"
-						class="inline-flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary transition-all hover:brightness-110"
+						class="inline-flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary transition-all hover:brightness-[115%]"
 						@click.stop="removeTag(tag.value)"
 					>
 						{{ tag.label }}
@@ -63,7 +63,7 @@
 								<span
 									v-for="tag in overflowTags"
 									:key="String(tag.value)"
-									class="inline-flex cursor-pointer items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary hover:brightness-110"
+									class="inline-flex cursor-pointer items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary hover:brightness-[115%]"
 									@click.stop="removeTag(tag.value)"
 								>
 									{{ tag.label }}
@@ -140,8 +140,8 @@
 						>
 							<div v-if="shouldShowSelectAll" class="sticky top-0 z-10 bg-surface-4">
 								<span
-									class="flex w-full items-center gap-2.5 cursor-pointer p-3 text-left transition-all duration-150 text-contrast hover:brightness-110"
-									:class="{ 'brightness-110': focusedIndex === -2 }"
+									class="flex w-full items-center gap-2.5 cursor-pointer p-3 text-left transition-all duration-150 text-contrast hover:brightness-[115%]"
+									:class="{ 'brightness-[115%]': focusedIndex === -2 }"
 									data-option-index="-2"
 									:data-focused="focusedIndex === -2"
 									role="option"
@@ -258,12 +258,12 @@
 											:aria-disabled="item.disabled || undefined"
 											:data-option-index="index"
 											:data-focused="focusedIndex === index"
-											class="flex w-full cursor-pointer items-center gap-2.5 p-3 py-3.5 outline-none focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4 hover:brightness-110 focus:brightness-110"
+											class="flex w-full cursor-pointer items-center gap-2.5 p-3 py-3.5 outline-none focus-visible:outline-none text-left text-contrast transition-all duration-150 bg-surface-4 hover:brightness-[115%] focus:brightness-[115%]"
 											:class="[
 												item.class,
 												shouldVirtualizeOptions ? 'h-12' : undefined,
 												{
-													'brightness-110': item.selected,
+													'brightness-[115%]': item.selected,
 													'pointer-events-none cursor-not-allowed opacity-50': item.disabled,
 												},
 											]"

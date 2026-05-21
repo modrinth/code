@@ -1,9 +1,6 @@
 <template>
-	<div class="px-3 py-2">
-		<div
-			class="flex items-center gap-2.5 rounded-xl py-0.5 transition-colors"
-			:class="active ? 'bg-highlight-green' : ''"
-		>
+	<div class="px-3 py-2" :class="active ? 'bg-highlight-green' : ''">
+		<div class="flex items-center gap-2.5 py-0.5 transition-colors">
 			<span class="shrink-0 text-sm font-semibold" :class="active ? 'text-green' : 'text-primary'">
 				In the last
 			</span>

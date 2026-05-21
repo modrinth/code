@@ -2104,7 +2104,8 @@ export function createAnalyticsDashboardContext(
 			return timeSliceGroups.flat()
 		},
 		enabled: computed(
-			() => analyticsFilterOptionsRequests.value !== null && hasCompletedCurrentTimeSliceFetch.value,
+			() =>
+				analyticsFilterOptionsRequests.value !== null && hasCompletedCurrentTimeSliceFetch.value,
 		),
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 	})

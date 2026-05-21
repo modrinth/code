@@ -69,7 +69,11 @@
 								loading="lazy"
 								decoding="async"
 							/>
-							<BoxIcon v-else class="h-5 w-5 shrink-0 text-primary" />
+							<BoxIcon
+								v-else
+								class="h-5 w-5 shrink-0 text-primary"
+								:class="selected ? 'text-contrast' : 'text-primary'"
+							/>
 							<span
 								v-tooltip="item.label"
 								class="min-w-0 truncate font-semibold leading-tight"
@@ -83,16 +87,19 @@
 						<div>
 							<button
 								type="button"
-								class="flex w-full cursor-pointer items-center gap-2.5 border-0 bg-surface-4 p-3 py-3.5 text-left text-contrast shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110"
+								class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-4 p-3 py-3.5 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
 								:aria-selected="isAllProjectsOptionSelected"
+								:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 								role="option"
 								@click="selectAllProjectsMode"
 								@keydown.enter.stop
 								@keydown.space.stop
 							>
-								<span class="min-w-0 flex-1 font-semibold leading-tight text-primary">
-									All projects
-								</span>
+								<LayersIcon
+									class="h-5 w-5 shrink-0 text-primary"
+									:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
+								/>
+								<span class="min-w-0 flex-1 font-semibold leading-tight"> All projects </span>
 								<span class="flex shrink-0 items-center justify-center text-brand">
 									<CheckIcon v-if="isAllProjectsOptionSelected" aria-hidden="true" class="size-5" />
 								</span>
@@ -198,6 +205,7 @@ import {
 	CheckIcon,
 	ChevronLeftIcon,
 	FolderOpenIcon,
+	LayersIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
