@@ -48,6 +48,16 @@
 							<span class="text-sm text-secondary">Requesting</span>
 							<Badge :type="queueEntry.project.requested_status" class="text-sm" />
 						</div>
+						<div
+							v-if="showExternalDependencies"
+							v-tooltip="'External dependencies'"
+							class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+						>
+							<FileIcon aria-hidden="true" class="size-4 text-secondary" />
+							<span class="text-sm font-medium text-secondary">
+								{{ queueEntry.external_dependencies_count }}
+							</span>
+						</div>
 					</div>
 					<div v-if="queueEntry.ownership?.kind === 'user'">
 						<NuxtLink
@@ -119,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, LinkIcon, ScaleIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, LinkIcon, FileIcon, ScaleIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Badge,
@@ -151,6 +161,7 @@ const formatDateTimeFull = useFormatDateTime({
 
 const props = defineProps<{
 	queueEntry: ModerationProject
+	showExternalDependencies?: boolean
 }>()
 
 const emit = defineEmits<{
