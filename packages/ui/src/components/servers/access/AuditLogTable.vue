@@ -1,6 +1,8 @@
 <template>
 	<div class="@container flex flex-col gap-4">
-		<div class="flex min-w-0 flex-col items-start gap-3 @[640px]:flex-row @[640px]:items-center">
+		<div
+			class="flex min-w-0 flex-col items-start gap-3 @[640px]:flex-row @[640px]:items-center"
+		>
 			<TimeFramePicker
 				v-model:mode="timeframeMode"
 				v-model:preset="timeframePreset"
@@ -12,7 +14,7 @@
 				:trigger-class="timeframePickerTriggerClass"
 			/>
 			<template v-if="slots.filters">
-				<div class="hidden h-8 w-[1px] shrink-0 bg-surface-5 @[640px]:ml-4 @[640px]:block"></div>
+				<div class="hidden h-8 w-[1px] shrink-0 bg-surface-5 @[640px]:ml-1 @[640px]:block"></div>
 				<div class="flex min-w-0 flex-wrap items-center gap-2">
 					<slot name="filters"></slot>
 				</div>
