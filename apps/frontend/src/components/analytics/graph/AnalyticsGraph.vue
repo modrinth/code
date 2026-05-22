@@ -57,6 +57,12 @@
 						>
 						<Toggle id="ratio-mode-toggle" v-model="isRatioMode" small />
 					</div>
+					<div v-if="canShowPreviousPeriodToggle" class="inline-flex items-center gap-2">
+						<label for="previous-period-toggle" class="cursor-pointer text-sm text-secondary"
+							>Prev. period</label
+						>
+						<Toggle id="previous-period-toggle" v-model="showPreviousPeriod" small />
+					</div>
 					<div v-if="hasChartEvents" class="inline-flex items-center gap-2">
 						<label for="events-toggle" class="cursor-pointer text-sm text-secondary">Events</label>
 						<Toggle id="events-toggle" v-model="showChartEvents" small />
@@ -116,7 +122,18 @@
 							@blur="clearHoveredLegendEntryId(legendEntry.id)"
 							@click="onLegendEntryClick($event, legendEntry.id)"
 						>
-							<span class="size-2 rounded-full" :style="{ backgroundColor: legendEntry.color }" />
+							<span
+								:class="
+									legendEntry.isPreviousPeriod
+										? 'h-0 w-2 rounded-none border-0 border-t-2 border-dashed bg-transparent'
+										: 'size-2 rounded-full'
+								"
+								:style="
+									legendEntry.isPreviousPeriod
+										? { borderColor: legendEntry.color }
+										: { backgroundColor: legendEntry.color }
+								"
+							/>
 							<span
 								:class="{
 									'line-through': legendEntry.hidden,
@@ -340,9 +357,11 @@ const {
 	activeGraphViewMode,
 	isRatioMode,
 	showChartEvents,
+	showPreviousPeriod,
 	hiddenGraphDatasetIds,
 	isGraphDatasetSelectionActive,
 	selectedGraphDatasetIds,
+	hasPreviousPeriodComparison,
 	hasProjectContext,
 	selectedTimeframeMode,
 	selectedCustomTimeframeStartDate,
@@ -352,6 +371,7 @@ const {
 	projects,
 	displayedFetchRequest: fetchRequest,
 	displayedTimeSlices: timeSlices,
+	displayedPreviousTimeSlices: previousTimeSlices,
 	displayedSelectedGroupBy: selectedGroupBy,
 	displayedSelectedBreakdown: selectedBreakdown,
 	displayedSelectedFilters: selectedFilters,
@@ -391,6 +411,8 @@ const dashboardStats: readonly AnalyticsDashboardStat[] = [
 	'playtime',
 ]
 const GRAPH_RENDER_DATASET_LIMIT = 250
+const PREVIOUS_PERIOD_DATASET_ID_PREFIX = 'previous-period:'
+const PREVIOUS_PERIOD_BORDER_DASH = [6, 4]
 
 const localAnalyticsChartEvents = computed(() => analyticsEvents.value ?? [])
 const hasChartEvents = computed(() => localAnalyticsChartEvents.value.length > 0)
@@ -534,7 +556,7 @@ const tableSelectionSubheading = computed(() => {
 		return `Showing top ${tableProjectCount.value} ${tableBreakdownItemLabel.value} from table`
 	}
 
-	return `Showing ${tableProjectCount.value} from table`
+	return `Showing ${tableProjectCount.value} ${tableBreakdownItemLabel.value} from table`
 })
 const shouldCapitalizeDatasetLabels = computed(
 	() =>
@@ -546,6 +568,12 @@ const shouldCapitalizeDatasetLabels = computed(
 
 const chartType = computed<'line' | 'bar'>(() =>
 	activeGraphViewMode.value === 'bar' ? 'bar' : 'line',
+)
+const canShowPreviousPeriodToggle = computed(
+	() => activeGraphViewMode.value === 'line' && hasPreviousPeriodComparison.value,
+)
+const shouldShowPreviousPeriod = computed(
+	() => canShowPreviousPeriodToggle.value && showPreviousPeriod.value,
 )
 const canUseRatioMode = computed(
 	() =>
@@ -608,7 +636,36 @@ const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset
 
 	return datasetsByStat
 })
+const previousChartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset[]>>(() => {
+	const datasetsByStat = {} as Record<AnalyticsDashboardStat, ChartDataset[]>
+	const nextTimeSlices = previousTimeSlices.value
+	const nextSelectedProjects = selectedProjects.value
+	const nextPalette = legendPalette.value
+	const nextSelectedBreakdown = selectedBreakdown.value
+	const nextSelectedFilters = selectedFilters.value
+	const nextGetVersionProjectName = showProjectVersionNames.value
+		? getVersionProjectName
+		: undefined
+	const nextSliceCount = sliceCount.value
+
+	for (const stat of dashboardStats) {
+		datasetsByStat[stat] = buildChartDatasets(
+			nextTimeSlices,
+			nextSelectedProjects,
+			stat,
+			nextPalette,
+			nextSelectedBreakdown,
+			nextSelectedFilters,
+			getVersionDisplayName,
+			nextGetVersionProjectName,
+			nextSliceCount,
+		)
+	}
+
+	return datasetsByStat
+})
 const allChartDatasets = computed(() => chartDatasetsByStat.value[activeStat.value])
+const previousChartDatasets = computed(() => previousChartDatasetsByStat.value[activeStat.value])
 const selectedGraphDatasetIdSet = computed(() => new Set(selectedGraphDatasetIds.value))
 const showAllSelectedGraphDatasets = ref(false)
 const selectedChartDatasets = computed(() => {
@@ -723,6 +780,13 @@ const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
 const promotedCollapsedLegendEntryIdSet = computed(
 	() => new Set(promotedCollapsedLegendEntryIds.value),
 )
+const previousChartDatasetByOriginalId = computed(() => {
+	const datasets = new Map<string, ChartDataset>()
+	for (const dataset of previousChartDatasets.value) {
+		datasets.set(dataset.projectId, dataset)
+	}
+	return datasets
+})
 
 const LEGEND_MAX_ITEMS = 8
 
@@ -733,10 +797,15 @@ type LegendEntry = {
 	color: string
 	totalValue: number
 	hidden: boolean
+	isPreviousPeriod?: boolean
 }
 
 function getChartDatasetTotal(dataset: ChartDataset) {
 	return dataset.data.reduce((sum, value) => sum + value, 0)
+}
+
+function getPreviousPeriodDatasetId(datasetId: string) {
+	return `${PREVIOUS_PERIOD_DATASET_ID_PREFIX}${datasetId}`
 }
 
 function setHoverState(payload: HoverState) {
@@ -884,7 +953,7 @@ const showPinnedGuide = computed(
 		hoverState.sliceIndex !== null,
 )
 
-const legendEntries = computed<LegendEntry[]>(() =>
+const currentLegendEntries = computed<LegendEntry[]>(() =>
 	selectableChartDatasets.value
 		.map((dataset) => {
 			const totalValue = dataset.data.reduce((sum, value) => sum + value, 0)
@@ -900,6 +969,27 @@ const legendEntries = computed<LegendEntry[]>(() =>
 		})
 		.sort((a, b) => b.totalValue - a.totalValue || a.name.localeCompare(b.name)),
 )
+
+const legendEntries = computed<LegendEntry[]>(() => {
+	if (!shouldShowPreviousPeriod.value) {
+		return currentLegendEntries.value
+	}
+
+	return currentLegendEntries.value.flatMap((entry) => {
+		const previousDataset = previousChartDatasetByOriginalId.value.get(entry.id)
+		const previousEntry: LegendEntry = {
+			id: getPreviousPeriodDatasetId(entry.id),
+			name: `${entry.name} (Prev.)`,
+			projectName: entry.projectName,
+			color: entry.color,
+			totalValue: previousDataset ? getChartDatasetTotal(previousDataset) : 0,
+			hidden: hiddenDatasetIds.value.has(getPreviousPeriodDatasetId(entry.id)),
+			isPreviousPeriod: true,
+		}
+
+		return [entry, previousEntry]
+	})
+})
 
 const canToggleLegendExpansion = computed(() => legendEntries.value.length > LEGEND_MAX_ITEMS)
 
@@ -976,6 +1066,25 @@ const chartDatasetById = computed(() => {
 	const datasets = new Map<string, ChartDataset>()
 	for (const dataset of selectableChartDatasets.value) {
 		datasets.set(dataset.projectId, dataset)
+
+		if (!shouldShowPreviousPeriod.value) {
+			continue
+		}
+
+		const previousDataset = previousChartDatasetByOriginalId.value.get(dataset.projectId)
+		const previousData = Array.from(
+			{ length: dataset.data.length },
+			(_, index) => previousDataset?.data[index] ?? 0,
+		)
+		datasets.set(getPreviousPeriodDatasetId(dataset.projectId), {
+			projectId: getPreviousPeriodDatasetId(dataset.projectId),
+			label: `${dataset.label} (Prev.)`,
+			projectName: dataset.projectName,
+			data: previousData,
+			borderColor: dataset.borderColor,
+			backgroundColor: dataset.backgroundColor,
+			borderDash: PREVIOUS_PERIOD_BORDER_DASH,
+		})
 	}
 	return datasets
 })
@@ -1168,7 +1277,7 @@ watch(
 	([datasets]) => {
 		if (datasets.length === 0) return
 
-		const availableDatasetIds = new Set(datasets.map((dataset) => dataset.projectId))
+		const availableDatasetIds = new Set(legendEntries.value.map((entry) => entry.id))
 
 		const nextHiddenDatasetIds = hiddenGraphDatasetIds.value.filter((datasetId) =>
 			availableDatasetIds.has(datasetId),
@@ -1225,7 +1334,7 @@ const hoverTotalValue = computed(() => {
 	const sliceIndex = hoverState.sliceIndex
 	if (isRatioMode.value) return hoverRatioSliceTotals.value[sliceIndex] ?? 0
 
-	return legendEntries.value.reduce((sum, legendEntry) => {
+	return currentLegendEntries.value.reduce((sum, legendEntry) => {
 		if (legendEntry.hidden) return sum
 		const dataset = chartDatasetById.value.get(legendEntry.id)
 		return sum + (dataset?.data[sliceIndex] ?? 0)
@@ -1258,6 +1367,7 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 				: formatMetricValue(value, activeStat.value, formatNumber),
 			hidden: legendEntry.hidden,
 			toggleDisabled: !legendEntry.hidden && isLegendEntryToggleDisabled(legendEntry),
+			isPreviousPeriod: legendEntry.isPreviousPeriod,
 		}
 	})
 })

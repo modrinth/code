@@ -50,7 +50,18 @@
 					@blur="emit('entry-hover-clear', entry.projectId)"
 					@click="onEntryClick($event, entry)"
 				>
-					<span class="size-2 rounded-full" :style="{ backgroundColor: entry.color }" />
+					<span
+						:class="
+							entry.isPreviousPeriod
+								? 'h-0 w-2 rounded-none border-0 border-t-2 border-dashed bg-transparent'
+								: 'size-2 rounded-full'
+						"
+						:style="
+							entry.isPreviousPeriod
+								? { borderColor: entry.color }
+								: { backgroundColor: entry.color }
+						"
+					/>
 					<span
 						v-tooltip="entry.projectName ?? ''"
 						:class="{
@@ -83,6 +94,7 @@ export type AnalyticsChartTooltipEntry = {
 	formattedValue: string
 	hidden: boolean
 	toggleDisabled: boolean
+	isPreviousPeriod?: boolean
 }
 
 const props = defineProps<{

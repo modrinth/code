@@ -61,6 +61,7 @@ export type AnalyticsGraphState = {
 	activeGraphViewMode: AnalyticsGraphViewMode
 	isRatioMode: boolean
 	showChartEvents: boolean
+	showPreviousPeriod: boolean
 	hiddenGraphDatasetIds: string[]
 }
 
@@ -76,6 +77,7 @@ export const DEFAULT_ANALYTICS_DASHBOARD_STAT: AnalyticsDashboardStat = 'views'
 export const DEFAULT_ANALYTICS_GRAPH_VIEW_MODE: AnalyticsGraphViewMode = 'line'
 export const DEFAULT_ANALYTICS_GRAPH_RATIO_MODE = false
 export const DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY = true
+export const DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY = false
 
 const TIMEFRAME_PRESET_VALUES: AnalyticsTimeframePreset[] = [
 	'today',
@@ -165,6 +167,7 @@ const QUERY_KEY_STAT = 'a_stat'
 const QUERY_KEY_GRAPH_VIEW_MODE = 'a_chart'
 const QUERY_KEY_GRAPH_RATIO_MODE = 'a_ratio'
 const QUERY_KEY_GRAPH_EVENTS_VISIBILITY = 'a_events'
+const QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY = 'a_prev_period'
 const QUERY_KEY_GRAPH_HIDDEN_SERIES = 'a_hidden_series'
 const QUERY_KEY_LEGACY_GRAPH_TOP_BREAKDOWN_FILTER = 'a_top_breakdown'
 const QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION = 'a_legend_expanded'
@@ -217,6 +220,7 @@ const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_GRAPH_VIEW_MODE,
 	QUERY_KEY_GRAPH_RATIO_MODE,
 	QUERY_KEY_GRAPH_EVENTS_VISIBILITY,
+	QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY,
 	QUERY_KEY_GRAPH_HIDDEN_SERIES,
 	QUERY_KEY_LEGACY_GRAPH_TOP_BREAKDOWN_FILTER,
 	QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION,
@@ -388,6 +392,7 @@ export function buildDefaultAnalyticsGraphState(): AnalyticsGraphState {
 		activeGraphViewMode: DEFAULT_ANALYTICS_GRAPH_VIEW_MODE,
 		isRatioMode: DEFAULT_ANALYTICS_GRAPH_RATIO_MODE,
 		showChartEvents: DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY,
+		showPreviousPeriod: DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY,
 		hiddenGraphDatasetIds: [],
 	}
 }
@@ -462,6 +467,7 @@ export function isAnalyticsGraphStateDefault(state: AnalyticsGraphState): boolea
 		state.activeGraphViewMode === defaultState.activeGraphViewMode &&
 		state.isRatioMode === defaultState.isRatioMode &&
 		state.showChartEvents === defaultState.showChartEvents &&
+		state.showPreviousPeriod === defaultState.showPreviousPeriod &&
 		areStringArraysEqual(state.hiddenGraphDatasetIds, defaultState.hiddenGraphDatasetIds)
 	)
 }
@@ -558,6 +564,7 @@ export function readAnalyticsGraphState(query: LocationQuery): AnalyticsGraphSta
 		),
 		isRatioMode: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_RATIO_MODE]),
 		showChartEvents: parseVisibleQueryValue(query[QUERY_KEY_GRAPH_EVENTS_VISIBILITY]),
+		showPreviousPeriod: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY]),
 		hiddenGraphDatasetIds: parseListQueryValue(query[QUERY_KEY_GRAPH_HIDDEN_SERIES]),
 	}
 }
@@ -722,6 +729,9 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 				: undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_RATIO_MODE] = graphState.isRatioMode ? '1' : undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_EVENTS_VISIBILITY] = graphState.showChartEvents ? undefined : '0'
+		nextRouteQuery[QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY] = graphState.showPreviousPeriod
+			? '1'
+			: undefined
 		nextRouteQuery[QUERY_KEY_LEGACY_GRAPH_TOP_BREAKDOWN_FILTER] = undefined
 		nextRouteQuery[QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION] = undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_HIDDEN_SERIES] = serializeListQueryValue(

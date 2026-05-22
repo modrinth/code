@@ -19,6 +19,7 @@ export type ChartDataset = {
 	data: number[]
 	borderColor: string
 	backgroundColor: string
+	borderDash?: number[]
 }
 
 const LOADER_CHART_COLORS: Record<string, string> = {

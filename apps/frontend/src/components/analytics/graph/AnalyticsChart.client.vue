@@ -395,6 +395,7 @@ function buildDatasets() {
 			label: dataset.label,
 			data: dataset.data,
 			borderColor: colors.borderColor,
+			borderDash: dataset.borderDash,
 			borderWidth: 2,
 		}
 

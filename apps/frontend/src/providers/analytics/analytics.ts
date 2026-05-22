@@ -204,12 +204,14 @@ export interface AnalyticsDashboardContextValue {
 	timeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	displayedTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
+	displayedPreviousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	isLoading: ComputedRef<boolean>
 	isRefetching: ComputedRef<boolean>
 	activeStat: Ref<AnalyticsDashboardStat>
 	activeGraphViewMode: Ref<AnalyticsGraphViewMode>
 	isRatioMode: Ref<boolean>
 	showChartEvents: Ref<boolean>
+	showPreviousPeriod: Ref<boolean>
 	hiddenGraphDatasetIds: Ref<string[]>
 	isGraphDatasetSelectionActive: Ref<boolean>
 	selectedGraphDatasetIds: Ref<string[]>
@@ -1208,6 +1210,7 @@ export function createAnalyticsDashboardContext(
 	const activeGraphViewMode = ref<AnalyticsGraphViewMode>(initialGraphState.activeGraphViewMode)
 	const isRatioMode = ref(initialGraphState.isRatioMode)
 	const showChartEvents = ref(initialGraphState.showChartEvents)
+	const showPreviousPeriod = ref(initialGraphState.showPreviousPeriod)
 	const hiddenGraphDatasetIds = ref<string[]>(initialGraphState.hiddenGraphDatasetIds)
 	const isGraphDatasetSelectionActive = ref(false)
 	const selectedGraphDatasetIds = ref<string[]>([])
@@ -1597,6 +1600,7 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode: activeGraphViewMode.value,
 			isRatioMode: isRatioMode.value,
 			showChartEvents: showChartEvents.value,
+			showPreviousPeriod: showPreviousPeriod.value,
 			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
 		})
 
@@ -1682,6 +1686,7 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode: activeGraphViewMode.value,
 			isRatioMode: isRatioMode.value,
 			showChartEvents: showChartEvents.value,
+			showPreviousPeriod: showPreviousPeriod.value,
 			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
 		}
 	}
@@ -1867,6 +1872,8 @@ export function createAnalyticsDashboardContext(
 				activeGraphViewMode.value !== nextGraphState.activeGraphViewMode
 			const shouldUpdateIsRatioMode = isRatioMode.value !== nextGraphState.isRatioMode
 			const shouldUpdateShowChartEvents = showChartEvents.value !== nextGraphState.showChartEvents
+			const shouldUpdateShowPreviousPeriod =
+				showPreviousPeriod.value !== nextGraphState.showPreviousPeriod
 			const shouldUpdateHiddenGraphDatasetIds = !areStringArraysEqual(
 				hiddenGraphDatasetIds.value,
 				nextGraphState.hiddenGraphDatasetIds,
@@ -1886,6 +1893,7 @@ export function createAnalyticsDashboardContext(
 				shouldUpdateActiveGraphViewMode ||
 				shouldUpdateIsRatioMode ||
 				shouldUpdateShowChartEvents ||
+				shouldUpdateShowPreviousPeriod ||
 				shouldUpdateHiddenGraphDatasetIds
 
 			if (hasRouteStateUpdate) {
@@ -1934,6 +1942,9 @@ export function createAnalyticsDashboardContext(
 			if (shouldUpdateShowChartEvents) {
 				showChartEvents.value = nextGraphState.showChartEvents
 			}
+			if (shouldUpdateShowPreviousPeriod) {
+				showPreviousPeriod.value = nextGraphState.showPreviousPeriod
+			}
 			if (shouldUpdateHiddenGraphDatasetIds) {
 				hiddenGraphDatasetIds.value = nextGraphState.hiddenGraphDatasetIds
 			}
@@ -1973,7 +1984,14 @@ export function createAnalyticsDashboardContext(
 	)
 
 	watch(
-		[activeStat, activeGraphViewMode, isRatioMode, showChartEvents, hiddenGraphDatasetIds],
+		[
+			activeStat,
+			activeGraphViewMode,
+			isRatioMode,
+			showChartEvents,
+			showPreviousPeriod,
+			hiddenGraphDatasetIds,
+		],
 		() => {
 			syncAnalyticsRouteQuery('replace')
 		},
@@ -2240,6 +2258,7 @@ export function createAnalyticsDashboardContext(
 		cloneAnalyticsFilterOptions(filterOptions.value),
 	)
 	const displayedTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const displayedPreviousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 
 	function commitDisplayedAnalyticsState() {
 		displayedSelectedProjectIds.value = [...selectedProjectIds.value]
@@ -2249,6 +2268,7 @@ export function createAnalyticsDashboardContext(
 		displayedFetchRequest.value = cloneAnalyticsFetchRequest(fetchRequest.value)
 		displayedFilterOptions.value = cloneAnalyticsFilterOptions(filterOptions.value)
 		displayedTimeSlices.value = timeSlices.value
+		displayedPreviousTimeSlices.value = previousTimeSlices.value
 	}
 
 	watch(
@@ -2419,6 +2439,7 @@ export function createAnalyticsDashboardContext(
 		[
 			isLoading,
 			currentTimeSliceData,
+			previousTimeSliceData,
 			fetchRequest,
 			selectedProjectIds,
 			selectedGroupBy,
@@ -2489,6 +2510,7 @@ export function createAnalyticsDashboardContext(
 		activeGraphViewMode.value = defaultGraphState.activeGraphViewMode
 		isRatioMode.value = defaultGraphState.isRatioMode
 		showChartEvents.value = defaultGraphState.showChartEvents
+		showPreviousPeriod.value = defaultGraphState.showPreviousPeriod
 		hiddenGraphDatasetIds.value = defaultGraphState.hiddenGraphDatasetIds
 		isGraphDatasetSelectionActive.value = false
 		selectedGraphDatasetIds.value = []
@@ -2567,12 +2589,14 @@ export function createAnalyticsDashboardContext(
 		timeSlices,
 		displayedTimeSlices,
 		previousTimeSlices,
+		displayedPreviousTimeSlices,
 		isLoading,
 		isRefetching,
 		activeStat,
 		activeGraphViewMode,
 		isRatioMode,
 		showChartEvents,
+		showPreviousPeriod,
 		hiddenGraphDatasetIds,
 		isGraphDatasetSelectionActive,
 		selectedGraphDatasetIds,
