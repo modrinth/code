@@ -4301,6 +4301,87 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Apply"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Clear"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "Custom fixed date range..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "Decrease timeframe amount"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": "No date range selected."
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "Increase timeframe amount"
+  },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "In the last {amount} {unit, select, hours {{amount, plural, one {hour} other {hours}}} days {{amount, plural, one {day} other {days}}} weeks {{amount, plural, one {week} other {weeks}}} months {{amount, plural, one {month} other {months}}} other {days}}"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "In the last"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "All time"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Last 14 days"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Last 180 days"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Last 30 days"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Last 7 days"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Last 90 days"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Today"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": "Year to date"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Yesterday"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "Select timeframe"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "Selected"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "Selecting"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "Timeframe amount"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "Timeframe unit"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "days"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "hours"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "months"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "weeks"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "You have unsaved changes."
   },
