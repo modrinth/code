@@ -48,6 +48,26 @@ export const WithTime: Story = {
 	}),
 }
 
+export const Clearable: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-04-27')
+			return { value }
+		},
+		template: /* html */ `
+			<div class="flex max-w-sm flex-col gap-2">
+				<DatePicker
+					v-model="value"
+					wrapperClass="w-[300px]"
+					placeholder="Select a date..."
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const OpenWithTime: Story = {
 	render: () => ({
 		components: { DatePicker },

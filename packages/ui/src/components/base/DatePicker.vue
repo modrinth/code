@@ -32,13 +32,22 @@
 			:aria-hidden="calendarOnly ? 'true' : undefined"
 			type="text"
 		/>
+		<button
+			v-if="hasClearButton"
+			type="button"
+			class="absolute right-0.5 z-[1] cursor-pointer select-none border-none bg-transparent p-2 text-secondary transition-colors hover:text-contrast"
+			aria-label="Clear date"
+			@click.stop="clearValue"
+		>
+			<XIcon class="h-5 w-5" aria-hidden="true" />
+		</button>
 	</div>
 </template>
 
 <script setup lang="ts">
 import 'flatpickr/dist/flatpickr.css'
 
-import { CalendarIcon } from '@modrinth/assets'
+import { CalendarIcon, XIcon } from '@modrinth/assets'
 import chevronLeftIcon from '@modrinth/assets/icons/chevron-left.svg?raw'
 import chevronRightIcon from '@modrinth/assets/icons/chevron-right.svg?raw'
 import flatpickr from 'flatpickr'
@@ -944,19 +953,6 @@ const resolvedShowMonths = computed(() =>
 	Number.isFinite(props.showMonths) ? Math.max(1, Math.floor(props.showMonths)) : 1,
 )
 
-const inputClasses = computed(() => [
-	props.calendarOnly
-		? 'sr-only pointer-events-none absolute h-0 w-0 opacity-0'
-		: 'w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow !outline-0',
-	!props.calendarOnly && props.showIcon ? 'pl-10' : '',
-	!props.calendarOnly && !props.showIcon ? 'pl-3' : '',
-	!props.calendarOnly
-		? 'pr-3 h-9 py-2 text-base outline-none bg-surface-4 border-none rounded-xl'
-		: '',
-	props.disabled && !props.calendarOnly ? 'cursor-not-allowed' : '',
-	props.inputClass,
-])
-
 const selectedDates = computed(() => {
 	const value = model.value
 	if (Array.isArray(value)) {
@@ -965,6 +961,28 @@ const selectedDates = computed(() => {
 
 	return value ? [value] : []
 })
+
+const hasClearButton = computed(
+	() =>
+		!props.calendarOnly &&
+		props.clearable &&
+		!props.disabled &&
+		!props.readonly &&
+		selectedDates.value.length > 0,
+)
+
+const inputClasses = computed(() => [
+	props.calendarOnly
+		? 'sr-only pointer-events-none absolute h-0 w-0 opacity-0'
+		: 'w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow !outline-0',
+	!props.calendarOnly && props.showIcon ? 'pl-10' : '',
+	!props.calendarOnly && !props.showIcon ? 'pl-3' : '',
+	!props.calendarOnly
+		? `${hasClearButton.value ? 'pr-10' : 'pr-3'} h-9 py-2 text-base outline-none bg-surface-4 border-none rounded-xl`
+		: '',
+	props.disabled && !props.calendarOnly ? 'cursor-not-allowed' : '',
+	props.inputClass,
+])
 
 watch(
 	() => [
@@ -1273,19 +1291,21 @@ function syncAltInputState() {
 	picker.value.altInput.readOnly = props.readonly
 }
 
+function clearValue() {
+	const nextValue = props.mode === 'single' ? null : []
+	model.value = nextValue
+	picker.value?.clear(false)
+	setRangeEndpointMoveState(null)
+	syncMissingRangeEndState()
+	emit('clear')
+	emit('change', nextValue)
+}
+
 defineExpose({
 	focus: () => picker.value?.altInput?.focus() ?? inputRef.value?.focus(),
 	open: () => picker.value?.open(),
 	close: () => picker.value?.close(),
-	clear: () => {
-		const nextValue = props.mode === 'single' ? null : []
-		model.value = nextValue
-		picker.value?.clear(false)
-		setRangeEndpointMoveState(null)
-		syncMissingRangeEndState()
-		emit('clear')
-		emit('change', nextValue)
-	},
+	clear: clearValue,
 })
 </script>
 
@@ -1625,7 +1645,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-time) {
-	@apply mt-2 flex h-11 max-h-none items-center  gap-2 border-0 border-t border-solid border-surface-5 px-1 pt-2 leading-none;
+	@apply mt-2 flex h-11 max-h-none items-center  gap-2 border-0 border-t border-solid border-surface-5 px-1 pt-2 overflow-visible leading-none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .numInputWrapper) {
